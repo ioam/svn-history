@@ -54,17 +54,14 @@ def get_input_params(log_file):
 
 # CEBALERT: this kind of function probably exists somewhere already.
 
-def get_matrix(matrix_file,side_length,center=None):
+def get_matrix(matrix_file):
     """
     Returns an array containing the data in the specified C++ LISSOM .matrix
-    file. The dimensions of the array must match those specified in
-    dim=(rows,cols)  (to ensure that the matrix is the size you expect).
+    file. 
 
     Ignores lines that start with a hash (#).
     """
     f = open(matrix_file)
-
-    n_rows_read = 0
 
     matrix = []
     
@@ -73,14 +70,12 @@ def get_matrix(matrix_file,side_length,center=None):
         
         if not line.startswith('#'):
             values = line.split()
-            assert len(values)==side_length, "Number of cols doesn't match expected value."
             for v in values:
                 row.append(float(v))
-            n_rows_read+=1
             matrix.append(row)
-
-    assert n_rows_read==side_length, "Number of rows doesn't match expected value."
-
+            
+    # maybe should be setting a typecode of 'f', or maybe they should
+    # actually be FixedPoint numbers...
     return array(matrix)
 
 
@@ -111,7 +106,7 @@ def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
         
 
 
-def check_weights(sheet_name,proj_name,unit,c_row_slice,c_col_slice,side):
+def check_weights(sheet_name,proj_name,unit,c_row_slice,c_col_slice):
     """
     Print the smallest number of decimal places to which all
     corresponding elements of the C++ lissom and Topographica weights
@@ -130,14 +125,14 @@ def check_weights(sheet_name,proj_name,unit,c_row_slice,c_col_slice,side):
     comparing_what = proj_name + " " + str(unit) + " t=" + str(topo.sim.time()) 
 
     topo_weights = topo.sim[sheet_name].projections()[proj_name].cf(*unit).weights
-    c_weights = get_matrix(c_matrix_filename,side)[c_row_slice,c_col_slice]
+    c_weights = get_matrix(c_matrix_filename)[c_row_slice,c_col_slice]
 
     match_dp = compare_elements(topo_weights,c_weights)
     print comparing_what+" matched to "+`match_dp`+" d.p."
     # could return comparing_what & dp if that information is to be used for something else
 
 
-def check_activities(sheet_name,side):
+def check_activities(sheet_name):
     """
     Print the smallest number of decimal places to which all
     corresponding elements of the C++ lissom and Topographica
@@ -152,7 +147,7 @@ def check_activities(sheet_name,side):
     comparing_what = sheet_name + " activity t=" + str(topo.sim.time()) 
 
     topo_act = topo.sim[sheet_name].activity
-    c_act = get_matrix(c_matrix_filename,side)
+    c_act = get_matrix(c_matrix_filename)
 
     match_dp = compare_elements(topo_act,c_act)
     print comparing_what+" matched to "+`match_dp`+" d.p."
