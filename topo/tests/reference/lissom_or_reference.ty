@@ -61,7 +61,10 @@ from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 import topo.patterns.basic
 
-from topo.tests.reference.lissom_log_parser import get_input_params,compare_weights,compare_activities
+from topo.tests.reference.lissom_log_parser import get_input_params,check_weights,check_activities
+
+#
+filename_base="topo/tests/reference/or_map_topo."
 
 
 ### Variables to match or_map_topo.param
@@ -121,7 +124,7 @@ gaussian_height = ysigma/BaseRN/sqrt(2.0)
 # get input pattern position parameters from the log file output of
 # the equivalent c++ simulation
 n_inputs,input_x,input_y,input_orientation = get_input_params(
-    log_file="topo/tests/reference/or_map_topo.log")
+    log_file=filename_base+"log")
 
 # c++ lissom's first iteration is just a test, so we lose it
 n_inputs-=1;input_x.next();input_y.next();input_orientation.next() 
@@ -236,35 +239,13 @@ topo.sim.schedule_command(19999, 'topo.sim["Primary"].output_fn.lower_bound=delt
 # CEBHACKALERT: I'm still writing this file as I work on the comparisons
 
 
-def check_weights(sheet_name,name,unit,r_slice,c_slice,side):
-    """
-    """
-    cTIME = "%06d"%long(topo.sim.time())
-    cREGION = sheet_name
-    cNAME = name
-    cUNIT = "%03d_%03d"%unit
-    
-    compare_weights(
-        'topo/tests/reference/or_map_topo.'+cTIME+'.wts.'+cREGION+'.'+cNAME+'.'+cUNIT+'.matrix',
-        c_slice,r_slice,side,
-        unit,sheet_name,name)
-
-
-def check_activities(sheet_name,side):
-    """
-    """
-    cTIME = "%06d"%long(topo.sim.time())
-    cREGION = sheet_name
-
-    compare_activities(
-        'topo/tests/reference/or_map_topo.'+cTIME+'p000.'+cREGION+'_Activity.matrix',side,sheet_name)
-
 
 if locals().get('comparisons',False):
 
     # whether or not those functions should plot if there's a difference
     topo.tests.reference.lissom_log_parser.plots = locals().get('plots',False)
 
+    topo.tests.reference.lissom_log_parser.filename_base=filename_base
 
     ## C++ lissom doesn't situate weights in matrix files, so slices etc have to be given
     ## Calculate here?

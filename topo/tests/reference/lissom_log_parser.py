@@ -3,7 +3,6 @@ import topo
 
 from Numeric import ones,zeros,where,ravel,sum,array
 
-from topo.commands.pylabplots import matrixplot
 
 
 
@@ -129,3 +128,28 @@ def compare_activities(c_matrix_filename,c_sheet_side,sheet):
     # comparing_what & dp if that information is to be used for something else
 
 
+# comparing_what & dp if that information is to be used for something else
+
+filename_base = ""
+def check_weights(sheet_name,name,unit,r_slice,c_slice,side):
+    """
+    """
+    cTIME = "%06d"%long(topo.sim.time())
+    cREGION = sheet_name
+    cNAME = name
+    cUNIT = "%03d_%03d"%unit
+    
+    compare_weights(
+        filename_base+cTIME+'.wts.'+cREGION+'.'+cNAME+'.'+cUNIT+'.matrix',
+        c_slice,r_slice,side,
+        unit,sheet_name,name)
+
+
+def check_activities(sheet_name,side):
+    """
+    """
+    cTIME = "%06d"%long(topo.sim.time())
+    cREGION = sheet_name
+
+    compare_activities(
+        filename_base+cTIME+'p000.'+cREGION+'_Activity.matrix',side,sheet_name)
