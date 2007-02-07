@@ -106,21 +106,6 @@ def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
         
 
 
-def compare_activities(c_matrix_filename,c_sheet_side,sheet):
-
-    comparing_what = sheet + " activity, t=" + str(topo.sim.time()) 
-
-    topo_act = topo.sim[sheet].activity
-    c_act = get_matrix(c_matrix_filename,c_sheet_side)
-
-    match_dp = compare_elements(topo_act,c_act)
-    print comparing_what+" matched to "+`match_dp`+" d.p."
-    # comparing_what & dp if that information is to be used for something else
-
-
-# comparing_what & dp if that information is to be used for something else
-
-
 def check_weights(sheet_name,proj_name,unit,c_row_slice,c_col_slice,side):
     """
     - slices (not nec. square, lissom doesn't situate)
@@ -139,9 +124,7 @@ def check_weights(sheet_name,proj_name,unit,c_row_slice,c_col_slice,side):
 
     match_dp = compare_elements(topo_weights,c_weights)
     print comparing_what+" matched to "+`match_dp`+" d.p."
-    # comparing_what & dp if that information is to be used for something else
-
-
+    # could return comparing_what & dp if that information is to be used for something else
 
 
 def check_activities(sheet_name,side):
@@ -150,5 +133,14 @@ def check_activities(sheet_name,side):
     cTIME = "%06d"%long(topo.sim.time())
     cREGION = sheet_name
 
-    compare_activities(
-        filename_base+cTIME+'p000.'+cREGION+'_Activity.matrix',side,sheet_name)
+    c_matrix_filename=filename_base+cTIME+'p000.'+cREGION+'_Activity.matrix'
+
+    
+    comparing_what = sheet_name + " activity t=" + str(topo.sim.time()) 
+
+    topo_act = topo.sim[sheet_name].activity
+    c_act = get_matrix(c_matrix_filename,side)
+
+    match_dp = compare_elements(topo_act,c_act)
+    print comparing_what+" matched to "+`match_dp`+" d.p."
+    # could return comparing_what & dp if that information is to be used for something else
