@@ -108,8 +108,8 @@ that are e.g. being selected.
 </li>
 
 <li>
-2007/02/06 (CB): clean up lissom_or_reference, lissom_oo_or_reference, and associated
-testing files. 
+2007/02/07 (CB): update lissom_oo_or_reference; change topo/tests/test_lissom_oo_or.py
+so it can be used to compare the results from any simulation before and after a change. 
 </li>
 
 </ul>
@@ -192,8 +192,7 @@ The xml is still complex, but better than looking at a pickle.
 </li>
 
 <li>
-2007/02/06 (CB): The apply/ok/cancel/reset etc buttons on ParametersFrame;
-which to have for object, which for class, and what order.
+2007/02/06 (CB): update lissom_oo_or_reference, retina_lgn_match; document reference stuff.
 </li>
 
 <li>
