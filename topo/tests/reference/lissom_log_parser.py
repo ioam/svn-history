@@ -49,8 +49,7 @@ def get_input_params(log_file='or_map_topo.log'):
 
 
 
-# CEBHACKALERT: this kind of function probably exists somewhere
-# already.
+# CEBALERT: this kind of function probably exists somewhere already.
 
 def get_matrix(matrix_file,side_length,center=None):
     """
@@ -85,15 +84,14 @@ def get_matrix(matrix_file,side_length,center=None):
 
 def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
     """
-    Return the smallest number of decimal places to which all corresponding elements of the two arrays match.
+    Return the smallest number of decimal places to which all
+    corresponding elements of the two arrays match.
 
     max_dp specifies the greatest number of decimal places to try.
 
-    Returns -1 if they don't match to at least 1 decimal place. (CB: Because I don't want to
-    fix the functions in topo.tests.utils - they probably exist in numpy.)
+    Returns -1 if they don't match to at least 1 decimal place.
     """
-    assert topo_matrix.shape == lissom_matrix.shape, "topographica and c++ matrices are different shapes; did you take the right slice of the c++ matrix?"
-
+    assert topo_matrix.shape == lissom_matrix.shape, "topographica and c++ matrices are different shapes"
     match_at=-1
     
     for dp in range(1,max_dp+1)[::-1]:
@@ -106,20 +104,6 @@ def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
         
     return match_at
         
-
-def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_side,unit,sheet,conn):
-    """
-
-    - slices (not nec. square, lissom doesn't situate)
-    """
-    comparing_what = conn + " " + str(unit) + " t=" + str(topo.sim.time()) 
-
-    topo_weights = topo.sim[sheet].projections()[conn].cf(*unit).weights
-    c_weights = get_matrix(c_matrix_filename,c_sheet_side)[c_row_slice,c_col_slice] # c++ lissom doesn't situate weights  
-
-    match_dp = compare_elements(topo_weights,c_weights)
-    print comparing_what+" matched to "+`match_dp`+" d.p."
-    # comparing_what & dp if that information is to be used for something else
 
 
 def compare_activities(c_matrix_filename,c_sheet_side,sheet):
@@ -137,18 +121,27 @@ def compare_activities(c_matrix_filename,c_sheet_side,sheet):
 # comparing_what & dp if that information is to be used for something else
 
 
-def check_weights(sheet_name,name,unit,r_slice,c_slice,side):
+def check_weights(sheet_name,proj_name,unit,c_row_slice,c_col_slice,side):
     """
+    - slices (not nec. square, lissom doesn't situate)
     """
     cTIME = "%06d"%long(topo.sim.time())
     cREGION = sheet_name
-    cNAME = name
+    cCONN = proj_name
     cUNIT = "%03d_%03d"%unit
     
-    compare_weights(
-        filename_base+cTIME+'.wts.'+cREGION+'.'+cNAME+'.'+cUNIT+'.matrix',
-        c_slice,r_slice,side,
-        unit,sheet_name,name)
+    c_matrix_filename=filename_base+cTIME+'.wts.'+cREGION+'.'+cCONN+'.'+cUNIT+'.matrix'
+
+    comparing_what = proj_name + " " + str(unit) + " t=" + str(topo.sim.time()) 
+
+    topo_weights = topo.sim[sheet_name].projections()[proj_name].cf(*unit).weights
+    c_weights = get_matrix(c_matrix_filename,side)[c_row_slice,c_col_slice] # c++ lissom doesn't situate weights  
+
+    match_dp = compare_elements(topo_weights,c_weights)
+    print comparing_what+" matched to "+`match_dp`+" d.p."
+    # comparing_what & dp if that information is to be used for something else
+
+
 
 
 def check_activities(sheet_name,side):
