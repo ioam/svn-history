@@ -123,8 +123,7 @@ gaussian_height = ysigma/BaseRN/sqrt(2.0)
 
 # get input pattern position parameters from the log file output of
 # the equivalent c++ simulation
-n_inputs,input_x,input_y,input_orientation = get_input_params(
-    log_file=filename_base+"log")
+n_inputs,input_x,input_y,input_orientation = get_input_params(filename_base+'log')
 
 # c++ lissom's first iteration is just a test, so we lose it
 n_inputs-=1;input_x.next();input_y.next();input_orientation.next() 
