@@ -1,9 +1,18 @@
-# CEBHACKALERT: filename should change...
-import topo
+"""
+
+
+$Id$
+"""
+__version__='$Revision$'
+
+# CEBHACKALERT: filename should change
 
 from Numeric import ones,zeros,where,ravel,sum,array
+import topo
+from topo.tests.utils import array_almost_equal
 
-
+# 
+filename_base = ""
 
 
 def get_input_params(log_file='or_map_topo.log'):
@@ -41,7 +50,7 @@ def get_input_params(log_file='or_map_topo.log'):
 
 
 # CEBHACKALERT: this kind of function probably exists somewhere
-# already. In any case, needs to print out meaningful errors.
+# already.
 
 def get_matrix(matrix_file,side_length,center=None):
     """
@@ -73,9 +82,6 @@ def get_matrix(matrix_file,side_length,center=None):
     return array(matrix)
 
 
-# CB: simplify these three functions when it's clear what is useful to know.
-
-from topo.tests.utils import array_almost_equal
 
 def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
     """
@@ -130,7 +136,7 @@ def compare_activities(c_matrix_filename,c_sheet_side,sheet):
 
 # comparing_what & dp if that information is to be used for something else
 
-filename_base = ""
+
 def check_weights(sheet_name,name,unit,r_slice,c_slice,side):
     """
     """
