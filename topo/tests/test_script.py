@@ -7,6 +7,9 @@ stored in x_DATA, where x is the path of the script.
 You can run the test like this:
   ./topographica -c 'from topo.tests.test_script import TestScript; TestScript(x)'
 
+You can specify which sheet to look at, its density, and the number of iterations.
+
+
 You can generate a new data file like this:
   ./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(x)'
 
@@ -43,7 +46,7 @@ def GenerateData(script="examples/lissom_oo_or.ty",look_at='V1',density=4,run_fo
 
     for time in run_for:
         topo.sim.run(time)
-        data[`topo.sim.time()`] = copy.deepcopy(topo.sim[look_at].activity)
+        data[topo.sim.time()] = copy.deepcopy(topo.sim[look_at].activity)
         
     data['run_for']=run_for
     data['density']=density
@@ -62,7 +65,7 @@ def TestScript(script="examples/lissom_oo_or.ty"):
         data_filename = script+'_DATA'
         data = pickle.load(open(data_filename,"r"))
     except IOError:
-        print "Data file '"+data_filename+"' could not be opened; run GenerateData() to create a data file before making changes to the script you wish to check."
+        print "\nData file '"+data_filename+"' could not be opened; run GenerateData() to create a data file before making changes to the script you wish to check."
         raise
 
     # retrieve parameters used when script was run
@@ -75,8 +78,9 @@ def TestScript(script="examples/lissom_oo_or.ty"):
 
     for time in run_for:
         topo.sim.run(time)
-        assert_array_equal(data[`topo.sim.time()`],topo.sim[look_at].activity)
+        assert_array_equal(data[topo.sim.time()],topo.sim[look_at].activity,
+                           err_msg="\nAt topo.sim.time()=%d"%topo.sim.time())
 
-    print "Results from " + script + " have not changed."
+    print "\nResults from " + script + " have not changed."
 
 
