@@ -235,10 +235,6 @@ topo.sim.schedule_command(19999, 'topo.sim["Primary"].output_fn.lower_bound=delt
 
 
 
-# CEBHACKALERT: I'm still writing this file as I work on the comparisons
-
-
-
 if locals().get('comparisons',False):
 
     ## C++ lissom doesn't situate weights in matrix files, so slices etc have to be given
