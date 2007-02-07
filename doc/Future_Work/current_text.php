@@ -193,10 +193,6 @@ The xml is still complex, but better than looking at a pickle.
 </li>
 
 <li>
-2007/02/06 (CB): update lissom_oo_or_reference, retina_lgn_match; document reference stuff.
-</li>
-
-<li>
 2007/02/06 (CB): Remove -Wl from LDFLAGS and test that builds ok on os x (keep rpath).
 </li>
 
