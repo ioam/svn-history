@@ -25,7 +25,7 @@ import Numeric
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
-from Numeric import sum,ones,exp
+from Numeric import sum,ones,exp,array
 
 import topo.patterns.random
 import topo.patterns.basic
@@ -49,6 +49,49 @@ from topo.commands.basic import pattern_present
 
 
 topo.sim.name = "sullivan_nn06.ty"
+
+
+# JABALERT: Needs a better name.  Completely untested.  Should this be a SharedWeightCFProjection?
+# If so, derive from LISSOM and set tsettle to 1
+class Hacked_CFSOM(CFSOM):
+    """
+    Modified CFSOM that convolves the input projection's output with a
+    set of lateral weights (a DoG by default) to produce the final
+    activity values.
+    """
+    
+    neighborhood_kernel_generator = PatternGeneratorParameter(
+        default=topo.patterns.basic.Composite(
+        generators=[topo.patterns.basic.Gaussian(size=0.25, aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()),
+                    topo.patterns.basic.Gaussian(size=0.50, aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())],
+        operator=Wrapper("Numeric.subtract")),
+        doc="Function to set up the lateral weight patterns")
+
+    def __init__(self,**params):
+        super(Hacked_CFSOM,self).__init__(**params)
+
+        neighborhoods=array(activity.shape)
+        rows,cols = activity.shape
+        bb = BoundingBox(points=((0,0), (rows,cols))) # Check if bb is upper exclusive
+        for wr in enumerate(rows):
+            for wc in enumerate(cols):
+                neighborhoods[wr,wc]=self.neighborhood_kernel_generator(bounds=bb,xdensity=1,ydensity=1,x=wc,y=wr)
+
+
+    def activate(self):
+        # Only supports one input projection
+        assert(len(self.in_connections)==1)
+        
+        # Apply lateral weights to the proj.activity
+        self.activity *= 0.0
+        self.activity += matrixmultiply(neighborhoods,proj.activity)
+        
+        if self.apply_output_fn:
+            self.output_fn(self.activity)
+
+        self.send_output(src_port='Activity',data=self.activity)
+
+
 
 
 #weight initialization, response 
@@ -75,7 +118,7 @@ topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
 
 # Note that the learning rates from the original paper must be scaled
 # by the number of units in a typical ConnectionField, i.e. 150 in this case
-topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',15),
+topo.sim['V1'] = Hacked_CFSOM(nominal_density=locals().get('default_density',15),
                        radius_0=0.1,alpha_0=0.00083*150,learning_length=150000,
                        nominal_bounds=BoundingBox(points=((-0.5,-0.5/15.0),(0.5,0.5/15.0))),
                        output_fn=PiecewiseLinear_debug2())
