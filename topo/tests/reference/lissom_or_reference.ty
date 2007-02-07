@@ -242,9 +242,7 @@ topo.sim.schedule_command(19999, 'topo.sim["Primary"].output_fn.lower_bound=delt
 
 if locals().get('comparisons',False):
 
-    # whether or not those functions should plot if there's a difference
-    topo.tests.reference.lissom_log_parser.plots = locals().get('plots',False)
-
+    # 
     topo.tests.reference.lissom_log_parser.filename_base=filename_base
 
     ## C++ lissom doesn't situate weights in matrix files, so slices etc have to be given
