@@ -145,48 +145,48 @@ CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
 
-topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
+topo.sim['Eye0'] = GeneratorSheet(input_generator=input_pattern,
                                     nominal_bounds=input_bounds,
                                     nominal_density=BaseRN*area_scale,
                                     period=1,
                                     phase=0.05)
 
-topo.sim['V1'] = LISSOM(output_fn = PiecewiseLinear(lower_bound=delta_i,upper_bound=beta_i),
+topo.sim['Primary'] = LISSOM(output_fn = PiecewiseLinear(lower_bound=delta_i,upper_bound=beta_i),
                         nominal_density = BaseN,
                         tsettle=tsettle)
 
-topo.sim.connect('Retina','V1', delay = fixedpoint.FixedPoint("0.05"),
+topo.sim.connect('Eye0','Primary', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength = 1.0, name='Afferent0',
           nominal_bounds_template=BoundingBox(radius=rf_radius/BaseRN))
 
-topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"),
+topo.sim.connect('Primary','Primary', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength=gammaexc,
           name='LateralExcitatory',
           nominal_bounds_template=BoundingBox(radius=exc_rad/BaseN))
 
-topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"),
+topo.sim.connect('Primary','Primary', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength=-gammainh,
           name='LateralInhibitory',
           nominal_bounds_template=BoundingBox(radius=inh_rad/BaseN) )
 
 
 
-center_unit=(int(BaseN/2),int(BaseN/2))
+
 def n_units(x):
     """
-    Topographica learning rate is density-independent so to compare
-    with C++ lissom it's necessary to know the number of units.
-    (Same method as in cf.py.)
+    Same technique as in cf.py for counting the number of units.
     """
+    center_unit=(int(BaseN/2),int(BaseN/2))
     return len(Numeric.nonzero(Numeric.ravel(x.cf(*center_unit).mask)))
 
 
 # shortcuts to save on typing...
-Af = topo.sim['V1'].projections()["Afferent0"]
-LE = topo.sim['V1'].projections()["LateralExcitatory"]
-LI = topo.sim['V1'].projections()["LateralInhibitory"]
+Af = topo.sim['Primary'].projections()["Afferent0"]
+LE = topo.sim['Primary'].projections()["LateralExcitatory"]
+LI = topo.sim['Primary'].projections()["LateralInhibitory"]
 
 
+# Topographica learning rate is independent of density
 Af.learning_rate=alpha_input*n_units(Af)
 LE.learning_rate=alpha_exc*n_units(LE)
 LI.learning_rate=alpha_inh*n_units(LI)
@@ -219,25 +219,18 @@ topo.sim.schedule_command(19999,'alpha_input=0.0015*acs; Af.learning_rate=alpha_
 
 ### delta/beta changes
 #
-topo.sim.schedule_command(  199, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.01; topo.sim["V1"].output_fn.upper_bound=beta_i+0.01')
-topo.sim.schedule_command(  499, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.02; topo.sim["V1"].output_fn.upper_bound=beta_i+0.02')
-topo.sim.schedule_command(  999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.05; topo.sim["V1"].output_fn.upper_bound=beta_i+0.03')
-topo.sim.schedule_command( 1999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.08; topo.sim["V1"].output_fn.upper_bound=beta_i+0.05')
-topo.sim.schedule_command( 2999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.10; topo.sim["V1"].output_fn.upper_bound=beta_i+0.08')
-topo.sim.schedule_command( 3999,                                                    'topo.sim["V1"].output_fn.upper_bound=beta_i+0.11')
-topo.sim.schedule_command( 4999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.11; topo.sim["V1"].output_fn.upper_bound=beta_i+0.14')
-topo.sim.schedule_command( 6499, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.12; topo.sim["V1"].output_fn.upper_bound=beta_i+0.17')
-topo.sim.schedule_command( 7999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.13; topo.sim["V1"].output_fn.upper_bound=beta_i+0.20')
-topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.14; topo.sim["V1"].output_fn.upper_bound=beta_i+0.23')
+topo.sim.schedule_command(  199, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.01; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.01')
+topo.sim.schedule_command(  499, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.02; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.02')
+topo.sim.schedule_command(  999, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.05; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.03')
+topo.sim.schedule_command( 1999, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.08; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.05')
+topo.sim.schedule_command( 2999, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.10; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.08')
+topo.sim.schedule_command( 3999,                                                    'topo.sim["Primary"].output_fn.upper_bound=beta_i+0.11')
+topo.sim.schedule_command( 4999, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.11; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.14')
+topo.sim.schedule_command( 6499, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.12; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.17')
+topo.sim.schedule_command( 7999, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.13; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.20')
+topo.sim.schedule_command(19999, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.14; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.23')
 
 
-
-
-
-
-# might be better to rename the topographica ones
-c_regions = {'V1':'Primary','Retina':'Eye0'}
-c_names = {'Afferent0':'Afferent0','LateralExcitatory':'LateralExcitatory','LateralInhibitory':'LateralInhibitory'}
 
 
 # CEBHACKALERT: I'm still writing this file as I work on the comparisons
@@ -247,8 +240,8 @@ def check_weights(sheet_name,name,unit,r_slice,c_slice,side):
     """
     """
     cTIME = "%06d"%long(topo.sim.time())
-    cREGION = c_regions[sheet_name]
-    cNAME = c_names[name]
+    cREGION = sheet_name
+    cNAME = name
     cUNIT = "%03d_%03d"%unit
     
     matching.update(compare_weights(
@@ -261,7 +254,7 @@ def check_activities(sheet_name,side):
     """
     """
     cTIME = "%06d"%long(topo.sim.time())
-    cREGION = c_regions[sheet_name]
+    cREGION = sheet_name
 
     matching.update(compare_activities(
         'topo/tests/reference/or_map_topo.'+cTIME+'p000.'+cREGION+'_Activity.matrix',side,sheet_name))
@@ -282,255 +275,255 @@ if locals().get('comparisons',False):
 
     ### Initial weights
     #
-    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
-    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
+    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
 
 
-    ### Check initial patterns are ok on the retina (and V1)
+    ### Check initial patterns are ok on the retina (and Primary)
     #
     topo.sim.run(1)
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
     topo.sim.run(1)
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
     
     topo.sim.run(1)
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
     
     topo.sim.run(1)
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
     
     topo.sim.run(1)
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
     
     topo.sim.run(5)
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
     
     topo.sim.run(10)
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
 
 
     topo.sim.run(80)
     print "100"
 
-    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
-    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
+    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
 
     topo.sim.run(900)
     print "1000"
 
-    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
-    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
+    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
 
     topo.sim.run(1000)
     print "2000"
 
-    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
-    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
+    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
 
     topo.sim.run(1000)
     print "3000"
 
-    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
-    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
+    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
 
     topo.sim.run(1000)
     print "4000"
 
-    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
-    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
+    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
 
     topo.sim.run(1000)
     print "5000"
 
-    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
-    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
+    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
 
     topo.sim.run(1000)
     print "6000"
 
-    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
-    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
+    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
 
     topo.sim.run(1000)
     print "7000"
 
-    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
-    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
+    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
 
     topo.sim.run(1000)
     print "8000"
 
-    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
-    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
+    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
 
     topo.sim.run(1000)
     print "9000"
 
-    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
-    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
+    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
 
     topo.sim.run(3000)
     print "12000"
 
-    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
-    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
+    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
 
     topo.sim.run(3000)
     print "15000"
 
-    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
-    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
+    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
 
     topo.sim.run(5000)
     print "20000"
 
-    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
-    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
+    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    check_activities('Retina',RN)
-    check_activities('V1',BaseN)
+    check_activities('Eye0',RN)
+    check_activities('Primary',BaseN)
 
 
 
@@ -572,19 +565,19 @@ if locals().get('comparisons',False):
 
     ### display results for activities
     times=[1,2,3,4,5,10,20,100,1000,2000,3000,4000,5000,6000,7000,8000,9000,12000,15000,20000]
-    r_act = []
-    v_act = []
+    e_act = []
+    p_act = []
     for t in times:
-        r_act.append(matching['Retina activity, t='+`t`+'.0000'])
-        v_act.append(matching['V1 activity, t='+`t`+'.0000'])
+        e_act.append(matching['Eye0 activity, t='+`t`+'.0000'])
+        p_act.append(matching['Primary activity, t='+`t`+'.0000'])
 
 
     print "\n"
     print "** Activities **"
     
     print "times",times
-    print "ret act",r_act
-    print "v1 act",v_act
+    print "ret act",e_act
+    print "v1 act",p_act
     
 
         
