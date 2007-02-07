@@ -244,10 +244,10 @@ def check_weights(sheet_name,name,unit,r_slice,c_slice,side):
     cNAME = name
     cUNIT = "%03d_%03d"%unit
     
-    matching.update(compare_weights(
+    compare_weights(
         'topo/tests/reference/or_map_topo.'+cTIME+'.wts.'+cREGION+'.'+cNAME+'.'+cUNIT+'.matrix',
         c_slice,r_slice,side,
-        unit,sheet_name,name))
+        unit,sheet_name,name)
 
 
 def check_activities(sheet_name,side):
@@ -256,12 +256,9 @@ def check_activities(sheet_name,side):
     cTIME = "%06d"%long(topo.sim.time())
     cREGION = sheet_name
 
-    matching.update(compare_activities(
-        'topo/tests/reference/or_map_topo.'+cTIME+'p000.'+cREGION+'_Activity.matrix',side,sheet_name))
+    compare_activities(
+        'topo/tests/reference/or_map_topo.'+cTIME+'p000.'+cREGION+'_Activity.matrix',side,sheet_name)
 
-
-
-matching = {}
 
 if locals().get('comparisons',False):
 
@@ -273,7 +270,7 @@ if locals().get('comparisons',False):
     ## Calculate here?
 
 
-    ### Initial weights
+    ### Check initial weights
     #
     check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
@@ -286,7 +283,7 @@ if locals().get('comparisons',False):
 
 
 
-    ### Check initial patterns are ok on the retina (and Primary)
+    ### Check initial patterns are ok on Eye0 and Primary
     #
     topo.sim.run(1)
     check_activities('Eye0',RN)
@@ -319,7 +316,6 @@ if locals().get('comparisons',False):
 
 
     topo.sim.run(80)
-    print "100"
 
     check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
@@ -335,7 +331,6 @@ if locals().get('comparisons',False):
 
 
     topo.sim.run(900)
-    print "1000"
 
     check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
@@ -351,7 +346,6 @@ if locals().get('comparisons',False):
 
 
     topo.sim.run(1000)
-    print "2000"
 
     check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
@@ -367,7 +361,6 @@ if locals().get('comparisons',False):
 
 
     topo.sim.run(1000)
-    print "3000"
 
     check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
@@ -383,7 +376,6 @@ if locals().get('comparisons',False):
 
 
     topo.sim.run(1000)
-    print "4000"
 
     check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
@@ -399,7 +391,6 @@ if locals().get('comparisons',False):
 
 
     topo.sim.run(1000)
-    print "5000"
 
     check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
@@ -415,7 +406,6 @@ if locals().get('comparisons',False):
 
 
     topo.sim.run(1000)
-    print "6000"
 
     check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
@@ -431,7 +421,6 @@ if locals().get('comparisons',False):
 
 
     topo.sim.run(1000)
-    print "7000"
 
     check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
@@ -447,7 +436,6 @@ if locals().get('comparisons',False):
 
 
     topo.sim.run(1000)
-    print "8000"
 
     check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
@@ -463,7 +451,6 @@ if locals().get('comparisons',False):
 
 
     topo.sim.run(1000)
-    print "9000"
 
     check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
@@ -479,7 +466,6 @@ if locals().get('comparisons',False):
 
 
     topo.sim.run(3000)
-    print "12000"
 
     check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
@@ -495,7 +481,6 @@ if locals().get('comparisons',False):
 
 
     topo.sim.run(3000)
-    print "15000"
 
     check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
@@ -511,7 +496,6 @@ if locals().get('comparisons',False):
 
 
     topo.sim.run(5000)
-    print "20000"
 
     check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
@@ -524,72 +508,6 @@ if locals().get('comparisons',False):
 
     check_activities('Eye0',RN)
     check_activities('Primary',BaseN)
-
-
-
-
-    ### display results for weights
-    times = [0,100,1000,2000,3000,4000,5000,6000,7000,8000,9000,12000,15000,20000]
-
-    Af = []
-    LE = []
-    LI = []
-
-    for t in times:
-        Af.append(matching['Afferent0 (12, 12) t='+str(t)+'.0000'])
-        LE.append(matching['LateralExcitatory (12, 12) t='+str(t)+'.0000'])
-        LI.append(matching['LateralInhibitory (12, 12) t='+str(t)+'.0000'])
-
-    print "** Weights **"
-
-    print "times:", times
-    print "Af 12 12:", Af
-    print "LE 12 12:", LE
-    print "LI 12 12:", LI
-
-
-    Af = []
-    LE = []
-    LI = []
-
-    for t in times:
-        Af.append(matching['Afferent0 (0, 0) t='+str(t)+'.0000'])
-        LE.append(matching['LateralExcitatory (0, 0) t='+str(t)+'.0000'])
-        LI.append(matching['LateralInhibitory (0, 0) t='+str(t)+'.0000'])
-        
-    print "Af 0 0:", Af
-    print "LE 0 0:", LE
-    print "LI 0 0:", LI
-
-
-
-    ### display results for activities
-    times=[1,2,3,4,5,10,20,100,1000,2000,3000,4000,5000,6000,7000,8000,9000,12000,15000,20000]
-    e_act = []
-    p_act = []
-    for t in times:
-        e_act.append(matching['Eye0 activity, t='+`t`+'.0000'])
-        p_act.append(matching['Primary activity, t='+`t`+'.0000'])
-
-
-    print "\n"
-    print "** Activities **"
-    
-    print "times",times
-    print "ret act",e_act
-    print "v1 act",p_act
-    
-
-        
-    #import pylab
-    #pylab.grid(True)
-    #pylab.show._needmain=False    
-    #pylab.scatter(times,Af,marker='o')
-    #pylab.scatter(times,LE,marker='^')
-    #pylab.scatter(times,LI,marker='v')
-    #pylab.show()
-
-
 
 
 

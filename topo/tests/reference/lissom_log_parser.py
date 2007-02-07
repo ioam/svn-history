@@ -103,15 +103,18 @@ def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
         
 
 def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_side,unit,sheet,conn):
+    """
 
+    - slices (not nec. square, lissom doesn't situate)
+    """
     comparing_what = conn + " " + str(unit) + " t=" + str(topo.sim.time()) 
 
     topo_weights = topo.sim[sheet].projections()[conn].cf(*unit).weights
     c_weights = get_matrix(c_matrix_filename,c_sheet_side)[c_row_slice,c_col_slice] # c++ lissom doesn't situate weights  
 
-    zed = compare_elements(topo_weights,c_weights)
-
-    return {comparing_what:zed}
+    match_dp = compare_elements(topo_weights,c_weights)
+    print comparing_what+" matched to "+`match_dp`+" d.p."
+    # comparing_what & dp if that information is to be used for something else
 
 
 def compare_activities(c_matrix_filename,c_sheet_side,sheet):
@@ -121,8 +124,8 @@ def compare_activities(c_matrix_filename,c_sheet_side,sheet):
     topo_act = topo.sim[sheet].activity
     c_act = get_matrix(c_matrix_filename,c_sheet_side)
 
-    zed = compare_elements(topo_act,c_act)
-
-    return {comparing_what:zed}
+    match_dp = compare_elements(topo_act,c_act)
+    print comparing_what+" matched to "+`match_dp`+" d.p."
+    # comparing_what & dp if that information is to be used for something else
 
 
