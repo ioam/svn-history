@@ -108,10 +108,9 @@ that are e.g. being selected.
 </li>
 
 <li>
-2007/02/07 (CB): check numpy vs numeric for lissom_or_reference with
-density=36; update lissom_oo_or_reference; change
-topo/tests/test_lissom_oo_or.py so it can be used to compare the
-results from any simulation before and after a change.
+2007/02/07 (CB): change topo/tests/test_lissom_oo_or.py so it can be
+used to compare the results from any simulation before and after a
+change.
 </li>
 
 </ul>
