@@ -2,6 +2,9 @@
 Functions for getting C++ LISSOM data and comparing them
 with Topographica's.
 
+Before using these functions, you should set filename_base to
+give the base filename path of the C++ LISSOM files, e.g.
+'topo/tests/reference/or_map_topo.'
 
 $Id$
 """
@@ -13,12 +16,10 @@ from Numeric import ones,zeros,where,ravel,sum,array
 import topo
 from topo.tests.utils import array_almost_equal
 
-# The base part of the C++ lissom files that you are dealing with
-# e.g. "topo/tests/reference/or_map_topo."
 filename_base = ""
 
 
-def get_input_params(log_file):
+def get_input_params():
     """
     Return iterators over list of float values for C++ LISSOM's cx, cy, and theta.
 
@@ -26,7 +27,7 @@ def get_input_params(log_file):
     
       'Iteration: 000000  [Eye0 [Obj0 cx:02.1 cy:11.6 theta:074.0]]\n'  
     """
-    f = open(log_file,'r')
+    f = open(filename_base+'log','r')
     
     x = []
     y = []
