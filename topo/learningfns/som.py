@@ -71,8 +71,13 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
         # rate like some do, so it does not use constant_sum_connection_rate()
 	single_connection_learning_rate = learning_rate
 
-        ### JABHACKALERT: Need to convert from Sheet to Matrix coordinates!
-        ### (and then change all the example files to use Sheet coordinates).
+        ### JABALERT: The learning_radius is normally set by
+        ### the learn() function of CFSOM, so it doesn't matter
+        ### much that the value accepted here is in matrix and 
+        ### not sheet coordinates.  It's confusing that anything
+        ### would accept matrix coordinates, but the learning_fn
+        ### doesn't have access to the sheet, so it can't easily
+        ### convert from sheet coords.
         radius = self.learning_radius
         crop_radius = max(1.25,radius*self.crop_radius_multiplier)
 
