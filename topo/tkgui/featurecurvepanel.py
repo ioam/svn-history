@@ -60,7 +60,7 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
 
         cmdbox = Pmw.ComboBox(self.params_frame,autoclear=1,history=1,dropdown=1,
                               entry_textvariable=self.cmdname,
-                              scrolledlist_items=([self.cmdname]))
+                              scrolledlist_items=([self.cmdname.get()]))
         cmdbox.pack(side=LEFT,expand=YES,fill=X)
         self.balloon.bind(cmdbox,getdoc(self.plotgroup.params()['updatecommand']))
   
@@ -238,7 +238,7 @@ class FullFieldFeatureCurvePanel(FeatureCurvePanel):
 
         plot_cmdbox = Pmw.ComboBox(self.params_frame,autoclear=1,history=1,dropdown=1,
                               entry_textvariable=self.plot_cmdname,
-                              scrolledlist_items=([self.plot_cmdname]))
+                              scrolledlist_items=([self.plot_cmdname.get()]))
         plot_cmdbox.pack(side=TOP,expand=YES,fill=X)
         self.balloon.bind(plot_cmdbox,getdoc(self.plotgroup.params()['plotcommand']))
                      

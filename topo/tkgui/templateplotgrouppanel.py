@@ -59,7 +59,7 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
         
         cmdbox = Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
                               entry_textvariable=self.cmdname,
-                              scrolledlist_items=([self.cmdname]))
+                              scrolledlist_items=([self.cmdname.get()]))
         cmdbox.pack(side=LEFT,expand=YES,fill=X)
         self.balloon.bind(cmdbox,getdoc(self.plotgroup.params()['updatecommand']))
 
