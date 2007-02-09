@@ -84,6 +84,7 @@ function menu_side($fname) {
 		"Forums" => "../Forums/index.html",
 		"Team Members" => "../Team_Members/index.html",
 		"Future Work" => "../Future_Work/index.html",
+		"FAQ" => "../FAQ/index.html",
 		"Links" => "../Links/index.html",
 		);
 
