@@ -108,9 +108,7 @@ that are e.g. being selected.
 </li>
 
 <li>
-2007/02/07 (CB): change topo/tests/test_lissom_oo_or.py so it can be
-used to compare the results from any simulation before and after a
-change.
+2007/02/09 (CB): when we've switched to numpy: update topographica-win to numpy& remove -Wl from LDFLAGS and test that builds ok on os x (keep rpath).
 </li>
 
 </ul>
@@ -190,10 +188,6 @@ menu items...a really useful feature.
 <li>
 2007/01/25 (CB): Gnosis Utils has xml pickling. Add this as an optional format.
 The xml is still complex, but better than looking at a pickle.
-</li>
-
-<li>
-2007/02/06 (CB): Remove -Wl from LDFLAGS and test that builds ok on os x (keep rpath).
 </li>
 
 <li>
