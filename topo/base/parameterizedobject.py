@@ -248,6 +248,7 @@ class Parameter(object):
             self.instantiate = True
         else:
             self.instantiate = instantiate
+
         
     def __get__(self,obj,objtype):
         """
@@ -527,7 +528,7 @@ class ParameterizedObjectMetaclass(type):
     def print_param_defaults(self):
         for key,val in self.__dict__.items():
             if isinstance(val,Parameter):
-                print self.__name__+'.'+key, '=', val.default
+                print self.__name__+'.'+key, '=', repr(val.default)
 
 
     def classparams(self):
@@ -633,54 +634,48 @@ class ParameterizedObject(object):
 
         self.initialized=True
 
+
     def __generate_name(self):
         """
         Sets name to a gensym formed from the object's type name and a unique number.
         """
         self.name = '%s%05d' % (self.__class__.__name__ ,object_count)
 
+
     def __repr__(self):
         """
-        Return 'classname(parameter1=x,parameter2=y,...)',
-        where all parameter=value pairs are printed in the parentheses.
-
-        An almost-valid expression that could be used to
-        recreate the object in the correct environment.
+        Provide a nearly valid Python representation that could be used to recreate
+        the item with its parameters, if executed in the appropriate environment.
+        
+        Returns 'classname(parameter1=x,parameter2=y,...)', listing
+        all the parameters of this object.
         """
-        param_value_pairs = []
-        for name,val in self.get_param_values():
-             param_value_pairs.append( '%s=%s' % (name,repr(val)) )
-
-        rep = self.__class__.__name__+"("
-
-        for item in param_value_pairs:
-            rep = rep + item + ", "
-
-        # remove trailing ", " and add final parenthesis
-        return rep[0:rep.rindex(", ")] + ")"
+        settings = ['%s=%s' % (name,repr(val))
+                    for name,val in self.get_param_values()]
+        return self.__class__.__name__ + "(" + ", ".join(settings) + ")"
 
         
     def __str__(self):
-        """
-        Return '<self.class.name self.name>'.
-        """
+        """Return a short representation of the name and class of this object."""
         return "<%s %s>" % (self.__class__.__name__,self.name)
 
 
     def __db_print(self,level=NORMAL,*args):
         """
-        Iff print_level or self.db_print_level is greater than or
-        equal to the given level, print str.
-        """            
+        Print each of the given args iff print_level or
+        self.db_print_level is greater than or equal to the given
+        level.
+        """
         if level <= max(min_print_level,self.print_level):
             s = ' '.join([str(x) for x in args])
             print "%s: %s" % (self.name,s)
         sys.stdout.flush()
 
+
     def warning(self,*args):
         """Print the arguments as a warning."""
         self.__db_print(WARNING,"Warning:",*args)
-        
+
     def message(self,*args):
         """Print the arguments as a message."""
         self.__db_print(MESSAGE,*args)
@@ -696,10 +691,16 @@ class ParameterizedObject(object):
 
     def __setup_params(self,**params):
         """
+        Initialize default and keyword parameter values.
+
+        First, ensures that all Parameters with 'instantiate=True'
+        (typically used for mutable Parameters) are copied directly
+        into each object, to ensure that there is an independent copy
+        (to avoid strange aliasing errors).  Then sets each of the
+        keyword arguments, warning when any of them are not defined as
+        parameters.
         """
-        # deepcopy a Parameter if its 'instantiate' attribute is True,
-        # and put it in this ParameterizedObject's dictionary - so it has its
-        # own copy, rather than sharing the class'.        
+        # Deepcopy all 'instantiate=True' parameters
         for class_ in classlist(type(self)):
             for (k,v) in class_.__dict__.items():
                 if isinstance(v,Parameter) and v.instantiate==True:
@@ -714,8 +715,6 @@ class ParameterizedObject(object):
                         global object_count
                         object_count+=1
                         new_object.__generate_name()
-                        
-                    
                     
         for name,val in params.items():
             desc,desctype = self.__class__.get_param_descriptor(name)
