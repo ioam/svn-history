@@ -10,12 +10,12 @@ saved-examples: lissom_oo_or_20000.typ
 # Define typical commands used in the examples
 SNAPSHOT = -c "from topo.commands.basic import save_snapshot ; save_snapshot"
 
-OR_ANALYSIS = -c "from topo.commands.analysis import measure_or_pref,measure_position_pref,measure_cog,measure_or_tuning_fullfield,measure_contrast_response_fullfield; \
+OR_ANALYSIS = -c "from topo.commands.analysis import measure_or_pref,measure_position_pref,measure_cog,measure_or_tuning_fullfield,measure_contrast_response; \
 measure_or_pref(); \
 measure_position_pref(); \
 measure_cog(); \
 measure_or_tuning_fullfield(); \
-measure_contrast_response_fullfield(); \
+measure_contrast_response(); \
 "
 
 RETINOTOPY_ANALYSIS = -c "from topo.commands.analysis import measure_position_pref,measure_cog ;\
