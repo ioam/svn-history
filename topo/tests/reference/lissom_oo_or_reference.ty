@@ -147,7 +147,7 @@ fixedpoint.DEFAULT_PRECISION=3
 
 # input generation params
 GeneratorSheet.nominal_density = BaseRN*area_scale
-GeneratorSheet.period = 1
+GeneratorSheet.period = 1.0
 GeneratorSheet.phase=0.05
 
 # take the input pattern position parameters from the log file output of the equivalent c++ simulation
@@ -207,10 +207,10 @@ topo.sim['Primary'] = LISSOM(nominal_density=BaseN,
 # C++ LISSOM divides by pi in RadialFunction::Gaussian but not for
 # Gaussian in retinalobjs (and elsewhere)
 centerg = topo.patterns.basic.Gaussian(
-    size=2*sigma_c*sqrt(pi)/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1(norm_value=2.33))
+    size=2*sigma_c*sqrt(pi)/BaseRN,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))
 
 surroundg = topo.patterns.basic.Gaussian(
-    size=2*sigma_s*sqrt(pi)/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1(norm_value=2.33))
+    size=2*sigma_s*sqrt(pi)/BaseRN,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))
 
 
 on_weights = topo.patterns.basic.Composite(
@@ -289,12 +289,12 @@ topo.sim.schedule_command(499, 'exc_rad*=0.7; LE.change_bounds(BoundingBox(radiu
 
 ### LEARNING RATE CHANGES
 #
-topo.sim.schedule_command(  499, 'alpha_exc=0.0010*ecs; LE.learning_rate=alpha_input*n_units(LE)')
+topo.sim.schedule_command(  499, 'alpha_exc=0.0010*ecs; LE.learning_rate=alpha_exc*n_units(LE)')
 
 topo.sim.schedule_command(  499, 'alpha_input=0.0050*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
 topo.sim.schedule_command( 1999, 'alpha_input=0.0040*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
-topo.sim.schedule_command( 3999, 'alpha_input=0.0030*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af1.learning_rate=alpha_input*n_units(Af01)')
-topo.sim.schedule_command(19999, 'alpha_input=0.0015*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af1.learning_rate=alpha_input*n_units(Af01)')
+topo.sim.schedule_command( 3999, 'alpha_input=0.0030*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
+topo.sim.schedule_command(19999, 'alpha_input=0.0015*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
 
 
 ### Primary output function bounds changes
