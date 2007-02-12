@@ -6,7 +6,8 @@ Contains a Retina (2D Gaussian generator) fully connected to a V1
 
 Constructed to match the retinotopic simulation from page 53-59 of
 Miikkulainen, Bednar, Choe, and Sirosh (2005), Computational Maps in
-the Visual Cortex, Springer.
+the Visual Cortex, Springer, except with a slower learning rate for
+better convergence.
 
 $Id$
 """
@@ -33,12 +34,10 @@ topo.sim.name = "som_retinotopy"
 class RetinotopicSOM(CFSOM):
     """A variant of CFSOM that uses exponential decay functions for alpha and radius."""
 
-    # Minimum radius to allow
-    radius_min=Number(0)
+    radius_min=Number(0.5/40.0,doc="Minimum radius to allow")
 
     def __init__(self,**params):
         super(RetinotopicSOM,self).__init__(**params)
-        self.radius_min=0.5/40
 
     def alpha(self):
        """Exponential decay."""
@@ -59,19 +58,19 @@ input_pattern = topo.patterns.basic.Gaussian(
     scale=1.0,
     size=2*sqrt(2.0*0.1*24.0)/24.0,
     aspect_ratio=1.0,
-    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=9999)),
-    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=2)),
-    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=10)))
+    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=23)),
+    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=45)),
+    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=67)))
 
 # cortical sheet
 RetinotopicSOM.nominal_density = locals().get('default_density',40.0)
 RetinotopicSOM.learning_length = 40000
 
-# CEBHACKALERT: should be 13.3? See doc/Future_Work/current.html.
-RetinotopicSOM.radius_0 = 13.2/40
-RetinotopicSOM.alpha_0  = 0.42
+RetinotopicSOM.radius_0 = 13.3/40.0
+# Original CMVC simulation used 0.42
+RetinotopicSOM.alpha_0  = 0.42/4.0
 
-RandomArray.seed(500,500)
+RandomArray.seed(50,50)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom() 
 
 CFProjection.nominal_bounds_template=BoundingBox(radius=1.0) # fully connected network.
