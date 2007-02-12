@@ -9,6 +9,7 @@ __version__='$Revision$'
 
 import sys
 import copy
+import re
 
 
 from pprint import pprint
@@ -653,6 +654,34 @@ class ParameterizedObject(object):
         settings = ['%s=%s' % (name,repr(val))
                     for name,val in self.get_param_values()]
         return self.__class__.__name__ + "(" + ", ".join(settings) + ")"
+
+        
+    def script_repr(self,prefix="    "):
+        """
+        Variant of __repr__ designed for generating a runnable script.
+
+        May replace __repr__ at some point, so that the default representation
+        is runnable.
+        """
+        # Should consider adding an option to suppress values that do not
+        # differ from the defaults, to get a much more concise output
+        #
+        # Currently suppresses automatically generated names and
+        # print_levels.
+        settings=[]
+        for name,val in self.get_param_values():
+            if name == 'name' and re.match('^'+self.__class__.__name__+'[0-9]+$',val):
+                rep=None
+            elif name == 'print_level':
+                rep=None
+            elif isinstance(val,ParameterizedObject):
+                rep=val.script_repr(prefix+"    ")
+            else:
+                rep=repr(val)
+            if rep is not None:
+                settings.append('%s=%s' % (name,rep))
+
+        return self.__class__.__name__ + "(" + (",\n"+prefix).join(settings) + ")"
 
         
     def __str__(self):

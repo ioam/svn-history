@@ -71,6 +71,10 @@ STOP = "Simulation Stopped"
 
 Forever = FixedPoint(-1)
 
+# Default path to the current simulation, from main
+# Only to be used by script_repr(), to allow it to generate
+# a runnable script
+simulation_path="topo.sim"
 
 class Singleton(object):
     """
@@ -328,7 +332,14 @@ class EventProcessor(ParameterizedObject):
         """
         pass
 
+    def script_repr(self,prefix="    "):
+        """Generate a runnable command for creating this EventProcessor."""
+        return simulation_path+"['"+self.name+"']="+\
+        super(EventProcessor,self).script_repr(prefix)
 
+
+
+        
 class EventProcessorParameter(Parameter):
     """Parameter whose value can be any EventProcessor instance."""
     
@@ -414,6 +425,23 @@ class EPConnection(ParameterizedObject):
         for i in to_del:
             del self.src.out_connections[i]
 
+
+    def script_repr(self,prefix="    "):
+        """Generate a runnable command for creating this connection."""
+        settings=[]
+        for name,val in self.get_param_values():
+            if name=="src" or name=="dest":
+                rep=None
+            elif isinstance(val,ParameterizedObject):
+                rep=val.script_repr(prefix+"    ")
+            else:
+                rep=repr(val)
+            if rep is not None:
+                settings.append('%s=%s' % (name,rep))
+
+        return simulation_path+".connect('"+self.src.name+"','"+self.dest.name+ \
+               "',connection_type="+self.__class__.__name__+ \
+               ",\n"+prefix+(",\n"+prefix).join(settings) + ")"
 
 
 class Event(object):
@@ -628,8 +656,8 @@ class Simulation(ParameterizedObject):
         Remove the specified EventProcessor from the simulation, plus
         delete connections that come into it and connections that go from it.
 
-        (Used by 'del topo.sim[ep_name]' (as for a dictionary) to delete
-        event processors from the simulation.)
+        (Used by 'del sim[ep_name]' (as for a dictionary) to delete
+        an event processor from the simulation.)
         """
         ep = self[ep_name]
         
@@ -813,7 +841,6 @@ class Simulation(ParameterizedObject):
         return conn
     
 
-    ### Could change the name to event_processors().
     def objects(self,baseclass=EventProcessor):
         """
         Return a list of simulation objects having the specified base
@@ -827,3 +854,31 @@ class Simulation(ParameterizedObject):
         return dict([(ep_name,ep)
                      for (ep_name,ep) in self._event_processors.items()
                      if isinstance(ep,baseclass)])
+
+
+    def connections(self):
+        """Return a list of all unique connections to or from any object."""
+        # The return value cannot be a dictionary like objects(),
+        # because connection names are not guaranteed to be unique
+        connlists =[o.in_connections + o.out_connections
+                    for o in self.objects().values()]
+        # Flatten one level
+        conns=[]
+        for cl in connlists:
+            for c in cl:
+                conns.append(c)
+        return [c for c in set(conns)]
+
+
+    def script_repr(self,prefix="    "):
+        """
+        Return a nearly runnable script recreating this simulation.
+
+        Needs some work to make the result truly runnable.
+
+        The parameters of the simulation object itself, such as
+        its name, are not yet included.
+        """
+        ### JABALERT: It may be possible to generate the list of required imports too
+        reps = [o.script_repr() for o in self.objects().values() + self.connections()]
+        return '\n\n\n'.join(reps)
