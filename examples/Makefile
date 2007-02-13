@@ -1,6 +1,9 @@
 # $Id$
 #
 # Commands for running the example files
+#
+# JPALERT: Should consider rewriting this in Python so that it can run
+# easily under Windows as well.
 
 all_quick: hierarchical cfsom_or som_retinotopy lissom_oo_or
 all_long: lissom_oo_or_20000.typ som_retinotopy_40000.typ lissom_or_20000.typ
