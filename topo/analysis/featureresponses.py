@@ -240,7 +240,8 @@ class FeatureCurves(FeatureResponses):
 	super(FeatureCurves, self).__init__(features)
         self.sheet=sheet
         self.x_axis=x_axis
-        sheet.curve_dict={}
+        if hasattr(sheet, "curve_dict")==False:
+            sheet.curve_dict={}
         sheet.curve_dict[x_axis]={}
 
     def sheets_to_measure(self):
