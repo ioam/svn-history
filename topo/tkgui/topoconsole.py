@@ -687,12 +687,12 @@ class TopoConsole(Frame):
         self.parent.title(topo.sim.name) ## this changes the title bar to more useful
 
         ## Duration of most recent times from which to estimate remaining time
-        estimate_interval=50.0
+        estimate_interval=50
         for i in xrange(iters):
             recenttimes.append(time.time())
             length = len(recenttimes)
 
-            if (length>50):
+            if (length>estimate_interval):
                 recenttimes.pop(0)
                 length-=1
                 
@@ -700,17 +700,17 @@ class TopoConsole(Frame):
             percent = 100.0*i/iters
 
             estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
-            
-            message = 'Time ' + str(topo.sim.time()) + ': ' + \
-                      str(int(percent)) + '% of '  + str(fduration) + ' completed ' + \
-                      ('(%02d' % int(estimate/60))+':' + \
-                      ('%02d' % int(estimate%60))+ ' remaining at current rate).'
+
+            # Should say 'at current rate', since the calculation assumes linearity
+            message = ('Time %0.2f: %d%% of %0.0f completed (%02d:%02d remaining)' %
+                       (topo.sim.time(),int(percent),fduration, int(estimate/60),
+                        int(estimate%60)))
 
             self.messageBar.message('state', message)
             self.update_idletasks()
                                                                                                                                                   
         topo.sim.run(remain)
-        message = 'Ran ' + str(fduration) + ' to time ' + str(topo.sim.time())
+        message = ('Ran %0.2f to time %0.2f' % (fduration, topo.sim.time()))
         self.auto_refresh()
 
 
