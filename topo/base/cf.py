@@ -770,7 +770,7 @@ The true bounds will differ depending on the density (see initialize_bounds())."
 	Returns the activity in a single projection
 	"""
 	matrix_data = Numeric.array(self.activity)
-	return ProjectionView((matrix_data,self.src.bounds),self,timestamp)
+	return ProjectionView((matrix_data,self.dest.bounds),self,timestamp)
 
 
     def activate(self,input_activity):
