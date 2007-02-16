@@ -60,7 +60,7 @@ input_pattern = topo.patterns.basic.Gaussian(
     aspect_ratio=1.0,
     x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=23)),
     y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=45)),
-    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=67)))
+    orientation=0)
 
 # cortical sheet
 RetinotopicSOM.nominal_density = locals().get('default_density',40.0)
