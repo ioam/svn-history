@@ -648,5 +648,5 @@ def update_projectionactivity():
                 else:
                     v = p.get_projection_view(topo.sim.time())
                     key = ('ProjectionActivity',v.projection.dest.name,v.projection.name)
-                    v.projection.src.sheet_view_dict[key] = v
+                    v.projection.dest.sheet_view_dict[key] = v
 
