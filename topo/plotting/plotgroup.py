@@ -444,8 +444,19 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
 
     keyname='ProjectionActivity'
 
-
-
+    def _create_plots(self,pt_name,pt,sheet):
+	"""Creates plots as specified by the plot_template."""
+        plot_list = []
+        for p in sheet.projections().values():
+            plot_channels = copy.deepcopy(pt)
+            key = (self.keyname,sheet.name,p.name)
+            plot_channels['Strength'] = key
+            plot_list.append(make_template_plot(plot_channels,p.dest.sheet_view_dict,
+                                                p.dest.xdensity,
+                                                p.dest.bounds,self.normalize,name=p.name))
+        return plot_list
+                
+	    
 ### JABALERT: Should pull out common code from
 ### ConnectionFieldsPlotGroup, ProjectionActivityPlotGroup, and
 ### ProjectionPlotGroup into a shared parent class; then those
