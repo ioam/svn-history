@@ -285,6 +285,53 @@ def shortclassname(x):
     return re.sub("'>","",re.sub(".*[.]","",repr(type(x))))
 
 
+
+# CEBHACKALERT: see http://docs.python.org/lib/module-hotshot.html for
+# two hackalerts (the timings might be 'more meaningful' when we
+# switch to python 2.5, and we should use hotshot.cProfile).
+def profile(callable,n=50,sorting=('cumulative','time'),strip_dirs=True):
+    """
+    Profile the given callable, printing statistics about the top n
+    functions when ordered according to sorting.
+
+    sorting defaults to ordering by cumulative time and then internal
+    time; see http://docs.python.org/lib/profile-stats.html for other
+    sorting options.
+
+    By default, the complete paths of files are not shown. If there
+    are multiple files with the same name, you might wish to set
+    strip_dirs=False to make it easier to follow the output.
+        
+
+    Examples:
+
+    - profile loading a simulation:
+    profile('execfile("examples/hierarchical.ty")')
+
+    - profile running an already loaded simulation:
+    profile('topo.sim.run(10)')
+
+    - profile running a whole simulation:
+    profile('execfile("examples/lissom_oo_or.ty");topo.sim.run(20000)')
+
+    - profile running a simulation, but from the commandline:
+    ./topographica examples/hierarchical.ty -c "from topo.misc.utils import profile; profile('topo.sim.run(10)')"
+    """
+    # This function simply wraps some functions from the hotshot
+    # module, making profiling easier.
+    import hotshot,hotshot.stats
+    
+    prof = hotshot.Profile('current_profile')
+    prof.run(callable)
+    prof.close()
+    
+    prof_stats = hotshot.stats.load('current_profile')
+
+    if strip_dirs:prof_stats.strip_dirs()
+    prof_stats.sort_stats(*sorting).print_stats(n)
+
+
+
             
 
 
