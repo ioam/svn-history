@@ -26,7 +26,7 @@ from plot import make_template_plot, Plot
 
 def cmp_plot(plot1,plot2):
     """
-    Comparison function for Plots.
+    Comparison function for sorting Plots.
     It compares the precedence number first and then the src_name and name attributes.
     """
     if plot1.precedence != plot2.precedence:
@@ -50,28 +50,34 @@ class PlotGroup(ParameterizedObject):
     ### - clean up the doc.
     ### - rewrite the test file.
 
-    normalize = BooleanParameter(default=False,doc=
-"""Whether to scale plots so that the peak value will be white
-and the minimum value black.""")
+    normalize = BooleanParameter(default=False,doc="""
+        Whether to scale plots so that the peak value will be white
+        and the minimum value black.  Otherwise, 0.0 will be black
+        and 1.0 will be white.  Normalization has the advantage of
+        ensuring that any data that is present will be visible, but
+        the disadvantage that the absolute scale will be obscured.
+        Non-normalized plots are guaranteed to be on a known scale,
+        but only values between 0.0 and 1.0 will be visibly
+        distinguishable.""")
 
-    sheetcoords = BooleanParameter(default=False,doc=
-"""Whether to scale plots based on their relative sizes in sheet
-coordinates.  If true, plots are scaled so that their sizes are
-proportional to their area in sheet coordinates, so that one can
-compare corresponding areas.  If false, plots are scaled to have
-similar sizes on screen, regardless of their corresponding
-sheet areas.""")
+    sheetcoords = BooleanParameter(default=False,doc="""
+        Whether to scale plots based on their relative sizes in sheet
+        coordinates.  If true, plots are scaled so that their sizes are
+        proportional to their area in sheet coordinates, so that one can
+        compare corresponding areas.  If false, plots are scaled to have
+        similar sizes on screen, regardless of their corresponding
+        sheet areas, which maximizes the size of each plot.""")
 
-    integerscaling = BooleanParameter(default=False,doc=
-"""When scaling bitmaps, whether to ensure that the scaled bitmap is an even
-multiple of the original.  If true, every unit will be represented by a
-square of the same size.  Typically false so that the overall area will
-be correct, e.g. when using Sheet coordinates, which is often more
-important.""")
+    integerscaling = BooleanParameter(default=False,doc="""
+        When scaling bitmaps, whether to ensure that the scaled bitmap is an even
+        multiple of the original.  If true, every unit will be represented by a
+        square of the same size.  Typically false so that the overall area will
+        be correct, e.g. when using Sheet coordinates, which is often more
+        important.""")
     
     def __init__(self, plot_list, **params):
         """
-	plot_list is a static list specifying the Plot objects belonging to the PlotGroup.
+        Initialize using a static list of Plots that will make up this PlotGroup.
         """
         super(PlotGroup,self).__init__(**params)  
 
@@ -238,24 +244,24 @@ important.""")
 
 class FeatureCurvePlotGroup(PlotGroup):
     
-   updatecommand = Parameter(default="",doc=
-"""Command to execute before updating this plot, e.g. to calculate sheet views.
+   updatecommand = Parameter(default="",doc="""
+       Command to execute before updating this plot, e.g. to calculate sheet views.
 
-The command can be any Python code, and will be evaluated in the main namespace
-(as if it were typed into a .ty script).  The initial value is determined by
-the template for this plot, but various arguments can be passed, a modified
-version substituted, etc.""")
+       The command can be any Python code, and will be evaluated in the main namespace
+       (as if it were typed into a .ty script).  The initial value is determined by
+       the template for this plot, but various arguments can be passed, a modified
+       version substituted, etc.""")
 
-   plotcommand = Parameter(default="",doc=
-"""Command to execute when updating sheet or coordinate of unit to be plotted
-when the simulator time has not changed.
-In the case of a full-field stimulus, responses do not need to be re-measured
-since the necessary values are already stored. 
+   plotcommand = Parameter(default="",doc="""
+       Command to execute when updating sheet or coordinate of unit to be plotted
+       when the simulator time has not changed.
+       In the case of a full-field stimulus, responses do not need to be re-measured
+       since the necessary values are already stored. 
 
-The command can be any Python code, and will be evaluated in the main namespace
-(as if it were typed into a .ty script).  The initial value is determined by
-the template for this plot, but various arguments can be passed, a modified
-version substituted, etc.""")
+       The command can be any Python code, and will be evaluated in the main namespace
+       (as if it were typed into a .ty script).  The initial value is determined by
+       the template for this plot, but various arguments can be passed, a modified
+       version substituted, etc.""")
 
    def __init__(self,plot_list,template,sheet_name,x,y):
 
@@ -302,19 +308,21 @@ version substituted, etc.""")
                self.warning("Displaying curves from different times (%s,%s)" %
                             (min(timestamps),max(timestamps)))
 
+
+
 class TemplatePlotGroup(PlotGroup):
     """
     PlotGroup that is built as specified by a PlotGroupTemplate.
     """
 
     # JABALERT: Should be a StringParameter
-    updatecommand = Parameter(default="",doc=
-"""Command to execute before updating this plot, e.g. to calculate sheet views.
+    updatecommand = Parameter(default="",doc="""
+        Command to execute before updating this plot, e.g. to calculate sheet views.
 
-The command can be any Python code, and will be evaluated in the main namespace
-(as if it were typed into a .ty script).  The initial value is determined by
-the template for this plot, but various arguments can be passed, a modified
-version substituted, etc.""")
+        The command can be any Python code, and will be evaluated in the main namespace
+        (as if it were typed into a .ty script).  The initial value is determined by
+        the template for this plot, but various arguments can be passed, a modified
+        version substituted, etc.""")
 
 
     def __init__(self,plot_list,template,sheet_name,**params):
@@ -342,15 +350,17 @@ version substituted, etc.""")
 	
     def _plot_list(self):
         """
-        Procedure that is called when creating a PlotGroup, that return the plot_list attribute
-        i.e. the list of plot that are specified by the PlotGroup template.
+        Procedure that is called when creating a PlotGroup.
 
-        This function calls create_plots, that is implemented in each TemplatePlotGroup subclasses.
+        Returns the plot_list attribute, i.e., the list of plots that
+        are specified by the PlotGroup template.
+
+        This function calls create_plots, which is implemented in each
+        TemplatePlotGroup subclass.
         """
-	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
-        # (i.e the PlotGroup will try to build a Plot object for each Sheet in the simulation)
 	if self.sheet_name:
-	    sheet_list = [each for each in topo.sim.objects(Sheet).values() if each.name == self.sheet_name]   
+	    sheet_list = [each for each in topo.sim.objects(Sheet).values()
+                          if each.name == self.sheet_name]   
 	else:
 	    sheet_list = [each for each in topo.sim.objects(Sheet).values()]
    
@@ -410,7 +420,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
         else:
 	    # Special case: if the Strength is set to self.keyname, we
 	    # request UnitViews (i.e. by changing the Strength key in
-	    # the plot_channels) Otherwise, we consider Strength as
+	    # the plot_channels). Otherwise, we consider Strength as
 	    # specifying an arbitrary SheetView.
 	    if ( pt.get('Strength', None) == self.keyname):
                 plot_list = []
@@ -428,8 +438,6 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 	    else: # Fall back to normal case
                 return super(ProjectionSheetPlotGroup,self)._create_plots(pt_name,pt,sheet)
     
-
-
  
     def generate_labels(self):
 	""" Function used for generating the labels."""
@@ -466,7 +474,7 @@ class ConnectionFieldsPlotGroup(ProjectionSheetPlotGroup):
     """
     PlotGroup for Connection Fields UnitViews.  
 
-    Attributes:
+    Attributes::
       x: x-coordinate of the unit to plot
       y: y-coordinate of the unit to plot
       situate: Whether to situate the plot on the full source sheet, or just show the weights.
