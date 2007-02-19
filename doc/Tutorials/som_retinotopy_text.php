@@ -31,7 +31,6 @@ develops a mapping of the dimensions of variance in the input space.
   $ cp /home/jbednar/public/topographica/examples/som_retinotopy.ty .
 </pre>
 
-<!--
 <P><li>Next, you will usually want to edit the <code>som_retinotopy.ty</code> file to make it
   faster to run, by reducing the number of units simulated in the
   retina and V1.  On most machines, a GeneratorSheet.nominal_density of 10
@@ -44,16 +43,6 @@ develops a mapping of the dimensions of variance in the input space.
 <pre>
   $ emacs som_retinotopy.ty
   $ diff som_retinotopy.ty~ som_retinotopy.ty
-  66c66
-  < RetinotopicSOM.nominal_density = locals().get('default_density',40.0)
-  ---
-  > RetinotopicSOM.nominal_density = locals().get('default_density',10.0)
-  69,70c69,70
-  < RetinotopicSOM.radius_0 = 13.2/40
-  ---
-  > RetinotopicSOM.radius_0 = 15.0/40.0
-
-  $ diff som_retinotopy.ty~ som_retinotopy.ty
   65c65
   < GeneratorSheet.nominal_density = 24
   ---
@@ -63,7 +52,6 @@ develops a mapping of the dimensions of variance in the input space.
   ---
   > RetinotopicSOM.nominal_density = locals().get('default_density',10.0)
 </pre>
--->
 
 <P><li> Next, start the Topographica GUI, telling it to load the
 SOM retinotopy simulation:
@@ -137,10 +125,9 @@ plot window:
 the V1 X CoG plot shows the X location preferred by each neuron, where
 black is the minimum (usually coordinate -0.5) and white is the
 maximum (usually coordinate 0.5).  Because the initial weight values
-are random and fully connected, the center of gravity is typicallly
-around the center of the retina, and thus most pixels are a medium
-gray in this plot.  The V1 Y CoG plot shows similar measurements for
-the Y locations.
+are random and fully connected, the center of gravity is typically
+around the center of the retina.  The V1 Y CoG plot shows similar
+measurements for the Y locations.
 
 <P>The colorful plot labeled "V1 CoG" may be difficult to interpret at
 this stage, and we will discuss it further below.  It shows a
@@ -152,9 +139,8 @@ yellow (because red and green light together appears yellow).  Most
 pixels are a medium green or red at this stage in training.
 
 <P>Easier to interpret at this stage is the <span
-class='w_title'>Topographic mapping</span> window, helpfully labeled
-"Figure 1".  This plot shows the CoG for each V1 neuron, plotted on
-the Retina:
+class='w_title'>Topographic mapping</span> window.  This plot shows
+the CoG for each V1 neuron, plotted on the Retina:
 
 <p class='center'>
 <IMG WIDTH="420" HEIGHT="474" SRC="images/som_grid_000000.png" align="middle" alt="CoG bitmap plots">
@@ -187,7 +173,7 @@ learning iteration, click in the <span class='t_item'>Run
 for</span> field of the <span class='w_title'>Topographica
 Console</span> window, make sure it says 1, and hit Go.  The
 <span class='w_title'>Activity</span> window should then refresh to
-show:
+show something like:
 
 <p class='center'>
 <IMG WIDTH="408" HEIGHT="326" SRC="images/som_activity_000001.png" align="middle" alt="Activity at 0">
