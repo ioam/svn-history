@@ -2,10 +2,13 @@
 
 <p>
 This tutorial shows how to use the
-<a href="http://topographica.org/">Topographica</a> software to explore a
-simple retinotopic map simulation.  This particular example uses a
-Kohonen-type Self-Organizing Map (SOM), although Topographica supports
-other models and is easily extensible for models not yet supported.
+<a href="http://topographica.org/">Topographica</a> simulator to explore a
+simple retinotopic map simulation.  This particular example, taken
+from Chapter 3 of the <A
+href="http://computationalmaps.org">Computational Maps in the Visual
+Cortex</A>, uses a Kohonen-type Self-Organizing Map (SOM).
+Topographica also supports a wide range of other models, and is easily
+extensible for models not yet supported.
 </p>
 
 <p>This tutorial assumes that you have already followed the
@@ -22,7 +25,7 @@ develops a mapping of the dimensions of variance in the input space.
 <p></p>
 
 <li>First, copy the <code>som_retinotopy.ty</code> example file from
-  wherever the Topographica distribution is installed into
+  wherever the Topographica distribution is installed, into
   your own directory.  For instance, if Topographica is installed in
   <code>/home/jbednar/public/topographica/</code> and you would like
   to work in <code>~/cnv</code> in UNIX, you would type:
@@ -31,46 +34,34 @@ develops a mapping of the dimensions of variance in the input space.
   $ cp /home/jbednar/public/topographica/examples/som_retinotopy.ty .
 </pre>
 
-<P><li>Next, you will usually want to edit the <code>som_retinotopy.ty</code> file to make it
-  faster to run, by reducing the number of units simulated in the
-  retina and V1.  On most machines, a GeneratorSheet.nominal_density of 10
-  (used for the Retina) and a RetinotopicSOM.nominal_density of 10 (used for
-  V1) should be reasonably fast to run.  The default Retina density of
-  24 and V1 density of 40 are set to match the simulation presented in
-  Chapter 3 of the CMVC book, but much smaller densities should also
-  work well.
-  
-<pre>
-  $ emacs som_retinotopy.ty
-  $ diff som_retinotopy.ty~ som_retinotopy.ty
-  65c65
-  < GeneratorSheet.nominal_density = 24
-  ---
-  > GeneratorSheet.nominal_density = 10
-  76c76
-  < RetinotopicSOM.nominal_density = locals().get('default_density',40.0)
-  ---
-  > RetinotopicSOM.nominal_density = locals().get('default_density',10.0)
-</pre>
-
-<P><li> Next, start the Topographica GUI, telling it to load the
-SOM retinotopy simulation:
+<P><li>To start the full simulation from the book using the
+  Topographica GUI, you could run:
 <pre>
   /home/jbednar/public/topographica/topographica -g som_retinotopy.ty
 </pre>
-
-<p></p>
-You should see a new window for the GUI:
+  However, a much smaller network is faster to run, and gets similar
+  results.  To use a retina density of 10 and a cortical density of
+  10, instead run Topographica as:
+<pre>
+  /home/jbednar/public/topographica/topographica -g \
+  -c default_retina_density=10 -c default_density=10 som_retinotopy.ty
+</pre>
+  (all on one line, with no backslash).  These changes can also be
+  made in the .ty file itself, if you do not want to type them each
+  time you run the program.
+  
+<p>
+You should now see a window for the GUI:
 <p class='center'>
 <img src="images/topographica_console.png" alt="Console Window"
 align="middle" width="370" height="239">
 </p>
+  
 <p>
-The window and button style will differ on different platforms, but
-similar buttons should be provided.
+The font, window, and button style will differ on different platforms,
+but similar controls should be provided.
 </p>
 
-<p></p>
 </li>
 
 <li>This simulation is a small, fully connected map, with one input
@@ -114,41 +105,51 @@ the <span class='t_item'>Plots</span> menu on the <span
 class='w_title'>Topographica Console</span> to get several plots.
 These plots show the results of computing the <i>center of gravity</i>
 (a.k.a. <i>centroid</i> or <i>center of mass</i>) of the set of input
-weights for each neuron.  For instance, in
-the <span class='w_title'>Center of Gravity</span>
-plot window:
+weights for each neuron.
 
-<p class='center'>
-<IMG WIDTH="513" HEIGHT="326" SRC="images/som_cog_000000.png"  align="middle" alt="CoG bitmap plots">
-</p>
-
-the V1 X CoG plot shows the X location preferred by each neuron, where
-black is the minimum (usually coordinate -0.5) and white is the
-maximum (usually coordinate 0.5).  Because the initial weight values
-are random and fully connected, the center of gravity is typically
-around the center of the retina.  The V1 Y CoG plot shows similar
-measurements for the Y locations.
-
-<P>The colorful plot labeled "V1 CoG" may be difficult to interpret at
-this stage, and we will discuss it further below.  It shows a
-false-color visualization of the CoG values, where the amount of red
-in the plot is proportional to the X CoG, and the amount of green in
-the plot is proportional to the Y CoG.  Where both X and Y are low,
-the plot is black or very dark, and where both are high the plot is
-yellow (because red and green light together appears yellow).  Most
-pixels are a medium green or red at this stage in training.
-
-<P>Easier to interpret at this stage is the <span
-class='w_title'>Topographic mapping</span> window.  This plot shows
-the CoG for each V1 neuron, plotted on the Retina:
+<P>This data is presented in several forms, of which the easiest to
+interpret at this stage is the <span class='w_title'>Topographic
+mapping</span> window.  This plot shows the CoG for each V1 neuron,
+plotted on the Retina:
 
 <p class='center'>
 <IMG WIDTH="420" HEIGHT="474" SRC="images/som_grid_000000.png" align="middle" alt="CoG bitmap plots">
 </p>
 
-All of the neurons have a CoG near the center of the retina, which is
-to be expected because the weights are fully connected and evenly
-distributed on average.  
+<P>Each neuron is represented by a point, and a line segment is drawn
+from each neuron to each of its four immediate neighbors so that
+neighborhood relationships (if any) will be visible.  From this plot
+is is clear that all of the neurons have a CoG near the center of the
+retina, which is to be expected because the weights are fully
+connected and evenly distributed (and thus all have an average (X,Y)
+value near the center of the retina).
+
+<P>The same data is shown in the <span class='w_title'>Center of
+Gravity</span> plot window, although it is more difficult to interpret
+at this stage:
+
+<p class='center'>
+<IMG WIDTH="513" HEIGHT="326" SRC="images/som_cog_000000.png"  align="middle" alt="CoG bitmap plots">
+</p>
+
+where the V1 X CoG plot shows the X location preferred by each neuron,
+and the V1 Y CoG plot shows the preferred Y locations.  The monochrome
+values are scaled so that the neuron with the smallest X preference is
+colored black, and that with the largest is colored white, regardless
+of the absolute preference values (due to Normalization being
+enabled).  Thus the absolute values of the X preferences are not
+visible in these plots.  (Without normalization, values below 0.0 are
+cropped to black, so only normalized plots are useful for this
+particular example.)
+
+<P>The colorful plot labeled "V1 CoG" shows a false-color
+visualization of the CoG values, where the amount of red in the plot
+is proportional to the X CoG, and the amount of green in the plot is
+proportional to the Y CoG.  Where both X and Y are low, the plot is
+black or very dark, and where both are high the plot is yellow
+(because red and green light together appears yellow).  This provides
+a way to visualize how smoothly both X and Y are mapped, although at
+this stage of training it is not particularly useful.
 
 <P><li>The behavior of this randomly connected network can be visualized
 by plotting the feedforward activation of each neuron, which
@@ -295,6 +296,8 @@ equivalent results.
 <P><LI>Now, re-run the basic simulation by quitting and restarting
 Topographica.  This time, change one of the parameter values, either
 by editing the <code>som_retinotopy.ty</code> file before starting, or
+by providing it on the command line (for those parameters that check
+<code>locals()</code> for their defaults), or 
 by typing the command at the Topographica terminal prompt.  For
 instance, to see the starting value of the neighborhood radius (from
 which all future values are calculated according to exponential
@@ -305,7 +308,7 @@ decay), type:
 </pre>
 
 
-You should see an initial value of something like 0.3325 displayed in
+You should see an initial value of something like 0.9975 displayed in
 your terminal window. Then change this value as you see fit, e.g. to
 0.1:
 
@@ -313,23 +316,38 @@ your terminal window. Then change this value as you see fit, e.g. to
   topo.sim['V1'].radius_0=0.1
 </pre>
 
-and go through learning again.  (You can also make this change in the Model Editor.) 
-With such a small learning radius,
-global ordering is unlikely to happen, and one can expect the
-topographic grid not to flatten out (despite local order in patches).
+and go through learning again.  (You can also make this change in the
+Model Editor, or by passing "-c radius_0=0.1" on the command line.) 
+With such a small learning radius, global ordering is unlikely to
+happen, and one can expect the topographic grid not to flatten out
+(despite local order in patches).
 <br>
 <br>
 
 <P>Similarly, consider changing the learning rate from
-<code>V1.alpha_0=0.42</code> to e.g. 1.0.  V1.density and
-Retina.density cannot be changed after the simulation has started; to
-change those edit the <code>som_retinotopy.ty</code> file as described
-in the initial steps above and start Topographica again.
+<code>V1.alpha_0=0.42</code> to e.g. 1.0
+(e.g. by passing "-c alpha_0=1.0" on the command line).  The retina
+and V1 densities cannot be changed after the simulation has started; to
+change those provide their values on the command line as above (or
+edit the <code>som_retinotopy.ty</code> file)
+and start Topographica again.
 
-<P>You can also try changing the random.seed() value in the .ty file,
-to get a different stream of inputs, or RandomArray.seed(), to get a
-different set of initial weights.
+<P>You can also try changing the input_seed ("-c input_seed=XX"), to
+get a different stream of inputs, or weight_seed ("-c
+weight_seed=XX"), to get a different set of initial weights.
+<!-- 
+With some of these values, you may encounter cases where the SOM
+fails to converge even though it seems to be working properly
+otherwise.  For instance, some seed values result in topological
+defects like a 'kink':
 
+  (add picture)
+
+<P>This condition represents a local optimum from which the network
+has difficulty escaping, where there is local order over most of the
+map except for a discontinuity. -->
+
+<P>This condition represents a local optimum from which the network
 <P>Finally, you could change the input pattern to get a different type
 of map.  E.g. if an oriented pattern is used, with random
 orientations, neurons will become selective for orientation and not
