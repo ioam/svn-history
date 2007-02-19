@@ -6,8 +6,9 @@ Contains a Retina (2D Gaussian generator) fully connected to a V1
 
 Constructed to match the retinotopic simulation from page 53-59 of
 Miikkulainen, Bednar, Choe, and Sirosh (2005), Computational Maps in
-the Visual Cortex, Springer, except with a slower learning rate for
-better convergence.
+the Visual Cortex, Springer.  The original simulation used a radius_0
+of 13.3/40, which does work for some random seeds, but a much larger
+radius is used here so that it converges more reliably.
 
 $Id$
 """
@@ -58,19 +59,19 @@ input_pattern = topo.patterns.basic.Gaussian(
     scale=1.0,
     size=2*sqrt(2.0*0.1*24.0)/24.0,
     aspect_ratio=1.0,
-    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=23)),
-    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=45)),
+    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
+    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=56)),
     orientation=0)
 
 # cortical sheet
 RetinotopicSOM.nominal_density = locals().get('default_density',40.0)
 RetinotopicSOM.learning_length = 40000
 
-RetinotopicSOM.radius_0 = 13.3/40.0
-# Original CMVC simulation used 0.42
-RetinotopicSOM.alpha_0  = 0.42/4.0
+# Original CMVC simulation used 13.3/40.0
+RetinotopicSOM.radius_0 = 13.3/40.0*3.0
+RetinotopicSOM.alpha_0  = 0.42
 
-RandomArray.seed(50,50)
+RandomArray.seed(67,89)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom() 
 
 CFProjection.nominal_bounds_template=BoundingBox(radius=1.0) # fully connected network.
