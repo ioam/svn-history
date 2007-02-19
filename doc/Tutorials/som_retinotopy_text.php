@@ -100,9 +100,9 @@ set of weights from a 10x10 subset of the V1 neurons:
 align="middle" WIDTH="615" HEIGHT="457">
 </p>
 
-<p>
-Each neuron is fully connected to the input units, and thus has a
-10x10 array of weights.  Initially, the weights are uniformly random.
+<p> Each neuron is fully connected to the input units, and thus has a
+24x24 array of weights (or 10x10 if you reduced the density as
+suggested above).  Initially, the weights are uniformly random.
 </p>
 
 <p></p>
@@ -242,6 +242,9 @@ class='t_item'>Run for</span> field to any number to train
 several iterations in a batch, e.g. 10.  After 100 iterations, 
 updating the <span class='w_title'>Center of Gravity</span> should
 result in something like:
+
+<!-- Now need to replace 100 with 5000 (!); 10000 and 40000 should work 
+     fine for the rest. -->
 
 <p class='center'>
 <IMG WIDTH="513" HEIGHT="326" SRC="images/som_cog_000100.png"  align="middle" alt="CoG bitmap plots">
