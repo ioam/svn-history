@@ -286,9 +286,13 @@ def shortclassname(x):
 
 
 
-# CEBHACKALERT: see http://docs.python.org/lib/module-hotshot.html for
-# two hackalerts (the timings might be 'more meaningful' when we
-# switch to python 2.5, and we should use hotshot.cProfile).
+# CEBALERT: we should consider switching to cProfile when we update python
+# to 2.5, because the hotshot module is not going to be maintained.
+
+# CEBHACKALERT: the current timings might not be 'meaningful', because
+# 'the timing core [contains] a critical bug' (see
+# http://www.python.org/doc/lib/module-hotshot.html).
+
 def profile(callable,n=50,sorting=('cumulative','time'),strip_dirs=True):
     """
     Profile the given callable, printing statistics about the top n
