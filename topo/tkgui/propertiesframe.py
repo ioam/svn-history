@@ -89,11 +89,10 @@ class PropertiesFrame(Frame):
         Create a ComboBox that can convert its string variable using the given translator and add it to self.properties.
         """        
         var = StringVar()
-        control = ComboBoxTranslator(self,
-                               selectioncommand=(lambda value: self.properties[name].set(value)),**kw)
+        control = ComboBoxTranslator(self,initial_selection=value,
+                                     selectioncommand=(lambda value: self.properties[name].set(value)),
+                                     **kw)
                 
-        control.selectitem(value)
-
         # CEBHACKALERT: this doesn't work for PMW. How do we bind the return
         # key to a PMW combobox? I couldn't figure it out.
         control.bind('<Return>', self.optional_refresh)
