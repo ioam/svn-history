@@ -5,6 +5,8 @@ $Id$
 """
 __version__='$Revision$'
 
+from inspect import getdoc
+
 from Tkinter import Frame, IntVar, Scale, Entry, Checkbutton, Label
 from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH, NORMAL
 import Pmw
@@ -60,12 +62,42 @@ class ComboBoxTranslator(Pmw.ComboBox,WidgetTranslator):
     """
     A Pmw ComboBox with a translator.
     """
-    def __init__(self, parent,selectioncommand=None,scrolledlist_items=[],
+    def __init__(self, parent,initial_selection=None,selectioncommand=None,scrolledlist_items=[],
                  translator=None, **kw):
+        """
+        Initialize a ComboBox and a WidgetTranslator.
+
+        initial_selection is set as the currently selected item.
+
+        Rather than being passed straight to the ComboBox, selectioncommand
+        is stored so that more than one action can be performed when an item
+        in the ComboBox is selected.
+        """
         Pmw.ComboBox.__init__(self, parent,
-                              selectioncommand=selectioncommand,
+                              selectioncommand=self.on_selection,
                               scrolledlist_items=scrolledlist_items, **kw)
         WidgetTranslator.__init__(self,translator=translator)
+        self.__selection_command = selectioncommand
+        self.selectitem(initial_selection)
+
+        # CEBHACKALERT: I'd like to display a help balloon for items in the listbox,
+        # but that doesn't seem to be possible! on_selection() and the help balloon
+        # here are a hack to have at least help text for the currently selected item.
+        
+        # CEBHACKALERT: could probably move this stuff up to widgettranslator so
+        # that there is help text for other types of widget.
+        
+        # create balloon and bind to initial value
+        self.__help_balloon = Pmw.Balloon(parent)
+        self.__help_balloon.bind(self,getdoc(self.get_value()))
+                                 
+    def on_selection(self,value):
+        """
+        Perform the selectioncommand, but also add the currently selected value's
+        docstring to the help balloon.
+        """
+        self.__selection_command(value)
+        self.__help_balloon.bind(self,getdoc(self.get_value()))
 
 
 
