@@ -102,9 +102,11 @@ to see the current matching status).
 
 
 <li>
-2006/05/23 (JB): binding help balloon to the widget (already bound to
+2006/02/20 (JB): binding help balloon to the widget (already bound to
 the label) in parametersframe so that help can be seen for objects
-that are e.g. being selected.
+that are e.g. being selected. <br />
+CB: I've kind of done this. It doesn't seem to be possible to have a
+balloon bound to the options in a ComboBox's list.
 </li>
 
 <li>
@@ -191,10 +193,17 @@ The xml is still complex, but better than looking at a pickle.
 </li>
 
 <li>
-2006/12/21: Could add an example of processing auditory data by
+2007/02/20 (CB): check what happens when building via ssh without an X
+display, but setting the display variable to some other existing display.
+</li>
+
+<li>
+2007/02/20: Could add an example of processing auditory data by
 writing a PatternGenerator that does an FFT incrementally on an audio
 file, delivering part of a spectrogram at each clock tick.  The
-Numeric FFT.fft function might come in handy for this.
+Numeric FFT.fft function might come in handy for this. <br />
+CB: I've added pyaudiolab, and will sometime soon try making a
+PatternGenerator.
 </li>
 
 <li>
@@ -351,10 +360,13 @@ Otherwise, save_snapshot and load_snapshot could specifically avoid items.
 </li>
 
 <li>
-2005/01/01: Should add simple timing functions -- what was the total
+2007/02/20: Should add simple timing functions -- what was the total
 time to run?  What components are taking a long time to run?  Guide
 the user for optimization, focusing on the components we expect to be
 the bottlenecks.
+<br />
+CB: Add information to developers' manual about using profile() to
+investigate optimization.
 </li>
 
 <!--
