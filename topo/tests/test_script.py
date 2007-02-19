@@ -30,6 +30,8 @@ import topo
 from topo.tests.utils import assert_array_equal
 
 
+# CBALERT: will these 'script="examples..."' paths work on Windows?
+
 
 def GenerateData(script="examples/lissom_oo_or.ty",look_at='V1',density=4,run_for=[1,99,150]):
     """
@@ -82,5 +84,4 @@ def TestScript(script="examples/lissom_oo_or.ty"):
                            err_msg="\nAt topo.sim.time()=%d"%topo.sim.time())
 
     print "\nResults from " + script + " have not changed."
-
 
