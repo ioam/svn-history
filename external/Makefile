@@ -353,6 +353,47 @@ gnosis-clean:
 gnosis-uninstall:
 	rm -rf gnosis $(foreach f, ${GNOSIS_UNINSTALL}, ${PREFIX}/${f})
 
+
+
+##############################################################
+# ctypes (used by pyaudiolab)
+#
+
+# CBALERT: ctypes is present in Python 2.5, so remove it
+# if python is updated!
+CTYPES = ctypes-1.0.1
+CTYPES_UNINSTALL =  ${PYTHON_LIB}/site-packages/ctypes
+CTYPES_UNINSTALL += ${PYTHON_LIB}/_ctypes.so ${PYTHON_LIB}/_ctypes_test.so
+
+ctypes: ${CTYPES}.tar.gz python
+	tar xzf ${CTYPES}.tar.gz
+	cd ${CTYPES}; ${PREFIX}/bin/python setup.py build
+	cd ${CTYPES}; ${PREFIX}/bin/python setup.py install
+	touch ctypes
+
+ctypes-clean:
+	rm -rf ${CTYPES}
+ctypes-uninstall:
+	rm -rf ctypes ${CTYPES} $(foreach f, ${CTYPES_UNINSTALL}, ${PREFIX}/${f})
+
+
+
+##############################################################
+# pyaudiolab (sound file reading)
+#
+PYAUDIOLAB = pyaudiolab-0.6.6
+PYAUDIOLAB_UNINSTALL =  ${PYTHON_LIB}/site-packages/pyaudiolab
+
+pyaudiolab: ${PYAUDIOLAB}.tar.gz python
+	tar xzf ${PYAUDIOLAB}.tar.gz
+	cd ${PYAUDIOLAB}; ${PREFIX}/bin/python setup.py install
+	touch pyaudiolab
+
+pyaudiolab-clean:
+	rm -rf ${PYAUDIOLAB} 
+pyaudiolab-uninstall:
+	rm -rf pyaudiolab ${PYAUDIOLAB} $(foreach f, ${PYAUDIOLAB_UNINSTALL}, ${PREFIX}/${f})
+
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
