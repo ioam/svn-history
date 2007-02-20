@@ -315,6 +315,7 @@ Each type will have various parameters that can be changed.""")
 	new_plotgroup.sizeconvertfn = self.plotgroup.sizeconvertfn
 	new_plotgroup.normalize = self.plotgroup.normalize
 	new_plotgroup.minimum_height_of_tallest_plot = self.plotgroup.minimum_height_of_tallest_plot
+	new_plotgroup.time = topo.sim.time()
 	self.plotgroup = new_plotgroup
  				
     
