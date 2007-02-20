@@ -45,6 +45,9 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
 	self.strengthonly_checkbutton = Checkbutton(self.control_frame_1,
              text="Strength only",variable=self.strengthonly,command=self.set_strengthonly)
 	self.strengthonly_checkbutton.pack(side=RIGHT)
+        self.balloon.bind(self.strengthonly_checkbutton,
+"""If true, disables all but the Strength channel of each plot,
+disabling all color coding for Strength/Hue/Confidence plots.""")
 
 	self.normalize.set(self.pgt.normalize)
         self.plotgroup.normalize=self.normalize.get()
@@ -83,6 +86,23 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
         if self.__class__ == TemplatePlotGroupPanel:
             self.refresh(update=self.pgt.plot_immediately)
 
+    def _pg_template(self):
+        """
+        Function that returns the plotgroup_template for this panel,
+        after first stripping non-strength plots if necessary
+        """
+        # Strip Hue and Confidence if strengthonly is set
+        if self.strengthonly.get() == False:
+            return self.pgt
+        else:
+            pgt = copy.deepcopy(self.pgt)
+            for name,template in pgt.plot_templates:
+                if template.has_key('Hue'):
+                    del template['Hue']
+                if template.has_key('Confidence'):
+                    del template['Confidence']
+            return pgt
+        
     def generate_plotgroup(self):
         """
         Function that generates the plot for the panel.
@@ -91,22 +111,11 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
         command is executed, then the plot is generated using the
         specified PlotGroupTemplate.
         """
-        # Strip Hue and Confidence if strengthonly is set
-        if self.strengthonly.get() == False:
-            pgt=self.pgt
-        else:
-            pgt = copy.deepcopy(self.pgt)
-            for name,template in pgt.plot_templates:
-                if template.has_key('Hue'):
-                    del template['Hue']
-                if template.has_key('Confidence'):
-                    del template['Confidence']
-        
         ### JCALERT! Maybe if the template specified a PlotGroup, we could
         ### take the one that is specified.
         ### Otherwise, we could assume that each panel is associated with a PlotGroup
         ### and then specify a panel for each template. (as it is done from topoconsole)
-	plotgroup = TemplatePlotGroup([],pgt,None,
+	plotgroup = TemplatePlotGroup([],self._pg_template(),None,
                                       normalize=self.normalize.get(),
 				      sheetcoords=self.sheetcoords.get(),
                                       integerscaling=self.integerscaling.get())

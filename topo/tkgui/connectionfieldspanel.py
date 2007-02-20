@@ -198,7 +198,8 @@ It is an error to request a unit outside the area of the Sheet.""")
         PlotGroup is created, call its do_plot_cmd() to prepare
         the Plot objects.
         """
-	plotgroup = ConnectionFieldsPlotGroup([],self.pgt,self.region.get(),self.x,self.y,
+	plotgroup = ConnectionFieldsPlotGroup([],self._pg_template(),self.region.get(),
+                                              self.x,self.y,
                                               normalize=self.normalize.get(),
                                               sheetcoords=self.sheetcoords.get(),
                                               integerscaling=self.integerscaling.get())
