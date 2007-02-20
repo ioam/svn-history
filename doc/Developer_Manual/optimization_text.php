@@ -339,3 +339,49 @@ $ ./topographica examples/speed_test.ty -c "from topo.misc.utils import profile;
 
 and we have cut the total run time to 70% of its starting value with just a few minutes' work. learning function is now
 taking the larger fraction of runtime
+
+
+
+<P>[probably new subsection]Being possible to re-write functions in c, might wonder if it would help in this case, or does numpy already do a good job?
+Replace <code>CFPRF_Plugin(single_cf_fn=dot)</code> with <code>CFPRF_DotProduct_opt</code>, an optimized version written in C.
+
+
+
+<pre>
+marfa:~/dev_ext/topographica chris$ ./topographica examples/speed_test.ty -c "from topo.misc.utils import profile; profile('topo.sim.run(50)',n=20)" 
+         131886 function calls (129784 primitive calls) in 7.098 CPU seconds
+
+   Ordered by: cumulative time, internal time
+   List reduced from 155 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    7.098    7.098 <string>:1(?)
+        1    0.014    0.014    7.098    7.098 simulation.py:626(run)
+      100    0.001    0.000    4.504    0.045 projection.py:151(process_current_time)
+       50    0.002    0.000    4.462    0.089 cfsom.py:58(learn)
+       50    0.002    0.000    4.449    0.089 cf.py:792(learn)
+       50    1.814    0.036    4.446    0.089 som.py:66(__call__)
+    13652    2.282    0.000    2.282    0.000 arrayutils.py:18(L2norm)
+      100    0.001    0.000    1.560    0.016 simulation.py:452(__call__)
+      100    0.014    0.000    1.280    0.013 patterngenerator.py:92(__call__)
+       50    0.010    0.000    1.238    0.025 generatorsheet.py:106(input_event)
+5150/4850    0.043    0.000    1.172    0.000 parameterclasses.py:179(__get__)
+    14600    0.260    0.000    1.172    0.000 parameterizedobject.py:307(get_name)
+      150    0.002    0.000    1.070    0.007 parameterclasses.py:386(__get__)
+      100    0.003    0.000    0.992    0.010 simulation.py:455(__repr__)
+ 1900/100    0.152    0.000    0.980    0.010 parameterizedobject.py:642(__repr__)
+    20378    0.455    0.000    0.900    0.000 parameterizedobject.py:513(get_param_descriptor)
+     1900    0.197    0.000    0.824    0.000 parameterizedobject.py:742(get_param_values)
+    22695    0.550    0.000    0.550    0.000 parameterizedobject.py:29(classlist)
+     2100    0.010    0.000    0.446    0.000 parameterizedobject.py:829(params)
+     2100    0.344    0.000    0.436    0.000 parameterizedobject.py:533(classparams)
+       50    0.002    0.000    0.320    0.006 projection.py:122(input_event)
+       50    0.000    0.000    0.314    0.006 projection.py:182(present_input)
+       50    0.004    0.000    0.313    0.006 cf.py:785(activate)
+       50    0.002    0.000    0.307    0.006 optimized.py:28(__call__)
+
+</pre>
+
+<P>The simulation now takes about 80% of the time the numpy version takes. The c code adds 
+a lot of complexity to the code: for maintenance, for deployment on different platforms, and
+for user understanding - so it has to justify this with bigtime speedups.
