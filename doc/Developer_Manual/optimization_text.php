@@ -338,4 +338,4 @@ $ ./topographica examples/speed_test.ty -c "from topo.misc.utils import profile;
 </pre>
 
 and we have cut the total run time to 70% of its starting value with just a few minutes' work. learning function is now
-taking more total run time.
+taking the larger fraction of runtime
