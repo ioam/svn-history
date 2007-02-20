@@ -339,19 +339,19 @@ and start Topographica again.
 <P>You can also try changing the input_seed ("-c input_seed=XX"), to
 get a different stream of inputs, or weight_seed ("-c
 weight_seed=XX"), to get a different set of initial weights.
-<!-- 
 With some of these values, you may encounter cases where the SOM
 fails to converge even though it seems to be working properly
 otherwise.  For instance, some seed values result in topological
 defects like a 'kink':
 
-  (add picture)
+<p class='center'>
+<IMG WIDTH="420" HEIGHT="474" SRC="images/som_grid_kink.png" align="middle" alt="Grid with a kink">
+</p>
 
 <P>This condition represents a local optimum from which the network
 has difficulty escaping, where there is local order over most of the
-map except for a discontinuity. -->
+map except for a discontinuity.
 
-<P>This condition represents a local optimum from which the network
 <P>Finally, you could change the input pattern to get a different type
 of map.  E.g. if an oriented pattern is used, with random
 orientations, neurons will become selective for orientation and not
