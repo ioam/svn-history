@@ -378,13 +378,37 @@ ctypes-uninstall:
 
 
 
+
+##############################################################
+# libsndfile (used by pyaudiolab)
+#
+LIBSNDFILE = libsndfile-1.0.17
+
+LIBSNDFILE_UNINSTALL += bin/sndfile-* 
+LIBSNDFILE_UNINSTALL += lib/libsndfile.*
+
+libsndfile: ${LIBSNDFILE}.tar.gz
+	tar xzf ${LIBSNDFILE}.tar.gz
+	cd ${LIBSNDFILE}; ./configure --prefix=${PREFIX}
+	cd ${LIBSNDFILE}; make 
+	cd ${LIBSNDFILE}; make install
+	touch libsndfile
+
+libsndfile-clean:
+	rm -rf  ${LIBSNDFILE} 
+libsndfile-uninstall:
+	rm -rf libsndfile ${foreach f,${LIBSNDFILE_UNINSTALL}, ${PREFIX}/${f}}
+
+
+
+
 ##############################################################
 # pyaudiolab (sound file reading)
 #
 PYAUDIOLAB = pyaudiolab-0.6.6
 PYAUDIOLAB_UNINSTALL =  ${PYTHON_LIB}/site-packages/pyaudiolab
 
-pyaudiolab: ${PYAUDIOLAB}.tar.gz python
+pyaudiolab: ${PYAUDIOLAB}.tar.gz python libsndfile ctypes
 	tar xzf ${PYAUDIOLAB}.tar.gz
 	cd ${PYAUDIOLAB}; ${PREFIX}/bin/python setup.py install
 	touch pyaudiolab
