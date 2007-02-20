@@ -53,14 +53,18 @@ class RetinotopicSOM(CFSOM):
 # input pattern
 GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0.05
-GeneratorSheet.nominal_density = 24
+# The locals().get calls allow the parameter to be overriden on the command line
+GeneratorSheet.nominal_density = locals().get('default_retina_density',24.0)
+
+# Local variable to allow inputs to be controlled easily
+input_seed=locals().get('input_seed',0)
 
 input_pattern = topo.patterns.basic.Gaussian(
     scale=1.0,
     size=2*sqrt(2.0*0.1*24.0)/24.0,
     aspect_ratio=1.0,
-    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
-    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=56)),
+    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=input_seed+12)),
+    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=input_seed+56)),
     orientation=0)
 
 # cortical sheet
@@ -68,10 +72,13 @@ RetinotopicSOM.nominal_density = locals().get('default_density',40.0)
 RetinotopicSOM.learning_length = 40000
 
 # Original CMVC simulation used 13.3/40.0
-RetinotopicSOM.radius_0 = 13.3/40.0*3.0
-RetinotopicSOM.alpha_0  = 0.42
+RetinotopicSOM.radius_0 = locals().get('radius_0',13.3/40.0*3.0)
+RetinotopicSOM.alpha_0  = locals().get('alpha_0',0.42)
 
-RandomArray.seed(67,89)
+# Local variable to allow weights to be controlled easily
+weight_seed=locals().get('weight_seed',0)
+
+RandomArray.seed(weight_seed+67,weight_seed+89)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom() 
 
 CFProjection.nominal_bounds_template=BoundingBox(radius=1.0) # fully connected network.
