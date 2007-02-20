@@ -81,7 +81,7 @@ select <span class='t_item'>Test pattern</span> from the <span class='t_item'>Si
 
 <p class='center'>
 <img src="images/test_pattern_oo.png" alt="Test Pattern window"
-align="middle" WIDTH="426" HEIGHT="730">
+align="middle" WIDTH="432" HEIGHT="759">
 </p>
 
 <p>
@@ -94,7 +94,7 @@ This will present a horizontal line.
 <li>To see the result, select <span class='t_item'>Activity</span> from
 the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topographica Console</span> to get:
 <p class='center'>
-<img src="images/activity_line_oo.png" alt="Response to a line" align="middle" width="676" height="328">
+<img src="images/activity_line_oo.png" alt="Response to a line" align="middle" width="676" height="340">
 </p>
 
 This window shows the response for each neural area.  
@@ -133,7 +133,7 @@ to the neuron in the center of the cortex (by default):
 
 <p class="center">
 <img src="images/unit_weights_0_0_oo.png" alt="Weights of one
-neuron" align="middle" WIDTH="676" HEIGHT="358">
+neuron" align="middle" WIDTH="676" HEIGHT="370">
 </p>
 
 <p> The plot shows the afferent weights to V1 (i.e., connections from
@@ -156,7 +156,7 @@ class='t_item'>Projection</span> list:
 
 <p class="center">
 <img src="images/projection_oo.png" alt="Afferent weights of many
-neurons" align="middle" WIDTH="659" HEIGHT="491">
+neurons" align="middle" WIDTH="644" HEIGHT="559">
 </p>
 
 This plot shows the afferent weights from the LGN ON sheet for every fifth neuron in each
@@ -177,7 +177,7 @@ neuron.  The results of a similar procedure can be viewed by selecting
 class='t_item'>Plots</span> menu, which should show something like:
 
 <p class="center">
-<img src="images/oo_or_map.png" alt="Orientation map" width="629" height="369">
+<img src="images/oo_or_map.png" alt="Orientation map" width="625" height="381">
 </p><br>
 
 <P>
@@ -209,7 +209,7 @@ on the <span class='w_title'>Test pattern</span> window and then looking
 at the refreshed image in the <span class='w_title'>Activity</span> window:
 
 <p class="center">
-<img src="images/activity_line_oo_or.png" alt="Color-coded response to a line" width="676" height="328" ><br />
+<img src="images/activity_line_oo_or.png" alt="Color-coded response to a line" width="676" height="340" ><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
@@ -238,7 +238,7 @@ located in a patch of neurons with similar orientation preferences:
 
 <p class="center">
 <img src="images/unit_weights_0_0_oo_or.png" alt="Colorized weights of
-one neuron" align="middle" width="676" height="358" ><br />
+one neuron" align="middle" width="676" height="370" ><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
@@ -303,7 +303,7 @@ orientation-specific responses to large contours in the image:
 </p>
 
 <p class="center">
-<img src="images/natural_image_oo_or.png" alt="Ellen Arthur" align="middle" width="676" height="328" ><br />
+<img src="images/natural_image_oo_or.png" alt="Ellen Arthur" align="middle" width="676" height="340" ><br />
 </p>
 
 <P>Be aware when comparing the Retina and V1 plots for a photograph
@@ -401,9 +401,8 @@ topo.sim['V1'].projections()['LGNOffAfferent'].learning_rate=200
 
 Now each new pattern generated in a
 training iteration will nearly wipe out any existing weights.
-(It may also be possible to view and change the learning_rate in the
-<span class='w_title'>Model Editor</span> window, although that
-feature is currently under development.)
+(It should also be possible to view and change the learning_rate in the
+<span class='w_title'>Model Editor</span> window.)
 
 <p></p></li><li>For more control over the training inputs, open the
 <span class='w_title'>Test Pattern</span> window, select an
