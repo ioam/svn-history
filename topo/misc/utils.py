@@ -293,10 +293,11 @@ def shortclassname(x):
 # 'the timing core [contains] a critical bug' (see
 # http://www.python.org/doc/lib/module-hotshot.html).
 
-def profile(callable,n=50,sorting=('cumulative','time'),strip_dirs=True):
+def profile(command,n=50,sorting=('cumulative','time'),strip_dirs=True):
     """
-    Profile the given callable, printing statistics about the top n
-    functions when ordered according to sorting.
+    Profile the given command (supplied as a string), printing
+    statistics about the top n functions when ordered according to
+    sorting.
 
     sorting defaults to ordering by cumulative time and then internal
     time; see http://docs.python.org/lib/profile-stats.html for other
@@ -326,7 +327,7 @@ def profile(callable,n=50,sorting=('cumulative','time'),strip_dirs=True):
     import hotshot,hotshot.stats
     
     prof = hotshot.Profile('current_profile')
-    prof.run(callable)
+    prof.run(command)
     prof.close()
     
     prof_stats = hotshot.stats.load('current_profile')
