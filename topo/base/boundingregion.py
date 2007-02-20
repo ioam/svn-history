@@ -50,7 +50,13 @@ class BoundingBox(BoundingRegion):
         will display the bounds.
         """
         l,b,r,t = self._aarect.lbrt()
-        return 'BoundingBox(points=((%s,%s),(%s,%s)))'%(l,b,r,t)
+        if r == -l and t == -b and r == t:
+            return 'BoundingBox(radius=%s)'%(r)
+        else:
+            return 'BoundingBox(points=((%s,%s),(%s,%s)))'%(l,b,r,t)
+
+    def script_repr(self,prefix="    "):
+        return self.__str__()
 
     def __init__(self,**args):
         """
