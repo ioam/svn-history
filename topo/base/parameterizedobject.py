@@ -655,7 +655,14 @@ class ParameterizedObject(object):
                     for name,val in self.get_param_values()]
         return self.__class__.__name__ + "(" + ", ".join(settings) + ")"
 
-        
+
+    # JABALERT: Only partially achieved so far -- objects of the same
+    # type and parameter values are treated as different, so anything
+    # for which instantiate == True is reported as being non-default.
+    script_repr_suppress_defaults=Parameter(True, doc="""
+        Whether script_repr should avoid reporting the values of parameters
+        that are just inheriting their values from the class defaults.""")
+    
     def script_repr(self,prefix="    "):
         """
         Variant of __repr__ designed for generating a runnable script.
@@ -668,8 +675,12 @@ class ParameterizedObject(object):
         #
         # Currently suppresses automatically generated names and
         # print_levels.
+        #
+        # JABHACKALERT: Dynamic parameters are currently silently
+        # reported as their current value; they should instead get a
+        # representation that allows them to be regenerated.
         settings=[]
-        for name,val in self.get_param_values():
+        for name,val in self.get_param_values(onlychanged=self.script_repr_suppress_defaults):
             if name == 'name' and re.match('^'+self.__class__.__name__+'[0-9]+$',val):
                 rep=None
             elif name == 'print_level':
@@ -767,25 +778,13 @@ class ParameterizedObject(object):
                 self.warning("'%s' was ignored (not a Parameter)."%item)
 
 
-    def get_param_values(self):
+    def get_param_values(self,onlychanged=False):
         """Return a list of name,value pairs for all Parameters of this object"""
-        from parameterclasses import DynamicNumber
         vals = []
-        for name in self.params().keys():
-
-            # CEBHACKALERT: avoids getting a new value for a DynamicNumber!
-            # (Otherwise, all that should be here is value=getattr(self,name).)
-            k = "_%s_param_value"%(name)
-            if k in self.__dict__:
-                if isinstance(self.__dict__[k],DynamicNumber):
-                    value = self.__dict__[k].last_value
-                else:
-                    value = getattr(self,name)
-            else:
-                value = getattr(self,name)                    
-            # end CEBHACKALERT 
-                    
-            vals.append((name,value))
+        for name,val in self.params().items():
+            value = self.inspect_value(name)
+            if (not onlychanged or value != val.default):
+                vals.append((name,value))
 
         vals.sort(key=lambda x:x[0])
         return vals
