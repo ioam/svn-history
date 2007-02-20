@@ -88,7 +88,7 @@ set of weights from a 10x10 subset of the V1 neurons:
 
 <p class='center'>
 <img src="images/som_projection_000000.png" alt="Projection window at 0"
-align="middle" WIDTH="615" HEIGHT="457">
+align="middle" WIDTH="420" HEIGHT="469">
 </p>
 
 <p> Each neuron is fully connected to the input units, and thus has a
@@ -113,7 +113,7 @@ mapping</span> window.  This plot shows the CoG for each V1 neuron,
 plotted on the Retina:
 
 <p class='center'>
-<IMG WIDTH="420" HEIGHT="474" SRC="images/som_grid_000000.png" align="middle" alt="CoG bitmap plots">
+<IMG WIDTH="420" HEIGHT="469" SRC="images/som_grid_000000.png" align="middle" alt="CoG bitmap plots">
 </p>
 
 <P>Each neuron is represented by a point, and a line segment is drawn
@@ -129,7 +129,7 @@ Gravity</span> plot window, although it is more difficult to interpret
 at this stage:
 
 <p class='center'>
-<IMG WIDTH="513" HEIGHT="326" SRC="images/som_cog_000000.png"  align="middle" alt="CoG bitmap plots">
+<IMG WIDTH="513" HEIGHT="340" SRC="images/som_cog_000000.png"  align="middle" alt="CoG bitmap plots">
 </p>
 
 where the V1 X CoG plot shows the X location preferred by each neuron,
@@ -158,7 +158,7 @@ represents the SOM Euclidean-distance response function.  Select
 the <span class='t_item'>Plots</span> menu to get the following plot:
 
 <p class='center'>
-<IMG WIDTH="408" HEIGHT="326" SRC="images/som_activity_000000.png" align="middle" alt="Activity at 0">
+<IMG WIDTH="416" HEIGHT="340" SRC="images/som_activity_000000.png" align="middle" alt="Activity at 0">
 </p>
 
 <p>This window shows the response for each Sheet in the model, which
@@ -177,7 +177,7 @@ Console</span> window, make sure it says 1, and hit Go.  The
 show something like:
 
 <p class='center'>
-<IMG WIDTH="408" HEIGHT="326" SRC="images/som_activity_000001.png" align="middle" alt="Activity at 0">
+<IMG WIDTH="416" HEIGHT="340" SRC="images/som_activity_000001.png" align="middle" alt="Activity at 0">
 </p>
 
 <p>In the <span class='t_item'>Retina</span> plot, each photoreceptor
@@ -203,7 +203,7 @@ of the neurons have learned new weight patterns based on this input.
 
 <p class='center'>
 <img src="images/som_projection_000001.png" alt="Projection window at 1"
-align="middle" WIDTH="615" HEIGHT="457">
+align="middle" WIDTH="420" HEIGHT="469">
 </p>
 
 (You should probably turn on the <span
@@ -225,30 +225,27 @@ that the input patterns are becoming represented in the weight
 patterns, though not very cleanly yet:
 
 <p class='center'>
-<img src="images/som_projection_000006.png" alt="Projection window at 1"
-align="middle" WIDTH="615" HEIGHT="457">
+<img src="images/som_projection_000005.png" alt="Projection window at 5"
+align="middle" WIDTH="420" HEIGHT="469">
 </p>
 
 Also note that the activation patterns are becoming smoother, since
 the weight vectors are now similar between neighboring neurons:
 
 <p class='center'>
-<IMG WIDTH="408" HEIGHT="326" SRC="images/som_activity_000006.png" align="middle" alt="Activity at 0">
+<IMG WIDTH="416" HEIGHT="340" SRC="images/som_activity_000005.png" align="middle" alt="Activity at 0">
 </p>
 
 <P><li>Continue training for a while and looking at the activation and
 weight patterns.  Instead of 1, you can change the
 <span
 class='t_item'>Run for</span> field to any number to train
-several iterations in a batch, e.g. 10.  After 100 iterations, 
+numerous iterations in a batch, e.g. 1000.  After 5000 iterations, 
 updating the <span class='w_title'>Center of Gravity</span> should
 result in something like:
 
-<!-- Now need to replace 100 with 5000 (!); 10000 and 40000 should work 
-     fine for the rest. -->
-
 <p class='center'>
-<IMG WIDTH="513" HEIGHT="326" SRC="images/som_cog_000100.png"  align="middle" alt="CoG bitmap plots">
+<IMG WIDTH="513" HEIGHT="340" SRC="images/som_cog_005000.png"  align="middle" alt="CoG bitmap plots">
 </p>
 
 The X and Y CoG plots are now smooth, but not yet the axis-aligned gradients
@@ -256,7 +253,7 @@ The X and Y CoG plots are now smooth, but not yet the axis-aligned gradients
 have. Similarly, the topographic grid plot:
 
 <p class='center'>
-<IMG WIDTH="420" HEIGHT="474" SRC="images/som_grid_000100.png" align="middle" alt="Grid at 100">
+<IMG WIDTH="420" HEIGHT="469" SRC="images/som_grid_005000.png" align="middle" alt="Grid at 100">
 </p>
 
 shows that the network is now responding to different regions of the
@@ -265,14 +262,23 @@ properly.  Additional training up to 10000 iterations leads to a flat, square
 map:
 
 <p class='center'>
-<IMG WIDTH="420" HEIGHT="474" SRC="images/som_grid_010000.png" align="middle" alt="Grid at 10000">
+<IMG WIDTH="420" HEIGHT="469" SRC="images/som_grid_010000.png" align="middle" alt="Grid at 10000">
 </p>
+
+although the weight patterns are still quite broad and not very
+selective for typical input patterns:
+
+<P class='center'>
+<img src="images/som_projection_010000.png" alt="Projection window at 10000"
+align="middle" WIDTH="420" HEIGHT="469">
+</p>
+
 
 and by 40000 the map has good coverage of the available portion of the
 input space:
 
 <p class='center'>
-<IMG WIDTH="420" HEIGHT="474" SRC="images/som_grid_040000.png" align="middle" alt="Grid at 40000">
+<IMG WIDTH="420" HEIGHT="469" SRC="images/som_grid_040000.png" align="middle" alt="Grid at 40000">
 </p>
 
 <LI>The final projection window at 40000 now shows that each neuron
@@ -281,17 +287,15 @@ matching a prototypical input at one location:
 
 <p class='center'>
 <img src="images/som_projection_040000.png" alt="Projection window at 40000"
-align="middle" WIDTH="615" HEIGHT="457">
+align="middle" WIDTH="420" HEIGHT="469">
 </p>
 
-For this particular example, the topographic mapping for the x
-dimension happens to be in the same orientation as the retina, and for
-the y dimension happens to be opposite.
-For example, responses to patterns in the
-upper left of the retina lead to responses in the bottom left of the
-cortex.  There is no reason this should be the case in general, and
-the map can be flipped or rotated by 90 degrees along any axis with
-equivalent results.
+For this particular example, the topographic mapping for the x and y
+dimensions happen to be in the same orientation as the retina.  For
+example, responses to patterns in the upper left of the retina lead to
+responses in the upper left of the cortex.  There is no reason this
+should be the case in general, and the map can be flipped or rotated
+by 90 degrees along any axis with equivalent results.
 
 <P><LI>Now, re-run the basic simulation by quitting and restarting
 Topographica.  This time, change one of the parameter values, either
