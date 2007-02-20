@@ -880,5 +880,6 @@ class Simulation(ParameterizedObject):
         its name, are not yet included.
         """
         ### JABALERT: It may be possible to generate the list of required imports too
+        ### Also need topo.sim.name
         reps = [o.script_repr() for o in self.objects().values() + self.connections()]
         return '\n\n\n'.join(reps)
