@@ -18,8 +18,8 @@ from topo.misc.utils import shortclassname
 from parametersframe import ParametersFrame
 
 
-# CEBHACKALERT: any reason this isn't a new-style class
-# (i.e. why doesn't this inherit from object)?
+# CEBALERT: any reason this isn't a new-style class (i.e. why doesn't
+# this inherit from object)?
 # JAB: Probably no reason; should be changed to inherit from object.
 #
 class EditorObject:
@@ -173,10 +173,10 @@ class EditorSheet(EditorNode):
 
     def __init__(self, canvas, sheet, pos, name):
         EditorNode.__init__(self, canvas, pos, name)
-        # CEBHACKALERT: couldn't the object be stored in something like
-        # self.parameterized_object rather than specifically self.sheet
-        # or self.connection? I've added a copy but 'sheet' needs to be
-        # replaced (here and in other classes).
+        # CEBALERT: couldn't the object be stored in something like
+        # self.parameterized_object rather than specifically
+        # self.sheet or self.connection? I've added a copy but 'sheet'
+        # needs to be replaced (here and in other classes).
         self.sheet = sheet # the topo sheet that this object represents
         self.parameterized_obj = self.sheet
         
@@ -480,7 +480,7 @@ class EditorConnection(EditorObject):
 
     def connect(self, to_node, con) : # pass the node this connection is to
         self.connection = con # store the topo connection this object represents
-        # CEBHACKALERT: see earlier alert about sheet attribute name
+        # CEBALERT: see earlier alert about sheet attribute name
         self.parameterized_obj = self.connection
         if (self.name == ""):
             self.name = con.name
@@ -490,8 +490,11 @@ class EditorConnection(EditorObject):
         self.to_node.attach_connection(self, self.TO)
 
     def remove(self):
-        # CEBHACKALERT: there's no code to handle GUI object removal
-        # (though it looks like the EditorProjection subclass implements it).
+        # CEBHACKALERT: there's no code here to handle GUI object
+        # removal (though the EditorProjection subclass does have GUI
+        # removal code, so presumably projections do get removed from
+        # the screen. But I'm confused about what is treated as a
+        # connection, and what as a projection in the model editor).
         if hasattr(self,'connection'):
             self.connection.remove()
 
@@ -686,9 +689,8 @@ class EditorProjection(EditorConnection):
             self.canvas.delete(id)
         self.canvas.delete(self.label)
 
-        # CEBHACKALERT: see alert about EditorObject not inheriting from object.
-        EditorConnection.remove(self)
-        #super(EditorProjection,self).remove()
+        # CEBALERT: see earlier alert about EditorObject not inheriting from object.
+        EditorConnection.remove(self) #super(EditorProjection,self).remove()
         
 
     def decrement_draw_index(self):
