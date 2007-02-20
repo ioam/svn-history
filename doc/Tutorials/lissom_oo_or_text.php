@@ -97,7 +97,9 @@ the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topograp
 <img src="images/activity_line_oo.png" alt="Response to a line" align="middle" width="676" height="340">
 </p>
 
-This window shows the response for each neural area.  
+<P>This window shows the response for each neural area.  For now, please
+make sure that <span class='t_item'>Strength only</span> is turned on;
+it is usually off by default.
 
 </p><p>In the <span class='t_item'>Retina</span> plot, each
 photoreceptor is represented as a pixel whose shade of grey codes the
@@ -129,12 +131,13 @@ class='t_item'>V1</span> from the <span class='t_item'>Sheet</span>
 drop-down list. This will plot the synaptic strengths of connections
 to the neuron in the center of the cortex (by default):
 
-
-
 <p class="center">
 <img src="images/unit_weights_0_0_oo.png" alt="Weights of one
 neuron" align="middle" WIDTH="676" HEIGHT="370">
 </p>
+
+<P>Again, please make sure for now that <span class='t_item'>Strength
+only</span> is turned on; it is usually off by default.
 
 <p> The plot shows the afferent weights to V1 (i.e., connections from
 the ON and OFF channels of the LGN, followed by the lateral excitatory
@@ -203,38 +206,32 @@ Preference&Selectivity plot is nearly identical to the Preference plot.
 </p><p>
 </p></li>
 
-<li>Now that we have the orientation map, we can see more clearly
-why activation patterns are patchy by pressing <span class='b_press'>Present</span>
-on the <span class='w_title'>Test pattern</span> window and then looking
-at the refreshed image in the <span class='w_title'>Activity</span> window:
+<li>Now that we have looked at the orientation map, we can see more clearly
+why activation patterns are patchy by coloring each neuron with its
+orientation preference.  To do this, make sure that <span
+class='t_item'>Strength only</span> is turned off:
 
 <p class="center">
 <img src="images/activity_line_oo_or.png" alt="Color-coded response to a line" width="676" height="340" ><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
-(Alternatively, if you want to keep the old plot for comparison, you
-can make sure that <span class='t_item'>Auto-refresh</span> is not enabled in it, then
-generate a new plot by selecting <span class='t_item'>Activity</span> in the
-<span class='t_item'>Plots</span> menu of the <span class='w_title'>Topographica Console</span> window.  This technique also applies to all of the other window types as well.)
-</p>
-<p> The V1 activity plots are colorized now that the orientation map
-has been measured.  Each V1 neuron is now color coded by its
+<p>Each V1 neuron is now color coded by its
 orientation, with brighter colors indicating stronger activation.  We
 can now see that the neurons responding are indeed those that prefer
 orientations similar to the input pattern, and that the response is
 patchy because other nearby neurons do not respond.  To be sure of
 that, try rotating the image by adjusting the orientation, then present 
-it again -- the colors should be different, and match the orientation chosen.
+it again -- the colors should be different, and should match the
+orientation chosen. 
 </p>
 <p></p>
 </li>
 
-<li> If you now <span class='b_press'>Refresh</span> the
-<span class='w_title'>Connection Fields</span>
+<li> If you now turn off <span class='t_item'>Strength only</span>
+in the <span class='w_title'>Connection Fields</span>
 window, you can see that the neuron whose weights we plotted is
 located in a patch of neurons with similar orientation preferences: 
-
 
 <p class="center">
 <img src="images/unit_weights_0_0_oo_or.png" alt="Colorized weights of
@@ -244,9 +241,9 @@ one neuron" align="middle" width="676" height="370" ><br />
 
 <p>
 Look at the <span class='t_item'>LateralExcitatory</span> weights, which show that
-the neurons near this neuron are primarily green and blue.
-Neurons just to the left or right can be selected by changing the
-(X,Y) coordinates; these should have higher selectivity.
+the neurons near this neuron are all red (horizontal). Other neurons
+can be selected by changing the (X,Y) coordinates; these should have
+higher selectivity.
 </p>
 <p></p></li>
 
