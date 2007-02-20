@@ -124,6 +124,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
     def set_strengthonly(self):
         """Function called by Widget when check-box clicked"""
 	self.plotgroup=self.generate_plotgroup()
+        self.refresh(update=False)
 	self.plotgroup.update_plots(False)
         self.display_plots()
         self.display_labels()
