@@ -8,9 +8,10 @@ __version__='$Revision$'
 
 from inspect import getdoc
 
+import copy
 import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
-     Entry, Canvas, Checkbutton
+     Entry, Canvas, Checkbutton, BooleanVar
 
 import topo
 from plotgrouppanel import PlotGroupPanel
@@ -35,7 +36,15 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
         # Plotgroup Template associated
         self.pgt = plotgroup_templates.get(pgt_name,None)
 
+	# Strength only check button
+	self.strengthonly = BooleanVar()
+	self.strengthonly.set(False)
+
 	PlotGroupPanel.__init__(self,parent,console,pgt_name,**params)
+
+	self.strengthonly_checkbutton = Checkbutton(self.control_frame_1,
+             text="Strength only",variable=self.strengthonly,command=self.set_strengthonly)
+	self.strengthonly_checkbutton.pack(side=RIGHT)
 
 	self.normalize.set(self.pgt.normalize)
         self.plotgroup.normalize=self.normalize.get()
@@ -62,7 +71,6 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
                               scrolledlist_items=([self.cmdname.get()]))
         cmdbox.pack(side=LEFT,expand=YES,fill=X)
         self.balloon.bind(cmdbox,getdoc(self.plotgroup.params()['updatecommand']))
-
        
         # To make the auto-refresh button off by default except for
         # the Activity PlotGroup
@@ -75,7 +83,6 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
         if self.__class__ == TemplatePlotGroupPanel:
             self.refresh(update=self.pgt.plot_immediately)
 
-
     def generate_plotgroup(self):
         """
         Function that generates the plot for the panel.
@@ -84,16 +91,34 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
         command is executed, then the plot is generated using the
         specified PlotGroupTemplate.
         """
+        # Strip Hue and Confidence if strengthonly is set
+        if self.strengthonly.get() == False:
+            pgt=self.pgt
+        else:
+            pgt = copy.deepcopy(self.pgt)
+            for name,template in pgt.plot_templates:
+                if template.has_key('Hue'):
+                    del template['Hue']
+                if template.has_key('Confidence'):
+                    del template['Confidence']
+        
         ### JCALERT! Maybe if the template specified a PlotGroup, we could
         ### take the one that is specified.
         ### Otherwise, we could assume that each panel is associated with a PlotGroup
         ### and then specify a panel for each template. (as it is done from topoconsole)
-	plotgroup = TemplatePlotGroup([],self.pgt,None,
+	plotgroup = TemplatePlotGroup([],pgt,None,
                                       normalize=self.normalize.get(),
 				      sheetcoords=self.sheetcoords.get(),
                                       integerscaling=self.integerscaling.get())
 	return plotgroup
 
+    def set_strengthonly(self):
+        """Function called by Widget when check-box clicked"""
+	self.plotgroup=self.generate_plotgroup()
+	self.plotgroup.update_plots(False)
+        self.display_plots()
+        self.display_labels()
+        
     def update_plotgroup_variables(self):
         self.plotgroup.updatecommand = self.cmdname.get()
  
