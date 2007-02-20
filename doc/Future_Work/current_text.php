@@ -110,7 +110,7 @@ balloon bound to the options in a ComboBox's list.
 </li>
 
 <li>
-2007/02/09 (CB): when we've switched to numpy: update topographica-win to numpy& remove -Wl from LDFLAGS and test that builds ok on os x (keep rpath).
+2007/02/20 (CB): when we've switched to numpy: update topographica-win to numpy (plus catchup other external packages like pyaudiolab & gnosis utils) 
 </li>
 
 </ul>
