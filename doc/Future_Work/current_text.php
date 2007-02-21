@@ -24,6 +24,10 @@ differences from the current Numeric documentation for our users, as
 we find these differences.
 </li>
 
+<li>
+2007/02/20 (JB): Upgrade epydoc to the current SVN version to incorporate
+recent changes and bugfixes for the Reference Manual.
+</li>
 
 <li>
 2006/11/09 (CP): Add automatic assignment of topo.sim.name, by taking
