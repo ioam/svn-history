@@ -24,7 +24,6 @@ differences from the current Numeric documentation for our users, as
 we find these differences.
 </li>
 
-</li>
 
 <li>
 2006/11/09 (CP): Add automatic assignment of topo.sim.name, by taking
@@ -109,10 +108,35 @@ CB: I've kind of done this. It doesn't seem to be possible to have a
 balloon bound to the options in a ComboBox's list.
 </li>
 
+
 <li>
-2007/02/20 (CB): when we've switched to numpy: update topographica-win to numpy (plus catchup other external packages like pyaudiolab & gnosis utils) 
+2007/01/25 (CB): Set order and names of ParametersFrame's Ok, Apply,
+Cancel, Reset, and Defaults buttons, and make them behave as expected
+for classes and instances.  Figure out and clean up
+translator_dictionary & its uses.
 </li>
 
+<li>
+2007/02/20 (CB): Should add simple timing functions -- what was the total
+time to run?  What components are taking a long time to run?  Guide
+the user for optimization, focusing on the components we expect to be
+the bottlenecks. How do I find out which libraries are being used by
+numpy functions?
+</li>
+</ul>
+
+<h4>After merging numpy_test_branch</h4>
+<ul>
+<li>
+2007/01/25 (CB): Gnosis Utils has xml pickling. Add this as an optional format.
+The xml is still complex, but better than looking at a pickle.
+</li>
+
+<li>
+2007/02/20 (CB): update topographica-win to numpy (plus catchup other
+external packages like pyaudiolab & gnosis utils)
+</li>
+ 
 </ul>
 
 
@@ -120,6 +144,10 @@ balloon bound to the options in a ComboBox's list.
 
 <ul>
 
+<li>
+2007/02/21: move from a Makefile in examples/ to some kind of
+setup.py script? Then Windows users could follow the tutorial.
+</li>
 
 <li> 
 2006/02/04 (JAB): Should work through some of the most commonly used
@@ -159,37 +187,12 @@ and well designed so that it can be flexible.
 </li>
 
 <li>
+2006/05/23: minor tkgui cleanup? Which widgets should expand (expand=YES ?), which should fill the space (fill=X ?) (e.g. the command output box should expand when topoconsole does, and in parameters frames sliders etc should expand).
+</li>
+
+
+<li>
 2006/11/09 (JL?): Add better support for exploring and optimizing parameter spaces.
-</li>
-
-<li>
-2007/01/25 (CB): Set order and names of ParametersFrame's Ok, Apply, Cancel,
-Reset, and Defaults buttons, and make them behave as expected for classes and instances.
-Figure out and clean up translator_dictionary & its uses.
-</li>
-
-<!--
-<li>
-2007/01/25 (CB): Investigate using Tile (which has become part of Tkinter now anyway).
-Tile looks good on linux and windows (haven't tried mac but screenshots look good). But,
-Tile does not have all the widgets we need yet. Tile uses themes so we can 
-set it to classic and use Tile + Tkinter widgets and still have a uniform look. This gives us
-nothing to begin with, but Tile should eventually have all the widgets of Tkinter, at
-which point we can simply set the theme to get a Topographica which looks 'right' on windows and
-mac.
-Well, that is almost true. Pmw (which is not compatible with Tile because of Tile's theme-based
-approach) provides some things we really need. The first of these is balloon help. In fact, that
-is ok to mix with other widgets because Tile doesn't provide an equivalent and the popup help
-doesn't need to match the 'theme' so much. The second is the menubar, which could be replicated 
-in Tkinter easily - except that it doesn't seem to be possible to bind popup help to individual 
-menu items...a really useful feature.
-[Add note about the others: messagebar, combobox, radiobutton, etc.]
-</li>
---> 
-
-<li>
-2007/01/25 (CB): Gnosis Utils has xml pickling. Add this as an optional format.
-The xml is still complex, but better than looking at a pickle.
 </li>
 
 <li>
@@ -227,9 +230,6 @@ deal with CFs missing altogether.
 (As an example, the problem of zero-sized CFs arises in examples/joublin_bc96.ty.)
 </li>
 
-<li>
-2006/05/23: tkgui cleanup - what widgets should expand (expand=YES ?), which should fill the space (fill=X ?) (e.g. the command output box should expand when topoconsole does, and in parameters frames sliders etc should expand).
-</li>
 
 <li>
 2006/05/19: look at the output from:
@@ -269,7 +269,7 @@ Need to make sure DynamicNumbers are advanced only once per simulation time.
 <li>
 2006/04/27 (JB): Allowing there to be a slower, more in-depth set of tests
 (that don't run with make tests, etc). Required slower tests: pickling [testsnapshots.py], that
-example networks' results haven't changed [testlissom_oo_or.py], that performance doesn't get worse, ...
+example networks' results haven't changed [test_script.py], that performance doesn't get worse, ...
 </li>
 
 <li>
@@ -359,15 +359,6 @@ attribute/parameter that lists attributes not to pickle? Or something like that.
 Otherwise, save_snapshot and load_snapshot could specifically avoid items.
 </li>
 
-<li>
-2007/02/20: Should add simple timing functions -- what was the total
-time to run?  What components are taking a long time to run?  Guide
-the user for optimization, focusing on the components we expect to be
-the bottlenecks.
-<br />
-CB: Add information to developers' manual about using profile() to
-investigate optimization.
-</li>
 
 <!--
 <li>
@@ -585,7 +576,34 @@ achieve in Python.
 </li>
 
 <li>
-2006/03/07: Build python on windows with free compiler. Maybe use pymingw?
+2007/02/21: Build python on windows with free compiler. Maybe use pymingw?
+At the moment, this seems much more difficult to setup than the current system,
+but it might be much easier to maintain. 
+<br />
+Python for Windows (as distributed by python.org) is built using a
+Microsoft compiler (with associated project files).
 </li>
+
+<li>
+2007/02/21 (CB): Investigate using Tile (which has become part of
+Tkinter now anyway).  Tile looks good on linux and windows (haven't
+tried mac but screenshots look good). But, Tile does not have all the
+widgets we need yet. Tile uses themes so we can set it to classic and
+use Tile + Tkinter widgets and still have a uniform look. This gives
+us nothing to begin with, but Tile should eventually have all the
+widgets of Tkinter, at which point we can simply set the theme to get
+a Topographica which looks 'right' on windows and mac.
+<br />
+Well, that is almost true. Pmw (which is not compatible with Tile
+because of Tile's theme-based approach) provides some things we really
+need. The first of these is balloon help. In fact, that is ok to mix
+with other widgets; it doesn't need to match the 'theme' since it's
+undecorated by the window manager.  The second is the menubar, which
+could be replicated in Tkinter easily - except that it doesn't seem to
+be possible to bind popup help to individual menu items...a really
+useful feature.  [Add note about the others: messagebar, combobox,
+radiobutton, etc.]
+</li>
+
 
 </ul>
