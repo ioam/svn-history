@@ -425,7 +425,8 @@ average.
 
 
 <!--CB:
-These timings come from ***cvs date***, using the numpy libraries ?.
+These timings come from 2007/02/21 13:27:26 on the numpy_test_branch, 
+using the numpy libraries ?.
 
 
 Note that numpy has vdot(a,b)=dot(a.ravel(),b.ravel()), but it
