@@ -114,32 +114,32 @@ following output:
 <pre>
 $ ./topographica speed_test.ty -c "from topo.misc.utils import profile; \
 profile('topo.sim.run(200)',n=20)" 
-         1477056 function calls (1468656 primitive calls) in 60.782 CPU seconds
+         1477056 function calls (1468656 primitive calls) in 50.198 CPU seconds
 
    Ordered by: cumulative time, internal time
    List reduced from 111 to 20 due to restriction <20>
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        1    0.000    0.000   60.782   60.782 <string>:1(?)
-        1    0.122    0.122   60.782   60.782 simulation.py:626(run)
-      400    0.005    0.000   40.816    0.102 simulation.py:452(__call__)
-      200    0.011    0.000   35.588    0.178 projection.py:122(input_event)
-      200    0.002    0.000   35.551    0.178 projection.py:182(present_input)
-      200    0.010    0.000   35.549    0.178 cf.py:785(activate)
-      200   10.216    0.051   35.531    0.178 cf.py:352(__call__)
-   320000   14.853    0.000   25.312    0.000 functionfamilies.py:151(__call__)
-      400    0.008    0.000   15.769    0.039 projection.py:151(process_current_time)
-      200    0.014    0.000   15.578    0.078 cfsom.py:58(learn)
-      200    0.011    0.000   15.516    0.078 cf.py:792(learn)
-      200    6.844    0.034   15.498    0.077 som.py:66(__call__)
-   320000    1.528    0.000   10.459    0.000 functions.py:21(sum)
-   320000    8.932    0.000    8.932    0.000 fromnumeric.py:383(sum)
-    52303    7.241    0.000    7.241    0.000 arrayutils.py:18(L2norm)
-      400    0.049    0.000    5.451    0.014 patterngenerator.py:92(__call__)
-      200    0.020    0.000    5.219    0.026 generatorsheet.py:106(input_event)
-20600/19400    0.192    0.000    4.811    0.000 parameterclasses.py:179(__get__)
-    58600    1.010    0.000    4.745    0.000 parameterizedobject.py:307(get_name)
-      600    0.010    0.000    4.438    0.007 parameterclasses.py:386(__get__)
+        1    0.000    0.000   50.198   50.198 <string>:1(?)
+        1    0.038    0.038   50.198   50.198 simulation.py:626(run)
+      400    0.005    0.000   33.882    0.085 simulation.py:452(__call__)
+      200    0.010    0.000   29.444    0.147 projection.py:122(input_event)
+      200    0.002    0.000   29.415    0.147 projection.py:182(present_input)
+      200    0.009    0.000   29.413    0.147 cf.py:786(activate)
+      200    8.124    0.041   29.396    0.147 cf.py:352(__call__)
+   320000   12.163    0.000   21.270    0.000 functionfamilies.py:157(__call__)
+      400    0.004    0.000   13.012    0.033 projection.py:151(process_current_time)
+      200    0.007    0.000   12.851    0.064 cfsom.py:58(learn)
+      200    0.008    0.000   12.804    0.064 cf.py:793(learn)
+      200    5.665    0.028   12.791    0.064 som.py:66(__call__)
+   320000    1.881    0.000    9.107    0.000 functions.py:21(sum)
+   320000    7.227    0.000    7.227    0.000 fromnumeric.py:383(sum)
+    52303    6.020    0.000    6.020    0.000 arrayutils.py:18(L2norm)
+      400    0.052    0.000    4.629    0.012 patterngenerator.py:92(__call__)
+      200    0.024    0.000    4.430    0.022 generatorsheet.py:106(input_event)
+20600/19400    0.139    0.000    4.056    0.000 parameterclasses.py:179(__get__)
+    58600    0.907    0.000    3.997    0.000 parameterizedobject.py:307(get_name)
+      600    0.011    0.000    3.817    0.006 parameterclasses.py:386(__get__)
 </pre>
 
 The <code>n=20</code> argument restricts the list to the top 20
@@ -222,7 +222,7 @@ class DotProduct(ResponseFn):
 </pre>
 
 <P>In this case, it seems strange that <code>numpy</code>'s own
-<code>vdot</code> function is not being used; why perform the dot
+<code>dot</code> function is not being used; why perform the dot
 product in stages ourselves when <code>numpy</code> provides a
 function to take care of it? Straightaway, it is worthwhile to see if
 using an equivalent <code>numpy</code> function can speed up the
@@ -230,11 +230,11 @@ performance. To find out, we can replace the implementation of
 <code>DotProduct</code> with the following:
 
 <pre>
-from numpy import vdot
+from numpy import dot
 
 class DotProduct(ResponseFn):
     def __call__(self,m1,m2):
-        return vdot(m1,m2)
+        return dot(m1.ravel(),m2.ravel())
 </pre>
 
 
@@ -244,115 +244,123 @@ class DotProduct(ResponseFn):
 <pre>
 $ ./topographica examples/speed_test.ty -c "from topo.misc.utils import profile; \
 profile('topo.sim.run(200)',n=20)"
-         837056 function calls (828656 primitive calls) in 49.375 CPU seconds
+         837056 function calls (828656 primitive calls) in 38.153 CPU seconds
 
    Ordered by: cumulative time, internal time
    List reduced from 109 to 20 due to restriction <20>
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        1    0.000    0.000   49.375   49.375 <string>:1(?)
-        1    0.043    0.043   49.375   49.375 simulation.py:626(run)
-      400    0.007    0.000   27.542    0.069 simulation.py:452(__call__)
-      200    0.010    0.000   21.070    0.105 projection.py:122(input_event)
-      200    0.002    0.000   21.035    0.105 projection.py:182(present_input)
-      200    0.010    0.000   21.034    0.105 cf.py:785(activate)
-      200    9.312    0.047   21.013    0.105 cf.py:352(__call__)
-      400    0.004    0.000   17.303    0.043 projection.py:151(process_current_time)
-      200    0.008    0.000   17.090    0.085 cfsom.py:58(learn)
-      200    0.009    0.000   17.035    0.085 cf.py:792(learn)
-      200    7.394    0.037   17.021    0.085 som.py:66(__call__)
-   320000   11.699    0.000   11.699    0.000 functionfamilies.py:173(__call__)
-    52303    8.110    0.000    8.110    0.000 arrayutils.py:18(L2norm)
-      400    0.074    0.000    6.864    0.017 patterngenerator.py:92(__call__)
-      200    0.024    0.000    6.462    0.032 generatorsheet.py:106(input_event)
-20600/19400    0.174    0.000    5.937    0.000 parameterclasses.py:179(__get__)
-    58600    1.071    0.000    5.798    0.000 parameterizedobject.py:307(get_name)
-      600    0.012    0.000    5.567    0.009 parameterclasses.py:386(__get__)
-    79328    2.169    0.000    4.709    0.000 parameterizedobject.py:513(get_param_descriptor)
-      400    0.017    0.000    4.419    0.011 simulation.py:455(__repr__)
+        1    0.000    0.000   38.153   38.153 <string>:1(?)
+        1    0.040    0.040   38.153   38.153 simulation.py:626(run)
+      400    0.005    0.000   21.262    0.053 simulation.py:452(__call__)
+      200    0.010    0.000   16.864    0.084 projection.py:122(input_event)
+      200    0.002    0.000   16.837    0.084 projection.py:182(present_input)
+      200    0.008    0.000   16.835    0.084 cf.py:786(activate)
+      200    7.375    0.037   16.817    0.084 cf.py:352(__call__)
+      400    0.004    0.000   13.538    0.034 projection.py:151(process_current_time)
+      200    0.009    0.000   13.370    0.067 cfsom.py:58(learn)
+      200    0.007    0.000   13.316    0.067 cf.py:793(learn)
+      200    5.858    0.029   13.303    0.067 som.py:66(__call__)
+   320000    9.440    0.000    9.440    0.000 functionfamilies.py:149(__call__)
+    52303    6.320    0.000    6.320    0.000 arrayutils.py:18(L2norm)
+      400    0.054    0.000    4.589    0.011 patterngenerator.py:92(__call__)
+      200    0.019    0.000    4.389    0.022 generatorsheet.py:106(input_event)
+20600/19400    0.157    0.000    4.032    0.000 parameterclasses.py:179(__get__)
+    58600    0.894    0.000    3.975    0.000 parameterizedobject.py:307(get_name)
+      600    0.011    0.000    3.786    0.006 parameterclasses.py:386(__get__)
+      400    0.008    0.000    3.244    0.008 simulation.py:455(__repr__)
+ 7600/400    0.528    0.000    3.211    0.008 parameterizedobject.py:642(__repr__)
 </pre>
 
 <P>More than halved functionfamilies, and cf.py call only 60% what it
-was. Overall, we have cut time to 80% of original with just a few
+was. Overall, we have cut time to about 75% of original with just a few
 minutes' work.
 
 
-<!--
-ravel and dot instead of vdot - it's slightly faster:
-<pre>
-$ ./topographica speed_test.ty -c "from topo.misc.utils import profile; \
-profile('topo.sim.run(200)',n=20)"
-         837056 function calls (828656 primitive calls) in 45.044 CPU seconds
-
-   Ordered by: cumulative time, internal time
-   List reduced from 109 to 20 due to restriction <20>
-
-   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        1    0.000    0.000   45.044   45.044 <string>:1(?)
-        1    0.048    0.048   45.044   45.044 simulation.py:626(run)
-      400    0.008    0.000   25.774    0.064 simulation.py:452(__call__)
-      200    0.010    0.000   20.298    0.101 projection.py:122(input_event)
-      200    0.001    0.000   20.269    0.101 projection.py:182(present_input)
-      200    0.011    0.000   20.267    0.101 cf.py:785(activate)
-      200    8.695    0.043   20.248    0.101 cf.py:352(__call__)
-      400    0.007    0.000   15.153    0.038 projection.py:151(process_current_time)
-      200    0.012    0.000   14.983    0.075 cfsom.py:58(learn)
-      200    0.009    0.000   14.927    0.075 cf.py:792(learn)
-      200    6.518    0.033   14.909    0.075 som.py:66(__call__)
-   320000   11.551    0.000   11.551    0.000 functionfamilies.py:172(__call__)
-    52303    6.987    0.000    6.987    0.000 arrayutils.py:18(L2norm)
-      400    0.065    0.000    5.753    0.014 patterngenerator.py:92(__call__)
-      200    0.022    0.000    5.463    0.027 generatorsheet.py:106(input_event)
-20600/19400    0.192    0.000    5.168    0.000 parameterclasses.py:179(__get__)
-    58600    1.131    0.000    5.055    0.000 parameterizedobject.py:307(get_name)
-      600    0.015    0.000    4.811    0.008 parameterclasses.py:386(__get__)
-      400    0.009    0.000    3.999    0.010 simulation.py:455(__repr__)
- 7600/400    0.657    0.000    3.967    0.010 parameterizedobject.py:642(__repr__)
-</pre>
--->
-
-<P>If we want, there is still further room for optimization -- lots of
+<P>If we wanted, there is still further room for optimization -- lots of
 time is still spent in call. Replace our <code>DotProduct</code>
-entirely with numpy's vdot, <code>CFPRF_Plugin.single_cf_fn=numpy.vdot</code>
+entirely with numpy's dot, giving us a <code>CFPRF_Plugin</code> of:
+
+<pre>
+import numpy
+class CFPRF_Plugin(CFPResponseFn):
+    """
+    Generic large-scale response function based on a simple single-CF function.
+
+    Applies the single_cf_fn to each CF in turn.  For the default
+    single_cf_fn of DotProduct, does a basic dot product of each CF with the
+    corresponding slice of the input array.  This function is likely
+    to be slow to run, but it is easy to extend with any arbitrary
+    single-CF response function.
+
+    The single_cf_fn must be a function f(X,W) that takes two
+    identically shaped matrices X (the input) and W (the
+    ConnectionField weights) and computes a scalar activation value
+    based on those weights.
+    """
+    #single_cf_fn = ResponseFnParameter(DotProduct(),
+    #    doc="Accepts a ResponseFn that will be applied to each CF individually.")
+    
+    def __call__(self, cfs, input_activity, activity, strength):
+        rows,cols = activity.shape
+
+        single_cf_fn = numpy.dot
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                r1,r2,c1,c2 = cf.slice_array
+                X = input_activity[r1:r2,c1:c2]
+                #if (X.shape != cf.weights.shape):
+                #  self.warning("Shapes %s and %s are not compatible" % (X.shape,cf.weights.shape))
+                activity[r,c] = single_cf_fn(X.ravel(),cf.weights.ravel())
+        activity *= strength
+</pre>
 
 <P>Then we get:
 
 <pre>
 $ ./topographica speed_test.ty -c "from topo.misc.utils import profile; \
 profile('topo.sim.run(200)',n=20)"
-         514656 function calls (506456 primitive calls) in 40.731 CPU seconds
+         516656 function calls (508256 primitive calls) in 35.410 CPU seconds
 
    Ordered by: cumulative time, internal time
    List reduced from 108 to 20 due to restriction <20>
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        1    0.000    0.000   40.731   40.731 <string>:1(?)
-        1    0.041    0.041   40.730   40.730 simulation.py:626(run)
-      400    0.005    0.000   21.262    0.053 simulation.py:452(__call__)
-      200    0.010    0.000   16.158    0.081 projection.py:122(input_event)
-      200    0.002    0.000   16.120    0.081 projection.py:182(present_input)
-      200    0.012    0.000   16.119    0.081 cf.py:785(activate)
-      200   16.095    0.080   16.097    0.080 cf.py:352(__call__)
-      400    0.063    0.000   15.556    0.039 projection.py:151(process_current_time)
-      200    0.008    0.000   15.282    0.076 cfsom.py:58(learn)
-      200    0.008    0.000   15.215    0.076 cf.py:792(learn)
-      200    6.886    0.034   15.200    0.076 som.py:66(__call__)
-    52303    7.020    0.000    7.020    0.000 arrayutils.py:18(L2norm)
-      400    0.073    0.000    5.323    0.013 patterngenerator.py:92(__call__)
-      200    0.025    0.000    5.093    0.025 generatorsheet.py:106(input_event)
-20600/19400    0.158    0.000    4.697    0.000 parameterclasses.py:179(__get__)
-    58200    1.060    0.000    4.646    0.000 parameterizedobject.py:307(get_name)
-      600    0.012    0.000    4.409    0.007 parameterclasses.py:386(__get__)
-      400    0.010    0.000    3.794    0.009 simulation.py:455(__repr__)
- 7400/400    0.659    0.000    3.752    0.009 parameterizedobject.py:642(__repr__)
-    79328    1.776    0.000    3.566    0.000 parameterizedobject.py:513(get_param_descriptor)
+        1    0.000    0.000   35.410   35.410 <string>:1(?)
+        1    0.042    0.042   35.410   35.410 simulation.py:626(run)
+      400    0.006    0.000   18.675    0.047 simulation.py:452(__call__)
+      200    0.017    0.000   13.961    0.070 projection.py:122(input_event)
+      200    0.001    0.000   13.928    0.070 projection.py:182(present_input)
+      200    0.014    0.000   13.926    0.070 cf.py:786(activate)
+      200   13.904    0.070   13.904    0.070 cf.py:352(__call__)
+      400    0.005    0.000   13.355    0.033 projection.py:151(process_current_time)
+      200    0.012    0.000   13.173    0.066 cfsom.py:58(learn)
+      200    0.010    0.000   13.106    0.066 cf.py:793(learn)
+      200    5.816    0.029   13.085    0.065 som.py:66(__call__)
+    52303    6.144    0.000    6.144    0.000 arrayutils.py:18(L2norm)
+      400    0.055    0.000    4.821    0.012 patterngenerator.py:92(__call__)
+      200    0.020    0.000    4.704    0.024 generatorsheet.py:106(input_event)
+20600/19400    0.150    0.000    4.255    0.000 parameterclasses.py:179(__get__)
+    58400    0.873    0.000    4.193    0.000 parameterizedobject.py:307(get_name)
+      600    0.012    0.000    4.015    0.007 parameterclasses.py:386(__get__)
+    79328    1.518    0.000    3.297    0.000 parameterizedobject.py:513(get_param_descriptor)
+      400    0.009    0.000    3.269    0.008 simulation.py:455(__repr__)
+ 7600/400    0.561    0.000    3.239    0.008 parameterizedobject.py:642(__repr__)
 </pre>
 
-<P>Now we have reduced the cf call to 45% of its original run time, and
-the total run time to 2/3 its original.
+<P>we have reduced the total run time to 93% of its previous value. 
+But <code>CFPRF_Plugin</code> is
+no longer the same as it was before; arrays it receives are flattened,
+which restricts what functions could be plugged in as the single_cf_fn.
+So this optimization has gone too far; if the performance gains were 
+significant, it would be worthwhile calling this class CFPRF_DotProduct
+and offering it as an alternative choice to CFPRF_Plugin(single_cf_fn=DotProduct()),
+but it isn't so it's not worthwhile.
 
 
-<P>[probably new subsection]Being possible to re-write functions in c,
+<H3>Considering optimizations with C++ (weave)</H3>
+Being possible to re-write functions in c,
 might wonder if it would help in this case, or does numpy already do a
 good job? We could replace the numpy dot with a dot written in c, but
 probably the overhead in calling is too much anyway so wouldn't be big
@@ -365,36 +373,36 @@ version?  Replace <code>CFPRF_Plugin(single_cf_fn=dot)</code> with
 <pre>
 $ ./topographica speed_test.ty -c "from topo.misc.utils import profile; \
 profile('topo.sim.run(200)',n=20)"
-         517531 function calls (509129 primitive calls) in 28.509 CPU seconds
+         515119 function calls (506917 primitive calls) in 22.492 CPU seconds
 
    Ordered by: cumulative time, internal time
    List reduced from 155 to 20 due to restriction <20>
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        1    0.000    0.000   28.509   28.509 <string>:1(?)
-        1    0.057    0.057   28.509   28.509 simulation.py:626(run)
-      400    0.004    0.000   16.689    0.042 projection.py:151(process_current_time)
-      200    0.008    0.000   16.477    0.082 cfsom.py:58(learn)
-      200    0.007    0.000   16.409    0.082 cf.py:792(learn)
-      200    7.264    0.036   16.397    0.082 som.py:66(__call__)
-    52303    7.726    0.000    7.726    0.000 arrayutils.py:18(L2norm)
-      400    0.007    0.000    7.103    0.018 simulation.py:452(__call__)
-      400    0.053    0.000    5.803    0.015 patterngenerator.py:92(__call__)
-      200    0.020    0.000    5.607    0.028 generatorsheet.py:106(input_event)
-20600/19400    0.182    0.000    5.242    0.000 parameterclasses.py:179(__get__)
-    58400    1.154    0.000    5.168    0.000 parameterizedobject.py:307(get_name)
-      600    0.011    0.000    4.848    0.008 parameterclasses.py:386(__get__)
-      400    0.009    0.000    4.537    0.011 simulation.py:455(__repr__)
- 7600/400    0.671    0.000    4.504    0.011 parameterizedobject.py:642(__repr__)
-    79328    1.944    0.000    3.988    0.000 parameterizedobject.py:513(get_param_descriptor)
-     7600    0.941    0.000    3.813    0.001 parameterizedobject.py:742(get_param_values)
-    88545    2.384    0.000    2.384    0.000 parameterizedobject.py:29(classlist)
-     8400    0.048    0.000    1.847    0.000 parameterizedobject.py:829(params)
-     8400    1.491    0.000    1.799    0.000 parameterizedobject.py:533(classparams)
+        1    0.000    0.000   22.492   22.492 <string>:1(?)
+        1    0.052    0.052   22.492   22.492 simulation.py:626(run)
+      400    0.004    0.000   13.358    0.033 projection.py:151(process_current_time)
+      200    0.009    0.000   13.147    0.066 cfsom.py:58(learn)
+      200    0.008    0.000   13.088    0.065 cf.py:793(learn)
+      200    5.776    0.029   13.075    0.065 som.py:66(__call__)
+    52303    6.152    0.000    6.152    0.000 arrayutils.py:18(L2norm)
+      400    0.005    0.000    5.668    0.014 simulation.py:452(__call__)
+      400    0.055    0.000    4.803    0.012 patterngenerator.py:92(__call__)
+      200    0.021    0.000    4.599    0.023 generatorsheet.py:106(input_event)
+20600/19400    0.149    0.000    4.314    0.000 parameterclasses.py:179(__get__)
+    58000    0.927    0.000    4.257    0.000 parameterizedobject.py:307(get_name)
+      600    0.011    0.000    4.004    0.007 parameterclasses.py:386(__get__)
+      400    0.011    0.000    3.346    0.008 simulation.py:455(__repr__)
+ 7400/400    0.540    0.000    3.310    0.008 parameterizedobject.py:642(__repr__)
+    79328    1.735    0.000    3.310    0.000 parameterizedobject.py:513(get_param_descriptor)
+     7400    0.843    0.000    2.758    0.000 parameterizedobject.py:742(get_param_values)
+    88345    1.871    0.000    1.871    0.000 parameterizedobject.py:29(classlist)
+     8200    0.041    0.000    1.436    0.000 parameterizedobject.py:829(params)
+     8200    1.134    0.000    1.395    0.000 parameterizedobject.py:533(classparams)
 </pre>
 
-<P>The simulation now takes less than half the time the original
-version took, and 70% the time numpy version takes. The c code adds a
+<P>The simulation now takes about half the time the original
+version took, and 60% the time numpy version takes. The c code adds a
 lot of complexity to the code: for maintenance, for deployment on
 different platforms, and for user understanding - so it has to justify
 this with bigtime speedups.
@@ -408,3 +416,88 @@ profiling to show the sum of V1 activity, or something similar.)
 
 run times should be long enough for reliable results, or repeat and
 average.
+
+
+
+
+
+<!--CB:
+These timings come from ***cvs date***, using the numpy libraries ?.
+
+
+Note that numpy has vdot(a,b)=dot(a.ravel(),b.ravel()), but it
+is slower than the dot & ravel version. However, the timing 
+functions appear to be a little inconsistent, so once we upgrade
+to Python 2.5 and use cProfile, that should be checked. If vdot
+is actually as fast as dot & ravel, then vdot would be a complete
+replacement for DotProduct:
+
+<pre>
+from numpy import vdot
+class CFPRF_Plugin(CFPResponseFn):
+    """
+    Generic large-scale response function based on a simple single-CF function.
+
+    Applies the single_cf_fn to each CF in turn.  For the default
+    single_cf_fn of vdot, does a basic dot product of each CF with the
+    corresponding slice of the input array.  This function is likely
+    to be slow to run, but it is easy to extend with any arbitrary
+    single-CF response function.
+
+    The single_cf_fn must be a function f(X,W) that takes two
+    identically shaped matrices X (the input) and W (the
+    ConnectionField weights) and computes a scalar activation value
+    based on those weights.
+    """
+    single_cf_fn = ResponseFnParameter(vdot,
+        doc="Accepts a ResponseFn that will be applied to each CF individually.")
+    
+    def __call__(self, cfs, input_activity, activity, strength):
+        rows,cols = activity.shape
+
+        single_cf_fn = self.single_cf_fn
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                r1,r2,c1,c2 = cf.slice_array
+                X = input_activity[r1:r2,c1:c2]
+                #if (X.shape != cf.weights.shape):
+                #  self.warning("Shapes %s and %s are not compatible" % (X.shape,cf.weights.shape))
+                activity[r,c] = single_cf_fn(X,cf.weights)
+        activity *= strength
+</pre>
+
+However, vdot wouldn't show up in GUI menus etc because it's not
+actually a ResponseFn.
+
+The last couple of times I ran this vdot version, I was getting
+<pre>
+         516656 function calls (508256 primitive calls) in 34.597 CPU seconds
+
+   Ordered by: cumulative time, internal time
+   List reduced from 108 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000   34.597   34.597 <string>:1(?)
+        1    0.053    0.053   34.597   34.597 simulation.py:626(run)
+      400    0.006    0.000   17.882    0.045 simulation.py:452(__call__)
+      200    0.017    0.000   13.440    0.067 projection.py:122(input_event)
+      200    0.001    0.000   13.403    0.067 projection.py:182(present_input)
+      200    0.011    0.000   13.401    0.067 cf.py:786(activate)
+      200   13.381    0.067   13.381    0.067 cf.py:352(__call__)
+      400    0.005    0.000   13.180    0.033 projection.py:151(process_current_time)
+      200    0.009    0.000   13.023    0.065 cfsom.py:58(learn)
+      200    0.008    0.000   12.943    0.065 cf.py:793(learn)
+      200    5.704    0.029   12.930    0.065 som.py:66(__call__)
+    52303    6.103    0.000    6.103    0.000 arrayutils.py:18(L2norm)
+      400    0.048    0.000    4.611    0.012 patterngenerator.py:92(__call__)
+      200    0.021    0.000    4.432    0.022 generatorsheet.py:106(input_event)
+20600/19400    0.141    0.000    4.030    0.000 parameterclasses.py:179(__get__)
+    58400    0.856    0.000    3.983    0.000 parameterizedobject.py:307(get_name)
+      600    0.010    0.000    3.802    0.006 parameterclasses.py:386(__get__)
+      400    0.009    0.000    3.417    0.009 simulation.py:455(__repr__)
+ 7600/400    0.563    0.000    3.386    0.008 parameterizedobject.py:642(__repr__)
+    79328    1.508    0.000    3.111    0.000 parameterizedobject.py:513(get_param_descriptor)
+</pre>
+-->
+
