@@ -1,3 +1,1534 @@
+2007-02-20  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulation.py 1.49: Added note about script_repr
+
+	* topo/base/parameterizedobject.py 1.55: Added suppression of
+	default values to script_repr()
+
+	* topo/base/boundingregion.py 1.30: Simplified str()
+	representation of BoundingBox.  Added script_repr, because the
+	relevant attributes of a BoundingBox are not Parameters
+
+2007-02-20  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/templateplotgrouppanel.py 1.32: added refresh to
+	set_strengthonly to avoid resizing error
+
+2007-02-20  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Developer_Manual/optimization_text.php 1.9: Added further
+	part to bottleneck guide, regarding C code.
+
+	* doc/Developer_Manual/optimization_text.php 1.8: Minor change to
+	wording.
+
+	* doc/Developer_Manual/optimization_text.php 1.7: Began to draft a
+	guide to finding bottlenecks.
+
+	* topo/misc/utils.py 1.32: Minor clarification of profile().
+
+2007-02-20  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/som_retinotopy_text.php 1.12: Added info on
+	topological defects
+
+	* doc/Tutorials/images/som_grid_kink.png 1.1: Initial version,
+	from ./topographica -g -c alpha_0=0.1 -c radius_0=0.32 -c
+	default_density=10 -c default_retina_density=10
+	examples/som_retinotopy.ty
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.16: Updated sizes and
+	descriptions to match new images
+
+2007-02-20  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorobjects.py 1.46: Re-classified some HACKALERTs
+	as ALERTs (they were wrong before).
+
+2007-02-20  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.15: Updated sizes to match
+	new images
+
+	* doc/Tutorials/images/projection_oo.png 1.4,
+	doc/Tutorials/images/test_pattern_oo.png 1.4,
+	doc/Tutorials/images/unit_weights_0_0_oo.png 1.4,
+	doc/Tutorials/images/unit_weights_0_0_oo_or.png 1.4,
+	doc/Tutorials/images/oo_or_map.png 1.4,
+	doc/Tutorials/images/activity_line_oo.png 1.4,
+	doc/Tutorials/images/activity_line_oo_or.png 1.4,
+	doc/Tutorials/images/natural_image_oo_or.png 1.4,
+	doc/Tutorials/images/natural_image_projact_oo_or.png 1.1: Updated
+	for current CVS version
+
+	* topo/tkgui/connectionfieldspanel.py 1.32,
+	topo/tkgui/templateplotgrouppanel.py 1.31: Extracted strength-only
+	support into a method so that it can be used in ConnectionField
+	plots
+
+2007-02-20  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/index_text.php 1.38: Removed commented-out note
+	about pyaudiolab.
+
+	* doc/Future_Work/current_text.php 1.148: Updated topographica-win
+	task.
+
+	* external/Makefile 1.48: Added libsndfile, and updated
+	pyaudiolab's entry.
+
+2007-02-20  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/testpattern.py 1.54: Fixed missing time from Test
+	Pattern window title
+
+	* topo/tkgui/templateplotgrouppanel.py 1.30: Added Strength only
+	button to allow orientation subplots to be enabled or disabled on
+	the fly
+
+	* topo/plotting/templates.py 1.61: Removed orientation subplot
+	from Projection Activity, because it can be confusing with
+	inhibitory weights
+
+2007-02-20  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* external/libsndfile-1.0.17.tar.gz 1.1:
+	http://www.mega-nerd.com/libsndfile/
+
+2007-02-20  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/som_retinotopy.ty 1.51: Added mechanism for specifying
+	seeds, retina density, radius_0, and alpha_0 from the command line
+
+	* doc/Tutorials/images/som_grid_000000.png 1.4: Removed stray
+	garbage from screenshot
+
+	* doc/Tutorials/som_retinotopy_text.php 1.11: Updated to match new
+	screenshots
+
+	* doc/Tutorials/images/som_activity_000006.png 1.3,
+	doc/Tutorials/images/som_cog_000100.png 1.3,
+	doc/Tutorials/images/som_grid_000100.png 1.3,
+	doc/Tutorials/images/som_projection_000006.png 1.3: Removed
+	now-unused plots
+
+	* doc/Tutorials/images/som_projection_000001.png 1.3,
+	doc/Tutorials/images/som_projection_000005.png 1.1,
+	doc/Tutorials/images/som_projection_010000.png 1.1,
+	doc/Tutorials/images/som_projection_040000.png 1.3,
+	doc/Tutorials/images/som_activity_000000.png 1.3,
+	doc/Tutorials/images/som_activity_000001.png 1.3,
+	doc/Tutorials/images/som_activity_000005.png 1.1,
+	doc/Tutorials/images/som_activity_040000.png 1.1,
+	doc/Tutorials/images/som_cog_000000.png 1.3,
+	doc/Tutorials/images/som_cog_005000.png 1.1,
+	doc/Tutorials/images/som_cog_010000.png 1.1,
+	doc/Tutorials/images/som_cog_040000.png 1.1,
+	doc/Tutorials/images/som_grid_000000.png 1.3,
+	doc/Tutorials/images/som_grid_005000.png 1.1,
+	doc/Tutorials/images/som_grid_010000.png 1.3,
+	doc/Tutorials/images/som_grid_040000.png 1.3,
+	doc/Tutorials/images/som_projection_000000.png 1.3: Updated for
+	current CVS version of the simulator
+
+2007-02-19  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/som_retinotopy_text.php 1.10: General overhaul to
+	work with recent Topographica versions, with various other
+	improvements and clarifications.  The screenshots still need to be
+	updated.
+
+	* topo/patterns/basic.py 1.106.2.8: Added blank default Composite
+	pattern so that the Test Pattern window won't give an error
+
+2007-02-19  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.147: Updated some tasks.
+
+2007-02-19  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/index.html 1.5: Fixed typos
+
+2007-02-19  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/index_text.php 1.37: Added commented-out note
+	about libraries for pyaudiolab.
+
+	* external/Makefile 1.47: Added ctypes and pyaudiolab (but they
+	are not built by default).
+
+	* external/pyaudiolab-0.6.6.tar.gz 1.1:
+	http://www.ar.media.kyoto-u.ac.jp/members/david/softwares/pyaudiolab/
+
+	* external/ctypes-1.0.1.tar.gz 1.1:
+	http://sourceforge.net/projects/ctypes/
+
+2007-02-19  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/som_retinotopy_text.php 1.9: Minor update
+
+2007-02-19  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/propertiesframe.py 1.24: Initial selection command
+	performed inside ComboBoxTranslator widget, rather than here.
+
+	* topo/tkgui/translatorwidgets.py 1.11: Added balloon help text to
+	currently selected item in a ComboBox.
+
+2007-02-19  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/som_retinotopy_text.php 1.8: Small updates
+
+	* doc/FAQ/.cvsignore 1.1: Initial version
+
+	* examples/Makefile 1.18: Removed measure_contrast_response for
+	now
+
+	* topo/plotting/plotgroup.py 1.142: Cleaned up documentation
+
+	* examples/som_retinotopy.ty 1.50: Increased radius to improve
+	convergence.  Removed now-redundant change to learning rate.
+	Changed random seeds to avoid topological defect.
+
+2007-02-19  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/utils.py 1.31: Clarified alerts.
+
+	* topo/misc/utils.py 1.30: Added profile() function.
+
+	* topo/tests/test_script.py 1.3: Added HACKALERT.
+
+2007-02-17  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.141: added correct _create_plots
+	command to ProjectionActivityPlotGroup
+
+	* topo/commands/analysis.py 1.63: changed update_projection
+	activity so that values stored in correct sheet_view_dict
+
+2007-02-17  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/responsefns/optimized.py 1.50.2.5: Minor cleanup to
+	comments
+
+2007-02-16  antolikjan  <antolikjan@lodestar.inf.ed.ac.uk>
+
+	* topo/sheets/lissom.py 1.64.2.3: changed the code to use the new
+	CFProjection.cfs_shape property
+
+	* topo/responsefns/optimized.py 1.50.2.4: Removed obsolete
+	JAHACKALERT, added some comments why changes were done to the
+	optimized dot product response fn, and added changed the last
+	contiguous test to be rather a simple value test
+
+	* topo/projections/basic.py 1.54.2.4: Added proposal how to solve
+	the output_fn application problem
+
+	* topo/patterns/basic.py 1.106.2.7: Repaired the ConrnersGaussian
+	so that it works with the numpy update - no refference to the old
+	Wrapper anymore
+
+	* topo/base/cf.py 1.64.2.6: Deleted an forgotten JAHACKALERT and
+	added the cfs_shape property that is linked to the dimensions of
+	the _cfs field. This way the shape of this field can be obtained
+	indirectly - independetly on the exact representation of the _cfs
+
+2007-02-16  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/base/cf.py 1.65: Fixed bug in projection activity window -
+	now uses correct bounds
+
+2007-02-16  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/laminar_oo_or.ty 1.2.2.4, examples/laminar_or.ty
+	1.1.2.4, examples/lissom_fsa.ty 1.1.2.4, examples/lissom_oo_od.ty
+	1.11.2.2, examples/lissom_oo_or_dy.ty 1.10.2.2,
+	examples/lissom_oo_or_dy_photo.ty 1.3.2.2,
+	examples/lissom_oo_or_homeomaxent.ty 1.1.2.2,
+	examples/lissom_or_noshrinking.ty 1.4.2.4,
+	examples/lissom_or_noshrinking_latswitch.ty 1.4.2.5,
+	examples/lissom_or_sf.ty 1.25.2.2: Updated to match new
+	SharedWeight implementation
+
+	* topo/tkgui/topoconsole.py 1.103: Cleaned up progress report
+	printing
+
+	* examples/som_retinotopy.ty 1.49: Removed confusing random
+	orientation
+
+2007-02-15  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/responsefns/optimized.py 1.50.2.3: Cleaned up C code
+	formatting
+
+	* topo/base/cf.py 1.64.2.5, topo/projections/basic.py 1.54.2.3:
+	Removed dependency on pylabplots.  Cleaned up docstrings and
+	whitespace.  Removed outdated alerts
+
+2007-02-15  antolikjan  <antolikjan@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/basic.py 1.106.2.6: Adding gaussian corner pattern
+
+	* examples/lissom_oo_or.ty 1.72.2.4, examples/lgn_lateral.ty 1.2:
+	Getting rid of CFPRF_SharedWeightDotProduct_opt and Wrapper
+
+	* topo/sheets/lissom.py 1.64.2.2: Minor changes so that it works
+	with the renamed cfs -> _cfs variable in cfprojection class
+
+	* topo/responsefns/optimized.py 1.50.2.2: No special optimized dot
+	product for share weight connection needed anymore - deleted the
+	corresponding function. Slight adjustments to the optimized dot
+	product response fn to work with views
+
+	* topo/projections/basic.py 1.54.2.2: Complete overhaul of the
+	ShareWeightProjections/Connections classes. Complete replacement
+	of DummyCF with SharedWeightCF and deletion of CFPRF_SharedWeight
+
+	* topo/base/cf.py 1.64.2.4: Rewriting the projections such that it
+	stores that bounds_tamplate internally rather than sending it
+	around as a parameter. Further restricitng the access to cfs by
+	renaming it to _cfs and writing some access functions.
+
+2007-02-15  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/analysis/featureresponses.py 1.10: fixed bug causing
+	featurecurves to overwrite all previous data
+
+2007-02-13  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/Makefile 1.17: Added alert from Jeff
+
+	* examples/lissom_oo_or.ty 1.73: Updated to match
+	lissom_oo_or_reference.ty
+
+	* examples/Makefile 1.16: Added (now?) required argument for
+	measure_contrast_response
+
+2007-02-13  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.86: Removed outdated plotting option for comparisons.
+
+2007-02-12  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/som_retinotopy.ty 1.48: Significantly reduced alpha_0
+	to improve the convergence; not clear why this is
+	necessary. Changed random seeds (may or may not be important).
+
+	* examples/Makefile 1.15: Updated to match changes in
+	topo/commands/analysis.py
+
+	* topo/base/parameterizedobject.py 1.54, topo/base/simulation.py
+	1.48: Added script_repr method for generating a concise, nearly
+	runnable representation of a simulation in memory
+
+	* topo/tests/reference/lissom_oo_or_reference.ty 1.36: Fixed
+	integer constants to be floats.  Fixed apparent bug in alpha_exc
+	application at 499; was using alpha_input instead.  Fixed bug in
+	3999 and 19999 actions; Af01 was misspelled.
+
+2007-02-11  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.53: Changed
+	print_param_defaults to use repr() instead of str(), to get closer
+	to having a value that could be instantiated. Simplified
+	__repr__() implementation.  Cleaned up docstrings and spacing
+
+2007-02-11  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.138.2.1: Updated Windows
+	mingw task and removed a stray tag.
+
+	* external/.cvsignore 1.17.2.3: Updated to ignore new matplotlib
+	version.
+
+2007-02-10  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* external/Makefile 1.41.2.5: Removed -Wl from LD_FLAGS for
+	compiling Python. Since rpath is not used on OS X, having Wl
+	causes compilation to fail. Now during compilation on OS X,
+	warnings are printed about the unrecognized rpath option, but
+	compilation succeeds on OS X 10.4.8 (intel and ppc).
+
+2007-02-09  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/FAQ/index_text.php 1.1, doc/shared/util.php 1.22: Added FAQ
+
+2007-02-09  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.146: Updated my tasks.
+
+2007-02-08  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/featurecurvepanel.py 1.11,
+	topo/tkgui/templateplotgrouppanel.py 1.29: Added fix from Chris
+	Ball for problem reported by Jan Antolik -- the initial contents
+	of the scrolledlist_items in plot windows were bogus, showing up
+	as PY_VARXX, rather than as proper strings
+
+2007-02-08  antolikjan  <antolikjan@lodestar.inf.ed.ac.uk>
+
+	* external/matplotlib-0.90.0.tar.gz 1.1.2.1: Adding new matplotlib
+
+	* external/matplotlib-0.90.0.tar.gz 1.1: New file.
+
+	* external/Makefile 1.41.2.4, external/matplotlib-0.81.tgz
+	1.1.2.1: Removing the old matplotlib
+
+2007-02-07  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/commandline_text.php 1.5.2.1: Added note about
+	how to get numpy to display large arrays
+
+	* topo/base/arrayutils.py 1.20.2.6: Changed numpy array printing
+	to show the actual data for any array up to 200*200 by default.
+
+	* topo/learningfns/som.py 1.13: Clarified alert
+
+	* examples/sullivan_nn06.ty 1.12: Added hacks to do lateral
+	weights; probably broken right now
+
+2007-02-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/test_script.py 1.2: Minor updates.
+
+	* topo/tests/__init__.py 1.16, topo/tests/test_script.py 1.1,
+	topo/tests/testlissom_oo_or.data 1.2,
+	topo/tests/testlissom_oo_or.py 1.4: Replaced testlissom_oo_or.py
+	with more general test_script.py.
+
+	* doc/Future_Work/current_text.php 1.145: Removed a task.
+
+	* topo/tests/reference/or_map_topo.log 1.1.2.1,
+	topo/tests/reference/or_map_topo.log.gz 1.1.2.2: Gzipped (as in
+	the main branch).
+
+	* topo/tests/reference/retina_lgn_match.000000.wts.Ganglia00.Afferent0.018_018.matrix
+	1.1.2.1,
+	topo/tests/reference/retina_lgn_match.000001p000.Eye0_Activity.matrix
+	1.1.2.1,
+	topo/tests/reference/retina_lgn_match.000001p000.Ganglia00_Activity.matrix
+	1.1.2.1, topo/tests/reference/retina_lgn_match.param 1.1.2.1,
+	topo/tests/reference/retina_lgn_match.ty 1.11.2.2: Removed (as in
+	the main branch).
+
+	* topo/tests/reference/or_map_topo.param 1.8.2.2: Version 1.8 from
+	the main branch.
+
+	* topo/tests/reference/lissom_log_parser.py 1.6.2.2: Version 1.28
+	from the main branch.
+
+	* topo/tests/reference/oo_or_map_topo.param 1.2.2.1: Version 1.3
+	from the main branch.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.4.2.1: Version
+	1.33 from the main branch, but updated for numpy.
+
+	* topo/tests/utils.py 1.1.2.2: Version 1.5 from the main branch,
+	but updated for numpy.
+
+	* topo/tests/reference/lissom_oo_or_reference.ty 1.32.2.2: Version
+	1.35 from the main branch, but updated for numpy.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.33: Added a
+	comment.
+
+	* doc/Future_Work/current_text.php 1.144: Removed some parts of a
+	task.
+
+	* topo/tests/reference/retina_lgn_match.000000.wts.Ganglia00.Afferent0.018_018.matrix.gz 1.2,
+	topo/tests/reference/retina_lgn_match.000001p000.Eye0_Activity.matrix.gz 1.2,
+	topo/tests/reference/retina_lgn_match.000001p000.Ganglia00_Activity.matrix.gz 1.2,
+	topo/tests/reference/retina_lgn_match.param 1.2,
+	topo/tests/reference/retina_lgn_match.ty 1.13: 
+	Removed the retina_lgn_match simulation, since it's not really
+	nescessary but is probably confusing and creates extra work for
+	maintaining.
+
+	* topo/tests/reference/oo_or_map_topo.param 1.3: Updated some
+	comments and orderings; shouldn't have affected network behavior.
+
+	* topo/tests/reference/lissom_oo_or_reference.ty 1.35: Updated to
+	work with new comparison functions.
+
+	* doc/Future_Work/current_text.php 1.143: Updated a task again.
+
+	* doc/Future_Work/current_text.php 1.142: Updated a task.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.32: Removed
+	HACKALERT.
+
+	* topo/tests/reference/lissom_log_parser.py 1.28,
+	topo/tests/reference/lissom_or_reference.ty 1.31: Minor
+	simplification to filename_base.
+
+	* topo/tests/reference/lissom_log_parser.py 1.27: Removed
+	not-very-useful check from get_matrix(), so comparisons don't have
+	to specify the sheet size every time.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.30: Minor change;
+	no visible different.
+
+	* topo/tests/reference/lissom_log_parser.py 1.26: Updated
+	documentation, plus minor change.
+
+	* topo/tests/reference/lissom_log_parser.py 1.25: Merged activity
+	comparison functions.
+
+	* topo/tests/reference/lissom_log_parser.py 1.24: Merged weight
+	comparison functions.
+
+	* topo/tests/reference/lissom_log_parser.py 1.23: Minor cleanup -
+	should be no visible changes.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.29: Removed
+	outdated code related to plotting.
+
+	* topo/tests/reference/lissom_log_parser.py 1.22,
+	topo/tests/reference/lissom_or_reference.ty 1.28: Moved functions
+	out of lissom_or to lissom_log_parser.
+
+	* topo/tests/reference/lissom_log_parser.py 1.21,
+	topo/tests/reference/lissom_or_reference.ty 1.27:
+	compare_weights() and compare_activities() just print the results
+	immediately, and do not return anything.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.26: Renamed
+	Topographica sheets to match C++ lissom regions.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.25: Cleanup:
+	should be no visible change.
+
+2007-02-06  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.141: Updated my tasks.
+
+2007-02-06  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/som_retinotopy_text.php 1.7: Minor clarifications
+
+2007-02-06  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/reference/lissom_log_parser.py 1.20: Updated a
+	comment.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.24,
+	topo/tests/reference/or_map_topo.param 1.8: Reverted to a density
+	of 24.
+
+	* topo/tests/reference/or_map_topo.param 1.8.2.1: file
+	or_map_topo.param was added on branch numpy_test_branch on
+	2007-02-07 14:28:57 +0000
+
+	* doc/Future_Work/current_text.php 1.140: Updated some of my
+	tasks.
+
+	* topo/misc/utils.py 1.29: Simplified Struct class.
+
+2007-02-05  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/utils.py 1.5: Added comment.
+
+	* topo/tests/reference/lissom_log_parser.py 1.19: Converting both
+	arrays to float seems to fix the comparisons problems.
+
+	* topo/tests/reference/lissom_log_parser.py 1.18: Made error
+	message slightly more helpful.
+
+	* topo/tests/utils.py 1.4: Added HACKALERT.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.23: Corrected
+	timing and syntax of excitatory bounds change events. Updated c++
+	weights slices now that the bounds are different (plus corrected
+	typo BaseRN for Base N, which didn't matter before since they were
+	equal).
+
+	* topo/base/simulation.py 1.47: CommandEvent warns if an event is
+	added that has faulty syntax. Additionally, any CommandEvent that
+	causes an error when it executes is skipped, and a warning message
+	is printed.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.22,
+	topo/tests/reference/or_map_topo.param 1.7: Enlarged V1 density
+	and added in an excitatory bounds change.
+
+	* topo/tests/reference/lissom_log_parser.py 1.17:
+	compare_elements() no longer has a fixed maximum number of decimal
+	places at which to check for approximate equality.
+
+	* topo/tests/reference/lissom_oo_or_reference.ty 1.34,
+	topo/tests/reference/retina_lgn_match.ty 1.12: Added note that the
+	comparisons in these files will not work until they are updated.
+
+	* topo/tests/reference/retina_lgn_match.000001p000.Eye0_Activity.matrix 1.2,
+	topo/tests/reference/retina_lgn_match.000001p000.Ganglia00_Activity.matrix 1.2,
+	topo/tests/reference/retina_lgn_match.000000.wts.Ganglia00.Afferent0.018_018.matrix 1.2,
+	topo/tests/reference/retina_lgn_match.000001p000.Eye0_Activity.matrix.gz 1.1,
+	topo/tests/reference/retina_lgn_match.000001p000.Ganglia00_Activity.matrix.gz 1.1,
+	topo/tests/reference/retina_lgn_match.000000.wts.Ganglia00.Afferent0.018_018.matrix.gz 1.1: 
+	Gzipped to save space.
+	
+	* topo/tests/reference/or_map_topo.log 1.2: Now present as .gz
+	file.
+
+2007-02-05  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Developer_Manual/imports_text.php 1.5,
+	doc/Developer_Manual/revisioncontrol_text.php 1.3: Minor tweak
+
+	* topo/patterns/basic.py 1.107: Idea for a gradient pattern
+	generator
+
+	* doc/Future_Work/current_text.php 1.139: Added note on
+	numpy.dot() performance
+
+2007-02-04  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/utils.py 1.3: Minor cleanup
+
+2007-02-04  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/reference/lissom_or_reference.ty 1.21: Now runs tests
+	to 20000 iterations.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.20: Now prints the
+	smallest number of decimal places to which C++ LISSOM and
+	Topographica match for various items.
+
+	* topo/tests/reference/lissom_log_parser.py 1.16:
+	compare_elements() now returns the smallest number of decimal
+	places to which all corresponding elements of two arrays match.
+
+	* topo/tests/utils.py 1.2: Added array_almost_equal() (based on
+	assert_array_almost_equal()), which tests whether or not two
+	arrays are equal to a specified number of decimal places. Added a
+	condition that assert_array_almost_equal is only valid if the
+	given number of decimal places is greater than 0.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.19: Added some
+	functions to cut down on typing, and updated lissom command.
+
+	* topo/tests/reference/lissom_log_parser.py 1.15: Minor update to
+	an error message.
+
+	* topo/misc/utils.py 1.28: Added repr method to Struct class.
+
+2007-02-03  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/reference/lissom_log_parser.py 1.14: Minor
+	simplifications.
+
+	* topo/tests/reference/lissom_log_parser.py 1.13: Removed unused
+	code.
+
+	* topo/tests/reference/or_map_topo.param 1.6: Uncommented all the
+	scheduled actions (except lat. exc. bounds change).
+
+	* topo/tests/reference/lissom_or_reference.ty 1.18: Uncommented
+	all the scheduled actions (except for lat. exc. bounds change,
+	since that starts off too small to shrink further. Added
+	commented-out code for comparisons up to t=14000.
+
+2007-02-02  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/reference/lissom_or_reference.ty 1.17,
+	topo/tests/reference/or_map_topo.param 1.5: Reverted times in
+	topographica simulation. Uncommented scheduled events for as far
+	as I've checked (700 iterations, weights to 6 dp).
+
+	* topo/tests/reference/lissom_or_reference.ty 1.16: The previous
+	commit happened by mistake, although the message was partially
+	correct (also commented out all scheduled actions in the c++ and
+	topographica simulations; topographica matches the c++ lissom one
+	to 6 decimal places in the weights of the central unit after 700
+	iterations). Updated c++ lissom command this time.
+
+	* topo/tests/reference/or_map_topo.param 1.4: Commented out all
+	scheduled actions.
+
+	* topo/tests/reference/lissom_log_parser.py 1.12,
+	topo/tests/reference/lissom_or_reference.ty 1.15: compare_elements
+	returns more useful information (you can see how what fraction of
+	elements match at various numbers of decimal places).
+
+2007-02-02  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.62: removed print statements from
+	debugging
+
+2007-02-02  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/reference/lissom_or_reference.ty 1.14: Slight
+	simplification (c++ lissom sheets will always be square).
+
+	* topo/tests/reference/lissom_log_parser.py 1.11: Slight
+	simplification (c++ lissom sheets will always be square). Added a
+	comment and moved some import statements around.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.13: Added
+	comparison of retina activities.
+
+	* topo/tests/reference/lissom_log_parser.py 1.10: Records no. of
+	d.p.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.12,
+	topo/tests/reference/or_map_topo.param 1.3: The comparison
+	simulations use a lower density. There are no excitatory bounds
+	changes.
+
+	* topo/tests/reference/lissom_log_parser.py 1.9: Corrected element
+	comparison test (before it was sometimes saying values didn't
+	match to a certain number of decimal places, when in fact they did
+	(the numbers are floats).
+
+2007-02-01  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/reference/lissom_or_reference.ty 1.11,
+	topo/tests/reference/or_map_topo.param 1.2: Updated
+	lissom_or_reference and or_map_topo at the same time, checking
+	they match the reference simulation in the book (except with
+	BaseN=72, and consequent changes). Currently radii are set to
+	specific values for testing; similarly, only some scheduled events
+	are present. These files can be made more general later on. At
+	this revision, the two simulations' weight values consistently
+	match to at least 4 d.p. over 550 iterations (I haven't yet tested
+	to more than 4 d.p. or 550 iterations). Both files need to be
+	tidied up.
+
+	* topo/tests/reference/lissom_log_parser.py 1.8: Added missing
+	import.
+
+2007-02-01  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.61: fixed arror in contrast_response
+	- added size to param_dict, changed some default parameters
+
+2007-02-01  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/reference/lissom_or_reference.ty 1.10: Previous
+	commit did not contain the real times (by mistake).
+
+	* topo/tests/reference/lissom_or_reference.ty 1.9: Corrected
+	scheduled events.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.8: Removed
+	outdated alteration of scheduled-event timings.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.7: Adjust learning
+	rates by an amount that is now calculated when the bounds change
+	(and hence the number of units changes).
+
+	* topo/tests/reference/lissom_or_reference.ty 1.6: Updated some
+	comments.
+
+	* topo/commands/basic.py 1.44.2.3: Removed unused import.
+
+	* topo/tests/reference/lissom_or_reference.ty 1.5: Updated to
+	allow some automatic comparisons. Removed assertion statements.
+
+	* topo/tests/reference/or_map_topo.log.gz 1.1: Compressed
+	or_map_topo.log.
+
+	* topo/tests/reference/or_map_topo.log.gz 1.1.2.1: file
+	or_map_topo.log.gz was added on branch numpy_test_branch on
+	2007-02-07 14:45:28 +0000
+
+	* topo/tests/reference/.cvsignore 1.3: Ignore or_map_topo.log;
+	might remove this line in the future but for now it's the only way
+	to make cvs diff feasible for me.
+
+	* topo/tests/reference/lissom_log_parser.py 1.7,
+	topo/tests/reference/lissom_oo_or_reference.ty 1.33: Moved some
+	functions to a more general location so I can use them in
+	lissom_or_reference.
+
+	* topo/tests/reference/or_map_topo.param 1.1: Version taken
+	straight from the c++ lissom repository (the current version,
+	1.15).
+
+2007-01-31  fdemertzis  <fdemertzis@lodestar.inf.ed.ac.uk>
+
+	* examples/goodhill_network90.ty 1.14: Fixed initialisation, and
+	corrected the values for printing in CoG.
+
+2007-01-31  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/goodhill_network90.ty 1.13: Forced update commands to
+	be set properly for OD and CoG map plotting
+
+	* examples/sullivan_nn06.ty 1.11: Added optimized dot product
+	activation function
+
+	* topo/commands/pylabplots.py 1.14: Made axis parameter be
+	user-controllable
+
+2007-01-31  fdemertzis  <fdemertzis@lodestar.inf.ed.ac.uk>
+
+	* examples/goodhill_network90.ty 1.12: Changed one value.
+
+2007-01-31  antolikjan  <antolikjan@lodestar.inf.ed.ac.uk>
+
+	* examples/lgn_lateral.ty 1.1: The initial version of LGN with
+	lateral connectivity
+
+2007-01-31  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* external/Makefile 1.41.2.3, external/numpy.diff 1.1.2.1: Added
+	patch to numpy to fix bug in numpy.subtract.reduce
+
+	* external/numpy.diff 1.1: New file.
+
+	* external/.cvsignore 1.17.2.2: Added gnosis utils
+
+	* topo/tkgui/topoconsole.py 1.102: Changed 'Load script' menu
+	option to 'Run script' to avoid confusion with 'Load snapshot'
+
+	* doc/index.html 1.4.2.1: Minor typo fix
+
+	* external/.cvsignore 1.18: More to ignore
+
+2007-01-30  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/goodhill_network90.ty 1.11: Added
+	update_elastic_net_maps to allow plotting in the GUI
+
+	* examples/Makefile 1.14: Changed order of making examples
+
+2007-01-30  fdemertzis  <fdemertzis@lodestar.inf.ed.ac.uk>
+
+	* examples/goodhill_network90.ty 1.10: fixed documentation, made
+	an array that stores the results for printing.
+
+2007-01-30  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* external/Makefile 1.46: Added gnosis utils.
+
+	* external/Gnosis_Utils-1.2.1.tar.gz 1.1: Initial
+	version. Provides various xml tools, among other things.
+
+	* topo/commands/basic.py 1.44.2.2: Slightly simplified the pickle
+	code now we don't subclass pickle.Pickler and
+	pickle.Unpickler. Should be no visible change.
+
+	* topo/base/arrayutils.py 1.20.2.5: Added code to allow pickling
+	and unpickling of numpy ufuncs.
+
+2007-01-30  fdemertzis  <fdemertzis@lodestar.inf.ed.ac.uk>
+
+	* examples/goodhill_network90.ty 1.9: Complete
+	implementation,fixed documentation, simplified some code.
+
+2007-01-29  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/index_text.php 1.36: Added note about Mac system
+	problems
+
+2007-01-29  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/cvs_text.php 1.8: Minor update to Windows
+	information.
+
+2007-01-28  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/goodhill_network90.ty 1.8: Reformatted comments to
+	match Topographica conventions.  Changed size parameters to be
+	Integers.  Made points be proper objects.
+
+2007-01-28  fdemertzis  <fdemertzis@lodestar.inf.ed.ac.uk>
+
+	* examples/goodhill_network90.ty 1.7: Implemented the second term
+	of equation 1 of the paper, the printing functionality is still
+	missing.So now I the model must be complete.
+
+2007-01-28  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* external/Makefile 1.41.2.2: Forced removal of Numeric's weave to
+	allow switching between numpy and Numeric's branches
+
+	* external/Makefile 1.45: Fixed typo in previous checkin
+
+	* external/Makefile 1.44: Force removal of numpy weave version,
+	for safety
+
+	* external/Makefile 1.43: Fixed typo in previous checkin
+
+	* external/Makefile 1.42: Added removal of previous installation
+	for safety when switching between the numpy and Numeric branches
+
+	* topo/misc/inlinec.py 1.12.2.2: Reenabled optimized components
+	now that weave appears to be working.  Changed error reporting to
+	print only one error by default, instead of one per optimized
+	component; the old behavior can be obtained by setting
+	warn_for_each_unoptimized_component=True
+
+	* external/.cvsignore 1.17.2.1: More to ignore
+
+	* external/scipy-0.5.2.tar.gz 1.1: New file.
+
+	* external/Makefile 1.41.2.1,
+	external/Scipy_core-0.3.0_108.1820.tar.gz 1.1.2.1,
+	external/scipy-0.5.2.tar.gz 1.1.2.1, external/weave.diff 1.1.2.1:
+	Updated weave to work with numpy.  Also adds full SciPy
+	distribution, although it is not yet unpacked and built
+	automatically
+
+	* topo/base/boundingregion.py 1.29.2.1: Fixed import of
+	no-longer-existing alias
+
+2007-01-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/numbergenerators.py 1.14: Removed unused RandomWrapper
+	class.
+
+2007-01-28  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/arrayutils.py 1.20.2.4: Removed unused import
+
+2007-01-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/utils.py 1.27: Removed function that wrote an array to
+	a file; there are now functions to do this in arrayutils.
+
+	* topo/patterns/basic.py 1.106.2.5: Change to docstring (about
+	Wrapper).
+
+	* examples/lissom_or_noshrinking_latswitch.ty 1.4.2.4,
+	examples/cfsom_or.ty 1.53.2.2, examples/hierarchical.ty 1.61.2.2,
+	examples/joublin_bc96.ty 1.12.2.2, examples/laminar_oo_or.ty
+	1.2.2.3, examples/laminar_or.ty 1.1.2.3, examples/lissom_fsa.ty
+	1.1.2.3, examples/lissom_oo_or.ty 1.72.2.3,
+	examples/lissom_or_noshrinking.ty 1.4.2.3,
+	examples/sullivan_neurocomputing04.ty 1.13.2.2,
+	examples/sullivan_nn06.ty 1.10.2.2: Removed Wrapper class since
+	numpy's ufuncs deepcopy without problems.
+
+	* topo/base/parameterclasses.py 1.51.2.1,
+	topo/tests/reference/lissom_oo_or_reference.ty 1.32.2.1: Removed
+	Wrapper class now numpy ufuncs deepcopy without problems.
+
+	* topo/patterns/basic.py 1.106.2.4: Removed Wrapper import now the
+	Wrapper class is not used.
+
+	* topo/commands/analysis.py 1.59.2.2,
+	topo/tests/reference/retina_lgn_match.ty 1.11.2.1: Removed unused
+	Wrapper import.
+
+	* topo/patterns/basic.py 1.106.2.3: The ufuncs from numpy appear
+	to deepcopy, so Wrapper is not needed.
+
+	* topo/commands/analysis.py 1.60: Removed unused import.
+
+	* topo/base/arrayutils.py 1.20.2.3: Removed ununused import.
+
+2007-01-28  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/cf.py 1.64.2.3: Removed outdated comments
+
+	* examples/lissom_or_noshrinking_latswitch.ty 1.4.2.2,
+	topo/patterns/basic.py 1.106.2.2, examples/laminar_oo_or.ty
+	1.2.2.2, examples/laminar_or.ty 1.1.2.2, examples/lissom_fsa.ty
+	1.1.2.2, examples/lissom_oo_or.ty 1.72.2.2,
+	examples/lissom_or_noshrinking.ty 1.4.2.2: Replaced Numeric with
+	numpy in calls to Wrapper.  The automatic numpy functions for
+	updating from Numeric failed to catch those, because the relevant
+	code was embedded in a string.
+
+2007-01-27  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/__init__.py 1.57.2.2: Disabled underflow error reporting by
+	default, because underflows are expected in many normal cases
+
+	* topo/base/arrayutils.py 1.20.2.2, topo/misc/patternfns.py
+	1.10.2.2: Cleaned up handling of division-by-zero and underflow
+	errors for Gaussian patterns.  It is now much simpler and the
+	problems with numpy appear to have been eliminated.
+
+	* topo/__init__.py 1.57.2.1: Enabled strict reporting of
+	floating-point errors as exceptions by default, to facilitate
+	debugging of numpy
+
+	* topo/base/cf.py 1.64.2.2: Removed unused imports
+
+2007-01-27  fdemertzis  <fdemertzis@lodestar.inf.ed.ac.uk>
+
+	* examples/goodhill_network90.ty 1.6: Complete overhaul. comment
+	it heavily for future refernces. Implemented further the learning
+	function. Most of the heavy parts are done. Missing the second
+	term of equation 1 of the paper, and the printing functionality.
+
+2007-01-26  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* README.txt 1.18, topo/__init__.py 1.58: Updated copyright info
+
+2007-01-25  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/reference/lissom_log_parser.py 1.6.2.1,
+	topo/tkgui/editorobjects.py 1.45.2.1, topo/tkgui/plotgrouppanel.py
+	1.99.2.1, topo/plotting/plot.py 1.100.2.1,
+	topo/projections/basic.py 1.54.2.1, topo/responsefns/optimized.py
+	1.50.2.1, topo/responsefns/projfns.py 1.17.2.1,
+	topo/sheets/cfsom.py 1.32.2.1, topo/sheets/composer.py 1.19.2.1,
+	topo/sheets/lissom.py 1.64.2.1, topo/sheets/slissom.py 1.5.2.1,
+	topo/tests/testbitmap.py 1.7.2.1, topo/tests/testcfsom.py
+	1.32.2.1, topo/tests/testfeaturemap.py 1.23.2.1,
+	topo/tests/testimage.py 1.7.2.1, topo/tests/testoutputfnsbasic.py
+	1.11.2.1, topo/tests/testoutputfnsoptimized.py 1.7.2.1,
+	topo/tests/testpalette.py 1.2.2.1,
+	topo/tests/testpatterngenerator.py 1.16.2.1,
+	topo/tests/testplot.py 1.19.2.1, topo/tests/testplotfilesaver.py
+	1.20.2.1, topo/tests/testplotgroup.py 1.26.2.1,
+	topo/tests/testsheet.py 1.46.2.1, topo/tests/testsheetview.py
+	1.16.2.1, topo/tests/testsimulation.py 1.7.2.1,
+	topo/tests/testtemplateplotgrouppanel.py 1.7.2.1,
+	topo/tests/utils.py 1.1.2.1, topo/misc/distribution.py 1.3.2.1,
+	topo/misc/inlinec.py 1.12.2.1, topo/misc/patternfns.py 1.10.2.1,
+	topo/misc/utils.py 1.26.2.1, topo/outputfns/basic.py 1.55.2.1,
+	topo/outputfns/homeostatic.py 1.8.2.1, topo/outputfns/optimized.py
+	1.43.2.1, topo/patterns/basic.py 1.106.2.1, topo/patterns/image.py
+	1.56.2.1, topo/patterns/random.py 1.30.2.1, topo/patterns/rds.py
+	1.15.2.1, topo/plotting/bitmap.py 1.34.2.1,
+	topo/plotting/palette.py 1.11.2.1, examples/laminar_or.ty 1.1.2.1,
+	examples/leaky_lissom_or.ty 1.15.2.1, examples/lissom_fsa.ty
+	1.1.2.1, examples/lissom_oo_od.ty 1.11.2.1,
+	examples/lissom_oo_or.ty 1.72.2.1, examples/lissom_oo_or_dy.ty
+	1.10.2.1, examples/lissom_oo_or_dy_photo.ty 1.3.2.1,
+	examples/lissom_oo_or_homeomaxent.ty 1.1.2.1,
+	examples/lissom_or.ty 1.109.2.1, examples/lissom_or_homeomaxent.ty
+	1.2.2.1, examples/lissom_or_homeoscale.ty 1.7.2.1,
+	examples/lissom_or_noshrinking.ty 1.4.2.1,
+	examples/lissom_or_noshrinking_latswitch.ty 1.4.2.1,
+	examples/lissom_or_sf.ty 1.25.2.1, examples/obermayer_pnas90.ty
+	1.48.2.1, examples/ohzawa_science90.ty 1.5.2.1,
+	examples/som_retinotopy.ty 1.47.2.1,
+	examples/sullivan_neurocomputing04.ty 1.13.2.1,
+	examples/sullivan_nn06.ty 1.10.2.1, examples/tiny.ty 1.27.2.1,
+	topo/analysis/featureresponses.py 1.9.2.1, topo/base/arrayutils.py
+	1.20.2.1, topo/base/cf.py 1.64.2.1, topo/base/functionfamilies.py
+	1.14.2.1, topo/base/patterngenerator.py 1.101.2.1,
+	topo/base/projection.py 1.82.2.1, topo/base/sheet.py 1.115.2.1,
+	topo/base/sheetcoords.py 1.9.2.1, topo/commands/analysis.py
+	1.59.2.1, topo/commands/basic.py 1.44.2.1,
+	topo/commands/pylabplots.py 1.13.2.1, topo/learningfns/basic.py
+	1.63.2.1, topo/learningfns/projfns.py 1.16.2.1,
+	topo/learningfns/som.py 1.12.2.1, examples/cfsom_or.ty 1.53.2.1,
+	examples/hierarchical.ty 1.61.2.1, examples/joublin_bc96.ty
+	1.12.2.1, examples/laminar_oo_or.ty 1.2.2.1, README.txt 1.17.2.1:
+	Updated to use numpy instead of Numeric, on a separate CVS branch
+	named numpy_test_branch.  First, ran the automatic conversion
+	code:
+
+	  import numpy.oldnumeric.alter_code1 as noa
+	  noa.converttree('topo') noa.convertall('examples') # (After
+	  temporarily renaming .ty to .py)
+
+	The main automatic changes were:
+
+	  - Change 'import Numeric' to 'import numpy.oldnumeric as
+	  Numeric' - Change 'from Numeric import' to 'from
+	  numpy.oldnumeric import' - Converted .flat to .ravel() - Changed
+	  typecode= to dtype= - Eliminated savespace() and spacesaver()
+
+	Then cleaned up the results by hand, removing all traces of
+	savespace, using pickle.Pickler and pickle.Unpickler instead of
+	ExtraPickler and ExtraUnpickler, and using 'from numpy import inf'
+	rather than the previous ad-hoc way of generating an infinite
+	float.  Also disabled optimized components, until we can make it
+	all work for the unoptimized ones.  The result should pass most of
+	the tests, and run most scripts, but there are still various
+	problems to debug.
+
+2007-01-25  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/templates.py 1.60: removed parameter inital_plot
+
+	* topo/plotting/templates.py 1.59: removed contrast response full
+	field
+
+	* topo/tkgui/topoconsole.py 1.101: added ProjectionActivity window
+	to refresh_activity_windows
+
+2007-01-25  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.138: Removed a task and
+	updated another; added some notes for myself.
+
+	* topo/tkgui/editortools.py 1.36: Made the new object parameters
+	appear in the model editor, rather than as a separate
+	window. Needs some tidying up now.
+
+	* topo/tkgui/editorwindow.py 1.36: The root of the editor window
+	is not created by calling Tk(), but is created by calling
+	Toplevel(). Tk() - which initializes Tk - 'should only be called
+	once per application'. This change corrects some strange behavior
+	(for example: having a ParametersFrame inside a model editor
+	window previously resulted in a non-functional ParametersFrame).
+
+2007-01-25  r_primrose  <r_primrose@lodestar.inf.ed.ac.uk>
+
+	* examples/sullivan_neurocomputing04.ty 1.13: added orientation
+	code for sweeping lines
+
+2007-01-25  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_od.ty 1.11, topo/base/arrayutils.py 1.20:
+	Removed previous bogus checkin
+
+	* topo/base/arrayutils.py 1.19, topo/base/cf.py 1.64,
+	examples/lissom_oo_od.ty 1.10: Fixed boolean comparison against
+	array, to be compatible with both Numeric and Numpy
+
+	* topo/sheets/generatorsheet.py 1.47: Added assertion to catch
+	confusing problem
+
+	* topo/commands/analysis.py 1.59: Fixed longstanding bug -- if
+	there were multiple input sheets with different sizes (as in
+	hierarchical.ty), patterns were being presented by
+	PatternPresenter with the same size in each sheet, causing
+	undefined behavior for values off the edge of the ConnectionFields
+	for each neuron.
+
+2007-01-24  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/basic.py 1.44: Changed default argument for
+	pattern_present to present an empty set of patterns, rather than
+	give an error
+
+	* topo/misc/inlinec.py 1.12: Fixed previous checkin -- was turning
+	off optimization by default
+
+	* topo/learningfns/optimized.py 1.63, topo/misc/inlinec.py 1.11,
+	topo/outputfns/optimized.py 1.43, topo/responsefns/optimized.py
+	1.50: Moved component substitution code into
+	provide_unoptimized_equivalent function for simplicity and to all
+	the messages to be disabled when necessary
+
+	* examples/goodhill_network90.ty 1.5: Simplified and changed from
+	a CFPLearningFn to a Sheet; no real change in capabilities (other
+	than commenting out some code that was not working).
+
+	* examples/goodhill_network90.ty 1.4: Minor cleanup of docstrings
+	and comments
+
+2007-01-24  fdemertzis  <fdemertzis@lodestar.inf.ed.ac.uk>
+
+	* examples/goodhill_network90.ty 1.3: Implemented further the
+	learning function
+
+2007-01-24  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* external/.cvsignore 1.17, external/Makefile 1.41,
+	external/numpy-1.0.1.tar.gz 1.1: Added numpy to allow transition
+	from Numeric
+
+	* topo/commands/basic.py 1.43: Minor cleanup
+
+	* topo/outputfns/homeostatic.py 1.8: Simplified docstring
+
+2007-01-23  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.99: Removed duplicate code in
+	enlarge() and reduce()
+
+	* topo/plotting/templates.py 1.58, topo/tkgui/featurecurvepanel.py
+	1.10, topo/tkgui/templateplotgrouppanel.py 1.28: Changed
+	PlotGroupTemplate.initial_plot to plot_immediately, to avoid
+	confusion with the entirely unrelated PlotGroup.initial_plot.
+	Made the default *not* to plot immediately, because most
+	user-added plots will need to be measured somehow first, which is
+	usually slow
+
+	* topo/tkgui/plotgrouppanel.py 1.98: Changed right click to print
+	plot name as well as the region name
+
+	* topo/tkgui/plotgrouppanel.py 1.97, topo/plotting/plotgroup.py
+	1.140: Changed to use plot's new rescale() method, and removed the
+	temporary hacks previously required for keeping track of the
+	scaling factors (using plot's new scale_factor instead).
+
+	* topo/plotting/plot.py 1.100: Added method to rescale the images,
+	keeping the original image around for later rescaling, and storing
+	the current scale_factor
+
+2007-01-23  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/basic.py 1.42: in pattern_present if any output_fn
+	has a learning parameter then set this to false during
+	presentation of patterns
+
+	* topo/outputfns/homeostatic.py 1.6: added learning parameter
+	which can turn homeostatic learning off during measurement of maps
+	or curves
+
+2007-01-23  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.96: Trivial reformatting of
+	docstrings
+
+2007-01-22  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/templates.py 1.57, topo/tkgui/featurecurvepanel.py
+	1.9, topo/tkgui/topoconsole.py 1.100: corrected Contrast Response
+	Full field - should be replotted each time unit is changed to
+	avoid using wrong orientation
+
+	* topo/commands/analysis.py 1.58, topo/commands/pylabplots.py
+	1.13, topo/plotting/templates.py 1.56,
+	topo/tkgui/featurecurvepanel.py 1.8: corrected error in
+	prerequisite name, added sheet name to warnings in feature curve
+	measurement
+
+	* topo/commands/analysis.py 1.57: corrected error in parameters
+	for measure_or_tuning_fullfield
+
+	* topo/tkgui/featurecurvepanel.py 1.7: added warnings for
+	prerequisites
+
+	* topo/plotting/templates.py 1.55: added a prerequisites
+	paramleter for curves
+
+	* topo/plotting/plotgroup.py 1.139: added a get_curve_time to
+	FeatureCurvePlotGroup to get timestamps from Curve SheetViews
+
+	* topo/commands/pylabplots.py 1.12: changed tuning_curve_data to
+	support getting data from SheetViews rather than arrays
+
+	* topo/commands/analysis.py 1.56: separated warnings for
+	prerequisites in measure curves commands so that defaults can be
+	used separately
+
+	* topo/analysis/featureresponses.py 1.9: changed curve_dict to
+	contain SheetViews rather than activity arrays in FeatureCurves
+
+2007-01-22  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.95: The row and col calculated
+	for the matrix of a plot that is right clicked on are integer row
+	and column indexes.
+
+	* topo/tkgui/plotgrouppanel.py 1.94: Added right click popup menu
+	to PlotgroupPanel, showing the row and column of the matrix
+	corresponding to where was clicked on a plot. Lots of the code is
+	to illustrate how this could be used, but does not currently do
+	much.
+
+	* topo/plotting/plotgroup.py 1.138: Added hack to store the
+	original scaling factor. Might not be required if that information
+	is already available.
+
+2007-01-21  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/templateplotgrouppanel.py 1.27: Trivial cleanup
+
+2007-01-21  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editortools.py 1.35: Upgraded hack for 'new object
+	properties' window: now clicking on close does not destroy the
+	window, but only hides it. This prevents the error messages that
+	used to appear if the window was closed but then the user wanted
+	to add another new object.
+
+	* topo/tkgui/topoconsole.py 1.99: Added comment about clicking the
+	window's 'X' to quit.
+
+	* topo/tkgui/editortools.py 1.34, topo/tkgui/parametersframe.py
+	1.110: Removed Reset button from the ParametersFrame for new
+	objects, because reset is not yet implemented for a class in a
+	ParametersFrame. Added reminder in parametersframe.
+
+	* topo/tkgui/editortools.py 1.33, topo/tkgui/parametersframe.py
+	1.109, topo/tkgui/testpattern.py 1.53: Changed how to request
+	which buttons a ParametersFrame should display.
+
+2007-01-20  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.137: call command and plot command
+	separately
+
+	* topo/plotting/templates.py 1.54: made command and plot command
+	separate in full field curve templates
+
+	* examples/laminar.ty 1.36: corrected name, now laminar_or.ty
+
+	* examples/laminar_or.ty 1.1: version with better self
+	organisation
+
+	* examples/laminar_oo_or.ty 1.2: *** empty log message ***
+
+2007-01-20  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/Makefile 1.13: Added measure_cog and
+	measure_position_pref
+
+2007-01-19  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/featurecurvepanel.py 1.6: Put commands side by side
+
+	* topo/commands/analysis.py 1.55: Changed order of feature
+	measurement so that the display option is more meaningful
+
+	* topo/tkgui/plotgrouppanel.py 1.93: Added help text for what to
+	do when there is no plot on screen yet
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.14: Updated to reflect the
+	orientation map being saved with the file.
+
+	* examples/Makefile 1.12: Added or maps and tuning curves to each
+	snapshot
+
+	* topo/commands/analysis.py 1.54: Turned display option off by
+	default to allow usage in batch mode
+
+	* topo/plotting/plotgroup.py 1.136: Set up to be a better starting
+	point for using the timestamps saved with curve data
+
+2007-01-19  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.108: Added a HACKALERT.
+
+	* topo/tkgui/parametersframe.py 1.107: Added Cancel button.
+
+	* topo/tkgui/testpattern.py 1.52: ParametersFrame for
+	PatternGenerator has only Reset button.
+
+	* topo/tkgui/editortools.py 1.32: New object properties window has
+	only Reset button. Also added some notes to myself for coming
+	changes.
+
+	* topo/tkgui/editorobjects.py 1.45: ParametersFrame itself has
+	Apply, Reset, and Ok buttons.
+
+	* topo/tkgui/parametersframe.py 1.106: ParametersFrame itself has
+	Apply, Reset, and Ok buttons (which can be displayed or
+	not). Removed buttons from right-click editing method.
+
+2007-01-19  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/analysis/featureresponses.py 1.8: Fixed curve_dict to be of
+	type Float32 instead of Object to allow it to be pickled
+
+	* topo/plotting/templates.py 1.53: Added proj_name parameter to
+	the measure_cog template so that users can tell what to change
+	when they don't get a plot
+
+	* examples/cfsom_or.ty 1.53: Changed projection name to make
+	measure_cog() work with no edits
+
+	* topo/base/cf.py 1.63, topo/base/sheetview.py 1.18,
+	topo/commands/analysis.py 1.53: Fixed Projection plots to use
+	timestamps.  Removed inappropriate import of topo into cf.py
+
+	* topo/plotting/plotgroup.py 1.135,
+	topo/tkgui/templateplotgrouppanel.py 1.26: Changed to use Plot's
+	timestamps (created from the SheetView timestamps) rather than the
+	current time, to make it obvious when old data is being plotted.
+	Made various parts of the code work when there were no plots (or
+	only non-resizeable plots), to make it possible to use any plots
+	whose data *is* available while not dying when there is no data
+	available
+
+	* topo/tkgui/plotgrouppanel.py 1.92: Removed code duplicated
+	between PlotGroupPanel.refresh() and BasicPlotGroupPanel.refresh()
+
+	* topo/commands/analysis.py 1.52,
+	topo/analysis/featureresponses.py 1.7, topo/base/cf.py 1.62,
+	topo/base/sheetview.py 1.17: Added timestamp to SheetViews
+
+	* topo/plotting/plot.py 1.99: Added timestamp to Plots.  Added
+	warning for when the bitmaps used in the plots become too stale,
+	i.e. are too far out of sync in their timestamps
+
+2007-01-18  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.51: Changed print statements into
+	warnings
+
+	* topo/misc/numbergenerators.py 1.13: Removed apparently stray
+	print statement in RandomInt
+
+2007-01-18  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.98: added plotpanelclass for full
+	field curves
+
+	* topo/plotting/templates.py 1.52: added plotcommand for fullfield
+	curves
+
+	* topo/plotting/plotgroup.py 1.134: added support for fullfield
+	feature curves ie. command to only re-plot without re-measuring
+	responses
+
+	* topo/tkgui/featurecurvepanel.py 1.5: added a
+	FullFieldFeatureCurvePanel for special case where full field
+	stimulus is used
+
+	* topo/tkgui/featurecurvepanel.py 1.4: correction to
+	update_plotgroup_variables to allow update command to be changed
+	before refresh
+
+	* topo/commands/analysis.py 1.50: changes to allow for plotting
+	curves for LGN, ie. using default values for orientation
+
+	* topo/analysis/featureresponses.py 1.6: added sheets_to_measure
+	code to allow for plotting curves for LGN
+
+	* topo/tkgui/featurecurvepanel.py 1.3: small changes to code
+	determining wether or not to plot before opening gui and adding
+	all CFSheets to region list
+
+	* topo/tkgui/templateplotgrouppanel.py 1.25: small change to code
+	determining wether or not to plot before opening gui
+
+	* topo/plotting/templates.py 1.51: added flag for determining
+	wether or not to plot before opening gui window
+
+	* topo/tkgui/connectionfieldspanel.py 1.31: minor change
+	simplifying _add_region_menu
+
+2007-01-17  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/pylabplots.py 1.11: Cleaned up docstrings
+
+	* topo/tkgui/topoconsole.py 1.97: Changed to allow specific
+	override to FeatureCurvePanel if it is ever needed for a
+	particular template
+
+	* topo/plotting/templates.py 1.50: Cleaned up documentation and
+	some comments
+
+	* examples/goodhill_network90.ty 1.2: Cleaned up comments
+
+2007-01-17  fdemertzis  <fdemertzis@lodestar.inf.ed.ac.uk>
+
+	* examples/goodhill_network90.ty 1.1: Initial scetch of the
+	Elastic net model
+
+	* examples/sullivan_nn06.ty 1.10: Reviewed the parameters to be
+	more precise but has error still..
+
+2007-01-17  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editortools.py 1.31: The little window for editing
+	sheets/connections no longer appears when the model editor is
+	first opened.
+
+	* topo/tkgui/parametersframe.py 1.105: Added reset method.
+
+	* topo/base/parameterizedobject.py 1.52: Added reset_params()
+	method, to return parameters to class default values.
+
+	* doc/User_Manual/parameters_text.php 1.6: Added a missing space.
+
+	* topo/tkgui/parametersframe.py 1.104: Changes made while
+	right-click editing a Parameter are saved for all values of the
+	Parameter, not just its initial value. (Also corrected an
+	accidental deletion of a 'self.__' I committed previously.)
+
+	* topo/tkgui/parametersframe.py 1.103: Clarified some of the code
+	relating to right-click editing of ParameterizedObjects. There
+	should be no visible changes.
+
+2007-01-15  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.49: Various improvements to tuning
+	curve measurements
+
+	* topo/tkgui/plotgrouppanel.py 1.91: BasicPlotGroupPanel class
+	added to plotgrouppanel.py
+
+	* topo/tkgui/basicplotgrouppanel.py 1.24: no longer required,
+	class added to plotgrouppanel.py
+
+	* topo/analysis/featureresponses.py 1.5: updated gui refresh in
+	measure_responses, removed curve_param_dict
+
+	* topo/tkgui/featurecurvepanel.py 1.2: now importing
+	BasicPlotGroupPanel from plotgrouppanel
+
+	* topo/commands/pylabplots.py 1.10: made changes to tuning_curve
+	plotting
+
+	* topo/tkgui/topoconsole.py 1.96: added if statement to decide on
+	plotpanel class for FeatureCurvePanel rather than making it a
+	special case, also added refresh_activity_windows function
+
+	* topo/plotting/templates.py 1.49: made changes to tuning curve
+	plotgroup templates, added template_plot_type parameter for using
+	in topoconcole to decide on plotpanel class
+
+	* topo/patterns/basic.py 1.106: changed name and fixed problems
+	with SineGratingDisk
+
+2007-01-15  antolikjan  <antolikjan@lodestar.inf.ed.ac.uk>
+
+	* examples/laminar_oo.ty 1.2, examples/laminar_oo_or.ty 1.1: Moved
+	laminar_oo.ty to laminar_oo_or.ty
+
+2007-01-13  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/analysis/featureresponses.py 1.4: Cleaned up docstrings
+
+2007-01-12  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.48: Cleaned up docstrings and
+	formatting
+
+	* topo/patterns/basic.py 1.105: Added alert
+
+	* topo/patterns/basic.py 1.104: Minor cleanup to docstring
+
+	* topo/plotting/templates.py 1.48: Restored fixes to docstrings
+	lost in previous revision
+
+2007-01-11  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.90: Now a subclass of
+	BasicPlotGroupPanel
+
+	* topo/tkgui/featurecurvepanel.py 1.1: plot panel type for Feature
+	curves - subclass of BasicPlotGroupPanel
+
+	* topo/tkgui/basicplotgrouppanel.py 1.23: Created superclass to
+	PlotGroupPanel whcih implements only basic refresh functions
+
+	* topo/commands/analysis.py 1.47: Added new functions for
+	measuring orientation tuning, contrast response and size tuning
+	curves
+
+	* topo/tkgui/topoconsole.py 1.95: Specified plotpanel types for
+	Feature Curves
+
+	* topo/patterns/basic.py 1.103: Added GratingStimulus pattern for
+	using as stimulus for plotting curves
+
+	* topo/analysis/featureresponses.py 1.3: Added FeatureCurve class
+	for storing data for curve plotting
+
+	* topo/commands/pylabplots.py 1.8: Added tuning_curve plots for
+	curve plotting
+
+	* topo/plotting/plotgroup.py 1.133: Added FeatureCurvePlotGroup
+	for curve plotting
+
+	* topo/plotting/templates.py 1.47: Added templates for new tuning
+	curves
+
+2007-01-06  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Makefile 1.17: Now allows running even when the previous run
+	was aborted, leaving the tests directory in the wrong place
+
+2007-01-05  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/analysis/featureresponses.py 1.2: Cleaned up documentation,
+	variable names, and private routines; should not have changed
+	behavior (except if callers used keyword rather than positional
+	arguments)
+
+	* topo/tests/testfeaturemap.py 1.23: Fixed to work with
+	featureresponses.py; was only working on systems with a .pyc file
+	hanging around from earlier versions
+
+	* ChangeLog.txt 1.13: Updated with recent changes
+
 2007-01-04  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
 	* doc/User_Manual/patterns_text.php 1.5: Made link more explicit
