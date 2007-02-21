@@ -90,30 +90,29 @@ over time, while preserving the same user-visible behavior.
 <H2>Finding bottlenecks</H2>
 
 <P>As discussed above, we wish to spend our time optimizing parts of
-the code which account for most of the run time. To do this, we must
-find those bottlenecks; <code>topo.misc.utils</code> contains the
-<code>profile()</code> function, which provides a simple way to do
+the code that account for most of the run time. <code>topo.misc.utils</code> contains the
+<code>profile()</code> function, providing a simple way to do
 this.
 
 <P>For instance, if we have a simple simulation consisting of a
 <code>CFSOM</code> sheet connected to a <code>GeneratorSheet</code>
 with a <code>CFProjection</code>, we might wish to find out if there
-is an obvious bottleneck that could be eliminated, suspecting that
-such a bottleneck could be in either the learning function or the
-response function.  For concreteness, let us say that in this instance
-the <code>CFProjection</code> has a learning function of
+is an obvious bottleneck that could be eliminated, speeding up the
+network's performance. For concreteness, let us say that in this
+instance the <code>CFProjection</code> has a learning function of
 <code>CFPLF_HebbianSOM()</code>, and a response function of
 <code>CFPRF_Plugin()</code>, and that the script
 <code>speed_test.ty</code> simply creates the network but does not run
 the simulation.
 
 <P>We can run topographica as follows, using the
-<code>profile()</code> function to profile the run, getting the
-following output:
+<code>profile()</code> function to give us information about the 
+performance:
 
 <pre>
 $ ./topographica speed_test.ty -c "from topo.misc.utils import profile; \
 profile('topo.sim.run(200)',n=20)" 
+
          1477056 function calls (1468656 primitive calls) in 50.198 CPU seconds
 
    Ordered by: cumulative time, internal time
@@ -147,12 +146,13 @@ functions, ordered by cumulative time.  For more information about the
 types of ordering available, <code>help(profile)</code> provides a
 link to Python's documentation.
 
-<P>From the output, we can see that all the time is spent in
+<P>From <code>profile()</code>'s output above, we see (as expected) that 
+all the time is spent in
 <code>Simulation</code>'s <code>run()</code> method. We must proceed
-down the list until we find a less granular function: one that does
-not call many others, but performs some atomic task. The first such
-function is <code>cf.py:352(__call__)</code>,
-<code>CFPRF_Plugin</code>'s <code>call()</code> method:
+down the list until we find a less granular function --- one that does
+not call many others, but instead performs some atomic task. The first such
+function is <code>cf.py:352(__call__)</code> (<code>cf.py</code>, line 352),
+<code>CFPRF_Plugin</code>'s <code>__call__()</code> method:
 
 <pre>
 from topo.base.functionfamilies import DotProduct
@@ -191,19 +191,19 @@ class CFPRF_Plugin(CFPResponseFn):
 </pre>
 
 About 60% of the total run time is spent in this method, so if we were
-able to optimize it, then this would lead to good optimization of the
+able to optimize it, this would lead to good optimization of the
 simulation in total. Looking further down the list, we can see
 functions associated with learning, and that these account for about
 half as much of the run time. So, optimizing the response function
 will be approximately twice as beneficial as optimizing the learning
-function; only if it were much easier to optimize the learning
+function in this case; only if it were much easier to optimize the learning
 function would it be worthwhile to begin with that.
 
-<P> How do we begin to optimize the response function?  In fact, we
-have more fine-grained information about the occupation of the CPU
-while executing the response function: the subsequent line in the
-output shows that about 70% of the time spent running the response
-function is spent in <code>functionfamilies.py:151(__call__)</code>,
+<P>How do we begin to optimize the response function?  We have more
+fine-grained information about the occupation of the CPU while
+executing the response function; the subsequent line in the output
+shows that about 70% of the time spent running the response function
+is spent in <code>functionfamilies.py:151(__call__)</code>,
 <code>CFPRF_Plugin</code>'s default <code>single_cf_fn</code>:
 
 <pre>
@@ -222,9 +222,9 @@ class DotProduct(ResponseFn):
 </pre>
 
 <P>In this case, it seems strange that <code>numpy</code>'s own
-<code>dot</code> function is not being used; why perform the dot
+<code>dot</code> function is not being used: why perform the dot
 product in stages ourselves when <code>numpy</code> provides a
-function to take care of it? Straightaway, it is worthwhile to see if
+function for it? Straightaway, it is worthwhile to see if
 using an equivalent <code>numpy</code> function can speed up the
 performance. To find out, we can replace the implementation of
 <code>DotProduct</code> with the following:
@@ -237,13 +237,12 @@ class DotProduct(ResponseFn):
         return dot(m1.ravel(),m2.ravel())
 </pre>
 
-
-
 <P>With this new DotProduct, we can profile the code again:
 
 <pre>
 $ ./topographica examples/speed_test.ty -c "from topo.misc.utils import profile; \
 profile('topo.sim.run(200)',n=20)"
+
          837056 function calls (828656 primitive calls) in 38.153 CPU seconds
 
    Ordered by: cumulative time, internal time
@@ -272,14 +271,17 @@ profile('topo.sim.run(200)',n=20)"
  7600/400    0.528    0.000    3.211    0.008 parameterizedobject.py:642(__repr__)
 </pre>
 
-<P>More than halved functionfamilies, and cf.py call only 60% what it
-was. Overall, we have cut time to about 75% of original with just a few
-minutes' work.
+<P>We can see from the above output that the time spent in <code>functionfamilies.py149(__call__)</code>
+has been more than halved, and only about 60% as much time is now spent
+in <code>CFPRF_Plugin()</code>. Overall, we have cut the simulation run time to
+about 75% of its original value with just a few minutes' work.
 
-
-<P>If we wanted, there is still further room for optimization -- lots of
-time is still spent in call. Replace our <code>DotProduct</code>
-entirely with numpy's dot, giving us a <code>CFPRF_Plugin</code> of:
+<P>If we wanted to proceed further with this particular optimization, 
+we note that although we have reduced the execution time of <code>DotProduct</code>,
+the time spent in <code>CFPRF_Plugin</code> has not fallen as much because some time
+is still spent in the overhead of making the function call. We could replace our
+<code>DotProduct</code> entirely with <code>numpy.dot</code>, giving us a
+<code>CFPRF_Plugin</code> of:
 
 <pre>
 import numpy
@@ -316,11 +318,12 @@ class CFPRF_Plugin(CFPResponseFn):
         activity *= strength
 </pre>
 
-<P>Then we get:
+<P>This leads to the following performance profile:
 
 <pre>
 $ ./topographica speed_test.ty -c "from topo.misc.utils import profile; \
 profile('topo.sim.run(200)',n=20)"
+
          516656 function calls (508256 primitive calls) in 35.410 CPU seconds
 
    Ordered by: cumulative time, internal time
@@ -349,30 +352,39 @@ profile('topo.sim.run(200)',n=20)"
  7600/400    0.561    0.000    3.239    0.008 parameterizedobject.py:642(__repr__)
 </pre>
 
-<P>we have reduced the total run time to 93% of its previous value. 
-But <code>CFPRF_Plugin</code> is
-no longer the same as it was before; arrays it receives are flattened,
-which restricts what functions could be plugged in as the single_cf_fn.
-So this optimization has gone too far; if the performance gains were 
-significant, it would be worthwhile calling this class CFPRF_DotProduct
-and offering it as an alternative choice to CFPRF_Plugin(single_cf_fn=DotProduct()),
-but it isn't so it's not worthwhile.
+<P>We have reduced the total run time to 93% of its previous value.
+But <code>CFPRF_Plugin</code> is no longer the same as it was before:
+arrays it receives are flattened, which restricts what functions could
+be plugged in as the <code>single_cf_fn</code>.  If the performance
+gains were significant, it would be worthwhile calling this new class
+<code>CFPRF_DotProduct</code> and offering it as an alternative choice
+to <code>CFPRF_Plugin(single_cf_fn=DotProduct())</code> --- but in
+this case the performance gain is not worth the additional complexity
+of the resulting code.
 
 
 <H3>Considering optimizations with C++ (weave)</H3>
-Being possible to re-write functions in c,
-might wonder if it would help in this case, or does numpy already do a
-good job? We could replace the numpy dot with a dot written in c, but
-probably the overhead in calling is too much anyway so wouldn't be big
-enough optimization, but what about replacing whole function with a c
-version?  Replace <code>CFPRF_Plugin(single_cf_fn=dot)</code> with
-<code>CFPRF_DotProduct_opt</code>, an optimized version written in C.
+Topographica makes it reasonably easy to re-write functions in C++ and
+offer them as optimized alternatives. We might wonder if it would help
+in this case, or does <code>numpy</code> already do a good job? We
+could replace <code>DotProduct</code> with a version written in 
+C++, or we could replace the entire <code>CFPRF_Plugin</code> class
+with one written in C++. As at 02/2007, we find that simply re-writing
+the <code>single_cf_fn</code> in C++ provides little performance improvement,
+but that re-writing the entire CFP function provides a big performance
+improvement.
+<!-- CB: presumably because of the increased speed of looping through
+all the CFs and having the slice_arrays available, all in C++, etc-
+should add this explanation somewhere -->
+<!-- CB: certainly for the response function, anyway.-->
 
 
-
+<P>Replacing the CFP function with one written entirely in C++, we
+get the following profile:
 <pre>
 $ ./topographica speed_test.ty -c "from topo.misc.utils import profile; \
 profile('topo.sim.run(200)',n=20)"
+
          515119 function calls (506917 primitive calls) in 22.492 CPU seconds
 
    Ordered by: cumulative time, internal time
@@ -402,26 +414,29 @@ profile('topo.sim.run(200)',n=20)"
 </pre>
 
 <P>The simulation now takes about half the time the original
-version took, and 60% the time numpy version takes. The response function code
-is not among the top 20 times, and any bottleneck is now part of learning. 
+version took, and 60% of the time the <code>numpy</code> version takes
+to run. The response function code
+is not among the top 20 times; any bottleneck is now part of learning. 
 
-<P>The c code adds a
-lot of complexity to the code: for maintenance, for deployment on
-different platforms, and for user understanding - so it has to justify
-this with bigtime speedups.
+<P>The C++ code adds extra work: for maintenance, for deployment on
+different platforms, and for user understanding --- so it has to be 
+justified, meaning it should provide large speedups. In this
+case, the performance improvement justifies the additional costs
+(which have been substantial in terms of maintenance and platform
+support --- although platform support cost is diluted by all such C++
+functions, and any added in the future).
 
-<P>While making this kind of investigation, you should also check that
-the simulations are producing the same results. particularly when
-working with optimized c functions, it is possible for one to appear
-much faster than another when the computations being performed are not
-equivalent.  (You could do this by adding a print statement after
-profiling to show the sum of V1 activity, or something similar.)
+<P>While making this kind of investigation, you should check that
+simulations run with different versions of a function are producing 
+the same results. In particular, when working with optimized C++ functions, 
+it is possible for one version to appear much faster than another when in fact 
+the computations being performed are not
+equivalent. You could make a simple check by adding a print statement after
+profiling to show the sum of V1 activity, or some similar indicator.
 
-run times should be long enough for reliable results, or repeat and
-average.
-
-
-
+<P>A final consideration is to ensure that the profile run times are
+long enough to obtain reliable results. For shorter runs, it would
+be necessary to repeat them and average the results.
 
 
 <!--CB:
