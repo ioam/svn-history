@@ -22,8 +22,11 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
     Dot-product response function.
 
     Written in C for a several-hundred-times speedup; see
-    CFPRF_DotProduct for an easier-to-read (but otherwise equivalent)
+    CFPRF_DotProduct for an easier-to-read (but otherwise equivalent*)
     version in Python.
+
+    * The unoptimized Python version works for 1D arrays, whereas this
+    function assumes 2D arrays.
     """
 
     single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)    
