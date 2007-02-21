@@ -402,7 +402,10 @@ profile('topo.sim.run(200)',n=20)"
 </pre>
 
 <P>The simulation now takes about half the time the original
-version took, and 60% the time numpy version takes. The c code adds a
+version took, and 60% the time numpy version takes. The response function code
+is not among the top 20 times, and any bottleneck is now part of learning. 
+
+<P>The c code adds a
 lot of complexity to the code: for maintenance, for deployment on
 different platforms, and for user understanding - so it has to justify
 this with bigtime speedups.
