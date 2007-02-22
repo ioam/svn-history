@@ -1,0 +1,259 @@
+Index: numpy/core/src/ufuncobject.c
+===================================================================
+--- numpy/core/src/ufuncobject.c (revision 3480)
++++ numpy/core/src/ufuncobject.c (revision 3503)
+@@ -2133,5 +2133,5 @@
+ 		else {
+ 			loop->meth = NOBUFFER_UFUNCLOOP;
+-			loop->steps[0] = (aar)->strides[axis];
++			loop->steps[1] = (aar)->strides[axis];
+ 			loop->N -= 1;
+ 		}
+@@ -2228,5 +2228,5 @@
+         loop->insize = aar->descr->elsize;
+         loop->outsize = loop->ret->descr->elsize;
+-        loop->bufptr[1] = loop->ret->data;
++        loop->bufptr[0] = loop->ret->data;
+ 
+ 	if (loop->meth == ZERO_EL_REDUCELOOP) {
+@@ -2255,5 +2255,5 @@
+ 
+ 	if (operation == UFUNC_REDUCE) {
+-		loop->steps[1] = 0;
++		loop->steps[0] = 0;
+ 	}
+ 	else {
+@@ -2271,15 +2271,15 @@
+ 
+ 		if (operation == UFUNC_ACCUMULATE)
+-			loop->steps[1] = loop->ret->strides[axis];
++			loop->steps[0] = loop->ret->strides[axis];
+ 		else
+-			loop->steps[1] = 0;
+-	}
+-	loop->steps[2] = loop->steps[1];
+-	loop->bufptr[2] = loop->bufptr[1] + loop->steps[2];
++			loop->steps[0] = 0;
++	}
++	loop->steps[2] = loop->steps[0];
++	loop->bufptr[2] = loop->bufptr[0] + loop->steps[2];
+ 
+ 
+ 	if (loop->meth == BUFFER_UFUNCLOOP) {
+ 		int _size;
+-		loop->steps[0] = loop->outsize;
++		loop->steps[1] = loop->outsize;
+                 if (otype != aar->descr->type_num) {
+ 			_size=loop->bufsize*(loop->outsize +		\
+@@ -2290,5 +2290,5 @@
+                         loop->castbuf = loop->buffer + \
+                                 loop->bufsize*aar->descr->elsize;
+-                        loop->bufptr[0] = loop->castbuf;
++                        loop->bufptr[1] = loop->castbuf;
+                         loop->cast = PyArray_GetCastFunc(aar->descr, otype);
+ 			if (loop->cast == NULL) goto fail;
+@@ -2299,5 +2299,5 @@
+                         if (loop->buffer == NULL) goto fail;
+ 			if (loop->obj) memset(loop->buffer, 0, _size);
+-                        loop->bufptr[0] = loop->buffer;
++                        loop->bufptr[1] = loop->buffer;
+                 }
+ 	}
+@@ -2342,6 +2342,6 @@
+ 		for(i=0; i<loop->size; i++) {
+ 			if (loop->obj) Py_INCREF(*((PyObject **)loop->idptr));
+-			memmove(loop->bufptr[1], loop->idptr, loop->outsize);
+-			loop->bufptr[1] += loop->outsize;
++			memmove(loop->bufptr[0], loop->idptr, loop->outsize);
++			loop->bufptr[0] += loop->outsize;
+ 		}
+                 break;
+@@ -2351,8 +2351,8 @@
+ 			if (loop->obj)
+ 				Py_INCREF(*((PyObject **)loop->it->dataptr));
+-                        memmove(loop->bufptr[1], loop->it->dataptr,
++                        memmove(loop->bufptr[0], loop->it->dataptr,
+                                loop->outsize);
+ 			PyArray_ITER_NEXT(loop->it);
+-			loop->bufptr[1] += loop->outsize;
++			loop->bufptr[0] += loop->outsize;
+ 			loop->index++;
+ 		}
+@@ -2364,8 +2364,8 @@
+ 			if (loop->obj)
+ 				Py_INCREF(*((PyObject **)loop->it->dataptr));
+-                        memmove(loop->bufptr[1], loop->it->dataptr,
++                        memmove(loop->bufptr[0], loop->it->dataptr,
+                                loop->outsize);
+ 			/* Adjust input pointer */
+-                        loop->bufptr[0] = loop->it->dataptr+loop->steps[0];
++                        loop->bufptr[1] = loop->it->dataptr+loop->steps[1];
+                         loop->function((char **)loop->bufptr,
+ 				       &(loop->N),
+@@ -2374,6 +2374,6 @@
+ 
+                         PyArray_ITER_NEXT(loop->it)
+-                        loop->bufptr[1] += loop->outsize;
+-                        loop->bufptr[2] = loop->bufptr[1];
++                        loop->bufptr[0] += loop->outsize;
++                        loop->bufptr[2] = loop->bufptr[0];
+                         loop->index++;
+                 }
+@@ -2406,9 +2406,9 @@
+ 				if (loop->obj)
+ 					Py_INCREF(*((PyObject **)loop->castbuf));
+-				memcpy(loop->bufptr[1], loop->castbuf,
++				memcpy(loop->bufptr[0], loop->castbuf,
+ 				       loop->outsize);
+ 			}
+ 			else { /* Simple copy */
+-				arr->descr->f->copyswap(loop->bufptr[1],
++				arr->descr->f->copyswap(loop->bufptr[0],
+ 							loop->inptr,
+ 							loop->swap, NULL);
+@@ -2436,11 +2436,11 @@
+                                                &i,
+ 					       loop->steps, loop->funcdata);
+-				loop->bufptr[1] += loop->steps[1]*i;
++				loop->bufptr[0] += loop->steps[0]*i;
+ 				loop->bufptr[2] += loop->steps[2]*i;
+ 				UFUNC_CHECK_ERROR(loop);
+                         }
+                         PyArray_ITER_NEXT(loop->it);
+-                        loop->bufptr[1] += loop->outsize;
+-                        loop->bufptr[2] = loop->bufptr[1];
++                        loop->bufptr[0] += loop->outsize;
++                        loop->bufptr[2] = loop->bufptr[0];
+                         loop->index++;
+                 }
+@@ -2486,6 +2486,6 @@
+ 			if (loop->obj)
+ 				Py_INCREF(*((PyObject **)loop->idptr));
+-			memcpy(loop->bufptr[1], loop->idptr, loop->outsize);
+-			loop->bufptr[1] += loop->outsize;
++			memcpy(loop->bufptr[0], loop->idptr, loop->outsize);
++			loop->bufptr[0] += loop->outsize;
+ 		}
+                 break;
+@@ -2495,8 +2495,8 @@
+ 			if (loop->obj)
+ 				Py_INCREF(*((PyObject **)loop->it->dataptr));
+-                        memcpy(loop->bufptr[1], loop->it->dataptr,
++                        memcpy(loop->bufptr[0], loop->it->dataptr,
+                                loop->outsize);
+ 			PyArray_ITER_NEXT(loop->it);
+-			loop->bufptr[1] += loop->outsize;
++			loop->bufptr[0] += loop->outsize;
+ 			loop->index++;
+ 		}
+@@ -2508,8 +2508,8 @@
+ 			if (loop->obj)
+ 				Py_INCREF(*((PyObject **)loop->it->dataptr));
+-                        memcpy(loop->bufptr[1], loop->it->dataptr,
++                        memcpy(loop->bufptr[0], loop->it->dataptr,
+                                loop->outsize);
+ 			/* Adjust input pointer */
+-                        loop->bufptr[0] = loop->it->dataptr+loop->steps[0];
++                        loop->bufptr[1] = loop->it->dataptr+loop->steps[1];
+                         loop->function((char **)loop->bufptr,
+ 				       &(loop->N),
+@@ -2519,6 +2519,6 @@
+                         PyArray_ITER_NEXT(loop->it);
+ 			PyArray_ITER_NEXT(loop->rit);
+-                        loop->bufptr[1] = loop->rit->dataptr;
+-			loop->bufptr[2] = loop->bufptr[1] + loop->steps[1];
++                        loop->bufptr[0] = loop->rit->dataptr;
++			loop->bufptr[2] = loop->bufptr[0] + loop->steps[0];
+                         loop->index++;
+                 }
+@@ -2551,9 +2551,9 @@
+ 				if (loop->obj)
+ 					Py_INCREF(*((PyObject **)loop->castbuf));
+-				memcpy(loop->bufptr[1], loop->castbuf,
++				memcpy(loop->bufptr[0], loop->castbuf,
+ 				       loop->outsize);
+ 			}
+ 			else { /* Simple copy */
+-				arr->descr->f->copyswap(loop->bufptr[1],
++				arr->descr->f->copyswap(loop->bufptr[0],
+ 							loop->inptr,
+ 							loop->swap,
+@@ -2582,5 +2582,5 @@
+                                                &i,
+ 					       loop->steps, loop->funcdata);
+-				loop->bufptr[1] += loop->steps[1]*i;
++				loop->bufptr[0] += loop->steps[0]*i;
+ 				loop->bufptr[2] += loop->steps[2]*i;
+ 				UFUNC_CHECK_ERROR(loop);
+@@ -2588,6 +2588,6 @@
+                         PyArray_ITER_NEXT(loop->it);
+ 			PyArray_ITER_NEXT(loop->rit);
+-                        loop->bufptr[1] = loop->rit->dataptr;
+-			loop->bufptr[2] = loop->bufptr[1] + loop->steps[1];
++                        loop->bufptr[0] = loop->rit->dataptr;
++			loop->bufptr[2] = loop->bufptr[0] + loop->steps[0];
+                         loop->index++;
+                 }
+@@ -2670,15 +2670,15 @@
+ 			ptr = (intp *)ind->data;
+ 			for (i=0; i<nn; i++) {
+-				loop->bufptr[0] = loop->it->dataptr +	\
++				loop->bufptr[1] = loop->it->dataptr +	\
+ 					(*ptr)*loop->instrides;
+ 				if (loop->obj)
+-					Py_INCREF(*((PyObject **)loop->bufptr[0]));
+-				memcpy(loop->bufptr[1], loop->bufptr[0],
++					Py_INCREF(*((PyObject **)loop->bufptr[1]));
++				memcpy(loop->bufptr[0], loop->bufptr[1],
+ 				       loop->outsize);
+ 				mm = (i==nn-1 ? arr->dimensions[axis]-*ptr : \
+ 				      *(ptr+1) - *ptr) - 1;
+ 				if (mm > 0) {
+-					loop->bufptr[0] += loop->instrides;
+-					loop->bufptr[2] = loop->bufptr[1];
++					loop->bufptr[1] += loop->instrides;
++					loop->bufptr[2] = loop->bufptr[0];
+ 					loop->function((char **)loop->bufptr,
+ 						       &mm, loop->steps,
+@@ -2686,10 +2686,10 @@
+ 					UFUNC_CHECK_ERROR(loop);
+ 				}
+-				loop->bufptr[1] += loop->ret->strides[axis];
++				loop->bufptr[0] += loop->ret->strides[axis];
+ 				ptr++;
+ 			}
+ 			PyArray_ITER_NEXT(loop->it);
+ 			PyArray_ITER_NEXT(loop->rit);
+-			loop->bufptr[1] = loop->rit->dataptr;
++			loop->bufptr[0] = loop->rit->dataptr;
+ 			loop->index++;
+ 		}
+@@ -2704,5 +2704,5 @@
+ 				if (loop->obj)
+ 					Py_INCREF(*((PyObject **)loop->idptr));
+-				memcpy(loop->bufptr[1], loop->idptr,
++				memcpy(loop->bufptr[0], loop->idptr,
+ 				       loop->outsize);
+ 				n = 0;
+@@ -2729,17 +2729,17 @@
+ 							   loop->castbuf,
+ 							   j, NULL, NULL);
+-					loop->bufptr[2] = loop->bufptr[1];
++					loop->bufptr[2] = loop->bufptr[0];
+ 					loop->function((char **)loop->bufptr,
+ 						       &j, loop->steps,
+ 						       loop->funcdata);
+ 					UFUNC_CHECK_ERROR(loop);
+-					loop->bufptr[1] += j*loop->steps[1];
++					loop->bufptr[0] += j*loop->steps[0];
+ 				}
+-				loop->bufptr[1] += loop->ret->strides[axis];
++				loop->bufptr[0] += loop->ret->strides[axis];
+ 				ptr++;
+ 			}
+ 			PyArray_ITER_NEXT(loop->it);
+ 			PyArray_ITER_NEXT(loop->rit);
+-			loop->bufptr[1] = loop->rit->dataptr;
++			loop->bufptr[0] = loop->rit->dataptr;
+ 			loop->index++;
+ 		}
