@@ -22,9 +22,9 @@ from topo.base.parameterclasses import Number,BooleanParameter,Parameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.base.sheetview import UnitView
+from topo.base.cf import ConnectionField, CFPRF_Plugin
 
 from topo.outputfns.basic import IdentityOF
-
 
 
 # CEBHACKALERT: This file contains numerous hacks, all around
@@ -37,7 +37,6 @@ from topo.outputfns.basic import IdentityOF
 # ConnectionField could e.g. be subclassed. At the moment,
 # a shared ConnectionField is in a list of 'DummyCF' wrappers.
 
-
 class CFPOF_SharedWeight(CFPOutputFn):
     single_cf_fn = OutputFnParameter(default=IdentityOF())
     
@@ -48,54 +47,48 @@ class CFPOF_SharedWeight(CFPOutputFn):
             self.single_cf_fn(cf.weights)
 
 
-class CFPRF_SharedWeight(CFPResponseFn):
-    """
-    Response function accepting a single CF applied to all units.
-    Otherwise similar to GenericCFResponseFn.
-    """
-    single_cf_fn = ResponseFnParameter(default=DotProduct())
-    
-    def __call__(self, cfs, input_activity, activity, strength):
-        rows,cols = activity.shape
-        single_cf_fn = self.single_cf_fn
-        shared_weights = cfs[0][0].weights
-        
-        for r in xrange(rows):
-            for c in xrange(cols):
-                # get right submatrix from input_activity
-                act_r1,act_r2,act_c1,act_c2 = cfs[r][c].slice_array
-                X = input_activity[act_r1:act_r2,act_c1:act_c2]
-                # get right submatrix from weights
-                w_r1,w_r2,w_c1,w_c2 = cfs[r][c].weights_slice
-                weights = shared_weights[w_r1:w_r2,w_c1:w_c2]
+class SharedWeightCF(ConnectionField):
+	
+    # JAHACKALERT: This implementation copies some of the CEBHACKALERTS 
+    # of the ConnectionField.__init__ function from which it is dervied
+    def __init__(self,cf,x,y,bounds_template,mask_template,input_sheet):
+        """
+        	From an existing copy of ConnectionField (CF) that suits as a template 
+		create a new connection field that shares weights with the template CF	
+		Copies all the properties of CF to stay identical except the wights variable
+		that actually contains the data
+		
+		The only difference will be the boundaries of the CF
+		that will be implemented as a numpy view into
+		the weights stored in the CF template.
+        """
+        self.x = x; self.y = y
+        self.input_sheet = input_sheet
+	self.bounds_template = bounds_template
 
-                activity[r,c] = single_cf_fn(X,weights)
-        activity *= strength
+        # Move bounds to correct (x,y) location, and convert to an array
+        # CEBHACKALERT: make this clearer by splitting into two functions.
+        # JANOTE sets self.bounds and self.slice_array
+	# JAHACKALERT not sure whether this has to be still called!!!!
+	self.offset_bounds()
 
+        # Now we have to get the right submatrix of the mask (in case
+        # it is near an edge)
+        r1,r2,c1,c2 =  self.get_slice()
+        self.weights = cf.weights[r1:r2,c1:c2]
+	
+	# JAHACKALERT the OutputFn cannot be applied in SharedWeightCF
+	# - another inconsistency in the class tree design - there
+	# should be nothing in the parent class that is ignored in its
+	# children.  Probably need to extract some functionality of
+        # ConnectionField into a shared abstract parent class.
+	# We have agreed to make this right by adding a constant property that
+	# will be set true if the learning should be active
+	# The SharedWeightCFProjection class and its anccestors will
+	# have this property set to false which means that the 
+	# learning will be deactivated
+	
 
-# CEBHACKALERT: this is a temporary implementation!
-# It isn't the right way to allow a collection of CFs
-# sharing one set of weights.
-class DummyCF(ParameterizedObject):
-
-    weights = property(lambda self: self.cf.weights)
-    
-    def __init__(self,cf,x,y,bounds_template):
-        cf.x=x; cf.y=y
-        cf.offset_bounds(bounds_template)
-
-        self.bounds = copy.deepcopy(cf.bounds)
-        self.slice_array =  copy.deepcopy(cf.slice_array)
-        self.weights_slice = cf.get_slice(bounds_template)
-        
-        self.cf = cf
-        self.x=x; self.y=y
-
-
-
-# CEBHACKALERT: users should not access .sharedcf or .cfs directly,
-# but should use .cf(r,c). That all needs to be cleaned up, here and
-# in connectionfield.py.
 class SharedWeightCFProjection(CFProjection):
     """
     A Projection with a single set of weights, shared by all units.
@@ -103,18 +96,11 @@ class SharedWeightCFProjection(CFProjection):
     Otherwise similar to CFProjection, except that learning is
     currently disabled.
     """
-    response_fn = CFPResponseFnParameter(
-        default=CFPRF_SharedWeight())
     
     ### JABHACKALERT: Set to be constant as a clue that learning won't
     ### actually work yet.
-    learning_fn = CFPLearningFnParameter(
-        CFPLF_Identity(),constant=True)
-
+    learning_fn = CFPLearningFnParameter(CFPLF_Identity(),constant=True)
     output_fn  = OutputFnParameter(default=IdentityOF())
-    
-    strength = Number(default=1.0)
-
     weights_output_fn = CFPOutputFnParameter(default=CFPOF_SharedWeight())
 
 
@@ -123,11 +109,11 @@ class SharedWeightCFProjection(CFProjection):
         Initialize the Projection with a single cf_type object
         (typically a ConnectionField),
         """
-        # we don't want the whole set of cfs initialized, but we
+        # We don't want the whole set of cfs initialized, but we
         # do want anything that CFProjection defines.
         super(SharedWeightCFProjection,self).__init__(initialize_cfs=False,**params)
 
-        # want the sharedcf to be located on the grid, so
+        # We want the sharedcf to be located on the grid, so
         # pick a central unit and use its center
         self.__sharedcf=self.cf_type(self.center_unitxcenter,
                                      self.center_unitycenter,
@@ -143,30 +129,16 @@ class SharedWeightCFProjection(CFProjection):
         for y in self.dest.sheet_rows()[::-1]:
             row = []
             for x in self.dest.sheet_cols():
-                cf = DummyCF(scf,x,y,bounds_template)
+                cf = SharedWeightCF(scf,x,y,bounds_template,self.mask_template,self.src)
                 row.append(cf)
             cflist.append(row)
-
-        ### JABHACKALERT: cfs is a dummy, here only so that learning will
-        ### run without an exception
-        #self.cfs = [self.sharedcf]
-        self.cfs = cflist
-        
-    
-    def cf(self,r,c):
-        """Return the shared ConnectionField, for all coordinates."""
-        # CEBHACKALERT: there's a better way to do this than
-        # just replacing the sharedcf's bounds and slice_array;
-        # see HACKALERT by DummyCF.
-        self.__sharedcf.bounds = self.cfs[r][c].bounds
-        self.__sharedcf.slice_array = self.cfs[r][c].slice_array
-        return self.__sharedcf
+        self._cfs = cflist
 
     
     def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
-        self.response_fn(self.cfs, input_activity, self.activity, self.strength)
+	self.response_fn(self._cfs, input_activity, self.activity, self.strength)
         self.output_fn(self.activity)
 
 
@@ -186,7 +158,24 @@ class SharedWeightCFProjection(CFProjection):
 	Not yet implemented.
 	"""
         raise NotImplementedError
-
+    
+    
+    def learn(self):
+	"""
+        Because of how output functions are applied, it is not currently
+        possible to use learning functions and output functions for
+        SharedWeightCFProjections, so we disable them here.
+	"""
+        pass
+    
+    
+    def apply_learn_output_fn(self,mask):
+	"""
+        Because of how output functions are applied, it is not currently
+        possible to use learning functions and output functions for
+        SharedWeightCFProjections, so we disable them here.
+	"""
+	pass
 
 
 class LeakyCFProjection(CFProjection):
@@ -211,4 +200,6 @@ class LeakyCFProjection(CFProjection):
 	"""
 	self.leaky_input_buffer = input_activity + self.leaky_input_buffer*exp(-self.decay_rate) 
         super(LeakyCFProjection,self).activate(self.leaky_input_buffer)
+
+
 

@@ -54,7 +54,7 @@ from Numeric import sum,ones,exp, tan, sin, cos
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
-from topo.responsefns.optimized import CFPRF_DotProduct_opt, CFPRF_SharedWeightDotProduct_opt
+from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
@@ -304,7 +304,7 @@ CFProjection.weights_generator = topo.patterns.basic.Gaussian(
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
-SharedWeightCFProjection.response_fn=CFPRF_SharedWeightDotProduct_opt()
+SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
 
 topo.sim['Retina'] = GeneratorSheet(nominal_bounds=retina_bounds, nominal_density=BaseRN,

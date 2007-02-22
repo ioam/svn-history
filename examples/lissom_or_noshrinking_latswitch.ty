@@ -27,7 +27,7 @@ from topo.base.functionfamilies import ResponseFn, ResponseFnParameter
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
-from topo.responsefns.optimized import CFPRF_DotProduct_opt, CFPRF_SharedWeightDotProduct_opt
+from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.base.parameterclasses import DynamicNumber, Number
 from topo.base.cf import CFSheet, CFPResponseFn
 from topo.base.boundingregion import BoundingBox

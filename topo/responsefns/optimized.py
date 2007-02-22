@@ -14,8 +14,6 @@ from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 
 from topo.responsefns.projfns import CFPRF_EuclideanDistance
-from topo.projections.basic import CFPRF_SharedWeight
-
 
 class CFPRF_DotProduct_opt(CFPResponseFn):
     """
@@ -32,6 +30,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
     single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)    
 
     def __call__(self, cfs, input_activity, activity, strength, **params):
+	
         temp_act = activity
         rows,cols = activity.shape
         len, len2 = input_activity.shape
@@ -39,6 +38,9 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
     
         code = """
             double *tact = temp_act;
+	    float *wj;
+	    PyArrayObject *array;
+	    
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
 		for (int l=0; l<cols; ++l) {
@@ -46,7 +48,17 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                     PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
                     PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
 
-                    float *wj = (float *)(((PyArrayObject*)weights_obj)->data);
+		    // This code is optimized for contiguous arrays, which are typical,
+                    // but we make it work for noncontiguous arrays (e.g. views) by
+                    // creating a contiguous copy if necessary.
+                    array=0;
+		    if(PyArray_ISCONTIGUOUS((PyArrayObject*)weights_obj))
+                        wj = (float *)(((PyArrayObject*)weights_obj)->data);
+                    else {
+		    	array = (PyArrayObject*) PyArray_ContiguousFromObject(weights_obj,PyArray_FLOAT,2,2);
+		    	wj = (float *) array->data;
+		    }
+                    
                     int *slice = (int *)(((PyArrayObject*)slice_obj)->data);
                     
                     int rr1 = *slice++;
@@ -74,11 +86,13 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                     // Anything obtained with PyObject_GetAttrString must be explicitly freed
                     Py_DECREF(weights_obj);
                     Py_DECREF(slice_obj);
+		    
+                    if(array != 0)
+		    	Py_DECREF(array);
                 }
             }
         """
-    
-        inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
+	inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 class CFPRF_DotProduct(CFPRF_Plugin):
     """
@@ -163,6 +177,7 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
             }	
         """
 
+
 	
     
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
@@ -195,65 +210,3 @@ class DotProduct_opt(ResponseFn):
         return tot
 
 provide_unoptimized_equivalent("DotProduct_opt","DotProduct",locals())
-
-
-# See the hackalert in projections/basic.py; this wouldn't be
-# required if SharedWeightProjection wrapped the list of cfs
-# better.
-class CFPRF_SharedWeightDotProduct_opt(CFPResponseFn):
-    """
-    Dot-product response function for SharedWeightCFProjection.
-
-    The same as CFPRF_DotProduct, but where there is only one set of weights.
-    """
-    single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)    
-
-    def __call__(self, cfs, input_activity, activity, strength, **params):
-        temp_act = activity
-        rows,cols = activity.shape
-        len, len2 = input_activity.shape
-        X = input_activity.ravel()
-        sw = cfs[0][0].weights
-
-        code = """
-            double *tact = temp_act;
-            for (int r=0; r<rows; ++r) {
-                PyObject *cfsr = PyList_GetItem(cfs,r);
-		for (int l=0; l<cols; ++l) {
-                    PyObject *cf = PyList_GetItem(cfsr,l);
-                    PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
-                    
-                    int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
-
-                    int rr1 = *slice++;
-                    int rr2 = *slice++;
-                    int cc1 = *slice++;
-                    int cc2 = *slice;
-		    double tot = 0.0;
-                    float *wj = sw;
-		    double *xj = X+len*rr1+cc1;
-
-                    // computes the dot product
-		    for (int i=rr1; i<rr2; ++i) {
-                        double *xi = xj;
-			float *wi = wj;                       
-			for (int j=cc1; j<cc2; ++j) {
-                            tot += *wi * *xi;
-                            ++wi;
-                            ++xi;
-                        }
-                        xj += len;
-			wj += cc2-cc1;
-                    }  
-                    *tact = tot*strength;
-                    ++tact;
-                    
-                    // Anything obtained with PyObject_GetAttrString must be explicitly freed
-                    Py_DECREF(slice_obj);
-                }
-            }
-        """
-    
-        inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows','sw'], local_dict=locals())
-
-provide_unoptimized_equivalent("CFPRF_SharedWeightDotProduct_opt","CFPRF_SharedWeight",locals())

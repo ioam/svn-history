@@ -28,7 +28,6 @@ __version__ = '$Revision$'
 
 import numpy.oldnumeric as Numeric
 import copy
-from numpy.oldnumeric import sum,ones,exp
 
 import patterngenerator
 from patterngenerator import PatternGeneratorParameter
@@ -42,6 +41,7 @@ from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorPara
 from sheet import Sheet,Slice
 from sheetview import UnitView, ProjectionView
 from boundingregion import BoundingBox,BoundingRegionParameter
+
 
 # Specified explicitly when creating weights matrix - required
 # for optimized C functions.
@@ -57,11 +57,15 @@ class ConnectionField(ParameterizedObject):
     including many other ConnectionFields.
     """
     
-    x = Number(default=0.0,softbounds=(-1.0,1.0),
-               doc='The x coordinate of the location of the center of this ConnectionField\non the input Sheet, e.g. for use when determining where the weight matrix\nlines up with the input Sheet matrix.')
-    y = Number(default=0.0,softbounds=(-1.0,1.0),
-               doc='The y coordinate of the location of the center of this ConnectionField\non the input Sheet, e.g. for use when determining where the weight matrix\nlines up with the input Sheet matrix.')
-
+    x = Number(default=0.0,softbounds=(-1.0,1.0),doc="""
+        The x coordinate of the location of the center of this ConnectionField
+        on the input Sheet, e.g. for use when determining where the weight matrix
+        lines up with the input Sheet matrix.""")
+    
+    y = Number(default=0.0,softbounds=(-1.0,1.0),doc="""
+        The y coordinate of the location of the center of this ConnectionField
+        on the input Sheet, e.g. for use when determining where the weight matrix
+        lines up with the input Sheet matrix.""")
 
     # Weights matrix; not yet initialized.
     weights = []
@@ -71,6 +75,7 @@ class ConnectionField(ParameterizedObject):
     # array for speed of access from optimized C components.
     # CEBHACKALERT: can rename this to 'slice_' now.
     slice_array = []
+
 
     def get_norm_total(self):
         """
@@ -133,12 +138,21 @@ class ConnectionField(ParameterizedObject):
                  weights_generator,mask_template,
                  output_fn=IdentityOF(),slice_=None,**params):
         """
-        Create weights at the specified (x,y) location.
-
+        Create weights at the specified (x,y) location on the specified input_sheet.
+        
         The supplied bounds_template is moved to the specified location,
         then converted to an array, and finally the weights pattern is
-        drawn inside.
-   
+        drawn inside by the weights_generator.
+        
+        The mask_template allows the weights to be limited to being non-zero in a subset 
+        of the rectangular weights area.  The actual mask is created by cropping the 
+        mask_template by the boundaries of the input_sheet, so that the weights all
+        correspond to actual locations in the input sheet.  For instance, if a circular 
+        pattern of weights is desired, the mask_template should have a disk-shaped 
+        pattern of elements with value 1, surrounded by elements with the value 0.  
+        If the CF extends over the edge of the input sheet then the weights will 
+        actually be half-moon (or similar) rather than circular. 
+        
         Note that bounds_template is assumed to have been initialized correctly
         already (i.e. represents the exact bounds) - see
         CFProjection.initialize_bounds().
@@ -153,10 +167,12 @@ class ConnectionField(ParameterizedObject):
 
         self.x = x; self.y = y
         self.input_sheet = input_sheet
-
+	self.bounds_template = bounds_template
+	
         # Move bounds to correct (x,y) location, and convert to an array
         # CEBHACKALERT: make this clearer by splitting into two functions.
-        self.offset_bounds(bounds_template,slice_)
+        self.offset_bounds(slice_)
+	
 
         # CEBHACKALERT: might want to do something about a size that's specified
         # (right now the size is assumed to be that of the bounds)
@@ -167,9 +183,9 @@ class ConnectionField(ParameterizedObject):
 
         # Now we have to get the right submatrix of the mask (in case
         # it is near an edge)
-        r1,r2,c1,c2 =  self.get_slice(bounds_template,slice_)
+        r1,r2,c1,c2 =  self.get_slice(slice_)
         m = mask_template[r1:r2,c1:c2]
-        
+	
         self.mask = m.astype(weight_type)
 
         # CEBHACKALERT: this works for now, while the output_fns are
@@ -181,7 +197,7 @@ class ConnectionField(ParameterizedObject):
 
 
     ### CEBHACKALERT: there is presumably a better way than this.
-    def get_slice(self,bounds_template,slice_=None):
+    def get_slice(self,slice_=None):
         """
         Return the correct slice for a weights/mask matrix at this
         ConnectionField's location on the sheet (i.e. for getting
@@ -189,7 +205,7 @@ class ConnectionField(ParameterizedObject):
         unit is near the edge of the sheet).
         """
         if not slice_:
-            slice_ = Slice(bounds_template,self.input_sheet)
+            slice_ = Slice(self.bounds_template,self.input_sheet)
             
         sheet_rows,sheet_cols = self.input_sheet.activity.shape
 
@@ -209,27 +225,26 @@ class ConnectionField(ParameterizedObject):
     # CEBHACKALERT: assumes the user wants the bounds to be centered
     # about the unit, which might not be true. Same HACKALERT as for
     # CFProjection.initialize_bounds()
-    def offset_bounds(self,bounds,slice_=None):
+    def offset_bounds(self,slice_=None):
         """
-        Offset the given bounds to this cf's location and store the
+        Offset the bounds_template to this cf's location and store the
         result in the 'bounds' attribute.
 
         Also stores the slice_array for access by C.
 	"""
         if not slice_:
-            slice_ = Slice(bounds,self.input_sheet)
+            slice_ = Slice(self.bounds_template,self.input_sheet)
         else:
             slice_ = copy.copy(slice_)
                
         # translate to this cf's location
         cf_row,cf_col = self.input_sheet.sheet2matrixidx(self.x,self.y)
-        bounds_x,bounds_y=bounds.get_center()
+        bounds_x,bounds_y=self.bounds_template.get_center()
         b_row,b_col=self.input_sheet.sheet2matrixidx(bounds_x,bounds_y)
 
         row_offset = cf_row-b_row
         col_offset = cf_col-b_col
         slice_.translate(row_offset,col_offset)
-
 
         slice_.crop_to_sheet()
 
@@ -239,9 +254,7 @@ class ConnectionField(ParameterizedObject):
         if nrows<1 or ncols<1:
             raise ValueError("ConnectionField at (%s,%s) (input_sheet=%s) has a zero-sized weights matrix (%s,%s); you may need to supply a larger bounds_template or increase the density of the sheet."%(self.x,self.y,self.input_sheet,nrows,ncols))
 
-
         self.bounds = slice_.bounds
-
 
         # Also, store the array for direct access by C.
         # Numeric.Int32 is specified explicitly here to avoid having it
@@ -271,10 +284,12 @@ class ConnectionField(ParameterizedObject):
         should be extended to support increasing as well.
         """
         # CEBHACKALERT: re-write to allow arbitrary resizing
+	self.bounds_template = bounds_template
         or1,or2,oc1,oc2 = self.slice_array
 
         self.offset_bounds(bounds_template)
         r1,r2,c1,c2 = self.slice_array
+
 
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
@@ -441,6 +456,7 @@ class CFPLF_Plugin(CFPLearningFn):
                 # CEBHACKALERT: see ConnectionField.__init__() re. mask & output fn
                 cf.weights *= cf.mask
                 
+
 class CFPOutputFn(ParameterizedObject):
     """
     Type for an object that applies some operation (typically something
@@ -532,9 +548,9 @@ class CFProjection(Projection):
         doc="Type of ConnectionField to use when creating individual CFs.")
     
     nominal_bounds_template = BoundingRegionParameter(
-        default=BoundingBox(radius=0.1),
-        doc="""Bounds defining the Sheet area covered by a prototypical ConnectionField.
-The true bounds will differ depending on the density (see initialize_bounds()).""")
+        default=BoundingBox(radius=0.1),doc="""
+        Bounds defining the Sheet area covered by a prototypical ConnectionField.
+        The true bounds will differ depending on the density (see initialize_bounds()).""")
     
     weights_generator = PatternGeneratorParameter(
         default=patterngenerator.Constant(),constant=True,
@@ -550,8 +566,9 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         doc='Function for computing changes to the weights based on one activation step.')
 
     # JABALERT: Shouldn't learning_rate be owned by the learning_fn?
-    learning_rate = Number(default=0.0,softbounds=(0,100),
-        doc="Amount of learning at each step for this projection, specified in units that are independent of the density of each Sheet.")
+    learning_rate = Number(default=0.0,softbounds=(0,100),doc="""
+        Amount of learning at each step for this projection, specified
+        in units that are independent of the density of each Sheet.""")
     
     output_fn  = OutputFnParameter(
         default=IdentityOF(),
@@ -561,15 +578,13 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         default=CFPOF_Plugin(),
         doc='Function applied to each CF after learning.')
 
-    strength = Number(default=1.0,doc="Global multiplicative scaling applied to the Activity of this Sheet.")
+    strength = Number(default=1.0,doc="""
+        Global multiplicative scaling applied to the Activity of this Sheet.""")
 
-    min_matrix_radius = Integer(
-        default=1,bounds=(0,None),
-        doc="""
+    min_matrix_radius = Integer(default=1,bounds=(0,None),doc="""
         Enforced minimum for radius of weights matrix.
         The default of 1 gives a minimum matrix of 3x3. 0 would
-        allow a 1x1 matrix.
-        """)
+        allow a 1x1 matrix.""")
 
     x_coord_mapper = CoordinateMapperFnParameter(
         default=XIdentity(),
@@ -578,6 +593,11 @@ The true bounds will differ depending on the density (see initialize_bounds())."
     y_coord_mapper = CoordinateMapperFnParameter(
         default=YIdentity(),
         doc='Function to map a projected y coordinate into the target sheet.')
+
+    # shape property defining the dimension of the _cfs field
+    def get_shape(self): return [len(self._cfs),len(self._cfs[0])]
+    def set_shape(self,x): print "Error: this method should never be called. The scf_shape property can be only read not set!"
+    cfs_shape = property(get_shape)
 
 
     def __init__(self,initialize_cfs=True,**params):
@@ -606,7 +626,6 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         slice_ = Slice(self.bounds_template,self.src)
 
         self.mask_template = self.create_mask_template()
-        
 
         if initialize_cfs:            
             # set up array of ConnectionFields translated to each x,y in the src sheet
@@ -625,12 +644,7 @@ The true bounds will differ depending on the density (see initialize_bounds())."
                                             slice_=slice_))
                 cflist.append(row)
 
-
-            ### JABALERT: Should make cfs semi-private, since it has an
-            ### accessor function and isn't always the same format
-            ### (e.g. for SharedWeightCFProjection).  Could also make it
-            ### be a class attribute; not sure.
-            self.cfs = cflist
+            self._cfs = cflist
 
         ### JCALERT! We might want to change the default value of the
         ### input value to self.src.activity; but it fails, raising a
@@ -638,7 +652,6 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         ### happening
         self.input_buffer = None
         self.activity = Numeric.array(self.dest.activity)
-
 
 
     def create_mask_template(self):
@@ -737,17 +750,16 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         if rows%2!=1 or cols%2!=1:
             raise AssertionError("nominal_bounds_template yielded even-height or even-width weights matrix (%s rows, %s columns) for %s - weights matrix must have odd dimensions."%(rows,cols,self.name))
 
-
-
         return weights_slice.bounds
+
 
     def cf(self,r,c):
         """Return the specified ConnectionField"""
-        return self.cfs[r][c]
+        return self._cfs[r][c]
 
 
     def get_shape(self):
-        return len(self.cfs),len(self.cfs[0])
+        return len(self._cfs),len(self._cfs[0])
 
 
     def get_view(self,sheet_x, sheet_y, timestamp):
@@ -761,6 +773,7 @@ The true bounds will differ depending on the density (see initialize_bounds())."
 	matrix_data[r1:r2,c1:c2] = self.cf(r,c).weights
         return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self,timestamp)
 
+
     def get_projection_view(self, timestamp):
 	"""
 	Returns the activity in a single projection
@@ -772,7 +785,7 @@ The true bounds will differ depending on the density (see initialize_bounds())."
     def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
-        self.response_fn(self.cfs, input_activity, self.activity, self.strength)
+        self.response_fn(self._cfs, input_activity, self.activity, self.strength)
         self.output_fn(self.activity)
 
 
@@ -783,11 +796,11 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         # Learning is performed if the input_buffer has already been set,
         # i.e. there is an input to the Projection.
         if self.input_buffer != None:
-            self.learning_fn(self.cfs,self.input_buffer,self.dest.activity,self.learning_rate)
+            self.learning_fn(self._cfs,self.input_buffer,self.dest.activity,self.learning_rate)
 
 
     def apply_learn_output_fn(self,mask):
-        self.weights_output_fn(self.cfs,mask)
+        self.weights_output_fn(self._cfs,mask)
 
 
     ### JABALERT: This should be changed into a special __set__ method for
@@ -817,14 +830,13 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         mask_template = self.create_mask_template()
         
         rows,cols = self.get_shape()
-        cfs = self.cfs
+        cfs = self._cfs
         output_fn = self.weights_output_fn.single_cf_fn
         for r in xrange(rows):
             for c in xrange(cols):
                 cfs[r][c].change_bounds(copy.copy(bounds_template),
                                         copy.copy(mask_template),
                                         output_fn=output_fn)
-
 
 
     def change_density(self, new_wt_density):
@@ -834,7 +846,6 @@ The true bounds will differ depending on the density (see initialize_bounds())."
 	Not yet implemented.
 	"""
         raise NotImplementedError
-
 
 
 
@@ -860,6 +871,7 @@ class CFSheet(ProjectionSheet):
 
     precedence = Number(0.5)
 
+
     def update_unit_view(self,x,y,proj_name=''):
         """
 	Creates the list of UnitView objects for a particular unit in this CFSheet.
@@ -876,9 +888,8 @@ class CFSheet(ProjectionSheet):
                 src = v.projection.src
                 key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
                 src.sheet_view_dict[key] = v
-    
 
- 
+
     ### JCALERT! This should probably be deleted...
     def release_unit_view(self,x,y):
         self.release_sheet_view(('Weights',x,y))
