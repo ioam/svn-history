@@ -86,3 +86,12 @@ details.
         return ABOUT_TEXT
 
 
+# Set most floating-point errors to be fatal for safety; see
+# topo/misc/patternfns.py for examples of how to disable
+# the exceptions when doing so is safe.  Underflow is always
+# considered safe; e.g. input patterns can be very small
+# at large distances, and when they are scaled by small
+# weights underflows are common and not a problem.
+from numpy import seterr
+old_seterr_settings=seterr(all="raise",under="ignore")
+
