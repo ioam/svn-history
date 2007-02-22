@@ -580,9 +580,12 @@ achieve in Python.
 </li>
 
 <li>
-2007/02/21: Build python on windows with free compiler. Maybe use pymingw?
-At the moment, this seems much more difficult to setup than the current system,
-but it might be much easier to maintain. 
+2007/02/21: Build python on windows with free compiler. Maybe use
+pymingw?  At the moment, this seems much more difficult to setup than
+the current system, but it might be much easier to maintain.  Before
+that, could at least add mingw's msys stuff for a shell and make -
+then the tutorial instructions could be followed ('make examples'
+etc).
 <br />
 Python for Windows (as distributed by python.org) is built using a
 Microsoft compiler (with associated project files).
