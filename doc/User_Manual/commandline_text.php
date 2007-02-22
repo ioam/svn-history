@@ -31,7 +31,15 @@ array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0
 ...
 </pre>
 
-To see what is available for inspection or manipulation for any
+<P>For very large arrays, numpy will suppress printing the array data
+to avoid filling your terminal with numbers.  If you do want to see
+the data, you can tell numpy to print even the largest arrays:
+
+<pre>
+Topographica&gt; numpy.set_printoptions(threshold=2**30)
+</pre>
+
+<P>To see what is available for inspection or manipulation for any
 object, you can use <code>dir()</code>:
 
 <pre>
