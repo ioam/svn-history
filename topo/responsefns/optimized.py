@@ -182,31 +182,3 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
     
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
 provide_unoptimized_equivalent("CFPRF_EuclideanDistance_opt","CFPRF_EuclideanDistance",locals())
-
-
-class DotProduct_opt(ResponseFn):
-    """
-    Dot-product response function. Equivalent to DotProduct.
-
-    When used as the single_cf_fn for CFPRF_Plugin,
-    improves the performance (compared with using DotProduct).
-    However, the entirely C++ CFPRF_DotProduct_opt is still
-    much faster.
-    """
-    def __call__(self, m1, m2):
-        rows,cols = m1.shape
-        tot = 0.0
-
-        code = """
-               for (int i=0; i<rows; ++i) {
-                   for (int j=0; j<cols; ++j) {
-                       tot += *m1 * *m2;
-                       ++m1;
-                       ++m2;
-                   }
-               }  
-               """    
-        inline(code, ['m1', 'm2', 'cols','rows','tot'], local_dict=locals())
-        return tot
-
-provide_unoptimized_equivalent("DotProduct_opt","DotProduct",locals())
