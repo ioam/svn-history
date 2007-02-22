@@ -6,7 +6,7 @@ __version__='$Revision$'
 
 import unittest
 
-import Numeric
+import numpy.oldnumeric as Numeric
 
 from topo.base.sheet import Sheet
 from topo.base.boundingregion import BoundingBox
@@ -91,7 +91,7 @@ class TestSheetView(unittest.TestCase):
 
 ## # CEBHACKALERT: Used in a number of test files. Maybe one day topo/patterns/image.py
 ## # will be based on a Sheet, in which case this could be removed.
-## from Numeric import resize,array
+## from numpy.oldnumeric import resize,array
 ## from topo.base.sheet import Sheet
 ## from topo.base.simulation import EventProcessor
 ## from topo.misc.utils import NxN
@@ -133,7 +133,7 @@ class TestSheetView(unittest.TestCase):
 ##                                  (image.size[1],image.size[0]))
 
 ## 	self.verbose("Initialized %s activity from %s" % (NxN(self.activity.shape),self.filename))
-##         max_val = float(max(self.activity.flat))
+##         max_val = float(max(self.activity.ravel()))
 ##         self.activity = self.activity / max_val
 
 

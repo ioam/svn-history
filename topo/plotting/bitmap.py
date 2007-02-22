@@ -24,7 +24,7 @@ __version__='$Revision$'
 
 from colorsys import hsv_to_rgb
 
-import Numeric, Image, math
+import numpy.oldnumeric as Numeric, Image, math
 from topo.base.parameterclasses import Parameter
 from topo.base.parameterizedobject import ParameterizedObject
 
@@ -96,7 +96,7 @@ class Bitmap(ParameterizedObject):
         inArray = (Numeric.floor(inArray * max_pixel_value)).astype(Numeric.Int)
 
         # Clip any values that are still larger than max_pixel_value
-        to_clip = sum(Numeric.greater(inArray.flat,max_pixel_value))
+        to_clip = sum(Numeric.greater(inArray.ravel(),max_pixel_value))
 	if (to_clip>0):
             self.clipped_pixels = self.clipped_pixels + to_clip
 	    inArray = Numeric.clip(inArray,0,max_pixel_value)
@@ -105,7 +105,7 @@ class Bitmap(ParameterizedObject):
         r,c = inArray.shape
         # The size is (width,height), so we swap r and c:
         newImage = Image.new('L',(c,r),None)
-        newImage.putdata(inArray.flat)
+        newImage.putdata(inArray.ravel())
         return newImage
         
 

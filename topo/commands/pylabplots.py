@@ -23,7 +23,7 @@ import matplotlib
 import pylab
 import re, os
 
-from Numeric import arange, cos, pi, array, transpose
+from numpy.oldnumeric import arange, cos, pi, array, transpose
 
 import topo
 

@@ -9,7 +9,7 @@ __version__='$Revision$'
 import unittest,random
 
 import topo
-import Numeric
+import numpy.oldnumeric as Numeric
 import Tkinter
 import Pmw
 from PIL import Image

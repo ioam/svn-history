@@ -9,7 +9,7 @@ from pprint import pprint
 from topo.plotting import plot
 from topo.base.sheet import *
 from topo.sheets.generatorsheet import *
-import Numeric, random, os
+import numpy.oldnumeric as Numeric, random, os
 from math import pi
 import topo.patterns.basic
 import topo.patterns.random

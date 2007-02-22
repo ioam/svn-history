@@ -14,7 +14,8 @@ from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 from topo.base.projection import ProjectionSheet
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.misc.utils import get_states_of_classes_from_module,ExtraPickler,ExtraUnpickler
+from topo.misc.utils import get_states_of_classes_from_module
+import pickle
 
 
 
@@ -160,12 +161,12 @@ def save_snapshot(snapshot_name):
     # CEBHACKALERT: someone should figure out if that is really
     # necessary
     pickled_sim=StringIO.StringIO()
-    p = ExtraPickler(pickled_sim,2)
+    p = pickle.Pickler(pickled_sim,2)
     p.dump(topo.sim.actual_sim)
 
     ### Now pickle the lot to a file
     #
-    q = ExtraPickler(open(snapshot_name,'wb'),2)
+    q = pickle.Pickler(open(snapshot_name,'wb'),2)
     q.dump((startup_commands,states_of_classes,pickled_sim))
     pickled_sim.close() # necessary?
 
@@ -178,7 +179,7 @@ def load_snapshot(snapshot_name):
     topo.sim.startup_commands, then restores class attributes
     for ParameterizedObjects, then loads the simulation.
     """
-    u = ExtraUnpickler(open(snapshot_name,'rb'))
+    u = pickle.Unpickler(open(snapshot_name,'rb'))
     startup_commands,states_of_classes,pickled_sim = u.load()
 
     ### First execute the startup commands
@@ -211,6 +212,6 @@ def load_snapshot(snapshot_name):
     ### Now unpickle the simulation and set it to be topo.sim
     #
     pickled_sim.seek(0)
-    v = ExtraUnpickler(pickled_sim)
+    v = pickle.Unpickler(pickled_sim)
     topo.sim.change_sim(v.load())
 

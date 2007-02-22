@@ -23,7 +23,7 @@ __version__='$Revision$'
 ### been documented.
 
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
 import fixedpoint
 
 from math import pi, sqrt
@@ -42,7 +42,7 @@ from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
 from os import listdir
-from Numeric import array, Float, ravel
+from numpy.oldnumeric import array, Float, ravel
 import Image as pImage
 import ImageOps
 
@@ -54,7 +54,7 @@ from topo.outputfns.basic import DivisiveNormalizeLinf,IdentityOF
 from topo.patterns.image import PatternSampler
 from topo.misc.numbergenerators import UniformRandom
 from pylab import fix,ceil
-from RandomArray import randint,seed,uniform
+from numpy.oldnumeric.random_array import randint,seed,uniform
 
 
 topo.sim.name = "lissom_oo_or_dy_photo"

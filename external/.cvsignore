@@ -4,7 +4,7 @@ Numeric-24.0
 Pmw
 Pmw.tar
 matplotlib
-matplotlib-0.81
+matplotlib-0.90.0
 Python-2.4.4
 jpeg
 jpeg-6b
@@ -18,7 +18,6 @@ tcl8.4.13
 tk
 tk8.4.13
 weave
-Scipy_core-0.3.0_108.1820
 fixedpoint
 fixedpoint-0.1.2
 pychecker
@@ -33,6 +32,6 @@ epydoc
 epydoc-3.0alpha3
 numpy
 numpy-1.0.1
+scipy-0.5.2
 Gnosis_Utils-1.2.1
 gnosis
-scipy-0.5.2

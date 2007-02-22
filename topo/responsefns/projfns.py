@@ -9,7 +9,7 @@ $Id$
 __version__='$Revision$'
 
 
-from Numeric import zeros, Float, ravel
+from numpy.oldnumeric import zeros, Float, ravel
 
 from topo.base.functionfamilies import ResponseFnParameter,DotProduct
 from topo.base.arrayutils import L2norm
@@ -36,7 +36,7 @@ class CFPRF_EuclideanDistance(CFPResponseFn):
 		diff = ravel(X) - ravel(cf.weights)
 		euclidean_dist_mat[r,c] = L2norm(diff)
 
-        max_dist = max(euclidean_dist_mat.flat)
+        max_dist = max(euclidean_dist_mat.ravel())
         activity *= 0.0
         activity += (max_dist - euclidean_dist_mat)
         activity *= strength

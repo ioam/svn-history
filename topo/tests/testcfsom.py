@@ -27,7 +27,7 @@ import pdb #debugger
 
 
 ### Only for ImageSaver
-from Numeric import resize,array,zeros
+from numpy.oldnumeric import resize,array,zeros
 from topo.base.simulation import EventProcessor
 from topo.misc.utils import NxN
 from pprint import *
@@ -72,7 +72,7 @@ class ImageSaver(EventProcessor):
     def input_event(self,conn,data):
 
         self.verbose("Received %s  input from %s" % (NxN(data.shape),conn.src))
-        self.verbose("input max value = %d" % max(data.flat))
+        self.verbose("input max value = %d" % max(data.ravel()))
 
         # assemble the filename
         filename = self.file_prefix + self.name
@@ -86,7 +86,7 @@ class ImageSaver(EventProcessor):
         # make and populate the image
         im = Image.new('L',(data.shape[1],data.shape[0]))
         self.verbose("image size = %s" % NxN(im.size))
-        im.putdata(data.flat,
+        im.putdata(data.ravel(),
                    scale=self.pixel_scale,
                    offset=self.pixel_offset)
 

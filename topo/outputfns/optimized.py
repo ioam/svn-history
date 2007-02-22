@@ -14,7 +14,7 @@ from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 
 from basic import DivisiveNormalizeL1
 
-from Numeric import sum
+from numpy.oldnumeric import sum
 
 # For backwards compatibility when loading pickled files; can be deleted
 DivisiveNormalizeL1_opt=DivisiveNormalizeL1

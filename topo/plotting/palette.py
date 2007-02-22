@@ -161,7 +161,7 @@ WHITE_BACKGROUND = 1
 
 
 ########################  JC: starting new implementation #############
-from Numeric import zeros
+from numpy.oldnumeric import zeros
 
 class StringBasedPalette(ParameterizedObject):
     

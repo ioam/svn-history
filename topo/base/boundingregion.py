@@ -6,13 +6,14 @@ $Id$
 
 __version__='$Revision$'
 
+from numpy import inf
+
 ### JABALERT: The aarect information should probably be rewritten in
 ### matrix notation, not list notation, so that it can be scaled,
 ### translated, etc. easily.
 ###
 from parameterizedobject import ParameterizedObject, Parameter
 from parameterclasses import Number
-from arrayutils import inf
 
 class BoundingRegion(ParameterizedObject):
     """
@@ -228,7 +229,6 @@ class BoundingCircle(BoundingRegion):
         r = self.radius
         return AARectangle((xc-r,yc-r),(xc+r,yc+r))
 
-#inf = array(1)/0.0
 class Unbounded(BoundingRegion):
     def __init__(self,**args):
         super(Unbounded,self).__init__(**args)

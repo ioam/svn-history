@@ -16,7 +16,7 @@ import unittest
 from topo.misc.utils import wrap
 from topo.base.arrayutils import arg
 from math import pi
-from Numeric import array, exp
+from numpy.oldnumeric import array, exp
 from topo.base.sheet import Sheet
 from topo.base.boundingregion import BoundingBox
 

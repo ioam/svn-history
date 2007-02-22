@@ -9,7 +9,7 @@ __version__='$Revision$'
 
 from topo.base.sheet import Sheet
 from topo.misc.utils import Struct, NxN
-from Numeric import zeros
+from numpy.oldnumeric import zeros
 
 class Composer(Sheet):
     """

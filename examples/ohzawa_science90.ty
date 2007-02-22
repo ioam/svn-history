@@ -13,7 +13,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
 import fixedpoint
 import copy
 
@@ -178,7 +178,7 @@ import pylab
 import random
 
 from math import pi
-from Numeric import array, zeros, Float,size, shape
+from numpy.oldnumeric import array, zeros, Float,size, shape
 
 import topo
 import topo.base.patterngenerator

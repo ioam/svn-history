@@ -8,7 +8,7 @@ __version__ = "$Revision$"
 
 from math import ceil
 
-from Numeric import exp, argmax
+from numpy.oldnumeric import exp, argmax
 
 from topo.base.arrayutils import L2norm, array_argmax
 from topo.base.boundingregion import BoundingBox
@@ -121,11 +121,6 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
                     cf = cfs[r][c]
                     rate = single_connection_learning_rate * neighborhood_matrix[rwr+radius_int,cwc+radius_int]
 		    X = cf.get_input_matrix(input_activity)
-
-                    # CEBALERT:
-                    # This is for pickling - the savespace for cf.weights does
-                    # not appear to be pickled.
-                    cf.weights.savespace(1)
                     cf.weights += rate * (X - cf.weights)
 
                     # CEBHACKALERT: see ConnectionField.__init__()

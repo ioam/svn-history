@@ -7,14 +7,14 @@ $Id$
 __version__='$Revision$'
 
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
 import fixedpoint
 import copy
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
-from Numeric import sum,ones,exp
-import Numeric
+from numpy.oldnumeric import sum,ones,exp
+import numpy.oldnumeric as Numeric
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -69,7 +69,7 @@ class InitFn(CFPLearningFn):
                 for c in xrange(cols):
                     cf = cfs[r][c]
 
-	            current_norm_value = 1.0*Numeric.sum(abs(cf.weights.flat))
+	            current_norm_value = 1.0*Numeric.sum(abs(cf.weights.ravel()))
 		    if current_norm_value != 0:
             	    	factor = (1.0/current_norm_value)
             	    	cf.weights *= factor

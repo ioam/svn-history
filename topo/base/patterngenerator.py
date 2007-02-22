@@ -8,7 +8,7 @@ __version__='$Revision$'
 
 from math import pi
 
-from Numeric import add,subtract,cos,sin
+from numpy.oldnumeric import add,subtract,cos,sin
 
 from boundingregion import BoundingBox, BoundingRegionParameter
 from functionfamilies import OutputFnParameter, IdentityOF
@@ -167,7 +167,7 @@ class PatternGenerator(ParameterizedObject):
 # Trivial example of a PatternGenerator, provided for when a default is
 # needed.  The other concrete PatternGenerator classes are stored in
 # patterns/, to be imported as needed.
-from Numeric import ones, Float
+from numpy.oldnumeric import ones, Float
 
 class Constant(PatternGenerator):
     """Constant pattern generator, i.e., a solid, uniform field of the same value."""

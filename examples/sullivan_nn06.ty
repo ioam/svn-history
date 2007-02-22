@@ -18,14 +18,14 @@ $Id$
 _version__='$Revision$'
 
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
 import fixedpoint
 import copy
-import Numeric
+import numpy.oldnumeric as Numeric
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
-from Numeric import sum,ones,exp,array
+from numpy.oldnumeric import sum,ones,exp
 
 import topo.patterns.random
 import topo.patterns.basic
@@ -36,7 +36,7 @@ from topo.base.cf import CFPLearningFn,LearningFnParameter
 from topo.base.cf import CFProjection
 from topo.base.functionfamilies import LearningFn
 from topo.base.functionfamilies import OutputFn
-from topo.base.parameterclasses import DynamicNumber, Number, Wrapper
+from topo.base.parameterclasses import DynamicNumber, Number
 from topo.learningfns.basic import Hebbian
 from topo.learningfns.projfns import HomeoSynaptic
 from topo.learningfns.som import CFPLF_HebbianSOM
@@ -64,7 +64,7 @@ class Hacked_CFSOM(CFSOM):
         default=topo.patterns.basic.Composite(
         generators=[topo.patterns.basic.Gaussian(size=0.25, aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()),
                     topo.patterns.basic.Gaussian(size=0.50, aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())],
-        operator=Wrapper("Numeric.subtract")),
+        operator=numpy.subtract),
         doc="Function to set up the lateral weight patterns")
 
     def __init__(self,**params):

@@ -6,8 +6,19 @@ $Id$
 
 import sys
 
-from Numeric import alltrue,equal,shape,ravel,around,asarray,less_equal,array2string
+from numpy.oldnumeric import alltrue,equal,shape,ravel,around,asarray,less_equal,array2string
 
+
+
+
+# CEBALERT: are these functions available to us somewhere from numpy?
+# They are:
+#  from numpy.testing import assert_array_equal,assert_array_almost_equal
+# The numpy functions might be better, because they correctly assert
+# two arrays are not equal even if the 'astype(float)' code in
+# lissom_log_parser's compare_elements() is not present. (Although they
+# claim one of the arrays has three dimensions, which is clearly not true
+# but might be something to do with the arrays having different types.)
 
 
 

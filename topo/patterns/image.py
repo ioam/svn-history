@@ -8,7 +8,7 @@ $Id$
 import Image as pImage
 import ImageOps
 
-from Numeric import array, Float, sum, ravel, ones
+from numpy.oldnumeric import array, Float, sum, ravel, ones
 
 from topo.base.boundingregion import BoundingBox
 from topo.base.parameterclasses import Filename, Number, Parameter, Enumeration
@@ -163,7 +163,7 @@ class PatternSampler(ParameterizedObject):
 
 
 
-from Numeric import sum,ravel
+from numpy.oldnumeric import sum,ravel
 def edge_average(a):
     "Return the mean value around the edge of an array."
     

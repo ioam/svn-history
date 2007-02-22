@@ -12,7 +12,7 @@ __version__='$Revision$'
 
 # CEBHACKALERT: filename should change
 
-from Numeric import ones,zeros,where,ravel,sum,array
+from numpy.oldnumeric import ones,zeros,where,ravel,sum,array
 import topo
 from topo.tests.utils import array_almost_equal
 

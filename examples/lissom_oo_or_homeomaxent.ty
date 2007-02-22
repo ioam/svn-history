@@ -5,17 +5,17 @@ $Id$
 """
 __version__='$Revision$'
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
 import fixedpoint
 import copy
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
-from Numeric import sum,ones,exp
+from numpy.oldnumeric import sum,ones,exp
 
 import topo.patterns.basic
 import topo.patterns.random
-import Numeric
+import numpy.oldnumeric as Numeric
 
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet

@@ -1,5 +1,5 @@
 """
-General utility functions and classes for Topographica that require Numeric.
+General utility functions and classes for Topographica that require numpy.
 
 $Id$
 """
@@ -7,39 +7,10 @@ __version__ = "$Revision$"
 
 import re
 
-from Numeric import sqrt, ones, dot, sum, arctan2, array2string, logical_not, bitwise_or, argmax
+from numpy.oldnumeric import sqrt, ones, dot, sum, arctan2, array2string, logical_not, bitwise_or, argmax
+from numpy import seterr
+from numpy import inf
 
-# CEBHACKALERT: there are some inconsistencies throughout as to
-# whether we should assume arrays are contiguous (i.e. using an
-# array's 'flat' attribute, or using the ravel() function).  It
-# appears that in the most recent Numeric, this problem is taken care
-# of, so when we change, these problems should go away.  In addition,
-# we won't have to deal with savespace.
-#
-# You can see the changes that are made to code when upgrading to the
-# most recent version by looking at Numeric's code converting utility:
-# http://projects.scipy.org/scipy/numpy/browser/trunk/numpy/lib/convertcode.py
-# Notably for this hackalert:
-#8	 * Makes search and replace changes to:	
-#9	   - .typecode()	
-#10	   - .iscontiguous()	
-#13	 * Converts .flat to .ravel() except for .flat = xxx or .flat[xxx]	
-#14	 * Change typecode= to dtype=	
-#15	 * Eliminates savespace=xxx	
-#16	 * Replace xxx.spacesaver() with True	
-#17	 * Convert xx.savespace(?) to pass + ## xx.savespace(?)	
-
-
-
-
-
-# One might think we could use float('inf') or array([float('inf')]) here,
-# but as of Python 2.4 only some platforms will support float('inf').
-# 
-# In particular, Python 2.4 for Windows generates a cast error even though
-# the operation works under Linux.
-# (see http://www.python.org/peps/pep-0754.html)
-inf = (ones(1)/0.0)[0]
 
 def L2norm(v):
     """
@@ -57,17 +28,18 @@ def norm(v,p=2):
 
 def divisive_normalization(weights):
     """Divisively normalize an array to sum to 1.0"""
-    s = sum(weights.flat)
+    s = sum(weights.ravel())
     if s != 0:
         factor = 1.0/s
         weights *= factor
+
 
 def add_border(matrix,width=1,value=0.0):
     """   
     Returns a new matrix consisting of the given matrix with a border
     or margin of the given width filled with the given value.
     """
-    from Numeric import concatenate as join,array
+    from numpy.oldnumeric import concatenate as join,array
     rows,cols = matrix.shape
 
     hborder = array([ [value]*(cols+2*width) ]*width)
@@ -76,6 +48,7 @@ def add_border(matrix,width=1,value=0.0):
     temp = join( (vborder,matrix,vborder), axis=1)
     return join( (hborder,temp,hborder) )     
 
+
 def arg(z):
     """
     Return the complex argument (phase) of z.
@@ -83,29 +56,6 @@ def arg(z):
     """
     z = z + complex()  # so that arg(z) also works for real z
     return arctan2(z.imag, z.real)
-
-
-import Numeric
-def exp(x):
-    """
-    Avoid overflow of Numeric.exp() for large-magnitude arguments (abs(x)>MAX_MAG).
-
-    Return  Numeric.exp( inf)==inf  if x > MAX_MAG
-            Numeric.exp(-inf)==0.0  if x < -MAX_MAG
-                                 x  otherwise
-
-    Numeric.exp() gives an OverflowError ('math range error') for
-    arguments of magnitude greater than about 700 (on linux).
-
-    See e.g.
-    [Python-Dev] RE: Possible bug (was Re: numpy, overflow, inf, ieee, and richcomparison)
-    http://mail.python.org/pipermail/python-dev/2000-October/thread.html#9851
-    """
-
-    # CEBHACKALERT:
-    # This value works on the linuxes we all use, but what about on other platforms?
-    MAX_MAG = 700.0
-    return Numeric.exp(Numeric.where(abs(x)>MAX_MAG,Numeric.sign(x)*inf,x))
 
 
 def octave_str(mat,name="mat",owner=""):
@@ -178,7 +128,7 @@ def clip_lower(mat,lower_bound):
 def array_argmax(mat):
     "Returns the coordinates of the maximum element in the given matrix."
     rows,cols = mat.shape
-    pos = argmax(mat.flat)
+    pos = argmax(mat.ravel())
     r = pos/cols
     c = pos%cols
     return r,c

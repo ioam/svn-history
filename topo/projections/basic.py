@@ -10,7 +10,7 @@ $Id$
 __version__ = "$Revision$"
 
 import copy
-import Numeric
+import numpy.oldnumeric as Numeric
 from math import exp
 
 # So all Projections are present in this package

@@ -11,7 +11,7 @@ import copy
 
 from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, Bitmap
 
-from Numeric import zeros, ones, Float, divide,ravel,clip,array
+from numpy.oldnumeric import zeros, ones, Float, divide,ravel,clip,array
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
@@ -230,12 +230,12 @@ class TemplatePlot(Plot):
         In case of a constant array, ones is returned for value greater than zero,
         and zeros in case of value inferior or equal to zero.
         """
-        a_offset = a-min(a.flat)
-        max_a_offset = max(a_offset.flat)
+        a_offset = a-min(a.ravel())
+        max_a_offset = max(a_offset.ravel())
         if max_a_offset>0:
              a = divide(a_offset,float(max_a_offset))
         else:
-             if min(a.flat)<=0:
+             if min(a.ravel())<=0:
                   a=zeros(a.shape,Float)
              else:
                   a=ones(a.shape,Float)

@@ -611,7 +611,7 @@ class ListParameter(Parameter):
                 assert isinstance(v,self.class_),repr(v)+" is not an instance of " + repr(self.class_) + "."
 
 
-
+# JABHACKALERT: This can be deleted now that we use numpy, right?
 # For the moment, this takes the string name in the form
 # module.function
 # and does 'import module' itself.

@@ -26,7 +26,7 @@ $Id$
 __version__='$Revision$'
 
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
 import fixedpoint
 
 from math import pi, sqrt

@@ -6,7 +6,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from Numeric import argmax,exp,floor
+from numpy.oldnumeric import argmax,exp,floor
 
 from topo.base.arrayutils import L2norm
 from topo.base.parameterclasses import Number

@@ -57,7 +57,8 @@ __version__='$Revision$'
 ## from topo.base.parameterizedobject import ParameterizedObject
 ## ParameterizedObject.print_level=300
 
-import fixedpoint, Numeric
+import fixedpoint
+import numpy.oldnumeric as Numeric
 #import pdb # debugger
 
 from math import pi, sqrt
@@ -214,10 +215,11 @@ surroundg = topo.patterns.basic.Gaussian(
 
 
 on_weights = topo.patterns.basic.Composite(
-    generators=[centerg,surroundg],operator=Wrapper("Numeric.subtract"))
+    generators=[centerg,surroundg],operator=Numeric.subtract)
 
 off_weights = topo.patterns.basic.Composite(
-    generators=[surroundg,centerg],operator=Wrapper("Numeric.subtract"))
+    generators=[surroundg,centerg],operator=Numeric.subtract)
+
 
 topo.sim.connect('Eye0','Ganglia00',delay=FixedPoint("0.05"),
                  connection_type=SharedWeightCFProjection,strength=1.0,

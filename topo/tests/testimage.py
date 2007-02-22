@@ -20,8 +20,8 @@ __version__='$Revision$'
 import unittest
 from utils import assert_array_almost_equal
 
-from Numeric import array,Float,pi
-## from MLab import rot90
+from numpy.oldnumeric import array,Float,pi
+## from numpy.oldnumeric.mlab import rot90
 
 from topo.base.boundingregion import BoundingBox
 from topo.patterns.image import Image

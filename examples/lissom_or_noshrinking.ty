@@ -13,7 +13,8 @@ $Id$
 __version__='$Revision$'
 
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
+import numpy
 import fixedpoint
 
 from math import pi, sqrt
@@ -34,7 +35,7 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfns.homeostatic import HomeostaticMaxEnt
-from topo.base.parameterclasses import Wrapper
+
 
 # Normally uses homeostatic plasticity, but can be called as
 #   ./topographica -c "homeostatic=False" ...
@@ -88,7 +89,7 @@ if not homeostatic:
 
 topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
                   connection_type=CFProjection,strength=1.0,name='Afferent',
-                 weights_generator=topo.patterns.basic.Composite(operator=Wrapper("Numeric.multiply"),
+                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply,
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.271),
                                                                              topo.patterns.random.UniformRandom()]),
                   nominal_bounds_template=BoundingBox(radius=0.271),learning_rate=0.9590)
@@ -100,7 +101,7 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
             
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                   connection_type=CFProjection,strength=-0.9,
-                 weights_generator=topo.patterns.basic.Composite(operator=Wrapper("Numeric.multiply"),
+                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply,
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.229),
                                                                              topo.patterns.random.UniformRandom()]),
                   nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.627)

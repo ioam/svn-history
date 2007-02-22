@@ -11,8 +11,8 @@ from topo.plotting import plot
 from topo.base.sheet import *
 from topo.plotting.plotgroup import *
 from topo.plotting.templates import PlotGroupTemplate
-import Numeric
-from Numeric import divide
+import numpy.oldnumeric as Numeric
+from numpy.oldnumeric import divide
 
 SHOW_PLOTS = False
 

@@ -12,14 +12,14 @@ $Id$
 """
 __version__='$Revision$'
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
 
 import topo.patterns.random
 import topo.patterns.basic
  
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFProjection
-from topo.base.parameterclasses import DynamicNumber,Wrapper
+from topo.base.parameterclasses import DynamicNumber
 from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.cfsom import CFSOM

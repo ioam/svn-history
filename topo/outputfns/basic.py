@@ -13,9 +13,9 @@ $Id$
 __version__='$Revision$'
 
 
-import Numeric
+import numpy.oldnumeric as Numeric
 import copy
-from Numeric import dot, exp
+from numpy.oldnumeric import dot, exp
 from math import ceil
 
 from topo.base.arrayutils import clip_in_place,clip_lower
@@ -119,7 +119,7 @@ class DivisiveNormalizeL1(OutputFn):
 
     def __call__(self,x):
         """L1-normalize the input array, if it has a nonzero sum."""
-        current_sum = 1.0*Numeric.sum(abs(x.flat))
+        current_sum = 1.0*Numeric.sum(abs(x.ravel()))
         if current_sum != 0:
             factor = (self.norm_value/current_sum)
             x *= factor
@@ -135,7 +135,7 @@ class DivisiveNormalizeL2(OutputFn):
     norm_value = Number(default=1.0)
     
     def __call__(self,x):
-        tot = 1.0*L2norm(x.flat)
+        tot = 1.0*L2norm(x.ravel())
         if tot != 0:
             factor = (self.norm_value/tot)
             x *= factor
@@ -156,7 +156,7 @@ class DivisiveNormalizeLinf(OutputFn):
     norm_value = Number(default=1.0)
     
     def __call__(self,x):
-        tot = 1.0*max(abs(x.flat))
+        tot = 1.0*max(abs(x.ravel()))
         if tot != 0:
             factor = (self.norm_value/tot)
             x *= factor
@@ -176,7 +176,7 @@ class DivisiveNormalizeLp(OutputFn):
     norm_value = Number(default=1.0)
     
     def __call__(self,x):
-        tot = 1.0*norm(x.flat,self.p)
+        tot = 1.0*norm(x.ravel(),self.p)
         if tot != 0:
             factor = (self.norm_value/tot)
             x *=factor 

@@ -5,7 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
 
 from topo.base.parameterclasses import Number,Parameter
 from topo.base.patterngenerator import PatternGenerator

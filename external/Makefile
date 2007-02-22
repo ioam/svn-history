@@ -21,10 +21,11 @@ PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.4
 
 
 # LDFLAGS sets ${PREFIX}/lib as the LD_LIBRARY in the binary
+# CB: rpath is ignored on OS X (so where are the library files taken from?). 
 python: ${PYTHON}.tgz tk
 	echo ${PREFIX}
 	tar xzf ${PYTHON}.tgz
-	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
+	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-rpath,${PREFIX}/lib
 	cd ${PYTHON}; env PREFIX=${PREFIX} make 
 	cd ${PYTHON}; env PREFIX=${PREFIX} make install
 	touch python
@@ -146,9 +147,10 @@ numeric-uninstall:
 NUMPY = numpy-1.0.1
 NUMPY_UNINSTALL =  ${PYTHON_LIB}/site-packages/numpy
 
-numpy: ${NUMPY}.tar.gz python
+numpy: ${NUMPY}.tar.gz python numpy.diff
 	tar xzf ${NUMPY}.tar.gz
-	cd ${NUMPY}; ${PREFIX}/bin/python setup.py install
+	cp numpy.diff ${NUMPY}/
+	cd ${NUMPY}; patch -p0 < numpy.diff; ${PREFIX}/bin/python setup.py install
 	touch numpy
 
 numpy-clean:
@@ -160,7 +162,7 @@ numpy-uninstall:
 ##############################################################
 # MatPlotLib (plotting library)
 #
-MATPLOTLIB = matplotlib-0.81
+MATPLOTLIB = matplotlib-0.90.0
 MATPLOTLIB_UNINSTALL =  ${PYTHON_LIB}/site-packages/matplotlib
 
 # Workaround to allow MATPLOTLIB to compile on a remote session.
@@ -174,8 +176,8 @@ else
   MATPLOTLIB_DISPLAY=
 endif
 
-matplotlib: ${MATPLOTLIB}.tgz python
-	tar xzf ${MATPLOTLIB}.tgz
+matplotlib: ${MATPLOTLIB}.tar.gz python
+	tar xzf ${MATPLOTLIB}.tar.gz
 	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py build
 	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py install
 	touch matplotlib
@@ -206,15 +208,15 @@ pmw-uninstall:
 ##############################################################
 # Scipy (for weave)
 #
-WEAVE = Scipy_core-0.3.0_108.1820
+WEAVE = scipy-0.5.2
 WEAVE_UNINSTALL = ${PYTHON_LIB}/site-packages/weave external/weave
 
-# Forces removal of weave version used with numpy
-weave: ${WEAVE}.tar.gz python weave.diff
-	rm -rf scipy-0.5.2
+# Forces removal of weave version used with Numeric
+weave: ${WEAVE}.tar.gz python
+	rm -rf Scipy_core-0.3.0_108.1820
 	rm -f ${PYTHON_LIB}/site-packages/weave external/weave
 	tar xzf ${WEAVE}.tar.gz
-	cd ${WEAVE}; patch -p0 < ../weave.diff; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
+	cd ${WEAVE}/Lib/weave/; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch weave
 
 weave-clean:

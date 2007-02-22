@@ -35,7 +35,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
         temp_act = activity
         rows,cols = activity.shape
         len, len2 = input_activity.shape
-        X = input_activity.flat
+        X = input_activity.ravel()
     
         code = """
             double *tact = temp_act;
@@ -103,7 +103,7 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
         temp_act = activity
         rows,cols = activity.shape
         len, len2 = input_activity.shape
-        X = input_activity.flat
+        X = input_activity.ravel()
 
         code = """
 	    #include <math.h>
@@ -212,7 +212,7 @@ class CFPRF_SharedWeightDotProduct_opt(CFPResponseFn):
         temp_act = activity
         rows,cols = activity.shape
         len, len2 = input_activity.shape
-        X = input_activity.flat
+        X = input_activity.ravel()
         sw = cfs[0][0].weights
 
         code = """

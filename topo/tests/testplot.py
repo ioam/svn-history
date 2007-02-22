@@ -18,12 +18,12 @@ SHOW_PLOTS = False
 
 ### JC: My new imports
 from topo.plotting.plot import TemplatePlot, make_template_plot
-import Numeric
-from Numeric import zeros, divide, Float, ones,reshape,array
+import numpy.oldnumeric as Numeric
+from numpy.oldnumeric import zeros, divide, Float, ones,reshape,array
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheetview import SheetView
-import MLab
-import RandomArray
+import numpy.oldnumeric.mlab as MLab
+import numpy.oldnumeric.random_array as RandomArray
 
 
 from random import random
@@ -49,11 +49,11 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     
     ## This code should never be seen.  It means that calling code did
     ## not take the precaution of clipping the input matrices.
-    if max(rmat.flat) > 1 or max(gmat.flat) > 1 or max(bmat.flat) > 1:
+    if max(rmat.ravel()) > 1 or max(gmat.ravel()) > 1 or max(bmat.ravel()) > 1:
 	topo.base.parameterizedobject.ParameterizedObject().warning('HSVBitmap inputs exceed 1. Clipping to 1.0')
-	if max(rmat.flat) > 0: rmat = clip(rmat,0.0,1.0)
-	if max(gmat.flat) > 0: gmat = clip(gmat,0.0,1.0)
-	if max(bmat.flat) > 0: bmat = clip(bmat,0.0,1.0)
+	if max(rmat.ravel()) > 0: rmat = clip(rmat,0.0,1.0)
+	if max(gmat.ravel()) > 0: gmat = clip(gmat,0.0,1.0)
+	if max(bmat.ravel()) > 0: bmat = clip(bmat,0.0,1.0)
 
     # List comprehensions were not used because they were slower.
     for j in range(shape[0]):
@@ -188,7 +188,7 @@ class TestPlot(unittest.TestCase):
 
 # 	test = matrix_hsv_to_rgb(hue,sat,val)
 # 	for each1,each2 in zip(self.plot2.rgb_matrices,test):
-# 	    for each3,each4 in zip(each1.flat,each2.flat):
+# 	    for each3,each4 in zip(each1.ravel(),each2.ravel()):
 # 		self.assertAlmostEqual(each3,each4)
 
 # 	# plot 3
@@ -198,7 +198,7 @@ class TestPlot(unittest.TestCase):
 
 # 	test = matrix_hsv_to_rgb(hue,sat,val)
 # 	for each1,each2 in zip(self.plot3.rgb_matrices,test):
-# 	    for each3,each4 in zip(each1.flat,each2.flat):
+# 	    for each3,each4 in zip(each1.ravel(),each2.ravel()):
 # 		self.assertAlmostEqual(each3,each4)  
 
 # 	# plot 4
@@ -208,7 +208,7 @@ class TestPlot(unittest.TestCase):
 
 # 	test = matrix_hsv_to_rgb(hue,sat,val)
 # 	for each1,each2 in zip(self.plot4.rgb_matrices,test):
-# 	    for each3,each4 in zip(each1.flat,each2.flat):
+# 	    for each3,each4 in zip(each1.ravel(),each2.ravel()):
 # 		self.assertAlmostEqual(each3,each4)  
 
 # 	# plot 5
@@ -218,7 +218,7 @@ class TestPlot(unittest.TestCase):
 
 # 	test = matrix_hsv_to_rgb(hue,sat,val)
 # 	for each1,each2 in zip(self.plot5.rgb_matrices,test):
-# 	    for each3,each4 in zip(each1.flat,each2.flat):
+# 	    for each3,each4 in zip(each1.ravel(),each2.ravel()):
 # 		self.assertAlmostEqual(each3,each4)
 
 # 	# plot 6
@@ -228,7 +228,7 @@ class TestPlot(unittest.TestCase):
 
 # 	test = matrix_hsv_to_rgb(hue,sat,val)
 # 	for each1,each2 in zip(self.plot6.rgb_matrices,test):
-# 	    for each3,each4 in zip(each1.flat,each2.flat):
+# 	    for each3,each4 in zip(each1.ravel(),each2.ravel()):
 # 		self.assertAlmostEqual(each3,each4)  
     
 # 	# plot 7
@@ -240,7 +240,7 @@ class TestPlot(unittest.TestCase):
 	
 # 	test = matrix_hsv_to_rgb(hue,sat,val)
 # 	for each1,each2 in zip(self.plot7.rgb_matrices,test):
-# 	    for each3,each4 in zip(each1.flat,each2.flat):
+# 	    for each3,each4 in zip(each1.ravel(),each2.ravel()):
 # 		self.assertAlmostEqual(each3,each4)
 	
 
@@ -249,12 +249,12 @@ class TestPlot(unittest.TestCase):
 # 	hue = zeros((10,10),Float) + 0.3 
 # 	val = self.matrix1
 
-# 	val = divide(val,float(max(val.flat)))
+# 	val = divide(val,float(max(val.ravel())))
 	
 # 	test = matrix_hsv_to_rgb(hue,sat,val)
 
 # 	for each1,each2 in zip(self.plot8.rgb_matrices,test):
-# 	    for each3,each4 in zip(each1.flat,each2.flat):
+# 	    for each3,each4 in zip(each1.ravel(),each2.ravel()):
 # 		self.assertAlmostEqual(each3,each4)
 
 
@@ -267,7 +267,7 @@ class TestPlot(unittest.TestCase):
 	
 # 	test = matrix_hsv_to_rgb(hue,sat,val)
 # 	for each1,each2 in zip(self.plot9.rgb_matrices,test):
-# 	    for each3,each4 in zip(each1.flat,each2.flat):
+# 	    for each3,each4 in zip(each1.ravel(),each2.ravel()):
 # 		self.assertAlmostEqual(each3,each4)  
 
 # #### Think about doing a plot test using sheet_dict and a sheet?

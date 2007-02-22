@@ -6,8 +6,8 @@ $Id$
 __version__='$Revision$'
 
 
-from Numeric import zeros, Float
-from Numeric import array
+from numpy.oldnumeric import zeros, Float
+from numpy.oldnumeric import array
 
 import topo
 import topo.base.sheetcoords

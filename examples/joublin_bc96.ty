@@ -26,8 +26,8 @@ __version__='$Revision$'
 ## To measure the position preference:
 ## measure_position_pref(divisions=6,size=0.3,scale=1.0,offset=0.0,display=True,pattern_presenter=PatternPresenter(HindpawGaussian(aspect_ratio=1.0),False,1.0), x_range=(0.0,0.6),y_range=(0.0,1.0)) ; topographic_grid()
 
-import Numeric
-import RandomArray
+import numpy.oldnumeric as Numeric
+import numpy.oldnumeric.random_array as RandomArray
 import copy
 
 import topo.patterns.random
@@ -35,14 +35,14 @@ import topo.patterns.basic
 
 import topo.base.patterngenerator
 
-from Numeric import argmax, ones, Float
+from numpy.oldnumeric import argmax, ones, Float
 
 from topo.patterns.basic import Gaussian
 from topo.base.arrayutils import exp, L2norm
 from topo.base.cf import ConnectionField, CFPLearningFn, CFPLF_Identity, CFProjection, CFPResponseFn, CFSheet
 from topo.base.functionfamilies import DotProduct, ResponseFnParameter, LearningFn
 from topo.base.functionfamilies import OutputFn, OutputFnParameter, IdentityOF
-from topo.base.parameterclasses import DynamicNumber, Number, Wrapper
+from topo.base.parameterclasses import DynamicNumber, Number
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGenerator, PatternGeneratorParameter
 from topo.base.sheetcoords import SheetCoordinateSystem
@@ -197,11 +197,12 @@ class RCells_CFProjection(CFProjection):
             for c in xrange(cols):
                 cf = self.n_cfs[r][c]
                 r1,r2,c1,c2 = cf.slice_array
-                # JABALERT: Could avoid the copying here by using ravel() instead of X.flat
+                # JABALERT: Should be able to remove the Numeric.array() copying
+                # now that it is using numpy's .ravel(); not sure
                 X = Numeric.array(feedforward_influence[r1:r2,c1:c2])
                 # Find winner
                 rX,cX = X.shape
-                pos = argmax(X.flat)
+                pos = argmax(X.ravel())
                 rw = pos/cX
                 cw = pos%cX
                 ro = r-r1
@@ -259,8 +260,8 @@ class RCells_CFPRF_DotProduct_Norm(CFPResponseFn):
 
                 # "DotProduct()"
                 a = X*cf.weights
-                b = X.flat
-                activity[r,c] = sum(a.flat)/L2norm(b)
+                b = X.ravel()
+                activity[r,c] = sum(a.ravel())/L2norm(b)
         activity *= strength
 
 
@@ -276,7 +277,7 @@ class RCells_CFPRF_DotProduct_Norm_opt(CFPResponseFn):
         temp_act = activity
         rows,cols = activity.shape
         len, len2 = input_activity.shape
-        X = input_activity.flat
+        X = input_activity.ravel()
     
         code = """
             #include <math.h>
@@ -435,12 +436,10 @@ class ECells_ConnectionField(ConnectionField):
                               cf_centre_col = self.weight_pos_col)
         w[self.weight_pos_row, self.weight_pos_col] = 0.0
         self.weights = w.astype(weight_type)
-        self.weights.savespace(1)
 
         m = mask_template[r1:r2,c1:c2]
         
         self.mask = m.astype(weight_type)
-        self.mask.savespace(1)
 
         self.weights *= self.mask   
         output_fn(self.weights)
@@ -453,7 +452,6 @@ class ECells_ConnectionField(ConnectionField):
                                   cf_centre_row = self.weight_pos_row,
                                   cf_centre_col = self.weight_pos_col)
         self.weights_max = w_max.astype(weight_type)
-        self.weights_max.savespace(1)
         self.weights_max *= self.mask   
         output_fn(self.weights_max)
         
@@ -465,7 +463,6 @@ class ECells_ConnectionField(ConnectionField):
                                   cf_centre_row = self.weight_pos_row,
                                   cf_centre_col = self.weight_pos_col)
         self.weights_min = w_min.astype(weight_type)
-        self.weights_min.savespace(1)
         self.weights_min *= self.mask   
         output_fn(self.weights_min) 
 

@@ -24,7 +24,7 @@ __version__='$Revision$'
 # The basic functions do not have any dependencies, but these imports
 # are needed for some of the statistical functions (e.g. vector sum).
 from math import pi
-from Numeric import innerproduct, array, exp, argmax
+from numpy.oldnumeric import innerproduct, array, exp, argmax
 from topo.base.arrayutils import arg
 
 from topo.misc.utils import wrap

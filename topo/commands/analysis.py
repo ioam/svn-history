@@ -6,7 +6,7 @@ $Id$
 __version__='$Revision$'
 
 
-from Numeric import array, zeros, Float,size, shape
+from numpy.oldnumeric import array, zeros, Float,size, shape
 from math import pi
 from copy import deepcopy
 

@@ -5,10 +5,10 @@ value in a desired range over time.
 Originally implemented by Veldri Kurniawan, 2006.
 """
 
-import Numeric
+import numpy.oldnumeric as Numeric
 import copy
 
-from Numeric import exp,zeros,ones
+from numpy.oldnumeric import exp,zeros,ones
 
 from topo.base.arrayutils import clip_in_place
 from topo.base.functionfamilies import OutputFn
@@ -47,8 +47,8 @@ class HomeostaticMaxEnt(OutputFn):
         	
 	if self.first_call:
 	    self.first_call = False
-	    self.a = Numeric.ones(x.shape, x.typecode()) * self.a_init
-	    self.b = Numeric.ones(x.shape, x.typecode()) * self.b_init
+	    self.a = Numeric.ones(x.shape, x.dtype.char) * self.a_init
+	    self.b = Numeric.ones(x.shape, x.dtype.char) * self.b_init
 
 	# Apply sigmoid function to x, resulting in what Triesch calls y
         x_orig = copy.copy(x)
@@ -91,12 +91,12 @@ class HomeostaticMaxEnt_debug(OutputFn):
 	
 	if self.first_call:
 	    self.first_call = False
-	    self.a = Numeric.ones(x.shape, x.typecode()) * self.a_init
-	    self.b = Numeric.ones(x.shape, x.typecode()) * self.b_init
+	    self.a = Numeric.ones(x.shape, x.dtype.char) * self.a_init
+	    self.b = Numeric.ones(x.shape, x.dtype.char) * self.b_init
 
             # DEBUG only (only required for computing average
             # activity of each neuron over time)
-	    self.y_avg = zeros(x.shape,x.typecode())
+	    self.y_avg = zeros(x.shape,x.dtype.char)
 	    self.y_hist = zeros([5,30000],activity_type)  # average firing rate
 	    self.y_rate = zeros([5,30000],activity_type)  # firing rate over time
 	    self.x_rate = zeros([5,30000],activity_type)  # input to postsynaptic neurons, before thresholding
@@ -189,7 +189,7 @@ class PiecewiseLinear_debug(OutputFn):
 
 	if self.first_call:
 	    self.first_call = False
-	    self.y_avg = zeros(x.shape,x.typecode())
+	    self.y_avg = zeros(x.shape,x.dtype.char)
 	    self.y_hist = zeros([5,30000],activity_type)  # average firing rate
 	    self.y_rate = zeros([5,30000],activity_type)  # firing rate over time
 	    self.y_rate = zeros([5,30000],activity_type)  # firing rate over time
@@ -256,7 +256,7 @@ class PiecewiseLinear_debug2(OutputFn):
 
 	if self.first_call:
 	    self.first_call = False
-	    self.x_avg = zeros(x.shape,x.typecode())
+	    self.x_avg = zeros(x.shape,x.dtype.char)
 	    self.x_hist = []
 	else:
 	    if self.ncall <= 1000:

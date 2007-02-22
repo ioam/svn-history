@@ -25,7 +25,7 @@ __version__ = '$Revision$'
 from simulation import EventProcessor
 from sheetcoords import SheetCoordinateSystem
 from parameterclasses import BooleanParameter, Number, Parameter
-from Numeric import zeros,array,Float,ArrayType
+from numpy.oldnumeric import zeros,array,Float,ArrayType
 
 from boundingregion import BoundingBox, BoundingRegionParameter
 import sheetview 

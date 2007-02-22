@@ -26,9 +26,9 @@ __version__ = '$Revision$'
 # bugs. (Same applies to SharedWeightCFProjection.)
 
 
-import Numeric
+import numpy.oldnumeric as Numeric
 import copy
-from Numeric import sum,ones,exp
+from numpy.oldnumeric import sum,ones,exp
 
 import patterngenerator
 from patterngenerator import PatternGeneratorParameter
@@ -81,7 +81,7 @@ class ConnectionField(ParameterizedObject):
         if hasattr(self,'_norm_total'):
             return self._norm_total
         else:
-            return Numeric.sum(self.weights.flat)
+            return Numeric.sum(self.weights.ravel())
             
     def set_norm_total(self,new_norm_total):
         """
@@ -164,9 +164,6 @@ class ConnectionField(ParameterizedObject):
                               xdensity=self.input_sheet.xdensity,
                               ydensity=self.input_sheet.ydensity)
         self.weights = w.astype(weight_type)
-        # Maintain the original type throughout operations, i.e. do not
-        # promote to double.
-        self.weights.savespace(1)
 
         # Now we have to get the right submatrix of the mask (in case
         # it is near an edge)
@@ -174,13 +171,11 @@ class ConnectionField(ParameterizedObject):
         m = mask_template[r1:r2,c1:c2]
         
         self.mask = m.astype(weight_type)
-        self.mask.savespace(1)
 
         # CEBHACKALERT: this works for now, while the output_fns are
         # all multiplicative.  But in the long run we need a better
         # way to apply the mask.  The same applies anywhere the mask
         # is used, including in learningfns/.
-
         self.weights *= self.mask   
         output_fn(self.weights)        
 
@@ -287,7 +282,6 @@ class ConnectionField(ParameterizedObject):
             mr1,mr2,mc1,mc2 = self.get_slice(bounds_template)
             m = mask_template[mr1:mr2,mc1:mc2]
             self.mask = m.astype(weight_type)
-            self.mask.savespace(1)
 
             # CEBHACKALERT: see __init__() regarding mask & output fn.
             self.weights *= self.mask
@@ -349,6 +343,8 @@ class CFPRF_Plugin(CFPResponseFn):
                 cf = cfs[r][c]
                 r1,r2,c1,c2 = cf.slice_array
                 X = input_activity[r1:r2,c1:c2]
+                #if (X.shape != cf.weights.shape):
+                #  self.warning("Shapes %s and %s are not compatible" % (X.shape,cf.weights.shape))
                 activity[r,c] = single_cf_fn(X,cf.weights)
         activity *= strength
 

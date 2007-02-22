@@ -9,13 +9,13 @@ $Id$
 """
 __version__='$Revision$'
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
 
 import topo.patterns.random
 import topo.patterns.basic
 
 from topo.base.cf import CFProjection
-from topo.base.parameterclasses import DynamicNumber, Number, Wrapper
+from topo.base.parameterclasses import DynamicNumber, Number
 from topo.base.patterngenerator import BoundingBox
 from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.outputfns.basic import PiecewiseLinear

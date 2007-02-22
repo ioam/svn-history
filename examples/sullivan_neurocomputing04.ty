@@ -15,7 +15,7 @@ $Id$
 _version__='$Revision$'
 
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
 from math import exp, sqrt, fmod, pi, radians,sin,cos
 
 import topo.patterns.random
@@ -36,10 +36,10 @@ from topo.misc.patternfns import line
 
 
 from math import pi, sin, cos
-from Numeric import around,bitwise_and,sin,add,Float,bitwise_or
+from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 
 from topo.base.parameterclasses import Number, Parameter, Enumeration
-from topo.base.parameterclasses import Wrapper, DynamicNumber, ListParameter
+from topo.base.parameterclasses import DynamicNumber, ListParameter
 from topo.base.functionfamilies import OutputFnParameter
 from topo.base.patterngenerator import PatternGenerator
 

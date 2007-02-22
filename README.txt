@@ -53,7 +53,7 @@ see doc/Downloads/index.html.  There may also be additional
 platform-specific information in doc/Downloads/<platform>.html.  If
 you haven't compiled the documentation, for each <file>.html you can
 simply read the corresponding source file <file>_text.php in a text
-editor.
+editor. 
 
 
 USING TOPOGRAPHICA

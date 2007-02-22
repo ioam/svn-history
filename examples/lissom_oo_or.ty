@@ -5,7 +5,8 @@ $Id$
 """
 __version__='$Revision$'
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
+import numpy
 import fixedpoint
 
 from math import pi, sqrt
@@ -18,7 +19,7 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt, CFPRF_SharedWeightDotProduct_opt
-from topo.base.parameterclasses import DynamicNumber, Wrapper
+from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
@@ -85,10 +86,10 @@ surroundg = topo.patterns.basic.Gaussian(
     size=0.2954, aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 
 on_weights = topo.patterns.basic.Composite(
-    generators=[centerg,surroundg],operator=Wrapper("Numeric.subtract"))
+    generators=[centerg,surroundg],operator=numpy.subtract)
 
 off_weights = topo.patterns.basic.Composite(
-    generators=[surroundg,centerg],operator=Wrapper("Numeric.subtract"))
+    generators=[surroundg,centerg],operator=numpy.subtract)
 
 
 

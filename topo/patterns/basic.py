@@ -5,11 +5,13 @@ $Id$
 """
 __version__='$Revision$'
 
+import numpy
+
 from math import pi, sin, cos
-from Numeric import around,bitwise_and,sin,add,Float,bitwise_or
+from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 
 from topo.base.parameterclasses import Number, Parameter, Enumeration
-from topo.base.parameterclasses import Wrapper, DynamicNumber, ListParameter
+from topo.base.parameterclasses import DynamicNumber, ListParameter
 from topo.base.functionfamilies import OutputFnParameter
 from topo.base.patterngenerator import PatternGenerator
 
@@ -259,7 +261,6 @@ class SquareGrating(PatternGenerator):
         return around(0.5 + 0.5*sin(frequency*2*pi*self.pattern_y + phase))
 
 
-
 class Composite(PatternGenerator):
 
     """
@@ -272,7 +273,7 @@ class Composite(PatternGenerator):
     # The Accum_Replace operator from LISSOM is not yet supported,
     # but it should be added once PatternGenerator bounding boxes
     # are respected and/or Image patterns support transparency.
-    operator = Parameter(default=Wrapper("Numeric.maximum"),precedence=0.98,doc="""
+    operator = Parameter(numpy.maximum,precedence=0.98,doc="""
         Binary Numeric function used to combine the individual patterns.
 
         Any binary Numeric array "ufunc" returning the same
@@ -295,13 +296,6 @@ class Composite(PatternGenerator):
         are uses for at least some of the others as well (e.g. to
         remove pieces of other patterns).
 
-        The function is specified using the Wrapper class as a string
-        with the complete pathname to the ufunc
-        (e.g. Wrapper("Numeric.add")); when that string is evaluated
-        in the main namespace an appropriate ufunc should be returned.
-        (This approach is required to allow these objects to be
-        pickled; Numeric ufuncs themselves are not picklable.)
-
         You can also write your own operators, by making a class that
         has a static method named "reduce" that returns an array of the
         same size and type as the arrays in the list.  For example::
@@ -310,8 +304,7 @@ class Composite(PatternGenerator):
               @staticmethod
               def reduce(x):
                   return x[0]
-
-        In this case the Wrapper class should not be necessary.    
+              
         """)
     
     generators = ListParameter(default=[],precedence=0.97,class_=PatternGenerator,
@@ -446,7 +439,7 @@ class SineGratingDisk(PatternGenerator):
         patterns = [input_1(xdensity=xdensity,ydensity=ydensity,bounds=bounds),
                             input_2(xdensity=xdensity,ydensity=ydensity,bounds=bounds)]
                       
-        image_array = Wrapper("Numeric.minimum").reduce(patterns)
+        image_array = numpy.minimum.reduce(patterns)
         return image_array
 
 

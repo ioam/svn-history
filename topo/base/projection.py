@@ -5,7 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import Numeric
+import numpy.oldnumeric as Numeric
 
 from sheet import Sheet
 from parameterclasses import Number, BooleanParameter, Parameter

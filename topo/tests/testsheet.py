@@ -10,7 +10,7 @@ import topo
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.base.sheet import *
 import topo.base.parameterizedobject
-import Numeric
+import numpy.oldnumeric as Numeric
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheetview import SheetView
 

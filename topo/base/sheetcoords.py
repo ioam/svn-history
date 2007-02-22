@@ -79,7 +79,7 @@ $Id$
 __version__ = '$Revision$'
 
 
-from Numeric import zeros,array,floor,ceil,around
+from numpy.oldnumeric import zeros,array,floor,ceil,around
 
 from boundingregion import BoundingBox
 

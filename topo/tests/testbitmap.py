@@ -15,7 +15,8 @@ __version__='$Revision$'
 
 import topo
 from topo.plotting.bitmap import *
-import Image, Numeric
+import Image
+import numpy.oldnumeric as Numeric
 import unittest
 
 class TestBitmap(unittest.TestCase):

@@ -8,8 +8,8 @@ __version__='$Revision$'
 
 import unittest
 
-from Numeric import array, pi
-from MLab import rot90
+from numpy.oldnumeric import array, pi
+from numpy.oldnumeric.mlab import rot90
 
 from topo.base.patterngenerator import Constant
 from topo.base.boundingregion import BoundingBox

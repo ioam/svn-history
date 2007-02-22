@@ -11,7 +11,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
 
 from math import pi
 from fixedpoint import FixedPoint

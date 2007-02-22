@@ -11,7 +11,7 @@ __version__='$Revision$'
 
 # CEBHACKALERT: Documentation is just draft.
 
-import Numeric
+import numpy.oldnumeric as Numeric
 
 from topo.base.parameterizedobject import ParameterizedObject,Parameter
 from topo.base.parameterclasses import ClassSelectorParameter
@@ -149,12 +149,10 @@ class DotProduct(ResponseFn):
     arrays.  
     """
     def __call__(self,m1,m2):
-        # Works in cases where dot(a.flat,b.flat) fails, e.g, with
-        # matrix slices or submatrices.
-        # CB: presumably that is to do with whether or not the arrays
-        # are each contiguous.        
+        # Should work even for non-contiguous arrays, e.g. with matrix
+        # slices or submatrices.
         a = m1*m2
-        return Numeric.sum(a.flat)
+        return Numeric.sum(a.ravel())
 
 
 class ResponseFnParameter(ClassSelectorParameter):

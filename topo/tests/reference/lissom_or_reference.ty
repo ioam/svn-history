@@ -46,7 +46,7 @@ __version__='$Revision$'
 
 #import pdb 
 import fixedpoint
-import Numeric  # CB: (need to update for numpy)
+import numpy.oldnumeric as Numeric
 
 from math import pi, sqrt
 

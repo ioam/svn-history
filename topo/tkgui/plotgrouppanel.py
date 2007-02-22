@@ -9,7 +9,7 @@ $Id$
 __version__='$Revision$'
 
 
-import Numeric
+import numpy.oldnumeric as Numeric
 import copy
 
 from inspect import getdoc

@@ -7,7 +7,7 @@ __version__='$Revision$'
 
 import unittest
 
-from Numeric import array, Float32
+from numpy.oldnumeric import array, Float32
 
 # Currently empty; should be expanded
 cases = []

@@ -15,7 +15,7 @@ $Id$
 __version__='$Revision$'
 
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
 from math import exp, sqrt
 
 import topo.patterns.random

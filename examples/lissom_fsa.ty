@@ -28,7 +28,6 @@ $Id$
 """
 __version__='$Revision$'
 
-
 # This simulation is still being worked on:
 #
 # - learning rates need to be adjusted for all the times the bounds
@@ -43,7 +42,8 @@ __version__='$Revision$'
 ## from topo.base.parameterizedobject import ParameterizedObject
 ## ParameterizedObject.print_level=300
 
-import RandomArray
+import numpy.oldnumeric.random_array as RandomArray
+import numpy
 import fixedpoint
 #import pdb # debugger
 
@@ -53,13 +53,11 @@ from Numeric import sum,ones,exp, tan, sin, cos
 
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.projections.basic import CFProjection,SharedWeightCFProjection
-from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.sheet import BoundingBox
+from topo.projections.basic import CFProjection, SharedWeightCFProjection
+from topo.responsefns.optimized import CFPRF_DotProduct_opt, CFPRF_SharedWeightDotProduct_opt
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
-from topo.base.parameterclasses import Wrapper
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import DivisiveNormalizeL1,PiecewiseLinear
@@ -272,16 +270,16 @@ righteye = Gaussian(aspect_ratio = 1.0, x = 1 * retina_scale, y = -2.5 * retina_
                     size = 2.0 * retina_scale, scale = -0.5, offset = 0.5)
 mouth   =  Gaussian(aspect_ratio = 1.0, x = -5 * retina_scale, y = 0.0 * retina_scale,
                     size = 2.0 * retina_scale, scale = -0.5, offset = 0.5)
-face0 = Composite(generators = [lefteye, righteye, mouth], operator = Wrapper("Numeric.minimum"), orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=56)))
-face1 = Composite(generators = [lefteye, righteye, mouth], operator = Wrapper("Numeric.minimum"), orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=78)))
-face2 = Composite(generators = [lefteye, righteye, mouth], operator = Wrapper("Numeric.minimum"), orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=90)))
+face0 = Composite(generators = [lefteye, righteye, mouth], operator = numpy.minimum, orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=56)))
+face1 = Composite(generators = [lefteye, righteye, mouth], operator = numpy.minimum, orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=78)))
+face2 = Composite(generators = [lefteye, righteye, mouth], operator = numpy.minimum, orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=90)))
 
 input_separation_min = RN / LN * 36.0  # retina_lgn_ratio * size_in_lgn_coor
 
 input_pattern = ManagedComposite(generators = [face0, face1, face2], input_separation_min = input_separation_min / BaseRN,
                 x_range = DynamicNumber(UniformRandom(lbound=-85.0 / BaseRN, ubound = 85.0 / BaseRN, seed=41)),
                 y_range = DynamicNumber(UniformRandom(lbound=-85.0 / BaseRN, ubound = 85.0 / BaseRN, seed=27)),
-                operator = Wrapper("Numeric.minimum"))
+                operator = numpy.minimum)
 
 retina_bounds = BoundingBox(radius = RN / (2.0 * BaseRN * area_scale))
 lgn_bounds = BoundingBox(radius = LN / (2.0 * BaseLN * area_scale))
@@ -332,11 +330,12 @@ surroundg = topo.patterns.basic.Gaussian(
     size=2*sigma_s/BaseRN,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))  # norm_value=2.33
 
 on_weights = topo.patterns.basic.Composite(
-    generators=[centerg,surroundg],operator=Wrapper("Numeric.subtract"))
+    generators=[centerg,surroundg],operator=numpy.subtract)
 
 off_weights = topo.patterns.basic.Composite(
-    generators=[surroundg,centerg],operator=Wrapper("Numeric.subtract"))
-    
+    generators=[surroundg,centerg],operator=numpy.subtract)
+
+
 topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
           connection_type=SharedWeightCFProjection,strength=blur_scale,
           nominal_bounds_template=lgn_weight_bounds,

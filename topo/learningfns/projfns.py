@@ -10,8 +10,8 @@ $Id$
 """
 __version__ = "$Revision$"
 
-import Numeric
-from Numeric import ones,Float,Float32,zeros
+import numpy.oldnumeric as Numeric
+from numpy.oldnumeric import ones,Float,Float32,zeros
 
 from topo.base.cf import CFPLearningFn,LearningFnParameter
 from topo.base.sheet import activity_type
@@ -44,7 +44,6 @@ from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 ##        # Initialize thresholds the first time we learn the size of the output_activity.
 ##        if not hasattr(self,'unit_thresholds'):
 ##            self.unit_thresholds=ones(output_activity.shape,Float32)*self.unit_threshold_0
-##            self.unit_thresholds.savespace(1)
 ##
 ##        rows,cols = output_activity.shape
 ##
@@ -100,7 +99,6 @@ class CFPLF_Trace(CFPLearningFn):
         ##Initialise traces to zero if they don't already exist
         if not hasattr(self,'traces'):
             self.traces=zeros(output_activity.shape,activity_type)
-            self.traces.savespace(1)
             
         for r in xrange(rows):
             for c in xrange(cols):
@@ -204,7 +202,7 @@ class HomeoSynaptic(CFPLearningFn):
                 for c in xrange(cols):
                     cf = cfs[r][c]
 
-	            current_norm_value = 1.0*Numeric.sum(abs(cf.weights.flat))
+	            current_norm_value = 1.0*Numeric.sum(abs(cf.weights.ravel()))
 		    if current_norm_value != 0:
             	    	factor = (1.0/current_norm_value)
             	    	cf.weights *= factor
@@ -232,4 +230,4 @@ class HomeoSynaptic(CFPLearningFn):
          
 	# For analysis only; can be removed (in which case also remove the initializations above)
         self.ave_hist.append(self.averages[0][7])
-        self.temp_hist.append (Numeric.sum(abs(cfs[0][7].weights.flat)))
+        self.temp_hist.append (Numeric.sum(abs(cfs[0][7].weights.ravel())))

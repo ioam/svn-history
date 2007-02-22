@@ -5,8 +5,8 @@ $Id$
 """
 __version__='$Revision$'
 
-from Numeric import zeros,ones,floor,where,choose,less,greater,Int
-from RandomArray import random,seed
+from numpy.oldnumeric import zeros,ones,floor,where,choose,less,greater,Int
+from numpy.oldnumeric.random_array import random,seed
 
 from topo.base.parameterclasses import Number,Integer
 from topo.base.patterngenerator import PatternGenerator

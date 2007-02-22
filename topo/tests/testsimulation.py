@@ -7,7 +7,7 @@ __version__='$Revision$'
 import unittest
 import copy
 
-from Numeric import array
+from numpy.oldnumeric import array
 from topo.base.simulation import *
 from topo.eps.basic import *
 
