@@ -7,6 +7,8 @@ __version__='$Revision$'
 
 import numpy
 
+import numpy
+
 from math import pi, sin, cos
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 
@@ -307,15 +309,14 @@ class Composite(PatternGenerator):
               
         """)
     
-    generators = ListParameter(default=[],precedence=0.97,class_=PatternGenerator,
-        doc="List of patterns to use in the composite pattern.")
+    generators = ListParameter(default=[Constant(scale=0.0)],precedence=0.97,class_=PatternGenerator,doc="""
+        List of patterns to use in the composite pattern.  The default is
+        a blank pattern, and should thus be overridden for any useful work.""")
 
     size  = Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
         
-    def __init__(self,generators=[Disk(x=-0.3,aspect_ratio=0.5),
-                                  Disk(x= 0.3,aspect_ratio=0.5)],**params):
+    def __init__(self,**params):
         super(Composite,self).__init__(**params)
-        self.generators = generators
         assert hasattr(self.operator,'reduce'),repr(self.operator)+" does not support 'reduce'."
 
 
@@ -443,3 +444,34 @@ class SineGratingDisk(PatternGenerator):
         return image_array
 
 
+class GaussiansCorner(PatternGenerator):
+    """ Two Gaussian pattern generators """
+    
+    x = Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
+                doc="X center of the corner")
+    
+    y = Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
+                doc="Y center of the corner")
+		
+    size = Number(default=0.5,doc="The size of the corner")
+    
+    angle = Number(default=pi/2,doc="The angle of the corner")
+    
+    
+    def __call__(self,**params):
+        offset=params.get('offset',self.offset)
+ 	bounds = params.get('bounds',self.bounds)
+        xdensity=params.get('xdensity',self.xdensity)
+        ydensity=params.get('ydensity',self.ydensity)
+        x=params.get('x',self.x)
+        y=params.get('y',self.y)
+        scale=params.get('scale',self.scale)
+        offset=params.get('offset',self.offset)
+        orientation=params.get('orientation',self.orientation)   
+        size=params.get('size',self.size)
+	
+	input_1=Gaussian()
+        input_2=Gaussian()
+	patterns = [input_1(orientation = orientation, bounds = bounds, xdensity = xdensity, ydensity = ydensity, offset = offset, size = size, x = self.x + cos(orientation) * size*0.9, y = self.y + sin(orientation)*size*0.9),input_2(orientation = orientation+pi/2, bounds = bounds, xdensity = xdensity, ydensity = ydensity, offset = offset, size = size,x = self.x + cos(orientation+pi/2) * size*0.9, y = self.y + sin(orientation+pi/2)*size*0.9)]
+	
+	return numpy.maximum(patterns[0],patterns[1])
