@@ -76,6 +76,9 @@ except ImportError:
 # versions or not.
 optimized = weave_imported
 
+warn_for_each_unoptimized_component = False
+
+
 def provide_unoptimized_equivalent(optimized_name, unoptimized_name, local_dict):
     """
     If not using optimization, replace the optimized component with its unoptimized equivalent.
@@ -99,8 +102,12 @@ def provide_unoptimized_equivalent(optimized_name, unoptimized_name, local_dict)
     """
     if not optimized:
         local_dict[optimized_name] = local_dict[unoptimized_name]
-        print '%s: Inline-optimized components not available; using %s instead of %s.' \
-              % (local_dict['__name__'], optimized_name, unoptimized_name)
+        if warn_for_each_unoptimized_component:
+            print '%s: Inline-optimized components not available; using %s instead of %s.' \
+                  % (local_dict['__name__'], optimized_name, unoptimized_name)
+
+if not optimized and not warn_for_each_unoptimized_component:
+    print "Note: Inline-optimized components are currently disabled; see topo.misc.inlinec.py."
 
 
 # Simple test
