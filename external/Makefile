@@ -1,11 +1,13 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-all: python jpeg pil numeric numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis
+default: python jpeg pil numeric numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis
 
-clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean
+all: default scipy pyaudiolab
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall
+clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy
+
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall
 
 ##############################################################
 # Python (interpreted language)
@@ -206,7 +208,7 @@ pmw-uninstall:
 
 
 ##############################################################
-# Scipy (for weave)
+# Weave (on its own apart from Scipy)
 #
 WEAVE = scipy-0.5.2
 WEAVE_UNINSTALL = ${PYTHON_LIB}/site-packages/weave external/weave
@@ -223,6 +225,26 @@ weave-clean:
 	rm -rf ${WEAVE} 
 weave-uninstall:
 	rm -rf weave ${WEAVE} $(foreach f, ${WEAVE_UNINSTALL}, ${PREFIX}/${f})
+
+
+
+##############################################################
+# Scipy
+#
+SCIPY = scipy-0.5.2
+SCIPY_UNINSTALL = ${PYTHON_LIB}/site-packages/scipy external/scipy
+
+# Forces removal of scipy version used with Numeric
+scipy: ${SCIPY}.tar.gz python
+	rm -f ${PYTHON_LIB}/site-packages/scipy external/scipy
+	tar xzf ${SCIPY}.tar.gz
+	cd ${SCIPY}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
+	touch scipy
+
+scipy-clean:
+	rm -rf ${SCIPY} 
+scipy-uninstall:
+	rm -rf scipy ${SCIPY} $(foreach f, ${SCIPY_UNINSTALL}, ${PREFIX}/${f})
 
 
 
