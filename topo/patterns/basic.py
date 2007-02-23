@@ -7,8 +7,6 @@ __version__='$Revision$'
 
 import numpy
 
-import numpy
-
 from math import pi, sin, cos
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 

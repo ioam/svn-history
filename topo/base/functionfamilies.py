@@ -12,6 +12,7 @@ __version__='$Revision$'
 # CEBHACKALERT: Documentation is just draft.
 
 import numpy.oldnumeric as Numeric
+import numpy
 
 from topo.base.parameterizedobject import ParameterizedObject,Parameter
 from topo.base.parameterclasses import ClassSelectorParameter
@@ -140,19 +141,15 @@ class ResponseFn(ParameterizedObject):
         raise NotImplementedError
 
 
-# This function (and any other Numeric functions that create an
-# intermediate array) might be better rewritten using weave.blitz to
-# avoid creating the temporary.
+
 class DotProduct(ResponseFn):
     """
     Return the sum of the element-by-element product of two 2D
     arrays.  
     """
     def __call__(self,m1,m2):
-        # Should work even for non-contiguous arrays, e.g. with matrix
-        # slices or submatrices.
-        a = m1*m2
-        return Numeric.sum(a.ravel())
+        return numpy.dot(m1.ravel(),m2.ravel())
+
 
 
 class ResponseFnParameter(ClassSelectorParameter):

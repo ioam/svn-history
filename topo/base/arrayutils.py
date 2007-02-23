@@ -8,8 +8,10 @@ __version__ = "$Revision$"
 import re
 
 from numpy.oldnumeric import sqrt, ones, dot, sum, arctan2, array2string, logical_not, bitwise_or, argmax
-from numpy import seterr
-from numpy import inf
+from numpy import set_printoptions
+
+# Ask numpy to print even relatively large arrays by default
+set_printoptions(threshold=200*200)
 
 
 def L2norm(v):
@@ -134,3 +136,30 @@ def array_argmax(mat):
     return r,c
 
 
+
+def __numpy_ufunc_pickle_support():
+    """
+    CEBHACKALERT: Allow instances of numpy.ufunc to pickle. We should be able to remove
+    this when numpy.ufuncs themselves support pickling.
+
+    See http://news.gmane.org/find-root.php?group=gmane.comp.python.numeric.general&article=13400
+    """
+    # Code from Robert Kern
+
+    # Note that this only works if the ufunc is from numpy; we might want to add a warning
+    # on finding that isinstance(ufunc,numpy.ufunc) is False.
+
+    import copy_reg
+
+    def ufunc_pickler(ufunc):
+	return ufunc.__name__
+    
+    def ufunc_unpickler(ufunc):
+	import numpy
+	getattr(numpy,name)
+
+    import numpy
+    copy_reg.pickle(numpy.ufunc,ufunc_pickler,ufunc_unpickler)
+
+
+__numpy_ufunc_pickle_support()
