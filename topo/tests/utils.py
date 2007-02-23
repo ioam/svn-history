@@ -17,6 +17,7 @@ from numpy.oldnumeric import alltrue,equal,shape,ravel,around,asarray,less_equal
 # lissom_log_parser's compare_elements() is not present. (Although they
 # claim one of the arrays has three dimensions, which is clearly not true
 # but might be something to do with the arrays having different types.)
+# * Also see numpy.allclose()
 
 
 def assert_array_equal(x,y,err_msg=''):
