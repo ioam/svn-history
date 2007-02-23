@@ -131,10 +131,6 @@ numpy functions?
 
 <h4>After merging numpy_test_branch</h4>
 <ul>
-<li>
-2007/01/25 (CB): Gnosis Utils has xml pickling. Add this as an optional format.
-The xml is still complex, but better than looking at a pickle.
-</li>
 
 <li>
 2007/02/23 (CB): update topographica-win to numpy (plus catchup other
@@ -149,6 +145,18 @@ the subtract.reduce bug.)
 <h3>Things we hope to take care of eventually</h3>
 
 <ul>
+
+<li>
+2007/02/23 (CB): Gnosis Utils has xml pickling - add this as an
+optional format.  (The xml is still complex, but is at least readable
+independently of python and Topographica.)
+<br />
+gnosis.xml.pickle cannot handle numpy.float64 for some reason (it works 
+for float32, and worked on the main branch before numpy);
+somewhere numpy.float64 must be imported into Topographica
+(Numeric.Float64 either caused no problems or was not imported -
+I don't know which).
+</li>
 
 <li>
 2007/02/23: which version of libraries is numpy using?
