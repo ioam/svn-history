@@ -71,7 +71,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection,SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.base.sheet import BoundingBox
-from topo.base.parameterclasses import DynamicNumber, Wrapper
+from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
