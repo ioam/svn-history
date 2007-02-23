@@ -15,7 +15,7 @@ the bounding boxes to be square instead of a narrow rectangle.
 
 $Id$
 """
-_version__='$Revision$'
+__version__='$Revision$'
 
 
 import numpy.oldnumeric.random_array as RandomArray

@@ -12,7 +12,7 @@ Input line thickness.
 
 $Id$
 """
-_version__='$Revision$'
+__version__='$Revision$'
 
 
 import numpy.oldnumeric.random_array as RandomArray
