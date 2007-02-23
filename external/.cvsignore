@@ -35,3 +35,9 @@ numpy-1.0.1
 scipy-0.5.2
 Gnosis_Utils-1.2.1
 gnosis
+ctypes
+ctypes-1.0.1
+libsndfile
+libsndfile-1.0.17
+pyaudiolab
+pyaudiolab-0.6.6
