@@ -137,8 +137,10 @@ The xml is still complex, but better than looking at a pickle.
 </li>
 
 <li>
-2007/02/20 (CB): update topographica-win to numpy (plus catchup other
-external packages like pyaudiolab & gnosis utils)
+2007/02/23 (CB): update topographica-win to numpy (plus catchup other
+external packages like pyaudiolab & gnosis utils).
+(The current Windows numpy version at scipy.org presumably contains 
+the subtract.reduce bug.)
 </li>
  
 </ul>
@@ -149,8 +151,19 @@ external packages like pyaudiolab & gnosis utils)
 <ul>
 
 <li>
-2007/02/21: move from a Makefile in examples/ to some kind of
-setup.py script? Then Windows users could follow the tutorial.
+2007/02/23: which version of libraries is numpy using?
+<br />
+numpy.__config__.show()
+<br />
+warn users if they're using a slow version?
+<br />
+http://www.scipy.org/Numpy_Example_List?highlight=%28example%29#head-c7a573f030ff7cbaea62baf219599b3976136bac
+</pre>
+>>>
+>>> import numpy
+>>> if id(dot) == id(numpy.core.multiarray.dot):           # A way to know if you use fast blas/lapack or not.
+...   print "Not using blas/lapack!"
+</pre>
 </li>
 
 <li> 
@@ -585,11 +598,17 @@ pymingw?  At the moment, this seems much more difficult to setup than
 the current system, but it might be much easier to maintain.  Before
 that, could at least add mingw's msys stuff for a shell and make -
 then the tutorial instructions could be followed ('make examples'
-etc).
+etc). (Or, move from a Makefile in examples/ to some kind of
+setup.py script? Then Windows users could follow the tutorial.)
 <br />
 Python for Windows (as distributed by python.org) is built using a
-Microsoft compiler (with associated project files).
+non-free (money,speech) Microsoft compiler (with associated project files):
+external/Python-2.4.4/PCbuild/readme.txt.
+<br />
+Apparently it can be built using a free (money) Microsoft compiler:
+http://wiki.python.org/moin/Building_Python_with_the_free_MS_C_Toolkit
 </li>
+
 
 <li>
 2007/02/21 (CB): Investigate using Tile (which has become part of
