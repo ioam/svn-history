@@ -287,14 +287,14 @@ class ConnectionField(ParameterizedObject):
 	self.bounds_template = bounds_template
         or1,or2,oc1,oc2 = self.slice_array
 
-        self.offset_bounds(bounds_template)
+        self.offset_bounds()
         r1,r2,c1,c2 = self.slice_array
 
 
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
 
-            mr1,mr2,mc1,mc2 = self.get_slice(bounds_template)
+            mr1,mr2,mc1,mc2 = self.get_slice()
             m = mask_template[mr1:mr2,mc1:mc2]
             self.mask = m.astype(weight_type)
 
