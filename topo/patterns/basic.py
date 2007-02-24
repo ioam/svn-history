@@ -489,10 +489,11 @@ class OneDPowerSpectrum(PatternGenerator):
     ** This class has not been tested, and is still being written **
     """    
     windowing_function = Parameter(default=numpy.hanning)
-    window_length = Integer(default=12)
-    window_overlap = Integer(default=2)
+    window_length = Integer(default=2)
+    window_overlap = Integer(default=0)
+    sample_spacing = Number(default=1.0)
     
-    def __init__(self,signal,sample_spacing=1.0,**params):
+    def __init__(self,signal=[1,1,1,1],**params):
         """
         Read the audio file into an array.
         """
@@ -502,7 +503,6 @@ class OneDPowerSpectrum(PatternGenerator):
         # Or should users do them first, if they want them?
 
         self.signal = numpy.asarray(signal,dtype=numpy.float32)
-        self.sample_spacing = sample_spacing
         
         # current position of 'read pointer' in the signal
         self.location = 0
