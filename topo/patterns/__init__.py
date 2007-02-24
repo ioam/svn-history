@@ -16,3 +16,6 @@ __all__ = [re.sub('\.py$','',f) for f in os.listdir(__path__[0])
            if re.match('^[^_].*\.py$',f)]
 
 
+# CB: temporarily hide the audio module until it works and is properly
+# supported by the GUI etc.
+__all__.remove('audio')
