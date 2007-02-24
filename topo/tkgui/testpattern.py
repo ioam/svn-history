@@ -119,6 +119,10 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         
         self.pattern_generators = KeyedList()
         self.pattern_generators.update(pattern_generators)
+
+        # CEBHACKALERT: remove OneDPowerSpectrum from testpattern window
+        self.pattern_generators.remove(('OneDPowerSpectrum',topo.patterns.basic.OneDPowerSpectrum))
+        
         self.pattern_generators.sort()  # sorted so the pgs appear alphabetically
         ## END CEBHACKALERT
         
