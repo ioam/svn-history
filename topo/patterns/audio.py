@@ -8,6 +8,9 @@ __version__='$Revision$'
 
 import numpy
 import numpy.fft
+# CEBHACKALERT: you need to build pyaudiolab to use this file.
+# Should we have pyaudiolab built by default now? (I haven't
+# tested it on Windows or OS X.)
 import pyaudiolab
 
 from topo.base.patterngenerator import PatternGenerator
@@ -30,8 +33,8 @@ class Audio(PatternGenerator):
 
     ** This class has not been tested, and is not documented **
     """
-    # CB: find a decent example sound (I haven't listened to this)
-    filename = Filename(default='examples/test.flac',precedence=0.9,doc=
+    # CB: find an example sound (I haven't listened to this one)
+    filename = Filename(default='lib/python2.4/site-packages/pyaudiolab/test_data/test.flac',precedence=0.9,doc=
         """
         File path (can be relative to Topographica's base path) to an audio file.
         The audio can be in any format accepted by pyaudiolab, e.g. WAV, AIFF, or FLAC.
