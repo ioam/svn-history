@@ -45,7 +45,17 @@ unpickling.
 That doesn't necessarily indicate anything is wrong.  What it is
 saying is that you have defined some variables and/or classes in your
 .ty script file, rather than in a .py module in topo/.  Python knows
+
+<!-- No warning is printed for variables: just functions and classes.
+Do we need to add a warning for variables? (Maybe we could actually
+pickle variables?)  Also, it's not just those functions and classes
+defined in a .ty script file, but also those defined at the command
+prompt. -->
+
 how to restore the state of anything in an imported module, but it has
+
+<!-- 'imported module' = module imported from topo -->
+
 no idea how to find classes defined in regular scripts like those in
 the examples directory (which we name ending in .ty to make the
 difference obvious).  So you can either:
@@ -67,6 +77,8 @@ etc., and then reloading the saved snapshot should work fine.
 want to suppress the warning entirely you can do option 1.
 </LI>
 
+
+<!-- what about: "I think I've found a problem: what should I do now?" -->
 
   
 </OL>
