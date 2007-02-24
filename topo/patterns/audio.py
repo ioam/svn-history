@@ -31,6 +31,9 @@ class Audio(OneDPowerSpectrum):
         The audio can be in any format accepted by pyaudiolab, e.g. WAV, AIFF, or FLAC.
         """)
 
+    # CEBALERT: make Audio's parameters window_length,overlap be independent of
+    # the sampling rate.
+
     def __init__(self,**params):
         """
         Read the audio file into an array.
