@@ -10,7 +10,7 @@ import numpy
 from math import pi, sin, cos
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 
-from topo.base.parameterclasses import Number, Parameter, Enumeration
+from topo.base.parameterclasses import Integer, Number, Parameter, Enumeration
 from topo.base.parameterclasses import DynamicNumber, ListParameter
 from topo.base.functionfamilies import OutputFnParameter
 from topo.base.patterngenerator import PatternGenerator
@@ -473,3 +473,70 @@ class GaussiansCorner(PatternGenerator):
 	patterns = [input_1(orientation = orientation, bounds = bounds, xdensity = xdensity, ydensity = ydensity, offset = offset, size = size, x = self.x + cos(orientation) * size*0.9, y = self.y + sin(orientation)*size*0.9),input_2(orientation = orientation+pi/2, bounds = bounds, xdensity = xdensity, ydensity = ydensity, offset = offset, size = size,x = self.x + cos(orientation+pi/2) * size*0.9, y = self.y + sin(orientation+pi/2)*size*0.9)]
 	
 	return numpy.maximum(patterns[0],patterns[1])
+
+
+
+
+# CB: being a PatternGenerator gives this lots of parameters that don't really
+# mean anything.
+class OneDPowerSpectrum(PatternGenerator):
+    """
+    Performs a discrete Fourier transform each time it's called,
+    on a rolling window of the signal.
+    
+    Over time, outputs a power spectrum.
+
+    ** This class has not been tested, and is still being written **
+    """    
+    windowing_function = Parameter(default=numpy.hanning)
+    window_length = Integer(default=12)
+    window_overlap = Integer(default=2)
+    
+    def __init__(self,signal,sample_spacing=1.0,**params):
+        """
+        Read the audio file into an array.
+        """
+        super(OneDPowerSpectrum,self).__init__(**params)
+
+        # CB: add pre-processing options (e.g. remove DC) here?
+        # Or should users do them first, if they want them?
+
+        self.signal = numpy.asarray(signal,dtype=numpy.float32)
+        self.sample_spacing = sample_spacing
+        
+        # current position of 'read pointer' in the signal
+        self.location = 0
+
+
+    def __call__(self,**params):
+        """
+        Perform a DFT (FFT) of the current sample from the signal multiplied
+        by the smoothing window.
+        """
+        # CB: How much to explain in docstring? numpy.fft.fft has
+        # documentation e.g. numpy.fft.fft most efficient if
+        # window_length 'is a power of 2 (or decomposable into low
+        # prime factors)', and what the output represents
+        # (X[N-k]=X[-k] as usual in FFT formula).
+
+        # currently these can all be changed each call: is that useful?
+        # (unusual for creating a spectrogram)
+        n_samples = params.get('window_length',self.window_length)
+        overlap = params.get('window_overlap',self.window_overlap)
+        w_func = params.get('windowing_function',self.windowing_function)
+        
+        start = max(self.location-overlap,0)
+        end = start+n_samples
+        signal_sample = self.signal[start:end]
+
+        self.location+=n_samples
+
+        # make the frequencies easily available; would be calc'd only once
+        # if the above parameters were constant
+        self.last_freq = numpy.fft.fftfreq(n_samples,d=self.sample_spacing)
+
+        # again, would store if above parameters were constant
+        smoothing_window = w_func(n_samples)  
+
+        return numpy.fft.fft(signal_sample*smoothing_window) #,n=n_samples)
+    
