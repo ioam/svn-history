@@ -10,6 +10,7 @@ __version__='$Revision$'
 # Should we have pyaudiolab built by default now? (I haven't
 # tested it on Windows or OS X.)
 import pyaudiolab
+import numpy
 
 from topo.base.parameterclasses import Filename,Integer,Parameter
 
