@@ -1,4 +1,3 @@
-
 """
 TopoConsole class file.
 
@@ -16,13 +15,14 @@ __version__='$Revision$'
 from math import fmod,floor
 import Tkinter
 from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, Button, \
-     LEFT, RIGHT, YES, BOTH, Label, Text, END, DISABLED, NORMAL, Scrollbar, Y
+     LEFT, RIGHT, YES, NO, BOTH, Label, Text, END, DISABLED, NORMAL, Scrollbar, Y
 import Pmw, os, sys, traceback, __main__
 import StringIO
 import tkFileDialog
 import time
 import webbrowser
 from inspect import getdoc
+import code
 
 import topo
 import topo.commands.basic
@@ -76,6 +76,21 @@ plotpanel_classes = {}
 # two-pane approach we have gives some advantages. For example, I can
 # press the "up" arrow in the 'Command:' box to find previous
 # commands. It was also very simple to implement.
+
+
+class InterpreterComboBox(Pmw.ComboBox):
+
+    # Subclass of combobox to allow null strings to be passed to
+    # the interpreter.
+    
+    def _addHistory(self):
+        input = self._entryWidget.get()
+        if input == '':
+            self['selectioncommand'](input)
+        else:
+            Pmw.ComboBox._addHistory(self)
+        
+
 
 class OutputText(Text):
     """
@@ -198,6 +213,9 @@ class TopoConsole(Frame):
         title = "Topographica Console"
         self.parent.title(title)
 
+        # command interpreter for executing commands in the console (used by exec_cmd).
+        self.interpreter = code.InteractiveConsole(__main__.__dict__)
+        
         # Provide a way for other code to access the GUI when necessary
         topo.guimain=self
 
@@ -251,7 +269,7 @@ class TopoConsole(Frame):
 
 	# Create and pack the MessageBar.  (Shows "Status")
         msg_group = Pmw.Group(self,tag_text='Status')
-        msg_group.pack(side=BOTTOM,expand=YES,fill=X,padx=4,pady=8)
+        msg_group.pack(side=BOTTOM,expand=NO,fill=X,padx=4,pady=8)
 	self.messageBar = Pmw.MessageBar(msg_group.interior(),
                                          entry_width = 45,
                                          entry_relief='groove')
@@ -309,7 +327,7 @@ class TopoConsole(Frame):
         #
         learning_group = Pmw.Group(self,tag_text='Simulation control')
         learning_frame = learning_group.interior()
-        learning_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
+        learning_group.pack(side=TOP,expand=NO,fill=X,padx=4,pady=8)
 
         rf=Label(learning_frame,text='Run for: ')
         rf.pack(side=LEFT)
@@ -363,19 +381,20 @@ class TopoConsole(Frame):
                               tag_variable = self.show_command_widgets)
 
                 
-        command_group.pack(fill = 'both', expand = 1, side='left')
+        command_group.pack(fill = 'both', expand = YES, side='left')
         cw = Tkinter.Frame(command_group.interior())
-        cw.pack(padx = 2, pady = 2, expand='yes', fill='both')
+        cw.pack(padx = 2, pady = 2, expand=YES, fill='both')
         command_frame.pack(padx = 6, pady = 6, expand='yes', fill='both')
 
         # empty frame to allow resizing to 0 (otherwise cw
         # would stay at the size it was before all widgets were removed)
-        Tkinter.Frame(cw).pack()
+        Tkinter.Frame(cw).pack(expand=NO)
 
         ### Make a ComboBox (command_entry) for entering commands.
-        self.command_entry=Pmw.ComboBox(cw,autoclear=1,history=1,dropdown=1,
-                                        label_text='>>> ',labelpos='w',
-                               selectioncommand=Pmw.busycallback(self.exec_cmd))
+        self.command_entry=InterpreterComboBox(cw,autoclear=1,history=1,dropdown=1,
+                                               label_text='>>> ',labelpos='w',
+                                               selectioncommand=Pmw.busycallback(self.exec_cmd))
+        
         self.balloon.bind(self.command_entry,
              """Accepts any valid Python command and executes it in main as if typed at a terminal window.""")
 
@@ -390,7 +409,7 @@ class TopoConsole(Frame):
                                          state=DISABLED,
                                          height=10,
                                          yscrollcommand=scrollbar.set)
-        self.command_output.pack(side=TOP,expand=YES,fill=X)
+        self.command_output.pack(side=TOP,expand=YES,fill='both')
         scrollbar.config(command=self.command_output.yview)
 
         # note that pack() hasn't been called on command_output or on
@@ -399,8 +418,8 @@ class TopoConsole(Frame):
 
     def toggle_command_widgets(self):
         if self.show_command_widgets.get()==1:
-            self.command_entry.pack(side=BOTTOM,expand=YES,fill=X)
-            self.command_output_frame.pack()
+            self.command_entry.pack(side=BOTTOM,expand=NO,fill=X)
+            self.command_output_frame.pack(expand=YES,fill='both')
         else:
             self.command_entry.pack_forget()
             self.command_output_frame.pack_forget()
@@ -590,13 +609,14 @@ class TopoConsole(Frame):
                 
     def exec_cmd(self,cmd):
         """
-        exec the cmd in __main__.__dict__.
+        Pass cmd to the console's command interpreter.
 
         Redirects sys.stdout and sys.stderr to the output text window
         for the duration of the command.
 
         Updates the status bar to indicate success or not.
         """
+        
         capture_stdout = StringIO.StringIO()
         capture_stderr = StringIO.StringIO()
 
@@ -604,13 +624,12 @@ class TopoConsole(Frame):
         sys.stdout = capture_stdout
         sys.stderr = capture_stderr
 
-        try:
-            exec cmd in __main__.__dict__
+        if self.interpreter.push(cmd):
+            self.command_entry.configure(label_text='... ')
+            result = 'Continue: ' + cmd
+        else:
+            self.command_entry.configure(label_text='>>> ')
             result = 'OK: ' + cmd
-            
-        except Exception, e:
-            traceback.print_exc()
-            result = 'Exception Raised: ' + getdoc(e)
 
         output = capture_stdout.getvalue()
         error = capture_stderr.getvalue()
@@ -628,7 +647,7 @@ class TopoConsole(Frame):
         capture_stderr.close()
 
 	self.messageBar.message('state', result)
-
+        self.command_entry.component('entryfield').clear()
     
     def load_script_file(self,filename):
         """
