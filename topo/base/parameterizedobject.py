@@ -659,7 +659,7 @@ class ParameterizedObject(object):
     # JABALERT: Only partially achieved so far -- objects of the same
     # type and parameter values are treated as different, so anything
     # for which instantiate == True is reported as being non-default.
-    script_repr_suppress_defaults=Parameter(True, doc="""
+    script_repr_suppress_defaults=Parameter(True, hidden=True, doc="""
         Whether script_repr should avoid reporting the values of parameters
         that are just inheriting their values from the class defaults.""")
     
