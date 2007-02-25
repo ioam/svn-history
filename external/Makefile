@@ -3,11 +3,11 @@ CC = gcc
 
 default: python jpeg pil numeric numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis
 
-all: default scipy pyaudiolab
+all: default scipy pyaudiolab mlabwrap
 
-clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall
 
 ##############################################################
 # Python (interpreted language)
@@ -425,7 +425,6 @@ libsndfile-uninstall:
 
 
 
-
 ##############################################################
 # pyaudiolab (sound file reading)
 #
@@ -441,6 +440,29 @@ pyaudiolab-clean:
 	rm -rf ${PYAUDIOLAB} 
 pyaudiolab-uninstall:
 	rm -rf pyaudiolab ${PYAUDIOLAB} $(foreach f, ${PYAUDIOLAB_UNINSTALL}, ${PREFIX}/${f})
+
+
+
+
+##############################################################
+# mlabwrap (high level python to matlab bridge)
+#
+MLABWRAP = mlabwrap-1.0a3
+MLABWRAP_UNINSTALL =  ${PYTHON_LIB}/site-packages/mlabwrap.py*
+MLABWRAP_UNINSTALL += ${PYTHON_LIB}/site-packages/mlabrawmodule.so
+
+mlabwrap: ${MLABWRAP}.tar.gz python 
+	tar xzf ${MLABWRAP}.tar.gz
+	cd ${MLABWRAP}; ${PREFIX}/bin/python setup.py install
+	touch mlabwrap
+
+mlabwrap-clean:
+	rm -rf ${MLABWRAP} 
+mlabwrap-uninstall:
+	rm -rf mlabwrap ${MLABWRAP} $(foreach f, ${MLABWRAP_UNINSTALL}, ${PREFIX}/${f})
+
+
+
 
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
