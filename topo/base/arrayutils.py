@@ -139,7 +139,7 @@ def array_argmax(mat):
 
 def __numpy_ufunc_pickle_support():
     """
-    CEBHACKALERT: Allow instances of numpy.ufunc to pickle. We should be able to remove
+    CEBALERT: Allow instances of numpy.ufunc to pickle. We should be able to remove
     this when numpy.ufuncs themselves support pickling.
 
     See http://news.gmane.org/find-root.php?group=gmane.comp.python.numeric.general&article=13400

@@ -107,7 +107,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 
         ### Menu of PatternGenerator types
         #
-        # CEBHACKALERT: this way is just temporary while I reorganize these files.
+        # CEBALERT: this way is just temporary while I reorganize these files.
         # Take the list of PatternGenerators from the first GeneratorSheet's
         # input_generator PatternGeneratorParameter for now.
         #
@@ -124,20 +124,20 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         self.pattern_generators.remove(('OneDPowerSpectrum',topo.patterns.basic.OneDPowerSpectrum))
         
         self.pattern_generators.sort()  # sorted so the pgs appear alphabetically
-        ## END CEBHACKALERT
+        ## end alert
         
 
         # Set initial PatternGenerator to PatternGeneratorParameter.default
         # 
-        assert isinstance(generator_sheet_params['input_generator'].default,topo.base.patterngenerator.PatternGenerator) #CEBHACKALERT: and if that isn't to be True, this file might need changing (check that)
+        assert isinstance(generator_sheet_params['input_generator'].default,topo.base.patterngenerator.PatternGenerator) #CEBALERT: and if that isn't to be True, this file might need changing (check that)
         self.__current_pattern_generator = generator_sheet_params['input_generator'].default
         
         self.__current_pattern_generator_name = StringVar()
-        # CEBHACKALERT: you can set the current pg from the name in a better way
+        # CEBALERT: you can set the current pg from the name in a better way
         for (pg_name,pg) in self.pattern_generators.items():
             if pg==type(self.__current_pattern_generator):
                 self.__current_pattern_generator_name.set(pg_name)
-                self.__default_pattern_generator_name = pg_name #CEBHACKALERT: don't need to store this
+                self.__default_pattern_generator_name = pg_name #CEBALERT: don't need to store this
 
         # PatternGenerator choice box
         self.pg_choice_box = Pmw.OptionMenu(self,
@@ -160,7 +160,7 @@ Each type will have various parameters that can be changed.""")
 
         ### 'Edit patterns in' boxes
         #
-        # CEBHACKALERT: don't want these boxes up so high on window, should be lower.
+        # CEBALERT: don't want these boxes up so high on window, should be lower.
         # Also, boxes are in the wrong order (need to match the plots).
         self.__input_box = Pmw.RadioSelect(parent, labelpos = 'w',
                                 command = self._input_change,label_text = 'Apply to pattern in:',
@@ -168,12 +168,12 @@ Each type will have various parameters that can be changed.""")
                                 selectmode = 'multiple')
         self.__input_box.pack(fill = 'x', padx = 5)
 
-        CEBHACKALERT = copy.copy(self.generator_sheets_patterns.keys())
-        CEBHACKALERT.reverse()
-        for generator_sheet_name in CEBHACKALERT:
+        # CEBALERT:
+        keys = copy.copy(self.generator_sheets_patterns.keys())
+        keys.reverse()
+        for generator_sheet_name in keys:
             self.__input_box.add(generator_sheet_name)
             self.__input_box.invoke(generator_sheet_name)
-        
 
         self.__change_pattern_generator(self.__current_pattern_generator_name.get())
 	self.refresh()
