@@ -27,6 +27,7 @@ from topo.misc.numbergenerators import UniformRandom
 
 topo.sim.name = "hierarchical"
 
+# CEBHACKALERT: Doesn't seem to work on the Windows version; not clear why. 
 
 ###########################################
 # Set parameters
