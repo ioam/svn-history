@@ -13,6 +13,66 @@ from topo.base.parameterclasses import Number
 from topo.base.cf import CFSheet
 from topo.learningfns.som import CFPLF_SOM
 
+### JABHACKALERT: The SOM support needs complete reworking to fit with
+### the rest of Topographica.  Here is the current plan, as of 3/2007:
+# 
+# 1. Remove alpha(), radius(), decay(), and learning_length from the
+#    CFSOM class, and make new Dynamic parameters instead.  One such
+#    class can handle both alpha() and radius() right now.  We'll have
+#    to figure out where to put these new classes, because unlike
+#    existing Parameter classes, these depend on topo.sim.time(), so
+#    they can't go into topo/base/parameterclasses.py.
+# 
+#    It may be best for these types to take an arbitrary function as
+#    their timebase.  That way SOM users could implement batch training
+#    by having a special "batch generator" that produces its own
+#    timebase for parameter annealing. (i.e. the batch number)  
+# 
+#    Also remove the special learn() function, which exists only because
+#    the current handling of these parameters is at the wrong level (the
+#    Sheet, while the values are used at the Projection level).  The
+#    CFSOM class will then become empty, and an ordinary CFSheet can be
+#    used for SOMs instead.
+# 
+# 2. Do the same for the variants of these functions in RetinotopicSOM
+#    in examples/som_retinotopy.ty and ObermayerSOM in
+#    examples/obermayer_pnas90.ty, and then eliminate both of these
+#    classes as well.
+# 
+# 3. Change the output_fn for SOM models to be KernelMax.
+# 
+# 4. Remove the neighborhood function handling from CFPLF_HebbianSOM,
+#    and instead learn based on the already-placed version in the
+#    Sheet's activity matrix.  This should be much simpler, but it will
+#    slow things down relative to the current implementation, because it
+#    will mean that all units will learn, rather than just those within
+#    a fixed distance from the winner.  So we will need to implement
+#    some sort of optimization so that we ignore units whose activation
+#    is zero.  (Which is an optimization that should be useful for
+#    nearly all algorithms, right?  Of course, it should still be off by
+#    default, just for safety.)
+# 
+# 5. Although it is not needed for any current model, we can add a new
+#    SOM Sheet class that provides output in a form needed as input for
+#    another SOM.  The activity matrix described above is one obvious
+#    choice, but others include the coordinates of the winning unit (in
+#    Sheet coordinates, or in the range 0.0,1.0), or the weight vector
+#    of the winning unit, or a copy of the Activity matrix with all
+#    units set to zero except the winner (one-hot).  All but one-hot can
+#    probably be implemented most naturally as a Sheet class that sends
+#    messages out on different ports than Activity, although that might
+#    make things more difficult for subsequent sheets to process.  I'm
+#    not sure how to handle a one-hot approach -- in that case the
+#    output is indeed interpretable as an activity pattern, yet it's not
+#    the right one for driving learning, so it's not clear how to
+#    implement it.  In any case, none of these options need to be done
+#    soon, but I do want to have them sketched out somewhere, so that
+#    anyone who needs to do something like this will see the right way
+#    to do it.  
+
+
+
+
 
 class CFSOM(CFSheet):
     """
