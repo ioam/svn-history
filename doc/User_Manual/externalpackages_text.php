@@ -1,3 +1,8 @@
+<!-- CB: maybe shouldn't be called 'external' packages, since
+to the user they are part of topographica. users might think this
+is just a list of packages they can get from somewhere if they 
+are interested. -->
+
 <H1>External Packages</H1>
 
 <P>Packages available for use in Topographica...
