@@ -159,6 +159,12 @@ I don't know which).
 </li>
 
 <li>
+2007/02/25: how to build scipy without requiring any of the external
+linear algebra libraries, etc? Then scipy would at least build
+easily, and users could install the optimized versions if they wished.
+</li>
+
+<li>
 2007/02/23: which version of libraries is numpy using?
 <br />
 numpy.__config__.show()
@@ -221,17 +227,10 @@ and well designed so that it can be flexible.
 </li>
 
 <li>
-2007/02/20 (CB): check what happens when building via ssh without an X
-display, but setting the display variable to some other existing display.
-</li>
-
-<li>
-2007/02/20: Could add an example of processing auditory data by
-writing a PatternGenerator that does an FFT incrementally on an audio
-file, delivering part of a spectrogram at each clock tick.  The
-Numeric FFT.fft function might come in handy for this. <br />
-CB: I've added pyaudiolab, and will sometime soon try making a
-PatternGenerator.
+2007/02/25 (CB): OneDPowerSpectrum(PatternGenerator) and
+Audio(OneDPowerSpectrum) (an example of processing auditory data: does
+an FFT incrementally on an audio file, delivering part of a
+spectrogram at each clock tick.
 </li>
 
 <li>
