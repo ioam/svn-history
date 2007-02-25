@@ -138,7 +138,6 @@ external packages like pyaudiolab & gnosis utils).
 (The current Windows numpy version at scipy.org presumably contains 
 the subtract.reduce bug.)
 </li>
- 
 </ul>
 
 
@@ -218,7 +217,9 @@ and well designed so that it can be flexible.
 </li>
 
 <li>
-2006/05/23: minor tkgui cleanup? Which widgets should expand (expand=YES ?), which should fill the space (fill=X ?) (e.g. the command output box should expand when topoconsole does, and in parameters frames sliders etc should expand).
+2006/05/23: minor tkgui cleanup? Which widgets should expand
+(expand=YES ?), which should fill the space (fill=X ?) (e.g. in
+parameters frames sliders etc should expand).
 </li>
 
 

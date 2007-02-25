@@ -5,13 +5,6 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBALERT: widget and frame sizes (e.g. widths) are a mess
-# throughout topo.tkgui
-# Also, notice what happens on resizing: space between widgets increases,
-# but the widgets themselves stay the same size. It would be better if
-# some were allowed to expand, like the Text box for command output
-# and in particular the status box.
-
 from math import fmod,floor
 import Tkinter
 from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, Button, \
