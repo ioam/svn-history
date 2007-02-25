@@ -118,8 +118,8 @@ Topographica is built on an unmodified copy of Python, so anything that
 Python can do is also valid for Topographica.
 </DD>
 
-<P><DT><A href="http://numeric.scipy.org/numpydoc/numdoc.htm">Numeric</A></DT>
-<DD>Topographica makes heavy use of Numeric arrays and math functions; these
+<P><DT><A href="http://numpy.scipy.org/">NumPy</A></DT>
+<DD>Topographica makes heavy use of NumPy arrays and math functions; these
 provide high-level operations for dealing with matrix data.  The
 interface and options are similar to Matlab and other high-level array
 languages.  These operations are generally much higher performance
