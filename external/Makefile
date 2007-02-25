@@ -3,7 +3,7 @@ CC = gcc
 
 default: python jpeg pil numeric numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis
 
-all: default scipy pyaudiolab mlabwrap
+all: default pyaudiolab mlabwrap scipy
 
 clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap
 
