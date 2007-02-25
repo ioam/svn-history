@@ -114,17 +114,22 @@ def save_snapshot(snapshot_name):
     """
     Save a snapshot of the network's current state.
 
-    Commands listed in topo.sim.startup_commands are stored ready
-    to run before the simulation is unpickled in the future.
+    Commands stored in topo.sim.startup_commands will be executed
+    by the corresponding load_snapshot() function.
 
-    Uses Python's 'pickle' module, so subject to the same limitations (see
-    the pickle module's documentation) - except that class attributes
-    of ParameterizedObjects declared within the topo package (including
-    all subpackages - except ones like 'plotting') are pickled.
+    Uses Python's 'pickle' module, so subject to the same limitations
+    (see the pickle module's documentation) - with the notable
+    exception of class attributes. Python does not pickle class
+    attributes, but this function stores class attributes of any
+    ParameterizedObject class that is declared within the topo
+    package.
+
+    (Subpackages of topo that are not part of the simulation are
+    excluded from having their classes' attributes saved: plotting,
+    tkgui, and tests.)
     """
-    ### Classes etc defined in __main__ won't unpickle (so warn).
-    # The source code won't exist to recreate the class. If e.g. a class
-    # is redefined in main before unpickling, it will be ok though.
+    ### Warn that classes & functions defined in __main__ won't unpickle
+    #
     import types
     for k,v in __main__.__dict__.items():
         # there's classes and functions...what else?
@@ -136,7 +141,6 @@ def save_snapshot(snapshot_name):
     ### Get ParameterizedObject class attributes
     #
     states_of_classes = {}
-    classes = {}
 
     # For now we just search topo, but it could be extended to all packages.
     # We exclude certain subpackages that contain classes that aren't part
@@ -145,50 +149,32 @@ def save_snapshot(snapshot_name):
     get_states_of_classes_from_module(topo,states_of_classes,[],exclude)
 
 
-    ### Get startup commands
-    #
-    startup_commands = topo.sim.startup_commands
-
-
     ### Set the release version for this simulation.
     #
     topo.sim.RELEASE = topo.release
 
 
-    ### Pickle the simulation itself
-    #
-    # Note that simulation is subjected to two levels of pickling so
-    # that commands can be executed before it's unpickled.
-    # CEBHACKALERT: someone should figure out if that is really
-    # necessary
-    pickled_sim=pickle.dumps(topo.sim.actual_sim,2)
-
     ### Now pickle the lot to a file
-    pickle.dump((startup_commands,states_of_classes,pickled_sim),open(snapshot_name,'wb'),2)
+    #
+    pickle.dump( (topo.sim.actual_sim,states_of_classes), open(snapshot_name,'wb'),2)
 
 
 def load_snapshot(snapshot_name):
     """
     Load the simulation stored in snapshot_name.
 
-    First executes any commands that were stored previously in
-    topo.sim.startup_commands, then restores class attributes
-    for ParameterizedObjects, then loads the simulation.
+    Unpickles the simulation, sets ParameterizedObject class
+    attributes, and executes commands in topo.sim.startup_commands
     """
-    startup_commands,states_of_classes,pickled_sim = pickle.load(open(snapshot_name,'rb'))
+    sim,states_of_classes = pickle.load(open(snapshot_name,'rb'))
 
-    ### First execute the startup commands
+    topo.sim.change_sim(sim)
+
+    ### Set class attributes
     #
-    for cmd in startup_commands:
-        exec cmd in __main__.__dict__
-
-
-    ### Now set class attributes
-    #
-    # i.e. execute the command "path.to.module.Class.x=y" for each
+    # (i.e. execute in __main__ the command "path.to.module.Class.x=y" for each class)
     for class_name,state in states_of_classes.items():
 
-        # Import class back to __main__
         # from "topo.base.parameter.Parameter", we want "topo.base.parameter"
         module_path = class_name[0:class_name.rindex('.')]
         exec 'import '+module_path in __main__.__dict__
@@ -201,10 +187,9 @@ def load_snapshot(snapshot_name):
             except:
                 ParameterizedObject().warning('Problem restoring parameter %s=%s for class %s; name may have changed since the snapshot was created.' % (p_name,repr(p),class_name))
 
-    # CEBHACKALERT? Assumes parameters weren't added dynamically to a class
-    # i.e. they're all in the source code.
 
-    ### Now unpickle the simulation and set it to be topo.sim
+    ### Execute the startup commands
     #
-    topo.sim.change_sim(pickle.loads(pickled_sim))
+    for cmd in topo.sim.startup_commands:
+        exec cmd in __main__.__dict__
 
