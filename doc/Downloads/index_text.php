@@ -42,17 +42,20 @@ directory after checking out the code.
 
 <P>On other systems, just type <code>make</code> (which may be called
 <code>gmake</code> on some systems) from within the
-<code>topographica/</code> directory.  The build process will take a
+<code>topographica/</code> directory.  You will currently (3/2007)
+need to do this on a machine with a functioning DISPLAY, not on a
+remote text-only windowless session, because of build requirements for
+the MatPlotLib library.  The build process will take a
 while to complete (e.g. about 5-10 minutes on a 1.5GHz Pentium IV
 machine with a local disk).  If you have PHP, m4, and fig2dev
 installed, you can also make local copies of the HTML documentation
 from the web site; to do so, type <code>make all</code> instead of (or
 after) <code>make</code>.  <code>make all</code> will
 also run the regression tests and example files, to ensure that
-everything is functioning properly on your system.  (Note that if you
+everything is functioning properly on your system.  If you
 do the tests on a machine without a functioning DISPLAY, such as a
 remote text-only session, there will be some warnings about GUI tests
-being skipped.)
+being skipped.
 
 <P>On some Linux distributions that start with a minimal set of
 packages included, such as Ubuntu or the various "live CD" systems,
@@ -60,10 +63,6 @@ you may need to specify explicitly that some standard libraries be
 installed in your system, such as <code>libfreetype</code>,
 <code>libpng</code>, <code>libx11-dev</code>, and <code>zlib</code>,
 before <code>make</code> will succeed.
-
-<P>On some recent Mac OS X installations (1/2006), you may need to
-remove "-Wl," from external/Makefile for python to compile; it is not
-yet clear why.
 
 <P>If all goes well, a script named <code>topographica</code> or
 <code>topographica.bat</code> will be created in the
