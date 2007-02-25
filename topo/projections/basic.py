@@ -27,17 +27,12 @@ from topo.base.cf import ConnectionField, CFPRF_Plugin
 from topo.outputfns.basic import IdentityOF
 
 
-# CEBHACKALERT: This file contains numerous hacks, all around
-# to allow there to be a collection of cfs which all share one
-# set of weights. The classes in here could be implemented much
-# better, it just hasn't been done yet.
-# SharedWeightCFProjection should have the list of 'cfs', and
-# it should contain CFs that allow the standard CFP functions to work as
-# normal with the list, but these CFs should not each have a set of weights.
-# ConnectionField could e.g. be subclassed. At the moment,
-# a shared ConnectionField is in a list of 'DummyCF' wrappers.
-
 class CFPOF_SharedWeight(CFPOutputFn):
+    """
+    CFPOutputFn for use with SharedWeightCFProjections.
+
+    Applies the single_cf_fn to the single shared CF's weights.
+    """
     single_cf_fn = OutputFnParameter(default=IdentityOF())
     
     def __call__(self, cfs, output_activity, norm_values=None, **params):
@@ -53,14 +48,15 @@ class SharedWeightCF(ConnectionField):
     # of the ConnectionField.__init__ function from which it is dervied
     def __init__(self,cf,x,y,bounds_template,mask_template,input_sheet):
         """
-        	From an existing copy of ConnectionField (CF) that suits as a template 
-		create a new connection field that shares weights with the template CF	
-		Copies all the properties of CF to stay identical except the wights variable
-		that actually contains the data
-		
-		The only difference will be the boundaries of the CF
-		that will be implemented as a numpy view into
-		the weights stored in the CF template.
+        From an existing copy of ConnectionField (CF) that acts as a
+	template, create a new CF that shares weights with the
+	template CF.  Copies all the properties of CF to stay
+	identical except the weights variable that actually contains
+	the data.
+	
+	The only difference from a normal CF is that the weights of
+	the CF are implemented as a numpy view into the single master
+	copy of the weights stored in the CF template.
         """
         self.x = x; self.y = y
         self.input_sheet = input_sheet
@@ -68,8 +64,8 @@ class SharedWeightCF(ConnectionField):
 
         # Move bounds to correct (x,y) location, and convert to an array
         # CEBHACKALERT: make this clearer by splitting into two functions.
-        # JANOTE sets self.bounds and self.slice_array
-	# JAHACKALERT not sure whether this has to be still called!!!!
+        # JANOTE: sets self.bounds and self.slice_array; not sure
+	# whether this has to be still called!!!!
 	self.offset_bounds()
 
         # Now we have to get the right submatrix of the mask (in case

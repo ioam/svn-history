@@ -61,7 +61,7 @@ class TestSheetView(unittest.TestCase):
             sv6.message(sv6.view())
 
 
-# CEBHACKALERT: replace with test using Image
+# CEBALERT: replace with test using Image
 ##     def test_view(self):
 ##         ImageGenerator.nominal_bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 ##         ImageGenerator.nominal_density = 100
@@ -89,7 +89,7 @@ class TestSheetView(unittest.TestCase):
 
 # CB: I think this class can be removed now. We have topo/patterns/image.py, which uses a Sheet.
 
-## # CEBHACKALERT: Used in a number of test files. Maybe one day topo/patterns/image.py
+## # CEBALERT: Used in a number of test files. Maybe one day topo/patterns/image.py
 ## # will be based on a Sheet, in which case this could be removed.
 ## from numpy.oldnumeric import resize,array
 ## from topo.base.sheet import Sheet

@@ -5,7 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBHACKALERT: almost finished. Clean up redundant tests, comment,
+# CEBALERT: almost finished. Clean up redundant tests, comment,
 # and test selectivity for non-cyclic quantities once that has been
 # finished in distribution.
 

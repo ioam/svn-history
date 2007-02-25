@@ -9,7 +9,7 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBHACKALERT: Documentation is just draft.
+# CEBALERT: Documentation is just draft.
 
 import numpy.oldnumeric as Numeric
 import numpy

@@ -14,9 +14,9 @@ import numpy.oldnumeric as Numeric
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheetview import SheetView
 
-# CEBHACKALERT: 
+# CEBALERT: 
 # Changes that need to be made to this file:
-# - stop various tests running twice, identically (see HACKALERT later on)
+# - stop various tests running twice, identically (see alert later on)
 # - don't create a new ct every time, just change its density
 # - test array versions of coordinate transform functions
 # - ensure methods of Slice are tested
@@ -41,7 +41,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         #self.rbound = int(self.density*(self.top-self.bottom)) / float((self.top-self.bottom))
 
 
-        # CEBHACKALERT: this is supposed to be a small distance
+        # CEBALERT: this is supposed to be a small distance
         D = 0.00001
 
         # Sheet values around the edge of the BoundingBox
@@ -338,7 +338,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         self.assertEqual((bottom_row,left_col),(float(self.last_row),float(0)))
 
     ### JC This test might have to be re-written
-    # CEBHACKALERT: it's not too important, but this test (like
+    # CEBALERT: it's not too important, but this test (like
     # test_coordinate_position() below) will run three times,
     # identically.  All these test_* functions are run for each of the
     # classes in the cases list below. So, this should be re-written
@@ -445,7 +445,7 @@ class TestCoordinateTransforms(unittest.TestCase):
 
 
 
-    # CEBHACKALERT: this test should probably be somewhere else and
+    # CEBALERT: this test should probably be somewhere else and
     # called something different
     def test_connection_field_like(self):
         # test a ConnectionField-like example
@@ -469,7 +469,7 @@ class TestCoordinateTransforms(unittest.TestCase):
 #        rows,cols = bounds2shape(cropped_bounds,sheet.density,sheet.ydensity)
 #        self.assertEqual((rows,cols),(2,2))
 
-# CEBHACKALERT: slice is a Python type
+# CEBALERT: slice is a Python type
     def test_bounds2slice(self):
         
         # test that if you ask to slice the matrix with the sheet's BoundingBox, you
@@ -627,7 +627,7 @@ class TestCoordinateTransforms(unittest.TestCase):
     #
     def test_coordinate_position(self):
         """
-        CEBHACKALERT: these tests duplicate those above
+        CEBALERT: these tests duplicate those above
         except these use a matrix with non-integer
         (right-left) and (top-bottom). This is an important
         test case for the definition of density; without it,

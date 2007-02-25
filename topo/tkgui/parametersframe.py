@@ -20,7 +20,8 @@ from topo.base.parameterclasses import Integer,Number,Enumeration,ClassSelectorP
 from propertiesframe import PropertiesFrame
 from translatorwidgets import CheckbuttonTranslator
 
-# Some things missing from/wrong with ParametersFrame (other than the HACKALERTs):
+# CEBALERT:
+# Some things missing from/wrong with ParametersFrame (other than the alerts):
 #
 # - When creating a new Projection, we offer a 'name' field and
 #   allow it to be typed in, but then ignore any text that's been entered.
@@ -50,7 +51,7 @@ class ParametersFrame(Frame):
         self.parent = parent
         Frame.__init__(self,parent,config)
 
-        # CBHACKALERT: why do we pass parent rather than self here?
+        # CEBALERT: why do we pass parent rather than self here?
         # PropertiesFrame has all the 'optional refresh' code, I guess that's why.
         # Maybe take a look at this when that code is investigated.
         self.__properties_frame = PropertiesFrame(parent)
@@ -66,7 +67,7 @@ class ParametersFrame(Frame):
 
         self.__help_balloon = Pmw.Balloon(parent)
 
-        # CEBHACKALERT: to comment (& maybe simplify)
+        # CEBALERT: to comment (& maybe simplify)
         self.translator_dictionary = {}
 
         # The ParameterizedObject instance or class for which this
@@ -259,6 +260,9 @@ class ParametersFrame(Frame):
         """
         # CEBHACKALERT: results in DynamicNumber being called and producing
         # a value, rather than displaying information about the dynamic number.
+        # JAB: Can't it at least use .inspect_value(), for now, to avoid
+        # advancing the values?  After that it would be good to support
+        # some more informative and useful display.
         value = getattr(self.parameterized_object,parameter_name)
  
         # CEBHACKALERT: name should be a constant Parameter; the
@@ -417,7 +421,7 @@ class ParametersFrame(Frame):
         parameter_frame = ParametersFrame(parameter_window)
         parameter_frame.create_widgets(param_to_edit)
 
-        #CEBHACKALERT: this code is the same as some in add_class_selector_property()
+        #CEBALERT: this code is the same as some in add_class_selector_property()
         for (vis_name,class_) in self.translator_dictionary[param_name].items():
             if param_to_edit.__class__ == class_:
                  self.translator_dictionary[param_name].update({vis_name:param_to_edit})
@@ -445,11 +449,10 @@ class ParametersFrame(Frame):
         Reset self.parameterized_object's Parameters to their default values.
 
         For a ParameterizedObject, these are the class defaults. For a
-        ParameterizedObjectMetaclass, CEBHACKALERT currently does
-        nothing.
+        ParameterizedObjectMetaclass, currently does nothing.
         """
         if isinstance(self.parameterized_object,ParameterizedObjectMetaclass):
-            # CB: get values from source files, or what?
+            # CEBHACKALERT: get values from source files, or what?
             # When this is implemented, re-enable the Reset button in
             # editortools.
             pass

@@ -73,7 +73,7 @@ class ConnectionField(ParameterizedObject):
     # Specifies how to get a submatrix from the source sheet that is aligned
     # properly with this weight matrix.  The information is stored as an
     # array for speed of access from optimized C components.
-    # CEBHACKALERT: can rename this to 'slice_' now.
+    # CEBALERT: can rename this to 'slice_' now.
     slice_array = []
 
 
@@ -103,7 +103,7 @@ class ConnectionField(ParameterizedObject):
         if hasattr(self,'_norm_total'): delattr(self,'_norm_total')
 
 
-    # CEBHACKALERT: Accessing norm_total as a property from the C code will probably
+    # CEBALERT: Accessing norm_total as a property from the C code will probably
     # slow it down; this should be checked.
     norm_total = property(get_norm_total,set_norm_total,del_norm_total,
         """
@@ -133,7 +133,7 @@ class ConnectionField(ParameterizedObject):
         """)
 
 
-    # CEBHACKALERT: add some default values
+    # CEBALERT: add some default values
     def __init__(self,x,y,input_sheet,bounds_template,
                  weights_generator,mask_template,
                  output_fn=IdentityOF(),slice_=None,**params):
@@ -157,7 +157,7 @@ class ConnectionField(ParameterizedObject):
         already (i.e. represents the exact bounds) - see
         CFProjection.initialize_bounds().
         """
-        # CEBHACKALERT: maybe an external function is required for
+        # CEBALERT: maybe an external function is required for
         # initializing the bounds? We need to have correctly setup bounds
         # here, in change_bounds(), and in other places such as CFProjection
         # (where the mask is made). At the moment, the function is in
@@ -170,11 +170,11 @@ class ConnectionField(ParameterizedObject):
 	self.bounds_template = bounds_template
 	
         # Move bounds to correct (x,y) location, and convert to an array
-        # CEBHACKALERT: make this clearer by splitting into two functions.
+        # CEBALERT: make this clearer by splitting into two functions.
         self.offset_bounds(slice_)
 	
 
-        # CEBHACKALERT: might want to do something about a size that's specified
+        # CEBALERT: might want to do something about a size that's specified
         # (right now the size is assumed to be that of the bounds)
         w = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
                               xdensity=self.input_sheet.xdensity,
@@ -196,7 +196,7 @@ class ConnectionField(ParameterizedObject):
         output_fn(self.weights)        
 
 
-    ### CEBHACKALERT: there is presumably a better way than this.
+    ### CEBALERT: there is presumably a better way than this.
     def get_slice(self,slice_=None):
         """
         Return the correct slice for a weights/mask matrix at this
@@ -283,7 +283,7 @@ class ConnectionField(ParameterizedObject):
         Currently only supports reducing the size, not increasing, but
         should be extended to support increasing as well.
         """
-        # CEBHACKALERT: re-write to allow arbitrary resizing
+        # CEBALERT: re-write to allow arbitrary resizing
 	self.bounds_template = bounds_template
         or1,or2,oc1,oc2 = self.slice_array
 
@@ -657,7 +657,7 @@ class CFProjection(Projection):
     def create_mask_template(self):
         """
         """
-        # CEBHACKALERT: allow user to override this.
+        # CEBALERT: allow user to override this.
         # Calculate the size & aspect_ratio of the mask if appropriate;
         # mask size set to be that of the weights matrix
         if hasattr(self.weights_shape, 'size'):
@@ -673,7 +673,7 @@ class CFProjection(Projection):
                                            bounds=self.bounds_template,
                                            xdensity=self.src.xdensity,
                                            ydensity=self.src.ydensity)
-        # CEBHACKALERT: threshold should be settable by user
+        # CEBALERT: threshold should be settable by user
         mask_template = Numeric.where(mask_template>=0.5,mask_template,0.0)
 
         return mask_template
@@ -712,13 +712,13 @@ class CFProjection(Projection):
         unit_xcenter,unit_ycenter=self.src.matrixidx2sheet(center_row,
                                                            center_col)
 
-        #CEBHACKALERT: to be cleaned up...
+        #CEBALERT: to be cleaned up...
         self.center_unitxcenter,self.center_unitycenter = unit_xcenter,unit_ycenter
 
         bounds.translate(unit_xcenter-bounds_xcenter,
                          unit_ycenter-bounds_ycenter)
 
-        ### CEBHACKALERT: for now, assumes weights are to be centered
+        ### CEBALERT: for now, assumes weights are to be centered
         # about each unit, whatever the user specified. This will be
         # changed. See also CF.offset_bounds().
         #
@@ -737,7 +737,7 @@ class CFProjection(Projection):
         c1=center_col-xrad
 
         weights_slice._set_slice((r1,r2,c1,c2))
-        ### end CEBHACKALERT
+        ### end alert
 
         ### Checks:
         # (1) user-supplied bounds must lead to a weights matrix of at

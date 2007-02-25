@@ -142,7 +142,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         the activity matrix of the sheet.
         """
         rows,cols = self.activity.shape
-        # CEBHACKALERT: use matrixidx2sheet_array
+        # CEBALERT: Should use matrixidx2sheet_array
         coords = [self.matrixidx2sheet(r,0) for r in range(rows-1,-1,-1)]
         return [y for (x,y) in coords]
 
@@ -152,7 +152,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         of the activity matrix of the sheet.
         """
         rows,cols = self.activity.shape
-        # CEBHACKALERT: use matrixidx2sheet_array
+        # CEBALERT: Should use matrixidx2sheet_array
         coords = [self.matrixidx2sheet(0,c) for c in range(cols)]
         return [x for (x,y) in coords]
 
@@ -211,7 +211,7 @@ class Slice(object):
     SheetCoordinateSystem's bounds, use crop_to_sheet().
     """
     ### Allows shape to work like Numeric.array's
-    # CEBHACKALERT: can this method be made private?
+    # CEBALERT: can this method be made private?
     def get_shape(self):
         """Return the shape of the slice."""
         r1,r2,c1,c2 = self.__slice

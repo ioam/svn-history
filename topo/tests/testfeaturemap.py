@@ -8,7 +8,7 @@ __version__='$Revision$'
 
 
 
-# CEBHACKALERT: this isn't finished.
+# CEBALERT: this isn't finished.
 
 
 import unittest

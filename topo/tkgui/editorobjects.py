@@ -490,7 +490,7 @@ class EditorConnection(EditorObject):
         self.to_node.attach_connection(self, self.TO)
 
     def remove(self):
-        # CEBHACKALERT: there's no code here to handle GUI object
+        # CEBALERT: there's no code here to handle GUI object
         # removal (though the EditorProjection subclass does have GUI
         # removal code, so presumably projections do get removed from
         # the screen. But I'm confused about what is treated as a

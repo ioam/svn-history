@@ -93,7 +93,7 @@ class PropertiesFrame(Frame):
                                      selectioncommand=(lambda value: self.properties[name].set(value)),
                                      **kw)
                 
-        # CEBHACKALERT: this doesn't work for PMW. How do we bind the return
+        # CEBALERT: this doesn't work for PMW. How do we bind the return
         # key to a PMW combobox? I couldn't figure it out.
         control.bind('<Return>', self.optional_refresh)
         return self.add_property(name,var,control,value)
@@ -107,8 +107,8 @@ class PropertiesFrame(Frame):
          return self.add_property(name,var,control,value)
 
 
-    # CEBHACKALERT: currently unused, but could be used in the future to set the
-    # properties from a dictionary (see CEBHACKALERT in ParametersFrame).
+    # CEBALERT: currently unused, but could be used in the future to set the
+    # properties from a dictionary (see CEBALERT in ParametersFrame).
 ##     def set_values(self,values):
 ##         for (name,value) in values.items():
 ##             self.properties[name].set(value)

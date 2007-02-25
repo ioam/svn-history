@@ -229,7 +229,7 @@ def keys_sorted_by_value(d):
     return [ backitems[i][1] for i in range(0,len(backitems))]
 
 
-# CEBHACKALERT: this could be improved!
+# CEBALERT: this could be improved!
 import inspect
 from topo.base.parameterizedobject import Parameter, ParameterizedObject
 def get_states_of_classes_from_module(module,states_of_classes,processed_modules,exclude=None):

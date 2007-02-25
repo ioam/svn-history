@@ -187,11 +187,11 @@ class ProjectionSheet(Sheet):
         The sheet's own activity is not calculated until activate()
         is called.
         """
-        # CEBHACKALERT: can remove assert statement.
+        # CEBALERT: can remove assert statement.
         assert isinstance(conn,Projection), type(conn)
         conn.activate(input_activity)
         
-    # CEBHACKALERT: check if we still need this now that in_connections
+    # CEBALERT: check if we still need this now that in_connections
     # is a list. We should be able to delete it.
     def projections(self):
         """

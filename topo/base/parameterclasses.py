@@ -13,11 +13,11 @@ import sys
 from parameterizedobject import Parameter, descendents
 
 
-# CEBHACKALERT: much of the documentation for Parameter subclasses
+# CEBALERT: much of the documentation for Parameter subclasses
 # that ought to be in the class docstring is in the __init__
 # docstring so that it shows up. In some cases there is
 # some repetition.
-# See JABHACKALERT by Parameter's __doc__.
+# See JAB hackalert by Parameter's __doc__.
 
 class Filename(Parameter):
     """
@@ -35,7 +35,7 @@ class Filename(Parameter):
     __slots__ = ['search_paths']
     __doc__ = property((lambda self: self.doc))
 
-    # CEBHACKALERT: there's a better way, right? See the sys module documentation,
+    # CEBALERT: there's a better way, right? See the sys module documentation,
     # and consider unix and windows.
     def __init__(self,default=None,search_paths=[os.path.split(os.path.split(sys.executable)[0])[0]],**params):
         """
@@ -121,7 +121,7 @@ class Enumeration(Parameter):
         """
         Raises an error if the given value isn't in the list of available ones.
         """
-        # CEBHACKALERT: it would be good to print the Parameter's name
+        # CEBALERT: it would be good to print the Parameter's name
         # here (see also Number and elsewhere in this file).
         if not self.available.count(val) >= 1:
             raise ValueError("EnumeratedParamater can't be set to '" + repr(val) + "' because that's not in the list of available values " + repr(self.available) + ".")
@@ -379,8 +379,7 @@ class DynamicNumber(Number):
         self._softbounds = softbounds  
         self._check_bounds(default)  # only create this number if the default value and bounds are consistent
 
-        # CEBHACKALERT: allows to avoid the problem of displaying the value without
-        # changing its value.
+        # Provides a way to display a value without changing it
         self.last_value = None
 
     def __get__(self,obj,objtype):

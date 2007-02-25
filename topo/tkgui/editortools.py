@@ -262,7 +262,7 @@ class ParametersTool(Frame):
 
     def __init__(self, parent = None):
 
-        # CEBHACKALERT: need to tidy up the title, positioning, etc.
+        # CEBALERT: need to tidy up the title, positioning, etc.
         Frame.__init__(self, parent)
         self.focus = None
         # label
@@ -272,7 +272,7 @@ class ParametersTool(Frame):
         self.doc_label.pack(side = TOP)
 
         
-        # CEBHACKALERT: (Going to add apply and reset)
+        # CEBALERT: (Going to add apply and reset)
         self.parameter_frame = ParametersFrame(self,buttons_to_remove=['Apply','Reset','Ok','Cancel'])        
         self.parameter_frame.pack(side=BOTTOM)
 

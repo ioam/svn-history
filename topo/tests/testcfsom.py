@@ -107,7 +107,7 @@ class TestCFSom(unittest.TestCase):
         self.sheet2 = Sheet()
 
 
-# CEBHACKALERT: replace with an equivalent example that uses Image
+# CEBALERT: replace with an equivalent example that uses Image
 ##     def test_imagegenerator(self):
 ##         """
 ##         Code moved from __main__ block of cfsom.py.  Gives a tight example

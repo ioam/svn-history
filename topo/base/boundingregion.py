@@ -269,7 +269,7 @@ class BoundingBoxIntersection(BoundingBox):
         right = min([r for (l,b,r,t) in bounds])
         top = min([t for (l,b,r,t) in bounds])
 
-        # JABHACKALERT: Why is this one __aarect, and BoundingBox
+        # JABALERT: Why is this one __aarect, and BoundingBox
         # _aarect?  Probably should change this one to _aarect and
         # eliminate aarect(self).
         self.__aarect = AARectangle((left,bottom),(right,top))

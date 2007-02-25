@@ -92,7 +92,7 @@ class TestActivityPanel(unittest.TestCase):
         sheetG.activity = self.ga
         sheetB.activity = self.ba
 
-        # CEBHACKALERT: I don't understand what this is testing; it's not
+        # CEBALERT: I don't understand what this is testing; it's not
         # used later.
 ##         self.s.add(sheetR)
 ##         self.s.add(sheetG)
@@ -113,7 +113,7 @@ class TestActivityPanel(unittest.TestCase):
         Pmw.initialise(root)
         console = topo.tkgui.topoconsole.TopoConsole(parent=root)
         console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
-        # CEBHACKALERT: what was this testing?
+        # CEBALERT: what was this testing?
         #console.set_active_simulator()
 
         #console.new_activity_window()

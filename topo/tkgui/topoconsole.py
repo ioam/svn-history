@@ -335,7 +335,7 @@ class TopoConsole(Frame):
         go = Button(learning_frame,text="Go",
                     command=Pmw.busycallback(self.do_learning))
         go.pack(side=LEFT)
-        # CEBHACKALERT: this prevents the simulation time from being updated
+        # CEBALERT: this prevents the simulation time from being updated
         # in the messagebar
         #self.balloon.bind(go,"Run the simulation for the specified duration.")
 

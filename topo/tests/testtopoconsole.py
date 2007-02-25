@@ -5,7 +5,7 @@ $Id$
 __version__='$Revision$'
 
 
-# CEBHACKALERT: doesn't test topoconsole completely.
+# CEBALERT: doesn't test topoconsole completely.
 
 import topo
 import unittest
@@ -16,7 +16,7 @@ import topo.base.simulation
 
 class TestTopoConsole(unittest.TestCase):
     def setUp(self):
-        # CEBHACKALERT: do we need such a test now?
+        # CEBALERT: do we need such a test now?
         # topo.base.registry.set_active_sim(None)
         self.s = Simulation(register=False)
         self.console = start()

@@ -12,7 +12,7 @@ from topo.base.simulation import *
 from topo.eps.basic import *
 
 
-# CEBHACKALERT: not a complete test of Simulation
+# CEBALERT: not a complete test of Simulation
 
 class TestSimulation(unittest.TestCase):
     def test_event_copy(self):

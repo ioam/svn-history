@@ -160,8 +160,6 @@ are stored.""")
     ### anything about CFs, and this code can only handle CFs (at
     ### present).
     ###
-    ### JABHACKALERT!
-    ###
     ### Items in the Projection list in CFSheets should always be
     ### guaranteed to have unique names; if that's not true at
     ### present, the definition of an EventProcessor or a CFSheet (as

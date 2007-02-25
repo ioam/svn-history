@@ -22,19 +22,21 @@ $Id$
 
 __version__='$Revision$'
 
-# CEBHACKALERT: if I try to do e.g.
+# CEBHACKALERT:
+# 
+# Maybe when we altered the way that Topographica starts up,
+# this file got forgotten and is no longer used?
+#
+# if I try to do e.g.
 #   import examples.obermayer_pnas90
 # I get an error that the module doesn't exist.
 # If I rename obermayer_pnas90.ty to obermayer_pnas90.py,
 # the import works fine.
 #
-# Maybe when we altered the way that Topographica starts up,
-# this file got forgotten and is no longer used?
-#
 # Consider that exec_file can be used to run a script from the
 # command line, so maybe we no longer need this file?
 
-### JABHACKALERT!
+### JAB:
 ###
 ### What does "Replaced extension module with the full imputil once
 ### problems were encountered with subpackages for future

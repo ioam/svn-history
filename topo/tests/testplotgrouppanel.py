@@ -90,7 +90,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         sheetG.activity = self.ga
         sheetB.activity = self.ba
 
-        # CEBHACKALERT: I don't understand what this was supposed to
+        # CEBALERT: I don't understand what this was supposed to
         # test (i.e. how is it used by one of the tests?).
 ##         self.s.add(sheetR)
 ##         self.s.add(sheetG)

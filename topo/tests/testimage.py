@@ -4,7 +4,7 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBHACKALERT: incomplete - being written.
+# CEBALERT: incomplete - being written.
 
 # To do:
 # - finish the positioning tests (like tests 1 and 2)

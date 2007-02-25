@@ -154,7 +154,7 @@ class SheetCoordinateSystem(object):
                         """The spacing between elements in an underlying
                         matrix representation, in the y direction.""")
 
-    ### CEBHACKALERT: temporary implementation
+    ### CEBHACKALERT: temporary implementation.  JAB: In what way?
     def get_shape(self):
         r1,r2,c1,c2 = self.bounds2slice(self.bounds)
         return (r2-r1,c2-c1)
@@ -323,7 +323,7 @@ class SheetCoordinateSystem(object):
         return self.matrixidx2sheet_array(rows,cols)
 
 
-    ### CEBHACKALERT: move these two methods to Slice.
+    ### CEBALERT: move these two methods to Slice.
     def bounds2slice(self,slice_bounds):
         """
         Convert a bounding box into an array slice suitable for computing

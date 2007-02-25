@@ -175,7 +175,7 @@ class Distribution(object):
             if self.cyclic==False:
                 if not (self.axis_bounds[0] <= bin <= self.axis_bounds[1]):
                     raise ValueError("Bin outside bounds.")
-            # CEBHACKALERT: Neet to support wrapping of bin values
+            # CEBALERT: Neet to support wrapping of bin values
             # else:  new_bin = wrap(self.axis_bounds[0], self.axis_bounds[1], bin)
             new_bin = bin
             

@@ -200,7 +200,7 @@ class Parameter(object):
     # describes X's specific Parameters).  Seems difficult, though.
 
 
-    # CEBHACKALERT: I think this can be made simpler
+    # CEBALERT: I think this can be made simpler
     def __init__(self,default=None,doc=None,hidden=False,precedence=None,instantiate=False,constant=False):
         """
         Initialize a new parameter.
@@ -243,7 +243,7 @@ class Parameter(object):
         self.doc = doc
         self.constant = constant
 
-        # CEBHACKALERT: constants must be instantiated: should this
+        # CEBALERT: constants must be instantiated: should this
         # instead be a check and raise an error to inform the user?
         if self.constant:
             self.instantiate = True
@@ -798,8 +798,8 @@ class ParameterizedObject(object):
         """
         from parameterclasses import DynamicNumber
         
-        # CEBHACKALERT: avoids getting a new value for a DynamicNumber!
-        # (Otherwise, all that should be here is value=getattr(self,name).)
+        # Avoids getting a new value for a DynamicNumber. Otherwise,
+        # all that would be here is value=getattr(self,name).)
         k = "_%s_param_value"%(name)
         if k in self.__dict__:
             if isinstance(self.__dict__[k],DynamicNumber):
@@ -808,7 +808,6 @@ class ParameterizedObject(object):
                 value = getattr(self,name)
         else:
             value = getattr(self,name)                    
-        # end CEBHACKALERT 
 
         return value
 
@@ -866,7 +865,7 @@ class ParameterizedObject(object):
         Return Parameters with modifiable values to the class defaults.
         """
         for (attr_name,param) in self.params().items():
-            # CEBHACKALERT: name should be Constant - should stop faking it
+            # CEBALERT: name should be Constant - should stop faking it
             # everywhere (see current task list).
             if param.constant or attr_name=="name": # CB:what about instantiate & dynamic?
                 pass

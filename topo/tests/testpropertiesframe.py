@@ -6,7 +6,7 @@ $Id$
 __version__='$Revision$'
 
 
-# CEBHACKALERT: this does not test PropertiesFrame completely.
+# CEBALERT: this does not test PropertiesFrame completely.
 
 import unittest
 from Tkinter import *
@@ -32,7 +32,7 @@ class TestPropertiesFrame(unittest.TestCase):
 #                                      min_value="0",max_value="11",
 #                                      string_translator=string.atof)
     
-        # CEBHACKALERT: "I fix this another day"
+        # CEBALERT: "I fix this another day"
         #pp.add_combobox_property("File",value='xxx',
         #                         scrolledlist_items=('AAA','BBB','CCC'))
         

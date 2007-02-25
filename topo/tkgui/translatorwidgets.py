@@ -80,11 +80,11 @@ class ComboBoxTranslator(Pmw.ComboBox,WidgetTranslator):
         self.__selection_command = selectioncommand
         self.selectitem(initial_selection)
 
-        # CEBHACKALERT: I'd like to display a help balloon for items in the listbox,
+        # CEBALERT: I'd like to display a help balloon for items in the listbox,
         # but that doesn't seem to be possible! on_selection() and the help balloon
         # here are a hack to have at least help text for the currently selected item.
         
-        # CEBHACKALERT: could probably move this stuff up to widgettranslator so
+        # CEBALERT: could probably move this stuff up to widgettranslator so
         # that there is help text for other types of widget.
         
         # create balloon and bind to initial value
