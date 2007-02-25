@@ -6,6 +6,7 @@ __version__='$Revision$'
 
 import pickle
 import __main__
+import gzip
 
 import topo
 
@@ -156,7 +157,7 @@ def save_snapshot(snapshot_name):
 
     ### Now pickle the lot to a file
     #
-    pickle.dump( (topo.sim.actual_sim,states_of_classes), open(snapshot_name,'wb'),2)
+    pickle.dump( (topo.sim.actual_sim,states_of_classes), gzip.open(snapshot_name,'wb'),2)
 
 
 def load_snapshot(snapshot_name):
@@ -166,7 +167,7 @@ def load_snapshot(snapshot_name):
     Unpickles the simulation, sets ParameterizedObject class
     attributes, and executes commands in topo.sim.startup_commands
     """
-    sim,states_of_classes = pickle.load(open(snapshot_name,'rb'))
+    sim,states_of_classes = pickle.load(gzip.open(snapshot_name,'rb'))
 
     topo.sim.change_sim(sim)
 
