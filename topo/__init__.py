@@ -51,8 +51,8 @@ __all__ = ['analysis',
 # gets set by the topographica script
 release = ''
 
-# Enable automatic importing of .ty files, treating them just like .py
-import topo.misc.tyimputil
+# JABHACKALERT: Disabled for now to see if we can delete tyimputil.py altogether
+#import topo.misc.tyimputil
 
 
 
