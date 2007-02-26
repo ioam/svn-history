@@ -232,9 +232,9 @@ def keys_sorted_by_value(d):
 # CEBALERT: this could be improved!
 import inspect
 from topo.base.parameterizedobject import Parameter, ParameterizedObject
-def get_states_of_classes_from_module(module,states_of_classes,processed_modules,exclude=None):
+def get_states_of_classes_from_module(module,states_of_classes,processed_modules,exclude=()):
     """
-    Recursively search module and get states of classes within it.
+    Recursively search module and get states of ParameterizedObject classes within it.
 
     states_of_classes is a dictionary {module.path.and.Classname: state}
 
@@ -249,14 +249,11 @@ def get_states_of_classes_from_module(module,states_of_classes,processed_modules
     """
     if not exclude:
         exclude = []
-
-#    print "process",module
     
     dict_ = module.__dict__
     for (k,v) in dict_.items():
         if '__all__' in dict_ and inspect.ismodule(v) and k not in exclude:
             if k in dict_['__all__'] and v not in processed_modules:
-                #print "pickling classes in",k
                 get_states_of_classes_from_module(v,states_of_classes,processed_modules,exclude)
             processed_modules.append(v)
 
@@ -271,7 +268,7 @@ def get_states_of_classes_from_module(module,states_of_classes,processed_modules
                 # is correct to set the attributes on the true class.
                 full_class_path = v.__module__+'.'+v.__name__
                 states_of_classes[full_class_path] = {}
-                # class ALWAYS has __dict__, right? And no P.O. has slots.
+                # POs always have __dict__, never slots
                 for (name,obj) in v.__dict__.items():
                     if isinstance(obj,Parameter):
                         states_of_classes[full_class_path][name] = obj
