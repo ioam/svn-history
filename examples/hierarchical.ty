@@ -38,15 +38,6 @@ GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0.25
 GeneratorSheet.nominal_density = 20
 
-
-# CEBHACKALERT: something isn't working about using e.g.
-# PatternGeneratorParameter(default=X) in various places in the code
-# so I've temporarily commented out this line.
-# PatternGeneratorParameter.default=topo.patterns.basic.Line()
-
-
-
-
 left_input_pattern = topo.patterns.basic.Line(
     thickness=0.02,
     bounds=BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
@@ -128,3 +119,7 @@ topo.sim['V2'].gui_x=500          ; topo.sim['V2'].gui_y=230
 topo.sim['V3'].gui_x=500          ; topo.sim['V3'].gui_y=90
 topo.sim['LeftRetina'].gui_x=151  ; topo.sim['LeftRetina'].gui_y=520
 topo.sim['RightRetina'].gui_x=369 ; topo.sim['RightRetina'].gui_y=520
+
+
+# set default input generator (e.g. for the GUI)
+GeneratorSheet.input_generator.default=topo.patterns.basic.Line()
