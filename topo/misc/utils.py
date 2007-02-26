@@ -229,14 +229,15 @@ def keys_sorted_by_value(d):
     return [ backitems[i][1] for i in range(0,len(backitems))]
 
 
-# CEBALERT: this could be improved!
+# CEBALERT: might could be simplified
 import inspect
 from topo.base.parameterizedobject import Parameter, ParameterizedObject
-def get_states_of_classes_from_module(module,states_of_classes,processed_modules,exclude=()):
+def get_PO_class_attributes(module,class_attributes,processed_modules,exclude=()):
     """
-    Recursively search module and get states of ParameterizedObject classes within it.
+    Recursively search module and get attributes of ParameterizedObject classes within it.
 
-    states_of_classes is a dictionary {module.path.and.Classname: state}
+    class_attributes is a dictionary {module.path.and.Classname: state}, where state
+    is the dictionary {attribute: value}.
 
     Something is considered a module for our purposes if inspect says it's a module,
     and it defines __all__. We only search through modules listed in __all__.
@@ -245,16 +246,13 @@ def get_states_of_classes_from_module(module,states_of_classes,processed_modules
     more than once (since e.g. __main__ contains __main__ contains
     __main__...)
 
-    Packages can be specifically excluded if listed in exclude.
+    Modules can be specifically excluded if listed in exclude.
     """
-    if not exclude:
-        exclude = []
-    
     dict_ = module.__dict__
     for (k,v) in dict_.items():
         if '__all__' in dict_ and inspect.ismodule(v) and k not in exclude:
             if k in dict_['__all__'] and v not in processed_modules:
-                get_states_of_classes_from_module(v,states_of_classes,processed_modules,exclude)
+                get_PO_class_attributes(v,class_attributes,processed_modules,exclude)
             processed_modules.append(v)
 
         else:
@@ -267,11 +265,11 @@ def get_states_of_classes_from_module(module,states_of_classes,processed_modules
                 # - and the actual class - is "CFPRF_DotProduct". It
                 # is correct to set the attributes on the true class.
                 full_class_path = v.__module__+'.'+v.__name__
-                states_of_classes[full_class_path] = {}
+                class_attributes[full_class_path] = {}
                 # POs always have __dict__, never slots
                 for (name,obj) in v.__dict__.items():
                     if isinstance(obj,Parameter):
-                        states_of_classes[full_class_path][name] = obj
+                        class_attributes[full_class_path][name] = obj
 
 def shortclassname(x):
     """
