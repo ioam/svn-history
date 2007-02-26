@@ -135,13 +135,8 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 
         
 
-        # Set initial PatternGenerator to PatternGeneratorParameter.default
-        #
+        self.__current_pattern_generator = GeneratorSheet.input_generator.default
 
-        # CEBALERT: does this 'default' work? (There's a note in the current tasks
-        # section about this.)
-        assert isinstance(generator_sheet_params['input_generator'].default,topo.base.patterngenerator.PatternGenerator) 
-        self.__current_pattern_generator = generator_sheet_params['input_generator'].default
         
         self.__current_pattern_generator_name = StringVar()
         # CEBALERT: presumably can set the current pg from the name in a better way
