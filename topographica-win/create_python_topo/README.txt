@@ -14,8 +14,8 @@ added does someone need to go through this procedure.
 
 Please note: it will trash any existing copy of python that you have
 installed before (so not a python associated with topographica, but a
-standalone one). It seems
-you can only have
+standalone one). It seems you can only have one copy of Python 2.4
+installed at once.
 
 
 (1) Run setup.bat. Accept all defaults (they're set programmatically)
@@ -26,6 +26,6 @@ you can only have
     directory works.
 
 (3) If it does, turn it into a tar.gz file and commit to the repository
-    (topographica-win\common\python_topo.tar.gz
+    (topographica-win\common\python_topo.tar.gz)
 
 
