@@ -57,7 +57,7 @@ import topo.misc.tyimputil
 
 
 # CEBALERT: name and location might be changed.
-from topo.misc.utils import get_states_of_classes_from_module
+from topo.misc.utils import get_PO_class_attributes
 from topo.base.parameterizedobject import ParameterizedObject,Parameter
 import __main__
 class PickleSupport(object):
@@ -87,7 +87,7 @@ class PickleSupport(object):
         
         class_attributes = {}
         # For now we just search topo, but it could be extended to all packages.
-        get_states_of_classes_from_module(topo,class_attributes,[],exclude=('plotting','tkgui','tests'))
+        get_PO_class_attributes(topo,class_attributes,[],exclude=('plotting','tkgui','tests'))
 
         global sim
         sim.RELEASE=release
