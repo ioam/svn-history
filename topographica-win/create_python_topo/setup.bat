@@ -1,57 +1,58 @@
 @echo off
 
-REM CEBALERT: need to update Numeric-->numpy, update weave version
-REM (extracting it from the scipy binary), and install Gnosis_Utils
+REM add Gnosis_Utils, libsndfile, pyaudiolab, mlabwrap
 
 
-REM assumes we're going to c:\Python24
+REM Assumes we're going to c:\Python24; be careful to update everything if you decide to
+REM change this.
 
 set startdir=%CD%
 
+
+REM ** GRAB PACKAGES IN COMMON WITH topographica\external
+REM Pmw
 ..\util\gunzip -c ..\..\external\Pmw.tgz > ..\..\external\Pmw.tar
 ..\util\tar xvf ..\..\external\Pmw.tar
 copy ..\..\external\Pmw .
 
-
-..\util\gunzip weave.tar.gz
-..\util\tar xvf weave.tar
-..\util\gunzip scipy_test.tar.gz
-..\util\tar xvf scipy_test.tar
-
-
-
 cd ..
+
+REM CEBALERT: because of some path trouble with some of the installation
+REM programs, we move to working in c:\create_python_topo.
 xcopy /E /I create_python_topo c:\create_python_topo
 xcopy /E /I util c:\create_python_topo\util
-REM CEBHACKALERT: because the msi won't run from this directory, at least
-REM on my PC! Why? Is it a path problem?
 c:
 cd \
 cd create_python_topo
 
 
-start /w msiexec /i python-2.4.2.msi ALLUSERS=0 TARGETDIR=c:\python24 ADDLOCAL=DefaultFeature,TclTk
-start /w Numeric-24.2.win32-py2.4.exe
-start /w matplotlib-0.81.win32-py2.4.exe
-start /w PIL-1.1.5.win32-py2.4.exe
-REM start /w scipy-0.5.1.win32-py2.4.exe
+REM * python,tcl/tk
+start /w msiexec /i python-2.4.4.msi ALLUSERS=0 TARGETDIR=c:\python24 ADDLOCAL=DefaultFeature,TclTk
 
+REM * numpy
+start /w numpy-1.0.1.win32-py2.4.exe
+
+REM * matplotlib
+start /w matplotlib-0.90.0.win32-py2.4.exe
+
+REM * PIL
+start /w PIL-1.1.5.win32-py2.4.exe
+
+REM * scipy
+start /w scipy-0.5.2.win32-py2.4.exe
+
+REM * PMW
 move Pmw c:\python24\Lib\site-packages
 
-REM this is weave that I think I compiled with mingw from
-REM scipy 0.3.2, since none was already compiled for 
-REM python 2.4 and Numeric 24. The way scipy is organized
-REM has changed in later releases (notably weave has changed location; 
-REM when topographica
-REM switches to use a recent scipy, we should just be able
-REM to use the scipy*.exe provided online (as for Numeric, etc).
-REM and remove these.
-move weave c:\python24\Lib\site-packages
-move scipy_test c:\python24\Lib\site-packages
+
+
+REM CEBALERT: when scipy is compiled by default in the linux distribution, and it's
+REM "from scipy import weave" rather than "import weave", then remove this
+xcopy /E /I c:\python24\Lib\site-packages\scipy\weave c:\python24\Lib\site-packages\weave
 
 
 REM ** For fixedpoint, the patched version from unix is used.
-REM ** CEBHACKALERT: use the patch executable in utils to create the
+REM ** CEBALERT: use the patch executable in utils to create the
 REM patch from the diff and fixedpoint.tgz file in external\
 move fixedpoint-0.1.2_patched.py c:\python24\Lib\site-packages\fixedpoint.py
 
