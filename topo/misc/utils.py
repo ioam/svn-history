@@ -229,48 +229,6 @@ def keys_sorted_by_value(d):
     return [ backitems[i][1] for i in range(0,len(backitems))]
 
 
-# CEBALERT: might could be simplified
-import inspect
-from topo.base.parameterizedobject import Parameter, ParameterizedObject
-def get_PO_class_attributes(module,class_attributes,processed_modules,exclude=()):
-    """
-    Recursively search module and get attributes of ParameterizedObject classes within it.
-
-    class_attributes is a dictionary {module.path.and.Classname: state}, where state
-    is the dictionary {attribute: value}.
-
-    Something is considered a module for our purposes if inspect says it's a module,
-    and it defines __all__. We only search through modules listed in __all__.
-
-    Keeps a list of processed modules to avoid looking at the same one
-    more than once (since e.g. __main__ contains __main__ contains
-    __main__...)
-
-    Modules can be specifically excluded if listed in exclude.
-    """
-    dict_ = module.__dict__
-    for (k,v) in dict_.items():
-        if '__all__' in dict_ and inspect.ismodule(v) and k not in exclude:
-            if k in dict_['__all__'] and v not in processed_modules:
-                get_PO_class_attributes(v,class_attributes,processed_modules,exclude)
-            processed_modules.append(v)
-
-        else:
-            if isinstance(v,type) and issubclass(v,ParameterizedObject):
-
-                # Note: we take the class name as v.__name__, not k, because
-                # k might be just a label for the true class. For example,
-                # if Topographica falls back to the unoptimized components,
-                # k could be "CFPRF_DotProduct_opt", but v.__name__
-                # - and the actual class - is "CFPRF_DotProduct". It
-                # is correct to set the attributes on the true class.
-                full_class_path = v.__module__+'.'+v.__name__
-                class_attributes[full_class_path] = {}
-                # POs always have __dict__, never slots
-                for (name,obj) in v.__dict__.items():
-                    if isinstance(obj,Parameter):
-                        class_attributes[full_class_path][name] = obj
-
 def shortclassname(x):
     """
     Returns the class name of x as a string with the leading package information removed.
