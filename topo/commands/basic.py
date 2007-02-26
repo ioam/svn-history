@@ -16,9 +16,6 @@ from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 from topo.base.projection import ProjectionSheet
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.misc.utils import get_states_of_classes_from_module
-
-
 
 
 
