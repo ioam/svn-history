@@ -523,7 +523,10 @@ Display issues;
   (Part of our general project of allowing
    user-configurable units. I think that's is the only way to do things
    like this, because the simulator is not limited to vision only, and so
-   the underlying units have to be very general.)
+   the underlying units have to be very general.
+   See http://ipython.scipy.org/doc/manual/node11.html
+   for bg on handling arbitrary units.
+ )
 
 Minor
   
@@ -592,6 +595,13 @@ Apparently it can be built using a free (money) Microsoft compiler:
 http://wiki.python.org/moin/Building_Python_with_the_free_MS_C_Toolkit
 </li>
 
+<li>
+2007/02/26: Consider moving to IPython, to get command-prompt
+completion in the local namespace, debugging in the namespace of the
+exception, with easier to follow tracebacks, persistent command
+histories, easy interaction with the system shell (using ! to get a
+shell and $ to feed it Python variables), and session logging.
+</li>
 
 <li>
 2007/02/21 (CB): Investigate using Tile (which has become part of
