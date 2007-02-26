@@ -115,82 +115,28 @@ def save_snapshot(snapshot_name):
     """
     Save a snapshot of the network's current state.
 
-    Commands stored in topo.sim.startup_commands will be executed
-    by the corresponding load_snapshot() function.
-
     Uses Python's 'pickle' module, so subject to the same limitations
     (see the pickle module's documentation) - with the notable
     exception of class attributes. Python does not pickle class
     attributes, but this function stores class attributes of any
     ParameterizedObject class that is declared within the topo
-    package.
-
-    (Subpackages of topo that are not part of the simulation are
-    excluded from having their classes' attributes saved: plotting,
-    tkgui, and tests.)
+    package. See the topo.PickleSupport class for more information.
     """
-    ### Warn that classes & functions defined in __main__ won't unpickle
-    #
-    import types
-    for k,v in __main__.__dict__.items():
-        # there's classes and functions...what else?
-        if isinstance(v,type) or isinstance(v,types.FunctionType):
-            if v.__module__ == "__main__":
-                ParameterizedObject().warning("%s (type %s) has source in __main__; it will only be found on unpickling if the class is explicitly defined (e.g. by running the same script first) before unpickling."%(k,type(v)))
-
-
-    ### Get ParameterizedObject class attributes
-    #
-    states_of_classes = {}
-
-    # For now we just search topo, but it could be extended to all packages.
-    # We exclude certain subpackages that contain classes that aren't part
-    # of the simulation.
-    exclude = ('plotting','tkgui','tests') 
-    get_states_of_classes_from_module(topo,states_of_classes,[],exclude)
-
-
-    ### Set the release version for this simulation.
-    #
-    topo.sim.RELEASE = topo.release
-
-
-    ### Now pickle the lot to a file
-    #
-    pickle.dump( (topo.sim.actual_sim,states_of_classes), gzip.open(snapshot_name,'wb'),2)
+    # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
+    # If not, then startup commands are not necessarily executed before
+    # the simulation is unpickled
+    pickle.dump( (topo._picklesupport,topo.sim.actual_sim) , gzip.open(snapshot_name,'wb'),2)
 
 
 def load_snapshot(snapshot_name):
     """
     Load the simulation stored in snapshot_name.
-
-    Unpickles the simulation, sets ParameterizedObject class
-    attributes, and executes commands in topo.sim.startup_commands
     """
-    sim,states_of_classes = pickle.load(gzip.open(snapshot_name,'rb'))
-
+    # unpickling the PickleSupport() executes startup_commands and
+    # sets PO class parameters.
+    discard,sim = pickle.load(gzip.open(snapshot_name,'rb'))
     topo.sim.change_sim(sim)
 
-    ### Set class attributes
-    #
-    # (i.e. execute in __main__ the command "path.to.module.Class.x=y" for each class)
-    for class_name,state in states_of_classes.items():
-
-        # from "topo.base.parameter.Parameter", we want "topo.base.parameter"
-        module_path = class_name[0:class_name.rindex('.')]
-        exec 'import '+module_path in __main__.__dict__
-
-        # now restore class Parameter values
-        for p_name,p in state.items():
-            __main__.__dict__['val'] = p
-            try:
-                exec 'setattr('+class_name+',"'+p_name+'",val)' in __main__.__dict__
-            except:
-                ParameterizedObject().warning('Problem restoring parameter %s=%s for class %s; name may have changed since the snapshot was created.' % (p_name,repr(p),class_name))
 
 
-    ### Execute the startup commands
-    #
-    for cmd in topo.sim.startup_commands:
-        exec cmd in __main__.__dict__
 
