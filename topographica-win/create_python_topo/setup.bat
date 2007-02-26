@@ -1,6 +1,6 @@
 @echo off
 
-REM add Gnosis_Utils, libsndfile, pyaudiolab, mlabwrap
+REM still to add: libsndfile, pyaudiolab, mlabwrap
 
 
 REM Assumes we're going to c:\Python24; be careful to update everything if you decide to
@@ -14,6 +14,12 @@ REM Pmw
 ..\util\gunzip -c ..\..\external\Pmw.tgz > ..\..\external\Pmw.tar
 ..\util\tar xvf ..\..\external\Pmw.tar
 copy ..\..\external\Pmw .
+REM Gnosis_Utils
+..\util\gunzip -c ..\..\external\Gnosis_Utils-1.2.1.tar.gz > ..\..\external\Gnosis_Utils-1.2.1.tar
+..\util\tar xvf ..\..\external\Gnosis_Utils-1.2.1.tar
+copy ..\..\external\Gnosis_Utils-1.2.1 .
+
+
 
 cd ..
 
@@ -25,6 +31,8 @@ c:
 cd \
 cd create_python_topo
 
+
+REM ** INSTALL PACKAGES
 
 REM * python,tcl/tk
 start /w msiexec /i python-2.4.4.msi ALLUSERS=0 TARGETDIR=c:\python24 ADDLOCAL=DefaultFeature,TclTk
@@ -44,8 +52,15 @@ start /w scipy-0.5.2.win32-py2.4.exe
 REM * PMW
 move Pmw c:\python24\Lib\site-packages
 
+REM * gnosis
+cd Gnosis_Utils-1.2.1\
+c:\python24\python.exe setup.py install
+cd ..
+
+REM CEBALERT: why isn't the jpeg package installed? (What's it required for?)
 
 
+REM * weave
 REM CEBALERT: when scipy is compiled by default in the linux distribution, and it's
 REM "from scipy import weave" rather than "import weave", then remove this
 xcopy /E /I c:\python24\Lib\site-packages\scipy\weave c:\python24\Lib\site-packages\weave
