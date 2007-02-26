@@ -54,8 +54,76 @@ release = ''
 # Enable automatic importing of .ty files, treating them just like .py
 import topo.misc.tyimputil
 
+
+
+# CEBALERT: name and location might be changed.
+from topo.misc.utils import get_states_of_classes_from_module
+from topo.base.parameterizedobject import ParameterizedObject,Parameter
+import __main__
+class PickleSupport(object):
+    """
+    When requested to be pickled, stores topo's PO classes' attributes and
+    topo.sim.startup_commands.
+    """
+    def __getstate__(self):
+        """
+        Return a dictionary of topo's PO classes' attributes, plus
+        topo.sim's startup_commands.
+
+        Subpackages of topo that are not part of the simulation are
+        excluded from having their classes' attributes saved: plotting,
+        tkgui, and tests.  [CB: can add analysis, etc.]
+
+        Also sets the value of topo.sim.RELEASE.
+        """
+        # warn that classes & functions defined in __main__ won't unpickle
+        import types
+        for k,v in __main__.__dict__.items():
+            # there's classes and functions...what else?
+            if isinstance(v,type) or isinstance(v,types.FunctionType):
+                if v.__module__ == "__main__":
+                    ParameterizedObject().warning("%s (type %s) has source in __main__; it will only be found on unpickling if the class is explicitly defined (e.g. by running the same script first) before unpickling."%(k,type(v)))
+
+        
+        class_attributes = {}
+        # For now we just search topo, but it could be extended to all packages.
+        get_states_of_classes_from_module(topo,class_attributes,[],exclude=('plotting','tkgui','tests'))
+
+        global sim
+        sim.RELEASE=release
+
+        return {'class_attributes':class_attributes,
+                'startup_commands':topo.sim.actual_sim.startup_commands}   
+
+
+    def __setstate__(self,state):
+        """
+        Execute the startup commands and set class attributes.
+        """
+        for cmd in state['startup_commands']:
+            exec cmd in __main__.__dict__
+            
+        for class_name,state in state['class_attributes'].items():
+            
+            # from "topo.base.parameter.Parameter", we want "topo.base.parameter"
+            module_path = class_name[0:class_name.rindex('.')]
+            exec 'import '+module_path in __main__.__dict__
+            
+            # now restore class Parameter values
+            for p_name,p in state.items():
+                __main__.__dict__['val'] = p
+                try:
+                    exec 'setattr('+class_name+',"'+p_name+'",val)' in __main__.__dict__
+                except:
+                    ParameterizedObject().warning('Problem restoring parameter %s=%s for class %s; name may have changed since the snapshot was created.' % (p_name,repr(p),class_name))
+                    
+
+
 from topo.base.simulation import SimSingleton
 sim = SimSingleton()
+
+
+_picklesupport = PickleSupport()
 
 
 def about(display=True):
