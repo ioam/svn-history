@@ -147,7 +147,7 @@ class PatternPresenter(ParameterizedObject):
         if features_values.has_key("contrast") or param_dict.has_key("contrast"):
             if self.contrast_parameter=='michelson_contrast':
                 for g in inputs.itervalues():
-                    g.offset=0.5
+                    g.offset=1.0
                     g.scale=2*g.offset*g.contrast/100
 
             
@@ -158,7 +158,7 @@ class PatternPresenter(ParameterizedObject):
                 # to the target offset in the pattern type
                 # SineGratingDisk
                 for g in inputs.itervalues():
-                    g.offset=0.5   #In this case this is the offset of both the background and the sine grating
+                    g.offset=1.0   #In this case this is the offset of both the background and the sine grating
                     g.scale=2*g.offset*g.contrast/100
             
                 
@@ -311,7 +311,8 @@ def measure_size_response(num_phase=18,
     matrix_coords = sheet.sheet2matrixidx(coordinate[0],coordinate[1])
     if('OrientationPreference' in sheet.sheet_view_dict):
         or_pref = sheet.sheet_view_dict['OrientationPreference'].view()[0]
-        or_value = or_pref[matrix_coords]
+        or_value = or_pref[matrix_coords]*pi # Orientations are stored as a normalized value beween 0 and 1.
+                                             # The factor of pi is the norm_factor and is the range of orientation in measure_or_pref.
     else:
         topo.sim.warning("Orientation Preference should be measured before plotting Size Response -- using default values for "+sheet_name)
         or_value = 0.0
@@ -351,7 +352,7 @@ def measure_size_response(num_phase=18,
             x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
 
 
-def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relative_orientations=[-pi/6,0,pi/6, pi/8, pi/2],
+def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relative_orientations=[0, pi/6, pi/4, pi/2],
                               size=0.5,display=False,frequency=2.4,
                               num_phase=18,pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
                                                                               apply_output_fn=True,duration=1.0,
@@ -376,7 +377,8 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relativ
 
     if('OrientationPreference' in sheet.sheet_view_dict):
         or_pref = sheet.sheet_view_dict['OrientationPreference'].view()[0]
-        or_value = or_pref[matrix_coords]
+        or_value = or_pref[matrix_coords]*pi # Orientations are stored as a normalized value beween 0 and 1.
+                                             # The factor of pi is the norm_factor and is the range of orientation in measure_or_pref.
     else:
         topo.sim.warning("Orientation Preference should be measured before plotting Contrast Response -- using default values for "+sheet_name)
         or_value = 0.0
