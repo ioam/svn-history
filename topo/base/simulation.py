@@ -170,6 +170,16 @@ class SimSingleton(Singleton):
         """Allow dictionary-style deletion of objects from the simulation."""
         del self.actual_sim[item_name]
 
+    def __getstate__(self):
+        """Avoid calling actual_sim's __getstate__ directly.""" 
+        return {'actual_sim':self.actual_sim}
+
+    def __setstate__(self,state):
+        """On unpickling, change to the pickled simulation."""
+        self.change_sim(state['actual_sim'])
+        
+        
+
 
 class EventProcessor(ParameterizedObject):
     """

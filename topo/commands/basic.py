@@ -122,7 +122,7 @@ def save_snapshot(snapshot_name):
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
-    pickle.dump( (topo._picklesupport,topo.sim.actual_sim) , gzip.open(snapshot_name,'wb'),2)
+    pickle.dump( (topo._picklesupport,topo.sim) , gzip.open(snapshot_name,'wb'),2)
 
 
 def load_snapshot(snapshot_name):
@@ -131,8 +131,8 @@ def load_snapshot(snapshot_name):
     """
     # unpickling the PickleSupport() executes startup_commands and
     # sets PO class parameters.
-    discard,sim = pickle.load(gzip.open(snapshot_name,'rb'))
-    topo.sim.change_sim(sim)
+    pickle.load(gzip.open(snapshot_name,'rb'))
+    
 
 
 
