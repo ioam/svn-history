@@ -20,6 +20,10 @@ __version__='$Revision$'
 ### JABHACKALERT: Need to remove Back/Forward buttons, because they do not
 ### do what the user would expect.  
 
+# CEBALERT: this file needs quite a substantial overhaul before it
+# will work well.
+
+
 import copy
 import Pmw
 
@@ -56,7 +60,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 	self.auto_refresh.set(True)
         
         ### Find the GeneratorSheets in the simulation, set up generator_sheet_patterns dictionary
-        #
+        # CEBALERT: this has a difficult structure to work with.
         # generator_sheets_patterns = 
         # {generator_sheet_name:  { 'generator_sheet': <gs_obj>,
         #                           'editing': True/False,
@@ -70,7 +74,8 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 
         ### learning buttons
         #
-        # CEBHACKALERT: I think this doesn't work at the moment
+        # CEBHACKALERT: I think this doesn't work at the moment;
+        # certainly one of the relevant methods is commented out.
         self.learning = IntVar()
         self.learning.set(0)
         self.learning_button = Checkbutton(self,text='Network Learning',
@@ -107,9 +112,10 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 
         ### Menu of PatternGenerator types
         #
-        # CEBALERT: this way is just temporary while I reorganize these files.
-        # Take the list of PatternGenerators from the first GeneratorSheet's
-        # input_generator PatternGeneratorParameter for now.
+        # CEBALERT: seems like a poor way of doing this (just written
+        # to get it working).
+        # Take the list of PatternGenerators from the first
+        # GeneratorSheet's input_generator PatternGeneratorParameter.
         #
         # pattern_generators = {'Pattern': <PatternGenerator_obj>}
         for generator_sheet_name in self.generator_sheets_patterns.values():
@@ -120,24 +126,29 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         self.pattern_generators = KeyedList()
         self.pattern_generators.update(pattern_generators)
 
-        # CEBHACKALERT: remove OneDPowerSpectrum from testpattern window
+        # CEBALERT: remove OneDPowerSpectrum from list of pattern generators
+        # because it doesn't yet work with the test pattern window (an error
+        # in this file or in plotting or in OneDPowerSpectrum - I'm not sure).
         self.pattern_generators.remove(('OneDPowerSpectrum',topo.patterns.basic.OneDPowerSpectrum))
         
         self.pattern_generators.sort()  # sorted so the pgs appear alphabetically
-        ## end alert
+
         
 
         # Set initial PatternGenerator to PatternGeneratorParameter.default
-        # 
-        assert isinstance(generator_sheet_params['input_generator'].default,topo.base.patterngenerator.PatternGenerator) #CEBALERT: and if that isn't to be True, this file might need changing (check that)
+        #
+
+        # CEBALERT: does this 'default' work? (There's a note in the current tasks
+        # section about this.)
+        assert isinstance(generator_sheet_params['input_generator'].default,topo.base.patterngenerator.PatternGenerator) 
         self.__current_pattern_generator = generator_sheet_params['input_generator'].default
         
         self.__current_pattern_generator_name = StringVar()
-        # CEBALERT: you can set the current pg from the name in a better way
+        # CEBALERT: presumably can set the current pg from the name in a better way
         for (pg_name,pg) in self.pattern_generators.items():
             if pg==type(self.__current_pattern_generator):
                 self.__current_pattern_generator_name.set(pg_name)
-                self.__default_pattern_generator_name = pg_name #CEBALERT: don't need to store this
+                self.__default_pattern_generator_name = pg_name #CEBALERT: don't need to store this, right?
 
         # PatternGenerator choice box
         self.pg_choice_box = Pmw.OptionMenu(self,
@@ -168,7 +179,6 @@ Each type will have various parameters that can be changed.""")
                                 selectmode = 'multiple')
         self.__input_box.pack(fill = 'x', padx = 5)
 
-        # CEBALERT:
         keys = copy.copy(self.generator_sheets_patterns.keys())
         keys.reverse()
         for generator_sheet_name in keys:
@@ -358,11 +368,6 @@ Each type will have various parameters that can be changed.""")
 
         Also does some other things...
         """
-
-        # CEBHACKALERT: this method (still) sets bounds and density
-        # every time the pattern's redrawn.
-        # This method will change.
-
         self.__params_frame.set_parameters()
 
         disparity_flip=1
