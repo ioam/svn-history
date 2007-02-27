@@ -18,6 +18,15 @@ REM Gnosis_Utils
 ..\util\gunzip -c ..\..\external\Gnosis_Utils-1.2.1.tar.gz > ..\..\external\Gnosis_Utils-1.2.1.tar
 ..\util\tar xvf ..\..\external\Gnosis_Utils-1.2.1.tar
 copy ..\..\external\Gnosis_Utils-1.2.1 .
+REM REM pyaudiolab
+REM ..\util\gunzip -c ..\..\external\pyaudiolab-0.6.6.tar.gz > ..\..\external\pyaudiolab-0.6.6.tar
+REM ..\util\tar xvf ..\..\external\pyaudiolab-0.6.6.tar
+REM copy ..\..\external\pyaudiolab-0.6.6 .
+
+REM REM CEBALERT: this should be down with the libfile
+REM REM section, but by then I've lost track of where gunzip is!
+REM ..\util\gunzip -c libsndfile-1.0.17.tar.gz > libsndfile-1.0.17.tar
+REM ..\util\tar xvf libsndfile-1.0.17.tar
 
 
 
@@ -57,12 +66,23 @@ cd Gnosis_Utils-1.2.1\
 c:\python24\python.exe setup.py install
 cd ..
 
-REM CEBALERT: why isn't the jpeg package installed? (What's it required for?)
+REM REM * ctypes
+REM start /w ctypes-1.0.1.win32-py2.4.exe
+REM 
+REM REM * libsndfile
+REM move libsndfile-1.0.17\* c:\python24\libs
+
+REM REM * pyaudiolab
+REM REM cd pyaudiolab-0.6.6
+REM REM c:\python24\python.exe setup.py install
+REM cd ..
+
+REM CEBHACKALERT: add the jpeg package 
 
 
 REM * weave
-REM CEBALERT: when scipy is compiled by default in the linux distribution, and it's
-REM "from scipy import weave" rather than "import weave", then remove this
+REM we just take it from scipy, since it's not available
+REM separately as a binary (unless we ourselves build it).
 xcopy /E /I c:\python24\Lib\site-packages\scipy\weave c:\python24\Lib\site-packages\weave
 
 
