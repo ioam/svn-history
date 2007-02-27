@@ -86,6 +86,7 @@ class PickleSupport(object):
 
         
         class_attributes = {}
+        import topo
         # For now we just search topo, but it could be extended to all packages.
         self.get_PO_class_attributes(topo,class_attributes,[],exclude=('plotting','tkgui','tests'))
 
