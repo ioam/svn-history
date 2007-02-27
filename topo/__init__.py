@@ -51,9 +51,6 @@ __all__ = ['analysis',
 # gets set by the topographica script
 release = ''
 
-# JABHACKALERT: Disabled for now to see if we can delete tyimputil.py altogether
-#import topo.misc.tyimputil
-
 
 
 # CEBALERT: name and location might be changed.
