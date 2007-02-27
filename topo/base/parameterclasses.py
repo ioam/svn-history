@@ -371,7 +371,7 @@ class DynamicNumber(Number):
         """
         Create Dynamic version of Number parameter.
 
-        If set with a callable object, the bounds are checked when the
+        If set with a callable or iterable object, the bounds are checked when the
         number is retrieved (generated), rather than when it is set.
         """
         Parameter.__init__(self,default=default,**params)
@@ -401,11 +401,11 @@ class DynamicNumber(Number):
         """
         Except for callable values (assumed to be checked at get time), checks against bounds.
 
-        Non-callable values are checked to be numeric and within the hard
+        Non-callable, non-iterable values are checked to be numeric and within the hard
         bounds.  If they are not, an exception is raised.
         """
 
-        if not callable(val):
+        if not (callable(val) or is_iterator(val)):
             super(DynamicNumber,self)._check_bounds(val)
 
 
