@@ -77,7 +77,7 @@ align="middle" width="569" height="413">
 
 <li> To see how this network responds to a simple visual image,
 select <span class='t_item'>Test pattern</span> from the <span class='t_item'>Simulation</span> menu to get the
-<span class='w_title'>Test Pattern</span> window, select a <span class='t_item'>Line</span> <span class='t_item'>Input type</span>, then hit <span class='b_press'>Present</span>:
+<span class='w_title'>Test Pattern</span> window:
 
 <p class='center'>
 <img src="images/test_pattern_oo.png" alt="Test Pattern window"
@@ -85,7 +85,10 @@ align="middle" WIDTH="432" HEIGHT="759">
 </p>
 
 <p>
-This will present a horizontal line.  
+Then select a <span class='t_item'>Line</span> <span
+class='t_item'>Pattern generator</span>, and hit <span
+class='b_press'>Present</span> to present a horizontal line to the
+network.  
 </p>
 
 <p></p>
@@ -144,8 +147,8 @@ the ON and OFF channels of the LGN, followed by the lateral excitatory
 and lateral inhibitory weights to that neuron from nearby neurons in
 V1. The afferent weights represent the retinal pattern that would most
 excite the neuron.  For this particular neuron, the optimal retinal
-stimulus would be a short, bright line oriented at about 40 degrees (2
-o'clock) in the center of the retina.  </p><p></p></li>
+stimulus would be a short, bright line oriented at about 170 degrees
+(nearly horizontal) in the center of the retina.  </p><p></p></li>
 
 <li>If all neurons had the same weight pattern, the response
 would not be patchy -- it would just be a blurred version of the
@@ -250,12 +253,12 @@ higher selectivity.
 
 <li> Now that you have a feel for the various plots, you can try
 different input patterns, seeing how the cortex responds to each one.
-Just select an <span class='t_item'>Input type</span>, e.g.  <span class='t_item'>Gaussian</span>,
+Just select a <span class='t_item'>Pattern generator</span>, e.g.  <span class='t_item'>Gaussian</span>,
 <span class='t_item'>Disk</span>, or <span
 class='t_item'>SineGrating</span>, and then hit
 <span class='b_press'>Present</span>.
 
-<p> For each <span class='t_item'>Input type</span>, you can change various parameters that
+<p> For each <span class='t_item'>Pattern generator</span>, you can change various parameters that
 control its size, location, etc.:
 
 </p><blockquote>
@@ -402,8 +405,8 @@ training iteration will nearly wipe out any existing weights.
 <span class='w_title'>Model Editor</span> window.)
 
 <p></p></li><li>For more control over the training inputs, open the
-<span class='w_title'>Test Pattern</span> window, select an
-<span class='t_item'>Input type</span>, e.g. <span class='t_item'>Disk</span>, and other
+<span class='w_title'>Test Pattern</span> window, select a
+<span class='t_item'>Pattern generator</span>, e.g. <span class='t_item'>Disk</span>, and other
 parameters as desired.  Then enable <span class='t_item'>Network learning</span> in that
 window, and hit <span class='b_press'>Present</span>.  You should again see how
 this input changes the weights, and can experiment with different inputs.
@@ -442,7 +445,7 @@ selective for each orientation.
 simulation with your favorite type of input. (**no you can't, or at
 least not this way: UPDATE.)  To do this, quit and
 start again and change the
-<span class='t_item'>Input type</span> as before, but make sure not to change
+<span class='t_item'>Pattern generator</span> as before, but make sure not to change
 <code>alpha_input</code>.  Then you can change
 <span class='t_item'>Learning iterations</span> to 10000 and ** <span class='b_press'>Train</span>), to see how
 a full simulation would work with your new inputs.  If you hit the
