@@ -253,6 +253,8 @@ unit.  But that's going to make the rest of the code hard to write,
 because we'll either have to deal with CFs with empty matrices, or
 deal with CFs missing altogether.
 (As an example, the problem of zero-sized CFs arises in examples/joublin_bc96.ty.)
+Maybe it would be simplest to use a non-zero CF size, but with a mask
+making no unit visible; not sure.
 </li>
 
 
