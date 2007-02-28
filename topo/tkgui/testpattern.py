@@ -127,8 +127,9 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         self.pattern_generators.update(pattern_generators)
 
         # CEBALERT: remove OneDPowerSpectrum from list of pattern generators
-        # because it doesn't yet work with the test pattern window (an error
-        # in this file or in plotting or in OneDPowerSpectrum - I'm not sure).
+        # because it doesn't yet work with the test pattern window.
+        # (I think because plotting assumes 2d matrices when PatternGenerators are
+        # called.)
         self.pattern_generators.remove(('OneDPowerSpectrum',topo.patterns.basic.OneDPowerSpectrum))
         
         self.pattern_generators.sort()  # sorted so the pgs appear alphabetically
