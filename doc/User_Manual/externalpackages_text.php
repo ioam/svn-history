@@ -28,7 +28,10 @@ illustrates a command.
 <P>See mlabwrap.sourceforge.net [add link] for more
 information.
 
-<P>To use this package, you need to build the 
+<P>To use this package, 
+first check you can run 
+</code>'matlab -nodesktop -nosplash'</code> successfully.
+Then you need to build the 
 external 'all' target etc, or 
 <code>cd external; make mlabwrap</code>.
 When you do this, if the matlab libraries are not in your PATH,
