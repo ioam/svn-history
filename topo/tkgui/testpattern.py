@@ -135,7 +135,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 
         
 
-        self.__current_pattern_generator = GeneratorSheet.input_generator.default
+        self.__current_pattern_generator = GeneratorSheet.default_input_generator
 
         
         self.__current_pattern_generator_name = StringVar()
