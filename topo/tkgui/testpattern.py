@@ -133,9 +133,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         
         self.pattern_generators.sort()  # sorted so the pgs appear alphabetically
 
-        
-
-        self.__current_pattern_generator = GeneratorSheet.default_input_generator
+        self.__current_pattern_generator = GeneratorSheet.classparams()['input_generator'].default
 
         
         self.__current_pattern_generator_name = StringVar()
