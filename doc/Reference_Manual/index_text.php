@@ -154,11 +154,11 @@ for cases when speed is crucial.</DD>
 
 <H3>Optional External Packages</H3>
 
-<P>Some packages are included with the Topographica distribution, but are
-not built by default because the process is not
-straightforward. Often, however, it is not difficult to build the 
-package yourself. The individual packages can be built as described in their
-own sections below, or you can attempt to build them all with 
+<P>Several packages included with the Topographica distribution are
+not built by default because their build processes are sometimes difficult.
+Often, however, it is reasonably straightforward to build these 
+packages yourself. Individual packages can be built as described in their
+own sections below, or you can attempt to build all the optional packages with 
 <code>make -C external all</code> (though this will stop at the first failure).
 <!--add more info? e.g. -k -->
 
