@@ -152,7 +152,40 @@ This functionality is available for any user-defined library function,
 for cases when speed is crucial.</DD>
 </DL>
 
-<H2>Optional extensions</H2>
+<H3>Optional External Packages</H3>
+
+<P>Some packages are included with the Topographica distribution, but are
+not built by default because the process is not
+straightforward. Often, however, it is not difficult to build the 
+package yourself. The individual packages can be built as described in their
+own sections below, or you can attempt to build them all with 
+<code>make -C external all</code> (though this will stop at the first failure).
+<!--add more info? e.g. -k -->
+
+
+<P><DL COMPACT>
+<P><DT><A href="http://mlabwrap.sourceforge.net/">mlabwrap</A></DT>
+<DD>mlabwrap is a high-level Python-to-Matlab bridge, allowing Matlab to look like
+a normal Python library:
+<PRE>
+from mlabwrap import mlab  # start a Matlab session
+mlab.plot([1,2,3],'-o')
+</PRE>
+To use this package, first check you can run 
+<code>matlab -nodesktop -nosplash</code> successfully, then build with
+<code>cd external; make mlabwrap</code>.
+If the matlab libraries are not in your <code>LD_LIBRARY_PATH</code>,
+there will be a note during the build telling you to add the libraries 
+to your path. For example:
+<pre>
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/matlab-7.2/bin/glnx86
+</pre>
+You can either add that permanently to your path, or add it each time
+before using mlabwrap.
+</DD>
+</DL>
+
+<H2>Additional extensions</H2>
 
 <P>Topographica runs on an unmodified version of the Python language,
 and so it can be used with any Python package that you install
