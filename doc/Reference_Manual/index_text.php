@@ -199,6 +199,16 @@ You can either add that permanently to your path, or add it each time
 before using mlabwrap.
 </DD>
 
+<P><DT><A href="http://www.ar.media.kyoto-u.ac.jp/members/david/softwares/pyaudiolab/index.html">pyaudiolab</DT></A>
+<DD>
+pyaudiolab provides an easy way to read from and write to sound files (it wraps 
+<A href="http://www.mega-nerd.com/libsndfile/">libsndfile</A>).
+On linux, building should require nothing more than <code>cd external; make pyaudiolab</code>.
+<!--Currently: untested on OSX, not present on Windows-->
+</DD>
+
+
+
 
 
 <H2>Additional extensions</H2>
