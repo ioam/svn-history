@@ -189,6 +189,7 @@ desirable to calibrate the system for specific scales, such as degrees
 of visual angle, millimeters in cortex, etc.  We plan to add
 user-defined scales on top of the arbitrary scales, mapping from
 values in the simulator to user-defined quantities for display.
+<!-- See http://ipython.scipy.org/doc/manual/node11.html for bg on handling arbitrary units. -->
 
 <P><DT>Parallelization</DT><DD>
 Due to their weakly interconnected graph structure, Topographica
