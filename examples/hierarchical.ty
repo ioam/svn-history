@@ -9,6 +9,12 @@ $Id$
 """
 __version__='$Revision$'
 
+# CEBHACKALERT: For Windows:
+# This example doesn't work properly with the current version of
+# python_topo, but it does work properly with the version of
+# python_topo that's created by setup.bat (i.e. this problem has
+# been fixed, but I haven't yet made it available).
+
 import numpy.oldnumeric.random_array as RandomArray
 
 import topo.patterns.random
@@ -27,7 +33,6 @@ from topo.misc.numbergenerators import UniformRandom
 
 topo.sim.name = "hierarchical"
 
-# CEBHACKALERT: Doesn't seem to work on the Windows version; not clear why. 
 
 ###########################################
 # Set parameters
@@ -120,6 +125,5 @@ topo.sim['V3'].gui_x=500          ; topo.sim['V3'].gui_y=90
 topo.sim['LeftRetina'].gui_x=151  ; topo.sim['LeftRetina'].gui_y=520
 topo.sim['RightRetina'].gui_x=369 ; topo.sim['RightRetina'].gui_y=520
 
-
 # set default input generator (e.g. for the GUI)
-GeneratorSheet.input_generator.default=topo.patterns.basic.Line()
+GeneratorSheet.classparams()['input_generator'].default=topo.patterns.basic.Line()
