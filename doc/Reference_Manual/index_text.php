@@ -164,6 +164,21 @@ own sections below, or you can attempt to build them all with
 
 
 <P><DL COMPACT>
+
+<P><DT><A href="http://www.scipy.org/">SciPy</A></DT>
+<DD>
+<!--CBALERT: update this text. JAB has more information already?
+It's easy on Ubuntu linux because you can get the package manager
+to add the libraries. Also on Windows, it's already working
+-->
+SciPy includes many, many functions useful in scientific research,
+such as statistics, linear algebra, image processing, integration and
+differential equation solvers, etc.  However, because of all the
+external libraries that it uses, it can be difficult to get SciPy
+working on a particular installation. ... You can try with 
+<code>cd external; make scipy</code>.</DD>
+</DL>
+
 <P><DT><A href="http://mlabwrap.sourceforge.net/">mlabwrap</A></DT>
 <DD>mlabwrap is a high-level Python-to-Matlab bridge, allowing Matlab to look like
 a normal Python library:
@@ -183,7 +198,8 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/matlab-7.2/bin/glnx86
 You can either add that permanently to your path, or add it each time
 before using mlabwrap.
 </DD>
-</DL>
+
+
 
 <H2>Additional extensions</H2>
 
@@ -200,15 +216,6 @@ of Python that might be present on your system.
 Some packages of note:
 
 <P><DL COMPACT>
-<P><DT><A href="http://www.scipy.org/">SciPy</A></DT>
-<DD>
-SciPy includes many, many functions useful in scientific research,
-such as statistics, linear algebra, image processing, integration and
-differential equation solvers, etc.  However, because of all the
-external libraries that it uses, it can be difficult to get SciPy
-working on a particular installation.  To avoid these problems, we do
-not ship SciPy with Topographica by default, but encourage users to
-try it out themselves.</DD>
 
 <P><DT><A href="http://rpy.sourceforge.net/">RPy</A></DT>
 <DD>The language R (a free implementation of the S statistical
