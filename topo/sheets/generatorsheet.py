@@ -8,7 +8,6 @@ __version__='$Revision$'
 from topo.base.simulation import EPConnectionEvent
 from topo.base.sheet import Sheet 
 from topo.base.sheet import BoundingBox
-from topo.patterns.basic import Gaussian, SineGrating
 from topo.misc.utils import NxN
 
 from topo.base.parameterclasses import Number, Dynamic
@@ -39,9 +38,6 @@ class GeneratorSheet(Sheet):
         than the user-visible step size (typically 1.0), so that inputs are
         generated and processed before this step is complete.
         """)
-
-    default_input_generator = topo.base.patterngenerator.PatternGeneratorParameter(default=Gaussian(),doc=
-        "Specifies a particular PatternGenerator type to use in testpattern window")
     
     input_generator = topo.base.patterngenerator.PatternGeneratorParameter(doc=
         "Specifies a particular PatternGenerator type to use when creating patterns.")
