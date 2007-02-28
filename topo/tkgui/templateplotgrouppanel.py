@@ -7,6 +7,9 @@ $Id$
 __version__='$Revision$'
 
 from inspect import getdoc
+from math import pi
+from numpy.fft.fftpack import fft2
+from numpy.fft.helper import fftshift
 
 import copy
 import Pmw
@@ -86,6 +89,10 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         if self.__class__ == TemplatePlotGroupPanel:
             self.refresh(update=self.pgt.plot_immediately)
 
+    
+        self._canvas_menu.insert_command(2,label='Plot Fourier Transform',
+                                         command=self.__fft)
+
     def _pg_template(self):
         """
         Function that returns the plotgroup_template for this panel,
@@ -120,6 +127,16 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 				      sheetcoords=self.sheetcoords.get(),
                                       integerscaling=self.integerscaling.get())
 	return plotgroup
+
+    def __fft(self):
+        plot = self._canvas_click_info[0]
+        if plot.channels.has_key('Strength'):
+            plot_array=plot._get_matrix('Strength')
+        elif plot.channels.has_key('Hue'):
+            plot_array=plot._get_matrix('Hue')
+        fft_plot=fftshift(fft2(plot_array-0.5, s=None, axes=(-2,-1)))
+        topo.commands.pylabplots.matrixplot(fft_plot, title="FFT Plot: "+plot.plot_src_name+" "+ plot.name)
+        
 
     def set_strengthonly(self):
         """Function called by Widget when check-box clicked"""
