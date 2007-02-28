@@ -114,20 +114,30 @@ translator_dictionary & its uses.
 </li>
 
 <li>
-2007/02/20 (CB): Should add simple timing functions -- what was the total
+2007/02/28 (CB): Should add simple timing functions -- what was the total
 time to run?  What components are taking a long time to run?  Guide
 the user for optimization, focusing on the components we expect to be
 the bottlenecks. How do I find out which libraries are being used by
-numpy functions?
+numpy functions? 
+<!--Add in general guide & reorganize.-->
 </li>
 
 <li>
-2007/02/23 (CB): update topographica-win to numpy (plus catchup other
+2007/02/28 (CB): update topographica-win to numpy (plus catchup other
 external packages like pyaudiolab & gnosis utils).
 (The current Windows numpy version at scipy.org presumably contains 
 the subtract.reduce bug.)
+<!--libsndfile, pyaudiolab, jpeg (in PIL binary?), (mlabwrap) to go-->
 </li>
+
+<li>
+2007/02/28 (CB): finish pickling reorganization.
+<!-- rename picklesupport class, move to base, bzip, xml option, etc-->
+</li>
+
 </ul>
+
+
 
 
 <h3>Things we hope to take care of eventually</h3>
@@ -217,10 +227,12 @@ parameters frames sliders etc should expand).
 </li>
 
 <li>
-2007/02/25 (CB): OneDPowerSpectrum(PatternGenerator) and
+2007/02/28 (CB): OneDPowerSpectrum(PatternGenerator) and
 Audio(OneDPowerSpectrum) (an example of processing auditory data: does
 an FFT incrementally on an audio file, delivering part of a
-spectrogram at each clock tick.
+spectrogram at each clock tick).
+<!-- doesn't work with test pattern window because plotting expects
+2d arrays, I think -->
 </li>
 
 <li>
