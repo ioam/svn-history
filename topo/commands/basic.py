@@ -4,15 +4,10 @@ $Id$
 """
 __version__='$Revision$'
 
-# CBALERT: use cPickle? It's "up to 1000 times faster" than pickle.
-# cPickle and pickle are "guaranteed to be able to be able to read each other's
-# data streams". With cPickle, one can't subclass Pickler and Unpickler since
-# they're functions and not classes (as with pickle). Since we no longer have
-# any need to do this after changing to numpy, we should switch!
-import pickle
+import cPickle as pickle
 import __main__
 
-from bz2 import BZ2File    
+from bz2 import BZ2File 
 
 import topo
 
@@ -135,10 +130,17 @@ def save_snapshot(snapshot_name):
                                                 startup_commands=topo.sim.startup_commands)
 
     topo.sim.RELEASE=topo.release
+
+    # CEBALERT: I think any compression (even gzip) is too slow
+    # (e.g. try pickling lissom_oo_or.ty).
+    # Should experiment with compression_level to find a suitable
+    # balance, or remove the compression completely.
+
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
     pickle.dump( (topoPOclassattrs,topo.sim) , BZ2File(snapshot_name,'w'),2)
+
 
 def load_snapshot(snapshot_name):
     """
