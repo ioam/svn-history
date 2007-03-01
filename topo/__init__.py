@@ -53,109 +53,6 @@ release = ''
 
 
 
-# CEBALERT: name and location might be changed.
-from topo.base.parameterizedobject import ParameterizedObject,Parameter
-import __main__
-import inspect
-class PickleSupport(object):
-    """
-    When requested to be pickled, stores topo's PO classes' attributes and
-    topo.sim.startup_commands.
-    """
-    def __getstate__(self):
-        """
-        Return a dictionary of topo's PO classes' attributes, plus
-        topo.sim's startup_commands.
-
-        Subpackages of topo that are not part of the simulation are
-        excluded from having their classes' attributes saved: plotting,
-        tkgui, and tests.  [CB: can add analysis, etc.]
-
-        Also sets the value of topo.sim.RELEASE.
-        """
-        # warn that classes & functions defined in __main__ won't unpickle
-        import types
-        for k,v in __main__.__dict__.items():
-            # there's classes and functions...what else?
-            if isinstance(v,type) or isinstance(v,types.FunctionType):
-                if v.__module__ == "__main__":
-                    ParameterizedObject().warning("%s (type %s) has source in __main__; it will only be found on unpickling if the class is explicitly defined (e.g. by running the same script first) before unpickling."%(k,type(v)))
-
-        
-        class_attributes = {}
-        import topo
-        # For now we just search topo, but it could be extended to all packages.
-        self.get_PO_class_attributes(topo,class_attributes,[],exclude=('plotting','tkgui','tests'))
-
-        global sim
-        sim.RELEASE=release
-
-        return {'class_attributes':class_attributes,
-                'startup_commands':topo.sim.actual_sim.startup_commands}   
-
-
-    def __setstate__(self,state):
-        """
-        Execute the startup commands and set class attributes.
-        """
-        for cmd in state['startup_commands']:
-            exec cmd in __main__.__dict__
-            
-        for class_name,state in state['class_attributes'].items():
-            
-            # from "topo.base.parameter.Parameter", we want "topo.base.parameter"
-            module_path = class_name[0:class_name.rindex('.')]
-            exec 'import '+module_path in __main__.__dict__
-            
-            # now restore class Parameter values
-            for p_name,p in state.items():
-                __main__.__dict__['val'] = p
-                try:
-                    exec 'setattr('+class_name+',"'+p_name+'",val)' in __main__.__dict__
-                except:
-                    ParameterizedObject().warning('Problem restoring parameter %s=%s for class %s; name may have changed since the snapshot was created.' % (p_name,repr(p),class_name))
-
-
-    # CEBALERT: might could be simplified
-    def get_PO_class_attributes(self,module,class_attributes,processed_modules,exclude=()):
-        """
-        Recursively search module and get attributes of ParameterizedObject classes within it.
-
-        class_attributes is a dictionary {module.path.and.Classname: state}, where state
-        is the dictionary {attribute: value}.
-
-        Something is considered a module for our purposes if inspect says it's a module,
-        and it defines __all__. We only search through modules listed in __all__.
-
-        Keeps a list of processed modules to avoid looking at the same one
-        more than once (since e.g. __main__ contains __main__ contains
-        __main__...)
-
-        Modules can be specifically excluded if listed in exclude.
-        """
-        dict_ = module.__dict__
-        for (k,v) in dict_.items():
-            if '__all__' in dict_ and inspect.ismodule(v) and k not in exclude:
-                if k in dict_['__all__'] and v not in processed_modules:
-                    self.get_PO_class_attributes(v,class_attributes,processed_modules,exclude)
-                processed_modules.append(v)
-
-            else:
-                if isinstance(v,type) and issubclass(v,ParameterizedObject):
-
-                    # Note: we take the class name as v.__name__, not k, because
-                    # k might be just a label for the true class. For example,
-                    # if Topographica falls back to the unoptimized components,
-                    # k could be "CFPRF_DotProduct_opt", but v.__name__
-                    # - and the actual class - is "CFPRF_DotProduct". It
-                    # is correct to set the attributes on the true class.
-                    full_class_path = v.__module__+'.'+v.__name__
-                    class_attributes[full_class_path] = {}
-                    # POs always have __dict__, never slots
-                    for (name,obj) in v.__dict__.items():
-                        if isinstance(obj,Parameter):
-                            class_attributes[full_class_path][name] = obj
-
 
                     
 
@@ -164,7 +61,7 @@ from topo.base.simulation import SimSingleton
 sim = SimSingleton()
 
 
-_picklesupport = PickleSupport()
+
 
 
 def about(display=True):

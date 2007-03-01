@@ -10,13 +10,12 @@ import gzip
 
 import topo
 
-from topo.base.parameterizedobject import ParameterizedObject, Parameter
+from topo.base.parameterizedobject import ParameterizedObject, Parameter, PicklableClassAttributes
 from topo.base.functionfamilies import OutputFn
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 from topo.base.projection import ProjectionSheet
 from topo.sheets.generatorsheet import GeneratorSheet
-
 
 
 def save_input_generators():
@@ -117,19 +116,28 @@ def save_snapshot(snapshot_name):
     exception of class attributes. Python does not pickle class
     attributes, but this function stores class attributes of any
     ParameterizedObject class that is declared within the topo
-    package. See the topo.PickleSupport class for more information.
+    package. See the topo.base.PicklableClassAttributes class for
+    more information.
     """
+    # CEBHACKALERT: (1) add back setting of topo.sim.release somewhere
+    # (2) probably should be pickling topo.sim.actual_sim, as before
+    
+    # For now we just search topo, but could do same for other packages.
+    topoPOclassattrs = PicklableClassAttributes(topo,exclusions=('plotting','tests','tkgui'),
+                                                startup_commands=topo.sim.startup_commands)
+
+
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
-    pickle.dump( (topo._picklesupport,topo.sim) , gzip.open(snapshot_name,'wb'),2)
+    pickle.dump( (topoPOclassattrs,topo.sim) , gzip.open(snapshot_name,'wb'),2)
 
 
 def load_snapshot(snapshot_name):
     """
     Load the simulation stored in snapshot_name.
     """
-    # unpickling the PickleSupport() executes startup_commands and
+    # unpickling the PicklableClassAttributes() executes startup_commands and
     # sets PO class parameters.
     pickle.load(gzip.open(snapshot_name,'rb'))
     
