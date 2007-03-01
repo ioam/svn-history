@@ -28,6 +28,7 @@ $Id$
 """
 __version__='$Revision$'
 
+
 # This simulation is still being worked on:
 #
 # - learning rates need to be adjusted for all the times the bounds
@@ -49,7 +50,9 @@ import fixedpoint
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
-from Numeric import sum,ones,exp, tan, sin, cos
+#from Numeric import sum,ones,exp, tan, sin, cos
+from numpy.oldnumeric import  sum,ones,exp, tan, sin, cos
+import numpy.oldnumeric as Numeric
 
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
@@ -60,8 +63,8 @@ from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfns.basic import DivisiveNormalizeL1,PiecewiseLinear
-from topo.responsefns.optimized import CFPRF_SharedWeightDotProduct_opt
+from topo.outputfns.basic import DivisiveNormalizeL1, PiecewiseLinear
+#from topo.responsefns.optimized import CFPRF_SharedWeightDotProduct_opt
 from topo.base.patterngenerator import PatternGenerator
 from topo.misc.numbergenerators import UniformRandom, NormalRandom, Choice
 from topo.base.parameterclasses import DynamicNumber, Number, ListParameter
@@ -83,8 +86,10 @@ world_size_scale = 2.0
 BaseRN = BaseLN * world_size_scale
 area_scale = 1.0
 #num_eyes = 2
-rf_radius_scale = 6.5 / 9.5
-rf_radius_scale_inv = 9.5 / 6.5
+rf_radius_ref = 9.5
+orig_rf_radius = 6.5
+rf_radius_scale = orig_rf_radius / rf_radius_ref
+rf_radius_scale_inv = rf_radius_ref / orig_rf_radius
 rf_radius = 25.5
 
 num_aff_inputs = 2.0
@@ -116,19 +121,21 @@ xsigma = 10.2308
 ysigma = 2.19231
 scale_input = 0.5
 
-sigma_a = 9.5 / 1.3
+sigma_a = rf_radius_ref / 1.3
 
 # radius of LGN DoG center Gaussian
-sigma_c = 0.75 * rf_radius_scale_inv  # blur_radius
+# the value set in the book (0.75 * rf_radius_scale_inv)
+# is adjusted
+sigma_c = 0.75 * rf_radius_scale_inv * rf_radius_scale
 
 # radius of LGN DoG surround Gaussian
 blur_radius_surround_multiplier = 1.6
-sigma_s = blur_radius_surround_multiplier * sigma_c  # ??? *blur_radius_surround_multiplier
+sigma_s = blur_radius_surround_multiplier * sigma_c
 
 # radius of LGN afferent connections
 blur_range = 4.7
 blur_range_multiplier = 1.0
-r_L = blur_range_multiplier * blur_range * sigma_s # ??? *blur_range_multiplier or 4.7
+r_L = blur_range_multiplier * blur_range * sigma_s
 
 # buffers so sheet above has full rfs...
 lgn_edge_buffer = round(rf_radius,0)
@@ -137,7 +144,8 @@ retina_edge_buffer = 25.0
 # ...and actual numbers of neurons with the buffers
 #RN = round(BaseRN * area_scale + 2 * retina_edge_buffer, 0)
 RN = 170.0
-LN = round(BaseLN * area_scale + 2 * lgn_edge_buffer, 0)
+#LN = round(BaseLN * area_scale + 2 * lgn_edge_buffer, 0)
+LN = 74.0
 N = BaseN
 
 ### (3)
@@ -152,7 +160,7 @@ alpha_inh = 0.00025 * ics
 
 preset_sigma_aff = 9.5 / 1.3
 
-blur_scale = 10.2 * 2.0
+blur_scale = 10.2
 
 tsettle=8
 
@@ -261,25 +269,25 @@ class ManagedComposite(Composite):
         return super(ManagedComposite, self).function(generators = valid_generators, **params)
 
 
-size_scale = 1.7
+size_scale = 1.0
 retina_scale = 1.0 / 24.0 * size_scale  # BaseLN * size_scale
 
 lefteye =  Gaussian(aspect_ratio = 1.0, x = 1 * retina_scale, y = 2.5 * retina_scale,
-                    size = 2.0 * retina_scale, scale = -0.5, offset = 0.5)
+                    size = 2.0 * 1.2 * retina_scale / 1.7, scale = 0.5, offset = 0.5)
 righteye = Gaussian(aspect_ratio = 1.0, x = 1 * retina_scale, y = -2.5 * retina_scale,
-                    size = 2.0 * retina_scale, scale = -0.5, offset = 0.5)
+                    size = 2.0 * 1.2 * retina_scale / 1.7, scale = 0.5, offset = 0.5)
 mouth   =  Gaussian(aspect_ratio = 1.0, x = -5 * retina_scale, y = 0.0 * retina_scale,
-                    size = 2.0 * retina_scale, scale = -0.5, offset = 0.5)
-face0 = Composite(generators = [lefteye, righteye, mouth], operator = numpy.minimum, orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=56)))
-face1 = Composite(generators = [lefteye, righteye, mouth], operator = numpy.minimum, orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=78)))
-face2 = Composite(generators = [lefteye, righteye, mouth], operator = numpy.minimum, orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=90)))
+                    size = 2.0 * 1.2 * retina_scale / 1.7, scale = 0.5, offset = 0.5)
+face0 = Composite(generators = [lefteye, righteye, mouth], operator = numpy.maximum, orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=56)), size = 1.7)
+face1 = Composite(generators = [lefteye, righteye, mouth], operator = numpy.maximum, orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=78)), size = 1.7)
+face2 = Composite(generators = [lefteye, righteye, mouth], operator = numpy.maximum, orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=90)), size = 1.7)
 
 input_separation_min = RN / LN * 36.0  # retina_lgn_ratio * size_in_lgn_coor
 
 input_pattern = ManagedComposite(generators = [face0, face1, face2], input_separation_min = input_separation_min / BaseRN,
                 x_range = DynamicNumber(UniformRandom(lbound=-85.0 / BaseRN, ubound = 85.0 / BaseRN, seed=41)),
                 y_range = DynamicNumber(UniformRandom(lbound=-85.0 / BaseRN, ubound = 85.0 / BaseRN, seed=27)),
-                operator = numpy.minimum)
+                operator = numpy.maximum)
 
 retina_bounds = BoundingBox(radius = RN / (2.0 * BaseRN * area_scale))
 lgn_bounds = BoundingBox(radius = LN / (2.0 * BaseLN * area_scale))
@@ -291,21 +299,20 @@ fsa_bounds = BoundingBox(radius = N / (2.0 * BaseN * area_scale))
 min_exc_radius = min_exc_rad / (BaseN * area_scale)
 
 # Connection parameters
-lgn_weight_bounds = BoundingBox(radius = r_L / BaseRN)
+lgn_weight_bounds = BoundingBox(radius = r_L / BaseLN)
 afferent_weight_bounds   = BoundingBox(radius = rf_radius / (BaseLN * area_scale)) #?? sigma_A? rf_radius / BaseLN)
 excitatory_weight_bounds = BoundingBox(radius = exc_rad / (BaseN * area_scale), min_radius = min_exc_radius)  
 inhibitory_weight_bounds = BoundingBox(radius = inh_rad / (BaseN * area_scale))                  
 
 # Circular ConnectionFields
 RandomArray.seed(500,500)
-CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Gaussian(
     size = 2.0 * preset_sigma_aff / (BaseLN), aspect_ratio = 1.0, output_fn=DivisiveNormalizeL1(norm_value=2.33))
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
+#SharedWeightCFProjection.response_fn=CFPRF_SharedWeightDotProduct_opt()
 SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
-
 
 topo.sim['Retina'] = GeneratorSheet(nominal_bounds=retina_bounds, nominal_density=BaseRN,
                                     input_generator=input_pattern)
@@ -324,17 +331,16 @@ topo.sim['V1'] = LISSOM(nominal_bounds=fsa_bounds,nominal_density=BaseN,
 # Gaussian in retinalobjs (and elsewhere)
 
 centerg = topo.patterns.basic.Gaussian(
-    size=2*sigma_c/BaseRN,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))  # norm_value=2.33
+    size = 2.0 * sigma_c * sqrt(pi) / BaseLN, aspect_ratio = 1.0, output_fn = DivisiveNormalizeL1(norm_value = 2.33))
 
 surroundg = topo.patterns.basic.Gaussian(
-    size=2*sigma_s/BaseRN,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))  # norm_value=2.33
+    size = 2.0 * sigma_s * sqrt(pi) / BaseLN, aspect_ratio = 1.0, output_fn = DivisiveNormalizeL1(norm_value = 2.33))
 
 on_weights = topo.patterns.basic.Composite(
-    generators=[centerg,surroundg],operator=numpy.subtract)
+    generators = [centerg,surroundg], operator = numpy.subtract)
 
 off_weights = topo.patterns.basic.Composite(
-    generators=[surroundg,centerg],operator=numpy.subtract)
-
+    generators = [surroundg,centerg], operator = numpy.subtract)
 
 topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
           connection_type=SharedWeightCFProjection,strength=blur_scale,
@@ -357,14 +363,16 @@ topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"),
           connection_type=CFProjection,strength=gammaaff,name='LGNOffAfferent',
           nominal_bounds_template=afferent_weight_bounds, learning_rate = 0.007 / 1.5 * pi * 25.5 * 25.5) # learning_rate=alpha_input*n_aff_units)
 
+# Temporarily moved here to avoid masking the LGN weights until we can do it in a way that doesn't change the sum of the weights
+CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),
           connection_type=CFProjection,strength=gammaexc,name='LateralExcitatory',
-          nominal_bounds_template=excitatory_weight_bounds, learning_rate = 3.2018) # learning_rate=alpha_exc*n_exc_units) 
-            
+          nominal_bounds_template=excitatory_weight_bounds, learning_rate = alpha_exc*n_exc_units)  # 3.2018) 
+
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),
           connection_type=CFProjection,strength=-gammainh,name='LateralInhibitory',
-          nominal_bounds_template=inhibitory_weight_bounds, learning_rate = 1.9626) # learning_rate=alpha_inh*n_inh_units)         
+          nominal_bounds_template=inhibitory_weight_bounds, learning_rate = alpha_inh*n_inh_units)  # 1.9626)
 
 # CEBHACKALERT: this is out of date and the times should be corrected.
 #
