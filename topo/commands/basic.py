@@ -119,14 +119,13 @@ def save_snapshot(snapshot_name):
     package. See the topo.base.PicklableClassAttributes class for
     more information.
     """
-    # CEBHACKALERT: (1) add back setting of topo.sim.release somewhere
-    # (2) probably should be pickling topo.sim.actual_sim, as before
+    # CEBHACKALERT: should be pickling topo.sim.actual_sim, as before?
     
     # For now we just search topo, but could do same for other packages.
     topoPOclassattrs = PicklableClassAttributes(topo,exclusions=('plotting','tests','tkgui'),
                                                 startup_commands=topo.sim.startup_commands)
 
-
+    topo.sim.RELEASE=topo.release
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
