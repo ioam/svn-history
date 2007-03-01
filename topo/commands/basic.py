@@ -139,7 +139,7 @@ def save_snapshot(snapshot_name):
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
-    pickle.dump( (topoPOclassattrs,topo.sim) , BZ2File(snapshot_name,'w'),2)
+    pickle.dump( (topoPOclassattrs,topo.sim) , BZ2File(snapshot_name,'w',compresslevel=1),2)
 
 
 def load_snapshot(snapshot_name):
