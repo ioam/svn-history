@@ -4,9 +4,15 @@ $Id$
 """
 __version__='$Revision$'
 
+# CBALERT: use cPickle? It's "up to 1000 times faster" than pickle.
+# cPickle and pickle are "guaranteed to be able to be able to read each other's
+# data streams". With cPickle, one can't subclass Pickler and Unpickler since
+# they're functions and not classes (as with pickle). Since we no longer have
+# any need to do this after changing to numpy, we should switch!
 import pickle
 import __main__
-import gzip
+
+from bz2 import BZ2File    
 
 import topo
 
@@ -111,13 +117,16 @@ def save_snapshot(snapshot_name):
     """
     Save a snapshot of the network's current state.
 
-    Uses Python's 'pickle' module, so subject to the same limitations
-    (see the pickle module's documentation) - with the notable
-    exception of class attributes. Python does not pickle class
-    attributes, but this function stores class attributes of any
-    ParameterizedObject class that is declared within the topo
-    package. See the topo.base.PicklableClassAttributes class for
-    more information.
+    The snapshot is saved as a bzip2-compressed Python binary pickle.
+
+
+    As this function uses Python's 'pickle' module, it is subject to
+    the same limitations (see the pickle module's documentation) -
+    with the notable exception of class attributes. Python does not
+    pickle class attributes, but this function stores class attributes
+    of any ParameterizedObject class that is declared within the topo
+    package. See the topo.base.PicklableClassAttributes class for more
+    information.
     """
     # CEBHACKALERT: should be pickling topo.sim.actual_sim, as before?
     
@@ -129,8 +138,7 @@ def save_snapshot(snapshot_name):
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
-    pickle.dump( (topoPOclassattrs,topo.sim) , gzip.open(snapshot_name,'wb'),2)
-
+    pickle.dump( (topoPOclassattrs,topo.sim) , BZ2File(snapshot_name,'w'),2)
 
 def load_snapshot(snapshot_name):
     """
@@ -138,7 +146,7 @@ def load_snapshot(snapshot_name):
     """
     # unpickling the PicklableClassAttributes() executes startup_commands and
     # sets PO class parameters.
-    pickle.load(gzip.open(snapshot_name,'rb'))
+    pickle.load(BZ2File(snapshot_name,'r'))
     
 
 
