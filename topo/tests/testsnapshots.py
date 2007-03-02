@@ -58,6 +58,8 @@ class TestSnapshots(unittest.TestCase):
         self.assertEqual(Line.x,12.0)
         self.assertEqual(__main__.__dict__['z'],99)
 
+        # CB: add xml pickling test
+        
 
 # CB: longer to run test should additionally quit the simulation
 # and start again. Should also test scheduled actions.
