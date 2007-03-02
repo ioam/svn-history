@@ -6,6 +6,7 @@ __version__='$Revision$'
 
 import cPickle as pickle
 import gnosis.xml.pickle
+from xml.parsers.expat import ExpatError
 
 import __main__
 import gzip
@@ -145,7 +146,7 @@ def save_snapshot(snapshot_name,xml=False):
         pickle.dump( (topoPOclassattrs,topo.sim) , gzip.open(snapshot_name,'w',compresslevel=5),2)
 
 
-def load_snapshot(snapshot_name, xml=False):
+def load_snapshot(snapshot_name):
     """
     Load the simulation stored in snapshot_name.
     """
@@ -161,10 +162,15 @@ def load_snapshot(snapshot_name, xml=False):
     except IOError:
         snapshot = open(snapshot_name,'r')
 
-    if xml:
+    # If it's not xml, open as a normal pickle.
+    try:
         gnosis.xml.pickle.load(snapshot)
-    else:
+    except ExpatError:
+        snapshot.seek(0) 
         pickle.load(snapshot)
+        
+
+        
     
     
 
