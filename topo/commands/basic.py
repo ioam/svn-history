@@ -152,10 +152,19 @@ def load_snapshot(snapshot_name, xml=False):
     # unpickling the PicklableClassAttributes() executes startup_commands and
     # sets PO class parameters.
 
+    snapshot = gzip.open(snapshot_name,'r')
+
+    # If it's not gzipped, open as a normal file.
+    try:
+        snapshot.read(1)
+        snapshot.seek(0)
+    except IOError:
+        snapshot = open(snapshot_name,'r')
+
     if xml:
-        gnosis.xml.pickle.load(open(snapshot_name,'r'))
+        gnosis.xml.pickle.load(snapshot)
     else:
-        pickle.load(gzip.open(snapshot_name,'r'))
+        pickle.load(snapshot)
     
     
 
