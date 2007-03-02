@@ -135,7 +135,9 @@ class ProjectionSheet(Sheet):
     def activate(self):
         """
         Collect activity from each projection, combine it to calculate
-        the activity for this sheet, and send the result out.
+        the activity for this sheet, and send the result out.  Subclasses
+        may override this method to whatever it means to calculate activity
+        in that subclass.
         """
         self.activity *= 0.0
 
