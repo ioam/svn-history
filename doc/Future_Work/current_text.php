@@ -123,8 +123,9 @@ numpy functions?
 </li>
 
 <li>
-2007/02/28 (CB): update topographica-win to numpy (plus catchup other
-external packages like pyaudiolab & gnosis utils).
+2007/03/02 (CB): update topographica-win to numpy (plus catchup other
+external packages like pyaudiolab & gnosis utils). Test that results from 
+Windows version match those from the standard one.
 (The current Windows numpy version at scipy.org presumably contains 
 the subtract.reduce bug.)
 <!--libsndfile, pyaudiolab, jpeg (in PIL binary?), (mlabwrap) to go-->
@@ -143,6 +144,13 @@ the subtract.reduce bug.)
 <h3>Things we hope to take care of eventually</h3>
 
 <ul>
+
+<li>
+2007/03/02: Should have an easy way to add things to the right click
+menu, just as it is easy to add templates -- it's a very natural way
+to add user-defined analyses and plots. (Then test pattern window
+could get right-click menu to show e.g. Fourier transform option.)  
+</li>
 
 <li>
 2007/02/23 (CB): Gnosis Utils has xml pickling - add this as an
