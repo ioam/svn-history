@@ -6,7 +6,7 @@ Conversely, be sure to update your checked out code before doing any
 new work.  The goal is to make sure that all developers are always
 working with the latest code.
 
-<P>Every CVS commit must include an informative log message,
+<P>Every CVS commit <em>must</em> include an informative log message,
 summarizing the items changed in easily understandable terms, and
 avoiding pejorative language (i.e. comments like "Lord only knows what
 idiot coded it that way!").
