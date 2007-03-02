@@ -5,6 +5,8 @@ $Id$
 __version__='$Revision$'
 
 import cPickle as pickle
+import gnosis.xml.pickle
+
 import __main__
 import gzip
 
@@ -107,12 +109,14 @@ def pattern_present(inputs={},duration=1.0,learning=False,overwrite_previous=Fal
         restore_input_generators()
 
 
-def save_snapshot(snapshot_name):
+def save_snapshot(snapshot_name,xml=False):
     """
     Save a snapshot of the network's current state.
 
-    The snapshot is saved as a bzip2-compressed Python binary pickle.
+    The snapshot is saved as a gzip-compressed Python binary pickle.
 
+    (xml snapshots are currently experimental, and will not work for
+    most users.)
 
     As this function uses Python's 'pickle' module, it is subject to
     the same limitations (see the pickle module's documentation) -
@@ -121,9 +125,7 @@ def save_snapshot(snapshot_name):
     of any ParameterizedObject class that is declared within the topo
     package. See the topo.base.PicklableClassAttributes class for more
     information.
-    """
-    # CEBHACKALERT: should be pickling topo.sim.actual_sim, as before?
-    
+    """    
     # For now we just search topo, but could do same for other packages.
     topoPOclassattrs = PicklableClassAttributes(topo,exclusions=('plotting','tests','tkgui'),
                                                 startup_commands=topo.sim.startup_commands)
@@ -133,16 +135,28 @@ def save_snapshot(snapshot_name):
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
-    pickle.dump( (topoPOclassattrs,topo.sim) , gzip.open(snapshot_name,'w',compresslevel=5),2)
+    if xml:
+        # CEBALERT: gnosis.xml.pickle needs updating to work with
+        # numpy.  However, you can test saving a simulation that
+        # does not import numpy to see what the xml looks like.
+        ParameterizedObject(name="save_snapshot").warning("XML snapshots are only experimental at present.")
+        gnosis.xml.pickle.dump( (topoPOclassattrs,topo.sim) , open(snapshot_name,'w') )
+    else:
+        pickle.dump( (topoPOclassattrs,topo.sim) , gzip.open(snapshot_name,'w',compresslevel=5),2)
 
 
-def load_snapshot(snapshot_name):
+def load_snapshot(snapshot_name, xml=False):
     """
     Load the simulation stored in snapshot_name.
     """
     # unpickling the PicklableClassAttributes() executes startup_commands and
     # sets PO class parameters.
-    pickle.load(gzip.open(snapshot_name,'r'))
+
+    if xml:
+        gnosis.xml.pickle.load(open(snapshot_name,'r'))
+    else:
+        pickle.load(gzip.open(snapshot_name,'r'))
+    
     
 
 
