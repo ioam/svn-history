@@ -52,6 +52,9 @@ start /w numpy-1.0.1.win32-py2.4.exe
 REM * matplotlib
 start /w matplotlib-0.90.0.win32-py2.4.exe
 
+REM * jpeg-6b
+start /w jpeg-6b-3.exe
+
 REM * PIL
 start /w PIL-1.1.5.win32-py2.4.exe
 
@@ -77,7 +80,7 @@ REM REM cd pyaudiolab-0.6.6
 REM REM c:\python24\python.exe setup.py install
 REM cd ..
 
-REM CEBHACKALERT: add the jpeg package 
+REM CEBHACKALERT: add the jpeg package? 
 
 
 REM * weave
