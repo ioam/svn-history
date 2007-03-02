@@ -53,6 +53,8 @@ REM * matplotlib
 start /w matplotlib-0.90.0.win32-py2.4.exe
 
 REM * jpeg-6b
+REM CEBHACKALERT: need to test this; can't just accept defaults during installation.
+REM (install to python24/libs) 
 start /w jpeg-6b-3.exe
 
 REM * PIL
@@ -121,5 +123,12 @@ echo.
 echo If successful, tar.gz this python_topo and add it to cvs at
 echo topographica-win\common\python_topo.tar.gz.
 echo.
+echo.
+echo.
+echo ** Before testing, you should proabably delete any previously compiled
+echo c++ code from python24_compiled and python24_intermediate in:
+echo %TEMP%
+echo or:
+echo %TMP%
 echo.
 pause

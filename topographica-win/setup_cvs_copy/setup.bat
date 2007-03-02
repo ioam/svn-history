@@ -83,6 +83,17 @@ echo in the Topographica directory (or 'topographica -g' to
 echo get a graphical interface).
 echo.
 echo.
+echo.
+echo IMPORTANT: if you are upgrading from a previous version, 
+echo you should delete two temporary directories before running
+echo Topographica: 
+echo "python24_compiled" and "python24_intermediate"
+echo.
+echo On your computer, these are likely to be location in 
+echo either:
+echo %TEMP%
+echo or:
+echo %TMP%
 
 :exit
 echo.
