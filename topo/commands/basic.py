@@ -6,8 +6,7 @@ __version__='$Revision$'
 
 import cPickle as pickle
 import __main__
-
-from bz2 import BZ2File 
+import gzip
 
 import topo
 
@@ -131,15 +130,10 @@ def save_snapshot(snapshot_name):
 
     topo.sim.RELEASE=topo.release
 
-    # CEBALERT: I think any compression (even gzip) is too slow
-    # (e.g. try pickling lissom_oo_or.ty).
-    # Should experiment with compression_level to find a suitable
-    # balance, or remove the compression completely.
-
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
-    pickle.dump( (topoPOclassattrs,topo.sim) , BZ2File(snapshot_name,'w',compresslevel=1),2)
+    pickle.dump( (topoPOclassattrs,topo.sim) , gzip.open(snapshot_name,'w',compresslevel=5),2)
 
 
 def load_snapshot(snapshot_name):
@@ -148,7 +142,7 @@ def load_snapshot(snapshot_name):
     """
     # unpickling the PicklableClassAttributes() executes startup_commands and
     # sets PO class parameters.
-    pickle.load(BZ2File(snapshot_name,'r'))
+    pickle.load(gzip.open(snapshot_name,'r'))
     
 
 
