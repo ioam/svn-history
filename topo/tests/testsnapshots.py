@@ -58,7 +58,13 @@ class TestSnapshots(unittest.TestCase):
         self.assertEqual(Line.x,12.0)
         self.assertEqual(__main__.__dict__['z'],99)
 
-        # CB: add xml pickling test
+        # CB: add xml pickling test. Certainly seems like
+        # gnosis.xml.pickle is not the drop-in replacement
+        # for pickle that it is supposed to be
+        # (e.g. on unpickling, startup commands are not
+        # executed: so gnosis.xml.pickle.load() does
+        # things differently from pickle.load() ).
+        # Need to investigate this.
         
 
 # CB: longer to run test should additionally quit the simulation
