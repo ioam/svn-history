@@ -44,6 +44,10 @@ cd create_python_topo
 REM ** INSTALL PACKAGES
 
 REM * python,tcl/tk
+REM This ought to go through without asking any questions. If it doesn't, make sure to choose
+REM NOT to register extensions when you are offered the choice.
+REM The key thing is to have python24.dll installed in this directory, not into windows somewhere.
+REM If it doesn't end up in c:\python24, you can actually just copy it in.
 start /w msiexec /i python-2.4.4.msi ALLUSERS=0 TARGETDIR=c:\python24 ADDLOCAL=DefaultFeature,TclTk
 
 REM * numpy
@@ -119,6 +123,9 @@ echo.
 echo.
 echo Now test this has worked by renaming c:\Python24 to c:\python_topo 
 echo and replacing your copy of Topographica's python_topo with this new one.
+echo To be sure this copy works correctly, you should make sure any other
+echo copy of Topographica is uninstalled first (or try on a computer that does
+echo not have Python installed).
 echo.
 echo If successful, tar.gz this python_topo and add it to cvs at
 echo topographica-win\common\python_topo.tar.gz.
