@@ -48,45 +48,37 @@ class PatternGenerator(ParameterizedObject):
     
     bounds  = BoundingRegionParameter(
         default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True,
-        doc = "BoundingBox of the area in which the pattern is generated.")
+        doc="BoundingBox of the area in which the pattern is generated.")
     
-    xdensity = Number(
-        default=10,bounds=(0,None),hidden=True,
-        doc="Density (number of samples per 1.0 length) in the x direction.")
+    xdensity = Number(default=10,bounds=(0,None),hidden=True,doc="""
+        Density (number of samples per 1.0 length) in the x direction.""")
 
-    ydensity = Number(
-        default=10,bounds=(0,None),hidden=True,doc="""
-           Density (number of samples per 1.0 length) in the y direction.
-           Typically the same as the xdensity.""")
+    ydensity = Number(default=10,bounds=(0,None),hidden=True,doc="""
+        Density (number of samples per 1.0 length) in the y direction.
+        Typically the same as the xdensity.""")
 
-    x = Number(
-        default=0.0,softbounds=(-1.0,1.0),precedence=0.20,
-        doc="X-coordinate location of pattern center.")
+    x = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.20,doc="""
+        X-coordinate location of pattern center.""")
 
-    y = Number(
-        default=0.0,softbounds=(-1.0,1.0),precedence=0.21,
-        doc="Y-coordinate location of pattern center.")
+    y = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.21,doc="""
+        Y-coordinate location of pattern center.""")
 
-    orientation = Number(
-        default=0.0,softbounds=(0.0,2*pi),precedence=0.40,
-        doc="""Polar angle of pattern, i.e., the orientation in the Cartesian coordinate
+    orientation = Number(default=0.0,softbounds=(0.0,2*pi),precedence=0.40,doc="""
+        Polar angle of pattern, i.e., the orientation in the Cartesian coordinate
         system, with zero at 3 o'clock and increasing counterclockwise.""")
     
     size = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.30,doc="""Determines the overall size of the pattern.""")
 
-    scale = Number(
-        default=1.0,softbounds=(0.0,2.0),precedence=0.10,
-        doc="Multiplicative strength of input pattern, defaulting to 1.0")
+    scale = Number(default=1.0,softbounds=(0.0,2.0),precedence=0.10,doc="""
+        Multiplicative strength of input pattern, defaulting to 1.0""")
     
-    offset = Number(
-        default=0.0,softbounds=(-1.0,1.0),precedence=0.11,
-        doc="Additive offset to input pattern, defaulting to 0.0")
+    offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.11,doc="""
+        Additive offset to input pattern, defaulting to 0.0""")
     
-    output_fn = OutputFnParameter(
-        default=IdentityOF(),
-        precedence=0.08,
-        doc="Optional function to apply to the pattern array after it has been created.")
+    output_fn = OutputFnParameter(default=IdentityOF(),precedence=0.08,doc="""
+        Optional function to apply to the pattern array after it has been created.
+        This function can be used for normalization, thresholding, etc.""")
 
         
     def __call__(self,**params):
