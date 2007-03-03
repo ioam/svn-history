@@ -115,10 +115,10 @@ class PatternGenerator(ParameterizedObject):
         result = scale*self.function(**params)+offset
         
         if output_fn is not IdentityOF: # Optimization (but may not actually help)
-            output_fn(result)
-        
-        return result
-
+            output_fn(result)           # CEBHACKALERT: particularly since everything but
+                                        # the IdentityOF *class* will pass this if-test!
+        return result                   # Should be: "if not instance(output_fn,IdentityOF):".
+                                        # I guess this needs fixing in several places.
 
     def __setup_xy(self,bounds,xdensity,ydensity,x,y,orientation):
         """
