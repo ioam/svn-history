@@ -146,6 +146,16 @@ the subtract.reduce bug.)
 <ul>
 
 <li>
+2007/03/03 (CB): investigate why this: 
+<pre>
+from topo.base.patterngenerator import PatternGeneratorParameter
+PatternGeneratorParameter.default=topo.patterns.basic.Line()
+</pre>
+gives errors about being read only sometimes. (Try at 
+the commandline, from a script, and saving/loading snapshots.)
+</li>
+
+<li>
 2007/03/02: Should have an easy way to add things to the right click
 menu, just as it is easy to add templates -- it's a very natural way
 to add user-defined analyses and plots. (Then test pattern window
