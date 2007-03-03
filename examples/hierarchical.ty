@@ -9,12 +9,6 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBHACKALERT: For Windows:
-# This example doesn't work properly with the current version of
-# python_topo, but it does work properly with the version of
-# python_topo that's created by setup.bat (i.e. this problem has
-# been fixed, but I haven't yet made it available).
-
 import numpy.oldnumeric.random_array as RandomArray
 
 import topo.patterns.random
