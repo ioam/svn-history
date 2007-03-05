@@ -321,8 +321,6 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         ### edit options.
         self._canvas_menu = Menu(self, tearoff=0)
         self._canvas_menu.insert_command(0,label='',state=DISABLED) # title
-        self._canvas_menu.insert_command(1,label='Print info',
-                                          command=self.__print_info)
 
 
     def __canvas_right_click(self,event):
@@ -334,24 +332,21 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         and shows a popup menu.
         """
         x,y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
-        sf = event.widget.plot.scale_factor
+        plot = event.widget.plot
+        sf = plot.scale_factor
         r,c=int(floor(y/sf)),int(floor(x/sf))
         # Store information about the mouse click location,
         # for use in code processing the click.
-        self._canvas_click_info = (event.widget.plot,r,c)
+        self._canvas_click_info = (plot,r,c)
 
         # set menu title
-        self._canvas_menu.entryconfig(0,state=DISABLED,label="Options for (" + `r` + "," + `c` + ")")
+        self._canvas_menu.entryconfig(0,state=DISABLED,label=
+                                      ("%s %s: row %d, col %d" % 
+                                       (plot.plot_src_name,plot.name,r,c)))
 
         self._canvas_menu.tk_popup(event.x_root,event.y_root)
 
    
-    # CB: temporary, example menu command
-    def __print_info(self):
-        plot,r,c = self._canvas_click_info
-        print plot.plot_src_name + " " + plot.name + ": row "+ `r` + ", col " + `c`
-
-
     def generate_plotgroup(self):
 	"""
 	Function that creates the PlotGroupPanels's plotgroup.
