@@ -321,7 +321,19 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         ### edit options.
         self._canvas_menu = Menu(self, tearoff=0)
         self._canvas_menu.insert_command(0,label='',state=DISABLED) # title
-
+        
+### Partial support for opening a Connection Fields window on a right click;
+### for this to be useful we would need to convert matrix coordinates
+### into sheet coords, and to pass them to the ConnectionFields panel.
+### 
+#        self._canvas_menu.insert_command(2,label='Connection Fields',
+#                                         command=self.__connection_fields_window)
+#   def __connection_fields_window(self):
+#       plot,r,c = self._canvas_click_info
+#       print plot.plot_src_name + " " + plot.name + ": row "+ `r` + ", col " + `c`
+#
+#       print self.console.plots_menu_entries["Connection Fields"]
+#       self.console.plots_menu_entries["Connection Fields"].command()
 
     def __canvas_right_click(self,event):
         """
