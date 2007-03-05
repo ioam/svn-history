@@ -160,8 +160,10 @@ Often, however, it is reasonably straightforward to build these
 packages yourself. Individual packages can be built as described in their
 own sections below, or you can attempt to build all the optional packages with 
 <code>make -C external all</code> (though this will stop at the first failure).
-<!--add more info? e.g. -k -->
-
+Alternatively, if you want to see which of these packages will build
+without errors, just do <code>make -k -C external all</code>; any
+packages with errors will then be skipped rather than stopping the
+build process.
 
 <P><DL COMPACT>
 
@@ -217,9 +219,13 @@ On linux, building should require nothing more than <code>cd external; make pyau
 and so it can be used with any Python package that you install
 yourself.  To install such a package in Topographica, just run its
 <code>setup.py</code> as usual, but using the copy of Python in
-<code>topographica/bin/python</code>.  That way the package will be
-installed in Topographica's copy of python, rather than any other copy
-of Python that might be present on your system.
+<code>topographica/bin/python</code>.  For instance, if you are
+currently in the main topographica directory and the new package has
+been unpacked in your home directory <code>/home/user/pkg</code>, just type
+<code>bin/python /home/user/pkg/setup.py</code>.
+Running setup in this way ensures that the package will be installed
+in Topographica's copy of python, rather than any other copy of Python
+that might be present on your system.
 
 <P>A good list of potentially useful software is located at 
 <A href="http://www.scipy.org/Topical_Software">SciPy.org</A>.
@@ -230,7 +236,8 @@ Some packages of note:
 <P><DT><A href="http://rpy.sourceforge.net/">RPy</A></DT>
 <DD>The language R (a free implementation of the S statistical
 language) has a nice interface to Python that allows any R
-function to be called from Python.
+function to be called from Python.  Nearly any statistical
+function you might ever need is in R.
 </DD>
 
 </DL>
