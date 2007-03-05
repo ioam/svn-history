@@ -7,7 +7,7 @@ __version__='$Revision$'
 
 import numpy
 
-from math import pi, sin, cos
+from math import pi, sin, cos, sqrt
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 
 from topo.base.parameterclasses import Integer, Number, Parameter, Enumeration
@@ -262,7 +262,6 @@ class SquareGrating(PatternGenerator):
 
 
 class Composite(PatternGenerator):
-
     """
     PatternGenerator that accepts a list of other PatternGenerators.
     To create a new pattern, asks each of the PatternGenerators in the
@@ -333,12 +332,109 @@ class Composite(PatternGenerator):
         orientation=params.get('orientation',self.orientation)
         size=params.get('size',self.size)
 
+        ### JABHACKALERT: Are pg.x and pg.y being disturbed as they are accessed here?
         patterns = [pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
                        x=x+size*(pg.x*cos(orientation)-pg.y*sin(orientation)),
                        y=y+size*(pg.x*sin(orientation)+pg.y*cos(orientation)),
                        orientation=pg.orientation+orientation,size=pg.size*size,
                        scale=pg.scale*scale,offset=pg.offset+offset)
                     for pg in self.generators]
+        image_array = self.operator.reduce(patterns)
+        return image_array
+
+
+
+class ManagedComposite(Composite):
+    """
+    Generalized version of the Composite PatternGenerator that enforces spacing constraints
+    between pattern centers.
+
+    Currently supports minimum spacing, but can be generalized to
+    support maximum spacing also (and both at once).
+    """
+
+    min_separation = Number(default=0.0, bounds = (0,None), softbounds = (0.0,1.0), doc="""
+        Minimum distance to enforce between all pairs of pattern centers.
+
+        Useful for ensuring that multiple randomly generated patterns
+        do not overlap spatially.  Note that as this this value is
+        increased relative to the area in which locations are chosen,
+        the likelihood of a pattern appearing near the center of the
+        area will decrease.  As this value approaches the available
+        area, the corners become far more likely to be chosen, due to
+        the distances being greater along the diagonals.
+        """)
+        ### JABNOTE: Should provide a mechanism for collecting and
+        ### plotting the training pattern center distribution, so that
+        ### such issues can be checked.
+
+    max_trials = Integer(default = 50, bounds = (0,None), softbounds = (0,100), hidden=True, doc="""
+        Number of times to try for a new pattern location that meets the criteria.
+        
+        This is an essentially arbitrary timeout value that helps
+        prevent an endless loop in case the requirements cannot be
+        met.""")
+
+        
+    def __distance_valid(self, g0, g1):
+        """
+        Returns true if the distance between the (x,y) locations of two generators
+        g0 and g1 is greater than a minimum separation.
+
+        Can be extended easily to support other criteria.
+        """
+        dist = sqrt((g1.inspect_value("x") - g0.inspect_value("x")) ** 2 +
+                    (g1.inspect_value("y") - g0.inspect_value("y")) ** 2)
+        return dist >= self.min_separation
+
+
+    def __add_generator(self, new_generator, generators_so_far):
+        """
+        Pick a position for the new_generator that is accepted by __distance_valid;
+        returns False if this was not possible.
+        """
+        for trial in xrange(self.max_trials):
+            # Generate a new position (as a side effect) and add generator if it's ok
+            pos = (new_generator.x,new_generator.y) 
+            if reduce(self.__distance_valid, generators_so_far, new_generator):
+                generators_so_far.append(new_generator)
+                return True
+            
+        # Unsuccessful -- unable to place this pattern            
+        return False 
+
+
+    def function(self, **params):
+        """Constructs combined pattern out of the individual ones."""
+
+        if params.has_key("min_separation"):
+            self.warning("""Ignoring min_separation value provided in this call;
+            the value stored in the ManagedComposite object will be used instead.""")
+
+        # Construct list of generators matching the requirements
+        generators = params.get('generators', self.generators)
+        valid_generators = []
+        for g in generators:
+            self.__add_generator(g,valid_generators)
+
+        # Make a pattern from the valid generators
+        # JABALERT: Can this overlap with the superclass be eliminated?
+        bounds = params.get('bounds',self.bounds)
+        xdensity=params.get('xdensity',self.xdensity)
+        ydensity=params.get('ydensity',self.ydensity)
+        x=params.get('x',self.x)
+        y=params.get('y',self.y)
+        scale=params.get('scale',self.scale)
+        offset=params.get('offset',self.offset)
+        orientation=params.get('orientation',self.orientation)
+        size=params.get('size',self.size)
+
+        patterns = [pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
+                       x=x+size*(pg.inspect_value("x")*cos(orientation)-pg.inspect_value("y")*sin(orientation)),
+                       y=y+size*(pg.inspect_value("x")*sin(orientation)+pg.inspect_value("y")*cos(orientation)),
+                       orientation=pg.orientation+orientation,size=pg.size*size,
+                       scale=pg.scale*scale,offset=pg.offset+offset)
+                    for pg in valid_generators]
         image_array = self.operator.reduce(patterns)
         return image_array
 
@@ -442,8 +538,11 @@ class SineGratingDisk(PatternGenerator):
         return image_array
 
 
+### JABALERT: This class should be eliminated if at all possible; it
+### is just a specialized version of Composite, and should be
+### implementable directly using what is already in Composite.    
 class GaussiansCorner(PatternGenerator):
-    """ Two Gaussian pattern generators """
+    """Two Gaussian pattern generators arranged into a corner shape."""
     
     x = Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                 doc="X center of the corner")
