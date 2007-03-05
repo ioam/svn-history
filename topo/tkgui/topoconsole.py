@@ -199,7 +199,6 @@ class TopoConsole(Frame):
         topo.guimain=self
 
 
-
     def _init_widgets(self):
         
 
@@ -264,6 +263,7 @@ class TopoConsole(Frame):
         # Plot menu
         #
         self.menubar.addmenu('Plots','Assorted plot displays')
+        self.plots_menu_entries={}
         self.populate_plots_menu(self.menubar)
 
         #
@@ -419,6 +419,7 @@ class TopoConsole(Frame):
             menubar.addmenuitem('Plots','command',
                                 obj.name,label=label,
                                 command=entry.command)
+            self.plots_menu_entries[label]=entry
     
     # CEBALERT: Should catch a click on Topoconsole's X (maybe
     # then offer a 'quit or not?' option), but should go out
