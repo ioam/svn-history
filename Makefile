@@ -88,10 +88,13 @@ lint:
 
 
 # Compare topographica and C++ lissom output
-compare: 
+compare_or: 
+	make -C topo/tests/reference/
+	./topographica -c "comparisons=True" topo/tests/reference/lissom_or_reference.ty 
+
+compare_oo_or: 
 	make -C topo/tests/reference/
 	./topographica -c "comparisons=True" topo/tests/reference/lissom_oo_or_reference.ty 
-
 
 clean-pyc:
 	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc
