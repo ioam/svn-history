@@ -345,12 +345,19 @@ class BooleanParameter(Parameter):
 
 
 class CallableParameter(Parameter):
-    """Parameter holding a value that is a callable object, such as a function."""
+    """
+    Parameter holding a value that is a callable object, such as a function.
+    
+    A keyword argument instantiate=True should be provided when a
+    function object is used that might have state.  On the other hand,
+    regular standalone functions cannot be deepcopied as of Python
+    2.4, so instantiate must be False for those values.
+    """
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=None,**params):
-        Parameter.__init__(self,default=default,instantiate=True,**params)
+        Parameter.__init__(self,default=default,**params)
 
     def __set__(self,obj,val):
         if not callable(val):
