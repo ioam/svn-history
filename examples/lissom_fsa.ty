@@ -69,7 +69,7 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.misc.numbergenerators import UniformRandom, NormalRandom, Choice
 from topo.base.parameterclasses import DynamicNumber, Number, ListParameter
 from topo.base.parameterizedobject import Parameter
-from topo.patterns.basic import Composite, Gaussian, Disk, Constant
+from topo.patterns.basic import Composite, SeparatedComposite, Gaussian, Disk, Constant
 from topo.patterns.image import Image
 
 #from topo.tests.reference.lissom_log_parser import get_input_params
@@ -207,68 +207,7 @@ GeneratorSheet.nominal_density = BaseRN * area_scale
 GeneratorSheet.period = 1
 GeneratorSheet.phase = 0.05
 
-# input pattern
-
-class ManagedComposite(Composite):
-    """
-    Pattern generator which composes input patterns and places them
-    at random positions, constraint with a minimum distance among
-    the pattern centers.
-
-    """
-
-    input_separation_min = Number(default = 0.0, doc="minimum distances among pattern centers.")
-    x_range = Number(default = 0.0, softbounds = (-1.0,1.0), precedence = 0.20,
-                     doc="range of X-coordinate location of pattern centers.") 
-    y_range = Number(default = 0.0, softbounds = (-1.0,1.0), precedence = 0.21,
-                     doc="range of Y-coordinate location of pattern centers.") 
-
-    def __distance_valid(self, x0, y0, x1, y1, min_distance):
-        dist = sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2)
-        return dist >= min_distance
-
-    def __pick_centers(self, targets, min_distance):
-
-        # Arbitrary "timeout" value to prevent endless loop; with
-        # some parameter values it may be impossible to find a
-        # valid distance.
-
-        max_trials = 50;
-        valid = True;
-
-        for trial in range(max_trials):
-            pos_x = self.x_range
-            pos_y = self.y_range
-            for target in targets:
-                if (not self.__distance_valid(target[0], target[1], pos_x, pos_y, min_distance)):
-                    valid = False;
-            if (valid): return [pos_x, pos_y]
-            valid = True;
-
-        # Unsuccessful -- unable to place this pattern
-        return []
-
-    def function(self, **params):
-
-        """Constructs combined pattern out of the individual ones."""
-
-        input_separation_min = params.get('input_separation_min', self.input_separation_min)
-
-        generators = params.get('generators', self.generators) 
-        valid_generators = []
-        valid_positions  = []
-
-        for item in generators:
-
-            pos = self.__pick_centers(valid_positions, input_separation_min)
-            if (not pos == []):
-                [item.x, item.y] = pos
-                valid_positions.append((item.x, item.y))
-                valid_generators.append(item)
-
-        return super(ManagedComposite, self).function(generators = valid_generators, **params)
-
-
+# input patterns
 size_scale = 1.0
 retina_scale = 1.0 / 24.0 * size_scale  # BaseLN * size_scale
 
@@ -278,16 +217,26 @@ righteye = Gaussian(aspect_ratio = 1.0, x = 1 * retina_scale, y = -2.5 * retina_
                     size = 2.0 * 1.2 * retina_scale / 1.7, scale = 0.5, offset = 0.5)
 mouth   =  Gaussian(aspect_ratio = 1.0, x = -5 * retina_scale, y = 0.0 * retina_scale,
                     size = 2.0 * 1.2 * retina_scale / 1.7, scale = 0.5, offset = 0.5)
-face0 = Composite(generators = [lefteye, righteye, mouth], operator = numpy.maximum, orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=56)), size = 1.7)
-face1 = Composite(generators = [lefteye, righteye, mouth], operator = numpy.maximum, orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=78)), size = 1.7)
-face2 = Composite(generators = [lefteye, righteye, mouth], operator = numpy.maximum, orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi, ubound = 19.0/36.0*pi,seed=90)), size = 1.7)
+
+
+num_inputs=3
+inputs=[Composite(generators = [lefteye, righteye, mouth],
+                  operator = numpy.maximum, size = 1.7,
+                  orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi,
+                                                          ubound = 19.0/36.0*pi,seed=56+i)),
+                  x=DynamicNumber(UniformRandom(lbound=-85.0 / BaseRN,
+                                                ubound= 85.0 / BaseRN,seed=12+i)),
+                  y=DynamicNumber(UniformRandom(lbound=-85.0 / BaseRN,
+                                                ubound= 85.0 / BaseRN,seed=34+i)))
+        for i in xrange(num_inputs)]
+
 
 input_separation_min = RN / LN * 36.0  # retina_lgn_ratio * size_in_lgn_coor
 
-input_pattern = ManagedComposite(generators = [face0, face1, face2], input_separation_min = input_separation_min / BaseRN,
-                x_range = DynamicNumber(UniformRandom(lbound=-85.0 / BaseRN, ubound = 85.0 / BaseRN, seed=41)),
-                y_range = DynamicNumber(UniformRandom(lbound=-85.0 / BaseRN, ubound = 85.0 / BaseRN, seed=27)),
-                operator = numpy.maximum)
+combined_inputs = SeparatedComposite(
+    min_separation = input_separation_min / BaseRN,
+    generators = inputs,
+    operator = numpy.maximum)
 
 retina_bounds = BoundingBox(radius = RN / (2.0 * BaseRN * area_scale))
 lgn_bounds = BoundingBox(radius = LN / (2.0 * BaseLN * area_scale))
@@ -315,7 +264,7 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
 topo.sim['Retina'] = GeneratorSheet(nominal_bounds=retina_bounds, nominal_density=BaseRN,
-                                    input_generator=input_pattern)
+                                    input_generator=combined_inputs)
 
 topo.sim['LGNOn'] = CFSheet(nominal_bounds=lgn_bounds,nominal_density=BaseLN,
                       output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
