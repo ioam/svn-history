@@ -32,16 +32,35 @@ that the log file or_map_topo.log contains at least as many iterations
 as you are trying to perform in this simulation.
 
 
+Matches the orientation map simulation from figure 6.4 (Reduced) of
+Miikkulainen, Bednar, Choe, and Sirosh (2005), Computational Maps in
+the Visual Cortex, Springer, except:
+
+ - The default_density is smaller for practicality (142 in the book)
+ - The lateral inhibitory radius is 0.5 matrix units greater than in the 
+   book, becauseTopographica enforces good circular-shaped CF outlines.
+ - Input patterns are evaluated on the entire retina, instead of only up
+   to bounds_multiplier=2.5 times the gaussian sigma in the book
+ - Input pattern parameters are cropped to a precision of 1 decimal
+   place so that they can be exchanged losslessly between simulators
+ - Weight patterns are not smoothed around the edges, unlike
+   smooth_circular_outlines=True and smooth_circular_radius_trim=-0.25
+   used in the book
+ - Initial weight patterns were all Constant rather than random afferent
+   and Gaussian sigma preset_sigma_exc=11.076 preset_sigma_inh=71.76
+   lateral weights used in the book.
+ - Inhibitory weight pruning is disabled (not pruning all weights below
+   1e-5 as in the book)
+ - Only one input pattern is used per iteration, instead of two patterns
+   with input_separation_min=14.3 LGN units in the book
+
+All but the first two of these need to be fixed eventually.
+
+NOT YET TESTED AT DIFFERENT DENSITIES.
 
 $Id$
 """
 __version__='$Revision$'
-
-
-# CB:
-# The plan is that when this simulation matches the c++ one (or_map_topo.param),
-# more features can be added, and it can be generalized.
-
 
 
 #import pdb 
@@ -64,39 +83,39 @@ import topo.patterns.basic
 from topo.tests.reference.lissom_log_parser import get_input_params,check_weights,check_activities
 
 # All the C++ data-getting functions will use this as the filename base
-topo.tests.reference.lissom_log_parser.filename_base="topo/tests/reference/or_map_topo."
+topo.tests.reference.lissom_log_parser.filename_base="topo/tests/reference/010910_or_map_512MB."
 
 
-### Variables to match or_map_topo.param
+### Variables to match 010910_or_map_512MB.param and or_defs
 #
 BaseN=24.0
 BaseRN=24.0
 area_scale=1.0
 #num_eyes=1
-rf_radius=BaseRN/4.0+0.5 
-inh_rad=BaseN/4.0-1.0+0.5
-exc_rad=2.5 #BaseN/10.0              
-#min_exc_rad=max(1.0,BaseN/44+0.5)
+rf_radius=BaseRN/4.0+0.5
+inh_rad=BaseN/4.0-1.0+0.5 # this factor of 0.5 is added to make shapes similar in C++ and topographica version
+exc_rad=2.5
 
-#default_afferent_size_scale=BaseN/BaseRN
 gammaexc=0.9
 gammainh=0.9
 
-delta_i=0.083
+
+delta_i=0.1
 beta_i=delta_i+0.55
 
-randomness = 0.0
-#smooth_circular_radius_trim = -0.25
 
-rf_radius_scale=5.0/rf_radius
-#retina_area_scale = (BaseRN*area_scale/24.0*rf_radius_scale)*(BaseRN*area_scale/24.0*rf_radius_scale)
-#inputs_pereye=max(retina_area_scale,1)
-xsigma=6.0
+randomness = 0.0
+
+
+rf_radius_scale=1.0
+xsigma=7.0
 ysigma=1.5
 scale_input=1.0
 
-retina_edge_buffer=round((rf_radius+(randomness*BaseRN*area_scale/2.0)),0)
-RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
+
+retina_edge_buffer=rf_radius-0.5+(randomness*BaseRN*area_scale/2)
+RN=BaseRN*area_scale+2*retina_edge_buffer
+
 
 acs=6.5*6.5/rf_radius/rf_radius
 ecs=19.5*19.5/exc_rad/exc_rad
@@ -105,13 +124,11 @@ alpha_input=0.007*acs
 alpha_exc=0.002*ecs
 alpha_inh=0.00025*ics
 
-tsettle=8
+tsettle=9
 
 
 # Number of decimal places for simulator time
 fixedpoint.DEFAULT_PRECISION=3
-
-
 
 ### Setup the Topographica simulation
 #
@@ -161,17 +178,17 @@ topo.sim.connect('Eye0','Primary', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength = 1.0, name='Afferent0',
           nominal_bounds_template=BoundingBox(radius=rf_radius/BaseRN))
 
+
 topo.sim.connect('Primary','Primary', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength=gammaexc,
           name='LateralExcitatory',
-          nominal_bounds_template=BoundingBox(radius=exc_rad/BaseN))
+          nominal_bounds_template=BoundingBox(radius=exc_rad/BaseN, min_radius=1.5/BaseN))
+
 
 topo.sim.connect('Primary','Primary', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength=-gammainh,
           name='LateralInhibitory',
           nominal_bounds_template=BoundingBox(radius=inh_rad/BaseN) )
-
-
 
 
 def n_units(x):
@@ -196,21 +213,24 @@ LI.learning_rate=alpha_inh*n_units(LI)
 
 ### Excitatory bounds changes
 #
-# The learning rate is adjusted too because the number of units changes (even if the learning
+# The learning rate is adjusted too because the number of units changes and ecs changes (even if the learning
 # rate is going to be adjusted anyway at this time)
-# exc_rad*=0.6
-#topo.sim.schedule_command(199,'exc_rad=2.5; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); LE.learning_rate=alpha_exc*n_units(LE)')
-
-#topo.sim.schedule_command(499,'exc_rad=exc_rad*0.7+0.35; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); LE.learning_rate=alpha_exc*n_units(LE)')
-
-#topo.sim.schedule_command(999,'exc_rad=exc_rad*0.8-0.3; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); LE.learning_rate=alpha_exc*n_units(LE)')
-
-#topo.sim.schedule_command(1999,'exc_rad=2.5; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); LE.learning_rate=alpha_exc*n_units(LE)')
+topo.sim.schedule_command(199,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); LE.learning_rate=alpha_exc*n_units(LE)')
+topo.sim.schedule_command(499,'exc_rad=exc_rad*0.7; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*n_units(LE)')
+topo.sim.schedule_command(999,'exc_rad=exc_rad*0.8; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*n_units(LE)')
+topo.sim.schedule_command(1999,'exc_rad=exc_rad*0.8; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*n_units(LE)')
+topo.sim.schedule_command(2999,'exc_rad=exc_rad*0.8; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*n_units(LE)')
+topo.sim.schedule_command(3999,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*n_units(LE)')
+topo.sim.schedule_command(4999,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*n_units(LE)')
+topo.sim.schedule_command(6499,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*n_units(LE)')
+topo.sim.schedule_command(7999,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*n_units(LE)')
+topo.sim.schedule_command(19999,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*n_units(LE)')
 
 
 ### Excitatory learning rate changes
 #
 topo.sim.schedule_command(499,'alpha_exc=0.001*ecs; LE.learning_rate=alpha_exc*n_units(LE)')
+
 
 ### Afferent learning rate changes
 #
@@ -232,7 +252,11 @@ topo.sim.schedule_command( 6499, 'topo.sim["Primary"].output_fn.lower_bound=delt
 topo.sim.schedule_command( 7999, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.13; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.20')
 topo.sim.schedule_command(19999, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.14; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.23')
 
-
+#tsettle changes
+topo.sim.schedule_command( 1999, 'topo.sim["Primary"].tsettle=10')
+topo.sim.schedule_command( 4999, 'topo.sim["Primary"].tsettle=11')
+topo.sim.schedule_command( 6499, 'topo.sim["Primary"].tsettle=12')
+topo.sim.schedule_command( 7999, 'topo.sim["Primary"].tsettle=13')
 
 
 if locals().get('comparisons',False):
@@ -243,8 +267,8 @@ if locals().get('comparisons',False):
 
     ### Check initial weights
     #
-    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26))
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
 
     check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3))
     check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15))
@@ -284,13 +308,11 @@ if locals().get('comparisons',False):
     check_activities('Eye0')
     check_activities('Primary')
 
-
-
     topo.sim.run(80)
 
-    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26))
-
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
+    
     check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3))
     check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15))
 
@@ -300,14 +322,69 @@ if locals().get('comparisons',False):
     check_activities('Eye0')
     check_activities('Primary')
 
+    topo.sim.run(100)
 
-    topo.sim.run(900)
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
+    
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
 
-    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26))
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
 
-    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3))
-    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15))
+    check_activities('Eye0')
+    check_activities('Primary')
+    
+    topo.sim.run(400)
+
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
+    
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
+    
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
+
+    check_activities('Eye0')
+    check_activities('Primary')
+
+    topo.sim.run(300)
+
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
+    
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
+    
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
+
+    check_activities('Eye0')
+    check_activities('Primary')
+
+    topo.sim.run(100)
+
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
+    
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
+    
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
+
+    check_activities('Eye0')
+    check_activities('Primary')
+    
+    topo.sim.run(1000)
+
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
+    
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
 
     check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
     check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
@@ -318,11 +395,26 @@ if locals().get('comparisons',False):
 
     topo.sim.run(1000)
 
-    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26))
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
+    
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
+    
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
 
-    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3))
-    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15))
+    check_activities('Eye0')
+    check_activities('Primary')
+
+
+    topo.sim.run(1000)
+
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
+    
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
 
     check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
     check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
@@ -333,11 +425,26 @@ if locals().get('comparisons',False):
 
     topo.sim.run(1000)
 
-    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26))
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
+    
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
+    
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
+    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
 
-    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3))
-    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15))
+    check_activities('Eye0')
+    check_activities('Primary')
+
+
+    topo.sim.run(1000)
+
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
+
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
 
     check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
     check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
@@ -348,12 +455,12 @@ if locals().get('comparisons',False):
 
     topo.sim.run(1000)
 
-    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26))
-
-    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3))
-    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15))
-
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
+    
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
+    
     check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
     check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
 
@@ -363,12 +470,12 @@ if locals().get('comparisons',False):
 
     topo.sim.run(1000)
 
-    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26))
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
 
-    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3))
-    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15))
-
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
+    
     check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
     check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
 
@@ -378,57 +485,12 @@ if locals().get('comparisons',False):
 
     topo.sim.run(1000)
 
-    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26))
-
-    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3))
-    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15))
-
-    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
-    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
-
-    check_activities('Eye0')
-    check_activities('Primary')
-
-
-    topo.sim.run(1000)
-
-    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26))
-
-    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3))
-    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15))
-
-    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
-    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
-
-    check_activities('Eye0')
-    check_activities('Primary')
-
-
-    topo.sim.run(1000)
-
-    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26))
-
-    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3))
-    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15))
-
-    check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
-    check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
-
-    check_activities('Eye0')
-    check_activities('Primary')
-
-
-    topo.sim.run(1000)
-
-    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26))
-
-    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3))
-    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15))
-
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
+    
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
+    
     check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
     check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
 
@@ -438,12 +500,12 @@ if locals().get('comparisons',False):
 
     topo.sim.run(3000)
 
-    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26))
-
-    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3))
-    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15))
-
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
+    
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
+    
     check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
     check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
 
@@ -453,38 +515,33 @@ if locals().get('comparisons',False):
 
     topo.sim.run(3000)
 
-    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26))
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
 
-    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3))
-    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15))
-
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
+    
     check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
     check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
 
     check_activities('Eye0')
     check_activities('Primary')
-
 
     topo.sim.run(5000)
 
-    check_weights('Primary','Afferent0',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent0',(12,12),slice(13,26),slice(13,26))
+    check_weights('Primary','Afferent0',(0,0),slice(0,13),slice(0,13))
+    check_weights('Primary','Afferent0',(12,12),slice(12,25),slice(12,25))
 
-    check_weights('Primary','LateralExcitatory',(0,0),slice(0,3),slice(0,3))
-    check_weights('Primary','LateralExcitatory',(12,12),slice(10,15),slice(10,15))
-
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,2),slice(0,2)) 
+    check_weights('Primary','LateralExcitatory',(12,12),slice(11,14),slice(11,14))
+    
     check_weights('Primary','LateralInhibitory',(0,0),slice(0,6),slice(0,6))
     check_weights('Primary','LateralInhibitory',(12,12),slice(7,18),slice(7,18))
 
     check_activities('Eye0')
     check_activities('Primary')
 
-
-
-
 # Command to generate lissom data for comparisons
 #
-#./lissom5 commandpath="/home/v1cball/public/lissom/command" display=0 or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'   -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+5" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+10" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+80" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+900" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+5000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12'
+#./lissom5 display=0 010910_or_map_512MB.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'   -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+5" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+10" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+80" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+400" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12'  -c "training t+300" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+5000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12'
 
-# CBHACKALERT: these should be hooks in the params file, rather than being like this!
