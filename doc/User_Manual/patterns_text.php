@@ -84,7 +84,7 @@ random but with a Gaussian falloff in strength by setting:
 CFProjection.weights_generator=topo.patterns.basic.Composite(
     generators=[topo.patterns.random.UniformRandom(),
                 topo.patterns.basic.Gaussian(aspect_ratio=1.0,size=0.2)],
-    operator=Wrapper("Numeric.multiply"))
+    operator=numpy.multiply)
 </pre>
 
 <center>
@@ -97,19 +97,18 @@ CFProjection.weights_generator=topo.patterns.basic.Composite(
 <pre>
 $ ./topographica -g
 Topographica&gt; from topo.patterns.basic import SineGrating, Disk, Composite
-Topographica&gt; from topo.base.parameterclasses import Wrapper
 Topographica&gt; surroundsine   = SineGrating(frequency=8.0,orientation=0.25*pi, phase=3*pi/2)
 Topographica&gt; centersine     = SineGrating(frequency=8.0,orientation=0.60*pi)
 Topographica&gt; centerdisk     = Disk(aspect_ratio=1.0, size=0.35, smoothing=0.005)
 Topographica&gt; surrounddisk   = Disk(aspect_ratio=1.0, size=0.90, smoothing=0.005)
 Topographica&gt; surroundring   = Composite(generators=[surrounddisk,centerdisk],
-Topographica&gt;                            operator=Wrapper("Numeric.subtract"))
+Topographica&gt;                            operator=numpy.subtract)
 Topographica&gt; center         = Composite(generators=[centersine,centerdisk],
-Topographica&gt;                            operator=Wrapper("Numeric.multiply"))
+Topographica&gt;                            operator=numpy.multiply)
 Topographica&gt; surround       = Composite(generators=[surroundsine,surroundring],
-Topographica&gt;                            operator=Wrapper("Numeric.multiply"))
+Topographica&gt;                            operator=numpy.multiply)
 Topographica&gt; centersurround = Composite(generators=[center,surround],
-Topographica&gt;                            operator=Wrapper("Numeric.add"),
+Topographica&gt;                            operator=numpy.add,
 Topographica&gt;                            xdensity=160,ydensity=160)
 Topographica&gt; matrixplot(centersurround())
 </pre>
@@ -124,7 +123,6 @@ rotated, and placed together as a unit:
 <pre>
 $ ./topographica -g
 Topographica&gt; from topo.patterns.basic import Gaussian, Disk, Composite
-Topographica&gt; from topo.base.parameterclasses import Wrapper
 Topographica&gt; lefteye    = Disk(    aspect_ratio=0.7, x=0.04, y=0.10, size=0.08, scale=1.00)
 Topographica&gt; leftpupil  = Disk(    aspect_ratio=1.0, x=0.03, y=0.08, size=0.04, scale=-1.6)
 Topographica&gt; righteye   = Disk(    aspect_ratio=0.7, x=0.04, y=-0.1, size=0.08, scale=1.00)
@@ -133,7 +131,7 @@ Topographica&gt; nose       = Gaussian(aspect_ratio=0.8, x=-0.1, y=0.00, size=0.
 Topographica&gt; mouth      = Gaussian(aspect_ratio=0.8, x=-0.2, y=0.00, size=0.06, scale=-0.8)
 Topographica&gt; head       = Disk(    aspect_ratio=1.5, x=-0.02,y=0.00, size=0.40, scale=0.70)
 Topographica&gt; pg=Composite(generators=[lefteye,leftpupil,righteye,rightpupil,nose,mouth,head],
-Topographica&gt;              operator=Wrapper("Numeric.add"),xdensity=160,ydensity=160)
+Topographica&gt;              operator=numpy.add,xdensity=160,ydensity=160)
 Topographica&gt; matrixplot(pg(orientation=pi/1.8, x=0.2, y=0.1, offset=0.5, size=0.75))
 </pre>
 
