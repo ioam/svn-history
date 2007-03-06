@@ -306,15 +306,34 @@ class Composite(PatternGenerator):
               
         """)
     
-    generators = ListParameter(default=[Constant(scale=0.0)],precedence=0.97,class_=PatternGenerator,doc="""
+    generators = ListParameter(default=[Constant(scale=0.0)],precedence=0.97,
+        class_=PatternGenerator,doc="""
         List of patterns to use in the composite pattern.  The default is
         a blank pattern, and should thus be overridden for any useful work.""")
 
     size  = Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
-        
+
+    
     def __init__(self,**params):
         super(Composite,self).__init__(**params)
         assert hasattr(self.operator,'reduce'),repr(self.operator)+" does not support 'reduce'."
+
+
+    def _advance_pattern_generators(self,generators):
+        """
+        Advance each of the parameters overriden by this class.
+        
+        Each parameter should be accessed once, as it would be if the
+        pattern generator was used on its own, so that any dynamic
+        values are calculated first.
+
+        Subclasses can override this method to provide constraints
+        on these values and/or eliminate generators from this list
+        if necessary.
+        """
+        for g in generators:
+            vals = (g.x, g.y, g.size, g.orientation, g.scale, g.offset)
+        return generators
 
 
     # JABALERT: To support large numbers of patterns on a large input region,
@@ -322,6 +341,9 @@ class Composite(PatternGenerator):
     # combine them at the full Composite Bounding box size.
     def function(self,**params):
         """Constructs combined pattern out of the individual ones."""
+        generators = self._advance_pattern_generators(
+            params.get('generators', self.generators))
+
         bounds = params.get('bounds',self.bounds)
         xdensity=params.get('xdensity',self.xdensity)
         ydensity=params.get('ydensity',self.ydensity)
@@ -332,19 +354,22 @@ class Composite(PatternGenerator):
         orientation=params.get('orientation',self.orientation)
         size=params.get('size',self.size)
 
-        ### JABHACKALERT: Are pg.x and pg.y being disturbed as they are accessed here?
         patterns = [pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
-                       x=x+size*(pg.x*cos(orientation)-pg.y*sin(orientation)),
-                       y=y+size*(pg.x*sin(orientation)+pg.y*cos(orientation)),
-                       orientation=pg.orientation+orientation,size=pg.size*size,
-                       scale=pg.scale*scale,offset=pg.offset+offset)
-                    for pg in self.generators]
+                       x=x+size*(pg.inspect_value("x")*cos(orientation)-
+                                 pg.inspect_value("y")*sin(orientation)),
+                       y=y+size*(pg.inspect_value("x")*sin(orientation)+
+                                 pg.inspect_value("y")*cos(orientation)),
+                       orientation=pg.inspect_value("orientation")+orientation,
+                       size=pg.inspect_value("size")*size,
+                       scale=pg.inspect_value("scale")*scale,
+                       offset=pg.inspect_value("offset")+offset)
+                    for pg in generators]
         image_array = self.operator.reduce(patterns)
         return image_array
 
 
 
-class ManagedComposite(Composite):
+class SeparatedComposite(Composite):
     """
     Generalized version of the Composite PatternGenerator that enforces spacing constraints
     between pattern centers.
@@ -353,7 +378,8 @@ class ManagedComposite(Composite):
     support maximum spacing also (and both at once).
     """
 
-    min_separation = Number(default=0.0, bounds = (0,None), softbounds = (0.0,1.0), doc="""
+    min_separation = Number(default=0.0, bounds = (0,None),
+                            softbounds = (0.0,1.0), doc="""
         Minimum distance to enforce between all pairs of pattern centers.
 
         Useful for ensuring that multiple randomly generated patterns
@@ -368,7 +394,8 @@ class ManagedComposite(Composite):
         ### plotting the training pattern center distribution, so that
         ### such issues can be checked.
 
-    max_trials = Integer(default = 50, bounds = (0,None), softbounds = (0,100), hidden=True, doc="""
+    max_trials = Integer(default = 50, bounds = (0,None),
+                         softbounds = (0,100), hidden=True, doc="""
         Number of times to try for a new pattern location that meets the criteria.
         
         This is an essentially arbitrary timeout value that helps
@@ -388,55 +415,34 @@ class ManagedComposite(Composite):
         return dist >= self.min_separation
 
 
-    def __add_generator(self, new_generator, generators_so_far):
+    def _advance_pattern_generators(self,generators):
         """
-        Pick a position for the new_generator that is accepted by __distance_valid;
-        returns False if this was not possible.
+        Advance the parameters for each generator for this presentation.
+
+        Picks a position for each generator that is accepted by __distance_valid
+        for all combinations.  Returns a new list of the generators, with
+        some potentially omitted due to failure to meet the constraints.
         """
-        for trial in xrange(self.max_trials):
-            # Generate a new position (as a side effect) and add generator if it's ok
-            pos = (new_generator.x,new_generator.y) 
-            if reduce(self.__distance_valid, generators_so_far, new_generator):
-                generators_so_far.append(new_generator)
-                return True
-            
-        # Unsuccessful -- unable to place this pattern            
-        return False 
-
-
-    def function(self, **params):
-        """Constructs combined pattern out of the individual ones."""
-
-        if params.has_key("min_separation"):
-            self.warning("""Ignoring min_separation value provided in this call;
-            the value stored in the ManagedComposite object will be used instead.""")
-
-        # Construct list of generators matching the requirements
-        generators = params.get('generators', self.generators)
+        
         valid_generators = []
         for g in generators:
-            self.__add_generator(g,valid_generators)
+            # Advance values as a side effect
+            vals = (g.size, g.orientation, g.scale, g.offset)
+            
+            for trial in xrange(self.max_trials):
+                # Generate a new position (as a side effect) and add generator if it's ok
+                vals = (g.x, g.y)
+                for v in valid_generators:
+                    if not self.__distance_valid(g,v):
+                        break
+                else:
+                    valid_generators.append(g)
+                    break
+            else:
+                self.warning("Unable to place pattern %s subject to given constraints" %
+                             g.name)
 
-        # Make a pattern from the valid generators
-        # JABALERT: Can this overlap with the superclass be eliminated?
-        bounds = params.get('bounds',self.bounds)
-        xdensity=params.get('xdensity',self.xdensity)
-        ydensity=params.get('ydensity',self.ydensity)
-        x=params.get('x',self.x)
-        y=params.get('y',self.y)
-        scale=params.get('scale',self.scale)
-        offset=params.get('offset',self.offset)
-        orientation=params.get('orientation',self.orientation)
-        size=params.get('size',self.size)
-
-        patterns = [pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
-                       x=x+size*(pg.inspect_value("x")*cos(orientation)-pg.inspect_value("y")*sin(orientation)),
-                       y=y+size*(pg.inspect_value("x")*sin(orientation)+pg.inspect_value("y")*cos(orientation)),
-                       orientation=pg.orientation+orientation,size=pg.size*size,
-                       scale=pg.scale*scale,offset=pg.offset+offset)
-                    for pg in valid_generators]
-        image_array = self.operator.reduce(patterns)
-        return image_array
+        return valid_generators
 
 
 
@@ -445,7 +451,8 @@ class Selector(PatternGenerator):
     PatternGenerator that selects from a list of other PatternGenerators.
     """
 
-    generators = ListParameter(default=[Constant()],precedence=0.97,class_=PatternGenerator,bounds=(1,None),
+    generators = ListParameter(default=[Constant()],precedence=0.97,
+                               class_=PatternGenerator,bounds=(1,None),
         doc="List of patterns from which to select.")
 
     size  = Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
