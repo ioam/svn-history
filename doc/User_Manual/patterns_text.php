@@ -97,6 +97,7 @@ CFProjection.weights_generator=topo.patterns.basic.Composite(
 <pre>
 $ ./topographica -g
 Topographica&gt; from topo.patterns.basic import SineGrating, Disk, Composite
+Topographica&gt; import numpy
 Topographica&gt; surroundsine   = SineGrating(frequency=8.0,orientation=0.25*pi, phase=3*pi/2)
 Topographica&gt; centersine     = SineGrating(frequency=8.0,orientation=0.60*pi)
 Topographica&gt; centerdisk     = Disk(aspect_ratio=1.0, size=0.35, smoothing=0.005)
@@ -123,6 +124,7 @@ rotated, and placed together as a unit:
 <pre>
 $ ./topographica -g
 Topographica&gt; from topo.patterns.basic import Gaussian, Disk, Composite
+Topographica&gt; import numpy
 Topographica&gt; lefteye    = Disk(    aspect_ratio=0.7, x=0.04, y=0.10, size=0.08, scale=1.00)
 Topographica&gt; leftpupil  = Disk(    aspect_ratio=1.0, x=0.03, y=0.08, size=0.04, scale=-1.6)
 Topographica&gt; righteye   = Disk(    aspect_ratio=0.7, x=0.04, y=-0.1, size=0.08, scale=1.00)
