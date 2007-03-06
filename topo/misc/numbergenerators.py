@@ -7,9 +7,10 @@ $Id$
 __version__='$Revision$'
 
 import random
+from math import e
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Number, ListParameter
+from topo.base.parameterclasses import Number, ListParameter, CallableParameter
 
 
 class RandomDistribution(ParameterizedObject):
@@ -106,5 +107,35 @@ class NormalRandom(RandomDistribution):
     
     def __call__(self):
         return self.random_generator.normalvariate(self.mu,self.sigma)
+
+
+class ExponentialDecay(ParameterizedObject):
+    """
+    Function object that provides a value that decays according to an
+    exponential function, based on a given timebase.
+
+    Returns starting_value*base^(-time/time_constant).
+    
+    See http://en.wikipedia.org/wiki/Exponential_decay.
+    """
+    starting_value = Number(1.0, doc="Value used for time zero.")
+
+    time_constant = Number(10000,doc="""
+        Time scale for the exponential; large values give slow decay.""")
+
+    base = Number(e, doc="""
+        Base of the exponent; the default yields starting_value*exp(-t/time_constant.""")
+
+    timebase = CallableParameter(None, doc="Function to call to determine current time.")
+    
+    def __init__(self,**params):
+        super(ExponentialDecay,self).__init__(**params)
+        if not callable(self.timebase):
+            self.warning("ExponentialDecay timebase must be a callable object (e.g. a function)")
+
+    def __call__(self):
+        return self.starting_value * self.base**(-1.0*float(self.timebase())/
+                                                 float(self.time_constant))
+
 
 
