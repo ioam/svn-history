@@ -34,9 +34,9 @@ RandomArray.seed(500,500)
 # Input patterns
 num_inputs=2
 input_type=topo.patterns.basic.Gaussian
-generators=[]
+inputs=[]
 for i in xrange(num_inputs):
-    generators.append(input_type(
+    inputs.append(input_type(
         x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12+i)),
         y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34+i)),
         orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56+i)),
@@ -45,11 +45,11 @@ for i in xrange(num_inputs):
         bounds=BoundingBox(radius=0.8)))
 
 # Contents of retina
-inputs = topo.patterns.basic.SeparatedComposite(min_separation=0.6,generators=generators)
+combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=0.6,generators=inputs)
 
 
 # Sheets, connections, and their parameters
-topo.sim['Retina'] = GeneratorSheet(input_generator=inputs,
+topo.sim['Retina'] = GeneratorSheet(input_generator=combined_inputs,
                                     period=1.0,phase=0.05,nominal_density=30)
 
 topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',50.0),
