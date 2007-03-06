@@ -7,11 +7,11 @@ this version are likely to need modification when subsequent versions
 are released.
 
 The Topographica software code and documentation are copyright
-2005-2007 James A. Bednar, Christopher Ball, Christopher Palmer,
-Yoonsuck Choe, Julien Ciroux, Judah B. De Paula, Judith Law, Alan
-Lindsay, Louise Mathews, Jefferson Provost, Veldri Kurniawan, Tikesh
-Ramtohul, Lewis Ng, Ruaidhri Primrose, Foivos Demertzis, Roger Zhao,
-and Yiu Fai Sit.
+2005-2007 James A. Bednar, Jan Antolik, Christopher Ball, Yoonsuck
+Choe, Julien Ciroux, Judah B. De Paula, Foivos Demertzis, Veldri
+Kurniawan, Judith Law, Alan Lindsay, Louise Mathews, Lewis Ng,
+Christopher Palmer, Ruaidhri Primrose, Jefferson Provost, Tikesh
+Ramtohul, Yiu Fai Sit, Stuart Wilson, and Roger Zhao.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License version 2 as
