@@ -125,6 +125,7 @@ rotated, and placed together as a unit:
 $ ./topographica -g
 Topographica&gt; from topo.patterns.basic import Gaussian, Disk, Composite
 Topographica&gt; import numpy
+Topographica&gt; Disk.smoothing=0.005
 Topographica&gt; lefteye    = Disk(    aspect_ratio=0.7, x=0.04, y=0.10, size=0.08, scale=1.00)
 Topographica&gt; leftpupil  = Disk(    aspect_ratio=1.0, x=0.03, y=0.08, size=0.04, scale=-1.6)
 Topographica&gt; righteye   = Disk(    aspect_ratio=0.7, x=0.04, y=-0.1, size=0.08, scale=1.00)
