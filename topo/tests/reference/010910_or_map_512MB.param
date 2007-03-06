@@ -1,0 +1,37 @@
+#!./lissom
+#
+# RF-LISSOM parameter file for an orientation-map simulation with
+# ellipsoidal Gaussian inputs.
+#
+# $Header: /u/nn/cvsroot/lissom/samples/or_map.param,v 1.60 2001/05/22 20:10:04 jbednar Exp $
+
+#reduce density of book version
+set BaseN=24 BaseRN=24 area_scale=1.0
+set num_eyes=1 layers_pereye=0
+set inputs_pereye=1
+
+set rf_radius=BaseRN/4+0.5       
+set inh_rad=BaseN/4-1+0.5 #no .5 in actual book version - this is to keep shapes the same in this version and topographica
+exc_rad=2.5>?(BaseN/10)
+
+#Make version work with only one input so we can compare
+define_param ids Param_Float  0 MaxInt  "Input Density Scale"
+set ids=1.0
+set inh_death=0.0
+
+call or_defs
+
+set bound_multiplier=BaseRN*area_scale*10 # Make sure all input patterns are evaluated fully
+
+set input_default_position="Uncorrelate &uncorrelation 0 RN  Random RN/2 RN/2 Precision 1"
+set input_default_angle="Random PI/2 PI/2 Precision 1"
+
+
+set preset_aff_wts=True preset_sigma_aff=0
+set preset_lat_wts=True preset_sigma_exc=0 preset_sigma_inh=0
+set circular_aff_wts=True  circular_lat_wts=True
+set smooth_circular_outlines=False smooth_circular_radius_trim=-0.25
+
+
+
+
