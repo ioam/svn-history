@@ -18,13 +18,14 @@ import topo.patterns.random
 import topo.patterns.basic
  
 from topo.base.boundingregion import BoundingBox
-from topo.base.cf import CFProjection
+from topo.base.cf import CFProjection, CFSheet
 from topo.base.parameterclasses import DynamicNumber
-from topo.learningfns.som import CFPLF_HebbianSOM
+from topo.learningfns.som import CFPLF_HebbianSOM,CFPLF_EuclideanHebbian
+from topo.outputfns.basic import KernelMax
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.misc.numbergenerators import UniformRandom
+from topo.misc.numbergenerators import UniformRandom,ExponentialDecay
 
 topo.sim.name = "cfsom_or"
 
@@ -44,12 +45,14 @@ inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12+
 # Contents of retina
 combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=0.6,generators=inputs)
 
-
 # Sheets, connections, and their parameters
 topo.sim['Retina'] = GeneratorSheet(input_generator=combined_inputs,
                                     period=1.0,phase=0.05,nominal_density=30)
 
-topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',50.0),
+default_density=locals().get('default_density',50.0)
+
+# Original version using CFSOM.
+topo.sim['V1'] = CFSOM(nominal_density=default_density,
                        learning_length=10000,radius_0=0.1,alpha_0=0.5)
 
 topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,
@@ -58,3 +61,28 @@ topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,
                   nominal_bounds_template=BoundingBox(radius=0.1),
                   response_fn = CFPRF_DotProduct_opt(),
                   learning_fn=CFPLF_HebbianSOM())
+
+
+# Experimental version using KernelMax and CFPLF_EuclideanHebbian
+# instead of CFSOM.  Works the same but needs optimization.  Currently
+# about 50% slower at least for the first 100 iterations, possibly
+# because the neighborhood kernel is evaluated over the entire
+# CFSheet, not just the local neighborhood.
+#
+#topo.sim['V1'] = CFSheet(
+#    nominal_density=default_density,
+#    output_fn = KernelMax(density=default_density,
+#                          kernel_radius=ExponentialDecay(starting_value = 0.1,
+#                                                         time_constant=-10000/8.0,
+#                                                         base=0.5,timebase=topo.sim.time)))
+#
+#topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,
+#                 connection_type=CFProjection,
+#                 learning_rate=DynamicNumber(ExponentialDecay(starting_value = 0.5,
+#                                                              time_constant=-10000/8.0,
+#                                                              base=0.5,timebase=topo.sim.time)),
+#                 weights_generator = topo.patterns.basic.Gaussian(),
+#                 nominal_bounds_template=BoundingBox(radius=0.1),
+#                 response_fn = CFPRF_DotProduct_opt(),
+#                 learning_fn=CFPLF_EuclideanHebbian())
+
