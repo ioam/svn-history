@@ -21,7 +21,7 @@ from math import ceil
 from topo.base.arrayutils import clip_in_place,clip_lower
 from topo.base.arrayutils import L2norm, norm, array_argmax
 from topo.base.functionfamilies import OutputFn
-from topo.base.parameterclasses import Number
+from topo.base.parameterclasses import Parameter,Number,DynamicNumber
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.base.boundingregion import BoundingBox
@@ -232,32 +232,42 @@ class BinaryThreshold(OutputFn):
 ### not things that many OutputFns will need.  Perhaps move to som.py?
 class KernelMax(OutputFn):
     """
-    Based upon CFPLF_HebbianSOM but without learning. Finds the maximum activity and
-    replaces the output with a kernel centered around the max
+    Finds the maximum activity and replaces the output with a kernel
+    function centered around the max.
 
-    The radius of the surround is specified by the parameter
-    kernel_radius, which should be set before using __call__.  The
-    shape of the surround is determined by the neighborhood_kernel_generator, 
-    and can be any PatternGenerator instance, or any function accepting
-    bounds, density, radius, and height to return a kernel matrix.
+    This operation is usually part of the Kohonen SOM algorithm, and
+    approximates a series of lateral interactions resulting in a
+    single activity bubble.
+
+    The radius of the kernel (i.e. the surround) is specified by the
+    parameter 'radius', which should be set before using __call__.
+    The shape of the surround is determined by the
+    neighborhood_kernel_generator, and can be any PatternGenerator
+    instance, or any function accepting bounds, density, radius, and
+    height to return a kernel matrix.
     """
-    kernel_radius = Number(default=0.0)  
+    kernel_radius = DynamicNumber(default=0.0,bounds=(0,None),doc="""
+        Kernel radius in Sheet coordinates.""")
     
     neighborhood_kernel_generator = PatternGeneratorParameter(
         default=Gaussian(x=0.0,y=0.0,aspect_ratio=1.0),
         doc="Neighborhood function")
-  
-    def __call__(self, x):
+
+    density=Number(1.0,bounds=(0,None),doc="""
+        Density of the Sheet whose matrix we act on, for use
+        in converting from matrix to Sheet coordinates.""")
+    
+    def __call__(self,x):
       	output_activity=x
         rows,cols = output_activity.shape
-        radius = self.kernel_radius
+        radius = self.density*self.kernel_radius
 
         # find out the matrix coordinates of the winner
         wr,wc = array_argmax(output_activity)
 
         # generate the kernel matrix and set output activity to it.
         nk_generator = self.neighborhood_kernel_generator
-        bb = BoundingBox(points=((0,0), (rows,cols))) # Check if bb is upper exclusive
+        bb = BoundingBox(points=((0,0), (rows,cols)))
         x *= 0.0
         x += nk_generator(bounds=bb,xdensity=1,ydensity=1,size=2*radius,x=wc,y=wr)
-        
+
