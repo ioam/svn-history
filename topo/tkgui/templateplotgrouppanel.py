@@ -142,6 +142,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         topo.commands.pylabplots.matrixplot(fft_plot, title="FFT Plot: "+plot.plot_src_name+" "+ plot.name)
         
 
+    ### Should add an option to plot using matplotlib
     def __print_matrix(self):
         plot = self._canvas_click_info[0]
         
