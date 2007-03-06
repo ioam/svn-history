@@ -34,15 +34,12 @@ RandomArray.seed(500,500)
 # Input patterns
 num_inputs=2
 input_type=topo.patterns.basic.Gaussian
-inputs=[]
-for i in xrange(num_inputs):
-    inputs.append(input_type(
-        x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12+i)),
-        y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34+i)),
-        orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56+i)),
-        size=2*0.3*1.5/7.0,
-        aspect_ratio=7.0/1.5,
-        bounds=BoundingBox(radius=0.8)))
+inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12+i)),
+                   y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34+i)),
+                   orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56+i)),
+                   size=2*0.3*1.5/7.0, aspect_ratio=7.0/1.5,
+                   bounds=BoundingBox(radius=0.8))
+                for i in xrange(num_inputs)]
 
 # Contents of retina
 combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=0.6,generators=inputs)
