@@ -301,21 +301,32 @@ class KernelMax(OutputFn):
         default=Gaussian(x=0.0,y=0.0,aspect_ratio=1.0),
         doc="Neighborhood function")
 
+    crop_radius_multiplier = Number(default=3.0,doc="""        
+        Factor by which the radius should be multiplied, when deciding
+        how far from the winner to keep evaluating the kernel.""")
+    
     density=Number(1.0,bounds=(0,None),doc="""
         Density of the Sheet whose matrix we act on, for use
         in converting from matrix to Sheet coordinates.""")
     
     def __call__(self,x):
-      	output_activity=x
-        rows,cols = output_activity.shape
+        rows,cols = x.shape
         radius = self.density*self.kernel_radius
+        crop_radius = max(1.25,radius*self.crop_radius_multiplier)
 
         # find out the matrix coordinates of the winner
-        wr,wc = array_argmax(output_activity)
+        wr,wc = array_argmax(x)
 
-        # generate the kernel matrix and set output activity to it.
-        nk_generator = self.neighborhood_kernel_generator
-        bb = BoundingBox(points=((0,0), (rows,cols)))
+        # Optimization: Calculate the bounding box around the winner
+        # in which weights will be changed
+        rmin = int(max(wr-crop_radius,  0))
+        cmin = int(max(wc-crop_radius,  0))
+        rmax = int(min(wr+crop_radius+1,rows))
+        cmax = int(min(wc+crop_radius+1,cols))
+        bb = BoundingBox(points=((cmin,rmin), (cmax,rmax)))
+
+        # generate the kernel matrix and insert it into the correct
+        # part of the output activity array 
+        kernel = self.neighborhood_kernel_generator(bounds=bb,xdensity=1,ydensity=1,size=2*radius,x=wc,y=wr)
         x *= 0.0
-        x += nk_generator(bounds=bb,xdensity=1,ydensity=1,size=2*radius,x=wc,y=wr)
-
+        x[rows-rmax:rows-rmin,cmin:cmax] = kernel
