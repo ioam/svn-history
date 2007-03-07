@@ -12,18 +12,19 @@ $Id$
 """
 __version__='$Revision$'
 
-
+import numpy
 import numpy.oldnumeric as Numeric
 import copy
+
 from numpy.oldnumeric import dot, exp
 from math import ceil
 
 from topo.base.arrayutils import clip_in_place,clip_lower
 from topo.base.arrayutils import L2norm, norm, array_argmax
 from topo.base.functionfamilies import OutputFn
-from topo.base.parameterclasses import Parameter,Number,DynamicNumber
+from topo.base.parameterclasses import Parameter,Number,DynamicNumber,ListParameter
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.patterngenerator import PatternGeneratorParameter
+from topo.base.patterngenerator import PatternGeneratorParameter,Constant
 from topo.base.boundingregion import BoundingBox
 from topo.patterns.basic import Gaussian
 
@@ -225,6 +226,53 @@ class BinaryThreshold(OutputFn):
         above_threshold = x>=self.threshold
         x *= 0.0
         x += above_threshold
+
+
+class Pipeline(OutputFn):
+    """
+    Applies a list of other OutputFns in order, to combine their effects.
+    """
+    output_fns = ListParameter(default=[],class_=OutputFn,doc="""
+        List of OutputFns to apply, in order.  The default is an empty list, 
+        which should be overridden for any useful work.""")
+
+    def __call__(self,x):
+        for of in self.output_fns:
+            of(x)
+
+
+### JABALERT: Is this the right location for this class?  It brings in
+### dependencies on PatternGenerator, which is not something that many
+### OutputFns will need.
+class PatternCombine(OutputFn):
+    """
+    Combine the supplied pattern with one generated using a
+    PatternGenerator.
+
+    Useful for operations like adding noise or masking out lesioned
+    items or around the edges of non-rectangular shapes.
+    """
+    generator = PatternGeneratorParameter(default=Constant(), doc="""
+        Pattern to combine with the supplied matrix.""")
+
+    operator = Parameter(numpy.multiply,precedence=0.98,doc="""
+        Binary Numeric function used to combine the two patterns.
+
+        Any binary Numeric array "ufunc" returning the same type of
+        array as the operands and supporting the reduce operator is
+        allowed here.  See topo.patterns.basic.Composite.operator for
+        more details.              
+        """)
+    
+    def __call__(self,x):
+        ###JABHACKALERT: Need to set it up to be independent of
+        #density; right now only things like random numbers work
+        #reasonably
+        rows,cols = x.shape
+        bb = BoundingBox(points=((0,0), (rows,cols)))
+        new_pattern = self.operator(x, self.generator(bounds=bb,xdensity=1,ydensity=1))
+        x *= 0.0
+        x += new_pattern
 
 
 ### JABALERT: Is this the right location for this class?  It brings in
