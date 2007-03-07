@@ -67,25 +67,22 @@ input_pattern = topo.patterns.basic.Gaussian(
     y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=input_seed+56)),
     orientation=0)
 
-# cortical sheet
-RetinotopicSOM.nominal_density = locals().get('default_density',40.0)
-RetinotopicSOM.learning_length = 40000
-
-# Original CMVC simulation used 13.3/40.0
-RetinotopicSOM.radius_0 = locals().get('radius_0',13.3/40.0*3.0)
-RetinotopicSOM.alpha_0  = locals().get('alpha_0',0.42)
 
 # Local variable to allow weights to be controlled easily
 weight_seed=locals().get('weight_seed',0)
-
 RandomArray.seed(weight_seed+67,weight_seed+89)
-CFProjection.weights_generator = topo.patterns.random.UniformRandom() 
-
-CFProjection.nominal_bounds_template=BoundingBox(radius=1.0) # fully connected network.
-CFProjection.response_fn = CFPRF_EuclideanDistance_opt()
-CFProjection.learning_fn = CFPLF_HebbianSOM()
-
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
-topo.sim['V1'] = RetinotopicSOM()
-topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,connection_type=CFProjection)
+
+topo.sim['V1'] = RetinotopicSOM(
+    nominal_density = locals().get('default_density',40.0),
+    learning_length = 40000,
+    # Original CMVC simulation used an initial radius of 13.3/40.0
+    radius_0 = locals().get('radius_0',13.3/40.0*3.0),
+    alpha_0  = locals().get('alpha_0',0.42))
+
+topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,connection_type=CFProjection,
+    weights_generator = topo.patterns.random.UniformRandom(),
+    nominal_bounds_template=BoundingBox(radius=1.0), # fully connected network.
+    response_fn = CFPRF_EuclideanDistance_opt(),
+    learning_fn = CFPLF_HebbianSOM())
