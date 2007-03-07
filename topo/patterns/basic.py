@@ -9,6 +9,7 @@ import numpy
 
 from math import pi, sin, cos, sqrt
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
+from numpy import alltrue
 
 from topo.base.parameterclasses import Integer, Number, Parameter, Enumeration
 from topo.base.parameterclasses import DynamicNumber, ListParameter
@@ -432,10 +433,7 @@ class SeparatedComposite(Composite):
             for trial in xrange(self.max_trials):
                 # Generate a new position (as a side effect) and add generator if it's ok
                 vals = (g.x, g.y)
-                for v in valid_generators:
-                    if not self.__distance_valid(g,v):
-                        break
-                else:
+                if alltrue([self.__distance_valid(g,v) for v in valid_generators]):
                     valid_generators.append(g)
                     break
             else:
