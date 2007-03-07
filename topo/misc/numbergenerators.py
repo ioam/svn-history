@@ -10,7 +10,7 @@ import random
 from math import e
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Number, ListParameter
+from topo.base.parameterclasses import Number, ListParameter, CallableParameter, Parameter
 
 
 class RandomDistribution(ParameterizedObject):
@@ -139,5 +139,27 @@ class ExponentialDecay(ParameterizedObject):
         return self.starting_value * self.base**(-1.0*float(topo.sim.time())/
                                                  float(self.time_constant))
 
+
+class BoundedNumber(ParameterizedObject):
+    """
+    Function object that silently enforces numeric bounds on values
+    returned by a callable object.
+    """
+    generator = CallableParameter(None, doc="Object to call to generate values.")
+
+    bounds = Parameter((None,None), doc="""
+        Legal range for the value returned, as a pair.
+        
+        The default bounds are (None,None), meaning there are actually
+        no bounds.  One or both bounds can be set by specifying a
+        value.  For instance, bounds=(None,10) means there is no lower
+        bound, and an upper bound of 10.""")
+
+    def __call__(self):
+        val = self.generator()
+        min_, max_ = self.bounds
+        if   min_ != None and val < min_: return min_
+        elif max_ != None and val > max_: return max_
+        else: return val
 
 
