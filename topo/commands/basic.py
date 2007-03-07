@@ -9,7 +9,12 @@ import gnosis.xml.pickle
 from xml.parsers.expat import ExpatError
 
 import __main__
-import gzip
+
+# gzip module might not have been built (if zlib could not be found when building)
+try:
+    import gzip
+except ImportError:
+    pass
 
 import topo
 
@@ -133,17 +138,25 @@ def save_snapshot(snapshot_name,xml=False):
 
     topo.sim.RELEASE=topo.release
 
+    try:
+        snapshot_file=gzip.open(snapshot_name,'w',compresslevel=5)
+    except NameError:
+        snapshot_file=open(snapshot_name,'w')
+ 
+
+    # CEBALERT: gnosis.xml.pickle is currently being updated to work
+    # with numpy.  However, you can test saving a simulation that does
+    # not import numpy to see what the xml looks like.
+    pickle_fn=pickle.dump
+    if xml:
+        ParameterizedObject(name="save_snapshot").warning("XML snapshots are only experimental at present.")
+        pickle_fn=gnosis.xml.pickle.dump
+
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
-    if xml:
-        # CEBALERT: gnosis.xml.pickle needs updating to work with
-        # numpy.  However, you can test saving a simulation that
-        # does not import numpy to see what the xml looks like.
-        ParameterizedObject(name="save_snapshot").warning("XML snapshots are only experimental at present.")
-        gnosis.xml.pickle.dump( (topoPOclassattrs,topo.sim) , open(snapshot_name,'w') )
-    else:
-        pickle.dump( (topoPOclassattrs,topo.sim) , gzip.open(snapshot_name,'w',compresslevel=5),2)
+    pickle_fn((topoPOclassattrs,topo.sim),snapshot_file,2)
+    snapshot_file.close()
 
 
 def load_snapshot(snapshot_name):
