@@ -89,11 +89,18 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         if self.__class__ == TemplatePlotGroupPanel:
             self.refresh(update=self.pgt.plot_immediately)
 
+        self._canvas_menu.insert_command(2,label='Print info',
+                                         command=self.__print_info)
+
         self._canvas_menu.insert_command(2,label='Plot Fourier transform',
                                          command=self.__fft)
         
         self._canvas_menu.insert_command(2,label='Print matrix values',
                                          command=self.__print_matrix)
+
+        self._canvas_menu.insert_command(2,label='Plot in new window',
+                                         command=self.__plot_matrix)
+
 
     def _pg_template(self):
         """
@@ -130,28 +137,47 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
                                       integerscaling=self.integerscaling.get())
 	return plotgroup
 
-    # JABALERT: Should change this to be part of submenus for Strength, Hue, etc.,
-    # instead of checking it here.
+    # JABALERT: Should change these commands to be part of submenus
+    # for Strength, Hue, etc., instead of checking it here.
     def __fft(self):
         plot = self._canvas_click_info[0]
+        description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
         if plot.channels.has_key('Strength'):
             m=plot._get_matrix('Strength')
         elif plot.channels.has_key('Hue'):
             m=plot._get_matrix('Hue')
         fft_plot=fftshift(fft2(m-0.5, s=None, axes=(-2,-1)))
-        topo.commands.pylabplots.matrixplot(fft_plot, title="FFT Plot: "+plot.plot_src_name+" "+ plot.name)
-        
+        topo.commands.pylabplots.matrixplot(fft_plot, title="FFT Plot: " + description)        
 
-    ### Should add an option to plot using matplotlib
     def __print_matrix(self):
         plot = self._canvas_click_info[0]
-        
-        print ("#%s %s" % (plot.plot_src_name,plot.name))
+        description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
+        print ("#" + description)
         if plot.channels.has_key('Strength'):
             m=plot._get_matrix('Strength')
         elif plot.channels.has_key('Hue'):
             m=plot._get_matrix('Hue')
         print m
+
+
+    def __plot_matrix(self):
+        plot = self._canvas_click_info[0]
+        description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
+        if plot.channels.has_key('Strength'):
+            m=plot._get_matrix('Strength')
+        elif plot.channels.has_key('Hue'):
+            m=plot._get_matrix('Hue')
+        topo.commands.pylabplots.matrixplot(m, title=description)
+
+
+    def __print_info(self):
+        plot,r,c = self._canvas_click_info
+        description ="%s %s, row %d, col %d at time %0.2f: " % (plot.plot_src_name, plot.name, r, c, topo.sim.time())
+        if plot.channels.has_key('Strength'):
+            m=plot._get_matrix('Strength')
+        elif plot.channels.has_key('Hue'):
+            m=plot._get_matrix('Hue')
+        print "%s %f" % (description, m[r,c])
 
 
     def set_strengthonly(self):
@@ -161,6 +187,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 	self.plotgroup.update_plots(False)
         self.display_plots()
         self.display_labels()
+
         
     def update_plotgroup_variables(self):
         self.plotgroup.updatecommand = self.cmdname.get()
