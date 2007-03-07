@@ -63,6 +63,7 @@ inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=1
 combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
                                  
 # Specify weight initialization, response function, and learning function
+RandomArray.seed(500,500)
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
