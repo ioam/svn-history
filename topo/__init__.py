@@ -72,11 +72,11 @@ Pre-release version """+release+ \
 """ of Topographica; an updated version may be
 available from topographica.org.
 
-Copyright 2005-2007 James A. Bednar, Christopher Ball, Christopher
-Palmer, Yoonsuck Choe, Julien Ciroux, Judah B. De Paula, Judith Law,
-Alan Lindsay, Louise Mathews, Jefferson Provost, Veldri Kurniawan,
-Tikesh Ramtohul, Lewis Ng, Ruaidhri Primrose, Foivos Demertzis, Roger
-Zhao, and Yiu Fai Sit.
+Copyright 2005-2007 James A. Bednar, Jan Antolik, Christopher Ball,
+Yoonsuck Choe, Julien Ciroux, Judah B. De Paula, Foivos Demertzis,
+Veldri Kurniawan, Judith Law, Alan Lindsay, Louise Mathews, Lewis Ng,
+Christopher Palmer, Ruaidhri Primrose, Jefferson Provost, Tikesh
+Ramtohul, Yiu Fai Sit, Stuart Wilson, and Roger Zhao.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License version 2 as
