@@ -10,7 +10,7 @@ import random
 from math import e
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Number, ListParameter, CallableParameter
+from topo.base.parameterclasses import Number, ListParameter
 
 
 class RandomDistribution(ParameterizedObject):
@@ -109,10 +109,19 @@ class NormalRandom(RandomDistribution):
         return self.random_generator.normalvariate(self.mu,self.sigma)
 
 
+# It would be good to eliminate the dependency on topo, but it's not
+# otherwise obvious how to pass in a suitable time object.  Storing
+# topo.sim.time in a CallableParameter won't work as of Python 2.4,
+# because a reference to an instance method cannot be pickled.
+# Calling .time() on a stored object doesn't work either, because
+# storing topo.sim leads to a infinite loop during pickling topo.sim.
+# Surely there is somehow a way to provide topo.sim.time to the
+# constructor rather than hardcoding it like this...
+import topo
 class ExponentialDecay(ParameterizedObject):
     """
     Function object that provides a value that decays according to an
-    exponential function, based on a given timebase.
+    exponential function, based on topo.sim.time().
 
     Returns starting_value*base^(-time/time_constant).
     
@@ -126,15 +135,8 @@ class ExponentialDecay(ParameterizedObject):
     base = Number(e, doc="""
         Base of the exponent; the default yields starting_value*exp(-t/time_constant.""")
 
-    timebase = CallableParameter(None, doc="Function to call to determine current time.")
-    
-    def __init__(self,**params):
-        super(ExponentialDecay,self).__init__(**params)
-        if not callable(self.timebase):
-            self.warning("ExponentialDecay timebase must be a callable object (e.g. a function)")
-
     def __call__(self):
-        return self.starting_value * self.base**(-1.0*float(self.timebase())/
+        return self.starting_value * self.base**(-1.0*float(topo.sim.time())/
                                                  float(self.time_constant))
 
 
