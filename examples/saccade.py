@@ -32,20 +32,22 @@ from topo.misc import utils
 
 class SaccadeController(CFSheet):
     """
-    This accepts CF-projected input and computes its activity like a
-    normal CFSheet, then decodes that activity into saccade amplitude
-    and direction as would be specified by activity in the superior
-    colliculi.  The X dimension of activity corresponds to amplitude,
-    the Y dimension to direction.  The activity is decoded to a single
-    (x,y) point according the the parameter decode_method.
+    Sheet that decodes activity on CFProjections into a saccade command.
+    
+    This class accepts CF-projected input and computes its activity
+    like a normal CFSheet, then decodes that activity into a saccade
+    amplitude and direction as would be specified by activity in the
+    superior colliculi.  The X dimension of activity corresponds to
+    amplitude, the Y dimension to direction.  The activity is decoded
+    to a single (x,y) point according to the parameter decode_method.
 
     From this (x,y) point an (amplitude,direction) pair, specified in
     degrees, is computed using the parameters amplitude_scale and
     direction scale.  That pair is then sent out on the 'Saccade'
     output port.
 
-    NOTE: Non-linear mappings for saccade commands, as in (Ottes, et
-    al), are assumed to be provided using the x and y_mapping
+    NOTE: Non-linear mappings for saccade commands, as in Ottes, et
+    al (below), are assumed to be provided using the x and y_mapping
     parameters of the incoming CFProjection.
 
     References:
@@ -54,19 +56,17 @@ class SaccadeController(CFSheet):
     26(6): 857-73.
     """
 
-    amplitude_scale = Number(default=120,doc=
-        """
+    amplitude_scale = Number(default=120,doc="""
         Scale factor for saccade command amplitude, expressed in
         degrees per unit of sheet.  Indicates how large a
         saccade is represented by the x-component of the command
-        input.
-        """)
-    direction_scale = Number(default=180,doc=
-        """
+        input.""")
+    
+    direction_scale = Number(default=180,doc="""
         Scale factor for saccade command direction, expressed in
         degrees per unit of sheet.  Indicates what direction of saccade
-        is represented by the y-component of the command input.  
-        """ )
+        is represented by the y-component of the command input.""")
+
 
     # JPALERT: For generality, decode_method should really be a
     # CallableParameter that directly specifies the fn for decoding
@@ -77,25 +77,31 @@ class SaccadeController(CFSheet):
     # activity_mode) are promoted to a superclass, then this parameter
     # can be changed to a CallableParameter. (with the necessary
     # internal changes in .activate()).
+    # JAB: However, if an instance method is stored in a parameter,
+    # this class will not be able to be pickled, because Python cannot
+    # pickle instance method references.  With that in mind, maybe it
+    # would be better to make activity_centroid into a module-level
+    # function (as mentioned below), and then anyone could add more
+    # such functions.
 
     decode_method = Enumeration(default='centroid',
                                 available=['centroid','sample','mode'],
                                 instantiate=False,
-                                doc=
-        """
+                                doc="""
         Selects the method for decoding activity into a saccade
-        command.  Choices are:
+        command.  Choices are::
 
            'centroid' -- computes the (weighted) centroid of the activity.
            'sample'   -- Treats activity as a probability distribution and
                          samples from that distribution.
-           'mode'     -- Takes the mode (highest point) of the a activity.
+           'mode'     -- Takes the mode (highest point) of the activity.
                          If activity has multiple equal modes, will always select
                          the one with the lowest matrix coordinates.           
         """)
 
 
     src_ports = ['Activity','Saccade']
+
 
     def activate(self):
         super(SaccadeController,self).activate()
@@ -120,12 +126,16 @@ class SaccadeController(CFSheet):
     # JPALERT: The next three methods (activity_centroid,
     # activity_sample, and activity_mode) could actually apply to any
     # Sheet.  Maybe they should be promoted?
+    # JAB: They don't seem to need any access to the internals of
+    # Sheet, so my guess is that they should be module-level functions
+    # accepting a sheet argument.
                          
     def activity_centroid(self,activity=None):
         """
-        Returns the sheet coords of the (weighted) centroid of the
-        activity of the sheet, if activity argument is not None, then
-        it is used instead of self.activity.
+        Return the sheet coords of the (weighted) centroid of sheet activity.
+
+        If the activity argument is not None, then it is used instead
+        of self.activity.
         """
         
         if activity is None:
@@ -139,14 +149,15 @@ class SaccadeController(CFSheet):
 
         ## JPALERT: should optimize here to only compute centroid from
         ## active (non-zero) units.  Should be a couple lines of numpy commands.
-
         return utils.centroid(xy,a)
+
       
     def activity_sample(self,activity=None):
         """
-        Samples from the sheet activity as if it were a probability
-        distribution.  Returns the sheet coordinates of the sampled unit.
-        If activity is not None, it is used instead of self.activity.
+        Sample from the sheet activity as if it were a probability distribution.
+
+        Returns the sheet coordinates of the sampled unit.  If
+        activity is not None, it is used instead of self.activity.
         """
 
         if activity is None:
@@ -155,6 +166,7 @@ class SaccadeController(CFSheet):
         r,c = utils.idx2rowcol(idx,activity.shape)
         
         return self.matrix2sheet(r,c)
+
 
     def activity_mode(self,activity=None):
         """
@@ -168,7 +180,6 @@ class SaccadeController(CFSheet):
         # y values. (in that order).  Function may still be useful for
         # unimodal activity distributions, or sheets without limiting/squashing
         # output functions.
-        
         if activity is None:
             activity = self.activity
         idx = numpy.argmax(activity.flat)
@@ -178,7 +189,7 @@ class SaccadeController(CFSheet):
         
 class ShiftingGeneratorSheet(GeneratorSheet):
     """
-    A GeneratorSheet that takes an extra  input on port 'Saccade'
+    A GeneratorSheet that takes an extra input on port 'Saccade'
     that specifies a saccade command as a tuple (amplitude,direction),
     indicating the relative size and direction of the saccade in
     degrees.  The parameter visual_angle_scale defines the
@@ -186,24 +197,19 @@ class ShiftingGeneratorSheet(GeneratorSheet):
     saccade bounds limits the region within which the saccades may occur.
     """
 
-    visual_angle_scale = Number(default=90,doc=
-        """
-        The scale factor deterimining the visual angle subtended by this sheet, in
-        degrees per unit of sheet.
-        """)
+    visual_angle_scale = Number(default=90,doc="""
+        The scale factor determining the visual angle subtended by this sheet, in
+        degrees per unit of sheet.""")
 
-    saccade_bounds = BoundingRegionParameter(default=BoundingBox(radius=1.0),doc=
-        """
+    saccade_bounds = BoundingRegionParameter(default=BoundingBox(radius=1.0),doc="""
         The bounds for saccades.  Saccades are constrained such that the centroid of the
-        sheet bounds remains within this region.
-        """)
+        sheet bounds remains within this region.""")
 
     dest_ports = ["Trigger","Saccade"]
 
+
     def input_event(self,conn,data):
-
         if conn.dest_port == 'Saccade':
-
 
             # JPALERT:  Right now this method assumes that we're doing
             # colliculus-style saccades. i.e. amplitude and direction
@@ -241,24 +247,26 @@ class ShiftingGeneratorSheet(GeneratorSheet):
 
     def _shift(self,radius,angle):
         angle *= pi/180
-        xoff = radius * cos( angle )
-        yoff = radius * sin( angle )
-        # apply translation to bbox.
+        xoff = radius * cos(angle)
+        yoff = radius * sin(angle)
+
         self.verbose("Applying translation vector (%.2f,%.2f)"%(xoff,yoff))
         self.bounds.translate(xoff,yoff)
 
+
     def _out_of_bounds(self):
         """
-        True if the centroid of the current bounds is outside the
-        saccade bounds.
+        Return true if the centroid of the current bounds is outside the saccade bounds.
         """
         return not self.saccade_bounds.contains(*self.bounds.aarect().centroid())
 
+
     def _find_saccade_in_bounds(self,radius,theta):
         """
-        Find a saccade in the given direction (theta) that lies within
-        self.saccade_bounds.  Assumes that the given saccade was
-        already performed and landed out of bounds.
+        Find a saccade in the given direction (theta) that lies within self.saccade_bounds.
+
+        Assumes that the given saccade was already performed and
+        landed out of bounds.
         """
 
         # JPHACKALERT: This method iterates to search for a saccade
@@ -266,9 +274,8 @@ class ShiftingGeneratorSheet(GeneratorSheet):
         # really compute this algebraically. Doing so involves computing
         # the intersection of the saccade vector with the saccade
         # bounds.  Ideally, each type of BoundingRegion would know how
-        # to compute its own intersection with a given line (should be easy for
-        # boxes, circles, and ellipses, at least.)
-
+        # to compute its own intersection with a given line (should be
+        # easy for boxes, circles, and ellipses, at least.)
 
         # Assume we're starting out of bounds, so start by shifting
         # back to the original position        

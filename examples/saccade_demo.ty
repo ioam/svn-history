@@ -13,9 +13,10 @@ Saccade Demo example.  This script defines three sheets:
 
 $Id$
 """
+
 import pdb
 
-from saccade import ShiftingGeneratorSheet, SaccadeController
+from itertools import cycle
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.boundingregion import BoundingBox
@@ -23,9 +24,11 @@ from topo.base.parameterclasses import DynamicNumber
 from topo.projections.basic import SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.base.parameterizedobject import VERBOSE,NORMAL,DEBUG
+
 import topo.patterns.image
 
-from itertools import cycle
+from examples.saccade import ShiftingGeneratorSheet, SaccadeController
+
 
 ##########################################################################
 # defaults:
