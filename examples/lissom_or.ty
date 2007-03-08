@@ -37,6 +37,7 @@ from fixedpoint import FixedPoint
 import topo.patterns.basic
 import topo.patterns.random
 
+from topo.patterns.basic import Gaussian
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection
@@ -52,7 +53,7 @@ from topo.misc.numbergenerators import UniformRandom
 topo.sim.name = "lissom_or"
 
 num_inputs=2
-input_type=topo.patterns.basic.Gaussian
+input_type=Gaussian
 inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),
                    y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i)),
                    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56+i)),

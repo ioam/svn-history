@@ -41,6 +41,7 @@ from fixedpoint import FixedPoint
 import topo.patterns.basic
 import topo.patterns.random
 
+from topo.patterns.basic import Gaussian
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
@@ -56,7 +57,7 @@ from topo.misc.numbergenerators import UniformRandom
 topo.sim.name = "lissom_oo_or"
 
 num_inputs=2
-input_type=topo.patterns.basic.Gaussian
+input_type=Gaussian
 inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),
                    y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i)),
                    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56+i)),
@@ -107,11 +108,8 @@ topo.sim['V1'].output_fn.lower_bound=0.083
 topo.sim['V1'].output_fn.upper_bound=0.633
 
 # DoG weights for the LGN
-centerg = topo.patterns.basic.Gaussian(
-    size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
-
-surroundg = topo.patterns.basic.Gaussian(
-    size=0.2954, aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 
 on_weights = topo.patterns.basic.Composite(
     generators=[centerg,surroundg],operator=numpy.subtract)
