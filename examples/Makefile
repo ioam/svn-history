@@ -6,8 +6,8 @@
 # easily under Windows as well.
 
 all_quick: hierarchical cfsom_or som_retinotopy lissom_oo_or
-all_long: lissom_oo_or_20000.typ som_retinotopy_40000.typ lissom_or_20000.typ
-saved-examples: lissom_oo_or_20000.typ
+all_long: lissom_oo_or_10000.typ som_retinotopy_40000.typ lissom_or_10000.typ
+saved-examples: lissom_oo_or_10000.typ
 
 
 # Define typical commands used in the examples
@@ -45,12 +45,12 @@ som_retinotopy:
 
 
 # Generate saved examples of complete simulations
-lissom_oo_or_20000.typ: lissom_oo_or.ty ../topo/*/*.py
-	../topographica lissom_oo_or.ty -c "topo.sim.run(20000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
+lissom_oo_or_10000.typ: lissom_oo_or.ty ../topo/*/*.py
+	../topographica lissom_oo_or.ty -c "topo.sim.run(10000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
 
 
-lissom_or_20000.typ: lissom_or.ty ../topo/*/*.py
-	../topographica lissom_or.ty -c "topo.sim.run(20000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
+lissom_or_10000.typ: lissom_or.ty ../topo/*/*.py
+	../topographica lissom_or.ty -c "topo.sim.run(10000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
 
 
 obermayer_pnas90_30000.typ: obermayer_pnas90.ty ../topo/*/*.py
