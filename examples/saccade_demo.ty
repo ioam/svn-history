@@ -1,0 +1,103 @@
+"""
+Saccade Demo example.  This script defines three sheets:
+
+- a Generator sheet corresponding to the superior colliculus (SC),
+  generates saccade commands.  It projects to,
+
+- a SaccadeController, that decodes the SC activity into saccade
+  amplitude and direction, and sends that information to,
+
+- a ShiftingGenerator sheet, that generates image input and shifts its
+  bounds according to the received saccade command.
+
+
+$Id$
+"""
+import pdb
+
+from saccade import ShiftingGeneratorSheet, SaccadeController
+
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.base.boundingregion import BoundingBox
+from topo.base.parameterclasses import DynamicNumber
+from topo.projections.basic import SharedWeightCFProjection
+from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.base.parameterizedobject import VERBOSE,NORMAL,DEBUG
+import topo.patterns.image
+
+from itertools import cycle
+
+##########################################################################
+# defaults:
+
+topo.base.sheet.Sheet.nominal_density = 48
+
+topo.patterns.image.Image.size = 2.0
+
+SaccadeController.decode_method = 'centroid'
+SaccadeController.print_level = VERBOSE
+
+ShiftingGeneratorSheet.print_level = VERBOSE
+
+
+##########################################################################
+# Generators
+
+saccade_generator = topo.patterns.basic.Gaussian(
+
+    #
+    # A cycle through a series of saccades to the
+    # periphery, and back to the center.
+    # 
+    #                      NE    C    SE   C     NW   C     SW    C
+    #x=DynamicNumber(cycle([0.3,-0.3,  0.3,-0.3, -0.3, 0.3, -0.3, 0.3])),
+    #y=DynamicNumber(cycle([0.3,-0.3, -0.3, 0.3,  0.3,-0.3, -0.3, 0.3])),
+
+    # random saccades
+    x = DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5))
+    y = DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5))
+
+    # constant 'still' saccade: will produce random walk if using
+    # SaccadeController.decode_method = 'sample'
+    # x = 0.0,
+    # y = 0.0,
+    
+    size =  0.1,
+    aspect_ratio=1.0,
+    bounds = BoundingBox(radius = 0.5))
+
+scene_generator = topo.patterns.image.Image()
+
+##########################################################################
+# Sheets: A movable eye, a SuperiorColliculus generating eye movements,
+# and a SaccadeController to decode SC activity into eye movement commands.
+
+topo.sim['Eye'] = ShiftingGeneratorSheet(input_generator=scene_generator)
+
+topo.sim['SaccadeControl'] = SaccadeController()
+
+topo.sim['SC'] = GeneratorSheet(input_generator=saccade_generator,
+                                period=2)
+
+##########################################################################
+# Connections: The colliculus efferent connection connects to the
+# saccade controller's activity port with a CFProjection, which
+# connects to the 'Saccade' port of the Eye with a generic connection. 
+
+topo.sim.connect('SC','SaccadeControl',name="SC Efferent",
+                 dest_port = 'Activity',
+                 delay = 1.0,
+                 connection_type=SharedWeightCFProjection,
+                 weights_generator = topo.patterns.basic.Gaussian(),
+                 nominal_bounds_template = BoundingBox(radius=0),
+                 response_fn = CFPRF_DotProduct_opt(),
+                 min_matrix_radius=0)
+
+topo.sim.connect('SaccadeControl','Eye',
+                 name='Saccade Command',
+                 src_port='Saccade',
+                 dest_port='Saccade')
+
+
+
+
