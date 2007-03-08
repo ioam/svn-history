@@ -54,8 +54,8 @@ saccade_generator = topo.patterns.basic.Gaussian(
     #y=DynamicNumber(cycle([0.3,-0.3, -0.3, 0.3,  0.3,-0.3, -0.3, 0.3])),
 
     # random saccades
-    x = DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5))
-    y = DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5))
+    x = DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5)),
+    y = DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5)),
 
     # constant 'still' saccade: will produce random walk if using
     # SaccadeController.decode_method = 'sample'

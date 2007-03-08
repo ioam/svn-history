@@ -64,10 +64,9 @@ class SaccadeController(CFSheet):
     direction_scale = Number(default=180,doc=
         """
         Scale factor for saccade command direction, expressed in
-        degrees per unit of sheet.  Indicates what
-        direction ofsaccade is represented by the y-component of the
-        command input.
-        """)
+        degrees per unit of sheet.  Indicates what direction of saccade
+        is represented by the y-component of the command input.  
+        """ )
 
     # JPALERT: For generality, decode_method should really be a
     # CallableParameter that directly specifies the fn for decoding
