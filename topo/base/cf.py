@@ -596,9 +596,6 @@ class CFProjection(Projection):
 
     # shape property defining the dimension of the _cfs field
     def get_shape(self): return [len(self._cfs),len(self._cfs[0])]
-    # CEBALERT: is this set_shape() method required? cfs_shape is already read-only
-    # because the property definition only includes a get method.
-    def set_shape(self,x): print "Error: this method should never be called. The scf_shape property can be only read not set!"
     cfs_shape = property(get_shape)
 
 
