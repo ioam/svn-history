@@ -1,19 +1,40 @@
 """
-LISSOM-based orientation map (without ON/OFF channels) 
-with Homeostatic Intrinsic Plasticity Mechanism
+Example of a LISSOM-based orientation map (without ON/OFF channels).
+Scheduled threshold changes have been replaced with a
+Homeostatic Intrinsic Plasticity Mechanism.
+
+Is based on topo/tests/reference/lissom_or_reference.ty which matches the
+orientation map simulation from figure 6.4 (Reduced) of
+Miikkulainen, Bednar, Choe, and Sirosh (2005), Computational Maps in
+the Visual Cortex, Springer, except:
+
+ - The default_density is smaller for practicality (142 in the book).
+   The matching is not yet perfect at different densities
+ - The lateral inhibitory radius is 0.5 matrix units greater than in the 
+   book, becauseTopographica enforces good circular-shaped CF outlines.
+ - Input patterns are evaluated on the entire retina, instead of only up
+   to bounds_multiplier=2.5 times the gaussian sigma in the book
+ - Weight patterns are not smoothed around the edges, unlike
+   smooth_circular_outlines=True and smooth_circular_radius_trim=-0.25
+   used in the book
+ - Initial weight patterns are all random within a gaussian envelope
+   rather than random afferent and Gaussian sigma preset_sigma_exc=11.076
+   preset_sigma_inh=71.76 lateral weights used in the book.
+ - Inhibitory weight pruning is disabled (not pruning all weights below
+   1e-5 as in the book)
 
 $Id$
 """
 __version__='$Revision$'
 
+
 import numpy.oldnumeric.random_array as RandomArray
 import fixedpoint
-import copy
+import numpy.oldnumeric as Numeric
+import numpy
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
-from numpy.oldnumeric import sum,ones,exp
-import numpy.oldnumeric as Numeric
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -22,61 +43,68 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import DynamicNumber, Number
+from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
-from topo.base.functionfamilies import OutputFn
-from topo.base.arrayutils import clip_in_place
 from topo.outputfns.homeostatic import HomeostaticMaxEnt
 
 topo.sim.name = "lissom_or_homeomaxent"
 
-input_pattern = topo.patterns.basic.Gaussian(
-          scale=1.0, size=2*0.0468, aspect_ratio=4.0,
-          x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
-          y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
-          orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+num_inputs=2
+input_type=topo.patterns.basic.Gaussian
+inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),
+                   y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i)),
+                   orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56+i)),
+                   size=0.088388, aspect_ratio=4.66667, scale=1.0,
+                   bounds=BoundingBox(radius=0.8))
+                for i in xrange(num_inputs)]
 
+combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
                                  
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)
-CFProjection.weights_generator=topo.patterns.random.UniformRandom()
-CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
-
 
 ###########################################
 # build simulation
 
 topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
-                                  input_generator=input_pattern,
+                                  input_generator=combined_inputs,
                                   period=1.0, phase=0.05,
-                                  nominal_bounds=BoundingBox(radius=0.5+0.275))
+                                  nominal_bounds=BoundingBox(radius=0.5+0.25))
 
 
-topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
-                        nominal_bounds=BoundingBox(radius=0.5),output_fn=HomeostaticMaxEnt())
+topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,output_fn=HomeostaticMaxEnt())
 
-#topo.sim['V1'].output_fn.lower_bound=0.1
-#topo.sim['V1'].output_fn.upper_bound=0.65
 
 topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
-                  connection_type=CFProjection,strength=1.0,name='Afferent',
-                  nominal_bounds_template=BoundingBox(radius=0.275),learning_rate=0.9590)
+                 connection_type=CFProjection,strength=1.0,name='Afferent',
+                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
+                                                                             topo.patterns.random.UniformRandom()]),
+                 nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590)
 
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
-                  connection_type=CFProjection,strength=0.9,
-                  nominal_bounds_template=BoundingBox(radius=0.10),learning_rate=3.2018) 
+                 connection_type=CFProjection,strength=0.9,
+                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.10417),
+                                                                             topo.patterns.random.UniformRandom()]),
+                 nominal_bounds_template=BoundingBox(radius=0.10417),learning_rate=2.55528) 
             
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
-                  connection_type=CFProjection,strength=-0.9,
-                  nominal_bounds_template=BoundingBox(radius=0.23),learning_rate=1.9626)  
+                 connection_type=CFProjection,strength=-0.9,
+                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
+                                                                             topo.patterns.random.UniformRandom()]),
+                 nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=1.80873)  
 
 
 
@@ -85,51 +113,49 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
 
 topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
 
-### Lateral excitatory bounds changes
-topo.sim.schedule_command(200,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.06))')
-topo.sim.schedule_command(500,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.042))')
-topo.sim.schedule_command(1000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.0336))')
-topo.sim.schedule_command(2000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.02688))')
-topo.sim.schedule_command(3000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.02150))')
-topo.sim.schedule_command(4000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.01290))')
-topo.sim.schedule_command(5000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00774))')
-topo.sim.schedule_command(6500,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00464))')
-topo.sim.schedule_command(8000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00279))')
-topo.sim.schedule_command(20000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00167))')
+def n_units(x):
+    """
+    Same technique as in cf.py for counting the number of units.
+    """
+    density=topo.sim["V1"].nominal_density
+    center_unit=(int(density/2),int(density/2))
+    return len(Numeric.nonzero(Numeric.ravel(x.cf(*center_unit).mask)))
 
+### Lateral excitatory bounds changes
+topo.sim.schedule_command(99,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.0625))')
+topo.sim.schedule_command(249,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.04375))')
+topo.sim.schedule_command(499,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.035))')
+topo.sim.schedule_command(999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.02800))')
+topo.sim.schedule_command(1499,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.02240))')
+topo.sim.schedule_command(1999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.01344))')
+topo.sim.schedule_command(2499,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00806))')
+topo.sim.schedule_command(3249,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00484))')
+topo.sim.schedule_command(3999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00290))')
+topo.sim.schedule_command(9999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00174))')
 
 ### Lateral excitatory learning rate changes
-topo.sim.schedule_command(200,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=1.2213')
-topo.sim.schedule_command(500,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.3466')
+LE=topo.sim["V1"].projections()["LateralExcitatory"]
+
+topo.sim.schedule_command(99,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.12168*n_units(LE)')
+topo.sim.schedule_command(249,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command(499,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command(999,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command(1499,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command(1999,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command(2499,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command(3249,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command(3999,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command(9999,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
 
 
 ### Afferent learning rate changes
-topo.sim.schedule_command(  500,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.6850;topo.sim["V1"].projections()["Afferent"].learning_rate=0.6850')
-topo.sim.schedule_command( 2000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.5480;topo.sim["V1"].projections()["Afferent"].learning_rate=0.5480')
-topo.sim.schedule_command( 4000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.4110;topo.sim["V1"].projections()["Afferent"].learning_rate=0.4110')
-topo.sim.schedule_command(20000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.2055;topo.sim["V1"].projections()["Afferent"].learning_rate=0.2055')
-
-
-
-### Schedule LISSOM output function threshold changes
-#
-'''
-topo.sim.schedule_command(  200, 'topo.sim["V1"].output_fn.lower_bound=0.11; topo.sim["V1"].output_fn.upper_bound=0.66')
-topo.sim.schedule_command(  500, 'topo.sim["V1"].output_fn.lower_bound=0.12; topo.sim["V1"].output_fn.upper_bound=0.67')
-topo.sim.schedule_command( 1000, 'topo.sim["V1"].output_fn.lower_bound=0.15; topo.sim["V1"].output_fn.upper_bound=0.68')
-topo.sim.schedule_command( 2000, 'topo.sim["V1"].output_fn.lower_bound=0.18; topo.sim["V1"].output_fn.upper_bound=0.70')
-topo.sim.schedule_command( 3000, 'topo.sim["V1"].output_fn.lower_bound=0.20; topo.sim["V1"].output_fn.upper_bound=0.73')
-topo.sim.schedule_command( 4000, 'topo.sim["V1"].output_fn.lower_bound=0.20; topo.sim["V1"].output_fn.upper_bound=0.76')
-topo.sim.schedule_command( 5000, 'topo.sim["V1"].output_fn.lower_bound=0.21; topo.sim["V1"].output_fn.upper_bound=0.79')
-topo.sim.schedule_command( 6500, 'topo.sim["V1"].output_fn.lower_bound=0.22; topo.sim["V1"].output_fn.upper_bound=0.82')
-topo.sim.schedule_command( 8000, 'topo.sim["V1"].output_fn.lower_bound=0.23; topo.sim["V1"].output_fn.upper_bound=0.85')
-topo.sim.schedule_command(20000, 'topo.sim["V1"].output_fn.lower_bound=0.24; topo.sim["V1"].output_fn.upper_bound=0.88')
-'''
+topo.sim.schedule_command(249,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.685')
+topo.sim.schedule_command(999,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.5480')
+topo.sim.schedule_command(1999,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.4110')
+topo.sim.schedule_command(9999,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.2055')
 
 topo.sim.run(0)
 
-
-# Uncomment to allow profiling
 ## import hotshot,hotshot.stats
 ## prof = hotshot.Profile("abc")
 ## prof.runctx('topo.sim.run(199)',globals(),locals())
