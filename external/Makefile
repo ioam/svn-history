@@ -3,11 +3,11 @@ CC = gcc
 
 default: python jpeg pil numeric numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis
 
-all: default pyaudiolab mlabwrap scipy
+all: default pyaudiolab mlabwrap scipy ipython
 
-clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-clean
 
 ##############################################################
 # Python (interpreted language)
@@ -76,6 +76,25 @@ tk-clean:
 	rm -rf  ${TK} 
 tk-uninstall:
 	rm -rf tk ${foreach f,${TK_UNINSTALL}, ${PREFIX}/${f}}
+
+
+
+##############################################################
+# ipython (improved interactive prompt)
+#
+IPYTHON = ipython-0.7.3
+IPYTHON_UNINSTALL =  ${PYTHON_LIB}/site-packages/IPython
+
+ipython: ${IPYTHON}.tar.gz python 
+	tar xzf ${IPYTHON}.tar.gz
+	cd ${IPYTHON}; ${PREFIX}/bin/python setup.py install
+	touch ipython
+
+ipython-clean:
+	rm -rf ${IPYTHON} 
+ipython-uninstall:
+	rm -rf ipython ${IPYTHON} $(foreach f, ${IPYTHON_UNINSTALL}, ${PREFIX}/${f})
+
 
 
 
