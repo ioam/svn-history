@@ -27,7 +27,7 @@ compared exhaustively to the original simulations.
 
 $Id$
 """
-__version__='$$'
+__version__='$Revision$'
 
 
 import numpy.oldnumeric.random_array as RandomArray
@@ -102,7 +102,8 @@ topo.sim['LGNOff']=CFSheet(nominal_density=24.0,
                            output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                            measure_maps=False)
 
-topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9)
+topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,
+                        nominal_bounds=BoundingBox(radius=0.5))
 
 topo.sim['V1'].output_fn.lower_bound=0.083
 topo.sim['V1'].output_fn.upper_bound=0.633
@@ -131,6 +132,7 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 
 topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=1.0,name='LGNOnAfferent',
+                 # JABALERT: Should probably simplify this by making a function for it.
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.patterns.random.UniformRandom()]),
@@ -204,16 +206,17 @@ topo.sim.schedule_command( 4000*st,'topo.sim["V1"].projections()["LGNOnAfferent"
 topo.sim.schedule_command(20000*st,'topo.sim["V1"].projections()["LGNOnAfferent"].learning_rate=0.2055/2;topo.sim["V1"].projections()["LGNOffAfferent"].learning_rate=0.2055/2')
 
 ### Activation function threshold changes
-topo.sim.schedule_command(  200*st,'topo.sim["V1"].output_fn.lower_bound=0.11; topo.sim["V1"].output_fn.upper_bound=0.66')
-topo.sim.schedule_command(  500*st,'topo.sim["V1"].output_fn.lower_bound=0.12; topo.sim["V1"].output_fn.upper_bound=0.67')
-topo.sim.schedule_command( 1000*st,'topo.sim["V1"].output_fn.lower_bound=0.15; topo.sim["V1"].output_fn.upper_bound=0.68')
-topo.sim.schedule_command( 2000*st,'topo.sim["V1"].output_fn.lower_bound=0.18; topo.sim["V1"].output_fn.upper_bound=0.70')
-topo.sim.schedule_command( 3000*st,'topo.sim["V1"].output_fn.lower_bound=0.20; topo.sim["V1"].output_fn.upper_bound=0.73')
-topo.sim.schedule_command( 4000*st,'topo.sim["V1"].output_fn.lower_bound=0.20; topo.sim["V1"].output_fn.upper_bound=0.76')
-topo.sim.schedule_command( 5000*st,'topo.sim["V1"].output_fn.lower_bound=0.21; topo.sim["V1"].output_fn.upper_bound=0.79')
-topo.sim.schedule_command( 6500*st,'topo.sim["V1"].output_fn.lower_bound=0.22; topo.sim["V1"].output_fn.upper_bound=0.82')
-topo.sim.schedule_command( 8000*st,'topo.sim["V1"].output_fn.lower_bound=0.23; topo.sim["V1"].output_fn.upper_bound=0.85')
-topo.sim.schedule_command(20000*st,'topo.sim["V1"].output_fn.lower_bound=0.24; topo.sim["V1"].output_fn.upper_bound=0.88')
+topo.sim.schedule_command(  200*st,'topo.sim["V1"].output_fn.lower_bound=0.093;topo.sim["V1"].output_fn.upper_bound=0.643')
+topo.sim.schedule_command(  500*st,'topo.sim["V1"].output_fn.lower_bound=0.103;topo.sim["V1"].output_fn.upper_bound=0.643')
+topo.sim.schedule_command( 1000*st,'topo.sim["V1"].output_fn.lower_bound=0.133;topo.sim["V1"].output_fn.upper_bound=0.663')
+topo.sim.schedule_command( 2000*st,'topo.sim["V1"].output_fn.lower_bound=0.163;topo.sim["V1"].output_fn.upper_bound=0.683')
+topo.sim.schedule_command( 3000*st,'topo.sim["V1"].output_fn.lower_bound=0.183;topo.sim["V1"].output_fn.upper_bound=0.713')
+topo.sim.schedule_command( 4000*st,'topo.sim["V1"].output_fn.lower_bound=0.183;topo.sim["V1"].output_fn.upper_bound=0.743')
+topo.sim.schedule_command( 5000*st,'topo.sim["V1"].output_fn.lower_bound=0.193;topo.sim["V1"].output_fn.upper_bound=0.773')
+topo.sim.schedule_command( 6500*st,'topo.sim["V1"].output_fn.lower_bound=0.203;topo.sim["V1"].output_fn.upper_bound=0.803')
+topo.sim.schedule_command( 8000*st,'topo.sim["V1"].output_fn.lower_bound=0.213;topo.sim["V1"].output_fn.upper_bound=0.833')
+topo.sim.schedule_command(20000*st,'topo.sim["V1"].output_fn.lower_bound=0.223;topo.sim["V1"].output_fn.upper_bound=0.863')
+
 
 ### Settling steps changes
 topo.sim.schedule_command( 2000*st,'topo.sim["V1"].tsettle=10')
