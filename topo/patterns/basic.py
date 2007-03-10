@@ -150,7 +150,8 @@ class Disk(PatternGenerator):
     def function(self,**params):
         height = params.get('size',self.size)
         aspect_ratio = params.get('aspect_ratio',self.aspect_ratio)
-        
+
+        # CEBHACKALERT: this division should handle aspect_ratio=0
         return disk(self.pattern_x/aspect_ratio,self.pattern_y,height,
                          params.get('smoothing',self.smoothing))
 
