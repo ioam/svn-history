@@ -17,6 +17,13 @@ from parameterizedobject import ParameterizedObject
 from sheetcoords import SheetCoordinateSystem
 
 
+# CEBALERT: PatternGenerator has become a bit of a monster abstract
+# class.  Can it be split into the minimum required to specify the
+# interface, with a subclass implementing the rest (this subclass
+# still being above the rest of the PatternGenerators)?  We want to
+# make it easy to add new types of PatternGenerator that don't match
+# the assumptions of the current ones, but still lets them be used
+# like the current ones.
 class PatternGenerator(ParameterizedObject):
     """
     A class hierarchy for callable objects that can generate 2D patterns.
@@ -75,12 +82,17 @@ class PatternGenerator(ParameterizedObject):
     
     offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.11,doc="""
         Additive offset to input pattern, defaulting to 0.0""")
+
+    mask = Parameter(default=None,precedence=0.06,doc="""
+        Optional object (expected to be an array) with which to multiply the
+        pattern array after it has been created, before any output_fn is
+        applied. This can be used to shape the pattern.""")
     
     output_fn = OutputFnParameter(default=IdentityOF(),precedence=0.08,doc="""
         Optional function to apply to the pattern array after it has been created.
         This function can be used for normalization, thresholding, etc.""")
 
-        
+      
     def __call__(self,**params):
         """
         Call the subclasses 'function' method on a rotated and scaled coordinate system.
@@ -103,8 +115,12 @@ class PatternGenerator(ParameterizedObject):
         scale = params.get('scale',self.scale)
         offset = params.get('offset',self.offset)
         output_fn = params.get('output_fn',self.output_fn)
-
+        
         result = scale*self.function(**params)+offset
+
+        mask = params.get('mask',self.mask)
+        if mask is not None:
+            result*=mask
         
         if output_fn is not IdentityOF: # Optimization (but may not actually help)
             output_fn(result)           # CEBHACKALERT: particularly since everything but
@@ -185,6 +201,10 @@ class Constant(PatternGenerator):
         shape = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
 
         result = scale*ones(shape, Float)+offset
+
+        mask = params.get('mask',self.mask)
+        if mask is not None:
+            result*=mask
         
         if output_fn is not IdentityOF: # Optimization (but may not actually help)
             output_fn(result)

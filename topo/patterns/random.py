@@ -42,6 +42,10 @@ class RandomGenerator(PatternGenerator):
         shape = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
 
         result = self._distrib(shape)
+
+        mask = params.get('mask',self.mask)
+        if mask is not None:
+            result*=mask
         
         if output_fn is not IdentityOF: # Optimization (but may not actually help)
             output_fn(result)

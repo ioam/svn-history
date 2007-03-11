@@ -174,13 +174,6 @@ class ConnectionField(ParameterizedObject):
         self.offset_bounds(slice_)
 	
 
-        # CEBALERT: might want to do something about a size that's specified
-        # (right now the size is assumed to be that of the bounds)
-        w = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
-                              xdensity=self.input_sheet.xdensity,
-                              ydensity=self.input_sheet.ydensity)
-        self.weights = w.astype(weight_type)
-
         # Now we have to get the right submatrix of the mask (in case
         # it is near an edge)
         r1,r2,c1,c2 =  self.get_slice(slice_)
@@ -188,11 +181,21 @@ class ConnectionField(ParameterizedObject):
 	
         self.mask = m.astype(weight_type)
 
-        # CEBHACKALERT: this works for now, while the output_fns are
-        # all multiplicative.  But in the long run we need a better
-        # way to apply the mask.  The same applies anywhere the mask
-        # is used, including in learningfns/.
-        self.weights *= self.mask   
+        # CEBALERT: might want to do something about a size that's specified
+        # (right now the size is assumed to be that of the bounds)
+        w = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
+                              xdensity=self.input_sheet.xdensity,
+                              ydensity=self.input_sheet.ydensity,
+                              mask=self.mask)
+        
+        self.weights = w.astype(weight_type)
+
+        # CEBHACKALERT: the system of masking through multiplication
+        # by 0 works for now, while the output_fns are all
+        # multiplicative.  But in the long run we need a better way to
+        # apply the mask.  The same applies anywhere the mask is used,
+        # including in learningfns/.
+        # We should investigate the numpy.ma module.
         output_fn(self.weights)        
 
 

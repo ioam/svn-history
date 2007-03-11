@@ -355,8 +355,12 @@ class Composite(PatternGenerator):
         offset=params.get('offset',self.offset)
         orientation=params.get('orientation',self.orientation)
         size=params.get('size',self.size)
+        mask=params.get('mask',self.mask)
 
-        patterns = [pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
+        # CEBALERT: mask gets applied by all PGs including the Composite itself
+        # (leads to redundant calculations in current lissom_oo_or usage, but
+        # will lead to problems/limitations in the future). 
+        patterns = [pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,mask=mask,
                        x=x+size*(pg.inspect_value("x")*cos(orientation)-
                                  pg.inspect_value("y")*sin(orientation)),
                        y=y+size*(pg.inspect_value("x")*sin(orientation)+
