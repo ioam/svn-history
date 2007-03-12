@@ -121,38 +121,40 @@ def n_units(x):
     center_unit=(int(density/2),int(density/2))
     return len(Numeric.nonzero(Numeric.ravel(x.cf(*center_unit).mask)))
 
+# Convenience variable: timescale (s_t)
+st=1.0/num_inputs
+
 ### Lateral excitatory bounds changes
-topo.sim.schedule_command(99,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.0625))')
-topo.sim.schedule_command(249,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.04375))')
-topo.sim.schedule_command(499,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.035))')
-topo.sim.schedule_command(999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.02800))')
-topo.sim.schedule_command(1499,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.02240))')
-topo.sim.schedule_command(1999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.01344))')
-topo.sim.schedule_command(2499,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00806))')
-topo.sim.schedule_command(3249,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00484))')
-topo.sim.schedule_command(3999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00290))')
-topo.sim.schedule_command(9999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00174))')
+topo.sim.schedule_command(  200*st,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.0625))')
+topo.sim.schedule_command(  500*st,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.04375))')
+topo.sim.schedule_command( 1000*st,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.035))')
+topo.sim.schedule_command( 2000*st,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.02800))')
+topo.sim.schedule_command( 3000*st,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.02240))')
+topo.sim.schedule_command( 4000*st,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.01344))')
+topo.sim.schedule_command( 5000*st,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00806))')
+topo.sim.schedule_command( 6500*st,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00484))')
+topo.sim.schedule_command( 8000*st,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00290))')
+topo.sim.schedule_command(20000*st,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00174))')
 
 ### Lateral excitatory learning rate changes
 LE=topo.sim["V1"].projections()["LateralExcitatory"]
 
-topo.sim.schedule_command(99,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.12168*n_units(LE)')
-topo.sim.schedule_command(249,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command(499,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command(999,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command(1499,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command(1999,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command(2499,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command(3249,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command(3999,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command(9999,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-
+topo.sim.schedule_command(  200*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.12168*n_units(LE)')
+topo.sim.schedule_command(  500*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command( 1000*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command( 2000*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command( 3000*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command( 4000*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command( 5000*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command( 6500*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command( 8000*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command(20000*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
 
 ### Afferent learning rate changes
-topo.sim.schedule_command(249,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.685')
-topo.sim.schedule_command(999,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.5480')
-topo.sim.schedule_command(1999,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.4110')
-topo.sim.schedule_command(9999,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.2055')
+topo.sim.schedule_command(  500*st,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.6850')
+topo.sim.schedule_command( 2000*st,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.5480')
+topo.sim.schedule_command( 4000*st,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.4110')
+topo.sim.schedule_command(20000*st,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.2055')
 
 topo.sim.run(0)
 

@@ -35,26 +35,30 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfns.homeostatic import HomeostaticMaxEnt
-
+from topo.patterns.basic import Gaussian
 
 # Normally uses homeostatic plasticity, but can be called as
 #   ./topographica -c "homeostatic=False" ...
 # to use scheduled threshold changes instead.
+
 homeostatic = locals().get('homeostatic',True)
 
 if homeostatic:
     topo.sim.name = "homeo_lissom_or_noshrinking"
 else:
     topo.sim.name = "lissom_or_noshrinking"
+    
+num_inputs=2
+input_type=topo.patterns.basic.Gaussian
+inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),
+                   y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i)),
+                   orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56+i)),
+                   size=0.088388, aspect_ratio=4.66667, scale=1.0,
+                   bounds=BoundingBox(radius=0.8))
+                for i in xrange(num_inputs)]
 
+combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
 
-input_pattern = topo.patterns.basic.Gaussian(
-          scale=1.0, size=2*0.0468, aspect_ratio=4.0,
-          x=DynamicNumber(UniformRandom(lbound=-0.775,ubound=0.775,seed=12)),
-          y=DynamicNumber(UniformRandom(lbound=-0.775,ubound=0.775,seed=34)),
-          orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
-
-                                 
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)
 CFProjection.weights_generator=topo.patterns.random.UniformRandom()
@@ -68,70 +72,71 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 # build simulation
 
 topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
-                                  input_generator=input_pattern,
+                                  input_generator=combined_inputs,
                                   period=1.0, phase=0.05,
                                   nominal_bounds=BoundingBox(radius=0.5+0.25))
 
-
 if homeostatic:
-    topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',84.0),
+    topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
                             nominal_bounds=BoundingBox(radius=0.5),tsettle=9, 
-                            output_fn=HomeostaticMaxEnt(a_init=13, b_init=-4, eta=0.002, mu=0.01))
-else:
-    topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',84.0),
-                            nominal_bounds=BoundingBox(radius=0.5),tsettle=9)
-
+                            output_fn=HomeostaticMaxEnt())
+else:    
+    topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
+                            nominal_bounds=BoundingBox(radius=0.5), tsettle=9)
 
 if not homeostatic:
     topo.sim['V1'].output_fn.lower_bound=0.1
     topo.sim['V1'].output_fn.upper_bound=0.65
 
 
-topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
+topo.sim.connect('Retina','V1',delay=FixedPoint("0.05"),
                   connection_type=CFProjection,strength=1.0,name='Afferent',
-                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply,
-                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.271),
+                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.patterns.random.UniformRandom()]),
-                  nominal_bounds_template=BoundingBox(radius=0.271),learning_rate=0.9590)
+                  nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590)
 
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
-                  connection_type=CFProjection,strength=0.9,
+                 connection_type=CFProjection,strength=0.9,
                  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=2*0.03),
-                  nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0) 
+                 nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0) 
             
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
-                  connection_type=CFProjection,strength=-0.9,
-                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply,
-                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.229),
+                 connection_type=CFProjection,strength=-0.9,
+                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
                                                                              topo.patterns.random.UniformRandom()]),
-                  nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.627)
+                 nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.8087)
+
 
 ### Actions scheduled to occur as the simulation proceeds.#
 
-
 topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
 
+# Convenience variable: timescale (s_t)
+st=1.0/num_inputs
 
 ### Schedule learning rate changes
 #
-topo.sim.schedule_command( 100,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.548')
-topo.sim.schedule_command( 1000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.274')
-topo.sim.schedule_command( 3000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.137')
+topo.sim.schedule_command( 100*st,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.548')
+topo.sim.schedule_command( 1000*st,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.274')
+topo.sim.schedule_command( 3000*st,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.137')
 
 
 if not homeostatic:
     ### Schedule LISSOM settling and output function threshold changes
-    topo.sim.schedule_command( 1000,'topo.sim["V1"].tsettle=11')
-    topo.sim.schedule_command( 3000,'topo.sim["V1"].tsettle=12')
-    topo.sim.schedule_command( 5000,'topo.sim["V1"].tsettle=13')
+    topo.sim.schedule_command( 1000*st,'topo.sim["V1"].tsettle=11')
+    topo.sim.schedule_command( 3000*st,'topo.sim["V1"].tsettle=12')
+    topo.sim.schedule_command( 5000*st,'topo.sim["V1"].tsettle=13')
 
-    topo.sim.schedule_command( 100, 'topo.sim["V1"].output_fn.lower_bound=0.15; topo.sim["V1"].output_fn.upper_bound=0.68')
-    topo.sim.schedule_command( 1000, 'topo.sim["V1"].output_fn.lower_bound=0.21; topo.sim["V1"].output_fn.upper_bound=0.79')
-    topo.sim.schedule_command( 3000, 'topo.sim["V1"].output_fn.lower_bound=0.22; topo.sim["V1"].output_fn.upper_bound=0.82')
-    topo.sim.schedule_command( 5000, 'topo.sim["V1"].output_fn.lower_bound=0.23; topo.sim["V1"].output_fn.upper_bound=0.85')
-    topo.sim.schedule_command( 10000, 'topo.sim["V1"].output_fn.lower_bound=0.24; topo.sim["V1"].output_fn.upper_bound=0.88')
+    topo.sim.schedule_command( 100*st, 'topo.sim["V1"].output_fn.lower_bound=0.15; topo.sim["V1"].output_fn.upper_bound=0.68')
+    topo.sim.schedule_command( 1000*st, 'topo.sim["V1"].output_fn.lower_bound=0.21; topo.sim["V1"].output_fn.upper_bound=0.79')
+    topo.sim.schedule_command( 3000*st, 'topo.sim["V1"].output_fn.lower_bound=0.22; topo.sim["V1"].output_fn.upper_bound=0.82')
+    topo.sim.schedule_command( 5000*st, 'topo.sim["V1"].output_fn.lower_bound=0.23; topo.sim["V1"].output_fn.upper_bound=0.85')
+    topo.sim.schedule_command( 10000*st, 'topo.sim["V1"].output_fn.lower_bound=0.24; topo.sim["V1"].output_fn.upper_bound=0.88')
 
 topo.sim.run(0)
+
 
 
 
