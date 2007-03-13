@@ -74,6 +74,11 @@ def line(y, thickness, gaussian_width):
     return where(gaussian_y_coord<=0, 1.0, falloff)
 
 
+# CEBALERT: when there is no smoothing (gaussian_width=0), it's possible
+# to get an invalid error if distance_outside_disk==0 (because 0/0 is nan).
+# We could select a different implementation if the smoothing is 0 to avoid
+# this problem, and to avoid needing any element-by-element checking for
+# 0/0). Similar alerts apply to line() and ring().
 def disk(x, y, height, gaussian_width):
     """
     Circular disk with Gaussian fall-off after the solid central region.
