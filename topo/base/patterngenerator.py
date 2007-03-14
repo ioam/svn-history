@@ -22,8 +22,10 @@ from sheetcoords import SheetCoordinateSystem
 # interface, with a subclass implementing the rest (this subclass
 # still being above the rest of the PatternGenerators)?  We want to
 # make it easy to add new types of PatternGenerator that don't match
-# the assumptions of the current ones, but still lets them be used
-# like the current ones.
+# the assumptions of the current ones (OneDPowerSpectrum is an example
+# of a PG that doesn't match the current assumptions), but still lets
+# them be used like the current ones.
+# (PatternGenerator-->TwoDPatternGenerator?)
 class PatternGenerator(ParameterizedObject):
     """
     A class hierarchy for callable objects that can generate 2D patterns.
