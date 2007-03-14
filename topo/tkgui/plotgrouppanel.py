@@ -321,6 +321,10 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         ### edit options.
         self._canvas_menu = Menu(self, tearoff=0)
         self._canvas_menu.insert_command(0,label='',state=DISABLED) # title
+
+        # CEBALERT: put this somewhere reasonable, with description + help, and so on.
+        self.location_info = StringVar()
+        Label(self,textvariable=self.location_info).pack(side=TOP)
         
 ### Partial support for opening a Connection Fields window on a right click;
 ### for this to be useful we would need to convert matrix coordinates
@@ -334,6 +338,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 #
 #       print self.console.plots_menu_entries["Connection Fields"]
 #       self.console.plots_menu_entries["Connection Fields"].command()
+
 
     def __canvas_right_click(self,event):
         """
@@ -350,13 +355,27 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         # Store information about the mouse click location,
         # for use in code processing the click.
         self._canvas_click_info = (plot,r,c)
-
+        
         # set menu title
         self._canvas_menu.entryconfig(0,state=DISABLED,label=
                                       ("%s %s: row %d, col %d" % 
                                        (plot.plot_src_name,plot.name,r,c)))
 
         self._canvas_menu.tk_popup(event.x_root,event.y_root)
+
+
+    def __dynamic_popup(self,event):
+        # CEBALERT: just a demo of having dynamic update
+        # reorganize - copies stuff from __canvas_right_click,
+        # etc.
+        x,y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
+        plot = event.widget.plot
+        sf = plot.scale_factor
+        r,c=int(floor(y/sf)),int(floor(x/sf))
+        # Store information about the mouse click location,
+        # for use in code processing the click.
+        #self._canvas_location_info = (plot,r,c)
+        self.location_info.set("(%s,%s) on %s"%(r,c,plot.plot_src_name))
 
    
     def generate_plotgroup(self):
@@ -456,6 +475,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
             # for the right_click menu.
             canvas.plot=plot
             canvas.bind('<Button-3>',self.__canvas_right_click)
+            canvas.bind('<Motion>',self.__dynamic_popup)
 
 
     def add_to_history(self):
