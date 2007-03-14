@@ -131,11 +131,6 @@ the subtract.reduce bug.)
 <!--libsndfile, pyaudiolab, jpeg (in PIL binary?), (mlabwrap) to go-->
 </li>
 
-<li>
-2007/02/28 (CB): finish pickling reorganization.
-<!-- rename picklesupport class, move to base, bzip, xml option, etc-->
-</li>
-
 </ul>
 
 
@@ -163,21 +158,15 @@ could get right-click menu to show e.g. Fourier transform option.)
 </li>
 
 <li>
-2007/02/23 (CB): Gnosis Utils has xml pickling - add this as an
-optional format.  (The xml is still complex, but is at least readable
-independently of python and Topographica.)
-<br />
-gnosis.xml.pickle cannot handle numpy.float64 for some reason (it works 
-for float32, and worked on the main branch before numpy);
-somewhere numpy.float64 must be imported into Topographica
-(Numeric.Float64 either caused no problems or was not imported -
-I don't know which).
+2007/03/14 (CB): gnosis.xml.pickle needs to be updated for 
+numpy. I'm working with module's author at the moment.
 </li>
 
 <li>
-2007/02/25: how to build scipy without requiring any of the external
+2007/03/14 (CB): how to build scipy without requiring any of the external
 linear algebra libraries, etc? Then scipy would at least build
 easily, and users could install the optimized versions if they wished.
+Investigate garnumpy.
 </li>
 
 <li>
@@ -600,7 +589,7 @@ achieve in Python.
 </li>
 
 <li>
-2007/02/21: Build python on windows with free compiler. Maybe use
+2007/03/14: Build python on windows with free compiler. Maybe use
 pymingw?  At the moment, this seems much more difficult to setup than
 the current system, but it might be much easier to maintain.  Before
 that, could at least add mingw's msys stuff for a shell and make -
@@ -614,6 +603,8 @@ external/Python-2.4.4/PCbuild/readme.txt.
 <br />
 Apparently it can be built using a free (money) Microsoft compiler:
 http://wiki.python.org/moin/Building_Python_with_the_free_MS_C_Toolkit
+<br />
+I'm working on this using cygwin at the moment...
 </li>
 
 <li>
