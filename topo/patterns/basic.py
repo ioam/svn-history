@@ -585,67 +585,74 @@ class GaussiansCorner(PatternGenerator):
 
 
 
-
-# CB: being a PatternGenerator gives this lots of parameters that don't really
-# mean anything.
 class OneDPowerSpectrum(PatternGenerator):
     """
-    Performs a discrete Fourier transform each time it's called,
-    on a rolling window of the signal.
-    
-    Over time, outputs a power spectrum.
-
     ** This class has not been tested, and is still being written **
-    """    
-    windowing_function = Parameter(default=numpy.hanning)
-    window_length = Integer(default=2)
-    window_overlap = Integer(default=0)
-    sample_spacing = Number(default=1.0)
     
-    def __init__(self,signal=[1,1,1,1],**params):
+    Returns the spectral density of a rolling window of the input signal
+    each time it is called. Over time, outputs a spectrogram.
+    """
+    window_length = Integer(constant=True,default=2,doc="""
+    The interval of the signal on which to perform the Fourier transform.
+    
+    The Fourier transform algorithm is most efficient if this is a power of 2
+    (or can be decomposed into small prime factors - see numpy.fft).""")
+
+    
+    # CEBALERT: this should be constant, but setting it so gives an error
+    windowing_function = Parameter(default=numpy.hanning,doc="""
+    This function is multiplied with the interval of signal before performing the
+    Fourier transform (i.e. it is used to shape the interval). 
+
+    The function chosen here dictates the tradeoff between resolving comparable
+    signal strengths with similar frequencies, and resolving disparate signal
+    strengths with dissimilar frequencies.
+
+    See  http://en.wikipedia.org/wiki/Window_function
+    """)
+
+    window_overlap = Integer(default=0,doc="""Amount of overlap between each window of
+    the signal.""")
+    
+    sample_spacing = Number(constant=True,default=1.0,doc="""
+    ...1/samplerate,relate to time, etc...""")
+    
+    
+    def __init__(self,signal=[1,1,1,1],start_location=0,**params):
         """
-        Read the audio file into an array.
+        Reads the given signal into a float32 array.
+
+        The current position of the 'read pointer' in the signal array
+        is given by self.location. start_location allows the starting
+        point to be set.
+
+        self.frequencies gives the DFT's sample frequencies, matching
+        the order returned by __call__().
         """
         super(OneDPowerSpectrum,self).__init__(**params)
-
+        
         # CB: add pre-processing options (e.g. remove DC) here?
         # Or should users do them first, if they want them?
 
         self.signal = numpy.asarray(signal,dtype=numpy.float32)
-        
-        # current position of 'read pointer' in the signal
-        self.location = 0
+        self.location = start_location
+        self.frequencies = numpy.fft.fftfreq(self.window_length,d=self.sample_spacing)
+
+        self.smoothing_window = self.windowing_function(self.window_length)  
 
 
-    def __call__(self,**params):
+    def __call__(self):
         """
         Perform a DFT (FFT) of the current sample from the signal multiplied
         by the smoothing window.
-        """
-        # CB: How much to explain in docstring? numpy.fft.fft has
-        # documentation e.g. numpy.fft.fft most efficient if
-        # window_length 'is a power of 2 (or decomposable into low
-        # prime factors)', and what the output represents
-        # (X[N-k]=X[-k] as usual in FFT formula).
 
-        # currently these can all be changed each call: is that useful?
-        # (unusual for creating a spectrogram)
-        n_samples = params.get('window_length',self.window_length)
-        overlap = params.get('window_overlap',self.window_overlap)
-        w_func = params.get('windowing_function',self.windowing_function)
-        
-        start = max(self.location-overlap,0)
-        end = start+n_samples
+        See numpy.fft for information about the Fourier transform.
+        """
+        start = max(self.location-self.window_overlap,0)
+        end = start+self.window_length
         signal_sample = self.signal[start:end]
 
-        self.location+=n_samples
+        self.location+=self.window_length
 
-        # make the frequencies easily available; would be calc'd only once
-        # if the above parameters were constant
-        self.last_freq = numpy.fft.fftfreq(n_samples,d=self.sample_spacing)
-
-        # again, would store if above parameters were constant
-        smoothing_window = w_func(n_samples)  
-
-        return numpy.fft.fft(signal_sample*smoothing_window) #,n=n_samples)
+        return numpy.fft.fft(signal_sample*self.smoothing_window) #,n=n_samples)
     
