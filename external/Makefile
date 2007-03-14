@@ -1,7 +1,7 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-default: python jpeg pil numeric numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis
+default: python jpeg pil numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis
 
 all: default pyaudiolab mlabwrap scipy ipython
 
@@ -147,7 +147,8 @@ pil-uninstall:
 
 ##############################################################
 # Numeric (matrix library)
-#
+# CEBALERT: we can remove this section (and other references
+# to numeric).
 NUMERIC = Numeric-24.0
 NUMERIC_UNINSTALL =  ${PYTHON_LIB}/site-packages/Numeric
 
