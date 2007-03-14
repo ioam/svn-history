@@ -11,8 +11,9 @@ $Id$
 _version__='$Revision$'
 
 from __future__ import division #DO NOT DELETE!Needs it for correct&precise divisions.
-from RandomArray import *
-from Numeric import *
+import numpy.oldnumeric.random_array as RandomArray
+from numpy.oldnumeric import *
+import numpy
 from fixedpoint import FixedPoint
 
 import topo.patterns.random
@@ -118,9 +119,9 @@ class ElasticNet(Sheet):
         
         for i in range(CS):
             for j in range(CS):
-                self.net[i][j].x=i/(CS-1)+0.1*(random()-0.5)
-                self.net[i][j].y=j/(CS-1)+0.1*(random()-0.5)
-                self.net[i][j].z=GAP/2+0.1*(random()-0.5)
+                self.net[i][j].x=i/(CS-1)+0.1*(numpy.random.uniform()-0.5)
+                self.net[i][j].y=j/(CS-1)+0.1*(numpy.random.uniform()-0.5)
+                self.net[i][j].z=GAP/2+0.1*(numpy.random.uniform()-0.5)
 
         #For printing afterwards..
         self.xarray=[[self.net[i][r].x for i in range(CS)] for r in range(CS)]
