@@ -6,9 +6,8 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBHACKALERT: you need to build pyaudiolab to use this file.
-# Should we have pyaudiolab built by default now? (I haven't
-# tested it on Windows or OS X.)
+# CEBALERT: you need to build pyaudiolab to use this file.
+# (Not tested it on Windows or OS X.)
 import pyaudiolab
 import numpy
 
@@ -20,9 +19,11 @@ from topo.patterns.basic import OneDPowerSpectrum
 
 class Audio(OneDPowerSpectrum):
     """
+    ** Untested: currently being written. ** 
     """
     # CB: find an example sound (I haven't listened to this one;
-    # there's no signal in it for the first hundred or so frames)
+    # there's no signal in it for the first hundred or so frames).
+    # Use a wav file.
     filename = Filename(
         default='lib/python2.4/site-packages/pyaudiolab/test_data/test.flac',
         precedence=0.9,doc=
@@ -31,7 +32,7 @@ class Audio(OneDPowerSpectrum):
         The audio can be in any format accepted by pyaudiolab, e.g. WAV, AIFF, or FLAC.
         """)
 
-    # CEBALERT: make Audio's parameters window_length,overlap be independent of
+    # CEBHACKALERT: make Audio's parameters window_length,overlap be independent of
     # the sampling rate.
 
     def __init__(self,**params):
