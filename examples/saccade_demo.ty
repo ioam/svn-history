@@ -17,30 +17,73 @@ $Id$
 import pdb
 
 from itertools import cycle
+import pylab
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.boundingregion import BoundingBox
-from topo.base.parameterclasses import DynamicNumber
+from topo.base.parameterclasses import DynamicNumber,Number
 from topo.projections.basic import SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.base.parameterizedobject import VERBOSE,NORMAL,DEBUG
+from topo.coordmapperfns.basic import OttesSCMotorMapper
 
 import topo.patterns.image
 
-from examples.saccade import ShiftingGeneratorSheet, SaccadeController
+from saccade import ShiftingGeneratorSheet, SaccadeController
+
+
+def plot_proj_mapping(mapper,sheet,style='b-'):
+    """
+    Given a CoordinateMapperFn for a CFProjection and the
+    dest sheet of the projection, plot a grid showing the locations of
+    the CFs on the source sheet.
+    """
+
+    # JPALERT:  Not sure where this fn should go...
+    
+    from pylab import plot,hold,ishold
+    
+    xs = sheet.sheet_rows()
+    ys = sheet.sheet_cols()
+
+    hold_on = ishold()
+    if not hold_on:
+        plot()
+    hold(True)
+
+    for y in ys:
+        pts = [mapper(x,y) for x in xs]
+        plot([u for u,v in pts],
+             [v for u,v in pts],
+             style)
+
+    for x in xs:
+        pts = [mapper(x,y) for y in ys]
+        plot([u for u,v in pts],
+             [v for u,v in pts],
+             style)
+
+    hold(hold_on)
+    
+
+        
+
+    
 
 
 ##########################################################################
 # defaults:
 
 topo.base.sheet.Sheet.nominal_density = 48
-
+topo.base.sheet.Sheet.nominal_bounds = BoundingBox(radius=0.5)
 topo.patterns.image.Image.size = 2.0
 
 SaccadeController.decode_method = 'centroid'
 SaccadeController.print_level = VERBOSE
 
 ShiftingGeneratorSheet.print_level = VERBOSE
+
+
 
 
 ##########################################################################
@@ -52,13 +95,13 @@ saccade_generator = topo.patterns.basic.Gaussian(
     # A cycle through a series of saccades to the
     # periphery, and back to the center.
     # 
-    #                      NE    C    SE   C     NW   C     SW    C
-    #x=DynamicNumber(cycle([0.3,-0.3,  0.3,-0.3, -0.3, 0.3, -0.3, 0.3])),
-    #y=DynamicNumber(cycle([0.3,-0.3, -0.3, 0.3,  0.3,-0.3, -0.3, 0.3])),
+    #                        NE    C     SE   C     NW   C     SW    C
+    # x=DynamicNumber(cycle([0.3,-0.3,  0.3,-0.3, -0.3, 0.3, -0.3, 0.3])),
+    # y=DynamicNumber(cycle([0.3,-0.3, -0.3, 0.3,  0.3,-0.3, -0.3, 0.3])),
 
     # random saccades
     x = DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5)),
-    y = DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5)),
+    y = DynamicNumber(UniformRandom(lbound=-0.4,ubound=0.4)),
 
     # constant 'still' saccade: will produce random walk if using
     # SaccadeController.decode_method = 'sample'
@@ -77,27 +120,31 @@ scene_generator = topo.patterns.image.Image()
 
 topo.sim['Eye'] = ShiftingGeneratorSheet(input_generator=scene_generator)
 
-topo.sim['SaccadeControl'] = SaccadeController()
+decoder = topo.sim['SaccadeControl'] = SaccadeController()
 
 topo.sim['SC'] = GeneratorSheet(input_generator=saccade_generator,
-                                period=2)
+                                nominal_bounds = BoundingBox(radius=0.6),
+                                period=1.0)
 
 ##########################################################################
 # Connections: The colliculus efferent connection connects to the
 # saccade controller's activity port with a CFProjection, which
 # connects to the 'Saccade' port of the Eye with a generic connection. 
 
-topo.sim.connect('SC','SaccadeControl',name="SC Efferent",
+topo.sim.connect('SC','SaccadeControl',name="Efferent",
                  dest_port = 'Activity',
-                 delay = 1.0,
-                 connection_type=SharedWeightCFProjection,
+                 delay = 0.5,
+                 connection_type=CFProjection,
                  weights_generator = topo.patterns.basic.Gaussian(),
                  nominal_bounds_template = BoundingBox(radius=0),
                  response_fn = CFPRF_DotProduct_opt(),
-                 min_matrix_radius=0)
+                 min_matrix_radius=0,
+                 coord_mapper = OttesSCMotorMapper(decoder_sheet=decoder)
+                 )
 
 topo.sim.connect('SaccadeControl','Eye',
                  name='Saccade Command',
+                 delay=0.5,
                  src_port='Saccade',
                  dest_port='Saccade')
 
