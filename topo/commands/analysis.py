@@ -209,13 +209,7 @@ def measure_position_pref(reading='average',divisions=6,size=0.5,scale=0.3,offse
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,reading='average',
-#<<<<<<< analysis.py
-                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=1.0)):
-
-#=======
- #                   pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
- #                                                      apply_output_fn=False,duration=0.175)):
-#>>>>>>> 1.65
+                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
     """
     Measure orientation maps, using a sine grating by default.
 
@@ -251,13 +245,8 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
 def measure_sf_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,reading='max',
-#<<<<<<< analysis.py
-                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=1.0)):
+                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
 
-#=======
- #                   pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
- #                                                      apply_output_fn=False,duration=0.175)):
-#>>>>>>> 1.65
     """
     Measure spatial freqquwncy maps, using a sine grating by default.
 
