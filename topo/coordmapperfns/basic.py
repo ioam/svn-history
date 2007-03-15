@@ -38,7 +38,7 @@ class SingleDimensionMapper(CoordinateMapperFn):
     in_range = Number(default=0.5*sqrt(2),bounds=(0,None),doc="""
        The maximum range of the mapping input.""")
     out_range = Number(default=0.5*sqrt(2),bounds=(0,None), doc="""
-       The maximumum range of the output.""")
+       The maximum range of the output.""")
     remap_dimension = Enumeration(default='radius',
                                   available=['radius','x','y','xy'],
                                   doc="""
@@ -68,7 +68,8 @@ class SingleDimensionMapper(CoordinateMapperFn):
 
     def _map_fn(self,z):
         raise NotImplementedError
-    
+
+
 class MagnifyingMapper(SingleDimensionMapper):
     """
     Exponential (magnifying) mapping function.
@@ -108,7 +109,8 @@ class OttesSCMotorMapper(CoordinateMapperFn):
     """
     Mapping function for mapping motor output from superior colliculus.
 
-    This mapping is taken from Ottes et al. Vision Research; 1986.
+    This mapping is taken from Ottes et al. (1986) Vision Research 26:857-873.
+    
     Default constant values are from Table 1, ibid.  The mapping allows the creation
     of a single sheet representing both colliculi, one in the x-positive hemisheet and
     the other in the x-negative hemisheet.
