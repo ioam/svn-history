@@ -49,16 +49,16 @@ class ElasticNet(Sheet):
     rate_of_k = Number(default=0.997,bounds=(0,None),
                    doc="Rate of reduction of k must be a lot less than 10% depending on the parameters")
 
-    two_l = Number(default=0.1,bounds=(0,None),
+    two_l = Number(default=0.2,bounds=(0,None),
                    doc="Separation between the two layers of cells")
 
     two_d = Number(default=0.05,bounds=(0,None),
                    doc="Separation between the cells within a layer")
 
-    retinasize=Integer(default=10,bounds=(0,None),
+    retinasize=Integer(default=20,bounds=(0,None),
                    doc="Retina size") # Ideally, would get this info from the retina objects
 
-    cortexsize=Integer(default=20,bounds=(0,None),
+    cortexsize=Integer(default=40,bounds=(0,None),
                    doc="Cortex size") # Ideally, would calculate this info from our bounding box and density
 
 
@@ -335,7 +335,7 @@ topo.sim['RightRetina']=GeneratorSheet(nominal_density=1, period=1.0, phase=0.05
                                        nominal_bounds=BoundingBox(radius=0.5))
 
 ## The elastic net.
-topo.sim['V1'] = ElasticNet(nominal_density=20,nominal_bounds=BoundingBox(radius=0.5))
+topo.sim['V1'] = ElasticNet(nominal_density=40,nominal_bounds=BoundingBox(radius=0.5))
 
 
 ## Currently no need for connections, not even for visualization. They just don't exist.
