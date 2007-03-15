@@ -674,7 +674,9 @@ class TopoConsole(Frame):
         ### JABALERT: Most of this code should move to the
         ### Simulation class, because it is not specific to the GUI.
         ### E.g. we'll also want time remaining estimates from the
-        ### command line and the batch interface.
+        ### command line and the batch interface.  Also see
+        ### topo/analysis/featureresponses.py; maybe it should 
+        ### be its own object instead; not sure.
         fduration = self.run_for.get_value()
         step   = 2.0
         iters  = int(floor(fduration/step))
