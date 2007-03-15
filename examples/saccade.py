@@ -21,7 +21,7 @@ $Id$
 """
 __version__ = '$Revision$'
 
-from numpy import dot,sin,cos,pi,array
+from numpy import dot,sin,cos,pi,array,argmax
 
 from topo.base.cf import CFSheet
 from topo.sheets.generatorsheet import GeneratorSheet
@@ -182,7 +182,7 @@ class SaccadeController(CFSheet):
         # output functions.
         if activity is None:
             activity = self.activity
-        idx = numpy.argmax(activity.flat)
+        idx = argmax(activity.flat)
         r,c = utils.idx2rowcol(idx,activity.shape)
         return self.matrix2sheet(r,c)
       
