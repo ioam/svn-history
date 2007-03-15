@@ -206,7 +206,7 @@ class FeatureResponses(ParameterizedObject):
                       
 # uncomment print command below for map generation timer
         
-            print message
+#            print message
             
 ######################### end of timer   
 
