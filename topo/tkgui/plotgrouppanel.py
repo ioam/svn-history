@@ -340,6 +340,19 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 #       self.console.plots_menu_entries["Connection Fields"].command()
 
 
+    def __process_canvas_event_info(self,event):
+        # CEBHACKALERT: does the canvas match the underlying matrix correctly?
+        # You can point to the edge of the plot and get a value beyond the end
+        # of the underlying matrix. Can we make it match? Otherwise, what's the
+        # best way to deal with this?
+        x,y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
+        plot = event.widget.plot
+        sf = plot.scale_factor
+        r,c=int(floor(y/sf)),int(floor(x/sf))
+        x,y = topo.sim[plot.plot_src_name].matrix2sheet(r,c)
+        self._canvas_click_info = (plot,r,c,x,y)
+
+
     def __canvas_right_click(self,event):
         """
         Method to be called when a user right-clicks inside a displayed Plot.
@@ -348,13 +361,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         stores the row and column of the click in the canvas's plot,
         and shows a popup menu.
         """
-        x,y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
-        plot = event.widget.plot
-        sf = plot.scale_factor
-        r,c=int(floor(y/sf)),int(floor(x/sf))
-        # Store information about the mouse click location,
-        # for use in code processing the click.
-        self._canvas_click_info = (plot,r,c)
+        self.__process_canvas_event_info(event)
         
         # set menu title
         self._canvas_menu.entryconfig(0,state=DISABLED,label=
@@ -365,21 +372,11 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 
 
     def __dynamic_popup(self,event):
-        # CEBALERT: just a demo of having dynamic update.
-        # Reorganize - copies stuff from __canvas_right_click,
-        # etc.
 
-        # CEBHACKALERT: does the canvas match the underlying matrix correctly?
-        # You can point to the edge of the plot and get a value beyond the end
-        # of the underlying matrix. Can we make it match? Otherwise, what's the
-        # best way to deal with this?
-        x,y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
-        plot = event.widget.plot
-        sf = plot.scale_factor
-        r,c=int(floor(y/sf)),int(floor(x/sf))
+        self.__process_canvas_event_info(event)
 
-        x,y = topo.sim[plot.plot_src_name].matrix2sheet(r,c)
-
+        plot,r,c,x,y = self._canvas_click_info
+        
         # this try/except is temporary (plot doesn't match matrix exactly).
         try:
             # CEBALERT: I should be doing this stuff from a sheet_view or something, I guess
