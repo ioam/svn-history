@@ -142,12 +142,11 @@ def process_argv(argv):
     for (k,v) in global_constants.items():
         exec '%s = %s' % (k,v) in __main__.__dict__
 
-    # if -i is on, or no scripts were given and no commands were given.
-    # JP: or if -g is on. We still want readline in the shell, even if
-    # the gui is running, right? 
+    # Provide an interactive prompt unless running in batch mode
     if option.interactive or option.gui:
 	os.environ["PYTHONINSPECT"] = "1"
-	print BANNER
+        if not option.gui:
+            print BANNER
         try:
             import readline
         except ImportError:
