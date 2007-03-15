@@ -368,8 +368,8 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         plot,r,c,x,y = self._canvas_click_info
         
         # CB: currently working on this
-        self._canvas_menu.entryconfig(0,label="Unit (%s,%s)/coord (%s,%s)..."%(r,c,x,y))
-        self._canvas_menu.entryconfig(1,label="%s..."%(plot.plot_src_name))
+        self._canvas_menu.entryconfig(0,label="Unit (%s,%s)/coord (%s,%s)"%(r,c,x,y))
+        self._canvas_menu.entryconfig(1,label="%s"%(plot.plot_src_name))
                                          
                                        
 
