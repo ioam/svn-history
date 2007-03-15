@@ -89,17 +89,17 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         if self.__class__ == TemplatePlotGroupPanel:
             self.refresh(update=self.pgt.plot_immediately)
 
-        self._canvas_menu.insert_command(2,label='Print info',
-                                         command=self.__print_info)
+        #self._canvas_menu.insert_command(2,label='Print info',
+        #                                 command=self.__print_info)
 
-        self._canvas_menu.insert_command(2,label='Plot Fourier transform',
-                                         command=self.__fft)
+        #self._canvas_menu.insert_command(2,label='Plot Fourier transform',
+        #                                 command=self.__fft)
         
-        self._canvas_menu.insert_command(2,label='Print matrix values',
-                                         command=self.__print_matrix)
+        #self._canvas_menu.insert_command(2,label='Print matrix values',
+        #                                 command=self.__print_matrix)
 
-        self._canvas_menu.insert_command(2,label='Plot in new window',
-                                         command=self.__plot_matrix)
+        #self._canvas_menu.insert_command(2,label='Plot in new window',
+        #                                 command=self.__plot_matrix)
 
 
     def _pg_template(self):
@@ -171,7 +171,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
 
     def __print_info(self):
-        plot,r,c = self._canvas_click_info
+        plot,r,c,x,y = self._canvas_click_info
         description ="%s %s, row %d, col %d at time %0.2f: " % (plot.plot_src_name, plot.name, r, c, topo.sim.time())
         if plot.channels.has_key('Strength'):
             m=plot._get_matrix('Strength')
