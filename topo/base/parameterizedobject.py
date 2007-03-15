@@ -228,7 +228,7 @@ class Parameter(object):
         class hierarchy (see ParameterizedObjectMetaclass).
         """
         # Make sure subclass authors read all the documentation...
-        assert hasattr(self,'__dict__')==False, \
+        assert not hasattr(self,'__dict__'), \
                "Subclasses of Parameter should define __slots__; " \
                + `type(self)` + " does not."
 
@@ -743,7 +743,7 @@ class ParameterizedObject(object):
         # Deepcopy all 'instantiate=True' parameters
         for class_ in classlist(type(self)):
             for (k,v) in class_.__dict__.items():
-                if isinstance(v,Parameter) and v.instantiate==True:
+                if isinstance(v,Parameter) and v.instantiate:
                     parameter_name = v.get_name(self) 
                     new_object = copy.deepcopy(v.default)
                     self.__dict__[parameter_name]=new_object
