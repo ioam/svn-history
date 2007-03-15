@@ -82,17 +82,28 @@ class DistributionMatrix(ParameterizedObject):
         """Return the weighted average of each Distribution as a matrix."""
 
         weighted_average_matrix=zeros(self.distribution_matrix.shape,Float)
-         
-#        print pattern_presenter.measure_or_pref.reading
-        
+              
         for i in range(len(weighted_average_matrix)):
             for j in range(len(weighted_average_matrix[i])):
                 weighted_average_matrix[i,j]=self.distribution_matrix[i,j].weighted_average()
 #                weighted_average_matrix[i,j]=self.distribution_matrix[i,j].estimated_maximum()               
-#                weighted_average_matrix[i,j]=self.distribution_matrix[i,j].max_value_bin()                             
+                           
 
         return weighted_average_matrix
+        
+        
+    def max_value_bin(self):
+        """Return the bin with the max value of each Distribution as a matrix."""
 
+        max_value_bin_matrix=zeros(self.distribution_matrix.shape,Float)
+            
+        for i in range(len(max_value_bin_matrix)):
+            for j in range(len(max_value_bin_matrix[i])):           
+                max_value_bin_matrix[i,j]=self.distribution_matrix[i,j].max_value_bin()                             
+
+        return max_value_bin_matrix
+        
+        
 
     def selectivity(self):
         """Return the selectivity of each Distribution as a matrix."""
@@ -242,7 +253,7 @@ class FeatureMaps(FeatureResponses):
 	super(FeatureMaps,self).__init__(features)
         self.features=features
         
-    def collect_feature_responses(self,pattern_presenter,param_dict,display):
+    def collect_feature_responses(self,pattern_presenter,param_dict,display,reading):
 	self.measure_responses(pattern_presenter,param_dict,self.features,display)    
 	
         for sheet in self.sheets_to_measure():
@@ -260,9 +271,14 @@ class FeatureMaps(FeatureResponses):
                     norm_factor = self._featureresponses[sheet][feature].distribution_matrix[0,0].axis_range
                 else:
                     norm_factor = 1.0
-#                print self.reading   
-                preference_map = SheetView(((self._featureresponses[sheet][feature].weighted_average())/norm_factor,
-                                            bounding_box), sheet.name, sheet.precedence, topo.sim.time())
+
+                if reading=='max':
+                    preference_map = SheetView(((self._featureresponses[sheet][feature].max_value_bin())/norm_factor,
+                                                bounding_box), sheet.name, sheet.precedence, topo.sim.time())               
+                else:
+                    preference_map = SheetView(((self._featureresponses[sheet][feature].weighted_average())/norm_factor,
+                                                bounding_box), sheet.name, sheet.precedence, topo.sim.time()) 
+
                 sheet.sheet_view_dict[feature.capitalize()+'Preference']=preference_map
                 
                 # note the temporary multiplication by 17
