@@ -141,6 +141,6 @@ class OttesSCMotorMapper(CoordinateMapperFn):
         R = abs(R)
         
         u = Rsign * Bu * log(sqrt(R**2 + A**2 + 2*A*R*cos(phi))) - Rsign*Bu*log(A)
-        v = Bv * atan((R*sin(phi))/(R*cos(phi)+A*pi/180))
+        v = Bv * atan((R*sin(phi))/(R*cos(phi)+A))
         
         return u,v
