@@ -127,7 +127,16 @@ class Enumeration(Parameter):
             raise ValueError("EnumeratedParamater can't be set to '" + repr(val) + "' because that's not in the list of available values " + repr(self.available) + ".")
 
 
+class Boolean(Parameter):
+    """
+    """
+    __slots__ = []
+    __doc__ = property((lambda self: self.doc))
 
+    def __set__(self,obj,val):
+        if not (isinstance(val,bool)):
+            raise ValueError, "Parameter only takes a boolean value."
+        super(Boolean,self).__set__(obj,bool(val))
 
 
 ### JABALERT: Needs to be extended to accept FixedPoint as a number.
@@ -242,14 +251,14 @@ class Number(Parameter):
         if (is_number(val)):
             if self.bounds==None:
                 return val
-            min, max = self.bounds 
-            if min != None: 
-                if val < min:
-                    return  min
+            vmin, vmax = self.bounds 
+            if vmin != None: 
+                if val < vmin:
+                    return  vmin
 
-            if max != None:
-                if val > max:
-                    return max
+            if vmax != None:
+                if val > vmax:
+                    return vmax
 
         else:
             # non-numeric value sent in: reverts to default value
@@ -271,16 +280,16 @@ class Number(Parameter):
             raise ValueError("Parameter " + `self._name` + " (" + `self.__class__` + ") only takes a numeric value; " + `type(val)` + " is not numeric.")
 
         if self.bounds!=None:
-            min,max = self.bounds
-            if min != None and max != None:
-                if not (min <= val <= max):
-                    raise ValueError("Parameter must be between " + `min` + ' and ' + `max` + ' (inclusive).')
-            elif min != None:
-                if not min <= val: 
-                    raise ValueError("Parameter must be at least " + `min` + '.')
-            elif max != None:
-                if not val <= max:
-                    raise ValueError("Parameter must be at most " + `max` + '.')
+            vmin,vmax = self.bounds
+            if vmin != None and vmax != None:
+                if not (vmin <= val <= vmax):
+                    raise ValueError("Parameter must be between " + `vmin` + ' and ' + `vmax` + ' (inclusive).')
+            elif vmin != None:
+                if not vmin <= val: 
+                    raise ValueError("Parameter must be at least " + `vmin` + '.')
+            elif vmax != None:
+                if not val <=vmax:
+                    raise ValueError("Parameter must be at most " + `vmax` + '.')
 
     def get_soft_bounds(self):
         """
