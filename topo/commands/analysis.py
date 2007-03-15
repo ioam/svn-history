@@ -180,7 +180,7 @@ proj_name =''
 ### should be changed to something cleaner.  It might also be better
 ### to access a Sheet instance directly, rather than searching by name.
 
-def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
+def measure_position_pref(reading='average',divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
                           pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),False,0.175),
                           x_range=(-0.5,0.5),y_range=(-0.5,0.5)):
     """
@@ -203,14 +203,19 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
                           
         param_dict = {"size":size,"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,reading)
        
 
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=False,
-                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
-                                                       apply_output_fn=False,duration=0.175)):
+                    scale=0.3,offset=0.0,display=False,reading='average',
+#<<<<<<< analysis.py
+                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=1.0)):
+
+#=======
+ #                   pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
+ #                                                      apply_output_fn=False,duration=0.175)):
+#>>>>>>> 1.65
     """
     Measure orientation maps, using a sine grating by default.
 
@@ -242,9 +247,49 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
         param_dict = {"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,reading)
 
+def measure_sf_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
+                    scale=0.3,offset=0.0,display=False,reading='max',
+#<<<<<<< analysis.py
+                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=1.0)):
 
+#=======
+ #                   pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
+ #                                                      apply_output_fn=False,duration=0.175)):
+#>>>>>>> 1.65
+    """
+    Measure spatial freqquwncy maps, using a sine grating by default.
+
+    Measures maps by collating the responses to a set of input
+    patterns controlled by some parameters.  The parameter ranges and
+    number of input patterns in each range are determined by the
+    num_phase, num_orientation, and frequencies parameters.  The
+    particular pattern used is determined by the pattern_presenter
+    argument, which defaults to a sine grating presented for a short
+    duration.  By convention, most Topographica example files
+    are designed to have a suitable activity pattern computed by
+    that time, but the duration will need to be changed for other
+    models that do not follow that convention.
+    """
+    # Could consider having scripts set a variable for the duration,
+    # based on their own particular model setup, and to have it read
+    # from here.  Instead, assumes a fixed default duration right now...
+
+    if num_phase <= 0 or num_orientation <= 0:
+        raise ValueError("num_phase and num_orientation must be greater than 0")
+
+    else:
+        step_phase=2*pi/num_phase
+        step_orientation=pi/num_orientation
+
+        feature_values = [Feature(name="frequency",values=frequencies),
+                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
+                          Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
+
+        param_dict = {"scale":scale,"offset":offset}
+        x=FeatureMaps(feature_values)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,reading)
 
 def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4],
                                 curve_parameters=[{"contrast":30}, {"contrast":60},{"contrast":80},{"contrast":90}],
@@ -471,7 +516,7 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
 
 ### JABALERT: Shouldn't there be a num_ocularities argument as well, to
 ### present various combinations of left and right eye activity?        
-def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
+def measure_od_pref(reading='average',num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,
 		    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
                                                    apply_output_fn=False,duration=0.175)):
@@ -504,11 +549,11 @@ def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
         param_dict = {"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,reading)
   
 
 
-def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
+def measure_phasedisparity(reading='average',num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
                            scale=0.3,offset=0.0,display=False,
                            pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
                                                               apply_output_fn=False,duration=0.175)):
@@ -543,7 +588,7 @@ def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequ
 
         param_dict = {"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,reading)
      
 
 
