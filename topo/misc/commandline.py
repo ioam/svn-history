@@ -84,7 +84,10 @@ def get_filenames(parser):
             (arg[:1] == "-" and len(arg) > 1 and arg[1] != "-")):
             break
 	else:
-	    list_command = list_command +  ['execfile(' + repr(os.path.abspath(arg)) + ')']
+            abs_arg = os.path.abspath(arg)
+
+	    list_command = list_command + ['import sys; sys.path.insert(0,"%s")'%os.path.dirname(abs_arg),
+                                           'execfile(' + repr(abs_arg) + ')']
 	    del rargs[0]
     setattr(parser.values,"commands",list_command) 
 
@@ -139,8 +142,10 @@ def process_argv(argv):
     for (k,v) in global_constants.items():
         exec '%s = %s' % (k,v) in __main__.__dict__
 
-    # if -i is on, or no scripts were given and no commands were given
-    if option.interactive:
+    # if -i is on, or no scripts were given and no commands were given.
+    # JP: or if -g is on. We still want readline in the shell, even if
+    # the gui is running, right? 
+    if option.interactive or option.gui:
 	os.environ["PYTHONINSPECT"] = "1"
 	print BANNER
         try:
@@ -169,6 +174,12 @@ def process_argv(argv):
     for filename in filename_arg:
         # CB: this is going to need converting too, I don't know when it's used yet.
         # JABALERT: What do you mean?  It looks fine to me.
+        # JPALERT: Because topo_parser.parse_args(argv) converts all the files on
+        # the command line into execfile commands, there are no files left to
+        # process here.  So this code is never called.  Still I updated it to add
+        # the file directory to sys.path, just in case.
+        filedir = os.path.dirname(os.path.abspath(filename))
+        sys.path.insert(0,filedir)
 	execfile(filename,__main__.__dict__)
 
     # execute remaining commands.
