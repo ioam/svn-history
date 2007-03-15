@@ -14,7 +14,7 @@ from numpy.fft.helper import fftshift
 import copy
 import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
-     Entry, Canvas, Checkbutton, BooleanVar
+     Entry, Canvas, Checkbutton, BooleanVar, Menu
 
 import topo
 from plotgrouppanel import PlotGroupPanel
@@ -92,8 +92,11 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         #self._canvas_menu.insert_command(2,label='Print info',
         #                                 command=self.__print_info)
 
-        #self._canvas_menu.insert_command(2,label='Plot Fourier transform',
-        #                                 command=self.__fft)
+        sheet_menu = Menu(self)
+        sheet_menu.insert_command(0,label="plot ft",command=self.__fft)
+
+        self._canvas_menu.entryconfig(2,menu=sheet_menu)
+
         
         #self._canvas_menu.insert_command(2,label='Print matrix values',
         #                                 command=self.__print_matrix)
