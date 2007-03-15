@@ -165,7 +165,9 @@ class FeatureResponses(ParameterizedObject):
         feature_names=[f.name for f in features]
         values_lists=[f.values for f in features]
         permutations = cross_product(values_lists)
-   
+
+        ### JABHACKALERT: This timer code should be moved to its own object;
+        ### it is much too difficult to follow here (and in tkgui/topoconsole.py).
 ################## timer part 1        
         
         i=0
