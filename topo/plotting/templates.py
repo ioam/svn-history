@@ -39,6 +39,8 @@ class PlotGroupTemplate(ParameterizedObject):
       doc="Whether to call the plot command initially, to avoid waiting for long processes before changing the update command")
     normalize = BooleanParameter(False,
       doc="Default value for the normalize option for the plot")
+#    expander = BooleanParameter(False,
+#      doc="Default value for the expander option for the plot")
     image_location = Filename(doc='Paths to search for images to be loaded.')
     prerequisites=ListParameter([], doc="list of preference maps which should be plotted before a curve is measured")
 
@@ -136,14 +138,18 @@ def new_plotgroup_template(name,command,
                            plot_immediately=False,
                            plotcommand="pass",
                            template_plot_type='bitmap',
-                           normalize=False,prerequisites=[]):
+                           normalize=False,
+#                           expander=False,
+                           prerequisites=[]):
     pgt = PlotGroupTemplate(name=name,
                             command=command,
                             plot_immediately=plot_immediately,
                             plotcommand=plotcommand,
                             template_plot_type=template_plot_type,
                             normalize=normalize,
+#                            expander=expander,
                             prerequisites=prerequisites)
+
     plotgroup_templates[pgt.name]=pgt
     return pgt
 
@@ -185,9 +191,15 @@ pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference
 pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 pgt.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
 
+
+pgt = new_plotgroup_template(name='Spatial Frequency Preference',command='measure_sf_pref(frequencies=frange(1.0,6.0,0.2),num_phase=15,num_orientation=4)')
+pgt.add_plot('Spatial Frequency Preference',[('Strength','FrequencyPreference')])
+pgt.add_plot('Spatial Frequency Selectivity',[('Strength','FrequencySelectivity')]) # confidence??
+
 pgt = new_plotgroup_template(name='Position Preference',
                              command='measure_position_pref() ; topographic_grid()',
                              normalize=True)
+
 pgt.add_plot('X Preference',[('Strength','XPreference')])
 pgt.add_plot('Y Preference',[('Strength','YPreference')])
 pgt.add_plot('Position Preference',[('Red','XPreference'),
