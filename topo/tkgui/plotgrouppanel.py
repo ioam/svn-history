@@ -365,17 +365,31 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 
 
     def __dynamic_popup(self,event):
-        # CEBALERT: just a demo of having dynamic update
-        # reorganize - copies stuff from __canvas_right_click,
+        # CEBALERT: just a demo of having dynamic update.
+        # Reorganize - copies stuff from __canvas_right_click,
         # etc.
+
+        # CEBHACKALERT: does the canvas match the underlying matrix correctly?
+        # You can point to the edge of the plot and get a value beyond the end
+        # of the underlying matrix. Can we make it match? Otherwise, what's the
+        # best way to deal with this?
         x,y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
         plot = event.widget.plot
         sf = plot.scale_factor
         r,c=int(floor(y/sf)),int(floor(x/sf))
-        # Store information about the mouse click location,
-        # for use in code processing the click.
-        #self._canvas_location_info = (plot,r,c)
-        self.location_info.set("(%s,%s) on %s"%(r,c,plot.plot_src_name))
+
+        x,y = topo.sim[plot.plot_src_name].matrix2sheet(r,c)
+
+        # this try/except is temporary (plot doesn't match matrix exactly).
+        try:
+            # CEBALERT: I should be doing this stuff from a sheet_view or something, I guess
+            act = topo.sim[plot.plot_src_name].activity[r,c]
+        except IndexError:
+            act = -1
+
+        # CB: format these numbers
+        self.location_info.set("%s Unit:(%s,%s) Coord:(%s,%s) Activity: %s"%(plot.plot_src_name,r,c,x,y,act))
+        
 
    
     def generate_plotgroup(self):
