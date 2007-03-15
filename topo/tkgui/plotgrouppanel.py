@@ -320,8 +320,9 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         ### Right-click menu for canvases; subclasses should be able to add/
         ### edit options.
         self._canvas_menu = Menu(self, tearoff=0)
-        self._canvas_menu.insert_command(0,label='',state=DISABLED) # title
-
+        self._canvas_menu.insert_cascade(0,label='') 
+        self._canvas_menu.insert_cascade(1,label='') 
+        
         # CEBALERT: put this somewhere reasonable, with description + help, and so on.
         self.location_info = StringVar()
         Label(self,textvariable=self.location_info).pack(side=TOP)
@@ -343,14 +344,16 @@ class PlotGroupPanel(BasicPlotGroupPanel):
     def __process_canvas_event_info(self,event):
         # CEBHACKALERT: does the canvas match the underlying matrix correctly?
         # You can point to the edge of the plot and get a value beyond the end
-        # of the underlying matrix. Can we make it match? Otherwise, what's the
-        # best way to deal with this?
+        # of the underlying matrix, or before the start (-1, which will actually
+        # be a value from the other end of the array).
+        # Can we make it match? Otherwise, what's the best way to deal with this?
         x,y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
         plot = event.widget.plot
         sf = plot.scale_factor
-        r,c=int(floor(y/sf)),int(floor(x/sf))
+        r,c=int(floor(y/sf)),int(floor(x/sf))        
         x,y = topo.sim[plot.plot_src_name].matrix2sheet(r,c)
         self._canvas_click_info = (plot,r,c,x,y)
+        # should probably make this return
 
 
     def __canvas_right_click(self,event):
@@ -362,11 +365,13 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         and shows a popup menu.
         """
         self.__process_canvas_event_info(event)
+        plot,r,c,x,y = self._canvas_click_info
         
-        # set menu title
-        self._canvas_menu.entryconfig(0,state=DISABLED,label=
-                                      ("%s %s: row %d, col %d" % 
-                                       (plot.plot_src_name,plot.name,r,c)))
+        # CB: currently working on this
+        self._canvas_menu.entryconfig(0,label="Unit (%s,%s)/coord (%s,%s)..."%(r,c,x,y))
+        self._canvas_menu.entryconfig(1,label="%s..."%(plot.plot_src_name))
+                                         
+                                       
 
         self._canvas_menu.tk_popup(event.x_root,event.y_root)
 
@@ -374,7 +379,6 @@ class PlotGroupPanel(BasicPlotGroupPanel):
     def __dynamic_popup(self,event):
 
         self.__process_canvas_event_info(event)
-
         plot,r,c,x,y = self._canvas_click_info
         
         # this try/except is temporary (plot doesn't match matrix exactly).
