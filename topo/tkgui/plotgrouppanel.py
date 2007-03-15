@@ -388,8 +388,8 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         except IndexError:
             act = -1
 
-        # CB: format these numbers
-        self.location_info.set("%s Unit:(%s,%s) Coord:(%s,%s) Activity: %s"%(plot.plot_src_name,r,c,x,y,act))
+        self.location_info.set("%s Unit:(%3d,%3d) Coord:(%2.2f,%2.2f) Activity: %1.3f" %
+                               (plot.plot_src_name,r,c,x,y,act))
         
 
    
