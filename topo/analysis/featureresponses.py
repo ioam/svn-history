@@ -6,6 +6,13 @@ $Id$
 __version__='$Revision$'
 
 
+#from Numeric import zeros, Float
+#from Numeric import array
+import time
+#import topo
+from math import fmod,floor
+
+
 from numpy.oldnumeric import zeros, Float
 from numpy.oldnumeric import array
 
@@ -74,14 +81,17 @@ class DistributionMatrix(ParameterizedObject):
     def weighted_average(self):
         """Return the weighted average of each Distribution as a matrix."""
 
-        weighted_average_matrix=zeros(self.distribution_matrix.shape,Float) 
-
+        weighted_average_matrix=zeros(self.distribution_matrix.shape,Float)
+         
+#        print pattern_presenter.measure_or_pref.reading
+        
         for i in range(len(weighted_average_matrix)):
             for j in range(len(weighted_average_matrix[i])):
                 weighted_average_matrix[i,j]=self.distribution_matrix[i,j].weighted_average()
+#                weighted_average_matrix[i,j]=self.distribution_matrix[i,j].estimated_maximum()               
+#                weighted_average_matrix[i,j]=self.distribution_matrix[i,j].max_value_bin()                             
 
         return weighted_average_matrix
-
 
 
     def selectivity(self):
@@ -144,6 +154,24 @@ class FeatureResponses(ParameterizedObject):
         feature_names=[f.name for f in features]
         values_lists=[f.values for f in features]
         permutations = cross_product(values_lists)
+   
+################## timer part 1        
+        
+        i=0
+        fduration = len(permutations)
+        step   = 1.0
+        iters  = int(floor(fduration/step))
+        remain = fmod(fduration, step)
+        starttime=time.time()
+        recenttimes=[]
+
+        # Temporary:
+ #       self.parent.title(topo.sim.name) ## this changes the title bar to more useful
+
+        ## Duration of most recent times from which to estimate remaining time
+        estimate_interval=50.0        
+
+#################### end of timer part 1    
     
         for p in permutations:
             topo.sim.state_push()
@@ -151,6 +179,36 @@ class FeatureResponses(ParameterizedObject):
             # Present input patterns
             settings = dict(zip(feature_names, p))
             pattern_presenter(settings,param_dict)
+
+  ##################### timer part 2
+
+            # DRAW THE PATTERN: call to the pattern_presenter
+            pattern_presenter(settings,param_dict)
+
+
+      #  for i in xrange(iters):
+            i=i+1
+            recenttimes.append(time.time())
+            length = len(recenttimes)
+
+            if (length>50):
+                recenttimes.pop(0)
+                length-=1
+ #       topo.sim.run(step)
+            percent = 100.0*i/iters
+
+            estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
+            
+            message = 'Time ' + str(topo.sim.time()) + ': ' + \
+                      str(int(percent)) + '% of '  + str(fduration) + ' completed ' + \
+                      ('(%02d' % int(estimate/60))+':' + \
+                      ('%02d' % int(estimate%60))+ ' remaining at current rate).'
+                      
+# uncomment print command below for map generation timer
+        
+            print message
+            
+######################### end of timer   
 
             if display:
                 if hasattr(topo,'guimain'):
@@ -202,7 +260,7 @@ class FeatureMaps(FeatureResponses):
                     norm_factor = self._featureresponses[sheet][feature].distribution_matrix[0,0].axis_range
                 else:
                     norm_factor = 1.0
-                    
+#                print self.reading   
                 preference_map = SheetView(((self._featureresponses[sheet][feature].weighted_average())/norm_factor,
                                             bounding_box), sheet.name, sheet.precedence, topo.sim.time())
                 sheet.sheet_view_dict[feature.capitalize()+'Preference']=preference_map
