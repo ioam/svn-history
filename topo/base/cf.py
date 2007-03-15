@@ -35,7 +35,7 @@ from parameterizedobject import ParameterizedObject
 from functionfamilies import OutputFnParameter,IdentityOF
 from functionfamilies import LearningFnParameter,Hebbian,IdentityLF
 from functionfamilies import ResponseFnParameter,DotProduct
-from functionfamilies import CoordinateMapperFnParameter,XIdentity,YIdentity
+from functionfamilies import CoordinateMapperFnParameter,IdentityMF
 from projection import Projection,ProjectionSheet
 from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter,Integer
 from sheet import Sheet,Slice
@@ -589,13 +589,10 @@ class CFProjection(Projection):
         The default of 1 gives a minimum matrix of 3x3. 0 would
         allow a 1x1 matrix.""")
 
-    x_coord_mapper = CoordinateMapperFnParameter(
-        default=XIdentity(),
-        doc='Function to map a projected x coordinate into the target sheet.')
+    coord_mapper = CoordinateMapperFnParameter(
+        default=IdentityMF(),
+        doc='Function to map a projected coordinate into the target sheet.')
 
-    y_coord_mapper = CoordinateMapperFnParameter(
-        default=YIdentity(),
-        doc='Function to map a projected y coordinate into the target sheet.')
 
     # shape property defining the dimension of the _cfs field
     def get_shape(self): return [len(self._cfs),len(self._cfs[0])]
@@ -636,8 +633,8 @@ class CFProjection(Projection):
             for y in self.dest.sheet_rows()[::-1]:
                 row = []
                 for x in self.dest.sheet_cols():
-                    row.append(self.cf_type(self.x_coord_mapper(x,y),
-                                            self.y_coord_mapper(x,y),
+                    x_cf,y_cf = self.coord_mapper(x,y)
+                    row.append(self.cf_type(x_cf,y_cf,
                                             self.src,
                                             copy.copy(self.bounds_template),
                                             self.weights_generator,

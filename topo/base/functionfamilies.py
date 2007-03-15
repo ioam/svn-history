@@ -177,16 +177,12 @@ class CoordinateMapperFn(ParameterizedObject):
         raise NotImplementedError
 
 
-class XIdentity(CoordinateMapperFn):
+class IdentityMF(CoordinateMapperFn):
     """Return the x coordinate of the given coordinate."""
     def __call__(self,x,y):
-        return x
+        return x,y
 
 
-class YIdentity(CoordinateMapperFn):
-    """Return the y coordinate of the given coordinate."""
-    def __call__(self,x,y):
-        return y
 
 
 class CoordinateMapperFnParameter(ClassSelectorParameter):
@@ -196,6 +192,6 @@ class CoordinateMapperFnParameter(ClassSelectorParameter):
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
-    def __init__(self,default=XIdentity(),**params):
+    def __init__(self,default=IdentityMF(),**params):
         super(CoordinateMapperFnParameter,self).__init__(CoordinateMapperFn,default=default,**params)
 
