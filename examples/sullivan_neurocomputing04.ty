@@ -30,7 +30,7 @@ from topo.responsefns.optimized import CFPRF_EuclideanDistance_opt,CFPRF_DotProd
 from topo.learningfns.projfns import CFPLF_Trace, CFPLF_Plugin,  CFPLF_OutstarHebbian
 from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.misc.numbergenerators import UniformRandom
-from topo.outputfns.basic import DivisiveNormalizeL1, KernelMax
+from topo.outputfns.basic import DivisiveNormalizeL2, KernelMax
 from topo.base.functionfamilies import CoordinateMapperFn
 from topo.misc.patternfns import line
 
@@ -52,11 +52,13 @@ from topo.misc.numbergenerators import UniformRandom
 
 topo.sim.name = "sullivan_neurocomputing04"
 
+
 class XYModulo(CoordinateMapperFn):
     """Return the x coordinate of the given coordinate, modulo the specified step distance."""
  
     grid_element_width = Number(1.0/5.0, doc="Length in Sheet coordinates of one large grid element.")
     def __call__(self,x,y):
+        #Distance between 8 cells is 0.165, so offset by half that to align with center of box, not corner
         xmod=fmod(x+0.4875,self.grid_element_width)
         ymod=fmod(y+0.4875,self.grid_element_width)
 	# x: 0.1 offset to align with center of box, not corner
@@ -64,62 +66,8 @@ class XYModulo(CoordinateMapperFn):
         return x-xmod+0.1,y-ymod+0.08125
 
 
-class OrientedX(ParameterizedObject):
-      """Increments the x position 
-      """
-      base         = Number(default=0.0,doc="Passed in position.")
-      direction	   = Number(default=0.0,doc="Direction line is heading.")
-      step_number  = Number(default=0.0,doc="Current Step.")
-      orientation  = Number(default=0.0,doc="Orientation of line.")
-      angle	   = Number(default=0.0,doc="")
-      def __call__(self,**params):
-	  base=params.get('base',self.base)
-	  orientation=params.get('orientation',self.orientation)
-	  if not hasattr(self,'curr_pos'):
-	     self.curr_pos=base
-	     self.step_number=0
-	     self.direction=1
-	     self.angle=orientation
-	  if (fmod(topo.sim.time(),15)<1): #time starts from 0.05
-	       self.curr_pos=base
-	       self.step_number=0
-	       self.angle=orientation   
-
-	  print "orientation is", self.angle
-	  #0.03 as grid is 40 cells wide and line advances 1.2 cells per step
-   	  self.curr_pos+=(self.direction*0.03*self.step_number)*cos(radians(self.angle)-pi/2)
-	  self.step_number+=1
-          return self.curr_pos
-
-class OrientedY(ParameterizedObject):
-      """Increments the y position 
-      """
-      base         = Number(default=0.0,doc="Passed in position.")
-      direction	   = Number(default=0.0,doc="Direction line is heading.")
-      step_number  = Number(default=0.0,doc="Current Step.")
-      orientation  = Number(default=0.0,doc="Orientation of line.")
-      angle	   = Number(default=0.0,doc="")
-      def __call__(self,**params):
-	  base=params.get('base',self.base)
-	  orientation=params.get('orientation',self.orientation)
-	  if not hasattr(self,'curr_pos'):
-	     self.curr_pos=base
-	     self.step_number=0
-	     self.direction=1
-	     self.angle=orientation
-	  if (fmod(topo.sim.time(),15)<1): #time starts from 0.05
-	       self.curr_pos=base
-	       self.step_number=0
-	       self.angle=orientation   
-
-	  print "orientation is", self.angle
-	  #0.03 as grid is 40 cells wide and line advances 1.2 cells per step
-   	  self.curr_pos+=(self.direction*0.03*self.step_number)*sin(radians(self.angle)-pi/2)
-	  self.step_number+=1
-          return self.curr_pos
-
 class OrientedLine(PatternGenerator):
-    """2D line pattern generator."""
+    """2D line pattern generator, based upon the behaviour of sullivan ."""
 
     thickness   = Number(default=0.006,bounds=(0.0,None),softbounds=(0.0,1.0),
                          precedence=0.60,
@@ -127,22 +75,60 @@ class OrientedLine(PatternGenerator):
     smoothing = Number(default=0.05,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.61,
                        doc="Width of the Gaussian fall-off.")
-
+    offEdge = Number(default=1,doc="1 if previous line has gone off edge of grid, 0 otherwise")
+    angle	   = Number(default=0.0,doc="")
     def function(self,**params):
+        if (self.offEdge==1):
+            angle=params.get('angle',self.angle)           
+            if (angle>180):
+                angle-=180
+                direction=-1
+            else:
+                direction=1
+            delta=0.03 #0.03 as grid is 40 cells wide and line moves 1.2 per step
+            if (angle == 0):
+                self.deltaX = 0 #1000 * XGRIDEND
+                self.deltaY = delta
+            elif (angle == 90):
+                self.deltaY = 0 #1000 * YGRIDEND
+                self.deltaX = delta
+            elif (angle< 90):
+                self.deltaX = delta / sin(radians(angle))
+                self.deltaY = delta / sin(radians(90 - angle))
+            else:
+                self.deltaY = delta / sin(radians(angle - 90))
+                self.deltaX = delta / sin(radians(180 - angle))
+            if ((angle >= 0) and ( angle < 90)):
+                if (direction == 1):
+                    startPointx = -0.5
+                    startPointy = -0.5
+                else:
+                    startPointx = 0.5
+                    startPointy = 0.5
+                    self.deltaX *= -1
+                    self.deltaY *= -1
+            elif (direction == 1):
+                startPointx = -0.5
+                startPointy = 0.5
+                self.deltaY *= -1;
+            else:
+                startPointx = 0.5
+                startPointy = -0.5 
+                self.deltaX*= -1
 
-	if (fmod(topo.sim.time(),15)<1):
-		x=params.get('x',self.x)
-		y=params.get('y',self.y)
-		orientation=params.get('orientation',self.orientation)
-		#RPHACKALERT check values from this are correct
-		x=1-sin(radians(180*x))
-	   	y=1-cos(radians(180*y))
-		print "x is ",x
-	#RPHACKALERT Move incrementing code here
-        return line(self.pattern_y, 
+            self.x=startPointx
+            self.y=startPointy
+            self.offEdge=0
+            self.orientation=angle
+        else:
+            self.offEdge=0
+            self.x+=self.deltaX
+            self.y+=self.deltaY
+            if (self.x<-0.5 or self.x>0.5 or self.y<-0.5 or self.y>0.5):
+               self.offEdge=1
+        return line(self.pattern_y,
                     params.get('thickness',self.thickness),
                     params.get('smoothing',self.smoothing))
-
 
 
 # Weight seed
@@ -150,16 +136,9 @@ RandomArray.seed(500,500)
 GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0
 
-line_x=OrientedX(base=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),orientation=DynamicNumber(UniformRandom(lbound=0,ubound=360,seed=22)))
-line_y=OrientedY(base=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=22)),orientation=DynamicNumber(UniformRandom(lbound=0,ubound=360,seed=22)))
-
-##RPHACKALERT Change to using line_x and line_y
-#input_pattern = OrientedLine(
-input_pattern = topo.patterns.basic.Line(
-	            x=DynamicNumber(line_x),
-		    y=DynamicNumber(line_y),
-		    #orientation=orientation
-		    orientation=70
+input_pattern = OrientedLine(
+    offEdge=1,
+    angle=DynamicNumber(UniformRandom(lbound=0,ubound=360,seed=13))
 		    )
 
 # Sheets, connections, and their parameters
@@ -173,16 +152,18 @@ topo.sim['V1'] = CFSheet(nominal_density=locals().get('default_density',40.0),
                          output_fn = KernelMax(kernel_radius=3.5))
 
 topo.sim.connect('Retina','V1',delay=0.05,connection_type=CFProjection,
-                     weights_generator = topo.patterns.basic.Line(orientation=DynamicNumber(UniformRandom(lbound=0.0,ubound=2*pi,seed=30))),
-                     nominal_bounds_template=BoundingBox(radius=0.1),
-                     response_fn = CFPRF_DotProduct_opt(),
-                     coord_mapper=XYModulo())
+                 weights_generator = topo.patterns.basic.Line(orientation=DynamicNumber(UniformRandom(lbound=0.0,ubound=2*pi,seed=30))),
+                 nominal_bounds_template=BoundingBox(radius=0.1),
+                 response_fn = CFPRF_DotProduct_opt(),
+                 coord_mapper=XYModulo())
 
 topo.sim['Complex Cell Layer'] = CFSOM(nominal_density=locals().get('default_density',5.0),
-                       learning_length=10000,radius_0=0.1,alpha_0=0.02*5*5)
+                       learning_length=12000,radius_0=0.25,alpha_0=0.99)
                          
 topo.sim.connect('V1','Complex Cell Layer',delay=0.05,connection_type=CFProjection,
-                  weights_generator = topo.patterns.random.UniformRandom(),
-                  nominal_bounds_template=BoundingBox(radius=1),
-                  response_fn = CFPRF_DotProduct_opt(),
-                  learning_fn=CFPLF_Trace())
+                 weights_generator = topo.patterns.random.UniformRandom(),
+                 nominal_bounds_template=BoundingBox(radius=0.1),
+                 response_fn = CFPRF_DotProduct_opt(),
+                 learning_fn=CFPLF_Trace(trace_strength=0.2))
+
+

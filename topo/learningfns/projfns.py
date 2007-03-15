@@ -95,7 +95,6 @@ class CFPLF_Trace(CFPLearningFn):
         rows,cols = output_activity.shape
         single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
         single_cf_fn = self.single_cf_fn
-        
         ##Initialise traces to zero if they don't already exist
         if not hasattr(self,'traces'):
             self.traces=zeros(output_activity.shape,activity_type)
@@ -104,11 +103,11 @@ class CFPLF_Trace(CFPLearningFn):
             for c in xrange(cols):
                 cf = cfs[r][c]
                 unit_activity = output_activity[r,c]
-                #print "r is",r,"c is",c,"unit_activity is",unit_activity
-                new_trace = ((1-self.trace_strength)*unit_activity)+(self.trace_strength*self.traces[r,c])
+             #   print "unit activity is",unit_activity
+            #    print "self trace is",self.traces[r,c]
+                new_trace = (self.trace_strength*unit_activity)+((1-self.trace_strength)*self.traces[r,c])
+           #     print "and is now",new_trace
                 self.traces[r,c] = new_trace
-                #print "input=",input_activity[10,10],"weights=",cf.weights[10,10]
-                #print "cf.get_input_matrix(input_activity) - cf.weights is",cf.get_input_matrix(input_activity)[10,10]-cf.weights[10,10]           
                 cf.weights += single_connection_learning_rate * new_trace * \
                               (cf.get_input_matrix(input_activity) - cf.weights)
                 
