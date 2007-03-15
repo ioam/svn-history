@@ -52,23 +52,17 @@ from topo.misc.numbergenerators import UniformRandom
 
 topo.sim.name = "sullivan_neurocomputing04"
 
-class XModulo(CoordinateMapperFn):
+class XYModulo(CoordinateMapperFn):
     """Return the x coordinate of the given coordinate, modulo the specified step distance."""
  
-    grid_element_width = Number(1.0/5.0, doc="Length in Sheet coordinates of one large grid element.")    
-    def __call__(self,x,y):
-        xmod=fmod(x+0.4875,self.grid_element_width)
-	#0.1 offset to align with center of box, not corner
-        return x-xmod+0.1
-
-class YModulo(CoordinateMapperFn):
-    """Return the y coordinate of the given coordinate, modulo the specified step distance."""
-
     grid_element_width = Number(1.0/5.0, doc="Length in Sheet coordinates of one large grid element.")
     def __call__(self,x,y):
+        xmod=fmod(x+0.4875,self.grid_element_width)
         ymod=fmod(y+0.4875,self.grid_element_width)
-	#offset to align with center of box, not corner
-        return y-ymod+0.08125
+	# x: 0.1 offset to align with center of box, not corner
+	# y: offset to align with center of box, not corner
+        return x-xmod+0.1,y-ymod+0.08125
+
 
 class OrientedX(ParameterizedObject):
       """Increments the x position 
@@ -182,8 +176,7 @@ topo.sim.connect('Retina','V1',delay=0.05,connection_type=CFProjection,
                      weights_generator = topo.patterns.basic.Line(orientation=DynamicNumber(UniformRandom(lbound=0.0,ubound=2*pi,seed=30))),
                      nominal_bounds_template=BoundingBox(radius=0.1),
                      response_fn = CFPRF_DotProduct_opt(),
-                     x_coord_mapper=XModulo(),
-                     y_coord_mapper=YModulo())
+                     coord_mapper=XYModulo())
 
 topo.sim['Complex Cell Layer'] = CFSOM(nominal_density=locals().get('default_density',5.0),
                        learning_length=10000,radius_0=0.1,alpha_0=0.02*5*5)
