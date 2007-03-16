@@ -29,6 +29,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     single_cf_fn = OutputFnParameter(DivisiveNormalizeL1(norm_value=1.0),
                                      constant=True)
 
+    
     def __call__(self, cfs, mask, **params):
         rows,cols = mask.shape
 
@@ -69,8 +70,8 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                         Py_DECREF(slice_obj);
                         Py_DECREF(sum_obj);
 
-                        // Delete the stale norm_total
-                        PyObject_DelAttrString(cf,"norm_total");
+                        // Indicate that norm_total is stale
+                        PyObject_SetAttrString(cf,"has_norm_total",Py_False);
                     }
                 }
             }
