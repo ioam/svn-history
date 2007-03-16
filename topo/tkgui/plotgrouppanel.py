@@ -342,6 +342,12 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 
 
     def __process_canvas_event_info(self,event):
+        """
+
+        x and y are both of them None if there is no sheet associated with
+        the plot.
+        """
+        
         # CEBHACKALERT: does the canvas match the underlying matrix correctly?
         # You can point to the edge of the plot and get a value beyond the end
         # of the underlying matrix, or before the start (-1, which will actually
@@ -351,7 +357,13 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         plot = event.widget.plot
         sf = plot.scale_factor
         r,c=int(floor(y/sf)),int(floor(x/sf))        
-        x,y = topo.sim[plot.plot_src_name].matrix2sheet(r,c)
+
+        # if there is no associated sheet, there cannot be sheet coords
+        if plot.plot_src_name=='':
+            x,y = None,None
+        else:
+            x,y = topo.sim[plot.plot_src_name].matrix2sheet(r,c)
+
         self._canvas_click_info = (plot,r,c,x,y)
         # should probably make this return
 
@@ -384,12 +396,16 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         # this try/except is temporary (plot doesn't match matrix exactly).
         try:
             # CEBALERT: I should be doing this stuff from a sheet_view or something, I guess
-            act = topo.sim[plot.plot_src_name].activity[r,c]
+            act = 0 #topo.sim[plot.plot_src_name].activity[r,c]
         except IndexError:
             act = -1
 
-        self.location_info.set("%s Unit:(%3d,%3d) Coord:(%2.2f,%2.2f) Activity: %1.3f" %
-                               (plot.plot_src_name,r,c,x,y,act))
+        # CB: will change when x,y moved to templateplotgrouppanel
+        if (x,y)==(None,None):
+            self.location_info.set("")
+        else:
+            self.location_info.set("%s Unit:(%3d,%3d) Coord:(%2.2f,%2.2f) Activity: %1.3f" %
+                                   (plot.plot_src_name,r,c,x,y,act))
         
 
    
