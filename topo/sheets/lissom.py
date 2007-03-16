@@ -52,7 +52,6 @@ class JointNormalizingCFSheet(CFSheet):
     # JABALERT: Should check that whenever a connection is added to a
     # group, it has the same no of cfs as the existing connections.
 
-
     def start(self):
         # Force the weights to be normalized at the start of the simulation
         # JABALERT: There may be some cleaner way to achieve this.
@@ -106,8 +105,10 @@ class JointNormalizingCFSheet(CFSheet):
         return in_proj
 
                         
-    def __compute_joint_norm_totals(self,projlist):
-        """Compute norm_total for each CF in each projections from a group to be normalized jointly."""
+    def compute_joint_norm_totals(self,projlist,mask):
+        """
+        Compute norm_total for each CF in each projections from a group to be normalized jointly.
+        """
 
         # Assumes that all Projections in the list have the same r,c size
         assert len(projlist)>=1
@@ -116,27 +117,36 @@ class JointNormalizingCFSheet(CFSheet):
 
         for r in range(rows):
             for c in range(cols):
-                sums = [p.cf(r,c).norm_total for p in projlist]
-                joint_sum = Numeric.add.reduce(sums)
-                for p in projlist:
-                    p.cf(r,c).norm_total=joint_sum
+                if(mask[r,c] != 0):
+                    sums = [p.cf(r,c).norm_total for p in projlist]
+                    joint_sum = Numeric.add.reduce(sums)
+                    for p in projlist:
+                        p.cf(r,c).norm_total=joint_sum
 
 
-    def _normalize_weights(self):
-        """Apply the weights_output_fn for every group of Projections."""
+    def _normalize_weights(self,mask = None):
+        """
+        Apply the weights_output_fn for every group of Projections.
+        
+        The mask is telling which neurons need to be normalized.
+        """
+        
+        if(mask == None):
+            mask = Numeric.ones(self.shape,activity_type)
         
         for key,projlist in self.__grouped_in_projections():
+            
             if key == None:
                 normtype='Independent'
             else:
                 normtype='Joint'
-                self.__compute_joint_norm_totals(projlist)
+                self.compute_joint_norm_totals(projlist,mask)
 
             self.debug("Time " + str(self.simulation.time()) + ": " + normtype +
                        "ly normalizing:")
 
             for p in projlist:
-                p.apply_learn_output_fn(Numeric.ones(self.shape,activity_type))
+                p.apply_learn_output_fn(mask)
                 self.debug('  ',p.name)
 
 
@@ -153,7 +163,7 @@ class JointNormalizingCFSheet(CFSheet):
                 proj.learn()
 
         # Apply output function in groups determined by dest_port
-        self._normalize_weights()
+        self._normalize_weights(self.activity)
 
         
 
