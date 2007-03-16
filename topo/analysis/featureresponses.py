@@ -6,10 +6,7 @@ $Id$
 __version__='$Revision$'
 
 
-#from Numeric import zeros, Float
-#from Numeric import array
 import time
-#import topo
 from math import fmod,floor
 
 
@@ -255,7 +252,33 @@ class FeatureMaps(FeatureResponses):
 	super(FeatureMaps,self).__init__(features)
         self.features=features
         
-    def collect_feature_responses(self,pattern_presenter,param_dict,display,reading):
+    def collect_feature_responses(self,pattern_presenter,param_dict,display,weighted_average=True):
+        """
+        Present the given input patterns and collate the responses.
+
+        If weighted_average is True, the feature responses are
+        calculated from a weighted average of the values of each bin
+        in the distribution, rather than simply using the actual value
+        of the parameter for which response was maximal (the discrete
+        method).  Such a computation will generally produce much more
+        precise maps using fewer test stimuli than the discrete
+        method.  However, weighted_average methods generally require
+        uniform and full-range sampling, as described below, which is
+        not always feasible.
+
+        For measurements at evenly-spaced intervals over the full
+        range of possible parameter values, weighted_averages are a
+        good measure of the underlying continuous-valued parameter
+        preference, assuming that neurons are tuned broadly enough
+        (and/or sampled finely enough) that they respond to at least
+        two of the tested parameter values.  This method will not
+        usually give good results when those criteria are not met,
+        i.e. if the sampling is too sparse, not at evenly-spaced
+        intervals, or does not cover the full range of possible
+        values.  In such cases weighted_average should be set to
+        False, and the number of test patterns will usually need
+        to be increased instead.
+        """
 	self.measure_responses(pattern_presenter,param_dict,self.features,display)    
 	
         for sheet in self.sheets_to_measure():
@@ -273,14 +296,14 @@ class FeatureMaps(FeatureResponses):
                     norm_factor = self._featureresponses[sheet][feature].distribution_matrix[0,0].axis_range
                 else:
                     norm_factor = 1.0
-
-                if reading=='max':
-                    preference_map = SheetView(((self._featureresponses[sheet][feature].max_value_bin())/norm_factor,
-                                                bounding_box), sheet.name, sheet.precedence, topo.sim.time())               
-                else:
+                    
+                if weighted_average==True:
                     preference_map = SheetView(((self._featureresponses[sheet][feature].weighted_average())/norm_factor,
-                                                bounding_box), sheet.name, sheet.precedence, topo.sim.time()) 
+                                                bounding_box), sheet.name, sheet.precedence, topo.sim.time())
+                else:
 
+                    preference_map = SheetView(((self._featureresponses[sheet][feature].max_value_bin())/norm_factor,
+                                                bounding_box), sheet.name, sheet.precedence, topo.sim.time())
                 sheet.sheet_view_dict[feature.capitalize()+'Preference']=preference_map
                 
                 # note the temporary multiplication by 17

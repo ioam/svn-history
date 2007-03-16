@@ -180,9 +180,9 @@ proj_name =''
 ### should be changed to something cleaner.  It might also be better
 ### to access a Sheet instance directly, rather than searching by name.
 
-def measure_position_pref(reading='average',divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
+def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
                           pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),False,0.175),
-                          x_range=(-0.5,0.5),y_range=(-0.5,0.5)):
+                          x_range=(-0.5,0.5),y_range=(-0.5,0.5),weighted_average=True):
     """
     Measure position preference map, using a circular Gaussian by default.
 
@@ -203,12 +203,12 @@ def measure_position_pref(reading='average',divisions=6,size=0.5,scale=0.3,offse
                           
         param_dict = {"size":size,"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,reading)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
        
 
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=False,reading='average',
+                    scale=0.3,offset=0.0,display=False,weighted_average=True,
                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
     """
     Measure orientation maps, using a sine grating by default.
@@ -241,10 +241,10 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
         param_dict = {"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,reading)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
 def measure_sf_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=False,reading='max',
+                    scale=0.3,offset=0.0,display=False,weighted_average=True,
                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
 
     """
@@ -278,7 +278,7 @@ def measure_sf_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
         param_dict = {"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,reading)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
 def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4],
                                 curve_parameters=[{"contrast":30}, {"contrast":60},{"contrast":80},{"contrast":90}],
@@ -505,8 +505,8 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
 
 ### JABALERT: Shouldn't there be a num_ocularities argument as well, to
 ### present various combinations of left and right eye activity?        
-def measure_od_pref(reading='average',num_phase=18,num_orientation=4,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=False,
+def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
+                    scale=0.3,offset=0.0,display=False,weighted_average=True,
 		    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
                                                    apply_output_fn=False,duration=0.175)):
     """
@@ -538,12 +538,12 @@ def measure_od_pref(reading='average',num_phase=18,num_orientation=4,frequencies
 
         param_dict = {"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,reading)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
   
 
 
-def measure_phasedisparity(reading='average',num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
-                           scale=0.3,offset=0.0,display=False,
+def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
+                           scale=0.3,offset=0.0,display=False,weighted_average=True,
                            pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
                                                               apply_output_fn=False,duration=0.175)):
     """
@@ -577,7 +577,7 @@ def measure_phasedisparity(reading='average',num_phase=12,num_orientation=4,num_
 
         param_dict = {"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,reading)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
      
 
 
