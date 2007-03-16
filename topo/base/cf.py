@@ -76,6 +76,7 @@ class ConnectionField(ParameterizedObject):
     # CEBALERT: can rename this to 'slice_' now.
     slice_array = []
 
+    has_norm_total = False
 
     def get_norm_total(self):
         """
@@ -83,16 +84,17 @@ class ConnectionField(ParameterizedObject):
         See the norm_total property for more details.
         """
         # The actual value is cached in _norm_total.
-        if hasattr(self,'_norm_total'):
+        if self.has_norm_total == True:
             return self._norm_total
         else:
-            return Numeric.sum(self.weights.ravel())
+            return self.weights.sum()
             
     def set_norm_total(self,new_norm_total):
         """
         Set an explicit value to be returned by norm_total.
         See the norm_total property for more details.
-        """        
+        """
+        self.has_norm_total = True
         self._norm_total = new_norm_total
 
     def del_norm_total(self):
@@ -100,11 +102,12 @@ class ConnectionField(ParameterizedObject):
         Delete any cached norm_total that may have been set.
         See the norm_total property for more details.
         """
-        if hasattr(self,'_norm_total'): delattr(self,'_norm_total')
+        self.has_norm_total = False
 
 
     # CEBALERT: Accessing norm_total as a property from the C code will probably
     # slow it down; this should be checked.
+    
     norm_total = property(get_norm_total,set_norm_total,del_norm_total,
         """
         The norm_total property returns a value useful in computing
@@ -130,6 +133,10 @@ class ConnectionField(ParameterizedObject):
         will never be accessed.  A good way to do this is to make sure
         that the value is only set just before it will be used, and
         deleted as soon as it has been accessed.
+        
+        WARNING: Any c-optimized code can bypass this property and access directly
+        has_norm_total, _norm_total
+        
         """)
 
 
