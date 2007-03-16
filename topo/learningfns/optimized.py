@@ -84,6 +84,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                         // store the sum of the cf's weights
                         PyObject *total_obj = PyFloat_FromDouble(total);  //(new ref)
                         PyObject_SetAttrString(cf,"norm_total",total_obj);
+                        PyObject_SetAttrString(cf,"has_norm_total",Py_True);
                         Py_DECREF(total_obj);
                     }
                 }
