@@ -396,9 +396,10 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         # this try/except is temporary (plot doesn't match matrix exactly).
         try:
             # CEBALERT: I should be doing this stuff from a sheet_view or something, I guess
-            act = 0 #topo.sim[plot.plot_src_name].activity[r,c]
-        except IndexError:
+            act = topo.sim[plot.plot_src_name].activity[r,c]
+        except:
             act = -1
+            x,y=None,None # just to have it work for now
 
         # CB: will change when x,y moved to templateplotgrouppanel
         if (x,y)==(None,None):
