@@ -39,8 +39,6 @@ class PlotGroupTemplate(ParameterizedObject):
       doc="Whether to call the plot command initially, to avoid waiting for long processes before changing the update command")
     normalize = BooleanParameter(False,
       doc="Default value for the normalize option for the plot")
-#    expander = BooleanParameter(False,
-#      doc="Default value for the expander option for the plot")
     image_location = Filename(doc='Paths to search for images to be loaded.')
     prerequisites=ListParameter([], doc="list of preference maps which should be plotted before a curve is measured")
 
@@ -139,7 +137,6 @@ def new_plotgroup_template(name,command,
                            plotcommand="pass",
                            template_plot_type='bitmap',
                            normalize=False,
-#                           expander=False,
                            prerequisites=[]):
     pgt = PlotGroupTemplate(name=name,
                             command=command,
@@ -147,7 +144,6 @@ def new_plotgroup_template(name,command,
                             plotcommand=plotcommand,
                             template_plot_type=template_plot_type,
                             normalize=normalize,
-#                            expander=expander,
                             prerequisites=prerequisites)
 
     plotgroup_templates[pgt.name]=pgt
