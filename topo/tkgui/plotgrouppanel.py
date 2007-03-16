@@ -317,15 +317,15 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         self.balloon.bind(self.integerscaling_checkbutton,
                           getdoc(self.plotgroup.params()['integerscaling']))
 
-        ### Right-click menu for canvases; subclasses should be able to add/
-        ### edit options.
+        ### Right-click menu for canvases; subclasses can add cascades
+        ### or insert commands on the existing cascades.
         self._canvas_menu = Menu(self, tearoff=0)
-        self._canvas_menu.insert_cascade(0,label='') 
-        self._canvas_menu.insert_cascade(1,label='') 
+        self._canvas_menu.insert_cascade(0,label='',state=DISABLED) # sheet menu
+        self._canvas_menu.insert_cascade(1,label='',state=DISABLED) # unit menu
         
         # CEBALERT: put this somewhere reasonable, with description + help, and so on.
-        self.location_info = StringVar()
-        Label(self,textvariable=self.location_info).pack(side=TOP)
+        self.dynamic_info = StringVar()
+        Label(self,textvariable=self.dynamic_info).pack(side=TOP)
         
 ### Partial support for opening a Connection Fields window on a right click;
 ### for this to be useful we would need to convert matrix coordinates
@@ -341,74 +341,78 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 #       self.console.plots_menu_entries["Connection Fields"].command()
 
 
-    def __process_canvas_event_info(self,event):
+    def __process_canvas_event(self,event,func):
         """
-
-        x and y are both of them None if there is no sheet associated with
-        the plot.
+        Store a dictionary _canvas_event_info, containing the plot that was clicked on, plus
+        the coordinates on the sheet (if there is a sheet for this plot), and then
+        call the given func to do the correct things for the event.....
         """
-        
-        # CEBHACKALERT: does the canvas match the underlying matrix correctly?
-        # You can point to the edge of the plot and get a value beyond the end
-        # of the underlying matrix, or before the start (-1, which will actually
-        # be a value from the other end of the array).
-        # Can we make it match? Otherwise, what's the best way to deal with this?
-        x,y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
-        plot = event.widget.plot
+        # CB: I want this to be called for all the canvas events - see
+        # ALERT by canvas button bindings. Surely can do better than just func through.
+        plot=event.widget.plot
+        canvas_x,canvas_y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
         sf = plot.scale_factor
-        r,c=int(floor(y/sf)),int(floor(x/sf))        
+        canvas_r,canvas_c=int(floor(canvas_y/sf)),int(floor(canvas_x/sf))
 
-        # if there is no associated sheet, there cannot be sheet coords
-        if plot.plot_src_name=='':
-            x,y = None,None
-        else:
+        info = {'plot':plot,'event':event} # store event in case more info needed elsewhere
+
+        if plot.plot_src_name is not '':
+            r,c = canvas_r,canvas_c # CEBHACKALERT: crop canvas values to sheet        
             x,y = topo.sim[plot.plot_src_name].matrix2sheet(r,c)
-
-        self._canvas_click_info = (plot,r,c,x,y)
-        # should probably make this return
-
-
-    def __canvas_right_click(self,event):
-        """
-        Method to be called when a user right-clicks inside a displayed Plot.
+            info['coords'] = [(r,c),(x,y)]
+            
+        self._canvas_event_info = info
+ 
+        func()
         
-        Stub implementation for future expansion; just calculates and
-        stores the row and column of the click in the canvas's plot,
-        and shows a popup menu.
+
+    def __canvas_right_click(self):
         """
-        self.__process_canvas_event_info(event)
-        plot,r,c,x,y = self._canvas_click_info
+        Update labels on right-click menu.
+        """
+        plot = self._canvas_event_info['plot']
 
-        # CB: currently working on this
-        self._canvas_menu.entryconfig(0,label="Unit (%s,%s)/coord (%s,%s)"%(r,c,x,y))
-        self._canvas_menu.entryconfig(1,label="%s %s"%(plot.plot_src_name,plot.name))
-                                         
-                                       
-
-        self._canvas_menu.tk_popup(event.x_root,event.y_root)
-
-
-    def __dynamic_popup(self,event):
-
-        self.__process_canvas_event_info(event)
-        plot,r,c,x,y = self._canvas_click_info
-        
-        # this try/except is temporary (plot doesn't match matrix exactly).
-        try:
-            # CEBALERT: I should be doing this stuff from a sheet_view or something, I guess
-            act = topo.sim[plot.plot_src_name].activity[r,c]
-        except:
-            act = -1
-            x,y=None,None # just to have it work for now
-
-        # CB: will change when x,y moved to templateplotgrouppanel
-        if (x,y)==(None,None):
-            self.location_info.set("")
+        if 'coords' in self._canvas_event_info:
+            self._canvas_menu.entryconfig(0,label="%s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
+            (r,c),(x,y) = self._canvas_event_info['coords']
+            self._canvas_menu.entryconfig(1,label="Unit (%s,%s)/coord (%s,%s)"%(r,c,x,y),state=NORMAL)
         else:
-            self.location_info.set("%s Unit:(%3d,%3d) Coord:(%2.2f,%2.2f) Activity: %1.3f" %
-                                   (plot.plot_src_name,r,c,x,y,act))
-        
+            # CB: Apart from disabling menu items, this stuff is not needed. In fact it would
+            # probably be better to disable the menu entirely. (Unless we'll be plotting stuff
+            # that's not from sheets but with which users might still wish to interact...)
+            event = self._canvas_event_info['event']
+            self._canvas_menu.entryconfig(0,state=DISABLED,label="%s %s"%(plot.plot_src_name,plot.name))
+            self._canvas_menu.entryconfig(1,state=DISABLED,label="(%s,%s)"%(event.x-CANVASBUFFER,
+                                                                            event.y-CANVASBUFFER))
 
+        self._canvas_menu.tk_popup(self._canvas_event_info['event'].x_root,
+                                   self._canvas_event_info['event'].y_root)
+
+
+    def __update_dynamic_info(self):
+        """
+        Update dynamic information.
+        """
+        plot = self._canvas_event_info['plot']
+
+        location_string = "%s"%(plot.plot_src_name)
+
+        if 'coords' in self._canvas_event_info:        
+            (r,c),(x,y) = self._canvas_event_info['coords']
+            location_string+=" Unit:(%3d,%3d) Coord:(%2.2f,%2.2f)"%(r,c,x,y)
+            # CB: isn't there a nicer way to allow more info to be added?
+            self.dynamic_info.set(self._dynamic_info_string(location_string))
+        else:
+            # no sheet, so won't be more dynamic info to add
+            self.dynamic_info.set(location_string)
+
+        
+    def _dynamic_info_string(self,x):
+        """
+        Subclasses can override to add extra relevant information.
+        """
+        return x
+        
    
     def generate_plotgroup(self):
 	"""
@@ -500,14 +504,17 @@ class PlotGroupPanel(BasicPlotGroupPanel):
                                     image.height()/2+BORDERWIDTH+1,image=image)
                 canvas.grid(row=0,column=i,padx=5)
 
-        ### bind right click to each canvas
+        ### bind events to each canvas
         for plot,canvas in zip(plots,self.canvases):
             # Store the corresponding plot with each canvas so that the
             # plot information (e.g. scale_factor) will be available
             # for the right_click menu.
             canvas.plot=plot
-            canvas.bind('<Button-3>',self.__canvas_right_click)
-            canvas.bind('<Motion>',self.__dynamic_popup)
+            # CEBALERT: I want process_canvas_event to be called for all of these bindings, with
+            # an additional method also called to do something specific to the action. I'm sure
+            # python has something that lets this be done in a clearer way.
+            canvas.bind('<Button-3>',lambda event: self.__process_canvas_event(event,self.__canvas_right_click))
+            canvas.bind('<Motion>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))
 
 
     def add_to_history(self):
