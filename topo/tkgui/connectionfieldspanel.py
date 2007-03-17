@@ -32,11 +32,18 @@ import topo.commands.analysis
 # don't make sense at the moment when things like 'situate' are clicked.
 
 class ConnectionFieldsPanel(TemplatePlotGroupPanel):
-    def __init__(self,parent,console=None,pgt_name=None,**params):       
+    def __init__(self,parent,console=None,pgt_name=None,x=0,y=0,**params):       
 
+        # CEBALERT: I'm not sure what the various definitions of x and y
+        # are for - I wonder if they can be cleaned up? I haven't looked,
+        # and when adding the x any y args above with their defaults, I've
+        # left a note of the previous values in case they're needed while
+        # cleaning up.
         self.region = StringVar()
-	self.x = 0
-	self.y = 0
+	self.x = x # (was 0)
+	self.y = y # (was 0)
+
+        # CEBALERT: why not a super() call?
 	TemplatePlotGroupPanel.__init__(self,parent,console,pgt_name,**params)
 
 
@@ -49,9 +56,9 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         self.WEIGHT_PLOT_INITIAL_SIZE = 30
 
         self.x_str = StringVar()
-        self.x_str.set(0.0)
+        self.x_str.set(float(self.x)) # was set(0.0)
         self.y_str = StringVar()
-        self.y_str.set(0.0)
+        self.y_str.set(float(self.y)) # was set(0.0)
 	self._add_region_menu()
         self._add_xy_boxes()
 
