@@ -335,22 +335,16 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         self._canvas_menu.entryconfig(1,menu=self._unit_menu)
         self._canvas_menu.entryconfig(0,menu=self._sheet_menu)
 
+        # (CB: be consistent about insert/END or add)
+        self._unit_menu.add_command(label='Connection Fields',
+                                    command=self.__connection_fields_window)
         
-### Partial support for opening a Connection Fields window on a right
-### click; for this to be useful we would need to pass the coords to
-### the ConnectionFields panel.
-##         # should probably be using append command or whatever it is        
-##         self._unit_menu.insert_command(0,label='Connection Fields',
-##                                          command=self.__connection_fields_window)
+    def __connection_fields_window(self):
+        plot = self._canvas_event_info['plot']
+        x,y = self._canvas_event_info['coords'][1]
         
-##     def __connection_fields_window(self):
-##         plot = self._canvas_event_info['plot']
-##         x,y = self._canvas_event_info['coords'][1]
-        
-##         print plot.plot_src_name + " " + plot.name + ": x "+ `x` + ", y " + `y`
-        
-##         print self.console.plots_menu_entries["Connection Fields"]
-##         self.console.plots_menu_entries["Connection Fields"].command()
+        # CEBHACKALERT: got to avoid requesting cf out of range.
+        self.console.plots_menu_entries["Connection Fields"].command(x=x,y=y)
 
 
     def __process_canvas_event(self,event,func):
