@@ -326,19 +326,31 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         # CEBALERT: put this somewhere reasonable, with description + help, and so on.
         self.dynamic_info = StringVar()
         Label(self,textvariable=self.dynamic_info).pack(side=TOP)
+
+        # CB: currently working on these right-click menu items: variable names
+        # might change, and things might move to other classes.
+        self._sheet_menu = Menu(self)
+        self._unit_menu = Menu(self)
+
+        self._canvas_menu.entryconfig(1,menu=self._unit_menu)
+        self._canvas_menu.entryconfig(0,menu=self._sheet_menu)
+
         
-### Partial support for opening a Connection Fields window on a right click;
-### for this to be useful we would need to convert matrix coordinates
-### into sheet coords, and to pass them to the ConnectionFields panel.
-### 
-#        self._canvas_menu.insert_command(2,label='Connection Fields',
-#                                         command=self.__connection_fields_window)
-#   def __connection_fields_window(self):
-#       plot,r,c = self._canvas_click_info
-#       print plot.plot_src_name + " " + plot.name + ": row "+ `r` + ", col " + `c`
-#
-#       print self.console.plots_menu_entries["Connection Fields"]
-#       self.console.plots_menu_entries["Connection Fields"].command()
+### Partial support for opening a Connection Fields window on a right
+### click; for this to be useful we would need to pass the coords to
+### the ConnectionFields panel.
+##         # should probably be using append command or whatever it is        
+##         self._unit_menu.insert_command(0,label='Connection Fields',
+##                                          command=self.__connection_fields_window)
+        
+##     def __connection_fields_window(self):
+##         plot = self._canvas_event_info['plot']
+##         x,y = self._canvas_event_info['coords'][1]
+        
+##         print plot.plot_src_name + " " + plot.name + ": x "+ `x` + ", y " + `y`
+        
+##         print self.console.plots_menu_entries["Connection Fields"]
+##         self.console.plots_menu_entries["Connection Fields"].command()
 
 
     def __process_canvas_event(self,event,func):

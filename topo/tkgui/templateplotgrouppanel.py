@@ -89,16 +89,13 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         if self.__class__ == TemplatePlotGroupPanel:
             self.refresh(update=self.pgt.plot_immediately)
 
-        sheet_menu = Menu(self)
-        sheet_menu.insert_command(2,label="Plot FFT",command=self.__fft)
-        sheet_menu.insert_command(1,label="Print matrix values",command=self.__print_matrix)
-        sheet_menu.insert_command(0,label="Plot in new window",command=self.__plot_matrix)
+        
+        self._sheet_menu.insert_command(2,label="Plot FFT",command=self.__fft)
+        self._sheet_menu.insert_command(1,label="Print matrix values",command=self.__print_matrix)
+        self._sheet_menu.insert_command(0,label="Plot in new window",command=self.__plot_matrix)
+        self._unit_menu.insert_command(1,label="Print info",command=self.__print_info)
 
-        unit_menu = Menu(self)
-        unit_menu.insert_command(0,label="Print info",command=self.__print_info)
 
-        self._canvas_menu.entryconfig(1,menu=unit_menu)
-        self._canvas_menu.entryconfig(0,menu=sheet_menu)
 
 
     def _pg_template(self):
