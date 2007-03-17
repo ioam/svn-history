@@ -144,7 +144,14 @@ class PlotsMenuEntry(ParameterizedObject):
         self.title = ''
 
 
-    def command(self):
+    def command(self,**args):
+        """
+
+
+        args are keyword arguments that are passed to the class that's
+        being constructed
+        """
+        
         self.num_windows = self.num_windows + 1
         self.title = '%s %d' % (self.label, self.num_windows)
         #if 'valid_context' in dir(self.class_name):
@@ -153,7 +160,8 @@ class PlotsMenuEntry(ParameterizedObject):
             win = GUIToplevel(self.console)
             win.withdraw()
             win.title(self.title)
-            pn = self.class_name(parent=win,console=self.console,pgt_name=self.template.name)
+
+            pn = self.class_name(parent=win,console=self.console,pgt_name=self.template.name,**args)
             pn.pack(expand=YES,fill=BOTH)
 
             pn.refresh_title()
