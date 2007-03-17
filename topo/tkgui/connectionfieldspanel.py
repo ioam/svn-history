@@ -28,6 +28,9 @@ import topo.base.cf
 from topo.commands.analysis import *
 import topo.commands.analysis
 
+# CEBHACKALERT: various parts of the dynamic info/right-click menu stuff
+# don't make sense at the moment when things like 'situate' are clicked.
+
 class ConnectionFieldsPanel(TemplatePlotGroupPanel):
     def __init__(self,parent,console=None,pgt_name=None,**params):       
 
@@ -113,11 +116,17 @@ are stored.""")
     def _add_xy_boxes(self):
         params_frame = Frame(master=self)
         params_frame.pack(side=TOP,expand=YES,fill=X)
-
+        
         Message(params_frame,text="Unit  X:",aspect=1000).pack(side=LEFT)
         self.xe = Entry(params_frame,textvariable=self.x_str)
         # JC: we would like to update when the user leaves the box,
 	# but we don't know yet how to do it.(id for ye)
+        # CB: this is how to do it for both:
+        #  params_frame.bind('<Leave>',self.refresh)
+        # (because the outer frame has the mouse info stuff.)
+        # *But* I don't think we really want to do that. At least,
+        # refreshing should occur only if there has been a change
+        # (otherwise the history will build up pretty fast). 
         self.xe.bind('<Return>',self.refresh)
         self.xe.pack(side=LEFT,expand=YES,fill=X)
         self.balloon.bind(self.xe,
