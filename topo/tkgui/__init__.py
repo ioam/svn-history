@@ -14,6 +14,16 @@ import Pmw, sys, Tkinter
 import topo.base.parameterizedobject
 import topoconsole
 
+# CB: I think we should setup some named font instances here
+# to use throughout tkgui, and avoid all the various local
+# specifications (which will become very tedious to maintain).
+# Doing this will give other advantages, too, like maybe allowing
+# a user to say "make all the fonts a bit bigger", and so on.
+#
+# Some font links:
+# http://www.pythonware.com/library/tkinter/introduction/x444-fonts.htm
+# http://www.astro.washington.edu/owen/ROTKFolklore.html
+
 
 # When not using the GUI, Topographica does not ordinary import any of
 # the classes in the separate Topographica packages. For example, none
