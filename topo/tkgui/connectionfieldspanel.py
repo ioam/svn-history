@@ -126,21 +126,12 @@ are stored.""")
         
         Message(params_frame,text="Unit  X:",aspect=1000).pack(side=LEFT)
         self.xe = Entry(params_frame,textvariable=self.x_str)
-        # JC: we would like to update when the user leaves the box,
-	# but we don't know yet how to do it.(id for ye)
-        # CB: this is how to do it for both:
-        #  params_frame.bind('<Leave>',self.refresh)
-        # (because the outer frame has the mouse info stuff.)
-        # *But* I don't think we really want to do that. At least,
-        # refreshing should occur only if there has been a change
-        # (otherwise the history will build up pretty fast). 
         self.xe.bind('<Return>',self.refresh)
         self.xe.pack(side=LEFT,expand=YES,fill=X)
         self.balloon.bind(self.xe,
 """Sheet coordinate location desired.  The unit nearest this location will be returned.
 It is an error to request a unit outside the area of the Sheet.""")
-        #self.tag.bind('<KeyRelease>', self.tag_keypress)
-
+        
         Message(params_frame,text="Y:",aspect=1000).pack(side=LEFT)
         self.ye = Entry(params_frame,textvariable=self.y_str)
 	self.ye.bind('<Return>', self.refresh)
