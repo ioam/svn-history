@@ -340,7 +340,9 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         # (CB: be consistent about insert/END or add)
         self._unit_menu.add_command(label='Connection Fields',
                                     command=self.__connection_fields_window)
-        
+
+
+               
     def __connection_fields_window(self):
         plot = self._canvas_event_info['plot']
         x,y = self._canvas_event_info['coords'][1]
@@ -523,6 +525,8 @@ class PlotGroupPanel(BasicPlotGroupPanel):
             # python has something that lets this be done in a clearer way.
             canvas.bind('<Button-3>',lambda event: self.__process_canvas_event(event,self.__canvas_right_click))
             canvas.bind('<Motion>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))
+            canvas.bind('<Leave>',lambda event: self.dynamic_info.set(""))
+            
 
 
     def add_to_history(self):
