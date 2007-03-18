@@ -325,9 +325,9 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 
         
         # CEBALERT: put this somewhere reasonable, with description + help, and so on.
-        # Use a fixed-width font.
+        # Haven't checked the fixed-width font on windows/os x.
         self.dynamic_info = StringVar()
-        Label(self,textvariable=self.dynamic_info).pack(side=TOP)
+        Label(self,textvariable=self.dynamic_info,font=("courier",12)).pack(side=TOP)
 
         # CB: currently working on these right-click menu items: variable names
         # might change, and things might move to other classes.
