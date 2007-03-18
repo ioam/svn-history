@@ -324,6 +324,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         self._canvas_menu.insert_cascade(1,label='',state=DISABLED) # unit menu
         
         # CEBALERT: put this somewhere reasonable, with description + help, and so on.
+        # Use a fixed-width font.
         self.dynamic_info = StringVar()
         Label(self,textvariable=self.dynamic_info).pack(side=TOP)
 
