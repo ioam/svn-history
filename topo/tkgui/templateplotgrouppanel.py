@@ -74,6 +74,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         
         cmdbox = Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
                               entry_textvariable=self.cmdname,
+                              selectioncommand=self.refresh,
                               scrolledlist_items=([self.cmdname.get()]))
         cmdbox.pack(side=LEFT,expand=YES,fill=X)
         self.balloon.bind(cmdbox,getdoc(self.plotgroup.params()['updatecommand']))
@@ -94,8 +95,6 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         self._sheet_menu.insert_command(1,label="Print matrix values",command=self.__print_matrix)
         self._sheet_menu.insert_command(0,label="Plot in new window",command=self.__plot_matrix)
         self._unit_menu.insert_command(1,label="Print info",command=self.__print_info)
-
-
 
 
     def _pg_template(self):
