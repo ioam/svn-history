@@ -322,6 +322,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         self._canvas_menu = Menu(self, tearoff=0)
         self._canvas_menu.insert_cascade(0,label='',state=DISABLED) # sheet menu
         self._canvas_menu.insert_cascade(1,label='',state=DISABLED) # unit menu
+
         
         # CEBALERT: put this somewhere reasonable, with description + help, and so on.
         # Use a fixed-width font.
@@ -330,8 +331,8 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 
         # CB: currently working on these right-click menu items: variable names
         # might change, and things might move to other classes.
-        self._sheet_menu = Menu(self)
-        self._unit_menu = Menu(self)
+        self._sheet_menu = Menu(self._canvas_menu)
+        self._unit_menu = Menu(self._canvas_menu)
 
         self._canvas_menu.entryconfig(1,menu=self._unit_menu)
         self._canvas_menu.entryconfig(0,menu=self._sheet_menu)
