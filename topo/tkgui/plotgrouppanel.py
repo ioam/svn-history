@@ -354,11 +354,11 @@ class PlotGroupPanel(BasicPlotGroupPanel):
     def __process_canvas_event(self,event,func):
         """
         Store a dictionary _canvas_event_info, containing the plot that was clicked on, plus
-        the coordinates on the sheet (if there is a sheet for this plot), and then
-        call the given func to do the correct things for the event.....
+        the coordinates on the sheet (if there is a sheet for this plot i.e. plot has a non-empty
+        plot_src_name), and then call the given func to do the correct things for the event.....
         """
         # CB: I want this to be called for all the canvas events - see
-        # ALERT by canvas button bindings. Surely can do better than just func through.
+        # ALERT by canvas button bindings. Surely can do better than just passing func through.
         plot=event.widget.plot
         canvas_x,canvas_y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
         sf = plot.scale_factor
@@ -367,12 +367,19 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         info = {'plot':plot,'event':event} # store event in case more info needed elsewhere
 
         if plot.plot_src_name is not '':
-            r,c = canvas_r,canvas_c # CEBHACKALERT: crop canvas values to sheet        
-            x,y = topo.sim[plot.plot_src_name].matrix2sheet(r,c)
+            sheet = topo.sim[plot.plot_src_name]
+            r,c = canvas_r,canvas_c 
+            x,y = sheet.matrix2sheet(r,c)
             info['coords'] = [(r,c),(x,y)]
+
+            ## The plot doesn't correspond exactly to the sheet (there is some
+            ## kind of border), so if we're not actually on the sheet then
+            ## don't set the coords info (=> no sheet)
+            max_r,max_c = sheet.activity.shape
+            if r>=max_r or c>=max_c or r<0 or c<0:
+                del info['coords']
             
-        self._canvas_event_info = info
- 
+        self._canvas_event_info = info 
         func()
         
 
