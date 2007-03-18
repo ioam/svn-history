@@ -217,4 +217,4 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
             act = topo.sim[plot.plot_src_name].activity[r,c]
         except IndexError:
             act = -1
-        return x+" Activity: %1.3f" %(act)
+        return x+" Activity:% 1.3f" %(act)
