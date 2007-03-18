@@ -25,6 +25,9 @@ import topoconsole
 # http://www.astro.washington.edu/owen/ROTKFolklore.html
 
 
+
+
+
 # When not using the GUI, Topographica does not ordinary import any of
 # the classes in the separate Topographica packages. For example, none
 # of the pattern types in topo.patterns is imported in Topographica by
@@ -76,6 +79,32 @@ def start(mainloop=False):
     # Without this line the command-line remains responsive.
     if mainloop:
         console.mainloop()
+
+
+
+    ##########
+    ### Make cascading menus open automatically on linux when the mouse
+    ### is over the menu title.
+    ### [Tkinter-discuss] Cascade menu issue
+    ### http://mail.python.org/pipermail/tkinter-discuss/2006-August/000864.html
+    from Tkinter import Menu
+    # CEBALERT: there is now a kind of partial menu bar above the one
+    # we use on topoconsole (this shows up as an extra line).  Because
+    # we use pmw's menubar, we're not using the overall ('toplevel')
+    # menu that tk apps would usually have.
+    # The reason to use pmw's menu bar is that balloon help can be bound
+    # to the options - this doesn't seem to be possible with tk alone
+    # (at least in any reasonable way).
+    menubar=Menu(root)  # toplevel menu
+    root.configure(menu=menubar)
+    activate_cascade = """\
+    if {[%W cget -type] != {menubar} && [%W type active] == {cascade}} {
+        %W postcascade active
+    }
+    """
+    root.bind_class("Menu", "<<MenuSelect>>", activate_cascade)
+    ##########
+
 
     return console
 
