@@ -248,7 +248,7 @@ def measure_sf_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
 
     """
-    Measure spatial freqquwncy maps, using a sine grating by default.
+    Measure spatial frequency maps, using a sine grating by default.
 
     Measures maps by collating the responses to a set of input
     patterns controlled by some parameters.  The parameter ranges and
