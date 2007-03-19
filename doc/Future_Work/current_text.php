@@ -74,11 +74,6 @@ statistics about maps, e.g. for estimating perceived quantities.
 </li>
 
 <li>
-2006/11/09 (RZ): Add simple timing functions to suggest what components
-need optimizing.
-</li>
-
-<li>
 2006/11/09 (JA): Need to implement more of the optimizations from the C++ LISSOM code.
 </li>
 
