@@ -532,13 +532,14 @@ class PlotGroupPanel(BasicPlotGroupPanel):
             # python has something that lets this be done in a clearer way.
             canvas.bind('<Button-3>',lambda event: self.__process_canvas_event(event,self.__canvas_right_click))
             canvas.bind('<Motion>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))
+            canvas.bind('<Leave>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))
+            # When user has a menu up, it's often natural to click elsewhere to make the menu disappear. Need
+            # to update the dynamic information in that case. (Happens on OS X anyway, but needed on Win and linux.)
+            canvas.bind('<Button-1>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))
 
-            # CEBALERT: this also makes the dynamic text disappear
-            # when the right mouse button is pressed (to get a
-            # menu). Why does it do that?!
-            canvas.bind('<Leave>',lambda event: self.dynamic_info.set(""))
+        
             
-
+            
 
     def add_to_history(self):
 	"""
