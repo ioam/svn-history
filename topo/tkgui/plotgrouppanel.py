@@ -327,7 +327,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         # CEBALERT: put this somewhere reasonable, with description + help, and so on.
         # Haven't checked the fixed-width font on windows/os x.
         self.dynamic_info = StringVar()
-        Label(self,textvariable=self.dynamic_info,font=("courier",12)).pack(side=TOP)
+        Label(self,textvariable=self.dynamic_info).pack(side=TOP) #,font=("courier",12)
 
         # CB: currently working on these right-click menu items: variable names
         # might change, and things might move to other classes.
@@ -392,7 +392,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         if 'coords' in self._canvas_event_info:
             self._canvas_menu.entryconfig(0,label="%s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
             (r,c),(x,y) = self._canvas_event_info['coords']
-            self._canvas_menu.entryconfig(1,label="Unit:(% 3d,% 3d) Coord:(%+2.2f,%+2.2f)"%(r,c,x,y),state=NORMAL)
+            self._canvas_menu.entryconfig(1,label="Unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),state=NORMAL)
         else:
             # CB: Apart from disabling menu items, this stuff is not needed. In fact it would
             # probably be better to disable the menu entirely. (Unless we'll be plotting stuff
@@ -416,7 +416,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 
         if 'coords' in self._canvas_event_info:        
             (r,c),(x,y) = self._canvas_event_info['coords']
-            location_string+=" Unit:(% 3d,% 3d) Coord:(%+2.2f,%+2.2f)"%(r,c,x,y)
+            location_string+=" Unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y)
             # CB: isn't there a nicer way to allow more info to be added?
             self.dynamic_info.set(self._dynamic_info_string(location_string))
         else:
