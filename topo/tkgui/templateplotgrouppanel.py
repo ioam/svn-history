@@ -135,7 +135,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
     # JABALERT: Should change these commands to be part of submenus
     # for Strength, Hue, etc., instead of checking it here.
     def __fft(self):
-        plot = self._canvas_event_info['plot']
+        plot = self._right_click_info['plot']
         description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
         if plot.channels.has_key('Strength'):
             m=plot._get_matrix('Strength')
@@ -145,7 +145,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         topo.commands.pylabplots.matrixplot(fft_plot, title="FFT Plot: " + description)        
 
     def __print_matrix(self):
-        plot = self._canvas_event_info['plot']
+        plot = self._right_click_info['plot']
         description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
         print ("#" + description)
         if plot.channels.has_key('Strength'):
@@ -156,7 +156,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
 
     def __plot_matrix(self):
-        plot = self._canvas_event_info['plot']
+        plot = self._right_click_info['plot']
         description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
         if plot.channels.has_key('Strength'):
             m=plot._get_matrix('Strength')
@@ -166,8 +166,8 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
 
     def __print_info(self):
-        plot = self._canvas_event_info['plot']
-        (r,c),(x,y) = self._canvas_event_info['coords']
+        plot = self._right_click_info['plot']
+        (r,c),(x,y) = self._right_click_info['coords']
         description ="%s %s, row %d, col %d at time %0.2f: " % (plot.plot_src_name, plot.name, r, c, topo.sim.time())
         if plot.channels.has_key('Strength'):
             m=plot._get_matrix('Strength')
@@ -202,18 +202,14 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         self.parent.title(topo.sim.name+': '+self.mapname.get() + " time:%s" % self.plotgroup.time)
 
 
-    def _dynamic_info_string(self,x):
+    def _dynamic_info_string(self,event_info,basic_text):
         """
         Also print the activity...
         """
-        info = self._canvas_event_info
-        plot = info['plot']
+        plot = event_info['plot']
 
-        # CB: use sheetviews and add whatever is available
-        # (try/catch until rc are cropped in process_canvas_event)
-        try:
-            r,c = info['coords'][0]
-            act = topo.sim[plot.plot_src_name].activity[r,c]
-        except IndexError:
-            act = -1
-        return x+" Activity:% 1.3f" %(act)
+        # CB: can use sheetviews and add whatever is available + on menu
+        r,c = event_info['coords'][0]
+        act = topo.sim[plot.plot_src_name].activity[r,c]
+
+        return basic_text+" Activity:% 1.3f" %(act)
