@@ -323,7 +323,6 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         self._canvas_menu.insert_cascade(0,label='',state=DISABLED) # sheet menu
         self._canvas_menu.insert_cascade(1,label='',state=DISABLED) # unit menu
 
-        
         # CEBALERT: put this somewhere reasonable, with description + help, and so on.
         # Haven't checked the fixed-width font on windows/os x.
         self.dynamic_info = StringVar()
@@ -344,87 +343,86 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 
                
     def __connection_fields_window(self):
-        plot = self._canvas_event_info['plot']
-        x,y = self._canvas_event_info['coords'][1]
-        
-        # CEBHACKALERT: got to avoid requesting cf out of range.
-        self.console.plots_menu_entries["Connection Fields"].command(x=x,y=y)
+        if 'plot' in self._right_click_info:
+            plot = self._right_click_info['plot']
+            x,y =  self._right_click_info['coords'][1]
+            # CEBHACKALERT: got to avoid requesting cf out of range.
+            self.console.plots_menu_entries["Connection Fields"].command(x=x,y=y)
 
 
     def __process_canvas_event(self,event,func):
         """
-        Store a dictionary _canvas_event_info, containing the plot that was clicked on, plus
-        the coordinates on the sheet (if there is a sheet for this plot i.e. plot has a non-empty
-        plot_src_name), and then call the given func to do the correct things for the event.....
+        Return a dictionary containing the event itself, and, if the
+        event occurs on a plot of a sheet, store the plot and the
+        coordinates on the sheet.
+
+        Then, call func.
         """
         # CB: I want this to be called for all the canvas events - see
-        # ALERT by canvas button bindings. Surely can do better than just passing func through.
+        # ALERT by canvas button bindings. Surely can do better than
+        # just passing func through.
         plot=event.widget.plot
-        canvas_x,canvas_y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
-        sf = plot.scale_factor
-        canvas_r,canvas_c=int(floor(canvas_y/sf)),int(floor(canvas_x/sf))
+        event_info = {'event':event} # store event in case more info needed elsewhere
 
-        info = {'plot':plot,'event':event} # store event in case more info needed elsewhere
-
+        # Later functions assume that if event_info does not contain
+        # 'plot', then the event did not occur on a plot of a sheet
+        # (or occurred outside the sheet's bounds).  If sometime in
+        # the future we want to do things for plots that do not have
+        # sheets, then this can be changed (e.g. we can put in plot
+        # but not coords, and use a check for coords to discover if
+        # there is a sheet or not).
+        
         if plot.plot_src_name is not '':
+            canvas_x,canvas_y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
+            sf = plot.scale_factor
+            canvas_r,canvas_c=int(floor(canvas_y/sf)),int(floor(canvas_x/sf))
+
             sheet = topo.sim[plot.plot_src_name]
             r,c = canvas_r,canvas_c 
             x,y = sheet.matrix2sheet(r,c)
-            info['coords'] = [(r,c),(x,y)]
 
-            ## The plot doesn't correspond exactly to the sheet (there is some
-            ## kind of border), so if we're not actually on the sheet then
-            ## don't set the coords info (=> no sheet)
+            ## The plot doesn't correspond exactly to the sheet (there
+            ## is some kind of border), so only store the plot and
+            ## coords if we're actually on the sheet
             max_r,max_c = sheet.activity.shape
-            if r>=max_r or c>=max_c or r<0 or c<0:
-                del info['coords']
-            
-        self._canvas_event_info = info 
-        func()
+            if 0<=r<max_r and 0<=c<max_c:
+                event_info['plot'] = plot
+                event_info['coords'] = [(r,c),(x,y)]
+
+        func(event_info)
         
 
-    def __canvas_right_click(self):
+    def __canvas_right_click(self,event_info):
         """
-        Update labels on right-click menu.
-        """
-        plot = self._canvas_event_info['plot']
-
-        if 'coords' in self._canvas_event_info:
+        Update labels on right-click menu and popup the menu, plus store the event info
+        for access by any menu commands that require it.
+        """        
+        if 'plot' in event_info:
+            plot = event_info['plot']
             self._canvas_menu.entryconfig(0,label="%s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
-            (r,c),(x,y) = self._canvas_event_info['coords']
+            (r,c),(x,y) = event_info['coords']
             self._canvas_menu.entryconfig(1,label="Unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),state=NORMAL)
-        else:
-            # CB: Apart from disabling menu items, this stuff is not needed. In fact it would
-            # probably be better to disable the menu entirely. (Unless we'll be plotting stuff
-            # that's not from sheets but with which users might still wish to interact...)
-            event = self._canvas_event_info['event']
-            self._canvas_menu.entryconfig(0,state=DISABLED,label="%s %s"%(plot.plot_src_name,plot.name))
-            self._canvas_menu.entryconfig(1,state=DISABLED,label="(%s,%s)"%(event.x-CANVASBUFFER,
-                                                                            event.y-CANVASBUFFER))
+            self._canvas_menu.tk_popup(event_info['event'].x_root,
+                                       event_info['event'].y_root)
 
-        self._canvas_menu.tk_popup(self._canvas_event_info['event'].x_root,
-                                   self._canvas_event_info['event'].y_root)
+            self._right_click_info = event_info
 
 
-    def __update_dynamic_info(self):
+    def __update_dynamic_info(self,event_info):
         """
         Update dynamic information.
         """
-        plot = self._canvas_event_info['plot']
-
-        location_string = "%s"%(plot.plot_src_name)
-
-        if 'coords' in self._canvas_event_info:        
-            (r,c),(x,y) = self._canvas_event_info['coords']
-            location_string+=" Unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y)
+        if 'plot' in event_info:
+            plot = event_info['plot']
+            (r,c),(x,y) = event_info['coords']
+            location_string="%s Unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(plot.plot_src_name,r,c,x,y)
             # CB: isn't there a nicer way to allow more info to be added?
-            self.dynamic_info.set(self._dynamic_info_string(location_string))
+            self.dynamic_info.set(self._dynamic_info_string(event_info,location_string))
         else:
-            # no sheet, so won't be more dynamic info to add
-            self.dynamic_info.set(location_string)
+            self.dynamic_info.set("")
 
         
-    def _dynamic_info_string(self,x):
+    def _dynamic_info_string(self,event_info,x):
         """
         Subclasses can override to add extra relevant information.
         """
@@ -532,10 +530,12 @@ class PlotGroupPanel(BasicPlotGroupPanel):
             # python has something that lets this be done in a clearer way.
             canvas.bind('<Button-3>',lambda event: self.__process_canvas_event(event,self.__canvas_right_click))
             canvas.bind('<Motion>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))
+
             canvas.bind('<Leave>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))
             # When user has a menu up, it's often natural to click elsewhere to make the menu disappear. Need
             # to update the dynamic information in that case. (Happens on OS X anyway, but needed on Win and linux.)
             canvas.bind('<Button-1>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))
+
 
         
             
