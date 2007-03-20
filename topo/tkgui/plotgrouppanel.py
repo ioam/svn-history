@@ -317,26 +317,27 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         self.balloon.bind(self.integerscaling_checkbutton,
                           getdoc(self.plotgroup.params()['integerscaling']))
 
-        ### Right-click menu for canvases; subclasses can add cascades
-        ### or insert commands on the existing cascades.
-        self._canvas_menu = Menu(self, tearoff=0)
-        self._canvas_menu.insert_cascade(0,label='',state=DISABLED) # sheet menu
-        self._canvas_menu.insert_cascade(1,label='',state=DISABLED) # unit menu
 
-        # CEBALERT: put this somewhere reasonable, with description + help, and so on.
-        # Haven't checked the fixed-width font on windows/os x.
+        ### Dynamic info about cursor location on plot
+        # CEBALERT: the location of this widget is simply good luck: should position properly.
         self.dynamic_info = StringVar()
         Label(self,textvariable=self.dynamic_info).pack(side=TOP) #,font=("courier",12)
 
-        # CB: currently working on these right-click menu items: variable names
-        # might change, and things might move to other classes.
+        ### Right-click menu for canvases; subclasses can add cascades
+        ### or insert commands on the existing cascades.
+        self._canvas_menu = Menu(self, tearoff=0)
+
+        # sheet submenu
+        self._canvas_menu.insert_cascade(1) 
         self._sheet_menu = Menu(self._canvas_menu)
+        self._canvas_menu.entryconfig(1,menu=self._sheet_menu,state=DISABLED)
+
+        # unit submenu
+        self._canvas_menu.insert_cascade(0)
         self._unit_menu = Menu(self._canvas_menu)
-
-        self._canvas_menu.entryconfig(1,menu=self._unit_menu)
-        self._canvas_menu.entryconfig(0,menu=self._sheet_menu)
-
-        # (CB: be consistent about insert/END or add)
+        self._canvas_menu.entryconfig(0,menu=self._unit_menu,state=DISABLED)
+        
+        
         self._unit_menu.add_command(label='Connection Fields',
                                     command=self.__connection_fields_window)
 
@@ -346,7 +347,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         if 'plot' in self._right_click_info:
             plot = self._right_click_info['plot']
             x,y =  self._right_click_info['coords'][1]
-            # CEBHACKALERT: got to avoid requesting cf out of range.
+            # CEBHACKALERT: should avoid requesting cf out of range.
             self.console.plots_menu_entries["Connection Fields"].command(x=x,y=y)
 
 
@@ -392,16 +393,17 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         func(event_info)
         
 
-    def __canvas_right_click(self,event_info):
+    def _canvas_right_click(self,event_info):
         """
         Update labels on right-click menu and popup the menu, plus store the event info
         for access by any menu commands that require it.
         """        
         if 'plot' in event_info:
             plot = event_info['plot']
-            self._canvas_menu.entryconfig(0,label="%s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
+
+            self._canvas_menu.entryconfig(1,label="%s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
             (r,c),(x,y) = event_info['coords']
-            self._canvas_menu.entryconfig(1,label="Unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),state=NORMAL)
+            self._canvas_menu.entryconfig(0,label="Unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),state=NORMAL)
             self._canvas_menu.tk_popup(event_info['event'].x_root,
                                        event_info['event'].y_root)
 
@@ -528,7 +530,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
             # CEBALERT: I want process_canvas_event to be called for all of these bindings, with
             # an additional method also called to do something specific to the action. I'm sure
             # python has something that lets this be done in a clearer way.
-            canvas.bind('<Button-3>',lambda event: self.__process_canvas_event(event,self.__canvas_right_click))
+            canvas.bind('<Button-3>',lambda event: self.__process_canvas_event(event,self._canvas_right_click))
             canvas.bind('<Motion>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))
 
             canvas.bind('<Leave>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))
