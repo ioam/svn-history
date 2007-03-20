@@ -14,7 +14,7 @@ from numpy.fft.helper import fftshift
 import copy
 import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
-     Entry, Canvas, Checkbutton, BooleanVar, Menu
+     Entry, Canvas, Checkbutton, BooleanVar, Menu, DISABLED, NORMAL
 
 import topo
 from plotgrouppanel import PlotGroupPanel
@@ -32,6 +32,22 @@ import __main__
 exec "from topo.commands.analysis import *" in __main__.__dict__
 exec "from topo.commands.basic import *"  in __main__.__dict__
 exec "from topo.commands.pylabplots import *" in __main__.__dict__
+
+
+
+
+# CEBALERT: should  be something in plot or wherever, or maybe I don't see how to get this
+# info the easy way from it? Not sure I actually wrote this correctly, anyway.
+def available_plot_channels(plot):
+    """
+    Return the channels+names of the channels that have views.
+    """
+    available_channels = {}
+    for name,channel in plot.channels.items():
+        if plot.view_dict.has_key(channel):
+            available_channels[name]=channel
+    return available_channels
+
 
 
 class TemplatePlotGroupPanel(PlotGroupPanel):
@@ -90,12 +106,61 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         if self.__class__ == TemplatePlotGroupPanel:
             self.refresh(update=self.pgt.plot_immediately)
 
-        
-        self._sheet_menu.insert_command(2,label="Plot FFT",command=self.__fft)
-        self._sheet_menu.insert_command(1,label="Print matrix values",command=self.__print_matrix)
-        self._sheet_menu.insert_command(0,label="Plot in new window",command=self.__plot_matrix)
-        self._unit_menu.insert_command(1,label="Print info",command=self.__print_info)
 
+        self._sheet_menu.add_command(label="Save image",
+                                     state=DISABLED)
+
+        
+        self._unit_menu.add_command(label="Print info",
+                                    command=self.__print_info)
+
+
+        # CEBALERT: do we have to index with numbers? It will get
+        # messy if we want to add something in the middle...and it's
+        # already a pain for accessing the items.
+
+        ## Strength channel
+        self._canvas_menu.insert_cascade(2) 
+        self._strength_menu = Menu(self._canvas_menu)
+        self._canvas_menu.entryconfig(2,menu=self._strength_menu,label='Strength channel')
+        
+        ## Hue channel
+        self._canvas_menu.insert_cascade(3) 
+        self._hue_menu = Menu(self._canvas_menu)
+        self._canvas_menu.entryconfig(3,menu=self._hue_menu,label='Hue channel')
+
+        ## Confidence channel
+        self._canvas_menu.insert_cascade(4) 
+        self._conf_menu = Menu(self._canvas_menu)
+        self._canvas_menu.entryconfig(4,menu=self._conf_menu,label='Confidence channel')
+
+
+        # CEBALERT: there doesn't seem to be any way within tkinter itself to let me
+        # know which submenu was used!
+        # http://mail.python.org/pipermail/python-list/1999-May/003482.html
+        # http://groups.google.com/group/comp.lang.python/browse_thread/thread/de5cf21073610446/7ce05db5dbc4c3f3%237ce05db5dbc4c3f3
+
+        self._strength_menu.add_command(label="Plot in new window",
+                                        command=lambda: self.__plot_matrix('Strength'))
+        self._strength_menu.add_command(label="Fourier transform",
+                                        command=lambda: self.__fft('Strength'))
+
+        self._hue_menu.add_command(label="Plot in new window",
+                                   command=lambda: self.__plot_matrix('Hue'))
+        self._hue_menu.add_command(label="Fourier transform",
+                                   command=lambda: self.__fft('Hue'))
+        
+        self._conf_menu.add_command(label="Plot in new window",
+                                    command=lambda: self.__plot_matrix('Confidence'))
+        self._conf_menu.add_command(label="Fourier transform",
+                                    command=lambda: self.__fft('Confidence'))
+
+
+        
+        #self._sheet_menu.add_command(label="Print matrix values",
+        #                             command=self.__print_matrix)
+        
+        
 
     def _pg_template(self):
         """
@@ -132,48 +197,87 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
                                       integerscaling=self.integerscaling.get())
 	return plotgroup
 
-    # JABALERT: Should change these commands to be part of submenus
-    # for Strength, Hue, etc., instead of checking it here.
-    def __fft(self):
+
+    def _canvas_right_click(self,event_info):
+
+        # CEBALERT: hope I can do something like:
+        #  super(TemplatePlotGroupPanel,self)._canvas_right_click_info(event_info)
+        # and add extra stuff here.
+        # (But anyway, something about these methods does not seem to fit the PlotGroup hierarchy...)
+        if 'plot' in event_info:
+            plot = event_info['plot']
+
+            self._canvas_menu.entryconfig(1,label="%s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
+            (r,c),(x,y) = event_info['coords']
+            self._canvas_menu.entryconfig(0,label="Unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),state=NORMAL)
+
+
+            # CEBALERT: need to simplify this!
+            available_channels = available_plot_channels(plot)
+            if 'Strength' in available_channels:
+                self._canvas_menu.entryconfig(2,label="%s"%(plot.channels['Strength']),state=NORMAL)
+            else:
+                self._canvas_menu.entryconfig(2,label="%s"%('Strength'),state=DISABLED)
+
+            if 'Hue' in available_channels:
+                self._canvas_menu.entryconfig(3,label="%s"%(plot.channels['Hue']),state=NORMAL)
+            else:
+                self._canvas_menu.entryconfig(3,label="%s"%('Hue'),state=DISABLED)
+
+            if 'Confidence' in available_channels:
+                self._canvas_menu.entryconfig(4,label="%s"%(plot.channels['Confidence']),state=NORMAL)
+            else:
+                self._canvas_menu.entryconfig(4,label="%s"%('Confidence'),state=DISABLED)
+
+
+            self._canvas_menu.tk_popup(event_info['event'].x_root,
+                                       event_info['event'].y_root)
+
+            self._right_click_info = event_info
+
+        
+
+
+    # CB: these methods assume channel has a view (the menu only displays those that do)
+    def __fft(self,channel):
         plot = self._right_click_info['plot']
         description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
-        if plot.channels.has_key('Strength'):
-            m=plot._get_matrix('Strength')
-        elif plot.channels.has_key('Hue'):
-            m=plot._get_matrix('Hue')
+        m=plot._get_matrix(channel)
         fft_plot=fftshift(fft2(m-0.5, s=None, axes=(-2,-1)))
         topo.commands.pylabplots.matrixplot(fft_plot, title="FFT Plot: " + description)        
 
-    def __print_matrix(self):
+    def __print_matrix(self,channel):
         plot = self._right_click_info['plot']
         description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
         print ("#" + description)
-        if plot.channels.has_key('Strength'):
-            m=plot._get_matrix('Strength')
-        elif plot.channels.has_key('Hue'):
-            m=plot._get_matrix('Hue')
+        m=plot._get_matrix(channel)
         print m
 
-
-    def __plot_matrix(self):
+    def __plot_matrix(self,channel):
         plot = self._right_click_info['plot']
         description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
-        if plot.channels.has_key('Strength'):
-            m=plot._get_matrix('Strength')
-        elif plot.channels.has_key('Hue'):
-            m=plot._get_matrix('Hue')
+        m=plot._get_matrix(channel)
         topo.commands.pylabplots.matrixplot(m, title=description)
 
-
-    def __print_info(self):
+    # CEBALERT: decide if and how to allow any of these functions to be used for getting as many
+    # channels' info as possible.
+    # e.g. in this one...
+    def __print_info(self,channel=None):
         plot = self._right_click_info['plot']
         (r,c),(x,y) = self._right_click_info['coords']
         description ="%s %s, row %d, col %d at time %0.2f: " % (plot.plot_src_name, plot.name, r, c, topo.sim.time())
-        if plot.channels.has_key('Strength'):
-            m=plot._get_matrix('Strength')
-        elif plot.channels.has_key('Hue'):
-            m=plot._get_matrix('Hue')
-        print "%s %f" % (description, m[r,c])
+
+        channels_info = ""
+        if channel is None:
+            for channel,name in available_plot_channels(plot).items():
+                m=plot._get_matrix(channel)
+                channels_info+="%s:%f"%(name,m[r,c])
+        else:
+            m=plot._get_matrix(channel)
+            channels_info+="%s:%f"%(plot.channels[channel],m[r,c])
+            
+        print "%s %s" % (description, channels_info)
+
 
 
     def set_strengthonly(self):
@@ -204,12 +308,16 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
     def _dynamic_info_string(self,event_info,basic_text):
         """
-        Also print the activity...
+        Also print whatever other channels are there and have views.
         """
         plot = event_info['plot']
-
-        # CB: can use sheetviews and add whatever is available + on menu
         r,c = event_info['coords'][0]
-        act = topo.sim[plot.plot_src_name].activity[r,c]
+        
+        info_string = basic_text
 
-        return basic_text+" Activity:% 1.3f" %(act)
+        for channel,channel_name in available_plot_channels(plot).items():
+            info_string+=" %s: % 1.3f"%(channel_name,plot._get_matrix(channel)[r,c])
+                                        
+        return info_string
+
+    
