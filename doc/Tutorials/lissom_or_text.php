@@ -21,7 +21,7 @@ orientation map network, which can be done by changing to the
 <code>examples/</code> directory and running "make
 lissom_or_20000.typ".  Depending on the speed of your machine, you
 may want to go out for coffee at this point; on a 3GHz machine
-this training process currently takes about an hour.
+this training process currently takes about forty minutes.
 </p>
 
 
