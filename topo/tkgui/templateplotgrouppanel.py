@@ -215,17 +215,20 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
             # CEBALERT: need to simplify this!
             available_channels = available_plot_channels(plot)
             if 'Strength' in available_channels:
-                self._canvas_menu.entryconfig(2,label="Strength channel: %s"%(plot.channels['Strength']),state=NORMAL)
+                self._canvas_menu.entryconfig(2,label="Strength channel: %s" %
+                                              (str(plot.channels['Strength'])),state=NORMAL)
             else:
                 self._canvas_menu.entryconfig(2,label="Strength channel: None",state=DISABLED)
 
             if 'Hue' in available_channels:
-                self._canvas_menu.entryconfig(3,label="Hue channel: %s"%(plot.channels['Hue']),state=NORMAL)
+                self._canvas_menu.entryconfig(3,label="Hue channel: %s" %
+                                              (str(plot.channels['Hue'])),state=NORMAL)
             else:
                 self._canvas_menu.entryconfig(3,label="Hue channel: None",state=DISABLED)
 
             if 'Confidence' in available_channels:
-                self._canvas_menu.entryconfig(4,label="Confidence channel: %s"%(plot.channels['Confidence']),state=NORMAL)
+                self._canvas_menu.entryconfig(4,label="Confidence channel: %s" %
+                                              (str(plot.channels['Confidence'])),state=NORMAL)
             else:
                 self._canvas_menu.entryconfig(4,label="Confidence channel: None",state=DISABLED)
 
