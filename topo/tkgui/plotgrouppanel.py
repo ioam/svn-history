@@ -401,9 +401,9 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         if 'plot' in event_info:
             plot = event_info['plot']
 
-            self._canvas_menu.entryconfig(1,label="%s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
+            self._canvas_menu.entryconfig(1,label="Combined plot: %s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
             (r,c),(x,y) = event_info['coords']
-            self._canvas_menu.entryconfig(0,label="Unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),state=NORMAL)
+            self._canvas_menu.entryconfig(0,label="Single unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),state=NORMAL)
             self._canvas_menu.tk_popup(event_info['event'].x_root,
                                        event_info['event'].y_root)
 

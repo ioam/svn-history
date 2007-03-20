@@ -207,27 +207,27 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         if 'plot' in event_info:
             plot = event_info['plot']
 
-            self._canvas_menu.entryconfig(1,label="%s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
+            self._canvas_menu.entryconfig(1,label="Combined plot: %s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
             (r,c),(x,y) = event_info['coords']
-            self._canvas_menu.entryconfig(0,label="Unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),state=NORMAL)
+            self._canvas_menu.entryconfig(0,label="Single unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),state=NORMAL)
 
 
             # CEBALERT: need to simplify this!
             available_channels = available_plot_channels(plot)
             if 'Strength' in available_channels:
-                self._canvas_menu.entryconfig(2,label="%s"%(plot.channels['Strength']),state=NORMAL)
+                self._canvas_menu.entryconfig(2,label="Strength channel: %s"%(plot.channels['Strength']),state=NORMAL)
             else:
-                self._canvas_menu.entryconfig(2,label="%s"%('Strength'),state=DISABLED)
+                self._canvas_menu.entryconfig(2,label="Strength channel: None",state=DISABLED)
 
             if 'Hue' in available_channels:
-                self._canvas_menu.entryconfig(3,label="%s"%(plot.channels['Hue']),state=NORMAL)
+                self._canvas_menu.entryconfig(3,label="Hue channel: %s"%(plot.channels['Hue']),state=NORMAL)
             else:
-                self._canvas_menu.entryconfig(3,label="%s"%('Hue'),state=DISABLED)
+                self._canvas_menu.entryconfig(3,label="Hue channel: None",state=DISABLED)
 
             if 'Confidence' in available_channels:
-                self._canvas_menu.entryconfig(4,label="%s"%(plot.channels['Confidence']),state=NORMAL)
+                self._canvas_menu.entryconfig(4,label="Confidence channel: %s"%(plot.channels['Confidence']),state=NORMAL)
             else:
-                self._canvas_menu.entryconfig(4,label="%s"%('Confidence'),state=DISABLED)
+                self._canvas_menu.entryconfig(4,label="Confidence channel: None",state=DISABLED)
 
 
             self._canvas_menu.tk_popup(event_info['event'].x_root,
