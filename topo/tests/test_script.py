@@ -27,7 +27,7 @@ import pickle, copy, __main__
 
 import topo
 
-from topo.tests.utils import assert_array_equal
+from topo.tests.utils import assert_array_equal, assert_array_almost_equal
 
 
 # CEBALERT: will these 'script="examples..."' paths work on Windows?
@@ -58,10 +58,13 @@ def GenerateData(script="examples/lissom_oo_or.ty",look_at='V1',density=4,run_fo
 
 
 
-def TestScript(script="examples/lissom_oo_or.ty"):
+def TestScript(script="examples/lissom_oo_or.ty", decimal = None):
     """
     Run script with the parameters specified when its DATA file was generated, and check
-    for changes.
+    for changes. 
+    
+    The decimal parameter defines to how many decimal points will the equality with the DATA file
+    be measured. Setting it to the default None will cause exact matching.
     """
     try:
         data_filename = script+'_DATA'
@@ -80,8 +83,12 @@ def TestScript(script="examples/lissom_oo_or.ty"):
 
     for time in run_for:
         topo.sim.run(time)
-        assert_array_equal(data[topo.sim.time()],topo.sim[look_at].activity,
+        if(decimal == None):
+            assert_array_equal(data[topo.sim.time()],topo.sim[look_at].activity,
                            err_msg="\nAt topo.sim.time()=%d"%topo.sim.time())
+        else:
+            assert_array_almost_equal(data[topo.sim.time()],topo.sim[look_at].activity,
+                           decimal,err_msg="\nAt topo.sim.time()=%d"%topo.sim.time())
 
     print "\nResults from " + script + " have not changed."
 
