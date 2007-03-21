@@ -107,7 +107,7 @@ class ConnectionField(ParameterizedObject):
 
     # CEBALERT: Accessing norm_total as a property from the C code will probably
     # slow it down; this should be checked.
-    
+    # We can remove this ALERT now, right?
     norm_total = property(get_norm_total,set_norm_total,del_norm_total,
         """
         The norm_total property returns a value useful in computing
