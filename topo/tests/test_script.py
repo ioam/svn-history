@@ -33,13 +33,16 @@ from topo.tests.utils import assert_array_equal, assert_array_almost_equal
 # CEBALERT: will these 'script="examples..."' paths work on Windows?
 
 
-def GenerateData(script="examples/lissom_oo_or.ty",look_at='V1',density=4,run_for=[1,99,150]):
+def GenerateData(script="examples/lissom_oo_or.ty",data_filename=None,look_at='V1',density=4,run_for=[1,99,150]):
     """
     Run script (with the sheet look_at set to the specified density) for the times in run_for;
     after each run_for time the activity of look_at is saved.
 
-    Saves the resulting data to the pickle script_DATA
+    For the default data_filename of None, saves the resulting data to the pickle script_DATA.
     """
+    if data_filename==None:
+        data_filename=script+"_DATA"
+    
     # we must execute in main because e.g. scheduled events are run in __main__
     __main__.__dict__['default_density']=density
     execfile(script,__main__.__dict__)
@@ -54,20 +57,25 @@ def GenerateData(script="examples/lissom_oo_or.ty",look_at='V1',density=4,run_fo
     data['density']=density
     data['look_at']=look_at
     
-    pickle.dump(data,open(script+'_DATA','wb'),2)
+    pickle.dump(data,open(data_filename,'wb'),2)
 
 
 
-def TestScript(script="examples/lissom_oo_or.ty", decimal = None):
+def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None):
     """
     Run script with the parameters specified when its DATA file was generated, and check
     for changes. 
+
+    data_filename allows the location of the DATA file to be specified (for the default of None,
+    the location is assumed to be script_DATA.
     
     The decimal parameter defines to how many decimal points will the equality with the DATA file
     be measured. Setting it to the default None will cause exact matching.
     """
+    if data_filename==None:
+        data_filename=script+"_DATA"
+        
     try:
-        data_filename = script+'_DATA'
         data = pickle.load(open(data_filename,"r"))
     except IOError:
         print "\nData file '"+data_filename+"' could not be opened; run GenerateData() to create a data file before making changes to the script you wish to check."
