@@ -298,7 +298,7 @@ Need to make sure DynamicNumbers are advanced only once per simulation time.
 
 <li>
 2006/04/27 (JB): Allowing there to be a slower, more in-depth set of tests
-(that don't run with make tests, etc). Required slower tests: pickling [testsnapshots.py], that
+(that don't run with make tests, etc). Required slower tests: that
 example networks' results haven't changed [test_script.py], that performance doesn't get worse, ...
 </li>
 
