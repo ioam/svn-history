@@ -84,8 +84,10 @@ def get_filenames(parser):
             (arg[:1] == "-" and len(arg) > 1 and arg[1] != "-")):
             break
 	else:
+            # Adds commands for opening a script; also adds the location
+            # of the file to sys.path so that imports relative to the
+            # script's location will work
             abs_arg = os.path.abspath(arg)
-
 	    list_command = list_command + ['import sys; sys.path.insert(0,"%s")'%os.path.dirname(abs_arg),
                                            'execfile(' + repr(abs_arg) + ')']
 	    del rargs[0]
