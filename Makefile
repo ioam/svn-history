@@ -96,24 +96,34 @@ compare_oo_or:
 	make -C topo/tests/reference/
 	./topographica -c "comparisons=True" topo/tests/reference/lissom_oo_or_reference.ty 
 
-# CB: Test lissom_oo_or and som_retinotopy haven't changed. Likely that we'll change how this works so
-# we can have more tests (see current tasks).
-slow-tests: 
-	./topographica -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/lissom_oo_or.ty",data_filename="topo/tests/lissom_oo_or.ty_DATA")'
-	./topographica -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/som_retinotopy.ty",data_filename="topo/tests/som_retinotopy.ty_DATA")'
+# Test that the specified scripts haven't changed in results or speed.
+SLOWSCRIPTS=lissom_oo_or.ty som_retinotopy.ty
 
-slow-tests-generate:
-	./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(script="examples/lissom_oo_or.ty",data_filename="topo/tests/lissom_oo_or.ty_DATA",density=8,run_for=[1,99,150])'
-	./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(script="examples/som_retinotopy.ty",data_filename="topo/tests/som_retinotopy.ty_DATA",density=8,run_for=[1,99])'
+SLOWDATA=${subst .ty,.ty_DATA,${SLOWSCRIPTS}}
+SLOWTESTS=${subst .ty,.ty_TEST,${SLOWSCRIPTS}}
+SPEEDSCRIPTS=${SLOWSCRIPTS}
+SPEEDDATA=${subst .ty,.ty_SPEEDDATA,${SPEEDSCRIPTS}}
+SPEEDTESTS=${subst .ty,.ty_SPEEDTEST,${SPEEDSCRIPTS}}
 
-speed-tests:
-	./topographica -c "from topo.tests.test_script import compare_speed_data; compare_speed_data('examples/lissom_oo_or.ty')"
-	./topographica -c "from topo.tests.test_script import compare_speed_data; compare_speed_data('examples/som_retinotopy.ty')"
+slow-tests: ${SLOWTESTS}
+speed-tests: ${SPEEDTESTS}
 
-# CB: will be able to specify number of iterations etc like for slow-tests.
-speed-tests-generate:
-	./topographica -c "from topo.tests.test_script import generate_speed_data; generate_speed_data('examples/lissom_oo_or.ty')"
-	./topographica -c "from topo.tests.test_script import generate_speed_data; generate_speed_data('examples/som_retinotopy.ty')"
+# General rules for generating test data and running the tests
+%_DATA:
+	./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",density=8,run_for=[1,99,150])'
+
+%_TEST: %_DATA
+	./topographica -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA")'
+
+#  CB: will be able to specify number of iterations etc like for slow-tests.
+%_SPEEDDATA:
+	./topographica -c "from topo.tests.test_script import generate_speed_data; generate_speed_data('examples/${notdir $*}')"
+
+%_SPEEDTEST: %_SPEEDDATA
+	./topographica -c "from topo.tests.test_script import compare_speed_data; compare_speed_data('examples/${notdir $*}')"
+
+.SECONDARY: ${SPEEDDATA} ${SLOWDATA} # Make sure that *_*DATA is kept around
+
 
 clean-pyc:
 	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc
