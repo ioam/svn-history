@@ -34,6 +34,23 @@ exec "from topo.commands.basic import *"  in __main__.__dict__
 exec "from topo.commands.pylabplots import *" in __main__.__dict__
 
 
+### CEBALERT: additional dynamic info/right-click problems:
+#
+# 1: If I open an Activity plot and then measure an orientation map,
+# the plot only shows Activity, but the dynamic info includes the or
+# pref and selectivity.  That makes sense, given that the plot would
+# show that if it were refreshed, but it's confusing. 
+#
+# 2. Once I've measured an orientation map, the dynamic info in the
+# cfsom_or.ty Activity window is very long, and it causes the window
+# size to change dynamically as I drag the mouse around.  That's very
+# distracting.  Is there any way to make the window enlarge only once,
+# and then keep it big? How to do that without disrupting
+# enlarge/reduce etc.?
+#
+# 3. Formatting of plot name (a tuple) in CF window (e.g. cfsom_or,
+# Unit X: 0.3).
+
 
 
 # CEBALERT: should  be something in plot or wherever, or maybe I don't see how to get this
@@ -113,6 +130,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         
         self._unit_menu.add_command(label="Print info",
                                     command=self.__print_info)
+
 
 
         # CEBALERT: do we have to index with numbers? It will get
