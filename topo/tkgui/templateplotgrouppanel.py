@@ -219,33 +219,22 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
     # CB: something about these methods does not seem to fit the PlotGroup hierarchy.
     def _canvas_right_click(self,event_info):
         """
-        Make whatever channels are present in the plot available on the menu.
+        Make whichever of the SHC channels present in the plot available on the menu.
         """
         super(TemplatePlotGroupPanel,self)._canvas_right_click(event_info,show_menu=False)
         
         if 'plot' in event_info:
             plot = event_info['plot']
             
-            # CEBALERT: need to simplify this!
-            available_channels = available_plot_channels(plot)
-            if 'Strength' in available_channels:
-                self._canvas_menu.entryconfig(2,label="Strength channel: %s" %
-                                              (str(plot.channels['Strength'])),state=NORMAL)
-            else:
-                self._canvas_menu.entryconfig(2,label="Strength channel: None",state=DISABLED)
+            available_channels =available_plot_channels(plot) 
 
-            if 'Hue' in available_channels:
-                self._canvas_menu.entryconfig(3,label="Hue channel: %s" %
-                                              (str(plot.channels['Hue'])),state=NORMAL)
-            else:
-                self._canvas_menu.entryconfig(3,label="Hue channel: None",state=DISABLED)
-
-            if 'Confidence' in available_channels:
-                self._canvas_menu.entryconfig(4,label="Confidence channel: %s" %
-                                              (str(plot.channels['Confidence'])),state=NORMAL)
-            else:
-                self._canvas_menu.entryconfig(4,label="Confidence channel: None",state=DISABLED)
-
+            for channel,menu_posn in zip(('Strength','Hue','Confidence'),(2,3,4)):
+                if channel in available_channels:
+                    self._canvas_menu.entryconfig(menu_posn,label="%s channel: %s" %
+                                                  (channel,str(plot.channels[channel])),state=NORMAL)
+                else:
+                    self._canvas_menu.entryconfig(menu_posn,label="%s channel: None" %
+                                                  (channel),state=DISABLED)
 
             self._canvas_menu.tk_popup(event_info['event'].x_root,
                                        event_info['event'].y_root)
