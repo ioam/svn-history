@@ -106,11 +106,11 @@ slow-tests-generate:
 	./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(script="examples/lissom_oo_or.ty",data_filename="topo/tests/lissom_oo_or.ty_DATA",density=8,run_for=[1,99,150])'
 	./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(script="examples/som_retinotopy.ty",data_filename="topo/tests/som_retinotopy.ty_DATA",density=8,run_for=[1,99])'
 
-
 speed-tests:
 	./topographica -c "from topo.tests.test_script import compare_speed_data; compare_speed_data('examples/lissom_oo_or.ty')"
 	./topographica -c "from topo.tests.test_script import compare_speed_data; compare_speed_data('examples/som_retinotopy.ty')"
 
+# CB: will be able to specify number of iterations etc like for slow-tests.
 speed-tests-generate:
 	./topographica -c "from topo.tests.test_script import generate_speed_data; generate_speed_data('examples/lissom_oo_or.ty')"
 	./topographica -c "from topo.tests.test_script import generate_speed_data; generate_speed_data('examples/som_retinotopy.ty')"

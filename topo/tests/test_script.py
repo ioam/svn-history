@@ -110,6 +110,10 @@ def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None
 
 def generate_speed_data(script="examples/lissom_oo_or.ty"):
 
+
+    # I'm sure there is a function that simply does timing, so I can avoid 90 % of this stuff.
+
+    
     filename = script+'_SPEEDDATA' 
 
     from topo.misc.utils import profile
@@ -124,6 +128,8 @@ def generate_speed_data(script="examples/lissom_oo_or.ty"):
     speed_data = open('temp','r')
     perf = speed_data.readline()
     speed_data.close()
+
+
 
     # Should be replaced with a regular expression (by someone who knows them...)
     # perf looks like:
