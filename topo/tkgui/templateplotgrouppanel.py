@@ -216,20 +216,16 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 	return plotgroup
 
 
+    # CB: something about these methods does not seem to fit the PlotGroup hierarchy.
     def _canvas_right_click(self,event_info):
-
-        # CEBALERT: hope I can do something like:
-        #  super(TemplatePlotGroupPanel,self)._canvas_right_click_info(event_info)
-        # and add extra stuff here.
-        # (But anyway, something about these methods does not seem to fit the PlotGroup hierarchy...)
+        """
+        Make whatever channels are present in the plot available on the menu.
+        """
+        super(TemplatePlotGroupPanel,self)._canvas_right_click(event_info,show_menu=False)
+        
         if 'plot' in event_info:
             plot = event_info['plot']
-
-            self._canvas_menu.entryconfig(1,label="Combined plot: %s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
-            (r,c),(x,y) = event_info['coords']
-            self._canvas_menu.entryconfig(0,label="Single unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),state=NORMAL)
-
-
+            
             # CEBALERT: need to simplify this!
             available_channels = available_plot_channels(plot)
             if 'Strength' in available_channels:
@@ -254,7 +250,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
             self._canvas_menu.tk_popup(event_info['event'].x_root,
                                        event_info['event'].y_root)
 
-            self._right_click_info = event_info
+ 
 
         
 
