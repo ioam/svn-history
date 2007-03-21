@@ -139,17 +139,17 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
         ## Strength channel
         self._canvas_menu.insert_cascade(2) 
-        self._strength_menu = Menu(self._canvas_menu)
+        self._strength_menu = Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.entryconfig(2,menu=self._strength_menu,label='Strength channel')
         
         ## Hue channel
         self._canvas_menu.insert_cascade(3) 
-        self._hue_menu = Menu(self._canvas_menu)
+        self._hue_menu = Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.entryconfig(3,menu=self._hue_menu,label='Hue channel')
 
         ## Confidence channel
         self._canvas_menu.insert_cascade(4) 
-        self._conf_menu = Menu(self._canvas_menu)
+        self._conf_menu = Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.entryconfig(4,menu=self._conf_menu,label='Confidence channel')
 
 

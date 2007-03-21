@@ -329,12 +329,12 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 
         # sheet submenu
         self._canvas_menu.insert_cascade(1) 
-        self._sheet_menu = Menu(self._canvas_menu)
+        self._sheet_menu = Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.entryconfig(1,menu=self._sheet_menu,state=DISABLED)
 
         # unit submenu
         self._canvas_menu.insert_cascade(0)
-        self._unit_menu = Menu(self._canvas_menu)
+        self._unit_menu = Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.entryconfig(0,menu=self._unit_menu,state=DISABLED)
         
         
