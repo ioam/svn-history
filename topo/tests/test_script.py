@@ -32,7 +32,7 @@ from topo.tests.utils import assert_array_equal, assert_array_almost_equal
 
 # CEBALERT: will these 'script="examples..."' paths work on Windows?
 
-
+# CBALERT: guess I should have named this generate_data, since it's a function (same for TestScript).
 def GenerateData(script="examples/lissom_oo_or.ty",data_filename=None,look_at='V1',density=4,run_for=[1,99,150]):
     """
     Run script (with the sheet look_at set to the specified density) for the times in run_for;
@@ -100,3 +100,62 @@ def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None
 
     print "\nResults from " + script + " have not changed."
 
+
+
+# CB: currently working on these!
+
+def generate_speed_data(script="examples/lissom_oo_or.ty"):
+
+    filename = script+'_SPEEDDATA' 
+
+    from topo.misc.utils import profile
+    import sys
+    f = open('temp','w') # how do I have a temporary file? This might write over someone's stuff
+    old_stdout=sys.stdout
+    sys.stdout = f
+    profile('execfile("'+script+'");topo.sim.run(10)',n=0)
+    sys.stdout = old_stdout
+    f.close()
+
+    speed_data = open('temp','r')
+    perf = speed_data.readline()
+    speed_data.close()
+
+    # Should be replaced with a regular expression (by someone who knows them...)
+    # perf looks like:
+    #"         172124 function calls (169542 primitive calls) in 1.689 CPU seconds"    
+    perf= perf[perf.find("in ")+3:perf.find("CPU")-1]
+    speed_data = open(filename,'w')
+    speed_data.write(perf)
+    speed_data.close()
+
+
+def compare_speed_data(script="examples/lissom_oo_or.ty"):
+
+    filename = script+'_SPEEDDATA' 
+
+    from topo.misc.utils import profile
+    import sys
+    f = open('temp','w') # how do I have a temporary file? This might write over someone's stuff
+    old_stdout=sys.stdout
+    sys.stdout = f
+    profile('execfile("'+script+'");topo.sim.run(10)',n=0)
+    sys.stdout = old_stdout
+    f.close()
+
+    speed_data = open('temp','r')
+    perf = speed_data.readline()
+    speed_data.close()
+
+    # Should be replaced with a regular expression (by someone who knows them...)
+    # perf looks like:
+    #"         172124 function calls (169542 primitive calls) in 1.689 CPU seconds"    
+    perf= float(perf[perf.find("in ")+3:perf.find("CPU")-1])
+
+
+    old = open(filename,'r')
+    old_speed_data = float(old.readline())
+    old.close()
+
+
+    print "["+script+"]"+ " Before: %f s   Now: %f s  (change=%f s, %f percent)"%(old_speed_data,perf,perf-old_speed_data,100.0*(perf-old_speed_data)/old_speed_data)
