@@ -23,6 +23,7 @@ __version__='$Revision$'
 # CEBALERT: this file needs quite a substantial overhaul before it
 # will work well.
 
+# CEBALERT: taggedsliders refresh the display even when auto-refresh is off.
 
 import copy
 import Pmw
