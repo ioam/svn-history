@@ -97,13 +97,13 @@ compare_oo_or:
 	./topographica -c "comparisons=True" topo/tests/reference/lissom_oo_or_reference.ty 
 
 # Test that the specified scripts haven't changed in results or speed.
-SLOWSCRIPTS=lissom_oo_or.ty som_retinotopy.ty
+SLOWSCRIPTS=^lissom_oo_or.ty ^som_retinotopy.ty
 
-SLOWDATA=${subst .ty,.ty_DATA,${SLOWSCRIPTS}}
-SLOWTESTS=${subst .ty,.ty_TEST,${SLOWSCRIPTS}}
+SLOWDATA =${subst ^,topo/tests/,${subst .ty,.ty_DATA,${SLOWSCRIPTS}}}
+SLOWTESTS=${subst ^,topo/tests/,${subst .ty,.ty_TEST,${SLOWSCRIPTS}}}
 SPEEDSCRIPTS=${SLOWSCRIPTS}
-SPEEDDATA=${subst .ty,.ty_SPEEDDATA,${SPEEDSCRIPTS}}
-SPEEDTESTS=${subst .ty,.ty_SPEEDTEST,${SPEEDSCRIPTS}}
+SPEEDDATA =${subst ^,topo/tests/,${subst .ty,.ty_SPEEDDATA,${SPEEDSCRIPTS}}}
+SPEEDTESTS=${subst ^,topo/tests/,${subst .ty,.ty_SPEEDTEST,${SPEEDSCRIPTS}}}
 
 slow-tests: ${SLOWTESTS}
 speed-tests: ${SPEEDTESTS}
