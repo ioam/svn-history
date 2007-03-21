@@ -2,21 +2,21 @@
 Test that the results of a particular script have not changed.
 
 The current results from running x are checked against the results
-stored in x_DATA, where x is the path of the script.
-
-You can run the test like this:
-  ./topographica -c 'from topo.tests.test_script import TestScript; TestScript(x)'
-
-You can specify which sheet to look at, its density, and the number of iterations.
-
+stored in x_DATA, where x is the path to the script (including the
+filename).
 
 You can generate a new data file like this:
   ./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(x)'
 
 
+You can run the test like this:
+  ./topographica -c 'from topo.tests.test_script import TestScript; TestScript(x,6)'
+
+You can specify which sheet to look at, its density, the number of iterations, and
+how many decimal places to check (defaulting to all).
+
+
 The script x is assumed to support 'default_density' (see e.g. examples/lissom_oo_or.ty)
-
-
 
 $Id$
 """
@@ -26,7 +26,6 @@ __version__='$Revision$'
 import pickle, copy, __main__
 
 import topo
-
 from topo.tests.utils import assert_array_equal, assert_array_almost_equal
 
 
@@ -35,10 +34,12 @@ from topo.tests.utils import assert_array_equal, assert_array_almost_equal
 # CBALERT: guess I should have named this generate_data, since it's a function (same for TestScript).
 def GenerateData(script="examples/lissom_oo_or.ty",data_filename=None,look_at='V1',density=4,run_for=[1,99,150]):
     """
-    Run script (with the sheet look_at set to the specified density) for the times in run_for;
-    after each run_for time the activity of look_at is saved.
+    Run script (with the sheet look_at set to the specified density)
+    for the times in run_for; after each run_for time the activity of
+    look_at is saved.
 
-    For the default data_filename of None, saves the resulting data to the pickle script_DATA.
+    For the default data_filename of None, saves the resulting data to
+    the pickle script_DATA.
     """
     if data_filename==None:
         data_filename=script+"_DATA"
@@ -63,14 +64,16 @@ def GenerateData(script="examples/lissom_oo_or.ty",data_filename=None,look_at='V
 
 def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None):
     """
-    Run script with the parameters specified when its DATA file was generated, and check
-    for changes. 
+    Run script with the parameters specified when its DATA file was
+    generated, and check for changes.
 
-    data_filename allows the location of the DATA file to be specified (for the default of None,
-    the location is assumed to be script_DATA.
+    data_filename allows the location of the DATA file to be specified
+    (for the default of None, the location is assumed to be
+    script_DATA).
     
-    The decimal parameter defines to how many decimal points will the equality with the DATA file
-    be measured. Setting it to the default None will cause exact matching.
+    The decimal parameter defines to how many decimal points will the
+    equality with the DATA file be measured. Setting it to the default
+    of None will cause exact matching.
     """
     if data_filename==None:
         data_filename=script+"_DATA"
@@ -91,7 +94,7 @@ def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None
 
     for time in run_for:
         topo.sim.run(time)
-        if(decimal == None):
+        if (decimal == None):
             assert_array_equal(data[topo.sim.time()],topo.sim[look_at].activity,
                            err_msg="\nAt topo.sim.time()=%d"%topo.sim.time())
         else:
@@ -99,6 +102,7 @@ def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None
                            decimal,err_msg="\nAt topo.sim.time()=%d"%topo.sim.time())
 
     print "\nResults from " + script + " have not changed."
+    if (decimal != None): print "(to %d decimal places)" % (decimal)
 
 
 
