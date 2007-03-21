@@ -96,6 +96,17 @@ compare_oo_or:
 	make -C topo/tests/reference/
 	./topographica -c "comparisons=True" topo/tests/reference/lissom_oo_or_reference.ty 
 
+# CB: Test lissom_oo_or and som_retinotopy haven't changed. Likely that we'll change how this works so
+# we can have more tests (see current tasks).
+slow-tests: FORCE
+	./topographica -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/lissom_oo_or.ty",data_filename="topo/tests/lissom_oo_or.ty_DATA")'
+	./topographica -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/som_retinotopy.ty",data_filename="topo/tests/som_retinotopy.ty_DATA")'
+
+slow-tests-generate:
+	./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(script="examples/lissom_oo_or.ty",data_filename="topo/tests/lissom_oo_or.ty_DATA",density=8,run_for=[1,99,150])'
+	./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(script="examples/som_retinotopy.ty",data_filename="topo/tests/som_retinotopy.ty_DATA",density=8,run_for=[1,99])'
+
+
 clean-pyc:
 	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc
 
