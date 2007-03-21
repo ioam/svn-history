@@ -1,14 +1,14 @@
 """
-Functions for mapping from one 2D cartesion coordinate system to
-another.
+Functions for mapping from one 2D Cartesian coordinate system to another.
 
-These are useful for defining projections with magnifications,
-reductions, or other transformations on the input coordinate system.
+These are useful for defining projections with nonlinear magnifications,
+reductions, or other transformations of the input coordinate system.
 
 Generally, these function objects should work for an arbitrary (x,y) pair,
 returning new, remapped (x,y), although some classes of mappers may
 define their range and domain, with undesirable or undefined behavior
-outside those regions.
+outside those regions.  It is best if such objects raise a suitable
+exception in those circumstances.
 
 $Id$
 """
