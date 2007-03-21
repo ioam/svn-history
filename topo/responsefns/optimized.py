@@ -33,7 +33,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
 	
         temp_act = activity
         rows,cols = activity.shape
-        len, len2 = input_activity.shape
+        irows,icols = input_activity.shape
         X = input_activity.ravel()
     
         code = """
@@ -66,7 +66,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                     int cc1 = *slice++;
                     int cc2 = *slice;
 		    double tot = 0.0;
-		    double *xj = X+len*rr1+cc1;
+		    double *xj = X+icols*rr1+cc1;
 
                     // computes the dot product
 		    for (int i=rr1; i<rr2; ++i) {
@@ -77,7 +77,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                             ++wi;
                             ++xi;
                         }
-                        xj += len;
+                        xj += icols;
 			wj += cc2-cc1;
                     }  
                     *tact = tot*strength;
@@ -92,7 +92,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                 }
             }
         """
-	inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
+	inline(code, ['X', 'strength', 'icols', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 class CFPRF_DotProduct(CFPRF_Plugin):
     """
@@ -116,7 +116,7 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
     def __call__(self, cfs, input_activity, activity, strength, **params):
         temp_act = activity
         rows,cols = activity.shape
-        len, len2 = input_activity.shape
+        irows,icols = input_activity.shape
         X = input_activity.ravel()
 
         code = """
@@ -139,7 +139,7 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
                     int cc1 = *slice++;
                     int cc2 = *slice;
 
-                    double *xj = X+len*rr1+cc1;
+                    double *xj = X+icols*rr1+cc1;
     
                     // computes the dot product
 		    double tot = 0.0;
@@ -152,7 +152,7 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
                             ++wi;
                             ++xi;
                         }
-                        xj += len;
+                        xj += icols;
 			wj += cc2-cc1;
                     }
 		    
@@ -180,5 +180,5 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
 
 	
     
-        inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
+        inline(code, ['X', 'strength', 'icols', 'temp_act','cfs','cols','rows'], local_dict=locals())
 provide_unoptimized_equivalent("CFPRF_EuclideanDistance_opt","CFPRF_EuclideanDistance",locals())

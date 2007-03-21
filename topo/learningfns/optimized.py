@@ -29,9 +29,9 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
     that might depend on it.
     """
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
-        rows,cols = output_activity.shape
 	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
-        len, len2 = input_activity.shape
+        rows,cols = output_activity.shape
+        irows,icols = input_activity.shape
 
         hebbian_code = """
             double *x = output_activity;
@@ -59,7 +59,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                         double total = 0.0;
                         
                         // modify non-masked weights
-                        double *inpj = input_activity+len*rr1+cc1;
+                        double *inpj = input_activity+icols*rr1+cc1;
                         for (int i=rr1; i<rr2; ++i) {
                             double *inpi = inpj;
                             for (int j=cc1; j<cc2; ++j) {
@@ -73,7 +73,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                                 ++wi;
                                 ++inpi;
                             }
-                            inpj += len;
+                            inpj += icols;
                         }
 
                         // Anything obtained with PyObject_GetAttrString must be explicitly freed
@@ -91,7 +91,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
             }
         """
 
-        inline(hebbian_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
+        inline(hebbian_code, ['input_activity', 'output_activity','rows', 'cols', 'icols', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
     
        
 
