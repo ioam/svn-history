@@ -393,10 +393,13 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         func(event_info)
         
 
-    def _canvas_right_click(self,event_info):
+    def _canvas_right_click(self,event_info,show_menu=True):
         """
         Update labels on right-click menu and popup the menu, plus store the event info
         for access by any menu commands that require it.
+
+        If show_menu is False, popup menu is not displayed (in case subclasses
+        wish to add extra menu items first).
         """        
         if 'plot' in event_info:
             plot = event_info['plot']
@@ -404,10 +407,11 @@ class PlotGroupPanel(BasicPlotGroupPanel):
             self._canvas_menu.entryconfig(1,label="Combined plot: %s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
             (r,c),(x,y) = event_info['coords']
             self._canvas_menu.entryconfig(0,label="Single unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),state=NORMAL)
-            self._canvas_menu.tk_popup(event_info['event'].x_root,
-                                       event_info['event'].y_root)
-
             self._right_click_info = event_info
+
+            if show_menu:
+                self._canvas_menu.tk_popup(event_info['event'].x_root,
+                                           event_info['event'].y_root)
 
 
     def __update_dynamic_info(self,event_info):
