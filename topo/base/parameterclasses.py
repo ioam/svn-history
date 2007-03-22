@@ -37,7 +37,10 @@ class Filename(Parameter):
 
     # CEBALERT: there's a better way, right? See the sys module documentation,
     # and consider unix and windows.
-    def __init__(self,default=None,search_paths=[os.path.split(os.path.split(sys.executable)[0])[0]],**params):
+    def __init__(self,default=None,
+                 search_paths=[os.getcwd(),
+                               os.path.split(os.path.split(sys.executable)[0])[0]],
+                 **params):
         """
         Create a Filename Parameter with the specified string.
         
@@ -126,17 +129,6 @@ class Enumeration(Parameter):
         if not self.available.count(val) >= 1:
             raise ValueError("EnumeratedParamater can't be set to '" + repr(val) + "' because that's not in the list of available values " + repr(self.available) + ".")
 
-
-class Boolean(Parameter):
-    """
-    """
-    __slots__ = []
-    __doc__ = property((lambda self: self.doc))
-
-    def __set__(self,obj,val):
-        if not (isinstance(val,bool)):
-            raise ValueError, "Parameter only takes a boolean value."
-        super(Boolean,self).__set__(obj,bool(val))
 
 
 ### JABALERT: Needs to be extended to accept FixedPoint as a number.
@@ -371,9 +363,14 @@ class CallableParameter(Parameter):
     def __set__(self,obj,val):
         if not callable(val):
             raise ValueError("CallableParameter only takes a callable object.")
-        super(CallableParameter,self).__set__(obj,val)
+        if isinstance(val,type(self.__init__)):
+            # If val is an instance method, then wrap it
+            # so it can be pickled
+            super(CallableParameter,self).__set__(obj,InstanceMethodWrapper(val))
+        else:
+            super(CallableParameter,self).__set__(obj,val)
 
-
+        
 
 # This could multiply inherit from Dynamic and Number, but it's
 # currently mixed together by hand for simplicity.
@@ -569,6 +566,7 @@ class ClassSelectorParameter(Parameter):
 
 
 
+
 class ListParameter(Parameter):
     """
     Parameter whose value is a list of objects, usually of a specified type.
@@ -626,10 +624,24 @@ class ListParameter(Parameter):
                 assert isinstance(v,self.class_),repr(v)+" is not an instance of " + repr(self.class_) + "."
 
 
+class InstanceMethodWrapper(object):
+    """
+    Wrapper for pickling instance methods.
 
+    Constructor takes an instance method (e.g. topo.sim.time) as
+    its only argument.  Wrapper instance is callable, picklable, etc.
+    """
+    def __init__(self,im):
+        self.im = im
 
+    def __getstate__(self):
+        return (self.im.im_self,
+                self.im.im_func.func_name)
 
-        
-        
-        
+    def __setstate__(self,state):
+        obj,func_name = state
+        self.im = getattr(obj,func_name)
 
+    def __call__(self,*args,**kw):
+        return self.im(*args,**kw)
+    
