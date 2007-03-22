@@ -19,56 +19,20 @@ import pdb
 from itertools import cycle
 import pylab
 
-from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.boundingregion import BoundingBox
+from topo.base.parameterizedobject import VERBOSE,NORMAL,DEBUG
 from topo.base.parameterclasses import DynamicNumber,Number
+from topo.base.boundingregion import BoundingBox
+from topo.base.cf import CFProjection
+
+from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterizedobject import VERBOSE,NORMAL,DEBUG
 from topo.coordmapperfns.basic import OttesSCMotorMapper
+from topo.misc.numbergenerators import UniformRandom
 
 import topo.patterns.image
 
-from saccade import ShiftingGeneratorSheet, SaccadeController
-
-
-def plot_proj_mapping(mapper,sheet,style='b-'):
-    """
-    Given a CoordinateMapperFn for a CFProjection and the
-    dest sheet of the projection, plot a grid showing the locations of
-    the CFs on the source sheet.
-    """
-
-    # JPALERT:  Not sure where this fn should go...
-    
-    from pylab import plot,hold,ishold
-    
-    xs = sheet.sheet_rows()
-    ys = sheet.sheet_cols()
-
-    hold_on = ishold()
-    if not hold_on:
-        plot()
-    hold(True)
-
-    for y in ys:
-        pts = [mapper(x,y) for x in xs]
-        plot([u for u,v in pts],
-             [v for u,v in pts],
-             style)
-
-    for x in xs:
-        pts = [mapper(x,y) for y in ys]
-        plot([u for u,v in pts],
-             [v for u,v in pts],
-             style)
-
-    hold(hold_on)
-    
-
-        
-
-    
+from saccade import ShiftingGeneratorSheet, SaccadeController    
 
 
 ##########################################################################
@@ -78,11 +42,9 @@ topo.base.sheet.Sheet.nominal_density = 48
 topo.base.sheet.Sheet.nominal_bounds = BoundingBox(radius=0.5)
 topo.patterns.image.Image.size = 2.0
 
-SaccadeController.decode_method = 'centroid'
-SaccadeController.print_level = VERBOSE
+SaccadeController.print_level = NORMAL
 
-ShiftingGeneratorSheet.print_level = VERBOSE
-
+ShiftingGeneratorSheet.print_level = NORMAL
 
 
 
