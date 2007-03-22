@@ -89,6 +89,15 @@ def matrixplot(mat,title=None):
     pylab.show()
 
 
+def activityplot(sheet,title=None,cmap=pylab.cm.Greys):
+
+    l,b,r,t = sheet.bounds.aarect().lbrt()
+
+    pylab.imshow(sheet.activity,
+                 extent=(l,r,b,t),
+                 cmap=cmap)
+
+
 def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreference',axis=[-0.5,0.5,-0.5,0.5]):
     """
     By default, plot the XPreference and YPreference preferences for all
@@ -195,3 +204,50 @@ def tuning_curve(x_axis,plot_type,x_ticks,x_labels,x_lim,unit):
     pylab.legend()
     pylab.show._needmain = False 
     pylab.show()
+
+def plot_cfproj_mapping(dest,proj='Afferent',style='b-'):
+    """
+    Given a CF sheet receiving a CFProjection, plot
+    the mapping of the dests CF centers on the src sheet.
+    """
+    if isinstance(dest,str):
+        from topo import sim
+        dest = sim[dest]
+    plot_coord_mapping(dest.projections()[proj].coord_mapper,
+                       dest,style=style)
+
+def plot_coord_mapping(mapper,sheet,style='b-'):
+    """
+    Plot a coordinate mapping for a sheet.
+    
+    Given a CoordinateMapperFn (as for a CFProjection) and a sheet
+    of the projection, plot a grid showing where the sheet's units
+    are mapped.
+    """
+
+    # JPALERT:  Not sure where this fn should go...
+    
+    from pylab import plot,hold,ishold
+    
+    xs = sheet.sheet_rows()
+    ys = sheet.sheet_cols()
+
+    hold_on = ishold()
+    if not hold_on:
+        plot()
+    hold(True)
+
+    for y in ys:
+        pts = [mapper(x,y) for x in xs]
+        plot([u for u,v in pts],
+             [v for u,v in pts],
+             style)
+
+    for x in xs:
+        pts = [mapper(x,y) for y in ys]
+        plot([u for u,v in pts],
+             [v for u,v in pts],
+             style)
+
+    hold(hold_on)
+    
