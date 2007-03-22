@@ -18,7 +18,8 @@ from topo.base.simulation import *
 from topo.base import patterngenerator
 import topo.patterns.basic
 from math import pi
-from topo.base.parameterclasses import Dynamic, Parameter
+from topo.base.parameterclasses import DynamicNumber, Parameter
+from topo.misc.numbergenerators import UniformRandom
 import random
 import topo.base.parameterizedobject
 from topo.base.cf import CFProjection
@@ -135,20 +136,24 @@ class TestCFSom(unittest.TestCase):
     def test_cfsom(self):
         """
         """
+
+        gaussian_width = 0.02
+        gaussian_height = 0.9
+
+        input_pattern = topo.patterns.basic.Gaussian(
+            bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))),
+            scale=gaussian_height,
+            aspect_ratio=gaussian_width/gaussian_height,
+            x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=100)),
+            y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
+            orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=300)))
+
+        
         # input generation params
         GeneratorSheet.period = 1.0
         GeneratorSheet.nominal_density = 5
         GeneratorSheet.print_level = topo.base.parameterizedobject.WARNING
         
-        topo.patterns.basic.Gaussian.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        topo.patterns.basic.Gaussian.y = Dynamic(lambda : random.uniform(-0.5,0.5))        
-        topo.patterns.basic.Gaussian.orientation = Dynamic(lambda :random.uniform(-pi,pi))
-        
-        gaussian_width = 0.02
-        gaussian_height = 0.9
-        topo.patterns.basic.Gaussian.scale = gaussian_height
-        topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
-        topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
         # cf som parameters
         CFSOM.nominal_density = 5
@@ -162,7 +167,7 @@ class TestCFSom(unittest.TestCase):
       
         s = Simulation()
         s.verbose("Creating simulation objects...")
-        s['retina']=GeneratorSheet(input_generator=topo.patterns.basic.Gaussian())
+        s['retina']=GeneratorSheet(input_generator=input_pattern)
         
         s['V1'] = CFSOM()
         s['V1'].print_level = topo.base.parameterizedobject.WARNING
