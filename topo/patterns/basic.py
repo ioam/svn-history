@@ -511,7 +511,7 @@ class SineGratingDisk(PatternGenerator):
 
     size  = Number(default=0.5,doc="Top to bottom height of the disk")
     
-    smoothing = Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
+    smoothing = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.61,doc="Width of the Gaussian fall-off")
 
     phase  = Number(default=1.0, doc="phase of the sine grating")
