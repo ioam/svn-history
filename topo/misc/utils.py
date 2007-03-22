@@ -347,3 +347,18 @@ def centroid(pts,weights):
     and weights should be a vector of weights.
     """
     return numpy.dot(numpy.transpose(pts),weights)/sum(weights)
+
+def signabs(x):
+    """
+    Split x into its sign and absolute value.
+
+    Returns a tuple (sign(x),abs(x)).  Note: sign(0) = 1, unlike
+    numpy.sign.
+    """
+
+    if x < 0:
+        sgn = -1
+    else:
+        sgn = 1
+
+    return sgn,abs(x)
