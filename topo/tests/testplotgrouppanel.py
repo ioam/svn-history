@@ -19,10 +19,12 @@ import topo.tkgui.plotgrouppanel
 import Tkinter
 from topo.sheets.cfsom import CFSOM
 from math import pi
-from topo.base.parameterclasses import Dynamic
+from topo.base.parameterclasses import DynamicNumber
+from topo.misc.numbergenerators import UniformRandom
 import random
 import pdb #debugger
 import topo.patterns.basic
+
 
 class TestPlotGroupPanel(unittest.TestCase):
 
@@ -36,16 +38,18 @@ class TestPlotGroupPanel(unittest.TestCase):
         GeneratorSheet.nominal_density = 5
 #        base.print_level = topo.base.parameterizedobject.WARNING
 #        GeneratorSheet.print_level = topo.base.parameterizedobject.WARNING
-        
-        topo.patterns.basic.Gaussian.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        topo.patterns.basic.Gaussian.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        topo.patterns.basic.Gaussian.orientation = Dynamic(lambda :random.uniform(-pi,pi))
 
-        width = 0.02
-        height = 0.9
-        topo.patterns.basic.Gaussian.size = height
-        topo.patterns.basic.Gaussian.aspect_ratio = width/height
-        topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        gaussian_width = 0.02
+        gaussian_height = 0.9
+
+        input_pattern = topo.patterns.basic.Gaussian(
+            bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))),
+            scale=gaussian_height,
+            aspect_ratio=gaussian_width/gaussian_height,
+            x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=100)),
+            y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
+            orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=300)))
+
 
         ###########################################
         # build simulation
@@ -73,7 +77,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         sheetR = Sheet()
         sheetG = Sheet()
         sheetB = Sheet()
-        retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian())
+        retina = GeneratorSheet(input_generator=input_pattern)
         retina.print_level = topo.base.parameterizedobject.WARNING
 
         # For a new sheet_group named Miata:

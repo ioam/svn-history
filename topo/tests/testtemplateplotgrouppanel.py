@@ -20,6 +20,8 @@ from topo.base.sheetview import *
 from topo.tkgui.templateplotgrouppanel import *
 import topo.patterns.basic
 
+from topo.base.parameterclasses import DynamicNumber
+from topo.misc.numbergenerators import UniformRandom
 
 ### JCALERT: This test has to be written in order to test the new change in
 ### the TemplatePlotGroupPanel file
@@ -38,16 +40,18 @@ class TestActivityPanel(unittest.TestCase):
         GeneratorSheet.nominal_density = 30
 #        base.print_level = topo.base.parameterizedobject.WARNING
 #        GeneratorSheet.print_level = topo.base.parameterizedobject.WARNING
-        
-        topo.patterns.basic.Gaussian.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        topo.patterns.basic.Gaussian.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        topo.patterns.basic.Gaussian.orientation = Dynamic(lambda :random.uniform(-pi,pi))
 
-        width = 0.02
-        height = 0.9
-        topo.patterns.basic.Gaussian.size = height
-        topo.patterns.basic.Gaussian.aspect_ratio = (width/height)
-        topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        gaussian_width = 0.02
+        gaussian_height = 0.9
+
+        input_pattern = topo.patterns.basic.Gaussian(
+            bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))),
+            scale=gaussian_height,
+            aspect_ratio=gaussian_width/gaussian_height,
+            x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=100)),
+            y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
+            orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=300)))
+
 
         ###########################################
         # build simulation
@@ -75,7 +79,7 @@ class TestActivityPanel(unittest.TestCase):
         sheetR = Sheet()
         sheetG = Sheet()
         sheetB = Sheet()
-        retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian())
+        retina = GeneratorSheet(input_generator=input_pattern)
         retina.print_level = topo.base.parameterizedobject.WARNING
 
         # For a new sheet_group named Miata:

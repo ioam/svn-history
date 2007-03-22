@@ -7,7 +7,7 @@ __version__='$Revision$'
 
 import unittest, random
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.parameterclasses import Dynamic
+from topo.base.parameterclasses import DynamicNumber
 import topo.patterns.basic
 from topo.base.boundingregion import BoundingBox
 from topo.sheets.cfsom import CFSOM
@@ -17,17 +17,29 @@ import topo.base.parameterizedobject
 from math import pi
 from topo.commands.basic import pattern_present
 from topo.learningfns.som import CFPLF_HebbianSOM
+from topo.misc.numbergenerators import UniformRandom
 
 class TestPatternPresent(unittest.TestCase):
 
     def test_pattern_present(self):
         GeneratorSheet.period = 1.0
         GeneratorSheet.nominal_density = 4
-        topo.patterns.basic.Line.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        topo.patterns.basic.Line.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        topo.patterns.basic.Line.orientation = Dynamic(lambda :random.uniform(-pi,pi))
-        topo.patterns.basic.Line.thickness = 0.02
-        topo.patterns.basic.Line.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+
+
+        input_pattern1 = topo.patterns.basic.Line(
+            thickness=0.02,
+            bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))),
+            x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=100)),
+            y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
+            orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=300)))
+
+        input_pattern2 = topo.patterns.basic.Line(
+            thickness=0.02,
+            bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))),
+            x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=100)),
+            y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
+            orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=300)))
+
         CFSOM.nominal_density = 4
         CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
@@ -35,8 +47,8 @@ class TestPatternPresent(unittest.TestCase):
 	CFProjection.learning_fn=CFPLF_HebbianSOM()
         topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.MESSAGE
         s = topo.base.simulation.Simulation()
-        s['Retina'] = GeneratorSheet(input_generator=topo.patterns.basic.Line())
-        s['Retina2'] = GeneratorSheet(input_generator=topo.patterns.basic.Line())
+        s['Retina'] = GeneratorSheet(input_generator=input_pattern1)
+        s['Retina2'] = GeneratorSheet(input_generator=input_pattern2)
         s['V1'] = CFSOM()
         s['V2'] = CFSOM()
         s.connect('Retina','V1',delay=0.5,connection_type=CFProjection,name='R1toV1')
