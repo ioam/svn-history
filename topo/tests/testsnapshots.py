@@ -4,15 +4,6 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBHACKALERT: other test files set ParameterizedObject class
-# attributes to unpickleable things such as a lambdas (in various
-# out-of-date ways!).  This test file therefore fails when run with
-# the others, but runs fine on its own.
-# So, we need to eliminate such things as
-# "topo.patterns.basic.Gaussian.x=lambda..." from the test files.
-#
-# Meanwhile, run as:
-#./topographica -c 'import topo.tests.testsnapshots; topo.tests.run(test_modules=[topo.tests.testsnapshots])'    
 import unittest, copy
 
 import topo
