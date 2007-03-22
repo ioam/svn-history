@@ -49,15 +49,25 @@ class CommandPrompt(object):
     # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/475116
     # (or other such solutions)
     # Predefined alternatives
-    basic_format   = '"Topographica> "'
-    simtime_format = '"Topographica_t%g> " % topo.sim.time()'
-    ansi_format    = '"\x1b[32;40;1mTopographica\x1b[33;40;1m_t%g>\x1b[m " % topo.sim.time()'
+    basic_format   = '"Topographica>>> "'
+    simtime_format = '"Topographica_t%g>>> " % topo.sim.time()'
+    ansi_format    = '"\x1b[32;40;1mTopographica\x1b[33;40;1m_t%g>>>\x1b[m " % topo.sim.time()'
 
     # Select from one of the predefined alternatives (or any other format):
     format = simtime_format
-    
+
     def __str__(self): return str(eval(self.format,__main__.__dict__))
 
+class CommandPrompt2(CommandPrompt):
+    """
+    Provides a dynamically updated command prompt for sys.ps2.
+
+    This function uses the exact same prompt strings that are defined in
+    CommandPrompt (above), but it replaces any occurrances of the substring '>>>'
+    with '...'.
+    """
+
+    def __str__(self): return str(eval(self.format.replace('>>>','...'),__main__.__dict__))
 
 # Use to define global constants
 global_constants = {'pi':math.pi}
@@ -140,9 +150,21 @@ def process_argv(argv):
     if import_weave: exec "import weave" in __main__.__dict__    
 
     sys.ps1 = CommandPrompt()
+    sys.ps2 = CommandPrompt2()
     
     for (k,v) in global_constants.items():
         exec '%s = %s' % (k,v) in __main__.__dict__
+
+    # exec a .topographicarc file if one can be found
+    #
+    # JPALERT: This is all very unix-y.  We could try to do the right
+    # thing on each platform.  I.e. put prefs/startup files in $HOME/Library
+    # on the Mac, and wherever it goes on Windows.
+    homedir = os.getenv('HOME')
+    if homedir:
+        rcpath = os.path.join(homedir,'.topographicarc')
+        if os.path.exists(rcpath):
+            execfile(rcpath,__main__.__dict__)
 
     # Provide an interactive prompt unless running in batch mode
     if option.interactive or option.gui:
