@@ -18,6 +18,12 @@ __version__='$Revision$'
 # testing, which could make it simpler to find the right test file.
 
 
+# CEBALERT: the tests need to be cleaned up. In each test file,
+# setup() is to setup something that a series of tests can then all use.
+# That saves on duplication, etc.
+# We should at least start doing it right from now, or this problem
+# is going to grow.
+
 import unittest,re,os
 
 # Automatically discover all test*.py files in this directory
@@ -27,7 +33,6 @@ __all__ = [re.sub('\.py$','',f)
 
 
 # Remove any test that for now we don't want to run with the others
-__all__.remove('testsnapshots') # (see the note in that file)
 __all__.remove('test_script')   # this is a slower test & should have a different
                                 # calling mechanism (see Future_Work/current)
 
@@ -87,7 +92,7 @@ def run(verbosity=1,test_modules=None):
     else:
         suite = unittest.TestSuite()
         for test_module in test_modules:
-            new_suite.addTest(getattr(test_module,'suite'))
+            suite.addTest(getattr(test_module,'suite'))
 
     unittest.TextTestRunner(verbosity=verbosity).run(suite)
 
