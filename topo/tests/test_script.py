@@ -1,5 +1,9 @@
 """
-Test that the results of a particular script have not changed.
+Contains tests to check a particular script's results or speed have not changed.
+
+
+Test that the results of a script have not changed
+==================================================
 
 The current results from running x are checked against the results
 stored in x_DATA, where x is the path to the script (including the
@@ -8,22 +12,36 @@ filename).
 You can generate a new data file like this:
   ./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(x)'
 
-
 You can run the test like this:
   ./topographica -c 'from topo.tests.test_script import TestScript; TestScript(x,6)'
 
 You can specify which sheet to look at, its density, the number of iterations, and
 how many decimal places to check (defaulting to all).
 
-
 The script x is assumed to support 'default_density' (see e.g. examples/lissom_oo_or.ty)
+
+
+
+Test that the speed of running a simulation has not changed
+===========================================================
+
+You can generate a new data file like this:
+  ./topographica -c 'from topo.tests.test_script import *; generate_speed_data(script="examples/hierarchical.ty",iterations=50)'
+
+You can run a test like this:
+  ./topographica -c 'from topo.tests.test_script import compare_speed_data; compare_speed_data("examples/hierarchical.ty")'
+
+
+You should select enough iterations that the timings can be reliable.
+
+
 
 $Id$
 """
 __version__='$Revision$'
 
 
-import pickle, copy, __main__
+import pickle, copy, __main__, timeit
 
 import topo
 from topo.tests.utils import assert_array_equal, assert_array_almost_equal
@@ -106,66 +124,51 @@ def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None
 
 
 
-# CB: currently working on these!
-
-def generate_speed_data(script="examples/lissom_oo_or.ty"):
 
 
-    # I'm sure there is a function that simply does timing, so I can avoid 90 % of this stuff.
 
+def time_sim_run(script="examples/lissom_oo_or.ty",iterations=10):
+    """
+    Execute the script in __main__, then time topo.sim.run(iterations).
+
+    Uses the timeit module.
+    """
+    execfile(script,__main__.__dict__)
+    return timeit.Timer('topo.sim.run('+`iterations`+')','import topo').timeit(number=1)
+
+     
+def generate_speed_data(script="examples/lissom_oo_or.ty",iterations=100,data_filename=None):
+    """
+    Calls time_sim_run(script,iterations) and saves 'iterations=time'
+    to script_SPEEDDATA.
+    """
+    if data_filename==None:
+        data_filename=script+"_SPEEDDATA"
+
+    how_long = time_sim_run(script,iterations)
+
+    speed_data_file = open(data_filename,'w')
+    speed_data_file.write("%s=%s"%(iterations,how_long))
+    speed_data_file.close()
+
+
+def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
+    """
+    Using previously generated script_SPEEDDATA, compares current
+    time_sim_run(script) with the previous.
+    """
+    if data_filename==None:
+        data_filename=script+"_SPEEDDATA"
+
+    speed_data_file = open(data_filename,'r')
+        
+    info = speed_data_file.readline()
+    speed_data_file.close()
+
+    iterations,old_time = info.split('=')
+    iterations = float(iterations); old_time=float(old_time)
     
-    filename = script+'_SPEEDDATA' 
+    new_time = time_sim_run(script,iterations)
 
-    from topo.misc.utils import profile
-    import sys
-    f = open('temp','w') # how do I have a temporary file? This might write over someone's stuff
-    old_stdout=sys.stdout
-    sys.stdout = f
-    profile('execfile("'+script+'");topo.sim.run(10)',n=0)
-    sys.stdout = old_stdout
-    f.close()
-
-    speed_data = open('temp','r')
-    perf = speed_data.readline()
-    speed_data.close()
-
-
-
-    # Should be replaced with a regular expression (by someone who knows them...)
-    # perf looks like:
-    #"         172124 function calls (169542 primitive calls) in 1.689 CPU seconds"    
-    perf= perf[perf.find("in ")+3:perf.find("CPU")-1]
-    speed_data = open(filename,'w')
-    speed_data.write(perf)
-    speed_data.close()
-
-
-def compare_speed_data(script="examples/lissom_oo_or.ty"):
-
-    filename = script+'_SPEEDDATA' 
-
-    from topo.misc.utils import profile
-    import sys
-    f = open('temp','w') # how do I have a temporary file? This might write over someone's stuff
-    old_stdout=sys.stdout
-    sys.stdout = f
-    profile('execfile("'+script+'");topo.sim.run(10)',n=0)
-    sys.stdout = old_stdout
-    f.close()
-
-    speed_data = open('temp','r')
-    perf = speed_data.readline()
-    speed_data.close()
-
-    # Should be replaced with a regular expression (by someone who knows them...)
-    # perf looks like:
-    #"         172124 function calls (169542 primitive calls) in 1.689 CPU seconds"    
-    perf= float(perf[perf.find("in ")+3:perf.find("CPU")-1])
-
-
-    old = open(filename,'r')
-    old_speed_data = float(old.readline())
-    old.close()
-
-
-    print "["+script+"]"+ " Before: %f s   Now: %f s  (change=%f s, %f percent)"%(old_speed_data,perf,perf-old_speed_data,100.0*(perf-old_speed_data)/old_speed_data)
+    print "["+script+"]"+ " Before: %f s   Now: %f s  (change=%f s, %f percent)"%(old_time,new_time,new_time-old_time,
+                                                                                  100.0*(new_time-old_time)/old_time)
