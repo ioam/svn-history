@@ -31,30 +31,36 @@ __all__.remove('testsnapshots') # (see the note in that file)
 __all__.remove('test_script')   # this is a slower test & should have a different
                                 # calling mechanism (see Future_Work/current)
 
-# For each test module that defines a 'suite' attribute, add its
-# tests.
-# Only adds tests requiring a display if the DISPLAY environment
-# variable is set.
-suite = unittest.TestSuite()
-display_loc = os.getenv('DISPLAY')
 
-for test_name in __all__:
-    # import the module
-    exec 'import '+test_name
-    
-    test_module = locals()[test_name]
-    try:        
-        print 'Checking module %s for test suite...' % test_name,
-        new_test = getattr(test_module,'suite')
-        
-        if hasattr(new_test,'requires_display') and not display_loc:
-            print 'skipped: No $DISPLAY.'
-        else:
-            print 'found.'
-            suite.addTest(new_test)
-    except AttributeError,err:
-        print err
-    
+
+
+
+def all_suite():
+    """
+    For each test module that defines a 'suite' attribute, add its tests.
+    Only adds tests requiring a display if the DISPLAY environment
+    variable is set.
+    """
+    suite = unittest.TestSuite()
+    display_loc = os.getenv('DISPLAY')    
+    for test_name in __all__:
+        # import the module
+        exec 'import '+test_name
+
+        test_module = locals()[test_name]
+        try:        
+            print 'Checking module %s for test suite...' % test_name,
+            new_test = getattr(test_module,'suite')
+
+            if hasattr(new_test,'requires_display') and not display_loc:
+                print 'skipped: No $DISPLAY.'
+            else:
+                print 'found.'
+                suite.addTest(new_test)
+        except AttributeError,err:
+            print err
+    return suite
+
 
 def run(verbosity=1,test_modules=None):
     """
@@ -74,12 +80,14 @@ def run(verbosity=1,test_modules=None):
     
       ./topographica -c 'import topo.tests.testimage; topo.tests.run(test_modules=[topo.tests.testimage])'    
     """
-
+    suite = None
+    
     if not test_modules:
-        unittest.TextTestRunner(verbosity=verbosity).run(suite)
+        suite = all_suite()
     else:
-        new_suite = unittest.TestSuite()
+        suite = unittest.TestSuite()
         for test_module in test_modules:
             new_suite.addTest(getattr(test_module,'suite'))
-        unittest.TextTestRunner(verbosity=verbosity).run(new_suite)
+
+    unittest.TextTestRunner(verbosity=verbosity).run(suite)
 
