@@ -136,7 +136,19 @@ def time_sim_run(script="examples/lissom_oo_or.ty",iterations=10):
     Uses the timeit module.
     """
     execfile(script,__main__.__dict__)
-    return timeit.Timer('topo.sim.run('+`iterations`+')','import topo').timeit(number=1)
+
+    # CB: not clear whether to turn off GC?
+    # http://docs.python.org/lib/module-timeit.html
+    # """
+    # By default, timeit() temporarily turns off garbage collection
+    # during the timing. The advantage of this approach is that it
+    # makes independent timings more comparable. This disadvantage is
+    # that GC may be an important component of the performance of the
+    # function being measured. If so, GC can be re-enabled as the
+    # first statement in the setup string. For example:
+    # timeit.Timer('for i in xrange(10):oct(i)','gc.enable()').timeit()
+    # """
+    return timeit.Timer('topo.sim.run('+`iterations`+')','gc.enable(); import topo').timeit(number=1)
 
      
 def generate_speed_data(script="examples/lissom_oo_or.ty",iterations=100,data_filename=None):
