@@ -14,13 +14,13 @@ $Id$
 """
 __version__='$Revision$'
 
-from numpy import exp,log,sign,sqrt,sin,cos
+from numpy import exp,log,sqrt,sin,cos
 from math import atan,pi,atan2
 
 from topo.base.parameterizedobject import Parameter
 from topo.base.parameterclasses import Number,Enumeration
-
 from topo.base.functionfamilies import CoordinateMapperFn, IdentityMF
+from topo.misc.utils import signabs
 
 ##########################################################################
 # coordinate mapper functions
@@ -85,8 +85,7 @@ class MagnifyingMapper(SingleDimensionMapper):
         if k == 0:
             return z
         else:
-            sgn = sign(z)
-            z = abs(z)
+            sgn,z = signabs(z)
             return sgn * self.out_range * (exp(z/self.in_range*k)-1)/(exp(k)-1)
 
 
@@ -100,8 +99,7 @@ class ReducingMapper(SingleDimensionMapper):
     
     def _map_fn(self,z):
         k = self.k
-        sgn = sign(z)
-        z = abs(z)
+        sgn,z = signabs(z)
         return sgn * self.out_range * log(z/self.in_range*k+1)/log(k+1)
         
 
@@ -116,9 +114,12 @@ class OttesSCMotorMapper(CoordinateMapperFn):
     the other in the x-negative hemisheet.
     """
     
-    A = Number(default=5.3)
-    Bu = Number(default=1.8)
-    Bv = Number(default=1.8)
+    A = Number(default=5.3, doc="""
+       Shape parameter A, in degrees""")
+    Bu = Number(default=1.8, doc="""
+       Rostral-caudal scale parameter, in mm""")
+    Bv = Number(default=1.8, doc="""
+       Orthogonal (medial-lateral?) scale paraemter in mm/deg""")
 
     mm_scale = Number(default=8.0,doc="""
        Scale factor to convert constants Bu and Bv from mm to sheet
@@ -135,14 +136,9 @@ class OttesSCMotorMapper(CoordinateMapperFn):
         R = x * self.decoder_sheet.amplitude_scale 
         phi = y * self.decoder_sheet.direction_scale * pi/180
 
-        if R < 0:
-            Rsign = -1
-        else:
-            Rsign = 1
-            
-        R = abs(R)
+        Rsign,R = signabs(R)
         
-        u = Rsign * Bu * log(sqrt(R**2 + A**2 + 2*A*R*cos(phi))) - Rsign*Bu*log(A)
+        u = Rsign * Bu * (log(sqrt(R**2 + A**2 + 2*A*R*cos(phi))) - log(A))
         v = Bv * atan((R*sin(phi))/(R*cos(phi)+A))
         
         return u,v
