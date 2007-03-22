@@ -42,7 +42,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         gaussian_width = 0.02
         gaussian_height = 0.9
 
-        input_pattern = topo.patterns.basic.Gaussian(
+        self.input_pattern = topo.patterns.basic.Gaussian(
             bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))),
             scale=gaussian_height,
             aspect_ratio=gaussian_width/gaussian_height,
@@ -77,7 +77,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         sheetR = Sheet()
         sheetG = Sheet()
         sheetB = Sheet()
-        retina = GeneratorSheet(input_generator=input_pattern)
+        retina = GeneratorSheet(input_generator=self.input_pattern)
         retina.print_level = topo.base.parameterizedobject.WARNING
 
         # For a new sheet_group named Miata:
@@ -116,12 +116,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         GeneratorSheet.period = 1.0
         GeneratorSheet.nominal_density = 5
         
-        topo.patterns.basic.Line.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        topo.patterns.basic.Line.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        topo.patterns.basic.Line.orientation = Dynamic(lambda :random.uniform(-pi,pi))
-        topo.patterns.basic.Line.thickness = 0.02
-        topo.patterns.basic.Line.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
-        
+         
         # rf som parameters
         CFSOM.nominal_density = 5
         CFSOM.learning_length = 10000
@@ -131,7 +126,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         # build simulation
         s = topo.base.simulation.Simulation()
         
-        s['retina'] = GeneratorSheet(input_generator=topo.patterns.basic.Line(),nominal_density=3)
+        s['retina'] = GeneratorSheet(input_generator=self.input_pattern,nominal_density=3)
         s['retina'].print_level = topo.base.parameterizedobject.WARNING
         s['V1'] = CFSOM(nominal_density=3)
         s['V1'].print_level = topo.base.parameterizedobject.WARNING
