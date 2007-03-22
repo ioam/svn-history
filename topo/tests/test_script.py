@@ -126,7 +126,9 @@ def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None
 
 
 
-
+# CB: ought to tell users that they should expect variation in results etc
+# so they might know what is significant. Or use repeat(3 or 4) and return
+# the minimum value to try to make the result more reliable.
 def time_sim_run(script="examples/lissom_oo_or.ty",iterations=10):
     """
     Execute the script in __main__, then time topo.sim.run(iterations).
