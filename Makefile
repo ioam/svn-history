@@ -115,12 +115,11 @@ speed-tests: ${SPEEDTESTS}
 %_TEST: %_DATA
 	./topographica -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA")'
 
-#  CB: will be able to specify number of iterations etc like for slow-tests.
 %_SPEEDDATA:
-	./topographica -c "from topo.tests.test_script import generate_speed_data; generate_speed_data('examples/${notdir $*}')"
+	./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/${notdir $*}",iterations=250,data_filename="topo/tests/${notdir $*}_SPEEDDATA")'
 
 %_SPEEDTEST: %_SPEEDDATA
-	./topographica -c "from topo.tests.test_script import compare_speed_data; compare_speed_data('examples/${notdir $*}')"
+	./topographica -c 'from topo.tests.test_script import compare_speed_data; compare_speed_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_SPEEDDATA")'
 
 .SECONDARY: ${SPEEDDATA} ${SLOWDATA} # Make sure that *_*DATA is kept around
 
