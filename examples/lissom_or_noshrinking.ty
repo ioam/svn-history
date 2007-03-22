@@ -98,7 +98,7 @@ topo.sim.connect('Retina','V1',delay=FixedPoint("0.05"),
 
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
-                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=2*0.03),
+                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
                  nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0) 
             
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
