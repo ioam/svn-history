@@ -23,6 +23,7 @@ class RandomGenerator(PatternGenerator):
     # so they aren't shown in auto-generated lists of parameters (e.g. in the GUI)
     x       = Number(hidden = True)
     y       = Number(hidden = True)
+    size    = Number(hidden = True)
     orientation   = Number(hidden = True)
 
     def _distrib(self,shape,**params):
