@@ -93,7 +93,7 @@ def activityplot(sheet,title=None,cmap=pylab.cm.Greys):
     """
     Plots the activity in a sheet.
 
-    Get's plot's extent from sheet.bounds.aarect(). Adds a title and
+    Gets plot's extent from sheet.bounds.aarect(). Adds a title and
     allows the selection of a colormap.
     """
     l,b,r,t = sheet.bounds.aarect().lbrt()
@@ -230,8 +230,6 @@ def plot_coord_mapping(mapper,sheet,style='b-'):
     are mapped.
     """
 
-    # JPALERT:  Not sure where this fn should go...
-    
     from pylab import plot,hold,ishold
     
     xs = sheet.sheet_rows()
