@@ -49,7 +49,7 @@ from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 ##        rows,cols = output_activity.shape
 ##
 ##        # JABALERT: Is this correct?
-##	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
+##	single_connection_learning_rate = self.constant_sum_connection_rate(proj,learning_rate)
 ##
 ##        # avoid evaluating these references each time in the loop
 ##        single_cf_fn = self.single_cf_fn
@@ -95,7 +95,7 @@ class CFPLF_Trace(CFPLearningFn):
     def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
         cfs = proj._cfs
         rows,cols = output_activity.shape
-        single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
+        single_connection_learning_rate = self.constant_sum_connection_rate(proj,learning_rate)
         single_cf_fn = self.single_cf_fn
         ##Initialise traces to zero if they don't already exist
         if not hasattr(self,'traces'):
@@ -135,7 +135,7 @@ class CFPLF_OutstarHebbian(CFPLearningFn):
     def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
         cfs = proj._cfs
         rows,cols = output_activity.shape
-	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
+	single_connection_learning_rate = self.constant_sum_connection_rate(proj,learning_rate)
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
 	outstar_wsum = zeros(input_activity.shape)
@@ -214,7 +214,7 @@ class HomeoSynaptic(CFPLearningFn):
         activity_norm = 1.0 + self.beta_n * \
            ((self.averages - self.activity_target)/self.activity_target)
         rows,cols = output_activity.shape
-	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
+	single_connection_learning_rate = self.constant_sum_connection_rate(proj,learning_rate)
 
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
