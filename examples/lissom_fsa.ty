@@ -170,77 +170,78 @@ def n_units(x):
     return len(Numeric.nonzero(Numeric.ravel(x.cf(*center_unit).mask)))
 
 # Convenience variable: timescale
-st=1.0/num_inputs
+st=1.0/2.0
 
 ### Lateral excitatory bounds changes
-topo.sim.schedule_command(  99, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
-topo.sim.schedule_command( 249, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1167,min_radius=0.0625))')
-topo.sim.schedule_command( 499, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1333,min_radius=0.0625))')
-topo.sim.schedule_command( 999, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1333,min_radius=0.0625))')
-topo.sim.schedule_command(1499, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1333,min_radius=0.0625))')
-topo.sim.schedule_command(1999, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
-topo.sim.schedule_command(2499, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
-topo.sim.schedule_command(3249, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
-topo.sim.schedule_command(4999, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
-topo.sim.schedule_command(9999, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
+topo.sim.schedule_command( 200*st, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
+topo.sim.schedule_command( 500*st, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1167,min_radius=0.0625))')
+topo.sim.schedule_command(1000*st, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1333,min_radius=0.0625))')
+topo.sim.schedule_command(2000*st, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1333,min_radius=0.0625))')
+topo.sim.schedule_command(3000*st, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1333,min_radius=0.0625))')
+topo.sim.schedule_command(4000*st, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
+topo.sim.schedule_command(5000*st, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
+topo.sim.schedule_command(6500*st, 'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
+topo.sim.schedule_command(10000*st,'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
+topo.sim.schedule_command(20000*st,'topo.sim["FSA"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
 
 
 ### Lateral excitatory learning rate changes
 LE=topo.sim["FSA"].projections()["LateralExcitatory"]
-topo.sim.schedule_command(  99, 'topo.sim["FSA"].projections()["LateralExcitatory"].learning_rate=0.063375*n_units(LE)')
-topo.sim.schedule_command( 249, 'topo.sim["FSA"].projections()["LateralExcitatory"].learning_rate=0.0316875*n_units(LE)')
+topo.sim.schedule_command( 200*st, 'topo.sim["FSA"].projections()["LateralExcitatory"].learning_rate=0.063375*n_units(LE)')
+topo.sim.schedule_command( 500*st, 'topo.sim["FSA"].projections()["LateralExcitatory"].learning_rate=0.0316875*n_units(LE)')
 
 
 ### Afferent learning rate changes
 ### Note that AON and AOF's masks are square but not circular
 AON=topo.sim["FSA"].projections()["LGNOnAfferent"]
-topo.sim.schedule_command(  99, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.004667*n_units(AON)')
-topo.sim.schedule_command( 249, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.003333*n_units(AON)')
-topo.sim.schedule_command( 499, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.003333*n_units(AON)')
-topo.sim.schedule_command( 999, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.002667*n_units(AON)')
-topo.sim.schedule_command(1499, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.002667*n_units(AON)')
-topo.sim.schedule_command(1999, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.002*n_units(AON)')
-topo.sim.schedule_command(2499, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.002*n_units(AON)')
-topo.sim.schedule_command(3249, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.002*n_units(AON)')
-topo.sim.schedule_command(4999, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.002*n_units(AON)')
-topo.sim.schedule_command(9999, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.001*n_units(AON)')
+topo.sim.schedule_command( 200*st, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.004667*n_units(AON)')
+topo.sim.schedule_command( 500*st, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.003333*n_units(AON)')
+topo.sim.schedule_command(1000*st, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.003333*n_units(AON)')
+topo.sim.schedule_command(2000*st, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.002667*n_units(AON)')
+topo.sim.schedule_command(3000*st, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.002667*n_units(AON)')
+topo.sim.schedule_command(4000*st, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.002*n_units(AON)')
+topo.sim.schedule_command(5000*st, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.002*n_units(AON)')
+topo.sim.schedule_command(6500*st, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.002*n_units(AON)')
+topo.sim.schedule_command(10000*st, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.002*n_units(AON)')
+topo.sim.schedule_command(20000*st, 'topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.001*n_units(AON)')
+
 AOF=topo.sim["FSA"].projections()["LGNOffAfferent"]
-topo.sim.schedule_command(  99, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.004667*n_units(AOF)')
-topo.sim.schedule_command( 249, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.003333*n_units(AOF)')
-topo.sim.schedule_command( 499, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.003333*n_units(AOF)')
-topo.sim.schedule_command( 999, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.002667*n_units(AOF)')
-topo.sim.schedule_command(1499, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.002667*n_units(AOF)')
-topo.sim.schedule_command(1999, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.002*n_units(AOF)')
-topo.sim.schedule_command(2499, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.002*n_units(AOF)')
-topo.sim.schedule_command(3249, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.002*n_units(AOF)')
-topo.sim.schedule_command(4999, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.002*n_units(AOF)')
-topo.sim.schedule_command(9999, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.001*n_units(AOF)')
+topo.sim.schedule_command( 200*st, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.004667*n_units(AOF)')
+topo.sim.schedule_command( 500*st, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.003333*n_units(AOF)')
+topo.sim.schedule_command(1000*st, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.003333*n_units(AOF)')
+topo.sim.schedule_command(2000*st, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.002667*n_units(AOF)')
+topo.sim.schedule_command(3000*st, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.002667*n_units(AOF)')
+topo.sim.schedule_command(4000*st, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.002*n_units(AOF)')
+topo.sim.schedule_command(5000*st, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.002*n_units(AOF)')
+topo.sim.schedule_command(6500*st, 'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.002*n_units(AOF)')
+topo.sim.schedule_command(10000*st,'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.002*n_units(AOF)')
+topo.sim.schedule_command(20000*st,'topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.001*n_units(AOF)')
 
 
 ### Activation function threshold changes
-topo.sim.schedule_command(  99, 'topo.sim["FSA"].output_fn.lower_bound=0.093; topo.sim["FSA"].output_fn.upper_bound=0.643')
-topo.sim.schedule_command( 249, 'topo.sim["FSA"].output_fn.lower_bound=0.103; topo.sim["FSA"].output_fn.upper_bound=0.653')
-topo.sim.schedule_command( 499, 'topo.sim["FSA"].output_fn.lower_bound=0.133; topo.sim["FSA"].output_fn.upper_bound=0.663')
-topo.sim.schedule_command( 999, 'topo.sim["FSA"].output_fn.lower_bound=0.163; topo.sim["FSA"].output_fn.upper_bound=0.683')
-topo.sim.schedule_command(1499, 'topo.sim["FSA"].output_fn.lower_bound=0.183; topo.sim["FSA"].output_fn.upper_bound=0.713')
-topo.sim.schedule_command(1999, 'topo.sim["FSA"].output_fn.lower_bound=0.183; topo.sim["FSA"].output_fn.upper_bound=0.743')
-topo.sim.schedule_command(2499, 'topo.sim["FSA"].output_fn.lower_bound=0.193; topo.sim["FSA"].output_fn.upper_bound=0.773')
-topo.sim.schedule_command(3249, 'topo.sim["FSA"].output_fn.lower_bound=0.203; topo.sim["FSA"].output_fn.upper_bound=0.803')
-topo.sim.schedule_command(4999, 'topo.sim["FSA"].output_fn.lower_bound=0.213; topo.sim["FSA"].output_fn.upper_bound=0.833')
-topo.sim.schedule_command(9999, 'topo.sim["FSA"].output_fn.lower_bound=0.223; topo.sim["FSA"].output_fn.upper_bound=0.863')
+topo.sim.schedule_command( 200*st, 'topo.sim["FSA"].output_fn.lower_bound=0.093; topo.sim["FSA"].output_fn.upper_bound=0.643')
+topo.sim.schedule_command( 500*st, 'topo.sim["FSA"].output_fn.lower_bound=0.103; topo.sim["FSA"].output_fn.upper_bound=0.653')
+topo.sim.schedule_command(1000*st, 'topo.sim["FSA"].output_fn.lower_bound=0.133; topo.sim["FSA"].output_fn.upper_bound=0.663')
+topo.sim.schedule_command(2000*st, 'topo.sim["FSA"].output_fn.lower_bound=0.163; topo.sim["FSA"].output_fn.upper_bound=0.683')
+topo.sim.schedule_command(3000*st, 'topo.sim["FSA"].output_fn.lower_bound=0.183; topo.sim["FSA"].output_fn.upper_bound=0.713')
+topo.sim.schedule_command(4000*st, 'topo.sim["FSA"].output_fn.lower_bound=0.183; topo.sim["FSA"].output_fn.upper_bound=0.743')
+topo.sim.schedule_command(5000*st, 'topo.sim["FSA"].output_fn.lower_bound=0.193; topo.sim["FSA"].output_fn.upper_bound=0.773')
+topo.sim.schedule_command(6500*st, 'topo.sim["FSA"].output_fn.lower_bound=0.203; topo.sim["FSA"].output_fn.upper_bound=0.803')
+topo.sim.schedule_command(10000*st,'topo.sim["FSA"].output_fn.lower_bound=0.213; topo.sim["FSA"].output_fn.upper_bound=0.833')
+topo.sim.schedule_command(20000*st,'topo.sim["FSA"].output_fn.lower_bound=0.223; topo.sim["FSA"].output_fn.upper_bound=0.863')
 
 
 ### Settling steps changes
-topo.sim.schedule_command(  99, 'topo.sim["FSA"].tsettle=9')
-topo.sim.schedule_command( 249, 'topo.sim["FSA"].tsettle=9')
-topo.sim.schedule_command( 499, 'topo.sim["FSA"].tsettle=9')
-topo.sim.schedule_command( 999, 'topo.sim["FSA"].tsettle=10')
-topo.sim.schedule_command(1499, 'topo.sim["FSA"].tsettle=10')
-topo.sim.schedule_command(1999, 'topo.sim["FSA"].tsettle=10')
-topo.sim.schedule_command(2499, 'topo.sim["FSA"].tsettle=11')
-topo.sim.schedule_command(3249, 'topo.sim["FSA"].tsettle=12')
-topo.sim.schedule_command(4999, 'topo.sim["FSA"].tsettle=13')
-topo.sim.schedule_command(9999, 'topo.sim["FSA"].tsettle=13')
+topo.sim.schedule_command( 200*st, 'topo.sim["FSA"].tsettle=9')
+topo.sim.schedule_command( 500*st, 'topo.sim["FSA"].tsettle=9')
+topo.sim.schedule_command(1000*st, 'topo.sim["FSA"].tsettle=9')
+topo.sim.schedule_command(2000*st, 'topo.sim["FSA"].tsettle=10')
+topo.sim.schedule_command(3000*st, 'topo.sim["FSA"].tsettle=10')
+topo.sim.schedule_command(4000*st, 'topo.sim["FSA"].tsettle=10')
+topo.sim.schedule_command(5000*st, 'topo.sim["FSA"].tsettle=11')
+topo.sim.schedule_command(6500*st, 'topo.sim["FSA"].tsettle=12')
+topo.sim.schedule_command(10000*st,'topo.sim["FSA"].tsettle=13')
+topo.sim.schedule_command(20000*st,'topo.sim["FSA"].tsettle=13')
 
 
 # default locations for model editor
