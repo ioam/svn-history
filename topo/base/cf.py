@@ -403,27 +403,13 @@ class CFPLearningFn(ParameterizedObject):
     _abstract_class_name = "CFPLearningFn"
         
 
-    def constant_sum_connection_rate(self,cfs,learning_rate):
+    def constant_sum_connection_rate(self,proj,learning_rate):
 	""" 
 	Return the learning rate for a single connection assuming that
         the total rate is to be divided evenly among all the units in
         the connection field.
 	"""
-        return learning_rate/self.n_units(cfs)
-
-
-    def n_units(self,cfs):
-	"""Return the number of unmasked units in a typical ConnectionField."""      
-        ### JCALERT! To check with Jim: right now, we take the number of units
-        ### at the center of the matrix.  It would be better to calculate it
-        ### directly from the sheet_density and bounds, but it is not currently
-        ### possible to access those from here.  Example:
-        #center_r,center_c = sheet2matrixidx(0,0,bounds,xdensity,ydensity)
-	rows = len(cfs)
-	cols = len(cfs[0])
-	cf = cfs[rows/2][cols/2]
-        # The number of units in the mask 
-	return float(len(Numeric.nonzero(Numeric.ravel(cf.mask))))
+        return learning_rate/proj.n_units()
 
 
     # JABALERT: Should the learning_rate be a parameter of this object instead of an argument?
@@ -465,7 +451,7 @@ class CFPLF_Plugin(CFPLearningFn):
         """Apply the specified single_cf_fn to every CF."""
         cfs = proj._cfs
         rows,cols = output_activity.shape
-	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
+	single_connection_learning_rate = self.constant_sum_connection_rate(proj,learning_rate)
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
 	for r in xrange(rows):
