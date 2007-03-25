@@ -524,7 +524,10 @@ class TopoConsole(Frame):
         """
         for win in self.auto_refresh_panels:
             win.refresh()
+
         self.update_idletasks()
+
+        
 
     def refresh_activity_windows(self):
         """
@@ -748,6 +751,26 @@ class GUIToplevel(Toplevel):
         Toplevel.__init__(self,parent,config)
         self.protocol('WM_DELETE_WINDOW',self.destroy)
         self.resizable(1,1)
+
+
+
+# CB: Some notes about tkgui
+# 
+# All our windows that open from topoconsole inherit from Frame.  I'm
+# a bit confused about why we do that, instead of using Toplevel.
+# Using Toplevel seems more natural to me.
+#
+# I also think that TopoConsole should not inherit from Frame, but
+# should inherit from Tk.  After all, topoconsole is the main application
+# window.
+#
+# Along with sorting out all the various refresh() methods that we
+# have, fixing these things might be worthwhile in that programming
+# tkgui could become less confusing (that is, once you understand 
+# tkgui itself - which is something else that needs fixing...).
+
+
+
 
 
 if __name__ != '__main__':
