@@ -233,7 +233,8 @@ class RCells_CFPL_Hebbian(CFPLearningFn):
     Feedforward learning rule for the R-cells.
     """
 
-    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
+        cfs = proj._cfs
         rows,cols = output_activity.shape
         for r in xrange(rows):
             for c in xrange(cols):
@@ -480,7 +481,8 @@ class ECells_Learning(CFPLearningFn):
     alpha_p = Number(default=1.0,doc="Learning rate.")
     alpha_n = Number(default=0.01,doc="Unlearning rate.") 
     
-    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
+        cfs = proj._cfs
         rows,cols = output_activity.shape
         for r in xrange(rows):
             for c in xrange(cols):

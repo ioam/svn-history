@@ -28,7 +28,8 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
     weights are updated during learning, to speed up later operations
     that might depend on it.
     """
-    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
+        cfs = proj._cfs
 	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
         rows,cols = output_activity.shape
         irows,icols = input_activity.shape

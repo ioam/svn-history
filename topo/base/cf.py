@@ -427,7 +427,7 @@ class CFPLearningFn(ParameterizedObject):
 
 
     # JABALERT: Should the learning_rate be a parameter of this object instead of an argument?
-    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
         """
         Apply this learning function to the given set of ConnectionFields,
         and input and output activities, using the given learning_rate.
@@ -439,7 +439,7 @@ class CFPLF_Identity(CFPLearningFn):
     """CFLearningFunction performing no learning."""
     single_cf_fn = LearningFnParameter(default=IdentityLF(),constant=True)
   
-    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
         pass
 
 
@@ -461,8 +461,9 @@ class CFPLF_Plugin(CFPLearningFn):
     single_cf_fn = LearningFnParameter(default=Hebbian(),
         doc="Accepts a LearningFn that will be applied to each CF individually.")
        
-    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
+        cfs = proj._cfs
         rows,cols = output_activity.shape
 	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
         # avoid evaluating these references each time in the loop
@@ -815,12 +816,12 @@ class CFProjection(Projection):
 
     def learn(self):
         """
-        For a CFProjection, learn consist in calling the learning_fn.
+        For a CFProjection, learn consists of calling the learning_fn.
         """
         # Learning is performed if the input_buffer has already been set,
         # i.e. there is an input to the Projection.
         if self.input_buffer != None:
-            self.learning_fn(self._cfs,self.input_buffer,self.dest.activity,self.learning_rate)
+            self.learning_fn(self,self.input_buffer,self.dest.activity,self.learning_rate)
 
 
     def apply_learn_output_fn(self,mask):
