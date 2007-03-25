@@ -97,17 +97,23 @@ compare_oo_or:
 	./topographica -c "comparisons=True" topo/tests/reference/lissom_oo_or_reference.ty 
 
 # Test that the specified scripts haven't changed in results or speed.
-SLOWSCRIPTS=^lissom_oo_or.ty ^som_retinotopy.ty
-#SLOWSCRIPTS=^lissom_oo_or.ty ^som_retinotopy.ty ^lissom_oo_or_homeomaxent.ty ^lissom_or.ty ^lissom_or_homeomaxent.ty ^lissom_photo_or.ty 
+#SCRIPTS=^cfsom_or.ty ^lissom_oo_or.ty ^som_retinotopy.ty
+SCRIPTS=^cfsom_or.ty ^hierarchical.ty ^lissom_or.ty ^lissom_oo_or.ty ^lissom_oo_or_dy.ty ^lissom_oo_od.ty ^lissom_oo_or_homeomaxent.ty ^lissom_or_homeomaxent.ty ^lissom_or_homeoscale.ty ^lissom_or_noshrinking.ty ^laminar_oo_or.ty ^laminar_or.ty ^som_retinotopy.ty ^sullivan_neurocomputing04.ty ^sullivan_nn06.ty
+# ^lissom_photo_or.ty # Omitted because photos are not always installed
 
-SLOWDATA =${subst ^,topo/tests/,${subst .ty,.ty_DATA,${SLOWSCRIPTS}}}
-SLOWTESTS=${subst ^,topo/tests/,${subst .ty,.ty_TEST,${SLOWSCRIPTS}}}
-SPEEDSCRIPTS=${SLOWSCRIPTS}
+
+TRAINSCRIPTS=${SCRIPTS}
+TRAINDATA =${subst ^,topo/tests/,${subst .ty,.ty_DATA,${TRAINSCRIPTS}}}
+TRAINTESTS=${subst ^,topo/tests/,${subst .ty,.ty_TEST,${TRAINSCRIPTS}}}
+
+SPEEDSCRIPTS=${SCRIPTS}
 SPEEDDATA =${subst ^,topo/tests/,${subst .ty,.ty_SPEEDDATA,${SPEEDSCRIPTS}}}
 SPEEDTESTS=${subst ^,topo/tests/,${subst .ty,.ty_SPEEDTEST,${SPEEDSCRIPTS}}}
 
-slow-tests: ${SLOWTESTS}
+train-tests: ${TRAINTESTS}
 speed-tests: ${SPEEDTESTS}
+
+slow-tests: train-tests snapshot-tests speed-tests
 
 
 # General rules for generating test data and running the tests
@@ -123,14 +129,14 @@ speed-tests: ${SPEEDTESTS}
 %_SPEEDTEST: %_SPEEDDATA
 	./topographica -c 'from topo.tests.test_script import compare_speed_data; compare_speed_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_SPEEDDATA")'
 
-.SECONDARY: ${SPEEDDATA} ${SLOWDATA} # Make sure that *_*DATA is kept around
+.SECONDARY: ${SPEEDDATA} ${TRAINDATA} # Make sure that *_*DATA is kept around
 
 
 snapshot-tests:
 	./topographica -c "default_density=4" examples/lissom_oo_or.ty -c "topo.sim.run(1)" -c "from topo.commands.basic import save_snapshot ; save_snapshot('snapshot-tests.typ')"
 	./topographica -c "from topo.commands.basic import load_snapshot ; load_snapshot('snapshot-tests.typ')"
 	./topographica -c "default_density=4" examples/som_retinotopy.ty -c "topo.sim.run(1)" -c "from topo.commands.basic import save_snapshot ; save_snapshot('snapshot-tests.typ')"
-	./topographica -c "from topo.commands.basic import load_snapshot ; load_snapshot('snapshot-tests.typ')"
+	./topographica -c "default_density=4" examples/som_retinotopy.ty -c "from topo.commands.basic import load_snapshot ; load_snapshot('snapshot-tests.typ')"
 	rm -f 'snapshot-tests.typ'
 
 
