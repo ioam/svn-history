@@ -346,6 +346,7 @@ def centroid(pts,weights):
     The pts argument should be an array of points, one per row,
     and weights should be a vector of weights.
     """
+    # CEBALERT: use numpy.sum? Worthwhile if weights is a numpy.array.
     return numpy.dot(numpy.transpose(pts),weights)/sum(weights)
 
 def signabs(x):
