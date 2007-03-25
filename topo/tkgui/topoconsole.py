@@ -759,6 +759,8 @@ class GUIToplevel(Toplevel):
 # All our windows that open from topoconsole inherit from Frame.  I'm
 # a bit confused about why we do that, instead of using Toplevel.
 # Using Toplevel seems more natural to me.
+# (From the web, I find that at least 1 person agrees with this:
+# http://www.thescripts.com/forum/thread492532.html)
 #
 # I also think that TopoConsole should not inherit from Frame, but
 # should inherit from Tk.  After all, topoconsole is the main application
