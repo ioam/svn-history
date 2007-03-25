@@ -222,7 +222,7 @@ topo.sim.schedule_command(20000*st,'OFF.learning_rate=0.001*n_units(OFF)')
 
 
 ### Activation function threshold changes
-OF=topo.sim["V1"].output_fn
+OF=topo.sim["FSA"].output_fn
 
 topo.sim.schedule_command( 200*st, 'OF.lower_bound=0.093; OF.upper_bound=0.643')
 topo.sim.schedule_command( 500*st, 'OF.lower_bound=0.103; OF.upper_bound=0.653')
