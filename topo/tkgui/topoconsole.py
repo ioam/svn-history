@@ -726,7 +726,9 @@ class TopoConsole(Frame):
         self.messageBar.message('state', message)
 
         
-        
+
+# CB: why do we have this class? Does self.resizable(1,1) add anything?
+# Why not just use Toplevel()?
 class GUIToplevel(Toplevel):
     """
     Each new TK window requires a new Toplevel class that contains the
