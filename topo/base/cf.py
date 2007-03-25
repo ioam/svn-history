@@ -777,8 +777,8 @@ class CFProjection(Projection):
         ### calculate it directly from the target sheet density and
         ### the weight_bounds.  Example:
         #center_r,center_c = sheet2matrixidx(0,0,bounds,xdensity,ydensity)
-	rows,cols=self.shape
-	cf = cfs[rows/2][cols/2]
+        rows,cols=self.cfs_shape
+        cf = self._cfs[rows/2][cols/2]
 	return len(Numeric.nonzero(Numeric.ravel(cf.mask)))
 
 
