@@ -32,6 +32,7 @@ from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.outputfns.basic import GeneralizedLogistic, Sigmoid
 from topo.outputfns.homeostatic import HomeostaticMaxEnt
 from topo.misc.numbergenerators import UniformRandom
+from topo.patterns.basic import Gaussian
 
 
 topo.sim.name = "laminar_oo_or"
