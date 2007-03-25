@@ -121,59 +121,56 @@ topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingB
 st=1.0/num_inputs
 
 ### Lateral excitatory bounds changes
-topo.sim.startup_commands.append('LE=topo.sim["V1"].projections()["LateralExcitatory"]')
+LE='topo.sim["V1"].projections()["LateralExcitatory"]'
 
-topo.sim.schedule_command(  200*st,'LE.change_bounds(BoundingBox(radius=0.0625))')
-topo.sim.schedule_command(  500*st,'LE.change_bounds(BoundingBox(radius=0.04375))')
-topo.sim.schedule_command( 1000*st,'LE.change_bounds(BoundingBox(radius=0.035))')
-topo.sim.schedule_command( 2000*st,'LE.change_bounds(BoundingBox(radius=0.02800))')
-topo.sim.schedule_command( 3000*st,'LE.change_bounds(BoundingBox(radius=0.02240))')
-topo.sim.schedule_command( 4000*st,'LE.change_bounds(BoundingBox(radius=0.01344))')
-topo.sim.schedule_command( 5000*st,'LE.change_bounds(BoundingBox(radius=0.00806))')
-topo.sim.schedule_command( 6500*st,'LE.change_bounds(BoundingBox(radius=0.00484))')
-topo.sim.schedule_command( 8000*st,'LE.change_bounds(BoundingBox(radius=0.00290))')
-topo.sim.schedule_command(20000*st,'LE.change_bounds(BoundingBox(radius=0.00174))')
+topo.sim.schedule_command(  200*st,LE+'.change_bounds(BoundingBox(radius=0.0625))')
+topo.sim.schedule_command(  500*st,LE+'.change_bounds(BoundingBox(radius=0.04375))')
+topo.sim.schedule_command( 1000*st,LE+'.change_bounds(BoundingBox(radius=0.035))')
+topo.sim.schedule_command( 2000*st,LE+'.change_bounds(BoundingBox(radius=0.02800))')
+topo.sim.schedule_command( 3000*st,LE+'.change_bounds(BoundingBox(radius=0.02240))')
+topo.sim.schedule_command( 4000*st,LE+'.change_bounds(BoundingBox(radius=0.01344))')
+topo.sim.schedule_command( 5000*st,LE+'.change_bounds(BoundingBox(radius=0.00806))')
+topo.sim.schedule_command( 6500*st,LE+'.change_bounds(BoundingBox(radius=0.00484))')
+topo.sim.schedule_command( 8000*st,LE+'.change_bounds(BoundingBox(radius=0.00290))')
+topo.sim.schedule_command(20000*st,LE+'.change_bounds(BoundingBox(radius=0.00174))')
 
 ### Lateral excitatory learning rate changes
-topo.sim.schedule_command(  200*st,'LE.learning_rate=0.12168*LE.n_units()')
-topo.sim.schedule_command(  500*st,'LE.learning_rate=0.06084*LE.n_units()')
-topo.sim.schedule_command( 1000*st,'LE.learning_rate=0.06084*LE.n_units()')
-topo.sim.schedule_command( 2000*st,'LE.learning_rate=0.06084*LE.n_units()')
-topo.sim.schedule_command( 3000*st,'LE.learning_rate=0.06084*LE.n_units()')
-topo.sim.schedule_command( 4000*st,'LE.learning_rate=0.06084*LE.n_units()')
-topo.sim.schedule_command( 5000*st,'LE.learning_rate=0.06084*LE.n_units()')
-topo.sim.schedule_command( 6500*st,'LE.learning_rate=0.06084*LE.n_units()')
-topo.sim.schedule_command( 8000*st,'LE.learning_rate=0.06084*LE.n_units()')
-topo.sim.schedule_command(20000*st,'LE.learning_rate=0.06084*LE.n_units()')
+topo.sim.schedule_command(  200*st,LE+'.learning_rate=0.12168*'+LE+'.n_units()')
+topo.sim.schedule_command(  500*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
+topo.sim.schedule_command( 1000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
+topo.sim.schedule_command( 2000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
+topo.sim.schedule_command( 3000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
+topo.sim.schedule_command( 4000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
+topo.sim.schedule_command( 5000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
+topo.sim.schedule_command( 6500*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
+topo.sim.schedule_command( 8000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
+topo.sim.schedule_command(20000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 
 
 ### Afferent learning rate changes
-topo.sim.startup_commands.append('AFF=topo.sim["V1"].projections()["Afferent"]')
+AFF='topo.sim["V1"].projections()["Afferent"]'
 
-topo.sim.schedule_command(  500*st,'AFF.learning_rate=0.6850')
-topo.sim.schedule_command( 2000*st,'AFF.learning_rate=0.5480')
-topo.sim.schedule_command( 4000*st,'AFF.learning_rate=0.4110')
-topo.sim.schedule_command(20000*st,'AFF.learning_rate=0.2055')
+topo.sim.schedule_command(  500*st,AFF+'.learning_rate=0.6850')
+topo.sim.schedule_command( 2000*st,AFF+'.learning_rate=0.5480')
+topo.sim.schedule_command( 4000*st,AFF+'.learning_rate=0.4110')
+topo.sim.schedule_command(20000*st,AFF+'.learning_rate=0.2055')
 
 ### Schedule LISSOM output function threshold changes
-OF=topo.sim["V1"].output_fn
+OF='topo.sim["V1"].output_fn'
 
-topo.sim.schedule_command(  200*st,'OF.lower_bound=0.11; OF.upper_bound=0.66')
-topo.sim.schedule_command(  500*st,'OF.lower_bound=0.12; OF.upper_bound=0.67')
-topo.sim.schedule_command( 1000*st,'OF.lower_bound=0.15; OF.upper_bound=0.68')
-topo.sim.schedule_command( 2000*st,'OF.lower_bound=0.18; OF.upper_bound=0.70')
-topo.sim.schedule_command( 3000*st,'OF.lower_bound=0.20; OF.upper_bound=0.73')
-topo.sim.schedule_command( 4000*st,'OF.lower_bound=0.20; OF.upper_bound=0.76')
-topo.sim.schedule_command( 5000*st,'OF.lower_bound=0.21; OF.upper_bound=0.79')
-topo.sim.schedule_command( 6500*st,'OF.lower_bound=0.22; OF.upper_bound=0.82')
-topo.sim.schedule_command( 8000*st,'OF.lower_bound=0.23; OF.upper_bound=0.85')
-topo.sim.schedule_command(20000*st,'OF.lower_bound=0.24; OF.upper_bound=0.88')
+topo.sim.schedule_command(  200*st,OF+'.lower_bound=0.11;'+OF+'.upper_bound=0.66')
+topo.sim.schedule_command(  500*st,OF+'.lower_bound=0.12;'+OF+'.upper_bound=0.67')
+topo.sim.schedule_command( 1000*st,OF+'.lower_bound=0.15;'+OF+'.upper_bound=0.68')
+topo.sim.schedule_command( 2000*st,OF+'.lower_bound=0.18;'+OF+'.upper_bound=0.70')
+topo.sim.schedule_command( 3000*st,OF+'.lower_bound=0.20;'+OF+'.upper_bound=0.73')
+topo.sim.schedule_command( 4000*st,OF+'.lower_bound=0.20;'+OF+'.upper_bound=0.76')
+topo.sim.schedule_command( 5000*st,OF+'.lower_bound=0.21;'+OF+'.upper_bound=0.79')
+topo.sim.schedule_command( 6500*st,OF+'.lower_bound=0.22;'+OF+'.upper_bound=0.82')
+topo.sim.schedule_command( 8000*st,OF+'.lower_bound=0.23;'+OF+'.upper_bound=0.85')
+topo.sim.schedule_command(20000*st,OF+'.lower_bound=0.24;'+OF+'.upper_bound=0.88')
 
 #tsettle changes
 topo.sim.schedule_command( 2000*st,'topo.sim["V1"].tsettle=10')
 topo.sim.schedule_command( 5000*st,'topo.sim["V1"].tsettle=11')
 topo.sim.schedule_command( 6500*st,'topo.sim["V1"].tsettle=12')
 topo.sim.schedule_command( 8000*st,'topo.sim["V1"].tsettle=13')
-
-## Make sure that the startup commands have been run at least once
-for cmd in topo.sim.startup_commands: exec cmd
