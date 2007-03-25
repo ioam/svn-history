@@ -147,15 +147,9 @@ pil-uninstall:
 
 ##############################################################
 # Numeric (matrix library)
-# CEBALERT: we can remove this section (and other references
-# to numeric).
+# CB: will remove this section shortly...
 NUMERIC = Numeric-24.0
 NUMERIC_UNINSTALL =  ${PYTHON_LIB}/site-packages/Numeric
-
-numeric: ${NUMERIC}.tar.gz python
-	tar xzf ${NUMERIC}.tar.gz
-	cd ${NUMERIC}; ${PREFIX}/bin/python setup.py install
-	touch numeric
 
 numeric-clean:
 	rm -rf ${NUMERIC} 
