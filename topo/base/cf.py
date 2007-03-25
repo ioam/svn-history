@@ -388,7 +388,6 @@ class CFPResponseFnParameter(ClassSelectorParameter):
         super(CFPResponseFnParameter,self).__init__(CFPResponseFn,default=default,**params)        
 
 
-
 class CFPLearningFn(ParameterizedObject):
     """
     Compute new CFs for a CFProjection based on input and output activity values.
@@ -403,12 +402,18 @@ class CFPLearningFn(ParameterizedObject):
     """
     _abstract_class_name = "CFPLearningFn"
         
+
     def constant_sum_connection_rate(self,cfs,learning_rate):
 	""" 
 	Return the learning rate for a single connection assuming that
         the total rate is to be divided evenly among all the units in
         the connection field.
-	"""      
+	"""
+        return learning_rate/self.n_units(cfs)
+
+
+    def n_units(self,cfs):
+	"""Return the number of unmasked units in a typical ConnectionField."""      
         ### JCALERT! To check with Jim: right now, we take the number of units
         ### at the center of the matrix.  It would be better to calculate it
         ### directly from the sheet_density and bounds, but it is not currently
@@ -418,11 +423,15 @@ class CFPLearningFn(ParameterizedObject):
 	cols = len(cfs[0])
 	cf = cfs[rows/2][cols/2]
         # The number of units in the mask 
-	nb_unit = len(Numeric.nonzero(Numeric.ravel(cf.mask)))
-	constant_sum_connection_rate=learning_rate/float(nb_unit)
-	return constant_sum_connection_rate
+	return float(len(Numeric.nonzero(Numeric.ravel(cf.mask))))
 
+
+    # JABALERT: Should the learning_rate be a parameter of this object instead of an argument?
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+        """
+        Apply this learning function to the given set of ConnectionFields,
+        and input and output activities, using the given learning_rate.
+        """
         raise NotImplementedError
 
 
@@ -602,8 +611,9 @@ class CFProjection(Projection):
 
 
     # shape property defining the dimension of the _cfs field
-    def get_shape(self): return [len(self._cfs),len(self._cfs[0])]
+    def get_shape(self): return len(self._cfs),len(self._cfs[0])
     cfs_shape = property(get_shape)
+
 
 
     def __init__(self,initialize_cfs=True,**params):
@@ -759,13 +769,21 @@ class CFProjection(Projection):
         return weights_slice.bounds
 
 
+    def n_units(self):
+	"""Return the number of unmasked units in a typical ConnectionField."""      
+        ### JCALERT! Right now, we take the number of units at the
+        ### center of the cfs matrix.  It would be more reliable to
+        ### calculate it directly from the target sheet density and
+        ### the weight_bounds.  Example:
+        #center_r,center_c = sheet2matrixidx(0,0,bounds,xdensity,ydensity)
+	rows,cols=self.shape
+	cf = cfs[rows/2][cols/2]
+	return len(Numeric.nonzero(Numeric.ravel(cf.mask)))
+
+
     def cf(self,r,c):
         """Return the specified ConnectionField"""
         return self._cfs[r][c]
-
-
-    def get_shape(self):
-        return len(self._cfs),len(self._cfs[0])
 
 
     def get_view(self,sheet_x, sheet_y, timestamp):
