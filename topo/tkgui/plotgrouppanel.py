@@ -210,8 +210,19 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
         happens to the widgets, and the user can resize the window.
         """
         if self.auto_resize.get():
+            # geometry('') returns to default resizing behavior
+            # ("Tkinter Toplevel geometry" on comp.lang.python,
+            # http://groups.google.com/group/comp.lang.python/browse_thread/thread/b905714b901923b9/30674ae5a2eae363#30674ae5a2eae363)
             self.parent.geometry('')
+            
             self.parent.resizable(0,0)
+            # CEBALERT: need some kind of refresh on the window so
+            # that the resize/maximize button of the window
+            # decorations disappears (currently it disappears when the
+            # mouse goes over it). Similarly, in the 'else' part
+            # below, a window refresh is needed to display the
+            # resize/maximize button (currently it appears when the
+            # mouse goes over the area).
         else:
             self.parent.geometry(self.parent.geometry())
             self.parent.resizable(1,1)
