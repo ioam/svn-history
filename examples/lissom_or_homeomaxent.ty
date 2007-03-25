@@ -130,7 +130,7 @@ topo.sim.schedule_command( 8000*st,'topo.sim["V1"].projections()["LateralExcitat
 topo.sim.schedule_command(20000*st,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00174))')
 
 ### Lateral excitatory learning rate changes
-LE=topo.sim["V1"].projections()["LateralExcitatory"]
+topo.sim.startup_commands.append('LE=topo.sim["V1"].projections()["LateralExcitatory"]')
 
 topo.sim.schedule_command(  200*st,'LE.learning_rate=0.12168*LE.n_units()')
 topo.sim.schedule_command(  500*st,'LE.learning_rate=0.06084*LE.n_units()')
@@ -144,7 +144,7 @@ topo.sim.schedule_command( 8000*st,'LE.learning_rate=0.06084*LE.n_units()')
 topo.sim.schedule_command(20000*st,'LE.learning_rate=0.06084*LE.n_units()')
 
 ### Afferent learning rate changes
-AFF=topo.sim["V1"].projections()["Afferent"]
+topo.sim.startup_commands.append('AFF=topo.sim["V1"].projections()["Afferent"]')
 
 topo.sim.schedule_command(  500*st,'AFF.learning_rate=0.6850')
 topo.sim.schedule_command( 2000*st,'AFF.learning_rate=0.5480')

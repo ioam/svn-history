@@ -188,8 +188,8 @@ topo.sim.schedule_command( 500*st, 'LE.learning_rate=0.0316875*LE.n_units()')
 
 ### Afferent learning rate changes
 ### Note that AON and AOF's masks are square but not circular
-ON =topo.sim["FSA"].projections()["LGNOnAfferent"]
-OFF=topo.sim["FSA"].projections()["LGNOffAfferent"]
+topo.sim.startup_commands.append('ON =topo.sim["FSA"].projections()["LGNOnAfferent"]')
+topo.sim.startup_commands.append('OFF=topo.sim["FSA"].projections()["LGNOffAfferent"]')
 
 
 topo.sim.schedule_command( 200*st, 'ON.learning_rate=0.004667*ON.n_units()')
@@ -216,7 +216,7 @@ topo.sim.schedule_command(20000*st,'OFF.learning_rate=0.001*OFF.n_units()')
 
 
 ### Activation function threshold changes
-OF=topo.sim["FSA"].output_fn
+topo.sim.startup_commands.append('OF=topo.sim["FSA"].output_fn')
 
 topo.sim.schedule_command( 200*st, 'OF.lower_bound=0.093; OF.upper_bound=0.643')
 topo.sim.schedule_command( 500*st, 'OF.lower_bound=0.103; OF.upper_bound=0.653')
