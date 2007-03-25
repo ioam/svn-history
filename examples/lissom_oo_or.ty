@@ -221,6 +221,8 @@ topo.sim.schedule_command( 5000*st,'topo.sim["V1"].tsettle=11')
 topo.sim.schedule_command( 6500*st,'topo.sim["V1"].tsettle=12')
 topo.sim.schedule_command( 8000*st,'topo.sim["V1"].tsettle=13')
 
+## Make sure that the startup commands have been run at least once
+for cmd in topo.sim.startup_commands: exec cmd
 
 # default locations for model editor
 topo.sim['V1'    ].gui_x=306.0;  topo.sim['V1'    ].gui_y=225.0

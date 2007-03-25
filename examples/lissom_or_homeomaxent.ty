@@ -151,7 +151,8 @@ topo.sim.schedule_command( 2000*st,'AFF.learning_rate=0.5480')
 topo.sim.schedule_command( 4000*st,'AFF.learning_rate=0.4110')
 topo.sim.schedule_command(20000*st,'AFF.learning_rate=0.2055')
 
-topo.sim.run(0)
+## Make sure that the startup commands have been run at least once
+for cmd in topo.sim.startup_commands: exec cmd
 
 ## import hotshot,hotshot.stats
 ## prof = hotshot.Profile("abc")
