@@ -114,14 +114,6 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
 
 topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
 
-def n_units(x):
-    """
-    Same technique as in cf.py for counting the number of units.
-    """
-    density=topo.sim["V1"].nominal_density
-    center_unit=(int(density/2),int(density/2))
-    return len(Numeric.nonzero(Numeric.ravel(x.cf(*center_unit).mask)))
-
 # Convenience variable: timescale (s_t)
 st=1.0/num_inputs
 
@@ -140,22 +132,24 @@ topo.sim.schedule_command(20000*st,'topo.sim["V1"].projections()["LateralExcitat
 ### Lateral excitatory learning rate changes
 LE=topo.sim["V1"].projections()["LateralExcitatory"]
 
-topo.sim.schedule_command(  200*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.12168*n_units(LE)')
-topo.sim.schedule_command(  500*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command( 1000*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command( 2000*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command( 3000*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command( 4000*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command( 5000*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command( 6500*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command( 8000*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
-topo.sim.schedule_command(20000*st,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.06084*n_units(LE)')
+topo.sim.schedule_command(  200*st,'LE.learning_rate=0.12168*LE.n_units()')
+topo.sim.schedule_command(  500*st,'LE.learning_rate=0.06084*LE.n_units()')
+topo.sim.schedule_command( 1000*st,'LE.learning_rate=0.06084*LE.n_units()')
+topo.sim.schedule_command( 2000*st,'LE.learning_rate=0.06084*LE.n_units()')
+topo.sim.schedule_command( 3000*st,'LE.learning_rate=0.06084*LE.n_units()')
+topo.sim.schedule_command( 4000*st,'LE.learning_rate=0.06084*LE.n_units()')
+topo.sim.schedule_command( 5000*st,'LE.learning_rate=0.06084*LE.n_units()')
+topo.sim.schedule_command( 6500*st,'LE.learning_rate=0.06084*LE.n_units()')
+topo.sim.schedule_command( 8000*st,'LE.learning_rate=0.06084*LE.n_units()')
+topo.sim.schedule_command(20000*st,'LE.learning_rate=0.06084*LE.n_units()')
 
 ### Afferent learning rate changes
-topo.sim.schedule_command(  500*st,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.6850')
-topo.sim.schedule_command( 2000*st,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.5480')
-topo.sim.schedule_command( 4000*st,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.4110')
-topo.sim.schedule_command(20000*st,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.2055')
+AFF=topo.sim["V1"].projections()["Afferent"]
+
+topo.sim.schedule_command(  500*st,'AFF.learning_rate=0.6850')
+topo.sim.schedule_command( 2000*st,'AFF.learning_rate=0.5480')
+topo.sim.schedule_command( 4000*st,'AFF.learning_rate=0.4110')
+topo.sim.schedule_command(20000*st,'AFF.learning_rate=0.2055')
 
 topo.sim.run(0)
 
