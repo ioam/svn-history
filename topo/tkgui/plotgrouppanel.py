@@ -132,6 +132,18 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
         self.balloon.bind(self.auto_refresh_checkbutton,
             "Whether to regenerate this plot whenever the simulation time advances.")
 
+
+        ### Auto-resize checkbutton.
+        # See set_auto_resize() for more info.
+        self.auto_resize = BooleanVar()
+        auto_resize_checkbutton=Checkbutton(self.control_frame_1, text="Auto-resize",
+                                            variable=self.auto_resize,command=self.set_auto_resize)
+        auto_resize_checkbutton.pack(side=RIGHT)
+        self.auto_resize.set(True); self.set_auto_resize()
+        self.balloon.bind(auto_resize_checkbutton,
+            "Whether to resize this window automatically to fit the contents, or to allow the window to be resized manually.")
+
+
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
 	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plotgroup_key))
@@ -188,6 +200,21 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
 	"""Implemented in sub-classes."""
 	pass
 
+
+    def set_auto_resize(self):
+        """
+        If auto-resize on, window automatically resizes to fit widgets
+        (Tkinter default), and user cannot resize window.
+
+        If auto-resize is off, the window stays the same size whatever
+        happens to the widgets, and the user can resize the window.
+        """
+        if self.auto_resize.get():
+            self.parent.geometry('')
+            self.parent.resizable(0,0)
+        else:
+            self.parent.geometry(self.parent.geometry())
+            self.parent.resizable(1,1)
 
     def set_auto_refresh(self):
         """Function called by Widget when check-box clicked."""
