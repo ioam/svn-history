@@ -9,7 +9,6 @@ from numpy.oldnumeric import ones,Float32
 
 from topo.base.functionfamilies import LearningFn,LearningFnParameter
 from topo.base.parameterclasses import Number
-from topo.base.cf import CFPLearningFn
 
 # Imported here so that all learning functions will be in the same package
 from topo.base.functionfamilies import Hebbian
