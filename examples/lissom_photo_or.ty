@@ -38,6 +38,7 @@ from fixedpoint import FixedPoint
 
 import topo.patterns.basic
 import topo.patterns.random
+import topo.patterns.image
 
 from topo.patterns.basic import Gaussian
 from topo.sheets.lissom import LISSOM

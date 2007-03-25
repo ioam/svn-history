@@ -51,6 +51,7 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfns.homeostatic import HomeostaticMaxEnt
+from topo.patterns.basic import Gaussian
 
 topo.sim.name = "lissom_or_homeomaxent"
 
