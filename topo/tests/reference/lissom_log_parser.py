@@ -92,7 +92,7 @@ def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
     """
     # CB: this could be a general function, but I doubt anybody would use it.
     # Plus the hackalert below would have to be fixed.
-    assert topo_matrix.shape == lissom_matrix.shape, "topographica and c++ matrices are different shapes"
+    assert topo_matrix.shape == lissom_matrix.shape, "topographica array shape %s, but c++ matrix shape %s"%(topo_matrix.shape,lissom_matrix.shape)
     match_at=-1
     
     for dp in range(1,max_dp+1)[::-1]:
