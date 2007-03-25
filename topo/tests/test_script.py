@@ -184,5 +184,6 @@ def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
     
     new_time = time_sim_run(script,iterations)
 
-    print "["+script+"]"+ " Before: %f s   Now: %f s  (change=%f s, %f percent)"%(old_time,new_time,new_time-old_time,
-                                                                                  100.0*(new_time-old_time)/old_time)
+    # (printing to 0 dp might be better)
+    print "["+script+"]"+ "  Before: %2.1f s  Now: %2.1f s  (change=%2.1f s, %2.1f %)"\
+          %(old_time,new_time,new_time-old_time,100.0*(new_time-old_time)/old_time)
