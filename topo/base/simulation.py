@@ -510,6 +510,12 @@ class CommandEvent(Event):
     def __repr__(self):
         return "CommandEvent(time="+`self.time`+", command_string='"+self.command_string+"')"
 
+
+    def script_repr(self,prefix="    "):
+        """Generate a runnable command for creating this CommandEvent."""
+        return simulation_path+".schedule_command("+`self.time`+",'"+ self.command_string+"')"
+
+
     # CEBALERT: should we stop execution after detecting errors
     # (rather than just printing a warning) in __call__() and
     # __test()? After deciding, make docstrings match behavior.
@@ -891,8 +897,26 @@ class Simulation(ParameterizedObject):
 
         The parameters of the simulation object itself, such as
         its name, are not yet included.
+
+        Only scheduled commands that have not yet been executed are
+        included, because executed commands are not kept around.
         """
         ### JABALERT: It may be possible to generate the list of required imports too
-        ### Also need topo.sim.name
-        reps = [o.script_repr() for o in self.objects().values() + self.connections()]
-        return '\n\n\n'.join(reps)
+
+        objs  = [o.script_repr() for o in
+                 sorted(self.objects().values(), cmp=lambda x, y: cmp(x.name,y.name))]
+
+        conns = [o.script_repr() for o in
+                 sorted(self.connections(),      cmp=lambda x, y: cmp(x.name,y.name))]
+        
+        
+        cmds  = [o.script_repr() for o in
+                 sorted(sorted([e for e in self.events if isinstance(e,CommandEvent)],
+                               cmp=lambda x, y: cmp(x.command_string,y.command_string)),
+                        cmp=lambda x, y: cmp(x.time,y.time))]
+
+        return simulation_path+".name='"+self.name + "'" \
+               '\n\n\n\n# Objects:\n\n'            + '\n\n\n'.join(objs) + \
+               '\n\n\n\n# Connections:\n\n'        + '\n\n\n'.join(conns) + \
+               '\n\n\n\n# Scheduled commands:\n\n' +     '\n'.join(cmds)
+    
