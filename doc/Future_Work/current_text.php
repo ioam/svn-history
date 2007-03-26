@@ -87,19 +87,10 @@ plots.
 </li>
 
 <li>
-2006/11/23 (JB,JL): Matching lissom_oo_or with C++ lissom (do a 'make compare'
-to see the current matching status).
+2006/03/26 (CB): Matching lissom_oo_or with C++ lissom. Only retina-lgn weights
+don't match, but they match if topographica uses the user-specified lgn weights
+radius rather than the radius of the actual connection field.
 </li>
-
-
-<li>
-2006/02/20 (JB): binding help balloon to the widget (already bound to
-the label) in parametersframe so that help can be seen for objects
-that are e.g. being selected. <br />
-CB: I've kind of done this. It doesn't seem to be possible to have a
-balloon bound to the options in a ComboBox's list.
-</li>
-
 
 <li>
 2007/01/25 (CB): Set order and names of ParametersFrame's Ok, Apply,
@@ -109,11 +100,10 @@ translator_dictionary & its uses.
 </li>
 
 <li>
-2007/02/28 (CB): Should add simple timing functions -- what was the total
+2007/03/26 (CB): Should add simple timing functions -- what was the total
 time to run?  What components are taking a long time to run?  Guide
 the user for optimization, focusing on the components we expect to be
-the bottlenecks. How do I find out which libraries are being used by
-numpy functions? 
+the bottlenecks.
 <!--Add in general guide & reorganize.-->
 </li>
 
@@ -126,14 +116,10 @@ the subtract.reduce bug.)
 <!--libsndfile, pyaudiolab, jpeg (in PIL binary?), (mlabwrap) to go-->
 </li>
 
-</ul>
-
-
-
-
-<h3>Things we hope to take care of eventually</h3>
-
-<ul>
+<li>
+2007/03/26 (CB): plotgroup panel resizing. Add scrollbars when not
+auto-resizing. Maybe crop dynamic info text, too.
+</li>
 
 
 <li>
@@ -143,7 +129,7 @@ PCA, ICA, SFA, ISFA, etc. algorithms.
 </li>
 			     
 <li>
-2007/03/03 (CB): investigate why this: 
+2007/03/26 (CB): investigate why this: 
 <pre>
 from topo.base.patterngenerator import PatternGeneratorParameter
 PatternGeneratorParameter.default=topo.patterns.basic.Line()
@@ -153,11 +139,25 @@ the commandline, from a script, and saving/loading snapshots.)
 </li>
 
 <li>
-2007/03/02: Should have an easy way to add things to the right click
-menu, just as it is easy to add templates -- it's a very natural way
-to add user-defined analyses and plots. (Then test pattern window
-could get right-click menu to show e.g. Fourier transform option.)  
+2007/03/26 (CB): tidy up, document right-click menu code. 
 </li>
+
+<li>
+2007/03/26 (CB): developer page about efficient array computations.
+Measurement of numpy.sum(X)/X.sum()/sum(X) performance. Difference
+between simulation results on different platforms (for slow-tests in
+Makefile).
+</li>
+
+
+</ul>
+
+
+
+
+<h3>Things we hope to take care of eventually</h3>
+
+<ul>
 
 <li>
 2007/03/14 (CB): gnosis.xml.pickle needs to be updated for 
@@ -225,11 +225,11 @@ and well designed so that it can be flexible.
 </li>
 
 <li>
-2006/05/23: minor tkgui cleanup? Which widgets should expand
+2007/03/26: minor tkgui cleanup? Which widgets should expand
 (expand=YES ?), which should fill the space (fill=X ?) (e.g. in
-parameters frames sliders etc should expand).
+parameters frames sliders etc should expand). Plus see notes in 
+tkgui/__init__ and topoconsole (CB: maybe put those all together.)
 </li>
-
 
 <li>
 2006/11/09 (JL?): Add better support for exploring and optimizing parameter spaces.
@@ -301,12 +301,6 @@ Need to make sure DynamicNumbers are advanced only once per simulation time.
 
 <li>
 2006/05/22: HACKALERTs relating to connection fields; test file for connectionfield; cleaning up cf.py and projections/basic.py (e.g. DummyCF) along with the Slice class (there are several simplifications that can be made).
-</li>
-
-<li>
-2006/04/27 (JB): Allowing there to be a slower, more in-depth set of tests
-(that don't run with make tests, etc). Required slower tests: that
-example networks' results haven't changed [test_script.py], that performance doesn't get worse, ...
 </li>
 
 <li>
@@ -586,18 +580,19 @@ aiming at copy-on-write semantics, but this seems quite difficult to
 achieve in Python.
 </li>
 
+
+<li>
+2007/03/26 (CB): Migrate examples/Makefile to python script.
+(Plus, eventually, control tests from a python file rather than the Makefile.)
+</li>
+
 <li>
 2006/02/21 (all): Improving documentation and test files; eliminating ALERTs.
 </li>
 
 <li>
-2007/03/14: Build python on windows with free compiler. Maybe use
-pymingw?  At the moment, this seems much more difficult to setup than
-the current system, but it might be much easier to maintain.  Before
-that, could at least add mingw's msys stuff for a shell and make -
-then the tutorial instructions could be followed ('make examples'
-etc). (Or, move from a Makefile in examples/ to some kind of
-setup.py script? Then Windows users could follow the tutorial.)
+2007/03/26 (CB): Build python on windows with free compiler. Maybe use
+pymingw? Or cygwin? Currently trying cygwin, with some success.
 <br />
 Python for Windows (as distributed by python.org) is built using a
 non-free (money,speech) Microsoft compiler (with associated project files):
