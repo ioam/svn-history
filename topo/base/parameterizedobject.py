@@ -550,6 +550,16 @@ class ParameterizedObjectMetaclass(type):
 
 
 
+# JABALERT: Only partially achieved so far -- objects of the same
+# type and parameter values are treated as different, so anything
+# for which instantiate == True is reported as being non-default.
+# Note that this module-level Parameter won't actually do most 
+# of the things a Parameter does, but using a Parameter here
+# should be more readable anyway.
+script_repr_suppress_defaults=Parameter(True, hidden=True, doc="""
+    Whether script_repr should avoid reporting the values of parameters
+    that are just inheriting their values from the class defaults.""")
+    
 
 class ParameterizedObject(object):
     """
@@ -656,13 +666,6 @@ class ParameterizedObject(object):
         return self.__class__.__name__ + "(" + ", ".join(settings) + ")"
 
 
-    # JABALERT: Only partially achieved so far -- objects of the same
-    # type and parameter values are treated as different, so anything
-    # for which instantiate == True is reported as being non-default.
-    script_repr_suppress_defaults=Parameter(True, hidden=True, doc="""
-        Whether script_repr should avoid reporting the values of parameters
-        that are just inheriting their values from the class defaults.""")
-    
     def script_repr(self,prefix="    "):
         """
         Variant of __repr__ designed for generating a runnable script.
@@ -670,23 +673,27 @@ class ParameterizedObject(object):
         May replace __repr__ at some point, so that the default representation
         is runnable.
         """
-        # Should consider adding an option to suppress values that do not
-        # differ from the defaults, to get a much more concise output
-        #
-        # Currently suppresses automatically generated names and
-        # print_levels.
+        # Suppresses automatically generated names and print_levels.
         #
         # JABHACKALERT: Dynamic parameters are currently silently
         # reported as their current value; they should instead get a
         # representation that allows them to be regenerated.
         settings=[]
-        for name,val in self.get_param_values(onlychanged=self.script_repr_suppress_defaults):
+        for name,val in self.get_param_values(onlychanged=script_repr_suppress_defaults):
             if name == 'name' and re.match('^'+self.__class__.__name__+'[0-9]+$',val):
                 rep=None
             elif name == 'print_level':
                 rep=None
             elif isinstance(val,ParameterizedObject):
                 rep=val.script_repr(prefix+"    ")
+            elif isinstance(val,list):
+                result=[]
+                for i in val:
+                    if hasattr(i,'script_repr'):
+                        result.append(i.script_repr(prefix+"    "))
+                    else:
+                        result.append(repr(i))
+                rep=','.join(result)
             else:
                 rep=repr(val)
             if rep is not None:
