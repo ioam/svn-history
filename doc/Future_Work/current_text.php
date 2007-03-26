@@ -135,6 +135,13 @@ the subtract.reduce bug.)
 
 <ul>
 
+
+<li>
+2007/03/26: Add a wrapper around the Modular Data Processing (MDP) toolkit
+(http://mdp-toolkit.sourceforge.net) to provide easy access to the
+PCA, ICA, SFA, ISFA, etc. algorithms.
+</li>
+			     
 <li>
 2007/03/03 (CB): investigate why this: 
 <pre>
