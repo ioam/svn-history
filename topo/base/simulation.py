@@ -527,8 +527,11 @@ class CommandEvent(Event):
         # Presumably here to avoid importing __main__ into the rest of the file
         import __main__
 
+        ParameterizedObject(name='CommandEvent').message("Time %08.2f: Running command %s" % (self.time,self.command_string))
+        
         try:
             exec self.command_string in __main__.__dict__
+            
         except Exception, err:
             ParameterizedObject(name='CommandEvent').warning(`self`+' was not executed because it would cause an error - '+`err`+': "' +err[0]+'".')
         
