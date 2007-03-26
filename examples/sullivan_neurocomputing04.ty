@@ -23,7 +23,7 @@ import topo.patterns.basic
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.boundingregion import BoundingBox
-from topo.base.cf import CFProjection,CFPOF_Plugin
+from topo.base.cf import CFProjection,CFPOF_Plugin,CFSheet
 from topo.base.parameterclasses import DynamicNumber,Number
 from topo.sheets.cfsom import CFSOM
 from topo.responsefns.optimized import CFPRF_EuclideanDistance_opt,CFPRF_DotProduct_opt
