@@ -140,6 +140,9 @@ the commandline, from a script, and saving/loading snapshots.)
 
 <li>
 2007/03/26 (CB): tidy up, document right-click menu code. 
+JB: Would also be good to make it possible to add things to the menu
+without changing the tkgui files, like the templates work for activity
+plots.
 </li>
 
 <li>
