@@ -168,6 +168,12 @@ numpy. I'm working with module's author at the moment.
 </li>
 
 <li>
+2007/03/27 (CB): given how private attributes work in Python, it seems like we can just
+have a parameter __abstract_class=True for abstract classes, and then __is_abstract 
+can check to see if there is such an attribute (and that it is True, just in case).  
+</li>
+
+<li>
 2007/03/14 (CB): how to build scipy without requiring any of the external
 linear algebra libraries, etc? Then scipy would at least build
 easily, and users could install the optimized versions if they wished.
@@ -586,7 +592,8 @@ achieve in Python.
 
 <li>
 2007/03/26 (CB): Migrate examples/Makefile to python script.
-(Plus, eventually, control tests from a python file rather than the Makefile.)
+(Plus, eventually, control tests from a python file rather than the Makefile.
+Can then include more tests of examples, by specifying sheet to look at etc.)
 </li>
 
 <li>
