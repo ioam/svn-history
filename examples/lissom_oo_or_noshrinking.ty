@@ -66,7 +66,7 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
                                   input_generator=combined_inputs,
                                   period=1.0, phase=0.05,
-                                  nominal_bounds=BoundingBox(radius=0.5+0.25))
+                                  nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
 
 topo.sim['LGNOn']=CFSheet(nominal_density=24.0,
                           nominal_bounds=BoundingBox(radius=0.5+0.25),
