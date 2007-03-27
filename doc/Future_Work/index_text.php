@@ -75,8 +75,7 @@ learning, so that users will be able to tell how much progress has
 been made.  However, during other processor-intensive computations
 like computing preference maps, the display will not yet be updated,
 and users are likely to assume that the software has hung.  Thus it is
-crucial to provide a status display in such cases, as well as allowing
-interruption or other activities during long computations.
+crucial to provide a status display and allow interruptions in such cases.
 <!--
   Using an RPC (or XML-RPC) subprocess would be nice, because it will
   allow a "clean reload" of the simulation like what you get with F5
