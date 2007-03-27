@@ -343,6 +343,12 @@ class TopoConsole(Frame):
         go = Button(learning_frame,text="Go",
                     command=Pmw.busycallback(self.do_learning))
         go.pack(side=LEFT)
+
+	self.stop_button = Button(learning_frame,text="Stop",state=DISABLED,
+                                  command=lambda: self.set_stop())
+	self.stop_button.pack(side=LEFT)
+            
+
         # CEBALERT: this prevents the simulation time from being updated
         # in the messagebar
         #self.balloon.bind(go,"Run the simulation for the specified duration.")
@@ -403,6 +409,11 @@ class TopoConsole(Frame):
         # command_entry - get called by toggle_command_widgets
 
 
+    def set_stop(self):
+        """Declare that running should be interrupted."""
+        self.stop=True
+
+            
     def toggle_command_widgets(self):
         if self.show_command_widgets.get()==1:
             self.command_entry.pack(side=BOTTOM,expand=NO,fill=X)
@@ -700,6 +711,9 @@ class TopoConsole(Frame):
 
         ## Duration of most recent times from which to estimate remaining time
         estimate_interval=50
+        start_sim_time=topo.sim.time()
+        self.stop=False
+        self.stop_button.config(state=NORMAL)        
         for i in xrange(iters):
             recenttimes.append(time.time())
             length = len(recenttimes)
@@ -719,12 +733,18 @@ class TopoConsole(Frame):
                         int(estimate%60)))
 
             self.messageBar.message('state', message)
+            self.update()
             self.update_idletasks()
+            if self.stop:
+                break
                                                                                                                                                   
-        topo.sim.run(remain)
-        message = ('Ran %0.2f to time %0.2f' % (fduration, topo.sim.time()))
+        self.stop_button.config(state=DISABLED)
+        if not self.stop:
+            topo.sim.run(remain)
+        
+        message = ('Ran %0.2f to time %0.2f' %
+                   (topo.sim.time()-start_sim_time, topo.sim.time()))
         self.auto_refresh()
-
 
         self.messageBar.message('state', message)
 
