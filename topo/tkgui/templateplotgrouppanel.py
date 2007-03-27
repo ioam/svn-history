@@ -10,6 +10,7 @@ from inspect import getdoc
 from math import pi
 from numpy.fft.fftpack import fft2
 from numpy.fft.helper import fftshift
+from numpy import abs
 
 import copy
 import Pmw
@@ -249,7 +250,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         plot = self._right_click_info['plot']
         description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
         m=plot._get_matrix(channel)
-        fft_plot=fftshift(fft2(m-0.5, s=None, axes=(-2,-1)))
+        fft_plot=1-abs(fftshift(fft2(m-0.5, s=None, axes=(-2,-1))))
         topo.commands.pylabplots.matrixplot(fft_plot, title="FFT Plot: " + description)        
 
     def __print_matrix(self,channel):
