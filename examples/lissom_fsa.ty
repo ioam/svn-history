@@ -82,7 +82,7 @@ topo.patterns.basic.Gaussian.aspect_ratio=4.0
 
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)
-#CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
@@ -145,9 +145,6 @@ topo.sim.connect('LGNOff','FSA',delay=FixedPoint('0.050', 3), dest_port=('Activi
                  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.4167),
                  nominal_bounds_template=BoundingBox(radius=1.0625),learning_rate=9.533,)
 
-# Temporarily moved here to avoid masking the LGN weights until we can do it in a way that doesn't change the sum of the weights
-CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
-
 topo.sim.connect('FSA','FSA',delay=FixedPoint('0.050', 3),name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
                  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.4167),
@@ -187,7 +184,6 @@ topo.sim.schedule_command( 500*st, LE+'.learning_rate=0.0316875*'+LE+'.n_units()
 
 
 ### Afferent learning rate changes
-### Note that AON and AOF's masks are square but not circular
 ON ='topo.sim["FSA"].projections()["LGNOnAfferent"]'
 OFF='topo.sim["FSA"].projections()["LGNOffAfferent"]'
 
