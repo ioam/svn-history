@@ -162,8 +162,7 @@ neuron.  A similar procedure can be performed in the model by selecting
 
 
 <P>
-(This will usually take about 30 seconds to complete; it is normal
-for the Topographica windows not to refresh during this time.)
+(This will usually take about 30 seconds to complete.)
 The plot on the left is the orientation map for V1 in this network.
 Each neuron in the plot is color coded by its preferred orientation,
 according to the key beneath the image.

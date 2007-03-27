@@ -210,13 +210,13 @@ class FeatureResponses(ParameterizedObject):
             estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
             
             message = 'Time ' + str(topo.sim.time()) + ': ' + \
-                      str(int(percent)) + '% of '  + str(fduration) + ' completed ' + \
+                      str(int(percent)) + '% of '  + str(fduration) + ' patterns completed ' + \
                       ('(%02d' % int(estimate/60))+':' + \
-                      ('%02d' % int(estimate%60))+ ' remaining at current rate).'
+                      ('%02d' % int(estimate%60))+ ' remaining).'
                       
-# uncomment print command below for map generation timer
-        
-#            print message
+            if hasattr(topo,'guimain'):
+                topo.guimain.messageBar.message('state', message)
+                topo.guimain.update()
             
 ######################### end of timer   
 

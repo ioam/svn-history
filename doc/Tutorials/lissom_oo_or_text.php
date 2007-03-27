@@ -432,8 +432,7 @@ plot (or refresh) an <span class='w_title'>Orientation
 Preference</span> map to see what sort of
 orientation map has developed.  (Press 'Refresh' if no plot is visible when
 first opening the window.  Measuring a new map will usually take about 30
-seconds to complete, and it is normal for the Topographica windows not to
-refresh during this time.)  If you've changed the learning rate to
+seconds to complete.)  If you've changed the learning rate to
 a high value, or haven't presented many inputs, the map will not
 resemble actual animal maps, but it should still have patches
 selective for each orientation.

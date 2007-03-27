@@ -69,23 +69,6 @@ files will not necessarily be readable by future versions of
 Topographica, and should be considered temporary.
 <!-- Also consider CDF, HDF, or something like it for binary files -->
   
-<P><DT>Progress updating and cancellation</DT><DD> 
-Progress reporting of the display has now been implemented during
-learning, so that users will be able to tell how much progress has
-been made.  However, during other processor-intensive computations
-like computing preference maps, the display will not yet be updated,
-and users are likely to assume that the software has hung.  Thus it is
-crucial to provide a status display and allow interruptions in such cases.
-<!--
-  Using an RPC (or XML-RPC) subprocess would be nice, because it will
-  allow a "clean reload" of the simulation like what you get with F5
-  in IDLE, and will allow the GUI to be local while the simulator runs
-  on a distant machine.
--->
-In addition to the progress bars, it would be nice to have an estimate
-for the memory requirements of a large network, so that the user can
-verify that it is a reasonable simulation to run on his or her machine.
-
 <!-- Should consider sparse layers with patch distribution of units -->
 
 <P><DT>More example models</DT><DD>
