@@ -384,7 +384,7 @@ class ParametersFrame(Frame):
 
         # A right-click on the widget shows the right-click menu
         w = self.__widgets[parameter_name][1] 
-        w._entryWidget.bind('<Button-3>', 
+        w._entryWidget.bind('<<right-click>>', 
             lambda event: self.__right_click(event, w))
         
 

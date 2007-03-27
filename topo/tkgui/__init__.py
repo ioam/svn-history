@@ -71,6 +71,15 @@ def start(mainloop=False):
     """
     root = Tkinter.Tk()
     root.resizable(1,1)
+
+    # This alows context menus to work on the Mac.  Widget code should bind
+    # contextual menus to the virtual event <<right-click>>, not
+    # <Button-3>.
+    # JPALERT: We probably should do an OS check here if
+    # ctrl-click means something else on Windows.
+
+    root.event_add('<<right-click>>','<Button-3>','<Control-Button-1>')
+    root.event_add('<<right-click-release>>','<ButtonRelease-3>','<Control-ButtonRelease-1>')
     Pmw.initialise(root)
     console = topoconsole.TopoConsole(parent=root)
     console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)

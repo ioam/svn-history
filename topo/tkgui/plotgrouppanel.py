@@ -572,7 +572,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
             # CEBALERT: I want process_canvas_event to be called for all of these bindings, with
             # an additional method also called to do something specific to the action. I'm sure
             # python has something that lets this be done in a clearer way.
-            canvas.bind('<Button-3>',lambda event: self.__process_canvas_event(event,self._canvas_right_click))
+            canvas.bind('<<right-click>>',lambda event: self.__process_canvas_event(event,self._canvas_right_click))
             canvas.bind('<Motion>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))
 
             canvas.bind('<Leave>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))

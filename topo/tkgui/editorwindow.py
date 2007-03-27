@@ -103,9 +103,11 @@ class EditorCanvas(Canvas):
         self.bind('<Double-1>', self.left_double_click)
         self.bind('<ButtonRelease-1>', self.left_release)
         # bind the possible right button events to the canvas.
-        self.bind('<Button-3>', self.right_click)
+        self.event_add('<<right-click>>','Button-3','Control-Button-1')
+        self.event_add('<<right-click-release>>','ButtonRelease-3','Control-ButtonRelease-1')
+        self.bind('<<right-click>>', self.right_click)
         # because right-click opens menu, a release event can only be flagged by the menu.
-        self.item_menu.bind('<ButtonRelease-3>', self.right_release)   
+        self.item_menu.bind('<<right-click-release>>', self.right_release)   
 
         # add scroll bar; horizontal and vertical
         self.config(scrollregion = (0, 0, 1200, 1200))
