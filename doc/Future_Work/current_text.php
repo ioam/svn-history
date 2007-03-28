@@ -8,7 +8,66 @@ please feel free to volunteer!!!!). Dates indicate the item was first
 added to the list, or a change was made.
 </small>
 
-<h3>Tasks to be addressed for the 0.9.3 release:</h3>
+<h3>Tasks to be addressed for the upcoming 0.9.3 release:</h3>
+
+<ul>
+
+<li>
+2007/02/20 (JB): Errata before release:
+update Changelog.txt,
+summarize major changes in it for the release notes,
+make a pass through the documentation to fix anything that is not up to date
+(especially things related to Numpy support and to describe new features),
+build on the various platforms, etc.
+</li>
+
+<li>
+2007/03/28 (?): Update the lissom_oo_or tutorial page to match changes
+in the GUI and elsewhere.  E.g. we can mention the right-click menus,
+how to use the dynamic info to see the coordinate systems and numeric values,
+how to start and stop training, and add sections about plotting
+'Orientation tuning fullfield' tuning curves and FFTs.
+</li>
+
+<li>
+2007/03/28 (JB): Finish converting som_retinotopy.ty and
+obermayer_pnas90.ty to use the new simpler and faster SOM support as
+in cfsom_or.ty, and delete all of the old SOM support.  Requires
+checking that the som_retinotopy.ty tutorial still works ok after the
+conversion.
+</li>
+
+<li>
+2007/02/20 (JB): Upgrade epydoc to the current SVN version to incorporate
+recent changes and bugfixes for the Reference Manual.
+</li>
+
+<li>
+2006/03/26 (CB): Matching lissom_oo_or with C++ lissom. Only retina-lgn weights
+don't match, but they match if topographica uses the user-specified lgn weights
+radius rather than the radius of the actual connection field.
+Are there any more missing scheduled_actions in lissom examples?
+</li>
+
+<li>
+2007/03/02 (CB): update topographica-win to numpy (plus catchup other
+external packages like pyaudiolab & gnosis utils). Test that results from 
+Windows version match those from the standard one.
+(The current Windows numpy version at scipy.org presumably contains 
+the subtract.reduce bug.)
+<!--libsndfile, pyaudiolab, jpeg (in PIL binary?), (mlabwrap) to go-->
+</li>
+
+<li>
+2007/03/26 (CB): plotgroup panel resizing. Add scrollbars when not
+auto-resizing (and ideally even when auto-resizing but the window
+would otherwise be larger than the screen). 
+</li>
+
+</ul>
+
+
+<h3>Tasks to be addressed for the 0.9.4 or later releases:</h3>
 
 <ul>
 
@@ -16,11 +75,6 @@ added to the list, or a change was made.
 2006/12/14 (JB): Documentation for the new Numeric is not free. But we
 could document differences from the current Numeric documentation for
 our users, as we find these differences.
-</li>
-
-<li>
-2007/02/20 (JB): Upgrade epydoc to the current SVN version to incorporate
-recent changes and bugfixes for the Reference Manual.
 </li>
 
 <li>
@@ -39,16 +93,6 @@ normalization across all plots with the same name.
 </li>
 
 <li>
-2006/10/10 (JL): Add FFT plot using Jim's Octave code; shouldn't be
-difficult.  Should also be easy to port it to native Python, because
-Numeric already includes a 2D FFT (see FFT.fft2d).
-</li>
-
-<li>
-2006/11/09 (JL): Add plotting of tuning curves and contrast response functions
-</li>
-
-<li>
 2006/11/09 (JL): Support better saving of results during long batch
 runs (e.g. orientation maps and other plots).
 </li>
@@ -56,11 +100,6 @@ runs (e.g. orientation maps and other plots).
 <li>
 2006/11/09 (CP/JL): Add support for measuring receptive fields,
 perhaps using STRFPAK or a similar approach.
-</li>
-
-<li>
-2006/11/09 (CP): Add numerical indication of size and brightness scales
-to plots, to allow different Projections, etc. to be compared properly.
 </li>
 
 <li>
@@ -78,18 +117,8 @@ statistics about maps, e.g. for estimating perceived quantities.
 </li>
 
 <li>
-2006/05/15 (JB): Missing scheduled_actions in lissom examples
-</li>
-
-<li>
 2006/05/24 (JB): Problems with examples/joublin_bc96.ty: strange Projection
 plots.
-</li>
-
-<li>
-2006/03/26 (CB): Matching lissom_oo_or with C++ lissom. Only retina-lgn weights
-don't match, but they match if topographica uses the user-specified lgn weights
-radius rather than the radius of the actual connection field.
 </li>
 
 <li>
@@ -100,34 +129,14 @@ translator_dictionary & its uses.
 </li>
 
 <li>
-2007/03/26 (CB): Should add simple timing functions -- what was the total
-time to run?  What components are taking a long time to run?  Guide
-the user for optimization, focusing on the components we expect to be
-the bottlenecks.
-<!--Add in general guide & reorganize.-->
+2007/03/26 (CB): Finish support for optimization.  Do we need our own
+simple timing functions to make it easier for users to optimize their
+components (as opposed to the overall Topographica framework, for which
+the current profile() commands are appropriate)?  In any case, provide
+more guide for the user for doing optimization, focusing on the
+   components we expect to be the bottlenecks.
 </li>
 
-<li>
-2007/03/02 (CB): update topographica-win to numpy (plus catchup other
-external packages like pyaudiolab & gnosis utils). Test that results from 
-Windows version match those from the standard one.
-(The current Windows numpy version at scipy.org presumably contains 
-the subtract.reduce bug.)
-<!--libsndfile, pyaudiolab, jpeg (in PIL binary?), (mlabwrap) to go-->
-</li>
-
-<li>
-2007/03/26 (CB): plotgroup panel resizing. Add scrollbars when not
-auto-resizing. Maybe crop dynamic info text, too.
-</li>
-
-
-<li>
-2007/03/26: Add a wrapper around the Modular Data Processing (MDP) toolkit
-(http://mdp-toolkit.sourceforge.net) to provide easy access to the
-PCA, ICA, SFA, ISFA, etc. algorithms.
-</li>
-			     
 <li>
 2007/03/26 (CB): investigate why this: 
 <pre>
@@ -162,6 +171,12 @@ Makefile).
 
 <ul>
 
+<li>
+2007/03/26: Add a wrapper around the Modular Data Processing (MDP) toolkit
+(http://mdp-toolkit.sourceforge.net) to provide easy access to the
+PCA, ICA, SFA, ISFA, etc. algorithms.
+</li>
+			     
 <li>
 2007/03/14 (CB): gnosis.xml.pickle needs to be updated for 
 numpy. I'm working with module's author at the moment.
@@ -309,7 +324,11 @@ Need to make sure DynamicNumbers are advanced only once per simulation time.
 </li>
 
 <li>
-2006/05/22: HACKALERTs relating to connection fields; test file for connectionfield; cleaning up cf.py and projections/basic.py (e.g. DummyCF) along with the Slice class (there are several simplifications that can be made).
+2006/05/22: HACKALERTs relating to connection fields; test file for
+connectionfield; cleaning up cf.py and projections/basic.py along with
+the Slice class (there are several simplifications that can be made).
+Maybe we can use masked arrays, now that Numpy has support for several
+varieties that might meet our needs better than Numeric's did.
 </li>
 
 <li>
@@ -318,10 +337,6 @@ Need to make sure DynamicNumbers are advanced only once per simulation time.
 
 <li> 
 2006/05/02: Finish Slice and SheetCoordinateSystem classes (see ALERTs).
-</li>
-
-<li> 
-2006/03/17 (JB): Fix problem (matching previous work) with som_retinotopy, at least for small densities.
 </li>
 
 <li> 
