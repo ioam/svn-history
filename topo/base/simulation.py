@@ -895,9 +895,6 @@ class Simulation(ParameterizedObject):
 
         Needs some work to make the result truly runnable.
 
-        The parameters of the simulation object itself, such as
-        its name, are not yet included.
-
         Only scheduled commands that have not yet been executed are
         included, because executed commands are not kept around.
         """
@@ -915,7 +912,8 @@ class Simulation(ParameterizedObject):
                                cmp=lambda x, y: cmp(x.command_string,y.command_string)),
                         cmp=lambda x, y: cmp(x.time,y.time))]
 
-        return simulation_path+".name='"+self.name + "'" \
+        return simulation_path+".name='"+self.name + "'\n\n" +\
+               simulation_path+".startup_commands="+repr(self.startup_commands) +\
                '\n\n\n\n# Objects:\n\n'            + '\n\n\n'.join(objs) + \
                '\n\n\n\n# Connections:\n\n'        + '\n\n\n'.join(conns) + \
                '\n\n\n\n# Scheduled commands:\n\n' +     '\n'.join(cmds)
