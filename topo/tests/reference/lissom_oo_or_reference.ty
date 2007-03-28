@@ -106,7 +106,7 @@ beta=0.633
 randomness = 0.0
 #smooth_circular_radius_trim = -0.25
 
-rf_radius_scale=5.0/rf_radius
+#rf_radius_scale=5.0/rf_radius
 #retina_area_scale = (BaseRN*area_scale/24.0*rf_radius_scale)*(BaseRN*area_scale/24.0*rf_radius_scale)
 #inputs_pereye=max(retina_area_scale,1)
 xsigma=6.0
@@ -115,7 +115,7 @@ scale_input=1.0
 
 
 # radius of LGN DoG center Gaussian
-sigma_c = 0.5 
+sigma_c = 0.5
 
 # radius of LGN DoG surround Gaussian
 sigma_s = 4*sigma_c 
@@ -186,8 +186,10 @@ CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
-SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
+SharedWeightCFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0,size=2.0*r_L/BaseLN)
+SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
+SharedWeightCFProjection.as=False
 
 
 topo.sim['Eye0'] = GeneratorSheet(nominal_bounds=retina_bounds,
@@ -228,7 +230,7 @@ topo.sim.connect('Eye0','Ganglia00',delay=FixedPoint("0.05"),
 topo.sim.connect('Eye0','Ganglia01',delay = FixedPoint("0.05"),
                  connection_type=SharedWeightCFProjection,strength=1.0,
                  nominal_bounds_template=lgn_weight_bounds,
-                 weights_generator=off_weights,name="Afferent1")
+                 weights_generator=off_weights,name="Afferent0")
 
 
 topo.sim.connect('Ganglia00','Primary',delay=FixedPoint("0.05"),
@@ -313,7 +315,14 @@ topo.sim.schedule_command(19999, 'topo.sim["Primary"].output_fn.lower_bound=0.22
 
 
 
+from math import floor
 
+def the_slice(row):
+
+    start_r = row
+    end_r = start_r + int(floor(0.5*4*4.7*2)) + 1
+
+    return slice(start_r,end_r)
 
 
 if locals().get('comparisons',False):
@@ -322,29 +331,27 @@ if locals().get('comparisons',False):
 
     ### INITIAL WEIGHTS COMPARISONS
     #
-    # CEBHACKALERT: the shared weight is similar, but does not match exactly.
-    # Using one gaussian (rather than DoG), it doesn't match exactly either.
-    # Using a solid disk, though (e.g. see retina_lgn_match.ty), the match is very close.
-
-    check_weights('Ganglia00','Afferent0',(0,0),slice(0,19),slice(0,19))
-    #check_weights('Ganglia01','Afferent1',(0,0),slice(0,19),slice(0,19))
-
-    # CEBHACKALERT: Before the simulation has been run, the
+    check_weights('Ganglia00','Afferent0',(0,0),the_slice(0),the_slice(0))
+    check_weights('Ganglia00','Afferent0',(12,12),the_slice(12),the_slice(12))
+    
+    check_weights('Ganglia01','Afferent0',(0,0),the_slice(0),the_slice(0))
+    check_weights('Ganglia01','Afferent0',(12,12),the_slice(12),the_slice(12))
+    
+    # CEBALERT: Before the simulation has been run, the
     # Topographica weights are not jointly normalized.
     topo.sim.run(0.00001)
     
     check_weights('Primary','Afferent00',(0,0),slice(1,14),slice(1,14))
     check_weights('Primary','Afferent00',(23,23),slice(12,25),slice(12,25))
-    #check_weights('Primary','Afferent01',(0,0),slice(1,14),slice(1,14))
-    #check_weights('Primary','Afferent01',(23,23),slice(12,25),slice(12,25))
+    check_weights('Primary','Afferent01',(0,0),slice(1,14),slice(1,14))
+    check_weights('Primary','Afferent01',(23,23),slice(12,25),slice(12,25))
     
 
+    #check_weights('Primary','LateralExcitatory',(0,0),slice(0,5),slice(0,5))
+    #check_weights('Primary','LateralExcitatory',(23,23),slice(19,28),slice(19,28))
 
-    check_weights('Primary','LateralExcitatory',(0,0),slice(0,5),slice(0,5))
-    check_weights('Primary','LateralExcitatory',(23,23),slice(19,28),slice(19,28))
-
-    check_weights('Primary','LateralInhibitory',(0,0),slice(0,12),slice(0,12))
-    check_weights('Primary','LateralInhibitory',(23,23),slice(12,35),slice(12,35))
+    #check_weights('Primary','LateralInhibitory',(0,0),slice(0,12),slice(0,12))
+    #check_weights('Primary','LateralInhibitory',(23,23),slice(12,35),slice(12,35))
     
 
 
@@ -352,4 +359,8 @@ if locals().get('comparisons',False):
 
 ### Command used to generate C++ LISSOM data for comparisons.
 #
-# ./lissom5 commandpath="/home/v1cball/public/lissom/command/" display=0 oo_or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' 
+# ./lissom5 commandpath="/home/chris/mae/lissom/command/" display=0 oo_or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c "plot_unit region=Ganglia00 save_matrices=True 12 12" -c "plot_unit region=Ganglia01 save_matrices=True 0 0" -c "plot_unit region=Ganglia01 save_matrices=True 12 12" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23'
+
+
+
+#-c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' 

@@ -566,7 +566,10 @@ class CFProjection(Projection):
     weights_shape = PatternGeneratorParameter(
         default=patterngenerator.Constant(),constant=True,
         doc="Define the shape of the connection fields.")
-    
+
+    # CB: temporary!
+    as = BooleanParameter(default=True,constant=True,doc="TEMPORARY")
+                                     
     learning_fn = CFPLearningFnParameter(
         default=CFPLF_Plugin(),
         doc='Function for computing changes to the weights based on one activation step.')
@@ -660,10 +663,12 @@ class CFProjection(Projection):
     def create_mask_template(self):
         """
         """
-        # CEBALERT: allow user to override this.
+        # CEBALERT: allow user to override this (offer a scaling parameter).
         # Calculate the size & aspect_ratio of the mask if appropriate;
         # mask size set to be that of the weights matrix
-        if hasattr(self.weights_shape, 'size'):
+
+        # CB: temporary 'self.as'
+        if hasattr(self.weights_shape,'size') and self.as:
             l,b,r,t = self.bounds_template.lbrt()
             self.weights_shape.size = t-b
             self.weights_shape.aspect_ratio = (r-l)/self.weights_shape.size
