@@ -91,7 +91,8 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         #
         self.present_length = Pmw.EntryField(self,
                 labelpos = 'w',label_text = 'Duration to Present:',
-                value = DEFAULT_PRESENTATION,validate = {'validator' : 'real'})
+                value = DEFAULT_PRESENTATION,validate = {'validator' : 'real'},
+                command = self.present)
         self.present_length.pack(fill='x', expand=1, padx=10, pady=5)
         self.balloon.bind(self.present_length,
 """How long to run the simulator when presenting.""")
