@@ -124,6 +124,10 @@ that version of the system, you would do:
   (free from Apple) and install it.  (It is also possible to build
   Topographica using a native (Aqua) version of Python, which looks a
   bit nicer, but we have not yet documented how to do that.)
+<li> If the X11 Software Development Kit is not already installed,
+install x11SDK from the Apple OS X distribution.  (You'll know if
+it is missing if you get messages like
+'error: X11/Xlib.h: No such file or directory'.)
 <li> From the Apple developer web site, download 
 <A HREF="http://developer.apple.com/tools/xcode/index.html">XCode_Tool2.2</a>
 (among other development utilities, it provides the required GCC C/C++ compiler).
