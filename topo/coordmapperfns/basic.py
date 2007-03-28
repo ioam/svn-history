@@ -25,6 +25,26 @@ from topo.misc.utils import signabs
 ##########################################################################
 # coordinate mapper functions
 
+
+class ConstantMapper(CoordinateMapperFn):
+    """
+    Coordinate Mapper that uses constant mapping values.
+
+    Outputs constant coordinate (x_cons, y_cons).
+    """
+    x_cons = Number(default=0.0,bounds=(0,None),doc="""
+       The maximum range of the mapping input.""")
+    y_cons = Number(default=0.0,bounds=(0,None), doc="""
+       The y coordinate of the mapping output.""")
+
+    def __call__(self, x, y):
+        """
+        Arguments x and y are used to follow the abstraction class
+        CoordinateMapperFn only.
+        """
+        return self.x_cons, self.y_cons
+
+
 class SingleDimensionMapper(CoordinateMapperFn):
     """
     Coordinate Mapper that uses an origin-centered 1-D mapping function.
