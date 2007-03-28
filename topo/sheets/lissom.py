@@ -54,7 +54,12 @@ class JointNormalizingCFSheet(CFSheet):
 
     def start(self):
         # Force the weights to be normalized at the start of the simulation
-        # JABALERT: There may be some cleaner way to achieve this.
+        #
+        # JABALERT: There must be some cleaner way to achieve this.
+        # The biggest problem with this approach is that if someone
+        # presents a pattern to an unorganized network to see the
+        # initial response before training, each time they do that the
+        # weights are normalized again.
         assert self.simulation
         self.simulation.schedule_command(topo.sim.time(),
                                          'topo.sim["' + self.name + '"]._normalize_weights()')
