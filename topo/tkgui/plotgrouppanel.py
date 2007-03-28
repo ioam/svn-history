@@ -133,6 +133,11 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
             "Whether to regenerate this plot whenever the simulation time advances.")
 
 
+        # CEBALERT: it's probably not clear to users whether the
+        # various 'reduce', 'resize', 'refresh', etc. buttons apply to
+        # the plots or to the whole window.
+
+
         ### Auto-resize checkbutton.
         # See set_auto_resize() for more info.
         self.auto_resize = BooleanVar()
@@ -357,9 +362,11 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 
 
         ### Dynamic info about cursor location on plot
-        # CEBALERT: the location of this widget is simply good luck: should position properly.
-        self.dynamic_info = StringVar()
-        Label(self,textvariable=self.dynamic_info).pack(side=TOP) #,font=("courier",12)
+        # CEBALERT: should go in one of the plotting frames and probably
+        # doesn't need a border.
+	self.messageBar = Pmw.MessageBar(self)
+	self.messageBar.pack(side=BOTTOM,fill=X,expand=1,padx=4,pady=8)
+
 
         ### Right-click menu for canvases; subclasses can add cascades
         ### or insert commands on the existing cascades.
@@ -456,14 +463,17 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         """
         Update dynamic information.
         """
+
         if 'plot' in event_info:
             plot = event_info['plot']
             (r,c),(x,y) = event_info['coords']
             location_string="%s Unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(plot.plot_src_name,r,c,x,y)
             # CB: isn't there a nicer way to allow more info to be added?
-            self.dynamic_info.set(self._dynamic_info_string(event_info,location_string))
+            self.messageBar.message('state', self._dynamic_info_string(event_info,location_string))
         else:
-            self.dynamic_info.set("")
+            self.messageBar.message('state',"")
+
+        
 
         
     def _dynamic_info_string(self,event_info,x):
