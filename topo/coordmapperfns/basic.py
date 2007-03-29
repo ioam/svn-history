@@ -14,7 +14,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from numpy import exp,log,sqrt,sin,cos
+from numpy import exp,log,sqrt,sin,cos,zeros
 from math import atan,pi,atan2
 
 from topo.base.parameterizedobject import Parameter
@@ -123,16 +123,17 @@ class ReducingMapper(SingleDimensionMapper):
         return sgn * self.out_range * log(z/self.in_range*k+1)/log(k+1)
         
 
-class OttesSCMotorMapper(CoordinateMapperFn):
+class OttesSCMapper(CoordinateMapperFn):
     """
-    Mapping function for mapping motor output from superior colliculus.
+    Abstract class for superior colliculus mappings.
 
-    This mapping is taken from Ottes et al. (1986) Vision Research 26:857-873.
+    Subclasses of this class implement afferent and efferent mappings
+    from Ottes et al. (1986) Vision Research 26:857-873.
     
-    Default constant values are from Table 1, ibid.  The mapping allows the creation
-    of a single sheet representing both colliculi, one in the x-positive hemisheet and
-    the other in the x-negative hemisheet.
+    Default constant values are from Table 1, ibid.  
     """
+    __abstract_class = "OttesSCMapper"
+
     
     A = Number(default=5.3, doc="""
        Shape parameter A, in degrees""")
@@ -145,20 +146,112 @@ class OttesSCMotorMapper(CoordinateMapperFn):
        Scale factor to convert constants Bu and Bv from mm to sheet
        units.  Expressed in mm/unit. """)
 
-    decoder_sheet = Parameter(default=None)
+    amplitude_scale = Number(default=1,doc="""
+        Scale factor for saccade command amplitude, expressed in
+        degrees per unit of sheet.  Indicates how large a
+        saccade is represented by the x-component of the command
+        input.""")
     
+    direction_scale = Number(default=1,doc="""
+        Scale factor for saccade command direction, expressed in
+        degrees per unit of sheet.  Indicates what direction of saccade
+        is represented by the y-component of the command input.""")
+    
+
+    def __call__(self,x,y):
+        raise NotImplementedError        
+
+class OttesSCMotorMapper(OttesSCMapper):
+    """
+    Efferent superior colliculus mapping.
+
+    Provides the output/motor mapping from SC as defined by Ottes et al.
+    (see superclass docs for reference)
+
+    The mapping allows the creation of a single sheet representing
+    both colliculi, one in the x-positive hemisheet and the other in
+    the x-negative hemisheet.
+    """
     def __call__(self,x,y):
 
         A = self.A 
-        Bu = (self.Bu / self.mm_scale)
+        Bu = self.Bu / self.mm_scale
         Bv = self.Bv / self.mm_scale 
 
-        R = x * self.decoder_sheet.amplitude_scale 
-        phi = y * self.decoder_sheet.direction_scale * pi/180
+        R = x * self.amplitude_scale 
+        phi = y * self.direction_scale
 
         Rsign,R = signabs(R)
+
+        u,v = ottes_mapping(R,phi,A,Bu,Bv)
+        return Rsign*u,v
+
         
-        u = Rsign * Bu * (log(sqrt(R**2 + A**2 + 2*A*R*cos(phi))) - log(A))
-        v = Bv * atan((R*sin(phi))/(R*cos(phi)+A))
-        
-        return u,v
+
+class OttesSCSenseMapper(OttesSCMapper):
+    """
+    Afferent superior colliculus mapping.
+
+    Provides the input/retinal mapping to SC as defined by Ottes et al.
+    (see superclass docs for reference)
+
+    The mapping allows the creation of a single sheet representing
+    both colliculi, one in the x-positive hemisheet and the other in
+    the x-negative hemisheet.
+
+    [NOTE: see warning in docs for ottes_inverse_mapping()]
+    """
+
+    def __call__(self,x,y):
+
+        A = self.A 
+        Bu = self.Bu 
+        Bv = self.Bv 
+
+        u = x * self.mm_scale
+        v = y * self.mm_scale
+
+        usgn,u = signabs(u)
+
+        R,phi = ottes_inverse_mapping(u,v,A,Bu,Bv)
+
+        return (usgn*R/self.amplitude_scale,
+                phi/self.direction_scale)
+
+
+def ottes_mapping(R,phi,A,Bu,Bv):
+    """
+    The efferent mapping function from Ottes et al. (1986)
+    Vision Research 26:857-873.
+
+    Takes saccade with amplitude R (in degrees) and direction
+    phi (in degrees), and returns a location u,v on the colliculus
+    in mm, where the u axis is rostral/caudal, and the v axis  is
+    medial/lateral.
+    """
+    phi *= pi/180
+    u = Bu * (log(sqrt(R**2 + A**2 + 2*A*R*cos(phi))) - log(A))
+    v = Bv * atan((R*sin(phi))/(R*cos(phi)+A))        
+    return u,v
+
+def ottes_inverse_mapping(u,v,A,Bu,Bv):
+    """
+    The inverse funtion provided in the appendix of Ottes et al. (1986)
+    Vision Research 26:857-873
+
+    Supposedly takes a location u,v on the colliculus in mm and maps
+    to a retinal eccentricity R and direction phi, in degrees.
+    However, this function is not actually the mathematical inverse of
+    the forward mapping, nor even close.  
+    """
+    # JPALERT: As mentioned above, this is not actually the inverse of
+    # the efferent mapping. I believe the formula in the paper is
+    # in error, though it's possible that there's a bug below that
+    # I've missed.
+    
+    rads = pi/180
+    R   = A * sqrt(exp(2*u/Bu) - 2*exp(u/Bu)*cos(rads*v/Bv) + 1)
+    phi = atan( (exp(u/Bu)*sin(rads*v/Bv)) / (exp(u/Bu)*cos(rads*v/Bv) -1) )
+    return R,phi*180/pi
+                 
+
