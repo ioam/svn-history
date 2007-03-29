@@ -2,6 +2,7 @@
 - order tasks by priority
 - cleanup
 - check all my tasks from emails are here
+- add note: anyone needs stuff at bottom, they should probably do it themselves!
 -->
 
 
@@ -50,10 +51,8 @@ recent changes and bugfixes for the Reference Manual.
 </li>
 
 <li>
-2006/03/26 (CB): Matching lissom_oo_or with C++ lissom. Only retina-lgn weights
-don't match, but they match if topographica uses the user-specified lgn weights
-radius rather than the radius of the actual connection field.
-Are there any more missing scheduled_actions in lissom examples?
+2006/03/26 (CB): Are there any more missing scheduled_actions in lissom examples?
+[who added that?! i don't want to do this!]
 </li>
 
 <li>
@@ -77,6 +76,12 @@ release.
 <h3>Tasks to be addressed for the 0.9.4 or later releases:</h3>
 
 <ul>
+
+
+<li>
+2007/03/29 (CB): checkin some data for the make compare_or test,
+allowing people to use the test even if they haven't run c++ lissom?
+</li>
 
 <li>
 2007/03/29 (CB): Migrate examples/Makefile to python script.
@@ -191,6 +196,17 @@ Makefile).
 <h3>Things we hope to take care of eventually</h3>
 
 <ul>
+
+<li>
+2007/03/29 (CB): set c++ lissom params so that topographica
+doesn't have to set ganglia weight mask specially.
+</li>
+
+
+<li>
+2007/03/29: make slow tests output a little more obvious (e.g. speed change
+of more than 5%).
+</li>
 
 <li>
 2007/03/26: Add a wrapper around the Modular Data Processing (MDP) toolkit
@@ -345,9 +361,9 @@ Need to make sure DynamicNumbers are advanced only once per simulation time.
 </li>
 
 <li>
-2006/05/22: HACKALERTs relating to connection fields; test file for
+2007/03/29: HACKALERTs relating to connection fields; test file for
 connectionfield; cleaning up cf.py and projections/basic.py along with
-the Slice class (there are several simplifications that can be made).
+the Slice class and SheetCoordinateSystem (there are several simplifications that can be made).
 Maybe we can use masked arrays, now that Numpy has support for several
 varieties that might meet our needs better than Numeric's did.
 </li>
@@ -357,15 +373,12 @@ varieties that might meet our needs better than Numeric's did.
 </li>
 
 <li> 
-2006/05/02: Finish Slice and SheetCoordinateSystem classes (see ALERTs).
-</li>
-
-<li> 
 2006/04/20: many of the tests in testsheet.py run twice - correct that.  See CEBHACKALERT in topo/tests/testsheet.py.
 </li>
 
 <li>
-2006/04/20 (JB): Complete test file for Composite and Image.
+2006/04/20 (JB): Complete test file for Composite and Image.  investigate failing test in testimage.py (that uses sheet functions).
+Currently commented out; may not be a problem.
 </li>
 
 <li>
@@ -394,11 +407,6 @@ use them.  It might be better just to create an abstract PatternGenerator
 class for grouping together all patterns using those parameters, which shouldn't be too hard. 
 </li>
 
-<li> 
-2006/05/02: investigate failing test in testimage.py (that uses sheet functions).
-Currently commented out; may not be a problem.
-</li>
-
 <li>
 2006/03/07 (JL): make change_bounds() able to enlarge as well as shrink [made a first draft, JL is working with it]
 </li>
@@ -410,12 +418,9 @@ attribute/parameter that lists attributes not to pickle? Or something like that.
 Otherwise, save_snapshot and load_snapshot could specifically avoid items.
 </li>
 
-
-<!--
 <li>
 2005/01/01: Could add a web site with results of unit tests, updated nightly
 </li>
--->
 
 <li>
 2005/01/01: Could consider using or taking components from: SciPy,
@@ -453,6 +458,13 @@ and III of the LISSOM book (i.e. orientation maps, ocular dominance
 maps, direction maps, combined maps, face maps, and two-level maps) to
 Topographica.
 </li>
+
+</ul>
+
+
+
+
+
 
 <!-- From Tue Sep  6 15:32:25 BST 2005 meeting with Eyal
 
@@ -596,7 +608,8 @@ To figure out:
    Normalize toggle again it does not revert to the old response.
 -->
 
-</ul>
+
+
 
 
 <h3>Other work</h3>
@@ -604,6 +617,7 @@ To figure out:
 Ongoing work with uncertain finishing times.
 
 <ul>
+
 <li>
 2006/02/23 (all): Making more things be Parameters, and writing doc strings at the same time. E.g. the x and y widgets in the Unit Weights window can be Numbers with bounds, etc.
 </li>
