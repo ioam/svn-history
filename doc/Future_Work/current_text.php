@@ -58,7 +58,6 @@ Are there any more missing scheduled_actions in lissom examples?
 
 <li>
 2007/03/02 (CB): update topographica-win:
-- jpeg (in PIL binary?)
 - test that results from Windows version match those from the standard
 one.  (The current Windows numpy version at scipy.org presumably
 contains the subtract.reduce bug. Without an updated numpy binary,
