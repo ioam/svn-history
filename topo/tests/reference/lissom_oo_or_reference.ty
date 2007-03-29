@@ -188,9 +188,15 @@ CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
 SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
+
+# CB: examples/ files should not copy this, because we prefer the way
+# topographica sizes the mask (c++ lissom and topographica are the
+# same for certain values of r_L, but topographica makes the mask size
+# match the actual connectionfield in general).
+SharedWeightCFProjection.autosizemask=False
 SharedWeightCFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0,
                                                                 size=2.0*r_L/BaseLN)
-SharedWeightCFProjection.autosizemask=False
+
 
 
 topo.sim['Eye0'] = GeneratorSheet(nominal_bounds=retina_bounds,
