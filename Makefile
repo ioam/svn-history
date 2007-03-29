@@ -120,6 +120,7 @@ slow-tests: train-tests snapshot-tests speed-tests
 %_DATA:
 	./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",density=8,run_for=[1,99,150])'
 
+# CB: add in decimal=e.g. 6 or 7 or whatever is the minimum to which all platforms agree
 %_TEST: %_DATA
 	./topographica -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA")'
 
