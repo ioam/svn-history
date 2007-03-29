@@ -1,3 +1,10 @@
+<!--CB: going to go through this file and: 
+- order tasks by priority
+- cleanup
+- check all my tasks from emails are here
+-->
+
+
 <h3>Current tasks</h3>
 
 <p><small>
@@ -50,19 +57,21 @@ Are there any more missing scheduled_actions in lissom examples?
 </li>
 
 <li>
-2007/03/02 (CB): update topographica-win to numpy (plus catchup other
-external packages like pyaudiolab & gnosis utils). Test that results from 
-Windows version match those from the standard one.
-(The current Windows numpy version at scipy.org presumably contains 
-the subtract.reduce bug.)
-<!--libsndfile, pyaudiolab, jpeg (in PIL binary?), (mlabwrap) to go-->
+2007/03/02 (CB): update topographica-win:
+- gnosis utils
+- jpeg (in PIL binary?)
+- test that results from Windows version match those from the standard
+one.  (The current Windows numpy version at scipy.org presumably
+contains the subtract.reduce bug. Without an updated numpy binary,
+can't really test Windows version.)
+- pyaudiolab, mlabwrap, other optional packages will wait until a future
+release.
 </li>
 
 <li>
-2007/03/26 (CB): plotgroup panel resizing. Add scrollbars when not
-auto-resizing (and ideally even when auto-resizing but the window
-would otherwise be larger than the screen). 
+2007/03/29 (CB): can I do script_repr task? (email from JAB)
 </li>
+
 
 </ul>
 
@@ -70,6 +79,19 @@ would otherwise be larger than the screen).
 <h3>Tasks to be addressed for the 0.9.4 or later releases:</h3>
 
 <ul>
+
+<li>
+2007/03/29 (CB): Migrate examples/Makefile to python script.
+Plus control tests from a python file rather than the Makefile.
+Can then include more tests of examples, by specifying sheet to look at etc.
+But importantly, can easily run tests on Windows version.
+</li>
+
+<li>
+2007/03/26 (CB): plotgroup panel resizing. Add scrollbars when not
+auto-resizing (and ideally even when auto-resizing but the window
+would otherwise be larger than the screen). 
+</li>
 
 <li>
 2006/12/14 (JB): Documentation for the new Numeric is not free. But we
@@ -602,13 +624,6 @@ to a function that can be called easily, which wouldn't be very difficult.
 2006/02/21: Might someday be interesting to have read-only objects,
 aiming at copy-on-write semantics, but this seems quite difficult to
 achieve in Python.
-</li>
-
-
-<li>
-2007/03/26 (CB): Migrate examples/Makefile to python script.
-(Plus, eventually, control tests from a python file rather than the Makefile.
-Can then include more tests of examples, by specifying sheet to look at etc.)
 </li>
 
 <li>
