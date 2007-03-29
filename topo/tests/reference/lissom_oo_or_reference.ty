@@ -188,6 +188,9 @@ CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
 SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
+SharedWeightCFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0,
+                                                                size=2.0*r_L/BaseLN)
+SharedWeightCFProjection.autosizemask=False
 
 
 topo.sim['Eye0'] = GeneratorSheet(nominal_bounds=retina_bounds,
