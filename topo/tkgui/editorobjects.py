@@ -12,7 +12,8 @@ import Pmw
 import math
 
 import topo
-
+from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.parameterclasses import Enumeration,BooleanParameter
 from topo.commands.analysis import update_activity
 from topo.misc.utils import shortclassname
 from parametersframe import ParametersFrame
@@ -22,7 +23,7 @@ from parametersframe import ParametersFrame
 # this inherit from object)?
 # JAB: Probably no reason; should be changed to inherit from object.
 #
-class EditorObject:
+class EditorObject(ParameterizedObject):
     """
     Anything that can be added and manipulated in an EditorCanvas. Every EditorCanvas
     has a corresponding Topo object associated with it. An instance of this class can 
@@ -72,9 +73,6 @@ class EditorObject:
     def set_focus(self, focus) : # set focus
         self.focus = focus
 
-    def show_activity(self) : # set whether activity should be displayed.
-        pass
-
     def move(self):
         "Update position of object and redraw."
         pass
@@ -96,9 +94,6 @@ class EditorNode(EditorObject):
     in a EditorCanvas. Extending classes will supply a draw method and other type specific 
     attributes. 
     """
-    show_density = False
-    show_activity = False
-    normalize = False
 
     def __init__(self, canvas, pos, name):
         EditorObject.__init__(self, name, canvas)
@@ -170,7 +165,11 @@ class EditorSheet(EditorNode):
     Canvas. The colours used for drawing can be set. Uses bounding box to
     determine if x, y coord is within its boundary.
     """
-
+    normalize = BooleanParameter(default=False)
+    show_density = BooleanParameter(default=False)
+    view = Enumeration(default='normal',
+                       available=['normal','activity'])
+    
     def __init__(self, canvas, sheet, pos, name):
         EditorNode.__init__(self, canvas, pos, name)
         # CEBALERT: couldn't the object be stored in something like
@@ -183,13 +182,9 @@ class EditorSheet(EditorNode):
         sheet.gui_x, sheet.gui_y = self.x, self.y # store the ed coords in the topo sheet
         self.element_count = self.matrix_element_count()
         self.set_bounds()
-        self.activity = False
+
         self.set_colours()
         col = self.colour[1]
-        if (self.activity):
-            self.view = 'activity'
-        else : 
-            self.view = 'normal'
         self.init_draw(col, False) # create a new paralellogram
         self.currentCol = col
         self.gradient = 1
@@ -301,10 +296,8 @@ class EditorSheet(EditorNode):
     def dec_to_hex_str(self, val, length):
         # expects a normalised value and maps it to a hex value of the given length
         max_val = pow(16, length) - 1
-        hex_string = str(hex(int(val * max_val)))
-        extend = length - len(hex_string) + 2
-        hex_string = (extend * '0') + hex_string[2:]
-        return hex_string
+        fmt = '%%0%dx'%length
+        return fmt % (val*max_val)
 
     def draw(self, x = 0, y = 0):
         # move the parallelogram and label by the given x, y coords (default redraw)

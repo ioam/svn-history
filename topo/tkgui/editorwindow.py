@@ -45,7 +45,7 @@ class EditorCanvas(Canvas):
                                                     command=self.toggle_normalize)
 
         self.normalize_checkbutton.pack(side=LEFT)
-        if EditorNode.normalize == True:
+        if EditorSheet.normalize == True:
             self.normalize_checkbutton.select()
 
         # retain the current focus in the canvas
@@ -233,7 +233,7 @@ class EditorCanvas(Canvas):
             self.console.auto_refresh_panels.remove(self)
 
     def toggle_normalize(self):
-        EditorNode.normalize = not EditorNode.normalize
+        EditorSheet.normalize = not EditorSheet.normalize
         self.refresh()
 
 
