@@ -343,7 +343,9 @@ if locals().get('comparisons',False):
     check_weights('Primary','Afferent00',(23,23),slice(12,25),slice(12,25))
     check_weights('Primary','Afferent01',(0,0),slice(1,14),slice(1,14))
     check_weights('Primary','Afferent01',(23,23),slice(12,25),slice(12,25))
-    
+
+    # CB: checkin
+    # 'topo/tests/reference/oo_or_map_topo.000000.wts.Primary.Afferent01.023_023.matrix'
 
     #check_weights('Primary','LateralExcitatory',(0,0),slice(0,5),slice(0,5))
     #check_weights('Primary','LateralExcitatory',(23,23),slice(19,28),slice(19,28))
