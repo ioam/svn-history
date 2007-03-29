@@ -112,16 +112,16 @@ def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None
 
     for time in run_for:
         topo.sim.run(time)
-        if (decimal == None):
+        if decimal is None:
             assert_array_equal(data[topo.sim.time()],topo.sim[look_at].activity,
                            err_msg="\nAt topo.sim.time()=%d"%topo.sim.time())
         else:
             assert_array_almost_equal(data[topo.sim.time()],topo.sim[look_at].activity,
                            decimal,err_msg="\nAt topo.sim.time()=%d"%topo.sim.time())
 
-    print "\nResults from " + script + " have not changed."
-    if (decimal != None): print "(to %d decimal places)" % (decimal)
-
+    result = "Results from " + script + " have not changed."
+    if decimal is not None: result+= " (%d dp)" % (decimal)
+    print "\n"+result+"\n"
 
 
 
