@@ -568,7 +568,12 @@ class CFProjection(Projection):
         doc="Define the shape of the connection fields.")
 
     # CEBALERT: this is temporary (allows c++ matching in certain cases)
-    autosizemask = BooleanParameter(default=True,doc="Please do not use: will be removed.")
+    autosizemask = BooleanParameter(
+        default=True,constant=True,doc="""
+        Topographica sets the mask size so that it is the same as the connection field's
+        size, unless this parameter is False - in which case the user-specified size of
+        the weights_shape is used. In normal usage of Topographica, this parameter should
+        remain True.""")
 
     learning_fn = CFPLearningFnParameter(
         default=CFPLF_Plugin(),
