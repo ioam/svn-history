@@ -89,18 +89,18 @@ def matrixplot(mat,title=None):
     pylab.show()
 
 
-def activityplot(sheet,title=None,cmap=pylab.cm.Greys):
+def activityplot(sheet,activity=None,title=None,cmap=pylab.cm.Greys):    
     """
-    Plots the activity in a sheet.
+    Plots the activity in a sheetx.
 
     Gets plot's extent from sheet.bounds.aarect(). Adds a title and
-    allows the selection of a colormap.
+    allows the selection of a colormap.  If activity is not given,
+    the sheet's current activity is used.
     """
     l,b,r,t = sheet.bounds.aarect().lbrt()
-
-    pylab.imshow(sheet.activity,
-                 extent=(l,r,b,t),
-                 cmap=cmap)
+    if activity is None:
+        activity = sheet.activity
+    pylab.imshow(activity, extent=(l,r,b,t),cmap=cmap)
 
 
 def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreference',axis=[-0.5,0.5,-0.5,0.5]):
