@@ -10,7 +10,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import Pmw, sys, Tkinter
+import Pmw, sys, Tkinter, platform
 import topo.base.parameterizedobject
 import topoconsole
 
@@ -23,7 +23,6 @@ import topoconsole
 # Some font links:
 # http://www.pythonware.com/library/tkinter/introduction/x444-fonts.htm
 # http://www.astro.washington.edu/owen/ROTKFolklore.html
-
 
 
 
@@ -49,6 +48,20 @@ from topo.base.cf import CFPLearningFnParameter,CFPOutputFnParameter,CFPResponse
 from topo.base.functionfamilies import LearningFnParameter,OutputFnParameter,ResponseFnParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
 
+#
+# Define up the right click (context menu) events. These variables can
+# be appended or overridden in .topographicarc, if the user has some
+# crazy input device.
+#
+if platform.mac_ver()[0]:
+    # if it's on the mac, these are the context-menu events
+    right_click_events = ['<Button-2>','<Control-Button-1>']
+    right_click_release_events = ['ButtonRelease-2', 'Control-ButtonRelease-1']
+else:
+    # everywhere else (I think) it's Button-3
+    right_click_events = ['<Button-3>']
+    right_click_release_events = ['ButtonRelease-2']
+    
 
 def show_cmd_prompt():
     """
@@ -78,8 +91,8 @@ def start(mainloop=False):
     # JPALERT: We probably should do an OS check here if
     # ctrl-click means something else on Windows.
 
-    root.event_add('<<right-click>>','<Button-3>','<Control-Button-1>')
-    root.event_add('<<right-click-release>>','<ButtonRelease-3>','<Control-ButtonRelease-1>')
+    root.event_add('<<right-click>>',*right_click_events)
+    root.event_add('<<right-click-release>>',*right_click_release_events)
     Pmw.initialise(root)
     console = topoconsole.TopoConsole(parent=root)
     console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
@@ -104,6 +117,9 @@ def start(mainloop=False):
     # The reason to use pmw's menu bar is that balloon help can be bound
     # to the options - this doesn't seem to be possible with tk alone
     # (at least in any reasonable way).
+    # JP: If we could find a way to use the top-level menus it would
+    # be nice.  On the Mac, the current menus are notably un-mac-like
+    # in many ways.
     menubar=Menu(root)  # toplevel menu
     root.configure(menu=menubar)
     activate_cascade = """\
