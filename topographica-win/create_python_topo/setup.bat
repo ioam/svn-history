@@ -14,10 +14,12 @@ REM Pmw
 ..\util\gunzip -c ..\..\external\Pmw.tgz > ..\..\external\Pmw.tar
 ..\util\tar xvf ..\..\external\Pmw.tar
 copy ..\..\external\Pmw .
+
 REM Gnosis_Utils
 ..\util\gunzip -c ..\..\external\Gnosis_Utils-1.2.1.tar.gz > ..\..\external\Gnosis_Utils-1.2.1.tar
 ..\util\tar xvf ..\..\external\Gnosis_Utils-1.2.1.tar
 copy ..\..\external\Gnosis_Utils-1.2.1 .
+
 REM REM pyaudiolab
 REM ..\util\gunzip -c ..\..\external\pyaudiolab-0.6.6.tar.gz > ..\..\external\pyaudiolab-0.6.6.tar
 REM ..\util\tar xvf ..\..\external\pyaudiolab-0.6.6.tar
@@ -56,12 +58,7 @@ start /w numpy-1.0.1.win32-py2.4.exe
 REM * matplotlib
 start /w matplotlib-0.90.0.win32-py2.4.exe
 
-REM * jpeg-6b
-REM CEBHACKALERT: need to test this; can't just accept defaults during installation.
-REM (install to python24/libs) 
-start /w jpeg-6b-3.exe
-
-REM * PIL
+REM * PIL (has jpeg already)
 start /w PIL-1.1.5.win32-py2.4.exe
 
 REM * scipy
@@ -86,7 +83,6 @@ REM REM cd pyaudiolab-0.6.6
 REM REM c:\python24\python.exe setup.py install
 REM cd ..
 
-REM CEBHACKALERT: add the jpeg package? 
 
 
 REM * weave
