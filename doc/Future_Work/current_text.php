@@ -154,7 +154,8 @@ simple timing functions to make it easier for users to optimize their
 components (as opposed to the overall Topographica framework, for which
 the current profile() commands are appropriate)?  In any case, provide
 more guide for the user for doing optimization, focusing on the
-   components we expect to be the bottlenecks.
+   components we expect to be the bottlenecks. Add general advice
+for optimization to the manual pages.
 </li>
 
 <li>
