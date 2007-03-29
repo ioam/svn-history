@@ -68,8 +68,31 @@ format.  In the meantime, users should be aware that saved snapshot
 files will not necessarily be readable by future versions of
 Topographica, and should be considered temporary.
 <!-- Also consider CDF, HDF, or something like it for binary files -->
+<!-- From: fwh@inf.ed.ac.uk ; Oct  5 08:41:59 2005 +0100:
+
+  Consider http://www.neurogems.org/nmlparser/index.html ; see
+  message in mail/research/Topographica from the above date.
+
+  Also: binary file formats for XML:
+
+  XOP 
+  http://www.w3.org/TR/2005/REC-xop10-20050125/
   
-<!-- Should consider sparse layers with patch distribution of units -->
+  w3 Binary XML working group
+  http://www.tarari.com/PDF/BinaryXML/
+  Existing binary XML formats include: ASN.1, BiM, BXML, CMF-B, esXML,
+  Efficient XML, FastInfoSet, FastSchema, XBIS, XBVM, Xebu, XEUS and
+  XFSB.
+  
+  DFDL
+  https://forge.gridforum.org/projects/dfdl-wg/
+  
+  BinX
+  http://www.edikt.org/binx/
+-->
+
+							 
+<!-- Should consider sparse layers with patchy distribution of units -->
 
 <P><DT>More example models</DT><DD>
 Topographica currently includes a small sampling of example models,
@@ -108,8 +131,11 @@ of (sheetview, threshold) pairs, which will be drawn in order. -->
 <P>Other minor changes planned include adding outlining of
 ConnectionField extents, plotting histograms for each bitmap,
 and separate default colors for onscreen and publication plots.
-<!-- plus user-defined arbitrary colormaps ("KRYW", "BbKrR", etc.). -->
-  
+<!-- plus user-defined arbitrary colormaps ("KRYW", "BbKrR", etc.), 
+including allowing a threshold so that a colormap plot can be
+shown on top of a monochrome background plot, e.g. an activity blob on
+top of an ocular dominance or other grayscale map. -->
+							 
 <P><DT>Selecting units for plotting or analysis</DT><DD>
 In many of the GUI displays, a large number of units are shown.  These
 plots are designed to make the large-scale topographic structure of
