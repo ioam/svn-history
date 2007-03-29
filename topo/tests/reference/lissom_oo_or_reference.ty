@@ -50,7 +50,8 @@ __version__='$Revision$'
 
 
 # CB: the plan is to make this file more and more general while
-# keeping it matching the equivalent c++ lissom simulation.
+# keeping it matching the equivalent c++ lissom simulation (i.e. do to
+# this what was done to lissom_or_reference/or_map_topo.param).
 
 
 
@@ -102,6 +103,7 @@ gammaexc=0.9
 gammainh=0.9
 delta=0.083
 beta=0.633
+
 
 randomness = 0.0
 #smooth_circular_radius_trim = -0.25
@@ -283,8 +285,6 @@ LE.learning_rate=alpha_exc*n_units(LE)
 LI.learning_rate=alpha_inh*n_units(LI)
 
 
-# CB: Please verify these scheduled actions before moving onto comparisons at times later than 0
-# (which is as far as I got).
 
 
 ### EXCITATORY BOUNDS CHANGES
@@ -294,7 +294,6 @@ LI.learning_rate=alpha_inh*n_units(LI)
 # this time)
 #
 topo.sim.schedule_command(199, 'exc_rad*=0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=n_units(LE)*alpha_exc')
-topo.sim.schedule_command(499, 'exc_rad*=0.7; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=n_units(LE)*alpha_exc')
 
 
 ### LEARNING RATE CHANGES
@@ -309,16 +308,16 @@ topo.sim.schedule_command(19999, 'alpha_input=0.0015*acs; Af00.learning_rate=alp
 
 ### Primary output function bounds changes
 #
-topo.sim.schedule_command(  199, 'topo.sim["Primary"].output_fn.lower_bound=0.093; topo.sim["Primary"].output_fn.upper_bound=0.643')
-topo.sim.schedule_command(  499, 'topo.sim["Primary"].output_fn.lower_bound=0.103; topo.sim["Primary"].output_fn.upper_bound=0.653')
-topo.sim.schedule_command(  999, 'topo.sim["Primary"].output_fn.lower_bound=0.133; topo.sim["Primary"].output_fn.upper_bound=0.663')
-topo.sim.schedule_command( 1999, 'topo.sim["Primary"].output_fn.lower_bound=0.163; topo.sim["Primary"].output_fn.upper_bound=0.683')
-topo.sim.schedule_command( 2999, 'topo.sim["Primary"].output_fn.lower_bound=0.183; topo.sim["Primary"].output_fn.upper_bound=0.713')
-topo.sim.schedule_command( 3999, 'topo.sim["Primary"].output_fn.lower_bound=0.183; topo.sim["Primary"].output_fn.upper_bound=0.743')
-topo.sim.schedule_command( 4999, 'topo.sim["Primary"].output_fn.lower_bound=0.193; topo.sim["Primary"].output_fn.upper_bound=0.773')
-topo.sim.schedule_command( 6499, 'topo.sim["Primary"].output_fn.lower_bound=0.203; topo.sim["Primary"].output_fn.upper_bound=0.803')
-topo.sim.schedule_command( 7999, 'topo.sim["Primary"].output_fn.lower_bound=0.213; topo.sim["Primary"].output_fn.upper_bound=0.833')
-topo.sim.schedule_command(19999, 'topo.sim["Primary"].output_fn.lower_bound=0.223; topo.sim["Primary"].output_fn.upper_bound=0.863')
+topo.sim.schedule_command(  199, 'topo.sim["Primary"].output_fn.lower_bound=0.11; topo.sim["Primary"].output_fn.upper_bound=0.66')
+topo.sim.schedule_command(  499, 'topo.sim["Primary"].output_fn.lower_bound=0.12; topo.sim["Primary"].output_fn.upper_bound=0.67')
+topo.sim.schedule_command(  999, 'topo.sim["Primary"].output_fn.lower_bound=0.15; topo.sim["Primary"].output_fn.upper_bound=0.68')
+topo.sim.schedule_command( 1999, 'topo.sim["Primary"].output_fn.lower_bound=0.18; topo.sim["Primary"].output_fn.upper_bound=0.70')
+topo.sim.schedule_command( 2999, 'topo.sim["Primary"].output_fn.lower_bound=0.20; topo.sim["Primary"].output_fn.upper_bound=0.73')
+topo.sim.schedule_command( 3999, 'topo.sim["Primary"].output_fn.lower_bound=0.20; topo.sim["Primary"].output_fn.upper_bound=0.76')
+topo.sim.schedule_command( 4999, 'topo.sim["Primary"].output_fn.lower_bound=0.21; topo.sim["Primary"].output_fn.upper_bound=0.79')
+topo.sim.schedule_command( 6499, 'topo.sim["Primary"].output_fn.lower_bound=0.22; topo.sim["Primary"].output_fn.upper_bound=0.82')
+topo.sim.schedule_command( 7999, 'topo.sim["Primary"].output_fn.lower_bound=0.23; topo.sim["Primary"].output_fn.upper_bound=0.85')
+topo.sim.schedule_command(19999, 'topo.sim["Primary"].output_fn.lower_bound=0.24; topo.sim["Primary"].output_fn.upper_bound=0.88')
 
 
 
@@ -373,10 +372,69 @@ if locals().get('comparisons',False):
     check_activities('Ganglia01')
     check_activities('Primary')
 
-    # matches until bounds change...presumably there's an error
-    # in scheduled actions.
+    # add some checks for weights
     
     topo.sim.run(1) # to 200
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(300) # to 500
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(500) # to 1000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(1000) # to 2000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(1000) # to 3000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(1000) # to 4000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(1000) # to 5000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(1000) # to 6000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(1000) # to 7000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(1000) # to 8000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(12000) # to 20000
     check_activities('Eye0')
     check_activities('Ganglia00')
     check_activities('Ganglia01')
@@ -389,4 +447,4 @@ if locals().get('comparisons',False):
 #
 #
 
-#./lissom5 commandpath="/home/chris/mae/lissom/command/" display=0 oo_or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c "plot_unit region=Ganglia00 save_matrices=True 12 12" -c "plot_unit region=Ganglia01 save_matrices=True 0 0" -c "plot_unit region=Ganglia01 save_matrices=True 12 12" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+197' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'step' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'step' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'step' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'
+#./lissom5 commandpath="/home/chris/mae/lissom/command/" display=0 oo_or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c "plot_unit region=Ganglia00 save_matrices=True 12 12" -c "plot_unit region=Ganglia01 save_matrices=True 0 0" -c "plot_unit region=Ganglia01 save_matrices=True 12 12" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+198' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'step' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+300' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+500' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+12000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'
