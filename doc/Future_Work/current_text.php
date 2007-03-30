@@ -5,257 +5,251 @@
 - add note: anyone needs stuff at bottom, they should probably do it themselves!
 -->
 
+<p>
+This list forms the developers' to-do list. It's divided into several
+sections, with earlier sections being higher priority than later ones.
+Tasks within each section are also ordered approximately by priority.
 
-<h3>Current tasks</h3>
+<li><em>Tasks to be addressed for the upcoming n release</em><br />
+What the developers are working on most actively right now.
+</li>
 
-<p><small>
+<li><em>Tasks to be addressed for the upcoming n+1 release or later</em><br />
+Tasks that the developers hope to be able to start on after finishing
+their work for the current upcoming release.
+</li>
+
+<li><em>Things we hope to take care of eventually</em><br />
+Tasks of lower priority; if you would like to see one of these tasks
+completed any time soon, please volunteer (even if a developer is
+already assigned)! 
+</li>
+
+<li><em>Ongoing work </em><br />
+Long-term tasks that are underway, and tasks that the developers might
+currently be investigating: work with uncertain finishing times.
+</li>
+</p>
+
+<p>
 By each task, initials in parentheses typically indicate the main
 person working on an item, but others may also be involved.  Items
 with no initials are not (yet) assigned to a specific developer (so
 please feel free to volunteer!!!!). Dates indicate the item was first
 added to the list, or a change was made.
-</small>
+</p>
 
-<h3>Tasks to be addressed for the upcoming 0.9.3 release:</h3>
+<H2>Tasks to be addressed for the upcoming 0.9.3 release:</H2>
 
-<ul>
+<pre>
+2007/02/20 (JB): Errata before release
+- update Changelog.txt, summarize major changes in it for the release
+notes
+- make a pass through the documentation to fix anything that is not up
+to date (especially things related to Numpy support and to describe
+new features)
+- build on the various platforms, etc.
 
-<li>
-2007/02/20 (JB): Errata before release:
-update Changelog.txt,
-summarize major changes in it for the release notes,
-make a pass through the documentation to fix anything that is not up to date
-(especially things related to Numpy support and to describe new features),
-build on the various platforms, etc.
-</li>
 
-<li>
-2007/03/28 (?): Update the lissom_oo_or tutorial page to match changes
-in the GUI and elsewhere.  E.g. we can mention the right-click menus,
-how to use the dynamic info to see the coordinate systems and numeric values,
-how to start and stop training, and add sections about plotting
-'Orientation tuning fullfield' tuning curves and FFTs.
-</li>
+2007/03/28 (?): Update tutorial
+Update the lissom_oo_or tutorial page to match changes in the GUI and
+elsewhere.  E.g. we can mention the right-click menus, how to use the
+dynamic info to see the coordinate systems and numeric values, how to
+start and stop training, and add sections about plotting 'Orientation
+tuning fullfield' tuning curves and FFTs.
 
-<li>
-2007/03/28 (JB): Finish converting som_retinotopy.ty and
-obermayer_pnas90.ty to use the new simpler and faster SOM support as
-in cfsom_or.ty, and delete all of the old SOM support.  Requires
-checking that the som_retinotopy.ty tutorial still works ok after the
-conversion.
-</li>
 
-<li>
-2007/02/20 (JB): Upgrade epydoc to the current SVN version to incorporate
-recent changes and bugfixes for the Reference Manual.
-</li>
+2007/03/28 (JB): Using new SOM support
+Finish converting som_retinotopy.ty and obermayer_pnas90.ty to use the
+new simpler and faster SOM support as in cfsom_or.ty, and delete all
+of the old SOM support.  Requires checking that the som_retinotopy.ty
+tutorial still works ok after the conversion.
 
-<li>
-2006/03/26 (CB): Are there any more missing scheduled_actions in lissom examples?
-[who added that?! i don't want to do this!]
-</li>
 
-<li>
-2007/03/02 (CB): update topographica-win:
+2007/02/20 (JB): Upgrade epydoc 
+Update to the current SVN version to incorporate recent changes and
+bugfixes for the Reference Manual.
+
+
+2006/03/26 (CB): scheduled_actions in lissom examples
+Are there any more missing ones?
+
+
+2007/03/02 (CB): update topographica-win
 - test that results from Windows version match those from the standard
 one.  (The current Windows numpy version at scipy.org presumably
 contains the subtract.reduce bug. Without an updated numpy binary,
 can't really test Windows version.)
-- pyaudiolab, mlabwrap, other optional packages will wait until a future
-release.
-</li>
-
-<li>
-2007/03/29 (CB): can I do script_repr task? (email from JAB)
-</li>
+- pyaudiolab, mlabwrap, other optional packages will wait until a
+future release.
 
 
-</ul>
+2007/03/29 (CB): script_repr task
+Can I do it easily for the release? (email from JAB)
+</pre>
 
 
-<h3>Tasks to be addressed for the 0.9.4 or later releases:</h3>
+<H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
 
-<ul>
-
-
-<li>
-2007/03/29 (CB): checkin some data for the make compare_or test,
-allowing people to use the test even if they haven't run c++ lissom?
-</li>
-
-<li>
-2007/03/29 (CB): Migrate examples/Makefile to python script.
-Plus control tests from a python file rather than the Makefile.
-Can then include more tests of examples, by specifying sheet to look at etc.
-But importantly, can easily run tests on Windows version.
-</li>
-
-<li>
-2007/03/26 (CB): plotgroup panel resizing. Add scrollbars when not
-auto-resizing (and ideally even when auto-resizing but the window
-would otherwise be larger than the screen). 
-</li>
-
-<li>
-2006/12/14 (JB): Documentation for the new Numeric is not free. But we
-could document differences from the current Numeric documentation for
-our users, as we find these differences.
-</li>
-
-<li>
-2006/11/09 (CP): Add automatic assignment of topo.sim.name, by taking
-the base name of the first .ty file in sys.argv (if any).  Also should
-clean up how the window titles are initialized, so that it is done
-after a .ty script is loaded (whether on the initial command line or
-from the GUI).  (Right now the name is updated only when a window is
-first opened, or when learning is done in the topoconsole.)
-</li>
-
-<li>
-2006/07/07 (CP): Fix normalization to allow negative weights.  Also
-consider adding other normalization options, including joint
-normalization across all plots with the same name.
-</li>
-
-<li>
-2006/11/09 (JL): Support better saving of results during long batch
-runs (e.g. orientation maps and other plots).
-</li>
-
-<li>
-2006/11/09 (CP/JL): Add support for measuring receptive fields,
-perhaps using STRFPAK or a similar approach.
-</li>
-
-<li>
-2006/11/09 (CP?): Add support for plotting outstar connections, i.e. outgoing
-ConnectionFields.
-</li>
-
-<li>
-2006/11/09 (RZ): Add support for automatic generation of reports with
-statistics about maps, e.g. for estimating perceived quantities.
-</li>
-
-<li>
-2006/11/09 (JA): Need to implement more of the optimizations from the C++ LISSOM code.
-</li>
-
-<li>
-2006/05/24 (JB): Problems with examples/joublin_bc96.ty: strange Projection
-plots.
-</li>
-
-<li>
-2007/01/25 (CB): Set order and names of ParametersFrame's Ok, Apply,
-Cancel, Reset, and Defaults buttons, and make them behave as expected
-for classes and instances.  Figure out and clean up
-translator_dictionary & its uses.
-</li>
-
-<li>
-2007/03/26 (CB): Finish support for optimization.  Do we need our own
-simple timing functions to make it easier for users to optimize their
-components (as opposed to the overall Topographica framework, for which
-the current profile() commands are appropriate)?  In any case, provide
-more guide for the user for doing optimization, focusing on the
-   components we expect to be the bottlenecks. Add general advice
-for optimization to the manual pages.
-</li>
-
-<li>
-2007/03/26 (CB): investigate why this: 
 <pre>
+2007/03/29 (CB): make compare tests
+checkin some data for the make compare_or and compare_oo_or tests,
+allowing people to use the test even if they haven't run c++ lissom.
+
+
+2007/03/29 (CB): Makefiles to python sccripts
+Migrate examples/Makefile to python script.  Plus control tests from a
+python file rather than the Makefile.  Can then include more tests of
+examples, by specifying sheet to look at etc.  And importantly, can
+easily run tests on Windows version.
+
+
+2007/03/26 (CB): plotgroup panel resizing 
+Add scrollbars when not auto-resizing (and ideally even when
+auto-resizing but the window would otherwise be larger than the
+screen).
+
+
+2006/12/14 (JB): Documentation for the new Numeric 
+It's not free. But we could document differences from the current
+Numeric documentation for our users, as we find these differences.
+
+
+2006/11/09 (CP): Add automatic assignment of topo.sim.name
+Take the base name of the first .ty file in sys.argv (if any).  Also
+should clean up how the window titles are initialized, so that it is
+done after a .ty script is loaded (whether on the initial command line
+or from the GUI).  (Right now the name is updated only when a window
+is first opened, or when learning is done in the topoconsole.)
+
+
+2006/07/07 (CP): Fix normalization to allow negative weights.  
+Also consider adding other normalization options, including joint
+normalization across all plots with the same name.
+
+
+2006/11/09 (JL): better saving during batch runs
+Support better saving of results during long batch runs
+(e.g. orientation maps and other plots).
+
+
+2006/11/09 (CP/JL): Add support for measuring receptive fields
+Perhaps use STRFPAK or a similar approach.
+
+
+2006/11/09 (CP?): plot outstar connections
+Add support for plotting outstar connections, i.e. outgoing
+ConnectionFields.
+
+
+2006/11/09 (RZ): map statistics
+Add support for automatic generation of reports with statistics about
+maps, e.g. for estimating perceived quantities.
+
+
+2006/11/09 (JA): optimizations from c++
+Need to implement more of the optimizations from the C++ LISSOM code.
+
+
+2006/05/24 (JB): Problems with examples/joublin_bc96.ty
+Strange Projection plots.
+
+
+2007/01/25 (CB): ParametersFrame ok/apply/reset/cancel
+Set order and names of ParametersFrame's Ok, Apply, Cancel, Reset, and
+Defaults buttons, and make them behave as expected for classes and
+instances.  Figure out and clean up translator_dictionary & its uses.
+
+
+2007/03/26 (CB): Support for optimization  
+Do we need our own simple timing functions to make it easier for users
+to optimize their components (as opposed to the overall Topographica
+framework, for which the current profile() commands are appropriate)?
+A facility for reporting the approximate time spent in methods of each
+EventProcessor?  In any case, provide more guide for the user for
+doing optimization, focusing on the components we expect to be the
+bottlenecks. Add general advice for optimization to the manual pages.
+
+
+2007/03/26 (CB): PatternGeneratorParameter default value
+Investigate why this:
+
 from topo.base.patterngenerator import PatternGeneratorParameter
 PatternGeneratorParameter.default=topo.patterns.basic.Line()
-</pre>
+
 gives errors about being read only sometimes. (Try at 
 the commandline, from a script, and saving/loading snapshots.)
-</li>
 
-<li>
-2007/03/26 (CB): tidy up, document right-click menu code. 
-JB: Would also be good to make it possible to add things to the menu
-without changing the tkgui files, like the templates work for activity
-plots.
-</li>
 
-<li>
+2007/03/26 (CB): right-click menus
+Tidy code, then make it possible to add things to the menu without
+changing the tkgui files, like the templates work for activity plots.
+
+
 2007/03/26 (CB): developer page about efficient array computations.
 Measurement of numpy.sum(X)/X.sum()/sum(X) performance. Difference
 between simulation results on different platforms (for slow-tests in
 Makefile).
-</li>
-
-
-</ul>
+</pre>
 
 
 
 
-<h3>Things we hope to take care of eventually</h3>
+<H2>Things we hope to take care of eventually</H2>
 
-<ul>
-
-<li>
-2007/03/29 (CB): set c++ lissom params so that topographica
-doesn't have to set ganglia weight mask specially.
-</li>
+<pre>
+2007/03/29 (CB): c++ lissom matching
+set c++ lissom params so that topographica doesn't have to set ganglia
+weight mask specially.
 
 
-<li>
-2007/03/29: make slow tests output a little more obvious (e.g. speed change
-of more than 5%).
-</li>
+2007/03/29: make slow tests output
+make slow tests output a little more obvious (e.g. speed change of
+more than 5%).
 
-<li>
-2007/03/26: Add a wrapper around the Modular Data Processing (MDP) toolkit
+
+2007/03/26: wrap MDP
+Add a wrapper around the Modular Data Processing (MDP) toolkit
 (http://mdp-toolkit.sourceforge.net) to provide easy access to the
 PCA, ICA, SFA, ISFA, etc. algorithms.
-</li>
+
 			     
-<li>
-2007/03/14 (CB): gnosis.xml.pickle needs to be updated for 
-numpy. I'm working with module's author at the moment.
-</li>
+2007/03/14 (CB): gnosis.xml.pickle 
+Needs to be updated for numpy. I'm working with module's author at the
+moment.
 
-<li>
-2007/03/27 (CB): given how private attributes work in Python, it seems like we can just
-have a parameter __abstract_class=True for abstract classes, and then __is_abstract 
-can check to see if there is such an attribute (and that it is True, just in case).  
-</li>
 
-<li>
-2007/03/14 (CB): how to build scipy without requiring any of the external
-linear algebra libraries, etc? Then scipy would at least build
-easily, and users could install the optimized versions if they wished.
+2007/03/27 (CB): abstract classes
+given how private attributes work in Python, it seems like we can just
+have a parameter __abstract_class=True for abstract classes, and then
+__is_abstract can check to see if there is such an attribute (and that
+it is True, just in case).
+
+
+2007/03/14 (CB): building scipy
+how to build scipy without requiring any of the external linear
+algebra libraries, etc? Then scipy would at least build easily, and
+users could install the optimized versions if they wished.
 Investigate garnumpy.
-</li>
 
-<li>
+
 2007/02/23: which version of libraries is numpy using?
-<br />
-numpy.__config__.show()
-<br />
-warn users if they're using a slow version?
-<br />
-http://www.scipy.org/Numpy_Example_List?highlight=%28example%29#head-c7a573f030ff7cbaea62baf219599b3976136bac
-</pre>
+- numpy.__config__.show()
+- warn users if they're using a slow version?
+- http://www.scipy.org/Numpy_Example_List?highlight=%28example%29#head-c7a573f030ff7cbaea62baf219599b3976136bac
 >>>
 >>> import numpy
 >>> if id(dot) == id(numpy.core.multiarray.dot):           # A way to know if you use fast blas/lapack or not.
 ...   print "Not using blas/lapack!"
-</pre>
-</li>
 
-<li> 
-2006/02/04 (JAB): Should work through some of the most commonly used
+
+2006/02/04 (JAB): tune non-inline-optimtized components
+Should work through some of the most commonly used
 non-inline-optimized components to see if the implementation can be
 tuned slightly for better performance.  For instance, numpy.dot()
 appears to be much faster than the current sum(x*y) implementation of
 DotProduct:
 
-<pre>
 Topographica_t0> import time,numpy,Numeric
 Topographica_t0> def runtime(code): start = time.time() ; z = eval(code) ; end = time.time() ; print z, end-start
 ... 
@@ -273,65 +267,65 @@ Topographica_t0> runtime("Numeric.dot(x.flat,y.flat)")
 20000000 0.0919671058655
 Topographica_t0> runtime("Numeric.sum(x.flat*y.flat)")
 20000000 0.358192205429
-</pre>
 
 After this, it would be interesting to get some hard numbers about how
 much faster the inline-optimized components are than those using numpy
 primitives.
-</li>
-
-<li>
-2006/11/09 (JA?): Need to do a general overhaul of the GUI; it needs to be clean 
-and well designed so that it can be flexible.
-</li>
-
-<li>
-2007/03/26: minor tkgui cleanup? Which widgets should expand
-(expand=YES ?), which should fill the space (fill=X ?) (e.g. in
-parameters frames sliders etc should expand). Plus see notes in 
-tkgui/__init__ and topoconsole (CB: maybe put those all together.)
-</li>
-
-<li>
-2006/11/09 (JL?): Add better support for exploring and optimizing parameter spaces.
-</li>
-
-<li>
-2007/02/28 (CB): OneDPowerSpectrum(PatternGenerator) and
-Audio(OneDPowerSpectrum) (an example of processing auditory data: does
-an FFT incrementally on an audio file, delivering part of a
-spectrogram at each clock tick).
-<!-- doesn't work with test pattern window because plotting expects
-2d arrays, I think -->
-</li>
-
-<li>
-2006/12/21: Could add an option to lock Topographica to real time, so
-that once processing is done at a particular virtual time, it waits
-until the next real time before moving to the next event (which may be
-different due to real-time input arriving by then).  On the other
-hand, maybe this isn't necessary?  E.g. everything could be driven
-from a PatternGenerator that produces a new pattern whenever some
-real-world input arrives, and then the rest of the processing can be
-triggered from that, as fast as it can compute.  Worth thinking about,
-e.g. to handle simple webcam input.
-</li>
-
-<li>
-2006/06/03: Allow min_matrix_radius to be set to zero, and then say
-that if no unit ends up in the CF, then there will be no CF for that
-unit.  But that's going to make the rest of the code hard to write,
-because we'll either have to deal with CFs with empty matrices, or
-deal with CFs missing altogether.
-(As an example, the problem of zero-sized CFs arises in examples/joublin_bc96.ty.)
-Maybe it would be simplest to use a non-zero CF size, but with a mask
-making no unit visible; not sure.
-</li>
 
 
-<li>
-2006/05/19: look at the output from:
-<code>bin/python lib/python2.4/site-packages/pychecker/checker.py topo/base/*.py</code>.
+2006/11/09 (JA?): overhaul tkgui
+Need to do a general overhaul of the GUI; it needs to be clean and
+well designed so that it can be flexible. Before any such overall,
+review the available graphics toolkits (e.g. wxpython vs tkinter).
+
+
+2007/03/26: minor tkgui cleanup
+Which widgets should expand (expand=YES ?), which should fill the
+space (fill=X ?) (e.g. in parameters frames sliders etc should
+expand). Plus see notes in tkgui/__init__ and topoconsole (CB: maybe
+put those all together.)
+
+
+2006/11/09 (JL?): parameter spaces
+Add better support for exploring and optimizing parameter spaces.
+
+
+2007/02/28 (CB): OneDPowerSpectrum & Audio PatternGenerators
+Finish the two classes. Make a demo with Audio Currently don't work
+with test pattern window because plotting expects 2d arrays.
+
+
+2007/03/30 (CB): PatternGenerator, PatternGenerator2D
+Have a second abstract class so that the base PatternGenerator is
+simpler.
+
+
+2006/12/21: lock to real time?
+Could add an option to lock Topographica to real time, so that once
+processing is done at a particular virtual time, it waits until the
+next real time before moving to the next event (which may be different
+due to real-time input arriving by then).  On the other hand, maybe
+this isn't necessary?  E.g. everything could be driven from a
+PatternGenerator that produces a new pattern whenever some real-world
+input arrives, and then the rest of the processing can be triggered
+from that, as fast as it can compute.  Worth thinking about, e.g. to
+handle simple webcam input.
+
+
+2006/06/03: zero-sized CFs
+Allow min_matrix_radius to be set to zero, and then say that if no
+unit ends up in the CF, then there will be no CF for that unit.  But
+that's going to make the rest of the code hard to write, because we'll
+either have to deal with CFs with empty matrices, or deal with CFs
+missing altogether.  (As an example, the problem of zero-sized CFs
+arises in examples/joublin_bc96.ty.)  Maybe it would be simplest to
+use a non-zero CF size, but with a mask making no unit visible; not
+sure.
+
+
+2006/05/19: pychecker
+look at the output from:
+bin/python lib/python2.4/site-packages/pychecker/checker.py topo/base/*.py
 Decide which ones of the messages are real problems.  Running it
 right now gives 86 warnings, which isn't too hard to imagine looking
 at.  Some of them look like things that could be genuinely confusing,
@@ -342,95 +336,125 @@ don't quite understand (like "Function (__init__) uses named
 arguments" or "__set__ is not a special method"); those would be worth
 understanding.  Once that's done for base/, the rest should be much
 easier.
-</li>
 
 
-<li>
-2006/06/19 (JB): Number, DynamicNumber: Need to replace the current
-implementation with one where Number has a 'dynamic' slot that
-can be turned on or off, so that any Number could be dynamic.
-Includes making sure something sensible happens in model editor,
-and (eventually) making it possible to set their values and
+2006/06/19 (JB): Number, DynamicNumber
+- Need to replace the current implementation with one where Number has a
+'dynamic' slot that can be turned on or off, so that any Number could
+be dynamic.  Includes making sure something sensible happens in model
+editor, and (eventually) making it possible to set their values and
 (hopefully) change any Number to be dynamic.
-<br />
-Need to make sure DynamicNumbers are advanced only once per simulation time.
-</li>
+- Need to make sure DynamicNumbers are advanced only once per simulation time.
 
-<li>
-2006/05/15: All arrays should be Numeric.Float32
-</li>
 
-<li>
-2007/03/29: HACKALERTs relating to connection fields; test file for
+2006/05/15: array type
+All arrays should be numpy.float32
+
+
+2007/03/29: connectionfield/slice/sheetcoords
+HACKALERTs relating to connection fields; test file for
 connectionfield; cleaning up cf.py and projections/basic.py along with
-the Slice class and SheetCoordinateSystem (there are several simplifications that can be made).
-Maybe we can use masked arrays, now that Numpy has support for several
-varieties that might meet our needs better than Numeric's did.
-</li>
+the Slice class and SheetCoordinateSystem (there are several
+simplifications that can be made).  Maybe we can use masked arrays,
+now that Numpy has support for several varieties that might meet our
+needs better than Numeric's did.
 
-<li>
-2006/05/15: Objects in the simulation are indexed by name, so name needs to be a constant Parameter (which <i>might</i> cause some other problems).  There are some related hacks in ParametersFrame that would also need to be cleaned up.
-</li>
 
-<li> 
-2006/04/20: many of the tests in testsheet.py run twice - correct that.  See CEBHACKALERT in topo/tests/testsheet.py.
-</li>
+2006/05/15: name should be constant
+Objects in the simulation are indexed by name, so name needs to be a
+constant Parameter (which <i>might</i> cause some other problems).
+There are some related hacks in ParametersFrame that would also need
+to be cleaned up.
 
-<li>
-2006/04/20 (JB): Complete test file for Composite and Image.  investigate failing test in testimage.py (that uses sheet functions).
-Currently commented out; may not be a problem.
-</li>
 
-<li>
-2006/02/24: SheetSelectorParameter etc (so that the GUI (model editor) can
-display list of sheet classes etc from a Parameter).
-</li>
+2006/04/20: unit tests
+Need to be cleaned up so they run correctly. For example, many of the
+tests in testsheet.py run twice - correct that.  See CEBALERT in
+topo/tests/testsheet.py.
 
-<li>
-2006/02/24 (JB): find_classes_in_package() will become a method of ClassSelectorParameter. 
-</li>
 
-<li>
-2006/02/21: ReadOnlyParameter to allow declaration of something but not let it
-be set anywhere else, even in a ParameterizedObject constructor.
-</li>
+2006/04/20 (JB): Composite & Image test files.
+Complete test file for Composite and Image.  investigate failing test
+in testimage.py (that uses sheet functions).  Currently commented out;
+may not be a problem.
 
-<li>
-2006/02/21 (JB): Remove Parameter's hidden attribute, and instead use (e.g. negative) precendence.
-</li>
 
-<li>
-2006/02/21 (JB): Have size and aspect_ratio Parameters in
-PatternGenerator so that subclasses can inherit doc, precedence
-attributes (etc), but have them not used unless a subclass does really
-use them.  It might be better just to create an abstract PatternGenerator
-class for grouping together all patterns using those parameters, which shouldn't be too hard. 
-</li>
+2006/02/24: SheetSelectorParameter etc 
+So that the GUI (model editor) can display list of sheet classes etc
+from a Parameter.
 
-<li>
-2006/03/07 (JL): make change_bounds() able to enlarge as well as shrink [made a first draft, JL is working with it]
-</li>
 
-<li>
-2006/06/19: e.g. Filename's search_paths attribute shouldn't be pickled.
-Presumably there will be other such items, so should objects have a standard 
-attribute/parameter that lists attributes not to pickle? Or something like that.
-Otherwise, save_snapshot and load_snapshot could specifically avoid items.
-</li>
+2006/02/24 (JB): ClassSelectorParameter
+find_classes_in_package() will become a method of ClassSelectorParameter. 
 
-<li>
-2005/01/01: Could add a web site with results of unit tests, updated nightly
-</li>
 
-<li>
-2005/01/01: Could consider using or taking components from: SciPy,
+2006/02/21: ReadOnlyParameter
+To allow declaration of something but not let it be set anywhere else,
+even in a ParameterizedObject constructor.
+
+
+2006/02/21 (JB): Parameters: remove 'hidden' attribute
+Instead use (e.g. negative) precendence.
+
+
+2006/02/21 (JB): PatternGenerator parameters
+Have size and aspect_ratio Parameters in PatternGenerator so that
+subclasses can inherit doc, precedence attributes (etc), but have them
+not used unless a subclass does really use them.  It might be better
+just to create an abstract PatternGenerator class for grouping
+together all patterns using those parameters, which shouldn't be too
+hard.
+
+
+2006/03/07 (JL): change_bounds()
+make change_bounds() able to enlarge as well as shrink 
+
+
+2006/06/19: things not to pickle
+e.g. Filename's search_paths attribute shouldn't be pickled.
+Presumably there will be other such items, so should objects have a
+standard attribute/parameter that lists attributes not to pickle? Or
+something like that.  Otherwise, save_snapshot and load_snapshot could
+specifically avoid items.
+
+
+2005/01/01: unit test results on the web
+Could add a web site with results of unit tests, updated nightly
+
+
+2005/01/01: components from external packages 
+Could consider using or taking components from: SciPy,
 ScientificPython, Chaco, Pyro (the robotics package), g, logger
 (instead of our custom messaging functions).
-</li>
 
-<li>
-2005/01/01: Should add support for additive or multiplicative noise, with
-many possible places it could be added.
+
+2005/01/01: noise
+Should add support for additive or multiplicative noise, with many
+possible places it could be added.
+
+
+2005/01/01: grouping sheets for plotting
+Add a mechanism to group Sheets into a logical unit for plotting,
+analysis, etc.  For instance, it should be possible to group three
+R,G,B sheets into one eye, two ON and OFF sheets into one LGN area,
+and several V1 layers into one stack.  Such grouping should support
+e.g. presenting a color bitmap to an Eye instead of to R, G, and B
+separately, plotting the resulting activation from the three areas in
+true color, combining ON and OFF plots into one bitmap (by
+subtraction), and measuring a vertically summed orientation map for a
+model using several layers.
+
+
+2005/01/01: porting other simulations from c++ lissom
+Finish porting all categories of simulations from parts II and III of
+the LISSOM book (i.e. orientation maps, ocular dominance maps,
+direction maps, combined maps, face maps, and two-level maps) to
+Topographica.
+</pre>
+
+
+
+
 <!-- Also suggested by Geisler, 7/1/2005:
   Package as a Matlab toolbox to get the right people to use it?
   Package it as an easy-to-use out-of-the-box optical imaging simulator
@@ -438,32 +462,6 @@ many possible places it could be added.
   Be able to look at the effects of attention
   Add specific models for intrinsic or voltage-sensitive-dye imaging 
 -->
-</li>
-
-<li>
-2005/01/01: Add a mechanism to group Sheets into a logical unit for
-plotting, analysis, etc.  For instance, it should be possible to group
-three R,G,B sheets into one eye, two ON and OFF sheets into one LGN
-area, and several V1 layers into one stack.  Such grouping should
-support e.g. presenting a color bitmap to an Eye instead of to R, G,
-and B separately, plotting the resulting activation from the three
-areas in true color, combining ON and OFF plots into one bitmap (by
-subtraction), and measuring a vertically summed orientation map for a
-model using several layers.
-</li>
-
-<li>
-2005/01/01: Finish porting all categories of simulations from parts II
-and III of the LISSOM book (i.e. orientation maps, ocular dominance
-maps, direction maps, combined maps, face maps, and two-level maps) to
-Topographica.
-</li>
-
-</ul>
-
-
-
-
 
 
 <!-- From Tue Sep  6 15:32:25 BST 2005 meeting with Eyal
@@ -612,79 +610,59 @@ To figure out:
 
 
 
-<h3>Other work</h3>
+<H2>Ongoing work</H2>
 
-Ongoing work with uncertain finishing times.
-
-<ul>
-
-<li>
-2006/02/23 (all): Making more things be Parameters, and writing doc strings at the same time. E.g. the x and y widgets in the Unit Weights window can be Numbers with bounds, etc.
-</li>
-
-<li> 
-2006/02/23 (all): Ensuring classes are declared abstract when they should be, and making sure base and simple classes are imported into packages (i.e. Sheet into topo/sheets/, Projection into topo/projections/, Constant into topo/patterns/, and so on).
-</li>
-
-<li>
-2006/05/24 (JB): Add a facility for reporting the approximate time spent
-in methods of each EventProcessor, to allow simple debugging without having
-to use the profiler.  Or at least add the hotshot commands from lissom_or.ty
-to a function that can be called easily, which wouldn't be very difficult.
-</li>
-
-<li>
-2006/02/21: Might someday be interesting to have read-only objects,
-aiming at copy-on-write semantics, but this seems quite difficult to
-achieve in Python.
-</li>
-
-<li>
-2006/02/21 (all): Improving documentation and test files; eliminating ALERTs.
-</li>
-
-<li>
-2007/03/26 (CB): Build python on windows with free compiler. Maybe use
-pymingw? Or cygwin? Currently trying cygwin, with some success.
-<br />
-Python for Windows (as distributed by python.org) is built using a
-non-free (money,speech) Microsoft compiler (with associated project files):
-external/Python-2.4.4/PCbuild/readme.txt.
-<br />
-Apparently it can be built using a free (money) Microsoft compiler:
-http://wiki.python.org/moin/Building_Python_with_the_free_MS_C_Toolkit
-<br />
-I'm working on this using cygwin at the moment...
-</li>
-
-<li>
-2007/02/26: Consider moving to IPython, to get command-prompt
-completion in the local namespace, debugging in the namespace of the
-exception, with easier to follow tracebacks, persistent command
-histories, easy interaction with the system shell (using ! to get a
-shell and $ to feed it Python variables), and session logging.
-</li>
-
-<li>
-2007/02/21 (CB): Investigate using Tile (which has become part of
-Tkinter now anyway).  Tile looks good on linux and windows (haven't
-tried mac but screenshots look good). But, Tile does not have all the
-widgets we need yet. Tile uses themes so we can set it to classic and
-use Tile + Tkinter widgets and still have a uniform look. This gives
-us nothing to begin with, but Tile should eventually have all the
-widgets of Tkinter, at which point we can simply set the theme to get
-a Topographica which looks 'right' on windows and mac.
-<br />
-Well, that is almost true. Pmw (which is not compatible with Tile
-because of Tile's theme-based approach) provides some things we really
-need. The first of these is balloon help. In fact, that is ok to mix
-with other widgets; it doesn't need to match the 'theme' since it's
-undecorated by the window manager.  The second is the menubar, which
-could be replicated in Tkinter easily - except that it doesn't seem to
-be possible to bind popup help to individual menu items...a really
-useful feature.  [Add note about the others: messagebar, combobox,
-radiobutton, etc.]
-</li>
+<pre>
+2006/02/23 (all): Making more things be Parameters
+And writing doc strings at the same time. E.g. the x and y widgets in
+the Unit Weights window can be Numbers with bounds, etc.
 
 
-</ul>
+2006/02/23 (all): ensuring classes are declared abstract if they are abstract
+Plus making sure base and simple classes are imported into packages
+(i.e. Sheet into topo/sheets/, Projection into topo/projections/,
+Constant into topo/patterns/, and so on).
+
+
+2006/02/21: read-only objects
+Might someday be interesting to have read-only objects, aiming at
+copy-on-write semantics, but this seems quite difficult to achieve in
+Python.
+
+
+2006/02/21 (all): documentation, unit tests
+Improving both, plus eliminating ALERTs.
+
+
+2007/03/26 (CB): Build topographica on windows 
+With free compiler (python for windows is built with a Microsoft
+compiler). Maybe use pymingw? Or cygwin? Currently trying cygwin, with
+some success.
+
+
+2007/02/26: Consider moving to IPython
+Would get command-prompt completion in the local namespace, debugging
+in the namespace of the exception, with easier to follow tracebacks,
+persistent command histories, easy interaction with the system shell
+(using ! to get a shell and $ to feed it Python variables), and
+session logging.
+
+
+2007/02/21 (CB): Investigate using Tile 
+Tile has become part of Tkinter now anyway.  Tile looks good on linux
+and windows (haven't tried mac but screenshots look good). But, Tile
+does not have all the widgets we need yet. Tile uses themes so we can
+set it to classic and use Tile + Tkinter widgets and still have a
+uniform look. This gives us nothing to begin with, but Tile should
+eventually have all the widgets of Tkinter, at which point we can
+simply set the theme to get a Topographica which looks 'right' on
+windows and mac. Well, that is almost true. Pmw (which is not
+compatible with Tile because of Tile's theme-based approach) provides
+some things we really need. The first of these is balloon help. In
+fact, that is ok to mix with other widgets; it doesn't need to match
+the 'theme' since it's undecorated by the window manager.  The second
+is the menubar, which could be replicated in Tkinter easily - except
+that it doesn't seem to be possible to bind popup help to individual
+menu items...a really useful feature.  [Add note about the others:
+messagebar, combobox, radiobutton, etc.]
+</pre>
