@@ -449,6 +449,13 @@ class EPConnection(ParameterizedObject):
             if rep is not None:
                 settings.append('%s=%s' % (name,rep))
 
+        ### CEBALERT: see PO's script_repr() 
+        import topo
+        cls = self.__class__.__name__
+        mod = self.__module__
+        topo._imports[mod+'.'+cls]="from %s import %s" % (mod,cls)
+        ###
+
         return simulation_path+".connect('"+self.src.name+"','"+self.dest.name+ \
                "',connection_type="+self.__class__.__name__+ \
                ",\n"+prefix+(",\n"+prefix).join(settings) + ")"
@@ -903,7 +910,6 @@ class Simulation(ParameterizedObject):
 
         conns = [o.script_repr() for o in
                  sorted(self.connections(),      cmp=lambda x, y: cmp(x.name,y.name))]
-        
         
         cmds  = [o.script_repr() for o in
                  sorted(sorted([e for e in self.events if isinstance(e,CommandEvent)],
