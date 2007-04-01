@@ -101,3 +101,7 @@ details.
 from numpy import seterr
 old_seterr_settings=seterr(all="raise",under="ignore")
 
+
+# CEBALERT! When a PO's script_repr() runs, classes are
+# recorded here. Will replace with a better idea.
+_imports = {}
