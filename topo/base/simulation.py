@@ -342,10 +342,10 @@ class EventProcessor(ParameterizedObject):
         """
         pass
 
-    def script_repr(self,prefix="    "):
+    def script_repr(self,imports={},prefix="    "):
         """Generate a runnable command for creating this EventProcessor."""
         return simulation_path+"['"+self.name+"']="+\
-        super(EventProcessor,self).script_repr(prefix)
+        super(EventProcessor,self).script_repr(imports=imports,prefix=prefix)
 
 
 
@@ -436,25 +436,23 @@ class EPConnection(ParameterizedObject):
             del self.src.out_connections[i]
 
 
-    def script_repr(self,prefix="    "):
+    def script_repr(self,imports={},prefix="    "):
         """Generate a runnable command for creating this connection."""
         settings=[]
         for name,val in self.get_param_values():
             if name=="src" or name=="dest":
                 rep=None
             elif isinstance(val,ParameterizedObject):
-                rep=val.script_repr(prefix+"    ")
+                rep=val.script_repr(imports=imports,prefix=prefix+"    ")
             else:
                 rep=repr(val)
             if rep is not None:
                 settings.append('%s=%s' % (name,rep))
 
-        ### CEBALERT: see PO's script_repr() 
-        import topo
+        # add import statement
         cls = self.__class__.__name__
         mod = self.__module__
-        topo._imports[mod+'.'+cls]="from %s import %s" % (mod,cls)
-        ###
+        imports[mod+'.'+cls]="from %s import %s" % (mod,cls)
 
         return simulation_path+".connect('"+self.src.name+"','"+self.dest.name+ \
                "',connection_type="+self.__class__.__name__+ \
@@ -896,7 +894,7 @@ class Simulation(ParameterizedObject):
         return [c for c in set(conns)]
 
 
-    def script_repr(self,prefix="    "):
+    def script_repr(self,imports={},prefix="    "):
         """
         Return a nearly runnable script recreating this simulation.
 
@@ -905,27 +903,23 @@ class Simulation(ParameterizedObject):
         Only scheduled commands that have not yet been executed are
         included, because executed commands are not kept around.
         """
-        objs  = [o.script_repr() for o in
+        objs  = [o.script_repr(imports=imports) for o in
                  sorted(self.objects().values(), cmp=lambda x, y: cmp(x.name,y.name))]
 
-        conns = [o.script_repr() for o in
+        conns = [o.script_repr(imports=imports) for o in
                  sorted(self.connections(),      cmp=lambda x, y: cmp(x.name,y.name))]
-        
-        cmds  = [o.script_repr() for o in
+
+        cmds  = [o.script_repr(imports=imports) for o in
                  sorted(sorted([e for e in self.events if isinstance(e,CommandEvent)],
                                cmp=lambda x, y: cmp(x.command_string,y.command_string)),
                         cmp=lambda x, y: cmp(x.time,y.time))]
 
 
-        ### CEBALERT: See PO's script_repr()
-        import topo
-        imports = ""
-        for s in topo._imports.values():
-            imports+="%s\n"%(s)
-        ###
-            
+        import_statements = ""
+        for s in imports.values():
+            import_statements+="%s\n"%(s)            
 
-        return "\n\n# Imports:\n\n"+imports+"\n\n"+\
+        return "\n\n# Imports:\n\n"+import_statements+"\n\n"+\
                simulation_path+".name='"+self.name + "'\n\n" +\
                simulation_path+".startup_commands="+repr(self.startup_commands) +\
                '\n\n\n\n# Objects:\n\n'            + '\n\n\n'.join(objs) + \

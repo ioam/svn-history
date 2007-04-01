@@ -666,7 +666,7 @@ class ParameterizedObject(object):
         return self.__class__.__name__ + "(" + ", ".join(settings) + ")"
 
 
-    def script_repr(self,prefix="    "):
+    def script_repr(self,imports={},prefix="    "):
         """
         Variant of __repr__ designed for generating a runnable script.
 
@@ -685,12 +685,12 @@ class ParameterizedObject(object):
             elif name == 'print_level':
                 rep=None
             elif isinstance(val,ParameterizedObject):
-                rep=val.script_repr(prefix+"    ")
+                rep=val.script_repr(imports=imports,prefix=prefix+"    ")
             elif isinstance(val,list):
                 result=[]
                 for i in val:
                     if hasattr(i,'script_repr'):
-                        result.append(i.script_repr(prefix+"    "))
+                        result.append(i.script_repr(imports=imports,prefix=prefix+"    "))
                     else:
                         result.append(repr(i))
                 rep=','.join(result)
@@ -699,15 +699,10 @@ class ParameterizedObject(object):
             if rep is not None:
                 settings.append('%s=%s' % (name,rep))
 
-        ### CBALERT: surely can do this better (than using variable
-        ### in topo). + same code must be present in any subclass that
-        ### overrides this method.
         # Generate import statement
-        import topo
         cls = self.__class__.__name__
         mod = self.__module__
-        topo._imports[mod+'.'+cls]="from %s import %s" % (mod,cls)
-        ###
+        imports[mod+'.'+cls]="from %s import %s" % (mod,cls)
 
         return self.__class__.__name__ + "(" + (",\n"+prefix).join(settings) + ")"
 
