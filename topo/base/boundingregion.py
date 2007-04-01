@@ -57,6 +57,13 @@ class BoundingBox(BoundingRegion):
             return 'BoundingBox(points=((%s,%s),(%s,%s)))'%(l,b,r,t)
 
     def script_repr(self,prefix="    "):
+        ### CBALERT: see alert in PO's script_repr()
+        # Generate import statement
+        import topo
+        cls = self.__class__.__name__
+        mod = self.__module__
+        topo._imports[mod+'.'+cls]="from %s import %s" % (mod,cls)
+        ###
         return self.__str__()
 
     def __init__(self,**args):

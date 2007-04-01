@@ -898,8 +898,6 @@ class Simulation(ParameterizedObject):
         Only scheduled commands that have not yet been executed are
         included, because executed commands are not kept around.
         """
-        ### JABALERT: It may be possible to generate the list of required imports too
-
         objs  = [o.script_repr() for o in
                  sorted(self.objects().values(), cmp=lambda x, y: cmp(x.name,y.name))]
 
@@ -912,7 +910,17 @@ class Simulation(ParameterizedObject):
                                cmp=lambda x, y: cmp(x.command_string,y.command_string)),
                         cmp=lambda x, y: cmp(x.time,y.time))]
 
-        return simulation_path+".name='"+self.name + "'\n\n" +\
+
+        ### CEBALERT: See PO's script_repr()
+        import topo
+        imports = ""
+        for s in topo._imports.values():
+            imports+="%s\n"%(s)
+        ###
+            
+
+        return "\n\n# Imports:\n\n"+imports+"\n\n"+\
+               simulation_path+".name='"+self.name + "'\n\n" +\
                simulation_path+".startup_commands="+repr(self.startup_commands) +\
                '\n\n\n\n# Objects:\n\n'            + '\n\n\n'.join(objs) + \
                '\n\n\n\n# Connections:\n\n'        + '\n\n\n'.join(conns) + \

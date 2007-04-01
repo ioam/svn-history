@@ -699,6 +699,16 @@ class ParameterizedObject(object):
             if rep is not None:
                 settings.append('%s=%s' % (name,rep))
 
+        ### CBALERT: surely can do this better (than using variable
+        ### in topo). + same code must be present in any subclass that
+        ### overrides this method.
+        # Generate import statement
+        import topo
+        cls = self.__class__.__name__
+        mod = self.__module__
+        topo._imports[mod+'.'+cls]="from %s import %s" % (mod,cls)
+        ###
+
         return self.__class__.__name__ + "(" + (",\n"+prefix).join(settings) + ")"
 
         
