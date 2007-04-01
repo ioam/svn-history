@@ -107,7 +107,7 @@ def provide_unoptimized_equivalent(optimized_name, unoptimized_name, local_dict)
                   % (local_dict['__name__'], optimized_name, unoptimized_name)
 
 if not optimized and not warn_for_each_unoptimized_component:
-    print "Note: Inline-optimized components are currently disabled; see topo.misc.inlinec.py."
+    print "Note: Inline-optimized components are currently disabled; see topo.misc.inlinec"
 
 
 # Simple test
