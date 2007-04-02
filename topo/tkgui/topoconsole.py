@@ -340,20 +340,28 @@ class TopoConsole(Frame):
         # the simulation in this case.
         learning_frame.optional_action=Pmw.busycallback(self.do_learning)
 
-        go = Button(learning_frame,text="Go",
-                    command=Pmw.busycallback(self.do_learning))
-        go.pack(side=LEFT)
+        go_button = Button(learning_frame,text="Go",
+                           command=Pmw.busycallback(self.do_learning))
+        go_button.pack(side=LEFT)
+        
+        # Because the balloon help in the main window is currently
+        # shown in the status bar, if this line is enabled then the
+        # simulation time is not visible there until the mouse moves
+        # off of the Go button.
+        #self.balloon.bind(go_button,"Run the simulation for the specified duration.")
+
 
 	self.stop_button = Button(learning_frame,text="Stop",state=DISABLED,
                                   command=lambda: self.set_stop())
 	self.stop_button.pack(side=LEFT)
-            
+        self.balloon.bind(self.stop_button,"""
+            Stop a running simulation.
 
-        # CEBALERT: this prevents the simulation time from being updated
-        # in the messagebar
-        #self.balloon.bind(go,"Run the simulation for the specified duration.")
-
-
+            The simulation can be interrupted only on round integer
+            simulation times, e.g. at 3.0 or 4.0 but not 3.15.  This
+            ensures that stopping and restarting are safe for any
+            model set up to be in a consistent state at integer
+            boundaries, as the example Topographica models are.""")
 
 
         #
@@ -734,7 +742,6 @@ class TopoConsole(Frame):
 
             self.messageBar.message('state', message)
             self.update()
-            self.update_idletasks()
             if self.stop:
                 break
                                                                                                                                                   
