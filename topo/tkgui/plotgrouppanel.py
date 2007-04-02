@@ -41,6 +41,10 @@ BORDERWIDTH = 1
 CANVASBUFFER = 1
 
 
+
+
+
+
 class BasicPlotGroupPanel(Frame,ParameterizedObject):
     """
     Abstract BasicPlotGroupPanel class for displaying plots to a TK
@@ -165,8 +169,6 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
 # 	self.scrollbar.pack(side=TOP,expand=YES,fill=X)
 #       self.plot_frame = self.scrollbar.interior()
         
-        self.control_frame = Frame(self)
-        self.control_frame.pack(side=TOP,expand=YES,fill=X)
 
 	# Hotkey for killing the window
 	self.parent.bind('<Control-q>',self.parent_destroy)
