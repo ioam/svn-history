@@ -1,12 +1,10 @@
 <!--CB: going to go through this file and: 
 - order tasks by priority
-- cleanup
 - check all my tasks from emails are here
-- add note: anyone needs stuff at bottom, they should probably do it themselves!
 -->
 
 <p>
-This list forms the developers' to-do list. It's divided into several
+This is the developers' to-do list. It's divided into several
 sections, with earlier sections being higher priority than later ones.
 Tasks within each section are also ordered approximately by priority.
 
@@ -71,10 +69,6 @@ Update to the current SVN version to incorporate recent changes and
 bugfixes for the Reference Manual.
 
 
-2006/03/26 (CB): scheduled_actions in lissom examples
-Insert missing actions in case someone tries higher densities.
-
-
 2007/03/02 (CB): update topographica-win
 - test that results from Windows version match those from the standard
 one.  (The current Windows numpy version at scipy.org presumably
@@ -83,22 +77,22 @@ can't really test Windows version.)
 - pyaudiolab, mlabwrap, other optional packages will wait until a
 future release.
 
-
-2007/03/29 (CB): script_repr task
-Can I do it easily for the release? (email from JAB)
-
-
 2007/03/30 (CB): timing
 - How much faster is c++ lissom than topographica?
 4-5 times for lissom_oo_or_reference
 - How much faster is topographica with c++ optimized components than
 without?
+10 times for 200 iterations of lissom_oo_or_reference.
 </pre>
 
 
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
 
 <pre>
+2006/03/26 (CB): scheduled_actions in lissom examples
+Insert missing actions in case someone tries higher densities.
+
+
 2007/01/25 (CB): ParametersFrame ok/apply/reset/cancel
 Set order and names of ParametersFrame's Ok, Apply, Cancel, Reset, and
 Defaults buttons, and make them behave as expected for classes and
