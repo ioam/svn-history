@@ -157,7 +157,7 @@ class PlotsMenuEntry(ParameterizedObject):
         #if 'valid_context' in dir(self.class_name):
 
         if self.class_name.valid_context():
-            win = GUIToplevel(self.console)
+            win = Toplevel(self.console)
             win.withdraw()
             win.title(self.title)
 
@@ -566,7 +566,7 @@ class TopoConsole(Frame):
         Test Pattern Window.  
         """
         if TestPattern.valid_context():
-            self.input_params_window = GUIToplevel(self)
+            self.input_params_window = Toplevel(self)
             self.input_params_window.withdraw()
             self.input_params_window.title('Test Pattern')
             ripp = TestPattern(self.input_params_window,self)
@@ -579,7 +579,7 @@ class TopoConsole(Frame):
 
 
     def new_about_window(self):
-        win = GUIToplevel(self)
+        win = Toplevel(self)
         win.withdraw()
         win.title("About Topographica")
         text = Label(win,text=topo.about(display=False),justify=LEFT)
@@ -749,29 +749,6 @@ class TopoConsole(Frame):
         self.messageBar.message('state', message)
 
         
-
-# CB: why do we have this class? Does self.resizable(1,1) add anything?
-# Why not just use Toplevel()?
-class GUIToplevel(Toplevel):
-    """
-    Each new TK window requires a new Toplevel class that contains the
-    object that created it, to handle such things as allowing resizing
-    windows, etc.  (In this file, it's usually called with something
-    like win = GUIToplevel(self).)
-    
-    The PMW Megawidgets classes also contain a Tkinter.toplevel object
-    stored within the object variable .hull.  For now the GUIToplevel
-    is subclassing the Tkinter Toplevel, but the Megawidgets could
-    also be used here and the same function calls made upon the object
-    stored in the .hull
-    """
-    def __init__(self,parent,**config):
-        # Megawidgets contain Toplevels in .hull  Either system is acceptable.
-        # Pmw.MegaToplevel.__init__(self,parent)
-        Toplevel.__init__(self,parent,config)
-        self.protocol('WM_DELETE_WINDOW',self.destroy)
-        self.resizable(1,1)
-
 
 
 # CB: Some notes about tkgui
