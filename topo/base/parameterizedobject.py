@@ -693,7 +693,7 @@ class ParameterizedObject(object):
                         result.append(i.script_repr(imports=imports,prefix=prefix+"    "))
                     else:
                         result.append(repr(i))
-                rep=','.join(result)
+                rep='['+','.join(result)+']'
             else:
                 rep=repr(val)
             if rep is not None:
