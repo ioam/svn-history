@@ -77,12 +77,6 @@ can't really test Windows version.)
 - pyaudiolab, mlabwrap, other optional packages will wait until a
 future release.
 
-2007/03/30 (CB): timing
-- How much faster is c++ lissom than topographica?
-4-5 times for lissom_oo_or_reference
-- How much faster is topographica with c++ optimized components than
-without?
-10 times for 200 iterations of lissom_oo_or_reference.
 </pre>
 
 
