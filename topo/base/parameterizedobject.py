@@ -871,7 +871,7 @@ class ParameterizedObject(object):
         """
         return type(self).classparams()
 
-
+    # CEBALERT: should be 'defaults' or something similar.
     def reset_params(self):
         """
         Return Parameters with modifiable values to the class defaults.
