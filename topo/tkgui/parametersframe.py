@@ -41,6 +41,7 @@ class ParametersFrame(Frame):
     an associated ParameterizedObject instance or class (via a
     PropertiesFrame for that ParameterizedObject).
     """
+    # CEBALERT: should probably be buttons_to_display
     def __init__(self, parent=None, buttons_to_remove=[], **config):
         """
         Create a Frame... with  'Apply', 'Reset', 'Ok', and 'Cancel' buttons.
@@ -89,17 +90,18 @@ class ParametersFrame(Frame):
         ### Apply, Reset, etc buttons; not displayed on creation but in create_widgets()
         self.__buttons = {'Apply': Button(button_panel, text='Apply',
                                           command = self.set_parameters),
+                          'Defaults': Button(button_panel, text='Defaults',
+                                          command= self.__defaults),
                           'Reset': Button(button_panel, text='Reset',
-                                          command= self.__reset_values),
-                          'Ok': Button(button_panel, text='Ok',
-                                       command=self.__ok_values),
-                          'Cancel': Button(button_panel, text='Cancel',
-                                           command= self.__cancel_values)}
+                                          command= self.__reset),
+                          'Close': Button(button_panel, text='Close',
+                                           command= self.parent.destroy)} # should display warning if changed
 
         for button in buttons_to_remove:
             self.__buttons.pop(button)
 
-        button_panel.pack()
+        # CEBALERT: not always expanding to width, so Defaults isn't separated.
+        button_panel.pack(side=BOTTOM,expand=YES,fill=X)
 
 
 
@@ -183,9 +185,17 @@ class ParametersFrame(Frame):
 
 
         ### Display the buttons
-        for button in self.__buttons.values():
-            button.pack(side=LEFT)
-            
+        # Ordering of buttons is important. Chose java convention:
+        # http://java.sun.com/products/jlf/ed2/book/HIG.Dialogs2.html
+        # CEBALERT: but we also have 'Defaults', which resets to class
+        # defaults. I'm not yet sure where that should go...
+        if 'Defaults' in self.__buttons:
+            self.__buttons['Defaults'].pack(side=LEFT)
+        
+        for name in ['Close','Reset','Apply']:
+            if name in self.__buttons:
+                self.__buttons[name].pack(side=RIGHT)
+        
         # callers can also call pack() on this frame to set its attributes,
         # but it's called here so that at least everything appears.
         self.pack()
@@ -428,23 +438,7 @@ class ParametersFrame(Frame):
                  break
 
 
-    def __ok_values(self):
-        """
-        Set self.parameterized_object's Parameters to the values currently
-        shown, and close this window.
-        """
-        self.set_parameters()
-        self.parent.destroy()
-
-
-    def __cancel_values(self):
-        """
-        Close the ParametersFrame and do not set the values on self.parameterized_object.
-        """
-        self.parent.destroy()
-
-
-    def __reset_values(self):
+    def __defaults(self):
         """
         Reset self.parameterized_object's Parameters to their default values.
 
@@ -471,4 +465,16 @@ class ParametersFrame(Frame):
         else:
             raise TypeError, "ParameterFrame must be associated with a ParameterizedObject or ParameterizedObjectMetaclass."
 
+    def __reset(self):
+        """
+        Resets the values displayed to those currently set on the thing.
+        """
+        assert isinstance(self.parameterized_object,ParameterizedObject) # for the moment
+
+        # CEBALERT: no need to re-draw all the widgets. Should add
+        # a method to allow the widget values to be set (i.e. cut out
+        # of the create method).
+        self.create_widgets(self.parameterized_object)
+        
+        
 
