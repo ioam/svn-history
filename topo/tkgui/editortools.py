@@ -271,9 +271,9 @@ class ParametersTool(Frame):
         self.doc_label = Label(self, font = ("Times", 12))
         self.doc_label.pack(side = TOP)
 
-        
-        # CEBALERT: (Going to add apply and reset)
-        self.parameter_frame = ParametersFrame(self,buttons_to_remove=['Reset','Close','Defaults'])        
+        # CEBALERT: will the users think they have to press 'apply' rather than just clicking
+        # on the canvas to get the new object?
+        self.parameter_frame = ParametersFrame(self,buttons_to_remove=['Close','Defaults'])        
         self.parameter_frame.pack(side=BOTTOM)
 
 

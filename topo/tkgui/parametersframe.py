@@ -469,8 +469,6 @@ class ParametersFrame(Frame):
         """
         Resets the values displayed to those currently set on the thing.
         """
-        assert isinstance(self.parameterized_object,ParameterizedObject) # for the moment
-
         # CEBALERT: no need to re-draw all the widgets. Should add
         # a method to allow the widget values to be set (i.e. cut out
         # of the create method).
