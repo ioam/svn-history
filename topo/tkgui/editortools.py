@@ -273,7 +273,7 @@ class ParametersTool(Frame):
 
         
         # CEBALERT: (Going to add apply and reset)
-        self.parameter_frame = ParametersFrame(self,buttons_to_remove=['Apply','Reset','Ok','Cancel'])        
+        self.parameter_frame = ParametersFrame(self,buttons_to_remove=['Apply','Reset','Close','Defaults'])        
         self.parameter_frame.pack(side=BOTTOM)
 
 

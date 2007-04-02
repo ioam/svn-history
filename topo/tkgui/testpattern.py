@@ -25,6 +25,7 @@ __version__='$Revision$'
 
 # CEBALERT: taggedsliders refresh the display even when auto-refresh is off.
 
+
 import copy
 import Pmw
 
@@ -161,7 +162,10 @@ Each type will have various parameters that can be changed.""")
 
         ### The ParametersFrame
         #
-        self.__params_frame = parametersframe.ParametersFrame(self,buttons_to_remove=['Apply','Ok','Cancel'])
+        # Because this window applies changes to an object immediately
+        # (unlike ParametersFrame), the button to 'reset' is
+        # 'Defaults'. 'Reset' would do nothing.
+        self.__params_frame = parametersframe.ParametersFrame(self,buttons_to_remove=['Apply','Close','Reset'])
         self.__params_frame.create_widgets(self.__current_pattern_generator)
         self.__params_frame.pack(side=TOP,expand=YES,fill=X)
 
