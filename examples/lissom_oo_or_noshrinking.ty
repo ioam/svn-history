@@ -34,7 +34,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear,DivisiveNormalizeL1
-from topo.misc.numbergenerators import UniformRandom
+from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.outputfns.homeostatic import HomeostaticMaxEnt
 from topo.patterns.basic import Gaussian
 
@@ -80,7 +80,7 @@ topo.sim['LGNOff']=CFSheet(nominal_density=24.0,
 
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
                         nominal_bounds=BoundingBox(radius=0.5),tsettle=9,
-                        output_fn=HomeostaticMaxEnt(a_init=13, b_init=-3, eta=0.0002))
+                        output_fn=HomeostaticMaxEnt(a_init=14.5, b_init=-4))
 
 # DoG weights for the LGN
 centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
@@ -110,7 +110,9 @@ topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"),dest_port=('Activity','Jo
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.patterns.random.UniformRandom()]),
-                  nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590/2)
+                  nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
+                                                                                                 ExponentialDecay(starting_value = locals().get('LGNOnafferent_lr',0.9590/2),
+                                                                                                                  time_constant=1600))))) #time constant depends on nuber of inputs!
 
 
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
@@ -118,7 +120,9 @@ topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"),dest_port=('Activity','J
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.patterns.random.UniformRandom()]),
-                  nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590/2)
+                  nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
+                                                                                                 ExponentialDecay(starting_value = locals().get('LGNOffafferent_lr',0.9590/2),
+                                                                                                                  time_constant=1600)))))
 
 
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
@@ -132,19 +136,6 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
                                                                              topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.8087)
-
-
-# Actions scheduled to occur as the simulation proceeds
-topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
-st=1.0/num_inputs # Convenience variable: timescale (s_t)
-
-ON ='topo.sim["V1"].projections()["LGNOnAfferent"]'
-OFF='topo.sim["V1"].projections()["LGNOffAfferent"]'
-
-topo.sim.schedule_command(  500*st,ON+'.learning_rate=0.6850/2;'+OFF+'.learning_rate=0.6850/2')
-topo.sim.schedule_command( 2000*st,ON+'.learning_rate=0.5480/2;'+OFF+'.learning_rate=0.5480/2')
-topo.sim.schedule_command( 4000*st,ON+'.learning_rate=0.4110/2;'+OFF+'.learning_rate=0.4110/2')
-topo.sim.schedule_command(20000*st,ON+'.learning_rate=0.2055/2;'+OFF+'.learning_rate=0.2055/2')
 
 
 
