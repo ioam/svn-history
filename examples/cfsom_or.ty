@@ -1,7 +1,7 @@
 """
 Basic example of a SOM-based orientation map with ConnectionFields.
 
-Contains a Retina (2D Gaussian generator) and a V1 (CFSOM) sheet.
+Contains a Retina (2D Gaussian generator) and a V1 sheet.
 Each V1 neuron receives input from a limited-size square area on the
 Retina, called its ConnectionField.
 
@@ -20,10 +20,9 @@ import topo.patterns.basic
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFProjection, CFSheet
 from topo.base.parameterclasses import DynamicNumber
-from topo.learningfns.som import CFPLF_HebbianSOM,CFPLF_EuclideanHebbian
+from topo.learningfns.som import CFPLF_EuclideanHebbian
 from topo.outputfns.basic import KernelMax
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.numbergenerators import UniformRandom,ExponentialDecay
 
