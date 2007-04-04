@@ -77,8 +77,7 @@ class BasicPlotGroupPanel(Toplevel,ParameterizedObject):
         name: name associated with the panel
 	"""
         Toplevel.__init__(self)
-        #Frame.__init__(self,parent)
-        topo.plotting.plot.ParameterizedObject.__init__(self,**params)
+        ParameterizedObject.__init__(self,**params)
 
 	self.console = console
         
