@@ -11,6 +11,7 @@ __version__='$Revision$'
 
 import numpy.oldnumeric as Numeric
 import copy
+import re
 
 from inspect import getdoc
 from math import floor
@@ -21,7 +22,7 @@ import Pmw
 from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
      BooleanVar, StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
-     Scrollbar, Y, VERTICAL, HORIZONTAL, Menu, END
+     Scrollbar, Y, VERTICAL, HORIZONTAL, Menu, END, NO, NONE,Scrollbar,Canvas
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
@@ -39,10 +40,6 @@ BORDERWIDTH = 1
 # the border will not be close, too small, and some of the image is
 # not displayed.  
 CANVASBUFFER = 1
-
-
-
-
 
 
 class BasicPlotGroupPanel(Frame,ParameterizedObject):
@@ -78,7 +75,6 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
         console: is the associated console, (i.e. the TopoConsole that has this panel)
         name: name associated with the panel
 	"""
-
         Frame.__init__(self,parent)
         topo.plotting.plot.ParameterizedObject.__init__(self,**params)
 
@@ -102,9 +98,9 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
 
         # Create and fill the 2 control Frames
 	self.control_frame_1 = Frame(self)
-        self.control_frame_1.pack(side=TOP,expand=YES,fill=X)
+        self.control_frame_1.pack(side=TOP,expand=NO,fill=X)
 	self.control_frame_2 = Frame(self)
-        self.control_frame_2.pack(side=TOP,expand=YES,fill=X)
+        self.control_frame_2.pack(side=TOP,expand=NO,fill=X)
 
         # JAB: Because these three buttons are present in nearly every
         # window, and aren't particularly important, we should
@@ -113,8 +109,7 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
         # ignore.  Of course, the icons will need to announce their
         # names as help text if the mouse lingers over them, so that
         # the user can figure them out the first time.
-        # 
-       
+        #        
         self.refresh_button = Button(self.control_frame_1,text="Refresh",
                                           command=self.refresh)
         self.refresh_button.pack(side=LEFT)
@@ -137,41 +132,48 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
             "Whether to regenerate this plot whenever the simulation time advances.")
 
 
-        # CEBALERT: it's probably not clear to users whether the
-        # various 'reduce', 'resize', 'refresh', etc. buttons apply to
-        # the plots or to the whole window.
-
-
-        ### Auto-resize checkbutton.
-        # See set_auto_resize() for more info.
-        self.auto_resize = BooleanVar()
-        auto_resize_checkbutton=Checkbutton(self.control_frame_1, text="Auto-resize",
-                                            variable=self.auto_resize,command=self.set_auto_resize)
-        auto_resize_checkbutton.pack(side=RIGHT)
-        self.auto_resize.set(True); self.set_auto_resize()
-        self.balloon.bind(auto_resize_checkbutton,
-            "Whether to resize this window automatically to fit the contents, or to allow the window to be resized manually.")
-
-
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
 	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plotgroup_key))
         self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH,padx=5,pady=5)
-	self.plot_frame = self.plot_group_title.interior()
+	#self.plot_frame = self.plot_group_title.interior()
 
-        ### JABALERT! Need to implement scrollbars for viewing plots
-        ### too large for the screen.
-	# JC: A way of implementing it. Needs more work: for the moment,
-        # the window expands without the scrollbar, but does not when the scrollbar is on.
-# 	self.scrollbar = Pmw.ScrolledFrame(self,borderframe=0,
-# 					   horizflex = 'elastic', vertflex='elastic',
-# 					   hscrollmode = 'dynamic', vscrollmode = 'dynamic')
-# 	self.scrollbar.pack(side=TOP,expand=YES,fill=X)
-#       self.plot_frame = self.scrollbar.interior()
+
+        # CB: this scrolled plots implementation should be considered
+        # temporary - see note by _sizeright().
         
+        # When I use 'expand' for flex, the scrollbars don't update
+        # the first time unless you click on them (so it looks like they
+        # don't work). Must be missing a refresh? Works fine with fixed,
+        # though (but 'expand' looks better because the plots are centered).
+        # Also should use 'dynamic' so they're only drawn when required.
+ 	self.scrollbar = Pmw.ScrolledFrame(self.plot_group_title.interior(),
+                                           borderframe=0,
+ 					   horizflex ='expand', #fixed
+                                           vertflex='expand',#fixed
+ 					   hscrollmode = 'static', #dynamic
+                                           vscrollmode = 'static') #dynamic
+ 	self.scrollbar.pack(side=TOP,expand=YES,fill=BOTH)
+        self.plot_frame = self.scrollbar.interior()
+
 
 	# Hotkey for killing the window
 	self.parent.bind('<Control-q>',self.parent_destroy)
+
+        # prevent resizing bigger than the screen (scrollbars should
+        # appear on plot frame at that point)
+        self.parent.maxsize(self.parent.winfo_screenwidth(),self.parent.winfo_screenheight())
+
+
+    ### Convenience functions for parent's geometry(), which uses a string
+    ### like "210x280+23+121" for width,height,x,y
+    def set_geom(self,width,height):
+        """Set parent's geometry width and height."""
+        self.parent.geometry("%sx%s"%(width,height))
+    def get_geom(self):
+        """Return parent's geometry width and height."""
+        width,height,x,y = re.findall("[0-9.]+",self.parent.geometry())
+        return int(width),int(height)
 
 
     def refresh(self,update=True):
@@ -207,33 +209,6 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
 	"""Implemented in sub-classes."""
 	pass
 
-
-    def set_auto_resize(self):
-        """
-        If auto-resize on, window automatically resizes to fit widgets
-        (Tkinter default), and user cannot resize window.
-
-        If auto-resize is off, the window stays the same size whatever
-        happens to the widgets, and the user can resize the window.
-        """
-        if self.auto_resize.get():
-            # geometry('') returns to default resizing behavior
-            # ("Tkinter Toplevel geometry" on comp.lang.python,
-            # http://groups.google.com/group/comp.lang.python/browse_thread/thread/b905714b901923b9/30674ae5a2eae363#30674ae5a2eae363)
-            self.parent.geometry('')
-            
-            self.parent.resizable(0,0)
-            # CEBALERT: need some kind of refresh on the window so
-            # that the resize/maximize button of the window
-            # decorations disappears (currently it disappears when the
-            # mouse goes over it). Similarly, in the 'else' part
-            # below, a window refresh is needed to display the
-            # resize/maximize button (currently it appears when the
-            # mouse goes over the area).
-        else:
-            self.parent.geometry(self.parent.geometry())
-            self.parent.resizable(1,1)
-
     def set_auto_refresh(self):
         """Function called by Widget when check-box clicked."""
 
@@ -261,6 +236,39 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
     def parent_destroy(self,dummy):
 	self.destroy()
 	self.parent.destroy()
+
+
+    # CEBALERT: I hope this hack can be removed if we tidy up tkgui a little,
+    # and then switch to having scrollbars on the entire window. We could
+    # use bwidget's scrolled window and frame, for instance.
+    # I think doing something like this would lead to better resizing behavior
+    # of the windows, and much simpler code.
+    def _sizeright(self):
+        """
+        Using a scrolled frame for the plots means that the initial size of the window
+        does not allow for displaying all the plots. This is a hack to allow the initial
+        size to be large enough to display all the plots.
+        """
+        # Pmw.Scrolledframe is made up of a frame and a clipper (both tkinter frames).
+        
+        frame_width,frame_height = self.scrollbar._frame.winfo_width(),\
+                                   self.scrollbar._frame.winfo_height()
+
+        clipper_width,clipper_height=self.scrollbar._clipper.winfo_width(),\
+                                     self.scrollbar._clipper.winfo_height()
+
+        window_width,window_height = self.get_geom()
+
+        new_width= max(window_width+(frame_width-clipper_width),window_width)
+        new_height=max(window_height,window_height+(frame_height-clipper_height))
+
+        #print "W: frame=%s,clipper=%s,window=%s,new_win=%s"\
+        #      %(frame_width,clipper_width,window_width,new_width)
+        #print "H: frame=%s,clipper=%s,window=%s,new_win=%s"\
+        #      %(frame_height,clipper_height,window_height,new_height)
+
+        return new_width,new_height
+
 
 
 class PlotGroupPanel(BasicPlotGroupPanel):
@@ -322,7 +330,6 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         self.forward_button.pack(side=LEFT)
         self.balloon.bind(self.forward_button,
             "Move forward through the history of all the plots shown in this window.")
-
 	# Normalize check button
 	self.normalize = BooleanVar()
 	self.normalize.set(False)
@@ -367,7 +374,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         # CEBALERT: should go in one of the plotting frames and probably
         # doesn't need a border.
 	self.messageBar = Pmw.MessageBar(self,entry_relief='groove')
-	self.messageBar.pack(side=BOTTOM,fill=X,expand=1,padx=4,pady=8)
+	self.messageBar.pack(side=BOTTOM,fill=X,expand=NO,padx=4,pady=8)
 
 
         ### Right-click menu for canvases; subclasses can add cascades
@@ -387,7 +394,6 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         
         self._unit_menu.add_command(label='Connection Fields',
                                     command=self.__connection_fields_window)
-
 
                
     def __connection_fields_window(self):
@@ -541,6 +547,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
                          for zi in self.canvases]
         else:
             new_sizes, old_sizes = 0, 0
+
         if len(self.zoomed_images) != len(self.canvases) or \
                new_sizes != old_sizes:
             old_canvases = self.canvases
@@ -575,6 +582,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
                                     image.height()/2+BORDERWIDTH+1,image=image)
                 canvas.grid(row=0,column=i,padx=5)
 
+
         ### bind events to each canvas
         for plot,canvas in zip(plots,self.canvases):
             # Store the corresponding plot with each canvas so that the
@@ -594,7 +602,15 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 
 
         
-            
+        ########## CBALERT! Hack for getting initial size right
+        # (for all plots to be displayed).
+        if not hasattr(self,'have_set_initial_size'):
+            self.parent.update_idletasks()
+            self.parent.deiconify()
+            self.parent.minsize(*self._sizeright())
+            self.have_set_initial_size = True
+        ##########
+
             
 
     def add_to_history(self):
