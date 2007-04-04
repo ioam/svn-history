@@ -77,6 +77,9 @@ can't really test Windows version.)
 - pyaudiolab, mlabwrap, other optional packages will wait until a
 future release.
 
+2007/04/04 (CB): projection activity window's dynamic text
+Gives some error...
+
 </pre>
 
 
