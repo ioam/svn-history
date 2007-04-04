@@ -149,14 +149,14 @@ class BasicPlotGroupPanel(Toplevel,ParameterizedObject):
         # though (but 'expand' looks better because the plots are centered).
         # Also should use 'dynamic' so they're only drawn when required.
         ### Will need to test these on Win and OS X.
- 	self.scrollbar = Pmw.ScrolledFrame(self.plot_group_title.interior(),
-                                           borderframe=0,
- 					   horizflex ='expand', #fixed
-                                           vertflex='expand',#fixed
- 					   hscrollmode = 'static', #dynamic
-                                           vscrollmode = 'static') #dynamic
- 	self.scrollbar.pack(side=TOP,expand=YES,fill=BOTH)
-        self.plot_frame = self.scrollbar.interior()
+ 	self.scrolledplotframe = Pmw.ScrolledFrame(self.plot_group_title.interior(),
+                                                   borderframe=0,
+                                                   horizflex ='expand', #fixed
+                                                   vertflex='expand',#fixed
+                                                   hscrollmode = 'static', #dynamic
+                                                   vscrollmode = 'static') #dynamic
+ 	self.scrolledplotframe.pack(side=TOP,expand=YES,fill=BOTH)
+        self.plot_frame = self.scrolledplotframe.interior()
 
 
 	# Hotkey for killing the window
@@ -247,11 +247,11 @@ class BasicPlotGroupPanel(Toplevel,ParameterizedObject):
         """
         # Pmw.Scrolledframe is made up of a frame and a clipper (both tkinter frames).
         
-        frame_width,frame_height = self.scrollbar._frame.winfo_width(),\
-                                   self.scrollbar._frame.winfo_height()
+        frame_width,frame_height = self.scrolledplotframe._frame.winfo_width(),\
+                                   self.scrolledplotframe._frame.winfo_height()
 
-        clipper_width,clipper_height=self.scrollbar._clipper.winfo_width(),\
-                                     self.scrollbar._clipper.winfo_height()
+        clipper_width,clipper_height=self.scrolledplotframe._clipper.winfo_width(),\
+                                     self.scrolledplotframe._clipper.winfo_height()
 
         window_width,window_height = self.get_geom()
 
