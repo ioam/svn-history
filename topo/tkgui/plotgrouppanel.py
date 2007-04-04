@@ -467,6 +467,8 @@ class PlotGroupPanel(BasicPlotGroupPanel):
                                            event_info['event'].y_root)
 
 
+    # CEBHACKALERT: something about the dynamic info doesn't work on hierarchical's projection
+    # activity window. Should be fixed before upcoming 0.9.3 release.
     def __update_dynamic_info(self,event_info):
         """
         Update dynamic information.
