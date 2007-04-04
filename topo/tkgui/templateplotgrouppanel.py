@@ -15,7 +15,7 @@ from numpy import abs
 import copy
 import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
-     Entry, Canvas, Checkbutton, BooleanVar, Menu, DISABLED, NORMAL
+     Entry, Canvas, Checkbutton, BooleanVar, Menu, DISABLED, NORMAL,NO
 
 import topo
 from plotgrouppanel import PlotGroupPanel
@@ -101,9 +101,9 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 	self.plotgroup_key=self.pgt.name
         
         params_frame = Frame(master=self)
-        params_frame.pack(side=TOP,expand=YES,fill=X)
+        params_frame.pack(side=TOP,expand=NO,fill=X)
         cmdlabel = Message(params_frame,text="Update command:",aspect=1000)
-        cmdlabel.pack(side=LEFT)
+        cmdlabel.pack(side=LEFT,expand=NO,fill=X)
         self.balloon.bind(cmdlabel,getdoc(self.plotgroup.params()['updatecommand']))
         
         cmdbox = Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
@@ -175,6 +175,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
                                     command=lambda: self.__fft('Confidence'))
 
 
+
         
         #self._sheet_menu.add_command(label="Print matrix values",
         #                             command=self.__print_matrix)
@@ -214,6 +215,8 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
                                       normalize=self.normalize.get(),
 				      sheetcoords=self.sheetcoords.get(),
                                       integerscaling=self.integerscaling.get())
+
+        
 	return plotgroup
 
 
