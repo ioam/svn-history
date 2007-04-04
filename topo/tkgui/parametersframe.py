@@ -101,6 +101,7 @@ class ParametersFrame(Frame):
             self.__buttons.pop(button)
 
         # CEBALERT: not always expanding to width, so Defaults isn't separated.
+        # Defaults button needs to be in a reasonable position on test pattern window.
         button_panel.pack(side=BOTTOM,expand=YES,fill=X)
 
 

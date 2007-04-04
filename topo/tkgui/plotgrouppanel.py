@@ -147,6 +147,7 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
         # don't work). Must be missing a refresh? Works fine with fixed,
         # though (but 'expand' looks better because the plots are centered).
         # Also should use 'dynamic' so they're only drawn when required.
+        ### Will need to test these on Win and OS X.
  	self.scrollbar = Pmw.ScrolledFrame(self.plot_group_title.interior(),
                                            borderframe=0,
  					   horizflex ='expand', #fixed
