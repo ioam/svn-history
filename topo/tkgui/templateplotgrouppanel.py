@@ -6,6 +6,10 @@ $Id$
 """
 __version__='$Revision$'
 
+# CEBALERT: on orienation full field plot, there's no text telling you
+# to click refresh. (Not the right place for this alert!)
+
+
 from inspect import getdoc
 from math import pi
 from numpy.fft.fftpack import fft2
