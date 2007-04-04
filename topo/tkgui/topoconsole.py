@@ -175,14 +175,15 @@ class PlotsMenuEntry(ParameterizedObject):
 
 
 
-class TopoConsole(Frame):
+class TopoConsole(Tkinter.Tk):
     """
     Main window for the Tk-based GUI.
     """
-    def __init__(self, parent=None,**config):
-        Frame.__init__(self,parent,config)
+    def __init__(self,**config):
 
-        self.parent = parent
+        Tkinter.Tk.__init__(self,**config)
+        #super(TopoConsole,self).__init__(**config)
+              
         self.num_activity_windows = 0
         self.num_orientation_windows = 0
         self.num_weights_windows = 0
@@ -198,7 +199,7 @@ class TopoConsole(Frame):
         # Doesn't work for providing icon for the window:
         #parent.wm_iconbitmap('@/home/jbednar/research/topographica/topo.xpm')
         title = "Topographica Console"
-        self.parent.title(title)
+        self.title(title)
 
         # command interpreter for executing commands in the console (used by exec_cmd).
         self.interpreter = code.InteractiveConsole(__main__.__dict__)
@@ -458,9 +459,9 @@ class TopoConsole(Frame):
 
         Exits the Topographica interpreter.
         """
-        Frame.quit(self)
-        Frame.destroy(self)     # Get rid of widgets
-        self.parent.destroy()   # Get rid of window
+        #Frame.quit(self)
+        #Frame.destroy(self)     # Get rid of widgets
+        self.destroy()   # Get rid of window
         if topo.gui_cmdline_flag:
             print "Quit selected; exiting"
             sys.exit()
@@ -715,7 +716,7 @@ class TopoConsole(Frame):
         recenttimes=[]
 
         # Temporary:
-        self.parent.title(topo.sim.name) ## this changes the title bar to more useful
+        self.title(topo.sim.name) ## this changes the title bar to more useful
 
         ## Duration of most recent times from which to estimate remaining time
         estimate_interval=50

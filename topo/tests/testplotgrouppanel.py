@@ -136,11 +136,9 @@ class TestPlotGroupPanel(unittest.TestCase):
         
         s.run(1)
 
-        root = Tkinter.Tk()
-        root.resizable(1,1)
-        Pmw.initialise(root)
-        console = topo.tkgui.topoconsole.TopoConsole(parent=root)
-        console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
+        
+        console = topo.tkgui.topoconsole.TopoConsole()
+        Pmw.initialise(console)
         #console.new_weights_window()
         # console.mainloop()
         

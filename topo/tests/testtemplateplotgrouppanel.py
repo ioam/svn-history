@@ -112,11 +112,10 @@ class TestActivityPanel(unittest.TestCase):
         topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
         TemplatePlotGroupPanel.print_level = topo.base.parameterizedobject.WARNING
 
-        root = Tkinter.Tk()
-        root.resizable(1,1)
-        Pmw.initialise(root)
-        console = topo.tkgui.topoconsole.TopoConsole(parent=root)
-        console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
+        
+        console = topo.tkgui.topoconsole.TopoConsole()
+        Pmw.initialise(console)
+        
         # CEBALERT: what was this testing?
         #console.set_active_simulator()
 

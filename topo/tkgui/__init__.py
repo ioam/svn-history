@@ -82,8 +82,11 @@ def start(mainloop=False):
     is open.  If False, then commands can be entered at the command-line
     even while the GUI is operational.  Default is False.
     """
-    root = Tkinter.Tk()
-    root.resizable(1,1)
+    console = topoconsole.TopoConsole()
+
+    #root = Tkinter.Tk()
+    
+    console.resizable(1,1)
 
     # This alows context menus to work on the Mac.  Widget code should bind
     # contextual menus to the virtual event <<right-click>>, not
@@ -91,11 +94,11 @@ def start(mainloop=False):
     # JPALERT: We probably should do an OS check here if
     # ctrl-click means something else on Windows.
 
-    root.event_add('<<right-click>>',*right_click_events)
-    root.event_add('<<right-click-release>>',*right_click_release_events)
-    Pmw.initialise(root)
-    console = topoconsole.TopoConsole(parent=root)
-    console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
+    console.event_add('<<right-click>>',*right_click_events)
+    console.event_add('<<right-click-release>>',*right_click_release_events)
+    Pmw.initialise(console)
+    #console = topoconsole.TopoConsole(parent=root)
+    #console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
 
     # mainloop() freezes the commandline until the GUI window exits.
     # Without this line the command-line remains responsive.
@@ -120,14 +123,14 @@ def start(mainloop=False):
     # JP: If we could find a way to use the top-level menus it would
     # be nice.  On the Mac, the current menus are notably un-mac-like
     # in many ways.
-    menubar=Menu(root)  # toplevel menu
-    root.configure(menu=menubar)
+    menubar=Menu(console)  # toplevel menu
+    console.configure(menu=menubar)
     activate_cascade = """\
     if {[%W cget -type] != {menubar} && [%W type active] == {cascade}} {
         %W postcascade active
     }
     """
-    root.bind_class("Menu", "<<MenuSelect>>", activate_cascade)
+    console.bind_class("Menu", "<<MenuSelect>>", activate_cascade)
     ##########
 
 
