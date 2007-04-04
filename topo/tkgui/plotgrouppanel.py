@@ -30,6 +30,7 @@ from topo.base.sheet import Sheet
 from topo.plotting.templates import plotgroup_templates # is this used?
 from topo.plotting.plotgroup import PlotGroup,identity
 
+from Tkinter import Toplevel
 
 
 BORDERWIDTH = 1
@@ -42,7 +43,7 @@ BORDERWIDTH = 1
 CANVASBUFFER = 1
 
 
-class BasicPlotGroupPanel(Frame,ParameterizedObject):
+class BasicPlotGroupPanel(Toplevel,ParameterizedObject):
     """
     Abstract BasicPlotGroupPanel class for displaying plots to a TK
     GUI window. Implements only basic buttons required. 
@@ -69,19 +70,20 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
             return False
 
 
-    def __init__(self,parent,console,plotgroup_key,**params):
+    def __init__(self,console,plotgroup_key,**params):
         """
         parent:  it is the window (GUIToplevel()) that contains the panel.
         console: is the associated console, (i.e. the TopoConsole that has this panel)
         name: name associated with the panel
 	"""
-        Frame.__init__(self,parent)
+        Toplevel.__init__(self)
+        #Frame.__init__(self,parent)
         topo.plotting.plot.ParameterizedObject.__init__(self,**params)
 
 	self.console = console
-        self.parent = parent
+        
 	# balloon help component
-        self.balloon = Pmw.Balloon(parent)
+        self.balloon = Pmw.Balloon(self)
         self.canvases = []
 
 	### JCALERT: we will have to rename plotgroup_key to something like 
@@ -159,21 +161,21 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
 
 
 	# Hotkey for killing the window
-	self.parent.bind('<Control-q>',self.parent_destroy)
+	self.bind('<Control-q>',self.destroy)
 
         # prevent resizing bigger than the screen (scrollbars should
         # appear on plot frame at that point)
-        self.parent.maxsize(self.parent.winfo_screenwidth(),self.parent.winfo_screenheight())
+        self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
 
 
     ### Convenience functions for parent's geometry(), which uses a string
     ### like "210x280+23+121" for width,height,x,y
     def set_geom(self,width,height):
         """Set parent's geometry width and height."""
-        self.parent.geometry("%sx%s"%(width,height))
+        self.geometry("%sx%s"%(width,height))
     def get_geom(self):
         """Return parent's geometry width and height."""
-        width,height,x,y = re.findall("[0-9.]+",self.parent.geometry())
+        width,height,x,y = re.findall("[0-9.]+",self.geometry())
         return int(width),int(height)
 
 
@@ -198,7 +200,7 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
         Change the window title.  TopoConsole will call this on
         startup of window.  
         """
-        self.parent.title(topo.sim.name+': '+"%s time:%s" %
+        self.title(topo.sim.name+': '+"%s time:%s" %
                           (self.plotgroup_key,self.plotgroup.time))
           
     def display_plots(self):
@@ -227,17 +229,11 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
         # recalculation).
         
     def destroy(self):
-        if self.auto_refresh.get():
-            if self in self.console.auto_refresh_panels:
-                self.console.auto_refresh_panels.remove(self)
-        Frame.destroy(self)
-
-    # The dummy argument makes the method signature match what is
-    # required by the Control-q hotkey
-    def parent_destroy(self,dummy):
-	self.destroy()
-	self.parent.destroy()
-
+        """overrides toplevel destroy, adding removal from autorefresh panels"""
+        if self in self.console.auto_refresh_panels:
+            self.console.auto_refresh_panels.remove(self)
+        Toplevel.destroy(self)
+        
 
     # CEBALERT: I hope this hack can be removed if we tidy up tkgui a little,
     # and then switch to having scrollbars on the entire window. We could
@@ -282,13 +278,13 @@ class PlotGroupPanel(BasicPlotGroupPanel):
     sheet_coordinates and normalize) and storing plot history.
     """
 	
-    def __init__(self,parent,console,plotgroup_key,**params):
+    def __init__(self,console,plotgroup_key,**params):
         """
         parent:  it is the window (GUIToplevel()) that contains the panel.
         console: is the associated console, (i.e. the TopoConsole that has this panel)
         name: name associated with the panel
 	"""
-	BasicPlotGroupPanel.__init__(self,parent,console,plotgroup_key,**params)
+	BasicPlotGroupPanel.__init__(self,console,plotgroup_key,**params)
       
         self.plotgroups_history=[]
         self.history_index = -1
@@ -608,9 +604,9 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         ########## CBALERT! Hack for getting initial size right
         # (for all plots to be displayed).
         if not hasattr(self,'have_set_initial_size'):
-            self.parent.update_idletasks()
-            self.parent.deiconify()
-            self.parent.minsize(*self._sizeright())
+            self.update_idletasks()
+            self.deiconify()
+            self.minsize(*self._sizeright())
             self.have_set_initial_size = True
         ##########
 

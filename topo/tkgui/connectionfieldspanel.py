@@ -32,7 +32,7 @@ import topo.commands.analysis
 # don't make sense at the moment when things like 'situate' are clicked.
 
 class ConnectionFieldsPanel(TemplatePlotGroupPanel):
-    def __init__(self,parent,console=None,pgt_name=None,x=0,y=0,**params):       
+    def __init__(self,console=None,pgt_name=None,x=0,y=0,**params):       
 
         # CEBALERT: I'm not sure what the various definitions of x and y
         # are for - I wonder if they can be cleaned up? I haven't looked,
@@ -44,7 +44,7 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
 	self.y = y # (was 0)
 
         # CEBALERT: why not a super() call?
-	TemplatePlotGroupPanel.__init__(self,parent,console,pgt_name,**params)
+	TemplatePlotGroupPanel.__init__(self,console,pgt_name,**params)
 
 
         self.__params_frame = Frame(master=self)
@@ -183,7 +183,7 @@ It is an error to request a unit outside the area of the Sheet.""")
 	    self.plotgroup.x = self.x
 	    self.plotgroup.y = self.y
         else:
-            self.dialog = Pmw.Dialog(self.parent,title = 'Error')
+            self.dialog = Pmw.Dialog(self,title = 'Error')
             message = 'The x/y coordinates are outside the bounding region.\n'\
                     + '  ' + str(l) + ' < X < ' + str(r) + '\n' \
                     + '  ' + str(b) + ' < Y < ' + str(t)
@@ -227,7 +227,7 @@ It is an error to request a unit outside the area of the Sheet.""")
     
         
     def refresh_title(self):
-        self.parent.title(topo.sim.name+': '+self.pgt.name + " %s (%0.3f,%0.3f) time:%s" %
+        self.title(topo.sim.name+': '+self.pgt.name + " %s (%0.3f,%0.3f) time:%s" %
                           (self.plotgroup.sheet_name,self.plotgroup.x,self.plotgroup.y,self.plotgroup.time))
 
 

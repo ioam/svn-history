@@ -157,15 +157,8 @@ class PlotsMenuEntry(ParameterizedObject):
         #if 'valid_context' in dir(self.class_name):
 
         if self.class_name.valid_context():
-            win = Toplevel(self.console)
-            win.withdraw()
-            win.title(self.title)
-
-            pn = self.class_name(parent=win,console=self.console,pgt_name=self.template.name,**args)
-            pn.pack(expand=YES,fill=BOTH)
-
+            pn = self.class_name(console=self.console,pgt_name=self.template.name,**args)
             pn.refresh_title()
-            win.deiconify()
             self.console.messageBar.message('state', 'OK')
             return pn
         else:
@@ -575,12 +568,8 @@ class TopoConsole(Tkinter.Tk):
         Test Pattern Window.  
         """
         if TestPattern.valid_context():
-            self.input_params_window = Toplevel(self)
-            self.input_params_window.withdraw()
+            self.input_params_window = TestPattern(self.input_params_window,self)
             self.input_params_window.title('Test Pattern')
-            ripp = TestPattern(self.input_params_window,self)
-            ripp.pack(side=TOP,expand=YES,fill=BOTH)
-            self.input_params_window.deiconify()
             self.messageBar.message('state', 'OK')
         else:
             self.messageBar.message('state',
@@ -768,6 +757,9 @@ class TopoConsole(Tkinter.Tk):
 # (From the web, I find that at least 1 person agrees with this:
 # http://www.thescripts.com/forum/thread492532.html)
 #
+# (same guy?
+# http://mail.python.org/pipermail/python-list/2005-July/330613.html
+# )
 # We have too many frames everywhere! It's difficult to keep track
 # of what's going on...
 #

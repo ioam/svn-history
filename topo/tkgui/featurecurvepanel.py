@@ -31,12 +31,12 @@ import topoconsole
 
 
 class FeatureCurvePanel(BasicPlotGroupPanel):
-    def __init__(self,parent,console=None,pgt_name=None,**config):       
+    def __init__(self,console=None,pgt_name=None,**config):       
 
         self.pgt = plotgroup_templates.get(pgt_name,None)
 	self.plotgroup_key=self.pgt.name 
      
-	BasicPlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
+	BasicPlotGroupPanel.__init__(self,console,pgt_name,**config)
 
         self.region = StringVar()
 	self.x = 0
@@ -122,7 +122,7 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
 
         for prerequisite in self.pgt.prerequisites:
             if prerequisite not in topo.sim[str(self.region.get())].sheet_view_dict:
-                self.dialog = Pmw.Dialog(self.parent,title = 'Warning')
+                self.dialog = Pmw.Dialog(self,title = 'Warning')
                 if prerequisite=='XPreference':
                     message = 'Position preference should be plotted before plotting '+ str(self.plotgroup_key)+'\n'\
                               'Otherwise will use default values'
@@ -186,7 +186,7 @@ It is an error to request a unit outside the area of the Sheet.""")
 	    self.plotgroup.x = self.x
 	    self.plotgroup.y = self.y
         else:
-            self.dialog = Pmw.Dialog(self.parent,title = 'Error')
+            self.dialog = Pmw.Dialog(self,title = 'Error')
             message = 'The x/y coordinates are outside the bounding region.\n'\
                     + '  ' + str(l) + ' < X < ' + str(r) + '\n' \
                     + '  ' + str(b) + ' < Y < ' + str(t)
@@ -227,9 +227,9 @@ class FullFieldFeatureCurvePanel(FeatureCurvePanel):
     This class creates a gui window showing the reduced update command and in which updating the
     plotgroup variables from the gui calls the plotcommand rather than the full updatecommand.
     """
-    def __init__(self,parent,console=None,pgt_name=None,**config):
+    def __init__(self,console=None,pgt_name=None,**config):
 
-        FeatureCurvePanel.__init__(self,parent,console,pgt_name,**config)
+        FeatureCurvePanel.__init__(self,console,pgt_name,**config)
 
       
 	plot_cmdlabel = Message(self.params_frame, text="Plot command:",aspect=1000)

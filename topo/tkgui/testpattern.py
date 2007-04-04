@@ -54,9 +54,9 @@ DEFAULT_PRESENTATION = '1.0'
 
 
 class TestPattern(plotgrouppanel.PlotGroupPanel):
-    def __init__(self,parent,console=None,padding=2,**params):
+    def __init__(self,console=None,padding=2,**params):
 
-	super(TestPattern,self).__init__(parent,console,'Preview',**params)
+	super(TestPattern,self).__init__(console,'Preview',**params)
         self.INITIAL_PLOT_HEIGHT = 100
         self.padding = padding
 	self.auto_refresh.set(True)
@@ -173,7 +173,7 @@ Each type will have various parameters that can be changed.""")
         #
         # CEBALERT: don't want these boxes up so high on window, should be lower.
         # Also, boxes are in the wrong order (need to match the plots).
-        self.__input_box = Pmw.RadioSelect(parent, labelpos = 'w',
+        self.__input_box = Pmw.RadioSelect(self, labelpos = 'w',
                                 command = self._input_change,label_text = 'Apply to pattern in:',
                                 frame_borderwidth = 2,frame_relief = 'ridge',
                                 selectmode = 'multiple')

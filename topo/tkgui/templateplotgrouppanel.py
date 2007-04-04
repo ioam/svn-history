@@ -73,7 +73,7 @@ def available_plot_channels(plot):
 
 
 class TemplatePlotGroupPanel(PlotGroupPanel):
-    def __init__(self,parent,console,pgt_name,**params):
+    def __init__(self,console,pgt_name,**params):
         # Plotgroup Template associated
         self.pgt = plotgroup_templates.get(pgt_name,None)
 
@@ -81,7 +81,7 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
 	self.strengthonly = BooleanVar()
 	self.strengthonly.set(False)
 
-	PlotGroupPanel.__init__(self,parent,console,pgt_name,**params)
+	PlotGroupPanel.__init__(self,console,pgt_name,**params)
 
 	self.strengthonly_checkbutton = Checkbutton(self.control_frame_1,
              text="Strength only",variable=self.strengthonly,command=self.set_strengthonly)
@@ -317,7 +317,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
 
     def refresh_title(self):
-        self.parent.title(topo.sim.name+': '+self.mapname.get() + " time:%s" % self.plotgroup.time)
+        self.title(topo.sim.name+': '+self.mapname.get() + " time:%s" % self.plotgroup.time)
 
 
     def _dynamic_info_string(self,event_info,basic_text):
