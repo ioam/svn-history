@@ -8,29 +8,29 @@ $Id$
 """
 __version__='$Revision$'
 
-
-import numpy.oldnumeric as Numeric
 import copy
 import re
 
 from inspect import getdoc
 from math import floor
 
-import Image
 import ImageTk
 import Pmw
+
 from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
      BooleanVar, StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
      Scrollbar, Y, VERTICAL, HORIZONTAL, Menu, END, NO, NONE,Scrollbar,Canvas
 
+import topo
+
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
 
-from topo.plotting.templates import plotgroup_templates
+from topo.plotting.templates import plotgroup_templates # is this used?
 from topo.plotting.plotgroup import PlotGroup,identity
 
-import topo.tkgui
+
 
 BORDERWIDTH = 1
 
