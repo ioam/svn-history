@@ -208,7 +208,10 @@ class FeatureResponses(ParameterizedObject):
             percent = 100.0*i/iters
 
             estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
-            
+
+            # CEBALERT: when there are multiple sheets, this can make it seem
+            # like topographica's stuck in a loop (because the counter goes
+            # to 100% lots of times...e.g. hierarchical's orientation tuning fullfield.
             message = 'Time ' + str(topo.sim.time()) + ': ' + \
                       str(int(percent)) + '% of '  + str(fduration) + ' patterns completed ' + \
                       ('(%02d' % int(estimate/60))+':' + \
