@@ -160,13 +160,12 @@ numeric-uninstall:
 ##############################################################
 # numpy (matrix library)
 #
-NUMPY = numpy-1.0.1
+NUMPY = numpy-1.0.2
 NUMPY_UNINSTALL =  ${PYTHON_LIB}/site-packages/numpy
 
 numpy: ${NUMPY}.tar.gz python numpy.diff
 	tar xzf ${NUMPY}.tar.gz
-	cp numpy.diff ${NUMPY}/
-	cd ${NUMPY}; patch -p0 < numpy.diff; ${PREFIX}/bin/python setup.py install
+	cd ${NUMPY}; ${PREFIX}/bin/python setup.py install
 	touch numpy
 
 numpy-clean:
