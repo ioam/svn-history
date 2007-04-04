@@ -47,7 +47,7 @@ import topoconsole
 from topo.plotting.plot import make_template_plot
 
 from Tkinter import IntVar, StringVar, Checkbutton
-from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
+from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X,NO,NONE
 
 # Default time to show in the Presentation duration box.
 DEFAULT_PRESENTATION = '1.0'
@@ -94,7 +94,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
                 labelpos = 'w',label_text = 'Duration to Present:',
                 value = DEFAULT_PRESENTATION,validate = {'validator' : 'real'},
                 command = self.present)
-        self.present_length.pack(fill='x', expand=1, padx=10, pady=5)
+        self.present_length.pack(fill=NONE, expand=NO, padx=10, pady=5)
         self.balloon.bind(self.present_length,
 """How long to run the simulator when presenting.""")
 
@@ -171,13 +171,13 @@ Each type will have various parameters that can be changed.""")
 
         ### 'Edit patterns in' boxes
         #
-        # CEBALERT: don't want these boxes up so high on window, should be lower.
-        # Also, boxes are in the wrong order (need to match the plots).
+        # CEBHACKALERT: Buttons seem to have strange behavior!
+        # Also, will boxes be in the same order as the plots?
         self.__input_box = Pmw.RadioSelect(self, labelpos = 'w',
-                                command = self._input_change,label_text = 'Apply to pattern in:',
-                                frame_borderwidth = 2,frame_relief = 'ridge',
-                                selectmode = 'multiple')
-        self.__input_box.pack(fill = 'x', padx = 5)
+                                           command = self._input_change,
+                                           label_text = 'Apply to pattern in:',
+                                           selectmode = 'multiple')
+        self.__input_box.pack(expand=NO,fill=NONE,padx=5)
 
         keys = copy.copy(self.generator_sheets_patterns.keys())
         keys.reverse()
