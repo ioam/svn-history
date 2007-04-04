@@ -184,5 +184,10 @@ def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
     
     new_time = time_sim_run(script,iterations)
 
+    percent_change = 100.0*(new_time-old_time)/old_time
+
     print "["+script+"]"+ '  Before: %2.1f s  Now: %2.1f s  (change=%2.1f s, %2.1f percent)'\
-          %(old_time,new_time,new_time-old_time,100.0*(new_time-old_time)/old_time)
+          %(old_time,new_time,new_time-old_time,percent_change)
+
+    assert percent_change<=5, "\nTime increase was greater than 5%"
+
