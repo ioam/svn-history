@@ -115,6 +115,9 @@ speed-tests: ${SPEEDTESTS}
 
 slow-tests: train-tests snapshot-tests speed-tests
 
+# CB: add notes somewhere about...
+# - making sure weave compilation has already occurred before running speed tests
+# - when to delete data files (i.e. when to generate new data)
 
 # General rules for generating test data and running the tests
 %_DATA:
