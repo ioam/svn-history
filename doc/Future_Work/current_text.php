@@ -77,6 +77,10 @@ can't really test Windows version.)
 - pyaudiolab, mlabwrap, other optional packages will wait until a
 future release.
 
+2007/04/05 (CB): examples/Makefile -> python
+Migrate examples/Makefile to python script. Then, Windows users
+can follow the tutorial instructions. 
+
 2007/04/04 (CB): projection activity window's dynamic text
 Gives some error...
 
@@ -117,11 +121,10 @@ and to force us to update the data when we really did mean to change
 the code.
 
 
-2007/03/29 (CB): Makefiles to python sccripts
-Migrate examples/Makefile to python script.  Plus control tests from a
-python file rather than the Makefile.  Can then include more tests of
-examples, by specifying sheet to look at etc.  And importantly, can
-easily run tests on Windows version.
+2007/03/29 (CB): Makefiles to python scripts
+Control tests from a python file rather than the Makefile.  Can then include
+more tests of examples, by specifying sheet to look at etc.  And importantly,
+can easily run tests on Windows version.
 
 
 2007/03/26 (CB): Support for optimization  
