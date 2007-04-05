@@ -80,6 +80,14 @@ future release.
 2007/04/04 (CB): projection activity window's dynamic text
 Gives some error...
 
+2007/04/05 (CB): scrollbar behavior
+Seems like they don't look good on several computers...might
+just disable them until after the release.
+
+2007/04/05 (CB): startup commands
+special list of startup commands to avoid repeatedly
+calling those scheduled at time 0 (e.g. normalization).
+
 </pre>
 
 
