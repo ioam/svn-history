@@ -3,25 +3,28 @@ Commands for running the examples files.
 """
 
 # CEBHACKALERT! Still being written!
-# Not sure "setup.py" is the right name.  Just translating the
-# Makefile for now...but we definitely have topographica by now so we
-# could do this differently.
-
+# Not sure "setup.py" is the right name - maybe run.py?
+#
+# Just translating the Makefile for now...but we definitely have
+# topographica by now so we could do this differently.
+#
 # Has none of the Makefile's dependency processing, so just does
 # what you tell it (i.e. over-writes existing files).
 
 
 
 from os import spawnv, P_WAIT
-from sys import argv, exec_prefix
-from os.path import join
+from sys import argv, executable
+from os.path import join, split
 
+# (same ALERT as in Filename parameter)
+topographica_path = split(split(executable)[0])[0]
 
 # location of the topographica script
-topographica = join(exec_prefix,"topographica")
+topographica = join(topographica_path,"topographica")
 
 # location of examples dir
-examples = join(exec_prefix,"examples")
+examples = join(topographica_path,"examples")
 
 # first arg is script name
 command_names = argv[1:len(argv)]
