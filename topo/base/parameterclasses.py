@@ -35,10 +35,11 @@ class Filename(Parameter):
     __slots__ = ['search_paths']
     __doc__ = property((lambda self: self.doc))
 
-    # CEBALERT: there's a better way, right? See the sys module documentation,
-    # and consider unix and windows.
     def __init__(self,default=None,
                  search_paths=[os.getcwd(),
+                               # CEBALERT: topographica base path. Must be a better way!
+                               # (Needs to work on unix and windows.)
+                               # Also, seems like this might be needed in several places.
                                os.path.split(os.path.split(sys.executable)[0])[0]],
                  **params):
         """
