@@ -97,6 +97,11 @@ class ParametersFrame(Frame):
                           'Close': Button(button_panel, text='Close',
                                            command= self.parent.destroy)} # should display warning if changed
 
+        self.__help_balloon.bind(self.__buttons['Apply'],"Set the object's Parameters to the displayed values.")
+        self.__help_balloon.bind(self.__buttons['Reset'],'Return the displayed values to those currently set on the object.')
+        self.__help_balloon.bind(self.__buttons['Close'],'Close this window, losing any changes that have not been applied.')
+        self.__help_balloon.bind(self.__buttons['Defaults'],"Return the object's Parameters to its class defaults.") # english
+
         for button in buttons_to_remove:
             self.__buttons.pop(button)
 
