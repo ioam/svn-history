@@ -78,6 +78,12 @@ can't really test Windows version.)
 future release.
 
 
+2007/04/05 (CB): precision of slow-tests
+Reduce precision of tests for those with checked-in data - results
+vary in precision across platforms. Then I can run tests on Windows
+(and those tests will work on OS X too).
+
+
 2007/04/05 (CB): examples/Makefile -> python
 Migrate examples/Makefile to python script. Then, Windows users
 can follow the tutorial instructions. 
@@ -88,7 +94,7 @@ Projection activity window gives some error around edges of plot.
 
 
 2007/04/05 (CB): startup commands
-special list of startup commands to avoid repeatedly
+Special list of startup commands to avoid repeatedly
 calling those scheduled at time 0 (e.g. normalization).
 
 
