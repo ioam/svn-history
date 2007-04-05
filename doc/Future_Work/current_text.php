@@ -92,6 +92,27 @@ just disable them until after the release.
 special list of startup commands to avoid repeatedly
 calling those scheduled at time 0 (e.g. normalization).
 
+2007/03/28 (?): Figure out where to put this info in the docs:
+<blockquote>
+If you often need to change the parameters for map or curve measurement,
+then you can do that easily without modifying your copy of
+Topographica by putting the following lines into the .ty file to which
+they apply:
+
+<blockquote>
+  from topo.plotting.templates import plotgroup_templates
+  plotgroup_templates["Orientation Preference"].command="measure_or_pref(scale=0.75,offset=0.5,display=False,pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=0.225))"
+</blockquote>
+
+<P>Of course, the specific parameters here can be anything you want, and
+you can do it for any plot.
+
+<P>You can also put these lines into $HOME/.topographicarc, if you find
+that you always want different defaults than Topographica's, for all
+scripts that you look at...
+</blockquote>
+       
+We also need to document .topographicarc somewhere.
 </pre>
 
 
