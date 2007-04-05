@@ -594,10 +594,27 @@ class Simulation(ParameterizedObject):
         default=[],
         doc="""
             List of string commands that will be exec'd in
-            __main__.__dict__ (i.e. as if they were entered at the command prompt)
-            before this simulation is unpickled. Allows e.g. to make sure items
-            have been imported before scheduled_commands are run.
+            __main__.__dict__ (i.e. as if they were entered at the
+            command prompt) every time this simulation is unpickled
+            (and will be executed before the simulation is itself
+            unpickled).
+
+            For example, allows items to be imported before
+            scheduled_commands are run.
             """)
+
+    # CB: Is this the simplest way to do this?
+    # If we want this to be 'initial_commands' or something similar,
+    # then check _time==0 in run() or something like that.
+    execute_next = Parameter(
+        instantiate=True,
+        default=[],
+        doc="""
+        List of string commands that will be exec'd in __main__.__dict__
+        (i.e. as if they were entered at the command prompt) when the
+        simulation is next run(). These commands will run before any others,
+        and are guaranteed only to run once (before being destroyed).
+        """)
               
 
     def __init__(self,**params):
@@ -718,6 +735,10 @@ class Simulation(ParameterizedObject):
 
         If both duration and until are used, the one that is reached first will apply.
         """
+        # Execute any commands in execute_next, and then remove them.
+        [CommandEvent(time=self._time,command_string=cmd)() for cmd in self.execute_next]
+        self.execute_next=[]
+        
         # Complicated expression for min(time+duration,until)
         if duration == Forever:
             stop_time = until
