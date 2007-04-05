@@ -226,11 +226,13 @@ class BasicPlotGroupPanel(Toplevel,ParameterizedObject):
         # unexpected behavior for a preference map calculation
         # (where it would do unnecessary, and potentially lengthy,
         # recalculation).
-        
+
+    # CB: tidy up the window destruction code here & elsewhere 
     def destroy(self):
         """overrides toplevel destroy, adding removal from autorefresh panels"""
-        if self in self.console.auto_refresh_panels:
-            self.console.auto_refresh_panels.remove(self)
+        if self.console:
+            if self in self.console.auto_refresh_panels:
+                self.console.auto_refresh_panels.remove(self)
         Toplevel.destroy(self)
         
 
