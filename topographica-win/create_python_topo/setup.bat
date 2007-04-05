@@ -53,7 +53,7 @@ REM If it doesn't end up in c:\python24, you can actually just copy it in.
 start /w msiexec /i python-2.4.4.msi ALLUSERS=0 TARGETDIR=c:\python24 ADDLOCAL=DefaultFeature,TclTk
 
 REM * numpy
-start /w numpy-1.0.1.win32-py2.4.exe
+start /w numpy-1.0.2.win32-py2.4.exe
 
 REM * matplotlib
 start /w matplotlib-0.90.0.win32-py2.4.exe
