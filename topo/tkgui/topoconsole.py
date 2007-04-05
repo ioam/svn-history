@@ -348,6 +348,8 @@ class TopoConsole(Tkinter.Tk):
 	self.stop_button = Button(learning_frame,text="Stop",state=DISABLED,
                                   command=lambda: self.set_stop())
 	self.stop_button.pack(side=LEFT)
+        # CB: this is setup for a balloon, not status bar? Doesn't print properly
+        # on the status bar.
         self.balloon.bind(self.stop_button,"""
             Stop a running simulation.
 
