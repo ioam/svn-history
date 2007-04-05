@@ -257,6 +257,11 @@ Strange Projection plots.
 <H2>Things we hope to take care of eventually</H2>
 
 <pre>
+2007/04/05 (CB): quitting topographica
+Does topographica always exit correctly, whatever combination of windows
+is open? What should happen when a user clicks 'X' on topoconsole?
+
+
 2007/03/29 (CB): tidy up c++ lissom matching
 set c++ lissom params so that topographica doesn't have to set ganglia
 weight mask specially.
