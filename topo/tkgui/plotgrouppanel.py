@@ -137,45 +137,45 @@ class BasicPlotGroupPanel(Toplevel,ParameterizedObject):
         # command: self.plot_group.configure(tag_text='NewName')
 	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plotgroup_key))
         self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH,padx=5,pady=5)
-	#self.plot_frame = self.plot_group_title.interior()
+	self.plot_frame = self.plot_group_title.interior()
 
 
-        # CB: this scrolled plots implementation should be considered
-        # temporary - see note by _sizeright().
+##         # CB: this scrolled plots implementation should be considered
+##         # temporary - see note by _sizeright().
         
-        # When I use 'expand' for flex, the scrollbars don't update
-        # the first time unless you click on them (so it looks like they
-        # don't work). Must be missing a refresh? Works fine with fixed,
-        # though (but 'expand' looks better because the plots are centered).
-        # Also should use 'dynamic' so they're only drawn when required.
-        ### Will need to test these on Win and OS X.
- 	self.scrolledplotframe = Pmw.ScrolledFrame(self.plot_group_title.interior(),
-                                                   borderframe=0,
-                                                   horizflex ='expand', #fixed
-                                                   vertflex='expand',#fixed
-                                                   hscrollmode = 'static', #dynamic
-                                                   vscrollmode = 'static') #dynamic
- 	self.scrolledplotframe.pack(side=TOP,expand=YES,fill=BOTH)
-        self.plot_frame = self.scrolledplotframe.interior()
+##         # When I use 'expand' for flex, the scrollbars don't update
+##         # the first time unless you click on them (so it looks like they
+##         # don't work). Must be missing a refresh? Works fine with fixed,
+##         # though (but 'expand' looks better because the plots are centered).
+##         # Also should use 'dynamic' so they're only drawn when required.
+##         ### Will need to test these on Win and OS X.
+##  	self.scrolledplotframe = Pmw.ScrolledFrame(self.plot_group_title.interior(),
+##                                                    borderframe=0,
+##                                                    horizflex ='expand', #fixed
+##                                                    vertflex='expand',#fixed
+##                                                    hscrollmode = 'static', #dynamic
+##                                                    vscrollmode = 'static') #dynamic
+##  	self.scrolledplotframe.pack(side=TOP,expand=YES,fill=BOTH)
+##         self.plot_frame = self.scrolledplotframe.interior()
 
 
 	# Hotkey for killing the window
 	self.bind('<Control-q>',self.destroy)
 
-        # prevent resizing bigger than the screen (scrollbars should
-        # appear on plot frame at that point)
-        self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
+##         # prevent resizing bigger than the screen (scrollbars should
+##         # appear on plot frame at that point)
+##         self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
 
 
-    ### Convenience functions for parent's geometry(), which uses a string
-    ### like "210x280+23+121" for width,height,x,y
-    def set_geom(self,width,height):
-        """Set parent's geometry width and height."""
-        self.geometry("%sx%s"%(width,height))
-    def get_geom(self):
-        """Return parent's geometry width and height."""
-        width,height,x,y = re.findall("[0-9.]+",self.geometry())
-        return int(width),int(height)
+##     ### Convenience functions for parent's geometry(), which uses a string
+##     ### like "210x280+23+121" for width,height,x,y
+##     def set_geom(self,width,height):
+##         """Set parent's geometry width and height."""
+##         self.geometry("%sx%s"%(width,height))
+##     def get_geom(self):
+##         """Return parent's geometry width and height."""
+##         width,height,x,y = re.findall("[0-9.]+",self.geometry())
+##         return int(width),int(height)
 
 
     def refresh(self,update=True):
@@ -234,36 +234,36 @@ class BasicPlotGroupPanel(Toplevel,ParameterizedObject):
         Toplevel.destroy(self)
         
 
-    # CEBALERT: I hope this hack can be removed if we tidy up tkgui a little,
-    # and then switch to having scrollbars on the entire window. We could
-    # use bwidget's scrolled window and frame, for instance.
-    # I think doing something like this would lead to better resizing behavior
-    # of the windows, and much simpler code.
-    def _sizeright(self):
-        """
-        Using a scrolled frame for the plots means that the initial size of the window
-        does not allow for displaying all the plots. This is a hack to allow the initial
-        size to be large enough to display all the plots.
-        """
-        # Pmw.Scrolledframe is made up of a frame and a clipper (both tkinter frames).
+##     # CEBALERT: I hope this hack can be removed if we tidy up tkgui a little,
+##     # and then switch to having scrollbars on the entire window. We could
+##     # use bwidget's scrolled window and frame, for instance.
+##     # I think doing something like this would lead to better resizing behavior
+##     # of the windows, and much simpler code.
+##     def _sizeright(self):
+##         """
+##         Using a scrolled frame for the plots means that the initial size of the window
+##         does not allow for displaying all the plots. This is a hack to allow the initial
+##         size to be large enough to display all the plots.
+##         """
+##         # Pmw.Scrolledframe is made up of a frame and a clipper (both tkinter frames).
         
-        frame_width,frame_height = self.scrolledplotframe._frame.winfo_width(),\
-                                   self.scrolledplotframe._frame.winfo_height()
+##         frame_width,frame_height = self.scrolledplotframe._frame.winfo_width(),\
+##                                    self.scrolledplotframe._frame.winfo_height()
 
-        clipper_width,clipper_height=self.scrolledplotframe._clipper.winfo_width(),\
-                                     self.scrolledplotframe._clipper.winfo_height()
+##         clipper_width,clipper_height=self.scrolledplotframe._clipper.winfo_width(),\
+##                                      self.scrolledplotframe._clipper.winfo_height()
 
-        window_width,window_height = self.get_geom()
+##         window_width,window_height = self.get_geom()
 
-        new_width= max(window_width+(frame_width-clipper_width),window_width)
-        new_height=max(window_height,window_height+(frame_height-clipper_height))
+##         new_width= max(window_width+(frame_width-clipper_width),window_width)
+##         new_height=max(window_height,window_height+(frame_height-clipper_height))
 
-        #print "W: frame=%s,clipper=%s,window=%s,new_win=%s"\
-        #      %(frame_width,clipper_width,window_width,new_width)
-        #print "H: frame=%s,clipper=%s,window=%s,new_win=%s"\
-        #      %(frame_height,clipper_height,window_height,new_height)
+##         #print "W: frame=%s,clipper=%s,window=%s,new_win=%s"\
+##         #      %(frame_width,clipper_width,window_width,new_width)
+##         #print "H: frame=%s,clipper=%s,window=%s,new_win=%s"\
+##         #      %(frame_height,clipper_height,window_height,new_height)
 
-        return new_width,new_height
+##         return new_width,new_height
 
 
 
@@ -600,14 +600,14 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 
 
         
-        ########## CBALERT! Hack for getting initial size right
-        # (for all plots to be displayed).
-        if not hasattr(self,'have_set_initial_size'):
-            self.update_idletasks()
-            self.deiconify()
-            self.minsize(*self._sizeright())
-            self.have_set_initial_size = True
-        ##########
+##         ########## CBALERT! Hack for getting initial size right
+##         # (for all plots to be displayed).
+##         if not hasattr(self,'have_set_initial_size'):
+##             self.update_idletasks()
+##             self.deiconify()
+##             self.minsize(*self._sizeright())
+##             self.have_set_initial_size = True
+##         ##########
 
             
 
