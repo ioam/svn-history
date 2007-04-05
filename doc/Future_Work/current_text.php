@@ -77,20 +77,26 @@ can't really test Windows version.)
 - pyaudiolab, mlabwrap, other optional packages will wait until a
 future release.
 
+
 2007/04/05 (CB): examples/Makefile -> python
 Migrate examples/Makefile to python script. Then, Windows users
 can follow the tutorial instructions. 
 
-2007/04/04 (CB): projection activity window's dynamic text
-Gives some error...
 
-2007/04/05 (CB): scrollbar behavior
-Seems like they don't look good on several computers...might
-just disable them until after the release.
+2007/04/04 (CB): Dynamic text
+Projection activity window gives some error around edges of plot.
+
 
 2007/04/05 (CB): startup commands
 special list of startup commands to avoid repeatedly
 calling those scheduled at time 0 (e.g. normalization).
+
+
+2007/04/05 (CB): numpy deprecation warnings
+When I run slow-tests, I get a bunch of DeprecationWarnings
+after updating to numpy 1.0.2. Is that from importing
+an array equal test function from an old location?
+
 
 2007/03/28 (?): Figure out where to put this info in the docs:
 <blockquote>
@@ -119,6 +125,17 @@ We also need to document .topographicarc somewhere.
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
 
 <pre>
+2007/04/05 (CB): tests on non-linux platforms
+On some platforms (e.g. OS X?) the results of simulations do not
+match exactly the results from linux. So the tests fail - need
+to change them to test only to a certain number of decimal places.
+
+
+2007/04/05 (CB): scrollbars on plotgrouppanel windows
+Currently disabled, since they seem to have strange behavior.
+Consider not using Pmw's scrolledframe component.
+
+
 2006/03/26 (CB): scheduled_actions in lissom examples
 Insert missing actions in case someone tries higher densities.
 
@@ -127,6 +144,17 @@ Insert missing actions in case someone tries higher densities.
 Set order and names of ParametersFrame's Ok, Apply, Cancel, Reset, and
 Defaults buttons, and make them behave as expected for classes and
 instances.  Figure out and clean up translator_dictionary & its uses.
+
+
+2007/03/26 (CB): minor tkgui cleanup
+- Simplify tkgui, eliminating extra frames and any unnecessary
+refresh() etc methods. At the moment, the complexity makes it 
+difficult to add new features to the GUI and to correct problems.
+- Collect my notes together (from __init__ and topoconsole).  Decide
+what to do about them, and then start doing them.
+- Which widgets should expand (expand=YES ?), which should fill the
+space (fill=X ?) (e.g. in parameters frames sliders etc should
+expand).
 
 
 2007/03/26 (CB): plotgroup panel resizing 
@@ -162,11 +190,6 @@ bottlenecks. Add general advice for optimization to the manual pages.
 Measurement of numpy.sum(X)/X.sum()/sum(X) performance. Difference
 between simulation results on different platforms (for slow-tests in
 Makefile).
-
-
-2007/03/29 (CB): slow tests output
-make slow tests output a little more obvious (e.g. speed change of
-more than 5%).
 
 
 2007/03/27 (CB): abstract classes
@@ -252,14 +275,6 @@ PatternGeneratorParameter.default=topo.patterns.basic.Line()
 "
 gives errors about being read only sometimes. (Try at 
 the commandline, from a script, and saving/loading snapshots.)
-
-
-2007/03/26 (CB): minor tkgui cleanup
-- Collect my notes together (from __init__ and topoconsole).  Decide
-what to do about them, and then start doing them.
-- Which widgets should expand (expand=YES ?), which should fill the
-space (fill=X ?) (e.g. in parameters frames sliders etc should
-expand).
 
 
 2007/02/28 (CB): OneDPowerSpectrum & Audio PatternGenerators
