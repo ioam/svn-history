@@ -214,6 +214,12 @@ class TopoConsole(Tkinter.Tk):
         #
         # Simulation Menu
         #
+
+        # CB: seems like the status bar's not showing the help text
+        # for menu commands any more. Need to find out when that
+        # stopped working (suspect: when I made TopoConsole inherit
+        # from Tk, and windows be windows rather than frames).
+        
         self.menubar.addmenu('Simulation','Simulation commands')
         self.menubar.addmenuitem('Simulation', 'command', 'Run a .ty script file',
                                  label = 'Run script',
