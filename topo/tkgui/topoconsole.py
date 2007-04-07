@@ -215,11 +215,11 @@ class TopoConsole(Tkinter.Tk):
         # Simulation Menu
         #
 
-        # CB: seems like the status bar's not showing the help text
-        # for menu commands any more. Need to find out when that
-        # stopped working (suspect: when I made TopoConsole inherit
-        # from Tk, and windows be windows rather than frames).
-        
+        # CEBALERT: status bar help for menu items only works on
+        # linux, not on Windows (and probably not on OS X?).
+        # Is this a bug in Pmw, or a problem with our code?
+        # The page http://pmw.sourceforge.net/doc/bugs.html
+        # suggests that this is a known problem.
         self.menubar.addmenu('Simulation','Simulation commands')
         self.menubar.addmenuitem('Simulation', 'command', 'Run a .ty script file',
                                  label = 'Run script',
@@ -779,7 +779,9 @@ class TopoConsole(Tkinter.Tk):
 # have, fixing these things might be worthwhile in that programming
 # tkgui could become less confusing (that is, once you understand 
 # tkgui itself - which is something else that needs fixing...).
-
+#
+#
+# Is Pmw being maintained anymore? Is there a suitable replacement?
 
 
 
