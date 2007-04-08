@@ -193,6 +193,7 @@ class TopoConsole(Tkinter.Tk):
         #parent.wm_iconbitmap('@/home/jbednar/research/topographica/topo.xpm')
         # CB: this works on ubuntu...
         # self.iconbitmap('@/usr/include/X11/bitmaps/Left')
+        # (but see e.g. http://www.thescripts.com/forum/thread43119.html)
         title = "Topographica Console"
         self.title(title)
 
