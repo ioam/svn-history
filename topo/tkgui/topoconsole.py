@@ -191,6 +191,8 @@ class TopoConsole(Tkinter.Tk):
         self._init_widgets()
         # Doesn't work for providing icon for the window:
         #parent.wm_iconbitmap('@/home/jbednar/research/topographica/topo.xpm')
+        # CB: this works on ubuntu...
+        # self.iconbitmap('@/usr/include/X11/bitmaps/Left')
         title = "Topographica Console"
         self.title(title)
 
