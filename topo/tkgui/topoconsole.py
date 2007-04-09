@@ -189,11 +189,14 @@ class TopoConsole(Tkinter.Tk):
         self.input_params_window = None
         self.auto_refresh_panels = []
         self._init_widgets()
-        # Doesn't work for providing icon for the window:
-        #parent.wm_iconbitmap('@/home/jbednar/research/topographica/topo.xpm')
-        # CB: this works on ubuntu...
-        # self.iconbitmap('@/usr/include/X11/bitmaps/Left')
-        # (but see e.g. http://www.thescripts.com/forum/thread43119.html)
+        
+        # Provide window and taskbar icon under Linux
+        # Doesn't apply to subwindows at present
+        # 
+        # CB: It may be possible for the icon be in color (using
+        # e.g. topo/tkgui/topo.xpm), see http://www.thescripts.com/forum/thread43119.html
+        self.iconbitmap('@'+(os.path.join(topo_dir,'topo/tkgui/topo.xbm')))
+        
         title = "Topographica Console"
         self.title(title)
 
