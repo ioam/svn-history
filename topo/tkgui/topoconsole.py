@@ -209,12 +209,12 @@ class TopoConsole(Tkinter.Tk):
 
 
         ##########
-        ### Make cascading menus open automatically on linux when the mouse
+        ### Make cascade menus open automatically on linux when the mouse
         ### is over the menu title.
         ### [Tkinter-discuss] Cascade menu issue
         ### http://mail.python.org/pipermail/tkinter-discuss/2006-August/000864.html
         activate_cascade = """\
-        if {[%W cget -type] != {menubar} && [%W type active] == {cascade}} {
+        if {[%W type active] == {cascade}} {
             %W postcascade active
         }
         """
