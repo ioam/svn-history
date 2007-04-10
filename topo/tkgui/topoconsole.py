@@ -9,6 +9,7 @@ from math import fmod,floor
 import Tkinter
 from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, Button, \
      LEFT, RIGHT, YES, NO, BOTH, Label, Text, END, DISABLED, NORMAL, Scrollbar, Y
+import tkMessageBox
 import Pmw, os, sys, traceback, __main__
 import StringIO
 import tkFileDialog
@@ -182,9 +183,6 @@ class TopoConsole(Tkinter.Tk):
         self.num_weights_windows = 0
         self.num_weights_array_windows = 0
 
-	# Create the Balloon.
-	self.balloon = Pmw.Balloon(self)
-
         self.loaded_script = None
         self.input_params_window = None
         self.auto_refresh_panels = []
@@ -192,13 +190,11 @@ class TopoConsole(Tkinter.Tk):
         
         # Provide window and taskbar icon under Linux
         # Doesn't apply to subwindows at present
-        # 
         # CB: It may be possible for the icon be in color (using
         # e.g. topo/tkgui/topo.xpm), see http://www.thescripts.com/forum/thread43119.html
+        # or http://mail.python.org/pipermail/python-list/2005-March/314585.html 
         self.iconbitmap('@'+(os.path.join(topo_dir,'topo/tkgui/topo.xbm')))
-        
-        title = "Topographica Console"
-        self.title(title)
+        self.title("Topographica Console")
 
         # command interpreter for executing commands in the console (used by exec_cmd).
         self.interpreter = code.InteractiveConsole(__main__.__dict__)
@@ -206,60 +202,31 @@ class TopoConsole(Tkinter.Tk):
         # Provide a way for other code to access the GUI when necessary
         topo.guimain=self
 
+        # catch click on the 'x': offers choice to quit or not
+        self.protocol("WM_DELETE_WINDOW",self.quit)
+
+
+
+
+        ##########
+        ### Make cascading menus open automatically on linux when the mouse
+        ### is over the menu title.
+        ### [Tkinter-discuss] Cascade menu issue
+        ### http://mail.python.org/pipermail/tkinter-discuss/2006-August/000864.html
+        activate_cascade = """\
+        if {[%W cget -type] != {menubar} && [%W type active] == {cascade}} {
+            %W postcascade active
+        }
+        """
+        self.bind_class("Menu", "<<MenuSelect>>", activate_cascade)
+        ##########
+
 
     def _init_widgets(self):
         
 
-	# Create and pack the MenuBar.
-	self.menubar = Pmw.MenuBar(self,
-                                   hull_relief = 'raised',
-                                   hull_borderwidth = 1,
-                                   balloon = self.balloon)
-	self.menubar.pack(fill = X)
 
-        #
-        # Simulation Menu
-        #
-
-        # CEBALERT: status bar help for menu items only works on
-        # linux, not on Windows (and probably not on OS X?).
-        # Is this a bug in Pmw, or a problem with our code?
-        # The page http://pmw.sourceforge.net/doc/bugs.html
-        # suggests that this is a known problem.
-        self.menubar.addmenu('Simulation','Simulation commands')
-        self.menubar.addmenuitem('Simulation', 'command', 'Run a .ty script file',
-                                 label = 'Run script',
-                                 command = self.load_network)
-        self.menubar.addmenuitem('Simulation', 'command', "Save simulation's state to disk as a .typ file",
-                                 label = 'Save snapshot',
-                                 command = self.save_snapshot)
-        self.menubar.addmenuitem('Simulation', 'command', 'Load the previously saved .typ state',
-                                 label = 'Load snapshot',
-                                 command = self.load_snapshot)
-        self.menubar.addmenuitem('Simulation', 'command', 'Reset the network',
-                                 label = 'Reset',
-                                 ## Gray out menu item ###########
-                                 foreground = 'Gray',            #
-                                 activeforeground = 'Gray',      #
-                                 activebackground = 'Light Gray',#
-                                 #################################
-                                 command = self.reset_network)
-        self.menubar.addmenuitem('Simulation', 'command', 'Present a test pattern',
-                                 label = 'Test Pattern',
-                                 ## Gray out menu item ###########
-                                 # foreground = 'Gray',            #
-                                 # activeforeground = 'Gray',      #
-                                 # activebackground = 'Light Gray',#
-                                 #################################
-                                 command = self.open_plot_params_window)
-	self.menubar.addmenuitem('Simulation', 'command', 'Open the model editor',
-				 label = 'Model Editor', command = self.open_model_editor)
-        self.menubar.addmenuitem('Simulation', 'separator')
-        self.menubar.addmenuitem('Simulation', 'command', 'Close the GUI window',
-                                 label = 'Quit',
-                                 command = self.quit)
-
-	# Create and pack the MessageBar.  (Shows "Status")
+	### MessageBar.  (Shows "Status")
         msg_group = Pmw.Group(self,tag_text='Status')
         msg_group.pack(side=BOTTOM,expand=NO,fill=X,padx=4,pady=8)
 	self.messageBar = Pmw.MessageBar(msg_group.interior(),
@@ -267,52 +234,32 @@ class TopoConsole(Tkinter.Tk):
                                          entry_relief='groove')
 	self.messageBar.pack(side = BOTTOM,fill=X,padx=4,pady=8)
 	self.messageBar.message('state', 'OK')
-        # JABALERT: Commenting this out restores the balloons for the
-        # widgets in this window, but not for the menus.  Any idea how
-        # to make balloons appear for both?
-	self.balloon.configure(statuscommand = self.messageBar.helpmessage,
-                               state='status')
 
-        #
-        # Plot menu
-        #
-        self.menubar.addmenu('Plots','Assorted plot displays')
-        self.plots_menu_entries={}
-        self.populate_plots_menu(self.menubar)
 
-        #
-        # Help menu
-        #
-        self.menubar.addmenu('Help','Information about Topographica', side='right')
-        self.menubar.addmenuitem('Help', 'command',
-                                 'Licensing and release information',
-                                 label="About",
-                                 command=self.new_about_window)
+        # CEBALERT: status bar help for menu items only works on
+        # linux, not on Windows and on OS X.
+        # (Limitation of Tkinter/those platforms.)
+        # Plus: for menu help, have to direct to status bar
+        # (limitation of pmw/tkinter)...this stops pop-up help
+        # for the other widgets.
 
-        self.menubar.addmenuitem('Help', 'command',
-                                 'How to use Topographica',
-                                 label="User Manual",
-                                 command=(lambda x=user_manual_locations: self.open_location(x)))
+	### Balloon, for pop-up help
+	self.balloon = Pmw.Balloon(self)
+        # balloon -> status bar
+        # CB: temporarily disabled
+	# self.balloon.configure(statuscommand = self.messageBar.helpmessage)
 
-        self.menubar.addmenuitem('Help', 'command',
-                                 'Walk-through examples',
-                                 label="Tutorials",
-                                 command=(lambda x=tutorials_locations: self.open_location(x)))
-        
-        self.menubar.addmenuitem('Help', 'command',
-                                 'Detailed code documentation',
-                                 label="Reference Manual",
-                                 command=(lambda x=reference_manual_locations: self.open_location(x)))
-        
-        self.menubar.addmenuitem('Help', 'command',
-                                 'Topographica on the web',
-                                 label="Topographica.org",
-                                 command=(lambda x=topo_www_locations: self.open_location(x)))
+	### Top-level (native) menu bar
+	self.menubar = Pmw.MainMenuBar(self)
+                                   #hull_relief = 'raised',
+                                   #hull_borderwidth = 1,
+                                   #balloon = self.balloon)
+        self.configure(menu=self.menubar)
 
-        self.menubar.addmenuitem('Help', 'command',
-                                 'Python reference',
-                                 label="Python documentation",
-                                 command=(lambda x=python_doc_locations: self.open_location(x)))
+        self.__simulation_menu()
+        self.__plot_menu()
+        self.__help_menu()
+
 
 
         #
@@ -324,7 +271,8 @@ class TopoConsole(Tkinter.Tk):
 
         rf=Label(learning_frame,text='Run for: ')
         rf.pack(side=LEFT)
-        self.balloon.bind(rf,"Duration to run the simulation when Go is pressed.")
+        # CB: duplicate help
+        #self.balloon.bind(rf,"Duration to run the simulation when Go is pressed.")
         
         learning_str=StringVar()
         learning_str.set('1.0')
@@ -350,18 +298,16 @@ class TopoConsole(Tkinter.Tk):
                            command=Pmw.busycallback(self.do_learning))
         go_button.pack(side=LEFT)
         
-        # Because the balloon help in the main window is currently
+        # CB: when the balloon help in the main window is 
         # shown in the status bar, if this line is enabled then the
         # simulation time is not visible there until the mouse moves
         # off of the Go button.
-        #self.balloon.bind(go_button,"Run the simulation for the specified duration.")
+        self.balloon.bind(go_button,"Run the simulation for the specified duration.")
 
 
 	self.stop_button = Button(learning_frame,text="Stop",state=DISABLED,
                                   command=lambda: self.set_stop())
 	self.stop_button.pack(side=LEFT)
-        # CB: this is setup for a balloon, not status bar? Doesn't print properly
-        # on the status bar.
         self.balloon.bind(self.stop_button,"""
             Stop a running simulation.
 
@@ -425,6 +371,107 @@ class TopoConsole(Tkinter.Tk):
         # command_entry - get called by toggle_command_widgets
 
 
+        
+
+
+    def __simulation_menu(self):
+        """Add the simulation menu options to the menubar."""
+        
+        self.menubar.addmenu('Simulation',"") # CB: WHAT DID THIS SAY BEFORE?
+
+        self.menubar.addmenuitem('Simulation', 'command', 'Run a .ty script file',
+                                 label = 'Run script',
+                                 command = self.load_network)
+        self.menubar.addmenuitem('Simulation', 'command', "Save simulation's state to disk as a .typ file",
+                                 label = 'Save snapshot',
+                                 command = self.save_snapshot)
+        self.menubar.addmenuitem('Simulation', 'command', 'Load the previously saved .typ state',
+                                 label = 'Load snapshot',
+                                 command = self.load_snapshot)
+##         self.menubar.addmenuitem('Simulation', 'command', 'Reset the network',
+##                                  label = 'Reset',
+##                                  ## Gray out menu item ###########
+##                                  foreground = 'Gray',            #
+##                                  activeforeground = 'Gray',      #
+##                                  activebackground = 'Light Gray',#
+##                                  #################################
+##                                  command = self.reset_network)
+        self.menubar.addmenuitem('Simulation', 'command', 'Present a test pattern',
+                                 label = 'Test Pattern',
+                                 command = self.open_plot_params_window)
+	self.menubar.addmenuitem('Simulation', 'command', 'Open the model editor',
+				 label = 'Model Editor', command = self.open_model_editor)
+        self.menubar.addmenuitem('Simulation', 'separator')
+        self.menubar.addmenuitem('Simulation', 'command', 'Quit Topographica',
+                                 label = 'Quit',
+                                 command = self.quit)
+
+
+    def __plot_menu(self):
+        """
+        Add the plot menu options to the menubar.
+
+
+        Poll for a list of class types, and put them into the Console
+        plots list.  This replaces something of this form:
+
+        self.menubar.addmenuitem('Plots', 'command',
+                             'New activity plot',
+                             label="Activity",
+                             command=self.new_activity_window)
+        """
+
+        self.menubar.addmenu('Plots','Assorted plot displays')
+        self.plots_menu_entries={}
+
+        for (label,obj) in plotgroup_templates.items():
+            entry = PlotsMenuEntry(self,obj,label=label)            
+            self.menubar.addmenuitem('Plots','command',
+                                obj.name,label=label,
+                                command=entry.command)
+            self.plots_menu_entries[label]=entry
+
+
+
+    def __help_menu(self):
+        """Add the help menu options."""
+
+        self.menubar.addmenu('Help','Information about Topographica') #, side='right')#CB: possible on toplevel?...check
+
+        # CEBALERT: can simplify this
+        self.menubar.addmenuitem('Help', 'command',
+                                 'Licensing and release information',
+                                 label="About",
+                                 command=self.new_about_window)
+
+        self.menubar.addmenuitem('Help', 'command',
+                                 'How to use Topographica',
+                                 label="User Manual",
+                                 command=(lambda x=user_manual_locations: self.open_location(x)))
+
+        self.menubar.addmenuitem('Help', 'command',
+                                 'Walk-through examples',
+                                 label="Tutorials",
+                                 command=(lambda x=tutorials_locations: self.open_location(x)))
+        
+        self.menubar.addmenuitem('Help', 'command',
+                                 'Detailed code documentation',
+                                 label="Reference Manual",
+                                 command=(lambda x=reference_manual_locations: self.open_location(x)))
+        
+        self.menubar.addmenuitem('Help', 'command',
+                                 'Topographica on the web',
+                                 label="Topographica.org",
+                                 command=(lambda x=topo_www_locations: self.open_location(x)))
+
+        self.menubar.addmenuitem('Help', 'command',
+                                 'Python reference',
+                                 label="Python documentation",
+                                 command=(lambda x=python_doc_locations: self.open_location(x)))
+
+
+
+
     def set_stop(self):
         """Declare that running should be interrupted."""
         self.stop=True
@@ -439,39 +486,16 @@ class TopoConsole(Tkinter.Tk):
             self.command_output_frame.pack_forget()
             
 
-    def populate_plots_menu(self, menubar):
-        """
-        Poll for a list of class types, and put them into the Console
-        plots list.  This replaces something of this form:
-
-        self.menubar.addmenuitem('Plots', 'command',
-                             'New activity plot',
-                             label="Activity",
-                             command=self.new_activity_window)
-        """
-        for (label,obj) in plotgroup_templates.items():
-            entry = PlotsMenuEntry(self,obj,label=label)            
-            menubar.addmenuitem('Plots','command',
-                                obj.name,label=label,
-                                command=entry.command)
-            self.plots_menu_entries[label]=entry
-    
-    # CEBALERT: Should catch a click on Topoconsole's X (maybe
-    # then offer a 'quit or not?' option), but should go out
-    # finally via this quit method.
-    # Use self.protocol("WM_DELETE_WINDOW",self.whatevermethoditis)
     def quit(self):
-        """
-        Close the main GUI window.
+        """Quit topographica."""
 
-        Exits the Topographica interpreter.
-        """
-        #Frame.quit(self)
-        #Frame.destroy(self)     # Get rid of widgets
-        self.destroy()   # Get rid of window
-        if topo.gui_cmdline_flag:
-            print "Quit selected; exiting"
-            sys.exit()
+        # CB: can probably get an icon on here
+        # Also, is the title working?
+        if tkMessageBox.askyesno("Quit Topographica","Quit?"):
+            self.destroy() 
+            if topo.gui_cmdline_flag:
+                print "Quit selected; exiting"
+                sys.exit()
 
 
     # CEBALERT: the way this works might be a surprise, because previously
