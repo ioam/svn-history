@@ -209,6 +209,9 @@ class TopoConsole(Tkinter.Tk):
 
 
         ##########
+        # CEBALERT: the behavior on linux for the main menu bar is not
+        # so good. Menu shouldn't activate until it's been clicked, then
+        # items should activate automatically after that.
         ### Make cascade menus open automatically on linux when the mouse
         ### is over the menu title.
         ### [Tkinter-discuss] Cascade menu issue
