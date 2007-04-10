@@ -69,13 +69,13 @@ Update to the current SVN version to incorporate recent changes and
 bugfixes for the Reference Manual.
 
 
+2007/04/10: update weave
+Update scipy (weave) so that the numpy test deprecation warnings go away.
+
+
 2007/03/02 (CB): update topographica-win
 - test that results from Windows version match those from the standard
-one.  (The current Windows numpy version at scipy.org presumably
-contains the subtract.reduce bug. Without an updated numpy binary,
-can't really test Windows version.)
-- pyaudiolab, mlabwrap, other optional packages will wait until a
-future release.
+one. 
 
 
 2007/04/05 (CB): precision of slow-tests
@@ -91,11 +91,6 @@ can follow the tutorial instructions.
 
 2007/04/04 (CB): Dynamic text
 Projection activity window gives some error around edges of plot.
-
-
-2007/04/05 (CB): startup commands
-Special list of startup commands to avoid repeatedly
-calling those scheduled at time 0 (e.g. normalization).
 
 
 2007/04/05 (CB): numpy deprecation warnings
@@ -658,6 +653,9 @@ To figure out:
 <H2>Ongoing work</H2>
 
 <pre>
+2006/04/10: optional external packages
+Optional packages (e.g. mlabwrap, pyaudio) on Windows and OS X.
+
 2006/02/23 (all): Making more things be Parameters
 And writing doc strings at the same time. E.g. the x and y widgets in
 the Unit Weights window can be Numbers with bounds, etc.
