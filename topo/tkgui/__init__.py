@@ -84,10 +84,6 @@ def start(mainloop=False):
     """
     console = topoconsole.TopoConsole()
 
-    #root = Tkinter.Tk()
-    
-    console.resizable(1,1)
-
     # This alows context menus to work on the Mac.  Widget code should bind
     # contextual menus to the virtual event <<right-click>>, not
     # <Button-3>.
@@ -97,42 +93,11 @@ def start(mainloop=False):
     console.event_add('<<right-click>>',*right_click_events)
     console.event_add('<<right-click-release>>',*right_click_release_events)
     Pmw.initialise(console)
-    #console = topoconsole.TopoConsole(parent=root)
-    #console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
 
     # mainloop() freezes the commandline until the GUI window exits.
     # Without this line the command-line remains responsive.
     if mainloop:
         console.mainloop()
-
-
-
-    ##########
-    ### Make cascading menus open automatically on linux when the mouse
-    ### is over the menu title.
-    ### [Tkinter-discuss] Cascade menu issue
-    ### http://mail.python.org/pipermail/tkinter-discuss/2006-August/000864.html
-    from Tkinter import Menu
-    # CEBALERT: there is now a kind of partial menu bar above the one
-    # we use on topoconsole (this shows up as an extra line).  Because
-    # we use pmw's menubar, we're not using the overall ('toplevel')
-    # menu that tk apps would usually have.
-    # The reason to use pmw's menu bar is that balloon help can be bound
-    # to the options - this doesn't seem to be possible with tk alone
-    # (at least in any reasonable way).
-    # JP: If we could find a way to use the top-level menus it would
-    # be nice.  On the Mac, the current menus are notably un-mac-like
-    # in many ways.
-    menubar=Menu(console)  # toplevel menu
-    console.configure(menu=menubar)
-    activate_cascade = """\
-    if {[%W cget -type] != {menubar} && [%W type active] == {cascade}} {
-        %W postcascade active
-    }
-    """
-    console.bind_class("Menu", "<<MenuSelect>>", activate_cascade)
-    ##########
-
 
     return console
 
