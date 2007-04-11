@@ -25,7 +25,8 @@ class CFPRF_EuclideanDistance(CFPResponseFn):
     """
     Euclidean-distance--based response function.
     """
-    def __call__(self, cfs, input_activity, activity, strength, **params):
+    def __call__(self, iterator, input_activity, activity, strength, **params):
+        cfs = iterator.proj._cfs
         rows,cols = activity.shape
 	euclidean_dist_mat = zeros((rows,cols),Float)
         for r in xrange(rows):

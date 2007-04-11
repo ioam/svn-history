@@ -92,8 +92,8 @@ class CFPLF_Trace(CFPLearningFn):
     single_cf_fn = LearningFnParameter(default=Hebbian(),
         doc="LearningFn that will be applied to each CF individually.")              
 
-    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
-        cfs = proj._cfs
+    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
+        cfs = iterator.proj._cfs
         rows,cols = output_activity.shape
         single_connection_learning_rate = self.constant_sum_connection_rate(proj,learning_rate)
         single_cf_fn = self.single_cf_fn
@@ -132,8 +132,8 @@ class CFPLF_OutstarHebbian(CFPLearningFn):
 
     outstar_wsum = None
 
-    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
-        cfs = proj._cfs
+    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
+        cfs = iterator.proj._cfs
         rows,cols = output_activity.shape
 	single_connection_learning_rate = self.constant_sum_connection_rate(proj,learning_rate)
         # avoid evaluating these references each time in the loop
@@ -185,7 +185,7 @@ class HomeoSynaptic(CFPLearningFn):
 	self.temp_hist = []
         self.ave_hist = []
         
-    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
+    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
 	"""
         Update the value of the given weights matrix based on the
         input_activity matrix (of the same size as the weights matrix)
@@ -193,7 +193,7 @@ class HomeoSynaptic(CFPLearningFn):
         a per-connection learning rate.
 	"""
         
-        cfs = proj._cfs
+        cfs = iterator.proj._cfs
         if not hasattr(self,'averages'):
             self.averages = ones(output_activity.shape,Float) * 0.1
 	    
