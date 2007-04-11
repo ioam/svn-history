@@ -440,12 +440,17 @@ class EPConnection(ParameterizedObject):
         """Generate a runnable command for creating this connection."""
         settings=[]
         for name,val in self.get_param_values():
-            if name=="src" or name=="dest":
-                rep=None
-            elif isinstance(val,ParameterizedObject):
-                rep=val.script_repr(imports=imports,prefix=prefix+"    ")
-            else:
-                rep=repr(val)
+            try: # There may be a better way to figure out which parameters specify classes
+                if issubclass(val,object):
+                    rep=val.__name__
+            except TypeError:
+                if name=="src" or name=="dest":
+                    rep=None
+                elif isinstance(val,ParameterizedObject):
+                    rep=val.script_repr(imports=imports,prefix=prefix+"    ")
+                else:
+                    rep=repr(val)
+
             if rep is not None:
                 settings.append('%s=%s' % (name,rep))
 
