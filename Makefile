@@ -123,9 +123,12 @@ slow-tests: train-tests snapshot-tests speed-tests
 %_DATA:
 	./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",density=8,run_for=[1,99,150])'
 
-# CB: add in decimal=e.g. 6 or 7 or whatever is the minimum to which all platforms agree
 %_TEST: %_DATA
-	./topographica -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA")'
+	./topographica -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",decimal=14)'
+# CB: Beyond 14 dp, the results of the current tests do not match on ppc64 and i686 (using linux).
+# In the future, decimal=14 might have to be reduced (if the tests change, or to accommodate other
+# processors/platforms).
+
 
 %_SPEEDDATA:
 	./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/${notdir $*}",iterations=250,data_filename="topo/tests/${notdir $*}_SPEEDDATA")'
