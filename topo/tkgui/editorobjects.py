@@ -167,7 +167,7 @@ class EditorSheet(EditorNode):
     """
     normalize = BooleanParameter(default=False)
     show_density = BooleanParameter(default=False)
-    view = Enumeration(default='normal',
+    view = Enumeration(default='activity',
                        available=['normal','activity'])
     
     def __init__(self, canvas, sheet, pos, name):
