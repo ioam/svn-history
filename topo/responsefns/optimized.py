@@ -29,13 +29,15 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
 
     single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)    
 
-    def __call__(self, cfs, input_activity, activity, strength, **params):
+    def __call__(self, iterator, input_activity, activity, strength, **params):
 	
         temp_act = activity
         rows,cols = activity.shape
-        irows,icols = input_activity.shape
+        ignore,length = input_activity.shape
         X = input_activity.ravel()
-    
+        cfs = iterator.proj._cfs
+        mask = iterator.proj.dest.mask.data
+        
         code = """
             double *tact = temp_act;
 	    float *wj;
@@ -44,55 +46,60 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
 		for (int l=0; l<cols; ++l) {
-                    PyObject *cf = PyList_GetItem(cfsr,l);
-                    PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
-                    PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
-
-		    // This code is optimized for contiguous arrays, which are typical,
-                    // but we make it work for noncontiguous arrays (e.g. views) by
-                    // creating a contiguous copy if necessary.
-                    array=0;
-		    if(PyArray_ISCONTIGUOUS((PyArrayObject*)weights_obj))
-                        wj = (float *)(((PyArrayObject*)weights_obj)->data);
-                    else {
-		    	array = (PyArrayObject*) PyArray_ContiguousFromObject(weights_obj,PyArray_FLOAT,2,2);
-		    	wj = (float *) array->data;
-		    }
-                    
-                    int *slice = (int *)(((PyArrayObject*)slice_obj)->data);
-                    
-                    int rr1 = *slice++;
-                    int rr2 = *slice++;
-                    int cc1 = *slice++;
-                    int cc2 = *slice;
-		    double tot = 0.0;
-		    double *xj = X+icols*rr1+cc1;
-
-                    // computes the dot product
-		    for (int i=rr1; i<rr2; ++i) {
-                        double *xi = xj;
-			float *wi = wj;                       
-			for (int j=cc1; j<cc2; ++j) {
-                            tot += *wi * *xi;
-                            ++wi;
-                            ++xi;
+                    if((*mask++) != 0.0) {
+                        PyObject *cf = PyList_GetItem(cfsr,l);
+                        PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
+                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
+    
+                        // This code is optimized for contiguous arrays, which are typical,
+                        // but we make it work for noncontiguous arrays (e.g. views) by
+                        // creating a contiguous copy if necessary.
+                        array=0;
+                        if(PyArray_ISCONTIGUOUS((PyArrayObject*)weights_obj))
+                            wj = (float *)(((PyArrayObject*)weights_obj)->data);
+                        else {
+                            array = (PyArrayObject*) PyArray_ContiguousFromObject(weights_obj,PyArray_FLOAT,2,2);
+                            wj = (float *) array->data;
                         }
-                        xj += icols;
-			wj += cc2-cc1;
-                    }  
-                    *tact = tot*strength;
-                    ++tact;
-
-                    // Anything obtained with PyObject_GetAttrString must be explicitly freed
-                    Py_DECREF(weights_obj);
-                    Py_DECREF(slice_obj);
-		    
-                    if(array != 0)
-		    	Py_DECREF(array);
+                        int *slice = (int *)(((PyArrayObject*)slice_obj)->data);
+                        
+                        int rr1 = *slice++;
+                        int rr2 = *slice++;
+                        int cc1 = *slice++;
+                        int cc2 = *slice;
+                        double tot = 0.0;
+                        double *xj = X+length*rr1+cc1;
+    
+                        // computes the dot product
+                        for (int i=rr1; i<rr2; ++i) {
+                            double *xi = xj;
+                            float *wi = wj;                       
+                            for (int j=cc1; j<cc2; ++j) {
+                                tot += *wi * *xi;
+                                ++wi;
+                                ++xi;
+                            }
+                            xj += length;
+                            wj += cc2-cc1;
+                        }  
+                        *tact = tot*strength;
+                        
+    
+                        // Anything obtained with PyObject_GetAttrString must be explicitly freed
+                        Py_DECREF(weights_obj);
+                        Py_DECREF(slice_obj);
+                        
+                        if(array != 0)
+                            Py_DECREF(array);
+                    } else 
+                    {
+                     *tact = 0; 
+                    }
+                    ++tact;    
                 }
             }
         """
-	inline(code, ['X', 'strength', 'icols', 'temp_act','cfs','cols','rows'], local_dict=locals())
+	inline(code, ['mask','X', 'strength', 'length', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 class CFPRF_DotProduct(CFPRF_Plugin):
     """
@@ -113,11 +120,12 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
     CFPRF_EuclideanDistance for an easier-to-read (but otherwise
     equivalent) version in Python.
     """
-    def __call__(self, cfs, input_activity, activity, strength, **params):
+    def __call__(self, iterator, input_activity, activity, strength, **params):
         temp_act = activity
         rows,cols = activity.shape
         irows,icols = input_activity.shape
         X = input_activity.ravel()
+        cfs = iterator.proj._cfs
 
         code = """
 	    #include <math.h>
@@ -176,9 +184,6 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
                 }
             }	
         """
-
-
-	
-    
         inline(code, ['X', 'strength', 'icols', 'temp_act','cfs','cols','rows'], local_dict=locals())
+
 provide_unoptimized_equivalent("CFPRF_EuclideanDistance_opt","CFPRF_EuclideanDistance",locals())
