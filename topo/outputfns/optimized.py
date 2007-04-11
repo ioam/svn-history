@@ -22,7 +22,6 @@ DivisiveNormalizeL1_opt=DivisiveNormalizeL1
 class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     """
     Performs divisive normalization of the weights of all cfs.
-
     Intended to be equivalent to, but faster than,
     CFPOF_DivisiveNormalizeL1.
     """
@@ -30,9 +29,11 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                                      constant=True)
 
     
-    def __call__(self, cfs, mask, **params):
+    
+    def __call__(self, iterator, mask, **params):
         rows,cols = mask.shape
 
+        cfs = iterator.proj._cfs
         # The original code normalized only the CFs for units that were
         # activated; it might be possible to restore that extra optimization
         # if some way is found to override that for the first iteration.
@@ -91,7 +92,7 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
     single_cf_fn = OutputFnParameter(DivisiveNormalizeL1(norm_value=1.0),
                                      constant=True)
 
-    def __call__(self, cfs, mask, **params):
+    def __call__(self, iterator, mask, **params):
         """
         Uses the cf.norm_total attribute to allow optimization
         by computing the sum separately, and to allow joint
@@ -102,15 +103,12 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
             rows,cols = mask.shape
             single_cf_fn = self.single_cf_fn
             norm_value = self.single_cf_fn.norm_value                
-
-            for r in xrange(rows):
-                for c in xrange(cols):
-                    if (mask[r][c] != 0):
-                        cf = cfs[r][c]
-    		        current_sum=cf.norm_total
-    	                factor = norm_value/current_sum
-    	                cf.weights *= factor
-                        del cf.norm_total
+            for cf,r,c in iterator():
+                if (mask[r][c] != 0):
+                    current_sum=cf.norm_total
+                    factor = norm_value/current_sum
+                    cf.weights *= factor
+                    del cf.norm_total
 
 
 provide_unoptimized_equivalent("CFPOF_DivisiveNormalizeL1_opt","CFPOF_DivisiveNormalizeL1",locals())
