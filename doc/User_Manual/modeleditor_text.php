@@ -1,14 +1,11 @@
 <h1>Topographica Model Editor</h1>
 
-Topographica allows you to view, manipulate or create a Topographica
+The Model Editor allows you to view, manipulate or create a Topographica
 model. By combining pre-defined components and changing each
 component's parameters, you can produce useful models without any
-programming.  However, there are some limitations, such as only being
-able to save the model as a snapshot (which will not always be
-readable in future versions of Topographica), and not being able to
-declare some types of values (such as dynamic numbers) in the GUI.  As
-a result, the Model Editor is currently most useful for inspecting and
-modifying a model that you create with a script file.
+programming. The result can then be saved to a .ty script, which you
+can edit to add any features not yet supported by the Model Editor
+(such as dynamic numbers).
 
 <h2>Opening the Model Editor</h2>
 <p>The model editor can be accessed through the Topographica
@@ -58,7 +55,7 @@ a ConnectionField).
 
 <p>The editor represents connections that join a sheet to itself as a
 dotted ellipse around the centre of the sheet. These projections allow
-each neuron on a sheet to be stimulated the previous activity within a
+each neuron on a sheet to be stimulated by the previous activity within a
 localized area. A looped line is used as the line representation of
 the projection.
 
@@ -82,14 +79,16 @@ can be viewed on e) and f) respectively:
 
 <h2>Creating a Model</h2>
 <p>Creating a new model for Topographica can be achieved in two
-ways. If you have programming experience, it is probably easiest to
-define a model in Python script. Example scripts are distributed with
-Topographica in the examples directory. The second way is to use the
-model editor to either create a brand new model, or manipulate an
-existing model, although not all operations can be specified in the
-Model Editor yet.  <p>To create a model for Topographica, you need to
-specify the computational units required and how they should be
-connected. Open a new model editor window as described in Opening the
+ways. If you have programming experience, the most flexible option
+is to define a model directly using Python script, usually starting
+with one of the scripts that are distributed with Topographica in the
+examples directory.  A much simpler, though more limited, approach is
+to use the model editor to either create a brand new model, or
+manipulate an existing model.
+
+<p>To create a new model, you need to
+specify the computational elements required and how they should be
+connected. First, open a new model editor window as described in Opening the
 Model Editor. If a model is loaded, the editor work area will display
 the model as described in Viewing a Model. Now you are ready to
 specify your model.
@@ -112,11 +111,11 @@ first thing you may want to do is add a sheet to the model. Click on
 the sheet pull down menu and a list of all the types of sheet
 available to you will appear. This list is formed from the pre-defined
 library of Topographica, covered later. Select the type of sheet that
-you want to be part of your model, for example, you may wish to
+you want to be part of your model.  For example, you may wish to
 provide some stimulus to the model by using a GeneratorSheet, in this
 case you would select GeneratorSheet from the menu. Notice that the
-focus of the toolbar will have shifted to the object item, click in
-the canvas and a sheet of the type you selected will be added to the
+focus of the toolbar will have shifted to the object item.  Click in
+the canvas, and a sheet of the type you selected will be added to the
 model. You can repeat this process until you have all the sheets you
 require for your model.
 
@@ -159,8 +158,8 @@ how you can use them in your model.
 <p>The model editor's lists populate themselves from this library, so
 all the components described in the manual will be available for you
 to use in the editor. The editor places no restrictions on how you
-connect these components together, however projections may not always
-be able to connect obscurely shaped sheets. 
+connect these components together, but some combinations that are not
+supported may give error messages.
 
 <h3>Extending the Library</h3>
 <p>The Topographica team are regularly making additions to the library
@@ -181,7 +180,7 @@ entries vary in style, for a description of the various types of
 parameter and valid changes you can make to the parameters refer to
 Controlling simulation parameters in the User Guide. Some examples of
 entry methods are, sliders for real numbers or pull down menus for
-class selectors(described later) and enumerations. In these cases you
+class selectors and enumerations. In these cases you
 can simply move the slider or select a different option from the menu
 to change the parameter's value:
 
@@ -194,35 +193,52 @@ changes and close the window, or Update just to make the changes. If
 you decide not to make the changes then click the close box in the top
 right hand corner.
 
-<p>If you are looking at a sheet's parameters you will notice another
-menu under these buttons. This allows you to open the properties frame
-of any of the connections joined to that sheet. Simply select a
-connection from the list and its frame will open underneath.
+<p>Many of the parameters will be set to values that are objects that
+themselves have parameters. In this case, right clicking on the value
+will allow you to open a Properties window, which works just the same
+way as the main Properties window for that object but sets values on
+the sub-object instead.
 
 <P>Help for most of the options can be obtained by hovering the mouse
 over the option's name. Help for the entire object can be obtained by
 hovering over the object's name ('Surround' in this case). 
 
-<h3>Constants</h3>
+<h3>Changing constants and default values</h3>
 
 <p>The Parameters section of the User Guide also details that a
 parameter can be declared as a constant. This means you cannot change
 it once the component has been made. To ensure consistency, the model
 editor must create the components as soon as you make them in the
 editor, so these values must already be set. To set constant values
-(as well as any other values) before instantiating the object, the
-editor provides a window 'New object parameters' when one of the
-object creation widgets (Sheet or Projection) is selected.  Values set
-in this window are used for any new object created with those widgets.
+(as well as default values in general) before instantiating the
+object, the parameters of the object about to be created can be
+changed using the parameters listed underneath the toolbar.
 
+<h3>Saving a new or modified model</h3>
 
-<h3>Class Selector</h3>
-<p>As introduced earlier, there is a parameter type called a class
-selector. This is used when the field of a component is one of a
-selection of classes. You can choose the appropriate class by
-selecting it from the menu, however some of these classes have
-parameters of their own. The editor allows you to change these
-parameters. Select the option from the menu and then right click
-within the menu's box. A pop-up menu will allow you to open up that
-option's parameter frame.
+The Topographica console Simulation menu offers two options for saving
+simulations once you are done editing them: 'Save snapshot' and 'Save
+script'.
+
+<P>'Save snapshot' saves a complete record in a .typ file of all state
+of the current simulation, which allows that simulation to be restored
+with exactly the same state later.  However, because this option
+requires saving a large portion of the internal state of Topographica,
+the snapshot files will not usually be loadable in a different version
+of Topographica after an upgrade.  Thus .typ snapshots should be
+considered only temporary storage for a model.
+
+<P>'Save script' instead generates a Python script that, when run,
+will generate a model with the same architecture as the one currently
+in memory.  This option is generally more useful for models created in
+the Model Editor, because the resulting text file has very little of
+the internal state of Topographica, and it can easily be edited when
+necessary to work with other Topographica versions.  Moreover, the
+resulting .ty script can be edited to add features not yet supported
+by the Model Editor, such as generating dynamic numbers (e.g. to
+generate input patterns). Thus it is generally best to save a new
+model as a .ty script rather than a .typ snapshot.  Note that some
+editing of the .ty script may be necessary to make the script truly
+runnable, for features that have not yet been updated to provide good
+script representations, but such changes are typically quite minor.
 
