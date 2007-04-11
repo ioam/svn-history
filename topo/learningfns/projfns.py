@@ -40,8 +40,8 @@ from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 ##    unit_threshold_learning_rate=Number(default=0.1,bounds=(0,None),
 ##        doc="Amount by which the unit_threshold is adjusted for each activity calculation.")
 ##
-##    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
-##        cfs = proj._cfs
+##    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
+##        cfs = iterator.proj._cfs
 ##        # Initialize thresholds the first time we learn the size of the output_activity.
 ##        if not hasattr(self,'unit_thresholds'):
 ##            self.unit_thresholds=ones(output_activity.shape,Float32)*self.unit_threshold_0
@@ -49,7 +49,7 @@ from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 ##        rows,cols = output_activity.shape
 ##
 ##        # JABALERT: Is this correct?
-##	single_connection_learning_rate = self.constant_sum_connection_rate(proj,learning_rate)
+##	single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
 ##
 ##        # avoid evaluating these references each time in the loop
 ##        single_cf_fn = self.single_cf_fn
@@ -95,7 +95,7 @@ class CFPLF_Trace(CFPLearningFn):
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         cfs = iterator.proj._cfs
         rows,cols = output_activity.shape
-        single_connection_learning_rate = self.constant_sum_connection_rate(proj,learning_rate)
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         single_cf_fn = self.single_cf_fn
         ##Initialise traces to zero if they don't already exist
         if not hasattr(self,'traces'):
@@ -135,7 +135,7 @@ class CFPLF_OutstarHebbian(CFPLearningFn):
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         cfs = iterator.proj._cfs
         rows,cols = output_activity.shape
-	single_connection_learning_rate = self.constant_sum_connection_rate(proj,learning_rate)
+	single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
 	outstar_wsum = zeros(input_activity.shape)
@@ -214,7 +214,7 @@ class HomeoSynaptic(CFPLearningFn):
         activity_norm = 1.0 + self.beta_n * \
            ((self.averages - self.activity_target)/self.activity_target)
         rows,cols = output_activity.shape
-	single_connection_learning_rate = self.constant_sum_connection_rate(proj,learning_rate)
+	single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
 
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
