@@ -17,7 +17,7 @@ from topo.base.sheet import activity_type
 from topo.misc.inlinec import optimized
 from topo.misc.keyedlist import KeyedList
 from topo.outputfns.basic import PiecewiseLinear
-
+from topo.base.projection import NeighborhoodMask, SheetMask
 
 class JointNormalizingCFSheet(CFSheet):
     """
@@ -179,6 +179,15 @@ class LISSOM(JointNormalizingCFSheet):
     been reached, an external input is required before the sheet will
     activate again.
     """
+    mask_init_time=Integer(default=5,bounds=(0,None),doc=""" 
+        The mask_init parameter controls when the optimization mask is initialized each new iteration      
+    
+    A mask is reset whenever new input comes
+    A counter is incremented each time an input is received from any
+       source, and once the counter reaches mask_init_time, the mask is
+       initialized to reflect the current activity profile""")
+
+
 
     tsettle=Integer(default=8,bounds=(0,None),doc="""
        Number of times to activate the LISSOM sheet for each external input event.
@@ -196,12 +205,13 @@ class LISSOM(JointNormalizingCFSheet):
     output_fn = OutputFnParameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
     precedence = Number(0.6)
     
+    
     def __init__(self,**params):
         super(LISSOM,self).__init__(**params)
         self.__counter_stack=[]
         self.activation_count = 0
         self.new_iteration = True
-
+        
     def input_event(self,conn,data):
         # On a new afferent input, clear the activity
         if self.new_iteration:
@@ -209,7 +219,7 @@ class LISSOM(JointNormalizingCFSheet):
             self.activity *= 0.0
             for proj in self.in_connections:
                 proj.activity *= 0.0
-                    
+            self.mask.reset()        
         super(LISSOM,self).input_event(conn,data)
 
 
@@ -226,6 +236,10 @@ class LISSOM(JointNormalizingCFSheet):
         """
         if self.new_input:
             self.new_input = False
+            
+            if self.activation_count == self.mask_init_time:
+                self.mask.calculate()
+            
     	    if self.activation_count == self.tsettle:
                 # Once we have been activated the required number of times
                 # (determined by tsettle), reset various counters, learn
