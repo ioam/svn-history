@@ -212,8 +212,9 @@ class TopoConsole(Tkinter.Tk):
         self.protocol("WM_DELETE_WINDOW",self.quit)
 
 
-
-
+        
+        # CEBALERT: add test for linux - this code doesn't need to be
+        # run on windows and mac.
         ##########
         # CEBALERT: the behavior on linux for the main menu bar is not
         # so good. Menu shouldn't activate until it's been clicked, then

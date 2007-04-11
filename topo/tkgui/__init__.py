@@ -48,6 +48,25 @@ from topo.base.cf import CFPLearningFnParameter,CFPOutputFnParameter,CFPResponse
 from topo.base.functionfamilies import LearningFnParameter,OutputFnParameter,ResponseFnParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
 
+
+
+### Which os is being used (for gui purposes)?
+#
+# CEBALERT: let's test once for the OS here.
+#
+# Right now tkgui only needs to detect if the platform is linux (do I
+# mean any kind of non-OS X unix*?) or mac, because there is some
+# special-purpose code for both those two: the mac code below, and the
+# menu-activating code in topoconsole.  We might have some Windows-
+# specific code for the window icons later on, too.
+# * actually it's the window manager that's important, right?
+#
+# platform.system()  sys.platform  os.name
+# platform.dist()/platform.win32_ver()/platform.mac_ver
+
+
+
+
 #
 # Define up the right click (context menu) events. These variables can
 # be appended or overridden in .topographicarc, if the user has some
