@@ -16,22 +16,23 @@ from numpy import ones
 
 class SheetMask(object):
     """
-    This is an abstract class that defines a mask over an SheetProjection object
-    A typical usage of this class is for optimization purposes, in that case this mask
-    indicates which neurons are active and which are not. Another example of usage is for
-    leassion experiments where it can indicate the lesion area.
-    This class is used by CFProjections and the related CFResponseFn to restrict the computation 
-    to only those neurons that are indicated in the Mask as active.
+    An abstract class that defines a mask over an SheetProjection object.
+    
+    A typical usage of this class is for optimization purposes, in
+    which case the mask indicates which neurons are active and should
+    be processed further. Alternatively, the mask could be used for
+    lesion experiments, to specify which units should be kept
+    inactive.  This class is currently used by CFProjections and the
+    related CFResponseFn to restrict the computation to only those
+    neurons that are indicated in the Mask as active.
     """
     # data property ensuring that whenever somebody accesses data they are not None
     def get_data(self): 
         assert(self._sheet != None)
         return self._data
-    
     def set_data(self,data): 
         assert(self._sheet != None)
         self._data = data
-    
     data = property(get_data,set_data)
     
     
@@ -48,23 +49,27 @@ class SheetMask(object):
         super(SheetMask,self).__init__()
         self.sheet = sheet
         
+
     def reset(self):
-      """Initialize mask to default values (meaning all neurons are not masked out)"""
+      """Initialize mask to default values (meaning all neurons are not masked out)."""
       self.data = ones(self.sheet.shape)
 
 
     def calculate(self):
       """
-      Abstract method that needs to be called when the Mask is initialized based on the activity of the sheet 
-      
-      For instance in the LISSOM algorithm this happens at the beginning of each iteration
+      Abstract method to calculate a new mask based on the activity of the sheet.
+
+      For instance, in the LISSOM algorithm that is based on a process
+      of feedforward activation followed by lateral settling, the
+      calculation is done at the beginning of each iteration, based on
+      the feedforward activity.
       """
       pass
 
+    # JABALERT: Not clear what the user should do with this.
     def update(self):
       """
-      Abstract update method... this method is called whenever the mask needs to be updated, meaning that it is recalculated
-      based on the activity of the sheet and its previous values
+      Abstract method to update the current mask based on the current activity and a previous mask.
       """
       pass
 
