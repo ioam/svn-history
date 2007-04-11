@@ -336,9 +336,8 @@ class CFPResponseFn(ParameterizedObject):
     """
     _abstract_class_name = "CFPResponseFn"
 
-    def __call__(self, cfs, input_activity, activity, strength, **params):
+    def __call__(self, iterator, input_activity, activity, strength, **params):
         raise NotImplementedError
-
 
 
 class CFPRF_Plugin(CFPResponseFn):
@@ -359,20 +358,13 @@ class CFPRF_Plugin(CFPResponseFn):
     single_cf_fn = ResponseFnParameter(default=DotProduct(),
         doc="Accepts a ResponseFn that will be applied to each CF individually.")
     
-    def __call__(self, cfs, input_activity, activity, strength):
-        rows,cols = activity.shape
-
+    def __call__(self, iterator, input_activity, activity, strength):
         single_cf_fn = self.single_cf_fn
-        for r in xrange(rows):
-            for c in xrange(cols):
-                cf = cfs[r][c]
-                r1,r2,c1,c2 = cf.slice_array
-                X = input_activity[r1:r2,c1:c2]
-                #if (X.shape != cf.weights.shape):
-                #  self.warning("Shapes %s and %s are not compatible" % (X.shape,cf.weights.shape))
-                activity[r,c] = single_cf_fn(X,cf.weights)
+        for cf,r,c in iterator():
+           r1,r2,c1,c2 = cf.slice_array
+           X = input_activity[r1:r2,c1:c2]
+           activity[r,c] = single_cf_fn(X,cf.weights)
         activity *= strength
-
 
 
 class CFPResponseFnParameter(ClassSelectorParameter):
@@ -425,7 +417,7 @@ class CFPLF_Identity(CFPLearningFn):
     """CFLearningFunction performing no learning."""
     single_cf_fn = LearningFnParameter(default=IdentityLF(),constant=True)
   
-    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
+    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         pass
 
 
@@ -446,22 +438,18 @@ class CFPLF_Plugin(CFPLearningFn):
     """CFPLearningFunction applying the specified single_cf_fn to each CF."""
     single_cf_fn = LearningFnParameter(default=Hebbian(),
         doc="Accepts a LearningFn that will be applied to each CF individually.")
-       
-    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
+    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
-        cfs = proj._cfs
-        rows,cols = output_activity.shape
-	single_connection_learning_rate = self.constant_sum_connection_rate(proj,learning_rate)
+	single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
-	for r in xrange(rows):
-            for c in xrange(cols):
-                cf = cfs[r][c]
-                single_cf_fn(cf.get_input_matrix(input_activity),
-                             output_activity[r,c], cf.weights, single_connection_learning_rate)
-                # CEBHACKALERT: see ConnectionField.__init__() re. mask & output fn
-                cf.weights *= cf.mask
-                
+
+
+	for cf,r,c in iterator():
+            single_cf_fn(cf.get_input_matrix(input_activity),
+                         output_activity[r,c], cf.weights, single_connection_learning_rate)
+            # CEBHACKALERT: see ConnectionField.__init__() re. mask & output fn
+            cf.weights *= cf.mask                
 
 class CFPOutputFn(ParameterizedObject):
     """
@@ -472,7 +460,7 @@ class CFPOutputFn(ParameterizedObject):
     """
     _abstract_class_name = "CFPOutputFn"
     
-    def __call__(self, cfs, mask, **params):
+    def __call__(self, iterator, mask, **params):
         """Operate on each CF for which the mask is nonzero."""
         raise NotImplementedError
 
@@ -485,7 +473,7 @@ class CFPOF_Plugin(CFPOutputFn):
     single_cf_fn = OutputFnParameter(default=IdentityOF(),
         doc="Accepts an OutputFn that will be applied to each CF individually.")
     
-    def __call__(self, cfs, mask, **params):
+    def __call__(self, iterator, mask, **params):
         """
         Apply the single_cf_fn to each CF for which the mask is nonzero.
 
@@ -495,16 +483,13 @@ class CFPOF_Plugin(CFPOutputFn):
         norm_value.
         """
         if type(self.single_cf_fn) is not IdentityOF:
-            rows,cols = mask.shape
             single_cf_fn = self.single_cf_fn
             norm_value = self.single_cf_fn.norm_value                
 
-            for r in xrange(rows):
-                for c in xrange(cols):
-                    if (mask[r][c] != 0):
-                        cf = cfs[r][c]
-                        single_cf_fn(cf.weights)
-                        del cf.norm_total
+            for cf,r,c in iterator():
+              if (mask[r][c] != 0):
+                 single_cf_fn(cf.weights)
+                 del cf.norm_total
 
 
 class CFPOF_Identity(CFPOutputFn):
@@ -516,7 +501,7 @@ class CFPOF_Identity(CFPOutputFn):
     """
     single_cf_fn = OutputFnParameter(default=IdentityOF(),constant=True)
     
-    def __call__(self, cfs, mask, **params):
+    def __call__(self, iterator, mask, **params):
         pass
 
 
@@ -804,8 +789,9 @@ class CFProjection(Projection):
     def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
-        self.response_fn(self._cfs, input_activity, self.activity, self.strength)
-        self.output_fn(self.activity)
+        self.activity *=0.0
+        self.response_fn(MaskedCFIter(self), input_activity, self.activity, self.strength)
+        self.output_fn(MaskedCFIter(self),self.activity)
 
 
     def learn(self):
@@ -815,11 +801,11 @@ class CFProjection(Projection):
         # Learning is performed if the input_buffer has already been set,
         # i.e. there is an input to the Projection.
         if self.input_buffer != None:
-            self.learning_fn(self,self.input_buffer,self.dest.activity,self.learning_rate)
+            self.learning_fn(MaskedCFIter(self),self.input_buffer,self.dest.activity,self.learning_rate)
 
 
     def apply_learn_output_fn(self,mask):
-        self.weights_output_fn(self._cfs,mask)
+        self.weights_output_fn(MaskedCFIter(self),mask)
 
 
     ### JABALERT: This should be changed into a special __set__ method for
@@ -866,6 +852,39 @@ class CFProjection(Projection):
 	"""
         raise NotImplementedError
 
+
+
+class CFIter(object):
+    """ This class is an iterator that will walk you through 
+    connection fields of all active neurons in the source sheet 
+    of the projection
+    """
+    def __init__(self,cfprojection):
+        self.proj = cfprojection    # the cfprojection that this iterator is defined over
+
+    def __call__(self):
+        rows,cols = self.proj.cfs_shape
+        for r in xrange(rows):
+            for c in xrange(cols):
+                    yield (self.proj._cfs[r][c],r,c)
+
+
+class MaskedCFIter(CFIter):
+    """ This class is an iterator that will walk you through 
+    connection fields of all active neurons in the source sheet 
+    of the projection that are not masked out
+    """
+
+    def __init__(self,cfprojection):
+        super(MaskedCFIter,self).__init__(cfprojection)
+    
+    def __call__(self):
+        rows,cols = self.proj.cfs_shape
+        mask = self.proj.dest.mask.data
+        for r in xrange(rows):
+            for c in xrange(cols):
+                if mask[r][c]:
+                    yield (self.proj._cfs[r][c],r,c)
 
 
 ### JABALERT: Should consider eliminating this class, moving its
