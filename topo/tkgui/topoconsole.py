@@ -169,6 +169,12 @@ class PlotsMenuEntry(ParameterizedObject):
 
 
 
+# CEBALERT: once we have figured out how to get topoconsole's window
+# icon right (as well as the "iconified" icon, if necessary) we should
+# consider how to give all topographica windows these
+# attributes. There are probably other things we want the windows to
+# share, too.
+
 class TopoConsole(Tkinter.Tk):
     """
     Main window for the Tk-based GUI.
