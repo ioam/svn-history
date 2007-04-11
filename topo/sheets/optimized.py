@@ -10,16 +10,15 @@ from topo.base.parameterclasses import Number
 from topo.base.parameterizedobject import ParameterizedObject
 
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
-
+from topo.base.projection import OutputFnParameter, Projection, NeighborhoodMask
 from topo.sheets.lissom import LISSOM
-from topo.base.projection import OutputFnParameter, Projection
+
 
 class LISSOM_Opt(LISSOM):
     """
     Overrides the function JointNormalizingCFSheet.__compute_joint_norm_totals 
     with C-optimized code for LISSOM sheet.
     """
-
     def compute_joint_norm_totals(self,projlist,mask):
         """
         Compute norm_total for each CF in each projections from a
@@ -67,3 +66,51 @@ class LISSOM_Opt(LISSOM):
         inline(code, ['projlist','mask','rows','cols','length'], local_dict=locals())
 
 provide_unoptimized_equivalent("LISSOM_Opt","LISSOM",locals())
+
+class NeighborhoodMask_Opt(NeighborhoodMask):
+    
+    def calculate(self):
+        rows,cols = self.data.shape
+        ignore1,matradius = self.sheet.sheet2matrixidx(self.radius,0)
+        ignore2,x = self.sheet.sheet2matrixidx(0,0)
+        matradius = abs(matradius -x)
+        thr = self.threshold
+        activity = self.sheet.activity
+        mask = self.data
+        
+        code = """
+            #define min(x,y) (x<y?x:y)
+            #define max(x,y) (x>y?x:y)
+            
+            double *X = mask;
+            double *A = activity;
+            for (int r=0; r<rows; ++r) {
+                for (int l=0; l<cols; ++l) {
+                    int lbx = max(0,r-matradius);
+                    int lby = max(0,l-matradius);
+                    int hbx = min(r+matradius+1,rows);
+                    int hby = min(l+matradius+1,cols);
+                    
+                    *X = 0.0;
+                    int breakFlag = 0;
+                    for(int k=lbx;k<hbx;k++)
+                    {
+                        for(int l=lby;l<hby;l++)
+                        {
+                            double *a = A+k*rows + l;
+                            if(*a > thr)
+                            {
+                                *X = 1.0;
+                                //JAALERT HACK. Want to jump out both nested loops!!!
+                                breakFlag = 1;
+                                break;
+                            }
+                        }
+                        if(breakFlag)break;
+                    }
+                    
+                    X++;
+                }
+            }
+        """    
+        inline(code, ['thr','activity','matradius','mask','rows','cols'], local_dict=locals())
