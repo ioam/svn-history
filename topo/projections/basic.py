@@ -22,7 +22,7 @@ from topo.base.parameterclasses import Number,BooleanParameter,Parameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.base.sheetview import UnitView
-from topo.base.cf import ConnectionField, CFPRF_Plugin
+from topo.base.cf import ConnectionField, CFPRF_Plugin, MaskedCFIter
 
 from topo.outputfns.basic import IdentityOF
 
@@ -129,14 +129,6 @@ class SharedWeightCFProjection(CFProjection):
                 row.append(cf)
             cflist.append(row)
         self._cfs = cflist
-
-    
-    def activate(self,input_activity):
-        """Activate using the specified response_fn and output_fn."""
-        self.input_buffer = input_activity
-	self.response_fn(self._cfs, input_activity, self.activity, self.strength)
-        self.output_fn(self.activity)
-
 
     def change_bounds(self, nominal_bounds_template):
         """
