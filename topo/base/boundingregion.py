@@ -56,11 +56,11 @@ class BoundingBox(BoundingRegion):
         else:
             return 'BoundingBox(points=((%s,%s),(%s,%s)))'%(l,b,r,t)
 
-    def script_repr(self,imports={},prefix="    "):
+    def script_repr(self,imports=[],prefix="    "):
         # Generate import statement
         cls = self.__class__.__name__
         mod = self.__module__
-        imports[mod+'.'+cls]="from %s import %s" % (mod,cls)
+        imports.append("from %s import %s" % (mod,cls))
         return self.__str__()
 
     def __init__(self,**args):

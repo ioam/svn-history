@@ -342,7 +342,7 @@ class EventProcessor(ParameterizedObject):
         """
         pass
 
-    def script_repr(self,imports={},prefix="    "):
+    def script_repr(self,imports=[],prefix="    "):
         """Generate a runnable command for creating this EventProcessor."""
         return simulation_path+"['"+self.name+"']="+\
         super(EventProcessor,self).script_repr(imports=imports,prefix=prefix)
@@ -436,7 +436,7 @@ class EPConnection(ParameterizedObject):
             del self.src.out_connections[i]
 
 
-    def script_repr(self,imports={},prefix="    "):
+    def script_repr(self,imports=[],prefix="    "):
         """Generate a runnable command for creating this connection."""
         settings=[]
         for name,val in self.get_param_values():
@@ -457,7 +457,7 @@ class EPConnection(ParameterizedObject):
         # add import statement
         cls = self.__class__.__name__
         mod = self.__module__
-        imports[mod+'.'+cls]="from %s import %s" % (mod,cls)
+        imports.append("from %s import %s" % (mod,cls))
 
         return simulation_path+".connect('"+self.src.name+"','"+self.dest.name+ \
                "',connection_type="+self.__class__.__name__+ \
@@ -521,7 +521,7 @@ class CommandEvent(Event):
         return "CommandEvent(time="+`self.time`+", command_string='"+self.command_string+"')"
 
 
-    def script_repr(self,prefix="    "):
+    def script_repr(self,imports=[],prefix="    "):
         """Generate a runnable command for creating this CommandEvent."""
         return simulation_path+".schedule_command("+`self.time`+",'"+ self.command_string+"')"
 
@@ -920,7 +920,7 @@ class Simulation(ParameterizedObject):
         return [c for c in set(conns)]
 
 
-    def script_repr(self,imports={},prefix="    "):
+    def script_repr(self,imports=[],prefix="    "):
         """
         Return a nearly runnable script recreating this simulation.
 
@@ -940,15 +940,15 @@ class Simulation(ParameterizedObject):
                                cmp=lambda x, y: cmp(x.command_string,y.command_string)),
                         cmp=lambda x, y: cmp(x.time,y.time))]
 
+        imps  = sorted(set(imports))
 
-        import_statements = ""
-        for s in imports.values():
-            import_statements+="%s\n"%(s)            
+        vals  = [simulation_path + "." + p + "=" + repr(getattr(self,p)) for p in
+                 ["name","startup_commands","execute_next"]
+                 if getattr(self,p)]
 
-        return "\n\n# Imports:\n\n"+import_statements+"\n\n"+\
-               simulation_path+".name='"+self.name + "'\n\n" +\
-               simulation_path+".startup_commands="+repr(self.startup_commands) +\
-               '\n\n\n\n# Objects:\n\n'            + '\n\n\n'.join(objs) + \
+        return "\n\n# Imports:\n\n"                +     '\n'.join(imps)  + \
+               "\n\n\n"                            +   '\n\n'.join(vals)  + \
+               '\n\n\n\n# Objects:\n\n'            + '\n\n\n'.join(objs)  + \
                '\n\n\n\n# Connections:\n\n'        + '\n\n\n'.join(conns) + \
                '\n\n\n\n# Scheduled commands:\n\n' +     '\n'.join(cmds)
     

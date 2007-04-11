@@ -666,12 +666,9 @@ class ParameterizedObject(object):
         return self.__class__.__name__ + "(" + ", ".join(settings) + ")"
 
 
-    def script_repr(self,imports={},prefix="    "):
+    def script_repr(self,imports=[],prefix="    "):
         """
         Variant of __repr__ designed for generating a runnable script.
-
-        May replace __repr__ at some point, so that the default representation
-        is runnable.
         """
         # Suppresses automatically generated names and print_levels.
         #
@@ -702,7 +699,7 @@ class ParameterizedObject(object):
         # Generate import statement
         cls = self.__class__.__name__
         mod = self.__module__
-        imports[mod+'.'+cls]="from %s import %s" % (mod,cls)
+        imports.append("from %s import %s" % (mod,cls))
 
         return self.__class__.__name__ + "(" + (",\n"+prefix).join(settings) + ")"
 
