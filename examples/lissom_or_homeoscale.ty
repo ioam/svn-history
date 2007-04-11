@@ -59,9 +59,9 @@ class InitFn(CFPLearningFn):
         super(InitFn,self).__init__(**params)
 	self.FirstCall = True
    
-    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
+    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         
-        cfs = proj._cfs
+        cfs = iterator.proj._cfs
         if self.FirstCall:
 	    self.FirstCall = False
 	    # normalize initial weights to 1.0
