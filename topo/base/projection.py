@@ -11,6 +11,62 @@ from sheet import Sheet
 from parameterclasses import Number, BooleanParameter, Parameter
 from simulation import EPConnection
 from functionfamilies import OutputFnParameter,IdentityOF
+from numpy import ones
+
+
+class SheetMask(object):
+    """
+    This is an abstract class that defines a mask over an SheetProjection object
+    A typical usage of this class is for optimization purposes, in that case this mask
+    indicates which neurons are active and which are not. Another example of usage is for
+    leassion experiments where it can indicate the lesion area.
+    This class is used by CFProjections and the related CFResponseFn to restrict the computation 
+    to only those neurons that are indicated in the Mask as active.
+    """
+    # data property ensuring that whenever somebody accesses data they are not None
+    def get_data(self): 
+        assert(self._sheet != None)
+        return self._data
+    
+    def set_data(self,data): 
+        assert(self._sheet != None)
+        self._data = data
+    
+    data = property(get_data,set_data)
+    
+    
+    def get_sheet(self): 
+        assert(self._sheet != None)
+        return self._sheet
+    def set_sheet(self,sheet): 
+        self._sheet = sheet 
+        if(self._sheet != None): self.reset()
+    sheet = property(get_sheet,set_sheet)
+    
+    
+    def __init__(self,sheet=None):
+        super(SheetMask,self).__init__()
+        self.sheet = sheet
+        
+    def reset(self):
+      """Initialize mask to default values (meaning all neurons are not masked out)"""
+      self.data = ones(self.sheet.shape)
+
+
+    def calculate(self):
+      """
+      Abstract method that needs to be called when the Mask is initialized based on the activity of the sheet 
+      
+      For instance in the LISSOM algorithm this happens at the beginning of each iteration
+      """
+      pass
+
+    def update(self):
+      """
+      Abstract update method... this method is called whenever the mask needs to be updated, meaning that it is recalculated
+      based on the activity of the sheet and its previous values
+      """
+      pass
 
 ### JABALERT
 ###
@@ -101,11 +157,17 @@ class ProjectionSheet(Sheet):
     apply_output_fn=BooleanParameter(default=True,
         doc="Whether to apply the output_fn after computing an Activity matrix.")
 
+    # Should be a MaskParameter for safety
+    mask = Parameter(default=SheetMask(),instantiate=True,doc="""
+        Mask to apply to the activity when determining which units need to be computed.
+        Should be set to an instance of SheetMask.  By default, the mask is ignored, but
+        subclasses can use this mask to implement optimizations, non-square Sheet shapes, etc. 
+    """)
                              
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)
         self.new_input = False
-
+        self.mask.sheet = self
 
     def _dest_connect(self, conn):
         """
@@ -202,3 +264,43 @@ class ProjectionSheet(Sheet):
         """
         return dict([(p.name,p) for p in self.in_connections])
 
+
+  
+    
+    
+class NeighborhoodMask(SheetMask):
+    """
+    This is an implementation of Mask class that uses a small radius around each neuron 
+    and a threshold whether it is active: it check whether an activity of at least one neuron
+    in the surrounding of the given neuron is over the threshold in which case it sets it as active.
+    """
+    
+    def __init__(self,threshold,radius,sheet):
+        super(NeighborhoodMask,self).__init__(sheet)
+        self.threshold = threshold
+        self.radius = radius
+        
+
+    def calculate(self):
+        rows,cols = self.data.shape
+        # JAHACKALERT 
+        # not sure whether this is OK, another way to do this would be 
+        # to ask for the sheet coordinates of each unit inside the loop
+        # transform the sheet bounds woth bounds2slice() and than use this to
+        # cut out the activity window
+        
+        ignore1,matradius = self.sheet.sheet2matrixidx(self.radius,0)
+        ignore2,x = self.sheet.sheet2matrixidx(0,0)
+        matradius = abs(matradius -x)
+        #print matradius
+        d = self.data
+        for r in xrange(rows):
+            for c in xrange(cols):
+                rr = max(0,r-matradius)
+                cc = max(0,c-matradius)
+                neighbourhood = self.sheet.activity[rr:r+matradius+1,cc:c+matradius+1].ravel()
+                d[r][c] = 0
+                for x in neighbourhood:
+                  if(x > self.threshold):
+                    d[r][c] = 1
+                    break
