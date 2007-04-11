@@ -61,7 +61,9 @@ tuning fullfield' tuning curves and FFTs.
 Finish converting som_retinotopy.ty and obermayer_pnas90.ty to use the
 new simpler and faster SOM support as in cfsom_or.ty, and delete all
 of the old SOM support.  Requires checking that the som_retinotopy.ty
-tutorial still works ok after the conversion.
+tutorial still works ok after the conversion.  Also check that
+the examples handle exponential decay of parameter values, so that
+they are good starting points.
 
 
 2007/02/20 (JB): Upgrade epydoc 
@@ -126,6 +128,12 @@ We also need to document .topographicarc somewhere.
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
 
 <pre>
+2007/04/10 (JB): Add an example that is a good starting point for
+wrapping an external simulation as a Sheet in Topographica.  A
+first pass wrapping a spiking retina simulation written in PyNN/PyNEST
+was done at the FACETS CodeJam in March 2007, but a cleaner example
+can be made.
+       
 2007/04/05 (CB): tests on non-linux platforms
 On some platforms (e.g. OS X?) the results of simulations do not
 match exactly the results from linux. So the tests fail - need
