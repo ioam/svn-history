@@ -10,6 +10,7 @@ import Tkinter
 from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, Button, \
      LEFT, RIGHT, YES, NO, BOTH, Label, Text, END, DISABLED, NORMAL, Scrollbar, Y
 import tkMessageBox
+from tkFileDialog import asksaveasfilename
 import Pmw, os, sys, traceback, __main__
 import StringIO
 import tkFileDialog
@@ -393,6 +394,11 @@ class TopoConsole(Tkinter.Tk):
         self.menubar.addmenuitem('Simulation', 'command', 'Run a .ty script file',
                                  label = 'Run script',
                                  command = self.load_network)
+
+        self.menubar.addmenuitem('Simulation', 'command', 'Save the current simulation architecture to a script',
+                                 label = 'Save script',
+                                 command = self.save_script_repr)
+        
         self.menubar.addmenuitem('Simulation', 'command', "Save simulation's state to disk as a .typ file",
                                  label = 'Save snapshot',
                                  command = self.save_snapshot)
@@ -530,6 +536,14 @@ class TopoConsole(Tkinter.Tk):
                 self.messageBar.message('state', 'Failed to load ' + self.loaded_script)
         
 
+    def save_script_repr(self):
+        script_name = asksaveasfilename(filetypes=SCRIPT_FILETYPES,initialfile=topo.sim.name+"_script_repr.ty")
+        if script_name:
+            script_file = open(script_name,'w')
+            topo.commands.basic.save_script_repr(script_name)
+            self.messageBar.message('state', 'Script saved to ' + script_name)
+            
+            
     # CEBALERT:
     # save_ and load_snapshot() and load_network() ought to close open windows such
     # as Activity.  Currently it just refreshes the windows, but that could get
