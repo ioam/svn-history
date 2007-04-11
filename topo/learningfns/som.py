@@ -65,8 +65,8 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
         doc="Neighborhood function")
     
 
-    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
-        cfs = proj._cfs
+    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
+        cfs = iterator.proj._cfs
         rows,cols = output_activity.shape
 
         # This learning function does not need to scale the learning
@@ -140,11 +140,11 @@ class CFPLF_EuclideanHebbian(CFPLearningFn):
     centered around the winning unit, as implemented by KernelMax.
     """
 
-    def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
+    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         # This learning function does not need to scale the learning
         # rate like some do, so it does not use constant_sum_connection_rate()
 
-        cfs = proj._cfs
+        cfs = iterator.proj._cfs
         rows,cols = output_activity.shape
         for r in xrange(rows):
             for c in xrange(cols):
