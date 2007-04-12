@@ -80,12 +80,6 @@ Update scipy (weave) so that the numpy test deprecation warnings go away.
 one. 
 
 
-2007/04/05 (CB): precision of slow-tests
-Reduce precision of tests for those with checked-in data - results
-vary in precision across platforms. Then I can run tests on Windows
-(and those tests will work on OS X too).
-
-
 2007/04/05 (CB): examples/Makefile -> python
 Migrate examples/Makefile to python script. Then, Windows users
 can follow the tutorial instructions. 
@@ -95,11 +89,12 @@ can follow the tutorial instructions.
 Projection activity window gives some error around edges of plot.
 
 
-2007/04/05 (CB): numpy deprecation warnings
-When I run slow-tests, I get a bunch of DeprecationWarnings
-after updating to numpy 1.0.2. Is that from importing
-an array equal test function from an old location?
+2007/04/12 (CB): Rename autosizemask
+And change comment about being temporary.
 
+
+2007/04/12 (CB): Update mlabwrap
+  
 
 2007/03/28 (?): Figure out where to put this info in the docs:
 <blockquote>
