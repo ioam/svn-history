@@ -94,27 +94,23 @@ class CFPLF_Trace(CFPLearningFn):
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         cfs = iterator.proj._cfs
-        rows,cols = output_activity.shape
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         single_cf_fn = self.single_cf_fn
         ##Initialise traces to zero if they don't already exist
         if not hasattr(self,'traces'):
             self.traces=zeros(output_activity.shape,activity_type)
-            
-        for r in xrange(rows):
-            for c in xrange(cols):
-                cf = cfs[r][c]
-                unit_activity = output_activity[r,c]
-             #   print "unit activity is",unit_activity
-            #    print "self trace is",self.traces[r,c]
-                new_trace = (self.trace_strength*unit_activity)+((1-self.trace_strength)*self.traces[r,c])
-           #     print "and is now",new_trace
-                self.traces[r,c] = new_trace
-                cf.weights += single_connection_learning_rate * new_trace * \
+        for cf,r,c in iterator():                       
+            unit_activity = output_activity[r,c]
+            #   print "unit activity is",unit_activity
+        #    print "self trace is",self.traces[r,c]
+            new_trace = (self.trace_strength*unit_activity)+((1-self.trace_strength)*self.traces[r,c])
+        #     print "and is now",new_trace
+            self.traces[r,c] = new_trace
+            cf.weights += single_connection_learning_rate * new_trace * \
                               (cf.get_input_matrix(input_activity) - cf.weights)
                 
-                #CEBHACKALERT: see ConnectionField.__init__()
-                cf.weights *= cf.mask
+            #CEBHACKALERT: see ConnectionField.__init__()
+            cf.weights *= cf.mask
       
 
 
@@ -134,24 +130,21 @@ class CFPLF_OutstarHebbian(CFPLearningFn):
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         cfs = iterator.proj._cfs
-        rows,cols = output_activity.shape
 	single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
 	outstar_wsum = zeros(input_activity.shape)
-	for r in xrange(rows):
-            for c in xrange(cols):
-                cf = cfs[r][c]
-                single_cf_fn(cf.get_input_matrix(input_activity),
-                             output_activity[r,c], cf.weights, single_connection_learning_rate)
-		# Outstar normalization
-		wrows,wcols = cf.weights.shape
-		for wr in xrange(wrows):
-		   for wc in xrange(wcols):
-			outstar_wsum[wr][wc] += cf.weights[wr][wc]
+        for cf,r,c in iterator():
+            single_cf_fn(cf.get_input_matrix(input_activity),
+                            output_activity[r,c], cf.weights, single_connection_learning_rate)
+            # Outstar normalization
+            wrows,wcols = cf.weights.shape
+            for wr in xrange(wrows):
+                for wc in xrange(wcols):
+                    outstar_wsum[wr][wc] += cf.weights[wr][wc]
 
-                # CEBHACKALERT: see ConnectionField.__init__()
-                cf.weights *= cf.mask
+            # CEBHACKALERT: see ConnectionField.__init__()
+            cf.weights *= cf.mask
 
 
 
@@ -199,36 +192,30 @@ class HomeoSynaptic(CFPLearningFn):
 	    
                        	    
 	    # normalize initial weights to 1.0
-            rows,cols = output_activity.shape
-            for r in xrange(rows):
-                for c in xrange(cols):
-                    cf = cfs[r][c]
+            for cf,r,c in iterator():
+                current_norm_value = 1.0*Numeric.sum(abs(cf.weights.ravel()))
+                if current_norm_value != 0:
+                    factor = (1.0/current_norm_value)
+                    cf.weights *= factor
 
-	            current_norm_value = 1.0*Numeric.sum(abs(cf.weights.ravel()))
-		    if current_norm_value != 0:
-            	    	factor = (1.0/current_norm_value)
-            	    	cf.weights *= factor
-    
         # compute recent average of output activity
         self.averages = self.beta_c * output_activity + (1.0-self.beta_c) * self.averages
         activity_norm = 1.0 + self.beta_n * \
            ((self.averages - self.activity_target)/self.activity_target)
-        rows,cols = output_activity.shape
+
 	single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
 
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
-	for r in xrange(rows):
-            for c in xrange(cols):
-                cf = cfs[r][c]
-                single_cf_fn(cf.get_input_matrix(input_activity),
-                             output_activity[r,c], cf.weights, single_connection_learning_rate)
+        for cf,r,c in iterator():
+            single_cf_fn(cf.get_input_matrix(input_activity),
+                            output_activity[r,c], cf.weights, single_connection_learning_rate)
 
-		# homeostatic normalization
-                cf.weights /= activity_norm[r][c]
+            # homeostatic normalization
+            cf.weights /= activity_norm[r][c]
 
-                # CEBHACKALERT: see ConnectionField.__init__()
-                cf.weights *= cf.mask
+            # CEBHACKALERT: see ConnectionField.__init__()
+            cf.weights *= cf.mask
          
 	# For analysis only; can be removed (in which case also remove the initializations above)
         self.ave_hist.append(self.averages[0][7])
