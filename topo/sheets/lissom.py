@@ -17,7 +17,7 @@ from topo.base.sheet import activity_type
 from topo.misc.inlinec import optimized
 from topo.misc.keyedlist import KeyedList
 from topo.outputfns.basic import PiecewiseLinear
-from topo.base.projection import NeighborhoodMask, SheetMask
+
 
 class JointNormalizingCFSheet(CFSheet):
     """
@@ -179,15 +179,13 @@ class LISSOM(JointNormalizingCFSheet):
     been reached, an external input is required before the sheet will
     activate again.
     """
-    mask_init_time=Integer(default=5,bounds=(0,None),doc=""" 
-        The mask_init parameter controls when the optimization mask is initialized each new iteration      
     
-    A mask is reset whenever new input comes
-    A counter is incremented each time an input is received from any
-       source, and once the counter reaches mask_init_time, the mask is
-       initialized to reflect the current activity profile""")
+    mask_init_time=Integer(default=5,bounds=(0,None),doc=""" 
+       Determines when a new mask is initialized in each new iteration.
 
-
+       The mask is reset whenever new input comes in.  Once the
+       activation_count (see tsettle) reaches mask_init_time, the mask
+       is initialized to reflect the current activity profile.""")
 
     tsettle=Integer(default=8,bounds=(0,None),doc="""
        Number of times to activate the LISSOM sheet for each external input event.
