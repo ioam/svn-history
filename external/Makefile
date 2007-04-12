@@ -5,9 +5,9 @@ default: python jpeg pil numpy pmw matplotlib weave fixedpoint pychecker common 
 
 all: default pyaudiolab mlabwrap scipy ipython
 
-clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean ctypes-clean pyaudiolab-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean ctypes-clean pyaudiolab-clean tile-clean bwidget-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-clean libsndfile-uninstall ctypes-uninstall pyaudiolab-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-clean libsndfile-uninstall ctypes-uninstall pyaudiolab-uninstall tile-uninstall bwidget-uninstall
 
 ##############################################################
 # Python (interpreted language)
@@ -474,6 +474,49 @@ mlabwrap-clean:
 mlabwrap-uninstall:
 	rm -rf mlabwrap ${MLABWRAP} $(foreach f, ${MLABWRAP_UNINSTALL}, ${PREFIX}/${f})
 
+
+
+
+##############################################################
+# TILE (extension to tk; actually a part of tk 8.5)
+#
+TILE = tile-0.7.8
+
+# CB: did I get everything to uninstall?
+TILE_UNINSTALL += lib/tile0.7.8 lib/libttkstub.a
+TILE_UNINSTALL += include/ttk*.h
+TILE_UNINSTALL += ${PYTHON_LIB}/site-packages/Tile.py
+
+tile: ${TILE}.tar.gz
+	tar xzf ${TILE}.tar.gz
+	cd ${TILE}/generic; ./configure --prefix=${PREFIX}
+	make -C ${TILE}/generic install
+	touch tile
+
+tile-clean:
+	rm -rf  ${TILE} 
+tile-uninstall:
+	rm -rf tile ${foreach f,${TILE_UNINSTALL}, ${PREFIX}/${f}}
+
+
+
+##############################################################
+# BWIDGET
+#
+BWIDGET = pybwidget-0.1.2_1.7.0
+
+BWIDGET_UNINSTALL += share/pybwidget 
+BWIDGET_UNINSTALL += ${PYTHON_LIB}/site-packages/bwidget
+
+bwidget: ${BWIDGET}.tar.gz python tcl tk
+	tar xzf ${BWIDGET}.tar.gz
+	cd ${BWIDGET}; ${PREFIX}/bin/python setup.py install
+	touch bwidget
+
+bwidget-clean:
+	rm -rf  ${BWIDGET} 
+bwidget-uninstall:
+	rm -rf bwidget ${foreach f,${BWIDGET_UNINSTALL}, ${PREFIX}/${f}}
 
 
 
