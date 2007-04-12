@@ -482,12 +482,10 @@ mlabwrap-uninstall:
 #
 TILE = tile-0.7.8
 
-# CB: did I get everything to uninstall?
 TILE_UNINSTALL += lib/tile0.7.8 lib/libttkstub.a
 TILE_UNINSTALL += include/ttk*.h
-TILE_UNINSTALL += ${PYTHON_LIB}/site-packages/Tile.py
 
-tile: ${TILE}.tar.gz
+tile: ${TILE}.tar.gz tk
 	tar xzf ${TILE}.tar.gz
 	cd ${TILE}/generic; ./configure --prefix=${PREFIX}
 	make -C ${TILE}/generic install
@@ -497,6 +495,26 @@ tile-clean:
 	rm -rf  ${TILE} 
 tile-uninstall:
 	rm -rf tile ${foreach f,${TILE_UNINSTALL}, ${PREFIX}/${f}}
+
+
+##############################################################
+# TILEWRAPPER (makes tile easy to use from tkinter)
+#
+TILEWRAPPER = Tile
+
+TILEWRAPPER_UNINSTALL += ${PYTHON_LIB}/site-packages/Tile.py*
+
+# CB: I've made a bit of a meal out of simply copying
+# Tile.py to the site-packages directory!
+tilewrapper: ${TILEWRAPPER}.py.gz tile
+	gzip -dc ${TILEWRAPPER}.py.gz > ${TILEWRAPPER}.py
+	cp ${TILEWRAPPER}.py ${PREFIX}/${PYTHON_LIB}/site-packages/
+	touch tilewrapper
+
+tilewrapper-clean:
+	rm -rf  ${TILEWRAPPER}.py 
+tilewrapper-uninstall:
+	rm -rf tilewrapper ${foreach f,${TILEWRAPPER_UNINSTALL}, ${PREFIX}/${f}}
 
 
 
