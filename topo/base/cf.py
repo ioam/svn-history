@@ -27,6 +27,7 @@ __version__ = '$Revision$'
 
 
 import numpy.oldnumeric as Numeric
+from numpy import abs
 import copy
 
 import patterngenerator
@@ -36,11 +37,12 @@ from functionfamilies import OutputFnParameter,IdentityOF
 from functionfamilies import LearningFnParameter,Hebbian,IdentityLF
 from functionfamilies import ResponseFnParameter,DotProduct
 from functionfamilies import CoordinateMapperFnParameter,IdentityMF
-from projection import Projection,ProjectionSheet
+from projection import Projection,ProjectionSheet, SheetMask
 from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter,Integer
 from sheet import Sheet,Slice
 from sheetview import UnitView, ProjectionView
 from boundingregion import BoundingBox,BoundingRegionParameter
+
 
 
 # Specified explicitly when creating weights matrix - required
@@ -87,7 +89,7 @@ class ConnectionField(ParameterizedObject):
         if self.has_norm_total == True:
             return self._norm_total
         else:
-            return self.weights.sum()
+            return abs(self.weights).sum()
             
     def set_norm_total(self,new_norm_total):
         """
@@ -880,11 +882,18 @@ class MaskedCFIter(CFIter):
     
     def __call__(self):
         rows,cols = self.proj.cfs_shape
-        mask = self.proj.dest.mask.data
-        for r in xrange(rows):
-            for c in xrange(cols):
-                if mask[r][c]:
-                    yield (self.proj._cfs[r][c],r,c)
+        
+        if(type(self.proj.dest.mask) == type(SheetMask)):
+            mask = self.proj.dest.mask.data
+            for r in xrange(rows):
+                for c in xrange(cols):
+                    if mask[r,c]:
+                        yield (self.proj._cfs[r][c],r,c)
+        else:
+            for r in xrange(rows):
+                for c in xrange(cols):
+                        yield (self.proj._cfs[r][c],r,c)
+            
 
 
 ### JABALERT: Should consider eliminating this class, moving its
