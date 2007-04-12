@@ -303,7 +303,7 @@ def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4
             step_orientation=pi/num_orientation
             
             feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                              Feature(name="orientation",range=(0,5*pi/4),step=step_orientation,cyclic=True),
+                              Feature(name="orientation",range=(0,pi),step=step_orientation,cyclic=True),
                               Feature(name="frequency",values=frequencies)]     
             
             x_axis='orientation'
@@ -488,7 +488,7 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
         step_phase=2*pi/num_phase
         
         feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                          Feature(name="orientation",range=(0,5*pi/4),step=step_orientation,cyclic=True),
+                          Feature(name="orientation",range=(0,pi),step=step_orientation,cyclic=True),
                           Feature(name="frequency",values=frequencies)]     
 
         x_axis='orientation'
