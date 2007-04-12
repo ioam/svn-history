@@ -461,7 +461,11 @@ class CFPOutputFn(ParameterizedObject):
     is nonzero.
     """
     _abstract_class_name = "CFPOutputFn"
-    
+
+    # JABALERT: Shouldn't the mask parameter be dropped now that
+    # we can pass in a masked iterator?  A NeighborhoodMask iterator
+    # might not be the best choice, but it would be trivial to have one
+    # masking out all inactive neurons directly.
     def __call__(self, iterator, mask, **params):
         """Operate on each CF for which the mask is nonzero."""
         raise NotImplementedError
@@ -857,12 +861,12 @@ class CFProjection(Projection):
 
 
 class CFIter(object):
-    """ This class is an iterator that will walk you through 
-    connection fields of all active neurons in the source sheet 
-    of the projection
+    """
+    Iterator to walk through all ConnectionFields of all neurons in
+    the destination Sheet of the given CFProjection.
     """
     def __init__(self,cfprojection):
-        self.proj = cfprojection    # the cfprojection that this iterator is defined over
+        self.proj = cfprojection    
 
     def __call__(self):
         rows,cols = self.proj.cfs_shape
@@ -871,10 +875,11 @@ class CFIter(object):
                     yield (self.proj._cfs[r][c],r,c)
 
 
+
 class MaskedCFIter(CFIter):
-    """ This class is an iterator that will walk you through 
-    connection fields of all active neurons in the source sheet 
-    of the projection that are not masked out
+    """
+    Iterator to walk through the ConnectionFields of all active (i.e.,
+    non-masked) neurons in the destination Sheet of the given CFProjection.
     """
 
     def __init__(self,cfprojection):
@@ -882,7 +887,10 @@ class MaskedCFIter(CFIter):
     
     def __call__(self):
         rows,cols = self.proj.cfs_shape
-        
+
+        # JABALERT: What does this if statement do?
+        # Surely the type of the mask (an object) would never be the
+        # same as the type of SheetMask (a class)?
         if(type(self.proj.dest.mask) == type(SheetMask)):
             mask = self.proj.dest.mask.data
             for r in xrange(rows):
