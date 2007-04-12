@@ -63,6 +63,7 @@ from topo.base.patterngenerator import PatternGeneratorParameter
 #
 # platform.system()  sys.platform  os.name
 # platform.dist()/platform.win32_ver()/platform.mac_ver
+# Does tkinter give any useful information?
 
 
 
