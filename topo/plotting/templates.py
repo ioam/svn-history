@@ -223,22 +223,22 @@ pgt.add_static_image('Color Key','topo/commands/disp_key_white_vert_small.png')
 
 pgt = new_plotgroup_template(name='Orientation Tuning Fullfield',
                              command='measure_or_tuning_fullfield()',
-                             plotcommand='tuning_curve(x_axis="orientation", plot_type=pylab.plot, x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',
+                             plotcommand='or_tuning_curve(x_axis="orientation", plot_type=pylab.plot, unit="degrees")',
                              template_plot_type="curve")
 
 
 pgt = new_plotgroup_template(name='Orientation Tuning',
-                             command='measure_or_tuning(); tuning_curve(x_axis="orientation",plot_type=pylab.plot,x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',
+                             command='measure_or_tuning(); or_tuning_curve(x_axis="orientation",plot_type=pylab.plot,unit="degrees")',
                              template_plot_type="curve",
                              prerequisites=['XPreference'])
 
 pgt = new_plotgroup_template(name='Contrast Response',
-                             command='measure_contrast_response(); tuning_curve(x_axis="contrast",plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None,unit="%")',
+                             command='measure_contrast_response(); tuning_curve(x_axis="contrast",plot_type=pylab.semilogx,unit="%")',
                              template_plot_type="curve",
                              prerequisites=['OrientationPreference','XPreference'])
 
 pgt = new_plotgroup_template(name='Size Tuning',
-                             command='measure_size_response(); tuning_curve(x_axis="size",plot_type=pylab.plot, x_ticks=None, x_labels=None,x_lim=None, unit="Diameter of stimulus")',
+                             command='measure_size_response(); tuning_curve(x_axis="size",plot_type=pylab.plot,unit="Diameter of stimulus")',
                              template_plot_type="curve",
                              prerequisites=['OrientationPreference','XPreference'])
 
