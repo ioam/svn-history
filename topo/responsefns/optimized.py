@@ -19,12 +19,9 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
     """
     Dot-product response function.
 
-    Written in C for a several-hundred-times speedup; see
-    CFPRF_DotProduct for an easier-to-read (but otherwise equivalent*)
-    version in Python.
-
-    * The unoptimized Python version works for 1D arrays, whereas this
-    function assumes 2D arrays.
+    Written in C for a manyfold speedup; see CFPRF_DotProduct for an
+    easier-to-read version in Python.  The unoptimized Python version
+    is equivalent to this one, but it also works for 1D arrays.
     """
 
     single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)    
@@ -33,7 +30,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
 	
         temp_act = activity
         rows,cols = activity.shape
-        ignore,length = input_activity.shape
+        irows,icols = input_activity.shape
         X = input_activity.ravel()
         cfs = iterator.proj._cfs
         mask = iterator.proj.dest.mask.data
@@ -46,7 +43,9 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
 		for (int l=0; l<cols; ++l) {
-                    if((*mask++) != 0.0) {
+                    if((*mask++) == 0.0)
+                        *tact = 0;
+                    else {
                         PyObject *cf = PyList_GetItem(cfsr,l);
                         PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
                         PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
@@ -68,7 +67,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                         int cc1 = *slice++;
                         int cc2 = *slice;
                         double tot = 0.0;
-                        double *xj = X+length*rr1+cc1;
+                        double *xj = X+icols*rr1+cc1;
     
                         // computes the dot product
                         for (int i=rr1; i<rr2; ++i) {
@@ -79,7 +78,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                                 ++wi;
                                 ++xi;
                             }
-                            xj += length;
+                            xj += icols;
                             wj += cc2-cc1;
                         }  
                         *tact = tot*strength;
@@ -91,15 +90,12 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                         
                         if(array != 0)
                             Py_DECREF(array);
-                    } else 
-                    {
-                     *tact = 0; 
                     }
                     ++tact;    
                 }
             }
         """
-	inline(code, ['mask','X', 'strength', 'length', 'temp_act','cfs','cols','rows'], local_dict=locals())
+	inline(code, ['mask','X', 'strength', 'icols', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 class CFPRF_DotProduct(CFPRF_Plugin):
     """
@@ -110,6 +106,7 @@ class CFPRF_DotProduct(CFPRF_Plugin):
         super(CFPRF_DotProduct,self).__init__(single_cf_fn=DotProduct(),**params)
 
 provide_unoptimized_equivalent("CFPRF_DotProduct_opt","CFPRF_DotProduct",locals())
+
 
 
 class CFPRF_EuclideanDistance_opt(CFPResponseFn):
