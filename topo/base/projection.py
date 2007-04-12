@@ -9,24 +9,26 @@ import numpy.oldnumeric as Numeric
 
 from sheet import Sheet
 from parameterclasses import Number, BooleanParameter, Parameter
+from parameterizedobject import ParameterizedObject
 from simulation import EPConnection
 from functionfamilies import OutputFnParameter,IdentityOF
-from numpy import ones
+from numpy import ones,sometrue
 
 
-class SheetMask(object):
+class SheetMask(ParameterizedObject):
     """
-    An abstract class that defines a mask over an SheetProjection object.
+    An abstract class that defines a mask over a ProjectionSheet object.
     
-    A typical usage of this class is for optimization purposes, in
-    which case the mask indicates which neurons are active and should
-    be processed further. Alternatively, the mask could be used for
-    lesion experiments, to specify which units should be kept
-    inactive.  This class is currently used by CFProjections and the
-    related CFResponseFn to restrict the computation to only those
-    neurons that are indicated in the Mask as active.
+    This class is typically used for optimization, where mask
+    indicates which neurons are active and should be processed
+    further. A mask can also be used for lesion experiments, to
+    specify which units should be kept inactive.
+
+    See the code for CFProjection and CFResponseFn to see how this
+    class can be used to restrict the computation to only those
+    neurons that the Mask lists as active.
     """
-    # data property ensuring that whenever somebody accesses data they are not None
+    # Ensure that whenever somebody accesses the data they are not None
     def get_data(self): 
         assert(self._sheet != None)
         return self._data
@@ -45,38 +47,48 @@ class SheetMask(object):
     sheet = property(get_sheet,set_sheet)
     
     
-    def __init__(self,sheet=None):
-        super(SheetMask,self).__init__()
+    def __init__(self,sheet=None,**params):
+        super(SheetMask,self).__init__(**params)
         self.sheet = sheet
         
 
+    # JABALERT: Shouldn't this just keep one matrix around and zero it out,
+    # instead of allocating a new one each time?
     def reset(self):
-      """Initialize mask to default values (meaning all neurons are not masked out)."""
+      """Initialize mask to default value (with no neurons masked out)."""
       self.data = ones(self.sheet.shape)
 
 
     def calculate(self):
       """
-      Abstract method to calculate a new mask based on the activity of the sheet.
+      Calculate a new mask based on the activity of the sheet.
 
-      For instance, in the LISSOM algorithm that is based on a process
-      of feedforward activation followed by lateral settling, the
-      calculation is done at the beginning of each iteration, based on
-      the feedforward activity.
+      For instance, in an algorithm like LISSOM that is based on a
+      process of feedforward activation followed by lateral settling,
+      the calculation is done at the beginning of each iteration after
+      the feedforward activity has been calculated.
+
+      Subclasses should override this method to compute some non-default
+      mask.
       """
       pass
+      
 
     # JABALERT: Not clear what the user should do with this.
     def update(self):
       """
-      Abstract method to update the current mask based on the current activity and a previous mask.
+      Update the current mask based on the current activity and a previous mask.
+
+      Should be called only if calculate() has already been called since the last
+      reset(); potentially faster to compute than redoing the entire calculate().
+      
+      Subclasses should override this method to compute some non-default
+      mask.
       """
       pass
 
-### JABALERT
-###
-### Need to provide a way to visualize the activity of a Projection,
-### e.g. by putting it into the destination's SheetView database.
+
+
 class Projection(EPConnection):
     """
     A projection from a Sheet into a ProjectionSheet.
@@ -163,11 +175,15 @@ class ProjectionSheet(Sheet):
         doc="Whether to apply the output_fn after computing an Activity matrix.")
 
     # Should be a MaskParameter for safety
+    #mask = ClassSelectorParameter(SheetMask,default=SheetMask(),instantiate=True,doc="""
     mask = Parameter(default=SheetMask(),instantiate=True,doc="""
-        Mask to apply to the activity when determining which units need to be computed.
-        Should be set to an instance of SheetMask.  By default, the mask is ignored, but
-        subclasses can use this mask to implement optimizations, non-square Sheet shapes, etc. 
-    """)
+        SheetMask object for computing which units need to be computed further.
+        The object should be an instance of SheetMask, and will
+        compute which neurons will be considered active for the
+        purposes of further processing.  The default mask effectively
+        disables all masking, but subclasses can use this mask to
+        implement optimizations, non-rectangular Sheet shapes,
+        lesions, etc.""")
                              
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)
@@ -275,37 +291,43 @@ class ProjectionSheet(Sheet):
     
 class NeighborhoodMask(SheetMask):
     """
-    This is an implementation of Mask class that uses a small radius around each neuron 
-    and a threshold whether it is active: it check whether an activity of at least one neuron
-    in the surrounding of the given neuron is over the threshold in which case it sets it as active.
+    A SheetMask where the mask includes a neighborhood around active neurons.
+
+    Given a radius and a threshold, considers a neuron active if at
+    least one neuron in the radius is over the threshold.
     """
+
+    threshold = Number(default=0.00001,bounds=(0,None),doc="""
+       Threshold for considering a neuron active.
+       This value should be small to avoid discarding significantly active
+       neurons.""")
+
+    radius = Number(default=0.05,bounds=(0,None),doc="""
+       Radius in Sheet coordinates around active neurons to consider
+       neighbors active as well.  Using a larger radius ensures that
+       the calculation will be unaffected by the mask, but it will
+       reduce any computational benefit from the mask.""")
+
     
-    def __init__(self,threshold,radius,sheet):
-        super(NeighborhoodMask,self).__init__(sheet)
-        self.threshold = threshold
-        self.radius = radius
-        
+    def __init__(self,sheet,**params):
+        super(NeighborhoodMask,self).__init__(sheet,**params)
+
 
     def calculate(self):
         rows,cols = self.data.shape
-        # JAHACKALERT 
-        # not sure whether this is OK, another way to do this would be 
-        # to ask for the sheet coordinates of each unit inside the loop
-        # transform the sheet bounds woth bounds2slice() and than use this to
-        # cut out the activity window
         
+        # JAHACKALERT: Not sure whether this is OK. Another way to do
+        # this would be to ask for the sheet coordinates of each unit
+        # inside the loop.
+
+        # transforms the sheet bounds with bounds2slice() and then
+        # uses this to cut out the activity window
         ignore1,matradius = self.sheet.sheet2matrixidx(self.radius,0)
         ignore2,x = self.sheet.sheet2matrixidx(0,0)
-        matradius = abs(matradius -x)
-        #print matradius
-        d = self.data
+        matradius = abs(matradius-x)
         for r in xrange(rows):
             for c in xrange(cols):
                 rr = max(0,r-matradius)
                 cc = max(0,c-matradius)
                 neighbourhood = self.sheet.activity[rr:r+matradius+1,cc:c+matradius+1].ravel()
-                d[r][c] = 0
-                for x in neighbourhood:
-                  if(x > self.threshold):
-                    d[r][c] = 1
-                    break
+                self.data[r][c] = sometrue(neighbourhood>self.threshold)
