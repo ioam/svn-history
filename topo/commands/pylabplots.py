@@ -22,8 +22,9 @@ import matplotlib
 ### doing "matplotlib.use('Agg')" here.
 import pylab
 import re, os
+import copy
 
-from numpy.oldnumeric import arange, cos, pi, array, transpose
+from numpy.oldnumeric import arange, cos, pi, array, transpose, argmax, argmin
 
 import topo
 
@@ -169,8 +170,74 @@ def tuning_curve_data(sheet, x_axis, curve_label, i_value, j_value):
     y_values=[sheet.curve_dict[x_axis][curve_label][key].view()[0][i_value,j_value] for key in x_values]
     return x_values, y_values
 
-	   
-def tuning_curve(x_axis,plot_type,x_ticks,x_labels,x_lim,unit):
+def or_tuning_curve(x_axis,plot_type,unit):
+    """
+    Plots a tuning curve for orientation which rotates the curve 
+    values so that minimum y values are at the minimum x value.
+    The y_values and labels are rotated by an amount determined by the minmum 
+    y_value for the first curve plotted (usually the lowest contrast curve). 
+
+    The curve datapoints are collected from the curve_dict for each
+    sheet, depending on the value of topo.commands.analysis.sheet_name
+    and topo.commands.analysis.coordinate (which may be set by the GUI or
+    by hand).
+    """
+    # There may be cases (ie when the lowest contrast curve gives a lot of zero y_values)
+    # in which the maximum is not in the centre.
+    # Ideally this should be changed so that the preferred orientation is in the centre.
+    # This may also be useful for other tuning curve types, not just orientation ie. direction.
+    
+    sheet=topo.sim[topo.commands.analysis.sheet_name]
+    coordinate=topo.commands.analysis.coordinate
+    i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
+    
+
+    pylab.figure(figsize=(7,7))
+    isint=pylab.isinteractive()
+    pylab.ioff()
+    manager = pylab.get_current_fig_manager()
+    
+    pylab.ylabel('Response')
+    pylab.xlabel(x_axis.capitalize()+' ('+unit+')')
+    pylab.title('Sheet '+topo.commands.analysis.sheet_name+', coordinate(x,y)='+'('+
+	 	str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+str(topo.sim.time()))
+    manager.window.title(topo.sim.name+': '+x_axis.capitalize()+' Tuning Curve')
+
+    def rotate(seq, n=1):
+        n = n % len(seq) # n=hop interval
+        return seq[n:] + seq[:n]
+
+    first_curve=True
+    for curve_label in sorted(sheet.curve_dict[x_axis].keys()):
+	if first_curve==True:
+	    x_values, y_values = tuning_curve_data(sheet,x_axis, curve_label, i_value, j_value)
+	    min_arg=argmin(y_values)
+	    x_min=x_values[min_arg] 
+	    y_min=y_values[min_arg]
+	    y_values=rotate(y_values, n=min_arg)
+	    ticks=rotate(x_values, n=min_arg)
+	    label_min=ticks[0]
+	    x_max=min(x_values)+pi
+	    x_values.append(x_max)
+	    y_values.append(y_min)
+	    first_curve=False
+	else:
+	    y_values=[sheet.curve_dict[x_axis][curve_label][key].view()[0][i_value,j_value] for key in ticks]
+	    y_min=sheet.curve_dict[x_axis][curve_label][x_min].view()[0][i_value,j_value] 
+	    y_values.append(y_min)
+	labels = copy.copy(ticks)
+	labels.append(label_min)
+	labels= [x*180/pi for x in labels]
+	labels_new = [str(int(x)) for x in labels]
+	pylab.xticks(x_values, labels_new)
+	plot_type(x_values, y_values, label=curve_label)
+         
+    if isint: pylab.ion()
+    pylab.legend(loc=4)
+    pylab.show._needmain = False 
+    pylab.show()
+
+def tuning_curve(x_axis,plot_type,unit):
     """
     Plots a tuning curve for the appropriate feature type, such as orientation, contrast or size.
 
@@ -200,15 +267,12 @@ def tuning_curve(x_axis,plot_type,x_ticks,x_labels,x_lim,unit):
     for curve_label in sorted(sheet.curve_dict[x_axis].keys()):
         x_values, y_values = tuning_curve_data(sheet,x_axis, curve_label, i_value, j_value)
         plot_type(x_values, y_values, label=curve_label)
-	if (x_ticks): pylab.xticks(x_ticks,x_labels)
-        if (x_lim): pylab.xlim(x_lim)
-
-	   
+         
     if isint: pylab.ion()
-    
-    pylab.legend()
+    pylab.legend(loc=4)
     pylab.show._needmain = False 
     pylab.show()
+      	   
 
 def plot_cfproj_mapping(dest,proj='Afferent',style='b-'):
     """
