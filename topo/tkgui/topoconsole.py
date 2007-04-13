@@ -24,6 +24,8 @@ import topo.commands.basic
 from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
 import topo.base.simulation
 
+import topo.tkgui
+
 from topo.base.parameterizedobject import ParameterizedObject
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from connectionfieldspanel import ConnectionFieldsPanel
@@ -229,20 +231,18 @@ class TopoConsole(Tkinter.Tk):
         # click anywhere off the menu to deactivate it. Can probably
         # achieve that with some tk code like activate_cascade below.
 
-        # CEBALERT: add test for linux - this code doesn't need to be
-        # run on windows and mac.
-        #
         ##########
         ### Make cascade menus open automatically on linux when the mouse
         ### is over the menu title.
         ### [Tkinter-discuss] Cascade menu issue
         ### http://mail.python.org/pipermail/tkinter-discuss/2006-August/000864.html
-        activate_cascade = """\
-        if {[%W cget -type] != {menubar} && [%W type active] == {cascade}} {
-            %W postcascade active
-        }
-        """
-        self.bind_class("Menu", "<<MenuSelect>>", activate_cascade)
+        if topo.tkgui.system_platform is 'linux':
+            activate_cascade = """\
+            if {[%W cget -type] != {menubar} && [%W type active] == {cascade}} {
+                %W postcascade active
+               }
+            """
+            self.bind_class("Menu", "<<MenuSelect>>", activate_cascade)
         ##########
 
 
