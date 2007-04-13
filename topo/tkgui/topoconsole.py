@@ -223,19 +223,22 @@ class TopoConsole(Tkinter.Tk):
 
 
         
-        # CEBALERT: add test for linux - this code doesn't need to be
-        # run on windows and mac.
-        ##########
         # CEBALERT: the behavior on linux for the main menu bar is not
         # so good. Menu shouldn't activate until it's been clicked, then
         # items should activate automatically after that. Should be able to
-        # click anywhere off the menu to deactivate it.
+        # click anywhere off the menu to deactivate it. Can probably
+        # achieve that with some tk code like activate_cascade below.
+
+        # CEBALERT: add test for linux - this code doesn't need to be
+        # run on windows and mac.
+        #
+        ##########
         ### Make cascade menus open automatically on linux when the mouse
         ### is over the menu title.
         ### [Tkinter-discuss] Cascade menu issue
         ### http://mail.python.org/pipermail/tkinter-discuss/2006-August/000864.html
         activate_cascade = """\
-        if {[%W type active] == {cascade}} {
+        if {[%W cget -type] != {menubar} && [%W type active] == {cascade}} {
             %W postcascade active
         }
         """
