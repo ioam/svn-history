@@ -109,7 +109,7 @@ class OutputText(Text):
         self.see(END)
 
         
-
+# CEB: what's the difference between label, description, etc?
 class PlotsMenuEntry(ParameterizedObject):
     """
     Use these objects to populate the TopoConsole Plots pulldown.  The
@@ -146,7 +146,7 @@ class PlotsMenuEntry(ParameterizedObject):
         self.title = ''
 
 
-    def command(self,**args):
+    def command(self,event=None,**args):
         """
 
 
@@ -232,6 +232,17 @@ class TopoConsole(Tkinter.Tk):
         """
         self.bind_class("Menu", "<<MenuSelect>>", activate_cascade)
         ##########
+
+
+##         plots = []
+##         for (label,obj) in plotgroup_templates.items():
+##             entry = PlotsMenuEntry(self,obj,label=label)
+##             # CB: description should be somewhere in the plot, along with a sample image?
+##             plots.append((label,entry.command,entry.description+' desc.',"examples/ellen_arthur.pgm"))
+            
+##         plot_gallery = Gallery(plots=plots,image_size=(50,50))
+##         plot_gallery.title("Plots")
+        
 
 
     def _init_widgets(self):
@@ -846,3 +857,96 @@ if __name__ != '__main__':
     plotpanel_classes['Projection'] = ProjectionPanel 
     plotpanel_classes['Projection Activity'] = ProjectionActivityPanel
     plotpanel_classes['Orientation Tuning Fullfield'] = FullFieldFeatureCurvePanel
+
+
+
+## import Image,ImageOps
+## import ImageTk
+## import bwidget
+
+## # Could change to something with tabs to divide up plotlist
+## class Gallery(Tkinter.Toplevel):
+##     """
+##     A window displaying information about and allowing execution
+##     of plotting commands.
+
+
+##     Given a list of tuples [(label1,command1,description1,image1),
+##                             (label2,command2,description2,image2),
+##                             ...
+##                             ]
+##     displays a window
+
+##     [image1] label1
+##     [image2] label2
+
+##     where the descriptions are displayed as popup help over the
+##     labels, and double clicking a label executes the corresponding
+##     command.
+##     """    
+##     def __init__(self,plots,image_size=(40,40),**config):
+
+##         Tkinter.Toplevel.__init__(self,**config)
+##         self.dynamic_help = Pmw.Balloon(self)
+##         self.image_size = image_size
+
+##         # bwidget's scrolled frame: the frame to work
+##         # with is self.contents
+##         sw = bwidget.ScrolledWindow(self)
+##         sf = bwidget.ScrollableFrame(self)#,height=40*5+10)
+##         sw.setwidget(sf)
+##         sw.pack(fill="both",expand="yes")
+##         self.contents = sf.getframe()
+
+
+##         ####
+##         ##  CEBALERT: got to keep references to the images, or they vanish.
+##         ##  [http://infohost.nmt.edu/tcc/help/pubs/pil/image-tk.html]
+##         ##  There is a bug in the current version of the Python
+##         ##  Imaging Library that can cause your images not to display
+##         ##  properly. When you create an object of class PhotoImage,
+##         ##  the reference count for that object does not get properly
+##         ##  incremented, so unless you keep a reference to that object
+##         ##  somewhere else, the PhotoImage object may be
+##         ##  garbage-collected, leaving your graphic blank on the
+##         ##  application.
+##         self.__image_hack = []
+##         #####
+
+##         self.__create_entries(plots)
+
+        
+        
+
+##     def __create_entries(self,plots):
+##         """
+##         Use the grid manager to display the (image,label) pairs
+##         in rows of columns.
+##         """
+##         for row,(label,command,description,image_path) in zip(range(len(plots)),plots):
+
+
+##             # (labels should be buttons so they get highlighted
+##             # and you would press on them naturally, and no need
+##             # to bind click event)
+
+##             image = Image.open(image_path)
+##             image = ImageOps.fit(image,self.image_size)
+##             image = ImageTk.PhotoImage(image)
+
+##             li = Label(self.contents)
+##             li['image'] = image
+##             li.grid(row=row,column=0,sticky='w')
+
+##             l = Label(self.contents,text=label)
+##             l.grid(row=row,column=1,sticky='w')
+
+##             # (the order of binding pmw balloon and a something else
+##             # matters, since balloon clears previous bindings)
+##             self.dynamic_help.bind(l,description)
+##             l.bind("<Double-Button-1>",command)
+
+
+##             # see alert in __init__
+##             self.__image_hack.append(image)
+            
