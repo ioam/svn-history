@@ -76,7 +76,7 @@ Update scipy (weave) so that the numpy test deprecation warnings go away.
 
 
 2007/03/02 (CB): update topographica-win
-- test that results from Windows version match those from the standard
+Test that results from Windows version match those from the standard
 one. 
 
 
@@ -128,14 +128,12 @@ wrapping an external simulation as a Sheet in Topographica.  A
 first pass wrapping a spiking retina simulation written in PyNN/PyNEST
 was done at the FACETS CodeJam in March 2007, but a cleaner example
 can be made.
-       
-2007/04/05 (CB): tests on non-linux platforms
-On some platforms (e.g. OS X?) the results of simulations do not
-match exactly the results from linux. So the tests fail - need
-to change them to test only to a certain number of decimal places.
 
 
 2007/04/05 (CB): scrollbars on plotgrouppanel windows
+Add scrollbars when not auto-resizing (and ideally even when
+auto-resizing but the window would otherwise be larger than the
+screen).
 Currently disabled, since they seem to have strange behavior.
 Consider not using Pmw's scrolledframe component.
 
@@ -161,17 +159,8 @@ space (fill=X ?) (e.g. in parameters frames sliders etc should
 expand).
 
 
-2007/03/26 (CB): plotgroup panel resizing 
-Add scrollbars when not auto-resizing (and ideally even when
-auto-resizing but the window would otherwise be larger than the
-screen).
-
-
-2007/03/29 (CB): make compare tests
-Checkin some data for the make compare_or and compare_oo_or tests,
-allowing people to use the test even if they haven't run c++ lissom,
-and to force us to update the data when we really did mean to change
-the code.
+2007/04/13 (CB): make compare tests
+Checkin some data for the make compare_or test.
 
 
 2007/03/29 (CB): Makefiles to python scripts
@@ -261,14 +250,9 @@ Strange Projection plots.
 <H2>Things we hope to take care of eventually</H2>
 
 <pre>
-2007/04/05 (CB): quitting topographica
-Does topographica always exit correctly, whatever combination of windows
-is open? What should happen when a user clicks 'X' on topoconsole?
-
-
 2007/03/29 (CB): tidy up c++ lissom matching
-set c++ lissom params so that topographica doesn't have to set ganglia
-weight mask specially.
+Set c++ lissom params so that topographica doesn't have to set ganglia
+weight mask specially. Generalize oo_or_map_topo.params.
 
 
 2007/03/26 (CB): right-click menus
@@ -656,8 +640,9 @@ To figure out:
 <H2>Ongoing work</H2>
 
 <pre>
-2006/04/10: optional external packages
+2006/04/10 (CB): optional external packages on platforms other than linux
 Optional packages (e.g. mlabwrap, pyaudio) on Windows and OS X.
+
 
 2006/02/23 (all): Making more things be Parameters
 And writing doc strings at the same time. E.g. the x and y widgets in
