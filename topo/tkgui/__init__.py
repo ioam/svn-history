@@ -49,23 +49,35 @@ from topo.base.functionfamilies import LearningFnParameter,OutputFnParameter,Res
 from topo.base.patterngenerator import PatternGeneratorParameter
 
 
-
+##########
 ### Which os is being used (for gui purposes)?
 #
-# CEBALERT: let's test once for the OS here.
+# system_plaform can be:
+# "linux"
+# "mac"
+# "win"
+# "unknown"
 #
-# Right now tkgui only needs to detect if the platform is linux (do I
+# If you are programming tkgui and need to do something special
+# for some other platform (or to further distinguish the above
+# platforms, please modify this code.
+#
+# (Right now tkgui only needs to detect if the platform is linux (do I
 # mean any kind of non-OS X unix*?) or mac, because there is some
 # special-purpose code for both those two: the mac code below, and the
 # menu-activating code in topoconsole.  We might have some Windows-
 # specific code for the window icons later on, too.
-# * actually it's the window manager that's important, right?
-#
-# platform.system()  sys.platform  os.name
-# platform.dist()/platform.win32_ver()/platform.mac_ver
+# * actually it's the window manager that's important, right?)
 # Does tkinter give any useful information?
-
-
+#
+system_platform = 'unknown'
+if platform.system()=='Linux':
+    system_platform = 'linux'
+elif platform.system()=='Darwin' or platform.mac_ver()[0]:
+    system_platform = 'mac'
+elif platform.system()=='Windows':
+    system_platform = 'win'
+##########
 
 
 #
@@ -73,7 +85,7 @@ from topo.base.patterngenerator import PatternGeneratorParameter
 # be appended or overridden in .topographicarc, if the user has some
 # crazy input device.
 #
-if platform.mac_ver()[0]:
+if system_platform is 'mac':
     # if it's on the mac, these are the context-menu events
     right_click_events = ['<Button-2>','<Control-Button-1>']
     right_click_release_events = ['ButtonRelease-2', 'Control-ButtonRelease-1']
@@ -103,16 +115,14 @@ def start(mainloop=False):
     even while the GUI is operational.  Default is False.
     """
     console = topoconsole.TopoConsole()
+    Pmw.initialise(console)
 
     # This alows context menus to work on the Mac.  Widget code should bind
     # contextual menus to the virtual event <<right-click>>, not
     # <Button-3>.
-    # JPALERT: We probably should do an OS check here if
-    # ctrl-click means something else on Windows.
-
     console.event_add('<<right-click>>',*right_click_events)
     console.event_add('<<right-click-release>>',*right_click_release_events)
-    Pmw.initialise(console)
+    
 
     # mainloop() freezes the commandline until the GUI window exits.
     # Without this line the command-line remains responsive.
