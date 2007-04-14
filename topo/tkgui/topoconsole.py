@@ -878,82 +878,82 @@ import bwidget
 
 # Could change to something with tabs to divide up plotlist
 class Gallery(Tkinter.Toplevel):
-    """
-    A window displaying information about and allowing execution
-    of plotting commands.
+##     """
+##     A window displaying information about and allowing execution
+##     of plotting commands.
 
 
-    Given a list of tuples [(label1,command1,description1,image1),
-                            (label2,command2,description2,image2),
-                            ...
-                            ]
-    displays a window
+##     Given a list of tuples [(label1,command1,description1,image1),
+##                             (label2,command2,description2,image2),
+##                             ...
+##                             ]
+##     displays a window
 
-    [image1] label1
-    [image2] label2
+##     [image1] label1
+##     [image2] label2
 
-    where the descriptions are displayed as popup help over the
-    labels, and double clicking a label executes the corresponding
-    command.
-    """    
-    def __init__(self,plots,image_size=(40,40),**config):
+##     where the descriptions are displayed as popup help over the
+##     labels, and double clicking a label executes the corresponding
+##     command.
+##     """    
+##     def __init__(self,plots,image_size=(40,40),**config):
 
-        Tkinter.Toplevel.__init__(self,**config)
-        self.dynamic_help = Pmw.Balloon(self)
-        self.image_size = image_size
+##         Tkinter.Toplevel.__init__(self,**config)
+##         self.dynamic_help = Pmw.Balloon(self)
+##         self.image_size = image_size
 
-        # bwidget's scrolled frame: the frame to work
-        # with is self.contents
-        sw = bwidget.ScrolledWindow(self)
-        sf = bwidget.ScrollableFrame(self)#,height=40*5+10)
-        sw.setwidget(sf)
-        sw.pack(fill="both",expand="yes")
-        self.contents = sf.getframe()
+##         # bwidget's scrolled frame: the frame to work
+##         # with is self.contents
+##         sw = bwidget.ScrolledWindow(self)
+##         sf = bwidget.ScrollableFrame(self)#,height=40*5+10)
+##         sw.setwidget(sf)
+##         sw.pack(fill="both",expand="yes")
+##         self.contents = sf.getframe()
 
 
-        ####
-        ##  CEBALERT: got to keep references to the images, or they vanish.
-        ##  [http://infohost.nmt.edu/tcc/help/pubs/pil/image-tk.html]
-        ##  There is a bug in the current version of the Python
-        ##  Imaging Library that can cause your images not to display
-        ##  properly. When you create an object of class PhotoImage,
-        ##  the reference count for that object does not get properly
-        ##  incremented, so unless you keep a reference to that object
-        ##  somewhere else, the PhotoImage object may be
-        ##  garbage-collected, leaving your graphic blank on the
-        ##  application.
-        self.__image_hack = []
-        #####
+##         ####
+##         ##  CEBALERT: got to keep references to the images, or they vanish.
+##         ##  [http://infohost.nmt.edu/tcc/help/pubs/pil/image-tk.html]
+##         ##  There is a bug in the current version of the Python
+##         ##  Imaging Library that can cause your images not to display
+##         ##  properly. When you create an object of class PhotoImage,
+##         ##  the reference count for that object does not get properly
+##         ##  incremented, so unless you keep a reference to that object
+##         ##  somewhere else, the PhotoImage object may be
+##         ##  garbage-collected, leaving your graphic blank on the
+##         ##  application.
+##         self.__image_hack = []
+##         #####
 
-        self.__create_entries(plots)
+##         self.__create_entries(plots)
 
         
         
 
-    def __create_entries(self,plots):
-        """
-        Use the grid manager to display the (image,label) pairs
-        in rows of columns.
-        """
-        for row,(label,command,description,image_path) in zip(range(len(plots)),plots):
+##     def __create_entries(self,plots):
+##         """
+##         Use the grid manager to display the (image,label) pairs
+##         in rows of columns.
+##         """
+##         for row,(label,command,description,image_path) in zip(range(len(plots)),plots):
 
 
-            # (labels should be buttons so they get highlighted
-            # and you would press on them naturally, and no need
-            # to bind click event)
-            image = ImageTk.PhotoImage(ImageOps.fit(Image.open(image_path),self.image_size))
+##             # (labels should be buttons so they get highlighted
+##             # and you would press on them naturally, and no need
+##             # to bind click event)
+##             image = ImageTk.PhotoImage(ImageOps.fit(Image.open(image_path),self.image_size))
 
-            li = Button(self.contents,command=command)
-            li['image'] = image
-            li.grid(row=row,column=0,sticky='w')
+##             li = Button(self.contents,command=command)
+##             li['image'] = image
+##             li.grid(row=row,column=0,sticky='w')
 
-            l = Label(self.contents,text=label)
-            l.grid(row=row,column=1,sticky='w')
+##             l = Label(self.contents,text=label)
+##             l.grid(row=row,column=1,sticky='w')
 
-            # (the order of binding pmw balloon and a something else
-            # matters, since balloon clears previous bindings)
-            self.dynamic_help.bind(l,description)
+##             # (the order of binding pmw balloon and a something else
+##             # matters, since balloon clears previous bindings)
+##             self.dynamic_help.bind(l,description)
 
-            # see alert in __init__
-            self.__image_hack.append(image)
+##             # see alert in __init__
+##             self.__image_hack.append(image)
             
