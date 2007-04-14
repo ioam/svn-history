@@ -19,10 +19,6 @@ from topo.misc.utils import shortclassname
 from parametersframe import ParametersFrame
 
 
-# CEBALERT: any reason this isn't a new-style class (i.e. why doesn't
-# this inherit from object)?
-# JAB: Probably no reason; should be changed to inherit from object.
-#
 class EditorObject(ParameterizedObject):
     """
     Anything that can be added and manipulated in an EditorCanvas. Every EditorCanvas
@@ -245,7 +241,7 @@ class EditorSheet(EditorNode):
                         point = m[i][j]
                         if point < 0 : point = 0.0
                         if point > 1 : point = 1.0
-                        col = '#' + (self.dec_to_hex_str(m[i][j], 3)) * 3
+                        col = '#' + (self.dec_to_hex_str(point, 3)) * 3
                         self.id = self.id + [self.canvas.create_polygon
                            (x1, y1, x2, y2, x3, y2, x4, y1, fill = col, outline = col)]
         x, y = self.x, self.y
