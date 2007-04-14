@@ -58,7 +58,7 @@
 <dd>
   adding noise to any calculation<br>
   lesioning units and non-rectangular sheet shapes (see PatternCombine)<br>
-  basic audio pattern generation<br>
+  basic auditory pattern generation<br>
 <!--  greatly simplified convolutions<br>--> <!-- SharedWeightCFProjection -->
   greatly simplified SOM support<br> <!-- now can be mixed and matched with any other components<br> -->
   more dynamic parameters (such as ExponentialDecay)<br> 
@@ -67,8 +67,8 @@
 <dt>Example scripts:</dt>
 <dd>
   examples that more closely match published simulations<br>
-  new simulations for face processing, and<br>
-  self-organization from natural images.
+  new simulations for face processing and for
+  self-organization from natural images<br>
 </dd>
 </font>
 </dl>
@@ -84,12 +84,11 @@
   stop button to interrupt training safely<br>
   ability to plot and analyze during training<br>
   right-click menu for analysis of bitmap plots<br>
-  FFT transforms<br>
   saving current simulation as an editable .ty script<br>
 </dd>
 <dt>Command-line and batch:</dt>
 <dd>
-  more-informative command prompt<br>
+<!--  more-informative command prompt<br> -->
   site-specific commands in ~/.topographicarc<br>
   simple functions for doing optimization<br>
 <!--  saving of plot data with snapshots<br> -->
@@ -98,6 +97,7 @@
 <dd>
   spatial frequency map plots<br>
   tuning curve plots<br>
+  FFT transforms (in right-click menu)<br>
 </dd>
 </font>
 </dl>
