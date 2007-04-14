@@ -1,5 +1,24 @@
 <P>Older news:
 
+<p><b>29 November 06:</b> There will be a short talk on Topographica
+at the <A target="_top" href="http://us.pycon.org/TX2007/">PyCon 2007</A>
+convention, February 23-25, 2007.
+
+<p><b>22 November 06:</b> Version 0.9.2
+<A target="_top" href="../Downloads/index.html">released</A>, including
+numerous bugfixes (e.g. to support GCC 4.1.x compilers),
+much more complete user manual,
+more useful reference manual,
+more sample models,
+flexible joint normalization across Projections,
+arbitrary control of mapping CF centers (see CoordinateMapperFn),
+Composite and Selector patterns to allow flexible combinations of input patterns,
+homeostatic learning and output functions,
+sigmoid and generalized logistic output functions,
+and a new disparity map example (including a
+random dot stereogram input pattern).
+<!-- Choice class to select randomly from a list of choices -->
+
 <p><b>02 November 06:</b> Some users have reported problems when using
 optimized code on systems with the most recent GCC 4.1.x C/C++
 compilers.  We have added a patch to the included weave

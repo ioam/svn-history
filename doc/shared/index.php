@@ -32,32 +32,84 @@
 		print '
 <table width="100%" cellpadding="5"><tr><td bgcolor="'.$banner_bg_color.'">
 <blockquote>
-<blockquote>
 <i>
 <b>News:</b>
 
-<p><b>29 November 06:</b> There will be a short talk on Topographica
-at the <A target="_top" href="http://us.pycon.org/TX2007/">PyCon 2007</A>
-convention, February 23-25, 2007.
+<p><b>21 April 2007:</b> Version 0.9.3 to be
+<A target="_top" href="../Downloads/index.html">released</A>, including:
 
-<p><b>22 November 06:</b> Version 0.9.2
-<A target="_top" href="../Downloads/index.html">released</A>, including
-numerous bugfixes (e.g. to support GCC 4.1.x compilers),
-much more complete user manual,
-more useful reference manual,
-more sample models,
-flexible joint normalization across Projections,
-arbitrary control of mapping CF centers (see CoordinateMapperFn),
-Composite and Selector patterns to allow flexible combinations of input patterns,
-homeostatic learning and output functions,
-sigmoid and generalized logistic output functions,
-and a new disparity map example (including a 
-random dot stereogram input pattern).
-<!-- Choice class to select randomly from a list of choices -->
-
+<center>
+<table width="100%" cellpadding="5">
+<tr>
+<td width="50%">
+<dl COMPACT>
+<font size="-1">  
+<dt>General improvements:</dt>
+<dd>
+  numerous bugfixes<br>
+  significant optimizations (~5 times faster)<br>
+  <!-- (about 5 times faster than 0.9.2 for most scripts, with more improvements to come)<br>  -->
+  compressed snapshots (1/3 as large)<br>
+  <!-- more comprehensive test suite checking both speed and functionality<br> -->
+  much-improved reference manual<br>
+  <!-- arrays based on Numpy rather than Numeric<br> -->
+</dd>
+<dt>Component library:</dt>
+<dd>
+  adding noise to any calculation<br>
+  lesioning units and non-rectangular sheet shapes (see PatternCombine)<br>
+  basic audio pattern generation<br>
+<!--  greatly simplified convolutions<br>--> <!-- SharedWeightCFProjection -->
+  greatly simplified SOM support<br> <!-- now can be mixed and matched with any other components<br> -->
+  more dynamic parameters (such as ExponentialDecay)<br> 
+  flexible mapping of ConnectionField centers between sheets<br>
+</dd>
+<dt>Example scripts:</dt>
+<dd>
+  examples that more closely match published simulations<br>
+  new simulations for face processing, and<br>
+  self-organization from natural images.
+</dd>
+</font>
+</dl>
+</td>
+<td width="50%">
+<dl COMPACT>
+<font size="-1">
+<dt>GUI:</dt>
+<dd>
+  Better OS X and Windows support<br>
+  progress reporting for map measurement<br>
+  dynamic display of coordinates in plots<br>
+  stop button to interrupt training safely<br>
+  ability to plot and analyze during training<br>
+  right-click menu for analysis of bitmap plots<br>
+  FFT transforms<br>
+  saving current simulation as an editable .ty script<br>
+</dd>
+<dt>Command-line and batch:</dt>
+<dd>
+  more-informative command prompt<br>
+  site-specific commands in ~/.topographicarc<br>
+  simple functions for doing optimization<br>
+<!--  saving of plot data with snapshots<br> -->
+</dd>
+<dt>Plotting:</dt>
+<dd>
+  spatial frequency map plots<br>
+  tuning curve plots<br>
+</dd>
+</font>
+</dl>
+</td>
+</tr>
+</table>
+</center>
+  
 <p><A target="_top" href="../Home/oldnews.html"><i>Older news</i></A>
 </i>
-</blockquote>
+
+
 </blockquote>
 </td></tr></table>';
 	}
