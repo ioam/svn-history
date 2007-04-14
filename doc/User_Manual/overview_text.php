@@ -179,7 +179,7 @@ consists of a set of <?php
 classref('topo.base.cf','ConnectionField')?> objects, each of which
 contains the connections to one unit in the destination CFSheet.
 A special type of CFProjection, 
-<?php classref('topo.projections.basic','SharedWeightCFProjection')?>
+<?php classref('topo.projections.basic','SharedWeightCFProjection')?> 
 is used to perform the mathematical operation of convolution, i.e.,
 applying a set of weights to all points in a plane, and is equivalent
 to having one ConnectionField shared by every destination neuron.
