@@ -533,9 +533,15 @@ class CFProjection(Projection):
 
     CFProjection computes its activity using a response_fn of type
     CFPResponseFn (typically a CF-aware version of mdot) and output_fn 
-    (which is typically IdentityOF). Any subclass has to implement the interface
-    activate(self,input_activity) that computes the response from the input 
-    and stores it in the activity array.
+    (which is typically IdentityOF).  The initial contents of the 
+    ConnectionFields mapping from the input Sheet into the target
+    ProjectionSheet are controlled by the weights_generator, weights_shape,
+    and weights_output_fn parameters, while the location of the
+    ConnectionField is controlled by the coord_mapper parameter.
+
+    Any subclass has to implement the interface
+    activate(self,input_activity) that computes the response from the
+    input and stores it in the activity array.
     """
     response_fn = CFPResponseFnParameter(
         default=CFPRF_Plugin(),
