@@ -96,7 +96,7 @@ class GeneratorSheet(Sheet):
         assert self.simulation
 
         # connect self<->self (for repeating)
-        conn=self.simulation.connect(self.name,self.name,delay=self.period,src_port='Activity',dest_port='Trigger',name='Trigger')
+        conn=self.simulation.connect(self.name,self.name,delay=self.period,src_port='Activity',dest_port='Trigger',name='Trigger',private=True)
 
         # first event is special
         e=EPConnectionEvent(self.phase+topo.sim.time(),conn)
