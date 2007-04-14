@@ -2053,12 +2053,6 @@
 	    compile on OS X 10.4.8 (intel and ppc) even though that
 	    platform does not have or need the -rpath option
 
-2007-02-22  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
-
-	* topo/tkgui/topoconsole.py 1.101.2.1: Fixed widget resizing in
-	Console window.  Fixed console command prompt to be more
-	shell-like.
-
 2007-02-22  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
 	* topo/misc/inlinec.py 1.13: Changed error reporting to print only
@@ -2106,22 +2100,11 @@
 	* doc/Developer_Manual/optimization_text.php 1.14:
 	Added information about when the timing results were from.
 
-	* topo/responsefns/optimized.py 1.50.2.6:
-	Removed DotProduct_opt, which did not work for non-contiguous arrays.
-
-	* topo/base/functionfamilies.py 1.14.2.2:
-	Changed DotProduct to use numpy's dot function.
-
 	* doc/Developer_Manual/optimization_text.php 1.13:
 	Minor update to text of bottlenecks section.
 
 	* doc/Developer_Manual/optimization_text.php 1.12:
 	Updated bottlenecks section.
-
-2007-02-21  antolikjan  <antolikjan@lodestar.inf.ed.ac.uk>
-
-	* topo/base/cf.py 1.64.2.7:
-	Corrected bug, where bounds_template was passed instead of Slice object in two places
 
 2007-02-21  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
@@ -2135,9 +2118,6 @@
 
 	* doc/Future_Work/current_text.php 1.149:
 	Some updates and tidying of tasks.
-
-	* topo/tests/reference/lissom_oo_or_reference.ty 1.32.2.3:
-	Updated SharedWeightCFProjection's response_fn.
 
 	* doc/Developer_Manual/optimization_text.php 1.10:
 	Updated bottleneck section examples, and made some changes to text.
@@ -2282,9 +2262,6 @@
 	improvements and clarifications.  The screenshots still need to be
 	updated.
 
-	* topo/patterns/basic.py 1.106.2.8: Added blank default Composite
-	pattern so that the Test Pattern window won't give an error
-
 2007-02-19  ceball  <ceball@lodestar.inf.ed.ac.uk>
 
 	* doc/Future_Work/current_text.php 1.147: Updated some tasks.
@@ -2350,33 +2327,6 @@
 	* topo/commands/analysis.py 1.63: changed update_projection
 	activity so that values stored in correct sheet_view_dict
 
-2007-02-17  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
-
-	* topo/responsefns/optimized.py 1.50.2.5: Minor cleanup to
-	comments
-
-2007-02-16  antolikjan  <antolikjan@lodestar.inf.ed.ac.uk>
-
-	* topo/sheets/lissom.py 1.64.2.3: changed the code to use the new
-	CFProjection.cfs_shape property
-
-	* topo/responsefns/optimized.py 1.50.2.4: Removed obsolete
-	JAHACKALERT, added some comments why changes were done to the
-	optimized dot product response fn, and added changed the last
-	contiguous test to be rather a simple value test
-
-	* topo/projections/basic.py 1.54.2.4: Added proposal how to solve
-	the output_fn application problem
-
-	* topo/patterns/basic.py 1.106.2.7: Repaired the ConrnersGaussian
-	so that it works with the numpy update - no refference to the old
-	Wrapper anymore
-
-	* topo/base/cf.py 1.64.2.6: Deleted an forgotten JAHACKALERT and
-	added the cfs_shape property that is linked to the dimensions of
-	the _cfs field. This way the shape of this field can be obtained
-	indirectly - independetly on the exact representation of the _cfs
-
 2007-02-16  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
 
 	* topo/base/cf.py 1.65: Fixed bug in projection activity window -
@@ -2384,54 +2334,11 @@
 
 2007-02-16  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
-	* examples/laminar_oo_or.ty 1.2.2.4, examples/laminar_or.ty
-	1.1.2.4, examples/lissom_fsa.ty 1.1.2.4, examples/lissom_oo_od.ty
-	1.11.2.2, examples/lissom_oo_or_dy.ty 1.10.2.2,
-	examples/lissom_oo_or_dy_photo.ty 1.3.2.2,
-	examples/lissom_oo_or_homeomaxent.ty 1.1.2.2,
-	examples/lissom_or_noshrinking.ty 1.4.2.4,
-	examples/lissom_or_noshrinking_latswitch.ty 1.4.2.5,
-	examples/lissom_or_sf.ty 1.25.2.2: Updated to match new
-	SharedWeight implementation
-
 	* topo/tkgui/topoconsole.py 1.103: Cleaned up progress report
 	printing
 
 	* examples/som_retinotopy.ty 1.49: Removed confusing random
 	orientation
-
-2007-02-15  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
-
-	* topo/responsefns/optimized.py 1.50.2.3: Cleaned up C code
-	formatting
-
-	* topo/base/cf.py 1.64.2.5, topo/projections/basic.py 1.54.2.3:
-	Removed dependency on pylabplots.  Cleaned up docstrings and
-	whitespace.  Removed outdated alerts
-
-2007-02-15  antolikjan  <antolikjan@lodestar.inf.ed.ac.uk>
-
-	* topo/patterns/basic.py 1.106.2.6: Adding gaussian corner pattern
-
-	* examples/lissom_oo_or.ty 1.72.2.4, examples/lgn_lateral.ty 1.2:
-	Getting rid of CFPRF_SharedWeightDotProduct_opt and Wrapper
-
-	* topo/sheets/lissom.py 1.64.2.2: Minor changes so that it works
-	with the renamed cfs -> _cfs variable in cfprojection class
-
-	* topo/responsefns/optimized.py 1.50.2.2: No special optimized dot
-	product for share weight connection needed anymore - deleted the
-	corresponding function. Slight adjustments to the optimized dot
-	product response fn to work with views
-
-	* topo/projections/basic.py 1.54.2.2: Complete overhaul of the
-	ShareWeightProjections/Connections classes. Complete replacement
-	of DummyCF with SharedWeightCF and deletion of CFPRF_SharedWeight
-
-	* topo/base/cf.py 1.64.2.4: Rewriting the projections such that it
-	stores that bounds_tamplate internally rather than sending it
-	around as a parameter. Further restricitng the access to cfs by
-	renaming it to _cfs and writing some access functions.
 
 2007-02-15  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
 
@@ -2477,22 +2384,6 @@
 	to having a value that could be instantiated. Simplified
 	__repr__() implementation.  Cleaned up docstrings and spacing
 
-2007-02-11  ceball  <ceball@lodestar.inf.ed.ac.uk>
-
-	* doc/Future_Work/current_text.php 1.138.2.1: Updated Windows
-	mingw task and removed a stray tag.
-
-	* external/.cvsignore 1.17.2.3: Updated to ignore new matplotlib
-	version.
-
-2007-02-10  ceball  <ceball@lodestar.inf.ed.ac.uk>
-
-	* external/Makefile 1.41.2.5: Removed -Wl from LD_FLAGS for
-	compiling Python. Since rpath is not used on OS X, having Wl
-	causes compilation to fail. Now during compilation on OS X,
-	warnings are printed about the unrecognized rpath option, but
-	compilation succeeds on OS X 10.4.8 (intel and ppc).
-
 2007-02-09  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
 	* doc/FAQ/index_text.php 1.1, doc/shared/util.php 1.22: Added FAQ
@@ -2511,20 +2402,9 @@
 
 2007-02-08  antolikjan  <antolikjan@lodestar.inf.ed.ac.uk>
 
-	* external/matplotlib-0.90.0.tar.gz 1.1.2.1: Adding new matplotlib
-
 	* external/matplotlib-0.90.0.tar.gz 1.1: New file.
 
-	* external/Makefile 1.41.2.4, external/matplotlib-0.81.tgz
-	1.1.2.1: Removing the old matplotlib
-
 2007-02-07  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
-
-	* doc/User_Manual/commandline_text.php 1.5.2.1: Added note about
-	how to get numpy to display large arrays
-
-	* topo/base/arrayutils.py 1.20.2.6: Changed numpy array printing
-	to show the actual data for any array up to 200*200 by default.
 
 	* topo/learningfns/som.py 1.13: Clarified alert
 
@@ -2541,37 +2421,6 @@
 	with more general test_script.py.
 
 	* doc/Future_Work/current_text.php 1.145: Removed a task.
-
-	* topo/tests/reference/or_map_topo.log 1.1.2.1,
-	topo/tests/reference/or_map_topo.log.gz 1.1.2.2: Gzipped (as in
-	the main branch).
-
-	* topo/tests/reference/retina_lgn_match.000000.wts.Ganglia00.Afferent0.018_018.matrix
-	1.1.2.1,
-	topo/tests/reference/retina_lgn_match.000001p000.Eye0_Activity.matrix
-	1.1.2.1,
-	topo/tests/reference/retina_lgn_match.000001p000.Ganglia00_Activity.matrix
-	1.1.2.1, topo/tests/reference/retina_lgn_match.param 1.1.2.1,
-	topo/tests/reference/retina_lgn_match.ty 1.11.2.2: Removed (as in
-	the main branch).
-
-	* topo/tests/reference/or_map_topo.param 1.8.2.2: Version 1.8 from
-	the main branch.
-
-	* topo/tests/reference/lissom_log_parser.py 1.6.2.2: Version 1.28
-	from the main branch.
-
-	* topo/tests/reference/oo_or_map_topo.param 1.2.2.1: Version 1.3
-	from the main branch.
-
-	* topo/tests/reference/lissom_or_reference.ty 1.4.2.1: Version
-	1.33 from the main branch, but updated for numpy.
-
-	* topo/tests/utils.py 1.1.2.2: Version 1.5 from the main branch,
-	but updated for numpy.
-
-	* topo/tests/reference/lissom_oo_or_reference.ty 1.32.2.2: Version
-	1.35 from the main branch, but updated for numpy.
 
 	* topo/tests/reference/lissom_or_reference.ty 1.33: Added a
 	comment.
@@ -2658,10 +2507,6 @@
 	* topo/tests/reference/lissom_or_reference.ty 1.24,
 	topo/tests/reference/or_map_topo.param 1.8: Reverted to a density
 	of 24.
-
-	* topo/tests/reference/or_map_topo.param 1.8.2.1: file
-	or_map_topo.param was added on branch numpy_test_branch on
-	2007-02-07 14:28:57 +0000
 
 	* doc/Future_Work/current_text.php 1.140: Updated some of my
 	tasks.
@@ -2864,17 +2709,11 @@
 	* topo/tests/reference/lissom_or_reference.ty 1.6: Updated some
 	comments.
 
-	* topo/commands/basic.py 1.44.2.3: Removed unused import.
-
 	* topo/tests/reference/lissom_or_reference.ty 1.5: Updated to
 	allow some automatic comparisons. Removed assertion statements.
 
 	* topo/tests/reference/or_map_topo.log.gz 1.1: Compressed
 	or_map_topo.log.
-
-	* topo/tests/reference/or_map_topo.log.gz 1.1.2.1: file
-	or_map_topo.log.gz was added on branch numpy_test_branch on
-	2007-02-07 14:45:28 +0000
 
 	* topo/tests/reference/.cvsignore 1.3: Ignore or_map_topo.log;
 	might remove this line in the future but for now it's the only way
@@ -2916,17 +2755,10 @@
 
 2007-01-31  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
-	* external/Makefile 1.41.2.3, external/numpy.diff 1.1.2.1: Added
-	patch to numpy to fix bug in numpy.subtract.reduce
-
 	* external/numpy.diff 1.1: New file.
-
-	* external/.cvsignore 1.17.2.2: Added gnosis utils
 
 	* topo/tkgui/topoconsole.py 1.102: Changed 'Load script' menu
 	option to 'Run script' to avoid confusion with 'Load snapshot'
-
-	* doc/index.html 1.4.2.1: Minor typo fix
 
 	* external/.cvsignore 1.18: More to ignore
 
@@ -2948,13 +2780,6 @@
 
 	* external/Gnosis_Utils-1.2.1.tar.gz 1.1: Initial
 	version. Provides various xml tools, among other things.
-
-	* topo/commands/basic.py 1.44.2.2: Slightly simplified the pickle
-	code now we don't subclass pickle.Pickler and
-	pickle.Unpickler. Should be no visible change.
-
-	* topo/base/arrayutils.py 1.20.2.5: Added code to allow pickling
-	and unpickling of numpy ufuncs.
 
 2007-01-30  fdemertzis  <fdemertzis@lodestar.inf.ed.ac.uk>
 
@@ -2985,9 +2810,6 @@
 
 2007-01-28  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
-	* external/Makefile 1.41.2.2: Forced removal of Numeric's weave to
-	allow switching between numpy and Numeric's branches
-
 	* external/Makefile 1.45: Fixed typo in previous checkin
 
 	* external/Makefile 1.44: Force removal of numpy weave version,
@@ -2998,99 +2820,19 @@
 	* external/Makefile 1.42: Added removal of previous installation
 	for safety when switching between the numpy and Numeric branches
 
-	* topo/misc/inlinec.py 1.12.2.2: Reenabled optimized components
-	now that weave appears to be working.  Changed error reporting to
-	print only one error by default, instead of one per optimized
-	component; the old behavior can be obtained by setting
-	warn_for_each_unoptimized_component=True
-
-	* external/.cvsignore 1.17.2.1: More to ignore
-
 	* external/scipy-0.5.2.tar.gz 1.1: New file.
-
-	* external/Makefile 1.41.2.1,
-	external/Scipy_core-0.3.0_108.1820.tar.gz 1.1.2.1,
-	external/scipy-0.5.2.tar.gz 1.1.2.1, external/weave.diff 1.1.2.1:
-	Updated weave to work with numpy.  Also adds full SciPy
-	distribution, although it is not yet unpacked and built
-	automatically
-
-	* topo/base/boundingregion.py 1.29.2.1: Fixed import of
-	no-longer-existing alias
 
 2007-01-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
 
 	* topo/misc/numbergenerators.py 1.14: Removed unused RandomWrapper
 	class.
 
-2007-01-28  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
-
-	* topo/base/arrayutils.py 1.20.2.4: Removed unused import
-
 2007-01-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
 
 	* topo/misc/utils.py 1.27: Removed function that wrote an array to
 	a file; there are now functions to do this in arrayutils.
 
-	* topo/patterns/basic.py 1.106.2.5: Change to docstring (about
-	Wrapper).
-
-	* examples/lissom_or_noshrinking_latswitch.ty 1.4.2.4,
-	examples/cfsom_or.ty 1.53.2.2, examples/hierarchical.ty 1.61.2.2,
-	examples/joublin_bc96.ty 1.12.2.2, examples/laminar_oo_or.ty
-	1.2.2.3, examples/laminar_or.ty 1.1.2.3, examples/lissom_fsa.ty
-	1.1.2.3, examples/lissom_oo_or.ty 1.72.2.3,
-	examples/lissom_or_noshrinking.ty 1.4.2.3,
-	examples/sullivan_neurocomputing04.ty 1.13.2.2,
-	examples/sullivan_nn06.ty 1.10.2.2: Removed Wrapper class since
-	numpy's ufuncs deepcopy without problems.
-
-	* topo/base/parameterclasses.py 1.51.2.1,
-	topo/tests/reference/lissom_oo_or_reference.ty 1.32.2.1: Removed
-	Wrapper class now numpy ufuncs deepcopy without problems.
-
-	* topo/patterns/basic.py 1.106.2.4: Removed Wrapper import now the
-	Wrapper class is not used.
-
-	* topo/commands/analysis.py 1.59.2.2,
-	topo/tests/reference/retina_lgn_match.ty 1.11.2.1: Removed unused
-	Wrapper import.
-
-	* topo/patterns/basic.py 1.106.2.3: The ufuncs from numpy appear
-	to deepcopy, so Wrapper is not needed.
-
 	* topo/commands/analysis.py 1.60: Removed unused import.
-
-	* topo/base/arrayutils.py 1.20.2.3: Removed ununused import.
-
-2007-01-28  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
-
-	* topo/base/cf.py 1.64.2.3: Removed outdated comments
-
-	* examples/lissom_or_noshrinking_latswitch.ty 1.4.2.2,
-	topo/patterns/basic.py 1.106.2.2, examples/laminar_oo_or.ty
-	1.2.2.2, examples/laminar_or.ty 1.1.2.2, examples/lissom_fsa.ty
-	1.1.2.2, examples/lissom_oo_or.ty 1.72.2.2,
-	examples/lissom_or_noshrinking.ty 1.4.2.2: Replaced Numeric with
-	numpy in calls to Wrapper.  The automatic numpy functions for
-	updating from Numeric failed to catch those, because the relevant
-	code was embedded in a string.
-
-2007-01-27  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
-
-	* topo/__init__.py 1.57.2.2: Disabled underflow error reporting by
-	default, because underflows are expected in many normal cases
-
-	* topo/base/arrayutils.py 1.20.2.2, topo/misc/patternfns.py
-	1.10.2.2: Cleaned up handling of division-by-zero and underflow
-	errors for Gaussian patterns.  It is now much simpler and the
-	problems with numpy appear to have been eliminated.
-
-	* topo/__init__.py 1.57.2.1: Enabled strict reporting of
-	floating-point errors as exceptions by default, to facilitate
-	debugging of numpy
-
-	* topo/base/cf.py 1.64.2.2: Removed unused imports
 
 2007-01-27  fdemertzis  <fdemertzis@lodestar.inf.ed.ac.uk>
 
@@ -3102,83 +2844,6 @@
 2007-01-26  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
 	* README.txt 1.18, topo/__init__.py 1.58: Updated copyright info
-
-2007-01-25  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
-
-	* topo/tests/reference/lissom_log_parser.py 1.6.2.1,
-	topo/tkgui/editorobjects.py 1.45.2.1, topo/tkgui/plotgrouppanel.py
-	1.99.2.1, topo/plotting/plot.py 1.100.2.1,
-	topo/projections/basic.py 1.54.2.1, topo/responsefns/optimized.py
-	1.50.2.1, topo/responsefns/projfns.py 1.17.2.1,
-	topo/sheets/cfsom.py 1.32.2.1, topo/sheets/composer.py 1.19.2.1,
-	topo/sheets/lissom.py 1.64.2.1, topo/sheets/slissom.py 1.5.2.1,
-	topo/tests/testbitmap.py 1.7.2.1, topo/tests/testcfsom.py
-	1.32.2.1, topo/tests/testfeaturemap.py 1.23.2.1,
-	topo/tests/testimage.py 1.7.2.1, topo/tests/testoutputfnsbasic.py
-	1.11.2.1, topo/tests/testoutputfnsoptimized.py 1.7.2.1,
-	topo/tests/testpalette.py 1.2.2.1,
-	topo/tests/testpatterngenerator.py 1.16.2.1,
-	topo/tests/testplot.py 1.19.2.1, topo/tests/testplotfilesaver.py
-	1.20.2.1, topo/tests/testplotgroup.py 1.26.2.1,
-	topo/tests/testsheet.py 1.46.2.1, topo/tests/testsheetview.py
-	1.16.2.1, topo/tests/testsimulation.py 1.7.2.1,
-	topo/tests/testtemplateplotgrouppanel.py 1.7.2.1,
-	topo/tests/utils.py 1.1.2.1, topo/misc/distribution.py 1.3.2.1,
-	topo/misc/inlinec.py 1.12.2.1, topo/misc/patternfns.py 1.10.2.1,
-	topo/misc/utils.py 1.26.2.1, topo/outputfns/basic.py 1.55.2.1,
-	topo/outputfns/homeostatic.py 1.8.2.1, topo/outputfns/optimized.py
-	1.43.2.1, topo/patterns/basic.py 1.106.2.1, topo/patterns/image.py
-	1.56.2.1, topo/patterns/random.py 1.30.2.1, topo/patterns/rds.py
-	1.15.2.1, topo/plotting/bitmap.py 1.34.2.1,
-	topo/plotting/palette.py 1.11.2.1, examples/laminar_or.ty 1.1.2.1,
-	examples/leaky_lissom_or.ty 1.15.2.1, examples/lissom_fsa.ty
-	1.1.2.1, examples/lissom_oo_od.ty 1.11.2.1,
-	examples/lissom_oo_or.ty 1.72.2.1, examples/lissom_oo_or_dy.ty
-	1.10.2.1, examples/lissom_oo_or_dy_photo.ty 1.3.2.1,
-	examples/lissom_oo_or_homeomaxent.ty 1.1.2.1,
-	examples/lissom_or.ty 1.109.2.1, examples/lissom_or_homeomaxent.ty
-	1.2.2.1, examples/lissom_or_homeoscale.ty 1.7.2.1,
-	examples/lissom_or_noshrinking.ty 1.4.2.1,
-	examples/lissom_or_noshrinking_latswitch.ty 1.4.2.1,
-	examples/lissom_or_sf.ty 1.25.2.1, examples/obermayer_pnas90.ty
-	1.48.2.1, examples/ohzawa_science90.ty 1.5.2.1,
-	examples/som_retinotopy.ty 1.47.2.1,
-	examples/sullivan_neurocomputing04.ty 1.13.2.1,
-	examples/sullivan_nn06.ty 1.10.2.1, examples/tiny.ty 1.27.2.1,
-	topo/analysis/featureresponses.py 1.9.2.1, topo/base/arrayutils.py
-	1.20.2.1, topo/base/cf.py 1.64.2.1, topo/base/functionfamilies.py
-	1.14.2.1, topo/base/patterngenerator.py 1.101.2.1,
-	topo/base/projection.py 1.82.2.1, topo/base/sheet.py 1.115.2.1,
-	topo/base/sheetcoords.py 1.9.2.1, topo/commands/analysis.py
-	1.59.2.1, topo/commands/basic.py 1.44.2.1,
-	topo/commands/pylabplots.py 1.13.2.1, topo/learningfns/basic.py
-	1.63.2.1, topo/learningfns/projfns.py 1.16.2.1,
-	topo/learningfns/som.py 1.12.2.1, examples/cfsom_or.ty 1.53.2.1,
-	examples/hierarchical.ty 1.61.2.1, examples/joublin_bc96.ty
-	1.12.2.1, examples/laminar_oo_or.ty 1.2.2.1, README.txt 1.17.2.1:
-	Updated to use numpy instead of Numeric, on a separate CVS branch
-	named numpy_test_branch.  First, ran the automatic conversion
-	code:
-
-	  import numpy.oldnumeric.alter_code1 as noa
-	  noa.converttree('topo') noa.convertall('examples') # (After
-	  temporarily renaming .ty to .py)
-
-	The main automatic changes were:
-
-	  - Change 'import Numeric' to 'import numpy.oldnumeric as
-	  Numeric' - Change 'from Numeric import' to 'from
-	  numpy.oldnumeric import' - Converted .flat to .ravel() - Changed
-	  typecode= to dtype= - Eliminated savespace() and spacesaver()
-
-	Then cleaned up the results by hand, removing all traces of
-	savespace, using pickle.Pickler and pickle.Unpickler instead of
-	ExtraPickler and ExtraUnpickler, and using 'from numpy import inf'
-	rather than the previous ad-hoc way of generating an infinite
-	float.  Also disabled optimized components, until we can make it
-	all work for the unoptimized ones.  The result should pass most of
-	the tests, and run most scripts, but there are still various
-	problems to debug.
 
 2007-01-25  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
 
