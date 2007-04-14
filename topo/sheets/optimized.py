@@ -19,6 +19,12 @@ class LISSOM_Opt(LISSOM):
     Overrides the function JointNormalizingCFSheet.__compute_joint_norm_totals 
     with C-optimized code for LISSOM sheet.
     """
+
+    def __init__(self,**params):
+        super(LISSOM_Opt,self).__init__(**params)
+        self.mask = NeighborhoodMask_Opt(threshold = 0.00001,radius = 0.05,sheet = self)
+
+    
     def compute_joint_norm_totals(self,projlist,mask):
         """
         Compute norm_total for each CF in each projections from a
@@ -66,6 +72,8 @@ class LISSOM_Opt(LISSOM):
         inline(code, ['projlist','mask','rows','cols','length'], local_dict=locals())
 
 provide_unoptimized_equivalent("LISSOM_Opt","LISSOM",locals())
+
+
 
 class NeighborhoodMask_Opt(NeighborhoodMask):
     
