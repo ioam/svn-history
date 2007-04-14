@@ -15,10 +15,10 @@ SNAPSHOT = -c "from topo.commands.basic import save_snapshot ; save_snapshot"
 
 OR_ANALYSIS = -c "from topo.commands.analysis import measure_or_pref,measure_position_pref,measure_cog,measure_or_tuning_fullfield; \
 measure_or_pref(); \
-measure_position_pref(); \
 measure_cog(); \
-measure_or_tuning_fullfield(); \
 "
+#measure_or_tuning_fullfield(); \
+#measure_position_pref(); \
 
 RETINOTOPY_ANALYSIS = -c "from topo.commands.analysis import measure_position_pref,measure_cog ;\
 measure_position_pref(); \
@@ -46,7 +46,7 @@ som_retinotopy:
 
 # Generate saved examples of complete simulations
 lissom_oo_or_10000.typ: lissom_oo_or.ty ../topo/*/*.py
-	../topographica lissom_oo_or.ty -c "topo.sim.run(10000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
+	../topographica -c default_density=96 lissom_oo_or.ty -c "topo.sim.run(10000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
 
 
 lissom_or_10000.typ: lissom_or.ty ../topo/*/*.py
