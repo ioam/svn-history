@@ -211,7 +211,7 @@
 	so is now a proper Toplevel menu (should display as a native menu
 	bar i.e. along the top for OS X). Minor re-organization of
 	methods. Context-sensitive help for menus temporarily
-	disabled. Asks for confirmation before quitting. Clicking 'x' on
+	disabled. Asks for confirmation before quitting. Clicking 'x' on
 	the window is like quitting from the menu (rather than just
 	closing the topoconsole window). Moved in code for making cascades
 	open automatically (from __init__.py).
@@ -1121,8 +1121,8 @@
 	JointNormalizedSheet class
 
 	* topo/sheets/lissom.py 1.67: Change the handling of mask for the
-	apply_learn_output_fn and compute_joint_norm_totals, now this mask
-	is set to the activity of neurons thus preventing of uneccessary
+	apply_learn_output_fn and compute_joint_norm_totals.  Now this mask
+	is set to the activity of neurons, thus preventing unnecessary
 	recomputation of weights of inactive neurons
 
 	* topo/outputfns/optimized.py 1.45: Changed the optimized output
@@ -1134,12 +1134,12 @@
 	directly accessing _norm_total and has_norm_total
 
 	* topo/base/simulation.py 1.53: Commented out a debug statement at
-	line 745 that caused juge slow down of program because of
-	extremely frequent call to repr function
+	line 745 that caused huge slow down of program because of
+	extremely frequent call to repr function.
 
-	* topo/base/cf.py 1.74: Changed the norm_total property to rather
-	than deleting the _norm_total atribute to use has_norm_total flag
-	to indicate the validity of norm_total
+	* topo/base/cf.py 1.74: Changed the norm_total property so that,
+	rather than deleting the _norm_total atribute, uses a
+	has_norm_total flag to indicate the validity of norm_total
 
 2007-03-16  ceball  <ceball@lodestar.inf.ed.ac.uk>
 
@@ -11248,7 +11248,7 @@
 	declared as OutputFunctionParameter. I added a doc string when
 	needed, that might need to be reviewed. I tried to see in
 	which case this doc string was already inherited, and not
-	added it in such case.
+	added it in such case.
 
 2006-02-19 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
 
@@ -11267,7 +11267,7 @@
 	for Projection: first, ensure that all the projection to the
 	same ProjectionSheet are named differently by raising an error
 	if intenting to do so; second, allow all the projection
-	sharing the same ports to be activated (by removing the
+	sharing the same ports to be activated (by removing the
 	break in the activate method).
 
 	* topo/plotting/plot.py 1.85, topo/plotting/plotgroup.py 1.91:
