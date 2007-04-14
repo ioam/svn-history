@@ -872,12 +872,12 @@ if __name__ != '__main__':
 
 
 
-import Image,ImageOps
-import ImageTk
-import bwidget
+## import Image,ImageOps
+## import ImageTk
+## import bwidget
 
 # Could change to something with tabs to divide up plotlist
-class Gallery(Tkinter.Toplevel):
+##  class Gallery(Tkinter.Toplevel):
 ##     """
 ##     A window displaying information about and allowing execution
 ##     of plotting commands.
