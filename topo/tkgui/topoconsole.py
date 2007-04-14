@@ -531,7 +531,7 @@ class TopoConsole(Tkinter.Tk):
 
         # CB: can probably get an icon on here
         # Also, is the title working?
-        if tkMessageBox.askyesno("Quit Topographica","Quit?"):
+        if tkMessageBox.askyesno("Quit Topographica","Really quit?"):
             self.destroy() 
             if topo.gui_cmdline_flag:
                 print "Quit selected; exiting"
