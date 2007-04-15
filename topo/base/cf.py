@@ -564,8 +564,10 @@ class CFProjection(Projection):
         default=patterngenerator.Constant(),constant=True,
         doc="Define the shape of the connection fields.")
 
-    # CEBALERT: this is temporary (allows c++ matching in certain cases)
-    autosizemask = BooleanParameter(
+    # CEBALERT: this is temporary (allows c++ matching in certain
+    # cases).  We will allow the user to override the mask size, but
+    # by offering a scaling parameter.
+    autosize_mask = BooleanParameter(
         default=True,constant=True,hidden=True,doc="""
         Topographica sets the mask size so that it is the same as the connection field's
         size, unless this parameter is False - in which case the user-specified size of
@@ -665,10 +667,9 @@ class CFProjection(Projection):
     def create_mask_template(self):
         """
         """
-        # CEBALERT: allow user to override this (offer a scaling parameter).
         # Calculate the size & aspect_ratio of the mask if appropriate;
         # mask size set to be that of the weights matrix
-        if hasattr(self.weights_shape, 'size') and self.autosizemask:
+        if hasattr(self.weights_shape, 'size') and self.autosize_mask:
             l,b,r,t = self.bounds_template.lbrt()
             self.weights_shape.size = t-b
             self.weights_shape.aspect_ratio = (r-l)/self.weights_shape.size
