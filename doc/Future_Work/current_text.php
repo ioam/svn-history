@@ -74,9 +74,15 @@ bugfixes for the Reference Manual.
 Update scipy (weave) so that the numpy test deprecation warnings go away.
 
 
-<P>2007/03/02 (CB): update topographica-win
+<P>2007/04/15 (CB): test topographica-win
 Test that results from Windows version match those from the standard
-one. 
+one. The "make compare_oo_or" test is fine. I can't run the other,
+smaller tests of all the networks because the checked in _DATA files
+don't seem to work on Windows. I get "ImportError: no module named
+fixedpoint" during unpickling. Importing fixedpoint works in Windows,
+and I can see it there in site-packages. So there's some confusion
+somewhere, and it could be difficult to solve. This task is about to
+get relegated...
 
 
 <P>2007/04/05 (CB): examples/Makefile -> python
