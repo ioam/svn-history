@@ -272,21 +272,17 @@ class TopoConsole(Tkinter.Tk):
 	self.messageBar.pack(side = BOTTOM,fill=X,padx=4,pady=8)
 	self.messageBar.message('state', 'OK')
 
-
-        # CEBALERT: status bar help for menu items only works on
-        # linux, not on Windows and on OS X.
-        # (Limitation of Tkinter/those platforms.)
-        # Plus: for menu help, have to direct to status bar
-        # (limitation of pmw/tkinter)...this stops pop-up help
-        # for the other widgets.
-
 	### Balloon, for pop-up help
 	self.balloon = Pmw.Balloon(self)
-        # balloon -> status bar
-        # CB: temporarily disabled
-	# self.balloon.configure(statuscommand = self.messageBar.helpmessage)
+
 
 	### Top-level (native) menu bar
+        # (There is no context-sensitive help for the menu because mechanisms
+        #  for implementing it are not available on all platforms. We used to
+        #  have a Pmw Balloon bound to the menu, with its output directed to
+        #  the status bar.)
+
+        # CB: going to replace with standard tkinter code (no Pmw).
 	self.menubar = Pmw.MainMenuBar(self)
                                    #hull_relief = 'raised',
                                    #hull_borderwidth = 1,
@@ -308,15 +304,10 @@ class TopoConsole(Tkinter.Tk):
 
         rf=Label(learning_frame,text='Run for: ')
         rf.pack(side=LEFT)
-        # CB: duplicate help
-        #self.balloon.bind(rf,"Duration to run the simulation when Go is pressed.")
         
         learning_str=StringVar()
         learning_str.set('1.0')
 
-        # CEBHACKALERT: does the busycallback actually work? I don't
-        # see a busy cursor under metacity (the default GNOME window
-        # manager), but I do see one under twm.
         
         self.run_for = TaggedSlider(learning_frame,
                                     tagvariable=learning_str,
@@ -327,6 +318,11 @@ class TopoConsole(Tkinter.Tk):
         self.balloon.bind(self.run_for,"Duration to run the simulation, e.g. 0.0500, 1.0, or 20000.")
         self.run_for.pack(side=LEFT)
 
+
+        # CEBHACKALERT: does the busycallback actually work? I don't
+        # see a busy cursor under metacity (the default GNOME window
+        # manager), but I do see one under twm.
+
         # When return is pressed, the TaggedSlider updates itself...but we also want to run
         # the simulation in this case.
         learning_frame.optional_action=Pmw.busycallback(self.do_learning)
@@ -335,10 +331,6 @@ class TopoConsole(Tkinter.Tk):
                            command=Pmw.busycallback(self.do_learning))
         go_button.pack(side=LEFT)
         
-        # CB: when the balloon help in the main window is 
-        # shown in the status bar, if this line is enabled then the
-        # simulation time is not visible there until the mouse moves
-        # off of the Go button.
         self.balloon.bind(go_button,"Run the simulation for the specified duration.")
 
 
