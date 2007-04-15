@@ -3,39 +3,34 @@
 - check all my tasks from emails are here
 -->
 
-<p>
-This is the developers' to-do list. It's divided into several
-sections, with earlier sections being higher priority than later ones.
-Tasks within each section are also ordered approximately by priority.
+<P> This is the developers' to-do list. There are several sections,
+with earlier ones being higher priority than later ones.  Tasks
+within each section are also ordered approximately by priority.
 
-<li><em>Tasks to be addressed for the upcoming n release</em><br />
+<DL COMPACT>
+<P><DT>Tasks to be addressed for the upcoming n release</DT><DD>
 What the developers are working on most actively right now.
-</li>
 
-<li><em>Tasks to be addressed for the upcoming n+1 release or later</em><br />
+<P><DT>Tasks to be addressed for the upcoming n+1 release or later</DT><DD>
 Tasks that the developers hope to be able to start on after finishing
-their work for the current upcoming release.
-</li>
+their work for the current release.
 
-<li><em>Things we hope to take care of eventually</em><br />
+<P><DT>Things we hope to take care of eventually</DT><DD>
 Tasks of lower priority; if you would like to see one of these tasks
 completed any time soon, please volunteer (even if a developer is
 already assigned)! 
-</li>
 
-<li><em>Ongoing work </em><br />
+<P><DT>Ongoing work</DT><DD>
 Long-term tasks that are underway, and tasks that the developers might
 currently be investigating: work with uncertain finishing times.
-</li>
-</p>
+</DL>
 
-<p>
-By each task, initials in parentheses typically indicate the main
+<P> By each task, initials in parentheses typically indicate the main
 person working on an item, but others may also be involved.  Items
 with no initials are not (yet) assigned to a specific developer (so
-please feel free to volunteer!!!!). Dates indicate the item was first
-added to the list, or a change was made.
-</p>
+please feel free to volunteer!!!!). Dates indicate when the item was
+first added to the list, or a change was made.
+
 
 <H2>Tasks to be addressed for the upcoming 0.9.3 release:</H2>
 
@@ -699,7 +694,7 @@ persistent command histories, easy interaction with the system shell
 session logging.
 
 
-<H4>2007/02/21 (CB): Investigate using Tile<br></H4>
+<H4>2007/02/21 (CB): Investigate using Tile</H4>
 Tile has become part of Tkinter now anyway.  Tile looks good on linux
 and windows (haven't tried mac but screenshots look good). But, Tile
 does not have all the widgets we need yet. Tile uses themes so we can
