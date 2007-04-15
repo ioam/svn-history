@@ -97,7 +97,7 @@ def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None
         data_filename=script+"_DATA"
         
     try:
-        data = pickle.load(open(data_filename,"r"))
+        data = pickle.load(open(data_filename,"rb"))
     except IOError:
         print "\nData file '"+data_filename+"' could not be opened; run GenerateData() to create a data file before making changes to the script you wish to check."
         raise
