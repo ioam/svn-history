@@ -199,19 +199,17 @@ class TopoConsole(Tkinter.Tk):
         self.auto_refresh_panels = []
         self._init_widgets()
         
-        ### Provide window and taskbar icon under Linux and Windows
-        # CB: It may be possible for the icon be in color (using
-        # e.g. topo/tkgui/topo.xpm), see http://www.thescripts.com/forum/thread43119.html
-        # or http://mail.python.org/pipermail/python-list/2005-March/314585.html
-        self.iconbitmap('@'+(os.path.join(topo_dir,'topo/tkgui/topo.xbm')))
-        
-        ### window & taskbar icon under OS X
-        # To get an icon on OS X, we probably have to bundle into an application
-        # package or something like that.
-        # The following code did set some icon on titlebar (just to the left of the title),
-        # but not the 'taskbar' icon:
-        #  self.attributes("-titlepath","/Users/vanessa/topographica/AppIcon.icns")
-        # where AppIcon.icns was some file I found on the computer...
+        ### Window icon
+        if topo.tkgui.system_platform is 'mac':
+            # CB: To get a proper icon on OS X, we probably have to bundle into an application
+            # package or something like that.
+            pass # (don't know anything about the file format required)
+            # self.attributes("-titlepath","/Users/vanessa/topographica/AppIcon.icns")
+        else:
+            # CB: It may be possible for the icon be in color (using
+            # e.g. topo/tkgui/topo.xpm), see http://www.thescripts.com/forum/thread43119.html
+            # or http://mail.python.org/pipermail/python-list/2005-March/314585.html
+            self.iconbitmap('@'+(os.path.join(topo_dir,'topo/tkgui/topo.xbm')))
         
         
         self.title("Topographica Console")
