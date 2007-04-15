@@ -465,9 +465,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
                                            event_info['event'].y_root)
 
 
-    # CEBHACKALERT: something about the dynamic info doesn't work on hierarchical's projection
-    # activity window. Should be fixed before upcoming 0.9.3 release.
-    def __update_dynamic_info(self,event_info):
+    def _update_dynamic_info(self,event_info):
         """
         Update dynamic information.
         """
@@ -593,12 +591,12 @@ class PlotGroupPanel(BasicPlotGroupPanel):
             # an additional method also called to do something specific to the action. I'm sure
             # python has something that lets this be done in a clearer way.
             canvas.bind('<<right-click>>',lambda event: self.__process_canvas_event(event,self._canvas_right_click))
-            canvas.bind('<Motion>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))
+            canvas.bind('<Motion>',lambda event: self.__process_canvas_event(event,self._update_dynamic_info))
 
-            canvas.bind('<Leave>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))
+            canvas.bind('<Leave>',lambda event: self.__process_canvas_event(event,self._update_dynamic_info))
             # When user has a menu up, it's often natural to click elsewhere to make the menu disappear. Need
             # to update the dynamic information in that case. (Happens on OS X anyway, but needed on Win and linux.)
-            canvas.bind('<Button-1>',lambda event: self.__process_canvas_event(event,self.__update_dynamic_info))
+            canvas.bind('<Button-1>',lambda event: self.__process_canvas_event(event,self._update_dynamic_info))
 
 
         
