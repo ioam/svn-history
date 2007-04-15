@@ -48,6 +48,15 @@ class ProjectionActivityPanel(TemplatePlotGroupPanel):
 	self.refresh()
 	
 
+    # CEBALERT! Dynamic info doesn't work on projection activity windows!
+    # e.g. on hierarchical there is an error, on cfsom the dynamic info stops
+    # half way across the plot...
+    # So, dynamic info is disabled for now in proj. act. windows.
+    # This will be easier to fix when the class hierarchy is cleaned up
+    # (if it is still a problem then).
+    def _update_dynamic_info(self,e):
+        self.messageBar.message('state',"")
+
     def _add_region_menu(self):
         """
         This function adds a Sheet: menu that queries the active
