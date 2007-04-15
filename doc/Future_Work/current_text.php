@@ -69,17 +69,6 @@ bugfixes for the Reference Manual.
 Update scipy (weave) so that the numpy test deprecation warnings go away.
 
 
-<H4>2007/04/15 (CB): test topographica-win</H4>
-Test that results from Windows version match those from the standard
-one. The "make compare_oo_or" test is fine. I can't run the other,
-smaller tests of all the networks because the checked in _DATA files
-don't seem to work on Windows. I get "ImportError: no module named
-fixedpoint" during unpickling. Importing fixedpoint works in Windows,
-and I can see it there in site-packages. So there's some confusion
-somewhere, and it could be difficult to solve. This task is about to
-get relegated...
-
-
 <H4>2007/04/15 (CB): plot templates sections</H4>
 Add a section label for each plot template, so that we can categorize
 them in the menus. Categories: maybe Basic, Preference maps, and
@@ -210,6 +199,16 @@ the Slice class and SheetCoordinateSystem (there are several
 simplifications that can be made).  Maybe we can use masked arrays,
 now that Numpy has support for several varieties that might meet our
 needs better than Numeric's did.
+
+
+<H4>2007/04/15 (CB): test topographica-win</H4>
+Test that results from Windows version match those from the standard
+one. The "make compare_oo_or" test is fine. I can't run the other,
+smaller tests of all the networks because the checked in _DATA files
+don't seem to work on Windows. I get "ImportError: no module named
+fixedpoint" during unpickling. Importing fixedpoint works in Windows,
+and I can see it there in site-packages. So there's some confusion
+somewhere, and it could be difficult to solve. 
 
 
 <H4>2006/12/14 (JB): Documentation for the new Numeric </H4>
