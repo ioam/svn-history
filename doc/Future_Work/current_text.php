@@ -80,6 +80,14 @@ somewhere, and it could be difficult to solve. This task is about to
 get relegated...
 
 
+<H4>2007/04/15 (CB): plot templates sections</H4>
+Add a section label for each plot template, so that we can categorize
+them in the menus. Categories: maybe Basic, Preference maps, and
+Curves? Link to help. Add a page about plots to the User Manual
+explaining both the current plots and showing how easy it is to add
+new one.
+
+
 <H4>2007/04/05 (CB): examples/Makefile -> python</H4>
 Migrate examples/Makefile to python script. Then, Windows users
 can follow the tutorial instructions. 
@@ -124,6 +132,7 @@ We also need to document .topographicarc somewhere, and tuning curve plots.
 
 
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
+
 
 <H4>2007/04/10 (JB): Add an example that is a good starting point for</H4>
 wrapping an external simulation as a Sheet in Topographica.  A
