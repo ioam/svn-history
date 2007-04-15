@@ -195,7 +195,7 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 # topographica sizes the mask (c++ lissom and topographica are the
 # same for certain values of r_L, but topographica makes the mask size
 # match the actual connectionfield in general).
-SharedWeightCFProjection.autosizemask=False
+SharedWeightCFProjection.autosize_mask=False
 SharedWeightCFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0,
                                                                 size=2.0*r_L/BaseLN)
 
