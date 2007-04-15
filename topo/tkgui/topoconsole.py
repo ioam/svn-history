@@ -318,17 +318,12 @@ class TopoConsole(Tkinter.Tk):
         self.balloon.bind(self.run_for,"Duration to run the simulation, e.g. 0.0500, 1.0, or 20000.")
         self.run_for.pack(side=LEFT)
 
-
-        # CEBHACKALERT: does the busycallback actually work? I don't
-        # see a busy cursor under metacity (the default GNOME window
-        # manager), but I do see one under twm.
-
         # When return is pressed, the TaggedSlider updates itself...but we also want to run
         # the simulation in this case.
-        learning_frame.optional_action=Pmw.busycallback(self.do_learning)
+        learning_frame.optional_action=self.do_learning
 
         go_button = Button(learning_frame,text="Go",
-                           command=Pmw.busycallback(self.do_learning))
+                           command=self.do_learning)
         go_button.pack(side=LEFT)
         
         self.balloon.bind(go_button,"Run the simulation for the specified duration.")
@@ -377,7 +372,9 @@ class TopoConsole(Tkinter.Tk):
         ### Make a ComboBox (command_entry) for entering commands.
         self.command_entry=InterpreterComboBox(cw,autoclear=1,history=1,dropdown=1,
                                                label_text='>>> ',labelpos='w',
-                                               selectioncommand=Pmw.busycallback(self.exec_cmd))
+                                               # CB: if it's a long command, the gui obviously stops responding.
+                                               # On OS X, a spinning wheel appears. What about linux and win?
+                                               selectioncommand=self.exec_cmd)
         
         self.balloon.bind(self.command_entry,
              """Accepts any valid Python command and executes it in main as if typed at a terminal window.""")
