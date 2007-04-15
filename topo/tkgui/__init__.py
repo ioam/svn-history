@@ -14,15 +14,29 @@ import Pmw, sys, Tkinter, platform
 import topo.base.parameterizedobject
 import topoconsole
 
-# CB: I think we should setup some named font instances here
-# to use throughout tkgui, and avoid all the various local
-# specifications (which will become very tedious to maintain).
-# Doing this will give other advantages, too, like maybe allowing
-# a user to say "make all the fonts a bit bigger", and so on.
+#### notes about tkgui ####
 #
+## Fonts
+# I think we should setup some named font instances here to use
+# throughout tkgui, and avoid all the various local specifications
+# (which will become very tedious to maintain).  Doing this will give
+# other advantages, too, like maybe allowing a user to say "make all
+# the fonts a bit bigger", and so on.
 # Some font links:
 # http://www.pythonware.com/library/tkinter/introduction/x444-fonts.htm
 # http://www.astro.washington.edu/owen/ROTKFolklore.html
+#
+## Geometry management
+# In several places we use pack() when grid() would probably be
+# simpler. Check you know which fits a task better rather than copying
+# existing code.
+#
+## Pmw
+# Not being maintained, and incompatible with some improvements to
+# tk (like Tile). Everything we use from Pmw is available from
+# other packages (like bwidget, Tix, etc). So maybe try to avoid
+# adding more Pmw.
+#
 
 
 

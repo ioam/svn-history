@@ -178,6 +178,8 @@ class PlotsMenuEntry(ParameterizedObject):
 # attributes. There are probably other things we want the windows to
 # share, too.
 
+#class TopoWindow
+
 class TopoConsole(Tkinter.Tk):
     """
     Main window for the Tk-based GUI.
@@ -832,37 +834,6 @@ class TopoConsole(Tkinter.Tk):
         self.messageBar.message('state', message)
 
         
-
-
-# CB: Some notes about tkgui
-# 
-# All our windows that open from topoconsole inherit from Frame.  I'm
-# a bit confused about why we do that, instead of using Toplevel.
-# Using Toplevel seems more natural to me. There won't be so many
-# references to a mysterious parent everywhere, for one thing.
-# (From the web, I find that at least 1 person agrees with this:
-# http://www.thescripts.com/forum/thread492532.html)
-#
-# (same guy?
-# http://mail.python.org/pipermail/python-list/2005-July/330613.html
-# )
-# We have too many frames everywhere! It's difficult to keep track
-# of what's going on...
-#
-# I also think that TopoConsole should not inherit from Frame, but
-# should inherit from Tk.  After all, topoconsole is the main application
-# window.
-#
-# Along with sorting out all the various refresh() methods that we
-# have, fixing these things might be worthwhile in that programming
-# tkgui could become less confusing (that is, once you understand 
-# tkgui itself - which is something else that needs fixing...).
-#
-#
-# Is Pmw being maintained anymore? Is there a suitable replacement?
-
-
-
 
 if __name__ != '__main__':
     plotpanel_classes['Connection Fields'] = ConnectionFieldsPanel
