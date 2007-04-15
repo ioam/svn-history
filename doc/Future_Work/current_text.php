@@ -39,16 +39,16 @@ added to the list, or a change was made.
 
 <H2>Tasks to be addressed for the upcoming 0.9.3 release:</H2>
 
-<P>2007/02/20 (JB): Errata before release
+<H4>2007/02/20 (JB): Errata before release</H4>
 - update Changelog.txt, summarize major changes in it for the release
-notes
+notes<br>
 - make a pass through the documentation to fix anything that is not up
 to date (especially things related to Numpy support and to describe
-new features)
-- build on the various platforms, etc.
+new features)<br>
+- build on the various platforms, etc.<br>
 
 
-<P>2007/03/28 (?): Update tutorial<BR>
+<H4>2007/03/28 (?): Update tutorial</H4>
 Update the lissom_oo_or tutorial page to match changes in the GUI and
 elsewhere.  E.g. we can mention the right-click menus, how to use the
 dynamic info to see the coordinate systems and numeric values, how to
@@ -56,7 +56,7 @@ start and stop training, and add sections about plotting 'Orientation
 tuning fullfield' tuning curves and FFTs.
 
 
-<P>2007/03/28 (JB): Using new SOM support<BR>
+<H4>2007/03/28 (JB): Using new SOM support</H4>
 Finish converting som_retinotopy.ty and obermayer_pnas90.ty to use the
 new simpler and faster SOM support as in cfsom_or.ty, and delete all
 of the old SOM support.  Requires checking that the som_retinotopy.ty
@@ -65,16 +65,16 @@ the examples handle exponential decay of parameter values, so that
 they are good starting points.
 
 
-<P>2007/02/20 (JB): Upgrade epydoc <BR>
+<H4>2007/02/20 (JB): Upgrade epydoc </H4>
 Update to the current SVN version to incorporate recent changes and
 bugfixes for the Reference Manual.
 
 
-<P>2007/04/10: update weave<BR>
+<H4>2007/04/10: update weave</H4>
 Update scipy (weave) so that the numpy test deprecation warnings go away.
 
 
-<P>2007/04/15 (CB): test topographica-win<BR>
+<H4>2007/04/15 (CB): test topographica-win</H4>
 Test that results from Windows version match those from the standard
 one. The "make compare_oo_or" test is fine. I can't run the other,
 smaller tests of all the networks because the checked in _DATA files
@@ -85,23 +85,23 @@ somewhere, and it could be difficult to solve. This task is about to
 get relegated...
 
 
-<P>2007/04/05 (CB): examples/Makefile -> python<BR>
+<H4>2007/04/05 (CB): examples/Makefile -> python</H4>
 Migrate examples/Makefile to python script. Then, Windows users
 can follow the tutorial instructions. 
 
 
-<P>2007/04/04 (CB): Dynamic text<BR>
+<H4>2007/04/04 (CB): Dynamic text</H4>
 Projection activity window gives some error around edges of plot.
 
 
-<P>2007/04/12 (CB): Rename autosizemask<BR>
+<H4>2007/04/12 (CB): Rename autosizemask</H4>
 And change comment about being temporary.
 
 
-<P>2007/04/12 (CB): Update mlabwrap<BR>
+<H4>2007/04/12 (CB): Update mlabwrap</H4>
   
 
-<P>2007/03/28 (?): Figure out where to put this info in the docs:<BR>
+<H4>2007/03/28 (?): Figure out where to put this info in the docs:</H4>
 <blockquote>
 If you often need to change the parameters for map or curve measurement,
 then you can do that easily without modifying your copy of
@@ -130,14 +130,14 @@ We also need to document .topographicarc somewhere, and tuning curve plots.
 
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
 
-<P>2007/04/10 (JB): Add an example that is a good starting point for<BR>
+<H4>2007/04/10 (JB): Add an example that is a good starting point for</H4>
 wrapping an external simulation as a Sheet in Topographica.  A
 first pass wrapping a spiking retina simulation written in PyNN/PyNEST
 was done at the FACETS CodeJam in March 2007, but a cleaner example
 can be made.
 
 
-<P>2007/04/05 (CB): scrollbars on plotgrouppanel windows<BR>
+<H4>2007/04/05 (CB): scrollbars on plotgrouppanel windows</H4>
 Add scrollbars when not auto-resizing (and ideally even when
 auto-resizing but the window would otherwise be larger than the
 screen).
@@ -145,17 +145,17 @@ Currently disabled, since they seem to have strange behavior.
 Consider not using Pmw's scrolledframe component.
 
 
-<P>2006/03/26 (CB): scheduled_actions in lissom examples<BR>
+<H4>2006/03/26 (CB): scheduled_actions in lissom examples</H4>
 Insert missing actions in case someone tries higher densities.
 
 
-<P>2007/01/25 (CB): ParametersFrame ok/apply/reset/cancel<BR>
+<H4>2007/01/25 (CB): ParametersFrame ok/apply/reset/cancel</H4>
 Set order and names of ParametersFrame's Ok, Apply, Cancel, Reset, and
 Defaults buttons, and make them behave as expected for classes and
 instances.  Figure out and clean up translator_dictionary & its uses.
 
 
-<P>2007/03/26 (CB): minor tkgui cleanup<BR>
+<H4>2007/03/26 (CB): minor tkgui cleanup</H4>
 - Simplify tkgui, eliminating extra frames and any unnecessary
 refresh() etc methods. At the moment, the complexity makes it 
 difficult to add new features to the GUI and to correct problems.
@@ -166,17 +166,17 @@ space (fill=X ?) (e.g. in parameters frames sliders etc should
 expand).
 
 
-<P>2007/04/13 (CB): make compare tests<BR>
+<H4>2007/04/13 (CB): make compare tests</H4>
 Checkin some data for the make compare_or test.
 
 
-<P>2007/03/29 (CB): Makefiles to python scripts<BR>
+<H4>2007/03/29 (CB): Makefiles to python scripts</H4>
 Control tests from a python file rather than the Makefile.  Can then include
 more tests of examples, by specifying sheet to look at etc.  And importantly,
 can easily run tests on Windows version.
 
 
-<P>2007/03/26 (CB): Support for optimization  <BR>
+<H4>2007/03/26 (CB): Support for optimization  </H4>
 Do we need our own simple timing functions to make it easier for users
 to optimize their components (as opposed to the overall Topographica
 framework, for which the current profile() commands are appropriate)?
@@ -186,20 +186,20 @@ doing optimization, focusing on the components we expect to be the
 bottlenecks. Add general advice for optimization to the manual pages.
 
 
-<P>2007/03/26 (CB): developer page about efficient array computations.<BR>
+<H4>2007/03/26 (CB): developer page about efficient array computations.</H4>
 Measurement of numpy.sum(X)/X.sum()/sum(X) performance. Difference
 between simulation results on different platforms (for slow-tests in
 Makefile).
 
 
-<P>2007/03/27 (CB): abstract classes<BR>
+<H4>2007/03/27 (CB): abstract classes</H4>
 given how private attributes work in Python, it seems like we can just
 have a parameter __abstract_class=True for abstract classes, and then
 __is_abstract can check to see if there is such an attribute (and that
 it is True, just in case).
 
 
-<P>2007/03/29 (CB): connectionfield/slice/sheetcoords<BR>
+<H4>2007/03/29 (CB): connectionfield/slice/sheetcoords</H4>
 HACKALERTs relating to connection fields; test file for
 connectionfield; cleaning up cf.py and projections/basic.py along with
 the Slice class and SheetCoordinateSystem (there are several
@@ -208,12 +208,12 @@ now that Numpy has support for several varieties that might meet our
 needs better than Numeric's did.
 
 
-<P>2006/12/14 (JB): Documentation for the new Numeric <BR>
+<H4>2006/12/14 (JB): Documentation for the new Numeric </H4>
 It's not free. But we could document differences from the current
 Numeric documentation for our users, as we find these differences.
 
 
-<P>2006/11/09 (CP): Add automatic assignment of topo.sim.name<BR>
+<H4>2006/11/09 (CP): Add automatic assignment of topo.sim.name</H4>
 Take the base name of the first .ty file in sys.argv (if any).  Also
 should clean up how the window titles are initialized, so that it is
 done after a .ty script is loaded (whether on the initial command line
@@ -221,51 +221,51 @@ or from the GUI).  (Right now the name is updated only when a window
 is first opened, or when learning is done in the topoconsole.)
 
 
-<P>2006/07/07 (CP): Fix normalization to allow negative weights.  <BR>
+<H4>2006/07/07 (CP): Fix normalization to allow negative weights.  </H4>
 Also consider adding other normalization options, including joint
 normalization across all plots with the same name.
 
 
-<P>2006/11/09 (JL): better saving during batch runs<BR>
+<H4>2006/11/09 (JL): better saving during batch runs</H4>
 Support better saving of results during long batch runs
 (e.g. orientation maps and other plots).
 
 
-<P>2006/11/09 (CP/JL): Add support for measuring receptive fields<BR>
+<H4>2006/11/09 (CP/JL): Add support for measuring receptive fields</H4>
 Perhaps use STRFPAK or a similar approach.
 
 
-<P>2006/11/09 (CP?): plot outstar connections<BR>
+<H4>2006/11/09 (CP?): plot outstar connections</H4>
 Add support for plotting outstar connections, i.e. outgoing
 ConnectionFields.
 
 
-<P>2006/11/09 (RZ): map statistics<BR>
+<H4>2006/11/09 (RZ): map statistics</H4>
 Add support for automatic generation of reports with statistics about
 maps, e.g. for estimating perceived quantities.
 
 
-<P>2006/11/09 (JA): optimizations from c++<BR>
+<H4>2006/11/09 (JA): optimizations from c++</H4>
 Need to implement more of the optimizations from the C++ LISSOM code.
 
 
-<P>2006/05/24 (JB): Problems with examples/joublin_bc96.ty<BR>
+<H4>2006/05/24 (JB): Problems with examples/joublin_bc96.ty</H4>
 Strange Projection plots.
 
 
 <H2>Things we hope to take care of eventually</H2>
 
-<P>2007/03/29 (CB): tidy up c++ lissom matching<BR>
+<H4>2007/03/29 (CB): tidy up c++ lissom matching</H4>
 Set c++ lissom params so that topographica doesn't have to set ganglia
 weight mask specially. Generalize oo_or_map_topo.params.
 
 
-<P>2007/03/26 (CB): right-click menus<BR>
+<H4>2007/03/26 (CB): right-click menus</H4>
 Tidy code, then make it possible to add things to the menu without
 changing the tkgui files, like the templates work for activity plots.
 
 
-<P>2007/03/26 (CB): PatternGeneratorParameter default value<BR>
+<H4>2007/03/26 (CB): PatternGeneratorParameter default value</H4>
 Investigate why this:
 "
 from topo.base.patterngenerator import PatternGeneratorParameter
@@ -275,23 +275,23 @@ gives errors about being read only sometimes. (Try at
 the commandline, from a script, and saving/loading snapshots.)
 
 
-<P>2007/02/28 (CB): OneDPowerSpectrum & Audio PatternGenerators<BR>
+<H4>2007/02/28 (CB): OneDPowerSpectrum & Audio PatternGenerators</H4>
 Finish the two classes. Make a demo with Audio Currently don't work
 with test pattern window because plotting expects 2d arrays.
 
 
-<P>2007/03/30 (CB): PatternGenerator, PatternGenerator2D<BR>
+<H4>2007/03/30 (CB): PatternGenerator, PatternGenerator2D</H4>
 Have a second abstract class so that the base PatternGenerator is
 simpler.
 
 
-<P>2007/03/26: wrap MDP<BR>
+<H4>2007/03/26: wrap MDP</H4>
 Add a wrapper around the Modular Data Processing (MDP) toolkit
 (http://mdp-toolkit.sourceforge.net) to provide easy access to the
 PCA, ICA, SFA, ISFA, etc. algorithms.
 
 
-<P>2007/02/23: which version of libraries is numpy using?<BR>
+<H4>2007/02/23: which version of libraries is numpy using?</H4>
 <pre>
 - numpy.__config__.show()
 - warn users if they're using a slow version?
@@ -305,7 +305,7 @@ PCA, ICA, SFA, ISFA, etc. algorithms.
 </pre>
 
 
-<P>2006/02/04 (JAB): tune non-inline-optimtized components<BR>
+<H4>2006/02/04 (JAB): tune non-inline-optimtized components</H4>
 Should work through some of the most commonly used
 non-inline-optimized components to see if the implementation can be
 tuned slightly for better performance.  For instance, numpy.dot()
@@ -337,17 +337,17 @@ much faster the inline-optimized components are than those using numpy
 primitives.
 
 
-<P>2006/11/09 (JA?): overhaul tkgui<BR>
+<H4>2006/11/09 (JA?): overhaul tkgui</H4>
 Need to do a general overhaul of the GUI; it needs to be clean and
 well designed so that it can be flexible. Before any such overall,
 review the available graphics toolkits (e.g. wxpython vs tkinter).
 
 
-<P>2006/11/09 (JL?): parameter spaces<BR>
+<H4>2006/11/09 (JL?): parameter spaces</H4>
 Add better support for exploring and optimizing parameter spaces.
 
 
-<P>2006/12/21: lock to real time?<BR>
+<H4>2006/12/21: lock to real time?</H4>
 Could add an option to lock Topographica to real time, so that once
 processing is done at a particular virtual time, it waits until the
 next real time before moving to the next event (which may be different
@@ -359,7 +359,7 @@ from that, as fast as it can compute.  Worth thinking about, e.g. to
 handle simple webcam input.
 
 
-<P>2006/06/03: zero-sized CFs<BR>
+<H4>2006/06/03: zero-sized CFs</H4>
 Allow min_matrix_radius to be set to zero, and then say that if no
 unit ends up in the CF, then there will be no CF for that unit.  But
 that's going to make the rest of the code hard to write, because we'll
@@ -370,7 +370,7 @@ use a non-zero CF size, but with a mask making no unit visible; not
 sure.
 
 
-<P>2006/05/19: pychecker<BR>
+<H4>2006/05/19: pychecker</H4>
 look at the output from:
 bin/python lib/python2.4/site-packages/pychecker/checker.py topo/base/*.py
 Decide which ones of the messages are real problems.  Running it
@@ -385,7 +385,7 @@ understanding.  Once that's done for base/, the rest should be much
 easier.
 
 
-<P>2006/06/19 (JB): Number, DynamicNumber<BR>
+<H4>2006/06/19 (JB): Number, DynamicNumber</H4>
 - Need to replace the current implementation with one where Number has a
 'dynamic' slot that can be turned on or off, so that any Number could
 be dynamic.  Includes making sure something sensible happens in model
@@ -394,48 +394,48 @@ editor, and (eventually) making it possible to set their values and
 - Need to make sure DynamicNumbers are advanced only once per simulation time.
 
 
-<P>2006/05/15: array type<BR>
+<H4>2006/05/15: array type</H4>
 All arrays should be numpy.float32
 
 
-<P>2006/05/15: name should be constant<BR>
+<H4>2006/05/15: name should be constant</H4>
 Objects in the simulation are indexed by name, so name needs to be a
 constant Parameter (which <i>might</i> cause some other problems).
 There are some related hacks in ParametersFrame that would also need
 to be cleaned up.
 
 
-<P>2006/04/20: unit tests<BR>
+<H4>2006/04/20: unit tests</H4>
 Need to be cleaned up so they run correctly. For example, many of the
 tests in testsheet.py run twice - correct that.  See CEBALERT in
 topo/tests/testsheet.py.
 
 
-<P>2006/04/20 (JB): Composite & Image test files.<BR>
+<H4>2006/04/20 (JB): Composite & Image test files.</H4>
 Complete test file for Composite and Image.  investigate failing test
 in testimage.py (that uses sheet functions).  Currently commented out;
 may not be a problem.
 
 
-<P>2006/02/24: SheetSelectorParameter etc <BR>
+<H4>2006/02/24: SheetSelectorParameter etc </H4>
 So that the GUI (model editor) can display list of sheet classes etc
 from a Parameter.
 
 
-<P>2006/02/24 (JB): ClassSelectorParameter<BR>
+<H4>2006/02/24 (JB): ClassSelectorParameter</H4>
 find_classes_in_package() will become a method of ClassSelectorParameter. 
 
 
-<P>2006/02/21: ReadOnlyParameter<BR>
+<H4>2006/02/21: ReadOnlyParameter</H4>
 To allow declaration of something but not let it be set anywhere else,
 even in a ParameterizedObject constructor.
 
 
-<P>2006/02/21 (JB): Parameters: remove 'hidden' attribute<BR>
+<H4>2006/02/21 (JB): Parameters: remove 'hidden' attribute</H4>
 Instead use (e.g. negative) precendence.
 
 
-<P>2006/02/21 (JB): PatternGenerator parameters<BR>
+<H4>2006/02/21 (JB): PatternGenerator parameters</H4>
 Have size and aspect_ratio Parameters in PatternGenerator so that
 subclasses can inherit doc, precedence attributes (etc), but have them
 not used unless a subclass does really use them.  It might be better
@@ -444,11 +444,11 @@ together all patterns using those parameters, which shouldn't be too
 hard.
 
 
-<P>2006/03/07 (JL): change_bounds()<BR>
+<H4>2006/03/07 (JL): change_bounds()</H4>
 make change_bounds() able to enlarge as well as shrink 
 
 
-<P>2006/06/19: things not to pickle<BR>
+<H4>2006/06/19: things not to pickle</H4>
 e.g. Filename's search_paths attribute shouldn't be pickled.
 Presumably there will be other such items, so should objects have a
 standard attribute/parameter that lists attributes not to pickle? Or
@@ -456,22 +456,22 @@ something like that.  Otherwise, save_snapshot and load_snapshot could
 specifically avoid items.
 
 
-<P>2005/01/01: unit test results on the web<BR>
+<H4>2005/01/01: unit test results on the web</H4>
 Could add a web site with results of unit tests, updated nightly
 
 
-<P>2005/01/01: components from external packages <BR>
+<H4>2005/01/01: components from external packages </H4>
 Could consider using or taking components from: SciPy,
 ScientificPython, Chaco, Pyro (the robotics package), g, logger
 (instead of our custom messaging functions).
 
 
-<P>2005/01/01: noise<BR>
+<H4>2005/01/01: noise</H4>
 Should add support for additive or multiplicative noise, with many
 possible places it could be added.
 
 
-<P>2005/01/01: grouping sheets for plotting<BR>
+<H4>2005/01/01: grouping sheets for plotting</H4>
 Add a mechanism to group Sheets into a logical unit for plotting,
 analysis, etc.  For instance, it should be possible to group three
 R,G,B sheets into one eye, two ON and OFF sheets into one LGN area,
@@ -483,7 +483,7 @@ subtraction), and measuring a vertically summed orientation map for a
 model using several layers.
 
 
-<P>2005/01/01: porting other simulations from c++ lissom<BR>
+<H4>2005/01/01: porting other simulations from c++ lissom</H4>
 Finish porting all categories of simulations from parts II and III of
 the LISSOM book (i.e. orientation maps, ocular dominance maps,
 direction maps, combined maps, face maps, and two-level maps) to
@@ -648,50 +648,50 @@ To figure out:
 
 <H2>Ongoing work</H2>
 
-<P>2006/04/10 (CB): optional external packages on platforms other than linux<BR>
+<H4>2006/04/10 (CB): optional external packages on platforms other than linux</H4>
 Optional packages (e.g. mlabwrap, pyaudio) on Windows and OS X.
 
 
-<P>2006/02/23 (all): Making more things be Parameters<BR>
+<H4>2006/02/23 (all): Making more things be Parameters</H4>
 And writing doc strings at the same time. E.g. the x and y widgets in
 the Unit Weights window can be Numbers with bounds, etc.
 
 
-<P>2006/02/23 (all): ensuring classes are declared abstract if they are abstract<BR>
+<H4>2006/02/23 (all): ensuring classes are declared abstract if they are abstract</H4>
 Plus making sure base and simple classes are imported into packages
 (i.e. Sheet into topo/sheets/, Projection into topo/projections/,
 Constant into topo/patterns/, and so on).
 
 
-<P>2006/02/21: read-only objects<BR>
+<H4>2006/02/21: read-only objects</H4>
 Might someday be interesting to have read-only objects, aiming at
 copy-on-write semantics, but this seems quite difficult to achieve in
 Python.
 
 
-<P>2006/02/21 (all): documentation, unit tests<BR>
+<H4>2006/02/21 (all): documentation, unit tests</H4>
 Improving both, plus eliminating ALERTs.
 
 
-<P>2007/03/26 (CB): Build topographica on windows <BR>
+<H4>2007/03/26 (CB): Build topographica on windows </H4>
 With free compiler (python for windows is built with a Microsoft
 compiler). Maybe use pymingw? Or cygwin? Currently trying cygwin, with
 some success.
 
 			     
-<P>2007/03/14 (CB): gnosis.xml.pickle <BR>
+<H4>2007/03/14 (CB): gnosis.xml.pickle </H4>
 Needs to be updated for numpy. I'm working with module's author at the
 moment.
 
 
-<P>2007/03/14 (CB): building scipy<BR>
+<H4>2007/03/14 (CB): building scipy</H4>
 how to build scipy without requiring any of the external linear
 algebra libraries, etc? Then scipy would at least build easily, and
 users could install the optimized versions if they wished.
 Investigate garnumpy.
 
 
-<P>2007/02/26: Consider moving to IPython<BR>
+<H4>2007/02/26: Consider moving to IPython</H4>
 Would get command-prompt completion in the local namespace, debugging
 in the namespace of the exception, with easier to follow tracebacks,
 persistent command histories, easy interaction with the system shell
@@ -699,7 +699,7 @@ persistent command histories, easy interaction with the system shell
 session logging.
 
 
-<P>2007/02/21 (CB): Investigate using Tile<br><BR>
+<H4>2007/02/21 (CB): Investigate using Tile<br></H4>
 Tile has become part of Tkinter now anyway.  Tile looks good on linux
 and windows (haven't tried mac but screenshots look good). But, Tile
 does not have all the widgets we need yet. Tile uses themes so we can
