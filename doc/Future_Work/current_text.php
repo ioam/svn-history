@@ -82,14 +82,6 @@ Migrate examples/Makefile to python script. Then, Windows users
 can follow the tutorial instructions. 
 
 
-<H4>2007/04/04 (CB): Dynamic text</H4>
-Projection activity window gives some error around edges of plot.
-
-
-<H4>2007/04/12 (CB): Rename autosizemask</H4>
-And change comment about being temporary.
-
-
 <H4>2007/04/12 (CB): Update mlabwrap</H4>
   
 
@@ -157,6 +149,10 @@ what to do about them, and then start doing them.
 - Which widgets should expand (expand=YES ?), which should fill the
 space (fill=X ?) (e.g. in parameters frames sliders etc should
 expand).
+
+
+<H4>2007/04/15 (CB): Dynamic text</H4>
+Doesn't work properly for projection activity windows (see ALERT).
 
 
 <H4>2007/04/13 (CB): make compare tests</H4>
