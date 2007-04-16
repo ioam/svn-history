@@ -35,11 +35,13 @@ import topo.patterns.basic
 import topo.base.patterngenerator
 
 import numpy
-from numpy.oldnumeric import argmax, ones, Float
+from numpy import argmax, ones, exp
+from numpy.oldnumeric import Float
 
 from topo.patterns.basic import Gaussian
-from topo.base.arrayutils import exp, L2norm
+from topo.base.arrayutils import L2norm
 from topo.base.cf import ConnectionField, CFPLearningFn, CFPLF_Identity, CFProjection, CFPResponseFn, CFSheet
+from topo.base.cf import MaskedCFIter
 from topo.base.functionfamilies import DotProduct, ResponseFnParameter, LearningFn
 from topo.base.functionfamilies import OutputFn, OutputFnParameter, IdentityOF
 from topo.base.parameterclasses import DynamicNumber, Number
@@ -56,7 +58,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.inlinec import inline, optimized
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.patternfns import gaussian
-
+    
 topo.sim.name = "joublin_bc96"
 
 # Specified explicitly when creating weights matrix - required
@@ -188,7 +190,7 @@ class RCells_CFProjection(CFProjection):
     def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
-        self.response_fn(self.cfs, input_activity, self.activity, self.strength)
+        self.response_fn(MaskedCFIter(self), input_activity, self.activity, self.strength)
         
         # Local competition
         feedforward_influence = numpy.array(self.activity)
@@ -219,12 +221,12 @@ class RCells_CFProjection(CFProjection):
         """
         # Learning is performed if the input_buffer has already been set,
         # i.e. there is an input to the Projection.
-        if self.input_buffer:
+        if self.input_buffer != None:
             if self.rcells_learn == 1:
                 totalSimTime = float(self.dest.simulation.time())
                 self.neighborhood_sigma = self.neighborhood_sigma0 / (1.0 + totalSimTime/self.neighborhood_time_constant)
                 self.learning_rate = self.learning_rate0 / (1.0 + totalSimTime/self.learning_time_constant)
-                self.learning_fn(self.cfs,self.input_buffer,self.activity,self.learning_rate)
+                self.learning_fn(MaskedCFIter(self),self.input_buffer,self.activity,self.learning_rate)
                 #print "R-Cells finish learning"
 
 
@@ -274,58 +276,79 @@ class RCells_CFPRF_DotProduct_Norm_opt(CFPResponseFn):
     
     single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)    
 
-    def __call__(self, cfs, input_activity, activity, strength, **params):
+    def __call__(self, iterator, input_activity, activity, strength, **params):
         temp_act = activity
         rows,cols = activity.shape
-        len, len2 = input_activity.shape
+        irows,icols = input_activity.shape
         X = input_activity.ravel()
+        cfs = iterator.proj._cfs
+        mask = iterator.proj.dest.mask.data
     
         code = """
             #include <math.h>
             double *tact = temp_act;
+	    float *wj;
+	    PyArrayObject *array;
+
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
 		for (int l=0; l<cols; ++l) {
-                    PyObject *cf = PyList_GetItem(cfsr,l);
-                    PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
-                    PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
-
-                    float *wj = (float *)(((PyArrayObject*)weights_obj)->data);
-                    int *slice = (int *)(((PyArrayObject*)slice_obj)->data);
-                    
-                    int rr1 = *slice++;
-                    int rr2 = *slice++;
-                    int cc1 = *slice++;
-                    int cc2 = *slice;
-		    double tot = 0.0;
-                    double norm = 0.0;    // the normalization factor
-		    double *xj = X+len*rr1+cc1;
-
-                    // computes the dot product
-		    for (int i=rr1; i<rr2; ++i) {
-                        double *xi = xj;
-			float *wi = wj;                       
-			for (int j=cc1; j<cc2; ++j) {
-                            tot += *wi * *xi;
-                            norm += *xi * *xi;
-                            ++wi;
-                            ++xi;
+                    if((*mask++) == 0.0)
+                        *tact = 0;
+                    else {
+                        PyObject *cf = PyList_GetItem(cfsr,l);
+                        PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
+                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
+                        
+                        // This code is optimized for contiguous arrays, which are typical,
+                        // but we make it work for noncontiguous arrays (e.g. views) by
+                        // creating a contiguous copy if necessary.
+                        array=0;
+                        if(PyArray_ISCONTIGUOUS((PyArrayObject*)weights_obj))
+                            wj = (float *)(((PyArrayObject*)weights_obj)->data);
+                        else {
+                            array = (PyArrayObject*) PyArray_ContiguousFromObject(weights_obj,PyArray_FLOAT,2,2);
+                            wj = (float *) array->data;
                         }
-                        xj += len;
-			wj += cc2-cc1;
+                        int *slice = (int *)(((PyArrayObject*)slice_obj)->data);
+                        
+                        
+                        int rr1 = *slice++;
+                        int rr2 = *slice++;
+                        int cc1 = *slice++;
+                        int cc2 = *slice;
+		        double tot = 0.0;
+                        double norm = 0.0;    // the normalization factor
+		        double *xj = X+icols*rr1+cc1;
+                        
+                        // computes the dot product
+		        for (int i=rr1; i<rr2; ++i) {
+                            double *xi = xj;
+		            float *wi = wj;                       
+		            for (int j=cc1; j<cc2; ++j) {
+                                tot += *wi * *xi;
+                                norm += *xi * *xi;
+                                ++wi;
+                                ++xi;
+                            }
+                            xj += icols;
+		            wj += cc2-cc1;
+                        }
+                        tot = tot/sqrt(norm);    // normalize the total activity
+                        *tact = tot*strength;
+                        ++tact;
+                        
+                        // Anything obtained with PyObject_GetAttrString must be explicitly freed
+                        Py_DECREF(weights_obj);
+                        Py_DECREF(slice_obj);
+                        if(array != 0)
+                            Py_DECREF(array);
                     }
-                    tot = tot/sqrt(norm);    // normalize the total activity
-                    *tact = tot*strength;
-                    ++tact;
-
-                    // Anything obtained with PyObject_GetAttrString must be explicitly freed
-                    Py_DECREF(weights_obj);
-                    Py_DECREF(slice_obj);
                 }
             }
         """
     
-        inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
+        inline(code, ['mask', 'X', 'strength', 'icols', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 if not optimized:
     RCells_CFPRF_DotProduct_Norm_opt = RCells_CFPRF_DotProduct_Norm
