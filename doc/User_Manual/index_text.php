@@ -1,9 +1,8 @@
-<P>Although the relevant information is available in the reference
-manual, with the tutorial as a guide, it can be difficult to figure
-out the underlying principles and appropriate way to use Topographica.
-To clarify these issues, a detailed user manual is currently under
-development (as of 11/2006), and will be posted here when it is
-usable.  Sections that are ready so far include:
+<P>The Topographica user manual gives an overview of Topographica's
+structure and explains importaing concepts and features from a user
+perspective.  This information complements the complete and detailed
+component-level information in the reference manual, as well as the
+step-by-step explanations in the tutorials.
 
 <P>
 <A HREF="introduction.html">Introduction</A><BR>
@@ -16,3 +15,9 @@ usable.  Sections that are ready so far include:
 <A HREF="patterns.html">Generating patterns</A><BR>
 <A HREF="publishing.html">Publishing results from Topographica</A><BR>
 <A HREF="about.html">About Topographica</A><BR>
+
+<P>Please note that the user manual is not a complete reference to all
+available functionality, so that we can focus on the main ideas.  If
+there is a topic that you would like to see covered in the user
+manual, please contact us or contribute an initial sketch of that
+section.
