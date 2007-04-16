@@ -11,7 +11,7 @@ Work in progress - form of Activity_dependent response function needs to be refi
 
 import numpy
 import copy
-from numpy.oldnumeric import sum,ones,exp
+from numpy import exp
 import numpy.oldnumeric.random_array as RandomArray
 import fixedpoint
 

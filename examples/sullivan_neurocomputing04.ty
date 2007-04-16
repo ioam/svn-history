@@ -36,7 +36,7 @@ from topo.misc.patternfns import line
 
 
 from math import pi, sin, cos
-from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
+from numpy import sin,add
 
 from topo.base.parameterclasses import Number, Parameter, Enumeration
 from topo.base.parameterclasses import DynamicNumber, ListParameter

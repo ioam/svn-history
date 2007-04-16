@@ -178,7 +178,8 @@ import pylab
 import random
 
 from math import pi
-from numpy.oldnumeric import array, zeros, Float,size, shape
+from numpy import array, zeros
+from numpy.oldnumeric import Float
 
 import topo
 import topo.base.patterngenerator
