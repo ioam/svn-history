@@ -78,39 +78,39 @@ class ConnectionField(ParameterizedObject):
     # CEBALERT: can rename this to 'slice_' now.
     slice_array = []
 
-    has_norm_total = False
+    _has_norm_total = False
 
-    def get_norm_total(self):
+    def __get_norm_total(self):
         """
         Return the stored norm_value, if any, or else the current sum of the weights.
         See the norm_total property for more details.
         """
         # The actual value is cached in _norm_total.
-        if self.has_norm_total == True:
+        if self._has_norm_total == True:
             return self._norm_total
         else:
             return abs(self.weights).sum()
             
-    def set_norm_total(self,new_norm_total):
+    def __set_norm_total(self,new_norm_total):
         """
         Set an explicit value to be returned by norm_total.
         See the norm_total property for more details.
         """
-        self.has_norm_total = True
+        self._has_norm_total = True
         self._norm_total = new_norm_total
 
-    def del_norm_total(self):
+    def __del_norm_total(self):
         """
         Delete any cached norm_total that may have been set.
         See the norm_total property for more details.
         """
-        self.has_norm_total = False
+        self._has_norm_total = False
 
 
     # CEBALERT: Accessing norm_total as a property from the C code will probably
     # slow it down; this should be checked.
     # We can remove this ALERT now, right?
-    norm_total = property(get_norm_total,set_norm_total,del_norm_total,
+    norm_total = property(__get_norm_total,__set_norm_total,__del_norm_total,
         """
         The norm_total property returns a value useful in computing
         a sum-based weight normalization.
@@ -137,7 +137,7 @@ class ConnectionField(ParameterizedObject):
         deleted as soon as it has been accessed.
         
         WARNING: Any c-optimized code can bypass this property and access directly
-        has_norm_total, _norm_total
+        _has_norm_total, _norm_total
         
         """)
 

@@ -72,7 +72,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                         Py_DECREF(sum_obj);
 
                         // Indicate that norm_total is stale
-                        PyObject_SetAttrString(cf,"has_norm_total",Py_False);
+                        PyObject_SetAttrString(cf,"_has_norm_total",Py_False);
                     }
                 }
             }

@@ -61,7 +61,7 @@ class LISSOM_Opt(LISSOM):
                             PyObject *cf = PyList_GetItem(PyList_GetItem(cfs,r),l);
                             PyObject *total_obj = PyFloat_FromDouble(nt);  //(new ref)
                             PyObject_SetAttrString(cf,"norm_total",total_obj);
-                            PyObject_SetAttrString(cf,"has_norm_total",Py_True);
+                            PyObject_SetAttrString(cf,"_has_norm_total",Py_True);
                             Py_DECREF(cfs);
                             Py_DECREF(total_obj);
                         }
