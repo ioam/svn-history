@@ -39,7 +39,7 @@ all: default reference-manual doc tests examples
 
 clean: clean-doc clean-ext-packages clean-pyc
 	${RM} .??*~ *~ */*~ */.??*~ */*/*~ */*/.??*~ */*/*/*~ */*/*/.??*~ *.bak
-	${RM} .#??*.* */.#??*.* */*/.#??*.* */*/*/.#??*.*
+	${RM} .#??*.* */.#??*.* */*/.#??*.* */*/*/.#??*.* current_profile testsnapshot.typ
 	${RM} -r bin include share lib man topographica ImageSaver*.jpeg python_topo
 
 saved-examples: 
