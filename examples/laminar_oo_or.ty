@@ -14,7 +14,6 @@ import copy
 from math import pi, sqrt
 from fixedpoint import FixedPoint
 from numpy.oldnumeric import sum,ones,exp
-import numpy.oldnumeric as Numeric
 
 import topo.patterns.basic
 import topo.patterns.random

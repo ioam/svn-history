@@ -26,7 +26,6 @@ __version__='$Revision$'
 ## To measure the position preference:
 ## measure_position_pref(divisions=6,size=0.3,scale=1.0,offset=0.0,display=True,pattern_presenter=PatternPresenter(HindpawGaussian(aspect_ratio=1.0),False,1.0), x_range=(0.0,0.6),y_range=(0.0,1.0)) ; topographic_grid()
 
-import numpy.oldnumeric as Numeric
 import numpy.oldnumeric.random_array as RandomArray
 import copy
 
@@ -35,6 +34,7 @@ import topo.patterns.basic
 
 import topo.base.patterngenerator
 
+import numpy
 from numpy.oldnumeric import argmax, ones, Float
 
 from topo.patterns.basic import Gaussian
@@ -139,7 +139,7 @@ class RCells_CFProjection(CFProjection):
                                                         xdensity=self.src.xdensity,
                                                         ydensity=self.src.ydensity)
         
-        mask_template = Numeric.where(mask_template>=0.5,mask_template,0.0)
+        mask_template = numpy.where(mask_template>=0.5,mask_template,0.0)
 
         return mask_template
 
@@ -191,15 +191,15 @@ class RCells_CFProjection(CFProjection):
         self.response_fn(self.cfs, input_activity, self.activity, self.strength)
         
         # Local competition
-        feedforward_influence = Numeric.array(self.activity)
+        feedforward_influence = numpy.array(self.activity)
         rows,cols = self.activity.shape
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = self.n_cfs[r][c]
                 r1,r2,c1,c2 = cf.slice_array
-                # JABALERT: Should be able to remove the Numeric.array() copying
+                # JABALERT: Should be able to remove the numpy.array() copying
                 # now that it is using numpy's .ravel(); not sure
-                X = Numeric.array(feedforward_influence[r1:r2,c1:c2])
+                X = numpy.array(feedforward_influence[r1:r2,c1:c2])
                 # Find winner
                 rX,cX = X.shape
                 pos = argmax(X.ravel())

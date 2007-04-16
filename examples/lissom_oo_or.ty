@@ -32,7 +32,6 @@ __version__='$Revision$'
 
 import numpy.oldnumeric.random_array as RandomArray
 import fixedpoint
-import numpy.oldnumeric as Numeric
 import numpy
 
 from math import pi, sqrt

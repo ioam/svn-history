@@ -9,7 +9,6 @@ Work in progress - form of Activity_dependent response function needs to be refi
 """
 
 
-import numpy.oldnumeric as Numeric
 import numpy
 import copy
 from numpy.oldnumeric import sum,ones,exp
@@ -71,7 +70,7 @@ class Activity_based(CFPResponseFn):
 
     def strength_fn(self,a,w,l,u,m,r,b):
         s = a*w*(l + ( u /(1 + b*exp(-r *(a - 2*m))**(1 / b))))  
-        return Numeric.sum(s.ravel())
+        return numpy.sum(s.ravel())
        
   
     def __call__(self, iterator, input_activity, activity, strength, **params): #The strength parameter is not used but is here to avoid errors
