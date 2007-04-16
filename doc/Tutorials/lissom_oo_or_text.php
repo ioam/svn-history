@@ -94,7 +94,7 @@ network.
 <p></p>
 </li>
 
-<li>To see the result, select <span class='t_item'>Activity</span> from
+<li>To see the result, select <a name="Activity-plot"><span class='t_item'>Activity</span></a> from
 the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topographica Console</span> to get:
 <p class='center'>
 <img src="images/activity_line_oo.png" alt="Response to a line" align="middle" width="676" height="340">
@@ -127,8 +127,8 @@ explained below.
 <li> To help understand the response patterns in V1, we can look at
 the weights to V1 neurons.  These weights were learned previously, by
 presenting 20000 oriented Gaussian patterns at random angles
-and positions.  To plot a single neuron, select 
-<span class='t_item'>Connection Fields</span> from the <span
+and positions.  To plot a single neuron, select
+<a name="ConnectionFields-plot"><span class='t_item'>Connection Fields</span></a> from the <span
 class='t_item'>Plots</span> menu, then select <span
 class='t_item'>V1</span> from the <span class='t_item'>Sheet</span>
 drop-down list. This will plot the synaptic strengths of connections
@@ -153,9 +153,9 @@ stimulus would be a short, bright line oriented at about 170 degrees
 <li>If all neurons had the same weight pattern, the response
 would not be patchy -- it would just be a blurred version of the
 input (for inputs matching the weight pattern), or blank (for other
-inputs). To see what the other neurons look like, select <span
-class='t_item'>Projection</span> from the <span
-class='t_item'>Plots</span> menu, then select <span
+inputs). To see what the other neurons look like, select 
+<a name="Projection-plot"><span class='t_item'>Projection</span></a>
+from the <span class='t_item'>Plots</span> menu, then select <span
 class='t_item'>LGNOnAfferent</span> from the drop-down <span
 class='t_item'>Projection</span> list:
   
@@ -179,8 +179,8 @@ activity patterns are patchy.
 in experimental animals, optical imaging experiments measure responses
 to a variety of patterns and record the one most effective at stimulating each
 neuron.  The results of a similar procedure can be viewed by selecting
-<span class='t_item'>Orientation Preference</span> from the <span
-class='t_item'>Plots</span> menu, which should show something like:
+<a name="OrientationPreference-plot"><span class='t_item'>Orientation Preference</span></a>
+from the <span class='t_item'>Plots</span> menu, which should show something like:
 
 <p class="center">
 <img src="images/oo_or_map.png" alt="Orientation map" width="625" height="381">
