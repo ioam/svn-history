@@ -195,7 +195,7 @@ If the matlab libraries are not in your <code>LD_LIBRARY_PATH</code>,
 there will be a note during the build telling you to add the libraries 
 to your path. For example:
 <pre>
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/matlab-7.2/bin/glnx86
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/matlab-7.2/bin/glnx86
 </pre>
 You can either add that permanently to your path, or add it each time
 before using mlabwrap.
