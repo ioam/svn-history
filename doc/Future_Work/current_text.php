@@ -91,10 +91,6 @@ can follow the tutorial instructions.
 <H4>2007/04/12 (CB): Update mlabwrap</H4>
   
 
-<H4>2007/03/28 (?): Figure out where to put this info in the docs:</H4>
-We also need to document .topographicarc somewhere, and tuning curve plots.
-
-
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
 
 
