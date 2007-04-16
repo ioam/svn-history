@@ -65,6 +65,14 @@ Update to the current SVN version to incorporate recent changes and
 bugfixes for the Reference Manual.
 
 
+<H4>2007/04/16 (CB): topographica-win </H4>
+Somehow the current version of python_topo is missing Python24.dll,
+so unless that .dll is already present on a user's computer, topographica
+will give an error saying it's missing. If they copy Python24.dll
+into the python_topo directory, this will fix the problem. I'll 
+upload a new python_topo shortly.
+
+
 <H4>2007/04/10: update weave</H4>
 Update scipy (weave) so that the numpy test deprecation warnings go away.
 
