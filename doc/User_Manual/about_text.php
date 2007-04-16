@@ -1,18 +1,10 @@
 <P>
 The Topographica software code and documentation are
-copyright 2005-2006 
-James A. Bednar,
-Christopher Ball,
-Christopher Palmer,
-Yoonsuck Choe,
-Julien Ciroux,
-Judah B. De Paula, 
-Judith Law,
-Alan Lindsay, 
-Louise Mathews,
-Jefferson Provost,
-and
-Yiu Fai Sit.
+copyright 2005-2007 James A. Bednar, Jan Antolik, Christopher Ball,
+Yoonsuck Choe, Julien Ciroux, Judah B. De Paula, Foivos Demertzis,
+Veldri Kurniawan, Judith Law, Alan Lindsay, Louise Mathews, Lewis Ng,
+Christopher Palmer, Ruaidhri Primrose, Jefferson Provost, Tikesh
+Ramtohul, Yiu Fai Sit, Stuart Wilson, and Roger Zhao.
 
 <P>The development of Topographica was supported in part by the
 U.S. National Institutes of Mental Health under Human Brain Project

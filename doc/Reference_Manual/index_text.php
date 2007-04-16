@@ -177,9 +177,8 @@ SciPy includes many, many functions useful in scientific research,
 such as statistics, linear algebra, image processing, integration and
 differential equation solvers, etc.  However, because of all the
 external libraries that it uses, it can be difficult to get SciPy
-working on a particular installation. ... You can try with 
+working on a particular installation. You can try with:
 <code>cd external; make scipy</code>.</DD>
-</DL>
 
 <P><DT><A href="http://mlabwrap.sourceforge.net/">mlabwrap</A></DT>
 <DD>mlabwrap is a high-level Python-to-Matlab bridge, allowing Matlab to look like
@@ -190,7 +189,7 @@ mlab.plot([1,2,3],'-o')
 </PRE>
 To use this package, first check you can run 
 <code>matlab -nodesktop -nosplash</code> successfully, then build with
-<code>cd external; make mlabwrap</code>.
+<code>make -C external mlabwrap</code>.
 If the matlab libraries are not in your <code>LD_LIBRARY_PATH</code>,
 there will be a note during the build telling you to add the libraries 
 to your path. For example:
@@ -205,9 +204,10 @@ before using mlabwrap.
 <DD>
 pyaudiolab provides an easy way to read from and write to sound files (it wraps 
 <A href="http://www.mega-nerd.com/libsndfile/">libsndfile</A>).
-On linux, building should require nothing more than <code>cd external; make pyaudiolab</code>.
+On linux, building should require nothing more than <code>make -C external pyaudiolab</code>.
 <!--Currently: untested on OSX, not present on Windows-->
 </DD>
+</DL>
 
 
 

@@ -217,7 +217,7 @@ firing-rate or integrate-and-fire units. More detailed neuron models
 can also be used, when required for experimental validation or to
 simulate specific phenomena.  We plan for these models to be
 implemented using interfaces to existing low-level simulators such as
-NEURON and GENESIS.
+NEURON and GENESIS, and have implemented preliminary versions using NEST.
 
 <!-- Could work this in:
 <P> Starting point:

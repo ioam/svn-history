@@ -65,7 +65,9 @@ scaling equations that underlie Sheet coordinates
   <dd>Detailed low-level modeling of neurons and small networks.  It is possible
    to use these simulators for topographic maps, but the computational
    requirements are usually extremely high, and typical users simulate
-   much smaller networks .<BR><BR>
+   much smaller networks.  There are now (3/2007) Python bindings for
+    Neuron, so it should be practical to wrap a Neuron simulation into
+    a Python sheet.<BR><BR>
   <dt><A TARGET="_top" HREF="http://askja.bu.edu/catacomb">Catacomb</A></dt>
   <dd>Highly graphical Java-based simulator covering numerous levels,
     from ion channels to behavioral experiments.  Can be used for some
@@ -73,14 +75,17 @@ scaling equations that underlie Sheet coordinates
     not have an explicit focus on topographically organized areas.<BR><BR>
   <dt><A TARGET="_top" HREF="http://www.nest-initiative.org">NEST</A></dt>
   <dd>NEST (formerly called BLISS) is a general-purpose simulator for
-    large networks of neurons, but without an explicit focus on topography.
-    NEST is based on a custom stack-based scripting language (like RPN
-    calculators or PostScript) that is not nearly as friendly as
-    Python, and requires much more of the simulation code to be
-    written in C.  On the other hand, NEST does provide many useful,
-    high-performance primitives, has good parallel computer support,
-    and can be particularly useful for
-    models that do not fit Topographica's abstractions closely.<BR><BR>
+    large networks of neurons, but without an explicit focus on
+    topography.  NEST is based on a custom stack-based scripting
+    language (like RPN calculators or PostScript) that is not nearly
+    as friendly as Python, and requires much more of the simulation
+    code to be written in C.  On the other hand, NEST does provide
+    many useful, high-performance primitives, has good parallel
+    computer support, and can be particularly useful for models that
+    do not fit Topographica's abstractions closely.  NEST now has a
+    Python interface, which can be used to wrap a spiking NEST
+    simulation as a Topographica sheet.
+    <BR><BR>
   <dt><A TARGET="_top" HREF="http://ilab.usc.edu/toolkit/documentation.shtml">iNVT</A></dt>
   <dd>iLab Neuromorphic Vision Toolkit is a high-performance
     computer-vision oriented C++ toolkit from Koch and Itti with support

@@ -33,8 +33,8 @@ object segmentation and grouping processes.
 is a sheet of neurons, rather than a neuron or a part of a neuron.  For most
 simulations, the sheets can be implemented at a high level, consisting
 of abstract firing-rate or integrate-and-fire neurons.  When required
-for validation or for specific phenomena, Topographica will also
-support interfaces to sheets developed using more detailed neuron models
+for validation or for specific phenomena, Topographica can easily be
+extended using a Sheet that interfaces to more detailed neuron models
 in other simulators.  Less-detailed sheets can also be used temporarily,
 e.g. when interacting with the model in real time.  Throughout,
 Topographica makes it simple to use an appropriate level of detail and
@@ -45,7 +45,7 @@ of interest, and amount of biological data available for validation.
 early stages in the visual system, modeling how retinal input is
 transformed by the thalamus, primary visual cortex, and higher
 cortical areas.  Because Topographica is a general-purpose map
-simulator, it will also support any other sensory modality that is
+simulator, it also supports any other sensory modality that is
 organized into topographic maps, such as touch and hearing, as well as
 motor areas.
 
