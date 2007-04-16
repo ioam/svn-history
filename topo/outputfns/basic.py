@@ -5,7 +5,7 @@ These are useful for neuron output functions, normalization of
 matrices, etc.
 
 All of these function objects (callable objects) should work for
-Numeric array arguments of arbitrary shape.  Some may also work for
+Numpy array arguments of arbitrary shape.  Some may also work for
 scalars.
 
 $Id$
