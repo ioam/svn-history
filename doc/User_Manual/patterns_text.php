@@ -14,8 +14,8 @@ weight patterns, neighborhood kernels, or any similar application.
 </center>
 
 <P>These patterns are created using objects of type
-<A HREF="../Reference_Manual/topo.base.patterngenerator.html">
-PatternGenerator</A>, which is an object that will return a 2D pattern
+<?php classref('topo.base.patterngenerator','PatternGenerator')?>,
+which is an object that will return a 2D pattern 
 when it is called as a function.  For instance, the Gaussian
 PatternGenerator will return Gaussian-shaped patterns:
 
