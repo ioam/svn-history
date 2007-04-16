@@ -19,61 +19,14 @@
          if hasattr(value, '__name__'): name = value.__name__
          else: name = `value`
 
-*** docwriter/html.py	2006-08-23 17:44:57.000000000 +0100
---- docwriter/html.py	2007-01-04 17:01:45.000000000 +0000
-*************** class HTMLWriter:
-*** 1878,1887 ****
-              description = self.href(var_doc)
-              if isinstance(var_doc.value, GenericValueDoc):
-                  pyval_repr = var_doc.value.pyval_repr()
-!                 if pyval_repr is not UNKNOWN:
-!                     val_repr = pyval_repr
-!                 else:
-!                     val_repr = var_doc.value.parse_repr
-                  if val_repr is not UNKNOWN:
-                      val_repr = ' '.join(val_repr.strip().split())
-                      maxlen = self._variable_summary_linelen
---- 1878,1890 ----
-              description = self.href(var_doc)
-              if isinstance(var_doc.value, GenericValueDoc):
-                  pyval_repr = var_doc.value.pyval_repr()
-!                 ### Patched by JAB to favor the parse_repr whenever it is
-!                 ### available, to avoid uninformative representations like
-!                 ### <Number object at 0xb7a718b4>.
-!                 #if pyval_repr is not UNKNOWN:
-!                 #    val_repr = pyval_repr
-!                 #else:
-!                 val_repr = var_doc.value.parse_repr
-                  if val_repr is not UNKNOWN:
-                      val_repr = ' '.join(val_repr.strip().split())
-                      maxlen = self._variable_summary_linelen
-*************** class HTMLWriter:
-*** 2244,2255 ****
-  
-      def pprint_value(self, val_doc):
-          if val_doc is UNKNOWN: return ''
-!         if val_doc.pyval is not UNKNOWN:
-              return self.pprint_pyval(val_doc.pyval)
-          elif val_doc.pyval_repr() is not UNKNOWN:
-              s = plaintext_to_html(val_doc.pyval_repr())
--         elif val_doc.parse_repr is not UNKNOWN:
--             s = plaintext_to_html(val_doc.parse_repr)
-          else:
-              s = self.href(val_doc)
-          return self._linewrap_html(s, self._variable_linelen,
---- 2247,2261 ----
-  
-      def pprint_value(self, val_doc):
-          if val_doc is UNKNOWN: return ''
-!         ### Patched by JAB to favor the parse_repr whenever it is
-!         ### available, to avoid uninformative representations like
-!         ### <Number object at 0xb7a718b4>.
-!         if val_doc.parse_repr is not UNKNOWN:
-!             s = plaintext_to_html(val_doc.parse_repr)
-!         elif val_doc.pyval is not UNKNOWN:
-              return self.pprint_pyval(val_doc.pyval)
-          elif val_doc.pyval_repr() is not UNKNOWN:
-              s = plaintext_to_html(val_doc.pyval_repr())
-          else:
-              s = self.href(val_doc)
-          return self._linewrap_html(s, self._variable_linelen,
+--- docwriter/html.py	2007-02-26 02:17:41.000000000 +0000
++++ docwriter/html.py	2007-04-16 18:44:03.000000000 +0100
+@@ -328,7 +328,7 @@
+         self._variable_maxlines = kwargs.get('variable_maxlines', 8)
+         """Max lines for variable values"""
+         
+-        self._variable_linelen = kwargs.get('variable_linelength', 70)
++        self._variable_linelen = kwargs.get('variable_linelength', 82)
+         """Max line length for variable values"""
+         
+         self._variable_summary_linelen = \
