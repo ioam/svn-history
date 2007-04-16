@@ -277,6 +277,13 @@ def profile(command,n=50,sorting=('cumulative','time'),strip_dirs=True):
     if strip_dirs:prof_stats.strip_dirs()
     prof_stats.sort_stats(*sorting).print_stats(n)
 
+    ### JABALERT: Should enable this after switching to cProfile under
+    ### Python 2.5, as it will let us see which times are due to which
+    ### calls unambiguously.  The 2.4 hotshot version only reports
+    ### total time spent in each object, not the time due to that
+    ### particular call.
+    #prof_stats.sort_stats(*sorting).print_callees(n)
+
 
 def weighted_sample(seq,weights=[]):
     """
