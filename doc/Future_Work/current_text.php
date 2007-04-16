@@ -32,6 +32,8 @@ please feel free to volunteer!!!!). Dates indicate when the item was
 first added to the list, or a change was made.
 
 
+
+
 <H2>Tasks to be addressed for the upcoming 0.9.3 release:</H2>
 
 <H4>2007/02/20 (JB): Errata before release</H4>
@@ -58,11 +60,6 @@ of the old SOM support.  Requires checking that the som_retinotopy.ty
 tutorial still works ok after the conversion.  Also check that
 the examples handle exponential decay of parameter values, so that
 they are good starting points.
-
-
-<H4>2007/02/20 (JB): Upgrade epydoc </H4>
-Update to the current SVN version to incorporate recent changes and
-bugfixes for the Reference Manual.
 
 
 <H4>2007/04/16 (CB): topographica-win </H4>
