@@ -41,8 +41,6 @@ default: bib2html imagedirs all
 all: ${PHPHTML}
 
 
-# The --parse-only could be removed later if epydoc were patched to used the 
-# __repr___ for Parameter values, instead of a meaningless object identifier
 # Can also add --graph=classtree for graphical class diagrams
 reference-manual: Reference_Manual/toc.html
 Reference_Manual/toc.html: ../topo/*.py ../topo/*/*.py Reference_Manual/index_text.php
