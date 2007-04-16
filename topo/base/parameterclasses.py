@@ -346,6 +346,20 @@ class BooleanParameter(Parameter):
         super(BooleanParameter,self).__set__(obj,val)
 
 
+class StringParameter(Parameter):
+    __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+
+    def __init__(self,default="",**params):
+        Parameter.__init__(self,default=default,**params)
+        
+    def __set__(self,obj,val):
+        if not isinstance(val,str):
+            raise ValueError("StringParameter only takes a string value.")
+
+        super(StringParameter,self).__set__(obj,val)
+
+
 class CallableParameter(Parameter):
     """
     Parameter holding a value that is a callable object, such as a function.

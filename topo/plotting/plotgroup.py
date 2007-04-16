@@ -17,7 +17,7 @@ import __main__
 import topo
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Parameter,BooleanParameter
+from topo.base.parameterclasses import Parameter,BooleanParameter,StringParameter
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 
@@ -315,8 +315,7 @@ class TemplatePlotGroup(PlotGroup):
     PlotGroup that is built as specified by a PlotGroupTemplate.
     """
 
-    # JABALERT: Should be a StringParameter
-    updatecommand = Parameter(default="",doc="""
+    updatecommand = StringParameter(default="",doc="""
         Command to execute before updating this plot, e.g. to calculate sheet views.
 
         The command can be any Python code, and will be evaluated in the main namespace
