@@ -200,7 +200,7 @@ sf-web-site: reference-manual doc
 #
 #@@distclean: FORCE clean
 #@@	   ${RM} .#* */.#* */*/.#* */*~ .cvsignore ChangeLog.txt */.cvsignore */*/.cvsignore */*/*/.cvsignore
-#@@	   ${RM} etc/topographica.elc ImageSaver*.ppm countalerts* annotate.out
+#@@	   ${RM} etc/topographica.elc ImageSaver*.ppm countalerts* annotate.out current_profile testsnapshot.typ
 #@@	   ${RM} examples/disparity_energy.ty
 #@@	   ${RM} examples/homeostatic.ty
 #@@	   ${RM} examples/joublin_bc96.ty
