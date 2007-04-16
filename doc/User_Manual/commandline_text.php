@@ -174,7 +174,7 @@ We've provided a shortcut for the above format to make it easier:
 <P>Note that ANSI colors are not used by default, because terminals
 that do not support them will display them as unrecognizable symbols.
 				    
-<H2>Site-specific customizations</H2>
+<H2><A name="toporc">Site-specific customizations</A></H2>
 
 <P>If you have any commands that you want to be executed whenever you
 start Topographica, you can put them into the file
