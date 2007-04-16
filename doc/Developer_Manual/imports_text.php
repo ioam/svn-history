@@ -68,7 +68,7 @@ order from most general to most specific:
 
 <OL>
 <LI>Python standard library items (such as <CODE>math</CODE>, <CODE>sys</CODE>, <CODE>os</CODE>)
-<LI>Core external packages (such as <CODE>Numeric</CODE>)
+<LI>Core external packages (such as <CODE>numpy</CODE>)
 <LI>Other external pacages (such as <CODE>MLab</CODE>)
 <LI>Topographica files not in the current package<BR>
       (with absolute paths like <CODE>topo.base.sheet</CODE>)
@@ -84,7 +84,7 @@ long list).  For example:
   import types
   from math import pi
   
-  from Numeric import transpose, array
+  from numpy import transpose, array
   
   from topo.base.connectionfield import CFSheet
   from topo.base.topoobject import TopoObject

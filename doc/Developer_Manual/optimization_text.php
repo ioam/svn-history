@@ -42,14 +42,14 @@ version instead.
 
 <P>Where possible, Python components can be implemented with high
 performance using
-<A href="http://numeric.scipy.org/numpydoc/numdoc.htm">Numeric</A>
+<A href="http://numpy.scipy.org/">numpy</A>
 matrix operations.  This should be the first approach when optimizing
 any component, and indeed when writing the component for the first
-time (because the Numeric primitives are much easier to use and
+time (because the numpy primitives are much easier to use and
 maintain than e.g. explicitly writing <code>for</code> loops).
-However, there are certain cases where the performance of Numeric is
-not sufficient, or where Numeric is unsuitable (for example, many
-Numeric operations do not act in-place on arrays).  Other components
+However, there are certain cases where the performance of numpy is
+not sufficient, or where numpy is unsuitable (for example, many
+numpy operations do not act in-place on arrays).  Other components
 may be able to be implemented much more quickly if certain assumptions
 are made about the nature of their arguments, or the types of
 computations that can be performed.
