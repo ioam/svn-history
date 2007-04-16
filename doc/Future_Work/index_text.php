@@ -36,19 +36,17 @@ spiking models are currently under development, and preliminary
 versions are included already.  We will be developing interfaces
 between spiking and non-spiking Sheets and analysis tools for spiking
 neurons.  We primarily expect to support integrate-and-fire and
-related computationally tractable spiking unit models; more detailed
-compartmental models can be simulated in Neuron or Genesis instead.
+related computationally tractable spiking unit models.  More detailed
+compartmental models can be simulated in Neuron or Genesis instead,
+and packaged up using the Sheet interface so that they can be used
+in Topographica.
 
 <P><DT>Polishing the GUI model editor</DT><DD>
 The Topographica model editor allows a model to be constructed,
 modified, visualized, and edited.  However, there are a few operations
 not currently supported, such as setting a parameter to a random
-stream of numbers.  These limitations (combined with the ongoing
-changes to the saved file formats) mean that most models are best
-constructed using .ty script files rather than the editor.  These
-remaining limitations are feasible to overcome, but in the meantime
-the editor is still quite useful for exploring and modifying 
-models created using .ty scripts.
+stream of numbers.  These limitations mean that in most cases
+some editing of the .ty script file will be necessary.
 </DL>
 
 
@@ -107,8 +105,7 @@ for developing models in Topographica.
 
 The current basic support for two-dimensional bitmap plotting will
 eventually need to be expanded to allow the user to control plot
-brightness scaling, provide numerical indications of the plotting
-scales, allow custom colormaps, and add an "overload" or "cropped"
+brightness scaling, allow custom colormaps, and add an "overload" or "cropped"
 indicator to show if some values are too large to be displayed in the
 selected range.
 
@@ -136,16 +133,6 @@ including allowing a threshold so that a colormap plot can be
 shown on top of a monochrome background plot, e.g. an activity blob on
 top of an ocular dominance or other grayscale map. -->
 							 
-<P><DT>Selecting units for plotting or analysis</DT><DD>
-In many of the GUI displays, a large number of units are shown.  These
-plots are designed to make the large-scale topographic structure of
-the network clear.  However, it is often desirable to relate this
-large-scale structure to the small-scale structure of individual units
-or small areas of them.  Doing so is currently difficult, because the
-individual units are not labeled or individually selectable.  We plan
-to make all such plots "live", so that individual units or
-ConnectionFields can be selected and analyzed.
-
 <P><DT>Map statistics</DT><DD>  
 We will implement general routines for measuring the statistical
 properties of Sheets, such as for computing a perceived orientation.
@@ -253,10 +240,11 @@ from experimental data.  Meanwhile, the Python command-line interface
 can be used to display or save any element of the model.
 
 <P><DT>Lesion support</DT><DD>
-Eventually, all components will be temporarily lesionable, i.e.,
-disabled in a way that their function can be restored.  This
-capability will be crucial for testing which components are required
-for a certain behavior, and for replicating animal lesion experiments.
+It is now possible to temporarily lesion any part of a Topographica
+Sheet or Projection using a PatternCombine OutputFn.  This capability
+will eventually be extended so that it is easier to use, to make it
+simpler to test which components are required for a certain behavior,
+and to replicate animal lesion experiments.
 
 <P><DT>More library components</DT><DD>
 Topographica currently includes examples of each type of library
