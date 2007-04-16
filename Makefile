@@ -200,15 +200,21 @@ sf-web-site: reference-manual doc
 #
 #@@distclean: FORCE clean
 #@@	   ${RM} .#* */.#* */*/.#* */*~ .cvsignore ChangeLog.txt */.cvsignore */*/.cvsignore */*/*/.cvsignore
-#@@	   ${RM} etc/topographica.elc ImageSaver*.ppm countalerts* annotate.out current_profile testsnapshot.typ
+#@@	   ${RM} etc/topographica.elc ImageSaver*.ppm countalerts* annotate.out
+#@@	   ${RM} current_profile testsnapshot.typ script ./topo/tests/*.ty_*DATA
 #@@	   ${RM} examples/disparity_energy.ty
+#@@	   ${RM} examples/goodhill_network90.ty
 #@@	   ${RM} examples/homeostatic.ty
 #@@	   ${RM} examples/joublin_bc96.ty
 #@@	   ${RM} examples/laminar.ty
 #@@	   ${RM} examples/laminar_lissom.ty
 #@@	   ${RM} examples/laminar_nolearning.ty
+#@@	   ${RM} examples/laminar_oo_or.ty*
 #@@	   ${RM} examples/leaky_lissom_or.ty
+#@@	   ${RM} examples/lgn_lateral.ty*
+#@@	   ${RM} examples/lissom_fsa.ty
 #@@	   ${RM} examples/lissom_oo_od.ty
+#@@	   ${RM} examples/lissom_oo_or_dy.ty
 #@@	   ${RM} examples/lissom_oo_or_dy_photo.ty
 #@@	   ${RM} examples/lissom_oo_or_homeomaxent.ty
 #@@	   ${RM} examples/lissom_or_homeomaxent.ty
@@ -217,12 +223,13 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} examples/lissom_or_noshrinking_latswitch.ty
 #@@	   ${RM} examples/lissom_or_sf.ty
 #@@	   ${RM} examples/ohzawa_science90.ty
+#@@	   ${RM} examples/saccade_demo.ty
 #@@	   ${RM} examples/sullivan_neurocomputing04.ty
 #@@	   ${RM} examples/sullivan_nn06.ty
 #@@	   ${RM} -r topographica-win
 #@@	   ${RM} -r tmp/
 #@@	   ${RM} -r CVS */CVS */*/CVS */*/*/CVS
-
+#@@	   ${CD} topo/tests/reference ; make clean
 
 # Make public distribution archive
 distarc: FORCE distclean 
