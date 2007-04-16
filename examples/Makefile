@@ -9,6 +9,8 @@ all_quick: hierarchical cfsom_or som_retinotopy lissom_oo_or
 all_long: lissom_oo_or_10000.typ som_retinotopy_40000.typ lissom_or_10000.typ lissom_fsa_10000.typ
 saved-examples: lissom_oo_or_10000.typ
 
+# Allow extra arguments to be passed to the Topographica command line
+TOPOCMD=
 
 # Define typical commands used in the examples
 SNAPSHOT = -c "from topo.commands.basic import save_snapshot ; save_snapshot"
@@ -46,22 +48,22 @@ som_retinotopy:
 
 # Generate saved examples of complete simulations
 lissom_oo_or_10000.typ: lissom_oo_or.ty ../topo/*/*.py
-	../topographica -c default_density=96 lissom_oo_or.ty -c "topo.sim.run(10000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
+	../topographica ${TOPOCMD} lissom_oo_or.ty -c "topo.sim.run(10000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
 
 
 lissom_or_10000.typ: lissom_or.ty ../topo/*/*.py
-	../topographica lissom_or.ty -c "topo.sim.run(10000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
+	../topographica ${TOPOCMD} lissom_or.ty -c "topo.sim.run(10000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
 
 
 lissom_fsa_10000.typ: lissom_fsa.ty ../topo/*/*.py
-	../topographica lissom_fsa.ty -c "topo.sim.run(10000)" ${SNAPSHOT}"('$@')"
+	../topographica ${TOPOCMD} lissom_fsa.ty -c "topo.sim.run(10000)" ${SNAPSHOT}"('$@')"
 
 
 obermayer_pnas90_30000.typ: obermayer_pnas90.ty ../topo/*/*.py
-	../topographica obermayer_pnas90.ty -c "topo.sim.run(40000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
+	../topographica ${TOPOCMD} obermayer_pnas90.ty -c "topo.sim.run(40000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
 
 
 som_retinotopy_40000.typ: som_retinotopy.ty ../topo/*/*.py
-	../topographica som_retinotopy.ty -c "topo.sim.run(40000)" ${RETINOTOPY_ANALYSIS} ${SNAPSHOT}"('$@')"
+	../topographica ${TOPOCMD} som_retinotopy.ty -c "topo.sim.run(40000)" ${RETINOTOPY_ANALYSIS} ${SNAPSHOT}"('$@')"
 
 
