@@ -25,11 +25,11 @@ from topo.patterns.basic import SineGrating, Gaussian, SineGratingDisk
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.parameterclasses import Parameter
 from topo.analysis.featureresponses import FeatureMaps, FeatureCurves
-
+from topo.plotting.templates import new_pgt
 
 class Feature(object):
     """
-    Stores the parameters requires for generating a map of one input feature.
+    Stores the parameters required for generating a map of one input feature.
     """
 
     def __init__(self, name, range=None, step=0.0, values=None, cyclic=False):
@@ -170,6 +170,7 @@ class PatternPresenter(ParameterizedObject):
             
         pattern_present(inputs, self.duration, learning=False,
                         apply_output_fn=self.apply_output_fn)
+
 # Module variables for passing values to the commands.
 coordinate = (0,0)
 sheet_name = ''
@@ -179,6 +180,142 @@ proj_name =''
 ### JABALERT: This mechanism for passing values is a bit awkward, and
 ### should be changed to something cleaner.  It might also be better
 ### to access a Sheet instance directly, rather than searching by name.
+
+
+
+
+# Most of the rest of this file consists of commands for creating
+# SheetViews, paired with a template for how to construct plots from
+# these SheetViews.
+# 
+# For instance, the implementation of Activity plots consists of an
+# update_activity() plus the Activity PlotGroupTemplate.  The
+# update_activity() command reads the activity array of each Sheet and
+# makes a corresponding SheetView to put in the Sheet's
+# sheet_view_dict, while the Activity PlotGroupTemplate specifies
+# which SheetViews should be plotted in which combination.  See the
+# help for PlotGroupTemplate for more information.
+
+
+###############################################################################
+###############################################################################
+
+
+###############################################################################
+# JABALERT: Should probably change these defaults not to mention
+# Orientation, and instead change measure_or_pref or something related
+# to install Orientation as the subplot.  That way other subplots can
+# be handled similarly.
+pgt= new_pgt(name='Activity',category="Basic",
+             doc='Plot the activity for all Sheets.',
+             command='update_activity()', plot_immediately=True)
+pgt.add_plot('Activity',[('Strength','Activity'),
+                         ('Hue','OrientationPreference'),
+                         ('Confidence','OrientationSelectivity')])
+
+
+def update_activity():
+    """
+    Make a map of neural activity available for each sheet, for use in template-based plots.
+    
+    This command simply asks each sheet for a copy of its activity
+    matrix, and then makes it available for plotting.  Of course, for
+    some sheets providing this information may be non-trivial, e.g. if
+    they need to average over recent spiking activity.
+    """
+    for sheet in topo.sim.objects(Sheet).values():
+        activity_copy = array(sheet.activity)
+        new_view = SheetView((activity_copy,sheet.bounds),
+                              sheet.name,sheet.precedence,topo.sim.time())
+        sheet.sheet_view_dict['Activity']=new_view
+    
+
+###############################################################################
+pgt= new_pgt(name='Connection Fields',category="Basic",
+             doc='Plot the weight strength in each ConnectionField of a specific unit of a Sheet.',
+             command='update_connectionfields()',
+             plot_immediately=True, normalize=True)
+pgt.add_plot('Connection Fields',[('Strength','Weights'),
+                                  ('Hue','OrientationPreference'),
+                                  ('Confidence','OrientationSelectivity')])
+
+
+def update_connectionfields():
+    """
+    Add SheetViews for the weights of one unit in a CFSheet, 
+    for use in template-based plots.
+    """
+    sheets = topo.sim.objects(Sheet).values()
+    x = coordinate[0]
+    y = coordinate[1]
+    for s in sheets:
+	if (s.name == sheet_name and isinstance(s,CFSheet)):
+	    s.update_unit_view(x,y)
+
+
+###############################################################################
+pgt= new_pgt(name='Projection',category="Basic",
+             doc='Plot the weights of an array of ConnectionFields in a Projection.',
+             command='update_projections()',
+             plot_immediately=True, normalize=True)
+pgt.add_plot('Projection',[('Strength','Weights'),
+                           ('Hue','OrientationPreference'),
+                           ('Confidence','OrientationSelectivity')])
+
+
+def update_projections():
+    """
+    Add SheetViews for the weights in one CFProjection,
+    for use in template-based plots.
+    """
+    sheets = topo.sim.objects(Sheet).values()
+    for s in sheets:
+	if (s.name == sheet_name and isinstance(s,CFSheet)):
+	    for x,y in proj_coords:
+		s.update_unit_view(x,y,proj_name)
+
+
+###############################################################################
+pgt= new_pgt(name='Projection Activity',category="Basic",
+             doc='Plot the activity in each Projection that connects to a Sheet.',
+             command='update_projectionactivity()',
+             plot_immediately=True, normalize=True)
+pgt.add_plot('ProjectionActivity',[('Strength','ProjectionActivity')])
+
+
+def update_projectionactivity():
+    """
+    Add SheetViews for all of the Projections of the ProjectionSheet
+    specified by sheet_name, for use in template-based plots.
+    """
+    
+    for s in topo.sim.objects(Sheet).values():
+	if (s.name == sheet_name and isinstance(s,ProjectionSheet)):
+            for p in s.in_connections:
+                if not isinstance(p,Projection):
+                    topo.sim.debug("Skipping non-Projection "+p.name)
+                else:
+                    v = p.get_projection_view(topo.sim.time())
+                    key = ('ProjectionActivity',v.projection.dest.name,v.projection.name)
+                    v.projection.dest.sheet_view_dict[key] = v
+
+
+
+###############################################################################
+###############################################################################
+
+
+###############################################################################
+pgt= new_pgt(name='Position Preference',category="Preference Maps",
+             doc='Measure preference for the X and Y position of a Gaussian.',
+             command='measure_position_pref() ; topographic_grid()',
+             normalize=True)
+
+pgt.add_plot('X Preference',[('Strength','XPreference')])
+pgt.add_plot('Y Preference',[('Strength','YPreference')])
+pgt.add_plot('Position Preference',[('Red','XPreference'),
+                                    ('Green','YPreference')])
+
 
 def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
                           pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),False,0.175),
@@ -205,6 +342,76 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
        
+
+
+###############################################################################
+pgt= new_pgt(name='Center of Gravity',category="Preference Maps",
+             doc='Measure the center of gravity of each ConnectionField in a Projection.',
+             command='measure_cog(proj_name="Afferent") ; topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG")',
+             normalize=True)
+pgt.add_plot('X CoG',[('Strength','XCoG')])
+pgt.add_plot('Y CoG',[('Strength','YCoG')])
+pgt.add_plot('CoG',[('Red','XCoG'),('Green','YCoG')])
+
+
+def measure_cog(proj_name ="Afferent"):    
+    """
+    Calculate center of gravity (CoG) for each CF of each unit in each CFSheet.
+
+    Unlike measure_position_pref and other measure commands, this one
+    does not work by collate the responses to a set of input patterns.
+    Instead, the CoG is calculated directly from each set of afferent
+    weights.  The CoG value thus is an indirect estimate of what
+    patterns the neuron will prefer, but is not limited by the finite
+    number of test patterns as the other measure commands are.
+
+    At present, the name of the projection to use must be specified
+    in the argument to this function, and a model using any other
+    name must specify that explicitly when this function is called.
+    """
+    ### JABHACKALERT: Should be updated to support multiple projections
+    ### to each sheet, not requiring the name to be specified.
+    
+    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
+    measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
+    
+    for sheet in measured_sheets:
+	for proj in sheet.in_connections:
+	    if proj.name == proj_name:
+		rows,cols=sheet.activity.shape
+		xpref=zeros((rows,cols),Float)
+		ypref=zeros((rows,cols),Float)
+		for r in xrange(rows):
+		    for c in xrange(cols):
+			cf=proj.cf(r,c)
+			r1,r2,c1,c2 = cf.slice_array
+			row_centroid,col_centroid = centroid(cf.weights)
+			xcentroid, ycentroid = proj.src.matrix2sheet(
+			        r1+row_centroid+0.5,
+				c1+col_centroid+0.5)
+                    
+			xpref[r][c]= xcentroid
+			ypref[r][c]= ycentroid
+                    
+			new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
+			sheet.sheet_view_dict['XCoG']=new_view
+			new_view = SheetView((ypref,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
+			sheet.sheet_view_dict['YCoG']=new_view
+           
+
+###############################################################################
+###############################################################################
+
+
+###############################################################################
+pgt= new_pgt(name='Orientation Preference',category="Preference Maps",
+             doc='Measure preference for sine grating orientation.',
+             command='measure_or_pref()')
+pgt.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
+pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
+						   ('Confidence','OrientationSelectivity')])
+pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
+pgt.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
 
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
@@ -243,6 +450,61 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
+
+###############################################################################
+pgt= new_pgt(name='Ocular Preference',category="Preference Maps",
+             doc='Measure preference for sine gratings between two eyes.',
+             command='measure_od_pref()')
+pgt.add_plot('Ocular Preference',[('Strength','OcularPreference')])
+pgt.add_plot('Ocular Selectivity',[('Strength','OcularSelectivity')])
+
+
+### JABALERT: Shouldn't there be a num_ocularities argument as well, to
+### present various combinations of left and right eye activity?        
+def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
+                    scale=0.3,offset=0.0,display=False,weighted_average=True,
+		    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
+                                                   apply_output_fn=False,duration=0.175)):
+    """
+    Measure ocular dominance maps, using a sine grating by default.
+
+    Measures maps by collating the responses to a set of input
+    patterns controlled by some parameters.  The parameter ranges and
+    number of input patterns in each range are determined by the
+    num_phase, num_orientation, and frequencies parameters.  The
+    particular pattern used is determined by the pattern_presenter
+    argument, which defaults to a sine grating presented for a short
+    duration.  By convention, most Topographica example files
+    are designed to have a suitable activity pattern computed by
+    that time, but the duration will need to be changed for other
+    models that do not follow that convention.
+    """
+    
+    if num_phase <= 0 or num_orientation <= 0:
+        raise ValueError("num_phase and num_orientation must be greater than 0")
+
+    else:
+        step_phase=2*pi/num_phase
+        step_orientation=pi/num_orientation
+
+        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
+                          Feature(name="frequency",values=frequencies),
+                          Feature(name="ocular",range=(0.0,1.0),values=[0.0,1.0])]  
+
+        param_dict = {"scale":scale,"offset":offset}
+        x=FeatureMaps(feature_values)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+  
+
+###############################################################################
+pgt= new_pgt(name='Spatial Frequency Preference',category="Preference Maps",
+             doc='Measure preference for sine grating frequency.',
+             command='measure_sf_pref(frequencies=frange(1.0,6.0,0.2),num_phase=15,num_orientation=4)')
+pgt.add_plot('Spatial Frequency Preference',[('Strength','FrequencyPreference')])
+pgt.add_plot('Spatial Frequency Selectivity',[('Strength','FrequencySelectivity')]) # confidence??
+
+
 def measure_sf_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,weighted_average=True,
                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
@@ -280,6 +542,64 @@ def measure_sf_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
+
+###############################################################################
+pgt= new_pgt(name='PhaseDisparity Preference',category="Preference Maps",
+             doc='Measure preference for sine gratings differing in phase between two sheets.',
+             command='measure_phasedisparity()')
+pgt.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
+pgt.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
+pgt.add_static_image('Color Key','topo/commands/disp_key_white_vert_small.png')
+
+
+def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
+                           scale=0.3,offset=0.0,display=False,weighted_average=True,
+                           pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
+                                                              apply_output_fn=False,duration=0.175)):
+    """
+    Measure disparity maps, using sine gratings by default.
+
+    Measures maps by collating the responses to a set of input
+    patterns controlled by some parameters.  The parameter ranges and
+    number of input patterns in each range are determined by the
+    num_phase, num_orientation, num_disparity, and frequencies
+    parameters.  The particular pattern used is determined by the
+
+    pattern_presenter argument, which defaults to a sine grating presented
+    for a short duration.  By convention, most Topographica example
+    files are designed to have a suitable activity pattern computed by
+    that time, but the duration will need to be changed for other
+    models that do not follow that convention.
+    """
+
+    if num_phase <= 0 or num_orientation <= 0 or num_disparity <= 0:
+        raise ValueError("num_phase, num_disparity and num_orientation must be greater than 0")
+
+    else:
+        step_phase=2*pi/num_phase
+        step_orientation=pi/num_orientation
+        step_disparity=2*pi/num_disparity
+
+        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
+                          Feature(name="frequency",values=frequencies),
+                          Feature(name="phasedisparity",range=(0.0,2*pi),step=step_disparity,cyclic=True)]    
+
+        param_dict = {"scale":scale,"offset":offset}
+        x=FeatureMaps(feature_values)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+
+
+###############################################################################
+new_pgt(name='Orientation Tuning Fullfield',category="Tuning Curves",doc="""
+            Plot orientation tuning curves for a specific unit, measured using full-field sine gratings.
+            Although the data takes a long time to collect, once it is ready the plots
+            are available immediately for any unit.""",
+        command='measure_or_tuning_fullfield()',
+        plotcommand='or_tuning_curve(x_axis="orientation", plot_type=pylab.plot, unit="degrees")',
+        template_plot_type="curve")
+
+
 def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4],
                                 curve_parameters=[{"contrast":30}, {"contrast":60},{"contrast":80},{"contrast":90}],
                                 display=False,
@@ -315,6 +635,74 @@ def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4
                 curve_label='Contrast = '+str(curve["contrast"])+'%'
                 x.collect_feature_responses(feature_values,pattern_presenter,param_dict,curve_label,display)
 	  
+
+###############################################################################
+new_pgt(name='Orientation Tuning',category="Tuning Curves",doc="""
+            Measure orientation tuning for a specific unit at different contrasts,
+            using a pattern chosen to match the preferences of that unit.""",
+        command='measure_or_tuning(); or_tuning_curve(x_axis="orientation",plot_type=pylab.plot,unit="degrees")',
+        template_plot_type="curve",
+        prerequisites=['XPreference'])
+
+
+def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
+                      curve_parameters=[{"contrast":30}, {"contrast":60},{"contrast":80}, {"contrast":90}],
+                      display=False,size=0.5,
+                      pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
+                                                         apply_output_fn=True,duration=1.0,
+                                                         contrast_parameter="weber_contrast")):
+    """
+    Measures orientation tuning curve of a particular unit.
+    Uses a circular sine grating patch as the stimulus on the retina. If the network contains an LGN layer
+    then weber_contrast can be used as the contrast_parameter. If there is no LGN then scale (offset=0.0)
+    can be used to define the contrast. Other relevant contrast definitions can also be used provided
+    they are defined in PatternPresenter.(The curve_label should also be changed to reflect new units)
+    """
+
+    sheet=topo.sim[sheet_name]
+    sheet_x,sheet_y = coordinate
+    matrix_coords = sheet.sheet2matrixidx(sheet_x,sheet_y)
+    if(('XPreference' in sheet.sheet_view_dict) and
+       ('YPreference' in sheet.sheet_view_dict)):
+	x_pref = sheet.sheet_view_dict['XPreference'].view()[0]
+	y_pref = sheet.sheet_view_dict['YPreference'].view()[0]
+	x_value=x_pref[matrix_coords]
+	y_value=y_pref[matrix_coords]
+    else:
+        topo.sim.warning("Position Preference should be measured before plotting Orientation Tuning -- using default values for "+sheet_name)
+        x_value=coordinate[0]
+        y_value=coordinate[1]
+      
+	
+                 
+    if num_phase <= 0 or num_orientation <= 0:
+        raise ValueError("num_phase and num_orientation must be greater than 0")
+    
+    else:
+        step_orientation=pi/num_orientation
+        step_phase=2*pi/num_phase
+        
+        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                          Feature(name="orientation",range=(0,pi),step=step_orientation,cyclic=True),
+                          Feature(name="frequency",values=frequencies)]     
+
+        x_axis='orientation'
+        x=FeatureCurves(feature_values,sheet,x_axis)
+           
+    
+	for curve in curve_parameters:
+            param_dict = {"x":x_value,"y":y_value}
+            param_dict.update(curve)
+	    curve_label='Contrast = '+str(curve["contrast"])+'%'
+            x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
+               
+
+###############################################################################
+new_pgt(name='Size Tuning',category="Tuning Curves",
+        doc='Measure the size preference for a specific unit.',
+        command='measure_size_response(); tuning_curve(x_axis="size",plot_type=pylab.plot,unit="Diameter of stimulus")',
+        template_plot_type="curve",
+        prerequisites=['OrientationPreference','XPreference'])
 
 
 def measure_size_response(num_phase=18,
@@ -386,6 +774,14 @@ def measure_size_response(num_phase=18,
             x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
 
 
+###############################################################################
+new_pgt(name='Contrast Response',category="Tuning Curves",
+        doc='Measure the contrast response function for a specific unit.',
+        command='measure_contrast_response(); tuning_curve(x_axis="contrast",plot_type=pylab.semilogx,unit="%")',
+        template_plot_type="curve",
+        prerequisites=['OrientationPreference','XPreference'])
+
+
 def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relative_orientations=[0, pi/6, pi/4, pi/2],
                               size=0.5,display=False,frequency=2.4,
                               num_phase=18,pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
@@ -448,241 +844,6 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relativ
             param_dict.update(curve)
             curve_label='Orientation = %.4f rad' % curve["orientation"] 
 	    x.collect_feature_responses(feature_values,pattern_presenter, param_dict, curve_label,display)
-                        
+
             
-def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
-                      curve_parameters=[{"contrast":30}, {"contrast":60},{"contrast":80}, {"contrast":90}],
-                      display=False,size=0.5,
-                      pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
-                                                         apply_output_fn=True,duration=1.0,
-                                                         contrast_parameter="weber_contrast")):
-    """
-    Measures orientation tuning curve of a particular unit.
-    Uses a circular sine grating patch as the stimulus on the retina. If the network contains an LGN layer
-    then weber_contrast can be used as the contrast_parameter. If there is no LGN then scale (offset=0.0)
-    can be used to define the contrast. Other relevant contrast definitions can also be used provided
-    they are defined in PatternPresenter.(The curve_label should also be changed to reflect new units)
-    """
-
-    sheet=topo.sim[sheet_name]
-    sheet_x,sheet_y = coordinate
-    matrix_coords = sheet.sheet2matrixidx(sheet_x,sheet_y)
-    if(('XPreference' in sheet.sheet_view_dict) and
-       ('YPreference' in sheet.sheet_view_dict)):
-	x_pref = sheet.sheet_view_dict['XPreference'].view()[0]
-	y_pref = sheet.sheet_view_dict['YPreference'].view()[0]
-	x_value=x_pref[matrix_coords]
-	y_value=y_pref[matrix_coords]
-    else:
-        topo.sim.warning("Position Preference should be measured before plotting Orientation Tuning -- using default values for "+sheet_name)
-        x_value=coordinate[0]
-        y_value=coordinate[1]
-      
-	
-                 
-    if num_phase <= 0 or num_orientation <= 0:
-        raise ValueError("num_phase and num_orientation must be greater than 0")
-    
-    else:
-        step_orientation=pi/num_orientation
-        step_phase=2*pi/num_phase
-        
-        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                          Feature(name="orientation",range=(0,pi),step=step_orientation,cyclic=True),
-                          Feature(name="frequency",values=frequencies)]     
-
-        x_axis='orientation'
-        x=FeatureCurves(feature_values,sheet,x_axis)
-           
-    
-	for curve in curve_parameters:
-            param_dict = {"x":x_value,"y":y_value}
-            param_dict.update(curve)
-	    curve_label='Contrast = '+str(curve["contrast"])+'%'
-            x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
-               
-
-
-### JABALERT: Shouldn't there be a num_ocularities argument as well, to
-### present various combinations of left and right eye activity?        
-def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=False,weighted_average=True,
-		    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
-                                                   apply_output_fn=False,duration=0.175)):
-    """
-    Measure ocular dominance maps, using a sine grating by default.
-
-    Measures maps by collating the responses to a set of input
-    patterns controlled by some parameters.  The parameter ranges and
-    number of input patterns in each range are determined by the
-    num_phase, num_orientation, and frequencies parameters.  The
-    particular pattern used is determined by the pattern_presenter
-    argument, which defaults to a sine grating presented for a short
-    duration.  By convention, most Topographica example files
-    are designed to have a suitable activity pattern computed by
-    that time, but the duration will need to be changed for other
-    models that do not follow that convention.
-    """
-    
-    if num_phase <= 0 or num_orientation <= 0:
-        raise ValueError("num_phase and num_orientation must be greater than 0")
-
-    else:
-        step_phase=2*pi/num_phase
-        step_orientation=pi/num_orientation
-
-        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
-                          Feature(name="frequency",values=frequencies),
-                          Feature(name="ocular",range=(0.0,1.0),values=[0.0,1.0])]  
-
-        param_dict = {"scale":scale,"offset":offset}
-        x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
-  
-
-
-def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
-                           scale=0.3,offset=0.0,display=False,weighted_average=True,
-                           pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
-                                                              apply_output_fn=False,duration=0.175)):
-    """
-    Measure disparity maps, using sine gratings by default.
-
-    Measures maps by collating the responses to a set of input
-    patterns controlled by some parameters.  The parameter ranges and
-    number of input patterns in each range are determined by the
-    num_phase, num_orientation, num_disparity, and frequencies
-    parameters.  The particular pattern used is determined by the
-
-    pattern_presenter argument, which defaults to a sine grating presented
-    for a short duration.  By convention, most Topographica example
-    files are designed to have a suitable activity pattern computed by
-    that time, but the duration will need to be changed for other
-    models that do not follow that convention.
-    """
-
-    if num_phase <= 0 or num_orientation <= 0 or num_disparity <= 0:
-        raise ValueError("num_phase, num_disparity and num_orientation must be greater than 0")
-
-    else:
-        step_phase=2*pi/num_phase
-        step_orientation=pi/num_orientation
-        step_disparity=2*pi/num_disparity
-
-        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
-                          Feature(name="frequency",values=frequencies),
-                          Feature(name="phasedisparity",range=(0.0,2*pi),step=step_disparity,cyclic=True)]    
-
-        param_dict = {"scale":scale,"offset":offset}
-        x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
-     
-
-
-def measure_cog(proj_name ="Afferent"):    
-    """
-    Calculate center of gravity (CoG) for each CF of each unit in each CFSheet.
-
-    Unlike measure_position_pref and other measure commands, this one
-    does not work by collate the responses to a set of input patterns.
-    Instead, the CoG is calculated directly from each set of afferent
-    weights.  The CoG value thus is an indirect estimate of what
-    patterns the neuron will prefer, but is not limited by the finite
-    number of test patterns as the other measure commands are.
-
-    At present, the name of the projection to use must be specified
-    in the argument to this function, and a model using any other
-    name must specify that explicitly when this function is called.
-    """
-    ### JABHACKALERT: Should be updated to support multiple projections
-    ### to each sheet, not requiring the name to be specified.
-    
-    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
-    
-    for sheet in measured_sheets:
-	for proj in sheet.in_connections:
-	    if proj.name == proj_name:
-		rows,cols=sheet.activity.shape
-		xpref=zeros((rows,cols),Float)
-		ypref=zeros((rows,cols),Float)
-		for r in xrange(rows):
-		    for c in xrange(cols):
-			cf=proj.cf(r,c)
-			r1,r2,c1,c2 = cf.slice_array
-			row_centroid,col_centroid = centroid(cf.weights)
-			xcentroid, ycentroid = proj.src.matrix2sheet(
-			        r1+row_centroid+0.5,
-				c1+col_centroid+0.5)
-                    
-			xpref[r][c]= xcentroid
-			ypref[r][c]= ycentroid
-                    
-			new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
-			sheet.sheet_view_dict['XCoG']=new_view
-			new_view = SheetView((ypref,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
-			sheet.sheet_view_dict['YCoG']=new_view
-    
-                
-
-def update_activity():
-    """
-    Make a map of neural activity available for each sheet, for use in template-based plots.
-    
-    This command simply asks each sheet for a copy of its activity
-    matrix, and then makes it available for plotting.  Of course, for
-    some sheets providing this information may be non-trivial, e.g. if
-    they need to average over recent spiking activity.
-    """
-    for sheet in topo.sim.objects(Sheet).values():
-        activity_copy = array(sheet.activity)
-        new_view = SheetView((activity_copy,sheet.bounds),
-                              sheet.name,sheet.precedence,topo.sim.time())
-        sheet.sheet_view_dict['Activity']=new_view
-    
-
-
-
-def update_connectionfields():
-    """
-    Add SheetViews for the weights of one unit in a CFSheet, 
-    for use in template-based plots.
-    """
-    sheets = topo.sim.objects(Sheet).values()
-    x = coordinate[0]
-    y = coordinate[1]
-    for s in sheets:
-	if (s.name == sheet_name and isinstance(s,CFSheet)):
-	    s.update_unit_view(x,y)
-
-
-def update_projections():
-    """
-    Add SheetViews for the weights in one CFProjection,
-    for use in template-based plots.
-    """
-    sheets = topo.sim.objects(Sheet).values()
-    for s in sheets:
-	if (s.name == sheet_name and isinstance(s,CFSheet)):
-	    for x,y in proj_coords:
-		s.update_unit_view(x,y,proj_name)
-
-
-def update_projectionactivity():
-    """
-    Add SheetViews for all of the Projections of the ProjectionSheet
-    specified by sheet_name, for use in template-based plots.
-    """
-    
-    for s in topo.sim.objects(Sheet).values():
-	if (s.name == sheet_name and isinstance(s,ProjectionSheet)):
-            for p in s.in_connections:
-                if not isinstance(p,Projection):
-                    topo.sim.debug("Skipping non-Projection "+p.name)
-                else:
-                    v = p.get_projection_view(topo.sim.time())
-                    key = ('ProjectionActivity',v.projection.dest.name,v.projection.name)
-                    v.projection.dest.sheet_view_dict[key] = v
 

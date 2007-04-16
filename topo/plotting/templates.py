@@ -1,8 +1,9 @@
 """
-PlotGroupTemplate class, and global repository of such objects.
+PlotGroupTemplate class and global repository of such objects.
 
-These classes allow users to specify different types of plots in a way
-that is independent of particular models or Sheets.
+This code allows users to specify different types of plots in a way
+that is independent of particular models or Sheets.  Search for
+new_pgt elsewhere in the code to see examples of specific templates.
 
 $Id$
 """
@@ -119,10 +120,14 @@ class PlotGroupTemplate(ParameterizedObject):
 	self.static_images = KeyedList(static_images)
 
 
-    ### JCALERT! We might eventually write these two functions
-    ### 'Python-like' by using keyword argument to specify each
-    ### channel and then get the dictionnary of all remaining
-    ### arguments....
+    # JCALERT! We might eventually write these two functions
+    # 'Python-like' by using keyword argument to specify each
+    # channel and then get the dictionnary of all remaining
+    # arguments.
+    # 
+    # JABALERT: We should also be able to store a documentation string
+    # describing each plot (for hovering help text) within each
+    # plot template.
     def add_plot(self,name,specification_tuple_list):
 	dict={}
 	for key,value in specification_tuple_list:
@@ -135,28 +140,11 @@ class PlotGroupTemplate(ParameterizedObject):
         
 
 
-
-###############################################################################
-# Specific PlotGroupTemplates are stored in this repository,
-# to which users can add their own as needed
 plotgroup_templates = KeyedList()
-
-
-
-###############################################################################
-# Sample plots; users can override any of these as necessary
-#
-# JABALERT: Should eventually remove anything mentioning OrientationPreference
-# or OrientationSelectivity from here, and instead set those up in
-# measure_or_pref or somewhere like that.  That way, there will be no special
-# treatment of any particular input feature.
-
-# JABALERT:
-# We should also be able to store a documentation string describing each plot
-# (for hovering help text) within each template.
-# JC: we should also maybe add the situate option (and auto-refresh?)
-### we might want to pass a plotgroup_type to the template
-### (see corresponding alert in PlotGroupPanel)
+"""
+Global repository of PlotGroupTemplates, to which users can add
+their own as needed.
+"""
 
 
 def new_pgt(**params):
@@ -170,116 +158,3 @@ def new_pgt(**params):
     pgt = PlotGroupTemplate(**params)
     plotgroup_templates[pgt.name]=pgt
     return pgt
-
-
-pgt= new_pgt(name='Activity',category="Basic",
-             doc='Plot the activity for all Sheets.',
-             command='update_activity()', plot_immediately=True)
-pgt.add_plot('Activity',[('Strength','Activity'),
-                         ('Hue','OrientationPreference'),
-                         ('Confidence','OrientationSelectivity')])
-
-pgt= new_pgt(name='Connection Fields',category="Basic",
-             doc='Plot the weight strength in each ConnectionField of a specific unit of a Sheet.',
-             command='update_connectionfields()',
-             plot_immediately=True, normalize=True)
-pgt.add_plot('Connection Fields',[('Strength','Weights'),
-                                  ('Hue','OrientationPreference'),
-                                  ('Confidence','OrientationSelectivity')])
-
-pgt= new_pgt(name='Projection',category="Basic",
-             doc='Plot the weights of an array of ConnectionFields in a Projection.',
-             command='update_projections()',
-             plot_immediately=True, normalize=True)
-pgt.add_plot('Projection',[('Strength','Weights'),
-                           ('Hue','OrientationPreference'),
-                           ('Confidence','OrientationSelectivity')])
-
-pgt= new_pgt(name='Projection Activity',category="Basic",
-             doc='Plot the activity in each Projection that connects to a Sheet.',
-             command='update_projectionactivity()',
-             plot_immediately=True, normalize=True)
-pgt.add_plot('ProjectionActivity',[('Strength','ProjectionActivity')])
-
-
-
-pgt= new_pgt(name='Position Preference',category="Preference Maps",
-             doc='Measure preference for the X and Y position of a Gaussian.',
-             command='measure_position_pref() ; topographic_grid()',
-             normalize=True)
-
-pgt.add_plot('X Preference',[('Strength','XPreference')])
-pgt.add_plot('Y Preference',[('Strength','YPreference')])
-pgt.add_plot('Position Preference',[('Red','XPreference'),
-                                    ('Green','YPreference')])
-
-
-pgt= new_pgt(name='Center of Gravity',category="Preference Maps",
-             doc='Measure the center of gravity of each ConnectionField in a Projection.',
-             command='measure_cog(proj_name="Afferent") ; topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG")',
-             normalize=True)
-pgt.add_plot('X CoG',[('Strength','XCoG')])
-pgt.add_plot('Y CoG',[('Strength','YCoG')])
-pgt.add_plot('CoG',[('Red','XCoG'),('Green','YCoG')])
-
-
-
-pgt= new_pgt(name='Orientation Preference',category="Preference Maps",
-             doc='Measure preference for sine grating orientation.',
-             command='measure_or_pref()')
-pgt.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
-pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
-						   ('Confidence','OrientationSelectivity')])
-pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
-pgt.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
-
-
-pgt= new_pgt(name='Ocular Preference',category="Preference Maps",
-             doc='Measure preference for sine gratings between two eyes.',
-             command='measure_od_pref()')
-pgt.add_plot('Ocular Preference',[('Strength','OcularPreference')])
-pgt.add_plot('Ocular Selectivity',[('Strength','OcularSelectivity')])
-
-
-pgt= new_pgt(name='Spatial Frequency Preference',category="Preference Maps",
-             doc='Measure preference for sine grating frequency.',
-             command='measure_sf_pref(frequencies=frange(1.0,6.0,0.2),num_phase=15,num_orientation=4)')
-pgt.add_plot('Spatial Frequency Preference',[('Strength','FrequencyPreference')])
-pgt.add_plot('Spatial Frequency Selectivity',[('Strength','FrequencySelectivity')]) # confidence??
-
-
-pgt= new_pgt(name='PhaseDisparity Preference',category="Preference Maps",
-             doc='Measure preference for sine gratings differing in phase between two sheets.',
-             command='measure_phasedisparity()')
-pgt.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
-pgt.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
-pgt.add_static_image('Color Key','topo/commands/disp_key_white_vert_small.png')
-
-
-
-new_pgt(name='Orientation Tuning Fullfield',category="Tuning Curves",doc="""
-            Plot orientation tuning curves for a specific unit, measured using full-field sine gratings.
-            Although the data takes a long time to collect, once it is ready the plots
-            are available immediately for any unit.""",
-        command='measure_or_tuning_fullfield()',
-        plotcommand='or_tuning_curve(x_axis="orientation", plot_type=pylab.plot, unit="degrees")',
-        template_plot_type="curve")
-
-new_pgt(name='Orientation Tuning',category="Tuning Curves",
-        doc='Measure orientation tuning for a specific unit, using an appropriate pattern for that unit.',
-        command='measure_or_tuning(); or_tuning_curve(x_axis="orientation",plot_type=pylab.plot,unit="degrees")',
-        template_plot_type="curve",
-        prerequisites=['XPreference'])
-
-new_pgt(name='Contrast Response',category="Tuning Curves",
-        doc='Measure the contrast response function for a specific unit.',
-        command='measure_contrast_response(); tuning_curve(x_axis="contrast",plot_type=pylab.semilogx,unit="%")',
-        template_plot_type="curve",
-        prerequisites=['OrientationPreference','XPreference'])
-
-new_pgt(name='Size Tuning',category="Tuning Curves",
-        doc='Measure the size preference for a specific unit.',
-        command='measure_size_response(); tuning_curve(x_axis="size",plot_type=pylab.plot,unit="Diameter of stimulus")',
-        template_plot_type="curve",
-        prerequisites=['OrientationPreference','XPreference'])
-
