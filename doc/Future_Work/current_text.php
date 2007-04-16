@@ -78,11 +78,9 @@ Update scipy (weave) so that the numpy test deprecation warnings go away.
 
 
 <H4>2007/04/15 (CB): plot templates sections</H4>
-Add a section label for each plot template, so that we can categorize
-them in the menus. Categories: maybe Basic, Preference maps, and
-Curves? Link to help. Add a page about plots to the User Manual
-explaining both the current plots and showing how easy it is to add
-new one.
+JAB: I've added a category to each PlotGroupTemplate, and these can
+now be used in the menus.  The Plots menu can also now link to my
+new User_Manual/plotting.html page.
 
 
 <H4>2007/04/05 (CB): examples/Makefile -> python</H4>
@@ -94,29 +92,6 @@ can follow the tutorial instructions.
   
 
 <H4>2007/03/28 (?): Figure out where to put this info in the docs:</H4>
-<blockquote>
-If you often need to change the parameters for map or curve measurement,
-then you can do that easily without modifying your copy of
-Topographica by putting the following lines into the .ty file to which
-they apply:
-
-<pre>
-  from topo.plotting.templates import plotgroup_templates
-  plotgroup_templates["Orientation Preference"].command=
-      "measure_or_pref(scale=0.75,offset=0.5,display=False,
-       pattern_presenter=PatternPresenter(
-           pattern_generator=SineGrating(),apply_output_fn=True,
-           duration=0.225))"
-</pre>
-
-<P>Of course, the specific parameters here can be anything you want, and
-you can do it for any plot.
-
-<P>You can also put these lines into $HOME/.topographicarc, if you find
-that you always want different defaults than Topographica's, for all
-scripts that you look at...
-</blockquote>
-       
 We also need to document .topographicarc somewhere, and tuning curve plots.
 
 
