@@ -460,7 +460,7 @@ pyaudiolab-uninstall:
 ##############################################################
 # mlabwrap (high level python to matlab bridge)
 #
-MLABWRAP = mlabwrap-1.0a3
+MLABWRAP = mlabwrap-1.0
 MLABWRAP_UNINSTALL =  ${PYTHON_LIB}/site-packages/mlabwrap.py*
 MLABWRAP_UNINSTALL += ${PYTHON_LIB}/site-packages/mlabrawmodule.so
 
