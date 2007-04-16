@@ -28,7 +28,7 @@ pylint-0.7.0
 docutils
 docutils-0.4
 epydoc
-epydoc-3.0alpha3
+epydoc-3.0beta1
 numpy
 numpy-1.0.2
 scipy
