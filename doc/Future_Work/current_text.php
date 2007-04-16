@@ -88,8 +88,9 @@ Migrate examples/Makefile to python script. Then, Windows users
 can follow the tutorial instructions. 
 
 
-<H4>2007/04/12 (CB): Update mlabwrap</H4>
-  
+
+
+
 
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
 
