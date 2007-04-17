@@ -643,7 +643,7 @@ class TopoConsole(Tkinter.Tk):
         Test Pattern Window.  
         """
         if TestPattern.valid_context():
-            self.input_params_window = TestPattern(self.input_params_window,self)
+            self.input_params_window = TestPattern(self)
             self.input_params_window.title('Test Pattern')
             self.messageBar.message('state', 'OK')
         else:
