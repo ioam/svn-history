@@ -27,7 +27,7 @@ class GeneratorSheet(Sheet):
     
     dest_ports=['Trigger']
 
-    period = Number(default=1,doc=
+    period = Number(default=1,bounds=(0,None),doc=
         "Delay (in Simulation time) between generating new input patterns.")
     
     phase  = Number(default=0.05,doc=
