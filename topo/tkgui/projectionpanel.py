@@ -290,7 +290,7 @@ are stored.""")
         self.generate_plotgroup_key() creates the density information needed for
         a ProjectionPlotGroup to create necessary Plots.
         """
- 	plotgroup = ProjectionPlotGroup([],self.pgt,self.region.get(),
+ 	plotgroup = ProjectionPlotGroup([],self._pg_template(),self.region.get(),
 					self.weight_name.get(),self.density,
                                         normalize=self.normalize.get(),
                                         sheetcoords=self.sheetcoords.get(),
