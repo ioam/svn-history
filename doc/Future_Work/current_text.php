@@ -239,7 +239,8 @@ weight mask specially. Generalize oo_or_map_topo.params.
 <H4>2007/03/26 (CB): right-click menus</H4>
 Tidy code, then make it possible to add things to the menu without
 changing the tkgui files, like the templates work for activity plots.
-
+The menus need to be dynamic, adapting to whatever channels
+are present, rather than always assuming that plots are SHC plots.
 
 <H4>2007/03/26 (CB): PatternGeneratorParameter default value</H4>
 Investigate why this:
