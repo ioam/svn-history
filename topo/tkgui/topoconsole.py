@@ -465,7 +465,7 @@ class TopoConsole(Tkinter.Tk):
     def __help_menu(self):
         """Add the help menu options."""
 
-        self.menubar.addmenu('Help','Information about Topographica') #, side='right')#CB: possible on toplevel?...check
+        self.menubar.addmenu('Help','Information about Topographica',name='help')
 
         # CEBALERT: can simplify this
         self.menubar.addmenuitem('Help', 'command',
