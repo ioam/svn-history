@@ -2,14 +2,19 @@
 Commands for running the examples files.
 """
 
-# CEBHACKALERT! Still being written!
-# Not sure "setup.py" is the right name - maybe run.py?
+# CEBALERT: unfinished, and currently does not work on Windows.
+
+### NOTES
 #
-# Just translating the Makefile for now...but we definitely have
-# topographica by now so we could do this differently.
+# - Could be tricky to get this to work on Windows:
+#  http://mail.python.org/pipermail/python-bugs-list/2002-March/010393.html
+#  http://support.microsoft.com/kb/191495
 #
-# Has none of the Makefile's dependency processing, so just does
-# what you tell it (i.e. over-writes existing files).
+# - rename to run.py
+#
+# - has none of the Makefile's dependency processing, so just does
+#  what you tell it (i.e. over-writes existing files, which might be
+#  what we want).
 
 
 
@@ -110,12 +115,12 @@ targets = {
 
 
 
-
+# CB: using os.system rather than spawnv would allow this file to be simpler.
 
 
 ### Create the list of commands to execute either by getting the
 ### command labels from a target, or by inserting the command label
-# CEBALERT: I don't know any string methods; I'm sure this can
+# CB: I don't know any string methods; I'm sure this can
 # be simplified!
 command_labels=[]
 for a in command_names:
