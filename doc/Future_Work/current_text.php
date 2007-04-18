@@ -70,10 +70,6 @@ into the python_topo directory, this will fix the problem. I'll
 upload a new python_topo shortly.
 
 
-<H4>2007/04/10: update weave</H4>
-Update scipy (weave) so that the numpy test deprecation warnings go away.
-
-
 <H4>2007/04/15 (CB): plot templates sections</H4>
 JAB: I've added a category to each PlotGroupTemplate, and these can
 now be used in the menus.  The Plots menu can also now link to my
