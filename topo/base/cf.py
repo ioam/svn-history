@@ -251,7 +251,7 @@ class ConnectionField(ParameterizedObject):
                
         # translate to this cf's location
         cf_row,cf_col = self.input_sheet.sheet2matrixidx(self.x,self.y)
-        bounds_x,bounds_y=self.bounds_template.get_center()
+        bounds_x,bounds_y=self.bounds_template.centroid()
         b_row,b_col=self.input_sheet.sheet2matrixidx(bounds_x,bounds_y)
 
         row_offset = cf_row-b_row
@@ -714,7 +714,7 @@ class CFProjection(Projection):
         # don't alter the original_bounds
         bounds = copy.deepcopy(original_bounds)
         
-        bounds_xcenter,bounds_ycenter=bounds.get_center()
+        bounds_xcenter,bounds_ycenter=bounds.centroid()
         sheet_rows,sheet_cols=self.src.shape
         # arbitrary (e.g. could use 0,0) 
         center_row,center_col = sheet_rows/2,sheet_cols/2

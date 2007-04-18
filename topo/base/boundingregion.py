@@ -36,7 +36,11 @@ class BoundingRegion(ParameterizedObject):
         raise NotImplementedError
     def aarect(self):
         raise NotImplementedError
-
+    def centroid(self):
+        """
+        Return the coordinates of the center of this BoundingBox
+        """        
+        return self.aarect().centroid()
 
 class BoundingBox(BoundingRegion):
     """
@@ -162,15 +166,6 @@ class BoundingBox(BoundingRegion):
         """
         return self._aarect.lbrt()
 
-    def get_center(self):
-        """
-        Return the coordinates of the center of this BoundingBox
-        """
-        l,b,r,t = self._aarect.lbrt()
-        xcenter = l+(r-l)/2.0
-        ycenter = b+(t-b)/2.0
-        return xcenter,ycenter
-
 
 
 class Cartesian2DPoint(Parameter):
@@ -246,6 +241,8 @@ class Unbounded(BoundingRegion):
         pass
     def aarect(self):
         return AARectangle((-inf,-inf),(inf,inf))
+    def centroid(self):
+        return 0.0,0.0
 
 
 ### This class is valid only for BoundingBoxes, because it
