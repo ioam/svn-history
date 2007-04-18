@@ -165,6 +165,7 @@ NUMPY_UNINSTALL =  ${PYTHON_LIB}/site-packages/numpy
 
 numpy: ${NUMPY}.tar.gz python numpy.diff
 	tar xzf ${NUMPY}.tar.gz
+	cd ${NUMPY}; patch -p0 < ../numpy.diff
 	cd ${NUMPY}; ${PREFIX}/bin/python setup.py install
 	touch numpy
 
