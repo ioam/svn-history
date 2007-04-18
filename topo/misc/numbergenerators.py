@@ -117,6 +117,16 @@ class NormalRandom(RandomDistribution):
 # storing topo.sim leads to a infinite loop during pickling topo.sim.
 # Surely there is somehow a way to provide topo.sim.time to the
 # constructor rather than hardcoding it like this...
+#
+# JP: CallableParameter now handles pickling instance methods like
+# topo.sim.time.  I have added a parameter below, but it is commented
+# out because of the assertion (above) about circular references to
+# topo.sim causing infinite loops in pickling.  (The
+# InstanceMethodWrapper that CallableParameter uses stores a refernce
+# to the instance that the method belongs to.) Normally, pickling handles
+# circular references with no problem, so I wonder what's going wrong.
+
+
 import topo
 class ExponentialDecay(ParameterizedObject):
     """
@@ -128,15 +138,25 @@ class ExponentialDecay(ParameterizedObject):
     See http://en.wikipedia.org/wiki/Exponential_decay.
     """
     starting_value = Number(1.0, doc="Value used for time zero.")
+    ending_value = Number(0.0, doc="Value used for time infinity.")
 
     time_constant = Number(10000,doc="""
         Time scale for the exponential; large values give slow decay.""")
 
+    # JPALERT: A default base of 2 instead of e would make 
+    # time_constant = half-life.  Half-lives can be reasoned about
+    # much more easily than 1/e-lives.
     base = Number(e, doc="""
         Base of the exponent; the default yields starting_value*exp(-t/time_constant.""")
 
+##     time_fn = CallableParameter(default=topo.sim.time,doc="""
+##         Function to generate the time used for the decay.""")
+    time_fn = topo.sim.time
+
     def __call__(self):
-        return self.starting_value * self.base**(-1.0*float(topo.sim.time())/
+        Vi = self.starting_value
+        Vm = self.ending_value
+        return Vm + (Vi - Vm) * self.base**(-1.0*float(self.time_fn())/
                                                  float(self.time_constant))
 
 
