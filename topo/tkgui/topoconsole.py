@@ -225,12 +225,6 @@ class TopoConsole(Tkinter.Tk):
 
 
         
-        # CEBALERT: the behavior on linux for the main menu bar is not
-        # so good. Menu shouldn't activate until it's been clicked, then
-        # items should activate automatically after that. Should be able to
-        # click anywhere off the menu to deactivate it. Can probably
-        # achieve that with some tk code like activate_cascade below.
-
         ##########
         ### Make cascade menus open automatically on linux when the mouse
         ### is over the menu title.
@@ -246,6 +240,7 @@ class TopoConsole(Tkinter.Tk):
         ##########
 
 
+# CB: example code for plot gallery
 ##         plots = []
 ##         for (label,obj) in plotgroup_templates.items():
 ##             entry = PlotsMenuEntry(self,obj,label=label)
@@ -830,6 +825,7 @@ if __name__ != '__main__':
 
 
 
+# CB: example code for plot gallery
 ## import Image,ImageOps
 ## import ImageTk
 ## import bwidget
