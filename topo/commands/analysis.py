@@ -414,6 +414,25 @@ pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 pgt.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
 
 
+def measure_caricaturization(display=True,weighted_average=False,
+                    pattern_presenter=PatternPresenter(pattern_generator=FaceSpace2Dfromfile(),apply_output_fn=True,duration=1.0)):
+
+    feature_values = [Feature(name="caricaturization", values = frange(0.0, 1.125, 0.125), cyclic = False),
+                      Feature(name="identity", values = [0.25, 0.5, 0.75, 1.0], cyclic = False)]
+
+    param_dict = {'size_normalization' : 'original', 'x' : 0.0, 'y' : 0.0}
+    x=FeatureMaps(feature_values)
+    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+
+def measure_face_pref(display=True,weighted_average=False,
+                    pattern_presenter=PatternPresenter(pattern_generator=FaceSpace2Dfromfile(),apply_output_fn=True,duration=1.0)):
+
+    feature_values = [Feature(name="ci", values = frange(1/36.0, 1.0 + 1/36.0, 1/36.0), cyclic = False)]
+
+    param_dict = {'size_normalization' : 'original', 'x' : 0.0, 'y' : 0.0}
+    x=FeatureMaps(feature_values)
+    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,weighted_average=True,
                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
