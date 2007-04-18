@@ -1,5 +1,5 @@
 """
-PlotGroupTemplate class and global repository of such objects.
+PlotGroupTemplate class and global repository for such objects.
 
 This code allows users to specify different types of plots in a way
 that is independent of particular models or Sheets.  Search for
@@ -158,16 +158,3 @@ def new_pgt(**params):
     pgt = PlotGroupTemplate(**params)
     plotgroup_templates[pgt.name]=pgt
     return pgt
-
-pgt = new_pgt(name='Caricaturization Preference',command='measure_caricaturization(display=True,weighted_average=False,pattern_presenter=PatternPresenter(pattern_generator=FaceSpace2Dfromfile(),apply_output_fn=True,duration=1.0))')
-pgt.add_plot('Caricaturization Preference',[('Strength','CaricaturizationPreference')])
-pgt.add_plot('Caricaturization Preference',[('Hue','CaricaturizationPreference')])
-pgt.add_plot('Caricaturization Selectivity',[('Strength','CaricaturizationSelectivity')])
-pgt.add_plot('Identity Preference',[('Strength','IdentityPreference')])
-pgt.add_plot('Identity Preference',[('Hue','IdentityPreference')])
-pgt.add_plot('Identity Selectivity',[('Strength','IdentitySelectivity')])
-
-pgt = new_pgt(name='Face Preference',command='measure_face_pref(display=True,weighted_average=False,pattern_presenter=PatternPresenter(pattern_generator=FaceSpace2Dfromfile(),apply_output_fn=True,duration=1.0))')
-pgt.add_plot('Face Preference',[('Strength','CiPreference')])
-pgt.add_plot('Face Preference',[('Hue','CiPreference')])
-pgt.add_plot('Face Selectivity',[('Strength','CiSelectivity')])
