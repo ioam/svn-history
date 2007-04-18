@@ -270,3 +270,44 @@ class Image(PatternGenerator):
         return self.ps(x,y,float(xdensity),float(ydensity),size_normalization,float(width),float(height))
 
 
+class FaceSpace2Dfromfile(Image):
+
+    caricaturization = DynamicNumber(default = Choice(choices = [0, 20, 40, 60, 80, 100, 120, 140, 160]),
+                                     precedence = 0.20, doc = """""")
+
+    identity = DynamicNumber(default = UniformRandomInt(lbound = 1, ubound = 4, seed = 21),
+                             precedence = 0.20, doc = """""")
+
+    ci  = Number(default = 0.0, bounds = (0.0, 1.0), softbounds = (0.0, 2.0), precedence = 0.30)
+
+    file_prefix = '../imagedb/leopold/f'
+
+    file_suffix = '_enlarged.png'
+
+    file_separator = '_'
+
+    def function(self,**params):
+
+        caricaturization = params.get('caricaturization', self.caricaturization)
+        identity = params.get('identity', self.identity)
+        if type(caricaturization) == type(1.0):
+	    caricaturization = int(caricaturization * 160)
+	if type(identity) == type(1.0):
+	    identity = int(identity * 4)
+
+	ci = params.get('ci', self.ci)
+        file_prefix = params.get('file_prefix', self.file_prefix)
+        file_suffix = params.get('file_suffix', self.file_suffix)
+        file_separator = params.get('file_separator', self.file_separator)
+
+        if ci != 0.0:
+	    temp = int(ci * 36.0)
+	    identity = (temp - 1) / 9 + 1
+	    if temp % 9 == 0:
+	        caricaturization = 8 * 20
+	    else:
+	        caricaturization = (temp % 9 - 1) * 20
+
+	self.filename = file_prefix + str(identity) + file_separator + str(caricaturization) + file_suffix
+        #print 'caricaturization = ' + str(caricaturization) + '  identity = ' + str(identity)
+        return Image.function(self, **params)    
