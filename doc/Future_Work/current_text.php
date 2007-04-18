@@ -468,6 +468,49 @@ Topographica.
 
 
 
+<!-- 2007/04/18
+Information about OS X & icons, from Kevin Walzer (www.codebykevin.com)
+
+The application icon is part of the application bundle structure. See
+the link below for some basic tips on how to create an icon and specify
+it in your application. (Note this article does not deal specifically
+with deploying Python applications, but the parts about the icon are
+applicable.)
+
+http://tk-components.sourceforge.net/tk-bundle-tutorial/index.html
+
+The easiest way to specify the icon with a Python application is part of
+the setup file you use with py2app (which wraps all Python packages into
+an application package on the Mac).  Here's a basic example:
+
+"""
+Script for building the example.
+
+Usage:
+    python setup.py py2app
+"""
+from distutils.core import setup
+import py2app
+import os
+
+imagedir = (os.getcwd() + "/images")
+helpdir = (os.getcwd() + "/html")
+
+setup(
+    app = ['Phynchronicity.py'],
+    data_files = [imagedir, helpdir],
+    options=dict(py2app=
+                    dict(iconfile='Phynchronicity.icns',
+                    plist = 'Info.plist'),
+             ),
+    )
+
+You can get more information about using py2app, and help with
+questions, on the MacPython mailing list.
+
+-->
+
+
 <!-- Also suggested by Geisler, 7/1/2005:
   Package as a Matlab toolbox to get the right people to use it?
   Package it as an easy-to-use out-of-the-box optical imaging simulator
