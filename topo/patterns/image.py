@@ -11,11 +11,12 @@ import ImageOps
 from numpy.oldnumeric import array, Float, sum, ravel, ones
 
 from topo.base.boundingregion import BoundingBox
-from topo.base.parameterclasses import Filename, Number, Parameter, Enumeration
+from topo.base.parameterclasses import Filename, Number, Parameter, Enumeration, DynamicNumber
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.projection import OutputFnParameter
 from topo.base.sheetcoords import SheetCoordinateSystem
+from topo.misc.numbergenerators import Choice, UniformRandomInt
 
 from topo.outputfns.basic import DivisiveNormalizeLinf,IdentityOF
 

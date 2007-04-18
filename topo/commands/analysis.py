@@ -26,6 +26,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.parameterclasses import Parameter
 from topo.analysis.featureresponses import FeatureMaps, FeatureCurves
 from topo.plotting.templates import new_pgt
+from topo.patterns.image import FaceSpace2Dfromfile
 
 class Feature(object):
     """
@@ -147,7 +148,7 @@ class PatternPresenter(ParameterizedObject):
         if features_values.has_key("contrast") or param_dict.has_key("contrast"):
             if self.contrast_parameter=='michelson_contrast':
                 for g in inputs.itervalues():
-                    g.offset=1.0
+                    g.offset=0.5
                     g.scale=2*g.offset*g.contrast/100
 
             
@@ -158,7 +159,7 @@ class PatternPresenter(ParameterizedObject):
                 # to the target offset in the pattern type
                 # SineGratingDisk
                 for g in inputs.itervalues():
-                    g.offset=1.0   #In this case this is the offset of both the background and the sine grating
+                    g.offset=0.5   #In this case this is the offset of both the background and the sine grating
                     g.scale=2*g.offset*g.contrast/100
             
                 
