@@ -579,3 +579,24 @@ class ModelEditor:
                 # connect the connection to the destination node
                 editor_connection.connect(dest, con)
         self.canvas.redraw_objects()
+
+
+def setup_editor_grid(objgrid,xstart=100,xstep=150,ystart=100,ystep=150):
+    """
+    Set the editor positions of simulation objects in a grid pattern.
+
+    Takes a list of lists of simulation objects and positions them
+    in the editor window left-to-right, top-to-bottom, starting
+    at (xstart,ystart) and advancing by xstep and ystep.
+
+    The object None can be placed in the grid to skip a grid space.
+    """
+    y = ystart
+    for row in objgrid:
+        x = xstart
+        for obj in row:
+            if obj:
+                obj.gui_x = x
+                obj.gui_y = y
+            x += xstep
+        y += ystep
