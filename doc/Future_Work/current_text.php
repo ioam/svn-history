@@ -92,6 +92,11 @@ can follow the tutorial instructions.
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
 
 
+<H4>2007/04/18</H4>: more tests for non-square sheets
+We need a test with non-square input sheets, non-square LISSOM sheets, etc., 
+with both types of non-squareness...
+
+
 <H4>2007/04/10 (JB): Add an example that is a good starting point for</H4>
 wrapping an external simulation as a Sheet in Topographica.  A
 first pass wrapping a spiking retina simulation written in PyNN/PyNEST
