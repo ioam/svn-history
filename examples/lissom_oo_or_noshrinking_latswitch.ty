@@ -1,0 +1,149 @@
+"""
+Based on lissom_oo_or_noshrinking_adapthomeo. Longrange lateral connections change
+the strength of their connection based on the activity of each unit.
+
+This is still a work in progress - the parameters of the strength function
+need to be determined.
+
+$Id$
+"""
+__version__='$$'
+
+import numpy.oldnumeric as Numeric
+import numpy.oldnumeric.random_array as RandomArray
+from numpy.oldnumeric import sum,ones,exp
+import numpy
+import copy
+import fixedpoint
+
+from math import pi, sqrt
+from fixedpoint import FixedPoint
+
+import topo.patterns.basic
+import topo.patterns.random
+
+from topo.sheets.lissom import LISSOM
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.projections.basic import CFProjection, SharedWeightCFProjection
+from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.base.parameterclasses import DynamicNumber, Number
+from topo.base.cf import CFSheet, CFPResponseFn
+from topo.base.boundingregion import BoundingBox
+from topo.learningfns.optimized import CFPLF_Hebbian_opt
+from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.outputfns.basic import PiecewiseLinear,DivisiveNormalizeL1
+from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
+from topo.outputfns.homeostatic import AdaptingHomeostaticMaxEnt
+from topo.patterns.basic import Gaussian
+from topo.responsefns.projfns import CFPRF_ActivityBased
+
+topo.sim.name = "lissom_oo_or_noshrinking_latswitch"
+
+
+num_inputs=2
+input_type=topo.patterns.basic.Gaussian
+inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),
+                   y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i)),
+                   orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56+i)),
+                   size=0.088388, aspect_ratio=4.66667, scale=1.0,
+                   bounds=BoundingBox(radius=0.8))
+                for i in xrange(num_inputs)]
+
+combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
+
+# Specify weight initialization, response function, and learning function
+RandomArray.seed(500,500)
+CFProjection.weights_generator=topo.patterns.random.UniformRandom()
+CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.response_fn=CFPRF_DotProduct_opt()
+CFProjection.learning_fn=CFPLF_Hebbian_opt()
+CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
+
+
+###########################################
+# build simulation
+
+topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
+                                  input_generator=combined_inputs,
+                                  period=1.0, phase=0.05,
+                                  nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
+
+topo.sim['LGNOn']=CFSheet(nominal_density=24.0,
+                          nominal_bounds=BoundingBox(radius=0.5+0.25),
+                          output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                          measure_maps=False)
+
+topo.sim['LGNOff']=CFSheet(nominal_density=24.0,
+                           nominal_bounds=BoundingBox(radius=0.5+0.25),
+                           output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                           measure_maps=False)
+
+topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
+                        nominal_bounds=BoundingBox(radius=0.5),tsettle=9,
+                        output_fn=AdaptingHomeostaticMaxEnt(a_init=14.5, b_init=-4, eta_init=0.0002, mu=0.01, lstep=8, rate_factor=0.1))
+
+# DoG weights for the LGN
+centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+
+on_weights = topo.patterns.basic.Composite(
+    generators=[centerg,surroundg],operator=numpy.subtract)
+
+off_weights = topo.patterns.basic.Composite(
+    generators=[surroundg,centerg],operator=numpy.subtract)
+
+
+
+topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
+                 connection_type=SharedWeightCFProjection,strength=2.33,
+                 nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
+                 weights_generator=on_weights)
+
+topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
+                 connection_type=SharedWeightCFProjection,strength=2.33,
+                 nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
+                 weights_generator=off_weights)
+
+
+topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
+                 connection_type=CFProjection,strength=1.0,name='LGNOnAfferent',
+                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
+                                                                             topo.patterns.random.UniformRandom()]),
+                 nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
+                                                                                                                ExponentialDecay(starting_value =
+                                                                                                                                 locals().get('LGNOnafferent_lr',0.9590/2),
+                                                                                                                                 time_constant=1600)))))
+#time constant depends on nuber of inputs!
+
+
+topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
+                 connection_type=CFProjection,strength=1.0,name='LGNOffAfferent',
+                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
+                                                                             topo.patterns.random.UniformRandom()]),
+                 nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
+                                                                                                                ExponentialDecay(starting_value =
+                                                                                                                                 locals().get('LGNOffafferent_lr',0.9590/2),
+                                                                                                                                 time_constant=1600)))))
+
+
+topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
+                 connection_type=CFProjection,strength=0.9,
+                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
+                 nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0) 
+            
+topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='Lateral',
+                 connection_type=CFProjection,response_fn=topo.responsefns.projfns.CFPRF_ActivityBased(),
+                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
+                                                                             topo.patterns.random.UniformRandom()]),
+                 nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.8087)
+
+
+
+# default locations for model editor
+topo.sim['V1'    ].gui_x=306.0;  topo.sim['V1'    ].gui_y=225.0
+topo.sim['LGNOn' ].gui_x=432.0;  topo.sim['LGNOn' ].gui_y=345.0
+topo.sim['LGNOff'].gui_x=150.0;  topo.sim['LGNOff'].gui_y=345.0
+topo.sim['Retina'].gui_x=279.0;  topo.sim['Retina'].gui_y=500.0
