@@ -1,0 +1,276 @@
+﻿"""
+Example of a LISSOM-based face-selective-area simulation.
+
+Intended to be a close (but approximate) match to the default FSA
+simulation (such as figure 10.12) of Miikkulainen, Bednar, Choe, and
+Sirosh (2005), Computational Maps in the Visual Cortex, Springer.
+Known differences include:
+
+ - The matching is not yet perfect at different densities
+ - The lateral inhibitory radius is up to 0.5 matrix units greater
+   than in the book, because Topographica enforces good
+   circular-shaped CF outlines.
+ - Input patterns are evaluated on the entire retina, instead of only up
+   to bounds_multiplier=2.5 times the gaussian sigma in the book
+ - Initial weight patterns are not smoothed around the edges, unlike
+   smooth_circular_outlines=True and smooth_circular_radius_trim=-0.25
+   used in the book
+ - Inhibitory weight pruning is disabled (not pruning all weights below
+   1e-5 as in the book)
+
+There may be other small differences, as this file has not yet been
+compared exhaustively to the original simulations.
+
+$Id$
+"""
+__version__='$Revision$'
+
+
+import numpy.oldnumeric.random_array as RandomArray
+import fixedpoint
+import numpy.oldnumeric as Numeric
+import numpy
+
+from math import pi, sqrt
+from fixedpoint import FixedPoint
+
+import topo.patterns.basic
+import topo.patterns.random
+
+from topo.patterns.basic import Gaussian,Composite
+from topo.sheets.lissom import LISSOM
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.projections.basic import CFProjection, SharedWeightCFProjection
+from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.base.parameterclasses import DynamicNumber
+from topo.base.cf import CFSheet
+from topo.base.boundingregion import BoundingBox
+from topo.learningfns.optimized import CFPLF_Hebbian_opt
+from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
+from topo.misc.numbergenerators import UniformRandom
+from topo.outputfns.homeostatic import HomeostaticMaxEnt, HomeostaticMaxEnt_debug, PiecewiseLinear_debug
+from topo.coordmapperfns.basic import ConstantMapper
+from topo.patterns.image import Image, FaceSpace2Dfromfile
+
+topo.sim.name = "face_space"
+
+GeneratorSheet.nominal_density = 48.0
+
+# Input patterns
+
+input_type = Image
+dir_base = "../imagedb/"
+#file_base = ["distortion/f" + str(f) + ".pgm" for f in range(1, 21)]
+#image_size = 170.0 / 48.0 * 0.55
+#file_base = ["heads/class57_" + str(f) + "_170x170.png" for f in range(6)]
+#image_size = 170.0 / 48.0
+#file_base = ["leopold/f" + str(f) + "_" + str(c) + ".png" for f in range(1, 5) for c in range(20, 180, 20)]
+#image_size = 68.0 / 14.0
+#file_base = ["faces_db/MPIm" + '0' * (3 - len(str(f))) + str(f) + "_0r.jpg" for f in range(1, 11)]
+#image_size = 256.0 / 28.0 / 2.5
+file_base = ["leopold/f1_" + str(c) + "_enlarged.png" for c in range(20, 180, 20)]
+image_size = 256.0 / 28.0 / 2.5
+inputs = [input_type(filename = dir_base + f,
+                     size_normalization='original',
+                     #x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12)),
+                     #y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34)),
+                     x = 0.0, y = 0.0,
+                     #size = image_size,
+                     orientation = 0)
+          for f in file_base]
+
+#combined_inputs=topo.patterns.basic.Selector(generators=inputs)
+combined_inputs = FaceSpace2Dfromfile(size_normalization='original', x = 0.0, y = 0.0, orientation = 0)
+
+# Default for tutorial
+topo.patterns.basic.Line.scale=0.9
+topo.patterns.basic.Gaussian.size=0.08333
+topo.patterns.basic.Gaussian.aspect_ratio=4.0
+
+# Specify weight initialization, response function, and learning function
+RandomArray.seed(500,500)
+CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.weights_generator = topo.patterns.basic.Constant()
+CFProjection.response_fn=CFPRF_DotProduct_opt()
+CFProjection.learning_fn=CFPLF_Hebbian_opt()
+CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
+SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
+
+
+###########################################
+# build simulation
+
+topo.sim['Retina']=GeneratorSheet(nominal_bounds=BoundingBox(radius=1.77),
+                                  nominal_density=28.0,
+                                  input_generator=combined_inputs,
+                                  period=1.0, phase=0.05)
+
+topo.sim['LGNOn']=CFSheet(nominal_density=18.0,
+                          nominal_bounds=BoundingBox(radius=1.542),
+                          output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                          measure_maps = False)
+
+topo.sim['LGNOff']=CFSheet(nominal_density=18.0,
+                           nominal_bounds=BoundingBox(radius=1.542),
+                           output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                           measure_maps = False)
+
+topo.sim['FSA'] = LISSOM(nominal_density=locals().get('default_density',18.0),tsettle=9,
+                        nominal_bounds=BoundingBox(radius=0.5))
+
+#topo.sim['FSA'].output_fn = HomeostaticMaxEnt()
+#topo.sim['FSA'].output_fn = HomeostaticMaxEnt_debug(a_init = 13.75, b_init = -0.1560 * 13.75,
+#                                              learning = True, mu = 0.21, eta = 0.005)
+topo.sim['FSA'].output_fn = HomeostaticMaxEnt(a_init = 11.75, b_init = -4.59,
+                                              learning = True, mu = 0.22, eta = 0.005)
+
+#topo.sim['FSA'].output_fn = PiecewiseLinear_debug()
+#topo.sim['FSA'].output_fn.lower_bound=0.05
+#topo.sim['FSA'].output_fn.upper_bound=0.65
+
+# DoG weights for the LGN
+centerg   = Gaussian(size=0.11079,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))
+surroundg = Gaussian(size=0.17725,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))
+
+on_weights = topo.patterns.basic.Composite(
+    generators=[centerg,surroundg],operator=numpy.subtract)
+
+off_weights = topo.patterns.basic.Composite(
+    generators=[surroundg,centerg],operator=numpy.subtract)
+
+blur_scale = 10.2 * 1.5 / 4.0
+
+topo.sim.connect('Retina','LGNOn',delay=FixedPoint('0.050', 3),
+                 connection_type=SharedWeightCFProjection, strength = blur_scale,
+                 nominal_bounds_template=BoundingBox(radius=0.235),name='RetinaToLGNOn',
+                 weights_generator=on_weights)
+
+topo.sim.connect('Retina','LGNOff',delay=FixedPoint('0.050', 3),
+                 connection_type=SharedWeightCFProjection, strength = blur_scale,
+                 nominal_bounds_template=BoundingBox(radius=0.235),name='RetinaToLGNOff',
+                 weights_generator=off_weights)
+
+topo.sim.connect('LGNOn','FSA',delay=FixedPoint('0.050', 3), dest_port=('Activity','JointNormalize', 'Afferent'),
+                 connection_type=CFProjection,strength=1.07,name='LGNOnAfferent',
+                 # JABALERT: Should probably simplify this by making a function for it.
+                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size = 0.4167 * (37.0 / 25.5)),
+                 nominal_bounds_template = BoundingBox(radius = 74.0 / 24.0 / 2.0), learning_rate = 9.533,
+                 coord_mapper = ConstantMapper())
+
+topo.sim.connect('LGNOff','FSA',delay=FixedPoint('0.050', 3), dest_port=('Activity','JointNormalize', 'Afferent'),
+                 connection_type=CFProjection,strength=1.07,name='LGNOffAfferent',
+                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size = 0.4167 * (37.0 / 25.5)),
+                 nominal_bounds_template = BoundingBox(radius = 74.0 / 24.0 / 2.0), learning_rate = 9.533,
+                 coord_mapper = ConstantMapper())
+
+topo.sim.connect('FSA','FSA',delay=FixedPoint('0.050', 3),name='LateralExcitatory',
+                 connection_type=CFProjection,strength=1.0,
+                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.4167),
+                 nominal_bounds_template=BoundingBox(radius=0.166666666667/1.5),learning_rate=0.0)  # 3.1856)
+
+topo.sim.connect('FSA','FSA',delay=FixedPoint('0.050', 3),name='LateralInhibitory',
+                 connection_type=CFProjection,strength=-1.5,
+                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=1.414),
+                 nominal_bounds_template=BoundingBox(radius=1.414),learning_rate=2.3627*1.5)
+
+
+
+### Actions scheduled to occur as the simulation proceeds.#
+topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
+
+# Convenience variable: timescale
+st=1.0/2.0
+
+### Lateral excitatory bounds changes
+LE='topo.sim["FSA"].projections()["LateralExcitatory"]'
+"""
+topo.sim.schedule_command( 200*st, LE+'.change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
+topo.sim.schedule_command( 500*st, LE+'.change_bounds(BoundingBox(radius=0.1167,min_radius=0.0625))')
+topo.sim.schedule_command(1000*st, LE+'.change_bounds(BoundingBox(radius=0.1333,min_radius=0.0625))')
+topo.sim.schedule_command(2000*st, LE+'.change_bounds(BoundingBox(radius=0.1333,min_radius=0.0625))')
+topo.sim.schedule_command(3000*st, LE+'.change_bounds(BoundingBox(radius=0.1333,min_radius=0.0625))')
+topo.sim.schedule_command(4000*st, LE+'.change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
+topo.sim.schedule_command(5000*st, LE+'.change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
+topo.sim.schedule_command(6500*st, LE+'.change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
+topo.sim.schedule_command(10000*st,LE+'.change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
+topo.sim.schedule_command(20000*st,LE+'.change_bounds(BoundingBox(radius=0.1,min_radius=0.0625))')
+"""
+
+### Lateral excitatory learning rate changes
+"""
+topo.sim.schedule_command( 200*st, LE+'.learning_rate=0.063375*'+LE+'.n_units()')
+topo.sim.schedule_command( 500*st, LE+'.learning_rate=0.0316875*'+LE+'.n_units()')
+"""
+
+### Afferent learning rate changes
+ON ='topo.sim["FSA"].projections()["LGNOnAfferent"]'
+OFF='topo.sim["FSA"].projections()["LGNOffAfferent"]'
+
+
+topo.sim.schedule_command( 200*st, ON+'.learning_rate=0.004667*'+ON+'.n_units()')
+topo.sim.schedule_command( 500*st, ON+'.learning_rate=0.003333*'+ON+'.n_units()')
+topo.sim.schedule_command(1000*st, ON+'.learning_rate=0.003333*'+ON+'.n_units()')
+topo.sim.schedule_command(2000*st, ON+'.learning_rate=0.002667*'+ON+'.n_units()')
+topo.sim.schedule_command(3000*st, ON+'.learning_rate=0.002667*'+ON+'.n_units()')
+topo.sim.schedule_command(4000*st, ON+'.learning_rate=0.002*'+ON+'.n_units()')
+topo.sim.schedule_command(5000*st, ON+'.learning_rate=0.002*'+ON+'.n_units()')
+topo.sim.schedule_command(6500*st, ON+'.learning_rate=0.002*'+ON+'.n_units()')
+topo.sim.schedule_command(10000*st,ON+'.learning_rate=0.002*'+ON+'.n_units()')
+topo.sim.schedule_command(20000*st,ON+'.learning_rate=0.001*'+ON+'.n_units()')
+
+topo.sim.schedule_command( 200*st, OFF+'.learning_rate=0.004667*'+OFF+'.n_units()')
+topo.sim.schedule_command( 500*st, OFF+'.learning_rate=0.003333*'+OFF+'.n_units()')
+topo.sim.schedule_command(1000*st, OFF+'.learning_rate=0.003333*'+OFF+'.n_units()')
+topo.sim.schedule_command(2000*st, OFF+'.learning_rate=0.002667*'+OFF+'.n_units()')
+topo.sim.schedule_command(3000*st, OFF+'.learning_rate=0.002667*'+OFF+'.n_units()')
+topo.sim.schedule_command(4000*st, OFF+'.learning_rate=0.002*'+OFF+'.n_units()')
+topo.sim.schedule_command(5000*st, OFF+'.learning_rate=0.002*'+OFF+'.n_units()')
+topo.sim.schedule_command(6500*st, OFF+'.learning_rate=0.002*'+OFF+'.n_units()')
+topo.sim.schedule_command(10000*st,OFF+'.learning_rate=0.002*'+OFF+'.n_units()')
+topo.sim.schedule_command(20000*st,OFF+'.learning_rate=0.001*'+OFF+'.n_units()')
+
+
+### Activation function threshold changes
+OF='topo.sim["FSA"].output_fn'
+"""
+topo.sim.schedule_command( 200*st, OF+'.lower_bound=0.093;'+OF+'.upper_bound=0.643')
+topo.sim.schedule_command( 500*st, OF+'.lower_bound=0.103;'+OF+'.upper_bound=0.653')
+topo.sim.schedule_command(1000*st, OF+'.lower_bound=0.133;'+OF+'.upper_bound=0.663')
+topo.sim.schedule_command(2000*st, OF+'.lower_bound=0.163;'+OF+'.upper_bound=0.683')
+topo.sim.schedule_command(3000*st, OF+'.lower_bound=0.183;'+OF+'.upper_bound=0.713')
+topo.sim.schedule_command(4000*st, OF+'.lower_bound=0.183;'+OF+'.upper_bound=0.743')
+topo.sim.schedule_command(5000*st, OF+'.lower_bound=0.193;'+OF+'.upper_bound=0.773')
+topo.sim.schedule_command(6500*st, OF+'.lower_bound=0.203;'+OF+'.upper_bound=0.803')
+topo.sim.schedule_command(10000*st,OF+'.lower_bound=0.213;'+OF+'.upper_bound=0.833')
+topo.sim.schedule_command(20000*st,OF+'.lower_bound=0.223;'+OF+'.upper_bound=0.863')
+
+
+### Settling steps changes
+topo.sim.schedule_command( 200*st, 'topo.sim["FSA"].tsettle=9')
+topo.sim.schedule_command( 500*st, 'topo.sim["FSA"].tsettle=9')
+topo.sim.schedule_command(1000*st, 'topo.sim["FSA"].tsettle=9')
+topo.sim.schedule_command(2000*st, 'topo.sim["FSA"].tsettle=10')
+topo.sim.schedule_command(3000*st, 'topo.sim["FSA"].tsettle=10')
+topo.sim.schedule_command(4000*st, 'topo.sim["FSA"].tsettle=10')
+topo.sim.schedule_command(5000*st, 'topo.sim["FSA"].tsettle=11')
+topo.sim.schedule_command(6500*st, 'topo.sim["FSA"].tsettle=12')
+topo.sim.schedule_command(10000*st,'topo.sim["FSA"].tsettle=13')
+topo.sim.schedule_command(20000*st,'topo.sim["FSA"].tsettle=13')
+"""
+
+# default locations for model editor
+topo.sim['FSA'   ].gui_x=306.0;  topo.sim['FSA'   ].gui_y=225.0
+topo.sim['LGNOn' ].gui_x=432.0;  topo.sim['LGNOn' ].gui_y=345.0
+topo.sim['LGNOff'].gui_x=150.0;  topo.sim['LGNOff'].gui_y=345.0
+topo.sim['Retina'].gui_x=279.0;  topo.sim['Retina'].gui_y=500.0
+
+# Stop learning
+"""
+topo.sim["FSA"].projections()["LGNOnAfferent"].learning_rate=0.0
+topo.sim["FSA"].projections()["LGNOffAfferent"].learning_rate=0.0
+topo.sim["FSA"].projections()["LateralExcitatory"].learning_rate=0.0
+topo.sim["FSA"].projections()["LateralInhibitory"].learning_rate=0.0
+topo.sim['FSA'].output_fn.learning=False
+topo.sim['Retina'].input_generator.generators=[Image(filename = "../imagedb/" + f, size_normalization='original', x = 0.0, y = 0.0, orientation = 0) for f in ["leopold/f1_" + str(c) + "_enlarged.png" for c in range(20, 180, 20)]]
+"""
