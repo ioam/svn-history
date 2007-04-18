@@ -17,6 +17,7 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.base.projection import OutputFnParameter
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.misc.numbergenerators import Choice, UniformRandomInt
+from topo.base.parameterclasses import DynamicNumber
 
 from topo.outputfns.basic import DivisiveNormalizeLinf,IdentityOF
 
