@@ -83,7 +83,7 @@ from topo.base.patterngenerator import PatternGeneratorParameter
 # specific code for the window icons later on, too.
 # * actually it's the window manager that's important, right?)
 # Does tkinter give any useful information?
-#
+# What about root.tk.call("tk","windowingsystem")?
 system_platform = 'unknown'
 if platform.system()=='Linux':
     system_platform = 'linux'
@@ -146,7 +146,11 @@ def start(mainloop=False):
     return console
 
 
+
+
 ####################### 
 
 if __name__ == '__main__':
     start(mainloop=True)
+
+
