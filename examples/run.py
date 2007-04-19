@@ -12,8 +12,6 @@ $Id$
 
 __version__='$Revision$'
 
-
-
 # CB: Not yet fully tested.
 
 ### NOTES
@@ -25,6 +23,10 @@ __version__='$Revision$'
 #   So, currently have to take care over where this script is run from
 #   (covered by an assertion statement), and how to pass in commands
 #   (e.g. strings for printing - see trickysyntax target).
+#   I might have become confused by all this, so there's likely to be
+#   something simpler we could do - this script contains the history of
+#   its production in the code (e.g. I probably don't need the full
+#   path to the topographica script in here anymore.)
 #
 # - has none of the Makefile's dependency processing, so just does
 #  what you tell it (i.e. over-writes existing files - which might be
@@ -90,7 +92,7 @@ def run(script_name,density=4,commands=["topo.sim.run(1)"]):
     script = join(examples,script_name)
 
     if platform.system()=="Windows":
-        # CB: extra leading "
+        # CB: extra leading " required!
         c = '""'+topographica+'" "'+script+'"'+cmds
     else:
         c = topographica+" "+script+' '+cmds
@@ -159,9 +161,15 @@ for a in command_names:
     else:
         command_labels.append(a)
 
+### No arguments given: default to all_quick (that's what the Makefile does, right?)
+if len(command_labels)<1:
+    command_labels+=group_targets['all_quick']
+
 ### Execute the commands
+
 for cmd in command_labels:
     c = targets[cmd]
     print c
     system(c)
+        
     
