@@ -7,24 +7,28 @@ that specify various commands to run.
 E.g.
  ./topographica examples/run.py saved_examples
 
+$Id$
 """
+
+__version__='$Revision$'
+
+
 
 # CB: Not yet fully tested.
 
 ### NOTES
 #
-# - tricky to get this to work on Windows because of problems
-#   with quotes, spaces, and so on:
+# - Tricky to get this to work on Windows because of problems
+#   with quotes, spaces, and so on in cmd.exe:
 #   http://mail.python.org/pipermail/python-bugs-list/2002-March/010393.html
 #   http://support.microsoft.com/kb/191495
-#
-# - currently have to take care over where this script is run from
+#   So, currently have to take care over where this script is run from
 #   (covered by an assertion statement), and how to pass in commands
-#   (e.g. strings for printing - see anotherexample target.
+#   (e.g. strings for printing - see trickysyntax target).
 #
 # - has none of the Makefile's dependency processing, so just does
-#  what you tell it (i.e. over-writes existing files, which might be
-#  what we want).
+#  what you tell it (i.e. over-writes existing files - which might be
+#  behavior we actually want).
 
 import platform 
 from os import system
@@ -72,20 +76,28 @@ measure_cog()"
 ###
 
 
-def run(name,density=4,commands=["topo.sim.run(1)"]):
+def run(script_name,density=4,commands=["topo.sim.run(1)"]):
     """
-    Return a command formatted in a suitable way for input to spawnv.
-
-    Density will default to 4 unless you override it.
+    Return a complete command for running the given topographica
+    example script (i.e. a script in the examples/ directory) at the
+    given density, along with any additional commands.
     """
     cmds = ' -c "default_density='+`density`+'"'
 
     for c in commands:
-        cmds+=' -c "'
-        cmds+=c
-        cmds+='"'
+        cmds+=' -c "'+c+'"'
 
-    return (join(examples,name),cmds)
+    script = join(examples,script_name)
+
+    if platform.system()=="Windows":
+        # CB: extra leading "
+        c = '""'+topographica+'" "'+script+'"'+cmds
+    else:
+        c = topographica+" "+script+' '+cmds
+
+    return c
+
+
 
 
 # shortcuts for executing multiple targets
@@ -95,7 +107,7 @@ group_targets = dict( all_quick=["hierarchical","cfsom_or","som_retinotopy","lis
                       saved_examples=["lissom_oo_or_10000.typ"])
 
 
-# update the times!
+
 targets = {
     "cfsom_or":       run("cfsom_or.ty"),
     "hierarchical":   run("hierarchical.ty"),
@@ -103,32 +115,31 @@ targets = {
     "lissom_oo_or":   run("lissom_oo_or.ty"),
     "som_retinotopy": run("som_retinotopy.ty"),
 
-    "trickysyntaxexample":run("hierarchical.ty",commands=["topo.sim.run(1)",
-                                                          "print 'printing a string'",
-                                                          snapshot("hello.typ")]),
+    "trickysyntax":run("hierarchical.ty",commands=["topo.sim.run(1)",
+                                                   "print 'printing a string'"]),
 
     "lissom_oo_or_10000.typ":run("lissom_oo_or.ty",
-                                 commands=["topo.sim.run(1)",
+                                 commands=["topo.sim.run(10000)",
                                            or_analysis(),
                                            snapshot("lissom_oo_or_10000.typ")]),
     
 
     "lissom_or_10000.typ":run("lissom_or.ty",
-                              commands=["topo.sim.run(1)",
+                              commands=["topo.sim.run(10000)",
                                         or_analysis(),
                                         snapshot("lissom_or_10000.typ")]),
     
     "lissom_fsa_10000.typ":run("lissom_fsa.ty",
-                               commands=["topo.sim.run(1)",
+                               commands=["topo.sim.run(10000)",
                                          snapshot("lissom_fsa_10000.typ")]),
     
-    "obermayer_pnas90_30000.typ":run("obermayer_pnas90_30000.ty",
-                                     commands=["topo.sim.run(1)",
+    "obermayer_pnas90_40000.typ":run("obermayer_pnas90_40000.ty",
+                                     commands=["topo.sim.run(40000)",
                                                or_analysis(),
                                                snapshot("obermayer_pnas90_30000.typ")]),
     
     "som_retinotopy_40000.typ":run("som_retinotopy.ty",
-                                   commands=["topo.sim.run(1)",
+                                   commands=["topo.sim.run(40000)",
                                              retinotopy_analysis(),
                                              snapshot("som_retinotopy_40000.typ")])
                               
@@ -148,15 +159,9 @@ for a in command_names:
     else:
         command_labels.append(a)
 
-
 ### Execute the commands
 for cmd in command_labels:
-
-    if platform.system()=="Windows":
-        # CB: extra leading "
-        c = '""'+topographica+'" "'+targets[cmd][0]+'"'+targets[cmd][1]
-    else:
-        c = topographica+" "+targets[cmd][0]+' '+targets[cmd][1]
+    c = targets[cmd]
     print c
     system(c)
     
