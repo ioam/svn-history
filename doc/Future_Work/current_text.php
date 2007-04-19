@@ -88,7 +88,7 @@ can follow the tutorial instructions.
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
 
 
-<H4>2007/04/18</H4>: more tests for non-square sheets
+<H4>2007/04/18: more tests for non-square sheets</H4>
 We need a test with non-square input sheets, non-square LISSOM sheets, etc., 
 with both types of non-squareness...
 
@@ -127,6 +127,14 @@ what to do about them, and then start doing them.
 - Which widgets should expand (expand=YES ?), which should fill the
 space (fill=X ?) (e.g. in parameters frames sliders etc should
 expand).
+
+
+<H4>2007/04/19: messed-up terminal after quitting from GUI</H4>
+Quitting topographica from tkgui results in a messed up terminal
+(at least on bash under linux), where the terminal no longer
+prints anything at all. See this posting for more info: 
+http://groups.google.com/group/comp.lang.python/browse_thread/thread/68d0f33c8eb2e02d
+(Note that typing 'stty sane' fixes the terminal.)
 
 
 <H4>2007/04/15 (CB): Dynamic text</H4>
