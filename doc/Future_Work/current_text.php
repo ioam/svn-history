@@ -70,18 +70,16 @@ into the python_topo directory, this will fix the problem. I'll
 upload a new python_topo shortly.
 
 
-<H4>2007/04/15 (CB): plot templates sections</H4>
-JAB: I've added a category to each PlotGroupTemplate, and these can
-now be used in the menus.  The Plots menu can also now link to my
-new User_Manual/plotting.html page.
-
-
 <H4>2007/04/05 (CB): examples/Makefile -> python</H4>
 Migrate examples/Makefile to python script. Then, Windows users
 can follow the tutorial instructions. 
 
 
-
+<H4>2007/04/19: tkinter problems</H4>
+Should at least add a note to docs about messed-up terminal after
+tkgui quit (telling users they can run 'stty sane'), and a note
+about the tkinter problem on some machines. Or we should file bug reports
+on our sf.net pages.
 
 
 
@@ -135,6 +133,16 @@ Quitting topographica from tkgui results in a messed up terminal
 prints anything at all. See this posting for more info: 
 http://groups.google.com/group/comp.lang.python/browse_thread/thread/68d0f33c8eb2e02d
 (Note that typing 'stty sane' fixes the terminal.)
+
+
+<H4>2007/04/19: tkinter problem</H4>
+After make, can't start the gui on some machines (e.g. doozy):
+<pre>
+    import _tkinter # If this fails your Python may not be configured for Tk
+ImportError: No module named _tkinter
+</pre>
+This problem has been around a long time. Possible sources of info:<BR>
+http://www.thescripts.com/forum/thread38709.html
 
 
 <H4>2007/04/15 (CB): Dynamic text</H4>
