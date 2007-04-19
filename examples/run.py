@@ -156,8 +156,7 @@ targets = {
 command_labels=[]
 for a in command_names:
     if a in group_targets:
-        for X in group_targets[a]:
-            command_labels.append(X)
+        command_labels+=group_targets[a]
     else:
         command_labels.append(a)
 
