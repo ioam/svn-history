@@ -433,7 +433,9 @@ class TopoConsole(Tkinter.Tk):
 
     def __plot_menu(self):
         """
-        Add the plot menu options to the menubar.
+        Add the plot menu to the menubar, and create categorized entries
+        for all the plotgroup_templates.
+
 
 
         Poll for a list of class types, and put them into the Console
@@ -444,16 +446,37 @@ class TopoConsole(Tkinter.Tk):
                              label="Activity",
                              command=self.new_activity_window)
         """
+        # CEBALERT: more complex than it needs to be!
+        # Needs to be cleaned up, along with PlotsMenuEntry.
+        # There seem to be several unnecessary steps, and the same thing is often
+        # stored in too many different places.
+        # Update the documentation.
+        
+        # (Note about plots_menu_entries: it's accessed in 1 other place in tkgui.)
 
-        self.menubar.addmenu('Plots','Assorted plot displays')
+
+
+        # create plots_menu_entries, and get categories
         self.plots_menu_entries={}
-
-        for (label,obj) in plotgroup_templates.items():
-            entry = PlotsMenuEntry(self,obj,label=label)            
-            self.menubar.addmenuitem('Plots','command',
-                                obj.name,label=label,
-                                command=entry.command)
+        categories = []
+        for label,pgt in plotgroup_templates.items():
+            entry = PlotsMenuEntry(self,pgt,label=label)            
             self.plots_menu_entries[label]=entry
+            categories.append(entry.template.category)
+        categories = sorted(set(categories))
+
+
+        # add the categories to the menu, and the plots of each category
+        # under the category heading, with a separator after each category
+        self.menubar.addmenu('Plots','Assorted plot displays')
+        for category in categories:
+            self.menubar.addmenuitem('Plots','command',label=category,state='disabled')
+            for entry in self.plots_menu_entries.values():
+                if entry.template.category==category:
+                    self.menubar.addmenuitem('Plots','command',
+                                             entry.template.name,
+                                             label=entry.label,command=entry.command)
+            self.menubar.addmenuitem('Plots','separator')                                     
 
 
 
