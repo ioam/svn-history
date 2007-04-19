@@ -58,7 +58,7 @@ lissom_or_10000.typ: lissom_or.ty ../topo/*/*.py
 lissom_fsa_10000.typ: lissom_fsa.ty ../topo/*/*.py
 	../topographica ${TOPOCMD} lissom_fsa.ty -c "topo.sim.run(10000)" ${SNAPSHOT}"('$@')"
 
-
+# CB: called 30000 but runs to 40000 - which should it be?
 obermayer_pnas90_30000.typ: obermayer_pnas90.ty ../topo/*/*.py
 	../topographica ${TOPOCMD} obermayer_pnas90.ty -c "topo.sim.run(40000)" ${OR_ANALYSIS} ${SNAPSHOT}"('$@')"
 
