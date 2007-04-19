@@ -1,38 +1,54 @@
 """
-Commands for running the examples files.
+Commands for running the examples files in various ways.
+
+Like a Makefile: contains a list of targets (and groups of targets)
+that specify various commands to run.
+
+E.g.
+ ./topographica examples/run.py saved_examples
+
 """
 
-# CEBALERT: unfinished, and currently does not work on Windows.
+# CB: Not yet fully tested.
 
 ### NOTES
 #
-# - Could be tricky to get this to work on Windows:
-#  http://mail.python.org/pipermail/python-bugs-list/2002-March/010393.html
-#  http://support.microsoft.com/kb/191495
+# - tricky to get this to work on Windows because of problems
+#   with quotes, spaces, and so on:
+#   http://mail.python.org/pipermail/python-bugs-list/2002-March/010393.html
+#   http://support.microsoft.com/kb/191495
 #
-# - rename to run.py
+# - currently have to take care over where this script is run from
+#   (covered by an assertion statement), and how to pass in commands
+#   (e.g. strings for printing - see anotherexample target.
 #
 # - has none of the Makefile's dependency processing, so just does
 #  what you tell it (i.e. over-writes existing files, which might be
 #  what we want).
 
-
-
-from os import spawnv, P_WAIT
+import platform 
+from os import system
 from sys import argv, executable
-from os.path import join, split
+from os.path import join, dirname
 
+## location of topographica main directory
 # (same ALERT as in Filename parameter)
-topographica_path = split(split(executable)[0])[0]
+topographica_path = dirname(dirname(executable))
 
-# location of the topographica script
+## location of the topographica script
 topographica = join(topographica_path,"topographica")
 
-# location of examples dir
-examples = join(topographica_path,"examples")
+## location of the examples directory
+# CEBALERT: problem with paths on windows for passing in the script name to
+# run; should be:
+#  examples = join(topographica_path,"examples")
+examples = "examples"
+# temporary (I hope) test to ensure script is run from the topographica main directory
+from os import getcwd; assert topographica_path==getcwd(), "Must be run from main topographica directory."
 
-# first arg is script name
-command_names = argv[1:len(argv)]
+
+# (arg 0 is topographica, arg 1 is this script name)
+command_names = argv[2:len(argv)]
 
 
 ### Convenience functions
@@ -44,9 +60,9 @@ def or_analysis():
     """Return a command for orientation analysis."""
     return "from topo.commands.analysis import measure_or_pref,measure_position_pref,measure_cog,measure_or_tuning_fullfield; \
 measure_or_pref(); \
-measure_position_pref(); \
+#measure_position_pref(); \
 measure_cog(); \
-measure_or_tuning_fullfield()"
+#measure_or_tuning_fullfield()"
 
 def retinotopy_analysis():
     """Return a command for retinotopy analysis."""
@@ -59,20 +75,17 @@ measure_cog()"
 def run(name,density=4,commands=["topo.sim.run(1)"]):
     """
     Return a command formatted in a suitable way for input to spawnv.
+
+    Density will default to 4 unless you override it.
     """
-    cmd_list = ["topographica"]
-    cmd_list.append("-c")
-    cmd_list.append("default_density=%d"%density)
+    cmds = ' -c "default_density='+`density`+'"'
 
-    cmd_list.append(join(examples,name))
-    
     for c in commands:
-        cmd_list.append("-c")
-        cmd_list.append(c)
+        cmds+=' -c "'
+        cmds+=c
+        cmds+='"'
 
-    return tuple(cmd_list)
-
-
+    return (join(examples,name),cmds)
 
 
 # shortcuts for executing multiple targets
@@ -84,27 +97,36 @@ group_targets = dict( all_quick=["hierarchical","cfsom_or","som_retinotopy","lis
 
 # update the times!
 targets = {
-    "cfsom_or":run("cfsom_or.ty"),
-    "hierarchical":run("hierarchical.ty"),
-    "lissom_or":run("lissom_or.ty"),
-    "lissom_oo_or":run("lissom_oo_or.ty"),
-    "som_retinotopy":run("som_retinotopy.ty"),
+    "cfsom_or":       run("cfsom_or.ty"),
+    "hierarchical":   run("hierarchical.ty"),
+    "lissom_or":      run("lissom_or.ty"),
+    "lissom_oo_or":   run("lissom_oo_or.ty"),
+    "som_retinotopy": run("som_retinotopy.ty"),
+
+    "trickysyntaxexample":run("hierarchical.ty",commands=["topo.sim.run(1)",
+                                                          "print 'printing a string'",
+                                                          snapshot("hello.typ")]),
+
     "lissom_oo_or_10000.typ":run("lissom_oo_or.ty",
                                  commands=["topo.sim.run(1)",
                                            or_analysis(),
                                            snapshot("lissom_oo_or_10000.typ")]),
+    
+
     "lissom_or_10000.typ":run("lissom_or.ty",
                               commands=["topo.sim.run(1)",
                                         or_analysis(),
                                         snapshot("lissom_or_10000.typ")]),
+    
     "lissom_fsa_10000.typ":run("lissom_fsa.ty",
                                commands=["topo.sim.run(1)",
-                                         or_analysis(),
                                          snapshot("lissom_fsa_10000.typ")]),
+    
     "obermayer_pnas90_30000.typ":run("obermayer_pnas90_30000.ty",
                                      commands=["topo.sim.run(1)",
                                                or_analysis(),
                                                snapshot("obermayer_pnas90_30000.typ")]),
+    
     "som_retinotopy_40000.typ":run("som_retinotopy.ty",
                                    commands=["topo.sim.run(1)",
                                              retinotopy_analysis(),
@@ -112,10 +134,6 @@ targets = {
                               
     }
 
-
-
-
-# CB: using os.system rather than spawnv would allow this file to be simpler.
 
 
 ### Create the list of commands to execute either by getting the
@@ -130,11 +148,15 @@ for a in command_names:
     else:
         command_labels.append(a)
 
+
 ### Execute the commands
 for cmd in command_labels:
-	# CB: spawnv gives us new process,
-	# P_WAIT means the script waits until new process returns
-        print targets[cmd]
-	spawnv(P_WAIT,topographica,targets[cmd])
 
-print "(done)"
+    if platform.system()=="Windows":
+        # CB: extra leading "
+        c = '""'+topographica+'" "'+targets[cmd][0]+'"'+targets[cmd][1]
+    else:
+        c = topographica+" "+targets[cmd][0]+' '+targets[cmd][1]
+    print c
+    system(c)
+    
