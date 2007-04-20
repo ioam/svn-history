@@ -56,16 +56,19 @@ REM This ought to go through without asking any questions. If it doesn't, make s
 REM NOT to register extensions when you are offered the choice.
 REM The key thing is to have python24.dll installed in this directory, not into windows somewhere.
 REM If it doesn't end up in c:\python24, you can actually just copy it in.
-start /w msiexec /i python-2.4.4.msi ALLUSERS=0 TARGETDIR=c:\python24 ADDLOCAL=DefaultFeature,TclTk
+REM start /w msiexec /i python-2.4.4.msi ALLUSERS=0 TARGETDIR=c:\python24 ADDLOCAL=DefaultFeature,TclTk
 
 REM * numpy
-start /w numpy-1.0.2.win32-py2.4.exe
+REM start /w numpy-1.0.2.win32-py2.4.exe
 
 REM patch numpy
-set storecpt = %cd%
+set storecpt=%cd%
+echo %storecpt%
 cd c:\python24\Lib\site-packages
 %storecpt%\util\patch.exe -p0 < %storecpt%\numpy.diff
 cd %storecpt%
+
+pause
 
 REM * matplotlib
 start /w matplotlib-0.90.0.win32-py2.4.exe
