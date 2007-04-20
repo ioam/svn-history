@@ -61,8 +61,11 @@ f.close()
 # topographica.bat
 f = open(os.path.join(path,'topographica.bat'),'w')
 f.write("""@echo off"""+'\n')
+# store the original path so we can put the shell back after
+f.write("""set startdir=%cd%"""+'\n')
 f.write('cd "' + path + '"\n')
 f.write("""python_topo\python.exe topographica %*"""+'\n')
+f.write("""cd %startdir%"""+'\n')
 f.write("""@echo on"""+'\n')
 f.close()
 
