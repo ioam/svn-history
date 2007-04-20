@@ -62,10 +62,10 @@ REM * numpy
 start /w numpy-1.0.2.win32-py2.4.exe
 
 REM patch numpy
-cpt = %CD%
+set storecpt = %cd%
 cd c:\python24\Lib\site-packages
-cpt\util\patch.exe -p0 < cpt\numpy.diff
-cd cpt
+%storecpt%\util\patch.exe -p0 < %storecpt%\numpy.diff
+cd %storecpt%
 
 REM * matplotlib
 start /w matplotlib-0.90.0.win32-py2.4.exe
