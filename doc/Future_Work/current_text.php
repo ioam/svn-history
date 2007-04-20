@@ -62,24 +62,19 @@ the examples handle exponential decay of parameter values, so that
 they are good starting points.
 
 
-<H4>2007/04/16 (CB): topographica-win </H4>
-Somehow the current version of python_topo is missing Python24.dll,
-so unless that .dll is already present on a user's computer, topographica
-will give an error saying it's missing. If they copy Python24.dll
-into the python_topo directory, this will fix the problem. I'll 
-upload a new python_topo shortly.
-
-
 <H4>2007/04/05 (CB): examples/Makefile -> python</H4>
-Migrate examples/Makefile to python script. Then, Windows users
-can follow the tutorial instructions. 
+Migrate examples/Makefile to python script. Then, Windows users can
+follow the tutorial instructions.
+CB: I've done this (although the script's not great, and currently
+prints an error message at the end).
 
 
 <H4>2007/04/19: tkinter problems</H4>
 Should at least add a note to docs about messed-up terminal after
-tkgui quit (telling users they can run 'stty sane'), and a note
-about the tkinter problem on some machines. Or we should file bug reports
-on our sf.net pages.
+tkgui quit (telling users they can run 'stty sane': see 'messed-up
+terminal task' later in this document), and a note about the tkinter
+problem on some machines (see 'tkinter problem' later in this
+document. Or we should file bug reports on our sf.net pages.
 
 
 
