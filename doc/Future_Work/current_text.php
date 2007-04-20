@@ -81,6 +81,13 @@ document. Or we should file bug reports on our sf.net pages.
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
 
 
+<H4>2007/04/20: Fix the code in PlotGroup for calculating the minimum
+plot sizes in the GUI -- needs to be calculated independently for the
+Sheet and non-Sheet coordinate cases.  Somewhat tricky due to how
+_calculate_minimum_height_of_tallest_plot() also sets minimum_height;
+it all needs to be cleaned up so that the actual minimum is enforced,
+so that plots don't end up being so large.
+
 <H4>2007/04/18: more tests for non-square sheets</H4>
 We need a test with non-square input sheets, non-square LISSOM sheets, etc., 
 with both types of non-squareness...
