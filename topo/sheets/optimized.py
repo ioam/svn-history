@@ -17,7 +17,11 @@ from topo.sheets.lissom import LISSOM
 class LISSOM_Opt(LISSOM):
     """
     Overrides the function JointNormalizingCFSheet.__compute_joint_norm_totals 
-    with C-optimized code for LISSOM sheet.
+    with C-optimized code for LISSOM sheets.
+
+    Also adds a NeighborhoodMask, which skips computation for neurons
+    sufficiently distant from all those activated in the first few steps
+    of settling.
     """
 
     def __init__(self,**params):
