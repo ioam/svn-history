@@ -223,11 +223,19 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         
 	return plotgroup
 
-
+    ### JABALERT: Should remove the assumption that the plot will be
+    ### SHC (could e.g.  be RGB).
+    ### 
+    ### Should add the ability to turn off any of the channels
+    ### independently (just as the Strength-only button does), and
+    ### eventually should allow the user to type in the name of any
+    ### SheetView to change the template as desired to visualize any
+    ### quantity.
+    ###
     # CB: something about these methods does not seem to fit the PlotGroup hierarchy.
     def _canvas_right_click(self,event_info):
         """
-        Make whichever of the SHC channels present in the plot available on the menu.
+        Make whichever of the SHC channels is present in the plot available on the menu.
         """
         super(TemplatePlotGroupPanel,self)._canvas_right_click(event_info,show_menu=False)
         
