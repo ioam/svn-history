@@ -18,7 +18,8 @@ $Id$
 """
 __version__='$Revision$'
 
-import numpy.oldnumeric.random_array as RandomArray
+import numpy
+
 from math import sqrt, pi
 
 from topo.sheets.generatorsheet import GeneratorSheet
@@ -85,7 +86,7 @@ input_pattern = topo.patterns.basic.Gaussian(
 ObermayerSOM.nominal_density = 25 #6
 ObermayerSOM.learning_length = 30000
 
-RandomArray.seed(500,500)
+numpy.random.seed((500,500))
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.nominal_bounds_template = BoundingBox(radius=1.0)
 CFProjection.response_fn = CFPRF_DotProduct_opt()

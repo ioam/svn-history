@@ -12,7 +12,6 @@ Work in progress - form of Activity_dependent response function needs to be refi
 import numpy
 import copy
 from numpy import exp
-import numpy.oldnumeric.random_array as RandomArray
 import fixedpoint
 
 from math import pi, sqrt
@@ -35,7 +34,7 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfns.homeostatic import HomeostaticMaxEnt
-
+from topo.patterns.basic import Gaussian
 
 
 topo.sim.name = "homeo_lissom_or_noshrinking_latswitch"
@@ -95,7 +94,7 @@ input_pattern = topo.patterns.basic.Gaussian(
 
                                  
 # Specify weight initialization, response function, and learning function
-RandomArray.seed(500,500)
+numpy.random.seed((500,500))
 CFProjection.weights_generator=topo.patterns.random.UniformRandom()
 CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
@@ -148,9 +147,4 @@ topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingB
 topo.sim.schedule_command( 100,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.548')
 topo.sim.schedule_command( 1000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.274')
 topo.sim.schedule_command( 3000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.137')
-
-
-topo.sim.run(0)
-
-
 

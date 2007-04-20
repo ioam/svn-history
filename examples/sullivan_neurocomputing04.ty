@@ -15,7 +15,8 @@ $Id$
 __version__='$Revision$'
 
 
-import numpy.oldnumeric.random_array as RandomArray
+import numpy
+
 from math import exp, sqrt, fmod, pi, radians,sin,cos
 
 import topo.patterns.random
@@ -132,7 +133,7 @@ class OrientedLine(PatternGenerator):
 
 
 # Weight seed
-RandomArray.seed(500,500)
+numpy.random.seed((500,500))
 GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0
 

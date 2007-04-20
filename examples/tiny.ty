@@ -6,7 +6,7 @@ $Id$
 __version__='$Revision$'
 
 
-import numpy.oldnumeric.random_array as RandomArray
+import numpy
 
 from fixedpoint import FixedPoint
 
@@ -59,7 +59,7 @@ class SampleHebbian(LearningFn):
         self.value = self.value*0.9
 
 # Weight seed
-RandomArray.seed(500,500)
+numpy.random.seed((500,500))
 
 # Input pattern
 gaussian_generator = topo.patterns.basic.Gaussian(

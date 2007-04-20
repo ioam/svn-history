@@ -13,8 +13,8 @@ $Id$
 """
 __version__='$Revision$'
 
-import numpy.oldnumeric.random_array as RandomArray
-import fixedpoint
+import numpy
+
 import copy
 
 from math import pi, sqrt
@@ -22,6 +22,7 @@ from fixedpoint import FixedPoint
 
 import topo.patterns.basic
 import topo.patterns.random
+import topo.patterns.rds
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
@@ -81,7 +82,7 @@ topo.sim['C'] = CFSheet(nominal_density=1.0,measure_maps=True,learning=False,
 ##Parameters defining the connection field of each unit in S1,S2,S3 and S4
 
 # Specify weight initialization, response function, and learning function
-RandomArray.seed(500,500)
+numpy.random.seed((500,500))
 
 CFProjection.strength=1.0
 CFProjection.nominal_bounds_template=BoundingBox(radius=0.5)

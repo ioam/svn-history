@@ -11,7 +11,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import numpy.oldnumeric.random_array as RandomArray
+import numpy
 
 from math import pi
 from fixedpoint import FixedPoint
@@ -148,7 +148,7 @@ input_pattern = topo.patterns.basic.Gaussian(
 
                                                                       
 # Specify weight initialization, response function, and learning function
-RandomArray.seed(500,500)
+numpy.random.seed((500,500))
 CFProjection.weights_generator=topo.patterns.random.UniformRandom()
 CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
@@ -285,7 +285,7 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
 		  learning_rate=1.9626)         
 
 
-RandomArray.seed(500,500) #sets V1s connectionfileds random initial weights seeding.
+numpy.random.seed((500,500)) #sets V1s connectionfileds random initial weights seeding.
 
 topo.sim.connect('LGNOns','V1s',delay=FixedPoint("0.05"),name='LGNOnAfferents',
 		  connection_type=CFProjection,strength=0.75,

@@ -12,7 +12,8 @@ $Id$
 """
 __version__='$Revision$'
 
-import numpy.oldnumeric.random_array as RandomArray
+
+import numpy
 
 import topo.patterns.random
 import topo.patterns.basic
@@ -29,7 +30,7 @@ from topo.misc.numbergenerators import UniformRandom,ExponentialDecay
 topo.sim.name = "cfsom_or"
 
 # Weight seed
-RandomArray.seed(500,500)
+numpy.random.seed((500,500))
 
 # Input patterns
 num_inputs=2

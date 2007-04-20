@@ -26,9 +26,7 @@ $Id$
 __version__='$Revision$'
 
 
-import numpy.oldnumeric.random_array as RandomArray
 import fixedpoint
-import numpy.oldnumeric as Numeric
 import numpy
 
 from math import pi, sqrt
@@ -89,7 +87,7 @@ topo.patterns.basic.Gaussian.size=0.08333
 topo.patterns.basic.Gaussian.aspect_ratio=4.0
 
 # Specify weight initialization, response function, and learning function
-RandomArray.seed(500,500)
+numpy.random.seed((500,500))
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()

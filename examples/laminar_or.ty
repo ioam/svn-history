@@ -5,7 +5,6 @@ Based on lissom_or_noshrinking - work in progress.
 Has homeostatic plasticity of Excitatory units (updated at each settling step),a sigmoid output function for inhibitory units and no shrinking of excitatory connections.
 """
 
-import numpy.oldnumeric.random_array as RandomArray
 import numpy
 import fixedpoint
 import copy
@@ -43,7 +42,7 @@ input_pattern = topo.patterns.basic.Gaussian(
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
                                  
 # Specify weight initialization, response function, and learning function
-RandomArray.seed(500,500)
+numpy.random.seed((500,500))
 #CFProjection.weights_generator=topo.patterns.random.UniformRandom() #possible diff
 CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
@@ -123,6 +122,3 @@ topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingB
 topo.sim.schedule_command( 100,'topo.sim["V1Exc"].projections()["AfferentEx"].learning_rate=0.548')
 topo.sim.schedule_command( 1000,'topo.sim["V1Exc"].projections()["AfferentEx"].learning_rate=0.274')
 topo.sim.schedule_command( 3000,'topo.sim["V1Exc"].projections()["AfferentEx"].learning_rate=0.137')
-
-
-topo.sim.run(0)

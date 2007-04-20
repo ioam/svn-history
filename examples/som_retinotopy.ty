@@ -14,8 +14,8 @@ $Id$
 """
 __version__='$Revision$'
 
+import numpy
 
-import numpy.oldnumeric.random_array as RandomArray
 from math import exp, sqrt
 
 import topo.patterns.random
@@ -70,7 +70,7 @@ input_pattern = topo.patterns.basic.Gaussian(
 
 # Local variable to allow weights to be controlled easily
 weight_seed=locals().get('weight_seed',0)
-RandomArray.seed(weight_seed+67,weight_seed+89)
+numpy.random.seed((weight_seed+67,weight_seed+89))
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 

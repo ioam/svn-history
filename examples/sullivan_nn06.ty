@@ -18,7 +18,6 @@ $Id$
 __version__='$Revision$'
 
 
-import numpy.oldnumeric.random_array as RandomArray
 import fixedpoint
 import copy
 
@@ -95,7 +94,7 @@ class Hacked_CFSOM(CFSOM):
 
 
 #weight initialization, response 
-RandomArray.seed(500,500)
+numpy.random.seed((500,500))
 CFProjection.weights_generator=topo.patterns.random.UniformRandom()
 
 
