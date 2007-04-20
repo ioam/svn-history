@@ -57,13 +57,12 @@ examples = "examples"
 from os import getcwd; assert topographica_path==getcwd(), "Must be run from main topographica directory."
 
 
-# CEBHACKALERT: need to remove the supplied targets from the arguments
-# because otherwise commandline.py tries to use them as script names.
+# CEBHACKALERT: commandline.py tries to use the arguments intended for run.py as commands to execute.
 # (I originally wrote this script for running with python, not topographica,
-#  so I've failed to use some of topographica's commandline argument handling?
-#  In which case I  )
+# so I've failed to use some of topographica's own commandline argument handling?)
 # See the error message that comes at the end of doing e.g.
-# ./topographica examples/run.py all_quick
+#  ./topographica examples/run.py all_quick
+# examples/run.py operates correctly, doing everything from all_quick, but then this error occurs at the end:
 # Traceback (most recent call last):
 #  File "./topographica", line 10, in ?
 #    process_argv(argv[1:])
