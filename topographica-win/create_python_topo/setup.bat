@@ -2,14 +2,20 @@
 
 REM still to add: libsndfile, pyaudiolab, mlabwrap
 
+REM CEBHACKALERT: seems like python24.dll doesn't always end up in c:\python24 - maybe if there's
+REM already a python installation? Anyway, must make sure it's there!
 
 REM Assumes we're going to c:\Python24; be careful to update everything if you decide to
-REM change this.
+REM change this. (Should have used a variable, but that can't cover the graphical installs)
 
 set startdir=%CD%
 
 
 REM ** GRAB PACKAGES IN COMMON WITH topographica\external
+
+REM numpy.diff
+copy ..\..\external\numpy.diff .
+
 REM Pmw
 ..\util\gunzip -c ..\..\external\Pmw.tgz > ..\..\external\Pmw.tar
 ..\util\tar xvf ..\..\external\Pmw.tar
@@ -54,6 +60,12 @@ start /w msiexec /i python-2.4.4.msi ALLUSERS=0 TARGETDIR=c:\python24 ADDLOCAL=D
 
 REM * numpy
 start /w numpy-1.0.2.win32-py2.4.exe
+
+REM patch numpy
+cpt = %CD%
+cd c:\python24\Lib\site-packages
+cpt\util\patch.exe -p0 < cpt\numpy.diff
+cd cpt
 
 REM * matplotlib
 start /w matplotlib-0.90.0.win32-py2.4.exe
