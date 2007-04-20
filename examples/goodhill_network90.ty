@@ -11,7 +11,6 @@ $Id$
 _version__='$Revision$'
 
 from __future__ import division #DO NOT DELETE!Needs it for correct&precise divisions.
-import numpy.oldnumeric.random_array as RandomArray
 from numpy.oldnumeric import *
 import numpy
 from fixedpoint import FixedPoint
@@ -321,6 +320,7 @@ def update_elastic_net_maps():
                      sheet.name,sheet.precedence,topo.sim.time())
 
 from topo.plotting.templates import plotgroup_templates 
+import topo.commands.analysis
 plotgroup_templates['Ocular Preference'].command='update_elastic_net_maps()'
 plotgroup_templates['Center of Gravity'].command='update_elastic_net_maps() ; topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG",axis=[-0.1,1.1,-0.1,1.1])'
 
