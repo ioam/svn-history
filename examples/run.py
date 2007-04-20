@@ -7,6 +7,10 @@ that specify various commands to run.
 E.g.
  ./topographica examples/run.py saved_examples
 
+
+To add new single targets, just add to the targets dictionary;
+for groups of targets, add to the group_targets dictionary.
+
 $Id$
 """
 
