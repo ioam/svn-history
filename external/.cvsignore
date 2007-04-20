@@ -51,3 +51,5 @@ tilewrapper
 Tile.py
 bwidget
 pybwidget-0.1.2_1.7.0
+psyco
+psyco-dist
