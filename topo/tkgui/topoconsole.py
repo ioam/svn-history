@@ -25,7 +25,7 @@ from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
 import topo.base.simulation
 
 import topo.tkgui
-
+from topo.misc.utils import values_sorted_by_key
 from topo.base.parameterizedobject import ParameterizedObject
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from connectionfieldspanel import ConnectionFieldsPanel
@@ -471,7 +471,7 @@ class TopoConsole(Tkinter.Tk):
         self.menubar.addmenu('Plots','Assorted plot displays')
         for category in categories:
             self.menubar.addmenuitem('Plots','command',label=category,state='disabled')
-            for entry in self.plots_menu_entries.values():
+            for entry in values_sorted_by_key(self.plots_menu_entries):
                 if entry.template.category==category:
                     self.menubar.addmenuitem('Plots','command',
                                              entry.template.name,
