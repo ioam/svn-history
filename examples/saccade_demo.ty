@@ -31,6 +31,8 @@ from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.coordmapperfns.basic import OttesSCMotorMapper
 from topo.misc.numbergenerators import UniformRandom
 
+from topo.tkgui.editorwindow import setup_editor_grid
+
 import topo.patterns.image
 
 
@@ -101,7 +103,8 @@ topo.sim.connect('SC','SaccadeControl',name="Efferent",
                  nominal_bounds_template = BoundingBox(radius=0),
                  response_fn = CFPRF_DotProduct_opt(),
                  min_matrix_radius=0,
-                 coord_mapper = OttesSCMotorMapper(decoder_sheet=decoder)
+                 coord_mapper = OttesSCMotorMapper(amplitude_scale=decoder.amplitude_scale,
+                                                   direction_scale=decoder.direction_scale)
                  )
 
 topo.sim.connect('SaccadeControl','Eye',
@@ -111,5 +114,11 @@ topo.sim.connect('SaccadeControl','Eye',
                  dest_port='Saccade')
 
 
+# add the sim objects to the current namespace
+locals().update(topo.sim.objects())
 
+# layout the sim objects in the model editor
+setup_editor_grid([[SC],
+                   [SaccadeControl],
+                   [Eye]],xstart=300)
 
