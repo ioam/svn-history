@@ -1,7 +1,7 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-default: python jpeg pil numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis
+default: python jpeg pil numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis psyco
 
 all: default pyaudiolab mlabwrap scipy ipython
 
@@ -536,6 +536,25 @@ bwidget-clean:
 	rm -rf  ${BWIDGET} 
 bwidget-uninstall:
 	rm -rf bwidget ${foreach f,${BWIDGET_UNINSTALL}, ${PREFIX}/${f}}
+
+
+
+##############################################################
+# PSYCO
+#
+PSYCO = psyco-dist-svn42201
+
+PSYCO_UNINSTALL += ${PYTHON_LIB}/site-packages/psyco
+
+psyco: ${PSYCO}.tar.gz python
+	tar xzf ${PSYCO}.tar.gz
+	cd psyco-dist; ${PREFIX}/bin/python setup.py install
+	touch psyco
+
+psyco-clean:
+	rm -rf  ${PSYCO} 
+psyco-uninstall:
+	rm -rf psyco ${foreach f,${PSYCO_UNINSTALL}, ${PREFIX}/${f}}
 
 
 
