@@ -27,6 +27,16 @@ measure_position_pref(); \
 measure_cog(); \
 "
 
+tests: test_running
+
+# Trivial test to make sure that everything at least loads; will have some errors if images are not present
+test_loading:	
+	bash -c 'for file in *.ty ; do echo "Loading $${file}..." ; ../topographica -c default_density=2 $${file} ; done'
+
+# Trivial test to make sure that everything at least loads; will have some errors if images are not present
+test_running:	
+	bash -c 'for file in *.ty ; do echo "Running $${file}..." ; ../topographica -c default_density=2 $${file} -c "topo.sim.run(1)"; done'
+
 
 # Perform simple tests that the examples at least run; should be
 # replaced by more extensive tests.
