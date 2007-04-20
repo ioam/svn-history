@@ -51,7 +51,7 @@ tutorials_locations        = (os.path.join(topo_dir,'doc/Tutorials/index.html'),
 reference_manual_locations = (os.path.join(topo_dir,'doc/Reference_Manual/index.html'),'http://topographica.org/Reference_Manual/')
 python_doc_locations = ('http://www.python.org/doc/')
 topo_www_locations = ('http://www.topographica.org/')
-
+plotting_help_locations = (os.path.join(topo_dir,'doc/User_Manual/plotting.html'),'http://topographica.org/User_Manual/plotting.html')
 
 # If a particular plotgroup_template needs (or works better with) a
 # specific subclass of PlotPanel, the writer of the new subclass
@@ -476,6 +476,7 @@ class TopoConsole(Tkinter.Tk):
                                              label=entry.label,command=entry.command)
             self.menubar.addmenuitem('Plots','separator')                                     
 
+        self.menubar.addmenuitem('Plots','command',label="Help",command=(lambda x=plotting_help_locations: self.open_location(x)))
 
 
     def __help_menu(self):
