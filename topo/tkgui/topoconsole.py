@@ -176,9 +176,9 @@ class PlotsMenuEntry(ParameterizedObject):
 # icon right (as well as the "iconified" icon, if necessary) we should
 # consider how to give all topographica windows these
 # attributes. There are probably other things we want the windows to
-# share, too.
+# share, too. (See current task list.)
 
-#class TopoWindow
+
 
 class TopoConsole(Tkinter.Tk):
     """
