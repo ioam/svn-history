@@ -69,6 +69,12 @@ terminal task' later in this document), and a note about the tkinter
 problem on some machines (see 'tkinter problem' later in this
 document. Or we should file bug reports on our sf.net pages.
 
+<H4>2007/04/21: Note for Windows users</H4>
+Where to put this note? Working from the cmd.exe on Windows, single
+quotes must appear inside double quotes: it can't be the other way
+round. Applies to anywhere in topographica that there are commandline
+instructions that might include one string inside another.
+i.e. "'Hello'", not '"Hello"'
 
 
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
