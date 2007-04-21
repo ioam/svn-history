@@ -1,8 +1,10 @@
 <H1>LISSOM Orientation Map</H1>
 
-<!-- CEBALERT: Should fix indentation; make standards-compliant so it will -->
-<!-- display properly on different browsers (I'll fix spacing at the -->
-<!-- same time); sort blockquotes -->
+<!-- To do before release:
+- add new gui (+other) features
+- screenshots
+- time-to-run still accurate?
+-->
 
 <p>
 This tutorial shows how to use the
@@ -17,11 +19,11 @@ extensible for models not yet supported.
 <p>This tutorial assumes that you have already followed the
 instructions for <a href="../Downloads/index.html">obtaining and
 installing</a> Topographica.  Also, you will need to generate a saved
-orientation map network, which can be done by changing to the
-<code>examples/</code> directory and running "make
-lissom_oo_or_20000.typ".  Depending on the speed of your machine, you
-may want to go out for coffee at this point; on a 3GHz 512MB machine
-this training process currently takes a little over an hour.
+orientation map network, which can be done by running
+<blockquote><code class='to_type'>./topographica -c "targets=['lissom_oo_or_10000.typ']" examples/run.py</code></blockquote>
+Depending on the speed of your machine, you may want to go out for
+coffee at this point; on a 3GHz 512MB machine this training process
+currently takes a little over an hour.
 </p>
 
 
@@ -30,7 +32,7 @@ this training process currently takes a little over an hour.
 
 In this example, we will load a saved network and test its behavior by
 presenting different visual input patterns.  We will assume that
-Topographica is installed in /home/jbednar/public/topographica/.
+Topographica is installed in <code>/home/jbednar/public/topographica/</code>.
 
 <ol> 
 <p></p>
@@ -59,7 +61,7 @@ similar buttons should be provided.
 <li> Next, load the saved network by selecting
 selecting <span class='t_item'>Load snapshot</span> from the
 <span class='t_item'>Simulation</span> menu and selecting
-<code>examples/lissom_oo_or_20000.typ</code>. This small orientation
+<code>examples/lissom_oo_or_10000.typ</code>. This small orientation
 map simulation should load in a few seconds, with a 54x54
 retina, a 36x36 LGN (composed of one 36x36 OFF channel sheet, and one
 36x36 ON channel sheet), and a 48x48 V1 with about two million 
@@ -466,7 +468,7 @@ and doing:
 <p></p>
   
 You'll need a lot of memory and a lot of time, but you can then step
-through the simulation as above.  The final result after 20000
+through the simulation as above.  The final result after 10000
 iterations (requiring several hours, if not days) should be a much
 smoother map and neurons that are more orientation selective.  Even
 so, the overall organization and function should be similar.
