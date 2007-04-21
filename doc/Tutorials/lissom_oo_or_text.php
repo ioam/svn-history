@@ -4,6 +4,8 @@
 - add new gui (+other) features
 - screenshots
 - time-to-run still accurate?
+- the 'make' command measures an or map, but the tutorial shows plots
+  from before measuring the map (i.e. uncolored)
 -->
 
 <p>
