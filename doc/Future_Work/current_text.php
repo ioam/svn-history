@@ -62,13 +62,6 @@ the examples handle exponential decay of parameter values, so that
 they are good starting points.
 
 
-<H4>2007/04/05 (CB): examples/Makefile -> python</H4>
-Migrate examples/Makefile to python script. Then, Windows users can
-follow the tutorial instructions.
-CB: I've done this (although the script's not great, and currently
-prints an error message at the end).
-
-
 <H4>2007/04/19: tkinter problems</H4>
 Should at least add a note to docs about messed-up terminal after
 tkgui quit (telling users they can run 'stty sane': see 'messed-up
@@ -119,14 +112,20 @@ instances.  Figure out and clean up translator_dictionary & its uses.
 
 
 <H4>2007/03/26 (CB): minor tkgui cleanup</H4>
-- Simplify tkgui, eliminating extra frames and any unnecessary
+Simplify tkgui, e.g. eliminating extra frames and any unnecessary
 refresh() etc methods. At the moment, the complexity makes it 
 difficult to add new features to the GUI and to correct problems.
-- Collect my notes together (from __init__ and topoconsole).  Decide
-what to do about them, and then start doing them.
-- Which widgets should expand (expand=YES ?), which should fill the
+<BR>
+Which widgets should expand (expand=YES ?), which should fill the
 space (fill=X ?) (e.g. in parameters frames sliders etc should
-expand).
+expand), and so on.
+<BR>
+Get icon onto all windows e.g. with a mix-in class TkguiWindow that
+contains attributes we'd like all tkgui windows to have - like the
+icon.  What to do about decorating tkMessageBox etc? A TkguiWindow()
+instance would set attributes (e.g. window icon) based on the
+assumption that it is already some kind of Tk window (Tk() for
+TopoConsole, Toplevel() for the other windows): seems a bit wrong.
 
 
 <H4>2007/04/19: messed-up terminal after quitting from GUI</H4>
