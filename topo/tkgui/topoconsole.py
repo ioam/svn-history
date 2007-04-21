@@ -548,14 +548,16 @@ class TopoConsole(Tkinter.Tk):
 
     def quit(self):
         """Quit topographica."""
-
-        # CB: can probably get an icon on here
-        # Also, is the title working?
+        # CEBALERT: seems like using tkMessageBox gives no options about
+        # decorating the window (e.g. icon, title). Might want to create
+        # our own (or find one from somewhere) so that we can control
+        # the window decoration (make a class that can inherit from
+        # a TkguiWindow mix-in class).
         if tkMessageBox.askyesno("Quit Topographica","Really quit?"):
             self.destroy() 
             if topo.gui_cmdline_flag:
                 print "Quit selected; exiting"
-                sys.exit()
+            sys.exit()
 
 
     # CEBALERT: the way this works might be a surprise, because previously
