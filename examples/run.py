@@ -110,6 +110,9 @@ def run(script_name,density=4,commands=["topo.sim.run(1)"]):
 
 
 
+# CEBALERT: missing test_loading and test_running from the Makefile.
+# (Use glob module to get all the ty files.)
+
 
 # shortcuts for executing multiple targets
 group_targets = dict( all_quick=["hierarchical","cfsom_or","som_retinotopy","lissom_oo_or"],
