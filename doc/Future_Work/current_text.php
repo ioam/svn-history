@@ -74,7 +74,9 @@ Where to put this note? Working from the cmd.exe on Windows, single
 quotes must appear inside double quotes: it can't be the other way
 round. Applies to anywhere in topographica that there are commandline
 instructions that might include one string inside another.
-i.e. "'Hello'", not '"Hello"'
+i.e. "'Hello'", not '"Hello"'<BR>
+We might also want to add notes about omitting './' and changing
+'/' to '\' in general (currently on the downloads page).
 
 
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
