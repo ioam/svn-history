@@ -5,11 +5,15 @@ Like a Makefile: contains a list of targets (and groups of targets)
 that specify various commands to run.
 
 E.g.
- ./topographica examples/run.py saved_examples
+ ./topographica -c 'targets=["all_quick","saved_examples"]' examples/run.py 
+
+Runs the 'all_quick' target if called without any arguments: 
+ ./topographica examples/run.py 
 
 
 To add new single targets, just add to the targets dictionary;
 for groups of targets, add to the group_targets dictionary.
+
 
 $Id$
 """
@@ -57,22 +61,9 @@ examples = "examples"
 from os import getcwd; assert topographica_path==getcwd(), "Must be run from main topographica directory."
 
 
-# CEBHACKALERT: commandline.py tries to use the arguments intended for run.py as commands to execute.
-# (I originally wrote this script for running with python, not topographica,
-# so I've failed to use some of topographica's own commandline argument handling?)
-# See the error message that comes at the end of doing e.g.
-#  ./topographica examples/run.py all_quick
-# examples/run.py operates correctly, doing everything from all_quick, but then this error occurs at the end:
-# Traceback (most recent call last):
-#  File "./topographica", line 10, in ?
-#    process_argv(argv[1:])
-#  File "/home/chris/topographica/topo/misc/commandline.py", line 206, in process_argv
-#    execfile(filename,__main__.__dict__)
-# IOError: [Errno 2] No such file or directory: 'all_quick'
+specified_targets = locals().get('targets',['all_quick'])
+assert isinstance(specified_targets,list) or isinstance(specified_targets,tuple),"Targets must be a list (or tuple) of target names."
 
-
-# (arg 0 is topographica, arg 1 is this script name)
-command_names = argv[2:len(argv)]
 
 
 ### Convenience functions
@@ -172,18 +163,14 @@ targets = {
 # CB: I don't know any string methods; I'm sure this can
 # be simplified!
 command_labels=[]
-for a in command_names:
+for a in specified_targets:
     if a in group_targets:
         command_labels+=group_targets[a]
     else:
         command_labels.append(a)
 
-### No arguments given: default to all_quick (that's what the Makefile does, right?)
-if len(command_labels)<1:
-    command_labels+=group_targets['all_quick']
 
 ### Execute the commands
-
 for cmd in command_labels:
     c = targets[cmd]
     print c
