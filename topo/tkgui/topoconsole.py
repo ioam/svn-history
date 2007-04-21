@@ -446,7 +446,7 @@ class TopoConsole(Tkinter.Tk):
                              label="Activity",
                              command=self.new_activity_window)
         """
-        # CEBALERT: more complex than it needs to be!
+        # CEBALERT: more complex than it needs to be! (Hence the extra comments.)
         # Needs to be cleaned up, along with PlotsMenuEntry.
         # There seem to be several unnecessary steps, and the same thing is often
         # stored in too many different places.
@@ -464,9 +464,23 @@ class TopoConsole(Tkinter.Tk):
         categories = sorted(set(categories))
 
 
-        # add the categories to the menu, and the plots of each category
-        # under the category heading, with a separator after each category
+        basic_category = 'Basic'
+        assert basic_category in categories
+        
+
         self.menubar.addmenu('Plots','Assorted plot displays')
+
+        # The Basic category items appear on the menu itself.
+        for label,entry in self.plots_menu_entries:
+            if entry.template.category==basic_category:
+                    self.menubar.addmenuitem('Plots','command',
+                                             entry.template.name,
+                                             label=entry.label,command=entry.command)
+        categories.remove('Basic')
+        self.menubar.addmenuitem('Plots','separator')
+        
+        # Add the other categories to the menu as cascades, and the plots of each category to
+        # their cascades.
         for category in categories:
             self.menubar.addcascademenu('Plots',category)
             for label,entry in self.plots_menu_entries:
