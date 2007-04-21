@@ -468,14 +468,14 @@ class TopoConsole(Tkinter.Tk):
         # under the category heading, with a separator after each category
         self.menubar.addmenu('Plots','Assorted plot displays')
         for category in categories:
-            self.menubar.addmenuitem('Plots','command',label=category,state='disabled')
+            self.menubar.addcascademenu('Plots',category)
             for label,entry in self.plots_menu_entries:
                 if entry.template.category==category:
-                    self.menubar.addmenuitem('Plots','command',
+                    self.menubar.addmenuitem(category,'command',
                                              entry.template.name,
                                              label=entry.label,command=entry.command)
-            self.menubar.addmenuitem('Plots','separator')                                     
-
+            
+        self.menubar.addmenuitem('Plots','separator')                                     
         self.menubar.addmenuitem('Plots','command',label="Help",command=(lambda x=plotting_help_locations: self.open_location(x)))
 
 
