@@ -1,5 +1,7 @@
 <H1>LISSOM Orientation Map</H1>
 
+<!-- CEBALERT: the html in this file is a mix of standards (i.e., it's a mess). -->
+
 <p>
 This tutorial shows how to use the
 <a href="http://topographica.org/">Topographica</a> software to explore a
@@ -222,14 +224,19 @@ class='t_item'>Strength only</span> is turned off in the
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
-<p>Each V1 neuron is now color coded by its
-orientation, with brighter colors indicating stronger activation.  We
-can now see that the neurons responding are indeed those that prefer
-orientations similar to the input pattern, and that the response is
-patchy because other nearby neurons do not respond.  To be sure of
-that, try rotating the image by adjusting the orientation, then present 
-it again -- the colors should be different, and should match the
-orientation chosen. 
+<p>Each V1 neuron is now color coded by its orientation, with brighter
+colors indicating stronger activation.  Additionally, the status bar
+beneath the plots now also shows the values of the separate channels
+comprising the plot: OrientationPreference (color),
+OrientationSelectivity (saturation), and Activity (brightness).
+
+<P>
+The color coding allows us to see that the neurons responding are
+indeed those that prefer orientations similar to the input pattern,
+and that the response is patchy because other nearby neurons do not
+respond.  To be sure of that, try rotating the image by adjusting the
+orientation, then present it again -- the colors should be different,
+and should match the orientation chosen.
 </p>
 <p></p>
 </li>
@@ -245,24 +252,66 @@ one neuron" align="middle" width="676" height="404" ><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
-<p>
-Look at the <span class='t_item'>LateralExcitatory</span> weights, which show that
-the neurons near this neuron are all red (horizontal). 
-<!-- somewhere might want to say this one almost falls on a boundary -->
-[point out extra info available in the status bar]
-</p>
+<P> Look at the <span class='t_item'>LateralExcitatory</span> weights,
+which show that the neurons near this neuron are all red (horizontal).
+<!-- somewhere might want to say this one almost falls on a boundary--> 
+
+<P>
+Returning to the <span class='w_title'>Test pattern</span> window,
+try presenting a vertical line
+(<span_class='t_item'>orientation</span> of <code>pi/2</code>) and
+then, in the <span class='w_title'>Activity</span> window, right click
+on one of the cyan-colored patches of activity (for instance, around unit
+41,24). This will bring up a menu:
+
+<p class="center">
+<img src="images/lissom_oo_or_activity_rightclick.png" alt="Right-click menu" align="middle" width="424" height="109" >
+</p><br>
+
+<!--CB: should probably be a list-->
+<P>The menu offers operations on different parts of the plot:
+the first submenu shows operations available on the single selected unit, and
+the second shows operations available on the combined (visible) plot. The final
+three submenus show operations available on each of the separate channels that
+comprise the plot.
+
+<P>Here we are interested to see the connection fields of the unit we selected,
+so we choose <span class='t_item'>Connection Fields</span> from the 
+<span class='t_item'>Single unit</span> submenu to get a new plot:
+
+<p class="center">
+<img src="images/unit_weights_41_24_oo_or.png" alt="Colorized weights of
+one neuron" align="middle" width="676" height="404" ><br />
+<img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
+</p><br>
+
+<P>This time we can see from the <span class='t_item'>LateralExcitatory</span> weights
+that the neurons near this one are all cyan (vertical).
 </li>
 
 <li>
-[right-click menu intro. eg. Explore orientation plot by looking at cfs.
+<P>
+Right-click menus are available on most plots, and provide a convenient
+method of further investigating and understanding the plots. For instance,
+on the <span class='w_title'>Orientation Preference</span> window, the 
+connection fields of units at any location can easily be visualized, 
+allowing one to see the connection fields of units around different features of the map.
+<!-- ...do we want to go further or is this tutorial already ready to split into
+more optional sections? -->
 
-<P> Another paragraph.
-</li>
+<P>An interesting property of orientation maps measured in animals is that their
+Fourier spectrums usually show a ring shape, because the orientations repeat at
+a constant spatial frequency in all directions. Selecting <br>
+<span class='t_item'>Hue channel: OrientationPreference</span> > 
+<span class='t_item'>Fourier transform</span>
+ from the right-click menu allows us to see the same is true of the map generated
+by LISSOM:
 
-<li>
-More right-click menu functions.
 
-<P> More
+<p class="center">
+<img src="images/lissom_oo_or_orpref_ft.png" alt="FT of orientation preference map" align="middle" width="420" height="475" >
+</p><br>
+
 </li>
 
 
