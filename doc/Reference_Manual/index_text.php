@@ -180,7 +180,7 @@ external libraries that it uses, it can be difficult to get SciPy
 working on a particular installation. You can try with:
 <code>cd external; make scipy</code>.</DD>
 
-<P><DT><A href="http://mlabwrap.sourceforge.net/">mlabwrap</A></DT>
+<P><DT><A name="mlabwrap" href="http://mlabwrap.sourceforge.net/">mlabwrap</A></DT>
 <DD>mlabwrap is a high-level Python-to-Matlab bridge, allowing Matlab to look like
 a normal Python library:
 <PRE>
