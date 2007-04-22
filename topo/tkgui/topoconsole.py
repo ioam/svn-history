@@ -557,6 +557,18 @@ class TopoConsole(Tkinter.Tk):
             self.destroy() 
             if topo.gui_cmdline_flag:
                 print "Quit selected; exiting"
+
+            # Workaround for obscure problem on some UNIX systems
+            # as of 4/2007, probably including Fedora Core 5.  
+            # On these systems, if Topographica is started from a
+            # bash prompt and then quit from the Tkinter GUI (as
+            # opposed to using Ctrl-D in the terminal), the
+            # terminal would suppress echoing of all future user
+            # input.  stty sane restores the terminal to sanity,
+            # but it is not clear why this is necessary.
+            try: os.system("stty sane")
+            except: pass
+                
             sys.exit()
 
 
