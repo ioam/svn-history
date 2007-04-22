@@ -148,7 +148,7 @@ snapshot-tests:
 
 
 clean-pyc:
-	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc
+	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc examples/*.pyc
 
 clean-doc:
 	make -C doc clean
@@ -200,13 +200,14 @@ sf-web-site: reference-manual doc
 #
 #@@distclean: FORCE clean
 #@@	   ${RM} .#* */.#* */*/.#* */*~ .cvsignore ChangeLog.txt */.cvsignore */*/.cvsignore */*/*/.cvsignore
-#@@	   ${RM} etc/topographica.elc ImageSaver*.ppm countalerts* annotate.out
+#@@	   ${RM} etc/topographica.elc ImageSaver*.ppm countalerts* annotate.out emacslog
 #@@	   ${RM} current_profile testsnapshot.typ script ./topo/tests/*.ty_*DATA
 #@@	   ${RM} examples/disparity_energy.ty
 #@@	   ${RM} examples/goodhill_network90.ty
 #@@	   ${RM} examples/homeostatic.ty
 #@@	   ${RM} examples/joublin_bc96.ty
 #@@	   ${RM} examples/laminar.ty
+#@@	   ${RM} examples/laminar_or.ty
 #@@	   ${RM} examples/laminar_lissom.ty
 #@@	   ${RM} examples/laminar_nolearning.ty
 #@@	   ${RM} examples/laminar_oo_or.ty*
@@ -217,6 +218,8 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} examples/lissom_oo_or_dy.ty
 #@@	   ${RM} examples/lissom_oo_or_dy_photo.ty
 #@@	   ${RM} examples/lissom_oo_or_homeomaxent.ty
+#@@	   ${RM} examples/lissom_oo_or_noshrinking_adapthomeo.ty
+#@@	   ${RM} examples/lissom_oo_or_noshrinking_latswitch.ty
 #@@	   ${RM} examples/lissom_or_homeomaxent.ty
 #@@	   ${RM} examples/lissom_or_homeoscale.ty
 #@@	   ${RM} examples/lissom_or_noshrinking.ty
@@ -226,6 +229,8 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} examples/saccade_demo.ty
 #@@	   ${RM} examples/sullivan_neurocomputing04.ty
 #@@	   ${RM} examples/sullivan_nn06.ty
+#@@	   ${RM} examples/*.typ
+#@@	   ${RM} -r images
 #@@	   ${RM} -r topographica-win
 #@@	   ${RM} -r tmp/
 #@@	   ${RM} -r CVS */CVS */*/CVS */*/*/CVS
