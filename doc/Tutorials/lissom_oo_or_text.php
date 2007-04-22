@@ -299,11 +299,12 @@ allowing one to see the connection fields of units around different features of 
 <!-- ...do we want to go further or is this tutorial already ready to split into
 more optional sections? -->
 
-<P>An interesting property of orientation maps measured in animals is that their
-Fourier spectrums usually show a ring shape, because the orientations repeat at
-a constant spatial frequency in all directions. Selecting <br>
-<span class='t_item'>Hue channel: OrientationPreference</span> > 
-<span class='t_item'>Fourier transform</span>
+<P>As another example, an interesting property of orientation maps
+measured in animals is that their Fourier spectrums usually show a
+ring shape, because the orientations repeat at a constant spatial
+frequency in all directions. Selecting <br> <span class='t_item'>Hue
+channel: OrientationPreference</span> > <span class='t_item'>Fourier
+transform</span>
  from the right-click menu allows us to see the same is true of the map generated
 by LISSOM:
 
