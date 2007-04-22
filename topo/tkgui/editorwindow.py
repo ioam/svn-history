@@ -17,6 +17,10 @@ from topo.base.projection import Projection
 from editorobjects import EditorNode, EditorSheet, EditorProjection
 from editortools import ArrowTool, NodeTool, ConnectionTool, ParametersTool
 
+
+canvas_region = (0, 0, 1200, 1200)
+"""Size of the canvas, as a bounding box (xl yl xh yh)."""
+
 class EditorCanvas(Canvas):
 
     """ 
@@ -108,7 +112,7 @@ class EditorCanvas(Canvas):
         self.item_menu.bind('<<right-click-release>>', self.right_release)   
 
         # add scroll bar; horizontal and vertical
-        self.config(scrollregion = (0, 0, 1200, 1200))
+        self.config(scrollregion = canvas_region)
         vertical_scrollbar = Scrollbar(root)
         horizontal_scrollbar = Scrollbar(root, orient = 'horizontal')
         vertical_scrollbar.config(command = self.yview)
@@ -515,7 +519,7 @@ class ModelEditor:
         # create a GUICanvas and place it in a frame
         canvas_frame = Frame(root, bg = 'white')
         canvas = EditorCanvas(canvas_frame)
-
+    
         # create the three toolbar items and place them into a frame
         frame = Frame(root, bg = 'light grey', bd = 2)
         parameters_tool = ParametersTool(frame)
@@ -532,13 +536,22 @@ class ModelEditor:
         # give the canvas focus and import any objects and connections already in the simulation
         canvas.focus_set()
         self.canvas = canvas
+
+        # Grid layout defaults
+        self.xstart = 100
+        self.ystart = 100
+        self.next_x = self.xstart+100
+        self.next_y = self.ystart
+        self.xstep = 150
+        self.ystep = 150
+
         self.import_model()
 
     def import_model(self):
-        
+        # Could use dot/graphviz to place the objects nicely
         # random generator, and values used for randomly positioning sheets
         random_generator = Random() 
-        padding = 75; spread_extent = 500
+
         # get a list of all the sheets in the simulation
         sim = self.canvas.simulation
         node_dictionary = sim.objects(Sheet)
@@ -547,16 +560,19 @@ class ModelEditor:
         # create the editor covers for the nodes
         for node in node_list:
             # if the sheet has x,y coords, use them
-            ### JABALERT: Should probably change these to layout_x and layout_y, 
-            ### because they are about how the sheets are laid out in a visualization,
-            ### even if that layout is just generated as an image and saved to disk
-            ### rather than in a gui.
             if (hasattr(node,'layout_location') and node.layout_location!=(-1,-1)):
                 x, y = node.layout_location
-            # if not generate random coords
+            # if not generate new coords on a grid layout
             else:
-                x = padding + random_generator.random() * spread_extent 
-                y = padding + random_generator.random() * spread_extent
+                x, y = self.next_x , self.next_y
+                self.next_y += self.ystep
+                if self.next_y > canvas_region[3]:
+                    self.next_y  = self.ystart
+                    self.next_x += self.xstep
+                if self.next_x > canvas_region[2]:
+                    self.next_x = self.xstart + 15
+                    self.next_y = self.ystart + 15
+                    
             editor_node = EditorSheet(self.canvas, node, (x, y), node.name)
             node.layout_location=(x,y)
             self.canvas.add_object(editor_node)
@@ -582,21 +598,3 @@ class ModelEditor:
         self.canvas.redraw_objects()
 
 
-def setup_editor_grid(objgrid,xstart=100,xstep=150,ystart=100,ystep=150):
-    """
-    Set the editor positions of simulation objects in a grid pattern.
-
-    Takes a list of lists of simulation objects and positions them
-    in the editor window left-to-right, top-to-bottom, starting
-    at (xstart,ystart) and advancing by xstep and ystep.
-
-    The object None can be placed in the grid to skip a grid space.
-    """
-    y = ystart
-    for row in objgrid:
-        x = xstart
-        for obj in row:
-            if obj:
-                obj.layout_location = x,y
-            x += xstep
-        y += ystep
