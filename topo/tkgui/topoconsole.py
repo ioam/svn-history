@@ -566,6 +566,8 @@ class TopoConsole(Tkinter.Tk):
             # terminal would suppress echoing of all future user
             # input.  stty sane restores the terminal to sanity,
             # but it is not clear why this is necessary.
+            # For more info:
+            # http://groups.google.com/group/comp.lang.python/browse_thread/thread/68d0f33c8eb2e02d
             try: os.system("stty sane")
             except: pass
                 
