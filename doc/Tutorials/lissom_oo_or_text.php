@@ -17,7 +17,7 @@ orientation map network, which can be done by running
 <blockquote><code class='to_type'>./topographica -c "targets=['lissom_oo_or_10000.typ']" examples/run.py</code></blockquote>
 Depending on the speed of your machine, you may want to go out for
 coffee at this point; on a 3GHz 512MB machine this training process
-currently takes a little over half an hour <!--lodestar: 34m-->.
+currently takes a little over half an hour.<!--lodestar: 34m-->
 </p>
 
 
@@ -44,7 +44,7 @@ Topographica is installed in <code>/home/jbednar/public/topographica/</code>.
   
 <p class='center'>
 <img src="images/topographica_console.png" alt="Console Window"
-align="middle" width="370" height="239">
+align="middle" width="438" height="249">
 </p>
 <p>
 The window and button style will differ on different platforms, but
@@ -77,7 +77,7 @@ select <span class='t_item'>Test pattern</span> from the <span class='t_item'>Si
 
 <p class='center'>
 <img src="images/test_pattern_oo.png" alt="Test Pattern window"
-align="middle" WIDTH="432" HEIGHT="759">
+align="middle" WIDTH="450" HEIGHT="758">
 </p>
 
 <p>
@@ -93,7 +93,7 @@ network.
 <li>To see the result, select <a name="Activity-plot"><span class='t_item'>Activity</span></a> from
 the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topographica Console</span> to get:
 <p class='center'>
-<img src="images/activity_line_oo.png" alt="Response to a line" align="middle" width="676" height="340">
+<img src="images/activity_line_oo.png" alt="Response to a line" align="middle" width="676" height="372">
 </p>
 
 <P>This window shows the response for each neural area.  For now, please
@@ -132,14 +132,14 @@ to the neuron in the center of the cortex (by default):
 
 <p class="center">
 <img src="images/unit_weights_0_0_oo.png" alt="Weights of one
-neuron" align="middle" WIDTH="676" HEIGHT="370">
+neuron" align="middle" WIDTH="676" HEIGHT="404">
 </p>
 
 <P>Again, please make sure for now that <span class='t_item'>Strength
 only</span> is turned on; it is usually off by default.
 
 <p> The plot shows the afferent weights to V1 (i.e., connections from
-the ON and OFF channels of the LGN, followed by the lateral excitatory
+the ON and OFF channels of the LGN), followed by the lateral excitatory
 and lateral inhibitory weights to that neuron from nearby neurons in
 V1. The afferent weights represent the retinal pattern that would most
 excite the neuron.  For this particular neuron, the optimal retinal
@@ -158,7 +158,7 @@ class='t_item'>Projection</span> list:
 
 <p class="center">
 <img src="images/projection_oo.png" alt="Afferent weights of many
-neurons" align="middle" WIDTH="644" HEIGHT="559">
+neurons" align="middle" WIDTH="669" HEIGHT="627">
 </p>
 
 This plot shows the afferent weights from the LGN ON sheet for every fifth neuron in each
@@ -175,11 +175,11 @@ activity patterns are patchy.
 in experimental animals, optical imaging experiments measure responses
 to a variety of patterns and record the one most effective at stimulating each
 neuron.  The results of a similar procedure can be viewed by selecting
-<a name="OrientationPreference-plot"><span class='t_item'>Orientation Preference</span></a>
-from the <span class='t_item'>Plots</span> menu, which should show something like:
+<span class='t_item'>Plots</span> > <span class='t_item'>Preference Maps</span> >
+<a name="OrientationPreference-plot"><span class='t_item'>Orientation Preference</span></a>:
 
 <p class="center">
-<img src="images/oo_or_map.png" alt="Orientation map" width="625" height="381">
+<img src="images/oo_or_map.png" alt="Orientation map" width="629" height="413">
 </p><br>
 
 <P>
@@ -208,10 +208,11 @@ Preference&Selectivity plot is nearly identical to the Preference plot.
 <li>Now that we have looked at the orientation map, we can see more clearly
 why activation patterns are patchy by coloring each neuron with its
 orientation preference.  To do this, make sure that <span
-class='t_item'>Strength only</span> is turned off:
+class='t_item'>Strength only</span> is turned off in the 
+<span class='w_title'>Activity</span> window:
 
 <p class="center">
-<img src="images/activity_line_oo_or.png" alt="Color-coded response to a line" width="676" height="340" ><br />
+<img src="images/activity_line_oo_or.png" alt="Color-coded response to a line" width="676" height="372" ><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
@@ -234,7 +235,7 @@ located in a patch of neurons with similar orientation preferences:
 
 <p class="center">
 <img src="images/unit_weights_0_0_oo_or.png" alt="Colorized weights of
-one neuron" align="middle" width="676" height="370" ><br />
+one neuron" align="middle" width="676" height="404" ><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
@@ -299,7 +300,7 @@ orientation-specific responses to large contours in the image:
 </p>
 
 <p class="center">
-<img src="images/natural_image_oo_or.png" alt="Ellen Arthur" align="middle" width="676" height="340" ><br />
+<img src="images/natural_image_oo_or.png" alt="Ellen Arthur" align="middle" width="676" height="372" ><br />
 </p>
 
 <P>Be aware when comparing the Retina and V1 plots for a photograph
