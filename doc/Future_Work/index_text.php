@@ -232,7 +232,8 @@ particularly helpful.
 
 <P><DT>Data import/export</DT><DD> It will be crucial to provide
 easy-to-use interfaces for exchanging data and calling code in other
-simulators, such as Matlab (see
+simulators, such as Matlab (see the optional external package
+<A HREF="../Reference_Manual/index.html#mlabwrap">mlabwrap</A>, or
 <A HREF="http://pymat.sourceforge.net">pymat.sourceforge.net</A>).
 These will be used both for analyzing Topographica data, and for
 allowing connection patterns and/or map organization to be specified
