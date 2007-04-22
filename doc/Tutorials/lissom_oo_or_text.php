@@ -100,6 +100,12 @@ the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topograp
 make sure that <span class='t_item'>Strength only</span> is turned on;
 it is usually off by default.
 
+<P>As you move your mouse over the plots, information about the location
+of the mouse cursor is displayed in the status bar at the bottom of the 
+window. For these plots, you can see the coordinates,  
+<a href="../User_Manual/space.html">sheet coordinates</a>,
+and activity level of the unit you are looking at.
+
 </p><p>In the <span class='t_item'>Retina</span> plot, each
 photoreceptor is represented as a pixel whose shade of grey codes the
 response level, increasing from black to white.  This pattern is what
@@ -143,8 +149,8 @@ the ON and OFF channels of the LGN), followed by the lateral excitatory
 and lateral inhibitory weights to that neuron from nearby neurons in
 V1. The afferent weights represent the retinal pattern that would most
 excite the neuron.  For this particular neuron, the optimal retinal
-stimulus would be a short, bright line oriented at about 170 degrees
-(nearly horizontal) in the center of the retina.  </p><p></p></li>
+stimulus would be a short, bright line oriented at about 180 degrees
+(horizontal) in the center of the retina.  </p><p></p></li>
 
 <li>If all neurons had the same weight pattern, the response
 would not be patchy -- it would just be a blurred version of the
@@ -228,7 +234,7 @@ orientation chosen.
 <p></p>
 </li>
 
-<li> If you now turn off <span class='t_item'>Strength only</span>
+<li>If you now turn off <span class='t_item'>Strength only</span>
 in the <span class='w_title'>Connection Fields</span>
 window, you can see that the neuron whose weights we plotted is
 located in a patch of neurons with similar orientation preferences: 
@@ -241,11 +247,24 @@ one neuron" align="middle" width="676" height="404" ><br />
 
 <p>
 Look at the <span class='t_item'>LateralExcitatory</span> weights, which show that
-the neurons near this neuron are all red (horizontal). Other neurons
-can be selected by changing the (X,Y) coordinates; these should have
-higher selectivity.
+the neurons near this neuron are all red (horizontal). 
+<!-- somewhere might want to say this one almost falls on a boundary -->
+[point out extra info available in the status bar]
 </p>
-<p></p></li>
+</li>
+
+<li>
+[right-click menu intro. eg. Explore orientation plot by looking at cfs.
+
+<P> Another paragraph.
+</li>
+
+<li>
+More right-click menu functions.
+
+<P> More
+</li>
+
 
 
 <li> Now that you have a feel for the various plots, you can try
