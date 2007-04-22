@@ -83,7 +83,8 @@ We might also want to add notes about omitting './' and changing
 
 
 <H4>2007/04/20: Fix the code in PlotGroup for calculating the minimum
-plot sizes in the GUI -- needs to be calculated independently for the
+plot sizes in the GUI</H4>
+The minimum needs to be calculated independently for the
 Sheet and non-Sheet coordinate cases.  Somewhat tricky due to how
 _calculate_minimum_height_of_tallest_plot() also sets minimum_height;
 it all needs to be cleaned up so that the actual minimum is enforced,
