@@ -613,23 +613,6 @@ def measure_caricaturization(display=True,weighted_average=False,
 
 
 ###############################################################################
-pgt = new_pgt(name='Face Preference',command='measure_face_pref(display=True,weighted_average=False,pattern_presenter=PatternPresenter(pattern_generator=FaceSpace2Dfromfile(),apply_output_fn=True,duration=1.0))')
-pgt.add_plot('Face Preference',[('Strength','CiPreference')])
-pgt.add_plot('Face Preference',[('Hue','CiPreference')])
-pgt.add_plot('Face Selectivity',[('Strength','CiSelectivity')])
-
-def measure_face_pref(display=True,weighted_average=False,
-                    pattern_presenter=PatternPresenter(pattern_generator=FaceSpace2Dfromfile(),apply_output_fn=True,duration=1.0)):
-
-    feature_values = [Feature(name="ci", values = frange(1/36.0, 1.0 + 1/36.0, 1/36.0), cyclic = False)]
-
-    param_dict = {'size_normalization' : 'original', 'x' : 0.0, 'y' : 0.0}
-    x=FeatureMaps(feature_values)
-    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
-
-
-
-###############################################################################
 new_pgt(name='Orientation Tuning Fullfield',category="Tuning Curves",doc="""
             Plot orientation tuning curves for a specific unit, measured using full-field sine gratings.
             Although the data takes a long time to collect, once it is ready the plots

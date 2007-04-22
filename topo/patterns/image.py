@@ -1,5 +1,5 @@
 """
-Image is a PatternGenerator that displays grayscale images.
+PatternGenerators based on bitmap images stored in files.
 
 $Id$
 """
@@ -11,7 +11,8 @@ import ImageOps
 from numpy.oldnumeric import array, Float, sum, ravel, ones
 
 from topo.base.boundingregion import BoundingBox
-from topo.base.parameterclasses import Filename, Number, Parameter, Enumeration, DynamicNumber
+from topo.base.parameterclasses import Filename, Number, Parameter, Enumeration
+from topo.base.parameterclasses import DynamicNumber, StringParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.projection import OutputFnParameter
@@ -273,43 +274,42 @@ class Image(PatternGenerator):
 
 
 class FaceSpace2Dfromfile(Image):
+    """
+    Presents images from a set indexed in two dimensions: caricaturization and identity.
 
-    caricaturization = DynamicNumber(default = Choice(choices = [0, 20, 40, 60, 80, 100, 120, 140, 160]),
-                                     precedence = 0.20, doc = """""")
+    Used for testing how face-selective responses depend on
+    differences from a mean face and on individual identities.
 
-    identity = DynamicNumber(default = UniformRandomInt(lbound = 1, ubound = 4, seed = 21),
-                             precedence = 0.20, doc = """""")
+    Requires a set of images indexed by two numbers.  The numbers will
+    be passed to a string specification of the filename_format to
+    construct the actual filenames of these images.
+    """
+    
+    caricaturization = DynamicNumber(default = Choice(choices = [0,20,40,60,80,100,120,140,160]),                                      precedence = 0.20, doc = """
+        Amount of caricaturization, on a scale with 0 being the mean face
+        and 100 being a real face. Values above 100 represent exaggerations
+        (caricatures), and those below 100 represent averaged faces.""")
 
-    ci  = Number(default = 0.0, bounds = (0.0, 1.0), softbounds = (0.0, 2.0), precedence = 0.30)
+    identity = DynamicNumber(default = UniformRandomInt(lbound=1, ubound=4, seed=21),
+                             precedence = 0.20, doc = """
+        Number specifying which person's face should be used.""")
 
-    file_prefix = '../imagedb/leopold/f'
-
-    file_suffix = '_enlarged.png'
-
-    file_separator = '_'
+    filename_format = StringParameter('../imagedb/leopold/f%d_%d_enlarged.png', doc="""
+        String specification for the filename, where the first %d will
+        be replaced with the identity, and the second %d will be
+        replaced with the caricaturization.""")
 
     def function(self,**params):
-
         caricaturization = params.get('caricaturization', self.caricaturization)
         identity = params.get('identity', self.identity)
+        filename_format = params.get('filename_format', self.filename_format)
+
+        ### JABHACKALERT: Please remove this hack, and simply accept values
+        ### on a nominal scale 0.0 to 1.0 instead.
         if type(caricaturization) == type(1.0):
 	    caricaturization = int(caricaturization * 160)
 	if type(identity) == type(1.0):
 	    identity = int(identity * 4)
 
-	ci = params.get('ci', self.ci)
-        file_prefix = params.get('file_prefix', self.file_prefix)
-        file_suffix = params.get('file_suffix', self.file_suffix)
-        file_separator = params.get('file_separator', self.file_separator)
-
-        if ci != 0.0:
-	    temp = int(ci * 36.0)
-	    identity = (temp - 1) / 9 + 1
-	    if temp % 9 == 0:
-	        caricaturization = 8 * 20
-	    else:
-	        caricaturization = (temp % 9 - 1) * 20
-
-	self.filename = file_prefix + str(identity) + file_separator + str(caricaturization) + file_suffix
-        #print 'caricaturization = ' + str(caricaturization) + '  identity = ' + str(identity)
+	self.filename = filename_format % (identity,caricaturization)
         return Image.function(self, **params)    
