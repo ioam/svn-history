@@ -105,9 +105,7 @@ class ParametersFrame(Frame):
         for button in buttons_to_remove:
             self.__buttons.pop(button)
 
-        # CEBALERT: not always expanding to width, so Defaults isn't separated.
-        # Defaults button needs to be in a reasonable position on test pattern window.
-        button_panel.pack(side=BOTTOM,expand=YES,fill=X)
+        button_panel.pack(side=BOTTOM,expand='no',fill='none')
 
 
 
@@ -193,8 +191,8 @@ class ParametersFrame(Frame):
         ### Display the buttons
         # Ordering of buttons is important. Chose java convention:
         # http://java.sun.com/products/jlf/ed2/book/HIG.Dialogs2.html
-        # CEBALERT: but we also have 'Defaults', which resets to class
-        # defaults. I'm not yet sure where that should go...
+        # CEBALERT: I'm not yet sure where defaults should go - want
+        # it to be separated, probably.
         if 'Defaults' in self.__buttons:
             self.__buttons['Defaults'].pack(side=LEFT)
         
