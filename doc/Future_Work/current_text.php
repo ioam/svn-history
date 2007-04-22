@@ -63,11 +63,9 @@ they are good starting points.
 
 
 <H4>2007/04/19: tkinter problems</H4>
-Should at least add a note to docs about messed-up terminal after
-tkgui quit (telling users they can run 'stty sane': see 'messed-up
-terminal task' later in this document), and a note about the tkinter
-problem on some machines (see 'tkinter problem' later in this
-document. Or we should file bug reports on our sf.net pages.
+Add a note about the tkinter problem on some machines (see 'tkinter
+problem' later in this document. Or we should file bug reports on our
+sf.net pages.
 
 <H4>2007/04/21: Note for Windows users</H4>
 Where to put this note? Working from the cmd.exe on Windows, single
@@ -135,14 +133,6 @@ icon.  What to do about decorating tkMessageBox etc? A TkguiWindow()
 instance would set attributes (e.g. window icon) based on the
 assumption that it is already some kind of Tk window (Tk() for
 TopoConsole, Toplevel() for the other windows): seems a bit wrong.
-
-
-<H4>2007/04/19: messed-up terminal after quitting from GUI</H4>
-Quitting topographica from tkgui results in a messed up terminal
-(at least on bash under linux), where the terminal no longer
-prints anything at all. See this posting for more info: 
-http://groups.google.com/group/comp.lang.python/browse_thread/thread/68d0f33c8eb2e02d
-(Note that typing 'stty sane' fixes the terminal.)
 
 
 <H4>2007/04/19: tkinter problem</H4>
