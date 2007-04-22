@@ -221,7 +221,7 @@ topo.sim.schedule_command( 6500*st,'topo.sim["V1"].tsettle=12')
 topo.sim.schedule_command( 8000*st,'topo.sim["V1"].tsettle=13')
 
 # default locations for model editor
-topo.sim['V1'    ].layout_location=(306,225)
-topo.sim['LGNOn' ].layout_location=(432,345)
-topo.sim['LGNOff'].layout_location=(150,345)
-topo.sim['Retina'].layout_location=(279,500)
+from topo.base.simulation import grid_layout
+grid_layout([[None,              topo.sim['V1'],     None],
+             [topo.sim['LGNOn'], None,               topo.sim['LGNOff']],
+             [None,              topo.sim['Retina'], None]], xstart=150)
