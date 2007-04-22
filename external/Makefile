@@ -542,13 +542,13 @@ bwidget-uninstall:
 ##############################################################
 # PSYCO
 #
-PSYCO = psyco-dist-svn42201
+PSYCO = psyco-dist
 
 PSYCO_UNINSTALL += ${PYTHON_LIB}/site-packages/psyco
 
-psyco: ${PSYCO}.tar.gz python
-	tar xzf ${PSYCO}.tar.gz
-	cd psyco-dist; ${PREFIX}/bin/python setup.py install
+psyco: ${PSYCO}-svn42201.tar.gz python
+	tar xzf ${PSYCO}-svn42201.tar.gz
+	cd ${PSYCO}; ${PREFIX}/bin/python setup.py install
 	touch psyco
 
 psyco-clean:
