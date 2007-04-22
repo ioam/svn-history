@@ -60,6 +60,9 @@ class BoundingBox(BoundingRegion):
         else:
             return 'BoundingBox(points=((%s,%s),(%s,%s)))'%(l,b,r,t)
 
+    def __repr__(self):
+        return self.__str__()
+
     def script_repr(self,imports=[],prefix="    "):
         # Generate import statement
         cls = self.__class__.__name__
