@@ -176,9 +176,9 @@ to add the libraries. Also on Windows, it's already working
 SciPy includes many, many functions useful in scientific research,
 such as statistics, linear algebra, image processing, integration and
 differential equation solvers, etc.  However, because of all the
-external libraries that it uses, it can be difficult to get SciPy
-working on a particular installation. You can try with:
-<code>cd external; make scipy</code>.</DD>
+external libraries that it uses, getting SciPy to work 
+on a particular installation can be difficult. You can try with
+<code>make -C external scipy</code>.</DD>
 
 <P><DT><A name="mlabwrap" href="http://mlabwrap.sourceforge.net/">mlabwrap</A></DT>
 <DD>mlabwrap is a high-level Python-to-Matlab bridge, allowing Matlab to look like
