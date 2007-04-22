@@ -38,5 +38,8 @@ parameters, units, and external imports.
 <P><DT><A href="testing.html"><strong>Test suite</strong></A></DT>
 <DD>Rationale behind unit tests; should eventually include information
 about how to set up tests</DD>
+
+<P><DT><A href="releases.html"><strong>Releases</strong></A></DT>
+<DD>How to make a new public release of Topographica</DD>
 </DL>
 
