@@ -238,7 +238,7 @@ topo.sim.schedule_command(20000*st,'topo.sim["FSA"].tsettle=13')
 
 
 # default locations for model editor
-topo.sim['FSA'   ].gui_x=306.0;  topo.sim['FSA'   ].gui_y=225.0
-topo.sim['LGNOn' ].gui_x=432.0;  topo.sim['LGNOn' ].gui_y=345.0
-topo.sim['LGNOff'].gui_x=150.0;  topo.sim['LGNOff'].gui_y=345.0
-topo.sim['Retina'].gui_x=279.0;  topo.sim['Retina'].gui_y=500.0
+topo.sim['FSA'   ].layout_location=(306,225)
+topo.sim['LGNOn' ].layout_location=(432,345)
+topo.sim['LGNOff'].layout_location=(150,345)
+topo.sim['Retina'].layout_location=(279,500)

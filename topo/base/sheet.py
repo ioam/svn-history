@@ -24,7 +24,7 @@ __version__ = '$Revision$'
 
 from simulation import EventProcessor
 from sheetcoords import SheetCoordinateSystem
-from parameterclasses import BooleanParameter, Number, Parameter
+from parameterclasses import BooleanParameter, Number, Parameter, NumericTuple
 from numpy.oldnumeric import zeros,array,Float,ArrayType
 
 from boundingregion import BoundingBox, BoundingRegionParameter
@@ -78,9 +78,12 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
             incoming events.
             """)
 
-    precedence = Number(
-        default = 0.1, softbounds=(0.0,1.0),
+    precedence = Number(default = 0.1, softbounds=(0.0,1.0),
         doc='Allows a sorting order for Sheets, e.g. in the GUI.')
+
+    layout_location = NumericTuple(default = (-1,-1),doc="""
+        Location for this Sheet in an arbitrary pixel-based space
+        in which Sheets can be laid out for visualization.""")
 
 
     def __init__(self,**params):

@@ -138,7 +138,7 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='Lateral',
 
 
 # default locations for model editor
-topo.sim['V1'    ].gui_x=306.0;  topo.sim['V1'    ].gui_y=225.0
-topo.sim['LGNOn' ].gui_x=432.0;  topo.sim['LGNOn' ].gui_y=345.0
-topo.sim['LGNOff'].gui_x=150.0;  topo.sim['LGNOff'].gui_y=345.0
-topo.sim['Retina'].gui_x=279.0;  topo.sim['Retina'].gui_y=500.0
+topo.sim['V1'    ].layout_location=(306,225)
+topo.sim['LGNOn' ].layout_location=(432,345)
+topo.sim['LGNOff'].layout_location=(150,345)
+topo.sim['Retina'].layout_location=(279,500)

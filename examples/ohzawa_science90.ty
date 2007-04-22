@@ -153,20 +153,13 @@ topo.sim.connect('S4','C',delay = FixedPoint("0.05"),name='S4ToC',
 
 
 # default locations for model editor
-topo.sim['C'].gui_x=437.0
-topo.sim['C'].gui_y=54.0
-topo.sim['LeftRetina'].gui_x=284.0
-topo.sim['LeftRetina'].gui_y=532.0
-topo.sim['RightRetina'].gui_x=745.0
-topo.sim['RightRetina'].gui_y=532.0
-topo.sim['S1'].gui_x=142.0
-topo.sim['S1'].gui_y=230.0
-topo.sim['S2'].gui_x=396.0
-topo.sim['S2'].gui_y=230.0
-topo.sim['S3'].gui_x=658.0
-topo.sim['S3'].gui_y=230.0
-topo.sim['S4'].gui_x=902.0
-topo.sim['S4'].gui_y=230.0
+topo.sim['C'          ].layout_location=(437,054)
+topo.sim['LeftRetina' ].layout_location=(284,532)
+topo.sim['RightRetina'].layout_location=(745,532)
+topo.sim['S1'         ].layout_location=(142,230)
+topo.sim['S2'         ].layout_location=(396,230)
+topo.sim['S3'         ].layout_location=(658,230)
+topo.sim['S4'         ].layout_location=(902,230)
 
 
 ###############################################################################

@@ -113,11 +113,11 @@ topo.sim.schedule_command(10,"""topo.sim['V1'].projections()['AfferentLeft'].cha
 
 
 # Set default locations for the Model Editor
-topo.sim['V1'].gui_x=135          ; topo.sim['V1'].gui_y=320
-topo.sim['V2'].gui_x=500          ; topo.sim['V2'].gui_y=230
-topo.sim['V3'].gui_x=500          ; topo.sim['V3'].gui_y=90
-topo.sim['LeftRetina'].gui_x=151  ; topo.sim['LeftRetina'].gui_y=520
-topo.sim['RightRetina'].gui_x=369 ; topo.sim['RightRetina'].gui_y=520
+topo.sim['V3'         ].layout_location=(500, 90)
+topo.sim['V2'         ].layout_location=(500,230)
+topo.sim['V1'         ].layout_location=(135,320)
+topo.sim['LeftRetina' ].layout_location=(151,520)
+topo.sim['RightRetina'].layout_location=(369,520)
 
 # set default input generator (e.g. for the GUI)
 GeneratorSheet.classparams()['input_generator'].default=topo.patterns.basic.Line()

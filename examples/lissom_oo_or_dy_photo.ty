@@ -382,14 +382,14 @@ topo.sim.schedule_command(20000*st,'topo.sim["V1"].output_fn.lower_bound=0.216;t
 
 # default locations for model editor
 
-topo.sim['V1'].gui_x=600.0;           topo.sim['V1'].gui_y=225.0
-topo.sim['LGNOnLeft'].gui_x=200.0;    topo.sim['LGNOnLeft'].gui_y=445.0
-topo.sim['LGNOffLeft'].gui_x=482.0;   topo.sim['LGNOffLeft'].gui_y=445.0
-topo.sim['LeftRetina'].gui_x=279.0;   topo.sim['LeftRetina'].gui_y=700.0
+topo.sim['V1'         ].layout_location=( 600,225)
+topo.sim['LGNOnLeft'  ].layout_location=( 200,445)
+topo.sim['LGNOffLeft' ].layout_location=( 482,445)
+topo.sim['LeftRetina' ].layout_location=( 279,700)
 
-topo.sim['LGNOnRight'].gui_x=750.0;   topo.sim['LGNOnRight'].gui_y=445.0
-topo.sim['LGNOffRight'].gui_x=1030.0; topo.sim['LGNOffRight'].gui_y=445.0
-topo.sim['RightRetina'].gui_x=879.0;  topo.sim['RightRetina'].gui_y=700.0
+topo.sim['LGNOnRight' ].layout_location=( 750,445)
+topo.sim['LGNOffRight'].layout_location=(1030,445)
+topo.sim['RightRetina'].layout_location=( 879,700)
 
 
 

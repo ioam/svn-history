@@ -175,7 +175,7 @@ class EditorSheet(EditorNode):
         self.sheet = sheet # the topo sheet that this object represents
         self.parameterized_obj = self.sheet
         
-        sheet.gui_x, sheet.gui_y = self.x, self.y # store the ed coords in the topo sheet
+        sheet.layout_location = (self.x,self.y) # store the ed coords in the topo sheet
         self.element_count = self.matrix_element_count()
         self.set_bounds()
 
@@ -336,7 +336,7 @@ class EditorSheet(EditorNode):
         old = self.x, self.y
         self.x = x
         self.y = y
-        self.sheet.gui_x, self.sheet.gui_y = x, y # update topo sheet position
+        self.sheet.layout_location = (self.x,self.y) # update topo sheet position
         self.draw(self.x - old[0], self.y - old[1])
 
 

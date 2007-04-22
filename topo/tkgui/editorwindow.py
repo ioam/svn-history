@@ -551,13 +551,14 @@ class ModelEditor:
             ### because they are about how the sheets are laid out in a visualization,
             ### even if that layout is just generated as an image and saved to disk
             ### rather than in a gui.
-            if (hasattr(node,'gui_x') and hasattr(node,'gui_y')):
-                x, y = node.gui_x, node.gui_y
+            if (hasattr(node,'layout_location') and node.layout_location!=(-1,-1)):
+                x, y = node.layout_location
             # if not generate random coords
             else:
                 x = padding + random_generator.random() * spread_extent 
                 y = padding + random_generator.random() * spread_extent
             editor_node = EditorSheet(self.canvas, node, (x, y), node.name)
+            node.layout_location=(x,y)
             self.canvas.add_object(editor_node)
 
         # create the editor covers for the connections
@@ -596,7 +597,6 @@ def setup_editor_grid(objgrid,xstart=100,xstep=150,ystart=100,ystep=150):
         x = xstart
         for obj in row:
             if obj:
-                obj.gui_x = x
-                obj.gui_y = y
+                obj.layout_location = x,y
             x += xstep
         y += ystep
