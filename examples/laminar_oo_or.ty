@@ -30,7 +30,7 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.outputfns.basic import GeneralizedLogistic, Sigmoid
 from topo.outputfns.homeostatic import AdaptingHomeostaticMaxEnt
-from topo.patterns.basic import Gaussian
+from topo.patterns.basic import Gaussian, Composite, SeparatedComposite
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
 
 
@@ -45,7 +45,7 @@ inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=1
                    bounds=BoundingBox(radius=0.8))
                 for i in xrange(num_inputs)]
 
-combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
+combined_inputs = SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
 
 # Specify weight initialization, response function, and learning function
 numpy.random.seed((500,500))
@@ -94,11 +94,8 @@ centerg = topo.patterns.basic.Gaussian(
 surroundg = topo.patterns.basic.Gaussian(
     size=0.2954, aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 
-on_weights = topo.patterns.basic.Composite(
-    generators=[centerg,surroundg],operator=numpy.subtract)
-
-off_weights = topo.patterns.basic.Composite(
-    generators=[surroundg,centerg],operator=numpy.subtract)
+on_weights  = Composite(generators=[centerg,surroundg],operator=numpy.subtract)
+off_weights = Composite(generators=[surroundg,centerg],operator=numpy.subtract)
 
 # Retina -> LGN
 
@@ -117,22 +114,24 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 ## LGN -> V1 Exc
 topo.sim.connect('LGNOn','V1Exc',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=1.0,name='LGNOnAfferent',
-                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
-                                                                             topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
-                                                                                                 ExponentialDecay(starting_value = locals().get('LGNOnafferent_lr',0.9590/2),
-                                                                                                                  time_constant=1600))))) #time constant depends on nuber of inputs!
+                 weights_generator=Composite(operator=numpy.multiply, 
+                     generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
+                                 topo.patterns.random.UniformRandom()]),
+                 nominal_bounds_template=BoundingBox(radius=0.27083),
+                 learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
+                     ExponentialDecay(starting_value = locals().get('LGNOnafferent_lr',0.9590/2),
+                                      time_constant=1600))))) #time constant depends on number of inputs!
 
 
 topo.sim.connect('LGNOff','V1Exc',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=1.0,name='LGNOffAfferent',
-                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
-                                                                             topo.patterns.random.UniformRandom()]),
-                  nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
-                                                                                                 ExponentialDecay(starting_value = locals().get('LGNOffafferent_lr',0.9590/2),
-                                                                                                                  time_constant=1600)))))
+                 weights_generator=Composite(operator=numpy.multiply, 
+                     generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
+                                 topo.patterns.random.UniformRandom()]),
+                 nominal_bounds_template=BoundingBox(radius=0.27083),
+                 learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
+                     ExponentialDecay(starting_value = locals().get('LGNOffafferent_lr',0.9590/2),
+                                      time_constant=1600)))))
 
 
 # Intra V1  connections
@@ -145,9 +144,9 @@ topo.sim.connect('V1Exc','V1Exc', delay = FixedPoint("0.05",4),
 
 topo.sim.connect('V1Exc','V1Exc', delay = FixedPoint("0.05",4),
                  connection_type=CFProjection,strength = 0.1, name='LateralExcitatory',
-                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
-                                                                             topo.patterns.random.UniformRandom()]),
+                 weights_generator=Composite(operator=numpy.multiply, 
+                     generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
+                                 topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.8087)
               
 topo.sim.connect('V1Exc','V1Inh', delay = FixedPoint("0.05",4),
@@ -157,9 +156,9 @@ topo.sim.connect('V1Exc','V1Inh', delay = FixedPoint("0.05",4),
 
 topo.sim.connect('V1Exc','V1Inh', delay = FixedPoint("0.05",4),
                  connection_type=CFProjection,strength = 2.0, name='V1Exc_to_V1Inh',
-                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
-                                                                             topo.patterns.random.UniformRandom()]),
+                 weights_generator=Composite(operator=numpy.multiply, 
+                     generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
+                                 topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.8087)
             
 
