@@ -333,6 +333,7 @@ class BooleanParameter(Parameter):
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=False,bounds=(0,1),**params):
+        """Initialize a Boolean parameter, allowing values True or False."""
         Parameter.__init__(self,default=default,**params)
         self.bounds = bounds
 
@@ -351,6 +352,7 @@ class StringParameter(Parameter):
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default="",**params):
+        """Initialize a string parameter."""
         Parameter.__init__(self,default=default,**params)
         
     def __set__(self,obj,val):
@@ -358,6 +360,36 @@ class StringParameter(Parameter):
             raise ValueError("StringParameter only takes a string value.")
 
         super(StringParameter,self).__set__(obj,val)
+
+
+class NumericTuple(Parameter):
+    __slots__ = ['length']
+    __doc__ = property((lambda self: self.doc))
+
+    def __init__(self,default=(0,0),length=2,**params):
+        """
+        Initialize a numeric tuple parameter with a fixed length.
+        The length is determined by the initial default value, and
+        is not allowed to change after instantiation.
+        """
+        self.length=len(default)
+        self._check(default)
+        Parameter.__init__(self,default=default,**params)
+        
+    def _check(self,val):
+        if not isinstance(val,tuple):
+            raise ValueError("NumericTuple only takes a tuple value.")
+        
+        if not len(val)==self.length:
+            raise ValueError("Tuple is not of the correct length (%d instead of %d)." %
+                             (len(val),self.length))
+        for n in val:
+            if not is_number(n):
+                raise ValueError("Tuple element is not numeric: %s." % (str(n)))
+            
+    def __set__(self,obj,val):
+        self._check(val)
+        super(NumericTuple,self).__set__(obj,val)
 
 
 class CallableParameter(Parameter):
@@ -390,14 +422,12 @@ class CallableParameter(Parameter):
 # This could multiply inherit from Dynamic and Number, but it's
 # currently mixed together by hand for simplicity.
 class DynamicNumber(Number):
-    """
-    """
     __slots__ = ['last_value']
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=0.0,bounds=None,softbounds=None,**params):
         """
-        Create Dynamic version of Number parameter.
+        Create Dynamic version of a Number parameter.
 
         If set with a callable or iterable object, the bounds are checked when the
         number is retrieved (generated), rather than when it is set.
