@@ -143,12 +143,12 @@ class ExponentialDecay(ParameterizedObject):
     time_constant = Number(10000,doc="""
         Time scale for the exponential; large values give slow decay.""")
 
-    # JPALERT: A default base of 2 instead of e would make 
-    # time_constant = half-life.  Half-lives can be reasoned about
-    # much more easily than 1/e-lives.
     base = Number(e, doc="""
-        Base of the exponent; the default yields starting_value*exp(-t/time_constant.""")
+        Base of the exponent; the default yields starting_value*exp(-t/time_constant).
 
+        Another popular choice of base is 2, which allows the
+        time_constant to be interpreted as a half-life.""")
+    
 ##     time_fn = CallableParameter(default=topo.sim.time,doc="""
 ##         Function to generate the time used for the decay.""")
     time_fn = topo.sim.time
