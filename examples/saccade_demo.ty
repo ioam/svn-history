@@ -31,8 +31,6 @@ from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.coordmapperfns.basic import OttesSCMotorMapper
 from topo.misc.numbergenerators import UniformRandom
 
-from topo.tkgui.editorwindow import setup_editor_grid
-
 import topo.patterns.image
 
 
@@ -116,9 +114,3 @@ topo.sim.connect('SaccadeControl','Eye',
 
 # add the sim objects to the current namespace
 locals().update(topo.sim.objects())
-
-# layout the sim objects in the model editor
-setup_editor_grid([[SC],
-                   [SaccadeControl],
-                   [Eye]],xstart=300)
-
