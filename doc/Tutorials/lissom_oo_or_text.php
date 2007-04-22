@@ -1,13 +1,5 @@
 <H1>LISSOM Orientation Map</H1>
 
-<!-- To do before release:
-- add new gui (+other) features
-- screenshots
-- time-to-run still accurate?
-- the 'make' command measures an or map, but the tutorial shows plots
-  from before measuring the map (i.e. uncolored)
--->
-
 <p>
 This tutorial shows how to use the
 <a href="http://topographica.org/">Topographica</a> software to explore a
@@ -25,7 +17,7 @@ orientation map network, which can be done by running
 <blockquote><code class='to_type'>./topographica -c "targets=['lissom_oo_or_10000.typ']" examples/run.py</code></blockquote>
 Depending on the speed of your machine, you may want to go out for
 coffee at this point; on a 3GHz 512MB machine this training process
-currently takes a little over an hour.
+currently takes a little over half an hour <!--lodestar: 34m-->.
 </p>
 
 
@@ -130,7 +122,7 @@ explained below.
 
 <li> To help understand the response patterns in V1, we can look at
 the weights to V1 neurons.  These weights were learned previously, by
-presenting 20000 oriented Gaussian patterns at random angles
+presenting 10000 pairs of oriented Gaussian patterns at random angles
 and positions.  To plot a single neuron, select
 <a name="ConnectionFields-plot"><span class='t_item'>Connection Fields</span></a> from the <span
 class='t_item'>Plots</span> menu, then select <span
