@@ -36,15 +36,6 @@ first added to the list, or a change was made.
 
 <H2>Tasks to be addressed for the upcoming 0.9.3 release:</H2>
 
-<H4>2007/02/20 (JB): Errata before release</H4>
-- update Changelog.txt, summarize major changes in it for the release
-notes<br>
-- make a pass through the documentation to fix anything that is not up
-to date (especially things related to Numpy support and to describe
-new features)<br>
-- build on the various platforms, etc.<br>
-
-
 <H4>2007/03/28 (JB): Using new SOM support</H4>
 Finish converting som_retinotopy.ty and obermayer_pnas90.ty to use the
 new simpler and faster SOM support as in cfsom_or.ty, and delete all
@@ -52,7 +43,6 @@ of the old SOM support.  Requires checking that the som_retinotopy.ty
 tutorial still works ok after the conversion.  Also check that
 the examples handle exponential decay of parameter values, so that
 they are good starting points.
-
 
 <H4>2007/04/19: tkinter problems</H4>
 Add a note about the tkinter problem on some machines (see 'tkinter
