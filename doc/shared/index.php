@@ -35,7 +35,7 @@
 <i>
 <b>News:</b>
 
-<p><b>21 April 2007:</b> Version 0.9.3 to be
+<p><b>23 April 2007:</b> Version 0.9.3 to be
 <A target="_top" href="../Downloads/index.html">released</A>, including:
 
 <center>
@@ -105,6 +105,9 @@
 </tr>
 </table>
 </center>
+
+<P>Binaries will be available soon; in the meantime; this release 
+is available via <A HREF="../Downloads/cvs.html">cvs</a>.
   
 <p><A target="_top" href="../Home/oldnews.html"><i>Older news</i></A>
 </i>
