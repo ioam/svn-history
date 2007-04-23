@@ -17,9 +17,14 @@ instructions for <a href="../Downloads/index.html">obtaining and
 installing</a> Topographica.  Also, you will need to generate a saved
 orientation map network, which can be done by running
 <blockquote><code class='to_type'>./topographica -c "targets=['lissom_oo_or_10000.typ']" examples/run.py</code></blockquote>
-Depending on the speed of your machine, you may want to go out for
-coffee at this point; on a 3GHz 512MB machine this training process
-currently takes a little over half an hour.<!--lodestar: 34m-->
+
+(on Unix or Mac systems; Windows users should omit the initial
+'<code>./</code>' and should replace the second forward slash
+'<code>/</code>' with a backslash '<code>\</code>').
+
+<P>Depending on the speed of your machine, you may want to go get a
+snack at this point; on a 3GHz 512MB machine this training process
+currently takes about half an hour.<!--lodestar: 34m-->
 </p>
 
 
@@ -102,21 +107,25 @@ the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topograp
 make sure that <span class='t_item'>Strength only</span> is turned on;
 it is usually off by default.
 
-<P>As you move your mouse over the plots, information about the location
-of the mouse cursor is displayed in the status bar at the bottom of the 
-window. For these plots, you can see the coordinates,  
-<a href="../User_Manual/space.html">sheet coordinates</a>,
-and activity level of the unit you are looking at.
+<P>As you move your mouse over the plots, information about the
+location of the mouse cursor is displayed in the status bar at the
+bottom of the window. For these plots, you can see the
+<a href="../User_Manual/space.html#matrix-coords">matrix
+coordinates</a> (labeled "Unit"),
+<a href="../User_Manual/space.html#sheet-coords">sheet coordinates</a>
+(labeled "Coord"), and the activity level of the unit currently under
+the pointer.
 
 </p><p>In the <span class='t_item'>Retina</span> plot, each
-photoreceptor is represented as a pixel whose shade of grey codes the
+photoreceptor is represented as a pixel whose shade of gray codes the
 response level, increasing from black to white.  This pattern is what
 was specified in the <span class='w_title'>Test Pattern</span> window.
 Similarly, locations in the LGN that have an OFF or ON cell response
 to this pattern are shown in the <span class='t_item'>LGNOff</span> and
 <span class='t_item'>LGNOn</span> plots.  
 At this stage the response level in <span class='t_item'>V1</span> is
-also coded in shades of grey.
+also coded in shades of gray, and the numeric values can be found
+using the pointer.
 
 <P>From these plots, you can see that the single line presented on the
 retina is edge-detected in the LGN, with ON LGN cells responding to
@@ -234,8 +243,8 @@ OrientationSelectivity (saturation), and Activity (brightness).
 The color coding allows us to see that the neurons responding are
 indeed those that prefer orientations similar to the input pattern,
 and that the response is patchy because other nearby neurons do not
-respond.  To be sure of that, try rotating the image by adjusting the
-orientation, then present it again -- the colors should be different,
+respond.  To be sure of that, try selecting a line with a different
+orientation, and hit present again -- the colors should be different,
 and should match the orientation chosen.
 </p>
 <p></p>
@@ -253,7 +262,7 @@ one neuron" align="middle" width="676" height="404" ><br />
 </p><br>
 
 <P> Look at the <span class='t_item'>LateralExcitatory</span> weights,
-which show that the neurons near this neuron are all red (horizontal).
+which show that the neurons near this neuron are nearly all red (horizontal).
 <!-- somewhere might want to say this one almost falls on a boundary--> 
 
 <P>
@@ -286,7 +295,7 @@ one neuron" align="middle" width="676" height="404" ><br />
 </p><br>
 
 <P>This time we can see from the <span class='t_item'>LateralExcitatory</span> weights
-that the neurons near this one are all cyan (vertical).
+that the neurons near this one are all colored cyan (i.e., are selective for vertical).
 </li>
 
 <li>
@@ -375,9 +384,12 @@ orientation-specific responses to large contours in the image:
 <P>Be aware when comparing the Retina and V1 plots for a photograph
 that each processing stage eliminates some of the outer edges of the
 image, so that V1 is only looking at the center of the image on the
-LGN.  You can see the relative sizes by enabling "Sheet coordinates",
+LGN.  You can see the relative sizes by enabling
+<span class='t_item'>Sheet coordinates</span>,
 which will plot V1 at its true size relative to the LGN, and likewise
-for the LGN with respect to the Retina.
+for the LGN with respect to the Retina.  (This option is normally
+turned off because it makes the plots smaller, but it can be very
+helpful for understanding how the sheets relate to each other.)
 </p></li>
 
 <li>The procedure above allows you to explore the relationship between
@@ -405,7 +417,9 @@ is first activated at time 0.15.  V1 also has self-connections with a
 delay of 0.05, and so V1 is then repeatedly activated every 0.05 timesteps.
 Eventually, the number of V1 activations reaches a fixed limit for LISSOM
 (usually about 10 timesteps), and no further events are generated or consumed
-until the next input is generated at time 1.05.  
+until the next input is generated at time 1.05.  Thus the usual
+stepsize of 1.0 lets the user see the results after each input pattern
+has been presented and the cortex has come to a steady state.
 </li>
 </ol>
 
@@ -435,7 +449,7 @@ very slow, also enable <span class='t_item'>Auto-refresh</span> in a
 <span class='w_title'>Projection</span> window showing <span
 class='t_item'>LGNOnAfferent</span>.  On a very fast machine you could
 even <span class='t_item'>Auto-refresh</span> an <span class='w_title'>Orientation Preference</span> window
-(not really practical at present).
+(probably practical only if you reduce the nominal_density of V1).
 
 <p></p></li><li>Now click the mouse into the <span class='t_item'>Learning iterations</span> field
 of the <span class='w_title'>Topographica Console</span> window, and hit Go a few
@@ -497,7 +511,7 @@ training with (**UPDATE:) a photograph works only for photos named image.pgm.)</
 plot (or refresh) an <span class='w_title'>Orientation
 Preference</span> map to see what sort of
 orientation map has developed.  (Press 'Refresh' if no plot is visible when
-first opening the window.  Measuring a new map will usually take about 30
+first opening the window.  Measuring a new map will usually take about 15
 seconds to complete.)  If you've changed the learning rate to
 a high value, or haven't presented many inputs, the map will not
 resemble actual animal maps, but it should still have patches
@@ -524,16 +538,16 @@ an Orientation Map</b></span>.<p></p></li>
 <p><li> If you are <em>really</em> patient, you can change the number
 of units to something closer to real primate cortex, by quitting,
 editing the Python code file <code>examples/lissom_oo_or.ty</code> to
-change the <code>nominal_density</code> of V1 from 48 to 150,
+change the <code>nominal_density</code> of V1 from 48 to 142,
 and doing:
 <blockquote><code class='to_type'>
   ./topographica -g examples/lissom_oo_or.ty
   </code></blockquote>
 <p></p>
   
-You'll need a lot of memory and a lot of time, but you can then step
+You'll need about a gigabyte of memory and a lot of time, but you can then step
 through the simulation as above.  The final result after 10000
-iterations (requiring several hours, if not days) should be a much
+iterations (requiring about half a day on a 3GHz machine) should be a much
 smoother map and neurons that are more orientation selective.  Even
 so, the overall organization and function should be similar.
 </li></ol>
