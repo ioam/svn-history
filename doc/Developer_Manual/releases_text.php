@@ -37,6 +37,11 @@ such a release, the steps we generally follow are:
   <P>Be sure to work through the tutorial once it is updated, to make
   sure all of the instructions still make sense for the new release.
   
+<li><P>Update Changelog.txt (using "make Changelog.txt",
+  removing any overlap on the starting date, filling the new items in
+  Emacs, and checking in the result), summarize major changes in it
+  for the release notes.
+
 <li><P>Check in any modified files into CVS.
    
 <li><P>Save all open files from within any editor, and do a "make dist"
@@ -58,7 +63,7 @@ such a release, the steps we generally follow are:
       ("make tests").
     </ol>
     
-<li><P>If you find problems, go back to step 5 and start over.
+<li><P>If you find problems, go back to step 6 and start over.
 
 <li><P>When the package is ready for release, copy it to SourceForge
     using their admin interface, and add a news release and
@@ -70,5 +75,7 @@ such a release, the steps we generally follow are:
 <li><P>Tag the files in cvs as being the latest stable version using
     "make LATEST_STABLE" and notify the other developers, that they
     may once again check in new code to the CVS repository.
+
+<li>Send an announcement to topographica-announce at lists.sf.net.
 </ol>
 
