@@ -4,7 +4,7 @@
 Windows and Mac OS X.  It should work on non-Linux versions of UNIX as
 well, as long as standard GNU tools like make and GCC are installed.
 You will need a writable directory with a large amount of space
-available, about 500 megabytes as of 3/2007.
+available, about 800 megabytes as of 3/2007.
 
 <P>There are two ways to obtain Topographica: as downloadable
 installation packages, or via
