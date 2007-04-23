@@ -73,8 +73,11 @@ such a release, the steps we generally follow are:
     them to SourceForge.
 
 <li><P>Tag the files in cvs as being the latest stable version using
-    "make LATEST_STABLE" and notify the other developers, that they
-    may once again check in new code to the CVS repository.
+    "make LATEST_STABLE", and update the public web site with this version 
+    using "make sf-web-site".
+
+<li><P>Notify the other developers that they may once again commit new
+    code to the CVS repository.
 
 <li>Send an announcement to topographica-announce at lists.sf.net.
 </ol>
