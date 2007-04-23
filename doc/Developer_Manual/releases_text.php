@@ -39,7 +39,7 @@ such a release, the steps we generally follow are:
   
 <li><P>Update Changelog.txt (using "make Changelog.txt",
   removing any overlap on the starting date, filling the new items in
-  Emacs, and checking in the result), summarize major changes in it
+  Emacs, and checking in the result), and summarize major changes in it
   for the release notes.
 
 <li><P>Check in any modified files into CVS.
@@ -65,9 +65,9 @@ such a release, the steps we generally follow are:
     
 <li><P>If you find problems, go back to step 6 and start over.
 
-<li><P>When the package is ready for release, copy it to SourceForge
-    using their admin interface, and add a news release and
-    screenshot.
+<li><P>When the package is ready for release, copy binaries to
+    SourceForge using their admin interface, and add a news release
+    and screenshot.
 
 <li><P>Build on Windows and make .exe versions, test them, and upload
     them to SourceForge.
