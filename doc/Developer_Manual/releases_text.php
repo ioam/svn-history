@@ -13,7 +13,7 @@ such a release, the steps we generally follow are:
 <li><P>Increment the RELEASE number and the RELEASE_TAG in ./Makefile,
   and do "make new-version".
    
-<li><P>Update the documentation files, especially README.First and
+<li><P>Update the documentation files, especially README.txt and
   doc/Downloads/index_text.php.  The rest should be read through,
   making sure that the auto-generated pages are working properly,
   and that those written by hand match the current version of the
