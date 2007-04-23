@@ -25,7 +25,7 @@ Life Sciences Interface</A>.  For sample assignments see the
 href="http://www.inf.ed.ac.uk/teaching/courses/cnv/">web page</A>
 for the course
 <A  TARGET="_TOP" href="http://www.inf.ed.ac.uk/teaching/courses/cnv/">Computational
-Neuroscience of Vision (CNV)</A> offered by the the
+Neuroscience of Vision (CNV)</A> offered by the
 <A TARGET="_TOP" HREF="http://www.inf.ed.ac.uk">School of
 Informatics</A> of the 
 <A TARGET="_TOP" HREF="http://www.ed.ac.uk">University of Edinburgh</A>.
@@ -73,9 +73,9 @@ scaling equations that underlie Sheet coordinates
   <dd>Detailed low-level modeling of neurons and small networks.  It is possible
    to use these simulators for topographic maps, but the computational
    requirements are usually extremely high, and typical users simulate
-   much smaller networks.  There are now (3/2007) Python bindings for
-    Neuron, so it should be practical to wrap a Neuron simulation into
-    a Python sheet.<BR><BR>
+   much smaller networks.  Note that there are now (3/2007) Python
+   bindings for Neuron, so it should be practical to wrap a Neuron
+   simulation into a Topographica Sheet for analysis.<BR><BR>
   <dt><A TARGET="_top" HREF="http://askja.bu.edu/catacomb">Catacomb</A></dt>
   <dd>Highly graphical Java-based simulator covering numerous levels,
     from ion channels to behavioral experiments.  Can be used for some
