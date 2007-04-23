@@ -72,7 +72,7 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
         # This learning function does not need to scale the learning
         # rate like some do, so it does not use constant_sum_connection_rate()
 	single_connection_learning_rate = learning_rate
-
+        
         ### JABALERT: The learning_radius is normally set by
         ### the learn() function of CFSOM, so it doesn't matter
         ### much that the value accepted here is in matrix and 
@@ -82,7 +82,7 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
         ### convert from sheet coords.
         radius = self.learning_radius
         crop_radius = max(1.25,radius*self.crop_radius_multiplier)
-
+        
         # find out the matrix coordinates of the winner
         #
 	# NOTE: when there are multiple projections, it would be
@@ -93,13 +93,13 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
         # winner to be passed in would make it harder to mix and match
         # Projections and learning rules with different Sheets.
         wr,wc = array_argmax(output_activity)
-
+        
         # Optimization: Calculate the bounding box around the winner
         # in which weights will be changed, to avoid considering those
         # units below.
-        cmin = int(max(0,wc-crop_radius))
+        cmin = int(max(wc-crop_radius,0))
         cmax = int(min(wc+crop_radius+1,cols)) # at least 1 between cmin and cmax
-        rmin = int(max(0,wr-crop_radius))
+        rmin = int(max(wr-crop_radius,0))
         rmax = int(min(wr+crop_radius+1,rows))
 
         # generate the neighborhood kernel matrix so that the values
@@ -114,6 +114,7 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
 
         neighborhood_matrix = nk_generator(bounds=bb,xdensity=1,ydensity=1,
                                            size=2*radius)
+
         for r in range(rmin,rmax):
             for c in range(cmin,cmax):
                 cwc = c - wc 
@@ -150,10 +151,10 @@ class CFPLF_EuclideanHebbian(CFPLearningFn):
             for c in xrange(cols):
                 out = output_activity[r][c]
                 if out !=0:
+                    rate = learning_rate * out                    
                     cf = cfs[r][c]
 		    X = cf.get_input_matrix(input_activity)
-                    cf.weights += out * learning_rate * (X - cf.weights)
+                    cf.weights += rate * (X - cf.weights)
 
                     # CEBHACKALERT: see ConnectionField.__init__()
                     cf.weights *= cf.mask
-
