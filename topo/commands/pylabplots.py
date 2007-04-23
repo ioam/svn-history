@@ -54,7 +54,7 @@ def windowtitle(title):
         pass
 
 
-def vectorplot(vec,title=None):
+def vectorplot(vec,title=None, label=None):
     """
     Simple line plotting for any vector or list of numbers.
 
@@ -66,7 +66,7 @@ def vectorplot(vec,title=None):
     desired.  At present, this is only used for the body of the figure,
     not the 
     """
-    pylab.plot(vec)
+    pylab.plot(vec, label=label)
     pylab.grid(True)
     if (title): windowtitle(title)
     pylab.show._needmain = False
