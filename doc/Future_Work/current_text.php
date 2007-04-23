@@ -45,14 +45,6 @@ new features)<br>
 - build on the various platforms, etc.<br>
 
 
-<H4>2007/03/28 (?): Update tutorial</H4>
-Update the lissom_oo_or tutorial page to match changes in the GUI and
-elsewhere.  E.g. we can mention the right-click menus, how to use the
-dynamic info to see the coordinate systems and numeric values, how to
-start and stop training, and add sections about plotting 'Orientation
-tuning fullfield' tuning curves and FFTs.
-
-
 <H4>2007/03/28 (JB): Using new SOM support</H4>
 Finish converting som_retinotopy.ty and obermayer_pnas90.ty to use the
 new simpler and faster SOM support as in cfsom_or.ty, and delete all
@@ -79,6 +71,11 @@ We might also want to add notes about omitting './' and changing
 
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
 
+
+<H4>2007/03/28 (?): Update tutorial</H4>
+Update the lissom_oo_or tutorial page to include how to start and stop
+training and to add a section about plotting 'Orientation tuning
+fullfield' tuning curves.
 
 <H4>2007/04/20: Fix the code in PlotGroup for calculating the minimum
 plot sizes in the GUI</H4>
