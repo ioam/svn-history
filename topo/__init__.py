@@ -3,7 +3,7 @@ Topographica cortical map simulator package.
 
 Topographica is designed as a collection of packages from which
 elements can be selected to model specific systems.  For more
-information, see the individual subpackages:
+information, see the individual subpackages::
 
 base        - Core Topographica functions and classes
 plotting    - Visualization functions and classes
@@ -13,7 +13,7 @@ commands    - High-level user commands
 misc        - Various useful independent modules
 
 The Topographica primitives library consists of a family of classes
-that can be used with the above functions and classes:
+that can be used with the above functions and classes::
 
 sheets      - Sheet classes: 2D arrays of processing units
 projections - Projection classes: connections between Sheets
