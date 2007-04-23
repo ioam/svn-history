@@ -211,7 +211,7 @@ class FeatureResponses(ParameterizedObject):
 
             # CEBALERT: when there are multiple sheets, this can make it seem
             # like topographica's stuck in a loop (because the counter goes
-            # to 100% lots of times...e.g. hierarchical's orientation tuning fullfield.
+            # to 100% lots of times...e.g. hierarchical's orientation tuning fullfield.)
             message = 'Time ' + str(topo.sim.time()) + ': ' + \
                       str(int(percent)) + '% of '  + str(fduration) + ' patterns completed ' + \
                       ('(%02d' % int(estimate/60))+':' + \
