@@ -9,7 +9,26 @@ Human Brain Project</A>
 grant 1R01-MH66991, and by the U.S.
 <A TARGET="_top" HREF="http://www.nsf.gov">
 National Science Foundation</A> under
-grant IIS-9811478.
+grant IIS-9811478.  
+
+<P>Educational applications of Topographica are supported in part by
+the University of Edinburgh <A TARGET="_top"
+HREF="http://anc.ed.ac.uk/neuroinformatics">Doctoral Training Centre
+in Neuroinformatics</A>, with funding from the <A TARGET="_top"
+HREF="http://www.epsrc.ac.uk/">Engineering and Physical Sciences
+Research Council</A> and the <A TARGET="_top"
+HREF="http://www.mrc.ac.uk/">Medical Research council</A> through the
+<A TARGET="_top"
+HREF="http://www.epsrc.ac.uk/ResearchFunding/Programmes/LifeSciencesInterface/">
+Life Sciences Interface</A>.  For sample assignments see the 
+<A  TARGET="_TOP"
+href="http://www.inf.ed.ac.uk/teaching/courses/cnv/">web page</A>
+for the course
+<A  TARGET="_TOP" href="http://www.inf.ed.ac.uk/teaching/courses/cnv/">Computational
+Neuroscience of Vision (CNV)</A> offered by the the
+<A TARGET="_TOP" HREF="http://www.inf.ed.ac.uk">School of
+Informatics</A> of the 
+<A TARGET="_TOP" HREF="http://www.ed.ac.uk">University of Edinburgh</A>.
 
 <P>If you use this software in work leading to an academic
 publication, please cite this reference:
@@ -26,17 +45,6 @@ publication, please cite this reference:
   url	       = "<A TARGET="_top" HREF="http://nn.cs.utexas.edu/keyword?bednar:neurocomputing04-sw">http://nn.cs.utexas.edu/keyword?bednar:neurocomputing04-sw</A>",
 }
 </pre>
-
-<P>
-Topographica is currently being used in the course
-<A  TARGET="_TOP" href="http://www.inf.ed.ac.uk/teaching/courses/cnv/">Computational
-Neuroscience of Vision (CNV)</A> in the
-<A TARGET="_TOP" HREF="http://www.inf.ed.ac.uk">School of
-Informatics</A> of the 
-<A TARGET="_TOP" HREF="http://www.ed.ac.uk">University of Edinburgh</A>.
-Sample assignments are on the
-<A  TARGET="_TOP"
-href="http://www.inf.ed.ac.uk/teaching/courses/cnv/">course web page</A>.
 
 <P>
 <A TARGET="_TOP" HREF="http://www.computationalmaps.org">
