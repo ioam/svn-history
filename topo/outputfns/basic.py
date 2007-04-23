@@ -313,20 +313,20 @@ class KernelMax(OutputFn):
         rows,cols = x.shape
         radius = self.density*self.kernel_radius
         crop_radius = max(1.25,radius*self.crop_radius_multiplier)
-
+        
         # find out the matrix coordinates of the winner
         wr,wc = array_argmax(x)
-
+        
         # Optimization: Calculate the bounding box around the winner
         # in which weights will be changed
-        rmin = int(max(wr-crop_radius,  0))
         cmin = int(max(wc-crop_radius,  0))
-        rmax = int(min(wr+crop_radius+1,rows))
         cmax = int(min(wc+crop_radius+1,cols))
+        rmin = int(max(wr-crop_radius,  0))
+        rmax = int(min(wr+crop_radius+1,rows))
         bb = BoundingBox(points=((cmin,rmin), (cmax,rmax)))
 
         # generate the kernel matrix and insert it into the correct
-        # part of the output activity array 
-        kernel = self.neighborhood_kernel_generator(bounds=bb,xdensity=1,ydensity=1,size=2*radius,x=wc,y=wr)
+        # part of the output activity array
+        kernel = self.neighborhood_kernel_generator(bounds=bb,xdensity=1,ydensity=1,size=2*radius,x=wc+0.5,y=rmax-wr-0.5)
         x *= 0.0
         x[rows-rmax:rows-rmin,cmin:cmax] = kernel
