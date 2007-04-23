@@ -73,14 +73,13 @@ topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
 
 
 topo.sim.connect('Retina','V1',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=1.0,name='Afferent',
-                 weights_generator=Composite(operator=numpy.multiply, 
-                     generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
-                                 topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.27083),
-                 learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
-                     ExponentialDecay(starting_value = locals().get('afferent_lr',0.9590),
-                                      time_constant=1600)))))#time constant depends on number of inputs!
+                 connection_type=CFProjection,strength=1.0,name='Afferent',
+                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
+                                                                             topo.patterns.random.UniformRandom()]),
+                 nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
+                                                                                                 ExponentialDecay(starting_value = locals().get('afferent_lr',0.9590),
+                                                                                                                  time_constant=3200/num_inputs)))))
 
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
