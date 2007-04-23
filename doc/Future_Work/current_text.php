@@ -44,10 +44,50 @@ tutorial still works ok after the conversion.  Also check that
 the examples handle exponential decay of parameter values, so that
 they are good starting points.
 
-<H4>2007/04/19: tkinter problems</H4>
-Add a note about the tkinter problem on some machines (see 'tkinter
-problem' later in this document. Or we should file bug reports on our
-sf.net pages.
+
+<H4>2007/04/23: tkinter problem</H4>
+After make, can't start the gui on some machines (e.g. doozy):
+<pre>
+    import _tkinter # If this fails your Python may not be configured for Tk
+ImportError: No module named _tkinter
+</pre>
+This problem has been around a long time. Possible sources of info:<BR>
+http://www.thescripts.com/forum/thread38709.html
+<BR>
+CB: Python's setup.py is not finding our own tcl/tk libraries/headers.
+If we specify where the tcl/tk files are in Modules/Setup.dist, and that we want
+_tkinter to be built, this problem is fixed (at least on my computer: does
+this work on doozy?) Need to check what happens on OS X, too.
+
+<pre>
+chris@zh:~/dev_ext/topographica$ diff ~/dev_ext/topographica4/external/Python-2.4.4/Modules/Setup.dist external/Python-2.4.4/Modules/Setup.dist 
+312c312
+< # _tkinter _tkinter.c tkappinit.c -DWITH_APPINIT \
+---
+> _tkinter _tkinter.c tkappinit.c -DWITH_APPINIT \
+314c314
+< #	-L/usr/local/lib \
+---
+> 	-L/home/chris/dev_ext/topographica/lib \
+316c316
+< #	-I/usr/local/include \
+---
+> 	-I/home/chris/dev_ext/topographica/include \
+331c331
+< #	-ltk8.2 -ltcl8.2 \
+---
+> 	-ltk8.4 -ltcl8.4 \
+341c341
+< #	-lX11
+---
+> 	-lX11
+</pre>
+
+<pre>
+chris@zh:~/dev_ext/topographica$ echo $LD_LIBRARY_PATH
+/home/chris/dev_ext/topographica/lib
+</pre>
+
 
 <H4>2007/04/21: Note for Windows users</H4>
 Where to put this note? Working from the cmd.exe on Windows, single
@@ -59,13 +99,22 @@ We might also want to add notes about omitting './' and changing
 '/' to '\' in general (currently on the downloads page).
 
 
+
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
+
+
+<H4>2007/04/23: psyco on Windows</H4>
+It's built by default, so should be part of topographica-win
+(even though its use is optional).
 
 
 <H4>2007/03/28 (?): Update tutorial</H4>
 Update the lissom_oo_or tutorial page to include how to start and stop
 training and to add a section about plotting 'Orientation tuning
 fullfield' tuning curves.
+CB: would the tutorial benefit from being split up a little more?
+Maybe it's getting daunting?
+
 
 <H4>2007/04/20: Fix the code in PlotGroup for calculating the minimum
 plot sizes in the GUI</H4>
@@ -122,17 +171,7 @@ assumption that it is already some kind of Tk window (Tk() for
 TopoConsole, Toplevel() for the other windows): seems a bit wrong.
 
 
-<H4>2007/04/19: tkinter problem</H4>
-After make, can't start the gui on some machines (e.g. doozy):
-<pre>
-    import _tkinter # If this fails your Python may not be configured for Tk
-ImportError: No module named _tkinter
-</pre>
-This problem has been around a long time. Possible sources of info:<BR>
-http://www.thescripts.com/forum/thread38709.html
-
-
-<H4>2007/04/15 (CB): Dynamic text</H4>
+<H4>2007/04/15 (CB): Dynamic info</H4>
 Doesn't work properly for projection activity windows (see ALERT).
 
 
