@@ -69,8 +69,8 @@ class CFPRF_ActivityBased(CFPResponseFn):
 
     This function has five parameters::
 
-    * l: the lower asymptote;
-    * u: the upper asymptote minus l;
+    * l: the lower asymptote, i.e. the value at infinity;
+    * u: the upper asymptote minus l, i.e. (u + l) is the value at minus infinity;
     * m: the time of maximum growth;
     * r: the growth rate;
     * b: affects near which asymptote maximum growth occurs.
@@ -80,17 +80,11 @@ class CFPRF_ActivityBased(CFPResponseFn):
     http://en.wikipedia.org/wiki/Generalised_logistic_curve
     """
 
-    ### JABALERT: These should be described in a way that clarifies
-    ### what they actually do.  E.g. instead of 'parameter controlling
-    ### the lower asymptote', it should be something like 'Value at
-    ### negative infinity', or whatever is actually true for this
-    ### parameter.  They need not say Parameter explicitly, as they
-    ### are all obviously parameters.
-    l = Number(default=-1.3,doc="Parameter controlling the lower asymptote")
-    u = Number(default=1.2,doc="Parameter controlling the upper asymptote (upper asymptote minus lower asymptote")
-    m = Number(default=0.25,doc="Parameter controlling the time of maximum growth.")
-    r = Number(default=-200,doc="Parameter controlling the growth rate.")
-    b = Number(default=2,doc="Parameter which affects near which asymptote maximum growth occurs")
+    l = Number(default=-1.3,doc="Value at infinity")
+    u = Number(default=1.2,doc="(u + l) is the value at minus infinity")
+    m = Number(default=0.25,doc="Time of maximum growth.")
+    r = Number(default=-200,doc="Growth rate, controls the gradient")
+    b = Number(default=2,doc="Controls position of maximum growth")
     single_cf_fn = ResponseFnParameter(default=DotProduct(),doc="""
         ResponseFn to apply to each CF individually.""")
   
