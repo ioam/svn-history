@@ -1,12 +1,19 @@
 """
-Based on lissom_or_noshrinking (homeostatic=True). Lateral connection strength is dependent on the activity of each unit.
-Model is based on models of surround modulation in which lateral connections can be either facilitatory or suppressive
-depending on the contrast of the input. This should be a simpler implementation of what happens in the laminar model.
-Local inhibition becomes active only when there is sufficient exciatory drive.
+Based on lissom_or_noshrinking (homeostatic=True). Lateral connection
+strength is dependent on the activity of each unit.
 
-Work in progress - form of Activity_dependent response function needs to be refined in order to match experimental data
+Model is based on models of surround modulation in which lateral
+connections can be either facilitatory or suppressive depending on the
+contrast of the input. This should be a simpler implementation of what
+happens in the laminar model.  Local inhibition becomes active only
+when there is sufficient exciatory drive.
 
+Work in progress - form of Activity_dependent response function needs
+to be refined in order to match experimental data
+
+$Id$
 """
+__version__='$Revision$'
 
 
 import numpy

@@ -1,4 +1,4 @@
-e"""
+"""
 The laminar_or.ty extended with LGN
 Two layer model with one inhibitory and one excitatory sheet.
 Recurrent short range connections between sheets, long range excitation and short range inhibition
@@ -6,7 +6,10 @@ Based on lissom_oo_or_noshrinking - work in progress.
 Has homeostatic plasticity of Excitatory units (updated at each settling step),a sigmoid output function for inhibitory units and no shrinking of excitatory connections.
 
 Currently updated with new lissom_oo_or_noshrinking parameters but not yet tested - will need to change strengths.
+
+$Id$
 """
+__version__='$Revision$'
 
 import numpy
 import fixedpoint

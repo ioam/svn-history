@@ -1,9 +1,18 @@
 """
 Two layer model with one inhibitory and one excitatory sheet.
-Recurrent short range connections between sheets, long range excitation and short range inhibition
+
+Recurrent short range connections between sheets, long range
+excitation and short range inhibition
+
 Based on lissom_or_noshrinking - work in progress.
-Has homeostatic plasticity of Excitatory units (updated at each settling step),a sigmoid output function for inhibitory units and no shrinking of excitatory connections.
+
+Has homeostatic plasticity of Excitatory units (updated at each
+settling step),a sigmoid output function for inhibitory units and no
+shrinking of excitatory connections.
+
+$Id$
 """
+__version__='$Revision$'
 
 import numpy
 import fixedpoint
