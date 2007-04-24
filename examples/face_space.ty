@@ -47,7 +47,7 @@ from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
-from topo.outputfns.homeostatic import HomeostaticMaxEnt, HomeostaticMaxEnt_debug, PiecewiseLinear_debug
+from topo.outputfns.homeostatic import HomeostaticMaxEnt,PiecewiseLinear_debug
 from topo.coordmapperfns.basic import ConstantMapper
 from topo.patterns.image import Image, FaceSpace2Dfromfile
 
