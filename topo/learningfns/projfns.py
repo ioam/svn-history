@@ -23,6 +23,36 @@ from topo.base.functionfamilies import Hebbian,LearningFn,LearningFnParameter
 from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 
 
+class CFPLF_EuclideanHebbian(CFPLearningFn):
+    """
+    Hebbian CFProjection learning rule based on Euclidean distance.
+
+    Learning is driven by the distance from the input pattern to the
+    weights, scaled by the current activity.  To implement a Kohonen
+    SOM algorithm, the activity should be the neighborhood kernel
+    centered around the winning unit, as implemented by KernelMax.
+    """
+
+    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
+        # This learning function does not need to scale the learning
+        # rate like some do, so it does not use constant_sum_connection_rate()
+
+        cfs = iterator.proj._cfs
+        rows,cols = output_activity.shape
+        for r in xrange(rows):
+            for c in xrange(cols):
+                out = output_activity[r][c]
+                if out !=0:
+                    rate = learning_rate * out                    
+                    cf = cfs[r][c]
+		    X = cf.get_input_matrix(input_activity)
+                    cf.weights += rate * (X - cf.weights)
+
+                    # CEBHACKALERT: see ConnectionField.__init__()
+                    cf.weights *= cf.mask
+
+
+
 #### JABHACKALERT: Untested
 ##class CFPLF_BCM(CFPLearningFn):
 ##    """

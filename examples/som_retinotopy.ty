@@ -2,7 +2,7 @@
 Basic example of a fully connected SOM retinotopic map with ConnectionFields.
 
 Contains a Retina (2D Gaussian generator) fully connected to a V1
-(CFSOM) sheet, with no initial ordering for topography.
+(SOM) sheet, with no initial ordering for topography.
 
 Constructed to match the retinotopic simulation from page 53-59 of
 Miikkulainen, Bednar, Choe, and Sirosh (2005), Computational Maps in
@@ -24,7 +24,7 @@ import topo.patterns.basic
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet,CFProjection
 from topo.base.parameterclasses import DynamicNumber,Number
-from topo.learningfns.som import CFPLF_EuclideanHebbian
+from topo.learningfns.projfns import CFPLF_EuclideanHebbian
 from topo.misc.numbergenerators import UniformRandom,BoundedNumber,ExponentialDecay
 from topo.outputfns.basic import KernelMax
 from topo.responsefns.optimized import CFPRF_EuclideanDistance_opt

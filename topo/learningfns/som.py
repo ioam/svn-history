@@ -1,5 +1,5 @@
 """
-Basic learning functions for CFProjections.
+SOM-based learning functions for CFProjections.
 
 $Id$
 """
@@ -21,8 +21,15 @@ from topo.patterns.basic import Gaussian
 from topo.outputfns.basic import IdentityOF
 
 
+### JABHACKALERT: This class will be removed once the examples no
+### longer rely upon it
 class CFPLF_SOM(CFPLearningFn):
-    """An abstract base class of learning functions for Self-Organizing Maps."""
+    """
+    An abstract base class of learning functions for Self-Organizing Maps.
+
+    This implementation is obsolete and will be removed soon.
+    Please see examples/cfsom_or.ty for current SOM support.
+    """
     _abstract_class_name = "CFPLF_SOM"
 
     learning_radius = Number(default=0.0,doc=
@@ -38,18 +45,14 @@ class CFPLF_SOM(CFPLearningFn):
 
 
 
-### JABALERT: It should be possible to eliminate this class once everything uses
-### CFPLF_EuclideanHebbian and KernelMax instead
+### JABHACKALERT: This class will be removed once the examples no
+### longer rely upon it
 class CFPLF_HebbianSOM(CFPLF_SOM):
     """
     Hebbian learning rule for CFProjections to Self-Organizing Maps.
 
-    Only the winner unit and those surrounding it will learn. The
-    radius of the surround is specified by the parameter
-    learning_radius, which should be set before using __call__.  The
-    shape of the surround is determined by the neighborhood_kernel_generator, 
-    and can be any PatternGenerator instance, or any function accepting
-    bounds, density, radius, and height to return a kernel matrix.
+    This implementation is obsolete and will be removed soon.
+    Please see examples/cfsom_or.ty for current SOM support.
     """
 
     learning_radius = Number(default=0.0)
@@ -130,31 +133,3 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
                     cf.weights *= cf.mask
 
 
-## Should probably move out of this file
-class CFPLF_EuclideanHebbian(CFPLearningFn):
-    """
-    Hebbian CFProjection learning rule based on Euclidean distance.
-
-    Learning is driven by the distance from the input pattern to the
-    weights, scaled by the current activity.  To implement a Kohonen
-    SOM algorithm, the activity should be the neighborhood kernel
-    centered around the winning unit, as implemented by KernelMax.
-    """
-
-    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
-        # This learning function does not need to scale the learning
-        # rate like some do, so it does not use constant_sum_connection_rate()
-
-        cfs = iterator.proj._cfs
-        rows,cols = output_activity.shape
-        for r in xrange(rows):
-            for c in xrange(cols):
-                out = output_activity[r][c]
-                if out !=0:
-                    rate = learning_rate * out                    
-                    cf = cfs[r][c]
-		    X = cf.get_input_matrix(input_activity)
-                    cf.weights += rate * (X - cf.weights)
-
-                    # CEBHACKALERT: see ConnectionField.__init__()
-                    cf.weights *= cf.mask
