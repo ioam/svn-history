@@ -57,7 +57,8 @@ http://www.thescripts.com/forum/thread38709.html
 CB: Python's setup.py is not finding our own tcl/tk libraries/headers.
 If we specify where the tcl/tk files are in Modules/Setup.dist, and that we want
 _tkinter to be built, this problem is fixed (at least on my computer: does
-this work on doozy?) Need to check what happens on OS X, too.
+this work on doozy?) Need to check what happens on OS X, too
+(see e.g. http://article.gmane.org/gmane.comp.python.tkinter/1050).
 
 <pre>
 chris@zh:~/dev_ext/topographica$ diff ~/dev_ext/topographica4/external/Python-2.4.4/Modules/Setup.dist external/Python-2.4.4/Modules/Setup.dist 
