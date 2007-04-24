@@ -14,41 +14,23 @@ $Id$
 """
 __version__='$Revision$'
 
-import numpy
 
+import numpy
 from math import exp, sqrt
 
 import topo.patterns.random
 import topo.patterns.basic
 
-from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.boundingregion import BoundingBox
-from topo.base.cf import CFProjection
+from topo.base.cf import CFSheet,CFProjection
 from topo.base.parameterclasses import DynamicNumber,Number
-from topo.sheets.cfsom import CFSOM
+from topo.learningfns.som import CFPLF_EuclideanHebbian
+from topo.misc.numbergenerators import UniformRandom,BoundedNumber,ExponentialDecay
+from topo.outputfns.basic import KernelMax
 from topo.responsefns.optimized import CFPRF_EuclideanDistance_opt
-from topo.learningfns.som import CFPLF_HebbianSOM
-from topo.misc.numbergenerators import UniformRandom
+from topo.sheets.generatorsheet import GeneratorSheet
 
 topo.sim.name = "som_retinotopy"
-
-class RetinotopicSOM(CFSOM):
-    """A variant of CFSOM that uses exponential decay functions for alpha and radius."""
-
-    radius_min=Number(0.5/40.0,doc="Minimum radius to allow")
-
-    def __init__(self,**params):
-        super(RetinotopicSOM,self).__init__(**params)
-
-    def alpha(self):
-       """Exponential decay."""
-       return self.alpha_0*exp(-6.0*(float(self.simulation.time())/self.learning_length))
-    
-    def radius(self):
-       """Exponential decay, but with a minimum value enforced."""
-       decayed_radius = self.radius_0*exp(-5.0*(float(self.simulation.time())/self.learning_length))
-       return max(decayed_radius,self.radius_min)
-
 
 # input pattern
 GeneratorSheet.period = 1.0
@@ -74,15 +56,20 @@ numpy.random.seed((weight_seed+67,weight_seed+89))
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 
-topo.sim['V1'] = RetinotopicSOM(
-    nominal_density = locals().get('default_density',40.0),
-    learning_length = 40000,
+default_density=locals().get('default_density',40.0)
+topo.sim['V1'] = CFSheet(
+    nominal_density = default_density,
     # Original CMVC simulation used an initial radius of 13.3/40.0
-    radius_0 = locals().get('radius_0',13.3/40.0*3.0),
-    alpha_0  = locals().get('alpha_0',0.42))
+    output_fn = KernelMax(density=default_density,
+        kernel_radius=BoundedNumber(bounds=(0.5/40,None),generator=
+            ExponentialDecay(starting_value = locals().get('radius_0',13.3/40.0*3.0),
+                             time_constant=40000/5.0))))
 
 topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,connection_type=CFProjection,
     weights_generator = topo.patterns.random.UniformRandom(),
     nominal_bounds_template=BoundingBox(radius=1.0), # fully connected network.
+    learning_rate=DynamicNumber(ExponentialDecay(starting_value = locals().get('alpha_0',0.42),
+                                                 time_constant=40000/6.0)),
     response_fn = CFPRF_EuclideanDistance_opt(),
-    learning_fn = CFPLF_HebbianSOM())
+    learning_fn = CFPLF_EuclideanHebbian())
+
