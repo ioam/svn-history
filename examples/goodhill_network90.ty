@@ -8,7 +8,7 @@ NOT YET TESTED.
 
 $Id$
 """
-_version__='$Revision$'
+__version__='$Revision$'
 
 from __future__ import division #DO NOT DELETE!Needs it for correct&precise divisions.
 from numpy.oldnumeric import *
