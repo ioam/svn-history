@@ -22,44 +22,49 @@ import numpy
 
 from math import sqrt, pi
 
-from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.patterngenerator import BoundingBox
-from topo.base.cf import CFProjection
-from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import Number,DynamicNumber
-from topo.sheets.cfsom import CFSOM
-import topo.patterns.random
-import topo.patterns.basic
-from topo.learningfns.som import CFPLF_HebbianSOM
+import topo
+
+from topo.base.boundingregion import BoundingBox
+from topo.base.cf import CFSheet,CFProjection
+from topo.base.parameterclasses import DynamicNumber,Number
+from topo.learningfns.som import CFPLF_EuclideanHebbian
+from topo.misc.numbergenerators import UniformRandom,BoundedNumber
 from topo.outputfns.basic import DivisiveNormalizeL1
-from topo.misc.numbergenerators import UniformRandom
+from topo.outputfns.basic import KernelMax
+from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.sheets.generatorsheet import GeneratorSheet
+
+import topo.patterns.basic
+import topo.patterns.random
 
 topo.sim.name = "obermayer_pnas90"
 
-
-class ObermayerSOM(CFSOM):
-    """A variant of CFSOM that uses linear decay functions for alpha and radius."""
-
-    # These values have been adjusted to convert from Obermayer's
-    # per-unit learning rates to Topographica's per-CF learning rates,
-    # assuming a 30x30 ConnectionField.
-    alpha_0 = Number(0.09)
-    alpha_f = Number(0.02)
-
-    radius_0 = Number(240.0/256.0)  # Value at the beginning of learning
-    radius_m = Number(60.0/256.0)   # Value at the midpoint of learning
-    radius_f = Number(2.0/256.0)    # Value at the end of learning
-    midpoint = 15000
+class LinearDecay(ParameterizedObject):
+    """Linear function decreasing from the starting_value to the ending_value."""
+    starting_value = Number(0.09,doc="""Value at the beginning of learning.""")
+    ending_value = Number(0.02,doc="""Value at the end of learning.""")
+    duration = Number(30000,doc="""Time for the ending_value.""")
+    time_fn = topo.sim.time
     
-    def alpha(self):
-        return self.alpha_0 + (self.alpha_f-self.alpha_0)/self.learning_length*float(self.simulation.time())
-    
-    def radius(self):
-       """Two-part piecewise-linear decay function."""
-       if self.simulation.time() < self.midpoint:
-         return self.radius_0 + (self.radius_m-self.radius_0)/self.midpoint*float(self.simulation.time())
+    def __call__(self):
+        return self.starting_value + (self.ending_value-self.starting_value)/self.duration*float(self.time_fn())
+
+
+class PiecewiseLinearDecay(ParameterizedObject):
+    """Two-part piecewise-linear decay function."""
+
+    starting_value = Number(240.0/256.0,doc="""Value at the beginning of learning.""")
+    middle_value = Number(60.0/256.0,doc="""Value at the midpoint of learning.""")
+    ending_value = Number(2.0/256.0,doc="""Value at the end of learning.""")
+    midpoint = Number(15000,doc="""Time for the middle_value.""")
+    duration = Number(30000,doc="""Time for the ending_value.""")
+    time_fn = topo.sim.time
+
+    def __call__(self):
+       if self.time_fn() < self.midpoint:
+         return self.starting_value + (self.middle_value-self.starting_value)/self.midpoint*float(self.time_fn())
        else:
-         return self.radius_m + (self.radius_f-self.radius_m)/(self.learning_length-self.midpoint)*float(self.simulation.time()-self.midpoint)
+         return self.middle_value + (self.ending_value-self.middle_value)/(self.duration-self.midpoint)*float(self.time_fn()-self.midpoint)
 
 
 
@@ -70,7 +75,6 @@ class ObermayerSOM(CFSOM):
 GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0.05
 GeneratorSheet.nominal_density = 30
-
 
 gaussian_width = 0.23/sqrt(2)
 gaussian_height = 0.09/sqrt(2)
@@ -83,21 +87,26 @@ input_pattern = topo.patterns.basic.Gaussian(
     bounds=BoundingBox(radius=0.5))
 
 # cortical sheet (original network had a density of 256, but that is too large for normal use)
-ObermayerSOM.nominal_density = 25 #6
-ObermayerSOM.learning_length = 30000
-
 numpy.random.seed((500,500))
-CFProjection.weights_generator = topo.patterns.random.UniformRandom()
-CFProjection.nominal_bounds_template = BoundingBox(radius=1.0)
-CFProjection.response_fn = CFPRF_DotProduct_opt()
-CFProjection.learning_fn=CFPLF_HebbianSOM()
-
-# Weights should be initialized to sum to unity: (Will this work?)
-# CEBHACKALERT: they will be made to sum to 1 after every learning iteration.
-# I guess that isn't what was intended?
-CFProjection.weights_output_fn.single_cf_fn=DivisiveNormalizeL1()
-
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
-topo.sim['V1'] = ObermayerSOM()
-topo.sim.connect('Retina','V1',delay=0.10,connection_type=CFProjection)
+
+default_density=locals().get('default_density',25) #256
+
+KernelMax.kernel_radius=DynamicNumber(PiecewiseLinearDecay())
+
+topo.sim['V1'] = CFSheet(
+    nominal_density = default_density,
+    output_fn = KernelMax(density=default_density))
+
+from topo.misc.numbergenerators import ExponentialDecay
+CFProjection.learning_rate=DynamicNumber(LinearDecay())
+topo.sim.connect('Retina','V1',delay=0.10,connection_type=CFProjection,
+                 response_fn = CFPRF_DotProduct_opt(),
+                 learning_fn = CFPLF_EuclideanHebbian(),
+                 nominal_bounds_template = BoundingBox(radius=1.0),
+                 weights_generator = topo.patterns.random.UniformRandom())
+
+# Initialize weight values once; should verify that it does this ok
+from topo.outputfns.basic import IdentityOF
+topo.sim.schedule_command(0,'topo.sim["V1"].weights_output_fn=IdentityOF()')
