@@ -1,7 +1,7 @@
 """
 SOM-based orientation map based on Obermayer et al., PNAS 87, pp. 8345-8349, 1990.
 
-Contains a Retina (2D Gaussian generator) and a V1 (CFSOM) sheet.
+Contains a Retina (2D Gaussian generator) and a V1 (SOM) sheet.
 Each V1 neuron receives input from the entire Retina.
 
 Known differences from the reference simulation:
@@ -10,7 +10,7 @@ Known differences from the reference simulation:
     borders of our simulation will have edge effects not present in the
     original.
 
-  - Currently only isotropic Gaussian neighborhood functions are supported.
+  - Currently only isotropic Gaussian neighborhood functions are implemented.
 
   - Not tested. :-)
 
@@ -27,12 +27,13 @@ import topo
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet,CFProjection
 from topo.base.parameterclasses import DynamicNumber,Number
-from topo.learningfns.som import CFPLF_EuclideanHebbian
+from topo.learningfns.projfns import CFPLF_EuclideanHebbian
 from topo.misc.numbergenerators import UniformRandom,BoundedNumber
 from topo.outputfns.basic import DivisiveNormalizeL1
 from topo.outputfns.basic import KernelMax
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.generatorsheet import GeneratorSheet
+from topo.base.parameterizedobject import ParameterizedObject
 
 import topo.patterns.basic
 import topo.patterns.random
