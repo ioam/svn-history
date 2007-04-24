@@ -25,10 +25,9 @@ include:
       other code to Topographica.
 
   <p><dt>Chris Ball, September 2005-</dt>
-  <dd>Chris recently worked on 
-      <a href="http://homepages.inf.ed.ac.uk/v1cball/mae/lissom/">modeling
-      motion aftereffects in LISSOM</a>, and now works on many different 
-      parts of Topographica.  
+  <dd>Chris works on various parts of Topographica, and is 
+      <a target="_top" href="http://homepages.inf.ed.ac.uk/v1cball/mae/">modeling
+      motion aftereffects in LISSOM</a>.
 
   <p><dt>Julien Ciroux, October 2005 - April 2006</dt>
   <dd>Julien recently received an MSc from the University of Edinburgh
