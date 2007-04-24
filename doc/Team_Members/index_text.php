@@ -66,7 +66,7 @@ include:
       starting points for future studies (e.g. comparison studies).
 
   <p><dt>Ruaidhri Primrose, September 2006 - May 2007</dt>
-  <dd>Foivos is working on his undergraduate degree at the
+  <dd>Ruaidrhi is working on his undergraduate degree at the
       University of Edinburgh, with a project of developing
       more sample models for Topographica.
 
