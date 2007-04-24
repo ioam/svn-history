@@ -31,7 +31,8 @@ import topo.patterns.basic
 
 from topo.base.arrayutils import clip_in_place,array_argmax
 from topo.base.boundingregion import BoundingBox
-from topo.base.cf import CFProjection,CFSheet
+from topo.base.cf import CFSheet 
+from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.base.functionfamilies import OutputFn
 from topo.base.parameterclasses import DynamicNumber, Number
 from topo.base.patterngenerator import PatternGeneratorParameter
@@ -39,7 +40,7 @@ from topo.learningfns.basic import Hebbian
 from topo.learningfns.projfns import HomeoSynaptic
 from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.misc.numbergenerators import UniformRandom
-from topo.outputfns.homeostatic import PiecewiseLinear_debug2
+from topo.outputfns.basic import PiecewiseLinear
 from topo.outputfns.basic import DivisiveNormalizeL1
 from topo.patterns.basic import Rectangle
 from topo.sheets.cfsom import CFSOM
@@ -49,48 +50,8 @@ from topo.responsefns.optimized import CFPRF_DotProduct_opt
 
 topo.sim.name = "sullivan_nn06.ty"
 
-
-# JABALERT: Needs a better name.  Completely untested.  Should this be a SharedWeightCFProjection?
-# If so, derive from LISSOM and set tsettle to 1
-class Hacked_CFSOM(CFSOM):
-    """
-    Modified CFSOM that convolves the input projection's output with a
-    set of lateral weights (a DoG by default) to produce the final
-    activity values.
-    """
-    
-    neighborhood_kernel_generator = PatternGeneratorParameter(
-        default=topo.patterns.basic.Composite(
-        generators=[topo.patterns.basic.Gaussian(size=0.25, aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()),
-                    topo.patterns.basic.Gaussian(size=0.50, aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())],
-        operator=numpy.subtract),
-        doc="Function to set up the lateral weight patterns")
-
-    def __init__(self,**params):
-        super(Hacked_CFSOM,self).__init__(**params)
-
-#        neighborhoods=array(self.activity.shape,dtype=numpy.object)
-#        rows,cols = self.activity.shape
-#        bb = BoundingBox(points=((0,0), (rows,cols))) # Check if bb is upper exclusive
-#        for wr in xrange(rows):
-#            for wc in xrange(cols):
-#                neighborhoods[wr,wc]=self.neighborhood_kernel_generator(bounds=bb,xdensity=1,ydensity=1,x=wc,y=wr)
-
-
-    def activate(self):
-        # Only supports one input projection
-        assert(len(self.in_connections)==1)
-        
-        # Apply lateral weights to the proj.activity
-        self.activity *= 0.0
-#        self.activity += matrixmultiply(neighborhoods,proj.activity)
-        
-        if self.apply_output_fn:
-            self.output_fn(self.activity)
-
-        self.send_output(src_port='Activity',data=self.activity)
-
-
+### JABHACKALERT: Missing the lateral projection; should be
+### a SharedWeightCFProjection
 
 
 #weight initialization, response 
@@ -117,10 +78,10 @@ topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
 
 # Note that the learning rates from the original paper must be scaled
 # by the number of units in a typical ConnectionField, i.e. 150 in this case
-topo.sim['V1'] = Hacked_CFSOM(nominal_density=locals().get('default_density',15),
+topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',15),
                        radius_0=0.1,alpha_0=0.00083*150,learning_length=150000,
                        nominal_bounds=BoundingBox(points=((-0.5,-0.5/15.0),(0.5,0.5/15.0))),
-                       output_fn=PiecewiseLinear_debug2())
+                       output_fn=PiecewiseLinear())
 
 
 topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
