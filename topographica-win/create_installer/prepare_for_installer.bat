@@ -49,31 +49,31 @@ del /S /Q /F .#* *\.#* *\*~ .cvsignore ChangeLog.txt *\.cvsignore *\*\.cvsignore
 del etc\topographica.elc ImageSaver*.ppm countalerts* annotate.out emacslog
 del current_profile testsnapshot.typ script topo\tests\*.ty_*DATA timing*
 del examples\disparity_energy.ty
-del examples/face_space.ty
-del examples/goodhill_network90.ty
+del examples\face_space.ty
+del examples\goodhill_network90.ty
 del examples\homeostatic.ty
 del examples\joublin_bc96.ty
 del examples\laminar.ty
-del examples/laminar_or.ty
+del examples\laminar_or.ty
 del examples\laminar_lissom.ty
 del examples\laminar_nolearning.ty
-del examples/laminar_oo_or.ty*
+del examples\laminar_oo_or.ty*
 del examples\leaky_lissom_or.ty
-del examples/lgn_lateral.ty*
+del examples\lgn_lateral.ty*
 del examples\lissom_oo_od.ty
-del examples/lissom_oo_or_dy.ty
-del examples/lissom_oo_or_noshrinking_adapthomeo.ty
-del examples/lissom_oo_or_noshrinking_latswitch.ty
-del examples/lissom_or_homeomaxent.ty
-del examples/lissom_or_homeoscale.ty
-del examples/lissom_or_noshrinking.ty
-del examples/lissom_or_noshrinking_latswitch.ty
-del examples/lissom_or_sf.ty
-del examples/ohzawa_science90.ty
-del examples/saccade_demo.ty
-del examples/sullivan_neurocomputing04.ty
-del examples/sullivan_nn06.ty
-del examples/*.typ
+del examples\lissom_oo_or_dy.ty
+del examples\lissom_oo_or_noshrinking_adapthomeo.ty
+del examples\lissom_oo_or_noshrinking_latswitch.ty
+del examples\lissom_or_homeomaxent.ty
+del examples\lissom_or_homeoscale.ty
+del examples\lissom_or_noshrinking.ty
+del examples\lissom_or_noshrinking_latswitch.ty
+del examples\lissom_or_sf.ty
+del examples\ohzawa_science90.ty
+del examples\saccade_demo.ty
+del examples\sullivan_neurocomputing04.ty
+del examples\sullivan_nn06.ty
+del examples\*.typ
 
 
 REM CEBHACKALERT: need to make clean topo/tests/reference
