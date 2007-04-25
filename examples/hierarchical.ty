@@ -17,10 +17,10 @@ import topo.patterns.basic
 from topo.base.cf import CFProjection
 from topo.base.parameterclasses import DynamicNumber, Number
 from topo.base.patterngenerator import BoundingBox
-from topo.learningfns.som import CFPLF_HebbianSOM
+from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.basic import PiecewiseLinear
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.sheets.cfsom import CFSOM
+from topo.base.cf import CFSheet
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.numbergenerators import UniformRandom
 
@@ -53,18 +53,15 @@ right_input_pattern = topo.patterns.basic.Line(
 
 
 # cortical sheet
-CFSOM.nominal_density = locals().get('default_density',10.0)
-CFSOM.learning_length = 10000
-CFSOM.radius_0 = 0.1
+CFSheet.nominal_density = locals().get('default_density',10.0)
 
 # sheet activation saturates at 1
-CFSOM.output_fn = PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
+CFSheet.output_fn = PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
 
 numpy.random.seed((500,500))
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.nominal_bounds_template=BoundingBox(radius=0.1)
-# CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0)
-CFProjection.learning_fn = CFPLF_HebbianSOM()
+CFProjection.learning_fn = CFPLF_Hebbian_opt()
 CFProjection.response_fn = CFPRF_DotProduct_opt()
 
 
@@ -80,10 +77,9 @@ topo.sim['LeftRetina'] = GeneratorSheet(input_generator=left_input_pattern,
 topo.sim['RightRetina'] = GeneratorSheet(input_generator=right_input_pattern,
 	nominal_bounds = BoundingBox(points=((-0.5,-0.75),(0.5,0.75))))
 
-topo.sim['V1'] = CFSOM(alpha_0 = 0.5)
-topo.sim['V2'] = CFSOM(alpha_0 = 0.5,
-	nominal_bounds = BoundingBox(points=((-0.4,-0.4),(0.4,0.6))))
-topo.sim['V3'] = CFSOM(alpha_0 = 0.5,nominal_density=5)
+topo.sim['V1'] = CFSheet()
+topo.sim['V2'] = CFSheet(nominal_bounds = BoundingBox(points=((-0.4,-0.4),(0.4,0.6))))
+topo.sim['V3'] = CFSheet(nominal_density=5)
 
 # Projections to V1
 topo.sim.connect('LeftRetina','V1',delay=0.5,connection_type=CFProjection,name='AfferentLeft')
