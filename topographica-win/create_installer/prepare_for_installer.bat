@@ -44,7 +44,7 @@ del /Q /F topographica
 del /Q /F topographica.bat
 
 
-REM **** Things the Makefile deletes
+REM **** Things the Makefile deletes CEBHACKALERT: this line doesn't seem to be working any more!
 del /S /Q /F .#* *\.#* *\*~ .cvsignore ChangeLog.txt *\.cvsignore *\*\.cvsignore *\*\*\.cvsignore
 del etc\topographica.elc ImageSaver*.ppm countalerts* annotate.out emacslog
 del current_profile testsnapshot.typ script topo\tests\*.ty_*DATA timing*
