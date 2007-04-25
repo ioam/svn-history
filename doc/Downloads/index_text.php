@@ -40,6 +40,10 @@ on setup.bat in the
 <code>topographica\topographica-win\setup_cvs_copy\</code>
 directory after checking out the code.
 
+<P>On Mac OS X, you will need to edit the file external/Makefile
+and remove the string "-Wl", which is an option required on Linux but
+not supported on the Mac.  Then type <code>make</code> as below. 
+
 <P>On other systems, just type <code>make</code> (which may be called
 <code>gmake</code> on some systems) from within the
 <code>topographica/</code> directory.  You will currently (3/2007)
