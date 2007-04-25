@@ -190,6 +190,44 @@ class PiecewiseLinear_debug(OutputFn):
             self.y_avg = self.smoothing*x + (1.0-self.smoothing)*self.y_avg
 
 
+class PiecewiseLinear_debug2(OutputFn):
+    """
+    Same as PiecewiseLinear, but computes average activities for use
+    in validating homeostatic plasticity mechanisms.    
+    """
+    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
+    upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
+    learn_step = Number(default=8,doc="Number of step before learning take place")
+
+    def __init__(self,**params):
+        super(PiecewiseLinear_debug2,self).__init__(**params)
+
+	self.first_call = True
+	self.n_step = 0
+	self.beta = 0.0003
+	self.ncall = 0
+
+    def __call__(self,x):
+        fact = 1.0/(self.upper_bound-self.lower_bound)        
+        x -= self.lower_bound
+        x *= fact
+        clip_in_place(x,0.0,1.0)
+
+	if self.first_call:
+	    self.first_call = False
+	    self.x_avg = zeros(x.shape,x.dtype.char)
+	    self.x_hist = []
+	else:
+	    if self.ncall <= 1000:
+	    	self.x_avg = ((self.x_avg*self.ncall) + x) / (self.ncall+1)
+	    	self.ncall += 1
+	    else:	    
+	    	self.x_avg = self.beta*x + (1.0-self.beta)*self.x_avg
+	self.n_step += 1
+	if self.n_step == self.learn_step:
+	    self.n_step = 0
+	
+
 class OutputFnDebugger(OutputFn):
     """
     Collates information for debugging as specifed by the
