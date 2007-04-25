@@ -36,6 +36,7 @@ class CFSOM(CFSheet):
     def __init__(self,**params):
         super(CFSOM,self).__init__(**params)
         self.half_life = self.learning_length/8
+        self.warning("CFSOM is deprecated -- see the example in cfsom_or.ty for how to build a SOM")
 
     def decay(self, time, half_life):
         """Exponential decay."""

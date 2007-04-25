@@ -39,6 +39,9 @@ class CFPLF_SOM(CFPLearningFn):
         Projection owning this CFPLearningFn, but it can also be set
         explicitly by the user.
         """)
+
+    def __init__(self,**params):
+        self.warning("CFPLF_SOM is deprecated -- see the example in cfsom_or.ty for how to build a SOM")
     
     def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
         raise NotImplementedError
