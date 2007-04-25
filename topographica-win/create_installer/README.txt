@@ -25,7 +25,8 @@ Making a Windows installation package
 
 (6) I use 'Inno Setup 5', an open-source installation package creator
     (see http://www.jrsoftware.org/isinfo.php).
-    Open topographica.iss in the topographica directory, adjust the
-    paths marked *** to match those on your system, then just choose
+    Move topographica.iss to anywhere outside the topographica directory, 
+    then open it from the new location, adjust the
+    paths marked *** to match those on your system, and finally choose
     'compile' from the 'build' menu. You should get a setup.exe file
-    in the newly created Output directory.
+    in a newly created 'Output' directory at the same level as topographica.iss.
