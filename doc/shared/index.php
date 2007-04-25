@@ -35,7 +35,7 @@
 <i>
 <b>News:</b>
 
-<p><b>23 April 2007:</b> Version 0.9.3 to be
+<p><b>23 April 2007:</b> Version 0.9.3 
 <A target="_top" href="../Downloads/index.html">released</A>, including:
 
 <center>
