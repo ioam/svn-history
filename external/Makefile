@@ -27,7 +27,7 @@ PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.4
 python: ${PYTHON}.tgz tk
 	echo ${PREFIX}
 	tar xzf ${PYTHON}.tgz
-	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-rpath,${PREFIX}/lib
+	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
 	cd ${PYTHON}; env PREFIX=${PREFIX} make 
 	cd ${PYTHON}; env PREFIX=${PREFIX} make install
 	touch python
