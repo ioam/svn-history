@@ -22,7 +22,7 @@ from topo.commands.basic import pattern_present
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.utils import frange, wrap
 from topo.patterns.basic import SineGrating, Gaussian
-from topo.patterns.gratingpatches import SineGratingDisk
+from topo.patterns.teststimuli import SineGratingDisk
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.parameterclasses import Parameter
 from topo.analysis.featureresponses import FeatureMaps, FeatureCurves
