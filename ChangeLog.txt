@@ -1,3 +1,155 @@
+2007-04-25  James A. Bednar  <jbednar@lincoln>
+
+	* topo/tests/testfeaturemap.py 1.26,
+	topo/tests/testpatternpresent.py 1.18,
+	topo/tests/testplotfilesaver.py 1.22, topo/tests/testplotgroup.py
+	1.28, topo/tests/testplotgrouppanel.py 1.13,
+	topo/tests/testcfsom.py 1.36: Converted tests to use CFSheet
+	instead of CFSOM
+
+	* topo/learningfns/som.py 1.20, topo/sheets/cfsom.py 1.36: Added
+	deprecation warning
+
+	* examples/hierarchical.ty 1.69: Switched to CFSheet instead of
+	obsolete CFSOM
+
+	* topo/tests/test_script.py 1.20: Trivial cleanup to output
+
+	* topo/tests/som_retinotopy.ty_DATA 1.3,
+	topo/tests/sullivan_neurocomputing04.ty_DATA 1.2,
+	topo/tests/sullivan_nn06.ty_DATA 1.2: Updated to match changes in
+	SOM support
+
+	* topo/commands/analysis.py 1.77: Fixed import
+
+	* external/Makefile 1.69: Restored -Wl option to python's
+	configure, so that Topographica would compile under Ubuntu 6.10.
+
+2007-04-25  ceball  <ceball@lincoln>
+
+	* doc/shared/index.php 1.28: Correct minor typo.
+
+2007-04-24  James A. Bednar  <jbednar@lincoln>
+
+	* topo/tests/cfsom_or.ty_DATA 1.2: Updated to match changes to
+	KernelMax
+
+	* topo/sheets/cfsom.py 1.35: Updated comments
+
+	* examples/sullivan_nn06.ty 1.20: Removed unimplemented variant of
+	CFSOM
+
+	* examples/sullivan_neurocomputing04.ty 1.21: Added required
+	density parameter to KernelMax
+
+	* examples/saccade_demo.ty 1.9: Added version string
+
+	* examples/obermayer_pnas90.ty 1.52: Fixed imports
+
+	* examples/laminar_oo_or.ty 1.12, examples/laminar_or.ty 1.8,
+	examples/lissom_or_noshrinking_latswitch.ty 1.11: Cleaned up typos
+	and formatting. Added version string.
+
+	* examples/joublin_bc96.ty 1.20: Removed unused import
+
+	* examples/goodhill_network90.ty 1.18: Fixed typo in version
+	string
+
+	* examples/face_space.ty 1.5, examples/lissom_or_homeoscale.ty
+	1.14: Removed reference to obsolete class
+
+	* examples/cfsom_or.ty 1.63, examples/som_retinotopy.ty 1.56,
+	topo/learningfns/projfns.py 1.24, topo/learningfns/som.py 1.19:
+	Moved CFPLF_EuclideanHebbian to its final destination
+
+	* examples/obermayer_pnas90.ty 1.51: Updated with new SOM support
+
+	* examples/som_retinotopy.ty 1.55: Changed to use new SOM
+	implementation now that it works
+
+	* topo/outputfns/basic.py 1.62: Fixed KernelMax for when
+	crop_radius was less than the input sheet size
+
+	* doc/Team_Members/index_text.php 1.10: Fixed name
+
+2007-04-24  ceball  <ceball@lincoln>
+
+	* doc/Team_Members/index_text.php 1.9: Minor change to text and
+	link.
+
+	* doc/Future_Work/current_text.php 1.220: Added a link.
+
+2007-04-24  James A. Bednar  <jbednar@lincoln>
+
+	* topo/outputfns/homeostatic.py 1.12: Reformatted, cleaning up
+	comments and docstrings
+
+2007-04-23  judelaw  <judelaw@lincoln>
+
+	* examples/lissom_or_noshrinking.ty 1.12: fixed calculation of
+	time constant for afferent learning rate decrease
+
+	* topo/commands/pylabplots.py 1.21: added label option to
+	vectorplot
+
+	* topo/patterns/teststimuli.py 1.1: changed name from
+	gratingpatches.py
+
+	* topo/patterns/gratingpatches.py 1.2: changed name to
+	teststimuli.py
+
+	* topo/outputfns/homeostatic.py 1.11: simplified to include a
+	function for debugging and plotting debug graphs
+
+	* examples/laminar_oo_or.ty 1.11,
+	examples/lissom_oo_or_noshrinking.ty 1.8,
+	examples/lissom_oo_or_noshrinking_adapthomeo.ty 1.5,
+	examples/lissom_oo_or_noshrinking_latswitch.ty 1.5: fixed
+	calculation of time constant for afferent learning rate
+	decreaseexamples/lissom_or_noshrinking.ty
+
+2007-04-23  ceball  <ceball@lincoln>
+
+	* doc/Future_Work/current_text.php 1.219:
+	Updated tkinter problem (and merged note+task). Added psyco on Windows task.
+
+2007-04-23  James A. Bednar  <jbednar@lincoln>
+
+	* doc/Downloads/index_text.php 1.41: Updated disk space requirements
+
+2007-04-23  judelaw  <judelaw@lincoln>
+
+	* topo/responsefns/projfns.py 1.23:
+	fixed documentation for CFPRF_ActivityBased
+
+2007-04-23  James A. Bednar  <jbednar@lincoln>
+
+	* topo/__init__.py 1.72: Minor fix to revision control info
+
+	* topo/__init__.py 1.71: Minor reformatting for epydoc
+
+	* topo/__init__.py 1.70: Fixed epydoc formatting
+
+	* doc/Developer_Manual/releases_text.php 1.5: Minor fixes
+
+	* doc/Developer_Manual/releases_text.php 1.4: Fixed minor typo
+
+	* doc/shared/index.php 1.27: Added caveat about the binaries
+
+	* doc/Future_Work/current_text.php 1.218: Removed completed tasks
+
+	* ChangeLog.txt 1.18: Updated with recent changes
+
+	* topo/outputfns/basic.py 1.61:
+	Fixed serious bug in KernelMax: the coordinates of the center of the kernel function were incorrect, with y reversed.
+
+	* topo/learningfns/som.py 1.18:
+	Trivial reformatting to match new SOM support; no change in function
+
+	* topo/analysis/featureresponses.py 1.19: Trivial fix to comment
+
+	* doc/Links/index_text.php 1.9: Minor fixes
+
 2007-04-23  James A. Bednar  <jbednar@lincoln>
 
 	* topo/outputfns/basic.py 1.61: Fixed serious bug in KernelMax:
