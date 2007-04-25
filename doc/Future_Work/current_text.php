@@ -103,12 +103,6 @@ We might also want to add notes about omitting './' and changing
 
 <H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
 
-
-<H4>2007/04/23: psyco on Windows</H4>
-It's built by default, so should be part of topographica-win
-(even though its use is optional).
-
-
 <H4>2007/03/28 (?): Update tutorial</H4>
 Update the lissom_oo_or tutorial page to include how to start and stop
 training and to add a section about plotting 'Orientation tuning
