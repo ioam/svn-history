@@ -24,7 +24,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.cf import CFProjection, CFSheet
 from topo.base.simulation import Simulation
-from topo.learningfns.som import CFPLF_HebbianSOM
+from topo.learningfns.optimized import CFPLF_Hebbian
 
 from topo.patterns import basic
 from topo.analysis.featureresponses import DistributionMatrix, FeatureMaps
@@ -198,10 +198,10 @@ class TestFeatureMaps(unittest.TestCase):
         self.s['V2'] = CFSheet(nominal_density=4.0)
 
         self.s.connect('Retina','V1',delay=0.5,connection_type=CFProjection,
-                       name='RtoV1',learning_fn=CFPLF_HebbianSOM())
+                       name='RtoV1',learning_fn=CFPLF_Hebbian())
 
         self.s.connect('Retina','V2',delay=0.5,connection_type=CFProjection,
-                       name='RtoV2',learning_fn=CFPLF_HebbianSOM())
+                       name='RtoV2',learning_fn=CFPLF_Hebbian())
 
 
 
