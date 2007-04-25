@@ -18,7 +18,6 @@ import time
 import webbrowser
 from inspect import getdoc
 import code
-import platform
 
 import topo
 import topo.commands.basic
@@ -569,7 +568,7 @@ class TopoConsole(Tkinter.Tk):
             # but it is not clear why this is necessary.
             # For more info:
             # http://groups.google.com/group/comp.lang.python/browse_thread/thread/68d0f33c8eb2e02d
-            if platform.system()!="Windows":  
+            if topo.tkgui.system_platform!="win":  
                 try: os.system("stty sane")   # Gives an error msg on Windows 
                 except: pass                  # and is not required.
                 
