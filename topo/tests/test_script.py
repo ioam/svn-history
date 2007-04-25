@@ -121,7 +121,7 @@ def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None
 
     result = "Results from " + script + " have not changed."
     if decimal is not None: result+= " (%d dp)" % (decimal)
-    print "\n"+result+"\n"
+    print result+"\n"
 
 
 
