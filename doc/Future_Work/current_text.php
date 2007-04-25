@@ -11,10 +11,12 @@ within each section are also ordered approximately by priority.
 <P><DT>Tasks to be addressed for the upcoming n release</DT><DD>
 What the developers are working on most actively right now.
 
+  <!--
 <P><DT>Tasks to be addressed for the upcoming n+1 release or later</DT><DD>
 Tasks that the developers hope to be able to start on after finishing
 their work for the current release.
-
+-->
+  
 <P><DT>Things we hope to take care of eventually</DT><DD>
 Tasks of lower priority; if you would like to see one of these tasks
 completed any time soon, please volunteer (even if a developer is
@@ -34,61 +36,7 @@ first added to the list, or a change was made.
 
 
 
-<H2>Tasks to be addressed for the upcoming 0.9.3 release:</H2>
-
-<H4>2007/03/28 (JB): Using new SOM support</H4>
-Finish converting som_retinotopy.ty and obermayer_pnas90.ty to use the
-new simpler and faster SOM support as in cfsom_or.ty, and delete all
-of the old SOM support.  Requires checking that the som_retinotopy.ty
-tutorial still works ok after the conversion.  Also check that
-the examples handle exponential decay of parameter values, so that
-they are good starting points.
-
-
-<H4>2007/04/23: tkinter problem</H4>
-After make, can't start the gui on some machines (e.g. doozy):
-<pre>
-    import _tkinter # If this fails your Python may not be configured for Tk
-ImportError: No module named _tkinter
-</pre>
-This problem has been around a long time. Possible sources of info:<BR>
-http://www.thescripts.com/forum/thread38709.html
-<BR>
-CB: Python's setup.py is not finding our own tcl/tk libraries/headers.
-If we specify where the tcl/tk files are in Modules/Setup.dist, and that we want
-_tkinter to be built, this problem is fixed (at least on my computer: does
-this work on doozy?) Need to check what happens on OS X, too
-(see e.g. http://article.gmane.org/gmane.comp.python.tkinter/1050).
-
-<pre>
-chris@zh:~/dev_ext/topographica$ diff ~/dev_ext/topographica4/external/Python-2.4.4/Modules/Setup.dist external/Python-2.4.4/Modules/Setup.dist 
-312c312
-< # _tkinter _tkinter.c tkappinit.c -DWITH_APPINIT \
----
-> _tkinter _tkinter.c tkappinit.c -DWITH_APPINIT \
-314c314
-< #	-L/usr/local/lib \
----
-> 	-L/home/chris/dev_ext/topographica/lib \
-316c316
-< #	-I/usr/local/include \
----
-> 	-I/home/chris/dev_ext/topographica/include \
-331c331
-< #	-ltk8.2 -ltcl8.2 \
----
-> 	-ltk8.4 -ltcl8.4 \
-341c341
-< #	-lX11
----
-> 	-lX11
-</pre>
-
-<pre>
-chris@zh:~/dev_ext/topographica$ echo $LD_LIBRARY_PATH
-/home/chris/dev_ext/topographica/lib
-</pre>
-
+<H2>Tasks to be addressed before the next release:</H2>
 
 <H4>2007/04/21: Note for Windows users</H4>
 Where to put this note? Working from the cmd.exe on Windows, single
@@ -99,17 +47,12 @@ i.e. "'Hello'", not '"Hello"'<BR>
 We might also want to add notes about omitting './' and changing
 '/' to '\' in general (currently on the downloads page).
 
-
-
-<H2>Tasks to be addressed for the 0.9.4 or later releases:</H2>
-
 <H4>2007/03/28 (?): Update tutorial</H4>
 Update the lissom_oo_or tutorial page to include how to start and stop
 training and to add a section about plotting 'Orientation tuning
 fullfield' tuning curves.
 CB: would the tutorial benefit from being split up a little more?
 Maybe it's getting daunting?
-
 
 <H4>2007/04/20: Fix the code in PlotGroup for calculating the minimum
 plot sizes in the GUI</H4>
@@ -141,7 +84,7 @@ Consider not using Pmw's scrolledframe component.
 
 <H4>2006/03/26 (CB): scheduled_actions in lissom examples</H4>
 Insert missing actions in case someone tries higher densities.
-
+JAB 2007/04/25: Isn't this already done?
 
 <H4>2007/01/25 (CB): ParametersFrame ok/apply/reset/cancel</H4>
 Set order and names of ParametersFrame's Ok, Apply, Cancel, Reset, and
