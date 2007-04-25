@@ -30,6 +30,7 @@ from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.learningfns.projfns import HomeoSynaptic
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
+from topo.outputfns.homeostatic import PiecewiseLinear_debug2
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.patterns.basic import Disk
 from topo.projections.basic import CFProjection
@@ -95,7 +96,7 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
 
 
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
-                        nominal_bounds=BoundingBox(radius=0.5), output_fn=PiecewiseLinear)
+                        nominal_bounds=BoundingBox(radius=0.5), output_fn=PiecewiseLinear_debug2())
 #, output_fn=HomeostaticMaxEnt())
 
 topo.sim['V1'].output_fn.lower_bound=0.1
