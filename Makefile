@@ -203,6 +203,7 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} etc/topographica.elc ImageSaver*.ppm countalerts* annotate.out emacslog
 #@@	   ${RM} current_profile testsnapshot.typ script ./topo/tests/*.ty_*DATA
 #@@	   ${RM} examples/disparity_energy.ty
+#@@	   ${RM} examples/face_space.ty
 #@@	   ${RM} examples/goodhill_network90.ty
 #@@	   ${RM} examples/homeostatic.ty
 #@@	   ${RM} examples/joublin_bc96.ty
@@ -213,7 +214,6 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} examples/laminar_oo_or.ty*
 #@@	   ${RM} examples/leaky_lissom_or.ty
 #@@	   ${RM} examples/lgn_lateral.ty*
-#@@	   ${RM} examples/lissom_fsa.ty
 #@@	   ${RM} examples/lissom_oo_od.ty
 #@@	   ${RM} examples/lissom_oo_or_dy.ty
 #@@	   ${RM} examples/lissom_oo_or_dy_photo.ty
