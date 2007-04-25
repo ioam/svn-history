@@ -160,7 +160,7 @@ def process_argv(argv):
     # JPALERT: This is all very unix-y.  We could try to do the right
     # thing on each platform.  I.e. put prefs/startup files in $HOME/Library
     # on the Mac, and wherever it goes on Windows.
-    homedir = os.getenv('HOME')
+    homedir = os.path.expanduser("~") # works on OS X, linux, windows
     if homedir:
         rcpath = os.path.join(homedir,'.topographicarc')
         if os.path.exists(rcpath):
