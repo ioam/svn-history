@@ -14,11 +14,9 @@ from math import pi
 import topo.patterns.basic
 import topo.patterns.random
 import topo.base.parameterizedobject
-from topo.sheets.cfsom import CFSOM
-import topo.base.cf
 from topo.plotting.plotfilesaver import *
 from PIL import *
-from topo.base.cf import CFProjection
+from topo.base.cf import CFProjection, CFSheet
 from topo.learningfns.som import CFPLF_HebbianSOM
 
 class TestPlotFileSaver(unittest.TestCase):
@@ -32,9 +30,7 @@ class TestPlotFileSaver(unittest.TestCase):
 #         topo.patterns.basic.Line.orientation = Dynamic(lambda :random.uniform(-pi,pi))
 #         topo.patterns.basic.Line.thickness = 0.02
 #         topo.patterns.basic.Line.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
-#         CFSOM.xdensity = 4
-#         CFSOM.learning_length = 10000
-#         CFSOM.radius_0 = 0.1
+#         CFSheet.nominal_density = 4
 #         CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 # 	CFProjection.learning_fn=CFPLF_HebbianSOM()
 #         topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
@@ -42,8 +38,8 @@ class TestPlotFileSaver(unittest.TestCase):
         
 #         retina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina')
 #         retina2 = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina2')
-#         V1 = CFSOM(name='V1')
-#         V2 = CFSOM(name='V2')
+#         V1 = CFSheet(name='V1')
+#         V2 = CFSheet(name='V2')
 #         retina.print_level = topo.base.parameterizedobject.WARNING
 #         retina2.print_level = topo.base.parameterizedobject.WARNING
 #         V1.print_level = topo.base.parameterizedobject.WARNING

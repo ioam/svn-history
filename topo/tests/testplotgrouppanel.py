@@ -11,13 +11,13 @@ from topo.tkgui import *
 from topo.base.patterngenerator import *
 from topo.base.simulation import *
 from PIL import Image
+from topo.base.cf import CFSheet
 from topo.base.sheetview import *
 from topo.plotting.bitmap import *
 from topo.projections.basic import CFProjection
 import topo.tkgui.topoconsole 
 import topo.tkgui.plotgrouppanel
 import Tkinter
-from topo.sheets.cfsom import CFSOM
 from math import pi
 from topo.base.parameterclasses import DynamicNumber
 from topo.misc.numbergenerators import UniformRandom
@@ -116,11 +116,8 @@ class TestPlotGroupPanel(unittest.TestCase):
         GeneratorSheet.period = 1.0
         GeneratorSheet.nominal_density = 5
         
-         
-        # rf som parameters
-        CFSOM.nominal_density = 5
-        CFSOM.learning_length = 10000
-        CFSOM.radius_0 = 0.1
+        # cortical parameters
+        CFSheet.nominal_density = 5
         
         ###########################################
         # build simulation
@@ -128,7 +125,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         
         s['retina'] = GeneratorSheet(input_generator=self.input_pattern,nominal_density=3)
         s['retina'].print_level = topo.base.parameterizedobject.WARNING
-        s['V1'] = CFSOM(nominal_density=3)
+        s['V1'] = CFSheet(nominal_density=3)
         s['V1'].print_level = topo.base.parameterizedobject.WARNING
         
         s.connect('retina','V1',delay=1,connection_type=CFProjection)

@@ -7,7 +7,6 @@ $Id$
 __version__='$Revision$'
 
 import unittest
-from topo.sheets.cfsom import CFSOM
 from pprint import pprint
 from topo.plotting import plot
 from topo.base import parameterizedobject
@@ -22,8 +21,8 @@ from topo.base.parameterclasses import DynamicNumber, Parameter
 from topo.misc.numbergenerators import UniformRandom
 import random
 import topo.base.parameterizedobject
-from topo.base.cf import CFProjection
-from topo.learningfns.som import CFPLF_HebbianSOM
+from topo.base.cf import CFProjection, CFSheet
+from topo.learningfns.optimized import CFPLF_Hebbian_opt
 import pdb #debugger
 
 
@@ -124,10 +123,10 @@ class TestCFSom(unittest.TestCase):
     
     
 ##         save = ImageSaver(pixel_scale=1.5)
-##         som = CFSOM()
+##         som = CFSheet()
         
 ##         s.add(som,input,save)
-##         s.connect(input,som,connection_type=CFProjection,learning_fn=CFPLF_HebbianSOM())
+##         s.connect(input,som,connection_type=CFProjection,learning_fn=CFPLF_Hebbian_opt())
 ##         s.connect(som,save)
 ##         s.run(duration=10)
     
@@ -156,9 +155,7 @@ class TestCFSom(unittest.TestCase):
         
 
         # cf som parameters
-        CFSOM.nominal_density = 5
-        CFSOM.learning_length = 10000
-        CFSOM.radius_0 = 0.1
+        CFSheet.nominal_density = 5
 
         ###########################################
         # build simulation
@@ -169,11 +166,11 @@ class TestCFSom(unittest.TestCase):
         s.verbose("Creating simulation objects...")
         s['retina']=GeneratorSheet(input_generator=input_pattern)
         
-        s['V1'] = CFSOM()
+        s['V1'] = CFSheet()
         s['V1'].print_level = topo.base.parameterizedobject.WARNING
 
         s.connect('retina','V1',delay=1,connection_type=CFProjection,
-                  learning_fn=CFPLF_HebbianSOM())
+                  learning_fn=CFPLF_Hebbian_opt())
         s.print_level = topo.base.parameterizedobject.WARNING
 
         self.assertTrue(topo.sim['V1'].projections().get('retinaToV1',None) != None)

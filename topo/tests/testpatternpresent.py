@@ -10,13 +10,12 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.parameterclasses import DynamicNumber
 import topo.patterns.basic
 from topo.base.boundingregion import BoundingBox
-from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
-from topo.base.cf import CFProjection
+from topo.base.cf import CFProjection, CFSheet
 import topo.base.parameterizedobject
 from math import pi
 from topo.commands.basic import pattern_present
-from topo.learningfns.som import CFPLF_HebbianSOM
+from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.misc.numbergenerators import UniformRandom
 
 class TestPatternPresent(unittest.TestCase):
@@ -40,17 +39,15 @@ class TestPatternPresent(unittest.TestCase):
             y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
             orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=300)))
 
-        CFSOM.nominal_density = 4
-        CFSOM.learning_length = 10000
-        CFSOM.radius_0 = 0.1
+        CFSheet.nominal_density = 4
         CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-	CFProjection.learning_fn=CFPLF_HebbianSOM()
+	CFProjection.learning_fn=CFPLF_Hebbian_opt()
         topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.MESSAGE
         s = topo.base.simulation.Simulation()
         s['Retina'] = GeneratorSheet(input_generator=input_pattern1)
         s['Retina2'] = GeneratorSheet(input_generator=input_pattern2)
-        s['V1'] = CFSOM()
-        s['V2'] = CFSOM()
+        s['V1'] = CFSheet()
+        s['V2'] = CFSheet()
         s.connect('Retina','V1',delay=0.5,connection_type=CFProjection,name='R1toV1')
         s.connect('Retina','V2',delay=0.5,connection_type=CFProjection,name='R1toV2')
         s.connect('Retina2','V2',delay=0.5,connection_type=CFProjection,name='R2toV2')

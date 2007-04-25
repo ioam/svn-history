@@ -155,10 +155,9 @@ import unittest
 from topo.base.simulation import Simulation
 from topo.plotting.plotgroup import TemplatePlotGroup, ConnectionFieldsPlotGroup
 from topo.plotting.templates import plotgroup_templates
-from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
 from topo.learningfns.som import CFPLF_HebbianSOM
-from topo.base.cf import CFProjection
+from topo.base.cf import CFProjection, CFSheet
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.base.patterngenerator import BoundingBox
 
@@ -172,11 +171,11 @@ from topo.base.patterngenerator import BoundingBox
 
 #           self.sim = Simulation()
 
-#           CFSOM.nominal_density = 10
+#           CFSheet.nominal_density = 10
           
-#           V1 = CFSOM(name='V1')
-#           V2 = CFSOM(name='V2')
-#           V3 = CFSOM(name='V3')
+#           V1 = CFSheet(name='V1')
+#           V2 = CFSheet(name='V2')
+#           V3 = CFSheet(name='V3')
 
 #           CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 #           CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))

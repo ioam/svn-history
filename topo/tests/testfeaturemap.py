@@ -22,8 +22,7 @@ from topo.base.boundingregion import BoundingBox
 
 # for making a simulation:
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.cf import CFProjection
-from topo.sheets.cfsom import CFSOM
+from topo.base.cf import CFProjection, CFSheet
 from topo.base.simulation import Simulation
 from topo.learningfns.som import CFPLF_HebbianSOM
 
@@ -191,12 +190,12 @@ class TestFeatureMaps(unittest.TestCase):
 
     def setUp(self):
         """
-        Create a CFSOM sheet ('V1') connected to a GeneratorSheet ('Retina').
+        Create a CFSheet ('V1') connected to a GeneratorSheet ('Retina').
         """
         self.s = Simulation()
         self.s['Retina']=GeneratorSheet(nominal_density=4.0)
-        self.s['V1']= CFSOM(nominal_density=4.0)
-        self.s['V2'] = CFSOM(nominal_density=4.0)
+        self.s['V1']= CFSheet(nominal_density=4.0)
+        self.s['V2'] = CFSheet(nominal_density=4.0)
 
         self.s.connect('Retina','V1',delay=0.5,connection_type=CFProjection,
                        name='RtoV1',learning_fn=CFPLF_HebbianSOM())
