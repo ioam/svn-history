@@ -201,7 +201,7 @@ sf-web-site: reference-manual doc
 #@@distclean: FORCE clean
 #@@	   ${RM} .#* */.#* */*/.#* */*~ .cvsignore ChangeLog.txt */.cvsignore */*/.cvsignore */*/*/.cvsignore
 #@@	   ${RM} etc/topographica.elc ImageSaver*.ppm countalerts* annotate.out emacslog
-#@@	   ${RM} current_profile testsnapshot.typ script ./topo/tests/*.ty_*DATA
+#@@	   ${RM} current_profile testsnapshot.typ script ./topo/tests/*.ty_*DATA timing*
 #@@	   ${RM} examples/disparity_energy.ty
 #@@	   ${RM} examples/face_space.ty
 #@@	   ${RM} examples/goodhill_network90.ty
