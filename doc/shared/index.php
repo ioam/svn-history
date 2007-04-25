@@ -106,7 +106,7 @@
 </table>
 </center>
 
-<P>Binaries will be available soon; in the meantime; this release 
+<P>Binaries will be available soon; in the meantime, this release 
 is available via <A HREF="../Downloads/cvs.html">cvs</a>.
   
 <p><A target="_top" href="../Home/oldnews.html"><i>Older news</i></A>
