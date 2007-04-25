@@ -3,7 +3,7 @@ below, a large number of changes and new features are scheduled over
 the next few months, as well as over the next few years.  Our current
 <a href="current.html">lower-level list of tasks</a> is kept separately.
 
-<H2>Most urgent (Winter 2006/2007):</H2>
+<H2>Most urgent (Summer 2007):</H2>
 <DL COMPACT>
 <DT>ALERTs</DT><DD>
 There are a large number of relatively small problems noted in the
