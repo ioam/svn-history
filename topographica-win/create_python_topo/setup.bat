@@ -84,6 +84,10 @@ cd Gnosis_Utils-1.2.1\
 c:\python24\python.exe setup.py install
 cd ..
 
+REM * psyco
+start /w psyco-1.5.2.win32-py2.4.exe
+
+
 REM REM * ctypes
 REM start /w ctypes-1.0.1.win32-py2.4.exe
 REM 
