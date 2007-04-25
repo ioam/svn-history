@@ -197,7 +197,7 @@ subplot from Activity plots using:
 
 
 <P>You can also put lines like these into
-<a href="commandline.html#toporc">$HOME/.topographicarc</a>, if you find
+<a href="commandline.html#toporc">~/.topographicarc</a>, if you find
 that you always want different defaults than Topographica's, for all
 scripts that you run.
 

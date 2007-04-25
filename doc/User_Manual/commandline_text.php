@@ -178,7 +178,7 @@ that do not support them will display them as unrecognizable symbols.
 
 <P>If you have any commands that you want to be executed whenever you
 start Topographica, you can put them into the file
-'$HOME/.topographicarc', if the HOME directory can be found and the
+'~/.topographicarc', if your home directory can be found and the
 file exists.  For instance, to use the ANSI colors every time, just
 create that file and add these lines to it:
 
