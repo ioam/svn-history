@@ -155,16 +155,45 @@ def process_argv(argv):
     for (k,v) in global_constants.items():
         exec '%s = %s' % (k,v) in __main__.__dict__
 
-    # exec a .topographicarc file if one can be found
+    ### exec one or more (possibly platform-specific) startup files 
+    home = os.path.expanduser("~")  # dotfiles on unix
+    appdata = os.path.expandvars("$APPDATA") # application data on windows
+    appsupport = os.path.join(home,"Library","Application Support") # application support on OS X  
+
+    rcpath = os.path.join(home,'.topographicarc')
+    inipath = os.path.join(appdata,'Topographica','topographica.ini')
+    configpath = os.path.join(appsupport,'Topographica','topographica.config')
+
+    for startup_file in (rcpath,configpath,inipath):
+        if os.path.exists(startup_file):
+            # CEBALERT: print a note that commands in a file are being executed?
+            execfile(startup_file,__main__.__dict__)
+
+
+    ### Notes about choices for topographica.rc equivalents on different platforms
     #
-    # JPALERT: This is all very unix-y.  We could try to do the right
-    # thing on each platform.  I.e. put prefs/startup files in $HOME/Library
-    # on the Mac, and wherever it goes on Windows.
-    homedir = os.path.expanduser("~") # works on OS X, linux, windows
-    if homedir:
-        rcpath = os.path.join(homedir,'.topographicarc')
-        if os.path.exists(rcpath):
-            execfile(rcpath,__main__.__dict__)
+    ## Windows:
+    # Location --  Most programs use the registry or a folder in %appdata% (which is typically
+    #  ~\Application Data). The registry is not easily accessible for users, and %appdata% is
+    # a hidden folder, which means it doesn't appear in Explorer (or file-open dialogs).
+    # Most programs do not have any user-editable configuration files, so this does not matter
+    # to them. Maybe we should just use ~\topographica.ini?
+    # 
+    # Name -- Considered topographica.rc, topographica.dat, topographica.cfg, topographica.ini.
+    #  Of those, only .ini is registered as standard in Windows. According to Winows Explorer:
+    #  "Files with extension 'INI' are of type 'Configuration Settings'"
+    #  Importantly, this means they are already setup to be editable by notepad by default, so
+    #  they can be double clicked.
+    #
+    # http://mail.python.org/pipermail/python-list/2005-September/341702.html
+    #
+    ## OS X:
+    # Location -- Seems like programs use either ~/Library/AppName or (more commonly)
+    # ~/Library/Application Support/AppName (CEBALERT: is there a var. for that on OS X?).
+    # 
+    # Name -- there are many different extensions (e.g. dat, config, cfg, ini), none of which
+    # opens with any application by default. Some applications use xml.
+
 
     # Provide an interactive prompt unless running in batch mode
     if option.interactive or option.gui:
