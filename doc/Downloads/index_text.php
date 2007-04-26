@@ -121,11 +121,12 @@ optimized components used in that example.  (Some components,
 generally those with <code>_opt</code> in their names, use code
 written in C++ internally for speed, and this code must be compiled.)
 The compiled versions are stored in <code>~/.python24_compiled/</code>
-on most systems (or in the system temporary directory on Windows), and
-they will be reused on the next run unless the source files have
-changed.  Thus you should only notice such pauses the first time you
-use a particular component, at which time you may also notice various
-inscrutable messages from the compiler (which may generally be ignored).
+on most systems (or in the temporary directory
+<code>%TEMP%\%USERNAME%</code> on Windows), and they will be reused on
+the next run unless the source files have changed.  Thus you should
+only notice such pauses the first time you use a particular component,
+at which time you may also notice various inscrutable messages from
+the compiler (which may generally be ignored).
 
 <P>In any case, a good way to get started with these examples is to
 work through  
