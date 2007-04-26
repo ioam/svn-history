@@ -9,6 +9,10 @@ Requires homeostatic plasticity -- otherwise the map still jumps
 around a lot at the start of learning, yet some neurons still fail to
 organize.
 
+The number of input patterns and type of V1 output function can be specified
+at the command line using e.g.
+-c 'num_inputs=3' and -c 'Outputfn_type='Homeostatic_debug''
+
 $Id$
 """
 __version__='$Revision$'
@@ -34,12 +38,14 @@ from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear,DivisiveNormalizeL1, Pipeline
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
-from topo.outputfns.homeostatic import HomeostaticMaxEnt, OutputFnDebugger
+from topo.outputfns.homeostatic import HomeostaticMaxEnt, AdaptingHomeostaticMaxEnt, OutputFnDebugger
 from topo.patterns.basic import Gaussian
 
-topo.sim.name = "lissom_oo_or_noshrinking"
-    
-num_inputs=2
+
+num_inputs=locals().get('num_inputs',2)
+
+topo.sim.name = "lissom_oo_or_noshrinking"+str(num_inputs)
+
 input_type=topo.patterns.basic.Gaussian
 inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),
                    y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i)),
@@ -58,12 +64,35 @@ CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
-#Output Functions, if want to print debugging info during simulation use Debug, otherwise use HE
-HE = HomeostaticMaxEnt(a_init=14.5, b_init=-4, eta=0.0002, mu=0.01, smoothing=0.0003)
+Outputfn_type=locals().get('Outputfn_type','Homeostatic')
 
-ODH=OutputFnDebugger(function=HE, debug_params=["a", "b","y_avg"], units=[(0,0),(11,11),(23,23)])
 
-Debug=Pipeline(output_fns=[HE, ODH])
+if Outputfn_type == 'Homeostatic':
+    topo.sim.name = "lissom_oo_or_noshrinking"
+    output_fn = HomeostaticMaxEnt(a_init=14.5, b_init=-4, eta=0.0002, mu=0.01, smoothing=0.0003) 
+
+elif Outputfn_type == 'AdaptingHomeostatic':
+
+    topo.sim.name = "lissom_oo_or_noshrinking_adapthomeo"
+    output_fn =AdaptingHomeostaticMaxEnt(a_init=14.5, b_init=-4, eta_init=0.0002, mu=0.01, lstep=8, rate_factor=0.1,smoothing=0.0003)
+
+elif Outputfn_type == "Homeostatic_debug":
+
+    topo.sim.name = "lissom_oo_or_noshrinking_debug"
+    HE=HomeostaticMaxEnt(a_init=14.5, b_init=-4, eta=0.0002, mu=0.01, smoothing=0.0003)
+    OD=OutputFnDebugger(function=HE, debug_params=["a", "b", "y_avg"] , units=[(0,0),(11,11),(23,23)])
+    output_fn=Pipeline(output_fns=[HE, OD])
+
+elif Outputfn_type == 'AdaptingHomeostatic_debug':
+
+    topo.sim.name = "lissom_oo_or_noshrinking_adapthomeo_debug"
+    AH = AdaptingHomeostaticMaxEnt(a_init=14.5, b_init=-4, eta_init=0.0002, mu=0.01, lstep=8, rate_factor=0.1,smoothing=0.0003)
+    OD=OutputFnDebugger(function=AH, debug_params=["a", "b","eta","y_avg"], units=[(0,0),(11,11),(23,23)])
+    output_fn=Pipeline(output_fns=[AH, OD])
+
+
+
+    
 ###########################################
 # build simulation
 
@@ -84,7 +113,7 @@ topo.sim['LGNOff']=CFSheet(nominal_density=24.0,
 
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
                         nominal_bounds=BoundingBox(radius=0.5),tsettle=9,
-                        output_fn=HE)
+                        output_fn=output_fn)
 
 # DoG weights for the LGN
 centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
@@ -108,25 +137,26 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
                  nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                  weights_generator=off_weights)
 
-
 topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=1.0,name='LGNOnAfferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
-                                                                             topo.patterns.random.UniformRandom()]),
-                  nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
-                                                                                                 ExponentialDecay(starting_value = locals().get('LGNOnafferent_lr',0.9590/2),
-                                                                                                                  time_constant=3200/num_inputs)))))
+                     generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
+                                topo.patterns.random.UniformRandom()]),
+                 nominal_bounds_template=BoundingBox(radius=0.27083),
+                 learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
+                               ExponentialDecay(starting_value = locals().get('LGNOnafferent_lr',0.9590/2),
+                                                time_constant=3200/num_inputs)))))
 
 
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=1.0,name='LGNOffAfferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
-                                                                             topo.patterns.random.UniformRandom()]),
-                  nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
-                                                                                                 ExponentialDecay(starting_value = locals().get('LGNOffafferent_lr',0.9590/2),
-                                                                                                                  time_constant=3200/num_inputs)))))
+                     generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
+                                topo.patterns.random.UniformRandom()]),
+                 nominal_bounds_template=BoundingBox(radius=0.27083),
+                 learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
+                               ExponentialDecay(starting_value = locals().get('LGNOffafferent_lr',0.9590/2),
+                                                time_constant=3200/num_inputs)))))
 
 
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
@@ -137,8 +167,8 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                  connection_type=CFProjection,strength=-0.9,
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
-                                                                             topo.patterns.random.UniformRandom()]),
+                     generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
+                                topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.8087)
 
 
