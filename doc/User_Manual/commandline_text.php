@@ -177,10 +177,15 @@ that do not support them will display them as unrecognizable symbols.
 <H2><A name="toporc">Site-specific customizations</A></H2>
 
 <P>If you have any commands that you want to be executed whenever you
-start Topographica, you can put them into the file
-'~/.topographicarc', if your home directory can be found and the
-file exists.  For instance, to use the ANSI colors every time, just
-create that file and add these lines to it:
+start Topographica, you can put them into a user configuration file.
+Topographica will run the following files in order:
+'~/.topographicarc' (typically for UNIX/Linux systems),
+'~/Library/Application Support/Topographica/topographica.config'
+(typically for Mac OS X systems), and
+'%APPDATA%\Topographica\topographica.ini' (on Windows).
+
+<P>For instance, to use the ANSI colors every time, just create
+one of the files above and add these lines to it:
 
 <pre>
 from topo.misc.commandline import CommandPrompt
