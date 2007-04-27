@@ -106,6 +106,10 @@
 </table>
 </center>
 
+<P>Screenshots: 
+<A target="_top" href="../images/topographica-0.9.3_ubuntu.png">Plotting</A>, 
+<A target="_top" href="../images/topographica-0.9.3_modeleditor_ubuntu.png">Model editor</A>.
+
 <p><A target="_top" href="../Home/oldnews.html"><i>Older news</i></A>
 </i>
 
