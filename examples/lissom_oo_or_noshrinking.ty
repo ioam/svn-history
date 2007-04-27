@@ -43,8 +43,11 @@ from topo.patterns.basic import Gaussian
 
 
 num_inputs=locals().get('num_inputs',2)
+output_fn_type=locals().get('output_fn_type','Homeostatic')
 
-topo.sim.name = "lissom_oo_or_noshrinking"+str(num_inputs)
+
+shared_params = {"a_init":14.5, "b_init":-4, "mu":0.01, "smoothing":0.0003}
+shared_debug_params = {"debug_params":["a", "b", "y_avg"] , "units":[(0,0),(11,11),(23,23)]}
 
 input_type=topo.patterns.basic.Gaussian
 inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),
@@ -64,30 +67,27 @@ CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
-Outputfn_type=locals().get('Outputfn_type','Homeostatic')
-
-
-if Outputfn_type == 'Homeostatic':
+if output_fn_type  == 'Homeostatic':
     topo.sim.name = "lissom_oo_or_noshrinking"
-    output_fn = HomeostaticMaxEnt(a_init=14.5, b_init=-4, eta=0.0002, mu=0.01, smoothing=0.0003) 
+    output_fn = HomeostaticMaxEnt(eta=0.0002, **shared_params) 
 
-elif Outputfn_type == 'AdaptingHomeostatic':
+elif output_fn_type == 'AdaptingHomeostatic':
 
     topo.sim.name = "lissom_oo_or_noshrinking_adapthomeo"
-    output_fn =AdaptingHomeostaticMaxEnt(a_init=14.5, b_init=-4, eta_init=0.0002, mu=0.01, lstep=8, rate_factor=0.1,smoothing=0.0003)
+    output_fn =AdaptingHomeostaticMaxEnt(eta_init=0.0002, lstep=8, rate_factor=0.1, **shared_params)
 
-elif Outputfn_type == "Homeostatic_debug":
+elif output_fn_type == "Homeostatic_debug":
 
     topo.sim.name = "lissom_oo_or_noshrinking_debug"
-    HE=HomeostaticMaxEnt(a_init=14.5, b_init=-4, eta=0.0002, mu=0.01, smoothing=0.0003)
-    OD=OutputFnDebugger(function=HE, debug_params=["a", "b", "y_avg"] , units=[(0,0),(11,11),(23,23)])
+    HE=HomeostaticMaxEnt(eta=0.0002, **shared_params )
+    OD=OutputFnDebugger(function=HE, **shared_debug_params)
     output_fn=Pipeline(output_fns=[HE, OD])
 
-elif Outputfn_type == 'AdaptingHomeostatic_debug':
+elif output_fn_type == 'AdaptingHomeostatic_debug':
 
     topo.sim.name = "lissom_oo_or_noshrinking_adapthomeo_debug"
-    AH = AdaptingHomeostaticMaxEnt(a_init=14.5, b_init=-4, eta_init=0.0002, mu=0.01, lstep=8, rate_factor=0.1,smoothing=0.0003)
-    OD=OutputFnDebugger(function=AH, debug_params=["a", "b","eta","y_avg"], units=[(0,0),(11,11),(23,23)])
+    AH = AdaptingHomeostaticMaxEnt(eta_init=0.0002,lstep=8, rate_factor=0.1,**shared_params)
+    OD=OutputFnDebugger(function=AH, **shared_debug_params)
     output_fn=Pipeline(output_fns=[AH, OD])
 
 
