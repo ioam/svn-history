@@ -22,7 +22,7 @@ from templateplotgrouppanel import TemplatePlotGroupPanel
 from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import ConnectionFieldsPlotGroup
 from topo.base.sheet import Sheet
-import topoconsole
+
 import topo.base.cf
 
 from topo.commands.analysis import *
