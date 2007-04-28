@@ -617,17 +617,10 @@ class TopoConsole(TkguiWindow):
             topo.commands.basic.save_script_repr(script_name)
             self.messageBar.message('state', 'Script saved to ' + script_name)
             
-            
-    # CEBALERT:
-    # save_ and load_snapshot() and load_network() ought to close open windows such
-    # as Activity.  Currently it just refreshes the windows, but that could get
-    # confusing.
     
     def load_snapshot(self):
         """
-        Return the current network to the state of the chosen snapshot.
-
-        See topo.commands.basic.load_snapshot().
+        Dialog to load a user-selected snapshot (see topo.commands.basic.load_snapshot() ).
         """
         snapshot_name = tkFileDialog.askopenfilename(filetypes=SAVED_FILETYPES)
 
@@ -642,10 +635,9 @@ class TopoConsole(TkguiWindow):
 
     def save_snapshot(self):
         """
-        Save a snapshot of the current network's state.
-
-        See topo.commands.basic.save_snapshot().
-        save_snapshot() here adds the file extension  if not already present.
+        Dialog to save a snapshot (see topo.commands.basic.save_snapshot() ).
+        
+        Adds the file extension .typ if not already present.
         """
         snapshot_name = tkFileDialog.asksaveasfilename(filetypes=SAVED_FILETYPES)
 
@@ -663,7 +655,6 @@ class TopoConsole(TkguiWindow):
 	self.messageBar.message('state', 'Reset not yet implemented')
 
 
-    # auto-refresh handling
     def auto_refresh(self):
         """
         Refresh all windows in auto_refresh_panels.
@@ -691,14 +682,12 @@ class TopoConsole(TkguiWindow):
                 self.update_idletasks()
 
 
-    # open the model editor window
-    def open_model_editor(self) :
+    def open_model_editor(self):
+        """Start the Model editor."""
 	ModelEditor()
 
 
 
-    #
-    # New plot windows
     # JABALERT: Shouldn't this be named open_test_pattern_window?
     def open_plot_params_window(self):
         """
