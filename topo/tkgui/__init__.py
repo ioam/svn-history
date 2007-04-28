@@ -12,7 +12,8 @@ __version__='$Revision$'
 
 import Pmw, sys, Tkinter, platform
 import topo.base.parameterizedobject
-import topoconsole
+
+from topoconsole import TopoConsole
 
 #### notes about tkgui ####
 #
@@ -138,7 +139,7 @@ def start(mainloop=False):
     root.withdraw()
     Pmw.initialise(root)
     
-    console = topoconsole.TopoConsole()
+    console = TopoConsole()
     
     # This alows context menus to work on the Mac.  Widget code should bind
     # contextual menus to the virtual event <<right-click>>, not
@@ -153,7 +154,6 @@ def start(mainloop=False):
         console.mainloop()
 
     return console
-
 
 
 
