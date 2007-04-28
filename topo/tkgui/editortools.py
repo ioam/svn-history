@@ -8,7 +8,6 @@ __version__='$Revision$'
 
 from Tkinter import Frame, Button, Label, Canvas, TOP, X, GROOVE, RAISED, BOTTOM, Toplevel
 import Pmw
-import tkFont
 
 import topo.sheets
 from topo.sheets import *
