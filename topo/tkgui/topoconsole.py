@@ -180,13 +180,13 @@ class PlotsMenuEntry(ParameterizedObject):
 
 
 
-class TopoConsole(Tkinter.Tk):
+class TopoConsole(Tkinter.Toplevel):
     """
     Main window for the Tk-based GUI.
     """
     def __init__(self,**config):
 
-        Tkinter.Tk.__init__(self,**config)
+        Tkinter.Toplevel.__init__(self,**config)
         #super(TopoConsole,self).__init__(**config)
     
         self.num_activity_windows = 0

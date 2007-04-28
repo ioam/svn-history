@@ -74,15 +74,15 @@ from topo.base.patterngenerator import PatternGeneratorParameter
 #
 # If you are programming tkgui and need to do something special
 # for some other platform (or to further distinguish the above
-# platforms, please modify this code.
+# platforms), please modify this code.
 #
-# (Right now tkgui only needs to detect if the platform is linux (do I
+# Right now tkgui only needs to detect if the platform is linux (do I
 # mean any kind of non-OS X unix*?) or mac, because there is some
 # special-purpose code for both those two: the mac code below, and the
 # menu-activating code in topoconsole.  We might have some Windows-
 # specific code for the window icons later on, too.
-# * actually it's the window manager that's important, right?)
-# Does tkinter give any useful information?
+# * actually it's the window manager that's important, right?
+# Does tkinter/tk itself give any useful information?
 # What about root.tk.call("tk","windowingsystem")?
 system_platform = 'unknown'
 if platform.system()=='Linux':
@@ -128,9 +128,18 @@ def start(mainloop=False):
     is open.  If False, then commands can be entered at the command-line
     even while the GUI is operational.  Default is False.
     """
-    console = topoconsole.TopoConsole()
-    Pmw.initialise(console)
 
+    # Creating an initial Tk() instance and then withdrawing the
+    # window is a common technique. Instead of doing this, having
+    # TopoConsole itself be a subclass of Tk would make sense - since
+    # it is the main application window - but then we could not have a
+    # hierarchy in which all windows are given some common properties.
+    root = Tkinter.Tk()
+    root.withdraw()
+    Pmw.initialise(root)
+    
+    console = topoconsole.TopoConsole()
+    
     # This alows context menus to work on the Mac.  Widget code should bind
     # contextual menus to the virtual event <<right-click>>, not
     # <Button-3>.
