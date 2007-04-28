@@ -179,14 +179,24 @@ class PlotsMenuEntry(ParameterizedObject):
 # share, too. (See current task list.)
 
 
+class TkguiWindow(Tkinter.Toplevel):
+    """
+    The standard tkgui window (the parent of most other tkgui windows).
 
-class TopoConsole(Tkinter.Toplevel):
+    Defines attributes common to tkgui windows.
+    """
+    def __init__(self,**config):
+        Tkinter.Toplevel.__init__(self,**config)
+
+
+
+class TopoConsole(TkguiWindow):
     """
     Main window for the Tk-based GUI.
     """
     def __init__(self,**config):
 
-        Tkinter.Toplevel.__init__(self,**config)
+        TkguiWindow.__init__(self,**config)
         #super(TopoConsole,self).__init__(**config)
     
         self.num_activity_windows = 0
