@@ -5,28 +5,33 @@ $Id$
 """
 __version__='$Revision$'
 
+
+import os
+import sys
+import traceback
+import __main__
+import code
+import StringIO
+import time
+import webbrowser
 from math import fmod,floor
+from inspect import getdoc
+
 import Tkinter
 from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, Button, \
      LEFT, RIGHT, YES, NO, BOTH, Label, Text, END, DISABLED, NORMAL, Scrollbar, Y
 import tkMessageBox
-from tkFileDialog import asksaveasfilename
-import Pmw, os, sys, traceback, __main__
-import StringIO
 import tkFileDialog
-import time
-import webbrowser
-from inspect import getdoc
-import code
+import Pmw
 
 import topo
-import topo.commands.basic
-from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
-import topo.base.simulation
-
-import topo.tkgui
 from topo.misc.keyedlist import KeyedList
 from topo.base.parameterizedobject import ParameterizedObject
+import topo.base.simulation
+import topo.commands.basic
+from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
+
+import topo.tkgui 
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from connectionfieldspanel import ConnectionFieldsPanel
 from projectionactivitypanel import ProjectionActivityPanel
@@ -36,8 +41,10 @@ from testpattern import TestPattern
 from editorwindow import ModelEditor
 from translatorwidgets import TaggedSlider
 
-SCRIPT_FILETYPES = [('Topographica scripts','*.ty'),('Python scripts','*.py'),('All files','*')]
 
+
+
+SCRIPT_FILETYPES = [('Topographica scripts','*.ty'),('Python scripts','*.py'),('All files','*')]
 SAVED_FILE_EXTENSION = '.typ'
 SAVED_FILETYPES = [('Topographica saved networks','*'+SAVED_FILE_EXTENSION),('All files','*')]
 
@@ -585,10 +592,7 @@ class TopoConsole(TkguiWindow):
             sys.exit()
 
 
-    # CEBALERT: the way this works might be a surprise, because previously
-    # defined things stay around. E.g. load hierarchical.ty, then lissom_or.ty.
-    # Because the BoundingBox is set for GeneratorSheet in hierarchical.ty but
-    # not lissom_or.ty, LISSOM is loaded with a rectangular retina.
+    # CEBALERT: change name to run_script
     def load_network(self):
         """
         Load a script file from disk and evaluate it.  The file is evaluated
@@ -607,9 +611,9 @@ class TopoConsole(TkguiWindow):
         
 
     def save_script_repr(self):
-        script_name = asksaveasfilename(filetypes=SCRIPT_FILETYPES,initialfile=topo.sim.name+"_script_repr.ty")
+        script_name = tkFileDialog.asksaveasfilename(filetypes=SCRIPT_FILETYPES,initialfile=topo.sim.name+"_script_repr.ty")
         if script_name:
-            script_file = open(script_name,'w')
+            script_file = open(script_name,'w') # CEBALERT: presumably stray, and should be removed
             topo.commands.basic.save_script_repr(script_name)
             self.messageBar.message('state', 'Script saved to ' + script_name)
             
