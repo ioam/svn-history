@@ -252,8 +252,9 @@ class TaggedSlider(Frame,WidgetTranslator):
 
         self.__set_slider_value(val)
 
-        
+
     def __get_slider_value(self):
+        # CEBALERT: range is an inbuilt function!
         range = self.__max_value - self.__min_value
         return self.__min_value + (self.__slider_val.get()/10000.0 * range)
     

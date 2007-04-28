@@ -129,7 +129,7 @@ class PlotGroupTemplate(ParameterizedObject):
     # describing each plot (for hovering help text) within each
     # plot template.
     def add_plot(self,name,specification_tuple_list):
-	dict={}
+	dict={}  # CEBALERT: dict is a type!
 	for key,value in specification_tuple_list:
 	    dict[key]=value
 	self.plot_templates.append((name,dict))
