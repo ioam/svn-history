@@ -27,7 +27,7 @@ from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import FeatureCurvePlotGroup
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
-import topoconsole
+
 
 
 class FeatureCurvePanel(BasicPlotGroupPanel):
