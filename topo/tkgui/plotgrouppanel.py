@@ -43,6 +43,8 @@ BORDERWIDTH = 1
 CANVASBUFFER = 1
 
 
+# CEBALERT: this should be a TkguiWindow, but that class will not import
+# from topoconsole. There is something like a circular problem somewhere!
 class BasicPlotGroupPanel(Toplevel,ParameterizedObject):
     """
     Abstract BasicPlotGroupPanel class for displaying plots to a TK
