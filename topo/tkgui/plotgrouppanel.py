@@ -30,8 +30,7 @@ from topo.base.sheet import Sheet
 from topo.plotting.templates import plotgroup_templates # is this used?
 from topo.plotting.plotgroup import PlotGroup,identity
 
-from Tkinter import Toplevel
-
+from tkguiwindow import TkguiWindow
 
 BORDERWIDTH = 1
 
@@ -43,9 +42,7 @@ BORDERWIDTH = 1
 CANVASBUFFER = 1
 
 
-# CEBALERT: this should be a TkguiWindow, but that class will not import
-# from topoconsole. There is something like a circular problem somewhere!
-class BasicPlotGroupPanel(Toplevel,ParameterizedObject):
+class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
     """
     Abstract BasicPlotGroupPanel class for displaying plots to a TK
     GUI window. Implements only basic buttons required. 
@@ -78,7 +75,7 @@ class BasicPlotGroupPanel(Toplevel,ParameterizedObject):
         console: is the associated console, (i.e. the TopoConsole that has this panel)
         name: name associated with the panel
 	"""
-        Toplevel.__init__(self)
+        TkguiWindow.__init__(self)
         ParameterizedObject.__init__(self,**params)
 
 	self.console = console
