@@ -32,6 +32,7 @@ import topo.commands.basic
 from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
 
 import topo.tkgui 
+from tkguiwindow import TkguiWindow
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from connectionfieldspanel import ConnectionFieldsPanel
 from projectionactivitypanel import ProjectionActivityPanel
@@ -49,10 +50,11 @@ SAVED_FILE_EXTENSION = '.typ'
 SAVED_FILETYPES = [('Topographica saved networks','*'+SAVED_FILE_EXTENSION),('All files','*')]
 
 
+# Location of topographica main directory
+topo_dir = os.path.split(os.path.split(sys.executable)[0])[0]
 
 # Documentation locations: locally built and web urls.
 # CEBALERT: is it appropriate to use Filename parameter here in some way?
-topo_dir = os.path.split(os.path.split(sys.executable)[0])[0]
 user_manual_locations      = (os.path.join(topo_dir,'doc/User_Manual/index.html'),'http://topographica.org/User_Manual/')
 tutorials_locations        = (os.path.join(topo_dir,'doc/Tutorials/index.html'),'http://topographica.org/Tutorials/')
 reference_manual_locations = (os.path.join(topo_dir,'doc/Reference_Manual/index.html'),'http://topographica.org/Reference_Manual/')
@@ -179,24 +181,6 @@ class PlotsMenuEntry(ParameterizedObject):
 
 
 
-# CEBALERT: once we have figured out how to get topoconsole's window
-# icon right (as well as the "iconified" icon, if necessary) we should
-# consider how to give all topographica windows these
-# attributes. There are probably other things we want the windows to
-# share, too. (See current task list.)
-
-
-class TkguiWindow(Tkinter.Toplevel):
-    """
-    The standard tkgui window (the parent of most other tkgui windows).
-
-    Defines attributes common to tkgui windows.
-    """
-    def __init__(self,**config):
-        Tkinter.Toplevel.__init__(self,**config)
-
-
-
 class TopoConsole(TkguiWindow):
     """
     Main window for the Tk-based GUI.
@@ -215,19 +199,7 @@ class TopoConsole(TkguiWindow):
         self.input_params_window = None
         self.auto_refresh_panels = []
         self._init_widgets()
-        
-        ### Window icon
-        if topo.tkgui.system_platform is 'mac':
-            # CB: To get a proper icon on OS X, we probably have to bundle into an application
-            # package or something like that.
-            pass # (don't know anything about the file format required)
-            # self.attributes("-titlepath","/Users/vanessa/topographica/AppIcon.icns")
-        else:
-            # CB: It may be possible for the icon be in color (using
-            # e.g. topo/tkgui/topo.xpm), see http://www.thescripts.com/forum/thread43119.html
-            # or http://mail.python.org/pipermail/python-list/2005-March/314585.html
-            self.iconbitmap('@'+(os.path.join(topo_dir,'topo/tkgui/topo.xbm')))
-        
+                
         
         self.title("Topographica Console")
 
@@ -239,7 +211,6 @@ class TopoConsole(TkguiWindow):
 
         # catch click on the 'x': offers choice to quit or not
         self.protocol("WM_DELETE_WINDOW",self.quit)
-
 
         
         ##########
