@@ -6,31 +6,31 @@ $Id$
 """
 __version__='$Revision$'
 
-
 import fixedpoint
 import copy
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
 import numpy
+import topo
 
 import topo.patterns.basic
 import topo.patterns.random
 
+from topo.base.sheet import activity_type
+from numpy import exp,zeros,ones
 from topo.base.arrayutils import clip_in_place
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFPLearningFn,LearningFnParameter
 from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 from topo.base.cf import CFSheet, CFPOF_Plugin
-from topo.base.functionfamilies import LearningFn
-from topo.base.functionfamilies import OutputFn
-from topo.base.parameterclasses import DynamicNumber, Number
+from topo.base.functionfamilies import LearningFn, OutputFn, OutputFnParameter, IdentityOF
+from topo.base.parameterclasses import DynamicNumber, Number, BooleanParameter, ListParameter
 from topo.learningfns.basic import Hebbian
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.learningfns.projfns import HomeoSynaptic
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
-from topo.outputfns.homeostatic import PiecewiseLinear_debug2
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.patterns.basic import Disk
 from topo.projections.basic import CFProjection
@@ -38,6 +38,43 @@ from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.sheets.lissom import LISSOM
 
+class PiecewiseLinear_debug2(OutputFn):
+    """
+    Same as PiecewiseLinear, but computes average activities for use
+    in validating homeostatic plasticity mechanisms.    
+    """
+    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
+    upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
+    learn_step = Number(default=8,doc="Number of step before learning take place")
+
+    def __init__(self,**params):
+        super(PiecewiseLinear_debug2,self).__init__(**params)
+
+	self.first_call = True
+	self.n_step = 0
+	self.beta = 0.0003
+	self.ncall = 0
+
+    def __call__(self,x):
+        fact = 1.0/(self.upper_bound-self.lower_bound)        
+        x -= self.lower_bound
+        x *= fact
+        clip_in_place(x,0.0,1.0)
+
+	if self.first_call:
+	    self.first_call = False
+	    self.x_avg = zeros(x.shape,x.dtype.char)
+	    self.x_hist = []
+	else:
+	    if self.ncall <= 1000:
+	    	self.x_avg = ((self.x_avg*self.ncall) + x) / (self.ncall+1)
+	    	self.ncall += 1
+	    else:	    
+	    	self.x_avg = self.beta*x + (1.0-self.beta)*self.x_avg
+	self.n_step += 1
+	if self.n_step == self.learn_step:
+	    self.n_step = 0
+            
 topo.sim.name = "lissom_or_homeoscale"
 
 input_pattern = topo.patterns.basic.Gaussian(
