@@ -25,9 +25,9 @@ $Id$
 """
 __version__='$Revision$'
 
-
-import fixedpoint
 import numpy
+import copy
+import topo
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
@@ -35,6 +35,12 @@ from fixedpoint import FixedPoint
 import topo.patterns.basic
 import topo.patterns.random
 
+from topo.base.arrayutils import clip_in_place
+from topo.base.functionfamilies import OutputFn, OutputFnParameter, IdentityOF
+from topo.base.parameterclasses import Number, BooleanParameter, ListParameter
+from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.sheet import activity_type
+from numpy import exp,zeros,ones
 from topo.patterns.basic import Gaussian,Composite
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
@@ -47,13 +53,51 @@ from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
-from topo.outputfns.homeostatic import HomeostaticMaxEnt,PiecewiseLinear_debug
+from topo.outputfns.homeostatic import HomeostaticMaxEnt
 from topo.coordmapperfns.basic import ConstantMapper
 from topo.patterns.image import Image, FaceSpace2Dfromfile
+
+class PiecewiseLinear_debug(OutputFn):
+    """
+    Same as PiecewiseLinear, but computes average activities for use
+    in validating homeostatic plasticity mechanisms.
+    Also calculates average activity as useful debugging information
+    (for use with OutputFnDebugger).
+    """
+    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
+    upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
+    smoothing = Number(default=0.0003, doc="""
+       Determines the degree of weighting of current activity vs.
+       previous activity when calculating the average.""")
+
+    def __init__(self,**params):
+        super(PiecewiseLinear_debug,self).__init__(**params)
+	self.first_call = True
+	self.n_step = 0
+
+    def __call__(self,x):
+        x_orig = copy.copy(x)
+        fact = 1.0/(self.upper_bound-self.lower_bound)
+        x -= self.lower_bound
+        x *= fact
+        clip_in_place(x,0.0,1.0)
+
+	if self.first_call:
+	    self.first_call = False
+	    self.y_avg = zeros(x.shape,x.dtype.char)
+
+	self.n_step += 1
+	if self.n_step == self.lstep:
+
+	    self.n_step = 0
+	    	
+            self.y_avg = self.smoothing*x + (1.0-self.smoothing)*self.y_avg
+
 
 topo.sim.name = "face_space"
 
 GeneratorSheet.nominal_density = 48.0
+
 
 # Input patterns
 
