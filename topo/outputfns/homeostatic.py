@@ -151,113 +151,51 @@ class AdaptingHomeostaticMaxEnt(OutputFn):
             self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
             self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
 
-
-
-class PiecewiseLinear_debug(OutputFn):
-    """
-    Same as PiecewiseLinear, but computes average activities for use
-    in validating homeostatic plasticity mechanisms.
-    Also calculates average activity as useful debugging information
-    (for use with OutputFnDebugger).
-    """
-    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
-    upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
-    smoothing = Number(default=0.0003, doc="""
-       Determines the degree of weighting of current activity vs.
-       previous activity when calculating the average.""")
-
-    def __init__(self,**params):
-        super(PiecewiseLinear_debug,self).__init__(**params)
-	self.first_call = True
-	self.n_step = 0
-
-    def __call__(self,x):
-        x_orig = copy.copy(x)
-        fact = 1.0/(self.upper_bound-self.lower_bound)
-        x -= self.lower_bound
-        x *= fact
-        clip_in_place(x,0.0,1.0)
-
-	if self.first_call:
-	    self.first_call = False
-	    self.y_avg = zeros(x.shape,x.dtype.char)
-
-	self.n_step += 1
-	if self.n_step == self.lstep:
-
-	    self.n_step = 0
-	    	
-            self.y_avg = self.smoothing*x + (1.0-self.smoothing)*self.y_avg
-
-
-class PiecewiseLinear_debug2(OutputFn):
-    """
-    Same as PiecewiseLinear, but computes average activities for use
-    in validating homeostatic plasticity mechanisms.    
-    """
-    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
-    upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
-    learn_step = Number(default=8,doc="Number of step before learning take place")
-
-    def __init__(self,**params):
-        super(PiecewiseLinear_debug2,self).__init__(**params)
-
-	self.first_call = True
-	self.n_step = 0
-	self.beta = 0.0003
-	self.ncall = 0
-
-    def __call__(self,x):
-        fact = 1.0/(self.upper_bound-self.lower_bound)        
-        x -= self.lower_bound
-        x *= fact
-        clip_in_place(x,0.0,1.0)
-
-	if self.first_call:
-	    self.first_call = False
-	    self.x_avg = zeros(x.shape,x.dtype.char)
-	    self.x_hist = []
-	else:
-	    if self.ncall <= 1000:
-	    	self.x_avg = ((self.x_avg*self.ncall) + x) / (self.ncall+1)
-	    	self.ncall += 1
-	    else:	    
-	    	self.x_avg = self.beta*x + (1.0-self.beta)*self.x_avg
-	self.n_step += 1
-	if self.n_step == self.learn_step:
-	    self.n_step = 0
-	
-
 class OutputFnDebugger(OutputFn):
     """
     Collates information for debugging as specifed by the
     parameter_list. Should be called as eg.::
     
       HE = HomeostaticMaxEnt(a_init=14.5, b_init=-4, eta=0.0002, mu=0.01)
-      ODH=OutputFnDebugger(function=HE, debug_params=['a', 'b'], units=[(0,0),(11,11)])
+      ODH=OutputFnDebugger(function=HE, debug_params=['a', 'b'], avg_params=['x'], units=[(0,0),(11,11)])
       topo.sim['V1'].output_fn=Pipeline(output_fns=[HE, ODH])
     """
     
     function = OutputFnParameter(default=IdentityOF(), doc="""
-        Output function whose parameters will be tracked.""")
+    Output function whose parameters will be tracked.""")
     
     debug_params = ListParameter(default=[], doc="""
-        List of the function object's parameters that should be stored.""")
+    List of the function object's parameters that should be stored.""")
+    
+    avg_params = ListParameter(default=[], doc="""
+    List of the function object's parameters that should be averaged and stored.""")
     
     units= ListParameter(default=[], doc="""
-        Units for which parameter values are stored.""")
+    Units for which parameter values are stored.""")
     
-    step=Number(default=8, doc="How often to update debugging information.")
-    
+    step=Number(default=8, doc="How often to update debugging information and calculate averages")
+
+    smoothing = Number(default=0.0003, doc="""
+    Determines the degree of weighting of current vs previous values when calculating the average.""")
     
     def __init__(self,**params):
         super(OutputFnDebugger,self).__init__(**params)
         self.debug_dict={}
+        self.avg_dict={}
         self.n_step = 0
+        self.first_call = True
         for dp in self.debug_params:
             self.debug_dict[dp]= zeros([len(self.units),30000],activity_type)
+        for ap in self.avg_params:
+            self.avg_dict[ap]=zeros([len(self.units),30000],activity_type) 
+    
         
     def __call__(self,x):
+        if self.first_call:
+	    self.first_call = False
+            self.avg_values={}
+            for ap in self.avg_params:
+                self.avg_values[ap]=zeros(x.shape, x.dtype.char)
         self.n_step += 1
         if self.n_step == self.step:
             self.n_step = 0
@@ -266,9 +204,19 @@ class OutputFnDebugger(OutputFn):
                     value_matrix= getattr(self.function, dp)
                     value=value_matrix[u]
                     self.debug_dict[dp][self.units.index(u)][topo.sim.time()]=value
-                   
-     
-    def plot_debug_graphs(self,debug_params, unit_list, init_time, final_time):
+            for ap in self.avg_params:
+                for u in self.units:
+                    if ap=="x":
+                        self.avg_values[ap] = self.smoothing*x + (1.0-self.smoothing)*self.avg_values[ap]
+                        self.avg_dict[ap][self.units.index(u)][topo.sim.time()]=self.avg_values[ap][u]
+                    else:
+                        value_matrix= getattr(self.function, ap)
+                        self.avg_values[ap] = self.smoothing*value + (1.0-self.smoothing)*self.avg_values[ap]
+                        self.avg_dict[ap][self.units.index(u)][topo.sim.time()]=self.avg_values[ap][u]
+
+
+                         
+    def plot_debug_graphs(self,debug_params,avg_params, unit_list, init_time, final_time):
         """
         Plots parameter values this object has been storing over time.
 
@@ -276,7 +224,7 @@ class OutputFnDebugger(OutputFn):
 
           HE = HomeostaticMaxEnt(a_init=14.5, b_init=-4, eta=0.0002, mu=0.01)
           ...
-          OutputFnDebugger.plot_debug_graphs(['a', 'b', 'y_avg', 'eta'],[(0,0),(11,11)],1,10000)
+          OutputFnDebugger.plot_debug_graphs(['a', 'b','eta'],[x],[(0,0),(11,11)],1,10000)
           
         or, if you want to plot graphs for all stored values for all units::
         
@@ -288,25 +236,45 @@ class OutputFnDebugger(OutputFn):
 
         import pylab
         from topo.commands.pylabplots import vectorplot
-   
-        for db in debug_params:
+
+        for dp in debug_params:
             pylab.figure()
             isint=pylab.isinteractive()
             pylab.ioff()
             manager = pylab.get_current_fig_manager()
-            pylab.ylabel(db)
+            pylab.ylabel(dp)
             pylab.xlabel('Time')
-            manager.window.title(topo.sim.name+': '+db)
+            manager.window.title(topo.sim.name+': '+dp)
             
             for unit in unit_list:
                 index=self.units.index(unit)
-                plot_data=self.debug_dict[db][index][init_time:final_time]
+                plot_data=self.debug_dict[dp][index][init_time:final_time]
                 vectorplot(plot_data, label='Unit'+str(unit))
-                
             if isint: pylab.ion()
             pylab.legend(loc=0)
             pylab.show._needmain = False 
             pylab.show()
+
+        for ap in avg_params:
+            pylab.figure()
+            isint=pylab.isinteractive()
+            pylab.ioff()
+            manager = pylab.get_current_fig_manager()
+            pylab.ylabel(ap)
+            pylab.xlabel('Time')
+            manager.window.title(topo.sim.name+': '+ap)
+            
+            for unit in unit_list:
+                index=self.units.index(unit)
+                plot_data=self.avg_dict[ap][index][init_time:final_time]
+                vectorplot(plot_data, label='Unit'+str(unit))   
+
+            if isint: pylab.ion()
+            pylab.legend(loc=0)
+            pylab.show._needmain = False 
+            pylab.show()
+                       
+                              
                        
 
 
