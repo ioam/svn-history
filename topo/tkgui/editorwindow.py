@@ -6,7 +6,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Canvas, Frame, Checkbutton, Button, Toplevel, Menu, Scrollbar, SUNKEN, YES, BOTH, LEFT, END, RIGHT, TOP, BOTTOM, X, Y
+from Tkinter import Canvas, Frame, Checkbutton, Button,Menu, Scrollbar, SUNKEN, YES, BOTH, LEFT, END, RIGHT, TOP, BOTTOM, X, Y
 from tkFileDialog import asksaveasfilename
 from random import Random, random
 
@@ -17,6 +17,7 @@ from topo.base.projection import Projection
 from editorobjects import EditorNode, EditorSheet, EditorProjection
 from editortools import ArrowTool, NodeTool, ConnectionTool, ParametersTool
 
+from tkguiwindow import TkguiWindow
 
 canvas_region = (0, 0, 1200, 1200)
 """Size of the canvas, as a bounding box (xl yl xh yh)."""
@@ -503,7 +504,7 @@ class EditorCanvas(Canvas):
 
 
 
-
+# (CB: Ought to be a TkguiWindow itself.)
 class ModelEditor:
     """
     This class constructs the main editor window. It uses a instance
@@ -514,7 +515,7 @@ class ModelEditor:
     def __init__(self):
         
         # create editor window and set title
-        root = Toplevel()
+        root = TkguiWindow()
         root.title("Model Editor")
         # create a GUICanvas and place it in a frame
         canvas_frame = Frame(root, bg = 'white')
