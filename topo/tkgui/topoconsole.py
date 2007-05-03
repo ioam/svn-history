@@ -18,7 +18,7 @@ from math import fmod,floor
 from inspect import getdoc
 
 import Tkinter
-from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, Button, \
+from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
      LEFT, RIGHT, YES, NO, BOTH, Label, Text, END, DISABLED, NORMAL, Scrollbar, Y
 import tkMessageBox
 import tkFileDialog
@@ -674,7 +674,7 @@ class TopoConsole(TkguiWindow):
 
 
     def new_about_window(self):
-        win = Toplevel(self)
+        win = TkguiWindow()
         win.withdraw()
         win.title("About Topographica")
         text = Label(win,text=topo.about(display=False),justify=LEFT)
