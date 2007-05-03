@@ -232,7 +232,7 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
         if self.console:
             if self in self.console.auto_refresh_panels:
                 self.console.auto_refresh_panels.remove(self)
-        Toplevel.destroy(self)
+        TkguiWindow.destroy(self)
         
 
 ##     # CEBALERT: I hope this hack can be removed if we tidy up tkgui a little,
