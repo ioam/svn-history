@@ -7,7 +7,7 @@ $Id$
 __version__='$Revision$'
 
 from inspect import getdoc
-from Tkinter import Button, Label, Frame, Toplevel, TOP, LEFT, RIGHT, BOTTOM, E, LAST, FIRST
+from Tkinter import Button, Label, Frame, TOP, LEFT, RIGHT, BOTTOM, E, LAST, FIRST
 import Pmw
 import math
 
@@ -16,7 +16,9 @@ from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Enumeration,BooleanParameter
 from topo.commands.analysis import update_activity
 from topo.misc.utils import shortclassname
+
 from parametersframe import ParametersFrame
+from tkguiwindow import TkguiWindow
 
 
 class EditorObject(ParameterizedObject):
@@ -49,7 +51,7 @@ class EditorObject(ParameterizedObject):
     def show_properties(self):
         "Show parameters frame for object."
         
-        parameter_window = Toplevel()
+        parameter_window = TkguiWindow()
         parameter_window.title(self.name)
         balloon = Pmw.Balloon(parameter_window)
 

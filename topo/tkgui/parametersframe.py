@@ -10,7 +10,8 @@ from inspect import getdoc
 
 import __main__
 import Pmw
-from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X, Menu, Toplevel, Label, LEFT
+from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X, Menu, Label, LEFT
+
 
 import topo.misc.utils
 from topo.misc.utils import keys_sorted_by_value, dict_translator, eval_atof
@@ -19,6 +20,7 @@ from topo.base.parameterclasses import Integer,Number,Enumeration,ClassSelectorP
 
 from propertiesframe import PropertiesFrame
 from translatorwidgets import CheckbuttonTranslator
+from tkguiwindow import TkguiWindow
 
 # CEBALERT:
 # Some things missing from/wrong with ParametersFrame (other than the alerts):
@@ -427,7 +429,7 @@ class ParametersFrame(Frame):
         param_to_edit = self.__currently_selected_widget.get_value()
         param_name = self.__currently_selected_widget.param_name
         
-        parameter_window = Toplevel()
+        parameter_window = TkguiWindow()
         parameter_window.title(param_to_edit.name+' parameters')
         title = Label(parameter_window, text = param_to_edit.name)
         title.pack(side = TOP)
