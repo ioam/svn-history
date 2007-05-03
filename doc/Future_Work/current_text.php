@@ -113,6 +113,16 @@ TopoConsole, Toplevel() for the other windows): seems a bit wrong.
 Doesn't work properly for projection activity windows (see ALERT).
 
 
+<H4>2007/05/03: "cross normalization"</H4>
+A button you can press that will normalize maps against each other
+(to view plots on the same scale).
+
+
+<H4>2007/05/03: plot histograms</H4>
+Histograms for the plots, with easy control over the number or bars,
+scale, etc.
+
+
 <H4>2007/04/13 (CB): make compare tests</H4>
 Checkin some data for the make compare_or test.
 
