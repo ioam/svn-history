@@ -41,9 +41,10 @@ on setup.bat in the
 directory after checking out the code.
 
 <P>On Mac OS X, you will first need to edit the file external/Makefile
-and remove the string "LDFLAGS=-Wl,-rpath,${PREFIX}/lib", because the
-"-rpath" option is required on Linux but neither needed nor supported
-on the Mac. Then type <code>make</code> as below.
+and remove the string <code>LDFLAGS=-Wl,-rpath,${PREFIX}/lib</code>,
+because the <code>-rpath</code> option is required on Linux but
+neither needed nor supported on the Mac. Then type <code>make</code>
+as below.
 
 <P>On other systems, just type <code>make</code> (which may be called
 <code>gmake</code> on some systems) from within the
