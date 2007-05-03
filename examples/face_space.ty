@@ -57,43 +57,6 @@ from topo.outputfns.homeostatic import HomeostaticMaxEnt
 from topo.coordmapperfns.basic import ConstantMapper
 from topo.patterns.image import Image, FaceSpace2Dfromfile
 
-class PiecewiseLinear_debug(OutputFn):
-    """
-    Same as PiecewiseLinear, but computes average activities for use
-    in validating homeostatic plasticity mechanisms.
-    Also calculates average activity as useful debugging information
-    (for use with OutputFnDebugger).
-    """
-    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
-    upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
-    smoothing = Number(default=0.0003, doc="""
-       Determines the degree of weighting of current activity vs.
-       previous activity when calculating the average.""")
-
-    def __init__(self,**params):
-        super(PiecewiseLinear_debug,self).__init__(**params)
-	self.first_call = True
-	self.n_step = 0
-
-    def __call__(self,x):
-        x_orig = copy.copy(x)
-        fact = 1.0/(self.upper_bound-self.lower_bound)
-        x -= self.lower_bound
-        x *= fact
-        clip_in_place(x,0.0,1.0)
-
-	if self.first_call:
-	    self.first_call = False
-	    self.y_avg = zeros(x.shape,x.dtype.char)
-
-	self.n_step += 1
-	if self.n_step == self.lstep:
-
-	    self.n_step = 0
-	    	
-            self.y_avg = self.smoothing*x + (1.0-self.smoothing)*self.y_avg
-
-
 topo.sim.name = "face_space"
 
 GeneratorSheet.nominal_density = 48.0
@@ -162,12 +125,12 @@ topo.sim['FSA'] = LISSOM(nominal_density=locals().get('default_density',18.0),ts
                         nominal_bounds=BoundingBox(radius=0.5))
 
 #topo.sim['FSA'].output_fn = HomeostaticMaxEnt()
-#topo.sim['FSA'].output_fn = HomeostaticMaxEnt_debug(a_init = 13.75, b_init = -0.1560 * 13.75,
+#topo.sim['FSA'].output_fn = HomeostaticMaxEnt(a_init = 13.75, b_init = -0.1560 * 13.75,
 #                                              learning = True, mu = 0.21, eta = 0.005)
 topo.sim['FSA'].output_fn = HomeostaticMaxEnt(a_init = 11.75, b_init = -4.59,
                                               learning = True, mu = 0.22, eta = 0.005)
 
-#topo.sim['FSA'].output_fn = PiecewiseLinear_debug()
+#topo.sim['FSA'].output_fn = PiecewiseLinear()
 #topo.sim['FSA'].output_fn.lower_bound=0.05
 #topo.sim['FSA'].output_fn.upper_bound=0.65
 
