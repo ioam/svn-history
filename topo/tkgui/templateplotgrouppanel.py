@@ -167,17 +167,24 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
                                         command=lambda: self.__plot_matrix('Strength'))
         self._strength_menu.add_command(label="Fourier transform",
                                         command=lambda: self.__fft('Strength'))
+        self._strength_menu.add_command(label="Histogram",
+                                        command=lambda: self.__histogram('Strength'))
+
 
         self._hue_menu.add_command(label="Plot in new window",
                                    command=lambda: self.__plot_matrix('Hue'))
         self._hue_menu.add_command(label="Fourier transform",
                                    command=lambda: self.__fft('Hue'))
+        self._hue_menu.add_command(label="Histogram",
+                                        command=lambda: self.__histogram('Hue'))
+
         
         self._conf_menu.add_command(label="Plot in new window",
                                     command=lambda: self.__plot_matrix('Confidence'))
         self._conf_menu.add_command(label="Fourier transform",
                                     command=lambda: self.__fft('Confidence'))
-
+        self._conf_menu.add_command(label="Histogram",
+                                        command=lambda: self.__histogram('Confidence'))
 
 
         
@@ -267,6 +274,13 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         m=plot._get_matrix(channel)
         fft_plot=1-abs(fftshift(fft2(m-0.5, s=None, axes=(-2,-1))))
         topo.commands.pylabplots.matrixplot(fft_plot, title="FFT Plot: " + description)        
+
+    def __histogram(self,channel):
+        plot = self._right_click_info['plot']
+        description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
+        m=plot._get_matrix(channel)
+        topo.commands.pylabplots.histogramplot(m,title=description)
+        
 
     def __print_matrix(self,channel):
         plot = self._right_click_info['plot']
