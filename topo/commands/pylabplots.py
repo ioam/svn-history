@@ -92,7 +92,7 @@ def matrixplot(mat,title=None):
 
 def activityplot(sheet,activity=None,title=None,cmap=pylab.cm.Greys):    
     """
-    Plots the activity in a sheetx.
+    Plots the activity in a sheet.
 
     Gets plot's extent from sheet.bounds.aarect(). Adds a title and
     allows the selection of a colormap.  If activity is not given,
