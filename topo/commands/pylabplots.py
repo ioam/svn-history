@@ -90,6 +90,31 @@ def matrixplot(mat,title=None):
     pylab.show()
 
 
+def histogramplot(data,title=None,colors=None,*args,**kw):
+    """
+    Compute and plot the histogram of the supplied data.
+    
+    See help(pylab.hist) for help on the histogram function itself.
+
+    If given, colors is an iterable collection of matplotlib.colors
+    (see help (matplotlib.colors) ) specifying the bar colors.
+
+
+    Example use:
+     histplot([1,1,1,2,2,3,4,5],title='hist',colors='rgb',bins=3,normed=1)
+    """
+    pylab.show._needmain=False
+    n,bins,bars = pylab.hist(data,*args,**kw)
+
+    # if len(bars)!=len(colors), then the extra bars won't have their color changed,
+    # or the extra colors will be ignored.
+    if colors: [bar.set_fc(color) for bar,color in zip(bars,colors)]
+    
+    if (title): windowtitle(title)
+    pylab.show()
+
+
+
 def activityplot(sheet,activity=None,title=None,cmap=pylab.cm.Greys):    
     """
     Plots the activity in a sheet.
