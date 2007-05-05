@@ -291,13 +291,13 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         plot = self._right_click_info['plot']
         description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
         m=plot._get_matrix(channel)
-        topo.commands.pylabplots.histogramplot(m,title=description)
+        topo.commands.pylabplots.histogramplot(m,title="Histogram: "+ description)
 
     def __gradient(self,channel):
         plot = self._right_click_info['plot']
         description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
         m=plot._get_matrix(channel)
-        topo.commands.pylabplots.gradientplot(m,title=description)
+        topo.commands.pylabplots.gradientplot(m,title="Gradient: " + description)
 
     def __print_matrix(self,channel):
         plot = self._right_click_info['plot']
