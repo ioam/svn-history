@@ -129,17 +129,11 @@ class PlotsMenuEntry(ParameterizedObject):
     different for each plot type since this will include Activity,
     Connection Fields, Projection grids, Preference Maps and more.
     """
-    def __init__(self,console,template,class_name=TemplatePlotGroupPanel,label=None,description=None,**params):
+    def __init__(self,console,template,class_name=TemplatePlotGroupPanel,**params):
         super(PlotsMenuEntry,self).__init__(**params)
+        
         self.console = console
         self.template = template
-
-        if not label:
-            label = template.name
-        self.label = label
-        if not description:
-            description = template.name
-        self.description = description
 
         # Special cases.  These classes are specific to the topo/tkgui
         # directory and therefore this link must be made within the tkgui
@@ -149,33 +143,26 @@ class PlotsMenuEntry(ParameterizedObject):
         # should add entries to plotpanel_classes.  If no dictionary
         # entry is defined then the default class is used.
         if self.template.template_plot_type=='curve':
-            class_name = plotpanel_classes.get(self.label,FeatureCurvePanel)
-        self.class_name = plotpanel_classes.get(self.label,class_name)
+            class_name = plotpanel_classes.get(template.name,FeatureCurvePanel)
+        self.class_name = plotpanel_classes.get(template.name,class_name)
         
-
-        self.title = ''
 
 
     def command(self,event=None,**args):
         """
 
+        (event to allow use in callbacks)
 
         args are keyword arguments that are passed to the class that's
         being constructed
         """
-        #CB: title gets overwritten anyway!
-        self.title = '%s' % (self.label)
-        #if 'valid_context' in dir(self.class_name):
-
         if self.class_name.valid_context():
-            pn = self.class_name(console=self.console,pgt_name=self.template.name,**args)
-            pn.refresh_title()
+            self.class_name(console=self.console,pgt_name=self.template.name,**args)
             self.console.messageBar.message('state', 'OK')
-            return pn
+
         else:
             self.console.messageBar.message('state',
                                             'No suitable objects in this simulation for this operation.')
-            return None
 
 
 
@@ -186,12 +173,9 @@ class TopoConsole(TkguiWindow):
     def __init__(self,**config):
 
         TkguiWindow.__init__(self,**config)
-        #super(TopoConsole,self).__init__(**config)
     
         self.auto_refresh_panels = []
         self._init_widgets()
-                
-        
         self.title("Topographica Console")
 
         # command interpreter for executing commands in the console (used by exec_cmd).
@@ -253,11 +237,8 @@ class TopoConsole(TkguiWindow):
         #  for implementing it are not available on all platforms. We used to
         #  have a Pmw Balloon bound to the menu, with its output directed to
         #  the status bar.)
-
 	self.menubar = Tkinter.Menu(self)       
         self.configure(menu=self.menubar)
-
-
 
         self.__simulation_menu()
         self.__plots_menu()
@@ -403,23 +384,21 @@ class TopoConsole(TkguiWindow):
         # create plots_menu_entries, and get categories
         self.plots_menu_entries=KeyedList() # keep the order of plotgroup_templates (which is also KL)
         categories = []
-        for label,pgt in plotgroup_templates.items():
-            entry = PlotsMenuEntry(self,pgt,label=label)            
-            self.plots_menu_entries[label]=entry
-            categories.append(entry.template.category)
+
+        for label,template in plotgroup_templates.items():
+            self.plots_menu_entries[label] = PlotsMenuEntry(self,template)
+            categories.append(template.category)
         categories = sorted(set(categories))
 
-
-        basic_category = 'Basic'
-        assert basic_category in categories
         
         plots_menu = Tkinter.Menu(self.menubar,tearoff=0)
         self.menubar.add_cascade(label='Plots',menu=plots_menu)
         
         # The Basic category items appear on the menu itself.
+        assert 'Basic' in categories, "'Basic' is the category for the standard Plots menu entries."
         for label,entry in self.plots_menu_entries:
-            if entry.template.category==basic_category:
-                    plots_menu.add_command(label=entry.label,command=entry.command)
+            if entry.template.category=='Basic':
+                    plots_menu.add_command(label=label,command=entry.command)
                                              
                                              
         categories.remove('Basic')
@@ -433,7 +412,7 @@ class TopoConsole(TkguiWindow):
             
             for label,entry in self.plots_menu_entries:
                 if entry.template.category==category:
-                    cat_menu.add_command(label=entry.label,command=entry.command)
+                    cat_menu.add_command(label=label,command=entry.command)
             
         plots_menu.add_separator()
         plots_menu.add_command(label="Help",command=(lambda x=plotting_help_locations: self.open_location(x)))
