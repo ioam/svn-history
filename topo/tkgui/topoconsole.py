@@ -72,6 +72,7 @@ plotting_help_locations = (os.path.join(topo_dir,'doc/User_Manual/plotting.html'
 # should use a specific PlotPanel subclass.  For example:
 #   plotpanel_classes['Hue Pref Map'] = HuePreferencePanel
 plotpanel_classes = {}
+# CEBALERT: why are the other plotpanel_classes updates at the end of this file?
 
 
 class InterpreterComboBox(Pmw.ComboBox):
@@ -224,11 +225,8 @@ class TopoConsole(TkguiWindow):
     def _init_widgets(self):
         
 
-
-	### MessageBar.  (Shows "Status")
-        msg_group = Pmw.Group(self,tag_text='Status')
-        msg_group.pack(side=BOTTOM,expand=NO,fill=X,padx=4,pady=8)
-	self.messageBar = Pmw.MessageBar(msg_group.interior(),
+        ### Status bar
+	self.messageBar = Pmw.MessageBar(self,
                                          entry_width = 45,
                                          entry_relief='groove')
 	self.messageBar.pack(side = BOTTOM,fill=X,padx=4,pady=8)
@@ -236,7 +234,6 @@ class TopoConsole(TkguiWindow):
 
 	### Balloon, for pop-up help
 	self.balloon = Pmw.Balloon(self)
-
 
 	### Top-level (native) menu bar
         # (There is no context-sensitive help for the menu because mechanisms
@@ -250,22 +247,16 @@ class TopoConsole(TkguiWindow):
         self.__plots_menu()
         self.__help_menu()
 
-
-
-        #
-        # Running the simulation
-        #
-        learning_group = Pmw.Group(self,tag_text='Simulation control')
-        learning_frame = learning_group.interior()
-        learning_group.pack(side=TOP,expand=NO,fill=X,padx=4,pady=8)
-
-        rf=Label(learning_frame,text='Run for: ')
-        rf.pack(side=LEFT)
+        ### Running the simulation
+        # CB: could replace with bwidget LabelFrame, if necessary
+        learning_frame = Tkinter.Frame(self,bd=1,relief=Tkinter.RAISED)
+        learning_frame.pack(side='top',fill='x',padx=4,pady=8)
+        
+        Label(learning_frame,text='Run for: ').pack(side=LEFT)
         
         learning_str=StringVar()
         learning_str.set('1.0')
 
-        
         self.run_for = TaggedSlider(learning_frame,
                                     tagvariable=learning_str,
                                     tag_width=11,
@@ -302,6 +293,12 @@ class TopoConsole(TkguiWindow):
         #
         # Command entry
         #
+        # CB: can we embed some shell or even ipython? Maybe not ipython for a while:
+        # http://lists.ipython.scipy.org/pipermail/ipython-user/2006-March/003352.html
+        # If we were to use ipython as the default interpreter for topographica, then we wouldn't need any of this,
+        # since all platforms could have a decent command line (could users override what they wanted to use
+        # as their interpreter in a config file?).
+        
         ### Make a Frame inside of which is a Pmw.Group, with a tag
         ### that incorporates a checkbutton. Deselecting the
         ### checkbutton empties the frame of the widgets (see
