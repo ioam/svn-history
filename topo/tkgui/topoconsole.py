@@ -532,7 +532,6 @@ class TopoConsole(TkguiWindow):
     def save_script_repr(self):
         script_name = tkFileDialog.asksaveasfilename(filetypes=SCRIPT_FILETYPES,initialfile=topo.sim.name+"_script_repr.ty")
         if script_name:
-            script_file = open(script_name,'w') # CEBALERT: presumably stray, and should be removed
             topo.commands.basic.save_script_repr(script_name)
             self.messageBar.message('state', 'Script saved to ' + script_name)
             
@@ -569,10 +568,6 @@ class TopoConsole(TkguiWindow):
             topo.commands.basic.save_snapshot(snapshot_name)
             self.messageBar.message('state', 'Snapshot saved to ' + snapshot_name)
     
-                
-    def reset_network(self):
-	self.messageBar.message('state', 'Reset not yet implemented')
-
 
     def auto_refresh(self):
         """
