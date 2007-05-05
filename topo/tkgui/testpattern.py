@@ -57,6 +57,9 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
     def __init__(self,console=None,padding=2,**params):
 
 	super(TestPattern,self).__init__(console,'Preview',**params)
+
+        self.title("Test Pattern") # CB: gets written over by something else, anyway...
+        
         self.INITIAL_PLOT_HEIGHT = 100
         self.padding = padding
 	self.auto_refresh.set(True)
