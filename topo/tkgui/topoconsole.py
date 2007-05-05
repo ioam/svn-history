@@ -153,7 +153,6 @@ class PlotsMenuEntry(ParameterizedObject):
         self.class_name = plotpanel_classes.get(self.label,class_name)
         
 
-        self.num_windows = 0
         self.title = ''
 
 
@@ -164,9 +163,8 @@ class PlotsMenuEntry(ParameterizedObject):
         args are keyword arguments that are passed to the class that's
         being constructed
         """
-        
-        self.num_windows = self.num_windows + 1
-        self.title = '%s %d' % (self.label, self.num_windows)
+        #CB: title gets overwritten anyway!
+        self.title = '%s' % (self.label)
         #if 'valid_context' in dir(self.class_name):
 
         if self.class_name.valid_context():
@@ -190,11 +188,6 @@ class TopoConsole(TkguiWindow):
         TkguiWindow.__init__(self,**config)
         #super(TopoConsole,self).__init__(**config)
     
-        self.num_activity_windows = 0
-        self.num_orientation_windows = 0
-        self.num_weights_windows = 0
-        self.num_weights_array_windows = 0
-
         self.auto_refresh_panels = []
         self._init_widgets()
                 
