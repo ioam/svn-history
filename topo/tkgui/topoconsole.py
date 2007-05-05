@@ -6,6 +6,10 @@ $Id$
 __version__='$Revision$'
 
 
+# CB: does the status bar need to keep saying 'ok'? Sometimes
+# positive feedback is useful, but 'ok' doesn't seem too helpful.
+
+
 import os
 import sys
 import traceback
