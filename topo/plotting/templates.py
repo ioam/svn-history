@@ -129,10 +129,10 @@ class PlotGroupTemplate(ParameterizedObject):
     # describing each plot (for hovering help text) within each
     # plot template.
     def add_plot(self,name,specification_tuple_list):
-	dict={}  # CEBALERT: dict is a type!
+	dict_={}
 	for key,value in specification_tuple_list:
-	    dict[key]=value
-	self.plot_templates.append((name,dict))
+	    dict_[key]=value
+	self.plot_templates.append((name,dict_))
 
     def add_static_image(self,name,file_path):
         self.image_location = file_path
