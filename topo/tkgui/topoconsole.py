@@ -195,7 +195,6 @@ class TopoConsole(TkguiWindow):
         self.num_weights_windows = 0
         self.num_weights_array_windows = 0
 
-        self.input_params_window = None
         self.auto_refresh_panels = []
         self._init_widgets()
                 
@@ -268,7 +267,7 @@ class TopoConsole(TkguiWindow):
 
 
         self.__simulation_menu()
-        self.__plot_menu()
+        self.__plots_menu()
         self.__help_menu()
 
 
@@ -388,14 +387,14 @@ class TopoConsole(TkguiWindow):
         simulation_menu.add_command(label='Load snapshot',command=self.load_snapshot)
         simulation_menu.add_command(label='Save snapshot',command=self.save_snapshot)
         #simulation_menu.add_command(label='Reset',command=self.reset_network)
-        simulation_menu.add_command(label='Test Pattern',command=self.open_plot_params_window)
+        simulation_menu.add_command(label='Test Pattern',command=self.open_test_pattern_window)
         simulation_menu.add_command(label='Model Editor',command=self.open_model_editor)
         simulation_menu.add_command(label='Quit',command=self.quit_topographica)
 
         
 
 
-    def __plot_menu(self):
+    def __plots_menu(self):
         """
         Add the plot menu to the menubar, and create categorized entries
         for all the plotgroup_templates.
@@ -602,14 +601,12 @@ class TopoConsole(TkguiWindow):
 
 
 
-    # JABALERT: Shouldn't this be named open_test_pattern_window?
-    def open_plot_params_window(self):
+    def open_test_pattern_window(self):
         """
         Test Pattern Window.  
         """
         if TestPattern.valid_context():
-            self.input_params_window = TestPattern(self)
-            self.input_params_window.title('Test Pattern')
+            TestPattern(self)
             self.messageBar.message('state', 'OK')
         else:
             self.messageBar.message('state',
