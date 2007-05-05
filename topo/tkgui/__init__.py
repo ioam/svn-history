@@ -38,6 +38,11 @@ from topoconsole import TopoConsole
 # other packages (like bwidget, Tix, etc). So maybe try to avoid
 # adding more Pmw.
 #
+## Dialogs
+# Don't know how to theme them (can't make them inherit from
+# our own class, for instance). Consider making our own dialog
+# boxes (subclass of Tkguiwindow) using transient and grab_set:
+# http://thread.gmane.org/gmane.comp.python.tkinter/657/focus=659
 
 
 
@@ -147,6 +152,12 @@ def start(mainloop=False):
     console.event_add('<<right-click>>',*right_click_events)
     console.event_add('<<right-click-release>>',*right_click_release_events)
     
+
+
+    # GUI/threads:
+    # http://thread.gmane.org/gmane.comp.python.scientific.user/4153
+    # (inc. ipython info)
+    # (Also http://mail.python.org/pipermail/python-list/2000-January/021250.html)
 
     # mainloop() freezes the commandline until the GUI window exits.
     # Without this line the command-line remains responsive.
