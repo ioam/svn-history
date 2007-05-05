@@ -370,27 +370,18 @@ class TopoConsole(TkguiWindow):
 
     def __plots_menu(self):
         """
-        Add the plot menu to the menubar, and create categorized entries
-        for all the plotgroup_templates.
+        Add the plot menu to the menubar, with Basic plots on the menu itself and
+        others in cascades by category (the plots come from plotgroup_templates).
         """
-        # CEBALERT: more complex than it needs to be! (Hence the extra comments.)
-        # Needs to be cleaned up, along with PlotsMenuEntry.
-        # There seem to be several unnecessary steps, and the same thing is often
-        # stored in too many different places.
-        # Update the documentation.
-        
-        # (Note about plots_menu_entries: it's accessed in 1 other place in tkgui.)
-
         # create plots_menu_entries, and get categories
         self.plots_menu_entries=KeyedList() # keep the order of plotgroup_templates (which is also KL)
         categories = []
-
         for label,template in plotgroup_templates.items():
             self.plots_menu_entries[label] = PlotsMenuEntry(self,template)
             categories.append(template.category)
         categories = sorted(set(categories))
 
-        
+        # 'Plots' menu
         plots_menu = Tkinter.Menu(self.menubar,tearoff=0)
         self.menubar.add_cascade(label='Plots',menu=plots_menu)
         
@@ -399,22 +390,25 @@ class TopoConsole(TkguiWindow):
         for label,entry in self.plots_menu_entries:
             if entry.template.category=='Basic':
                     plots_menu.add_command(label=label,command=entry.command)
-                                             
-                                             
         categories.remove('Basic')
+
         plots_menu.add_separator()
         
         # Add the other categories to the menu as cascades, and the plots of each category to
         # their cascades.
         for category in categories:
-            cat_menu = Tkinter.Menu(plots_menu,tearoff=0)
-            plots_menu.add_cascade(label=category,menu=cat_menu)
-            
+            category_menu = Tkinter.Menu(plots_menu,tearoff=0)
+            plots_menu.add_cascade(label=category,menu=category_menu)
+
+            # could probably search more efficiently than this
+            # (Note about plots_menu_entries: it's accessed in 1 other place in tkgui.)
             for label,entry in self.plots_menu_entries:
                 if entry.template.category==category:
-                    cat_menu.add_command(label=label,command=entry.command)
+                    category_menu.add_command(label=label,command=entry.command)
+
             
         plots_menu.add_separator()
+
         plots_menu.add_command(label="Help",command=(lambda x=plotting_help_locations: self.open_location(x)))
 
 
