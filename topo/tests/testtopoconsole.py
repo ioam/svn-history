@@ -5,7 +5,7 @@ $Id$
 __version__='$Revision$'
 
 
-# CEBALERT: doesn't test topoconsole completely.
+# CEBALERT: doesn't really test topoconsole.
 
 import topo
 import unittest
@@ -16,16 +16,15 @@ import topo.base.simulation
 
 class TestTopoConsole(unittest.TestCase):
     def setUp(self):
-        # CEBALERT: do we need such a test now?
-        # topo.base.registry.set_active_sim(None)
         self.s = Simulation(register=False)
         self.console = start()
         topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
         self.s.print_level = topo.base.parameterizedobject.WARNING
 
     def tearDown(self):
-        self.console.quit()
-
+        self.console.quit() # does quit() do anything without mainloop()? Why test a tkinter method?
+                            # we can't really test the interactive quit dialog...
+                            # should remove this, I think
 
 suite = unittest.TestSuite()
 #  Uncomment the following line of code, to disable the test if
