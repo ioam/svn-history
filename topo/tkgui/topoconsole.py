@@ -208,7 +208,7 @@ class TopoConsole(TkguiWindow):
         topo.guimain=self
 
         # catch click on the 'x': offers choice to quit or not
-        self.protocol("WM_DELETE_WINDOW",self.quit)
+        self.protocol("WM_DELETE_WINDOW",self.quit_topographica)
 
         
         ##########
