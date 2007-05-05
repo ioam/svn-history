@@ -169,6 +169,8 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
                                         command=lambda: self.__fft('Strength'))
         self._strength_menu.add_command(label="Histogram",
                                         command=lambda: self.__histogram('Strength'))
+        self._strength_menu.add_command(label="Gradient",
+                                        command=lambda: self.__gradient('Strength'))
 
 
         self._hue_menu.add_command(label="Plot in new window",
@@ -177,6 +179,8 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
                                    command=lambda: self.__fft('Hue'))
         self._hue_menu.add_command(label="Histogram",
                                         command=lambda: self.__histogram('Hue'))
+        self._hue_menu.add_command(label="Gradient",
+                                   command=lambda: self.__gradient('Hue'))
 
         
         self._conf_menu.add_command(label="Plot in new window",
@@ -185,6 +189,8 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
                                     command=lambda: self.__fft('Confidence'))
         self._conf_menu.add_command(label="Histogram",
                                         command=lambda: self.__histogram('Confidence'))
+        self._conf_menu.add_command(label="Gradient",
+                                        command=lambda: self.__gradient('Confidence'))
 
 
         
@@ -266,7 +272,6 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
         
 
-
     # CB: these methods assume channel has a view (the menu only displays those that do)
     def __fft(self,channel):
         plot = self._right_click_info['plot']
@@ -280,7 +285,12 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
         m=plot._get_matrix(channel)
         topo.commands.pylabplots.histogramplot(m,title=description)
-        
+
+    def __gradient(self,channel):
+        plot = self._right_click_info['plot']
+        description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
+        m=plot._get_matrix(channel)
+        topo.commands.pylabplots.gradientplot(m,title=description)
 
     def __print_matrix(self,channel):
         plot = self._right_click_info['plot']
