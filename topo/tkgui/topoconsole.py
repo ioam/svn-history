@@ -86,7 +86,6 @@ class InterpreterComboBox(Pmw.ComboBox):
             self['selectioncommand'](input)
         else:
             Pmw.ComboBox._addHistory(self)
-        
 
 
 class OutputText(Text):
@@ -123,6 +122,97 @@ class OutputText(Text):
         self.insert(END,"\n")
         self.config(state=DISABLED)
         self.see(END)
+
+
+
+# CB: can we embed some shell or even ipython instead? Maybe not ipython for a while:
+# http://lists.ipython.scipy.org/pipermail/ipython-user/2006-March/003352.html
+# If we were to use ipython as the default interpreter for topographica, then we wouldn't need any of this,
+# since all platforms could have a decent command line (could users override what they wanted to use
+# as their interpreter in a config file?).
+# Otherwise maybe we can turn this into something capable of passing input to and from some program
+# that the user can specify?
+class CommandPrompt(TkguiWindow):
+    """
+    Simple access to python interpreter.
+
+    Useful when there is no decent system terminal (e.g. on Windows).
+    """
+    def __init__(self,console,**config):
+        TkguiWindow.__init__(self,**config)
+
+        self.console = console
+        self.title('Topographica Command prompt')
+        self.balloon = Pmw.Balloon(self)
+
+        # command interpreter for executing commands (used by exec_cmd).
+        self.interpreter = code.InteractiveConsole(__main__.__dict__)
+        
+        ### Make a ComboBox (command_entry) for entering commands.
+        self.command_entry=InterpreterComboBox(self,autoclear=1,history=1,dropdown=1,
+                                               label_text='>>> ',labelpos='w',
+                                               # CB: if it's a long command, the gui obviously stops responding.
+                                               # On OS X, a spinning wheel appears. What about linux and win?
+                                               selectioncommand=self.exec_cmd)
+        
+        self.balloon.bind(self.command_entry,
+             """Accepts any valid Python command and executes it in main as if typed at a terminal window.""")
+
+        scrollbar = Scrollbar(self)
+        scrollbar.pack(side=RIGHT, fill=Y)
+        # CEBALERT: what length history is this going to keep?
+        self.command_output = OutputText(self,
+                                         state=DISABLED,
+                                         height=10,
+                                         yscrollcommand=scrollbar.set)
+        self.command_output.pack(side=TOP,expand=YES,fill=BOTH)
+        scrollbar.config(command=self.command_output.yview)
+
+        self.command_entry.pack(side=BOTTOM,expand=NO,fill=X)
+
+
+    def exec_cmd(self,cmd):
+        """
+        Pass cmd to the command interpreter.
+
+        Redirects sys.stdout and sys.stderr to the output text window
+        for the duration of the command.
+
+        Updates console's status bar to indicate success or not.
+        """   
+        capture_stdout = StringIO.StringIO()
+        capture_stderr = StringIO.StringIO()
+
+        # capture output and errors
+        sys.stdout = capture_stdout
+        sys.stderr = capture_stderr
+
+        if self.interpreter.push(cmd):
+            self.command_entry.configure(label_text='... ')
+            result = 'Continue: ' + cmd
+        else:
+            self.command_entry.configure(label_text='>>> ')
+            result = 'OK: ' + cmd
+
+        output = capture_stdout.getvalue()
+        error = capture_stderr.getvalue()
+
+        self.command_output.append_cmd(cmd,output)
+        
+        if error:
+            self.command_output.append_text("*** Error:\n"+error)
+            
+        # stop capturing
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+                
+        capture_stdout.close()
+        capture_stderr.close()
+
+	self.console.messageBar.message('state', result)
+        self.command_entry.component('entryfield').clear()
+
+
 
         
 
@@ -185,8 +275,6 @@ class TopoConsole(TkguiWindow):
         self._init_widgets()
         self.title("Topographica Console")
 
-        # command interpreter for executing commands in the console (used by exec_cmd).
-        self.interpreter = code.InteractiveConsole(__main__.__dict__)
         
         # Provide a way for other code to access the GUI when necessary
         topo.guimain=self
@@ -290,68 +378,6 @@ class TopoConsole(TkguiWindow):
             boundaries, as the example Topographica models are.""")
 
 
-        #
-        # Command entry
-        #
-        # CB: can we embed some shell or even ipython? Maybe not ipython for a while:
-        # http://lists.ipython.scipy.org/pipermail/ipython-user/2006-March/003352.html
-        # If we were to use ipython as the default interpreter for topographica, then we wouldn't need any of this,
-        # since all platforms could have a decent command line (could users override what they wanted to use
-        # as their interpreter in a config file?).
-        
-        ### Make a Frame inside of which is a Pmw.Group, with a tag
-        ### that incorporates a checkbutton. Deselecting the
-        ### checkbutton empties the frame of the widgets (see
-        ### toggle_command_widgets() and shrinks it) (i.e. it
-        ### shows/hides command entry/output widgets).
-        self.show_command_widgets = Tkinter.IntVar()
-        self.show_command_widgets.set(0)
-        command_frame = Frame(self)
-        command_group = Pmw.Group(command_frame,
-                              tag_pyclass = Tkinter.Checkbutton,
-                              tag_text='Command prompt',
-                              tag_command = self.toggle_command_widgets,
-                              tag_variable = self.show_command_widgets)
-
-                
-        command_group.pack(fill = 'both', expand = YES, side='left')
-        cw = Tkinter.Frame(command_group.interior())
-        cw.pack(padx = 2, pady = 2, expand=YES, fill='both')
-        command_frame.pack(padx = 6, pady = 6, expand='yes', fill='both')
-
-        # empty frame to allow resizing to 0 (otherwise cw
-        # would stay at the size it was before all widgets were removed)
-        Tkinter.Frame(cw).pack(expand=NO)
-
-        ### Make a ComboBox (command_entry) for entering commands.
-        self.command_entry=InterpreterComboBox(cw,autoclear=1,history=1,dropdown=1,
-                                               label_text='>>> ',labelpos='w',
-                                               # CB: if it's a long command, the gui obviously stops responding.
-                                               # On OS X, a spinning wheel appears. What about linux and win?
-                                               selectioncommand=self.exec_cmd)
-        
-        self.balloon.bind(self.command_entry,
-             """Accepts any valid Python command and executes it in main as if typed at a terminal window.""")
-
-        ### Make a Text (command_output, for output from commands)
-        ### with a Scrollbar, both inside a Frame (command_output_frame,
-        ### for convenient access)
-        self.command_output_frame = Tkinter.Frame(cw)
-        scrollbar = Scrollbar(self.command_output_frame)
-        scrollbar.pack(side=RIGHT, fill=Y)
-        # CEBALERT: what length history is this going to keep?
-        self.command_output = OutputText(self.command_output_frame,
-                                         state=DISABLED,
-                                         height=10,
-                                         yscrollcommand=scrollbar.set)
-        self.command_output.pack(side=TOP,expand=YES,fill='both')
-        scrollbar.config(command=self.command_output.yview)
-
-        # note that pack() hasn't been called on command_output or on
-        # command_entry - get called by toggle_command_widgets
-
-
-        
 
 
     def __simulation_menu(self):
@@ -366,6 +392,7 @@ class TopoConsole(TkguiWindow):
         #simulation_menu.add_command(label='Reset',command=self.reset_network)
         simulation_menu.add_command(label='Test Pattern',command=self.open_test_pattern_window)
         simulation_menu.add_command(label='Model Editor',command=self.open_model_editor)
+        simulation_menu.add_command(label='Command prompt',command=self.open_command_prompt)
         simulation_menu.add_command(label='Quit',command=self.quit_topographica)
 
         
@@ -445,15 +472,6 @@ class TopoConsole(TkguiWindow):
         self.stop=True
 
             
-    def toggle_command_widgets(self):
-        if self.show_command_widgets.get()==1:
-            self.command_entry.pack(side=BOTTOM,expand=NO,fill=X)
-            self.command_output_frame.pack(expand=YES,fill='both')
-        else:
-            self.command_entry.pack_forget()
-            self.command_output_frame.pack_forget()
-            
-
     def quit_topographica(self):
         """Quit topographica."""
         if tkMessageBox.askyesno("Quit Topographica","Really quit?"):
@@ -564,6 +582,11 @@ class TopoConsole(TkguiWindow):
                 self.update_idletasks()
 
 
+    def open_command_prompt(self):
+        CommandPrompt(self)
+
+        
+
     def open_model_editor(self):
         """Start the Model editor."""
 	ModelEditor()
@@ -613,47 +636,6 @@ class TopoConsole(TkguiWindow):
                 self.messageBar.message('state', "Couldn't open "+location+" in browser.")
 
                 
-    def exec_cmd(self,cmd):
-        """
-        Pass cmd to the console's command interpreter.
-
-        Redirects sys.stdout and sys.stderr to the output text window
-        for the duration of the command.
-
-        Updates the status bar to indicate success or not.
-        """
-        
-        capture_stdout = StringIO.StringIO()
-        capture_stderr = StringIO.StringIO()
-
-        # capture output and errors
-        sys.stdout = capture_stdout
-        sys.stderr = capture_stderr
-
-        if self.interpreter.push(cmd):
-            self.command_entry.configure(label_text='... ')
-            result = 'Continue: ' + cmd
-        else:
-            self.command_entry.configure(label_text='>>> ')
-            result = 'OK: ' + cmd
-
-        output = capture_stdout.getvalue()
-        error = capture_stderr.getvalue()
-
-        self.command_output.append_cmd(cmd,output)
-        
-        if error:
-            self.command_output.append_text("*** Error:\n"+error)
-            
-        # stop capturing
-        sys.stdout = sys.__stdout__
-        sys.stderr = sys.__stderr__
-                
-        capture_stdout.close()
-        capture_stderr.close()
-
-	self.messageBar.message('state', result)
-        self.command_entry.component('entryfield').clear()
     
 
 
@@ -822,3 +804,6 @@ if __name__ != '__main__':
 ##             # see alert in __init__
 ##             self.__image_hack.append(image)
             
+
+
+
