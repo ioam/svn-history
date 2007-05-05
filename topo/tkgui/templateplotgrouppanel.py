@@ -159,9 +159,16 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
 
         # CEBALERT: there doesn't seem to be any way within tkinter itself to let me
-        # know which submenu was used!
+        # know which submenu was used! (Hence the repetition.)
         # http://mail.python.org/pipermail/python-list/1999-May/003482.html
         # http://groups.google.com/group/comp.lang.python/browse_thread/thread/de5cf21073610446/7ce05db5dbc4c3f3%237ce05db5dbc4c3f3
+
+        # If the repetition here and elsewhere in this file (and tkgui
+        # in general) can't be avoided with loops, there is probably
+        # something else, like using a function to return the slightly
+        # different versions of the calls.
+        #
+        # In any case, shouldn't be assuming SHC here.
 
         self._strength_menu.add_command(label="Plot in new window",
                                         command=lambda: self.__plot_matrix('Strength'))
