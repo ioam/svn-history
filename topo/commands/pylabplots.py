@@ -15,6 +15,7 @@ $Id$
 """
 __version__='$Revision$'
 
+import numpy
 import matplotlib
 ### JABHACKALERT: Need to figure out how to use Agg by default, but
 ### override it with TkAgg, so that the documentation file for this
@@ -113,6 +114,28 @@ def histogramplot(data,title=None,colors=None,*args,**kw):
     if (title): windowtitle(title)
     pylab.show()
 
+
+def gradientplot(data,title=None):
+    """
+    Compute and show the gradient plot of the supplied data.
+    """
+    # CB: very direct translation of some octave code.
+    # Consider division by zero?
+    r,c = data.shape
+    dx = numpy.diff(data,1)
+    dx = dx[1:r-1,1:c-1]
+    x = dx.min()
+    y = dx.max()
+
+    dx = ((dx-x)/(y-x)-0.5)*2.0
+
+    dy=numpy.diff(data.transpose(),1)
+    dy=dy[1:r-1,1:c-1]
+    x=dy.min()
+    y=dy.max()
+    dy=((dy-x)/(y-x)-0.5)*2.0
+    matrixplot((cos(dx*2*pi)+cos(dy*2*pi)),title=title)
+    
 
 
 def activityplot(sheet,activity=None,title=None,cmap=pylab.cm.Greys):    
