@@ -263,12 +263,10 @@ class TopoConsole(TkguiWindow):
         #  have a Pmw Balloon bound to the menu, with its output directed to
         #  the status bar.)
 
-        # CB: going to replace with standard tkinter code (no Pmw).
-	self.menubar = Pmw.MainMenuBar(self)
-                                   #hull_relief = 'raised',
-                                   #hull_borderwidth = 1,
-                                   #balloon = self.balloon)
+	self.menubar = Tkinter.Menu(self)       
         self.configure(menu=self.menubar)
+
+
 
         self.__simulation_menu()
         self.__plot_menu()
@@ -383,56 +381,25 @@ class TopoConsole(TkguiWindow):
 
     def __simulation_menu(self):
         """Add the simulation menu options to the menubar."""
-        
-        self.menubar.addmenu('Simulation',"") # CB: WHAT DID THIS SAY BEFORE?
+        simulation_menu = Tkinter.Menu(self.menubar,tearoff=0)
+        self.menubar.add_cascade(label='Simulation',menu=simulation_menu)
 
-        self.menubar.addmenuitem('Simulation', 'command', 'Run a .ty script file',
-                                 label = 'Run script',
-                                 command = self.load_network)
+        simulation_menu.add_command(label='Run script',command=self.load_network)
+        simulation_menu.add_command(label='Save script',command=self.save_script_repr)
+        simulation_menu.add_command(label='Load snapshot',command=self.load_snapshot)
+        simulation_menu.add_command(label='Run script',command=self.load_snapshot)
+        #simulation_menu.add_command(label='Reset',command=self.reset_network)
+        simulation_menu.add_command(label='Test Pattern',command=self.open_plot_params_window)
+        simulation_menu.add_command(label='Model Editor',command=self.open_model_editor)
+        simulation_menu.add_command(label='Quit',command=self.quit_topographica)
 
-        self.menubar.addmenuitem('Simulation', 'command', 'Save the current simulation architecture to a script',
-                                 label = 'Save script',
-                                 command = self.save_script_repr)
         
-        self.menubar.addmenuitem('Simulation', 'command', "Save simulation's state to disk as a .typ file",
-                                 label = 'Save snapshot',
-                                 command = self.save_snapshot)
-        self.menubar.addmenuitem('Simulation', 'command', 'Load the previously saved .typ state',
-                                 label = 'Load snapshot',
-                                 command = self.load_snapshot)
-##         self.menubar.addmenuitem('Simulation', 'command', 'Reset the network',
-##                                  label = 'Reset',
-##                                  ## Gray out menu item ###########
-##                                  foreground = 'Gray',            #
-##                                  activeforeground = 'Gray',      #
-##                                  activebackground = 'Light Gray',#
-##                                  #################################
-##                                  command = self.reset_network)
-        self.menubar.addmenuitem('Simulation', 'command', 'Present a test pattern',
-                                 label = 'Test Pattern',
-                                 command = self.open_plot_params_window)
-	self.menubar.addmenuitem('Simulation', 'command', 'Open the model editor',
-				 label = 'Model Editor', command = self.open_model_editor)
-        self.menubar.addmenuitem('Simulation', 'separator')
-        self.menubar.addmenuitem('Simulation', 'command', 'Quit Topographica',
-                                 label = 'Quit',
-                                 command = self.quit)
 
 
     def __plot_menu(self):
         """
         Add the plot menu to the menubar, and create categorized entries
         for all the plotgroup_templates.
-
-
-
-        Poll for a list of class types, and put them into the Console
-        plots list.  This replaces something of this form:
-
-        self.menubar.addmenuitem('Plots', 'command',
-                             'New activity plot',
-                             label="Activity",
-                             command=self.new_activity_window)
         """
         # CEBALERT: more complex than it needs to be! (Hence the extra comments.)
         # Needs to be cleaned up, along with PlotsMenuEntry.
@@ -455,67 +422,53 @@ class TopoConsole(TkguiWindow):
         basic_category = 'Basic'
         assert basic_category in categories
         
-
-        self.menubar.addmenu('Plots','Assorted plot displays')
-
+        plots_menu = Tkinter.Menu(self.menubar,tearoff=0)
+        self.menubar.add_cascade(label='Plots',menu=plots_menu)
+        
         # The Basic category items appear on the menu itself.
         for label,entry in self.plots_menu_entries:
             if entry.template.category==basic_category:
-                    self.menubar.addmenuitem('Plots','command',
-                                             entry.template.name,
-                                             label=entry.label,command=entry.command)
+                    plots_menu.add_command(label=entry.label,command=entry.command)
+                                             
+                                             
         categories.remove('Basic')
-        self.menubar.addmenuitem('Plots','separator')
+        plots_menu.add_separator()
         
         # Add the other categories to the menu as cascades, and the plots of each category to
         # their cascades.
         for category in categories:
-            self.menubar.addcascademenu('Plots',category)
+            cat_menu = Tkinter.Menu(plots_menu,tearoff=0)
+            plots_menu.add_cascade(label=category,menu=cat_menu)
+            
             for label,entry in self.plots_menu_entries:
                 if entry.template.category==category:
-                    self.menubar.addmenuitem(category,'command',
-                                             entry.template.name,
-                                             label=entry.label,command=entry.command)
+                    cat_menu.add_command(label=entry.label,command=entry.command)
             
-        self.menubar.addmenuitem('Plots','separator')                                     
-        self.menubar.addmenuitem('Plots','command',label="Help",command=(lambda x=plotting_help_locations: self.open_location(x)))
+        plots_menu.add_separator()
+        plots_menu.add_command(label="Help",command=(lambda x=plotting_help_locations: self.open_location(x)))
 
 
     def __help_menu(self):
         """Add the help menu options."""
 
-        self.menubar.addmenu('Help','Information about Topographica',name='help')
+        help_menu = Tkinter.Menu(self.menubar,tearoff=0,name='help')
+        self.menubar.add_cascade(label='Help',menu=help_menu) # CB: did I keep help right?
 
-        # CEBALERT: can simplify this
-        self.menubar.addmenuitem('Help', 'command',
-                                 'Licensing and release information',
-                                 label="About",
-                                 command=self.new_about_window)
+        help_menu.add_command(label='About',command=self.new_about_window)
+        help_menu.add_command(label="User Manual",
+                              command=(lambda x=user_manual_locations: self.open_location(x)))
 
-        self.menubar.addmenuitem('Help', 'command',
-                                 'How to use Topographica',
-                                 label="User Manual",
-                                 command=(lambda x=user_manual_locations: self.open_location(x)))
-
-        self.menubar.addmenuitem('Help', 'command',
-                                 'Walk-through examples',
-                                 label="Tutorials",
-                                 command=(lambda x=tutorials_locations: self.open_location(x)))
+        help_menu.add_command(label="Tutorials",
+                              command=(lambda x=tutorials_locations: self.open_location(x)))
         
-        self.menubar.addmenuitem('Help', 'command',
-                                 'Detailed code documentation',
-                                 label="Reference Manual",
-                                 command=(lambda x=reference_manual_locations: self.open_location(x)))
+        help_menu.add_command(label="Reference Manual",
+                              command=(lambda x=reference_manual_locations: self.open_location(x)))
         
-        self.menubar.addmenuitem('Help', 'command',
-                                 'Topographica on the web',
-                                 label="Topographica.org",
-                                 command=(lambda x=topo_www_locations: self.open_location(x)))
+        help_menu.add_command(label="Topographica.org",
+                              command=(lambda x=topo_www_locations: self.open_location(x)))
 
-        self.menubar.addmenuitem('Help', 'command',
-                                 'Python reference',
-                                 label="Python documentation",
-                                 command=(lambda x=python_doc_locations: self.open_location(x)))
+        help_menu.add_command(label="Python documentation",
+                              command=(lambda x=python_doc_locations: self.open_location(x)))
 
 
 
@@ -534,13 +487,8 @@ class TopoConsole(TkguiWindow):
             self.command_output_frame.pack_forget()
             
 
-    def quit(self):
+    def quit_topographica(self):
         """Quit topographica."""
-        # CEBALERT: seems like using tkMessageBox gives no options about
-        # decorating the window (e.g. icon, title). Might want to create
-        # our own (or find one from somewhere) so that we can control
-        # the window decoration (make a class that can inherit from
-        # a TkguiWindow mix-in class).
         if tkMessageBox.askyesno("Quit Topographica","Really quit?"):
             self.destroy() 
             if topo.gui_cmdline_flag:
