@@ -512,45 +512,20 @@ class TopoConsole(TkguiWindow):
 
     def run_script(self):
         """
-        Load a script file from disk and evaluate it.  The file is evaluated
-        from within the globals() namespace.
+        Dialog to run a user-selected script
+
+        The script is exec'd in __main__.__dict__ (i.e. as if it were specified on the commandline.)
         """
         script = tkFileDialog.askopenfilename(filetypes=SCRIPT_FILETYPES)
-        if script in ('',(),None):
+        if script in ('',(),None): # (representing the various ways no script was selected in the dialog)
             self.messageBar.message('state', 'Run canceled')
         else:
-            result = self.load_script_file(script)
-            if result:
+            try:
+                execfile(script,__main__.__dict__)
                 self.messageBar.message('state', 'Ran ' + script)
-            else:
+            except:
                 self.messageBar.message('state', 'Failed to run ' + script)
-
-
-    def load_script_file(self,filename):
-        """
-        Load a script file from disk and evaluate it from within this
-        package globals() namespace.  The purpose is to allow a
-        Simulation to add in new script code into an existing
-        Simulation.  Care needs to be taken that namespace variable
-        collisions don't take place across multiple simulations or
-        script files.
-    
-        This function was originally written so that the same script
-        can be loaded into a simulation from the GUI or from the
-        command-line.
-    
-        Returns False if the filename is '', (), or None.  Otherwise
-        Returns True.  Exceptions raised by execfile are not caught
-        here, and are instead passed on to the calling function.
-        """
-        if filename in ('',(),None):
-            return False
-        else:
-            # g = globals()
-            g = __main__.__dict__
-            execfile(filename,g)
-            # print 'Loaded ' + filename + ' in ' + __name__
-            return True
+                raise # at least display the error somewhere 
 
         
 
