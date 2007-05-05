@@ -120,16 +120,22 @@ class OutputText(Text):
         self.see(END)
 
         
-# CEB: what's the difference between label, description, etc?
+
 class PlotsMenuEntry(ParameterizedObject):
     """
-    Use these objects to populate the TopoConsole Plots pulldown.  The
-    pulldown requires a name and a function to call when the item is
-    selected.  self.command is used for that.  self.command has to be
-    different for each plot type since this will include Activity,
-    Connection Fields, Projection grids, Preference Maps and more.
+    Stores information about a Plots menu command
+    (including the command itself, and the plotgroup template).
     """
-    def __init__(self,console,template,class_name=TemplatePlotGroupPanel,**params):
+    def __init__(self,console,template,class_=TemplatePlotGroupPanel,**params):
+        """
+        Store the template, and set the class that will be created by this menu entry
+
+        If users want to extend the Plot Panel classes, then they
+        should add entries to the plotpanel_classes dictionary.
+        If no entry is defined there, then the default class is used.
+
+        The class_ is overridden for any special cases listed in this method.
+        """
         super(PlotsMenuEntry,self).__init__(**params)
         
         self.console = console
@@ -138,26 +144,22 @@ class PlotsMenuEntry(ParameterizedObject):
         # Special cases.  These classes are specific to the topo/tkgui
         # directory and therefore this link must be made within the tkgui
         # files.
-        #
-        # If users want to extend the Plot Panel classes, then they
-        # should add entries to plotpanel_classes.  If no dictionary
-        # entry is defined then the default class is used.
         if self.template.template_plot_type=='curve':
-            class_name = plotpanel_classes.get(template.name,FeatureCurvePanel)
-        self.class_name = plotpanel_classes.get(template.name,class_name)
-        
+            class_ = plotpanel_classes.get(template.name,FeatureCurvePanel)
 
+        self.class_ = plotpanel_classes.get(template.name,class_)
+        
 
     def command(self,event=None,**args):
         """
+        Instantiate the class_ (used as menu commands' 'command' attribute).
 
-        (event to allow use in callbacks)
+        Keyword args are passed to the class_.
 
-        args are keyword arguments that are passed to the class that's
-        being constructed
+        (event is a dummy argument to allow use in callbacks.)
         """
-        if self.class_name.valid_context():
-            self.class_name(console=self.console,pgt_name=self.template.name,**args)
+        if self.class_.valid_context():
+            self.class_(console=self.console,pgt_name=self.template.name,**args)
             self.console.messageBar.message('state', 'OK')
 
         else:
