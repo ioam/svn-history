@@ -195,7 +195,6 @@ class TopoConsole(TkguiWindow):
         self.num_weights_windows = 0
         self.num_weights_array_windows = 0
 
-        self.loaded_script = None
         self.input_params_window = None
         self.auto_refresh_panels = []
         self._init_widgets()
@@ -384,10 +383,10 @@ class TopoConsole(TkguiWindow):
         simulation_menu = Tkinter.Menu(self.menubar,tearoff=0)
         self.menubar.add_cascade(label='Simulation',menu=simulation_menu)
 
-        simulation_menu.add_command(label='Run script',command=self.load_network)
+        simulation_menu.add_command(label='Run script',command=self.run_script)
         simulation_menu.add_command(label='Save script',command=self.save_script_repr)
         simulation_menu.add_command(label='Load snapshot',command=self.load_snapshot)
-        simulation_menu.add_command(label='Run script',command=self.load_snapshot)
+        simulation_menu.add_command(label='Save snapshot',command=self.save_snapshot)
         #simulation_menu.add_command(label='Reset',command=self.reset_network)
         simulation_menu.add_command(label='Test Pattern',command=self.open_plot_params_window)
         simulation_menu.add_command(label='Model Editor',command=self.open_model_editor)
@@ -511,22 +510,48 @@ class TopoConsole(TkguiWindow):
             sys.exit()
 
 
-    # CEBALERT: change name to run_script
-    def load_network(self):
+    def run_script(self):
         """
         Load a script file from disk and evaluate it.  The file is evaluated
         from within the globals() namespace.
         """
-        self.loaded_script = tkFileDialog.askopenfilename(filetypes=SCRIPT_FILETYPES)
-        if self.loaded_script in ('',(),None):
-            self.loaded_script = None
-            self.messageBar.message('state', 'Load canceled')
+        script = tkFileDialog.askopenfilename(filetypes=SCRIPT_FILETYPES)
+        if script in ('',(),None):
+            self.messageBar.message('state', 'Run canceled')
         else:
-            result = self.load_script_file(self.loaded_script)
+            result = self.load_script_file(script)
             if result:
-                self.messageBar.message('state', 'Loaded ' + self.loaded_script)
+                self.messageBar.message('state', 'Ran ' + script)
             else:
-                self.messageBar.message('state', 'Failed to load ' + self.loaded_script)
+                self.messageBar.message('state', 'Failed to run ' + script)
+
+
+    def load_script_file(self,filename):
+        """
+        Load a script file from disk and evaluate it from within this
+        package globals() namespace.  The purpose is to allow a
+        Simulation to add in new script code into an existing
+        Simulation.  Care needs to be taken that namespace variable
+        collisions don't take place across multiple simulations or
+        script files.
+    
+        This function was originally written so that the same script
+        can be loaded into a simulation from the GUI or from the
+        command-line.
+    
+        Returns False if the filename is '', (), or None.  Otherwise
+        Returns True.  Exceptions raised by execfile are not caught
+        here, and are instead passed on to the calling function.
+        """
+        if filename in ('',(),None):
+            return False
+        else:
+            # g = globals()
+            g = __main__.__dict__
+            execfile(filename,g)
+            # print 'Loaded ' + filename + ' in ' + __name__
+            return True
+
         
 
     def save_script_repr(self):
@@ -694,31 +719,6 @@ class TopoConsole(TkguiWindow):
 	self.messageBar.message('state', result)
         self.command_entry.component('entryfield').clear()
     
-    def load_script_file(self,filename):
-        """
-        Load a script file from disk and evaluate it from within this
-        package globals() namespace.  The purpose is to allow a
-        Simulation to add in new script code into an existing
-        Simulation.  Care needs to be taken that namespace variable
-        collisions don't take place across multiple simulations or
-        script files.
-    
-        This function was originally written so that the same script
-        can be loaded into a simulation from the GUI or from the
-        command-line.
-    
-        Returns False if the filename is '', (), or None.  Otherwise
-        Returns True.  Exceptions raised by execfile are not caught
-        here, and are instead passed on to the calling function.
-        """
-        if filename in ('',(),None):
-            return False
-        else:
-            # g = globals()
-            g = __main__.__dict__
-            execfile(filename,g)
-            # print 'Loaded ' + filename + ' in ' + __name__
-            return True
 
 
     def do_learning(self):
