@@ -156,7 +156,7 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
         # command: self.plot_group.configure(tag_text='NewName')
 	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plotgroup_key))
         self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)
- 
+
 
         if bwidget_imported:
             ### Scrollbars for the plots
@@ -170,13 +170,14 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
             self.width_sizer.pack()
 
             # the scrollable frame, with scrollbars
-            # CB: this window/frame has some minimum size, but I'd rather it didn't:
-            # it doesn't get small enough sometimes.
             scrolled_window = bwidget.ScrolledWindow(self.plot_group_title.interior(),
                                                      auto="both",scrollbar="both")
-            scrolled_frame = bwidget.ScrollableFrame(scrolled_window)
+            # set small start height/width, will grow if necessary
+            scrolled_frame = bwidget.ScrollableFrame(scrolled_window,height=50,width=50) 
             scrolled_window.setwidget(scrolled_frame)
             scrolled_window.pack(fill="both",expand='yes')
+
+            
             self.plot_frame = scrolled_frame.getframe() #according to bwidget docs, not necessary to do this
 
 
@@ -270,8 +271,8 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
     def sizeright(self):
         if bwidget_imported:
             self.update_idletasks()
-            # CB: the +'s are hacks, because for some reason the requested height and width aren't quite
-            # large enough.
+            # CB: the +'s are hacks, because for some reason the requested values aren't quite
+            # large enough (noticably when there are labels).
             self.width_sizer['width']=min(self.plot_frame.winfo_reqwidth()+30,self.winfo_screenwidth())
             self.height_sizer['height']=min(self.plot_frame.winfo_reqheight()+20,self.winfo_screenheight())
 
