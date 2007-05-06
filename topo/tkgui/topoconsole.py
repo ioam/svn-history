@@ -28,6 +28,13 @@ import tkMessageBox
 import tkFileDialog
 import Pmw
 
+try:
+    import bwidget
+    bwidget_imported=True
+except:
+    bwidget_imported=False
+
+
 import topo
 from topo.misc.keyedlist import KeyedList
 from topo.base.parameterizedobject import ParameterizedObject
@@ -275,7 +282,7 @@ class TopoConsole(TkguiWindow):
         self._init_widgets()
         self.title("Topographica Console")
 
-        
+
         # Provide a way for other code to access the GUI when necessary
         topo.guimain=self
 
@@ -635,8 +642,58 @@ class TopoConsole(TkguiWindow):
             except Exception:
                 self.messageBar.message('state', "Couldn't open "+location+" in browser.")
 
-                
+
     
+    def progress_window(self,progress_var,title=""):
+        """
+        Simplistic (& demo) progress bar in a window.
+
+        Specify a Tkinter variable (e.g. IntVar) as progress_var and the progress
+        bar will remain in sync with the value, and will disappear when the value is 100.
+
+
+        For (untested!) example:
+
+         progval = Tkinter.IntVar(self)        
+         self.progress_window(progval)
+
+         for i in range(100):
+             progval.set(i)
+
+        should give a progress meter that goes from 0 to 100 then disappears.
+
+
+        ** Currently expects a 0-100 (percent) value ***        
+        """
+        # relies on bwidget, which nobody has built yet
+        if not bwidget_imported:
+            return
+
+        # CB: could add more info to the window/bar, like time estimates...
+        
+        window = TkguiWindow()
+        window.title(title)
+
+        # trace the variable so that at 100 we can destroy the window
+        window.progress_trace_name = progress_var.trace_variable('w',lambda name,index,mode,x=window,y=progress_var: self.__close_progress_window_if_complete(x,y))
+
+        progress_bar = bwidget.ProgressBar(window,type="normal",
+                                           maximum=100,
+                                           height=20,
+                                           width=200,
+                                           variable=progress_var)
+        progress_bar.pack(padx=15,pady=15)
+
+
+    def __close_progress_window_if_complete(self,progress_window,progress_var):
+        """
+        Close the specified progress window if the value of progress_var has reached 100.
+        """
+        if progress_var.get()>=100:
+            # delete the variable trace (necessary?)
+            progress_var.trace_vdelete('w',progress_window.progress_trace_name)
+            progress_window.destroy()
+
 
 
     def do_learning(self):
@@ -649,6 +706,12 @@ class TopoConsole(TkguiWindow):
         features like periodically displaying the simulated and real
         time remaining.
         """
+
+        # progress bar updates per 1.0 iteration, so it's not always
+        # going to be helpful
+        progval = Tkinter.IntVar(self)        
+        self.progress_window(progval,title="Learning")
+
         
         # Should replace with a progress bar; see
         # http://tkinter.unpythonic.net/bwidget/
@@ -688,6 +751,8 @@ class TopoConsole(TkguiWindow):
 
             estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
 
+            progval.set(percent)
+
             # Should say 'at current rate', since the calculation assumes linearity
             message = ('Time %0.2f: %d%% of %0.0f completed (%02d:%02d remaining)' %
                        (topo.sim.time(),int(percent),fduration, int(estimate/60),
@@ -707,6 +772,7 @@ class TopoConsole(TkguiWindow):
         self.auto_refresh()
 
         self.messageBar.message('state', message)
+        progval.set(100) # CB: shouldn't percent have reached 100?
 
         
 
