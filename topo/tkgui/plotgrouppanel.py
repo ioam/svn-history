@@ -17,6 +17,13 @@ from math import floor
 import ImageTk
 import Pmw
 
+try:
+    import bwidget
+    bwidget_imported=True
+except:
+    bwidget_imported=False
+
+
 from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
      BooleanVar, StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
@@ -77,8 +84,10 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
 	"""
         TkguiWindow.__init__(self)
         ParameterizedObject.__init__(self,**params)
-
 	self.console = console
+
+	# Hotkey for killing the window
+	self.bind('<Control-q>',self.destroy)
         
 	# balloon help component
         self.balloon = Pmw.Balloon(self)
@@ -114,8 +123,8 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
                                           command=self.refresh)
         self.refresh_button.pack(side=LEFT)
         self.balloon.bind(self.refresh_button,"Force the current plot to be regenerated.")
-               
-        # Auto_refresh check button.
+
+        ### Auto_refresh check button.
         # Default is to not have the window Auto-refresh, because some
         # plots are very slow to generate (e.g. some preference map
         # plots).  Call self.auto_refresh.set(True) to enable
@@ -132,49 +141,71 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
             "Whether to regenerate this plot whenever the simulation time advances.")
 
 
+        ### Auto-resize checkbutton.
+        # See set_auto_resize() for more info.
+        self.auto_resize = BooleanVar()
+        auto_resize_checkbutton=Checkbutton(self.control_frame_1, text="Auto-resize",
+                                            variable=self.auto_resize,command=self.set_auto_resize)
+        auto_resize_checkbutton.pack(side=RIGHT)
+        self.auto_resize.set(True); self.set_auto_resize()
+        self.balloon.bind(auto_resize_checkbutton,
+            "Whether to resize this window automatically to fit the contents, or to allow the window to be resized manually.")
+
+
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
 	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plotgroup_key))
-        self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH,padx=5,pady=5)
-	self.plot_frame = self.plot_group_title.interior()
+        self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)
+ 
+
+        if bwidget_imported:
+            ### Scrollbars for the plots
+            # (Some of this would be simpler if we were using grid(), probably)
+
+            # non-empty Frames ignore any specified width/height, so create two empty
+            # frames used purely for setting height & width
+            self.height_sizer = Frame(self.plot_group_title.interior(),height=0,width=0)
+            self.height_sizer.pack(side=LEFT)
+            self.width_sizer = Frame(self,width=0,height=0)
+            self.width_sizer.pack()
+
+            # the scrollable frame, with scrollbars
+            # CB: this window/frame has some minimum size, but I'd rather it didn't:
+            # it doesn't get small enough sometimes.
+            scrolled_window = bwidget.ScrolledWindow(self.plot_group_title.interior(),
+                                                     auto="both",scrollbar="both")
+            scrolled_frame = bwidget.ScrollableFrame(scrolled_window)
+            scrolled_window.setwidget(scrolled_frame)
+            scrolled_window.pack(fill="both",expand='yes')
+            self.plot_frame = scrolled_frame.getframe() #according to bwidget docs, not necessary to do this
 
 
-##         # CB: this scrolled plots implementation should be considered
-##         # temporary - see note by _sizeright().
+            # CB: the following doesn't seem to work when frames are set to larger-than-screen sizes
+            # (so maximum window size is handled locally in later code)
+            ## Prevent resizing bigger than the screen 
+            # self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
+        else:
+            self.plot_frame = self.plot_group_title.interior()
+
+
+
+
+    def set_auto_resize(self):
+        """
+        If auto-resize on, window automatically resizes to fit widgets
+        (Tkinter default), and user cannot resize window.
+
+        If auto-resize is off, the window stays the same size whatever
+        happens to the widgets, and the user can resize the window.
+        """
+        if self.auto_resize.get():
+            self.geometry('')
+            self.resizable(0,0)
+        else:
+            self.geometry(self.geometry())
+            self.resizable(1,1)
+
         
-##         # When I use 'expand' for flex, the scrollbars don't update
-##         # the first time unless you click on them (so it looks like they
-##         # don't work). Must be missing a refresh? Works fine with fixed,
-##         # though (but 'expand' looks better because the plots are centered).
-##         # Also should use 'dynamic' so they're only drawn when required.
-##         ### Will need to test these on Win and OS X.
-##  	self.scrolledplotframe = Pmw.ScrolledFrame(self.plot_group_title.interior(),
-##                                                    borderframe=0,
-##                                                    horizflex ='expand', #fixed
-##                                                    vertflex='expand',#fixed
-##                                                    hscrollmode = 'static', #dynamic
-##                                                    vscrollmode = 'static') #dynamic
-##  	self.scrolledplotframe.pack(side=TOP,expand=YES,fill=BOTH)
-##         self.plot_frame = self.scrolledplotframe.interior()
-
-
-	# Hotkey for killing the window
-	self.bind('<Control-q>',self.destroy)
-
-##         # prevent resizing bigger than the screen (scrollbars should
-##         # appear on plot frame at that point)
-##         self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
-
-
-##     ### Convenience functions for parent's geometry(), which uses a string
-##     ### like "210x280+23+121" for width,height,x,y
-##     def set_geom(self,width,height):
-##         """Set parent's geometry width and height."""
-##         self.geometry("%sx%s"%(width,height))
-##     def get_geom(self):
-##         """Return parent's geometry width and height."""
-##         width,height,x,y = re.findall("[0-9.]+",self.geometry())
-##         return int(width),int(height)
 
 
     def refresh(self,update=True):
@@ -233,38 +264,16 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
             if self in self.console.auto_refresh_panels:
                 self.console.auto_refresh_panels.remove(self)
         TkguiWindow.destroy(self)
-        
 
-##     # CEBALERT: I hope this hack can be removed if we tidy up tkgui a little,
-##     # and then switch to having scrollbars on the entire window. We could
-##     # use bwidget's scrolled window and frame, for instance.
-##     # I think doing something like this would lead to better resizing behavior
-##     # of the windows, and much simpler code.
-##     def _sizeright(self):
-##         """
-##         Using a scrolled frame for the plots means that the initial size of the window
-##         does not allow for displaying all the plots. This is a hack to allow the initial
-##         size to be large enough to display all the plots.
-##         """
-##         # Pmw.Scrolledframe is made up of a frame and a clipper (both tkinter frames).
-        
-##         frame_width,frame_height = self.scrolledplotframe._frame.winfo_width(),\
-##                                    self.scrolledplotframe._frame.winfo_height()
 
-##         clipper_width,clipper_height=self.scrolledplotframe._clipper.winfo_width(),\
-##                                      self.scrolledplotframe._clipper.winfo_height()
-
-##         window_width,window_height = self.get_geom()
-
-##         new_width= max(window_width+(frame_width-clipper_width),window_width)
-##         new_height=max(window_height,window_height+(frame_height-clipper_height))
-
-##         #print "W: frame=%s,clipper=%s,window=%s,new_win=%s"\
-##         #      %(frame_width,clipper_width,window_width,new_width)
-##         #print "H: frame=%s,clipper=%s,window=%s,new_win=%s"\
-##         #      %(frame_height,clipper_height,window_height,new_height)
-
-##         return new_width,new_height
+    # CB: rename, document, and if possible delay showing the window until all the jiggling is over
+    def sizeright(self):
+        if bwidget_imported:
+            self.update_idletasks()
+            # CB: the +'s are hacks, because for some reason the requested height and width aren't quite
+            # large enough.
+            self.width_sizer['width']=min(self.plot_frame.winfo_reqwidth()+30,self.winfo_screenwidth())
+            self.height_sizer['height']=min(self.plot_frame.winfo_reqheight()+20,self.winfo_screenheight())
 
 
 
@@ -529,6 +538,10 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         This function should be redefined in subclasses for interesting
         things such as 2D grids.
         """
+
+        #plot_frame = Tkinter.Frame(self.plot_frame)
+        
+        
 	plots = self.plotgroup.plots
 	### JCALERT: Temporary: delete when sorting the bitmap history
 	self.bitmaps = [p.bitmap for p in plots]
@@ -598,17 +611,10 @@ class PlotGroupPanel(BasicPlotGroupPanel):
             canvas.bind('<Button-1>',lambda event: self.__process_canvas_event(event,self._update_dynamic_info))
 
 
-        
-##         ########## CBALERT! Hack for getting initial size right
-##         # (for all plots to be displayed).
-##         if not hasattr(self,'have_set_initial_size'):
-##             self.update_idletasks()
-##             self.deiconify()
-##             self.minsize(*self._sizeright())
-##             self.have_set_initial_size = True
-##         ##########
 
-            
+        self.sizeright()
+        
+         
 
     def add_to_history(self):
 	"""
@@ -631,6 +637,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 	self.plotgroup.normalize = self.normalize.get()
 	self.plotgroup.update_plots(False)
         self.display_plots()
+        
 
 
     def set_integerscaling(self):
@@ -695,7 +702,8 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         else:  # Same number of labels; reuse to avoid flickering.
             for i in range(len(self.labels)):
                 self.labels[i].configure(text=self.plotgroup.labels[i]) 
- 
+
+        self.sizeright()
       
 
     def reduce(self):
