@@ -91,7 +91,6 @@ Set order and names of ParametersFrame's Ok, Apply, Cancel, Reset, and
 Defaults buttons, and make them behave as expected for classes and
 instances.  Figure out and clean up translator_dictionary & its uses.
 
-
 <H4>2007/03/26 (CB): minor tkgui cleanup</H4>
 Simplify tkgui, e.g. eliminating extra frames and any unnecessary
 refresh() etc methods. At the moment, the complexity makes it 
@@ -101,12 +100,7 @@ Which widgets should expand (expand=YES ?), which should fill the
 space (fill=X ?) (e.g. in parameters frames sliders etc should
 expand), and so on.
 <BR>
-Get icon onto all windows e.g. with a mix-in class TkguiWindow that
-contains attributes we'd like all tkgui windows to have - like the
-icon.  What to do about decorating tkMessageBox etc? A TkguiWindow()
-instance would set attributes (e.g. window icon) based on the
-assumption that it is already some kind of Tk window (Tk() for
-TopoConsole, Toplevel() for the other windows): seems a bit wrong.
+More tasks/notes in topo/tkgui/__init__.py
 
 
 <H4>2007/04/15 (CB): Dynamic info</H4>
@@ -118,9 +112,10 @@ A button you can press that will normalize maps against each other
 (to view plots on the same scale).
 
 
-<H4>2007/05/03: plot histograms</H4>
+<H4>2007/05/06 (CB): plot histograms</H4>
 Histograms for the plots, with easy control over the number or bars,
-scale, etc.
+scale, etc.<BR>
+Need to add some controls and reasonable defaults for various plots.
 
 
 <H4>2007/04/13 (CB): make compare tests</H4>
