@@ -43,6 +43,12 @@ from topoconsole import TopoConsole
 # our own class, for instance). Consider making our own dialog
 # boxes (subclass of Tkguiwindow) using transient and grab_set:
 # http://thread.gmane.org/gmane.comp.python.tkinter/657/focus=659
+#
+## Mainloop
+# Because we don't call mainloop(), it's necessary to call
+# update() or update_idletasks() sometimes. Also, I think that sometimes
+# current graphics do not update properly (but I'm not sure - I don't
+# have a specific example yet).
 
 
 
