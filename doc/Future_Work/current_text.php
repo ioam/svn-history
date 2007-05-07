@@ -67,6 +67,16 @@ We need a test with non-square input sheets, non-square LISSOM sheets, etc.,
 with both types of non-squareness...
 
 
+<H4>2007/04/29: Weight seeds</H4>
+Instead of relying on numpy.random's global seed, should explicitly
+have a random number generator object in ConnectionField or
+CFProjection.  That way it will be more obvious what that seed
+controls, and the values won't depend on anything else that uses that
+seed value (such as some of the SciPy statistics routines,
+apparently).  All of the example files will need updating, but this
+shouldn't be difficult otherwise.
+
+
 <H4>2007/04/10 (JB): Add an example that is a good starting point for</H4>
 wrapping an external simulation as a Sheet in Topographica.  A
 first pass wrapping a spiking retina simulation written in PyNN/PyNEST
