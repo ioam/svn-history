@@ -344,7 +344,7 @@ class TopoConsole(TkguiWindow):
 
         ### Running the simulation
         # CB: could replace with bwidget LabelFrame, if necessary
-        learning_frame = Tkinter.Frame(self,bd=1,relief=Tkinter.RAISED)
+        learning_frame = Tkinter.Frame(self,bd=2,relief=Tkinter.GROOVE)
         learning_frame.pack(side='top',fill='x',padx=4,pady=8)
         
         Label(learning_frame,text='Run for: ').pack(side=LEFT)
@@ -453,7 +453,7 @@ class TopoConsole(TkguiWindow):
         """Add the help menu options."""
 
         help_menu = Tkinter.Menu(self.menubar,tearoff=0,name='help')
-        self.menubar.add_cascade(label='Help',menu=help_menu) # CB: did I keep help right?
+        self.menubar.add_cascade(label='Help',menu=help_menu) 
 
         help_menu.add_command(label='About',command=self.new_about_window)
         help_menu.add_command(label="User Manual",
@@ -670,6 +670,7 @@ class TopoConsole(TkguiWindow):
             return
 
         # CB: could add more info to the window/bar, like time estimates...
+        # (elapsed,remaining,axis label)
         
         window = TkguiWindow()
         window.title(title)
@@ -710,7 +711,7 @@ class TopoConsole(TkguiWindow):
         # progress bar updates per 1.0 iteration, so it's not always
         # going to be helpful
         progval = Tkinter.IntVar(self)        
-        self.progress_window(progval,title="Learning")
+        self.progress_window(progval,title="Running Simulation")
 
         
         # Should replace with a progress bar; see
