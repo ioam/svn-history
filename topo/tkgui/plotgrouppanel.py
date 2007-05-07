@@ -158,6 +158,8 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
         self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)
 
 
+
+        # CB: scrollbar frame stops plots from being centered...I wonder how to fix that?
         if bwidget_imported:
             ### Scrollbars for the plots
             # (Some of this would be simpler if we were using grid(), probably)
