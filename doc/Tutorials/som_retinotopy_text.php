@@ -37,19 +37,23 @@ develops a mapping of the dimensions of variance in the input space.
 <P><li>To start the full simulation from the book using the
   Topographica GUI, you could run:
 <pre>
-  /home/jbednar/public/topographica/topographica -g som_retinotopy.ty
-</pre>
-  However, a much smaller network is faster to run, and gets similar
-  results.  To use a retina density of 10 and a cortical density of
-  10, instead run Topographica as:
-<pre>
   /home/jbednar/public/topographica/topographica -g \
-  -c default_retina_density=10 -c default_density=10 som_retinotopy.ty
+  -c default_retina_density=24 -c default_density=40 som_retinotopy.ty
 </pre>
   (all on one line, with no backslash).  These changes can also be
   made in the .ty file itself, if you do not want to type them each
   time you run the program.
-  
+
+  <p>However, the default is to use a much smaller network that is
+  faster to run while getting similar results:
+<pre>
+  /home/jbednar/public/topographica/topographica -g som_retinotopy.ty
+</pre>
+	
+  <P>(The plots below show the results from the full density of the
+  book simulation, but results are similar for the default (lower)
+  densities.)
+
 <p>
 You should now see a window for the GUI:
 <p class='center'>

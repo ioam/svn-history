@@ -6,9 +6,13 @@ Contains a Retina (2D Gaussian generator) fully connected to a V1
 
 Constructed to match the retinotopic simulation from page 53-59 of
 Miikkulainen, Bednar, Choe, and Sirosh (2005), Computational Maps in
-the Visual Cortex, Springer.  The original simulation used a radius_0
-of 13.3/40, which does work for some random seeds, but a much larger
-radius is used here so that it converges more reliably.
+the Visual Cortex, Springer.  Known differences include:
+
+ - The default_density and default_retina_density are smaller for
+   speed (compared to 40 and 24 in the book).
+ - The original simulation used a radius_0 of 13.3/40, which does work
+   for some random seeds, but a much larger radius is used here so that
+   it converges more reliably.
 
 $Id$
 """
@@ -36,7 +40,7 @@ topo.sim.name = "som_retinotopy"
 GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0.05
 # The locals().get calls allow the parameter to be overriden on the command line
-GeneratorSheet.nominal_density = locals().get('default_retina_density',24.0)
+GeneratorSheet.nominal_density = locals().get('default_retina_density',10.0)
 
 # Local variable to allow inputs to be controlled easily
 input_seed=locals().get('input_seed',0)
@@ -56,13 +60,13 @@ numpy.random.seed((weight_seed+67,weight_seed+89))
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 
-default_density=locals().get('default_density',40.0)
+default_density=locals().get('default_density',10.0)
 topo.sim['V1'] = CFSheet(
     nominal_density = default_density,
-    # Original CMVC simulation used an initial radius of 13.3/40.0
+    # Original CMVC simulation used an initial radius of 13.3/40.0 (~0.33)
     output_fn = KernelMax(density=default_density,
         kernel_radius=BoundedNumber(bounds=(0.5/40,None),generator=
-            ExponentialDecay(starting_value = locals().get('radius_0',13.3/40.0*3.0),
+            ExponentialDecay(starting_value = locals().get('radius_0',1.0),
                              time_constant=40000/5.0))))
 
 topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,connection_type=CFProjection,
