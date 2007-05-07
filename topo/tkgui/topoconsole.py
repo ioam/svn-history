@@ -344,16 +344,16 @@ class TopoConsole(TkguiWindow):
 
         ### Running the simulation
         # CB: could replace with bwidget LabelFrame, if necessary
-        learning_frame = Tkinter.Frame(self,bd=2,relief=Tkinter.GROOVE)
-        learning_frame.pack(side='top',fill='x',padx=4,pady=8)
+        run_frame = Tkinter.Frame(self,bd=2,relief=Tkinter.GROOVE)
+        run_frame.pack(side='top',fill='x',padx=4,pady=8)
         
-        Label(learning_frame,text='Run for: ').pack(side=LEFT)
+        Label(run_frame,text='Run for: ').pack(side=LEFT)
         
-        learning_str=StringVar()
-        learning_str.set('1.0')
+        run_for_var=StringVar()
+        run_for_var.set('1.0')
 
-        self.run_for = TaggedSlider(learning_frame,
-                                    tagvariable=learning_str,
+        self.run_for = TaggedSlider(run_frame,
+                                    tagvariable=run_for_var,
                                     tag_width=11,
                                     slider_length=150,
                                     min_value=0,max_value=20000,
@@ -363,16 +363,16 @@ class TopoConsole(TkguiWindow):
 
         # When return is pressed, the TaggedSlider updates itself...but we also want to run
         # the simulation in this case.
-        learning_frame.optional_action=self.do_learning
+        run_frame.optional_action=self.run_simulation
 
-        go_button = Button(learning_frame,text="Go",
-                           command=self.do_learning)
+        go_button = Button(run_frame,text="Go",
+                           command=self.run_simulation)
         go_button.pack(side=LEFT)
         
         self.balloon.bind(go_button,"Run the simulation for the specified duration.")
 
 
-	self.stop_button = Button(learning_frame,text="Stop",state=DISABLED,
+	self.stop_button = Button(run_frame,text="Stop",state=DISABLED,
                                   command=lambda: self.set_stop())
 	self.stop_button.pack(side=LEFT)
         self.balloon.bind(self.stop_button,"""
@@ -697,7 +697,7 @@ class TopoConsole(TkguiWindow):
 
 
 
-    def do_learning(self):
+    def run_simulation(self):
         """
         Run the simulation for the duration specified in the
         'run for' taggedslider.
