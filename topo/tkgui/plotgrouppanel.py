@@ -181,10 +181,9 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
             self.plot_frame = scrolled_frame.getframe() #according to bwidget docs, not necessary to do this
 
 
-            # CB: the following doesn't seem to work when frames are set to larger-than-screen sizes
-            # (so maximum window size is handled locally in later code)
+            # CB: the following doesn't work on some platforms? OS X?
             ## Prevent resizing bigger than the screen 
-            # self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
+            self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
         else:
             self.plot_frame = self.plot_group_title.interior()
 
@@ -274,7 +273,9 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
             # CB: the +'s are hacks, because for some reason the requested values aren't quite
             # large enough (noticably when there are labels).
             self.width_sizer['width']=min(self.plot_frame.winfo_reqwidth()+30,self.winfo_screenwidth())
-            self.height_sizer['height']=min(self.plot_frame.winfo_reqheight()+20,self.winfo_screenheight())
+            # The - is to prevent the plot engulfing the rest of the plot window, obscuring controls at the bottom
+            # (not so important right now, since plots would rarely be as large as the screen height)
+            self.height_sizer['height']=min(self.plot_frame.winfo_reqheight()+20,self.winfo_screenheight()-250)
 
 
 
