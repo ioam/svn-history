@@ -1,9 +1,3 @@
-
-<!--CB: going to go through this file and: 
-- order tasks by priority
-- check all my tasks from emails are here
--->
-
 <P> This is the developers' to-do list. There are several sections,
 with earlier ones being higher priority than later ones.  Tasks
 within each section are also ordered approximately by priority.
@@ -192,10 +186,6 @@ fixedpoint" during unpickling. Importing fixedpoint works in Windows,
 and I can see it there in site-packages. So there's some confusion
 somewhere, and it could be difficult to solve. 
 
-<H4>2007/05/09 (CB): topoconsole workspace</H4>
-Can we have a matlab-like workspace?
-
-
 <H4>2006/12/14 (JB): Documentation for the new Numeric </H4>
 It's not free. But we could document differences from the current
 Numeric documentation for our users, as we find these differences.
@@ -248,6 +238,14 @@ Set c++ lissom params so that topographica doesn't have to set ganglia
 weight mask specially. Generalize oo_or_map_topo.params.
 
 
+<H4>2006/06/19 (CB): things not to pickle</H4>
+e.g. Filename's search_paths attribute shouldn't be pickled.
+Presumably there will be other such items, so should objects have a
+standard attribute/parameter that lists attributes not to pickle? Or
+something like that.  Otherwise, save_snapshot and load_snapshot could
+specifically avoid items.
+
+
 <H4>2007/03/26 (CB): right-click menus</H4>
 Tidy code, then make it possible to add things to the menu without
 changing the tkgui files, like the templates work for activity plots.
@@ -272,6 +270,12 @@ with test pattern window because plotting expects 2d arrays.
 <H4>2007/03/30 (CB): PatternGenerator, PatternGenerator2D</H4>
 Have a second abstract class so that the base PatternGenerator is
 simpler.
+
+
+<H4>2007/05/09 (CB): topoconsole workspace</H4>
+Can we have a matlab-like workspace?
+
+
 
 
 <H4>2007/03/26: wrap MDP</H4>
@@ -436,14 +440,6 @@ hard.
 
 <H4>2006/03/07 (JL): change_bounds()</H4>
 make change_bounds() able to enlarge as well as shrink 
-
-
-<H4>2006/06/19: things not to pickle</H4>
-e.g. Filename's search_paths attribute shouldn't be pickled.
-Presumably there will be other such items, so should objects have a
-standard attribute/parameter that lists attributes not to pickle? Or
-something like that.  Otherwise, save_snapshot and load_snapshot could
-specifically avoid items.
 
 
 <H4>2005/01/01: unit test results on the web</H4>
