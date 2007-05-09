@@ -139,17 +139,18 @@ class OutputText(Text):
 # as their interpreter in a config file?).
 # Otherwise maybe we can turn this into something capable of passing input to and from some program
 # that the user can specify?
-class CommandPrompt(TkguiWindow):
+class CommandPrompt(Tkinter.Frame):
     """
-    Simple access to python interpreter.
+    A Tkinter Frame widget that provides simple access to python interpreter.
 
     Useful when there is no decent system terminal (e.g. on Windows).
-    """
-    def __init__(self,console,**config):
-        TkguiWindow.__init__(self,**config)
 
-        self.console = console
-        self.title('Topographica Command prompt')
+    Provides status messages to any supplied msg_bar (which should be a Pmw.MessageBar).
+    """
+    def __init__(self,master,msg_bar=None,**config):
+        Tkinter.Frame.__init__(self,master,**config)
+
+        self.msg_bar=msg_bar
         self.balloon = Pmw.Balloon(self)
 
         # command interpreter for executing commands (used by exec_cmd).
@@ -184,8 +185,6 @@ class CommandPrompt(TkguiWindow):
 
         Redirects sys.stdout and sys.stderr to the output text window
         for the duration of the command.
-
-        Updates console's status bar to indicate success or not.
         """   
         capture_stdout = StringIO.StringIO()
         capture_stderr = StringIO.StringIO()
@@ -216,7 +215,8 @@ class CommandPrompt(TkguiWindow):
         capture_stdout.close()
         capture_stderr.close()
 
-	self.console.messageBar.message('state', result)
+        if self.msg_bar: self.msg_bar.message('state', result)
+
         self.command_entry.component('entryfield').clear()
 
 
@@ -590,7 +590,10 @@ class TopoConsole(TkguiWindow):
 
 
     def open_command_prompt(self):
-        CommandPrompt(self)
+        prompt_win = TkguiWindow()
+        prompt_win.title("Topographica Command Prompt")
+        CommandPrompt(prompt_win,self.messageBar).pack(expand='yes',fill='both')
+        
 
         
 
