@@ -1,3 +1,4 @@
+
 <!--CB: going to go through this file and: 
 - order tasks by priority
 - check all my tasks from emails are here
@@ -90,7 +91,16 @@ auto-resizing but the window would otherwise be larger than the
 screen).
 Currently disabled, since they seem to have strange behavior.
 Consider not using Pmw's scrolledframe component.
+<BR>
+Using bwidget scrollbar. Need to center plots, and have
+scrollbars update properly, and to stop window jiggling
+while it's being setup.
 
+<H4>2007/05/18 (CB): gradient plots </H4>
+Correct, finish and test.
+
+<H4>2007/05/18 (CB): timing code </H4>
+Clean up timing code, as in JABALERT. Then finish progress bar.
 
 <H4>2006/03/26 (CB): scheduled_actions in lissom examples</H4>
 Insert missing actions in case someone tries higher densities.
@@ -100,6 +110,7 @@ JAB 2007/04/25: Isn't this already done?
 Set order and names of ParametersFrame's Ok, Apply, Cancel, Reset, and
 Defaults buttons, and make them behave as expected for classes and
 instances.  Figure out and clean up translator_dictionary & its uses.
+ParametersFrame use for objects it doesn't know about (e-mail from JAB).
 
 <H4>2007/03/26 (CB): minor tkgui cleanup</H4>
 Simplify tkgui, e.g. eliminating extra frames and any unnecessary
@@ -108,9 +119,11 @@ difficult to add new features to the GUI and to correct problems.
 <BR>
 Which widgets should expand (expand=YES ?), which should fill the
 space (fill=X ?) (e.g. in parameters frames sliders etc should
-expand), and so on.
+expand), and so on. Switch to grid layout where it's more appropriate.
 <BR>
 More tasks/notes in topo/tkgui/__init__.py
+<BR>
+Document some Tkinter tips.
 
 
 <H4>2007/04/15 (CB): Dynamic info</H4>
@@ -178,6 +191,9 @@ don't seem to work on Windows. I get "ImportError: no module named
 fixedpoint" during unpickling. Importing fixedpoint works in Windows,
 and I can see it there in site-packages. So there's some confusion
 somewhere, and it could be difficult to solve. 
+
+<H4>2007/05/09 (CB): topoconsole workspace</H4>
+Can we have a matlab-like workspace?
 
 
 <H4>2006/12/14 (JB): Documentation for the new Numeric </H4>
@@ -249,7 +265,7 @@ the commandline, from a script, and saving/loading snapshots.)
 
 
 <H4>2007/02/28 (CB): OneDPowerSpectrum & Audio PatternGenerators</H4>
-Finish the two classes. Make a demo with Audio Currently don't work
+Finish the two classes. Make a demo with Audio. Both currently don't work
 with test pattern window because plotting expects 2d arrays.
 
 
@@ -314,7 +330,8 @@ primitives.
 Need to do a general overhaul of the GUI; it needs to be clean and
 well designed so that it can be flexible. Before any such overall,
 review the available graphics toolkits (e.g. wxpython vs tkinter).
-
+Note that wxpython might include some kind of GUI shell that's 
+integrated with ipython by the time we consider this task.
 
 <H4>2006/11/09 (JL?): parameter spaces</H4>
 Add better support for exploring and optimizing parameter spaces.
@@ -715,7 +732,7 @@ persistent command histories, easy interaction with the system shell
 session logging.
 
 
-<H4>2007/02/21 (CB): Investigate using Tile</H4>
+<H4>2007/05/08 (CB): Investigate using Tile</H4>
 Tile has become part of Tkinter now anyway.  Tile looks good on linux
 and windows (haven't tried mac but screenshots look good). But, Tile
 does not have all the widgets we need yet. Tile uses themes so we can
@@ -723,12 +740,14 @@ set it to classic and use Tile + Tkinter widgets and still have a
 uniform look. This gives us nothing to begin with, but Tile should
 eventually have all the widgets of Tkinter, at which point we can
 simply set the theme to get a Topographica which looks 'right' on
-windows and mac. Well, that is almost true. Pmw (which is not
+windows and mac. Well, that is almost true. Pmw (whose widgets are not
 compatible with Tile because of Tile's theme-based approach) provides
 some things we really need. The first of these is balloon help. In
 fact, that is ok to mix with other widgets; it doesn't need to match
-the 'theme' since it's undecorated by the window manager.  The second
-is the menubar, which could be replicated in Tkinter easily - except
-that it doesn't seem to be possible to bind popup help to individual
-menu items...a really useful feature.  [Add note about the others:
-messagebar, combobox, radiobutton, etc.]
+the 'theme' since it's undecorated by the window manager. [bwidget has
+dynamic help, so we can replace it anyway.] The second is the message
+bar. [Bwidget has a MainFrame that has status bar, menu, and - apparently -
+dynamic help. We might be able to simplify topoconsole further with this.] 
+[Add note about the others: messagebar, combobox, radiobutton, etc.
+Probably all available from Tkinter and bwidget...we can probably
+stop using Pmw.]
