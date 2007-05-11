@@ -171,6 +171,7 @@ are stored.""")
     ### PRE below should be deleted, once the behavior of the list of
     ### projections has been verified.
 
+
     ### JC: this function has to be re-written anyway... 
     ###	e.g I don't know why self.projections is a KeyedList...
     def _create_projection_dict(self,sheet_name):
@@ -189,13 +190,13 @@ are stored.""")
         it needs to be done the same way in both places.
         """
         if self._sim_eps:
-            self._sim_ep = [ep for ep in self._sim_eps
-                            if ep.name == sheet_name][0]
-            self.tmp_projections = dict([(i.name, i) for i in
-                                         self._sim_ep.in_connections])
-	    self.projections= KeyedList()
-            sorted_list = self.tmp_projections.items()
+            sim_ep = [ep for ep in self._sim_eps
+                      if ep.name == sheet_name][0]
+
+            sorted_list = sim_ep.projections().items()
             sorted_list.sort(cmp_projections)
+
+            self.projections= KeyedList()
             for item in sorted_list:
                 self.projections.append((item[0],item[1]))
                 
