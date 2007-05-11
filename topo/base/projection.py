@@ -271,8 +271,6 @@ class ProjectionSheet(Sheet):
         The sheet's own activity is not calculated until activate()
         is called.
         """
-        # CEBALERT: can remove assert statement.
-        assert isinstance(conn,Projection), type(conn)
         conn.activate(input_activity)
         
     # CEBALERT: check if we still need this now that in_connections
