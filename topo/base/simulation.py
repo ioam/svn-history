@@ -247,16 +247,16 @@ class EventProcessor(ParameterizedObject):
             raise ValueError("%s is not on the list of ports provided for outgoing connections for %s: %s." %
                              (str(conn.src_port), self.__class__, str(self.src_ports)))
 
-        # CB: outgoing connection must have a unique name
-##         for existing_connection in self.out_connections:
-##             if existing_connection.name==conn.name:
-##                 raise ValueError('A connection out of an EventProcessor must have a unique name; "%s" out of %s already exists'%(conn.name,self.name))
-
-        # CB: outgoing connection must be uniquely named among others going
-        # to the same destination.
+        # CB: outgoing connection must be uniquely named among others
+        # going to the same destination.
         for existing_connection in self.out_connections:
             if existing_connection.name==conn.name and existing_connection.dest==conn.dest:
                 raise ValueError('A connection out of an EventProcessor must have a unique name among connections to a particular destination; "%s" out of %s into %s already exists'%(conn.name,conn.dest,self.name))
+
+        # CB: alternative: outgoing connection must have a unique name
+##         for existing_connection in self.out_connections:
+##             if existing_connection.name==conn.name:
+##                 raise ValueError('A connection out of an EventProcessor must have a unique name; "%s" out of %s already exists'%(conn.name,self.name))
   
         self.out_connections.append(conn)
 
