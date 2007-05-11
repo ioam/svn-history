@@ -159,6 +159,8 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
 
 
 
+        # CB: make our scrollable frame into a widget when it's clear what it adds
+        # (resizes scrolled window content frame up to the screen size, then adds scrollbars).
         # CB: scrollbar frame stops plots from being centered...I wonder how to fix that?
         if bwidget_imported:
             ### Scrollbars for the plots
