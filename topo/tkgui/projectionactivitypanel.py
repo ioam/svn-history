@@ -99,7 +99,7 @@ class ProjectionActivityPanel(TemplatePlotGroupPanel):
         if not projectionsheets:
             return False
 
-        projections=[i.projections().values() for i in projectionsheets]
+        projections=[proj_sheet.in_connections for proj_sheet in projectionsheets]
         return (not projections == [])
 
 

@@ -239,7 +239,7 @@ are stored.""")
         if not projectionsheets:
             return False
 
-        projectionlists=[i.projections().values() for i in projectionsheets]
+        projectionlists=[proj_sheet.in_connections for proj_sheet in projectionsheets]
         projections=[i for i in chain(*projectionlists)]
         return (not projections == [])
 

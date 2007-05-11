@@ -423,7 +423,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 	    # specifying an arbitrary SheetView.
 	    if ( pt.get('Strength', None) == self.keyname):
                 plot_list = []
-		for p in sheet.projections().values():
+                for p in sheet.in_connections: 
 		    plot_channels = copy.deepcopy(pt)
 		    # Note: the UnitView is in the src_sheet view_dict,
 		    # and the name in the key is the destination sheet.
@@ -453,9 +453,13 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
 
     def _create_plots(self,pt_name,pt,sheet):
 	"""Creates plots as specified by the plot_template."""
+
+        # CEBALERT: should there be isinstance(sheet,ProjectionSheet) here, or
+        # has that already been ensured? Same question applies to all the other
+        # _create_plots() methods (where the test isn't already made).
         plot_list = []
-        for p in sheet.projections().values():
-            plot_channels = copy.deepcopy(pt)
+        for p in sheet.in_connections: 
+            plot_channels = copy.deepcopy(pt) 
             key = (self.keyname,sheet.name,p.name)
             plot_channels['Strength'] = key
             plot_list.append(make_template_plot(plot_channels,p.dest.sheet_view_dict,
@@ -503,7 +507,7 @@ class ConnectionFieldsPlotGroup(ProjectionSheetPlotGroup):
         else:
 	    if ( pt.get('Strength', None) == self.keyname):
                 plot_list = []
-		for p in sheet.projections().values():			    
+                for p in sheet.in_connections:
 		    plot_channels = copy.deepcopy(pt)
 		    key = (self.keyname,sheet.name,p.name,self.x,self.y)
 		    plot_channels['Strength'] = key
