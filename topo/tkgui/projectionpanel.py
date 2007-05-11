@@ -152,14 +152,6 @@ are stored.""")
 
         
     ### JABHACKALERT!
-    ###
-    ### This function should test the projections list from a Sheet to
-    ### make sure that only those of type CFProjection are included,
-    ### because those are the only ones that this code knows how to
-    ### deal with.  The abstract Projection class does not know
-    ### anything about CFs, and this code can only handle CFs (at
-    ### present).
-    ###
     ### Items in the Projection list in CFSheets should always be
     ### guaranteed to have unique names; if that's not true at
     ### present, the definition of an EventProcessor or a CFSheet (as
@@ -171,6 +163,8 @@ are stored.""")
     ### PRE below should be deleted, once the behavior of the list of
     ### projections has been verified.
 
+    # CB: I'm working here at the moment.
+    # (Update docstring, remove JABHACKALERT, look at simplification of self.projections stuff)
 
     ### JC: this function has to be re-written anyway... 
     ###	e.g I don't know why self.projections is a KeyedList...
@@ -198,7 +192,11 @@ are stored.""")
 
             self.projections= KeyedList()
             for item in sorted_list:
-                self.projections.append((item[0],item[1]))
+                # CEBALERT: this is ProjecionPanel, but Projection
+                # knows nothing about CFs!
+                if isinstance(item[1],topo.base.cf.CFProjection):
+                    # Only deal with CFProjections (at the moment).
+                    self.projections.append((item[0],item[1]))
                 
         old_projection_name = self.weight_name.get()
         if len(self.projections.keys()) == 0:
