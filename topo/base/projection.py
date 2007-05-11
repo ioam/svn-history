@@ -12,7 +12,6 @@ from parameterclasses import Number, BooleanParameter, Parameter
 from parameterizedobject import ParameterizedObject
 from simulation import EPConnection
 from functionfamilies import OutputFnParameter,IdentityOF
-from numpy import ones,sometrue
 
 
 class SheetMask(ParameterizedObject):
