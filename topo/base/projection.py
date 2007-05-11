@@ -272,13 +272,16 @@ class ProjectionSheet(Sheet):
         is called.
         """
         conn.activate(input_activity)
-        
-    # CEBALERT: check if we still need this now that in_connections
-    # is a list. We should be able to delete it.
+
+    # CB: a minor convenience function
     def projections(self):
         """
         Return a dictionary {projection_name, projection} of all the in_connections
-        for this Sheet.
+        for this ProjectionSheet.
+
+        A minor convenience function for finding projetions by name;
+        the sheet's list of in_connections usually provides simpler
+        access to the Projections.
         """
         return dict([(p.name,p) for p in self.in_connections])
 
