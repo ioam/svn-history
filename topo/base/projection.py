@@ -5,7 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import numpy.oldnumeric as Numeric
+from numpy import array,ones,sometrue
 
 from sheet import Sheet
 from parameterclasses import Number, BooleanParameter, Parameter
@@ -109,7 +109,7 @@ class Projection(EPConnection):
 
     def __init__(self,**params):
         super(Projection,self).__init__(**params)
-        self.activity = Numeric.array(self.dest.activity)
+        self.activity = array(self.dest.activity)
 
     def activate(self,input_activity):
         raise NotImplementedError
