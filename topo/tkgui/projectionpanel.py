@@ -80,19 +80,20 @@ class ProjectionPanel(TemplatePlotGroupPanel):
 	self.situate.set(False)
         self._add_sheet_menu()
         
-     #    self.MIN_PLOT_HEIGHT = 1
-#         self.INITIAL_PLOT_HEIGHT = 6
-#         self.min_master_zoom=1
+        # self.MIN_PLOT_HEIGHT = 1
+        # self.INITIAL_PLOT_HEIGHT = 6
+        # self.min_master_zoom=1
 
-        self.params_frame1 = Frame(master=self)
-        self.params_frame1.pack(side=RIGHT,expand=YES,fill=X)
-        pd = Message(self.params_frame1,text="Plotting Density:",aspect=1000)
+        params_frame1 = Frame(master=self)
+        params_frame1.pack(side=RIGHT,expand=YES,fill=X)
+        pd = Message(params_frame1,text="Plotting Density:",aspect=1000)
         pd.pack(side=LEFT)
         self.balloon.bind(pd,'Number of units to plot per 1.0 distance in sheet coordinates')
-        self.de = Entry(self.params_frame1,textvariable=self.density_var)
-        self.de.bind('<FocusOut>', self.refresh)
-        self.de.bind('<Return>', self.refresh)
-        self.de.pack(side=LEFT,expand=YES,fill=X,padx=2)
+
+        density_entry = Entry(params_frame1,textvariable=self.density_var)
+        density_entry.bind('<FocusOut>', self.refresh)
+        density_entry.bind('<Return>', self.refresh)
+        density_entry.pack(side=LEFT,expand=YES,fill=X,padx=2)
 
         self._add_projection_menu()
 
@@ -188,12 +189,12 @@ are stored.""")
         changing based on which Sheet is selected.  See
         self.sheet_refresh() 
         """
-        self.params_frame2 = Frame(master=self)
-        self.params_frame2.pack(side=LEFT,expand=YES,fill=X)
+        params_frame2 = Frame(master=self)
+        params_frame2.pack(side=LEFT,expand=YES,fill=X)
 
         self._create_projection_dict(self.sheet_var.get())
        
-        self.projection_menu = Pmw.OptionMenu(self.params_frame2,
+        self.projection_menu = Pmw.OptionMenu(params_frame2,
                        command = self.projection_refresh,
                        labelpos = 'w',
                        label_text = 'Projection:',
