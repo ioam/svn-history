@@ -60,11 +60,15 @@ def cmp_projections(p1,p2):
 class ProjectionPanel(TemplatePlotGroupPanel):
     def __init__(self,console=None,pgt_name=None,**params):
         
-        self.sheet_name_var = StringVar()
-	self.density_str = StringVar()
-        self.density_str.set('10.0')
-        self.density = float(eval(self.density_str.get(),__main__.__dict__))
-	self.weight_name = StringVar()
+        self.sheet_var = StringVar()
+	self.density_var = StringVar()
+        self.density_var.set('10.0')
+
+        # CEBALERT: seems like self.density should be kept in sync with
+        # self.density_var: could use a trace to do this.
+        self.density = float(eval(self.density_var.get(),__main__.__dict__))
+
+	self.projection_var = StringVar()
         self.projections = KeyedList()
  
 	super(ProjectionPanel,self).__init__(console,pgt_name,**params)
@@ -85,7 +89,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         pd = Message(self.params_frame1,text="Plotting Density:",aspect=1000)
         pd.pack(side=LEFT)
         self.balloon.bind(pd,'Number of units to plot per 1.0 distance in sheet coordinates')
-        self.de = Entry(self.params_frame1,textvariable=self.density_str)
+        self.de = Entry(self.params_frame1,textvariable=self.density_var)
         self.de.bind('<FocusOut>', self.refresh)
         self.de.bind('<Return>', self.refresh)
         self.de.pack(side=LEFT,expand=YES,fill=X,padx=2)
@@ -113,7 +117,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
 	self._sim_eps.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
         sim_ep_names = [ep.name for ep in self._sim_eps]
         if len(sim_ep_names) > 0:
-            self.sheet_name_var.set(sim_ep_names[0])
+            self.sheet_var.set(sim_ep_names[0])
 
         # The GUI label says Sheet, not CFSheet, because users probably 
         # don't need to worry about the distinction.
@@ -121,7 +125,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
                        command = self.sheet_refresh,
                        labelpos = 'w',
                        label_text = 'Sheet:',
-                       menubutton_textvariable = self.sheet_name_var,
+                       menubutton_textvariable = self.sheet_var,
                        items = sim_ep_names)
         self.opt_menu.pack(side=LEFT)
         # Should be shared with projectionpanel
@@ -170,11 +174,11 @@ are stored.""")
         ### JC: I don't know why self.projections is a KeyedList...
         self.projections = KeyedList(self.projections)
 
-        old_projection_name = self.weight_name.get()
+        old_projection_name = self.projection_var.get()
         if len(self.projections.keys()) == 0:
-            self.weight_name.set('None')
+            self.projection_var.set('None')
         elif old_projection_name not in self.projections.keys():
-            self.weight_name.set(self.projections.keys()[0])
+            self.projection_var.set(self.projections.keys()[0])
 
 
     def _add_projection_menu(self):
@@ -187,13 +191,13 @@ are stored.""")
         self.params_frame2 = Frame(master=self)
         self.params_frame2.pack(side=LEFT,expand=YES,fill=X)
 
-        self._create_projection_dict(self.sheet_name_var.get())
+        self._create_projection_dict(self.sheet_var.get())
        
         self.projection_menu = Pmw.OptionMenu(self.params_frame2,
                        command = self.projection_refresh,
                        labelpos = 'w',
                        label_text = 'Projection:',
-                       menubutton_textvariable = self.weight_name,
+                       menubutton_textvariable = self.projection_var,
                        items = self.projections.keys())
         self.projection_menu.pack(side=LEFT)
         # Should be shared with projectionpanel
@@ -247,13 +251,13 @@ are stored.""")
         The plotgroup_key for retrieving the PlotGroup depends on the
         values entered in the window widgets.  This method generates
         the appropriate key based on those values, using a tuple like:
-        ('Projection', self.weight_name, self.density, self.sheet_name_var).
+        ('Projection', self.projection_var, self.density, self.sheet_var).
         """
-        self.density = float(eval(self.density_str.get(),__main__.__dict__))
+        self.density = float(eval(self.density_var.get(),__main__.__dict__))
 	self.plotgroup.situate= self.situate.get()
 	self.plotgroup.density = self.density
-	self.plotgroup.sheet_name=self.sheet_name_var.get()
-	self.plotgroup.weight_name = self.weight_name.get()
+	self.plotgroup.sheet_name=self.sheet_var.get()
+	self.plotgroup.weight_name = self.projection_var.get()
 
 
     def generate_plotgroup(self):
@@ -261,8 +265,8 @@ are stored.""")
         self.generate_plotgroup_key() creates the density information needed for
         a ProjectionPlotGroup to create necessary Plots.
         """
- 	plotgroup = ProjectionPlotGroup([],self._pg_template(),self.sheet_name_var.get(),
-					self.weight_name.get(),self.density,
+ 	plotgroup = ProjectionPlotGroup([],self._pg_template(),self.sheet_var.get(),
+					self.projection_var.get(),self.density,
                                         normalize=self.normalize.get(),
                                         sheetcoords=self.sheetcoords.get(),
                                         integerscaling=self.integerscaling.get())
@@ -319,7 +323,7 @@ are stored.""")
         reasonable to put information around the plot group.
         """
         if len(self.projections) > 0:
-            src_name = self.projections[self.weight_name.get()].src.name
+            src_name = self.projections[self.projection_var.get()].src.name
 
             new_title = 'Projection ' + self.plotgroup.weight_name + ' from ' + src_name + ' to ' \
                         + self.plotgroup.sheet_name + ' at time ' + str(self.plotgroup.time)
