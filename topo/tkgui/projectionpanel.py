@@ -29,7 +29,7 @@ from templateplotgrouppanel import TemplatePlotGroupPanel
 
 
 ### JCALERT! See if we could delete this import * and replace it...
-from topo.commands.analysis import *
+#from topo.commands.analysis import *
 
 
 
