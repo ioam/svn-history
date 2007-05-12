@@ -11,9 +11,9 @@ $Id$
 __version__='$Revision$'
 
 import Pmw
-import __main__
 
-from Tkinter import StringVar, BooleanVar, Frame, TOP, LEFT, YES, X, Message
+
+from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message
 from Tkinter import Entry, Label, NSEW, Checkbutton, NORMAL, DISABLED
 
 import topo
@@ -21,11 +21,6 @@ import topo
 from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import ConnectionFieldsPlotGroup
 from topo.base.sheet import Sheet
-
-import topo.base.cf
-
-from topo.commands.analysis import *
-import topo.commands.analysis
 
 from projectionpanel import SomethingPanel
 
@@ -112,11 +107,9 @@ It is an error to request a unit outside the area of the Sheet.""")
 
         Key Format:  Tuple: ('Weights', Sheet_Name, X_Number, Y_Number)
         """
-        g = __main__.__dict__
-        self.x = eval(self.x_str.get(),g)
-        self.y = eval(self.y_str.get(),g)
-        if isinstance(self.x,int): self.x = float(self.x)
-        if isinstance(self.y,int): self.y = float(self.y)
+        self.x = float(self.x_str.get())
+        self.y = float(self.y_str.get())
+        
         # JABALERT: Need to display the actual x,y coordintes of the
         # nearest unit somehow, since that differs from the value requested.
 
