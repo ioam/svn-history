@@ -9,7 +9,6 @@ $Id$
 __version__='$Revision$'
 
 import copy
-import re
 
 from inspect import getdoc
 from math import floor
