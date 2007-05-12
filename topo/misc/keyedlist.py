@@ -6,6 +6,19 @@ $Id$
 __version__='$Revision$'
 
 
+# CEBALERT: Do most uses of KeyedList look like they would be better
+# served by something that's really a dictionary, but which maintains
+# order (rather than something that's really a list, but allows some
+# dictionary-style access)? If so, we could use one of the many online
+# ordered dictionaries instead.
+# http://cheeseshop.python.org/pypi/Ordered%20Dictionary/0.2.2
+# http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496761
+# http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/107747 
+#
+# Sometimes having a KeyedList is confusing, because you can't use
+# natural syntax such as "x in y" when y is a KeyedList. 
+
+
 class KeyedList(list):
     """
     Extends the built-in type 'list' to support dictionary-like
