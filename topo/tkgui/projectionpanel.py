@@ -63,11 +63,6 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         self.sheet_var = StringVar()
 	self.density_var = StringVar()
         self.density_var.set('10.0')
-
-        # CEBALERT: seems like self.density should be kept in sync with
-        # self.density_var: could use a trace to do this.
-        self.density = float(eval(self.density_var.get(),__main__.__dict__))
-
 	self.projection_var = StringVar()
         self.projections = KeyedList()
  
@@ -101,6 +96,15 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         self.set_auto_refresh()
         
         self.refresh()
+
+    def get_density(self):
+        """Return the float value of the density from self.density_var."""
+        # CEBALERT: Any reason to eval in __main__? Expecting to use a
+        # variable? Seems unlikely.
+        # return float(self.density_var.get())
+        return float(eval(self.density_var.get(),__main__.__dict__))
+
+        
 
     def _add_sheet_menu(self):
         """
@@ -254,9 +258,8 @@ are stored.""")
         the appropriate key based on those values, using a tuple like:
         ('Projection', self.projection_var, self.density, self.sheet_var).
         """
-        self.density = float(eval(self.density_var.get(),__main__.__dict__))
 	self.plotgroup.situate= self.situate.get()
-	self.plotgroup.density = self.density
+	self.plotgroup.density = self.get_density()
 	self.plotgroup.sheet_name=self.sheet_var.get()
 	self.plotgroup.weight_name = self.projection_var.get()
 
@@ -267,7 +270,7 @@ are stored.""")
         a ProjectionPlotGroup to create necessary Plots.
         """
  	plotgroup = ProjectionPlotGroup([],self._pg_template(),self.sheet_var.get(),
-					self.projection_var.get(),self.density,
+					self.projection_var.get(),self.get_density(),
                                         normalize=self.normalize.get(),
                                         sheetcoords=self.sheetcoords.get(),
                                         integerscaling=self.integerscaling.get())
