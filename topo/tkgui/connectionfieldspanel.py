@@ -29,21 +29,15 @@ from projectionpanel import SomethingPanel
 # don't make sense at the moment when things like 'situate' are clicked.
 
 class ConnectionFieldsPanel(SomethingPanel):
-    def __init__(self,console=None,pgt_name=None,x=0,y=0,**params):       
-
-
-	self.x = x # (was 0)
-	self.y = y # (was 0)
-
-
+    def __init__(self,console=None,pgt_name=None,x=0.0,y=0.0,**params):       
 
         # Receptive Fields are generally tiny.  Boost it up to make it visible.
         self.WEIGHT_PLOT_INITIAL_SIZE = 30
 
-        self.x_str = StringVar()
-        self.x_str.set(float(self.x)) # was set(0.0)
-        self.y_str = StringVar()
-        self.y_str.set(float(self.y)) # was set(0.0)
+        self.x_var = StringVar()
+        self.x_var.set(x) 
+        self.y_var = StringVar()
+        self.y_var.set(y) 
 
 
         super(ConnectionFieldsPanel,self).__init__(console,pgt_name,**params)
@@ -66,7 +60,7 @@ class ConnectionFieldsPanel(SomethingPanel):
         params_frame.pack(side=TOP,expand=YES,fill=X)
         
         Message(params_frame,text="Unit  X:",aspect=1000).pack(side=LEFT)
-        self.xe = Entry(params_frame,textvariable=self.x_str)
+        self.xe = Entry(params_frame,textvariable=self.x_var)
         self.xe.bind('<Return>',self.refresh)
         self.xe.pack(side=LEFT,expand=YES,fill=X)
         self.balloon.bind(self.xe,
@@ -74,7 +68,7 @@ class ConnectionFieldsPanel(SomethingPanel):
 It is an error to request a unit outside the area of the Sheet.""")
         
         Message(params_frame,text="Y:",aspect=1000).pack(side=LEFT)
-        self.ye = Entry(params_frame,textvariable=self.y_str)
+        self.ye = Entry(params_frame,textvariable=self.y_var)
 	self.ye.bind('<Return>', self.refresh)
         self.ye.pack(side=LEFT,expand=YES,fill=X,padx=5)
         self.balloon.bind(self.ye,
@@ -107,8 +101,7 @@ It is an error to request a unit outside the area of the Sheet.""")
 
         Key Format:  Tuple: ('Weights', Sheet_Name, X_Number, Y_Number)
         """
-        self.x = float(self.x_str.get())
-        self.y = float(self.y_str.get())
+        x,y = float(self.x_var.get()), float(self.y_var.get())
         
         # JABALERT: Need to display the actual x,y coordintes of the
         # nearest unit somehow, since that differs from the value requested.
@@ -118,10 +111,10 @@ It is an error to request a unit outside the area of the Sheet.""")
         # This assumes that displaying the rectangle information is enough.
         l,b,r,t = ep.bounds.aarect().lbrt()
 
-        if ep.bounds.contains(self.x,self.y):
+        if ep.bounds.contains(x,y):
 	    self.plotgroup.sheet_name = self.sheet_var.get()
-	    self.plotgroup.x = self.x
-	    self.plotgroup.y = self.y
+	    self.plotgroup.x = x
+	    self.plotgroup.y = y
         else:
             self.dialog = Pmw.Dialog(self,title = 'Error')
             message = 'The x/y coordinates are outside the bounding region.\n'\
@@ -146,7 +139,7 @@ It is an error to request a unit outside the area of the Sheet.""")
         the Plot objects.
         """
 	plotgroup = ConnectionFieldsPlotGroup([],self._pg_template(),self.sheet_var.get(),
-                                              self.x,self.y,
+                                              float(self.x_var.get()),float(self.y_var.get()),
                                               normalize=self.normalize.get(),
                                               sheetcoords=self.sheetcoords.get(),
                                               integerscaling=self.integerscaling.get())
