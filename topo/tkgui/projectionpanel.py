@@ -6,7 +6,7 @@ $Id$
 __version__='$Revision$'
 
 
-import __main__
+
 
 from Tkinter import StringVar, BooleanVar, Frame, YES, LEFT, TOP, RIGHT
 from Tkinter import X, Message, Entry, Canvas, FLAT, Checkbutton, NORMAL, DISABLED
@@ -160,15 +160,6 @@ class ProjectionPanel(SomethingPanel):
         self.refresh()
 
 
-    def get_density(self):
-        """Return the float value of the density from self.density_var."""
-        # CEBALERT: Any reason to eval in __main__? Expecting to use a
-        # variable? Seems unlikely.
-        # return float(self.density_var.get())
-        return float(eval(self.density_var.get(),__main__.__dict__))
-
-        
-
 
         
 
@@ -262,7 +253,7 @@ class ProjectionPanel(SomethingPanel):
         ('Projection', self.projection_var, self.density, self.sheet_var).
         """
 	self.plotgroup.situate= self.situate.get()
-	self.plotgroup.density = self.get_density()
+	self.plotgroup.density = float(self.density_var.get())
 	self.plotgroup.sheet_name=self.sheet_var.get()
 	self.plotgroup.weight_name = self.projection_var.get()
 
@@ -273,7 +264,8 @@ class ProjectionPanel(SomethingPanel):
         a ProjectionPlotGroup to create necessary Plots.
         """
  	plotgroup = ProjectionPlotGroup([],self._pg_template(),self.sheet_var.get(),
-					self.projection_var.get(),self.get_density(),
+					self.projection_var.get(),
+                                        float(self.density_var.get()),
                                         normalize=self.normalize.get(),
                                         sheetcoords=self.sheetcoords.get(),
                                         integerscaling=self.integerscaling.get())
