@@ -106,12 +106,12 @@ It is an error to request a unit outside the area of the Sheet.""")
         # JABALERT: Need to display the actual x,y coordintes of the
         # nearest unit somehow, since that differs from the value requested.
 
-        ep = [ep for ep in topo.sim.objects(Sheet).values()
-              if ep.name == self.sheet_var.get()][0]
-        # This assumes that displaying the rectangle information is enough.
-        l,b,r,t = ep.bounds.aarect().lbrt()
+        sheet = topo.sim[self.sheet_var.get()]
 
-        if ep.bounds.contains(x,y):
+        # This assumes that displaying the rectangle information is enough.
+        l,b,r,t = sheet.bounds.aarect().lbrt()
+
+        if sheet.bounds.contains(x,y):
 	    self.plotgroup.sheet_name = self.sheet_var.get()
 	    self.plotgroup.x = x
 	    self.plotgroup.y = y
