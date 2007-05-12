@@ -129,12 +129,16 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
         # plots).  Call self.auto_refresh.set(True) to enable
         # autorefresh in a subclassed constructor function.
 	self.auto_refresh = BooleanVar()
+        # just setting the variable calls the method (does not rely on
+        # checkbutton widget being clicked)
+        self.auto_refresh.trace_variable('w',lambda x,y,z: self.set_auto_refresh())
+        
 	self.auto_refresh.set(False)
         if self.auto_refresh.get():
             self.console.auto_refresh_panels.append(self)
-        self.auto_refresh_checkbutton = \
-            Checkbutton(self.control_frame_1, text="Auto-refresh",
-                        variable=self.auto_refresh,command=self.set_auto_refresh)
+        self.auto_refresh_checkbutton = Checkbutton(self.control_frame_1,text="Auto-refresh",
+                                                    variable=self.auto_refresh)
+        
         self.auto_refresh_checkbutton.pack(side=RIGHT)
         self.balloon.bind(self.auto_refresh_checkbutton,
             "Whether to regenerate this plot whenever the simulation time advances.")
@@ -143,10 +147,11 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
         ### Auto-resize checkbutton.
         # See set_auto_resize() for more info.
         self.auto_resize = BooleanVar()
+        self.auto_resize.trace_variable('w',lambda x,y,z: self.set_auto_resize())
+        self.auto_resize.set(True)
         auto_resize_checkbutton=Checkbutton(self.control_frame_1, text="Auto-resize",
-                                            variable=self.auto_resize,command=self.set_auto_resize)
+                                            variable=self.auto_resize)
         auto_resize_checkbutton.pack(side=RIGHT)
-        self.auto_resize.set(True); self.set_auto_resize()
         self.balloon.bind(auto_resize_checkbutton,
             "Whether to resize this window automatically to fit the contents, or to allow the window to be resized manually.")
 
@@ -246,7 +251,6 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
 
     def set_auto_refresh(self):
         """Function called by Widget when check-box clicked."""
-
         if self.auto_refresh.get():
             if not (self in self.console.auto_refresh_panels):
                 self.console.auto_refresh_panels.append(self)
