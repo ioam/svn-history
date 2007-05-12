@@ -273,7 +273,7 @@ class ProjectionSheet(Sheet):
         """
         conn.activate(input_activity)
 
-    # CB: a minor convenience function
+
     def projections(self):
         """
         Return a dictionary {projection_name, projection} of all the in_connections
