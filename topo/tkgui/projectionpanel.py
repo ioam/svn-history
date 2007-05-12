@@ -55,8 +55,10 @@ def cmp_projections(p1,p2):
 	return cmp(p1[0],p2[0])
 
 
-### JABALERT: Maybe this should be called CFProjectionPanel instead,
-### since it is only valid for CFProjections.
+### JABALERT: This should be called CFProjectionPanel since it is only
+### valid for CFProjections. We can consider having an abstract
+### ProjectionPanel above this class, or at least a common parent
+### for all the *Panel classes that share common code.
 class ProjectionPanel(TemplatePlotGroupPanel):
     def __init__(self,console=None,pgt_name=None,**params):
         
@@ -113,16 +115,12 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         _sheet_refresh() is called.  It can either call the refresh()
         function, or update another menu, and so on.
         """
+        cfsheets = [sheet for sheet in topo.sim.objects(topo.base.cf.CFSheet).values()]
+	cfsheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
 
-        # Create the item list for CFSheet 'Sheet'  This will not change
-        # since this window will only examine one Simulation.
-        sim = topo.sim
-        self._sim_eps = [ep for ep in sim.objects(Sheet).values()
-                  if isinstance(ep,topo.base.cf.CFSheet)]
-	self._sim_eps.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
-        sim_ep_names = [ep.name for ep in self._sim_eps]
-        if len(sim_ep_names) > 0:
-            self.sheet_var.set(sim_ep_names[0])
+        # CBALERT: already guaranteed to be true by valid_context()?
+        # If so, remove this line.
+        if len(cfsheets)>0: self.sheet_var.set(cfsheets[0].name)
 
         # The GUI label says Sheet, not CFSheet, because users probably 
         # don't need to worry about the distinction.
@@ -131,7 +129,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
                        labelpos = 'w',
                        label_text = 'Sheet:',
                        menubutton_textvariable = self.sheet_var,
-                       items = sim_ep_names)
+                       items = [sheet.name for sheet in cfsheets])
         self.sheet_menu.pack(side=LEFT)
         # Should be shared with projectionpanel
         self.balloon.bind(self.sheet_menu,
@@ -168,10 +166,7 @@ are stored.""")
 
         Does something else after that...
         """
-        # CEBALERT: this is ProjecionPanel, but Projection
-        # knows nothing about CFs!
         self.projections = [(p.name,p) for p in topo.sim[sheet_name].in_connections
-                            # Only deal with CFProjections (at the moment).
                             if isinstance(p,topo.base.cf.CFProjection)]
         
         self.projections.sort(cmp_projections)
