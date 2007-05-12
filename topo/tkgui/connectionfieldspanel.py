@@ -18,7 +18,6 @@ from Tkinter import Entry, Label, NSEW, Checkbutton, NORMAL, DISABLED
 
 import topo
 
-from templateplotgrouppanel import TemplatePlotGroupPanel
 from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import ConnectionFieldsPlotGroup
 from topo.base.sheet import Sheet
@@ -28,30 +27,21 @@ import topo.base.cf
 from topo.commands.analysis import *
 import topo.commands.analysis
 
+from projectionpanel import SomethingPanel
+
+
 # CEBHACKALERT: various parts of the dynamic info/right-click menu stuff
 # don't make sense at the moment when things like 'situate' are clicked.
 
-class ConnectionFieldsPanel(TemplatePlotGroupPanel):
+class ConnectionFieldsPanel(SomethingPanel):
     def __init__(self,console=None,pgt_name=None,x=0,y=0,**params):       
 
-        # CEBALERT: I'm not sure what the various definitions of x and y
-        # are for - I wonder if they can be cleaned up? I haven't looked,
-        # and when adding the x any y args above with their defaults, I've
-        # left a note of the previous values in case they're needed while
-        # cleaning up.
-        self.region = StringVar()
+
 	self.x = x # (was 0)
 	self.y = y # (was 0)
 
-        # CEBALERT: why not a super() call?
-	TemplatePlotGroupPanel.__init__(self,console,pgt_name,**params)
 
 
-        self.__params_frame = Frame(master=self)
-        self.__params_frame.pack(side=LEFT,expand=YES,fill=X)
-        self._add_situate_button()
-
-        
         # Receptive Fields are generally tiny.  Boost it up to make it visible.
         self.WEIGHT_PLOT_INITIAL_SIZE = 30
 
@@ -59,65 +49,21 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         self.x_str.set(float(self.x)) # was set(0.0)
         self.y_str = StringVar()
         self.y_str.set(float(self.y)) # was set(0.0)
-	self._add_region_menu()
+
+
+        super(ConnectionFieldsPanel,self).__init__(console,pgt_name,**params)
+
+        # CEBALERT: I'm not sure what the various definitions of x and y
+        # are for - I wonder if they can be cleaned up? I haven't looked,
+        # and when adding the x any y args above with their defaults, I've
+        # left a note of the previous values in case they're needed while
+        # cleaning up.
+ 
+	
         self._add_xy_boxes()
 
-        self.auto_refresh.set(False)
-        self.set_auto_refresh()
 
 	self.refresh()
-
-
-    def _add_region_menu(self):
-        """
-        This function adds a Sheet: menu that queries the active
-        simulation for the list of options.  When an update is made,
-        _region_refresh() is called.  It can either call the refresh()
-        funcion, or update another menu, and so on.
-        """
-        # Create the item list for CFSheet 'Sheet'  This will not change
-        # since this window will only examine one Simulation.
-
-        self._sim_eps = topo.sim.objects(CFSheet).values()
-	self._sim_eps.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
-        sim_ep_names = [ep.name for ep in self._sim_eps]
-        if len(sim_ep_names) > 0:
-            self.region.set(sim_ep_names[0])
-            
-        # The GUI label says Sheet, not CFSheet, because users probably 
-        # don't need to worry about the distinction.
-        self.opt_menu = Pmw.OptionMenu(self.__params_frame,
-                       command = self.refresh,
-                       labelpos = 'w',
-                       label_text = 'Sheet:',
-                       menubutton_textvariable = self.region,
-                       items = sim_ep_names)
-        self.opt_menu.pack(side=LEFT)
-        # Should be shared with projectionpanel
-        self.balloon.bind(self.opt_menu,"""CFSheet whose unit(s) will be plotted.""")
-
-
-    def _add_situate_button(self):
-	self.situate = BooleanVar()
-	self.situate.set(True)
-        self.situate_checkbutton = Checkbutton(self.__params_frame,
-             text="Situate",variable=self.situate,command=self.set_situate)
-        self.situate_checkbutton.pack(side=LEFT)
-        # Should move into the documentation for a situate parameter shared with projectionpanel
-        self.balloon.bind(self.situate_checkbutton,
-"""If True, plots the weights on the entire source sheet, using zeros for all
-weights outside the ConnectionField.  If False, plots only the actual weights that
-are stored.""")
-
-
-    def set_situate(self):
-        """Set the attribute situate"""
-        if self.plotgroup != None:
-            self.plotgroup.situate = self.situate.get()
-        self.initial_plot = True
-        self.height_of_tallest_plot = self.min_master_zoom = 1
-        self.plotgroup.update_plots(False)
-	self.display_plots()
 
 
     def _add_xy_boxes(self):
@@ -139,6 +85,7 @@ It is an error to request a unit outside the area of the Sheet.""")
         self.balloon.bind(self.ye,
 """Sheet coordinate location desired.  The unit nearest this location will be returned.
 It is an error to request a unit outside the area of the Sheet.""")
+
 
     @staticmethod
     def valid_context():
@@ -174,12 +121,12 @@ It is an error to request a unit outside the area of the Sheet.""")
         # nearest unit somehow, since that differs from the value requested.
 
         ep = [ep for ep in topo.sim.objects(Sheet).values()
-              if ep.name == self.region.get()][0]
+              if ep.name == self.sheet_var.get()][0]
         # This assumes that displaying the rectangle information is enough.
         l,b,r,t = ep.bounds.aarect().lbrt()
 
         if ep.bounds.contains(self.x,self.y):
-	    self.plotgroup.sheet_name = self.region.get()
+	    self.plotgroup.sheet_name = self.sheet_var.get()
 	    self.plotgroup.x = self.x
 	    self.plotgroup.y = self.y
         else:
@@ -194,7 +141,7 @@ It is an error to request a unit outside the area of the Sheet.""")
                               pady = 20)
             w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
 	self.plotgroup.situate=self.situate.get()
-	self.plotgroup.sheet_name = self.region.get()
+	self.plotgroup.sheet_name = self.sheet_var.get()
 
 
     def generate_plotgroup(self):
@@ -205,7 +152,7 @@ It is an error to request a unit outside the area of the Sheet.""")
         PlotGroup is created, call its do_plot_cmd() to prepare
         the Plot objects.
         """
-	plotgroup = ConnectionFieldsPlotGroup([],self._pg_template(),self.region.get(),
+	plotgroup = ConnectionFieldsPlotGroup([],self._pg_template(),self.sheet_var.get(),
                                               self.x,self.y,
                                               normalize=self.normalize.get(),
                                               sheetcoords=self.sheetcoords.get(),
@@ -237,7 +184,7 @@ It is an error to request a unit outside the area of the Sheet.""")
             self.situate_checkbutton.config(state=DISABLED)
 	    self.xe.config(state=DISABLED)
 	    self.ye.config(state=DISABLED)
-	    ### JCALERT: Should find a way to disable the region menu
+	    ### JCALERT: Should find a way to disable the sheet menu
 	    ### (What I tried below does not work)
 	    ### Also, disabled the text for the xy_boxes (i.e., X,Y)
 	    ## Also, when changing the menu while looking in history,

@@ -55,26 +55,90 @@ def cmp_projections(p1,p2):
 	return cmp(p1[0],p2[0])
 
 
+
+class SomethingPanel(TemplatePlotGroupPanel):
+
+    def __init__(self,console,pgt_name,**params):
+
+        self.sheet_var = StringVar()
+        super(SomethingPanel,self).__init__(console,pgt_name,**params)
+
+        self._params_frame = Frame(master=self)
+        self._params_frame.pack(side=LEFT,expand=YES,fill=X)
+        
+        self._add_situate_button()
+	self.situate.set(False)
+        self._add_sheet_menu()
+
+        self.auto_refresh.set(False)
+        self.set_auto_refresh()
+
+
+
+    def _add_sheet_menu(self):
+        """
+        This function adds a Sheet: menu that queries the active
+        simulation for the list of options.  When an update is made,
+        _sheet_refresh() is called.  It can either call the refresh()
+        function, or update another menu, and so on.
+        """
+        cfsheets = [sheet for sheet in topo.sim.objects(topo.base.cf.CFSheet).values()]
+	cfsheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
+
+        # CBALERT: already guaranteed to be true by valid_context()?
+        # If so, remove this line.
+        if len(cfsheets)>0: self.sheet_var.set(cfsheets[0].name)
+
+        # The GUI label says Sheet, not CFSheet, because users probably 
+        # don't need to worry about the distinction.
+        self.sheet_menu = Pmw.OptionMenu(self._params_frame,
+                       command = self.refresh,
+                       labelpos = 'w',
+                       label_text = 'Sheet:',
+                       menubutton_textvariable = self.sheet_var,
+                       items = [sheet.name for sheet in cfsheets])
+        self.sheet_menu.pack(side=LEFT)
+        # Should be shared with projectionpanel
+        self.balloon.bind(self.sheet_menu,
+"""CFSheet whose unit(s) will be plotted.""")
+
+    def _add_situate_button(self):
+        
+	self.situate = BooleanVar()
+	self.situate.set(True)
+        self.situate_checkbutton = Checkbutton(self._params_frame,
+             text="Situate",variable=self.situate,command=self.set_situate)
+        self.situate_checkbutton.pack(side=LEFT)
+        # Should move into the documentation for a situate parameter shared with connectionfieldspanel
+        self.balloon.bind(self.situate_checkbutton,
+"""If True, plots the weights on the entire source sheet, using zeros for all
+weights outside the ConnectionField.  If False, plots only the actual weights that
+are stored.""")
+
+    def set_situate(self):
+        """Set the attribute situate."""
+        if self.plotgroup != None:
+            self.plotgroup.situate = self.situate.get()
+        self.plotgroup.initial_plot = True
+        self.plotgroup.height_of_tallest_plot = self.min_master_zoom = 1
+	self.plotgroup.update_plots(False)
+	self.display_plots()
+
+    
+
+
+
 ### JABALERT: This should be called CFProjectionPanel since it is only
 ### valid for CFProjections. We can consider having an abstract
 ### ProjectionPanel above this class, or at least a common parent
 ### for all the *Panel classes that share common code.
-class ProjectionPanel(TemplatePlotGroupPanel):
+class ProjectionPanel(SomethingPanel):
     def __init__(self,console=None,pgt_name=None,**params):
-	super(ProjectionPanel,self).__init__(console,pgt_name,**params)
-        
-        self.sheet_var = StringVar()
-	self.density_var = StringVar()
-        self.density_var.set('10.0')
 	self.projection_var = StringVar()
         self.projections = KeyedList()
-
-        self.__params_frame = Frame(master=self)
-        self.__params_frame.pack(side=LEFT,expand=YES,fill=X)
-
-        self._add_situate_button()
-	self.situate.set(False)
-        self._add_sheet_menu()
+	self.density_var = StringVar()
+        self.density_var.set('10.0')
+        super(ProjectionPanel,self).__init__(console,pgt_name,**params)
         
         # self.MIN_PLOT_HEIGHT = 1
         # self.INITIAL_PLOT_HEIGHT = 6
@@ -93,10 +157,8 @@ class ProjectionPanel(TemplatePlotGroupPanel):
 
         self._add_projection_menu()
 
-        self.auto_refresh.set(False)
-        self.set_auto_refresh()
-        
         self.refresh()
+
 
     def get_density(self):
         """Return the float value of the density from self.density_var."""
@@ -107,54 +169,6 @@ class ProjectionPanel(TemplatePlotGroupPanel):
 
         
 
-    def _add_sheet_menu(self):
-        """
-        This function adds a Sheet: menu that queries the active
-        simulation for the list of options.  When an update is made,
-        _sheet_refresh() is called.  It can either call the refresh()
-        function, or update another menu, and so on.
-        """
-        cfsheets = [sheet for sheet in topo.sim.objects(topo.base.cf.CFSheet).values()]
-	cfsheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
-
-        # CBALERT: already guaranteed to be true by valid_context()?
-        # If so, remove this line.
-        if len(cfsheets)>0: self.sheet_var.set(cfsheets[0].name)
-
-        # The GUI label says Sheet, not CFSheet, because users probably 
-        # don't need to worry about the distinction.
-        self.sheet_menu = Pmw.OptionMenu(self.__params_frame,
-                       command = self.sheet_refresh,
-                       labelpos = 'w',
-                       label_text = 'Sheet:',
-                       menubutton_textvariable = self.sheet_var,
-                       items = [sheet.name for sheet in cfsheets])
-        self.sheet_menu.pack(side=LEFT)
-        # Should be shared with projectionpanel
-        self.balloon.bind(self.sheet_menu,
-"""CFSheet whose unit(s) will be plotted.""")
-
-    def _add_situate_button(self):
-        
-	self.situate = BooleanVar()
-	self.situate.set(True)
-        self.situate_checkbutton = Checkbutton(self.__params_frame,
-             text="Situate",variable=self.situate,command=self.set_situate)
-        self.situate_checkbutton.pack(side=LEFT)
-        # Should move into the documentation for a situate parameter shared with connectionfieldspanel
-        self.balloon.bind(self.situate_checkbutton,
-"""If True, plots the weights on the entire source sheet, using zeros for all
-weights outside the ConnectionField.  If False, plots only the actual weights that
-are stored.""")
-
-    def set_situate(self):
-        """Set the attribute situate."""
-        if self.plotgroup != None:
-            self.plotgroup.situate = self.situate.get()
-        self.plotgroup.initial_plot = True
-        self.plotgroup.height_of_tallest_plot = self.min_master_zoom = 1
-	self.plotgroup.update_plots(False)
-	self.display_plots()
 
         
 
@@ -204,6 +218,8 @@ are stored.""")
 """Projection to plot.""")
 
 
+
+
     @staticmethod
     def valid_context():
         """
@@ -217,16 +233,18 @@ are stored.""")
         projections=[i for i in chain(*projectionlists)]
         return (not projections == [])
         
-        
-    def sheet_refresh(self,sheet_name):
+
+    # CEBHACKALERT q
+    def refresh(self,q=None):
         """
         Update the Projection menu.  This overwrites the parent class
         function CFSheetPlotPanel.sheet_refresh() which is called when
         the Sheet Widget menu is changed.
         """
+        sheet_name = self.sheet_var.get()
         self._create_projection_dict(sheet_name)
         self.projection_menu.setitems(self.projections.keys())
-        self.refresh()
+        super(ProjectionPanel,self).refresh()
 
 
     def refresh_title(self):
