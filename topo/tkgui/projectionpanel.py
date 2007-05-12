@@ -151,53 +151,25 @@ are stored.""")
 	self.display_plots()
 
         
-    ### JABHACKALERT!
-    ### Items in the Projection list in CFSheets should always be
-    ### guaranteed to have unique names; if that's not true at
-    ### present, the definition of an EventProcessor or a CFSheet (as
-    ### appropriate) should be changed to force unique names.  We
-    ### should not have to be reasoning about multiple Projections
-    ### with the same name anywhere in the code except when such
-    ### Projections are first defined, because it's meaningless to
-    ### have such a set of Projections.  Thus all comments like the
-    ### PRE below should be deleted, once the behavior of the list of
-    ### projections has been verified.
 
-    # CB: I'm working here at the moment.
-    # (Update docstring, remove JABHACKALERT, look at simplification of self.projections stuff)
-
-    ### JC: this function has to be re-written anyway... 
-    ###	e.g I don't know why self.projections is a KeyedList...
+    ### JC: this function has to be re-written anyway...
     def _create_projection_dict(self,sheet_name):
         """
-        PRE: Each Projection in the CFSheet should have a unique name.
-        If there are two Projections with the same name, then even
-        though the list will show two entries with the same name, only
-        one Projection object will be accessible.
+        Create a KeyedList of the CFProjections into sheet_name.  
 
-        POST: self.projections dictionary has been populated with the
-        list of projections for the active Region name in self.region.
-        
-        Both _add_projection_menu(), and refresh_region() need to
-        create a dictionary with the Projection Name as key, and the
-        Projection object as value, so this is its own function since
-        it needs to be done the same way in both places.
+        Does something else after that...
         """
-        if self._sim_eps:
-            sim_ep = [ep for ep in self._sim_eps
-                      if ep.name == sheet_name][0]
+        # CEBALERT: this is ProjecionPanel, but Projection
+        # knows nothing about CFs!
+        self.projections = [(p.name,p) for p in topo.sim[sheet_name].in_connections
+                            # Only deal with CFProjections (at the moment).
+                            if isinstance(p,topo.base.cf.CFProjection)]
+        
+        self.projections.sort(cmp_projections)
 
-            sorted_list = sim_ep.projections().items()
-            sorted_list.sort(cmp_projections)
+        ### JC: I don't know why self.projections is a KeyedList...
+        self.projections = KeyedList(self.projections)
 
-            self.projections= KeyedList()
-            for item in sorted_list:
-                # CEBALERT: this is ProjecionPanel, but Projection
-                # knows nothing about CFs!
-                if isinstance(item[1],topo.base.cf.CFProjection):
-                    # Only deal with CFProjections (at the moment).
-                    self.projections.append((item[0],item[1]))
-                
         old_projection_name = self.weight_name.get()
         if len(self.projections.keys()) == 0:
             self.weight_name.set('None')
