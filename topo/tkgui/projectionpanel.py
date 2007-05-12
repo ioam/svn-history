@@ -126,15 +126,15 @@ class ProjectionPanel(TemplatePlotGroupPanel):
 
         # The GUI label says Sheet, not CFSheet, because users probably 
         # don't need to worry about the distinction.
-        self.opt_menu = Pmw.OptionMenu(self.__params_frame,
+        self.sheet_menu = Pmw.OptionMenu(self.__params_frame,
                        command = self.sheet_refresh,
                        labelpos = 'w',
                        label_text = 'Sheet:',
                        menubutton_textvariable = self.sheet_var,
                        items = sim_ep_names)
-        self.opt_menu.pack(side=LEFT)
+        self.sheet_menu.pack(side=LEFT)
         # Should be shared with projectionpanel
-        self.balloon.bind(self.opt_menu,
+        self.balloon.bind(self.sheet_menu,
 """CFSheet whose unit(s) will be plotted.""")
 
     def _add_situate_button(self):
@@ -344,10 +344,10 @@ are stored.""")
 	    ## Also, when changing the menu while looking in history,
             ### it will replaced the old current one by the new one instead of adding
 	    ### the new at the following.
-	    #self.opt_menu.config(state=DISABLED)
+	    #self.sheet_menu.config(state=DISABLED)
 
         if self.history_index >= len(self.plotgroups_history)-1:
 	    self.situate_checkbutton.config(state=NORMAL)
-	    #self.opt_menu.config(state=NORMAL)
+	    #self.sheet_menu.config(state=NORMAL)
 
 
