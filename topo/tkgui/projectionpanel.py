@@ -199,7 +199,7 @@ are stored.""")
         self._create_projection_dict(self.sheet_var.get())
        
         self.projection_menu = Pmw.OptionMenu(params_frame2,
-                       command = self.projection_refresh,
+                       command = self.refresh,
                        labelpos = 'w',
                        label_text = 'Projection:',
                        menubutton_textvariable = self.projection_var,
@@ -222,15 +222,6 @@ are stored.""")
         projectionlists=[proj_sheet.in_connections for proj_sheet in projectionsheets]
         projections=[i for i in chain(*projectionlists)]
         return (not projections == [])
-
-
-    def projection_refresh(self,projection_name):
-        """
-        Called by the Pmw.OptionMenu when the menubutton_textvariable
-        is updated.  The do_plot_cmd() already plots the correct
-        Projection but this will force a refresh().
-        """
-        self.refresh()
         
         
     def sheet_refresh(self,sheet_name):
