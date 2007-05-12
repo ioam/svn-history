@@ -55,6 +55,11 @@ def cmp_projections(p1,p2):
 	return cmp(p1[0],p2[0])
 
 
+# CEBALERT: the class hierarchy and naming is not finished!  Initially
+# I'm just removing duplicate code and cleaning up (including
+# documenting).  After that it will be much easier to get the classes
+# right.
+
 
 class SomethingPanel(TemplatePlotGroupPanel):
 
@@ -71,17 +76,10 @@ class SomethingPanel(TemplatePlotGroupPanel):
         self._add_sheet_menu()
 
         self.auto_refresh.set(False)
-        self.set_auto_refresh()
 
 
 
     def _add_sheet_menu(self):
-        """
-        This function adds a Sheet: menu that queries the active
-        simulation for the list of options.  When an update is made,
-        _sheet_refresh() is called.  It can either call the refresh()
-        function, or update another menu, and so on.
-        """
         cfsheets = [sheet for sheet in topo.sim.objects(topo.base.cf.CFSheet).values()]
 	cfsheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
 
