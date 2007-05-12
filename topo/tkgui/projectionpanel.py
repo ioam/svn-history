@@ -61,14 +61,13 @@ def cmp_projections(p1,p2):
 ### for all the *Panel classes that share common code.
 class ProjectionPanel(TemplatePlotGroupPanel):
     def __init__(self,console=None,pgt_name=None,**params):
+	super(ProjectionPanel,self).__init__(console,pgt_name,**params)
         
         self.sheet_var = StringVar()
 	self.density_var = StringVar()
         self.density_var.set('10.0')
 	self.projection_var = StringVar()
         self.projections = KeyedList()
- 
-	super(ProjectionPanel,self).__init__(console,pgt_name,**params)
 
         self.__params_frame = Frame(master=self)
         self.__params_frame.pack(side=LEFT,expand=YES,fill=X)
