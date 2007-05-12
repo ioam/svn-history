@@ -13,7 +13,7 @@ from Tkinter import X, Message, Entry, Canvas, FLAT, Checkbutton, NORMAL, DISABL
 
 import Pmw
 import ImageTk
-from math import ceil
+
 ### JCALERT! Try not to have to use chain and delete this import.
 from itertools import chain
 
@@ -26,7 +26,7 @@ from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import ProjectionPlotGroup
 
 from templateplotgrouppanel import TemplatePlotGroupPanel
-import topoconsole
+
 
 ### JCALERT! See if we could delete this import * and replace it...
 from topo.commands.analysis import *
@@ -60,7 +60,7 @@ def cmp_projections(p1,p2):
 class ProjectionPanel(TemplatePlotGroupPanel):
     def __init__(self,console=None,pgt_name=None,**params):
         
-        self.region = StringVar()
+        self.sheet_name_var = StringVar()
 	self.density_str = StringVar()
         self.density_str.set('10.0')
         self.density = float(eval(self.density_str.get(),__main__.__dict__))
@@ -74,7 +74,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
 
         self._add_situate_button()
 	self.situate.set(False)
-        self._add_region_menu()
+        self._add_sheet_menu()
         
      #    self.MIN_PLOT_HEIGHT = 1
 #         self.INITIAL_PLOT_HEIGHT = 6
@@ -97,11 +97,11 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         
         self.refresh()
 
-    def _add_region_menu(self):
+    def _add_sheet_menu(self):
         """
         This function adds a Sheet: menu that queries the active
         simulation for the list of options.  When an update is made,
-        _region_refresh() is called.  It can either call the refresh()
+        _sheet_refresh() is called.  It can either call the refresh()
         function, or update another menu, and so on.
         """
 
@@ -113,15 +113,15 @@ class ProjectionPanel(TemplatePlotGroupPanel):
 	self._sim_eps.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
         sim_ep_names = [ep.name for ep in self._sim_eps]
         if len(sim_ep_names) > 0:
-            self.region.set(sim_ep_names[0])
+            self.sheet_name_var.set(sim_ep_names[0])
 
         # The GUI label says Sheet, not CFSheet, because users probably 
         # don't need to worry about the distinction.
         self.opt_menu = Pmw.OptionMenu(self.__params_frame,
-                       command = self.region_refresh,
+                       command = self.sheet_refresh,
                        labelpos = 'w',
                        label_text = 'Sheet:',
-                       menubutton_textvariable = self.region,
+                       menubutton_textvariable = self.sheet_name_var,
                        items = sim_ep_names)
         self.opt_menu.pack(side=LEFT)
         # Should be shared with projectionpanel
@@ -181,13 +181,13 @@ are stored.""")
         """
         Adds a Projection Widget to the existing frame, and creates the
         item list for Unit Projection names.  This needs to be
-        changing based on which Region is selected.  See
-        self.region_refresh() 
+        changing based on which Sheet is selected.  See
+        self.sheet_refresh() 
         """
         self.params_frame2 = Frame(master=self)
         self.params_frame2.pack(side=LEFT,expand=YES,fill=X)
 
-        self._create_projection_dict(self.region.get())
+        self._create_projection_dict(self.sheet_name_var.get())
        
         self.projection_menu = Pmw.OptionMenu(self.params_frame2,
                        command = self.projection_refresh,
@@ -224,11 +224,11 @@ are stored.""")
         self.refresh()
         
         
-    def region_refresh(self,sheet_name):
+    def sheet_refresh(self,sheet_name):
         """
         Update the Projection menu.  This overwrites the parent class
-        function CFSheetPlotPanel.region_refresh() which is called when
-        the Region Widget menu is changed.
+        function CFSheetPlotPanel.sheet_refresh() which is called when
+        the Sheet Widget menu is changed.
         """
         self._create_projection_dict(sheet_name)
         self.projection_menu.setitems(self.projections.keys())
@@ -247,12 +247,12 @@ are stored.""")
         The plotgroup_key for retrieving the PlotGroup depends on the
         values entered in the window widgets.  This method generates
         the appropriate key based on those values, using a tuple like:
-        ('Projection', self.weight_name, self.density, self.region).
+        ('Projection', self.weight_name, self.density, self.sheet_name_var).
         """
         self.density = float(eval(self.density_str.get(),__main__.__dict__))
 	self.plotgroup.situate= self.situate.get()
 	self.plotgroup.density = self.density
-	self.plotgroup.sheet_name=self.region.get()
+	self.plotgroup.sheet_name=self.sheet_name_var.get()
 	self.plotgroup.weight_name = self.weight_name.get()
 
 
@@ -261,7 +261,7 @@ are stored.""")
         self.generate_plotgroup_key() creates the density information needed for
         a ProjectionPlotGroup to create necessary Plots.
         """
- 	plotgroup = ProjectionPlotGroup([],self._pg_template(),self.region.get(),
+ 	plotgroup = ProjectionPlotGroup([],self._pg_template(),self.sheet_name_var.get(),
 					self.weight_name.get(),self.density,
                                         normalize=self.normalize.get(),
                                         sheetcoords=self.sheetcoords.get(),
@@ -339,7 +339,7 @@ are stored.""")
 	super(ProjectionPanel,self).update_back_fwd_button()
 	if (self.history_index > 0):
             self.situate_checkbutton.config(state=DISABLED)
-	    ### JCALERT: Should find a way to disable the region menu
+	    ### JCALERT: Should find a way to disable the sheet menu
 	    ### (What I tried below does not work)
 	    ### Also, disabled the text for the xy_boxes (i.e., X,Y)
 	    ## Also, when changing the menu while looking in history,
