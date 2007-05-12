@@ -6,25 +6,12 @@ Subclasses CFSheetPlotPanel, which is basically a PlotGroupPanel.
 
 """
 
-
-import Pmw
-import __main__
-
-from Tkinter import StringVar, BooleanVar, Frame, TOP, LEFT, YES, X, Message
-from Tkinter import Entry, Label, NSEW, Checkbutton, NORMAL, DISABLED
-
 import topo
-
 from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import ProjectionActivityPlotGroup
-from topo.base.sheet import Sheet
-
-import topo.base.cf
-
-from topo.commands.analysis import *
-import topo.commands.analysis
-
+from topo.commands.analysis import update_projectionactivity
 from projectionpanel import SomethingPanel
+
 
 ### JABALERT: Should pull out common code from ProjectionActivityPanel,
 ### ProjectionPanel, and ConnectionFieldsPanel into a shared parent
