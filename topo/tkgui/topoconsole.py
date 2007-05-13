@@ -48,7 +48,7 @@ from templateplotgrouppanel import TemplatePlotGroupPanel
 from connectionfieldspanel import ConnectionFieldsPanel
 from projectionactivitypanel import ProjectionActivityPanel
 from featurecurvepanel import FeatureCurvePanel, FullFieldFeatureCurvePanel
-from projectionpanel import ProjectionPanel
+from projectionpanel import CFProjectionPanel
 from testpattern import TestPattern
 from editorwindow import ModelEditor
 from translatorwidgets import TaggedSlider
@@ -782,7 +782,7 @@ class TopoConsole(TkguiWindow):
 
 if __name__ != '__main__':
     plotpanel_classes['Connection Fields'] = ConnectionFieldsPanel
-    plotpanel_classes['Projection'] = ProjectionPanel 
+    plotpanel_classes['Projection'] = CFProjectionPanel 
     plotpanel_classes['Projection Activity'] = ProjectionActivityPanel
     plotpanel_classes['Orientation Tuning Fullfield'] = FullFieldFeatureCurvePanel
 

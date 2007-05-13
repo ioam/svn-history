@@ -63,7 +63,7 @@ def cmp_projections(p1,p2):
 
 # CEBHACKALERT: I've caused (uncovered?) a bug: sheets other than
 # CFSheets are having their Projection views requested when
-# ProjectionPanel and ConnectionFieldsPanel are created. The
+# CFProjectionPanel and ConnectionFieldsPanel are created. The
 # _set_situate() method is where the error comes from (the plotgroup
 # not being correct at the time it calls refresh(). This bug should go
 # away during my cleanup.
@@ -143,7 +143,7 @@ are stored.""")
 
     def set_situate(self):
         """Set the plotgroup.situate attribute, plus update and display plots."""
-         if self.plotgroup != None: # CB: is this test required?
+        if self.plotgroup != None: # CB: is this test required?
             self.plotgroup.situate = self.situate_var.get()
             self.plotgroup.initial_plot = True
             self.plotgroup.height_of_tallest_plot = self.min_master_zoom = 1
@@ -158,13 +158,13 @@ are stored.""")
 ### valid for CFProjections. We can consider having an abstract
 ### ProjectionPanel above this class, or at least a common parent
 ### for all the *Panel classes that share common code.
-class ProjectionPanel(SomethingPanel):
+class CFProjectionPanel(SomethingPanel):
     def __init__(self,console=None,pgt_name=None,**params):
 	self.projection_var = StringVar()
         self.projections = KeyedList()
 	self.density_var = StringVar()
         self.density_var.set('10.0')
-        super(ProjectionPanel,self).__init__(console,pgt_name,**params)
+        super(CFProjectionPanel,self).__init__(console,pgt_name,**params)
 
  
         
@@ -250,7 +250,7 @@ class ProjectionPanel(SomethingPanel):
         sheet_name = self.sheet_var.get()
         self._create_projection_dict(sheet_name)
         self.projection_menu.setitems(self.projections.keys())
-        super(ProjectionPanel,self).refresh()
+        super(CFProjectionPanel,self).refresh()
 
 
     def refresh_title(self):
@@ -290,7 +290,7 @@ class ProjectionPanel(SomethingPanel):
     def display_plots(self):
         """
         This must be changed from PlotGroupPanels version since
-        ProjectionPanel requires a 2D grid of plots.
+        CFProjectionPanel requires a 2D grid of plots.
         """
         if self.plotgroup:
 	    plots=self.plotgroup.plots
@@ -347,14 +347,14 @@ class ProjectionPanel(SomethingPanel):
         
 
     def restore_panel_environment(self):
-	super(ProjectionPanel,self).restore_panel_environment()
+	super(CFProjectionPanel,self).restore_panel_environment()
 	if self.plotgroup.situate != self.situate_var.get():
 	    self.situate_checkbutton.config(state=NORMAL)
 	    self.situate_checkbutton.invoke()
 	    self.situate_checkbutton.config(state=DISABLED)
 
     def update_back_fwd_button(self):
-	super(ProjectionPanel,self).update_back_fwd_button()
+	super(CFProjectionPanel,self).update_back_fwd_button()
 	if (self.history_index > 0):
             self.situate_checkbutton.config(state=DISABLED)
 	    ### JCALERT: Should find a way to disable the sheet menu
