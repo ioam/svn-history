@@ -101,7 +101,6 @@ class SomethingPanel(TemplatePlotGroupPanel):
         those available in the simulation.
         """
         cfsheets = topo.sim.objects(CFSheet).values()
-        print cfsheets
         
 	cfsheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
         self.sheet_var.set(cfsheets[0].name)
