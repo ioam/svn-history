@@ -78,8 +78,29 @@ class SomethingPanel(TemplatePlotGroupPanel):
         self.auto_refresh.set(False)
 
 
+    @staticmethod
+    def valid_context():
+        """
+        Return True if there are Projections in the simulation.
+
+        Used by TopoConsole to determine whether or not to open a SomethingPanel.
+        """
+        # CEBHACKALERT: since these classes assume CFs, should be checking for/getting
+        # CFSheets and CFProjections.
+        projectionsheets=topo.sim.objects(ProjectionSheet).values()
+        if not projectionsheets:
+            return False
+
+        projectionlists=[proj_sheet.in_connections for proj_sheet in projectionsheets]
+        projections=[i for i in chain(*projectionlists)]
+        return (not projections == [])
+
+
 
     def _add_sheet_menu(self):
+        """
+        Add a menu for selecting a sheet from those available in the simulation.
+        """
         cfsheets = [sheet for sheet in topo.sim.objects(topo.base.cf.CFSheet).values()]
 	cfsheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
 
@@ -157,8 +178,6 @@ class ProjectionPanel(SomethingPanel):
 
         self.refresh()
 
-
-
         
 
     ### JC: this function has to be re-written anyway...
@@ -209,18 +228,6 @@ class ProjectionPanel(SomethingPanel):
 
 
 
-    @staticmethod
-    def valid_context():
-        """
-        Only open if there are Projections defined.
-        """
-        projectionsheets=topo.sim.objects(ProjectionSheet).values()
-        if not projectionsheets:
-            return False
-
-        projectionlists=[proj_sheet.in_connections for proj_sheet in projectionsheets]
-        projections=[i for i in chain(*projectionlists)]
-        return (not projections == [])
         
 
     # CEBHACKALERT q

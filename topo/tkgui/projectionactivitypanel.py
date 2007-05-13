@@ -42,22 +42,6 @@ class ProjectionActivityPanel(SomethingPanel):
 
 
 
-
-
-
-    @staticmethod
-    def valid_context():
-        """
-        Only open if there are Projections defined.
-        """
-        projectionsheets=topo.sim.objects(ProjectionSheet).values()
-        if not projectionsheets:
-            return False
-
-        projections=[proj_sheet.in_connections for proj_sheet in projectionsheets]
-        return (not projections == [])
-
-
     ### JABALERT: This looks like too much intelligence to include in
     ### the GUI code; this function should probably just be calling a
     ### PlotGroup (or subclass) function to generate the key.  This
