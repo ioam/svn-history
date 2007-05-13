@@ -126,18 +126,18 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
         ### Auto_refresh check button.
         # Default is to not have the window Auto-refresh, because some
         # plots are very slow to generate (e.g. some preference map
-        # plots).  Call self.auto_refresh.set(True) to enable
+        # plots).  Call self.auto_refresh_var.set(True) to enable
         # autorefresh in a subclassed constructor function.
-	self.auto_refresh = BooleanVar()
+	self.auto_refresh_var = BooleanVar()
         # just setting the variable calls the method (does not rely on
         # checkbutton widget being clicked)
-        self.auto_refresh.trace_variable('w',lambda x,y,z: self.set_auto_refresh())
+        self.auto_refresh_var.trace_variable('w',lambda x,y,z: self.set_auto_refresh())
         
-	self.auto_refresh.set(False)
-        if self.auto_refresh.get():
+	self.auto_refresh_var.set(False)
+        if self.auto_refresh_var.get():
             self.console.auto_refresh_panels.append(self)
         self.auto_refresh_checkbutton = Checkbutton(self.control_frame_1,text="Auto-refresh",
-                                                    variable=self.auto_refresh)
+                                                    variable=self.auto_refresh_var)
         
         self.auto_refresh_checkbutton.pack(side=RIGHT)
         self.balloon.bind(self.auto_refresh_checkbutton,
@@ -146,11 +146,11 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
 
         ### Auto-resize checkbutton.
         # See set_auto_resize() for more info.
-        self.auto_resize = BooleanVar()
-        self.auto_resize.trace_variable('w',lambda x,y,z: self.set_auto_resize())
-        self.auto_resize.set(True)
+        self.auto_resize_var = BooleanVar()
+        self.auto_resize_var.trace_variable('w',lambda x,y,z: self.set_auto_resize())
+        self.auto_resize_var.set(True)
         auto_resize_checkbutton=Checkbutton(self.control_frame_1, text="Auto-resize",
-                                            variable=self.auto_resize)
+                                            variable=self.auto_resize_var)
         auto_resize_checkbutton.pack(side=RIGHT)
         self.balloon.bind(auto_resize_checkbutton,
             "Whether to resize this window automatically to fit the contents, or to allow the window to be resized manually.")
@@ -206,7 +206,7 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
         If auto-resize is off, the window stays the same size whatever
         happens to the widgets, and the user can resize the window.
         """
-        if self.auto_resize.get():
+        if self.auto_resize_var.get():
             self.geometry('')
             self.resizable(0,0)
         else:
@@ -251,7 +251,7 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
 
     def set_auto_refresh(self):
         """Function called by Widget when check-box clicked."""
-        if self.auto_refresh.get():
+        if self.auto_refresh_var.get():
             if not (self in self.console.auto_refresh_panels):
                 self.console.auto_refresh_panels.append(self)
         else:
@@ -263,6 +263,8 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
         # unexpected behavior for a preference map calculation
         # (where it would do unnecessary, and potentially lengthy,
         # recalculation).
+        # CB: not to mention the bad news of calling refresh before
+        # various subclasses have finished creating themselves!
 
     # CB: tidy up the window destruction code here & elsewhere 
     def destroy(self):

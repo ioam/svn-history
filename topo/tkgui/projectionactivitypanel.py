@@ -18,7 +18,7 @@ from projectionpanel import ProjectionRelatedPanel
 class ProjectionActivityPanel(ProjectionRelatedPanel):
     def __init__(self,console=None,pgt_name=None,**params):       
         super(ProjectionActivityPanel,self).__init__(console,pgt_name,**params)
-        self.auto_refresh.set(True)
+        self.auto_refresh_var.set(True)
 	self.plotgroup_key='ProjectionActivity'
 	self.cmdname = update_projectionactivity()
 	self.refresh()

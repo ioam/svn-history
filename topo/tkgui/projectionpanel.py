@@ -237,7 +237,7 @@ class CFProjectionPanel(CFRelatedPanel):
         density_entry.pack(side=LEFT,expand=YES,fill=X,padx=2)
 
         self._add_projection_menu()
-        self.auto_refresh.set(False) # panels can be slow to refresh
+        self.auto_refresh_var.set(False) # panels can be slow to refresh
         self.refresh()
         
 

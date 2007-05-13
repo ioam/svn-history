@@ -124,7 +124,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         # To make the auto-refresh button off by default except for
         # the Activity PlotGroup
 	if self.mapname.get() == 'Activity':
-	    self.auto_refresh.set(True)
+	    self.auto_refresh_var.set(True)
             self.set_auto_refresh()
 
         # Display any plots that can be done with existing data, but
