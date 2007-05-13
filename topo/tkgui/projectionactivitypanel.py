@@ -27,6 +27,8 @@ class ProjectionActivityPanel(SomethingPanel):
 
 	self.cmdname = update_projectionactivity()
 
+        self.auto_refresh.set(True)
+
 
 	self.refresh()
 	

@@ -59,6 +59,10 @@ def cmp_projections(p1,p2):
 # right.
 # I'm making assumptions about CFs explicit, even if we'd like a class
 # to be more general eventually.
+#
+
+# CEBHACKALERT: I've caused a bug: sheets other than CFSheets are
+# having their Projection views requested.
 
 class SomethingPanel(TemplatePlotGroupPanel):
 
@@ -69,12 +73,9 @@ class SomethingPanel(TemplatePlotGroupPanel):
 
         self._params_frame = Frame(master=self)
         self._params_frame.pack(side=LEFT,expand=YES,fill=X)
-        
-        self._add_situate_button()
-	self.situate.set(False)
-        self._add_sheet_menu()
 
-        self.auto_refresh.set(False)
+        self._add_sheet_menu() # CEBALERT: need situate button to be left of this, not right
+        self.auto_refresh.set(False) # panels can be slow to refresh
 
 
     @staticmethod
@@ -96,7 +97,8 @@ class SomethingPanel(TemplatePlotGroupPanel):
 
     def _add_sheet_menu(self):
         """
-        Add a menu for selecting a sheet from those available in the simulation.
+        Add a menu to self._params_frame for selecting a sheet from
+        those available in the simulation.
         """
         cfsheets = topo.sim.objects(CFSheet).values()
 	cfsheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
@@ -111,27 +113,30 @@ class SomethingPanel(TemplatePlotGroupPanel):
                        menubutton_textvariable = self.sheet_var,
                        items = [sheet.name for sheet in cfsheets])
         self.sheet_menu.pack(side=LEFT)
-        # Should be shared with projectionpanel
         self.balloon.bind(self.sheet_menu,
 """CFSheet whose unit(s) will be plotted.""")
 
+
     def _add_situate_button(self):
-        
-	self.situate = BooleanVar()
-	self.situate.set(True)
+        """
+        Add 'situate' checkbutton to self._params_frame (and set to False)
+        """        
+	self.situate_var = BooleanVar()
+        self.situate_var.trace_variable('w',lambda x,y,z: self.set_situate())
+	self.situate_var.set(False)
         self.situate_checkbutton = Checkbutton(self._params_frame,
-             text="Situate",variable=self.situate,command=self.set_situate)
+             text="Situate",variable=self.situate_var)
         self.situate_checkbutton.pack(side=LEFT)
-        # Should move into the documentation for a situate parameter shared with connectionfieldspanel
         self.balloon.bind(self.situate_checkbutton,
 """If True, plots the weights on the entire source sheet, using zeros for all
 weights outside the ConnectionField.  If False, plots only the actual weights that
 are stored.""")
 
+
     def set_situate(self):
         """Set the attribute situate."""
         if self.plotgroup != None:
-            self.plotgroup.situate = self.situate.get()
+            self.plotgroup.situate = self.situate_var.get()
         self.plotgroup.initial_plot = True
         self.plotgroup.height_of_tallest_plot = self.min_master_zoom = 1
 	self.plotgroup.update_plots(False)
@@ -169,6 +174,8 @@ class ProjectionPanel(SomethingPanel):
         density_entry.pack(side=LEFT,expand=YES,fill=X,padx=2)
 
         self._add_projection_menu()
+
+        self._add_situate_button() 
 
         self.refresh()
 
@@ -251,7 +258,7 @@ class ProjectionPanel(SomethingPanel):
         the appropriate key based on those values, using a tuple like:
         ('Projection', self.projection_var, self.density, self.sheet_var).
         """
-	self.plotgroup.situate= self.situate.get()
+	self.plotgroup.situate= self.situate_var.get()
 	self.plotgroup.density = float(self.density_var.get())
 	self.plotgroup.sheet_name=self.sheet_var.get()
 	self.plotgroup.weight_name = self.projection_var.get()
@@ -332,7 +339,7 @@ class ProjectionPanel(SomethingPanel):
 
     def restore_panel_environment(self):
 	super(ProjectionPanel,self).restore_panel_environment()
-	if self.plotgroup.situate != self.situate.get():
+	if self.plotgroup.situate != self.situate_var.get():
 	    self.situate_checkbutton.config(state=NORMAL)
 	    self.situate_checkbutton.invoke()
 	    self.situate_checkbutton.config(state=DISABLED)

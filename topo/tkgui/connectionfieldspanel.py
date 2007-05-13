@@ -50,7 +50,8 @@ class ConnectionFieldsPanel(SomethingPanel):
  
 	
         self._add_xy_boxes()
-
+        self._add_situate_button()
+        self.situate_var.set(True) 
 
 	self.refresh()
 
@@ -114,7 +115,7 @@ It is an error to request a unit outside the area of the Sheet.""")
                               foreground = 'white',
                               pady = 20)
             w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
-	self.plotgroup.situate=self.situate.get()
+	self.plotgroup.situate=self.situate_var.get()
 	self.plotgroup.sheet_name = self.sheet_var.get()
 
 
@@ -174,7 +175,7 @@ It is an error to request a unit outside the area of the Sheet.""")
 
     def restore_panel_environment(self):
 	super(ConnectionFieldsPanel,self).restore_panel_environment()
-	if self.plotgroup.situate != self.situate.get():
+	if self.plotgroup.situate != self.situate_var.get():
 	    self.situate_checkbutton.config(state=NORMAL)
 	    self.situate_checkbutton.invoke()
 	    self.situate_checkbutton.config(state=DISABLED)
