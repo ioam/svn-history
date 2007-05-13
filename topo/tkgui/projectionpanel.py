@@ -166,6 +166,25 @@ are stored.""")
                 self.situate_checkbutton.invoke()
                 self.situate_checkbutton.config(state=DISABLED)
 
+    def update_back_fwd_button(self):
+	super(SomethingPanel,self).update_back_fwd_button()
+	if (self.history_index > 0):
+
+            if hasattr(self,'situate_checkbutton'):
+                self.situate_checkbutton.config(state=DISABLED)
+	    ### JCALERT: Should find a way to disable the sheet menu
+	    ### (What I tried below does not work)
+	    ### Also, disabled the text for the xy_boxes (i.e., X,Y)
+	    ## Also, when changing the menu while looking in history,
+            ### it will replaced the old current one by the new one instead of adding
+	    ### the new at the following.
+	    #self.sheet_menu.config(state=DISABLED)
+
+        if self.history_index >= len(self.plotgroups_history)-1:
+            if hasattr(self,'situate_checkbutton'):
+                self.situate_checkbutton.config(state=NORMAL)
+                
+	    #self.sheet_menu.config(state=NORMAL)
 
 
 
@@ -363,21 +382,6 @@ class CFProjectionPanel(SomethingPanel):
         
 
 
-    def update_back_fwd_button(self):
-	super(CFProjectionPanel,self).update_back_fwd_button()
-	if (self.history_index > 0):
-            self.situate_checkbutton.config(state=DISABLED)
-	    ### JCALERT: Should find a way to disable the sheet menu
-	    ### (What I tried below does not work)
-	    ### Also, disabled the text for the xy_boxes (i.e., X,Y)
-	    ## Also, when changing the menu while looking in history,
-            ### it will replaced the old current one by the new one instead of adding
-	    ### the new at the following.
-	    #self.sheet_menu.config(state=DISABLED)
-
-        if self.history_index >= len(self.plotgroups_history)-1:
-	    self.situate_checkbutton.config(state=NORMAL)
-	    #self.sheet_menu.config(state=NORMAL)
 
 
 
