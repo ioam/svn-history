@@ -20,6 +20,7 @@ from itertools import chain
 import topo
 from topo.misc.keyedlist import KeyedList
 from topo.base.cf import CFSheet, CFProjection
+from topo.base.projection import ProjectionSheet
 from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import ProjectionPlotGroup
 
@@ -53,13 +54,17 @@ def cmp_projections(p1,p2):
 	return cmp(p1[0],p2[0])
 
 
+    # (Note for somewhere: if someone clicks 'back' on a window, would
+    # they expect auto-refresh to become unchecked/disabled?)
+
+
+
 # CEBALERT: the class hierarchy and naming is not finished!  Initially
-# I'm just removing duplicate code and cleaning up (including
+# I've just removed duplicate code and am cleaning up (including
 # documenting).  After that it will be much easier to get the classes
 # right.
-# I'm making assumptions about CFs explicit, even if we'd like a class
-# to be more general eventually.
-#
+
+
 
 # CEBHACKALERT: I've caused (uncovered?) a bug: sheets other than
 # CFSheets are having their Projection views requested when
@@ -69,37 +74,43 @@ def cmp_projections(p1,p2):
 # away during my cleanup.
 
 
-class SomethingPanel(TemplatePlotGroupPanel):
+class ProjectionRelatedPanel(TemplatePlotGroupPanel):
+    """
+    Abstract base class for panels relating to Projections.
+    """
+    # CB: declare abstract
 
-    def __init__(self,console,pgt_name,**params):
+    def __init__(self,console,pgt_name,sheet_type=ProjectionSheet,**params):
+        self.sheet_var = StringVar()  # CEBALERT: should go after super call when whatever stops
+                                      # it working that way is cleaned up...
+        super(ProjectionRelatedPanel,self).__init__(console,pgt_name,**params)
+
+        self.sheet_type = sheet_type
 
 
-        self.sheet_var = StringVar()
-        super(SomethingPanel,self).__init__(console,pgt_name,**params)
-
-
-        self._params_frame = Frame(master=self)
+        self._params_frame = Frame(self)
         self._params_frame.pack(side=LEFT,expand=YES,fill=X)
-
         self._add_sheet_menu() # CEBALERT: need situate button to be left of this, not right
-        self.auto_refresh.set(False) # panels can be slow to refresh
 
 
+    # CEBHACKALERT: valid_context() needs to be more specific in subclasses.
+    # Should sheet_type be an argument on construction of ProjectionRelatedPanel?
+    # How to allow valid_context() to work for more specific subclasses (i.e. to replace
+    # ProjectionSheet with e.g. CFSheet)?
     @staticmethod
     def valid_context():
         """
-        Return True if there are CFProjections in the simulation.
+        Return True if there are Projections in the simulation.
 
-        Used by TopoConsole to determine whether or not to open a SomethingPanel.
+        Used by TopoConsole to determine whether or not to open a ProjectionPanel.
         """
-        cfsheets = topo.sim.objects(CFSheet).values()
-        if not cfsheets:
+        sheets = topo.sim.objects(ProjectionSheet).values()
+        if not sheets:
             return False
-
-        cfprojectionlists=[cfsheet.in_connections for cfsheet in cfsheets]
-        cfprojections=[i for i in chain(*cfprojectionlists)]
-        return (not cfprojections == [])
-
+        
+        projectionlists=[sheet.in_connections for sheet in sheets]
+        projections=[i for i in chain(*projectionlists)]
+        return (not projections == [])
 
 
     def _add_sheet_menu(self):
@@ -107,22 +118,53 @@ class SomethingPanel(TemplatePlotGroupPanel):
         Add a menu to self._params_frame for selecting a sheet from
         those available in the simulation.
         """
-        cfsheets = topo.sim.objects(CFSheet).values()
+        sheets = topo.sim.objects(self.sheet_type).values()
         
-	cfsheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
-        self.sheet_var.set(cfsheets[0].name)
+	sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
+        self.sheet_var.set(sheets[0].name)
 
-        # The GUI label says Sheet, not CFSheet, because users probably 
-        # don't need to worry about the distinction.
+        # The GUI label says Sheet, not e.g. CFSheet even when they're
+        # CFSheets, because users probably don't need to worry about
+        # the distinction.
         self.sheet_menu = Pmw.OptionMenu(self._params_frame,
                        command = self.refresh,
                        labelpos = 'w',
                        label_text = 'Sheet:',
                        menubutton_textvariable = self.sheet_var,
-                       items=[cfsheet.name for cfsheet in cfsheets])
+                       items=[sheet.name for sheet in sheets])
         self.sheet_menu.pack(side=LEFT)
         self.balloon.bind(self.sheet_menu,
 """CFSheet whose unit(s) will be plotted.""")
+
+
+    def update_back_fwd_button(self):
+	super(ProjectionRelatedPanel,self).update_back_fwd_button()
+	if (self.history_index > 0):
+            pass
+ 	    ### JCALERT: Should find a way to disable the sheet menu
+	    ### (What I tried below does not work)
+	    ### Also, disabled the text for the xy_boxes (i.e., X,Y)
+	    ## Also, when changing the menu while looking in history,
+            ### it will replaced the old current one by the new one instead of adding
+	    ### the new at the following.
+	    #self.sheet_menu.config(state=DISABLED)
+        if self.history_index >= len(self.plotgroups_history)-1:
+            pass                
+	    #self.sheet_menu.config(state=NORMAL)
+
+
+
+# CB: maybe should be a mix-in class, not inheriting from ProjectionRelatedPanel.
+# Anyway, the classes are yet to be determined...
+class CFRelatedPanel(ProjectionRelatedPanel):
+    """
+    Existence is dedicated to...a situate button! 
+    """
+    # CB: declare abstract
+    
+    def __init__(self,console,pgt_name,**params):
+        super(CFRelatedPanel,self).__init__(console,pgt_name,sheet_type=CFSheet,**params)
+        self._add_situate_button()
 
 
     def _add_situate_button(self):
@@ -150,59 +192,35 @@ are stored.""")
             self.plotgroup.update_plots(False)
             self.display_plots()
 
-    # (Note for somewhere: if someone clicks 'back' on a window, would
-    # they expect auto-refresh to become unchecked/disabled?)
-
     
     def restore_panel_environment(self):
-	super(SomethingPanel,self).restore_panel_environment()
-
-        # CEBALERT: all the situate stuff doesn't fit for ProjectionActivityPanel (i.e. ProjectionActivityPanel
-        # is the only Projection-related panel for which situate isn't relevant - because it has nothing to do with
-        # CFs).
-        if hasattr(self,'situate_var'):
-            if self.plotgroup.situate != self.situate_var.get():
-                self.situate_checkbutton.config(state=NORMAL)
-                self.situate_checkbutton.invoke()
-                self.situate_checkbutton.config(state=DISABLED)
+	super(CFRelatedPanel,self).restore_panel_environment()
+        if self.plotgroup.situate != self.situate_var.get():
+            self.situate_checkbutton.config(state=NORMAL)
+            self.situate_checkbutton.invoke()
+            self.situate_checkbutton.config(state=DISABLED)
 
     def update_back_fwd_button(self):
-	super(SomethingPanel,self).update_back_fwd_button()
+	super(CFRelatedPanel,self).update_back_fwd_button()
 	if (self.history_index > 0):
-
-            if hasattr(self,'situate_checkbutton'):
-                self.situate_checkbutton.config(state=DISABLED)
-	    ### JCALERT: Should find a way to disable the sheet menu
-	    ### (What I tried below does not work)
-	    ### Also, disabled the text for the xy_boxes (i.e., X,Y)
-	    ## Also, when changing the menu while looking in history,
-            ### it will replaced the old current one by the new one instead of adding
-	    ### the new at the following.
-	    #self.sheet_menu.config(state=DISABLED)
-
+            self.situate_checkbutton.config(state=DISABLED)
         if self.history_index >= len(self.plotgroups_history)-1:
-            if hasattr(self,'situate_checkbutton'):
-                self.situate_checkbutton.config(state=NORMAL)
-                
-	    #self.sheet_menu.config(state=NORMAL)
+            self.situate_checkbutton.config(state=NORMAL)
 
 
 
-
-### JABALERT: This should be called CFProjectionPanel since it is only
-### valid for CFProjections. We can consider having an abstract
-### ProjectionPanel above this class, or at least a common parent
-### for all the *Panel classes that share common code.
-class CFProjectionPanel(SomethingPanel):
+class CFProjectionPanel(CFRelatedPanel):
+    """
+    Panel for displaying CFProjections.
+    """
     def __init__(self,console=None,pgt_name=None,**params):
-	self.projection_var = StringVar()
-        self.projections = KeyedList()
-	self.density_var = StringVar()
+	self.projection_var = StringVar()  # CB: these should go after super call, once
+        self.projections = KeyedList()     # whatever is stopping it from working that
+	self.density_var = StringVar()     # way is fixed.
         self.density_var.set('10.0')
         super(CFProjectionPanel,self).__init__(console,pgt_name,**params)
 
  
-        
         # self.MIN_PLOT_HEIGHT = 1
         # self.INITIAL_PLOT_HEIGHT = 6
         # self.min_master_zoom=1
@@ -219,11 +237,9 @@ class CFProjectionPanel(SomethingPanel):
         density_entry.pack(side=LEFT,expand=YES,fill=X,padx=2)
 
         self._add_projection_menu()
-        self._add_situate_button()
-        
+        self.auto_refresh.set(False) # panels can be slow to refresh
         self.refresh()
         
-
 
     ### JC: this function has to be re-written anyway...
     def _create_projection_dict(self,sheet_name):
@@ -271,17 +287,8 @@ class CFProjectionPanel(SomethingPanel):
 """Projection to plot.""")
 
 
-
-
-        
-
     # CEBHACKALERT q
     def refresh(self,q=None):
-        """
-        Update the Projection menu.  This overwrites the parent class
-        function CFSheetPlotPanel.sheet_refresh() which is called when
-        the Sheet Widget menu is changed.
-        """
         sheet_name = self.sheet_var.get()
         self._create_projection_dict(sheet_name)
         self.projection_menu.setitems(self.projections.keys())
@@ -294,14 +301,6 @@ class CFProjectionPanel(SomethingPanel):
         
 
     def update_plotgroup_variables(self):
-        """
-        Generate the key used to look up the PlotGroup for this Projection.
-
-        The plotgroup_key for retrieving the PlotGroup depends on the
-        values entered in the window widgets.  This method generates
-        the appropriate key based on those values, using a tuple like:
-        ('Projection', self.projection_var, self.density, self.sheet_var).
-        """
 	self.plotgroup.situate= self.situate_var.get()
 	self.plotgroup.density = float(self.density_var.get())
 	self.plotgroup.sheet_name=self.sheet_var.get()
@@ -309,10 +308,6 @@ class CFProjectionPanel(SomethingPanel):
 
 
     def generate_plotgroup(self):
-        """
-        self.generate_plotgroup_key() creates the density information needed for
-        a ProjectionPlotGroup to create necessary Plots.
-        """
  	plotgroup = ProjectionPlotGroup([],self._pg_template(),self.sheet_var.get(),
 					self.projection_var.get(),
                                         float(self.density_var.get()),
