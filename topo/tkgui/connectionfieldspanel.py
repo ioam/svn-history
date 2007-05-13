@@ -22,13 +22,13 @@ from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import ConnectionFieldsPlotGroup
 from topo.base.sheet import Sheet
 
-from projectionpanel import SomethingPanel
+from projectionpanel import CFRelatedPanel
 
 
 # CEBHACKALERT: various parts of the dynamic info/right-click menu stuff
 # don't make sense at the moment when things like 'situate' are clicked.
 
-class ConnectionFieldsPanel(SomethingPanel):
+class ConnectionFieldsPanel(CFRelatedPanel):
     def __init__(self,console=None,pgt_name=None,x=0.0,y=0.0,**params):       
 
         # Receptive Fields are generally tiny.  Boost it up to make it visible.
@@ -39,19 +39,8 @@ class ConnectionFieldsPanel(SomethingPanel):
         self.y_var = StringVar()
         self.y_var.set(y) 
 
-
-        super(ConnectionFieldsPanel,self).__init__(console,pgt_name,**params)
-
-        # CEBALERT: I'm not sure what the various definitions of x and y
-        # are for - I wonder if they can be cleaned up? I haven't looked,
-        # and when adding the x any y args above with their defaults, I've
-        # left a note of the previous values in case they're needed while
-        # cleaning up.
- 
-	
+        super(ConnectionFieldsPanel,self).__init__(console,pgt_name,**params) 
         self._add_xy_boxes()
-        self._add_situate_button()#; self.situate_var.set(True) 
-
 	self.refresh()
 
 
