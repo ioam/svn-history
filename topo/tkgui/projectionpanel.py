@@ -61,15 +61,22 @@ def cmp_projections(p1,p2):
 # to be more general eventually.
 #
 
-# CEBHACKALERT: I've caused a bug: sheets other than CFSheets are
-# having their Projection views requested.
+# CEBHACKALERT: I've caused (uncovered?) a bug: sheets other than
+# CFSheets are having their Projection views requested when
+# ProjectionPanel and ConnectionFieldsPanel are created. The
+# _set_situate() method is where the error comes from (the plotgroup
+# not being correct at the time it calls refresh(). This bug should go
+# away during my cleanup.
+
 
 class SomethingPanel(TemplatePlotGroupPanel):
 
     def __init__(self,console,pgt_name,**params):
 
+
         self.sheet_var = StringVar()
         super(SomethingPanel,self).__init__(console,pgt_name,**params)
+
 
         self._params_frame = Frame(master=self)
         self._params_frame.pack(side=LEFT,expand=YES,fill=X)
@@ -135,13 +142,13 @@ are stored.""")
 
 
     def set_situate(self):
-        """Set the attribute situate."""
-        if self.plotgroup != None:
+        """Set the plotgroup.situate attribute, plus update and display plots."""
+         if self.plotgroup != None: # CB: is this test required?
             self.plotgroup.situate = self.situate_var.get()
-        self.plotgroup.initial_plot = True
-        self.plotgroup.height_of_tallest_plot = self.min_master_zoom = 1
-	self.plotgroup.update_plots(False)
-	self.display_plots()
+            self.plotgroup.initial_plot = True
+            self.plotgroup.height_of_tallest_plot = self.min_master_zoom = 1
+            self.plotgroup.update_plots(False)
+            self.display_plots()
 
     
 
@@ -158,6 +165,8 @@ class ProjectionPanel(SomethingPanel):
 	self.density_var = StringVar()
         self.density_var.set('10.0')
         super(ProjectionPanel,self).__init__(console,pgt_name,**params)
+
+ 
         
         # self.MIN_PLOT_HEIGHT = 1
         # self.INITIAL_PLOT_HEIGHT = 6
@@ -175,12 +184,11 @@ class ProjectionPanel(SomethingPanel):
         density_entry.pack(side=LEFT,expand=YES,fill=X,padx=2)
 
         self._add_projection_menu()
-
-        self._add_situate_button() 
-
-        self.refresh()
-
+        self._add_situate_button()
         
+        self.refresh()
+        
+
 
     ### JC: this function has to be re-written anyway...
     def _create_projection_dict(self,sheet_name):
