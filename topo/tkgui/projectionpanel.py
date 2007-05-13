@@ -19,9 +19,7 @@ from itertools import chain
 
 import topo
 from topo.misc.keyedlist import KeyedList
-from topo.base.projection import ProjectionSheet
-from topo.base.sheet import Sheet
-import topo.base.cf
+from topo.base.cf import CFSheet, CFProjection
 from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import ProjectionPlotGroup
 
@@ -59,7 +57,8 @@ def cmp_projections(p1,p2):
 # I'm just removing duplicate code and cleaning up (including
 # documenting).  After that it will be much easier to get the classes
 # right.
-
+# I'm making assumptions about CFs explicit, even if we'd like a class
+# to be more general eventually.
 
 class SomethingPanel(TemplatePlotGroupPanel):
 
@@ -81,19 +80,17 @@ class SomethingPanel(TemplatePlotGroupPanel):
     @staticmethod
     def valid_context():
         """
-        Return True if there are Projections in the simulation.
+        Return True if there are CFProjections in the simulation.
 
         Used by TopoConsole to determine whether or not to open a SomethingPanel.
         """
-        # CEBHACKALERT: since these classes assume CFs, should be checking for/getting
-        # CFSheets and CFProjections.
-        projectionsheets=topo.sim.objects(ProjectionSheet).values()
-        if not projectionsheets:
+        cfsheets = topo.sim.objects(CFSheet).values()
+        if not cfsheets:
             return False
 
-        projectionlists=[proj_sheet.in_connections for proj_sheet in projectionsheets]
-        projections=[i for i in chain(*projectionlists)]
-        return (not projections == [])
+        cfprojectionlists=[cfsheet.in_connections for cfsheet in cfsheets]
+        cfprojections=[i for i in chain(*cfprojectionlists)]
+        return (not cfprojections == [])
 
 
 
@@ -101,12 +98,9 @@ class SomethingPanel(TemplatePlotGroupPanel):
         """
         Add a menu for selecting a sheet from those available in the simulation.
         """
-        cfsheets = [sheet for sheet in topo.sim.objects(topo.base.cf.CFSheet).values()]
+        cfsheets = topo.sim.objects(CFSheet).values()
 	cfsheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
-
-        # CBALERT: already guaranteed to be true by valid_context()?
-        # If so, remove this line.
-        if len(cfsheets)>0: self.sheet_var.set(cfsheets[0].name)
+        self.sheet_var.set(cfsheets[0].name)
 
         # The GUI label says Sheet, not CFSheet, because users probably 
         # don't need to worry about the distinction.
@@ -188,7 +182,7 @@ class ProjectionPanel(SomethingPanel):
         Does something else after that...
         """
         self.projections = [(p.name,p) for p in topo.sim[sheet_name].in_connections
-                            if isinstance(p,topo.base.cf.CFProjection)]
+                            if isinstance(p,CFProjection)]
         
         self.projections.sort(cmp_projections)
 
