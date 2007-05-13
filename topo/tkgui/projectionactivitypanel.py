@@ -7,29 +7,20 @@ Subclasses CFSheetPlotPanel, which is basically a PlotGroupPanel.
 """
 
 import topo
-from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import ProjectionActivityPlotGroup
 from topo.commands.analysis import update_projectionactivity
-from projectionpanel import SomethingPanel
+from projectionpanel import ProjectionRelatedPanel
 
 
 ### JABALERT: Should pull out common code from ProjectionActivityPanel,
 ### ProjectionPanel, and ConnectionFieldsPanel into a shared parent
 ### class.  Then those classes should probably all be in one file.
-class ProjectionActivityPanel(SomethingPanel):
+class ProjectionActivityPanel(ProjectionRelatedPanel):
     def __init__(self,console=None,pgt_name=None,**params):       
-
-
         super(ProjectionActivityPanel,self).__init__(console,pgt_name,**params)
-
-	self.plotgroup_key='ProjectionActivity'
-
-
-	self.cmdname = update_projectionactivity()
-
         self.auto_refresh.set(True)
-
-
+	self.plotgroup_key='ProjectionActivity'
+	self.cmdname = update_projectionactivity()
 	self.refresh()
 	
 
