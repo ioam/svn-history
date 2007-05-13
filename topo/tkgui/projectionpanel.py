@@ -150,7 +150,23 @@ are stored.""")
             self.plotgroup.update_plots(False)
             self.display_plots()
 
+    # (Note for somewhere: if someone clicks 'back' on a window, would
+    # they expect auto-refresh to become unchecked/disabled?)
+
     
+    def restore_panel_environment(self):
+	super(SomethingPanel,self).restore_panel_environment()
+
+        # CEBALERT: all the situate stuff doesn't fit for ProjectionActivityPanel (i.e. ProjectionActivityPanel
+        # is the only Projection-related panel for which situate isn't relevant - because it has nothing to do with
+        # CFs).
+        if hasattr(self,'situate_var'):
+            if self.plotgroup.situate != self.situate_var.get():
+                self.situate_checkbutton.config(state=NORMAL)
+                self.situate_checkbutton.invoke()
+                self.situate_checkbutton.config(state=DISABLED)
+
+
 
 
 
@@ -346,12 +362,6 @@ class CFProjectionPanel(SomethingPanel):
             self.plot_group_title.configure(tag_text = 'No Projections')
         
 
-    def restore_panel_environment(self):
-	super(CFProjectionPanel,self).restore_panel_environment()
-	if self.plotgroup.situate != self.situate_var.get():
-	    self.situate_checkbutton.config(state=NORMAL)
-	    self.situate_checkbutton.invoke()
-	    self.situate_checkbutton.config(state=DISABLED)
 
     def update_back_fwd_button(self):
 	super(CFProjectionPanel,self).update_back_fwd_button()
@@ -368,5 +378,6 @@ class CFProjectionPanel(SomethingPanel):
         if self.history_index >= len(self.plotgroups_history)-1:
 	    self.situate_checkbutton.config(state=NORMAL)
 	    #self.sheet_menu.config(state=NORMAL)
+
 
 

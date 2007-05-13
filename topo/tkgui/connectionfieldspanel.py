@@ -172,9 +172,3 @@ It is an error to request a unit outside the area of the Sheet.""")
 	    self.ye.config(state=NORMAL)
 	    #self.opt_menu.config(state=NORMAL)
 
-    def restore_panel_environment(self):
-	super(ConnectionFieldsPanel,self).restore_panel_environment()
-	if self.plotgroup.situate != self.situate_var.get():
-	    self.situate_checkbutton.config(state=NORMAL)
-	    self.situate_checkbutton.invoke()
-	    self.situate_checkbutton.config(state=DISABLED)
