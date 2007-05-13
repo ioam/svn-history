@@ -50,8 +50,7 @@ class ConnectionFieldsPanel(SomethingPanel):
  
 	
         self._add_xy_boxes()
-        self._add_situate_button()
-        self.situate_var.set(True) 
+        self._add_situate_button()#; self.situate_var.set(True) 
 
 	self.refresh()
 

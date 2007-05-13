@@ -131,7 +131,7 @@ class SomethingPanel(TemplatePlotGroupPanel):
         """        
 	self.situate_var = BooleanVar()
         self.situate_var.trace_variable('w',lambda x,y,z: self.set_situate())
-	self.situate_var.set(False)
+	#self.situate_var.set(False)
         self.situate_checkbutton = Checkbutton(self._params_frame,
              text="Situate",variable=self.situate_var)
         self.situate_checkbutton.pack(side=LEFT)
