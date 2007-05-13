@@ -101,6 +101,8 @@ class SomethingPanel(TemplatePlotGroupPanel):
         those available in the simulation.
         """
         cfsheets = topo.sim.objects(CFSheet).values()
+        print cfsheets
+        
 	cfsheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
         self.sheet_var.set(cfsheets[0].name)
 
@@ -111,7 +113,7 @@ class SomethingPanel(TemplatePlotGroupPanel):
                        labelpos = 'w',
                        label_text = 'Sheet:',
                        menubutton_textvariable = self.sheet_var,
-                       items = [sheet.name for sheet in cfsheets])
+                       items=[cfsheet.name for cfsheet in cfsheets])
         self.sheet_menu.pack(side=LEFT)
         self.balloon.bind(self.sheet_menu,
 """CFSheet whose unit(s) will be plotted.""")
