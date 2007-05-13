@@ -78,6 +78,10 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
         self.pgt = plotgroup_templates.get(pgt_name,None)
 
 	# Strength only check button
+        # CEBHACKALERT: not among the buttons disabled when in the history!
+        # Means update_back_fwd... has to be overridden in this class, too.
+        # But there's a note saying that method's temporary and needs to be
+        # removed...
 	self.strengthonly = BooleanVar()
 	self.strengthonly.set(False)
 
