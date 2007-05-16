@@ -62,7 +62,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         
         self.INITIAL_PLOT_HEIGHT = 100
         self.padding = padding
-	self.auto_refresh.set(True)
+	self.auto_refresh_var.set(True)
         
         ### Find the GeneratorSheets in the simulation, set up generator_sheet_patterns dictionary
         # CEBALERT: this has a difficult structure to work with.
@@ -228,7 +228,7 @@ Each type will have various parameters that can be changed.""")
         if not self.generator_sheets_patterns[button_name]['editing']:
             self.generator_sheets_patterns[button_name]['pattern_generator'] = copy.copy(self.__current_pattern_generator)
         else:
-            if self.auto_refresh.get():
+            if self.auto_refresh_var.get():
                 self.__setup_pattern_generators()
                 self.refresh()
         
@@ -242,7 +242,7 @@ Each type will have various parameters that can be changed.""")
         """
         self.__current_pattern_generator = self.pattern_generators[pattern_generator_name]()
         self.__params_frame.create_widgets(self.__current_pattern_generator)
-        if self.auto_refresh.get(): 
+        if self.auto_refresh_var.get(): 
 	    self.refresh()
 
 
@@ -293,7 +293,7 @@ Each type will have various parameters that can be changed.""")
         self.present_length.setvalue(DEFAULT_PRESENTATION)
         self.learning_button.deselect()
         self.pg_choice_box.invoke(self.__default_pattern_generator_name)
-        if self.auto_refresh.get(): self.refresh()
+        if self.auto_refresh_var.get(): self.refresh()
 
 
     ### JCALERT! This has to be re-implemented for testpattern, it has to be done in a better way:
