@@ -121,17 +121,17 @@ class SimSingleton(Singleton):
         # The Simulation constructor will call SimSingleton's change_sim()
         Simulation()
 
-    def __getattribute__(self,attribute):
+    def __getattribute__(self,name):
         """
         If the SimSingleton object has the attribute, return it; if the
         actual_sim has the attribute, return it; otherwise, an AttributeError
         relating to Simulation will be raised (as usual).
         """
         try:
-            return object.__getattribute__(self,attribute)
+            return object.__getattribute__(self,name)
         except AttributeError:
             actual_sim = object.__getattribute__(self,'actual_sim')
-            return getattr(actual_sim,attribute)
+            return getattr(actual_sim,name)
 
     def __setattr__(self,name,value):
         """
