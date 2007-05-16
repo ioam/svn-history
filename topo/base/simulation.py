@@ -138,9 +138,9 @@ class SimSingleton(Singleton):
         If this object has the attribute name, set it to value.
         Otherwise, set self.actual_sim.name=value.
 
-        Unless an attribute is inserted into this object's __dict__,
-        the only one it is are 'actual_sim'.
-        So, this method really sets attributes on the actual_sim.
+        (Unless an attribute is inserted directly into this object's
+        __dict__, the only attribute it has is 'actual_sim'. So, this
+        method really sets attributes on actual_sim.)
         """
         # read like:
         #  if hasattr(self,name):
