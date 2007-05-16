@@ -78,12 +78,12 @@ if bwidget_imported:
             self.__width_sizer.pack()
 
             # the scrollable frame, with scrollbars
-            scrolled_window = bwidget.ScrolledWindow(self,auto="both",scrollbar="both")
+            self.__scrolled_window = bwidget.ScrolledWindow(self,auto="both",scrollbar="both")
 
             # set small start height/width, will grow if necessary
-            scrolled_frame = bwidget.ScrollableFrame(scrolled_window,height=50,width=50) 
-            scrolled_window.setwidget(scrolled_frame)
-            scrolled_window.pack(fill="both",expand='yes')
+            scrolled_frame = bwidget.ScrollableFrame(self.__scrolled_window,height=50,width=50) 
+            self.__scrolled_window.setwidget(scrolled_frame)
+            self.__scrolled_window.pack(fill="both",expand='yes')
 
             # CB: tk docs say getframe() not necessary? Where did I see that?
             self.contents = scrolled_frame.getframe()
@@ -93,8 +93,10 @@ if bwidget_imported:
             """
             Manually specify the size of the scrollable frame area.
             """
+            self.__scrolled_window.pack_forget() # removing and redrawing stops stray scrollbars
             if width is not None: self.__width_sizer['width']=width
             if height is not None: self.__height_sizer['height']=height
+            self.__scrolled_window.pack(fill="both",expand="yes")
 
 
 
@@ -317,7 +319,6 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
             h = min(self.plot_frame.winfo_reqheight()+20,self.winfo_screenheight()-250)
             
             self.__scroll_frame.set_size(w,h)
-        
 
 
 
