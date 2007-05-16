@@ -332,6 +332,8 @@ class BooleanParameter(Parameter):
     __slots__ = ['bounds']
     __doc__ = property((lambda self: self.doc))
 
+
+    # CB: what does bounds=(0,1) mean/do for this Parameter?
     def __init__(self,default=False,bounds=(0,1),**params):
         """Initialize a Boolean parameter, allowing values True or False."""
         Parameter.__init__(self,default=default,**params)
