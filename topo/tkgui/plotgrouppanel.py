@@ -72,9 +72,9 @@ if bwidget_imported:
 
             # non-empty Frames ignore any specified width/height, so create two empty
             # frames used purely for setting height & width
-            self.__height_sizer = Frame(self,height=0,width=5,bd=2,relief="groove")
+            self.__height_sizer = Frame(self,height=0,width=0)
             self.__height_sizer.pack(side=LEFT)
-            self.__width_sizer = Frame(self,width=0,height=5,bd=2,relief="groove")
+            self.__width_sizer = Frame(self,width=0,height=0)
             self.__width_sizer.pack()
 
             # the scrollable frame, with scrollbars
