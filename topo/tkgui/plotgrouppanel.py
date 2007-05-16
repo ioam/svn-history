@@ -421,8 +421,6 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 
 
         ### Dynamic info about cursor location on plot
-        # CEBALERT: should go in one of the plotting frames and probably
-        # doesn't need a border.
 	self.messageBar = Pmw.MessageBar(self,entry_relief='groove')
 	self.messageBar.pack(side=BOTTOM,fill=X,expand=NO,padx=4,pady=8)
 
@@ -695,7 +693,9 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         self.display_plots()
 
 
-    ### Temporary; needs to be removed:  
+    ### Temporary; needs to be removed:
+    # CB: was there ever a plan for doing this? If not, I
+    # will come up with one...
     def update_back_fwd_button(self):	
 	if (self.history_index > 0):
             self.back_button.config(state=NORMAL)
