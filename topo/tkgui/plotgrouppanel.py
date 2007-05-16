@@ -22,7 +22,7 @@ try:
 except:
     bwidget_imported=False
 
-
+import Tkinter
 from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
      BooleanVar, StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
@@ -46,6 +46,60 @@ BORDERWIDTH = 1
 # the border will not be close, too small, and some of the image is
 # not displayed.  
 CANVASBUFFER = 1
+
+
+
+if bwidget_imported:
+    class ResizableScrollableFrame(Tkinter.Frame):
+        """
+        A scrollable frame that can also be manually resized.
+        
+        Any normal scrollable frame will not resize automatically to
+        accommodate its contents, because that would defeat the
+        purpose of scrolling in the first place.  However, having a
+        scrollable frame that can be resized manually is useful; this
+        class adds easy resizing to a bwidget
+        ScrollableFrame/ScrolledWindow combination.
+        """
+        def __init__(self,master,**config):
+            """
+            The 'contents' attribute is the frame into which contents
+            should be placed (for the contents to be inside the
+            scrollable area), i.e. almost all use of
+            f=ResizableScrollableFrame(master) will be via f.contents.
+            """
+            Tkinter.Frame.__init__(self,master,**config)
+
+            # non-empty Frames ignore any specified width/height, so create two empty
+            # frames used purely for setting height & width
+            self.__height_sizer = Frame(self,height=0,width=5,bd=2,relief="groove")
+            self.__height_sizer.pack(side=LEFT)
+            self.__width_sizer = Frame(self,width=0,height=5,bd=2,relief="groove")
+            self.__width_sizer.pack()
+
+            # the scrollable frame, with scrollbars
+            scrolled_window = bwidget.ScrolledWindow(self,auto="both",scrollbar="both")
+
+            # set small start height/width, will grow if necessary
+            scrolled_frame = bwidget.ScrollableFrame(scrolled_window,height=50,width=50) 
+            scrolled_window.setwidget(scrolled_frame)
+            scrolled_window.pack(fill="both",expand='yes')
+
+            # CB: tk docs say getframe() not necessary? Where did I see that?
+            self.contents = scrolled_frame.getframe()
+
+
+        def set_size(self,width=None,height=None):
+            """
+            Manually specify the size of the scrollable frame area.
+            """
+            if width is not None: self.__width_sizer['width']=width
+            if height is not None: self.__height_sizer['height']=height
+
+
+
+
+
 
 
 class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
@@ -161,40 +215,15 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
 	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plotgroup_key))
         self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)
 
-
-
-        # CB: make our scrollable frame into a widget when it's clear what it adds
-        # (resizes scrolled window content frame up to the screen size, then adds scrollbars).
-        # CB: scrollbar frame stops plots from being centered...I wonder how to fix that?
+        
         if bwidget_imported:
-            ### Scrollbars for the plots
-            # (Some of this would be simpler if we were using grid(), probably)
-
-            # non-empty Frames ignore any specified width/height, so create two empty
-            # frames used purely for setting height & width
-            self.height_sizer = Frame(self.plot_group_title.interior(),height=0,width=0)
-            self.height_sizer.pack(side=LEFT)
-            self.width_sizer = Frame(self,width=0,height=0)
-            self.width_sizer.pack()
-
-            # the scrollable frame, with scrollbars
-            scrolled_window = bwidget.ScrolledWindow(self.plot_group_title.interior(),
-                                                     auto="both",scrollbar="both")
-            # set small start height/width, will grow if necessary
-            scrolled_frame = bwidget.ScrollableFrame(scrolled_window,height=50,width=50) 
-            scrolled_window.setwidget(scrolled_frame)
-            scrolled_window.pack(fill="both",expand='yes')
-
-            
-            self.plot_frame = scrolled_frame.getframe() #according to bwidget docs, not necessary to do this
-
-
-            # CB: the following doesn't work on some platforms? OS X?
-            ## Prevent resizing bigger than the screen 
+            # max window size (works on all platforms? os x?)
             self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
+            self.__scroll_frame = ResizableScrollableFrame(self.plot_group_title.interior())
+            self.__scroll_frame.pack()
+            self.plot_frame = self.__scroll_frame.contents
         else:
             self.plot_frame = self.plot_group_title.interior()
-
 
 
 
@@ -279,12 +308,16 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
     def sizeright(self):
         if bwidget_imported:
             self.update_idletasks()
+        
             # CB: the +'s are hacks, because for some reason the requested values aren't quite
             # large enough (noticably when there are labels).
-            self.width_sizer['width']=min(self.plot_frame.winfo_reqwidth()+30,self.winfo_screenwidth())
+            w = min(self.plot_frame.winfo_reqwidth()+30,self.winfo_screenwidth())
             # The - is to prevent the plot engulfing the rest of the plot window, obscuring controls at the bottom
             # (not so important right now, since plots would rarely be as large as the screen height)
-            self.height_sizer['height']=min(self.plot_frame.winfo_reqheight()+20,self.winfo_screenheight()-250)
+            h = min(self.plot_frame.winfo_reqheight()+20,self.winfo_screenheight()-250)
+            
+            self.__scroll_frame.set_size(w,h)
+        
 
 
 
