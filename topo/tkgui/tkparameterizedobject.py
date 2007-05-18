@@ -44,16 +44,14 @@ class TkPO(object):
     stored in THIS object), AND set()s the corresponding Tkinter variable.
     (e.g. this_obj._tk_vars[param_name].set(val)).
     """
-
-    #__slots__ = ['_tk_vars','po']
     _tk_vars = None
-    po = None
+    _parameterized_object = None
 
-    def __init__(self,po,**params):
+    def __init__(self,parameterized_object,**params):
         """
         tkmaster is the tk widget onto which widgets will be placed.
         """
-        self.po = po
+        self._parameterized_object = parameterized_object
         self._tk_vars = {} # tk variables corresponding to this tkpo's parameters
         super(TkPO,self).__init__(**params)
         self.__setup_tk_vars()
@@ -71,9 +69,9 @@ class TkPO(object):
         be set on this object. If setting the parameter value fails (e.g. inappropriate
         value), the tk var is reverted.
         """
-        for name,param in self.po.params().items():
+        for name,param in self._parameterized_object.params().items():
             self._tk_vars[name]=parameters_to_tkvars.get(type(param),StringVar)()
-            self._tk_vars[name].set(getattr(self.po,name))
+            self._tk_vars[name].set(getattr(self._parameterized_object,name))
             self._tk_vars[name]._last_good_val=self._tk_vars[name].get() # for reverting
             self._tk_vars[name].trace_variable('w',lambda a,b,c,p_name=name: self.update_param(p_name))     
   
@@ -85,7 +83,7 @@ class TkPO(object):
         val = tk_var.get()
         
         try:
-            setattr(self.po,param_name,val)
+            setattr(self._parameterized_object,param_name,val)
         except:
             #tk_var.set(tk_var._last_good_val)
             # hack: above is too fast for gui? variable changes correctly, but doesn't appear
@@ -103,8 +101,8 @@ class TkPO(object):
         try:
             return object.__getattribute__(self,name)
         except AttributeError:
-            po = object.__getattribute__(self,'po')
-            return getattr(po,name)
+            parameterized_object = object.__getattribute__(self,'_parameterized_object')
+            return getattr(parameterized_object,name)
 
     def __setattr__(self,name,value):
         """
@@ -124,7 +122,7 @@ class TkPO(object):
             object.__getattribute__(self, name) 
             object.__setattr__(self, name, value)
         except AttributeError:
-            object.__setattr__(self.po, name, value)
+            object.__setattr__(self._parameterized_object, name, value)
             # why 'if name'? better have it, no?
             if name in self._tk_vars: self._tk_vars[name].set(value)
                     
@@ -174,6 +172,7 @@ class SomeFrame(WidgetDrawingTkPO,Frame):
         Frame.__init__(self,master)
         
         for name in po.params().keys():
+            Tkinter.Label(master,text=name).pack()
             self.create_widget(param_name=name).pack()
 
 
@@ -183,7 +182,8 @@ g = Gaussian()
 f = SomeFrame(g,Tkinter.Toplevel())
 
 
-
+# ** changes to g are not reflected in the gui **
+# Although the variable is updated, nothing happens to the gui.
 
 
 
