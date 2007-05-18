@@ -1,3 +1,8 @@
+"""
+
+$Id$
+"""
+
 # CB: testing out Parameter-Tkinter Variable coupling
 
 
@@ -9,17 +14,25 @@ import Pmw
 from topo.base.parameterizedobject import ParameterizedObject,Parameter
 from topo.base.parameterclasses import BooleanParameter,StringParameter,Number
 
-
-#root = Tk()
-# Pmw.initialise(root)
+from translatorwidgets import TaggedSlider
 
 
-# there's only: IntVar,BooleanVar,StringVar,DoubleVar
+
+
+# (Duplicates PropertiesFrame/ParamtersFrame)
 parameters_to_tkvars = {
     BooleanParameter:BooleanVar,
     StringParameter:StringVar,
     Number:DoubleVar
     }
+parameters_to_tkwidgets = {
+    BooleanParameter:Checkbutton,
+    Number:TaggedSlider,
+    StringParameter:Entry
+    }
+
+
+
 
 
 class TkPO(ParameterizedObject):
@@ -89,26 +102,31 @@ class WidgetDrawingTkPO(TkPO):
         self.tkmaster = tkmaster
         self.balloon = Pmw.Balloon(tkmaster)
 
-    def create_widget(self,widget_type,**kw):
+    def create_widget(self,param_name,**kw):
         """
         Return a widget of the requested type, with ...
         """
-        ###
-        # This complication is because sometimes tkinter calls it textvariable,
-        # sometimes variable (depending on widget).
-        # User of this method must just pass right one for requested widget (but must pass one).
-        if 'variable' in kw:
-            param_name = kw['variable']
-            kw['variable'] = self._tk_vars[param_name]
-        elif 'textvariable' in kw:
-            param_name = kw['textvariable']
-            kw['textvariable'] = self._tk_vars[param_name]
-        else:
-            raise ValueError("must pass variable or textvariable")
-        ###
+        param = self.params()[param_name]
+        widget_type = parameters_to_tkwidgets.get(type(param),Entry)
+        tk_var = self._tk_vars[param_name]
 
-        w = widget_type(self.tkmaster,**kw)
+        ### CB: obviously I'm just joking
+        import _tkinter
+        try:
+            w = widget_type(self.tkmaster,variable=tk_var,**kw)
+        except _tkinter.TclError:
+            try:
+                w = widget_type(self.tkmaster,textvariable=tk_var,**kw)
+            except _tkinter.TclError:
+                try:
+                    w = widget_type(self.tkmaster,tagvariable=tk_var,**kw)
+                except _tkinter.TclError:
+                    raise _tkinter.TclError("no variable, textvariable, tagvariable")
+        ### end of joke
+        
         self.balloon.bind(w,getdoc(self.params()[param_name]))
+
+        # could pack the widget, could pass in pack options, etc
         return w
 
 
@@ -123,9 +141,9 @@ class SomeFrame(WidgetDrawingTkPO,Frame):
         WidgetDrawingTkPO.__init__(self,tkmaster=master,**params)
         Frame.__init__(self,master)
 
-        self.create_widget(Checkbutton,variable='test').pack()
-        self.create_widget(Entry,textvariable='name').pack()
-        self.create_widget(Entry,textvariable='some_number').pack()
+        self.create_widget(param_name='test').pack()
+        self.create_widget(param_name='name').pack()
+        self.create_widget(param_name='some_number').pack()
 
         
 
