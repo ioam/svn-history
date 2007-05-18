@@ -200,18 +200,6 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
             "Whether to regenerate this plot whenever the simulation time advances.")
 
 
-        ### Auto-resize checkbutton.
-        # See set_auto_resize() for more info.
-        self.auto_resize_var = BooleanVar()
-        self.auto_resize_var.trace_variable('w',lambda x,y,z: self.set_auto_resize())
-        self.auto_resize_var.set(True)
-        auto_resize_checkbutton=Checkbutton(self.control_frame_1, text="Auto-resize",
-                                            variable=self.auto_resize_var)
-        auto_resize_checkbutton.pack(side=RIGHT)
-        self.balloon.bind(auto_resize_checkbutton,
-            "Whether to resize this window automatically to fit the contents, or to allow the window to be resized manually.")
-
-
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
 	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plotgroup_key))
@@ -227,24 +215,6 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
         else:
             self.plot_frame = self.plot_group_title.interior()
 
-
-
-    def set_auto_resize(self):
-        """
-        If auto-resize on, window automatically resizes to fit widgets
-        (Tkinter default), and user cannot resize window.
-
-        If auto-resize is off, the window stays the same size whatever
-        happens to the widgets, and the user can resize the window.
-        """
-        if self.auto_resize_var.get():
-            self.geometry('')
-            self.resizable(0,0)
-        else:
-            self.geometry(self.geometry())
-            self.resizable(1,1)
-
-        
 
 
     def refresh(self,update=True):
@@ -309,6 +279,8 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
     # CB: rename, document, and if possible delay showing the window until all the jiggling is over
     def sizeright(self):
         if bwidget_imported:
+            self.geometry('') # if user has changed window size, need to tell tkinter that it should take
+                              # control again.
             self.update_idletasks()
         
             # CB: the +'s are hacks, because for some reason the requested values aren't quite
@@ -319,6 +291,7 @@ class BasicPlotGroupPanel(TkguiWindow,ParameterizedObject):
             h = min(self.plot_frame.winfo_reqheight()+20,self.winfo_screenheight()-250)
             
             self.__scroll_frame.set_size(w,h)
+            
 
 
 
