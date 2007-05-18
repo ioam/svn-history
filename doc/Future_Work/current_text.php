@@ -33,6 +33,21 @@ first added to the list, or a change was made.
 
 <H2>Tasks to be addressed before the next release:</H2>
 
+<H4>2007/05/18: Add-on packages</H4>
+We should set up some way to handle Topographica components that are
+too unwieldy to be part of the main distribution, but that we want to
+work smoothly when they are present.  Roger's face work is a case in
+point -- it relies on a lot of external images and data files that we
+don't want to ship with every copy of Topographica.  The current
+approach of including the code with Topographica but not the data
+doesn't really work, because now when someone tries those menu options
+(such as measuring a face map or using the FaceSpace2D pattern
+generator), it fails because it can't find the files it needs.
+Instead, we should probably just have a single directory containing
+all the face code and data, which is maintained separately in CVS
+(like topographica-win is) and can be explicitly downloaded and
+installed.
+
 <H4>2007/04/21: Note for Windows users</H4>
 Where to put this note? Working from the cmd.exe on Windows, single
 quotes must appear inside double quotes: it can't be the other way
