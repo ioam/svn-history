@@ -27,7 +27,7 @@ specific object implementations will not have any effect.  Instead, we
 can optimize the individual PatternGenerator or Sheet object heavily.
 If some special hack needs to be done at a high level, e.g. at the
 base Sheet class level, we can add a method there that then gets
-overridden in the base class with the special purpose code.  That way
+overridden in the subclass with the special purpose code.  That way
 all optimization will be local (and thus maintainable).  If it's not
 clear how to optimize something cleanly, first do it uncleanly to see
 if it will have any effect, but don't check it in to CVS.  If it looks
@@ -35,18 +35,28 @@ like the optimization is worthwhile, brainstorm with other team
 members to figure out a way to do it cleanly and check in the clean
 version instead.
 
+<H2>Optimizing Python code</H2>
+
+<P>Although dramatic speedups usually require big changes as described
+below, sometimes all you need is minor tweaks to Python code to get it
+to have reasonable performance.  Usually this involves avoiding
+unnecessary attribute lookup, as described
+<A href="http://www.informit.com/articles/article.asp?p=453682&rl=1">here</A>.
+
+<P>What is usually more important to ensure is that anything that can
+use the array-based primitives provided by
+<A href="http://numpy.scipy.org/">numpy</A> does so, because these
+generally have underlying C implementations that are quite fast.
+Using numpy operations should be the first approach when optimizing
+any component, and indeed when writing the component for the first
+time (because the numpy primitives are much easier to use and
+maintain than e.g. explicitly writing <code>for</code> loops).
+
 
 <H2>Providing optimized versions of Topographica objects</H2>
 
 <!-- CB: update to numpy! & cleanup numpy/Numeric in following section!-->
 
-<P>Where possible, Python components can be implemented with high
-performance using
-<A href="http://numpy.scipy.org/">numpy</A>
-matrix operations.  This should be the first approach when optimizing
-any component, and indeed when writing the component for the first
-time (because the numpy primitives are much easier to use and
-maintain than e.g. explicitly writing <code>for</code> loops).
 However, there are certain cases where the performance of numpy is
 not sufficient, or where numpy is unsuitable (for example, many
 numpy operations do not act in-place on arrays).  Other components
@@ -54,7 +64,7 @@ may be able to be implemented much more quickly if certain assumptions
 are made about the nature of their arguments, or the types of
 computations that can be performed.
 
-<P>In the cases mentioned above, it is worthwhile to have a reference
+<P>In these cases, it is worthwhile to have a reference
 version of the object that is simple to understand and does not make
 any special assumptions. Then, an optimized version can be offered as
 an alternative. The convention we use is to add the suffix
