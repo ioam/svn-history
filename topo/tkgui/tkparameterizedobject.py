@@ -35,7 +35,7 @@ parameters_to_tkwidgets = {
 
 
 
-class TkPO(ParameterizedObject):
+class TkPO(object):
     """
     A PO but with additional Tkinter Variables available representing the Parameters.
 
@@ -45,10 +45,15 @@ class TkPO(ParameterizedObject):
     (e.g. this_obj._tk_vars[param_name].set(val)).
     """
 
-    def __init__(self,**params):
+    #__slots__ = ['_tk_vars','po']
+    _tk_vars = None
+    po = None
+
+    def __init__(self,po,**params):
         """
         tkmaster is the tk widget onto which widgets will be placed.
         """
+        self.po = po
         self._tk_vars = {} # tk variables corresponding to this tkpo's parameters
         super(TkPO,self).__init__(**params)
         self.__setup_tk_vars()
@@ -66,9 +71,9 @@ class TkPO(ParameterizedObject):
         be set on this object. If setting the parameter value fails (e.g. inappropriate
         value), the tk var is reverted.
         """
-        for name,param in self.params().items():
+        for name,param in self.po.params().items():
             self._tk_vars[name]=parameters_to_tkvars.get(type(param),StringVar)()
-            self._tk_vars[name].set(getattr(self,name))
+            self._tk_vars[name].set(getattr(self.po,name))
             self._tk_vars[name]._last_good_val=self._tk_vars[name].get() # for reverting
             self._tk_vars[name].trace_variable('w',lambda a,b,c,p_name=name: self.update_param(p_name))     
   
@@ -80,7 +85,7 @@ class TkPO(ParameterizedObject):
         val = tk_var.get()
         
         try:
-            setattr(self,param_name,val)
+            setattr(self.po,param_name,val)
         except:
             #tk_var.set(tk_var._last_good_val)
             # hack: above is too fast for gui? variable changes correctly, but doesn't appear
@@ -88,15 +93,47 @@ class TkPO(ParameterizedObject):
             topo.guimain.after(250,lambda x=tk_var._last_good_val: tk_var.set(x))
             raise
 
+
+    def __getattribute__(self,name):
+        """
+        If the SimSingleton object has the attribute, return it; if the
+        actual_sim has the attribute, return it; otherwise, an AttributeError
+        relating to Simulation will be raised (as usual).
+        """
+        try:
+            return object.__getattribute__(self,name)
+        except AttributeError:
+            po = object.__getattribute__(self,'po')
+            return getattr(po,name)
+
     def __setattr__(self,name,value):
-        super(TkPO,self).__setattr__(name,value)
-        if name in self._tk_vars: self._tk_vars[name].set(value)
+        """
+        If this object has the attribute name, set it to value.
+        Otherwise, set self.actual_sim.name=value.
+
+        (Unless an attribute is inserted directly into this object's
+        __dict__, the only attribute it has is 'actual_sim'. So, this
+        method really sets attributes on actual_sim.)
+        """
+        # read like:
+        #  if hasattr(self,name):
+        #      setattr(self,name,value)
+        #  else:
+        #      setattr(self.actual_sim,name,value)
+        try:
+            object.__getattribute__(self, name) 
+            object.__setattr__(self, name, value)
+        except AttributeError:
+            object.__setattr__(self.po, name, value)
+            # why 'if name'? better have it, no?
+            if name in self._tk_vars: self._tk_vars[name].set(value)
+                    
 
 
 class WidgetDrawingTkPO(TkPO):
 
-    def __init__(self,tkmaster,**params):
-        super(WidgetDrawingTkPO,self).__init__(**params)
+    def __init__(self,po,tkmaster,**params):
+        super(WidgetDrawingTkPO,self).__init__(po,**params)
         # for widget creation
         assert tkmaster is not None
         self.tkmaster = tkmaster
@@ -130,24 +167,20 @@ class WidgetDrawingTkPO(TkPO):
         return w
 
 
-
-
 class SomeFrame(WidgetDrawingTkPO,Frame):
 
-    test = BooleanParameter(default=True,doc="some test parameter")
-    some_number = Number(default=0.3,bounds=(0.0,1.0),doc="Takes 0.0 to 1.0")
-
-    def __init__(self,master,**params):
-        WidgetDrawingTkPO.__init__(self,tkmaster=master,**params)
+    def __init__(self,po,master,**params):
+        WidgetDrawingTkPO.__init__(self,po,tkmaster=master,**params)
         Frame.__init__(self,master)
-
-        self.create_widget(param_name='test').pack()
-        self.create_widget(param_name='name').pack()
-        self.create_widget(param_name='some_number').pack()
-
         
+        for name in po.params().keys():
+            self.create_widget(param_name=name).pack()
 
-f = SomeFrame(Tkinter.Toplevel())
+
+
+from topo.patterns.basic import Gaussian        
+g = Gaussian()
+f = SomeFrame(g,Tkinter.Toplevel())
 
 
 
