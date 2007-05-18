@@ -59,7 +59,7 @@ class TkPO(object):
 
     def __setup_tk_vars(self):
         """
-        Create Tk Variables corresponding to the Parameter types, and store them in the
+        Create Tk Variables corresponding to parameterized_object's Parameter types, and store them in the
         _tk_vars dictionary under the corresponding parameter name.
 
         The tkinter Variable defaults to StringVar if no corresponding variable for the
@@ -93,11 +93,6 @@ class TkPO(object):
 
 
     def __getattribute__(self,name):
-        """
-        If the SimSingleton object has the attribute, return it; if the
-        actual_sim has the attribute, return it; otherwise, an AttributeError
-        relating to Simulation will be raised (as usual).
-        """
         try:
             return object.__getattribute__(self,name)
         except AttributeError:
@@ -105,14 +100,7 @@ class TkPO(object):
             return getattr(parameterized_object,name)
 
     def __setattr__(self,name,value):
-        """
-        If this object has the attribute name, set it to value.
-        Otherwise, set self.actual_sim.name=value.
 
-        (Unless an attribute is inserted directly into this object's
-        __dict__, the only attribute it has is 'actual_sim'. So, this
-        method really sets attributes on actual_sim.)
-        """
         # read like:
         #  if hasattr(self,name):
         #      setattr(self,name,value)
@@ -182,8 +170,8 @@ g = Gaussian()
 f = SomeFrame(g,Tkinter.Toplevel())
 
 
-# ** changes to g are not reflected in the gui **
-# Although the variable is updated, nothing happens to the gui.
+# ** direct changes to g are not reflected in f **
+
 
 
 
