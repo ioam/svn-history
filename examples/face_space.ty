@@ -25,9 +25,10 @@ $Id$
 """
 __version__='$Revision$'
 
+import numpy.oldnumeric.random_array as RandomArray
+import fixedpoint
+import numpy.oldnumeric as Numeric
 import numpy
-import copy
-import topo
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
@@ -35,13 +36,7 @@ from fixedpoint import FixedPoint
 import topo.patterns.basic
 import topo.patterns.random
 
-from topo.base.arrayutils import clip_in_place
-from topo.base.functionfamilies import OutputFn, OutputFnParameter, IdentityOF
-from topo.base.parameterclasses import Number, BooleanParameter, ListParameter
-from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.sheet import activity_type
-from numpy import exp,zeros,ones
-from topo.patterns.basic import Gaussian,Composite
+from topo.patterns.basic import Gaussian,Composite, Constant
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
@@ -56,11 +51,11 @@ from topo.misc.numbergenerators import UniformRandom
 from topo.outputfns.homeostatic import HomeostaticMaxEnt
 from topo.coordmapperfns.basic import ConstantMapper
 from topo.patterns.image import Image, FaceSpace2Dfromfile
+from topo.patterns.face import FaceSpace2D
 
 topo.sim.name = "face_space"
 
 GeneratorSheet.nominal_density = 48.0
-
 
 # Input patterns
 
@@ -85,8 +80,12 @@ inputs = [input_type(filename = dir_base + f,
                      orientation = 0)
           for f in file_base]
 
-#combined_inputs=topo.patterns.basic.Selector(generators=inputs)
-combined_inputs = FaceSpace2Dfromfile(size_normalization='original', x = 0.0, y = 0.0, orientation = 0)
+#inputs=topo.patterns.basic.Selector(generators=inputs)
+#inputs = FaceSpace2Dfromfile(size = 180.0 / 28.0 / 1.75,  #size_normalization='original', 
+#                                      x = 0.0, y = 0.0, orientation = 0, caricaturization = 100)
+inputs = FaceSpace2D(x = 0.0, y = 0.0, size = 351.0 / 28.0 / 3.5, #size_normalization='original', 
+                     orientation = 0, identity_ref = 0, #identity_target = 26,
+                     caricaturization_shape = 0.6, caricaturization_texture = 0.6)
 
 # Default for tutorial
 topo.patterns.basic.Line.scale=0.9
@@ -94,7 +93,7 @@ topo.patterns.basic.Gaussian.size=0.08333
 topo.patterns.basic.Gaussian.aspect_ratio=4.0
 
 # Specify weight initialization, response function, and learning function
-numpy.random.seed((500,500))
+RandomArray.seed(500,500)
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
@@ -108,7 +107,7 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
 topo.sim['Retina']=GeneratorSheet(nominal_bounds=BoundingBox(radius=1.77),
                                   nominal_density=28.0,
-                                  input_generator=combined_inputs,
+                                  input_generator=inputs,
                                   period=1.0, phase=0.05)
 
 topo.sim['LGNOn']=CFSheet(nominal_density=18.0,
@@ -130,7 +129,7 @@ topo.sim['FSA'] = LISSOM(nominal_density=locals().get('default_density',18.0),ts
 topo.sim['FSA'].output_fn = HomeostaticMaxEnt(a_init = 11.75, b_init = -4.59,
                                               learning = True, mu = 0.22, eta = 0.005)
 
-#topo.sim['FSA'].output_fn = PiecewiseLinear()
+#topo.sim['FSA'].output_fn = PiecewiseLinear_debug()
 #topo.sim['FSA'].output_fn.lower_bound=0.05
 #topo.sim['FSA'].output_fn.upper_bound=0.65
 
@@ -177,7 +176,7 @@ topo.sim.connect('FSA','FSA',delay=FixedPoint('0.050', 3),name='LateralExcitator
 topo.sim.connect('FSA','FSA',delay=FixedPoint('0.050', 3),name='LateralInhibitory',
                  connection_type=CFProjection,strength=-1.5,
                  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=1.414),
-                 nominal_bounds_template=BoundingBox(radius=1.414),learning_rate=2.3627*1.5)
+                 nominal_bounds_template=BoundingBox(radius=1.414),learning_rate=2.3627)  #*1.5)
 
 
 
@@ -213,27 +212,27 @@ ON ='topo.sim["FSA"].projections()["LGNOnAfferent"]'
 OFF='topo.sim["FSA"].projections()["LGNOffAfferent"]'
 
 
-topo.sim.schedule_command( 200*st, ON+'.learning_rate=0.004667*'+ON+'.n_units()')
-topo.sim.schedule_command( 500*st, ON+'.learning_rate=0.003333*'+ON+'.n_units()')
-topo.sim.schedule_command(1000*st, ON+'.learning_rate=0.003333*'+ON+'.n_units()')
-topo.sim.schedule_command(2000*st, ON+'.learning_rate=0.002667*'+ON+'.n_units()')
-topo.sim.schedule_command(3000*st, ON+'.learning_rate=0.002667*'+ON+'.n_units()')
-topo.sim.schedule_command(4000*st, ON+'.learning_rate=0.002*'+ON+'.n_units()')
-topo.sim.schedule_command(5000*st, ON+'.learning_rate=0.002*'+ON+'.n_units()')
-topo.sim.schedule_command(6500*st, ON+'.learning_rate=0.002*'+ON+'.n_units()')
-topo.sim.schedule_command(10000*st,ON+'.learning_rate=0.002*'+ON+'.n_units()')
-topo.sim.schedule_command(20000*st,ON+'.learning_rate=0.001*'+ON+'.n_units()')
+#topo.sim.schedule_command( 200*st, ON+'.learning_rate=0.004667*'+ON+'.n_units()')
+#topo.sim.schedule_command( 500*st, ON+'.learning_rate=0.003333*'+ON+'.n_units()')
+#topo.sim.schedule_command(1000*st, ON+'.learning_rate=0.003333*'+ON+'.n_units()')
+#topo.sim.schedule_command(2000*st, ON+'.learning_rate=0.002667*'+ON+'.n_units()')
+#topo.sim.schedule_command(3000*st, ON+'.learning_rate=0.002667*'+ON+'.n_units()')
+#topo.sim.schedule_command(4000*st, ON+'.learning_rate=0.002*'+ON+'.n_units()')
+#topo.sim.schedule_command(5000*st, ON+'.learning_rate=0.002*'+ON+'.n_units()')
+#topo.sim.schedule_command(6500*st, ON+'.learning_rate=0.002*'+ON+'.n_units()')
+#topo.sim.schedule_command(10000*st,ON+'.learning_rate=0.002*'+ON+'.n_units()')
+#topo.sim.schedule_command(20000*st,ON+'.learning_rate=0.001*'+ON+'.n_units()')
 
-topo.sim.schedule_command( 200*st, OFF+'.learning_rate=0.004667*'+OFF+'.n_units()')
-topo.sim.schedule_command( 500*st, OFF+'.learning_rate=0.003333*'+OFF+'.n_units()')
-topo.sim.schedule_command(1000*st, OFF+'.learning_rate=0.003333*'+OFF+'.n_units()')
-topo.sim.schedule_command(2000*st, OFF+'.learning_rate=0.002667*'+OFF+'.n_units()')
-topo.sim.schedule_command(3000*st, OFF+'.learning_rate=0.002667*'+OFF+'.n_units()')
-topo.sim.schedule_command(4000*st, OFF+'.learning_rate=0.002*'+OFF+'.n_units()')
-topo.sim.schedule_command(5000*st, OFF+'.learning_rate=0.002*'+OFF+'.n_units()')
-topo.sim.schedule_command(6500*st, OFF+'.learning_rate=0.002*'+OFF+'.n_units()')
-topo.sim.schedule_command(10000*st,OFF+'.learning_rate=0.002*'+OFF+'.n_units()')
-topo.sim.schedule_command(20000*st,OFF+'.learning_rate=0.001*'+OFF+'.n_units()')
+#topo.sim.schedule_command( 200*st, OFF+'.learning_rate=0.004667*'+OFF+'.n_units()')
+#topo.sim.schedule_command( 500*st, OFF+'.learning_rate=0.003333*'+OFF+'.n_units()')
+#topo.sim.schedule_command(1000*st, OFF+'.learning_rate=0.003333*'+OFF+'.n_units()')
+#topo.sim.schedule_command(2000*st, OFF+'.learning_rate=0.002667*'+OFF+'.n_units()')
+#topo.sim.schedule_command(3000*st, OFF+'.learning_rate=0.002667*'+OFF+'.n_units()')
+#topo.sim.schedule_command(4000*st, OFF+'.learning_rate=0.002*'+OFF+'.n_units()')
+#topo.sim.schedule_command(5000*st, OFF+'.learning_rate=0.002*'+OFF+'.n_units()')
+#topo.sim.schedule_command(6500*st, OFF+'.learning_rate=0.002*'+OFF+'.n_units()')
+#topo.sim.schedule_command(10000*st,OFF+'.learning_rate=0.002*'+OFF+'.n_units()')
+#topo.sim.schedule_command(20000*st,OFF+'.learning_rate=0.001*'+OFF+'.n_units()')
 
 
 ### Activation function threshold changes
@@ -265,10 +264,10 @@ topo.sim.schedule_command(20000*st,'topo.sim["FSA"].tsettle=13')
 """
 
 # default locations for model editor
-topo.sim['FSA'   ].layout_location=(306,225)
-topo.sim['LGNOn' ].layout_location=(432,345)
-topo.sim['LGNOff'].layout_location=(150,345)
-topo.sim['Retina'].layout_location=(279,500)
+topo.sim['FSA'   ].gui_x=306.0;  topo.sim['FSA'   ].gui_y=225.0
+topo.sim['LGNOn' ].gui_x=432.0;  topo.sim['LGNOn' ].gui_y=345.0
+topo.sim['LGNOff'].gui_x=150.0;  topo.sim['LGNOff'].gui_y=345.0
+topo.sim['Retina'].gui_x=279.0;  topo.sim['Retina'].gui_y=500.0
 
 # Stop learning
 """
