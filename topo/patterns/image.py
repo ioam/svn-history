@@ -17,8 +17,6 @@ from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.projection import OutputFnParameter
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.misc.numbergenerators import Choice, UniformRandomInt
-from topo.base.parameterclasses import DynamicNumber
 
 from topo.outputfns.basic import DivisiveNormalizeLinf,IdentityOF
 
@@ -273,43 +271,3 @@ class Image(PatternGenerator):
         return self.ps(x,y,float(xdensity),float(ydensity),size_normalization,float(width),float(height))
 
 
-class FaceSpace2Dfromfile(Image):
-    """
-    Presents images from a set indexed in two dimensions: caricaturization and identity.
-
-    Used for testing how face-selective responses depend on
-    differences from a mean face and on individual identities.
-
-    Requires a set of images indexed by two numbers.  The numbers will
-    be passed to a string specification of the filename_format to
-    construct the actual filenames of these images.
-    """
-    
-    caricaturization = DynamicNumber(default = Choice(choices = [0,20,40,60,80,100,120,140,160]),                                      precedence = 0.20, doc = """
-        Amount of caricaturization, on a scale with 0 being the mean face
-        and 100 being a real face. Values above 100 represent exaggerations
-        (caricatures), and those below 100 represent averaged faces.""")
-
-    identity = DynamicNumber(default = UniformRandomInt(lbound=1, ubound=4, seed=21),
-                             precedence = 0.20, doc = """
-        Number specifying which person's face should be used.""")
-
-    filename_format = StringParameter('../imagedb/leopold/f%d_%d_enlarged.png', doc="""
-        String specification for the filename, where the first %d will
-        be replaced with the identity, and the second %d will be
-        replaced with the caricaturization.""")
-
-    def function(self,**params):
-        caricaturization = params.get('caricaturization', self.caricaturization)
-        identity = params.get('identity', self.identity)
-        filename_format = params.get('filename_format', self.filename_format)
-
-        ### JABHACKALERT: Please remove this hack, and simply accept values
-        ### on a nominal scale 0.0 to 1.0 instead.
-        if type(caricaturization) == type(1.0):
-	    caricaturization = int(caricaturization * 160)
-	if type(identity) == type(1.0):
-	    identity = int(identity * 4)
-
-	self.filename = filename_format % (identity,caricaturization)
-        return Image.function(self, **params)    

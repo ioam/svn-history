@@ -27,7 +27,6 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.parameterclasses import Parameter
 from topo.analysis.featureresponses import FeatureMaps, FeatureCurves
 from topo.plotting.templates import new_pgt
-from topo.patterns.image import FaceSpace2Dfromfile
 
 class Feature(object):
     """
@@ -590,26 +589,6 @@ def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequ
         param_dict = {"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
-
-
-###############################################################################
-pgt = new_pgt(name='Caricaturization Preference',command='measure_caricaturization(display=True,weighted_average=False,pattern_presenter=PatternPresenter(pattern_generator=FaceSpace2Dfromfile(),apply_output_fn=True,duration=1.0))')
-pgt.add_plot('Caricaturization Preference',[('Strength','CaricaturizationPreference')])
-pgt.add_plot('Caricaturization Preference',[('Hue','CaricaturizationPreference')])
-pgt.add_plot('Caricaturization Selectivity',[('Strength','CaricaturizationSelectivity')])
-pgt.add_plot('Identity Preference',[('Strength','IdentityPreference')])
-pgt.add_plot('Identity Preference',[('Hue','IdentityPreference')])
-pgt.add_plot('Identity Selectivity',[('Strength','IdentitySelectivity')])
-
-def measure_caricaturization(display=True,weighted_average=False,
-                    pattern_presenter=PatternPresenter(pattern_generator=FaceSpace2Dfromfile(),apply_output_fn=True,duration=1.0)):
-
-    feature_values = [Feature(name="caricaturization", values = frange(0.0, 1.125, 0.125), cyclic = False),
-                      Feature(name="identity", values = [0.25, 0.5, 0.75, 1.0], cyclic = False)]
-
-    param_dict = {'size_normalization' : 'original', 'x' : 0.0, 'y' : 0.0}
-    x=FeatureMaps(feature_values)
-    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
 
 ###############################################################################
