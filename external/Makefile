@@ -1,13 +1,13 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-default: python jpeg pil numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis psyco
+default: python jpeg pil numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis psyco 
 
-all: default pyaudiolab mlabwrap scipy ipython
+all: default pyaudiolab mlabwrap scipy ipython pyrex pytables
 
-clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean ctypes-clean pyaudiolab-clean tile-clean tilewrapper-clean bwidget-clean psyco-clean 
+clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean ctypes-clean pyaudiolab-clean tile-clean tilewrapper-clean bwidget-clean psyco-clean pyrex-clean hdf5-clean pytables-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall ctypes-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall ctypes-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall
 
 ##############################################################
 # Python (interpreted language)
@@ -558,6 +558,60 @@ psyco-uninstall:
 
 
 
+##############################################################
+# Pyrex (required by PyTables)
+#
+PYREX = Pyrex-0.9.5.1a
+
+PYREX_UNINSTALL += ${PYTHON_LIB}/site-packages/Pyrex
+
+pyrex: ${PYREX}.tar.gz python
+	tar xzf ${PYREX}.tar.gz
+	cd ${PYREX}; ${PREFIX}/bin/python setup.py install
+	touch pyrex
+
+pyrex-clean:
+	rm -rf ${PYREX}
+pyrex-uninstall:
+	rm -rf pyrex ${foreach f,${PYREX_UNINSTALL}, ${PREFIX}/${f}}
+
+
+
+##############################################################
+# HDF5 library (required by PyTables)
+#
+HDF5 = hdf5-1.6.5
+
+HDF5_UNINSTALL += 
+
+hdf5: ${HDF5}.tar.gz
+	tar xzf ${HDF5}.tar.gz
+	cd ${HDF5}; ./configure --prefix=${PREFIX}
+	make -C ${HDF5} install
+	touch hdf5
+
+hdf5-clean:
+	rm -rf ${HDF5} 
+hdf5-uninstall:
+	rm -rf hdf5 ${foreach f,${HDF5_UNINSTALL}, ${PREFIX}/${f}}
+
+
+##############################################################
+# PyTables
+#
+PYTABLES = pytables
+
+PYTABLES_UNINSTALL += ${PYTHON_LIB}/site-packages/tables
+
+pytables: ${PYTABLES}-20070518.tar.gz pyrex hdf5
+	tar xzf ${PYTABLES}-20070518.tar.gz
+	cd ${PYTABLES}; ${PREFIX}/bin/python setup.py install
+	touch pytables
+
+pytables-clean:
+	rm -rf ${PYTABLES}
+pytables-uninstall:
+	rm -rf pytables ${foreach f,${PYTABLES_UNINSTALL}, ${PREFIX}/${f}}
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #

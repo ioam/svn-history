@@ -53,3 +53,6 @@ bwidget
 pybwidget-0.1.2_1.7.0
 psyco
 psyco-dist
+pytables
+pyrex
+Pyrex-0.9.5.1a
