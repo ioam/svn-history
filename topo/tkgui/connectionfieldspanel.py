@@ -78,6 +78,7 @@ It is an error to request a unit outside the area of the Sheet.""")
 
         Key Format:  Tuple: ('Weights', Sheet_Name, X_Number, Y_Number)
         """
+        # CEB: allow eval here an elsewhere in tkgui so variables can be used.
         x,y = float(self.x_var.get()), float(self.y_var.get())
         
         # JABALERT: Need to display the actual x,y coordintes of the
