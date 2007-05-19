@@ -148,17 +148,21 @@ class TkPO(object):
             if name in self._tk_vars: self._tk_vars[name].set(value)
                     
 
-import _tkinter # (required to catch tcl exception)
-# Needs renaming. Could be a Frame, too. 
-class WidgetDrawingTkPO(TkPO):
+import _tkinter # (required to get tcl exception class)
+
+# CB: needs renaming
+class WidgetDrawingTkPO(TkPO,Frame):
     """
-    A TkPO that can create widgets on a specified Tkinter Widget (master).
+    A TkPO and Tkinter Frame that can draw widgets representing the Parameters of the supplied po.
     """
-    def __init__(self,po,tkmaster):
-        super(WidgetDrawingTkPO,self).__init__(po)
-        assert tkmaster is not None # need tkmaster for widget creation
-        self.tkmaster = tkmaster
-        self.balloon = Pmw.Balloon(tkmaster)
+    def __init__(self,po,master,**config):
+        """
+        (Frame.__init__ gets the config.)
+        """
+        assert master is not None # (could probably remove this but i didn't want to think about it)
+        TkPO.__init__(self,po)
+        Frame.__init__(self,master,**config)
+        self.balloon = Pmw.Balloon(self)
 
     def pack_param(self,name,widget_options={},**pack_options):
         """
@@ -174,18 +178,21 @@ class WidgetDrawingTkPO(TkPO):
         self.pack_param(name,side='left')
         self.pack_param(name,{'width':50},side='top',expand='yes',fill='y')
         """
+        # CB: should probably do some labeling, too
         param = self.params()[name]
         widget_type = parameters_to_tkwidgets.get(type(param),Entry)
         tk_var = self._tk_vars[name]
 
+        ### Tkinter widgets use either variable or textvariable
         try:
-            w = widget_type(self.tkmaster,variable=tk_var,**widget_options)
+            w = widget_type(self,variable=tk_var,**widget_options)
         except _tkinter.TclError:
             try:
-                w = widget_type(self.tkmaster,textvariable=tk_var,**widget_options)
+                w = widget_type(self,textvariable=tk_var,**widget_options)
             except _tkinter.TclError:
                 raise # meaning the widget doesn't support variable or textvariable
-        
+        ###
+            
         self.balloon.bind(w,getdoc(self.params()[name]))
 
         w.pack(pack_options)
@@ -193,27 +200,37 @@ class WidgetDrawingTkPO(TkPO):
 
 
 
-### demo
-class SomeFrame(WidgetDrawingTkPO,Frame):
+### some demo
+## class SomeFrame(WidgetDrawingTkPO):
 
-    def __init__(self,po,master,**config):
-        WidgetDrawingTkPO.__init__(self,po,tkmaster=master)
-        Frame.__init__(self,master,**config)
+##     def __init__(self,po,master,**config):
+##         WidgetDrawingTkPO.__init__(self,po,master)
         
-        for name in po.params().keys():
-            Tkinter.Label(master,text=name).pack()
-            self.pack_param(name)
+##         for name in po.params().keys():
+##             Tkinter.Label(self,text=name).pack()
+##             self.pack_param(name)
 
 
-#from topo.patterns.basic import Gaussian        
-#g = Gaussian()
-#f = SomeFrame(g,Tkinter.Toplevel())
-
+## from topo.patterns.basic import Gaussian        
+## g = Gaussian()
+## f = SomeFrame(g,Tkinter.Toplevel())
+## f.pack()
 
 # ** direct changes to g are not reflected in f's tkinter shadows **
 
 
+### plotgroup template demo
+
+## from topo.plotting.templates import plotgroup_templates
+## class ExamplePlotGroupPanel(WidgetDrawingTkPO):
+##     def __init__(self,pgt_name,master):
+##         pgt = plotgroup_templates[pgt_name]
+##         WidgetDrawingTkPO.__init__(self,pgt,master)
+
+##         for name in pgt.params().keys():
+##             self.pack_param(name)
 
 
 
-
+## e = ExamplePlotGroupPanel("Activity",Tkinter.Toplevel())
+## e.pack()
