@@ -151,7 +151,9 @@ class TkPO(object):
 import _tkinter # (required to catch tcl exception)
 # Needs renaming. Could be a Frame, too. 
 class WidgetDrawingTkPO(TkPO):
-
+    """
+    A TkPO that can create widgets on a specified Tkinter Widget (master).
+    """
     def __init__(self,po,tkmaster,**params):
         super(WidgetDrawingTkPO,self).__init__(po,**params)
         assert tkmaster is not None # need tkmaster for widget creation
@@ -190,6 +192,8 @@ class WidgetDrawingTkPO(TkPO):
         return w 
 
 
+
+### demo
 class SomeFrame(WidgetDrawingTkPO,Frame):
 
     def __init__(self,po,master,**params):
@@ -201,9 +205,9 @@ class SomeFrame(WidgetDrawingTkPO,Frame):
             self.pack_param(name)
 
 
-from topo.patterns.basic import Gaussian        
-g = Gaussian()
-f = SomeFrame(g,Tkinter.Toplevel())
+#from topo.patterns.basic import Gaussian        
+#g = Gaussian()
+#f = SomeFrame(g,Tkinter.Toplevel())
 
 
 # ** direct changes to g are not reflected in f's tkinter shadows **
