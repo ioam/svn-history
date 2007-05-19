@@ -94,7 +94,8 @@ class TkPO(object):
             self._tk_vars[name]._last_good_val=self._tk_vars[name].get() # for reverting
             self._tk_vars[name].trace_variable('w',lambda a,b,c,p_name=name: self.__update_param(p_name))        
 
-        # Instead of a trace, could override the Variable's set() method i.e. trace it ourselves.
+        # Instead of a trace, could we override the Variable's set() method i.e. trace it ourselves?
+        # Or does too much happen in tcl/tk for that to work?
         # Additionally, maybe we should override the Variable's get() method so that it first updates
         # the var to match the parameter?
 
