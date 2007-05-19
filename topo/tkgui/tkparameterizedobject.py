@@ -154,8 +154,8 @@ class WidgetDrawingTkPO(TkPO):
     """
     A TkPO that can create widgets on a specified Tkinter Widget (master).
     """
-    def __init__(self,po,tkmaster,**params):
-        super(WidgetDrawingTkPO,self).__init__(po,**params)
+    def __init__(self,po,tkmaster):
+        super(WidgetDrawingTkPO,self).__init__(po)
         assert tkmaster is not None # need tkmaster for widget creation
         self.tkmaster = tkmaster
         self.balloon = Pmw.Balloon(tkmaster)
@@ -196,9 +196,9 @@ class WidgetDrawingTkPO(TkPO):
 ### demo
 class SomeFrame(WidgetDrawingTkPO,Frame):
 
-    def __init__(self,po,master,**params):
-        WidgetDrawingTkPO.__init__(self,po,tkmaster=master,**params)
-        Frame.__init__(self,master)
+    def __init__(self,po,master,**config):
+        WidgetDrawingTkPO.__init__(self,po,tkmaster=master)
+        Frame.__init__(self,master,**config)
         
         for name in po.params().keys():
             Tkinter.Label(master,text=name).pack()
