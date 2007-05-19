@@ -353,7 +353,7 @@ class TopoConsole(TkguiWindow):
         run_for_var.set('1.0')
 
         self.run_for = TaggedSlider(run_frame,
-                                    tagvariable=run_for_var,
+                                    variable=run_for_var,
                                     tag_width=11,
                                     slider_length=150,
                                     min_value=0,max_value=20000,

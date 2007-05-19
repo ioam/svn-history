@@ -79,7 +79,7 @@ class PropertiesFrame(Frame):
         var = StringVar()
         var.set(value)
         control = TaggedSlider(self,
-                               tagvariable=var,
+                               variable=var,
                                **kw)
         return self.add_property(name,var,control,value)
 

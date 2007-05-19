@@ -140,7 +140,7 @@ class TaggedSlider(Frame,WidgetTranslator):
 
     """
     def __init__(self,root,
-                 tagvariable=None,
+                 variable=None,
                  min_value="0.0",
                  max_value="1.0",
                  string_format = '%f',
@@ -156,7 +156,7 @@ class TaggedSlider(Frame,WidgetTranslator):
         self.__string_format = string_format
         
         # Add the tag
-        self.__tag_val = tagvariable
+        self.__tag_val = variable
         self.__tag = Entry(self,textvariable=self.__tag_val,width=tag_width)
         self.__tag.bind('<FocusOut>', self.refresh) # slider is updated on tag return... 
         self.__tag.bind('<Return>', self.action)   # ...and on tag losing focus
