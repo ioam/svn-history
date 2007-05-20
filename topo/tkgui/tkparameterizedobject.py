@@ -34,12 +34,7 @@ parameters_to_tkwidgets = {
 
 
 
-# ParameterizedObject's params() could be a property or something. How much
-# do we use it in the rest of topographica?
-
-
-# CB: documentation hasn't been updated regarding parameter access
-# (currently t.p__param).
+# CB: documentation hasn't been updated regarding parameter access.
 
 # CB: need to rename - not sure what to choose.
 class TkPO(object):
@@ -74,8 +69,6 @@ class TkPO(object):
     # if the above becomes a problem, we could have some autorefresh of the vars
     # or a callback of some kind in the parameterized object itself.
 
-    _param_suffix = "__param"
-  
     def __init__(self,parameterized_object):
         super(TkPO,self).__init__()
         self._parameterized_object = parameterized_object
@@ -97,15 +90,17 @@ class TkPO(object):
         the corresponding parameter is set on parameterized_object.
         """
         for name,param in self._parameterized_object.params().items():
-            self._tk_vars[name]=parameters_to_tkvars.get(type(param),StringVar)()
-            self._tk_vars[name].set(getattr(self._parameterized_object,name))
-            self._tk_vars[name]._last_good_val=self._tk_vars[name].get() # for reverting
-            self._tk_vars[name].trace_variable('w',lambda a,b,c,p_name=name: self.__update_param(p_name))        
+            tk_var = parameters_to_tkvars.get(type(param),StringVar)()
+            self._tk_vars[name] = tk_var
+            tk_var.set(getattr(self._parameterized_object,name))
+            tk_var._last_good_val=tk_var.get() # for reverting
+            tk_var.trace_variable('w',lambda a,b,c,p_name=name: self.__update_param(p_name))        
             # Instead of a trace, could we override the Variable's set() method i.e. trace it ourselves?
             # Or does too much happen in tcl/tk for that to work?
 
-            # override the Variable's get() method to guarantee an out-of-date value is never returned.
-            tk_var = self._tk_vars[name]
+            # Override the Variable's get() method to guarantee an out-of-date value is never returned.
+            # In cases where the tkinter val is the most recently changed (i.e. when it's edited in the
+            # gui, resulting in a trace_variable being called), use the _original_get() method.
             tk_var._original_get = tk_var.get
             tk_var.get = lambda x=name: self.__get_tk_val(x) 
 
@@ -136,8 +131,8 @@ class TkPO(object):
         (Called by the Tkinter Variable's trace_variable() method.)
         """
         tk_var = self._tk_vars[param_name]
-        val = tk_var.get()
-        
+        val = tk_var._original_get() # tk_var ahead of parameter
+
         try:
             setattr(self._parameterized_object,param_name,val)
         except:
@@ -148,33 +143,21 @@ class TkPO(object):
             raise
 
 
-    def __getattribute__(self,name):
-        """
-        Return self.name if that attribute exists, otherwise return
-        self._parameterized_object.name.
+    # Could define attribute resolution order so that attributes from
+    # this object (which could also be e.g. a Frame) are returned
+    # first, then parameters from the parameterized_object (so
+    # parameters could be accessed as attributes of this object).
 
-        If neither self.name nore self._parameterized_object.name
-        exists, an AttributeError is raised for the
-        parameterized_object.
-        """
-        l = name.find(object.__getattribute__(self,'_param_suffix'))
-        if l>0:
-            n=name[0:l]
-            parameterized_object = object.__getattribute__(self,'_parameterized_object')
-            return getattr(parameterized_object,n)
-        else:
-            return object.__getattribute__(self,name)
+    def get_param(self,name):
+        return getattr(self._parameterized_object,name)
 
+    def set_param(self,name,value):
+        # have to go through this method for tk_var to be updated, but
+        # we probably won't be using this at all.
+        setattr(self._parameterized_object,name,value)
+        # why 'if name'? better have it, no?
+        if name in self._tk_vars: self._tk_vars[name].set(value)
 
-    def __setattr__(self,name,value):
-        l = name.find(object.__getattribute__(self,'_param_suffix'))
-        if l>0:
-            n=name[0:l]
-            object.__setattr__(self._parameterized_object, n, value)
-            # why 'if name'? better have it, no?
-            if n in self._tk_vars: self._tk_vars[n].set(value)
-        else:
-            object.__setattr__(self, name, value)
 
 
 import _tkinter # (required to get tcl exception class)
@@ -193,7 +176,7 @@ class WidgetDrawingTkPO(TkPO,Frame):
         Frame.__init__(self,master,**config)
         self.balloon = Pmw.Balloon(self)
 
-        # a refresh-the-widgets-on-focus-in would make the gui in sync with the actual object
+        # a refresh-the-widgets-on-focus-in method would make the gui in sync with the actual object
         
 
     def pack_param(self,name,widget_options={},**pack_options):
