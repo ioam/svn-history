@@ -148,6 +148,7 @@ class TkPO(object):
     # first, then parameters from the parameterized_object (so
     # parameters could be accessed as attributes of this object).
 
+    # (if we're going to have these, should update the gui display too)
     def get_param(self,name):
         return getattr(self._parameterized_object,name)
 
@@ -177,6 +178,13 @@ class WidgetDrawingTkPO(TkPO,Frame):
         self.balloon = Pmw.Balloon(self)
 
         # a refresh-the-widgets-on-focus-in method would make the gui in sync with the actual object
+
+
+    # (It sucks having to type 'master' all the time for stuff like a window title.
+    # Maybe it's not just title, in which case use __getattribute__ to try method
+    # on master.)
+    def title(self,t):
+        self.master.title(t)
         
 
     def pack_param(self,name,widget_options={},**pack_options):
@@ -193,6 +201,9 @@ class WidgetDrawingTkPO(TkPO,Frame):
         self.pack_param(name,side='left')
         self.pack_param(name,{'width':50},side='top',expand='yes',fill='y')
         """
+
+        f = Frame(self)
+        
         # CB: should probably do some labeling, too
         param = self._parameterized_object.params()[name]
         widget_type = parameters_to_tkwidgets.get(type(param),Entry)
@@ -200,38 +211,41 @@ class WidgetDrawingTkPO(TkPO,Frame):
         
         ### Tkinter widgets use either variable or textvariable
         try:
-            w = widget_type(self,variable=tk_var,**widget_options)
+            w = widget_type(f,variable=tk_var,**widget_options)
         except _tkinter.TclError:
             try:
-                w = widget_type(self,textvariable=tk_var,**widget_options)
+                w = widget_type(f,textvariable=tk_var,**widget_options)
             except _tkinter.TclError:
                 raise # meaning the widget doesn't support variable or textvariable
         ###
-            
-        self.balloon.bind(w,getdoc(param))
 
-        w.pack(pack_options)
-        return w 
+        # i'll probably pack in a better way at some point
+        Tkinter.Label(f,text=name).pack(side="left")
+        w.pack(side="right")
+
+        # f's probably better than w
+        self.balloon.bind(f,getdoc(param))
+
+        f.pack(pack_options)
+        return f 
 
 
 
-### some demo
-class SomeFrame(WidgetDrawingTkPO):
+## ### some demo
+## class SomeFrame(WidgetDrawingTkPO):
 
-    def __init__(self,po,master,**config):
-        WidgetDrawingTkPO.__init__(self,po,master)
+##     def __init__(self,po,master,**config):
+##         WidgetDrawingTkPO.__init__(self,po,master)
     
-        for name in po.params().keys():
-            Tkinter.Label(self,text=name).pack()
-            self.pack_param(name)
+##         for name in po.params().keys():
+##             Tkinter.Label(self,text=name).pack()
+##             self.pack_param(name)
 
 
-from topo.patterns.basic import Gaussian        
-g = Gaussian()
-f = SomeFrame(g,Tkinter.Toplevel())
-f.pack()
-
-# ** direct changes to g are not reflected in f's tkinter shadows **
+## from topo.patterns.basic import Gaussian        
+## g = Gaussian()
+## f = SomeFrame(g,Tkinter.Toplevel())
+## f.pack()
 
 
 ### plotgroup template demo
