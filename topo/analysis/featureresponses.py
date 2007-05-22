@@ -192,10 +192,6 @@ class FeatureResponses(ParameterizedObject):
 
   ##################### timer part 2
 
-            # DRAW THE PATTERN: call to the pattern_presenter
-            pattern_presenter(settings,param_dict)
-
-
       #  for i in xrange(iters):
             i=i+1
             recenttimes.append(time.time())
