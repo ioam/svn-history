@@ -101,6 +101,7 @@ if bwidget_imported:
 
 
 
+
 # CB: I'm working here at the moment.
 import Tkinter
 from tkparameterizedobject import WidgetDrawingTkPO
@@ -128,6 +129,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
 
     def __init__(self,console,plotgroup_label,master):
 
+        # CB: self.plotgroup is also self._parameterized_object!
         self.plotgroup = self.generate_plotgroup()
         self.plotgroup_label = plotgroup_label
         
@@ -141,27 +143,69 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
 
         ### JCALERT! Figure out why we need that!
         self._num_labels = 0
-
         
 
-        self.pack_param('normalize',on_change=self.update_plots)
-        self.pack_param('integerscaling',on_change=self.integerscaling_changed)
-        self.pack_param('sheetcoords',on_change=self.update_plots)
-        
 
-        # Create and fill the 2 control Frames
-	self.control_frame_1 = Frame(self)
+        ########## HISTORY STUFF ##########
+        self.plotgroups_history=[]
+        self.history_index = -1
+	# indicate if we are currently looking into the past
+	self.looking_in_history = False
+        ###################################
+                              
+            
+    	# Factor for reducing or enlarging the Plots (where 1.2 = 20% change)
+	self.zoom_factor = 1.2
+
+
+
+        # -----------------------
+        # | ------------------- |
+        # | | control_frame_1 | |
+        # | ------------------- |
+        # |                     |
+        # | ------------------- |
+        # | | control_frame_2 | |
+        # | ------------------- |
+        # |                     |
+        # | ------------------- |
+        # | |      plots      | |
+        # | ------------------- |
+        # -----------------------  
+
+
+        self.control_frame_1 = Frame(self)
         self.control_frame_1.pack(side=TOP,expand=NO,fill=X)
+
 	self.control_frame_2 = Frame(self)
         self.control_frame_2.pack(side=TOP,expand=NO,fill=X)
 
-        # JAB: Because these three buttons are present in nearly every
-        # window, and aren't particularly important, we should
-        # probably use small icons for them instead of text.  That way
-        # they will form a visual group that users can typically
-        # ignore.  Of course, the icons will need to announce their
-        # names as help text if the mouse lingers over them, so that
-        # the user can figure them out the first time.
+
+        
+        self.pack_param('normalize',parent=self.control_frame_1,
+                        on_change=self.update_plots,side="right")
+
+        
+        self.pack_param('integerscaling',parent=self.control_frame_2,
+                        on_change=self.integerscaling_changed,side='right')
+        self.pack_param('sheetcoords',parent=self.control_frame_2,
+                        on_change=self.update_plots,side='right')
+
+        
+
+
+
+        
+        ########## BUTTONS ETC FOR VARIABLES SPECIFIC TO GUI #########
+
+        # JAB: Because the Refresh, Reduce, and Enlarge buttons are
+        # present in nearly every window, and aren't particularly
+        # important, we should probably use small icons for them
+        # instead of text.  That way they will form a visual group
+        # that users can typically ignore.  Of course, the icons will
+        # need to announce their names as help text if the mouse
+        # lingers over them, so that the user can figure them out the
+        # first time.
         #        
         self.refresh_button = Button(self.control_frame_1,text="Refresh",
                                           command=self.refresh)
@@ -177,44 +221,16 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         # just setting the variable calls the method (does not rely on
         # checkbutton widget being clicked)
         self.auto_refresh_var.trace_variable('w',lambda x,y,z: self.set_auto_refresh())
-        
 	self.auto_refresh_var.set(False)
         if self.auto_refresh_var.get():
             self.console.auto_refresh_panels.append(self)
         self.auto_refresh_checkbutton = Checkbutton(self.control_frame_1,text="Auto-refresh",
                                                     variable=self.auto_refresh_var)
-        
         self.auto_refresh_checkbutton.pack(side=RIGHT)
         self.balloon.bind(self.auto_refresh_checkbutton,
             "Whether to regenerate this plot whenever the simulation time advances.")
 
 
-        # Main Plot group title can be changed from a subclass with the
-        # command: self.plot_group.configure(tag_text='NewName')
-	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plotgroup_label))
-        self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)
-
-        
-        if bwidget_imported:
-            # max window size (works on all platforms? os x?)
-            self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
-            self.__scroll_frame = ResizableScrollableFrame(self.plot_group_title.interior())
-            self.__scroll_frame.pack()
-            self.plot_frame = self.__scroll_frame.contents
-        else:
-            self.plot_frame = self.plot_group_title.interior()
-
-
-
-      
-        self.plotgroups_history=[]
-        self.history_index = -1
-	# indicate if we are currently looking into the past
-	self.looking_in_history = False
-
-         
-        # Reduce, Enlarge, Back and Forward Buttons.
-                      
         self.reduce_button = Button(self.control_frame_1,text="Reduce",
                                     command=self.reduce)
         self.reduce_button.pack(side=LEFT)
@@ -231,6 +247,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         enlarge_button.pack(side=LEFT)
         self.balloon.bind(enlarge_button,
             """Increase the displayed size of the current plots by about 20%.""")
+
 
         self.back_button = Button(self.control_frame_2,text="Back",
                                   state = DISABLED,command=self.back)
@@ -249,19 +266,38 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         self.balloon.bind(self.forward_button,
             "Move forward through the history of all the plots shown in this window.")
 
+        ############################################################
 
-            
-    	# Factor for reducing or enlarging the Plots (where 1.2 = 20% change)
-	self.zoom_factor = 1.2
+
+
+        #################### PLOT AREA ####################
+        # Main Plot group title can be changed from a subclass with the
+        # command: self.plot_group.configure(tag_text='NewName')
+	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plotgroup_label))
+        self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)
         
+        if bwidget_imported:
+            # max window size (works on all platforms? os x?)
+            self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
+            self.__scroll_frame = ResizableScrollableFrame(self.plot_group_title.interior())
+            self.__scroll_frame.pack()
+            self.plot_frame = self.__scroll_frame.contents
+        else:
+            self.plot_frame = self.plot_group_title.interior()
+        ###################################################       
+
+
 	
 
-
-        ### Dynamic info about cursor location on plot
+        #################### DYNAMIC INFO BAR ####################
 	self.messageBar = Pmw.MessageBar(self,entry_relief='groove')
 	self.messageBar.pack(side=BOTTOM,fill=X,expand=NO,padx=4,pady=8)
+        ##########################################################
 
 
+
+
+        #################### RIGHT-CLICK MENU STUFF ####################
         ### Right-click menu for canvases; subclasses can add cascades
         ### or insert commands on the existing cascades.
         self._canvas_menu = Menu(self, tearoff=0)
@@ -279,6 +315,12 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         
         self._unit_menu.add_command(label='Connection Fields',
                                     command=self.__connection_fields_window)
+        #################################################################
+
+
+
+
+
 
 
 

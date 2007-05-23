@@ -390,24 +390,16 @@ class TemplatePlotGroupPanel2(PlotGroupPanel):
         PlotGroupPanel.__init__(self,console,pgt_name,master)#**params)
 
 
+        self.pack_param('strength_only',parent=self.control_frame_1,
+                        on_change=self.update_plots,side='right')
 
-
-        self.pack_param('strength_only',on_change=self.update_plots)
-
-        
-
-        
-        params_frame = Frame(master=self)
-        params_frame.pack(side=TOP,expand=NO,fill=X)
-
-        # (needs a combobox)
         self.pack_param('updatecommand')
+
                
         # To make the auto-refresh button off by default except for
         # the Activity PlotGroup
-	if self.plotgroup_label == 'Activity':
-	    self.auto_refresh_var.set(True)
-            self.set_auto_refresh()
+	if self.plotgroup_label == 'Activity':self.auto_refresh_var.set(True)
+
 
         # Display any plots that can be done with existing data, but
         # don't regenerate the SheetViews
@@ -415,14 +407,14 @@ class TemplatePlotGroupPanel2(PlotGroupPanel):
             self.refresh(update=self.pgt.plot_immediately)
 
 
+
+
+        #################### RIGHT-CLICK MENU STUFF ####################
         self._sheet_menu.add_command(label="Save image",
                                      state=DISABLED)
-
         
         self._unit_menu.add_command(label="Print info",
                                     command=self.__print_info)
-
-
 
         # CEBALERT: do we have to index with numbers? It will get
         # messy if we want to add something in the middle...and it's
@@ -485,10 +477,10 @@ class TemplatePlotGroupPanel2(PlotGroupPanel):
         self._conf_menu.add_command(label="Gradient",
                                         command=lambda: self.__gradient('Confidence'))
 
-
-        
         #self._sheet_menu.add_command(label="Print matrix values",
         #                             command=self.__print_matrix)
+        #################################################################
+        
         
 
     def generate_plotgroup(self):
