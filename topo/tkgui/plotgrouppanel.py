@@ -628,12 +628,10 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         
     def change_plot_sizes(self,new_height):
         """Set the plots to have a new maximum height"""
-        if self.looking_in_history == True:
-            self.plotgroup = self.plotgroups_history[self.plotgroup.time]
-            self.plotgroup.height_of_tallest_plot = new_height
+        self.plotgroup.height_of_tallest_plot = new_height
+        if self.history_index!=0:
             self.plotgroup.scale_images()
         else:
-            self.plotgroup.height_of_tallest_plot = new_height
             self.plotgroup.update_plots(False)
             
         self.display_plots()
@@ -658,14 +656,6 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         else:
             state = 'normal'
         for w in self._widgets: w['state']=state
-
-        ## CEBALERT: shouldn't resizing be a gui thing? who else needs our resizing?
-        ## In that case we wouldn't need to disable these buttons.
-        ## Might be that we need to support disabling of arbitrary widgets (for any
-        ## widgets added by a subclass that aren't from a plotgroup). In that
-        ## case, have a list of such widgets (created in __init__; append these).
-        for b in [self.enlarge_button,self.reduce_button]:
-            b['state']=state
 
     def update_history_buttons(self):
         space_back = len(self.plotgroups_history)-1+self.history_index
