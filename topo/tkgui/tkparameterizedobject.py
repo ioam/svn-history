@@ -135,13 +135,14 @@ class TkPO(object):
 
         try:
             setattr(self._parameterized_object,param_name,val)
-        except:
+        except: # everything
             #tk_var.set(tk_var._last_good_val)
             # hack: above is too fast for gui? variable changes correctly, but doesn't appear
             # on gui until next click
             topo.guimain.after(250,lambda x=tk_var._last_good_val: tk_var.set(x))
             raise
 
+        if hasattr(tk_var,'_on_change'): tk_var._on_change()
 
     # Could define attribute resolution order so that attributes from
     # this object (which could also be e.g. a Frame) are returned
@@ -187,7 +188,8 @@ class WidgetDrawingTkPO(TkPO,Frame):
         self.master.title(t)
         
 
-    def pack_param(self,name,widget_options={},**pack_options):
+    # CEBALERT: rename & doc parent * on_change
+    def pack_param(self,name,parent=None,widget_options={},on_change=None,**pack_options):
         """
         Create a widget for Parameter name, configured according to
         widget_options, and pack()ed according to the pack_options.
@@ -201,13 +203,14 @@ class WidgetDrawingTkPO(TkPO,Frame):
         self.pack_param(name,side='left')
         self.pack_param(name,{'width':50},side='top',expand='yes',fill='y')
         """
-
-        f = Frame(self)
+        f = Frame(parent or self)
         
-        # CB: should probably do some labeling, too
         param = self._parameterized_object.params()[name]
         widget_type = parameters_to_tkwidgets.get(type(param),Entry)
         tk_var = self._tk_vars[name]
+
+        # CB: called on_change, but it's on_set
+        if on_change is not None: tk_var._on_change=on_change
         
         ### Tkinter widgets use either variable or textvariable
         try:
