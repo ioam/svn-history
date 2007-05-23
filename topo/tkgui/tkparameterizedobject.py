@@ -75,7 +75,7 @@ class TkPO(object):
         self._tk_vars = {}
         self.__setup_tk_vars()
 
-
+    
     def __setup_tk_vars(self):
         """
         Create Tkinter Variables corresponding to
@@ -178,6 +178,8 @@ class WidgetDrawingTkPO(TkPO,Frame):
         Frame.__init__(self,master,**config)
         self.balloon = Pmw.Balloon(self)
 
+        self._widgets = []
+
         # a refresh-the-widgets-on-focus-in method would make the gui in sync with the actual object
 
 
@@ -221,6 +223,10 @@ class WidgetDrawingTkPO(TkPO,Frame):
             except _tkinter.TclError:
                 raise # meaning the widget doesn't support variable or textvariable
         ###
+
+        # CEBALERT: possibly temporary. Needs attention: allows subclasses to
+        # access all plotgroup's widgets in an easy way.
+        self._widgets.append(w)
 
         # CBALERT: should format label nicely (e.g. underscore to space)
         # some widgets: label widget    (e.g. entry)
