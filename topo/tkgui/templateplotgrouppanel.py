@@ -384,17 +384,18 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 class TemplatePlotGroupPanel2(PlotGroupPanel):
     def __init__(self,console,pgt_name,master,**params):
 
-        self.pgt=pgt = plotgroup_templates[pgt_name]
-        
-        pg = self.generate_plotgroup()
-        self.plotgroup = pg
-	PlotGroupPanel.__init__(self,console,pgt_name,master)#**params)
+        self.pgt_name = pgt_name
+        self.pgt=plotgroup_templates[pgt_name]
+
+        PlotGroupPanel.__init__(self,console,pgt_name,master)#**params)
+
+
+
 
         self.pack_param('strength_only',on_change=self.update_plots)
 
         
-	# For a BasicPlotGroup, the plotgroup_key is the name of the template
-	self.plotgroup_key=self.pgt.name
+
         
         params_frame = Frame(master=self)
         params_frame.pack(side=TOP,expand=NO,fill=X)
@@ -404,13 +405,13 @@ class TemplatePlotGroupPanel2(PlotGroupPanel):
                
         # To make the auto-refresh button off by default except for
         # the Activity PlotGroup
-	if self.plotgroup_key == 'Activity':
+	if self.plotgroup_label == 'Activity':
 	    self.auto_refresh_var.set(True)
             self.set_auto_refresh()
 
         # Display any plots that can be done with existing data, but
         # don't regenerate the SheetViews
-        if self.__class__ == TemplatePlotGroupPanel:
+        if self.__class__ == TemplatePlotGroupPanel: # shen me?
             self.refresh(update=self.pgt.plot_immediately)
 
 
@@ -589,13 +590,13 @@ class TemplatePlotGroupPanel2(PlotGroupPanel):
         Change the title of the grid group by refreshing the simulated time,
         then call PlotGroupPanel's display_labels().
         """
-        self.plot_group_title.configure(tag_text = self.plotgroup_key + \
+        self.plot_group_title.configure(tag_text = self.plotgroup_label + \
                                   ' at time ' + str(self.plotgroup.time))
         super(TemplatePlotGroupPanel,self).display_labels()
 
 
     def refresh_title(self):
-        self.title(topo.sim.name+': '+self.plotgroup_key + " time:%s" % self.plotgroup.time)
+        self.title(topo.sim.name+': '+self.plotgroup_label + " time:%s" % self.plotgroup.time)
 
 
     def _dynamic_info_string(self,event_info,basic_text):

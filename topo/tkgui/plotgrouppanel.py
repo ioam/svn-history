@@ -125,18 +125,14 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         else:
             return False
 
-    def __init__(self,console,pgt_name,master):
+
+    def __init__(self,console,plotgroup_label,master):
+
+        self.plotgroup = self.generate_plotgroup()
+        self.plotgroup_label = plotgroup_label
         
-        pgt = plotgroup_templates[pgt_name]
-
-        self.pgt =pgt
-
-        if hasattr(self,'plotgroup') and self.plotgroup!=None:
-            pass
-        else:
-            self.generate_plotgroup()
-
         super(PlotGroupPanel,self).__init__(self.plotgroup,master)
+
         self.console=console
 
         
@@ -147,12 +143,10 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         self._num_labels = 0
 
         
-	self.plotgroup_key = pgt_name
-        self.pgt_name = self.plotgroup_key #!!!
-
 
         self.pack_param('normalize',on_change=self.update_plots)
         self.pack_param('integerscaling',on_change=self.integerscaling_changed)
+        self.pack_param('sheetcoords',on_change=self.update_plots)
         
 
         # Create and fill the 2 control Frames
@@ -172,7 +166,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         self.refresh_button = Button(self.control_frame_1,text="Refresh",
                                           command=self.refresh)
         self.refresh_button.pack(side=LEFT)
-        #self.balloon.bind(self.refresh_button,"Force the current plot to be regenerated.")
+        self.balloon.bind(self.refresh_button,"Force the current plot to be regenerated.")
 
         ### Auto_refresh check button.
         # Default is to not have the window Auto-refresh, because some
@@ -191,13 +185,13 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
                                                     variable=self.auto_refresh_var)
         
         self.auto_refresh_checkbutton.pack(side=RIGHT)
-        #self.balloon.bind(self.auto_refresh_checkbutton,
-        #    "Whether to regenerate this plot whenever the simulation time advances.")
+        self.balloon.bind(self.auto_refresh_checkbutton,
+            "Whether to regenerate this plot whenever the simulation time advances.")
 
 
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
-	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plotgroup_key))
+	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plotgroup_label))
         self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)
 
         
@@ -224,12 +218,12 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         self.reduce_button = Button(self.control_frame_1,text="Reduce",
                                     command=self.reduce)
         self.reduce_button.pack(side=LEFT)
-##         self.balloon.bind(self.reduce_button,
-##             """
-##             Reduce the displayed size of the current plots by about 20%.  A
-##             minimum size that preserves at least one pixel per unit is enforced,
-##             to ensure that no data is lost when displaying.
-##             """)
+        self.balloon.bind(self.reduce_button,
+            """
+            Reduce the displayed size of the current plots by about 20%.  A
+            minimum size that preserves at least one pixel per unit is enforced,
+            to ensure that no data is lost when displaying.
+            """)
 
         
         enlarge_button=Button(self.control_frame_1,text="Enlarge",
@@ -241,19 +235,19 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         self.back_button = Button(self.control_frame_2,text="Back",
                                   state = DISABLED,command=self.back)
         self.back_button.pack(side=LEFT)
-##         self.balloon.bind(self.back_button,
-##             """
-##             Move backward through the history of all the plots shown in this
-##             window.  When showing a historical plot, some functions will be
-##             disabled, because the original data is no longer available.
-##             """)
+        self.balloon.bind(self.back_button,
+            """
+            Move backward through the history of all the plots shown in this
+            window.  When showing a historical plot, some functions will be
+            disabled, because the original data is no longer available.
+            """)
 
         self.forward_button = Button(self.control_frame_2,text="Forward",
                                      state = DISABLED,
                                      command=self.forward)
         self.forward_button.pack(side=LEFT)
-##         self.balloon.bind(self.forward_button,
-##             "Move forward through the history of all the plots shown in this window.")
+        self.balloon.bind(self.forward_button,
+            "Move forward through the history of all the plots shown in this window.")
 
 
             
@@ -287,10 +281,6 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
                                     command=self.__connection_fields_window)
 
 
-
-    def normalize_changed(self):
-	self.plotgroup.update_plots(False)
-        self.display_plots()
 
                
     def __connection_fields_window(self):
@@ -673,16 +663,6 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
 	    self.integerscaling_checkbutton.config(state=DISABLED)
 	
 
-    def set_sheetcoords(self):
-        """Function called by Widget when check-box clicked"""
-	self.plotgroup.sheetcoords = self.sheetcoords.get()
-	self.plotgroup.update_plots(False)
-	self.display_plots()
-
-
- 
-
-
 
 
     def refresh(self,update=True):
@@ -707,7 +687,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         startup of window.  
         """
         self.master.title(topo.sim.name+': '+"%s time:%s" %
-                          (self.plotgroup_key,self.plotgroup.time))
+                          (self.plotgroup_label,self.plotgroup.time))
           
 
     def set_auto_refresh(self):
