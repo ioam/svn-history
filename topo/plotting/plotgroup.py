@@ -68,12 +68,21 @@ class PlotGroup(ParameterizedObject):
         similar sizes on screen, regardless of their corresponding
         sheet areas, which maximizes the size of each plot.""")
 
+
+    # CEBHACKALERT: if this parameter is modified after __init__ has been
+    # called, the sizeconvertfn isn't changed. Code from plotgrouppanel:
+    #if self.plotgroup.integerscaling:
+    #    self.plotgroup.sizeconvertfn = int
+    #else:
+    #    self.plotgroup.sizeconvertfn = identity
+
     integerscaling = BooleanParameter(default=False,doc="""
         When scaling bitmaps, whether to ensure that the scaled bitmap is an even
         multiple of the original.  If true, every unit will be represented by a
         square of the same size.  Typically false so that the overall area will
         be correct, e.g. when using Sheet coordinates, which is often more
         important.""")
+
     
     def __init__(self, plot_list, **params):
         """
@@ -322,6 +331,17 @@ class TemplatePlotGroup(PlotGroup):
         (as if it were typed into a .ty script).  The initial value is determined by
         the template for this plot, but various arguments can be passed, a modified
         version substituted, etc.""")
+
+    strength_only = BooleanParameter(default=False,doc="""unfinished""")
+
+    # CEBHACKALERT! strength-only function missing: needs to be in the plotgroup.
+    # Code from templateplotgrouppanel:
+##             for name,template in self.pgt.plot_templates:
+##                 if template.has_key('Hue'):
+##                     del template['Hue']
+##                 if template.has_key('Confidence'):
+##                     del template['Confidence']
+
 
 
     def __init__(self,plot_list,template,sheet_name,**params):
