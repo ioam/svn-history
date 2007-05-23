@@ -129,6 +129,8 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
 
 
     ####### CEB: temporary #######
+    # (CB: check normalize works correctly over & after the
+    #  history)
     def get_pg(self):
         return self.__pg
         
@@ -184,7 +186,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         # | ------------------- |
         # |                     |
         # | ------------------- |
-        # | |      plots      | |
+        # | |   plot_frame    | |
         # | ------------------- |
         # -----------------------  
 
@@ -202,7 +204,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
 
         
         self.pack_param('integerscaling',parent=self.control_frame_2,
-                        on_change=self.integerscaling_changed,side='right')
+                        on_change=self.update_plots,side='right')
         self.pack_param('sheetcoords',parent=self.control_frame_2,
                         on_change=self.update_plots,side='right')
 
@@ -554,16 +556,6 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         self.sizeright()
         
 
-
-
-    def integerscaling_changed(self):    
-        # CEBALERT: what's that sizeconvertfn? shouldn't it be in the plotgroup?
-        if self.plotgroup.integerscaling:
-            self.plotgroup.sizeconvertfn = int
-        else:
-            self.plotgroup.sizeconvertfn = identity
-
-        self.update_plots()
         
 
     # CB: rename/remove
