@@ -127,10 +127,27 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
             return False
 
 
+
+    ####### CEB: temporary #######
+    def get_pg(self):
+        return self.__pg
+        
+    def set_pg(self,new_pg):
+        
+        self.__pg = new_pg
+        # hack hasattr
+        if hasattr(self,'_parameterized_object'):
+            self._parameterized_object = new_pg
+        
+    plotgroup = property(get_pg,set_pg)
+    ##############################
+
+
     def __init__(self,console,plotgroup_label,master):
 
         # CB: self.plotgroup is also self._parameterized_object!
-        self.plotgroup = self.generate_plotgroup()
+        self.__pg=self.generate_plotgroup()
+        # self.plotgroup = self.generate_plotgroup()
         self.plotgroup_label = plotgroup_label
         
         super(PlotGroupPanel,self).__init__(self.plotgroup,master)
@@ -148,9 +165,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
 
         ########## HISTORY STUFF ##########
         self.plotgroups_history=[]
-        self.history_index = -1
-	# indicate if we are currently looking into the past
-	self.looking_in_history = False
+        self.history_index = 0
         ###################################
                               
             
@@ -191,7 +206,8 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         self.pack_param('sheetcoords',parent=self.control_frame_2,
                         on_change=self.update_plots,side='right')
 
-        
+
+
 
 
 
@@ -242,15 +258,15 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
             """)
 
         
-        enlarge_button=Button(self.control_frame_1,text="Enlarge",
+        self.enlarge_button=Button(self.control_frame_1,text="Enlarge",
                               command=self.enlarge)
-        enlarge_button.pack(side=LEFT)
-        self.balloon.bind(enlarge_button,
+        self.enlarge_button.pack(side=LEFT)
+        self.balloon.bind(self.enlarge_button,
             """Increase the displayed size of the current plots by about 20%.""")
 
 
         self.back_button = Button(self.control_frame_2,text="Back",
-                                  state = DISABLED,command=self.back)
+                                  state=DISABLED,command=lambda x=-1: self.navigate_pg_history(x))
         self.back_button.pack(side=LEFT)
         self.balloon.bind(self.back_button,
             """
@@ -260,8 +276,8 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
             """)
 
         self.forward_button = Button(self.control_frame_2,text="Forward",
-                                     state = DISABLED,
-                                     command=self.forward)
+                                     state =DISABLED,
+                                     command=lambda x=1: self.navigate_pg_history(x))
         self.forward_button.pack(side=LEFT)
         self.balloon.bind(self.forward_button,
             "Move forward through the history of all the plots shown in this window.")
@@ -425,27 +441,31 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
 	Function that creates the PlotGroupPanels's plotgroup.
 	Needs to be reimplemented for subclasses.
 	"""
-	plotgroup = PlotGroup([])#,
-			      #normalize=self.normalize.get(),
-			      #sheetcoords=self.sheetcoords.get(),
-			      #integerscaling=self.integerscaling.get())
-	return plotgroup
+	return PlotGroup([])
 
 
     def refresh(self,update=True):
         """
-        Main steps for generating plots in the Frame.
+        Main steps for generating plots in the Frame. 
+	Must be re-implemented in sub-classes which save a history of the plots.
         """
-        super(PlotGroupPanel,self).refresh(update)
-	self.add_to_history()             # Add current Plotgroup to history
+        Pmw.showbusycursor()
+
+        if self.history_index!=0: self.plotgroup = self.generate_plotgroup()
+
+	# if update is True, the SheetViews are re-generated            
+        self.plotgroup.update_plots(update)
+
+	self.display_plots()              # Put images in GUI canvas
+        self.display_labels()             # Match labels to grid
+        self.refresh_title()              # Update Frame title.
+
+        self.add_to_history()             # Add current Plotgroup to history
+        
+        self.set_pg_widgets_state()
+        Pmw.hidebusycursor()
 
 
-    def update_plotgroup_variables(self):
-	"""
-	Update the variables of the plotgroup according to the panel's variables.
-	Re-implemented for sub-classes.
-	"""
-	pass
 
 
     def display_plots(self):
@@ -461,10 +481,6 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         This function should be redefined in subclasses for interesting
         things such as 2D grids.
         """
-
-        #plot_frame = Tkinter.Frame(self.plot_frame)
-        
-
 	plots = self.plotgroup.plots
 	### JCALERT: Temporary: delete when sorting the bitmap history
 	self.bitmaps = [p.bitmap for p in plots]
@@ -537,22 +553,6 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
 
         self.sizeright()
         
-         
-
-    def add_to_history(self):
-	"""
-        If new_iteration is True, advances the plot history counter; otherwise
-        just overwrites the current one.
-	"""
-	# if we hit refresh during a Back research, we do not want to copy the 
-	# same PlotGroup two times in the history.
-	if self.looking_in_history == True:
-	    self.history_index = len(self.plotgroups_history)-1
-	    self.plotgroups_history[self.history_index]=self.plotgroup	
-	else:
-	    self.plotgroups_history.append(self.plotgroup)
-	    self.history_index = len(self.plotgroups_history)-1
-	self.update_back_fwd_button()
 
 
 
@@ -568,31 +568,11 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
 
     # CB: rename/remove
     def update_plots(self):
-	self.plotgroup.update_plots(False)
+        self.plotgroup.update_plots(False)
         self.display_plots()
 
 
 
-    ### Temporary; needs to be removed:
-    # CB: was there ever a plan for doing this? If not, I
-    # will come up with one...
-    def update_back_fwd_button(self):	
-	if (self.history_index > 0):
-            self.back_button.config(state=NORMAL)
-	    self.normalize_checkbutton.config(state=DISABLED)
-	    self.sheetcoords_checkbutton.config(state=DISABLED)
-	    self.integerscaling_checkbutton.config(state=DISABLED)
-        else:
-            self.back_button.config(state=DISABLED)
-
-        if self.history_index >= len(self.plotgroups_history)-1:
-            self.forward_button.config(state=DISABLED)
-	    self.normalize_checkbutton.config(state=NORMAL)
-	    self.sheetcoords_checkbutton.config(state=NORMAL)
-	    self.integerscaling_checkbutton.config(state=NORMAL)
-	    self.looking_in_history = False
-        else:
-            self.forward_button.config(state=NORMAL)
 
 
     def display_labels(self):
@@ -649,7 +629,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
     def change_plot_sizes(self,new_height):
         """Set the plots to have a new maximum height"""
         if self.looking_in_history == True:
-            self.plotgroup = self.plotgroups_history[self.history_index]
+            self.plotgroup = self.plotgroups_history[self.plotgroup.time]
             self.plotgroup.height_of_tallest_plot = new_height
             self.plotgroup.scale_images()
         else:
@@ -659,68 +639,70 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         self.display_plots()
 
 
+
+
+####################### HISTORY METHODS ##########################         
+    # CEBHACKALERT: currently, any click on refresh adds to history
+    def add_to_history(self):
+        self.plotgroups_history.append(copy.copy(self.plotgroup))
+        self.history_index=0
+        self.update_history_buttons()
+
+    def set_pg_widgets_state(self):
+        """
+        The plotgroup's widgets are all irrelevent when the plotgroup's from
+        history.
+        """
+        if self.history_index!=0: 
+            state= 'disabled'
+        else:
+            state = 'normal'
+        for w in self._widgets: w['state']=state
+
+        ## CEBALERT: shouldn't resizing be a gui thing? who else needs our resizing?
+        ## In that case we wouldn't need to disable these buttons.
+        ## Might be that we need to support disabling of arbitrary widgets (for any
+        ## widgets added by a subclass that aren't from a plotgroup). In that
+        ## case, have a list of such widgets (created in __init__; append these).
+        for b in [self.enlarge_button,self.reduce_button]:
+            b['state']=state
+
+    def update_history_buttons(self):
+        space_back = len(self.plotgroups_history)-1+self.history_index
+        space_fwd  = -self.history_index
+
+        if space_back>0:
+            self.back_button['state']='normal'
+        else:
+            self.back_button['state']='disabled'
+
+        if space_fwd>0:
+            self.forward_button['state']='normal'
+        else:
+            self.forward_button['state']='disabled'
+        
+        
     # JLENHANCEMENT: It would be nice to be able to scroll back through many
     # iterations.  Could put in a box for entering either the iteration
     # number you want to view, or perhaps how many you want to jump...
-    def back(self):
-        """Function called by Widget to scroll back through the previous bitmaps"""
-  
-	self.looking_in_history = True
-        self.history_index -= 1
-	self.update_back_fwd_button()
-        self.plotgroup = self.plotgroups_history[self.history_index]
-	self.display_plots()
-        self.display_labels()
-        self.refresh_title() 
-	self.restore_panel_environment()
-	self.update_back_fwd_button()
-  
-
-
-    def forward(self):
-        """
-        Function called by Widget to scroll forward through the bitmaps.
-        Only useful if previously you have scrolled back.
-        """
-        self.history_index += 1
-	self.plotgroup=self.plotgroups_history[self.history_index]
-	self.display_plots()
+    def navigate_pg_history(self,steps):
+        self.history_index+=steps
+        
+        self.plotgroup = self.plotgroups_history[len(self.plotgroups_history)-1+self.history_index]
+        self.set_pg_widgets_state()
+        
+ 	self.display_plots()
         self.display_labels()
         self.refresh_title()
-	self.restore_panel_environment()
-	self.update_back_fwd_button()
-	
-    def restore_panel_environment(self):
-	if self.plotgroup.normalize != self.normalize.get():
-	    self.normalize_checkbutton.config(state=NORMAL)
-	    self.normalize_checkbutton.invoke()
-	    self.normalize_checkbutton.config(state=DISABLED)
-	if self.plotgroup.sheetcoords != self.sheetcoords.get():
-	    self.sheetcoords_checkbutton.config(state=NORMAL)
-	    self.sheetcoords_checkbutton.invoke()
-	    self.sheetcoords_checkbutton.config(state=DISABLED)
-	if self.plotgroup.integerscaling != self.integerscaling.get():
-	    self.integerscaling_checkbutton.config(state=NORMAL)
-	    self.integerscaling_checkbutton.invoke()
-	    self.integerscaling_checkbutton.config(state=DISABLED)
-	
+        
+        self.update_history_buttons()
+###########################################################         
 
 
 
-    def refresh(self,update=True):
-        """
-        Main steps for generating plots in the Frame. 
-	Must be re-implemented in sub-classes which save a history of the plots.
-        """
-        Pmw.showbusycursor()
-#	self.plotgroup = copy.copy(self.plotgroup)
-	self.update_plotgroup_variables() # update PlotGroup variables
-	# if update is True, the SheetViews are re-generated
-	self.plotgroup.update_plots(update)
-	self.display_plots()              # Put images in GUI canvas
-        self.display_labels()             # Match labels to grid
-        self.refresh_title()              # Update Frame title.
-        Pmw.hidebusycursor()
+
+
+
 
 
     def refresh_title(self):
@@ -728,8 +710,8 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         Change the window title.  TopoConsole will call this on
         startup of window.  
         """
-        self.master.title(topo.sim.name+': '+"%s time:%s" %
-                          (self.plotgroup_label,self.plotgroup.time))
+        self.title(topo.sim.name+': '+"%s time:%s" %
+                   (self.plotgroup_label,self.plotgroup.time))
           
 
     def set_auto_refresh(self):
@@ -749,6 +731,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         # CB: not to mention the bad news of calling refresh before
         # various subclasses have finished creating themselves!
 
+    # CEBHACKALERT: that's broken too
     # CB: tidy up the window destruction code here & elsewhere 
     def destroy(self):
         """overrides toplevel destroy, adding removal from autorefresh panels"""
@@ -1209,7 +1192,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         Main steps for generating plots in the Frame.
         """
         super(PlotGroupPanel,self).refresh(update)
-	self.add_to_history()             # Add current Plotgroup to history
+        self.add_to_history()             # Add current Plotgroup to history
 
 
     def update_plotgroup_variables(self):
