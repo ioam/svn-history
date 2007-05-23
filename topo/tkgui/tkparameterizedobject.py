@@ -222,6 +222,9 @@ class WidgetDrawingTkPO(TkPO,Frame):
                 raise # meaning the widget doesn't support variable or textvariable
         ###
 
+        # CBALERT: should format label nicely (e.g. underscore to space)
+        # some widgets: label widget    (e.g. entry)
+        # others:       widget label    (e.g. checkbutton)
         # i'll probably pack in a better way at some point
         Tkinter.Label(f,text=name).pack(side="left")
         w.pack(side="right")
