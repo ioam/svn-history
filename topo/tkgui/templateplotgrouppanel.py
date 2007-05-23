@@ -208,7 +208,6 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         #self._sheet_menu.add_command(label="Print matrix values",
         #                             command=self.__print_matrix)
         
-        
 
     def _pg_template(self):
         """
@@ -384,37 +383,15 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
 class TemplatePlotGroupPanel2(PlotGroupPanel):
     def __init__(self,console,pgt_name,master,**params):
-        # Plotgroup Template associated
-        #self.pgt = plotgroup_templates.get(pgt_name,None)
 
-	# Strength only check button
-        # CEBHACKALERT: not among the buttons disabled when in the history!
-        # Means update_back_fwd... has to be overridden in this class, too.
-        # But there's a note saying that method's temporary and needs to be
-        # removed...
-	self.strengthonly = BooleanVar()
-	self.strengthonly.set(False)
-
+        self.pgt=pgt = plotgroup_templates[pgt_name]
+        
+        pg = self.generate_plotgroup()
+        self.plotgroup = pg
 	PlotGroupPanel.__init__(self,console,pgt_name,master)#**params)
 
+        self.pack_param('strength_only',on_change=self.update_plots)
 
-	self.strengthonly_checkbutton = Checkbutton(self.control_frame_1,
-             text="Strength only",variable=self.strengthonly,command=self.set_strengthonly)
-	self.strengthonly_checkbutton.pack(side=RIGHT)
-        self.balloon.bind(self.strengthonly_checkbutton,
-"""If true, disables all but the Strength channel of each plot,
-disabling all color coding for Strength/Hue/Confidence plots.""")
-
-	#self.normalize.set(self.pgt.normalize)
-        #self.plotgroup.normalize=self.normalize.get()
-
-        # Command used to refresh the plot, if any
-        #self.cmdname = StringVar()
-	#self.cmdname.set(self.plotgroup.updatecommand)
-
-	### JCALERT! We might get rid of that, as it is redundant with plotgroup_key
-        self.mapname = StringVar()       
-        self.mapname.set(self.pgt.name)
         
 	# For a BasicPlotGroup, the plotgroup_key is the name of the template
 	self.plotgroup_key=self.pgt.name
@@ -422,21 +399,12 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         params_frame = Frame(master=self)
         params_frame.pack(side=TOP,expand=NO,fill=X)
 
-        self.pack_param('command')
-#        cmdlabel = Message(params_frame,text="Update command:",aspect=1000)
-#        cmdlabel.pack(side=LEFT,expand=NO,fill=X)
-#        self.balloon.bind(cmdlabel,getdoc(self.plotgroup.params()['updatecommand']))
-        
-##         cmdbox = Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
-##                               entry_textvariable=self.cmdname,
-##                               selectioncommand=self.refresh,
-##                               scrolledlist_items=([self.cmdname.get()]))
-##         cmdbox.pack(side=LEFT,expand=YES,fill=X)
-##         self.balloon.bind(cmdbox,getdoc(self.plotgroup.params()['updatecommand']))
-       
+        # (needs a combobox)
+        self.pack_param('updatecommand')
+               
         # To make the auto-refresh button off by default except for
         # the Activity PlotGroup
-	if self.mapname.get() == 'Activity':
+	if self.plotgroup_key == 'Activity':
 	    self.auto_refresh_var.set(True)
             self.set_auto_refresh()
 
@@ -521,45 +489,10 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         #self._sheet_menu.add_command(label="Print matrix values",
         #                             command=self.__print_matrix)
         
-        
 
-    def _pg_template(self):
-        """
-        Function that returns the plotgroup_template for this panel,
-        after first stripping non-strength plots if necessary
-        """
-        # Strip Hue and Confidence if strengthonly is set
-        if self.strengthonly.get() == False:
-            return self.pgt
-        else:
-            pgt = copy.deepcopy(self.pgt)
-            for name,template in pgt.plot_templates:
-                if template.has_key('Hue'):
-                    del template['Hue']
-                if template.has_key('Confidence'):
-                    del template['Confidence']
-            return pgt
-        
     def generate_plotgroup(self):
-        """
-        Function that generates the plot for the panel.
+        return TemplatePlotGroup([],self.pgt,None)
 
-        When the panel is first created or refreshed, the specified
-        command is executed, then the plot is generated using the
-        specified PlotGroupTemplate.
-        """
-        ### JCALERT! Maybe if the template specified a PlotGroup, we could
-        ### take the one that is specified.
-        ### Otherwise, we could assume that each panel is associated with a PlotGroup
-        ### and then specify a panel for each template. (as it is done from topoconsole)
-	plotgroup = TemplatePlotGroup([],self._pg_template(),None)#,
-
-                                      #normalize=self.normalize.get(),
-				      #sheetcoords=self.sheetcoords.get(),
-                                      #integerscaling=self.integerscaling.get())
-
-        
-	return plotgroup
 
     ### JABALERT: Should remove the assumption that the plot will be
     ### SHC (could e.g.  be RGB).
@@ -650,31 +583,19 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         print "%s %s" % (description, channels_info)
 
 
-
-    def set_strengthonly(self):
-        """Function called by Widget when check-box clicked"""
-	self.plotgroup=self.generate_plotgroup()
-        self.refresh(update=False)
-	self.plotgroup.update_plots(False)
-        self.display_plots()
-        self.display_labels()
-
-        
-##     def update_plotgroup_variables(self):
-##         self.plotgroup.updatecommand = self.cmdname.get()
  
     def display_labels(self):
         """
         Change the title of the grid group by refreshing the simulated time,
         then call PlotGroupPanel's display_labels().
         """
-        self.plot_group_title.configure(tag_text = self.mapname.get() + \
+        self.plot_group_title.configure(tag_text = self.plotgroup_key + \
                                   ' at time ' + str(self.plotgroup.time))
         super(TemplatePlotGroupPanel,self).display_labels()
 
 
     def refresh_title(self):
-        self.title(topo.sim.name+': '+self.mapname.get() + " time:%s" % self.plotgroup.time)
+        self.title(topo.sim.name+': '+self.plotgroup_key + " time:%s" % self.plotgroup.time)
 
 
     def _dynamic_info_string(self,event_info,basic_text):

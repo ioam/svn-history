@@ -100,7 +100,8 @@ if bwidget_imported:
 
 
 
-# CB: I'm working here at the moment
+
+# CB: I'm working here at the moment.
 import Tkinter
 from tkparameterizedobject import WidgetDrawingTkPO
 class PlotGroupPanel2(WidgetDrawingTkPO):
@@ -125,11 +126,19 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
             return False
 
     def __init__(self,console,pgt_name,master):
+        
         pgt = plotgroup_templates[pgt_name]
 
         self.pgt =pgt
-        super(PlotGroupPanel,self).__init__(pgt,master)
+
+        if hasattr(self,'plotgroup') and self.plotgroup!=None:
+            pass
+        else:
+            self.generate_plotgroup()
+
+        super(PlotGroupPanel,self).__init__(self.plotgroup,master)
         self.console=console
+
         
         self.canvases = []
         self.labels = []
@@ -142,9 +151,9 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         self.pgt_name = self.plotgroup_key #!!!
 
 
-        self.pack_param('normalize')
-
-
+        self.pack_param('normalize',on_change=self.update_plots)
+        self.pack_param('integerscaling',on_change=self.integerscaling_changed)
+        
 
         # Create and fill the 2 control Frames
 	self.control_frame_1 = Frame(self)
@@ -251,7 +260,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
     	# Factor for reducing or enlarging the Plots (where 1.2 = 20% change)
 	self.zoom_factor = 1.2
         
-	self.plotgroup = self.generate_plotgroup()
+	
 
 
         ### Dynamic info about cursor location on plot
@@ -276,6 +285,12 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         
         self._unit_menu.add_command(label='Connection Fields',
                                     command=self.__connection_fields_window)
+
+
+
+    def normalize_changed(self):
+	self.plotgroup.update_plots(False)
+        self.display_plots()
 
                
     def __connection_fields_window(self):
@@ -417,7 +432,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
 
         #plot_frame = Tkinter.Frame(self.plot_frame)
         
-        
+
 	plots = self.plotgroup.plots
 	### JCALERT: Temporary: delete when sorting the bitmap history
 	self.bitmaps = [p.bitmap for p in plots]
@@ -508,16 +523,22 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
 	self.update_back_fwd_button()
 
 
-# CEBALERT: what's that sizeconvertfn? should it be in the plotgroup?
-##     def set_integerscaling(self):
-##         """Function called by Widget when check-box clicked"""
-##  	self.plotgroup.integerscaling = self.integerscaling.get()
-##         if self.integerscaling.get():
-##             self.plotgroup.sizeconvertfn = int
-##         else:
-##             self.plotgroup.sizeconvertfn = identity
-## 	self.plotgroup.update_plots(False)
-##         self.display_plots()
+
+    def integerscaling_changed(self):    
+        # CEBALERT: what's that sizeconvertfn? shouldn't it be in the plotgroup?
+        if self.plotgroup.integerscaling:
+            self.plotgroup.sizeconvertfn = int
+        else:
+            self.plotgroup.sizeconvertfn = identity
+
+        self.update_plots()
+        
+
+    # CB: rename/remove
+    def update_plots(self):
+	self.plotgroup.update_plots(False)
+        self.display_plots()
+
 
 
     ### Temporary; needs to be removed:
@@ -670,7 +691,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
 	Must be re-implemented in sub-classes which save a history of the plots.
         """
         Pmw.showbusycursor()
-	self.plotgroup = copy.copy(self.plotgroup)
+#	self.plotgroup = copy.copy(self.plotgroup)
 	self.update_plotgroup_variables() # update PlotGroup variables
 	# if update is True, the SheetViews are re-generated
 	self.plotgroup.update_plots(update)
