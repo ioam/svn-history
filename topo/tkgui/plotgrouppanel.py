@@ -47,7 +47,9 @@ BORDERWIDTH = 1
 # not displayed.  
 CANVASBUFFER = 1
 
-
+    
+        
+from topo.base.parameterclasses import BooleanParameter
 
 if bwidget_imported:
     class ResizableScrollableFrame(Tkinter.Frame):
@@ -101,12 +103,43 @@ if bwidget_imported:
 
 
 
+    
+
+
+from tkparameterizedobject import ButtonParameter
+
+
 
 # CB: I'm working here at the moment.
 import Tkinter
 from tkparameterizedobject import WidgetDrawingTkPO
-class PlotGroupPanel2(WidgetDrawingTkPO):
+class PlotGroupPanel2(WidgetDrawingTkPO,Frame,ParameterizedObject):
 
+    auto_refresh = BooleanParameter(default=False,doc="yes")
+
+    Enlarge = ButtonParameter(doc="""Increase the displayed size of the current plots by about 20%.""")
+
+    Reduce = ButtonParameter(doc=
+            """
+            Reduce the displayed size of the current plots by about 20%.  A
+            minimum size that preserves at least one pixel per unit is enforced,
+            to ensure that no data is lost when displaying.
+            """)
+
+
+    Fwd = ButtonParameter(doc="Move forward through the history of all the plots shown in this window.")
+
+    Back = ButtonParameter(doc=
+            """
+            Move backward through the history of all the plots shown in this
+            window.  When showing a historical plot, some functions will be
+            disabled, because the original data is no longer available.
+            """)
+
+            
+
+
+    
     @staticmethod
     def valid_context():
         """
@@ -129,8 +162,8 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
 
 
     ####### CEB: temporary #######
-    # (CB: check normalize works correctly over & after the
-    #  history)
+    # (**CB: check normalize works correctly over & after the
+    #  history...certainly it's out of sync after history**)
     def get_pg(self):
         return self.__pg
         
@@ -145,17 +178,24 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
     ##############################
 
 
-    def __init__(self,console,plotgroup_label,master):
+    def __init__(self,console,plotgroup_label,master,**params):
 
         # CB: self.plotgroup is also self._parameterized_object!
         self.__pg=self.generate_plotgroup()
         # self.plotgroup = self.generate_plotgroup()
         self.plotgroup_label = plotgroup_label
-        
-        super(PlotGroupPanel,self).__init__(self.plotgroup,master)
+
+        WidgetDrawingTkPO.__init__(self,self.plotgroup,master)
+        Frame.__init__(self,master)
+        ParameterizedObject.__init__(self,**params)
+
+        # Shouldn't be called frame
+        self.trial = WidgetDrawingTkPO(self,master)
+        #self.trial.pack()
 
         self.console=console
 
+        self._properties = {}
         
         self.canvases = []
         self.labels = []
@@ -230,59 +270,37 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         self.refresh_button.pack(side=LEFT)
         self.balloon.bind(self.refresh_button,"Force the current plot to be regenerated.")
 
+
+
         ### Auto_refresh check button.
         # Default is to not have the window Auto-refresh, because some
         # plots are very slow to generate (e.g. some preference map
         # plots).  Call self.auto_refresh_var.set(True) to enable
         # autorefresh in a subclassed constructor function.
-	self.auto_refresh_var = BooleanVar()
-        # just setting the variable calls the method (does not rely on
-        # checkbutton widget being clicked)
-        self.auto_refresh_var.trace_variable('w',lambda x,y,z: self.set_auto_refresh())
-	self.auto_refresh_var.set(False)
-        if self.auto_refresh_var.get():
+
+        self.trial.pack_param('auto_refresh',parent=self.control_frame_1,
+                                     on_change=self.set_auto_refresh,
+                                     side=RIGHT)
+
+        # get_param
+        if self.trial.get_param('auto_refresh'):
             self.console.auto_refresh_panels.append(self)
-        self.auto_refresh_checkbutton = Checkbutton(self.control_frame_1,text="Auto-refresh",
-                                                    variable=self.auto_refresh_var)
-        self.auto_refresh_checkbutton.pack(side=RIGHT)
-        self.balloon.bind(self.auto_refresh_checkbutton,
-            "Whether to regenerate this plot whenever the simulation time advances.")
+            
+
+        self.trial.pack_param('Enlarge',parent=self.control_frame_1,
+                                    on_change=self.enlarge_plots,side=LEFT)
+
+        self.trial.pack_param('Reduce',parent=self.control_frame_1,
+                                    on_change=self.reduce_plots,side=LEFT)
 
 
-        self.reduce_button = Button(self.control_frame_1,text="Reduce",
-                                    command=self.reduce)
-        self.reduce_button.pack(side=LEFT)
-        self.balloon.bind(self.reduce_button,
-            """
-            Reduce the displayed size of the current plots by about 20%.  A
-            minimum size that preserves at least one pixel per unit is enforced,
-            to ensure that no data is lost when displaying.
-            """)
+        self.trial.pack_param('Back',parent=self.control_frame_2,
+                                     on_change=lambda x=-1: self.navigate_pg_history(x),
+                                     side=LEFT)
 
-        
-        self.enlarge_button=Button(self.control_frame_1,text="Enlarge",
-                              command=self.enlarge)
-        self.enlarge_button.pack(side=LEFT)
-        self.balloon.bind(self.enlarge_button,
-            """Increase the displayed size of the current plots by about 20%.""")
-
-
-        self.back_button = Button(self.control_frame_2,text="Back",
-                                  state=DISABLED,command=lambda x=-1: self.navigate_pg_history(x))
-        self.back_button.pack(side=LEFT)
-        self.balloon.bind(self.back_button,
-            """
-            Move backward through the history of all the plots shown in this
-            window.  When showing a historical plot, some functions will be
-            disabled, because the original data is no longer available.
-            """)
-
-        self.forward_button = Button(self.control_frame_2,text="Forward",
-                                     state =DISABLED,
-                                     command=lambda x=1: self.navigate_pg_history(x))
-        self.forward_button.pack(side=LEFT)
-        self.balloon.bind(self.forward_button,
-            "Move forward through the history of all the plots shown in this window.")
+        self.trial.pack_param('Fwd',parent=self.control_frame_2,
+                                     on_change=lambda x=+1: self.navigate_pg_history(x),
+                                     side=LEFT)
 
         ############################################################
 
@@ -334,6 +352,30 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         self._unit_menu.add_command(label='Connection Fields',
                                     command=self.__connection_fields_window)
         #################################################################
+
+
+        #import __main__
+        #__main__.__dict__['abc']=self
+
+
+
+
+    def set_auto_refresh(self):
+        """Function called by Widget when check-box clicked."""
+        if self.trial.get_param('auto_refresh'):
+            if not (self in self.console.auto_refresh_panels):
+                self.console.auto_refresh_panels.append(self)
+        else:
+            if self in self.console.auto_refresh_panels:
+                self.console.auto_refresh_panels.remove(self)
+            
+        # JAB: it might make sense for turning on auto-refresh
+        # to do a refresh automatically, though that might have
+        # unexpected behavior for a preference map calculation
+        # (where it would do unnecessary, and potentially lengthy,
+        # recalculation).
+        # CB: not to mention the bad news of calling refresh before
+        # various subclasses have finished creating themselves!
 
 
 
@@ -602,19 +644,19 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         self.sizeright()
       
 
-    def reduce(self):
+    def reduce_plots(self):
         """Function called by Widget to reduce the plot size"""
         new_height = self.plotgroup.height_of_tallest_plot / self.zoom_factor
         if new_height < self.plotgroup.minimum_height_of_tallest_plot:
-            self.reduce_button.config(state=DISABLED)
+            self.trial._widgets2['Reduce']['state']=DISABLED
         else:
             self.change_plot_sizes(new_height)
 
 
-    def enlarge(self):
+    def enlarge_plots(self):
         """Function called by Widget to increase the plot size"""
         new_height = self.plotgroup.height_of_tallest_plot * self.zoom_factor
-        self.reduce_button.config(state=NORMAL)
+        self.trial._widgets2['Reduce']['state']=NORMAL
         self.change_plot_sizes(new_height)
 
         
@@ -653,15 +695,19 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
         space_back = len(self.plotgroups_history)-1+self.history_index
         space_fwd  = -self.history_index
 
+        back_button = self.trial._widgets2['Back']
+        forward_button = self.trial._widgets2['Fwd']
+        
+
         if space_back>0:
-            self.back_button['state']='normal'
+            back_button['state']='normal'
         else:
-            self.back_button['state']='disabled'
+            back_button['state']='disabled'
 
         if space_fwd>0:
-            self.forward_button['state']='normal'
+            forward_button['state']='normal'
         else:
-            self.forward_button['state']='disabled'
+            forward_button['state']='disabled'
         
         
     # JLENHANCEMENT: It would be nice to be able to scroll back through many
@@ -696,22 +742,6 @@ class PlotGroupPanel2(WidgetDrawingTkPO):
                    (self.plotgroup_label,self.plotgroup.time))
           
 
-    def set_auto_refresh(self):
-        """Function called by Widget when check-box clicked."""
-        if self.auto_refresh_var.get():
-            if not (self in self.console.auto_refresh_panels):
-                self.console.auto_refresh_panels.append(self)
-        else:
-            if self in self.console.auto_refresh_panels:
-                self.console.auto_refresh_panels.remove(self)
-            
-        # JAB: it might make sense for turning on auto-refresh
-        # to do a refresh automatically, though that might have
-        # unexpected behavior for a preference map calculation
-        # (where it would do unnecessary, and potentially lengthy,
-        # recalculation).
-        # CB: not to mention the bad news of calling refresh before
-        # various subclasses have finished creating themselves!
 
     # CEBHACKALERT: that's broken too
     # CB: tidy up the window destruction code here & elsewhere 
