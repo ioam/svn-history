@@ -387,7 +387,7 @@ class TemplatePlotGroupPanel2(PlotGroupPanel):
         self.pgt_name = pgt_name
         self.pgt=plotgroup_templates[pgt_name]
 
-        PlotGroupPanel.__init__(self,console,pgt_name,master)#**params)
+        PlotGroupPanel.__init__(self,console,pgt_name,master, **params)
 
 
         self.pack_param('strength_only',parent=self.control_frame_1,
@@ -398,7 +398,7 @@ class TemplatePlotGroupPanel2(PlotGroupPanel):
                
         # To make the auto-refresh button off by default except for
         # the Activity PlotGroup
-	if self.plotgroup_label == 'Activity':self.auto_refresh_var.set(True)
+	if self.plotgroup_label == 'Activity':self.trial.set_param('auto_refresh',True)
 
 
         # Display any plots that can be done with existing data, but
