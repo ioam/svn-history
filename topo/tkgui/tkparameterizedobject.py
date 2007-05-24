@@ -8,7 +8,7 @@ $Id$
 
 from inspect import getdoc
 import Tkinter
-from Tkinter import BooleanVar, StringVar, DoubleVar, IntVar,Frame, Tk, Checkbutton, Entry
+from Tkinter import BooleanVar, StringVar, DoubleVar, IntVar,Frame, Tk, Checkbutton, Entry, Button
 import Pmw
 
 from topo.base.parameterizedobject import ParameterizedObject,Parameter
@@ -17,6 +17,20 @@ from topo.base.parameterclasses import BooleanParameter,StringParameter,Number
 from translatorwidgets import TaggedSlider
 
 
+
+# buttons are not naturally represented by parameters?
+# they're like callableparameters, i guess, but if the
+# thing they should call is a method of another object,
+# that's a bit tricky
+class ButtonParameter(Parameter):
+
+    __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+
+    def __init__(self,default="[button]",**params):
+        """Initialize a string parameter."""
+        Parameter.__init__(self,default=default,**params)
+        
 
 
 
@@ -29,8 +43,12 @@ parameters_to_tkvars = {
 parameters_to_tkwidgets = {
     BooleanParameter:Checkbutton,
     Number:TaggedSlider,
-    StringParameter:Entry
+    StringParameter:Entry,
+    ButtonParameter:Button
     }
+
+
+
 
 
 
@@ -162,10 +180,11 @@ class TkPO(object):
 
 
 
+
 import _tkinter # (required to get tcl exception class)
 
 # CB: needs renaming
-class WidgetDrawingTkPO(TkPO,Frame):
+class WidgetDrawingTkPO(TkPO):
     """
     A TkPO and Tkinter Frame that can draw widgets representing the Parameters of the supplied po.
     """
@@ -174,11 +193,13 @@ class WidgetDrawingTkPO(TkPO,Frame):
         (Frame.__init__ gets the config.)
         """
         assert master is not None # (could probably remove this but i didn't want to think about it)
+        self.master = master
         TkPO.__init__(self,po)
-        Frame.__init__(self,master,**config)
-        self.balloon = Pmw.Balloon(self)
+        #Frame.__init__(self,master,**config)
+        self.balloon = Pmw.Balloon(master)
 
         self._widgets = []
+        self._widgets2 = {}
 
         # a refresh-the-widgets-on-focus-in method would make the gui in sync with the actual object
 
@@ -205,35 +226,49 @@ class WidgetDrawingTkPO(TkPO,Frame):
         self.pack_param(name,side='left')
         self.pack_param(name,{'width':50},side='top',expand='yes',fill='y')
         """
-        f = Frame(parent or self)
+        f = Frame(parent or self.master)
         
         param = self._parameterized_object.params()[name]
         widget_type = parameters_to_tkwidgets.get(type(param),Entry)
-        tk_var = self._tk_vars[name]
 
-        # CB: called on_change, but it's on_set
-        if on_change is not None: tk_var._on_change=on_change
-        
+
+        # better not look expect a var for each param anywhere 
+        ### buttons are different from the other widgets: different labeling,
+        ### and no need for a variable
+        # not isinstance because tkinter classes are oldstyle
+        if widget_type==Tkinter.Button:
+            assert on_change is not None, "Buttons need a command."
+            w = widget_type(f,text=name,command=on_change,**widget_options)
+        else:
+
+            tk_var = self._tk_vars[name]
+
+            # CB: called on_change, but it's on_set
+            if on_change is not None: tk_var._on_change=on_change
+    
         ### Tkinter widgets use either variable or textvariable
-        try:
-            w = widget_type(f,variable=tk_var,**widget_options)
-        except _tkinter.TclError:
             try:
-                w = widget_type(f,textvariable=tk_var,**widget_options)
+                w = widget_type(f,variable=tk_var,**widget_options)
             except _tkinter.TclError:
-                raise # meaning the widget doesn't support variable or textvariable
+                try:
+                    w = widget_type(f,textvariable=tk_var,**widget_options)
+                except _tkinter.TclError:
+                    raise # meaning the widget doesn't support variable or textvariable
         ###
+
+            # CBALERT: should format label nicely (e.g. underscore to space)
+            # some widgets: label widget    (e.g. entry)
+            # others:       widget label    (e.g. checkbutton)
+            # i'll probably pack in a better way at some point
+            Tkinter.Label(f,text=name).pack(side="left")
+
+
+        w.pack(side="right")
 
         # CEBALERT: possibly temporary. Needs attention: allows subclasses to
         # access all plotgroup's widgets in an easy way.
         self._widgets.append(w)
-
-        # CBALERT: should format label nicely (e.g. underscore to space)
-        # some widgets: label widget    (e.g. entry)
-        # others:       widget label    (e.g. checkbutton)
-        # i'll probably pack in a better way at some point
-        Tkinter.Label(f,text=name).pack(side="left")
-        w.pack(side="right")
+        self._widgets2[name]=w
 
         # f's probably better than w
         self.balloon.bind(f,getdoc(param))
@@ -243,20 +278,26 @@ class WidgetDrawingTkPO(TkPO,Frame):
 
 
 
-## ### some demo
-## class SomeFrame(WidgetDrawingTkPO):
 
-##     def __init__(self,po,master,**config):
-##         WidgetDrawingTkPO.__init__(self,po,master)
+
+
+
+## ### some demo
+## class SomeFrame(WidgetDrawingTkPOr):
+
+##     k = BooleanParameter(default=True)
+
+##     def __init__(self,master,**params):
+##         WidgetDrawingTkPOr.__init__(self,master,**params)
     
-##         for name in po.params().keys():
-##             Tkinter.Label(self,text=name).pack()
+##         for name in self.params().keys():
+##             Tkinter.Label(self.master,text=name).pack()
 ##             self.pack_param(name)
 
 
 ## from topo.patterns.basic import Gaussian        
 ## g = Gaussian()
-## f = SomeFrame(g,Tkinter.Toplevel())
+## f = SomeFrame(Tkinter.Toplevel())
 ## f.pack()
 
 
@@ -275,3 +316,4 @@ class WidgetDrawingTkPO(TkPO,Frame):
 
 ## e = ExamplePlotGroupPanel("Activity",Tkinter.Toplevel())
 ## e.pack()
+
