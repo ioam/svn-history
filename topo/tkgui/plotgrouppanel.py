@@ -112,10 +112,10 @@ from tkparameterizedobject import ButtonParameter
 
 # CB: I'm working here at the moment.
 import Tkinter
-from tkparameterizedobject import WidgetDrawingTkPO
-class PlotGroupPanel2(WidgetDrawingTkPO,Frame,ParameterizedObject):
+from tkparameterizedobject import TkParameterizedObject
+class PlotGroupPanel2(TkParameterizedObject,Frame):
 
-    auto_refresh = BooleanParameter(default=False,doc="yes")
+    auto_refresh = BooleanParameter(default=False,doc="Whether to regenerate this plot whenever the simulation time advances.")
 
     Enlarge = ButtonParameter(doc="""Increase the displayed size of the current plots by about 20%.""")
 
@@ -162,18 +162,16 @@ class PlotGroupPanel2(WidgetDrawingTkPO,Frame,ParameterizedObject):
 
 
     ####### CEB: temporary #######
+    # fix this next
     # (**CB: check normalize works correctly over & after the
     #  history...certainly it's out of sync after history**)
     def get_pg(self):
         return self.__pg
         
-    def set_pg(self,new_pg):
-        
+    def set_pg(self,new_pg):        
         self.__pg = new_pg
-        # hack hasattr
-        if hasattr(self,'_parameterized_object'):
-            self._parameterized_object = new_pg
-        
+        self._extra_pos = [new_pg]
+
     plotgroup = property(get_pg,set_pg)
     ##############################
 
@@ -185,20 +183,16 @@ class PlotGroupPanel2(WidgetDrawingTkPO,Frame,ParameterizedObject):
         # self.plotgroup = self.generate_plotgroup()
         self.plotgroup_label = plotgroup_label
 
-        WidgetDrawingTkPO.__init__(self,self.plotgroup,master)
+        TkParameterizedObject.__init__(self,master,extra_pos=[self.plotgroup],**params)
         Frame.__init__(self,master)
-        ParameterizedObject.__init__(self,**params)
 
-        # Shouldn't be called frame
-        self.trial = WidgetDrawingTkPO(self,master)
-        #self.trial.pack()
 
         self.console=console
 
         self._properties = {}
         
         self.canvases = []
-        self.labels = []
+        self.plot_labels = []
 
         ### JCALERT! Figure out why we need that!
         self._num_labels = 0
@@ -206,6 +200,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO,Frame,ParameterizedObject):
 
 
         ########## HISTORY STUFF ##########
+        # ** when i tried to simplify the history i think i also broke it slightly: need to fix **
         self.plotgroups_history=[]
         self.history_index = 0
         ###################################
@@ -278,29 +273,29 @@ class PlotGroupPanel2(WidgetDrawingTkPO,Frame,ParameterizedObject):
         # plots).  Call self.auto_refresh_var.set(True) to enable
         # autorefresh in a subclassed constructor function.
 
-        self.trial.pack_param('auto_refresh',parent=self.control_frame_1,
+        self.pack_param('auto_refresh',parent=self.control_frame_1,
                                      on_change=self.set_auto_refresh,
                                      side=RIGHT)
 
         # get_param
-        if self.trial.get_param('auto_refresh'):
+        if self.auto_refresh: 
             self.console.auto_refresh_panels.append(self)
             
 
-        self.trial.pack_param('Enlarge',parent=self.control_frame_1,
-                                    on_change=self.enlarge_plots,side=LEFT)
+        self.pack_param('Enlarge',parent=self.control_frame_1,
+                        on_change=self.enlarge_plots,side=LEFT)
 
-        self.trial.pack_param('Reduce',parent=self.control_frame_1,
-                                    on_change=self.reduce_plots,side=LEFT)
+        self.pack_param('Reduce',parent=self.control_frame_1,
+                        on_change=self.reduce_plots,side=LEFT)
 
 
-        self.trial.pack_param('Back',parent=self.control_frame_2,
-                                     on_change=lambda x=-1: self.navigate_pg_history(x),
-                                     side=LEFT)
+        self.pack_param('Back',parent=self.control_frame_2,
+                        on_change=lambda x=-1: self.navigate_pg_history(x),
+                        side=LEFT)
 
-        self.trial.pack_param('Fwd',parent=self.control_frame_2,
-                                     on_change=lambda x=+1: self.navigate_pg_history(x),
-                                     side=LEFT)
+        self.pack_param('Fwd',parent=self.control_frame_2,
+                        on_change=lambda x=+1: self.navigate_pg_history(x),
+                        side=LEFT)
 
         ############################################################
 
@@ -354,15 +349,15 @@ class PlotGroupPanel2(WidgetDrawingTkPO,Frame,ParameterizedObject):
         #################################################################
 
 
-        #import __main__
-        #__main__.__dict__['abc']=self
+        import __main__
+        __main__.__dict__['abc']=self
 
 
 
 
     def set_auto_refresh(self):
         """Function called by Widget when check-box clicked."""
-        if self.trial.get_param('auto_refresh'):
+        if self.auto_refresh: 
             if not (self in self.console.auto_refresh_panels):
                 self.console.auto_refresh_panels.append(self)
         else:
@@ -618,7 +613,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO,Frame,ParameterizedObject):
         """
         if len(self.canvases) == 0:
             # If there are no plots yet, tell the user what to do.
-            self.labels=[Label(self.plot_frame,text="""
+            self.plot_labels=[Label(self.plot_frame,text="""
               (Press Refresh to generate the plot, after
               modifying the commands below if necessary.
               Refreshing may take some time.  Many
@@ -626,20 +621,20 @@ class PlotGroupPanel2(WidgetDrawingTkPO,Frame,ParameterizedObject):
               the progress can be viewed in an open
               Activity window, e.g. for debugging.)
               """)]
-            self.labels[0].grid(row=1,column=0,sticky=NSEW)
-                
+            self.plot_labels[0].grid(row=1,column=0,sticky=NSEW)
+
         elif self._num_labels != len(self.canvases):
-            old_labels = self.labels
-            self.labels = [Label(self.plot_frame,text=each)
+            old_labels = self.plot_labels
+            self.plot_labels = [Label(self.plot_frame,text=each)
 				 for each in self.plotgroup.labels]
-            for i in range(len(self.labels)):
-                self.labels[i].grid(row=1,column=i,sticky=NSEW)
+            for i in range(len(self.plot_labels)):
+                self.plot_labels[i].grid(row=1,column=i,sticky=NSEW)
             for l in old_labels:
                 l.grid_forget()
             self._num_labels = len(self.canvases)
         else:  # Same number of labels; reuse to avoid flickering.
-            for i in range(len(self.labels)):
-                self.labels[i].configure(text=self.plotgroup.labels[i]) 
+            for i in range(len(self.plot_labels)):
+                self.plot_labels[i].configure(text=self.plotgroup.labels[i]) 
 
         self.sizeright()
       
@@ -648,7 +643,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO,Frame,ParameterizedObject):
         """Function called by Widget to reduce the plot size"""
         new_height = self.plotgroup.height_of_tallest_plot / self.zoom_factor
         if new_height < self.plotgroup.minimum_height_of_tallest_plot:
-            self.trial._widgets2['Reduce']['state']=DISABLED
+            self._widgets2['Reduce']['state']=DISABLED
         else:
             self.change_plot_sizes(new_height)
 
@@ -656,7 +651,7 @@ class PlotGroupPanel2(WidgetDrawingTkPO,Frame,ParameterizedObject):
     def enlarge_plots(self):
         """Function called by Widget to increase the plot size"""
         new_height = self.plotgroup.height_of_tallest_plot * self.zoom_factor
-        self.trial._widgets2['Reduce']['state']=NORMAL
+        self._widgets2['Reduce']['state']=NORMAL
         self.change_plot_sizes(new_height)
 
         
@@ -695,8 +690,8 @@ class PlotGroupPanel2(WidgetDrawingTkPO,Frame,ParameterizedObject):
         space_back = len(self.plotgroups_history)-1+self.history_index
         space_fwd  = -self.history_index
 
-        back_button = self.trial._widgets2['Back']
-        forward_button = self.trial._widgets2['Fwd']
+        back_button = self._widgets2['Back']
+        forward_button = self._widgets2['Fwd']
         
 
         if space_back>0:

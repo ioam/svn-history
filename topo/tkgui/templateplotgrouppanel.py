@@ -398,7 +398,7 @@ class TemplatePlotGroupPanel2(PlotGroupPanel):
                
         # To make the auto-refresh button off by default except for
         # the Activity PlotGroup
-	if self.plotgroup_label == 'Activity':self.trial.set_param('auto_refresh',True)
+	if self.plotgroup_label == 'Activity':self.auto_refresh=True
 
 
         # Display any plots that can be done with existing data, but
