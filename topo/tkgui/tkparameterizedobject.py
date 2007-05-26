@@ -48,25 +48,26 @@ parameters_to_tkwidgets = {
     }
 
 
+### CB: most of the documenation needs to be updated! Please ignore
+### it for the moment.
 
-
-
-
-# CB: documentation hasn't been updated regarding parameter access.
-
-# CB: need to rename - not sure what to choose.
-class TkPO(object):
+class TkParameterizedObjectBase(ParameterizedObject):
     """
-    Stores a ParameterizedObject and creates Tkinter.Variable shadows
+    A ParameterizedObject that maintains Tkinter.Variable shadows
     (proxies) of its Parameters.
 
-    The Parameters of the parameterized_object are available as
+    Optionally performs the same for any number of additional
+    shadowed ParameterizedObjects.
+
+
+    
+    The Parameters are available as
     attributes of this object; the Tkinter.Variable shadows are
     available under their corresponding parameter name in the _tk_vars
     dictionary.
 
 
-    So, for a ParameterizedObject po with a Parameter p, t=TkPO(po) allows
+    So, for a ParameterizedObject po with a Parameter p, t=TkParameterizedObjectBase(po) allows
     access to po.p via t.p, i.e. setting t.p sets po.p, and getting
     t.p returns po.p.
 
@@ -87,9 +88,16 @@ class TkPO(object):
     # if the above becomes a problem, we could have some autorefresh of the vars
     # or a callback of some kind in the parameterized object itself.
 
-    def __init__(self,parameterized_object):
-        super(TkPO,self).__init__()
-        self._parameterized_object = parameterized_object
+    _extra_pos = []
+    #_tk_vars = {}
+    
+
+    # __repr__ will need some work (display params of subobjects etc?)
+
+
+    def __init__(self,extra_pos=[],**params):
+        super(TkParameterizedObjectBase,self).__init__(**params)
+        self._extra_pos = extra_pos
         self._tk_vars = {}
         self.__setup_tk_vars()
 
@@ -107,20 +115,22 @@ class TkPO(object):
         Each Tkinter Variable is traced so that when its value changes
         the corresponding parameter is set on parameterized_object.
         """
-        for name,param in self._parameterized_object.params().items():
-            tk_var = parameters_to_tkvars.get(type(param),StringVar)()
-            self._tk_vars[name] = tk_var
-            tk_var.set(getattr(self._parameterized_object,name))
-            tk_var._last_good_val=tk_var.get() # for reverting
-            tk_var.trace_variable('w',lambda a,b,c,p_name=name: self.__update_param(p_name))        
-            # Instead of a trace, could we override the Variable's set() method i.e. trace it ourselves?
-            # Or does too much happen in tcl/tk for that to work?
-
-            # Override the Variable's get() method to guarantee an out-of-date value is never returned.
-            # In cases where the tkinter val is the most recently changed (i.e. when it's edited in the
-            # gui, resulting in a trace_variable being called), use the _original_get() method.
-            tk_var._original_get = tk_var.get
-            tk_var.get = lambda x=name: self.__get_tk_val(x) 
+        # * lookup order: self then extra_pos in order, so set in reverse *
+        for PO in self._extra_pos[::-1]+[self]:
+            for name,param in PO.params().items():
+                tk_var = parameters_to_tkvars.get(type(param),StringVar)()
+                self._tk_vars[name] = tk_var
+                tk_var.set(getattr(PO,name))
+                tk_var._last_good_val=tk_var.get() # for reverting
+                tk_var.trace_variable('w',lambda a,b,c,p_name=name: self.__update_param(p_name))        
+                # Instead of a trace, could we override the Variable's set() method i.e. trace it ourselves?
+                # Or does too much happen in tcl/tk for that to work?
+                
+                # Override the Variable's get() method to guarantee an out-of-date value is never returned.
+                # In cases where the tkinter val is the most recently changed (i.e. when it's edited in the
+                # gui, resulting in a trace_variable being called), use the _original_get() method.
+                tk_var._original_get = tk_var.get
+                tk_var.get = lambda x=name: self.__get_tk_val(x)
 
 
     def __get_tk_val(self,param_name):
@@ -129,8 +139,8 @@ class TkPO(object):
         """
         tk_var = self._tk_vars[param_name]
         tk_val = tk_var._original_get()
-        po_val = getattr(self._parameterized_object,param_name)
-        
+        po_val = self.get_parameter_value(param_name)
+
         if not tk_val==po_val:
             # tk var needs to be updated
             tk_var.set(po_val)
@@ -152,7 +162,16 @@ class TkPO(object):
         val = tk_var._original_get() # tk_var ahead of parameter
 
         try:
-            setattr(self._parameterized_object,param_name,val)
+            sources = [self]+self._extra_pos
+            
+            for po in sources:
+                if param_name in po.params().keys():
+                    setattr(po,param_name,val)
+                    if hasattr(tk_var,'_on_change'): tk_var._on_change()
+                    return # hidden
+
+            assert False,"Error in use of __update_param: param must exist" # remove this
+            
         except: # everything
             #tk_var.set(tk_var._last_good_val)
             # hack: above is too fast for gui? variable changes correctly, but doesn't appear
@@ -160,23 +179,93 @@ class TkPO(object):
             topo.guimain.after(250,lambda x=tk_var._last_good_val: tk_var.set(x))
             raise
 
-        if hasattr(tk_var,'_on_change'): tk_var._on_change()
+    def __sources(self,parameterized_object=None):
+        
+        if parameterized_object is None:
+            sources = [self]+self._extra_pos
+        else:
+            sources = [parameterized_object] 
+        return sources
+    
 
-    # Could define attribute resolution order so that attributes from
-    # this object (which could also be e.g. a Frame) are returned
-    # first, then parameters from the parameterized_object (so
-    # parameters could be accessed as attributes of this object).
+    def get_parameter_object(self,name,parameterized_object=None):
 
-    # (if we're going to have these, should update the gui display too)
-    def get_param(self,name):
-        return getattr(self._parameterized_object,name)
+        sources = self.__sources(parameterized_object)
+        
+        for po in sources:
+            params = po.params()
+            if name in params: return params[name] # a bit hidden
 
-    def set_param(self,name,value):
-        # have to go through this method for tk_var to be updated, but
-        # we probably won't be using this at all.
-        setattr(self._parameterized_object,name,value)
-        # why 'if name'? better have it, no?
-        if name in self._tk_vars: self._tk_vars[name].set(value)
+        raise AttributeError("none of %s have parameter %s"%(str(sources),name))
+            
+
+##### these guarantee only to get/set parameters #####
+    def get_parameter_value(self,name,parameterized_object=None):
+
+        sources = self.__sources(parameterized_object)
+
+        for po in sources:
+            params = po.params()
+            if name in params: return getattr(po,name) # also hidden!
+
+        raise AttributeError("none of %s have parameter %s"%(str(sources),name))
+        
+    def set_parameter_value(self,name,val,parameterized_object=None):
+
+        sources = self.__sources(parameterized_object)
+
+        for po in sources:
+            if name in po.params().keys(): 
+                setattr(po,name,val)
+
+        raise AttributeError("none of %s have parameter %s"%(str(sources),name))
+#######################################################        
+
+
+###### these lookup attributes in order #####
+# (i.e. you could get attribute of self rather than a parameter)
+# (might remove these to save confusion: they are useful except when 
+#  someone would be surprised to get an attribute of e.g. a Frame (like 'size') when
+#  they were expecting to get one of their parameters. Also, means you can't set
+#  an attribute a on self if a exists on one of the shadowed objects)
+
+    def __getattribute__(self,name):
+        """
+        If the attribute is found on this object, return it. Otherwise,
+        search the list of shadow POs and return from the first match.
+        If no match, get attribute error.
+        """
+        try:
+            return object.__getattribute__(self,name)
+        except AttributeError:
+            extra_pos = object.__getattribute__(self,'_extra_pos')
+            for po in extra_pos:
+                if hasattr(po,name): return getattr(po,name) 
+
+            raise AttributeError("none of %s, %s has attribute %s"%(self,str(extra_pos),name))
+
+    def __setattr__(self,name,val):
+        """
+        If the attribute already exists on this object, set it. If the attribute
+        is found on a shadow PO (searched in order), set it there. Otherwise, set the
+        attribute on this object (i.e. add a new attribute).
+        """
+        try:
+            object.__getattribute__(self,name)
+            object.__setattr__(self,name,val)
+            if name in self._tk_vars: self._tk_vars[name].set(val)
+            return # a bit hidden
+
+        except AttributeError:
+            for po in self._extra_pos:
+                if hasattr(po,name):
+                    setattr(po,name,val)
+                    if name in self._tk_vars: self._tk_vars[name].set(val)
+                    return # also a bit hidden
+
+        # name not found, so set on this object
+        object.__setattr__(self,name,val)
+################################################
 
 
 
@@ -184,26 +273,27 @@ class TkPO(object):
 import _tkinter # (required to get tcl exception class)
 
 # CB: needs renaming
-class WidgetDrawingTkPO(TkPO):
+class TkParameterizedObject(TkParameterizedObjectBase):
     """
-    A TkPO and Tkinter Frame that can draw widgets representing the Parameters of the supplied po.
+    A TkParameterizedObjectBase and Tkinter Frame that can draw widgets representing the Parameters of the supplied po.
     """
-    def __init__(self,po,master,**config):
+    def __init__(self,master,extra_pos=[],**params):
         """
         (Frame.__init__ gets the config.)
         """
         assert master is not None # (could probably remove this but i didn't want to think about it)
         self.master = master
-        TkPO.__init__(self,po)
-        #Frame.__init__(self,master,**config)
+        TkParameterizedObjectBase.__init__(self,extra_pos=extra_pos,**params)
         self.balloon = Pmw.Balloon(master)
 
+        # just going to keep the dict
         self._widgets = []
         self._widgets2 = {}
 
         # a refresh-the-widgets-on-focus-in method would make the gui in sync with the actual object
 
 
+    # should remove this now it's not a frame
     # (It sucks having to type 'master' all the time for stuff like a window title.
     # Maybe it's not just title, in which case use __getattribute__ to try method
     # on master.)
@@ -227,10 +317,9 @@ class WidgetDrawingTkPO(TkPO):
         self.pack_param(name,{'width':50},side='top',expand='yes',fill='y')
         """
         f = Frame(parent or self.master)
+        param = self.get_parameter_object(name) 
         
-        param = self._parameterized_object.params()[name]
         widget_type = parameters_to_tkwidgets.get(type(param),Entry)
-
 
         # better not look expect a var for each param anywhere 
         ### buttons are different from the other widgets: different labeling,
@@ -282,38 +371,50 @@ class WidgetDrawingTkPO(TkPO):
 
 
 
-## ### some demo
-## class SomeFrame(WidgetDrawingTkPOr):
+
+
+
+## ### A setup for basic testing...
+
+## class OverlapPO(ParameterizedObject):
+##     x = Parameter(0.0)
+##     size = Parameter(1.0)
+##     notoverlap = Parameter(0.4)
+
+
+## class SomeFrame(TkParameterizedObject,Frame):
 
 ##     k = BooleanParameter(default=True)
 
-##     def __init__(self,master,**params):
-##         WidgetDrawingTkPOr.__init__(self,master,**params)
-    
-##         for name in self.params().keys():
-##             Tkinter.Label(self.master,text=name).pack()
-##             self.pack_param(name)
+##     def __init__(self,master,extra_pos=[],**params):
+##         TkParameterizedObject.__init__(self,master,extra_pos=extra_pos,**params)
+##         Frame.__init__(self,master)
+
+##         self.pack_param('k',on_change=self.some_function)
+
+##     def some_function(self):
+##         print "called some_function"
+
+
+## def another_function():
+##     print "called another_function"
 
 
 ## from topo.patterns.basic import Gaussian        
+## from topo.outputfns.basic import PiecewiseLinear
+
 ## g = Gaussian()
-## f = SomeFrame(Tkinter.Toplevel())
+## p = PiecewiseLinear()
+## o = OverlapPO()
+
+## f = SomeFrame(Tkinter.Toplevel(),extra_pos=[g,p,o])
 ## f.pack()
 
-
-### plotgroup template demo
-
-## from topo.plotting.templates import plotgroup_templates
-## class ExamplePlotGroupPanel(WidgetDrawingTkPO):
-##     def __init__(self,pgt_name,master):
-##         pgt = plotgroup_templates[pgt_name]
-##         WidgetDrawingTkPO.__init__(self,pgt,master)
-
-##         for name in pgt.params().keys():
-##             self.pack_param(name)
+## f.pack_param('x') # from the Gaussian
+## f.pack_param('size',on_change=another_function) # from the Gaussian
+## f.pack_param('upper_bound')
+## f.pack_param('notoverlap')
 
 
 
-## e = ExamplePlotGroupPanel("Activity",Tkinter.Toplevel())
-## e.pack()
 
