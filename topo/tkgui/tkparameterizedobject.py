@@ -17,21 +17,26 @@ from topo.base.parameterclasses import BooleanParameter,StringParameter,Number
 from translatorwidgets import TaggedSlider
 
 
-
+##### Temporary: for easy buttons
+#
 # buttons are not naturally represented by parameters?
 # they're like callableparameters, i guess, but if the
 # thing they should call is a method of another object,
 # that's a bit tricky
+
+# Maybe we should have a parent class that implements the
+# non-Parameter specific stuff, then one that bolts on the
+# Parameter-specific stuff, and then instead of ButtonParameter we'd
+# have TopoButton, or something like that...
+
 class ButtonParameter(Parameter):
 
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default="[button]",**params):
-        """Initialize a string parameter."""
         Parameter.__init__(self,default=default,**params)
-        
-
+#####
 
 
 # (Duplicates PropertiesFrame/ParamtersFrame)
@@ -286,9 +291,9 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         TkParameterizedObjectBase.__init__(self,extra_pos=extra_pos,**params)
         self.balloon = Pmw.Balloon(master)
 
-        # just going to keep the dict
-        self._widgets = []
-        self._widgets2 = {}
+        # allows subclasses to 
+        # access all plotgroup's widgets in an easy way.
+        self._widgets = {}
 
         # a refresh-the-widgets-on-focus-in method would make the gui in sync with the actual object
 
@@ -354,10 +359,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         w.pack(side="right")
 
-        # CEBALERT: possibly temporary. Needs attention: allows subclasses to
-        # access all plotgroup's widgets in an easy way.
-        self._widgets.append(w)
-        self._widgets2[name]=w
+        self._widgets[name]=w
 
         # f's probably better than w
         self.balloon.bind(f,getdoc(param))

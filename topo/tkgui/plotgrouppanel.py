@@ -643,7 +643,7 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
         """Function called by Widget to reduce the plot size"""
         new_height = self.plotgroup.height_of_tallest_plot / self.zoom_factor
         if new_height < self.plotgroup.minimum_height_of_tallest_plot:
-            self._widgets2['Reduce']['state']=DISABLED
+            self._widgets['Reduce']['state']=DISABLED
         else:
             self.change_plot_sizes(new_height)
 
@@ -651,7 +651,7 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
     def enlarge_plots(self):
         """Function called by Widget to increase the plot size"""
         new_height = self.plotgroup.height_of_tallest_plot * self.zoom_factor
-        self._widgets2['Reduce']['state']=NORMAL
+        self._widgets['Reduce']['state']=NORMAL
         self.change_plot_sizes(new_height)
 
         
@@ -684,14 +684,14 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
             state= 'disabled'
         else:
             state = 'normal'
-        for w in self._widgets: w['state']=state
+        for w in self._widgets.values(): w['state']=state
 
     def update_history_buttons(self):
         space_back = len(self.plotgroups_history)-1+self.history_index
         space_fwd  = -self.history_index
 
-        back_button = self._widgets2['Back']
-        forward_button = self._widgets2['Fwd']
+        back_button = self._widgets['Back']
+        forward_button = self._widgets['Fwd']
         
 
         if space_back>0:
