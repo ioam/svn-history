@@ -115,7 +115,13 @@ import Tkinter
 from tkparameterizedobject import TkParameterizedObject
 class PlotGroupPanel2(TkParameterizedObject,Frame):
 
+
+    # Default is to not have the window Auto-refresh, because some
+    # plots are very slow to generate (e.g. some preference map
+    # plots).
     auto_refresh = BooleanParameter(default=False,doc="Whether to regenerate this plot whenever the simulation time advances.")
+
+    Refresh = ButtonParameter(doc="Force the current plot to be regenerated.")
 
     Enlarge = ButtonParameter(doc="""Increase the displayed size of the current plots by about 20%.""")
 
@@ -221,8 +227,12 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
         # | ------------------- |
         # |                     |
         # | ------------------- |
+        # | |                 | |
         # | |   plot_frame    | |
+        # | |                 | |
         # | ------------------- |
+        # |                     |
+        # |     messagebar      |
         # -----------------------  
 
 
@@ -231,73 +241,6 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
 
 	self.control_frame_2 = Frame(self)
         self.control_frame_2.pack(side=TOP,expand=NO,fill=X)
-
-
-        
-        self.pack_param('normalize',parent=self.control_frame_1,
-                        on_change=self.update_plots,side="right")
-
-        
-        self.pack_param('integerscaling',parent=self.control_frame_2,
-                        on_change=self.update_plots,side='right')
-        self.pack_param('sheetcoords',parent=self.control_frame_2,
-                        on_change=self.update_plots,side='right')
-
-
-
-
-
-
-        
-        ########## BUTTONS ETC FOR VARIABLES SPECIFIC TO GUI #########
-
-        # JAB: Because the Refresh, Reduce, and Enlarge buttons are
-        # present in nearly every window, and aren't particularly
-        # important, we should probably use small icons for them
-        # instead of text.  That way they will form a visual group
-        # that users can typically ignore.  Of course, the icons will
-        # need to announce their names as help text if the mouse
-        # lingers over them, so that the user can figure them out the
-        # first time.
-        #        
-        self.refresh_button = Button(self.control_frame_1,text="Refresh",
-                                          command=self.refresh)
-        self.refresh_button.pack(side=LEFT)
-        self.balloon.bind(self.refresh_button,"Force the current plot to be regenerated.")
-
-
-
-        ### Auto_refresh check button.
-        # Default is to not have the window Auto-refresh, because some
-        # plots are very slow to generate (e.g. some preference map
-        # plots).  Call self.auto_refresh_var.set(True) to enable
-        # autorefresh in a subclassed constructor function.
-
-        self.pack_param('auto_refresh',parent=self.control_frame_1,
-                                     on_change=self.set_auto_refresh,
-                                     side=RIGHT)
-
-        # get_param
-        if self.auto_refresh: 
-            self.console.auto_refresh_panels.append(self)
-            
-
-        self.pack_param('Enlarge',parent=self.control_frame_1,
-                        on_change=self.enlarge_plots,side=LEFT)
-
-        self.pack_param('Reduce',parent=self.control_frame_1,
-                        on_change=self.reduce_plots,side=LEFT)
-
-
-        self.pack_param('Back',parent=self.control_frame_2,
-                        on_change=lambda x=-1: self.navigate_pg_history(x),
-                        side=LEFT)
-
-        self.pack_param('Fwd',parent=self.control_frame_2,
-                        on_change=lambda x=+1: self.navigate_pg_history(x),
-                        side=LEFT)
-
-        ############################################################
 
 
 
@@ -328,6 +271,50 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
 
 
 
+        ### Parameters common to all PlotGroups
+        self.pack_param('normalize',parent=self.control_frame_1,
+                        on_change=self.update_plots,side="right")
+        self.pack_param('integerscaling',parent=self.control_frame_2,
+                        on_change=self.update_plots,side='right')
+        self.pack_param('sheetcoords',parent=self.control_frame_2,
+                        on_change=self.update_plots,side='right')
+
+        
+
+        ### GUI Parameters 
+        # JAB: Because the Refresh, Reduce, and Enlarge buttons are
+        # present in nearly every window, and aren't particularly
+        # important, we should probably use small icons for them
+        # instead of text.  That way they will form a visual group
+        # that users can typically ignore.  Of course, the icons will
+        # need to announce their names as help text if the mouse
+        # lingers over them, so that the user can figure them out the
+        # first time.
+        self.pack_param('Refresh',parent=self.control_frame_1,
+                        on_change=self.refresh,side=LEFT)
+
+        self.pack_param('auto_refresh',parent=self.control_frame_1,
+                                     on_change=self.set_auto_refresh,
+                                     side=RIGHT)
+
+        if self.auto_refresh: self.console.auto_refresh_panels.append(self)
+            
+        self.pack_param('Enlarge',parent=self.control_frame_1,
+                        on_change=self.enlarge_plots,side=LEFT)
+
+        self.pack_param('Reduce',parent=self.control_frame_1,
+                        on_change=self.reduce_plots,side=LEFT)
+
+        self.pack_param('Back',parent=self.control_frame_2,
+                        on_change=lambda x=-1: self.navigate_pg_history(x),
+                        side=LEFT)
+
+        self.pack_param('Fwd',parent=self.control_frame_2,
+                        on_change=lambda x=+1: self.navigate_pg_history(x),
+                        side=LEFT)
+
+
+
         #################### RIGHT-CLICK MENU STUFF ####################
         ### Right-click menu for canvases; subclasses can add cascades
         ### or insert commands on the existing cascades.
@@ -349,9 +336,13 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
         #################################################################
 
 
-        import __main__
-        __main__.__dict__['abc']=self
 
+
+
+    # CB: rename/remove
+    def update_plots(self):
+        self.plotgroup.update_plots(False)
+        self.display_plots()
 
 
 
@@ -373,13 +364,6 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
         # various subclasses have finished creating themselves!
 
 
-
-
-
-
-
-
-               
     def __connection_fields_window(self):
         if 'plot' in self._right_click_info:
             plot = self._right_click_info['plot']
@@ -593,16 +577,6 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
         self.sizeright()
         
 
-        
-
-    # CB: rename/remove
-    def update_plots(self):
-        self.plotgroup.update_plots(False)
-        self.display_plots()
-
-
-
-
 
     def display_labels(self):
         """
@@ -723,29 +697,16 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
 
 
 
-
-
-
-
-
     def refresh_title(self):
-        """
-        Change the window title.  TopoConsole will call this on
-        startup of window.  
-        """
         self.title(topo.sim.name+': '+"%s time:%s" %
                    (self.plotgroup_label,self.plotgroup.time))
           
 
-
-    # CEBHACKALERT: that's broken too
-    # CB: tidy up the window destruction code here & elsewhere 
     def destroy(self):
         """overrides toplevel destroy, adding removal from autorefresh panels"""
-        if self.console:
-            if self in self.console.auto_refresh_panels:
-                self.console.auto_refresh_panels.remove(self)
-        TkguiWindow.destroy(self)
+        if self.console and self in self.console.auto_refresh_panels:
+            self.console.auto_refresh_panels.remove(self)
+        Frame.destroy(self)
 
 
     # CB: rename, document, and if possible delay showing the window until all the jiggling is over
