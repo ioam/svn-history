@@ -167,36 +167,28 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
 
 
 
-    ####### CEB: temporary #######
-    # fix this next
-    # (**CB: check normalize works correctly over & after the
-    #  history...certainly it's out of sync after history**)
-    def get_pg(self):
-        return self.__pg
-        
-    def set_pg(self,new_pg):        
-        self.__pg = new_pg
+    # CB: Surely there's a better way?
+    # Maybe we don't need the plotgroup attribute, since all the
+    # plotgroup's attributes (e.g. self.plotgroup.a) are available via
+    # this object itself (e.g. self.a). Will address this later...
+    def get_plotgroup(self):
+        return self._extra_pos[0]        
+    def set_plotgroup(self,new_pg):
         self._extra_pos = [new_pg]
-
-    plotgroup = property(get_pg,set_pg)
-    ##############################
+    plotgroup = property(get_plotgroup,set_plotgroup,"""something something.""")
 
 
     def __init__(self,console,plotgroup_label,master,**params):
 
-        # CB: self.plotgroup is also self._parameterized_object!
-        self.__pg=self.generate_plotgroup()
-        # self.plotgroup = self.generate_plotgroup()
+        TkParameterizedObject.__init__(self,master,extra_pos=[self.generate_plotgroup()],**params)
+        Frame.__init__(self,master)
+
         self.plotgroup_label = plotgroup_label
 
-        TkParameterizedObject.__init__(self,master,extra_pos=[self.plotgroup],**params)
-        Frame.__init__(self,master)
 
 
         self.console=console
 
-        self._properties = {}
-        
         self.canvases = []
         self.plot_labels = []
 
@@ -205,11 +197,8 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
         
 
 
-        ########## HISTORY STUFF ##########
-        # ** when i tried to simplify the history i think i also broke it slightly: need to fix **
         self.plotgroups_history=[]
         self.history_index = 0
-        ###################################
                               
             
     	# Factor for reducing or enlarging the Plots (where 1.2 = 20% change)
@@ -232,16 +221,20 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
         # | |                 | |
         # | ------------------- |
         # |                     |
+        # | ------------------- |
+        # | | control_frame_3 | |
+        # | ------------------- |
+        # |                     |
         # |     messagebar      |
         # -----------------------  
 
 
+        # CB: rename these frames
         self.control_frame_1 = Frame(self)
         self.control_frame_1.pack(side=TOP,expand=NO,fill=X)
 
 	self.control_frame_2 = Frame(self)
         self.control_frame_2.pack(side=TOP,expand=NO,fill=X)
-
 
 
         #################### PLOT AREA ####################
@@ -260,8 +253,9 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
             self.plot_frame = self.plot_group_title.interior()
         ###################################################       
 
+        self.control_frame_3 = Frame(self)
+        self.control_frame_3.pack(side=TOP,expand=NO,fill=X)
 
-	
 
         #################### DYNAMIC INFO BAR ####################
 	self.messageBar = Pmw.MessageBar(self,entry_relief='groove')
@@ -334,8 +328,6 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
         self._unit_menu.add_command(label='Connection Fields',
                                     command=self.__connection_fields_window)
         #################################################################
-
-
 
 
 
@@ -474,7 +466,11 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
         """
         Pmw.showbusycursor()
 
-        if self.history_index!=0: self.plotgroup = self.generate_plotgroup()
+        # if we're looking in the history, need a new plotgroup (don't update old one,
+        # which is a record of some previous state)
+        if self.history_index!=0:
+            #self.plotgroup = self.generate_plotgroup()
+            self.plotgroup = copy.copy(self.plotgroup)
 
 	# if update is True, the SheetViews are re-generated            
         self.plotgroup.update_plots(update)
@@ -483,9 +479,9 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
         self.display_labels()             # Match labels to grid
         self.refresh_title()              # Update Frame title.
 
-        self.add_to_history()             # Add current Plotgroup to history
+        self.add_to_history()             
         
-        self.set_pg_widgets_state()
+        self.update_widgets()
         Pmw.hidebusycursor()
 
 
@@ -647,27 +643,29 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
     def add_to_history(self):
         self.plotgroups_history.append(copy.copy(self.plotgroup))
         self.history_index=0
-        self.update_history_buttons()
+        self.update_widgets() 
 
-    def set_pg_widgets_state(self):
+    def update_widgets(self):
         """
-        The plotgroup's widgets are all irrelevent when the plotgroup's from
+        The plotgroup's non-history widgets are all irrelevent when the plotgroup's from
         history.
         """
         if self.history_index!=0: 
             state= 'disabled'
         else:
             state = 'normal'
+
         for w in self._widgets.values(): w['state']=state
+        self.update_history_buttons()
+
 
     def update_history_buttons(self):
         space_back = len(self.plotgroups_history)-1+self.history_index
-        space_fwd  = -self.history_index
+        space_fwd  = -self.history_index 
 
         back_button = self._widgets['Back']
         forward_button = self._widgets['Fwd']
         
-
         if space_back>0:
             back_button['state']='normal'
         else:
@@ -677,7 +675,7 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
             forward_button['state']='normal'
         else:
             forward_button['state']='disabled'
-        
+
         
     # JLENHANCEMENT: It would be nice to be able to scroll back through many
     # iterations.  Could put in a box for entering either the iteration
@@ -686,13 +684,13 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
         self.history_index+=steps
         
         self.plotgroup = self.plotgroups_history[len(self.plotgroups_history)-1+self.history_index]
-        self.set_pg_widgets_state()
+
+        self.update_widgets()
         
  	self.display_plots()
         self.display_labels()
         self.refresh_title()
         
-        self.update_history_buttons()
 ###########################################################         
 
 
