@@ -41,6 +41,8 @@ from templates import plotgroup_templates
 
 class PlotGroupSaver(ParameterizedObject):
 
+    # temporary!
+    filename_prefix = Parameter(default="")
     file_format = Parameter(default="PNG")
 
 
@@ -67,7 +69,7 @@ class PlotGroupSaver(ParameterizedObject):
         for p,l in zip(self.plotgroup.plots,self.plotgroup.labels):
             name = "%s.%s.%s"%(n,t,l.replace('\n','.'))
             #print "outfile",name
-            p.bitmap.image.save(name+".%s"%self.file_format,self.file_format)
+            p.bitmap.image.save(self.filename_prefix+name+".%s"%self.file_format,self.file_format)
 
 
 
