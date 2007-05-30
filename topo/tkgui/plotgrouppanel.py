@@ -48,9 +48,6 @@ BORDERWIDTH = 1
 CANVASBUFFER = 1
 
 
-# (CB: right-click code in the *2 classes needs to be copied over
-# from originals)
-    
         
 from topo.base.parameterclasses import BooleanParameter
 
@@ -315,20 +312,18 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
         #################### RIGHT-CLICK MENU STUFF ####################
         ### Right-click menu for canvases; subclasses can add cascades
         ### or insert commands on the existing cascades.
-        self._canvas_menu = Menu(self, tearoff=0)
+        self._canvas_menu = Menu(self, tearoff=0) #self.context_menu 
 
-        # sheet submenu
-        self._canvas_menu.insert_cascade(1) 
-        self._sheet_menu = Menu(self._canvas_menu, tearoff=0)
-        self._canvas_menu.entryconfig(1,menu=self._sheet_menu,state=DISABLED)
-
-        # unit submenu
-        self._canvas_menu.insert_cascade(0)
         self._unit_menu = Menu(self._canvas_menu, tearoff=0)
-        self._canvas_menu.entryconfig(0,menu=self._unit_menu,state=DISABLED)
+        self._canvas_menu.add_cascade(menu=self._unit_menu,state=DISABLED,
+                                      indexname='unit_menu')
+        
+        self._sheet_menu = Menu(self._canvas_menu, tearoff=0)
+        self._canvas_menu.add_cascade(menu=self._sheet_menu,state=DISABLED,
+                                      indexname='sheet_menu') 
         
         
-        self._unit_menu.add_command(label='Connection Fields',
+        self._unit_menu.add_command(label='Connection Fields',indexname='connection_fields',
                                     command=self.__connection_fields_window)
         #################################################################
 

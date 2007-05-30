@@ -423,29 +423,27 @@ class TemplatePlotGroupPanel2(PlotGroupPanel):
 
         #################### RIGHT-CLICK MENU STUFF ####################
         self._sheet_menu.add_command(label="Save image",
-                                     state=DISABLED)
+                                     command=self.__save_to_postscript)
+
         
         self._unit_menu.add_command(label="Print info",
                                     command=self.__print_info)
 
-        # CEBALERT: do we have to index with numbers? It will get
-        # messy if we want to add something in the middle...and it's
-        # already a pain for accessing the items.
 
         ## Strength channel
-        self._canvas_menu.insert_cascade(2) 
         self._strength_menu = Menu(self._canvas_menu, tearoff=0)
-        self._canvas_menu.entryconfig(2,menu=self._strength_menu,label='Strength channel')
+        self._canvas_menu.add_cascade(menu=self._strength_menu,label='Strength channel',
+                                      indexname="Strength")
         
         ## Hue channel
-        self._canvas_menu.insert_cascade(3) 
         self._hue_menu = Menu(self._canvas_menu, tearoff=0)
-        self._canvas_menu.entryconfig(3,menu=self._hue_menu,label='Hue channel')
+        self._canvas_menu.add_cascade(menu=self._hue_menu,label='Hue channel',
+                                      indexname="Hue")
 
         ## Confidence channel
-        self._canvas_menu.insert_cascade(4) 
         self._conf_menu = Menu(self._canvas_menu, tearoff=0)
-        self._canvas_menu.entryconfig(4,menu=self._conf_menu,label='Confidence channel')
+        self._canvas_menu.add_cascade(menu=self._conf_menu,label='Confidence channel',
+                                      indexname="Confidence")
 
 
         # CEBALERT: there doesn't seem to be any way within tkinter itself to let me
@@ -489,6 +487,8 @@ class TemplatePlotGroupPanel2(PlotGroupPanel):
         self._conf_menu.add_command(label="Gradient",
                                         command=lambda: self.__gradient('Confidence'))
 
+
+        
         #self._sheet_menu.add_command(label="Print matrix values",
         #                             command=self.__print_matrix)
         #################################################################
@@ -520,20 +520,30 @@ class TemplatePlotGroupPanel2(PlotGroupPanel):
             
             available_channels =available_plot_channels(plot) 
 
-            for channel,menu_posn in zip(('Strength','Hue','Confidence'),(2,3,4)):
+            for channel in ('Strength','Hue','Confidence'):
                 if channel in available_channels:
-                    self._canvas_menu.entryconfig(menu_posn,label="%s channel: %s" %
+                    self._canvas_menu.entryconfig(channel,
+                                                  label="%s channel: %s" %
                                                   (channel,str(plot.channels[channel])),state=NORMAL)
                 else:
-                    self._canvas_menu.entryconfig(menu_posn,label="%s channel: None" %
+                    self._canvas_menu.entryconfig(channel,
+                                                  label="%s channel: None" %
                                                   (channel),state=DISABLED)
 
             self._canvas_menu.tk_popup(event_info['event'].x_root,
                                        event_info['event'].y_root)
 
- 
 
+     # just about copied from editorwindow.py
+    def __save_to_postscript(self):
+
+        canvas = self._right_click_info['event'].widget
         
+        POSTSCRIPT_FILETYPES = [('Encapsulated PostScript images','*.eps'),
+                                ('PostScript images','*.ps'),('All files','*')]
+        snapshot_name = asksaveasfilename(filetypes=POSTSCRIPT_FILETYPES)
+        if snapshot_name:
+            canvas.postscript(file=snapshot_name)
 
     # CB: these methods assume channel has a view (the menu only displays those that do)
     def __fft(self,channel):
