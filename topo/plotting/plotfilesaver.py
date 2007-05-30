@@ -18,8 +18,13 @@ __version__='$Revision$'
 # you can use this to save images, though
 
 # e.g.
-#from topo.plotting.plotfilesaver import TemplatePlotGroupSaver; t = TemplatePlotGroupSaver('Orientation Preference'); t.save_images()
-#from topo.plotting.plotfilesaver import TemplatePlotGroupSaver; t = TemplatePlotGroupSaver('Activity'); t.save_images()
+#from topo.plotting.plotfilesaver import TemplatePlotGroupSaver; t = TemplatePlotGroupSaver('Orientation Preference'); t.save_to_disk()
+#from topo.plotting.plotfilesaver import TemplatePlotGroupSaver; t = TemplatePlotGroupSaver('Activity'); t.save_to_disk()
+#
+# you can use the same TemplatePlotGFroupSaver later:
+#  topo.sim.run(10)
+#  t.plotgroup.update_plots()
+#  t.save_to_disk()
 
 
 # probably does all kinds of things you don't want, like updating the plots (re-measuring maps, etc)...
@@ -56,6 +61,7 @@ class PlotGroupSaver(ParameterizedObject):
 	return PlotGroup([])
  
     def save_to_disk(self):
+        # need to format e.g. time like it's done elsewhere with some leading 0s
         n = topo.sim.name
         t = topo.sim.time()
         for p,l in zip(self.plotgroup.plots,self.plotgroup.labels):
