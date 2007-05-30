@@ -26,7 +26,7 @@ import Tkinter
 from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
      BooleanVar, StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
-     Scrollbar, Y, VERTICAL, HORIZONTAL, Menu, END, NO, NONE,Scrollbar,Canvas
+     Scrollbar, Y, VERTICAL, HORIZONTAL, END, NO, NONE,Scrollbar,Canvas
 
 import topo
 
@@ -36,7 +36,7 @@ from topo.base.sheet import Sheet
 from topo.plotting.templates import plotgroup_templates # is this used?
 from topo.plotting.plotgroup import PlotGroup,identity
 
-from tkguiwindow import TkguiWindow
+from tkguiwindow import TkguiWindow, Menu
 
 BORDERWIDTH = 1
 
@@ -47,6 +47,9 @@ BORDERWIDTH = 1
 # not displayed.  
 CANVASBUFFER = 1
 
+
+# (CB: right-click code in the *2 classes needs to be copied over
+# from originals)
     
         
 from topo.base.parameterclasses import BooleanParameter
@@ -328,7 +331,6 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
         self._unit_menu.add_command(label='Connection Fields',
                                     command=self.__connection_fields_window)
         #################################################################
-
 
 
     # CB: rename/remove
@@ -1029,21 +1031,21 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 
         ### Right-click menu for canvases; subclasses can add cascades
         ### or insert commands on the existing cascades.
-        self._canvas_menu = Menu(self, tearoff=0)
+        self._canvas_menu = self.context_menu  #Menu(self, tearoff=0)
 
-        # sheet submenu
-        self._canvas_menu.insert_cascade(1) 
-        self._sheet_menu = Menu(self._canvas_menu, tearoff=0)
-        self._canvas_menu.entryconfig(1,menu=self._sheet_menu,state=DISABLED)
-
-        # unit submenu
-        self._canvas_menu.insert_cascade(0)
         self._unit_menu = Menu(self._canvas_menu, tearoff=0)
-        self._canvas_menu.entryconfig(0,menu=self._unit_menu,state=DISABLED)
+        self._canvas_menu.add_cascade(menu=self._unit_menu,state=DISABLED,
+                                      indexname='unit_menu')
+        
+        self._sheet_menu = Menu(self._canvas_menu, tearoff=0)
+        self._canvas_menu.add_cascade(menu=self._sheet_menu,state=DISABLED,
+                                      indexname='sheet_menu') 
         
         
-        self._unit_menu.add_command(label='Connection Fields',
+        self._unit_menu.add_command(label='Connection Fields',indexname='connection_fields',
                                     command=self.__connection_fields_window)
+
+
 
                
     def __connection_fields_window(self):
@@ -1107,9 +1109,12 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         if 'plot' in event_info:
             plot = event_info['plot']
 
-            self._canvas_menu.entryconfig(1,label="Combined plot: %s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
+            
+            self._canvas_menu.entryconfig('sheet_menu',
+                                          label="Combined plot: %s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
             (r,c),(x,y) = event_info['coords']
-            self._canvas_menu.entryconfig(0,label="Single unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),state=NORMAL)
+            self._canvas_menu.entryconfig('unit_menu',
+                                          label="Single unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),state=NORMAL)
             self._right_click_info = event_info
 
             if show_menu:

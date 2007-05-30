@@ -19,12 +19,14 @@ from numpy import abs
 import copy
 import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
-     Entry, Canvas, Checkbutton, BooleanVar, Menu, DISABLED, NORMAL,NO
+     Entry, Canvas, Checkbutton, BooleanVar, DISABLED, NORMAL,NO
 
 import topo
 from plotgrouppanel import PlotGroupPanel
 from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import TemplatePlotGroup
+
+from tkguiwindow import Menu
 
 ### We want to support any featuremap type defined in that file, and
 ### so import all of them here.
@@ -141,25 +143,20 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
                                     command=self.__print_info)
 
 
-
-        # CEBALERT: do we have to index with numbers? It will get
-        # messy if we want to add something in the middle...and it's
-        # already a pain for accessing the items.
-
         ## Strength channel
-        self._canvas_menu.insert_cascade(2) 
         self._strength_menu = Menu(self._canvas_menu, tearoff=0)
-        self._canvas_menu.entryconfig(2,menu=self._strength_menu,label='Strength channel')
+        self._canvas_menu.add_cascade(menu=self._strength_menu,label='Strength channel',
+                                      indexname="Strength")
         
         ## Hue channel
-        self._canvas_menu.insert_cascade(3) 
         self._hue_menu = Menu(self._canvas_menu, tearoff=0)
-        self._canvas_menu.entryconfig(3,menu=self._hue_menu,label='Hue channel')
+        self._canvas_menu.add_cascade(menu=self._hue_menu,label='Hue channel',
+                                      indexname="Hue")
 
         ## Confidence channel
-        self._canvas_menu.insert_cascade(4) 
         self._conf_menu = Menu(self._canvas_menu, tearoff=0)
-        self._canvas_menu.entryconfig(4,menu=self._conf_menu,label='Confidence channel')
+        self._canvas_menu.add_cascade(menu=self._conf_menu,label='Confidence channel',
+                                      indexname="Confidence")
 
 
         # CEBALERT: there doesn't seem to be any way within tkinter itself to let me
@@ -267,12 +264,14 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
             
             available_channels =available_plot_channels(plot) 
 
-            for channel,menu_posn in zip(('Strength','Hue','Confidence'),(2,3,4)):
+            for channel in ('Strength','Hue','Confidence'):
                 if channel in available_channels:
-                    self._canvas_menu.entryconfig(menu_posn,label="%s channel: %s" %
+                    self._canvas_menu.entryconfig(channel,
+                                                  label="%s channel: %s" %
                                                   (channel,str(plot.channels[channel])),state=NORMAL)
                 else:
-                    self._canvas_menu.entryconfig(menu_posn,label="%s channel: None" %
+                    self._canvas_menu.entryconfig(channel,
+                                                  label="%s channel: None" %
                                                   (channel),state=DISABLED)
 
             self._canvas_menu.tk_popup(event_info['event'].x_root,
