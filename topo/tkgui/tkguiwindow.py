@@ -101,25 +101,14 @@ class TkguiWindow(Tkinter.Toplevel):
             self.iconbitmap('@'+(os.path.join(topo_dir,'topo/tkgui/topo.xbm')))
 
 
-        ### Universal right-click menu
+        ### Universal right-click menu   CB: not currently used by anything but the plotgrouppanels
         self.context_menu = Menu(self, tearoff=0)
 ##         self.bind("<<right-click>>",self.display_context_menu)
 
-
-##         self.context_menu.add_command(0,label="Save window",
-##                                       indexname="save_to_postscript",
-##                                       command=self.save_to_postscript)
-        
-
-
-    # CB: still to decide between frame/window; the right-click stuff will probably change.
+##     # CB: still to decide between frame/window; the right-click stuff will probably change.
     
-##     def display_context_menu(self,e):
-##         self.context_menu.tk_popup(e.x_root,
-##                                    e.y_root)
-        
-##     def save_to_postscript(self):
-##         print "save to postscript"
+
+
 
      
 
