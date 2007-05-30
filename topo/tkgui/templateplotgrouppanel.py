@@ -405,7 +405,7 @@ class TemplatePlotGroupPanel2(PlotGroupPanel):
         self.pack_param('strength_only',parent=self.control_frame_1,
                         on_change=self.update_plots,side='right')
 
-        self.pack_param('updatecommand')
+        self.pack_param('updatecommand',parent=self.control_frame_3)
 
                
         # To make the auto-refresh button off by default except for
@@ -631,3 +631,4 @@ class TemplatePlotGroupPanel2(PlotGroupPanel):
 
 
 #TemplatePlotGroupPanel = TemplatePlotGroupPanel2
+
