@@ -17,6 +17,19 @@ __version__='$Revision$'
 
 
 
+# Plan:
+# - get working for activity, orientation pref, projection
+#   (The next thing that needs to happen is just to adjust
+#   CFProjectionPlotGroupSaver's "make_contact_sheet" method to position
+#   different sized CFs properly. And then,the arguments should be
+#   filled in.)
+
+# - clean up
+# - add cf
+
+
+
+# PIL has ImageFont module
 
 
 
@@ -89,6 +102,7 @@ class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
 					self.projection_name,
                                         self.density)
         return plotgroup
+
 
 
     # Almost straight from:
