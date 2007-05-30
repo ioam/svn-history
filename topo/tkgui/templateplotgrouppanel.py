@@ -20,6 +20,7 @@ import copy
 import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas, Checkbutton, BooleanVar, DISABLED, NORMAL,NO
+from tkFileDialog import asksaveasfilename
 
 import topo
 from plotgrouppanel import PlotGroupPanel
@@ -136,7 +137,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
 
         self._sheet_menu.add_command(label="Save image",
-                                     state=DISABLED)
+                                     command=self.__save_to_postscript)
 
         
         self._unit_menu.add_command(label="Print info",
@@ -279,7 +280,19 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
  
 
+    # just about copied from editorwindow.py
+    def __save_to_postscript(self):
+
+        canvas = self._right_click_info['event'].widget
         
+        POSTSCRIPT_FILETYPES = [('Encapsulated PostScript images','*.eps'),
+                                ('PostScript images','*.ps'),('All files','*')]
+        snapshot_name = asksaveasfilename(filetypes=POSTSCRIPT_FILETYPES)
+        if snapshot_name:
+            canvas.postscript(file=snapshot_name)
+
+
+   
 
     # CB: these methods assume channel has a view (the menu only displays those that do)
     def __fft(self,channel):
