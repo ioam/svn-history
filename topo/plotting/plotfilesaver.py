@@ -11,38 +11,24 @@ __version__='$Revision$'
 
 
 
-# * Incomplete & untested *
+### Currently being written
+
+# (revision 1.33 can actually be used to plot activities and preference maps)
 
 
 
-# you can use this to save images, though
-
-# e.g.
-#from topo.plotting.plotfilesaver import TemplatePlotGroupSaver; t = TemplatePlotGroupSaver('Orientation Preference'); t.save_to_disk()
-#from topo.plotting.plotfilesaver import TemplatePlotGroupSaver; t = TemplatePlotGroupSaver('Activity'); t.save_to_disk()
-#
-# you can use the same TemplatePlotGFroupSaver later:
-#  topo.sim.run(10)
-#  t.plotgroup.update_plots()
-#  t.save_to_disk()
 
 
-# probably does all kinds of things you don't want, like updating the plots (re-measuring maps, etc)...
-
-# The implementation and names of things will change, so if you use these classes you will have to update
-# your code in the future...
 
 
 import topo
 from topo.base.parameterizedobject import ParameterizedObject,Parameter
 
-from plotgroup import PlotGroup,TemplatePlotGroup
+from plotgroup import PlotGroup,TemplatePlotGroup,ProjectionPlotGroup
 from templates import plotgroup_templates
 
 class PlotGroupSaver(ParameterizedObject):
 
-    # temporary!
-    filename_prefix = Parameter(default="")
     file_format = Parameter(default="PNG")
 
 
@@ -56,8 +42,8 @@ class PlotGroupSaver(ParameterizedObject):
     def __init__(self,plotgroup_label,**params):
         super(PlotGroupSaver,self).__init__(**params)
         self.plotgroup_label = plotgroup_label
-        self.plotgroup = self.generate_plotgroup()
-        self.plotgroup.update_plots(True)
+        #self.plotgroup = self.generate_plotgroup()
+        #self.plotgroup.update_plots(True)
 
     def generate_plotgroup(self):
 	return PlotGroup([])
@@ -69,7 +55,7 @@ class PlotGroupSaver(ParameterizedObject):
         for p,l in zip(self.plotgroup.plots,self.plotgroup.labels):
             name = "%s.%s.%s"%(n,t,l.replace('\n','.'))
             #print "outfile",name
-            p.bitmap.image.save(self.filename_prefix+name+".%s"%self.file_format,self.file_format)
+            p.bitmap.image.save(name+".%s"%self.file_format,self.file_format)
 
 
 
@@ -83,147 +69,93 @@ class TemplatePlotGroupSaver(PlotGroupSaver):
 	plotgroup = TemplatePlotGroup([],self.pgt,None)
 	return plotgroup
 
-
-
-
-### JABHACKALERT!
-### 
-### Not yet properly implemented; all the code in this file needs to
-### be either implemented or removed.  The class ImageSaver in
-### topo/tests/testcfsom.py might be of some help for inspiration.
-
-## import topo
-## import topo.base.parameterizedobject
-## from topo.misc.utils import *
-
-## from topo.commands.analysis import *
-
-## from topo.plotting.templates import plotgroup_templates
-## from topo.plotting.plotgroup import TemplatePlotGroup, ConnectionFieldsPlotGroup,ProjectionPlotGroup 
-
-
-
- 
-## class PlotFileSaver(topo.base.parameterizedobject.ParameterizedObject):
-##     def __init__(self,**params):
-##         super(PlotFileSaver,self).__init__(**params)
-##         self.bitmaps = []
-##         self.files = []
-##         self.name = {'base':topo.sim.name, 'iteration':topo.sim.time(), \
-##                     'presentation':'0', 'region':'', 'type':''}
-
-##     def create_bitmaps(self):
-##         raise NotImplementedError
-
-
-##     def save_to_disk(self):
-##         if self.bitmaps:
-## 	    d = self.name
-	  
-##             for bitmap in self.bitmaps:               
-##                 #self.message('Saving', filename)
-## 		d['title']=bitmap.name
-## 		filename = '%s.%06d.p%03d.%s_%s_%s.png' % \
-##                            (d['base'], int(d['iteration']), \
-##                            int(d['presentation']), d['region'], d['type'],d['title'])
-## 		f = open(filename,'w')                           
-##                 bitmap.image.save(f,"png")
-## 	    f.close()
-## 	    self.files.append(filename)
+import Image
+from topo.base.parameterclasses import Number
 
 
 
 
-## class TemplateFile(PlotFileSaver):
-##     def __init__(self,pgt_name,**params):
+# produce a projection plot (all cfs same size)...
+# ./topographica -g examples/cfsom_or.ty -c "from topo.plotting.plotfilesaver import *; p = CFProjectionPlotGroupSaver('Projection');p.projection_name='Afferent';p.sheet_name='V1';p.plotgroup=p.generate_plotgroup();p.plotgroup.update_plots(True); i = p.make_contact_sheet((10,10),(40,40),(10,10,10,10),3); i.show()
 
-##         super(TemplateFile,self).__init__(**params)
-##         self.pgt = plotgroup_templates.get(pgt_name,None)
-##         self.name['region'] = 'All_region'
-##         self.name['type'] = self.pgt.name
-##         self.create_bitmaps()
-##         self.save_to_disk()
+class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
 
-##     def create_bitmaps(self):
-		
-## 	pg = plotgroup_dict.get(self.pgt.name,None)
-## 	exec(self.pgt.command)
-## 	if pg == None:
-## 	    pg = TemplatePlotGroup(self.pgt.name,[],self.pgt.normalize,
-## 				   self.pgt,None)
-##         self.bitmaps = pg.load_images()
+    sheet_name = Parameter(default="")
+    projection_name = Parameter(default="")
+    density = Number(default=10.0)
+
+    def generate_plotgroup(self):
+ 	plotgroup = ProjectionPlotGroup([],self.pgt,self.sheet_name,
+					self.projection_name,
+                                        self.density)
+        return plotgroup
+
+
+    # Almost straight from:
+    # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/412982
+    # 
+    # shows how to make a composite image
+    # should be easy to modify to do what we want.
+    def make_contact_sheet(self,(ncols,nrows),(photow,photoh),
+                       (marl,mart,marr,marb),
+                       padding):
+        """\
+        Make a contact sheet from a group of filenames:
         
+        fnames       A list of names of the image files
+
+        ncols        Number of columns in the contact sheet
+        nrows        Number of rows in the contact sheet
+        photow       The width of the photo thumbs in pixels
+        photoh       The height of the photo thumbs in pixels
+
+        marl         The left margin in pixels
+        mart         The top margin in pixels
+        marr         The right margin in pixels
+        marl         The left margin in pixels
+
+        padding      The padding between images in pixels
+
+        returns a PIL image object.
+        """
+
+        # Read in all images and resize appropriately
+        #imgs = [Image.open(fn).resize((photow,photoh)) for fn in fnames]
+
+        imgs = [p.bitmap.image for p in self.plotgroup.plots]
 
 
-
-## class ActivityFile(PlotFileSaver):
-##     def __init__(self,region=None,**params):
-##         super(ActivityFile,self).__init__(**params)
-##         self.region = region
-##         self.name['region'] = region
-##         self.name['type'] = 'Activity'
-##         self.create_bitmaps()
-##         self.save_to_disk()
-
-##     def create_bitmaps(self):
-	
-## 	pgt = plotgroup_templates['Activity']
-## 	pg = plotgroup_dict.get('Activity',None)
-	
-## 	if pg == None:
-## 	    pgt = plotgroup_templates['Activity']
-## 	    pg = TemplatePlotGroup('Activity',[],pgt.normalize,
-## 				   pgt,None)
-	    
-##         self.bitmaps = pg.load_images()
-	
-        
+        # **temp: resize all the same at the moment.
+        imgs = [i.resize((photow,photoh)) for i in imgs]
 
 
-## class UnitWeightsFile(PlotFileSaver):
-##     def __init__(self,region,x,y,**params):
-##         super(UnitWeightsFile,self).__init__(**params)
-##         self.region = region
-##         self.name['region'] = '%s_%01.03f_%01.03f' % (region, x, y)
-##         self.name['type'] = 'Weights'
-##         self.plotgroup_key = ('Weights',self.region,x,y)
+        # Calculate the size of the output image, based on the
+        #  photo thumb sizes, margins, and padding
+        marw = marl+marr
+        marh = mart+ marb
 
-##         self.create_bitmaps()
-##         self.save_to_disk()
+        padw = (ncols-1)*padding
+        padh = (nrows-1)*padding
+        isize = (ncols*photow+marw+padw,nrows*photoh+marh+padh)
 
-##     def create_bitmaps(self):
+        # Create the new image. The background doesn't have to be white
+        white = (255,255,255)
+        inew = Image.new('RGB',isize,white)
 
-## 	pg = plotgroup_dict.get(self.plotgroup_key,None)	
-## 	if pg == None:
-## 	    pgt = plotgroup_templates['Connection Fields']
-## 	    pg = ConnectionFieldsPlotGroup(self.plotgroup_key,[],pgt.normalize,
-## 					   pgt,self.region)
-			
-	
-##         self.bitmaps = pg.load_images()
+        # Insert each thumb:
+        for irow in range(nrows):
+            for icol in range(ncols):
+                left = marl + icol*(photow+padding)
+                right = left + photow
+                upper = mart + irow*(photoh+padding)
+                lower = upper + photoh
+                bbox = (left,upper,right,lower)
+                try:
+                    img = imgs.pop(0)
+                except:
+                    print "doh"
+                    break
+                inew.paste(img,bbox)
+        return inew
 
-
-
-## class ProjectionFile(PlotFileSaver):
-##     def __init__(self,region,projection,density,**params):
-##         super(ProjectionFile,self).__init__(**params)
-##         self.region = region
-##         self.name['region'] = '%s_%s' % (region, projection)
-##         self.name['type'] = 'Projection'
-##         self.plotgroup_key = ('Projection',projection,density,self.region)
-
-##         self.create_bitmaps()
-##         self.save_to_disk()
-
-
-##     def create_bitmaps(self):
-
-## 	pg = plotgroup_dict.get(self.plotgroup_key,None)	
-## 	if pg == None:
-## 	    pgt = plotgroup_templates['Projection']
-## 	    pg = ProjectionPlotGroup(self.plotgroup_key,[],pgt.normalize,
-## 				     pgt,self.region)
-
-##         self.bitmaps = pg.load_images()
-        
 
