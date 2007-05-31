@@ -122,7 +122,7 @@ class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
 
     # Adapting from:
     # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/412982
-    # 
+    # Should become ImageCompositor(ParameterizedObject).
     def make_contact_sheet(self,(ncols,nrows),
                        (marl,mart,marr,marb),
                        padding):
