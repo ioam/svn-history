@@ -27,7 +27,6 @@ def save_plotgroup(name,**params):
     """
     class_ = plotsaving_classes.get(name,TemplatePlotGroupSaver)
     p = class_(name,**params)
-    print p.projection_name,p.sheet_name
     p.plotgroup=p.generate_plotgroup()
     p.plotgroup.update_plots(True)
     p.save_to_disk()
