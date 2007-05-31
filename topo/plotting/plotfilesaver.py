@@ -10,11 +10,32 @@ $Id$
 __version__='$Revision$'
 
 
+# (see comments at the end of this file)
+plotsaving_classes = {}
+
+
+def save_plotgroup(name,**params):
+    """
+    Convenience command for saving a set of plots to disk.  Examples:
+
+      save_plotgroup("Activity")
+      save_plotgroup("Orientation Preference")
+      save_plotgroup("Projection",projection_name='Afferent',sheet_name='V1')
+
+    Some plotgroups accept optional parameters, which can be passed
+    like projection_name and sheet_name above.
+    """
+    class_ = plotsaving_classes.get(name,TemplatePlotGroupSaver)
+    p = class_(name,**params)
+    print p.projection_name,p.sheet_name
+    p.plotgroup=p.generate_plotgroup()
+    p.plotgroup.update_plots(True)
+    p.save_to_disk()
+
 
 ### Currently being written
 
 # (any code written using these classes will have to be altered in the future)
-
 
 
 ### Examples
@@ -127,7 +148,7 @@ class ImageCompositor(ParameterizedObject):
 
 class PlotGroupSaver(ParameterizedObject):
 
-    file_format = Parameter(default="PNG")
+    file_format = Parameter(default="png")
 
     filename_prefix=Parameter(default="")
 # filename_format:
@@ -201,8 +222,10 @@ class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
         i.save(self.filename_prefix+name+".%s"%self.file_format,self.file_format)
 
 
-
-
-       
-
-
+# plotsaving_classes is like plotpanel_classes in tkgui/topoconsole.py;
+# it allows anyone to add their own special plotsaving_classes for any
+# particular PlotGroup.  By default, everything uses TemplatePlotGroupSaver
+# unless that is overridden explicitly for a particular PlotGroup using
+# this data structure.
+plotsaving_classes['Projection'] = CFProjectionPlotGroupSaver
+#plotsaving_classes['Connection Fields'] = ConnectionFieldsPlotGroupSaver
