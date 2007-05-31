@@ -13,17 +13,27 @@ __version__='$Revision$'
 
 ### Currently being written
 
-# (revision 1.33 can actually be used to plot activities and preference maps)
+# (any code written using these classes will have to be altered in the future)
 
 
 
+### Examples
+#
+# Activity:
+#./topographica -g examples/cfsom_or.ty -c "topo.sim.run(1); from topo.plotting.plotfilesaver import *; p = TemplatePlotGroupSaver('Activity');p.plotgroup=p.generate_plotgroup();p.plotgroup.update_plots(True);p.save_to_disk()"
+#
+# Projection:
+#./topographica -g examples/cfsom_or.ty -c "from topo.plotting.plotfilesaver import *; p = CFProjectionPlotGroupSaver('Projection');p.projection_name='Afferent';p.sheet_name='V1';p.plotgroup=p.generate_plotgroup();p.plotgroup.update_plots(True);p.save_to_disk()"#
+# Orientation Preference:
+#./topographica -g examples/cfsom_or.ty -c "topo.sim.run(10); from topo.plotting.plotfilesaver import *; p = TemplatePlotGroupSaver('Orientation Preference');p.plotgroup=p.generate_plotgroup();p.plotgroup.update_plots(True);p.save_to_disk()"
+#
+# If you have an existing Plot?Saver p, you can use it again:
+#  topo.sim.run(10)
+#  p.plotgroup.update_plots();p.save_to_disk()
+
+
+ 
 # Plan:
-# - get working for activity, orientation pref, projection
-#   (The next thing that needs to happen is just to adjust
-#   CFProjectionPlotGroupSaver's "make_contact_sheet" method to position
-#   different sized CFs properly. And then,the arguments should be
-#   filled in.)
-
 # - clean up
 # - add cf
 
@@ -39,6 +49,81 @@ from topo.base.parameterizedobject import ParameterizedObject,Parameter
 
 from plotgroup import PlotGroup,TemplatePlotGroup,ProjectionPlotGroup
 from templates import plotgroup_templates
+
+
+import ImageOps
+import numpy
+
+import Image
+from topo.base.parameterclasses import Number
+
+
+# move elsewhere, and give it some parameters etc
+# Alos, maybe call something more specific than compositor, since
+# it's jiust for building an array (grid) of images into one big image/
+class ImageCompositor(ParameterizedObject):
+
+    # Adapting from:
+    # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/412982
+    def make_contact_sheet(self,imgs,
+                       (marl,mart,marr,marb),
+                       padding):
+        """\
+        Make a contact sheet from a group of filenames:
+        
+        fnames       A list of names of the image files
+
+        ncols        Number of columns in the contact sheet
+        nrows        Number of rows in the contact sheet
+        photow       The width of the photo thumbs in pixels
+        photoh       The height of the photo thumbs in pixels
+
+        marl         The left margin in pixels
+        mart         The top margin in pixels
+        marr         The right margin in pixels
+        marl         The left margin in pixels
+
+        padding      The padding between images in pixels
+
+        returns a PIL image object.
+        """
+        # should make sure imgs is numpy array
+        
+        # CB: *** should do this in numpy without the conversion to list and back! ***
+        nrows,ncols = imgs.shape
+        i_widths = numpy.array([i.size[0] for i in imgs.ravel()]).reshape(nrows,ncols)
+        i_heights = numpy.array([i.size[1] for i in imgs.ravel()]).reshape(nrows,ncols)
+
+        col_widths = i_widths.max(axis=0)
+        row_heights = i_heights.max(axis=1)
+        
+        marw = marl+marr
+        marh = mart+ marb
+
+        padw = (ncols-1)*padding
+        padh = (nrows-1)*padding
+
+        isize = (col_widths.sum()+marw+padw, row_heights.sum()+marh+padh)
+
+        # Create the new image. The background doesn't have to be white
+        white = (255,255,255)
+        inew = Image.new('RGB',isize,white)
+
+        # CB: should be replaced with a more numpy technique.        
+        for irow in range(nrows):
+            for icol in range(ncols):
+                # if different widths in a col, or different heights in a row,
+                # each image will just go at top left defined by largest in col/row
+                # (should probably be centered)
+                left = marl+col_widths[0:icol].sum()+icol*padding
+                right = left+i_widths[irow,icol]
+                upper = mart+row_heights[0:irow].sum()+irow*padding
+                lower = upper+i_heights[irow,icol] 
+                inew.paste(imgs[irow,icol],(left,upper,right,lower))
+        return inew
+
+
+
 
 class PlotGroupSaver(ParameterizedObject):
 
@@ -82,14 +167,7 @@ class TemplatePlotGroupSaver(PlotGroupSaver):
 	plotgroup = TemplatePlotGroup([],self.pgt,None)
 	return plotgroup
 
-import Image
-from topo.base.parameterclasses import Number
 
-import ImageOps
-import numpy
-
-# produce a projection plot 
-# ./topographica -g examples/cfsom_or.ty -c "from topo.plotting.plotfilesaver import *; p = CFProjectionPlotGroupSaver('Projection');p.projection_name='Afferent';p.sheet_name='V1';p.plotgroup=p.generate_plotgroup();p.plotgroup.update_plots(True); i = p.make_contact_sheet((10,10),(3,3,3,3),3); i.show()"
 
 class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
 
@@ -105,14 +183,18 @@ class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
 
 
     def save_to_disk(self):
-        # need to format e.g. time like it's done elsewhere with some leading 0s
+        
+
+        imgs = numpy.array([p.bitmap.image for p in self.plotgroup.plots]).reshape(self.plotgroup.proj_plotting_shape)
+
+        i = ImageCompositor().make_contact_sheet(imgs, (3,3,3,3), 3)
+        
+        
         n = topo.sim.name
         t = topo.sim.time()
 
         sheet = topo.sim[self.sheet_name]
         proj = topo.sim[self.sheet_name].projections()[self.projection_name]
-
-        i = self.make_contact_sheet( self.plotgroup.proj_plotting_shape, (3,3,3,3), 3)
 
         name = "%s.%s.%s"%(n,t,self.projection_name)
         
@@ -120,64 +202,6 @@ class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
 
 
 
-    # Adapting from:
-    # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/412982
-    # Should become ImageCompositor(ParameterizedObject).
-    def make_contact_sheet(self,(ncols,nrows),
-                       (marl,mart,marr,marb),
-                       padding):
-        """\
-        Make a contact sheet from a group of filenames:
-        
-        fnames       A list of names of the image files
-
-        ncols        Number of columns in the contact sheet
-        nrows        Number of rows in the contact sheet
-        photow       The width of the photo thumbs in pixels
-        photoh       The height of the photo thumbs in pixels
-
-        marl         The left margin in pixels
-        mart         The top margin in pixels
-        marr         The right margin in pixels
-        marl         The left margin in pixels
-
-        padding      The padding between images in pixels
-
-        returns a PIL image object.
-        """
-        imgs = numpy.array([p.bitmap.image for p in self.plotgroup.plots]).reshape(nrows,ncols)
-
-        # CB: *** should do this in numpy without the conversion to list and back! ***
-        i_widths = numpy.array([i.size[0] for i in imgs.ravel()]).reshape(nrows,ncols)
-        i_heights = numpy.array([i.size[1] for i in imgs.ravel()]).reshape(nrows,ncols)
-
-        col_widths = i_widths.max(axis=0)
-        row_heights = i_heights.max(axis=1)
-        
-        marw = marl+marr
-        marh = mart+ marb
-
-        padw = (ncols-1)*padding
-        padh = (nrows-1)*padding
-
-        isize = (col_widths.sum()+marw+padw, row_heights.sum()+marh+padh)
-
-        # Create the new image. The background doesn't have to be white
-        white = (255,255,255)
-        inew = Image.new('RGB',isize,white)
-
-        # CB: should be replaced with a more numpy technique.        
-        for irow in range(nrows):
-            for icol in range(ncols):
-                # if different widths in a col, or different heights in a row,
-                # each image will just go at top left defined by largest in col/row
-                # (should probably be centered)
-                left = marl+col_widths[0:icol].sum()+icol*padding
-                right = left+i_widths[irow,icol]
-                upper = mart+row_heights[0:irow].sum()+irow*padding
-                lower = upper+i_heights[irow,icol] 
-                inew.paste(imgs[irow,icol],(left,upper,right,lower))
-        return inew
 
        
 
