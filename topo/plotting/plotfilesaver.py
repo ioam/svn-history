@@ -44,7 +44,7 @@ class PlotGroupSaver(ParameterizedObject):
 
     file_format = Parameter(default="PNG")
 
-
+    filename_prefix=Parameter(default="")
 # filename_format:
 #  "topo.sim.name+'.'+topo.sim.time()+'.'+current_sheet+'.'+current_plot+'.'+current_unit'"
 # (Eventually we could customize this to allow each template in topo/commands/analysis.py
@@ -68,7 +68,7 @@ class PlotGroupSaver(ParameterizedObject):
         for p,l in zip(self.plotgroup.plots,self.plotgroup.labels):
             name = "%s.%s.%s"%(n,t,l.replace('\n','.'))
             #print "outfile",name
-            p.bitmap.image.save(name+".%s"%self.file_format,self.file_format)
+            p.bitmap.image.save(self.filename_prefix+name+".%s"%self.file_format,self.file_format)
 
 
 
@@ -85,11 +85,11 @@ class TemplatePlotGroupSaver(PlotGroupSaver):
 import Image
 from topo.base.parameterclasses import Number
 
+import ImageOps
+import numpy
 
-
-
-# produce a projection plot (all cfs same size)...
-# ./topographica -g examples/cfsom_or.ty -c "from topo.plotting.plotfilesaver import *; p = CFProjectionPlotGroupSaver('Projection');p.projection_name='Afferent';p.sheet_name='V1';p.plotgroup=p.generate_plotgroup();p.plotgroup.update_plots(True); i = p.make_contact_sheet((10,10),(40,40),(10,10,10,10),3); i.show()
+# produce a projection plot 
+# ./topographica -g examples/cfsom_or.ty -c "from topo.plotting.plotfilesaver import *; p = CFProjectionPlotGroupSaver('Projection');p.projection_name='Afferent';p.sheet_name='V1';p.plotgroup=p.generate_plotgroup();p.plotgroup.update_plots(True); i = p.make_contact_sheet((10,10),(3,3,3,3),3); i.show()"
 
 class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
 
@@ -104,13 +104,26 @@ class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
         return plotgroup
 
 
+    def save_to_disk(self):
+        # need to format e.g. time like it's done elsewhere with some leading 0s
+        n = topo.sim.name
+        t = topo.sim.time()
 
-    # Almost straight from:
+        sheet = topo.sim[self.sheet_name]
+        proj = topo.sim[self.sheet_name].projections()[self.projection_name]
+
+        i = self.make_contact_sheet( self.plotgroup.proj_plotting_shape, (3,3,3,3), 3)
+
+        name = "%s.%s.%s"%(n,t,self.projection_name)
+        
+        i.save(self.filename_prefix+name+".%s"%self.file_format,self.file_format)
+
+
+
+    # Adapting from:
     # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/412982
     # 
-    # shows how to make a composite image
-    # should be easy to modify to do what we want.
-    def make_contact_sheet(self,(ncols,nrows),(photow,photoh),
+    def make_contact_sheet(self,(ncols,nrows),
                        (marl,mart,marr,marb),
                        padding):
         """\
@@ -132,44 +145,40 @@ class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
 
         returns a PIL image object.
         """
+        imgs = numpy.array([p.bitmap.image for p in self.plotgroup.plots]).reshape(nrows,ncols)
 
-        # Read in all images and resize appropriately
-        #imgs = [Image.open(fn).resize((photow,photoh)) for fn in fnames]
+        # CB: *** should do this in numpy without the conversion to list and back! ***
+        i_widths = numpy.array([i.size[0] for i in imgs.ravel()]).reshape(nrows,ncols)
+        i_heights = numpy.array([i.size[1] for i in imgs.ravel()]).reshape(nrows,ncols)
 
-        imgs = [p.bitmap.image for p in self.plotgroup.plots]
-
-
-        # **temp: resize all the same at the moment.
-        imgs = [i.resize((photow,photoh)) for i in imgs]
-
-
-        # Calculate the size of the output image, based on the
-        #  photo thumb sizes, margins, and padding
+        col_widths = i_widths.max(axis=0)
+        row_heights = i_heights.max(axis=1)
+        
         marw = marl+marr
         marh = mart+ marb
 
         padw = (ncols-1)*padding
         padh = (nrows-1)*padding
-        isize = (ncols*photow+marw+padw,nrows*photoh+marh+padh)
+
+        isize = (col_widths.sum()+marw+padw, row_heights.sum()+marh+padh)
 
         # Create the new image. The background doesn't have to be white
         white = (255,255,255)
         inew = Image.new('RGB',isize,white)
 
-        # Insert each thumb:
+        # CB: should be replaced with a more numpy technique.        
         for irow in range(nrows):
             for icol in range(ncols):
-                left = marl + icol*(photow+padding)
-                right = left + photow
-                upper = mart + irow*(photoh+padding)
-                lower = upper + photoh
-                bbox = (left,upper,right,lower)
-                try:
-                    img = imgs.pop(0)
-                except:
-                    print "doh"
-                    break
-                inew.paste(img,bbox)
+                # if different widths in a col, or different heights in a row,
+                # each image will just go at top left defined by largest in col/row
+                # (should probably be centered)
+                left = marl+col_widths[0:icol].sum()+icol*padding
+                right = left+i_widths[irow,icol]
+                upper = mart+row_heights[0:irow].sum()+irow*padding
+                lower = upper+i_heights[irow,icol] 
+                inew.paste(imgs[irow,icol],(left,upper,right,lower))
         return inew
+
+       
 
 
