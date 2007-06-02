@@ -196,6 +196,12 @@ class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
     density = Number(default=10.0)
 
     def generate_plotgroup(self):
+
+        
+        ## CEBHACKALERT: the PlotGroups should check this stuff
+        assert self.sheet_name in topo.sim.objects(), "no sheet %s"%self.sheet_name
+        assert self.projection_name in topo.sim[self.sheet_name].projections().keys(), "no proj %s for %s"%(self.projection_name,self.sheet_name)
+        
  	plotgroup = ProjectionPlotGroup([],self.pgt,self.sheet_name,
 					self.projection_name,
                                         self.density)
@@ -209,12 +215,11 @@ class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
 
         i = ImageCompositor().make_contact_sheet(imgs, (3,3,3,3), 3)
         
-        
         n = topo.sim.name
         t = topo.sim.time()
 
         sheet = topo.sim[self.sheet_name]
-        proj = topo.sim[self.sheet_name].projections()[self.projection_name]
+        proj = topo.sim[self.sheet_name].projections()[self.projection_name]                
 
         name = "%s.%s.%s"%(n,t,self.projection_name)
         
