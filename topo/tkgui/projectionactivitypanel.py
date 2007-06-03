@@ -6,6 +6,12 @@ Subclasses CFSheetPlotPanel, which is basically a PlotGroupPanel.
 
 """
 
+
+### ***** CEB yet to make things parameters, etc... *****
+
+
+
+
 import topo
 from topo.plotting.plotgroup import ProjectionActivityPlotGroup
 from topo.commands.analysis import update_projectionactivity
@@ -16,9 +22,9 @@ from projectionpanel import ProjectionRelatedPanel
 ### ProjectionPanel, and ConnectionFieldsPanel into a shared parent
 ### class.  Then those classes should probably all be in one file.
 class ProjectionActivityPanel(ProjectionRelatedPanel):
-    def __init__(self,console=None,pgt_name=None,**params):       
-        super(ProjectionActivityPanel,self).__init__(console,pgt_name,**params)
-        self.auto_refresh_var.set(True)
+    def __init__(self,console,pgt_name,master,**params):       
+        super(ProjectionActivityPanel,self).__init__(console,pgt_name,master,**params)
+        self.auto_refresh = True
 	self.plotgroup_key='ProjectionActivity'
 	self.cmdname = update_projectionactivity()
 	self.refresh()
@@ -55,11 +61,8 @@ class ProjectionActivityPanel(ProjectionRelatedPanel):
         the Plot objects.
         """
 
-	plotgroup = ProjectionActivityPlotGroup([],self.pgt,self.sheet_var.get(),
-                                              normalize=self.normalize.get(),
-                                              sheetcoords=self.sheetcoords.get(),
-                                              integerscaling=self.integerscaling.get())
-	return plotgroup
+	plotgroup = ProjectionActivityPlotGroup([],self.pgt,self.sheet_var.get())
+        return plotgroup
 
 
     def display_labels(self):

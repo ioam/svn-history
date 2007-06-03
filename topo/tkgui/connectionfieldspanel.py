@@ -10,6 +10,10 @@ $Id$
 """
 __version__='$Revision$'
 
+
+### ***** CEB yet to make things parameters, etc... *****
+
+
 import Pmw
 
 
@@ -29,7 +33,7 @@ from projectionpanel import CFRelatedPanel
 # don't make sense at the moment when things like 'situate' are clicked.
 
 class ConnectionFieldsPanel(CFRelatedPanel):
-    def __init__(self,console=None,pgt_name=None,x=0.0,y=0.0,**params):       
+    def __init__(self,console,pgt_name,master,x=0.0,y=0.0,**params):       
 
         # Receptive Fields are generally tiny.  Boost it up to make it visible.
         self.WEIGHT_PLOT_INITIAL_SIZE = 30
@@ -39,7 +43,7 @@ class ConnectionFieldsPanel(CFRelatedPanel):
         self.y_var = StringVar()
         self.y_var.set(y) 
 
-        super(ConnectionFieldsPanel,self).__init__(console,pgt_name,**params) 
+        super(ConnectionFieldsPanel,self).__init__(console,pgt_name,master,**params) 
         self._add_xy_boxes()
 	self.refresh()
 
@@ -116,11 +120,8 @@ It is an error to request a unit outside the area of the Sheet.""")
         PlotGroup is created, call its do_plot_cmd() to prepare
         the Plot objects.
         """
-	plotgroup = ConnectionFieldsPlotGroup([],self._pg_template(),self.sheet_var.get(),
-                                              float(self.x_var.get()),float(self.y_var.get()),
-                                              normalize=self.normalize.get(),
-                                              sheetcoords=self.sheetcoords.get(),
-                                              integerscaling=self.integerscaling.get())
+	plotgroup = ConnectionFieldsPlotGroup([],self.pgt,self.sheet_var.get(),
+                                              float(self.x_var.get()),float(self.y_var.get()))
 	return plotgroup
 
 

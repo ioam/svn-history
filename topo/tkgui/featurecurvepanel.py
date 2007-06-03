@@ -10,6 +10,11 @@ $Id$
 """
 __version__='$Revision$'
 
+
+### ***** CEB yet to make things parameters, etc... *****
+
+
+
 import Pmw
 import __main__
 import copy
@@ -22,7 +27,7 @@ import topo
 from inspect import getdoc
 
 from topo.plotting.templates import plotgroup_templates
-from plotgrouppanel import BasicPlotGroupPanel
+from plotgrouppanel import PlotGroupPanel
 from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import FeatureCurvePlotGroup
 from topo.base.sheet import Sheet
@@ -30,19 +35,34 @@ from topo.base.cf import CFSheet
 
 
 
-class FeatureCurvePanel(BasicPlotGroupPanel):
-    def __init__(self,console=None,pgt_name=None,**config):       
 
-        self.pgt = plotgroup_templates.get(pgt_name,None)
-	self.plotgroup_key=self.pgt.name 
-     
-	BasicPlotGroupPanel.__init__(self,console,pgt_name,**config)
+
+class FeatureCurvePanel(PlotGroupPanel):
+
+    def __init__(self,console,pgt_name,master,**params):       
+
 
         self.region = StringVar()
+
+        ###CEBHACKALERT##################################################
+        self._sim_eps = topo.sim.objects(CFSheet).values()
+	self._sim_eps.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
+        sim_ep_names = [ep.name for ep in self._sim_eps]
+
+        if len(self._sim_eps) > 0:
+            self.region.set(sim_ep_names[0])
+        #################################################################
+
 	self.x = 0
 	self.y = 0
 
-	self.plotgroup = self.generate_plotgroup()
+
+        self.pgt_name = pgt_name                 #
+        self.pgt=plotgroup_templates[pgt_name]   # CEBALERT
+        self.plotgroup_key=self.pgt.name         #
+        
+	PlotGroupPanel.__init__(self,console,pgt_name,master,**params)
+
 
         # Command used to refresh the plot, if any
         self.cmdname = StringVar()
@@ -76,8 +96,7 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
         self._add_xy_boxes()
 
           
-        self.auto_refresh.set(False)
-        self.set_auto_refresh()
+        self.auto_refresh= False
 
         if self.pgt.plot_immediately: self.refresh()
 
@@ -227,9 +246,9 @@ class FullFieldFeatureCurvePanel(FeatureCurvePanel):
     This class creates a gui window showing the reduced update command and in which updating the
     plotgroup variables from the gui calls the plotcommand rather than the full updatecommand.
     """
-    def __init__(self,console=None,pgt_name=None,**config):
+    def __init__(self,console,pgt_name,master,**config):
 
-        FeatureCurvePanel.__init__(self,console,pgt_name,**config)
+        FeatureCurvePanel.__init__(self,console,pgt_name,master,**config)
 
       
 	plot_cmdlabel = Message(self.params_frame, text="Plot command:",aspect=1000)

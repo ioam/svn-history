@@ -7,6 +7,11 @@ __version__='$Revision$'
 
 
 
+### ***** CEB yet to make things parameters, etc... *****
+
+
+
+
 
 from Tkinter import StringVar, BooleanVar, Frame, YES, LEFT, TOP, RIGHT
 from Tkinter import X, Message, Entry, Canvas, FLAT, Checkbutton, NORMAL, DISABLED
@@ -80,17 +85,24 @@ class ProjectionRelatedPanel(TemplatePlotGroupPanel):
     """
     # CB: declare abstract
 
-    def __init__(self,console,pgt_name,sheet_type=ProjectionSheet,**params):
+    def __init__(self,console,pgt_name,master,sheet_type=ProjectionSheet,**params):
+        self.sheet_type = sheet_type
         self.sheet_var = StringVar()  # CEBALERT: should go after super call when whatever stops
                                       # it working that way is cleaned up...
-        super(ProjectionRelatedPanel,self).__init__(console,pgt_name,**params)
+        sheets = topo.sim.objects(self.sheet_type).values()        
+	sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
+        self.sheet_var.set(sheets[0].name)
 
-        self.sheet_type = sheet_type
 
+        super(ProjectionRelatedPanel,self).__init__(console,pgt_name,master,**params)
 
-        self._params_frame = Frame(self)
-        self._params_frame.pack(side=LEFT,expand=YES,fill=X)
         self._add_sheet_menu() # CEBALERT: need situate button to be left of this, not right
+        # add sheet menu to list of nothistorywidgets
+
+
+
+
+
 
 
     # CEBHACKALERT: valid_context() needs to be more specific in subclasses.
@@ -118,15 +130,15 @@ class ProjectionRelatedPanel(TemplatePlotGroupPanel):
         Add a menu to self._params_frame for selecting a sheet from
         those available in the simulation.
         """
-        sheets = topo.sim.objects(self.sheet_type).values()
-        
+        sheets = topo.sim.objects(self.sheet_type).values()        
 	sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
         self.sheet_var.set(sheets[0].name)
+
 
         # The GUI label says Sheet, not e.g. CFSheet even when they're
         # CFSheets, because users probably don't need to worry about
         # the distinction.
-        self.sheet_menu = Pmw.OptionMenu(self._params_frame,
+        self.sheet_menu = Pmw.OptionMenu(self.control_frame_3,
                        command = self.refresh,
                        labelpos = 'w',
                        label_text = 'Sheet:',
@@ -137,21 +149,7 @@ class ProjectionRelatedPanel(TemplatePlotGroupPanel):
 """CFSheet whose unit(s) will be plotted.""")
 
 
-    def update_back_fwd_button(self):
-	super(ProjectionRelatedPanel,self).update_back_fwd_button()
-	if (self.history_index > 0):
-            pass
- 	    ### JCALERT: Should find a way to disable the sheet menu
-	    ### (What I tried below does not work)
-	    ### Also, disabled the text for the xy_boxes (i.e., X,Y)
-	    ## Also, when changing the menu while looking in history,
-            ### it will replaced the old current one by the new one instead of adding
-	    ### the new at the following.
-	    #self.sheet_menu.config(state=DISABLED)
-        if self.history_index >= len(self.plotgroups_history)-1:
-            pass                
-	    #self.sheet_menu.config(state=NORMAL)
-
+ 
 
 
 # CB: maybe should be a mix-in class, not inheriting from ProjectionRelatedPanel.
@@ -162,9 +160,12 @@ class CFRelatedPanel(ProjectionRelatedPanel):
     """
     # CB: declare abstract
     
-    def __init__(self,console,pgt_name,**params):
-        super(CFRelatedPanel,self).__init__(console,pgt_name,sheet_type=CFSheet,**params)
+    def __init__(self,console,pgt_name,master,**params):
+        super(CFRelatedPanel,self).__init__(console,pgt_name,master,sheet_type=CFSheet,**params)
         self._add_situate_button()
+        
+        
+        # add situate to list of nothistorywidgets
 
 
     def _add_situate_button(self):
@@ -174,7 +175,7 @@ class CFRelatedPanel(ProjectionRelatedPanel):
 	self.situate_var = BooleanVar()
         self.situate_var.trace_variable('w',lambda x,y,z: self.set_situate())
 	#self.situate_var.set(False)
-        self.situate_checkbutton = Checkbutton(self._params_frame,
+        self.situate_checkbutton = Checkbutton(self.control_frame_3,
              text="Situate",variable=self.situate_var)
         self.situate_checkbutton.pack(side=LEFT)
         self.balloon.bind(self.situate_checkbutton,
@@ -193,34 +194,33 @@ are stored.""")
             self.display_plots()
 
     
-    def restore_panel_environment(self):
-	super(CFRelatedPanel,self).restore_panel_environment()
-        if self.plotgroup.situate != self.situate_var.get():
-            self.situate_checkbutton.config(state=NORMAL)
-            self.situate_checkbutton.invoke()
-            self.situate_checkbutton.config(state=DISABLED)
-
-    def update_back_fwd_button(self):
-	super(CFRelatedPanel,self).update_back_fwd_button()
-	if (self.history_index > 0):
-            self.situate_checkbutton.config(state=DISABLED)
-        if self.history_index >= len(self.plotgroups_history)-1:
-            self.situate_checkbutton.config(state=NORMAL)
-
 
 
 class CFProjectionPanel(CFRelatedPanel):
     """
     Panel for displaying CFProjections.
     """
-    def __init__(self,console=None,pgt_name=None,**params):
+    def __init__(self,console,pgt_name,master,**params):
+
 	self.projection_var = StringVar()  # CB: these should go after super call, once
         self.projections = KeyedList()     # whatever is stopping it from working that
+        self._create_projection_dict('V1') #self.sheet_var.get())
+        # CEBHACKALERT don't know how else to beat this circle until i update this class
+        # to use parameters etc; written over by add_projection_menu() probably, anyway
 	self.density_var = StringVar()     # way is fixed.
         self.density_var.set('10.0')
-        super(CFProjectionPanel,self).__init__(console,pgt_name,**params)
 
- 
+
+        super(CFProjectionPanel,self).__init__(console,pgt_name,master,**params)
+
+        
+
+        
+
+
+        
+
+
         # self.MIN_PLOT_HEIGHT = 1
         # self.INITIAL_PLOT_HEIGHT = 6
         # self.min_master_zoom=1
@@ -237,7 +237,12 @@ class CFProjectionPanel(CFRelatedPanel):
         density_entry.pack(side=LEFT,expand=YES,fill=X,padx=2)
 
         self._add_projection_menu()
-        self.auto_refresh_var.set(False) # panels can be slow to refresh
+
+
+
+
+
+        self.auto_refresh = False # panels can be slow to refresh
         self.refresh()
         
 
@@ -308,12 +313,10 @@ class CFProjectionPanel(CFRelatedPanel):
 
 
     def generate_plotgroup(self):
- 	plotgroup = ProjectionPlotGroup([],self._pg_template(),self.sheet_var.get(),
+ 	plotgroup = ProjectionPlotGroup([],self.pgt,self.sheet_var.get(),
 					self.projection_var.get(),
-                                        float(self.density_var.get()),
-                                        normalize=self.normalize.get(),
-                                        sheetcoords=self.sheetcoords.get(),
-                                        integerscaling=self.integerscaling.get())
+                                        float(self.density_var.get()))
+
   	return plotgroup
 
 
