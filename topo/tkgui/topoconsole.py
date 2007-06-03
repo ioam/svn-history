@@ -260,8 +260,13 @@ class PlotsMenuEntry(ParameterizedObject):
 
         (event is a dummy argument to allow use in callbacks.)
         """
+        # CEBHACKALERT
         if self.class_.valid_context():
-            self.class_(console=self.console,pgt_name=self.template.name,**args)
+            t = TkguiWindow()
+ #           try:
+            self.class_(self.console,self.template.name,t,**args).pack()
+#            except:
+#                self.class_(self.console,self.template.name,**args)
             self.console.messageBar.message('state', 'OK')
 
         else:
@@ -277,6 +282,8 @@ class TopoConsole(TkguiWindow):
     def __init__(self,**config):
 
         TkguiWindow.__init__(self,**config)
+
+        self.chris=True
     
         self.auto_refresh_panels = []
         self._init_widgets()
