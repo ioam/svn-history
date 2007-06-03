@@ -327,6 +327,10 @@ class PlotGroupPanel2(TkParameterizedObject,Frame):
                                     command=self.__connection_fields_window)
         #################################################################
 
+        # CB: don't forget to include ctrl-q
+
+        
+
 
     # CB: rename/remove
     def update_plots(self):
