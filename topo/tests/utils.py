@@ -20,6 +20,12 @@ from numpy.oldnumeric import alltrue,equal,shape,ravel,around,asarray,less_equal
 # * Also see numpy.allclose()
 
 
+### CB: note to myself
+#Message: 5 Date: Mon, 07 May 2007 11:36:19 -0500 From: Robert Kern <robert.kern@gmail.com> Subject: Re: [Numpy-discussion] Should numpy.allclose return True for arrays of different shape ? To: Discussion of Numerical Python <numpy-discussion@scipy.org> Message-ID: <463F5583.7080802@gmail.com> Content-Type: text/plain; charset=UTF-8 David Cournapeau wrote:     > > Hi,     > >      > >     I wanted to know if the following behaviour is a bug or intended      > > behaviour:     > >      > > """       > > import numpy as N     > > N.allclose(N.array([[1., 1.]]), N.array([1.]))     > > """     > >      > > eg should allclose return True if arrays have different shape ?          If they are broadcastable to each other, then yes:          >>> >>> from numpy import *     >>> >>> array([[1., 1.]]) + array([1.])     array([[ 2.,  2.]])     
+###
+
+
+
 def assert_array_equal(x,y,err_msg=''):
     """
     Test equality of two arrays.
