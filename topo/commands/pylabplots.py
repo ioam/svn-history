@@ -137,7 +137,6 @@ def gradientplot(data,title=None):
     matrixplot((cos(dx*2*pi)+cos(dy*2*pi)),title=title)
     
 
-
 def activityplot(sheet,activity=None,title=None,cmap=pylab.cm.Greys):    
     """
     Plots the activity in a sheet.
@@ -218,6 +217,7 @@ def tuning_curve_data(sheet, x_axis, curve_label, i_value, j_value):
     y_values=[sheet.curve_dict[x_axis][curve_label][key].view()[0][i_value,j_value] for key in x_values]
     return x_values, y_values
 
+
 def or_tuning_curve(x_axis,plot_type,unit):
     """
     Plots a tuning curve for orientation which rotates the curve 
@@ -285,6 +285,7 @@ def or_tuning_curve(x_axis,plot_type,unit):
     pylab.show._needmain = False 
     pylab.show()
 
+
 def tuning_curve(x_axis,plot_type,unit):
     """
     Plots a tuning curve for the appropriate feature type, such as orientation, contrast or size.
@@ -332,6 +333,7 @@ def plot_cfproj_mapping(dest,proj='Afferent',style='b-'):
         dest = sim[dest]
     plot_coord_mapping(dest.projections()[proj].coord_mapper,
                        dest,style=style)
+
 
 def plot_coord_mapping(mapper,sheet,style='b-'):
     """
