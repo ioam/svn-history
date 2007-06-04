@@ -233,11 +233,12 @@ class FeatureResponses(ParameterizedObject):
         restore_input_generators()
 
 
+
 grid=[]
 
 class ReverseCorrelation(ParameterizedObject):
     """
-    Figures out the recptive fields for all V1 neurons by using reverse correlation
+    Calculate the receptive fields for all neurons using reverse correlation.
     """
     
     def measure_responses(self,pattern_presenter,param_dict,features,display):
