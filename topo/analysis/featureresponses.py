@@ -234,6 +234,20 @@ class FeatureResponses(ParameterizedObject):
 
 
 
+### JABALERT: This class needs significant cleanup:
+### 1. The timing code should be moved out of here and the other places it appears
+### 
+### 2. This class should calculate RFs for all units in all sheets for which
+###    measure_maps is true, rather than being hardcoded to "V1"
+###
+### 3. This class should have some sort of parameter for specifying the name
+###    of the input region, rather than being hardcoded to "Retina"
+###
+### 4. The plotting code at the end should mostly be eliminated, and replaced
+###    with a separate command (called from the 'Receptive Fields*' pgts in
+###    topo/commands/analysis.py instead of from here), sharing the implementation
+###    of topographic_grid (because that's what is intended to be visualized here).
+
 grid=[]
 
 class ReverseCorrelation(ParameterizedObject):
@@ -244,8 +258,8 @@ class ReverseCorrelation(ParameterizedObject):
     def measure_responses(self,pattern_presenter,param_dict,features,display):
         """Present the given input patterns and collate the responses."""
          
-        #ALERT: GRID SHOULD BE A MATRIX OF 2D MATRICES
-        #ALERT: IF THERE IS NO SHEET WITH NAME 'V1' THIS WILL FALLOVER
+        # JABALERT: The grid data structure should be a matrix of 2D matrices,
+        # not a nested list.
         global grid
         rows, cols = topo.sim["V1"].activity.shape
         for iiii in range(rows):
@@ -322,30 +336,18 @@ class ReverseCorrelation(ParameterizedObject):
                 else:
                     self.warning("No GUI available for display.")
 
-            #ALERT: NO NEED FOR GLOBAL CALLS - INSTEAD OF TOPO.SIM, ITERATE THROUGH ALL SHEETS...
-            #ALERT: HOWEVER, HOW WILL WE FIGURE OUT WHICH ONE IS THE RETINA? USER SPECIFY...?
-#            master=master+topo.sim["V1 4Ca"].activity[1,1]*(topo.sim["Retina"].activity) #24,24
-
             for ii in range(rows): 
                 for jj in range(cols):
                     grid[ii][jj]=grid[ii][jj]+topo.sim["V1"].activity[ii,jj]*(topo.sim["Retina"].activity)
   
-########
-######## TO VIEW A RECEPTIVE FIELD, TYPE IN THE COMMAND LINE:
-######## matrixplot(topo.analysis.featureresponses.grid[x][y])
-######## 
-
             topo.sim.state_pop()
 
         restore_input_generators()
 
-###############***************####################
-#THIS SECTION PRODUCES A POSITION PREFERENCE MAP #
-#USING THE ABSOLUTE CENTROID OF THE RECEPTIVE    #
-#FIELDS. IT WOULD BE GOOD TO PROPERLY INTEGRATE  #
-#THIS AND HAVE IT PRODUCE THE MAP WITH THE GRID  #
-#DRAWING METHOD..................................#
-#                                                #
+        ### JABALERT: The remaining code should move into a separate command in
+        ### topo/commands/pylabplots.py, and it should be changed to
+        ### use the code from topographic_grid (because that's what
+        ### is intended to be visualized here).
         import matplotlib
         matplotlib.use('TkAgg')
         import pylab
@@ -356,6 +358,8 @@ class ReverseCorrelation(ParameterizedObject):
         yy=[]  
         for iii in range(rows): 
             for jjj in range(cols):
+                # The abs() ensures the centroid is taken over both 
+                # positive and negative correlations
                 xxx,yyy = centroid(fabs(grid[iii][jjj]))
                 xx.append(xxx)
                 yy.append(yyy)
@@ -363,7 +367,6 @@ class ReverseCorrelation(ParameterizedObject):
         pylab.scatter(xx,yy)
         pylab.show._needmain = False
         pylab.show()
-#################**************###################
 
 
                           
