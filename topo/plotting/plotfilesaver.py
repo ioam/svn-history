@@ -83,8 +83,9 @@ class TemplatePlotGroupSaver(PlotGroupSaver):
 
     def __init__(self,pgt_name,**params):
         self.pgt = plotgroup_templates.get(pgt_name,None)
+        if not self.pgt:
+            raise(ValueError("No PlotGroupTemplate named %s found" % pgt_name))
         super(TemplatePlotGroupSaver,self).__init__(pgt_name,**params)
-
 
     def generate_plotgroup(self):
 	plotgroup = TemplatePlotGroup([],self.pgt,None)
