@@ -9,13 +9,17 @@ __version__='$Revision$'
 import time
 from math import fmod,floor
 
+import matplotlib
+matplotlib.use('TkAgg')
+import pylab
+from numpy import fabs
 
-from numpy.oldnumeric import zeros, Float
+from numpy.oldnumeric import zeros, Float, fabs
 from numpy.oldnumeric import array
 
 import topo
 import topo.base.sheetcoords
-
+from topo.base.arrayutils import centroid
 from topo.base.sheet import Sheet, activity_type
 from topo.base.sheetview import SheetView
 from topo.base.parameterizedobject import ParameterizedObject
@@ -26,6 +30,9 @@ from topo.misc.distribution import Distribution
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.cf import CFSheet
 
+from topo.commands.pylabplots import matrixplot
+
+grid=[]
 
 class DistributionMatrix(ParameterizedObject):
     """
@@ -202,7 +209,7 @@ class FeatureResponses(ParameterizedObject):
                 length-=1
  #       topo.sim.run(step)
             percent = 100.0*i/iters
-
+#            print percent,i
             estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
 
             # CEBALERT: when there are multiple sheets, this can make it seem
@@ -235,8 +242,131 @@ class FeatureResponses(ParameterizedObject):
 
         restore_input_generators()
 
+class ReverseCorrelation(ParameterizedObject):
+    """
+    Figures out the recptive fields for all V1 neurons by using reverse correlation
+    """
+    
+    def measure_responses(self,pattern_presenter,param_dict,features,display):
+        """Present the given input patterns and collate the responses."""
+         
+        #ALERT: GRID SHOULD BE A MATRIX OF 2D MATRICES
+        #ALERT: IF THERE IS NO SHEET WITH NAME 'V1' THIS WILL FALLOVER
+        global grid
+        rows, cols = topo.sim["V1"].activity.shape
+        for iiii in range(rows):
+            row = []        
+            for jjjj in range(cols):
+                row.append(0*topo.sim["Retina"].activity)
+            grid.append(row)
+
+     
+        save_input_generators()
+
+        feature_names=[f.name for f in features]
+        values_lists=[f.values for f in features]
+        permutations = cross_product(values_lists)
+
+        ### JABHACKALERT: This timer code should be moved to its own object;
+        ### it is much too difficult to follow here (and in tkgui/topoconsole.py).
+################## timer part 1        
+        
+        i=0
+        fduration = len(permutations)
+        step   = 1.0
+        iters  = int(floor(fduration/step))
+        remain = fmod(fduration, step)
+        starttime=time.time()
+        recenttimes=[]
+
+        # Temporary:
+ #       self.parent.title(topo.sim.name) ## this changes the title bar to more useful
+
+        ## Duration of most recent times from which to estimate remaining time
+        estimate_interval=50.0        
+
+#################### end of timer part 1    
+    
+        for p in permutations:
+            topo.sim.state_push()
+
+            # Present input patterns
+            settings = dict(zip(feature_names, p))
+            pattern_presenter(settings,param_dict)
+                                        
+  ##################### timer part 2
+
+      #  for i in xrange(iters):
+            i=i+1
+            recenttimes.append(time.time())
+            length = len(recenttimes)
+
+            if (length>50):
+                recenttimes.pop(0)
+                length-=1
+ #       topo.sim.run(step)
+            percent = 100.0*i/iters
+#            print percent,i
+            estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
+            # CEBALERT: when there are multiple sheets, this can make it seem
+            # like topographica's stuck in a loop (because the counter goes
+            # to 100% lots of times...e.g. hierarchical's orientation tuning fullfield.
+            message = 'Time ' + str(topo.sim.time()) + ': ' + \
+                      str(int(percent)) + '% of '  + str(fduration) + ' patterns completed ' + \
+                      ('(%02d' % int(estimate/60))+':' + \
+                      ('%02d' % int(estimate%60))+ ' remaining).'
+                      
+            if hasattr(topo,'guimain'):
+                topo.guimain.messageBar.message('state', message)
+                topo.guimain.update()
+            
+######################### end of timer              
+
+            if display:
+                if hasattr(topo,'guimain'):
+                    topo.guimain.refresh_activity_windows()
+                else:
+                    self.warning("No GUI available for display.")
+
+            #ALERT: NO NEED FOR GLOBAL CALLS - INSTEAD OF TOPO.SIM, ITERATE THROUGH ALL SHEETS...
+            #ALERT: HOWEVER, HOW WILL WE FIGURE OUT WHICH ONE IS THE RETINA? USER SPECIFY...?
+#            master=master+topo.sim["V1 4Ca"].activity[1,1]*(topo.sim["Retina"].activity) #24,24
+
+            for ii in range(rows): 
+                for jj in range(cols):
+                    grid[ii][jj]=grid[ii][jj]+topo.sim["V1"].activity[ii,jj]*(topo.sim["Retina"].activity)
+  
+########
+######## TO VIEW A RECEPTIVE FIELD, TYPE IN THE COMMAND LINE:
+######## matrixplot(topo.analysis.featureresponses.grid[x][y])
+######## 
+
+            topo.sim.state_pop()
+
+        restore_input_generators()
+
+###############***************####################
+#THIS SECTION PRODUCES A POSITION PREFERENCE MAP #
+#USING THE ABSOLUTE CENTROID OF THE RECEPTIVE    #
+#FIELDS. IT WOULD BE GOOD TO PROPERLY INTEGRATE  #
+#THIS AND HAVE IT PRODUCE THE MAP WITH THE GRID  #
+#DRAWING METHOD..................................#
+#                                                #
+        xx=[]
+        yy=[]  
+        for iii in range(rows): 
+            for jjj in range(cols):
+                xxx,yyy = centroid(fabs(grid[iii][jjj]))
+                xx.append(xxx)
+                yy.append(yyy)
+    
+        pylab.scatter(xx,yy)
+        pylab.show._needmain = False
+        pylab.show()
+#################**************###################
 
 
+                          
 class FeatureMaps(FeatureResponses):
     """
     Measures and collects the responses to a set of features for calculating feature maps.
@@ -280,6 +410,9 @@ class FeatureMaps(FeatureResponses):
         """
 	self.measure_responses(pattern_presenter,param_dict,self.features,display)    
 	
+########vvvvvvvvvvv
+#        matrixplot(topo.sim["V1"].sheet_view_dict["OrientationPreference"].view()[0])
+########vvvvvvvvvvv
         for sheet in self.sheets_to_measure():
             bounding_box = sheet.bounds
             
@@ -300,7 +433,6 @@ class FeatureMaps(FeatureResponses):
                     preference_map = SheetView(((self._featureresponses[sheet][feature].weighted_average())/norm_factor,
                                                 bounding_box), sheet.name, sheet.precedence, topo.sim.time())
                 else:
-
                     preference_map = SheetView(((self._featureresponses[sheet][feature].max_value_bin())/norm_factor,
                                                 bounding_box), sheet.name, sheet.precedence, topo.sim.time())
                 sheet.sheet_view_dict[feature.capitalize()+'Preference']=preference_map
