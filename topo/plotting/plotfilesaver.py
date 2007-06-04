@@ -61,6 +61,15 @@ class PlotGroupSaver(ParameterizedObject):
 	return PlotGroup([])
 
 
+    def strip(self,filename):
+        """Strip inappropriate characters from a filename."""
+        return filename\
+            .replace('\n','_')\
+            .replace('\t','_')\
+            .replace(' ','_')\
+            .replace('&','And')
+
+
     def filename(self,label):
         """Calculate a specific filename from the filename_format."""
         
@@ -70,12 +79,12 @@ class PlotGroupSaver(ParameterizedObject):
         vars = dict(self.get_param_values())
         vars.update(self.__dict__)
         
-        return self.filename_format % vars
- 
+        return self.strip(self.filename_format % vars)
+
 
     def save_to_disk(self):
          for p,l in zip(self.plotgroup.plots,self.plotgroup.labels):
-            p.bitmap.image.save(self.filename(l.replace('\n','_')))
+            p.bitmap.image.save(self.filename(l))
 
 
 
