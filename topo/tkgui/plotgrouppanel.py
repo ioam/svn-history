@@ -742,4 +742,4 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             h = min(self.plot_frame.winfo_reqheight()+20,self.winfo_screenheight()-250)
             
             self.__scroll_frame.set_size(w,h)
-            
+
