@@ -5,8 +5,11 @@ $Id$
 """
 __version__='$Revision$'
 
+import pylab
+from numpy import fabs
+from topo.base.arrayutils import centroid
 
-from numpy.oldnumeric import array, zeros, Float,size, shape
+from numpy.oldnumeric import array, zeros, Float,size, shape, fabs
 from math import pi
 from copy import deepcopy
 
@@ -25,8 +28,12 @@ from topo.patterns.basic import SineGrating, Gaussian
 from topo.patterns.teststimuli import SineGratingDisk
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.parameterclasses import Parameter
-from topo.analysis.featureresponses import FeatureMaps, FeatureCurves
+from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.templates import new_pgt
+
+from topo.patterns.random import GaussianRandom
+
+from topo.commands.pylabplots import matrixplot
 
 class Feature(object):
     """
@@ -317,7 +324,6 @@ pgt.add_plot('Y Preference',[('Strength','YPreference')])
 pgt.add_plot('Position Preference',[('Red','XPreference'),
                                     ('Green','YPreference')])
 
-
 def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
                           pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),False,0.175),
                           x_range=(-0.5,0.5),y_range=(-0.5,0.5),weighted_average=True):
@@ -331,19 +337,95 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
     size, scale, offset, and pattern_presenter arguments.
     """
 
+
     if divisions <= 0:
         raise ValueError("divisions must be greater than 0")
 
     else:
         # JABALERT: Will probably need some work to support multiple input regions
         feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
-                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]          
+                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]   
+                          
+                                      
+                              
                           
         param_dict = {"size":size,"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
        
 
+###############################################################################
+pgt= new_pgt(name='Receptive Fields',category="Preference Maps",
+             doc='Measure receptive fields.',
+             command='measure_rfs()',
+                          normalize=True)
+
+def measure_rfs(divisions=53,resolution=100,
+                num_phase=1,num_orientation=1,scale=0.5,offset=0.5,display=True,
+                size=0.041666666666666,
+                pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),True,duration=1.0),
+                x_range=(-1.125,1.125),y_range=(-1.125,1.125),weighted_average=False):
+    """
+    Measure receptive fields presenting small Gaussian at all pixel locations
+    """
+    resolution = 100 # percentage, 100 is max, 0 is min
+    a,b,c,d = topo.sim["Retina"].nominal_bounds.lbrt()
+    density=resolution*topo.sim["Retina"].nominal_density/100
+    divisions = density*(c-a)-1
+    size = 1/(density)
+    x_range=(c,a)
+    y_range=(d,b)
+    
+    
+    if divisions <= 0 or num_phase <= 0 or num_orientation <= 0:
+        raise ValueError("divisions must be greater than 0 and num_phase and num_orientation must be greater than 0")
+
+    else:
+        # JABALERT: Will probably need some work to support multiple input regions
+#        step_phase=2*pi/num_phase
+#        step_orientation=pi/num_orientation
+        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
+                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
+                          Feature(name="scale",range=(-0.5,0.5),step=1.0)]   
+                                                                                        
+                          
+        param_dict = {"size":size,"scale":scale,"offset":offset}
+
+        x=ReverseCorrelation(feature_values) #+change argument
+        x.measure_responses(pattern_presenter,param_dict,feature_values,display)
+     
+
+###############################################################################
+pgt= new_pgt(name='Receptive Fields noise',category="Preference Maps",
+             doc='Measure receptive fields noisy.',
+             command='measure_rfs_noise()',
+                          normalize=True)
+                        
+                                    
+def measure_rfs_noise(divisions=99,num_phase=1,num_orientation=1,size=0.02,scale=0.5,offset=0.5,display=True,
+                          pattern_presenter=PatternPresenter(GaussianRandom(scale=0.5,offset=0.5),True,duration=1.0),
+                          x_range=(-1.0,1.0),y_range=(-1.0,1.0),weighted_average=False):
+    """
+    Measure receptive fields suning Guassian white noise
+    """
+
+
+    if divisions <= 0 or num_phase <= 0 or num_orientation <= 0:
+        raise ValueError("divisions must be greater than 0 and num_phase and num_orientation must be greater than 0")
+
+    else:
+        # JABALERT: Will probably need some work to support multiple input regions
+        step_phase=2*pi/num_phase
+        step_orientation=pi/num_orientation
+        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
+                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]   
+                                                                                        
+                          
+        param_dict = {"size":size,"scale":scale,"offset":offset}
+
+        x=ReverseCorrelation(feature_values) #+change argument
+        x.measure_responses(pattern_presenter,param_dict,feature_values,display)
+    
 
 ###############################################################################
 pgt= new_pgt(name='Center of Gravity',category="Preference Maps",
@@ -353,6 +435,7 @@ pgt= new_pgt(name='Center of Gravity',category="Preference Maps",
 pgt.add_plot('X CoG',[('Strength','XCoG')])
 pgt.add_plot('Y CoG',[('Strength','YCoG')])
 pgt.add_plot('CoG',[('Red','XCoG'),('Green','YCoG')])
+
 
 
 def measure_cog(proj_name ="Afferent"):    
@@ -403,7 +486,6 @@ def measure_cog(proj_name ="Afferent"):
 ###############################################################################
 ###############################################################################
 
-
 ###############################################################################
 pgt= new_pgt(name='Orientation Preference',category="Preference Maps",
              doc='Measure preference for sine grating orientation.',
@@ -451,13 +533,13 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
-
 ###############################################################################
 pgt= new_pgt(name='Ocular Preference',category="Preference Maps",
              doc='Measure preference for sine gratings between two eyes.',
              command='measure_od_pref()')
 pgt.add_plot('Ocular Preference',[('Strength','OcularPreference')])
 pgt.add_plot('Ocular Selectivity',[('Strength','OcularSelectivity')])
+
 
 
 ### JABALERT: Shouldn't there be a num_ocularities argument as well, to
@@ -507,7 +589,7 @@ pgt.add_plot('Spatial Frequency Selectivity',[('Strength','FrequencySelectivity'
 
 
 def measure_sf_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=False,weighted_average=True,
+                    scale=0.3,offset=0.0,display=True,weighted_average=False,
                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
 
     """
