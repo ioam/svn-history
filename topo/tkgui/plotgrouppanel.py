@@ -378,7 +378,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         if 'plot' in self._right_click_info:
             plot = self._right_click_info['plot']
             x,y =  self._right_click_info['coords'][0]
-            matrixplot(topo.analysis.featureresponses.grid[x][y],title=("receptive field",x,y))
+            matrixplot(topo.analysis.featureresponses.grid[x][y],title=("Receptive Field",x,y))
 
     def __process_canvas_event(self,event,func):
         """
