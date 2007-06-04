@@ -247,7 +247,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         
         if bwidget_imported:
             # max window size (works on all platforms? os x?)
-            self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
+            self.master.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
             self.__scroll_frame = ResizableScrollableFrame(self.plot_group_title.interior())
             self.__scroll_frame.pack()
             self.plot_frame = self.__scroll_frame.contents
@@ -730,7 +730,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
     # CB: rename, document, and if possible delay showing the window until all the jiggling is over
     def sizeright(self):
         if bwidget_imported:
-            self.geometry('') # if user has changed window size, need to tell tkinter that it should take
+            self.master.geometry('') # if user has changed window size, need to tell tkinter that it should take
                               # control again.
             self.update_idletasks()
         
