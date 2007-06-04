@@ -377,7 +377,7 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
 pgt= new_pgt(name='Receptive Fields',category="Other",
              doc='Measure receptive fields.', command='measure_rfs()', normalize=True)
 
-def measure_rfs(divisions=53,resolution=100,offset=0.5,display=True,
+def measure_rfs(divisions=53,resolution=100,offset=0.5,display=False,
                 size=0.041666666666666,
                 pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),True,duration=1.0),
                 x_range=(-1.125,1.125),y_range=(-1.125,1.125),weighted_average=False):
@@ -414,7 +414,7 @@ pgt= new_pgt(name='Receptive Fields noise',category="Other",
                         
 
 ### JABALERT: Why is the scale and offset set twice?                                    
-def measure_rfs_noise(divisions=99,scale=0.5,offset=0.5,display=True,
+def measure_rfs_noise(divisions=99,scale=0.5,offset=0.5,display=False,
                       pattern_presenter=PatternPresenter(GaussianRandom(scale=0.5,offset=0.5),True,duration=1.0),
                       x_range=(-1.0,1.0),y_range=(-1.0,1.0)):
     """Map receptive field on a GeneratorSheet using Gaussian noise inputs."""
