@@ -9,17 +9,11 @@ __version__='$Revision$'
 import time
 from math import fmod,floor
 
-import matplotlib
-matplotlib.use('TkAgg')
-import pylab
-from numpy import fabs
-
-from numpy.oldnumeric import zeros, Float, fabs
-from numpy.oldnumeric import array
+from numpy import zeros, array
+from numpy.oldnumeric import Float
 
 import topo
 import topo.base.sheetcoords
-from topo.base.arrayutils import centroid
 from topo.base.sheet import Sheet, activity_type
 from topo.base.sheetview import SheetView
 from topo.base.parameterizedobject import ParameterizedObject
@@ -29,10 +23,6 @@ from topo.commands.basic import restore_input_generators, save_input_generators
 from topo.misc.distribution import Distribution
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.cf import CFSheet
-
-from topo.commands.pylabplots import matrixplot
-
-grid=[]
 
 class DistributionMatrix(ParameterizedObject):
     """
@@ -209,7 +199,7 @@ class FeatureResponses(ParameterizedObject):
                 length-=1
  #       topo.sim.run(step)
             percent = 100.0*i/iters
-#            print percent,i
+
             estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
 
             # CEBALERT: when there are multiple sheets, this can make it seem
@@ -241,6 +231,9 @@ class FeatureResponses(ParameterizedObject):
             topo.sim.state_pop()
 
         restore_input_generators()
+
+
+grid=[]
 
 class ReverseCorrelation(ParameterizedObject):
     """
@@ -352,6 +345,12 @@ class ReverseCorrelation(ParameterizedObject):
 #THIS AND HAVE IT PRODUCE THE MAP WITH THE GRID  #
 #DRAWING METHOD..................................#
 #                                                #
+        import matplotlib
+        matplotlib.use('TkAgg')
+        import pylab
+        from numpy import fabs
+        from topo.base.arrayutils import centroid
+
         xx=[]
         yy=[]  
         for iii in range(rows): 
@@ -410,9 +409,6 @@ class FeatureMaps(FeatureResponses):
         """
 	self.measure_responses(pattern_presenter,param_dict,self.features,display)    
 	
-########vvvvvvvvvvv
-#        matrixplot(topo.sim["V1"].sheet_view_dict["OrientationPreference"].view()[0])
-########vvvvvvvvvvv
         for sheet in self.sheets_to_measure():
             bounding_box = sheet.bounds
             
