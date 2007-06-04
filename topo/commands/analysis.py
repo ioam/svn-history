@@ -589,7 +589,7 @@ pgt.add_plot('Spatial Frequency Selectivity',[('Strength','FrequencySelectivity'
 
 
 def measure_sf_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=True,weighted_average=False,
+                    scale=0.3,offset=0.0,display=False,weighted_average=True,
                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
 
     """
