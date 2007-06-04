@@ -8,6 +8,8 @@ $Id$
 """
 __version__='$Revision$'
 
+from topo.commands.pylabplots import matrixplot
+
 import copy
 
 from inspect import getdoc
@@ -325,6 +327,11 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         
         self._unit_menu.add_command(label='Connection Fields',indexname='connection_fields',
                                     command=self.__connection_fields_window)
+                                    
+        self._unit_menu.add_command(label='Receptive Field',indexname='receptive_field',
+                                    command=self.__receptive_field_window)                             
+                                    
+                                    
         #################################################################
 
         # CB: don't forget to include ctrl-q
@@ -366,7 +373,12 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             x,y =  self._right_click_info['coords'][1]
             # CEBHACKALERT: should avoid requesting cf out of range.
             self.console.plots_menu_entries["Connection Fields"].command(x=x,y=y)
-
+            
+    def __receptive_field_window(self):
+        if 'plot' in self._right_click_info:
+            plot = self._right_click_info['plot']
+            x,y =  self._right_click_info['coords'][0]
+            matrixplot(topo.analysis.featureresponses.grid[x][y],title=("receptive field",x,y))
 
     def __process_canvas_event(self,event,func):
         """
@@ -731,5 +743,3 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             
             self.__scroll_frame.set_size(w,h)
             
-
-
