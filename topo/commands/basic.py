@@ -25,7 +25,6 @@ from topo.base.functionfamilies import OutputFn
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 from topo.base.projection import ProjectionSheet
-from topo.plotting.plotfilesaver import plotsaving_classes
 from topo.sheets.generatorsheet import GeneratorSheet
 
 def save_input_generators():
@@ -219,21 +218,3 @@ def save_script_repr(script_name):
     
     script_file = open(script_name,'w')
     script_file.write(script)
-
-
-def save_plotgroup(name,**params):
-    """
-    Convenience command for saving a set of plots to disk.  Examples:
-
-      save_plotgroup("Activity")
-      save_plotgroup("Orientation Preference")
-      save_plotgroup("Projection",projection_name='Afferent',sheet_name='V1')
-
-    Some plotgroups accept optional parameters, which can be passed
-    like projection_name and sheet_name above.
-    """
-    p_class = plotsaving_classes.get(name,plotsaving_classes[None])
-    p = p_class(name,**params)
-    p.plotgroup=p.generate_plotgroup()
-    p.plotgroup.update_plots(True)
-    p.save_to_disk()

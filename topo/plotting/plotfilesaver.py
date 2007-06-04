@@ -1,7 +1,7 @@
 """
 File saving routines for plots.
 
-Typically called using save_plotgroup in commands/basic.py, but these
+Typically called using save_plotgroup in commands/analysis.py, but these
 objects can also be instantiated explicitly, to save a series of plots.
 
 $Id$
