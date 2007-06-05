@@ -54,15 +54,16 @@ DEFAULT_PRESENTATION = '1.0'
 
 
 class TestPattern(plotgrouppanel.PlotGroupPanel):
-    def __init__(self,console=None,padding=2,**params):
+    def __init__(self,console,master,padding=2,**params):
 
-	super(TestPattern,self).__init__(console,'Preview',**params)
+	super(TestPattern,self).__init__(console,'Preview',master,**params)
 
         self.title("Test Pattern") # CB: gets written over by something else, anyway...
         
         self.INITIAL_PLOT_HEIGHT = 100
         self.padding = padding
-	self.auto_refresh_var.set(True)
+        self.auto_refresh=True
+
         
         ### Find the GeneratorSheets in the simulation, set up generator_sheet_patterns dictionary
         # CEBALERT: this has a difficult structure to work with.
@@ -210,6 +211,7 @@ Each type will have various parameters that can be changed.""")
 
         Also call the parent class refresh.
         """
+        self.update_plotgroup_variables()
         self.__setup_pattern_generators()
         super(TestPattern,self).refresh()
 
@@ -228,7 +230,7 @@ Each type will have various parameters that can be changed.""")
         if not self.generator_sheets_patterns[button_name]['editing']:
             self.generator_sheets_patterns[button_name]['pattern_generator'] = copy.copy(self.__current_pattern_generator)
         else:
-            if self.auto_refresh_var.get():
+            if self.auto_refresh:
                 self.__setup_pattern_generators()
                 self.refresh()
         
@@ -242,7 +244,7 @@ Each type will have various parameters that can be changed.""")
         """
         self.__current_pattern_generator = self.pattern_generators[pattern_generator_name]()
         self.__params_frame.create_widgets(self.__current_pattern_generator)
-        if self.auto_refresh_var.get(): 
+        if self.auto_refresh: 
 	    self.refresh()
 
 
@@ -293,7 +295,7 @@ Each type will have various parameters that can be changed.""")
         self.present_length.setvalue(DEFAULT_PRESENTATION)
         self.learning_button.deselect()
         self.pg_choice_box.invoke(self.__default_pattern_generator_name)
-        if self.auto_refresh_var.get(): self.refresh()
+        if self.auto_refresh: self.refresh()
 
 
     ### JCALERT! This has to be re-implemented for testpattern, it has to be done in a better way:
@@ -320,11 +322,8 @@ Each type will have various parameters that can be changed.""")
 	    view_dict[each] = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each)
 	    channels = {'Strength':each,'Hue':None,'Confidence':None}
 	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
-	    plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize.get(),name=''))
-	new_plotgroup = topo.plotting.plotgroup.PlotGroup(plot_list,
-                                                          normalize=self.normalize.get(),
-                                                          sheetcoords=self.sheetcoords.get(),
-                                                          integerscaling=self.integerscaling.get())
+	    plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
+	new_plotgroup = topo.plotting.plotgroup.PlotGroup(plot_list)
 	new_plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot
 	new_plotgroup.initial_plot = self.plotgroup.initial_plot
 	new_plotgroup.sheetcoords = self.plotgroup.sheetcoords
@@ -339,14 +338,14 @@ Each type will have various parameters that can be changed.""")
     ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
     def set_normalize(self):
         """Function called by Widget when check-box clicked"""
-	self.plotgroup.normalize = self.normalize.get()
+	#self.plotgroup.normalize = self.normalize.get()
 	self.plotgroup.update_plots(False)
 	self.refresh()
 
     ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
     def set_sheetcoords(self):
         """Function called by Widget when check-box clicked"""
-	self.plotgroup.sheetcoords = self.sheetcoords.get()
+	#self.plotgroup.sheetcoords = self.sheetcoords.get()
 	self.plotgroup.update_plots(False)
 	self.display_plots()
 	self.refresh()
@@ -354,7 +353,7 @@ Each type will have various parameters that can be changed.""")
     ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
     def set_integerscaling(self):
         """Function called by Widget when check-box clicked"""
-        if self.integerscaling.get():
+        if self.integerscaling:#.get():
             self.plotgroup.sizeconvertfn = int
         else:
             self.plotgroup.sizeconvertfn = identity
@@ -374,7 +373,7 @@ Each type will have various parameters that can be changed.""")
         self.__params_frame.set_parameters()
 
         disparity_flip=1
-        
+
         for (gs_name,o_s_p) in self.generator_sheets_patterns.items():
             if o_s_p['editing']==True:
                 
