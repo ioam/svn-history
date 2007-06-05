@@ -591,7 +591,7 @@ class TopoConsole(TkguiWindow):
         Used primarily for debugging long scripts that present a lot of activity patterns.
         """
         for win in self.auto_refresh_panels:
-            if win.plotgroup_key=='Activity' or win.plotgroup_key=='ProjectionActivity' :
+            if win.plotgroup_label=='Activity' or win.plotgroup_label=='ProjectionActivity' :
                 win.refresh()
                 self.update_idletasks()
 
@@ -615,7 +615,8 @@ class TopoConsole(TkguiWindow):
         Test Pattern Window.  
         """
         if TestPattern.valid_context():
-            TestPattern(self)
+            t = TkguiWindow()
+            TestPattern(self,t).pack()
             self.messageBar.message('state', 'OK')
         else:
             self.messageBar.message('state',
