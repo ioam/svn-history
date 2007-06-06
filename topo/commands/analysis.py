@@ -377,12 +377,11 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
 pgt= new_pgt(name='Receptive Fields',category="Other",
              doc='Measure receptive fields.', command='measure_rfs()', normalize=True)
 
-def measure_rfs(divisions=53,resolution=100,offset=0.5,display=False,
-                size=0.041666666666666,
-                pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),True,duration=1.0),
-                x_range=(-1.125,1.125),y_range=(-1.125,1.125),weighted_average=False):
+def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=True,
+                pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),True,duration=1.0),             x_range=(-0.2,0.2),y_range=(-0.2,0.2),weighted_average=False):
     """Map receptive field on a GeneratorSheet by reverse correlation using small Gaussian inputs."""
-
+  # ALERT: THIS CRAZILY HIGH VALUE IS NECCESSARY FOR THE CURRENT LISSOM_OO_OR.TY 
+  # NORMALLY A VALUE AROUND 0.5 TO 3.0 SEEMS OK....
     # Presents the pattern at each pixel location
     resolution = 100 # percentage, 100 is max, 0 is min
     a,b,c,d = topo.sim["Retina"].nominal_bounds.lbrt()
@@ -392,16 +391,17 @@ def measure_rfs(divisions=53,resolution=100,offset=0.5,display=False,
     x_range=(c,a)
     y_range=(d,b)
     
+    
     if divisions <= 0:
         raise ValueError("Divisions must be greater than 0")
 
     else:
         feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
                           Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
-                          Feature(name="scale",range=(-0.5,0.5),step=1.0)]   
+                          Feature(name="scale",range=(-scale,scale),step=scale*2)]   
                                                                                         
                           
-        param_dict = {"size":size,"offset":offset}
+        param_dict = {"size":size,"scale":scale,"offset":offset}
 
         x=ReverseCorrelation(feature_values) #+change argument
         x.measure_responses(pattern_presenter,param_dict,feature_values,display)
