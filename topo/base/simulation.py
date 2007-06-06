@@ -371,10 +371,31 @@ class EPConnection(ParameterizedObject):
     EPConnection stores basic information for a connection between
     two EventProcessors.
     """
-    src = EventProcessorParameter(default=None,constant=True,precedence=0.10,doc=
+
+## JPALERT: This type-checking is redundant, since
+##     Simulation.connect() only allows the user to create connections
+##     between existing simulation objects, which must be EPs.  Type
+##     checking here means that it is impossible to ever instantiate
+##     an EPConnection in any situation (including debugging) w/o
+##     making src and dest be EPs.  However, there is nothing I can
+##     find that requires that the src or dest be EPs.  While some
+##     *subclasses* of EPConnection (such as Projection) do require
+##     that their src and dest support the interfaces of some
+##     *subclasses* of EventProcessor (e.g. Sheet.activity), there is
+##     no reason that those objects have to be EPs, per se.  IMO,
+##     excessive type checking removes much of the power of using a
+##     dynamic language like Python.
+    
+##     src = EventProcessorParameter(default=None,constant=True,precedence=0.10,doc=
+##        """The EventProcessor from which messages originate.""")
+    
+##     dest = EventProcessorParameter(default=None,constant=True,precedence=0.11,doc=
+##        """The EventProcessor to which messages are delivered.""")
+
+    src = Parameter(default=None,constant=True,precedence=0.10,doc=
        """The EventProcessor from which messages originate.""")
     
-    dest = EventProcessorParameter(default=None,constant=True,precedence=0.11,doc=
+    dest = Parameter(default=None,constant=True,precedence=0.11,doc=
        """The EventProcessor to which messages are delivered.""")
     
     src_port = Parameter(default=None,precedence=0.20,doc=
@@ -970,10 +991,10 @@ class Simulation(ParameterizedObject):
         """
         Set the layout_location of simulation objects in a grid pattern.
     
-        Takes a list of lists of names of simulation objects and
-        positions them with layout_locations left-to-right,
-        top-to-bottom, starting at (xstart,ystart) and advancing by
-        xstep and ystep.
+        Takes a list of lists of simulation objects, or names of
+        simulation objects, and positions them with layout_locations
+        left-to-right, top-to-bottom, starting at (xstart,ystart) and
+        advancing by xstep and ystep.
     
         The object None can be placed in the grid to skip a grid space.
         """
@@ -982,7 +1003,10 @@ class Simulation(ParameterizedObject):
             x = xstart
             for obj in row:
                 if obj:
-                    self[obj].layout_location = x,y
+                    if isinstance(obj,str):
+                        self[obj].layout_location = x,y
+                    else:
+                        obj.layout_location = x,y
                 x += xstep
             y += ystep
 
