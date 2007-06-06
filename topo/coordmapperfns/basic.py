@@ -14,7 +14,8 @@ $Id$
 """
 __version__='$Revision$'
 
-from numpy import exp,log,sqrt,sin,cos,zeros
+from numpy import exp,log,sqrt,sin,cos,zeros,ones,dot,array
+from numpy.matlib import matrix, zeros as mzeros
 from math import atan,pi,atan2
 
 from topo.base.parameterizedobject import Parameter
@@ -43,6 +44,122 @@ class ConstantMapper(CoordinateMapperFn):
         CoordinateMapperFn only.
         """
         return self.x_cons, self.y_cons
+
+
+class AffineTransform(CoordinateMapperFn):
+    """
+    Remaps the input with an affine transform.
+
+    This mapper allows the specification of an arbitrary combination
+    of translation, rotation and scaling via a transform
+    matrix. Single translations, etc, can be specified more simply
+    with the subclasses Translate2d, Rotate2d, and Scale2d.
+
+    """
+    
+    matrix = Parameter(default=ones((3,3)),
+
+       doc="""The affine transformation matrix.  The functions
+       Translate2dMat, Rotate2dMat, and Scale2dMat generate affine
+       transform matrices that can be multiplied together to create
+       combination transforms.  E.g. the matrix
+
+       Translate2dMat(3,0)*Rotate2d(pi/2)
+
+       will shift points to the right by 3 units and rotate them around
+       the origin by 90 degrees.""")
+
+    def __init__(self, **kw):
+        super(AffineTransform,self).__init__(**kw)
+
+        # This buffer prevents having to allocate memory for each point.
+        self._op_buf = matrix([[0.0],
+                               [0.0],
+                               [1.0]])
+                               
+        
+    def __call__(self, x, y):
+
+
+        ## JPHACKALERT: If the coordmapper interface took a matrix of
+        ## x/y column vectors, instead of x and y separately, affine
+        ## transforms could be applied to all the points in a single
+        ## matrix operation.  This would probably require revision of
+        ## some of the other coordmapper functions, but it might allow
+        ## some optimization in, e.g., CFProjection intialization by
+        ## allowing all the CF positions to be computed at once.
+
+        ## JPALERT: This is the easy way, but it allocates a matrix
+        ## for the result.  It might be faster to unroll the
+        ## computation.
+
+        self._op_buf[0] = x
+        self._op_buf[1] = y
+        result = dot(self.matrix,self._op_buf)
+               
+        return result[0,0],result[1,0]
+
+def Translate2dMat(xoff,yoff):
+    """
+    Return an affine transformation matrix that translates points by
+    the offset (xoff,yoff).
+    """
+    return matrix([[1, 0, xoff],
+                   [0, 1, yoff],
+                   [0, 0,   1 ]])
+
+def Rotate2dMat(t):
+    """
+    Return an affine transformation matrix that rotates the points
+    around the origin by t radians.
+    """
+    return matrix([[cos(t), -sin(t), 0],
+                   [sin(t),  cos(t), 0],
+                   [  0   ,    0   , 1]])
+
+def Scale2dMat(sx,sy):
+    """
+    Return an affine translation matrix that scales the points
+    toward/away from the origin by a factor of sx on x-axis and sy on
+    the y-axis.
+    """
+    return matrix([[sx,  0, 0],
+                   [ 0, sy, 0],
+                   [ 0,  0, 1]])
+
+
+def Translate2d(AffineTransform):
+    """
+    Translate the input by xoff,yoff.
+    """
+    xoff = Number(default=0.0)
+    yoff = Number(default=0.0)
+
+    def __init__(self,**kw):
+        super(Translate2d,self).__init__(**kw)
+        self.matrix = Translate2dMat(self.xoff,self.yoff)
+
+def Rotate2d(AffineTransform):
+    """
+    Rotate the input around the origin by an angle in radians.
+    """
+    angle = Number(default=0.0)
+
+    def __init__(self,**kw):
+        super(Rotate2d,self).__init__(**kw)
+        self.matrix = Rotate2dMat(self.angle)
+
+def Scale2d(AffineTransform):
+    """
+    Scale the input along the x and y axes by sx an sy, respectively.
+    """
+    sx = Number(default=1.0)
+    sy = Number(default=1.0)
+
+    def __init__(self,**kw):
+        super(Scale2d2dMat,self).__init__(**kw)
+        self.matrix = Scale2d2dMat(self.sx,self.sy)
+
 
 
 class SingleDimensionMapper(CoordinateMapperFn):
