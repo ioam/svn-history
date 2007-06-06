@@ -9,6 +9,7 @@ import copy
 import re
 import os.path
 import sys
+import types
 
 from parameterizedobject import Parameter, descendents
 
@@ -407,18 +408,25 @@ class CallableParameter(Parameter):
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=None,**params):
-        Parameter.__init__(self,default=default,**params)
+        Parameter.__init__(self,default=wrap_callable(default),**params)
 
     def __set__(self,obj,val):
         if not callable(val):
             raise ValueError("CallableParameter only takes a callable object.")
-        if isinstance(val,type(self.__init__)):
-            # If val is an instance method, then wrap it
-            # so it can be pickled
-            super(CallableParameter,self).__set__(obj,InstanceMethodWrapper(val))
-        else:
-            super(CallableParameter,self).__set__(obj,val)
+        super(CallableParameter,self).__set__(obj,wrap_callable(val))
 
+
+def wrap_callable(c):
+    """
+    Wrap a callable object in an InstanceMethodWrapper, if necessary.
+
+    If c is an instancemethod, then wrap it and return the wrapper,
+    otherwise return c.
+    """
+    if isinstance(c,types.MethodType):
+        return InstanceMethodWrapper(c)
+    else:
+        return c
         
 
 # This could multiply inherit from Dynamic and Number, but it's
@@ -583,6 +591,12 @@ class ClassSelectorParameter(Parameter):
         Parameter.__init__(self,default=default,instantiate=instantiate,
                            **params)
 
+
+    def __set__(self,obj,val):
+        if not (isinstance(val,self.class_)):
+            raise ValueError("Parameter " + `self._name` + " (" + `self.__class__` +
+                             ") must be an instance of" + self.__class__.__name__)
+        super(ClassSelectorParameter,self).__set__(obj,val)
         
     def range(self):
         """
@@ -670,6 +684,16 @@ class ListParameter(Parameter):
             for v in val:
                 assert isinstance(v,self.class_),repr(v)+" is not an instance of " + repr(self.class_) + "."
 
+
+class DictParameter(ClassSelectorParameter):
+    """
+    Parameter whose value is a dictionary.
+    """
+    __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+
+    def __init__(self,**params):
+        super(DictParameter,self).__init__(dict,**params)
 
 class InstanceMethodWrapper(object):
     """
