@@ -257,7 +257,7 @@ class ProjectionSheet(Sheet):
         """
         for proj in self.in_connections:
             if not isinstance(proj,Projection):
-                topo.sim.debug("Skipping non-Projection "+proj.name)
+                self.debug("Skipping non-Projection "+proj.name)
             else:
                 proj.learn()
                 proj.apply_learn_output_fn(self.activity)
