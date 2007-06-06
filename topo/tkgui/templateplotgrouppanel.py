@@ -86,6 +86,9 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
 
         PlotGroupPanel.__init__(self,console,pgt_name,master, **params)
 
+        # CEBHACKALERT
+        self.normalize = self.pgt.normalize
+
 
         self.pack_param('strength_only',parent=self.control_frame_1,
                         on_change=self.update_plots,side='right')
