@@ -38,7 +38,7 @@ from functionfamilies import LearningFnParameter,Hebbian,IdentityLF
 from functionfamilies import ResponseFnParameter,DotProduct
 from functionfamilies import CoordinateMapperFnParameter,IdentityMF
 from projection import Projection,ProjectionSheet, SheetMask
-from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter,Integer
+from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter,Integer,BooleanParameter
 from sheet import Sheet,Slice
 from sheetview import UnitView, ProjectionView
 from boundingregion import BoundingBox,BoundingRegionParameter
@@ -50,6 +50,14 @@ from boundingregion import BoundingBox,BoundingRegionParameter
 weight_type = Numeric.Float32
 
 
+class NullCFError(ValueError):
+    """
+    Error thrown when trying to create an empty CF.
+    """
+    def __init__(self,x,y,input,rows,cols):
+        ValueError.__init__(self,"ConnectionField at (%s,%s) (input_sheet=%s) has a zero-sized weights matrix (%s,%s); you may need to supply a larger bounds_template or increase the density of the sheet."%(x,y,input,rows,cols))
+    
+                 
 class ConnectionField(ParameterizedObject):
     """
     A set of weights on one input Sheet.
@@ -264,7 +272,7 @@ class ConnectionField(ParameterizedObject):
         # happen at this stage because of cropping)
         nrows,ncols = slice_.shape
         if nrows<1 or ncols<1:
-            raise ValueError("ConnectionField at (%s,%s) (input_sheet=%s) has a zero-sized weights matrix (%s,%s); you may need to supply a larger bounds_template or increase the density of the sheet."%(self.x,self.y,self.input_sheet,nrows,ncols))
+            raise NullCFError(self.x,self.y,self.input_sheet,nrows,ncols)
 
         self.bounds = slice_.bounds
 
@@ -549,6 +557,9 @@ class CFProjection(Projection):
     
     cf_type = Parameter(default=ConnectionField,constant=True,
         doc="Type of ConnectionField to use when creating individual CFs.")
+
+    allow_null_cfs = BooleanParameter(default=False,
+        doc="Whether or not the projection can have entirely empty CFs")
     
     nominal_bounds_template = BoundingRegionParameter(
         default=BoundingBox(radius=0.1),doc="""
@@ -641,17 +652,29 @@ class CFProjection(Projection):
             # set up array of ConnectionFields translated to each x,y in the src sheet
             cflist = []
 
-            for y in self.dest.sheet_rows()[::-1]:
+            # JPALERT: Should we be using a 2D object array here instead of a list of lists?
+            # (i.e. self._cfs = numpy.array((rows,cols,dtype=object)
+            # This would allow single-call addressing (self._cfs[r,c]), and might
+            # be more efficient in other ways, but it might require modification
+            # of the optimized CFPOFs and CFPLFs.
+            for r,y in enumerate(self.dest.sheet_rows()[::-1]):
                 row = []
-                for x in self.dest.sheet_cols():
+                for c,x in enumerate(self.dest.sheet_cols()):
                     x_cf,y_cf = self.coord_mapper(x,y)
-                    row.append(self.cf_type(x_cf,y_cf,
-                                            self.src,
-                                            copy.copy(self.bounds_template),
-                                            self.weights_generator,
-                                            copy.copy(self.mask_template), 
-                                            output_fn=self.weights_output_fn.single_cf_fn,
-                                            slice_=slice_))
+                    self.debug("Creating CF(%d,%d) from src (%.3f,%.3f) to  dest (%.3f,%.3f)"%(r,c,x_cf,y_cf,x,y))
+                    try:
+                        row.append(self.cf_type(x_cf,y_cf,
+                                                self.src,
+                                                copy.copy(self.bounds_template),
+                                                self.weights_generator,
+                                                copy.copy(self.mask_template), 
+                                                output_fn=self.weights_output_fn.single_cf_fn,
+                                                slice_=slice_))
+                    except NullCFError,e:
+                        if self.allow_null_cfs:
+                            row.append(None)
+                        else:
+                            raise
                 cflist.append(row)
 
             self._cfs = cflist
@@ -879,7 +902,9 @@ class CFIter(object):
         rows,cols = self.proj.cfs_shape
         for r in xrange(rows):
             for c in xrange(cols):
-                    yield (self.proj._cfs[r][c],r,c)
+                cf = self.proj._cfs[r][c]
+                if cf is not None:
+                    yield cf,r,c
 
 
 
@@ -895,19 +920,19 @@ class MaskedCFIter(CFIter):
     def __call__(self):
         rows,cols = self.proj.cfs_shape
 
-        # JABALERT: What does this if statement do?
-        # Surely the type of the mask (an object) would never be the
-        # same as the type of SheetMask (a class)?
-        if(type(self.proj.dest.mask) == type(SheetMask)):
+        if self.proj.dest.mask:
             mask = self.proj.dest.mask.data
             for r in xrange(rows):
                 for c in xrange(cols):
-                    if mask[r,c]:
-                        yield (self.proj._cfs[r][c],r,c)
+                    cf = self.proj._cfs[r][c]
+                    if (cf is not None) and mask[r,c]:
+                        yield cf,r,c
         else:
             for r in xrange(rows):
                 for c in xrange(cols):
-                        yield (self.proj._cfs[r][c],r,c)
+                    cf = self.proj._cfs[r][c]
+                    if cf is not None:
+                        yield cf,r,c
             
 
 
