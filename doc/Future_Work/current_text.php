@@ -248,6 +248,20 @@ Strange Projection plots.
 
 <H2>Things we hope to take care of eventually</H2>
 
+<H4>2007/05/29 (JP) Mac GUI cleanup</H4>
+The Mac GUI needs a variety of things to make it more Mac-like.
+<ul>
+<li> Menus are only visible when Console is frontmost. Probably need a menubar
+for every window.
+<li> Pmw radio buttons are broken on mac.  Their selected state is invisible. E.g. in Test pattern window.
+<li> Various window styles need to be tweaked: e.g.  EntryFields should be sunken, backgrounds, light grey (not white), etc.
+<li> Tooltip timing is screwed up.
+</ul>
+
+<h4>2007/05/29 (JP) Replace this list with a bunch of tickets in the sourceforge bug reporting  system?</h4>
+
+For better tracking, etc.
+
 <H4>2007/03/29 (CB): tidy up c++ lissom matching</H4>
 Set c++ lissom params so that topographica doesn't have to set ganglia
 weight mask specially. Generalize oo_or_map_topo.params.
