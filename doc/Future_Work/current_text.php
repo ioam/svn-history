@@ -282,6 +282,7 @@ for every window.
 <li> Various window styles need to be tweaked: e.g.  EntryFields should be sunken, backgrounds, light grey (not white), etc.
 <li> Tooltip timing is screwed up.
 </ul>
+(Note that some of these would be fixed by switching to Tile (see 'investigate using Tile' task). Do any Mac apps use a series of separate windows as topographica does? Anyway, we are already considering (or will consider sometime!) if it's possible to have a workspace for topographica (like matlab has) with tkinter.)
 
 <h4>2007/05/29 (JP) Replace this list with a bunch of tickets in the sourceforge bug reporting  system?</h4>
 
