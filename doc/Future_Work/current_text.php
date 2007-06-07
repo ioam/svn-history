@@ -72,9 +72,10 @@ _calculate_minimum_height_of_tallest_plot() also sets minimum_height;
 it all needs to be cleaned up so that the actual minimum is enforced,
 so that plots don't end up being so large.
 
-<H4>2007/04/18: more tests for non-square sheets</H4>
+<H4>2007/07/07: more tests </H4>
 We need a test with non-square input sheets, non-square LISSOM sheets, etc., 
-with both types of non-squareness...
+with both types of non-squareness...and we also need to test whatever
+map measurement that we can (e.g. or maps).
 
 
 <H4>2007/04/29: Weight seeds</H4>
@@ -94,34 +95,12 @@ was done at the FACETS CodeJam in March 2007, but a cleaner example
 can be made.
 
 
-<H4>2007/04/05 (CB): scrollbars on plotgrouppanel windows</H4>
-Add scrollbars when not auto-resizing (and ideally even when
-auto-resizing but the window would otherwise be larger than the
-screen).
-Currently disabled, since they seem to have strange behavior.
-Consider not using Pmw's scrolledframe component.
-<BR>
-Using bwidget scrollbar. Need to center plots, and have
-scrollbars update properly, and to stop window jiggling
-while it's being setup.
 
-<H4>2007/05/18 (CB): gradient plots </H4>
-Correct, finish and test.
 
-<H4>2007/05/18 (CB): timing code </H4>
-Clean up timing code, as in JABALERT. Then finish progress bar.
 
-<H4>2006/03/26 (CB): scheduled_actions in lissom examples</H4>
-Insert missing actions in case someone tries higher densities.
-JAB 2007/04/25: Isn't this already done?
-
-<H4>2007/01/25 (CB): ParametersFrame ok/apply/reset/cancel</H4>
-Set order and names of ParametersFrame's Ok, Apply, Cancel, Reset, and
-Defaults buttons, and make them behave as expected for classes and
-instances.  Figure out and clean up translator_dictionary & its uses.
-ParametersFrame use for objects it doesn't know about (e-mail from JAB).
-
-<H4>2007/03/26 (CB): minor tkgui cleanup</H4>
+<H4>2007/06/07 (CB): tkgui cleanup</H4>
+Using tkparameterizedobject to cut out tracking of variables and
+widgets: tkgui_parameterization_branch. Also plotgroup cleanup.<BR>
 Simplify tkgui, e.g. eliminating extra frames and any unnecessary
 refresh() etc methods. At the moment, the complexity makes it 
 difficult to add new features to the GUI and to correct problems.
@@ -133,6 +112,52 @@ expand), and so on. Switch to grid layout where it's more appropriate.
 More tasks/notes in topo/tkgui/__init__.py
 <BR>
 Document some Tkinter tips.
+
+
+<H4>2007/06/07 (CB): timing code </H4>
+Clean up timing code, as in JABALERT. Then finish progress bar.
+
+
+<H4>2007/06/07 (CB): hierarchical </H4>
+The results have changed: is that ok, or not?
+
+
+<H4>2007/06/07: unit test results on the web</H4>
+Could add a web site with results of unit tests, updated nightly.
+Plus make slow-tests. Probably run on lodestar or doozy, since 
+sf's compile farm has been stopped.
+
+
+<H4>2007/06/07: reverse correlation rfs cleanup. </H4>
+Fit code into topographica properly, once it's working.
+
+
+<H4>2007/06/07 (CB): scrollbars on plotgrouppanel windows</H4>
+Add scrollbars when not auto-resizing (and ideally even when
+auto-resizing but the window would otherwise be larger than the
+screen).
+Currently disabled, since they seem to have strange behavior.
+Consider not using Pmw's scrolledframe component.
+<BR>
+Using bwidget scrollbar. Need to have
+scrollbars update properly, and to stop window jiggling
+while it's being setup.
+
+
+<H4>2007/05/18 (CB): gradient plots </H4>
+Correct, finish and test.
+
+
+<H4>2006/03/26 (CB): scheduled_actions in lissom examples</H4>
+Insert missing actions in case someone tries higher densities.
+JAB 2007/04/25: Isn't this already done?
+
+
+<H4>2007/01/25 (CB): ParametersFrame ok/apply/reset/cancel</H4>
+Set order and names of ParametersFrame's Ok, Apply, Cancel, Reset, and
+Defaults buttons, and make them behave as expected for classes and
+instances.  Figure out and clean up translator_dictionary & its uses.
+ParametersFrame use for objects it doesn't know about (e-mail from JAB).
 
 
 <H4>2007/04/15 (CB): Dynamic info</H4>
@@ -471,10 +496,6 @@ hard.
 make change_bounds() able to enlarge as well as shrink 
 
 
-<H4>2005/01/01: unit test results on the web</H4>
-Could add a web site with results of unit tests, updated nightly
-
-
 <H4>2005/01/01: components from external packages </H4>
 Could consider using or taking components from: SciPy,
 ScientificPython, Chaco, Pyro (the robotics package), g, logger
@@ -503,6 +524,12 @@ Finish porting all categories of simulations from parts II and III of
 the LISSOM book (i.e. orientation maps, ocular dominance maps,
 direction maps, combined maps, face maps, and two-level maps) to
 Topographica.
+
+<H4>2007/06/07: plotgrouppanel's plots </H4>
+Maybe should be one canvas with bitmaps drawn on. Then we'd get
+canvas methods (eg postscript()). But right-click code will need
+updating. Should be easy to lay out plots on a canvas, just like
+the grid() code that we have at the moment.
 
 
 
