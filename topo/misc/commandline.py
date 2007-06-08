@@ -9,11 +9,13 @@ $Id$
 __version__='$Revision$'
 
 
-import sys, __main__, math, os
-
+import sys, __main__, math, os, topo
 from optparse import OptionParser
 from inlinec import import_weave
-
+from time import gmtime, strftime
+import datetime
+import string
+from topo.commands.basic import save_script_repr ;
 
 # Startup banner
 BANNER = """
@@ -138,7 +140,6 @@ def process_argv(argv):
     Process command-line arguments (minus argv[0]!), rearrange and execute.
     """
     (option,args) = topo_parser.parse_args(argv)
-
     # If no scripts and no commands were given, pretend -i was given.
     if len(args)==0 and len(option.commands)==0:
         option.interactive=True
@@ -237,7 +238,38 @@ def process_argv(argv):
     # execute remaining commands.
     for cmd in option.commands:
 	exec cmd in __main__.__dict__
+
+def run_batch(script_file,output_directory="./Data",plotting_script="topo/plotting/default_plottingscript.py", recording_times = (50,100,500,1000,2000,3000,4000,5000), **params):
+    """
+    Any parameters supplied will be set in the main namespace before
+    any scripts are run, and will be used to construct a unique
+    topo.sim.name for the file.
+    """
+    from topo.base.parameterizedobject import script_repr_suppress_defaults
+    script_repr_suppress_defaults=False
+    import matplotlib 
+    matplotlib.use('GD')
+
     
+    prefix = ""
+    prefix = prefix + strftime("%H%M%d%m%y")
 
+    prefix = prefix + ":" + os.path.basename(script_file) + ">"
+    
+    for a in params.keys():
+        prefix = prefix + a + "=" + str(params[a]) + ",";
+        
+    for a in params.keys():
+        __main__.__dict__[a] = params[a]
+    
+    os.mkdir(output_directory+prefix)
+    execfile(script_file,__main__.__dict__)
+    topo.sim.name = prefix
+    __main__.__dict__["output_directory"] = output_directory
+    
+    while len(recording_times) != 0:
+        run_to = recording_times.pop(0)
+        topo.sim.run(run_to - topo.sim.time())
+        execfile(plotting_script,__main__.__dict__)
+        save_script_repr("./"+ output_directory + prefix + "/" + prefix + "." +str(topo.sim.time())+ ".params")
 
-	
