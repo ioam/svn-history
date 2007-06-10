@@ -94,5 +94,5 @@ def run(verbosity=1,test_modules=None):
         for test_module in test_modules:
             suite.addTest(getattr(test_module,'suite'))
 
-    unittest.TextTestRunner(verbosity=verbosity).run(suite)
+    return unittest.TextTestRunner(verbosity=verbosity).run(suite)
 
