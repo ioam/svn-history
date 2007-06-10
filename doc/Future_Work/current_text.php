@@ -114,18 +114,16 @@ More tasks/notes in topo/tkgui/__init__.py
 Document some Tkinter tips.
 
 
+<H4>2007/06/10 (CB): rebuild doozy's webtests topographica with an X display</H4>
+And actually get the scheduling of nightly tests to work...
+
+
 <H4>2007/06/07 (CB): timing code </H4>
 Clean up timing code, as in JABALERT. Then finish progress bar.
 
 
 <H4>2007/06/07 (CB): hierarchical </H4>
 The results have changed: is that ok, or not?
-
-
-<H4>2007/06/07: unit test results on the web</H4>
-Could add a web site with results of unit tests, updated nightly.
-Plus make slow-tests. Probably run on lodestar or doozy, since 
-sf's compile farm has been stopped.
 
 
 <H4>2007/06/07: reverse correlation rfs cleanup. </H4>
@@ -273,6 +271,28 @@ Strange Projection plots.
 
 <H2>Things we hope to take care of eventually</H2>
 
+
+<H4>2007/06/10: test results on the web</H4>
+Results of nightly (GMT) 'make tests' and 'make slow-tests' are available at
+<a href="http://topographica.org/Tests/">topographica.org/Tests/</a>.<BR>
+The mechanism is very rough: after a 'cvs update -A -P -d', the output
+of make tests is extracted to a webpage named with the date, and the
+output of make slow-tests is saved as a text file (also named with the
+date).  It's obvious if a unit test fails, but 'make slow-tests >
+file' does not capture tracebacks in file, so to see if a slow-test
+failed you have to look for *missing* 'Results from X have not
+changed...' statements!
+<BR>
+For code, see doozy.inf.ed.ac.uk:/home/ceball/webtests/topographica/tester  
+<ul>
+<li>Should replace this system when slow-tests etc are done with a python file rather than a Makefile; why 
+do we have to write and maintain all the testing mechanisms (apart from that for the unit tests) - isn't 
+there some other python package to help?</li>
+<li>Probably should do make clean and make first to test that too.</li>
+<li>Doesn't python's unittest already have web formatting somewhere?</li>
+</ul>
+
+
 <H4>2007/05/29 (JP) Mac GUI cleanup</H4>
 The Mac GUI needs a variety of things to make it more Mac-like.
 <ul>
@@ -320,6 +340,7 @@ the commandline, from a script, and saving/loading snapshots.)
 <H4>2007/02/28 (CB): OneDPowerSpectrum & Audio PatternGenerators</H4>
 Finish the two classes. Make a demo with Audio. Both currently don't work
 with test pattern window because plotting expects 2d arrays.
+
 
 
 <H4>2007/03/30 (CB): PatternGenerator, PatternGenerator2D</H4>
