@@ -115,7 +115,10 @@ Document some Tkinter tips.
 
 
 <H4>2007/06/10 (CB): rebuild doozy's webtests topographica with an X display</H4>
+(and have an x display available for gui tests.)
 And actually get the scheduling of nightly tests to work...
+(note that at seems to behave strangely when using su). 
+And indicate on output when  it's skipping tests.
 
 
 <H4>2007/06/07 (CB): timing code </H4>
