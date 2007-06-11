@@ -43,13 +43,15 @@ class TestParameterizedObject(unittest.TestCase):
 
         anothertestpo = AnotherTestPO()
 
-        ### CBALERT: AnotherTestPO.instPO is instantiated, but
+        ### CB: AnotherTestPO.instPO is instantiated, but
         ### TestPO.notinst is not instantiated - so notinst is still
         ### shared, even by instantiated parameters of AnotherTestPO.
-        ### Seems like this behavior of ParameterizedObject might be
-        ### confusing, so either document it or change it.
+        ### Seems like this behavior of ParameterizedObject could be
+        ### confusing, so maybe mention it in documentation somewhere.
         TestPO.notinst[1]=7
-        self.assertEqual(anothertestpo.instPO.notinst,[1,7,3]) # [1,2,3]
+        # (if you thought your instPO was completely an independent object, you
+        # might be expecting [1,2,3] here)
+        self.assertEqual(anothertestpo.instPO.notinst,[1,7,3]) 
         
 
 suite = unittest.TestSuite()
