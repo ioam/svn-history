@@ -109,6 +109,7 @@ class Enumeration(Parameter):
         Create an Enumeration, checking that 'default' is in 'available'.
         """
         Parameter.__init__(self,default=default,**params)
+        # CB: just needs to be list-like. has __iter__ method?
         if not type(available)==list:
             raise ValueError("Enumeration must be created with a list of available values.")
         self.available = available
@@ -131,6 +132,10 @@ class Enumeration(Parameter):
         if not self.available.count(val) >= 1:
             raise ValueError("EnumeratedParamater can't be set to '" + repr(val) + "' because that's not in the list of available values " + repr(self.available) + ".")
 
+
+
+# CEBHACKALERT: how did I get this? Seems like it could be a problem...
+#  ValueError: Parameter '_x_param_value' (<class 'topo.base.parameterclasses.Number'>) only takes a numeric value; <type 'long'> is not numeric.
 
 
 ### JABALERT: Needs to be extended to accept FixedPoint as a number.
