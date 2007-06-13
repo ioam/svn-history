@@ -283,7 +283,6 @@ class Parameter(object):
         the attributes of the object stored in a constant (e.g. the
         left bound of a BoundingBox).
         """
-        
         if self.constant:
             if not obj:
                 self.default = val
@@ -616,6 +615,15 @@ class ParameterizedObject(object):
     ### JABALERT: Should probably make this an Enumeration instead.
     print_level = Parameter(default=MESSAGE,hidden=True)
 
+
+    # CEBHACKALERT: see warning() ##########
+    receive_warnings = []
+    def warn(self,*args):
+        s = ' '.join([str(x) for x in args])
+        for x in self.receive_warnings:
+            x.warn(s)
+    ########################################
+
     
     def __init__(self,abstract_class=None,**params):
         """
@@ -637,7 +645,7 @@ class ParameterizedObject(object):
 
         self.__generate_name()
         
-        self.__setup_params(**params)
+        self._setup_params(**params)
         object_count += 1
 
         self.nopickle = []
@@ -723,6 +731,11 @@ class ParameterizedObject(object):
 
     def warning(self,*args):
         """Print the arguments as a warning."""
+
+        # CEBHACKALERT! added to help my tkgui life for the moment.
+        # How to have general notification system?
+        self.warn(*args)
+        
         self.__db_print(WARNING,"Warning:",*args)
 
     def message(self,*args):
@@ -738,7 +751,7 @@ class ParameterizedObject(object):
         self.__db_print(DEBUG,*args)
 
 
-    def __setup_params(self,**params):
+    def _setup_params(self,**params):
         """
         Initialize default and keyword parameter values.
 
@@ -771,6 +784,7 @@ class ParameterizedObject(object):
                 self.debug("Setting param %s ="%name, val)
             else:
                 self.warning("CANNOT SET non-parameter %s ="%name, val)
+            # i.e. if not desc it's setting an attribute in __dict__, not a Parameter
             setattr(self,name,val)
 
 
