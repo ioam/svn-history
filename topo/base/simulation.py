@@ -157,7 +157,9 @@ class SimSingleton(Singleton):
         """Set actual_sim to be new_sim."""
         assert isinstance(new_sim,Simulation), "Can only change to a Simulation instance."
         self.actual_sim=new_sim
-            
+
+
+    ## CEBALERT: syntax like "'V1' in topo.sim" does not work
     def __getitem__(self,item_name):
         """Allow dictionary-style access to the simulation."""
         return self.actual_sim[item_name]
@@ -677,7 +679,7 @@ class Simulation(ParameterizedObject):
         the Simulation. See objects().
         """
         if not isinstance(item_name,str):
-            raise TypeError("Expected string (objects in the Simulation are indexed by name).")
+            raise TypeError("Expected string (objects in the Simulation are indexed by name); %s is a %s"%(item_name,type(item_name)))
         try:
             return self.objects()[item_name]
         except KeyError:
