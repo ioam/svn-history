@@ -558,6 +558,9 @@ class CFProjection(Projection):
     cf_type = Parameter(default=ConnectionField,constant=True,
         doc="Type of ConnectionField to use when creating individual CFs.")
 
+    # JPHACKALERT: Not all support for null CFs has been implemented.
+    # CF plotting and C-optimized CFPxF_ functions need
+    # to be fixed to support null CFs without crashing.    
     allow_null_cfs = BooleanParameter(default=False,
         doc="Whether or not the projection can have entirely empty CFs")
     
@@ -593,7 +596,9 @@ class CFProjection(Projection):
     learning_rate = Number(default=0.0,softbounds=(0,100),doc="""
         Amount of learning at each step for this projection, specified
         in units that are independent of the density of each Sheet.""")
-    
+
+    # JPALERT: Shouldn't this be a "CFPOFParameter" or something?  OutputFns and
+    # CFPOFs have different interfaces.  I guess this parameter is never actually used?
     output_fn  = OutputFnParameter(
         default=IdentityOF(),
         doc='Function applied to the Projection activity after it is computed.')
@@ -920,7 +925,7 @@ class MaskedCFIter(CFIter):
     def __call__(self):
         rows,cols = self.proj.cfs_shape
 
-        if self.proj.dest.mask:
+        if isinstance(self.proj.dest.mask,SheetMask):
             mask = self.proj.dest.mask.data
             for r in xrange(rows):
                 for c in xrange(cols):
