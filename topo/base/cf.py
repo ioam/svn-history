@@ -830,7 +830,7 @@ class CFProjection(Projection):
         self.input_buffer = input_activity
         self.activity *=0.0
         self.response_fn(MaskedCFIter(self), input_activity, self.activity, self.strength)
-        self.output_fn(MaskedCFIter(self),self.activity)
+        self.output_fn(self.activity)
 
 
     def learn(self):
