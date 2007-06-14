@@ -597,8 +597,6 @@ class CFProjection(Projection):
         Amount of learning at each step for this projection, specified
         in units that are independent of the density of each Sheet.""")
 
-    # JPALERT: Shouldn't this be a "CFPOFParameter" or something?  OutputFns and
-    # CFPOFs have different interfaces.  I guess this parameter is never actually used?
     output_fn  = OutputFnParameter(
         default=IdentityOF(),
         doc='Function applied to the Projection activity after it is computed.')
