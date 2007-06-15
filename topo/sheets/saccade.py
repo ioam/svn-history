@@ -39,7 +39,8 @@ def activity_centroid(sheet,activity=None,threshold=0.0):
     Return the sheet coords of the (weighted) centroid of sheet activity.
 
     If the activity argument is not None, then it is used instead
-    of sheet.activity.
+    of sheet.activity.  If the sheet activity is all zero, the
+    centroid of the sheet bounds is returned.
     """
 
     if activity is None:
@@ -54,6 +55,8 @@ def activity_centroid(sheet,activity=None,threshold=0.0):
     ## Optimization to only compute centroid from
     ## active (non-zero) units. 
     idxs = nonzero(a > threshold)[0]
+    if not len(idxs):
+        return sheet.bounds.centroid()
     return utils.centroid(take(xy,idxs,axis=0),take(a,idxs))
 
 
