@@ -923,6 +923,12 @@ class MaskedCFIter(CFIter):
     def __call__(self):
         rows,cols = self.proj.cfs_shape
 
+        # JPHACKALERT: Should really check for the existence of the
+        # mask, rather than checking its type. This is a hack to
+        # support higher-order projections whose dest is a CF, instead
+        # of a sheet.  The right thing to do is refactor so that CF
+        # masks and  SheetMasks are subclasses of an abstract Mask
+        # type so that they support the same interfaces.
         if isinstance(self.proj.dest.mask,SheetMask):
             mask = self.proj.dest.mask.data
             for r in xrange(rows):
