@@ -46,7 +46,7 @@ class EditorObject(ParameterizedObject):
         ### and should be bound to the actual editor object as well.
         return self.name + " is of type " + \
                shortclassname(self.parameterized_obj) + \
-               ":\n\n" + getdoc(self.parameterized_obj)
+               ":\n\n" + str(getdoc(self.parameterized_obj))
 
     def show_properties(self):
         "Show parameters frame for object."
