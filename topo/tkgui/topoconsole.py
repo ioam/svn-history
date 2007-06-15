@@ -584,6 +584,9 @@ class TopoConsole(TkguiWindow):
 
         
 
+    ### CEBHACKALERT: why doesn't updatecommand("display=True") for an orientation preference map
+    ### measurement work with the hierarchical example? I guess this is the reason I thought
+    ### the updating never worked properly (or I really did break it recently - or I'm confused)...
     def refresh_activity_windows(self):
         """
         Update any windows with a plotgroup_key of 'Activity'.
