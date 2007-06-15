@@ -276,7 +276,8 @@ class Number(Parameter):
         # CEB: all the following error messages should probably print out the parameter's name
         # ('x', 'theta', or whatever)
         if not (is_number(val)):
-            raise ValueError("Parameter " + `self._name` + " (" + `self.__class__` + ") only takes a numeric value; " + `type(val)` + " is not numeric.")
+            raise ValueError("Parameter " + `self.attrib_name()` + " (" + `self.__class__.__name__` +
+                             ") only takes a numeric value; " + `type(val)` + " is not numeric.")
 
         if self.bounds!=None:
             vmin,vmax = self.bounds
@@ -599,8 +600,8 @@ class ClassSelectorParameter(Parameter):
 
     def __set__(self,obj,val):
         if not (isinstance(val,self.class_)):
-            raise ValueError("Parameter " + `self._name` + " (" + `self.__class__` +
-                             ") must be an instance of" + self.__class__.__name__)
+            raise ValueError("Parameter " + `self.attrib_name()` + " (" + `self.__class__.__name__` +
+                             ") must be an instance of " + self.class_.__name__)
         super(ClassSelectorParameter,self).__set__(obj,val)
         
     def range(self):
@@ -670,7 +671,7 @@ class ListParameter(Parameter):
         # CEB: all the following error messages should probably print out the parameter's name
         # ('x', 'theta', or whatever)
         if not (isinstance(val,list)):
-            raise ValueError("Parameter " + `self._name` + " (" + `self.__class__` + ") must be a list.")
+            raise ValueError("Parameter " + `self.attrib_name()` + " (" + `self.__class__.__name__` + ") must be a list.")
 
         if self.bounds!=None:
             min,max = self.bounds
