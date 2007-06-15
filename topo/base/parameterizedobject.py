@@ -848,7 +848,7 @@ class ParameterizedObject(object):
         for name,val in self.get_param_values():
             print '%s.%s = %s' % (self.name,name,val)
 
-
+            
     def __getstate__(self):
         """
         Save the object's state: return a dictionary that is a shallow
@@ -862,10 +862,18 @@ class ParameterizedObject(object):
         # shallow copy the __dict__ because we change some entries
         state = self.__dict__.copy()
 
+##  JPHACKALERT: After discussing with JAB and CEB, I'm commenting out
+##  these entire functions, because they seem to only exist for the
+##  purpose of deepcopying the parameters, which is (probably?) not
+##  necessary.  Note that this function and the accompanying
+##  __setstate__ don't seem to do anything useful -- they just copy
+##  self.__dict__ -- but I get weird warnings from 'make tests' if I
+##  remove them.
+
         # deep copy Parameters; overwrites their original shallow copies 
-        for (k,v) in self.__dict__.items():
-            if isinstance(v,Parameter):
-                state[k] = copy.deepcopy(v)
+##         for (k,v) in self.__dict__.items():
+##             if isinstance(v,Parameter):
+##                 state[k] = copy.deepcopy(v)
 
         return state
 
