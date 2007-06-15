@@ -10,9 +10,10 @@ from topo.base.sheet import Sheet
 from topo.base.sheet import BoundingBox
 from topo.misc.utils import NxN
 
-from topo.base.parameterclasses import Number, Dynamic
+from topo.base.parameterclasses import Number, Dynamic, ListParameter
 
 import topo.base.patterngenerator
+import topo.patterns.basic
 
 
 class GeneratorSheet(Sheet):
@@ -117,3 +118,34 @@ class GeneratorSheet(Sheet):
                "Generated pattern shape %s does not match sheet shape %s." % \
                (self.shape,self.activity.shape)
         self.send_output(src_port='Activity',data=self.activity)
+
+
+class SequenceGeneratorSheet(GeneratorSheet):
+    """
+    Sheet that generates a timed sequence of patterns.
+
+    This sheet will repeatedly generate the input_sequence, at the
+    given delays.  The sequence begins after self.phase time units.
+    """
+    
+    input_sequence = ListParameter(default=[(1,topo.patterns.basic.Gaussian())],
+          doc="""The sequence of patterns to generate. Must be a list
+          of (delay,generator) tuples.""")
+
+
+    def start(self):
+        self._seq_pos = 0
+        super(SequenceGeneratorSheet,self).start()
+        
+    def input_event(self,conn,data):
+        if conn.name == 'Trigger':
+            delay,gen = self.input_sequence[self._seq_pos]
+            # JPALERT: it might be simpler just to create an event and
+            # enqueue it manually, rather than modifying the trigger
+            # delay, but this way allows us to retain the debugging
+            # statements and other code from GeneratorSheet            
+            conn.delay = delay
+            self.set_input_generator(gen)
+            self._seq_pos = (self._seq_pos+1)%len(self.input_sequence)
+        super(SequenceGeneratorSheet,self).input_event(conn,data)
+          
