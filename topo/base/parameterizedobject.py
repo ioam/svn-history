@@ -327,6 +327,15 @@ class Parameter(object):
         else:
             return self._name
 
+    def attrib_name(self):
+        """
+        Return the attribute name (not the internal name) for this parameter, for
+        use in generating error messages. If self._name isn't set
+        (i.e., .get_name() hasn't been called yet), returns None.
+        """
+        if self._name:
+            return self._name.split('_param_value')[0][1:]
+        
 
     def __getstate__(self):
         """
