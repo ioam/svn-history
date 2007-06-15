@@ -28,6 +28,14 @@ from topo.misc.numbergenerators import UniformRandom
 # background, or to see how sharp a gradient is needed to get a
 # response.
 
+
+class Null(Constant):
+    """
+    A constant pattern of zero activity.
+    """
+    scale = Number(default=0,constant=True,hidden=True)
+
+
 class Gaussian(PatternGenerator):
     """
     2D Gaussian pattern generator.
