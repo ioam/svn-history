@@ -10,20 +10,22 @@ $Id$
 __version__ = "$Revision$"
 
 import copy
-import numpy.oldnumeric as Numeric
+import numpy
 from math import exp
 
 # So all Projections are present in this package
 from topo.base.projection import Projection
 
 from topo.base.cf import CFProjection,CFPLearningFnParameter,CFPLF_Identity,CFPResponseFnParameter,CFPOutputFnParameter,CFPOF_Identity,CFPOutputFn,CFPResponseFn, DotProduct, ResponseFnParameter
-from topo.base.functionfamilies import OutputFnParameter
+from topo.base.functionfamilies import OutputFnParameter,LearningFnParameter,IdentityLF
 from topo.base.parameterclasses import Number,BooleanParameter,Parameter
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.patterngenerator import PatternGeneratorParameter
+from topo.base.patterngenerator import PatternGeneratorParameter,Constant
 from topo.base.sheetview import UnitView
 from topo.base.cf import ConnectionField, CFPRF_Plugin, MaskedCFIter
+from topo.base.functionfamilies import CoordinateMapperFnParameter,IdentityMF
 
+from topo.misc.utils import rowcol2idx
 from topo.outputfns.basic import IdentityOF
 
 
@@ -178,7 +180,7 @@ class LeakyCFProjection(CFProjection):
 
     def __init__(self,**params):
         super(LeakyCFProjection,self).__init__(**params)
-	self.leaky_input_buffer = Numeric.zeros(self.src.activity.shape)
+	self.leaky_input_buffer = numpy.zeros(self.src.activity.shape)
 
     def activate(self,input_activity):
 	"""
@@ -191,3 +193,84 @@ class LeakyCFProjection(CFProjection):
 
 
 
+class OneToOneProjection(Projection):
+    """
+    A projection that has at most one input connection for each unit.
+
+    This projection has exactly one weight for each destination unit,
+    the input locations on the input sheet are determined by a
+    coordinate mapper.  Inputs that map outside the bounds of the
+    input sheet are treated as having zero weight.
+    """
+    coord_mapper = CoordinateMapperFnParameter(
+        default=IdentityMF(),
+        doc='Function to map a destination unit coordinate into the src sheet.')
+
+    weights_generator = PatternGeneratorParameter(
+        default=Constant(),constant=True,
+        doc="""Generate initial weight values for each unit of the destination sheet."""
+        )
+
+    output_fn  = OutputFnParameter(
+        default=IdentityOF(),
+        doc='Function applied to the Projection activity after it is computed.')
+
+    learning_fn = LearningFnParameter(
+        default=IdentityLF,
+        doc="""Learning function applied to weights.""")
+
+    learning_rate = Number(default=0)
+    
+    def __init__(self,**kw):
+        super(OneToOneProjection,self).__init__(**kw)
+
+        dx,dy = self.dest.bounds.centroid()
+
+        # JPALERT: Not sure if this is the right way to generate weights.
+        # FOr full specificity, the each initial weight should be dependent on the
+        # coordinates of both the src unit and the dest unit.
+        self.weights = self.weights_generator(bounds=self.dest.bounds,
+                                              xdensity=self.dest.xdensity,
+                                              ydensity=self.dest.ydensity)
+
+
+        # JPALERT: CoordMapperFns should really be made to take
+        # matrices of x/y points and apply their mapping to all.  This
+        # could give great speedups, ep for AffineTransform mappings,
+        # which are can be applied to many points with a single matrix multiplication.
+        srccoords = [self.coord_mapper(x,y) 
+                     for y in reversed(self.dest.sheet_rows())
+                     for x in self.dest.sheet_cols()
+                     ]
+        self.src_idxs = numpy.array([rowcol2idx(r,c,self.src.activity.shape)
+                                     for r,c in (self.src.sheet2matrixidx(u,v)
+                                                 for u,v in srccoords)])
+
+        # dest_idxs contains the indices of the dest units whose weights project
+        # in bounds on the src sheet.
+        src_rows,src_cols = self.src.activity.shape
+        def in_bounds(x,y):
+            r,c = self.src.sheet2matrixidx(x,y)
+            return (0 <= r < src_rows) and (0 <= c < src_cols)
+        destmask = [in_bounds(x,y) for x,y in srccoords]
+
+        # JPALERT: For some reason numpy.nonzero returns the nonzero indices wrapped in a one-tuple.
+        # Maybe a bug in numpy?
+        self.dest_idxs = numpy.nonzero(destmask)[0]
+        self.src_idxs = self.src_idxs.take(self.dest_idxs)
+        assert len(self.dest_idxs) == len(self.src_idxs)
+
+        self.activity = numpy.zeros(self.dest.shape,dtype=float)
+
+    def activate(self,input):
+        self.input_buffer = input
+        result = self.weights.take(self.dest_idxs) * input.take(self.src_idxs)
+        self.activity.put(self.dest_idxs,result)
+        self.output_fn(self.activity)
+
+    def learn(self):
+        if self.input_buffer is not None:
+            self.learning_fn(self.input_buffer,
+                             self.dest.activity,
+                             self.weights,
+                             self.learning_rate)
