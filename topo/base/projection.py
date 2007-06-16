@@ -277,8 +277,9 @@ class ProjectionSheet(Sheet):
     def projections(self,name=None):
         """
         
-        Return a named inpu p, or a a dictionary {projection_name, projection}
-        of all the in_connections for this ProjectionSheet.
+        Return either a named input p, or a dictionary
+        {projection_name, projection} of all the in_connections for
+        this ProjectionSheet.
 
         A minor convenience function for finding projetions by name;
         the sheet's list of in_connections usually provides simpler
