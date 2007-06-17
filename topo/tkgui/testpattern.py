@@ -17,13 +17,16 @@ $Id$
 """
 __version__='$Revision$'
 
+
 ### JABHACKALERT: Need to remove Back/Forward buttons, because they do not
 ### do what the user would expect.  
 
-# CEBALERT: this file needs quite a substantial overhaul before it
-# will work well.
+# CEBALERT: this file needs a substantial overhaul before it will work
+# well.
 
 # CEBALERT: taggedsliders refresh the display even when auto-refresh is off.
+
+# CB changing pattern doesn't refresh plots even when autorefresh is on.
 
 
 import copy
@@ -41,7 +44,8 @@ from topo.plotting.plotgroup import identity
 from topo.misc.keyedlist import KeyedList
 
 import parametersframe
-import plotgrouppanel
+from plotgrouppanel import XPGPanel
+#from templateplotgrouppanel import TemplatePlotGroupPanel
 import topoconsole
 
 from topo.plotting.plot import make_template_plot
@@ -53,15 +57,15 @@ from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X,NO,NONE
 DEFAULT_PRESENTATION = '1.0'
 
 
-class TestPattern(plotgrouppanel.PlotGroupPanel):
-    def __init__(self,console,master,padding=2,**params):
+class TestPattern(XPGPanel):
+    def __init__(self,console,master,label="Preview",**params):
+	super(TestPattern,self).__init__(console,master,label,**params)
 
-	super(TestPattern,self).__init__(console,'Preview',master,**params)
 
         self.title("Test Pattern") # CB: gets written over by something else, anyway...
         
         self.INITIAL_PLOT_HEIGHT = 100
-        self.padding = padding
+        self.padding = 2
         self.auto_refresh=True
 
         
@@ -323,7 +327,11 @@ Each type will have various parameters that can be changed.""")
 	    channels = {'Strength':each,'Hue':None,'Confidence':None}
 	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
 	    plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
-	new_plotgroup = topo.plotting.plotgroup.PlotGroup(plot_list)
+
+
+        # CEBHACKALERT (** change   any point marking hackalerts in here?
+	new_plotgroup = self.generate_plotgroup() #topo.plotting.plotgroup.PlotGroup(plot_list)
+        new_plotgroup.plot_list = plot_list
 	new_plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot
 	new_plotgroup.initial_plot = self.plotgroup.initial_plot
 	new_plotgroup.sheetcoords = self.plotgroup.sheetcoords
@@ -332,6 +340,7 @@ Each type will have various parameters that can be changed.""")
 	new_plotgroup.normalize = self.plotgroup.normalize
 	new_plotgroup.minimum_height_of_tallest_plot = self.plotgroup.minimum_height_of_tallest_plot
 	new_plotgroup.time = topo.sim.time()
+
 	self.plotgroup = new_plotgroup
  				
     
