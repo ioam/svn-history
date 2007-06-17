@@ -6,28 +6,18 @@ $Id$
 __version__='$Revision$'
 
 
-
-### ***** CEB yet to make things parameters, etc... *****
-
-
-
-
-
-from Tkinter import StringVar, BooleanVar, Frame, YES, LEFT, TOP, RIGHT
-from Tkinter import X, Message, Entry, Canvas, FLAT, Checkbutton, NORMAL, DISABLED
-
-import Pmw
 import ImageTk
-
 ### JCALERT! Try not to have to use chain and delete this import.
 from itertools import chain
+from Tkinter import Canvas, FLAT 
 
 import topo
-from topo.misc.keyedlist import KeyedList
+
 from topo.base.cf import CFSheet, CFProjection
 from topo.base.projection import ProjectionSheet
-from topo.plotting.templates import plotgroup_templates
-from topo.plotting.plotgroup import ProjectionPlotGroup
+from topo.base.parameterclasses import BooleanParameter
+
+from topo.plotting.plotgroup import CFProjectionPlotGroup,ProjectionSheetPlotGroup,CFPlotGroup
 
 from templateplotgrouppanel import TemplatePlotGroupPanel
 
@@ -35,6 +25,16 @@ from templateplotgrouppanel import TemplatePlotGroupPanel
 ### JCALERT! See if we could delete this import * and replace it...
 #from topo.commands.analysis import *
 
+
+def cmp_projections(p1,p2):
+    """
+    Comparison function for Plots.
+    It compares the precedence number first and then the src_name and name attributes.
+    """
+    if p1.src.precedence != p2.src.precedence:
+	return cmp(p1.src.precedence,p2.src.precedence)
+    else:
+	return cmp(p1,p2)
 
 
 UNIT_PADDING = 1
@@ -48,67 +48,23 @@ BORDERWIDTH = 1
 CANVASBUFFER = 1
 
 
-def cmp_projections(p1,p2):
+# need some refreshing when changing params?
+
+class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
     """
-    Comparison function for Plots.
-    It compares the precedence number first and then the src_name and name attributes.
+    Abstract base class for panels relating to ProjectionSheets.
     """
-    if p1[1].src.precedence != p2[1].src.precedence:
-	return cmp(p1[1].src.precedence,p2[1].src.precedence)
-    else:
-	return cmp(p1[0],p2[0])
+    # CB: abstract
 
+    plotgroup_type = ProjectionSheetPlotGroup
+    sheet_type = ProjectionSheet
 
-    # (Note for somewhere: if someone clicks 'back' on a window, would
-    # they expect auto-refresh to become unchecked/disabled?)
+    auto_refresh = BooleanParameter(False) # these panels can be slow to refresh
 
-
-
-# CEBALERT: the class hierarchy and naming is not finished!  Initially
-# I've just removed duplicate code and am cleaning up (including
-# documenting).  After that it will be much easier to get the classes
-# right.
-
-
-
-# CEBHACKALERT: I've caused (uncovered?) a bug: sheets other than
-# CFSheets are having their Projection views requested when
-# CFProjectionPanel and ConnectionFieldsPanel are created. The
-# _set_situate() method is where the error comes from (the plotgroup
-# not being correct at the time it calls refresh(). This bug should go
-# away during my cleanup.
-
-
-class ProjectionRelatedPanel(TemplatePlotGroupPanel):
-    """
-    Abstract base class for panels relating to Projections.
-    """
-    # CB: declare abstract
-
-    def __init__(self,console,pgt_name,master,sheet_type=ProjectionSheet,**params):
-        self.sheet_type = sheet_type
-        self.sheet_var = StringVar()  # CEBALERT: should go after super call when whatever stops
-                                      # it working that way is cleaned up...
-        sheets = topo.sim.objects(self.sheet_type).values()        
-	sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
-        self.sheet_var.set(sheets[0].name)
-
-
-        super(ProjectionRelatedPanel,self).__init__(console,pgt_name,master,**params)
-
-        self._add_sheet_menu() # CEBALERT: need situate button to be left of this, not right
-        # add sheet menu to list of nothistorywidgets
-
-
-
-
-
-
-
-    # CEBHACKALERT: valid_context() needs to be more specific in subclasses.
-    # Should sheet_type be an argument on construction of ProjectionRelatedPanel?
-    # How to allow valid_context() to work for more specific subclasses (i.e. to replace
-    # ProjectionSheet with e.g. CFSheet)?
+    # CEBHACKALERT: valid_context() needs to be more specific in
+    # subclasses.  How to allow valid_context() to work for more
+    # specific subclasses (e.g. to replace ProjectionSheet with
+    # CFSheet)?
     @staticmethod
     def valid_context():
         """
@@ -119,266 +75,161 @@ class ProjectionRelatedPanel(TemplatePlotGroupPanel):
         sheets = topo.sim.objects(ProjectionSheet).values()
         if not sheets:
             return False
-        
         projectionlists=[sheet.in_connections for sheet in sheets]
         projections=[i for i in chain(*projectionlists)]
         return (not projections == [])
 
 
-    def _add_sheet_menu(self):
-        """
-        Add a menu to self._params_frame for selecting a sheet from
-        those available in the simulation.
-        """
-        sheets = topo.sim.objects(self.sheet_type).values()        
-	sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
-        self.sheet_var.set(sheets[0].name)
+    def __init__(self,console,master,pgt,**params):
+        super(ProjectionSheetPGPanel,self).__init__(console,master,pgt,**params)
+        self.pack_param('sheet',parent=self.control_frame_3,on_change=self.sheet_change)
+        #self.refresh()
 
 
-        # The GUI label says Sheet, not e.g. CFSheet even when they're
-        # CFSheets, because users probably don't need to worry about
-        # the distinction.
-        self.sheet_menu = Pmw.OptionMenu(self.control_frame_3,
-                       command = self.refresh,
-                       labelpos = 'w',
-                       label_text = 'Sheet:',
-                       menubutton_textvariable = self.sheet_var,
-                       items=[sheet.name for sheet in sheets])
-        self.sheet_menu.pack(side=LEFT)
-        self.balloon.bind(self.sheet_menu,
-"""CFSheet whose unit(s) will be plotted.""")
+    def generate_plotgroup(self):
+        p = self.plotgroup_type(template=self.pgt)
+        self.populate_sheet_param(p)
+        return p
 
 
- 
+    def sheet_change(self):
+        pass
+        # don't self.update_plots() because they have to select the projection first
+        ## CEBHACKALERT: think it gets updated anywhere somewhere in the refresh+prjections part.
 
+        
+    def populate_sheet_param(self,p):
+        sheets = topo.sim.objects(self.sheet_type).values() 
+        sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
+        p.params()['sheet'].range = sheets
+        p.sheet = sheets[0]
 
-# CB: maybe should be a mix-in class, not inheriting from ProjectionRelatedPanel.
-# Anyway, the classes are yet to be determined...
-class CFRelatedPanel(ProjectionRelatedPanel):
+        
+   
+
+class CFPGPanel(ProjectionSheetPGPanel):
     """
     Existence is dedicated to...a situate button! 
     """
     # CB: declare abstract
+
+    sheet_type = CFSheet
+    plotgroup_type = CFPlotGroup
     
-    def __init__(self,console,pgt_name,master,**params):
-        super(CFRelatedPanel,self).__init__(console,pgt_name,master,sheet_type=CFSheet,**params)
-        self._add_situate_button()
-        
-        
-        # add situate to list of nothistorywidgets
+    def __init__(self,console,master,pgt,**params):
+        super(CFPGPanel,self).__init__(console,master,pgt,**params)
+        self.min_master_zoom = 1
+        self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change)
 
-
-    def _add_situate_button(self):
-        """
-        Add 'situate' checkbutton to self._params_frame (and set to False)
-        """        
-	self.situate_var = BooleanVar()
-        self.situate_var.trace_variable('w',lambda x,y,z: self.set_situate())
-	#self.situate_var.set(False)
-        self.situate_checkbutton = Checkbutton(self.control_frame_3,
-             text="Situate",variable=self.situate_var)
-        self.situate_checkbutton.pack(side=LEFT)
-        self.balloon.bind(self.situate_checkbutton,
-"""If True, plots the weights on the entire source sheet, using zeros for all
-weights outside the ConnectionField.  If False, plots only the actual weights that
-are stored.""")
-
-
-    def set_situate(self):
-        """Set the plotgroup.situate attribute, plus update and display plots."""
-        if self.plotgroup != None: # CB: is this test required?
-            self.plotgroup.situate = self.situate_var.get()
-            self.plotgroup.initial_plot = True
+# CEBALERT: can't this be simplified? what's min_master_zoom?
+    def situate_change(self):
+        if self.situate:
+            self.plotgroup.initial_plot=True
             self.plotgroup.height_of_tallest_plot = self.min_master_zoom = 1
-            self.plotgroup.update_plots(False)
-            self.display_plots()
+        else:
+            pass
+        self.redraw_plots()
 
-    
 
 
-class CFProjectionPanel(CFRelatedPanel):
+
+
+class CFProjectionPGPanel(CFPGPanel):
     """
     Panel for displaying CFProjections.
     """
-    def __init__(self,console,pgt_name,master,**params):
 
-	self.projection_var = StringVar()  # CB: these should go after super call, once
-        self.projections = KeyedList()     # whatever is stopping it from working that
-        self._create_projection_dict('V1') #self.sheet_var.get())
-        # CEBHACKALERT don't know how else to beat this circle until i update this class
-        # to use parameters etc; written over by add_projection_menu() probably, anyway
-	self.density_var = StringVar()     # way is fixed.
-        self.density_var.set('10.0')
+    plotgroup_type = CFProjectionPlotGroup
 
-
-        super(CFProjectionPanel,self).__init__(console,pgt_name,master,**params)
-
-        
-
-        
-
-
-        
-
-
-        # self.MIN_PLOT_HEIGHT = 1
-        # self.INITIAL_PLOT_HEIGHT = 6
-        # self.min_master_zoom=1
-
-        params_frame1 = Frame(master=self)
-        params_frame1.pack(side=RIGHT,expand=YES,fill=X)
-        pd = Message(params_frame1,text="Plotting Density:",aspect=1000)
-        pd.pack(side=LEFT)
-        self.balloon.bind(pd,'Number of units to plot per 1.0 distance in sheet coordinates')
-
-        density_entry = Entry(params_frame1,textvariable=self.density_var)
-        density_entry.bind('<FocusOut>', self.refresh)
-        density_entry.bind('<Return>', self.refresh)
-        density_entry.pack(side=LEFT,expand=YES,fill=X,padx=2)
-
-        self._add_projection_menu()
-
-
-
-
-
-        self.auto_refresh = False # panels can be slow to refresh
-        self.refresh()
-        
-
-    ### JC: this function has to be re-written anyway...
-    def _create_projection_dict(self,sheet_name):
-        """
-        Create a KeyedList of the CFProjections into sheet_name.  
-
-        Does something else after that...
-        """
-        self.projections = [(p.name,p) for p in topo.sim[sheet_name].in_connections
-                            if isinstance(p,CFProjection)]
-        
-        self.projections.sort(cmp_projections)
-
-        ### JC: I don't know why self.projections is a KeyedList...
-        self.projections = KeyedList(self.projections)
-
-        old_projection_name = self.projection_var.get()
-        if len(self.projections.keys()) == 0:
-            self.projection_var.set('None')
-        elif old_projection_name not in self.projections.keys():
-            self.projection_var.set(self.projections.keys()[0])
-
-
-    def _add_projection_menu(self):
-        """
-        Adds a Projection Widget to the existing frame, and creates the
-        item list for Unit Projection names.  This needs to be
-        changing based on which Sheet is selected.  See
-        self.sheet_refresh() 
-        """
-        params_frame2 = Frame(master=self)
-        params_frame2.pack(side=LEFT,expand=YES,fill=X)
-
-        self._create_projection_dict(self.sheet_var.get())
-       
-        self.projection_menu = Pmw.OptionMenu(params_frame2,
-                       command = self.refresh,
-                       labelpos = 'w',
-                       label_text = 'Projection:',
-                       menubutton_textvariable = self.projection_var,
-                       items = self.projections.keys())
-        self.projection_menu.pack(side=LEFT)
-        # Should be shared with projectionpanel
-        self.balloon.bind(self.projection_menu,
-"""Projection to plot.""")
-
-
-    # CEBHACKALERT q
-    def refresh(self,q=None):
-        sheet_name = self.sheet_var.get()
-        self._create_projection_dict(sheet_name)
-        self.projection_menu.setitems(self.projections.keys())
-        super(CFProjectionPanel,self).refresh()
-
-
-    def refresh_title(self):
-        self.title(topo.sim.name+': '+"Projection %s %s time:%s" % (self.plotgroup.sheet_name,
-            self.plotgroup.weight_name,self.plotgroup.time))
-        
-
-    def update_plotgroup_variables(self):
-	self.plotgroup.situate= self.situate_var.get()
-	self.plotgroup.density = float(self.density_var.get())
-	self.plotgroup.sheet_name=self.sheet_var.get()
-	self.plotgroup.weight_name = self.projection_var.get()
+    def __init__(self,console,master,pgt,**params):
+        super(CFProjectionPGPanel,self).__init__(console,master,pgt,**params)
+        self.pack_param('projection',parent=self.control_frame_3,on_change=self.update_plots)
+        self.pack_param('density',parent=self.control_frame_3)
 
 
     def generate_plotgroup(self):
- 	plotgroup = ProjectionPlotGroup([],self.pgt,self.sheet_var.get(),
-					self.projection_var.get(),
-                                        float(self.density_var.get()))
+        p = super(CFProjectionPGPanel,self).generate_plotgroup()        
+        self.populate_projection_param(p)
+        return p
 
-  	return plotgroup
+    
+    def refresh_title(self):
+        self.title(topo.sim.name+': '+"Projection %s %s time:%s" % (self.plotgroup.sheet.name,
+                                                                    self.projection.name,self.plotgroup.time))
+
+
+    def sheet_change(self):
+        self.refresh_projections()
+
+
+    def populate_projection_param(self,p):
+        prjns = p.sheet.projections().values() 
+        prjns.sort(cmp_projections)
+        p.params()['projection'].range = prjns
+        p.projection = prjns[0]        
+
+    def refresh_projections(self):
+        self.populate_projection_param(self.plotgroup)
+        
+        # CB: How do you change list of tkinter.optionmenu options? Use pmw's optionmenu?
+        # Currently, replace widget completely: looks bad and is complex.
+        if 'projection' in self._widgets:
+            self._widgets['projection'].destroy()
+            self._furames['projection'][1].destroy()
+            self.pack_param('projection',parent=self._furames['projection'][0])
 
 
     def display_plots(self):
         """
-        This must be changed from PlotGroupPanels version since
         CFProjectionPanel requires a 2D grid of plots.
         """
-        if self.plotgroup:
-	    plots=self.plotgroup.plots
-	    ### Momentary: delete when sorting the bitmap history
-	    self.bitmaps = [p.bitmap for p in plots]
-            # Generate the zoomed images.
-            self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image)
-                                  for p in plots]
-            old_canvases = self.canvases
-            self.canvases = [Canvas(self.plot_frame,
-                               width=image.width()+BORDERWIDTH*2+CANVASBUFFER,
-                               height=image.height()+BORDERWIDTH*2+CANVASBUFFER,
-                               bd=0)
-                             for image in self.zoomed_images]
-    
-            # Lay out images
-            for i,image,canvas in zip(range(len(self.zoomed_images)),
-                                      self.zoomed_images,self.canvases):
-                canvas.grid(row=i//self.plotgroup.proj_plotting_shape[0],
-                            column=i%self.plotgroup.proj_plotting_shape[1],
-                            padx=UNIT_PADDING,pady=UNIT_PADDING)
-                # BORDERWIDTH is added because the border is drawn on the
-                # canvas, overwriting anything underneath it.
-                # The +1 is necessary since the TKinter Canvas object
-                # has a problem with axis alignment, and 1 produces
-                # the best result.
-                canvas.create_image(image.width()/2+BORDERWIDTH+1,
-                                    image.height()/2+BORDERWIDTH+1,
-                                    image=image)
-                canvas.config(highlightthickness=0,borderwidth=0,relief=FLAT)
-                canvas.create_rectangle(1, 1, image.width()+BORDERWIDTH*2,
-                                        image.height()+BORDERWIDTH*2,
-                                        width=BORDERWIDTH,outline="black")
+        plots=self.plotgroup.plots
+        ### Momentary: delete when sorting the bitmap history
+        self.bitmaps = [p.bitmap for p in plots]
+        # Generate the zoomed images.
+        self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image)
+                              for p in plots]
+        old_canvases = self.canvases
+        self.canvases = [Canvas(self.plot_frame,
+                           width=image.width()+BORDERWIDTH*2+CANVASBUFFER,
+                           height=image.height()+BORDERWIDTH*2+CANVASBUFFER,
+                           bd=0)
+                         for image in self.zoomed_images]
 
-    
-            # Delete old ones.  This may resize the grid.
-            for c in old_canvases:
-                c.grid_forget()
+        # Lay out images
+        for i,image,canvas in zip(range(len(self.zoomed_images)),
+                                  self.zoomed_images,self.canvases):
+            canvas.grid(row=i//self.plotgroup.proj_plotting_shape[0],
+                        column=i%self.plotgroup.proj_plotting_shape[1],
+                        padx=UNIT_PADDING,pady=UNIT_PADDING)
+            # BORDERWIDTH is added because the border is drawn on the
+            # canvas, overwriting anything underneath it.
+            # The +1 is necessary since the TKinter Canvas object
+            # has a problem with axis alignment, and 1 produces
+            # the best result.
+            canvas.create_image(image.width()/2+BORDERWIDTH+1,
+                                image.height()/2+BORDERWIDTH+1,
+                                image=image)
+            canvas.config(highlightthickness=0,borderwidth=0,relief=FLAT)
+            canvas.create_rectangle(1, 1, image.width()+BORDERWIDTH*2,
+                                    image.height()+BORDERWIDTH*2,
+                                    width=BORDERWIDTH,outline="black")
+
+
+        # Delete old ones.  This may resize the grid.
+        for c in old_canvases:
+            c.grid_forget()
     
 
     def display_labels(self):
-        """
-        It's not a good idea to show the name of every plot, but it is
-        reasonable to put information around the plot group.
-        """
-        if len(self.projections) > 0:
-            src_name = self.projections[self.projection_var.get()].src.name
-
-            new_title = 'Projection ' + self.plotgroup.weight_name + ' from ' + src_name + ' to ' \
-                        + self.plotgroup.sheet_name + ' at time ' + str(self.plotgroup.time)
-            self.plot_group_title.configure(tag_text = new_title)
-        else:
-            self.plot_group_title.configure(tag_text = 'No Projections')
+        # CB: not a gui thing + there'll be a problem when changing sheets
+        src_name = self.projection.src.name
         
-
+        new_title = 'Projection ' + self.projection.name + ' from ' + src_name + ' to ' \
+                    + self.sheet.name + ' at time ' + str(self.plotgroup.time)
+        
+        self.plot_group_title.configure(tag_text = new_title)
+            
 
 
 
