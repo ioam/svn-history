@@ -162,8 +162,8 @@ class TaggedSlider(Frame,WidgetTranslator):
         self.__tag.bind('<Return>', self.action)   # ...and on tag losing focus
         self.__tag.pack(side=LEFT)
 
-        self.__min_value = self.translator(min_value)
-        self.__max_value = self.translator(max_value)
+        self.set_bounds(min_value,max_value)
+
         
         # Add the slider        
         self.__slider_val = IntVar(0)
@@ -175,7 +175,11 @@ class TaggedSlider(Frame,WidgetTranslator):
         self.__slider.pack(side=LEFT,expand=YES,fill=BOTH)
         self.__set_slider_from_tag()
         self.__first_slider_command = True          # see self.__slider_command below
-        
+
+
+    def set_bounds(self,min,max):
+        self.__min_value=self.translator(min)
+        self.__max_value = self.translator(max)
 
     # CEBALERT: I find the refresh() and optional_refresh() methods
     # confusing. Is there a simpler way to implement this kind of
