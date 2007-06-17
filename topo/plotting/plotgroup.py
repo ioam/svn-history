@@ -1,4 +1,3 @@
-
 """
 Hierarchy of PlotGroup classes, i.e. output-device-independent sets of plots.
 
@@ -17,11 +16,16 @@ import __main__
 import topo
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Parameter,BooleanParameter,StringParameter
+from topo.base.parameterclasses import Parameter,BooleanParameter,StringParameter,Number
 from topo.base.sheet import Sheet
-from topo.base.cf import CFSheet
+from topo.base.cf import CFSheet,CFProjection
+from topo.base.projection import ProjectionSheet
 
 from plot import make_template_plot, Plot
+
+
+### CEBHACKALERT: make sure error messages are reasonable for trying to do plots
+### with e.g. sheet=None or projection=None.
 
 
 def cmp_plot(plot1,plot2):
@@ -35,9 +39,29 @@ def cmp_plot(plot1,plot2):
 	return cmp((plot1.plot_src_name+plot1.name),
 		   (plot2.plot_src_name+plot2.name))
 
+
 def identity(x):
     """No-op function for use as a default."""
     return x
+
+
+### Temporary
+class RangedParameter(Parameter):
+
+    # instantiate?
+
+    __slots__ = ['range']
+    __doc__ = property((lambda self: self.doc))
+
+    def __init__(self, default=None, range=[], **params):
+        Parameter.__init__(self,default=default,**params)
+        self.range = range
+
+    def __set__(self,obj,val):
+        #assert not isinstance(val,str),"%s"%val
+        super(RangedParameter,self).__set__(obj,val)
+
+        
 
 
 class PlotGroup(ParameterizedObject):
@@ -45,59 +69,50 @@ class PlotGroup(ParameterizedObject):
     Container that has one or more Plots and also knows how to arrange
     the plots and other special parameters.
     """
-
     ###JCALERT:
     ### - clean up the doc.
     ### - rewrite the test file.
 
-    normalize = BooleanParameter(default=False,doc="""
-        Whether to scale plots so that the peak value will be white
-        and the minimum value black.  Otherwise, 0.0 will be black
-        and 1.0 will be white.  Normalization has the advantage of
-        ensuring that any data that is present will be visible, but
-        the disadvantage that the absolute scale will be obscured.
-        Non-normalized plots are guaranteed to be on a known scale,
-        but only values between 0.0 and 1.0 will be visibly
-        distinguishable.""")
+    # listparameter
+    #plot_list = Parameter(default=[],instantiate=True)
 
-    sheetcoords = BooleanParameter(default=False,doc="""
-        Whether to scale plots based on their relative sizes in sheet
-        coordinates.  If true, plots are scaled so that their sizes are
-        proportional to their area in sheet coordinates, so that one can
-        compare corresponding areas.  If false, plots are scaled to have
-        similar sizes on screen, regardless of their corresponding
-        sheet areas, which maximizes the size of each plot.""")
-
-
-    # CEBHACKALERT: if this parameter is modified after __init__ has been
-    # called, the sizeconvertfn isn't changed. Code from plotgrouppanel:
-    #if self.plotgroup.integerscaling:
-    #    self.plotgroup.sizeconvertfn = int
-    #else:
-    #    self.plotgroup.sizeconvertfn = identity
-
-    integerscaling = BooleanParameter(default=False,doc="""
-        When scaling bitmaps, whether to ensure that the scaled bitmap is an even
-        multiple of the original.  If true, every unit will be represented by a
-        square of the same size.  Typically false so that the overall area will
-        be correct, e.g. when using Sheet coordinates, which is often more
-        important.""")
-
+    updatecommand = Parameter(default="",doc="""
+    Command to execute before updating this plot, e.g. to calculate sheet views.
     
-    def __init__(self, plot_list, **params):
+    The command can be any Python code, and will be evaluated in the main namespace
+    (as if it were typed into a .ty script).  The initial value is determined by
+    the template for this plot, but various arguments can be passed, a modified
+    version substituted, etc.""")
+
+    ## CEBHACKALERT
+    command = updatecommand
+    
+    plotcommand = Parameter(default="",doc="""
+    Command to execute when updating sheet or coordinate of unit to be plotted
+    when the simulator time has not changed.
+    In the case of a full-field stimulus, responses do not need to be re-measured
+    since the necessary values are already stored. 
+    
+    The command can be any Python code, and will be evaluated in the main namespace
+    (as if it were typed into a .ty script).  The initial value is determined by
+    the template for this plot, but various arguments can be passed, a modified
+       version substituted, etc.""")
+    
+    def __init__(self,**params):
         """
         Initialize using a static list of Plots that will make up this PlotGroup.
         """
-        super(PlotGroup,self).__init__(**params)  
+        super(PlotGroup,self).__init__(**params)
 
-	self.plot_list = plot_list	
-	if self.integerscaling:
-            self.sizeconvertfn = int
+        # CEBALERT
+        if 'plot_list' in params:
+            self.plot_list = copy.copy(params['plot_list'])
+            #del params['plot_list']
         else:
-            self.sizeconvertfn = identity
-
-	# List of plot labels
-	self.labels = []
+            self.plot_list = []
+        
+	#self.plot_list = plot_list	
+	self.labels = [] # List of plot labels
 
         # In the future, it might be good to be able to specify the
         # plot rows and columns using tuples.  For instance, if three
@@ -107,28 +122,23 @@ class PlotGroup(ParameterizedObject):
         # would have the first row with 3, the second row with 2, the
         # third row with 4, etc.  The default left-to-right ordering
         # in one row could perhaps be represented as (None, Inf).
-
-	# Enforce a minimum plot height for the tallest plot of the PlotGroup.
-	self.INITIAL_PLOT_HEIGHT = 150
-
-	self.height_of_tallest_plot = 1.0
-	self.initial_plot = True
-	self.minimum_height_of_tallest_plot = 1.0
-
-	# Time attribute.
+        
+	self.initial_plot = True  # CB: what's this?
 	self.time = None
 
-
-    ### JCALERT: ASK JIM if we should rename that.
-    def update_environment(self):
-	""" 
-	Only implemented for TemplatePlotGroup. 
-	Execute the command associated with the template
-	(e.g. generating the Sheetviews necessary to create the PlotGroup's Plots).
-	"""
-	pass
+        ## CB  import __main__; __main__.__dict__['zzz'] = self
 
 
+    def _plotcommand(self):
+        exec self.plotcommand in __main__.__dict__
+
+
+
+    def _updatecommand(self):
+        exec self.updatecommand in __main__.__dict__
+
+
+        
     def _plot_list(self):
 	"""
 	function that returns the plot_list.
@@ -136,14 +146,31 @@ class PlotGroup(ParameterizedObject):
 	"""
 	return self.plot_list
 
-    
-    def update_plots(self,update=True):
+
+    # CB: rename
+    def draw_plots(self,update=True):
+	"""
+
+	If update=True, execute the command associated with the template
+	(e.g. generating the Sheetviews necessary to create the PlotGroup's Plots).
+	"""
+        if update: self._updatecommand()
+        self._plotcommand()
+        self._make_plots()
+        
+
+    # CB: ** replace calls to these two methods **
+    def redraw_plots(self):
+        self.draw_plots(update=False)
+    def update_plots(self):
+        self.draw_plots(update=True)
+
+
+
+    def _make_plots(self):
         """
         Generate the sorted and scaled list of plots constituting the PlotGroup.
         """
-	### JCALERT! See if we keep this test
-	if update:
-	    self.update_environment()
 
         self.plots = [plot for plot in self._plot_list() if plot != None]
 
@@ -163,20 +190,97 @@ class PlotGroup(ParameterizedObject):
                 self.warning("Combining Plots from different times (%s,%s)" %
                              (min(timestamps),max(timestamps)))
 
-	# scaling the Plots
-	### JCALERT: momentary hack
-	if self.plots!=[]:
-	    self.scale_images()
-	# sorting the Plots.
 	self._ordering_plots()	
 	self.generate_labels()
 
-     ### Need to be re-implemented for connectionfieldplotgroup.
+
     def generate_labels(self):
 	""" Function used for generating the labels."""
 	self.labels = []
 	for plot in self.plots:
 	    self.labels.append(plot.plot_src_name + '\n' + plot.name)
+
+
+    def _ordering_plots(self):
+	"""
+	Function called to sort the Plots in order.
+	They are ordered according to their precedence number first, and then by alphabetical order.
+	"""
+	self.plots.sort(cmp_plot)
+
+
+
+
+### In the rest of the file, whenever we do a loop through all the
+### simulation's sheets, seems like we should have set the sheet
+### Parameter's range instead. sheet's range is set by the GUI.
+### i.e. maybe there should be a sheet parameter here, with its range
+### set when the plotgroup is instantiated. Then if sheet=None, the
+### sheet's range can be used as the list of sheets.
+
+
+# rename; represents 3d AND draws plots on itself
+class XPlotGroup(PlotGroup):
+
+    # Sheet_name can be none, in which case the PlotGroup build Plots for each Sheet.
+    sheet = RangedParameter(default=None,doc="""CEBHACKALERT""") 
+
+
+    sheetcoords = BooleanParameter(default=False,doc="""
+    Whether to scale plots based on their relative sizes in sheet
+    coordinates.  If true, plots are scaled so that their sizes are
+    proportional to their area in sheet coordinates, so that one can
+    compare corresponding areas.  If false, plots are scaled to have
+    similar sizes on screen, regardless of their corresponding
+    sheet areas, which maximizes the size of each plot.""")
+
+    normalize = BooleanParameter(default=False,doc="""
+        Whether to scale plots so that the peak value will be white
+        and the minimum value black.  Otherwise, 0.0 will be black
+        and 1.0 will be white.  Normalization has the advantage of
+        ensuring that any data that is present will be visible, but
+        the disadvantage that the absolute scale will be obscured.
+        Non-normalized plots are guaranteed to be on a known scale,
+        but only values between 0.0 and 1.0 will be visibly
+        distinguishable.""")
+
+    integerscaling = BooleanParameter(default=False,doc="""
+        When scaling bitmaps, whether to ensure that the scaled bitmap is an even
+        multiple of the original.  If true, every unit will be represented by a
+        square of the same size.  Typically false so that the overall area will
+        be correct, e.g. when using Sheet coordinates, which is often more
+        important.""")
+
+
+
+
+    def sizeconvertfn(self,X):
+        if self.integerscaling:
+            return int(X)
+        else:
+            return identity(X)
+        
+ 
+    def __init__(self,**params):
+        super(XPlotGroup,self).__init__(**params)
+
+        # Enforce a minimum plot height for the tallest plot of the PlotGroup.
+        self.INITIAL_PLOT_HEIGHT = 150
+        self.height_of_tallest_plot = 1.0
+        self.minimum_height_of_tallest_plot = 1.0
+
+
+
+
+######################################################################
+### At least some of this scaling would be common to all plotgroups, if
+### some (e.g. featurecurve) didn't open new windows.
+    def _make_plots(self):
+        super(XPlotGroup,self)._make_plots()
+        # scaling the Plots
+	### JCALERT: momentary hack        
+	if self.plots!=[]:
+	    self.scale_images()
 
 
     def scale_images(self):
@@ -240,131 +344,30 @@ class PlotGroup(ParameterizedObject):
             else:   
                 self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
             self.initial_plot=False
+######################################################################
 
-
-    def _ordering_plots(self):
-	"""
-	Function called to sort the Plots in order.
-	They are ordered according to their precedence number first, and then by alphabetical order.
-	"""
-	self.plots.sort(cmp_plot)
-
-
-
-class FeatureCurvePlotGroup(PlotGroup):
     
-   updatecommand = Parameter(default="",doc="""
-       Command to execute before updating this plot, e.g. to calculate sheet views.
-
-       The command can be any Python code, and will be evaluated in the main namespace
-       (as if it were typed into a .ty script).  The initial value is determined by
-       the template for this plot, but various arguments can be passed, a modified
-       version substituted, etc.""")
-
-   plotcommand = Parameter(default="",doc="""
-       Command to execute when updating sheet or coordinate of unit to be plotted
-       when the simulator time has not changed.
-       In the case of a full-field stimulus, responses do not need to be re-measured
-       since the necessary values are already stored. 
-
-       The command can be any Python code, and will be evaluated in the main namespace
-       (as if it were typed into a .ty script).  The initial value is determined by
-       the template for this plot, but various arguments can be passed, a modified
-       version substituted, etc.""")
-
-   def __init__(self,plot_list,template,sheet_name,x,y):
-
-	super(FeatureCurvePlotGroup,self).__init__(plot_list)
-        self.template=template
-        self.updatecommand = self.template.command
-        self.plotcommand = self.template.plotcommand
-        self.x = x
-        self.y = y
-        self.sheet_name=sheet_name
-
-  
-   def update_environment(self):
-       topo.commands.analysis.coordinate = (self.x,self.y)
-       topo.commands.analysis.sheet_name = self.sheet_name
-          
-       exec  self.updatecommand in __main__.__dict__
-       exec  self.plotcommand in __main__.__dict__
-
-       self.get_curve_time()
-       
-   def update_variables(self):
-       topo.commands.analysis.coordinate = (self.x,self.y)
-       topo.commands.analysis.sheet_name = self.sheet_name
-       
-       exec  self.plotcommand in __main__.__dict__
-
-       self.get_curve_time()
-
-   def get_curve_time(self):
-       """
-       Get timestamps from the current SheetViews in the curve_dict and
-       use the max timestamp as the plot label
-       Displays a warning if not all curves have been measured at the same time.
-       """
-
-       for x_axis in topo.sim[str(self.sheet_name)].curve_dict.itervalues():
-           for curve_label in x_axis.itervalues():
-               timestamps = [SheetView.timestamp for SheetView in curve_label.itervalues()]
-               
-       if timestamps != []:
-           self.time = max(timestamps)
-           if max(timestamps) != min(timestamps):
-               self.warning("Displaying curves from different times (%s,%s)" %
-                            (min(timestamps),max(timestamps)))
 
 
-
-class TemplatePlotGroup(PlotGroup):
+class TemplatePlotGroup(XPlotGroup):
     """
     PlotGroup that is built as specified by a PlotGroupTemplate.
     """
 
-    updatecommand = StringParameter(default="",doc="""
-        Command to execute before updating this plot, e.g. to calculate sheet views.
+    template = Parameter() 
 
-        The command can be any Python code, and will be evaluated in the main namespace
-        (as if it were typed into a .ty script).  The initial value is determined by
-        the template for this plot, but various arguments can be passed, a modified
-        version substituted, etc.""")
+    def __init__(self,**params):
+	super(TemplatePlotGroup,self).__init__(**params)
 
-    strength_only = BooleanParameter(default=False,doc="""unfinished""")
-
-    # CEBHACKALERT! strength-only function missing: needs to be in the plotgroup.
-    # Code from templateplotgrouppanel:
-##             for name,template in self.pgt.plot_templates:
-##                 if template.has_key('Hue'):
-##                     del template['Hue']
-##                 if template.has_key('Confidence'):
-##                     del template['Confidence']
-
-
-
-    def __init__(self,plot_list,template,sheet_name,**params):
-
-	super(TemplatePlotGroup,self).__init__(plot_list,**params)
-	self.template = template
-
-	# Sheet_name can be none, in which case the PlotGroup build Plots for each Sheet.
-	self.sheet_name=sheet_name
-
-	# Command used to refresh the plot, if any.  Overwrites any keyword parameter above.
-        self.updatecommand = self.template.command
-
+        ##### CEBHACKALERT: set params from template #####
+        assert self.template is not None
+        for n in self.template.params().keys():
+            if hasattr(self,n):
+                setattr(self,n,getattr(self.template,n))
+        ##################################################
+                
 	# Add static images to the added_plot_list, as specified by the template.
         self._add_static_images()
-	
-
-    def update_environment(self):
-	""" 
-	Only implemented for TemplatePlotGroup. 
-	Execute the command associated with the template.
-	"""
-	exec self.updatecommand in __main__.__dict__
 
 	
     def _plot_list(self):
@@ -377,11 +380,10 @@ class TemplatePlotGroup(PlotGroup):
         This function calls create_plots, which is implemented in each
         TemplatePlotGroup subclass.
         """
-	if self.sheet_name:
-	    sheet_list = [each for each in topo.sim.objects(Sheet).values()
-                          if each.name == self.sheet_name]   
+	if self.sheet:
+            sheet_list = [self.sheet]
 	else:
-	    sheet_list = [each for each in topo.sim.objects(Sheet).values()]
+	    sheet_list = topo.sim.objects(Sheet).values() #self.params()['sheet'].range()  
    
 	plot_list = self.plot_list
         # Loop over all sheets that passed the filter.
@@ -414,22 +416,33 @@ class TemplatePlotGroup(PlotGroup):
             self.plot_list.append(plot)
 
 
-            
+
+### CEBALERT: shouldn't contain any CF-related stuff. 
 class ProjectionSheetPlotGroup(TemplatePlotGroup):
     """
-    Abstract PlotGroup for visualizations of the Projections of one Sheet.
+    Abstract PlotGroup for visualizations of the Projections of one ProjectionSheet.
 
     Requires self.keyname to be set to the name of a placeholder
     SheetView that will be replaced with a key that is unique to a
     particular Projection of the current Sheet.
     """
+    _abstract_class_name = "ProjectionSheetPlotGroup"
 
-    def update_environment(self):
-	"""Execute the command associated with the template."""
+    keyname = "ProjectionSheet" # CB: document what these are
+
+    sheet = RangedParameter() 
+
+
+    def _updatecommand(self):
+
+        # CEBALERT: rather than various scattered tests like the one below and for projections in later classes,
+        # have some method (probabable decalred in a super calss) like "_check_conditions()".
+        if self.sheet is None: raise ValueError("%s must have a sheet (currently None)."%self)
 	### JCALERT: commands in analysis.py should be re-written to
 	### avoid setting these global parameters.
-	topo.commands.analysis.sheet_name = self.sheet_name
-        exec self.updatecommand  in __main__.__dict__
+	topo.commands.analysis.sheet_name = self.sheet.name
+        super(ProjectionSheetPlotGroup,self)._updatecommand()
+        
 		
     def _create_plots(self,pt_name,pt,sheet):
 	"""Creates plots as specified by the plot_template."""
@@ -456,7 +469,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
                 
 	    else: # Fall back to normal case
                 return super(ProjectionSheetPlotGroup,self)._create_plots(pt_name,pt,sheet)
-    
+
  
     def generate_labels(self):
 	""" Function used for generating the labels."""
@@ -467,10 +480,12 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
 
 class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
-    """PlotGroup for ProjectionActivity views."""
+    """Visualize the activity of all Projections into a ProjectionSheet."""
 
-    keyname='ProjectionActivity'
+    keyname='ProjectionActivity' 
 
+ 
+    ### CEBALERT: very similar to large part of ProjectionSheetPlotGroup's _create_plots
     def _create_plots(self,pt_name,pt,sheet):
 	"""Creates plots as specified by the plot_template."""
 
@@ -487,33 +502,45 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
                                                 p.dest.bounds,self.normalize,name=p.name))
         return plot_list
                 
+
+
+
+
+class CFPlotGroup(ProjectionSheetPlotGroup):
+
+    situate = BooleanParameter(default=False,doc=
+                               """If True, plots the weights on the
+entire source sheet, using zeros for all weights outside the
+ConnectionField.  If False, plots only the actual weights that are
+stored.""")
+
+# CEBALERT: all necessary situate stuff removed from tkgui? See ALERT in CFRelatedPlotGroupPanel.
+
+
+
 	    
 ### JABALERT: Should pull out common code from
 ### ConnectionFieldsPlotGroup, ProjectionActivityPlotGroup, and
 ### ProjectionPlotGroup into a shared parent class; then those
 ### three classes should be much shorter.
 
-class ConnectionFieldsPlotGroup(ProjectionSheetPlotGroup):
+class ConnectionFieldsPlotGroup(CFPlotGroup):
     """
-    PlotGroup for Connection Fields UnitViews.  
-
-    Attributes::
-      x: x-coordinate of the unit to plot
-      y: y-coordinate of the unit to plot
-      situate: Whether to situate the plot on the full source sheet, or just show the weights.
+    Visualize a ConnectionField for each of a CFSheet's CFProjections.
     """
-
     keyname='Weights'
+    situate = BooleanParameter(False)
 
-    def __init__(self,plot_list,template,sheet_name,x,y,**params):
-        self.x = x
-        self.y = y
-      	self.situate = False       
-	super(ConnectionFieldsPlotGroup,self).__init__(plot_list,template,sheet_name,**params)
-  
-    def update_environment(self):
+    # JABALERT: need to show actual coordinates of unit returned
+    x = Number(default=0.0,doc="""x-coordinate of the unit to plot""")
+    y = Number(default=0.0,doc="""y-coordinate of the unit to plot""")
+## """Sheet coordinate location desired.  The unit nearest this location will be returned.
+## It is an error to request a unit outside the area of the Sheet.""")
+
+        
+    def _update_command(self):
 	topo.commands.analysis.coordinate = (self.x,self.y)
-	super(ConnectionFieldsPlotGroup,self).update_environment()
+	super(ConnectionFieldsPlotGroup,self)._update_command()
 
     def _create_plots(self,pt_name,pt,sheet):
 	""" 
@@ -545,40 +572,43 @@ class ConnectionFieldsPlotGroup(ProjectionSheetPlotGroup):
 
 
 
-### JABALERT: Should change ProjectionPlotGroup to CFProjectionPlotGroup.
-class ProjectionPlotGroup(ProjectionSheetPlotGroup):
-    """PlotGroup for Projection Plots."""
+### Someday will need an abstract ProjectionPlotGroup
+
+
+class CFProjectionPlotGroup(CFPlotGroup):
+    """Visualize one CFProjection."""
 
     keyname='Weights'
 
-    def __init__(self,plot_list,template,sheet_name,proj_name,density,**params):
+    projection = RangedParameter(default=None)
 
-	### JCALERT! rename to proj_name
-        self.weight_name = proj_name
-        self.density = density
+    ### CEBHACKALERT: tkpo gui not setup to read softbounds
+    density = Number(default=10.0,doc='Number of units to plot per 1.0 distance in sheet coordinates',
+                     softbounds=(5.0,50.0))
+    
+    situate = BooleanParameter(False) # override default 
 
+    def __init__(self,**params):
+        super(CFProjectionPlotGroup,self).__init__(**params)
+        self.INITIAL_PLOT_HEIGHT = 5
+        
         ### JCALERT! shape determined by the plotting density
         ### This is set by self.generate_coords()
         self.proj_plotting_shape = (0,0)
-	
-	### JCALERT! should become an argument of the constructor (id:for connectionPlotGroup) 
-	self.situate = False 
-       
-        super(ProjectionPlotGroup,self).__init__(plot_list,template,sheet_name,**params)
+    
 
-        self.INITIAL_PLOT_HEIGHT = 5
-
-    def update_environment(self):
-	""" 
-	Only implemented for TemplatePlotGroup. 
-	Execute the command associated with the template.
-	"""
+    def _updatecommand(self):
+        print "_update_command"
+        print "self.projection",self.projection,type(self.projection)
+        
+        if self.projection is None: raise ValueError("%s must have a projection (currently None)."%self)
 	### JCALERT: commands in analysis have to be re-written so that to avoid
 	### setting all these global parameters.
-	coords = self.generate_coords()
-        topo.commands.analysis.proj_coords = coords
-        topo.commands.analysis.proj_name = self.weight_name
-	super(ProjectionPlotGroup,self).update_environment()
+        topo.commands.analysis.proj_coords = self.generate_coords()
+        topo.commands.analysis.proj_name = self.projection.name
+        print "name",self.projection.name
+        super(CFProjectionPlotGroup,self)._updatecommand()
+
 		
     def _create_plots(self,pt_name,pt,sheet):
 	""" 
@@ -586,22 +616,24 @@ class ProjectionPlotGroup(ProjectionSheetPlotGroup):
 	Creates a plot as specified by a Projection plot_template:
 	Built a projection Plot from corresponding UnitViews.
 	"""
-	projection = sheet.projections().get(self.weight_name,None)
+        if self.projection is None: raise ValueError("%s must have a projection (currently None)."%self)
+        
+	projection = self.projection
         plot_list=[]
-        if projection:
-	    src_sheet=projection.src
-	    for x,y in self.generate_coords():
-		plot_channels = copy.deepcopy(pt)
-		# JC: we might consider allowing the construction of 'projection type' plots
-		# with other things than UnitViews.
-		key = (self.keyname,sheet.name,projection.name,x,y)
-		plot_channels['Strength'] = key
-		if self.situate:
-		    plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.xdensity,
-							src_sheet.bounds,self.normalize))
-		else:
-		    (r,c) = projection.dest.sheet2matrixidx(x,y)
-		    plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.xdensity,
+        src_sheet=projection.src
+
+        for x,y in self.generate_coords():
+            plot_channels = copy.deepcopy(pt)
+            # JC: we might consider allowing the construction of 'projection type' plots
+            # with other things than UnitViews.
+            key = (self.keyname,sheet.name,projection.name,x,y)
+            plot_channels['Strength'] = key
+            if self.situate:
+                plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.xdensity,
+                                                    src_sheet.bounds,self.normalize))
+            else:
+                (r,c) = projection.dest.sheet2matrixidx(x,y)
+                plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.xdensity,
 							projection.cf(r,c).bounds,self.normalize))
         return plot_list
 
@@ -616,10 +648,12 @@ class ProjectionPlotGroup(ProjectionSheetPlotGroup):
         def rev(x): y = x; y.reverse(); return y
         ### JCALERT! Here, we assume that for a ProjectionPlotGroup,
 	### sheet_name is not None.
-	for s in topo.sim.objects(Sheet).values():
-	    if (s.name==self.sheet_name and isinstance(s,CFSheet)):
-		self._sim_ep = s
-        (l,b,r,t) = self._sim_ep.bounds.lbrt()
+
+        # why was this here?
+	#for s in topo.sim.objects(Sheet).values():
+	#    if (s.name==self.sheet_name and isinstance(s,CFSheet)):
+	#	self._sim_ep = s
+        (l,b,r,t) = self.sheet.bounds.lbrt()
         x = float(r - l) 
         y = float(t - b)
         x_step = x / (int(x * self.density) + 1)
@@ -635,6 +669,7 @@ class ProjectionPlotGroup(ProjectionSheetPlotGroup):
         return coords
 
 
+    ## CEBALERT: very similar to XPlotGroup's (marked by "diff"s)
     def scale_images(self):
         if self.initial_plot:
             self._calculate_minimum_height_of_tallest_plot()
@@ -646,7 +681,7 @@ class ProjectionPlotGroup(ProjectionSheetPlotGroup):
             max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
                                      -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
                                     for p in resizeable_plots])
-            matrix_max_height = max([p.bitmap.height() for p in resizeable_plots])
+            matrix_max_height = max([p.bitmap.height() for p in resizeable_plots]) # diff 1 (addition)
 
 	for plot in self.plots:
             if not plot.resize:
@@ -657,9 +692,75 @@ class ProjectionPlotGroup(ProjectionSheetPlotGroup):
 		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(s.xdensity)/max_sheet_height)
 		else:
 		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(matrix_max_height))
-	    plot.bitmap.image = plot.bitmap.zoom(scaling_factor)
+                    # diff 2 (missing enforced min scaling_factor)
+
+	    plot.bitmap.image = plot.bitmap.zoom(scaling_factor) # diff 3 [plot.rescale(scaling_factor)]
 
 
     def _ordering_plots(self):
 	"""Skips plot sorting for Projections to keep the units in order."""
 	pass
+
+
+
+
+class FeatureCurvePlotGroup(PlotGroup):
+
+
+    sheet = RangedParameter() 
+
+    template = Parameter() # doesn't this make it a templateplotgroup?
+
+    x = Number(default=0.0,doc="something")
+    y = Number(default=0.0,doc="somethingelse")
+
+
+
+    ### CEBALERT: these won't stay here 
+    normalize=Parameter(hidden=True)
+    sheetcoords=Parameter(hidden=True)
+    integerscaling=Parameter(hidden=True)
+    
+
+    def __init__(self,**params):
+        super(FeatureCurvePlotGroup,self).__init__(**params)
+
+        ##### CEBHACKALERT: set params from template #####
+        assert self.template is not None
+        for n in self.template.params().keys():
+            if hasattr(self,n):
+                setattr(self,n,getattr(self.template,n))
+        ##################################################
+
+
+    def CEBALERT(self):
+        topo.commands.analysis.coordinate = (self.x,self.y)
+        topo.commands.analysis.sheet_name = self.sheet.name
+
+    def _updatecommand(self):
+        self.CEBALERT()
+        super(FeatureCurvePlotGroup,self)._updatecommand()          
+        self.get_curve_time()
+
+    def _plotcommand(self):
+        self.CEBALERT()
+        super(FeatureCurvePlotGroup,self)._plotcommand()
+        self.get_curve_time()
+
+
+    def get_curve_time(self):
+        """
+        Get timestamps from the current SheetViews in the curve_dict and
+        use the max timestamp as the plot label
+        Displays a warning if not all curves have been measured at the same time.
+        """
+        for x_axis in self.sheet.curve_dict.itervalues():
+            for curve_label in x_axis.itervalues():
+                timestamps = [SheetView.timestamp for SheetView in curve_label.itervalues()]
+
+        if timestamps != []:
+            self.time = max(timestamps)
+            if max(timestamps) != min(timestamps):
+                self.warning("Displaying curves from different times (%s,%s)" %
+                             (min(timestamps),max(timestamps)))
+
