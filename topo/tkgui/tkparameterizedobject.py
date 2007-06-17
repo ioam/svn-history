@@ -3,13 +3,18 @@
 $Id$
 """
 
-# CB: testing out Parameter-Tkinter Variable coupling
+# CB: this file has now gone beyond the maximum complexity limit
 
 
 from inspect import getdoc
 import Tkinter
-from Tkinter import BooleanVar, StringVar, DoubleVar, IntVar,Frame, Tk, Checkbutton, Entry, Button
+from Tkinter import BooleanVar, StringVar, DoubleVar, IntVar,Frame, Tk, Checkbutton, Entry, Button,OptionMenu
 import Pmw
+
+import topo
+
+from topo.plotting.plotgroup import RangedParameter
+
 
 from topo.base.parameterizedobject import ParameterizedObject,Parameter
 from topo.base.parameterclasses import BooleanParameter,StringParameter,Number
@@ -49,12 +54,18 @@ parameters_to_tkwidgets = {
     BooleanParameter:Checkbutton,
     Number:TaggedSlider,
     StringParameter:Entry,
-    ButtonParameter:Button
+    ButtonParameter:Button,
+    RangedParameter:OptionMenu
     }
 
+## CEBHACKALERT: by using tkinter's optionmenu rather than pmw's, i think
+## i lost the history.
 
-### CB: most of the documenation needs to be updated! Please ignore
+
+### CEBHACKALERT: most of the documenation needs to be updated! Please ignore
 ### it for the moment.
+
+
 
 class TkParameterizedObjectBase(ParameterizedObject):
     """
@@ -94,18 +105,87 @@ class TkParameterizedObjectBase(ParameterizedObject):
     # or a callback of some kind in the parameterized object itself.
 
     _extra_pos = []
-    #_tk_vars = {}
+    _tk_vars = {}
+    translators = {}
     
 
     # __repr__ will need some work (display params of subobjects etc?)
 
 
+    # CEBALERT: a list's too confusing, and there's currently no need for more
+    # than one extra po.
     def __init__(self,extra_pos=[],**params):
-        super(TkParameterizedObjectBase,self).__init__(**params)
+
         self._extra_pos = extra_pos
         self._tk_vars = {}
-        self.__setup_tk_vars()
+        self.translators = {}
+        
+        super(TkParameterizedObjectBase,self).__init__(**params)
 
+        for PO in extra_pos[::-1]+[self]:
+            self.init_tk_vars(PO)
+
+
+
+    ### CB: can't use this because widgets will be left behind with old variables!
+##     def add_extra_po(self,PO):
+##         # CB ** insert at start since last PO in will write over other same-named tkvars,
+##         # so indicate that in search order. 
+##         self._extra_pos.insert(0,PO)
+##         self.init_tk_vars(PO)
+
+
+
+    def update_translator(self,name,param):
+        t=self.translators[name]={}
+        for a in param.range:
+            # use name if has one
+            try:
+               t[a.name] = a
+            except AttributeError:
+               t[str(a)]=a
+        
+
+    def init_tk_vars(self,PO):
+        for name,param in PO.params().items():
+
+            if hasattr(param,'range'): #isinstance(param,RangedParameter):
+                self.update_translator(name,param)
+
+            tk_var = parameters_to_tkvars.get(type(param),StringVar)()
+            self._tk_vars[name] = tk_var
+
+            tk_var._original_set = tk_var.set
+            tk_var.set = lambda v,x=name: self.__set_tk_val(x,v)
+
+            tk_var.set(getattr(PO,name))
+            tk_var._last_good_val=tk_var.get() # for reverting
+            tk_var.trace_variable('w',lambda a,b,c,p_name=name: self.__update_param(p_name))        
+            # Instead of a trace, could we override the Variable's set() method i.e. trace it ourselves?
+            # Or does too much happen in tcl/tk for that to work?
+
+            # Override the Variable's get() method to guarantee an out-of-date value is never returned.
+            # In cases where the tkinter val is the most recently changed (i.e. when it's edited in the
+            # gui, resulting in a trace_variable being called), use the _original_get() method.
+            tk_var._original_get = tk_var.get
+            tk_var.get = lambda x=name: self.__get_tk_val(x)
+
+    def _setup_params(self,**params):
+        """
+        Parameters that are not in this object itself but are in one of the
+        extra_pos get set on that extra_po.
+
+        Then calls ParameterizedObject's _setup_params().
+        """
+        ### a parameter might be passed in for one of the extra_pos;
+        ### if a key in the params dict is not a *parameter* of this
+        ### PO, then try it on the extra_pos
+        for n,p in params.items():
+            if n not in self.params():
+                self.set_parameter_value(n,p)
+                del params[n]
+
+        ParameterizedObject._setup_params(self,**params)
     
     def __setup_tk_vars(self):
         """
@@ -121,22 +201,10 @@ class TkParameterizedObjectBase(ParameterizedObject):
         the corresponding parameter is set on parameterized_object.
         """
         # * lookup order: self then extra_pos in order, so set in reverse *
-        for PO in self._extra_pos[::-1]+[self]:
-            for name,param in PO.params().items():
-                tk_var = parameters_to_tkvars.get(type(param),StringVar)()
-                self._tk_vars[name] = tk_var
-                tk_var.set(getattr(PO,name))
-                tk_var._last_good_val=tk_var.get() # for reverting
-                tk_var.trace_variable('w',lambda a,b,c,p_name=name: self.__update_param(p_name))        
-                # Instead of a trace, could we override the Variable's set() method i.e. trace it ourselves?
-                # Or does too much happen in tcl/tk for that to work?
-                
-                # Override the Variable's get() method to guarantee an out-of-date value is never returned.
-                # In cases where the tkinter val is the most recently changed (i.e. when it's edited in the
-                # gui, resulting in a trace_variable being called), use the _original_get() method.
-                tk_var._original_get = tk_var.get
-                tk_var.get = lambda x=name: self.__get_tk_val(x)
+        raise
 
+
+    # goes round the houses when already know tk_var
 
     def __get_tk_val(self,param_name):
         """
@@ -150,7 +218,45 @@ class TkParameterizedObjectBase(ParameterizedObject):
             # tk var needs to be updated
             tk_var.set(po_val)
         return po_val #tk_var.get()
+
+    def __set_tk_val(self,param_name,val):
+        val = self.atrevnoc(param_name,val)
+        tk_var = self._tk_vars[param_name]
+        tk_var._original_set(val)
+        
     
+    def converta(self,param_name,val):
+        """
+        string rep -> object
+        """
+        new_val = val
+        
+        if param_name in self.translators:
+            t = self.translators[param_name]
+            if val in t:
+                new_val = t[val]
+
+        return new_val
+
+
+
+    def atrevnoc(self,param_name,val):
+        """
+        object --> string rep
+        """
+        new_val = val
+
+        if param_name in self.translators:
+            t = self.translators[param_name]
+
+            for k,v in t.items():
+                if v==val:
+                    new_val = k
+
+        return new_val
+        
+            
+
 
     def __update_param(self,param_name):
         """
@@ -164,25 +270,44 @@ class TkParameterizedObjectBase(ParameterizedObject):
         (Called by the Tkinter Variable's trace_variable() method.)
         """
         tk_var = self._tk_vars[param_name]
-        val = tk_var._original_get() # tk_var ahead of parameter
 
+        try:
+            val = tk_var._original_get() # tk_var ahead of parameter
+        except ValueError:
+            ### CEBHACKALERT: trying this out...
+            # valueerror here means user not finished typing
+            print "### You're typing..."
+            return 
+
+
+        val = self.converta(param_name,val)
+
+        
         try:
             sources = [self]+self._extra_pos
             
             for po in sources:
                 if param_name in po.params().keys():
-                    setattr(po,param_name,val)
+                    parameter = po.params()[param_name]
+                    ## use set_in_bounds if it exists: i.e. users of widgets get their
+                    ## values cropped (no warnings/errors)
+                    if hasattr(parameter,'set_in_bounds'):
+                        parameter.set_in_bounds(po,val)
+                    else:
+                        setattr(po,param_name,val)
+                        
                     if hasattr(tk_var,'_on_change'): tk_var._on_change()
                     return # hidden
+
 
             assert False,"Error in use of __update_param: param must exist" # remove this
             
         except: # everything
-            #tk_var.set(tk_var._last_good_val)
+            tk_var.set(tk_var._last_good_val)
             # hack: above is too fast for gui? variable changes correctly, but doesn't appear
             # on gui until next click
-            topo.guimain.after(250,lambda x=tk_var._last_good_val: tk_var.set(x))
-            raise
+            #topo.guimain.after(250,lambda x=tk_var._last_good_val: tk_var.set(x))
+            raise #print "warning! couldn't set param_name to val" #raise 
 
     def __sources(self,parameterized_object=None):
         
@@ -202,7 +327,10 @@ class TkParameterizedObjectBase(ParameterizedObject):
             if name in params: return params[name] # a bit hidden
 
         raise AttributeError("none of %s have parameter %s"%(str(sources),name))
-            
+
+
+#    def get_like_the_gui(self,name):
+#        return self._tk_vars[name].get()
 
 ##### these guarantee only to get/set parameters #####
     def get_parameter_value(self,name,parameterized_object=None):
@@ -222,6 +350,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         for po in sources:
             if name in po.params().keys(): 
                 setattr(po,name,val)
+                return # so hidden I forgot to write it until now
 
         raise AttributeError("none of %s have parameter %s"%(str(sources),name))
 #######################################################        
@@ -294,6 +423,9 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # allows subclasses to 
         # access all plotgroup's widgets in an easy way.
         self._widgets = {}
+        ## CEBALERT: just keep one and will name properly
+        ## & probably provide access methods
+        self._furames = {}
 
         # a refresh-the-widgets-on-focus-in method would make the gui in sync with the actual object
 
@@ -306,7 +438,19 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         self.master.title(t)
         
 
+    # CEBHACKALERT: some widgets need to have <return> bound to frame's refresh!
+    # Also think about taggedsliders.
+
+##     ## CEBALERT
+##     def repackparam(self,name):
+
+##         self._widgets[name].destroy()
+##         self.pack_param(name,parent=self._furames[name])
+        
+        
+
     # CEBALERT: rename & doc parent * on_change
+
     def pack_param(self,name,parent=None,widget_options={},on_change=None,**pack_options):
         """
         Create a widget for Parameter name, configured according to
@@ -322,10 +466,19 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         self.pack_param(name,{'width':50},side='top',expand='yes',fill='y')
         """
         f = Frame(parent or self.master)
-        param = self.get_parameter_object(name) 
+        param = self.get_parameter_object(name)
         
         widget_type = parameters_to_tkwidgets.get(type(param),Entry)
 
+        # checkbuttons are 'wdiget label'; everything else is 'label widget'
+        if widget_type is Tkinter.Checkbutton:
+            widget_side='left'; label_side='right'
+        else:
+            widget_side='right';label_side='left'
+            
+
+        l = None #  CEBALERT
+        
         # better not look expect a var for each param anywhere 
         ### buttons are different from the other widgets: different labeling,
         ### and no need for a variable
@@ -339,35 +492,71 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
             # CB: called on_change, but it's on_set
             if on_change is not None: tk_var._on_change=on_change
-    
-        ### Tkinter widgets use either variable or textvariable
-            try:
-                w = widget_type(f,variable=tk_var,**widget_options)
-            except _tkinter.TclError:
+
+            ### CEBALERT: clean up this widget type selection
+
+            ### CB: add bounds/softbounds for taggedsliders
+            
+            if widget_type==Tkinter.OptionMenu:
+
+                self.update_translator(name,param)
+
+                
+
+                new_range = [self.atrevnoc(name,i) for i in param.range]
+
+                assert len(new_range)>0
+
+                #if tk_var.get() not in new_range:  
+                tk_var.set(new_range[0])
+
+                
+                w = widget_type(f,tk_var,*new_range,**widget_options)
+
+               
+                
+                #self.set_parameter_value(name,new_range[0])
+                
+            else:
+            ### Tkinter widgets use either variable or textvariable
                 try:
-                    w = widget_type(f,textvariable=tk_var,**widget_options)
+                    w = widget_type(f,variable=tk_var,**widget_options)
                 except _tkinter.TclError:
-                    raise # meaning the widget doesn't support variable or textvariable
-        ###
+                    try:
+                        w = widget_type(f,textvariable=tk_var,**widget_options)
+                    except _tkinter.TclError:
+                        raise # meaning the widget doesn't support variable or textvariable
+            ###
 
-            # CBALERT: should format label nicely (e.g. underscore to space)
-            # some widgets: label widget    (e.g. entry)
-            # others:       widget label    (e.g. checkbutton)
             # i'll probably pack in a better way at some point
-            Tkinter.Label(f,text=name).pack(side="left")
+            # (including packing of w below)
+            # (e.g. checbutton should be closer to label)
+
+            # CEBALERT: use a function: what other formatting is needed?
+            # Shouldn't there be some general function for converting parameter names to
+            # a user-readable representation? E.g. how can I indicate a hyphen 
+            # rather than a space in a parmeter name?
+            n = name.replace("_"," ")
+
+            l = Tkinter.Label(f,text=n)
+            l.pack(side=label_side)
 
 
-        w.pack(side="right")
+        ### CEBALERT:
+        if param.hidden:
+            return f
+
+        w.pack(side=widget_side,expand='yes',fill='x')
 
         self._widgets[name]=w
+
+        self._furames[name]=(f,l)
 
         # f's probably better than w
         self.balloon.bind(f,getdoc(param))
 
         f.pack(pack_options)
         return f 
-
-
 
 
 
