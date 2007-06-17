@@ -870,6 +870,23 @@ class ParameterizedObject(object):
 ##  self.__dict__ -- but I get weird warnings from 'make tests' if I
 ##  remove them.
 
+## CB: __setstate__ exists only to set 'self.initialized'. If that
+## were not necessary, we wouldn't need it; that is, __setstate__ does
+## not exist to support pickling, but to work around problems
+## setting Constant parameters when either copying or recreating (unpickling)
+## parameterized objects (I can't remember which -- maybe it's both).
+
+## The weird warnings caused by removing __gestate__ appear to be from
+## something internal to python's default handling of getstate and
+## setstate; python seems to pass around some seemingly undocumented
+## __slotnames__ thing in the keyword arguments, and of course we
+## assume things in keywords are parameters to be set on parameterized
+## objects, hence the weird warnings. Anyone want to look at the
+## source code for python? Because it seems like otherwise we could
+## delete this __getstate__ method.
+## (Why would there be anything to do with slots for ParameterizedObjects,
+## anyway?)
+        
         # deep copy Parameters; overwrites their original shallow copies 
 ##         for (k,v) in self.__dict__.items():
 ##             if isinstance(v,Parameter):

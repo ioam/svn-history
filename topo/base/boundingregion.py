@@ -301,6 +301,25 @@ class AARectangle(object):
         self._left = min([x for x,y in points])
         self._right = max([x for x,y in points])
 
+
+    ## CB: are __gestate__ and __setstate__ needed?
+    ## According to http://www.python.org/dev/peps/pep-0307/, pickling
+    ## should be taken care of automatically without these methods:
+    ##   
+    ##   For a new-style class that has __slots__ and no instance
+    ##   __dict__, the default state [returned by __getstate__] is a
+    ##   tuple whose first item is None and whose second item is a
+    ##   dictionary mapping slot names to slot values described in the
+    ##   previous bullet.
+    ##
+    ## The default __setstate__ would then handle this state automatically.
+    ##
+    ## But I think if we remove __getstate__ we get a TypeError saying
+    ## that classes with __slots__ must have __getstate__ for pickling.
+    ## So I'm not sure. Anyway, I guess this could change in the future,
+    ## so this note could remain for information (and also applies to
+    ## Parameter -- in fact it should probably be there rather than here).
+        
     # Basic support for pickling
     def __getstate__(self):
         state={}
