@@ -177,7 +177,8 @@ class PatternPresenter(ParameterizedObject):
                         apply_output_fn=self.apply_output_fn)
 
 
-
+# CEBHACKALERT: have plotgroup_params?
+# CEBHACKALERT: test passing e.g. normalize and add example.
 def save_plotgroup(name,**params):
     """
     Convenience command for saving a set of plots to disk.  Examples:
@@ -190,9 +191,9 @@ def save_plotgroup(name,**params):
     like projection_name and sheet_name above.
     """
     p_class = plotsaving_classes.get(name,plotsaving_classes[None])
-    p = p_class(name,**params)
-    p.plotgroup=p.generate_plotgroup()
-    p.plotgroup.update_plots(True)
+    p = p_class(name)#,**params)
+    p.plotgroup=p.generate_plotgroup(**params)
+    p.plotgroup.draw_plots(update=True)#update_plots()
     p.save_to_disk()
 
 
@@ -689,7 +690,7 @@ new_pgt(name='Orientation Tuning Fullfield',category="Tuning Curves",doc="""
 
 
 def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4],
-                                curve_parameters=[{"contrast":30}, {"contrast":60},{"contrast":80},{"contrast":90}],
+                                curve_parameters=[{"contrast":30},{"contrast":60},{"contrast":80},{"contrast":90}],
                                 display=False,
                                 pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
                                                                    apply_output_fn=True,duration=1.0,
@@ -734,7 +735,7 @@ new_pgt(name='Orientation Tuning',category="Tuning Curves",doc="""
 
 
 def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
-                      curve_parameters=[{"contrast":30}, {"contrast":60},{"contrast":80}, {"contrast":90}],
+                      curve_parameters=[{"contrast":30},{"contrast":60},{"contrast":80}, {"contrast":90}],
                       display=False,size=0.5,
                       pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
                                                          apply_output_fn=True,duration=1.0,
