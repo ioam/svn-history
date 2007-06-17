@@ -11,233 +11,87 @@ $Id$
 __version__='$Revision$'
 
 
-### ***** CEB yet to make things parameters, etc... *****
-
-
-
-import Pmw
-import __main__
-import copy
-
-from Tkinter import StringVar, BooleanVar, Frame, TOP, LEFT, RIGHT, YES, X, Message, Button
-from Tkinter import Entry, Label, NSEW, Checkbutton, NORMAL, DISABLED
-
 import topo
 
-from inspect import getdoc
+from topo.base.projection import ProjectionSheet
 
 from topo.plotting.templates import plotgroup_templates
-from plotgrouppanel import PlotGroupPanel
-from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import FeatureCurvePlotGroup
-from topo.base.sheet import Sheet
-from topo.base.cf import CFSheet
+
+from plotgrouppanel import PlotGroupPanel
+from tkparameterizedobject import ButtonParameter
 
 
-
-
-
+## CEBALERT: same as for featurecurveplotgroup: shares code with templateplotgrouppanel
 class FeatureCurvePanel(PlotGroupPanel):
 
-    def __init__(self,console,pgt_name,master,**params):       
+    def __init__(self,console,master,pgt,**params):       
+        self.pgt=pgt
+	PlotGroupPanel.__init__(self,console,master,pgt.name,**params)
 
+        self.pack_param("sheet",parent=self.control_frame_3,on_change=self.sheet_change)
+        self.pack_param("x",parent=self.control_frame_3)
+        self.pack_param("y",parent=self.control_frame_3)
 
-        self.region = StringVar()
+        # remove currently irrelevant widgets (plots are drawn in a separate window by pylab)
+        [self._widgets[n].destroy() for n in ['Enlarge','Reduce']]
 
-        ###CEBHACKALERT##################################################
-        self._sim_eps = topo.sim.objects(CFSheet).values()
-	self._sim_eps.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
-        sim_ep_names = [ep.name for ep in self._sim_eps]
-
-        if len(self._sim_eps) > 0:
-            self.region.set(sim_ep_names[0])
-        #################################################################
-
-	self.x = 0
-	self.y = 0
-
-
-        self.pgt_name = pgt_name                 #
-        self.pgt=plotgroup_templates[pgt_name]   # CEBALERT
-        self.plotgroup_key=self.pgt.name         #
-        
-	PlotGroupPanel.__init__(self,console,pgt_name,master,**params)
-
-
-        # Command used to refresh the plot, if any
-        self.cmdname = StringVar()
-	self.cmdname.set(self.plotgroup.updatecommand)
-
-        self.plot_cmdname = StringVar()
-	self.plot_cmdname.set(self.plotgroup.plotcommand)
-      
-	self.params_frame = Frame(master=self)
-        self.params_frame.pack(side=TOP,expand=YES,fill=X)
-        
-	cmdlabel = Message(self.params_frame,text="Update command:",aspect=1000)
-        cmdlabel.pack(side=LEFT)
-        self.balloon.bind(cmdlabel,getdoc(self.plotgroup.params()['updatecommand'])) 
-
-        cmdbox = Pmw.ComboBox(self.params_frame,autoclear=1,history=1,dropdown=1,
-                              entry_textvariable=self.cmdname,
-                              scrolledlist_items=([self.cmdname.get()]))
-        cmdbox.pack(side=LEFT,expand=YES,fill=X)
-        self.balloon.bind(cmdbox,getdoc(self.plotgroup.params()['updatecommand']))
-  
-        self.__params_frame = Frame(master=self)
-        self.__params_frame.pack(side=LEFT,expand=YES,fill=X)
-
-        
-	self.x_str = StringVar()
-        self.x_str.set(0.0)
-        self.y_str = StringVar()
-        self.y_str.set(0.0)
-        self._add_region_menu()
-        self._add_xy_boxes()
-
-          
         self.auto_refresh= False
-
         if self.pgt.plot_immediately: self.refresh()
 
-    def refresh_variables(self, update=True):
-        """
-        Command to be called when plotgroup variables are updated in the GUI
-        """
-        Pmw.showbusycursor()
-	self.plotgroup = copy.copy(self.plotgroup)
-	self.update_plotgroup_variables()# update PlotGroup variables
-        self.plotgroup.plotcommand = self.plot_cmdname.get()# in this case must also update plotcommand
-       	self.plotgroup.update_environment()
-	self.display_plots()              # Put images in GUI canvas
-        self.display_labels()             # Match labels to grid
-        self.refresh_title()              # Update Frame title.
-        Pmw.hidebusycursor()
 
-              
-    def _add_region_menu(self):
-        """
-        This function adds a Sheet: menu that queries the active
-        simulation for the list of options.  When an update is made,
-        refresh_variables() is called.
-        """
+##############################################################################
+        self.sheet_change()
+    def sheet_change(self):
 
-        self._sim_eps = topo.sim.objects(CFSheet).values()
-	self._sim_eps.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
-        sim_ep_names = [ep.name for ep in self._sim_eps]
-	
-        if len(sim_ep_names) > 0:
-            self.region.set(sim_ep_names[0])
+        s = self.sheet
+        l,b,r,t = s.bounds.lbrt()
 
-     
-        self.opt_menu = Pmw.OptionMenu(self.__params_frame,
-                       command = self.refresh_variables,
-                       labelpos = 'w',
-                       label_text = 'Sheet:',
-                       menubutton_textvariable = self.region,
-                       items = sim_ep_names)
-        self.opt_menu.pack(side=LEFT)
-        self.balloon.bind(self.opt_menu,"""Sheet whose unit(s) will be plotted.""")
+        x = self.get_parameter_object('x')
+        y = self.get_parameter_object('y')
 
-        for prerequisite in self.pgt.prerequisites:
-            if prerequisite not in topo.sim[str(self.region.get())].sheet_view_dict:
-                self.dialog = Pmw.Dialog(self,title = 'Warning')
-                if prerequisite=='XPreference':
-                    message = 'Position preference should be plotted before plotting '+ str(self.plotgroup_key)+'\n'\
-                              'Otherwise will use default values'
-                else:
-                    message = prerequisite + ' should be plotted before plotting '+ str(self.plotgroup_key)+'\n'\
-                              'Otherwise will use default values'
-                w = Label(self.dialog.interior(),
-                          text = message,
-                          background = 'black',
-                          foreground = 'white',
-                          pady = 20)
-                w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
-               
+        x.bounds=(l,r)
+        y.bounds=(b,t)
 
-    def _add_xy_boxes(self):
-        """
-        This function adds boxes that allow the user to input the x and y variables
-        When an update is made,refresh_variables() is called.
-        """
-      
-        Message(self.__params_frame,text="Unit  X:",aspect=1000).pack(side=LEFT)
-        self.xe = Entry(self.__params_frame,textvariable=self.x_str)
-        # JC: we would like to update when the user leaves the box,
-	# but we don't know yet how to do it.(id for ye)
-        self.xe.bind('<Return>',self.refresh_variables)
-        self.xe.pack(side=LEFT,expand=YES,fill=X)
-        self.balloon.bind(self.xe,
-"""Sheet coordinate location desired.  The unit nearest this location will be returned.
-It is an error to request a unit outside the area of the Sheet.""")
-        #self.tag.bind('<KeyRelease>', self.tag_keypress)
+        self.x = 0.0
+        self.y = 0.0
 
-        Message(self.__params_frame,text="Y:",aspect=1000).pack(side=LEFT)
-        self.ye = Entry(self.__params_frame,textvariable=self.y_str)
-	self.ye.bind('<Return>', self.refresh_variables)
-        self.ye.pack(side=LEFT,expand=YES,fill=X,padx=5)
-        self.balloon.bind(self.ye,
-"""Sheet coordinate location desired.  The unit nearest this location will be returned.
-It is an error to request a unit outside the area of the Sheet.""")
+        if 'x' and 'y' in self._widgets:
+            w1,w2=self._widgets['x'],self._widgets['y']
+            w1.set_bounds(*x.bounds)
+            w2.set_bounds(*y.bounds)
+            
+            w1.refresh();w2.refresh()
+##############################################################################
 
 
-    def update_plotgroup_variables(self):
-        """
-        Get the plotgroup variables (ie. x,y, sheet and update command) from the gui before
-        updating the plots.
-        """
-        g = __main__.__dict__
-        self.x = eval(self.x_str.get(),g)
-        self.y = eval(self.y_str.get(),g)
-        if isinstance(self.x,int): self.x = float(self.x)
-        if isinstance(self.y,int): self.y = float(self.y)
-        # JABALERT: Need to display the actual x,y coordintes of the
-        # nearest unit somehow, since that differs from the value requested.
+    def populate_sheet_param(self,p):
+        # CEBHACKALERT: to which types of sheet is this plotgroup supposed to be applicable?
+        sheets = topo.sim.objects(ProjectionSheet).values() 
+        sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
+        p.params()['sheet'].range = sheets
+        p.sheet = sheets[0]
 
-        ep = [ep for ep in topo.sim.objects(Sheet).values()
-              if ep.name == self.region.get()][0]
-        # This assumes that displaying the rectangle information is enough.
-        l,b,r,t = ep.bounds.aarect().lbrt()
-
-        if ep.bounds.contains(self.x,self.y):
-	    self.plotgroup.sheet_name = self.region.get()
-	    self.plotgroup.x = self.x
-	    self.plotgroup.y = self.y
-        else:
-            self.dialog = Pmw.Dialog(self,title = 'Error')
-            message = 'The x/y coordinates are outside the bounding region.\n'\
-                    + '  ' + str(l) + ' < X < ' + str(r) + '\n' \
-                    + '  ' + str(b) + ' < Y < ' + str(t)
-	    w = Label(self.dialog.interior(),
-                              text = message,
-                              background = 'black',
-                              foreground = 'white',
-                              pady = 20)
-            w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
-	self.plotgroup.sheet_name = self.region.get()
-        self.plotgroup.updatecommand = self.cmdname.get()
-
-       
 
     def generate_plotgroup(self):
         """
         Create the right Plot Key that will define the needed
         information for a FeatureCurvePlotGroup. 
         """
-	plotgroup = FeatureCurvePlotGroup([],self.pgt,self.region.get(),self.x,self.y)
+        p = FeatureCurvePlotGroup(template=self.pgt)
+        self.populate_sheet_param(p)
+	return p
                                            
-                                            
-	return plotgroup
-
 
     def display_labels(self):
         """
         Change the title of the grid group by refreshing the simulated time.
         """
-        self.plot_group_title.configure(tag_text = str(self.plotgroup_key) + \
+        # CEBHACKALERT: str()  (shouldn't lanbl be string already?)
+        self.plot_group_title.configure(tag_text = str(self.plotgroup_label) + \
                                   ' at time ' + str(self.plotgroup.time))
      
+
 
 
 class FullFieldFeatureCurvePanel(FeatureCurvePanel):
@@ -246,34 +100,14 @@ class FullFieldFeatureCurvePanel(FeatureCurvePanel):
     This class creates a gui window showing the reduced update command and in which updating the
     plotgroup variables from the gui calls the plotcommand rather than the full updatecommand.
     """
-    def __init__(self,console,pgt_name,master,**config):
 
-        FeatureCurvePanel.__init__(self,console,pgt_name,master,**config)
+### CEBHACKALERT! Not sure how best to handle redrawing here. Don't want to redraw on dragging the sliders,
+### I guess...would lead to too many windows.
 
-      
-	plot_cmdlabel = Message(self.params_frame, text="Plot command:",aspect=1000)
-        plot_cmdlabel.pack(side=LEFT)
-        self.balloon.bind(plot_cmdlabel,getdoc(self.plotgroup.params()['plotcommand']))
+    Redraw = ButtonParameter(doc="""Redraw plots using existing data.""")
 
-        plot_cmdbox = Pmw.ComboBox(self.params_frame,autoclear=1,history=1,dropdown=1,
-                              entry_textvariable=self.plot_cmdname,
-                              scrolledlist_items=([self.plot_cmdname.get()]))
-        plot_cmdbox.pack(side=TOP,expand=YES,fill=X)
-        self.balloon.bind(plot_cmdbox,getdoc(self.plotgroup.params()['plotcommand']))
-                     
-    def refresh_variables(self, update=True):
-        """
-        Command called when variables are updated in the gui.
-        In this case only the plotcommand is called rather than the full updatecommand.
-        """
-        Pmw.showbusycursor()
-	self.plotgroup = copy.copy(self.plotgroup)
-	self.update_plotgroup_variables()# update PlotGroup variables
-        self.plotgroup.plotcommand = self.plot_cmdname.get()# in this case must also update plotcommand
-	self.plotgroup.update_variables()
-	self.display_plots()              # Put images in GUI canvas
-        self.display_labels()             # Match labels to grid
-        self.refresh_title()              # Update Frame title.
-        Pmw.hidebusycursor()
+    def __init__(self,console,master,pgt,**config):
+        FeatureCurvePanel.__init__(self,console,master,pgt,**config)
 
- 
+        self.pack_param('Redraw',parent=self.control_frame_1,
+                        on_change=self.redraw_plots,side="left")
