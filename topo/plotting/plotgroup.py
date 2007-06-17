@@ -598,15 +598,11 @@ class CFProjectionPlotGroup(CFPlotGroup):
     
 
     def _updatecommand(self):
-        print "_update_command"
-        print "self.projection",self.projection,type(self.projection)
-        
         if self.projection is None: raise ValueError("%s must have a projection (currently None)."%self)
 	### JCALERT: commands in analysis have to be re-written so that to avoid
 	### setting all these global parameters.
         topo.commands.analysis.proj_coords = self.generate_coords()
         topo.commands.analysis.proj_name = self.projection.name
-        print "name",self.projection.name
         super(CFProjectionPlotGroup,self)._updatecommand()
 
 		

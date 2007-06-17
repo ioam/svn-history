@@ -94,8 +94,6 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
     # plot templates directly if they need more control than that.
     # *** not actually working properly **
     def strength_only_fn(self):
-        print "strength-only",self.strength_only
-
         if self.strength_only:
             for name,template in self.pgt.plot_templates:
                 if template.has_key('Hue'):
@@ -103,9 +101,7 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
                 if template.has_key('Confidence'):
                     del template['Confidence']
         else:
-            if not 'Hue' and 'Confidence' in self.pgt:
-                "(have not)"
-            print "new pgt"
+            #if not 'Hue' and 'Confidence' in self.pgt:
             self.pgt = plotgroup_templates[self.pgt.name]
 
         # CEBALERT: but won't improve because will implement this
