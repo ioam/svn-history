@@ -11,7 +11,7 @@ __version__='$Revision$'
 
 
 ### CEBHACKALERT: something's funny with packing sometimes (e.g. open connection fields
-### window, change params, then redraw).
+### window, change params, then redraw). (It's to do with labels being left behind.)
 
 
 
