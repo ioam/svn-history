@@ -1,9 +1,11 @@
 """
 TopoConsole class file.
 
+
 $Id$
 """
 __version__='$Revision$'
+
 
 
 # CB: does the status bar need to keep saying 'ok'? Sometimes
@@ -48,7 +50,7 @@ from templateplotgrouppanel import TemplatePlotGroupPanel
 from connectionfieldspanel import ConnectionFieldsPanel
 from projectionactivitypanel import ProjectionActivityPanel
 from featurecurvepanel import FeatureCurvePanel, FullFieldFeatureCurvePanel
-from projectionpanel import CFProjectionPanel
+from projectionpanel import CFProjectionPGPanel
 from testpattern import TestPattern
 from editorwindow import ModelEditor
 from translatorwidgets import TaggedSlider
@@ -263,10 +265,7 @@ class PlotsMenuEntry(ParameterizedObject):
         # CEBHACKALERT
         if self.class_.valid_context():
             t = TkguiWindow()
- #           try:
-            self.class_(self.console,self.template.name,t,**args).pack()
-#            except:
-#                self.class_(self.console,self.template.name,**args)
+            self.class_(self.console,t,self.template,**args).pack()
             self.console.messageBar.message('state', 'OK')
 
         else:
@@ -283,7 +282,7 @@ class TopoConsole(TkguiWindow):
 
         TkguiWindow.__init__(self,**config)
 
-        self.chris=True
+        
     
         self.auto_refresh_panels = []
         self._init_widgets()
@@ -321,11 +320,23 @@ class TopoConsole(TkguiWindow):
             
 ##         plot_gallery = Gallery(plots=plots,image_size=(50,50))
 ##         plot_gallery.title("Plots")
+
+
+## CEBHACKALERT: see PO.warning() ################
+        ParameterizedObject.receive_warnings.append(self)
+
+    def warn(self,msg):
+        tkMessageBox.showwarning("title",msg)
+##################################################
+
+
         
 
 
     def _init_widgets(self):
         
+        ## CEBALERT: now we can have multiple operations at the same time,
+        ## status bar could be improved to show all tasks?
 
         ### Status bar
 	self.messageBar = Pmw.MessageBar(self,
@@ -372,6 +383,8 @@ class TopoConsole(TkguiWindow):
         # the simulation in this case.
         run_frame.optional_action=self.run_simulation
 
+        ## CEBALERT: ever tried pressing 'go' a couple of times while measuring e.g. an orientation preference map?
+        ## The various parts weren't designed to operate in parallel...
         go_button = Button(run_frame,text="Go",
                            command=self.run_simulation)
         go_button.pack(side=LEFT)
@@ -793,7 +806,7 @@ class TopoConsole(TkguiWindow):
 
 if __name__ != '__main__':
     plotpanel_classes['Connection Fields'] = ConnectionFieldsPanel
-    plotpanel_classes['Projection'] = CFProjectionPanel 
+    plotpanel_classes['Projection'] = CFProjectionPGPanel 
     plotpanel_classes['Projection Activity'] = ProjectionActivityPanel
     plotpanel_classes['Orientation Tuning Fullfield'] = FullFieldFeatureCurvePanel
 
