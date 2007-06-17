@@ -1,33 +1,27 @@
 """
-ProjectionActivity object for GUI visualization.
-
-Subclasses CFSheetPlotPanel, which is basically a PlotGroupPanel.
-
-
+ProjectionActivityPanel
 """
-
-
-### ***** CEB yet to make things parameters, etc... *****
-
-
 
 
 import topo
 from topo.plotting.plotgroup import ProjectionActivityPlotGroup
 from topo.commands.analysis import update_projectionactivity
-from projectionpanel import ProjectionRelatedPanel
+from projectionpanel import ProjectionSheetPGPanel
 
 
 ### JABALERT: Should pull out common code from ProjectionActivityPanel,
 ### ProjectionPanel, and ConnectionFieldsPanel into a shared parent
 ### class.  Then those classes should probably all be in one file.
-class ProjectionActivityPanel(ProjectionRelatedPanel):
-    def __init__(self,console,pgt_name,master,**params):       
-        super(ProjectionActivityPanel,self).__init__(console,pgt_name,master,**params)
+class ProjectionActivityPanel(ProjectionSheetPGPanel):
+
+    plotgroup_type = ProjectionActivityPlotGroup
+    
+    
+    def __init__(self,console,master,pgt,**params):       
+        super(ProjectionActivityPanel,self).__init__(console,master,pgt,**params)
         self.auto_refresh = True
-	self.plotgroup_key='ProjectionActivity'
-	self.cmdname = update_projectionactivity()
-	self.refresh()
+        # CB: why do we do this?
+	self.plotgroup_label='ProjectionActivity'
 	
 
     # CEBALERT! Dynamic info doesn't work on projection activity windows!
@@ -40,29 +34,8 @@ class ProjectionActivityPanel(ProjectionRelatedPanel):
         self.messageBar.message('state',"")
 
 
-
-    ### JABALERT: This looks like too much intelligence to include in
-    ### the GUI code; this function should probably just be calling a
-    ### PlotGroup (or subclass) function to generate the key.  This
-    ### file should have only GUI-specific stuff.
-  
-    def update_plotgroup_variables(self):
-
-	self.plotgroup.sheet_name = self.sheet_var.get()
-
-
-
-    def generate_plotgroup(self):
-        """
-        Create the right Plot Key that will define the needed
-        information for a ProjectionActivityPlotGroup.  This is the key-word
-        'ProjectionActivity'.  Once the
-        PlotGroup is created, call its do_plot_cmd() to prepare
-        the Plot objects.
-        """
-
-	plotgroup = ProjectionActivityPlotGroup([],self.pgt,self.sheet_var.get())
-        return plotgroup
+    def sheet_change(self):
+        self.refresh() 
 
 
     def display_labels(self):
@@ -70,7 +43,7 @@ class ProjectionActivityPanel(ProjectionRelatedPanel):
         Change the title of the grid group, then call PlotGroupPanel's
         display_labels().
         """
-        new_title = 'Projection Activity of ' + self.plotgroup.sheet_name + ' at time ' + str(self.plotgroup.time)
+        new_title = 'Projection Activity of ' + self.plotgroup.sheet.name + ' at time ' + str(self.plotgroup.time)
         self.plot_group_title.configure(tag_text = new_title)
         super(ProjectionActivityPanel,self).display_labels()
 

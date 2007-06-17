@@ -1,128 +1,68 @@
 """
-WeightsPanel object for GUI visualization.
+ConnectionFieldsPanel for GUI visualization of ConnectionFieldsPlotGroup.
 
-Subclasses CFSheetPlotPanel, which is basically a PlotGroupPanel.
-
-Uses a WeightsPlotGroup to generate the plots displayed in the main
-widget.
 
 $Id$
 """
 __version__='$Revision$'
 
 
-### ***** CEB yet to make things parameters, etc... *****
-
-
-import Pmw
-
-
-from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message
-from Tkinter import Entry, Label, NSEW, Checkbutton, NORMAL, DISABLED
-
 import topo
 
-from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import ConnectionFieldsPlotGroup
-from topo.base.sheet import Sheet
+from topo.base.cf import CFSheet
 
-from projectionpanel import CFRelatedPanel
+from projectionpanel import CFPGPanel
 
 
 # CEBHACKALERT: various parts of the dynamic info/right-click menu stuff
 # don't make sense at the moment when things like 'situate' are clicked.
 
-class ConnectionFieldsPanel(CFRelatedPanel):
-    def __init__(self,console,pgt_name,master,x=0.0,y=0.0,**params):       
+class ConnectionFieldsPanel(CFPGPanel):
 
-        # Receptive Fields are generally tiny.  Boost it up to make it visible.
-        self.WEIGHT_PLOT_INITIAL_SIZE = 30
-
-        self.x_var = StringVar()
-        self.x_var.set(x) 
-        self.y_var = StringVar()
-        self.y_var.set(y) 
-
-        super(ConnectionFieldsPanel,self).__init__(console,pgt_name,master,**params) 
-        self._add_xy_boxes()
-	self.refresh()
+    plotgroup_type = ConnectionFieldsPlotGroup
 
 
-    def _add_xy_boxes(self):
-        params_frame = Frame(master=self)
-        params_frame.pack(side=TOP,expand=YES,fill=X)
-        
-        Message(params_frame,text="Unit  X:",aspect=1000).pack(side=LEFT)
-        self.xe = Entry(params_frame,textvariable=self.x_var)
-        self.xe.bind('<Return>',self.refresh)
-        self.xe.pack(side=LEFT,expand=YES,fill=X)
-        self.balloon.bind(self.xe,
-"""Sheet coordinate location desired.  The unit nearest this location will be returned.
-It is an error to request a unit outside the area of the Sheet.""")
-        
-        Message(params_frame,text="Y:",aspect=1000).pack(side=LEFT)
-        self.ye = Entry(params_frame,textvariable=self.y_var)
-	self.ye.bind('<Return>', self.refresh)
-        self.ye.pack(side=LEFT,expand=YES,fill=X,padx=5)
-        self.balloon.bind(self.ye,
-"""Sheet coordinate location desired.  The unit nearest this location will be returned.
-It is an error to request a unit outside the area of the Sheet.""")
+        # CEBALERT: used to eval x,y in main here and elsewhere in tkgui so that variables could be used.
+        # Now that the widget selection is automatic, this should be taken care of (at least partly) elsewhere
+        # (e.g. a taggedslider that converts to float by doing an eval in main and float(), etc).
 
+    
+    def __init__(self,console,master,pgt,**params):       
+        super(ConnectionFieldsPanel,self).__init__(console,master,pgt,**params) 
+        self.pack_param('x',parent=self.control_frame_3,on_change=self.update_plots)
+        self.pack_param('y',parent=self.control_frame_3,on_change=self.update_plots)
 
+##############################################################################       
+        # Need to couple taggedslider to a Number parameter in a better way
+        # somewhere else.
+        # Current defects:
+        # e.g. bound on parameter is 0.5 but means <0.5, taggedslider
+        #   still lets you set to 0.5 -> error
+        self.sheet_change()
+    def sheet_change(self):
 
-    ### JABALERT: This looks like too much intelligence to include in
-    ### the GUI code; this function should probably just be calling a
-    ### PlotGroup (or subclass) function to generate the key.  This
-    ### file should have only GUI-specific stuff.
-    def update_plotgroup_variables(self):
-        """
-        The plotgroup_key for the ConnectionFieldsPanel will change depending on the
-        input within the window widgets.  This means that the key
-        needs to be regenerated at the appropriate times.
+        super(ConnectionFieldsPanel,self).sheet_change()
 
-        Key Format:  Tuple: ('Weights', Sheet_Name, X_Number, Y_Number)
-        """
-        # CEB: allow eval here an elsewhere in tkgui so variables can be used.
-        x,y = float(self.x_var.get()), float(self.y_var.get())
-        
-        # JABALERT: Need to display the actual x,y coordintes of the
-        # nearest unit somehow, since that differs from the value requested.
+        s = self.sheet
+        l,b,r,t = s.bounds.lbrt()
 
-        sheet = topo.sim[self.sheet_var.get()]
+        x = self.get_parameter_object('x')
+        y = self.get_parameter_object('y')
 
-        # This assumes that displaying the rectangle information is enough.
-        l,b,r,t = sheet.bounds.aarect().lbrt()
+        x.bounds=(l,r)
+        y.bounds=(b,t)
 
-        if sheet.bounds.contains(x,y):
-	    self.plotgroup.sheet_name = self.sheet_var.get()
-	    self.plotgroup.x = x
-	    self.plotgroup.y = y
-        else:
-            self.dialog = Pmw.Dialog(self,title = 'Error')
-            message = 'The x/y coordinates are outside the bounding region.\n'\
-                    + '  ' + str(l) + ' < X < ' + str(r) + '\n' \
-                    + '  ' + str(b) + ' < Y < ' + str(t)
-	    w = Label(self.dialog.interior(),
-                              text = message,
-                              background = 'black',
-                              foreground = 'white',
-                              pady = 20)
-            w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
-	self.plotgroup.situate=self.situate_var.get()
-	self.plotgroup.sheet_name = self.sheet_var.get()
+        self.x = 0.0
+        self.y = 0.0
 
-
-    def generate_plotgroup(self):
-        """
-        Create the right Plot Key that will define the needed
-        information for a WeightsPlotGroup.  This is the key-word
-        'Weights', and the necessary x,y coordinate.  Once the
-        PlotGroup is created, call its do_plot_cmd() to prepare
-        the Plot objects.
-        """
-	plotgroup = ConnectionFieldsPlotGroup([],self.pgt,self.sheet_var.get(),
-                                              float(self.x_var.get()),float(self.y_var.get()))
-	return plotgroup
+        if 'x' and 'y' in self._widgets:
+            w1,w2=self._widgets['x'],self._widgets['y']
+            w1.set_bounds(*x.bounds)
+            w2.set_bounds(*y.bounds)
+            
+            w1.refresh();w2.refresh()
+##############################################################################
 
 
     def display_labels(self):
@@ -130,28 +70,16 @@ It is an error to request a unit outside the area of the Sheet.""")
         Change the title of the grid group, then call PlotGroupPanel's
         display_labels().
         """
-        new_title = 'Connection Fields of ' + self.plotgroup.sheet_name + \
+        new_title = 'Connection Fields of ' + self.sheet.name + \
                     ' unit (' + str(self.plotgroup.x) + ',' + str(self.plotgroup.y) + ') at time '\
                     + str(self.plotgroup.time)
         self.plot_group_title.configure(tag_text = new_title)
         super(ConnectionFieldsPanel,self).display_labels()
 
-    
-        
+
     def refresh_title(self):
         self.title(topo.sim.name+': '+self.pgt.name + " %s (%0.3f,%0.3f) time:%s" %
-                          (self.plotgroup.sheet_name,self.plotgroup.x,self.plotgroup.y,self.plotgroup.time))
+                          (self.plotgroup.sheet.name,self.plotgroup.x,self.plotgroup.y,self.plotgroup.time))
 
-
-    def update_back_fwd_button(self):
-	super(ConnectionFieldsPanel,self).update_back_fwd_button()
-
-	if (self.history_index > 0):
-	    self.xe.config(state=DISABLED)
-	    self.ye.config(state=DISABLED)
-
-        if self.history_index >= len(self.plotgroups_history)-1:
-	    self.xe.config(state=NORMAL)
-	    self.ye.config(state=NORMAL)
 
 
