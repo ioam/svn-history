@@ -15,7 +15,8 @@ import numpy
 from topo.base.parameterizedobject import ParameterizedObject,Parameter
 from topo.base.parameterclasses import Number, StringParameter
 
-from plotgroup import PlotGroup,TemplatePlotGroup,ProjectionPlotGroup
+from plotgroup import PlotGroup,TemplatePlotGroup
+from plotgroup import CFProjectionPlotGroup,ConnectionFieldsPlotGroup 
 from templates import plotgroup_templates
 
 import topo
@@ -57,8 +58,8 @@ class PlotGroupSaver(ParameterizedObject):
         self.plotgroup_label = plotgroup_label
 
 
-    def generate_plotgroup(self):
-	return PlotGroup([])
+    def generate_plotgroup(self,**params):
+	return PlotGroup(**params)
 
 
     def strip(self,filename):
@@ -83,27 +84,30 @@ class PlotGroupSaver(ParameterizedObject):
 
 
     def save_to_disk(self):
-         for p,l in zip(self.plotgroup.plots,self.plotgroup.labels):
+        for p,l in zip(self.plotgroup.plots,self.plotgroup.labels):
             p.bitmap.image.save(self.filename(l))
 
 
 
 class TemplatePlotGroupSaver(PlotGroupSaver):
 
+    plotgroup_class = TemplatePlotGroup
+
+    # CEBALERT: pass pgt, or maybe nothing at all
     def __init__(self,pgt_name,**params):
         self.pgt = plotgroup_templates.get(pgt_name,None)
         if not self.pgt:
             raise(ValueError("No PlotGroupTemplate named %s found" % pgt_name))
         super(TemplatePlotGroupSaver,self).__init__(pgt_name,**params)
 
-    def generate_plotgroup(self):
-	plotgroup = TemplatePlotGroup([],self.pgt,None)
-	return plotgroup
+    def generate_plotgroup(self,**params):
+	return self.plotgroup_class(template=self.pgt,**params)
 
 
-# CEBALERT: Need to add Connection Fields plot
-# class ConnectionFieldsPlotGroupSaver(TemplatePlotGroupSaver):
-#     ...
+
+
+class ConnectionFieldsPlotGroupSaver(TemplatePlotGroupSaver):
+    plotgroup_class = ConnectionFieldsPlotGroup
 
 
 
@@ -167,26 +171,19 @@ def make_contact_sheet(imgs, (marl,mart,marr,marb), padding):
 
 class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
 
-    sheet_name = Parameter(default="")
-    projection_name = Parameter(default="")
-    density = Number(default=10.0)
-
-    def generate_plotgroup(self):
-        ## CEBHACKALERT: the PlotGroups should check this stuff
-        assert self.sheet_name in topo.sim.objects(), "no sheet %s" % self.sheet_name
-        assert self.projection_name in topo.sim[self.sheet_name].projections().keys(),\
-            "no proj %s for %s"%(self.projection_name,self.sheet_name)
-        
- 	plotgroup = ProjectionPlotGroup([],self.pgt,self.sheet_name,
-					self.projection_name,
-                                        self.density)
-        return plotgroup
-
+    plotgroup_class = CFProjectionPlotGroup
 
     def save_to_disk(self):
         imgs = numpy.array([p.bitmap.image for p in self.plotgroup.plots]).reshape(self.plotgroup.proj_plotting_shape)
         img = make_contact_sheet(imgs, (3,3,3,3), 3)
         img.save(self.filename(self.sheet_name+"_"+self.projection_name))
+
+
+
+
+
+    
+
 
 
 
@@ -202,4 +199,4 @@ class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
 plotsaving_classes = {}
 plotsaving_classes[None] = TemplatePlotGroupSaver
 plotsaving_classes['Projection'] = CFProjectionPlotGroupSaver
-#plotsaving_classes['Connection Fields'] = ConnectionFieldsPlotGroupSaver
+plotsaving_classes['Connection Fields'] = ConnectionFieldsPlotGroupSaver
