@@ -4,9 +4,16 @@ Classes BasicPlotGroupPanel and PlotGroupPanel.
 These classes provide GUI windows for PlotGroups, allowing sets of
 related plots to be displayed.
 
+
 $Id$
 """
 __version__='$Revision$'
+
+
+### CEBHACKALERT: something's funny with packing sometimes (e.g. open connection fields
+### window, change params, then redraw).
+
+
 
 from topo.commands.pylabplots import matrixplot
 
@@ -25,6 +32,7 @@ except:
     bwidget_imported=False
 
 import Tkinter
+import _tkinter
 from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
      BooleanVar, StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
@@ -35,8 +43,8 @@ import topo
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
 
-from topo.plotting.templates import plotgroup_templates # is this used?
-from topo.plotting.plotgroup import PlotGroup,identity
+#from topo.plotting.templates import plotgroup_templates # is this used?
+from topo.plotting.plotgroup import PlotGroup,XPlotGroup
 
 from tkguiwindow import TkguiWindow, Menu
 
@@ -50,6 +58,9 @@ BORDERWIDTH = 1
 CANVASBUFFER = 1
 
 
+
+### CEBHACKALERT: balloon help can show up on the wrong window!
+### (Probably bound the balloon incorrectly somewhere.)
         
 from topo.base.parameterclasses import BooleanParameter
 
@@ -105,6 +116,21 @@ if bwidget_imported:
 
 
 
+##     def refresh_variables(self, update=True):
+##         """
+##         Command to be called when plotgroup variables are updated in the GUI
+##         """
+##         Pmw.showbusycursor()
+## 	self.plotgroup = copy.copy(self.plotgroup)
+## 	self.update_plotgroup_variables()# update PlotGroup variables
+##         self.plotgroup.plotcommand = self.plot_cmdname.get()# in this case must also update plotcommand
+##        	self.plotgroup.update_environment()
+## 	self.display_plots()              # Put images in GUI canvas
+##         self.display_labels()             # Match labels to grid
+##         self.refresh_title()              # Update Frame title.
+##         Pmw.hidebusycursor()
+
+
     
 
 
@@ -112,15 +138,25 @@ from tkparameterizedobject import ButtonParameter
 
 
 
+### This should actually be an XPlotGroupPanel
+
+
+
 # CB: I'm working here at the moment.
 import Tkinter
 from tkparameterizedobject import TkParameterizedObject
+
+
+
 class PlotGroupPanel(TkParameterizedObject,Frame):
 
 
     # Default is to not have the window Auto-refresh, because some
     # plots are very slow to generate (e.g. some preference map
     # plots).
+    # CEBALERT: (if someone clicks 'back' on a window, would
+    # they expect auto-refresh to become unchecked/disabled?)
+
     auto_refresh = BooleanParameter(default=False,doc="Whether to regenerate this plot whenever the simulation time advances.")
 
     Refresh = ButtonParameter(doc="Force the current plot to be regenerated.")
@@ -176,18 +212,23 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
     def get_plotgroup(self):
         return self._extra_pos[0]        
     def set_plotgroup(self,new_pg):
-        self._extra_pos = [new_pg]
+        self._extra_pos[0] = new_pg
+        #del self._extra_pos[0]
+        #self.add_extra_po(new_pg)
+
     plotgroup = property(get_plotgroup,set_plotgroup,"""something something.""")
 
-
-    def __init__(self,console,plotgroup_label,master,**params):
-
-        TkParameterizedObject.__init__(self,master,extra_pos=[self.generate_plotgroup()],**params)
+    ## why do i allow passing of pg's params in **params...delete that and do something explicit?
+    def __init__(self,console,master,plotgroup_label,**params):
+        """
+        If your parameter should be available in history, add it to widgets_in_history list,
+        otherwise it will be disabeld.
+        """
+        TkParameterizedObject.__init__(self,master,extra_pos=[self.generate_plotgroup()],
+                                       **params)
         Frame.__init__(self,master)
 
         self.plotgroup_label = plotgroup_label
-
-
 
         self.console=console
 
@@ -198,13 +239,16 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         self._num_labels = 0
         
 
-
         self.plotgroups_history=[]
         self.history_index = 0
+        self.widgets_in_history = [] # widgets valid to use in history
                               
             
     	# Factor for reducing or enlarging the Plots (where 1.2 = 20% change)
 	self.zoom_factor = 1.2
+
+
+
 
 
 
@@ -242,7 +286,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         #################### PLOT AREA ####################
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
-	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plotgroup_label))
+	self.plot_group_title = Pmw.Group(self,tag_text=self.plotgroup_label)
         self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)
         
         if bwidget_imported:
@@ -268,12 +312,18 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
 
         ### Parameters common to all PlotGroups
+        self.pack_param('updatecommand',parent=self.control_frame_3,
+                        expand='yes',fill='x')
+        self.pack_param('plotcommand',parent=self.control_frame_3,
+                        expand='yes',fill='x')
+
+        
         self.pack_param('normalize',parent=self.control_frame_1,
-                        on_change=self.update_plots,side="right")
+                        on_change=self.redraw_plots,side="right")
         self.pack_param('integerscaling',parent=self.control_frame_2,
-                        on_change=self.update_plots,side='right')
+                        on_change=self.redraw_plots,side='right')
         self.pack_param('sheetcoords',parent=self.control_frame_2,
-                        on_change=self.update_plots,side='right')
+                        on_change=self.redraw_plots,side='right')
 
         
 
@@ -288,18 +338,23 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         # first time.
         self.pack_param('Refresh',parent=self.control_frame_1,
                         on_change=self.refresh,side=LEFT)
+        self.widgets_in_history.append(self._widgets['Refresh'])
 
         self.pack_param('auto_refresh',parent=self.control_frame_1,
-                                     on_change=self.set_auto_refresh,
-                                     side=RIGHT)
+                        on_change=self.set_auto_refresh,
+                        side=RIGHT)
+        self.widgets_in_history.append(self._widgets['auto_refresh'])
 
         if self.auto_refresh: self.console.auto_refresh_panels.append(self)
             
         self.pack_param('Enlarge',parent=self.control_frame_1,
                         on_change=self.enlarge_plots,side=LEFT)
+        self.widgets_in_history.append(self._widgets['Enlarge'])
 
         self.pack_param('Reduce',parent=self.control_frame_1,
                         on_change=self.reduce_plots,side=LEFT)
+        self.widgets_in_history.append(self._widgets['Reduce'])
+
 
         self.pack_param('Back',parent=self.control_frame_2,
                         on_change=lambda x=-1: self.navigate_pg_history(x),
@@ -308,6 +363,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         self.pack_param('Fwd',parent=self.control_frame_2,
                         on_change=lambda x=+1: self.navigate_pg_history(x),
                         side=LEFT)
+
 
 
 
@@ -335,18 +391,31 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         #################################################################
 
         # CB: don't forget to include ctrl-q
+        # CB   import __main__; __main__.__dict__['qqq']=self
 
 
-        # should remove history widgets from this list! (doesn't amtter because
-        # hist buttons get updated after anyway)
-        self.nothistorywidgets = []+self._widgets.values()
+    def generate_plotgroup(self):
+	"""
+	Function that creates the PlotGroupPanels's plotgroup.
+	Needs to be reimplemented for subclasses.
+	"""
+	return PlotGroup()
 
 
-    # CB: rename/remove
+
+    # CEBALERT: use one method w/ update arg for these two.
     def update_plots(self):
-        self.plotgroup.update_plots(False)
-        self.display_plots()
+        # shouldn't call this from within history unless you've copied the plotgroup (as in redresh)
+        
+        #assert self.history_index==0,"Programming error: can't update plotgroup while looking in history." # (never update plots in the history, or they go to current activity)
 
+        self.plotgroup.draw_plots(update=True)
+        self.display_plots()
+        self.display_labels()
+    def redraw_plots(self):
+        self.plotgroup.draw_plots(update=False)
+        self.display_plots()  # ?
+ 
 
 
     def set_auto_refresh(self):
@@ -466,30 +535,28 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         """
         return x
         
-   
-    def generate_plotgroup(self):
-	"""
-	Function that creates the PlotGroupPanels's plotgroup.
-	Needs to be reimplemented for subclasses.
-	"""
-	return PlotGroup([])
 
 
     def refresh(self,update=True):
         """
         Main steps for generating plots in the Frame. 
 	Must be re-implemented in sub-classes which save a history of the plots.
+
+        # if update is True, the SheetViews are re-generated
         """
         Pmw.showbusycursor()
 
-        # if we're looking in the history, need a new plotgroup (don't update old one,
-        # which is a record of some previous state)
+        # if we've been looking in the history, now need to return to the "current time"
+        # plotgroup (but copy it: don't update the old one, which is a record of the previous state)
         if self.history_index!=0:
-            #self.plotgroup = self.generate_plotgroup()
-            self.plotgroup = copy.copy(self.plotgroup)
+            self.plotgroup = copy.copy(self.plotgroups_history[-1])
 
-	# if update is True, the SheetViews are re-generated            
-        self.plotgroup.update_plots(update)
+
+        if update:
+            self.update_plots()            
+        else:
+            self.redraw_plots()
+
 
 	self.display_plots()              # Put images in GUI canvas
         self.display_labels()             # Match labels to grid
@@ -647,7 +714,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         if self.history_index!=0:
             self.plotgroup.scale_images()
         else:
-            self.plotgroup.update_plots(False)
+            self.redraw_plots() #update_plots(False)
             
         self.display_plots()
 
@@ -671,7 +738,25 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         else:
             state = 'normal'
 
-        for w in self.nothistorywidgets: w['state']=state
+        widgets_to_update = [w for w in self._widgets.values()
+                             if w not in self.widgets_in_history]
+
+        for widget in widgets_to_update:
+            try:  ### CEBHACKALERT re TaggedSlider: doesn't support state! Need to be
+                  ### able to disable taggedsliders, so that class needs modifying.
+                  ### Plus, when TSs are changed, need to handle refreshing properly.
+                widget['state']=state
+            except _tkinter.TclError:
+                pass
+
+        ## CEBHACKALERT: necessary to update the gui.
+        ## Instead of this, need to handle replacing an extra PO properly in
+        ## tkparameterizedobject.
+        for n in self._widgets: 
+            self._tk_vars[n].get() 
+        
+            
+
         self.update_history_buttons()
 
 
@@ -742,4 +827,26 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             h = min(self.plot_frame.winfo_reqheight()+20,self.winfo_screenheight()-250)
             
             self.__scroll_frame.set_size(w,h)
+
+
+
+
+class XPGPanel(PlotGroupPanel):
+
+#    init
+#    self.refresh_sheets()
+    
+##     def refresh_sheets(self,sheet_type=Sheet):
+##         sheets = [v for v in topo.sim.objects(sheet_type).values()]
+##         sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))        
+##         p = self.get_parameter_object('sheet')
+##         p.set_range(sheets)
+
+
+    def generate_plotgroup(self):
+	"""
+	Function that creates the PlotGroupPanels's plotgroup.
+	Needs to be reimplemented for subclasses.
+	"""
+	return XPlotGroup()
 
