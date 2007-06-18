@@ -612,6 +612,82 @@ class CommandEvent(Event):
         
 
 
+### Initial draft.
+# Might need (among other things):
+#  - parameters to control formatting
+import time
+from math import fmod,floor
+class SomeTimer(object):
+
+    # CB: some of these things are temporary
+    def __init__(self,func,sim_time,step=2.0,estimate_interval=50,receive_message=[],var=None):
+        self.func = func
+        self.sim_time = sim_time
+        self.step = step
+        self.estimate_interval = estimate_interval
+        self.receive_message = receive_message
+        self.var = var
+        
+    def __set_var(self,val):
+        if self.var: self.var.set(val)
+
+    def __pass_out_message(self,message):
+        [thing.timing_message(message) for thing in self.receive_message]
+
+    def call_and_time(self,duration):
+
+        iters = int(floor(duration/self.step))
+        remain = fmod(duration, self.step)
+        
+        starttime=time.time()
+        recenttimes=[]
+
+        ## Duration of most recent times from which to estimate remaining time
+        self.estimate_interval=50
+        start_sim_time=self.sim_time()
+        self.stop=False
+
+        for i in xrange(iters):
+            recenttimes.append(time.time())
+            length = len(recenttimes)
+
+            if (length>self.estimate_interval):
+                recenttimes.pop(0)
+                length-=1
+
+            self.func(self.step) 
+            
+            percent = 100.0*i/iters
+            estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
+
+            self.__set_var(percent)
+
+            
+            # Should say 'at current rate', since the calculation assumes linearity
+            message = ('Time %0.2f: %d%% of %0.0f completed (%02d:%02d remaining)' %
+                       (self.sim_time(),int(percent),duration, int(estimate/60),
+                        int(estimate%60)))
+            self.__pass_out_message(message)
+
+        percent = 100
+        
+        self.__set_var(percent)
+        
+        message = ('Ran %0.2f to time %0.2f' %
+                   (self.sim_time()-start_sim_time, self.sim_time()))
+        self.__pass_out_message(message)
+
+
+# for testing timing object
+class TempPrinter(object):
+    def timing_message(self,m):
+        print m
+
+#from topo.base.simulation import SomeTimer,TempPrinter; t=TempPrinter(); s = SomeTimer(topo.sim.run,topo.sim.time,receive_message=[t]); s.call_and_time(100)
+
+
+
+
 # Simulation stores its events in a linear-time priority queue (i.e., a
 # sorted list.) For efficiency, e.g. for spiking neuron simulations,
 # we'll probably need to replace the linear priority queue with a more
