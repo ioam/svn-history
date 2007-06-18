@@ -276,7 +276,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         except ValueError:
             ### CEBHACKALERT: trying this out...
             # valueerror here means user not finished typing
-            print "### You're typing..."
+            #print "### You're typing..."
             return 
 
 
