@@ -15,7 +15,6 @@ import topo
 
 from topo.base.projection import ProjectionSheet
 
-from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import FeatureCurvePlotGroup
 
 from plotgrouppanel import PlotGroupPanel
@@ -24,6 +23,31 @@ from tkparameterizedobject import ButtonParameter
 
 ## CEBALERT: same as for featurecurveplotgroup: shares code with templateplotgrouppanel
 class FeatureCurvePanel(PlotGroupPanel):
+
+    plotgroup_type = FeatureCurvePlotGroup
+
+
+    # CEBHACKALERT: to which types of sheet is this plotgroup supposed to be applicable?
+    # Also applies to populate_sheet_param() below.
+    @staticmethod
+    def valid_context():
+        """
+        Return true if there appears to be data available for this type of plot.
+
+        To avoid confusing error messages, this method should be
+        defined to return False in the case where there is no
+        appropriate data to plot.  This information can be used to,
+        e.g., gray out the appropriate menu item.
+        By default, PlotPanels are assumed to be valid only for
+        simulations that contain at least one Sheet.  Subclasses with
+        more specific requirements should override this method with
+        something more appropriate.
+        """
+        if topo.sim.objects(ProjectionSheet).items():
+            return True
+        else:
+            return False
+
 
     def __init__(self,console,master,pgt,**params):       
         self.pgt=pgt
@@ -66,7 +90,6 @@ class FeatureCurvePanel(PlotGroupPanel):
 
 
     def populate_sheet_param(self,p):
-        # CEBHACKALERT: to which types of sheet is this plotgroup supposed to be applicable?
         sheets = topo.sim.objects(ProjectionSheet).values() 
         sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
         p.params()['sheet'].range = sheets
@@ -78,7 +101,7 @@ class FeatureCurvePanel(PlotGroupPanel):
         Create the right Plot Key that will define the needed
         information for a FeatureCurvePlotGroup. 
         """
-        p = FeatureCurvePlotGroup(template=self.pgt)
+        p = self.plotgroup_type(template=self.pgt)
         self.populate_sheet_param(p)
 	return p
                                            

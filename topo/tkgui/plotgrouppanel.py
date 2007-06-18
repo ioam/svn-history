@@ -10,12 +10,6 @@ $Id$
 __version__='$Revision$'
 
 
-### CEBHACKALERT: something's funny with packing sometimes (e.g. open connection fields
-### window, change params, then redraw). (It's to do with labels being left behind.)
-
-
-
-from topo.commands.pylabplots import matrixplot
 
 import copy
 
@@ -31,8 +25,7 @@ try:
 except:
     bwidget_imported=False
 
-import Tkinter
-import _tkinter
+import Tkinter, _tkinter
 from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
      BooleanVar, StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
@@ -41,12 +34,16 @@ from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
 import topo
 
 from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.parameterclasses import BooleanParameter
 from topo.base.sheet import Sheet
 
-#from topo.plotting.templates import plotgroup_templates # is this used?
 from topo.plotting.plotgroup import PlotGroup,XPlotGroup
 
+from topo.commands.pylabplots import matrixplot
+
 from tkguiwindow import TkguiWindow, Menu
+from tkparameterizedobject import ButtonParameter, TkParameterizedObject
+
 
 BORDERWIDTH = 1
 
@@ -59,10 +56,15 @@ CANVASBUFFER = 1
 
 
 
+
+
+### CEBHACKALERT: something's funny with packing sometimes (e.g. open connection fields
+### window, change params, then redraw). (It's to do with labels being left behind.)
+
 ### CEBHACKALERT: balloon help can show up on the wrong window!
 ### (Probably bound the balloon incorrectly somewhere.)
         
-from topo.base.parameterclasses import BooleanParameter
+
 
 if bwidget_imported:
     class ResizableScrollableFrame(Tkinter.Frame):
@@ -116,48 +118,20 @@ if bwidget_imported:
 
 
 
-##     def refresh_variables(self, update=True):
-##         """
-##         Command to be called when plotgroup variables are updated in the GUI
-##         """
-##         Pmw.showbusycursor()
-## 	self.plotgroup = copy.copy(self.plotgroup)
-## 	self.update_plotgroup_variables()# update PlotGroup variables
-##         self.plotgroup.plotcommand = self.plot_cmdname.get()# in this case must also update plotcommand
-##        	self.plotgroup.update_environment()
-## 	self.display_plots()              # Put images in GUI canvas
-##         self.display_labels()             # Match labels to grid
-##         self.refresh_title()              # Update Frame title.
-##         Pmw.hidebusycursor()
-
-
-    
-
-
-from tkparameterizedobject import ButtonParameter
-
-
-
-### This should actually be an XPlotGroupPanel
-
-
-
-# CB: I'm working here at the moment.
-import Tkinter
-from tkparameterizedobject import TkParameterizedObject
-
-
 
 class PlotGroupPanel(TkParameterizedObject,Frame):
+
+    _abstract_class_name = "PlotGroupPanel"
+
+    plotgroup_type = PlotGroup
 
 
     # Default is to not have the window Auto-refresh, because some
     # plots are very slow to generate (e.g. some preference map
     # plots).
+    auto_refresh = BooleanParameter(default=False,doc="Whether to regenerate this plot whenever the simulation time advances.")
     # CEBALERT: (if someone clicks 'back' on a window, would
     # they expect auto-refresh to become unchecked/disabled?)
-
-    auto_refresh = BooleanParameter(default=False,doc="Whether to regenerate this plot whenever the simulation time advances.")
 
     Refresh = ButtonParameter(doc="Force the current plot to be regenerated.")
 
@@ -170,7 +144,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             to ensure that no data is lost when displaying.
             """)
 
-
     Fwd = ButtonParameter(doc="Move forward through the history of all the plots shown in this window.")
 
     Back = ButtonParameter(doc=
@@ -179,32 +152,8 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             window.  When showing a historical plot, some functions will be
             disabled, because the original data is no longer available.
             """)
-
-            
-
-
     
-    @staticmethod
-    def valid_context():
-        """
-        Return true if there appears to be data available for this type of plot.
-
-        To avoid confusing error messages, this method should be
-        defined to return False in the case where there is no
-        appropriate data to plot.  This information can be used to,
-        e.g., gray out the appropriate menu item.
-        By default, PlotPanels are assumed to be valid only for
-        simulations that contain at least one Sheet.  Subclasses with
-        more specific requirements should override this method with
-        something more appropriate.
-        """
-        if topo.sim.objects(Sheet).items():
-            return True
-        else:
-            return False
-
-
-
+    
     # CB: Surely there's a better way?
     # Maybe we don't need the plotgroup attribute, since all the
     # plotgroup's attributes (e.g. self.plotgroup.a) are available via
@@ -218,14 +167,14 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
     plotgroup = property(get_plotgroup,set_plotgroup,"""something something.""")
 
-    ## why do i allow passing of pg's params in **params...delete that and do something explicit?
+    ## CB: Rather than passing params for the PlotGroup in **params, have plotgroup_params
+    ## and pass those to generate_plotgroup(**params)?
     def __init__(self,console,master,plotgroup_label,**params):
         """
         If your parameter should be available in history, add it to widgets_in_history list,
         otherwise it will be disabeld.
         """
-        TkParameterizedObject.__init__(self,master,extra_pos=[self.generate_plotgroup()],
-                                       **params)
+        TkParameterizedObject.__init__(self,master,extra_pos=[self.generate_plotgroup()],**params)
         Frame.__init__(self,master)
 
         self.plotgroup_label = plotgroup_label
@@ -246,11 +195,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             
     	# Factor for reducing or enlarging the Plots (where 1.2 = 20% change)
 	self.zoom_factor = 1.2
-
-
-
-
-
+        
 
         # -----------------------
         # | ------------------- |
@@ -318,12 +263,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
                         expand='yes',fill='x')
 
         
-        self.pack_param('normalize',parent=self.control_frame_1,
-                        on_change=self.redraw_plots,side="right")
-        self.pack_param('integerscaling',parent=self.control_frame_2,
-                        on_change=self.redraw_plots,side='right')
-        self.pack_param('sheetcoords',parent=self.control_frame_2,
-                        on_change=self.redraw_plots,side='right')
 
         
 
@@ -394,13 +333,15 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         # CB   import __main__; __main__.__dict__['qqq']=self
 
 
+    # CB: rename to _generate_plotgroup()
     def generate_plotgroup(self):
 	"""
-	Function that creates the PlotGroupPanels's plotgroup.
-	Needs to be reimplemented for subclasses.
-	"""
-	return PlotGroup()
+        Create this Panel's PlotGroup.
 
+        Reimplement in subclasses that must perform additional setup of their
+        PlotGroup (e.g. populating Parameter ranges).
+	"""
+        return self.plotgroup_type()
 
 
     # CEBALERT: use one method w/ update arg for these two.
@@ -411,7 +352,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
         self.plotgroup.draw_plots(update=True)
         self.display_plots()
-        self.display_labels()
+        #self.display_labels()
     def redraw_plots(self):
         self.plotgroup.draw_plots(update=False)
         self.display_plots()  # ?
@@ -831,22 +772,42 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
 
 
+
+
+
 class XPGPanel(PlotGroupPanel):
 
-#    init
-#    self.refresh_sheets()
+    plotgroup_type = XPlotGroup
     
-##     def refresh_sheets(self,sheet_type=Sheet):
-##         sheets = [v for v in topo.sim.objects(sheet_type).values()]
-##         sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))        
-##         p = self.get_parameter_object('sheet')
-##         p.set_range(sheets)
 
+    @staticmethod
+    def valid_context():
+        """
+        Return true if there appears to be data available for this type of plot.
 
-    def generate_plotgroup(self):
-	"""
-	Function that creates the PlotGroupPanels's plotgroup.
-	Needs to be reimplemented for subclasses.
-	"""
-	return XPlotGroup()
+        To avoid confusing error messages, this method should be
+        defined to return False in the case where there is no
+        appropriate data to plot.  This information can be used to,
+        e.g., gray out the appropriate menu item.
+        By default, PlotPanels are assumed to be valid only for
+        simulations that contain at least one Sheet.  Subclasses with
+        more specific requirements should override this method with
+        something more appropriate.
+        """
+        if topo.sim.objects(Sheet).items():
+            return True
+        else:
+            return False
+        
+
+    def __init__(self,console,master,plotgroup_label,**params):
+        super(XPGPanel,self).__init__(console,master,plotgroup_label,**params)
+
+        self.pack_param('normalize',parent=self.control_frame_1,
+                        on_change=self.redraw_plots,side="right")
+        self.pack_param('integerscaling',parent=self.control_frame_2,
+                        on_change=self.redraw_plots,side='right')
+        self.pack_param('sheetcoords',parent=self.control_frame_2,
+                        on_change=self.redraw_plots,side='right')
+
 

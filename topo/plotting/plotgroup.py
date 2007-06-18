@@ -711,11 +711,6 @@ class FeatureCurvePlotGroup(PlotGroup):
     y = Number(default=0.0,doc="somethingelse")
 
 
-
-    ### CEBALERT: these won't stay here 
-    normalize=Parameter(hidden=True)
-    sheetcoords=Parameter(hidden=True)
-    integerscaling=Parameter(hidden=True)
     
 
     def __init__(self,**params):

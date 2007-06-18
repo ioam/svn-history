@@ -26,7 +26,7 @@ import topo
 
 from topo.base.parameterclasses import BooleanParameter
 
-from plotgrouppanel import PlotGroupPanel
+from plotgrouppanel import XPGPanel
 from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import TemplatePlotGroup
 
@@ -81,7 +81,9 @@ def available_plot_channels(plot):
 
 ### CB: I'm working here at the moment.
 
-class TemplatePlotGroupPanel(PlotGroupPanel):
+class TemplatePlotGroupPanel(XPGPanel):
+
+    plotgroup_type = TemplatePlotGroup
 
 
     ## CEBHACKALERT: recover the doc string from a previous cvs version.
@@ -125,7 +127,7 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
         
         # copied because we modify it in strength_only_fn; see HACKALERT.
         self.pgt=copy.deepcopy(pgt)
-        PlotGroupPanel.__init__(self,console,master,pgt.name,**params)
+        super(TemplatePlotGroupPanel,self).__init__(console,master,pgt.name,**params)
 
 
         self.pack_param('strength_only',parent=self.control_frame_1,
@@ -215,9 +217,8 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
         #################################################################
 
 
-    # CEBALERT
     def generate_plotgroup(self):
-        return TemplatePlotGroup(template=self.pgt)
+        return self.plotgroup_type(template=self.pgt)
 
 
 
