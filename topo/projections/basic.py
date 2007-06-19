@@ -197,26 +197,22 @@ class OneToOneProjection(Projection):
     """
     A projection that has at most one input connection for each unit.
 
-    This projection has exactly one weight for each destination unit,
-    the input locations on the input sheet are determined by a
+    This projection has exactly one weight for each destination unit.
+    The input locations on the input sheet are determined by a
     coordinate mapper.  Inputs that map outside the bounds of the
     input sheet are treated as having zero weight.
     """
-    coord_mapper = CoordinateMapperFnParameter(
-        default=IdentityMF(),
+    coord_mapper = CoordinateMapperFnParameter(default=IdentityMF(),
         doc='Function to map a destination unit coordinate into the src sheet.')
 
     weights_generator = PatternGeneratorParameter(
         default=Constant(),constant=True,
-        doc="""Generate initial weight values for each unit of the destination sheet."""
-        )
+        doc="""Generate initial weight values for each unit of the destination sheet.""")
 
-    output_fn  = OutputFnParameter(
-        default=IdentityOF(),
+    output_fn  = OutputFnParameter(default=IdentityOF(),
         doc='Function applied to the Projection activity after it is computed.')
 
-    learning_fn = LearningFnParameter(
-        default=IdentityLF,
+    learning_fn = LearningFnParameter(default=IdentityLF,
         doc="""Learning function applied to weights.""")
 
     learning_rate = Number(default=0)
@@ -227,7 +223,7 @@ class OneToOneProjection(Projection):
         dx,dy = self.dest.bounds.centroid()
 
         # JPALERT: Not sure if this is the right way to generate weights.
-        # FOr full specificity, the each initial weight should be dependent on the
+        # For full specificity, each initial weight should be dependent on the
         # coordinates of both the src unit and the dest unit.
         self.weights = self.weights_generator(bounds=self.dest.bounds,
                                               xdensity=self.dest.xdensity,
@@ -236,12 +232,13 @@ class OneToOneProjection(Projection):
 
         # JPALERT: CoordMapperFns should really be made to take
         # matrices of x/y points and apply their mapping to all.  This
-        # could give great speedups, ep for AffineTransform mappings,
-        # which are can be applied to many points with a single matrix multiplication.
+        # could give great speedups, esp for AffineTransform mappings,
+        # which can be applied to many points with a single matrix
+        # multiplication.
         srccoords = [self.coord_mapper(x,y) 
                      for y in reversed(self.dest.sheet_rows())
-                     for x in self.dest.sheet_cols()
-                     ]
+                     for x in self.dest.sheet_cols()]
+        
         self.src_idxs = numpy.array([rowcol2idx(r,c,self.src.activity.shape)
                                      for r,c in (self.src.sheet2matrixidx(u,v)
                                                  for u,v in srccoords)])
@@ -254,8 +251,8 @@ class OneToOneProjection(Projection):
             return (0 <= r < src_rows) and (0 <= c < src_cols)
         destmask = [in_bounds(x,y) for x,y in srccoords]
 
-        # JPALERT: For some reason numpy.nonzero returns the nonzero indices wrapped in a one-tuple.
-        # Maybe a bug in numpy?
+        # The [0] is required because numpy.nonzero returns the
+        # nonzero indices wrapped in a one-tuple.
         self.dest_idxs = numpy.nonzero(destmask)[0]
         self.src_idxs = self.src_idxs.take(self.dest_idxs)
         assert len(self.dest_idxs) == len(self.src_idxs)
