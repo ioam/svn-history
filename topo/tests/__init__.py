@@ -23,6 +23,12 @@ __version__='$Revision$'
 # That saves on duplication, etc.
 # We should at least start doing it right from now, or this problem
 # is going to grow.
+#
+# Additionally, tests often affect each other. Instead of creating
+# independent objects, they often share them (in particular, they
+# often share topo.sim). 
+
+
 
 import unittest,re,os
 
