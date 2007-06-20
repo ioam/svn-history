@@ -612,69 +612,80 @@ class CommandEvent(Event):
         
 
 
-### Initial draft.
-# Might need (among other things):
-#  - parameters to control formatting
+
+### CB: not yet finished.
+
+
 import time
 from math import fmod,floor
-class SomeTimer(object):
+class SomeTimer(ParameterizedObject):
 
-    # CB: some of these things are temporary
-    def __init__(self,func,sim_time,step=2.0,estimate_interval=50,receive_message=[],var=None):
-        self.func = func
-        self.sim_time = sim_time
-        self.step = step
-        self.estimate_interval = estimate_interval
-        self.receive_message = receive_message
-        self.var = var
+# Might need to add:
+#  - parameters to control formatting
+
+# CEBALERT: author of timing code, please add some docstrings and
+# check the parameters are the correct type:
+    step = Number(default=2.0,doc="")
+    estimate_interval = Number(default=50,doc="") # Integer?
+
+    # CB: need to change Parameter types - Callable, List, ...
+    # CB: rename
+    func = Parameter(default=None,doc="Function that call_and_time() will call and give timing info about.")
+
+    func_args = Parameter(default=None,doc="Arguments passed to func at time of calling.")
+
+    simulation_time_fn = Parameter(default=None,doc="")
+
+    real_time_fn = Parameter(default=time.time,doc="")
+
+    receive_messages = Parameter(default=[],doc="List of objects that will receive timing messages. Each must have a timing_message() method.")
+
+    receive_progress = Parameter(default=[],doc="List of objects that will receive the current 'percentage complete' value. Each must have a set() method. (e.g. a Tkinter variable).""")
+    
         
-    def __set_var(self,val):
-        if self.var: self.var.set(val)
-
+    def __pass_out_progress(self,val):
+        [thing.set(val) for thing in self.receive_progress]
+    
     def __pass_out_message(self,message):
-        [thing.timing_message(message) for thing in self.receive_message]
+        [thing.timing_message(message) for thing in self.receive_messages]
 
-    def call_and_time(self,duration):
-
-        iters = int(floor(duration/self.step))
-        remain = fmod(duration, self.step)
-        
-        starttime=time.time()
+    # __call__
+    def call_and_time(self,simulation_duration):
+        iters = int(floor(simulation_duration/self.step))
+        remain = fmod(simulation_duration, self.step)    
+        starttime=self.real_time_fn()
         recenttimes=[]
 
         ## Duration of most recent times from which to estimate remaining time
         self.estimate_interval=50
-        start_sim_time=self.sim_time()
+        start_sim_time=self.simulation_time_fn()
         self.stop=False
 
         for i in xrange(iters):
-            recenttimes.append(time.time())
+            recenttimes.append(self.real_time_fn())
             length = len(recenttimes)
 
             if (length>self.estimate_interval):
                 recenttimes.pop(0)
                 length-=1
 
-            self.func(self.step) 
+            # CEBALERT: need to do a callable check/have it done by a param
+            self.func(self.step)
             
             percent = 100.0*i/iters
             estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
-
-            self.__set_var(percent)
-
-            
+            self.__pass_out_progress(percent)
+        
             # Should say 'at current rate', since the calculation assumes linearity
             message = ('Time %0.2f: %d%% of %0.0f completed (%02d:%02d remaining)' %
-                       (self.sim_time(),int(percent),duration, int(estimate/60),
+                       (self.simulation_time_fn(),int(percent),simulation_duration, int(estimate/60),
                         int(estimate%60)))
             self.__pass_out_message(message)
 
-        percent = 100
-        
-        self.__set_var(percent)
-        
+        percent = 100   
+        self.__pass_out_progress(percent)        
         message = ('Ran %0.2f to time %0.2f' %
-                   (self.sim_time()-start_sim_time, self.sim_time()))
+                   (self.simulation_time_fn()-start_sim_time, self.simulation_time_fn()))
         self.__pass_out_message(message)
 
 
@@ -683,7 +694,7 @@ class TempPrinter(object):
     def timing_message(self,m):
         print m
 
-#from topo.base.simulation import SomeTimer,TempPrinter; t=TempPrinter(); s = SomeTimer(topo.sim.run,topo.sim.time,receive_message=[t]); s.call_and_time(100)
+#from topo.base.simulation import TempPrinter; topo.sim.timer.receive_messages.append(TempPrinter()); topo.sim.run(10)
 
 
 
@@ -731,7 +742,13 @@ class Simulation(ParameterizedObject):
         simulation is next run(). These commands will run before any others,
         and are guaranteed only to run once (before being destroyed).
         """)
-              
+
+    #timer = Parameter(default=SomeTimer(),instantiate=True,
+    #                  doc="""
+    #                  ...
+    #                  receive_messages, receive_progress
+    #                  """)
+
 
     def __init__(self,**params):
         """
@@ -748,6 +765,10 @@ class Simulation(ParameterizedObject):
 
         self.events = []
         self._events_stack = []
+
+        #self.timer.func=self._run
+        #self.timer.simulation_time_fn=self.time
+        
 
     def __getitem__(self,item_name):
         """
@@ -840,7 +861,12 @@ class Simulation(ParameterizedObject):
         """
         return self._time
 
-    
+
+    # CB: got to integrate with run(). I don't want to edit run() itself.
+    #def run(self,duration):  # deal with Forever,until=Forever
+    #    self.timer.call_and_time(duration)
+
+    # _run
     def run(self,duration=Forever,until=Forever):
         """
         Process simulation events for the specified duration or until the specified time.
