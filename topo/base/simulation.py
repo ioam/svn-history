@@ -69,6 +69,9 @@ from fixedpoint import FixedPoint
 SLEEP_EXCEPTION = "Sleep Exception"
 STOP = "Simulation Stopped"
 
+# CEBALERT: Is it dangerous to have 'Forever' implemented
+# like this? To start with, min(Forever,1) gives
+# FixedPoint('-1.00,2') i.e. Forever.
 Forever = FixedPoint(-1)
 
 # Default path to the current simulation, from main
@@ -880,6 +883,9 @@ class Simulation(ParameterizedObject):
         # CEBHACKALERT? I can do topo.sim.run(2) and the simulation time
         # remains FixedPoint.  If I do topo.sim.run(until=100), the
         # simulation time is no longer FixedPoint: it becomes an int.
+
+        # CEBHACKALERT: If I do topo.sim.run(10), then topo.sim.run(until=3),
+        # topo.sim._time returns to 3 (i.e. the simulation time can jump backwards).
 
         # Execute any commands in execute_next, and then remove them.
         [CommandEvent(time=self._time,command_string=cmd)() for cmd in self.execute_next]
