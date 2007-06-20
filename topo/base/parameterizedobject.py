@@ -626,7 +626,9 @@ class ParameterizedObject(object):
 
 
     # CEBHACKALERT: see warning() ##########
-    receive_warnings = []
+    receive_warnings = [] # not a parameter, so doesn't get pickled
+                          # (if it did get pickled, there'd be problems
+                          #  since we'd be trying to pickle topoconsole...)
     def warn(self,*args):
         s = ' '.join([str(x) for x in args])
         for x in self.receive_warnings:
@@ -886,6 +888,12 @@ class ParameterizedObject(object):
 ## delete this __getstate__ method.
 ## (Why would there be anything to do with slots for ParameterizedObjects,
 ## anyway?)
+
+        # CB (note to myself): note that this code applies *only* when
+        # a __something_param_value contains a Parameter.
+        # e.g. k is a ParameterizedObject with a Parameter p.
+        #   k.p = DynamicNumber(something)
+        # k.p is then a Parameter itself. 
         
         # deep copy Parameters; overwrites their original shallow copies 
 ##         for (k,v) in self.__dict__.items():
