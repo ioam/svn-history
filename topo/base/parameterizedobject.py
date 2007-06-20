@@ -1016,6 +1016,8 @@ class PicklableClassAttributes(object):
             
             # now restore class Parameter values
             for p_name,p in state.items():
+                # CEBHACKALERT: doesn't seem like a great mechanism;
+                # could write over a user's variable?
                 __main__.__dict__['val'] = p
                 try:
                     exec 'setattr('+class_name+',"'+p_name+'",val)' in __main__.__dict__
