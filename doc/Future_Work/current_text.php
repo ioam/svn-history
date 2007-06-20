@@ -871,4 +871,12 @@ _________________________________________________________
 
 +(OPTIMIZATION PAGE)
 
+
+_________________________________________________________
+
+
+Has anyone looked at the (new to python 2.4) decimal module? 
+http://docs.python.org/lib/module-decimal.html
+
+
 -->
