@@ -293,6 +293,8 @@ do we have to write and maintain all the testing mechanisms (apart from that for
 there some other python package to help?</li>
 <li>Probably should do make clean and make first to test that too.</li>
 <li>Doesn't python's unittest already have web formatting somewhere?</li>
+
+Consider buildbot: http://buildbot.sourceforge.net/, http://buildbot.scipy.org/
 </ul>
 
 
