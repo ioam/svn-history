@@ -828,3 +828,45 @@ dynamic help. We might be able to simplify topoconsole further with this.]
 [Add note about the others: messagebar, combobox, radiobutton, etc.
 Probably all available from Tkinter and bwidget...we can probably
 stop using Pmw.]
+
+
+
+
+<!-- NOTES NEEDING TO BE TURNED INTO TASKS 
+
+Any idea what this does?
+alterdot()
+numpy.alterdot(...)
+alterdot() changes all dot functions to use blas.
+
+_________________________________________________________
+
+
+|            if output_fn is not IdentityOF: # Optimization (but may not actually help)
+|  !             output_fn(result)           # CEBHACKALERT: particularly since everything but
+|  !                                         # the IdentityOF *class* will pass this if-test!
+|  !         return result                   # Should be: "if not instance(output_fn,IdentityOF):".
+|  !                                         # I guess this needs fixing in several places.
+
+I think the "optimization" should just be removed
+everywhere.  It would be good to test the speed first, but if that's
+too much trouble, just removing it is fine.
+
+
+_________________________________________________________
+
+
+
+
+|  > |  > - For (basic ?) indexing of an ndarray - is there any reason to prefer
+|  > |  > A[i,j] over A[i][j]?
+|  > |
+|  > |  The latter involves two function calls and creation of an intermediate
+|  > |  object (a view array).
+|  >
+|  > Whoa, I didn't realize that!  I guess we should always be doing
+|  > A[i,j]?  I think in most of our code we do A[i][j]...
+
++(OPTIMIZATION PAGE)
+
+-->
