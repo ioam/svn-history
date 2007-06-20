@@ -153,6 +153,7 @@ def save_snapshot(snapshot_name,xml=False):
         ParameterizedObject(name="save_snapshot").warning("XML snapshots are only experimental at present.")
         pickle_fn=gnosis.xml.pickle.dump
 
+
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
@@ -192,7 +193,12 @@ def load_snapshot(snapshot_name):
         pickle.load(snapshot)
 
     # (part of HACKALERT above)
-    Image.filename = fn    
+    Image.filename = fn
+
+
+    # CEBHACKALERT: see SomeTimer's __getstate__ method.
+    if hasattr(topo,'guimain'):
+        topo.guimain._add_to_lists()
 
 
 def save_script_repr(script_name):
