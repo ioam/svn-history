@@ -323,7 +323,9 @@ e.g. Filename's search_paths attribute shouldn't be pickled.
 Presumably there will be other such items, so should objects have a
 standard attribute/parameter that lists attributes not to pickle? Or
 something like that.  Otherwise, save_snapshot and load_snapshot could
-specifically avoid items.
+specifically avoid items. Parameter could have a 'pickle' attribute
+that indicates whether or not to pickle its contents. Could we have some
+global list of objects not to pickle? Need to think about what's best.
 
 
 <H4>2007/03/26 (CB): right-click menus</H4>
