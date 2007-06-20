@@ -153,7 +153,9 @@ def __numpy_ufunc_pickle_support():
 
     def ufunc_pickler(ufunc):
 	return ufunc.__name__
-    
+
+    ## CEBHACKALERT! How can this work? It should be ufunc_unpickler(name)!
+    ## And *return* getattr(numpy,name)!! How is any of this working?
     def ufunc_unpickler(ufunc):
 	import numpy
 	getattr(numpy,name)
