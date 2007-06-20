@@ -708,6 +708,10 @@ class InstanceMethodWrapper(object):
     Constructor takes an instance method (e.g. topo.sim.time) as
     its only argument.  Wrapper instance is callable, picklable, etc.
     """
+    # CEBALERT: add reasonable repr and str methods.
+    # (Probably won't happen before we upgrade to python 2.5, at which
+    # point we probably won't need this class...)
+    
     def __init__(self,im):
         self.im = im
 
