@@ -877,6 +877,10 @@ class Simulation(ParameterizedObject):
 
         If both duration and until are used, the one that is reached first will apply.
         """
+        # CEBHACKALERT? I can do topo.sim.run(2) and the simulation time
+        # remains FixedPoint.  If I do topo.sim.run(until=100), the
+        # simulation time is no longer FixedPoint: it becomes an int.
+
         # Execute any commands in execute_next, and then remove them.
         [CommandEvent(time=self._time,command_string=cmd)() for cmd in self.execute_next]
         self.execute_next=[]
