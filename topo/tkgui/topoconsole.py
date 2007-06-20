@@ -311,6 +311,12 @@ class TopoConsole(TkguiWindow):
         ##########
 
 
+        # CEBALERT: there's only one progress variable (like only one message
+        # at a time can be displayed on messagebar).
+        self.progval = Tkinter.IntVar(self)
+        self._add_to_lists()
+
+
 # CB: example code for plot gallery
 ##         plots = []
 ##         for (label,obj) in plotgroup_templates.items():
@@ -329,6 +335,12 @@ class TopoConsole(TkguiWindow):
         tkMessageBox.showwarning("title",msg)
 ##################################################
 
+
+    ## CEBHACKALERT: see SomeTimer ##
+    def _add_to_lists(self):
+        # should include adding to the warning list
+        topo.sim.timer.receive_messages.append(self.timing_message)
+        topo.sim.timer.receive_progress.append(self.timing_progress)
 
         
 
@@ -496,7 +508,8 @@ class TopoConsole(TkguiWindow):
 
     def set_stop(self):
         """Declare that running should be interrupted."""
-        self.stop=True
+        topo.sim.timer.stop=True
+        
 
             
     def quit_topographica(self):
@@ -670,7 +683,12 @@ class TopoConsole(TkguiWindow):
                 self.messageBar.message('state', "Couldn't open "+location+" in browser.")
 
 
-    
+
+    # CEBHACKALERT: need to decide what to do about multiple concurrent timed process, and
+    # clicking on Stop. If we'll only ever allow one progress meter, then have a
+    # window created at start and just show/hide it. Otherwise need some way to
+    # close a window when stop is pressed (can do that from set_stop method, if
+    # we put the 'stop' button on the progress meter window...)
     def progress_window(self,progress_var,title=""):
         """
         Simplistic (& demo) progress bar in a window.
@@ -724,6 +742,14 @@ class TopoConsole(TkguiWindow):
 
 
 
+    def timing_message(self,message):
+        self.messageBar.message('state', message)
+
+    def timing_progress(self,val):
+        self.progval.set(val)
+        self.update()
+
+    
     def run_simulation(self):
         """
         Run the simulation for the duration specified in the
@@ -734,74 +760,15 @@ class TopoConsole(TkguiWindow):
         features like periodically displaying the simulated and real
         time remaining.
         """
+        self.title(topo.sim.name) # ALERT: Temporary
 
-        # progress bar updates per 1.0 iteration, so it's not always
-        # going to be helpful
-        progval = Tkinter.IntVar(self)        
-        self.progress_window(progval,title="Running Simulation")
-
-        
-        # Should replace with a progress bar; see
-        # http://tkinter.unpythonic.net/bwidget/
-        # http://tkinter.unpythonic.net/wiki/ProgressBar
-
-        ### JABALERT: Most of this code should move to the
-        ### Simulation class, because it is not specific to the GUI.
-        ### E.g. we'll also want time remaining estimates from the
-        ### command line and the batch interface.  Also see
-        ### topo/analysis/featureresponses.py; maybe it should 
-        ### be its own object instead; not sure.
         fduration = self.run_for.get_value()
-        step   = 2.0
-        iters  = int(floor(fduration/step))
-        remain = fmod(fduration, step)
-        starttime=time.time()
-        recenttimes=[]
-
-        # Temporary:
-        self.title(topo.sim.name) ## this changes the title bar to more useful
-
-        ## Duration of most recent times from which to estimate remaining time
-        estimate_interval=50
-        start_sim_time=topo.sim.time()
-        self.stop=False
-        self.stop_button.config(state=NORMAL)        
-        for i in xrange(iters):
-            recenttimes.append(time.time())
-            length = len(recenttimes)
-
-            if (length>estimate_interval):
-                recenttimes.pop(0)
-                length-=1
-                
-            topo.sim.run(step)
-            percent = 100.0*i/iters
-
-            estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
-
-            progval.set(percent)
-
-            # Should say 'at current rate', since the calculation assumes linearity
-            message = ('Time %0.2f: %d%% of %0.0f completed (%02d:%02d remaining)' %
-                       (topo.sim.time(),int(percent),fduration, int(estimate/60),
-                        int(estimate%60)))
-
-            self.messageBar.message('state', message)
-            self.update()
-            if self.stop:
-                break
-                                                                                                                                                  
+        if fduration>9: self.progress_window(self.progval,title="Running Simulation")
+        self.stop_button.config(state=NORMAL) 
+        topo.sim.run_and_time(fduration)
         self.stop_button.config(state=DISABLED)
-        if not self.stop:
-            topo.sim.run(remain)
-        
-        message = ('Ran %0.2f to time %0.2f' %
-                   (topo.sim.time()-start_sim_time, topo.sim.time()))
         self.auto_refresh()
-
-        self.messageBar.message('state', message)
-        progval.set(100) # CB: shouldn't percent have reached 100?
-
+        
         
 
 if __name__ != '__main__':
