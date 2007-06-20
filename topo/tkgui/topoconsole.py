@@ -316,6 +316,12 @@ class TopoConsole(TkguiWindow):
         self.progval = Tkinter.IntVar(self)
         self._add_to_lists()
 
+        self.show_lots=False # testing: update plots at every iteration of timer code
+        # so to see your activity windows etc update in 'slow motion' (I think that
+        # term covers the slow-down and the apparent visual effect), try e.g.:
+        # topo.sim.timer.step=0.05; topo.guimain.show_lots=True
+        # then run for 1 iteration from the gui.
+
 
 # CB: example code for plot gallery
 ##         plots = []
@@ -746,8 +752,12 @@ class TopoConsole(TkguiWindow):
         self.messageBar.message('state', message)
 
     def timing_progress(self,val):
+        if self.show_lots:
+            self.auto_refresh()
+            
         self.progval.set(val)
         self.update()
+        #self.update_idletasks()
 
     
     def run_simulation(self):
