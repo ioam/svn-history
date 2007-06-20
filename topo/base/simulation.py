@@ -616,46 +616,71 @@ class CommandEvent(Event):
 
 
 
-### CB: not yet finished.
-
+### CB: not yet finished (documenation to follow).
 
 import time
 from math import fmod,floor
 class SomeTimer(ParameterizedObject):
-
+    """
+    """
 # Might need to add:
 #  - parameters to control formatting
 
-# CEBALERT: author of timing code, please add some docstrings and
-# check the parameters are the correct type:
-    step = Number(default=2.0,doc="")
+    step = Parameter(default=None ,
+                     doc="""
+                     Each iteration, func is called as func(step).
+
+                     For example, step=1 with func set to topo.sim.time would cause
+                     the simulation time to advance once per iteration.
+
+                     The default value (None) gives 50 iterations for any value of simulation_duration
+                     passed to call_and_time(simulation_duration).
+                     """)
     estimate_interval = Number(default=50,doc="") # Integer?
 
     # CB: need to change Parameter types - Callable, List, ...
     # CB: rename
-    func = Parameter(default=None,doc="Function that call_and_time() will call and give timing info about.")
+    func = Parameter(default=None,instantiate=True, doc="Function that call_and_time() will call and give timing info about.")
 
-    func_args = Parameter(default=None,doc="Arguments passed to func at time of calling.")
+    func_args = Parameter(default=None,instantiate=True,doc="Arguments passed to func at time of calling.")
 
-    simulation_time_fn = Parameter(default=None,doc="")
+    simulation_time_fn = Parameter(default=None,instantiate=True,doc="")
 
-    real_time_fn = Parameter(default=time.time,doc="")
+    real_time_fn = Parameter(default=time.time,instantiate=True,doc="")
 
-    receive_messages = Parameter(default=[],doc="List of objects that will receive timing messages. Each must have a timing_message() method.")
+    receive_messages = Parameter(default=[],instantiate=True,doc="List of objects that will receive timing messages. Each must have a timing_message() method.")
 
-    receive_progress = Parameter(default=[],doc="List of objects that will receive the current 'percentage complete' value. Each must have a set() method. (e.g. a Tkinter variable).""")
-    
-        
+    receive_progress = Parameter(default=[],instantiate=True,doc="List of objects that will receive the current 'percentage complete' value. Each must have a timing_value() method.""")
+
+    ## CEBHACKALERT: don't pickle receive_messages and receive_progress: contain things that can't be
+    ## pickled when topographica launched with -g (i.e. lists contain topoconsole methods).
+    ## Really need to sort out how to avoid pickling specific things.
+    def __getstate__(self):
+       state = self.__dict__.copy()
+       for a in ("_receive_messages_param_value","_receive_progress_param_value"):
+           state.pop(a,None)
+       return state
+    ####################################################################################################
+
     def __pass_out_progress(self,val):
-        [thing.set(val) for thing in self.receive_progress]
+        [thing(val) for thing in self.receive_progress]
     
     def __pass_out_message(self,message):
-        [thing.timing_message(message) for thing in self.receive_messages]
+        [thing(message) for thing in self.receive_messages]
 
     # __call__
     def call_and_time(self,simulation_duration):
-        iters = int(floor(simulation_duration/self.step))
-        remain = fmod(simulation_duration, self.step)    
+        """
+        document stop
+        """
+
+        # default to 50 steps unless someone set otherwise
+        step = self.step or simulation_duration/50.0
+
+        simulation_starttime = self.simulation_time_fn()
+        
+        iters = int(floor(simulation_duration/step))
+        remain = fmod(simulation_duration, step)    
         starttime=self.real_time_fn()
         recenttimes=[]
 
@@ -673,7 +698,7 @@ class SomeTimer(ParameterizedObject):
                 length-=1
 
             # CEBALERT: need to do a callable check/have it done by a param
-            self.func(self.step)
+            self.func(step)
             
             percent = 100.0*i/iters
             estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
@@ -685,19 +710,21 @@ class SomeTimer(ParameterizedObject):
                         int(estimate%60)))
             self.__pass_out_message(message)
 
-        percent = 100   
-        self.__pass_out_progress(percent)        
+            if self.stop:
+                break
+
+
+        if not self.stop:
+            # ensure specified duration has been respected, since code above might not
+            # complete specified duration (integer number of iterations)
+            leftover = simulation_duration+simulation_starttime-self.simulation_time_fn()
+            if leftover>0: self.func(leftover)
+            percent = 100   
+            self.__pass_out_progress(percent)
+            
         message = ('Ran %0.2f to time %0.2f' %
                    (self.simulation_time_fn()-start_sim_time, self.simulation_time_fn()))
         self.__pass_out_message(message)
-
-
-# for testing timing object
-class TempPrinter(object):
-    def timing_message(self,m):
-        print m
-
-#from topo.base.simulation import TempPrinter; topo.sim.timer.receive_messages.append(TempPrinter()); topo.sim.run(10)
 
 
 
@@ -746,13 +773,6 @@ class Simulation(ParameterizedObject):
         and are guaranteed only to run once (before being destroyed).
         """)
 
-    #timer = Parameter(default=SomeTimer(),instantiate=True,
-    #                  doc="""
-    #                  ...
-    #                  receive_messages, receive_progress
-    #                  """)
-
-
     def __init__(self,**params):
         """
         Create the Simulation and register it with SimSingleton unless
@@ -769,8 +789,15 @@ class Simulation(ParameterizedObject):
         self.events = []
         self._events_stack = []
 
-        #self.timer.func=self._run
-        #self.timer.simulation_time_fn=self.time
+        # CB: make this a parameter for documentation? Otherwise nobody will know
+        # about being able to adjust step.
+        from topo.base.parameterclasses import wrap_callable # CEBALERT: remove with python 2.5
+        # we set step to 2 so that by default timing doesn't slow simulation too much. but
+        # e.g. leaving it as None would result in info at 2% increments of requested run duration,
+        # no matter what duration (0.005 or 5, etc).
+        self.timer = SomeTimer(func=wrap_callable(self.run),
+                               simulation_time_fn=wrap_callable(self.time),step=2)
+
         
 
     def __getitem__(self,item_name):
@@ -865,11 +892,21 @@ class Simulation(ParameterizedObject):
         return self._time
 
 
-    # CB: got to integrate with run(). I don't want to edit run() itself.
-    #def run(self,duration):  # deal with Forever,until=Forever
-    #    self.timer.call_and_time(duration)
+    # Change current run() to _run(), and current run_and_time() to run()?
 
-    # _run
+    # CEBALERT: need to simplify duration/until code. Hiding 'until' option
+    # until it's fixed (presumably nobody's using it).
+    def run_and_time(self,duration=Forever): # ,until=Forever):
+
+        if duration==Forever:
+            # CEBALERT: timing code not setup to handle indefinite durations
+            # (e.g. 'Forever')
+            self.run(duration)
+            return
+        else:
+            self.timer.call_and_time(duration)
+
+
     def run(self,duration=Forever,until=Forever):
         """
         Process simulation events for the specified duration or until the specified time.
@@ -938,6 +975,7 @@ class Simulation(ParameterizedObject):
         #if self.events and self.events[0].time >= stop_time:
         if stop_time != Forever:
             self._time = stop_time
+
 
 
     def enqueue_event(self,event):
@@ -1123,4 +1161,5 @@ class Simulation(ParameterizedObject):
                         obj.layout_location = x,y
                 x += xstep
             y += ystep
+
 
