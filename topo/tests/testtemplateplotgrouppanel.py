@@ -105,22 +105,22 @@ class TestActivityPanel(unittest.TestCase):
 	
         # s.run(1)
 
-    def test_activity_plot(self):
-        """
-        Test the creation the widgets
-        """
-        topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
-        TemplatePlotGroupPanel.print_level = topo.base.parameterizedobject.WARNING
+##     def test_activity_plot(self):
+##         """
+##         Test the creation the widgets
+##         """
+##         topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
+##         TemplatePlotGroupPanel.print_level = topo.base.parameterizedobject.WARNING
 
         
-        console = topo.tkgui.topoconsole.TopoConsole()
-        Pmw.initialise(console)
+##         console = topo.tkgui.topoconsole.TopoConsole()
+##         Pmw.initialise(console)
         
-        # CEBALERT: what was this testing?
-        #console.set_active_simulator()
+##         # CEBALERT: what was this testing?
+##         #console.set_active_simulator()
 
-        #console.new_activity_window()
-        # console.mainloop()
+##         #console.new_activity_window()
+##         # console.mainloop()
 
 
 class TestTemplatePlotGroupPanel(unittest.TestCase):
