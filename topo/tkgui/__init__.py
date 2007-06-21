@@ -48,7 +48,8 @@ from topoconsole import TopoConsole
 # Because we don't call mainloop(), it's necessary to call
 # update() or update_idletasks() sometimes. Also, I think that sometimes
 # current graphics do not update properly (but I'm not sure - I don't
-# have a specific example yet).
+# have a specific example yet). Need to clean up all the scattered
+# update() and update_idletasks()...
 
 
 
