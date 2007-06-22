@@ -969,24 +969,22 @@ class Simulation(ParameterizedObject):
 
         If both duration and until are used, the one that is reached first will apply.
         """
-        # CEBHACKALERT? I can do topo.sim.run(2) and the simulation time
-        # remains FixedPoint.  If I do topo.sim.run(until=100), the
-        # simulation time is no longer FixedPoint: it becomes an int.
-
         # CEBHACKALERT: If I do topo.sim.run(10), then topo.sim.run(until=3),
         # topo.sim._time returns to 3 (i.e. the simulation time can jump backwards).
-
+        # JP: This because of the weird sim._time = stop_time line at the end of this method.
+        # see my HACKALERT below.
+        
         # Execute any commands in execute_next, and then remove them.
         [CommandEvent(time=self._time,command_string=cmd)() for cmd in self.execute_next]
         self.execute_next=[]
         
         # Complicated expression for min(time+duration,until)
         if duration == Forever:
-            stop_time = until
+            stop_time = FixedPoint(until)
         elif until == Forever:
             stop_time = self._time + duration
         else:
-            stop_time = min(self._time+duration,until)
+            stop_time = min(self._time+duration,FixedPoint(until))
             
         did_event = False
 
@@ -1025,7 +1023,12 @@ class Simulation(ParameterizedObject):
 
         # The time needs updating if the events have not done it.
         #if self.events and self.events[0].time >= stop_time:
-        if stop_time != Forever:
+
+        # JPHACKALERT: This is weird.  It can cause time to go backwards,
+        # (see CEBHACKALERT above.  Also, if the simulation runs out of
+        # events before stop_time is reached, shouldn't that be reflected in
+        # Simulation.time()?
+        if stop_time != Forever :
             self._time = stop_time
 
 
