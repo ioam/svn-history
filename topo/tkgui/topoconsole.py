@@ -47,10 +47,8 @@ from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
 import topo.tkgui 
 from tkguiwindow import TkguiWindow
 from templateplotgrouppanel import TemplatePlotGroupPanel
-from connectionfieldspanel import ConnectionFieldsPanel
-from projectionactivitypanel import ProjectionActivityPanel
 from featurecurvepanel import FeatureCurvePanel, FullFieldFeatureCurvePanel
-from projectionpanel import CFProjectionPGPanel
+from projectionpanel import CFProjectionPGPanel,ProjectionActivityPanel,ConnectionFieldsPanel
 from testpattern import TestPattern
 from editorwindow import ModelEditor
 from translatorwidgets import TaggedSlider
