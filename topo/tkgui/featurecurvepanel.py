@@ -104,16 +104,15 @@ class FeatureCurvePanel(PlotGroupPanel):
         p = self.plotgroup_type(template=self.pgt)
         self.populate_sheet_param(p)
 	return p
-                                           
+
+    def _plot_title(self):
+        # CEBHACKALERT: str()  (shouldn't lanbl be string already?)
+        return str(self.plotgroup_label)+' at time ' + str(self.plotgroup.time)
+
 
     def display_labels(self):
-        """
-        Change the title of the grid group by refreshing the simulated time.
-        """
-        # CEBHACKALERT: str()  (shouldn't lanbl be string already?)
-        self.plot_group_title.configure(tag_text = str(self.plotgroup_label) + \
-                                  ' at time ' + str(self.plotgroup.time))
-     
+        # plots are displayed in new windows, so don't add any labels
+        pass
 
 
 
