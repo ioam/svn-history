@@ -656,10 +656,10 @@ class SomeTimer(ParameterizedObject):
     ## pickled when topographica launched with -g (i.e. lists contain topoconsole methods).
     ## Really need to sort out how to avoid pickling specific things.
     def __getstate__(self):
-       state = self.__dict__.copy()
-       for a in ("_receive_messages_param_value","_receive_progress_param_value"):
-           state.pop(a,None)
-       return state
+        state = self.__dict__.copy()
+        for a in ("_receive_messages_param_value","_receive_progress_param_value"):
+            state.pop(a,None)
+        return state
     ####################################################################################################
 
     def __pass_out_progress(self,val):
@@ -668,6 +668,58 @@ class SomeTimer(ParameterizedObject):
     def __pass_out_message(self,message):
         [thing(message) for thing in self.receive_messages]
 
+
+    ########################################################################
+    ## CEB: I'm working here. call_and_time will be generalized to
+    ## support how X works - the timing code will only appear
+    ## once.
+    def X(self,a):
+        fduration = len(a)
+        
+        i=0
+        step   = 1.0
+        iters  = int(floor(fduration/step))
+        remain = fmod(fduration, step)
+        starttime=self.real_time_fn()
+        recenttimes=[]
+
+        for i in xrange(iters):
+
+            recenttimes.append(self.real_time_fn())
+            length = len(recenttimes)
+
+            if (length>self.estimate_interval):
+                recenttimes.pop(0)
+                length-=1
+
+            self.func(a[i])
+
+            percent = 100.0*i/iters
+            self.__pass_out_progress(percent)
+            
+            estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
+
+            # CEBALERT: when there are multiple sheets, this can make it seem
+            # like topographica's stuck in a loop (because the counter goes
+            # to 100% lots of times...e.g. hierarchical's orientation tuning fullfield.)
+            message = 'Time ' + str(self.simulation_time_fn()) + ': ' + \
+                      str(int(percent)) + '% of '  + str(fduration) + ' patterns completed ' + \
+                      ('(%02d' % int(estimate/60))+':' + \
+                      ('%02d' % int(estimate%60))+ ' remaining).'
+                      
+            self.__pass_out_message(message)
+            i+=1
+
+
+        percent = 100   
+        self.__pass_out_progress(percent)
+
+        message = ("Showed %s patterns in %0.1f s" %
+                   (fduration,self.real_time_fn()-starttime))
+        self.__pass_out_message(message)
+    ########################################################################
+   
+        
     # __call__
     def call_and_time(self,simulation_duration):
         """
