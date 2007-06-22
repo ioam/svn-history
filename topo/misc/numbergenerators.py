@@ -145,13 +145,11 @@ class ExponentialDecay(ParameterizedObject):
 
     base = Number(e, doc="""
         Base of the exponent; the default yields starting_value*exp(-t/time_constant).
-
         Another popular choice of base is 2, which allows the
         time_constant to be interpreted as a half-life.""")
-    
-##     time_fn = CallableParameter(default=topo.sim.time,doc="""
-##         Function to generate the time used for the decay.""")
-    time_fn = topo.sim.time
+
+    time_fn = CallableParameter(default=topo.sim.time,doc="""
+     Function to generate the time used for the decay.""")
 
     def __call__(self):
         Vi = self.starting_value
