@@ -352,6 +352,8 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
         self.plotgroup.draw_plots(update=True)
         self.display_plots()
+        self.refresh_title()
+        
         #self.display_labels()
     def redraw_plots(self):
         self.plotgroup.draw_plots(update=False)
