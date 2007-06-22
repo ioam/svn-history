@@ -19,7 +19,7 @@ from numpy.matlib import matrix, zeros as mzeros
 from math import atan,pi,atan2
 
 from topo.base.parameterizedobject import Parameter
-from topo.base.parameterclasses import Number,Enumeration
+from topo.base.parameterclasses import Number,Enumeration,ListParameter,BooleanParameter
 from topo.base.functionfamilies import CoordinateMapperFn, IdentityMF
 from topo.misc.utils import signabs
 
@@ -44,6 +44,68 @@ class ConstantMapper(CoordinateMapperFn):
         CoordinateMapperFn only.
         """
         return self.x_cons, self.y_cons
+
+
+class Pipeline(CoordinateMapperFn):
+    """
+    Applies a sequence of coordmappers,  left to right.
+    """
+    
+    mappers = ListParameter(
+        default=[],
+        doc = "The sequence of mappers  to apply."
+        )
+
+    def __call__(self,x,y):
+        return reduce( lambda args,f: apply(f,args),
+                       [(x,y)] + self.mappers )
+    
+class Polar2Cartesian(CoordinateMapperFn):
+    """
+    Maps from polar (radius,angle) to cartesian coordinates.
+    """
+
+    degrees = BooleanParameter(
+        default=True,
+        doc="Indicates whether the input angle is in degrees or radians."
+        )
+
+    def __call__(self, r, theta):
+
+        if self.degrees:
+            theta = theta * pi/180
+
+            return r*cos(theta), r*sin(theta)
+                          
+class Cartesian2Polar(CoordinateMapperFn):
+    """
+    Maps from cartesian (x,y) to polar (radius,angle).
+    """
+
+    degrees = BooleanParameter(default=True,
+        doc="Indicates whether the output angle is in degrees or radians.")
+
+    negative_radii = BooleanParameter(default = False,
+        doc="""If true, coordinates with negative x values will be
+        given negative radii, and angles between -90 and 90
+        degrees. (useful for mapping to saccade amplitude/direction space)""")
+
+    def __call__(self, x, y):
+
+        if self.negative_radii:
+            xsgn,xabs = signabs(x)            
+            radius = xsgn * sqrt(x*x+y*y)
+            angle = atan2(y,xabs)
+        else:
+            radius = sqrt(x*x+y*y)
+            angle = atan2(y,x)
+
+        if self.degrees:
+            angle *= 180/pi
+
+        return radius,angle
+                          
+
 
 
 class AffineTransform(CoordinateMapperFn):
@@ -128,7 +190,7 @@ def Scale2dMat(sx,sy):
                    [ 0,  0, 1]])
 
 
-def Translate2d(AffineTransform):
+class Translate2d(AffineTransform):
     """
     Translate the input by xoff,yoff.
     """
@@ -139,7 +201,7 @@ def Translate2d(AffineTransform):
         super(Translate2d,self).__init__(**kw)
         self.matrix = Translate2dMat(self.xoff,self.yoff)
 
-def Rotate2d(AffineTransform):
+class Rotate2d(AffineTransform):
     """
     Rotate the input around the origin by an angle in radians.
     """
@@ -149,7 +211,7 @@ def Rotate2d(AffineTransform):
         super(Rotate2d,self).__init__(**kw)
         self.matrix = Rotate2dMat(self.angle)
 
-def Scale2d(AffineTransform):
+class Scale2d(AffineTransform):
     """
     Scale the input along the x and y axes by sx an sy, respectively.
     """
@@ -157,8 +219,8 @@ def Scale2d(AffineTransform):
     sy = Number(default=1.0)
 
     def __init__(self,**kw):
-        super(Scale2d2dMat,self).__init__(**kw)
-        self.matrix = Scale2d2dMat(self.sx,self.sy)
+        super(Scale2d,self).__init__(**kw)
+        self.matrix = Scale2dMat(self.sx,self.sy)
 
 
 
