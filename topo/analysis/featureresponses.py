@@ -7,6 +7,7 @@ __version__='$Revision$'
 
 
 import time
+import copy
 from math import fmod,floor
 
 from numpy import zeros, array
@@ -160,75 +161,41 @@ class FeatureResponses(ParameterizedObject):
         values_lists=[f.values for f in features]
         permutations = cross_product(values_lists)
 
-        ### JABHACKALERT: This timer code should be moved to its own object;
-        ### it is much too difficult to follow here (and in tkgui/topoconsole.py).
-################## timer part 1        
+        refresh_act_wins=False
+        if display:
+            if hasattr(topo,'guimain'):
+                refresh_act_wins=True
+            else:
+                self.warning("No GUI available for display.")
+
+
+        # CEB: currently working here
         
-        i=0
-        fduration = len(permutations)
-        step   = 1.0
-        iters  = int(floor(fduration/step))
-        remain = fmod(fduration, step)
-        starttime=time.time()
-        recenttimes=[]
-
-        # Temporary:
- #       self.parent.title(topo.sim.name) ## this changes the title bar to more useful
-
-        ## Duration of most recent times from which to estimate remaining time
-        estimate_interval=50.0        
-
-#################### end of timer part 1    
-    
-        for p in permutations:
+        def m(permutation):
             topo.sim.state_push()
 
             # Present input patterns
-            settings = dict(zip(feature_names, p))
+            settings = dict(zip(feature_names, permutation))
             pattern_presenter(settings,param_dict)
 
-  ##################### timer part 2
-
-      #  for i in xrange(iters):
-            i=i+1
-            recenttimes.append(time.time())
-            length = len(recenttimes)
-
-            if (length>50):
-                recenttimes.pop(0)
-                length-=1
- #       topo.sim.run(step)
-            percent = 100.0*i/iters
-
-            estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
-
-            # CEBALERT: when there are multiple sheets, this can make it seem
-            # like topographica's stuck in a loop (because the counter goes
-            # to 100% lots of times...e.g. hierarchical's orientation tuning fullfield.)
-            message = 'Time ' + str(topo.sim.time()) + ': ' + \
-                      str(int(percent)) + '% of '  + str(fduration) + ' patterns completed ' + \
-                      ('(%02d' % int(estimate/60))+':' + \
-                      ('%02d' % int(estimate%60))+ ' remaining).'
-                      
-            if hasattr(topo,'guimain'):
-                topo.guimain.messageBar.message('state', message)
-                topo.guimain.update()
-            
-######################### end of timer   
-
-            if display:
-                if hasattr(topo,'guimain'):
-                    topo.guimain.refresh_activity_windows()
-                else:
-                    self.warning("No GUI available for display.")
-
-                       
+            if refresh_act_wins:topo.guimain.refresh_activity_windows()
+                    
             # Update each DistributionMatrix with (activity,bin)
             for sheet in self.sheets_to_measure():
-                for feature,value in zip(feature_names, p):
+                for feature,value in zip(feature_names, permutation):
                     self._featureresponses[sheet][feature].update(sheet.activity, value)
-                    
+
             topo.sim.state_pop()
+
+
+            
+        timer = copy.copy(topo.sim.timer)
+        # CEBHACKALERT: hack to work round timer pickling hack
+        timer.receive_messages=topo.sim.timer.receive_messages
+        timer.receive_progress=topo.sim.timer.receive_progress
+        ######################################################
+        timer.func = m
+        timer.X(permutations)
 
         restore_input_generators()
 
