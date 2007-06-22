@@ -179,14 +179,17 @@ class ConnectionFieldsPanel(CFPGPanel):
         self.pack_param('x',parent=self.control_frame_3,on_change=self.update_plots)
         self.pack_param('y',parent=self.control_frame_3,on_change=self.update_plots)
 
-##############################################################################       
-        # Need to couple taggedslider to a Number parameter in a better way
+##############################################################################
+        # CEBALERT:
+        # - Need to couple taggedslider to a Number parameter in a better way
         # somewhere else.
-        # Current defects:
+        # - Clean up or document: passing the params, setting the bounds
+        # 
+        # Also:        
         # e.g. bound on parameter is 0.5 but means <0.5, taggedslider
         #   still lets you set to 0.5 -> error
-        self.sheet_change()
-    def sheet_change(self):
+        self.sheet_change(**params)
+    def sheet_change(self,**args):
 
         super(ConnectionFieldsPanel,self).sheet_change()
 
@@ -199,8 +202,12 @@ class ConnectionFieldsPanel(CFPGPanel):
         x.bounds=(l,r)
         y.bounds=(b,t)
 
-        self.x = 0.0
-        self.y = 0.0
+        if 'x' and 'y' in args:
+            self._tk_vars['x'].set(args['x'])
+            self._tk_vars['y'].set(args['y'])
+        else:
+            self.x = self.y = 0.0
+
 
         if 'x' and 'y' in self._widgets:
             w1,w2=self._widgets['x'],self._widgets['y']
