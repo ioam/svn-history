@@ -538,9 +538,9 @@ class ConnectionFieldsPlotGroup(CFPlotGroup):
 ## It is an error to request a unit outside the area of the Sheet.""")
 
         
-    def _update_command(self):
+    def _updatecommand(self):
 	topo.commands.analysis.coordinate = (self.x,self.y)
-	super(ConnectionFieldsPlotGroup,self)._update_command()
+	super(ConnectionFieldsPlotGroup,self)._updatecommand()
 
     def _create_plots(self,pt_name,pt,sheet):
 	""" 
