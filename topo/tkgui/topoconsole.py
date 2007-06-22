@@ -395,7 +395,7 @@ class TopoConsole(TkguiWindow):
                                     min_value=0,max_value=20000,
                                     string_format='%.4f')
         self.balloon.bind(self.run_for,"Duration to run the simulation, e.g. 0.0500, 1.0, or 20000.")
-        self.run_for.pack(side=LEFT)
+        self.run_for.pack(side=LEFT,fill='x',expand=YES)
 
         # When return is pressed, the TaggedSlider updates itself...but we also want to run
         # the simulation in this case.
@@ -422,7 +422,9 @@ class TopoConsole(TkguiWindow):
             model set up to be in a consistent state at integer
             boundaries, as the example Topographica models are.""")
 
-
+        self.step_button = Button(run_frame,text="Step",command=self.run_step)
+        self.balloon.bind(self.step_button,"Run the simulation through the time at which the next events are processed.")
+        self.step_button.pack(side=LEFT)
 
 
     def __simulation_menu(self):
@@ -612,6 +614,7 @@ class TopoConsole(TkguiWindow):
         for win in self.auto_refresh_panels:
             win.refresh()
 
+        self.set_step_button_state()
         self.update_idletasks()
 
         
@@ -786,8 +789,24 @@ class TopoConsole(TkguiWindow):
         self.stop_button.config(state=DISABLED)
         self.auto_refresh()
         
-        
+    def run_step(self):
 
+        if not topo.sim.events:
+            # JP: step button should be disabled if there are no events,
+            # but just in case...
+            return
+
+        # JPALERT: This should really use .run_and_time() but it doesn't support
+        # run(until=...)
+        topo.sim.run(until=topo.sim.events[0].time)
+        self.auto_refresh()
+
+    def set_step_button_state(self):
+        if topo.sim.events:
+            self.step_button.config(state=NORMAL)
+        else:
+            self.step_button.config(state=DISABLED)
+        
 if __name__ != '__main__':
     plotpanel_classes['Connection Fields'] = ConnectionFieldsPanel
     plotpanel_classes['Projection'] = CFProjectionPGPanel 
