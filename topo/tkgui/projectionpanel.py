@@ -17,7 +17,7 @@ from topo.base.cf import CFSheet, CFProjection
 from topo.base.projection import ProjectionSheet
 from topo.base.parameterclasses import BooleanParameter
 
-from topo.plotting.plotgroup import CFProjectionPlotGroup,ProjectionSheetPlotGroup,CFPlotGroup
+from topo.plotting.plotgroup import CFProjectionPlotGroup,ProjectionSheetPlotGroup,CFPlotGroup,ProjectionActivityPlotGroup
 
 from templateplotgrouppanel import TemplatePlotGroupPanel
 
@@ -104,7 +104,36 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
         p.params()['sheet'].range = sheets
         p.sheet = sheets[0]
 
-        
+
+
+
+class ProjectionActivityPanel(ProjectionSheetPGPanel):
+
+    plotgroup_type = ProjectionActivityPlotGroup
+    
+    
+    def __init__(self,console,master,pgt,**params):       
+        super(ProjectionActivityPanel,self).__init__(console,master,pgt,**params)
+        self.auto_refresh = True
+        # CB: why do we do this?
+	self.plotgroup_label='ProjectionActivity'
+	
+
+    # CEBALERT! Dynamic info doesn't work on projection activity windows!
+    # e.g. on hierarchical there is an error, on cfsom the dynamic info stops
+    # half way across the plot...
+    # So, dynamic info is disabled for now in proj. act. windows.
+    # This will be easier to fix when the class hierarchy is cleaned up
+    # (if it is still a problem then).
+    def _update_dynamic_info(self,e):
+        self.messageBar.message('state',"")
+
+    def sheet_change(self):
+        self.refresh() 
+
+    def _plot_title(self):
+        return "Projections into %s at time %s"%(self.plotgroup.sheet.name,self.plotgroup.time)
+
    
 
 class CFPGPanel(ProjectionSheetPGPanel):
