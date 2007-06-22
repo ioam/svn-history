@@ -193,6 +193,8 @@ class ConnectionFieldsPanel(CFPGPanel):
 
         super(ConnectionFieldsPanel,self).sheet_change()
 
+        if 'sheet' in args: self.sheet=args['sheet']
+            
         s = self.sheet
         l,b,r,t = s.bounds.lbrt()
 
@@ -205,8 +207,11 @@ class ConnectionFieldsPanel(CFPGPanel):
         if 'x' and 'y' in args:
             self._tk_vars['x'].set(args['x'])
             self._tk_vars['y'].set(args['y'])
+            
         else:
             self.x = self.y = 0.0
+
+
 
 
         if 'x' and 'y' in self._widgets:
