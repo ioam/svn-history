@@ -750,6 +750,7 @@ class TopoConsole(TkguiWindow):
 
     def timing_message(self,message):
         self.messageBar.message('state', message)
+        self.update()
 
     def timing_progress(self,val):
         if self.show_lots:
@@ -758,6 +759,12 @@ class TopoConsole(TkguiWindow):
         self.progval.set(val)
         self.update()
         #self.update_idletasks()
+
+
+    # CEB: Will add a method to allow other things to access the
+    # timing stuff (e.g. progress bar) in a simple way. (Also
+    # this class will use the method). Probably will add support
+    # for multiple things getting timed.
 
     
     def run_simulation(self):
