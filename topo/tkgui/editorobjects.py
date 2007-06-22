@@ -398,17 +398,23 @@ class EditorSheet(EditorNode):
             return True
         return False
 
+
     def matrix_element_count(self):
         # returns the length and width of the matrix that holds this sheet's plot values
-        lbrt = self.sheet.bounds.aarect().lbrt()
+        l,b,r,t = self.sheet.bounds.aarect().lbrt()
         density = self.sheet.xdensity
-        return int(density *(lbrt[2] - lbrt[0])), int(density *(lbrt[3] - lbrt[1]))
+        return int(density * (r - l)), int(density * (t - b))
     
     def set_bounds(self):
-        width_fact = 120; height_fact = 60
-        lbrt = self.sheet.bounds.aarect().lbrt()
-        self.width = width_fact * (lbrt[2] - lbrt[0]) * self.canvas.scaling_factor
-        self.height = height_fact * (lbrt[3] - lbrt[1]) * self.canvas.scaling_factor
+        # Use the default sheet bounds as to set the "normal" size
+        # of SheetObject in the GUI, so simulations using very large
+        # sheets still look normal.
+        dl,db,dr,dt = self.sheet.__class__.nominal_bounds.aarect().lbrt()
+        width_fact = 120.0 / (dr - dl) 
+        height_fact = 60.0 / (dt - db)
+        l,b,r,t = self.sheet.bounds.aarect().lbrt()
+        self.width = width_fact * (r - l) * self.canvas.scaling_factor
+        self.height = height_fact * (t - b) * self.canvas.scaling_factor
 
     def set_mode(self, mode):
         self.mode = mode

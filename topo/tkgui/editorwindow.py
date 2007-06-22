@@ -22,6 +22,12 @@ from tkguiwindow import TkguiWindow
 canvas_region = (0, 0, 1200, 1200)
 """Size of the canvas, as a bounding box (xl yl xh yh)."""
 
+# These can be customized, e.g. in .topographicarc; they should probably be parameters
+# somewhere.
+scaling_factor = 1.0
+enlarging_factor = 1.25
+
+
 class EditorCanvas(Canvas):
 
     """ 
@@ -54,7 +60,7 @@ class EditorCanvas(Canvas):
             self.normalize_checkbutton.select()
 
         # retain the current focus in the canvas
-        self.scaling_factor = 1.0
+        self.scaling_factor = scaling_factor
         self.current_object = None
         self.current_connection = None
         self.focus = None
@@ -222,12 +228,11 @@ class EditorCanvas(Canvas):
                 con.move()
 
     def enlarge_scale(self):
-        self.scaling_factor += 0.2
+        self.scaling_factor *= enlarging_factor
         self.refresh()
  
     def reduce_scale(self):
-        if self.scaling_factor <= 0.4 : return
-        self.scaling_factor -= 0.2
+        self.scaling_factor /= enlarging_factor
         self.refresh()
 
     def toggle_auto_refresh(self):

@@ -328,16 +328,26 @@ class XPlotGroup(PlotGroup):
         minimum height to which the plot can be reduced.
 	"""
         # JCALERT: Should be rewritten more cleanly.
+        # JPALERT: Indeed, since it seems to be wrong.  Plots with
+        # large bounds and low desnity are plotted very large and
+        # can't be reduced.  (E.g. sheet bounds -60 to +60, density =
+        # 1/6)
+        # JPHACKALERT: My changes below are hacks to try to get it to
+        # do something sensible for simulations with large bounds.  We
+        # need to spec out how it _should_ behave first, then rewrite.
         resizeable_plots = [p for p in self.plots if p.resize]
         if resizeable_plots:
-            max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
-                              -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
-                              for p in resizeable_plots])
-            max_density = max([topo.sim.objects(Sheet)[p.plot_src_name].xdensity
-                               for p in resizeable_plots])
-            sheet_max_height = max_density*max_sheet_height
+##             max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
+##                               -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
+##                               for p in resizeable_plots])
+##             max_density = max([topo.sim.objects(Sheet)[p.plot_src_name].xdensity
+##                                for p in resizeable_plots])
+##             # JPALERT: the max_density and the max_height may come
+##             # from different sheets, it doesn't make sense to multiply them
+##             sheet_max_height = max_density*max_sheet_height
             matrix_max_height = max([p.bitmap.height() for p in self.plots if p.resize])
-            max_height = max(sheet_max_height,matrix_max_height)
+##             max_height = max(sheet_max_height,matrix_max_height)
+            max_height = matrix_max_height
             self.minimum_height_of_tallest_plot = max_height
             if (max_height >= self.INITIAL_PLOT_HEIGHT):
                 self.height_of_tallest_plot = max_height
@@ -583,6 +593,12 @@ class CFProjectionPlotGroup(CFPlotGroup):
     projection = RangedParameter(default=None)
 
     ### CEBHACKALERT: tkpo gui not setup to read softbounds
+    ### JPALERT: The bounds are meaningless for large sheets anyway.  If a sheet
+    ### is specified in, say, visual angle coordinates (e.g., -60 to +60 degrees), then
+    ### the soft min of 5.0/unit will still give a 600x600 array of CFs!
+    ### Density should probably be specified WRT to sheet bounds,
+    ### instead of per-unit-of-sheet.
+    
     density = Number(default=10.0,doc='Number of units to plot per 1.0 distance in sheet coordinates',
                      softbounds=(5.0,50.0))
     
