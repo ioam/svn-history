@@ -330,7 +330,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         #################################################################
 
         # CB: don't forget to include ctrl-q
-        # CB   import __main__; __main__.__dict__['qqq']=self
+        # import __main__; __main__.__dict__['qqq']=self
 
 
     # CB: rename to _generate_plotgroup()
@@ -381,10 +381,10 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
     def __connection_fields_window(self):
         if 'plot' in self._right_click_info:
-            plot = self._right_click_info['plot']
+            sheet = topo.sim[self._right_click_info['plot'].plot_src_name]
             x,y =  self._right_click_info['coords'][1]
             # CEBHACKALERT: should avoid requesting cf out of range.
-            self.console.plots_menu_entries["Connection Fields"].command(x=x,y=y)
+            self.console.plots_menu_entries["Connection Fields"].command(x=x,y=y,sheet=sheet)
             
     def __receptive_field_window(self):
         if 'plot' in self._right_click_info:
