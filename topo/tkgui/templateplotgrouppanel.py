@@ -323,19 +323,7 @@ class TemplatePlotGroupPanel(XPGPanel):
         print "%s %s" % (description, channels_info)
 
 
- 
-    def display_labels(self):
-        """
-        Change the title of the grid group by refreshing the simulated time,
-        then call PlotGroupPanel's display_labels().
-        """
-        self.plot_group_title.configure(tag_text = self.plotgroup_label + \
-                                  ' at time ' + str(self.plotgroup.time))
-        super(TemplatePlotGroupPanel,self).display_labels()
 
-
-    def refresh_title(self):
-        self.title(topo.sim.name+': '+self.plotgroup_label + " time:%s" % self.plotgroup.time)
 
 
     def _dynamic_info_string(self,event_info,basic_text):

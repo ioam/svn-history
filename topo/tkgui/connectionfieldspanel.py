@@ -65,21 +65,10 @@ class ConnectionFieldsPanel(CFPGPanel):
 ##############################################################################
 
 
-    def display_labels(self):
-        """
-        Change the title of the grid group, then call PlotGroupPanel's
-        display_labels().
-        """
-        new_title = 'Connection Fields of ' + self.sheet.name + \
-                    ' unit (' + str(self.plotgroup.x) + ',' + str(self.plotgroup.y) + ') at time '\
-                    + str(self.plotgroup.time)
-        self.plot_group_title.configure(tag_text = new_title)
-        super(ConnectionFieldsPanel,self).display_labels()
-
-
-    def refresh_title(self):
-        self.title(topo.sim.name+': '+self.pgt.name + " %s (%0.3f,%0.3f) time:%s" %
-                          (self.plotgroup.sheet.name,self.plotgroup.x,self.plotgroup.y,self.plotgroup.time))
+    def _plot_title(self):
+        return 'Connection Fields of ' + self.sheet.name + \
+               ' unit (' + str(self.plotgroup.x) + ',' + str(self.plotgroup.y) + ') at time '\
+               + str(self.plotgroup.time)
 
 
 

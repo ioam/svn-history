@@ -605,6 +605,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         it may be useful to make this function a stub, and display the
         labels at the same time the images are displayed.
         """
+        
         if len(self.canvases) == 0:
             # If there are no plots yet, tell the user what to do.
             self.plot_labels=[Label(self.plot_frame,text="""
@@ -738,14 +739,30 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
     # CEBHACKALERT
     def title(self,t):
+        # assumes Frame is in a window dedicated to that Frame
         self.master.title(t)
 
+    def _plot_title(self):
+        """
+        Provide a string describing the current plot.
 
+        Override in subclasses to provide more information.
+        """
+        return "%s at time %s"%(self.plotgroup_label,self.plotgroup.time)
+
+                
+    # rename to refresh_titles
     def refresh_title(self):
-        self.title(topo.sim.name+': '+"%s time:%s" %
-                   (self.plotgroup_label,self.plotgroup.time))
-          
+        """
+        Set Window title and plot frame's title.
+        """
+        title = self._plot_title()
+        
+        self.plot_group_title.configure(tag_text=title)
+        window_title = "%s: %s"%(topo.sim.name,title)
+        self.title(window_title)
 
+          
     def destroy(self):
         """overrides toplevel destroy, adding removal from autorefresh panels"""
         if self.console and self in self.console.auto_refresh_panels:

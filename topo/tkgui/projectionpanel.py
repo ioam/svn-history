@@ -152,11 +152,10 @@ class CFProjectionPGPanel(CFPGPanel):
         self.populate_projection_param(p)
         return p
 
-    
-    def refresh_title(self):
-        self.title(topo.sim.name+': '+"Projection %s %s time:%s" % (self.plotgroup.sheet.name,
-                                                                    self.projection.name,self.plotgroup.time))
 
+    def _plot_title(self):
+        return 'Projection ' + self.projection.name + ' from ' + self.projection.src.name + ' to ' \
+               + self.sheet.name + ' at time ' + str(self.plotgroup.time)
 
     def sheet_change(self):
         self.refresh_projections()
@@ -222,13 +221,10 @@ class CFProjectionPGPanel(CFPGPanel):
     
 
     def display_labels(self):
-        # CB: not a gui thing + there'll be a problem when changing sheets
-        src_name = self.projection.src.name
-        
-        new_title = 'Projection ' + self.projection.name + ' from ' + src_name + ' to ' \
-                    + self.sheet.name + ' at time ' + str(self.plotgroup.time)
-        
-        self.plot_group_title.configure(tag_text = new_title)
+        """
+        Do not display a label for each plot.
+        """
+        pass
             
 
 

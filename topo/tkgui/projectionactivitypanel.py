@@ -38,14 +38,9 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
         self.refresh() 
 
 
-    def display_labels(self):
-        """
-        Change the title of the grid group, then call PlotGroupPanel's
-        display_labels().
-        """
-        new_title = 'Projection Activity of ' + self.plotgroup.sheet.name + ' at time ' + str(self.plotgroup.time)
-        self.plot_group_title.configure(tag_text = new_title)
-        super(ProjectionActivityPanel,self).display_labels()
+    def _plot_title(self):
+        return "Projection %s %s at time %s"%(self.plotgroup.sheet.name,self.projection.name,self.plotgroup.time)
+
 
     
 
