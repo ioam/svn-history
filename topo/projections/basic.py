@@ -212,7 +212,7 @@ class OneToOneProjection(Projection):
     output_fn  = OutputFnParameter(default=IdentityOF(),
         doc='Function applied to the Projection activity after it is computed.')
 
-    learning_fn = LearningFnParameter(default=IdentityLF,
+    learning_fn = LearningFnParameter(default=IdentityLF(),
         doc="""Learning function applied to weights.""")
 
     learning_rate = Number(default=0)
