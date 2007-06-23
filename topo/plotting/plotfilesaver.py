@@ -58,6 +58,7 @@ class PlotGroupSaver(ParameterizedObject):
         self.plotgroup_label = plotgroup_label
 
 
+    # CB: no need to return PlotGroup, just set self.plotgroup
     def generate_plotgroup(self,**params):
 	return PlotGroup(**params)
 
