@@ -76,6 +76,8 @@ class PlotGroup(ParameterizedObject):
     # listparameter
     #plot_list = Parameter(default=[],instantiate=True)
 
+    cmd_location = Parameter(default=__main__.__dict__)
+
     updatecommand = Parameter(default="",doc="""
     Command to execute before updating this plot, e.g. to calculate sheet views.
     
@@ -130,12 +132,12 @@ class PlotGroup(ParameterizedObject):
 
 
     def _plotcommand(self):
-        exec self.plotcommand in __main__.__dict__
+        exec self.plotcommand in self.cmd_location
 
 
 
     def _updatecommand(self):
-        exec self.updatecommand in __main__.__dict__
+        exec self.updatecommand in self.cmd_location
 
 
         
