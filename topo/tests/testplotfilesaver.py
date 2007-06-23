@@ -5,8 +5,10 @@ $Id$
 """
 __version__='$Revision$'
 
-### CEBHACKALERT: not currently working. For some reason, plotgroups
-### don't generate any plots.
+### CEBALERT: tests don't work properly when file run on its own i.e. like:
+###  ./topographica -c 'import topo.tests.testplotfilesaver; topo.tests.run(test_modules=[topo.tests.testplotfilesaver])'
+### Tests do work when run as part of 'make tests', though.
+
 
 import unittest
 
@@ -64,6 +66,7 @@ class TestConnectionFieldsPlotGroupSaver(TestPlotGroupSaver):
 class TestCFProjectionPlotGroupSaver(TestPlotGroupSaver):
     plotgroupsaver_class = CFProjectionPlotGroupSaver
 
+    # CEBHACKALERT: currently not working.
     def test_cfprojection_saving(self):
         pass
         #self.save('Projection',sheet=self.sim['B'],
