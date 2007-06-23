@@ -177,6 +177,7 @@ class PatternPresenter(ParameterizedObject):
                         apply_output_fn=self.apply_output_fn)
 
 
+
 # CEBHACKALERT: have plotgroup_params?
 # CEBHACKALERT: test passing e.g. normalize and add example.
 def save_plotgroup(name,**params):
@@ -185,11 +186,29 @@ def save_plotgroup(name,**params):
 
       save_plotgroup("Activity")
       save_plotgroup("Orientation Preference")
-      save_plotgroup("Projection",projection_name='Afferent',sheet_name='V1')
+      save_plotgroup("Projection",sheet=topo.sim['V1'],
+                                  projection=topo.sim['V1'].projections('Afferent'))
 
     Some plotgroups accept optional parameters, which can be passed
-    like projection_name and sheet_name above.
+    like sheet and projection above.
     """
+
+    ####################################################################################
+    # CB: support lookup of old sheet_name,projection_name etc
+    # Remove when everyone (JA only?) updated own code?
+    def old_name_support(params):
+        print "ons"
+        if 'sheet_name' in params:
+            params['sheet'] = topo.sim[params['sheet_name']]
+            del params['sheet_name']
+        if 'projection_name' in params:
+            assert 'sheet' in params
+            params['projection'] = params['sheet'].projections()[params['projection_name']]
+            del params['projection_name']
+
+    old_name_support(params)
+    ####################################################################################
+
     p_class = plotsaving_classes.get(name,plotsaving_classes[None])
     p = p_class(name)#,**params)
     p.plotgroup=p.generate_plotgroup(**params)
