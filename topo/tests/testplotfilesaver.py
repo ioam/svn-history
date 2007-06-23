@@ -1,65 +1,84 @@
 """
-Test for the PlotFileSaver class
+Tests for the PlotFileSaver classes.
+
 $Id$
 """
 __version__='$Revision$'
 
+### CEBHACKALERT: not currently working. For some reason, plotgroups
+### don't generate any plots.
+
 import unittest
-from pprint import pprint
-from topo.plotting import plot
-from topo.base.sheet import *
-from topo.sheets.generatorsheet import *
-import numpy.oldnumeric as Numeric, random, os
-from math import pi
-import topo.patterns.basic
-import topo.patterns.random
-import topo.base.parameterizedobject
-from topo.plotting.plotfilesaver import *
-from PIL import *
-from topo.base.cf import CFProjection, CFSheet
-from topo.learningfns.som import CFPLF_HebbianSOM
 
-class TestPlotFileSaver(unittest.TestCase):
+from topo.base.simulation import Simulation
+from topo.base.cf import CFSheet, CFProjection
+from topo.sheets.generatorsheet import GeneratorSheet
 
-    def test_file_saving(self):
+from topo.plotting.plotfilesaver import PlotGroupSaver,TemplatePlotGroupSaver,ConnectionFieldsPlotGroupSaver,CFProjectionPlotGroupSaver
+
+from topo.plotting.plotgroup import PlotGroup
+PlotGroup.cmd_location = locals()
+
+# CEBHACKALERT: seems like I'm testing these commands...i.e. I should have written
+# a different test file...
+from topo.commands.analysis import update_activity,measure_or_pref,update_projections,update_connectionfields
+
+
+
+PlotGroupSaver.filename_prefix="topo/tests/"
+
+class TestPlotGroupSaver(unittest.TestCase):
+
+    plotgroupsaver_class = PlotGroupSaver
+
+    def setUp(self):
+        self.sim = Simulation(register=False)
+        self.sim['A'] = GeneratorSheet(nominal_density=4)
+        self.sim['B'] = CFSheet(nominal_density=4)
+        self.sim.connect('A','B',connection_type=CFProjection,name='Afferent')
+
+    def save(self,name,**params):
+        p = self.plotgroupsaver_class(name)
+        p.plotgroup=p.generate_plotgroup(**params)
+        p.plotgroup.draw_plots(update=True)
+        p.save_to_disk()
+
+
+class TestTemplatePlotGroupSaver(TestPlotGroupSaver):
+    plotgroupsaver_class = TemplatePlotGroupSaver
+
+    def test_activity_saving(self):
+        self.save('Activity')
+        
+    def test_orientation_preference_saving(self):
+        self.save('Orientation Preference')
+
+
+class TestConnectionFieldsPlotGroupSaver(TestPlotGroupSaver):
+    plotgroupsaver_class = ConnectionFieldsPlotGroupSaver
+
+    def test_cf_saving(self):
+        self.save("Connection Fields",sheet=self.sim['B'])
+
+        
+class TestCFProjectionPlotGroupSaver(TestPlotGroupSaver):
+    plotgroupsaver_class = CFProjectionPlotGroupSaver
+
+    def test_cfprojection_saving(self):
         pass
-# 	  GeneratorSheet.period = 1.0
-#         GeneratorSheet.xdensity = 4
-#         topo.patterns.basic.Line.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-#         topo.patterns.basic.Line.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-#         topo.patterns.basic.Line.orientation = Dynamic(lambda :random.uniform(-pi,pi))
-#         topo.patterns.basic.Line.thickness = 0.02
-#         topo.patterns.basic.Line.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
-#         CFSheet.nominal_density = 4
-#         CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-# 	CFProjection.learning_fn=CFPLF_HebbianSOM()
-#         topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
-#         self.s = topo.base.simulation.Simulation()
-        
-#         retina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina')
-#         retina2 = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina2')
-#         V1 = CFSheet(name='V1')
-#         V2 = CFSheet(name='V2')
-#         retina.print_level = topo.base.parameterizedobject.WARNING
-#         retina2.print_level = topo.base.parameterizedobject.WARNING
-#         V1.print_level = topo.base.parameterizedobject.WARNING
-#         V2.print_level = topo.base.parameterizedobject.WARNING
-        
-#         self.s.connect(retina,V1,delay=0.5,connection_type=CFProjection,name='R1toV1')
-#         self.s.connect(retina,V2,delay=0.5,connection_type=CFProjection,name='R1toV2')
-#         self.s.connect(retina2,V2,delay=0.5,connection_type=CFProjection,name='R2toV2')
-#         self.s.run(2)
-
-#         af = ActivityFile('Retina')
-#         wf = UnitWeightsFile('V1',0.0,0.0)
-#         waf = ProjectionFile('V1','R1toV1',10)
-#         for each in af.files + wf.files + waf.files:
-#             os.remove(each)
+        #self.save('Projection',sheet=self.sim['B'],
+        #          projection=self.sim['B'].projections('Afferent'))
 
 
 
-# suite = unittest.TestSuite()
-# suite.addTest(unittest.makeSuite(TestPlotFileSaver))
 
-# if __name__ == '__main__':
-#     unittest.TextTestRunner(verbosity=2).run(suite)
+###########################################################
+
+cases = [TestPlotGroupSaver,TestTemplatePlotGroupSaver,TestConnectionFieldsPlotGroupSaver,TestCFProjectionPlotGroupSaver]
+
+suite = unittest.TestSuite()
+suite.addTests([unittest.makeSuite(case) for case in cases])
+
+if __name__ == '__main__':
+    unittest.TextTestRunner(verbosity=2).run(suite)
+
