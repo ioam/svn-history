@@ -616,7 +616,7 @@ class CommandEvent(Event):
 
 
 
-### CB: not yet finished (documenation to follow).
+### CB: I'm working here (not yet finished; documenation to follow).
 
 import time
 from math import fmod,floor
@@ -669,78 +669,23 @@ class SomeTimer(ParameterizedObject):
         [thing(message) for thing in self.receive_messages]
 
 
-    ########################################################################
-    ## CEB: I'm working here. call_and_time will be generalized to
-    ## support how X works - the timing code will only appear
-    ## once.
-    def X(self,a):
-        fduration = len(a)
-        
-        i=0
-        step   = 1.0
+    # document stop
+
+    def _measure(self,fduration,step,alist=None,finish_off=False):
+
         iters  = int(floor(fduration/step))
         remain = fmod(fduration, step)
-        starttime=self.real_time_fn()
         recenttimes=[]
 
-        for i in xrange(iters):
 
-            recenttimes.append(self.real_time_fn())
-            length = len(recenttimes)
-
-            if (length>self.estimate_interval):
-                recenttimes.pop(0)
-                length-=1
-
-            self.func(a[i])
-
-            percent = 100.0*i/iters
-            self.__pass_out_progress(percent)
-            
-            estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
-
-            # CEBALERT: when there are multiple sheets, this can make it seem
-            # like topographica's stuck in a loop (because the counter goes
-            # to 100% lots of times...e.g. hierarchical's orientation tuning fullfield.)
-            message = 'Time ' + str(self.simulation_time_fn()) + ': ' + \
-                      str(int(percent)) + '% of '  + str(fduration) + ' patterns completed ' + \
-                      ('(%02d' % int(estimate/60))+':' + \
-                      ('%02d' % int(estimate%60))+ ' remaining).'
-                      
-            self.__pass_out_message(message)
-            i+=1
-
-
-        percent = 100   
-        self.__pass_out_progress(percent)
-
-        message = ("Showed %s patterns in %0.1f s" %
-                   (fduration,self.real_time_fn()-starttime))
-        self.__pass_out_message(message)
-    ########################################################################
-   
+        if not alist:
+            alist = [step]*iters
         
-    # __call__
-    def call_and_time(self,simulation_duration):
-        """
-        document stop
-        """
-
-        # default to 50 steps unless someone set otherwise
-        step = self.step or simulation_duration/50.0
-
+        starttime=self.real_time_fn()
         simulation_starttime = self.simulation_time_fn()
-        
-        iters = int(floor(simulation_duration/step))
-        remain = fmod(simulation_duration, step)    
-        starttime=self.real_time_fn()
-        recenttimes=[]
 
-        ## Duration of most recent times from which to estimate remaining time
-        self.estimate_interval=50
-        start_sim_time=self.simulation_time_fn()
-        self.stop=False
 
+        self.stop = False
         for i in xrange(iters):
             recenttimes.append(self.real_time_fn())
             length = len(recenttimes)
@@ -749,17 +694,26 @@ class SomeTimer(ParameterizedObject):
                 recenttimes.pop(0)
                 length-=1
 
-            # CEBALERT: need to do a callable check/have it done by a param
-            self.func(step)
-            
+            self.func(alist[i])
+
             percent = 100.0*i/iters
             estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
             self.__pass_out_progress(percent)
-        
-            # Should say 'at current rate', since the calculation assumes linearity
-            message = ('Time %0.2f: %d%% of %0.0f completed (%02d:%02d remaining)' %
-                       (self.simulation_time_fn(),int(percent),simulation_duration, int(estimate/60),
-                        int(estimate%60)))
+            
+
+            if not finish_off: # (temp)
+            ####################################################################################
+                message = 'Time ' + str(self.simulation_time_fn()) + ': ' + \
+                          str(int(percent)) + '% of '  + str(fduration) + ' patterns completed ' + \
+                          ('(%02d' % int(estimate/60))+':' + \
+                          ('%02d' % int(estimate%60))+ ' remaining).'
+            else:
+                # Should say 'at current rate', since the calculation assumes linearity
+                message = ('Time %0.2f: %d%% of %0.0f completed (%02d:%02d remaining)' %
+                           (self.simulation_time_fn(),int(percent),fduration, int(estimate/60),
+                            int(estimate%60)))
+            ####################################################################################
+                
             self.__pass_out_message(message)
 
             if self.stop:
@@ -767,16 +721,41 @@ class SomeTimer(ParameterizedObject):
 
 
         if not self.stop:
-            # ensure specified duration has been respected, since code above might not
-            # complete specified duration (integer number of iterations)
-            leftover = simulation_duration+simulation_starttime-self.simulation_time_fn()
-            if leftover>0: self.func(leftover)
+            if finish_off:
+                # ensure specified duration has been respected, since code above might not
+                # complete specified duration (integer number of iterations)
+                leftover = fduration+simulation_starttime-self.simulation_time_fn()
+                if leftover>0: self.func(leftover)
             percent = 100   
             self.__pass_out_progress(percent)
-            
-        message = ('Ran %0.2f to time %0.2f' %
-                   (self.simulation_time_fn()-start_sim_time, self.simulation_time_fn()))
+
+
+        if not finish_off: # (temp)
+        ################################################################################
+
+            # (it's wrong if we had a stop)
+            message = ("Showed %s patterns in %0.1f s" %
+                       (fduration,self.real_time_fn()-starttime))
+        else:
+            message = ('Ran %0.2f to time %0.2f' %
+                       (self.simulation_time_fn()-simulation_starttime, self.simulation_time_fn()))
+        ################################################################################
+
         self.__pass_out_message(message)
+
+              
+    def X(self,a):
+        self._measure(len(a),1.0,alist=a)
+        
+    
+    def call_and_time(self,fduration):
+
+        # default to 50 steps unless someone set otherwise
+        step = self.step or fduration/50.0
+
+        self._measure(fduration,step,finish_off=True)
+        
+        
 
 
 
