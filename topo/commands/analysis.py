@@ -197,7 +197,6 @@ def save_plotgroup(name,**params):
     # CB: support lookup of old sheet_name,projection_name etc
     # Remove when everyone (JA only?) updated own code?
     def old_name_support(params):
-        print "ons"
         if 'sheet_name' in params:
             params['sheet'] = topo.sim[params['sheet_name']]
             del params['sheet_name']
