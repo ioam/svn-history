@@ -176,7 +176,7 @@ class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
     def save_to_disk(self):
         imgs = numpy.array([p.bitmap.image for p in self.plotgroup.plots]).reshape(self.plotgroup.proj_plotting_shape)
         img = make_contact_sheet(imgs, (3,3,3,3), 3)
-        img.save(self.filename(self.sheet_name+"_"+self.projection_name))
+        img.save(self.filename(self.plotgroup.sheet.name+"_"+self.plotgroup.projection.name))
 
 
 
