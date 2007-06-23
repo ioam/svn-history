@@ -188,6 +188,10 @@ class FeatureResponses(ParameterizedObject):
             topo.sim.state_pop()
 
 
+        # CEBALERT: when there are multiple sheets, this can make it seem
+        # like topographica's stuck in a loop (because the counter goes
+        # to 100% lots of times...e.g. hierarchical's orientation tuning fullfield.)
+
             
         timer = copy.copy(topo.sim.timer)
         # CEBHACKALERT: hack to work round timer pickling hack
