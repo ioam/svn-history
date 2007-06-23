@@ -291,9 +291,9 @@ For code, see doozy.inf.ed.ac.uk:/home/ceball/webtests/topographica/tester
 <li>Should replace this system when slow-tests etc are done with a python file rather than a Makefile; why 
 do we have to write and maintain all the testing mechanisms (apart from that for the unit tests) - isn't 
 there some other python package to help?</li>
-<li>Probably should do make clean and make first to test that too.</li>
+<li>Should do make clean and make first to test that too, and to get external upgrades.</li>
 <li>Doesn't python's unittest already have web formatting somewhere?</li>
-
+Consider: http://tungwaiyip.info/software/HTMLTestRunner.htm
 Consider buildbot: http://buildbot.sourceforge.net/, http://buildbot.scipy.org/
 </ul>
 
