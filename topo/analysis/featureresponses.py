@@ -178,6 +178,7 @@ class FeatureResponses(ParameterizedObject):
             settings = dict(zip(feature_names, permutation))
             pattern_presenter(settings,param_dict)
 
+
             if refresh_act_wins:topo.guimain.refresh_activity_windows()
                     
             # Update each DistributionMatrix with (activity,bin)
@@ -206,7 +207,7 @@ class FeatureResponses(ParameterizedObject):
 
 
 ### JABALERT: This class needs significant cleanup:
-### 1. The timing code should be moved out of here and the other places it appears
+
 ### 
 ### 2. This class should calculate RFs for all units in all sheets for which
 ###    measure_maps is true, rather than being hardcoded to "V1"
@@ -225,7 +226,9 @@ class ReverseCorrelation(ParameterizedObject):
     """
     Calculate the receptive fields for all neurons using reverse correlation.
     """
-    
+
+    # CB: has a lot in common with FeatureResponse's measure_responses!
+    # Can't we have a better class hierarchy?
     def measure_responses(self,pattern_presenter,param_dict,features,display):
         """Present the given input patterns and collate the responses."""
          
@@ -246,74 +249,44 @@ class ReverseCorrelation(ParameterizedObject):
         values_lists=[f.values for f in features]
         permutations = cross_product(values_lists)
 
-        ### JABHACKALERT: This timer code should be moved to its own object;
-        ### it is much too difficult to follow here (and in tkgui/topoconsole.py).
-################## timer part 1        
-        
-        i=0
-        fduration = len(permutations)
-        step   = 1.0
-        iters  = int(floor(fduration/step))
-        remain = fmod(fduration, step)
-        starttime=time.time()
-        recenttimes=[]
 
-        # Temporary:
- #       self.parent.title(topo.sim.name) ## this changes the title bar to more useful
+        #################################################################################################
+        refresh_act_wins=False
+        if display:
+            if hasattr(topo,'guimain'):
+                refresh_act_wins=True
+            else:
+                self.warning("No GUI available for display.")
 
-        ## Duration of most recent times from which to estimate remaining time
-        estimate_interval=50.0        
 
-#################### end of timer part 1    
-    
-        for p in permutations:
+        def m(permutation):
+
             topo.sim.state_push()
 
             # Present input patterns
-            settings = dict(zip(feature_names, p))
+            settings = dict(zip(feature_names, permutation))
             pattern_presenter(settings,param_dict)
-                                        
-  ##################### timer part 2
 
-      #  for i in xrange(iters):
-            i=i+1
-            recenttimes.append(time.time())
-            length = len(recenttimes)
-
-            if (length>50):
-                recenttimes.pop(0)
-                length-=1
- #       topo.sim.run(step)
-            percent = 100.0*i/iters
-#            print percent,i
-            estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
-            # CEBALERT: when there are multiple sheets, this can make it seem
-            # like topographica's stuck in a loop (because the counter goes
-            # to 100% lots of times...e.g. hierarchical's orientation tuning fullfield.
-            message = 'Time ' + str(topo.sim.time()) + ': ' + \
-                      str(int(percent)) + '% of '  + str(fduration) + ' patterns completed ' + \
-                      ('(%02d' % int(estimate/60))+':' + \
-                      ('%02d' % int(estimate%60))+ ' remaining).'
-                      
-            if hasattr(topo,'guimain'):
-                topo.guimain.messageBar.message('state', message)
-                topo.guimain.update()
+            if refresh_act_wins:topo.guimain.refresh_activity_windows()
             
-######################### end of timer              
-
-            if display:
-                if hasattr(topo,'guimain'):
-                    topo.guimain.refresh_activity_windows()
-                else:
-                    self.warning("No GUI available for display.")
-
             for ii in range(rows): 
                 for jj in range(cols):
                     grid[ii][jj]=grid[ii][jj]+topo.sim["V1"].activity[ii,jj]*(topo.sim["Retina"].activity)
   
             topo.sim.state_pop()
 
+            
+        timer = copy.copy(topo.sim.timer)
+        # CEBHACKALERT: hack to work round timer pickling hack
+        timer.receive_messages=topo.sim.timer.receive_messages
+        timer.receive_progress=topo.sim.timer.receive_progress
+        ######################################################
+        timer.func = m
+        timer.X(permutations)
+
         restore_input_generators()
+        ################################################################################################
+
 
         ### JABALERT: The remaining code should move into a separate command in
         ### topo/commands/pylabplots.py, and it should be changed to
