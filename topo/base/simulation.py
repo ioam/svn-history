@@ -655,6 +655,7 @@ class SomeTimer(ParameterizedObject):
     ## CEBHACKALERT: don't pickle receive_messages and receive_progress: contain things that can't be
     ## pickled when topographica launched with -g (i.e. lists contain topoconsole methods).
     ## Really need to sort out how to avoid pickling specific things.
+    ## (If the simulation timer is copied, these attributes will be lost!)
     def __getstate__(self):
         state = self.__dict__.copy()
         for a in ("_receive_messages_param_value","_receive_progress_param_value"):
