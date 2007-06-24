@@ -27,7 +27,15 @@ from topo.commands.analysis import update_activity,measure_or_pref,update_projec
 
 
 
-PlotGroupSaver.filename_prefix="topo/tests/"
+# CEBHACKALERT: somehow the simulation time's at 3 or something by the
+# time of saving files! See interacting-tests ALERT in
+# topo/tests/__init__.py. Also, does setting the simulation name below
+# actually work?
+
+
+
+
+PlotGroupSaver.filename_prefix="topo/tests/testplotfilesaver"
 
 class TestPlotGroupSaver(unittest.TestCase):
 
