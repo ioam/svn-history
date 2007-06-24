@@ -107,8 +107,8 @@ def histogramplot(data,title=None,colors=None,*args,**kw):
     pylab.show._needmain=False
     n,bins,bars = pylab.hist(data,*args,**kw)
 
-    # if len(bars)!=len(colors), then the extra bars won't have their color changed,
-    # or the extra colors will be ignored.
+    # if len(bars)!=len(colors), any extra bars won't have their
+    # colors changed, or any extra colors will be ignored.
     if colors: [bar.set_fc(color) for bar,color in zip(bars,colors)]
     
     if (title): windowtitle(title)
