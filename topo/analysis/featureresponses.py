@@ -113,6 +113,8 @@ class DistributionMatrix(ParameterizedObject):
 
 
 
+# CB: currently working on FeatureResponses and ReverseCorrelation.
+
 class FeatureResponses(ParameterizedObject):
     """
     Systematically vary input pattern feature values and collate the responses.
@@ -152,41 +154,24 @@ class FeatureResponses(ParameterizedObject):
         return  [x for x in topo.sim.objects(Sheet).values()
                  if hasattr(x,'measure_maps') and x.measure_maps]
         
-
+        
     def measure_responses(self,pattern_presenter,param_dict,features,display):
         """Present the given input patterns and collate the responses."""
         save_input_generators()
 
-        feature_names=[f.name for f in features]
-        values_lists=[f.values for f in features]
-        permutations = cross_product(values_lists)
+        self.param_dict=param_dict
+        self.pattern_presenter = pattern_presenter
 
-        refresh_act_wins=False
+        self.feature_names=[f.name for f in features]
+        values_lists=[f.values for f in features]
+        self.permutations = cross_product(values_lists)
+
+        self.refresh_act_wins=False
         if display:
             if hasattr(topo,'guimain'):
-                refresh_act_wins=True
+                self.refresh_act_wins=True
             else:
                 self.warning("No GUI available for display.")
-
-
-        # CEB: currently working here
-        
-        def m(permutation):
-            topo.sim.state_push()
-
-            # Present input patterns
-            settings = dict(zip(feature_names, permutation))
-            pattern_presenter(settings,param_dict)
-
-
-            if refresh_act_wins:topo.guimain.refresh_activity_windows()
-                    
-            # Update each DistributionMatrix with (activity,bin)
-            for sheet in self.sheets_to_measure():
-                for feature,value in zip(feature_names, permutation):
-                    self._featureresponses[sheet][feature].update(sheet.activity, value)
-
-            topo.sim.state_pop()
 
 
         # CEBALERT: when there are multiple sheets, this can make it seem
@@ -199,10 +184,30 @@ class FeatureResponses(ParameterizedObject):
         timer.receive_messages=topo.sim.timer.receive_messages
         timer.receive_progress=topo.sim.timer.receive_progress
         ######################################################
-        timer.func = m
-        timer.X(permutations)
+        timer.func = self.present_permutation
+        timer.X(self.permutations)
 
         restore_input_generators()
+
+
+    def present_permutation(self,permutation):
+
+        topo.sim.state_push()
+
+        # Present input patterns
+        settings = dict(zip(self.feature_names, permutation))
+        self.pattern_presenter(settings,self.param_dict)
+
+        if self.refresh_act_wins:topo.guimain.refresh_activity_windows()
+
+        # Update each DistributionMatrix with (activity,bin)
+        for sheet in self.sheets_to_measure():
+            for feature,value in zip(self.feature_names, permutation):
+                self._featureresponses[sheet][feature].update(sheet.activity, value)
+
+        topo.sim.state_pop()
+
+        
 
 
 
@@ -220,15 +225,21 @@ class FeatureResponses(ParameterizedObject):
 ###    topo/commands/analysis.py instead of from here), sharing the implementation
 ###    of topographic_grid (because that's what is intended to be visualized here).
 
-grid=[]
+grid=[] # CB: why's this here? Is it built up over time somewhere else? Can't it be
+        # an attribute like _featureresponses in FeatureResponses? 
 
-class ReverseCorrelation(ParameterizedObject):
+class ReverseCorrelation(FeatureResponses):
     """
     Calculate the receptive fields for all neurons using reverse correlation.
     """
+    # CB: Can't we have a better class hierarchy?
 
-    # CB: has a lot in common with FeatureResponse's measure_responses!
-    # Can't we have a better class hierarchy?
+    def __init__(self,features=None):
+        self.initialize_featureresponses(features)
+        
+    def initialize_featureresponses(self,features):
+        pass 
+
     def measure_responses(self,pattern_presenter,param_dict,features,display):
         """Present the given input patterns and collate the responses."""
          
@@ -242,52 +253,13 @@ class ReverseCorrelation(ParameterizedObject):
                 row.append(0*topo.sim["Retina"].activity)
             grid.append(row)
 
-     
-        save_input_generators()
-
-        feature_names=[f.name for f in features]
-        values_lists=[f.values for f in features]
-        permutations = cross_product(values_lists)
-
-
-        #################################################################################################
-        refresh_act_wins=False
-        if display:
-            if hasattr(topo,'guimain'):
-                refresh_act_wins=True
-            else:
-                self.warning("No GUI available for display.")
-
-
-        def m(permutation):
-
-            topo.sim.state_push()
-
-            # Present input patterns
-            settings = dict(zip(feature_names, permutation))
-            pattern_presenter(settings,param_dict)
-
-            if refresh_act_wins:topo.guimain.refresh_activity_windows()
-            
-            for ii in range(rows): 
-                for jj in range(cols):
-                    grid[ii][jj]=grid[ii][jj]+topo.sim["V1"].activity[ii,jj]*(topo.sim["Retina"].activity)
-  
-            topo.sim.state_pop()
-
-            
-        timer = copy.copy(topo.sim.timer)
-        # CEBHACKALERT: hack to work round timer pickling hack
-        timer.receive_messages=topo.sim.timer.receive_messages
-        timer.receive_progress=topo.sim.timer.receive_progress
-        ######################################################
-        timer.func = m
-        timer.X(permutations)
-
-        restore_input_generators()
-        ################################################################################################
-
-
+        # CEBHACKALERT 
+        self.rows,self.cols = rows,cols
+        
+        super(ReverseCorrelation,self).measure_responses(pattern_presenter,param_dict,
+                                                         features,display)
+                                                         
+        
         ### JABALERT: The remaining code should move into a separate command in
         ### topo/commands/pylabplots.py, and it should be changed to
         ### use the code from topographic_grid (because that's what
@@ -311,6 +283,22 @@ class ReverseCorrelation(ParameterizedObject):
         pylab.scatter(xx,yy)
         pylab.show._needmain = False
         pylab.show()
+
+
+    def present_permutation(self,permutation):
+        topo.sim.state_push()
+
+        # Present input patterns
+        settings = dict(zip(self.feature_names, permutation))
+        self.pattern_presenter(settings,self.param_dict)
+
+        if self.refresh_act_wins:topo.guimain.refresh_activity_windows()
+
+        for ii in range(self.rows): 
+            for jj in range(self.cols):
+                grid[ii][jj]=grid[ii][jj]+topo.sim["V1"].activity[ii,jj]*(topo.sim["Retina"].activity)
+
+        topo.sim.state_pop()
 
 
                           
