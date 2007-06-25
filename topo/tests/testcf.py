@@ -2,6 +2,7 @@ import unittest
 import numpy
 
 from topo.base.simulation import Simulation
+from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFIter,MaskedCFIter,CFProjection,CFSheet
 
 class TestIter(unittest.TestCase):
@@ -10,8 +11,8 @@ class TestIter(unittest.TestCase):
 
         self.sim = Simulation()
 
-        self.sim['Dest'] = CFSheet(nominal_density=10)
-        self.sim['Src'] = CFSheet(nominal_density=10)
+        self.sim['Dest'] = CFSheet(nominal_density=10,nominal_bounds=BoundingBox(radius=0.5))
+        self.sim['Src'] = CFSheet(nominal_density=10,nominal_bounds=BoundingBox(radius=0.5))
 
         self.sim.connect('Src','Dest',
                          connection_type = CFProjection,
