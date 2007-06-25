@@ -49,6 +49,10 @@ class TestSnapshots(unittest.TestCase):
         self.assertEqual(Line.x,12.0)
         self.assertEqual(__main__.__dict__['z'],99)
 
+        #  Test to make sure the above tests haven't screwed up
+        # the ability to construct new simulation objects
+        sim = topo.base.simulation.Simulation()
+
         # CB: add xml pickling test. Certainly seems like
         # gnosis.xml.pickle is not the drop-in replacement
         # for pickle that it is supposed to be
