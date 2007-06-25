@@ -43,7 +43,7 @@ __all__.remove('test_script')   # this is a slower test & should have a differen
                                 # calling mechanism (see Future_Work/current)
 
 
-
+__all__.sort()
 
 
 def all_suite():
