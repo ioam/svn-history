@@ -57,6 +57,16 @@ CANVASBUFFER = 1
 
 
 
+## CB: When I click off a text entry box after editing it (e.g. by
+## clicking on some bit of unused window), my change should be
+## applied. Currently, it is only applied if another widget gets the
+## focus. So do something like make the background get the focus if
+## it's clicked.
+## I don't want this behavior in the model editor, though. Although both use
+## ParametersFrame, a distinction is that in the Test Pattern window's
+## ParametersFrame, there is no 'Apply' button (because we want changes to be
+## applied immediately). So this indicates two different modes of use for
+## ParametersFrame.
 
 ### CEBHACKALERT: something's funny with packing sometimes (e.g. open connection fields
 ### window, change params, then redraw). (It's to do with labels being left behind.)
