@@ -132,7 +132,15 @@ def save_snapshot(snapshot_name,xml=False):
     of any ParameterizedObject class that is declared within the topo
     package. See the topo.base.PicklableClassAttributes class for more
     information.
-    """    
+    """
+    ## CEBHACKALERT: don't pickle receive_messages and
+    ## receive_progress: contain things that shouldn't be pickled when
+    ## topographica launched with -g (i.e. lists contain topoconsole
+    ## methods).  Really need to sort out how to avoid pickling
+    ## specific things.
+    topo.sim.timer.receive_messages = []
+    topo.sim.timer.receive_progress = []
+    
     # For now we just search topo, but could do same for other packages.
     topoPOclassattrs = PicklableClassAttributes(topo,exclusions=('plotting','tests','tkgui'),
                                                 startup_commands=topo.sim.startup_commands)
