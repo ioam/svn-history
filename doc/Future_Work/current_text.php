@@ -95,7 +95,9 @@ was done at the FACETS CodeJam in March 2007, but a cleaner example
 can be made.
 
 
-
+<H4>2007/06/27 (CB): Documentation & cleanup</H4>
+Of all the things I've recently been working on. The ALERTs and are 
+getting out of control!
 
 
 <H4>2007/06/07 (CB): tkgui cleanup</H4>
