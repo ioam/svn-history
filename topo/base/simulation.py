@@ -675,6 +675,9 @@ class SomeTimer(ParameterizedObject):
         simulation_starttime = self.simulation_time_fn()
 
 
+        # CEBALERT: check that the timing code is actually
+        # doing the right thing (e.g. step=20, but run for 10)
+
         self.stop = False
         for i in xrange(iters):
             recenttimes.append(self.real_time_fn())
@@ -747,7 +750,10 @@ class SomeTimer(ParameterizedObject):
         
         
 
-
+# CB: temporary - can use to get timing messages at the commandline
+class MessagePrinter(object):
+    def printm(self,x): print x
+# from topo.base.simulation import MessagePrinter; topo.sim.timer.receive_messages.append(MessagePrinter().printm)
 
 
 # Simulation stores its events in a linear-time priority queue (i.e., a
