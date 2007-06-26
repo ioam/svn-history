@@ -180,10 +180,6 @@ class FeatureResponses(ParameterizedObject):
 
             
         timer = copy.copy(topo.sim.timer)
-        # CEBHACKALERT: hack to work round timer pickling hack
-        timer.receive_messages=topo.sim.timer.receive_messages
-        timer.receive_progress=topo.sim.timer.receive_progress
-        ######################################################
         timer.func = self.present_permutation
         timer.X(self.permutations)
 
