@@ -17,6 +17,12 @@ from topo.patterns.basic import Gaussian, Line
 from utils import assert_array_equal
 
 
+# CEBALERT: testsnapshots is particularly sensitive to changes made by
+# other tests. I think its scope should be reduced, and instead we
+# ought to transfer some of its testing to one of the standalone
+# (i.e. in its own, fresh topographica instance), slow tests.
+
+
 class TestSnapshots(unittest.TestCase):
 
     def test_basic_save_load_snapshot(self):
@@ -33,7 +39,7 @@ class TestSnapshots(unittest.TestCase):
         Line.x = 12.0
         topo.sim.startup_commands.append("z=99")
 
-        save_snapshot("testsnapshot.typ") # CEBALERT: should delete at end of test
+        save_snapshot("topo/tests/testsnapshot.typ") # CEBALERT: should delete at end of test
 
         Line.x = 9.0
         exec "z=88" in __main__.__dict__
