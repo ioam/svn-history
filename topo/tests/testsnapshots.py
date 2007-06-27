@@ -25,16 +25,17 @@ from utils import assert_array_equal
 
 
 SNAPSHOT_LOCATION = "topo/tests/testsnapshot.typ"
+SIM_NAME = "testsnapshots"
 
 class TestSnapshots(unittest.TestCase):
 
-# CEBALERT: should use a new simulation
-##     def setUp(self):
-##         """
-##         Create a new Simulation as topo.sim (so this test isn't affected by changes made by other
-##         tests to the Simulation).
-##         """
-##         Simulation(register=True,name="testsnapshots")
+    # CB: all tests that use topo.sim ought to do make a new topo.sim
+    def setUp(self):
+        """
+        Create a new Simulation as topo.sim (so this test isn't affected by changes
+        to topo.sim by other tests).
+        """
+        Simulation(register=True,name=SIM_NAME)
 
 
     def test_basic_save_load_snapshot(self):
@@ -42,7 +43,7 @@ class TestSnapshots(unittest.TestCase):
         Very basic test to check the activity matrix of a GeneratorSheet
         comes back ok, and that class attributes are pickled.
         """
-        #assert topo.sim.name=="testsnapshots"
+        assert topo.sim.name==SIM_NAME
          
         topo.sim['R']=GeneratorSheet(input_generator=Gaussian(),nominal_density=2)
 
