@@ -23,6 +23,8 @@ from utils import assert_array_equal
 # (i.e. in its own, fresh topographica instance), slow tests.
 
 
+SNAPSHOT_LOCATION = "topo/tests/testsnapshot.typ"
+
 class TestSnapshots(unittest.TestCase):
 
     def test_basic_save_load_snapshot(self):
@@ -39,7 +41,7 @@ class TestSnapshots(unittest.TestCase):
         Line.x = 12.0
         topo.sim.startup_commands.append("z=99")
 
-        save_snapshot("topo/tests/testsnapshot.typ") # CEBALERT: should delete at end of test
+        save_snapshot(SNAPSHOT_LOCATION)
 
         Line.x = 9.0
         exec "z=88" in __main__.__dict__
@@ -47,7 +49,7 @@ class TestSnapshots(unittest.TestCase):
         topo.sim['R'].set_input_generator(Line())
         topo.sim.run(1)
 
-        load_snapshot("testsnapshot.typ")
+        load_snapshot(SNAPSHOT_LOCATION)
 
         # CEBALERT: should also test that unpickling order is correct
         # (i.e. startup_commands, class attributes, simulation)
