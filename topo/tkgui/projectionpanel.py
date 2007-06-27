@@ -185,10 +185,17 @@ class ConnectionFieldsPanel(CFPGPanel):
         #   still lets you set to 0.5 -> error
         self.sheet_change(**params)
     def sheet_change(self,**args):
+
+        # CEBHACKALERT: get an inconsequential but scary
+        # cf-out-of-range error if you e.g. set y < -0.4 on sheet V1
+        # and then change to V2 (which has smaller bounds).
+        # x and y don't seem to be updated in time...
+        #self.x,self.y = 0.0,0.0
+
         if 'sheet' in args: self.sheet=args['sheet']
-            
-        s = self.sheet
-        l,b,r,t = s.bounds.lbrt()
+        [self._tk_vars[coord].set(args.get(coord,0.0)) for coord in ('x','y')]
+                    
+        l,b,r,t = self.sheet.bounds.lbrt()
 
         x = self.get_parameter_object('x')
         y = self.get_parameter_object('y')
@@ -196,13 +203,10 @@ class ConnectionFieldsPanel(CFPGPanel):
         x.bounds=(l,r)
         y.bounds=(b,t)
 
-        [self._tk_vars[coord].set(args.get(coord,0.0)) for coord in ('x','y')]
-
+        # (method can be called before widgets are added)
         if 'x' and 'y' in self._widgets:
             w1,w2=self._widgets['x'],self._widgets['y']
-            w1.set_bounds(*x.bounds)
-            w2.set_bounds(*y.bounds)
-            
+            w1.set_bounds(*x.bounds); w2.set_bounds(*y.bounds)
             w1.refresh();w2.refresh()
 
         super(ConnectionFieldsPanel,self).sheet_change()
