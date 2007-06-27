@@ -93,9 +93,7 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
 
 
     def sheet_change(self):
-        pass
-        # don't self.update_plots() because they have to select the projection first
-        ## CEBHACKALERT: think it gets updated anywhere somewhere in the refresh+prjections part.
+        self.refresh()         
 
         
     def populate_sheet_param(self,p):
@@ -127,9 +125,6 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
     # (if it is still a problem then).
     def _update_dynamic_info(self,e):
         self.messageBar.message('state',"")
-
-    def sheet_change(self):
-        self.refresh() 
 
     def _plot_title(self):
         return "Projections into %s at time %s"%(self.plotgroup.sheet.name,self.plotgroup.time)
@@ -190,9 +185,6 @@ class ConnectionFieldsPanel(CFPGPanel):
         #   still lets you set to 0.5 -> error
         self.sheet_change(**params)
     def sheet_change(self,**args):
-
-        super(ConnectionFieldsPanel,self).sheet_change()
-
         if 'sheet' in args: self.sheet=args['sheet']
             
         s = self.sheet
@@ -204,15 +196,7 @@ class ConnectionFieldsPanel(CFPGPanel):
         x.bounds=(l,r)
         y.bounds=(b,t)
 
-        if 'x' and 'y' in args:
-            self._tk_vars['x'].set(args['x'])
-            self._tk_vars['y'].set(args['y'])
-            
-        else:
-            self.x = self.y = 0.0
-
-
-
+        [self._tk_vars[coord].set(args.get(coord,0.0)) for coord in ('x','y')]
 
         if 'x' and 'y' in self._widgets:
             w1,w2=self._widgets['x'],self._widgets['y']
@@ -220,6 +204,8 @@ class ConnectionFieldsPanel(CFPGPanel):
             w2.set_bounds(*y.bounds)
             
             w1.refresh();w2.refresh()
+
+        super(ConnectionFieldsPanel,self).sheet_change()
 ##############################################################################
 
 
