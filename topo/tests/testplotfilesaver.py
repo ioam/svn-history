@@ -60,11 +60,9 @@ class TestConnectionFieldsPlotGroupSaver(TestPlotGroupSaver):
 class TestCFProjectionPlotGroupSaver(TestPlotGroupSaver):
     plotgroupsaver_class = CFProjectionPlotGroupSaver
 
-    # CEBHACKALERT: currently not working.
     def test_cfprojection_saving(self):
-        pass
-        #self.save('Projection',sheet=self.sim['B'],
-        #          projection=self.sim['B'].projections('Afferent'))
+        self.save('Projection',sheet=self.sim['B'],
+                  projection=self.sim['B'].projections('Afferent'))
 
 
 
