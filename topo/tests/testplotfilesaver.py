@@ -5,11 +5,6 @@ $Id$
 """
 __version__='$Revision$'
 
-### CEBALERT: tests don't work properly when file run on its own i.e. like:
-###  ./topographica -c 'import topo.tests.testplotfilesaver; topo.tests.run(test_modules=[topo.tests.testplotfilesaver])'
-### Tests do work when run as part of 'make tests', though.
-
-
 import unittest
 
 from topo.base.simulation import Simulation
@@ -26,15 +21,6 @@ PlotGroup.cmd_location = locals()
 from topo.commands.analysis import update_activity,measure_or_pref,update_projections,update_connectionfields
 
 
-
-# CEBHACKALERT: somehow the simulation time's at 3 or something by the
-# time of saving files! See interacting-tests ALERT in
-# topo/tests/__init__.py. Also, does setting the simulation name below
-# actually work?
-
-
-
-
 PlotGroupSaver.filename_prefix="topo/tests/testplotfilesaver"
 
 class TestPlotGroupSaver(unittest.TestCase):
@@ -42,7 +28,7 @@ class TestPlotGroupSaver(unittest.TestCase):
     plotgroupsaver_class = PlotGroupSaver
 
     def setUp(self):
-        self.sim = Simulation(register=False,name="PGS_test")
+        self.sim = Simulation(register=True,name="PGS_test")
         self.sim['A'] = GeneratorSheet(nominal_density=4)
         self.sim['B'] = CFSheet(nominal_density=4)
         self.sim.connect('A','B',connection_type=CFProjection,name='Afferent')
