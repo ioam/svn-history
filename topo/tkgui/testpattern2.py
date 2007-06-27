@@ -1,17 +1,4 @@
 """
-TestPattern
-
-Sliders panel for inputs
-
-
-The list of valid Input Types is automatically generated from the
-PatternGenerator subclasses found in topo.base.patterngenerator (which
-can be extended by the user by setting a variable in that namespace to
-the name of their new class).  Every Parameter defined in the
-PatternGenerator subclass will be shown in the window.
-
-The Preview panel draws heavily from the PlotGroupPanel class, and instead
-of using a PlotGroup subclass, creates a group on the fly.  
 
 $Id$
 """
@@ -21,8 +8,6 @@ __version__='$Revision$'
 ### JABHACKALERT: Need to remove Back/Forward buttons, because they do not
 ### do what the user would expect.  
 
-# CEBALERT: this file needs a substantial overhaul before it will work
-# well.
 
 # CEBALERT: taggedsliders refresh the display even when auto-refresh is off.
 
@@ -45,15 +30,13 @@ from topo.misc.keyedlist import KeyedList
 
 import parametersframe
 from plotgrouppanel import XPGPanel
-#from templateplotgrouppanel import TemplatePlotGroupPanel
-import topoconsole
 
 from topo.plotting.plot import make_template_plot
 
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X,NO,NONE
 
-# Default time to show in the Presentation duration box.
+
 DEFAULT_PRESENTATION = '1.0'
 
 
@@ -61,13 +44,14 @@ class TestPattern(XPGPanel):
 
     
     def __init__(self,console,master,label="Preview",**params):
+
 	super(TestPattern,self).__init__(console,master,label,**params)
 
-
-        self.padding = 2
         self.auto_refresh=True
 
-        
+
+        # FIND GENERATOR SHEETS
+        ###############################################################################################
         ### Find the GeneratorSheets in the simulation, set up generator_sheet_patterns dictionary
         # CEBALERT: this has a difficult structure to work with.
         # generator_sheets_patterns = 
@@ -80,7 +64,11 @@ class TestPattern(XPGPanel):
             self.generator_sheets_patterns[gen_sheet_name] = {'generator_sheet': gen_sheet,
                                                               'editing': True,
                                                               'pattern_generator': None} 
+        ###############################################################################################
 
+
+        # LEARNING BUTTON
+        ###############################################################################################
         ### learning buttons
         #
         self.learning = IntVar()
@@ -91,11 +79,13 @@ class TestPattern(XPGPanel):
         self.balloon.bind(self.learning_button,
 """Whether to enable learning during presentation.""")
 
-        # buttonBox.add('Use for future learning',command = self.use_for_learning)
+        # (there was a) buttonBox.add('Use for future learning',command = self.use_for_learning)
+        ###############################################################################################
 
 
+        # DURATION BUTTON
+        ###############################################################################################
         ### 'Duration to present' box
-        #
         self.present_length = Pmw.EntryField(self,
                 labelpos = 'w',label_text = 'Duration to Present:',
                 value = DEFAULT_PRESENTATION,validate = {'validator' : 'real'},
@@ -103,29 +93,37 @@ class TestPattern(XPGPanel):
         self.present_length.pack(fill=NONE, expand=NO, padx=10, pady=5)
         self.balloon.bind(self.present_length,
 """How long to run the simulator when presenting.""")
+        ###############################################################################################
 
 
+        # PRESENT BUTTON
+        ###############################################################################################
         ### 'Present'/'reset to defaults' buttons  (i.e. re: patterns themselves)
-        #
         buttonBox = Pmw.ButtonBox(self,orient = 'horizontal',padx=0,pady=0)
         buttonBox.pack(side=TOP)
         
         present_button = buttonBox.add('Present', command=self.present)
         self.balloon.bind(present_button,
 """Present this pattern to the simulation.""")
+        ###############################################################################################
 
+
+        # RESET BUTTON
+        ###############################################################################################
         reset_button = buttonBox.add('Reset to defaults', command=self.reset_to_defaults)
         self.balloon.bind(reset_button,
 """Reset the parameters for this pattern back to their defaults.""")
+        ###############################################################################################
 
 
+
+
+
+        # LIST OF PATTERNGENERATORS
+        ###############################################################################################
         ### Menu of PatternGenerator types
-        #
-        # CEBALERT: seems like a poor way of doing this (just written
-        # to get it working).
         # Take the list of PatternGenerators from the first
         # GeneratorSheet's input_generator PatternGeneratorParameter.
-        #
         # pattern_generators = {'Pattern': <PatternGenerator_obj>}
         for generator_sheet_name in self.generator_sheets_patterns.values():
             generator_sheet_params = generator_sheet_name['generator_sheet'].params()
@@ -134,24 +132,16 @@ class TestPattern(XPGPanel):
         
         self.pattern_generators = KeyedList()
         self.pattern_generators.update(pattern_generators)
-
-        # CEBALERT: remove OneDPowerSpectrum from list of pattern generators
-        # because it doesn't yet work with the test pattern window.
-        # (I think because plotting assumes 2d matrices when PatternGenerators are
-        # called.)
-        self.pattern_generators.remove(('OneDPowerSpectrum',topo.patterns.basic.OneDPowerSpectrum))
-        
         self.pattern_generators.sort()  # sorted so the pgs appear alphabetically
 
         self.__current_pattern_generator = GeneratorSheet.classparams()['input_generator'].default
-
-        
         self.__current_pattern_generator_name = StringVar()
-        # CEBALERT: presumably can set the current pg from the name in a better way
+
         for (pg_name,pg) in self.pattern_generators.items():
             if pg==type(self.__current_pattern_generator):
                 self.__current_pattern_generator_name.set(pg_name)
-                self.__default_pattern_generator_name = pg_name #CEBALERT: don't need to store this, right?
+                self.__default_pattern_generator_name = pg_name 
+
 
         # PatternGenerator choice box
         self.pg_choice_box = Pmw.OptionMenu(self,
@@ -164,17 +154,32 @@ class TestPattern(XPGPanel):
         self.balloon.bind(self.pg_choice_box,
 """Type of pattern to present.
 Each type will have various parameters that can be changed.""")
+        # (remember to remove audiogen)
+        ###############################################################################################
 
 
-        ### The ParametersFrame
-        #
+        
+
+        
+
+
+        # PARAMETERSFRAME
+        ###############################################################################################
         # Because this window applies changes to an object immediately
         # (unlike ParametersFrame), the button to 'reset' is
         # 'Defaults'. 'Reset' would do nothing.
         self.__params_frame = parametersframe.ParametersFrame(self,buttons_to_remove=['Apply','Close','Reset'])
         self.__params_frame.create_widgets(self.__current_pattern_generator)
         self.__params_frame.pack(side=TOP,expand=YES,fill=X)
+        ###############################################################################################
+        
 
+
+
+
+
+        # SELECT GENERATORSHEET BUTTONS
+        ###############################################################################################
         ### 'Edit patterns in' boxes
         #
         # CEBHACKALERT: Buttons seem to have strange behavior!
@@ -190,9 +195,18 @@ Each type will have various parameters that can be changed.""")
         for generator_sheet_name in keys:
             self.__input_box.add(generator_sheet_name)
             self.__input_box.invoke(generator_sheet_name)
+        ###############################################################################################
+            
 
         self.__change_pattern_generator(self.__current_pattern_generator_name.get())
+        
+
 	self.refresh()
+
+
+
+
+
 
 
     @staticmethod
@@ -208,21 +222,16 @@ Each type will have various parameters that can be changed.""")
 
 
     def refresh(self):
-        """
-        Change the pattern generator objects as required
-
-        Also call the parent class refresh.
-        """
         self.update_plotgroup_variables()
         self.__setup_pattern_generators()
         super(TestPattern,self).refresh()
 
 
-        
+
+    # METHODS FOR BUTTONS
+    ###############################################################################################
     def _input_change(self,button_name, checked):
         """
-        The variable checked records the state, either True or False.
-
         Called by the input box.  The variable self.generator_sheets_patterns records
         all input event processors, and whether they are checked or
         not.
@@ -236,11 +245,8 @@ Each type will have various parameters that can be changed.""")
                 self.__setup_pattern_generators()
                 self.refresh()
         
-
     def __change_pattern_generator(self,pattern_generator_name):
         """
-        Change to the selected PatternGenerator.
-
         Set the current PatternGenerator to the one selected and get the
         ParametersFrame to draw the relevant widgets
         """
@@ -249,20 +255,12 @@ Each type will have various parameters that can be changed.""")
         if self.auto_refresh: 
 	    self.refresh()
 
-
     def present(self):
         """
         Move the user created patterns into the GeneratorSheets, run for
         the specified length of time, then restore the original
-        patterns.  The system may become unstable if the user breaks
-        this thread so that the original patterns are not properly
-        restored, but then there are going to be other problems with
-        the Simulation state if a run is interrupted.
-
-        This function is run no matter if learning is enabled or
-        disabled since run() will detect sheet attributes.
+        patterns.
         """
-
 	topo.sim.state_push()
         self.__setup_pattern_generators()
         input_dict = dict([(name,d['pattern_generator'])
@@ -273,23 +271,6 @@ Each type will have various parameters that can be changed.""")
         self.console.auto_refresh()
 	topo.sim.state_pop()
 
-    def use_for_learning(self):
-        """
-        Lock in the existing PatternFactories as the new default stimulus
-        input to the input sheets.  This should work like a test stimuli,
-        but the original input generator is not put back afterwards.
-
-        This function does run() the simulation, but for 0.0 time.
-        """
-        #self.__setup_pattern_generators()
-        #input_dict = dict([(name,d['pattern_generator'])
-        #                   for (name,d) in new_patterns_dict.items()])
-        #pattern_present(input_dict,0.0,learning=True,overwrite_previous=True)
-        #self.console.auto_refresh()
-        pass
-
-
-
     def reset_to_defaults(self):
         """
         Reset to default presentation length, no learning, and the original PatternGenerator.
@@ -298,6 +279,25 @@ Each type will have various parameters that can be changed.""")
         self.learning_button.deselect()
         self.pg_choice_box.invoke(self.__default_pattern_generator_name)
         if self.auto_refresh: self.refresh()
+
+    def set_normalize(self):
+	self.plotgroup.update_plots(False)
+	self.refresh()
+
+    def set_sheetcoords(self):
+	self.plotgroup.update_plots(False)
+	self.display_plots()
+	self.refresh()
+
+    def set_integerscaling(self):
+        if self.integerscaling:#.get():
+            self.plotgroup.sizeconvertfn = int
+        else:
+            self.plotgroup.sizeconvertfn = identity
+	self.refresh()
+    ###############################################################################################
+
+
 
 
     ### JCALERT! This has to be re-implemented for testpattern, it has to be done in a better way:
@@ -342,30 +342,6 @@ Each type will have various parameters that can be changed.""")
 	self.plotgroup = new_plotgroup
  				
     
-    ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
-    def set_normalize(self):
-        """Function called by Widget when check-box clicked"""
-	#self.plotgroup.normalize = self.normalize.get()
-	self.plotgroup.update_plots(False)
-	self.refresh()
-
-    ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
-    def set_sheetcoords(self):
-        """Function called by Widget when check-box clicked"""
-	#self.plotgroup.sheetcoords = self.sheetcoords.get()
-	self.plotgroup.update_plots(False)
-	self.display_plots()
-	self.refresh()
-
-    ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
-    def set_integerscaling(self):
-        """Function called by Widget when check-box clicked"""
-        if self.integerscaling:#.get():
-            self.plotgroup.sizeconvertfn = int
-        else:
-            self.plotgroup.sizeconvertfn = identity
-	self.refresh()
-
 
     ### JABHACKALERT: This should be replaced with a PatternPresenter
     ### (from topo.commands.analysis), which will allow flexible
