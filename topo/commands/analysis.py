@@ -403,12 +403,12 @@ def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
   # NORMALLY A VALUE AROUND 0.5 TO 3.0 SEEMS OK....
     # Presents the pattern at each pixel location
     resolution = 100 # percentage, 100 is max, 0 is min
-    a,b,c,d = topo.sim["Retina"].nominal_bounds.lbrt()
+    l,b,r,t = topo.sim["Retina"].nominal_bounds.lbrt()
     density=resolution*topo.sim["Retina"].nominal_density/100
-    divisions = density*(c-a)-1
+    divisions = density*(r-l)-1
     size = 1/(density)
-    x_range=(c,a)
-    y_range=(d,b)
+    x_range=(r,l)
+    y_range=(t,b)
     
     
     if divisions <= 0:
