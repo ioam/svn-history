@@ -58,13 +58,12 @@ DEFAULT_PRESENTATION = '1.0'
 
 
 class TestPattern(XPGPanel):
+
+    
     def __init__(self,console,master,label="Preview",**params):
 	super(TestPattern,self).__init__(console,master,label,**params)
 
 
-        self.title("Test Pattern") # CB: gets written over by something else, anyway...
-        
-        self.INITIAL_PLOT_HEIGHT = 100
         self.padding = 2
         self.auto_refresh=True
 
@@ -84,8 +83,6 @@ class TestPattern(XPGPanel):
 
         ### learning buttons
         #
-        # CEBHACKALERT: I think this doesn't work at the moment;
-        # certainly one of the relevant methods is commented out.
         self.learning = IntVar()
         self.learning.set(0)
         self.learning_button = Checkbutton(self,text='Network Learning',
@@ -93,6 +90,7 @@ class TestPattern(XPGPanel):
         self.learning_button.pack(side=TOP)
         self.balloon.bind(self.learning_button,
 """Whether to enable learning during presentation.""")
+
         # buttonBox.add('Use for future learning',command = self.use_for_learning)
 
 
@@ -400,3 +398,6 @@ Each type will have various parameters that can be changed.""")
                 newpattern.ydensity = o_s_p['generator_sheet'].ydensity
 
                 o_s_p['pattern_generator'] = newpattern
+
+
+
