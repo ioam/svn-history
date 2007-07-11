@@ -206,17 +206,12 @@ class FeatureResponses(ParameterizedObject):
 
 ### JABALERT: This class needs significant cleanup:
 
-### 
-### 2. This class should calculate RFs for all units in all sheets for which
-###    measure_maps is true, rather than being hardcoded to "V1"
-###
-###
 ### 4. The plotting code at the end should mostly be eliminated, and replaced
 ###    with a separate command (called from the 'Receptive Fields*' pgts in
 ###    topo/commands/analysis.py instead of from here), sharing the implementation
 ###    of topographic_grid (because that's what is intended to be visualized here).
 
-grid=[] # CB: why's this here? Is it built up over time somewhere else? Can't it be
+grid={} # CB: why's this here? Is it built up over time somewhere else? Can't it be
         # an attribute like _featureresponses in FeatureResponses?
         # (Ah, I see it's accessed for plotting from the GUI (or wherever)...surely
         #  there's a better way.)
@@ -233,17 +228,14 @@ class ReverseCorrelation(FeatureResponses):
 
         assert hasattr(self.input_sheet,'shape')
         
-        v1_shape = topo.sim['V1'].activity.shape
-
-        global grid
-        grid = numpy.ones(v1_shape,dtype=object) 
-
         # surely there's a way to get an array of 0s for each element without
         # looping? (probably had same question for distributionmatrix).
-        rows,cols = v1_shape
-        for r in range(rows):
-            for c in range(cols):
-                grid[r,c] = numpy.zeros(self.input_sheet.shape) # need to specify dtype?
+        for sheet in self.sheets_to_measure():
+            grid[sheet]= numpy.ones(sheet.activity.shape,dtype=object) 
+            rows,cols = sheet.activity.shape
+            for r in range(rows):
+                for c in range(cols):
+                    grid[sheet][r,c] = numpy.zeros(self.input_sheet.shape) # need to specify dtype?
         
 
     def measure_responses(self,pattern_presenter,param_dict,features,display):
@@ -271,28 +263,32 @@ class ReverseCorrelation(FeatureResponses):
         from topo.base.arrayutils import centroid
 
         # CB: make clearer (by doing in a more numpy way)
-        xx=[]
-        yy=[]
-        rows,cols = grid.shape
-        for iii in range(rows): 
-            for jjj in range(cols):
-                # The abs() ensures the centroid is taken over both 
-                # positive and negative correlations
-                xxx,yyy = centroid(fabs(grid[iii,jjj]))
-                xx.append(xxx)
-                yy.append(yyy)
-    
-        pylab.scatter(xx,yy)
+        # CB: only last plot hangs around because plots are overwritten
         pylab.show._needmain = False
-        pylab.show()
+        
+        for g in grid.values():
+            xx=[]
+            yy=[]
+            rows,cols = g.shape
+            for iii in range(rows): 
+                for jjj in range(cols):
+                    # The abs() ensures the centroid is taken over both 
+                    # positive and negative correlations
+                    xxx,yyy = centroid(fabs(g[iii,jjj]))
+                    xx.append(xxx)
+                    yy.append(yyy)
+
+            pylab.scatter(xx,yy)
+            pylab.show()
         ####################################################################################
 
 
     def _update(self,permutation):
-        rows,cols = grid.shape
-        for ii in range(rows): 
-            for jj in range(cols):
-                grid[ii,jj]+=topo.sim["V1"].activity[ii,jj]*topo.sim["Retina"].activity
+        for sheet in self.sheets_to_measure():
+            rows,cols = sheet.activity.shape
+            for ii in range(rows): 
+                for jj in range(cols):
+                    grid[sheet][ii,jj]+=sheet.activity[ii,jj]*self.input_sheet.activity
 
 
 
