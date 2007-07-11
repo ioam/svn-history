@@ -10,6 +10,7 @@ import time
 import copy
 from math import fmod,floor
 
+import numpy
 from numpy import zeros, array
 from numpy.oldnumeric import Float
 
@@ -17,7 +18,7 @@ import topo
 import topo.base.sheetcoords
 from topo.base.sheet import Sheet, activity_type
 from topo.base.sheetview import SheetView
-from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.parameterizedobject import ParameterizedObject,Parameter
 from topo.misc.utils import cross_product, frange
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.commands.basic import restore_input_generators, save_input_generators
@@ -61,7 +62,8 @@ class DistributionMatrix(ParameterizedObject):
 
     def __make_pairs(self,new_values,bin):
         """For a given bin, transform a matrix of values into a matrix of dictionaries {bin:element}."""
-        
+
+        # CBALERT: should be updated to dtype=object ?
         new_matrix=zeros(new_values.shape,'O')
         for i in range(len(new_values)):
             for j in range(len(new_values[i])):
@@ -134,7 +136,8 @@ class FeatureResponses(ParameterizedObject):
     # to a specific projection, rather than measure the map due
     # to all projections.
 
-    def __init__(self,features):
+    def __init__(self,features,**params):
+        super(FeatureResponses,self).__init__(**params)
         self.initialize_featureresponses(features)
         
     def initialize_featureresponses(self,features):
@@ -207,8 +210,6 @@ class FeatureResponses(ParameterizedObject):
 ### 2. This class should calculate RFs for all units in all sheets for which
 ###    measure_maps is true, rather than being hardcoded to "V1"
 ###
-### 3. This class should have some sort of parameter for specifying the name
-###    of the input region, rather than being hardcoded to "Retina"
 ###
 ### 4. The plotting code at the end should mostly be eliminated, and replaced
 ###    with a separate command (called from the 'Receptive Fields*' pgts in
@@ -216,7 +217,9 @@ class FeatureResponses(ParameterizedObject):
 ###    of topographic_grid (because that's what is intended to be visualized here).
 
 grid=[] # CB: why's this here? Is it built up over time somewhere else? Can't it be
-        # an attribute like _featureresponses in FeatureResponses? 
+        # an attribute like _featureresponses in FeatureResponses?
+        # (Ah, I see it's accessed for plotting from the GUI (or wherever)...surely
+        #  there's a better way.)
 
 class ReverseCorrelation(FeatureResponses):
     """
@@ -224,28 +227,33 @@ class ReverseCorrelation(FeatureResponses):
     """
     # CB: Can't we have a better class hierarchy?
 
-    def __init__(self,features=None):
-        self.initialize_featureresponses(features)
+    input_sheet = Parameter(default=None)
+
+    def initialize_featureresponses(self,features): # CB: doesn't need features!
+
+        assert hasattr(self.input_sheet,'shape')
         
-    def initialize_featureresponses(self,features):
-        pass 
+        v1_shape = topo.sim['V1'].activity.shape
+
+        global grid
+        grid = numpy.ones(v1_shape,dtype=object) 
+
+        # surely there's a way to get an array of 0s for each element without
+        # looping? (probably had same question for distributionmatrix).
+        rows,cols = v1_shape
+        for r in range(rows):
+            for c in range(cols):
+                grid[r,c] = numpy.zeros(self.input_sheet.shape) # need to specify dtype?
+        
 
     def measure_responses(self,pattern_presenter,param_dict,features,display):
         """Present the given input patterns and collate the responses."""
 
-
-        ##################################################
-        # JABALERT: The grid data structure should be a matrix of 2D matrices,
-        # not a nested list.
-        global grid
-        rows, cols = topo.sim["V1"].activity.shape
-        for iiii in range(rows):
-            row = []        
-            for jjjj in range(cols):
-                row.append(0*topo.sim["Retina"].activity)
-            grid.append(row)
-        self.rows,self.cols = rows,cols
-        ##################################################
+        # Since input_sheet's not fixed, we have to call this. Means that there are
+        # normally duplicate calls (e.g. gets called by __init__ and then gets called
+        # here for no reason except maybe the input_sheet got changed). Would be better
+        # to have the input_sheet fixed.
+        self.initialize_featureresponses(features) 
         
         super(ReverseCorrelation,self).measure_responses(pattern_presenter,param_dict,
                                                          features,display)
@@ -262,13 +270,15 @@ class ReverseCorrelation(FeatureResponses):
         from numpy import fabs
         from topo.base.arrayutils import centroid
 
+        # CB: make clearer (by doing in a more numpy way)
         xx=[]
-        yy=[]  
+        yy=[]
+        rows,cols = grid.shape
         for iii in range(rows): 
             for jjj in range(cols):
                 # The abs() ensures the centroid is taken over both 
                 # positive and negative correlations
-                xxx,yyy = centroid(fabs(grid[iii][jjj]))
+                xxx,yyy = centroid(fabs(grid[iii,jjj]))
                 xx.append(xxx)
                 yy.append(yyy)
     
@@ -279,9 +289,10 @@ class ReverseCorrelation(FeatureResponses):
 
 
     def _update(self,permutation):
-        for ii in range(self.rows): 
-            for jj in range(self.cols):
-                grid[ii][jj]=grid[ii][jj]+topo.sim["V1"].activity[ii,jj]*(topo.sim["Retina"].activity)
+        rows,cols = grid.shape
+        for ii in range(rows): 
+            for jj in range(cols):
+                grid[ii,jj]+=topo.sim["V1"].activity[ii,jj]*topo.sim["Retina"].activity
 
 
 
