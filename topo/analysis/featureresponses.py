@@ -184,22 +184,19 @@ class FeatureResponses(ParameterizedObject):
 
 
     def present_permutation(self,permutation):
-
         topo.sim.state_push()
-
-        # Present input patterns
         settings = dict(zip(self.feature_names, permutation))
         self.pattern_presenter(settings,self.param_dict)
-
         if self.refresh_act_wins:topo.guimain.refresh_activity_windows()
+        self._update(permutation)
+        topo.sim.state_pop()
 
+
+    def _update(self,permutation):
         # Update each DistributionMatrix with (activity,bin)
         for sheet in self.sheets_to_measure():
             for feature,value in zip(self.feature_names, permutation):
                 self._featureresponses[sheet][feature].update(sheet.activity, value)
-
-        topo.sim.state_pop()
-
         
 
 
@@ -235,7 +232,9 @@ class ReverseCorrelation(FeatureResponses):
 
     def measure_responses(self,pattern_presenter,param_dict,features,display):
         """Present the given input patterns and collate the responses."""
-         
+
+
+        ##################################################
         # JABALERT: The grid data structure should be a matrix of 2D matrices,
         # not a nested list.
         global grid
@@ -245,14 +244,14 @@ class ReverseCorrelation(FeatureResponses):
             for jjjj in range(cols):
                 row.append(0*topo.sim["Retina"].activity)
             grid.append(row)
-
-        # CEBHACKALERT 
         self.rows,self.cols = rows,cols
+        ##################################################
         
         super(ReverseCorrelation,self).measure_responses(pattern_presenter,param_dict,
                                                          features,display)
                                                          
-        
+
+        ####################################################################################
         ### JABALERT: The remaining code should move into a separate command in
         ### topo/commands/pylabplots.py, and it should be changed to
         ### use the code from topographic_grid (because that's what
@@ -276,22 +275,14 @@ class ReverseCorrelation(FeatureResponses):
         pylab.scatter(xx,yy)
         pylab.show._needmain = False
         pylab.show()
+        ####################################################################################
 
 
-    def present_permutation(self,permutation):
-        topo.sim.state_push()
-
-        # Present input patterns
-        settings = dict(zip(self.feature_names, permutation))
-        self.pattern_presenter(settings,self.param_dict)
-
-        if self.refresh_act_wins:topo.guimain.refresh_activity_windows()
-
+    def _update(self,permutation):
         for ii in range(self.rows): 
             for jj in range(self.cols):
                 grid[ii][jj]=grid[ii][jj]+topo.sim["V1"].activity[ii,jj]*(topo.sim["Retina"].activity)
 
-        topo.sim.state_pop()
 
 
                           
