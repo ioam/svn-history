@@ -400,7 +400,9 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         if 'plot' in self._right_click_info:
             plot = self._right_click_info['plot']
             x,y =  self._right_click_info['coords'][0]
-            matrixplot(topo.analysis.featureresponses.grid[x][y],title=("Receptive Field",x,y))
+            sheet = topo.sim[plot.plot_src_name]
+            # CB: not sure how title works for matrixplot - might need to be formatted better
+            matrixplot(topo.analysis.featureresponses.grid[sheet][x,y],title=("Receptive Field",sheet.name,x,y))
 
     def __process_canvas_event(self,event,func):
         """
