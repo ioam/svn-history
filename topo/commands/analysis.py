@@ -396,7 +396,8 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
 pgt= new_pgt(name='Receptive Fields',category="Other",
              doc='Measure receptive fields.', command='measure_rfs()', normalize=True)
 
-# CEB: can we have some default option for input_sheet?
+# CEB: can we have some default option for input_sheet? should the ReverseCorrelation parameter
+# be a name, which could default to 'Retina'?
 def measure_rfs(input_sheet,divisions=10,scale=30.0,offset=0.5,display=False,
                 pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),True,duration=1.0),
                 x_range=(-0.2,0.2),y_range=(-0.2,0.2)): #weighted_average=False)
