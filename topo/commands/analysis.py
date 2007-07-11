@@ -396,15 +396,14 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
 pgt= new_pgt(name='Receptive Fields',category="Other",
              doc='Measure receptive fields.', command='measure_rfs()', normalize=True)
 
-def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
-                pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),True,duration=1.0),             x_range=(-0.2,0.2),y_range=(-0.2,0.2),weighted_average=False):
+# CEB: can we have some default option for input_sheet?
+def measure_rfs(input_sheet,divisions=10,scale=30.0,offset=0.5,display=False,
+                pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),True,duration=1.0),
+                x_range=(-0.2,0.2),y_range=(-0.2,0.2)): #weighted_average=False)
     """Map receptive field on a GeneratorSheet by reverse correlation using small Gaussian inputs."""
-
 
     # CEBALERT: various things in here need to be arguments
 
-    input_sheet = topo.sim['Retina']
-    
   # ALERT: THIS CRAZILY HIGH VALUE IS NECCESSARY FOR THE CURRENT LISSOM_OO_OR.TY 
   # NORMALLY A VALUE AROUND 0.5 TO 3.0 SEEMS OK....
     # Presents the pattern at each pixel location
