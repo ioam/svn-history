@@ -399,12 +399,18 @@ pgt= new_pgt(name='Receptive Fields',category="Other",
 def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
                 pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),True,duration=1.0),             x_range=(-0.2,0.2),y_range=(-0.2,0.2),weighted_average=False):
     """Map receptive field on a GeneratorSheet by reverse correlation using small Gaussian inputs."""
+
+
+    # CEBALERT: various things in here need to be arguments
+
+    input_sheet = topo.sim['Retina']
+    
   # ALERT: THIS CRAZILY HIGH VALUE IS NECCESSARY FOR THE CURRENT LISSOM_OO_OR.TY 
   # NORMALLY A VALUE AROUND 0.5 TO 3.0 SEEMS OK....
     # Presents the pattern at each pixel location
     resolution = 100 # percentage, 100 is max, 0 is min
-    l,b,r,t = topo.sim["Retina"].nominal_bounds.lbrt()
-    density=resolution*topo.sim["Retina"].nominal_density/100
+    l,b,r,t = input_sheet.nominal_bounds.lbrt()
+    density=resolution*input_sheet.nominal_density/100
     divisions = density*(r-l)-1
     size = 1/(density)
     x_range=(r,l)
@@ -422,7 +428,7 @@ def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
                           
         param_dict = {"size":size,"scale":scale,"offset":offset}
 
-        x=ReverseCorrelation(feature_values) #+change argument
+        x=ReverseCorrelation(feature_values,input_sheet=input_sheet) #+change argument
         x.measure_responses(pattern_presenter,param_dict,feature_values,display)
      
 
