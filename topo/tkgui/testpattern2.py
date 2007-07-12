@@ -40,8 +40,22 @@ from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X,NO,NONE
 DEFAULT_PRESENTATION = '1.0'
 
 
+from topo.plotting.plotgroup import XPlotGroup
+
+class TestPatternPlotGroup(XPlotGroup):
+    def __init__(self,**params):
+        super(TestPatternPlotGroup,self).__init__(**params)
+
+        
+
+    
+
+
 class TestPattern(XPGPanel):
 
+    sheet_type = GeneratorSheet
+    plotgroup_type = TestPatternPlotGroup
+    
     
     def __init__(self,console,master,label="Preview",**params):
 
@@ -52,6 +66,8 @@ class TestPattern(XPGPanel):
 
         # FIND GENERATOR SHEETS
         ###############################################################################################
+        self.plotgroup.params()['sheet'].range=topo.sim.objects(GeneratorSheet).values()
+        
         ### Find the GeneratorSheets in the simulation, set up generator_sheet_patterns dictionary
         # CEBALERT: this has a difficult structure to work with.
         # generator_sheets_patterns = 
