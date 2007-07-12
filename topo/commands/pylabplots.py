@@ -368,3 +368,38 @@ def plot_coord_mapping(mapper,sheet,style='b-'):
 
     hold(hold_on)
     
+
+### JABHACKALERT: rename & should be called from the 'Receptive
+### Fields*' pgts in topo/commands/analysis.py & should share the
+### implementation of topographic_grid (because that's what is
+### intended to be visualized here).
+def plotrctg():
+    
+    import matplotlib
+    matplotlib.use('TkAgg')
+    import pylab
+    from numpy import fabs
+    from topo.base.arrayutils import centroid
+
+    # CEBALERT: make clearer (by doing in a more numpy way)
+    # CEBHACKALERT: only last plot hangs around because plots are overwritten
+    pylab.show._needmain = False
+
+    # CEBHACKALERT: needs to be better linked!
+    from topo.analysis.featureresponses import grid
+    
+    for g in grid.values():
+        xx=[]
+        yy=[]
+        rows,cols = g.shape
+        for iii in range(rows): 
+            for jjj in range(cols):
+                # The abs() ensures the centroid is taken over both 
+                # positive and negative correlations
+                xxx,yyy = centroid(fabs(g[iii,jjj]))
+                xx.append(xxx)
+                yy.append(yyy)
+
+        pylab.scatter(xx,yy)
+        pylab.show()
+

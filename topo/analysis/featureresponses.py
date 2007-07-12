@@ -112,7 +112,7 @@ class DistributionMatrix(ParameterizedObject):
 
 
 
-# CB: currently working on FeatureResponses and ReverseCorrelation.
+# CB: currently working on FeatureResponses and ReverseCorrelation: need cleanup
 
 class FeatureResponses(ParameterizedObject):
     """
@@ -204,13 +204,6 @@ class FeatureResponses(ParameterizedObject):
 
 
 
-### JABALERT: This class needs significant cleanup:
-
-### 4. The plotting code at the end should mostly be eliminated, and replaced
-###    with a separate command (called from the 'Receptive Fields*' pgts in
-###    topo/commands/analysis.py instead of from here), sharing the implementation
-###    of topographic_grid (because that's what is intended to be visualized here).
-
 grid={} # CB: why's this here? Is it built up over time somewhere else? Can't it be
         # an attribute like _featureresponses in FeatureResponses?
         # (Ah, I see it's accessed for plotting from the GUI (or wherever)...surely
@@ -250,38 +243,6 @@ class ReverseCorrelation(FeatureResponses):
         super(ReverseCorrelation,self).measure_responses(pattern_presenter,param_dict,
                                                          features,display)
                                                          
-
-        ####################################################################################
-        ### JABALERT: The remaining code should move into a separate command in
-        ### topo/commands/pylabplots.py, and it should be changed to
-        ### use the code from topographic_grid (because that's what
-        ### is intended to be visualized here).
-        import matplotlib
-        matplotlib.use('TkAgg')
-        import pylab
-        from numpy import fabs
-        from topo.base.arrayutils import centroid
-
-        # CB: make clearer (by doing in a more numpy way)
-        # CB: only last plot hangs around because plots are overwritten
-        pylab.show._needmain = False
-        
-        for g in grid.values():
-            xx=[]
-            yy=[]
-            rows,cols = g.shape
-            for iii in range(rows): 
-                for jjj in range(cols):
-                    # The abs() ensures the centroid is taken over both 
-                    # positive and negative correlations
-                    xxx,yyy = centroid(fabs(g[iii,jjj]))
-                    xx.append(xxx)
-                    yy.append(yyy)
-
-            pylab.scatter(xx,yy)
-            pylab.show()
-        ####################################################################################
-
 
     def _update(self,permutation):
         for sheet in self.sheets_to_measure():
