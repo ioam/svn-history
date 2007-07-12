@@ -40,7 +40,7 @@ from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X,NO,NONE
 
 from tkparameterizedobject import ButtonParameter
 
-DEFAULT_PRESENTATION = '1.0'
+DEFAULT_PRESENTATION = 1.0
 
 
 from topo.plotting.plotgroup import XPlotGroup
@@ -242,7 +242,7 @@ Each type will have various parameters that can be changed.""")
         """
         Reset to default presentation length, no learning, and the original PatternGenerator.
         """
-        self.present_length.setvalue(DEFAULT_PRESENTATION)
+        self.duration=DEFAULT_PRESENTATION
         #self.learning_button.deselect()
         self.pg_choice_box.invoke(self.__default_pattern_generator_name)
         if self.auto_refresh: self.refresh()
