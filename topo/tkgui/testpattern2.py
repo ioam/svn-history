@@ -306,7 +306,7 @@ Each type will have various parameters that can be changed.""")
 	self.refresh()
 
     def set_integerscaling(self):
-        if self.integerscaling:#.get():
+        if self.integerscaling:
             self.plotgroup.sizeconvertfn = int
         else:
             self.plotgroup.sizeconvertfn = identity
@@ -314,20 +314,7 @@ Each type will have various parameters that can be changed.""")
     ###############################################################################################
 
 
-
-
-    ### JCALERT! This has to be re-implemented for testpattern, it has to be done in a better way:
-    ### it does not work for integerscaling being on.
     def update_plotgroup_variables(self):
-        """
-        Replace the superclass do_plot_cmd.
-        Create a PlotGroup that has a list of Plots that have been
-        created from a set of activities defined by the user. We
-        don't need a completely new PlotGroup type for this temporary
-        plot.
-
-        Return self.pe_group which contains a PlotGroup.
-        """
         plot_list = []       
         for each in self.generator_sheets_patterns.keys():
             view_dict = {}
@@ -342,20 +329,8 @@ Each type will have various parameters that can be changed.""")
 	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
 	    plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
 
-
-        # CEBHACKALERT (** change   any point marking hackalerts in here?
-	new_plotgroup = self.generate_plotgroup() #topo.plotting.plotgroup.PlotGroup(plot_list)
-        new_plotgroup.plot_list = plot_list
-	new_plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot
-	new_plotgroup.initial_plot = self.plotgroup.initial_plot
-	new_plotgroup.sheetcoords = self.plotgroup.sheetcoords
-	new_plotgroup.integerscaling = self.plotgroup.integerscaling
-	new_plotgroup.sizeconvertfn = self.plotgroup.sizeconvertfn
-	new_plotgroup.normalize = self.plotgroup.normalize
-	new_plotgroup.minimum_height_of_tallest_plot = self.plotgroup.minimum_height_of_tallest_plot
-	new_plotgroup.time = topo.sim.time()
-
-	self.plotgroup = new_plotgroup
+        self.plotgroup.plot_list = plot_list
+	self.plotgroup.time = topo.sim.time()
  				
     
 
