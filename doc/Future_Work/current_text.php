@@ -132,7 +132,7 @@ while it's being setup.
 
 
 <H4>2007/05/18 (CB): gradient plots </H4>
-Correct, finish and test.
+[see SF bug tracker]
 
 
 <H4>2006/03/26 (CB): scheduled_actions in lissom examples</H4>
