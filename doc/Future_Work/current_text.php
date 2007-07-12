@@ -28,6 +28,11 @@ with no initials are not (yet) assigned to a specific developer (so
 please feel free to volunteer!!!!). Dates indicate when the item was
 first added to the list, or a change was made.
 
+<P>We are slowly changing over to use sourceforge's <a
+href="http://sourceforge.net/tracker/?group_id=53602">trackers</a>, so
+please also check there. Ideally, new tasks should be submitted to a
+tracker.
+
 
 
 
@@ -275,29 +280,6 @@ Strange Projection plots.
 
 
 <H2>Things we hope to take care of eventually</H2>
-
-
-<H4>2007/06/10: test results on the web</H4>
-Results of nightly (GMT) 'make tests' and 'make slow-tests' are available at
-<a href="http://topographica.org/Tests/">topographica.org/Tests/</a>.<BR>
-The mechanism is very rough: after a 'cvs update -A -P -d', the output
-of make tests is extracted to a webpage named with the date, and the
-output of make slow-tests is saved as a text file (also named with the
-date).  It's obvious if a unit test fails, but 'make slow-tests >
-file' does not capture tracebacks in file, so to see if a slow-test
-failed you have to look for *missing* 'Results from X have not
-changed...' statements!
-<BR>
-For code, see doozy.inf.ed.ac.uk:/home/ceball/webtests/topographica/tester  
-<ul>
-<li>Should replace this system when slow-tests etc are done with a python file rather than a Makefile; why 
-do we have to write and maintain all the testing mechanisms (apart from that for the unit tests) - isn't 
-there some other python package to help?</li>
-<li>Should do make clean and make first to test that too, and to get external upgrades.</li>
-<li>Doesn't python's unittest already have web formatting somewhere?</li>
-Consider: http://tungwaiyip.info/software/HTMLTestRunner.htm
-Consider buildbot: http://buildbot.sourceforge.net/, http://buildbot.scipy.org/
-</ul>
 
 
 <H4>2007/05/29 (JP) Mac GUI cleanup</H4>
@@ -787,12 +769,6 @@ Python.
 
 <H4>2006/02/21 (all): documentation, unit tests</H4>
 Improving both, plus eliminating ALERTs.
-
-
-<H4>2007/03/26 (CB): Build topographica on windows </H4>
-With free compiler (python for windows is built with a Microsoft
-compiler). Maybe use pymingw? Or cygwin? Currently trying cygwin, with
-some success.
 
 			     
 <H4>2007/03/14 (CB): gnosis.xml.pickle </H4>
