@@ -51,7 +51,7 @@ class TestPatternPlotGroup(XPlotGroup):
 
         
 
-    
+from topo.plotting.plotgroup import RangedParameter
 
 
 class TestPattern(XPGPanel):
@@ -64,23 +64,39 @@ class TestPattern(XPGPanel):
 
     present = ButtonParameter(doc="""Present this pattern to the simulation.""")
     reset = ButtonParameter(doc="""Reset the parameters for this pattern back to their defaults.""")
+
+    pattern_generator = RangedParameter(doc="""Type of pattern to present. Each type will have various parameters that can be changed.""")
     
     
     def __init__(self,console,master,label="Preview",**params):
 	super(TestPattern,self).__init__(console,master,label,**params)
         self.auto_refresh=True
 
+        #self.plotgroup.params()['sheet'].range=topo.sim.objects(GeneratorSheet).values()
 
-        # FIND GENERATOR SHEETS
-        ###############################################################################################
-        self.plotgroup.params()['sheet'].range=topo.sim.objects(GeneratorSheet).values()
-        
-        ### Find the GeneratorSheets in the simulation, set up generator_sheet_patterns dictionary
-        # {generator_sheet_name:pattern_generator}
+
+        gsig = GeneratorSheet.classparams()['input_generator']
+
+        pgparam = self.params()['pattern_generator']
+        pgparam.range = [pg() for pg in gsig.range().values()]
+        self.pattern_generator = gsig.default()
+        #pgparam.default = GeneratorSheet.classparams()['input_generator'].default        
+        self.pack_param('pattern_generator',on_change=self.change_pattern_generator)
+
+
+        # Because this window applies changes to an object immediately
+        # (unlike ParametersFrame), the button to 'reset' is
+        # 'Defaults'. 'Reset' would do nothing.
+        self.params_frame = parametersframe.ParametersFrame(self,buttons_to_remove=['Apply','Close','Reset'])
+
+
+        self.params_frame.create_widgets(self.pattern_generator) 
+        self.params_frame.pack(side=TOP,expand=YES,fill=X)
+
+
+        ### Find generator sheets        
         self.generator_sheets_patterns = dict.fromkeys(topo.sim.objects(GeneratorSheet),None)
-                                                              
-            # editing 'pattern_generator': None} 
-        ###############################################################################################
+
 
 
         self.pack_param('learning')
@@ -89,49 +105,12 @@ class TestPattern(XPGPanel):
         self.pack_param('present',on_change=self.present_pattern)
         self.pack_param('reset',on_change=self.reset_to_defaults)
         
-
-
-        # LIST OF PATTERNGENERATORS
-        ###############################################################################################
-        pattern_generators = GeneratorSheet.classparams()['input_generator'].range()
         
-        self.pattern_generators = KeyedList()
-        self.pattern_generators.update(pattern_generators)
-        self.pattern_generators.sort()  # sorted so the pgs appear alphabetically
-
-        self.__current_pattern_generator = GeneratorSheet.classparams()['input_generator'].default
-        self.__current_pattern_generator_name = StringVar()
-
-        for (pg_name,pg) in self.pattern_generators.items():
-            if pg==type(self.__current_pattern_generator):
-                self.__current_pattern_generator_name.set(pg_name)
-                self.__default_pattern_generator_name = pg_name 
+        # CB: remember
+        # - to remove audiogen
+        # - editing 'pattern_generator': None} 
 
 
-        # PatternGenerator choice box
-        self.pg_choice_box = Pmw.OptionMenu(self,
-                                            command = self.__change_pattern_generator,
-                                            labelpos = 'w',
-                                            label_text = 'Pattern generator:',
-                                            menubutton_textvariable = self.__current_pattern_generator_name,
-                                            items = self.pattern_generators.keys())
-        self.pg_choice_box.pack(side=TOP)
-        self.balloon.bind(self.pg_choice_box,
-"""Type of pattern to present.
-Each type will have various parameters that can be changed.""")
-        # (remember to remove audiogen)
-        ###############################################################################################
-
-
-        # PARAMETERSFRAME
-        ###############################################################################################
-        # Because this window applies changes to an object immediately
-        # (unlike ParametersFrame), the button to 'reset' is
-        # 'Defaults'. 'Reset' would do nothing.
-        self.__params_frame = parametersframe.ParametersFrame(self,buttons_to_remove=['Apply','Close','Reset'])
-        self.__params_frame.create_widgets(self.__current_pattern_generator)
-        self.__params_frame.pack(side=TOP,expand=YES,fill=X)
-        ###############################################################################################
         
 
         # SELECT GENERATORSHEET BUTTONS
@@ -154,7 +133,7 @@ Each type will have various parameters that can be changed.""")
         ###############################################################################################
             
 
-        self.__change_pattern_generator(self.__current_pattern_generator_name.get())
+        
 	self.refresh()
 
 
@@ -178,7 +157,6 @@ Each type will have various parameters that can be changed.""")
         super(TestPattern,self).refresh()
 
 
-
     # METHODS FOR BUTTONS
     ###############################################################################################
     def _input_change(self,button_name, checked):
@@ -192,19 +170,16 @@ Each type will have various parameters that can be changed.""")
         #if not self.generator_sheets_patterns[button_name]['editing']:
         #    self.generator_sheets_patterns[button_name]['pattern_generator'] = copy.copy(self.__current_pattern_generator)
         #else:
-        if self.auto_refresh:
-            self.__setup_pattern_generators()
-            self.refresh()
+        self.__setup_pattern_generators()
+        if self.auto_refresh:self.refresh()
         
-    def __change_pattern_generator(self,pattern_generator_name):
+    def change_pattern_generator(self):
         """
         Set the current PatternGenerator to the one selected and get the
         ParametersFrame to draw the relevant widgets
         """
-        self.__current_pattern_generator = self.pattern_generators[pattern_generator_name]()
-        self.__params_frame.create_widgets(self.__current_pattern_generator)
-        if self.auto_refresh: 
-	    self.refresh()
+        if self.pattern_generator is not None: self.params_frame.create_widgets(self.pattern_generator) 
+        if self.auto_refresh: self.refresh()
 
     def present_pattern(self):
         """
@@ -230,7 +205,7 @@ Each type will have various parameters that can be changed.""")
         """
         self.duration=DEFAULT_PRESENTATION
         #self.learning_button.deselect()
-        self.pg_choice_box.invoke(self.__default_pattern_generator_name)
+        #self.pg_choice_box.invoke(self.__default_pattern_generator_name)
         if self.auto_refresh: self.refresh()
 
     ###############################################################################################
@@ -269,12 +244,12 @@ Each type will have various parameters that can be changed.""")
         """
         # CB: remember to replace disparity flip stuff.
         
-        self.__params_frame.set_parameters()
+        self.params_frame.set_parameters()
 
         for sheetname in self.generator_sheets_patterns:
             #if o_s_p['editing']==True:
                 
-            newpattern = copy.deepcopy(self.__params_frame.parameterized_object)
+            newpattern = copy.deepcopy(self.params_frame.parameterized_object)
 
             sheet = topo.sim[sheetname]
             
