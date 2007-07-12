@@ -296,21 +296,6 @@ Each type will have various parameters that can be changed.""")
         self.pg_choice_box.invoke(self.__default_pattern_generator_name)
         if self.auto_refresh: self.refresh()
 
-    def set_normalize(self):
-	self.plotgroup.update_plots(False)
-	self.refresh()
-
-    def set_sheetcoords(self):
-	self.plotgroup.update_plots(False)
-	self.display_plots()
-	self.refresh()
-
-    def set_integerscaling(self):
-        if self.integerscaling:
-            self.plotgroup.sizeconvertfn = int
-        else:
-            self.plotgroup.sizeconvertfn = identity
-	self.refresh()
     ###############################################################################################
 
 
