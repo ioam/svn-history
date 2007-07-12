@@ -76,17 +76,10 @@ class TestPattern(XPGPanel):
         self.plotgroup.params()['sheet'].range=topo.sim.objects(GeneratorSheet).values()
         
         ### Find the GeneratorSheets in the simulation, set up generator_sheet_patterns dictionary
-        # CEBALERT: this has a difficult structure to work with.
-        # generator_sheets_patterns = 
-        # {generator_sheet_name:  { 'generator_sheet': <gs_obj>,
-        #                           'editing': True/False,
-        #                           'pattern_generator': <pg_obj> }
-        #                         }    
-        self.generator_sheets_patterns = {}
-        for (gen_sheet_name,gen_sheet) in topo.sim.objects(GeneratorSheet).items():
-            self.generator_sheets_patterns[gen_sheet_name] = {'generator_sheet': gen_sheet,
-                                                              'editing': True,
-                                                              'pattern_generator': None} 
+        # {generator_sheet_name:pattern_generator}
+        self.generator_sheets_patterns = dict.fromkeys(topo.sim.objects(GeneratorSheet),None)
+                                                              
+            # editing 'pattern_generator': None} 
         ###############################################################################################
 
 
@@ -100,14 +93,7 @@ class TestPattern(XPGPanel):
 
         # LIST OF PATTERNGENERATORS
         ###############################################################################################
-        ### Menu of PatternGenerator types
-        # Take the list of PatternGenerators from the first
-        # GeneratorSheet's input_generator PatternGeneratorParameter.
-        # pattern_generators = {'Pattern': <PatternGenerator_obj>}
-        for generator_sheet_name in self.generator_sheets_patterns.values():
-            generator_sheet_params = generator_sheet_name['generator_sheet'].params()
-            pattern_generators = generator_sheet_params['input_generator'].range()
-            break
+        pattern_generators = GeneratorSheet.classparams()['input_generator'].range()
         
         self.pattern_generators = KeyedList()
         self.pattern_generators.update(pattern_generators)
@@ -201,14 +187,14 @@ Each type will have various parameters that can be changed.""")
         all input event processors, and whether they are checked or
         not.
         """
-        self.generator_sheets_patterns[button_name]['editing'] = checked
+        #self.generator_sheets_patterns[button_name]['editing'] = checked
 
-        if not self.generator_sheets_patterns[button_name]['editing']:
-            self.generator_sheets_patterns[button_name]['pattern_generator'] = copy.copy(self.__current_pattern_generator)
-        else:
-            if self.auto_refresh:
-                self.__setup_pattern_generators()
-                self.refresh()
+        #if not self.generator_sheets_patterns[button_name]['editing']:
+        #    self.generator_sheets_patterns[button_name]['pattern_generator'] = copy.copy(self.__current_pattern_generator)
+        #else:
+        if self.auto_refresh:
+            self.__setup_pattern_generators()
+            self.refresh()
         
     def __change_pattern_generator(self,pattern_generator_name):
         """
@@ -229,8 +215,8 @@ Each type will have various parameters that can be changed.""")
 	topo.sim.state_push()
         self.__setup_pattern_generators()
 
-        input_dict = dict([(name,d['pattern_generator'])
-                           for (name,d) in self.generator_sheets_patterns.items()])
+        input_dict = dict([(name,pg)
+                           for name,pg in self.generator_sheets_patterns.items()])
         
         pattern_present(input_dict,self.duration,
                         learning=self.learning,overwrite_previous=False)
@@ -252,16 +238,15 @@ Each type will have various parameters that can be changed.""")
 
     def update_plotgroup_variables(self):
         plot_list = []       
-        for each in self.generator_sheets_patterns.keys():
+        for sheetname,pg in self.generator_sheets_patterns.items():
             view_dict = {}
-            k = self.generator_sheets_patterns[each]['pattern_generator']
             # xdensity and ydensity are the same for the pattern_generator
             # because they were set from a Sheet xdensity and ydensity,
             # which are guaranteed to be the same
-	    density = k.xdensity
+	    density = pg.xdensity
             
-	    view_dict[each] = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each)
-	    channels = {'Strength':each,'Hue':None,'Confidence':None}
+	    view_dict[sheetname] = topo.base.sheetview.SheetView((pg(),pg.bounds),src_name=sheetname)
+	    channels = {'Strength':sheetname,'Hue':None,'Confidence':None}
 	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
 	    plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
 
@@ -286,16 +271,18 @@ Each type will have various parameters that can be changed.""")
         
         self.__params_frame.set_parameters()
 
-        for (gs_name,o_s_p) in self.generator_sheets_patterns.items():
-            if o_s_p['editing']==True:
+        for sheetname in self.generator_sheets_patterns:
+            #if o_s_p['editing']==True:
                 
-                newpattern = copy.deepcopy(self.__params_frame.parameterized_object)
+            newpattern = copy.deepcopy(self.__params_frame.parameterized_object)
 
-                newpattern.bounds   = copy.deepcopy(o_s_p['generator_sheet'].bounds)
-                newpattern.xdensity = o_s_p['generator_sheet'].xdensity
-                newpattern.ydensity = o_s_p['generator_sheet'].ydensity
+            sheet = topo.sim[sheetname]
+            
+            newpattern.bounds   = copy.deepcopy(sheet.bounds)
+            newpattern.xdensity = sheet.xdensity
+            newpattern.ydensity = sheet.ydensity
 
-                o_s_p['pattern_generator'] = newpattern
+            self.generator_sheets_patterns[sheetname] = newpattern
 
 
 
