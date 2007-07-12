@@ -390,11 +390,11 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
         param_dict = {"size":size,"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
-       
+
 
 ###############################################################################
 pgt= new_pgt(name='Receptive Fields',category="Other",
-             doc='Measure receptive fields.', command='measure_rfs()', normalize=True)
+             doc='Measure receptive fields.', command='measure_rfs();plotrctg()', normalize=True)
 
 # CEB: can we have some default option for input_sheet? should the ReverseCorrelation parameter
 # be a name, which could default to 'Retina'?
@@ -435,11 +435,11 @@ def measure_rfs(input_sheet,divisions=10,scale=30.0,offset=0.5,display=False,
 ###############################################################################
 pgt= new_pgt(name='Receptive Fields noise',category="Other",
              doc='Measure receptive fields by reverse correlation using random noise.',
-             command='measure_rfs_noise()',normalize=True)
+             command='measure_rfs_noise();plotrctg()',normalize=True)
                         
 
 ### JABALERT: Why is the scale and offset set twice?                                    
-def measure_rfs_noise(divisions=99,scale=0.5,offset=0.5,display=False,
+def measure_rfs_noise(input_sheet,divisions=99,scale=0.5,offset=0.5,display=False,
                       pattern_presenter=PatternPresenter(GaussianRandom(scale=0.5,offset=0.5),True,duration=1.0),
                       x_range=(-1.0,1.0),y_range=(-1.0,1.0)):
     """Map receptive field on a GeneratorSheet using Gaussian noise inputs."""
@@ -453,8 +453,11 @@ def measure_rfs_noise(divisions=99,scale=0.5,offset=0.5,display=False,
                           
         param_dict = {"scale":scale,"offset":offset}
 
-        x=ReverseCorrelation(feature_values)
+        x=ReverseCorrelation(feature_values,input_sheet=input_sheet)
         x.measure_responses(pattern_presenter,param_dict,feature_values,display)
+
+
+
 
 
 ###############################################################################
