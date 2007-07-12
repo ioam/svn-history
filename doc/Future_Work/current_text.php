@@ -39,19 +39,8 @@ tracker.
 <H2>Tasks to be addressed before the next release:</H2>
 
 <H4>2007/05/18: Add-on packages</H4>
-We should set up some way to handle Topographica components that are
-too unwieldy to be part of the main distribution, but that we want to
-work smoothly when they are present.  Roger's face work is a case in
-point -- it relies on a lot of external images and data files that we
-don't want to ship with every copy of Topographica.  The current
-approach of including the code with Topographica but not the data
-doesn't really work, because now when someone tries those menu options
-(such as measuring a face map or using the FaceSpace2D pattern
-generator), it fails because it can't find the files it needs.
-Instead, we should probably just have a single directory containing
-all the face code and data, which is maintained separately in CVS
-(like topographica-win is) and can be explicitly downloaded and
-installed.
+[See SF feature tracker]
+
 
 <H4>2007/04/21: Note for Windows users</H4>
 Where to put this note? Working from the cmd.exe on Windows, single
@@ -71,11 +60,7 @@ Maybe it's getting daunting?
 
 <H4>2007/04/20: Fix the code in PlotGroup for calculating the minimum
 plot sizes in the GUI</H4>
-The minimum needs to be calculated independently for the
-Sheet and non-Sheet coordinate cases.  Somewhat tricky due to how
-_calculate_minimum_height_of_tallest_plot() also sets minimum_height;
-it all needs to be cleaned up so that the actual minimum is enforced,
-so that plots don't end up being so large.
+[See SF bug tracker]
 
 <H4>2007/07/07: more tests </H4>
 We need a test with non-square input sheets, non-square LISSOM sheets, etc., 
@@ -84,13 +69,7 @@ map measurement that we can (e.g. or maps).
 
 
 <H4>2007/04/29: Weight seeds</H4>
-Instead of relying on numpy.random's global seed, should explicitly
-have a random number generator object in ConnectionField or
-CFProjection.  That way it will be more obvious what that seed
-controls, and the values won't depend on anything else that uses that
-seed value (such as some of the SciPy statistics routines,
-apparently).  All of the example files will need updating, but this
-shouldn't be difficult otherwise.
+[See SF feature tracker]
 
 
 <H4>2007/04/10 (JB): Add an example that is a good starting point for</H4>
