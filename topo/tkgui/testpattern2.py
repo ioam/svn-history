@@ -21,6 +21,7 @@ import topo
 
 import topo.base.patterngenerator
 import topo.base.sheetview
+from topo.base.parameterclasses import BooleanParameter,Number
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.commands.basic import pattern_present
@@ -36,6 +37,8 @@ from topo.plotting.plot import make_template_plot
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X,NO,NONE
 
+
+from tkparameterizedobject import ButtonParameter
 
 DEFAULT_PRESENTATION = '1.0'
 
@@ -55,12 +58,16 @@ class TestPattern(XPGPanel):
 
     sheet_type = GeneratorSheet
     plotgroup_type = TestPatternPlotGroup
+
+    learning = BooleanParameter(default=False,doc="""Whether to enable learning during presentation.""")
+    duration = Number(default=1.0,doc="""How long to run the simulator when presenting.""")
+
+    present = ButtonParameter(doc="""Present this pattern to the simulation.""")
+    reset = ButtonParameter(doc="""Reset the parameters for this pattern back to their defaults.""")
     
     
     def __init__(self,console,master,label="Preview",**params):
-
 	super(TestPattern,self).__init__(console,master,label,**params)
-
         self.auto_refresh=True
 
 
@@ -83,56 +90,12 @@ class TestPattern(XPGPanel):
         ###############################################################################################
 
 
-        # LEARNING BUTTON
-        ###############################################################################################
-        ### learning buttons
-        #
-        self.learning = IntVar()
-        self.learning.set(0)
-        self.learning_button = Checkbutton(self,text='Network Learning',
-                                      variable=self.learning)
-        self.learning_button.pack(side=TOP)
-        self.balloon.bind(self.learning_button,
-"""Whether to enable learning during presentation.""")
+        self.pack_param('learning')
+        self.pack_param('duration')
 
-        # (there was a) buttonBox.add('Use for future learning',command = self.use_for_learning)
-        ###############################################################################################
-
-
-        # DURATION BUTTON
-        ###############################################################################################
-        ### 'Duration to present' box
-        self.present_length = Pmw.EntryField(self,
-                labelpos = 'w',label_text = 'Duration to Present:',
-                value = DEFAULT_PRESENTATION,validate = {'validator' : 'real'},
-                command = self.present)
-        self.present_length.pack(fill=NONE, expand=NO, padx=10, pady=5)
-        self.balloon.bind(self.present_length,
-"""How long to run the simulator when presenting.""")
-        ###############################################################################################
-
-
-        # PRESENT BUTTON
-        ###############################################################################################
-        ### 'Present'/'reset to defaults' buttons  (i.e. re: patterns themselves)
-        buttonBox = Pmw.ButtonBox(self,orient = 'horizontal',padx=0,pady=0)
-        buttonBox.pack(side=TOP)
+        self.pack_param('present',on_change=self.present_pattern)
+        self.pack_param('reset',on_change=self.reset_to_defaults)
         
-        present_button = buttonBox.add('Present', command=self.present)
-        self.balloon.bind(present_button,
-"""Present this pattern to the simulation.""")
-        ###############################################################################################
-
-
-        # RESET BUTTON
-        ###############################################################################################
-        reset_button = buttonBox.add('Reset to defaults', command=self.reset_to_defaults)
-        self.balloon.bind(reset_button,
-"""Reset the parameters for this pattern back to their defaults.""")
-        ###############################################################################################
-
-
-
 
 
         # LIST OF PATTERNGENERATORS
@@ -174,11 +137,6 @@ Each type will have various parameters that can be changed.""")
         ###############################################################################################
 
 
-        
-
-        
-
-
         # PARAMETERSFRAME
         ###############################################################################################
         # Because this window applies changes to an object immediately
@@ -189,10 +147,6 @@ Each type will have various parameters that can be changed.""")
         self.__params_frame.pack(side=TOP,expand=YES,fill=X)
         ###############################################################################################
         
-
-
-
-
 
         # SELECT GENERATORSHEET BUTTONS
         ###############################################################################################
@@ -215,12 +169,7 @@ Each type will have various parameters that can be changed.""")
             
 
         self.__change_pattern_generator(self.__current_pattern_generator_name.get())
-        
-
 	self.refresh()
-
-
-
 
 
 
@@ -271,7 +220,7 @@ Each type will have various parameters that can be changed.""")
         if self.auto_refresh: 
 	    self.refresh()
 
-    def present(self):
+    def present_pattern(self):
         """
         Move the user created patterns into the GeneratorSheets, run for
         the specified length of time, then restore the original
@@ -279,10 +228,12 @@ Each type will have various parameters that can be changed.""")
         """
 	topo.sim.state_push()
         self.__setup_pattern_generators()
+
         input_dict = dict([(name,d['pattern_generator'])
                            for (name,d) in self.generator_sheets_patterns.items()])
-        pattern_present(input_dict,self.present_length.getvalue(),
-                        learning=self.learning.get(),overwrite_previous=False)
+        
+        pattern_present(input_dict,self.duration,
+                        learning=self.learning,overwrite_previous=False)
 
         self.console.auto_refresh()
 	topo.sim.state_pop()
@@ -292,7 +243,7 @@ Each type will have various parameters that can be changed.""")
         Reset to default presentation length, no learning, and the original PatternGenerator.
         """
         self.present_length.setvalue(DEFAULT_PRESENTATION)
-        self.learning_button.deselect()
+        #self.learning_button.deselect()
         self.pg_choice_box.invoke(self.__default_pattern_generator_name)
         if self.auto_refresh: self.refresh()
 
@@ -323,27 +274,22 @@ Each type will have various parameters that can be changed.""")
     ### (from topo.commands.analysis), which will allow flexible
     ### support for making objects with different parameters in the
     ### different eyes, e.g. to test ocular dominance or disparity.
+
+    # (there was a) buttonBox.add('Use for future learning',command = self.use_for_learning)
     def __setup_pattern_generators(self):
         """
         Make an instantiation of the current user patterns.
 
         Also does some other things...
         """
+        # CB: remember to replace disparity flip stuff.
+        
         self.__params_frame.set_parameters()
-
-        disparity_flip=1
 
         for (gs_name,o_s_p) in self.generator_sheets_patterns.items():
             if o_s_p['editing']==True:
                 
                 newpattern = copy.deepcopy(self.__params_frame.parameterized_object)
-
-                ###TRHACKALERT: Supports two-eye disparity model for RandomDotStereogram only,
-                ###alternating direction for each eye
-                if type(newpattern) == topo.patterns.rds.RandomDotStereogram:
-                    newpattern.xdisparity=disparity_flip*newpattern.xdisparity/2
-                    newpattern.ydisparity=disparity_flip*newpattern.ydisparity/2
-                    disparity_flip=-1
 
                 newpattern.bounds   = copy.deepcopy(o_s_p['generator_sheet'].bounds)
                 newpattern.xdensity = o_s_p['generator_sheet'].xdensity
