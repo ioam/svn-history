@@ -15,12 +15,12 @@ from topo.base.parameterclasses import BooleanParameter,Number
 from topo.patterns.basic import Gaussian        
 from topo.outputfns.basic import PiecewiseLinear
 
-from topo.tkgui.tkparameterizedobject import TkParameterizedObject
-
+from topo.tkgui.tkparameterizedobject import TkParameterizedObject,RangedParameter
 
 
 class SomeFrame(TkParameterizedObject,Frame):
     k = BooleanParameter(default=True)
+    r = RangedParameter()
 
     def __init__(self,master,extra_pos=[],**params):
         TkParameterizedObject.__init__(self,master,extra_pos=extra_pos,**params)
@@ -34,6 +34,8 @@ class OverlapPO(ParameterizedObject):
     x = Number(0.0)
     size = Number(1.0)
     notoverlap = Number(0.4)
+
+
 
 
 
@@ -154,9 +156,6 @@ class TestTkParameterizedObject(unittest.TestCase):
 
 
 
-##     def test_translation(self):
-##         pass
-
     def test_direct_getting_and_setting(self):
         
         g = Gaussian()
@@ -182,6 +181,33 @@ class TestTkParameterizedObject(unittest.TestCase):
             pass
         else:
             raise("Failed to raise AttributeError on getting non-existant *Parameter* 'does_not_exist'")
+
+
+
+
+    def test_translation(self):
+        f = SomeFrame(Toplevel())
+
+        some_pos = [ParameterizedObject(name='cat'),ParameterizedObject(name='rat'),ParameterizedObject(name='bat')]
+        f.params()['r'].range = some_pos
+        f.params()['r'].default = some_pos[0]
+
+        f.pack_param('r')  # have to pack AFTER populating range for translators to get updated
+        ### rather than relying on pack, what about a method for populating parameter range? or something - think about it.
+        ### or, could have converta and atrevnoc build the trans dict each time...too slow?
+        ### (doesn't matter if range is fixed when widget created)
+
+        self.assertEqual(f.translators['r']['cat'],some_pos[0])
+        self.assertEqual(f.translators['r']['rat'],some_pos[1])
+        self.assertEqual(f.translators['r']['bat'],some_pos[2])
+
+        f.params()['r'].range.append(ParameterizedObject)
+        f.pack_param('r') # again, note the need to pack after updating range.
+
+        # or whatever class formatting is done eventually
+        self.assertEqual(f.translators['r']["<class 'topo.base.parameterizedobject.ParameterizedObject'>"],ParameterizedObject)
+
+
 
 
 
