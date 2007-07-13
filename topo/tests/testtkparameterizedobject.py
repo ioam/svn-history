@@ -102,6 +102,8 @@ class TestTkParameterizedObject(unittest.TestCase):
     def test_more_shadow(self):
         """
         Check shadowing of multiple POs' parameters.
+
+        Includes tests for handling of non-existant attributes.
         """
         g = Gaussian()
         p = PiecewiseLinear()
@@ -132,12 +134,30 @@ class TestTkParameterizedObject(unittest.TestCase):
         f.notoverlap = 9
         self.assertEqual(o.x,0.0) # shouldn't have been set
         self.assertEqual(o.size,1.0) # shouldn't have been set
-        self.assertEqual(o.notoverlap,9) # should've been set
+        self.assertEqual(o.notoverlap,9) # should have been set
+
+
+        # CEB: the following doesn't work:
+        #  self.assertRaises(AttributeError,f.does_not_exist)
+        # An AttributeError *is* raised, but it doesn't seem to be caught by testing mechanism!
+        # Below is equivalent test...
+        try:
+            f.does_not_exist
+        except AttributeError:
+            pass
+        else:
+            raise("Failed to raise AttributeError on looking up non-existant attribute 'does_not_exist'")
+            
+        f.did_not_exist = 9
+        assert 'did_not_exist' in f.__dict__ # check that new attribute added to f's dict...
+        self.assertEqual(f.did_not_exist,9)  # ...and that it was set
+
 
 
 ##     def test_translation(self):
 ##         pass
 
+##     def test_direct_getting_and_setting(self):
 
 
 
