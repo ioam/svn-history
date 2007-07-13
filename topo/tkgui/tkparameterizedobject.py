@@ -62,44 +62,60 @@ parameters_to_tkwidgets = {
 ## i lost the history.
 
 
-### CEBHACKALERT: most of the documenation needs to be updated! Please ignore
-### it for the moment.
-
 
 
 class TkParameterizedObjectBase(ParameterizedObject):
     """
     A ParameterizedObject that maintains Tkinter.Variable shadows
-    (proxies) of its Parameters.
+    (proxies) of its Parameters. The Tkinter Variable shadows are kept
+    in sync with the Parameter values, and vice versa.
 
     Optionally performs the same for any number of additional
     shadowed ParameterizedObjects.
 
 
+    Additionally, the Parameters of the shadowed POs are available as
+    attributes of this object (though see note 1); the
+    Tkinter.Variable shadows are available under their corresponding
+    parameter names in the _tk_vars dictionary.
+
+
+    Any Parameter being represented that has a 'range' attribute will
+    also have a 'translators' dictionary, allowing mapping between
+    string representations of the objects and the objects themselves
+    (for use with e.g. a Tkinter.OptionMenu).
+
+
+    Notes
+    =====
     
-    The Parameters are available as
-    attributes of this object; the Tkinter.Variable shadows are
-    available under their corresponding parameter name in the _tk_vars
-    dictionary.
+    (1) Attribute lookup follows a precedance order, object>shadowed POs (in order
+    of their initial specification):
+
+    E.g.
+    POa = ParameterizedObject(x=2,y=2)         # where x, y, z are Parameters
+    POb = ParameterizedObject(x=3,y=3,z=3)     #
+    TkPOt = TkParameterizedObjectBase(extra_pos=[a,b])
+
+    TkPOt.x = 1   # 'x' is just an attribute (not a Parameter)
+
+    TkPOt.x==1 (i.e. tTkPO.__dict__['x'])
+    TkPOt.y==2 ('y' not in tTkPO.__dict__ and precedence of POa is higher than POb)
+    TkPOt.z==3 ('z' not in tTkPO.__dict__ and not a Parameter of POa)
 
 
-    So, for a ParameterizedObject po with a Parameter p, t=TkParameterizedObjectBase(po) allows
-    access to po.p via t.p, i.e. setting t.p sets po.p, and getting
-    t.p returns po.p.
-
-    t stores a Tkinter Variable representing p as t._tk_vars[p];
-    setting t.p not only sets po.p, but also the Variable representing
-    p. Conversely, setting the Tkinter Variable t._tk_vars[p] also
-    sets po.p. In this way, a Parameter is kept in sync with a Tkinter
-    Variable.
+    To avoid confusion with attributes defined on the local object,
+    get_ and set_parameter_value() only return parameter values:
+    TkPOt.get_parameter_value('x') returns 2
 
 
-    ** Important Note **
-    If the parameterized_object itself is modified elsewhere (e.g. po.p=7),
-    the Tkinter Variable shadow is NOT updated until the shadow's value is
-    requested. Thus requesting t.p will correctly return 7, but any GUI
-    display of the Variable will display the old value until a refresh takes
-    place.
+    
+    (2) If a shadowed PO's Parameter value is modified elsewhere, the
+    Tkinter Variable shadow is NOT updated until that Parameter value
+    or shadow value is requested from this object. Thus requesting the
+    value will always return an up-to-date result, but any GUI display
+    of the Variable will display the old value (until a GUI refresh
+    takes place).
     """
     # if the above becomes a problem, we could have some autorefresh of the vars
     # or a callback of some kind in the parameterized object itself.
@@ -112,67 +128,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
     # __repr__ will need some work (display params of subobjects etc?)
 
 
-    # CEBALERT: a list's too confusing, and there's currently no need for more
-    # than one extra po.
-    def __init__(self,extra_pos=[],**params):
-
-        self._extra_pos = extra_pos
-        self._tk_vars = {}
-        self.translators = {}
-        
-        super(TkParameterizedObjectBase,self).__init__(**params)
-
-        for PO in extra_pos[::-1]+[self]:
-            self.init_tk_vars(PO)
-
-
-
-    ### CB: can't use this because widgets will be left behind with old variables!
-##     def add_extra_po(self,PO):
-##         # CB ** insert at start since last PO in will write over other same-named tkvars,
-##         # so indicate that in search order. 
-##         self._extra_pos.insert(0,PO)
-##         self.init_tk_vars(PO)
-
-
-
-    def update_translator(self,name,param):
-        t=self.translators[name]={}
-
-        for a in param.range:
-            # use name attribute if it's valid, otherwise use str()
-            # (this is the place to put any special name formatting)
-            if hasattr(a,'name') and isinstance(a.name,str) and len(a.name)>0: # CEBALERT!
-                t[a.name] = a
-            else:
-                t[str(a)]=a
-        
-
-    def init_tk_vars(self,PO):
-        for name,param in PO.params().items():
-
-            # shouldn't need second check but seems range could be None or something else not like a list?
-            if hasattr(param,'range') and hasattr(param.range,'__len__'): #isinstance(param,RangedParameter):
-                self.update_translator(name,param)
-
-            tk_var = parameters_to_tkvars.get(type(param),StringVar)()
-            self._tk_vars[name] = tk_var
-
-            tk_var._original_set = tk_var.set
-            tk_var.set = lambda v,x=name: self.__set_tk_val(x,v)
-
-            tk_var.set(getattr(PO,name))
-            tk_var._last_good_val=tk_var.get() # for reverting
-            tk_var.trace_variable('w',lambda a,b,c,p_name=name: self.__update_param(p_name))        
-            # Instead of a trace, could we override the Variable's set() method i.e. trace it ourselves?
-            # Or does too much happen in tcl/tk for that to work?
-
-            # Override the Variable's get() method to guarantee an out-of-date value is never returned.
-            # In cases where the tkinter val is the most recently changed (i.e. when it's edited in the
-            # gui, resulting in a trace_variable being called), use the _original_get() method.
-            tk_var._original_get = tk_var.get
-            tk_var.get = lambda x=name: self.__get_tk_val(x)
-
+    # Overrides method from superclass.
     def _setup_params(self,**params):
         """
         Parameters that are not in this object itself but are in one of the
@@ -189,25 +145,70 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 del params[n]
 
         ParameterizedObject._setup_params(self,**params)
-    
-    def __setup_tk_vars(self):
-        """
-        Create Tkinter Variables corresponding to
-        parameterized_object's Parameters, and store them in the
-        _tk_vars dictionary under the corresponding parameter name.
 
-        The Tkinter Variable defaults to StringVar if no corresponding
-        Variable for the Parameter type is found in
-        parameters_to_vars.
+
+    # CEBALERT: a list's too confusing, and there's currently no need for more
+    # than one extra po. Change to just one extra PO?
+    def __init__(self,extra_pos=[],**params):
+
+        self._extra_pos = extra_pos
+        self._tk_vars = {}
+        self.translators = {}
         
-        Each Tkinter Variable is traced so that when its value changes
-        the corresponding parameter is set on parameterized_object.
+        super(TkParameterizedObjectBase,self).__init__(**params)
+
+        for PO in extra_pos[::-1]+[self]:
+            self._init_tk_vars(PO)
+
+
+        
+
+    def _init_tk_vars(self,PO):
         """
-        # * lookup order: self then extra_pos in order, so set in reverse *
-        raise
+        Create Tkinter Variable shadows of all Parameters of PO.
+        
+        The appropriate Variable is used for each Parameter type.
+
+        Also adds tracing mechanism to keep the Variable and Parameter values in sync.
+        
+        For a Parameter with the 'range' attribute, also updates the translator dictionary to
+        map string representations to the objects themselves.
+        """
+        for name,param in PO.params().items():
+
+            # shouldn't need second check but seems range could be None or something else not like a list?
+            if hasattr(param,'range') and hasattr(param.range,'__len__'): 
+                self._update_translator(name,param)
+
+            tk_var = parameters_to_tkvars.get(type(param),StringVar)()
+            self._tk_vars[name] = tk_var
+
+            # overwrite Variable's set() with one that will handle transformations to string
+            tk_var._original_set = tk_var.set
+            tk_var.set = lambda v,x=name: self.__set_tk_val(x,v)
+
+            tk_var.set(getattr(PO,name))
+            tk_var._last_good_val=tk_var.get() # for reverting
+            tk_var.trace_variable('w',lambda a,b,c,p_name=name: self.__update_param(p_name))        
+            # Instead of a trace, could we override the Variable's set() method i.e. trace it ourselves?
+            # Or does too much happen in tcl/tk for that to work?
+
+            # Override the Variable's get() method to guarantee an out-of-date value is never returned.
+            # In cases where the tkinter val is the most recently changed (i.e. when it's edited in the
+            # gui, resulting in a trace_variable being called), the _original_get() method is used.
+            tk_var._original_get = tk_var.get
+            tk_var.get = lambda x=name: self.__get_tk_val(x)
 
 
-    # goes round the houses when already know tk_var
+
+    def __set_tk_val(self,param_name,val):
+        """
+        Set the tk variable to (the possibly transformed-to-string) val.
+        """
+        val = self.object2string_ifrequired(param_name,val)
+        tk_var = self._tk_vars[param_name]
+        tk_var._original_set(val)
+
 
     def __get_tk_val(self,param_name):
         """
@@ -222,15 +223,36 @@ class TkParameterizedObjectBase(ParameterizedObject):
             tk_var.set(po_val)
         return po_val #tk_var.get()
 
-    def __set_tk_val(self,param_name,val):
-        val = self.atrevnoc(param_name,val)
-        tk_var = self._tk_vars[param_name]
-        tk_var._original_set(val)
+
+
+    ### CB: can't use this because widgets will be left behind with old variables!
+##     def add_extra_po(self,PO):
+##         # CB ** insert at start since last PO in will write over other same-named tkvars,
+##         # so indicate that in search order. 
+##         self._extra_pos.insert(0,PO)
+##         self._init_tk_vars(PO)
+
+
+
+    def _update_translator(self,name,param):
+        """
+        Map names of objects in param.range to the actual objects.
+        """
+        t=self.translators[name]={}
+
+        for a in param.range:
+            # use name attribute if it's valid, otherwise use str()
+            # (this is the place to call any special name formatting)
+            if hasattr(a,'name') and isinstance(a.name,str) and len(a.name)>0: 
+                t[a.name] = a
+            else:
+                t[str(a)]=a
+
         
     
-    def converta(self,param_name,val):
+    def string2object_ifrequired(self,param_name,val):
         """
-        string rep -> object
+        If val is in param_name's translator, then translate to the object.
         """
         new_val = val
         
@@ -240,12 +262,13 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 new_val = t[val]
 
         return new_val
+    converta = string2object_ifrequired
 
 
-
-    def atrevnoc(self,param_name,val):
+    def object2string_ifrequired(self,param_name,val):
         """
-        object --> string rep
+        If val is one of the objects in param_name's translator,
+        translate to the string.
         """
         new_val = val
 
@@ -256,13 +279,14 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 if v==val:
                     new_val = k
         return new_val
+    atrevnoc = object2string_ifrequired
         
             
 
 
     def __update_param(self,param_name):
         """
-        Attempt to set the parameterized_object's param_name to the
+        Attempt to set the parameter represented by param_name to the
         value of its correspinding Tkinter Variable.
 
         If setting the parameter fails (e.g. an inappropriate value
@@ -275,15 +299,12 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         try:
             val = tk_var._original_get() # tk_var ahead of parameter
-        except ValueError:
-            ### CEBHACKALERT: trying this out...
-            # valueerror here means user not finished typing
-            #print "### You're typing..."
+        except ValueError: # means user not finished typing
+            ### CEBALERT: this needs more testing since I'm not sure
+            ### if it will always work!
             return 
 
-
-        val = self.converta(param_name,val)
-
+        val = self.string2object_ifrequired(param_name,val)
         
         try:
             sources = [self]+self._extra_pos
@@ -306,13 +327,17 @@ class TkParameterizedObjectBase(ParameterizedObject):
             
         except: # everything
             tk_var.set(tk_var._last_good_val)
-            # hack: above is too fast for gui? variable changes correctly, but doesn't appear
-            # on gui until next click
+            # CEBALERT: is above too fast for gui? variable changes correctly, but sometimes doesn't appear
+            # on gui until next click. Needs more testing. Could try:
             #topo.guimain.after(250,lambda x=tk_var._last_good_val: tk_var.set(x))
-            raise #print "warning! couldn't set param_name to val" #raise 
+            raise # whatever the parameter-setting error was
+
 
     def __sources(self,parameterized_object=None):
-        
+        """
+        Return a correctly ordered list of ParameterizedObjects in which to find Parameters
+        (unless one is specified, in which case it's the only item in the list).
+        """
         if parameterized_object is None:
             sources = [self]+self._extra_pos
         else:
@@ -320,8 +345,11 @@ class TkParameterizedObjectBase(ParameterizedObject):
         return sources
     
 
-    def get_parameter_object(self,name,parameterized_object=None):
-
+    def get_parameter(self,name,parameterized_object=None):
+        """
+        Return the Parameter specified by the name from the sources of
+        Parameters in this object (or the specified parameterized_object).
+        """
         sources = self.__sources(parameterized_object)
         
         for po in sources:
@@ -329,14 +357,17 @@ class TkParameterizedObjectBase(ParameterizedObject):
             if name in params: return params[name] # a bit hidden
 
         raise AttributeError("none of %s have parameter %s"%(str(sources),name))
-
+    get_parameter_object = get_parameter
+    
 
 #    def get_like_the_gui(self,name):
 #        return self._tk_vars[name].get()
 
 ##### these guarantee only to get/set parameters #####
     def get_parameter_value(self,name,parameterized_object=None):
-
+        """
+        Get the value of the parameter specified by name.
+        """
         sources = self.__sources(parameterized_object)
 
         for po in sources:
@@ -344,9 +375,12 @@ class TkParameterizedObjectBase(ParameterizedObject):
             if name in params: return getattr(po,name) # also hidden!
 
         raise AttributeError("none of %s have parameter %s"%(str(sources),name))
+
         
     def set_parameter_value(self,name,val,parameterized_object=None):
-
+        """
+        Set the value of the parameter specified by name to val.
+        """
         sources = self.__sources(parameterized_object)
 
         for po in sources:
@@ -501,11 +535,11 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             
             if widget_type==Tkinter.OptionMenu:
 
-                self.update_translator(name,param)
+                self._update_translator(name,param)
 
                 
 
-                new_range = [self.atrevnoc(name,i) for i in param.range]
+                new_range = [self.object2string_ifrequired(name,i) for i in param.range]
 
                 assert len(new_range)>0
 
