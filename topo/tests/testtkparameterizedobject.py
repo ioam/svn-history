@@ -186,6 +186,10 @@ class TestTkParameterizedObject(unittest.TestCase):
 
 
     def test_translation(self):
+        """
+        In the GUI, objects must sometimes be represented by strings (e.g. for an OptionMenu):
+        test that such conversion is handled correctly
+        """
         f = SomeFrame(Toplevel())
 
         some_pos = [ParameterizedObject(name='cat'),ParameterizedObject(name='rat'),ParameterizedObject(name='bat')]
@@ -197,6 +201,7 @@ class TestTkParameterizedObject(unittest.TestCase):
         ### or, could have converta and atrevnoc build the trans dict each time...too slow?
         ### (doesn't matter if range is fixed when widget created)
 
+        # tests converta()
         self.assertEqual(f.translators['r']['cat'],some_pos[0])
         self.assertEqual(f.translators['r']['rat'],some_pos[1])
         self.assertEqual(f.translators['r']['bat'],some_pos[2])
@@ -208,6 +213,10 @@ class TestTkParameterizedObject(unittest.TestCase):
         self.assertEqual(f.translators['r']["<class 'topo.base.parameterizedobject.ParameterizedObject'>"],ParameterizedObject)
 
 
+        self.assertEqual(f.atrevnoc('r',some_pos[0]),'cat')
+        self.assertEqual(f.atrevnoc('r',some_pos[1]),'rat')
+        self.assertEqual(f.atrevnoc('r',some_pos[2]),'bat') 
+        self.assertEqual(f.r,some_pos[0])
 
 
 
