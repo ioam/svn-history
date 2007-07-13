@@ -159,8 +159,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         for PO in extra_pos[::-1]+[self]:
             self._init_tk_vars(PO)
-
-
         
 
     def _init_tk_vars(self,PO):
@@ -282,7 +280,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
     atrevnoc = object2string_ifrequired
         
             
-
 
     def __update_param(self,param_name):
         """
@@ -438,6 +435,22 @@ class TkParameterizedObjectBase(ParameterizedObject):
 ################################################
 
 
+
+# can't use this unless Tkinter.OptionMenu supports changing the list
+# of items after widget creation - might need to use Pmw's OptionMenu.
+##     def initialize_ranged_parameter(self,param_name,range_):
+##         """
+##         range_ assumed to be sorted already.
+##         """
+##         p = self.get_parameter(param_name)
+
+##         if hasattr(range_,'__len__'):
+##             [p.range.append(x) for x in range_]
+##         else:
+##             p.range.append(range_)
+
+##         p.default = p.range[0]
+##         self._update_translator(param_name,p)
 
 
 
