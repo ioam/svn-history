@@ -181,6 +181,8 @@ class TemplatePlotGroupPanel(XPGPanel):
         #
         # In any case, shouldn't be assuming SHC here.
 
+        # CB: note that I've made Menu indexable by name (in tkguiwindow.py), so can now change this code.
+
         self._strength_menu.add_command(label="Plot in new window",
                                         command=lambda: self.__plot_matrix('Strength'))
         self._strength_menu.add_command(label="Fourier transform",
