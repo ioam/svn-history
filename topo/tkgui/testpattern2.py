@@ -72,7 +72,15 @@ class TestPattern(XPGPanel):
 	super(TestPattern,self).__init__(console,master,label,**params)
         self.auto_refresh=True
 
-        #self.plotgroup.params()['sheet'].range=topo.sim.objects(GeneratorSheet).values()
+        #self.plotgroup.params()['sheet'].range=
+
+        print "create_frame"
+        self.params_frame = parametersframe.ParametersFrame(self,buttons_to_remove=['Apply','Close','Reset'])
+
+
+        ### Find generator sheets
+        gsnames = topo.sim.objects(GeneratorSheet).keys()
+        self.generator_sheets_patterns = dict.fromkeys(gsnames,topo.sim[gsnames[0]].input_generator)
 
 
         gsig = GeneratorSheet.classparams()['input_generator']
@@ -87,15 +95,12 @@ class TestPattern(XPGPanel):
         # Because this window applies changes to an object immediately
         # (unlike ParametersFrame), the button to 'reset' is
         # 'Defaults'. 'Reset' would do nothing.
-        self.params_frame = parametersframe.ParametersFrame(self,buttons_to_remove=['Apply','Close','Reset'])
 
 
         self.params_frame.create_widgets(self.pattern_generator) 
         self.params_frame.pack(side=TOP,expand=YES,fill=X)
 
 
-        ### Find generator sheets        
-        self.generator_sheets_patterns = dict.fromkeys(topo.sim.objects(GeneratorSheet),None)
 
 
 
@@ -114,23 +119,23 @@ class TestPattern(XPGPanel):
         
 
         # SELECT GENERATORSHEET BUTTONS
-        ###############################################################################################
-        ### 'Edit patterns in' boxes
-        #
-        # CEBHACKALERT: Buttons seem to have strange behavior!
-        # Also, will boxes be in the same order as the plots?
-        self.__input_box = Pmw.RadioSelect(self, labelpos = 'w',
-                                           command = self._input_change,
-                                           label_text = 'Apply to pattern in:',
-                                           selectmode = 'multiple')
-        self.__input_box.pack(expand=NO,fill=NONE,padx=5)
+##         ###############################################################################################
+##         ### 'Edit patterns in' boxes
+##         #
+##         # CEBHACKALERT: Buttons seem to have strange behavior!
+##         # Also, will boxes be in the same order as the plots?
+##         self.__input_box = Pmw.RadioSelect(self, labelpos = 'w',
+##                                            command = self._input_change,
+##                                            label_text = 'Apply to pattern in:',
+##                                            selectmode = 'multiple')
+##         self.__input_box.pack(expand=NO,fill=NONE,padx=5)
 
-        keys = copy.copy(self.generator_sheets_patterns.keys())
-        keys.reverse()
-        for generator_sheet_name in keys:
-            self.__input_box.add(generator_sheet_name)
-            self.__input_box.invoke(generator_sheet_name)
-        ###############################################################################################
+##         keys = copy.copy(self.generator_sheets_patterns.keys())
+##         keys.reverse()
+##         for generator_sheet_name in keys:
+##             self.__input_box.add(generator_sheet_name)
+##             self.__input_box.invoke(generator_sheet_name)
+##         ###############################################################################################
             
 
         
@@ -152,33 +157,37 @@ class TestPattern(XPGPanel):
 
 
     def refresh(self):
+        print "refresh()"
         self.update_plotgroup_variables()
         self.__setup_pattern_generators()
-        super(TestPattern,self).refresh()
+        super(TestPattern,self).refresh(update=True)
 
 
     # METHODS FOR BUTTONS
     ###############################################################################################
-    def _input_change(self,button_name, checked):
-        """
-        Called by the input box.  The variable self.generator_sheets_patterns records
-        all input event processors, and whether they are checked or
-        not.
-        """
-        #self.generator_sheets_patterns[button_name]['editing'] = checked
+##     def _input_change(self,button_name, checked):
+##         """
+##         Called by the input box.  The variable self.generator_sheets_patterns records
+##         all input event processors, and whether they are checked or
+##         not.
+##         """
+##         #self.generator_sheets_patterns[button_name]['editing'] = checked
 
-        #if not self.generator_sheets_patterns[button_name]['editing']:
-        #    self.generator_sheets_patterns[button_name]['pattern_generator'] = copy.copy(self.__current_pattern_generator)
-        #else:
-        self.__setup_pattern_generators()
-        if self.auto_refresh:self.refresh()
+##         #if not self.generator_sheets_patterns[button_name]['editing']:
+##         #    self.generator_sheets_patterns[button_name]['pattern_generator'] = copy.copy(self.__current_pattern_generator)
+##         #else:
+##         self.__setup_pattern_generators()
+##         if self.auto_refresh:self.refresh()
         
     def change_pattern_generator(self):
         """
         Set the current PatternGenerator to the one selected and get the
         ParametersFrame to draw the relevant widgets
         """
-        if self.pattern_generator is not None: self.params_frame.create_widgets(self.pattern_generator) 
+        print "change_pattern_generator()"
+        # CEBALERT: if test to hide a logic error!
+        if hasattr(self,'params_frame'): #and self.pattern_generator is not None:
+            self.params_frame.create_widgets(self.pattern_generator) 
         if self.auto_refresh: self.refresh()
 
     def present_pattern(self):
@@ -212,6 +221,7 @@ class TestPattern(XPGPanel):
 
 
     def update_plotgroup_variables(self):
+        print "update_plotgroup_variables()"
         plot_list = []       
         for sheetname,pg in self.generator_sheets_patterns.items():
             view_dict = {}
@@ -242,6 +252,7 @@ class TestPattern(XPGPanel):
 
         Also does some other things...
         """
+        print "setup_pattern_generators()"
         # CB: remember to replace disparity flip stuff.
         
         self.params_frame.set_parameters()
