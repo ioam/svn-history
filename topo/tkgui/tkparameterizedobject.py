@@ -440,16 +440,22 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
 
+
+### CEB: working here - not complete.
+        
+
 import _tkinter # (required to get tcl exception class)
 
-# CB: needs renaming
+
 class TkParameterizedObject(TkParameterizedObjectBase):
     """
-    A TkParameterizedObjectBase and Tkinter Frame that can draw widgets representing the Parameters of the supplied po.
+    A TkParameterizedObjectBase and Tkinter Frame that can draw
+    widgets representing the Parameters of the supplied
+    ParameterizedObjects.
     """
     def __init__(self,master,extra_pos=[],**params):
         """
-        (Frame.__init__ gets the config.)
+
         """
         assert master is not None # (could probably remove this but i didn't want to think about it)
         self.master = master
