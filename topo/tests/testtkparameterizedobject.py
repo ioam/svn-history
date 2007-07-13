@@ -193,8 +193,9 @@ class TestTkParameterizedObject(unittest.TestCase):
         f = SomeFrame(Toplevel())
 
         some_pos = [ParameterizedObject(name='cat'),ParameterizedObject(name='rat'),ParameterizedObject(name='bat')]
-        f.params()['r'].range = some_pos
-        f.params()['r'].default = some_pos[0]
+        r = f.get_parameter('r')
+        r.range = some_pos
+        r.default = some_pos[0]
 
         f.pack_param('r')  # have to pack AFTER populating range for translators to get updated
         ### rather than relying on pack, what about a method for populating parameter range? or something - think about it.
@@ -206,7 +207,7 @@ class TestTkParameterizedObject(unittest.TestCase):
         self.assertEqual(f.translators['r']['rat'],some_pos[1])
         self.assertEqual(f.translators['r']['bat'],some_pos[2])
 
-        f.params()['r'].range.append(ParameterizedObject)
+        r.range.append(ParameterizedObject)
         f.pack_param('r') # again, note the need to pack after updating range.
 
         # or whatever class formatting is done eventually
