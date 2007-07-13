@@ -157,9 +157,31 @@ class TestTkParameterizedObject(unittest.TestCase):
 ##     def test_translation(self):
 ##         pass
 
-##     def test_direct_getting_and_setting(self):
+    def test_direct_getting_and_setting(self):
+        
+        g = Gaussian()
+        f = SomeFrame(Toplevel(),extra_pos=[g]) 
 
+        g.size=0.95
+        self.assertNotEqual(f.size,g.size)
+        self.assertEqual(f.get_parameter_value('size'),g.size)
 
+        f.set_parameter_value('size',0.23)
+        self.assertEqual(g.size,0.23)
+
+        try:
+            f.set_parameter_value('does_not_exist',100)
+        except AttributeError:
+            pass
+        else:
+            raise("Failed to raise AttributeError on setting non-existant *Parameter* 'does_not_exist'")
+
+        try:
+            f.get_parameter_value('does_not_exist')
+        except AttributeError:
+            pass
+        else:
+            raise("Failed to raise AttributeError on getting non-existant *Parameter* 'does_not_exist'")
 
 
 
