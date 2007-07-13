@@ -138,12 +138,14 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
     def update_translator(self,name,param):
         t=self.translators[name]={}
+
         for a in param.range:
-            # use name if has one
-            try:
-               t[a.name] = a
-            except AttributeError:
-               t[str(a)]=a
+            # use name attribute if it's valid, otherwise use str()
+            # (this is the place to put any special name formatting)
+            if hasattr(a,'name') and isinstance(a.name,str) and len(a.name)>0: # CEBALERT!
+                t[a.name] = a
+            else:
+                t[str(a)]=a
         
 
     def init_tk_vars(self,PO):
@@ -252,7 +254,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
             for k,v in t.items():
                 if v==val:
                     new_val = k
-
         return new_val
         
             
@@ -513,7 +514,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
                 
                 w = widget_type(f,tk_var,*new_range,**widget_options)
 
-               
+                
                 
                 #self.set_parameter_value(name,new_range[0])
                 
