@@ -151,7 +151,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
     def init_tk_vars(self,PO):
         for name,param in PO.params().items():
 
-            if hasattr(param,'range'): #isinstance(param,RangedParameter):
+            # shouldn't need second check but seems range could be None or something else not like a list?
+            if hasattr(param,'range') and hasattr(param.range,'__len__'): #isinstance(param,RangedParameter):
                 self.update_translator(name,param)
 
             tk_var = parameters_to_tkvars.get(type(param),StringVar)()
@@ -558,55 +559,6 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         f.pack(pack_options)
         return f 
-
-
-
-
-
-
-
-
-## ### A setup for basic testing...
-
-## class OverlapPO(ParameterizedObject):
-##     x = Parameter(0.0)
-##     size = Parameter(1.0)
-##     notoverlap = Parameter(0.4)
-
-
-## class SomeFrame(TkParameterizedObject,Frame):
-
-##     k = BooleanParameter(default=True)
-
-##     def __init__(self,master,extra_pos=[],**params):
-##         TkParameterizedObject.__init__(self,master,extra_pos=extra_pos,**params)
-##         Frame.__init__(self,master)
-
-##         self.pack_param('k',on_change=self.some_function)
-
-##     def some_function(self):
-##         print "called some_function"
-
-
-## def another_function():
-##     print "called another_function"
-
-
-## from topo.patterns.basic import Gaussian        
-## from topo.outputfns.basic import PiecewiseLinear
-
-## g = Gaussian()
-## p = PiecewiseLinear()
-## o = OverlapPO()
-
-## f = SomeFrame(Tkinter.Toplevel(),extra_pos=[g,p,o])
-## f.pack()
-
-## f.pack_param('x') # from the Gaussian
-## f.pack_param('size',on_change=another_function) # from the Gaussian
-## f.pack_param('upper_bound')
-## f.pack_param('notoverlap')
-
 
 
 
