@@ -184,7 +184,6 @@ class TestTkParameterizedObject(unittest.TestCase):
 
 
 
-
     def test_translation(self):
         """
         In the GUI, objects must sometimes be represented by strings (e.g. for an OptionMenu):
@@ -197,10 +196,13 @@ class TestTkParameterizedObject(unittest.TestCase):
         r.range = some_pos
         r.default = some_pos[0]
 
-        f.pack_param('r')  # have to pack AFTER populating range for translators to get updated
-        ### rather than relying on pack, what about a method for populating parameter range? or something - think about it.
-        ### or, could have converta and atrevnoc build the trans dict each time...too slow?
-        ### (doesn't matter if range is fixed when widget created)
+        f.pack_param('r')  # have to pack AFTER populating range for OptionMenu widget to work (see tkparameterizedobject.py)
+
+        # (otherwise, could do the following:
+##         f = SomeFrame(Toplevel())
+##         f.pack_param('r')
+##         f.initialize_ranged_parameter('r',
+##                                       [ParameterizedObject(name='cat'),ParameterizedObject(name='rat'),ParameterizedObject(name='bat')])
 
         # tests converta()
         self.assertEqual(f.translators['r']['cat'],some_pos[0])
@@ -209,6 +211,7 @@ class TestTkParameterizedObject(unittest.TestCase):
 
         r.range.append(ParameterizedObject)
         f.pack_param('r') # again, note the need to pack after updating range.
+##         f.initialize_ranged_parameter('r',ParameterizedObject)
 
         # or whatever class formatting is done eventually
         self.assertEqual(f.translators['r']["<class 'topo.base.parameterizedobject.ParameterizedObject'>"],ParameterizedObject)
