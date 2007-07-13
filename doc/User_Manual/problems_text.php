@@ -38,16 +38,17 @@ mentioned somewhere, please file a bug report by following the link in
 (1). For someone to help with your problem, we need to be able to
 replicate it. Please include:
 <ul>
-<li>the full error message;
-<li>the output of <code>cvs diff</code>;
-<li>any additional file needed to replicate the problem (e.g. a script you're using).</li>
+<li>the full error message;</li>
+<li>the output of <code>cvs diff</code>;</li>
+<li>any additional file needed to replicate the problem (e.g. a script you're using);</li>
+<li>steps needed to reproduce the problem.</li>
 </ul>
 To maximize the speed of resolution, please first try to reduce the differences
 between your copy of topographica and [**the original version/the one on cvs] to the
 minimum required to elicit [**right word?] the problem (e.g. by removing extra parts of a model, 
 removing other changes that do not affect the problem, reducing sheet densities, and so on.)
 </li>
-<li>Something about the tracking, what to do if you get no response, and so on.</li>
+<li>Something about the tracking, what to do if you get no response, and so on. Categories.</li>
 
 </ol>
 
