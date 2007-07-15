@@ -74,10 +74,10 @@ class TkParameterizedObjectBase(ParameterizedObject):
     shadowed ParameterizedObjects.
 
 
-    Additionally, the Parameters of the shadowed POs are available as
-    attributes of this object (though see note 1); the
-    Tkinter.Variable shadows are available under their corresponding
-    parameter names in the _tk_vars dictionary.
+    The Parameters of the shadowed POs are available as attributes of
+    this object (though see note 1); the Tkinter.Variable shadows are
+    available under their corresponding parameter names in the
+    _tk_vars dictionary.
 
 
     Any Parameter being represented that has a 'range' attribute will
@@ -105,8 +105,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
     To avoid confusion with attributes defined on the local object,
-    get_ and set_parameter_value() only return parameter values:
-    TkPOt.get_parameter_value('x') returns 2
+    get_ and set_parameter_value() can be used to access parameter values only:
+    TkPOt.get_parameter_value('x')==2  # POa.x is parameter with highest precedence 
 
 
     
@@ -114,7 +114,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
     Tkinter Variable shadow is NOT updated until that Parameter value
     or shadow value is requested from this object. Thus requesting the
     value will always return an up-to-date result, but any GUI display
-    of the Variable will display the old value (until a GUI refresh
+    of the Variable might display a stale value (until a GUI refresh
     takes place).
     """
     # if the above becomes a problem, we could have some autorefresh of the vars
@@ -436,21 +436,18 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
 
-# can't use this unless Tkinter.OptionMenu supports changing the list
+# CAN'T USE THIS AFTER PACK unless Tkinter.OptionMenu supports changing the list
 # of items after widget creation - might need to use Pmw's OptionMenu.
-##     def initialize_ranged_parameter(self,param_name,range_):
-##         """
-##         range_ assumed to be sorted already.
-##         """
-##         p = self.get_parameter(param_name)
+    def initialize_ranged_parameter(self,param_name,range_):
+        p = self.get_parameter(param_name)
 
-##         if hasattr(range_,'__len__'):
-##             [p.range.append(x) for x in range_]
-##         else:
-##             p.range.append(range_)
+        if hasattr(range_,'__len__'):
+            [p.range.append(x) for x in range_]
+        else:
+            p.range.append(range_)
 
-##         p.default = p.range[0]
-##         self._update_translator(param_name,p)
+        p.default = p.range[0]
+        self._update_translator(param_name,p)
 
 
 
@@ -475,37 +472,30 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         TkParameterizedObjectBase.__init__(self,extra_pos=extra_pos,**params)
         self.balloon = Pmw.Balloon(master)
 
+
+        ####################################################
+        ## CEBALERT: just keep one and will name properly
+        ## & probably provide access methods
         # allows subclasses to 
         # access all plotgroup's widgets in an easy way.
         self._widgets = {}
-        ## CEBALERT: just keep one and will name properly
-        ## & probably provide access methods
         self._furames = {}
-
-        # a refresh-the-widgets-on-focus-in method would make the gui in sync with the actual object
-
-
-    # should remove this now it's not a frame
-    # (It sucks having to type 'master' all the time for stuff like a window title.
-    # Maybe it's not just title, in which case use __getattribute__ to try method
-    # on master.)
-    def title(self,t):
-        self.master.title(t)
+        ####################################################
         
+        # (a refresh-the-widgets-on-focus-in method would make the gui
+        # in sync with the actual object)
 
-    # CEBHACKALERT: some widgets need to have <return> bound to frame's refresh!
+
+    # CB: some widgets need to have <return> bound to frame's refresh!
     # Also think about taggedsliders.
 
-##     ## CEBALERT
 ##     def repackparam(self,name):
-
 ##         self._widgets[name].destroy()
 ##         self.pack_param(name,parent=self._furames[name])
         
         
 
-    # CEBALERT: rename & doc parent * on_change
-
+    # CB: document!
     def pack_param(self,name,parent=None,widget_options={},on_change=None,**pack_options):
         """
         Create a widget for Parameter name, configured according to
@@ -532,12 +522,10 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             widget_side='right';label_side='left'
             
 
-        l = None #  CEBALERT
+        l = None #  CEBALERT: clean up
         
-        # better not look expect a var for each param anywhere 
         ### buttons are different from the other widgets: different labeling,
         ### and no need for a variable
-        # not isinstance because tkinter classes are oldstyle
         if widget_type==Tkinter.Button:
             assert on_change is not None, "Buttons need a command."
             w = widget_type(f,text=name,command=on_change,**widget_options)
@@ -545,7 +533,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
             tk_var = self._tk_vars[name]
 
-            # CB: called on_change, but it's on_set
+            # CEBALERT: called "on_change", but it should be "on_set"
+            # (since it's called not just for changes)
             if on_change is not None: tk_var._on_change=on_change
 
             ### CEBALERT: clean up this widget type selection
@@ -556,21 +545,15 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
                 self._update_translator(name,param)
 
-                
-
                 new_range = [self.object2string_ifrequired(name,i) for i in param.range]
 
                 assert len(new_range)>0
 
                 #if tk_var.get() not in new_range:  
                 tk_var.set(new_range[0])
-
                 
                 w = widget_type(f,tk_var,*new_range,**widget_options)
-
                 
-                
-                #self.set_parameter_value(name,new_range[0])
                 
             else:
             ### Tkinter widgets use either variable or textvariable
@@ -597,7 +580,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             l.pack(side=label_side)
 
 
-        ### CEBALERT:
+        ### CB: clean up
         if param.hidden:
             return f
 
@@ -615,3 +598,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
 
 
+    # For convenience. Maybe should offer a way to access any attribute on master.
+    # Probably too confusing - might remove this, too.
+    def title(self,t):
+        self.master.title(t)
+        
