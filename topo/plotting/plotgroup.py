@@ -48,13 +48,11 @@ def identity(x):
 ### Temporary
 class RangedParameter(Parameter):
 
-    # instantiate?
-
     __slots__ = ['range']
     __doc__ = property((lambda self: self.doc))
 
-    def __init__(self, default=None, range=[], **params):
-        Parameter.__init__(self,default=default,**params)
+    def __init__(self, default=None, range=[],instantiate=True,**params):
+        Parameter.__init__(self,default=default,instantiate=instantiate,**params)
         self.range = range
 
     def __set__(self,obj,val):
@@ -223,6 +221,8 @@ class PlotGroup(ParameterizedObject):
 
 # rename; represents 3d AND draws plots on itself
 class XPlotGroup(PlotGroup):
+
+    sheet_type = Sheet
 
     # Sheet_name can be none, in which case the PlotGroup build Plots for each Sheet.
     sheet = RangedParameter(default=None,doc="""CEBHACKALERT""") 
@@ -395,7 +395,7 @@ class TemplatePlotGroup(XPlotGroup):
 	if self.sheet:
             sheet_list = [self.sheet]
 	else:
-	    sheet_list = topo.sim.objects(Sheet).values() #self.params()['sheet'].range()  
+	    sheet_list = topo.sim.objects(self.sheet_type).values() #self.params()['sheet'].range()  
    
 	plot_list = self.plot_list
         # Loop over all sheets that passed the filter.
