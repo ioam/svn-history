@@ -11,7 +11,7 @@ from Tkinter import Frame,Toplevel
 
 from topo.base.simulation import Simulation
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import BooleanParameter,Number
+from topo.base.parameterclasses import BooleanParameter,Number,Parameter
 from topo.patterns.basic import Gaussian        
 from topo.outputfns.basic import PiecewiseLinear
 
@@ -36,6 +36,76 @@ class OverlapPO(ParameterizedObject):
     notoverlap = Number(0.4)
 
 
+
+
+class SometkPO(TkParameterizedObject,Frame):
+
+    x = RangedParameter(default=1)
+    y = RangedParameter(default=2)
+    z = Parameter(default=3)
+
+class SomePO(ParameterizedObject):
+
+    x = RangedParameter(default=1)
+    y = RangedParameter(default=2)
+    z = Parameter(default=3)
+
+
+## ### Temporaray, I hope, like the parameter.
+## class TestRangedParameter(unittest.TestCase):
+
+##     def test_basic(self):
+
+##         k = SomePO(Toplevel())
+##         k.x = 9
+##         k.z = 9
+
+##         y_param = k.params()['y']
+##         y_param.range = [1,2,3,4,5]
+##         y_param.default = [4,3]
+
+##         self.assertEqual(k.z,9)
+##         self.assertEqual(k.x,9)
+##         self.assertEqual(k.y,2)
+
+##         x_param = k.params()['x']
+##         x_param.range = [1,2,3,4]
+##         x_param.default = [1,2]
+        
+##         self.assertEqual(y_param.range,[1,2,3,4,5])
+##         self.assertEqual(x_param.range,[1,2,3,4])
+
+##         self.assertEqual(x_param.default,[1,2])
+##         self.assertEqual(y_param.default,[4,3])
+        
+
+##     def test_more(self):
+
+##         k = SomePO(Toplevel())
+
+##         x_param = k.params()['x']
+##         y_param = k.params()['y']
+
+##         k.x = 1 #x_param.default = '1'
+##         k.y = 2 #y_param.default = '2'
+
+##         k.initialize_ranged_parameter('x',range_=[1,2,3,4])        
+##         k.initialize_ranged_parameter('y',range_=[5,6,7,8])
+
+##         self.assertEqual(k.x,1)
+##         self.assertEqual(k.y,2)
+                
+##         self.assertEqual(x_param.range,[1,2,3,4])
+##         self.assertEqual(y_param.range,[5,6,7,8])
+
+
+##         k.pack_param('x')
+##         k.pack_param('y')
+
+##         self.assertEqual(x_param.range,[1,2,3,4])
+##         self.assertEqual(y_param.range,[5,6,7,8])
+
+        
 
 
 
@@ -66,8 +136,18 @@ class TestTkParameterizedObject(unittest.TestCase):
         self.assertEqual(f.kcount,2) # check that on_change was called
         self.assertEqual(f.k,True) # check that f.k was actually set
         self.assertEqual(f._tk_vars['k'].get(),True) # simulate GUI get
-        
-        
+
+
+    def test_show_type_bug(self):
+
+        a = SomePO()
+        a.z = 9
+        self.assertEqual(a.z,9)  
+                
+        b = SometkPO(Toplevel())
+        b.z = 9
+        self.assertEqual(b.z,9)  # CB: comes back as '9' - I'll fix this
+          
         
     def test_basic_shadow(self):
         """
@@ -91,7 +171,6 @@ class TestTkParameterizedObject(unittest.TestCase):
 
         g.x=0.4
         self.assertEqual(f._tk_vars['x'].get(),0.4) # simulate a GUI get & check up-to-date value returned
-
 
         self.z = 0
         f.pack_param('k',on_change=self.upzcount)
@@ -226,7 +305,7 @@ class TestTkParameterizedObject(unittest.TestCase):
 
 ###########################################################
 
-cases = [TestTkParameterizedObject]
+cases = [TestTkParameterizedObject] #,TestRangedParameter]
 
 suite = unittest.TestSuite()
 suite.addTests([unittest.makeSuite(case) for case in cases])
