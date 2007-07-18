@@ -8,9 +8,14 @@ __version__='$Revision$'
 import numpy.oldnumeric as Numeric
 
 from math import exp
-from topo.base.parameterclasses import BooleanParameter, Number, Integer
+from topo.base.parameterclasses import BooleanParameter, ListParameter
+from topo.base.parameterclasses import Number, Integer
 from lissom import LISSOM
+from topo.commands.pylabplots import vectorplot
 
+import numpy.oldnumeric.random_array as RandomArray
+
+activity_type = Numeric.Float32
 
 class SLISSOM(LISSOM):
     """
@@ -24,7 +29,7 @@ class SLISSOM(LISSOM):
     # configurable parameters
     threshold = Number(default=0.3,bounds=(0,None), doc="Baseline threshold")
 
-    decay_rate = Number(default=0.01,bounds=(0,None), 
+    threshold_decay_rate = Number(default=0.01,bounds=(0,None), 
         doc="Dynamic threshold decay rate")
     
     absolute_refractory = Number(default=1.0,bounds=(0,None),
@@ -36,10 +41,26 @@ class SLISSOM(LISSOM):
     spike_amplitude = Number(default=1.0,bounds=(0,None),
 	doc="Amplitude of spike at the moment of spiking")
 
-    # matrices for internal use
+    reset_on_new_iteration = BooleanParameter(default=False,
+	doc="Reset activity and projection activity when new iteration starts")
+
+    noise_rate = Number(default=0.0,bounds=(0,1.0),
+        doc="Noise added to the on-going activity")
+
+    # logging facility for debugging
+    trace_coords = ListParameter(default=[],
+        doc="List of coord(s) of membrane potential(s) to track over time")
+
+    trace_n = Number(default=400,bounds=(1,None),
+        doc="Number of steps to track neuron's membrane potential")
+
+    # matrices and vectors for internal use
     dynamic_threshold = None
     spike = None
     spike_history= None
+    membrane_potential = None
+    membrane_potential_trace = None
+    trace_count = 0
 
     def __init__(self,**params):
 	"""
@@ -47,24 +68,38 @@ class SLISSOM(LISSOM):
 	gets initialized. 
 	"""
 	super(SLISSOM,self).__init__(**params)
-	self.dynamic_threshold = Numeric.zeros(self.activity.shape)	
+	self.dynamic_threshold = \
+	    Numeric.zeros(self.activity.shape).astype(activity_type)	
 	self.spike = Numeric.zeros(self.activity.shape)	
-	self.spike_history = Numeric.zeros(self.activity.shape)	
+	self.spike_history = Numeric.zeros(self.activity.shape)
+	self.membrane_potential = \
+	    Numeric.zeros(self.activity.shape).astype(activity_type)
+
+	num_traces = len(self.trace_coords)
+	self.membrane_potential_trace = \
+	    Numeric.zeros((num_traces,self.trace_n)).astype(activity_type)	
 
     def activate(self):
 	"""
 	For now, this is the same as the parent's activate(), plus
-	fixed thresholding. Overloading was necessary to
+	fixed+dynamic thresholding. Overloading was necessary to
 	avoid self.send_output() being invoked before thresholding.
+	This function also updates and maintains internal values such as
+	membrane_potential, spike, etc.	
 	"""
 	
         self.activity *= 0.0
 
         for proj in self.in_connections:
-            self.activity+= proj.activity
+            self.activity += proj.activity
 
         if self.apply_output_fn:
             self.output_fn(self.activity)
+
+	# Add noise, based on the noise_rate.
+	if self.noise_rate > 0.0:
+	    self.activity = self.activity * (1.0-self.noise_rate) \
+		+ RandomArray.random(self.activity.shape) * self.noise_rate
 
 	# Thresholding: baseline + dynamic threshold + absolute refractory 
 	# period
@@ -75,17 +110,63 @@ class SLISSOM(LISSOM):
 
 		thresh = self.threshold + self.dynamic_threshold[r,c]
 
+		# Calculate membrane potential
+		self.membrane_potential[r,c] = self.activity[r,c] - thresh
+
                 if (self.activity[r,c] > thresh and self.spike_history[r,c]<=0):
                     self.activity[r,c] = self.spike_amplitude
 		    self.dynamic_threshold[r,c] = self.dynamic_threshold_init
 		    # set absolute refractory period for "next" timestep
 		    # (hence the "-1")
-		    self.spike_history[r,c] = self.absolute_refractory-1
+		    self.spike_history[r,c] = self.absolute_refractory-1.0
                 else:
                     self.activity[r,c] = 0.0
-		    self.dynamic_threshold[r,c] = \
-			self.dynamic_threshold[r,c] * exp(-self.decay_rate)
-		    self.spike_history[r,c] -= 1
+		    self.dynamic_threshold[r,c] = self.dynamic_threshold[r,c] * exp(-(self.threshold_decay_rate))
+		    self.spike_history[r,c] -= 1.0
 
+		# Append spike to the membrane potential
+		self.membrane_potential[r,c] += self.activity[r,c]
+
+ 	self._update_trace()
         self.send_output(src_port='Activity',data=self.activity)
+
+    def input_event(self,conn,data):
+	"""
+	SLISSOM-specific input_event handeling:
+        On a new afferent input, DO NOT clear the activity matrix unless
+	reset_on_new_iteration is True.
+        """
+        if self.new_iteration and self.reset_on_new_iteration:
+            self.new_iteration = False
+            self.activity *= 0.0
+            for proj in self.in_connections:
+                proj.activity *= 0.0
+            self.mask.reset()        
+        super(LISSOM,self).input_event(conn,data)
+
+    def plot_trace(self):
+	"""
+	Plot membrane potential trace of the unit designated by the
+	trace_coords list. This plot has trace_n data points.
+	"""
+	trace_offset=0
+	for trace in self.membrane_potential_trace:
+	    vectorplot(trace+trace_offset,style="b-")
+	    vectorplot(trace+trace_offset,style="rx")
+	    trace_offset += 3
+
+    def _update_trace(self):
+	"""
+	Update membrane potential trace for sheet coordinate (x,y).
+	"""
+
+	trace_id=0
+
+	for coord in self.trace_coords:
+	    (trace_r, trace_c) = self.sheet2matrix(coord[0],coord[1])
+	    self.membrane_potential_trace[trace_id][self.trace_count]=\
+		 self.membrane_potential[trace_r,trace_c]
+	    trace_id += 1
+
+	self.trace_count = (self.trace_count+1)%self.trace_n
 
