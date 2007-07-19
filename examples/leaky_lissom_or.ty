@@ -81,7 +81,7 @@ LeakyCFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 topo.sim['V1'] = SLISSOM(tsettle=1,threshold=0.05,noise_rate=0.001,
 	  absolute_refractory=1, threshold_decay_rate=0.1,
-	  trace_coords=[[0.29,0.29],[-0.29,-0.29],[-0.34,-0.34]],trace_n=400)
+	  trace_coords=[[0.29,0.29],[0.34,0.34],[-0.29,-0.29],[-0.34,-0.34]],trace_n=400)
 
 V1 = topo.sim['V1']
 
