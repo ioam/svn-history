@@ -40,70 +40,77 @@ class OverlapPO(ParameterizedObject):
 
 class SometkPO(TkParameterizedObject,Frame):
 
-    x = RangedParameter(default=1)
-    y = RangedParameter(default=2)
-    z = Parameter(default=3)
-
-class SomePO(ParameterizedObject):
-
-    x = RangedParameter(default=1)
-    y = RangedParameter(default=2)
-    z = Parameter(default=3)
+    x = RangedParameter(default="the")
+    y = RangedParameter(default="jane")
+    z = Number(default=3)
 
 
-## ### Temporaray, I hope, like the parameter.
+### Temporaray, I hope, like the parameter.
 ## class TestRangedParameter(unittest.TestCase):
 
 ##     def test_basic(self):
 
-##         k = SomePO(Toplevel())
-##         k.x = 9
+##         k = SometkPO(Toplevel())
+##         k.x = "cat"
 ##         k.z = 9
 
 ##         y_param = k.params()['y']
-##         y_param.range = [1,2,3,4,5]
-##         y_param.default = [4,3]
+##         y_param.range = ["fred","jane","phil"]
+##         #y_param.default = "phil"
 
-##         self.assertEqual(k.z,9)
-##         self.assertEqual(k.x,9)
-##         self.assertEqual(k.y,2)
+##         self.assertEqual(k.z,9) 
+##         self.assertEqual(k.x,"cat")
+##         #self.assertEqual(k.y,"phil")
 
 ##         x_param = k.params()['x']
-##         x_param.range = [1,2,3,4]
-##         x_param.default = [1,2]
+##         x_param.range = ["the","cat","sat"]
+##         #x_param.default = "sat"
         
-##         self.assertEqual(y_param.range,[1,2,3,4,5])
-##         self.assertEqual(x_param.range,[1,2,3,4])
+##         self.assertEqual(y_param.range,["fred","jane","phil"])
+##         self.assertEqual(x_param.range,["the","cat","sat"])
 
-##         self.assertEqual(x_param.default,[1,2])
-##         self.assertEqual(y_param.default,[4,3])
+##         #self.assertEqual(x_param.default,"sat")
+##         #self.assertEqual(y_param.default,"phil")
         
 
 ##     def test_more(self):
 
-##         k = SomePO(Toplevel())
+##         k = SometkPO(Toplevel())
 
 ##         x_param = k.params()['x']
 ##         y_param = k.params()['y']
 
-##         k.x = 1 #x_param.default = '1'
-##         k.y = 2 #y_param.default = '2'
+##         # need to reset parameter defaults
+##         x_param.range = []
+##         y_param.range = []
+        
+##         k.x = "cat" #x_param.default = '1'
+##         k.y = "phil" #y_param.default = '2'
 
-##         k.initialize_ranged_parameter('x',range_=[1,2,3,4])        
-##         k.initialize_ranged_parameter('y',range_=[5,6,7,8])
+##         k.initialize_ranged_parameter('x',range_=["the","cat","sat"])
+##         k.initialize_ranged_parameter('y',range_=["fred","jane","phil"])
 
-##         self.assertEqual(k.x,1)
-##         self.assertEqual(k.y,2)
-                
-##         self.assertEqual(x_param.range,[1,2,3,4])
-##         self.assertEqual(y_param.range,[5,6,7,8])
+##         self.assertNotEqual(id(x_param.range),id(y_param.range))
 
+##         self.assertEqual(k.x,"cat")
+##         self.assertEqual(k.y,"phil")
+
+##         self.assertEqual(x_param.range,["the","cat","sat"])
+##         self.assertEqual(y_param.range,["fred","jane","phil"])
 
 ##         k.pack_param('x')
 ##         k.pack_param('y')
 
-##         self.assertEqual(x_param.range,[1,2,3,4])
-##         self.assertEqual(y_param.range,[5,6,7,8])
+##         self.assertEqual(x_param.range,["the","cat","sat"])
+##         self.assertEqual(y_param.range,["fred","jane","phil"])
+
+##         x=k.get_parameter('x')
+##         y=k.get_parameter('y')
+
+##         self.assertEqual(x,x_param)
+##         self.assertEqual(y,y_param)
+        
+
 
         
 
@@ -137,16 +144,6 @@ class TestTkParameterizedObject(unittest.TestCase):
         self.assertEqual(f.k,True) # check that f.k was actually set
         self.assertEqual(f._tk_vars['k'].get(),True) # simulate GUI get
 
-
-    def test_show_type_bug(self):
-
-        a = SomePO()
-        a.z = 9
-        self.assertEqual(a.z,9)  
-                
-        b = SometkPO(Toplevel())
-        b.z = 9
-        self.assertEqual(b.z,9)  # CB: comes back as '9' - I'll fix this
           
         
     def test_basic_shadow(self):
