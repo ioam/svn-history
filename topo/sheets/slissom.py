@@ -11,7 +11,7 @@ from math import exp
 from topo.base.parameterclasses import BooleanParameter, ListParameter
 from topo.base.parameterclasses import Number, Integer
 from lissom import LISSOM
-from topo.commands.pylabplots import vectorplot
+from topo.commands.pylabplots import vectorplot, matrixplot
 
 import numpy.oldnumeric.random_array as RandomArray
 
@@ -154,6 +154,21 @@ class SLISSOM(LISSOM):
 	    vectorplot(trace+trace_offset,style="b-")
 	    vectorplot(trace+trace_offset,style="rx")
 	    trace_offset += 3
+
+    def vectorplot_trace(self):
+	"""
+	Plot membrane potential trace of the unit designated by the
+	trace_coords list. This plot has trace_n data points.
+	This method simply calls plot_trace().
+	"""
+	self.plot_trace()
+
+    def matrixplot_trace(self):
+	"""
+	Matrixplot membrane potential trace of the unit designated by the
+	trace_coords list.
+	"""
+	matrixplot(self.membrane_potential_trace,aspect=40)
 
     def _update_trace(self):
 	"""
