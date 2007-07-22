@@ -66,17 +66,19 @@ def vectorplot(vec,title=None,style='-',label=None):
     An optional string can be supplied as a title for the figure, if
     desired.  At present, this is only used for the window, not the
     actual body of the figure (and will thus not appear when the
-    figure is saved. The style parameter allows different
-    line/linespoints style for the plot: 'r-' for red solid line, 'bx'
-    for blue x-marks, etc.  Execution of multiple vectorplot()
-    commands with different styles will result in all those styles
-    overlayed on a single plot window.
-    """
-    if (style): 
-	pylab.plot(vec, style, label=label)
-    else:
-	pylab.plot(vec, label=label)
+    figure is saved).
 
+    The style argument allows different line/linespoints style for
+    the plot: 'r-' for red solid line, 'bx' for blue x-marks, etc.
+    See http://matplotlib.sourceforge.net/matplotlib.pylab.html#-plot
+    for more possibilities.
+
+    The label argument can be used to identify the line in a figure legend.
+
+    Execution of multiple vectorplot() commands with different styles
+    will result in all those styles overlayed on a single plot window.
+    """
+    pylab.plot(vec, style, label=label)
     pylab.grid(True)
     if (title): windowtitle(title)
     pylab.show._needmain = False
