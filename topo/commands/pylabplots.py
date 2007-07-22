@@ -64,11 +64,13 @@ def vectorplot(vec,title=None,style='-',label=None):
     or customized plots; this is just a simple example.
 
     An optional string can be supplied as a title for the figure, if
-    desired.  At present, this is only used for the body of the figure,
-    not the ????. The style parameter allows different line/linespoints 
-    style for the plot: 'r-' for red solid line, 'bx' for blue x-marks, etc.
-    Execution of multiple vectorplot() commands with different styles will
-    result in all those styles overlayed on a single plot window.
+    desired.  At present, this is only used for the window, not the
+    actual body of the figure (and will thus not appear when the
+    figure is saved. The style parameter allows different
+    line/linespoints style for the plot: 'r-' for red solid line, 'bx'
+    for blue x-marks, etc.  Execution of multiple vectorplot()
+    commands with different styles will result in all those styles
+    overlayed on a single plot window.
     """
     if (style): 
 	pylab.plot(vec, style, label=label)
