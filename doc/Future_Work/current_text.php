@@ -767,7 +767,10 @@ Would get command-prompt completion in the local namespace, debugging
 in the namespace of the exception, with easier to follow tracebacks,
 persistent command histories, easy interaction with the system shell
 (using ! to get a shell and $ to feed it Python variables), and
-session logging.
+session logging.  Combined with ipython.el, Emacs users will then
+be able to see the line of the source code where the error or
+breakpoint occurred.  Also consider an alternative debugger,
+http://www.digitalpeers.com/pythondebugger/.
 
 
 <H4>2007/05/08 (CB): Investigate using Tile</H4>
