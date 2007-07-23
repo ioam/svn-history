@@ -271,6 +271,55 @@ class SquareGrating(PatternGenerator):
         return around(0.5 + 0.5*sin(frequency*2*pi*self.pattern_y + phase))
 
 
+
+class Sweeper(PatternGenerator):
+    """
+    PatternGenerator that sweeps a supplied PatternGenerator in a direction
+    perpendicular to its orientation.
+    """
+
+    generator = Parameter(default=Gaussian(),precedence=0.97, doc="Pattern to sweep.")
+
+    speed = Number(default=0.25,bounds=(0.0,None),doc="""
+        Sweep speed: number of sheet coordinate units per unit time.""")
+
+    step = Number(default=1,doc="""
+        Number of steps at the given speed to move in the sweep direction.
+        The distance moved is speed*step.""")
+
+    def function(self,**params):
+        """Selects and returns one of the patterns in the list."""
+        bounds = params.get('bounds',self.bounds)
+        xdensity=params.get('xdensity',self.xdensity)
+        ydensity=params.get('ydensity',self.ydensity)
+        x=params.get('x',self.x)
+        y=params.get('y',self.y)
+        scale=params.get('scale',self.scale)
+        offset=params.get('offset',self.offset)
+        size=params.get('size',self.size)
+        orientation=params.get('orientation',self.orientation)
+        
+        pg = self.generator
+
+        pattern_orientation=orientation
+        motion_orientation=pattern_orientation+pi/2.0
+        
+        speed=params.get('speed',self.speed)
+        motion_sign=2*int(motion_orientation/pi)-1
+        step=params.get('step',self.step)
+
+        new_x = x+size*pg.x
+        new_y = y+size*pg.y
+        
+        image_array = pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
+                         x=new_x + motion_sign*speed*step*cos(motion_orientation),
+                         y=new_y + motion_sign*speed*step*sin(motion_orientation),
+                         orientation=pattern_orientation,
+                         scale=pg.scale*scale,offset=pg.offset+offset)
+        
+        return image_array
+
+
 class Composite(PatternGenerator):
     """
     PatternGenerator that accepts a list of other PatternGenerators.
