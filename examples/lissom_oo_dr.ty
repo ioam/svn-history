@@ -32,6 +32,7 @@ __version__='$Revision$'
 
 import fixedpoint
 import numpy
+import copy
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
@@ -39,7 +40,7 @@ from fixedpoint import FixedPoint
 import topo.patterns.basic
 import topo.patterns.random
 
-from topo.patterns.basic import Gaussian
+from topo.patterns.basic import Gaussian,Sweeper
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
@@ -58,12 +59,12 @@ num_inputs=1
 input_type=Gaussian
 inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),
                    y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i)),
-                   orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56+i)),
+                   orientation=0,
                    size=0.088388, aspect_ratio=4.66667, scale=1.0,
-                   bounds=BoundingBox(radius=0.8)) # JABALERT: What does this bounds do?
+                   bounds=BoundingBox(radius=0.8))
         for i in xrange(num_inputs)]
+sub_inputs = topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
 
-combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
                                  
 # Default for tutorial
 topo.patterns.basic.Line.scale=0.9
@@ -84,14 +85,15 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 ###########################################
 # build simulation
 
-topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
-                                  input_generator=combined_inputs,
-                                  period=1.0, phase=0.05,
-                                  nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
-
 # Number of separate delay lines in the LGN
 num_lags=4
 for i in xrange(num_lags):
+    topo.sim['Retina'+str(i)]=GeneratorSheet(nominal_density=24.0,
+                                             input_generator=Sweeper(generator=copy.deepcopy(sub_inputs),step=i,speed=1/24.0,
+                                                                     orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=88))),
+                                             period=1.0, phase=0.05,
+                                             nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
+
     topo.sim['LGNOn' +str(i)]=CFSheet(nominal_density=24.0,
                                       nominal_bounds=BoundingBox(radius=0.5+0.25),
                                       output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
@@ -121,24 +123,24 @@ off_weights = topo.patterns.basic.Composite(
 
 for i in xrange(num_lags):
 
-    topo.sim.connect('Retina','LGNOn'+str(i),delay=FixedPoint("0.05")*(i+1),
+    topo.sim.connect('Retina'+str(i),'LGNOn'+str(i),delay=FixedPoint("0.05"),
                      connection_type=SharedWeightCFProjection,strength=2.38,
                      nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                      weights_generator=on_weights)
     
-    topo.sim.connect('Retina','LGNOff'+str(i),delay = FixedPoint("0.05")*(i+1),
+    topo.sim.connect('Retina'+str(i),'LGNOff'+str(i),delay = FixedPoint("0.05"),
                      connection_type=SharedWeightCFProjection,strength=2.38,
                      nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                      weights_generator=off_weights)
     
-    topo.sim.connect('LGNOn'+str(i),'V1',delay=FixedPoint("0.05")*(i+1), dest_port=('Activity','JointNormalize', 'Afferent'),
+    topo.sim.connect('LGNOn'+str(i),'V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
                      connection_type=CFProjection,strength=1.0,name='LGNOnAfferent'+str(i),
                      weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                      generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                                  topo.patterns.random.UniformRandom()]),
                      nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590/2)
     
-    topo.sim.connect('LGNOff'+str(i),'V1',delay=FixedPoint("0.05")*(i+1), dest_port=('Activity','JointNormalize', 'Afferent'),
+    topo.sim.connect('LGNOff'+str(i),'V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
                      connection_type=CFProjection,strength=1.0,name='LGNOffAfferent'+str(i),
                      weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                      generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
@@ -198,8 +200,6 @@ topo.sim.schedule_command(20000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 for i in xrange(num_lags):
     ON ='topo.sim["V1"].projections()["LGNOnAfferent'+str(i)+'"]'
     OFF='topo.sim["V1"].projections()["LGNOffAfferent'+str(i)+'"]'
-    print ON
-    print OFF
     topo.sim.schedule_command(  500*st,ON+'.learning_rate=0.6850/2;'+OFF+'.learning_rate=0.6850/2')
     topo.sim.schedule_command( 2000*st,ON+'.learning_rate=0.5480/2;'+OFF+'.learning_rate=0.5480/2')
     topo.sim.schedule_command( 4000*st,ON+'.learning_rate=0.4110/2;'+OFF+'.learning_rate=0.4110/2')
@@ -227,7 +227,8 @@ topo.sim.schedule_command( 6500*st,'topo.sim["V1"].tsettle=12')
 topo.sim.schedule_command( 8000*st,'topo.sim["V1"].tsettle=13')
 
 # default locations for model editor
-topo.sim.grid_layout([[None,    'V1',     None],
+topo.sim.grid_layout([[None, 'V1'],
                       [('LGNOn' +str(i)) for i in xrange(num_lags)],
                       [('LGNOff'+str(i)) for i in xrange(num_lags)],
-                      [None,    'Retina', None]], xstart=150, xstep=200)
+                      [('Retina'+str(i)) for i in xrange(num_lags)]],
+                     xstart=150, xstep=300)
