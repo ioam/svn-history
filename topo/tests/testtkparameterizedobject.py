@@ -302,10 +302,12 @@ class TestTkParameterizedObject(unittest.TestCase):
 
 ###########################################################
 
+
 cases = [TestTkParameterizedObject] #,TestRangedParameter]
 
 suite = unittest.TestSuite()
 suite.addTests([unittest.makeSuite(case) for case in cases])
+suite.requires_display = True
 
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite)
