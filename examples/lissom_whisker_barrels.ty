@@ -9,6 +9,66 @@ $Id$
 __version__='$Revision$'
 
 
+###############################################################################
+# Input generation code; may eventually move to topo/patterns
+
+from mlabwrap import mlab
+mlab.addpath('examples/whiskers')
+
+from topo.base.parameterclasses import Integer, Number
+from topo.base.patterngenerator import PatternGenerator
+import topo
+
+class WhiskerArray(PatternGenerator):
+    """
+    Simulates a 2D array of whiskers using external Matlab programs.
+    """
+
+    # JABALERT: The parameter definitions here are quite arbitrary, e.g.
+    # differing over whether they are a square number or a square root.
+    # Should be generalized to handle a full range of reasonable values.
+    num_whiskers = Integer(default=5,bounds=(1,None),softbounds=(0.0,10.0),
+        precedence=0.31,doc="""
+        Square root of the number of whiskers to use.  E.g. 3 gives a 3x3 array.""")
+    
+    num_ganglion_cells = Integer(default=81,doc="""
+        Number of ganglion cells to use per whisker; must be a square integer.""")
+
+    # JABALERT: Apparently only supports a quantized set of directions, but that needs fixing.
+    direction = Number(default=pi/4,softbounds=(0.0,2*pi),doc="""
+        Direction of whisker array motion, in radians, assuming a stationary surface.""")
+
+    def __init__(self,**params):
+        super(WhiskerArray,self).__init__(**params)
+        # Should probably specify a fixed seed for the random numbers
+        # so that the positions won't change on each run
+        self.ganglion_cell_positions=mlab.shuffle(self.num_whiskers,self.num_ganglion_cells)
+        
+    def function(self,**params):
+        direction = params.get('direction',self.direction)
+        
+        return mlab.generate_barrelettes(
+            mlab.stim_whiskers_time(self.num_whiskers,
+                                    self.num_ganglion_cells,
+                                    int(direction/pi*180),
+                                    # Next two parameters may be best stored in matlab,
+                                    # because they depend on the input pattern type:
+                                    5,   # Stimulus length
+                                    0.4, # Stimulus height
+                                    0,   # Rectify?
+                                    int(topo.sim.time()+1)), # Time step; 1-based
+            self.ganglion_cell_positions)
+
+# Examples:
+#x=WhiskerArray()
+#from topo.commands.pylabplots import matrixplot
+#matrixplot(x())
+#topo.sim.run(2)
+#matrixplot(x())
+
+###############################################################################
+
+
 import fixedpoint
 import numpy
 import copy
