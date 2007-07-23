@@ -30,7 +30,8 @@ class WhiskerArray(PatternGenerator):
     num_whiskers = Integer(default=5,bounds=(1,None),softbounds=(0.0,10.0),
         precedence=0.31,doc="""
         Square root of the number of whiskers to use.  E.g. 3 gives a 3x3 array.""")
-    
+
+    # JABALERT: Change to be 9 by default and to be a square root.
     num_ganglion_cells = Integer(default=81,doc="""
         Number of ganglion cells to use per whisker; must be a square integer.""")
 
