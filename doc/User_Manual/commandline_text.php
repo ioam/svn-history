@@ -136,6 +136,39 @@ href="http://matplotlib.sourceforge.net/">MatPlotLib</A> documentation
 for how to make new plots and change their axes, labels, titles, line
 styles, etc.
 
+<H2>Saving Topographica bitmaps</H2>
+
+A command save_plotgroup is provided to allow you to automate the
+process of generating and saving the various bitmap images visible in
+the Topographica GUI.  For instance, to measure an orientation map and
+save the resulting bitmaps to disk, just do:
+
+<pre>
+Topographica&gt; from topo.commands.analysis import save_plotgroup, measure_or_pref
+Topographica&gt; measure_or_pref()
+Topographica&gt; save_plotgroup("Orientation Preference")
+</pre>
+
+<P>The name "Orientation Preference" here is just the name used in the
+Plots menu, and the command "measure_or_pref()" is listed at the
+bottom of the Orientation Preference window.  These names and
+functions are typically defined in topo/commands/analysis.py, and are
+used to present testing images and store the resulting responses.  The
+command save_plotgroup then uses this data to generate the bitmap
+images, and saves them to disk.
+
+<P>Other examples:
+
+<pre>
+save_plotgroup("Activity")
+save_plotgroup("Projection",projection_name='Afferent',sheet_name='V1')
+</pre>
+
+<P>Some plotgroups (such as Projection) accept optional parameters
+like projection_name and sheet_name.  Using these commands makes it
+possible to run simulations without any GUI, for batch or remote
+processing.
+
 
 <H2>Customizing the command prompt</H2>
 
