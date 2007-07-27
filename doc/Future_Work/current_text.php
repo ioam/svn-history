@@ -793,10 +793,25 @@ dynamic help. We might be able to simplify topoconsole further with this.]
 Probably all available from Tkinter and bwidget...we can probably
 stop using Pmw.]
 
+<H4>2007/07/24 (JB): Matlab Toolbox for Dimensionality Reduction</H4>
 
+Consider interfacing to this toolbox, which contains Matlab
+implementations of twenty techniques for dimensionality reduction. A
+number of these implementations were developed from scratch, whereas
+other implementations are based on software that is already available
+on the Web.  http://www.cs.unimaas.nl/l.vandermaaten/dr
+
+
+<H4>2007/07/24 (JB): Digital Embryo Workshop</H4>
+
+Consider interfacing to this toolbox, which is handy for generating
+novel 3D objects, e.g. to use as training stimuli (perhaps for
+somatosensory simulations?).
+http://www.psych.ndsu.nodak.edu/brady/downloads.html
 
 
 <!-- NOTES NEEDING TO BE TURNED INTO TASKS 
+
 
 Any idea what this does?
 alterdot()
