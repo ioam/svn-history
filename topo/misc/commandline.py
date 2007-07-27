@@ -209,18 +209,8 @@ def process_argv(argv):
             #set up command completion
             import rlcompleter
             readline.parse_and_bind("tab: complete")
-    
-    # if -g is on
-    # Not sure why we need that here, but it doesn't work when it is at the top of the file.
-    import topo
-    if option.gui:
-	import topo.tkgui
-	topo.gui_cmdline_flag = True
-	topo.tkgui.start() 
-	os.environ["PYTHONINSPECT"] = "1"
-    else:
-	topo.gui_cmdline_flag = False 
 
+    
      # catch the first filenames arguments (before any options) and execute them.
     filename_arg = topo_parser.largs
 
@@ -238,6 +228,19 @@ def process_argv(argv):
     # execute remaining commands.
     for cmd in option.commands:
 	exec cmd in __main__.__dict__
+
+    # if -g is on
+    # Not sure why we need import topo here, but it doesn't work when it is at the top of the file.
+    import topo
+    if option.gui:
+	import topo.tkgui
+	topo.gui_cmdline_flag = True
+	topo.tkgui.start() 
+	os.environ["PYTHONINSPECT"] = "1"
+    else:
+	topo.gui_cmdline_flag = False 
+
+
 
 def run_batch(script_file,output_directory="./Data",plotting_script="topo/plotting/default_plottingscript.py", recording_times = (50,100,500,1000,2000,3000,4000,5000), **params):
     """
