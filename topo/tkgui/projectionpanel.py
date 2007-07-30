@@ -193,8 +193,10 @@ class ConnectionFieldsPanel(CFPGPanel):
         #self.x,self.y = 0.0,0.0
 
         if 'sheet' in args: self.sheet=args['sheet']
-        [self._tk_vars[coord].set(args.get(coord,0.0)) for coord in ('x','y')]
-                    
+
+        for coord in ['x','y']:
+          self._tk_vars[coord].set(args.get(coord,0.0))
+          
         l,b,r,t = self.sheet.bounds.lbrt()
 
         x = self.get_parameter_object('x')
