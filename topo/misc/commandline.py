@@ -112,22 +112,38 @@ def boolean_option_action(option,opt_str,value,parser):
     get_filenames(parser)
 
 
-topo_parser.add_option("-g","--gui",action="callback",callback=boolean_option_action,dest="gui",
-		       default=False,help="launch an interactive graphical user interface.")
 topo_parser.add_option("-i","--interactive",action="callback",callback=boolean_option_action,
                        dest="interactive",default=False,
                        help="provide an interactive prompt even if stdin does not appear to be a terminal.")
 
 
+gui_started=False
+
+def g_action(option,opt_str,value,parser):
+    """Callback function for the -g option."""
+
+    # The first time -g is encountered (only), adds a command to the -c list to start the GUI
+    global gui_started
+    if not gui_started:
+        gui_started = True
+        list_command=getattr(parser.values,"commands")
+        list_command += ["print 'Launching GUI'; import topo.tkgui ; topo.tkgui.start()"]
+        setattr(parser.values,"commands",list_command)
+
+    boolean_option_action(option,opt_str,value,parser)
+
+topo_parser.add_option("-g","--gui",action="callback",callback=g_action,dest="gui",
+		       default=False,help="launch an interactive graphical user interface; equivalent to -c 'import topo.tkgui ; topo.tkgui.start()'.")
+
 
 def c_action(option,opt_str,value,parser):
     """Callback function for the -c option.""" 
     list_command=getattr(parser.values,option.dest)
-    list_command +=  [value]
+    list_command += [value]
     setattr(parser.values,option.dest,list_command) 
     get_filenames(parser)
 
-topo_parser.add_option("-c","--command",action = "callback",callback = c_action,type="string",
+topo_parser.add_option("-c","--command",action = "callback",callback=c_action,type="string",
 		       default=[],dest="commands",metavar="\"<command>\"",
 		       help="commands passed in as a string and followed by files to be executed.")
 
@@ -167,7 +183,8 @@ def process_argv(argv):
 
     for startup_file in (rcpath,configpath,inipath):
         if os.path.exists(startup_file):
-            # CEBALERT: print a note that commands in a file are being executed?
+            if option.interactive or option.gui:
+                print "Executing user startup file %s" % (startup_file)
             execfile(startup_file,__main__.__dict__)
 
 
@@ -197,10 +214,11 @@ def process_argv(argv):
 
 
     # Provide an interactive prompt unless running in batch mode
+    if option.interactive:
+        print BANNER
+
     if option.interactive or option.gui:
 	os.environ["PYTHONINSPECT"] = "1"
-        if not option.gui:
-            print BANNER
         try:
             import readline
         except ImportError:
@@ -228,17 +246,6 @@ def process_argv(argv):
     # execute remaining commands.
     for cmd in option.commands:
 	exec cmd in __main__.__dict__
-
-    # if -g is on
-    # Not sure why we need import topo here, but it doesn't work when it is at the top of the file.
-    import topo
-    if option.gui:
-	import topo.tkgui
-	topo.gui_cmdline_flag = True
-	topo.tkgui.start() 
-	os.environ["PYTHONINSPECT"] = "1"
-    else:
-	topo.gui_cmdline_flag = False 
 
 
 
