@@ -524,8 +524,7 @@ class TopoConsole(TkguiWindow):
         """Quit topographica."""
         if tkMessageBox.askyesno("Quit Topographica","Really quit?"):
             self.destroy() 
-            if topo.gui_cmdline_flag:
-                print "Quit selected; exiting"
+            print "Quit selected; exiting"
 
             # Workaround for obscure problem on some UNIX systems
             # as of 4/2007, probably including Fedora Core 5.  
