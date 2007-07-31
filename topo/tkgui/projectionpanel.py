@@ -156,7 +156,6 @@ class CFPGPanel(ProjectionSheetPGPanel):
 
 
 
-
 # CEBHACKALERT: various parts of the dynamic info/right-click menu stuff
 # don't make sense at the moment when things like 'situate' are clicked.
 class ConnectionFieldsPanel(CFPGPanel):
@@ -164,15 +163,19 @@ class ConnectionFieldsPanel(CFPGPanel):
     plotgroup_type = ConnectionFieldsPlotGroup
 
 
+
         # CEBALERT: used to eval x,y in main here and elsewhere in tkgui so that variables could be used.
         # Now that the widget selection is automatic, this should be taken care of (at least partly) elsewhere
         # (e.g. a taggedslider that converts to float by doing an eval in main and float(), etc).
 
-    
-    def __init__(self,console,master,pgt,**params):       
-        super(ConnectionFieldsPanel,self).__init__(console,master,pgt,**params) 
+    def __init__(self,console,master,pgt,**params):
+        self.initial_args=params # CEBALERT: store the initial arguments so we can get sheet,x,y in
+                                 # sheet_change if any of them were specified. Isn't there a cleaner
+                                 # way?
+        super(ConnectionFieldsPanel,self).__init__(console,master,pgt,**params)
         self.pack_param('x',parent=self.control_frame_3,on_change=self.update_plots)
         self.pack_param('y',parent=self.control_frame_3,on_change=self.update_plots)
+
 
 ##############################################################################
         # CEBALERT:
@@ -183,33 +186,37 @@ class ConnectionFieldsPanel(CFPGPanel):
         # Also:        
         # e.g. bound on parameter is 0.5 but means <0.5, taggedslider
         #   still lets you set to 0.5 -> error
-        self.sheet_change(**params)
-    def sheet_change(self,**args):
+            
+    def sheet_change(self):
         # CEBHACKALERT: get an inconsequential but scary
         # cf-out-of-range error if you e.g. set y < -0.4 on sheet V1
         # and then change to V2 (which has smaller bounds).
         # x and y don't seem to be updated in time...
         #self.x,self.y = 0.0,0.0
 
-        if 'sheet' in args: self.sheet=args['sheet']
+        # CEBALERT: need to crop x,y (for e.g. going to smaller sheet) rather
+        # than set to 0
+    
+        if 'sheet' in self.initial_args: self.sheet=self.initial_args['sheet']
 
         for coord in ['x','y']:
-          self._tk_vars[coord].set(args.get(coord,0.0))
+            self._tk_vars[coord].set(self.initial_args.get(coord,0.0))
           
         l,b,r,t = self.sheet.bounds.lbrt()
+        bounds = {'x':(l,r),
+                  'y':(b,t)}
 
-        x_param_obj = self.get_parameter_object('x')
-        y_param_obj = self.get_parameter_object('y')
+        for coord in ['x','y']:
+            param_obj=self.get_parameter_object(coord)                
+            param_obj.bounds = bounds[coord]
+            
+            # (method can be called before x,y widgets added)
+            if coord in self._widgets:
+                w=self._widgets[coord]
+                w.set_bounds(*param_obj.bounds)
+                w.refresh()
 
-        x_param_obj.bounds=(l,r)
-        y_param_obj.bounds=(b,t)
-
-        # (method can be called before widgets are added)
-        if 'x' and 'y' in self._widgets:
-            w1,w2=self._widgets['x'],self._widgets['y']
-            w1.set_bounds(*x_param_obj.bounds); w2.set_bounds(*y_param_obj.bounds)
-            w1.refresh();w2.refresh()
-
+        self.initial_args = {} # reset now we've used them
         super(ConnectionFieldsPanel,self).sheet_change()
 ##############################################################################
 
