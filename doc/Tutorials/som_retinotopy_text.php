@@ -37,8 +37,8 @@ develops a mapping of the dimensions of variance in the input space.
 <P><li>To start the full simulation from the book using the
   Topographica GUI, you could run:
 <pre>
-  /home/jbednar/public/topographica/topographica -g \
-  -c default_retina_density=24 -c default_density=40 som_retinotopy.ty
+  /home/jbednar/public/topographica/topographica \
+  -c default_retina_density=24 -c default_density=40 som_retinotopy.ty -g
 </pre>
   (all on one line, with no backslash).  These changes can also be
   made in the .ty file itself, if you do not want to type them each
@@ -47,7 +47,7 @@ develops a mapping of the dimensions of variance in the input space.
   <p>However, the default is to use a much smaller network that is
   faster to run while getting similar results:
 <pre>
-  /home/jbednar/public/topographica/topographica -g som_retinotopy.ty
+  /home/jbednar/public/topographica/topographica som_retinotopy.ty -g
 </pre>
 	
   <P>(The plots below show the results from the full density of the

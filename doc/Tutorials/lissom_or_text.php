@@ -299,7 +299,7 @@ studied using the LISSOM model in Topographica as follows.
 <p></p><li>First, quit from any existing simulation, and start with a fresh copy:
 
 <blockquote><code class='to_type'>
-  ./topographica -g examples/lissom_or.ty
+  ./topographica examples/lissom_or.ty -g
   </code></blockquote>
 <p></p>
 
@@ -384,7 +384,7 @@ editing the Python code file <code>examples/lissom_or.ty</code> to
 change the <code>nominal_density</code> of V1 from 48 to 150,
 and doing:
 <blockquote><code class='to_type'>
-  ./topographica -g examples/lissom_or.ty
+  ./topographica examples/lissom_or.ty -g
   </code></blockquote>
 <p></p>
   
