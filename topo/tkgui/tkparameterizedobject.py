@@ -496,6 +496,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         
 
     # CB: document!
+    # also note on_change is called during pack_param
     def pack_param(self,name,parent=None,widget_options={},on_change=None,**pack_options):
         """
         Create a widget for Parameter name, configured according to
@@ -585,6 +586,14 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             return f
 
         w.pack(side=widget_side,expand='yes',fill='x')
+
+        # CEBALERT: move this; doesn't always need to be done
+        try:
+            w.set_bounds(*param.bounds)
+            w.refresh()
+        except: # could be TypeError (param has None for bounds) or AttributeError (no set_bounds)
+                # (when moved to correct location, won't need AttributeError check)
+            pass
 
         self._widgets[name]=w
 
