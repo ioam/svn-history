@@ -246,8 +246,9 @@ Each type will have various parameters that can be changed.""")
         """
         self.__current_pattern_generator = self.pattern_generators[pattern_generator_name]()
         self.__params_frame.create_widgets(self.__current_pattern_generator)
-        if self.auto_refresh: 
+        if self.auto_refresh:
 	    self.refresh()
+            self.refresh() # CEBHACKALERT! No comment
 
 
     def present(self):
