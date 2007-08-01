@@ -100,7 +100,7 @@ checked out by changing to wherever you want the files to be stored,
 and using the command:
 
 <pre>
-  cvs -d $TOPOROOT checkout -P -r LATEST_STABLE topographica
+  cvs -d $TOPOROOT checkout -r LATEST_STABLE topographica
 </pre>
 
 The <code>-r LATEST_STABLE</code> option should be omitted if you want
