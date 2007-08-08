@@ -46,6 +46,7 @@ def identity(x):
 
 
 ### Temporary
+# ObjectSelectorParameter, plus a parent shared with ClassSelectorParameter?
 class RangedParameter(Parameter):
 
     __slots__ = ['range']
