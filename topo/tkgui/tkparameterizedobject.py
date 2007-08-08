@@ -587,27 +587,19 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             label.pack(side=label_side)
 
 
-        ### CB: clean up
-        if param.hidden:
-            return frame
-
         widget.pack(side=widget_side,expand='yes',fill='x')
 
-        # CEBALERT: move this; doesn't always need to be done
-        try:
-            widget.set_bounds(*param.bounds)
-            widget.refresh()
-        except: # could be TypeError (param has None for bounds) or AttributeError (no set_bounds)
-                # (when moved to correct location, won't need AttributeError check)
-            pass
+        if isinstance(param,Number):
+            try:
+                widget.set_bounds(*param.bounds)
+                widget.refresh()
+            except TypeError: # if param has None for bounds, the * won't work
+                pass
 
         self._widgets[name]=widget
-
         self._furames[name]=(frame,label)
 
-        # f's probably better than w
         self.balloon.bind(frame,getdoc(param))
-
         frame.pack(pack_options)
         return frame 
 
