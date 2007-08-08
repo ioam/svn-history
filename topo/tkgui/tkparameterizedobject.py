@@ -463,6 +463,9 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     widgets representing the Parameters of the supplied
     ParameterizedObjects.
     """
+
+    pretty_parameters = BooleanParameter(default=True,doc="Whether to format parameter names, or use the variable names instead.")
+    
     def __init__(self,master,extra_pos=[],**params):
         """
 
@@ -493,10 +496,24 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 ##         self._widgets[name].destroy()
 ##         self.pack_param(name,parent=self._furames[name])
         
-        
+
+    # move elsewhere
+    # Will create some general function for converting parameter names to
+    # a 'pretty' representation. Need to merge more of tkpo with param frame
+    def pretty_print(self,s):
+        """
+        """
+        if not self.pretty_parameters:
+            return s
+        else:
+            n = s.replace("_"," ")
+            n = n.capitalize()
+            return n
+
 
     # CB: document!
     # also note on_change is called during pack_param
+    # on_change should be on_set (since it's called not only for changes)
     def pack_param(self,name,parent=None,widget_options={},on_change=None,**pack_options):
         """
         Create a widget for Parameter name, configured according to
@@ -504,6 +521,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         Balloon help is automatically set from the Parameter's doc.
 
+        The widget and label (if appropriate) are enlosed in a Frame.
+        
         Returns the widget in case further processing of it is required.
         
         Examples:
@@ -511,7 +530,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         self.pack_param(name,side='left')
         self.pack_param(name,{'width':50},side='top',expand='yes',fill='y')
         """
-        f = Frame(parent or self.master)
+        frame = Frame(parent or self.master)
         param = self.get_parameter_object(name)
         
         widget_type = parameters_to_tkwidgets.get(type(param),Entry)
@@ -522,26 +541,20 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         else:
             widget_side='right';label_side='left'
             
-
-        l = None #  CEBALERT: clean up
-        
         ### buttons are different from the other widgets: different labeling,
         ### and no need for a variable
         if widget_type==Tkinter.Button:
             assert on_change is not None, "Buttons need a command."
-            w = widget_type(f,text=name,command=on_change,**widget_options)
+            widget = widget_type(frame,text=self.pretty_print(name),command=on_change,**widget_options)
+            label = None
         else:
 
             tk_var = self._tk_vars[name]
 
-            # CEBALERT: called "on_change", but it should be "on_set"
-            # (since it's called not just for changes)
             if on_change is not None: tk_var._on_change=on_change
 
             ### CEBALERT: clean up this widget type selection
 
-            ### CB: add bounds/softbounds for taggedsliders
-            
             if widget_type==Tkinter.OptionMenu:
 
                 self._update_translator(name,param)
@@ -553,16 +566,16 @@ class TkParameterizedObject(TkParameterizedObjectBase):
                 #if tk_var.get() not in new_range:  
                 tk_var.set(new_range[0])
                 
-                w = widget_type(f,tk_var,*new_range,**widget_options)
+                widget = widget_type(frame,tk_var,*new_range,**widget_options)
                 
                 
             else:
             ### Tkinter widgets use either variable or textvariable
                 try:
-                    w = widget_type(f,variable=tk_var,**widget_options)
+                    widget = widget_type(frame,variable=tk_var,**widget_options)
                 except _tkinter.TclError:
                     try:
-                        w = widget_type(f,textvariable=tk_var,**widget_options)
+                        widget = widget_type(frame,textvariable=tk_var,**widget_options)
                     except _tkinter.TclError:
                         raise # meaning the widget doesn't support variable or textvariable
             ###
@@ -570,40 +583,33 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             # i'll probably pack in a better way at some point
             # (including packing of w below)
             # (e.g. checbutton should be closer to label)
-
-            # CEBALERT: use a function: what other formatting is needed?
-            # Shouldn't there be some general function for converting parameter names to
-            # a user-readable representation? E.g. how can I indicate a hyphen 
-            # rather than a space in a parmeter name?
-            n = name.replace("_"," ")
-
-            l = Tkinter.Label(f,text=n)
-            l.pack(side=label_side)
+            label = Tkinter.Label(frame,text=self.pretty_print(name))
+            label.pack(side=label_side)
 
 
         ### CB: clean up
         if param.hidden:
-            return f
+            return frame
 
-        w.pack(side=widget_side,expand='yes',fill='x')
+        widget.pack(side=widget_side,expand='yes',fill='x')
 
         # CEBALERT: move this; doesn't always need to be done
         try:
-            w.set_bounds(*param.bounds)
-            w.refresh()
+            widget.set_bounds(*param.bounds)
+            widget.refresh()
         except: # could be TypeError (param has None for bounds) or AttributeError (no set_bounds)
                 # (when moved to correct location, won't need AttributeError check)
             pass
 
-        self._widgets[name]=w
+        self._widgets[name]=widget
 
-        self._furames[name]=(f,l)
+        self._furames[name]=(frame,label)
 
         # f's probably better than w
-        self.balloon.bind(f,getdoc(param))
+        self.balloon.bind(frame,getdoc(param))
 
-        f.pack(pack_options)
-        return f 
+        frame.pack(pack_options)
+        return frame 
 
 
 
