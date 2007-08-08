@@ -81,8 +81,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
     Notes
     =====
     
-    (1) Attribute lookup follows a precedance order, object>shadowed POs (in order
-    of their initial specification):
+    (1) Attribute lookup follows a precedance order, object>shadowed POs (
+    (with the shadowed POs being in order of their initial specification):
 
     E.g.
     POa = ParameterizedObject(x=2,y=2)         # where x, y, z are Parameters
@@ -101,7 +101,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
     TkPOt.get_parameter_value('x')==2  # POa.x is parameter with highest precedence 
 
 
-    
+
     (2) If a shadowed PO's Parameter value is modified elsewhere, the
     Tkinter Variable shadow is NOT updated until that Parameter value
     or shadow value is requested from this object. Thus requesting the
@@ -117,8 +117,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
     translators = {}
     
 
-    # __repr__ will need some work (display params of subobjects etc?)
-
+    # CBENHANCEMENT: __repr__ will need some work (display params of subobjects etc?).
 
     # Overrides method from superclass.
     def _setup_params(self,**params):
@@ -252,7 +251,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 new_val = t[val]
 
         return new_val
-    converta = string2object_ifrequired
+    converta = string2object_ifrequired  #CB: old method name - remove when unused
 
 
     def object2string_ifrequired(self,param_name,val):
@@ -269,14 +268,14 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 if v==val:
                     new_val = k
         return new_val
-    atrevnoc = object2string_ifrequired
+    atrevnoc = object2string_ifrequired  #CB: old method name - remove when unused
         
             
 
     def __update_param(self,param_name):
         """
         Attempt to set the parameter represented by param_name to the
-        value of its correspinding Tkinter Variable.
+        value of its corresponding Tkinter Variable.
 
         If setting the parameter fails (e.g. an inappropriate value
         is set for that Parameter type), the Variable is reverted to
@@ -290,7 +289,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
             val = tk_var._original_get() # tk_var ahead of parameter
         except ValueError: # means user not finished typing
             ### CEBALERT: this needs more testing since I'm not sure
-            ### if it will always work!
+            ### if it will always work.
             return 
 
         val = self.string2object_ifrequired(param_name,val)
@@ -317,7 +316,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         except: # everything
             tk_var.set(tk_var._last_good_val)
             # CEBALERT: is above too fast for gui? variable changes correctly, but sometimes doesn't appear
-            # on gui until next click. Needs more testing. Could try:
+            # on gui until next click? Needs more testing. Could try:
             #topo.guimain.after(250,lambda x=tk_var._last_good_val: tk_var.set(x))
             raise # whatever the parameter-setting error was
 
@@ -428,8 +427,9 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
 
-# CAN'T USE THIS AFTER PACK unless Tkinter.OptionMenu supports changing the list
-# of items after widget creation - might need to use Pmw's OptionMenu.
+# CEBALERT: can't use this after pack_param() unless Tkinter.OptionMenu
+# supports changing the list of items after widget creation - might
+# need to use Pmw's OptionMenu (which does support that).
     def initialize_ranged_parameter(self,param_name,range_):
         p = self.get_parameter(param_name)
 
@@ -443,36 +443,29 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
 
-### CEB: working here - not complete.
-        
-
 import _tkinter # (required to get tcl exception class)
-
 
 class TkParameterizedObject(TkParameterizedObjectBase):
     """
-    A TkParameterizedObjectBase and Tkinter Frame that can draw
-    widgets representing the Parameters of the supplied
-    ParameterizedObjects.
+    A TkParameterizedObjectBase that can draw widgets representing the
+    Parameters of its ParameterizedObject(s).
     """
 
     pretty_parameters = BooleanParameter(default=True,doc="Whether to format parameter names, or use the variable names instead.")
     
     def __init__(self,master,extra_pos=[],**params):
-        """
-
-        """
         assert master is not None # (could probably remove this but i didn't want to think about it)
         self.master = master
         TkParameterizedObjectBase.__init__(self,extra_pos=extra_pos,**params)
         self.balloon = Pmw.Balloon(master)
 
+        # map Parameter classes to appropriate widget-creation method
         self.widget_creators = {
-            BooleanParameter:self.create_boolean_widget,
-            Number:self.create_number_widget,
-            ButtonParameter:self.create_button_widget,
-            RangedParameter:self.create_ranged_widget,
-            StringParameter:self.create_string_widget}
+            BooleanParameter:self._create_boolean_widget,
+            Number:self._create_number_widget,
+            ButtonParameter:self._create_button_widget,
+            RangedParameter:self._create_ranged_widget,
+            StringParameter:self._create_string_widget}
 
 
         ####################################################
@@ -488,8 +481,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # in sync with the actual object)
 
 
-    # CB: some widgets need to have <return> bound to frame's refresh!
-    # Also think about taggedsliders.
+    # CB: do some widgets need to have <return> bound to frame's refresh?
+
 
 ##     def repackparam(self,name):
 ##         self._widgets[name].destroy()
@@ -500,8 +493,6 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     # Will create some general function for converting parameter names to
     # a 'pretty' representation. Need to merge more of tkpo with param frame
     def pretty_print(self,s):
-        """
-        """
         if not self.pretty_parameters:
             return s
         else:
@@ -512,11 +503,11 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
 
 ### Methods to create widgets ###
-    def create_button_widget(self,frame,name,widget_options,command):
+    def _create_button_widget(self,frame,name,widget_options,command):
         return Button(frame,text=self.pretty_print(name),command=command,**widget_options)
 
     # CEB: rename 'ranged' after sorting out that Parameter (it is supposed to be temporary)
-    def create_ranged_widget(self,frame,name,widget_options):
+    def _create_ranged_widget(self,frame,name,widget_options):
         param = self.get_parameter_object(name)
         self._update_translator(name,param)
         new_range = [self.object2string_ifrequired(name,i) for i in param.range]
@@ -528,7 +519,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         ## CB: by using tkinter's optionmenu rather than pmw's, i think lost history
         return OptionMenu(frame,tk_var,*new_range,**widget_options)
 
-    def create_number_widget(self,frame,name,widget_options):
+    def _create_number_widget(self,frame,name,widget_options):
         widget = TaggedSlider(frame,variable=self._tk_vars[name],**widget_options)
         param = self.get_parameter_object(name)
         if param.bounds and param.bounds[0] and param.bounds[1]:
@@ -536,30 +527,39 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             widget.set_bounds(*param.bounds) # assumes set_bounds exists on the widget
         return widget
 
-    def create_boolean_widget(self,frame,name,widget_options):
+    def _create_boolean_widget(self,frame,name,widget_options):
         return Checkbutton(frame,variable=self._tk_vars[name],**widget_options)
         
-    def create_string_widget(self,frame,name,widget_options):
+    def _create_string_widget(self,frame,name,widget_options):
         return Entry(frame,textvariable=self._tk_vars[name],**widget_options)
 #################################
 
 
 
-
-    # CB: document!
-    # also note on_change is called during pack_param
-    # on_change should be on_set (since it's called not only for changes)
-    # Packing might need to be better (check eg label-widget space
+    # CEBALERT: on_change should be on_set (since it's called not only for changes)
+    # CB: packing might need to be better (check eg label-widget space)
     def pack_param(self,name,parent=None,widget_options={},on_change=None,**pack_options):
         """
-        Create a widget for Parameter name, configured according to
-        widget_options, and pack()ed according to the pack_options.
+        Create a widget for the Parameter name, configured according
+        to widget_options, and pack()ed according to the pack_options.
+
+        If no parent is specified, defaults to the originally supplied
+        master (i.e. that set during __init__).
+
+        on_change is an optional function to call whenever the Parameter's
+        corresponding Tkinter Variable's trace_variable indicates that it
+        has been set.
 
         Balloon help is automatically set from the Parameter's doc.
 
-        The widget and label (if appropriate) are enlosed in a Frame.
+        The widget and label (if appropriate) are enlosed in a Frame
+        so they can be manipulated as a single unit.
         
-        Returns the widget in case further processing of it is required.
+        Returns the widget in case further processing of it is
+        required.
+
+        Note that the on_change function (if supplied) will be called
+        on creation of the widget.
         
         Examples:
         self.pack_param(name)
@@ -572,10 +572,10 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # default is label on the left
         label_side='left'; widget_side='right'
             
-        widget_creation_fn = self.widget_creators.get(type(param),self.create_string_widget)
+        widget_creation_fn = self.widget_creators.get(type(param),self._create_string_widget)
 
         ### buttons are different from the other widgets: no label and no variable
-        if widget_creation_fn==self.create_button_widget:
+        if widget_creation_fn==self._create_button_widget:
             assert on_change is not None, "Buttons need a command."
             label = None
             widget = widget_creation_fn(frame,name,widget_options,command=on_change)
@@ -584,14 +584,13 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             if on_change is not None: tk_var._on_change=on_change
             widget = widget_creation_fn(frame,name,widget_options)
 
-            # checkbuttons are 'widget label'
+            # checkbuttons are 'widget label' rather than 'label widget'
             if widget.__class__ is Tkinter.Checkbutton:  # type(widget) doesn't seem to work
                 widget_side='left'; label_side='right'
 
             label = Tkinter.Label(frame,text=self.pretty_print(name))
             label.pack(side=label_side)
 
- 
         widget.pack(side=widget_side,expand='yes',fill='x')
 
         # CEBALERT: will just have one of these, and will be properly named.
@@ -599,6 +598,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         self.balloon.bind(frame,getdoc(param))
         frame.pack(pack_options)
+
         return frame 
 
 
