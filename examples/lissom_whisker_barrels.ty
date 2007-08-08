@@ -17,7 +17,9 @@ mlab.addpath('examples/whiskers')
 
 from topo.base.parameterclasses import Integer, Number
 from topo.base.patterngenerator import PatternGenerator
+from topo.commands.analysis import PatternPresenter
 import topo
+from topo.base.functionfamilies import CoordinateMapperFn
 
 class WhiskerArray(PatternGenerator):
     """
@@ -27,38 +29,126 @@ class WhiskerArray(PatternGenerator):
     # JABALERT: The parameter definitions here are quite arbitrary, e.g.
     # differing over whether they are a square number or a square root.
     # Should be generalized to handle a full range of reasonable values.
-    num_whiskers = Integer(default=5,bounds=(1,None),softbounds=(0.0,10.0),
+    num_whiskers = Integer(default=3,bounds=(1,None),softbounds=(0.0,10.0),
         precedence=0.31,doc="""
         Square root of the number of whiskers to use.  E.g. 3 gives a 3x3 array.""")
 
     # JABALERT: Change to be 9 by default and to be a square root.
-    num_ganglion_cells = Integer(default=81,doc="""
+
+
+    randomise_ganglion = bool(True)
+  
+
+    num_ganglion_cells = Integer(default=8,doc="""
         Number of ganglion cells to use per whisker; must be a square integer.""")
 
-    # JABALERT: Apparently only supports a quantized set of directions, but that needs fixing.
-    direction = Number(default=pi/4,softbounds=(0.0,2*pi),doc="""
-        Direction of whisker array motion, in radians, assuming a stationary surface.""")
+    deflection = Number(default=pi/4,softbounds=(0.0,2*pi),doc="""
+        Direction of whisker array motion, in radians from 0 to 2*pi, assuming a stationary surface.""")
+
+    step = Number(default=0,doc="""
+        Number of steps at the given speed to move in the sweep direction.
+        The distance moved is speed*step.""")
+
+    # was 0.04 for v2 model
+    speed = Number(default=0.09,bounds=(0.0,None),doc="""
+        Sweep speed: number of sheet coordinate units per unit time.""")
+
+    rectify = Integer(default=1,bounds=(0,1),doc="""
+        Whether or not to supress firing in depreseed ganglion. 1 is to rectify, 0 is to not""")
+
+    whisker = Integer(default=(0), doc="""
+        Which whiskers are to receive inputs, use 0 for all""")
+    
+    # parameters for generating the whisking surface
+    
+   # stim_tails = Integer(default=2,bounds=(1,2),doc=""" 
+    #    number of Guassian tails for the stimulator surface""")
+
+    #stim_dimension = Integer(default=2,bounds=(1,2),doc="""
+     #   dimensions of the surface (i.e. a single bar (1) or a circular shape (2)""")
+
+   # stim_convexity = Integer(default=1,bounds=(-1,1),doc="""
+    #    if convex the surface sticks out from 0, but if -1 then it receeds from a bed of ones""")
+
+    #stim_size = Integer(default=5,bounds=(1,None),doc="""
+     #   how wide the stimulator surface is""")
+
+    #stim_mean = Number(default=0,doc="""
+     #   position of the centre of the stimulator on the sheet, 0 is the centre""")
+
+    #stim_sigma = Number(default=2,doc="""
+     #  Sets the sigma of the Gaussian fall-off, i.e. larger makes a more gradually falling off shape""")
+    
+    start_point_scaling = Number(default = 0.75,doc="""
+      Scaling of the distance, must be fine tuned to geive good results...Bummer!""")
+
+    dohnut_size = Integer(default=100,doc="""
+      Sets the size of the dohnut""")
+
+    dohnut_sigma=Integer(default=20, doc="""
+       Sets the sigma off the dohnut falloff""")
+
+    dohnut_sigma_on=Number(default=0.1, doc="""
+       Falloff for the on response""")
+
+    dohnut_sigma_off=Number(default=0.9, doc="""
+       Falloff for the on response""")
+
+    dohnut_off_strength= Number(default=0, doc="""
+       Strength of the off response""") 
+    
+    single_whisker_plot = Integer(default=2)
+
+    random_seed = Number(default = 5489)
+
+    
 
     def __init__(self,**params):
         super(WhiskerArray,self).__init__(**params)
         # Should probably specify a fixed seed for the random numbers
         # so that the positions won't change on each run
-        self.ganglion_cell_positions=mlab.shuffle(self.num_whiskers,self.num_ganglion_cells)
+        self.ganglion_cell_positions=mlab.shuffle(self.num_whiskers,self.num_ganglion_cells,self.random_seed)
+        """
+        self.whisking_surface=mlab.gen_stim_surf(
+                                    self.stim_tails,
+                                    self.stim_dimension,
+                                    self.stim_convexity,
+                                    self.stim_size, 
+                                    self.stim_mean,
+                                    self.num_whiskers)"""
+        #self.whisking_dohnut=mlab.dohnut(self.dohnut_size,self.dohnut_sigma)
+        self.whisking_dohnut=mlab.dohnut_RA_SA(self.dohnut_size,
+                                               self.dohnut_sigma_on,
+                                               self.dohnut_sigma_off,
+                                               self.dohnut_off_strength,
+                                               self.num_whiskers)
         
     def function(self,**params):
-        direction = params.get('direction',self.direction)
+        deflection = params.get('deflection',self.deflection)
+        #firing_rates = mlab.sweep_whiskers_v2(
+        self.firing_rates = mlab.sweep_whiskers_v3(
+                                    self.num_whiskers,
+				    self.num_ganglion_cells,
+				    self.whisking_dohnut,
+                                    self.start_point_scaling,
+				    self.rectify, 
+				    self.speed, 
+				    360*self.deflection/2.0/pi,
+				    self.step+1,
+                                    self.whisker)
+        if self.randomise_ganglion ==True:
+            inputs = mlab.generate_barrelettes(self.firing_rates, self.ganglion_cell_positions)
+        else:
+            inputs =  mlab.generate_barrelettes(self.firing_rates, 0)
         
-        return mlab.generate_barrelettes(
-            mlab.stim_whiskers_time(self.num_whiskers,
-                                    self.num_ganglion_cells,
-                                    int(direction/pi*180),
-                                    # Next two parameters may be best stored in matlab,
-                                    # because they depend on the input pattern type:
-                                    5,   # Stimulus length
-                                    0.4, # Stimulus height
-                                    0,   # Rectify?
-                                    int(topo.sim.time()+1)), # Time step; 1-based
-            self.ganglion_cell_positions)
+        return inputs
+    
+
+    #def get_single_whisker_plot(self):
+        #return self.single_whisker_plot
+
+    
+
 
 # Examples:
 #x=WhiskerArray()
@@ -69,12 +159,133 @@ class WhiskerArray(PatternGenerator):
 
 ###############################################################################
 
+class TestWhiskerArray(PatternGenerator):
+    """
+    A second WhiskerArray Class for testing the Map
+    """
+
+    # JABALERT: The parameter definitions here are quite arbitrary, e.g.
+    # differing over whether they are a square number or a square root.
+    # Should be generalized to handle a full range of reasonable values.
+    num_whiskers = WhiskerArray.num_whiskers
+
+    randomise_ganglion = WhiskerArray.randomise_ganglion
+  
+    num_ganglion_cells = WhiskerArray.num_ganglion_cells
+
+    deflection = Number(default=pi/4,softbounds=(0.0,2*pi),doc="""
+        Deflection of whisker array motion, in radians from 0 to 2*pi, assuming a stationary surface.""")
+   
+    speed = Number(1)
+    
+    rectify = Integer(default=1,bounds=(0,1),doc="""
+        Whether or not to supress firing in depreseed ganglion. 1 is to rectify, 0 is to not""")
+    
+    whisker = Integer(default=0, doc="""
+        Which whiskers are to receive inputs, use 0 for all""")
+    
+
+    def __init__(self,**params):
+        super(TestWhiskerArray,self).__init__(**params)
+        # Should probably specify a fixed seed for the random numbers
+        # so that the positions won't change on each run
+        self.ganglion_cell_positions=mlab.shuffle(self.num_whiskers,self.num_ganglion_cells,WhiskerArray.random_seed)
+        
+
+    def function(self,**params):
+        deflection = params.get('deflection',self.deflection)
+        self.firing_rates = mlab.test_whiskers(
+                                    WhiskerArray.num_whiskers,
+				    WhiskerArray.num_ganglion_cells,
+				    WhiskerArray.rectify, 
+				    1,
+				    360*self.deflection/2.0/pi,
+                                    self.whisker)
+        if self.randomise_ganglion ==True:
+            inputs = mlab.generate_barrelettes(self.firing_rates, self.ganglion_cell_positions)
+        else:
+            inputs =  mlab.generate_barrelettes(self.firing_rates, 0)
+        
+        return inputs
+
+
+###############################################################################
+    """
+    Stuart Wilson: 
+    This is the same as measure_or_pref in analysis.py, but edited to measure deflection preferences. 
+    Developed for use with the barrel cortex model
+    """
+
+def measure_dir_pref(num_deflection=12,
+                    scale=0.3,offset=0.0,display=False,weighted_average=False,
+                    pattern_presenter=PatternPresenter(pattern_generator=TestWhiskerArray(),apply_output_fn=False,duration=0.175)):
+    
+    """  
+    Measure deflection maps, 
+    * This needs to be commented
+    Measures maps by collating the responses to a set of input
+    patterns controlled by some parameters.  The parameter ranges and
+    number of input patterns in each range are determined by the
+    num_phase, num_deflection, and frequencies parameters.  24The
+    particular pattern used is determined by the pattern_presenter
+    argument, which defaults to a WhiskerArray sim presented for a short
+    duration.  By convention, most Topographica example files
+    are designed to have a suitable activity pattern computed by
+    that time, but the duration will need to be changed for other
+    models that do not follow that convention.
+    * This needs to be commented
+    # Could consider having scripts set a variable for the duration,
+    # based on their own particular model setup, and to have it read
+    # from here.  Instead, assumes a fixed default duration right now...
+    """
+
+    if num_deflection <= 0:
+        raise ValueError("num_deflection must be greater than 0")
+
+    else:
+        
+        step_deflection=pi/num_deflection
+        
+        step_whiskers = WhiskerArray.num_whiskers
+        
+        feature_values = [Feature(name="whisker",range=(1, WhiskerArray.num_whiskers*WhiskerArray.num_whiskers
+),step=1,cyclic=False),
+			  Feature(name="deflection",range=(0.0,2*pi),step=step_deflection,cyclic=True)]
+                         
+
+        param_dict = {"scale":scale,"offset":offset}
+        x=FeatureMaps(feature_values)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+
+
+
+
+
+###############################################################################
+
+
+class XYModulo(CoordinateMapperFn):
+    """Return the x coordinate of the given coordinate, modulo the specified step distance."""
+    default_density=locals().get('default_density',30.0)
+    grid_element_width = Number(1.0/WhiskerArray.num_whiskers, doc="Length in Sheet coordinates of one large grid element.")
+    def __call__(self,x,y):
+        # modulo to give step size for each cortical RF on the afferents
+        xmod=fmod(x+0.5,self.grid_element_width)
+        ymod=fmod(y+0.5,self.grid_element_width)
+	# x: 0.1 offset to align with center of box, not corner
+	# y: offset to align with center of box, not corner
+	#return x-xmod,y-ymod
+	return x-xmod+(1.0/self.default_density)*(0.5*self.default_density/WhiskerArray.num_whiskers),y-ymod+((1.0/self.default_density)*(0.5*self.default_density/WhiskerArray.num_whiskers))
+	#return x-xmod+0.1,y-ymod+((1.0/self.default_density)*(0.5*self.default_density/WhiskerArray.num_whiskers))
+
+###############################################################################
+
 
 import fixedpoint
 import numpy
 import copy
 
-from math import pi, sqrt
+from math import pi, sqrt, fmod
 from fixedpoint import FixedPoint
 
 import topo.patterns.basic
@@ -93,18 +304,10 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
+
 topo.sim.name = "lissom_whisker_barrels"
-
-num_inputs=1
-input_type=Gaussian
-inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),
-                   y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i)),
-                   orientation=0,
-                   size=0.088388, aspect_ratio=4.66667, scale=1.0,
-                   bounds=BoundingBox(radius=0.8))
-        for i in xrange(num_inputs)]
-sub_inputs = topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
-
+	      
+num_inputs=WhiskerArray.num_whiskers #was 1
                                  
 # Default for tutorial
 topo.patterns.basic.Line.scale=0.9
@@ -114,11 +317,13 @@ topo.patterns.basic.Gaussian.aspect_ratio=4.0
 # Specify weight initialization, response function, and learning function
 numpy.random.seed((500,500))
 
-CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
+#CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.weights_shape = topo.patterns.basic.Constant()
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
+
 
 
 ###########################################
@@ -126,15 +331,26 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
 # Number of separate delay lines from the input surface
 num_lags=4
+num_whiskers=WhiskerArray.num_whiskers
+num_ganglion_cells=WhiskerArray.num_ganglion_cells
+
+inhib_rad_barrels =0.5*1
+ex_rad_barrels=0.5*1.6
+
+ex_peak = 0.10417
+ex_scale = ex_rad_barrels*(1.0/WhiskerArray.num_whiskers)
+
+
 for i in xrange(num_lags):
-    topo.sim['Ganglia'+str(i)]=GeneratorSheet(nominal_density=24.0,
-                                             input_generator=Sweeper(generator=copy.deepcopy(sub_inputs),step=i,speed=1/24.0,
-                                                                     orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=88))),
+    topo.sim['Ganglia'+str(i)]=GeneratorSheet(nominal_density=num_whiskers*num_ganglion_cells,
+                                             input_generator=WhiskerArray(num_whiskers=num_whiskers,num_ganglion_cells=num_ganglion_cells,step=i,
+											       deflection=DynamicNumber(UniformRandom(lbound=0,ubound=2*pi,seed=23))),
                                              period=1.0, phase=0.05,
                                              nominal_bounds=BoundingBox(radius=0.5))
 
-topo.sim['S1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,
+topo.sim['S1'] = LISSOM(nominal_density=locals().get('default_density',50.0),tsettle=9,
                         nominal_bounds=BoundingBox(radius=0.5))
+
 
 topo.sim['S1'].output_fn.lower_bound=0.083
 topo.sim['S1'].output_fn.upper_bound=0.633
@@ -147,22 +363,23 @@ for i in xrange(num_lags):
                      weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                      generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                                  topo.patterns.random.UniformRandom()]),
-                     nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590)
+                     nominal_bounds_template=BoundingBox(radius=0.55/WhiskerArray.num_whiskers),learning_rate=0.9590,coord_mapper=XYModulo()) 
 
 
 topo.sim.connect('S1','S1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.10417),
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*(((1/ex_peak)*0.10417)*ex_scale)),#0.10417),
                                                                              topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.10417),learning_rate=2.55528) 
+                 nominal_bounds_template=BoundingBox(radius=(((1/ex_peak)*0.10417)*ex_scale)),learning_rate=2.55528) 
             
 topo.sim.connect('S1','S1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                  connection_type=CFProjection,strength=-0.9,
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*(inhib_rad_barrels*(1.0/WhiskerArray.num_whiskers))),#0.22917),
                                                                              topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=1.80873)  
+                 nominal_bounds_template=BoundingBox(radius=inhib_rad_barrels*(1.0/WhiskerArray.num_whiskers)),learning_rate=1.80873) 
+
 
 
 
@@ -175,16 +392,16 @@ st=1.0/num_inputs
 ### Lateral excitatory bounds changes
 LE='topo.sim["S1"].projections()["LateralExcitatory"]'
 
-topo.sim.schedule_command(  200*st,LE+'.change_bounds(BoundingBox(radius=0.06250))')
-topo.sim.schedule_command(  500*st,LE+'.change_bounds(BoundingBox(radius=0.04375))')
-topo.sim.schedule_command( 1000*st,LE+'.change_bounds(BoundingBox(radius=0.03500))')
-topo.sim.schedule_command( 2000*st,LE+'.change_bounds(BoundingBox(radius=0.02800))')
-topo.sim.schedule_command( 3000*st,LE+'.change_bounds(BoundingBox(radius=0.02240))')
-topo.sim.schedule_command( 4000*st,LE+'.change_bounds(BoundingBox(radius=0.01344))')
-topo.sim.schedule_command( 5000*st,LE+'.change_bounds(BoundingBox(radius=0.00806))')
-topo.sim.schedule_command( 6500*st,LE+'.change_bounds(BoundingBox(radius=0.00484))')
-topo.sim.schedule_command( 8000*st,LE+'.change_bounds(BoundingBox(radius=0.00290))')
-topo.sim.schedule_command(20000*st,LE+'.change_bounds(BoundingBox(radius=0.00174))')
+topo.sim.schedule_command(  200*st,LE+'.change_bounds(BoundingBox(radius=((1/ex_peak)*0.06250)*ex_scale))')
+topo.sim.schedule_command(  500*st,LE+'.change_bounds(BoundingBox(radius=((1/ex_peak)*0.04375)*ex_scale))')
+topo.sim.schedule_command( 1000*st,LE+'.change_bounds(BoundingBox(radius=((1/ex_peak)*0.03500)*ex_scale))')
+topo.sim.schedule_command( 2000*st,LE+'.change_bounds(BoundingBox(radius=((1/ex_peak)*0.02800)*ex_scale))')
+topo.sim.schedule_command( 3000*st,LE+'.change_bounds(BoundingBox(radius=((1/ex_peak)*0.02240)*ex_scale))')
+topo.sim.schedule_command( 4000*st,LE+'.change_bounds(BoundingBox(radius=((1/ex_peak)*0.01344)*ex_scale))')
+topo.sim.schedule_command( 5000*st,LE+'.change_bounds(BoundingBox(radius=((1/ex_peak)*0.00806)*ex_scale))')
+topo.sim.schedule_command( 6500*st,LE+'.change_bounds(BoundingBox(radius=((1/ex_peak)*0.00484)*ex_scale))')
+topo.sim.schedule_command( 8000*st,LE+'.change_bounds(BoundingBox(radius=((1/ex_peak)*0.00290)*ex_scale))')
+topo.sim.schedule_command(20000*st,LE+'.change_bounds(BoundingBox(radius=((1/ex_peak)*0.00174)*ex_scale))')
 
 ### Lateral excitatory learning rate changes
 topo.sim.schedule_command(  200*st,LE+'.learning_rate=0.12168*'+LE+'.n_units()')
@@ -231,3 +448,5 @@ topo.sim.schedule_command( 8000*st,'topo.sim["S1"].tsettle=13')
 topo.sim.grid_layout([[None, 'S1'],
                       [('Ganglia'+str(i)) for i in xrange(num_lags)]],
                      xstart=150, xstep=150)
+
+
