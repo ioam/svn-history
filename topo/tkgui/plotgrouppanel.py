@@ -267,7 +267,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
 
         ### Parameters common to all PlotGroups
-        self.pack_param('updatecommand',parent=self.control_frame_3,
+        self.pack_param('update_command',parent=self.control_frame_3,
                         expand='yes',fill='x')
         self.pack_param('plotcommand',parent=self.control_frame_3,
                         expand='yes',fill='x')

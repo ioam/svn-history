@@ -76,7 +76,7 @@ class PlotGroup(ParameterizedObject):
 
     cmd_location = Parameter(default=__main__.__dict__)
 
-    updatecommand = Parameter(default="",doc="""
+    update_command = Parameter(default="",doc="""
     Command to execute before updating this plot, e.g. to calculate sheet views.
     
     The command can be any Python code, and will be evaluated in the main namespace
@@ -85,7 +85,7 @@ class PlotGroup(ParameterizedObject):
     version substituted, etc.""")
 
     ## CEBHACKALERT
-    command = updatecommand
+    command = update_command
     
     plotcommand = Parameter(default="",doc="""
     Command to execute when updating sheet or coordinate of unit to be plotted
@@ -134,8 +134,8 @@ class PlotGroup(ParameterizedObject):
 
 
 
-    def _updatecommand(self):
-        exec self.updatecommand in self.cmd_location
+    def _update_command(self):
+        exec self.update_command in self.cmd_location
 
 
         
@@ -154,7 +154,7 @@ class PlotGroup(ParameterizedObject):
 	If update=True, execute the command associated with the template
 	(e.g. generating the Sheetviews necessary to create the PlotGroup's Plots).
 	"""
-        if update: self._updatecommand()
+        if update: self._update_command()
         self._plotcommand()
         self._make_plots()
         
@@ -445,7 +445,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
     sheet = RangedParameter() 
 
 
-    def _updatecommand(self):
+    def _update_command(self):
 
         # CEBALERT: rather than various scattered tests like the one below and for projections in later classes,
         # have some method (probabable decalred in a super calss) like "_check_conditions()".
@@ -453,7 +453,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 	### JCALERT: commands in analysis.py should be re-written to
 	### avoid setting these global parameters.
 	topo.commands.analysis.sheet_name = self.sheet.name
-        super(ProjectionSheetPlotGroup,self)._updatecommand()
+        super(ProjectionSheetPlotGroup,self)._update_command()
         
 		
     def _create_plots(self,pt_name,pt,sheet):
@@ -550,9 +550,9 @@ class ConnectionFieldsPlotGroup(CFPlotGroup):
 ## It is an error to request a unit outside the area of the Sheet.""")
 
         
-    def _updatecommand(self):
+    def _update_command(self):
 	topo.commands.analysis.coordinate = (self.x,self.y)
-	super(ConnectionFieldsPlotGroup,self)._updatecommand()
+	super(ConnectionFieldsPlotGroup,self)._update_command()
 
     def _create_plots(self,pt_name,pt,sheet):
 	""" 
@@ -615,13 +615,13 @@ class CFProjectionPlotGroup(CFPlotGroup):
         self.proj_plotting_shape = (0,0)
     
 
-    def _updatecommand(self):
+    def _update_command(self):
         if self.projection is None: raise ValueError("%s must have a projection (currently None)."%self)
 	### JCALERT: commands in analysis have to be re-written so that to avoid
 	### setting all these global parameters.
         topo.commands.analysis.proj_coords = self.generate_coords()
         topo.commands.analysis.proj_name = self.projection.name
-        super(CFProjectionPlotGroup,self)._updatecommand()
+        super(CFProjectionPlotGroup,self)._update_command()
 
 		
     def _create_plots(self,pt_name,pt,sheet):
@@ -746,9 +746,9 @@ class FeatureCurvePlotGroup(PlotGroup):
         topo.commands.analysis.coordinate = (self.x,self.y)
         topo.commands.analysis.sheet_name = self.sheet.name
 
-    def _updatecommand(self):
+    def _update_command(self):
         self.CEBALERT()
-        super(FeatureCurvePlotGroup,self)._updatecommand()          
+        super(FeatureCurvePlotGroup,self)._update_command()          
         self.get_curve_time()
 
     def _plotcommand(self):
