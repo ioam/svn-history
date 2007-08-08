@@ -333,7 +333,7 @@ Each type will have various parameters that can be changed.""")
         new_plotgroup.plot_list = plot_list
 	new_plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot
 	new_plotgroup.initial_plot = self.plotgroup.initial_plot
-	new_plotgroup.sheetcoords = self.plotgroup.sheetcoords
+	new_plotgroup.sheet_coords = self.plotgroup.sheet_coords
 	new_plotgroup.integer_scaling = self.plotgroup.integer_scaling
 	new_plotgroup.sizeconvertfn = self.plotgroup.sizeconvertfn
 	new_plotgroup.normalize = self.plotgroup.normalize
@@ -351,7 +351,7 @@ Each type will have various parameters that can be changed.""")
 	self.refresh()
 
     ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
-    def set_sheetcoords(self):
+    def set_sheet_coords(self):
         """Function called by Widget when check-box clicked"""
 	#self.plotgroup.sheetcoords = self.sheetcoords.get()
 	self.plotgroup.update_plots(False)

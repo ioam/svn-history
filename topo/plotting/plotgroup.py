@@ -228,7 +228,7 @@ class XPlotGroup(PlotGroup):
     sheet = RangedParameter(default=None,doc="""CEBHACKALERT""") 
 
 
-    sheetcoords = BooleanParameter(default=False,doc="""
+    sheet_coords = BooleanParameter(default=False,doc="""
     Whether to scale plots based on their relative sizes in sheet
     coordinates.  If true, plots are scaled so that their sizes are
     proportional to their area in sheet coordinates, so that one can
@@ -308,7 +308,7 @@ class XPlotGroup(PlotGroup):
             if not plot.resize:
                 scaling_factor = 1
             else:
-		if self.sheetcoords:		   
+		if self.sheet_coords:		   
                     s = topo.sim.objects(Sheet).get(plot.plot_src_name,None)
 		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(s.xdensity)/max_sheet_height)
 		else:
@@ -701,7 +701,7 @@ class CFProjectionPlotGroup(CFPlotGroup):
             if not plot.resize:
                 scaling_factor = 1
             else:
-		if self.sheetcoords:		   
+		if self.sheet_coords:		   
                     s = topo.sim.objects(Sheet).get(plot.plot_src_name,None)
 		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(s.xdensity)/max_sheet_height)
 		else:
