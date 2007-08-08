@@ -334,7 +334,7 @@ Each type will have various parameters that can be changed.""")
 	new_plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot
 	new_plotgroup.initial_plot = self.plotgroup.initial_plot
 	new_plotgroup.sheetcoords = self.plotgroup.sheetcoords
-	new_plotgroup.integerscaling = self.plotgroup.integerscaling
+	new_plotgroup.integer_scaling = self.plotgroup.integer_scaling
 	new_plotgroup.sizeconvertfn = self.plotgroup.sizeconvertfn
 	new_plotgroup.normalize = self.plotgroup.normalize
 	new_plotgroup.minimum_height_of_tallest_plot = self.plotgroup.minimum_height_of_tallest_plot
@@ -359,9 +359,9 @@ Each type will have various parameters that can be changed.""")
 	self.refresh()
 
     ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
-    def set_integerscaling(self):
+    def set_integer_scaling(self):
         """Function called by Widget when check-box clicked"""
-        if self.integerscaling:#.get():
+        if self.integer_scaling:#.get():
             self.plotgroup.sizeconvertfn = int
         else:
             self.plotgroup.sizeconvertfn = identity

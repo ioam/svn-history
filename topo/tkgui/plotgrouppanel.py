@@ -836,7 +836,7 @@ class XPGPanel(PlotGroupPanel):
 
         self.pack_param('normalize',parent=self.control_frame_1,
                         on_change=self.redraw_plots,side="right")
-        self.pack_param('integerscaling',parent=self.control_frame_2,
+        self.pack_param('integer_scaling',parent=self.control_frame_2,
                         on_change=self.redraw_plots,side='right')
         self.pack_param('sheetcoords',parent=self.control_frame_2,
                         on_change=self.redraw_plots,side='right')

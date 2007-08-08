@@ -246,7 +246,7 @@ class XPlotGroup(PlotGroup):
         but only values between 0.0 and 1.0 will be visibly
         distinguishable.""")
 
-    integerscaling = BooleanParameter(default=False,doc="""
+    integer_scaling = BooleanParameter(default=False,doc="""
         When scaling bitmaps, whether to ensure that the scaled bitmap is an even
         multiple of the original.  If true, every unit will be represented by a
         square of the same size.  Typically false so that the overall area will
@@ -257,7 +257,7 @@ class XPlotGroup(PlotGroup):
 
 
     def sizeconvertfn(self,X):
-        if self.integerscaling:
+        if self.integer_scaling:
             return int(X)
         else:
             return identity(X)
