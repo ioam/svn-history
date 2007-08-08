@@ -50,16 +50,8 @@ parameters_to_tkvars = {
     StringParameter:StringVar,
     Number:DoubleVar
     }
-parameters_to_tkwidgets = {
-    BooleanParameter:Checkbutton,
-    Number:TaggedSlider,
-    StringParameter:Entry,
-    ButtonParameter:Button,
-    RangedParameter:OptionMenu
-    }
 
-## CEBHACKALERT: by using tkinter's optionmenu rather than pmw's, i think
-## i lost the history.
+
 
 
 
@@ -475,6 +467,13 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         TkParameterizedObjectBase.__init__(self,extra_pos=extra_pos,**params)
         self.balloon = Pmw.Balloon(master)
 
+        self.widget_creators = {
+            BooleanParameter:self.create_boolean_widget,
+            Number:self.create_number_widget,
+            ButtonParameter:self.create_button_widget,
+            RangedParameter:self.create_ranged_widget,
+            StringParameter:self.create_string_widget}
+
 
         ####################################################
         ## CEBALERT: just keep one and will name properly
@@ -511,9 +510,46 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             return n
 
 
+
+### Methods to create widgets ###
+    def create_button_widget(self,frame,name,widget_options,command):
+        return Button(frame,text=self.pretty_print(name),command=command,**widget_options)
+
+    # CEB: rename 'ranged' after sorting out that Parameter (it is supposed to be temporary)
+    def create_ranged_widget(self,frame,name,widget_options):
+        param = self.get_parameter_object(name)
+        self._update_translator(name,param)
+        new_range = [self.object2string_ifrequired(name,i) for i in param.range]
+        assert len(new_range)>0 # CB: remove
+
+        tk_var = self._tk_vars[name]
+        tk_var.set(new_range[0])
+
+        ## CB: by using tkinter's optionmenu rather than pmw's, i think lost history
+        return OptionMenu(frame,tk_var,*new_range,**widget_options)
+
+    def create_number_widget(self,frame,name,widget_options):
+        widget = TaggedSlider(frame,variable=self._tk_vars[name],**widget_options)
+        param = self.get_parameter_object(name)
+        if param.bounds and param.bounds[0] and param.bounds[1]:
+            # CEBALERT: TaggedSlider.set_bounds() needs BOTH bounds (neither can be None)
+            widget.set_bounds(*param.bounds) # assumes set_bounds exists on the widget
+        return widget
+
+    def create_boolean_widget(self,frame,name,widget_options):
+        return Checkbutton(frame,variable=self._tk_vars[name],**widget_options)
+        
+    def create_string_widget(self,frame,name,widget_options):
+        return Entry(frame,textvariable=self._tk_vars[name],**widget_options)
+#################################
+
+
+
+
     # CB: document!
     # also note on_change is called during pack_param
     # on_change should be on_set (since it's called not only for changes)
+    # Packing might need to be better (check eg label-widget space
     def pack_param(self,name,parent=None,widget_options={},on_change=None,**pack_options):
         """
         Create a widget for Parameter name, configured according to
@@ -532,72 +568,34 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         """
         frame = Frame(parent or self.master)
         param = self.get_parameter_object(name)
-        
-        widget_type = parameters_to_tkwidgets.get(type(param),Entry)
 
-        # checkbuttons are 'wdiget label'; everything else is 'label widget'
-        if widget_type is Tkinter.Checkbutton:
-            widget_side='left'; label_side='right'
-        else:
-            widget_side='right';label_side='left'
+        # default is label on the left
+        label_side='left'; widget_side='right'
             
-        ### buttons are different from the other widgets: different labeling,
-        ### and no need for a variable
-        if widget_type==Tkinter.Button:
+        widget_creation_fn = self.widget_creators.get(type(param),self.create_string_widget)
+
+        ### buttons are different from the other widgets: no label and no variable
+        if widget_creation_fn==self.create_button_widget:
             assert on_change is not None, "Buttons need a command."
-            widget = widget_type(frame,text=self.pretty_print(name),command=on_change,**widget_options)
             label = None
+            widget = widget_creation_fn(frame,name,widget_options,command=on_change)
         else:
-
             tk_var = self._tk_vars[name]
-
             if on_change is not None: tk_var._on_change=on_change
+            widget = widget_creation_fn(frame,name,widget_options)
 
-            ### CEBALERT: clean up this widget type selection
+            # checkbuttons are 'widget label'
+            if widget.__class__ is Tkinter.Checkbutton:  # type(widget) doesn't seem to work
+                widget_side='left'; label_side='right'
 
-            if widget_type==Tkinter.OptionMenu:
-
-                self._update_translator(name,param)
-
-                new_range = [self.object2string_ifrequired(name,i) for i in param.range]
-
-                assert len(new_range)>0
-
-                #if tk_var.get() not in new_range:  
-                tk_var.set(new_range[0])
-                
-                widget = widget_type(frame,tk_var,*new_range,**widget_options)
-                
-                
-            else:
-            ### Tkinter widgets use either variable or textvariable
-                try:
-                    widget = widget_type(frame,variable=tk_var,**widget_options)
-                except _tkinter.TclError:
-                    try:
-                        widget = widget_type(frame,textvariable=tk_var,**widget_options)
-                    except _tkinter.TclError:
-                        raise # meaning the widget doesn't support variable or textvariable
-            ###
-
-            # i'll probably pack in a better way at some point
-            # (including packing of w below)
-            # (e.g. checbutton should be closer to label)
             label = Tkinter.Label(frame,text=self.pretty_print(name))
             label.pack(side=label_side)
 
-
+ 
         widget.pack(side=widget_side,expand='yes',fill='x')
 
-        if isinstance(param,Number):
-            try:
-                widget.set_bounds(*param.bounds)
-                widget.refresh()
-            except TypeError: # if param has None for bounds, the * won't work
-                pass
-
-        self._widgets[name]=widget
-        self._furames[name]=(frame,label)
+        # CEBALERT: will just have one of these, and will be properly named.
+        self._furames[name]=(frame,label); self._widgets[name]=widget
 
         self.balloon.bind(frame,getdoc(param))
         frame.pack(pack_options)
