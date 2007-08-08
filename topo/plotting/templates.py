@@ -35,7 +35,7 @@ class PlotGroupTemplate(ParameterizedObject):
     command = Parameter("pass",
       doc="Command string to run before plotting, if any.")
 
-    plotcommand=Parameter("pass",
+    plot_command=Parameter("pass",
       doc="Command string to run before plotting when no further measurement of responses is required")
 
     template_plot_type=Parameter('bitmap',

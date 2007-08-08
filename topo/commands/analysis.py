@@ -712,7 +712,7 @@ new_pgt(name='Orientation Tuning Fullfield',category="Tuning Curves",doc="""
             Although the data takes a long time to collect, once it is ready the plots
             are available immediately for any unit.""",
         command='measure_or_tuning_fullfield()',
-        plotcommand='or_tuning_curve(x_axis="orientation", plot_type=pylab.plot, unit="degrees")',
+        plot_command='or_tuning_curve(x_axis="orientation", plot_type=pylab.plot, unit="degrees")',
         template_plot_type="curve")
 
 

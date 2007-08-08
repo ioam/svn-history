@@ -87,7 +87,7 @@ class PlotGroup(ParameterizedObject):
     ## CEBHACKALERT
     command = update_command
     
-    plotcommand = Parameter(default="",doc="""
+    plot_command = Parameter(default="",doc="""
     Command to execute when updating sheet or coordinate of unit to be plotted
     when the simulator time has not changed.
     In the case of a full-field stimulus, responses do not need to be re-measured
@@ -129,8 +129,8 @@ class PlotGroup(ParameterizedObject):
         ## CB  import __main__; __main__.__dict__['zzz'] = self
 
 
-    def _plotcommand(self):
-        exec self.plotcommand in self.cmd_location
+    def _plot_command(self):
+        exec self.plot_command in self.cmd_location
 
 
 
@@ -155,7 +155,7 @@ class PlotGroup(ParameterizedObject):
 	(e.g. generating the Sheetviews necessary to create the PlotGroup's Plots).
 	"""
         if update: self._update_command()
-        self._plotcommand()
+        self._plot_command()
         self._make_plots()
         
 
@@ -751,9 +751,9 @@ class FeatureCurvePlotGroup(PlotGroup):
         super(FeatureCurvePlotGroup,self)._update_command()          
         self.get_curve_time()
 
-    def _plotcommand(self):
+    def _plot_command(self):
         self.CEBALERT()
-        super(FeatureCurvePlotGroup,self)._plotcommand()
+        super(FeatureCurvePlotGroup,self)._plot_command()
         self.get_curve_time()
 
 
