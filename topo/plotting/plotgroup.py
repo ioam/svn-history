@@ -225,8 +225,9 @@ class XPlotGroup(PlotGroup):
 
     sheet_type = Sheet
 
-    # Sheet_name can be none, in which case the PlotGroup build Plots for each Sheet.
-    sheet = RangedParameter(default=None,doc="""CEBHACKALERT""") 
+    sheet = RangedParameter(default=None,doc="""
+    The Sheet from which to produce plots.
+    If set to None, plots are created for each appropriate Sheet.""") 
 
 
     sheet_coords = BooleanParameter(default=False,doc="""
@@ -443,7 +444,8 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
     keyname = "ProjectionSheet" # CB: document what these are
 
-    sheet = RangedParameter() 
+    sheet = RangedParameter(default=None,doc="""
+    The Sheet from which to produce plots.""")
 
 
     def _update_command(self):
