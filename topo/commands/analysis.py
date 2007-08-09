@@ -394,16 +394,18 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
 
 ###############################################################################
 pgt= new_pgt(name='Receptive Fields',category="Other",
-             doc='Measure receptive fields.', command='measure_rfs();plotrctg()', normalize=True)
+             doc='Measure receptive fields.', command='measure_rfs(input_sheet=topo.sim["Retina"]); plotrctg()', normalize=True)
 
-# CEB: can we have some default option for input_sheet? should the ReverseCorrelation parameter
-# be a name, which could default to 'Retina'?
+# CEB: can we have some default option for input_sheet? Could have input_sheet_name, defaulting to
+# 'Retina', then lookup the sheet with topo.sim[input_sheet_name]?
+
 def measure_rfs(input_sheet,divisions=10,scale=30.0,offset=0.5,display=False,
                 pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),True,duration=1.0),
                 x_range=(-0.2,0.2),y_range=(-0.2,0.2)): #weighted_average=False)
     """Map receptive field on a GeneratorSheet by reverse correlation using small Gaussian inputs."""
 
     # CEBALERT: various things in here need to be arguments
+
 
   # ALERT: THIS CRAZILY HIGH VALUE IS NECCESSARY FOR THE CURRENT LISSOM_OO_OR.TY 
   # NORMALLY A VALUE AROUND 0.5 TO 3.0 SEEMS OK....
@@ -435,7 +437,7 @@ def measure_rfs(input_sheet,divisions=10,scale=30.0,offset=0.5,display=False,
 ###############################################################################
 pgt= new_pgt(name='Receptive Fields noise',category="Other",
              doc='Measure receptive fields by reverse correlation using random noise.',
-             command='measure_rfs_noise();plotrctg()',normalize=True)
+             command='measure_rfs_noise(input_sheet=topo.sim["Retina"]); plotrctg()',normalize=True)
                         
 
 ### JABALERT: Why is the scale and offset set twice?                                    
@@ -443,6 +445,7 @@ def measure_rfs_noise(input_sheet,divisions=99,scale=0.5,offset=0.5,display=Fals
                       pattern_presenter=PatternPresenter(GaussianRandom(scale=0.5,offset=0.5),True,duration=1.0),
                       x_range=(-1.0,1.0),y_range=(-1.0,1.0)):
     """Map receptive field on a GeneratorSheet using Gaussian noise inputs."""
+
 
     if divisions <= 0:
         raise ValueError("Divisions must be greater than 0")
