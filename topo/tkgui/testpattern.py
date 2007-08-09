@@ -18,15 +18,12 @@ $Id$
 __version__='$Revision$'
 
 
-### JABHACKALERT: Need to remove Back/Forward buttons, because they do not
-### do what the user would expect.  
 
 # CEBALERT: this file needs a substantial overhaul before it will work
 # well.
 
 # CEBALERT: taggedsliders refresh the display even when auto-refresh is off.
 
-# CB changing pattern doesn't refresh plots even when autorefresh is on.
 
 
 import copy
@@ -63,6 +60,13 @@ class TestPattern(XPGPanel):
     def __init__(self,console,master,label="Preview",**params):
 	super(TestPattern,self).__init__(console,master,label,**params)
 
+        # CB: remove updatecommand,redraw etc stuff...remember to remove from 2
+        self.plotcommand_frame.pack_forget()
+        self._furames['update_command'][0].pack_forget()
+        
+        self._furames['Fwd'][0].pack_forget()
+        self._furames['Back'][0].pack_forget()
+        
 
         self.padding = 2
         self.auto_refresh=True
