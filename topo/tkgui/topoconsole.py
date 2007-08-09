@@ -47,7 +47,7 @@ from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
 import topo.tkgui 
 from tkguiwindow import TkguiWindow
 from templateplotgrouppanel import TemplatePlotGroupPanel
-from featurecurvepanel import FeatureCurvePanel, FullFieldFeatureCurvePanel
+from featurecurvepanel import FeatureCurvePanel
 from projectionpanel import CFProjectionPGPanel,ProjectionActivityPanel,ConnectionFieldsPanel
 from testpattern import TestPattern
 from editorwindow import ModelEditor
@@ -810,7 +810,7 @@ if __name__ != '__main__':
     plotpanel_classes['Connection Fields'] = ConnectionFieldsPanel
     plotpanel_classes['Projection'] = CFProjectionPGPanel 
     plotpanel_classes['Projection Activity'] = ProjectionActivityPanel
-    plotpanel_classes['Orientation Tuning Fullfield'] = FullFieldFeatureCurvePanel
+
 
 
 

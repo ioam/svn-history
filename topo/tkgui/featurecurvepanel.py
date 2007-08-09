@@ -116,16 +116,4 @@ class FeatureCurvePanel(PlotGroupPanel):
 
 
 
-class FullFieldFeatureCurvePanel(FeatureCurvePanel):
-    """
-    In some cases it is not necessary to use the full updatecommand before plotting.
-    This class creates a gui window showing the reduced update command and in which updating the
-    plotgroup variables from the gui calls the plotcommand rather than the full updatecommand.
-    """
-
-    pass
-
-### CEBHACKALERT! Not sure how best to handle redrawing here. Don't want to redraw on dragging the sliders,
-### I guess...would lead to too many windows.
-
 
