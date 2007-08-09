@@ -16,8 +16,8 @@ import topo
 from topo.plotting.plotgroup import RangedParameter
 
 
-from topo.base.parameterizedobject import ParameterizedObject,Parameter
-from topo.base.parameterclasses import BooleanParameter,StringParameter,Number
+from topo.base.parameterizedobject import ParameterizedObject,Parameter,classlist
+from topo.base.parameterclasses import BooleanParameter,StringParameter,Number,ClassSelectorParameter
 
 from translatorwidgets import TaggedSlider
 
@@ -166,8 +166,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
         for name,param in PO.params().items():
 
             # shouldn't need second check but seems range could be None or something else not like a list?
-            if hasattr(param,'range') and hasattr(param.range,'__len__'): 
-                self._update_translator(name,param)
+            #if hasattr(param,'range') and hasattr(param.range,'__len__'): 
+            self._update_translator(name,param)
 
             tk_var = parameters_to_tkvars.get(type(param),StringVar)()
             self._tk_vars[name] = tk_var
@@ -178,7 +178,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
             tk_var.set(getattr(PO,name))
             tk_var._last_good_val=tk_var.get() # for reverting
-            tk_var.trace_variable('w',lambda a,b,c,p_name=name: self.__update_param(p_name))        
+            tk_var.trace_variable('w',lambda a,b,c,p_name=name: self._update_param(p_name))        
             # Instead of a trace, could we override the Variable's set() method i.e. trace it ourselves?
             # Or does too much happen in tcl/tk for that to work?
 
@@ -227,15 +227,27 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
         Map names of objects in param.range to the actual objects.
         """
-        t=self.translators[name]={}
+        if hasattr(param,'range'):
+            
+            t=self.translators[name]={}
 
-        for a in param.range:
-            # use name attribute if it's valid, otherwise use str()
-            # (this is the place to call any special name formatting)
-            if hasattr(a,'name') and isinstance(a.name,str) and len(a.name)>0: 
-                t[a.name] = a
+            # CB: see alert for RangedParameter: can simplify this once that's sorted!
+        
+            if not callable(param.range):
+                # RangedParameter
+                for a in param.range:
+                    # use name attribute if it's valid, otherwise use str()
+                    # (this is the place to call any special name formatting)
+                    if hasattr(a,'name') and isinstance(a.name,str) and len(a.name)>0: 
+                        t[a.name] = a
+                    else:
+                        t[str(a)]=a
             else:
-                t[str(a)]=a
+                # ClassSelectorParameter
+                for n,o in param.range().items():
+                    # use name attribute if it's valid, otherwise use str()
+                    # (this is the place to call any special name formatting)
+                    t[n] = o()
 
         
     
@@ -272,7 +284,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         
             
 
-    def __update_param(self,param_name):
+    def _update_param(self,param_name):
         """
         Attempt to set the parameter represented by param_name to the
         value of its corresponding Tkinter Variable.
@@ -293,6 +305,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
             return 
 
         val = self.string2object_ifrequired(param_name,val)
+
+        #print param_name,type(val)
         
         try:
             sources = [self]+self._extra_pos
@@ -311,7 +325,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                     return # hidden
 
 
-            assert False,"Error in use of __update_param: param must exist" # remove this
+            assert False,"Error in use of _update_param: param must exist" # remove this
             
         except: # everything
             tk_var.set(tk_var._last_good_val)
@@ -465,7 +479,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             Number:self._create_number_widget,
             ButtonParameter:self._create_button_widget,
             RangedParameter:self._create_ranged_widget,
-            StringParameter:self._create_string_widget}
+            StringParameter:self._create_string_widget,
+            ClassSelectorParameter:self._create_ranged_widget}
 
 
         ####################################################
@@ -510,7 +525,13 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     def _create_ranged_widget(self,frame,name,widget_options):
         param = self.get_parameter_object(name)
         self._update_translator(name,param)
-        new_range = [self.object2string_ifrequired(name,i) for i in param.range]
+
+        # CB: simplify after dealing with ALERT for RangedParameter
+        try:
+            new_range = [self.object2string_ifrequired(name,i) for i in param.range]
+        except TypeError:
+            new_range = [self.object2string_ifrequired(name,i) for i in param.range().values()]
+            
         assert len(new_range)>0 # CB: remove
 
         tk_var = self._tk_vars[name]
@@ -571,9 +592,16 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         # default is label on the left
         label_side='left'; widget_side='right'
-            
-        widget_creation_fn = self.widget_creators.get(type(param),self._create_string_widget)
 
+        # select the appropriate widget-creation method;
+        # default is self._create_string_widget... 
+        widget_creation_fn = self._create_string_widget
+        # ...but overwrite that with a more specific one, if possible
+        for c in classlist(type(param))[::-1]:
+            if self.widget_creators.has_key(c):
+                widget_creation_fn = self.widget_creators[c]
+                break
+            
         ### buttons are different from the other widgets: no label and no variable
         if widget_creation_fn==self._create_button_widget:
             assert on_change is not None, "Buttons need a command."
@@ -608,3 +636,39 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     def title(self,t):
         self.master.title(t)
         
+
+
+
+
+
+##########################################################################################
+
+# CB: just for testing at the moment
+class ParametersFrame2(TkParameterizedObject,Frame):
+
+    def __init__(self,master,extra_pos=[],**params):
+        assert len(extra_pos)==1
+        
+        TkParameterizedObject.__init__(self,master,extra_pos=extra_pos,**params)
+        Frame.__init__(self,master)
+
+        ### Pack all of the non-hidden Parameters
+        for n,p in extra_pos[0].params().items():
+            if not p.hidden: self.pack_param(n)
+
+        ### Delete all variable traces
+        for v in self._tk_vars.values():
+            self.__delete_trace(v)
+
+    def __delete_trace(self,var):
+        trace_mode = var.trace_vinfo()[0][0]
+        trace_name = var.trace_vinfo()[0][1]
+        var.trace_vdelete(trace_mode,trace_name)
+
+    def update_parameters(self):
+        for name in self._extra_pos[0].params().keys():
+            self._update_param(name)
+            
+        
+
+#./topographica -g examples/hierarchical.ty -c "from topo.tkgui.tkparameterizedobject import ParametersFrame; import Tkinter; g = Gaussian(); p = ParametersFrame(Tkinter.Toplevel(),extra_pos=[g]); p.pack()"
