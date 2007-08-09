@@ -85,9 +85,8 @@ class TemplatePlotGroupPanel(XPGPanel):
 
     plotgroup_type = TemplatePlotGroup
 
-
-    ## CEBHACKALERT: recover the doc string from a previous cvs version.
-    strength_only = BooleanParameter(default=False,doc="""unfinished""")
+    strength_only = BooleanParameter(default=False,doc="""If true, disables all but the Strength channel of each plot,
+disabling all color coding for Strength/Hue/Confidence plots.""")
 
     # CEBHACKALERT: copied from previous tkgui; probably don't need to do all this.
     # In any case, there will probably be some other mechanism for
