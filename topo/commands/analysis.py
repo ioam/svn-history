@@ -756,8 +756,7 @@ def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4
 new_pgt(name='Orientation Tuning',category="Tuning Curves",doc="""
             Measure orientation tuning for a specific unit at different contrasts,
             using a pattern chosen to match the preferences of that unit.""",
-        command='measure_or_tuning()',
-        plot_command='or_tuning_curve(x_axis="orientation",plot_type=pylab.plot,unit="degrees")',
+        command='measure_or_tuning(); or_tuning_curve(x_axis="orientation",plot_type=pylab.plot,unit="degrees")',
         template_plot_type="curve",
         prerequisites=['XPreference'])
 
