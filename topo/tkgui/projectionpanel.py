@@ -313,6 +313,8 @@ class CFProjectionPGPanel(CFPGPanel):
         # Delete old ones.  This may resize the grid.
         for c in old_canvases:
             c.grid_forget()
+
+        self.sizeright()
     
 
     def display_labels(self):
