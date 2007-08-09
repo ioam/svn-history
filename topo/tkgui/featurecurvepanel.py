@@ -123,13 +123,9 @@ class FullFieldFeatureCurvePanel(FeatureCurvePanel):
     plotgroup variables from the gui calls the plotcommand rather than the full updatecommand.
     """
 
+    pass
+
 ### CEBHACKALERT! Not sure how best to handle redrawing here. Don't want to redraw on dragging the sliders,
 ### I guess...would lead to too many windows.
 
-    Redraw = ButtonParameter(doc="""Redraw plots using existing data.""")
 
-    def __init__(self,console,master,pgt,**config):
-        FeatureCurvePanel.__init__(self,console,master,pgt,**config)
-
-        self.pack_param('Redraw',parent=self.control_frame_1,
-                        on_change=self.redraw_plots,side="left")
