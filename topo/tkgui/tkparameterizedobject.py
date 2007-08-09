@@ -1,4 +1,6 @@
 """
+TkParameterizedObject and associated classes, linking Parameters
+and tkgui.
 
 $Id$
 """
