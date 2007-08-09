@@ -263,7 +263,7 @@ class PlotsMenuEntry(ParameterizedObject):
         if self.class_.valid_context():
             # window hidden while being constructed to improve appearance
             t = TkguiWindow(); t.withdraw()
-            self.class_(self.console,t,self.template,**args).pack()
+            self.class_(self.console,t,self.template,**args).pack(expand='yes',fill='both')
             t.deiconify()
             
             self.console.messageBar.message('state', 'OK')
@@ -655,7 +655,7 @@ class TopoConsole(TkguiWindow):
         """
         if TestPattern.valid_context():
             t = TkguiWindow(); t.withdraw()
-            TestPattern(self,t).pack()
+            TestPattern(self,t).pack(expand='yes',fill='both')
             t.deiconify()
             self.messageBar.message('state', 'OK')
         else:
