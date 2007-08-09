@@ -143,7 +143,9 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
     # CEBALERT: (if someone clicks 'back' on a window, would
     # they expect auto-refresh to become unchecked/disabled?)
 
-    Refresh = ButtonParameter(doc="Force the current plot to be regenerated.")
+    Refresh = ButtonParameter(doc="Force the current plot to be regenerated (i.e. execute update_command and plot_command).")
+
+    Redraw = ButtonParameter(doc="Redraw the plot from existing data (i.e. execute plot_command only).")
 
     Enlarge = ButtonParameter(doc="""Increase the displayed size of the current plots by about 20%.""")
 
@@ -230,6 +232,9 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         # -----------------------  
 
 
+
+
+
         # CB: rename these frames
         self.control_frame_1 = Frame(self)
         self.control_frame_1.pack(side=TOP,expand=NO,fill=X)
@@ -254,8 +259,24 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             self.plot_frame = self.plot_group_title.interior()
         ###################################################       
 
+
+        # control_frame_3 is:
+        #
+        # -----------------------
+        # | updatecommand_frame |
+        # |---------------------|
+        # |  plotcommand_frame  |        
+        # -----------------------
+
+
         self.control_frame_3 = Frame(self)
         self.control_frame_3.pack(side=TOP,expand=NO,fill=X)
+
+        self.updatecommand_frame = Frame(self.control_frame_3)
+        self.updatecommand_frame.pack(side=TOP,expand=YES,fill=X)
+
+        self.plotcommand_frame = Frame(self.control_frame_3)
+        self.plotcommand_frame.pack(side=TOP,expand=YES,fill=X)
 
 
         #################### DYNAMIC INFO BAR ####################
@@ -265,13 +286,18 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
 
 
+        self.pack_param('update_command',parent=self.updatecommand_frame,
+                        expand='yes',fill='x',side='left')
 
-        ### Parameters common to all PlotGroups
-        self.pack_param('update_command',parent=self.control_frame_3,
-                        expand='yes',fill='x')
-        self.pack_param('plot_command',parent=self.control_frame_3,
-                        expand='yes',fill='x')
+        self.pack_param('Refresh',parent=self.updatecommand_frame,
+                        on_change=self.refresh,side='right')
 
+
+        self.pack_param('plot_command',parent=self.plotcommand_frame,
+                        expand='yes',fill='x',side='left')
+        # CEBALERT: should disable unless data exists.
+        self.pack_param('Redraw',parent=self.plotcommand_frame,
+                        on_change=self.redraw_plots,side='right')
         
 
         
@@ -285,8 +311,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         # need to announce their names as help text if the mouse
         # lingers over them, so that the user can figure them out the
         # first time.
-        self.pack_param('Refresh',parent=self.control_frame_1,
-                        on_change=self.refresh,side=LEFT)
+        
         self.widgets_in_history.append(self._widgets['Refresh'])
 
         self.pack_param('auto_refresh',parent=self.control_frame_1,
