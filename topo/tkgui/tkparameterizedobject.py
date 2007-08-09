@@ -626,9 +626,15 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # CEBALERT: will just have one of these, and will be properly named.
         self._furames[name]=(frame,label); self._widgets[name]=widget
 
-        self.balloon.bind(frame,getdoc(param))
+        # If there's a label, balloon's bound to it - otherwise, bound
+        # to enclosing frame.
+        # (E.g. when there's [label] [text_box], only want balloon for
+        # label (because maybe more help will be present for what's in
+        # the box) but when there's [button], want popup help over the
+        # button.)
+        self.balloon.bind(label or frame,getdoc(param))
+        
         frame.pack(pack_options)
-
         return frame 
 
 
