@@ -260,10 +260,12 @@ class PlotsMenuEntry(ParameterizedObject):
 
         (event is a dummy argument to allow use in callbacks.)
         """
-        # CEBHACKALERT
         if self.class_.valid_context():
-            t = TkguiWindow()
+            # window hidden while being constructed to improve appearance
+            t = TkguiWindow(); t.withdraw()
             self.class_(self.console,t,self.template,**args).pack()
+            t.deiconify()
+            
             self.console.messageBar.message('state', 'OK')
 
         else:
@@ -652,8 +654,9 @@ class TopoConsole(TkguiWindow):
         Test Pattern Window.  
         """
         if TestPattern.valid_context():
-            t = TkguiWindow()
+            t = TkguiWindow(); t.withdraw()
             TestPattern(self,t).pack()
+            t.deiconify()
             self.messageBar.message('state', 'OK')
         else:
             self.messageBar.message('state',
