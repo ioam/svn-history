@@ -15,8 +15,6 @@ import Pmw
 
 import topo
 
-
-
 from topo.base.parameterizedobject import ParameterizedObject,Parameter,classlist
 from topo.base.parameterclasses import BooleanParameter,StringParameter,Number,SelectorParameter,ClassSelectorParameter,ObjectSelectorParameter
 
@@ -562,9 +560,15 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         tk_var.set(current_string)
         #############
 
+        w = OptionMenu(frame,tk_var,*new_range,**widget_options)
 
-        ## CB: by using tkinter's optionmenu rather than pmw's, i think lost history
-        return OptionMenu(frame,tk_var,*new_range,**widget_options)
+        help_text =getdoc(self.get_parameter_value(name))
+        
+        self.balloon.bind(w,help_text)
+        
+        return w 
+
+
 
     def _create_number_widget(self,frame,name,widget_options):
         widget = TaggedSlider(frame,variable=self._tk_vars[name],**widget_options)
@@ -675,6 +679,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
 ##########################################################################################
 
+from tkguiwindow import Menu,TkguiWindow
+
 # CB: just for testing at the moment
 class ParametersFrame2(TkParameterizedObject,Frame):
 
@@ -692,8 +698,19 @@ class ParametersFrame2(TkParameterizedObject,Frame):
                 self.packed_params[n]=p 
 
         ### Delete all variable traces
+        # (don't want to update parameters immediately)
         for v in self._tk_vars.values():
             self.__delete_trace(v)
+
+        ### Right-click menu for widgets
+        self.option_add("*Menu.tearOff", "0") 
+        self.menu = Menu(self)
+        self.menu.insert_command('end', label = 'Properties', command = lambda: 
+            self.__edit_PO_in_currently_selected_widget())
+
+        
+
+
 
     def __delete_trace(self,var):
         trace_mode = var.trace_vinfo()[0][0]
@@ -707,7 +724,54 @@ class ParametersFrame2(TkParameterizedObject,Frame):
 
 
         #for name in self._extra_pos[0].params().keys():
-            
+
+
+
+    def _create_ranged_widget(self,frame,name,widget_options):
+
+        w = TkParameterizedObject._create_ranged_widget(self,frame,name,widget_options)
+        # A right-click on the widget shows the right-click menu
+        #w._entryWidget.bind('<<right-click>>',  ### (for  PMW optionmenu)
+        w.bind('<<right-click>>', 
+            lambda event: self.__right_click(event, w))
+        return w
+
+
+    def __right_click(self, event, widget):
+        self.__currently_selected_widget = widget
+        self.menu.tk_popup(event.x_root, event.y_root)
+
+
+    # rename
+    def __edit_PO_in_currently_selected_widget(self):
+        """
+        Open a new window containing a ParametersFrame for the 
+        PO in __currently_selected_widget.
+        """
+        w = self.__currently_selected_widget
+
+        editing = None
+
+        ### simplify this lookup by value!
+        for name,wid in self._widgets.items():
+            if w is wid:
+                editing = name
+                break
+
+        param_to_edit = self.get_parameter_value(editing)
+        param_name = editing
+
+        
+        #param_to_edit=self.__currently_selected_widget.get_value()
+        #param_name = self.__currently_selected_widget.param_name
+        
+        parameter_window = TkguiWindow()
+        parameter_window.title(param_to_edit.name+' parameters')
+        title = Tkinter.Label(parameter_window, text = param_to_edit.name)
+        title.pack(side = "top")
+        self.balloon.bind(title,getdoc(param_to_edit))
+        parameter_frame = ParametersFrame2(parameter_window,extra_pos=[param_to_edit])
+
             
         
 
