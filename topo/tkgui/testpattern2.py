@@ -21,7 +21,7 @@ import topo
 
 import topo.base.patterngenerator
 import topo.base.sheetview
-from topo.base.parameterclasses import BooleanParameter,Number
+from topo.base.parameterclasses import BooleanParameter,Number,ClassSelectorParameter
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.commands.basic import pattern_present
@@ -51,7 +51,7 @@ class TestPatternPlotGroup(XPlotGroup):
 
         
 
-from topo.plotting.plotgroup import RangedParameter
+
 
 
 class TestPattern(XPGPanel):
@@ -65,7 +65,7 @@ class TestPattern(XPGPanel):
     present = ButtonParameter(doc="""Present this pattern to the simulation.""")
     reset = ButtonParameter(doc="""Reset the parameters for this pattern back to their defaults.""")
 
-    pattern_generator = RangedParameter(doc="""Type of pattern to present. Each type will have various parameters that can be changed.""")
+    pattern_generator = ClassSelectorParameter(doc="""Type of pattern to present. Each type will have various parameters that can be changed.""")
     
     
     def __init__(self,console,master,label="Preview",**params):
