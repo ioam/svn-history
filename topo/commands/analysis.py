@@ -148,7 +148,6 @@ class PatternPresenter(ParameterizedObject):
                 inputs[input_sheet_names[0]].scale=2*inputs[input_sheet_names[0]].ocular
                 inputs[input_sheet_names[1]].scale=2.0-2*inputs[input_sheet_names[1]].ocular
 
-
         if features_values.has_key("contrast") or param_dict.has_key("contrast"):
             if self.contrast_parameter=='michelson_contrast':
                 for g in inputs.itervalues():
@@ -353,7 +352,8 @@ def update_projectionactivity():
 ###############################################################################
 pgt= new_pgt(name='Position Preference',category="Preference Maps",
              doc='Measure preference for the X and Y position of a Gaussian.',
-             command='measure_position_pref() ; topographic_grid()',
+             command='measure_position_pref()',
+             plot_command='topographic_grid()',
              normalize=True)
 
 pgt.add_plot('X Preference',[('Strength','XPreference')])
@@ -466,7 +466,8 @@ def measure_rfs_noise(input_sheet,divisions=99,scale=0.5,offset=0.5,display=Fals
 ###############################################################################
 pgt= new_pgt(name='Center of Gravity',category="Preference Maps",
              doc='Measure the center of gravity of each ConnectionField in a Projection.',
-             command='measure_cog(proj_name="Afferent") ; topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG")',
+             command='measure_cog(proj_name="Afferent")',
+             plot_command='topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG")',
              normalize=True)
 pgt.add_plot('X CoG',[('Strength','XCoG')])
 pgt.add_plot('Y CoG',[('Strength','YCoG')])
@@ -759,7 +760,8 @@ def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4
 new_pgt(name='Orientation Tuning',category="Tuning Curves",doc="""
             Measure orientation tuning for a specific unit at different contrasts,
             using a pattern chosen to match the preferences of that unit.""",
-        command='measure_or_tuning(); or_tuning_curve(x_axis="orientation",plot_type=pylab.plot,unit="degrees")',
+        command='measure_or_tuning()',
+        plot_command='or_tuning_curve(x_axis="orientation",plot_type=pylab.plot,unit="degrees")',
         template_plot_type="curve",
         prerequisites=['XPreference'])
 
@@ -819,7 +821,8 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
 ###############################################################################
 new_pgt(name='Size Tuning',category="Tuning Curves",
         doc='Measure the size preference for a specific unit.',
-        command='measure_size_response(); tuning_curve(x_axis="size",plot_type=pylab.plot,unit="Diameter of stimulus")',
+        command='measure_size_response()',
+        plot_command='tuning_curve(x_axis="size",plot_type=pylab.plot,unit="Diameter of stimulus")',
         template_plot_type="curve",
         prerequisites=['OrientationPreference','XPreference'])
 
@@ -896,7 +899,8 @@ def measure_size_response(num_phase=18,
 ###############################################################################
 new_pgt(name='Contrast Response',category="Tuning Curves",
         doc='Measure the contrast response function for a specific unit.',
-        command='measure_contrast_response(); tuning_curve(x_axis="contrast",plot_type=pylab.semilogx,unit="%")',
+        command='measure_contrast_response()',
+        plot_command='tuning_curve(x_axis="contrast",plot_type=pylab.semilogx,unit="%")',
         template_plot_type="curve",
         prerequisites=['OrientationPreference','XPreference'])
 
