@@ -15,11 +15,10 @@ import Pmw
 
 import topo
 
-from topo.plotting.plotgroup import RangedParameter
 
 
 from topo.base.parameterizedobject import ParameterizedObject,Parameter,classlist
-from topo.base.parameterclasses import BooleanParameter,StringParameter,Number,ClassSelectorParameter
+from topo.base.parameterclasses import BooleanParameter,StringParameter,Number,SelectorParameter,ClassSelectorParameter,ObjectSelectorParameter
 
 from translatorwidgets import TaggedSlider
 
@@ -55,6 +54,13 @@ parameters_to_tkvars = {
 
 
 
+
+
+# CB: ClassSelectorParam/ObjectSelectorParam work in progress; most
+# of the current tests to distinguish them should go away.
+
+# ClassSelectorParameter has its value set to an OBJECT but lists range of CLASSES
+# ObjectSelectorParameter has its value set to an OBJECT, and lists range of OBJECTS
 
 
 
@@ -152,7 +158,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         for PO in extra_pos[::-1]+[self]:
             self._init_tk_vars(PO)
-        
+
 
     def _init_tk_vars(self,PO):
         """
@@ -229,27 +235,29 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
         Map names of objects in param.range to the actual objects.
         """
-        if hasattr(param,'range'):
-            
+
+        current_param_value = self.get_parameter_value(name)
+
+        # store list of OBJECTS for ClassSelectorParameter's
+        # range (although CSParam's range uses classes; matches parametersframe.ParametersFrame behavior)
+        if isinstance(param,ClassSelectorParameter): #hasattr(param,'range'):
             t=self.translators[name]={}
 
-            # CB: see alert for RangedParameter: can simplify this once that's sorted!
-        
-            if not callable(param.range):
-                # RangedParameter
-                for a in param.range:
-                    # use name attribute if it's valid, otherwise use str()
-                    # (this is the place to call any special name formatting)
-                    if hasattr(a,'name') and isinstance(a.name,str) and len(a.name)>0: 
-                        t[a.name] = a
-                    else:
-                        t[str(a)]=a
-            else:
-                # ClassSelectorParameter
-                for n,o in param.range().items():
-                    # use name attribute if it's valid, otherwise use str()
-                    # (this is the place to call any special name formatting)
+            for n,o in param.range().items():
+
+                # ** current value takes the place of inst'd class
+                # or we lose the object
+                if type(current_param_value)==o:
+                    t[n] = current_param_value
+                else:
                     t[n] = o()
+                
+        elif isinstance(param,ObjectSelectorParameter):
+            t=self.translators[name]={}
+            
+            for n,o in param.range().items():
+                t[n] = o
+
 
         
     
@@ -273,6 +281,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         If val is one of the objects in param_name's translator,
         translate to the string.
         """
+        
         new_val = val
 
         if param_name in self.translators:
@@ -281,6 +290,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
             for k,v in t.items():
                 if v==val:
                     new_val = k
+
         return new_val
     atrevnoc = object2string_ifrequired  #CB: old method name - remove when unused
         
@@ -308,7 +318,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         val = self.string2object_ifrequired(param_name,val)
 
-        #print param_name,type(val)
         
         try:
             sources = [self]+self._extra_pos
@@ -446,15 +455,16 @@ class TkParameterizedObjectBase(ParameterizedObject):
 # CEBALERT: can't use this after pack_param() unless Tkinter.OptionMenu
 # supports changing the list of items after widget creation - might
 # need to use Pmw's OptionMenu (which does support that).
+
     def initialize_ranged_parameter(self,param_name,range_):
         p = self.get_parameter(param_name)
 
         if hasattr(range_,'__len__'):
-            [p.range.append(x) for x in range_]
+            [p.Arange.append(x) for x in range_]
         else:
-            p.range.append(range_)
+            p.Arange.append(range_)
 
-        p.default = p.range[0]
+        p.default = p.Arange[0]
         self._update_translator(param_name,p)
 
 
@@ -480,10 +490,10 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             BooleanParameter:self._create_boolean_widget,
             Number:self._create_number_widget,
             ButtonParameter:self._create_button_widget,
-            RangedParameter:self._create_ranged_widget,
             StringParameter:self._create_string_widget,
-            ClassSelectorParameter:self._create_ranged_widget}
-
+            SelectorParameter:self._create_ranged_widget}
+            #ClassSelectorParameter:self._create_ranged_widget}
+        
 
         ####################################################
         ## CEBALERT: just keep one and will name properly
@@ -528,16 +538,30 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         param = self.get_parameter_object(name)
         self._update_translator(name,param)
 
-        # CB: simplify after dealing with ALERT for RangedParameter
-        try:
-            new_range = [self.object2string_ifrequired(name,i) for i in param.range]
-        except TypeError:
-            new_range = [self.object2string_ifrequired(name,i) for i in param.range().values()]
-            
+        new_range = self.translators[name].keys()
+        
         assert len(new_range)>0 # CB: remove
 
         tk_var = self._tk_vars[name]
-        tk_var.set(new_range[0])
+
+
+        #############
+        current_string = self.get_parameter_value(name)
+        
+        if isinstance(param,ObjectSelectorParameter):
+            if current_string not in new_range: #param.range().values():
+                current_string = new_range[0]
+                
+        if isinstance(param,ClassSelectorParameter):
+            # need to break into the two possibilities of class & object
+            if param.in_range(current_string):
+                current_string = self.object2string_ifrequired(name,current_string)
+            else:
+                current_string = new_range[0]
+            
+        tk_var.set(current_string)
+        #############
+
 
         ## CB: by using tkinter's optionmenu rather than pmw's, i think lost history
         return OptionMenu(frame,tk_var,*new_range,**widget_options)
@@ -659,10 +683,13 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         
         TkParameterizedObject.__init__(self,master,extra_pos=extra_pos,**params)
         Frame.__init__(self,master)
+        self.packed_params = {}
 
         ### Pack all of the non-hidden Parameters
         for n,p in extra_pos[0].params().items():
-            if not p.hidden: self.pack_param(n)
+            if not p.hidden:
+                self.pack_param(n)
+                self.packed_params[n]=p 
 
         ### Delete all variable traces
         for v in self._tk_vars.values():
@@ -674,9 +701,14 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         var.trace_vdelete(trace_mode,trace_name)
 
     def update_parameters(self):
-        for name in self._extra_pos[0].params().keys():
+
+        for name in self.packed_params.keys():
             self._update_param(name)
+
+
+        #for name in self._extra_pos[0].params().keys():
+            
             
         
 
-#./topographica -g examples/hierarchical.ty -c "from topo.tkgui.tkparameterizedobject import ParametersFrame; import Tkinter; g = Gaussian(); p = ParametersFrame(Tkinter.Toplevel(),extra_pos=[g]); p.pack()"
+#./topographica -g examples/hierarchical.ty -c "from topo.tkgui.tkparameterizedobject import ParametersFrame2; import Tkinter; g = Gaussian(); p = ParametersFrame2(Tkinter.Toplevel(),extra_pos=[g]); p.pack()"
