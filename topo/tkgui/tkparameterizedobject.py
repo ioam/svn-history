@@ -15,7 +15,7 @@ import Pmw
 
 import topo
 
-from topo.base.parameterizedobject import ParameterizedObject,Parameter,classlist
+from topo.base.parameterizedobject import ParameterizedObject,Parameter,classlist,ParameterizedObjectMetaclass
 from topo.base.parameterclasses import BooleanParameter,StringParameter,Number,SelectorParameter,ClassSelectorParameter,ObjectSelectorParameter
 
 from translatorwidgets import TaggedSlider
@@ -124,6 +124,16 @@ class TkParameterizedObjectBase(ParameterizedObject):
     
 
     # CBENHANCEMENT: __repr__ will need some work (display params of subobjects etc?).
+    def rightparams(self,THING):
+        
+        if isinstance(THING,ParameterizedObjectMetaclass):
+            return THING.classparams()
+        elif isinstance(THING,ParameterizedObject):
+            return THING.params()
+        else:
+            raise TypeError
+
+
 
     # Overrides method from superclass.
     def _setup_params(self,**params):
@@ -169,7 +179,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         For a Parameter with the 'range' attribute, also updates the translator dictionary to
         map string representations to the objects themselves.
         """
-        for name,param in PO.params().items():
+        for name,param in self.rightparams(PO).items():
 
             # shouldn't need second check but seems range could be None or something else not like a list?
             #if hasattr(param,'range') and hasattr(param.range,'__len__'): 
@@ -321,8 +331,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
             sources = [self]+self._extra_pos
             
             for po in sources:
-                if param_name in po.params().keys():
-                    parameter = po.params()[param_name]
+                if param_name in self.rightparams(po).keys():
+                    parameter = self.rightparams(po)[param_name]
                     ## use set_in_bounds if it exists: i.e. users of widgets get their
                     ## values cropped (no warnings/errors)
                     if hasattr(parameter,'set_in_bounds'):
@@ -364,7 +374,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         sources = self.__sources(parameterized_object)
         
         for po in sources:
-            params = po.params()
+            params = self.rightparams(po)
             if name in params: return params[name] # a bit hidden
 
         raise AttributeError("none of %s have parameter %s"%(str(sources),name))
@@ -382,7 +392,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         sources = self.__sources(parameterized_object)
 
         for po in sources:
-            params = po.params()
+            params = self.rightparams(po)
             if name in params: return getattr(po,name) # also hidden!
 
         raise AttributeError("none of %s have parameter %s"%(str(sources),name))
@@ -395,7 +405,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         sources = self.__sources(parameterized_object)
 
         for po in sources:
-            if name in po.params().keys(): 
+            if name in self.rightparams(po).keys(): 
                 setattr(po,name,val)
                 return # so hidden I forgot to write it until now
 
@@ -623,7 +633,12 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         self.pack_param(name,{'width':50},side='top',expand='yes',fill='y')
         """
         frame = Frame(parent or self.master)
+
+        #print name,"PO is",PO
+        #if PO is None:
         param = self.get_parameter_object(name)
+        #else:
+        #    param = self.rightparams(PO)[name]
 
         # default is label on the left
         label_side='left'; widget_side='right'
@@ -696,14 +711,19 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         Frame.__init__(self,master)
         self.packed_params = {}
 
-        self.master.title("Parameters of "+extra_pos[0].name)
+        self.master.title("Parameters of "+ (extra_pos[0].name or str(extra_pos[0])))
 
         ### Pack all of the non-hidden Parameters
-        for n,p in extra_pos[0].params().items():
+        for n,p in self.rightparams(extra_pos[0]).items():
 
-            if not p.hidden and n!='name':
-                self.pack_param(n)
-                self.packed_params[n]=p 
+            if self.__editing_class():
+                if not p.hidden:
+                    self.pack_param(n)#,PO=extra_pos[0])
+                    self.packed_params[n]=p
+            else:
+                if not p.hidden and n!='name':
+                    self.pack_param(n)#,PO=extra_pos[0])
+                    self.packed_params[n]=p 
 
         ### Delete all variable traces
         # (don't want to update parameters immediately)
@@ -716,7 +736,21 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         self.menu.insert_command('end', label = 'Properties', command = lambda: 
             self.__edit_PO_in_currently_selected_widget())
 
-        
+
+    def __value_changed(self,name):
+        if self._tk_vars[name]!=getattr(self._extra_pos[0],name):
+            return True
+        else:
+            return False
+
+    def __editing_class(self):
+        if isinstance(self._extra_pos[0],ParameterizedObjectMetaclass):
+            return True
+        elif isinstance(self._extra_pos[0],ParameterizedObject):
+            return False
+        else:
+            raise TypeError
+
 
 
 
@@ -727,12 +761,19 @@ class ParametersFrame2(TkParameterizedObject,Frame):
 
     def update_parameters(self):
 
-        for name,param in self.packed_params.items():
-            if not param.constant:
-                self._update_param(name)
+        # CAN SIMPLIFY!
+        if self.__editing_class():
+            for name,param in self.packed_params.items():
+                if self.__value_changed(name):
+                    #print name
+                    self._update_param(name)
 
+        else:    
+            for name,param in self.packed_params.items():
+                if not param.constant:
+                    if self.__value_changed(name):
+                        self._update_param(name)
 
-        #for name in self._extra_pos[0].params().keys():
 
 
 
@@ -785,3 +826,5 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         
 
 #./topographica -g examples/hierarchical.ty -c "from topo.tkgui.tkparameterizedobject import ParametersFrame2; import Tkinter; g = Gaussian(); p = ParametersFrame2(Tkinter.Toplevel(),extra_pos=[g]); p.pack()"
+
+#./topographica -g examples/hierarchical.ty -c "from topo.tkgui.tkparameterizedobject import ParametersFrame2; import Tkinter; g = Gaussian(); p = ParametersFrame2(Tkinter.Toplevel(),extra_pos=[g]); p.pack(); p2 = ParametersFrame2(Tkinter.Toplevel(),extra_pos=[topo.sim['V1']]); p2.pack(); p3 = ParametersFrame2(Tkinter.Toplevel(),extra_pos=[Gaussian]); p3.pack(); p4 = ParametersFrame2(Tkinter.Toplevel(),extra_pos=[type(topo.sim['V1'])])"
