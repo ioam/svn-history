@@ -16,7 +16,7 @@ import __main__
 import topo
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Parameter,BooleanParameter,StringParameter,Number
+from topo.base.parameterclasses import Parameter,BooleanParameter,StringParameter,Number,ObjectSelectorParameter
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet,CFProjection
 from topo.base.projection import ProjectionSheet
@@ -44,23 +44,6 @@ def identity(x):
     """No-op function for use as a default."""
     return x
 
-
-### Temporary
-# ObjectSelectorParameter, plus a parent shared with ClassSelectorParameter?
-class RangedParameter(Parameter):
-
-    __slots__ = ['range']
-    __doc__ = property((lambda self: self.doc))
-
-    def __init__(self, default=None, range=[],instantiate=True,**params):
-        Parameter.__init__(self,default=default,instantiate=instantiate,**params)
-        self.range = range
-
-    def __set__(self,obj,val):
-        #assert not isinstance(val,str),"%s"%val
-        super(RangedParameter,self).__set__(obj,val)
-
-        
 
 
 class PlotGroup(ParameterizedObject):
@@ -225,7 +208,7 @@ class XPlotGroup(PlotGroup):
 
     sheet_type = Sheet
 
-    sheet = RangedParameter(default=None,doc="""
+    sheet = ObjectSelectorParameter(default=None,doc="""
     The Sheet from which to produce plots.
     If set to None, plots are created for each appropriate Sheet.""") 
 
@@ -444,7 +427,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
     keyname = "ProjectionSheet" # CB: document what these are
 
-    sheet = RangedParameter(default=None,doc="""
+    sheet = ObjectSelectorParameter(default=None,doc="""
     The Sheet from which to produce plots.""")
 
 
@@ -595,7 +578,7 @@ class CFProjectionPlotGroup(CFPlotGroup):
 
     keyname='Weights'
 
-    projection = RangedParameter(default=None)
+    projection = ObjectSelectorParameter(default=None)
 
     ### CEBHACKALERT: tkpo gui not setup to read softbounds
     ### JPALERT: The bounds are meaningless for large sheets anyway.  If a sheet
@@ -724,7 +707,7 @@ class CFProjectionPlotGroup(CFPlotGroup):
 class FeatureCurvePlotGroup(PlotGroup):
 
 
-    sheet = RangedParameter() 
+    sheet = ObjectSelectorParameter() 
 
     template = Parameter() # doesn't this make it a templateplotgroup?
 

@@ -95,7 +95,7 @@ class FeatureCurvePanel(PlotGroupPanel):
     def populate_sheet_param(self,p):
         sheets = topo.sim.objects(ProjectionSheet).values() 
         sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
-        p.params()['sheet'].range = sheets
+        p.params()['sheet'].Arange = sheets
         p.sheet = sheets[0]
 
 

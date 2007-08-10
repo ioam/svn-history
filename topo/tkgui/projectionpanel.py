@@ -99,7 +99,7 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
     def populate_sheet_param(self,p):
         sheets = topo.sim.objects(self.sheet_type).values() 
         sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
-        p.params()['sheet'].range = sheets
+        p.params()['sheet'].Arange = sheets
         p.sheet = sheets[0]
 
 
@@ -259,7 +259,7 @@ class CFProjectionPGPanel(CFPGPanel):
     def populate_projection_param(self,p):
         prjns = p.sheet.projections().values() 
         prjns.sort(cmp_projections)
-        p.params()['projection'].range = prjns
+        p.params()['projection'].Arange = prjns
         p.projection = prjns[0]        
 
     def refresh_projections(self):
