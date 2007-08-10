@@ -171,9 +171,9 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
     # plotgroup's attributes (e.g. self.plotgroup.a) are available via
     # this object itself (e.g. self.a). Will address this later...
     def get_plotgroup(self):
-        return self._extra_pos[0]        
+        return self._extraPO
     def set_plotgroup(self,new_pg):
-        self._extra_pos[0] = new_pg
+        self._extraPO = new_pg
         #del self._extra_pos[0]
         #self.add_extra_po(new_pg)
 
@@ -186,7 +186,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         If your parameter should be available in history, add it to widgets_in_history list,
         otherwise it will be disabeld.
         """
-        TkParameterizedObject.__init__(self,master,extra_pos=[self.generate_plotgroup()],**params)
+        TkParameterizedObject.__init__(self,master,extraPO=self.generate_plotgroup(),**params)
         Frame.__init__(self,master)
 
         self.plotgroup_label = plotgroup_label

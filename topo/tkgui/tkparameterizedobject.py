@@ -118,7 +118,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
     # if the above becomes a problem, we could have some autorefresh of the vars
     # or a callback of some kind in the parameterized object itself.
 
-    _extra_pos = []
+    _extraPO = None
     _tk_vars = {}
     translators = {}
     
@@ -156,15 +156,20 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
     # CEBALERT: a list's too confusing, and there's currently no need for more
     # than one extra po. Change to just one extra PO?
-    def __init__(self,extra_pos=[],**params):
+    def __init__(self,extraPO=None,**params):
 
-        self._extra_pos = extra_pos
+        self._extraPO = extraPO
         self._tk_vars = {}
         self.translators = {}
         
         super(TkParameterizedObjectBase,self).__init__(**params)
 
-        for PO in extra_pos[::-1]+[self]:
+        if extraPO:
+            pos = [extraPO,self]
+        else:
+            pos = [self]
+
+        for PO in pos:
             self._init_tk_vars(PO)
 
 
@@ -328,7 +333,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         
         try:
-            sources = [self]+self._extra_pos
+            sources = [self,self._extraPO]
             
             for po in sources:
                 if param_name in self.rightparams(po).keys():
@@ -360,7 +365,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         (unless one is specified, in which case it's the only item in the list).
         """
         if parameterized_object is None:
-            sources = [self]+self._extra_pos
+            sources = [self,self._extraPO]
         else:
             sources = [parameterized_object] 
         return sources
@@ -429,11 +434,10 @@ class TkParameterizedObjectBase(ParameterizedObject):
         try:
             return object.__getattribute__(self,name)
         except AttributeError:
-            extra_pos = object.__getattribute__(self,'_extra_pos')
-            for po in extra_pos:
-                if hasattr(po,name): return getattr(po,name) 
+            extraPO = object.__getattribute__(self,'_extraPO')
+            if hasattr(extraPO,name): return getattr(extraPO,name) 
 
-            raise AttributeError("none of %s, %s has attribute %s"%(self,str(extra_pos),name))
+            raise AttributeError("Neither %s nor %s has attribute %s"%(self,extraPO,name))
 
     def __setattr__(self,name,val):
         """
@@ -448,11 +452,10 @@ class TkParameterizedObjectBase(ParameterizedObject):
             return # a bit hidden
 
         except AttributeError:
-            for po in self._extra_pos:
-                if hasattr(po,name):
-                    setattr(po,name,val)
-                    if name in self._tk_vars: self._tk_vars[name].set(val)
-                    return # also a bit hidden
+            if hasattr(self._extraPO,name):
+                setattr(self._extraPO,name,val)
+                if name in self._tk_vars: self._tk_vars[name].set(val)
+                return # also a bit hidden
 
         # name not found, so set on this object
         object.__setattr__(self,name,val)
@@ -487,10 +490,10 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
     pretty_parameters = BooleanParameter(default=True,doc="Whether to format parameter names, or use the variable names instead.")
     
-    def __init__(self,master,extra_pos=[],**params):
+    def __init__(self,master,extraPO=None,**params):        
         assert master is not None # (could probably remove this but i didn't want to think about it)
         self.master = master
-        TkParameterizedObjectBase.__init__(self,extra_pos=extra_pos,**params)
+        TkParameterizedObjectBase.__init__(self,extraPO=extraPO,**params)
         self.balloon = Pmw.Balloon(master)
 
         # map Parameter classes to appropriate widget-creation method
@@ -704,17 +707,15 @@ from tkguiwindow import Menu,TkguiWindow
 # CB: just for testing at the moment
 class ParametersFrame2(TkParameterizedObject,Frame):
 
-    def __init__(self,master,extra_pos=[],**params):
-        assert len(extra_pos)==1
-        
-        TkParameterizedObject.__init__(self,master,extra_pos=extra_pos,**params)
+    def __init__(self,master,PO=None,**params):        
+        TkParameterizedObject.__init__(self,master,extraPO=PO,**params)
         Frame.__init__(self,master)
         self.packed_params = {}
 
-        self.master.title("Parameters of "+ (extra_pos[0].name or str(extra_pos[0])))
+        self.master.title("Parameters of "+ (PO.name or str(PO)) ) # classes dont have names
 
         ### Pack all of the non-hidden Parameters
-        for n,p in self.rightparams(extra_pos[0]).items():
+        for n,p in self.rightparams(PO).items():
 
             if self.__editing_class():
                 if not p.hidden:
@@ -738,15 +739,15 @@ class ParametersFrame2(TkParameterizedObject,Frame):
 
 
     def __value_changed(self,name):
-        if self._tk_vars[name]!=getattr(self._extra_pos[0],name):
+        if self._tk_vars[name]!=getattr(self._extraPO,name):
             return True
         else:
             return False
 
     def __editing_class(self):
-        if isinstance(self._extra_pos[0],ParameterizedObjectMetaclass):
+        if isinstance(self._extraPO,ParameterizedObjectMetaclass):
             return True
-        elif isinstance(self._extra_pos[0],ParameterizedObject):
+        elif isinstance(self._extraPO,ParameterizedObject):
             return False
         else:
             raise TypeError
@@ -820,11 +821,11 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         title = Tkinter.Label(parameter_window, text = param_to_edit.name)
         title.pack(side = "top")
         self.balloon.bind(title,getdoc(param_to_edit))
-        parameter_frame = ParametersFrame2(parameter_window,extra_pos=[param_to_edit])
+        parameter_frame = ParametersFrame2(parameter_window,extraPO=param_to_edit)
 
             
         
 
-#./topographica -g examples/hierarchical.ty -c "from topo.tkgui.tkparameterizedobject import ParametersFrame2; import Tkinter; g = Gaussian(); p = ParametersFrame2(Tkinter.Toplevel(),extra_pos=[g]); p.pack()"
+#./topographica -g examples/hierarchical.ty -c "from topo.tkgui.tkparameterizedobject import ParametersFrame2; import Tkinter; g = Gaussian(); p = ParametersFrame2(Tkinter.Toplevel(),PO=g); p.pack()"
 
-#./topographica -g examples/hierarchical.ty -c "from topo.tkgui.tkparameterizedobject import ParametersFrame2; import Tkinter; g = Gaussian(); p = ParametersFrame2(Tkinter.Toplevel(),extra_pos=[g]); p.pack(); p2 = ParametersFrame2(Tkinter.Toplevel(),extra_pos=[topo.sim['V1']]); p2.pack(); p3 = ParametersFrame2(Tkinter.Toplevel(),extra_pos=[Gaussian]); p3.pack(); p4 = ParametersFrame2(Tkinter.Toplevel(),extra_pos=[type(topo.sim['V1'])])"
+#./topographica -g examples/hierarchical.ty -c "from topo.tkgui.tkparameterizedobject import ParametersFrame2; import Tkinter; g = Gaussian(); p = ParametersFrame2(Tkinter.Toplevel(),PO=g); p.pack(); p2 = ParametersFrame2(Tkinter.Toplevel(),PO=topo.sim['V1']); p2.pack(); p3 = ParametersFrame2(Tkinter.Toplevel(),PO=Gaussian); p3.pack(); p4 = ParametersFrame2(Tkinter.Toplevel(),PO=type(topo.sim['V1']))"
