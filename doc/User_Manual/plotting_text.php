@@ -191,7 +191,7 @@ plot. For instance, you can remove the default OrientationPreference
 subplot from Activity plots using:
 <pre>
   from topo.plotting.templates import plotgroup_templates
-  plotgroup_templates["Orientation Preference"].plot_templates['Color']=None
+  plotgroup_templates["Orientation Preference"].plot_templates['Hue']=None
   plotgroup_templates["Orientation Preference"].plot_templates['Confidence']=None
 </pre>
 
