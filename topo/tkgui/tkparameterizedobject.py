@@ -582,9 +582,14 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         return Checkbutton(frame,variable=self._tk_vars[name],**widget_options)
         
     def _create_string_widget(self,frame,name,widget_options):
-        return Entry(frame,textvariable=self._tk_vars[name],**widget_options)
-#################################
+        w = Entry(frame,textvariable=self._tk_vars[name],**widget_options)
 
+        if self.get_parameter_object(name).constant:
+            w['state']='readonly'
+            w['fg']='gray45'
+            
+        return w
+#################################
 
 
     # CEBALERT: on_change should be on_set (since it's called not only for changes)
@@ -691,9 +696,12 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         Frame.__init__(self,master)
         self.packed_params = {}
 
+        self.master.title("Parameters of "+extra_pos[0].name)
+
         ### Pack all of the non-hidden Parameters
         for n,p in extra_pos[0].params().items():
-            if not p.hidden:
+
+            if not p.hidden and n!='name':
                 self.pack_param(n)
                 self.packed_params[n]=p 
 
@@ -719,8 +727,9 @@ class ParametersFrame2(TkParameterizedObject,Frame):
 
     def update_parameters(self):
 
-        for name in self.packed_params.keys():
-            self._update_param(name)
+        for name,param in self.packed_params.items():
+            if not param.constant:
+                self._update_param(name)
 
 
         #for name in self._extra_pos[0].params().keys():
