@@ -573,7 +573,29 @@ def concrete_descendents(parentclass):
                  if not (hasattr(c,'abstract') and c.abstract==True)])
 
 
-class ClassSelectorParameter(Parameter):
+
+########### CEB: currently working on SelectorParameters #########
+
+class SelectorParameter(Parameter):
+    __slots__=[]
+    __doc__ = property((lambda self: self.doc))
+
+    def range(self):
+        pass
+    
+class ObjectSelectorParameter(SelectorParameter):
+    __slots__ = ['Arange'] # Could generate range from a passed-in function, not sure yet.
+                           # In any case, won't stay as Arange.
+    __doc__ = property((lambda self: self.doc))
+
+    def __init__(self, default=None, Arange=[],instantiate=True,**params):
+        Parameter.__init__(self,default=default,instantiate=instantiate,**params)
+        self.Arange = Arange
+
+    def range(self):
+        return dict([(i.name,i) for i in self.Arange])
+    
+class ClassSelectorParameter(SelectorParameter):
     """
     Parameter whose value is an instance of the specified class.
 
@@ -597,12 +619,32 @@ class ClassSelectorParameter(Parameter):
         Parameter.__init__(self,default=default,instantiate=instantiate,
                            **params)
 
-
     def __set__(self,obj,val):
+
+        if val in self.range().values():
+            # CEBHACKALERT: caller attempted to set to one of values from range(); i.e., a class
+            # instead of instantiating it...so we instantiate it.
+            val=val()
+        
         if not (isinstance(val,self.class_)):
             raise ValueError("Parameter " + `self.attrib_name()` + " (" + `self.__class__.__name__` +
-                             ") must be an instance of " + self.class_.__name__)
+                             ") must be an instance of " + self.class_.__name__ +
+                             "; " + `val` + " is " + `type(val)` + ".")
         super(ClassSelectorParameter,self).__set__(obj,val)
+
+
+    # CB: temporary!
+    def in_range(self,val):
+
+        # val IS one of the classes = ok
+        if val in self.range().values():
+            return True
+        # val is an instance of one of the classes = ok
+        elif isinstance(val,self.class_):
+            return True
+        else:
+            return False
+
         
     def range(self):
         """
@@ -631,7 +673,7 @@ class ClassSelectorParameter(Parameter):
         """
         return re.sub(self.suffix_to_lose+'$','',class_name)
 
-
+#################################################################################
 
 
 class ListParameter(Parameter):
