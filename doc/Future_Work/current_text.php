@@ -140,11 +140,15 @@ Insert missing actions in case someone tries higher densities.
 JAB 2007/04/25: Isn't this already done?
 
 
-<H4>2007/01/25 (CB): ParametersFrame ok/apply/reset/cancel</H4>
-Set order and names of ParametersFrame's Ok, Apply, Cancel, Reset, and
+<H4>2007/01/25 (CB): ParametersFrame ok/apply/reset/cancel</H4> Set
+order and names of ParametersFrame's Ok, Apply, Cancel, Reset, and
 Defaults buttons, and make them behave as expected for classes and
 instances.  Figure out and clean up translator_dictionary & its uses.
-ParametersFrame use for objects it doesn't know about (e-mail from JAB).
+ParametersFrame use for objects it doesn't know about (e-mail from
+JAB).  Also, should add a Refresh button if the above buttons don't
+include such a feature, so that one can leave a PropertiesFrame window
+open during training, and hit Refresh or Update to see the values of
+DynamicParameters (or anything else changed outside of that window).
 
 
 <H4>2007/04/15 (CB): Dynamic info</H4>
@@ -226,10 +230,14 @@ or from the GUI).  (Right now the name is updated only when a window
 is first opened, or when learning is done in the topoconsole.)
 
 
-<H4>2006/07/07 (CP): Fix normalization to allow negative weights.  </H4>
-Also consider adding other normalization options, including joint
-normalization across all plots with the same name.
-
+<H4>2006/07/07 (CP): Fix normalization to allow negative weights.
+</H4> Also consider adding other normalization options, including
+joint normalization across all plots with the same name.  Actually,
+maybe we can automatically joint normalize plots for any
+joint-normalized projections?  That's presumably how we want it to
+behave with multiplicative normalization, because the sum is constant
+for each independent normalization, and thus the relative values are
+not very interesting unless the sums are normalized together.
 
 <H4>2006/11/09 (JL): better saving during batch runs</H4>
 Support better saving of results during long batch runs
