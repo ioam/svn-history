@@ -394,7 +394,10 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
 
 ###############################################################################
 pgt= new_pgt(name='Receptive Fields',category="Other",
-             doc='Measure receptive fields.', command='measure_rfs(input_sheet=topo.sim["Retina"]); plotrctg()', normalize=True)
+             doc='Measure receptive fields.',
+             command='measure_rfs(input_sheet=topo.sim["Retina"])',
+             plot_command='plotrctg()',
+             normalize=True)
 
 # CEB: can we have some default option for input_sheet? Could have input_sheet_name, defaulting to
 # 'Retina', then lookup the sheet with topo.sim[input_sheet_name]?
@@ -437,7 +440,8 @@ def measure_rfs(input_sheet,divisions=10,scale=30.0,offset=0.5,display=False,
 ###############################################################################
 pgt= new_pgt(name='Receptive Fields noise',category="Other",
              doc='Measure receptive fields by reverse correlation using random noise.',
-             command='measure_rfs_noise(input_sheet=topo.sim["Retina"]); plotrctg()',normalize=True)
+             command='measure_rfs_noise(input_sheet=topo.sim["Retina"])',
+             plot_command='plotrctg()',normalize=True)
                         
 
 ### JABALERT: Why is the scale and offset set twice?                                    
