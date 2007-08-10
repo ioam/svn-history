@@ -1,6 +1,60 @@
+<H1>Refactoring</H1>
+(From <a href="http://www.refactoring.com/">refactoring.com</A>):
+
+<blockquote>
+Refactoring is a disciplined technique for restructuring an existing
+body of code, altering its internal structure without changing its
+external behavior. Its heart is a series of small behavior preserving
+transformations. Each transformation (called a 'refactoring') does
+little, but a sequence of transformations can produce a significant
+restructuring. Since each refactoring is small, it's less likely to go
+wrong. The system is also kept fully working after each small
+refactoring, reducing the chances that a system can get seriously
+broken during the restructuring.
+</blockquote>
+
+We rely heavily on refactoring in Topographica to ensure that the
+design is always kept up to date and suitable for future scientific
+advances.
+
+<H1>Bad smells</H1>
+
+<P>Fowler 1999, <A
+HREF="http://www.amazon.co.uk/exec/obidos/ASIN/0201485672/">Refactoring:
+Improving the Design of Existing Code</A>, pp. 417-418) contains a
+nice list of "bad smells" in code that drive a developer to want or
+need to refactor it:
+
+    * Duplicated Code
+    * Long Method
+    * Large Class
+    * Long Parameter List
+    * Divergent Change
+    * Shotgun Surgery
+    * Feature Envy
+    * Data Clumps
+    * Primitive Obsession
+    * Switch Statements
+    * Parallel Inheritance Hierarchies
+    * Lazy Class
+    * Speculative Generality
+    * Temporary Field
+    * Message Chains
+    * Middle Man
+    * Inappropriate Intimacy
+    * Alternative Classes with Different Interfaces
+    * Incomplete Library Class
+    * Data Class
+    * Refused Bequest
+    * Comments
+
+More information is available from:
+http://sis36.berkeley.edu/projects/streek/agile/bad-smells-in-code.html
+
+
 <H1>Refactoring/testing tips</H1>
 
-<P>This list of "soundbites" comes from Fowler 1999, <A
+<P>This list of "soundbites" again comes from Fowler 1999, <A
 HREF="http://www.amazon.co.uk/exec/obidos/ASIN/0201485672/">Refactoring:
 Improving the Design of Existing Code</A>, pp. 417-418).  It seems to
 apply reasonably well to this project, particularly the parts about
