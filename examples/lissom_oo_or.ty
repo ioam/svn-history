@@ -213,6 +213,9 @@ topo.sim.schedule_command( 6500*st,OF+'.lower_bound=0.203;'+OF+'.upper_bound=0.8
 topo.sim.schedule_command( 8000*st,OF+'.lower_bound=0.213;'+OF+'.upper_bound=0.833')
 topo.sim.schedule_command(20000*st,OF+'.lower_bound=0.223;'+OF+'.upper_bound=0.863')
 
+### Just to get more progress reports
+topo.sim.schedule_command(12000*st,'pass')
+topo.sim.schedule_command(16000*st,'pass')
 
 ### Settling steps changes
 topo.sim.schedule_command( 2000*st,'topo.sim["V1"].tsettle=10')
