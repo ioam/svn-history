@@ -522,9 +522,9 @@ class TopoConsole(TkguiWindow):
         
 
             
-    def quit_topographica(self):
+    def quit_topographica(self,check=True):
         """Quit topographica."""
-        if tkMessageBox.askyesno("Quit Topographica","Really quit?"):
+        if not check or (check and tkMessageBox.askyesno("Quit Topographica","Really quit?")):
             self.destroy() 
             print "Quit selected; exiting"
 
