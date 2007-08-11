@@ -147,6 +147,12 @@ snapshot-tests:
 	rm -f 'snapshot-tests.typ'
 
 
+# Just check the basic types of window open without errors (because the unit tests don't yet do this).
+basic-gui-tests:
+	./topographica examples/hierarchical.ty -g -c "p=topo.guimain.plots_menu_entries; p['Activity'].command(); p['Connection Fields'].command(); p['Projection'].command(); p['Projection Activity'].command();p['Orientation Preference'].command();p['Orientation Tuning'].command();topo.guimain.quit_topographica(check=False)"
+
+
+
 clean-pyc:
 	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc examples/*.pyc
 
