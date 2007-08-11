@@ -746,12 +746,11 @@ from tkguiwindow import Menu,TkguiWindow
 
 class ParametersFrame2(TkParameterizedObject,Frame):
 
+    # CEBHACKALERT: semantics of all these buttons needs to be checked.
     Apply = ButtonParameter()
     Defaults = ButtonParameter()
-    Reset = ButtonParameter()
+    Reset = ButtonParameter(doc="Return displayed values to those of the object.")  # should it be refresh or reset?
     Close = ButtonParameter()
-
-    Refresh = ButtonParameter()
 
     def __init__(self,master,PO=None,**params):        
         Frame.__init__(self,master)
@@ -779,18 +778,13 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         self.menu.insert_command('end', label = 'Properties', command = lambda: 
             self.__edit_PO_in_currently_selected_widget())
 
-
-        self.pack_param('Refresh',on_change=self._sync_tkvars2po)
-
+        ### Apply/Close etc buttons
         self.buttons_frame = Frame(self)
         self.buttons_frame.pack()
         
         self.pack_param('Apply',parent=self.buttons_frame,on_change=self.update_parameters,side='left')
         self.pack_param('Defaults',parent=self.buttons_frame,on_change=self.defaultsB,side='left')
-
-        if isinstance(self._extraPO,ParameterizedObject):
-            self.pack_param('Reset',parent=self.buttons_frame,on_change=self.resetB,side='left')
-        
+        self.pack_param('Reset',parent=self.buttons_frame,on_change=self._sync_tkvars2po,side='left')
         self.pack_param('Close',parent=self.buttons_frame,on_change=self.closeB,side='left')
 
 
@@ -806,10 +800,6 @@ class ParametersFrame2(TkParameterizedObject,Frame):
             self._extraPO.reset_params()
             self._sync_tkvars2po()
         
-
-    def resetB(self):
-        self._sync_tkvars2po()
-
 
     def closeB(self):
         # CEBALERT: warn if there are unapplied changes
