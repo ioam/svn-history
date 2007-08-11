@@ -112,7 +112,7 @@ class DistributionMatrix(ParameterizedObject):
 
 
 
-# CB: currently working on FeatureResponses and ReverseCorrelation: need cleanup
+# CB: FeatureResponses and ReverseCorrelation need cleanup; I began but haven't finished.
 
 class FeatureResponses(ParameterizedObject):
     """
