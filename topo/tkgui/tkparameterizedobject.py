@@ -7,6 +7,9 @@ $Id$
 
 # CB: this file has now gone beyond the maximum complexity limit
 
+### CEB: currently working on this file
+
+import __main__
 
 from inspect import getdoc
 import Tkinter
@@ -121,17 +124,23 @@ class TkParameterizedObjectBase(ParameterizedObject):
     _extraPO = None
     _tk_vars = {}
     translators = {}
+    me_first = True  # for precedence 
     
 
+
     # CBENHANCEMENT: __repr__ will need some work (display params of subobjects etc?).
-    def rightparams(self,THING):
-        
-        if isinstance(THING,ParameterizedObjectMetaclass):
-            return THING.classparams()
-        elif isinstance(THING,ParameterizedObject):
-            return THING.params()
+
+    
+    def _parameters(self,parameterized_object):
+        """
+        ParameterizedObjectMetaclass has classparams(); ParameterizedObject has params().
+        """
+        if isinstance(parameterized_object,ParameterizedObjectMetaclass):
+            return parameterized_object.classparams()
+        elif isinstance(parameterized_object,ParameterizedObject):
+            return parameterized_object.params()
         else:
-            raise TypeError
+            raise TypeError(`parameterized_object`+" is not a ParameterizedObject or ParameterizedObjectMetaclass.")
 
 
 
@@ -156,20 +165,16 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
     # CEBALERT: a list's too confusing, and there's currently no need for more
     # than one extra po. Change to just one extra PO?
-    def __init__(self,extraPO=None,**params):
+    def __init__(self,extraPO=None,me_first=True,**params):
 
+        self.me_first = me_first
         self._extraPO = extraPO
         self._tk_vars = {}
         self.translators = {}
         
         super(TkParameterizedObjectBase,self).__init__(**params)
 
-        if extraPO:
-            pos = [extraPO,self]
-        else:
-            pos = [self]
-
-        for PO in pos:
+        for PO in self._source_POs()[::-1]:
             self._init_tk_vars(PO)
 
 
@@ -184,7 +189,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         For a Parameter with the 'range' attribute, also updates the translator dictionary to
         map string representations to the objects themselves.
         """
-        for name,param in self.rightparams(PO).items():
+        for name,param in self._parameters(PO).items():
 
             # shouldn't need second check but seems range could be None or something else not like a list?
             #if hasattr(param,'range') and hasattr(param.range,'__len__'): 
@@ -250,7 +255,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
 
         current_param_value = self.get_parameter_value(name)
-
+        #t=self.translators[name]={}
         # store list of OBJECTS for ClassSelectorParameter's
         # range (although CSParam's range uses classes; matches parametersframe.ParametersFrame behavior)
         if isinstance(param,ClassSelectorParameter): #hasattr(param,'range'):
@@ -267,11 +272,23 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 
         elif isinstance(param,ObjectSelectorParameter):
             t=self.translators[name]={}
-            
             for n,o in param.range().items():
                 t[n] = o
+#        else:
+
+#            t[repr(current_param_value)] = current_param_value
+            
 
 
+
+##     def tra(self,v):
+
+##         try:
+##             k=eval(v,__main__.__dict__)
+##         except TypeError:
+##             k=v
+
+##         return k
         
     
     def string2object_ifrequired(self,param_name,val):
@@ -279,11 +296,19 @@ class TkParameterizedObjectBase(ParameterizedObject):
         If val is in param_name's translator, then translate to the object.
         """
         new_val = val
-        
+
         if param_name in self.translators:
             t = self.translators[param_name]
             if val in t:
                 new_val = t[val]
+        else:
+            new_val = self.tra(val)
+            
+        #else:
+        #    # ALWAYS evaluate, which means strings must be quoted in the GUI
+        #    new_val = self.tra(val)
+
+
 
         return new_val
     converta = string2object_ifrequired  #CB: old method name - remove when unused
@@ -294,7 +319,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
         If val is one of the objects in param_name's translator,
         translate to the string.
         """
-        
         new_val = val
 
         if param_name in self.translators:
@@ -333,15 +357,19 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         
         try:
-            sources = [self,self._extraPO]
+            sources = self._source_POs()
             
             for po in sources:
-                if param_name in self.rightparams(po).keys():
-                    parameter = self.rightparams(po)[param_name]
+                if param_name in self._parameters(po).keys():
+                    parameter = self._parameters(po)[param_name]
                     ## use set_in_bounds if it exists: i.e. users of widgets get their
                     ## values cropped (no warnings/errors)
-                    if hasattr(parameter,'set_in_bounds'):
+                    if hasattr(parameter,'set_in_bounds') and isinstance(po,ParameterizedObject):
+                        #setattr(po,param_name,val)
+                        #try:
                         parameter.set_in_bounds(po,val)
+                        #except TypeError: # CEBHACKALERT: set_in_bounds not valid for POMetaclass
+                        #    setattr(po,param_name,val)
                     else:
                         setattr(po,param_name,val)
                         
@@ -359,15 +387,19 @@ class TkParameterizedObjectBase(ParameterizedObject):
             raise # whatever the parameter-setting error was
 
 
-    def __sources(self,parameterized_object=None):
+    def _source_POs(self,parameterized_object=None):
         """
         Return a correctly ordered list of ParameterizedObjects in which to find Parameters
         (unless one is specified, in which case it's the only item in the list).
         """
-        if parameterized_object is None:
+        if parameterized_object:
+            sources = [parameterized_object]
+        elif not self._extraPO:
+            sources = [self]
+        elif self.me_first:
             sources = [self,self._extraPO]
         else:
-            sources = [parameterized_object] 
+            sources = [self._extraPO,self]
         return sources
     
 
@@ -376,10 +408,10 @@ class TkParameterizedObjectBase(ParameterizedObject):
         Return the Parameter specified by the name from the sources of
         Parameters in this object (or the specified parameterized_object).
         """
-        sources = self.__sources(parameterized_object)
+        sources = self._source_POs(parameterized_object)
         
         for po in sources:
-            params = self.rightparams(po)
+            params = self._parameters(po)
             if name in params: return params[name] # a bit hidden
 
         raise AttributeError("none of %s have parameter %s"%(str(sources),name))
@@ -394,10 +426,10 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
         Get the value of the parameter specified by name.
         """
-        sources = self.__sources(parameterized_object)
+        sources = self._source_POs(parameterized_object)
 
         for po in sources:
-            params = self.rightparams(po)
+            params = self._parameters(po)
             if name in params: return getattr(po,name) # also hidden!
 
         raise AttributeError("none of %s have parameter %s"%(str(sources),name))
@@ -407,10 +439,10 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
         Set the value of the parameter specified by name to val.
         """
-        sources = self.__sources(parameterized_object)
+        sources = self._source_POs(parameterized_object)
 
         for po in sources:
-            if name in self.rightparams(po).keys(): 
+            if name in self._parameters(po).keys(): 
                 setattr(po,name,val)
                 return # so hidden I forgot to write it until now
 
@@ -425,6 +457,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
 #  they were expecting to get one of their parameters. Also, means you can't set
 #  an attribute a on self if a exists on one of the shadowed objects)
 
+# (also they ignore me_first)
+
     def __getattribute__(self,name):
         """
         If the attribute is found on this object, return it. Otherwise,
@@ -436,8 +470,9 @@ class TkParameterizedObjectBase(ParameterizedObject):
         except AttributeError:
             extraPO = object.__getattribute__(self,'_extraPO')
             if hasattr(extraPO,name): return getattr(extraPO,name) 
-
+            
             raise AttributeError("Neither %s nor %s has attribute %s"%(self,extraPO,name))
+                    
 
     def __setattr__(self,name,val):
         """
@@ -459,6 +494,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         # name not found, so set on this object
         object.__setattr__(self,name,val)
+            
 ################################################
 
 
@@ -467,6 +503,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 # supports changing the list of items after widget creation - might
 # need to use Pmw's OptionMenu (which does support that).
 
+# CEBHACKALERT: need to update this; not currently used in any code but testing
     def initialize_ranged_parameter(self,param_name,range_):
         p = self.get_parameter(param_name)
 
@@ -488,15 +525,17 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     Parameters of its ParameterizedObject(s).
     """
 
-    pretty_parameters = BooleanParameter(default=True,doc="Whether to format parameter names, or use the variable names instead.")
+    pretty_parameters = BooleanParameter(default=True,doc=
+                                         """Whether to format parameter names, or display
+                                         the variable names instead.""")
     
-    def __init__(self,master,extraPO=None,**params):        
-        assert master is not None # (could probably remove this but i didn't want to think about it)
+    def __init__(self,master,extraPO=None,me_first=True,**params):
         self.master = master
-        TkParameterizedObjectBase.__init__(self,extraPO=extraPO,**params)
+        TkParameterizedObjectBase.__init__(self,extraPO=extraPO,me_first=me_first,**params)
+
         self.balloon = Pmw.Balloon(master)
 
-        # map Parameter classes to appropriate widget-creation method
+        # map of Parameter classes to appropriate widget-creation method
         self.widget_creators = {
             BooleanParameter:self._create_boolean_widget,
             Number:self._create_number_widget,
@@ -556,7 +595,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         tk_var = self._tk_vars[name]
 
 
-        #############
+        ############# 
         current_string = self.get_parameter_value(name)
         
         if isinstance(param,ObjectSelectorParameter):
@@ -597,6 +636,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     def _create_string_widget(self,frame,name,widget_options):
         w = Entry(frame,textvariable=self._tk_vars[name],**widget_options)
 
+        # CEBHACKALERT: but need to be able to edit for a class!
         if self.get_parameter_object(name).constant:
             w['state']='readonly'
             w['fg']='gray45'
@@ -637,11 +677,10 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         """
         frame = Frame(parent or self.master)
 
-        #print name,"PO is",PO
         #if PO is None:
         param = self.get_parameter_object(name)
         #else:
-        #    param = self.rightparams(PO)[name]
+        #    param = self._parameters(PO)[name]
 
         # default is label on the left
         label_side='left'; widget_side='right'
@@ -699,37 +738,40 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
 
 
+# CB: ** just for testing at the moment **
 
 ##########################################################################################
 
 from tkguiwindow import Menu,TkguiWindow
 
-# CB: just for testing at the moment
 class ParametersFrame2(TkParameterizedObject,Frame):
 
-    def __init__(self,master,PO=None,**params):        
-        TkParameterizedObject.__init__(self,master,extraPO=PO,**params)
-        Frame.__init__(self,master)
-        self.packed_params = {}
+    Apply = ButtonParameter()
+    Defaults = ButtonParameter()
+    Reset = ButtonParameter()
+    Close = ButtonParameter()
 
+    Refresh = ButtonParameter()
+
+    def __init__(self,master,PO=None,**params):        
+        Frame.__init__(self,master)
         self.master.title("Parameters of "+ (PO.name or str(PO)) ) # classes dont have names
+        
+        TkParameterizedObject.__init__(self,master,extraPO=PO,me_first=False,**params)
 
         ### Pack all of the non-hidden Parameters
-        for n,p in self.rightparams(PO).items():
-
-            if self.__editing_class():
-                if not p.hidden:
-                    self.pack_param(n)#,PO=extra_pos[0])
-                    self.packed_params[n]=p
-            else:
-                if not p.hidden and n!='name':
-                    self.pack_param(n)#,PO=extra_pos[0])
-                    self.packed_params[n]=p 
-
+        self.packed_params = {}
+        for n,p in self._parameters(PO).items():
+            if not p.hidden:
+                self.pack_param(n)
+                self.packed_params[n]=p
+            
         ### Delete all variable traces
         # (don't want to update parameters immediately)
         for v in self._tk_vars.values():
             self.__delete_trace(v)
+            v._checking_get = v.get
+            v.get = v._original_get
 
         ### Right-click menu for widgets
         self.option_add("*Menu.tearOff", "0") 
@@ -738,21 +780,48 @@ class ParametersFrame2(TkParameterizedObject,Frame):
             self.__edit_PO_in_currently_selected_widget())
 
 
-    def __value_changed(self,name):
-        if self._tk_vars[name]!=getattr(self._extraPO,name):
-            return True
-        else:
-            return False
+        self.pack_param('Refresh',on_change=self._sync_tkvars2po)
 
-    def __editing_class(self):
+        self.buttons_frame = Frame(self)
+        self.buttons_frame.pack()
+        
+        self.pack_param('Apply',parent=self.buttons_frame,on_change=self.update_parameters,side='left')
+        self.pack_param('Defaults',parent=self.buttons_frame,on_change=self.defaultsB,side='left')
+
+        if isinstance(self._extraPO,ParameterizedObject):
+            self.pack_param('Reset',parent=self.buttons_frame,on_change=self.resetB,side='left')
+        
+        self.pack_param('Close',parent=self.buttons_frame,on_change=self.closeB,side='left')
+
+
+    def _sync_tkvars2po(self):
+        for name in self.packed_params.keys():
+            self._tk_vars[name]._checking_get()
+
+
+    def defaultsB(self):
         if isinstance(self._extraPO,ParameterizedObjectMetaclass):
-            return True
+            print "what are these?"
         elif isinstance(self._extraPO,ParameterizedObject):
-            return False
+            self._extraPO.reset_params()
+            self._sync_tkvars2po()
+        
+
+    def resetB(self):
+        self._sync_tkvars2po()
+
+
+    def closeB(self):
+        # CEBALERT: warn if there are unapplied changes
+        self.master.destroy()
+
+
+
+    def __value_changed(self,name):
+        if self.string2object_ifrequired(name,self._tk_vars[name]._original_get())!=getattr(self._extraPO,name):
+            return True
         else:
-            raise TypeError
-
-
+            return False
 
 
     def __delete_trace(self,var):
@@ -760,31 +829,20 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         trace_name = var.trace_vinfo()[0][1]
         var.trace_vdelete(trace_mode,trace_name)
 
+
     def update_parameters(self):
-
-        # CAN SIMPLIFY!
-        if self.__editing_class():
-            for name,param in self.packed_params.items():
-                if self.__value_changed(name):
-                    #print name
-                    self._update_param(name)
-
+        if isinstance(self._extraPO,ParameterizedObjectMetaclass):
+            for name in self.packed_params.keys():
+                if self.__value_changed(name): self._update_param(name)
         else:    
             for name,param in self.packed_params.items():
-                if not param.constant:
-                    if self.__value_changed(name):
-                        self._update_param(name)
-
-
+                if not param.constant and self.__value_changed(name):
+                    self._update_param(name)
 
 
     def _create_ranged_widget(self,frame,name,widget_options):
-
         w = TkParameterizedObject._create_ranged_widget(self,frame,name,widget_options)
-        # A right-click on the widget shows the right-click menu
-        #w._entryWidget.bind('<<right-click>>',  ### (for  PMW optionmenu)
-        w.bind('<<right-click>>', 
-            lambda event: self.__right_click(event, w))
+        w.bind('<<right-click>>',lambda event: self.__right_click(event, w))
         return w
 
 
@@ -799,29 +857,25 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         Open a new window containing a ParametersFrame for the 
         PO in __currently_selected_widget.
         """
-        w = self.__currently_selected_widget
-
-        editing = None
-
-        ### simplify this lookup by value!
+        ### simplify this lookup-by-value!
+        param_name = None
         for name,wid in self._widgets.items():
-            if w is wid:
-                editing = name
+            if self.__currently_selected_widget is wid:
+                param_name=name
                 break
 
-        param_to_edit = self.get_parameter_value(editing)
-        param_name = editing
+        PO_to_edit = self.get_parameter_value(param_name)
 
-        
-        #param_to_edit=self.__currently_selected_widget.get_value()
-        #param_name = self.__currently_selected_widget.param_name
-        
         parameter_window = TkguiWindow()
-        parameter_window.title(param_to_edit.name+' parameters')
-        title = Tkinter.Label(parameter_window, text = param_to_edit.name)
+        parameter_window.title(PO_to_edit.name+' parameters')
+
+        ### CB: could be confusing?
+        title=Tkinter.Label(parameter_window, text="("+param_name + " of " + self._extraPO.name + ")")
         title.pack(side = "top")
-        self.balloon.bind(title,getdoc(param_to_edit))
-        parameter_frame = ParametersFrame2(parameter_window,extraPO=param_to_edit)
+        self.balloon.bind(title,getdoc(self.get_parameter_object(param_name,self._extraPO)))
+        ###
+        
+        parameter_frame = type(self)(parameter_window,PO=PO_to_edit)
 
             
         
