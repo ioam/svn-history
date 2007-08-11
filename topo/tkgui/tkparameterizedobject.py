@@ -281,14 +281,14 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
 
-##     def tra(self,v):
+    def tra(self,v):
 
-##         try:
-##             k=eval(v,__main__.__dict__)
-##         except TypeError:
-##             k=v
+        try:
+            k=eval(v,__main__.__dict__)
+        except TypeError:
+            k=v
 
-##         return k
+        return k
         
     
     def string2object_ifrequired(self,param_name,val):
