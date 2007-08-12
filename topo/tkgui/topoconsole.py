@@ -694,6 +694,12 @@ class TopoConsole(TkguiWindow):
                 self.messageBar.message('state', "Couldn't open "+location+" in browser.")
 
 
+    # CEBALERT: need to take care of removing old messages automatically?
+    # (Otherwise callers might always have to pass 'ok'.)
+    def status_message(self,m):
+        self.messageBar.message('state',m)
+
+
 
     # CEBHACKALERT: need to decide what to do about multiple concurrent timed process, and
     # clicking on Stop. If we'll only ever allow one progress meter, then have a
