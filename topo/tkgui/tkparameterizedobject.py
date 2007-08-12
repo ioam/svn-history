@@ -18,7 +18,8 @@ $Id$
 # * Add some key bindings
 # * E.g. V1 nominal_density shows up & can edit though no change?
 # * For repr'd stuff, create new each time? e.g. SheetMask() (currently last
-#   val is stored in dict, so it's not created new each time unless text changes)
+#   val is stored in dict, so it's not created new each time unless text changes...
+#   also, creates new objects rather than using default values...)
 # * Clean up tests for the different params; many are probably unnecessary
 
 
