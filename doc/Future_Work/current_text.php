@@ -30,10 +30,8 @@ first added to the list, or a change was made.
 
 <P>We are slowly changing over to use sourceforge's <a
 href="http://sourceforge.net/tracker/?group_id=53602">trackers</a>, so
-please also check there. Ideally, new tasks should be submitted to a
-tracker.
-
-
+please also check there. Ideally, <B>new tasks should be submitted to a
+tracker rather than added to this list</B>.
 
 
 <H2>Tasks to be addressed before the next release:</H2>
@@ -84,9 +82,10 @@ Of all the things I've recently been working on. The ALERTs and are
 getting out of control!
 
 
-<H4>2007/06/07 (CB): tkgui cleanup</H4>
-Using tkparameterizedobject to cut out tracking of variables and
-widgets: tkgui_parameterization_branch. Also plotgroup cleanup.<BR>
+<H4>2007/08/12 (CB): tkgui + plotgroup cleanup</H4>
+Now replacing ParametersFrame with one using TkParameterizedObject,
+and finishing TkParameterizedObject.
+<BR>
 Simplify tkgui, e.g. eliminating extra frames and any unnecessary
 refresh() etc methods. At the moment, the complexity makes it 
 difficult to add new features to the GUI and to correct problems.
@@ -98,37 +97,43 @@ expand), and so on. Switch to grid layout where it's more appropriate.
 More tasks/notes in topo/tkgui/__init__.py
 <BR>
 Document some Tkinter tips.
+<BR>
+Make update_command/command consistent. Remove templateplotgroup? 
+Right click connection field on e.g. retina --> lots of errors.
+<BR>
+ParametersFrame ok/apply/reset/cancel...set order and names of
+ParametersFrame's Ok, Apply, Cancel, Reset, and Defaults buttons, and
+make them behave as expected for classes and instances.  
+<BR>
+SelectorParameters. Consider these old, forgotten tasks:
+SheetSelectorParameter so that the GUI (model editor) can display list
+of sheet classes etc from a Parameter; ClassSelectorParameter -
+find_classes_in_package() will become a method of
+ClassSelectorParameter.
+<BR>
+name should be constant: objects in the simulation are indexed by
+name, so name needs to be a constant Parameter (which <i>might</i>
+cause some other problems).  There are some related hacks in
+ParametersFrame that would also need to be cleaned up.
 
 
-<H4>2007/06/10 (CB): rebuild doozy's webtests topographica with an X display</H4>
-(and have an x display available for gui tests.)
-And actually get the scheduling of nightly tests to work...
-(note that at seems to behave strangely when using su). 
-And indicate on output when  it's skipping tests.
 
 
 <H4>2007/06/07 (CB): timing code </H4>
 Clean up timing code, as in JABALERT. Then finish progress bar.
 
 
-<H4>2007/06/07 (CB): hierarchical </H4>
-The results have changed: is that ok, or not?
+<H4>2007/08/12: reverse correlation rfs cleanup. </H4>
+Finishing cleaning up associated code.
 
 
-<H4>2007/06/07: reverse correlation rfs cleanup. </H4>
-Fit code into topographica properly, once it's working.
-
-
-<H4>2007/06/07 (CB): scrollbars on plotgrouppanel windows</H4>
+<H4>2007/08/12 (CB): scrollbars on plotgrouppanel windows</H4>
 Add scrollbars when not auto-resizing (and ideally even when
 auto-resizing but the window would otherwise be larger than the
 screen).
-Currently disabled, since they seem to have strange behavior.
-Consider not using Pmw's scrolledframe component.
 <BR>
-Using bwidget scrollbar. Need to have
-scrollbars update properly, and to stop window jiggling
-while it's being setup.
+Build bwidget to see scrollbars. Current problems include
+
 
 
 <H4>2007/05/18 (CB): gradient plots </H4>
@@ -140,15 +145,6 @@ Insert missing actions in case someone tries higher densities.
 JAB 2007/04/25: Isn't this already done?
 
 
-<H4>2007/01/25 (CB): ParametersFrame ok/apply/reset/cancel</H4> Set
-order and names of ParametersFrame's Ok, Apply, Cancel, Reset, and
-Defaults buttons, and make them behave as expected for classes and
-instances.  Figure out and clean up translator_dictionary & its uses.
-ParametersFrame use for objects it doesn't know about (e-mail from
-JAB).  Also, should add a Refresh button if the above buttons don't
-include such a feature, so that one can leave a PropertiesFrame window
-open during training, and hit Refresh or Update to see the values of
-DynamicParameters (or anything else changed outside of that window).
 
 
 <H4>2007/04/15 (CB): Dynamic info</H4>
@@ -176,7 +172,7 @@ more tests of examples, by specifying sheet to look at etc.  And importantly,
 can easily run tests on Windows version.
 
 
-<H4>2007/03/26 (CB): Support for optimization  </H4>
+<H4>2007/03/26 (CB): Support for optimization</H4>
 Do we need our own simple timing functions to make it easier for users
 to optimize their components (as opposed to the overall Topographica
 framework, for which the current profile() commands are appropriate)?
@@ -280,9 +276,6 @@ for every window.
 </ul>
 (Note that some of these would be fixed by switching to Tile (see 'investigate using Tile' task). Do any Mac apps use a series of separate windows as topographica does? Anyway, we are already considering (or will consider sometime!) if it's possible to have a workspace for topographica (like matlab has) with tkinter.)
 
-<h4>2007/05/29 (JP) Replace this list with a bunch of tickets in the sourceforge bug reporting  system?</h4>
-
-For better tracking, etc.
 
 <H4>2007/03/29 (CB): tidy up c++ lissom matching</H4>
 Set c++ lissom params so that topographica doesn't have to set ganglia
@@ -326,7 +319,7 @@ Have a second abstract class so that the base PatternGenerator is
 simpler.
 
 
-<H4>2007/05/09 (CB): topoconsole workspace</H4>
+<H4>2007/05/09: topoconsole workspace</H4>
 Can we have a matlab-like workspace?
 
 
@@ -446,11 +439,6 @@ editor, and (eventually) making it possible to set their values and
 All arrays should be numpy.float32
 
 
-<H4>2006/05/15: name should be constant</H4>
-Objects in the simulation are indexed by name, so name needs to be a
-constant Parameter (which <i>might</i> cause some other problems).
-There are some related hacks in ParametersFrame that would also need
-to be cleaned up.
 
 
 <H4>2006/04/20: unit tests</H4>
@@ -463,15 +451,6 @@ topo/tests/testsheet.py.
 Complete test file for Composite and Image.  investigate failing test
 in testimage.py (that uses sheet functions).  Currently commented out;
 may not be a problem.
-
-
-<H4>2006/02/24: SheetSelectorParameter etc </H4>
-So that the GUI (model editor) can display list of sheet classes etc
-from a Parameter.
-
-
-<H4>2006/02/24 (JB): ClassSelectorParameter</H4>
-find_classes_in_package() will become a method of ClassSelectorParameter. 
 
 
 <H4>2006/02/21: ReadOnlyParameter</H4>
@@ -801,6 +780,7 @@ dynamic help. We might be able to simplify topoconsole further with this.]
 Probably all available from Tkinter and bwidget...we can probably
 stop using Pmw.]
 
+
 <H4>2007/07/24 (JB): Matlab Toolbox for Dimensionality Reduction</H4>
 
 Consider interfacing to this toolbox, which contains Matlab
@@ -868,6 +848,23 @@ _________________________________________________________
 
 
 (CB) embed matplotlib windows / "histograms" conversation
+
+
+_________________________________________________________
+
+
+(CB) add note for developers: always specify GMT in cvs date commands
+when doing any kind of search through cvs history. your timezone might
+be different (e.g. BST or china time...) 
+
+_________________________________________________________
+
+
+Start to use doctest. Unit tests need to be sorted out: reset state
+between tests (e.g. by saving/restoring class attributes)?
+
+_________________________________________________________
+
 
 
 -->
