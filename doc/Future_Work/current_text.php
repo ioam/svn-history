@@ -132,7 +132,10 @@ Add scrollbars when not auto-resizing (and ideally even when
 auto-resizing but the window would otherwise be larger than the
 screen).
 <BR>
-Build bwidget to see scrollbars. Current problems include
+Build bwidget to see scrollbars. Current problems include flickering
+on linux (e.g. rotate a gaussian in test pattern window), and
+unnecessary scrollbars appearing on linux only to disappear when
+clicked.
 
 
 
