@@ -198,7 +198,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         
         super(TkParameterizedObjectBase,self).__init__(**params)
 
-        if extraPO: self.change_PO(extraPO)
+        self.change_PO(extraPO)
 
 
 
