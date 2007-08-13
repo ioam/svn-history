@@ -29,8 +29,14 @@ There are also discussion forums (web boards) and item trackers available:
 <P><DT><A HREF="http://sourceforge.net/forum/forum.php?forum_id=178311">Open Discussion</A></DT>
 <DD>Forum for discussion of any topic related to Topographica.</DD>
 
+<P><DT><A HREF="http://sourceforge.net/forum/forum.php?forum_id=552131">Windows users</A></DT>
+<DD>Forum for discussion of Windows-specific issues related to Topographica.</DD>
+
 <P><DT><A HREF="http://sourceforge.net/tracker/?group_id=53602&atid=470929">Bug reports</A></DT>
 <DD>Please file bug reports using this interface rather than emailing the developers directly.
+
 <P><DT><A HREF="http://sourceforge.net/tracker/?group_id=53602&atid=470932">Request for enhancement</A></DT>
 <DD>If you have ideas for features you would like to see, please enter them here.
+
+
 </DL>
