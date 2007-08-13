@@ -178,6 +178,14 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         ParameterizedObject._setup_params(self,**params)
 
+    def change_PO(self,extraPO):
+        self._extraPO = extraPO
+        self._tk_vars = {}
+        self.translators = {}
+
+        for PO in self._source_POs()[::-1]:
+            self._init_tk_vars(PO)
+
 
     # CB: rename extraPO
     def __init__(self,extraPO=None,self_first=True,**params):
@@ -187,14 +195,11 @@ class TkParameterizedObjectBase(ParameterizedObject):
                or isinstance(extraPO,ParameterizedObject)
         
         self.self_first = self_first
-        self._extraPO = extraPO
-        self._tk_vars = {}
-        self.translators = {}
         
         super(TkParameterizedObjectBase,self).__init__(**params)
 
-        for PO in self._source_POs()[::-1]:
-            self._init_tk_vars(PO)
+        if extraPO: self.change_PO(extraPO)
+
 
 
     def _source_POs(self,parameterized_object=None):
@@ -826,24 +831,12 @@ class ParametersFrame2(TkParameterizedObject,Frame):
 
     def __init__(self,master,PO=None,**params):        
         Frame.__init__(self,master)
-        self.master.title("Parameters of "+ (PO.name or str(PO)) ) # classes dont have names
         
         TkParameterizedObject.__init__(self,master,extraPO=PO,self_first=False,**params)
 
 
-        ### Pack all of the non-hidden Parameters
-        self.packed_params = {}
-        for n,p in parameters(PO).items():
-            if not p.hidden:
-                self.pack_param(n,fill='x',expand='yes')
-                self.packed_params[n]=p
-            
-        ### Delete all variable traces
-        # (don't want to update parameters immediately)
-        for v in self._tk_vars.values():
-            self.__delete_trace(v)
-            v._checking_get = v.get
-            v.get = v._original_get
+        if PO:self.set_PO(PO)
+
 
         ### Right-click menu for widgets
         self.option_add("*Menu.tearOff", "0") 
@@ -860,6 +853,28 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         self.pack_param('Reset',parent=self.buttons_frame,on_change=self._sync_tkvars2po,side='left')
         self.pack_param('Close',parent=self.buttons_frame,on_change=self.closeB,side='left')
 
+
+    def set_PO(self,PO):
+
+        self.change_PO(PO)
+
+        self.master.title("Parameters of "+ (PO.name or str(PO)) ) # classes dont have names
+
+        ### Pack all of the non-hidden Parameters
+        self.packed_params = {}
+        for n,p in parameters(PO).items():
+            if not p.hidden:
+                self.pack_param(n,fill='x',expand='yes')
+                self.packed_params[n]=p
+            
+        ### Delete all variable traces
+        # (don't want to update parameters immediately)
+        for v in self._tk_vars.values():
+            self.__delete_trace(v)
+            v._checking_get = v.get
+            v.get = v._original_get
+    create_widgets = set_PO
+    
 
     def _sync_tkvars2po(self):
         for name in self.packed_params.keys():
@@ -978,7 +993,7 @@ class Tester(ParameterizedObject):
     class_selection = OutputFnParameter(default=IdentityOF(),doc="class_selection doc")
     object_selection = ObjectSelectorParameter(doc="object_selection doc")
     boolean = BooleanParameter(default=True,doc="boolean doc")
-    parameter = Parameter(default=MoreParameterizedObject(name="A"),doc="parameter doc")
+    parameter = Parameter(instantiate=False,default=MoreParameterizedObject(name="A"),doc="parameter doc")
 
     
 # ./topographica -g examples/hierarchical.ty -c "from topo.tkgui.tkparameterizedobject import ParametersFrame2, Tester,po1,po2,po3; import Tkinter; t1 = Tester(); t1.params()['object_selection'].Arange = [po1,po2,po3]; p1 = ParametersFrame2(Tkinter.Toplevel(),PO=t1); p1.pack()"
