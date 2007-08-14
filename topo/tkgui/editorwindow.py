@@ -586,21 +586,19 @@ class ModelEditor:
         # create the editor covers for the connections
         
         for editor_node in self.canvas.object_list:
-            node = editor_node.sheet
-            for con in node.out_connections:
+            for con in editor_node.sheet.out_connections:
                 # create cover for a projection
                 editor_connection = EditorProjection("", self.canvas, editor_node)
                 # find the EditorNode that the proj connects to
-                for dest_editor_node in self.canvas.object_list:
-                    if (dest_editor_node.sheet == con.dest):
-                        dest = dest_editor_node
+                for dest in self.canvas.object_list:
+                    if (dest.sheet == con.dest):
+                        # connect the connection to the destination node
+                        editor_connection.connect(dest, con)
                         break
                 else:
                     # JABALERT: Should eliminate all print statements.
                     print "Incomplete connection: ", con
-                    break
-                # connect the connection to the destination node
-                editor_connection.connect(dest, con)
+                    
         self.canvas.redraw_objects()
 
 
