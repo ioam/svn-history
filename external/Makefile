@@ -134,6 +134,11 @@ pil: ${PIL}.tgz jpeg python
 	tar xzf ${PIL}.tgz
 #	cd ${PIL}/libImaging; ./configure --prefix=${PREFIX} --with-jpeg=${PREFIX}/lib
 #	make -C ${PIL}/libImaging
+#
+#       Apply patch for 64-bit machines; helps prevent "encoder zip not available" problems
+ifeq ("$(shell uname -m)","x86_64")
+	cd ${PIL}; patch < ../Imaging.diff
+endif
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build_ext -i
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python selftest.py
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
