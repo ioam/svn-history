@@ -149,7 +149,7 @@ snapshot-tests:
 
 # Just check the basic types of window open without errors (because the unit tests don't yet do this).
 basic-gui-tests:
-	./topographica examples/hierarchical.ty -g -c "p=topo.guimain.plots_menu_entries; p['Activity'].command(); p['Connection Fields'].command(); p['Projection'].command(); p['Projection Activity'].command();p['Orientation Preference'].command();p['Orientation Tuning'].command();topo.guimain.quit_topographica(check=False)"
+	./topographica examples/hierarchical.ty -g -c "p=topo.guimain.plots_menu_entries; p['Activity'](); p['Connection Fields'](); p['Projection'](); p['Projection Activity']();p['Orientation Preference']();p['Orientation Tuning']();topo.guimain.quit_topographica(check=False)"
 
 
 
