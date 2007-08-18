@@ -334,14 +334,6 @@ class TopoConsole(TkguiWindow):
 ##         plot_gallery.title("Plots")
 
 
-## CEBHACKALERT: see PO.warning() ################
-        ParameterizedObject.receive_warnings.append(self)
-
-    def warn(self,msg):
-        # CEBALERT: open a dialog box that doesn't suspend operation
-        # (i.e. open in the background). Or print message on status bar?
-        tkMessageBox.showwarning("title",msg)
-##################################################
 
 
     ## CEBHACKALERT: see SomeTimer ##
