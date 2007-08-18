@@ -625,15 +625,6 @@ class ParameterizedObject(object):
     print_level = Parameter(default=MESSAGE,hidden=True)
 
 
-    # CEBHACKALERT: see warning() ##########
-    receive_warnings = [] # not a parameter, so doesn't get pickled
-                          # (if it did get pickled, there'd be problems
-                          #  since we'd be trying to pickle topoconsole...)
-    def warn(self,*args):
-        s = ' '.join([str(x) for x in args])
-        for x in self.receive_warnings:
-            x.warn(s)
-    ########################################
 
     
     def __init__(self,abstract_class=None,**params):
@@ -742,11 +733,6 @@ class ParameterizedObject(object):
 
     def warning(self,*args):
         """Print the arguments as a warning."""
-
-        # CEBHACKALERT! added to help my tkgui life for the moment.
-        # How to have general notification system?
-        self.warn(*args)
-        
         self.__db_print(WARNING,"Warning:",*args)
 
     def message(self,*args):
