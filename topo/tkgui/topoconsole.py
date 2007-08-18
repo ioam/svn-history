@@ -250,9 +250,9 @@ class PlotsMenuEntry(ParameterizedObject):
             class_ = plotpanel_classes.get(template.name,FeatureCurvePanel)
 
         self.class_ = plotpanel_classes.get(template.name,class_)
-        
 
-    def command(self,event=None,**args):
+
+    def __call__(self,event=None,**args):
         """
         Instantiate the class_ (used as menu commands' 'command' attribute).
 
@@ -271,6 +271,8 @@ class PlotsMenuEntry(ParameterizedObject):
         else:
             self.console.messageBar.message('state',
                                             'No suitable objects in this simulation for this operation.')
+        
+    command = __call__        
 
 
 
