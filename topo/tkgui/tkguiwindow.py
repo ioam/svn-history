@@ -21,9 +21,11 @@ class Menu(Tkinter.Menu):
     ## (Original Menu class is in lib/python2.4/lib-tk/Tkinter.py)
 
     
-    ## note that I added a separate indexname rather than using
-    ## label or some other existing name because those could
-    ## change, and they're different for different widgets
+    ## Note that I added a separate indexname rather than using label
+    ## or some other existing name because those could change, and
+    ## they're different for different widgets.  Unfortunately this
+    ## means sometimes specifying label="Something" and
+    ## indexname="Something".
     
     def index2indexname(self,index):
         for name,i in self.contents.items():
@@ -51,7 +53,6 @@ class Menu(Tkinter.Menu):
         i = self.index("last") 
         self.contents[indexname or i] = i 
         
-
         
     def insert(self, index, itemType, cnf={}, **kw):
         indexname = cnf.pop('indexname',kw.pop('indexname',index))
@@ -75,7 +76,6 @@ class Menu(Tkinter.Menu):
         Tkinter.Menu.entryconfigure(self,i,cnf,**kw)
         
     entryconfig = entryconfigure
-
 
     def invoke(self, index):
         """Invoke a menu item identified by INDEX and execute
