@@ -53,6 +53,7 @@ from testpattern import TestPattern
 from editorwindow import ModelEditor
 from translatorwidgets import TaggedSlider
 
+import tkguiwindow
 
 
 
@@ -149,6 +150,7 @@ class CommandPrompt(Tkinter.Frame):
     """
     def __init__(self,master,msg_bar=None,**config):
         Tkinter.Frame.__init__(self,master,**config)
+
 
         self.msg_bar=msg_bar
         self.balloon = Pmw.Balloon(self)
@@ -280,12 +282,16 @@ class TopoConsole(TkguiWindow):
     """
     Main window for the Tk-based GUI.
     """
+
+    def __getitem__(self,menu_name):
+        """Allow dictionary-style access to the menu bar."""
+        return self.menubar[menu_name]
+
+    
     def __init__(self,**config):
 
         TkguiWindow.__init__(self,**config)
 
-        
-    
         self.auto_refresh_panels = []
         self._init_widgets()
         self.title("Topographica Console")
@@ -367,7 +373,7 @@ class TopoConsole(TkguiWindow):
         #  for implementing it are not available on all platforms. We used to
         #  have a Pmw Balloon bound to the menu, with its output directed to
         #  the status bar.)
-	self.menubar = Tkinter.Menu(self)       
+	self.menubar = tkguiwindow.ControllableMenu(self)       
         self.configure(menu=self.menubar)
 
         self.__simulation_menu()
@@ -425,7 +431,8 @@ class TopoConsole(TkguiWindow):
 
     def __simulation_menu(self):
         """Add the simulation menu options to the menubar."""
-        simulation_menu = Tkinter.Menu(self.menubar,tearoff=0)
+        simulation_menu = tkguiwindow.ControllableMenu(self.menubar,tearoff=0)
+
         self.menubar.add_cascade(label='Simulation',menu=simulation_menu)
 
         simulation_menu.add_command(label='Run script',command=self.run_script)
@@ -446,21 +453,21 @@ class TopoConsole(TkguiWindow):
         Add the plot menu to the menubar, with Basic plots on the menu itself and
         others in cascades by category (the plots come from plotgroup_templates).
         """
-        # create plots_menu_entries, and get categories
-        self.plots_menu_entries=KeyedList() # keep the order of plotgroup_templates (which is also KL)
+        # create menu entries, and get list of categories
+        entries=KeyedList() # keep the order of plotgroup_templates (which is also KL)
         categories = []
         for label,template in plotgroup_templates.items():
-            self.plots_menu_entries[label] = PlotsMenuEntry(self,template)
+            entries[label] = PlotsMenuEntry(self,template)
             categories.append(template.category)
         categories = sorted(set(categories))
 
         # 'Plots' menu
-        plots_menu = Tkinter.Menu(self.menubar,tearoff=0)
+        plots_menu = tkguiwindow.ControllableMenu(self.menubar,tearoff=0)
         self.menubar.add_cascade(label='Plots',menu=plots_menu)
         
         # The Basic category items appear on the menu itself.
         assert 'Basic' in categories, "'Basic' is the category for the standard Plots menu entries."
-        for label,entry in self.plots_menu_entries:
+        for label,entry in entries:
             if entry.template.category=='Basic':
                     plots_menu.add_command(label=label,command=entry.command)
         categories.remove('Basic')
@@ -470,12 +477,11 @@ class TopoConsole(TkguiWindow):
         # Add the other categories to the menu as cascades, and the plots of each category to
         # their cascades.
         for category in categories:
-            category_menu = Tkinter.Menu(plots_menu,tearoff=0)
+            category_menu = tkguiwindow.ControllableMenu(plots_menu,tearoff=0)
             plots_menu.add_cascade(label=category,menu=category_menu)
 
             # could probably search more efficiently than this
-            # (Note about plots_menu_entries: it's accessed in 1 other place in tkgui.)
-            for label,entry in self.plots_menu_entries:
+            for label,entry in entries:
                 if entry.template.category==category:
                     category_menu.add_command(label=label,command=entry.command)
 
@@ -488,8 +494,8 @@ class TopoConsole(TkguiWindow):
     def __help_menu(self):
         """Add the help menu options."""
 
-        help_menu = Tkinter.Menu(self.menubar,tearoff=0,name='help')
-        self.menubar.add_cascade(label='Help',menu=help_menu) 
+        help_menu = tkguiwindow.ControllableMenu(self.menubar,tearoff=0,name='help')
+        self.menubar.add_cascade(label='Help',menu=help_menu)
 
         help_menu.add_command(label='About',command=self.new_about_window)
         help_menu.add_command(label="User Manual",
