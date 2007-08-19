@@ -28,14 +28,14 @@ class Menu(Tkinter.Menu):
     ## indexname="Something".
     
     def index2indexname(self,index):
-        for name,i in self.contents.items():
+        for name,i in self.indexname2index.items():
             if index==i: return name
         raise ValueError("%s not in Tkinter.Menu %s"%(index,self))
 
     def index_convert(self,index):
         """Return the Tkinter index, whether given an indexname or index."""
         if isinstance(index,str):
-            i=self.contents[index]
+            i=self.indexname2index[index]
         else:
             i=index
         return i
@@ -43,7 +43,8 @@ class Menu(Tkinter.Menu):
 
     ########## METHODS OVERRIDDEN to keep track of contents
     def __init__(self, master=None, cnf={}, **kw):
-        self.contents = {}
+        self.indexname2index = {}  # rename to indexnames2index or similar
+        self.entries = {}
         Tkinter.Menu.__init__(self,master,cnf,**kw)
 
 
@@ -51,22 +52,30 @@ class Menu(Tkinter.Menu):
         indexname = cnf.pop('indexname',kw.pop('indexname',None))        
         Tkinter.Menu.add(self,itemType,cnf,**kw)
         i = self.index("last") 
-        self.contents[indexname or i] = i 
+        self.indexname2index[indexname or i] = i
+
+        # this pain is to keep the actual item, if it's a menu or a command, available to access
+        self.entries[indexname or i] = cnf.get('menu',kw.get('menu',cnf.get('command',kw.get('command',None))))
         
         
     def insert(self, index, itemType, cnf={}, **kw):
         indexname = cnf.pop('indexname',kw.pop('indexname',index))
-        self.contents[indexname] = index
+        self.indexname2index[indexname] = index
         Tkinter.Menu.insert(self,index,itemType,cnf,**kw)
+
+        # this pain is to keep the actual item, if it's a menu or a command, available to access
+        self.entries[indexname] = cnf.get('menu',kw.get('menu',cnf.get('command',kw.get('command',None))))
 
         
     def delete(self, index1, index2=None):
         assert index2 is None, "I only thought about single-item deletions: code needs to be upgraded..."
 
         i1 = self.index(index1)
-        self.contents.pop(self.index2name(i1))
+        self.indexname2index.pop(self.index2name(i1))
+        self.entries.pop(self.index2name(i1))
 
         Tkinter.Menu.delete(self,index1,index2)
+
 
 
     ########## METHODS OVERRIDDEN FOR CONVENIENCE
@@ -84,6 +93,14 @@ class Menu(Tkinter.Menu):
 
     # other methods can be overriden if they're needed
     
+
+# CEBALERT: not sure if, internally, Tkinter uses dictionary access to
+# do things. So testing this class out, but methods would otherwise be
+# in the Menu class above.
+class ControllableMenu(Menu):
+    def __getitem__(self,name):
+        return self.entries[name]
+
 
 
 
