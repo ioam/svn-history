@@ -80,7 +80,7 @@ class Menu(Tkinter.Menu):
     def invoke(self, index):
         """Invoke a menu item identified by INDEX and execute
         the associated command."""
-        return Tkinter.invoke(self,self.index_convert(index))
+        return Tkinter.Menu.invoke(self,self.index_convert(index))
 
     # other methods can be overriden if they're needed
     
