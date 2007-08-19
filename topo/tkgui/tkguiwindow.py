@@ -8,7 +8,7 @@
 
 import Tkinter
 
-# most of the classes in tkinter probably need to be in a different
+# most of the classes in tkgui probably need to be in a different
 # file from the one they're currently in...so does this one.
 class Menu(Tkinter.Menu):
     """
@@ -18,6 +18,9 @@ class Menu(Tkinter.Menu):
     and that indexname can be used to get the index of the entry
     later on.
     """
+    ## (Original Menu class is in lib/python2.4/lib-tk/Tkinter.py)
+
+    
     ## note that I added a separate indexname rather than using
     ## label or some other existing name because those could
     ## change, and they're different for different widgets
@@ -26,6 +29,14 @@ class Menu(Tkinter.Menu):
         for name,i in self.contents.items():
             if index==i: return name
         raise ValueError("%s not in Tkinter.Menu %s"%(index,self))
+
+    def index_convert(self,index):
+        """Return the Tkinter index, whether given an indexname or index."""
+        if isinstance(index,str):
+            i=self.contents[index]
+        else:
+            i=index
+        return i
 
 
     ########## METHODS OVERRIDDEN to keep track of contents
@@ -60,13 +71,16 @@ class Menu(Tkinter.Menu):
     ########## METHODS OVERRIDDEN FOR CONVENIENCE
     def entryconfigure(self, index, cnf=None, **kw):
         """Configure a menu item at INDEX."""
-        if isinstance(index,str):
-            i=self.contents[index]
-        else:
-            i=index      
+        i = self.index_convert(index)
         Tkinter.Menu.entryconfigure(self,i,cnf,**kw)
         
     entryconfig = entryconfigure
+
+
+    def invoke(self, index):
+        """Invoke a menu item identified by INDEX and execute
+        the associated command."""
+        return Tkinter.invoke(self,self.index_convert(index))
 
     # other methods can be overriden if they're needed
     
