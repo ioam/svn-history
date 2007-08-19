@@ -419,7 +419,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             sheet = topo.sim[self._right_click_info['plot'].plot_src_name]
             x,y =  self._right_click_info['coords'][1]
             # CEBHACKALERT: should avoid requesting cf out of range.
-            self.console.plots_menu_entries["Connection Fields"].command(x=x,y=y,sheet=sheet)
+            self.console['Plots']["Connection Fields"](x=x,y=y,sheet=sheet)
             
     def __receptive_field_window(self):
         if 'plot' in self._right_click_info:
