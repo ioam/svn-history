@@ -195,10 +195,11 @@ class TkParameterizedObjectBase(ParameterizedObject):
                or isinstance(extraPO,ParameterizedObject)
         
         self.self_first = self_first
-        
-        super(TkParameterizedObjectBase,self).__init__(**params)
 
         self.change_PO(extraPO)
+        super(TkParameterizedObjectBase,self).__init__(**params)
+
+        
 
 
 
