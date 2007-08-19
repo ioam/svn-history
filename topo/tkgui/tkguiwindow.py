@@ -16,7 +16,7 @@ class Menu(Tkinter.Menu):
 
     Supply indexname to any of the add/insert/delete methods
     and that indexname can be used to get the index of the entry
-    later on.
+    later on (if 'indexname' not supplied, uses 'label' instead, if that was supplied).
     """
     ## (Original Menu class is in lib/python2.4/lib-tk/Tkinter.py)
 
@@ -26,6 +26,9 @@ class Menu(Tkinter.Menu):
     ## they're different for different widgets.  Unfortunately this
     ## means sometimes specifying label="Something" and
     ## indexname="Something".
+    ## CB: It's probably possible to remove the requirement
+    ## for a separate indexname, taking label or whatever instead. I've tried
+    ## that (taking label if indexname not supplied).
     
     def index2indexname(self,index):
         for name,i in self.indexname2index.items():
@@ -49,7 +52,12 @@ class Menu(Tkinter.Menu):
 
 
     def add(self, itemType, cnf={}, **kw):
-        indexname = cnf.pop('indexname',kw.pop('indexname',None))        
+        indexname = cnf.pop('indexname',kw.pop('indexname',None))
+
+        # take indexname as label if indexname isn't actually specified
+        if indexname is None:
+            indexname = cnf.get('label',kw.get('label',None))
+        
         Tkinter.Menu.add(self,itemType,cnf,**kw)
         i = self.index("last") 
         self.indexname2index[indexname or i] = i
@@ -60,6 +68,11 @@ class Menu(Tkinter.Menu):
         
     def insert(self, index, itemType, cnf={}, **kw):
         indexname = cnf.pop('indexname',kw.pop('indexname',index))
+
+        # take indexname as label if indexname isn't actually specified
+        if indexname is None:
+            indexname = cnf.get('label',kw.get('label',None))
+
         self.indexname2index[indexname] = index
         Tkinter.Menu.insert(self,index,itemType,cnf,**kw)
 
