@@ -432,13 +432,19 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         val = self.string2object_ifrequired(param_name,val)
 
-        
+
+        # CEBALERT: needs simplifying!
         try:
             sources = self._source_POs()
             
             for po in sources:
                 if param_name in parameters(po).keys():
                     parameter = parameters(po)[param_name]
+
+                    # can only edit constant parameters for class objects
+                    if parameter.constant==True and not isinstance(po,ParameterizedObjectMetaclass):
+                        return ########### HIDDEN!
+
                     ## use set_in_bounds if it exists: i.e. users of widgets get their
                     ## values cropped (no warnings/errors)
                     if hasattr(parameter,'set_in_bounds') and isinstance(po,ParameterizedObject): # CEBHACKALERT: set_in_bounds not valid for POMetaclass?
@@ -711,10 +717,9 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     def _create_string_widget(self,frame,name,widget_options):
         w = Entry(frame,textvariable=self._tk_vars[name],**widget_options)
 
-
         param,location = self.get_parameter_object(name,with_location=True)        
         if param.constant and isinstance(location,ParameterizedObject): # need to be able to set on class
-            w['state']='readonly'
+            w['state']='readonly' 
             w['fg']='gray45'
             
         return w
@@ -912,7 +917,7 @@ class ParametersFrame2(TkParameterizedObject,Frame):
             for name in self.packed_params.keys():
                 if self.__value_changed(name):
                     self._update_param(name)
-        else:    
+        else:
             for name,param in self.packed_params.items():
                 if not param.constant and self.__value_changed(name):
                     self._update_param(name)
