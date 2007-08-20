@@ -554,10 +554,6 @@ class ModelEditor:
         self.import_model()
 
     def import_model(self):
-        # Could use dot/graphviz to place the objects nicely
-        # random generator, and values used for randomly positioning sheets
-        random_generator = Random() 
-
         # get a list of all the sheets in the simulation
         sim = self.canvas.simulation
         node_dictionary = sim.objects(Sheet)
@@ -569,6 +565,7 @@ class ModelEditor:
             if (hasattr(node,'layout_location') and node.layout_location!=(-1,-1)):
                 x, y = node.layout_location
             # if not generate new coords on a grid layout
+            # Could use dot/graphviz to place the objects nicely
             else:
                 x, y = self.next_x , self.next_y
                 self.next_y += self.ystep
