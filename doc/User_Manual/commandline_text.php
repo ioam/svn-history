@@ -3,7 +3,8 @@
 The GUI interface of Topographica provides the most commonly used
 plots and displays, but it is often useful to be able to manipulate
 the underlying program objects interactively.  The Topographica
-command prompt allows you to do this easily.  This section will
+command prompt allows you to do this easily, using the same syntax as
+in Topographica scripts.  This section will
 eventually include detailed information on how to do this, but
 hopefully the current information will help you get started.
 <!-- JABALERT: Needs much expansion -->
@@ -226,3 +227,75 @@ one of the files above and add these lines to it:
 from topo.misc.commandline import CommandPrompt
 CommandPrompt.format = CommandPrompt.ansi_format
 </pre>
+
+
+<H2>Controlling the GUI from scripts or the command line</H2>
+
+<P>The code for the Topographica GUI is kept strictly separate from
+the non-GUI code, so that Topographica simulations can be run
+remotely, automated using scripts, and upgraded to newer graphical
+interface libraries as they become available.  Thus in most cases it
+is best to ensure that your scripts do not contain any GUI-specific
+code.  Even so, in certain cases it can be very helpful to automate
+GUI operations using scripts or from the command line, e.g. if you
+always want to open a standard set of windows for analysis.
+
+<P>For such situations, Topographica provides a simple interface for
+controlling the GUI from within Python.  For instance, to open an
+Activity window, which is under the Plots menu, type:
+
+<pre>
+  import topo
+  topo.guimain['Plots']['Activity']()
+</pre>
+
+Some menu items accept optional arguments, which can be supplied as follows:
+
+<pre>
+  import topo
+  topo.guimain['Plots']['Connection Fields'](x=0.1,y=0.2,sheet=topo.sim['V1'])
+</pre>
+
+Other examples:
+
+<pre>
+  topo.guimain['Plots']['Preference Maps']['Orientation Preference']();
+
+  p=topo.guimain['Plots']
+  p['Activity']();
+  p['Connection Fields']();
+  p['Projection']();
+  p['Projection Activity']();
+  p['Tuning Curves']['Orientation Tuning']()
+
+  topo.guimain['Simulation']['Test Pattern']()
+  topo.guimain['Simulation']['Model Editor']()
+</pre>
+
+<P>In each case, the syntax for calling the command reflects the position
+of that command in the menu structure.  Thus these examples will no
+longer work as the menu structure changes; no backwards compatibility
+will be provided.  These commands should be treated only as a
+shortcut way to invoke GUI menu items, not as an archival
+specification for how a model works.
+
+<P>Note that if you are doing any of these operations from a
+Topographica script, it is safest to check first that there is a GUI
+available, because otherwise the script cannot be executed when
+Topographica is started without the -g option.  Topographica defines
+the <code>guimain</code> attribute of the <code>topo</code> namespace
+only when there is a GUI available in this run.  Thus if you check to
+make sure that guimain is defined before running your GUI commands:
+
+<pre>
+  if hasattr(topo,'guimain'):
+     topo.guimain['Plots']['Activity']()
+</pre>
+
+then your scripts should still work as usual without the GUI (apart
+from opening GUI-related windows, which would not work anyway).
+
+<P>Also note that at present, the main operation supported for most
+windows is opening them; there is no simple way yet to operate the
+widgets in most windows (e.g. for testing).
+
