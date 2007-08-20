@@ -866,7 +866,10 @@ class ParametersFrame2(TkParameterizedObject,Frame):
 
         self.change_PO(PO)
 
-        self.master.title("Parameters of "+ (PO.name or str(PO)) ) # classes dont have names
+        try:
+            self.master.title("Parameters of "+ (PO.name or str(PO)) ) # classes dont have names
+        except AttributeError:
+            pass # can only set window title on a window (model editor puts frame in another frame)
 
         ### Pack all of the non-hidden Parameters
         self.packed_params = {}
@@ -923,6 +926,8 @@ class ParametersFrame2(TkParameterizedObject,Frame):
             for name,param in self.packed_params.items():
                 if not param.constant and self.__value_changed(name):
                     self._update_param(name)
+
+    set_parameters=update_parameters
 
 
     def _create_string_widget(self,frame,name,widget_options):
