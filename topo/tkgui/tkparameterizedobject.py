@@ -656,7 +656,6 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # (a refresh-the-widgets-on-focus-in method could make the gui
         # in sync with the actual object?)
 
-
 ##     def repackparam(self,name):
 ##         self._widgets[name].destroy()
 ##         self.pack_param(name,parent=self._furames[name])
@@ -688,11 +687,14 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     def _create_selector_widget(self,frame,name,widget_options):
         param = self.get_parameter_object(name)
         self._update_translator(name,param)
+        
         new_range = self.translators[name].keys()        
         assert len(new_range)>0 # CB: remove
         tk_var = self._tk_vars[name]
-        current_value = self.get_parameter_value(name)
-        if current_value not in new_range: current_value = new_range[0] #whatever was there is out of date now
+
+        current_value = self.object2string_ifrequired(name,self.get_parameter_value(name))
+        if current_value not in new_range:current_value = new_range[0] #whatever was there is out of date now
+
         tk_var.set(current_value)
 
         w = OptionMenu(frame,tk_var,*new_range,**widget_options)
