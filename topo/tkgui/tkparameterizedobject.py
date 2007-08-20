@@ -486,7 +486,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 else:
                     return params[name],po
 
-        raise AttributeError("none of %s have parameter %s"%(str(sources),name))
+        raise AttributeError(self.__attr_err_msg(name,sources))
     get_parameter_object = get_parameter
         
     
@@ -505,7 +505,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
             params = parameters(po)
             if name in params: return getattr(po,name) # also hidden!
 
-        raise AttributeError("none of %s have parameter %s"%(str(sources),name))
+        raise AttributeError(self.__attr_err_msg(name,sources))
 
         
     def set_parameter_value(self,name,val,parameterized_object=None):
@@ -519,7 +519,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 setattr(po,name,val)
                 return # so hidden I forgot to write it until now
 
-        raise AttributeError("none of %s have parameter %s"%(str(sources),name))
+        raise AttributeError(self.__attr_err_msg(name,sources))
 #######################################################        
 
 
@@ -532,6 +532,17 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 # (also they ignore self_first)
 
+    def __attr_err_msg(self,attr_name,objects):
+        if not hasattr(objects,'__len__'):objects=[objects]
+
+        error_string = "'%s' not in %s"%(attr_name,str(objects.pop(0)))
+
+        for o in objects:
+            error_string+=" or %s"%str(o)
+            
+        return error_string
+    
+
     def __getattribute__(self,name):
         """
         If the attribute is found on this object, return it. Otherwise,
@@ -542,9 +553,11 @@ class TkParameterizedObjectBase(ParameterizedObject):
             return object.__getattribute__(self,name)
         except AttributeError:
             extraPO = object.__getattribute__(self,'_extraPO')
-            if hasattr(extraPO,name): return getattr(extraPO,name) 
-            
-            raise AttributeError("Neither %s nor %s has attribute %s"%(self,extraPO,name))
+
+            if hasattr(extraPO,name):
+                return getattr(extraPO,name) # HIDDEN!
+
+            raise AttributeError(self.__attr_err_msg(name,[self,extraPO]))
                     
 
     def __setattr__(self,name,val):
