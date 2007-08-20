@@ -264,12 +264,12 @@ class PlotsMenuEntry(ParameterizedObject):
         """
         if self.class_.valid_context():
             # window hidden while being constructed to improve appearance
-            t = TkguiWindow(); t.withdraw()
-            self.class_(self.console,t,self.template,**args).pack(expand='yes',fill='both')
-            t.deiconify()
-            
+            window = TkguiWindow(); window.withdraw()
+            panel = self.class_(self.console,window,self.template,**args)
+            panel.pack(expand='yes',fill='both')
+            window.deiconify()    
             self.console.messageBar.message('state', 'OK')
-
+            return panel
         else:
             self.console.messageBar.message('state',
                                             'No suitable objects in this simulation for this operation.')
@@ -654,13 +654,16 @@ class TopoConsole(TkguiWindow):
         Test Pattern Window.  
         """
         if TestPattern.valid_context():
-            t = TkguiWindow(); t.withdraw()
-            TestPattern(self,t).pack(expand='yes',fill='both')
-            t.deiconify()
+            window = TkguiWindow(); window.withdraw()
+            panel = TestPattern(self,window)
+            panel.pack(expand='yes',fill='both')
+            window.deiconify()
             self.messageBar.message('state', 'OK')
+            return panel
         else:
             self.messageBar.message('state',
                                     'No suitable objects in this simulation for this operation.')
+            
 
 
     def new_about_window(self):
