@@ -92,7 +92,12 @@ scaling equations that underlie Sheet coordinates
     computer support, and can be particularly useful for models that
     do not fit Topographica's abstractions closely.  NEST now has a
     Python interface, which can be used to wrap a spiking NEST
-    simulation as a Topographica sheet.
+    simulation as a Topographica sheet.  Thus it is possible to use
+    the NEST primitives to develop a model that is then controlled
+    at a higher level by Topographica.  Until such an example has
+    been put into the Topographica release, contact 
+    <A HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107?subject=Interface%20from%20NEST%20to%20Topographica">Jim</a>
+    for more details if you are interested.
     <BR><BR>
   <dt><A TARGET="_top" HREF="http://ilab.usc.edu/toolkit/documentation.shtml">iNVT</A></dt>
   <dd>iLab Neuromorphic Vision Toolkit is a high-performance
