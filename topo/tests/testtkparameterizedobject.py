@@ -181,7 +181,7 @@ class TestTkParameterizedObject(unittest.TestCase):
         """
         Check shadowing of multiple POs' parameters.
 
-        Includes tests for handling of non-existant attributes.
+        Includes tests for handling of non-existent attributes.
         """
         g = Gaussian()
         p = PiecewiseLinear()
@@ -224,7 +224,7 @@ class TestTkParameterizedObject(unittest.TestCase):
         except AttributeError:
             pass
         else:
-            raise("Failed to raise AttributeError on looking up non-existant attribute 'does_not_exist'")
+            raise("Failed to raise AttributeError on looking up non-existent attribute 'does_not_exist'")
             
         f.did_not_exist = 9
         assert 'did_not_exist' in f.__dict__ # check that new attribute added to f's dict...
@@ -249,14 +249,14 @@ class TestTkParameterizedObject(unittest.TestCase):
         except AttributeError:
             pass
         else:
-            raise("Failed to raise AttributeError on setting non-existant *Parameter* 'does_not_exist'")
+            raise("Failed to raise AttributeError on setting non-existent *Parameter* 'does_not_exist'")
 
         try:
             f.get_parameter_value('does_not_exist')
         except AttributeError:
             pass
         else:
-            raise("Failed to raise AttributeError on getting non-existant *Parameter* 'does_not_exist'")
+            raise("Failed to raise AttributeError on getting non-existent *Parameter* 'does_not_exist'")
 
 
     # CB: will need to be updated once ClassSelectorParam/ObjectSelectorParam are finished.
