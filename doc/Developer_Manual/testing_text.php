@@ -25,3 +25,18 @@ existing test files should <i>not</i> be assumed to be exhaustive or
 even particularly useful; they vary a lot in how comprehensive they
 are.  So please always check the test file when coding, especially
 when debugging, because it probably needs work too.
+
+<H2>Automatic testing</H2>
+
+<P>Currently, topographica is automatically checked out, built, and
+tested (via <code>make tests; make slow-tests</code>) every 12 hours on
+a linux computer (using <a href="http://buildbot.net/">buildbot</a>). 
+The results of these builds and tests can be seen at
+<a
+href="http://buildbot.topographica.org/">buildbot.topographica.org</a>.
+
+<P>In the future, we shall add a function so that builds and tests are
+run immediately after commits to the CVS repository. This will allow
+the developer responsible for an error to be alerted to it straight
+away. Additionally, we plan to add OS X and Windows buildslaves to
+catch any platform-specific problems.
