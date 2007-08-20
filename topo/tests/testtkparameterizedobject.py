@@ -6,6 +6,10 @@ $Id$
 __version__='$Revision$'
 
 
+## CB: add test for change of po
+
+
+
 import unittest
 from Tkinter import Frame,Toplevel
 
@@ -21,6 +25,7 @@ from topo.tkgui.tkparameterizedobject import TkParameterizedObject
 class SomeFrame(TkParameterizedObject,Frame):
     k = BooleanParameter(default=True)
     r = ObjectSelectorParameter()
+    c = Parameter(1.0,constant=True)
 
     def __init__(self,master,extraPO=None,**params):
         TkParameterizedObject.__init__(self,master,extraPO=extraPO,**params)
@@ -129,6 +134,9 @@ class TestTkParameterizedObject(unittest.TestCase):
         """
         f = SomeFrame(Toplevel())
         f.pack()
+
+        f.pack_param('c')
+        
         f.pack_param('k',on_change=f.upkcount)
 
         self.assertEqual(f.k,True); self.assertEqual(f.kcount,0)
