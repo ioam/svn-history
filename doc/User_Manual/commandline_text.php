@@ -254,6 +254,7 @@ Some menu items accept optional arguments, which can be supplied as follows:
 <pre>
   import topo
   topo.guimain['Plots']['Connection Fields'](x=0.1,y=0.2,sheet=topo.sim['V1'])
+  topo.guimain['Plots']['Activity'](normalize=True,auto_refresh=False)
 </pre>
 
 Other examples:
@@ -263,9 +264,9 @@ Other examples:
 
   p=topo.guimain['Plots']
   p['Activity']();
-  p['Connection Fields']();
-  p['Projection']();
-  p['Projection Activity']();
+  p['Connection Fields']()
+  p['Projection']()
+  p['Projection Activity']()
   p['Tuning Curves']['Orientation Tuning']()
 
   topo.guimain['Simulation']['Test Pattern']()
@@ -295,7 +296,29 @@ make sure that guimain is defined before running your GUI commands:
 then your scripts should still work as usual without the GUI (apart
 from opening GUI-related windows, which would not work anyway).
 
-<P>Also note that at present, the main operation supported for most
-windows is opening them; there is no simple way yet to operate the
-widgets in most windows (e.g. for testing).
+<P>Additionally, it is possible to script some GUI operations. For
+instance, one can open an Orientation Preference window and 
+request that the map be measured by invoking the 'Refresh' button:
 
+<pre>
+  o = topo.guimain['Plots']['Preference Maps']['Orientation Preference']()
+  o.refresh() # measure the map: equivalent to pressing the refresh button
+</pre>
+  
+<P>Parameters of the plots can also be set. Continuing from the previous example,
+we can switch the plots to be in sheet coordinates, and alter the update command
+so that progress will be displayed in an open Activity window:
+
+<pre>
+  o.sheet_coords=False
+  o.update_command='update_activity(display=True)'
+</pre>
+
+<P>At present, not all GUI operations can be controlled from the commandline,
+but eventually all will be available.
+
+
+<!--Also note that if you alter the plotgroup directly from the commandline,
+changes won't show in open GUI windows until they are refreshed. But that's 
+not going to be a problem here - will need this note for ParmetersFrame in
+the model editor instructions, etc.-->
