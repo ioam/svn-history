@@ -423,11 +423,14 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             
     def __receptive_field_window(self):
         if 'plot' in self._right_click_info:
-            plot = self._right_click_info['plot']
-            x,y =  self._right_click_info['coords'][0]
-            sheet = topo.sim[plot.plot_src_name]
-            # CB: not sure how title works for matrixplot - might need to be formatted better
-            matrixplot(topo.analysis.featureresponses.grid[sheet][x,y],title=("Receptive Field",sheet.name,x,y))
+            try:
+                plot = self._right_click_info['plot']
+                x,y =  self._right_click_info['coords'][0]
+                sheet = topo.sim[plot.plot_src_name]
+                # CB: not sure how title works for matrixplot - might need to be formatted better
+                matrixplot(topo.analysis.featureresponses.grid[sheet][x,y],title=("Receptive Field",sheet.name,x,y))
+            except KeyError:
+                topo.sim.warning("No RF measurements are available yet; run the Receptive Fields plot before accessing this right-click menu option.")
 
     def __process_canvas_event(self,event,func):
         """
