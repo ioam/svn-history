@@ -855,6 +855,8 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         
         TkParameterizedObject.__init__(self,master,extraPO=PO,self_first=False,**params)
 
+        self.pframe = Frame(self)
+        self.pframe.pack(side='top',expand='yes',fill='both')
 
         if PO:self.set_PO(PO)
 
@@ -867,13 +869,14 @@ class ParametersFrame2(TkParameterizedObject,Frame):
 
         ### Apply/Close etc buttons
         self.buttons_frame = Frame(self)
-        self.buttons_frame.pack()
+        self.buttons_frame.pack(side='bottom')
         
         self.pack_param('Apply',parent=self.buttons_frame,on_change=self.update_parameters,side='left')
         self.pack_param('Defaults',parent=self.buttons_frame,on_change=self.defaultsB,side='left')
         self.pack_param('Reset',parent=self.buttons_frame,on_change=self._sync_tkvars2po,side='left')
         self.pack_param('Close',parent=self.buttons_frame,on_change=self.closeB,side='left')
 
+        self.pack() # coz the old one did, and callers assume it
 
     def set_PO(self,PO):
 
@@ -888,7 +891,7 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         self.packed_params = {}
         for n,p in parameters(PO).items():
             if not p.hidden:
-                self.pack_param(n,fill='x',expand='yes')
+                self.pack_param(n,parent=self.pframe,fill='x',expand='yes')
                 self.packed_params[n]=p
             
         ### Delete all variable traces
@@ -985,6 +988,7 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         ###
         
         parameter_frame = type(self)(parameter_window,PO=PO_to_edit)
+
         parameter_frame.pack()
 
 
