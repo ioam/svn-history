@@ -225,7 +225,13 @@ update to the latest stable version at any time by doing:
 <P>This will retrieve the latest version for which installation
 packages have been released.  If you want the very most recent
 version, stable or not, replace <code>-r LATEST_STABLE</code> with
-<code>-A</code> to force a complete update.
+<code>-A</code> to force a complete update. Before updating to the
+most recent version, you can check its status (i.e. whether or not it
+builds successfully, and whether or not all the tests pass) by
+visiting <a
+href="http://buildbot.topographica.org/">buildbot.topographica.org</a>.
+
+
 
 <P>Windows TortoiseCVS users can right click in the topographica
 directory and select <code>CVS Update</code> to get the new files.
