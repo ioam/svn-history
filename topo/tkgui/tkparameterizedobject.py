@@ -690,8 +690,21 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
 ### Methods to create widgets ###
 
-    # CEBALERT: should probably have one create_widget method that calls others, so we can
-    # can have code that's common.
+    def create_widget(self,name,master,widget_options,on_change):
+        # select the appropriate widget-creation method;
+        # default is self._create_string_widget... 
+        widget_creation_fn = self._create_string_widget
+        # ...but overwrite that with a more specific one, if possible
+        for c in classlist(type(self.get_parameter_object(name)))[::-1]:
+            if self.widget_creators.has_key(c):
+                widget_creation_fn = self.widget_creators[c]
+                break
+            
+        if on_change is not None:
+            self._tk_vars[name]._on_change=on_change
+
+        return widget_creation_fn(master,name,widget_options)
+
     
     def _create_button_widget(self,frame,name,widget_options):
         # buttons just need a command, not tracing of a variable
@@ -763,6 +776,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 ##         self._widgets[name].destroy()
 ##         self.pack_param(name,parent=self._furames[name])
         
+
+
     
     # CEBALERT: on_change should be on_set (since it's called not only for changes)
     # CB: packing might need to be better (check eg label-widget space)
@@ -796,27 +811,10 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         """
         frame = Frame(parent or self.master)
 
-        #if PO is None:
-        param = self.get_parameter_object(name)
-        #else:
-        #    param = parameters(PO)[name]
-
         # default is label on the left
         label_side='left'; widget_side='right'
 
-        # select the appropriate widget-creation method;
-        # default is self._create_string_widget... 
-        widget_creation_fn = self._create_string_widget
-        # ...but overwrite that with a more specific one, if possible
-        for c in classlist(type(param))[::-1]:
-            if self.widget_creators.has_key(c):
-                widget_creation_fn = self.widget_creators[c]
-                break
-            
-        if on_change is not None:
-            self._tk_vars[name]._on_change=on_change
-
-        widget = widget_creation_fn(frame,name,widget_options)
+        widget = self.create_widget(name,frame,widget_options,on_change)
         
         ### buttons don't need a label
         if widget.__class__ is Tkinter.Button:
@@ -840,7 +838,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # label (because maybe more help will be present for what's in
         # the box) but when there's [button], want popup help over the
         # button.)
-        self.balloon.bind(label or frame,getdoc(param))
+        self.balloon.bind(label or frame,getdoc(self.get_parameter_object(name)))
         
         frame.pack(pack_options)
         return frame 
