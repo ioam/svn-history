@@ -62,10 +62,8 @@ class TestPattern(XPGPanel):
 
         # CB: remove updatecommand,redraw etc stuff...remember to remove from 2
         self.plotcommand_frame.pack_forget()
-        self._furames['update_command'][0].pack_forget()
-        
-        self._furames['Fwd'][0].pack_forget()
-        self._furames['Back'][0].pack_forget()
+        for name in ['update_command','Fwd','Back']:
+            self.hide_param(name) 
         
 
         self.padding = 2
