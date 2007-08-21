@@ -59,7 +59,8 @@ class FeatureCurvePanel(PlotGroupPanel):
         self.pack_param("y",parent=self.control_frame_3)
 
         # remove currently irrelevant widgets (plots are drawn in a separate window by pylab)
-        [self._widgets[n].destroy() for n in ['Enlarge','Reduce']]
+        # CEBNOTE: when plots are in this window, remove this line.
+        for name in ['Enlarge','Reduce','Back','Fwd']: self.hide_param(name)
 
         self.auto_refresh= False
         if self.pgt.plot_immediately: self.refresh()
@@ -83,8 +84,8 @@ class FeatureCurvePanel(PlotGroupPanel):
         self.x = 0.0
         self.y = 0.0
 
-        if 'x' and 'y' in self._widgets:
-            w1,w2=self._widgets['x'],self._widgets['y']
+        if 'x' and 'y' in self.representations:
+            w1,w2=self.representations['x']['widget'],self.representations['y']['widget']
             w1.set_bounds(*x.bounds)
             w2.set_bounds(*y.bounds)
             

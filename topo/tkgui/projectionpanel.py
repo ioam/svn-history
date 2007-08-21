@@ -212,8 +212,8 @@ class ConnectionFieldsPanel(CFPGPanel):
             param_obj.bounds = bounds[coord]
             
             # (method can be called before x,y widgets added)
-            if coord in self._widgets:
-                w=self._widgets[coord]
+            if coord in self.representations:
+                w=self.representations[coord]['widget']
                 w.set_bounds(*param_obj.bounds)
                 w.refresh()
 
@@ -265,13 +265,14 @@ class CFProjectionPGPanel(CFPGPanel):
 
     def refresh_projections(self):
         self.populate_projection_param(self.plotgroup)
-        
-        # CB: How do you change list of tkinter.optionmenu options? Use pmw's optionmenu?
+
+        # CEBALERT: How do you change list of tkinter.optionmenu options? Use pmw's optionmenu?
         # Currently, replace widget completely: looks bad and is complex.
-        if 'projection' in self._widgets:
-            self._widgets['projection'].destroy()
-            self._furames['projection'][1].destroy()
-            self.pack_param('projection',parent=self._furames['projection'][0])
+        if 'projection' in self.representations:
+            w  = self.representations['projection']['widget']
+            w.destroy()
+            self.pack_param('projection',parent=self.representations['projection']['frame'])
+
 
 
     def display_plots(self):
