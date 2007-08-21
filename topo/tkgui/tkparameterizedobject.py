@@ -346,8 +346,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
         If val is one of the objects in param_name's translator,
         translate to the string.
         """
-        #print "o2s",param_name,val,type(val)
-        
         translator = self.translators[param_name]
 
         new_val = val  # default is no translation required
@@ -692,7 +690,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
 ### Methods to create widgets ###
 
-    def create_widget(self,name,master,widget_options,on_change):
+    def create_widget(self,name,master,widget_options={},on_change=None):
         # select the appropriate widget-creation method;
         # default is self._create_string_widget... 
         widget_creation_fn = self._create_string_widget
@@ -705,7 +703,14 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         if on_change is not None:
             self._tk_vars[name]._on_change=on_change
 
-        return widget_creation_fn(master,name,widget_options)
+        widget=widget_creation_fn(master,name,widget_options)
+        
+        if widget.__class__ is Tkinter.Button:
+            label = None
+        else:
+            label = Tkinter.Label(master,text=self.pretty_print(name))
+        
+        return widget,label
 
     
     def _create_button_widget(self,frame,name,widget_options):
@@ -838,22 +843,15 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         """
         frame = Frame(parent or self.master)
 
-        # default is label on the left
-        label_side='left'; widget_side='right'
+        widget,label = self.create_widget(name,frame,widget_options,on_change)
 
-        widget = self.create_widget(name,frame,widget_options,on_change)
-        
-        ### buttons don't need a label
-        if widget.__class__ is Tkinter.Button:
-            label = None
-        else:            
-            # checkbuttons are 'widget label' rather than 'label widget'
-            if widget.__class__ is Tkinter.Checkbutton:  # type(widget) doesn't seem to work
-                widget_side='left'; label_side='right'
-
-            label = Tkinter.Label(frame,text=self.pretty_print(name))
-            label.pack(side=label_side)
-
+        # checkbuttons are 'widget label' rather than 'label widget'
+        if widget.__class__ is Tkinter.Checkbutton:  # type(widget) doesn't seem to work
+            widget_side='left'; label_side='right'
+        else:
+            label_side='left'; widget_side='right'
+            
+        if label: label.pack(side=label_side)
         widget.pack(side=widget_side,expand='yes',fill='x')
 
         representation = {"frame":frame,"widget":widget,"label":label,"pack_options":pack_options}
@@ -888,6 +886,9 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
 from tkguiwindow import Menu,TkguiWindow
 import tkMessageBox
+from topo.misc.utils import keys_sorted_by_value
+
+from Tkinter import N,S,E,W
 
 class ParametersFrame2(TkParameterizedObject,Frame):
     """
@@ -909,7 +910,6 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         self.pframe.pack(side='top',expand='yes',fill='both')
 
         if PO:self.set_PO(PO)
-
 
         ### Right-click menu for widgets
         self.option_add("*Menu.tearOff", "0") 
@@ -948,7 +948,6 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         self.displayed_params = {}
         for n,p in parameters(PO).items():
             if not p.hidden:
-                self.pack_param(n,parent=self.pframe,fill='x',expand='yes')
                 self.displayed_params[n]=p
             
         ### Delete all variable traces
@@ -957,8 +956,62 @@ class ParametersFrame2(TkParameterizedObject,Frame):
             self.__delete_trace(v)
             v._checking_get = v.get
             v.get = v._original_get
+        
+        
+        self.pack_displayed_params()
+        
     create_widgets = set_PO
-    
+
+    # CEBALERT: name doesn't make sense! change displayed_params to something else e.g. params_to_display
+    def pack_displayed_params(self):
+
+        # basically original ParametersFrame.__new_widgets
+
+        # wipe old labels and widgets from screen
+        for param_name in self.displayed_params:
+            try:
+                self.representations[param_name]['label'].destroy() #grid_forget()
+                self.representations[param_name]['widget'].destroy() #grid_forget()
+            except KeyError:
+                pass
+
+        # sort Parameters by reverse precedence
+        parameter_precedences = {}
+        for name,parameter in self.displayed_params.items():
+            parameter_precedences[name]=parameter.precedence
+        sorted_parameter_names = keys_sorted_by_value(parameter_precedences)
+            
+        # create the labels & widgets
+        for name in self.displayed_params:
+            widget,label = self.create_widget(name,self.pframe)
+            self.representations[name]={'widget':widget,'label':label}
+        
+        # add widgets & labels to screen in a grid
+        rows = range(len(sorted_parameter_names))
+        for row,parameter_name in zip(rows,sorted_parameter_names): 
+            widget = self.representations[parameter_name]['widget']
+            label = self.representations[parameter_name]['label']
+
+            help_text = getdoc(self.get_parameter_object(parameter_name))
+
+            label.grid(row=row,column=0,
+                       padx=2,pady=2,sticky=E)
+
+            self.balloon.bind(label, help_text)
+            
+            # We want widgets to stretch to both sides...
+            posn=E+W
+            # ...except Checkbuttons, which should be left-aligned.
+            if widget.__class__==Tkinter.Checkbutton:
+                posn=W
+                
+            widget.grid(row=row,
+                        column=1,
+                        padx=2,
+                        pady=2,
+                        sticky=posn)
+        
+        
 
     def _sync_tkvars2po(self):
         for name in self.displayed_params.keys():
@@ -969,6 +1022,7 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         if isinstance(self._extraPO,ParameterizedObjectMetaclass):
             print "what are these?"
         elif isinstance(self._extraPO,ParameterizedObject):
+            # CEBHACKALERT: broken because need to do obj->str conversion here too
             self._extraPO.reset_params()
             self._sync_tkvars2po()
         
