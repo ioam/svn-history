@@ -14,6 +14,7 @@ $Id$
 ## Notes
 # * Too fragile because there are too many tests for different types of Parameter. Most of these
 #   are there to make the code work immediately, but they should be cleaned up as soon as possible.
+# * ...and some of the tests look at the parameter type, but others look at widget type!
 # * Separate out pack displaying part of pack_param so we can have different layout for ParametersFrame
 # * Add some key bindings
 # * E.g. V1 nominal_density shows up & can edit though no change?
@@ -692,8 +693,16 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     # CEBALERT: should probably have one create_widget method that calls others, so we can
     # can have code that's common.
     
-    def _create_button_widget(self,frame,name,widget_options,command):
-        return Button(frame,text=self.pretty_print(name),command=command,**widget_options)
+    def _create_button_widget(self,frame,name,widget_options):
+        # buttons just need a command, not tracing of a variable
+        try:
+            command = self._tk_vars[name]._on_change
+            del self._tk_vars[name]._on_change
+        except AttributeError:
+            raise TypeError("No command given for '%s' button."%name)
+
+        return Button(frame,text=self.pretty_print(name),
+                      command=command,**widget_options)
 
 
     def _create_selector_widget(self,frame,name,widget_options):
@@ -804,16 +813,15 @@ class TkParameterizedObject(TkParameterizedObjectBase):
                 widget_creation_fn = self.widget_creators[c]
                 break
             
-        ### buttons are different from the other widgets: no label and no variable
-        if widget_creation_fn==self._create_button_widget:
-            assert on_change is not None, "Buttons need a command."
-            label = None
-            widget = widget_creation_fn(frame,name,widget_options,command=on_change)
-        else:
-            tk_var = self._tk_vars[name]
-            if on_change is not None: tk_var._on_change=on_change
-            widget = widget_creation_fn(frame,name,widget_options)
+        if on_change is not None:
+            self._tk_vars[name]._on_change=on_change
 
+        widget = widget_creation_fn(frame,name,widget_options)
+        
+        ### buttons don't need a label
+        if widget.__class__ is Tkinter.Button:
+            label = None
+        else:            
             # checkbuttons are 'widget label' rather than 'label widget'
             if widget.__class__ is Tkinter.Checkbutton:  # type(widget) doesn't seem to work
                 widget_side='left'; label_side='right'
