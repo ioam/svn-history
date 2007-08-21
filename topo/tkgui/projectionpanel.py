@@ -129,6 +129,7 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
     def _plot_title(self):
         return "Projections into %s at time %s"%(self.plotgroup.sheet.name,self.plotgroup.time)
 
+    # CEBHACKALERT! Back and Fwd buttons don't work.
    
 
 class CFPGPanel(ProjectionSheetPGPanel):
