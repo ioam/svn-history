@@ -10,11 +10,14 @@ $Id$
 
 
 ### CEB: currently working on this file
+# (documentation and organization are lacking)
 
 ## Notes
 # * Too fragile because there are too many tests for different types of Parameter. Most of these
 #   are there to make the code work immediately, but they should be cleaned up as soon as possible.
 # * ...and some of the tests look at the parameter type, but others look at widget type!
+# * I chose 'representation' to describe (Frame,widget,label,pack_options,etc) but there's probably a
+#   clearer term...
 # * Separate out pack displaying part of pack_param so we can have different layout for ParametersFrame
 # * Add some key bindings
 # * E.g. V1 nominal_density shows up & can edit though no change?
@@ -234,6 +237,10 @@ class TkParameterizedObjectBase(ParameterizedObject):
         string representations to the objects themselves.
         """
         for name,param in parameters(PO).items():
+            self._add_tk_var_entry(PO,name,param)
+
+
+    def _add_tk_var_entry(self,PO,name,param):
 
             self._update_translator(name,param)
 
@@ -636,12 +643,12 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         if isinstance(self.get_parameter_object(param_name),SelectorParameter):
             try:
-                w = self._widgets.get(param_name)
+                w = self.representations[param_name]['widget']
                 help_text =  getdoc(self.string2object_ifrequired(param_name,
                                                                   self._tk_vars[param_name]._original_get()))
                 self.balloon.bind(w,help_text)
 
-            except (AttributeError,KeyError):  # could be called before self._widgets exists,
+            except (AttributeError,KeyError):  # could be called before self.representations exists,
                                                # or before param in _tk_vars dict
                 pass
 
@@ -661,18 +668,13 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             SelectorParameter:self._create_selector_widget}
         
 
-        ####################################################
-        ## CEBALERT: just keep one and will name properly
-        ## & probably provide access methods
-        # allows subclasses to 
-        # access all plotgroup's widgets in an easy way.
-        self._widgets = {}
-        self._furames = {}
-        ####################################################
+        self.representations = {}  # to store (frame,widget,label) for each param
         
         # (a refresh-the-widgets-on-focus-in method could make the gui
         # in sync with the actual object?)
 
+
+        
 
     def pretty_print(self,s):
         """
@@ -762,21 +764,46 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 #################################
 
 
-    # CEBNOTE: could store original pack options
     def hide_param(self,name):
-        self._furames[name][0].pack_forget()
-    def unhide_param(self,name,**pack_options):
-        self._furames[name][0].pack(pack_options)
-
-##     def unpack_param(self,name):
-##         del self._tk_vars[name]
-##         self._widgets[name].destroy()
-##         a,b=self._furames[name]; a.destroy(); b.destroy()
-##     def repackparam(self,name):
-##         self._widgets[name].destroy()
-##         self.pack_param(name,parent=self._furames[name])
+        """Hide the representation of Parameter 'name'."""
+        self.representations[name]['frame'].pack_forget()
+        # CEBNOTE: forgetting label and widget would just hide while
+        # still occupying space (i.e. the empty frame stays in place)
+        #self.representations[name]['label'].pack_forget()
+        #self.representations[name]['widget'].pack_forget()
+        # unhide_param would need modifying too
         
 
+
+    def unhide_param(self,name,new_pack_options={}):
+        """
+        Un-hide the previously hidden representation of Parameter 'name'.
+
+        Any new pack options supplied overwrite the originally
+        supplied ones, but the parent of the widget remains the same.
+        """
+        # CEBNOTE: new_pack_options not really tested - maybe remove them.
+        pack_options = self.representations[name]['pack_options']
+        pack_options.update(new_pack_options)
+        self.representations[name]['frame'].pack(pack_options)
+
+
+    def unpack_param(self,name):
+        """
+        Destroy the representation of Parameter 'name'.
+
+        (unpack and then pack a param if you want to put it in a different
+        frame; otherwise use hide and unhide)
+        """
+        f = self.representations[name]['frame']
+        w = self.representations[name]['widget']
+        l = self.representations[name]['label']
+        o = self.representations[name]['pack_options']
+
+        del self.representations[name]
+
+        for x in [f,w,l]:
+            x.destroy()
 
     
     # CEBALERT: on_change should be on_set (since it's called not only for changes)
@@ -829,8 +856,9 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         widget.pack(side=widget_side,expand='yes',fill='x')
 
-        # CEBALERT: will just have one of these, and will be properly named.
-        self._furames[name]=(frame,label); self._widgets[name]=widget
+        representation = {"frame":frame,"widget":widget,"label":label,"pack_options":pack_options}
+        self.representations[name] = representation
+                               
 
         # If there's a label, balloon's bound to it - otherwise, bound
         # to enclosing frame.
@@ -841,7 +869,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         self.balloon.bind(label or frame,getdoc(self.get_parameter_object(name)))
         
         frame.pack(pack_options)
-        return frame 
+        return representation
 
 
 
@@ -900,8 +928,15 @@ class ParametersFrame2(TkParameterizedObject,Frame):
 
         self.pack() # coz the old one did, and callers assume it
 
-    def set_PO(self,PO):
 
+    # CEBALERT: clean this up.
+    def unpack_param(self,param_name):
+        raise NotImplementedError # unfinished (need to remove from list of displayed params)
+        # super(ParametersFrame2,self).unpack_param(param_name)
+    # also hide,unhide probably
+
+
+    def set_PO(self,PO):
         self.change_PO(PO)
 
         try:
@@ -910,11 +945,11 @@ class ParametersFrame2(TkParameterizedObject,Frame):
             pass # can only set window title on a window (model editor puts frame in another frame)
 
         ### Pack all of the non-hidden Parameters
-        self.packed_params = {}
+        self.displayed_params = {}
         for n,p in parameters(PO).items():
             if not p.hidden:
                 self.pack_param(n,parent=self.pframe,fill='x',expand='yes')
-                self.packed_params[n]=p
+                self.displayed_params[n]=p
             
         ### Delete all variable traces
         # (don't want to update parameters immediately)
@@ -926,7 +961,7 @@ class ParametersFrame2(TkParameterizedObject,Frame):
     
 
     def _sync_tkvars2po(self):
-        for name in self.packed_params.keys():
+        for name in self.displayed_params.keys():
             self._tk_vars[name]._checking_get()
 
 
@@ -941,7 +976,7 @@ class ParametersFrame2(TkParameterizedObject,Frame):
     def has_unapplied_change(self):
         """Return True if any one of the packed parameters' displayed values is different from
         that on the object."""
-        for name in self.packed_params.keys():
+        for name in self.displayed_params.keys():
             if self.__value_changed(name):
                 return True
         return False
@@ -969,11 +1004,11 @@ class ParametersFrame2(TkParameterizedObject,Frame):
 
     def update_parameters(self):
         if isinstance(self._extraPO,ParameterizedObjectMetaclass):
-            for name in self.packed_params.keys():
+            for name in self.displayed_params.keys():
                 if self.__value_changed(name):
                     self._update_param(name)
         else:
-            for name,param in self.packed_params.items():
+            for name,param in self.displayed_params.items():
                 if not param.constant and self.__value_changed(name):
                     self._update_param(name)
 
@@ -1005,8 +1040,8 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         """
         ### simplify this lookup-by-value!
         param_name = None
-        for name,wid in self._widgets.items():
-            if self.__currently_selected_widget is wid:
+        for name,representation in self.representations.items():
+            if self.__currently_selected_widget is representation['widget']:
                 param_name=name
                 break
 
