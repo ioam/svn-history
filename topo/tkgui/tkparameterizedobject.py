@@ -668,10 +668,6 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         
         # (a refresh-the-widgets-on-focus-in method could make the gui
         # in sync with the actual object?)
-
-##     def repackparam(self,name):
-##         self._widgets[name].destroy()
-##         self.pack_param(name,parent=self._furames[name])
         
 
     def pretty_print(self,s):
@@ -741,7 +737,20 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 #################################
 
 
-    
+    # CEBNOTE: could store original pack options
+    def hide_param(self,name):
+        self._furames[name][0].pack_forget()
+    def unhide_param(self,name,**pack_options):
+        self._furames[name][0].pack(pack_options)
+
+##     def unpack_param(self,name):
+##         del self._tk_vars[name]
+##         self._widgets[name].destroy()
+##         a,b=self._furames[name]; a.destroy(); b.destroy()
+##     def repackparam(self,name):
+##         self._widgets[name].destroy()
+##         self.pack_param(name,parent=self._furames[name])
+        
     
     # CEBALERT: on_change should be on_set (since it's called not only for changes)
     # CB: packing might need to be better (check eg label-widget space)
@@ -841,14 +850,15 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 ##########################################################################################
 
 from tkguiwindow import Menu,TkguiWindow
+import tkMessageBox
 
 class ParametersFrame2(TkParameterizedObject,Frame):
 
     # CEBHACKALERT: semantics of all these buttons needs to be checked.
-    Apply = ButtonParameter()
-    Defaults = ButtonParameter()
-    Reset = ButtonParameter(doc="Return displayed values to those of the object.")  # should it be refresh or reset?
-    Close = ButtonParameter()
+    Apply = ButtonParameter(doc="Set object's Parameters to displayed values")
+    Defaults = ButtonParameter(doc="defaults doc")
+    Refresh = ButtonParameter(doc="Return values to those currently set on the object")  # should it be refresh or reset?
+    Close = ButtonParameter(doc="Close this window")
 
     def __init__(self,master,PO=None,**params):        
         Frame.__init__(self,master)
@@ -873,7 +883,7 @@ class ParametersFrame2(TkParameterizedObject,Frame):
         
         self.pack_param('Apply',parent=self.buttons_frame,on_change=self.update_parameters,side='left')
         self.pack_param('Defaults',parent=self.buttons_frame,on_change=self.defaultsB,side='left')
-        self.pack_param('Reset',parent=self.buttons_frame,on_change=self._sync_tkvars2po,side='left')
+        self.pack_param('Refresh',parent=self.buttons_frame,on_change=self._sync_tkvars2po,side='left')
         self.pack_param('Close',parent=self.buttons_frame,on_change=self.closeB,side='left')
 
         self.pack() # coz the old one did, and callers assume it
@@ -916,14 +926,26 @@ class ParametersFrame2(TkParameterizedObject,Frame):
             self._sync_tkvars2po()
         
 
+    def has_unapplied_change(self):
+        """Return True if any one of the packed parameters' displayed values is different from
+        that on the object."""
+        for name in self.packed_params.keys():
+            if self.__value_changed(name):
+                return True
+        return False
+
+        
     def closeB(self):
-        # CEBALERT: warn if there are unapplied changes
+        if self.has_unapplied_change() and tkMessageBox.askyesno("Close","Apply changes before closing?"):
+            self.update_parameters()
         self.master.destroy()
-
-
+            
 
     def __value_changed(self,name):
-        if self.string2object_ifrequired(name,self._tk_vars[name]._original_get())!=getattr(self._extraPO,name):
+        """Return True if the displayed value does not equal the object's value (and False otherwise)"""
+        displayed_value = self.string2object_ifrequired(name,self._tk_vars[name]._original_get())
+        object_value = getattr(self._extraPO,name):
+        if displayed_value!=object_value:
             return True
         else:
             return False
