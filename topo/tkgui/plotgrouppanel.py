@@ -183,8 +183,9 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
     ## and pass those to generate_plotgroup(**params)?
     def __init__(self,console,master,plotgroup_label,**params):
         """
-        If your parameter should be available in history, add it to widgets_in_history list,
-        otherwise it will be disabeld.
+        If your parameter should be available in history, add its name
+        to the params_in_history list, otherwise it will be disabled
+        in historical views.
         """
         TkParameterizedObject.__init__(self,master,extraPO=self.generate_plotgroup(),**params)
         Frame.__init__(self,master)
@@ -202,7 +203,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
         self.plotgroups_history=[]
         self.history_index = 0
-        self.widgets_in_history = [] # widgets valid to use in history
+        self.params_in_history = [] # parameters valid to adjust in history
                               
             
     	# Factor for reducing or enlarging the Plots (where 1.2 = 20% change)
@@ -291,7 +292,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
         self.pack_param('Refresh',parent=self.updatecommand_frame,
                         on_change=self.refresh,side='right')
-
+        self.params_in_history.append('Refresh')
 
         self.pack_param('plot_command',parent=self.plotcommand_frame,
                         expand='yes',fill='x',side='left')
@@ -301,8 +302,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         
 
         
-
-        ### GUI Parameters 
         # JAB: Because the Refresh, Reduce, and Enlarge buttons are
         # present in nearly every window, and aren't particularly
         # important, we should probably use small icons for them
@@ -311,25 +310,27 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         # need to announce their names as help text if the mouse
         # lingers over them, so that the user can figure them out the
         # first time.
-        
-        self.widgets_in_history.append(self._widgets['Refresh'])
+    
 
         self.pack_param('auto_refresh',parent=self.control_frame_1,
                         on_change=self.set_auto_refresh,
                         side=RIGHT)
-        self.widgets_in_history.append(self._widgets['auto_refresh'])
+        self.params_in_history.append('auto_refresh')
 
         if self.auto_refresh: self.console.auto_refresh_panels.append(self)
             
         self.pack_param('Enlarge',parent=self.control_frame_1,
                         on_change=self.enlarge_plots,side=LEFT)
-        self.widgets_in_history.append(self._widgets['Enlarge'])
+        self.params_in_history.append('Enlarge') # CEBNOTE: while it's a GUI op
 
         self.pack_param('Reduce',parent=self.control_frame_1,
                         on_change=self.reduce_plots,side=LEFT)
-        self.widgets_in_history.append(self._widgets['Reduce'])
+        self.params_in_history.append('Reduce')
 
 
+        # Don't need to add these two to params_in_history because their
+        # availability is controlled separately (determined by what's
+        # in the history)
         self.pack_param('Back',parent=self.control_frame_2,
                         on_change=lambda x=-1: self.navigate_pg_history(x),
                         side=LEFT)
@@ -680,7 +681,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         """Function called by Widget to reduce the plot size"""
         new_height = self.plotgroup.height_of_tallest_plot / self.zoom_factor
         if new_height < self.plotgroup.minimum_height_of_tallest_plot:
-            self._widgets['Reduce']['state']=DISABLED
+            self.representations['Reduce']['widget']['state']=DISABLED
         else:
             self.change_plot_sizes(new_height)
 
@@ -688,7 +689,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
     def enlarge_plots(self):
         """Function called by Widget to increase the plot size"""
         new_height = self.plotgroup.height_of_tallest_plot * self.zoom_factor
-        self._widgets['Reduce']['state']=NORMAL
+        self.representations['Reduce']['widget']['state']=NORMAL
         self.change_plot_sizes(new_height)
 
         
@@ -722,8 +723,9 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         else:
             state = 'normal'
 
-        widgets_to_update = [w for w in self._widgets.values()
-                             if w not in self.widgets_in_history]
+        
+        widgets_to_update = [self.representations[p_name]['widget'] for p_name in self.representations
+                             if p_name not in self.params_in_history]
 
         for widget in widgets_to_update:
             try:  ### CEBHACKALERT re TaggedSlider: doesn't support state! Need to be
@@ -736,10 +738,10 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         ## CEBHACKALERT: necessary to update the gui.
         ## Instead of this, need to handle replacing an extra PO properly in
         ## tkparameterizedobject.
-        for n in self._widgets: 
+        ## CB: huh?
+        for n in self.representations:
             self._tk_vars[n].get() 
         
-            
 
         self.update_history_buttons()
 
@@ -748,8 +750,8 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         space_back = len(self.plotgroups_history)-1+self.history_index
         space_fwd  = -self.history_index 
 
-        back_button = self._widgets['Back']
-        forward_button = self._widgets['Fwd']
+        back_button = self.representations['Back']['widget']
+        forward_button = self.representations['Fwd']['widget']
         
         if space_back>0:
             back_button['state']='normal'
