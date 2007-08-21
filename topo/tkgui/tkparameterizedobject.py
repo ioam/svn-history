@@ -944,7 +944,7 @@ class ParametersFrame2(TkParameterizedObject,Frame):
     def __value_changed(self,name):
         """Return True if the displayed value does not equal the object's value (and False otherwise)"""
         displayed_value = self.string2object_ifrequired(name,self._tk_vars[name]._original_get())
-        object_value = getattr(self._extraPO,name):
+        object_value = getattr(self._extraPO,name)
         if displayed_value!=object_value:
             return True
         else:
