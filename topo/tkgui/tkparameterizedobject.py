@@ -628,18 +628,21 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
     def _set_tk_val(self,param_name,val):
         """
-        Calls superclass's version, adding help text for the currently selected item.
+        Calls superclass's version, adding help text for the currently selected item
+        of SelectorParameters.
         """
         super(TkParameterizedObject,self)._set_tk_val(param_name,val)
 
-        try:
-            w = self._widgets[param_name]
-            help_text =  getdoc(self.string2object_ifrequired(param_name,self._tk_vars[param_name]._original_get()))
-            self.balloon.bind(w,help_text)
-        except: #(AttributeError,KeyError):  # could be called before self._widgets exists, or before param in _tk_vars dict
-            # CEBALERT: why specific errors are commented out is:
-            # Projection window of hierarchical: change projection, get 'bad window path' error!
-            pass
+        if isinstance(self.get_parameter_object(param_name),SelectorParameter):
+            try:
+                w = self._widgets.get(param_name)
+                help_text =  getdoc(self.string2object_ifrequired(param_name,
+                                                                  self._tk_vars[param_name]._original_get()))
+                self.balloon.bind(w,help_text)
+
+            except (AttributeError,KeyError):  # could be called before self._widgets exists,
+                                               # or before param in _tk_vars dict
+                pass
 
 
     def __init__(self,master,extraPO=None,self_first=True,**params):
@@ -668,7 +671,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         
         # (a refresh-the-widgets-on-focus-in method could make the gui
         # in sync with the actual object?)
-        
+
 
     def pretty_print(self,s):
         """
@@ -853,6 +856,9 @@ from tkguiwindow import Menu,TkguiWindow
 import tkMessageBox
 
 class ParametersFrame2(TkParameterizedObject,Frame):
+    """
+    ParametersFrame something something.
+    """
 
     # CEBHACKALERT: semantics of all these buttons needs to be checked.
     Apply = ButtonParameter(doc="Set object's Parameters to displayed values")
