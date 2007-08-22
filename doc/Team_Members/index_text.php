@@ -1,5 +1,5 @@
 <P>Topographica is developed by a distributed team of researchers in
-the United Kingdom and the United States.  Major contributors
+the United Kingdom and the United States.  Major contributors to the code
 include:
 
 <dl>
@@ -25,7 +25,7 @@ include:
       other code to Topographica.
 
   <p><dt>Chris Ball, September 2005-</dt>
-  <dd>Chris works on various parts of Topographica, and is 
+  <dd>Chris works on nearly every part of Topographica, and is also working on
       <a target="_top" href="http://homepages.inf.ed.ac.uk/v1cball/mae/">modeling
       motion aftereffects in LISSOM</a>.
 
@@ -71,13 +71,13 @@ include:
       more sample models for Topographica.
 
   <p><dt><a target="_top" href="http://www.cs.utexas.edu/~jp/">Jefferson
-      Provost</a>, 2003-2004</dt> 
-  <dd>Jeff is a PhD student at the University of Texas (topic:
-      sensorimotor learning in robots).  He wrote the initial GUI
+      Provost</a>, 2003-</dt> 
+  <dd>Jeff is a postdoctoral researcher in the Neuroscience Department at
+      the University of Pittsburgh.  He wrote the initial GUI
       implementation (first in Scheme, then in Python), and the first
       Python version of most of the base classes (Sheet, CFSheet,
-      CFSOM, ParameterizedObject, LISSOM, etc.).  He has now moved on
-      to try to finish his PhD and get a job. :-)
+      CFSOM, ParameterizedObject, LISSOM, etc.), but is now primarily
+      Topographica user rather than a developer.
 
   <p><dt><a target="_top"
       href="http://www.cs.utexas.edu/users/yfsit/">Yiu Fai Sit</a>,
