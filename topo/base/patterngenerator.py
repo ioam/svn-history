@@ -72,9 +72,11 @@ class PatternGenerator(ParameterizedObject):
     y = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.21,doc="""
         Y-coordinate location of pattern center.""")
 
-
     position = CompoundParameter(attribs=['x','y'],doc="""
-                 Coordinates of location of pattern center.""")
+        Coordinates of location of pattern center.
+        Provides a convenient way to set the x and y parameters together
+        as a tuple (x,y), but shares the same actual storage as x and y
+        (and thus only position OR x and y need to be specified).""")
     
     orientation = Number(default=0.0,softbounds=(0.0,2*pi),precedence=0.40,doc="""
         Polar angle of pattern, i.e., the orientation in the Cartesian coordinate
