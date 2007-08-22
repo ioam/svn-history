@@ -12,7 +12,7 @@ from numpy.oldnumeric import add,subtract,cos,sin
 
 from boundingregion import BoundingBox, BoundingRegionParameter
 from functionfamilies import OutputFnParameter, IdentityOF
-from parameterclasses import Parameter,Number,ClassSelectorParameter
+from parameterclasses import Parameter,Number,ClassSelectorParameter,CompoundParameter
 from parameterizedobject import ParameterizedObject
 from sheetcoords import SheetCoordinateSystem
 
@@ -72,6 +72,10 @@ class PatternGenerator(ParameterizedObject):
     y = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.21,doc="""
         Y-coordinate location of pattern center.""")
 
+
+    position = CompoundParameter(attribs=['x','y'],doc="""
+                 Coordinates of location of pattern center.""")
+    
     orientation = Number(default=0.0,softbounds=(0.0,2*pi),precedence=0.40,doc="""
         Polar angle of pattern, i.e., the orientation in the Cartesian coordinate
         system, with zero at 3 o'clock and increasing counterclockwise.""")
@@ -112,6 +116,7 @@ class PatternGenerator(ParameterizedObject):
                         params.get('ydensity',self.ydensity),
                         params.get('x',self.x),
                         params.get('y',self.y),
+                        params.get('position',None),
                         params.get('orientation',self.orientation))
 
         scale = params.get('scale',self.scale)
@@ -130,12 +135,15 @@ class PatternGenerator(ParameterizedObject):
         return result                   # Should be: "if not instance(output_fn,IdentityOF):".
                                         # I guess this needs fixing in several places.
 
-    def __setup_xy(self,bounds,xdensity,ydensity,x,y,orientation):
+    def __setup_xy(self,bounds,xdensity,ydensity,x,y,position,orientation):
         """
         Produce pattern coordinate matrices from the bounds and
         density (or rows and cols), and transforms them according to
         x, y, and orientation.
         """
+        if position is not None:
+            x,y = position
+            
         self.debug("bounds = ",bounds,"xdensity =",xdensity,"x =",x,"y=",y)
         # Generate vectors representing coordinates at which the pattern
         # will be sampled.
@@ -182,10 +190,10 @@ from numpy.oldnumeric import ones, Float
 class Constant(PatternGenerator):
     """Constant pattern generator, i.e., a solid, uniform field of the same value."""
 
-    # The standard x, y, and orientation variables ignored for this special case,
+    # The standard position and orientation variables are ignored for this special case,
     # so we hide them from auto-generated lists of parameters (e.g. in the GUI)
-    x       = Number(hidden = True)
-    y       = Number(hidden = True)
+    x = Number(hidden=True)
+    y = Number(hidden=True)
     orientation   = Number(hidden = True)
 
     # Optimization: We use a simpler __call__ method here to skip the
