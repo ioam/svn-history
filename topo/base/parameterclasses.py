@@ -409,7 +409,7 @@ class XYCoordinates(NumericTuple):
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
   
-    def __init__(self,default=(0,0),**params):
+    def __init__(self,default=(0.0,0.0),**params):
         super(XYCoordinates,self).__init__(default=default,length=2,**params)
 
                  
