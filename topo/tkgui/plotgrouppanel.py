@@ -355,6 +355,10 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         self._canvas_menu.add_cascade(menu=self._sheet_menu,state=DISABLED,
                                       indexname='sheet_menu') 
         
+
+        ## CEBHACKALERT: got to control when menu options show. No good asking
+        ## for connection fields of a connection field! Or asking for connection
+        ## fields of a sheet that's not a cf sheet. And so on...
         
         self._unit_menu.add_command(label='Connection Fields',indexname='connection_fields',
                                     command=self.__connection_fields_window)
