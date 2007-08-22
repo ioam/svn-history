@@ -605,7 +605,7 @@ class CompoundParameter(Parameter):
         """
         Set the values of all the attribs.
         """
-        assert len(val) == len(self.attribs),"Compound parameter %s got the wrong number of values. Needed %d got %d." (self.attrib_name,len(self.attribs),len(val))
+        assert len(val) == len(self.attribs),"Compound parameter %s got the wrong number of values (needed %d, but got %d)." % (self.attrib_name,len(self.attribs),len(val))
         
         if not obj:
             for a,v in zip(self.attribs,val):
@@ -613,8 +613,7 @@ class CompoundParameter(Parameter):
         else:
             for a,v in zip(self.attribs,val):
                 setattr(obj,a,v)
-                
-                
+
 
 
 ########### CEB: currently working on SelectorParameters #########
