@@ -585,11 +585,21 @@ def concrete_descendents(parentclass):
                  if not (hasattr(c,'abstract') and c.abstract==True)])
 
 
-class CompoundParameter(Parameter):
+class CompositeParameter(Parameter):
+    """
+    A parameter that is in fact a composite of a set of other
+    parameters or attributes of the class.  The constructor argumentt
+    'attribs' takes a list of attribute names.  Getting the parameter
+    returns a list of the values of the constituents of the composite,
+    in the order specified.  Likewise, setting the parameter takes a
+    sequence of values and sets the value of the constituent
+    attributes sets all the constituents
+    """
+
     __slots__=['attribs','objtype']
 
     def __init__(self,attribs=[],**kw):
-        super(CompoundParameter,self).__init__(default=None,**kw)
+        super(CompositeParameter,self).__init__(default=None,**kw)
         self.attribs = attribs
 
     def __get__(self,obj,objtype):
