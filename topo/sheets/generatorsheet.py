@@ -124,28 +124,52 @@ class SequenceGeneratorSheet(GeneratorSheet):
     """
     Sheet that generates a timed sequence of patterns.
 
-    This sheet will repeatedly generate the input_sequence, at the
-    given delays.  The sequence begins after self.phase time units.
+    This sheet will repeatedly generate the input_sequence, with the
+    given onsets.  The sequence is repeated every self.period time
+    units.  If the total length of the sequence is longer than
+    self.period, a warning is issued and the sequence repeats
+    immediately after completion.
+
     """
     
     input_sequence = ListParameter(default=[(1,topo.patterns.basic.Gaussian())],
           doc="""The sequence of patterns to generate. Must be a list
-          of (delay,generator) tuples.""")
+          of (onset,generator) tuples.""")
 
 
     def start(self):
+        assert self.simulation
         self._seq_pos = 0
-        super(SequenceGeneratorSheet,self).start()
+        delay,gen = self.input_sequence[0]
         
+        # connect self<->self (for repeating)
+        # the delay is the delay of the first event
+        conn=self.simulation.connect(self.name,self.name,delay=delay,src_port='Activity',
+                                     dest_port='Trigger',name='Trigger',private=True)
+
+        e=EPConnectionEvent(delay+topo.sim.time(),conn)
+        self.simulation.enqueue_event(e)
+      
     def input_event(self,conn,data):
         if conn.name == 'Trigger':
+
+            last_delay,generator = self.input_sequence[self._seq_pos]
+            self.set_input_generator(generator)
             delay,gen = self.input_sequence[self._seq_pos]
-            # JPALERT: it might be simpler just to create an event and
-            # enqueue it manually, rather than modifying the trigger
-            # delay, but this way allows us to retain the debugging
-            # statements and other code from GeneratorSheet            
+            
+            if self._seq_pos < len(self.input_sequence)-1:                
+                self._seq_pos += 1
+            else:
+                self._seq_pos = 0
+                # if it's the last item in the sequence, then
+                # pad the time to fill out the generator's period
+                # before restarting.
+                total_time = sum([delay for delay,gen in self.input_sequence])
+                if total_time < self.period:
+                    delay += self.period - total_time
             conn.delay = delay
-            self.set_input_generator(gen)
-            self._seq_pos = (self._seq_pos+1)%len(self.input_sequence)
-        super(SequenceGeneratorSheet,self).input_event(conn,data)
+                
+            super(SequenceGeneratorSheet,self).input_event(conn,data)
+
+
           
