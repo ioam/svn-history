@@ -205,7 +205,7 @@ def process_argv(argv):
     #
     # http://mail.python.org/pipermail/python-list/2005-September/341702.html
     #
-    ## OS X:
+    ## Mac OS:
     # Location -- Seems like programs use either ~/Library/AppName or (more commonly)
     # ~/Library/Application Support/AppName (CEBALERT: is there a var. for that on OS X?).
     # 
