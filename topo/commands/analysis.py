@@ -152,7 +152,7 @@ class PatternPresenter(ParameterizedObject):
             if self.contrast_parameter=='michelson_contrast':
                 for g in inputs.itervalues():
                     g.offset=0.5
-                    g.scale=2*g.offset*g.contrast/100
+                    g.scale=2*g.offset*g.contrast/100.0
 
             
 	
@@ -163,7 +163,7 @@ class PatternPresenter(ParameterizedObject):
                 # SineGratingDisk
                 for g in inputs.itervalues():
                     g.offset=0.5   #In this case this is the offset of both the background and the sine grating
-                    g.scale=2*g.offset*g.contrast/100
+                    g.scale=2*g.offset*g.contrast/100.0
             
                 
             elif self.contrast_parameter=='scale':
@@ -399,28 +399,42 @@ pgt= new_pgt(name='Receptive Fields',category="Other",
              plot_command='plotrctg()',
              normalize=True)
 
-# CEB: can we have some default option for input_sheet? Could have input_sheet_name, defaulting to
-# 'Retina', then lookup the sheet with topo.sim[input_sheet_name]?
-
+# CEB: Could provide a default option for the input_sheet by making it
+# accept input_sheet_name instead, defaulting to 'Retina'.  We would
+# then look up the sheet with topo.sim[input_sheet_name].
 def measure_rfs(input_sheet,divisions=10,scale=30.0,offset=0.5,display=False,
                 pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),True,duration=1.0),
-                x_range=(-0.2,0.2),y_range=(-0.2,0.2)): #weighted_average=False)
-    """Map receptive field on a GeneratorSheet by reverse correlation using small Gaussian inputs."""
+                x_range=(-0.2,0.2),y_range=(-0.2,0.2)):
+    """
+    Map receptive fields by reverse correlation.
+
+    Presents a large collection of input patterns, typically small
+    Gaussians, keeping track of which units in the specified
+    input_sheet were active when each unit in other Sheets in the
+    simulation was active.  This data can then be used to plot
+    receptive fields for each unit.  Note that the results are true
+    receptive fields, not the connection fields usually presented in
+    lieu of receptive fields, because they take all circuitry in
+    between the input and the target unit into account.
+
+    Note that it is crucial to set the scale parameter properly when
+    using units with a hard activation threshold (as opposed to a
+    smooth sigmoid), because the input pattern used here may not be a
+    very effective way to drive the unit to activate.  The value
+    should be set high enough that the target units activate at least
+    some of the time there is a pattern on the input.
+    """
 
     # CEBALERT: various things in here need to be arguments
 
-
-  # ALERT: THIS CRAZILY HIGH VALUE IS NECCESSARY FOR THE CURRENT LISSOM_OO_OR.TY 
-  # NORMALLY A VALUE AROUND 0.5 TO 3.0 SEEMS OK....
     # Presents the pattern at each pixel location
     resolution = 100 # percentage, 100 is max, 0 is min
     l,b,r,t = input_sheet.nominal_bounds.lbrt()
-    density=resolution*input_sheet.nominal_density/100
+    density=resolution*input_sheet.nominal_density/100.0
     divisions = density*(r-l)-1
-    size = 1/(density)
+    size = 1.0/(density)
     x_range=(r,l)
     y_range=(t,b)
-    
     
     if divisions <= 0:
         raise ValueError("Divisions must be greater than 0")
@@ -429,7 +443,6 @@ def measure_rfs(input_sheet,divisions=10,scale=30.0,offset=0.5,display=False,
         feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
                           Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
                           Feature(name="scale",range=(-scale,scale),step=scale*2)]   
-                                                                                        
                           
         param_dict = {"size":size,"scale":scale,"offset":offset}
 
@@ -909,7 +922,7 @@ new_pgt(name='Contrast Response',category="Tuning Curves",
         prerequisites=['OrientationPreference','XPreference'])
 
 
-def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relative_orientations=[0, pi/6, pi/4, pi/2],
+def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relative_orientations=[0.0, pi/6, pi/4, pi/2],
                               size=0.5,display=False,frequency=2.4,
                               num_phase=18,pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
                                                                               apply_output_fn=True,duration=1.0,
