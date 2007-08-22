@@ -502,9 +502,17 @@ class ParameterizedObjectMetaclass(type):
             if hasattr(p_class,'__slots__'):
                 slots.update(dict.fromkeys(p_class.__slots__))
 
-        # JPALERT: This is to make CompoundParameter.__set__ work
-        # properly.  It feels hackish, but I can't think of a better
-        # way right now.
+        # This is to make CompositeParameter.__set__ work
+        # properly. Unlike __get__, the __set__ method of an attribute
+        # descriptor doesn't get passed any indication of what class
+        # it belongs to, when called without an instance.  In order
+        # for CompositeParameter.__set__ to work, it needs to know
+        # what class the Parameter belongs to. This code looks finds
+        # any parameter with a slot named 'objtype' and sets the
+        # slot's value to the current type (i.e. self).
+        # JPALERT: This feels hackish.  Not sure if there's a better
+        # way.  On the other hand, this mechanism might be useful for
+        # other parameters too.
         if 'objtype' in slots:
             setattr(param,'objtype',self)
             del slots['objtype']
