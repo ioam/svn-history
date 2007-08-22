@@ -375,13 +375,17 @@ class NumericTuple(Parameter):
     __slots__ = ['length']
     __doc__ = property((lambda self: self.doc))
 
-    def __init__(self,default=(0,0),length=2,**params):
+    def __init__(self,default=(0,0),length=None,**params):
         """
         Initialize a numeric tuple parameter with a fixed length.
         The length is determined by the initial default value, and
         is not allowed to change after instantiation.
         """
-        self.length=len(default)
+        if length is None:
+            self.length = len(default)
+        else:
+            self.length = length
+            
         self._check(default)
         Parameter.__init__(self,default=default,**params)
         
@@ -401,6 +405,14 @@ class NumericTuple(Parameter):
         super(NumericTuple,self).__set__(obj,val)
 
 
+class XYCoordinates(NumericTuple):
+    __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+  
+    def __init__(self,default=(0,0),**params):
+        super(XYCoordinates,self).__init__(default=default,length=2,**params)
+
+                 
 class CallableParameter(Parameter):
     """
     Parameter holding a value that is a callable object, such as a function.
@@ -572,6 +584,37 @@ def concrete_descendents(parentclass):
     return dict([(c.__name__,c) for c in descendents(parentclass)
                  if not (hasattr(c,'abstract') and c.abstract==True)])
 
+
+class CompoundParameter(Parameter):
+    __slots__=['attribs','objtype']
+
+    def __init__(self,attribs=[],**kw):
+        super(CompoundParameter,self).__init__(default=None,**kw)
+        self.attribs = attribs
+
+    def __get__(self,obj,objtype):
+        """
+        Return the values of all the attribs, as a list.
+        """
+        if not obj:
+            return [getattr(objtype,a) for a in self.attribs]
+        else:
+            return [getattr(obj,a) for a in self.attribs]
+
+    def __set__(self,obj,val):
+        """
+        Set the values of all the attribs.
+        """
+        assert len(val) == len(self.attribs),"Compound parameter %s got the wrong number of values. Needed %d got %d." (self.attrib_name,len(self.attribs),len(val))
+        
+        if not obj:
+            for a,v in zip(self.attribs,val):
+                setattr(self.objtype,a,v)
+        else:
+            for a,v in zip(self.attribs,val):
+                setattr(obj,a,v)
+                
+                
 
 
 ########### CEB: currently working on SelectorParameters #########

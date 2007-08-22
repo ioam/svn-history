@@ -23,6 +23,11 @@ VERBOSE = 200
 DEBUG   = 300
 
 min_print_level = NORMAL
+
+# Indicates whether warnings should be raised as errors, stopping
+# processing.
+warnings_as_errors = False
+
 object_count = 0
 
 
@@ -497,6 +502,14 @@ class ParameterizedObjectMetaclass(type):
             if hasattr(p_class,'__slots__'):
                 slots.update(dict.fromkeys(p_class.__slots__))
 
+        # JPALERT: This is to make CompoundParameter.__set__ work
+        # properly.  It feels hackish, but I can't think of a better
+        # way right now.
+        if 'objtype' in slots:
+            setattr(param,'objtype',self)
+            del slots['objtype']
+            
+
         for slot in slots.keys():
             superclasses = iter(classlist(self)[::-1])
 
@@ -624,8 +637,6 @@ class ParameterizedObject(object):
     ### JABALERT: Should probably make this an Enumeration instead.
     print_level = Parameter(default=MESSAGE,hidden=True)
 
-
-
     
     def __init__(self,abstract_class=None,**params):
         """
@@ -732,8 +743,16 @@ class ParameterizedObject(object):
 
 
     def warning(self,*args):
-        """Print the arguments as a warning."""
-        self.__db_print(WARNING,"Warning:",*args)
+        """
+        Print the arguments as a warning, unless module variable
+        warnings_as_errors is True, then raise an Exception containing
+        the arguments.
+        """
+
+        if not warnings_as_errors:
+            self.__db_print(WARNING,"Warning:",*args)
+        else:
+            raise Exception, ' '.join(["Warning:",]+[str(x) for x in args])
 
     def message(self,*args):
         """Print the arguments as a message."""
