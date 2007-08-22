@@ -594,7 +594,6 @@ class ModelEditor(ParameterizedObject):
                         editor_connection.connect(dest, con)
                         break
                 else:
-                    # JABALERT: Should eliminate all print statements.
                     self.warning("The model editor cannot draw connection", con.name,
                                  "because", con.dest.name, "is not drawn in the editor.")
                            
