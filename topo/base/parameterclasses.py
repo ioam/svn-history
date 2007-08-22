@@ -615,7 +615,7 @@ class CompositeParameter(Parameter):
         """
         Set the values of all the attribs.
         """
-        assert len(val) == len(self.attribs),"Compound parameter %s got the wrong number of values (needed %d, but got %d)." % (self.attrib_name,len(self.attribs),len(val))
+        assert len(val) == len(self.attribs),"Compound parameter %s got the wrong number of values (needed %d, but got %d)." % (self.attrib_name(),len(self.attribs),len(val))
         
         if not obj:
             for a,v in zip(self.attribs,val):

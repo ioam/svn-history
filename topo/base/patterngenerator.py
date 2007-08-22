@@ -73,7 +73,7 @@ class PatternGenerator(ParameterizedObject):
         Y-coordinate location of pattern center.""")
 
 
-    position = CompositeParameter(attribs=['x','y'],doc="""
+    position = CompositeParameter(attribs=['x','y'],hidden=True,doc="""
         Coordinates of location of pattern center.
         Provides a convenient way to set the x and y parameters together
         as a tuple (x,y), but shares the same actual storage as x and y
