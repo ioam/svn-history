@@ -30,12 +30,13 @@ __version__='$Revision$'
 
 
 
-import unittest,re,os
+import unittest,doctest,os,re,fnmatch
 
 # Automatically discover all test*.py files in this directory
 __all__ = [re.sub('\.py$','',f)
-           for f in os.listdir(__path__[0])
-           if re.match('^test.*\.py$',f)]
+           for f in fnmatch.filter(os.listdir(__path__[0]),'test*.py')]
+
+all_doctest = sorted(fnmatch.filter(os.listdir(__path__[0]),'test*.txt'))
 
 
 # Remove any test that for now we don't want to run with the others
@@ -70,6 +71,10 @@ def all_suite():
                 suite.addTest(new_test)
         except AttributeError,err:
             print err
+
+    for filename in all_doctest:
+        print 'Loading doctest file', filename
+        suite.addTest(doctest.DocFileSuite(filename))
     return suite
 
 
@@ -91,14 +96,30 @@ def run(verbosity=1,test_modules=None):
     
       ./topographica -c 'import topo.tests.testimage; topo.tests.run(test_modules=[topo.tests.testimage])'    
     """
+
+    import types
+    
     suite = None
     
     if not test_modules:
         suite = all_suite()
     else:
+        assert isinstance(test_modules,list), 'test_modules argument must be a list of test modules or doctest filenames.'
+        
         suite = unittest.TestSuite()
         for test_module in test_modules:
-            suite.addTest(getattr(test_module,'suite'))
+            if isinstance(test_module,types.ModuleType):
+                suite.addTest(getattr(test_module,'suite'))
+            elif isinstance(test_module,str):
+                if test_module in all_doctest:
+                    suite.addTest(doctest.DocFileSuite(test_module))
+                elif test_module+'.txt' in all_doctest:
+                    suite.addTest(doctest.DocFileSuite(test_module+'.txt'))
+                else:
+                    raise ValueError, '"%s" is not an available doctest file.' % test_module
+            else:
+                raise ValueError, '%s is not a valid test module' % str(test_module)
+                                 
 
     return unittest.TextTestRunner(verbosity=verbosity).run(suite)
 
