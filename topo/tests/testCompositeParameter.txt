@@ -1,11 +1,11 @@
 >>> from topo.base.parameterizedobject import ParameterizedObject
->>> from topo.base.parameterclasses import Number,CompoundParameter
+>>> from topo.base.parameterclasses import Number,CompositeParameter
 
 # initialize a class with a compound parameter
 >>> class A(ParameterizedObject):
 ...    x = Number(default=0)
 ...    y = Number(default=0)
-...    xy = CompoundParameter(attribs=['x','y'])
+...    xy = CompositeParameter(attribs=['x','y'])
 ... 
 
 # Make an instance and do default checks
