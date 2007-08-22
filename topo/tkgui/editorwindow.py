@@ -11,6 +11,7 @@ from tkFileDialog import asksaveasfilename
 from random import Random, random
 
 import topo
+from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
 from topo.base.projection import Projection
 
@@ -510,7 +511,7 @@ class EditorCanvas(Canvas):
 
 
 # (CB: Ought to be a TkguiWindow itself.)
-class ModelEditor:
+class ModelEditor(ParameterizedObject):
     """
     This class constructs the main editor window. It uses a instance
     of GUICanvas as the main editing canvas and inserts the
@@ -594,7 +595,10 @@ class ModelEditor:
                         break
                 else:
                     # JABALERT: Should eliminate all print statements.
-                    print "Incomplete connection: ", con
+                    self.warning("The model editor cannot draw connection", con.name,
+                                 "because", con.dest.name, "is not drawn in the editor.")
+                           
+                    
                     
         self.canvas.redraw_objects()
 
