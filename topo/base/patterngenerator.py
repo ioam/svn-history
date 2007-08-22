@@ -12,7 +12,7 @@ from numpy.oldnumeric import add,subtract,cos,sin
 
 from boundingregion import BoundingBox, BoundingRegionParameter
 from functionfamilies import OutputFnParameter, IdentityOF
-from parameterclasses import Parameter,Number,ClassSelectorParameter,CompoundParameter
+from parameterclasses import Parameter,Number,ClassSelectorParameter,CompositeParameter
 from parameterizedobject import ParameterizedObject
 from sheetcoords import SheetCoordinateSystem
 
@@ -72,7 +72,8 @@ class PatternGenerator(ParameterizedObject):
     y = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.21,doc="""
         Y-coordinate location of pattern center.""")
 
-    position = CompoundParameter(attribs=['x','y'],doc="""
+
+    position = CompositeParameter(attribs=['x','y'],doc="""
         Coordinates of location of pattern center.
         Provides a convenient way to set the x and y parameters together
         as a tuple (x,y), but shares the same actual storage as x and y
