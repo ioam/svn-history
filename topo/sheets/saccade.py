@@ -25,7 +25,7 @@ from numpy import dot,sin,cos,pi,array,argmax,nonzero,take
 
 from topo.base.cf import CFSheet
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.parameterclasses import Number,Magnitude,CallableParameter
+from topo.base.parameterclasses import Number,Magnitude,CallableParameter,BooleanParameter
 from topo.base.boundingregion import BoundingBox,BoundingRegionParameter
 from topo.misc import utils
 
@@ -184,7 +184,12 @@ class ShiftingGeneratorSheet(GeneratorSheet):
         The bounds for saccades.  Saccades are constrained such that the centroid of the
         sheet bounds remains within this region.""")
 
+    generate_on_shift = BooleanParameter(default=True,doc="""
+       Whether to generate a new pattern when a shift occurs.""")
+                                         
+
     dest_ports = ["Trigger","Saccade"]
+    src_ports = ['Activity','Position']
 
 
     def input_event(self,conn,data):
@@ -220,8 +225,11 @@ class ShiftingGeneratorSheet(GeneratorSheet):
 
             if self._out_of_bounds():
                 self._find_saccade_in_bounds(radius,direction)
-        else:
+
+        if self.generate_on_shift or conn.dest_port != 'Saccade':
             super(ShiftingGeneratorSheet,self).input_event(conn,data)
+            self.send_output(src_port='Position',
+                             data=self.bounds.aarect().centroid())
 
 
     def _shift(self,radius,angle):
