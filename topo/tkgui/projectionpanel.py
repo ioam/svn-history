@@ -127,7 +127,7 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
         self.messageBar.message('state',"")
 
     def _plot_title(self):
-        return "Projections into %s at time %s"%(self.plotgroup.sheet.name,self.plotgroup.time)
+        return "Activity in Projections to %s at time %s"%(self.plotgroup.sheet.name,self.plotgroup.time)
 
     # CEBHACKALERT! Back and Fwd buttons don't work.
    
