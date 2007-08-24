@@ -1,54 +1,75 @@
 <!-- -*-html-helper-*- mode -- (Hint for Emacs)-->
 
-<H1>Problems using Topographica</H1>
+<H1>Reporting specific problems with Topographica</H1>
 
-<P>Some introductory paragraph (what's on this page?).</P>
-
-[Can't work out how to do something specific: support requests forum;
-Want to discuss something else: open discussion, etc. What to do before
-filing a feature request.]
-
-
-<H2>Reporting problems with Topographica</H2>
-
-<P>When you have found what appears to be a problem with Topographica
-itself, please try the following:
+<P>Topographica is used actively in research, and is thus continuously
+changing, which inevitably adds new problems as old ones are fixed and
+new features are added.  When you have found what appears to be a
+problem with Topographica itself (whether a bug or a missing feature),
+please try the following:
 
 <ol>
 
-<li>First, you could search the list of <a
-href="http://sourceforge.net/tracker/?group_id=53602&atid=470929">bug
+<P><li> If you are using a version that is more than a few weeks old,
+consider trying the most up to date ("bleeding-edge") version via
+<a href="../Downloads/cvs.html">CVS</a>.  The code is updated nearly
+every day, so by the end of a few weeks many changes will have
+accumulated.  Often, bugs will have been fixed and new features will
+have been added already in the CVS repository, even though they are
+not yet released officially.
+
+<p><li>If the problem is still present in the current version, you can
+search the list of
+<a href="http://sourceforge.net/tracker/?group_id=53602&atid=470929">bug
 reports</a> on our project pages at SourceForge to see if we already
 know about the problem. If you find the problem, please feel free to
-add additional comments.</li>
+add additional comments to the report.</li>
 
-<li>We also have a <a
+<p><li>We also have a <a
 href="http://topographica.org/Future_Work/current.html">task list</a>,
 used by the developers to keep track of tasks. Try searching this list
 for information about your problem. If you find a related task, please
-send an e-mail to the developers [**link].</li>
+send an e-mail to the developer listed as being in charge of that item
+(if any).  If no one is yet listed as being responsible, feel free to
+volunteer!</li>
 
-<li>Next, maybe you're using an old version, and the problem you
-have has since been fixed? [** Where can a user easily look to see if
-a bug was fixed? The changelog? Search the cvs mailings? Update to the
-latest cvs version on another copy? Email the developers?]  </li>
+<p><li>If you can locate where in the code there might be a problem
+(e.g. by going to the line numbers mentioned in a Python exception),
+you will often find a comment with the keyword "ALERT" beside the
+code.  These notes are used to mark problems of which we are aware but
+have not yet been able to address.  If so, please let us know that
+fixing the problem is urgent, and/or suggest fixes for the offending
+code. </li>
 
-<li>Once you're reasonably sure the problem is not one already
-mentioned somewhere, please file a bug report by following the link in
-(1). For someone to help with your problem, we need to be able to
+<p><li>Otherwise, please
+<a href="http://sourceforge.net/tracker/?group_id=53602&atid=470929">file
+a bug report</a>. For us to help with your problem, we need to be able to
 replicate it. Please include:
+
+<p>
 <ul>
-<li>the full error message;</li>
-<li>the output of <code>cvs diff</code>;</li>
-<li>any additional file needed to replicate the problem (e.g. a script you're using);</li>
-<li>steps needed to reproduce the problem.</li>
+<li>the full error message, if any</li>
+<li>the output of <code>cvs diff</code> and <code>cvs status</code></li>
+(if using a CVS version), or the Topographica release number</li>
+<li>which operating system you are using (Linux, Mac, or Windows)</li>
+<li>any additional file needed to replicate the problem (e.g. a script you're using)</li>
+<li>a specific recipe (list of steps) that can reproduce the problem</li>
 </ul>
-To maximize the speed of resolution, please first try to reduce the differences
-between your copy of topographica and [**the original version/the one on cvs] to the
-minimum required to elicit [**right word?] the problem (e.g. by removing extra parts of a model, 
-removing other changes that do not affect the problem, reducing sheet densities, and so on.)
-</li>
-<li>Something about the tracking, what to do if you get no response, and so on. Categories.</li>
+
+<P>To maximize the speed of resolution, please make sure that your
+problem can be replicated using an unmodified copy of Topographica
+(either released or from CVS), and try to have a small, clear,
+quick-to-run example of the problem.  Any bug report is better than
+none, so in any case please do send it in even if you can't satisfy
+the above requests.  Even so, the clearer and simpler it is, the
+quicker we will be able to address the problem.  </li>
+
+<p><li>If you get no reply after a few days, you can try emailing
+<A HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107?subject=Bug%20report">Jim</a>
+directly, in case there was some problem with the email notification
+from the bug report system.  But it's much more effective to use the
+bug report system, which automatically delivers the appropriate
+messages to the appropriate developers.</li>
 
 </ol>
 
