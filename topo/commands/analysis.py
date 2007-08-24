@@ -20,7 +20,8 @@ from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 from topo.commands.basic import pattern_present
 from topo.misc.numbergenerators import UniformRandom
-from topo.misc.utils import frange, wrap
+from topo.misc.utils import frange
+from topo.base.arrayutils import wrap
 from topo.patterns.basic import SineGrating, Gaussian
 from topo.patterns.teststimuli import SineGratingDisk
 from topo.sheets.generatorsheet import GeneratorSheet
@@ -177,8 +178,8 @@ class PatternPresenter(ParameterizedObject):
 
 
 
-# CEBHACKALERT: have plotgroup_params?
-# CEBHACKALERT: test passing e.g. normalize and add example.
+# CEBALERT: have plotgroup_params?
+# CEBALERT: test passing e.g. normalize and add example.
 def save_plotgroup(name,**params):
     """
     Convenience command for saving a set of plots to disk.  Examples:
@@ -191,21 +192,6 @@ def save_plotgroup(name,**params):
     Some plotgroups accept optional parameters, which can be passed
     like sheet and projection above.
     """
-
-    ####################################################################################
-    # CB: support lookup of old sheet_name,projection_name etc
-    # Remove when everyone (JA only?) updated own code?
-    def old_name_support(params):
-        if 'sheet_name' in params:
-            params['sheet'] = topo.sim[params['sheet_name']]
-            del params['sheet_name']
-        if 'projection_name' in params:
-            assert 'sheet' in params
-            params['projection'] = params['sheet'].projections()[params['projection_name']]
-            del params['projection_name']
-
-    old_name_support(params)
-    ####################################################################################
 
     p_class = plotsaving_classes.get(name,plotsaving_classes[None])
     p = p_class(name)#,**params)
