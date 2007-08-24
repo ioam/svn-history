@@ -56,6 +56,11 @@ class DistributionMatrix(ParameterizedObject):
 
     def update(self, new_values, bin):
         """Add a new matrix of histogram values for a given bin value."""
+        ### JABHACKALERT!  The Distribution class should override +=,
+        ### rather than + as used here, because this operation
+        ### actually modifies the distribution_matrix, but that has
+        ### not yet been done.  Alternatively, it could use a different
+        ### function name altogether (e.g. update(x,y)).
         self.distribution_matrix + self.__make_pairs(new_values,bin)
         
         
