@@ -7,7 +7,7 @@ __version__ = "$Revision$"
 
 import re
 
-from numpy.oldnumeric import sqrt, ones, dot, sum, arctan2, array2string, logical_not, bitwise_or, argmax
+from numpy.oldnumeric import sqrt, ones, dot, sum, arctan2, array2string, logical_not, bitwise_or, argmax, fmod, floor
 from numpy import set_printoptions
 
 # Ask numpy to print even relatively large arrays by default
@@ -124,6 +124,17 @@ def clip_lower(mat,lower_bound):
 
     mat *= to_keep
     mat += lower_cropping*lower_bound
+
+
+def wrap(lower, upper, x):
+    """
+    Circularly alias the numeric value x into the range [lower,upper).
+
+    Valid for cyclic quantities like orientations or hues.
+    """
+    #I have no idea how I came up with this algorithm; it should be simplified.
+    range=upper-lower
+    return lower + fmod(x-lower + 2*range*(1-floor(x/(2*range))), range)
 
 
 # There might already be a function for this in Numeric...

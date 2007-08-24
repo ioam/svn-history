@@ -12,17 +12,6 @@ import string
 import random
 import numpy
 
-def wrap(lower, upper, x):
-    """
-    Circularly alias the numeric value x into the range [lower,upper).
-
-    Valid for cyclic quantities like orientations or hues.
-    """
-    #I have no idea how I came up with this algorithm; it should be simplified.
-    range=upper-lower
-    return lower + math.fmod(x-lower + 2*range*(1-math.floor(x/(2*range))), range)
-
-
 def NxN(tuple):
     """
     Converts a tuple (X1,X2,...,Xn) to a string 'X1xX2x...xXn'

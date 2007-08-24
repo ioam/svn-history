@@ -27,7 +27,7 @@ from math import pi
 from numpy.oldnumeric import innerproduct, array, exp, argmax
 from topo.base.arrayutils import arg
 
-from topo.misc.utils import wrap
+from topo.base.arrayutils import wrap
 
 class Distribution(object):
     """
