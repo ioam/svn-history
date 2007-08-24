@@ -51,24 +51,21 @@ class Pipeline(CoordinateMapperFn):
     Applies a sequence of coordmappers,  left to right.
     """
     
-    mappers = ListParameter(
-        default=[],
-        doc = "The sequence of mappers  to apply."
-        )
+    mappers=ListParameter(default=[],
+        doc="The sequence of mappers  to apply.")
 
     def __call__(self,x,y):
         return reduce( lambda args,f: apply(f,args),
                        [(x,y)] + self.mappers )
     
+
 class Polar2Cartesian(CoordinateMapperFn):
     """
-    Maps from polar (radius,angle) to cartesian coordinates.
+    Map from polar (radius,angle) to Cartesian coordinates.
     """
 
-    degrees = BooleanParameter(
-        default=True,
-        doc="Indicates whether the input angle is in degrees or radians."
-        )
+    degrees=BooleanParameter(default=True,
+        doc="Indicates whether the input angle is in degrees or radians.")
 
     def __call__(self, r, theta):
 
@@ -77,9 +74,10 @@ class Polar2Cartesian(CoordinateMapperFn):
 
             return r*cos(theta), r*sin(theta)
                           
+
 class Cartesian2Polar(CoordinateMapperFn):
     """
-    Maps from cartesian (x,y) to polar (radius,angle).
+    Maps from Cartesian (x,y) to polar (radius,angle).
     """
 
     degrees = BooleanParameter(default=True,
@@ -116,17 +114,15 @@ class AffineTransform(CoordinateMapperFn):
     of translation, rotation and scaling via a transform
     matrix. Single translations, etc, can be specified more simply
     with the subclasses Translate2d, Rotate2d, and Scale2d.
-
     """
     
-    matrix = Parameter(default=ones((3,3)),
-
-       doc="""The affine transformation matrix.  The functions
+    matrix = Parameter(default=ones((3,3)),doc="""
+       The affine transformation matrix.  The functions
        Translate2dMat, Rotate2dMat, and Scale2dMat generate affine
        transform matrices that can be multiplied together to create
-       combination transforms.  E.g. the matrix
+       combination transforms.  E.g. the matrix::
 
-       Translate2dMat(3,0)*Rotate2d(pi/2)
+         Translate2dMat(3,0)*Rotate2d(pi/2)
 
        will shift points to the right by 3 units and rotate them around
        the origin by 90 degrees.""")
@@ -138,10 +134,8 @@ class AffineTransform(CoordinateMapperFn):
         self._op_buf = matrix([[0.0],
                                [0.0],
                                [1.0]])
-                               
         
     def __call__(self, x, y):
-
 
         ## JPHACKALERT: If the coordmapper interface took a matrix of
         ## x/y column vectors, instead of x and y separately, affine
@@ -161,6 +155,7 @@ class AffineTransform(CoordinateMapperFn):
                
         return result[0,0],result[1,0]
 
+
 def Translate2dMat(xoff,yoff):
     """
     Return an affine transformation matrix that translates points by
@@ -170,6 +165,7 @@ def Translate2dMat(xoff,yoff):
                    [0, 1, yoff],
                    [0, 0,   1 ]])
 
+
 def Rotate2dMat(t):
     """
     Return an affine transformation matrix that rotates the points
@@ -178,6 +174,7 @@ def Rotate2dMat(t):
     return matrix([[cos(t), -sin(t), 0],
                    [sin(t),  cos(t), 0],
                    [  0   ,    0   , 1]])
+
 
 def Scale2dMat(sx,sy):
     """
@@ -201,6 +198,7 @@ class Translate2d(AffineTransform):
         super(Translate2d,self).__init__(**kw)
         self.matrix = Translate2dMat(self.xoff,self.yoff)
 
+
 class Rotate2d(AffineTransform):
     """
     Rotate the input around the origin by an angle in radians.
@@ -211,9 +209,10 @@ class Rotate2d(AffineTransform):
         super(Rotate2d,self).__init__(**kw)
         self.matrix = Rotate2dMat(self.angle)
 
+
 class Scale2d(AffineTransform):
     """
-    Scale the input along the x and y axes by sx an sy, respectively.
+    Scale the input along the x and y axes by sx and sy, respectively.
     """
     sx = Number(default=1.0)
     sy = Number(default=1.0)
@@ -221,7 +220,6 @@ class Scale2d(AffineTransform):
     def __init__(self,**kw):
         super(Scale2d,self).__init__(**kw)
         self.matrix = Scale2dMat(self.sx,self.sy)
-
 
 
 class SingleDimensionMapper(CoordinateMapperFn):
@@ -239,9 +237,8 @@ class SingleDimensionMapper(CoordinateMapperFn):
     out_range = Number(default=0.5*sqrt(2),bounds=(0,None), doc="""
        The maximum range of the output.""")
     remap_dimension = Enumeration(default='radius',
-                                  available=['radius','x','y','xy'],
-                                  doc="""
-        The dimension to remap. ('xy' remaps x and y independently)""")
+        available=['radius','x','y','xy'],doc="""
+        The dimension to remap. ('xy' remaps x and y independently.)""")
 
 
     def __call__(self,x,y):
@@ -274,7 +271,8 @@ class MagnifyingMapper(SingleDimensionMapper):
     Exponential (magnifying) mapping function.
 
     Provides a mapping that magnifies the center of the activity image. 
-    Parameter k indicates amount of magnification, k = 0 means no magnification,
+    Parameter k indicates amount of magnification, where 0 means no
+    magnification.
     """
     
     k = Number(default=1.0,bounds=(0,None))
@@ -292,7 +290,7 @@ class ReducingMapper(SingleDimensionMapper):
     """
     Provides a mapping that reduces the center of the activity.
 
-    Roughly the inverse of Magnifying Mapper.  k indicates amount of reduction.    
+    Roughly the inverse of MagnifyingMapper.  k indicates amount of reduction.    
     """
     k = Number(default=1.0,bounds=(0,None))
     
@@ -311,7 +309,7 @@ class OttesSCMapper(CoordinateMapperFn):
     
     Default constant values are from Table 1, ibid.  
     """
-    __abstract_class = "OttesSCMapper"
+    _abstract_class_name = "OttesSCMapper"
 
     
     A = Number(default=5.3, doc="""
@@ -339,6 +337,7 @@ class OttesSCMapper(CoordinateMapperFn):
 
     def __call__(self,x,y):
         raise NotImplementedError        
+
 
 class OttesSCMotorMapper(OttesSCMapper):
     """
@@ -378,12 +377,12 @@ class OttesSCSenseMapper(OttesSCMapper):
     both colliculi, one in the x-positive hemisheet and the other in
     the x-negative hemisheet.
 
-    [NOTE: see warning in docs for ottes_inverse_mapping()]
+    [NOTE: see warning in docs for ottes_inverse_mapping().]
     """
 
     def __call__(self,x,y):
 
-        A = self.A 
+        A  = self.A 
         Bu = self.Bu 
         Bv = self.Bv 
 
@@ -405,13 +404,15 @@ def ottes_mapping(R,phi,A,Bu,Bv):
 
     Takes saccade with amplitude R (in degrees) and direction
     phi (in degrees), and returns a location u,v on the colliculus
-    in mm, where the u axis is rostral/caudal, and the v axis  is
+    in mm, where the u axis is rostral/caudal, and the v axis is
     medial/lateral.
     """
+    
     phi *= pi/180
     u = Bu * (log(sqrt(R**2 + A**2 + 2*A*R*cos(phi))) - log(A))
     v = Bv * atan((R*sin(phi))/(R*cos(phi)+A))        
     return u,v
+
 
 def ottes_inverse_mapping(u,v,A,Bu,Bv):
     """
