@@ -440,8 +440,13 @@ def test_ottes_inverse():
 
     A,Bu,Bv = 5.3,1.8,1.8
 
-    for r in range(=60,60,10):
+    print '%10s %10s | %10s %10s | %10s %10s | %s' \
+          % ('R in','phi in','R out','phi out','R err','phi err','phi ratio')
+    for r in range(10,60,10):
         for phi in range(-60,60,10):
-            u,v = ottes_mapping(r,phi,A,Bu,Bv)
-            r2,phi2 = ottes_inverse_mapping(u,v,A,Bu,Bv)
-            print "In:", (r,phi), "Out:",  (r2,phi2),"Error:", (r2-r,phi2-phi), "Direction ratio:", phi/phi2
+            if  phi != 0:
+                u,v = ottes_mapping(r,phi,A,Bu,Bv)
+                r2,phi2 = ottes_inverse_mapping(u,v,A,Bu,Bv)
+                print '%10.2f %10.2f | %10.2f %10.2f | %10.2f %10.2f | %.2f' \
+                      % (r,phi,r2,phi2,r2-r,phi2-phi,phi/phi2)
+
