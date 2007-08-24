@@ -33,7 +33,11 @@ There are also discussion forums (web boards) and item trackers available:
 <DD>Forum for discussion of Windows-specific issues related to Topographica.</DD>
 
 <P><DT><A HREF="http://sourceforge.net/tracker/?group_id=53602&atid=470929">Bug reports</A></DT>
-<DD>Please file bug reports using this interface rather than emailing the developers directly.
+<DD>Please file bug reports using this interface rather than emailing
+  the developers directly.  For information on how to track down
+  problems and how to file effective bug reports, please see the
+  <A HREF="../User_Manual/problems.html">Problems</A> section of the
+  user manual. 
 
 <P><DT><A HREF="http://sourceforge.net/tracker/?group_id=53602&atid=470932">Request for enhancement</A></DT>
 <DD>If you have ideas for features you would like to see, please enter them here.
