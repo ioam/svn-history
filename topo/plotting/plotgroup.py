@@ -58,7 +58,8 @@ class PlotGroup(ParameterizedObject):
     # listparameter
     #plot_list = Parameter(default=[],instantiate=True)
 
-    cmd_location = Parameter(default=__main__.__dict__)
+    cmd_location = Parameter(default=__main__.__dict__,doc="""
+    Namespace in which to execute the update_command and plot_command.""")
 
     update_command = Parameter(default="",doc="""
     Command to execute before updating this plot, e.g. to calculate sheet views.
