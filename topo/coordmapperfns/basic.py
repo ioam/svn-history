@@ -416,22 +416,32 @@ def ottes_mapping(R,phi,A,Bu,Bv):
 
 def ottes_inverse_mapping(u,v,A,Bu,Bv):
     """
-    The inverse funtion provided in the appendix of Ottes et al. (1986)
-    Vision Research 26:857-873
+    Approximate inverse of ottes_mapping(), using the inverse function
+    provided in the appendix of Ottes et al. (1986) Vision Research 26:857-873
 
-    Supposedly takes a location u,v on the colliculus in mm and maps
+    Takes takes a location u,v on the colliculus in mm and maps
     to a retinal eccentricity R and direction phi, in degrees.
-    However, this function is not actually the mathematical inverse of
-    the forward mapping, nor even close.  
+    Inverse is approximate, with increasing error as positions near the
+    edges of the collicular sheet. (I.e. with high absolute v value).
     """
-    # JPALERT: As mentioned above, this is not actually the inverse of
-    # the efferent mapping. I believe the formula in the paper is
-    # in error, though it's possible that there's a bug below that
-    # I've missed.
     
     rads = pi/180
     R   = A * sqrt(exp(2*u/Bu) - 2*exp(u/Bu)*cos(rads*v/Bv) + 1)
-    phi = atan( (exp(u/Bu)*sin(rads*v/Bv)) / (exp(u/Bu)*cos(rads*v/Bv) -1) )
+    #phi = atan( (exp(u/Bu)*sin(rads*v/Bv)) / (exp(u/Bu)*cos(rads*v/Bv) -1) )
+    phi = atan2( (exp(u/Bu)*sin(rads*v/Bv)), (exp(u/Bu)*cos(rads*v/Bv) -1) ) * 180/pi
+
+    # JPALERT: Don't know why we have to multiply by 180/pi twice, but the answers
+    # are way off without it.  Is the bug in my code, or in the original formula?
     return R,phi*180/pi
                  
 
+# JPALERT: Temporary testing function.  Will disappear eventually.
+def test_ottes_inverse():
+
+    A,Bu,Bv = 5.3,1.8,1.8
+
+    for r in range(=60,60,10):
+        for phi in range(-60,60,10):
+            u,v = ottes_mapping(r,phi,A,Bu,Bv)
+            r2,phi2 = ottes_inverse_mapping(u,v,A,Bu,Bv)
+            print "In:", (r,phi), "Out:",  (r2,phi2),"Error:", (r2-r,phi2-phi), "Direction ratio:", phi/phi2
