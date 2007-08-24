@@ -427,12 +427,12 @@ class ParameterizedObjectMetaclass(type):
 
     def __is_abstract(self):
         """
-        Return True if this class has an __abstract_class_name attribute,
+        Return True if this class has an _abstract_class_name attribute,
         and it's equal to this class' __name__. Otherwise, return False.
 
         Allows detection of abstract classes, since a concrete subclass
         of an abstract class will have a name not equal to the
-        __abstract_class_name.
+        _abstract_class_name.
         """
         if hasattr(self,'_abstract_class_name') and self.__name__==self._abstract_class_name:
             return True
