@@ -129,22 +129,12 @@ def histogramplot(data,title=None,colors=None,*args,**kw):
 def gradientplot(data,title=None):
     """
     Compute and show the gradient plot of the supplied data.
+    Translated from octave code by Yoonsuck Choe.
     """
-    # CB: very direct translation of some octave code.
-    # Consider division by zero?
     r,c = data.shape
-    dx = numpy.diff(data,1)
-    dx = dx[1:r-1,1:c-1]
-    x = dx.min()
-    y = dx.max()
-
-    dx = ((dx-x)/(y-x)-0.5)*2.0
-
-    dy=numpy.diff(data.transpose(),1)
-    dy=dy[1:r-1,1:c-1]
-    x=dy.min()
-    y=dy.max()
-    dy=((dy-x)/(y-x)-0.5)*2.0
+    dx = numpy.diff(data,1,axis=1)[0:r-1,0:c-1]
+    dy = numpy.diff(data,1,axis=0)[0:r-1,0:c-1]
+    
     matrixplot((cos(dx*2*pi)+cos(dy*2*pi)),title=title)
     
 
