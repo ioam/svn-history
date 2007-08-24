@@ -580,6 +580,8 @@ class TopoConsole(TkguiWindow):
         if snapshot_name in ('',(),None):
             self.messageBar.message('state','No snapshot loaded.')
         else:
+            self.messageBar.message('state', 'Loading snapshot (may take some time)...')
+            self.update_idletasks()            
             topo.commands.basic.load_snapshot(snapshot_name)
             self.messageBar.message('state', 'Loaded snapshot ' + snapshot_name)
 
