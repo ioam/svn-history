@@ -25,13 +25,13 @@ import pylab
 import re, os
 import copy
 
-from numpy.oldnumeric import arange, cos, pi, array, transpose, argmax, argmin
+from numpy.oldnumeric import arange, sqrt, pi, array, floor, transpose, argmax, argmin
 
 import topo
 
 from topo.base.arrayutils import octave_output
 from topo.base.sheet import Sheet
-from topo.misc.utils import frange
+from topo.base.arrayutils import wrap
 
 
 
@@ -126,16 +126,29 @@ def histogramplot(data,title=None,colors=None,*args,**kw):
     pylab.show()
 
 
-def gradientplot(data,title=None):
+def gradientplot(data,cyclic=True,cyclic_range=1.0,title=None):
     """
     Compute and show the gradient plot of the supplied data.
-    Translated from octave code by Yoonsuck Choe.
+    Translated from Octave code by Yoonsuck Choe.
+
+    If the data is specified to be cyclic, negative differences will
+    be wrapped into the range specified (1.0 by default).
     """
     r,c = data.shape
     dx = numpy.diff(data,1,axis=1)[0:r-1,0:c-1]
     dy = numpy.diff(data,1,axis=0)[0:r-1,0:c-1]
-    
-    matrixplot((cos(dx*2*pi)+cos(dy*2*pi)),title=title)
+
+    if cyclic: # Wrap into the specified range
+        # Convert negative differences to an equivalent positive value
+        dx = wrap(0,cyclic_range,dx)
+        dy = wrap(0,cyclic_range,dy)
+        #
+        # Make it increase as gradient reaches the halfway point,
+        # and decrease from there
+        dx = 0.5*cyclic_range-abs(dx-0.5*cyclic_range)
+        dy = 0.5*cyclic_range-abs(dy-0.5*cyclic_range)
+
+    matrixplot(sqrt(dx*dx+dy*dy),title=title)
     
 
 def activityplot(sheet,activity=None,title=None,cmap=pylab.cm.Greys):    
