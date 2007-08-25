@@ -2,7 +2,7 @@
 
 <P>As a convention, problematic areas of the code have been marked
 with comments containing the text <CODE>ALERT</CODE> or
-<CODE>HACKALERT</CODE>, usually prefixed with the initials of the
+<CODE>ERRORALERT</CODE>, usually prefixed with the initials of the
 person who wrote the alert.  These comments help clarify how the code
 should look when it is fully polished, and act as our to-do list.
 They also help prevent poor programming style from being propagated to
@@ -12,8 +12,8 @@ other parts of the code before we have a chance to correct it.
 to fix the problem should add an alert for it.  The alert must
 specifically describe what the problem is and how it could be
 corrected (if known). If the problem is serious, especially if it may
-affect any results seen by the users, it should be labeled a
-HACKALERT.  Less serious issues, such as those primarily affecting
+affect any results seen by the users, it should be labeled an
+ERRORALERT.  Less serious issues, such as those primarily affecting
 code readability, future maintainability, and generality, should be
 labeled an ALERT.
 
