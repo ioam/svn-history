@@ -15,7 +15,6 @@ step-by-step explanations in the tutorials.
 <A HREF="plotting.html">Plotting and visualization</A><BR>
 <A HREF="modeleditor.html">Graphical model editor</A><BR>
 <A HREF="publishing.html">Publishing results from Topographica</A><BR>
-<A HREF="problems.html">Reporting problems with Topographica</A><BR>
 <A HREF="about.html">About Topographica</A><BR>
 
 <P>Please note that the user manual is not a complete reference to all
