@@ -82,10 +82,10 @@ want to suppress the warning entirely you can do option 1.
 <LI><B>Q:</B> <i>I think I've found a problem with Topographica. What should
   I do now?</i>
 
-<P><B>A:</B>
+<P><B>A:</B> 
 Topographica is continuously changing to support active research, so
 problems can occur. To be sure you have found a problem with
-Topographica, and to help us fix it quickly, please follow our
+Topographica itself, and to help us fix it quickly, please follow our
 guidelines for <a href="../Forums/problems.html">Reporting specific
 problems with Topographica</a>.
   
