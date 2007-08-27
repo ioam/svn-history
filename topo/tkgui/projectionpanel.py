@@ -54,7 +54,7 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
     """
     Abstract base class for panels relating to ProjectionSheets.
     """
-    # CB: abstract
+    _abstract_class_name = "ProjectionSheetPGPanel"
 
     plotgroup_type = ProjectionSheetPlotGroup
     sheet_type = ProjectionSheet
@@ -132,27 +132,24 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
     # CEBHACKALERT! Back and Fwd buttons don't work.
    
 
+
 class CFPGPanel(ProjectionSheetPGPanel):
     """
-    Existence is dedicated to...a situate button! 
+    Special type of ProjectionSheetPGPanel that supports a situate button.
     """
-    # CB: declare abstract
 
     sheet_type = CFSheet
     plotgroup_type = CFPlotGroup
-    
+    _abstract_class_name = "CFPGPanel"
+
     def __init__(self,console,master,pgt,**params):
         super(CFPGPanel,self).__init__(console,master,pgt,**params)
-        self.min_master_zoom = 1
         self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change)
 
-# CEBALERT: can't this be simplified? what's min_master_zoom?
     def situate_change(self):
         if self.situate:
             self.plotgroup.initial_plot=True
-            self.plotgroup.height_of_tallest_plot = self.min_master_zoom = 1
-        else:
-            pass
+            self.plotgroup.height_of_tallest_plot = 1
         self.redraw_plots()
 
 
