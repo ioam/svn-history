@@ -644,7 +644,18 @@ class TkParameterizedObject(TkParameterizedObjectBase):
                 w = self.representations[param_name]['widget']
                 help_text =  getdoc(self.string2object_ifrequired(param_name,
                                                                   self._tk_vars[param_name]._original_get()))
-                self.balloon.bind(w,help_text)
+
+
+                ######################################################
+                # CEBALERT: for projectionpanel, which currently has
+                # to destroy a widget (because Tkinter.OptionMenu's
+                # list of choices cannot easily be replaced). See ALERT
+                # 'How do you change list [...]' in projectionpanel.py.
+                try:
+                    self.balloon.bind(w,help_text)
+                except _tkinter.TclError:
+                    pass
+                ######################################################
 
             except (AttributeError,KeyError):  # could be called before self.representations exists,
                                                # or before param in _tk_vars dict
@@ -670,7 +681,6 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         
         # (a refresh-the-widgets-on-focus-in method could make the gui
         # in sync with the actual object?)
-
 
         
 
