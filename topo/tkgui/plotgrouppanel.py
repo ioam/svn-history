@@ -386,7 +386,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
     # CEBALERT: use one method w/ update arg for these two.
     def update_plots(self):
-        # shouldn't call this from within history unless you've copied the plotgroup (as in redresh)
+        # shouldn't call this from within history unless you've copied the plotgroup (as in refresh)
         
         #assert self.history_index==0,"Programming error: can't update plotgroup while looking in history." # (never update plots in the history, or they go to current activity)
 
@@ -682,32 +682,19 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
       
 
     def reduce_plots(self):
-        """Function called by Widget to reduce the plot size"""
-        new_height = self.plotgroup.height_of_tallest_plot / self.zoom_factor
-        if new_height < self.plotgroup.minimum_height_of_tallest_plot:
+        """Function called by widget to reduce the plot size, when possible."""
+        if (not self.plotgroup.scale_images(1.0/self.zoom_factor)):
             self.representations['Reduce']['widget']['state']=DISABLED
-        else:
-            self.change_plot_sizes(new_height)
-
-
-    def enlarge_plots(self):
-        """Function called by Widget to increase the plot size"""
-        new_height = self.plotgroup.height_of_tallest_plot * self.zoom_factor
-        self.representations['Reduce']['widget']['state']=NORMAL
-        self.change_plot_sizes(new_height)
-
-        
-    def change_plot_sizes(self,new_height):
-        """Set the plots to have a new maximum height"""
-        self.plotgroup.height_of_tallest_plot = new_height
-        if self.history_index!=0:
-            self.plotgroup.scale_images()
-        else:
-            self.redraw_plots() #update_plots(False)
-            
+        self.representations['Enlarge']['widget']['state']=NORMAL
         self.display_plots()
 
-
+    def enlarge_plots(self):
+        """Function called by widget to increase the plot size, when possible."""
+        self.plotgroup._make_plots() # JABALERT: Temporary -- Why is this necessary to get decent enlarged Projection plots?
+        if (not self.plotgroup.scale_images(self.zoom_factor)):
+            self.representations['Enlarge']['widget']['state']=DISABLED
+        self.representations['Reduce']['widget']['state']=NORMAL
+        self.display_plots()
 
 
 ####################### HISTORY METHODS ##########################         
@@ -719,7 +706,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
     def update_widgets(self):
         """
-        The plotgroup's non-history widgets are all irrelevent when the plotgroup's from
+        The plotgroup's non-history widgets are all irrelevant when the plotgroup's from
         history.
         """
         if self.history_index!=0: 
