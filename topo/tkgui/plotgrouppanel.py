@@ -690,7 +690,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
     def enlarge_plots(self):
         """Function called by widget to increase the plot size, when possible."""
-        self.plotgroup._make_plots() # JABALERT: Temporary -- Why is this necessary to get decent enlarged Projection plots?
         if (not self.plotgroup.scale_images(self.zoom_factor)):
             self.representations['Enlarge']['widget']['state']=DISABLED
         self.representations['Reduce']['widget']['state']=NORMAL

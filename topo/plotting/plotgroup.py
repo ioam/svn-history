@@ -718,7 +718,7 @@ class CFProjectionPlotGroup(CFPlotGroup):
 		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(matrix_max_height))
                     # diff 2 (missing enforced min scaling_factor)
 
-	    plot.bitmap.image = plot.bitmap.zoom(scaling_factor) # diff 3 [plot.rescale(scaling_factor)]
+	    plot.rescale(scaling_factor)
 
         return True
 
