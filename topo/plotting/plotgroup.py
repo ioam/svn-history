@@ -685,43 +685,6 @@ class CFProjectionPlotGroup(CFPlotGroup):
         return coords
 
 
-    ## CEBALERT: very similar to XPlotGroup's (marked by "diff"s)
-    def scale_images(self,zoom_factor=None):
-        if self.initial_plot:
-            self._calculate_minimum_height_of_tallest_plot()
-            
-        if zoom_factor:
-            new_height = self.height_of_tallest_plot * zoom_factor
-            # Currently enforces only a minimum, but could enforce maximum height
-            if new_height >= self.minimum_height_of_tallest_plot:
-                self.height_of_tallest_plot = new_height
-            else:
-                return False
-
-	    ### JCALERT: here we should take the plot bounds instead of the sheet one (id in set_height_of..)?
-
-        resizeable_plots = [p for p in self.plots if p.resize]
-        if resizeable_plots:
-            max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
-                                     -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
-                                    for p in resizeable_plots])
-            matrix_max_height = max([p.bitmap.height() for p in resizeable_plots]) # diff 1 (addition)
-
-	for plot in self.plots:
-            if not plot.resize:
-                scaling_factor = 1
-            else:
-		if self.sheet_coords:		   
-                    s = topo.sim.objects(Sheet).get(plot.plot_src_name,None)
-		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(s.xdensity)/max_sheet_height)
-		else:
-		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(matrix_max_height))
-                    # diff 2 (missing enforced min scaling_factor)
-
-	    plot.rescale(scaling_factor)
-
-        return True
-
     def _ordering_plots(self):
 	"""Skips plot sorting for Projections to keep the units in order."""
 	pass
