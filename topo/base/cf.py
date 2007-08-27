@@ -805,10 +805,10 @@ class CFProjection(Projection):
         return self._cfs[r][c]
 
 
-    def get_view(self,sheet_x, sheet_y, timestamp):
+    def get_view(self, sheet_x, sheet_y, timestamp):
         """
         Return a single connection field UnitView, for the unit
-        located at sheet coordinate (sheet_x,sheet_y).
+        located nearest to sheet coordinate (sheet_x,sheet_y).
         """
 	matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)
         (r,c) = self.dest.sheet2matrixidx(sheet_x,sheet_y)
