@@ -251,8 +251,7 @@ class XPlotGroup(PlotGroup):
         super(XPlotGroup,self).__init__(**params)
 
         # Enforce a minimum plot height for the tallest plot of the PlotGroup.
-        self.INITIAL_PLOT_HEIGHT = 150
-        self.height_of_tallest_plot = 1.0
+        self.height_of_tallest_plot = 150.0
         self.minimum_height_of_tallest_plot = 1.0
 
 
@@ -352,10 +351,8 @@ class XPlotGroup(PlotGroup):
 ##             max_height = max(sheet_max_height,matrix_max_height)
             max_height = matrix_max_height
             self.minimum_height_of_tallest_plot = max_height
-            if (max_height >= self.INITIAL_PLOT_HEIGHT):
+            if (max_height >= self.height_of_tallest_plot):
                 self.height_of_tallest_plot = max_height
-            else:   
-                self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
             self.initial_plot=False
 ######################################################################
 
@@ -610,7 +607,7 @@ class CFProjectionPlotGroup(CFPlotGroup):
 
     def __init__(self,**params):
         super(CFProjectionPlotGroup,self).__init__(**params)
-        self.INITIAL_PLOT_HEIGHT = 5
+        self.height_of_tallest_plot = 5 # Initial value
         
         ### JCALERT! shape determined by the plotting density
         ### This is set by self.generate_coords()
