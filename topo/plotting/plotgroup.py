@@ -150,8 +150,6 @@ class PlotGroup(ParameterizedObject):
     def update_plots(self):
         self.draw_plots(update=True)
 
-
-
     def _make_plots(self):
         """
         Generate the sorted and scaled list of plots constituting the PlotGroup.
@@ -271,18 +269,33 @@ class XPlotGroup(PlotGroup):
 	    self.scale_images()
 
 
-    def scale_images(self):
+    def scale_images(self,zoom_factor=None):
         """
-        Enlarge the bitmaps as needed for display.
+        Enlarge or reduce the bitmaps as needed for display.
+
+        The calculated sizes will be multiplied by the given
+        zoom_factor, if it is not None.
+        
+        Returns True if the plots were scaled, and otherwise False
+        (e.g. if the scaled sizes are outside the allowed range).
         """
         ### JABALERT: Should this be done by the GUI instead, without changing the bitmaps?
         
         ### JCALERT: that cannot be in the constructor for the moment, because when creating the 
  	### panel, there is no PlotGroup assigned to it... It will change when all will be inserted 
  	### in the PlotGroup (i.e scale_image, set_initial_master_zoom, compute_max_height...)
+
         if self.initial_plot:
             self._calculate_minimum_height_of_tallest_plot()
             
+        if zoom_factor:
+            new_height = self.height_of_tallest_plot * zoom_factor
+            # Currently enforces only a minimum, but could enforce maximum height
+            if new_height >= self.minimum_height_of_tallest_plot:
+                self.height_of_tallest_plot = new_height
+            else:
+                return False
+
         ### JCALERT: here we should take the plot bounds instead of the sheet one (id in set_height_of..)?
         resizeable_plots = [p for p in self.plots if p.resize]
         if resizeable_plots:
@@ -306,6 +319,8 @@ class XPlotGroup(PlotGroup):
                         scaling_factor=1
                     
 	    plot.rescale(scaling_factor)
+
+        return True
 
 
     def _calculate_minimum_height_of_tallest_plot(self):
@@ -671,10 +686,18 @@ class CFProjectionPlotGroup(CFPlotGroup):
 
 
     ## CEBALERT: very similar to XPlotGroup's (marked by "diff"s)
-    def scale_images(self):
+    def scale_images(self,zoom_factor=None):
         if self.initial_plot:
             self._calculate_minimum_height_of_tallest_plot()
             
+        if zoom_factor:
+            new_height = self.height_of_tallest_plot * zoom_factor
+            # Currently enforces only a minimum, but could enforce maximum height
+            if new_height >= self.minimum_height_of_tallest_plot:
+                self.height_of_tallest_plot = new_height
+            else:
+                return False
+
 	    ### JCALERT: here we should take the plot bounds instead of the sheet one (id in set_height_of..)?
 
         resizeable_plots = [p for p in self.plots if p.resize]
@@ -697,6 +720,7 @@ class CFProjectionPlotGroup(CFPlotGroup):
 
 	    plot.bitmap.image = plot.bitmap.zoom(scaling_factor) # diff 3 [plot.rescale(scaling_factor)]
 
+        return True
 
     def _ordering_plots(self):
 	"""Skips plot sorting for Projections to keep the units in order."""
