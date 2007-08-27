@@ -579,7 +579,7 @@ class CFProjectionPlotGroup(CFPlotGroup):
 
     keyname='Weights'
 
-    projection = ObjectSelectorParameter(default=None)
+    projection = ObjectSelectorParameter(default=None,doc="The projection to visualize.")
 
     ### CEBHACKALERT: tkpo gui not setup to read softbounds
     ### JPALERT: The bounds are meaningless for large sheets anyway.  If a sheet
