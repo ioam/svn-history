@@ -108,7 +108,6 @@ class PlotGroup(ParameterizedObject):
         # third row with 4, etc.  The default left-to-right ordering
         # in one row could perhaps be represented as (None, Inf).
         
-	self.initial_plot = True  # CB: what's this?
 	self.time = None
 
         ## CB  import __main__; __main__.__dict__['zzz'] = self
@@ -142,6 +141,9 @@ class PlotGroup(ParameterizedObject):
         if update: self._update_command()
         self._plot_command()
         self._make_plots(update)
+        self._calculate_minimum_height_of_tallest_plot()
+	if self.plots!=[]: # Not sure if test is really needed
+	    self.scale_images()
         
 
     # CB: ** replace calls to these two methods **
@@ -176,7 +178,10 @@ class PlotGroup(ParameterizedObject):
 	self._ordering_plots()	
 	self.generate_labels()
 
-
+    def scale_images(self,zoom_factor=None):
+        """Scale the images by the given zoom factor, if appropriate; default is to do nothing."""
+        pass
+    
     def generate_labels(self):
 	""" Function used for generating the labels."""
 	self.labels = []
@@ -260,13 +265,6 @@ class XPlotGroup(PlotGroup):
 ######################################################################
 ### At least some of this scaling would be common to all plotgroups, if
 ### some (e.g. featurecurve) didn't open new windows.
-    def _make_plots(self,update):
-        super(XPlotGroup,self)._make_plots(update)
-        # scaling the Plots
-	### JCALERT: momentary hack        
-	if self.plots!=[]:
-	    self.scale_images()
-
     def scale_images(self,zoom_factor=None):
         """
         Enlarge or reduce the bitmaps as needed for display.
@@ -283,9 +281,6 @@ class XPlotGroup(PlotGroup):
  	### panel, there is no PlotGroup assigned to it... It will change when all will be inserted 
  	### in the PlotGroup (i.e scale_image, set_initial_master_zoom, compute_max_height...)
 
-        if self.initial_plot:
-            self._calculate_minimum_height_of_tallest_plot()
-            
         if zoom_factor:
             new_height = self.height_of_tallest_plot * zoom_factor
             # Currently enforces only a minimum, but could enforce maximum height
@@ -352,7 +347,6 @@ class XPlotGroup(PlotGroup):
             self.minimum_height_of_tallest_plot = max_height
             if (max_height >= self.height_of_tallest_plot):
                 self.height_of_tallest_plot = max_height
-            self.initial_plot=False
 ######################################################################
 
     
