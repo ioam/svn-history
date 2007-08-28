@@ -52,9 +52,9 @@ class Plot(ParameterizedObject):
           self.scale_factor=1.0
           self.plot_src_name = ''
           self.precedence = 0.0
-          # indicate if we should re-size as a topographica plot (using integer)
-          # or if it is a static image that we can re-size without having to worry 
-          # about what a pixel represents.
+          # If False, this plot should be left in its native size
+          # pixel-for-pixel, (e.g. for a color key or similar static
+          # image), rather than being resized as necessary.
           self.resize=False
 
           # Time at which the bitmaps were created
