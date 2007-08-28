@@ -141,7 +141,7 @@ class PlotGroup(ParameterizedObject):
 	"""
         if update: self._update_command()
         self._plot_command()
-        self._make_plots()
+        self._make_plots(update)
         
 
     # CB: ** replace calls to these two methods **
@@ -150,18 +150,18 @@ class PlotGroup(ParameterizedObject):
     def update_plots(self):
         self.draw_plots(update=True)
 
-    def _make_plots(self):
+    def _make_plots(self,update):
         """
         Generate the sorted and scaled list of plots constituting the PlotGroup.
         """
 
         self.plots = [plot for plot in self._plot_list() if plot != None]
 
-        # Suppress plots in the special case of an initial plot that
-        # has no resizable images, to suppress plotgroups that have
-        # nothing but a color key
+        # Suppress plots in the special case of plots not being updated 
+        # and having no resizable images, to suppress plotgroups that
+        # have nothing but a color key
         resizeable_plots = [p for p in self.plots if p.resize]
-        if self.initial_plot and not resizeable_plots:
+        if not update and not resizeable_plots:
             self.plots=[]
 
         # Take the timestamps from the underlying Plots
@@ -260,13 +260,12 @@ class XPlotGroup(PlotGroup):
 ######################################################################
 ### At least some of this scaling would be common to all plotgroups, if
 ### some (e.g. featurecurve) didn't open new windows.
-    def _make_plots(self):
-        super(XPlotGroup,self)._make_plots()
+    def _make_plots(self,update):
+        super(XPlotGroup,self)._make_plots(update)
         # scaling the Plots
 	### JCALERT: momentary hack        
 	if self.plots!=[]:
 	    self.scale_images()
-
 
     def scale_images(self,zoom_factor=None):
         """
