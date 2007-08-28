@@ -54,7 +54,8 @@ similar buttons should be provided.
 </li>
 <li> Next, load the saved network by selecting
 selecting <span class='t_item'>Load snapshot</span> from the
-<span class='t_item'>Simulation</span> menu and selecting <code>examples/lissom_or_20000.typ</code>. This
+<span class='t_item'>Simulation</span> menu and selecting
+<code>lissom_or_20000.typ</code> in the examples/ directory. This
 simulation is a small orientation map, with a 24x24
 retina and a 48x48 V1 with about two million
 synaptic weights. The architecture can be viewed in the <span class='w_title'>Model Editor</span> window (which can be selected from the <span class='t_item'>Simulation</span> menu), but is also shown below:

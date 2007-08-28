@@ -575,7 +575,7 @@ class TopoConsole(TkguiWindow):
         """
         Dialog to load a user-selected snapshot (see topo.commands.basic.load_snapshot() ).
         """
-        snapshot_name = tkFileDialog.askopenfilename(filetypes=SAVED_FILETYPES)
+        snapshot_name = tkFileDialog.askopenfilename(filetypes=SAVED_FILETYPES,initialdir="examples")
 
         if snapshot_name in ('',(),None):
             self.messageBar.message('state','No snapshot loaded.')

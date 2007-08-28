@@ -62,7 +62,7 @@ similar buttons should be provided.
 <li> Next, load the saved network by selecting
 selecting <span class='t_item'>Load snapshot</span> from the
 <span class='t_item'>Simulation</span> menu and selecting
-<code>examples/lissom_oo_or_10000.typ</code>. This small orientation
+<code>lissom_oo_or_10000.typ</code> in the examples/ directory. This small orientation
 map simulation should load in a few seconds, with a 54x54
 retina, a 36x36 LGN (composed of one 36x36 OFF channel sheet, and one
 36x36 ON channel sheet), and a 48x48 V1 with about two million 
