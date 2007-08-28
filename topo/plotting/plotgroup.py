@@ -141,7 +141,6 @@ class PlotGroup(ParameterizedObject):
         if update: self._update_command()
         self._plot_command()
         self._make_plots(update)
-        self._calculate_minimum_height_of_tallest_plot()
 	if self.plots!=[]: # Not sure if test is really needed
 	    self.scale_images()
         
@@ -254,10 +253,7 @@ class XPlotGroup(PlotGroup):
  
     def __init__(self,**params):
         super(XPlotGroup,self).__init__(**params)
-
-        # Enforce a minimum plot height for the tallest plot of the PlotGroup.
-        self.height_of_tallest_plot = 150.0
-        self.minimum_height_of_tallest_plot = 1.0
+        self.height_of_tallest_plot = 150.0 # Initial value
 
 
 
@@ -265,6 +261,8 @@ class XPlotGroup(PlotGroup):
 ######################################################################
 ### At least some of this scaling would be common to all plotgroups, if
 ### some (e.g. featurecurve) didn't open new windows.
+
+    ### JABALERT: Should this be done by the GUI instead, without changing the bitmaps?
     def scale_images(self,zoom_factor=None):
         """
         Enlarge or reduce the bitmaps as needed for display.
@@ -275,16 +273,30 @@ class XPlotGroup(PlotGroup):
         Returns True if the plots were scaled, and otherwise False
         (e.g. if the scaled sizes are outside the allowed range).
         """
-        ### JABALERT: Should this be done by the GUI instead, without changing the bitmaps?
         
-        ### JCALERT: that cannot be in the constructor for the moment, because when creating the 
- 	### panel, there is no PlotGroup assigned to it... It will change when all will be inserted 
- 	### in the PlotGroup (i.e scale_image, set_initial_master_zoom, compute_max_height...)
+        # Determine which plot will be the largest, to ensure that
+        # no plot is missing any pixels.
+        resizeable_plots = [p for p in self.plots if p.resize]
+        minimum_height_of_tallest_plot = 1.0
+        if resizeable_plots:
+            # Need to add support for sheet_coords
+##          if self.sheet_coords:		   
+##             max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
+##                               -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
+##                               for p in resizeable_plots])
+##             max_density = max([topo.sim.objects(Sheet)[p.plot_src_name].xdensity
+##                                for p in resizeable_plots])
+##             max_height = max_density*max_sheet_height
+##          else:            
+            max_height = max([p._orig_bitmap.height() for p in self.plots if p.resize])
+            minimum_height_of_tallest_plot = max_height
+            if (max_height >= self.height_of_tallest_plot):
+                self.height_of_tallest_plot = max_height
 
         if zoom_factor:
             new_height = self.height_of_tallest_plot * zoom_factor
             # Currently enforces only a minimum, but could enforce maximum height
-            if new_height >= self.minimum_height_of_tallest_plot:
+            if new_height >= minimum_height_of_tallest_plot:
                 self.height_of_tallest_plot = new_height
             else:
                 return False
@@ -315,41 +327,6 @@ class XPlotGroup(PlotGroup):
 
         return True
 
-
-    def _calculate_minimum_height_of_tallest_plot(self):
-	"""
-        Calculate the size of the plot that will generate the largest bitmap.
-
-        This value is used to set the initial plot heights, and the
-        minimum height to which the plot can be reduced.
-	"""
-        # JCALERT: Should be rewritten more cleanly.
-        # JPALERT: Indeed, since it seems to be wrong.  Plots with
-        # large bounds and low desnity are plotted very large and
-        # can't be reduced.  (E.g. sheet bounds -60 to +60, density =
-        # 1/6)
-        # JPHACKALERT: My changes below are hacks to try to get it to
-        # do something sensible for simulations with large bounds.  We
-        # need to spec out how it _should_ behave first, then rewrite.
-        resizeable_plots = [p for p in self.plots if p.resize]
-        if resizeable_plots:
-##             max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
-##                               -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
-##                               for p in resizeable_plots])
-##             max_density = max([topo.sim.objects(Sheet)[p.plot_src_name].xdensity
-##                                for p in resizeable_plots])
-##             # JPALERT: the max_density and the max_height may come
-##             # from different sheets, it doesn't make sense to multiply them
-##             sheet_max_height = max_density*max_sheet_height
-            matrix_max_height = max([p.bitmap.height() for p in self.plots if p.resize])
-##             max_height = max(sheet_max_height,matrix_max_height)
-            max_height = matrix_max_height
-            self.minimum_height_of_tallest_plot = max_height
-            if (max_height >= self.height_of_tallest_plot):
-                self.height_of_tallest_plot = max_height
-######################################################################
-
-    
 
 
 class TemplatePlotGroup(XPlotGroup):
