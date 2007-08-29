@@ -61,9 +61,6 @@ class PlotGroup(ParameterizedObject):
     the template for this plot, but various arguments can be passed, a modified
     version substituted, etc.""")
 
-    ## CEBHACKALERT
-    command = update_command
-    
     plot_command = StringParameter(default="",doc="""
     Command to execute when updating sheet or coordinate of unit to be plotted
     when the simulator time has not changed.
