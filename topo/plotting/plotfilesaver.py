@@ -58,9 +58,8 @@ class PlotGroupSaver(ParameterizedObject):
         self.plotgroup_label = plotgroup_label
 
 
-    # CB: no need to return PlotGroup, just set self.plotgroup
     def generate_plotgroup(self,**params):
-	return PlotGroup(**params)
+	self.plotgroup = PlotGroup(**params)
 
 
     def strip(self,filename):
@@ -102,9 +101,9 @@ class TemplatePlotGroupSaver(PlotGroupSaver):
         super(TemplatePlotGroupSaver,self).__init__(pgt_name,**params)
 
     def generate_plotgroup(self,**params):
-	return self.plotgroup_class(template=self.pgt,**params)
-
-
+        # CEBALERT: template Parameter stuff needs cleaning (but not just here).
+        params['template'] = self.pgt 
+	self.plotgroup = self.plotgroup_class(**params)
 
 
 class ConnectionFieldsPlotGroupSaver(TemplatePlotGroupSaver):
