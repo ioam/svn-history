@@ -50,9 +50,6 @@ class PlotGroup(ParameterizedObject):
     ### - clean up the doc.
     ### - rewrite the test file.
 
-    # listparameter
-    #plot_list = Parameter(default=[],instantiate=True)
-
     cmd_location = Parameter(default=__main__.__dict__,doc="""
     Namespace in which to execute the update_command and plot_command.""")
 
@@ -84,14 +81,7 @@ class PlotGroup(ParameterizedObject):
         """
         super(PlotGroup,self).__init__(**params)
 
-        # CEBALERT
-        if 'plot_list' in params:
-            self.plot_list = copy.copy(params['plot_list'])
-            #del params['plot_list']
-        else:
-            self.plot_list = []
-        
-	#self.plot_list = plot_list	
+        self.plot_list = []
 	self.labels = [] # List of plot labels
 
         # In the future, it might be good to be able to specify the
