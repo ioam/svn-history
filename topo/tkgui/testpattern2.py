@@ -25,7 +25,6 @@ from topo.base.parameterclasses import BooleanParameter,Number,ClassSelectorPara
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.commands.basic import pattern_present
-from topo.plotting.plotgroup import identity
 
 from topo.misc.keyedlist import KeyedList
 
