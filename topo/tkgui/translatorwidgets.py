@@ -196,7 +196,7 @@ class TaggedSlider(Frame,WidgetTranslator):
         """
         self.__set_slider_from_tag()
         try:
-            # Refresh the PropertiesFrame (if embedded in one)
+            # Refresh the ParametersFrame (if embedded in one)
             self.root.optional_refresh()
         except AttributeError:
             pass
@@ -227,7 +227,7 @@ class TaggedSlider(Frame,WidgetTranslator):
         if not self.__first_slider_command:
             self.__set_tag_from_slider()
             try:
-                # Refresh the PropertiesFrame (if embedded in one)
+                # Refresh the ParametersFrame (if embedded in one)
                 self.root.optional_refresh()
             except AttributeError:
                 pass
@@ -337,7 +337,7 @@ class TaggedSlider2(Frame):
         """
         self.__set_slider_from_tag()
         try:
-            # Refresh the PropertiesFrame (if embedded in one)
+            # Refresh the ParametersFrame (if embedded in one)
             self.master.optional_refresh()
         except AttributeError:
             pass
