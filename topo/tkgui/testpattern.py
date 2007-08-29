@@ -36,8 +36,6 @@ import topo.base.sheetview
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.commands.basic import pattern_present
-from topo.plotting.plotgroup import identity
-
 from topo.misc.keyedlist import KeyedList
 
 import parametersframe
@@ -334,12 +332,9 @@ Each type will have various parameters that can be changed.""")
 	new_plotgroup = self.generate_plotgroup() #topo.plotting.plotgroup.PlotGroup(plot_list)
         new_plotgroup.plot_list = plot_list
 	new_plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot
-	new_plotgroup.initial_plot = self.plotgroup.initial_plot
 	new_plotgroup.sheet_coords = self.plotgroup.sheet_coords
 	new_plotgroup.integer_scaling = self.plotgroup.integer_scaling
-	new_plotgroup.sizeconvertfn = self.plotgroup.sizeconvertfn
 	new_plotgroup.normalize = self.plotgroup.normalize
-	new_plotgroup.minimum_height_of_tallest_plot = self.plotgroup.minimum_height_of_tallest_plot
 	new_plotgroup.time = topo.sim.time()
 
 	self.plotgroup = new_plotgroup
@@ -363,10 +358,6 @@ Each type will have various parameters that can be changed.""")
     ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
     def set_integer_scaling(self):
         """Function called by Widget when check-box clicked"""
-        if self.integer_scaling:#.get():
-            self.plotgroup.sizeconvertfn = int
-        else:
-            self.plotgroup.sizeconvertfn = identity
 	self.refresh()
 
 
