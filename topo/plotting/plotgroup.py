@@ -105,7 +105,7 @@ class PlotGroup(ParameterizedObject):
         
 	self.time = None
 
-        ## CB  import __main__; __main__.__dict__['zzz'] = self
+
 
 
     def _plot_command(self):
@@ -134,7 +134,7 @@ class PlotGroup(ParameterizedObject):
 	"""
         if update: self._update_command()
         self._plot_command()
-        self._make_plots(update)
+        self._create_images(update)
         self.scale_images()
         
 
@@ -144,8 +144,8 @@ class PlotGroup(ParameterizedObject):
     def update_plots(self):
         self.draw_plots(update=True)
 
-    # CB/JAB: rename to _create_images()
-    def _make_plots(self,update):
+
+    def _create_images(self,update):
         """
         Generate the sorted and scaled list of plots constituting the PlotGroup.
         """
@@ -168,7 +168,7 @@ class PlotGroup(ParameterizedObject):
                 self.warning("Combining Plots from different times (%s,%s)" %
                              (min(timestamps),max(timestamps)))
 
-	self._ordering_plots()	
+	self._sort_plots()	
 	self.generate_labels()
 
     def scale_images(self,zoom_factor=None):
@@ -182,8 +182,7 @@ class PlotGroup(ParameterizedObject):
 	    self.labels.append(plot.plot_src_name + '\n' + plot.name)
 
 
-    # CB/JAB: rename to _sort_plots
-    def _ordering_plots(self):
+    def _sort_plots(self):
 	"""
 	Function called to sort the Plots in order.
 	They are ordered according to their precedence number first, and then by alphabetical order.
@@ -663,7 +662,7 @@ class CFProjectionPlotGroup(CFPlotGroup):
         return coords
 
 
-    def _ordering_plots(self):
+    def _sort_plots(self):
 	"""Skips plot sorting for Projections to keep the units in order."""
 	pass
 
