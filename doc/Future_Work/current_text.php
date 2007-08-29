@@ -868,6 +868,15 @@ between tests (e.g. by saving/restoring class attributes)?
 
 _________________________________________________________
 
+Some useful links:
+http://scipy.org/Tentative_NumPy_Tutorial
+http://scipy.org/NumPy_for_Matlab_Users
+
+
+
+_________________________________________________________
+
 
 
 -->
+
