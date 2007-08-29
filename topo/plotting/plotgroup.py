@@ -202,13 +202,6 @@ class PlotGroup(ParameterizedObject):
 
 class SheetPlotGroup(PlotGroup):
 
-    # CB/JAB: Remove sheet_type and sheet from this class
-    sheet_type = Sheet
-
-    sheet = ObjectSelectorParameter(default=None,doc="""
-    The Sheet from which to produce plots.
-    If set to None, plots are created for each appropriate Sheet.""") 
-
 
     sheet_coords = BooleanParameter(default=False,doc="""
     Whether to scale plots based on their relative sizes in sheet
@@ -342,7 +335,7 @@ class TemplatePlotGroup(SheetPlotGroup):
     PlotGroup that is built as specified by a PlotGroupTemplate.
     """
 
-    template = Parameter() 
+    template = Parameter()
 
     def __init__(self,**params):
 	super(TemplatePlotGroup,self).__init__(**params)
@@ -357,6 +350,8 @@ class TemplatePlotGroup(SheetPlotGroup):
 	# Add static images to the added_plot_list, as specified by the template.
         self._add_static_images()
 
+    def _sheets(self):
+        return topo.sim.objects(Sheet).values()
 	
     def _plot_list(self):
         """
@@ -367,18 +362,12 @@ class TemplatePlotGroup(SheetPlotGroup):
 
         This function calls create_plots, which is implemented in each
         TemplatePlotGroup subclass.
-        """
-        # CB/JAB: Remove sheet_type and sheet from this class; instead have a mechanism for specifying a list of sheets
-	if self.sheet:
-            sheet_list = [self.sheet]
-	else:
-	    sheet_list = topo.sim.objects(self.sheet_type).values() #self.params()['sheet'].range()  
-   
+        """   
 	plot_list = self.plot_list
         # Loop over all sheets that passed the filter.
         #     Loop over each individual plot template:
         #         Call the create_plots function to create the according plot
-        for each in sheet_list:
+        for each in self._sheets():
 	    for (pt_name,pt) in self.template.plot_templates:
 		plot_list = plot_list + self._create_plots(pt_name,pt,each)
     	return plot_list
@@ -423,10 +412,16 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
     The Sheet from which to produce plots.""")
 
 
+    def _sheets(self):
+        return [self.sheet]
+
     def _update_command(self):
 
-        # CEBALERT: rather than various scattered tests like the one below and for projections in later classes,
-        # have some method (probabably declared in a super class) like "_check_conditions()".
+        # CEBALERT: rather than various scattered tests like the one
+        # below and for projections in later classes, have some method
+        # (probabably declared in a super class) like
+        # "_check_conditions()".
+
         if self.sheet is None: raise ValueError("%s must have a sheet (currently None)."%self)
 	### JCALERT: commands in analysis.py should be re-written to
 	### avoid setting these global parameters.
@@ -477,8 +472,6 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
 
     keyname='ProjectionActivity' 
 
-    # CB/JAB: Remove sheet_type and sheet from superclasses; instead have a mechanism for specifying a list of sheets, and then focus down to one sheet in this class
-        
     ### CEBALERT: very similar to large part of ProjectionSheetPlotGroup's _create_plots
     def _create_plots(self,pt_name,pt,sheet):
 	"""Creates plots as specified by the plot_template."""
