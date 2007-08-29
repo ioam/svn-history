@@ -32,9 +32,10 @@ class PlotGroupTemplate(ParameterizedObject):
     do not *usually* need to be modified.
     """
     
-    command = Parameter("pass",
+    update_command = Parameter("pass",
       doc="Command string to run before plotting, if any.")
-
+    command = update_command # CEBALERT: keep until all references to command are removed
+    
     plot_command=Parameter("pass",
       doc="Command string to run before plotting when no further measurement of responses is required")
 
@@ -85,7 +86,7 @@ class PlotGroupTemplate(ParameterizedObject):
         
           plotgroup_templates['Activity'] =
               PlotGroupTemplate(name='Activity', category='Basic',
-                  command='measure_activity()',
+                  update_command='measure_activity()',
                   plot_templates=[('Activity',
                       {'Strength': 'Activity', 'Hue': 'OrientationPreference', 'Confidence': None})])
     
@@ -102,7 +103,7 @@ class PlotGroupTemplate(ParameterizedObject):
         in the same PlotGroup::
     
           PlotGroupTemplate(name='Orientation Preference', category='Basic'
-              command = 'measure_or_pref()',
+              update_command = 'measure_or_pref()',
               plot_templates=
                   [('Orientation Preference',
                       {'Strength': None, 'Hue': 'OrientationPreference'}),
