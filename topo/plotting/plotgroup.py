@@ -205,6 +205,7 @@ class XPlotGroup(PlotGroup):
 
     sheet_type = Sheet
 
+    # JABALERT: Not currently used; confusing
     sheet = ObjectSelectorParameter(default=None,doc="""
     The Sheet from which to produce plots.
     If set to None, plots are created for each appropriate Sheet.""") 
