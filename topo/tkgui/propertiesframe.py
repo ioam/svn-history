@@ -7,6 +7,11 @@ $Id$
 """
 __version__='$Revision$'
 
+
+# CEBNOTE: no longer used now TkParameterizedObject can be used to
+# represent any Parameter.
+# Seems like this could be useful for non-ParameterizedObjects, but
+# do we want to maintain it?
 from Tkinter import Frame, StringVar, Message, Label, IntVar, N,S,E,W,X, NORMAL, Entry
 from translatorwidgets import TaggedSlider,EntryTranslator,ComboBoxTranslator,CheckbuttonTranslator
 

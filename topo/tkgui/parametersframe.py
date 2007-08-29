@@ -1,484 +1,341 @@
 """
-ParametersFrame class.
+ParametersFrame is allows the display of all non-hidden
 
 
 $Id$
 """
 __version__='$Revision$'
 
+
+# CEBNOTE: now we can consider having something that indicates if a
+# value has changed, and greying out irrelevant buttons (e.g. Apply
+# when there are no differences). Just depends on having a refresh
+# occur at the right time.
+
+# CEBNOTE: e.g. type SheetMask(), get new one every time click Apply.
+# Could stop by overwriting user-typed stuff with actual value, but
+# then we'd lose things like pi hanging around in the
+# display. Alternatively could add SheetMask() to translator
+# dictionary, so no new object would get created for that text for the
+# lifetime of the window, but could be risky - what if someone expects
+# a new one each time?
+
+# CEBERRORALERT: not wiping old widgets and labels from screen when
+# replacing the parameterizedobject!
+
+# CEBALERT: need to catch window close event so it uses the same exit handling
+# as the close button
+
+
+import tkMessageBox
+import Tkinter
+
 from inspect import getdoc
+from Tkinter import Frame, E,W, Label
 
-import __main__
-import Pmw
-from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X, Menu, Label, LEFT
+from topo.base.parameterizedobject import ParameterizedObject, ParameterizedObjectMetaclass
 
+from topo.misc.utils import keys_sorted_by_value
 
-import topo.misc.utils
-from topo.misc.utils import keys_sorted_by_value, dict_translator, eval_atof
-from topo.base.parameterizedobject import ParameterizedObject,ParameterizedObjectMetaclass,classlist
-from topo.base.parameterclasses import Integer,Number,Enumeration,ClassSelectorParameter,BooleanParameter
-
-from propertiesframe import PropertiesFrame
-from translatorwidgets import CheckbuttonTranslator
-from tkguiwindow import TkguiWindow
-
-# CEBALERT:
-# Some things missing from/wrong with ParametersFrame (other than the alerts):
-#
-# - When creating a new Projection, we offer a 'name' field and
-#   allow it to be typed in, but then ignore any text that's been entered.
+from tkguiwindow import Menu,TkguiWindow
+from tkparameterizedobject import TkParameterizedObject, ButtonParameter, parameters
 
 
-# CB: some grouping might improve appearance. Could have a LabelFrame, with the
-# text as the name of self.parameterized_object.
-#
-# Does the order of Apply, Reset, Ok, Cancel match well-known software? If not, it should.
-# Should be some space between e.g. ok & cancel to avoid accidental click on wrong one, etc.
-#
-# go through and fix up documentation.
 
-class ParametersFrame(Frame):
+# CEBALERT: remove the X when ParametersFrame below is renamed.
+class XParametersFrame(TkParameterizedObject,Frame):
     """
-    Frame that displays (and allows alteration of) the Parameters of
-    an associated ParameterizedObject instance or class (via a
-    PropertiesFrame for that ParameterizedObject).
+    ParametersFrame displays representations (widgets) for all the
+    Parameters of a ParameterizedObject.
     """
-    # CEBALERT: should probably be buttons_to_display
-    def __init__(self, parent=None, buttons_to_remove=[], **config):
-        """
-        Create a Frame... with  'Apply', 'Reset', 'Ok', and 'Cancel' buttons.
-        
-        Not all users of ParametersFrames will wish to have all the buttons displayed; buttons
-        can be removed by supplying their names in buttons_to_remove.
-        """
-        self.parent = parent
-        Frame.__init__(self,parent,config)
 
-        # CEBALERT: why do we pass parent rather than self here?
-        # PropertiesFrame has all the 'optional refresh' code, I guess that's why.
-        # Maybe take a look at this when that code is investigated.
-        self.__properties_frame = PropertiesFrame(parent)
+    Defaults = ButtonParameter(doc="Return object's Parameters to class defaults")
 
-        
-        self.__properties_frame.pack(side=TOP,expand=YES,fill=BOTH)
+    Close = ButtonParameter(doc="Close this window")
+
+    def __init__(self,master,PO=None,on_change=None,on_modify=None,**params):        
+        Frame.__init__(self,master)
+
+        self.on_change= on_change
+        self.on_modify = on_modify
+        TkParameterizedObject.__init__(self,master,extraPO=PO,self_first=False,**params)
+
+        self.pframe = Frame(self)
+        self.pframe.pack(side='top',expand='yes',fill='both')
+
+        if PO:self.set_PO(PO,on_change=on_change,on_modify=on_modify)
 
         ### Right-click menu for widgets
         self.option_add("*Menu.tearOff", "0") 
         self.menu = Menu(self)
-        self.menu.insert_command(END, label = 'Properties', command = lambda: 
+        self.menu.insert_command('end', label = 'Properties', command = lambda: 
             self.__edit_PO_in_currently_selected_widget())
 
-        self.__help_balloon = Pmw.Balloon(parent)
-
-        # CEBALERT: to comment (& maybe simplify)
-        self.translator_dictionary = {}
-
-        # The ParameterizedObject instance or class for which this
-        # ParametersFrame displays and alters parameters.
-        self.parameterized_object = None
-
-        # CB: __widgets is actually label/widget pairs, so maybe should rename 
-        self.__widgets = {}
-        self.__visible_parameters = {}
-
-        # The dictionary of parameter_type:property_to_add pairs.
-        self.__parameter_property = {
-            Number: self.__add_numeric_property,
-            Enumeration: self.__add_enumeration_property,
-            BooleanParameter: self.__add_boolean_property,
-            ClassSelectorParameter: self.__add_class_selector_property}
-
-        button_panel = Frame(self)
-        ### Apply, Reset, etc buttons; not displayed on creation but in create_widgets()
-        self.__buttons = {'Apply': Button(button_panel, text='Apply',
-                                          command = self.set_parameters),
-                          'Defaults': Button(button_panel, text='Defaults',
-                                          command= self.__defaults),
-                          'Reset': Button(button_panel, text='Reset',
-                                          command= self.__reset),
-                          'Close': Button(button_panel, text='Close',
-                                           command= self.parent.destroy)} # should display warning if changed
-
-        self.__help_balloon.bind(self.__buttons['Apply'],"Set the object's Parameters to the displayed values.")
-        self.__help_balloon.bind(self.__buttons['Reset'],'Return the displayed values to those currently set on the object.')
-        self.__help_balloon.bind(self.__buttons['Close'],'Close this window, losing any changes that have not been applied.')
-        self.__help_balloon.bind(self.__buttons['Defaults'],"Return the object's Parameters to its class defaults.") # english
-
-        for button in buttons_to_remove:
-            self.__buttons.pop(button)
-
-        button_panel.pack(side=BOTTOM,expand='no',fill='none')
-
-
-
-    def set_parameters(self) :
-        """
-        Set the parameters on the associated ParameterizedObject class or
-        instance to the values specified by the widgets.
+        self._buttons_frame = Frame(self)
+        self._buttons_frame.pack(side='bottom',expand='yes',fill='x')
         
-        For an instance, only sets the values of non-Constant Parameters,
 
-        Only sets a value if the value in the widget is different from the one
-        in the ParameterizedObject. This prevents a local copy of a variable
-        being made into a ParameterizedObject just because the
-        ParameterizedObject is opened in the model editor.
-        """
-        if isinstance(self.parameterized_object,ParameterizedObjectMetaclass):
-            for name in self.__visible_parameters: 
-                # [0] is label (Message), [1] is widget
-                w = self.__widgets[name][1]
+        self.pack_param('Defaults',parent=self._buttons_frame,on_change=self.defaultsB,side='left')
+        Frame(self._buttons_frame,width=20).pack(side='left') # spacer
+        self.pack_param('Close',parent=self._buttons_frame,on_change=self.closeB,side='right')
 
-                if w.get_value()!=getattr(self.parameterized_object,name):
-                    setattr(self.parameterized_object,name,w.get_value())
-
-        elif isinstance(self.parameterized_object,ParameterizedObject):
-            # CEBHACKALERT: name should be a constant Parameter; the
-            # 'or name==...' can be removed when it is.
-            parameters_to_modify = [(name,parameter)
-                                    for (name,parameter)
-                                    in self.__visible_parameters.items()
-                                    if not (parameter.constant==True or name=='name')]
-
-            for (name,parameter) in parameters_to_modify:
-                # [0] is label (Message), [1] is widget
-                w = self.__widgets[name][1]
-
-                if w.get_value()!=getattr(self.parameterized_object,name):
-                    setattr(self.parameterized_object,name,w.get_value())
-
-        else:
-            raise TypeError, "ParameterFrame must be associated with a ParameterizedObject class or instance to set parameters."
+        self.pack(expand='yes',fill='both') # coz the old one did, and callers assume it
 
 
- 
+    def set_parameters(self):
+        # after a while, add something to raise an error and eliminate from callers
+        # (i.e. after cleaning test pattern, won't be needed)
+        pass
+    
+    
 
-    def create_widgets(self, parameterized_object, translator_dictionary={}):
-        """
-        Create widgets for all non-hidden Parameters of parameterized_object and add them
-        to the screen.
+    # CEBALERT: clean this up.
+    def unpack_param(self,param_name):
+        raise NotImplementedError # unfinished (need to remove from list of displayed params)
+        # super(ParametersFrame,self).unpack_param(param_name)
+    # also hide,unhide probably
 
-        Each Parameter gets a suitable widget (e.g. a slider for a Number with
-        soft_bounds). The default widget is a text box.
+    # CEBALERT: all thses on_change=None mean someone could lose their initial setting which
+    # will suprise them: claenup
+    def set_PO(self,PO,on_change=None,on_modify=None):
 
-        Widgets are added in order of the Parameters' precedences.
+        self.change_PO(PO)
 
-        If a dictionary is passed in when create_widgets is called
-        __add_class_selector_property will attempt to get
-        dictionary[parameter_name]. It expects these entries to be
-        lists of relevant objects to cover the selectable classes. It
-        updates the lists and it can be retrieved from
-        self.translator_dictionary when set_parameters is called and
-        used on subsequent uses.
+        try:
+            self.master.title("Parameters of "+ (PO.name or str(PO)) ) # classes dont have names
+        except AttributeError:
+            pass # can only set window title on a window (model editor puts frame in another frame)
 
-        'Apply', 'Ok', 'Reset', and 'Cancel' buttons can each be displayed (the default) or hidden.
-        """
-        self.parameterized_object = parameterized_object
-        params = None
-
-        if isinstance(parameterized_object,ParameterizedObjectMetaclass):
-            self.translator_dictionary = translator_dictionary
-            params = self.parameterized_object.classparams().items()
-        elif isinstance(parameterized_object,ParameterizedObject):
-            params = self.parameterized_object.params().items()
-        else:
-            raise TypeError, "ParameterFrame must be passed a ParameterizedObject class or instance to create widgets for Parameters."
-
-        self.__visible_parameters = dict([(parameter_name,parameter)
-                                      for (parameter_name,parameter)
-                                      in params
-                                      if not parameter.hidden])
-        self.__new_widgets()
-
-
-        ### Display the buttons
-        # Ordering of buttons is important. Chose java convention:
-        # http://java.sun.com/products/jlf/ed2/book/HIG.Dialogs2.html
-        # CEBALERT: I'm not yet sure where defaults should go - want
-        # it to be separated, probably.
-        if 'Defaults' in self.__buttons:
-            self.__buttons['Defaults'].pack(side=LEFT)
+        ### Pack all of the non-hidden Parameters
+        self.displayed_params = {}
+        for n,p in parameters(PO).items():
+            if not p.hidden:
+                self.displayed_params[n]=p
+            
+        ### Delete all variable traces
+        # (don't want to update parameters immediately)
+        #for v in self._tk_vars.values():
+        #    self.__delete_trace(v)
+        #    v._checking_get = v.get
+        #    v.get = v._original_get
         
-        for name in ['Close','Reset','Apply']:
-            if name in self.__buttons:
-                self.__buttons[name].pack(side=RIGHT)
+        self.pack_displayed_params(on_change=on_change,on_modify=on_modify)
         
-        # callers can also call pack() on this frame to set its attributes,
-        # but it's called here so that at least everything appears.
-        self.pack()
-        # button_panel.pack()
+    create_widgets = set_PO
+
+    # CEBALERT: name doesn't make sense! change displayed_params to something else e.g. params_to_display
+    def pack_displayed_params(self,on_change=None,on_modify=None):
 
 
+        # basically original ParametersFrame.__new_widgets
 
-    def __new_widgets(self):
-        """
-        Remove old labels and widgets from the screen (if there
-        are any), then create new ones, sort them by Parameter
-        precedence, and finally add them to the screen.
-        """       
+
         # wipe old labels and widgets from screen
-        for (label,widget) in self.__widgets.values():
-            label.grid_forget()
-            widget.grid_forget()
+        if hasattr(self,'currently_displaying'):
+            for rep in self.currently_displaying.values():
+                try:
+                    rep['label'].destroy()
+                except AttributeError:
+                    # e.g. buttons have None for label
+                    pass
+                rep['widget'].destroy()
+                
 
-        # create the widgets
-        self.__widgets = {}
-        for (parameter_name, parameter) in self.__visible_parameters.items():
-            self.__add_property_for_parameter(parameter_name,parameter)
-
-        # sort Parameters by precedence (oops actually reverse of precedence!)
+        # sort Parameters by reverse precedence
         parameter_precedences = {}
-        for name,parameter in self.__visible_parameters.items():
-            parameter_precedences[name] = parameter.precedence
+        for name,parameter in self.displayed_params.items():
+            parameter_precedences[name]=parameter.precedence
         sorted_parameter_names = keys_sorted_by_value(parameter_precedences)
-
-        # add widgets to screen
+            
+        # create the labels & widgets
+        for name in self.displayed_params:
+            widget,label = self.create_widget(name,self.pframe,on_change=on_change or self.on_change,
+                                              on_modify=on_modify or self.on_modify)
+            self.representations[name]={'widget':widget,'label':label}
+        
+        # add widgets & labels to screen in a grid
         rows = range(len(sorted_parameter_names))
-        for (row,parameter_name) in zip(rows,sorted_parameter_names): 
-            (label,widget) = self.__widgets[parameter_name]
+        for row,parameter_name in zip(rows,sorted_parameter_names): 
+            widget = self.representations[parameter_name]['widget']
+            label = self.representations[parameter_name]['label']
 
-            help_text = getdoc(self.__visible_parameters[parameter_name])
+            help_text = getdoc(self.get_parameter_object(parameter_name))
 
-            label.grid(row=row,
-                       column=0,
-                       padx=self.__properties_frame.padding,
-                       pady=self.__properties_frame.padding,
-                       sticky=E)
+            label.grid(row=row,column=0,
+                       padx=2,pady=2,sticky=E)
 
-            self.__help_balloon.bind(label, help_text)
+            self.balloon.bind(label, help_text)
             
             # We want widgets to stretch to both sides...
             posn=E+W
             # ...except Checkbuttons, which should be left-aligned.
-            if isinstance(widget,CheckbuttonTranslator):
+            if widget.__class__==Tkinter.Checkbutton:
                 posn=W
                 
             widget.grid(row=row,
                         column=1,
-                        padx=self.__properties_frame.padding,
-                        pady=self.__properties_frame.padding,
+                        padx=2,
+                        pady=2,
                         sticky=posn)
-            
-            # Store the name of the parameter that this widget is controlling.
-            widget.param_name = parameter_name
 
-            
+        self.currently_displaying  = self.representations
 
 
 
-    def __add_property_for_parameter(self,parameter_name,parameter):
-        """
-        Find the correct property type for the given parameter.
 
-        If the parameter's type is not listed in
-        self.__parameter_property, the class hierarchy is traversed until
-        a match is found. If no match is found, the Parameter just gets a
-        textbox.
-        """
-        # CEBHACKALERT: results in DynamicNumber being called and producing
-        # a value, rather than displaying information about the dynamic number.
-        # JAB: Can't it at least use .inspect_value(), for now, to avoid
-        # advancing the values?  After that it would be good to support
-        # some more informative and useful display.
-        value = getattr(self.parameterized_object,parameter_name)
- 
-        # CEBHACKALERT: name should be a constant Parameter; the
-        # 'or parameter_name' can be removed when it is. (see earlier alert too)
-        if (parameter.constant==True or parameter_name=='name') and isinstance(self.parameterized_object,ParameterizedObject):
-            self.__add_readonly_text_property(parameter_name,value,parameter)
-        else:
-            for c in classlist(type(parameter))[::-1]:
-                if self.__parameter_property.has_key(c):
-                    # find the right method...
-                    property_to_add = self.__parameter_property[c]
-                    # ...then call it
-                    property_to_add(parameter_name,value,parameter)
-                    return
-            # no match: use text box
-            self.__add_text_property(parameter_name,value,parameter)
-            
+    def defaultsB(self):
+        # CEBERRORALERT: what about defaults of instantiated params? Check what happens.
+        # (ALERT should be in parameterizedobject.py)
+        assert isinstance(self._extraPO,ParameterizedObject), "Only defined for ParameterizedObject"
+        self._extraPO.reset_params()
 
-    def __add_text_property(self,parameter_name,value,parameter):
-        """
-        Add a text property to the properties_frame.
-        """
-        # Used to keep track of the value and its string representation, or
-        # to evaluate the string representation in __main__.__dict__
-        translator = lambda in_string: dict_translator(in_string,translator_dictionary={str(value):value})
-        
-        self.__widgets[parameter_name]=self.__properties_frame.add_text_property(
-            parameter_name,
-            translator = translator,
-            value = value)
-
-
-    def __add_readonly_text_property(self,parameter_name,value,parameter):
-        """
-        Add a readonly text property to the properties_frame.
-        """
-        self.__widgets[parameter_name] = self.__properties_frame.add_text_property(
-            parameter_name,
-            value = value,
-            readonly = True)
-
-    def __add_numeric_property(self,parameter_name,value,parameter):
-        """
-        Add a numeric property to the properties_frame.
-
-        If the parameter has distinct low and high softbounds, a tagged_slider
-        property is added. Otherwise, just a textbox is added (with
-        a translator for string to float).
-        """
-        # CEBHACKALERT: because TaggedSlider only works for floats, subclasses
-        # of Number (like Integer) are just represented with a text box
-        # (for the moment).
-        if type(parameter)==Number:
-            try:
-                low_bound,high_bound = parameter.get_soft_bounds()
-
-                if low_bound==None or high_bound==None or low_bound==high_bound:
-                    # i.e. there aren't really softbounds
-                    raise AttributeError 
-
-                self.__widgets[parameter_name] = self.__properties_frame.add_tagged_slider_property(
-                    parameter_name,
-                    value,
-                    min_value = str(low_bound),
-                    max_value = str(high_bound),
-                    string_format = '%.6f',
-                    translator = topo.misc.utils.eval_atof)
-
-            except AttributeError:
-                self.__widgets[parameter_name] = self.__properties_frame.add_text_property(parameter_name,value=value,translator=topo.misc.utils.eval_atof)
-        else:
-            self.__widgets[parameter_name] = self.__properties_frame.add_text_property(parameter_name,value=value,translator=lambda x: eval(x,__main__.__dict__))
-
-
-    def __add_enumeration_property(self,parameter_name,value,parameter):
-        """
-        Add an enumeration property to the properties_frame by representing
-        it with a ComboBox.
-        """
-        # CEBHACKALERT: only string Enumerations work at the moment.
-        self.__widgets[parameter_name] = self.__properties_frame.add_combobox_property(
-                    parameter_name,
-                    value = value,
-                    scrolledlist_items = parameter.available)
-
-
-    def __add_class_selector_property(self,parameter_name,value,parameter):
-        """
-        Add a package property to the properties_frame by representing it
-        with a ComboBox.
-        """
-        translator_dictionary = {}
-        value_text = ''
-        
-        possible_classes = parameter.range()
-        self.translator_dictionary[parameter_name] = possible_classes
-
-        for (visible_name,class_) in possible_classes.items():
-            if class_ == value.__class__:
-                value_text = visible_name
-                # overwrite the class in {visible_name:class} with
-                # the object, so it will be returned rather than a
-                # new object if this class is selected again 
-                self.translator_dictionary[parameter_name].update(
-                    {visible_name:value})
-                break
-
-
-        # maps the class key to the object found above. 
-        translator = lambda in_string: dict_translator(in_string, parameter_name, 
-            translator_dictionary = self.translator_dictionary)
-
-
-        self.__widgets[parameter_name] = self.__properties_frame.add_combobox_property(
-                    parameter_name,
-                    value = value_text,
-                    scrolledlist_items = possible_classes.keys(),
-                    translator = translator)
-
-        # A right-click on the widget shows the right-click menu
-        w = self.__widgets[parameter_name][1] 
-        w._entryWidget.bind('<<right-click>>', 
-            lambda event: self.__right_click(event, w))
+        # CEBERRORALERT: need a (/to call a) refresh method.
+        #self._sync_tkvars2po()
         
 
-    def __add_boolean_property(self,parameter_name,value,parameter):
-        """
-        Add a boolean property to the properties_frame by representing it with a
-        Checkbutton.
-        """
-        self.__widgets[parameter_name] = self.__properties_frame.add_checkbutton_property(parameter_name,value=value)
+
+        
+    def closeB(self):
+        ## CEBALERT: dialog box should include a cancel button
+        #if self.has_unapplied_change() and tkMessageBox.askyesno("Close","Apply changes before closing?"):
+        #    self.update_parameters()
+        Frame.destroy(self) # hmm
+        self.master.destroy()
+            
+
+    def _create_string_widget(self,frame,name,widget_options):
+        w = TkParameterizedObject._create_string_widget(self,frame,name,widget_options)
+        # for right-click editing of anything!...
+        #w.bind('<<right-click>>',lambda event: self.__right_click(event, w))
+        return w
+        
+    def _create_selector_widget(self,frame,name,widget_options):
+        w = TkParameterizedObject._create_selector_widget(self,frame,name,widget_options)
+        w.bind('<<right-click>>',lambda event: self.__right_click(event, w))
+        return w
 
 
     def __right_click(self, event, widget):
-        """
-        Set self.__currently_selected_widget to the widget that was right clicked
-        on, and show the right-click properties menu.
-        """
         self.__currently_selected_widget = widget
         self.menu.tk_popup(event.x_root, event.y_root)
 
 
+    # rename
     def __edit_PO_in_currently_selected_widget(self):
         """
         Open a new window containing a ParametersFrame for the 
         PO in __currently_selected_widget.
         """
-        param_to_edit = self.__currently_selected_widget.get_value()
-        param_name = self.__currently_selected_widget.param_name
-        
+        ### simplify this lookup-by-value!
+        param_name = None
+        for name,representation in self.representations.items():
+            if self.__currently_selected_widget is representation['widget']:
+                param_name=name
+                break
+
+        PO_to_edit = self.string2object_ifrequired(param_name,self._tk_vars[param_name].get()) #get_parameter_value(param_name)
+
         parameter_window = TkguiWindow()
-        parameter_window.title(param_to_edit.name+' parameters')
-        title = Label(parameter_window, text = param_to_edit.name)
-        title.pack(side = TOP)
-        self.__help_balloon.bind(title,getdoc(param_to_edit))
-        parameter_frame = ParametersFrame(parameter_window)
-        parameter_frame.create_widgets(param_to_edit)
+        parameter_window.title(PO_to_edit.name+' parameters')
 
-        #CEBALERT: this code is the same as some in add_class_selector_property()
-        for (vis_name,class_) in self.translator_dictionary[param_name].items():
-            if param_to_edit.__class__ == class_:
-                 self.translator_dictionary[param_name].update({vis_name:param_to_edit})
-                 break
+        ### CB: could be confusing?
+        title=Tkinter.Label(parameter_window, text="("+param_name + " of " + self._extraPO.name + ")")
+        title.pack(side = "top")
+        self.balloon.bind(title,getdoc(self.get_parameter_object(param_name,self._extraPO)))
+        ###
+        
+        parameter_frame = type(self)(parameter_window,PO=PO_to_edit)
+
+        parameter_frame.pack()
 
 
-    def __defaults(self):
-        """
-        Reset self.parameterized_object's Parameters to their default values.
 
-        For a ParameterizedObject, these are the class defaults. For a
-        ParameterizedObjectMetaclass, currently does nothing.
-        """
-        if isinstance(self.parameterized_object,ParameterizedObjectMetaclass):
-            # CEBHACKALERT: get values from source files, or what?
-            # When this is implemented, re-enable the Reset button in
-            # editortools.
-            pass
-        elif isinstance(self.parameterized_object,ParameterizedObject):
-            self.parameterized_object.reset_params()
-            self.__new_widgets()
+# CEBALERT: needs a new name, to convey that changes aren't applied
+# immediately i.e. has the apply & refresh buttons
+class ParametersFrame(XParametersFrame):
 
-            # CEBHACKALERT: is this the right way to do it?
-            # For Test Pattern window, which refreshes automatically (no
-            # ok/apply).
-            try:
-                self.parent.refresh()
-            except AttributeError:
-                pass
+    
+    # CEBHACKALERT: semantics of all these buttons needs to be checked.
+    Apply = ButtonParameter(doc="""Set object's Parameters to displayed values.
+                                   When editing a class, sets the class defaults
+                                   (i.e. acts on the class object).""")
+    
 
+    # (CEBNOTE: used to be called Reset)
+    Refresh = ButtonParameter(doc="Return values to those currently set on the object")  
+
+    def __init__(self,master,PO=None,on_change=None,on_modify=None,**params):        
+        super(ParametersFrame,self).__init__(master,PO,on_change,on_modify,**params)
+
+        
+        self.pack_param('Apply',parent=self._buttons_frame,on_change=self.update_parameters,side='left')
+        self.pack_param('Refresh',parent=self._buttons_frame,on_change=self._sync_tkvars2po,side='right')
+
+
+
+    def set_PO(self,PO,on_change=None,on_modify=None):
+        self.change_PO(PO)
+
+        try:
+            self.master.title("Parameters of "+ (PO.name or str(PO)) ) # classes dont have names
+        except AttributeError:
+            pass # can only set window title on a window (model editor puts frame in another frame)
+
+        ### Pack all of the non-hidden Parameters
+        self.displayed_params = {}
+        for n,p in parameters(PO).items():
+            if not p.hidden:
+                self.displayed_params[n]=p
+            
+        ### Delete all variable traces
+        # (don't want to update parameters immediately)
+        for v in self._tk_vars.values():
+            self.__delete_trace(v)
+            v._checking_get = v.get
+            v.get = v._original_get
+        
+        self.pack_displayed_params(on_change=on_change,on_modify=on_modify)
+    create_widgets = set_PO
+
+
+
+    def _sync_tkvars2po(self):
+        for name in self.displayed_params.keys():
+            self._tk_vars[name]._checking_get()
+
+    def defaultsB(self):
+        super(ParametersFrame,self).defaultsB()
+        self._sync_tkvars2po()
+
+    def has_unapplied_change(self):
+        """Return True if any one of the packed parameters' displayed values is different from
+        that on the object."""
+        for name in self.displayed_params.keys():
+            if self.__value_changed(name):
+                return True
+        return False
+
+    def closeB(self):
+        # CEBALERT: dialog box should include a cancel button
+        if self.has_unapplied_change() and tkMessageBox.askyesno("Close","Apply changes before closing?"):
+            self.update_parameters()
+        super(ParametersFrame,self).closeB()
+
+
+    __value_changed = TkParameterizedObject.value_changed
+
+
+    def __delete_trace(self,var):
+        var.trace_vdelete(*var.trace_vinfo()[0])
+
+    def update_parameters(self):
+        if isinstance(self._extraPO,ParameterizedObjectMetaclass):
+            for name in self.displayed_params.keys():
+                if self.__value_changed(name):
+                    self._update_param(name)
         else:
-            raise TypeError, "ParameterFrame must be associated with a ParameterizedObject or ParameterizedObjectMetaclass."
+            for name,param in self.displayed_params.items():
+                if not param.constant and self.__value_changed(name):
+                    self._update_param(name)
 
-    def __reset(self):
-        """
-        Resets the values displayed to those currently set on the thing.
-        """
-        # CEBALERT: no need to re-draw all the widgets. Should add
-        # a method to allow the widget values to be set (i.e. cut out
-        # of the create method).
-        self.create_widgets(self.parameterized_object)
-        
-        
-
+    set_parameters=update_parameters

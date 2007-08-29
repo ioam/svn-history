@@ -386,7 +386,15 @@ class TaggedSlider2(Frame):
         """
         Set the slider (including its movement limits) to match the tag value.
         """
-        val = float(self.__tag_val.get())
+        # CEBALERT!
+        try:
+            val = float(self.__tag_val.get())
+        except ValueError:
+            print "VA in TS"
+            from topo.misc.utils import eval_atof
+            val = eval_atof(self.__tag_val.get())
+
+        #val = self.__tag_val.get()
         if val > self.__max_value:
             self.__max_value = val
         elif val < self.__min_value:

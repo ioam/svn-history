@@ -171,8 +171,13 @@ Each type will have various parameters that can be changed.""")
         # Because this window applies changes to an object immediately
         # (unlike ParametersFrame), the button to 'reset' is
         # 'Defaults'. 'Reset' would do nothing.
-        self.__params_frame = parametersframe.ParametersFrame(self,buttons_to_remove=['Apply','Close','Reset'])
-        self.__params_frame.create_widgets(self.__current_pattern_generator)
+
+        self.__params_frame = parametersframe.XParametersFrame(self,PO=self.__current_pattern_generator,
+                                                               on_modify=self.hack_refresh)
+        self.__params_frame.hide_param('Close')
+
+
+        #self.__params_frame.set_PO(self.__current_pattern_generator)
         self.__params_frame.pack(side=TOP,expand=YES,fill=X)
 
         ### 'Edit patterns in' boxes
@@ -207,16 +212,28 @@ Each type will have various parameters that can be changed.""")
             return False
 
 
+    def hack_refresh(self):
+        self.refresh()
+        self.refresh()
+        
     def refresh(self):
         """
         Change the pattern generator objects as required
 
         Also call the parent class refresh.
         """
-        self.update_plotgroup_variables()
-        self.__setup_pattern_generators()
-        super(TestPattern,self).refresh()
+        # CEBALERT: added try/except because can be called before
+        # there's actually a patterngenerator, and other such ordering
+        # errors. Will go away when all's done with
+        # tkparameterizedobject.
+        try:
+            self.update_plotgroup_variables()
+            self.__setup_pattern_generators()
+            super(TestPattern,self).refresh()
+        except AttributeError:
+            pass
 
+        
 
         
     def _input_change(self,button_name, checked):
@@ -245,7 +262,7 @@ Each type will have various parameters that can be changed.""")
         ParametersFrame to draw the relevant widgets
         """
         self.__current_pattern_generator = self.pattern_generators[pattern_generator_name]()
-        self.__params_frame.create_widgets(self.__current_pattern_generator)
+        self.__params_frame.set_PO(self.__current_pattern_generator)
         if self.auto_refresh:
 	    self.refresh()
             self.refresh() # CEBHACKALERT! No comment
@@ -320,25 +337,25 @@ Each type will have various parameters that can be changed.""")
             # xdensity and ydensity are the same for the pattern_generator
             # because they were set from a Sheet xdensity and ydensity,
             # which are guaranteed to be the same
-	    density = k.xdensity
-            
-	    view_dict[each] = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each)
-	    channels = {'Strength':each,'Hue':None,'Confidence':None}
-	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
-	    plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
+            density = k.xdensity
+
+            view_dict[each] = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each)
+            channels = {'Strength':each,'Hue':None,'Confidence':None}
+            ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
+            plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
 
 
         # CEBHACKALERT (** change   any point marking hackalerts in here?
-	new_plotgroup = self.generate_plotgroup() #topo.plotting.plotgroup.PlotGroup(plot_list)
+        new_plotgroup = self.generate_plotgroup() #topo.plotting.plotgroup.PlotGroup(plot_list)
         new_plotgroup.plot_list = plot_list
-	new_plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot
-	new_plotgroup.sheet_coords = self.plotgroup.sheet_coords
-	new_plotgroup.integer_scaling = self.plotgroup.integer_scaling
-	new_plotgroup.normalize = self.plotgroup.normalize
-	new_plotgroup.time = topo.sim.time()
+        new_plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot
+        new_plotgroup.sheet_coords = self.plotgroup.sheet_coords
+        new_plotgroup.integer_scaling = self.plotgroup.integer_scaling
+        new_plotgroup.normalize = self.plotgroup.normalize
+        new_plotgroup.time = topo.sim.time()
 
-	self.plotgroup = new_plotgroup
- 				
+        self.plotgroup = new_plotgroup
+
     
     ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
     def set_normalize(self):
@@ -378,7 +395,7 @@ Each type will have various parameters that can be changed.""")
         for (gs_name,o_s_p) in self.generator_sheets_patterns.items():
             if o_s_p['editing']==True:
                 
-                newpattern = copy.deepcopy(self.__params_frame.parameterized_object)
+                newpattern = copy.deepcopy(self.__params_frame._extraPO)
 
                 ###TRHACKALERT: Supports two-eye disparity model for RandomDotStereogram only,
                 ###alternating direction for each eye

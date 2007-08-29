@@ -640,7 +640,7 @@ class ParameterizedObject(object):
 
     __metaclass__ = ParameterizedObjectMetaclass
 
-
+    ## CEBALERT: should be StringParameter, right?
     name           = Parameter(default=None,doc="String identifier for this object.")
     ### JABALERT: Should probably make this an Enumeration instead.
     print_level = Parameter(default=MESSAGE,hidden=True)

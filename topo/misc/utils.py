@@ -90,6 +90,7 @@ def flatten(l):
         return result
 
 
+# CEBNOTE: use this for tkparameterizedobject or delete it
 def eval_atof(str):
     """
     Evaluates the given string in __main__, and converts it to a float.
@@ -103,30 +104,6 @@ def eval_atof(str):
     """
     return string.atof(eval(str,__main__.__dict__))
     
-
-# CEBHACKALERT: see the problem in ParametersFrame with its translator_dictionary;
-# I also think this function can probably be simplified.
-def dict_translator(in_string, name = '', translator_dictionary = {}) :
-    """
-    Looks for an entry for the string in the dictionary. If it can't be
-    found the string is evaluated in __main__.__dict__.
-    """
-    if translator_dictionary.has_key(name) :
-        if translator_dictionary[name].has_key(in_string) :
-            val = translator_dictionary[name][in_string]
-            from topo.base.parameterizedobject import ParameterizedObject
-            if isinstance(val, ParameterizedObject) :
-                return val
-            else : 
-                try :
-                    val = val()
-                    return val
-                except : pass
-    elif translator_dictionary.has_key(in_string) :
-        return translator_dictionary[in_string]
-
-    val = eval(in_string, __main__.__dict__)
-    return val
 
 
 """

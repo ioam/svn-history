@@ -261,6 +261,7 @@ class CFProjectionPGPanel(CFPGPanel):
         p.params()['projection'].Arange = prjns
         p.projection = prjns[0]        
 
+    # CEBALERT: here and for other such lists, make things get sorted by precedence.
     def refresh_projections(self):
         self.populate_projection_param(self.plotgroup)
 

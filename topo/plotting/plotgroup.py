@@ -56,7 +56,7 @@ class PlotGroup(ParameterizedObject):
     cmd_location = Parameter(default=__main__.__dict__,doc="""
     Namespace in which to execute the update_command and plot_command.""")
 
-    update_command = Parameter(default="",doc="""
+    update_command = StringParameter(default="",doc="""
     Command to execute before updating this plot, e.g. to calculate sheet views.
     
     The command can be any Python code, and will be evaluated in the main namespace
@@ -67,7 +67,7 @@ class PlotGroup(ParameterizedObject):
     ## CEBHACKALERT
     command = update_command
     
-    plot_command = Parameter(default="",doc="""
+    plot_command = StringParameter(default="",doc="""
     Command to execute when updating sheet or coordinate of unit to be plotted
     when the simulator time has not changed.
     In the case of a full-field stimulus, responses do not need to be re-measured

@@ -272,9 +272,10 @@ class ParametersTool(Frame):
 
         # CEBALERT: will the users think they have to press 'apply' rather than just clicking
         # on the canvas to get the new object?
-        self.parameter_frame = ParametersFrame(self,buttons_to_remove=['Close','Defaults'])        
+        self.parameter_frame = ParametersFrame(self)#,buttons_to_remove=['Close','Defaults'])
+        self.parameter_frame.hide_param('Close')
+        self.parameter_frame.hide_param('Defaults')         
         self.parameter_frame.pack(side=BOTTOM)
-
 
     def update_parameters(self):
         self.parameter_frame.set_parameters()
