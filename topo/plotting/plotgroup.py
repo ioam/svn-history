@@ -423,7 +423,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
     def _update_command(self):
 
         # CEBALERT: rather than various scattered tests like the one below and for projections in later classes,
-        # have some method (probabable decalred in a super calss) like "_check_conditions()".
+        # have some method (probabable declared in a super class) like "_check_conditions()".
         if self.sheet is None: raise ValueError("%s must have a sheet (currently None)."%self)
 	### JCALERT: commands in analysis.py should be re-written to
 	### avoid setting these global parameters.
