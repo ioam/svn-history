@@ -25,10 +25,6 @@ from topo.base.projection import ProjectionSheet
 from plot import make_template_plot, Plot
 
 
-### CEBHACKALERT: make sure error messages are reasonable for trying to do plots
-### with e.g. sheet=None or projection=None.
-
-
 def cmp_plot(plot1,plot2):
     """
     Comparison function for sorting Plots.
@@ -395,20 +391,22 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
     sheet = ObjectSelectorParameter(default=None,doc="""
     The Sheet from which to produce plots.""")
 
+    sheet_type = ProjectionSheet
+
+
+    def _check_sheet_type(self):
+        assert isinstance(self.sheet,self.sheet_type), \
+               "%s's sheet Parameter must be set to a %s instance (currently %s, type %s)." \
+               %(self,self.sheet_type,self.sheet,type(self.sheet)) 
 
     def _sheets(self):
         return [self.sheet]
 
     def _update_command(self):
-
-        # CEBALERT: rather than various scattered tests like the one
-        # below and for projections in later classes, have some method
-        # (probabably declared in a super class) like
-        # "_check_conditions()".
-
-        if self.sheet is None: raise ValueError("%s must have a sheet (currently None)."%self)
+        self._check_sheet_type()
 	### JCALERT: commands in analysis.py should be re-written to
-	### avoid setting these global parameters.
+	### avoid setting these global parameters (ALERT applies
+	### elsewhere in this file, too).
 	topo.commands.analysis.sheet_name = self.sheet.name
         super(ProjectionSheetPlotGroup,self)._update_command()
         
@@ -418,29 +416,25 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
     # can be eliminated
     def _create_plots(self,pt_name,pt,sheet):
 	"""Creates plots as specified by the plot_template."""
-        if not isinstance(sheet,CFSheet):
-            self.warning('Requested Projection view from a Sheet that is not a CFSheet.')
-            return []
-        else:
-	    # Special case: if the Strength is set to self.keyname, we
-	    # request UnitViews (i.e. by changing the Strength key in
-	    # the plot_channels). Otherwise, we consider Strength as
-	    # specifying an arbitrary SheetView.
-	    if ( pt.get('Strength', None) == self.keyname):
-                plot_list = []
-                for p in sheet.in_connections: 
-		    plot_channels = copy.deepcopy(pt)
-		    # Note: the UnitView is in the src_sheet view_dict,
-		    # and the name in the key is the destination sheet.
-		    key = (self.keyname,sheet.name,p.name)
-		    plot_channels['Strength'] = key
-                    plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,
-                                                        p.src.xdensity,
-                                                        None,self.normalize,name=p.name))
-                return plot_list
-                
-	    else: # Fall back to normal case
-                return super(ProjectionSheetPlotGroup,self)._create_plots(pt_name,pt,sheet)
+        # Special case: if the Strength is set to self.keyname, we
+        # request UnitViews (i.e. by changing the Strength key in
+        # the plot_channels). Otherwise, we consider Strength as
+        # specifying an arbitrary SheetView.
+        if ( pt.get('Strength', None) == self.keyname):
+            plot_list = []
+            for p in sheet.in_connections: 
+                plot_channels = copy.deepcopy(pt)
+                # Note: the UnitView is in the src_sheet view_dict,
+                # and the name in the key is the destination sheet.
+                key = (self.keyname,sheet.name,p.name)
+                plot_channels['Strength'] = key
+                plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,
+                                                    p.src.xdensity,
+                                                    None,self.normalize,name=p.name))
+            return plot_list
+
+        else: # Fall back to normal case
+            return super(ProjectionSheetPlotGroup,self)._create_plots(pt_name,pt,sheet)
 
  
     def generate_labels(self):
@@ -459,10 +453,6 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
     ### CEBALERT: very similar to large part of ProjectionSheetPlotGroup's _create_plots
     def _create_plots(self,pt_name,pt,sheet):
 	"""Creates plots as specified by the plot_template."""
-
-        # CEBALERT: should there be isinstance(sheet,ProjectionSheet) here, or
-        # has that already been ensured? Same question applies to all the other
-        # _create_plots() methods (where the test isn't already made).
         plot_list = []
         for p in sheet.in_connections: 
             plot_channels = copy.deepcopy(pt) 
@@ -485,7 +475,6 @@ class CFPlotGroup(ProjectionSheetPlotGroup):
 entire source sheet, using zeros for all weights outside the
 ConnectionField.  If False, plots only the actual weights that are
 stored.""")
-
 # CEBALERT: all necessary situate stuff removed from tkgui? See ALERT in CFRelatedPlotGroupPanel.
 
 
@@ -498,6 +487,8 @@ class ConnectionFieldsPlotGroup(CFPlotGroup):
     """
     keyname='Weights'
     situate = BooleanParameter(False)
+
+    sheet_type = CFSheet
 
     # JABALERT: need to show actual coordinates of unit returned
     x = Number(default=0.0,doc="""x-coordinate of the unit to plot""")
@@ -516,27 +507,23 @@ class ConnectionFieldsPlotGroup(CFPlotGroup):
 	Creates a plot as specified by a Connection Field plot_template:
 	allows creating a connection field plot or a normal plot.
 	"""
-        if not isinstance(sheet,CFSheet):
-            self.warning('Requested Projection view from a Sheet that is not a CFSheet.')
-            return []
-        else:
-	    if ( pt.get('Strength', None) == self.keyname):
-                plot_list = []
-                for p in sheet.in_connections:
-		    plot_channels = copy.deepcopy(pt)
-		    key = (self.keyname,sheet.name,p.name,self.x,self.y)
-		    plot_channels['Strength'] = key
-		    if self.situate:
-			plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.xdensity,
-							    None,self.normalize,name=p.name))
-		    else:
-			(r,c) = p.dest.sheet2matrixidx(self.x,self.y)
-			plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.xdensity,
-							    p.cf(r,c).bounds,self.normalize,name=p.name))
-                return plot_list
-			
-	    else: # Fall back to normal case
-                return super(ConnectionFieldsPlotGroup,self)._create_plots(pt_name,pt,sheet)
+        if ( pt.get('Strength', None) == self.keyname):
+            plot_list = []
+            for p in sheet.in_connections:
+                plot_channels = copy.deepcopy(pt)
+                key = (self.keyname,sheet.name,p.name,self.x,self.y)
+                plot_channels['Strength'] = key
+                if self.situate:
+                    plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.xdensity,
+                                                        None,self.normalize,name=p.name))
+                else:
+                    (r,c) = p.dest.sheet2matrixidx(self.x,self.y)
+                    plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.xdensity,
+                                                        p.cf(r,c).bounds,self.normalize,name=p.name))
+            return plot_list
+
+        else: # Fall back to normal case
+            return super(ConnectionFieldsPlotGroup,self)._create_plots(pt_name,pt,sheet)
 
 
 
@@ -559,7 +546,10 @@ class CFProjectionPlotGroup(CFPlotGroup):
     density = Number(default=10.0,doc='Number of units to plot per 1.0 distance in sheet coordinates',
                      softbounds=(5.0,50.0))
     
-    situate = BooleanParameter(False) # override default 
+    situate = BooleanParameter(False) # override default
+
+    sheet_type = CFSheet
+    projection_type = CFProjection
 
     def __init__(self,**params):
         super(CFProjectionPlotGroup,self).__init__(**params)
@@ -570,8 +560,14 @@ class CFProjectionPlotGroup(CFPlotGroup):
         self.proj_plotting_shape = (0,0)
     
 
+    def _check_projection_type(self):
+        assert isinstance(self.projection,self.projection_type), \
+               "%s's projection Parameter must be set to a %s instance (currently %s, type %s)." \
+               %(self,self.projection_type,self.projection,type(self.projection)) 
+
+
     def _update_command(self):
-        if self.projection is None: raise ValueError("%s must have a projection (currently None)."%self)
+        self._check_projection_type()
 	### JCALERT: commands in analysis have to be re-written so that to avoid
 	### setting all these global parameters.
         topo.commands.analysis.proj_coords = self.generate_coords()
@@ -585,8 +581,6 @@ class CFProjectionPlotGroup(CFPlotGroup):
 	Creates a plot as specified by a Projection plot_template:
 	Built a projection Plot from corresponding UnitViews.
 	"""
-        if self.projection is None: raise ValueError("%s must have a projection (currently None)."%self)
-        
 	projection = self.projection
         plot_list=[]
         src_sheet=projection.src
