@@ -37,7 +37,7 @@ from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import BooleanParameter
 from topo.base.sheet import Sheet
 
-from topo.plotting.plotgroup import PlotGroup,XPlotGroup
+from topo.plotting.plotgroup import PlotGroup,SheetPlotGroup
 
 from topo.commands.pylabplots import matrixplot
 
@@ -828,7 +828,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
 class XPGPanel(PlotGroupPanel):
 
-    plotgroup_type = XPlotGroup
+    plotgroup_type = SheetPlotGroup
     
 
     @staticmethod

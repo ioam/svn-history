@@ -42,9 +42,9 @@ from tkparameterizedobject import ButtonParameter
 DEFAULT_PRESENTATION = 1.0
 
 
-from topo.plotting.plotgroup import XPlotGroup
+from topo.plotting.plotgroup import SheetPlotGroup
 
-class TestPatternPlotGroup(XPlotGroup):
+class TestPatternPlotGroup(SheetPlotGroup):
     def __init__(self,**params):
         super(TestPatternPlotGroup,self).__init__(**params)
 

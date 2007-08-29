@@ -200,8 +200,7 @@ class PlotGroup(ParameterizedObject):
 ### sheet's range can be used as the list of sheets.
 
 
-# rename; represents 3d AND draws plots on itself
-class XPlotGroup(PlotGroup):
+class SheetPlotGroup(PlotGroup):
 
     # CB/JAB: Remove sheet_type and sheet from this class
     sheet_type = Sheet
@@ -240,7 +239,7 @@ class XPlotGroup(PlotGroup):
 
 
     def __init__(self,**params):
-        super(XPlotGroup,self).__init__(**params)
+        super(SheetPlotGroup,self).__init__(**params)
         self.height_of_tallest_plot = 150.0 # Initial value
 
 
@@ -338,7 +337,7 @@ class XPlotGroup(PlotGroup):
 
 
 
-class TemplatePlotGroup(XPlotGroup):
+class TemplatePlotGroup(SheetPlotGroup):
     """
     PlotGroup that is built as specified by a PlotGroupTemplate.
     """
