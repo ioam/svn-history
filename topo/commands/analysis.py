@@ -178,9 +178,7 @@ class PatternPresenter(ParameterizedObject):
 
 
 
-# CEBALERT: have plotgroup_params?
-# CEBALERT: test passing e.g. normalize and add example.
-def save_plotgroup(name,**params):
+def save_plotgroup(name,saver_params={},**params):
     """
     Convenience command for saving a set of plots to disk.  Examples:
 
@@ -191,13 +189,20 @@ def save_plotgroup(name,**params):
 
     Some plotgroups accept optional parameters, which can be passed
     like sheet and projection above.
-    """
 
+    (To pass an optional parameter to the PlotFileSaver itself, the
+    saver_params dictionary can be used.)
+    """
     p_class = plotsaving_classes.get(name,plotsaving_classes[None])
-    p = p_class(name)#,**params)
-    p.plotgroup=p.generate_plotgroup(**params)
-    p.plotgroup.draw_plots(update=True)#update_plots()
-    p.save_to_disk()
+    saver = p_class(name,**saver_params)
+    # CEBERRORALERT: because parameters from a PlotGroupTemplate are
+    # set on the PlotGroup during its creation, Parameters specified
+    # here can be overwritten! This problem will go away when we stop
+    # using PlotGroupTemplate (i.e. problem is in plotgroup.py and
+    # templates.py).
+    saver.generate_plotgroup(**params)
+    saver.plotgroup.draw_plots(update=True)#update_plots()
+    saver.save_to_disk()
 
 
 
