@@ -126,7 +126,6 @@ class PlotGroup(ParameterizedObject):
 	return self.plot_list
 
 
-    # CB: rename
     def draw_plots(self,update=True):
 	"""
 
@@ -145,6 +144,7 @@ class PlotGroup(ParameterizedObject):
     def update_plots(self):
         self.draw_plots(update=True)
 
+    # CB/JAB: rename to _create_images()
     def _make_plots(self,update):
         """
         Generate the sorted and scaled list of plots constituting the PlotGroup.
@@ -182,6 +182,7 @@ class PlotGroup(ParameterizedObject):
 	    self.labels.append(plot.plot_src_name + '\n' + plot.name)
 
 
+    # CB/JAB: rename to _sort_plots
     def _ordering_plots(self):
 	"""
 	Function called to sort the Plots in order.
@@ -203,9 +204,9 @@ class PlotGroup(ParameterizedObject):
 # rename; represents 3d AND draws plots on itself
 class XPlotGroup(PlotGroup):
 
+    # CB/JAB: Remove sheet_type and sheet from this class
     sheet_type = Sheet
 
-    # JABALERT: Not currently used; confusing
     sheet = ObjectSelectorParameter(default=None,doc="""
     The Sheet from which to produce plots.
     If set to None, plots are created for each appropriate Sheet.""") 
@@ -252,6 +253,9 @@ class XPlotGroup(PlotGroup):
     ### JAB: Isn't there some way to have the GUI take care of the
     ### actual scaling, without us having to change the bitmaps
     ### ourselves?
+    ###
+    ### Could strip out the matrix-coord scaling and put it into
+    ### PlotGroup
     def scale_images(self,zoom_factor=None):
         """
         Enlarge or reduce the bitmaps as needed for display.
@@ -366,6 +370,7 @@ class TemplatePlotGroup(XPlotGroup):
         This function calls create_plots, which is implemented in each
         TemplatePlotGroup subclass.
         """
+        # CB/JAB: Remove sheet_type and sheet from this class; instead have a mechanism for specifying a list of sheets
 	if self.sheet:
             sheet_list = [self.sheet]
 	else:
@@ -414,7 +419,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
     """
     _abstract_class_name = "ProjectionSheetPlotGroup"
 
-    keyname = "ProjectionSheet" # CB: document what these are
+    keyname = "ProjectionSheet" # CB: Make into a parameter and document what it is
 
     sheet = ObjectSelectorParameter(default=None,doc="""
     The Sheet from which to produce plots.""")
@@ -430,7 +435,10 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 	topo.commands.analysis.sheet_name = self.sheet.name
         super(ProjectionSheetPlotGroup,self)._update_command()
         
-		
+    # CB/JAB: Should replace this custom routine with simply providing
+    # a method for constructing a special key name; then maybe nearly
+    # all the fancy processing in the various _create_plots functions
+    # can be eliminated
     def _create_plots(self,pt_name,pt,sheet):
 	"""Creates plots as specified by the plot_template."""
         if not isinstance(sheet,CFSheet):
@@ -471,7 +479,8 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
 
     keyname='ProjectionActivity' 
 
- 
+    # CB/JAB: Remove sheet_type and sheet from superclasses; instead have a mechanism for specifying a list of sheets, and then focus down to one sheet in this class
+        
     ### CEBALERT: very similar to large part of ProjectionSheetPlotGroup's _create_plots
     def _create_plots(self,pt_name,pt,sheet):
 	"""Creates plots as specified by the plot_template."""
@@ -494,7 +503,8 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
 
 
 class CFPlotGroup(ProjectionSheetPlotGroup):
-
+    _abstract_class_name = "CFPlotGroup"
+    
     situate = BooleanParameter(default=False,doc=
                                """If True, plots the weights on the
 entire source sheet, using zeros for all weights outside the
@@ -505,12 +515,8 @@ stored.""")
 
 
 
-	    
-### JABALERT: Should pull out common code from
-### ConnectionFieldsPlotGroup, ProjectionActivityPlotGroup, and
-### ProjectionPlotGroup into a shared parent class; then those
-### three classes should be much shorter.
-
+# CB/JAB: Consider -- is this actually general enough to handle
+# anything related to a unit, rather than CF specifically?
 class ConnectionFieldsPlotGroup(CFPlotGroup):
     """
     Visualize a ConnectionField for each of a CFSheet's CFProjections.
@@ -569,7 +575,6 @@ class CFProjectionPlotGroup(CFPlotGroup):
 
     projection = ObjectSelectorParameter(default=None,doc="The projection to visualize.")
 
-    ### CEBHACKALERT: tkpo gui not setup to read softbounds
     ### JPALERT: The bounds are meaningless for large sheets anyway.  If a sheet
     ### is specified in, say, visual angle coordinates (e.g., -60 to +60 degrees), then
     ### the soft min of 5.0/unit will still give a 600x600 array of CFs!
@@ -664,7 +669,9 @@ class CFProjectionPlotGroup(CFPlotGroup):
 
 
 
-
+# CB/JAB: Can't it just inherit from ConnectionFieldsPlotGroup
+# (renamed to something like UnitPlotGroup)?  Then will simply have
+# something about getting the right time.
 class FeatureCurvePlotGroup(PlotGroup):
 
 
