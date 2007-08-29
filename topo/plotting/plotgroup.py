@@ -351,9 +351,6 @@ class TemplatePlotGroup(SheetPlotGroup):
         TemplatePlotGroup subclass.
         """   
 	plot_list = self.plot_list
-        # Loop over all sheets that passed the filter.
-        #     Loop over each individual plot template:
-        #         Call the create_plots function to create the according plot
         for each in self._sheets():
 	    for (pt_name,pt) in self.template.plot_templates:
 		plot_list = plot_list + self._create_plots(pt_name,pt,each)
