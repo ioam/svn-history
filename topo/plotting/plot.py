@@ -47,8 +47,8 @@ class Plot(ParameterizedObject):
      def __init__(self,image=None,**params):
           
           super(Plot,self).__init__(**params)
-          self.bitmap = Bitmap(image)
-          self._orig_bitmap = self.bitmap # Copy kept in case of later rescaling
+          self._orig_bitmap = Bitmap(image)
+          self.bitmap = self._orig_bitmap # Possibly scaled copy (at first identical)
           self.scale_factor=1.0
           self.plot_src_name = ''
           self.precedence = 0.0
@@ -67,13 +67,30 @@ class Plot(ParameterizedObject):
 
           The original image is kept as-is in _orig_bitmap; the scaled
           image is stored in bitmap.  The scale_factor argument is
-          take as relative to the current scaling of the bitmap.  For
+          taken as relative to the current scaling of the bitmap.  For
           instance, calling scale(1.5) followed by scale(2.0) will
           yield a final scale of 3.0, not 2.0.
           """
           self.scale_factor *= scale_factor
 
-          if (self.bitmap):
+          if (self._orig_bitmap):
+              self.bitmap = copy.copy(self._orig_bitmap)
+              self.bitmap.image = self._orig_bitmap.zoom(self.scale_factor)
+
+
+     def set_scale(self,scale_factor):
+          """
+          Specify the numerical value of the scaling factor for this image.
+
+          The original image is kept as-is in _orig_bitmap; the scaled
+          image is stored in bitmap.  The scale_factor argument is
+          taken as relative to the original size of the bitmap.  For
+          instance, calling scale(1.5) followed by scale(2.0) will
+          yield a final scale of 2.0, not 3.0.
+          """
+          self.scale_factor = scale_factor
+
+          if (self._orig_bitmap):
               self.bitmap = copy.copy(self._orig_bitmap)
               self.bitmap.image = self._orig_bitmap.zoom(self.scale_factor)
 
