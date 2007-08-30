@@ -609,13 +609,7 @@ class CFProjectionPlotGroup(CFPlotGroup):
         from top-to-bottom.
         """
         def rev(x): y = x; y.reverse(); return y
-        ### JCALERT! Here, we assume that for a ProjectionPlotGroup,
-	### sheet_name is not None.
 
-        # why was this here?
-	#for s in topo.sim.objects(Sheet).values():
-	#    if (s.name==self.sheet_name and isinstance(s,CFSheet)):
-	#	self._sim_ep = s
         (l,b,r,t) = self.sheet.bounds.lbrt()
         x = float(r - l) 
         y = float(t - b)
