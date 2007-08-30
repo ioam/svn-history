@@ -19,16 +19,17 @@ import Pmw
 
 import topo
 
-import topo.base.patterngenerator
 import topo.base.sheetview
 from topo.base.parameterclasses import BooleanParameter,Number,ClassSelectorParameter
+
+from topo.base.patterngenerator import PatternGenerator
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.commands.basic import pattern_present
 
 from topo.misc.keyedlist import KeyedList
 
-import parametersframe
+from parametersframe import XParametersFrame
 from plotgrouppanel import XPGPanel
 
 from topo.plotting.plot import make_template_plot
@@ -64,9 +65,9 @@ class TestPattern(XPGPanel):
     present = ButtonParameter(doc="""Present this pattern to the simulation.""")
     reset = ButtonParameter(doc="""Reset the parameters for this pattern back to their defaults.""")
 
-    pattern_generator = ClassSelectorParameter(doc="""Type of pattern to present. Each type will have various parameters that can be changed.""")
+    pattern_generator = ClassSelectorParameter(class_=PatternGenerator, doc="""Type of pattern to present. Each type will have various parameters that can be changed.""")
     
-    
+
     def __init__(self,console,master,label="Preview",**params):
 	super(TestPattern,self).__init__(console,master,label,**params)
         self.auto_refresh=True
@@ -74,7 +75,10 @@ class TestPattern(XPGPanel):
         #self.plotgroup.params()['sheet'].range=
 
         print "create_frame"
-        self.params_frame = parametersframe.ParametersFrame(self,buttons_to_remove=['Apply','Close','Reset'])
+
+        self.params_frame = XParametersFrame(self,PO=self.pattern_generator,
+                                               on_modify=self.refresh)
+        self.params_frame.hide_param('Close')
 
 
         ### Find generator sheets
@@ -85,18 +89,14 @@ class TestPattern(XPGPanel):
         gsig = GeneratorSheet.classparams()['input_generator']
 
         pgparam = self.params()['pattern_generator']
-        pgparam.range = [pg() for pg in gsig.range().values()]
-        self.pattern_generator = gsig.default()
+        #pgparam.range = [pg() for pg in gsig.range().values()]
+        self.pattern_generator = gsig.default
         #pgparam.default = GeneratorSheet.classparams()['input_generator'].default        
         self.pack_param('pattern_generator',on_change=self.change_pattern_generator)
 
 
-        # Because this window applies changes to an object immediately
-        # (unlike ParametersFrame), the button to 'reset' is
-        # 'Defaults'. 'Reset' would do nothing.
 
-
-        self.params_frame.create_widgets(self.pattern_generator) 
+        #self.params_frame.create_widgets(self.pattern_generator) 
         self.params_frame.pack(side=TOP,expand=YES,fill=X)
 
 
@@ -259,7 +259,7 @@ class TestPattern(XPGPanel):
         for sheetname in self.generator_sheets_patterns:
             #if o_s_p['editing']==True:
                 
-            newpattern = copy.deepcopy(self.params_frame.parameterized_object)
+            newpattern = copy.deepcopy(self.params_frame._extraPO)
 
             sheet = topo.sim[sheetname]
             
