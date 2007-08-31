@@ -26,8 +26,6 @@ class GeneratorSheet(Sheet):
     
     src_ports=['Activity']
     
-    dest_ports=['Trigger']
-
     period = Number(default=1,bounds=(0,None),doc=
         "Delay (in Simulation time) between generating new input patterns.")
     
@@ -119,6 +117,7 @@ class GeneratorSheet(Sheet):
 
     def input_event(self,conn,data):
         raise NotImplementedError
+
         
 
 class SequenceGeneratorSheet(GeneratorSheet):
@@ -130,18 +129,16 @@ class SequenceGeneratorSheet(GeneratorSheet):
     units.  If the total length of the sequence is longer than
     self.period, a warning is issued and the sequence repeats
     immediately after completion.
-
     """
     
     input_sequence = ListParameter(default=[(1,topo.patterns.basic.Gaussian())],
-          doc="""The sequence of patterns to generate. Must be a list
-          of (onset,generator) tuples.""")
+          doc="""The sequence of patterns to generate. 
+          Must be a list of (onset,generator) tuples.""")
 
 
     def start(self):
         assert self.simulation
 
-        #
         event_seq = []
         for delay,gen in self.input_sequence:
             event_seq.append(FunctionEvent(delay,self.set_input_generator,gen))
@@ -149,4 +146,3 @@ class SequenceGeneratorSheet(GeneratorSheet):
         now = self.simulation.time()
         seq = PeriodicEventSequence(now+self.phase,self.period,event_seq)
         self.simulation.enqueue_event(seq)
-          
