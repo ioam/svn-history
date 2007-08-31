@@ -5,7 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.simulation import EPConnectionEvent
+from topo.base.simulation import FunctionEvent, PeriodicEventSequence
 from topo.base.sheet import Sheet 
 from topo.base.sheet import BoundingBox
 from topo.misc.utils import NxN
@@ -92,24 +92,12 @@ class GeneratorSheet(Sheet):
         else:
             ParameterizedObject().warning('There is no previous input generator to restore.')
 
-               
-    def start(self):
-        assert self.simulation
-
-        # connect self<->self (for repeating)
-        conn=self.simulation.connect(self.name,self.name,delay=self.period,src_port='Activity',dest_port='Trigger',name='Trigger',private=True)
-
-        # first event is special
-        e=EPConnectionEvent(self.phase+topo.sim.time(),conn)
-        self.simulation.enqueue_event(e)
-
-    def input_event(self,conn,data):
-        self.verbose("Time " + str(self.simulation.time()) + ":" +
-                     " Receiving input from " + str(conn.src.name) +
-                     " on dest_port " + str(conn.dest_port) +
-                     " via connection " + conn.name + ".")
+    def generate(self):
+        """
+        Generate the output and send it out the Activity port.
+        """
         self.verbose("Time %0.4f: Generating a new pattern" % (self.simulation.time()))
-        
+
         ### JABALERT: Would it be more efficient to re-use the same
         ### bit of memory each time?  This way allocates a new block
         ### of memory each time a pattern is drawn...
@@ -118,7 +106,20 @@ class GeneratorSheet(Sheet):
                "Generated pattern shape %s does not match sheet shape %s." % \
                (self.shape,self.activity.shape)
         self.send_output(src_port='Activity',data=self.activity)
+                                                        
+              
+    def start(self):
+        assert self.simulation
 
+        if self.period > 0:
+            # if it has a positive period, then schedule a repeating event to trigger it
+            e=FunctionEvent(0,self.generate)
+            now = self.simulation.time()
+            self.simulation.enqueue_event(PeriodicEventSequence(now+self.phase,self.period,[e]))
+
+    def input_event(self,conn,data):
+        raise NotImplementedError
+        
 
 class SequenceGeneratorSheet(GeneratorSheet):
     """
@@ -139,37 +140,13 @@ class SequenceGeneratorSheet(GeneratorSheet):
 
     def start(self):
         assert self.simulation
-        self._seq_pos = 0
-        delay,gen = self.input_sequence[0]
-        
-        # connect self<->self (for repeating)
-        # the delay is the delay of the first event
-        conn=self.simulation.connect(self.name,self.name,delay=delay,src_port='Activity',
-                                     dest_port='Trigger',name='Trigger',private=True)
 
-        e=EPConnectionEvent(delay+topo.sim.time(),conn)
-        self.simulation.enqueue_event(e)
-      
-    def input_event(self,conn,data):
-        if conn.name == 'Trigger':
-
-            last_delay,generator = self.input_sequence[self._seq_pos]
-            self.set_input_generator(generator)
-            delay,gen = self.input_sequence[self._seq_pos]
-            
-            if self._seq_pos < len(self.input_sequence)-1:                
-                self._seq_pos += 1
-            else:
-                self._seq_pos = 0
-                # if it's the last item in the sequence, then
-                # pad the time to fill out the generator's period
-                # before restarting.
-                total_time = sum([delay for delay,gen in self.input_sequence])
-                if total_time < self.period:
-                    delay += self.period - total_time
-            conn.delay = delay
-                
-            super(SequenceGeneratorSheet,self).input_event(conn,data)
-
-
+        #
+        event_seq = []
+        for delay,gen in self.input_sequence:
+            event_seq.append(FunctionEvent(delay,self.set_input_generator,gen))
+            event_seq.append(FunctionEvent(0,self.generate))
+        now = self.simulation.time()
+        seq = PeriodicEventSequence(now+self.phase,self.period,event_seq)
+        self.simulation.enqueue_event(seq)
           
