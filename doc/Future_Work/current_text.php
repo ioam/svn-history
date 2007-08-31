@@ -82,41 +82,37 @@ Of all the things I've recently been working on. The ALERTs and are
 getting out of control!
 
 
-<H4>2007/08/12 (CB): tkgui + plotgroup cleanup</H4>
-Now replacing ParametersFrame with one using TkParameterizedObject,
-and finishing TkParameterizedObject.
-<BR>
-Simplify tkgui, e.g. eliminating extra frames and any unnecessary
-refresh() etc methods. At the moment, the complexity makes it 
-difficult to add new features to the GUI and to correct problems.
-<BR>
-Which widgets should expand (expand=YES ?), which should fill the
-space (fill=X ?) (e.g. in parameters frames sliders etc should
-expand), and so on. Switch to grid layout where it's more appropriate.
-<BR>
-More tasks/notes in topo/tkgui/__init__.py
-<BR>
-Document some Tkinter tips.
-<BR>
-Make update_command/command consistent. Remove templateplotgroup? 
-Right click connection field on e.g. retina --> lots of errors.
-<BR>
-ParametersFrame ok/apply/reset/cancel...set order and names of
+<H4>2007/08/31 (CB): tkgui + plotgroup cleanup</H4>
+
+<ul>
+<li>plotgroup.py cleanup</li>
+
+<li>Remove templateplotgroup?</li>
+
+<li>Fix Back/Fwd buttons</li>
+
+<li>ParametersFrame ok/apply/reset/cancel...set order and names of
 ParametersFrame's Ok, Apply, Cancel, Reset, and Defaults buttons, and
-make them behave as expected for classes and instances.  
-<BR>
-SelectorParameters. Consider these old, forgotten tasks:
-SheetSelectorParameter so that the GUI (model editor) can display list
-of sheet classes etc from a Parameter; ClassSelectorParameter -
-find_classes_in_package() will become a method of
-ClassSelectorParameter.
-<BR>
-name should be constant: objects in the simulation are indexed by
-name, so name needs to be a constant Parameter (which <i>might</i>
-cause some other problems).  There are some related hacks in
-ParametersFrame that would also need to be cleaned up.
-
-
+make them behave as expected for classes and instances.</li>
+<li>Cleanup of tkparameterizedobject.py & parametersframe.py</li>
+<li>Finish SelectorParameter</li>
+<li>Right click connection field on e.g. retina --> lots of errors.</li>
+<li>Use parametersframe in more places</li>
+<li>Which widgets should expand (expand=YES ?), which should fill the
+space (fill=X ?) (e.g. in parameters frames sliders etc should
+expand), and so on. Switch to grid layout where it's more
+appropriate.</li>
+<li>Document some Tkinter tips. More tasks/notes in
+topo/tkgui/__init__.py</li>
+<li>Consider these old, forgotten tasks: SheetSelectorParameter so
+that the GUI (model editor) can display list of sheet classes etc from
+a Parameter; ClassSelectorParameter - find_classes_in_package() will
+become a method of ClassSelectorParameter.name should be constant:
+objects in the simulation are indexed by name, so name needs to be a
+constant Parameter (which <i>might</i> cause some other problems).
+There are some related hacks in ParametersFrame that would also need
+to be cleaned up.  </li>
+</ul>
 
 
 <H4>2007/06/07 (CB): timing code </H4>
@@ -398,13 +394,6 @@ After this, it would be interesting to get some hard numbers about how
 much faster the inline-optimized components are than those using numpy
 primitives.
 
-
-<H4>2006/11/09 (JA?): overhaul tkgui</H4>
-Need to do a general overhaul of the GUI; it needs to be clean and
-well designed so that it can be flexible. Before any such overall,
-review the available graphics toolkits (e.g. wxpython vs tkinter).
-Note that wxpython might include some kind of GUI shell that's 
-integrated with ipython by the time we consider this task.
 
 <H4>2006/11/09 (JL?): parameter spaces</H4>
 Add better support for exploring and optimizing parameter spaces.
