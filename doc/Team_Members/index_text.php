@@ -1,6 +1,5 @@
 <P>Topographica is developed by a distributed team of researchers in
-the United Kingdom and the United States.  Major contributors to the code
-include:
+the United Kingdom and the United States.  The principal developers are:
 
 <dl>
   <p><dt><a target="_top" href="http://homepages.inf.ed.ac.uk/jbednar">James
@@ -11,11 +10,6 @@ include:
       simulator, but is entirely reimplemented in Python for
       extensibility and generality.  Jim reviews all code and is the
       last word on the design and features.
-
-  <p><dt><a target="_top" href="http://www.cs.utexas.edu/users/risto">Risto 
-      Miikkulainen</a>, Principal investigator, 2002-2005</dt>
-  <dd>Risto is a Professor of Computer Science at the University of
-      Texas at Austin.
   <br>
   <br>
 
@@ -29,24 +23,59 @@ include:
       <a target="_top" href="http://homepages.inf.ed.ac.uk/v1cball/mae/">modeling
       motion aftereffects in LISSOM</a>.
 
+  <p><dt><a target="_top" href="http://faculty.cs.tamu.edu/choe/">Yoonsuck Choe</a>, 2002-</dt>
+  <dd>Yoonsuck is an Assistant Professor at Texas A&amp;M University.
+      He is implementing spiking neuron support,
+      primarily for integrate-and-fire neurons, and contributed
+      significantly to the web site and other graphical design.
+
+  <p><dt>Judith Law, September 2005-</dt>
+  <dd>Judith is working on her PhD thesis about V1 surround modulation
+      and species differences at the University of Edinburgh, but also
+      contributed tuning curve support and various GUI improvements.
+
+  <p><dt>Chris Palmer, September 2005-</dt>
+  <dd>Chris is working on his PhD thesis about spatial frequency
+      representations in V1 at the University of Edinburgh, but also
+      maintains receptive field plotting support and other analysis code.
+
+  <p><dt><a target="_top" href="http://www.cs.utexas.edu/~jp/">Jefferson
+      Provost</a>, 2003-</dt> 
+  <dd>Jeff is a postdoctoral researcher in the Neuroscience Department at
+      the University of Pittsburgh.  He wrote the initial GUI
+      implementation (first in Scheme, then in Python), and the first
+      Python version of most of the base classes (Sheet, CFSheet,
+      CFSOM, ParameterizedObject, LISSOM, etc.), but is now primarily
+      a Topographica user rather than a developer.
+
+  <p><dt>Roger Zhao, September 2006-</dt>
+  <dd>Roger is working on his PhD thesis about face aftereffects at the
+      University of Edinburgh, and contributes face-related code to
+      Topographica.
+
+</dl>
+
+<P><BR><BR>
+Other significant contributors include:
+
+<dl>
+  <p><dt><a target="_top" href="http://www.cs.utexas.edu/users/risto">Risto 
+      Miikkulainen</a>, Principal investigator, 2002-2005</dt>
+  <dd>Risto is a Professor of Computer Science at the University of
+      Texas at Austin.
+
   <p><dt>Julien Ciroux, October 2005 - April 2006</dt>
   <dd>Julien recently received an MSc from the University of Edinburgh
       (topic: modeling the McCollough effect in LISSOM).  He implemented the
       new plotting subsystem in 0.8.2 and other GUI-related functions.
-
-  <p><dt><a target="_top" href="http://faculty.cs.tamu.edu/choe/">Yoonsuck Choe</a>, 2002-</dt>
-  <dd>Yoonsuck is an Assistant Professor at Texas A&amp;M University.
-      He is implementing spiking neuron support,
-      primarily for integrate-and-fire neurons, and contributes
-      significantly to the web site and other graphical design.
 
   <p><dt>Foivos Demertzis, September 2006 - May 2007</dt>
   <dd>Foivos is working on his undergraduate degree at the
       University of Edinburgh, with a project of developing
       more sample models for Topographica.
 
-  <p><dt><a target="_top" href="http://porter.csres.utexas.edu/judah/">Judah De Paula</a>, 2004-</dt>
-  <dd>Judah is a PhD student at the University of Texas (topic:
+  <p><dt><a target="_top" href="http://porter.csres.utexas.edu/judah/">Judah De Paula</a>, 2004-2006</dt>
+  <dd>Judah has now completed his PhD at the University of Texas (topic:
       modeling the development of color maps in LISSOM).  He was
       responsible for the initial Windows support, and implemented the
       first complete plotting and related GUI code.
@@ -70,15 +99,6 @@ include:
       University of Edinburgh, with a project of developing
       more sample models for Topographica.
 
-  <p><dt><a target="_top" href="http://www.cs.utexas.edu/~jp/">Jefferson
-      Provost</a>, 2003-</dt> 
-  <dd>Jeff is a postdoctoral researcher in the Neuroscience Department at
-      the University of Pittsburgh.  He wrote the initial GUI
-      implementation (first in Scheme, then in Python), and the first
-      Python version of most of the base classes (Sheet, CFSheet,
-      CFSOM, ParameterizedObject, LISSOM, etc.), but is now primarily
-      Topographica user rather than a developer.
-
   <p><dt><a target="_top"
       href="http://www.cs.utexas.edu/users/yfsit/">Yiu Fai Sit</a>,
       May 2005-</dt>
@@ -87,11 +107,4 @@ include:
       V2).  He was responsible for making the first Topographica
       implementation of LISSOM match the C++ version, and for
       writing C code to optimize key Topographica functions.
-
-  <p><dt>Roger Zhao, September 2006-</dt>
-  <dd>Roger is working on his PhD thesis about face aftereffects at the
-      University of Edinburgh, but also contributes optimizations and
-      other code to Topographica.
-
 </dl>
-
