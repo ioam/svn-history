@@ -62,9 +62,10 @@ $Id$
 __version__='$Revision$'
 
 from parameterizedobject import ParameterizedObject, Parameter
-from parameterclasses import Number, BooleanParameter
+from parameterclasses import Number, BooleanParameter,wrap_callable
 from copy import copy, deepcopy
 from fixedpoint import FixedPoint
+import bisect
 
 SLEEP_EXCEPTION = "Sleep Exception"
 STOP = "Simulation Stopped"
@@ -510,12 +511,29 @@ class Event(object):
     def __init__(self,time):
         self.time = time
         
-    def __call__(self):
+    def __call__(self,sim):
         """
         Cause some computation to be performed, deliver a message, etc.,
-        as appropriate for each subtype of Event.
+        as appropriate for each subtype of Event.  Should be passed the
+        simulation object, to allow access to .time() etc.        
         """
         raise NotImplementedError
+
+    def __cmp__(self,ev):
+        """
+        Implements event comparison by time, allowing sorting,
+        and queue maintenance  using bisect module or minheap
+        implementations, if needed.
+
+        NOTE: identity comparisons should always be done using the
+        'is' operator, not '=='.
+        """
+        if self.time > ev.time:
+            return 1
+        elif self.time < ev.time:
+            return -1
+        else:
+            return 0
 
 
 class EPConnectionEvent(Event):
@@ -536,7 +554,7 @@ class EPConnectionEvent(Event):
         self.data = deepcopy(data)
         self.conn = conn
 
-    def __call__(self):
+    def __call__(self,sim):
         self.conn.dest.input_event(self.conn,self.data)
 
     def __repr__(self):
@@ -568,7 +586,7 @@ class CommandEvent(Event):
     # CEBALERT: should we stop execution after detecting errors
     # (rather than just printing a warning) in __call__() and
     # __test()? After deciding, make docstrings match behavior.
-    def __call__(self):
+    def __call__(self,sim):
         """
         exec's the command_string in __main__.__dict__.
         
@@ -582,7 +600,8 @@ class CommandEvent(Event):
         # Presumably here to avoid importing __main__ into the rest of the file
         import __main__
 
-        ParameterizedObject(name='CommandEvent').message("Time %08.2f: Running command %s" % (self.time,self.command_string))
+        ParameterizedObject(name='CommandEvent').message("Time %08.2f: Running command %s" \
+                                                         % (self.time,self.command_string))
         
         try:
             exec self.command_string in __main__.__dict__
@@ -616,9 +635,94 @@ class CommandEvent(Event):
             pass
         
 
+class FunctionEvent(Event):
+    """
+    Event that executes a given function function(*args,**kw).
+    """
+    def __init__(self,time,fn,*args,**kw):
+        super(FunctionEvent,self).__init__(time)
+        self.fn = wrap_callable(fn)
+        self.args = args
+        self.kw = kw
+
+    def __call__(self,sim):
+        self.fn(*self.args,**self.kw)
+
+    def __repr__(self):
+        return 'FunctionEvent(%s,%s,*%s,**%s)' % (`self.time`,`self.fn`,`self.args`,`self.kw`)
+
+class EventSequence(Event):
+    """
+    Event that contains a sequence of other events to be scheduled and
+    executed.
+
+    The .time attributes of the events in the sequence are interpreted
+    as offsets relative to the start time of the sequence itself.
+    """
+    def __init__(self,time,sequence):
+        super(EventSequence,self).__init__(time)
+        self.sequence = sequence
+
+    def __call__(self,sim):
+
+        # Enqueue all the events in the sequence, offsetting their
+        # times from the current time
+        sched_time = sim.time()
+        for ev in self.sequence:
+            new_ev = copy(ev)
+            sched_time += ev.time
+            new_ev.time = sched_time
+            sim.enqueue_event(new_ev)
+
+    def __repr__(self):
+        return 'EventSequence(%s,%s)' % (`self.time`,`self.sequence`)
+
+
+
+class PeriodicEventSequence(EventSequence):
+    """
+    An EventSequence that reschedules itself periodically
+
+    Takes a period argument that determines how often the sequence
+    will be scheduled.   If the length of the sequence is longer than
+    the period, then the length of the sequence will be used as the period.
+    """
+    ## JPHACKALERT: This should really be refactored into a
+    ## PeriodicEvent class that periodically executes a single event,
+    ## then the user can construct a periodic sequence using a
+    ## combination of PeriodicEvent and EventSequence.  This would
+    ## change the behavior if the sequence length is longer than the
+    ## period, but I'm not sure how important that is, and it might
+    ## actually be useful the other way.
+    
+
+    def __init__(self,time,period,sequence):
+        super(PeriodicEventSequence,self).__init__(time,sequence)
+        self.period = period
+        
+    def __call__(self,sim):        
+        super(PeriodicEventSequence,self).__call__(sim)
+
+        # Find the timed length of the sequence
+        seq_length = sum(e.time for e in self.sequence)
+
+        if seq_length < self.period:
+            # If the sequence is shorter than the period, then reschedule
+            # the sequence to occurr again after the period
+            self.time += self.period
+        else:
+            # If the sequence is longer than the period, then
+            # reschedule to start after the sequence ends.
+            self.time += seq_length
+        sim.enqueue_event(self)
+
+    def __repr__(self):
+        return 'PeriodicEventSequence(%s,%s,%s)' % (`self.time`,`self.period`,`self.sequence`)
 
 
 ### CB: I'm working here (not yet finished; documenation to follow).
+### JP: Is it possible that some or all of this can be more cleanly
+### implemented using PeriodicEvents?
 
 import time
 from math import fmod,floor
@@ -952,7 +1056,7 @@ class Simulation(ParameterizedObject):
         # see my HACKALERT below.
         
         # Execute any commands in execute_next, and then remove them.
-        [CommandEvent(time=self._time,command_string=cmd)() for cmd in self.execute_next]
+        [CommandEvent(time=self._time,command_string=cmd)(self) for cmd in self.execute_next]
         self.execute_next=[]
         
         # Complicated expression for min(time+duration,until)
@@ -994,7 +1098,7 @@ class Simulation(ParameterizedObject):
                 # Pop and call the event at the head of the queue.
                 event = self.events.pop(0)
                 #self.debug("Delivering "+ repr(event))
-                event()
+                event(self)
                 did_event=True
 
 
@@ -1002,7 +1106,7 @@ class Simulation(ParameterizedObject):
         #if self.events and self.events[0].time >= stop_time:
 
         # JPHACKALERT: This is weird.  It can cause time to go backwards,
-        # (see CEBHACKALERT above.  Also, if the simulation runs out of
+        # (see CEBHACKALERT above).  Also, if the simulation runs out of
         # events before stop_time is reached, shouldn't that be reflected in
         # Simulation.time()?
         if stop_time != Forever :
@@ -1018,16 +1122,21 @@ class Simulation(ParameterizedObject):
 
         # The new event goes at the end of the event queue if there
         # isn't a queue right now, or if it's later than the last
-        # event's time.  Otherwise, it's inserted at the appropriate
-        # position somewhere inside the event queue.
-        if not self.events or event.time >= self.events[-1].time:
+        # event's time. 
+        if not self.events or event >= self.events[-1]:
             self.events.append(event)
             return
 
-        for i,e in enumerate(self.events):
-            if event.time < e.time:
-                self.events.insert(i,event)
-                break
+        # If it's earlier than the first item it goes at the beginning.
+        if event < self.events[0]:
+            self.events.insert(0,event)
+
+        # Otherwise, it's inserted at the appropriate
+        # position somewhere inside the event queue.
+        # New events are enqueued after (right of) existing
+        # events with the same time, i.e. 'simultaneous' events
+        # are executed FIFO.
+        bisect.insort_right(self.events,event)
 
     def schedule_command(self,time,command_string):
         """
