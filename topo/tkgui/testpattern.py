@@ -8,6 +8,7 @@ __version__='$Revision$'
 ## Notes:
 # * need to remove audigen pgs
 # * missing disparity flip hack (though see JABHACKALERT below)
+# * values like pi are written over
 
 ## Needs to be upgraded to behave how we want:
 ### JABHACKALERT: Should use PatternPresenter (from
