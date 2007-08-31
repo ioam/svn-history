@@ -220,6 +220,8 @@ class OneToOneProjection(Projection):
     def __init__(self,**kw):
         super(OneToOneProjection,self).__init__(**kw)
 
+        self.input_buffer = None
+        
         dx,dy = self.dest.bounds.centroid()
 
         # JPALERT: Not sure if this is the right way to generate weights.
@@ -261,7 +263,7 @@ class OneToOneProjection(Projection):
 
     def activate(self,input):
         self.input_buffer = input
-        result = self.weights.take(self.dest_idxs) * input.take(self.src_idxs)
+        result = self.weights.take(self.dest_idxs) * input.take(self.src_idxs) * self.strength
         self.activity.put(self.dest_idxs,result)
         self.output_fn(self.activity)
 
