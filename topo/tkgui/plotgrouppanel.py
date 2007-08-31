@@ -399,8 +399,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         self.plotgroup.draw_plots(update=False)
         self.display_plots()  # ?
  
-
-
     def set_auto_refresh(self):
         """Function called by Widget when check-box clicked."""
         if self.auto_refresh: 
@@ -862,9 +860,11 @@ class XPGPanel(PlotGroupPanel):
 
         self.pack_param('normalize',parent=self.control_frame_1,
                         on_change=self.redraw_plots,side="right")
+        # Actually, these could simply call scale_images(), skipping redrawing...
         self.pack_param('integer_scaling',parent=self.control_frame_2,
                         on_change=self.redraw_plots,side='right')
         self.pack_param('sheet_coords',parent=self.control_frame_2,
                         on_change=self.redraw_plots,side='right')
+        
 
 
