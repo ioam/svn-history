@@ -524,6 +524,12 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         return x
         
 
+    def conditional_refresh(self):
+        """
+        Only calls refresh() if auto_refresh is enabled.
+        """
+        if self.auto_refresh:self.refresh()
+
 
     def refresh(self,update=True):
         """
