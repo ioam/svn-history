@@ -273,18 +273,18 @@ class SheetPlotGroup(PlotGroup):
             minimum_height_of_tallest_plot = max(bitmap_heights)
             
         else:           
-            ### Should take the plot bounds instead of the sheet ones, once that's supported            
-            sheet = topo.sim.objects(Sheet)[p.plot_src_name]
-            max_sheet_height = max([(sheet.bounds.lbrt()[3]-
-                                     sheet.bounds.lbrt()[1])
+            ### JABALERT: Should take the plot bounds instead of the sheet bounds
+            sheets = topo.sim.objects(Sheet)
+            max_sheet_height = max([(sheets[p.plot_src_name].bounds.lbrt()[3]-
+                                     sheets[p.plot_src_name].bounds.lbrt()[1])
                                    for p in resizeable_plots])
-            max_sheet_density = max([sheet.xdensity
+            max_sheet_density = max([sheets[p.plot_src_name].xdensity
                                      for p in resizeable_plots])
             minimum_height_of_tallest_plot = max_sheet_height*max_sheet_density
             
         if (self.height_of_tallest_plot < minimum_height_of_tallest_plot):
             self.height_of_tallest_plot = minimum_height_of_tallest_plot
-
+            
         # Apply optional scaling to the overall size
         if zoom_factor:
             new_height = self.height_of_tallest_plot * zoom_factor
@@ -297,7 +297,7 @@ class SheetPlotGroup(PlotGroup):
         # Scale the images so that each has a size up to the height_of_tallest_plot
 	for plot in resizeable_plots:
 	    if self.sheet_coords:
-                s = topo.sim.objects(Sheet).get(plot.plot_src_name,None)
+                s = topo.sim.objects(Sheet)[p.plot_src_name]
 	        scaling_factor=self.height_of_tallest_plot/float(s.xdensity)/max_sheet_height
 	    else:
 	        scaling_factor=self.height_of_tallest_plot/float(plot._orig_bitmap.height())
