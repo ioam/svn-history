@@ -106,6 +106,11 @@ class TestPattern(XPGPanel):
                                              on_modify=self.conditional_refresh)
 
         self.params_frame.hide_param('Close')
+        self.params_frame.hide_param('Defaults') # CB: see ALERT in ParameterizedObject.reset_params()
+        # (Additionally, changing the pattern generator has the same
+        # effect as pressing Defaults would have if it worked. In
+        # fact, changes to the pattern generators probably ought to
+        # persist.)
 
         self.pack_param('edit_sheet',parent=self.pg_control_pane,on_modify=self.switch_sheet)
         self.pack_param('pattern_generator',parent=self.pg_control_pane,
