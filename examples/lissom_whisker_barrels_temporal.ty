@@ -484,5 +484,9 @@ topo.sim.grid_layout([[None, 'S1'],
                       [('Ganglia'+str(i)) for i in xrange(num_lags)]],
                      xstart=150, xstep=150)
 
-
+# Make DeflectionPreference be the default subplot
+from topo.plotting.templates import plotgroup_templates
+for name in ["Activity", "Connection Fields", "Projection"]:
+    plotgroup_templates[name].plot_templates[name]["Hue"]="DeflectionPreference"
+    plotgroup_templates[name].plot_templates[name]["Confidence"]="DeflectionSelectivity"
 
