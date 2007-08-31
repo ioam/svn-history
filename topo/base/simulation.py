@@ -708,7 +708,7 @@ class PeriodicEventSequence(EventSequence):
 
         if seq_length < self.period:
             # If the sequence is shorter than the period, then reschedule
-            # the sequence to occurr again after the period
+            # the sequence to occur again after the period
             self.time += self.period
         else:
             # If the sequence is longer than the period, then
@@ -720,7 +720,7 @@ class PeriodicEventSequence(EventSequence):
         return 'PeriodicEventSequence(%s,%s,%s)' % (`self.time`,`self.period`,`self.sequence`)
 
 
-### CB: I'm working here (not yet finished; documenation to follow).
+### CB: I'm working here (not yet finished; documentation to follow).
 ### JP: Is it possible that some or all of this can be more cleanly
 ### implemented using PeriodicEvents?
 
