@@ -931,24 +931,33 @@ class ParameterizedObject(object):
 
 
     def params(self):
+
         """
         See ParameterizedObjectMetaClass.classparams(),
         which this method calls on the class of this object.
         """
         return type(self).classparams()
 
-    # CEBALERT: should be 'defaults' or something similar.
-    # CEBERRORALERT: what about defaults of instantiated params? Check what happens.
-    # Also doesn't work with ParameterizedObject.
+
+    # CEBALERTs:
+    # * should be called 'defaults' or something similar.
+    # * name should be a constant Parameter, rather than needing to test
+    #   specially for name here
+    # * what happens to dynamic parameters?
+    # * doing the right thing for instantiate? (probably duplicating
+    #   code & what about object_count)
+
+    # CEBERRORALERT: doesn't work for compound params? e.g. try
+    # 'defaults' button in test pattern window
     def reset_params(self):
         """
         Return Parameters with modifiable values to the class defaults.
         """
         for (attr_name,param) in self.params().items():
-            # CEBALERT: name should be Constant - should stop faking it
-            # everywhere (see current task list).
-            if param.constant or attr_name=="name": # CB:what about instantiate & dynamic?
+            if param.constant or attr_name=="name": 
                 pass
+            elif param.instantiate:
+                setattr(self,attr_name,copy.deepcopy(param.default))                
             else:
                 setattr(self,attr_name,param.default)
 
