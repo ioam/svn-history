@@ -278,7 +278,7 @@ include:
   Reduce    viewmag+_2.2.svg
   Back      back-2.0.svg    
   Forward   forward-2.0.svg
-<pre>
+</pre>
 
 
 Because the icons are distributed in SVG format, it should be easy to
