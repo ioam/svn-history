@@ -24,7 +24,7 @@ __version__ = '$Revision$'
 from numpy import dot,sin,cos,pi,array,argmax,nonzero,take
 
 from topo.base.cf import CFSheet
-from topo.sheets.generatorsheet import GeneratorSheet
+from topo.sheets.generatorsheet import SequenceGeneratorSheet
 from topo.base.parameterclasses import Number,Magnitude,CallableParameter,BooleanParameter
 from topo.base.boundingregion import BoundingBox,BoundingRegionParameter
 from topo.misc import utils
@@ -166,7 +166,7 @@ class SaccadeController(CFSheet):
 
 
         
-class ShiftingGeneratorSheet(GeneratorSheet):
+class ShiftingGeneratorSheet(SequenceGeneratorSheet):
     """
     A GeneratorSheet that takes an extra input on port 'Saccade'
     that specifies a saccade command as a tuple (amplitude,direction),
@@ -226,11 +226,15 @@ class ShiftingGeneratorSheet(GeneratorSheet):
             if self._out_of_bounds():
                 self._find_saccade_in_bounds(radius,direction)
 
-        if self.generate_on_shift or conn.dest_port != 'Saccade':
-            super(ShiftingGeneratorSheet,self).input_event(conn,data)
-            self.send_output(src_port='Position',
-                             data=self.bounds.aarect().centroid())
+            if self.generate_on_shift:
+                self.generate()
 
+
+    def generate(self):
+        super(ShiftingGeneratorSheet,self).generate()
+        self.send_output(src_port='Position',
+                         data=self.bounds.aarect().centroid())
+        
 
     def _shift(self,radius,angle):
         angle *= pi/180
