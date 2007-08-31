@@ -20,11 +20,10 @@ __version__='$Revision$'
 # lifetime of the window, but could be risky - what if someone expects
 # a new one each time?
 
-# CEBERRORALERT: not wiping old widgets and labels from screen when
-# replacing the parameterizedobject!
-
 # CEBALERT: need to catch window close event so it uses the same exit handling
 # as the close button
+
+# CEBALERT: apply/reset etc button positions need to be fixed.
 
 
 import tkMessageBox
@@ -178,14 +177,12 @@ class XParametersFrame(TkParameterizedObject,Frame):
                         pady=2,
                         sticky=posn)
 
-        self.currently_displaying  = self.representations
-
+        self.currently_displaying = dict([(param_name,self.representations[param_name])
+                                        for param_name in self.displayed_params])
 
 
 
     def defaultsB(self):
-        # CEBERRORALERT: what about defaults of instantiated params? Check what happens.
-        # (ALERT should be in parameterizedobject.py)
         assert isinstance(self._extraPO,ParameterizedObject), "Only defined for ParameterizedObject"
         self._extraPO.reset_params()
 
