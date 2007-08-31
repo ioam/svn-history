@@ -938,6 +938,8 @@ class ParameterizedObject(object):
         return type(self).classparams()
 
     # CEBALERT: should be 'defaults' or something similar.
+    # CEBERRORALERT: what about defaults of instantiated params? Check what happens.
+    # Also doesn't work with ParameterizedObject.
     def reset_params(self):
         """
         Return Parameters with modifiable values to the class defaults.
