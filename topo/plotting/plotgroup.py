@@ -274,6 +274,9 @@ class SheetPlotGroup(PlotGroup):
             
         else:           
             ### JABALERT: Should take the plot bounds instead of the sheet bounds
+            ### Specifically, a weights plot with situate=False
+            ### doesn't use the Sheet bounds, and so the
+            ### minimum_height is significantly overstated.
             sheets = topo.sim.objects(Sheet)
             max_sheet_height = max([(sheets[p.plot_src_name].bounds.lbrt()[3]-
                                      sheets[p.plot_src_name].bounds.lbrt()[1])
