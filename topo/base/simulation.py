@@ -720,7 +720,13 @@ class PeriodicEventSequence(EventSequence):
         return 'PeriodicEventSequence(%s,%s,%s)' % (`self.time`,`self.period`,`self.sequence`)
 
 
-### CB: I'm working here (not yet finished; documentation to follow).
+############ Timer code ############
+#
+# CB: code that previously existed in various places now collected
+# together. The original timing code was not properly tested, and the
+# current code has not been tested either: needs writing cleanly and
+# testing.
+#  
 ### JP: Is it possible that some or all of this can be more cleanly
 ### implemented using PeriodicEvents?
 
@@ -728,35 +734,64 @@ import time
 from math import fmod,floor
 class SomeTimer(ParameterizedObject):
     """
+    Provides a countdown timer for functions that run repeatedly.
+    
+    There are two distinct ways to use the timer.
+
+    The first, via call_and_time(), is for calling some function every
+    specified number of steps for a specified duration. Currently
+    call_and_time() is used for timing calls to simulation.run() every
+    1.0 steps for 100 iterations. See the Simulation class for an
+    example of using the timer in this way.
+
+    The second, via X(), is for calling some function repeatedly a
+    specified number of times. A case to use X() would be timing
+    pattern presentations, where the number of times the
+    pattern_presenter will be called is known in
+    advance. Additionally, this method allows a list of arguments to
+    be passed to the function (in this case, the permutation for each
+    call).
     """
-# Might need to add:
-#  - parameters to control formatting
+    # * parameters to control formatting?
+    # * the parameter types for some of the following could be more specific
+    step = Parameter(default=None,doc=
+        """Only relevant with call_and_time, not X. 
+        
+           Each iteration, func is called as func(step).
+    
+           For example, step=1 with func set to topo.sim.time would cause
+           the simulation time to advance once per iteration.
 
-    step = Parameter(default=None ,
-                     doc="""
-                     Each iteration, func is called as func(step).
+           The default value (None) gives 50 iterations for any value of simulation_duration
+           passed to call_and_time(simulation_duration).""")
+    
+    estimate_interval = Number(default=50,doc=
+        """Interval in simulation time between estimates.""") 
 
-                     For example, step=1 with func set to topo.sim.time would cause
-                     the simulation time to advance once per iteration.
+    func = Parameter(default=None,instantiate=True,doc=
+        """Function to be timed.""")
 
-                     The default value (None) gives 50 iterations for any value of simulation_duration
-                     passed to call_and_time(simulation_duration).
-                     """)
-    estimate_interval = Number(default=50,doc="") # Integer?
+##     func_args = Parameter(default=None,instantiate=True,doc=
+##         """Arguments passed to func at time of calling.""")
 
-    # CB: need to change Parameter types - Callable, List, ...
-    # CB: rename
-    func = Parameter(default=None,instantiate=True, doc="Function that call_and_time() will call and give timing info about.")
+    simulation_time_fn = Parameter(default=None,instantiate=True,doc=
+        """Function that returns the simulation time.""")
 
-    func_args = Parameter(default=None,instantiate=True,doc="Arguments passed to func at time of calling.")
+    real_time_fn = Parameter(default=time.time,instantiate=True,doc=
+        """Function that returns the wallclock time.""")
 
-    simulation_time_fn = Parameter(default=None,instantiate=True,doc="")
+    receive_messages = Parameter(default=[],instantiate=True,doc=
+        """List of objects that will receive timing messages.
+        Each must have a timing_message() method.""")
 
-    real_time_fn = Parameter(default=time.time,instantiate=True,doc="")
+    receive_progress = Parameter(default=[],instantiate=True,doc=
+        """List of objects that will receive the current 'percentage complete'
+        value. Each must have a timing_value() method.""")
 
-    receive_messages = Parameter(default=[],instantiate=True,doc="List of objects that will receive timing messages. Each must have a timing_message() method.")
+    stop = BooleanParameter(default=False,doc=
+        """If set to True, execution of func (and timing) will cease at the end of
+        the current iteration.""")
 
-    receive_progress = Parameter(default=[],instantiate=True,doc="List of objects that will receive the current 'percentage complete' value. Each must have a timing_value() method.""")
 
     def __pass_out_progress(self,val):
         [thing(val) for thing in self.receive_progress]
@@ -765,24 +800,16 @@ class SomeTimer(ParameterizedObject):
         [thing(message) for thing in self.receive_messages]
 
 
-    # document stop
-
-    def _measure(self,fduration,step,alist=None,finish_off=False):
+    def __measure(self,fduration,step,arg_list=None,finish_off=False):
 
         iters  = int(floor(fduration/step))
         remain = fmod(fduration, step)
         recenttimes=[]
 
-
-        if not alist:
-            alist = [step]*iters
+        if not arg_list: arg_list=[step]*iters
         
         starttime=self.real_time_fn()
         simulation_starttime = self.simulation_time_fn()
-
-
-        # CEBALERT: check that the timing code is actually
-        # doing the right thing (e.g. step=20, but run for 10)
 
         self.stop = False
         for i in xrange(iters):
@@ -793,13 +820,12 @@ class SomeTimer(ParameterizedObject):
                 recenttimes.pop(0)
                 length-=1
 
-            self.func(alist[i])
+            self.func(arg_list[i])
 
             percent = 100.0*i/iters
             estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
             self.__pass_out_progress(percent)
             
-
             if not finish_off: # (temp)
             ####################################################################################
                 message = 'Time ' + str(self.simulation_time_fn()) + ': ' + \
@@ -815,8 +841,7 @@ class SomeTimer(ParameterizedObject):
                 
             self.__pass_out_message(message)
 
-            if self.stop:
-                break
+            if self.stop: break
 
 
         if not self.stop:
@@ -843,23 +868,32 @@ class SomeTimer(ParameterizedObject):
         self.__pass_out_message(message)
 
               
-    def X(self,a):
-        self._measure(len(a),1.0,alist=a)
+    def X(self,args_for_iterations):
+        """
+        Call self.func(args_for_iterations[i]) for all i in args_for_iterations.
+        """
+        self.__measure(len(a),1.0,arg_list=args_for_iterations)
         
     
     def call_and_time(self,fduration):
-
+        """
+        Call self.func() every self.step over fduration.
+        """
         # default to 50 steps unless someone set otherwise
         step = self.step or fduration/50.0
-
-        self._measure(fduration,step,finish_off=True)
+        self.__measure(fduration,step,finish_off=True)
         
         
-
-# CB: temporary - can use to get timing messages at the commandline
+# CB: use to get timing messages at the commandline:
+# from topo.base.simulation import MessagePrinter
+# topo.sim.timer.receive_messages.append(MessagePrinter().printm)
 class MessagePrinter(object):
     def printm(self,x): print x
-# from topo.base.simulation import MessagePrinter; topo.sim.timer.receive_messages.append(MessagePrinter().printm)
+
+############ End of timer code ############
+
+
+
 
 
 # Simulation stores its events in a linear-time priority queue (i.e., a
