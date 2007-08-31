@@ -211,14 +211,14 @@ class SheetPlotGroup(PlotGroup):
         be correct, e.g. when using Sheet coordinates, which is often more
         important.""")
 
-
-
-
-    def __init__(self,**params):
+    # CEBALERT: ifkeeping this, need to add to other contructors.
+    def __init__(self,sheets=None,**params):
+        self.sheets = sheets
         super(SheetPlotGroup,self).__init__(**params)
         self.height_of_tallest_plot = 150.0 # Initial value
 
-
+    def _sheets(self):
+        return self.sheets or topo.sim.objects(Sheet).values()
 
     ### CEB: At least some of this scaling would be common to all
     ### plotgroups, if some (e.g. featurecurve) didn't open new
@@ -273,12 +273,12 @@ class SheetPlotGroup(PlotGroup):
             minimum_height_of_tallest_plot = max(bitmap_heights)
             
         else:           
-            sheets=topo.sim.objects(Sheet)
-            ### Should take the plot bounds instead of the sheet ones, once that's supported
-            max_sheet_height = max([(sheets[p.plot_src_name].bounds.lbrt()[3]-
-                                     sheets[p.plot_src_name].bounds.lbrt()[1])
+            ### Should take the plot bounds instead of the sheet ones, once that's supported            
+            sheet = topo.sim.objects(Sheet)[p.plot_src_name]
+            max_sheet_height = max([(sheet.bounds.lbrt()[3]-
+                                     sheet.bounds.lbrt()[1])
                                    for p in resizeable_plots])
-            max_sheet_density = max([sheets[p.plot_src_name].xdensity
+            max_sheet_density = max([sheet.xdensity
                                      for p in resizeable_plots])
             minimum_height_of_tallest_plot = max_sheet_height*max_sheet_density
             
@@ -332,9 +332,6 @@ class TemplatePlotGroup(SheetPlotGroup):
                 
 	# Add static images to the added_plot_list, as specified by the template.
         self._add_static_images()
-
-    def _sheets(self):
-        return topo.sim.objects(Sheet).values()
 	
     def _plot_list(self):
         """
@@ -353,6 +350,7 @@ class TemplatePlotGroup(SheetPlotGroup):
     	return plot_list
 
 
+# create_plot (no s)
     def _create_plots(self,pt_name,pt,sheet):
 	""" 
 	Sub-function of _plot_list().
