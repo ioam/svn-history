@@ -27,7 +27,7 @@ class TestSimulation(unittest.TestCase):
         se.data[0] = 5
         assert data[0] != se.data[0], 'Matrices should be different'
         se2 = copy(se)
-        assert se != se2, 'Objects are the same'
+        assert se is not se2, 'Objects are the same'
 
     def test_state_stack(self):
         s = Simulation()
@@ -43,6 +43,38 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(len(s._events_stack),0)
         
 
+    def test_event_cmp(self):
+
+        e1 = Event(1)
+        e1a = Event(1)
+        e2 = Event(2)
+
+        assert e1 ==  e1a
+        assert e1 < e2
+        assert e1 == e1
+        assert e2 > e1
+        assert e2 == e2
+        assert e1 != e2
+        assert e2 != e1
+        
+    def test_event_insert(self):
+        s = Simulation()
+
+        e1 = Event(1)
+        e1a = Event(1)
+        e2 = Event(2)
+        e2a = Event(2)
+
+        s.enqueue_event(e1)
+        s.enqueue_event(e2)
+        s.enqueue_event(e2a)
+        s.enqueue_event(e1a)
+
+        assert s.events[0] == e1
+        assert s.events[1] == e1a
+        assert s.events[2] == e2
+        assert s.events[3] == e2a
+        
     def test_get_objects(self):
         s = Simulation()
 
