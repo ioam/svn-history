@@ -63,6 +63,7 @@ from topoconsole import TopoConsole
 # also appear in the GUI menus if they are derived from any class
 # derived from the one specified in each widget, and imported before
 # the relevant GUI window starts.
+from topo.coordmapperfns import *
 from topo.eps import *
 from topo.learningfns import *
 from topo.outputfns import *
