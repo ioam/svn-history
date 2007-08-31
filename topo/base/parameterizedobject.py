@@ -26,7 +26,7 @@ min_print_level = NORMAL
 
 # Indicates whether warnings should be raised as errors, stopping
 # processing.
-warnings_as_errors = False
+warnings_as_exceptions = False
 
 object_count = 0
 
@@ -313,33 +313,56 @@ class Parameter(object):
     def get_name(self,obj):
         """
         Return the name that the specified object has for this parameter.
-
-        The parameter instance itself does not store its name, and cannot
-        know what name the object that owns it might have for it.  However,
-        it can discover this if the owning object is passed to this function,
-        which looks for itself in the owning class hierarchy and returns the name
-        assigned to it.    
         """
         if not hasattr(self,'_name') or not self._name:
-             classes = classlist(type(obj))[::-1]
-             for class_ in classes:
-                 for attrib_name in dir(class_):
-                     if hasattr(class_,'get_param_descriptor'):
-                         desc,desctype = class_.get_param_descriptor(attrib_name)
-                         if desc is self:
-                             self._name = '_%s_param_value'%attrib_name
-                             return self._name
-        else:
-            return self._name
+            self._name = '_%s_param_value'%self._discover_attrib_name(obj,None)
 
-    def attrib_name(self):
+        return self._name
+
+    def attrib_name(self,obj=None,objtype=None):
         """
-        Return the attribute name (not the internal name) for this parameter, for
-        use in generating error messages. If self._name isn't set
-        (i.e., .get_name() hasn't been called yet), returns None.
+        Return the attribute name (not the internal name) for this
+        parameter, for use in generating error messages.  If
+        self._name isn't set (i.e., .get_name() hasn't been called
+        yet), it is only generated if either obj or objtype is set,
+        otherwise an empty string is returned.
         """
-        if self._name:
-            return self._name.split('_param_value')[0][1:]
+        if not (obj or objtype):
+            if hasattr(self,'_name') and self._name:
+                return self._name.split('_param_value')[0][1:]
+            else:
+                return ''
+
+        return self._discover_attrib_name(obj,objtype)
+
+    def _discover_attrib_name(self,obj,objtype):
+        """
+        The parameter instance itself does not initially know its
+        name.  However, it can discover the name if the owning object
+        or object type is passed to this function, which looks for
+        itself in the owning class hierarchy and returns the name
+        assigned to it.
+        """
+        if obj and not objtype: objtype = type(obj)
+
+        classes = classlist(objtype)[::-1]
+        for class_ in classes:
+            for attrib_name in dir(class_):
+                if hasattr(class_,'get_param_descriptor'):
+                    desc,desctype = class_.get_param_descriptor(attrib_name)
+                    if desc is self:
+                        return attrib_name
+
+        # If things fall through to here without finding
+        # the descriptor, then check in the object dictionary.
+        # Dynamic parameters set in the object constructor are stored there.
+        if obj:
+            for name,value in obj.__dict__.iteritems():
+                if value is self:
+                    return name
+
+        # if we get this far, we couldn't find the name
+        return None
         
 
     def __getstate__(self):
@@ -753,11 +776,11 @@ class ParameterizedObject(object):
     def warning(self,*args):
         """
         Print the arguments as a warning, unless module variable
-        warnings_as_errors is True, then raise an Exception containing
-        the arguments.
+        warnings_as_exceptions is True, then raise an Exception
+        containing the arguments.
         """
 
-        if not warnings_as_errors:
+        if not warnings_as_exceptions:
             self.__db_print(WARNING,"Warning:",*args)
         else:
             raise Exception, ' '.join(["Warning:",]+[str(x) for x in args])

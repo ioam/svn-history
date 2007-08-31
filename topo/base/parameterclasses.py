@@ -615,7 +615,7 @@ class CompositeParameter(Parameter):
         """
         Set the values of all the attribs.
         """
-        assert len(val) == len(self.attribs),"Compound parameter %s got the wrong number of values (needed %d, but got %d)." % (self.attrib_name(),len(self.attribs),len(val))
+        assert len(val) == len(self.attribs),"Compound parameter %s got the wrong number of values (needed %d, but got %d)." % (self.attrib_name(obj=obj),len(self.attribs),len(val))
         
         if not obj:
             for a,v in zip(self.attribs,val):
@@ -679,7 +679,7 @@ class ClassSelectorParameter(SelectorParameter):
             val=val()
         
         if not (isinstance(val,self.class_)):
-            raise ValueError("Parameter " + `self.attrib_name()` + " (" + `self.__class__.__name__` +
+            raise ValueError("Parameter " + `self.attrib_name(obj=obj)` + " (" + `self.__class__.__name__` +
                              ") must be an instance of " + self.class_.__name__ +
                              "; " + `val` + " is " + `type(val)` + ".")
         super(ClassSelectorParameter,self).__set__(obj,val)
