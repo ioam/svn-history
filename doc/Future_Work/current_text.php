@@ -267,6 +267,25 @@ Strange Projection plots.
 
 <H2>Things we hope to take care of eventually</H2>
 
+<H4>2007/08/31 (JB) Icons for buttons</H4> We should replace some of
+the most common buttons with icons, to make the windows less busy
+looking.  An easy option would be to take the BlueSphere 0.3.0 icons,
+freely available from http://svgicons.sourceforge.net/.  Examples
+include:
+
+<pre>
+  Enlarge   viewmag-_2.1.svg
+  Reduce    viewmag+_2.2.svg
+  Back      back-2.0.svg    
+  Forward   forward-2.0.svg
+<pre>
+
+
+Because the icons are distributed in SVG format, it should be easy to
+adapt them if we need ones that are not included, e.g. using the
+Inkscape editor.  In Inkscape, PNG bitmap images can be created using
+Export Bitmap, selecting the Page option.
+
 
 <H4>2007/05/29 (JP) Mac GUI cleanup</H4>
 The Mac GUI needs a variety of things to make it more Mac-like.
