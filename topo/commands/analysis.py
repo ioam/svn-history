@@ -149,6 +149,16 @@ class PatternPresenter(ParameterizedObject):
                 inputs[input_sheet_names[0]].scale=2*inputs[input_sheet_names[0]].ocular
                 inputs[input_sheet_names[1]].scale=2.0-2*inputs[input_sheet_names[1]].ocular
 
+        # For WhiskerArray only; used to set the delay/lag in each input sheet
+        if features_values.has_key("deflection"):
+            for i in range(1): 
+                inputs[input_sheet_names[i]].step=i
+
+        # JABALERT: hard-coded to range of 4 temporal lags; should be renamed _temporal
+        if features_values.has_key("deflection_spatial"):
+            for i in range(4): 
+                inputs[input_sheet_names[i]].step=i
+
         if features_values.has_key("contrast") or param_dict.has_key("contrast"):
             if self.contrast_parameter=='michelson_contrast':
                 for g in inputs.itervalues():
