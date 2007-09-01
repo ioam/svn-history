@@ -754,6 +754,8 @@ class SomeTimer(ParameterizedObject):
     """
     # * parameters to control formatting?
     # * the parameter types for some of the following could be more specific
+    # * tried to use one message format whether X or call_and_time is being used;
+    #   could test for which (via if fixed_num_calls) if we do need two formats
     step = Parameter(default=None,doc=
         """Only relevant with call_and_time, not X. 
         
@@ -800,8 +802,14 @@ class SomeTimer(ParameterizedObject):
         [thing(message) for thing in self.receive_messages]
 
 
-    def __measure(self,fduration,step,arg_list=None,finish_off=False):
+    def __measure(self,fduration,step,arg_list=None):
 
+        if not arg_list:
+            # no list of arguments means not being called set number of times
+            fixed_num_calls = False
+        else:
+            fixed_num_calls = True
+            
         iters  = int(floor(fduration/step))
         remain = fmod(fduration, step)
         recenttimes=[]
@@ -825,19 +833,12 @@ class SomeTimer(ParameterizedObject):
             percent = 100.0*i/iters
             estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
             self.__pass_out_progress(percent)
-            
-            if not finish_off: # (temp)
-            ####################################################################################
-                message = 'Time ' + str(self.simulation_time_fn()) + ': ' + \
-                          str(int(percent)) + '% of '  + str(fduration) + ' patterns completed ' + \
-                          ('(%02d' % int(estimate/60))+':' + \
-                          ('%02d' % int(estimate%60))+ ' remaining).'
-            else:
-                # Should say 'at current rate', since the calculation assumes linearity
-                message = ('Time %0.2f: %d%% of %0.0f completed (%02d:%02d remaining)' %
-                           (self.simulation_time_fn(),int(percent),fduration, int(estimate/60),
-                            int(estimate%60)))
-            ####################################################################################
+
+            # Should say 'at current rate', since the calculation assumes linearity
+            message = 'Time ' + str(self.simulation_time_fn()) + ': ' + \
+                      str(int(percent)) + '% of ' + self.func.__name__ + ' ' + str(fduration) +\
+                      (' [%02d' % int(estimate/60))+':' + \
+                      ('%02d' % int(estimate%60))+ ' remaining]'
                 
             self.__pass_out_message(message)
 
@@ -845,7 +846,7 @@ class SomeTimer(ParameterizedObject):
 
 
         if not self.stop:
-            if finish_off:
+            if not fixed_num_calls:
                 # ensure specified duration has been respected, since code above might not
                 # complete specified duration (integer number of iterations)
                 leftover = fduration+simulation_starttime-self.simulation_time_fn()
@@ -854,16 +855,11 @@ class SomeTimer(ParameterizedObject):
             self.__pass_out_progress(percent)
 
 
-        if not finish_off: # (temp)
-        ################################################################################
-
-            # (it's wrong if we had a stop)
-            message = ("Showed %s patterns in %0.1f s" %
-                       (fduration,self.real_time_fn()-starttime))
-        else:
-            message = ('Ran %0.2f to time %0.2f' %
-                       (self.simulation_time_fn()-simulation_starttime, self.simulation_time_fn()))
-        ################################################################################
+        message = ('OK: %s (%0.2f) to time %0.2f  [%0.1f s]' %
+                   (self.func.__name__,
+                    max(self.simulation_time_fn()-simulation_starttime,fduration),
+                    self.simulation_time_fn(),
+                    self.real_time_fn()-starttime))
 
         self.__pass_out_message(message)
 
@@ -872,16 +868,16 @@ class SomeTimer(ParameterizedObject):
         """
         Call self.func(args_for_iterations[i]) for all i in args_for_iterations.
         """
-        self.__measure(len(a),1.0,arg_list=args_for_iterations)
+        self.__measure(len(args_for_iterations),1.0,arg_list=args_for_iterations)
         
     
     def call_and_time(self,fduration):
         """
-        Call self.func() every self.step over fduration.
+        Call self.func(self.step or fduration/50.0) for fduration.
         """
         # default to 50 steps unless someone set otherwise
         step = self.step or fduration/50.0
-        self.__measure(fduration,step,finish_off=True)
+        self.__measure(fduration,step)
         
         
 # CB: use to get timing messages at the commandline:
