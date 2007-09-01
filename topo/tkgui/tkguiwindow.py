@@ -233,10 +233,10 @@ class TaggedSlider(Frame):
     point out it only expects strings to come in, converts internally.
 
     """
-    def __init__(self,master,variable,min_value=0.0,max_value=1.0,
+    def __init__(self,master,variable,min_value=0.0,max_value=1.0,string_format='%f',
                  tag_width=10,slider_length=100,translator=None,**config):
 
-        # in calls: replace string_format with resolution
+        
 
         Frame.__init__(self,master,**config)
         self.master = master
@@ -363,10 +363,12 @@ class TaggedSlider(Frame):
 
 class TaggedSlider3(Frame):
     def __init__(self,master,variable,min_value=0,max_value=1,resolution=0.001,slider_length=100,
-                 string_format=None,tag_width=10,
+                 tag_width=10,
                  tag_extra_config={},slider_extra_config={}):
 
         Frame.__init__(self,master)
+
+        # in calls: replace string_format with resolution
 
         self.variable=variable
         
