@@ -805,6 +805,11 @@ class InstanceMethodWrapper(object):
     # CEBALERT: add reasonable repr and str methods.
     # (Probably won't happen before we upgrade to python 2.5, at which
     # point we probably won't need this class...)
+
+    # Hope __name__ doesn't get set...
+    def _fname(self):
+        return self.im.im_func.func_name
+    __name__ = property(_fname)
     
     def __init__(self,im):
         self.im = im
@@ -819,4 +824,6 @@ class InstanceMethodWrapper(object):
 
     def __call__(self,*args,**kw):
         return self.im(*args,**kw)
+
+
     
