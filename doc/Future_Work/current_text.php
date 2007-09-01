@@ -112,11 +112,8 @@ objects in the simulation are indexed by name, so name needs to be a
 constant Parameter (which <i>might</i> cause some other problems).
 There are some related hacks in ParametersFrame that would also need
 to be cleaned up.  </li>
+<li>Finish progress bar</li>
 </ul>
-
-
-<H4>2007/06/07 (CB): timing code </H4>
-Clean up timing code, as in JABALERT. Then finish progress bar.
 
 
 <H4>2007/08/12: reverse correlation rfs cleanup. </H4>
@@ -262,6 +259,10 @@ Strange Projection plots.
 
 
 <H2>Things we hope to take care of eventually</H2>
+
+<H4>2007/09/01: timing code </H4>
+Write simulation.SomeTimer cleanly, and test it.
+
 
 <H4>2007/08/31 (JB) Icons for buttons</H4> We should replace some of
 the most common buttons with icons, to make the windows less busy
