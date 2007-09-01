@@ -44,7 +44,7 @@ from topo.base.parameterclasses import BooleanParameter,StringParameter, \
 
 from topo.misc.utils import eval_atof
 
-from translatorwidgets import TaggedSlider2 as TaggedSlider
+from tkguiwindow import TaggedSlider
 
 
 

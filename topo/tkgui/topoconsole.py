@@ -45,13 +45,12 @@ import topo.commands.basic
 from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
 
 import topo.tkgui 
-from tkguiwindow import TkguiWindow
+from tkguiwindow import TkguiWindow,TaggedSlider
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from featurecurvepanel import FeatureCurvePanel
 from projectionpanel import CFProjectionPGPanel,ProjectionActivityPanel,ConnectionFieldsPanel
 from testpattern import TestPattern
 from editorwindow import ModelEditor
-from translatorwidgets import TaggedSlider
 
 import tkguiwindow
 
