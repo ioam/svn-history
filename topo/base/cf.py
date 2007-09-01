@@ -686,11 +686,7 @@ class CFProjection(Projection):
         ### input value to self.src.activity; but it fails, raising a
         ### type error. It probably has to be clarified why this is
         ### happening
-        ## JP: seems to work fine for me, and 'make tests' works okay.
-        ## I guess unless someone else finds a bug, we can remove these alerts.
-        ## if there is a bug then we need to add some new tests to the suite.
-        #self.input_buffer = None
-        self.input_buffer = Numeric.array(self.src.activity)
+        self.input_buffer = None
         self.activity = Numeric.array(self.dest.activity)
 
 
