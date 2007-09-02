@@ -237,7 +237,7 @@ class CFProjectionPGPanel(CFPGPanel):
 
     def __init__(self,console,master,pgt,**params):
         super(CFProjectionPGPanel,self).__init__(console,master,pgt,**params)
-        self.pack_param('projection',parent=self.control_frame_3,on_change=self.make_plots)
+        self.pack_param('projection',parent=self.control_frame_3,on_modify=self.make_plots)
         self.pack_param('density',parent=self.control_frame_3)
 
 
