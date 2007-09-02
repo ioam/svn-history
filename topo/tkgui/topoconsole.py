@@ -394,7 +394,7 @@ class TopoConsole(TkguiWindow):
                                     tag_width=11,
                                     slider_length=150,
                                     min_value=0,max_value=20000,
-                                    string_format='%.4f')
+                                    resolution=0.1)
         self.balloon.bind(self.run_for,"Duration to run the simulation, e.g. 0.0500, 1.0, or 20000.")
         self.run_for.pack(side=LEFT,fill='x',expand=YES)
 
