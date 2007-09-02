@@ -160,12 +160,6 @@ class ConnectionFieldsPanel(CFPGPanel):
 
     plotgroup_type = ConnectionFieldsPlotGroup
 
-
-
-        # CEBALERT: used to eval x,y in main here and elsewhere in tkgui so that variables could be used.
-        # Now that the widget selection is automatic, this should be taken care of (at least partly) elsewhere
-        # (e.g. a taggedslider that converts to float by doing an eval in main and float(), etc).
-
     def __init__(self,console,master,pgt,**params):
         self.initial_args=params # CEBALERT: store the initial arguments so we can get sheet,x,y in
                                  # sheet_change if any of them were specified. Isn't there a cleaner
@@ -173,6 +167,8 @@ class ConnectionFieldsPanel(CFPGPanel):
         super(ConnectionFieldsPanel,self).__init__(console,master,pgt,**params)
         self.pack_param('x',parent=self.control_frame_3,on_change=self.update_plots)
         self.pack_param('y',parent=self.control_frame_3,on_change=self.update_plots)
+
+
 
 
 ##############################################################################
