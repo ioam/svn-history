@@ -104,7 +104,7 @@ class TestPattern(XPGPanel):
         
         self.params_frame = XParametersFrame(self.pg_control_pane,
                                              PO=self.pattern_generator,
-                                             on_modify=self.conditional_update)
+                                             on_modify=self.conditional_refresh)
 
         self.params_frame.hide_param('Close')
         self.params_frame.hide_param('Defaults') # CB: see ALERT in ParameterizedObject.reset_params()
@@ -145,9 +145,14 @@ class TestPattern(XPGPanel):
         
         self.conditional_refresh()
 
-    def conditional_update(self):
-        if self.auto_refresh: self.make_plots()
 
+    def refresh(self):
+        """
+        Simply update the plots: skip all handling of history.
+        """
+        self.make_plots()
+
+        
     def present_pattern(self):
         """
         Move the user created patterns into the GeneratorSheets, run for
