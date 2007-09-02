@@ -6,6 +6,12 @@ $Id$
 __version__='$Revision$'
 
 
+# CEBERRORALERT: I've (temporarily) broken most of the buttons like
+# normalize and sheet_coords...will be fixed when I clean up all the
+# update methods.
+
+
+
 import ImageTk
 ### JCALERT! Try not to have to use chain and delete this import.
 from itertools import chain
@@ -165,8 +171,8 @@ class ConnectionFieldsPanel(CFPGPanel):
                                  # sheet_change if any of them were specified. Isn't there a cleaner
                                  # way?
         super(ConnectionFieldsPanel,self).__init__(console,master,pgt,**params)
-        self.pack_param('x',parent=self.control_frame_3,on_change=self.update_plots)
-        self.pack_param('y',parent=self.control_frame_3,on_change=self.update_plots)
+        self.pack_param('x',parent=self.control_frame_3,on_change=self.make_plots)
+        self.pack_param('y',parent=self.control_frame_3,on_change=self.make_plots)
 
 
 
@@ -233,7 +239,7 @@ class CFProjectionPGPanel(CFPGPanel):
 
     def __init__(self,console,master,pgt,**params):
         super(CFProjectionPGPanel,self).__init__(console,master,pgt,**params)
-        self.pack_param('projection',parent=self.control_frame_3,on_change=self.update_plots)
+        self.pack_param('projection',parent=self.control_frame_3,on_change=self.make_plots)
         self.pack_param('density',parent=self.control_frame_3)
 
 
@@ -285,6 +291,7 @@ class CFProjectionPGPanel(CFPGPanel):
         self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image)
                               for p in plots]
         old_canvases = self.canvases
+
         self.canvases = [Canvas(self.plot_frame,
                            width=image.width()+BORDERWIDTH*2+CANVASBUFFER,
                            height=image.height()+BORDERWIDTH*2+CANVASBUFFER,

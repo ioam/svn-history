@@ -36,7 +36,7 @@ class TestPlotGroupSaver(unittest.TestCase):
     def save(self,name,**params):
         p = self.plotgroupsaver_class(name)
         p.generate_plotgroup(**params)
-        p.plotgroup.draw_plots(update=True)
+        p.plotgroup.make_plots(update=True)
         p.save_to_disk()
 
 

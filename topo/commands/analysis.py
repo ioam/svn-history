@@ -211,7 +211,7 @@ def save_plotgroup(name,saver_params={},**params):
     # using PlotGroupTemplate (i.e. problem is in plotgroup.py and
     # templates.py).
     saver.generate_plotgroup(**params)
-    saver.plotgroup.draw_plots(update=True)#update_plots()
+    saver.plotgroup.make_plots()
     saver.save_to_disk()
 
 

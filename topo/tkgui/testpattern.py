@@ -146,7 +146,7 @@ class TestPattern(XPGPanel):
         self.conditional_refresh()
 
     def conditional_update(self):
-        if self.auto_refresh: self.update_plots()
+        if self.auto_refresh: self.make_plots()
 
     def present_pattern(self):
         """
