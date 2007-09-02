@@ -89,8 +89,6 @@ getting out of control!
 
 <li>Remove templateplotgroup?</li>
 
-<li>Fix Back/Fwd buttons</li>
-
 <li>ParametersFrame ok/apply/reset/cancel...set order and names of
 ParametersFrame's Ok, Apply, Cancel, Reset, and Defaults buttons, and
 make them behave as expected for classes and instances.</li>
