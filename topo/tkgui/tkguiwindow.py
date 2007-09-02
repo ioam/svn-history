@@ -158,14 +158,6 @@ class TkguiWindow(Tkinter.Toplevel):
      
 
 
-
-
-
-
-
-    
-
-
 ######################################################################
 ### CEB: working here
 ### PROBLEM: speed of test pattern window!
@@ -230,23 +222,33 @@ class TaggedSlider(Tkinter.Frame):
     def refresh(self):
         self.tag_changed()
 
-    # for matching old callers: should be removed
-    def get_value(self):
-        return float(self.variable.get())
-
-    # convenience methods
     def set_bounds(self,min_val,max_val,refresh=None):
         self.bounds = (min_val,max_val)
         self.slider.config(from_=min_val,to=max_val)
 
     def config(self,**options):
+        """
+        TaggedSlider is a compound widget. In most cases, config
+        options should be passed to one of the component widgets
+        (i.e. the tag or the slider). Some options, however, should
+        be applied to both.
+
+        Options applied to both:
+        * state
+        """
         if 'state' in options:
             self.tag['state']=options['state']
             self.slider['state']=options['state']
             del options['state']
         if len(options)>0:
-            raise NotImplementedError("Only state option is currently supported for this widget; \
-            set options on either the component tag or the slider instead.")
+            raise NotImplementedError(
+                """Only state option is currently supported for this widget;
+                set options on either the component tag or the slider instead.""")
+
+    # for matching old callers: should be removed
+    def get_value(self):
+        return float(self.variable.get())
+
 ######################################################################
         
 
