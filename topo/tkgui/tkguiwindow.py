@@ -183,7 +183,7 @@ class TaggedSlider(Tkinter.Frame):
     Widget for manipulating a numeric value using either a slider or a
     text-entry box, keeping the two values in sync.
     """
-    
+    # change min_value and max_value in callers to bounds
     def __init__(self,master,variable,min_value=0,max_value=1,resolution=0.001,slider_length=100,
                  tag_width=10,
                  tag_extra_config={},slider_extra_config={}):
@@ -191,11 +191,12 @@ class TaggedSlider(Tkinter.Frame):
         Tkinter.Frame.__init__(self,master)
 
         self.variable=variable
-
+        
         self.tag = Tkinter.Entry(self,textvariable=variable,width=tag_width,
                            **tag_extra_config)
         self.tag.pack(side='left')
         self.tag.bind('<Return>', self.tag_changed)  
+        self.tag.bind('<FocusOut>', self.tag_changed)
 
         self.slider_variable = Tkinter.DoubleVar()
         self.slider_variable.trace_variable('w',self.slider_changed)        
@@ -204,6 +205,7 @@ class TaggedSlider(Tkinter.Frame):
                     from_=min_value,to=max_value,resolution=resolution,
                     showvalue=0,orient='horizontal',length=slider_length,
                     **slider_extra_config)
+        self.bounds = (min_value,max_value)
         self.slider.pack(side='right')
 
 
@@ -212,6 +214,10 @@ class TaggedSlider(Tkinter.Frame):
 
     def tag_changed(self,event=None):
         val = self.variable.get()
+
+        self.set_bounds(min(self.bounds[0],val),
+                        max(self.bounds[1],val))
+                        
         self.slider_variable.set(float(val))
         # how to find n. dp simply? I just happened to know the
         # Decimal module...
@@ -226,7 +232,9 @@ class TaggedSlider(Tkinter.Frame):
         return float(self.variable.get())
 
     # convenience methods
-    def set_bounds(self,min_val,max_val,refresh=True):
+    def set_bounds(self,min_val,max_val,refresh=None):
+        self.bounds = (min_val,max_val)
+        print "bounds",min_val,max_val
         self.slider.config(from_=min_val,to=max_val)
 
     def config(self,**options):
