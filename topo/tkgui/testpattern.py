@@ -91,9 +91,8 @@ class TestPattern(XPGPanel):
 
         self.auto_refresh = True
 
-        # Remove plot_ & update_command
         self.plotcommand_frame.pack_forget()
-        for name in ['update_command','Fwd','Back']:
+        for name in ['update_command','plot_command','Fwd','Back']:
             self.hide_param(name) 
 
         edit_sheet_param = self.get_parameter_object('edit_sheet')
