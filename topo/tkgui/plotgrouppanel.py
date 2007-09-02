@@ -706,6 +706,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             self.representations['Reduce']['widget']['state']=DISABLED
         self.representations['Enlarge']['widget']['state']=NORMAL
         self.display_plots()
+        self.sizeright()
 
     def enlarge_plots(self):
         """Function called by widget to increase the plot size, when possible."""
@@ -713,7 +714,8 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             self.representations['Enlarge']['widget']['state']=DISABLED
         self.representations['Reduce']['widget']['state']=NORMAL
         self.display_plots()
-
+        self.sizeright()
+        
 
 ####################### HISTORY METHODS ##########################         
     # CEBHACKALERT: currently, any click on refresh adds to history
