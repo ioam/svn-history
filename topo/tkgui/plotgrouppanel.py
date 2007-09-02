@@ -523,6 +523,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         self.display_plots()
         self.display_labels()
         self.refresh_title()
+        self.sizeright()
         
     def make_plots(self):
         """
@@ -622,6 +623,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             for c in old_canvases:
                 c.grid_forget()
 
+
         else:
             # Don't need new canvases...
             for i,image,canvas in zip(range(len(self.zoomed_images)),
@@ -659,7 +661,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
                         self.__process_canvas_event(event,self._update_dynamic_info))
 
 
-        self.sizeright()
+        
         
 
 
@@ -696,7 +698,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             for i in range(len(self.plot_labels)):
                 self.plot_labels[i].configure(text=self.plotgroup.labels[i]) 
 
-        self.sizeright()
       
 
     def reduce_plots(self):
@@ -825,23 +826,29 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
     # CB: rename, document, and if possible delay showing the window until all the jiggling is over
     def sizeright(self):
         if bwidget_imported:
-            self.master.geometry('') # if user has changed window size, need to tell tkinter that it should take
-                              # control again.
+
+            # if user has changed window size, need to tell tkinter that it should take
+            # control again.
+            self.master.geometry('')
+            
             self.update_idletasks()
         
-            # CB: the +'s are hacks, because for some reason the requested values aren't quite
-            # large enough (noticably when there are labels).
+            # CB: the +'s are hacks, because for some reason the
+            # requested values aren't quite large enough (noticably
+            # when there are labels).
+            #
+            # The - is to prevent the plot engulfing the rest of the
+            # plot window, obscuring controls at the bottom (not so
+            # important right now, since plots would rarely be as
+            # large as the screen height)
+
             w = min(self.plot_frame.winfo_reqwidth()+30,self.winfo_screenwidth())
-            # The - is to prevent the plot engulfing the rest of the plot window, obscuring controls at the bottom
-            # (not so important right now, since plots would rarely be as large as the screen height)
             h = min(self.plot_frame.winfo_reqheight()+20,self.winfo_screenheight()-250)
+
+            if not hasattr(self,'oldsize') or self.oldsize!=(w,h): 
+                self.__scroll_frame.set_size(w,h)
+                self.oldsize = (w,h)
             
-            self.__scroll_frame.set_size(w,h)
-
-
-
-
-
 
 
 class XPGPanel(PlotGroupPanel):
