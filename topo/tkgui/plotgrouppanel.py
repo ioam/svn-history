@@ -9,7 +9,9 @@ $Id$
 """
 __version__='$Revision$'
 
-
+# CEBERRORALERT: I've (accidentally, temporarily) broken most of the
+# buttons like normalize and sheet_coords...will be fixed when I clean
+# up all the update methods.
 
 import copy
 
@@ -567,7 +569,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
 
 
-
+    # CEBALERT: this method needs cleaning, along with its versions in subclasses.
     def display_plots(self):
         """
         Pre:  self.bitmaps contains a list of topo.bitmap objects.
@@ -592,7 +594,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             new_sizes = [(str(zi.width()+BORDERWIDTH*2+CANVASBUFFER),
                           str(zi.height()+BORDERWIDTH*2+CANVASBUFFER))
                          for zi in self.zoomed_images]
-            old_sizes = [(zi.config()['width'][-1],zi.config()['height'][-1])
+            old_sizes = [(zi['width'],zi['height'])
                          for zi in self.canvases]
         else:
             new_sizes, old_sizes = 0, 0
