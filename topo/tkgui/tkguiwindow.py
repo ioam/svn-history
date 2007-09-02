@@ -178,7 +178,7 @@ class TkguiWindow(Tkinter.Toplevel):
 
 import Tkinter
 from decimal import Decimal
-class TaggedSlider(Frame):
+class TaggedSlider(Tkinter.Frame):
     """
     Widget for manipulating a numeric value using either a slider or a
     text-entry box, keeping the two values in sync.
@@ -188,11 +188,11 @@ class TaggedSlider(Frame):
                  tag_width=10,
                  tag_extra_config={},slider_extra_config={}):
 
-        Frame.__init__(self,master)
+        Tkinter.Frame.__init__(self,master)
 
         self.variable=variable
 
-        self.tag = Entry(self,textvariable=variable,width=tag_width,
+        self.tag = Tkinter.Entry(self,textvariable=variable,width=tag_width,
                            **tag_extra_config)
         self.tag.pack(side='left')
         self.tag.bind('<Return>', self.tag_changed)  
@@ -200,10 +200,10 @@ class TaggedSlider(Frame):
         self.slider_variable = Tkinter.DoubleVar()
         self.slider_variable.trace_variable('w',self.slider_changed)        
         
-        self.slider = Scale(self,variable=self.slider_variable,
-                           from_=min_value,to=max_value,resolution=resolution,
-                           showvalue=0,orient='horizontal',length=slider_length,
-                           **slider_extra_config)
+        self.slider = Tkinter.Scale(self,variable=self.slider_variable,
+                    from_=min_value,to=max_value,resolution=resolution,
+                    showvalue=0,orient='horizontal',length=slider_length,
+                    **slider_extra_config)
         self.slider.pack(side='right')
 
 
@@ -218,12 +218,10 @@ class TaggedSlider(Frame):
         p = Decimal(str(val)).as_tuple()[2]
         self.slider['resolution']=10**p
 
+    def refresh(self):
+        self.tag_changed()
 
-    # for matching old callers: I think should all be removed
-    def action(self,event=None):
-        raise NotImplementedError
-    def refresh(self,event=None):
-        raise NotImplementedError
+    # for matching old callers: should be removed
     def get_value(self):
         return float(self.variable.get())
 
