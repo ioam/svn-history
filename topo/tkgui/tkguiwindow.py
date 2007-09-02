@@ -176,234 +176,70 @@ class TkguiWindow(Tkinter.Toplevel):
 # possible to have relative sizes like that), then we won't have to have
 # widths specified everywhere.
 
-from inspect import getdoc
-
-from Tkinter import Frame, IntVar, Scale, Entry, Checkbutton, Label
-from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH, NORMAL
-import Pmw
-import string
-
-
-
-class WidgetTranslator(object):
-    """
-    Abstract superclass for objects (typically Widgets) that accept a string
-    value and compute a true value from that.  Subclasses must provide 
-    a get() operation (as do Tk Widgets)
-    """
-    def __init__(self, translator=None):
-        """
-        The translator should be a function accepting one string argument
-        and returning the result of the translation.
-        """
-        self.translator = translator
-
-
-    def get(self):
-        "Must be implemented by subclasses."
-        raise NotImplementedError
-
-
-    def get_value(self):
-        """
-        Method called by clients to get the real value that this widget
-        is representing.
-
-        Although a widget will typically display its contents as
-        a string, the underlying variable could be any type. Clients
-        can call this method to get that variable's value.
-        """
-        if self.translator != None:
-            return self.translator(self.get())
-        else:
-            return self.get()
-
-
-
+import Tkinter
+from decimal import Decimal
 class TaggedSlider(Frame):
     """
     Widget for manipulating a numeric value using either a slider or a
     text-entry box, keeping the two values in sync.
-
-    The expressions typed into the text-entry box are evaluated using
-    the given translator, which can be overridden with a custom
-    expression evaluator (e.g. to do a Python eval() in the namespace
-    of a particular object.)
-
-    point out it only expects strings to come in, converts internally.
-
     """
-    def __init__(self,master,variable,min_value=0.0,max_value=1.0,string_format='%f',
-                 tag_width=10,slider_length=100,translator=None,**config):
-
-        
-
-        Frame.__init__(self,master,**config)
-        self.master = master
-
-        self.__tag_val = variable
-        
-        self.__tag = Entry(self,textvariable=self.__tag_val,width=tag_width)
-        self.__tag.pack(side=LEFT)
-        
-        self.__tag.bind('<FocusOut>', self.refresh) # slider is updated on tag return... 
-
-        
-
-        self.set_bounds(min_value,max_value,refresh=False)
-
-
-        self.__slider_val = IntVar(0)
-        self.__slider = Scale(self,showvalue=0,from_=0,to=10000,
-                              orient='horizontal',
-                              length=slider_length,
-                              variable=self.__slider_val,
-                              command=self.__slider_command)
-        self.__slider.pack(side=LEFT,expand=YES,fill=BOTH)
-
-        self.__set_slider_from_tag()
-
-
-
-    def set_bounds(self,mn,mx,refresh=True):
-        mn+1.0
-        mx+1.0
-        self.__min_value=mn
-        self.__max_value=mx
-        if refresh: self.refresh()
-
-    # CEBALERT: I find the refresh() and optional_refresh() methods
-    # confusing. Is there a simpler way to implement this kind of
-    # functionality?    
-    def refresh(self,e=None):
-        """
-        Sets the slider's position according to the value in the tag.
-        Additionally, calls the parent widget's optional_refresh()
-        method.
-        """
-        self.__set_slider_from_tag()
-        try:
-            # Refresh the ParametersFrame (if embedded in one)
-            self.master.optional_refresh()
-        except AttributeError:
-            pass
-
-    # CB: having said the above, I compounded the problem by adding
-    # more of the same.
-    def action(self, e=None):
-        """
-        Pressing return in a TaggedSlider causes the slider itself to
-        be refresh()ed, but also (optionally) allows an action to be
-        'passed up' to its parent.
-        """
-        try:
-            self.master.optional_action()
-        except AttributeError:
-            pass
-        self.refresh()
-
-
-    # CEBALERT: the comment is true, this is required. But
-    # maybe there's a cleaner way?
-    def __slider_command(self,arg):
-        """
-        When this frame is first shown, it calls the slider callback,
-        which would overwrite the initial string value with a string
-        translation (e.g. 'PI' -> '3.142').  This code prevents that.
-        """
-        self.__set_tag_from_slider()
-
-
-
-    def get(self):
-        """
-        Return the (string) value stored in the tag.
-        """
-        return self.__tag_val.get()
-
-     
-
-    def __set_tag_from_slider(self):
-        new_string = self.__get_slider_value() #self.__string_format % self.__get_slider_value()
-        self.__tag_val.set(new_string)
-
-         
-    def __set_slider_from_tag(self):
-        """
-        Set the slider (including its movement limits) to match the tag value.
-        """
-        # CEBALERT!
-        try:
-            val = float(self.__tag_val.get())
-        except ValueError:
-            print "VA in TS"
-            from topo.misc.utils import eval_atof
-            val = eval_atof(self.__tag_val.get())
-
-        #val = self.__tag_val.get()
-        if val > self.__max_value:
-            self.__max_value = val
-        elif val < self.__min_value:
-            self.__min_value = val
-
-        self.__set_slider_value(val)
-
-
-    def __get_slider_value(self):
-        range_ = self.__max_value - self.__min_value
-        return self.__min_value + (self.__slider_val.get()/10000.0 * range_)
     
-    def __set_slider_value(self,val):
-        range = self.__max_value - self.__min_value
-        assert range!=0, "A TaggedSlider cannot have a maximum value equal to its minimum value."
-        new_val = 10000 * (val - self.__min_value)/range
-        self.__slider_val.set(int(new_val))
-
-
-
-class TaggedSlider3(Frame):
     def __init__(self,master,variable,min_value=0,max_value=1,resolution=0.001,slider_length=100,
                  tag_width=10,
                  tag_extra_config={},slider_extra_config={}):
 
         Frame.__init__(self,master)
 
-        # in calls: replace string_format with resolution
-
         self.variable=variable
-        
+
         self.tag = Entry(self,textvariable=variable,width=tag_width,
                            **tag_extra_config)
         self.tag.pack(side='left')
-        self.tag.bind('<Return>', self.action)  
+        self.tag.bind('<Return>', self.tag_changed)  
+
+        self.slider_variable = Tkinter.DoubleVar()
+        self.slider_variable.trace_variable('w',self.slider_changed)        
         
-        self.slider = Scale(self,variable=variable,
-                           from_=min_value,to_=max_value,resolution=resolution,
+        self.slider = Scale(self,variable=self.slider_variable,
+                           from_=min_value,to=max_value,resolution=resolution,
                            showvalue=0,orient='horizontal',length=slider_length,
                            **slider_extra_config)
         self.slider.pack(side='right')
 
+
+    def slider_changed(self,*args,**opts):
+        self.variable.set(self.slider_variable.get())
+
+    def tag_changed(self,event=None):
+        val = self.variable.get()
+        self.slider_variable.set(float(val))
+        # how to find n. dp simply? I just happened to know the
+        # Decimal module...
+        p = Decimal(str(val)).as_tuple()[2]
+        self.slider['resolution']=10**p
+
+
+    # for matching old callers: I think should all be removed
     def action(self,event=None):
         raise NotImplementedError
     def refresh(self,event=None):
         raise NotImplementedError
+    def get_value(self):
+        return float(self.variable.get())
 
     # convenience methods
     def set_bounds(self,min_val,max_val,refresh=True):
-        self.slider.config(from_=min_val,to_=max_val)
+        self.slider.config(from_=min_val,to=max_val)
 
     def config(self,**options):
-
         if 'state' in options:
             self.tag['state']=options['state']
             self.slider['state']=options['state']
             del options['state']
-
         if len(options)>0:
-            raise NotImplementedError("Only state option is currently supported; \
-            set options on either the tag or the slider.")
+            raise NotImplementedError("Only state option is currently supported for this widget; \
+            set options on either the component tag or the slider instead.")
 ######################################################################
         
-
 
 
