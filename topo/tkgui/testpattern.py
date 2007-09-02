@@ -9,6 +9,7 @@ __version__='$Revision$'
 # * need to remove audigen pgs
 # * missing disparity flip hack (though see JABHACKALERT below)
 # * values like pi are written over
+# * need to sort the list of Pattern generators
 
 ## Needs to be upgraded to behave how we want:
 ### JABHACKALERT: Should use PatternPresenter (from
@@ -103,7 +104,7 @@ class TestPattern(XPGPanel):
         
         self.params_frame = XParametersFrame(self.pg_control_pane,
                                              PO=self.pattern_generator,
-                                             on_modify=self.conditional_refresh)
+                                             on_modify=self.conditional_update)
 
         self.params_frame.hide_param('Close')
         self.params_frame.hide_param('Defaults') # CB: see ALERT in ParameterizedObject.reset_params()
@@ -136,7 +137,7 @@ class TestPattern(XPGPanel):
         Set the current PatternGenerator to the one selected and get the
         ParametersFrame to draw the relevant widgets
         """
-        self.params_frame.create_widgets(self.pattern_generator)
+        self.params_frame.set_PO(self.pattern_generator)
 
         for sheet in self.plotgroup._sheets():
             if sheet==self.edit_sheet:
@@ -144,6 +145,8 @@ class TestPattern(XPGPanel):
         
         self.conditional_refresh()
 
+    def conditional_update(self):
+        if self.auto_refresh: self.update_plots()
 
     def present_pattern(self):
         """
