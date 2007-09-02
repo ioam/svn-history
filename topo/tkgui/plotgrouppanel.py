@@ -383,21 +383,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 	"""
         return self.plotgroup_type()
 
-
-    # CEBALERT: use one method w/ update arg for these two.
-    def update_plots(self):
-        # shouldn't call this from within history unless you've copied the plotgroup (as in refresh)
-        
-        #assert self.history_index==0,"Programming error: can't update plotgroup while looking in history." # (never update plots in the history, or they go to current activity)
-
-        self.plotgroup.draw_plots(update=True)
-        self.display_plots()
-        self.refresh_title()
-        
-        #self.display_labels()
-    def redraw_plots(self):
-        self.plotgroup.draw_plots(update=False)
-        self.display_plots()  # ?
  
     def set_auto_refresh(self):
         """Function called by Widget when check-box clicked."""
@@ -527,6 +512,27 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         Only calls refresh() if auto_refresh is enabled.
         """
         if self.auto_refresh:self.refresh()
+
+
+    # CEBALERT: Now clean up the update, redraw, refresh methods in here
+    # and in plotgroup.
+    def update_plots(self):
+        
+        # shouldn't call this from within history unless you've copied
+        # the plotgroup (as in refresh)
+        
+        # assert self.history_index==0,"Programming error: can't
+        # update plotgroup while looking in history." # (never update
+        # plots in the history, or they go to current activity)
+
+        self.plotgroup.draw_plots(update=True)
+        self.display_plots()
+        self.refresh_title()
+        
+        #self.display_labels()
+    def redraw_plots(self):
+        self.plotgroup.draw_plots(update=False)
+        #self.display_plots()  # ?
 
 
     def refresh(self,update=True):
