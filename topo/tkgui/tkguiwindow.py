@@ -159,9 +159,6 @@ class TkguiWindow(Tkinter.Toplevel):
 
 
 ######################################################################
-### CEB: working here
-### PROBLEM: speed of test pattern window!
-        
 import Tkinter
 from decimal import Decimal
 class TaggedSlider(Tkinter.Frame):
