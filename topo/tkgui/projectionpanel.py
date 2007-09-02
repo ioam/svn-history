@@ -226,8 +226,6 @@ class ConnectionFieldsPanel(CFPGPanel):
 
 
 
-# CBERRORALERT: when 'Refresh' button is pressed, the current projection is reset to the original.
-# Needs to keep the user's selection. Might also happen for other SelectorParameters: need to check.
 class CFProjectionPGPanel(CFPGPanel):
     """
     Panel for displaying CFProjections.
