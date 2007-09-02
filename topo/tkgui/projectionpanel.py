@@ -88,8 +88,7 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
 
     def __init__(self,console,master,pgt,**params):
         super(ProjectionSheetPGPanel,self).__init__(console,master,pgt,**params)
-        self.pack_param('sheet',parent=self.control_frame_3,on_change=self.sheet_change)
-        #self.refresh()
+        self.pack_param('sheet',parent=self.control_frame_3,on_modify=self.sheet_change)
 
 
     def generate_plotgroup(self):
@@ -135,7 +134,6 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
     def _plot_title(self):
         return "Activity in Projections to %s at time %s"%(self.plotgroup.sheet.name,self.plotgroup.time)
 
-    # CEBHACKALERT! Back and Fwd buttons don't work.
    
 
 
