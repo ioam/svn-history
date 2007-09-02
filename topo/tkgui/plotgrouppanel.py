@@ -592,8 +592,8 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             new_sizes = [(str(zi.width()+BORDERWIDTH*2+CANVASBUFFER),
                           str(zi.height()+BORDERWIDTH*2+CANVASBUFFER))
                          for zi in self.zoomed_images]
-            old_sizes = [(zi['width'],zi['height'])
-                         for zi in self.canvases]
+            old_sizes = [(canvas['width'],canvas['height'])
+                         for canvas in self.canvases]
         else:
             new_sizes, old_sizes = 0, 0
 
