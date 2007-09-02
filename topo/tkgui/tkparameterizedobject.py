@@ -119,6 +119,7 @@ parameters_to_tkvars = {
 param_has_modifyable_choices = {BooleanParameter:False,SelectorParameter:False,Parameter:True}
 
 
+
 def parameters(parameterized_object):
     """
     Return a dictionary {name:parameter} of the parameters of
@@ -199,7 +200,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
     _tk_vars = {}
     translators = {}
     self_first = True  # for precedence 
-    
+    param_immediately_apply_change = {}
 
     # CBENHANCEMENT: __repr__ will need some work (display params of subobjects etc?).
 
@@ -230,6 +231,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
             self._init_tk_vars(PO)
 
 
+
     # CB: rename extraPO
     def __init__(self,extraPO=None,self_first=True,**params):
         """
@@ -243,6 +245,11 @@ class TkParameterizedObjectBase(ParameterizedObject):
         assert extraPO is None \
                or isinstance(extraPO,ParameterizedObjectMetaclass) \
                or isinstance(extraPO,ParameterizedObject)
+
+        self.param_immediately_apply_change = {BooleanParameter:True,
+                                               SelectorParameter:True,
+                                               Number:True,
+                                               Parameter:False}
         
         self.self_first = self_first
 
@@ -371,7 +378,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
             return False
 
 
-    def _update_param(self,param_name):
+    def _update_param(self,param_name,force=False):
         """
         Attempt to set the parameter represented by param_name to the
         value of its corresponding Tkinter Variable.
@@ -396,6 +403,11 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 if param_name in parameters(po).keys():
                     parameter = parameters(po)[param_name]
 
+
+                    if not force and not lookup_by_class(self.param_immediately_apply_change,
+                                                         type(parameter)):
+                        return
+
                     # CEBALERT!
                     if self.value_changed(param_name):
                         D=True
@@ -413,12 +425,18 @@ class TkParameterizedObjectBase(ParameterizedObject):
                     if hasattr(parameter,'set_in_bounds') and isinstance(po,ParameterizedObject): # CEBHACKALERT: set_in_bounds not valid for POMetaclass?
                         parameter.set_in_bounds(po,val)
                     else:
+                        #try:
                         setattr(po,param_name,val)
+                        #except Exception, inst:
+                        #    m = param_name+": "+str(sys.exc_info()[0])[11::]+" ("+str(inst)+")"
+                        #    return
 
                     # CEBALERT: now I've added on_modify, need to go through and rename
                     # on_change and decide whether each use should be for alteration of 
                     # value or just gui set. Or just have one. etc...
-                    if hasattr(tk_var,'_on_change'):tk_var._on_change()
+                    if hasattr(tk_var,'_on_change'):
+                        tk_var._on_change()
+
                     if hasattr(tk_var,'_on_modify'):
                         if D:
                             tk_var._on_modify()
@@ -921,7 +939,11 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     def _create_string_widget(self,frame,name,widget_options):
         w = Entry(frame,textvariable=self._tk_vars[name],**widget_options)
 
-        param,location = self.get_parameter_object(name,with_location=True)        
+        param,location = self.get_parameter_object(name,with_location=True)
+
+        if not lookup_by_class(self.param_immediately_apply_change,type(param)):
+            w.bind('<Return>', lambda e=None,x=name: self.junk(x))  
+        
         if param.constant and isinstance(location,ParameterizedObject): # need to be able to set on class
             w['state']='readonly' 
             w['fg']='gray45'
@@ -971,6 +993,10 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         for x in [f,w,l]:
             x.destroy()
 
+
+    def junk(self,param_name):
+        self._update_param(param_name,force=True)
+        
     
     # CEBALERT: on_change should be on_set (since it's called not only for changes)
     # CB: packing might need to be better (check eg label-widget space)
