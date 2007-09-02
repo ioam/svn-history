@@ -10,21 +10,18 @@ $Id$
 
 ### CEB: currently working on this file
 # Documentation and organization are lacking; some relatively simple
-# cleanup will make it much simpler.
+# cleanup (including renaming of things will make it much simpler.
 #
 
 ## Notes
 # * Too fragile because there are too many tests for different types
-# of Parameter. Most of these are there to make the code work
-# immediately, but they should be cleaned up as soon as possible.
+#   of Parameter. Most of these are there to make the code work
+#   immediately, but they should be cleaned up as soon as possible.
 # * ...and some of the tests look at the parameter type, but others
-# look at widget type!
+#   look at widget type!
 # * I chose 'representation' to describe
-# (Frame,widget,label,pack_options,etc) but there's probably a clearer
-# term...
-
-
-
+#   (Frame,widget,label,pack_options,etc) but there's probably a clearer
+#   term...
 
 import __main__, sys
 import Tkinter, Pmw
