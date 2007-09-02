@@ -6,12 +6,6 @@ $Id$
 __version__='$Revision$'
 
 
-# CEBERRORALERT: I've (temporarily) broken most of the buttons like
-# normalize and sheet_coords...will be fixed when I clean up all the
-# update methods.
-
-
-
 import ImageTk
 ### JCALERT! Try not to have to use chain and delete this import.
 from itertools import chain
