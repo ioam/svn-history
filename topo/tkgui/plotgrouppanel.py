@@ -624,7 +624,8 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
                 
             for c in old_canvases:
                 c.grid_forget()
-        else:  # Width of first plot still same, and same number of images.
+        else:
+            # Width of all canvases is the same (and same no. of canvases)
             for i,image,canvas in zip(range(len(self.zoomed_images)),
                                       self.zoomed_images,self.canvases):
                 canvas.create_image(image.width()/2+BORDERWIDTH+1,
