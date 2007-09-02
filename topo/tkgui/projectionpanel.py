@@ -281,8 +281,6 @@ class CFProjectionPGPanel(CFPGPanel):
         CFProjectionPanel requires a 2D grid of plots.
         """
         plots=self.plotgroup.plots
-        ### Momentary: delete when sorting the bitmap history
-        self.bitmaps = [p.bitmap for p in plots]
         # Generate the zoomed images.
         self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image)
                               for p in plots]

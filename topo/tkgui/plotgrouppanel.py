@@ -584,8 +584,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         things such as 2D grids.
         """
 	plots = self.plotgroup.plots
-	### JCALERT: Temporary: delete when sorting the bitmap history
-	self.bitmaps = [p.bitmap for p in plots]
 	self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image) for p in plots]
         # If the number of canvases or their sizes has changed, then
         # create a new set of canvases.  If the old canvases still can
