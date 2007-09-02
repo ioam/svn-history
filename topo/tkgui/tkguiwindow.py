@@ -168,14 +168,8 @@ class TkguiWindow(Tkinter.Toplevel):
 
 ######################################################################
 ### CEB: working here
+### PROBLEM: speed of test pattern window!
         
-# CEBALERT: Should make TaggedSlider accept either numeric or string
-# values (including for max_value and min_value).
-
-# CEBALERT: If we can make slider:tag space ratio about 2:1 (if it's
-# possible to have relative sizes like that), then we won't have to have
-# widths specified everywhere.
-
 import Tkinter
 from decimal import Decimal
 class TaggedSlider(Tkinter.Frame):
@@ -187,6 +181,15 @@ class TaggedSlider(Tkinter.Frame):
     def __init__(self,master,variable,min_value=0,max_value=1,resolution=0.001,slider_length=100,
                  tag_width=10,
                  tag_extra_config={},slider_extra_config={}):
+        """
+
+
+        On pressing Return in the tag, the slider value is set, but also:
+        * the range of the slider is adjusted (e.g. to fit in a larger max value)
+        * the resolution of the slider is adjusted based on the precision of the
+          value in the tag (e.g. 1 in the tag results in integer steps for the slider,
+          whereas 0.0001 in the tag results in a resolution of 10^-4
+        """
 
         Tkinter.Frame.__init__(self,master)
 
@@ -234,7 +237,6 @@ class TaggedSlider(Tkinter.Frame):
     # convenience methods
     def set_bounds(self,min_val,max_val,refresh=None):
         self.bounds = (min_val,max_val)
-        print "bounds",min_val,max_val
         self.slider.config(from_=min_val,to=max_val)
 
     def config(self,**options):
