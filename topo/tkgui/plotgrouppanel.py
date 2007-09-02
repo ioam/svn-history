@@ -67,14 +67,9 @@ CANVASBUFFER = 1
 ## applied immediately). So this indicates two different modes of use for
 ## ParametersFrame.
 
-### CEBHACKALERT: something's funny with packing sometimes (e.g. open connection fields
-### window, change params, then redraw). (It's to do with labels being left behind.)
-
-### CEBHACKALERT: balloon help can show up on the wrong window!
-### (Probably bound the balloon incorrectly somewhere.)
         
 
-
+# CEBALERT: move this class out of here! 
 if bwidget_imported:
     class ResizableScrollableFrame(Tkinter.Frame):
         """
