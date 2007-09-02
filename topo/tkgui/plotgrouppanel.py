@@ -9,9 +9,6 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBERRORALERT: I've (accidentally, temporarily) broken most of the
-# buttons like normalize and sheet_coords...will be fixed when I clean
-# up all the update methods.
 
 import copy
 
@@ -515,27 +512,26 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         """
         if self.auto_refresh:self.refresh()
 
+    def make_plots(self):
+        self.plotgroup.make_plots()
+        self._display_plots_and_labels()
 
-    # CEBALERT: Now clean up the update, redraw, refresh methods in here
-    # and in plotgroup.
-    def update_plots(self):
+    def _display_plots_and_labels(self):
+        self.display_plots()
+        self.display_labels()
+        self.refresh_title()
         
         # shouldn't call this from within history unless you've copied
         # the plotgroup (as in refresh)
-        
         # assert self.history_index==0,"Programming error: can't
         # update plotgroup while looking in history." # (never update
         # plots in the history, or they go to current activity)
 
-        self.plotgroup.draw_plots(update=True)
-        self.display_plots()
-        self.refresh_title()
-        
-        #self.display_labels()
-    def redraw_plots(self):
-        self.plotgroup.draw_plots(update=False)
-        #self.display_plots()  # ?
 
+    def redraw_plots(self):
+        self.plotgroup.redraw_plots()
+        self._display_plots_and_labels()
+        
 
     def refresh(self,update=True):
         """
@@ -553,13 +549,13 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
 
         if update:
-            self.update_plots()            
+            self.make_plots()            
         else:
             self.redraw_plots()
 
 
-	self.display_plots()              # Put images in GUI canvas
-        self.display_labels()             # Match labels to grid
+	#self.display_plots()              # Put images in GUI canvas
+        #self.display_labels()             # Match labels to grid
         self.refresh_title()              # Update Frame title.
 
         self.add_to_history()             
@@ -572,33 +568,27 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
     # CEBALERT: this method needs cleaning, along with its versions in subclasses.
     def display_plots(self):
         """
-        Pre:  self.bitmaps contains a list of topo.bitmap objects.
-
-        Post: The bitmaps have been displayed to the screen in the active
-              console window.  All images are displayed from left to right,
-              in a single row.  If the number of images have changed since
-              the last display, the grid size is increased, or decreased
-              accordingly.
 
         This function should be redefined in subclasses for interesting
         things such as 2D grids.
         """
 	plots = self.plotgroup.plots
 	self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image) for p in plots]
+
+
+        new_sizes = [(str(zi.width()+BORDERWIDTH*2+CANVASBUFFER),
+                      str(zi.height()+BORDERWIDTH*2+CANVASBUFFER))
+                     for zi in self.zoomed_images]
+        old_sizes = [(canvas['width'],canvas['height'])
+                     for canvas in self.canvases]
+
         # If the number of canvases or their sizes has changed, then
-        # create a new set of canvases.  If the old canvases still can
-        # work, then reuse them to prevent flicker.
-        if self.canvases and len(self.zoomed_images) > 0:
-            new_sizes = [(str(zi.width()+BORDERWIDTH*2+CANVASBUFFER),
-                          str(zi.height()+BORDERWIDTH*2+CANVASBUFFER))
-                         for zi in self.zoomed_images]
-            old_sizes = [(canvas['width'],canvas['height'])
-                         for canvas in self.canvases]
-        else:
-            new_sizes, old_sizes = 0, 0
+        # create a new set of canvases.  If the new images will fit into the
+        # old canvases, reuse them (prevents flicker)
 
         if len(self.zoomed_images) != len(self.canvases) or \
                new_sizes != old_sizes:
+            # Need new canvases...
             old_canvases = self.canvases
             self.canvases = [Canvas(self.plot_frame,
                                width=image.width()+BORDERWIDTH*2+CANVASBUFFER,
@@ -624,8 +614,9 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
                 
             for c in old_canvases:
                 c.grid_forget()
+
         else:
-            # Width of all canvases is the same (and same no. of canvases)
+            # Don't need new canvases...
             for i,image,canvas in zip(range(len(self.zoomed_images)),
                                       self.zoomed_images,self.canvases):
                 canvas.create_image(image.width()/2+BORDERWIDTH+1,
@@ -633,23 +624,32 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
                 canvas.grid(row=0,column=i,padx=5)
 
 
-        ### bind events to each canvas
+                
+
+        ### plotting over; bind events to each canvas
         for plot,canvas in zip(plots,self.canvases):
             # Store the corresponding plot with each canvas so that the
             # plot information (e.g. scale_factor) will be available
             # for the right_click menu.
             canvas.plot=plot
-            # CEBALERT: I want process_canvas_event to be called for all of these bindings, with
-            # an additional method also called to do something specific to the action. I'm sure
-            # python has something that lets this be done in a clearer way.
-            canvas.bind('<<right-click>>',lambda event: self.__process_canvas_event(event,self._canvas_right_click))
-            canvas.bind('<Motion>',lambda event: self.__process_canvas_event(event,self._update_dynamic_info))
+            # CEBALERT: I want process_canvas_event to be called for
+            # all of these bindings, with an additional method also
+            # called to do something specific to the action. I'm sure
+            # python has something that lets this be done in a clearer
+            # way.
+            canvas.bind('<<right-click>>',lambda event: \
+                        self.__process_canvas_event(event,self._canvas_right_click))
+            canvas.bind('<Motion>',lambda event: \
+                        self.__process_canvas_event(event,self._update_dynamic_info))
 
-            canvas.bind('<Leave>',lambda event: self.__process_canvas_event(event,self._update_dynamic_info))
-            # When user has a menu up, it's often natural to click elsewhere to make the menu disappear. Need
-            # to update the dynamic information in that case. (Happens on OS X anyway, but needed on Win and linux.)
-            canvas.bind('<Button-1>',lambda event: self.__process_canvas_event(event,self._update_dynamic_info))
-
+            canvas.bind('<Leave>',lambda event: \
+                        self.__process_canvas_event(event,self._update_dynamic_info))
+            # When user has a menu up, it's often natural to click
+            # elsewhere to make the menu disappear. Need to update the
+            # dynamic information in that case. (Happens on OS X
+            # anyway, but needed on Win and linux.)
+            canvas.bind('<Button-1>',lambda event: \
+                        self.__process_canvas_event(event,self._update_dynamic_info))
 
 
         self.sizeright()
@@ -866,7 +866,7 @@ class XPGPanel(PlotGroupPanel):
         super(XPGPanel,self).__init__(console,master,plotgroup_label,**params)
 
         self.pack_param('normalize',parent=self.control_frame_1,
-                        on_change=self.redraw_plots,side="right")
+                        on_change=self.make_plots,side="right")
         # Actually, these could simply call scale_images(), skipping redrawing...
         self.pack_param('integer_scaling',parent=self.control_frame_2,
                         on_change=self.redraw_plots,side='right')
