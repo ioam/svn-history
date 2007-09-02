@@ -520,6 +520,8 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
 
     def _display_plots_and_labels(self):
+        # CEBALERT: probably results in display_labels being called
+        # more often than needed (is it needed for redraw_plots?).
         self.display_plots()
         self.display_labels()
         self.refresh_title()
