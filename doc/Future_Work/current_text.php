@@ -82,9 +82,10 @@ Of all the things I've recently been working on. The ALERTs and are
 getting out of control!
 
 
-<H4>2007/08/31 (CB): tkgui + plotgroup cleanup</H4>
+<H4>2007/09/03 (CB): tkgui + plotgroup cleanup</H4>
 
 <ul>
+<li>**why does tagged slider not go to 20000 on the console?**</li>
 <li>plotgroup.py cleanup</li>
 <li>Remove templateplotgroup?</li>
 <li>ParametersFrame ok/apply/reset/cancel...set order and names of
