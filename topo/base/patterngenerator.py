@@ -198,6 +198,8 @@ class Constant(PatternGenerator):
     x = Number(hidden=True)
     y = Number(hidden=True)
     orientation   = Number(hidden = True)
+    size = Number(hidden=True)
+    
 
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
