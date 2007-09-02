@@ -512,23 +512,37 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         """
         if self.auto_refresh:self.refresh()
 
-    def make_plots(self):
-        self.plotgroup.make_plots()
-        self._display_plots_and_labels()
+    def conditional_redraw(self):
+        """
+        Only calls redraw_plots() if auto_refresh is enabled.
+        """
+        if self.auto_refresh:self.redraw_plots()
+
 
     def _display_plots_and_labels(self):
         self.display_plots()
         self.display_labels()
         self.refresh_title()
         
+    def make_plots(self):
+        """
+        Call plotgroup's make_plots (i.e. run update_command and
+        plot_command), then display the result.
+        """
         # shouldn't call this from within history unless you've copied
         # the plotgroup (as in refresh)
         # assert self.history_index==0,"Programming error: can't
         # update plotgroup while looking in history." # (never update
         # plots in the history, or they go to current activity)
+        self.plotgroup.make_plots()
+        self._display_plots_and_labels()
 
 
     def redraw_plots(self):
+        """
+        Only call plotgroup's redraw_plots (i.e. run only plot_command,
+        not update_command), then display the result.
+        """
         self.plotgroup.redraw_plots()
         self._display_plots_and_labels()
         
@@ -547,20 +561,14 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         if self.history_index!=0:
             self.plotgroup = copy.copy(self.plotgroups_history[-1])
 
-
         if update:
             self.make_plots()            
         else:
             self.redraw_plots()
 
-
-	#self.display_plots()              # Put images in GUI canvas
-        #self.display_labels()             # Match labels to grid
-        self.refresh_title()              # Update Frame title.
-
-        self.add_to_history()             
-        
+        self.add_to_history()                     
         self.update_widgets()
+        
         Pmw.hidebusycursor()
 
 
@@ -774,10 +782,9 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         self.plotgroup = self.plotgroups_history[len(self.plotgroups_history)-1+self.history_index]
 
         self.update_widgets()
-        
- 	self.display_plots()
-        self.display_labels()
-        self.refresh_title()
+
+        self._display_plots_and_labels()
+
         
 ###########################################################         
 
