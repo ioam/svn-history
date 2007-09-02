@@ -116,7 +116,6 @@ class TestPattern(XPGPanel):
         self.pack_param('pattern_generator',parent=self.pg_control_pane,
                         on_modify=self.change_pattern_generator,
                         side="top")
-        self.change_pattern_generator()
         
         present_frame = Frame(self)
         present_frame.pack(side='bottom')
