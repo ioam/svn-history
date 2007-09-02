@@ -86,16 +86,15 @@ getting out of control!
 
 <ul>
 <li>plotgroup.py cleanup</li>
-
 <li>Remove templateplotgroup?</li>
-
 <li>ParametersFrame ok/apply/reset/cancel...set order and names of
 ParametersFrame's Ok, Apply, Cancel, Reset, and Defaults buttons, and
 make them behave as expected for classes and instances.</li>
-<li>Cleanup of tkparameterizedobject.py & parametersframe.py</li>
+<li>Cleanup of tkparameterizedobject.py, parametersframe.py, *panel.py files</li>
 <li>Finish SelectorParameter</li>
 <li>Right click connection field on e.g. retina --> lots of errors.</li>
-<li>Use parametersframe in more places</li>
+<li>Use parametersframe/tkparameterizedobject in more places (topoconsole, 
+model editor, right click menus...) </li>
 <li>Which widgets should expand (expand=YES ?), which should fill the
 space (fill=X ?) (e.g. in parameters frames sliders etc should
 expand), and so on. Switch to grid layout where it's more
@@ -118,18 +117,6 @@ to be cleaned up.  </li>
 Finishing cleaning up associated code.
 
 
-<H4>2007/08/12 (CB): scrollbars on plotgrouppanel windows</H4>
-Add scrollbars when not auto-resizing (and ideally even when
-auto-resizing but the window would otherwise be larger than the
-screen).
-<BR>
-Build bwidget to see scrollbars. Current problems include flickering
-on linux (e.g. rotate a gaussian in test pattern window), and
-unnecessary scrollbars appearing on linux only to disappear when
-clicked.
-
-
-
 <H4>2007/05/18 (CB): gradient plots </H4>
 [see SF bug tracker]
 
@@ -137,8 +124,6 @@ clicked.
 <H4>2006/03/26 (CB): scheduled_actions in lissom examples</H4>
 Insert missing actions in case someone tries higher densities.
 JAB 2007/04/25: Isn't this already done?
-
-
 
 
 <H4>2007/04/15 (CB): Dynamic info</H4>
