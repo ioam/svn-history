@@ -200,6 +200,8 @@ class TaggedSlider(Tkinter.Frame):
         self.bounds = (min_value,max_value)
         self.slider.pack(side='right')
 
+        self.tag_changed() # ensure slider matches on widget creation
+
 
     def slider_changed(self,*args,**opts):
         self.variable.set(self.slider_variable.get())
