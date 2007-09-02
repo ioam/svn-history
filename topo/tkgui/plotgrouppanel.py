@@ -567,8 +567,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             self.redraw_plots()
 
         self.add_to_history()                     
-        self.update_widgets()
-        
+                
         Pmw.hidebusycursor()
 
 
@@ -733,7 +732,8 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             state = 'normal'
 
         
-        widgets_to_update = [self.representations[p_name]['widget'] for p_name in self.representations
+        widgets_to_update = [self.representations[p_name]['widget']
+                             for p_name in self.representations
                              if p_name not in self.params_in_history]
 
         for widget in widgets_to_update:
