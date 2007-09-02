@@ -264,11 +264,16 @@ class ParametersFrame(XParametersFrame):
     def __init__(self,master,PO=None,on_change=None,on_modify=None,**params):        
         super(ParametersFrame,self).__init__(master,PO,on_change,on_modify,**params)
 
+        for p in self.param_immediately_apply_change: self.param_immediately_apply_change[p]=True
+            
         
         self.pack_param('Apply',parent=self._buttons_frame,on_change=self.update_parameters,side='left')
         self.pack_param('Refresh',parent=self._buttons_frame,on_change=self._sync_tkvars2po,side='right')
 
 
+    def _create_string_widget(self,frame,name,widget_options):
+        w= super(ParametersFrame,self)._create_string_widget(frame,name,widget_options)
+        w.unbind('<Return>')
 
     def set_PO(self,PO,on_change=None,on_modify=None):
         self.change_PO(PO)
