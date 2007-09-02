@@ -90,15 +90,12 @@ class PlotGroup(ParameterizedObject):
 
 
 
-
     def _plot_command(self):
         exec self.plot_command in self.cmd_location
 
 
-
     def _update_command(self):
         exec self.update_command in self.cmd_location
-
 
         
     def _plot_list(self):
@@ -109,7 +106,7 @@ class PlotGroup(ParameterizedObject):
 	return self.plot_list
 
 
-    def draw_plots(self,update=True):
+    def make_plots(self,update=True):
 	"""
 
 	If update=True, execute the command associated with the template
@@ -119,13 +116,13 @@ class PlotGroup(ParameterizedObject):
         self._plot_command()
         self._create_images(update)
         self.scale_images()
-        
 
-    # CB: ** replace calls to these two methods **
+    def draw_plots(self,**args):
+        raise
+
+
     def redraw_plots(self):
-        self.draw_plots(update=False)
-    def update_plots(self):
-        self.draw_plots(update=True)
+        self.make_plots(update=False)
 
 
     def _create_images(self,update):
