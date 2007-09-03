@@ -322,3 +322,18 @@ but eventually all will be available.
 changes won't show in open GUI windows until they are refreshed. But that's 
 not going to be a problem here - will need this note for ParmetersFrame in
 the model editor instructions, etc.-->
+
+
+<P>Note that in some cases the GUI will reformat the name of a
+parameter to make it match look-and-feel expectations for GUI
+interfaces, such as removing underscores from names, making the
+initial letter capital, etc. (e.g. in the Test Pattern window).  If
+you want to disable this behavior so that you can tell exactly which
+parameter name to use from the command line or in a script, you can
+turn off the parameter name reformatting:
+
+<pre>
+  from  topo.tkgui.tkparameterizedobject import TkParameterizedObject
+  TkParameterizedObject.pretty_parameters=False
+</pre>
+
