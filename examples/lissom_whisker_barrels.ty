@@ -21,6 +21,16 @@ from topo.commands.analysis import PatternPresenter
 import topo
 from topo.base.functionfamilies import CoordinateMapperFn
 
+# Number of separate delay lines from the input surface, i.e. how
+# many ganglia sheets to use.  By default, uses only one, but if
+# called as:
+#
+# ./topographica -c num_lags=4 lissom_whisker_barrels.ty -g
+#
+# the spatiotemporal version can be used, with four input sheets.
+num_lags=locals().get('num_lags',1)
+
+
 class WhiskerArray(PatternGenerator):
     """
     Simulates a 2D array of whiskers using external Matlab programs. 
@@ -74,7 +84,6 @@ class WhiskerArray(PatternGenerator):
     single_whisker_plot = Integer(default=2)
 
     random_seed = Number(default = 310) # was 5489 for all sims in thesis
-
     
 
     def __init__(self,**params):
@@ -88,7 +97,7 @@ class WhiskerArray(PatternGenerator):
         
     def function(self,**params):
         deflection = params.get('deflection',self.deflection)
-	#use mlab.sweep for correlated model, mlab.sweep_uncor for uncorrelated model, mlab.sweep_random for the random model, and mlab.sweep_anticor for anticorrelated model reported in the thesis         
+	#use mlab.sweep for correlated model, mlab.sweep_uncor for uncorrelated model, mlab.sweep_random for the random model, and mlab.sweep_anticor for anticorrelated model reported in the thesis. ***Although these models havent bee tried yet (with the temporal case?), might randomise for each time sheet which would be inappropriate.         
 	self.firing_rates = mlab.sweep(
                                     self.num_whiskers,
 				    self.num_ganglion_cells,
@@ -144,7 +153,13 @@ class TestWhiskerArray(PatternGenerator):
         
 
     def function(self,**params):
-        deflection = params.get('deflection',self.deflection)
+        if num_lags==1:
+            deflection = params.get('deflection',self.deflection)
+        elif num_lags==4:
+            deflection = params.get('deflection_spatial',self.deflection)
+        else:
+            raise NotImplementedError, "Only one or four lags implemented at present"
+            
         self.firing_rates = mlab.test_deflections(
                                     WhiskerArray.num_whiskers,
 				    WhiskerArray.num_ganglion_cells,
@@ -247,7 +262,7 @@ def specify_whisker_deflections():
         ganglion_preferences = mlab.ganglion_labels(sheet.input_generator.ganglion_cell_positions,
                                                     WhiskerArray.num_ganglion_cells,
                                                     WhiskerArray.num_whiskers)
-	new_view = SheetView((ganglion_preferences,sheet.bounds), sheet.name,sheet.precedence)
+        new_view = SheetView((ganglion_preferences,sheet.bounds), sheet.name,sheet.precedence)
         sheet.sheet_view_dict['DeflectionPreference']=new_view
 
 
@@ -307,6 +322,7 @@ def measure_deflection_pref(num_deflection=12,
     param_dict = {"scale":scale,"offset":offset}
     x=FeatureMaps(feature_values)
     x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+
 
 ###############################################################################
 """
@@ -372,15 +388,18 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
 # build simulation
 
-# Number of separate delay lines from the input surface
-num_lags=4
 num_whiskers=WhiskerArray.num_whiskers
 num_ganglion_cells=WhiskerArray.num_ganglion_cells
 
+# Temporary hack to make this file compatible with previous version
+if num_lags==1:
+    step_offset=1
+else:
+    step_offset=0
 
-
-topo.sim['Ganglia0']=GeneratorSheet(nominal_density=num_whiskers*num_ganglion_cells,
-                                             input_generator=WhiskerArray(num_whiskers=num_whiskers,num_ganglion_cells=num_ganglion_cells,step=1,
+for i in xrange(num_lags):
+    topo.sim['Ganglia'+str(i)]=GeneratorSheet(nominal_density=num_whiskers*num_ganglion_cells,
+                                             input_generator=WhiskerArray(num_whiskers=num_whiskers,num_ganglion_cells=num_ganglion_cells,step=i+step_offset,
 											       deflection=DynamicNumber(UniformRandom(lbound=0,ubound=2*pi,seed=23))),
                                              period=1.0, phase=0.05,
                                              nominal_bounds=BoundingBox(radius=0.5))
@@ -394,10 +413,9 @@ topo.sim['S1'].output_fn.lower_bound=0.083
 topo.sim['S1'].output_fn.upper_bound=0.633
 
 
-
-
-topo.sim.connect('Ganglia0','S1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
-                     connection_type=CFProjection,strength=1.0,name='Afferent0',
+for i in xrange(num_lags):
+    topo.sim.connect('Ganglia'+str(i),'S1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
+                     connection_type=CFProjection,strength=1.0,name='Afferent'+str(i),
                      weights_generator=topo.patterns.basic.Composite(generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                                  topo.patterns.random.UniformRandom()]), nominal_bounds_template=BoundingBox(radius=0.53/WhiskerArray.num_whiskers),learning_rate=0.85, coord_mapper=XYModulo()) 
                    
@@ -453,7 +471,8 @@ topo.sim.schedule_command( 8000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 topo.sim.schedule_command(20000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 
 ### Afferent learning rate changes
-AFF ='topo.sim["S1"].projections()["Afferent0"]'
+for i in xrange(num_lags):
+    AFF ='topo.sim["S1"].projections()["Afferent'+str(i)+'"]'
 topo.sim.schedule_command(  500*st,AFF+'.learning_rate=0.6850')
 topo.sim.schedule_command( 2000*st,AFF+'.learning_rate=0.5480')
 topo.sim.schedule_command( 4000*st,AFF+'.learning_rate=0.4110')
@@ -482,7 +501,7 @@ topo.sim.schedule_command( 8000*st,'topo.sim["S1"].tsettle=13')
 
 # default locations for model editor
 topo.sim.grid_layout([[None, 'S1'],
-                      [('Ganglia0')]],
+                     [('Ganglia'+str(i)) for i in xrange(num_lags)]],
                      xstart=150, xstep=150)
 
 # Make DeflectionPreference be the default subplot
@@ -490,4 +509,5 @@ from topo.plotting.templates import plotgroup_templates
 for name in ["Activity", "Connection Fields", "Projection"]:
     plotgroup_templates[name].plot_templates[name]["Hue"]="DeflectionPreference"
     plotgroup_templates[name].plot_templates[name]["Confidence"]="DeflectionSelectivity"
+
 
