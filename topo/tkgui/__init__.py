@@ -54,7 +54,7 @@ from topoconsole import TopoConsole
 
 
 
-# When not using the GUI, Topographica does not ordinary import any of
+# When not using the GUI, Topographica does not ordinarily import any of
 # the classes in the separate Topographica packages. For example, none
 # of the pattern types in topo.patterns is imported in Topographica by
 # default.  But for the GUI, we want all such things to be available
