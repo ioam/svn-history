@@ -268,7 +268,7 @@ pgt.add_plot('Deflection Preference&Selectivity',[('Hue','DeflectionPreference')
 pgt.add_plot('Deflection Selectivity',[('Strength','DeflectionSelectivity')])
 pgt.add_plot('Whisker Preference',[('Strength','WhiskerPreference')])
 pgt.add_plot('Whisker Selectivity',[('Strength','WhiskerSelectivity')])
-pgt.add_static_image('Color Key','examples/whiskers/key.png')
+pgt.add_static_image('Color Key','examples/whiskers/dfl_key_white_vert.png')
 
 
 def measure_deflection_pref(num_deflection=12,
