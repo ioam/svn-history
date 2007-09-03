@@ -187,7 +187,7 @@ class IdentityMF(CoordinateMapperFn):
 
 class CoordinateMapperFnParameter(ClassSelectorParameter):
     """
-    Parameter whose value can be any ResponseFunction.
+    Parameter whose value can be any CoordinateMapperFn.
     """
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
