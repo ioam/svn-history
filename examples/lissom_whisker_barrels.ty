@@ -372,7 +372,7 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 num_whiskers=WhiskerArray.num_whiskers
 num_ganglion_cells=WhiskerArray.num_ganglion_cells
 
-# Temporary hack to make this file compatible with previous version
+# For the single-lag case, use an intermediate step
 if num_lags==1:
     step_offset=1
 else:
