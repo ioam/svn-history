@@ -593,8 +593,9 @@ class TopoConsole(TkguiWindow):
         
         Adds the file extension .typ if not already present.
         """
-        snapshot_name = tkFileDialog.asksaveasfilename(filetypes=SAVED_FILETYPES)
-
+        snapshot_name = tkFileDialog.asksaveasfilename(filetypes=SAVED_FILETYPES,
+            initialfile="%s_%05d.typ" % (topo.sim.name,int(topo.sim.time())))
+        
         if snapshot_name in ('',(),None):
             self.messageBar.message('state','No snapshot saved.')
         else:
