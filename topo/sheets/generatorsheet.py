@@ -46,6 +46,8 @@ class GeneratorSheet(Sheet):
         self.input_generator_stack = []
         self.set_input_generator(self.input_generator)
 
+        # JABALERT: Should make period have an exclusive lower bound instead
+        assert self.period!=0, "Period must be greater than zero."
 
     def set_input_generator(self,new_ig,push_existing=False):
         """
