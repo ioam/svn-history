@@ -153,12 +153,7 @@ class TestWhiskerArray(PatternGenerator):
         
 
     def function(self,**params):
-        if num_lags==1:
-            deflection = params.get('deflection',self.deflection)
-        elif num_lags==4:
-            deflection = params.get('deflection_spatial',self.deflection)
-        else:
-            raise NotImplementedError, "Only one or four lags implemented at present"
+        deflection = params.get('deflection',self.deflection)
             
         self.firing_rates = mlab.test_deflections(
                                     WhiskerArray.num_whiskers,
