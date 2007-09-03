@@ -6,7 +6,7 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBALERT: on orienation full field plot, there's no text telling you
+# CEBALERT: on orientation full field plot, there's no text telling you
 # to click refresh. (Not the right place for this alert!)
 
 
