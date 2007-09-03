@@ -1,21 +1,26 @@
 """
-Whisker barrel simulation from Stuart Wilson, using inputs calculated
-in Matlab attached to a LISSOM cortical sheet.
+Whisker barrel simulation from Stuart Wilson's 2007 University of
+Edinburgh MSc thesis, using inputs calculated in Matlab attached to a
+LISSOM cortical sheet.
+
+Requires Matlab (tested with 7.2 and 7.4) and mlabwrap to be installed; see
+http://topographica.org/Reference_Manual/index.html#mlabwrap.  
 
 $Id$
 """
 __version__='$Revision$'
 
 
-###############################################################################
-
-# The following code is needed before loading to set library path for mlabwrap
+# Before loading this script, run something like this code in your
+# shell so that mlabwrap can find matlab:
 # export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/matlab-7.4/bin/glnx86
 
 from mlabwrap import mlab
+
+# Location of the Matlab code
 mlab.addpath('examples/whiskers')
 
-from topo.base.parameterclasses import Integer, Number
+from topo.base.parameterclasses import Integer, Number, BooleanParameter
 from topo.base.patterngenerator import PatternGenerator
 from topo.commands.analysis import PatternPresenter
 import topo
@@ -31,12 +36,15 @@ from topo.base.functionfamilies import CoordinateMapperFn
 num_lags=locals().get('num_lags',1)
 
 
+
+###############################################################################
+
 class WhiskerArray(PatternGenerator):
     """
     Simulates a 2D array of whiskers using external Matlab programs. 
     """
 
-    # Becasue of quantisation issues, num_whiskers should be an odd number 
+    # Because of quantisation issues, num_whiskers should be an odd number 
     num_whiskers = Integer(default=3,bounds=(1,None),softbounds=(0.0,10.0),
         precedence=0.31,doc="""
         Square root of the number of whiskers to use.  E.g. 3 gives a 3x3 array.""")
@@ -44,45 +52,45 @@ class WhiskerArray(PatternGenerator):
     randomise_ganglion = bool(True)
   
     num_ganglion_cells = Integer(default=8,doc="""
-        Route Number of Ganglion Cells per Whisker""")
+        Square root of the number of ganglion cells per whisker.""")
 
     deflection = Number(default=pi/4,softbounds=(0.0,2*pi),doc="""
-        Whisker Deflection Angle in Radians""")
+        Whisker deflection angle, in radians""")
 
-    # This is useful for the lagged model, in the simple case step = 1
+    # This is useful for the lagged model; in the simple case step = 1
     step = Number(default=0,doc="""
         Number of steps at the given speed to move in the sweep direction.
         The distance moved is speed*step.""")
 
     speed = Number(default=0.09,bounds=(0.0,None),doc="""
-        Sweep speed: Distance moved in a time step, also scales the deflection""")
+        Sweep speed, i.e. distance moved in one time step.  Also scales the deflection.""")
 
-    rectify = Integer(default=1,bounds=(0,1),doc="""
-        Whether or not to supress firing in depreseed ganglion. 1 is to rectify, 0 is to not""")
+    rectify = BooleanParameter(default=True,doc="""
+        Whether or not to suppress firing in depressed ganglion. 1 means to rectify, 0 to not.""")
 
     whisker = Integer(default=(0), doc="""
-        Which whiskers are to receive inputs, use 0 for all""")
-    
+        Which whiskers are to receive inputs; use (0) for all.""")
+
+    ## SWALERT: This needs to be figured out.
     step_size = Number(default = 0.75,doc="""
-      Scaling of the distance, must be fine tuned to geive good results...This needs to be figured out""")
+        Scaling of the distance; must be fine tuned to give good results.""")
 
     pipe_size = Integer(default=100,doc="""
-      Route elements to define the pipe. A larger size means a more smoothly defined Gaussian drop off""")
+        Square root of the number of elements to define the pipe.
+        A larger size means a more smoothly defined Gaussian drop off.""")
 
     pipe_sigma=Integer(default=20, doc="""
-       Sets the sigma of the pipe falloff""")
+        Sigma of the pipe falloff.""")
 
     pipe_sigma_on=Number(default=0.1, doc="""
-       Falloff for the RA ON response""")
+        Falloff for the RA ON response.""")
 
     pipe_sigma_off=Number(default=0.9, doc="""
-       Falloff for the RA OFF response""")
+        Falloff for the RA OFF response.""")
 
     pipe_off_strength= Number(default=0, doc="""
-       Height of the RA OFF response""") 
+        Height of the RA OFF response.""") 
     
-    single_whisker_plot = Integer(default=2)
-
     random_seed = Number(default = 310) # was 5489 for all sims in thesis
     
 
@@ -97,13 +105,25 @@ class WhiskerArray(PatternGenerator):
         
     def function(self,**params):
         deflection = params.get('deflection',self.deflection)
-	#use mlab.sweep for correlated model, mlab.sweep_uncor for uncorrelated model, mlab.sweep_random for the random model, and mlab.sweep_anticor for anticorrelated model reported in the thesis. ***Although these models havent bee tried yet (with the temporal case?), might randomise for each time sheet which would be inappropriate.         
+        
+        # JABALERT: Should probably make the function "mlab.sweep" be a parameter,
+        # to make it simpler to choose between these models.
+	#
+        # For the various simulations reported in the thesis, use:
+        #  mlab.sweep for correlated model
+        #  mlab.sweep_uncor for uncorrelated model
+        #  mlab.sweep_random for the random model
+        #  mlab.sweep_anticor for anticorrelated model
+        #
+        # These models haven't yet been tried for the case of num_lags>1,
+        # which might inappropriately randomise for each lagged sheet
+        #
 	self.firing_rates = mlab.sweep(
                                     self.num_whiskers,
 				    self.num_ganglion_cells,
 				    self.whisking_pipe,
                                     self.step_size,
-				    self.rectify, 
+				    self.rectify*1, 
 				    self.speed, 
 				    360*self.deflection/2.0/pi,
 				    self.step+1,
@@ -118,14 +138,16 @@ class WhiskerArray(PatternGenerator):
     
 ###############################################################################
 
+# JABALERT: This class should share a parent class with WhiskerArray, instead
+# of hard-coding references to parameter values of WhiskerArray.  The
+# results will all be entirely mixed up if any of the defaults in
+# WhiskerArray are changed after this class has been created.
+#
 class TestWhiskerArray(PatternGenerator):
     """
-    A second WhiskerArray Class for testing the Map
+    A second WhiskerArray Class for testing the map.
     """
 
-    # JABALERT: The parameter definitions here are quite arbitrary, e.g.
-    # differing over whether they are a square number or a square root.
-    # Should be generalized to handle a full range of reasonable values.
     num_whiskers = WhiskerArray.num_whiskers
 
     randomise_ganglion = WhiskerArray.randomise_ganglion
@@ -137,15 +159,12 @@ class TestWhiskerArray(PatternGenerator):
    
     speed = Number(1)
     
-    rectify = Integer(default=1,bounds=(0,1),doc="""
-        Whether or not to supress firing in depreseed ganglion. 1 is to rectify, 0 is to not""")
+    rectify = BooleanParameter(default=True,doc="""
+        Whether or not to suppress firing in depressed ganglion. 1 means to rectify, 0 to not.""")
     
     whisker = Integer(default=0, doc="""
-        Which whiskers are to receive inputs, use 0 for all""")
+        Which whiskers are to receive inputs; use 0 for all.""")
 	
-    show_matlab_plots = Integer(default=0,doc="""
-	Use 1 to display the plots in matlab""")
-    
 
     def __init__(self,**params):
         super(TestWhiskerArray,self).__init__(**params)
@@ -158,10 +177,11 @@ class TestWhiskerArray(PatternGenerator):
         self.firing_rates = mlab.test_deflections(
                                     WhiskerArray.num_whiskers,
 				    WhiskerArray.num_ganglion_cells,
-				    WhiskerArray.rectify, 
+				    WhiskerArray.rectify*1, 
 				    1,
 				    360*self.deflection/2.0/pi,
                                     self.whisker)
+        
         if self.randomise_ganglion ==True:
             inputs = mlab.generate_barrelettes(self.firing_rates, self.ganglion_cell_positions)
         else:
@@ -172,35 +192,33 @@ class TestWhiskerArray(PatternGenerator):
 
 ###############################################################################
 
-
+# JABALERT: See JABALERT for the TestWhiskerArray class above.
 class WhiskerBotData(PatternGenerator):
     """
-    A third class for plugging whiskerBot data into the map. Some original whiskerbot sims are left in to give the idea of how this works
+    A third class for plugging WhiskerBot data into the map. Some
+    original WhiskerBot sims are left in to give the idea of how this
+    works.
     """
-
-    # JABALERT: The parameter definitions here are quite arbitrary, e.g.
-    # differing over whether they are a square number or a square root.
 
     num_whiskers = WhiskerArray.num_whiskers
 
     randomise_ganglion = WhiskerArray.randomise_ganglion 
 	
     whiskerBot_gain = Number(default=3.14,bounds=(0.0,20.0),doc="""
-	 Scale the whiskerBot strain data""")
+        Scale the WhiskerBot strain data""")
     
-    rectify = Integer(default=1,bounds=(0,1),doc="""
-        Whether or not to supress firing in depreseed ganglion. 1 is to rectify, 0 is to not""")
+    rectify = BooleanParameter(default=True,doc="""
+        Whether or not to supress firing in depressed ganglion cell. 1 is to rectify, 0 is to not""")
 
     time_step = Integer(default = 1,bounds=(1,50),doc="""
-    		Numbered frame from the WhiskerBot simulation""")
+        Numbered frame from the WhiskerBot simulation.""")
 
     whiskerBot_data = Integer(default = 1,doc="""
-		Choose WhiskerBot data to present. Data are stored in examples/whiskers/wbot_object_data:
-		1: Concave surface,2:Ball,3:Chequerboard,4:vertical ridges""") 
+        Choose WhiskerBot data to present. Data are stored in examples/whiskers/wbot_object_data:
+        1:Concave surface, 2:Ball, 3:Chequerboard, 4:vertical ridges.""") 
 	
-    plot_vectors = Integer(default = 1,bounds=(0,1),doc="""
-		Display vector plots from matlab""")
-		
+    plot_vectors = BooleanParameter(default = True,doc="""
+        Display vector plots from Matlab.""")
     
 
     def __init__(self,**params):
@@ -229,10 +247,10 @@ class WhiskerBotData(PatternGenerator):
         self.firing_rates = mlab.whiskerbot_frame(self.wbot_x,
 						  self.wbot_y,
 						  self.whiskerBot_gain,
-						  WhiskerArray.rectify,
+						  WhiskerArray.rectify*1,
 						  WhiskerArray.num_ganglion_cells,
 						  self.time_step,
-						  self.plot_vectors)
+						  self.plot_vectors*1)
         if self.randomise_ganglion ==True:
             inputs = mlab.generate_barrelettes(self.firing_rates, self.ganglion_cell_positions)
         else:
@@ -253,7 +271,7 @@ def specify_whisker_deflections():
    from mlabwrap import mlab
     
    for sheet in topo.sim.objects(GeneratorSheet).values():
-        # get data from matlab, getting deflection pref as a number between 0 and 2 pi
+        # Get data from matlab, with deflection pref as a number between 0 and 2*pi
         ganglion_preferences = mlab.ganglion_labels(sheet.input_generator.ganglion_cell_positions,
                                                     WhiskerArray.num_ganglion_cells,
                                                     WhiskerArray.num_whiskers)
@@ -261,14 +279,11 @@ def specify_whisker_deflections():
         sheet.sheet_view_dict['DeflectionPreference']=new_view
 
 
-#######################################################################################################
-# Stuart Wilson: 
-# This is the same as measure_or_pref in analysis.py, but edited to measure deflection preferences. 
-# Developed for use with the barrel cortex model
- 
+
+###############################################################################
+# Deflection preference map plotting, based on measure_or_pref in analysis.py
 
 from topo.plotting.templates import new_pgt
-
 pgt= new_pgt(name='Deflection Preference',category="Preference Maps",
              doc='Measure preference for direction stimulus for a lagged model.',
              command='measure_deflection_pref()')
@@ -280,28 +295,13 @@ pgt.add_plot('Whisker Preference',[('Strength','WhiskerPreference')])
 pgt.add_plot('Whisker Selectivity',[('Strength','WhiskerSelectivity')])
 pgt.add_static_image('Color Key','examples/whiskers/dfl_key_white_vert.png')
 
-
 def measure_deflection_pref(num_deflection=12,
                     scale=0.3,offset=0.0,display=False,weighted_average=False,
                     pattern_presenter=PatternPresenter(pattern_generator=TestWhiskerArray(),apply_output_fn=False,duration=0.175)):
     
     """  
-    Measure deflection maps, 
-    * This needs to be commented
-    Measures maps by collating the responses to a set of input
-    patterns controlled by some parameters.  The parameter ranges and
-    number of input patterns in each range are determined by the
-    num_phase, num_deflection, and frequencies parameters.  24The
-    particular pattern used is determined by the pattern_presenter
-    argument, which defaults to a WhiskerArray sim presented for a short
-    duration.  By convention, most Topographica example files
-    are designed to have a suitable activity pattern computed by
-    that time, but the duration will need to be changed for other
-    models that do not follow that convention.
-    * This needs to be commented
-    # Could consider having scripts set a variable for the duration,
-    # based on their own particular model setup, and to have it read
-    # from here.  Instead, assumes a fixed default duration right now...
+    Measure deflection maps, by collating the responses to a set of
+    whisker deflections in different directions.
     """
     if num_deflection <= 0:
         raise ValueError("num_deflection must be greater than 0")
@@ -319,16 +319,27 @@ def measure_deflection_pref(num_deflection=12,
     x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
 
+
 ###############################################################################
 """
-Divides the cortical sheet into barrel fields, 1 for each whisker
+Divides the cortical sheet into barrel fields, 1 for each whisker.
 """ 
 
-class XYModulo(CoordinateMapperFn):
+# JABALERT: The linkage between this class and WhiskerArray is
+# fragile, and should be rewritten so that it accepts num_whiskers as
+# an argument to its constructor.  It also seems quite general, and
+# should probably be moved to coordmapperfns/ after testing with other
+# values.
+class XYGrid(CoordinateMapperFn):
+
     def __call__(self,x,y):
-	xmod=(1.0/WhiskerArray.num_whiskers)*(int((WhiskerArray.num_whiskers*x)+(WhiskerArray.num_whiskers*0.5))-((WhiskerArray.num_whiskers-1)/2))
-	ymod=(1.0/WhiskerArray.num_whiskers)*(int((WhiskerArray.num_whiskers*y)+(WhiskerArray.num_whiskers*0.5))-((WhiskerArray.num_whiskers-1)/2))
+        nw=WhiskerArray.num_whiskers
+        
+	xmod=(1.0/nw)*(int((nw*x)+(nw*0.5))-((nw-1)/2))
+	ymod=(1.0/nw)*(int((nw*y)+(nw*0.5))-((nw-1)/2))
+        
 	return  xmod,ymod
+
 
 ###############################################################################
 
@@ -361,11 +372,6 @@ topo.sim.name = "lissom_whisker_barrels"
 	      
 num_inputs=WhiskerArray.num_whiskers 
                                  
-# Default for tutorial
-topo.patterns.basic.Line.scale=0.9
-topo.patterns.basic.Gaussian.size=0.08333
-topo.patterns.basic.Gaussian.aspect_ratio=4.0
-
 # Specify weight initialization, response function, and learning function
 numpy.random.seed((500,500))
 
@@ -378,9 +384,7 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
 
 
-###########################################
-
-
+###############################################################################
 # build simulation
 
 num_whiskers=WhiskerArray.num_whiskers
@@ -395,7 +399,7 @@ else:
 for i in xrange(num_lags):
     topo.sim['Ganglia'+str(i)]=GeneratorSheet(nominal_density=num_whiskers*num_ganglion_cells,
                                              input_generator=WhiskerArray(num_whiskers=num_whiskers,num_ganglion_cells=num_ganglion_cells,step=i+step_offset,
-											       deflection=DynamicNumber(UniformRandom(lbound=0,ubound=2*pi,seed=23))),
+                                                                          deflection=DynamicNumber(UniformRandom(lbound=0,ubound=2*pi,seed=23))),
                                              period=1.0, phase=0.05,
                                              nominal_bounds=BoundingBox(radius=0.5))
 specify_whisker_deflections()
@@ -412,7 +416,7 @@ for i in xrange(num_lags):
     topo.sim.connect('Ganglia'+str(i),'S1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                      connection_type=CFProjection,strength=1.0,name='Afferent'+str(i),
                      weights_generator=topo.patterns.basic.Composite(generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
-                                                                                 topo.patterns.random.UniformRandom()]), nominal_bounds_template=BoundingBox(radius=0.53/WhiskerArray.num_whiskers),learning_rate=0.85, coord_mapper=XYModulo()) 
+                                                                                 topo.patterns.random.UniformRandom()]), nominal_bounds_template=BoundingBox(radius=0.53/WhiskerArray.num_whiskers),learning_rate=0.85, coord_mapper=XYGrid()) 
                    
 
 
