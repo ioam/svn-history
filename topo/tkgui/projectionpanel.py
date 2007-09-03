@@ -22,9 +22,6 @@ from topo.plotting.plotgroup import CFProjectionPlotGroup,ProjectionSheetPlotGro
 from templateplotgrouppanel import TemplatePlotGroupPanel
 
 
-### JCALERT! See if we could delete this import * and replace it...
-#from topo.commands.analysis import *
-
 
 def cmp_projections(p1,p2):
     """
