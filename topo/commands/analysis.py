@@ -153,8 +153,13 @@ class PatternPresenter(ParameterizedObject):
         # For WhiskerArray only; used to set the delay/lag in each input sheet
         if features_values.has_key("deflection"):
             from __main__ import num_lags # Assumed to be defined in .ty file
+            if num_lags==1:
+                step_offset=1
+            else:
+                step_offset=0
+
             for i in xrange(num_lags):
-                inputs[input_sheet_names[i]].step=i
+                inputs[input_sheet_names[i]].step=i+step_offset
 
 
         if features_values.has_key("contrast") or param_dict.has_key("contrast"):
