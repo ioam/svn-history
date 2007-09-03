@@ -117,6 +117,21 @@ objects in the simulation are indexed by name, so name needs to be a
 constant Parameter (which <i>might</i> cause some other problems).
 There are some related hacks in ParametersFrame that would also need
 to be cleaned up.  </li>
+<li>scrollbars:
+If a plot window is resized vertically, the behavior is a bit odd, but
+I'm not sure whether it's good or bad.  Basically, it's surprising
+that the scrollbar doesn't appear until the widgets at the bottom are
+gone entirely.  That seems ok, but surprising, for the plot windows,
+because maybe it's helpful to be able to cover up those extra widgets
+and focus on the plots.  But for the Test Pattern window, it means
+that we still don't have any way to handle parameter lists that are
+too long for the current screen, which happens to me often on a
+relatively low-resolution laptop screen.  Only once the window is made
+so small that all the widgets are gone does a scrollbar appear, at
+which point it's too late.  So maybe a ParametersFrame should get its
+own scrollbar, having priority over the one for the plot?
+</li>
+
 
 </ul>
 
