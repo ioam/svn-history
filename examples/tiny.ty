@@ -75,7 +75,7 @@ topo.sim['Retina'] = GeneratorSheet(input_generator=gaussian_generator,
                                     nominal_bounds=BoundingBox(radius=0.6),
                                     period=1.0,phase=0.05,nominal_density=24)
 
-topo.sim['V1'] = CFSheet(nominal_density=5,nominal_bounds=BoundingBox(radius=0.5),
+topo.sim['V1'] = CFSheet(nominal_density=locals().get('default_density',5),nominal_bounds=BoundingBox(radius=0.5),
                          output_fn=PiecewiseLinear(lower_bound=0,upper_bound=1.0))
 
 topo.sim.connect(
