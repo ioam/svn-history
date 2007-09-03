@@ -247,7 +247,7 @@ def specify_whisker_deflections():
         ganglion_preferences = mlab.ganglion_labels(sheet.input_generator.ganglion_cell_positions,
                                                     WhiskerArray.num_ganglion_cells,
                                                     WhiskerArray.num_whiskers)
-	new_view = SheetView((ganglion_preferences,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
+	new_view = SheetView((ganglion_preferences,sheet.bounds), sheet.name,sheet.precedence)
         sheet.sheet_view_dict['DeflectionPreference']=new_view
 
 
@@ -384,7 +384,7 @@ topo.sim['Ganglia0']=GeneratorSheet(nominal_density=num_whiskers*num_ganglion_ce
 											       deflection=DynamicNumber(UniformRandom(lbound=0,ubound=2*pi,seed=23))),
                                              period=1.0, phase=0.05,
                                              nominal_bounds=BoundingBox(radius=0.5))
-
+specify_whisker_deflections()
 
 topo.sim['S1'] = LISSOM(nominal_density=locals().get('default_density',16*WhiskerArray.num_whiskers),tsettle=9,
                         nominal_bounds=BoundingBox(radius=0.5))
