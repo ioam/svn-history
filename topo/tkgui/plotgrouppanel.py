@@ -885,6 +885,7 @@ class XPGPanel(PlotGroupPanel):
                         on_change=self.redraw_plots,side='right')
         self.pack_param('sheet_coords',parent=self.control_frame_2,
                         on_change=self.redraw_plots,side='right')
-        
 
+        self.params_in_history.append('sheet_coords')
+        self.params_in_history.append('integer_scaling')
 
