@@ -23,8 +23,11 @@ mlab.addpath('examples/whiskers')
 from topo.base.parameterclasses import Integer, Number, BooleanParameter
 from topo.base.patterngenerator import PatternGenerator
 from topo.commands.analysis import PatternPresenter
-import topo
 from topo.base.functionfamilies import CoordinateMapperFn
+from topo.coordmapperfns.basic import Grid
+
+import topo
+
 
 # Number of separate delay lines from the input surface, i.e. how
 # many ganglia sheets to use.  By default, uses only one, but if
@@ -321,31 +324,6 @@ def measure_deflection_pref(num_deflection=12,
 
 
 ###############################################################################
-# JABALERT: This class will be moved to coordmapperfns/ shortly.
-# Divides the cortical sheet into barrel fields, 1 for each whisker.
-class Grid(CoordinateMapperFn):
-    """
-    Divides the 2D area into a grid, where all points within each grid
-    element map to the same location.
-    """
-
-    xdensity = Number(default=1, bounds=(0,None), doc="""
-        Number of columns per 1.0 input sheet distance horizontally.""")
-
-    ydensity = Number(default=1, bounds=(0,None), doc="""
-        Number of rows per 1.0 input sheet distance vertically.""")
-
-    def __call__(self,x,y):
-        xd=self.xdensity
-        yd=self.ydensity
-        
-	xquant=(1.0/xd)*(int(xd*(x+0.5))-(0.5*(xd-1)))
-	yquant=(1.0/yd)*(int(yd*(y+0.5))-(0.5*(yd-1)))
-        
-	return  xquant,yquant
-
-
-###############################################################################
 
 
 import fixedpoint
@@ -416,6 +394,7 @@ topo.sim['S1'].output_fn.lower_bound=0.083
 topo.sim['S1'].output_fn.upper_bound=0.633
 
 
+# The Grid coord_mapper divides the cortical sheet into barrel fields, 1 for each whisker. 
 for i in xrange(num_lags):
     topo.sim.connect('Ganglia'+str(i),'S1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                      connection_type=CFProjection,strength=1.0,name='Afferent'+str(i),

@@ -59,9 +59,31 @@ class Pipeline(CoordinateMapperFn):
                        [(x,y)] + self.mappers )
     
 
+class Grid(CoordinateMapperFn):
+    """
+    Divides the 2D area into a grid, where all points within each grid
+    element map to the same location.
+    """
+
+    xdensity = Number(default=1, bounds=(0,None), doc="""
+        Number of columns per 1.0 input sheet distance horizontally.""")
+
+    ydensity = Number(default=1, bounds=(0,None), doc="""
+        Number of rows per 1.0 input sheet distance vertically.""")
+
+    def __call__(self,x,y):
+        xd=self.xdensity
+        yd=self.ydensity
+        
+	xquant=(1.0/xd)*(int(xd*(x+0.5))-(0.5*(xd-1)))
+	yquant=(1.0/yd)*(int(yd*(y+0.5))-(0.5*(yd-1)))
+        
+	return  xquant,yquant
+
+
 class Polar2Cartesian(CoordinateMapperFn):
     """
-    Map from polar (radius,angle) to Cartesian coordinates.
+    Map from polar (radius,angle) to Cartesian (x,y) coordinates.
     """
 
     degrees=BooleanParameter(default=True,
