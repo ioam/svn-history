@@ -321,24 +321,28 @@ def measure_deflection_pref(num_deflection=12,
 
 
 ###############################################################################
-"""
-Divides the cortical sheet into barrel fields, 1 for each whisker.
-""" 
+# JABALERT: This class will be moved to coordmapperfns/ shortly.
+# Divides the cortical sheet into barrel fields, 1 for each whisker.
+class Grid(CoordinateMapperFn):
+    """
+    Divides the 2D area into a grid, where all points within each grid
+    element map to the same location.
+    """
 
-# JABALERT: The linkage between this class and WhiskerArray is
-# fragile, and should be rewritten so that it accepts num_whiskers as
-# an argument to its constructor.  It also seems quite general, and
-# should probably be moved to coordmapperfns/ after testing with other
-# values.
-class XYGrid(CoordinateMapperFn):
+    xdensity = Number(default=1, bounds=(0,None), doc="""
+        Number of columns per 1.0 input sheet distance horizontally.""")
+
+    ydensity = Number(default=1, bounds=(0,None), doc="""
+        Number of rows per 1.0 input sheet distance vertically.""")
 
     def __call__(self,x,y):
-        nw=WhiskerArray.num_whiskers
+        xd=self.xdensity
+        yd=self.ydensity
         
-	xmod=(1.0/nw)*(int((nw*x)+(nw*0.5))-((nw-1)/2))
-	ymod=(1.0/nw)*(int((nw*y)+(nw*0.5))-((nw-1)/2))
+	xquant=(1.0/xd)*(int(xd*(x+0.5))-(0.5*(xd-1)))
+	yquant=(1.0/yd)*(int(yd*(y+0.5))-(0.5*(yd-1)))
         
-	return  xmod,ymod
+	return  xquant,yquant
 
 
 ###############################################################################
@@ -416,7 +420,7 @@ for i in xrange(num_lags):
     topo.sim.connect('Ganglia'+str(i),'S1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                      connection_type=CFProjection,strength=1.0,name='Afferent'+str(i),
                      weights_generator=topo.patterns.basic.Composite(generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
-                                                                                 topo.patterns.random.UniformRandom()]), nominal_bounds_template=BoundingBox(radius=0.53/WhiskerArray.num_whiskers),learning_rate=0.85, coord_mapper=XYGrid()) 
+                                                                                 topo.patterns.random.UniformRandom()]), nominal_bounds_template=BoundingBox(radius=0.53/WhiskerArray.num_whiskers),learning_rate=0.85, coord_mapper=Grid(xdensity=WhiskerArray.num_whiskers,ydensity=WhiskerArray.num_whiskers))
                    
 
 
