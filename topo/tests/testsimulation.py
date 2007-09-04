@@ -49,6 +49,7 @@ class TestSimulation(unittest.TestCase):
         e1a = Event(1)
         e2 = Event(2)
 
+        assert e1 is not e1a
         assert e1 ==  e1a
         assert e1 < e2
         assert e1 == e1
