@@ -70,10 +70,15 @@ class TestSimulation(unittest.TestCase):
         s.enqueue_event(e2a)
         s.enqueue_event(e1a)
 
-        assert s.events[0] == e1
-        assert s.events[1] == e1a
-        assert s.events[2] == e2
-        assert s.events[3] == e2a
+        s.enqueue_event(Event(0))
+
+        assert len(s.events) == 5, 'Event queue has %d events, should have 5.' % len(s.events)
+
+        assert s.events[1] == e1
+        assert s.events[2] == e1a
+        assert s.events[3] == e2
+        assert s.events[4] == e2a
+
         
     def test_get_objects(self):
         s = Simulation()
