@@ -151,11 +151,14 @@ class XParametersFrame(TkParameterizedObject,Frame):
             widget,label = self.create_widget(name,self.pframe,on_change=on_change or self.on_change,
                                               on_modify=on_modify or self.on_modify)
             self.representations[name]={'widget':widget,'label':label}
+
+        
         
         # add widgets & labels to screen in a grid
         rows = range(len(sorted_parameter_names))
         for row,parameter_name in zip(rows,sorted_parameter_names): 
             widget = self.representations[parameter_name]['widget']
+
             label = self.representations[parameter_name]['label']
 
             help_text = getdoc(self.get_parameter_object(parameter_name))
@@ -274,6 +277,7 @@ class ParametersFrame(XParametersFrame):
     def _create_string_widget(self,frame,name,widget_options):
         w= super(ParametersFrame,self)._create_string_widget(frame,name,widget_options)
         w.unbind('<Return>')
+        return w
 
     def set_PO(self,PO,on_change=None,on_modify=None):
         self.change_PO(PO)
