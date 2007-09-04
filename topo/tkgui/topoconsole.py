@@ -647,7 +647,7 @@ class TopoConsole(TkguiWindow):
 
     def open_model_editor(self):
         """Start the Model editor."""
-	ModelEditor()
+	return ModelEditor()
 
 
 
