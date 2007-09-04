@@ -149,9 +149,12 @@ snapshot-tests:
 
 # Just check the basic types of window open without errors (because the unit tests don't yet do this).
 basic-gui-tests:
-	./topographica examples/hierarchical.ty -g -c "g=topo.guimain;g['Simulation']['Test Pattern'](); p=g['Plots']; p['Activity'](); p['Connection Fields'](); p['Projection'](); p['Projection Activity'](); p['Preference Maps']['Orientation Preference'](); p['Tuning Curves']['Orientation Tuning'](); topo.guimain.quit_topographica(check=False)"
+	./topographica examples/hierarchical.ty -g -c "g=topo.guimain;g['Simulation']['Test Pattern'](); p=g['Plots']; p['Activity'](); p['Connection Fields'](); p['Projection'](); p['Projection Activity'](); p['Preference Maps']['Orientation Preference'](); p['Tuning Curves']['Orientation Tuning'](); g.quit_topographica(check=False)"
 
-
+more-gui-tests:
+# (CB: using the model editor from the commandline will change when it's converted) 
+	./topographica examples/hierarchical.ty -g -c "g=topo.guimain; e=g['Simulation']['Model Editor'](); [X.show_properties() for X in e.canvas.object_list] # tests various parametersframes" -c "g.quit_topographica(check=False)"
+# (It should be a for loop above, not a comprehension, but I couldn't make the syntax work...)
 
 clean-pyc:
 	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc examples/*.pyc
