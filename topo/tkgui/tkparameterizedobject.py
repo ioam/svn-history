@@ -8,20 +8,15 @@ $Id$
 # CB: this file has now gone beyond the maximum complexity limit
 
 
-### CEB: currently working on this file
-# Documentation and organization are lacking; some relatively simple
-# cleanup (including renaming of things will make it much simpler.
-#
+### CEB: currently working on this file (still have to attend to
+# simple ALERTs).
+
 
 ## Notes
 # * Too fragile because there are too many tests for different types
 #   of Parameter. Most of these are there to make the code work
 #   immediately, but they should be cleaned up as soon as possible.
-# * ...and some of the tests look at the parameter type, but others
-#   look at widget type!
-# * I chose 'representation' to describe
-#   (Frame,widget,label,pack_options,etc) but there's probably a clearer
-#   term...
+
 
 import __main__, sys
 import Tkinter, Pmw
@@ -50,8 +45,8 @@ def lookup_by_class(dict_,class_):
     Look for class_ or its superclasses in the keys of dict_; on
     finding a match, return the value (return None if no match found).
 
-    Searches from the most immediate class (class_) to the most distant
-    (the final superclass of class_).
+    Searches from the most immediate class to the most distant
+    (i.e. from class_ to the final superclass of class_).
     """
     v = None
     for c in classlist(class_)[::-1]:
@@ -78,7 +73,7 @@ def find_key_from_value(dict_,val):
             
 
 
-
+# CEBALERT: implement buttons properly
 ##### Temporary: for easy buttons
 #
 # buttons are not naturally represented by parameters?
@@ -101,20 +96,24 @@ class ButtonParameter(Parameter):
 #####
 
 
-## Dictionary indicating any special Tkinter Variable to use for
-## particular Parameter types.
-parameters_to_tkvars = {
-    BooleanParameter:BooleanVar,
-    StringParameter:StringVar}
-# Don't include Number:DoubleVar because we use Number to control the
-# type.
+# Dictionary indicating Tkinter Variable to use for particular
+# Parameter types.
+# (Note that, for instance, we don't include Number:DoubleVar.  This
+# is because we use Number to control the type, so we don't need
+# restrictions from DoubleVar.)
+parameters_to_tkvars = {BooleanParameter:BooleanVar,
+                        Parameter:StringVar}
 
+# Some parameters are represented by widgets whose options can't be
+# changed once created (e.g. OptionMenu), and some parameters have a
+# fixed set of options (e.g. Boolean). The rest are presumed to have
+# options that can be updated.
+param_has_modifyable_choices = {BooleanParameter:False,
+                                SelectorParameter:False,
+                                Parameter:True}
 
-# Some parameters are represented by widgets whose options can't be changed once created
-# (e.g. OptionMenu), and some parameters have a fixed set of options (e.g. Boolean). The
-# rest are presumed to have options that can be updated.
-param_has_modifyable_choices = {BooleanParameter:False,SelectorParameter:False,Parameter:True}
-
+# CEBALERT: make the two vars above be attributes of
+# TkParameterizedObjectBase.
 
 
 def parameters(parameterized_object):
@@ -132,8 +131,8 @@ def parameters(parameterized_object):
     elif isinstance(parameterized_object,ParameterizedObject):
         return parameterized_object.params()
     else:
-        raise TypeError(`parameterized_object`+" is not a ParameterizedObject or ParameterizedObjectMetaclass.")
-
+        raise TypeError(`parameterized_object`+ \
+            " is not a ParameterizedObject or ParameterizedObjectMetaclass.")
 
 
 class TkParameterizedObjectBase(ParameterizedObject):
@@ -142,66 +141,100 @@ class TkParameterizedObjectBase(ParameterizedObject):
     (proxies) of its Parameters. The Tkinter Variable shadows are kept
     in sync with the Parameter values, and vice versa.
 
-    Optionally performs the same for an additional shadowed
-    ParameterizedObject.
+    Optionally performs the same for an *additional* shadowed
+    ParameterizedObject (extraPO). The Parameters of the extra
+    shadowed PO are available via this object (both via the usual
+    'dot' attribute access and via dedicated parameter accessors
+    declared in this class). 
 
+    The Tkinter.Variable shadows for this ParameterizedObject and any
+    extra shadowed one are available under their corresponding
+    parameter names in the _tk_vars dictionary.
 
-    The Parameters of the shadowed PO are available as attributes of
-    this object (though see note 1); the Tkinter.Variable shadows are
-    available under their corresponding parameter names in the
-    _tk_vars dictionary.
-
+    (See note 1 for complications arising from name clashes.)
+    
 
     Parameters being represented by TkParameterizedObjectBase also
     have a 'translators' dictionary, allowing mapping between string
     representations of the objects and the objects themselves (for use
-    with e.g. a Tkinter.OptionMenu).
+    with e.g. a Tkinter.OptionMenu). More information about the
+    translators is available from specific translator-related methods
+    in this class.
 
 
-
-    *** CEBHACKALERT: need to update the text below ***
     Notes
     =====
     
-    (1) Attribute lookup follows a precedance order, object>shadowed PO.
+    (1) (a) There is an order of precedance for parameter lookup:
+        this PO > shadowed PO.
 
-    E.g.
-    POa = ParameterizedObject(x=2,y=2)         # where x, y, z are Parameters
-    POb = ParameterizedObject(x=3,y=3,z=3)     #
-    TkPOt = TkParameterizedObjectBase(extra_pos=[a,b])
+        Therefore, if you create a Parameter for this PO
+        with the same name as one of the shadowed PO's Parameters, only
+        the Parameter on this PO will be shadowed.
 
-    TkPOt.x = 1   # 'x' is just an attribute (not a Parameter)
+        Example: 'name' is a common attribute. As a
+        ParameterizedObject, this object has a 'name' Parameter. Any
+        shadowed PO will also have a 'name' Parameter. By default,
+        this object's name will be shadowed at the expense of the name
+        of the extra shadowed PO.
 
-    TkPOt.x==1 (i.e. tTkPO.__dict__['x'])
-    TkPOt.y==2 ('y' not in tTkPO.__dict__ and precedence of POa is higher than POb)
-    TkPOt.z==3 ('z' not in tTkPO.__dict__ and not a Parameter of POa)
+        The precedence order can be reversed by setting the attribute
+        'me_first' on this object to False.
 
 
-    To avoid confusion with attributes defined on the local object,
-    get_ and set_parameter_value() can be used to access parameter values only:
-    TkPOt.get_parameter_value('x')==2  # POa.x is parameter with highest precedence 
-
+        (b) Along the same lines, an additional complication can arise
+        relating specifically to 'dot' attribute lookup.  For
+        instance, a sublass of TkParameterizedObject might also
+        inherit from Tkinter.Frame. Frame has many of its own
+        attributes, including - for example - 'size'. If we shadow a
+        ParameterizedObject that has a 'size' Parameter, the
+        ParameterizedObject's size Parameter will not be available as
+        .size because ('dot') attribute lookup begins on the local
+        object and is not overridden by 'me_first'. Using the
+        parameter accessors .get_parameter_object('size') or
+        .get_parameter_value('size') (and the equivalent set versions)
+        avoids this problem.
+        
 
 
     (2) If a shadowed PO's Parameter value is modified elsewhere, the
-    Tkinter Variable shadow is NOT updated until that Parameter value
-    or shadow value is requested from this object. Thus requesting the
-    value will always return an up-to-date result, but any GUI display
-    of the Variable might display a stale value (until a GUI refresh
-    takes place).
+        Tkinter Variable shadow is NOT updated until that Parameter value
+        or shadow value is requested from this object. Thus requesting the
+        value will always return an up-to-date result, but any GUI display
+        of the Variable might display a stale value (until a GUI refresh
+        takes place).
     """
-    # if the above becomes a problem, we could have some autorefresh of the vars
-    # or a callback of some kind in the parameterized object itself.
+    # CEBNOTE: Regarding note 1a above...it would be possible - with
+    # some extra work - to shadow Parameters that are duplicated on
+    # this PO and extraPO. Among other changes, things like the
+    # _tk_vars dict would need different (e.g. name on this PO and
+    # name on extraPO)
 
+    # CEBNOTE: Regarding note 1b...might be less confusing if we stop
+    # parameters of shadowed POs being available as attributes (and
+    # use only the parameter access methods instead).
+
+
+    # CEBNOTE: Regarding note 2 above...if the above becomes a
+    # problem, we could have some autorefresh of the vars or a
+    # callback of some kind in the parameterized object itself.
+
+
+    # CEB: all these attributes need to have names that are unlikely
+    # to clash with anything else. This will make it easier for
+    # creators and users of subclasses to avoid name clashes.
     _extraPO = None
     _tk_vars = {}
     translators = {}
-    self_first = True  # for precedence 
+    self_first = True  # CEBALERT: rename to my_parameters_first 
     param_immediately_apply_change = {}
 
-    # CBENHANCEMENT: __repr__ will need some work (display params of subobjects etc?).
+    # CBENHANCEMENT: __repr__ will need some work (display params of
+    # subobjects etc?).
 
-    # Overrides method from superclass.
+
+
+    ### Methods overridden from superclass ########################## 
     def _setup_params(self,**params):
         """
         Parameters that are not in this object itself but are in the
@@ -219,17 +252,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         ParameterizedObject._setup_params(self,**params)
 
-    def change_PO(self,extraPO):
-        self._extraPO = extraPO
-        self._tk_vars = {}
-        self.translators = {}
-
-        for PO in self._source_POs()[::-1]:
-            self._init_tk_vars(PO)
-
-
-
-    # CB: rename extraPO
+    # CEBALERT: rename extraPO...but to what?
     def __init__(self,extraPO=None,self_first=True,**params):
         """
 
@@ -237,26 +260,48 @@ class TkParameterizedObjectBase(ParameterizedObject):
         A Parameter has a value, but that might need some processing to
         become a value suitable for display. For instance,
         the SheetMask() object <SheetMask SheetMask0001923>  ...
-        
+
+
+
+        self_first determines precedence order for Parameter lookup:
+        if True, Parameters of this object take priority whenever
+        there is a name clash; if False, Parameters of extraPO take
+        priority.
         """        
         assert extraPO is None \
                or isinstance(extraPO,ParameterizedObjectMetaclass) \
                or isinstance(extraPO,ParameterizedObject)
 
+        self.self_first = self_first
+        
+
+        # Some types of Parameter are represented with widgets where a
+        # complete change can be instantaneous (e.g. when dragging a
+        # slider for a number, the change at each instant should be
+        # applied). Others, such as Parameter, are represented with
+        # widgets that do not finish their changes instantaneously:
+        # entry into a text box is not be considered finished until
+        # Return is pressed.
         self.param_immediately_apply_change = {BooleanParameter:True,
                                                SelectorParameter:True,
                                                Number:True,
                                                Parameter:False}
-        
-        self.self_first = self_first
+        # CEBALERT: really, this should be in TkParameterizedObject.
+        # All changes should be instantaneous here, and
+        # TkParameterizedObject (which has the concept of widgets)
+        # should override the _update_param method to have some
+        # Parameters not be updated immediately.
 
+
+        # CEBALERT: change the names & document following two dicts
+        # (and their contents).
+        
         # {Parameter type: (object-to-string fn,  string-to-object fn)}
         # A fn of None for object-to-string means no 
         # A fn of None for string-to-object means...
-        # CEBALERT: change the name
         self.reprify = {
-            # no translation of StringParameters
-            # (change if we want to e.g. concatenate strings) 
+            # There's no translation of StringParameters
+            # (could change if we wanted e.g. to concatenate strings) 
             StringParameter: (None, None),
             BooleanParameter: (None, None),
             ButtonParameter: (None, None),
@@ -266,21 +311,36 @@ class TkParameterizedObjectBase(ParameterizedObject):
                         lambda x: eval(x,__main__.__dict__))}
 
         # {Parameter type: create-translator fn}
-        # 
         self.translator_creators = {
             ClassSelectorParameter: self.csp_thing,
             ObjectSelectorParameter: self.osp_thing,
             Parameter: self.p_thing}
         
-        
         self.change_PO(extraPO)
         super(TkParameterizedObjectBase,self).__init__(**params)
 
 
+    # CEBALERT: rename
+    def change_PO(self,extraPO):
+        """
+        Shadow the Parameters of extraPO.
+        """
+        self._extraPO = extraPO
+        self._tk_vars = {}
+        self.translators = {}
+
+        # always respect the precedence
+        for PO in self._source_POs()[::-1]:
+            self._init_tk_vars(PO)
+
+
+
     def _source_POs(self,parameterized_object=None):
         """
-        Return a correctly ordered list of ParameterizedObjects in
-        which to find Parameters
+        Return a correctly ordered* list of ParameterizedObjects in
+        which to find Parameters.
+
+        (* ordered by precedence, as defined by me_first)
 
         Specifying parameterized_object results in the list
         containing only that parameterized_object.
@@ -298,7 +358,17 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
     def _init_tk_vars(self,PO):
         """
-        Create Tkinter Variable shadows of all Parameters of PO.
+        Create Tkinter Variable shadows of all Parameters of PO.        
+        """
+        for name,param in parameters(PO).items():
+            self._add_tk_var_entry(PO,name,param)
+
+
+# CB: got to here...
+
+    def _add_tk_var_entry(self,PO,name,param):
+        """
+        Add _tk_vars[name] to represent param.
         
         The appropriate Variable is used for each Parameter type.
 
@@ -306,32 +376,26 @@ class TkParameterizedObjectBase(ParameterizedObject):
         values in sync, and updates the translator dictionary to map
         string representations to the objects themselves.
         """
-        for name,param in parameters(PO).items():
-            self._add_tk_var_entry(PO,name,param)
+        self._update_translator(name,param)
 
+        tk_var = lookup_by_class(parameters_to_tkvars,type(param))()
+        self._tk_vars[name] = tk_var
 
-    def _add_tk_var_entry(self,PO,name,param):
+        # overwrite Variable's set() with one that will handle transformations to string
+        tk_var._original_set = tk_var.set
+        tk_var.set = lambda v,x=name: self._set_tk_val(x,v)
 
-            self._update_translator(name,param)
-
-            tk_var = parameters_to_tkvars.get(type(param),StringVar)()
-            self._tk_vars[name] = tk_var
-
-            # overwrite Variable's set() with one that will handle transformations to string
-            tk_var._original_set = tk_var.set
-            tk_var.set = lambda v,x=name: self._set_tk_val(x,v)
-
-            tk_var.set(getattr(PO,name))
-            tk_var._last_good_val=tk_var.get() # for reverting
-            tk_var.trace_variable('w',lambda a,b,c,p_name=name: self._update_param(p_name))        
-            # Instead of a trace, could we override the Variable's set() method i.e. trace it ourselves?
-            # Or does too much happen in tcl/tk for that to work?
-
-            # Override the Variable's get() method to guarantee an out-of-date value is never returned.
-            # In cases where the tkinter val is the most recently changed (i.e. when it's edited in the
-            # gui, resulting in a trace_variable being called), the _original_get() method is used.
-            tk_var._original_get = tk_var.get
-            tk_var.get = lambda x=name: self._get_tk_val(x)
+        tk_var.set(getattr(PO,name))
+        tk_var._last_good_val=tk_var.get() # for reverting
+        tk_var.trace_variable('w',lambda a,b,c,p_name=name: self._update_param(p_name))        
+        # Instead of a trace, could we override the Variable's set() method i.e. trace it ourselves?
+        # Or does too much happen in tcl/tk for that to work?
+        
+        # Override the Variable's get() method to guarantee an out-of-date value is never returned.
+        # In cases where the tkinter val is the most recently changed (i.e. when it's edited in the
+        # gui, resulting in a trace_variable being called), the _original_get() method is used.
+        tk_var._original_get = tk_var.get
+        tk_var.get = lambda x=name: self._get_tk_val(x)
 
 
 
@@ -453,7 +517,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         
 
-    def get_parameter(self,name,parameterized_object=None,with_location=False):
+    def get_parameter_object(self,name,parameterized_object=None,with_location=False):
         """
         Return the Parameter specified by the name from the sources of
         Parameters in this object (or the specified parameterized_object).
@@ -469,7 +533,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                     return params[name],po
 
         raise AttributeError(self.__attr_err_msg(name,sources))
-    get_parameter_object = get_parameter
+    get_parameter = get_parameter_object # CEBALERT: remove
         
     
 
@@ -768,6 +832,19 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
 
+##         Example 2: consider the class:
+##             class SomeFrame(TkParameterizedObjectBase,Tkinter.Frame)
+
+##         Additionally, creators of subclasses of TkParameterizedObjectBase
+##         must consider if any attributes of their new class will block
+##         attributes or Parameters of TkParameterizedObjectBase or any
+##         shadowed PO.
+
+##         Tkinter.Frame has a number of attributes, some of which have
+##         generic names ('size', for instance). If SomeFrame
+##         shadows a ParameterizedObject that has a 'size' Parameter,
+##         SomeFrame()
+        
 
 
 import _tkinter # (required to get tcl exception class)
@@ -791,7 +868,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
                                          Have all Parameters displayed with variable names
                                          (set on the class).""")
 
-
+    # CEBALERT: rename 'representations'
     def _set_tk_val(self,param_name,val):
         """
         Calls superclass's version, adding help text for the currently selected item
