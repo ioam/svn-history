@@ -1152,23 +1152,21 @@ class Simulation(ParameterizedObject):
         """
         assert isinstance(event,Event)
 
-        # The new event goes at the end of the event queue if there
-        # isn't a queue right now, or if it's later than the last
-        # event's time. 
         if not self.events or event >= self.events[-1]:
+            # The new event goes at the end of the event queue if there
+            # isn't a queue right now, or if it's later than the last
+            # event's time. 
             self.events.append(event)
-            return
-
-        # If it's earlier than the first item it goes at the beginning.
-        if event < self.events[0]:
+        elif event < self.events[0]:
+            # If it's earlier than the first item it goes at the beginning.
             self.events.insert(0,event)
-
-        # Otherwise, it's inserted at the appropriate
-        # position somewhere inside the event queue.
-        # New events are enqueued after (right of) existing
-        # events with the same time, i.e. 'simultaneous' events
-        # are executed FIFO.
-        bisect.insort_right(self.events,event)
+        else:
+            # Otherwise, it's inserted at the appropriate
+            # position somewhere inside the event queue.
+            # New events are enqueued after (right of) existing
+            # events with the same time, i.e. 'simultaneous' events
+            # are executed FIFO.
+            bisect.insort_right(self.events,event)
 
     def schedule_command(self,time,command_string):
         """
