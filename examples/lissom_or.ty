@@ -26,7 +26,6 @@ $Id$
 __version__='$Revision$'
 
 
-import fixedpoint
 import numpy
 
 from math import pi, sqrt
