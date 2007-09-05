@@ -133,6 +133,13 @@ def show_cmd_prompt():
     if topo.base.parameterizedobject.min_print_level >= topo.base.parameterizedobject.MESSAGE:
         print "\n", sys.ps1,
         sys.stdout.flush()
+
+
+
+## def ttkify(root,widget):
+##     la = "ttk::"+widget
+##     root.tk.call('namespace', 'import', '-force', la) 
+
     
 def start(mainloop=False):
     """
@@ -150,6 +157,20 @@ def start(mainloop=False):
     # hierarchy in which all windows are given some common properties.
     root = Tkinter.Tk()
     root.withdraw()
+
+
+##     root.tk.call('package', 'require', 'tile')
+##     widgets_to_ttkify = ['button'] #,'scrollbar','frame','labelframe','label','text','combobox']
+    
+##     for w in widgets_to_ttkify:
+##         ttkify(root,w)
+
+    
+##     #root.tk.call('namespace', 'import','-force','ttk::button')  # ,'force'
+##     root.tk.call('tile::setTheme', 'default')
+
+
+
     Pmw.initialise(root)
     
     console = TopoConsole()
