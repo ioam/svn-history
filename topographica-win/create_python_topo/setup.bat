@@ -21,6 +21,11 @@ REM Pmw
 ..\util\tar xvf ..\..\external\Pmw.tar
 copy ..\..\external\Pmw .
 
+REM bwidget
+..\util\gunzip -c ..\..\external\pybwidget-0.1.2_1.7.0.tar.gz > ..\..\external\pybwidget-0.1.2_1.7.0.tar
+..\util\tar xvf ..\..\external\pybwidget-0.1.2_1.7.0.tar
+copy ..\..\external\pybwidget-0.1.2_1.7.0 .
+
 REM Gnosis_Utils
 ..\util\gunzip -c ..\..\external\Gnosis_Utils-1.2.1.tar.gz > ..\..\external\Gnosis_Utils-1.2.1.tar
 ..\util\tar xvf ..\..\external\Gnosis_Utils-1.2.1.tar
@@ -78,6 +83,11 @@ start /w scipy-0.5.2.win32-py2.4.exe
 
 REM * PMW
 move Pmw c:\python24\Lib\site-packages
+
+REM * bwidget
+cd pybwidget-0.1.2_1.7.0\
+c:\python24\python.exe setup.py install
+cd..
 
 REM * gnosis
 cd Gnosis_Utils-1.2.1\
