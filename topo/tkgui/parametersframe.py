@@ -185,6 +185,7 @@ class XParametersFrame(TkParameterizedObject,Frame):
 
 
 
+    # CEBERRORALERT: shouldn't set straight onto the object: wait for Apply.
     def defaultsB(self):
         assert isinstance(self._extraPO,ParameterizedObject), "Only defined for ParameterizedObject"
         self._extraPO.reset_params()
