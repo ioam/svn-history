@@ -195,23 +195,19 @@ class TkParameterizedObjectBase(ParameterizedObject):
     # parameters of shadowed POs being available as attributes (and
     # use only the parameter access methods instead).
 
-
     # CEBNOTE: Regarding note 2 above...if the above becomes a
     # problem, we could have some autorefresh of the vars or a
     # callback of some kind in the parameterized object itself.
 
+    # CEB: because of note 1, attributes of this class should have
+    # names that are unlikely to clash (or they should be private);
+    # this will make it easier for creators and users of subclasses to
+    # avoid name clashes.
 
-    # CEB: all these attributes need to have names that are unlikely
-    # to clash with anything else. This will make it easier for
-    # creators and users of subclasses to avoid name clashes.
+
+    # must exist *before* an instance is init'd
+    # (for __getattribute__)
     _extraPO = None
-    _tk_vars = {}
-
-    translators = {}
-    self_first = True  # CEBALERT: rename to my_parameters_first 
-    param_immediately_apply_change = {}
-    param_has_modifyable_choices = {}
-    parameters_to_tkvars = {}
 
     # CBENHANCEMENT: __repr__ will need some work (display params of
     # subobjects etc?).
