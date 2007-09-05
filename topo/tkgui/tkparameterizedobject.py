@@ -12,12 +12,6 @@ $Id$
 # simple ALERTs).
 
 
-## Notes
-# * Too fragile because there are too many tests for different types
-#   of Parameter. Most of these are there to make the code work
-#   immediately, but they should be cleaned up as soon as possible.
-
-
 import __main__, sys
 import Tkinter, Pmw
 
@@ -212,9 +206,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
     # CBENHANCEMENT: __repr__ will need some work (display params of
     # subobjects etc?).
 
-
-
-    ### Methods overridden from superclass ########################## 
+    # overrides method from superclass
     def _setup_params(self,**params):
         """
         Parameters that are not in this object itself but are in the
@@ -236,47 +228,71 @@ class TkParameterizedObjectBase(ParameterizedObject):
     def __init__(self,extraPO=None,self_first=True,**params):
         """
 
+
+        Translation between displayed values and objects
+        ------------------------------------------------
+
+        A Parameter has a value, but that might need some processing
+        to become a value suitable for display. For instance, the
+        SheetMask() object <SheetMask SheetMask0001923> ...
+
+
+
+        Important attributes
+        --------------------
+
+        * _extraPO
         
-        A Parameter has a value, but that might need some processing to
-        become a value suitable for display. For instance,
-        the SheetMask() object <SheetMask SheetMask0001923>  ...
 
-
-
-        self_first determines precedence order for Parameter lookup:
+        * self_first
+        Determines precedence order for Parameter lookup:
         if True, Parameters of this object take priority whenever
         there is a name clash; if False, Parameters of extraPO take
         priority.
+
+        * param_to_tkvar
+        Dictionary indicating Tkinter Variable to use for particular
+        Parameter types.
+
+        * param_has_modifyable_choices
+        Some parameters are represented by widgets whose options
+        can't be changed once created (e.g. OptionMenu), and some
+        parameters have a fixed set of options (e.g. Boolean).
+        
+        * param_immediately_apply_change
+        Some types of Parameter are represented with widgets where a
+        complete change can be instantaneous (e.g. when dragging a
+        slider for a number, the change at each instant should be
+        applied). Others, such as Parameter, are represented with
+        widgets that do not finish their changes instantaneously:
+        entry into a text box is not be considered finished until
+        Return is pressed.
+
+        * obj2str_fn & str2obj_fn
+
+        * translator_creators
+
+
+        * _tk_vars
+
+        
         """        
         assert extraPO is None \
                or isinstance(extraPO,ParameterizedObjectMetaclass) \
                or isinstance(extraPO,ParameterizedObject)
 
         self.self_first = self_first
-        
-        # Dictionary indicating Tkinter Variable to use for particular
-        # Parameter types.
+
         # (Note that, for instance, we don't include Number:DoubleVar.
         # This is because we use Number to control the type, so we
         # don't need restrictions from DoubleVar.)
-        self.parameters_to_tkvars = {BooleanParameter:BooleanVar,
+        self.param_to_tkvar = {BooleanParameter:BooleanVar,
                                      Parameter:StringVar}
 
-        # Some parameters are represented by widgets whose options
-        # can't be changed once created (e.g. OptionMenu), and some
-        # parameters have a fixed set of options (e.g. Boolean).
         self.param_has_modifyable_choices = {BooleanParameter:False,
                                              SelectorParameter:False,
                                              Parameter:True}
 
-
-        # Some types of Parameter are represented with widgets where a
-        # complete change can be instantaneous (e.g. when dragging a
-        # slider for a number, the change at each instant should be
-        # applied). Others, such as Parameter, are represented with
-        # widgets that do not finish their changes instantaneously:
-        # entry into a text box is not be considered finished until
-        # Return is pressed.
         # CEBALERT: really, this should be in TkParameterizedObject.
         # All changes should be instantaneous here, and
         # TkParameterizedObject (which has the concept of widgets)
@@ -287,23 +303,21 @@ class TkParameterizedObjectBase(ParameterizedObject):
                                                Number:True,
                                                Parameter:False}
 
+        self.obj2str_fn = {
+            StringParameter: None,
+            BooleanParameter: None,
+            ButtonParameter: None,
+            Number: None,
+            SelectorParameter: self.__selector_obj2str,
+            Parameter: self.__param_obj2str}
 
-        # CEBALERT: change the names & document following two dicts
-        # (and their contents).
-        
-        # {Parameter type: (object-to-string fn,  string-to-object fn)}
-        # A fn of None for object-to-string means no 
-        # A fn of None for string-to-object means...
-        self.reprify = {
-            # There's no translation of StringParameters
-            # (could change if we wanted e.g. to concatenate strings) 
-            StringParameter: (None, None),
-            BooleanParameter: (None, None),
-            ButtonParameter: (None, None),
-            SelectorParameter: (self.__selector_obj2str, None),
-            Number: (None, eval_atof),
-            Parameter: (self.__param_obj2str,
-                        lambda x: eval(x,__main__.__dict__))}
+        self.str2obj_fn = {
+            StringParameter: None,
+            BooleanParameter: None, 
+            ButtonParameter: None,
+            SelectorParameter: None,
+            Number: eval_atof,
+            Parameter: lambda x: eval(x,__main__.__dict__)}
 
         # {Parameter type: create-translator fn}
         self.translator_creators = {
@@ -373,7 +387,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
         self._update_translator(name,param)
 
-        tk_var = lookup_by_class(self.parameters_to_tkvars,type(param))()
+        tk_var = lookup_by_class(self.param_to_tkvar,type(param))()
         self._tk_vars[name] = tk_var
 
         # overwrite Variable's set() with one that will handle transformations to string
@@ -761,7 +775,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         translate to the string.
         """
         param=self.get_parameter_object(param_name)
-        obj2string_fn = lookup_by_class(self.reprify,type(param))[0]
+        obj2string_fn = lookup_by_class(self.obj2str_fn,type(param))
 
         if obj2string_fn:
             string = obj2string_fn(param_name,obj)
@@ -807,7 +821,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
     def convert_string2obj(self,param_name,string):
         param=self.get_parameter_object(param_name)
-        string2obj_fn = lookup_by_class(self.reprify,type(param))[1]
+        string2obj_fn = lookup_by_class(self.str2obj_fn,type(param))
 
         if string2obj_fn:
             try:
