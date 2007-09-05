@@ -17,12 +17,7 @@ from math import floor
 
 import ImageTk
 import Pmw
-
-try:
-    import bwidget
-    bwidget_imported=True
-except:
-    bwidget_imported=False
+import bwidget
 
 import Tkinter, _tkinter
 from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
@@ -67,57 +62,55 @@ CANVASBUFFER = 1
 ## applied immediately). So this indicates two different modes of use for
 ## ParametersFrame.
 
-        
 
-# CEBALERT: move this class out of here! 
-if bwidget_imported:
-    class ResizableScrollableFrame(Tkinter.Frame):
+# CB: move out of here + cleanup and document
+class ResizableScrollableFrame(Tkinter.Frame):
+    """
+    A scrollable frame that can also be manually resized.
+
+    Any normal scrollable frame will not resize automatically to
+    accommodate its contents, because that would defeat the
+    purpose of scrolling in the first place.  However, having a
+    scrollable frame that can be resized manually is useful; this
+    class adds easy resizing to a bwidget
+    ScrollableFrame/ScrolledWindow combination.
+    """
+    def __init__(self,master,**config):
         """
-        A scrollable frame that can also be manually resized.
-        
-        Any normal scrollable frame will not resize automatically to
-        accommodate its contents, because that would defeat the
-        purpose of scrolling in the first place.  However, having a
-        scrollable frame that can be resized manually is useful; this
-        class adds easy resizing to a bwidget
-        ScrollableFrame/ScrolledWindow combination.
+        The 'contents' attribute is the frame into which contents
+        should be placed (for the contents to be inside the
+        scrollable area), i.e. almost all use of
+        f=ResizableScrollableFrame(master) will be via f.contents.
         """
-        def __init__(self,master,**config):
-            """
-            The 'contents' attribute is the frame into which contents
-            should be placed (for the contents to be inside the
-            scrollable area), i.e. almost all use of
-            f=ResizableScrollableFrame(master) will be via f.contents.
-            """
-            Tkinter.Frame.__init__(self,master,**config)
+        Tkinter.Frame.__init__(self,master,**config)
 
-            # non-empty Frames ignore any specified width/height, so create two empty
-            # frames used purely for setting height & width
-            self.__height_sizer = Frame(self,height=0,width=0)
-            self.__height_sizer.pack(side=LEFT)
-            self.__width_sizer = Frame(self,width=0,height=0)
-            self.__width_sizer.pack()
+        # non-empty Frames ignore any specified width/height, so create two empty
+        # frames used purely for setting height & width
+        self.__height_sizer = Frame(self,height=0,width=0)
+        self.__height_sizer.pack(side=LEFT)
+        self.__width_sizer = Frame(self,width=0,height=0)
+        self.__width_sizer.pack()
 
-            # the scrollable frame, with scrollbars
-            self.__scrolled_window = bwidget.ScrolledWindow(self,auto="both",scrollbar="both")
+        # the scrollable frame, with scrollbars
+        self.__scrolled_window = bwidget.ScrolledWindow(self,auto="both",scrollbar="both")
 
-            # set small start height/width, will grow if necessary
-            scrolled_frame = bwidget.ScrollableFrame(self.__scrolled_window,height=50,width=50) 
-            self.__scrolled_window.setwidget(scrolled_frame)
-            self.__scrolled_window.pack(fill="both",expand='yes')
+        # set small start height/width, will grow if necessary
+        scrolled_frame = bwidget.ScrollableFrame(self.__scrolled_window,height=50,width=50) 
+        self.__scrolled_window.setwidget(scrolled_frame)
+        self.__scrolled_window.pack(fill="both",expand='yes')
 
-            # CB: tk docs say getframe() not necessary? Where did I see that?
-            self.contents = scrolled_frame.getframe()
+        # CB: tk docs say getframe() not necessary? Where did I see that?
+        self.contents = scrolled_frame.getframe()
 
 
-        def set_size(self,width=None,height=None):
-            """
-            Manually specify the size of the scrollable frame area.
-            """
-            self.__scrolled_window.pack_forget() # removing and redrawing stops stray scrollbars
-            if width is not None: self.__width_sizer['width']=width
-            if height is not None: self.__height_sizer['height']=height
-            self.__scrolled_window.pack(fill="both",expand="yes")
+    def set_size(self,width=None,height=None):
+        """
+        Manually specify the size of the scrollable frame area.
+        """
+        self.__scrolled_window.pack_forget() # removing and redrawing stops stray scrollbars
+        if width is not None: self.__width_sizer['width']=width
+        if height is not None: self.__height_sizer['height']=height
+        self.__scrolled_window.pack(fill="both",expand="yes")
 
 
 
@@ -244,14 +237,11 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 	self.plot_group_title = Pmw.Group(self,tag_text=self.plotgroup_label)
         self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)
         
-        if bwidget_imported:
-            # max window size (works on all platforms? os x?)
-            self.master.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
-            self.__scroll_frame = ResizableScrollableFrame(self.plot_group_title.interior())
-            self.__scroll_frame.pack()
-            self.plot_frame = self.__scroll_frame.contents
-        else:
-            self.plot_frame = self.plot_group_title.interior()
+        # max window size (works on all platforms? os x?)
+        self.master.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
+        self.__scroll_frame = ResizableScrollableFrame(self.plot_group_title.interior())
+        self.__scroll_frame.pack()
+        self.plot_frame = self.__scroll_frame.contents
         ###################################################       
 
 
@@ -824,29 +814,27 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
     # CB: rename, document, and if possible delay showing the window until all the jiggling is over
     def sizeright(self):
-        if bwidget_imported:
+        # if user has changed window size, need to tell tkinter that it should take
+        # control again.
+        self.master.geometry('')
 
-            # if user has changed window size, need to tell tkinter that it should take
-            # control again.
-            self.master.geometry('')
-            
-            self.update_idletasks()
-        
-            # CB: the +'s are hacks, because for some reason the
-            # requested values aren't quite large enough (noticably
-            # when there are labels).
-            #
-            # The - is to prevent the plot engulfing the rest of the
-            # plot window, obscuring controls at the bottom (not so
-            # important right now, since plots would rarely be as
-            # large as the screen height)
+        self.update_idletasks()
 
-            w = min(self.plot_frame.winfo_reqwidth()+30,self.winfo_screenwidth())
-            h = min(self.plot_frame.winfo_reqheight()+20,self.winfo_screenheight()-250)
+        # CB: the +'s are hacks, because for some reason the
+        # requested values aren't quite large enough (noticably
+        # when there are labels).
+        #
+        # The - is to prevent the plot engulfing the rest of the
+        # plot window, obscuring controls at the bottom (not so
+        # important right now, since plots would rarely be as
+        # large as the screen height)
 
-            if not hasattr(self,'oldsize') or self.oldsize!=(w,h): 
-                self.__scroll_frame.set_size(w,h)
-                self.oldsize = (w,h)
+        w = min(self.plot_frame.winfo_reqwidth()+30,self.winfo_screenwidth())
+        h = min(self.plot_frame.winfo_reqheight()+20,self.winfo_screenheight()-250)
+
+        if not hasattr(self,'oldsize') or self.oldsize!=(w,h): 
+            self.__scroll_frame.set_size(w,h)
+            self.oldsize = (w,h)
             
 
 

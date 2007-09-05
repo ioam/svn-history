@@ -29,12 +29,7 @@ from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
 import tkMessageBox
 import tkFileDialog
 import Pmw
-
-try:
-    import bwidget
-    bwidget_imported=True
-except:
-    bwidget_imported=False
+import bwidget
 
 
 import topo
@@ -732,10 +727,6 @@ class TopoConsole(TkguiWindow):
 
         ** Currently expects a 0-100 (percent) value ***        
         """
-        # relies on bwidget, which nobody has built yet
-        if not bwidget_imported:
-            return
-
         # CB: could add more info to the window/bar, like time estimates...
         # (elapsed,remaining,axis label)
         
