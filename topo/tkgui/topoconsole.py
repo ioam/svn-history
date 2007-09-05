@@ -796,6 +796,8 @@ class TopoConsole(TkguiWindow):
         self.title(topo.sim.name) # ALERT: Temporary
 
         fduration = self.run_for.get_value()
+
+        # CEBALERT: that's just temporary
         if fduration>9: self.progress_window(self.progval,title="Running Simulation")
         self.stop_button.config(state=NORMAL) 
         topo.sim.run_and_time(fduration)
