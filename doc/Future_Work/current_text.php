@@ -83,21 +83,20 @@ getting out of control!
 
 
 <H4>2007/09/03 (CB): tkgui + plotgroup cleanup</H4>
-
 <ul>
-<li>parametersframe is broken (as used in model editor)</li>
-<li>**why does tagged slider not go to 20000 on the console?**</li>
-<li>Finish progress bar</li>
+<li>why does tagged slider not go to 20000 on the console?</li>
 <li>Sort pattern generators in test pattern window</li>
-<li>make bwidget by default</li>
 <li>Right click connection field on e.g. retina --> lots of errors.</li>
-<li>Is the slider resolution working?</li> 
+<li>FixedPoint in PArametersFrame: refresh error</li>
+<li>Cleanup of tkparameterizedobject.py, parametersframe.py, *panel.py files</li>
+<li>Change how slider resolution works.</li> 
+<li>Finish progress bar (close after stop)</li>
 <li>plotgroup.py cleanup</li>
 <li>Remove plotgrouptemplate?</li>
 <li>ParametersFrame ok/apply/reset/cancel...set order and names of
 ParametersFrame's Ok, Apply, Cancel, Reset, and Defaults buttons, and
-make them behave as expected for classes and instances.</li>
-<li>Cleanup of tkparameterizedobject.py, parametersframe.py, *panel.py files</li>
+make them behave as expected for classes and instances. (Defaults should
+not also Apply.)</li>
 <li>Finish SelectorParameter</li>
 <li>Replace Pmw balloon and message bar with those from bwidget; remove
 Pmw</li>
