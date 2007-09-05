@@ -144,14 +144,21 @@ by Topographica).
 and m4, if these are not already installed.
 <li> If CVS is not already installed, find and install
 <code>cvsup</code> (and the associated library and client) with Fink.
+<!--CB: Why not just install the one package 'cvs'? What is cvsup?-->
+<!--CB: Also, since you don't need commander (and can just use
+apt-get), we should probably give the apt-get commands in addition to
+talking about commander (it's much faster to use the commandline).-->
 </ol>
 
 <P>Once these programs are installed, Mac users can simply follow the
-<A HREF="#linux">Linux</A> instructions above.  If you have trouble,
-you might try specifying gcc 3.3 using <code>sudo gcc_select
-3.3</code>.  (The default GCC 4.0 compiler works fine with recent
-versions of Topographica under Linux, but has not yet been tested
-under OS X.)
+<A HREF="#linux">Linux</A> instructions above.  
+
+<!--If you have trouble, you might try specifying gcc 3.3 using
+<code>sudo gcc_select 3.3</code>. CB: Installing xcode and fink-0.8.1
+binary on 2007/09/05, then following the mac instructions, no
+additional steps are required on ppc or intel macs (apart from
+removing LDFLAGS as described in index_text.php).-->
+
 
 <H4><A NAME="windows">Windows:</A></H4>
 <!--  CEBALERT: One day we might have instructions for building -->
