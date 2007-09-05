@@ -1,25 +1,25 @@
 """
 Object classes for recording and plotting time-series data.
 
-This module defines a set DataRecorder object types for recording time-series
-data, a set of TraceSpecification object types for specifying ways of
-generating 1D-vs-time traces from recorded data, and a TraceGroup
-object that will plot a set of traces on stacked, aligned axes.
-
+This module defines a set of DataRecorder object types for recording
+time-series data, a set of TraceSpecification object types for
+specifying ways of generating 1D-vs-time traces from recorded data,
+and a TraceGroup object that will plot a set of traces on stacked,
+aligned axes.
 
 $Id$
 """
 __version__ = '$Revision$'
 
-from topo.base.simulation import EventProcessor
-from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Number,StringParameter,DictParameter,Integer, \
-     CompositeParameter,Parameter
-from topo.misc.utils import Struct
 from numpy import array
+
 import bisect
 
-
+from topo.base.simulation import EventProcessor
+from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.parameterclasses import Number,StringParameter,DictParameter
+from topo.base.parameterclasses import Integer,CompositeParameter,Parameter
+from topo.misc.utils import Struct
 
 
 class DataRecorder(EventProcessor):
@@ -32,7 +32,7 @@ class DataRecorder(EventProcessor):
 
     DataRecorder is an abstract class for which different
     implementations may exist for different means of storing recorded
-    data.  For example, the subclass, InMemoryRecorder, stores all the
+    data.  For example, the subclass InMemoryRecorder stores all the
     data in memory.
 
     A DataRecorder instance can operate either as an event processor, or in a
@@ -41,7 +41,7 @@ class DataRecorder(EventProcessor):
 
     STAND-ALONE USAGE:
 
-    A DataRecorder instance is used as follows
+    A DataRecorder instance is used as follows:
     
       - Method .add_variable adds a named time series variable.
       - Method .record_data records a new data item and timestamp.
@@ -55,18 +55,17 @@ class DataRecorder(EventProcessor):
     connected to a DataRecorder; the recorder will automaticall create
     a variable with the same name as the connection, and record any
     incoming data on that variable with the time it was received.  For
-    example:
+    example::
 
-    topo.sim['Recorder'] =  InMemoryRecorder()
-    topo.sim.connect('V1','Recorder',name='V1 Activity')
+      topo.sim['Recorder'] =  InMemoryRecorder()
+      topo.sim.connect('V1','Recorder',name='V1 Activity')
 
     This script snippet will create a new DataRecorder and
     automatically record all activity sent from the sheet 'V1'.
-
     """
 
-
     _abstract_class_name = "DataRecorder"
+
 
     def __init__(self,**params):
         super(DataRecorder,self).__init__(**params)
@@ -75,13 +74,16 @@ class DataRecorder(EventProcessor):
 
     def _src_connect(self,conn):
         raise NotImplementedError
+
     
     def _dest_connect(self,conn):
         super(DataRecorder,self)._dest_connect(conn)
         self.add_variable(conn.name)
 
+
     def input_event(self,conn,data):
         self.record_data(conn.name,self.simulation.time(),data)
+
 
     def add_variable(self,name):
         """
@@ -89,12 +91,14 @@ class DataRecorder(EventProcessor):
         """
         raise NotImplementedError
 
+
     def record_data(self,varname,time,data):
         """
         Record the given data item with the given timestamp in the
         named timeseries.
         """
         raise NotImplementedError
+
 
     def get_data(self,varname,times=(None,None),fill_range=False):
         """
@@ -109,16 +113,19 @@ class DataRecorder(EventProcessor):
         """
         raise NotImplementedError
 
+
     def get_times(self,var):
         """
         Get all the timestamps for a given variable.
         """
         raise NotImplementedError
 
+
     def get_time_indices(self,varname,start_time,end_time):
         """
         For the named variable, get the start and end indices suitable
-        for slicing the data to include all times t:
+        for slicing the data to include all times t::
+        
           start_time <= t <= end_time.
 
         A start_ or end_time of None is interpreted to mean the
@@ -139,21 +146,21 @@ class DataRecorder(EventProcessor):
         return start,end
 
 
-
-
                     
 
 class InMemoryRecorder(DataRecorder):
     """
-    A data recorder than stores all recorded data in memory.
+    A data recorder that stores all recorded data in memory.
     """
 
     def __init__(self,**params):
         super(InMemoryRecorder,self).__init__(**params)
         self._vars = {}
 
+
     def add_variable(self,name):
         self._vars[name] = Struct(time=[],data=[])
+
 
     def record_data(self,varname,time,data):
         var = self._vars[varname]
@@ -170,6 +177,7 @@ class InMemoryRecorder(DataRecorder):
             var.time.insert(idx,time)
             var.data.insert(idx,data)
 
+
     def get_data(self,name,times=(None,None),fill_range=False):
         tstart,tend = times
         start,end = self.get_time_indices(name,tstart,tend)
@@ -185,12 +193,17 @@ class InMemoryRecorder(DataRecorder):
         
         return time,data
 
+
     def get_times(self,varname):
         return self._vars[varname].time
 
 
 
 
+# JB: Is there some reason not to simply call it a Trace?  Or maybe a
+# TraceExtractor, if we view it not as an object that is a trace, but
+# as one that extracts a trace from some data?  TraceSpecification
+# seems a bit dry...
 class TraceSpecification(ParameterizedObject):
     """
     A specification for generating 1D traces of data from recorded
@@ -209,27 +222,40 @@ class TraceSpecification(ParameterizedObject):
     _abstract_class_name = "TraceSpecification"
 
     data_name = StringParameter(default=None,doc="""
-       Name of the timeseries from which the trace is generated.
-       E.g. the connection name into a DataRecorder object.
-       """)
+        Name of the timeseries from which the trace is generated.
+        E.g. the connection name into a DataRecorder object.""")
 
     # JPALERT: This should really be something like a NumericTuple,
     # except that NumericTuple won't allow the use of None to indicate
     # 'no default'.  (Nor will Number.)
+    # JB: We could have that as an option, or as another Parameter
+    # type, but in many cases knowing that the parameter cannot be set
+    # to a non-numeric value is crucial, as it means we don't have to
+    # do special checks every time the value is used.  So we should
+    # leave the default behavior as it is, but yes, it would be good
+    # to handle None for numeric types (and also for Boolean, to make
+    # it tri-state).  Note that Bounds is a specific type that we
+    # should probably support in any case, because it not only needs
+    # to support None, it needs to specify whether the bounds are
+    # inclusive or exclusive.
     ybounds = Parameter(default=(None,None),doc="""
-       The (min,max) boundaries for y axis.  If either is None, then
-       the bound min or max of the data given, respectively.""")
+        The (min,max) boundaries for y axis.  If either is None, then
+        the bound min or max of the data given, respectively.""")
 
     ymargin = Number(default=0.1,doc="""
-       The fraction of the difference ymax-ymin to add to the
-       top of the plot as padding.""")
+        The fraction of the difference ymax-ymin to add to the
+        top of the plot as padding.""")
+    
     plotkw = DictParameter(default=dict(linestyle='steps'),doc="""
-       Contains the keyword arguments to pass to the plot command
-       when plotting the trace.""")
+        Contains the keyword arguments to pass to the plot command
+        when plotting the trace.""")
+
        
     def __call__(self,data):
         raise NotImplementedError
 
+
+    # JB: Needs docstring.  Should this be a property instead?
     def get_ybounds(self,ydata):
         ymin,ymax = self.ybounds
         if ymax is None:
@@ -243,6 +269,7 @@ class TraceSpecification(ParameterizedObject):
         return ymin,ymax
 
 
+# JB: Should it say TraceSpecification here and below where it says Trace?
 class IdentityTrace(TraceSpecification):
     """
     A Trace that returns the data, unmodified.
@@ -250,40 +277,43 @@ class IdentityTrace(TraceSpecification):
     def __call__(self,data):
         return data
 
+
+
 class IndexTrace(TraceSpecification):
     """
     A Trace that assumes that each data item is a sequence that can be
     indexed with a single integer, and traces the value of one indexed element.
     """
+    
     index = Integer(default=0,doc="""
-       The index into the data to be traced.
-       """)
+        The index into the data to be traced.""")
     
     def __call__(self,data):
         return [x[self.index] for x in data]
+
+
 
 class SheetPositionTrace(TraceSpecification):
     """
     A trace that assumes that the data are sheet activity matrices,
     and traces the value of a given (x,y) position on the sheet.
     """
+    
     x = Number(default=0.0,doc="""
-       The x sheet-coordinate of the position to be traced.
-       """)
+        The x sheet-coordinate of the position to be traced.""")
+    
     y = Number(default=0.0,doc="""
-       The y sheet-coordinate of the position to be traced.
-       """)
+        The y sheet-coordinate of the position to be traced.""")
 
     position = CompositeParameter(attribs=['x','y'],doc="""
-       The sheet coordinates of the position to be traced.
-       """)
+        The sheet coordinates of the position to be traced.""")
 
-    # JPALERT:  Would be nice to some way to set up the coordinate frame
-    # automatically.  The DataRecorder object alread knows what sheet
+    # JPALERT:  Would be nice to some way to set up the coordinate system
+    # automatically.  The DataRecorder object already knows what Sheet
     # the data came from.
     coordframe = Parameter(default=None,doc="""
-       The SheetCoordinateFrame to use to convert the position
-       into matrix coordinates.""")
+        The SheetCoordinateSystem to use to convert the position
+        into matrix coordinates.""")
 
     def __call__(self,data):
         r,c = self.coordframe.sheet2matrixidx(self.x,self.y)
@@ -299,35 +329,42 @@ class TraceGroup(ParameterizedObject):
     them to be plotted on stacked, aligned axes.  The constructor
     takes a DataRecorder object as a data source, and a list of
     TraceSpecification objects that indicate the traces to plot.  The
-    trace specifications are stored in the attribute .traces, which
-    can be modified at any time.
+    trace specifications are stored in the attribute self.traces,
+    which can be modified at any time.
     """
+    
     def __init__(self,recorder,traces=[],**params):
         super(TraceGroup,self).__init__(**params)
         self.traces = traces
         self.recorder = recorder
 
+
     def plot(self,times=(None,None)):
         """
         Plot the traces.
 
+        Requires MatPlotLib (aka pylab).
+        
         Plots the traces specified in self.traces, over the timespan
         specified by times.  times = (start_time,end_time); if either
         start_time or end_time is None, it is assumed to extend to the
         beginning or end of the timeseries, respectively.
         """
-
         
         import pylab
         rows = len(self.traces)
         tstart,tend = times
+        
         if tstart is None:
             tstart = 0
+            
         if tend is None:
             # JPALERT: This should be coded more generally,
             # but this is the basic behavior we want, I think.
             tend = self.recorder.simulation.time()
+            
         pylab.subplots_adjust(hspace=0.6)
+        
         for i,trace in enumerate(self.traces):
             # JPALERT: The TraceGroup object should really create its
             # own matplotlib.Figure object and always plot there
