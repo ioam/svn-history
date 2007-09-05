@@ -147,6 +147,7 @@ snapshot-tests:
 	rm -f 'snapshot-tests.typ'
 
 
+# CEBALERT: run these tests using a script in tests/
 basic-gui-tests:
 # Check the basic types of window open without errors (because the unit tests don't yet do this).
 # Also check Model Editor works (including opening parameters frames).
