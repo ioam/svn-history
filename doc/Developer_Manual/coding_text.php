@@ -72,6 +72,13 @@ seems to be the most common Python names for the following concepts
 functions and attributes (variables and parameters) are lower_case,
 and filenames are lowercasewithnounderscores.py.
 
+<P>For whitespace, the convention is to use no more than one blank
+line within a function or method, two blank lines between methods, and
+three between classes.  The goal is to have the code making up a
+function or method group visually into a single unit, and then to have
+all methods and data in one class group visually into a higher level
+unit.  See the files in topo/base/ for examples.
+
 
 <H2><A NAME="naming">Using consistent names</A></H2>
 
