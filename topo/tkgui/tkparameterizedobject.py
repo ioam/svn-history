@@ -96,25 +96,6 @@ class ButtonParameter(Parameter):
 #####
 
 
-# Dictionary indicating Tkinter Variable to use for particular
-# Parameter types.
-# (Note that, for instance, we don't include Number:DoubleVar.  This
-# is because we use Number to control the type, so we don't need
-# restrictions from DoubleVar.)
-parameters_to_tkvars = {BooleanParameter:BooleanVar,
-                        Parameter:StringVar}
-
-# Some parameters are represented by widgets whose options can't be
-# changed once created (e.g. OptionMenu), and some parameters have a
-# fixed set of options (e.g. Boolean). The rest are presumed to have
-# options that can be updated.
-param_has_modifyable_choices = {BooleanParameter:False,
-                                SelectorParameter:False,
-                                Parameter:True}
-
-# CEBALERT: make the two vars above be attributes of
-# TkParameterizedObjectBase.
-
 
 def parameters(parameterized_object):
     """
@@ -225,9 +206,12 @@ class TkParameterizedObjectBase(ParameterizedObject):
     # creators and users of subclasses to avoid name clashes.
     _extraPO = None
     _tk_vars = {}
+
     translators = {}
     self_first = True  # CEBALERT: rename to my_parameters_first 
     param_immediately_apply_change = {}
+    param_has_modifyable_choices = {}
+    parameters_to_tkvars = {}
 
     # CBENHANCEMENT: __repr__ will need some work (display params of
     # subobjects etc?).
@@ -274,6 +258,21 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         self.self_first = self_first
         
+        # Dictionary indicating Tkinter Variable to use for particular
+        # Parameter types.
+        # (Note that, for instance, we don't include Number:DoubleVar.
+        # This is because we use Number to control the type, so we
+        # don't need restrictions from DoubleVar.)
+        self.parameters_to_tkvars = {BooleanParameter:BooleanVar,
+                                     Parameter:StringVar}
+
+        # Some parameters are represented by widgets whose options
+        # can't be changed once created (e.g. OptionMenu), and some
+        # parameters have a fixed set of options (e.g. Boolean).
+        self.param_has_modifyable_choices = {BooleanParameter:False,
+                                             SelectorParameter:False,
+                                             Parameter:True}
+
 
         # Some types of Parameter are represented with widgets where a
         # complete change can be instantaneous (e.g. when dragging a
@@ -282,15 +281,15 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # widgets that do not finish their changes instantaneously:
         # entry into a text box is not be considered finished until
         # Return is pressed.
-        self.param_immediately_apply_change = {BooleanParameter:True,
-                                               SelectorParameter:True,
-                                               Number:True,
-                                               Parameter:False}
         # CEBALERT: really, this should be in TkParameterizedObject.
         # All changes should be instantaneous here, and
         # TkParameterizedObject (which has the concept of widgets)
         # should override the _update_param method to have some
         # Parameters not be updated immediately.
+        self.param_immediately_apply_change = {BooleanParameter:True,
+                                               SelectorParameter:True,
+                                               Number:True,
+                                               Parameter:False}
 
 
         # CEBALERT: change the names & document following two dicts
@@ -378,7 +377,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
         self._update_translator(name,param)
 
-        tk_var = lookup_by_class(parameters_to_tkvars,type(param))()
+        tk_var = lookup_by_class(self.parameters_to_tkvars,type(param))()
         self._tk_vars[name] = tk_var
 
         # overwrite Variable's set() with one that will handle transformations to string
@@ -503,7 +502,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
                             tk_var._on_modify()
 
                     # Update the translator, if necessary
-                    if lookup_by_class(param_has_modifyable_choices,type(parameter)):
+                    if lookup_by_class(self.param_has_modifyable_choices,
+                                       type(parameter)):
                         self._update_translator(param_name,parameter)
 
                     return ########### HIDDEN!
