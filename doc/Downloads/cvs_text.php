@@ -112,45 +112,63 @@ extremely large files involved.
 
 <H4><A NAME="osx">Mac OS X</A></H4>
 
-Topographica can be built on Mac OS X (or later) using the
-<A HREF="#linux">Linux</A> instructions above, but you will likely
-first need to install several packages needed by Topographica. These instructions also assume that you will be using Mac OS
-X 10.4 (Tiger); other OS X versions may require small changes to this
-procedure, to make sure that compatible libraries are available.  On
-that version of the system, you would do:
+Topographica can be built on Mac OS X (or later) using the <A
+HREF="#linux">Linux</A> instructions above, but you will likely first
+need to install several packages required by Topographica. These
+instructions also assume that you will be using Mac OS X 10.4 (Tiger);
+other OS X versions may require small changes to this procedure, to
+make sure that compatible libraries are available.  On that version of
+the system, you would do:
 
 <ol>
-<li> If an X11 Xwindows server is not already installed, obtain one
-  (free from Apple) and install it.  (It is also possible to build
-  Topographica using a native (Aqua) version of Python, which looks a
-  bit nicer, but we have not yet documented how to do that.)
-<li> If the X11 Software Development Kit is not already installed,
-install x11SDK from the Apple OS X distribution.  (You'll know if
-it is missing if you get messages like
-'error: X11/Xlib.h: No such file or directory'.)
-<li> From the Apple developer web site, download 
-<A HREF="http://developer.apple.com/tools/xcode/index.html">XCode_Tool2.2</a>
-(among other development utilities, it provides the required GCC C/C++ compiler).
-Other versions should also work, but have not been tested.
-<li> Download and install the <A HREF="http://fink.sourceforge.net/download/">Fink</a> package.
-Also install the FinkCommander GUI, which makes finding and installing Unix software
-more convenient.
-<li> With Fink, find and install the following packages: <code>libpng</code> and 
-<code>freetype219</code> (they provide, respectively, the PNG format
-handling and the font handling for the matplotlib library used 
-by Topographica).
-<li> If you want to compile the local copy of the documentation
+
+<li> If an X11 Xwindows server is not already installed, install
+Apple's <a
+href="http://www.apple.com/support/downloads/x11formacosx.html">X11
+for Mac</a> (also available on the OS X installation DVD).  (It is
+also possible to build Topographica using a native (Aqua) version of
+Python, which looks a bit nicer, but we have not yet documented how to
+do that.)
+
+<li> If the X11 Software Development Kit (X11 SDK) is not already
+installed, add that too.  (You'll know if it is missing if you get
+messages like 'error: X11/Xlib.h: No such file or directory'.)
+
+<li> From the Apple developer web site, download <A
+HREF="http://developer.apple.com/tools/download/">Xcode 2.4.1</A>
+(which, among other development utilities, provides the required GCC
+C/C++ compiler).  Other versions should also work, but have not
+necessarily been tested.
+
+<li> Download and install the <A
+HREF="http://www.finkproject.org/download/">Fink 0.8.1 Binary Installer</A>
+package. Again, other versions should work, but have not necessarily
+been tested. 
+<!--CB: maybe macports is easier now?-->
+
+<li> Start an X11 terminal and enter the following command: <code>fink
+install cvs libpng3 freetype219</code>. (These packages provide,
+respectively, the CVS program required to access the Topographica code
+repository, the PNG format handling, and the font handling for the
+matplotlib library used by Topographica.)
+
+<li> If you want to compile a local copy of the documentation
 (e.g. for online help), use Fink to get imagemagick, transfig, php,
-and m4, if these are not already installed.
-<li> If CVS is not already installed, find and install
-<code>cvs</code> with Fink.
-<!--CB: Also, since you don't need commander (and can just use
-apt-get), we should probably give the apt-get commands in addition to
-talking about commander (it's much faster to use the commandline).-->
+and m4 (if these are not already installed): <code>fink install
+imagemagick transfig php4 m4</code>.
+
 </ol>
 
-<P>Once these programs are installed, Mac users can simply follow the
-<A HREF="#linux">Linux</A> instructions above.  
+<P>If you have trouble running <code>fink</code>, make sure the Fink
+installation is actually in your path (the default Fink path is
+<code>/sw/bin/</code>; the installer should have set this up for
+you). Also, if you prefer not to use the commandline, you can install
+<a href="http://finkcommander.sourceforge.net/">FinkCommander</a>, a
+GUI for Fink that allows you to search for the packages above and
+click to install them.
+
+<P>Once these programs are installed, simply follow the <A
+HREF="#linux">Linux</A> instructions above.
 
 <!--If you have trouble, you might try specifying gcc 3.3 using
 <code>sudo gcc_select 3.3</code>. CB: Installing xcode and fink-0.8.1
