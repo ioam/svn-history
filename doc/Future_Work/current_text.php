@@ -778,8 +778,6 @@ http://www.digitalpeers.com/pythondebugger/.
 
 
 <H4>2007/09/06 (CB): Investigate using Tile</H4> 
-
-
 Tile widgets looks good on linux, windows, and mac.  Tile uses themes
 & styles, so we get a GUI that looks 'right' on Windows and Mac.
 
@@ -803,6 +801,13 @@ can't use Pmw.OptionMenu and Pmw.Group (among others).
 
 <P> Tile is already in Tk8.5a6, so it'll come into Tkinter eventually
 anyway.
+
+<P>
+Tile: http://wiki.tcl.tk/11075 <BR>
+Migrate to Tile: http://wiki.tcl.tk/15443 <BR>
+Apps using Tile: http://wiki.tcl.tk/13636 <BR>
+Tile into tk core: http://www.nabble.com/Tile-merged-into-the-core-t2549979.html<BR>
+bwidget: http://tkinter.unpy.net/bwidget/
 
 
 <H4>2007/07/24 (JB): Matlab Toolbox for Dimensionality Reduction</H4>
