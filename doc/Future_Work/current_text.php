@@ -788,9 +788,10 @@ Tile widgets looks good on linux, windows, and mac.  Tile uses themes
 GUI popup errors - you won't be sad about that), then uncomment marked
 code in __init__.py.
 
-<P> Status (tile-0.7.8,bwidget-1.7.0): Console starts, but various
-parts of Tkinter (e.g. tkFileDialog) are obviously not compatible with
-Tile (try an 'Open' dialog). Tile is incompatible with options like
+<P> Status (tile-0.7.8,bwidget-1.7.0): On linux, console starts with all its
+widgets themed by Tile (except MessageBar), but various parts of
+Tkinter (e.g. tkFileDialog) are obviously not compatible with Tile
+(try an 'Open' dialog). Tile is incompatible with options like
 -background.  Plot group panels won't open as someone somewhere passes
 some -background options. Is it possible some bwidgets are not
 possible with Tile, too? In the Tk world, I think bwidget and Tile are
