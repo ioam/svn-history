@@ -26,7 +26,7 @@ import topo
 
 from topo.base.parameterclasses import BooleanParameter
 
-from plotgrouppanel import XPGPanel
+from plotgrouppanel import SheetPGPanel
 from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import TemplatePlotGroup
 
@@ -81,7 +81,7 @@ def available_plot_channels(plot):
 
 ### CB: I'm working here at the moment.
 
-class TemplatePlotGroupPanel(XPGPanel):
+class TemplatePlotGroupPanel(SheetPGPanel):
 
     plotgroup_type = TemplatePlotGroup
 

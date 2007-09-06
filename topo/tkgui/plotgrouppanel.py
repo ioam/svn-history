@@ -838,7 +838,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             
 
 
-class XPGPanel(PlotGroupPanel):
+class SheetPGPanel(PlotGroupPanel):
 
     plotgroup_type = SheetPlotGroup
     
@@ -864,7 +864,7 @@ class XPGPanel(PlotGroupPanel):
         
 
     def __init__(self,console,master,plotgroup_label,**params):
-        super(XPGPanel,self).__init__(console,master,plotgroup_label,**params)
+        super(SheetPGPanel,self).__init__(console,master,plotgroup_label,**params)
 
         self.pack_param('normalize',parent=self.control_frame_1,
                         on_change=self.make_plots,side="right")

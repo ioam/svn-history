@@ -31,7 +31,7 @@ from topo.plotting.plot import make_template_plot
 from topo.plotting.plotgroup import SheetPlotGroup
 
 from parametersframe import LiveParametersFrame
-from plotgrouppanel import XPGPanel
+from plotgrouppanel import SheetPGPanel
 from tkparameterizedobject import ButtonParameter
 
 
@@ -56,7 +56,7 @@ class TestPatternPlotGroup(SheetPlotGroup):
 
 
 
-class TestPattern(XPGPanel):
+class TestPattern(SheetPGPanel):
 
     plotgroup_type = TestPatternPlotGroup
 
