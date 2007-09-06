@@ -41,8 +41,7 @@ from tkparameterizedobject import TkParameterizedObject, ButtonParameter, parame
 
 
 
-# CEBALERT: remove the X when ParametersFrame below is renamed.
-class XParametersFrame(TkParameterizedObject,Frame):
+class LiveParametersFrame(TkParameterizedObject,Frame):
     """
     ParametersFrame displays representations (widgets) for all the
     Parameters of a ParameterizedObject.
@@ -251,9 +250,9 @@ class XParametersFrame(TkParameterizedObject,Frame):
 
 
 
-# CEBALERT: needs a new name, to convey that changes aren't applied
-# immediately i.e. has the apply & refresh buttons
-class ParametersFrame(XParametersFrame):
+# CB: names still seem strange...ParametersFrame inherits from
+# LiveParametersFrame?
+class ParametersFrame(LiveParametersFrame):
 
     
     # CEBHACKALERT: semantics of all these buttons needs to be checked.

@@ -30,7 +30,7 @@ from topo.misc.keyedlist import KeyedList
 from topo.plotting.plot import make_template_plot
 from topo.plotting.plotgroup import SheetPlotGroup
 
-from parametersframe import XParametersFrame
+from parametersframe import LiveParametersFrame
 from plotgrouppanel import XPGPanel
 from tkparameterizedobject import ButtonParameter
 
@@ -101,7 +101,7 @@ class TestPattern(XPGPanel):
         self.pg_control_pane = Frame(self,bd=1,relief="sunken")
         self.pg_control_pane.pack(side="top",expand='yes',fill='x')
         
-        self.params_frame = XParametersFrame(self.pg_control_pane,
+        self.params_frame = LiveParametersFrame(self.pg_control_pane,
                                              PO=self.pattern_generator,
                                              on_modify=self.conditional_refresh)
 
