@@ -135,10 +135,10 @@ def show_cmd_prompt():
         sys.stdout.flush()
 
 
-
-## def ttkify(root,widget):
-##     la = "ttk::"+widget
-##     root.tk.call('namespace', 'import', '-force', la) 
+def __ttkify(root,widget):
+    """Take widget from ttk instead of Tkinter"""
+    la = "ttk::"+widget
+    root.tk.call('namespace', 'import', '-force', la) # overwrites the current Tkinter one
 
     
 def start(mainloop=False):
@@ -159,18 +159,16 @@ def start(mainloop=False):
     root.withdraw()
 
 
+    # CB: uncomment for Tile
 ##     root.tk.call('package', 'require', 'tile')
-##     widgets_to_ttkify = ['button'] #,'scrollbar','frame','labelframe','label','text','combobox']
-    
+##     widgets_to_ttkify = [] # add widgets one by one until error,
+##                            # then find cause, fix, continue...
+##     #'text','scrollbar','button','frame','labelframe','label','combobox', etc
 ##     for w in widgets_to_ttkify:
-##         ttkify(root,w)
+##         __ttkify(root,w)
+##     root.tk.call('tile::setTheme', 'default') # or classic or xpnative or winnative or aqua
 
-    
-##     #root.tk.call('namespace', 'import','-force','ttk::button')  # ,'force'
-##     root.tk.call('tile::setTheme', 'default')
-
-
-
+    # CB: comment out for Tile
     Pmw.initialise(root)
     
     console = TopoConsole()
