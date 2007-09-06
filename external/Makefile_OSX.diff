@@ -1,0 +1,9 @@
+Index: external/Makefile
+===================================================================
+RCS file: /cvsroot/topographica/topographica/external/Makefile,v
+retrieving revision 1.74
+diff -r1.74 Makefile
+30c30
+< 	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
+---
+> 	cd ${PYTHON}; ./configure --prefix=${PREFIX}
