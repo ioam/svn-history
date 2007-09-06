@@ -143,8 +143,7 @@ by Topographica).
 (e.g. for online help), use Fink to get imagemagick, transfig, php,
 and m4, if these are not already installed.
 <li> If CVS is not already installed, find and install
-<code>cvsup</code> (and the associated library and client) with Fink.
-<!--CB: Why not just install the one package 'cvs'? What is cvsup?-->
+<code>cvs</code> with Fink.
 <!--CB: Also, since you don't need commander (and can just use
 apt-get), we should probably give the apt-get commands in addition to
 talking about commander (it's much faster to use the commandline).-->
