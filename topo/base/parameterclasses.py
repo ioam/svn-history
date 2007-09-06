@@ -134,11 +134,7 @@ class Enumeration(Parameter):
 
 
 
-# CEBHACKALERT: how did I get this? Seems like it could be a problem...
-#  ValueError: Parameter '_x_param_value' (<class 'topo.base.parameterclasses.Number'>) only takes a numeric value; <type 'long'> is not numeric.
-
-
-### JABALERT: Needs to be extended to accept FixedPoint as a number.
+# CEBALERT: Now accepts FixedPoint, but not fully tested.
 class Number(Parameter):
     """
     """
@@ -559,14 +555,8 @@ def is_iterator(obj):
     return type(obj) == types.GeneratorType or ('__iter__' in dir(obj) and 'next' in dir(obj))
 
 
-def is_number(obj):
-    """
-    Predicate that returns whether an object is a number.
-    """
-    # This may need to be extended to work with FixedPoint values.
-    return (isinstance(obj,int) or isinstance(obj,float))
-
-
+import operator
+is_number = operator.isNumberType
 
 
 # CEBALERT: this should be a method of ClassSelectorParameter.
@@ -826,4 +816,4 @@ class InstanceMethodWrapper(object):
         return self.im(*args,**kw)
 
 
-    
+
