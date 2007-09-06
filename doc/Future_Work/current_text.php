@@ -777,25 +777,31 @@ breakpoint occurred.  Also consider an alternative debugger,
 http://www.digitalpeers.com/pythondebugger/.
 
 
-<H4>2007/05/08 (CB): Investigate using Tile</H4>
-Tile has become part of Tkinter now anyway.  Tile looks good on linux
-and windows (haven't tried mac but screenshots look good). But, Tile
-does not have all the widgets we need yet. Tile uses themes so we can
-set it to classic and use Tile + Tkinter widgets and still have a
-uniform look. This gives us nothing to begin with, but Tile should
-eventually have all the widgets of Tkinter, at which point we can
-simply set the theme to get a Topographica which looks 'right' on
-windows and mac. Well, that is almost true. Pmw (whose widgets are not
-compatible with Tile because of Tile's theme-based approach) provides
-some things we really need. The first of these is balloon help. In
-fact, that is ok to mix with other widgets; it doesn't need to match
-the 'theme' since it's undecorated by the window manager. [bwidget has
-dynamic help, so we can replace it anyway.] The second is the message
-bar. [Bwidget has a MainFrame that has status bar, menu, and - apparently -
-dynamic help. We might be able to simplify topoconsole further with this.] 
-[Add note about the others: messagebar, combobox, radiobutton, etc.
-Probably all available from Tkinter and bwidget...we can probably
-stop using Pmw.]
+<H4>2007/09/06 (CB): Investigate using Tile</H4> 
+
+
+Tile widgets looks good on linux, windows, and mac.  Tile uses themes
+& styles, so we get a GUI that looks 'right' on Windows and Mac.
+
+<P> To use Tile: <code>make -C external tile</code> and remove
+<code>Pmw.initialize(root)</code> from __init__.py (means you lose the
+GUI popup errors - you won't be sad about that), then uncomment marked
+code in __init__.py.
+
+<P> Status (tile-0.7.8,bwidget-1.7.0): Console starts, but various
+parts of Tkinter (e.g. tkFileDialog) are obviously not compatible with
+Tile (try an 'Open' dialog). Tile is incompatible with options like
+-background.  Plot group panels won't open as someone somewhere passes
+some -background options. Is it possible some bwidgets are not
+possible with Tile, too? In the Tk world, I think bwidget and Tile are
+very popular, so there should be some information.
+
+<P> Pmw is definitely not compatible with Tile. Pmw.Balloon and
+Pmw.MessageBar are fine since they happen not to interact, but we
+can't use Pmw.OptionMenu and Pmw.Group (among others).
+
+<P> Tile is already in Tk8.5a6, so it'll come into Tkinter eventually
+anyway.
 
 
 <H4>2007/07/24 (JB): Matlab Toolbox for Dimensionality Reduction</H4>
