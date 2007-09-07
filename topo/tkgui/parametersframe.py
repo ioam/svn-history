@@ -1,4 +1,6 @@
 """
+Classes for manipulating all the Parameters of a ParameterizedObject.
+
 LiveParametersFrame and ParametersFrame display the Parameters of a
 supplied ParameterizedObject. Both allow these Parameters to be
 edited; LiveParametersFrame applies changes immediately as they are

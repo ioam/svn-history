@@ -1,6 +1,5 @@
 """
-TkParameterizedObjectBase and TkParameterizedObject classes, linking
-Parameters and tkgui.
+Classes linking ParameterizedObjects and Parameters to Tkinter.
 
 TkParameterizedObject allows graphical representation and manipulation
 of any ParameterizedObject's Parameters, in a flexible way. Usually,
