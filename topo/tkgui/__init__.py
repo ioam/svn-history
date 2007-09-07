@@ -50,7 +50,15 @@ from topoconsole import TopoConsole
 # current graphics do not update properly (but I'm not sure - I don't
 # have a specific example yet). Need to clean up all the scattered
 # update() and update_idletasks()...
-
+#
+## Window or Frame?
+# Maybe one day everything (PlotGroupPanels, ParametersFrames,
+# ModelEditor, ...) will be Frames inside one master window (for
+# e.g. a matlab-like workspace).  Nobody's been worrying too much
+# about whether something's a Frame or a window when they've been
+# implementing things, so 'close' buttons, title methods, and so on
+# are a bit of a mix. This needs to be cleaned up when we have a
+# final window organization method in mind.
 
 
 
