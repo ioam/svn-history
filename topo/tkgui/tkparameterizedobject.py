@@ -2,10 +2,86 @@
 TkParameterizedObjectBase and TkParameterizedObject classes, linking
 Parameters and tkgui.
 
+TkParameterizedObject allows graphical representation and manipulation
+of any ParameterizedObject's Parameters, in a flexible way. Usually,
+it is simply desired to display all the Parameters of a
+ParameterizedObject; for this, use ParametersFrame, which extends
+TkParameterizedObject. If more flexibility is required, though, it
+is possible to use TkParameterizedObject itself.
+
+A typical use of TkParameterizedObject might be in some subclass that
+is also a Tkinter.Frame. The Frame serves as the container into which
+the representations of the Parameters are placed - although any
+suitable Tkinter widget can be used, and there is in fact no need to
+sublass TkParameterizedObject. The following example shows this,
+displaying the Parameters from two different ParameterizedObjects in a
+window:
+
+
+ ## Existing, non-GUI code
+ from topo.base.parameterizedobject import ParameterizedObject
+ from topo.base.parameterclasses import Number,StringParameter,BooleanParameter
+
+ class Object1(ParameterizedObject):
+     duration = Number(2.0,bounds=(0,None),doc='Duration of measurement')
+     displacement = Number(0.0,bounds=(-1,1),doc='Displacement from point A')
+
+ class Object2(ParameterizedObject):
+     active_today = BooleanParameter(True,doc='Whether or not to count today')
+     operator_name = StringParameter('Zhong Wen',doc='Operator today')
+
+ o1 = Object1()
+ o2 = Object2()
+
+
+ ## Flexible GUI representation 
+ import Tkinter
+ from topo.tkgui.tkparameterizedobject import TkParameterizedObject
+
+ app_window = Tkinter.Tk()
+
+ t1 = TkParameterizedObject(app_window,extraPO=o1)
+ t2 = TkParameterizedObject(app_window,extraPO=o2)
+
+ t1.pack_param('duration')
+ t1.pack_param('displacement')
+ t2.pack_param('active_today')
+ # (choose not to display o2's 'operator_name')
+
+
+The resulting window exhibits some of the more important features of
+TkParameterizedObject: each Parameter is represented by an appropriate
+widget (e.g. slider for a Number); type and range checking is handled
+already by using Parameters; doc strings are displayed automatically
+as pop-up help for each Parameter; changes to the Parameters in the
+GUI are instantly reflected in the objects themselves; Parameter
+names are formatted nicely for display.
+
+Additionally, it is possible to associate changes to variables with
+function calls, display true Parameter variable names, and more (umm
+like what) - see the detailed documentation.
+
+Examples of TkParameterizedObject usage can be found in
+parametersframe.ParametersFrame (as mentioned above) and
+in plotgrouppanel.PlotGroupPanel (where it is used to
+allow editing of PlotGroups).
+
+
 $Id$
 """
 
 # CB: this file has now gone beyond the maximum complexity limit
+
+
+# CEBALERT: in the same way that parameterizedobject.py does not
+# import much, this file should import as little as possible from
+# outside basic gui files and topo/base so that it can be used
+# independently of as much of topographica as possible.  Right now,
+# the only real violation is 'import topo', and the place topo.guimain
+# is used (just to pass a message to the messagebar). Instead, should
+# pass in the console as an optional argument, and only use it if it's
+# not None.  (Also applies to parametersframe.py.)
+
 
 
 ### CEB: currently working on this file (still have to attend to
@@ -824,6 +900,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         string2obj_fn = lookup_by_class(self.str2obj_fn,type(param))
 
         if string2obj_fn:
+            
             try:
                 obj = string2obj_fn(string)
                 #topo.guimain.status_message("OK: %s -> %s"%(string,obj))
