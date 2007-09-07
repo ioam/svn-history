@@ -211,7 +211,9 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
 
     # CEBERRORALERT: shouldn't set straight onto the object: wait for Apply.
     def defaultsB(self):
-        assert isinstance(self._extraPO,ParameterizedObject), "Only defined for ParameterizedObject"
+        if isinstance(self._extraPO,ParameterizedObjectMetaclass):
+            raise NotImplementedError, "Unfinished"
+
         self._extraPO.reset_params()
 
         # CEBERRORALERT: need a (/to call a) refresh method.
@@ -379,3 +381,29 @@ class ParametersFrame(LiveParametersFrame):
                     self._update_param(name)
 
     set_parameters=update_parameters
+
+
+
+# CEBALERT: should be in something like tkgui.commands.
+# (Designed for use at the commandline.)
+def edit_parameters(parameterized_object,live=False,**params):
+    """
+    Edit the Parameters of parameterized_object.
+
+    Specify live=True for a LiveParametersFrame (immediately
+    updates the object - no need to press the Apply button).
+
+    Extra params are passed to the ParametersFrame constructor.
+    """
+    if not (isinstance(parameterized_object,ParameterizedObject) or \
+           isinstance(parameterized_object,ParameterizedObjectMetaclass)):
+        raise ValueError("Can only edit parameters of a ParameterizedObject.")
+
+    if live:
+        pf_class = LiveParametersFrame
+    else:
+        pf_class = ParametersFrame
+
+    return pf_class(Tkinter.Toplevel(),parameterized_object,**params)
+
+    
