@@ -101,9 +101,10 @@ class TestPattern(SheetPGPanel):
         self.pg_control_pane = Frame(self,bd=1,relief="sunken")
         self.pg_control_pane.pack(side="top",expand='yes',fill='x')
         
-        self.params_frame = LiveParametersFrame(self.pg_control_pane,
-                                             PO=self.pattern_generator,
-                                             on_modify=self.conditional_refresh)
+        self.params_frame = LiveParametersFrame(
+            self.pg_control_pane,
+            parameterized_object=self.pattern_generator,
+            on_modify=self.conditional_refresh)
 
         self.params_frame.hide_param('Close')
         self.params_frame.hide_param('Defaults') # CB: see ALERT in ParameterizedObject.reset_params()

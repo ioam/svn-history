@@ -154,7 +154,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         of the extra shadowed PO.
 
         The precedence order can be reversed by setting the attribute
-        'me_first' on this object to False.
+        'self_first' on this object to False.
 
 
         (b) Along the same lines, an additional complication can arise
@@ -165,7 +165,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         ParameterizedObject that has a 'size' Parameter, the
         ParameterizedObject's size Parameter will not be available as
         .size because ('dot') attribute lookup begins on the local
-        object and is not overridden by 'me_first'. Using the
+        object and is not overridden by 'self_first'. Using the
         parameter accessors .get_parameter_object('size') or
         .get_parameter_value('size') (and the equivalent set versions)
         avoids this problem.
@@ -349,7 +349,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         Return a correctly ordered* list of ParameterizedObjects in
         which to find Parameters.
 
-        (* ordered by precedence, as defined by me_first)
+        (* ordered by precedence, as defined by self_first)
 
         Specifying parameterized_object results in the list
         containing only that parameterized_object.

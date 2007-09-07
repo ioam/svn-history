@@ -1,5 +1,9 @@
 """
-ParametersFrame is allows the display of all non-hidden
+LiveParametersFrame and ParametersFrame display the Parameters of a
+supplied ParameterizedObject. Both allow these Parameters to be
+edited; LiveParametersFrame applies changes immediately as they are
+made, whereas ParametersFrame makes no changes until a confirmation is
+given (by pressing the 'Apply' button, for instance).
 
 
 $Id$
@@ -25,88 +29,107 @@ __version__='$Revision$'
 
 # CEBALERT: apply/reset etc button positions need to be fixed.
 
+# CEBERRORALERT: semantics of all the buttons needs to be checked.
+# In particular, defaults button has surprising behavior.
 
-import tkMessageBox
-import Tkinter
+import Tkinter, tkMessageBox
 
-from inspect import getdoc
 from Tkinter import Frame, E,W, Label
+from inspect import getdoc
 
-from topo.base.parameterizedobject import ParameterizedObject, ParameterizedObjectMetaclass
+from topo.base.parameterizedobject import ParameterizedObject, \
+                                          ParameterizedObjectMetaclass
 
 from topo.misc.utils import keys_sorted_by_value
 
 from tkguiwindow import Menu,TkguiWindow
-from tkparameterizedobject import TkParameterizedObject, ButtonParameter, parameters
+from tkparameterizedobject import TkParameterizedObject, ButtonParameter, \
+                                  parameters
 
 
 
 class LiveParametersFrame(TkParameterizedObject,Frame):
     """
-    ParametersFrame displays representations (widgets) for all the
-    Parameters of a ParameterizedObject.
+    Displays and allows instantaneous editing of the Parameters
+    of a supplied ParameterizedObject.
     """
+    Defaults = ButtonParameter(doc=
+        """Return object's Parameters to class defaults.""")
 
-    Defaults = ButtonParameter(doc="Return object's Parameters to class defaults")
+    # CEBALERT: this is a Frame, so close isn't likely to make
+    # sense. But fortunately the close button acts on master.
+    # Just be sure not to use this button when you don't want
+    # the master window to vanish (e.g. in the model editor).
+    Close = ButtonParameter(doc="Close the parent window.")
 
-    Close = ButtonParameter(doc="Close this window")
+    def __init__(self,master,parameterized_object=None,on_change=None,
+                 on_modify=None,**params):
+        """
+        Create a LiveParametersFrame with the specifed master, and
+        representing the Parameters of parameterized_object.
 
-    def __init__(self,master,PO=None,on_change=None,on_modify=None,**params):        
+        on_change is an optional function to call whenever any of the
+        GUI variables representing Parameter values is set() by the
+        GUI. Since a variable's value is not necessarily changed by
+        such a set(), on_modify is another optional function to call
+        only when a GUI variable's value changes.
+        (See TkParameterizedObject for more detail.)
+        """
         Frame.__init__(self,master)
+        TkParameterizedObject.__init__(self,master,
+                                       extraPO=parameterized_object,
+                                       self_first=False,**params)
 
         self.on_change= on_change
         self.on_modify = on_modify
-        TkParameterizedObject.__init__(self,master,extraPO=PO,self_first=False,**params)
 
-        self.pframe = Frame(self)
-        self.pframe.pack(side='top',expand='yes',fill='both')
+        ## Frame for the Parameters
+        self._params_frame = Frame(self)
+        self._params_frame.pack(side='top',expand='yes',fill='both')
 
-        if PO:self.set_PO(PO,on_change=on_change,on_modify=on_modify)
+        if parameterized_object:
+            self.set_PO(parameterized_object,on_change=on_change,
+                        on_modify=on_modify)
+
+        ## Frame for the Buttons
+        self._buttons_frame = Frame(self)
+        self._buttons_frame.pack(side='bottom',expand='yes',fill='x')
+        
+        self.pack_param('Defaults',parent=self._buttons_frame,
+                        on_change=self.defaultsB,side='left')
+        Frame(self._buttons_frame,width=20).pack(side='left') # spacer
+        self.pack_param('Close',parent=self._buttons_frame,
+                        on_change=self.closeB,side='right')
 
         ### Right-click menu for widgets
         self.option_add("*Menu.tearOff", "0") 
         self.menu = Menu(self)
-        self.menu.insert_command('end', label = 'Properties', command = lambda: 
-            self.__edit_PO_in_currently_selected_widget())
+        self.menu.insert_command('end',label='Properties',
+            command=lambda:self.__edit_PO_in_currently_selected_widget())
 
-        self._buttons_frame = Frame(self)
-        self._buttons_frame.pack(side='bottom',expand='yes',fill='x')
-        
-
-        self.pack_param('Defaults',parent=self._buttons_frame,on_change=self.defaultsB,side='left')
-        Frame(self._buttons_frame,width=20).pack(side='left') # spacer
-        self.pack_param('Close',parent=self._buttons_frame,on_change=self.closeB,side='right')
-
-        self.pack(expand='yes',fill='both') # coz the old one did, and callers assume it
+        # CEBALERT: just because callers assume this pack()s itself.
+        # Really it should be left to callers i.e. this should be removed.
+        self.pack(expand='yes',fill='both') 
 
 
-    def set_parameters(self):
-        # after a while, add something to raise an error and eliminate from callers
-        # (i.e. after cleaning test pattern, won't be needed)
-        pass
     
     
 
-    # CEBALERT: clean this up.
-    def unpack_param(self,param_name):
-        raise NotImplementedError # unfinished (need to remove from list of displayed params)
-        # super(ParametersFrame,self).unpack_param(param_name)
-    # also hide,unhide probably
 
     # CEBALERT: all thses on_change=None mean someone could lose their initial setting which
     # will suprise them: claenup
-    def set_PO(self,PO,on_change=None,on_modify=None):
+    def set_PO(self,parameterized_object,on_change=None,on_modify=None):
 
-        self.change_PO(PO)
+        self.change_PO(parameterized_object)
 
         try:
-            self.master.title("Parameters of "+ (PO.name or str(PO)) ) # classes dont have names
+            self.master.title("Parameters of "+ (parameterized_object.name or str(parameterized_object)) ) # classes dont have names
         except AttributeError:
             pass # can only set window title on a window (model editor puts frame in another frame)
 
         ### Pack all of the non-hidden Parameters
         self.displayed_params = {}
-        for n,p in parameters(PO).items():
+        for n,p in parameters(parameterized_object).items():
             if not p.hidden:
                 self.displayed_params[n]=p
             
@@ -147,7 +170,7 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
             
         # create the labels & widgets
         for name in self.displayed_params:
-            widget,label = self.create_widget(name,self.pframe,on_change=on_change or self.on_change,
+            widget,label = self.create_widget(name,self._params_frame,on_change=on_change or self.on_change,
                                               on_modify=on_modify or self.on_modify)
             self.representations[name]={'widget':widget,'label':label}
 
@@ -244,9 +267,18 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
         self.balloon.bind(title,getdoc(self.get_parameter_object(param_name,self._extraPO)))
         ###
         
-        parameter_frame = type(self)(parameter_window,PO=PO_to_edit)
+        parameter_frame = type(self)(parameter_window,parameterized_object=PO_to_edit)
 
         parameter_frame.pack()
+
+
+    # CEBALERT: clean this up.
+    def unpack_param(self,param_name):
+        raise NotImplementedError
+    # because it's unfinished (need to remove from list of displayed params)
+    # super(ParametersFrame,self).unpack_param(param_name)
+    # also need to do hide,unhide - probably
+
 
 
 
@@ -255,7 +287,7 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
 class ParametersFrame(LiveParametersFrame):
 
     
-    # CEBHACKALERT: semantics of all these buttons needs to be checked.
+
     Apply = ButtonParameter(doc="""Set object's Parameters to displayed values.
                                    When editing a class, sets the class defaults
                                    (i.e. acts on the class object).""")
@@ -264,8 +296,8 @@ class ParametersFrame(LiveParametersFrame):
     # (CEBNOTE: used to be called Reset)
     Refresh = ButtonParameter(doc="Return values to those currently set on the object")  
 
-    def __init__(self,master,PO=None,on_change=None,on_modify=None,**params):        
-        super(ParametersFrame,self).__init__(master,PO,on_change,on_modify,**params)
+    def __init__(self,master,parameterized_object=None,on_change=None,on_modify=None,**params):        
+        super(ParametersFrame,self).__init__(master,parameterized_object,on_change,on_modify,**params)
 
         for p in self.param_immediately_apply_change: self.param_immediately_apply_change[p]=True
             
@@ -279,17 +311,17 @@ class ParametersFrame(LiveParametersFrame):
         w.unbind('<Return>')
         return w
 
-    def set_PO(self,PO,on_change=None,on_modify=None):
-        self.change_PO(PO)
+    def set_PO(self,parameterized_object,on_change=None,on_modify=None):
+        self.change_PO(parameterized_object)
 
         try:
-            self.master.title("Parameters of "+ (PO.name or str(PO)) ) # classes dont have names
+            self.master.title("Parameters of "+ (parameterized_object.name or str(parameterized_object)) ) # classes dont have names
         except AttributeError:
             pass # can only set window title on a window (model editor puts frame in another frame)
 
         ### Pack all of the non-hidden Parameters
         self.displayed_params = {}
-        for n,p in parameters(PO).items():
+        for n,p in parameters(parameterized_object).items():
             if not p.hidden:
                 self.displayed_params[n]=p
             
