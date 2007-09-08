@@ -300,6 +300,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         ParameterizedObject._setup_params(self,**params)
 
     # CEBALERT: rename extraPO...but to what?
+    # Rename change_PO().
     def __init__(self,extraPO=None,self_first=True,**params):
         """
 
@@ -404,7 +405,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
         super(TkParameterizedObjectBase,self).__init__(**params)
 
 
-    # CEBALERT: rename
     def change_PO(self,extraPO):
         """
         Shadow the Parameters of extraPO.
@@ -800,7 +800,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 #######################################################################
 
 
-#########METHODS TO CONVERT BETWEEN OBJECTS AND STRING REPRESENTATIONS FOR PARAMETERS#########
+###METHODS TO CONVERT BETWEEN OBJECTS AND STRING REPRESENTATIONS FOR PARAMETERS###
 
     def __selector_obj2str(self,param_name,val):
         """
@@ -859,7 +859,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         return string       
                     
-    atrevnoc = object2string_ifrequired  #CB: old method name - remove when unused
 
 
     def string2object_ifrequired(self,param_name,string):
