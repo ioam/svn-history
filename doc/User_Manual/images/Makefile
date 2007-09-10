@@ -33,7 +33,7 @@ figoutput: ${FIGPNGS}
 # Cleanup
 
 clean:
-	$(RM) *~
+	${RM} *~ ${FIGPDFS} ${FIGPNGS}
 
 output_clean:
 	${RM} ${FIGEPSS} ${FIGPDFS} ${FIGPNGS} measuring-map.v3.png
