@@ -22,6 +22,13 @@ from topo.outputfns.basic import PiecewiseLinear
 from topo.tkgui.tkparameterizedobject import TkParameterizedObject
 
 
+# This test requires the GUI to be start()ed (as if -g were passed)
+# because otherwise simulation of GUI setting and getting (via
+# Tkinter.Variables' set() and get() methods) does not work.
+import topo.tkgui ; topo.tkgui.start()
+# CEBALERT: shouldn't the gui be started for all gui tests?
+
+
 class SomeFrame(TkParameterizedObject,Frame):
     k = BooleanParameter(default=True)
     r = ObjectSelectorParameter()
@@ -117,7 +124,8 @@ class SometkPO(TkParameterizedObject,Frame):
         
 
 
-        
+
+
 
 
 
