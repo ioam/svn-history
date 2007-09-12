@@ -22,14 +22,13 @@ from topo.outputfns.basic import PiecewiseLinear
 from topo.tkgui.tkparameterizedobject import TkParameterizedObject
 
 
-# This test requires the GUI to be start()ed (as if -g were passed)
-# because otherwise simulation of GUI setting and getting (via
-# Tkinter.Variables' set() and get() methods) does not work.
-#import topo.tkgui ; topo.tkgui.start()
-# CEBALERT: shouldn't the gui be started for all gui tests?
-# CEBERRORALERT: this can't be present - it causes other tests
-# to fail (because of interactions between the tests). Needs
-# to be investigated.
+# CEBALERT: if this test is run on its own
+# (./topographica -c 'import topo.tests.testtkparameterizedobject; topo.tests.run(test_modules=[topo.tests.testtkparameterizedobject])')
+# the following is required:
+# import topo.tkgui ; topo.tkgui.start()
+# (otherwise simulation of gui set()s and get()s doesn't work).
+# Why is that?
+
 
 class SomeFrame(TkParameterizedObject,Frame):
     k = BooleanParameter(default=True)
