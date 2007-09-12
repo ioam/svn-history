@@ -15,7 +15,10 @@ from Tkinter import Frame,Toplevel
 
 from topo.base.simulation import Simulation
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import BooleanParameter,Number,Parameter,ObjectSelectorParameter
+from topo.base.parameterclasses import BooleanParameter,Number,Parameter, \
+                                       ObjectSelectorParameter,ClassSelectorParameter
+from topo.base.patterngenerator import PatternGenerator
+import topo.patterns.basic
 from topo.patterns.basic import Gaussian        
 from topo.outputfns.basic import PiecewiseLinear
 
@@ -31,102 +34,20 @@ from topo.tkgui.tkparameterizedobject import TkParameterizedObject
 
 
 class SomeFrame(TkParameterizedObject,Frame):
-    k = BooleanParameter(default=True)
-    r = ObjectSelectorParameter()
-    c = Parameter(1.0,constant=True)
+    boo = BooleanParameter(default=True)
+    osp = ObjectSelectorParameter()
+    csp = ClassSelectorParameter(class_=PatternGenerator)
+    const = Parameter(1.0,constant=True)
+    pa = Parameter(default="test")
+    nu = Number(default=1.0,bounds=(-1,1))
 
     def __init__(self,master,extraPO=None,**params):
         TkParameterizedObject.__init__(self,master,extraPO=extraPO,**params)
         Frame.__init__(self,master)
-        self.kcount=0
+        self.boocount=0
 
-    def upkcount(self):
-        self.kcount+=1
-
-class OverlapPO(ParameterizedObject):
-    x = Number(0.0)
-    size = Number(1.0)
-    notoverlap = Number(0.4)
-
-
-
-
-class SometkPO(TkParameterizedObject,Frame):
-
-    x = ObjectSelectorParameter(default="the")
-    y = ObjectSelectorParameter(default="jane")
-    z = Number(default=3)
-
-
-### Temporaray, I hope, like the parameter.
-## class TestObjectSelectorParameter(unittest.TestCase):
-
-##     def test_basic(self):
-
-##         k = SometkPO(Toplevel())
-##         k.x = "cat"
-##         k.z = 9
-
-##         y_param = k.params()['y']
-##         y_param.range = ["fred","jane","phil"]
-##         #y_param.default = "phil"
-
-##         self.assertEqual(k.z,9) 
-##         self.assertEqual(k.x,"cat")
-##         #self.assertEqual(k.y,"phil")
-
-##         x_param = k.params()['x']
-##         x_param.range = ["the","cat","sat"]
-##         #x_param.default = "sat"
-        
-##         self.assertEqual(y_param.range,["fred","jane","phil"])
-##         self.assertEqual(x_param.range,["the","cat","sat"])
-
-##         #self.assertEqual(x_param.default,"sat")
-##         #self.assertEqual(y_param.default,"phil")
-        
-
-##     def test_more(self):
-
-##         k = SometkPO(Toplevel())
-
-##         x_param = k.params()['x']
-##         y_param = k.params()['y']
-
-##         # need to reset parameter defaults
-##         x_param.range = []
-##         y_param.range = []
-        
-##         k.x = "cat" #x_param.default = '1'
-##         k.y = "phil" #y_param.default = '2'
-
-##         k.initialize_ranged_parameter('x',range_=["the","cat","sat"])
-##         k.initialize_ranged_parameter('y',range_=["fred","jane","phil"])
-
-##         self.assertNotEqual(id(x_param.range),id(y_param.range))
-
-##         self.assertEqual(k.x,"cat")
-##         self.assertEqual(k.y,"phil")
-
-##         self.assertEqual(x_param.range,["the","cat","sat"])
-##         self.assertEqual(y_param.range,["fred","jane","phil"])
-
-##         k.pack_param('x')
-##         k.pack_param('y')
-
-##         self.assertEqual(x_param.range,["the","cat","sat"])
-##         self.assertEqual(y_param.range,["fred","jane","phil"])
-
-##         x=k.get_parameter('x')
-##         y=k.get_parameter('y')
-
-##         self.assertEqual(x,x_param)
-##         self.assertEqual(y,y_param)
-        
-
-
-
-
+    def upboocount(self):
+        self.boocount+=1
 
 
 
@@ -144,22 +65,22 @@ class TestTkParameterizedObject(unittest.TestCase):
         f = SomeFrame(Toplevel())
         f.pack()
 
-        f.pack_param('c')
+        f.pack_param('const')
         
-        f.pack_param('k',on_change=f.upkcount)
+        f.pack_param('boo',on_change=f.upboocount)
 
-        self.assertEqual(f.k,True); self.assertEqual(f.kcount,0)
+        self.assertEqual(f.boo,True); self.assertEqual(f.boocount,0)
 
-        f.k = False
-        self.assertEqual(f.kcount,1) # check that on_change was called
-        self.assertEqual(f.k,False)  # check that f.k was set
-        self.assertEqual(f._tk_vars['k'].get(),False) # simulate GUI get & check result
+        f.boo = False
+        self.assertEqual(f.boocount,1) # check that on_change was called
+        self.assertEqual(f.boo,False)  # check that f.boo was set
+        self.assertEqual(f._tk_vars['boo'].get(),False) # simulate GUI get & check result
 
 
-        f._tk_vars['k'].set(True) # simulate GUI set
-        self.assertEqual(f.kcount,2) # check that on_change was called
-        self.assertEqual(f.k,True) # check that f.k was actually set
-        self.assertEqual(f._tk_vars['k'].get(),True) # simulate GUI get
+        f._tk_vars['boo'].set(True) # simulate GUI set
+        self.assertEqual(f.boocount,2) # check that on_change was called
+        self.assertEqual(f.boo,True) # check that f.boo was actually set
+        self.assertEqual(f._tk_vars['boo'].get(),True) # simulate GUI get
 
           
         
@@ -173,27 +94,35 @@ class TestTkParameterizedObject(unittest.TestCase):
 
         f.pack_param('x') # (from the Gaussian)
 
-        g.x = 0.1 # (just so we know g.x doesn't start equal to 0.75)
+        # (just so we know g.x doesn't start equal to 0.75)
+        g.x=0.1 
         f.x=0.75
-        self.assertEqual(g.x,0.75) # test that setting f.x (where x is shadow of g.x) actually sets g.x
+        # test that setting f.x (where x is shadow of g.x) actually sets g.x
+        self.assertEqual(g.x,0.75) 
 
+        # simulate a GUI set & then and check g.x is set
         f._tk_vars['x'].set(0.9)
-        self.assertEqual(g.x,0.9) # simulate a GUI set & then and check g.x is set
+        self.assertEqual(g.x,0.9) 
 
+        # check that up-to-date value is returned when g got changed elsewhere
         g.x=0.3
-        self.assertEqual(f.x,0.3) # check that up-to-date value is returned when g got changed elsewhere
+        self.assertEqual(f.x,0.3) 
 
+        # simulate a GUI get & check up-to-date value returned
         g.x=0.4
-        self.assertEqual(f._tk_vars['x'].get(),0.4) # simulate a GUI get & check up-to-date value returned
+        self.assertEqual(f._tk_vars['x'].get(),0.4) 
 
+        # check that a method of this object can be called by on_change
         self.z = 0
-        f.pack_param('k',on_change=self.upzcount)
-        f.k=True
-        self.assertEqual(self.z,1) # check that a method of this object can be called by on_change
+        f.pack_param('boo',on_change=self.upzcount)
+        f.boo=True
+        self.assertEqual(self.z,1) 
 
     def upzcount(self): self.z+=1  # minor helper method
 
 
+
+#### REMOVE ##############################################################################
     def test_more_shadow(self):
         """
         Check shadowing of multiple POs' parameters.
@@ -201,8 +130,8 @@ class TestTkParameterizedObject(unittest.TestCase):
         Includes tests for handling of non-existent attributes.
         """
         g = Gaussian()
-        p = PiecewiseLinear()
-        o = OverlapPO()
+        #p = PiecewiseLinear()
+        #o = OverlapPO()
         
         f = SomeFrame(Toplevel(),extraPO=g)  #  =[g,p,o]) # i.e. precedence is f,g,p,o
         f.pack()
@@ -246,10 +175,15 @@ class TestTkParameterizedObject(unittest.TestCase):
         f.did_not_exist = 9
         assert 'did_not_exist' in f.__dict__ # check that new attribute added to f's dict...
         self.assertEqual(f.did_not_exist,9)  # ...and that it was set
+#### REMOVE ##############################################################################
 
+        
 
 
     def test_direct_getting_and_setting(self):
+        """
+        Test the methods used to set and get Parameter values.
+        """
         
         g = Gaussian()
         f = SomeFrame(Toplevel(),extraPO=g) 
@@ -276,26 +210,57 @@ class TestTkParameterizedObject(unittest.TestCase):
             raise("Failed to raise AttributeError on getting non-existent *Parameter* 'does_not_exist'")
 
 
-    # CB: will need to be updated once ClassSelectorParam/ObjectSelectorParam are finished.
-    def test_translation(self):
+
+class TestParameterTypeRepresentations(unittest.TestCase):
+
+
+##         In the GUI, objects must sometimes be represented by strings (e.g. for an OptionMenu):
+##         test that such conversion is handled correctly
+
+
+    def setUp(self):
+        self.f = SomeFrame(Toplevel())
+
+
+    def test_number_parameter(self):
+        nu_param = self.f.get_parameter_object('nu')
+        nu_tkvar = self.f._tk_vars['nu']
+        
+        self.f.pack_param('nu')
+
+        # check gui setting
+        self.f.nu = 0.1
+        nu_tkvar.set(0.4)
+        self.assertEqual(self.f.nu,0.4)
+
+        # check gui getting
+        self.f.nu = 0.2
+        self.assertEqual(nu_tkvar.get(),0.2)
+
+        # try to gui set beyond the 1 upper bound
+        nu_tkvar.set(40.0)
+        self.assertEqual(self.f.nu,1) 
+
+        
+
+    def test_object_selector_parameter(self):
         """
-        In the GUI, objects must sometimes be represented by strings (e.g. for an OptionMenu):
-        test that such conversion is handled correctly
+        Test that ObjectSelectorParameter representation works.        
         """
-        f = SomeFrame(Toplevel())
+        some_pos = [ParameterizedObject(name='cat'),
+                    ParameterizedObject(name='rat'),
+                    ParameterizedObject(name='bat')]
+        osp_param = self.f.get_parameter('osp')
+        osp_param.Arange = some_pos
+        #self.f.r.default = some_pos[0]
 
-        some_pos = [ParameterizedObject(name='cat'),ParameterizedObject(name='rat'),ParameterizedObject(name='bat')]
-        r = f.get_parameter('r')
-        r.Arange = some_pos
-        #f.r.default = some_pos[0]
+        self.f.pack_param('osp')  # have to pack AFTER populating range for OptionMenu widget to work (see ALERT in tkparameterizedobject.py)
 
-        f.pack_param('r')  # have to pack AFTER populating range for OptionMenu widget to work (see tkparameterizedobject.py)
-
-        # after packing, the value of r should not be its original value (None) since that's not in the range
-        self.assertNotEqual(f.r,None)
+        # after packing, the value of r should not be its original
+        # value (None) since that's not in the range
+        self.assertNotEqual(self.f.osp,None)
         # should be: self.assertEqual(f.r,some_pos[0])
         # but order not currently kept.
-
         
         # (otherwise, could do the following:
 ##         f = SomeFrame(Toplevel())
@@ -303,21 +268,58 @@ class TestTkParameterizedObject(unittest.TestCase):
 ##         f.initialize_ranged_parameter('r',
 ##                                       [ParameterizedObject(name='cat'),ParameterizedObject(name='rat'),ParameterizedObject(name='bat')])
 
-        # tests converta()
-        self.assertEqual(f.translators['r']['cat'],some_pos[0])
-        self.assertEqual(f.translators['r']['rat'],some_pos[1])
-        self.assertEqual(f.translators['r']['bat'],some_pos[2])
+        self.assertEqual(self.f.translators['osp']['cat'],some_pos[0])
+        self.assertEqual(self.f.translators['osp']['rat'],some_pos[1])
+        self.assertEqual(self.f.translators['osp']['bat'],some_pos[2])
 
         gnat = ParameterizedObject(name='gnat')
-        r.Arange.append(gnat)
-        f.pack_param('r') # again, note the need to pack after updating range.
-##         f.initialize_ranged_parameter('r',ParameterizedObject)
-        self.assertEqual(f.translators['r']['gnat'],gnat)
+        osp_param.Arange.append(gnat)
+        self.f.pack_param('osp') # again, note the need to pack after updating range.
+##         self.f.initialize_ranged_parameter('r',ParameterizedObject)
+        self.assertEqual(self.f.translators['osp']['gnat'],gnat)
+
+        self.assertEqual(self.f.object2string_ifrequired('osp',some_pos[0]),'cat')
+        self.assertEqual(self.f.object2string_ifrequired('osp',some_pos[1]),'rat')
+        self.assertEqual(self.f.object2string_ifrequired('osp',some_pos[2]),'bat')
 
 
-        self.assertEqual(f.object2string_ifrequired('r',some_pos[0]),'cat')
-        self.assertEqual(f.object2string_ifrequired('r',some_pos[1]),'rat')
-        self.assertEqual(f.object2string_ifrequired('r',some_pos[2]),'bat') 
+        # Simulate a GUI set
+        self.f._tk_vars['osp'].set('bat')
+        self.assertEqual(self.f.osp,some_pos[2])
+
+        # Test sorting
+        # CB: add
+
+
+    def test_class_selector_parameter(self):
+
+        self.f.pack_param('csp')
+
+        csp_param = self.f.get_parameter_object('csp')
+        csp_tkvar = self.f._tk_vars['csp']
+
+
+        csp_tkvar.set('Ring')
+        self.assertEqual(type(self.f.csp),topo.patterns.basic.Ring)
+        ring_id = id(self.f.csp)
+        
+        csp_tkvar.set('Rectangle')
+        self.assertEqual(type(self.f.csp),topo.patterns.basic.Rectangle)
+        rectangle_id = id(self.f.csp)
+        
+        csp_tkvar.set('Ring')
+        self.assertEqual(id(self.f.csp),ring_id)
+        csp_tkvar.set('Rectangle')
+        self.assertEqual(id(self.f.csp),rectangle_id)
+        
+
+        # test sorting
+        # CB: add
+        
+        
+   
+
+        
 
 
 
@@ -325,7 +327,7 @@ class TestTkParameterizedObject(unittest.TestCase):
 ###########################################################
 
 
-cases = [TestTkParameterizedObject] #,TestObjectSelectorParameter]
+cases = [TestTkParameterizedObject,TestParameterTypeRepresentations] 
 
 suite = unittest.TestSuite()
 suite.addTests([unittest.makeSuite(case) for case in cases])
