@@ -306,9 +306,9 @@ class TestTkParameterizedObject(unittest.TestCase):
         self.assertEqual(f.translators['r']['gnat'],gnat)
 
 
-        self.assertEqual(f.atrevnoc('r',some_pos[0]),'cat')
-        self.assertEqual(f.atrevnoc('r',some_pos[1]),'rat')
-        self.assertEqual(f.atrevnoc('r',some_pos[2]),'bat') 
+        self.assertEqual(f.object2string_ifrequired('r',some_pos[0]),'cat')
+        self.assertEqual(f.object2string_ifrequired('r',some_pos[1]),'rat')
+        self.assertEqual(f.object2string_ifrequired('r',some_pos[2]),'bat') 
 
 
 
