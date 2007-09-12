@@ -53,18 +53,7 @@ need to do this on a machine with a functioning DISPLAY, not on a
 remote text-only windowless session, because of build requirements for
 the MatPlotLib library.  The build process will take a
 while to complete (e.g. about 5-10 minutes on a 1.5GHz Pentium IV
-machine with a local disk).  If you have PHP, m4, bibtex, ImageMagick,
-and fig2dev installed, you can also make local copies of the HTML
-documentation from the web site; to do so, type <code>make all</code>
-instead of (or after) <code>make</code>.  (If you don't have those
-packages, in most distributions you can get them by installing
-transfig, tetex, imagemagick, m4, and php).
-
-<P><code>make all</code> will also run the regression tests and
-example files, to ensure that everything is functioning properly on
-your system.  If you do the tests on a machine without a functioning
-DISPLAY, such as a remote text-only session, there will be some
-warnings about GUI tests being skipped.
+machine with a local disk).
 
 <P>On some Linux distributions that start with a minimal set of
 packages included, such as Ubuntu or the various "live CD" systems,
@@ -72,6 +61,18 @@ you may need to specify explicitly that some standard libraries be
 installed in your system, such as <code>libfreetype</code>,
 <code>libpng</code>, <code>libx11-dev</code>, and <code>zlib</code>,
 before <code>make</code> will succeed.
+
+<P>If you have the php, m4, bibtex, convert,
+and fig2dev commands installed, you can also make local copies of the
+HTML documentation from the web site; to do so, type <code>make
+all</code> instead of (or after) <code>make</code>.  (If you don't
+have those commands, in most distributions you can get them by
+installing the php, m4, tetex, imagemagick, and transfig packages).
+<code>make all</code> will also run the regression tests and
+example files, to ensure that everything is functioning properly on
+your system.  If you do the tests on a machine without a functioning
+DISPLAY, such as a remote text-only session, there will be some
+warnings about GUI tests being skipped.
 
 <P>If all goes well, a script named <code>topographica</code> or
 <code>topographica.bat</code> will be created in the
