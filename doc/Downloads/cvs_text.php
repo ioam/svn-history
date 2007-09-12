@@ -155,9 +155,7 @@ matplotlib library used by Topographica.)
 <li> If you want to compile a local copy of the documentation
 (e.g. for online help), use Fink to get imagemagick, transfig, php,
 and m4 (if these are not already installed): <code>fink install
-imagemagick transfig php4 m4</code>.
-<!--CEBERRORALERT: evidently something's missing because
-sake won't complete 'make doc' (see buildbot.topographica.org)-->
+php4 m4 tetex imagemagick transfig</code>.
 
 </ol>
 
