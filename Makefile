@@ -51,7 +51,7 @@ FORCE:
 # To get more information about which tests are being run, do:
 # make TEST_VERBOSITY=2 tests
 tests: FORCE
-	./topographica -c "import topo.tests; topo.tests.run(verbosity=${TEST_VERBOSITY})"
+	./topographica -c "import topo.tests; t=topo.tests.run(verbosity=${TEST_VERBOSITY}); import sys; sys.exit(len(t.failures+t.errors))"
 
 examples: FORCE
 	make -C examples
