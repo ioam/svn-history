@@ -9,14 +9,15 @@ __version__='$Revision$'
 ## CB: add test for change of po
 
 
-
+import __main__
 import unittest
 from Tkinter import Frame,Toplevel
 
 from topo.base.simulation import Simulation
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import BooleanParameter,Number,Parameter, \
-                                       ObjectSelectorParameter,ClassSelectorParameter
+                                       ObjectSelectorParameter,ClassSelectorParameter, \
+                                       StringParameter
 from topo.base.patterngenerator import PatternGenerator
 import topo.patterns.basic
 from topo.patterns.basic import Gaussian        
@@ -25,12 +26,10 @@ from topo.outputfns.basic import PiecewiseLinear
 from topo.tkgui.tkparameterizedobject import TkParameterizedObject
 
 
-# CEBALERT: if this test is run on its own
-# (./topographica -c 'import topo.tests.testtkparameterizedobject; topo.tests.run(test_modules=[topo.tests.testtkparameterizedobject])')
-# the following is required:
-# import topo.tkgui ; topo.tkgui.start()
-# (otherwise simulation of gui set()s and get()s doesn't work).
-# Why is that?
+# In case this test is run alone, start tkgui
+# (otherwise simulation of gui set()s and get()s doesn't work)
+if not hasattr(topo,'guimain'):
+    import topo.tkgui; topo.tkgui.start()
 
 
 class SomeFrame(TkParameterizedObject,Frame):
@@ -40,6 +39,7 @@ class SomeFrame(TkParameterizedObject,Frame):
     const = Parameter(1.0,constant=True)
     pa = Parameter(default="test")
     nu = Number(default=1.0,bounds=(-1,1))
+    st = StringParameter("string1")
 
     def __init__(self,master,extraPO=None,**params):
         TkParameterizedObject.__init__(self,master,extraPO=extraPO,**params)
@@ -239,8 +239,27 @@ class TestParameterTypeRepresentations(unittest.TestCase):
 
         # try to gui set beyond the 1 upper bound
         nu_tkvar.set(40.0)
-        self.assertEqual(self.f.nu,1) 
+        self.assertEqual(self.f.nu,1)
 
+        # check actual typing
+        w = self.f.representations['nu']['widget'].tag
+        w.delete(0,"end")
+        w.insert(0,0.005)
+        self.assertEqual(self.f.nu,0.005)
+
+        # check we can retrieve a value from main
+        __main__.__dict__['testA'] = 0.075
+        w.delete(0,"end")
+        w.insert(0,"testA")
+        self.assertEqual(self.f.nu,0.075)
+
+        # check we can do some basic maths
+        exec "from math import sin,pi" in __main__.__dict__
+        w.delete(0,"end")
+        w.insert(0,"sin(pi)")
+        from math import sin,pi
+        self.assertAlmostEqual(self.f.nu,sin(pi))
+        
         
 
     def test_object_selector_parameter(self):
@@ -292,13 +311,15 @@ class TestParameterTypeRepresentations(unittest.TestCase):
 
 
     def test_class_selector_parameter(self):
-
         self.f.pack_param('csp')
 
         csp_param = self.f.get_parameter_object('csp')
         csp_tkvar = self.f._tk_vars['csp']
 
-
+        # For class selector parameters, the tkpo should instantiate
+        # all choices on pack()ing of the parameter and then maintain
+        # the instances (allows persistence of edits to properties of
+        # the classes during the lifetime of a window).
         csp_tkvar.set('Ring')
         self.assertEqual(type(self.f.csp),topo.patterns.basic.Ring)
         ring_id = id(self.f.csp)
@@ -312,14 +333,56 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         csp_tkvar.set('Rectangle')
         self.assertEqual(id(self.f.csp),rectangle_id)
         
-
         # test sorting
         # CB: add
-        
-        
-   
+
+
+    def test_string_parameter(self):
+
+        def test_fn(param_name):
+            self.f.pack_param(param_name)
+            w = self.f.representations[param_name]['widget']
+
+            test_string = "new test string"
+            w.delete(0,"end")
+            w.insert(0,test_string)
+            self.f._update_param(param_name,force=True)
+            
+            self.assertEqual(getattr(self.f,param_name),test_string)
+            self.assertEqual(w.get(),test_string)
+
+        # unlike when typed by a user, everything's immediate when simulating set()
+        self.f.param_immediately_apply_change[StringParameter] = True
+        test_fn('st')
+
+        # and now check the test actually works by making sure
+        # it doesn't work for a Parameter (there'll be an extra
+        # pair of quotes, stopping a match)
+        try:
+            test_fn('pa')
+        except AssertionError:
+            pass
+        else:
+            raise("Test should fail for Parameter")
 
         
+
+
+    def test_parameter(self):
+        self.f.pack_param('pa')
+        w = self.f.representations['pa']['widget']
+        w.delete(0,"end")
+        w.insert(0,"AnObjectNamedThisWillNotExist")
+        self.f._update_param('pa',True)
+        self.assertEqual(self.f.pa,"AnObjectNamedThisWillNotExist")
+
+        # Check that we can create an object from a class in __main__
+        exec "from topo.outputfns.basic import IdentityOF" in __main__.__dict__
+        w.delete(0,"end")
+        w.insert(0,"IdentityOF()")
+        self.f._update_param('pa',force=True)
+        import topo.outputfns.basic
+        self.assertEqual(type(self.f.pa),topo.outputfns.basic.IdentityOF)
 
 
 
@@ -327,7 +390,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
 ###########################################################
 
 
-cases = [TestTkParameterizedObject,TestParameterTypeRepresentations] 
+cases = [TestTkParameterizedObject,TestParameterTypeRepresentations]
 
 suite = unittest.TestSuite()
 suite.addTests([unittest.makeSuite(case) for case in cases])
