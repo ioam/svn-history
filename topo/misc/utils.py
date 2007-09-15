@@ -105,7 +105,7 @@ def eval_atof(str):
     return string.atof(eval(str,__main__.__dict__))
     
 
-
+# JABALERT: Should frange be replaced with numpy.arange or numpy.linspace?
 """
 Return the cross-product of a variable number of lists (e.g. of a list of lists).
 
