@@ -157,7 +157,6 @@ class TkguiWindow(Tkinter.Toplevel):
 
      
 
-
 ######################################################################
 import Tkinter
 from decimal import Decimal
@@ -179,6 +178,9 @@ class TaggedSlider(Tkinter.Frame):
           value in the tag (e.g. 1 in the tag results in integer steps for the slider,
           whereas 0.0001 in the tag results in a resolution of 10^-4
         """
+
+        ## CB: set resolution from range
+
 
         Tkinter.Frame.__init__(self,master)
 
@@ -209,10 +211,18 @@ class TaggedSlider(Tkinter.Frame):
     def tag_changed(self,event=None):
         val = self.variable.get()
 
-        self.set_bounds(min(self.bounds[0],val),
-                        max(self.bounds[1],val))
+        # CB: temporary
+        # if something strange has been typed in, don't
+        # set the slider etc
+        try:
+            float_val = float(val)
+        except ValueError:
+            return
+            
+        self.set_bounds(min(self.bounds[0],float_val),
+                        max(self.bounds[1],float_val))
                         
-        self.slider_variable.set(float(val))
+        self.slider_variable.set(float_val)
         # how to find n. dp simply? I just happened to know the
         # Decimal module...
         p = Decimal(str(val)).as_tuple()[2]
@@ -239,10 +249,16 @@ class TaggedSlider(Tkinter.Frame):
             self.tag['state']=options['state']
             self.slider['state']=options['state']
             del options['state']
+        if 'background' in options:
+            self.tag['background']=options['background']
+            del options['background']
+        if 'foreground' in options:
+            self.tag['foreground']=options['foreground']
+            del options['foreground']
         if len(options)>0:
             raise NotImplementedError(
-                """Only state option is currently supported for this widget;
-                set options on either the component tag or the slider instead.""")
+                """Only state, background, and foreground options are currently supported for this widget;
+                set options on either the component tag or slider instead.""")
 
     # for matching old callers: should be removed
     def get_value(self):
