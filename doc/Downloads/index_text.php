@@ -58,9 +58,19 @@ machine with a local disk).
 <P>On some Linux distributions that start with a minimal set of
 packages included, such as Ubuntu or the various "live CD" systems,
 you may need to specify explicitly that some standard libraries be
-installed in your system, such as <code>libfreetype</code>,
-<code>libpng</code>, <code>libx11-dev</code>, and <code>zlib</code>,
-before <code>make</code> will succeed.
+installed in your system, such as
+<code>libfreetype</code>,
+<code>libfreetype-dev</code>,
+<code>libpng</code>,
+<code>libpng-dev</code>,
+<code>libx11-dev</code>, and
+<code>zlib</code>,
+before <code>make</code> will succeed.  On some systems the
+<code>-dev</code> packages are called <code>-devel</code>, and
+sometimes specific versions must be specified (e.g.
+<code>libpng12-dev</code>,
+<code>libfreetype6-dev</code>).
+
 
 <P>If you have the php, m4, bibtex, convert,
 and fig2dev commands installed, you can also make local copies of the
