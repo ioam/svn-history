@@ -157,7 +157,8 @@ def start(mainloop=False):
     root.withdraw()
 
     # Try to read in options from an options_database file
-    # (see http://www.itworld.com/AppDev/1243/UIR000616regex/) 
+    # (see http://www.itworld.com/AppDev/1243/UIR000616regex/
+    # or p. 49 Grayson)
     try:
         options_database = os.path.join(sys.path[0],"topo","tkgui","options_database")
         root.option_readfile(options_database)
