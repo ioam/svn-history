@@ -10,7 +10,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import Pmw, sys, Tkinter, platform, _tkinter
+import Pmw, sys, Tkinter, platform, _tkinter,os
 import topo.base.parameterizedobject
 
 from topoconsole import TopoConsole
@@ -156,10 +156,12 @@ def start(mainloop=False):
     root = Tkinter.Tk()
     root.withdraw()
 
-    # CB: temp
-    # see http://www.itworld.com/AppDev/1243/UIR000616regex/ 
+    # Try to read in options from an options_database file
+    # (see http://www.itworld.com/AppDev/1243/UIR000616regex/) 
     try:
-        root.option_readfile(sys.path[0]+"/options_database")
+        options_database = os.path.join(sys.path[0],"topo","tkgui","options_database")
+        root.option_readfile(options_database)
+        print "Read options database from",options_database
     except _tkinter.TclError:
         pass
 
