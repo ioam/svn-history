@@ -155,6 +155,10 @@ def find_key_from_value(dict_,val):
 # Parameter-specific stuff, and then instead of ButtonParameter we'd
 # have TopoButton, or something like that...
 #
+# Anyway need to be able to do somrthing like call a button
+# rather than having all the variously named methods associated
+# with buttons.
+#
 class ButtonParameter(Parameter):
 
     __slots__ = []
@@ -829,7 +833,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         For ClassSelectorParameters, 
         
-        Defaults to no translation (i.e. val does not appear in the translator
+        Defaults to no translation (i.e. if val does not appear in the translator
         dictionary, then val itself is returned).
         """
         param = self.get_parameter_object(param_name)
@@ -845,7 +849,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 if object_==val:
                     new_val = name
                     break
-                elif type(object_)==type(val):  # for CSParam, assume that matching class 
+                elif type(object_)==type(val):  # for CSParam, assume that matching class
                     new_val = name              # means we already have a better object from
                                                 # whoever called this!
                     translator[name]=val # update translator
@@ -891,10 +895,15 @@ class TkParameterizedObjectBase(ParameterizedObject):
         string.
         """
         param=self.get_parameter_object(param_name)
+
+        ## CB: clean up/exclude CSP/remove [testtkpo failure]
+        ######
         # update the  translator incase objectchanged externally
         fn = lookup_by_class(self.translator_creators,type(param))
             
         if fn: fn(param_name,param)
+        ######
+
                 
         try:
             ## We have a dictionary entry so just translate
@@ -914,7 +923,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         return obj
     
 
-
+    # clean up test for guimain (see note at top of file)
     def convert_string2obj(self,param_name,string):
         param=self.get_parameter_object(param_name)
         string2obj_fn = lookup_by_class(self.str2obj_fn,type(param))
@@ -924,14 +933,16 @@ class TkParameterizedObjectBase(ParameterizedObject):
             try:
                 obj = string2obj_fn(string)
                 #topo.guimain.status_message("OK: %s -> %s"%(string,obj))
-                topo.guimain.status_message("OK")
+                if hasattr(topo,'guimain'):
+                    topo.guimain.status_message("OK")
                 # CEBALERT: setting colors like this is a hack: need some
                 # general method. Also this conflicts with tile.
                 if hasattr(self,'representations') and param_name in self.representations:
                     self.representations[param_name]['widget'].config(background="white")
             except Exception, inst:
                 m = param_name+": "+str(sys.exc_info()[0])[11::]+" ("+str(inst)+")"
-                topo.guimain.status_message(m)
+                if hasattr(topo,'guimain'):
+                    topo.guimain.status_message(m)
                 obj = string
 
                 if hasattr(self,'representations') and param_name in self.representations:
