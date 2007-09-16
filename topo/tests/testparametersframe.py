@@ -20,6 +20,13 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.tkgui.parametersframe import ParametersFrame
 
 
+# CEBALERT: can't have this code present when doing "make tests" - why?
+## # In case this test is run alone, start tkgui
+## # (otherwise simulation of gui set()s and get()s doesn't work)
+## if not hasattr(topo,'guimain'):
+##     import topo.tkgui; topo.tkgui.start()
+
+
 
 class TestPO(ParameterizedObject):
     boo = BooleanParameter(default=True)
@@ -58,30 +65,23 @@ class TestParametersFrame(unittest.TestCase):
 
 
 
-    def test_initial_update_parameters(self):
+    def test_apply_button_1(self):
         """
-        Checking for specific bug: quotation marks being
-        added to displayed values.
-
-        (Only time should get quotation marks is when
-        editing a Parameter and trying to create an instance
-        of a class that hasn't been imported: then string is
-        assumed, and quotes are added - since it's not a
-        StringParameter.)
+        Check:
+          when pressing apply after no changes, objects should remain
+          unchanged, and should still be displayed the same as before.
         """
-
         ## check that update doesn't affect the variable values
         orig_values = {}
         for param_name,tkvar in self.f._tk_vars.items():
             orig_values[param_name] = tkvar._original_get()
 
-        self.f.update_parameters()
+        self.f.apply_button()
 
         for param_name,val in orig_values.items():
             self.assertEqual(self.f._tk_vars[param_name].get(),val)
 
-
-        ## check that *displayed* values don't change 
+        ## and check that *displayed* values don't change 
         orig_values = {}
         for param_name,representation in self.f.representations.items():
             widget = representation['widget']
@@ -93,12 +93,42 @@ class TestParametersFrame(unittest.TestCase):
 
                 orig_values[param_name] = widget.get()
         
-        self.f.update_parameters()
+        self.f.apply_button()
 
         for param_name,val in orig_values.items():
             widget = self.f.representations[param_name]['widget']
             self.assertEqual(widget.get(),val)
-                             
+
+
+    def test_apply_button_2(self):
+        """
+        Check:
+          when code to instantiate an object is typed into the entry
+          representing a Parameter, if that object exists in main it
+          should be instantiated. Further, the display should NOT then
+          include quote marks.
+
+          (Only time should get quotation marks is when editing a
+          Parameter and trying to create an instance of a class that
+          hasn't been imported: then string is assumed, and quotes are
+          added - since it's not a StringParameter.)
+        """
+        exec "from topo.tests.testparametersframe import TestPO" in __main__.__dict__
+        w = self.f.representations['pa']['widget']
+        w.delete(0,"end")
+        w.insert(0,"TestPO()")
+        self.f.apply_button()
+        content = w.get()
+        self.assertEqual(type(self.f.pa),TestPO) # get the object?
+        self.assertEqual(content[0:7],"TestPO(") # object displayed right?
+        
+        
+        
+##         a new object is not created each time
+##         'Apply' is pressed if code to instantiate an object
+##         is present but doesn't change between presses.
+
+
             
 
     
