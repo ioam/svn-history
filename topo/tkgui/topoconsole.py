@@ -381,17 +381,16 @@ class TopoConsole(TkguiWindow):
         
         Label(run_frame,text='Run for: ').pack(side=LEFT)
         
-        run_for_var=StringVar()
-        run_for_var.set('1.0')
+        self.run_for_var=Tkinter.DoubleVar()
+        self.run_for_var.set(1.0)
 
-        self.run_for = TaggedSlider(run_frame,
-                                    variable=run_for_var,
-                                    tag_width=11,
-                                    slider_length=150,
-                                    min_value=0,max_value=20000,
-                                    resolution=0.1)
-        self.balloon.bind(self.run_for,"Duration to run the simulation, e.g. 0.0500, 1.0, or 20000.")
-        self.run_for.pack(side=LEFT,fill='x',expand=YES)
+        run_for = TaggedSlider(run_frame,
+                               variable=self.run_for_var,
+                               tag_width=11,
+                               slider_length=150,
+                               bounds=(0,20000))
+        self.balloon.bind(run_for,"Duration to run the simulation, e.g. 0.0500, 1.0, or 20000.")
+        run_for.pack(side=LEFT,fill='x',expand=YES)
 
         # When return is pressed, the TaggedSlider updates itself...but we also want to run
         # the simulation in this case.
@@ -777,17 +776,13 @@ class TopoConsole(TkguiWindow):
     def run_simulation(self):
         """
         Run the simulation for the duration specified in the
-        'run for' taggedslider.
-        
-        All this routine truly needs to do is
-        topo.sim.run(self.run_for.get_value()), but it adds other useful
-        features like periodically displaying the simulated and real
-        time remaining.
+        'run for' taggedslider.        
         """
         self.title(topo.sim.name) # ALERT: Temporary
 
-        fduration = self.run_for.get_value()
+        fduration = self.run_for_var.get()
 
+        # CB: clean up (+ docstring)
         # CEBALERT: that's just temporary
         if fduration>9: self.progress_window(self.progval,title="Running Simulation")
         self.stop_button.config(state=NORMAL) 
