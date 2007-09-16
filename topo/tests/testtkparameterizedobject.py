@@ -19,6 +19,9 @@ from topo.base.parameterclasses import BooleanParameter,Number,Parameter, \
                                        ObjectSelectorParameter,ClassSelectorParameter, \
                                        StringParameter
 from topo.base.patterngenerator import PatternGenerator
+from topo.base.sheet import Sheet
+
+
 import topo.patterns.basic
 from topo.patterns.basic import Gaussian        
 from topo.outputfns.basic import PiecewiseLinear
@@ -49,6 +52,9 @@ class SomeFrame(TkParameterizedObject,Frame):
 
     def upboocount(self):
         self.boocount+=1
+
+class TestPO(ParameterizedObject):
+    bool_param = BooleanParameter(default=False)
 
 
 
@@ -89,83 +95,36 @@ class TestTkParameterizedObject(unittest.TestCase):
         """
         Check shadowing of a PO's parameters.
         """
-        g = Gaussian()
-        f = SomeFrame(Toplevel(),extraPO=g)
+        t = TestPO()
+        f = SomeFrame(Toplevel(),extraPO=t)
         f.pack()
 
-        f.pack_param('x') # (from the Gaussian)
+        f.pack_param('bool_param') # (from the TestPO)
+        
+        # test that setting f.bool_param (where bool_param is
+        # shadow of t.bool_param) actually sets t.bool_param
+        self.assertEqual(t.bool_param,False) # so we know start state
+        f.bool_param=True
+        self.assertEqual(t.bool_param,True)
 
-        # (just so we know g.x doesn't start equal to 0.75)
-        g.x=0.1 
-        f.x=0.75
-        # test that setting f.x (where x is shadow of g.x) actually sets g.x
-        self.assertEqual(g.x,0.75) 
-
-        # simulate a GUI set & then and check g.x is set
-        f._tk_vars['x'].set(0.9)
-        self.assertEqual(g.x,0.9) 
+        # simulate a GUI set (typing then Return) & then and check
+        # g.bool_param is set
+        f._tk_vars['bool_param'].set(False)
+        self.assertEqual(t.bool_param,False) 
 
         # check that up-to-date value is returned when g got changed elsewhere
-        g.x=0.3
-        self.assertEqual(f.x,0.3) 
+        t.bool_param=True
+        self.assertEqual(f.bool_param,True) 
 
         # simulate a GUI get & check up-to-date value returned
-        g.x=0.4
-        self.assertEqual(f._tk_vars['x'].get(),0.4) 
-
-        # check that a method of this object can be called by on_change
-        self.z = 0
-        f.pack_param('boo',on_change=self.upzcount)
-        f.boo=True
-        self.assertEqual(self.z,1) 
-
-    def upzcount(self): self.z+=1  # minor helper method
-
-
-
-#### REMOVE ##############################################################################
-    def test_more_shadow(self):
-        """
-        Check shadowing of multiple POs' parameters.
-
-        Includes tests for handling of non-existent attributes.
-        """
-        g = Gaussian()
-        #p = PiecewiseLinear()
-        #o = OverlapPO()
-        
-        f = SomeFrame(Toplevel(),extraPO=g)  #  =[g,p,o]) # i.e. precedence is f,g,p,o
-        f.pack()
-
-##         f.pack_param('x') # from the Gaussian
-##         f.pack_param('size') # from the Gaussian
-##         f.pack_param('upper_bound') # from the PiecewiseLinear
-##         f.pack_param('notoverlap') # from the OverlapPO
-
-##         g.x = 0.1
-##         f.x = 0.7
-##         self.assertEqual(g.x,0.7) # test setting g.x via f.x 
-
-##         g.size=0.151515
-##         self.assertNotEqual(g.size,f.size) # because Frame has size attribute, g.size isn't accessible as f.size 
-
-##         f._tk_vars['size'].set(0.5)
-##         self.assertEqual(g.size,0.5) # GUI setting should be fine
-
-##         f.size=0.7
-##         self.assertEqual(g.size,0.7) # as in Python, a mistaken f.size=0.7 overwrites the method with a value
-
-
-##         f.notoverlap = 9
-##         self.assertEqual(o.x,0.0) # shouldn't have been set
-##         self.assertEqual(o.size,1.0) # shouldn't have been set
-##         self.assertEqual(o.notoverlap,9) # should have been set
+        t.bool_param=False
+        self.assertEqual(f._tk_vars['bool_param'].get(),False) 
 
 
         # CEB: the following doesn't work:
         #  self.assertRaises(AttributeError,f.does_not_exist)
-        # An AttributeError *is* raised, but it doesn't seem to be caught by testing mechanism!
-        # Below is equivalent test...
+        # An AttributeError *is* raised, but it doesn't seem to be
+        # caught by testing mechanism. Below is equivalent test...
         try:
             f.does_not_exist
         except AttributeError:
@@ -176,8 +135,39 @@ class TestTkParameterizedObject(unittest.TestCase):
         f.did_not_exist = 9
         assert 'did_not_exist' in f.__dict__ # check that new attribute added to f's dict...
         self.assertEqual(f.did_not_exist,9)  # ...and that it was set
-#### REMOVE ##############################################################################
 
+
+
+
+
+    def test_on_change(self):
+
+        f = SomeFrame(Toplevel())
+
+        self.z = 0
+        f.pack_param('boo',on_change=self.upzcount)
+        f.boo=True
+        self.assertEqual(self.z,1)
+        
+        f._tk_vars['boo'].set(True)
+        self.assertEqual(self.z,2)
+
+
+    def test_on_modify(self):
+
+        f = SomeFrame(Toplevel(),boo=True)
+
+        self.z = 0
+        f.pack_param('boo',on_modify=self.upzcount)
+
+        f._tk_vars['boo'].set(True)
+        self.assertEqual(self.z,0)
+        
+        f._tk_vars['boo'].set(False)
+        self.assertEqual(self.z,1)
+        
+
+    def upzcount(self): self.z+=1  # minor helper method
         
 
 
@@ -224,40 +214,63 @@ class TestParameterTypeRepresentations(unittest.TestCase):
 
 
     def test_number_parameter(self):
+
+        self.f.pack_param('nu')
+        
         nu_param = self.f.get_parameter_object('nu')
         nu_tkvar = self.f._tk_vars['nu']
+        nu_widget = self.f.representations['nu']['widget']
         
-        self.f.pack_param('nu')
+        # check standard gui setting (includes resolution test)
+        self.f.nu = 0.1
+        nu_tkvar.set(0.9999999)
+        self.f.update_idletasks()
+        nu_widget._tag_press_return()
+        self.assertEqual(self.f.nu,0.9999999)
 
-        # check gui setting
+        # ...and check the slider moved
+        self.assertEqual(nu_widget.slider.get(),0.9999999)
+
+        # check setting the slider
+        # CB: note that we can't test actually moving the
+        # slider with the mouse...
+        nu_widget.slider.set(0.8)
+        nu_widget._slider_used()
+        self.assertEqual(self.f.nu,0.8)        
+        self.assertEqual(nu_widget.slider.get(),0.8)
+        self.assertEqual(nu_widget.tag.get(),'0.8')
+        self.assertEqual(nu_tkvar.get(),0.8)
+
+        # now make immediate and test that
+        self.f.param_immediately_apply_change[Number]=True        
         self.f.nu = 0.1
         nu_tkvar.set(0.4)
         self.assertEqual(self.f.nu,0.4)
+
+        self.f.param_immediately_apply_change[Number]=False
 
         # check gui getting
         self.f.nu = 0.2
         self.assertEqual(nu_tkvar.get(),0.2)
 
-        # try to gui set beyond the 1 upper bound
+        # try to set tag beyond the 1 upper bound
         nu_tkvar.set(40.0)
-        self.assertEqual(self.f.nu,1)
-
-        # check actual typing
-        w = self.f.representations['nu']['widget'].tag
-        w.delete(0,"end")
-        w.insert(0,0.005)
-        self.assertEqual(self.f.nu,0.005)
+        nu_widget._tag_press_return()
+        self.assertEqual(self.f.nu,1) # stays at old value
 
         # check we can retrieve a value from main
         __main__.__dict__['testA'] = 0.075
-        w.delete(0,"end")
-        w.insert(0,"testA")
+        nu_widget.tag.delete(0,"end")
+        nu_widget.tag.insert(0,"testA")
+        nu_widget._tag_press_return()
         self.assertEqual(self.f.nu,0.075)
+        self.assertEqual(nu_widget.tag.get(),'0.075') # we overwrite display
 
         # check we can do some basic maths
         exec "from math import sin,pi" in __main__.__dict__
-        w.delete(0,"end")
-        w.insert(0,"sin(pi)")
+        nu_widget.tag.delete(0,"end")
+        nu_widget.tag.insert(0,"sin(pi)")
+        nu_widget._tag_press_return()
         from math import sin,pi
         self.assertAlmostEqual(self.f.nu,sin(pi))
         
@@ -389,7 +402,6 @@ class TestParameterTypeRepresentations(unittest.TestCase):
 
 
 ###########################################################
-
 
 cases = [TestTkParameterizedObject,TestParameterTypeRepresentations]
 
