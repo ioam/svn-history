@@ -158,92 +158,104 @@ class TkguiWindow(Tkinter.Toplevel):
      
 
 ######################################################################
+import copy
+import operator
 import Tkinter
 from decimal import Decimal
 class TaggedSlider(Tkinter.Frame):
     """
     Widget for manipulating a numeric value using either a slider or a
     text-entry box, keeping the two values in sync.
+
+    Generates a number of Events:
+
+    <<TagFocusOut>>  - tag loses focus
+    <<TagReturn>>    - Return pressed in tag
+    <<SliderSet>>    - slider is clicked/dragged
     """
-    # change min_value and max_value in callers to bounds
-    def __init__(self,master,variable,min_value=0,max_value=1,resolution=0.001,slider_length=100,
-                 tag_width=10,
+    def __init__(self,master,variable,bounds=(0,1),
+                 slider_length=100,tag_width=10,
                  tag_extra_config={},slider_extra_config={}):
         """
+        On clicking or dragging the slider, the tag value is set
+        to the slider's value.
 
+        On pressing Return in or moving focus from the tag, the slider
+        value is set, but also:
+        
+        * the range of the slider is adjusted (e.g. to fit a larger
+          max value)
 
-        On pressing Return in the tag, the slider value is set, but also:
-        * the range of the slider is adjusted (e.g. to fit in a larger max value)
-        * the resolution of the slider is adjusted based on the precision of the
-          value in the tag (e.g. 1 in the tag results in integer steps for the slider,
-          whereas 0.0001 in the tag results in a resolution of 10^-4
+        * the resolution of the slider is adjusted based on the
+          the value in the tag (e.g. 0.01 in the tag gives a
+          resolution of 0.01), also taking into account the precision
+          of the value in the tag (e.g. 0.0100 gives a resolution
+          of 0.0001).
         """
-
-        ## CB: set resolution from range
-
-
+        # CEBALERT: ...although respecting the precision isn't always
+        # helpful because the slider can still have a limited
+        # resolution anyway (from its length and the range, given the
+        # size of a pixel...)
         Tkinter.Frame.__init__(self,master)
 
-        self.variable=variable
-        
-        self.tag = Tkinter.Entry(self,textvariable=variable,width=tag_width,
-                           **tag_extra_config)
-        self.tag.pack(side='left')
-        self.tag.bind('<Return>', self.tag_changed)  
-        self.tag.bind('<FocusOut>', self.tag_changed)
+        self.variable= variable
+        self.bounds = bounds
 
-        self.slider_variable = Tkinter.DoubleVar()
-        self.slider_variable.trace_variable('w',self.slider_changed)        
-        
-        self.slider = Tkinter.Scale(self,variable=self.slider_variable,
-                    from_=min_value,to=max_value,resolution=resolution,
+        self.tag = Tkinter.Entry(self,textvariable=self.variable,
+                                 width=tag_width,**tag_extra_config)
+        self.tag.pack(side='left')
+        self.tag.bind('<Return>', self._tag_press_return)  
+        self.tag.bind('<FocusOut>', self._tag_focus_out)
+
+        # no variable: we control the slider ourselves
+        self.slider = Tkinter.Scale(self,variable=None,
+                    from_=self.bounds[0],to=self.bounds[1],
                     showvalue=0,orient='horizontal',length=slider_length,
                     **slider_extra_config)
-        self.bounds = (min_value,max_value)
+        
         self.slider.pack(side='right')
+        self.slider.bind('<ButtonRelease-1>', self._slider_used)
+        self.slider.bind('<B1-Motion>', self._slider_used)
 
-        self.tag_changed() # ensure slider matches on widget creation
+        self.tag_set()
 
 
-    def slider_changed(self,*args,**opts):
-        self.variable.set(self.slider_variable.get())
+    def tag_set(self):
+        """
+        After entering a value into the tag, this method should be
+        called to set the slider correctly.
 
-    def tag_changed(self,event=None):
-        val = self.variable.get()
+        (Called automatically for tag's <Return> and <FocusOut>
+        events.)
+        """
+        # Set slider resolution. This is important because
+        # we want the slider to be positioned at the exact
+        # tag value.
+        self._try_to_set_slider_resolution()
+        self._try_to_set_slider()
 
-        # CB: temporary
-        # if something strange has been typed in, don't
-        # set the slider etc
-        try:
-            float_val = float(val)
-        except ValueError:
-            return
-            
-        self.set_bounds(min(self.bounds[0],float_val),
-                        max(self.bounds[1],float_val))
-                        
-        self.slider_variable.set(float_val)
-        # how to find n. dp simply? I just happened to know the
-        # Decimal module...
-        p = Decimal(str(val)).as_tuple()[2]
-        self.slider['resolution']=10**p
 
-    def refresh(self):
-        self.tag_changed()
-
-    def set_bounds(self,min_val,max_val,refresh=None):
-        self.bounds = (min_val,max_val)
-        self.slider.config(from_=min_val,to=max_val)
-
+    def set_slider_bounds(self,lower,upper):
+        """
+        Set new lower and upper bounds for the slider.
+        """
+        self.bounds = (lower,upper)
+        self.slider.config(from_=lower,to=upper)
+    set_bounds = set_slider_bounds
+        
+                     
     def config(self,**options):
         """
         TaggedSlider is a compound widget. In most cases, config
         options should be passed to one of the component widgets
-        (i.e. the tag or the slider). Some options, however, should
-        be applied to both.
+        (i.e. the tag or the slider). For some options, however,
+        we need to handle them being set on the widget as a whole;
+        further, some of these should be applied to both component
+        widgets, but some should just be applied to one.
 
-        Options applied to both:
-        * state
+        Options handled:
+        * state (applied to both)
+        * background, foreground (applied to tag only)
         """
         if 'state' in options:
             self.tag['state']=options['state']
@@ -257,12 +269,106 @@ class TaggedSlider(Tkinter.Frame):
             del options['foreground']
         if len(options)>0:
             raise NotImplementedError(
-                """Only state, background, and foreground options are currently supported for this widget;
-                set options on either the component tag or slider instead.""")
+                """Only state, background, and foreground options are
+                currently supported for this widget; set options on
+                either the component tag or slider instead.""")
 
-    # for matching old callers: should be removed
-    def get_value(self):
-        return float(self.variable.get())
+
+
+    # CEBALERT: three different events for max. flexibility...but
+    # often a user will just want to know if the value was set. Could
+    # also generate a "<<TaggedSliderSet>>" event each time, which a
+    # user could just look for. Or could these events all be children
+    # of a <<TaggedSliderSet>>?
+    def _slider_used(self,event=None):
+        self.variable.set(self.slider.get())
+        self.event_generate("<<SliderSet>>")
+
+
+    def _tag_press_return(self,event=None):
+        self.event_generate("<<TagReturn>>")
+        self.tag_set()
+
+
+    def _tag_focus_out(self,event=None):
+        self.event_generate("<<TagFocusOut>>")
+        self.tag_set()        
+
+
+    def _set_slider_resolution(self,value):
+        # CEBALERT: how to find n. dp simply?
+        p = Decimal(str(value)).as_tuple()[2]
+        self.slider['resolution']=10**p
+
+
+    def _try_to_set_slider_resolution(self):
+        try:
+            # 1st choice is to get the actual number in the box:
+            # allows us to respect user-entered resolution
+            # (e.g. 0.010000) 
+            self._set_slider_resolution(self.tag.get())
+            return True
+        except: # probably tclerror
+            try:
+                # ...but that might have been text.  2nd choice is to
+                # get the value from the variable (e.g. 0.01)
+                self._set_slider_resolution(self.variable.get())
+                return True
+            except: # probably tclerror
+                return False # can't set a new resolution
+
+
+    def _try_to_set_slider(self):
+        """
+        expand bounds if necessary
+        """
+        tagvar_val = self.variable.get()
+        
+        if operator.isNumberType(tagvar_val):
+            self.set_slider_bounds(min(self.bounds[0],tagvar_val),
+                                   max(self.bounds[1],tagvar_val))
+            self.slider.set(tagvar_val)
+            return True
+        else:
+            return False
+
+
+
+
+
+# CB: haven't decided what to do. Might be temporary.
+class TkPOTaggedSlider(TaggedSlider):
+    """
+    Adds extra ability to set slider when e.g. a variable
+    name is in the tag.
+    """
+    def _try_to_set_slider_resolution(self):
+        if not TaggedSlider._try_to_set_slider_resolution(self):
+            # get the actual value as set on
+            # the object (which might be the "last good" value)
+            try:
+                self._set_slider_resolution(self.variable._true_val())
+            except: # probably tclerror
+                pass
+
+
+    def _try_to_set_slider(self):
+        if not TaggedSlider._try_to_set_slider(self):
+            v = self.variable._true_val()
+
+            if operator.isNumberType(v):
+                self.set_slider_bounds(min(self.bounds[0],v),
+                                       max(self.bounds[1],v))
+                self.slider.set(v)
+
+    
+    def refresh(self):
+        """Could anything survive in tkgui without a refresh() method?"""
+        self.tag_set()
+
+
+
+    
 
 ######################################################################
         
