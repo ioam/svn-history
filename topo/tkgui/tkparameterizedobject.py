@@ -105,7 +105,7 @@ from topo.base.parameterclasses import BooleanParameter,StringParameter, \
 
 from topo.misc.utils import eval_atof
 
-from tkguiwindow import TaggedSlider
+from tkguiwindow import TkPOTaggedSlider
 
 
 
@@ -340,9 +340,15 @@ class TkParameterizedObjectBase(ParameterizedObject):
         complete change can be instantaneous (e.g. when dragging a
         slider for a number, the change at each instant should be
         applied). Others, such as Parameter, are represented with
-        widgets that do not finish their changes instantaneously:
-        entry into a text box is not be considered finished until
-        Return is pressed.
+        widgets that do not finish their changes instantaneously
+        (e.g. entry into a text box is not be considered finished
+        until Return is pressed).
+
+        (Note that in the various dictionaries above, the entry for
+        Parameter serves as a default, since keys are looked up by
+        class, so any Parameter type not specifically listed will be
+        covered by the Parameter entry.)
+        
 
         * obj2str_fn & str2obj_fn
 
@@ -352,7 +358,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         * _tk_vars
 
         
-        """        
+        """
         assert extraPO is None \
                or isinstance(extraPO,ParameterizedObjectMetaclass) \
                or isinstance(extraPO,ParameterizedObject)
@@ -376,7 +382,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # Parameters not be updated immediately.
         self.param_immediately_apply_change = {BooleanParameter:True,
                                                SelectorParameter:True,
-                                               Number:True,
+                                               Number:False,
                                                Parameter:False}
 
         self.obj2str_fn = {
@@ -467,6 +473,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         # overwrite Variable's set() with one that will handle transformations to string
         tk_var._original_set = tk_var.set
+        #tk_var._original_set_untraced = lambda v,x=name: self._untraced_set_tk_val
         tk_var.set = lambda v,x=name: self._set_tk_val(x,v)
 
         tk_var.set(getattr(PO,name))
@@ -481,6 +488,14 @@ class TkParameterizedObjectBase(ParameterizedObject):
         tk_var._original_get = tk_var.get
         tk_var.get = lambda x=name: self._get_tk_val(x)
 
+        tk_var._true_val = lambda x=name: self.get_parameter_value(x)
+        
+
+##     def _set_tk_val_untraced(self,param_name,val): #set_slider_variable_without_trace(self,v):
+##         tkvar = self._tk_vars[param_name]
+##         tkvar.trace_vdelete(*tkvar.trace_vinfo()[0])
+##         tkvar._original_set(val)
+##         tkvar.trace_variable('w',lambda a,b,c,p_name=param_name: self._update_param_1(p_name))
 
 
     def _set_tk_val(self,param_name,val):
@@ -489,19 +504,18 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
         val = self.object2string_ifrequired(param_name,val)
         tk_var = self._tk_vars[param_name]
-        tk_var._original_set(val)
+        tk_var._original_set(val) # trace not called because we're already in trace,
+                                  # and tk disables trace activation during trace
 
     def _get_tk_val(self,param_name):
         """
         Before returning a tk variable's value, ensure it's up to date. 
         """
         tk_var = self._tk_vars[param_name]
-        tk_val = tk_var._original_get()
+        tk_val = tk_var._original_get() 
         po_val = self.get_parameter_value(param_name)
 
-        # CEBALERT: not sure why I don't do the translation - should become
-        # clear during cleanup
-        po_stringrep = po_val #self.object2string_ifrequired(param_name,po_val)
+        po_stringrep = self.object2string_ifrequired(param_name,po_val)
 
         # update translators, too, in case there's been external update
         param = self.get_parameter_object(param_name)
@@ -537,6 +551,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
         tk_var = self._tk_vars[param_name]
 
         # tk_var could be ahead of parameter
+
+        
         val = self.string2object_ifrequired(param_name,tk_var._original_get())
 
 
@@ -566,8 +582,11 @@ class TkParameterizedObjectBase(ParameterizedObject):
                         return ########### HIDDEN!
 
                     ## use set_in_bounds if it exists: i.e. users of widgets get their
+                    
                     ## values cropped (no warnings/errors)
                     if hasattr(parameter,'set_in_bounds') and isinstance(po,ParameterizedObject): # CEBHACKALERT: set_in_bounds not valid for POMetaclass?
+                        # note that using set_in_bounds silently crops (so e.g. a string
+                        # in a tagged slider just goes to a number)
                         parameter.set_in_bounds(po,val)
                     else:
                         #try:
@@ -575,6 +594,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                         #except Exception, inst:
                         #    m = param_name+": "+str(sys.exc_info()[0])[11::]+" ("+str(inst)+")"
                         #    return
+
 
                     # CEBALERT: now I've added on_modify, need to go through and rename
                     # on_change and decide whether each use should be for alteration of 
@@ -590,6 +610,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                     if lookup_by_class(self.param_has_modifyable_choices,
                                        type(parameter)):
                         self._update_translator(param_name,parameter)
+
 
                     return ########### HIDDEN!
 
@@ -888,9 +909,10 @@ class TkParameterizedObjectBase(ParameterizedObject):
             # because SheetMask is just a Parameter, it does get set to the string
             # "SheetMask()". Were it a Parameter only accepting SheetMasks, then
             # an error would be correctly raised by the Parameter itself.
+
+        
         return obj
     
-    converta = string2object_ifrequired  #CB: old method name - remove when unused
 
 
     def convert_string2obj(self,param_name,string):
@@ -903,10 +925,17 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 obj = string2obj_fn(string)
                 #topo.guimain.status_message("OK: %s -> %s"%(string,obj))
                 topo.guimain.status_message("OK")
+                # CEBALERT: setting colors like this is a hack: need some
+                # general method. Also this conflicts with tile.
+                if hasattr(self,'representations') and param_name in self.representations:
+                    self.representations[param_name]['widget'].config(background="white")
             except Exception, inst:
                 m = param_name+": "+str(sys.exc_info()[0])[11::]+" ("+str(inst)+")"
                 topo.guimain.status_message(m)
                 obj = string
+
+                if hasattr(self,'representations') and param_name in self.representations:
+                    self.representations[param_name]['widget'].config(background="red")
             return obj
         else:
             obj=string
@@ -1045,6 +1074,15 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             label = None
         else:
             label = Tkinter.Label(master,text=self.pretty_print(name))
+
+        # disable widgets for constant params
+        param,location = self.get_parameter_object(name,with_location=True)
+        if param.constant and isinstance(location,ParameterizedObject):
+            # (need to be able to set on class, hence location)
+            widget.config(state='disabled')
+
+        # will be ok until we need something other than return, then
+        # will have to go to one of the specific methods
         
         return widget,label
 
@@ -1081,13 +1119,26 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     
 
     def _create_number_widget(self,frame,name,widget_options):
-        widget = TaggedSlider(frame,variable=self._tk_vars[name],**widget_options)
+        widget = TkPOTaggedSlider(frame,variable=self._tk_vars[name],**widget_options)
         param = self.get_parameter_object(name)
 
         lower_bound,upper_bound = param.get_soft_bounds()
         if upper_bound is not None and lower_bound is not None:
             # CEBALERT: TaggedSlider.set_bounds() needs BOTH bounds (neither can be None)
             widget.set_bounds(lower_bound,upper_bound) # assumes set_bounds exists on the widget
+
+        param = self.get_parameter_object(name)
+        if not lookup_by_class(self.param_immediately_apply_change,type(param)):
+            #widget.update_command = lambda e=None,x=name:self.junk(x)
+            
+            widget.bind('<<TagReturn>>', lambda e=None,x=name: self.junk(x))
+            widget.bind('<<TagFocusOut>>', lambda e=None,x=name: self.junk(x))
+            widget.bind('<<SliderSet>>', lambda e=None,x=name: self.junk(x))
+            
+            #widget.bind('<<TaggedSliderSet>>', lambda e=None,x=name: self.junk(x))
+            # also bind focus out
+
+
         return widget
 
 
@@ -1096,18 +1147,15 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         
     def _create_string_widget(self,frame,name,widget_options):
-        w = Entry(frame,textvariable=self._tk_vars[name],**widget_options)
+        widget = Entry(frame,textvariable=self._tk_vars[name],**widget_options)
 
-        param,location = self.get_parameter_object(name,with_location=True)
-
+        param = self.get_parameter_object(name)
         if not lookup_by_class(self.param_immediately_apply_change,type(param)):
-            w.bind('<Return>', lambda e=None,x=name: self.junk(x))  
-        
-        if param.constant and isinstance(location,ParameterizedObject): # need to be able to set on class
-            w['state']='readonly' 
-            w['fg']='gray45'
-            
-        return w
+            widget.bind('<Return>', lambda e=None,x=name: self.junk(x))            
+            # also bind focus out
+
+        return widget
+
 #################################
 
 
