@@ -163,6 +163,8 @@ class ConnectionFieldsPanel(CFPGPanel):
         self.pack_param('x',parent=self.control_frame_3,on_change=self.make_plots)
         self.pack_param('y',parent=self.control_frame_3,on_change=self.make_plots)
 
+        self.sheet_change()
+
 
 
 
