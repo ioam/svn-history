@@ -274,6 +274,15 @@ class TaggedSlider(Tkinter.Frame):
                 either the component tag or slider instead.""")
 
 
+    def get(self):
+        """
+        Calls the tag's get() method.
+
+        Helps to match behavior of other Tkinter Widgets.
+        """
+        return self.tag.get()
+
+
 
     # CEBALERT: three different events for max. flexibility...but
     # often a user will just want to know if the value was set. Could
