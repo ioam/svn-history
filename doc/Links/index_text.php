@@ -76,11 +76,13 @@ scaling equations that underlie Sheet coordinates
    much smaller networks.  Note that there are now (3/2007) Python
    bindings for Neuron, so it should be practical to wrap a Neuron
    simulation into a Topographica Sheet for analysis.<BR><BR>
+
   <dt><A TARGET="_top" HREF="http://askja.bu.edu/catacomb">Catacomb</A></dt>
   <dd>Highly graphical Java-based simulator covering numerous levels,
     from ion channels to behavioral experiments.  Can be used for some
     of the same types of models supported by Topographica, but does
     not have an explicit focus on topographically organized areas.<BR><BR>
+
   <dt><A TARGET="_top" HREF="http://www.nest-initiative.org">NEST</A></dt>
   <dd>NEST (formerly called BLISS) is a general-purpose simulator for
     large networks of neurons, but without an explicit focus on
@@ -99,6 +101,7 @@ scaling equations that underlie Sheet coordinates
     <A HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107?subject=Interface%20from%20NEST%20to%20Topographica">Jim</a>
     for more details if you are interested.
     <BR><BR>
+
   <dt><A TARGET="_top" HREF="http://ilab.usc.edu/toolkit/documentation.shtml">iNVT</A></dt>
   <dd>iLab Neuromorphic Vision Toolkit is a high-performance
     computer-vision oriented C++ toolkit from Koch and Itti with support
@@ -107,6 +110,18 @@ scaling equations that underlie Sheet coordinates
     abstraction, and without specific support for learning and
     development.  It also requires more time-consuming and less
     flexible development in C++.<BR><BR>
+
+  <dt><A TARGET="_top" HREF="http://grey.colorado.edu/emergent/index.php/Main_Page">Emergent</A></dt>
+  <dd>Formerly called PDP++, Emergent focuses on simulating neural
+    networks of various types, for either engineering or cognitive
+    science applications.  Although there is support for networks
+    arranged as maps (e.g. Kohonen SOMs), the interface is designed to
+    make the influence of individual units clear, which is not
+    typically useful for analyzing maps.  In any case, Emergent has
+    less emphasis on simulating biological experiments and brain
+    tissue than does Topographica, instead concentrating on more
+    abstract systems that perform specific tasks.<BR><BR>
+
   <dt><A TARGET="_top" HREF="http://www.cs.cmu.edu/~dr/Lens">LENS</A></dt>
   <dd>Simple, basic artificial neural-network simulator (primarily
     abstract backpropagation networks, but also has support for
