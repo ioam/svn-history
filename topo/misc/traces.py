@@ -11,16 +11,15 @@ $Id$
 """
 __version__ = '$Revision$'
 
-from numpy import array
+from numpy import array,asarray
 
 import bisect
 
 from topo.base.simulation import EventProcessor
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Number,StringParameter,DictParameter
+from topo.base.parameterclasses import Number,StringParameter,DictParameter,BooleanParameter
 from topo.base.parameterclasses import Integer,CompositeParameter,Parameter
 from topo.misc.utils import Struct
-
 
 class DataRecorder(EventProcessor):
     """
@@ -332,6 +331,16 @@ class TraceGroup(ParameterizedObject):
     trace specifications are stored in the attribute self.traces,
     which can be modified at any time.
     """
+
+
+    hspace = Number(default=0.6,doc="""
+       Height spacing adjustment between plots.  Larger values
+       produce more space.""")
+
+    time_axis_relative = BooleanParameter(default=False,doc="""
+       Whether to plot the time-axis tic values relative to the start
+       of the plotted time range, or in absolute values.""")
+
     
     def __init__(self,recorder,traces=[],**params):
         super(TraceGroup,self).__init__(**params)
@@ -355,16 +364,7 @@ class TraceGroup(ParameterizedObject):
         rows = len(self.traces)
         tstart,tend = times
         
-        if tstart is None:
-            tstart = 0
-            
-        if tend is None:
-            # JPALERT: This should be coded more generally,
-            # but this is the basic behavior we want, I think.
-            tend = self.recorder.simulation.time()
-            
-        pylab.subplots_adjust(hspace=0.6)
-        
+        pylab.subplots_adjust(hspace=self.hspace)
         for i,trace in enumerate(self.traces):
             # JPALERT: The TraceGroup object should really create its
             # own matplotlib.Figure object and always plot there
@@ -374,8 +374,9 @@ class TraceGroup(ParameterizedObject):
             pylab.title(trace.name)
             time,data = self.recorder.get_data(trace.data_name,times=times,fill_range=True)
             y = trace(data)
+            if self.time_axis_relative:
+                time = asarray(time) - time[0]
             pylab.plot(time,y,**trace.plotkw)
             ymin,ymax = trace.get_ybounds(y)
-            pylab.axis(xmin=tstart,xmax=tend,ymin=ymin,ymax=ymax)        
-
-    
+            pylab.axis(xmin=time[0],xmax=time[-1],ymin=ymin,ymax=ymax)        
+            
