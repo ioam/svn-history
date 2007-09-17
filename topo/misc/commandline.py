@@ -59,6 +59,8 @@ class CommandPrompt(object):
     format = simtime_format
 
     def __str__(self): return str(eval(self.format,__main__.__dict__))
+    def split(self,*args):
+        return str(self).split(*args)
 
 class CommandPrompt2(CommandPrompt):
     """
