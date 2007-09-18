@@ -103,7 +103,7 @@ class TestParametersFrame(unittest.TestCase):
     def test_apply_button_2(self):
         """
         Check:
-          when code to instantiate an object is typed into the entry
+          When code to instantiate an object is typed into the entry
           representing a Parameter, if that object exists in main it
           should be instantiated. Further, the display should NOT then
           include quote marks.
@@ -112,6 +112,9 @@ class TestParametersFrame(unittest.TestCase):
           Parameter and trying to create an instance of a class that
           hasn't been imported: then string is assumed, and quotes are
           added - since it's not a StringParameter.)
+
+          Finally, check that when the string remains the same in a box
+          that a new object is not instantiated each time Apply is pressed.
         """
         exec "from topo.tests.testparametersframe import TestPO" in __main__.__dict__
         w = self.f.representations['pa']['widget']
@@ -121,13 +124,21 @@ class TestParametersFrame(unittest.TestCase):
         content = w.get()
         self.assertEqual(type(self.f.pa),TestPO) # get the object?
         self.assertEqual(content[0:7],"TestPO(") # object displayed right?
-        
-        
-        
-##         a new object is not created each time
-##         'Apply' is pressed if code to instantiate an object
-##         is present but doesn't change between presses.
 
+        # Now check that pressing apply over and over does not
+        # create a new object each time when the same string remains
+        # in the widget 
+        testpo_id = id(self.f.pa)
+        self.f.apply_button()
+        self.f.apply_button()
+        self.assertEqual(id(self.f.pa),testpo_id)
+        # ...but that we do get a new object when the string really changes
+        w.delete(0,"end")
+        w.insert(0,"TestPO(name='fred')")
+        self.f.apply_button()
+        self.assertNotEqual(id(self.f.pa),testpo_id)
+        
+        
 
             
 
