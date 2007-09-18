@@ -21,9 +21,10 @@ $Id$
 """
 __version__ = '$Revision$'
 
-from numpy import dot,sin,cos,pi,array,argmax,nonzero,take
+from numpy import dot,sin,cos,pi,array,asarray,argmax,nonzero,take,random
 
 from topo.base.cf import CFSheet
+from topo.base.simulation import PeriodicEventSequence,FunctionEvent
 from topo.sheets.generatorsheet import SequenceGeneratorSheet
 from topo.base.parameterclasses import Number,Magnitude,CallableParameter,BooleanParameter
 from topo.base.boundingregion import BoundingBox,BoundingRegionParameter
@@ -187,48 +188,32 @@ class ShiftingGeneratorSheet(SequenceGeneratorSheet):
     generate_on_shift = BooleanParameter(default=True,doc="""
        Whether to generate a new pattern when a shift occurs.""")
                                          
+    fixation_jitter = Number(default=0,doc="""
+       Standard deviation of Gaussian fixation jitter.""")
+    fixation_jitter_period = Number(default=10,doc="""
+       Period, in time units, indicating how often the eye jitters.
+       """)
 
     dest_ports = ["Trigger","Saccade"]
     src_ports = ['Activity','Position']
 
+    def __init__(self,**params):
+        super(ShiftingGeneratorSheet,self).__init__(**params)
+        self.fixation_point = self.bounds.centroid()
+
+    def start(self):
+        super(ShiftingGeneratorSheet,self).start()
+        now = self.simulation.time()
+        refix_event = PeriodicEventSequence(now+self.fixation_jitter_period,
+                                            self.fixation_jitter_period,
+                                            [FunctionEvent(0,self.refixate)])
+        self.simulation.enqueue_event(refix_event)
 
     def input_event(self,conn,data):
         if conn.dest_port == 'Saccade':
-
-            # JPALERT:  Right now this method assumes that we're doing
-            # colliculus-style saccades. i.e. amplitude and direction
-            # relative to the current position.  Technically it would
-            # not be hard to also support absolute or relative x,y
-            # commands, and select what style to use with either with
-            # a parameter, or with a different input port (e.g. 'xy
-            # relative', 'xy absolute' etc.
-
-            # JPHACKALERT: Currently there is no support for the fact
-            # that saccades actually take time, and larger amplitudes
-            # take more time than small amplitudes.  No clue if we
-            # should do that, or how, or what gets sent out while the
-            # saccade "eye" is moving.
-            
-            assert not self._out_of_bounds()
-
             # the data should be (amplitude,direction)
             amplitude,direction = data
-
-            # 4. convert the command to x/y translation
-            radius = amplitude/self.visual_angle_scale
-
-            # if the amplitude is negative, negate the direction (so up is still up)
-            if radius < 0.0:
-                direction *= -1
-
-            self._shift(radius,direction)
-
-            if self._out_of_bounds():
-                self._find_saccade_in_bounds(radius,direction)
-
-            if self.generate_on_shift:
-                self.generate()
-
+            self.shift(amplitude,direction)
 
     def generate(self):
         super(ShiftingGeneratorSheet,self).generate()
@@ -236,7 +221,74 @@ class ShiftingGeneratorSheet(SequenceGeneratorSheet):
                          data=self.bounds.aarect().centroid())
         
 
-    def _shift(self,radius,angle):
+    def shift(self,amplitude,direction,generate=None):
+        """
+        Shift the bounding box by the given amplitude and
+        direction.
+
+        Amplitude and direction are specified in degrees, and will be
+        converted using the sheet's visual_angle_scale
+        parameter. Negative directions are always downward, regardless
+        of whether the amplitude is positive (rightword) or negative
+        (leftward).  I.e. straight-down = -90, straight up = +90.
+
+        The generate argument indicates whether or not to generate
+        output after shifting.  If generate is None, then the value of
+        the sheet's generate_on_shift parameter will be used.
+        """
+        
+        # JPALERT:  Right now this method assumes that we're doing
+        # colliculus-style saccades. i.e. amplitude and direction
+        # relative to the current position.  Technically it would
+        # not be hard to also support absolute or relative x,y
+        # commands, and select what style to use with either with
+        # a parameter, or with a different input port (e.g. 'xy
+        # relative', 'xy absolute' etc.
+
+        # JPHACKALERT: Currently there is no support for modeling the
+        # fact that saccades actually take time, and larger amplitudes
+        # take more time than small amplitudes.  No clue if we should
+        # do that, or how, or what gets sent out while the saccade
+        # "eye" is moving.
+
+        assert not self._out_of_bounds()
+
+        # convert the command to x/y translation
+        radius = amplitude/self.visual_angle_scale
+
+        # if the amplitude is negative, negate the direction (so up is still up)
+        if radius < 0.0:
+            direction *= -1
+
+        self._translate(radius,direction)
+
+        if self._out_of_bounds():
+            self._find_saccade_in_bounds(radius,direction)
+
+        self.fixation_point = self.bounds.centroid()
+        
+        if generate is None:
+            generate = self.generate_on_shift
+            
+        if generate:
+            self.generate()
+
+    def refixate(self):
+        """
+        Move the bounds toward the fixation point.
+
+        Moves the bounds toward the fixation point specified in
+        self.fixation_point, potentially with noise as specified by
+        the parameter self.fixation_jitter.
+        """
+        self.debug("Refixating.")
+        if self.fixation_jitter > 0 or alltrue(self.bounds.centroid != self.fixation_point):
+            fix = asarray(self.fixation_point)
+            pos = asarray(self.bounds.centroid())
+            refix_vec = (fix - pos) + random.normal(0,self.fixation_jitter,(2,))
+            self.bounds.translate(*refix_vec)
+
+    def _translate(self,radius,angle):
         angle *= pi/180
         xoff = radius * cos(angle)
         yoff = radius * sin(angle)
@@ -270,16 +322,16 @@ class ShiftingGeneratorSheet(SequenceGeneratorSheet):
 
         # Assume we're starting out of bounds, so start by shifting
         # back to the original position        
-        self._shift(-radius,theta)
+        self._translate(-radius,theta)
 
         while not self._out_of_bounds():
             radius *= 0.5
-            self._shift(radius,theta)
+            self._translate(radius,theta)
 
         radius = -radius
         while self._out_of_bounds():
             radius *= 0.5
-            self._shift(radius,theta)
+            self._translate(radius,theta)
 
 
 
