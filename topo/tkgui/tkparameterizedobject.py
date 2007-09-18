@@ -339,14 +339,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
         can't be changed once created (e.g. OptionMenu), and some
         parameters have a fixed set of options (e.g. Boolean).
         
-        * param_immediately_apply_change
-        Some types of Parameter are represented with widgets where a
-        complete change can be instantaneous (e.g. when dragging a
-        slider for a number, the change at each instant should be
-        applied). Others, such as Parameter, are represented with
-        widgets that do not finish their changes instantaneously
-        (e.g. entry into a text box is not be considered finished
-        until Return is pressed).
 
         (Note that in the various dictionaries above, the entry for
         Parameter serves as a default, since keys are looked up by
@@ -378,16 +370,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
         self.param_has_modifyable_choices = {BooleanParameter:False,
                                              SelectorParameter:False,
                                              Parameter:True}
-
-        # CEBALERT: really, this should be in TkParameterizedObject.
-        # All changes should be instantaneous here, and
-        # TkParameterizedObject (which has the concept of widgets)
-        # should override the _update_param method to have some
-        # Parameters not be updated immediately.
-        self.param_immediately_apply_change = {BooleanParameter:True,
-                                               SelectorParameter:True,
-                                               Number:False,
-                                               Parameter:False}
 
         self.obj2str_fn = {
             StringParameter: None,
@@ -544,7 +526,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
             return False
 
 
-    def _update_param(self,param_name,force=False):
+    def _update_param(self,param_name):
         """
         Attempt to set the parameter represented by param_name to the
         value of its corresponding Tkinter Variable.
@@ -555,27 +537,11 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         (Called by the Tkinter Variable's trace_variable() method.)
         """
-        ### Find the correct Parameter
-        parameter = None
-        sourcePO = None
-        for PO in self._source_POs():
-            if param_name in parameters(PO):
-                parameter = parameters(PO)[param_name]
-                sourcePO = PO
-                break
-        assert parameter is not None, \
-               "Error calling _update_param: could not find Parameter %s"%param_name
-
+        parameter,sourcePO=self.get_parameter_object(param_name,with_location=True)
 
         ### can only edit constant parameters for class objects
         if parameter.constant==True and not isinstance(sourcePO,ParameterizedObjectMetaclass):
             return
-
-        ### only edit a non-immediate parameter type if force is True
-        if not force and not lookup_by_class(self.param_immediately_apply_change,
-                                             type(parameter)):
-            return
-
 
         tk_var = self._tk_vars[param_name]
 
@@ -607,7 +573,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
             if hasattr(tk_var,'_on_modify'): tk_var._on_modify()
 
-### Update the translator, if necessary
+            ### Update the translator, if necessary
             if lookup_by_class(self.param_has_modifyable_choices,
                                type(parameter)):
                 self._update_translator(param_name,parameter)
@@ -620,13 +586,13 @@ class TkParameterizedObjectBase(ParameterizedObject):
         if hasattr(tk_var,'_on_change'): tk_var._on_change()
 
 
-        
-        
-
+    # CB: change with_location to with_source
     def get_parameter_object(self,name,parameterized_object=None,with_location=False):
         """
         Return the Parameter specified by the name from the sources of
         Parameters in this object (or the specified parameterized_object).
+
+        If with_location=True, returns also the source parameterizedobject.
         """
         sources = self._source_POs(parameterized_object)
         
@@ -634,17 +600,14 @@ class TkParameterizedObjectBase(ParameterizedObject):
             params = parameters(po)
             if name in params:
                 if not with_location:
-                    return params[name] # a bit hidden
+                    return params[name] 
                 else:
                     return params[name],po
 
         raise AttributeError(self.__attr_err_msg(name,sources))
     get_parameter = get_parameter_object # CEBALERT: remove
         
-    
 
-#    def get_like_the_gui(self,name):
-#        return self._tk_vars[name].get()
 
 ##### these guarantee only to get/set parameters #####
     def get_parameter_value(self,name,parameterized_object=None):
@@ -737,11 +700,11 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
 
-# CEBALERT: can't use this after pack_param() unless Tkinter.OptionMenu
-# supports changing the list of items after widget creation - might
-# need to use Pmw's OptionMenu (which does support that).
-
-# CEBHACKALERT: need to update this; not currently used in any code except testing
+############ CB: cleanup
+# - can't use this after pack_param() unless Tkinter.OptionMenu
+#   supports changing the list of items after widget creation - might
+#   need to use Pmw's OptionMenu (which does support that).
+# - need to update this; not currently used in any code except testing
     def initialize_ranged_parameter(self,param_name,range_):
         p = self.get_parameter(param_name)
 
@@ -753,7 +716,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
         p.default = p.Arange[0]
         self._update_translator(param_name,p)
 
-
+############ 
+        
 
 ########## METHODS TO CREATE TRANSLATOR DICTIONARY ENTRIES ############
 
@@ -1021,11 +985,30 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
 
     def __init__(self,master,extraPO=None,self_first=True,**params):
+        """
+
+        * param_immediately_apply_change
+        Some types of Parameter are represented with widgets where a
+        complete change can be instantaneous (e.g. when dragging a
+        slider for a number, the change at each instant should be
+        applied). Others, such as Parameter, are represented with
+        widgets that do not finish their changes instantaneously
+        (e.g. entry into a text box is not be considered finished
+        until Return is pressed).
+
+        """
         self.master = master
+        self.param_immediately_apply_change = {BooleanParameter:True,
+                                               SelectorParameter:True,
+                                               Number:False,
+                                               Parameter:False}
 
         TkParameterizedObjectBase.__init__(self,extraPO=extraPO,self_first=self_first,**params)
 
         self.balloon = Balloon(master)
+
+
+
 
         # map of Parameter classes to appropriate widget-creation method
         self.widget_creators = {
@@ -1126,27 +1109,20 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     
 
     def _create_number_widget(self,frame,name,widget_options):
-        widget = TkPOTaggedSlider(frame,variable=self._tk_vars[name],**widget_options)
+        w = TkPOTaggedSlider(frame,variable=self._tk_vars[name],**widget_options)
         param = self.get_parameter_object(name)
 
         lower_bound,upper_bound = param.get_soft_bounds()
         if upper_bound is not None and lower_bound is not None:
-            # CEBALERT: TaggedSlider.set_bounds() needs BOTH bounds (neither can be None)
-            widget.set_bounds(lower_bound,upper_bound) # assumes set_bounds exists on the widget
-
+            # TaggedSlider needs BOTH bounds (neither can be None)
+            w.set_bounds(lower_bound,upper_bound) 
         param = self.get_parameter_object(name)
         if not lookup_by_class(self.param_immediately_apply_change,type(param)):
-            #widget.update_command = lambda e=None,x=name:self.junk(x)
+            w.bind('<<TagReturn>>', lambda e=None,x=name: self._update_param(x,force=True))
+            w.bind('<<TagFocusOut>>', lambda e=None,x=name: self._update_param(x,force=True))
+            w.bind('<<SliderSet>>', lambda e=None,x=name: self._update_param(x,force=True))
             
-            widget.bind('<<TagReturn>>', lambda e=None,x=name: self.junk(x))
-            widget.bind('<<TagFocusOut>>', lambda e=None,x=name: self.junk(x))
-            widget.bind('<<SliderSet>>', lambda e=None,x=name: self.junk(x))
-            
-            #widget.bind('<<TaggedSliderSet>>', lambda e=None,x=name: self.junk(x))
-            # also bind focus out
-
-
-        return widget
+        return w
 
 
     def _create_boolean_widget(self,frame,name,widget_options):
@@ -1158,8 +1134,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         param = self.get_parameter_object(name)
         if not lookup_by_class(self.param_immediately_apply_change,type(param)):
-            widget.bind('<Return>', lambda e=None,x=name: self.junk(x))            
-            # also bind focus out
+            widget.bind('<Return>', lambda e=None,x=name: self._update_param(x,force=True))
+            widget.bind('<FocusOut>', lambda e=None,x=name: self._update_param(x,force=True))
 
         return widget
 
@@ -1208,8 +1184,18 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             x.destroy()
 
 
-    def junk(self,param_name):
-        self._update_param(param_name,force=True)
+    def _update_param(self,param_name,force=False):
+        """
+        Only edit a non-immediate parameter type if force is True.
+        """
+        param = self.get_parameter_object(param_name)
+        
+        if not lookup_by_class(self.param_immediately_apply_change,
+                               type(param)) and not force:
+            return
+        else:
+            super(TkParameterizedObject,self)._update_param(param_name)
+
         
     
     # CEBALERT: on_change should be on_set (since it's called not only for changes)
