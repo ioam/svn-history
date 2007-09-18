@@ -509,7 +509,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         self._update_translator(param_name,param)
 
         if not tk_val==po_stringrep:
-            self._tk_vars[param_name].set(po_stringrep)
+            self._tk_vars[param_name]._original_set(po_stringrep)
         return po_val         
             
 
