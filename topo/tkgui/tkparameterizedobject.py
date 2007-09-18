@@ -139,7 +139,26 @@ def find_key_from_value(dict_,val):
         if object_==val:
             key=name
     return key
-            
+
+
+def parameters(parameterized_object):
+    """
+    Return a dictionary {name:parameter} of the parameters of
+    parameterized_object, where parameterized_object can be an
+    instance of ParameterizedObject or ParameterizedObjectMetaclass.
+    
+    (To list the Parameters, ParameterizedObjectMetaclass has
+    classparams(), whereas ParameterizedObject has params();  this
+    function selects the appropriate one.)
+    """
+    if isinstance(parameterized_object,ParameterizedObjectMetaclass):
+        return parameterized_object.classparams()
+    elif isinstance(parameterized_object,ParameterizedObject):
+        return parameterized_object.params()
+    else:
+        raise TypeError(`parameterized_object`+ \
+            " is not a ParameterizedObject or ParameterizedObjectMetaclass.")
+
 
 
 # CEBALERT: implement buttons properly
@@ -169,24 +188,6 @@ class ButtonParameter(Parameter):
 #####
 
 
-
-def parameters(parameterized_object):
-    """
-    Return a dictionary {name:parameter} of the parameters of
-    parameterized_object, where parameterized_object can be an
-    instance of ParameterizedObject or ParameterizedObjectMetaclass.
-    
-    (To list the Parameters, ParameterizedObjectMetaclass has
-    classparams(), whereas ParameterizedObject has params();  this
-    function selects the appropriate one.)
-    """
-    if isinstance(parameterized_object,ParameterizedObjectMetaclass):
-        return parameterized_object.classparams()
-    elif isinstance(parameterized_object,ParameterizedObject):
-        return parameterized_object.params()
-    else:
-        raise TypeError(`parameterized_object`+ \
-            " is not a ParameterizedObject or ParameterizedObjectMetaclass.")
 
 
 class TkParameterizedObjectBase(ParameterizedObject):
@@ -917,6 +918,9 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
 
+
+
+
 ##         Example 2: consider the class:
 ##             class SomeFrame(TkParameterizedObjectBase,Tkinter.Frame)
 
@@ -1198,7 +1202,6 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         
     
-    # CEBALERT: on_change should be on_set (since it's called not only for changes)
     # CB: packing might need to be better (check eg label-widget space)
     def pack_param(self,name,parent=None,widget_options={},on_change=None,on_modify=None,**pack_options):
         """
