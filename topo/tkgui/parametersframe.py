@@ -306,7 +306,7 @@ class ParametersFrame(LiveParametersFrame):
         for p in self.param_immediately_apply_change: self.param_immediately_apply_change[p]=True
             
         
-        self.pack_param('Apply',parent=self._buttons_frame,on_change=self.update_parameters,side='left')
+        self.pack_param('Apply',parent=self._buttons_frame,on_change=self.apply_button,side='left')
         self.pack_param('Refresh',parent=self._buttons_frame,on_change=self._sync_tkvars2po,side='right')
 
 
@@ -379,6 +379,11 @@ class ParametersFrame(LiveParametersFrame):
             for name,param in self.displayed_params.items():
                 if not param.constant and self.__value_changed(name):
                     self._update_param(name)
+
+    def apply_button(self):
+        self.update_parameters()
+        self._sync_tkvars2po()
+        
 
     set_parameters=update_parameters
 
