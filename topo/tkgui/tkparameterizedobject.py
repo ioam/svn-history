@@ -555,69 +555,71 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         (Called by the Tkinter Variable's trace_variable() method.)
         """
+        ### Find the correct Parameter
+        parameter = None
+        sourcePO = None
+        for PO in self._source_POs():
+            if param_name in parameters(PO):
+                parameter = parameters(PO)[param_name]
+                sourcePO = PO
+                break
+        assert parameter is not None, \
+               "Error calling _update_param: could not find Parameter %s"%param_name
+
+
+        ### can only edit constant parameters for class objects
+        if parameter.constant==True and not isinstance(sourcePO,ParameterizedObjectMetaclass):
+            return
+
+        ### only edit a non-immediate parameter type if force is True
+        if not force and not lookup_by_class(self.param_immediately_apply_change,
+                                             type(parameter)):
+            return
+
+        ### before we set the parameter, record if the value has actually changed
+        # CB: skip setting if it hasn't changed!
+        if self.value_changed(param_name):
+            gui_value_changed=True
+        else:
+            gui_value_changed=False
+
         tk_var = self._tk_vars[param_name]
 
         # tk_var could be ahead of parameter (set in GUI), so use
         # _original_get()
         val = self.string2object_ifrequired(param_name,tk_var._original_get())
 
-        # CB: simplify this
+
+        ### try to set the parameter to the gui value
         try:
-            sources = self._source_POs()
-            
-            for po in sources:
-
-                if param_name in parameters(po):
-                    parameter = parameters(po)[param_name]
-
-                    ### can only edit constant parameters for class objects
-                    if parameter.constant==True and not isinstance(po,ParameterizedObjectMetaclass):
-                        return
-
-                    ### only edit a non-immediate parameter type if force is True
-                    if not force and not lookup_by_class(self.param_immediately_apply_change,
-                                                         type(parameter)):
-                        return
-
-
-                    if self.value_changed(param_name):
-                        gui_value_changed=True
-                    else:
-                        gui_value_changed=False
-
-
-                    ### use set_in_bounds if it exists
-                    # i.e. users of widgets get their values cropped
-                    # (no warnings/errors, so e.g. a string in a
-                    # tagged slider just goes to the default value)
-                    # CEBALERT: set_in_bounds not valid for POMetaclass?
-                    if hasattr(parameter,'set_in_bounds') and isinstance(po,ParameterizedObject): 
-                        parameter.set_in_bounds(po,val)
-                    else:
-                        setattr(po,param_name,val)
-
-                    ### call any function associated with GUI set()/modification.
-                    # CEBALERT: now I've added on_modify, need to go through and rename
-                    # on_change and decide whether each use should be for alteration of 
-                    # value or just gui set. Or just have one. etc...
-                    if hasattr(tk_var,'_on_change'): tk_var._on_change()
-
-                    if hasattr(tk_var,'_on_modify'):
-                        if gui_value_changed: tk_var._on_modify()
-
-                    ### Update the translator, if necessary
-                    if lookup_by_class(self.param_has_modifyable_choices,
-                                       type(parameter)):
-                        self._update_translator(param_name,parameter)
-
-                    return
-
-            assert False, "can't get here!"
-
-            
+            # use set_in_bounds if it exists
+            # i.e. users of widgets get their values cropped
+            # (no warnings/errors, so e.g. a string in a
+            # tagged slider just goes to the default value)
+            # CEBALERT: set_in_bounds not valid for POMetaclass?
+            if hasattr(parameter,'set_in_bounds') and isinstance(sourcePO,ParameterizedObject): 
+                parameter.set_in_bounds(sourcePO,val)
+            else:
+                setattr(sourcePO,param_name,val)
         except: # everything
             tk_var.set(tk_var._last_good_val)
             raise # whatever the parameter-setting error was
+
+
+        ### call any function associated with GUI set()/modification.
+        # CEBALERT: now I've added on_modify, need to go through and rename
+        # on_change and decide whether each use should be for alteration of 
+        # value or just gui set. Or just have one. etc...
+
+        if hasattr(tk_var,'_on_change'): tk_var._on_change()
+
+        if hasattr(tk_var,'_on_modify'):
+            if gui_value_changed: tk_var._on_modify()
+
+        ### Update the translator, if necessary
+        if lookup_by_class(self.param_has_modifyable_choices,
+                           type(parameter)):
+            self._update_translator(param_name,parameter)
 
         
 
