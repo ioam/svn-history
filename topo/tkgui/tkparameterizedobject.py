@@ -458,8 +458,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
             self._add_tk_var_entry(PO,name,param)
 
 
-# CB: got to here...
-
     def _add_tk_var_entry(self,PO,name,param):
         """
         Add _tk_vars[name] to represent param.
@@ -475,32 +473,31 @@ class TkParameterizedObjectBase(ParameterizedObject):
         tk_var = lookup_by_class(self.param_to_tkvar,type(param))()
         self._tk_vars[name] = tk_var
 
-        # overwrite Variable's set() with one that will handle transformations to string
+        # overwrite Variable's set() with one that will handle
+        # transformations to string
         tk_var._original_set = tk_var.set
-        #tk_var._original_set_untraced = lambda v,x=name: self._untraced_set_tk_val
         tk_var.set = lambda v,x=name: self._set_tk_val(x,v)
 
         tk_var.set(getattr(PO,name))
         tk_var._last_good_val=tk_var.get() # for reverting
         tk_var.trace_variable('w',lambda a,b,c,p_name=name: self._update_param(p_name))        
-        # Instead of a trace, could we override the Variable's set() method i.e. trace it ourselves?
-        # Or does too much happen in tcl/tk for that to work?
+        # CB: Instead of a trace, could we override the Variable's
+        # set() method i.e. trace it ourselves?  Or does too much
+        # happen in tcl/tk for that to work?
         
-        # Override the Variable's get() method to guarantee an out-of-date value is never returned.
-        # In cases where the tkinter val is the most recently changed (i.e. when it's edited in the
-        # gui, resulting in a trace_variable being called), the _original_get() method is used.
+        # Override the Variable's get() method to guarantee an
+        # out-of-date value is never returned.  In cases where the
+        # tkinter val is the most recently changed (i.e. when it's
+        # edited in the gui, resulting in a trace_variable being
+        # called), the _original_get() method is used.
+        # CEBALERT: what about other users of the variable? Could they
+        # be surprised by the result from get()?
         tk_var._original_get = tk_var.get
         tk_var.get = lambda x=name: self._get_tk_val(x)
-
+        # CEB: document or remove (for TaggedSlider - allows
+        # slider to get value when only a string is present)
         tk_var._true_val = lambda x=name: self.get_parameter_value(x)
         
-
-##     def _set_tk_val_untraced(self,param_name,val): #set_slider_variable_without_trace(self,v):
-##         tkvar = self._tk_vars[param_name]
-##         tkvar.trace_vdelete(*tkvar.trace_vinfo()[0])
-##         tkvar._original_set(val)
-##         tkvar.trace_variable('w',lambda a,b,c,p_name=param_name: self._update_param_1(p_name))
-
 
     def _set_tk_val(self,param_name,val):
         """
@@ -513,25 +510,31 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
     def _get_tk_val(self,param_name):
         """
-        Before returning a tk variable's value, ensure it's up to date. 
+        Return the (possibly transformed-to-string) value of the
+        tk variable representing param_name.
+        
+        (Before returning the variable's value, ensures it's up to date.)
         """
-        tk_var = self._tk_vars[param_name]
-        tk_val = tk_var._original_get() 
+        tk_val = self._tk_vars[param_name]._original_get() 
         po_val = self.get_parameter_value(param_name)
 
         po_stringrep = self.object2string_ifrequired(param_name,po_val)
 
+        # CB: document
         # update translators, too, in case there's been external update
         param = self.get_parameter_object(param_name)
         self._update_translator(param_name,param)
 
         if not tk_val==po_stringrep:
-            tk_var.set(po_stringrep)
+            self._tk_vars[param_name].set(po_stringrep)
         return po_val         
             
 
     def value_changed(self,name):
-        """Return True if the displayed value does not equal the object's value (and False otherwise)"""
+        """
+        Return True if the displayed value does not equal the object's
+        value (and False otherwise).
+        """
         displayed_value = self.string2object_ifrequired(name,self._tk_vars[name]._original_get())
         object_value = self.get_parameter_value(name) #getattr(self._extraPO,name)
         
@@ -554,72 +557,63 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
         tk_var = self._tk_vars[param_name]
 
-        # tk_var could be ahead of parameter
-
-        
+        # tk_var could be ahead of parameter (set in GUI), so use
+        # _original_get()
         val = self.string2object_ifrequired(param_name,tk_var._original_get())
 
-
-        # CEBALERT: needs simplifying!
+        # CB: simplify this
         try:
             sources = self._source_POs()
             
             for po in sources:
-                if param_name in parameters(po).keys():
+
+                if param_name in parameters(po):
                     parameter = parameters(po)[param_name]
 
+                    ### can only edit constant parameters for class objects
+                    if parameter.constant==True and not isinstance(po,ParameterizedObjectMetaclass):
+                        return
 
+                    ### only edit a non-immediate parameter type if force is True
                     if not force and not lookup_by_class(self.param_immediately_apply_change,
                                                          type(parameter)):
                         return
 
-                    # CEBALERT!
+
                     if self.value_changed(param_name):
-                        D=True
+                        gui_value_changed=True
                     else:
-                        D=False
-                        
-                    #    return ########### HIDDEN!
+                        gui_value_changed=False
 
-                    # can only edit constant parameters for class objects
-                    if parameter.constant==True and not isinstance(po,ParameterizedObjectMetaclass):
-                        return ########### HIDDEN!
 
-                    ## use set_in_bounds if it exists: i.e. users of widgets get their
-                    
-                    ## values cropped (no warnings/errors)
-                    if hasattr(parameter,'set_in_bounds') and isinstance(po,ParameterizedObject): # CEBHACKALERT: set_in_bounds not valid for POMetaclass?
-                        # note that using set_in_bounds silently crops (so e.g. a string
-                        # in a tagged slider just goes to a number)
+                    ### use set_in_bounds if it exists
+                    # i.e. users of widgets get their values cropped
+                    # (no warnings/errors, so e.g. a string in a
+                    # tagged slider just goes to the default value)
+                    # CEBALERT: set_in_bounds not valid for POMetaclass?
+                    if hasattr(parameter,'set_in_bounds') and isinstance(po,ParameterizedObject): 
                         parameter.set_in_bounds(po,val)
                     else:
-                        #try:
                         setattr(po,param_name,val)
-                        #except Exception, inst:
-                        #    m = param_name+": "+str(sys.exc_info()[0])[11::]+" ("+str(inst)+")"
-                        #    return
 
-
+                    ### call any function associated with GUI set()/modification.
                     # CEBALERT: now I've added on_modify, need to go through and rename
                     # on_change and decide whether each use should be for alteration of 
                     # value or just gui set. Or just have one. etc...
-                    if hasattr(tk_var,'_on_change'):
-                        tk_var._on_change()
+                    if hasattr(tk_var,'_on_change'): tk_var._on_change()
 
                     if hasattr(tk_var,'_on_modify'):
-                        if D:
-                            tk_var._on_modify()
+                        if gui_value_changed: tk_var._on_modify()
 
-                    # Update the translator, if necessary
+                    ### Update the translator, if necessary
                     if lookup_by_class(self.param_has_modifyable_choices,
                                        type(parameter)):
                         self._update_translator(param_name,parameter)
 
+                    return
 
-                    return ########### HIDDEN!
+            assert False, "can't get here!"
 
-
-            assert False,"Error in use of _update_param: param must exist" # remove this
             
         except: # everything
             tk_var.set(tk_var._last_good_val)
