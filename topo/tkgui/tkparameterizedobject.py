@@ -576,51 +576,51 @@ class TkParameterizedObjectBase(ParameterizedObject):
                                              type(parameter)):
             return
 
-        ### before we set the parameter, record if the value has actually changed
-        # CB: skip setting if it hasn't changed!
-        if self.value_changed(param_name):
-            gui_value_changed=True
-        else:
-            gui_value_changed=False
 
         tk_var = self._tk_vars[param_name]
 
-        # tk_var could be ahead of parameter (set in GUI), so use
-        # _original_get()
-        val = self.string2object_ifrequired(param_name,tk_var._original_get())
+        ### before we set the parameter, record if the value has actually changed
+        # CB: skip setting if it hasn't changed!
+        if self.value_changed(param_name):
 
 
-        ### try to set the parameter to the gui value
-        try:
-            # use set_in_bounds if it exists
-            # i.e. users of widgets get their values cropped
-            # (no warnings/errors, so e.g. a string in a
-            # tagged slider just goes to the default value)
-            # CEBALERT: set_in_bounds not valid for POMetaclass?
-            if hasattr(parameter,'set_in_bounds') and isinstance(sourcePO,ParameterizedObject): 
-                parameter.set_in_bounds(sourcePO,val)
-            else:
-                setattr(sourcePO,param_name,val)
-        except: # everything
-            tk_var.set(tk_var._last_good_val)
-            raise # whatever the parameter-setting error was
+            # tk_var could be ahead of parameter (set in GUI), so use
+            # _original_get()
+            val = self.string2object_ifrequired(param_name,tk_var._original_get())
 
 
-        ### call any function associated with GUI set()/modification.
+            ### try to set the parameter to the gui value
+            try:
+                # use set_in_bounds if it exists
+                # i.e. users of widgets get their values cropped
+                # (no warnings/errors, so e.g. a string in a
+                # tagged slider just goes to the default value)
+                # CEBALERT: set_in_bounds not valid for POMetaclass?
+                if hasattr(parameter,'set_in_bounds') and isinstance(sourcePO,ParameterizedObject): 
+                    parameter.set_in_bounds(sourcePO,val)
+                else:
+                    setattr(sourcePO,param_name,val)
+            except: # everything
+                tk_var.set(tk_var._last_good_val)
+                raise # whatever the parameter-setting error was
+
+
+            if hasattr(tk_var,'_on_modify'): tk_var._on_modify()
+
+### Update the translator, if necessary
+            if lookup_by_class(self.param_has_modifyable_choices,
+                               type(parameter)):
+                self._update_translator(param_name,parameter)
+
+
+        ### call any function associated with GUI set()
         # CEBALERT: now I've added on_modify, need to go through and rename
         # on_change and decide whether each use should be for alteration of 
-        # value or just gui set. Or just have one. etc...
-
+        # value or just gui set. Probably can remove on_change.
         if hasattr(tk_var,'_on_change'): tk_var._on_change()
 
-        if hasattr(tk_var,'_on_modify'):
-            if gui_value_changed: tk_var._on_modify()
 
-        ### Update the translator, if necessary
-        if lookup_by_class(self.param_has_modifyable_choices,
-                           type(parameter)):
-            self._update_translator(param_name,parameter)
-
+        
         
 
     def get_parameter_object(self,name,parameterized_object=None,with_location=False):
