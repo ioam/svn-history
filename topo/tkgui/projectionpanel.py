@@ -247,7 +247,13 @@ class CFProjectionPGPanel(CFPGPanel):
 
 
     def populate_projection_param(self,p):
-        prjns = p.sheet.projections().values() 
+        # JPALERT: What is p?
+
+        # JPHACKALERT: Note that CFSheet can have projections that are not
+        # CFProjections (e.g., OneToOneProjections), if there exists a
+        # way of plotting them, they should be plotted.
+        prjns = [x for x in p.sheet.projections().values()
+                 if isinstance(x,CFProjection)]
         prjns.sort(cmp_projections)
         p.params()['projection'].Arange = prjns
         p.projection = prjns[0]        
