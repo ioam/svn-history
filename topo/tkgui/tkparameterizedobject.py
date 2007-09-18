@@ -857,12 +857,12 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
         param=self.get_parameter_object(param_name)
 
-        ## CB: clean up/exclude CSP/remove [testtkpo failure]
+        ## CB: clean up
         ######
         # update the  translator incase objectchanged externally
-        fn = lookup_by_class(self.translator_creators,type(param))
-            
-        if fn: fn(param_name,param)
+        if not isinstance(param,ClassSelectorParameter):
+            fn = lookup_by_class(self.translator_creators,type(param))
+            if fn: fn(param_name,param)
         ######
 
                 
@@ -872,14 +872,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
         except KeyError:
             ## No dictionary entry: might need conversion
             obj = self.convert_string2obj(param_name,string)
-            # CEBERRORALERT: silent problem here...
-            # e.g. for V1's mask, typing:
-            #  SheetMask()
-            # gives a warning on the console if SheetMask isn't imported, but
-            # because SheetMask is just a Parameter, it does get set to the string
-            # "SheetMask()". Were it a Parameter only accepting SheetMasks, then
-            # an error would be correctly raised by the Parameter itself.
-
         
         return obj
     
