@@ -97,6 +97,14 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
         # when they want to close and cancel their changes,
         # because they won't know if [Close] saves their changes
         # or not (until they press it, and find that it asks).
+        #
+        #
+        # Some links that discuss and address what order to use for buttons:
+        #
+        # http://java.sun.com/products/jlf/ed2/book/HIG.Dialogs2.html
+        # http://developer.kde.org/documentation/books/kde-2.0-development/ch08lev1sec6.html
+        # http://developer.kde.org/documentation/standards/kde/style/dialogs/index.html
+        # http://doc.trolltech.com/qq/qq19-buttons.html
         
         # Catch click on the [X]: like clicking [Close]
         # CB: but what if this frame isn't in its own window?
