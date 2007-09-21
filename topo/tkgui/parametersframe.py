@@ -179,10 +179,10 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
         self.pack_displayed_params(on_change=on_change,on_modify=on_modify)
 
         # hide Defaults button for classes
-        if isinstance(parameterized_object,ParameterizedObject):
-            self.unhide_param('Defaults')
-        else:
+        if isinstance(parameterized_object,ParameterizedObjectMetaclass):
             self.hide_param('Defaults')
+        else:
+            self.unhide_param('Defaults')
         
     create_widgets = set_PO
 
@@ -357,20 +357,11 @@ class ParametersFrame(LiveParametersFrame):
         w.unbind('<Return>')
         return w
 
+
     def set_PO(self,parameterized_object,on_change=None,on_modify=None):
-        self.change_PO(parameterized_object)
 
-        try:
-            self.master.title("Parameters of "+ (parameterized_object.name or str(parameterized_object)) ) # classes dont have names
-        except AttributeError:
-            pass # can only set window title on a window (model editor puts frame in another frame)
-
-        ### Pack all of the non-hidden Parameters
-        self.displayed_params = {}
-        for n,p in parameters(parameterized_object).items():
-            if not p.hidden:
-                self.displayed_params[n]=p
-            
+        super(ParametersFrame,self).set_PO(parameterized_object,on_change=on_change,
+                                           on_modify=on_modify)
         ### Delete all variable traces
         # (don't want to update parameters immediately)
         for v in self._tk_vars.values():
@@ -378,8 +369,6 @@ class ParametersFrame(LiveParametersFrame):
             v._checking_get = v.get
             v.get = v._original_get
         
-        self.pack_displayed_params(on_change=on_change,on_modify=on_modify)
-    create_widgets = set_PO
 
 
     def has_unapplied_change(self):
