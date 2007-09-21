@@ -101,7 +101,7 @@ from topo.base.parameterizedobject import ParameterizedObject,Parameter, \
      classlist,ParameterizedObjectMetaclass
 from topo.base.parameterclasses import BooleanParameter,StringParameter, \
      Number,SelectorParameter,ClassSelectorParameter,ObjectSelectorParameter, \
-     StringParameter
+     StringParameter,CallableParameter
 
 from topo.misc.utils import eval_atof
 
@@ -161,32 +161,15 @@ def parameters(parameterized_object):
 
 
 
-# CEBALERT: implement buttons properly
-##### Temporary: for easy buttons
-#
-# buttons are not naturally represented by parameters?
-# they're like callableparameters, i guess, but if the
-# thing they should call is a method of another object,
-# that's a bit tricky
+# Buttons are not naturally represented by parameters?
 #
 # Maybe we should have a parent class that implements the
 # non-Parameter specific stuff, then one that bolts on the
 # Parameter-specific stuff, and then instead of ButtonParameter we'd
 # have TopoButton, or something like that...
-#
-# Anyway need to be able to do somrthing like call a button
-# rather than having all the variously named methods associated
-# with buttons.
-#
-class ButtonParameter(Parameter):
-
+class ButtonParameter(CallableParameter):
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
-
-    def __init__(self,default="[button]",**params):
-        Parameter.__init__(self,default=default,**params)
-#####
-
 
 
 
@@ -283,8 +266,32 @@ class TkParameterizedObjectBase(ParameterizedObject):
     # (for __getattribute__)
     _extraPO = None
 
-    # CBENHANCEMENT: __repr__ will need some work (display params of
-    # subobjects etc?).
+
+    def __repr__(self):
+        # Method adds the name of the _extraPO, plus avoids recursion problem (see note).
+        
+        if isinstance(self._extraPO,ParameterizedObject):
+            extraPOstring = self._extraPO.__class__.__name__+"(name=%s)"%self._extraPO.name
+        elif isinstance(self._extraPO,ParameterizedObjectMetaclass):
+            extraPOstring = self._extraPO.__name__
+        elif isinstance(self._extraPO,None):
+            extraPOstring = "None"
+        else:
+            raise TypeError
+
+        # this is just like in the superclass, except that for a button parameter
+        # calling repr(val) won't work if val is a method of this object (leads
+        # to a recursion error).
+        settings = []
+        for name,val in self.get_param_values():
+            if isinstance(self.get_parameter_object,ButtonParameter):
+                r = object.__repr__(val)
+            else:
+                r = repr(val)
+            settings.append("%s=%s"%(name,r))
+            
+        return self.__class__.__name__ + "(_extraPO=%s, "%extraPOstring + ", ".join(settings) + ")"
+
 
     # overrides method from superclass
     def _setup_params(self,**params):
@@ -949,6 +956,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
                                          Have all Parameters displayed with variable names
                                          (set on the class).""")
 
+
     # CEBALERT: rename 'representations'
     def _set_tk_val(self,param_name,val):
         """
@@ -1067,20 +1075,19 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             # (need to be able to set on class, hence location)
             widget.config(state='disabled')
 
-        # will be ok until we need something other than return, then
-        # will have to go to one of the specific methods
-        
         return widget,label
 
     
     def _create_button_widget(self,frame,name,widget_options):
-        # buttons just need a command, not tracing of a variable
         try:
             command = self._tk_vars[name]._on_change
-            del self._tk_vars[name]._on_change
         except AttributeError:
             raise TypeError("No command given for '%s' button."%name)
 
+        # Calling the parameter (e.g. self.Apply()) is like pressing the button:
+        setattr(self,name,command)
+        del self._tk_vars[name]._on_change # because we use Button's command instead
+        
         return Button(frame,text=self.pretty_print(name),
                       command=command,**widget_options)
 
@@ -1140,7 +1147,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
     def hide_param(self,name):
         """Hide the representation of Parameter 'name'."""
-        self.representations[name]['frame'].pack_forget()
+        if name in self.representations:
+            self.representations[name]['frame'].pack_forget()
         # CEBNOTE: forgetting label and widget would just hide while
         # still occupying space (i.e. the empty frame stays in place)
         #self.representations[name]['label'].pack_forget()
@@ -1157,9 +1165,10 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         supplied ones, but the parent of the widget remains the same.
         """
         # CEBNOTE: new_pack_options not really tested - maybe remove them.
-        pack_options = self.representations[name]['pack_options']
-        pack_options.update(new_pack_options)
-        self.representations[name]['frame'].pack(pack_options)
+        if name in self.representations:
+            pack_options = self.representations[name]['pack_options']
+            pack_options.update(new_pack_options)
+            self.representations[name]['frame'].pack(pack_options)
 
 
     def unpack_param(self,name):
