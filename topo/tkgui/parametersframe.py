@@ -59,17 +59,17 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
 
         on_change is an optional function to call whenever any of the
         GUI variables representing Parameter values is set() by the
-        GUI. Since a variable's value is not necessarily changed by
-        such a set(), on_modify is another optional function to call
-        only when a GUI variable's value changes.
-        (See TkParameterizedObject for more detail.)
+        GUI (i.e. by the user). Since a variable's value is not
+        necessarily changed by such a set(), on_modify is another
+        optional function to call only when a GUI variable's value
+        actually changes. (See TkParameterizedObject for more detail.)
         """
         Frame.__init__(self,master,borderwidth=1,relief='raised')
         TkParameterizedObject.__init__(self,master,
                                        extraPO=parameterized_object,
                                        self_first=False,**params)
 
-        self.on_change= on_change
+        self.on_change = on_change
         self.on_modify = on_modify
 
         ## Frame for the Parameters
@@ -80,6 +80,21 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
             self.set_PO(parameterized_object,on_change=on_change,
                         on_modify=on_modify)
 
+        self.__create_button_panel()
+
+        ### Right-click menu for widgets
+        self.option_add("*Menu.tearOff", "0") 
+        self.menu = Menu(self)
+        self.menu.insert_command('end',label='Properties',
+            command=lambda:self.__edit_PO_in_currently_selected_widget())
+
+        # CEBALERT: just because callers assume this pack()s itself.
+        # Really it should be left to callers i.e. this should be removed.
+        self.pack(expand='yes',fill='both') 
+
+
+
+    def __create_button_panel(self):
         ## Buttons
         #
         # Our button order (when all buttons present):
@@ -130,18 +145,6 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
         self.pack_param('Close',parent=self._buttons_frame_right,
                         on_change=self.closeB,side='right')
 
-        ### Right-click menu for widgets
-        self.option_add("*Menu.tearOff", "0") 
-        self.menu = Menu(self)
-        self.menu.insert_command('end',label='Properties',
-            command=lambda:self.__edit_PO_in_currently_selected_widget())
-
-        # CEBALERT: just because callers assume this pack()s itself.
-        # Really it should be left to callers i.e. this should be removed.
-        self.pack(expand='yes',fill='both') 
-
-
-    
 
     def _sync_tkvars2po(self):
         for name in self.displayed_params.keys():
