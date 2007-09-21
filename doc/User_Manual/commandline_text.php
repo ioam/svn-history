@@ -296,13 +296,13 @@ make sure that guimain is defined before running your GUI commands:
 then your scripts should still work as usual without the GUI (apart
 from opening GUI-related windows, which would not work anyway).
 
-<P>Additionally, it is possible to script some GUI operations. For
+<P>Additionally, it is possible to script GUI operations. For
 instance, one can open an Orientation Preference window and 
 request that the map be measured by invoking the 'Refresh' button:
 
 <pre>
   o = topo.guimain['Plots']['Preference Maps']['Orientation Preference']()
-  o.refresh() # measure the map: equivalent to pressing the refresh button
+  o.Refresh() # measure the map: equivalent to pressing the Refresh button
 </pre>
   
 <P>Parameters of the plots can also be set. Continuing from the previous example,
@@ -314,8 +314,9 @@ so that progress will be displayed in an open Activity window:
   o.update_command='update_activity(display=True)'
 </pre>
 
-<P>At present, not all GUI operations can be controlled from the commandline,
-but eventually all will be available.
+<P>At present, not all GUI operations can be controlled easily from the commandline,
+but eventually all will be available. <!--because things like topoconsole haven't
+yet been converted to use tkparameterizedobject-->
 
 
 <!--Also note that if you alter the plotgroup directly from the commandline,
@@ -333,7 +334,7 @@ parameter name to use from the command line or in a script, you can
 turn off the parameter name reformatting:
 
 <pre>
-  from  topo.tkgui.tkparameterizedobject import TkParameterizedObject
+  from topo.tkgui.tkparameterizedobject import TkParameterizedObject
   TkParameterizedObject.pretty_parameters=False
 </pre>
 
