@@ -93,7 +93,7 @@ class TestPattern(SheetPGPanel):
 
         self.plotcommand_frame.pack_forget()
         for name in ['update_command','plot_command','Fwd','Back']:
-            self.hide_param(name) 
+            self.hide_param(name)
 
         edit_sheet_param = self.get_parameter_object('edit_sheet')
         edit_sheet_param.Arange = self.plotgroup._sheets()
@@ -107,6 +107,7 @@ class TestPattern(SheetPGPanel):
             on_modify=self.conditional_refresh)
 
         self.params_frame.hide_param('Close')
+        self.params_frame.hide_param('Refresh')
 
         self.pack_param('edit_sheet',parent=self.pg_control_pane,on_modify=self.switch_sheet)
         self.pack_param('pattern_generator',parent=self.pg_control_pane,
@@ -121,7 +122,15 @@ class TestPattern(SheetPGPanel):
         self.pack_param('duration',parent=present_frame,side='left')
         self.pack_param('present',parent=present_frame,on_change=self.present_pattern,side="right")
 
-    
+
+##     def sort_sheet_param(self,p):
+##         sheets = topo.sim.objects(self.sheet_type).values() 
+##         sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
+##         p.params()['sheet'].Arange = sheets
+##         p.sheet = sheets[0]
+
+
+
     def switch_sheet(self):
         self.pattern_generator = self.edit_sheet.input_generator
         self.change_pattern_generator()
