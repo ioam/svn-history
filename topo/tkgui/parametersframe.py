@@ -18,22 +18,6 @@ __version__='$Revision$'
 # when there are no differences). Just depends on having a refresh
 # occur at the right time.
 
-# CEBNOTE: e.g. type SheetMask(), get new one every time click Apply.
-# Could stop by overwriting user-typed stuff with actual value, but
-# then we'd lose things like pi hanging around in the
-# display. Alternatively could add SheetMask() to translator
-# dictionary, so no new object would get created for that text for the
-# lifetime of the window, but could be risky - what if someone expects
-# a new one each time?
-
-# CEBALERT: need to catch window close event so it uses the same exit handling
-# as the close button
-
-# CEBALERT: apply/reset etc button positions need to be fixed.
-
-# CEBERRORALERT: semantics of all the buttons needs to be checked.
-# In particular, defaults button has surprising behavior.
-
 import Tkinter, tkMessageBox
 
 from Tkinter import Frame, E,W, Label
@@ -56,13 +40,16 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
     of a supplied ParameterizedObject.
     """
     Defaults = ButtonParameter(doc=
-        """Return object's Parameters to class defaults.""")
+        """Return values to class defaults.""")
+
+    # CEBNOTE: used to be called Reset
+    Refresh = ButtonParameter(doc="Return values to those currently set on the object (or, if editing a class, to those currently set on the class).")  
 
     # CEBALERT: this is a Frame, so close isn't likely to make
     # sense. But fortunately the close button acts on master.
     # Just be sure not to use this button when you don't want
     # the master window to vanish (e.g. in the model editor).
-    Close = ButtonParameter(doc="Close the parent window.")
+    Close = ButtonParameter(doc="Close the window. (If applicable, asks if unsaved changes should be saved).")
 
     def __init__(self,master,parameterized_object=None,on_change=None,
                  on_modify=None,**params):
@@ -77,7 +64,7 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
         only when a GUI variable's value changes.
         (See TkParameterizedObject for more detail.)
         """
-        Frame.__init__(self,master)
+        Frame.__init__(self,master,borderwidth=1,relief='raised')
         TkParameterizedObject.__init__(self,master,
                                        extraPO=parameterized_object,
                                        self_first=False,**params)
@@ -93,15 +80,46 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
             self.set_PO(parameterized_object,on_change=on_change,
                         on_modify=on_modify)
 
-        ## Frame for the Buttons
-        self._buttons_frame = Frame(self)
-        self._buttons_frame.pack(side='bottom',expand='yes',fill='x')
+        ## Buttons
+        #
+        # Our button order (when all buttons present):
+        # [Defaults] [Refresh] [Apply] [Close]
+        # 
+        # Our button - Windows
+        # Close(yes) - OK
+        # Close(no ) - Cancel
+        # [X]        - Cancel
+        # Apply      - Apply
+        # Defaults   - 
+        # Refresh    - Reset
+        #
+        # I think Windows users will head for the window's [X]
+        # when they want to close and cancel their changes,
+        # because they won't know if [Close] saves their changes
+        # or not (until they press it, and find that it asks).
+        
+        # Catch click on the [X]: like clicking [Close]
+        # CB: but what if this frame isn't in its own window?
+        try:
+            self.master.protocol("WM_DELETE_WINDOW",self.closeB)
+        except AttributeError:
+            pass
 
-        # CBALERT: show/hide this if extraPO is PO/POM
-        self.pack_param('Defaults',parent=self._buttons_frame,
+
+        buttons_frame = Frame(self,borderwidth=1,relief='sunken')
+        buttons_frame.pack(side="bottom",expand="no")
+        
+        self._buttons_frame_left = Frame(buttons_frame)
+        self._buttons_frame_left.pack(side='left',expand='yes',fill='x')
+
+        self._buttons_frame_right = Frame(buttons_frame)
+        self._buttons_frame_right.pack(side='right',expand='yes',fill='x')
+
+        self.pack_param('Defaults',parent=self._buttons_frame_left,
                         on_change=self.defaultsB,side='left')
-        Frame(self._buttons_frame,width=20).pack(side='left') # spacer
-        self.pack_param('Close',parent=self._buttons_frame,
+        self.pack_param('Refresh',parent=self._buttons_frame_left,
+                        on_change=self._sync_tkvars2po,side='left')
+        self.pack_param('Close',parent=self._buttons_frame_right,
                         on_change=self.closeB,side='right')
 
         ### Right-click menu for widgets
@@ -116,7 +134,11 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
 
 
     
-    
+
+    def _sync_tkvars2po(self):
+        for name in self.displayed_params.keys():
+            self._tk_vars[name].get()
+
 
 
     # CEBALERT: all thses on_change=None mean someone could lose their initial setting which
@@ -144,6 +166,12 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
         #    v.get = v._original_get
         
         self.pack_displayed_params(on_change=on_change,on_modify=on_modify)
+
+        # hide Defaults button for classes
+        if isinstance(parameterized_object,ParameterizedObject):
+            self.unhide_param('Defaults')
+        else:
+            self.hide_param('Defaults')
         
     create_widgets = set_PO
 
@@ -207,6 +235,8 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
 
         self.currently_displaying = dict([(param_name,self.representations[param_name])
                                         for param_name in self.displayed_params])
+
+        
 
 
 
@@ -302,18 +332,13 @@ class ParametersFrame(LiveParametersFrame):
                                    When editing a class, sets the class defaults
                                    (i.e. acts on the class object).""")
     
-
-    # (CEBNOTE: used to be called Reset)
-    Refresh = ButtonParameter(doc="Return values to those currently set on the object")  
-
     def __init__(self,master,parameterized_object=None,on_change=None,on_modify=None,**params):        
         super(ParametersFrame,self).__init__(master,parameterized_object,on_change,on_modify,**params)
 
         for p in self.param_immediately_apply_change: self.param_immediately_apply_change[p]=True
             
         
-        self.pack_param('Apply',parent=self._buttons_frame,on_change=self.apply_button,side='left')
-        self.pack_param('Refresh',parent=self._buttons_frame,on_change=self._sync_tkvars2po,side='right')
+        self.pack_param('Apply',parent=self._buttons_frame_right,on_change=self.apply_button,side='left')
 
 
     def _create_string_widget(self,frame,name,widget_options):
