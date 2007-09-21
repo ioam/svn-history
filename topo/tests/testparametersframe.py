@@ -138,7 +138,9 @@ class TestParametersFrame(unittest.TestCase):
         self.f.apply_button()
         self.assertNotEqual(id(self.f.pa),testpo_id)
         
-        
+
+# CEBALERT: need test for defaults button. Check that works ok
+# for non-instantiated params etc
 
             
 
