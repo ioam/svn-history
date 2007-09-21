@@ -963,27 +963,32 @@ class ParameterizedObject(object):
 
 
     # CEBALERTs:
-    # * should be called 'defaults' or something similar.
     # * name should be a constant Parameter, rather than needing to test
     #   specially for name here
     # * what happens to dynamic parameters?
-    # * doing the right thing for instantiate? (probably duplicating
-    #   code & what about object_count)
+    # * doing the right thing for instantiate? (see note below)
+    def defaults(self):
+        """
+        Return {parameter_name:parameter.default} for all non-constant
+        Parameters.
 
-    # CEBERRORALERT: doesn't work for compound params? e.g. try
-    # 'defaults' button in test pattern window
-    def reset_params(self):
+        Note that a Parameter for which instantiate==True has its default
+        instantiated.
         """
-        Return Parameters with modifiable values to the class defaults.
-        """
-        for (attr_name,param) in self.params().items():
-            if param.constant or attr_name=="name": 
+        d = {}
+        for param_name,param in self.params().items():
+            if param.constant or param_name=='name': # fake constant name
                 pass
             elif param.instantiate:
-                setattr(self,attr_name,copy.deepcopy(param.default))                
+                # should use other code to instantiate. missing
+                # object count increase, etc? need some method to
+                # do this for everywhere that needs it?
+                d[param_name]=copy.deepcopy(param.default)
             else:
-                setattr(self,attr_name,param.default)
+                d[param_name]=param.default
+        return d
 
+        
 
 
 def print_all_param_defaults():
