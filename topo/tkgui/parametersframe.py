@@ -96,7 +96,8 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
         ## Frame for the Buttons
         self._buttons_frame = Frame(self)
         self._buttons_frame.pack(side='bottom',expand='yes',fill='x')
-        
+
+        # CBALERT: show/hide this if extraPO is PO/POM
         self.pack_param('Defaults',parent=self._buttons_frame,
                         on_change=self.defaultsB,side='left')
         Frame(self._buttons_frame,width=20).pack(side='left') # spacer
@@ -209,18 +210,23 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
 
 
 
-    # CEBERRORALERT: shouldn't set straight onto the object: wait for Apply.
+
     def defaultsB(self):
-        if isinstance(self._extraPO,ParameterizedObjectMetaclass):
-            raise NotImplementedError, "Unfinished"
+        """
+        Set all displayed parameters to their default values.
+        """
+        assert isinstance(self._extraPO,ParameterizedObject)
 
-        self._extraPO.reset_params()
+        defaults = self._extraPO.defaults()
 
-        # CEBERRORALERT: need a (/to call a) refresh method.
-        #self._sync_tkvars2po()
+        for param_name,val in defaults.items():
+            if not self.get_parameter_object(param_name).hidden:
+                self._tk_vars[param_name].set(val)
+
+        if self.on_modify: self.on_modify()
+        if self.on_change: self.on_change()
+        self.update_idletasks()
         
-
-
         
     def closeB(self):
         ## CEBALERT: dialog box should include a cancel button
@@ -340,15 +346,6 @@ class ParametersFrame(LiveParametersFrame):
     create_widgets = set_PO
 
 
-
-    def _sync_tkvars2po(self):
-        for name in self.displayed_params.keys():
-            self._tk_vars[name]._checking_get()
-
-    def defaultsB(self):
-        super(ParametersFrame,self).defaultsB()
-        self._sync_tkvars2po()
-
     def has_unapplied_change(self):
         """Return True if any one of the packed parameters' displayed values is different from
         that on the object."""
@@ -386,6 +383,11 @@ class ParametersFrame(LiveParametersFrame):
         
 
     set_parameters=update_parameters
+
+
+    def _sync_tkvars2po(self):
+        for name in self.displayed_params.keys():
+            self._tk_vars[name]._checking_get()
 
 
 
