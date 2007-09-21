@@ -699,6 +699,7 @@ class TopoConsole(TkguiWindow):
         self.messageBar.message('state',m)
 
 
+        # CB: window stays around after pressing stop
 
     # CEBHACKALERT: need to decide what to do about multiple concurrent timed process, and
     # clicking on Stop. If we'll only ever allow one progress meter, then have a
