@@ -296,9 +296,10 @@ make sure that guimain is defined before running your GUI commands:
 then your scripts should still work as usual without the GUI (apart
 from opening GUI-related windows, which would not work anyway).
 
-<P>Additionally, it is possible to script GUI operations. For
-instance, one can open an Orientation Preference window and 
-request that the map be measured by invoking the 'Refresh' button:
+<P>Additionally, it is possible to script more complex GUI
+operations. For instance, one can open an Orientation Preference
+window and request that the map be measured by invoking the 'Refresh'
+button:
 
 <pre>
   o = topo.guimain['Plots']['Preference Maps']['Orientation Preference']()
@@ -318,12 +319,12 @@ so that progress will be displayed in an open Activity window:
 but eventually all will be available. <!--because things like topoconsole haven't
 yet been converted to use tkparameterizedobject-->
 
+<!--Probably need an example of changing a SelectorParameter-->
 
 <!--Also note that if you alter the plotgroup directly from the commandline,
 changes won't show in open GUI windows until they are refreshed. But that's 
 not going to be a problem here - will need this note for ParmetersFrame in
 the model editor instructions, etc.-->
-
 
 <P>Note that in some cases the GUI will reformat the name of a
 parameter to make it match look-and-feel expectations for GUI
@@ -338,3 +339,15 @@ turn off the parameter name reformatting:
   TkParameterizedObject.pretty_parameters=False
 </pre>
 
+<!--CB: this document sounds like we keep adding things
+to the end of it...-->
+
+<P>One can also open a GUI window to inspect or edit any ParameterizedObject: 
+
+<pre>
+ from topo.tkgui.parametersframe import edit_parameters
+ edit_parameters(topo.sim['V1']) 
+</pre>
+
+This gives a ParametersFrame representing the Parameters of <code>topo.sim['V1']</code>,
+allowing values to be inspected and changed. (This is the same editing window as is available through the <a href="modeleditor.html#parameters">model editor</a>.) 
