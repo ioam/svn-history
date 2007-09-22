@@ -172,7 +172,6 @@ class ButtonParameter(CallableParameter):
     __doc__ = property((lambda self: self.doc))
 
 
-
 class TkParameterizedObjectBase(ParameterizedObject):
     """
     A ParameterizedObject that maintains Tkinter.Variable shadows
@@ -901,7 +900,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 # CEBALERT: setting colors like this is a hack: need some
                 # general method. Also this conflicts with tile.
                 if hasattr(self,'representations') and param_name in self.representations:
-                    self.representations[param_name]['widget'].config(background="white")
+                    self.representations[param_name]['widget']['background']=topo.ENTRYBACKGROUND
             except Exception, inst:
                 m = param_name+": "+str(sys.exc_info()[0])[11::]+" ("+str(inst)+")"
                 if hasattr(topo,'guimain'):

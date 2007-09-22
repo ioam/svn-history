@@ -166,6 +166,14 @@ def start(mainloop=False):
     except _tkinter.TclError:
         pass
 
+    ### CEBALERT: hack to get standard Entry background color! ###
+    e=Tkinter.Entry(root)
+    topo.ENTRYBACKGROUND=e['background']
+    e.destroy()
+    ##############################################################
+
+
+
     # CB: uncomment for Tile
 ##     root.tk.call('package', 'require', 'tile')
 ##     widgets_to_ttkify = [] # add widgets one by one until error,
