@@ -169,11 +169,6 @@ def parameters(parameterized_object):
 # have TopoButton, or something like that...
 import ImageTk, Image, ImageOps
 
-# CEBALERT: would create the photoimage on construction, except that
-# it gives "RuntimeError: Too early to create image"! Must be
-# happening before tk starts, or something. So instead, return
-# image on demand. Because of bug (see topoconsole.py "got to keep
-# references to the images") we also store a reference each time.
 
 class ButtonParameter(CallableParameter):
     """
@@ -184,11 +179,17 @@ class ButtonParameter(CallableParameter):
     of an image suitable for PIL, e.g. a PNG, TIFF, or JPEG image) and
     optionally a size (width,height) tuple.
 
-    CEBALERT: size can also be set when there is no image, but
-    it is used as the width and height in tkinter, which use
-    a different unit from the width and height in PIL! Need
-    to fix by choosing one and converting to get the other.
+
+    Note that the button size can also be set when there is no image,
+    but instead of being presumed to be in pixels, it is instead
+    presumed to be in text units (a Tkinter feature: see
+    e.g. http://effbot.org/tkinterbook/button.htm). Therefore, to
+    place two identically sized buttons next to each other, with one
+    displaying text and the other an image, you first have to convert
+    one of the sizes to the other's units.
     """
+    # CEBALERT: we should probably solve the above for users,
+    # but what a pain!
     __slots__ = ['image_path','size','_hack']
     __doc__ = property((lambda self: self.doc))
 
@@ -199,6 +200,12 @@ class ButtonParameter(CallableParameter):
         self.size = size
         self._hack = []
 
+# CB: would create the photoimage on construction and store it as an
+# attribute, except that it gives "RuntimeError: Too early to create
+# image". Must be happening before tk starts, or something. So
+# instead, return image on demand. Also, because of PIL bug (see
+# topoconsole.py "got to keep references to the images") we also store
+# a reference to the image each time.
     def get_image(self):
         """
         Return an ImageTk.PhotoImage of the image at image_path
@@ -1139,27 +1146,23 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # all skip translation etc. Instead should handle their
         # translation.)
 
-        # CEBALERT: what about size that comes in widget_options.
-        # Should override the less importatnt one.
-        # And see ALERT in ButtonParameter: if there's no image,
-        # Tkinter takes size as width and height of button. If
-        # there is an image, the button's height and width are
-        # ignored and the image size is used instead.
         b = Button(frame,text=self.pretty_print(name),
-                   command=command,**widget_options)
+                   command=command)
 
         button_param = self.get_parameter_object(name)
 
+        # now add image from ButtonParameter
         image = button_param.get_image()
         if image:
             b['image']=image
 
-
+        # and set size from ButtonParameter
         size = button_param.size
         if size:
             b['width']=size[0]
             b['height']=size[1]
 
+        b.config(**widget_options) # widget_options override things from parameter
         return b
 
 
@@ -1297,6 +1300,9 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         Note that the on_change function (if supplied) will be called
         on creation of the widget.
+
+        widget_options override anything that's e.g. set on Parameter
+        like ButtonParameter size
         
         Examples:
         self.pack_param(name)
