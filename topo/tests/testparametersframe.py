@@ -58,11 +58,12 @@ class TestParametersFrame(unittest.TestCase):
         self.f = ParametersFrame(self.toplevel,self.testpo1)
 
 
+
     def test_set_PO(self):
         self.assertEqual(self.f._extraPO,self.testpo1)
         self.f.set_PO(self.testpo2)
         self.assertEqual(self.f._extraPO,self.testpo2)
-
+        
 
 
     def test_apply_button_1(self):
@@ -76,7 +77,7 @@ class TestParametersFrame(unittest.TestCase):
         for param_name,tkvar in self.f._tk_vars.items():
             orig_values[param_name] = tkvar._original_get()
 
-        self.f.apply_button()
+        self.f.Apply()
 
         for param_name,val in orig_values.items():
             self.assertEqual(self.f._tk_vars[param_name].get(),val)
@@ -93,7 +94,7 @@ class TestParametersFrame(unittest.TestCase):
 
                 orig_values[param_name] = widget.get()
         
-        self.f.apply_button()
+        self.f.Apply()
 
         for param_name,val in orig_values.items():
             widget = self.f.representations[param_name]['widget']
@@ -120,7 +121,7 @@ class TestParametersFrame(unittest.TestCase):
         w = self.f.representations['pa']['widget']
         w.delete(0,"end")
         w.insert(0,"TestPO()")
-        self.f.apply_button()
+        self.f.Apply()
         content = w.get()
         self.assertEqual(type(self.f.pa),TestPO) # get the object?
         self.assertEqual(content[0:7],"TestPO(") # object displayed right?
@@ -129,13 +130,12 @@ class TestParametersFrame(unittest.TestCase):
         # create a new object each time when the same string remains
         # in the widget 
         testpo_id = id(self.f.pa)
-        self.f.apply_button()
-        self.f.apply_button()
+        self.f.Apply()
         self.assertEqual(id(self.f.pa),testpo_id)
         # ...but that we do get a new object when the string really changes
         w.delete(0,"end")
         w.insert(0,"TestPO(name='fred')")
-        self.f.apply_button()
+        self.f.Apply()
         self.assertNotEqual(id(self.f.pa),testpo_id)
         
 
