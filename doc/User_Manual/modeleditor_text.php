@@ -188,20 +188,37 @@ to change the parameter's value:
 <IMG WIDTH="353" HEIGHT="443" SRC="images/editorproperties.png">
 </center>
 
-<p>When you have made the necessary changes, click Ok to accept the
-changes and close the window, or Update just to make the changes. If
-you decide not to make the changes then click the close box in the top
-right hand corner.
-
-<p>Many of the parameters will be set to values that are objects that
-themselves have parameters. In this case, right clicking on the value
-will allow you to open a Properties window, which works just the same
-way as the main Properties window for that object but sets values on
-the sub-object instead.
+<P>Many of the parameters will be set to a value that is an object with
+its own parameters. In this case, right clicking on the value will
+allow you to open a Properties window, which works just the same way
+as the main Properties window for that object but sets values on the
+sub-object instead.
 
 <P>Help for most of the options can be obtained by hovering the mouse
 over the option's name. Help for the entire object can be obtained by
 hovering over the object's name ('Surround' in this case). 
+
+<P>Once you have made the necessary changes, clicking Apply sets these
+changes on the component. Clicking Close shuts the window, unless
+there are unapplied changes, in which case you can choose to save them
+before the window closes.  (Clicking the window's close icon---often
+an X in the top-right corner---has the same effect as clicking
+'Close'.)
+
+<P>In addition to the Close and Apply buttons, a Defaults button is
+also available for existing components (but not for new ones). This
+button allows you to return the displayed values to their <em>class
+defaults</em> <!--needs more explanation/link-->. As with other changes,
+you must click Apply before they take effect.
+
+<P>Finally, the Refresh button updates the displayed values to those
+currently set on the component. Hence, it serves as a 'reset' button
+when there are unapplied changes, but also allows you to update
+the displayed values to the ones currently on the component if the 
+compenent has been altered outside the GUI (at the commandline, for
+instance).
+
+
 
 <h3>Changing constants and default values</h3>
 
