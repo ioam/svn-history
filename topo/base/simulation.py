@@ -209,7 +209,9 @@ class EventProcessor(ParameterizedObject):
     src_ports=[None]
     
     dest_ports=[None]
-    
+
+    name = Parameter(constant=True)
+
     def __init__(self,**params):
         """
         Create an EventProcessor.
@@ -999,7 +1001,9 @@ class Simulation(ParameterizedObject):
         if ep in self._event_processors.values():
             self.warning("EventProcessor "+str(ep)+" () already exists in the simulation and will not be added.")
         else:
+            ep.initialized=False
             ep.name=ep_name
+            ep.initialized=True
             # deletes and overwrites any existing EP with the same name,
             # silently, as if a dictionary
             if ep.name in self._event_processors: del self[ep.name]
