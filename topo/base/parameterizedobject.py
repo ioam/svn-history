@@ -823,7 +823,9 @@ class ParameterizedObject(object):
                     if isinstance(new_object,ParameterizedObject):
                         global object_count
                         object_count+=1
+                        new_object.initialized=False
                         new_object.__generate_name()
+                        new_object.initialized=True
                     
         for name,val in params.items():
             desc,desctype = self.__class__.get_param_descriptor(name)
