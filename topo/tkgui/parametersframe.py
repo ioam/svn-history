@@ -124,7 +124,7 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
         # Catch click on the [X]: like clicking [Close]
         # CB: but what if this frame isn't in its own window?
         try:
-            self.master.protocol("WM_DELETE_WINDOW",self.closeB)
+            self.master.protocol("WM_DELETE_WINDOW",self._close_button)
         except AttributeError:
             pass
 
@@ -139,14 +139,14 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
         self._buttons_frame_right.pack(side='right',expand='yes',fill='x')
 
         self.pack_param('Defaults',parent=self._buttons_frame_left,
-                        on_change=self.defaultsB,side='left')
+                        on_change=self._defaults_button,side='left')
         self.pack_param('Refresh',parent=self._buttons_frame_left,
-                        on_change=self._sync_tkvars2po,side='left')
+                        on_change=self._refresh_button,side='left')
         self.pack_param('Close',parent=self._buttons_frame_right,
-                        on_change=self.closeB,side='right')
+                        on_change=self._close_button,side='right')
 
 
-    def _sync_tkvars2po(self):
+    def _refresh_button(self):
         for name in self.displayed_params.keys():
             self._tk_vars[name].get()
 
@@ -252,7 +252,7 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
 
 
 
-    def defaultsB(self):
+    def _defaults_button(self):
         """
         Set all displayed parameters to their default values.
         """
@@ -269,7 +269,7 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
         self.update_idletasks()
         
         
-    def closeB(self):
+    def _close_button(self):
         ## CEBALERT: dialog box should include a cancel button
         #if self.has_unapplied_change() and tkMessageBox.askyesno("Close","Apply changes before closing?"):
         #    self.update_parameters()
@@ -349,7 +349,7 @@ class ParametersFrame(LiveParametersFrame):
         for p in self.param_immediately_apply_change: self.param_immediately_apply_change[p]=True
             
         
-        self.pack_param('Apply',parent=self._buttons_frame_right,on_change=self.apply_button,side='left')
+        self.pack_param('Apply',parent=self._buttons_frame_right,on_change=self._apply_button,side='left')
 
 
     def _create_string_widget(self,frame,name,widget_options):
@@ -379,11 +379,11 @@ class ParametersFrame(LiveParametersFrame):
                 return True
         return False
 
-    def closeB(self):
+    def _close_button(self):
         # CEBALERT: dialog box should include a cancel button
         if self.has_unapplied_change() and tkMessageBox.askyesno("Close","Apply changes before closing?"):
             self.update_parameters()
-        super(ParametersFrame,self).closeB()
+        super(ParametersFrame,self)._close_button()
 
 
     __value_changed = TkParameterizedObject.value_changed
@@ -402,15 +402,15 @@ class ParametersFrame(LiveParametersFrame):
                 if not param.constant and self.__value_changed(name):
                     self._update_param(name)
 
-    def apply_button(self):
+    def _apply_button(self):
         self.update_parameters()
-        self._sync_tkvars2po()
+        self._refresh_button()
         
 
     set_parameters=update_parameters
 
 
-    def _sync_tkvars2po(self):
+    def _refresh_button(self):
         for name in self.displayed_params.keys():
             self._tk_vars[name]._checking_get()
 
