@@ -167,7 +167,7 @@ def parameters(parameterized_object):
 # non-Parameter specific stuff, then one that bolts on the
 # Parameter-specific stuff, and then instead of ButtonParameter we'd
 # have TopoButton, or something like that...
-class ButtonParameter(CallableParameter):
+class ButtonParameter(CallableParameter): 
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
@@ -267,30 +267,32 @@ class TkParameterizedObjectBase(ParameterizedObject):
     _extraPO = None
 
 
-    def __repr__(self):
-        # Method adds the name of the _extraPO, plus avoids recursion problem (see note).
+    # CB: fix repr 
+    def __repr__(self): return object.__repr__(self)    
+##     def __repr__(self):
+##         # Method adds the name of the _extraPO, plus avoids recursion problem (see note).
         
-        if isinstance(self._extraPO,ParameterizedObject):
-            extraPOstring = self._extraPO.__class__.__name__+"(name=%s)"%self._extraPO.name
-        elif isinstance(self._extraPO,ParameterizedObjectMetaclass):
-            extraPOstring = self._extraPO.__name__
-        elif isinstance(self._extraPO,None):
-            extraPOstring = "None"
-        else:
-            raise TypeError
+##         if isinstance(self._extraPO,ParameterizedObject):
+##             extraPOstring = self._extraPO.__class__.__name__+"(name=%s)"%self._extraPO.name
+##         elif isinstance(self._extraPO,ParameterizedObjectMetaclass):
+##             extraPOstring = self._extraPO.__name__
+##         elif self._extraPO is None:
+##             extraPOstring = "None"
+##         else:
+##             raise TypeError
 
-        # this is just like in the superclass, except that for a button parameter
-        # calling repr(val) won't work if val is a method of this object (leads
-        # to a recursion error).
-        settings = []
-        for name,val in self.get_param_values():
-            if isinstance(self.get_parameter_object,ButtonParameter):
-                r = object.__repr__(val)
-            else:
-                r = repr(val)
-            settings.append("%s=%s"%(name,r))
+##         # this is just like in the superclass, except that for a button parameter
+##         # calling repr(val) won't work if val is a method of this object (leads
+##         # to a recursion error).
+##         settings = []
+##         for name,val in self.get_param_values():
+##             if isinstance(self.get_parameter_object,ButtonParameter):
+##                 r = object.__repr__(val)
+##             else:
+##                 r = repr(val)
+##             settings.append("%s=%s"%(name,r))
             
-        return self.__class__.__name__ + "(_extraPO=%s, "%extraPOstring + ", ".join(settings) + ")"
+##         return self.__class__.__name__ + "(_extraPO=%s, "%extraPOstring + ", ".join(settings) + ")"
 
 
     # overrides method from superclass
@@ -382,15 +384,14 @@ class TkParameterizedObjectBase(ParameterizedObject):
         self.obj2str_fn = {
             StringParameter: None,
             BooleanParameter: None,
-            ButtonParameter: None,
             Number: None,
             SelectorParameter: self.__selector_obj2str,
             Parameter: self.__param_obj2str}
 
         self.str2obj_fn = {
+            ButtonParameter: None,
             StringParameter: None,
             BooleanParameter: None, 
-            ButtonParameter: None,
             SelectorParameter: None,
             Number: eval_atof,
             Parameter: lambda x: eval(x,__main__.__dict__)}
@@ -399,6 +400,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         self.translator_creators = {
             ClassSelectorParameter: self.csp_thing,
             ObjectSelectorParameter: self.osp_thing,
+            ButtonParameter: None,
             Parameter: self.p_thing}
         
         self.change_PO(extraPO)
@@ -419,19 +421,14 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
 
-    def _source_POs(self,parameterized_object=None):
+    def _source_POs(self):
         """
         Return a correctly ordered* list of ParameterizedObjects in
         which to find Parameters.
 
         (* ordered by precedence, as defined by self_first)
-
-        Specifying parameterized_object results in the list
-        containing only that parameterized_object.
         """
-        if parameterized_object:
-            sources = [parameterized_object]
-        elif not self._extraPO:
+        if not self._extraPO:
             sources = [self]
         elif self.self_first:
             sources = [self,self._extraPO]
@@ -498,6 +495,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
         tk_var._original_set(val) # trace not called because we're already in trace,
                                   # and tk disables trace activation during trace
 
+    
+    # CEBALERT: should probably separate into update and get
     def _get_tk_val(self,param_name):
         """
         Return the (possibly transformed-to-string) value of the
@@ -557,12 +556,10 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # CB: skip setting if it hasn't changed!
         if self.value_changed(param_name):
 
-
             # tk_var could be ahead of parameter (set in GUI), so use
             # _original_get()
             val = self.string2object_ifrequired(param_name,tk_var._original_get())
-
-
+                        
             ### try to set the parameter to the gui value
             try:
                 # use set_in_bounds if it exists
@@ -594,6 +591,18 @@ class TkParameterizedObjectBase(ParameterizedObject):
         if hasattr(tk_var,'_on_change'): tk_var._on_change()
 
 
+    def get_source_po(self,name):
+        
+        sources = self._source_POs()
+        
+        for po in sources:
+            params = parameters(po)
+            if name in params:
+                return po
+
+        raise AttributeError(self.__attr_err_msg(name,sources))
+
+        
     # CB: change with_location to with_source
     def get_parameter_object(self,name,parameterized_object=None,with_location=False):
         """
@@ -602,17 +611,13 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         If with_location=True, returns also the source parameterizedobject.
         """
-        sources = self._source_POs(parameterized_object)
-        
-        for po in sources:
-            params = parameters(po)
-            if name in params:
-                if not with_location:
-                    return params[name] 
-                else:
-                    return params[name],po
+        source = parameterized_object or self.get_source_po(name)
+        parameter_object = parameters(source)[name]
 
-        raise AttributeError(self.__attr_err_msg(name,sources))
+        if not with_location:
+            return parameter_object
+        else:
+            return parameter_object,source
     get_parameter = get_parameter_object # CEBALERT: remove
         
 
@@ -622,27 +627,17 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
         Get the value of the parameter specified by name.
         """
-        sources = self._source_POs(parameterized_object)
-
-        for po in sources:
-            params = parameters(po)
-            if name in params: return getattr(po,name) # also hidden!
-
-        raise AttributeError(self.__attr_err_msg(name,sources))
+        source = parameterized_object or self.get_source_po(name)
+        return getattr(source,name) 
 
         
     def set_parameter_value(self,name,val,parameterized_object=None):
         """
         Set the value of the parameter specified by name to val.
         """
-        sources = self._source_POs(parameterized_object)
+        source = parameterized_object or self.get_source_po(name)
+        setattr(source,name,val)
 
-        for po in sources:
-            if name in parameters(po).keys(): 
-                setattr(po,name,val)
-                return # so hidden I forgot to write it until now
-
-        raise AttributeError(self.__attr_err_msg(name,sources))
 #######################################################        
 
 
@@ -692,20 +687,23 @@ class TkParameterizedObjectBase(ParameterizedObject):
         try:
             object.__getattribute__(self,name)
             object.__setattr__(self,name,val)
-            if name in self._tk_vars: self._tk_vars[name].set(val)
+            # update tkvar
+            if name in self._tk_vars:
+                self._tk_vars[name]._original_set(self.object2string_ifrequired(name,val))
             return # a bit hidden
 
         except AttributeError:
             if hasattr(self._extraPO,name):
                 setattr(self._extraPO,name,val)
-                if name in self._tk_vars: self._tk_vars[name].set(val)
+                # update tkvar
+                if name in self._tk_vars:
+                    self._tk_vars[name]._original_set(self.object2string_ifrequired(name,val))
                 return # also a bit hidden
 
         # name not found, so set on this object
         object.__setattr__(self,name,val)
             
 ################################################
-
 
 
 ############ CB: cleanup
@@ -756,6 +754,11 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # store list of OBJECTS (not classes) for ClassSelectorParameter's range
         # (Although CSParam's range uses classes; allows parameters set on the
         # options to persist - matches parametersframe.ParametersFrame.)
+        # (But note, with f as a TkParameterizedObject with CSP x,
+        #  g=Gaussian()
+        #  f.x=Gaussian()
+        #  id(f.x)!=id(g.x)
+        # Not sure what behavior's best.)
         for class_name,class_ in param.range().items():
             translator[class_name] = class_()
 
@@ -871,7 +874,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
             fn = lookup_by_class(self.translator_creators,type(param))
             if fn: fn(param_name,param)
         ######
-
                 
         try:
             ## We have a dictionary entry so just translate
@@ -881,7 +883,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
             obj = self.convert_string2obj(param_name,string)
         
         return obj
-    
+
 
     # clean up test for guimain (see note at top of file)
     def convert_string2obj(self,param_name,string):
@@ -891,6 +893,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         if string2obj_fn:
             
             try:
+                # should take param_name as well as string
                 obj = string2obj_fn(string)
                 #topo.guimain.status_message("OK: %s -> %s"%(string,obj))
                 if hasattr(topo,'guimain'):
@@ -1084,9 +1087,15 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         except AttributeError:
             raise TypeError("No command given for '%s' button."%name)
 
-        # Calling the parameter (e.g. self.Apply()) is like pressing the button:
-        setattr(self,name,command)
         del self._tk_vars[name]._on_change # because we use Button's command instead
+
+        # Calling the parameter (e.g. self.Apply()) is like pressing the button:
+        self.__dict__["_%s_param_value"%name]=command
+        # like setattr(self,name,command) but without tracing etc
+        # (...and so you can't edit a tkparameterizedobject w/buttons
+        # with a tkparameterizedobject because the button parameters
+        # all skip translation etc. Instead should handle their
+        # translation.)
         
         return Button(frame,text=self.pretty_print(name),
                       command=command,**widget_options)
