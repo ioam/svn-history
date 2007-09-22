@@ -182,16 +182,21 @@ class ButtonParameter(CallableParameter):
     Can be associated with an image when used in a
     TkParameterizedObject by specifying an image_path (i.e. location
     of an image suitable for PIL, e.g. a PNG, TIFF, or JPEG image) and
-    optionally an image_size (width,height) tuple.
+    optionally a size (width,height) tuple.
+
+    CEBALERT: size can also be set when there is no image, but
+    it is used as the width and height in tkinter, which use
+    a different unit from the width and height in PIL! Need
+    to fix by choosing one and converting to get the other.
     """
-    __slots__ = ['image_path','image_size','_hack']
+    __slots__ = ['image_path','size','_hack']
     __doc__ = property((lambda self: self.doc))
 
-    def __init__(self,default=None,image_path=None,image_size=(32,32),
+    def __init__(self,default=None,image_path=None,size=None,
                  **params):
         CallableParameter.__init__(self,default=default,**params)
         self.image_path = image_path
-        self.image_size = image_size
+        self.size = size
         self._hack = []
 
     def get_image(self):
@@ -203,7 +208,7 @@ class ButtonParameter(CallableParameter):
             return None
         else:
             i=ImageTk.PhotoImage(ImageOps.fit(
-                Image.open(self.image_path),self.image_size))
+                Image.open(self.image_path),self.size or (32,32)))
             self._hack.append(i)
             return i  
             
@@ -1133,12 +1138,27 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # with a tkparameterizedobject because the button parameters
         # all skip translation etc. Instead should handle their
         # translation.)
-        
+
+        # CEBALERT: what about size that comes in widget_options.
+        # Should override the less importatnt one.
+        # And see ALERT in ButtonParameter: if there's no image,
+        # Tkinter takes size as width and height of button. If
+        # there is an image, the button's height and width are
+        # ignored and the image size is used instead.
         b = Button(frame,text=self.pretty_print(name),
                    command=command,**widget_options)
 
-        image = self.get_parameter_object(name).get_image()
-        if image: b['image']=image
+        button_param = self.get_parameter_object(name)
+
+        image = button_param.get_image()
+        if image:
+            b['image']=image
+
+
+        size = button_param.size
+        if size:
+            b['width']=size[0]
+            b['height']=size[1]
 
         return b
 
