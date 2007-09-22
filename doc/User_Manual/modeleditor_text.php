@@ -169,7 +169,7 @@ files in the same directory as the others of that type (or load it
 into Python beforehand from any file) and your extension will
 automatically be available for use in the model editor. 
 
-<h2><a name="#parameters">The Parameters</A></h2>
+<h2><a name="parameters">The Parameters</A></h2>
 <p>All of the components that you can use to define a Topographica
 model have parameters. Parameters are attributes that allow you to
 control the behaviour of your components. To view the parameters that
