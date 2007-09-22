@@ -168,23 +168,15 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
         for n,p in parameters(parameterized_object).items():
             if not p.hidden:
                 self.displayed_params[n]=p
-            
-        ### Delete all variable traces
-        # (don't want to update parameters immediately)
-        #for v in self._tk_vars.values():
-        #    self.__delete_trace(v)
-        #    v._checking_get = v.get
-        #    v.get = v._original_get
-        
+                    
         self.pack_displayed_params(on_change=on_change,on_modify=on_modify)
 
         # hide Defaults button for classes
         if isinstance(parameterized_object,ParameterizedObjectMetaclass):
             self.hide_param('Defaults')
         else:
-            self.unhide_param('Defaults')
-        
-    create_widgets = set_PO
+            self.unhide_param('Defaults')    
+    create_widgets = set_PO # CEBALERT: need to change callers to use set_PO
 
     # CEBALERT: name doesn't make sense! change displayed_params to something else e.g. params_to_display
     def pack_displayed_params(self,on_change=None,on_modify=None):
@@ -368,7 +360,7 @@ class ParametersFrame(LiveParametersFrame):
             self.__delete_trace(v)
             v._checking_get = v.get
             v.get = v._original_get
-        
+    create_widgets = set_PO # CEBALERT: need to change callers to use set_PO
 
 
     def has_unapplied_change(self):
@@ -413,7 +405,6 @@ class ParametersFrame(LiveParametersFrame):
     def _refresh_button(self):
         for name in self.displayed_params.keys():
             self._tk_vars[name]._checking_get()
-
 
 
 # CEBALERT: should be in something like tkgui.commands.
