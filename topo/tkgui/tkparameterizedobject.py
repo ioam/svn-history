@@ -167,9 +167,47 @@ def parameters(parameterized_object):
 # non-Parameter specific stuff, then one that bolts on the
 # Parameter-specific stuff, and then instead of ButtonParameter we'd
 # have TopoButton, or something like that...
-class ButtonParameter(CallableParameter): 
-    __slots__ = []
+import ImageTk, Image, ImageOps
+
+# CEBALERT: would create the photoimage on construction, except that
+# it gives "RuntimeError: Too early to create image"! Must be
+# happening before tk starts, or something. So instead, return
+# image on demand. Because of bug (see topoconsole.py "got to keep
+# references to the images") we also store a reference each time.
+
+class ButtonParameter(CallableParameter):
+    """
+    Parameter used to represent a Button (something something).
+
+    Can be associated with an image when used in a
+    TkParameterizedObject by specifying an image_path (i.e. location
+    of an image suitable for PIL, e.g. a PNG, TIFF, or JPEG image) and
+    optionally an image_size (width,height) tuple.
+    """
+    __slots__ = ['image_path','image_size','_hack']
     __doc__ = property((lambda self: self.doc))
+
+    def __init__(self,default=None,image_path=None,image_size=(32,32),
+                 **params):
+        CallableParameter.__init__(self,default=default,**params)
+        self.image_path = image_path
+        self.image_size = image_size
+        self._hack = []
+
+    def get_image(self):
+        """
+        Return an ImageTk.PhotoImage of the image at image_path
+        (or None if image_path is None).
+        """
+        if not self.image_path:
+            return None
+        else:
+            i=ImageTk.PhotoImage(ImageOps.fit(
+                Image.open(self.image_path),self.image_size))
+            self._hack.append(i)
+            return i  
+            
+
 
 
 class TkParameterizedObjectBase(ParameterizedObject):
@@ -1096,8 +1134,13 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # all skip translation etc. Instead should handle their
         # translation.)
         
-        return Button(frame,text=self.pretty_print(name),
-                      command=command,**widget_options)
+        b = Button(frame,text=self.pretty_print(name),
+                   command=command,**widget_options)
+
+        image = self.get_parameter_object(name).get_image()
+        if image: b['image']=image
+
+        return b
 
 
     def _create_selector_widget(self,frame,name,widget_options):
