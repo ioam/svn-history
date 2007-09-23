@@ -108,6 +108,15 @@ from topo.misc.utils import eval_atof
 from tkguiwindow import TkPOTaggedSlider
 
 
+### CEBALERT: hack to get standard Entry background color! ###
+t = Tkinter.Toplevel()
+t.withdraw()
+e=Tkinter.Entry(t)
+ENTRYBACKGROUND=e['background']
+e.destroy()
+##############################################################
+
+
 
 def lookup_by_class(dict_,class_):
     """
@@ -950,7 +959,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 # CEBALERT: setting colors like this is a hack: need some
                 # general method. Also this conflicts with tile.
                 if hasattr(self,'representations') and param_name in self.representations:
-                    self.representations[param_name]['widget']['background']=topo.ENTRYBACKGROUND
+                    self.representations[param_name]['widget']['background']=ENTRYBACKGROUND
             except Exception, inst:
                 m = param_name+": "+str(sys.exc_info()[0])[11::]+" ("+str(inst)+")"
                 if hasattr(topo,'guimain'):
