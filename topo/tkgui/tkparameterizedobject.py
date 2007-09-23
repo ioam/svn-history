@@ -108,16 +108,6 @@ from topo.misc.utils import eval_atof
 from tkguiwindow import TkPOTaggedSlider
 
 
-### CEBALERT: hack to get standard Entry background color! ###
-t = Tkinter.Toplevel()
-t.withdraw()
-e=Tkinter.Entry(t)
-ENTRYBACKGROUND=e['background']
-e.destroy()
-##############################################################
-
-
-
 def lookup_by_class(dict_,class_):
     """
     Look for class_ or its superclasses in the keys of dict_; on
@@ -959,7 +949,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 # CEBALERT: setting colors like this is a hack: need some
                 # general method. Also this conflicts with tile.
                 if hasattr(self,'representations') and param_name in self.representations:
-                    self.representations[param_name]['widget']['background']=ENTRYBACKGROUND
+                    self.representations[param_name]['widget'].config(background='systemWindowBody')
             except Exception, inst:
                 m = param_name+": "+str(sys.exc_info()[0])[11::]+" ("+str(inst)+")"
                 if hasattr(topo,'guimain'):
@@ -1087,7 +1077,6 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         
         # (a refresh-the-widgets-on-focus-in method could make the gui
         # in sync with the actual object?)
-
         
 
     def pretty_print(self,s):
