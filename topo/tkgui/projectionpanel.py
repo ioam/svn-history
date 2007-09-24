@@ -17,7 +17,8 @@ from topo.base.cf import CFSheet, CFProjection
 from topo.base.projection import ProjectionSheet
 from topo.base.parameterclasses import BooleanParameter
 
-from topo.plotting.plotgroup import CFProjectionPlotGroup,ProjectionSheetPlotGroup,CFPlotGroup,ProjectionActivityPlotGroup,ConnectionFieldsPlotGroup
+from topo.plotting.plotgroup import CFProjectionPlotGroup,ProjectionSheetPlotGroup, \
+     ProjectionActivityPlotGroup,ConnectionFieldsPlotGroup
 
 from templateplotgrouppanel import TemplatePlotGroupPanel
 
@@ -77,13 +78,13 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
         return (not projections == [])
 
 
-    def __init__(self,console,master,pgt,**params):
-        super(ProjectionSheetPGPanel,self).__init__(console,master,pgt,**params)
+    def __init__(self,console,master,pg=None,**params):
+        super(ProjectionSheetPGPanel,self).__init__(console,master,pg=pg,**params)
         self.pack_param('sheet',parent=self.control_frame_3,on_modify=self.sheet_change)
 
 
-    def generate_plotgroup(self):
-        p = self.plotgroup_type(template=self.pgt)
+    def generate_plotgroup(self,pg=None):
+        p = pg or self.plotgroup_type()
         self.populate_sheet_param(p)
         return p
 
@@ -106,8 +107,8 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
     plotgroup_type = ProjectionActivityPlotGroup
     
     
-    def __init__(self,console,master,pgt,**params):       
-        super(ProjectionActivityPanel,self).__init__(console,master,pgt,**params)
+    def __init__(self,console,master,pg=None,**params):       
+        super(ProjectionActivityPanel,self).__init__(console,master,pg=pg,**params)
         self.auto_refresh = True
         # CB: why do we do this?
 	self.plotgroup_label='ProjectionActivity'
@@ -125,45 +126,34 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
     def _plot_title(self):
         return "Activity in Projections to %s at time %s"%(self.plotgroup.sheet.name,self.plotgroup.time)
 
-   
+          
 
 
-class CFPGPanel(ProjectionSheetPGPanel):
-    """
-    Special type of ProjectionSheetPGPanel that supports a situate button.
-    """
+# CEBHACKALERT: various parts of the dynamic info/right-click menu stuff
+# don't make sense at the moment when things like 'situate' are clicked.
+class ConnectionFieldsPanel(ProjectionSheetPGPanel):
 
-    sheet_type = CFSheet
-    plotgroup_type = CFPlotGroup
-    _abstract_class_name = "CFPGPanel"
+    plotgroup_type = ConnectionFieldsPlotGroup
 
-    def __init__(self,console,master,pgt,**params):
-        super(CFPGPanel,self).__init__(console,master,pgt,**params)
+    def __init__(self,console,master,pg=None,**params):
+        self.initial_args=params # CEBALERT: store the initial arguments so we can get sheet,x,y in
+                                 # sheet_change if any of them were specified. Isn't there a cleaner
+                                 # way?
+        super(ConnectionFieldsPanel,self).__init__(console,master,pg,**params)
+
         self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change)
+        
+        self.pack_param('x',parent=self.control_frame_3,on_change=self.make_plots)
+        self.pack_param('y',parent=self.control_frame_3,on_change=self.make_plots)
+
+        self.sheet_change()
+
 
     def situate_change(self):
         if self.situate:
             self.plotgroup.initial_plot=True
             self.plotgroup.height_of_tallest_plot = 1
         self.redraw_plots()
-
-
-
-# CEBHACKALERT: various parts of the dynamic info/right-click menu stuff
-# don't make sense at the moment when things like 'situate' are clicked.
-class ConnectionFieldsPanel(CFPGPanel):
-
-    plotgroup_type = ConnectionFieldsPlotGroup
-
-    def __init__(self,console,master,pgt,**params):
-        self.initial_args=params # CEBALERT: store the initial arguments so we can get sheet,x,y in
-                                 # sheet_change if any of them were specified. Isn't there a cleaner
-                                 # way?
-        super(ConnectionFieldsPanel,self).__init__(console,master,pgt,**params)
-        self.pack_param('x',parent=self.control_frame_3,on_change=self.make_plots)
-        self.pack_param('y',parent=self.control_frame_3,on_change=self.make_plots)
-
-        self.sheet_change()
 
 
 
@@ -219,21 +209,21 @@ class ConnectionFieldsPanel(CFPGPanel):
 
 
 
-class CFProjectionPGPanel(CFPGPanel):
+class CFProjectionPGPanel(ProjectionSheetPGPanel):
     """
     Panel for displaying CFProjections.
     """
 
     plotgroup_type = CFProjectionPlotGroup
 
-    def __init__(self,console,master,pgt,**params):
-        super(CFProjectionPGPanel,self).__init__(console,master,pgt,**params)
+    def __init__(self,console,master,pg=None,**params):
+        super(CFProjectionPGPanel,self).__init__(console,master,pg=pg,**params)
         self.pack_param('projection',parent=self.control_frame_3,on_modify=self.make_plots)
         self.pack_param('density',parent=self.control_frame_3)
 
 
-    def generate_plotgroup(self):
-        p = super(CFProjectionPGPanel,self).generate_plotgroup()        
+    def generate_plotgroup(self,pg=None):
+        p = super(CFProjectionPGPanel,self).generate_plotgroup(pg)        
         self.populate_projection_param(p)
         return p
 
