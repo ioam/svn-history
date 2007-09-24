@@ -5,6 +5,8 @@ default: python jpeg pil numpy pmw matplotlib weave fixedpoint pychecker common 
 
 all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco
 
+dist: bluesphere
+
 clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean ctypes-clean pyaudiolab-clean tile-clean tilewrapper-clean bwidget-clean psyco-clean pyrex-clean hdf5-clean pytables-clean
 
 uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall ctypes-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall
@@ -617,6 +619,28 @@ pytables-clean:
 	rm -rf ${PYTABLES}
 pytables-uninstall:
 	rm -rf pytables ${foreach f,${PYTABLES_UNINSTALL}, ${PREFIX}/${f}}
+
+##############################################################
+# BlueSphere
+# Only needs to be updated when the choice of icons changes, as the results 
+# are ordinarily checked in under topo/tkgui/icons/.
+# 
+BLUESPHERE = BlueSphere-SVG-snapshot-Nov-29-2002
+
+BLUESPHERE_UNINSTALL += topo/tkgui/icons/*.png
+
+bluesphere: ${BLUESPHERE}.tar.gz
+	mkdir ${BLUESPHERE}
+	cd ${BLUESPHERE}; tar xzf ../${BLUESPHERE}.tar.gz
+	cp ${BLUESPHERE}_Makefile ${BLUESPHERE}/Makefile
+	cd ${BLUESPHERE}; make
+	cp ${BLUESPHERE}/*.png ../topo/tkgui/icons/
+	touch bluesphere
+
+bluesphere-clean:
+	rm -rf ${BLUESPHERE}
+bluesphere-uninstall:
+	rm -rf ${foreach f,${BLUESPHERE_UNINSTALL}, ${PREFIX}/${f}}
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
