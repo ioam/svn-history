@@ -141,9 +141,9 @@ class TkguiWindow(Tkinter.Toplevel):
             # self.attributes("-titlepath","/Users/vanessa/topographica/AppIcon.icns")
         else:
             # CB: It may be possible for the icon be in color (using
-            # e.g. topo/tkgui/topo.xpm), see http://www.thescripts.com/forum/thread43119.html
+            # e.g. topo/tkgui/icons/topo.xpm), see http://www.thescripts.com/forum/thread43119.html
             # or http://mail.python.org/pipermail/python-list/2005-March/314585.html
-            self.iconbitmap('@'+(os.path.join(topo_dir,'topo/tkgui/topo.xbm')))
+            self.iconbitmap('@'+(os.path.join(topo_dir,'topo/tkgui/icons/topo.xbm')))
 
 
         ### Universal right-click menu   CB: not currently used by anything but the plotgrouppanels
