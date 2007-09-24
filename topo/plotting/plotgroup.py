@@ -17,10 +17,13 @@ import __main__
 import topo
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Parameter,BooleanParameter,StringParameter,Number,ObjectSelectorParameter
+from topo.base.parameterclasses import Parameter,BooleanParameter, \
+     StringParameter,Number,ObjectSelectorParameter, Filename, ListParameter
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet,CFProjection
 from topo.base.projection import ProjectionSheet
+
+from topo.misc.keyedlist import KeyedList
 
 from plot import make_template_plot, Plot
 
@@ -35,6 +38,10 @@ def cmp_plot(plot1,plot2):
     else:
 	return cmp((plot1.plot_src_name+plot1.name),
 		   (plot2.plot_src_name+plot2.name))
+
+
+# CEB: working on this file (it's in an intermediate state: in the process of
+# removing PlotGroupTemplates and cleaning up).
 
 
 class PlotGroup(ParameterizedObject):
@@ -59,7 +66,8 @@ class PlotGroup(ParameterizedObject):
 
     plot_command = StringParameter(default="",doc="""
     Command to execute when updating sheet or coordinate of unit to be plotted
-    when the simulator time has not changed.
+    when the simulator time has not changed (i.e. no further measurement of
+    responses is required).
     In the case of a full-field stimulus, responses do not need to be re-measured
     since the necessary values are already stored. 
     
@@ -312,23 +320,57 @@ class SheetPlotGroup(PlotGroup):
         return True
 
 
-
+# CB: added in PlotGroupTemplate's Parameters, so now a bit of a mess.
 class TemplatePlotGroup(SheetPlotGroup):
     """
     PlotGroup that is built as specified by a PlotGroupTemplate.
     """
 
-    template = Parameter()
+    doc = StringParameter(default="",
+      doc="Documentation string describing this type of plot.")
 
-    def __init__(self,**params):
+
+    template_plot_type=Parameter('bitmap',
+      doc="Whether the plots are bitmap images or curves, to determine which GUI components are needed")
+
+    plot_immediately=BooleanParameter(False,doc="""
+      Whether to call the plot command at once or only when the user asks for a refresh.
+
+      Should be set to true for quick plots, but false for those that take a long time
+      to calculate, so that the user can change the update command if necessary.""")
+    
+    image_location = Filename(doc='Path to search for a user-specified image.')
+
+    prerequisites=ListParameter([],
+      doc="List of preference maps which must exist before this plot can be calculated.")
+
+    category = StringParameter(default="User",
+      doc="Category to which this plot belongs, which will be created if necessary.")
+
+    # JCALERT! We might eventually write these two functions
+    # 'Python-like' by using keyword argument to specify each
+    # channel and then get the dictionnary of all remaining
+    # arguments.
+    # 
+    # JABALERT: We should also be able to store a documentation string
+    # describing each plot (for hovering help text) within each
+    # plot template.
+    def add_plot(self,name,specification_tuple_list):
+	dict_={}
+	for key,value in specification_tuple_list:
+	    dict_[key]=value
+	self.plot_templates.append((name,dict_))
+
+    def add_static_image(self,name,file_path):
+        self.image_location = file_path
+	self.static_images.append((name,self.image_location))
+
+
+    def __init__(self,plot_templates=[],static_images=[],**params):
 	super(TemplatePlotGroup,self).__init__(**params)
 
-        ##### CEBHACKALERT: set params from template #####
-        assert self.template is not None
-        for n in self.template.params().keys():
-            if hasattr(self,n):
-                setattr(self,n,getattr(self.template,n))
-        ##################################################
+	self.plot_templates = KeyedList(plot_templates)
+	self.static_images = KeyedList(static_images)
                 
 	# Add static images to the added_plot_list, as specified by the template.
         self._add_static_images()
@@ -345,28 +387,25 @@ class TemplatePlotGroup(SheetPlotGroup):
         """   
 	plot_list = self.plot_list
         for each in self._sheets():
-	    for (pt_name,pt) in self.template.plot_templates:
+	    for (pt_name,pt) in self.plot_templates:
 		plot_list = plot_list + self._create_plots(pt_name,pt,each)
     	return plot_list
 
 
-# create_plot (no s)
     def _create_plots(self,pt_name,pt,sheet):
 	""" 
 	Sub-function of _plot_list().
 	Creates a plot corresponding to a plot_template, its name, and a sheet.
 	"""
-        p = make_template_plot(pt,sheet.sheet_view_dict,sheet.xdensity,
- 			       sheet.bounds,self.normalize,name=pt_name)
-
-	return [p]
+        return [make_template_plot(pt,sheet.sheet_view_dict,sheet.xdensity,
+                                   sheet.bounds,self.normalize,name=pt_name)]
 
 
     def _add_static_images(self):
         """
         Construct a static image Plot (e.g. a color key for an Orientation Preference map).
         """        
-        for image_name,file_path in self.template.static_images :
+        for image_name,file_path in self.static_images :
             image = Image.open(file_path)
 	    plot = Plot(image,name=image_name)
             self.plot_list.append(plot)
@@ -408,31 +447,37 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 	topo.commands.analysis.sheet_name = self.sheet.name
         super(ProjectionSheetPlotGroup,self)._update_command()
         
+
+
+
+    # Special case: if the Strength is set to self.keyname, we
+    # request UnitViews (i.e. by changing the Strength key in
+    # the plot_channels). Otherwise, we consider Strength as
+    # specifying an arbitrary SheetView.
+
     # CB/JAB: Should replace this custom routine with simply providing
     # a method for constructing a special key name; then maybe nearly
     # all the fancy processing in the various _create_plots functions
     # can be eliminated
+
+    # (this method isn't the solution to the above, it's just beginning
+    # to remove some duplication)
+    def _change_key(self,plotgroup_template,sheet,proj):
+        plot_channels = copy.deepcopy(plotgroup_template)
+        key = (self.keyname,sheet.name,proj.name)
+        plot_channels['Strength']=key
+        return plot_channels
+
     def _create_plots(self,pt_name,pt,sheet):
 	"""Creates plots as specified by the plot_template."""
-        # Special case: if the Strength is set to self.keyname, we
-        # request UnitViews (i.e. by changing the Strength key in
-        # the plot_channels). Otherwise, we consider Strength as
-        # specifying an arbitrary SheetView.
-        if ( pt.get('Strength', None) == self.keyname):
-            plot_list = []
-            for p in sheet.in_connections: 
-                plot_channels = copy.deepcopy(pt)
-                # Note: the UnitView is in the src_sheet view_dict,
-                # and the name in the key is the destination sheet.
-                key = (self.keyname,sheet.name,p.name)
-                plot_channels['Strength'] = key
-                plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,
-                                                    p.src.xdensity,
-                                                    None,self.normalize,name=p.name))
-            return plot_list
-
-        else: # Fall back to normal case
-            return super(ProjectionSheetPlotGroup,self)._create_plots(pt_name,pt,sheet)
+        # Note: the UnitView is in the src_sheet view_dict,
+        # and the name in the key is the destination sheet.
+        return [make_template_plot(self._change_key(pt,sheet,proj),
+                                   proj.src.sheet_view_dict,
+                                   proj.src.xdensity,
+                                   None,
+                                   self.normalize,
+                                   name=proj.name) for proj in sheet.in_connections]
 
  
     def generate_labels(self):
@@ -448,104 +493,41 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
 
     keyname='ProjectionActivity' 
 
-    ### CEBALERT: very similar to large part of ProjectionSheetPlotGroup's _create_plots
+
     def _create_plots(self,pt_name,pt,sheet):
-	"""Creates plots as specified by the plot_template."""
-        plot_list = []
-        for p in sheet.in_connections: 
-            plot_channels = copy.deepcopy(pt) 
-            key = (self.keyname,sheet.name,p.name)
-            plot_channels['Strength'] = key
-            plot_list.append(make_template_plot(plot_channels,p.dest.sheet_view_dict,
-                                                p.dest.xdensity,
-                                                p.dest.bounds,self.normalize,name=p.name))
-        return plot_list
-                
+        return [make_template_plot(self._change_key(pt,sheet,proj),
+                                   proj.src.sheet_view_dict,
+                                   proj.src.xdensity,
+                                   proj.dest.bounds,
+                                   self.normalize,
+                                   name=proj.name) for proj in sheet.in_connections]
 
 
-
-
-class CFPlotGroup(ProjectionSheetPlotGroup):
-    _abstract_class_name = "CFPlotGroup"
+class ProjectionPlotGroup(ProjectionSheetPlotGroup):
+    projection = ObjectSelectorParameter(default=None,doc="The projection to visualize.")
     
-    situate = BooleanParameter(default=False,doc=
-                               """If True, plots the weights on the
-entire source sheet, using zeros for all weights outside the
-ConnectionField.  If False, plots only the actual weights that are
-stored.""")
-# CEBALERT: all necessary situate stuff removed from tkgui? See ALERT in CFRelatedPlotGroupPanel.
+    
 
-
-
-# CB/JAB: Consider -- is this actually general enough to handle
-# anything related to a unit, rather than CF specifically?
-class ConnectionFieldsPlotGroup(CFPlotGroup):
-    """
-    Visualize a ConnectionField for each of a CFSheet's CFProjections.
-    """
-    keyname='Weights'
-    situate = BooleanParameter(False)
-
-    sheet_type = CFSheet
-
-    # JABALERT: need to show actual coordinates of unit returned
-    x = Number(default=0.0,doc="""x-coordinate of the unit to plot""")
-    y = Number(default=0.0,doc="""y-coordinate of the unit to plot""")
-## """Sheet coordinate location desired.  The unit nearest this location will be returned.
-## It is an error to request a unit outside the area of the Sheet.""")
-
-        
-    def _update_command(self):
-	topo.commands.analysis.coordinate = (self.x,self.y)
-	super(ConnectionFieldsPlotGroup,self)._update_command()
-
-    def _create_plots(self,pt_name,pt,sheet):
-	""" 
-	Sub-function of _plot_list().
-	Creates a plot as specified by a Connection Field plot_template:
-	allows creating a connection field plot or a normal plot.
-	"""
-        if ( pt.get('Strength', None) == self.keyname):
-            plot_list = []
-            for p in sheet.in_connections:
-                plot_channels = copy.deepcopy(pt)
-                key = (self.keyname,sheet.name,p.name,self.x,self.y)
-                plot_channels['Strength'] = key
-                if self.situate:
-                    plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.xdensity,
-                                                        None,self.normalize,name=p.name))
-                else:
-                    (r,c) = p.dest.sheet2matrixidx(self.x,self.y)
-                    plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.xdensity,
-                                                        p.cf(r,c).bounds,self.normalize,name=p.name))
-            return plot_list
-
-        else: # Fall back to normal case
-            return super(ConnectionFieldsPlotGroup,self)._create_plots(pt_name,pt,sheet)
-
-
-
-### Someday will need an abstract ProjectionPlotGroup
-
-
-class CFProjectionPlotGroup(CFPlotGroup):
+class CFProjectionPlotGroup(ProjectionPlotGroup):
     """Visualize one CFProjection."""
 
     keyname='Weights'
 
-    projection = ObjectSelectorParameter(default=None,doc="The projection to visualize.")
+    situate = BooleanParameter(default=False,doc="""
+    If True, plots the weights on the entire source sheet, using zeros
+    for all weights outside the ConnectionField.  If False, plots only
+    the actual weights that are stored.""")
+
 
     ### JPALERT: The bounds are meaningless for large sheets anyway.  If a sheet
     ### is specified in, say, visual angle coordinates (e.g., -60 to +60 degrees), then
     ### the soft min of 5.0/unit will still give a 600x600 array of CFs!
     ### Density should probably be specified WRT to sheet bounds,
-    ### instead of per-unit-of-sheet.
-    
-    density = Number(default=10.0,doc='Number of units to plot per 1.0 distance in sheet coordinates',
-                     softbounds=(5.0,50.0))
-    
-    situate = BooleanParameter(False) # override default
-
+    ### instead of per-unit-of-sheet.    
+    density = Number(default=10.0,
+                     softbounds=(5.0,50.0),doc="""
+                     Number of units to plot per 1.0 distance in sheet coordinates""")
+                     
     sheet_type = CFSheet
     projection_type = CFProjection
 
@@ -572,6 +554,13 @@ class CFProjectionPlotGroup(CFPlotGroup):
         topo.commands.analysis.proj_name = self.projection.name
         super(CFProjectionPlotGroup,self)._update_command()
 
+
+    def _change_key(self,plotgroup_template,sheet,proj,x,y):
+        plot_channels = copy.deepcopy(plotgroup_template)
+        key = (self.keyname,sheet.name,proj.name,x,y)
+        plot_channels['Strength']=key
+        return plot_channels
+
 		
     def _create_plots(self,pt_name,pt,sheet):
 	""" 
@@ -584,18 +573,22 @@ class CFProjectionPlotGroup(CFPlotGroup):
         src_sheet=projection.src
 
         for x,y in self.generate_coords():
-            plot_channels = copy.deepcopy(pt)
+            
             # JC: we might consider allowing the construction of 'projection type' plots
             # with other things than UnitViews.
-            key = (self.keyname,sheet.name,projection.name,x,y)
-            plot_channels['Strength'] = key
+            plot_channels = self._change_key(pt,sheet,projection,x,y)
+            
             if self.situate:
-                plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.xdensity,
-                                                    src_sheet.bounds,self.normalize))
+                bounds = src_sheet.bounds
             else:
                 (r,c) = projection.dest.sheet2matrixidx(x,y)
-                plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.xdensity,
-							projection.cf(r,c).bounds,self.normalize))
+                bounds = projection.cf(r,c).bounds
+                                                    
+            plot_list.append(make_template_plot(plot_channels,
+                                                src_sheet.sheet_view_dict,
+                                                src_sheet.xdensity,
+                                                bounds,
+                                                self.normalize))
         return plot_list
 
 
@@ -630,47 +623,79 @@ class CFProjectionPlotGroup(CFPlotGroup):
 
 
 
-# CB/JAB: Can't it just inherit from ConnectionFieldsPlotGroup
-# (renamed to something like UnitPlotGroup)?  Then will simply have
-# something about getting the right time.
-class FeatureCurvePlotGroup(PlotGroup):
 
 
-    sheet = ObjectSelectorParameter() 
 
-    template = Parameter() # doesn't this make it a templateplotgroup?
+# CB/JAB: Consider -- is this actually general enough to handle
+# anything related to a unit, rather than CF specifically?
+class UnitPlotGroup(ProjectionSheetPlotGroup):
+    """
+    Visualize anything related to a unit.
+    """
 
-    x = Number(default=0.0,doc="something")
-    y = Number(default=0.0,doc="somethingelse")
+    # JABALERT: need to show actual coordinates of unit returned
+    x = Number(default=0.0,doc="""x-coordinate of the unit to plot""")
+    y = Number(default=0.0,doc="""y-coordinate of the unit to plot""")
+## """Sheet coordinate location desired.  The unit nearest this location will be returned.
+## It is an error to request a unit outside the area of the Sheet.""")
+
+        
+    def _update_command(self):
+	topo.commands.analysis.coordinate = (self.x,self.y)
+	super(UnitPlotGroup,self)._update_command()
 
 
-    
 
-    def __init__(self,**params):
-        super(FeatureCurvePlotGroup,self).__init__(**params)
+class ConnectionFieldsPlotGroup(UnitPlotGroup):
+    """
+    Visualize ConnectionField for each of a CFSheet's CFProjections.
+    """
+    keyname='Weights'
 
-        ##### CEBHACKALERT: set params from template #####
-        assert self.template is not None
-        for n in self.template.params().keys():
-            if hasattr(self,n):
-                setattr(self,n,getattr(self.template,n))
-        ##################################################
+    sheet_type = CFSheet
+
+    situate = BooleanParameter(default=False,doc="""
+    If True, plots the weights on the entire source sheet, using zeros
+    for all weights outside the ConnectionField.  If False, plots only
+    the actual weights that are stored.""")
+
+    def _change_key(self,plotgroup_template,sheet,proj,x,y):
+        plot_channels = copy.deepcopy(plotgroup_template)
+        key = (self.keyname,sheet.name,proj.name,x,y)
+        plot_channels['Strength']=key
+        return plot_channels
 
 
-    def CEBALERT(self):
-        topo.commands.analysis.coordinate = (self.x,self.y)
-        topo.commands.analysis.sheet_name = self.sheet.name
+    def _create_plots(self,pt_name,pt,sheet):
+	""" 
+	Creates a plot as specified by a Connection Field plot_template:
+	"""
+        plot_list = []
+        for p in sheet.in_connections:
+            plot_channels = self._change_key(pt,sheet,p,self.x,self.y)
+            if self.situate:
+                bounds = None
+            else:
+                (r,c) = p.dest.sheet2matrixidx(self.x,self.y)
+                bounds = p.cf(r,c).bounds
+            plot_list.append(make_template_plot(plot_channels,
+                                                p.src.sheet_view_dict,
+                                                p.src.xdensity,
+                                                bounds,
+                                                self.normalize,
+                                                name=p.name))
+        return plot_list
+
+
+class FeatureCurvePlotGroup(UnitPlotGroup):
 
     def _update_command(self):
-        self.CEBALERT()
         super(FeatureCurvePlotGroup,self)._update_command()          
         self.get_curve_time()
 
     def _plot_command(self):
-        self.CEBALERT()
         super(FeatureCurvePlotGroup,self)._plot_command()
         self.get_curve_time()
-
 
     def get_curve_time(self):
         """
@@ -688,3 +713,40 @@ class FeatureCurvePlotGroup(PlotGroup):
                 self.warning("Displaying curves from different times (%s,%s)" %
                              (min(timestamps),max(timestamps)))
 
+
+
+
+plotgroups = KeyedList()
+"""
+Global repository of PlotGroups, to which users can add
+their own as needed.
+"""
+
+
+plotgroup_types = {'Connection Fields': ConnectionFieldsPlotGroup,
+                   # CB: and here's where to start with being able to plot any type
+                   # of projection
+                   'Projection': CFProjectionPlotGroup,
+                   'Projection Activity': ProjectionActivityPlotGroup}
+
+
+def new_pg(**params):
+    """
+    Create a new PlotGroup and add it to the plotgroups list.
+
+    Convenience function to make it simpler to use the name of the
+    PlotGroup as the key in the plotgroups list.
+    """
+    name = params.get('name')
+    template_plot_type = params.get('template_plot_type')
+
+    pg_type = TemplatePlotGroup
+    if name:
+        if name in plotgroup_types:
+            pg_type = plotgroup_types[name]
+        elif template_plot_type=='curve':
+            pg_type = FeatureCurvePlotGroup
+                
+    pg = pg_type(**params)
+    plotgroups[pg.name]=pg
+    return pg
