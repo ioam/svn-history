@@ -10,152 +10,146 @@ $Id$
 __version__='$Revision$'
 
 
-from topo.base.parameterizedobject import ParameterizedObject
-from topo.misc.keyedlist import KeyedList
-from topo.base.parameterclasses import Parameter, BooleanParameter, Filename
-from topo.base.parameterclasses import ListParameter, StringParameter
+## from topo.base.parameterizedobject import ParameterizedObject
+## from topo.misc.keyedlist import KeyedList
+## from topo.base.parameterclasses import Parameter, BooleanParameter, Filename
+## from topo.base.parameterclasses import ListParameter, StringParameter
 
 
-class PlotGroupTemplate(ParameterizedObject):
-    """
-    Class specifying how to construct a PlotGroup from the objects in a Simulation.
+## class PlotGroupTemplate(ParameterizedObject):
+##     """
+##     Class specifying how to construct a PlotGroup from the objects in a Simulation.
 
-    A PlotGroupTemplate is a data structure that specifies how to
-    construct a set of related plots, when later given a set of Sheets
-    in a Simulation.  The template can be modified however the user
-    wishes, allowing the user to control what information is shown in
-    plots, how the data is displayed, and so on.
+##     A PlotGroupTemplate is a data structure that specifies how to
+##     construct a set of related plots, when later given a set of Sheets
+##     in a Simulation.  The template can be modified however the user
+##     wishes, allowing the user to control what information is shown in
+##     plots, how the data is displayed, and so on.
 
-    A single template is sufficient for any model, because the
-    template does not include any information about specific Sheets.
-    Thus the templates can be modified whenever the user desires, but
-    do not *usually* need to be modified.
-    """
+##     A single template is sufficient for any model, because the
+##     template does not include any information about specific Sheets.
+##     Thus the templates can be modified whenever the user desires, but
+##     do not *usually* need to be modified.
+##     """
     
-    update_command = Parameter("pass",
-      doc="Command string to run before plotting, if any.")
-    command = update_command # CEBALERT: keep until all references to command are removed
+
+##     template_plot_type=Parameter('bitmap',
+##       doc="Whether the plots are bitmap images or curves, to determine which GUI components are needed")
+
+##     plot_immediately=BooleanParameter(False,doc="""
+##       Whether to call the plot command at once or only when the user asks for a refresh.
+
+##       Should be set to true for quick plots, but false for those that take a long time
+##       to calculate, so that the user can change the update command if necessary.""")
     
-    plot_command=Parameter("pass",
-      doc="Command string to run before plotting when no further measurement of responses is required")
+##     normalize = BooleanParameter(False,
+##       doc="If true, enables bitmap plot value normalization by default.")
 
-    template_plot_type=Parameter('bitmap',
-      doc="Whether the plots are bitmap images or curves, to determine which GUI components are needed")
+##     image_location = Filename(doc='Path to search for a user-specified image.')
 
-    plot_immediately=BooleanParameter(False,doc="""
-      Whether to call the plot command at once or only when the user asks for a refresh.
+##     prerequisites=ListParameter([],
+##       doc="List of preference maps which must exist before this plot can be calculated.")
 
-      Should be set to true for quick plots, but false for those that take a long time
-      to calculate, so that the user can change the update command if necessary.""")
-    
-    normalize = BooleanParameter(False,
-      doc="If true, enables bitmap plot value normalization by default.")
+##     category = StringParameter(default="User",
+##       doc="Category to which this plot belongs, which will be created if necessary.")
 
-    image_location = Filename(doc='Path to search for a user-specified image.')
+##     doc = StringParameter(default="",
+##       doc="Documentation string describing this type of plot.")
 
-    prerequisites=ListParameter([],
-      doc="List of preference maps which must exist before this plot can be calculated.")
+##     def __init__(self, plot_templates=[], static_images = [],**params):
+##         """
+##         A PlotGroupTemplate is constructed from a name, a plot_templates
+##         list, an optional command to run to generate the data, and other
+##         optional parameters.
 
-    category = StringParameter(default="User",
-      doc="Category to which this plot belongs, which will be created if necessary.")
+##         The plot_templates list should contain tuples (plot_name,
+##         plot_template).  Each plot_template is a list of (name,
+##         value) pairs, where each name specifies a plotting channel
+##         (such as Hue or Confidence), and the value is the name of a
+##         SheetView (such as Activity or OrientationPreference).
 
-    doc = StringParameter(default="",
-      doc="Documentation string describing this type of plot.")
+##         Various types of plots support different channels.  An SHC
+##         plot supports Strength, Hue, and Confidence channels (with
+##         Strength usually being visualized as luminance, Hue as a color
+##         value, and Confidence as the saturation of the color).  An RGB
+##         plot supports Red, Green, and Blue channels.  Other plot types
+##         will be added eventually.
 
-    def __init__(self, plot_templates=[], static_images = [],**params):
-        """
-        A PlotGroupTemplate is constructed from a name, a plot_templates
-        list, an optional command to run to generate the data, and other
-        optional parameters.
-
-        The plot_templates list should contain tuples (plot_name,
-        plot_template).  Each plot_template is a list of (name,
-        value) pairs, where each name specifies a plotting channel
-        (such as Hue or Confidence), and the value is the name of a
-        SheetView (such as Activity or OrientationPreference).
-
-        Various types of plots support different channels.  An SHC
-        plot supports Strength, Hue, and Confidence channels (with
-        Strength usually being visualized as luminance, Hue as a color
-        value, and Confidence as the saturation of the color).  An RGB
-        plot supports Red, Green, and Blue channels.  Other plot types
-        will be added eventually.
-
-        For instance, one could define an Orientation-colored Activity
-        plot as::
+##         For instance, one could define an Orientation-colored Activity
+##         plot as::
         
-          plotgroup_templates['Activity'] =
-              PlotGroupTemplate(name='Activity', category='Basic',
-                  update_command='measure_activity()',
-                  plot_templates=[('Activity',
-                      {'Strength': 'Activity', 'Hue': 'OrientationPreference', 'Confidence': None})])
+##           plotgroup_templates['Activity'] =
+##               PlotGroupTemplate(name='Activity', category='Basic',
+##                   update_command='measure_activity()',
+##                   plot_templates=[('Activity',
+##                       {'Strength': 'Activity', 'Hue': 'OrientationPreference', 'Confidence': None})])
     
-        This specifies that the final PlotGroup will contain up to one
-        Plot named Activity per Sheet, although there could be no
-        plots at all if no Sheet has a SheetView named Activity once
-        'measure_activity()' has been run.  The Plot will be colored
-        by OrientationPreference if such a SheetView exists for that
-        Sheet, and the value (luminance) channel will be determined by
-        the SheetView Activity.  This plot will be listed in the
-        category 'Basic'.
+##         This specifies that the final PlotGroup will contain up to one
+##         Plot named Activity per Sheet, although there could be no
+##         plots at all if no Sheet has a SheetView named Activity once
+##         'measure_activity()' has been run.  The Plot will be colored
+##         by OrientationPreference if such a SheetView exists for that
+##         Sheet, and the value (luminance) channel will be determined by
+##         the SheetView Activity.  This plot will be listed in the
+##         category 'Basic'.
     
-        Here's a more complicated example specifying two different plots
-        in the same PlotGroup::
+##         Here's a more complicated example specifying two different plots
+##         in the same PlotGroup::
     
-          PlotGroupTemplate(name='Orientation Preference', category='Basic'
-              update_command = 'measure_or_pref()',
-              plot_templates=
-                  [('Orientation Preference',
-                      {'Strength': None, 'Hue': 'OrientationPreference'}),
-                   ('Orientation Selectivity',
-                      {'Strength': 'OrientationSelectivity'})])
+##           PlotGroupTemplate(name='Orientation Preference', category='Basic'
+##               update_command = 'measure_or_pref()',
+##               plot_templates=
+##                   [('Orientation Preference',
+##                       {'Strength': None, 'Hue': 'OrientationPreference'}),
+##                    ('Orientation Selectivity',
+##                       {'Strength': 'OrientationSelectivity'})])
     
-        Here the PlotGroup will contain up to two Plots per Sheet,
-        depending on which Sheets have OrientationPreference and
-        OrientationSelectivity SheetViews.
-        """
+##         Here the PlotGroup will contain up to two Plots per Sheet,
+##         depending on which Sheets have OrientationPreference and
+##         OrientationSelectivity SheetViews.
+##         """
         
-        super(PlotGroupTemplate,self).__init__(**params)
+##         super(PlotGroupTemplate,self).__init__(**params)
        
-	self.plot_templates = KeyedList(plot_templates)
-	self.static_images = KeyedList(static_images)
+## 	self.plot_templates = KeyedList(plot_templates)
+## 	self.static_images = KeyedList(static_images)
 
 
-    # JCALERT! We might eventually write these two functions
-    # 'Python-like' by using keyword argument to specify each
-    # channel and then get the dictionnary of all remaining
-    # arguments.
-    # 
-    # JABALERT: We should also be able to store a documentation string
-    # describing each plot (for hovering help text) within each
-    # plot template.
-    def add_plot(self,name,specification_tuple_list):
-	dict_={}
-	for key,value in specification_tuple_list:
-	    dict_[key]=value
-	self.plot_templates.append((name,dict_))
+##     # JCALERT! We might eventually write these two functions
+##     # 'Python-like' by using keyword argument to specify each
+##     # channel and then get the dictionnary of all remaining
+##     # arguments.
+##     # 
+##     # JABALERT: We should also be able to store a documentation string
+##     # describing each plot (for hovering help text) within each
+##     # plot template.
+##     def add_plot(self,name,specification_tuple_list):
+## 	dict_={}
+## 	for key,value in specification_tuple_list:
+## 	    dict_[key]=value
+## 	self.plot_templates.append((name,dict_))
 
-    def add_static_image(self,name,file_path):
-        self.image_location = file_path
-	self.static_images.append((name,self.image_location))
+##     def add_static_image(self,name,file_path):
+##         self.image_location = file_path
+## 	self.static_images.append((name,self.image_location))
         
 
 
-plotgroup_templates = KeyedList()
-"""
-Global repository of PlotGroupTemplates, to which users can add
-their own as needed.
-"""
+## plotgroup_templates = KeyedList()
+## """
+## Global repository of PlotGroupTemplates, to which users can add
+## their own as needed.
+## """
 
 
-def new_pgt(**params):
-    """
-    Create a new PlotGroupTemplate and add it to the plotgroup_templates list.
+## def new_pgt(**params):
+##     """
+##     Create a new PlotGroupTemplate and add it to the plotgroup_templates list.
 
-    Convenience function to make it simpler to use the name of the
-    PlotGroupTemplate as the key in the plotgroup_templates list.
-    See the PlotGroupTemplate __init__ function for more details.
-    """
-    pgt = PlotGroupTemplate(**params)
-    plotgroup_templates[pgt.name]=pgt
-    return pgt
+##     Convenience function to make it simpler to use the name of the
+##     PlotGroupTemplate as the key in the plotgroup_templates list.
+##     See the PlotGroupTemplate __init__ function for more details.
+##     """
+##     pgt = PlotGroupTemplate(**params)
+##     plotgroup_templates[pgt.name]=pgt
+##     return pgt
