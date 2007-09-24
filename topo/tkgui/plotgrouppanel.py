@@ -130,22 +130,29 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
     # CEBALERT: (if someone clicks 'back' on a window, would
     # they expect auto-refresh to become unchecked/disabled?)
 
-    Refresh = ButtonParameter(doc="Force the current plot to be regenerated (i.e. execute update_command and plot_command).")
+    # Default size for images used on buttons
+    button_image_size=(20,20)
 
-    Redraw = ButtonParameter(doc="Redraw the plot from existing data (i.e. execute plot_command only).")
+    Refresh = ButtonParameter(image_path="topo/tkgui/icons/redo-small.png",size=button_image_size,
+                              doc="Force the current plot to be regenerated (i.e. execute update_command and plot_command).")
 
-    Enlarge = ButtonParameter(doc="""Increase the displayed size of the current plots by about 20%.""")
+    Redraw = ButtonParameter(image_path="topo/tkgui/icons/redo-small.png",size=button_image_size,
+                             doc="Redraw the plot from existing data (i.e. execute plot_command only).")
 
-    Reduce = ButtonParameter(doc=
+    Enlarge = ButtonParameter(image_path="topo/tkgui/icons/viewmag+_2.2.png",size=button_image_size,
+                              doc="""Increase the displayed size of the current plots by about 20%.""")
+                          
+    Reduce = ButtonParameter(image_path="topo/tkgui/icons/viewmag-_2.1.png",size=button_image_size,doc=
             """
             Reduce the displayed size of the current plots by about 20%.  A
             minimum size that preserves at least one pixel per unit is enforced,
             to ensure that no data is lost when displaying.
             """)
 
-    Fwd = ButtonParameter(doc="Move forward through the history of all the plots shown in this window.")
+    Fwd = ButtonParameter(image_path="topo/tkgui/icons/forward-2.0.png",size=button_image_size,
+                          doc="Move forward through the history of all the plots shown in this window.")
 
-    Back = ButtonParameter(doc=
+    Back = ButtonParameter(image_path="topo/tkgui/icons/back-2.0.png",size=button_image_size,doc=
             """
             Move backward through the history of all the plots shown in this
             window.  When showing a historical plot, some functions will be
