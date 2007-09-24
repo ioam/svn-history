@@ -10,7 +10,6 @@ from pprint import pprint
 from topo.plotting import plot
 from topo.base.sheet import *
 from topo.plotting.plotgroup import *
-from topo.plotting.templates import PlotGroupTemplate
 import numpy.oldnumeric as Numeric
 from numpy.oldnumeric import divide
 
@@ -154,7 +153,7 @@ class TestPlotGroup(unittest.TestCase):
 import unittest
 from topo.base.simulation import Simulation
 from topo.plotting.plotgroup import TemplatePlotGroup, ConnectionFieldsPlotGroup
-from topo.plotting.templates import plotgroup_templates
+
 import topo.patterns.random
 from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.base.cf import CFProjection, CFSheet

@@ -17,7 +17,7 @@ from topo.base.parameterclasses import Number, StringParameter
 
 from plotgroup import PlotGroup,TemplatePlotGroup
 from plotgroup import CFProjectionPlotGroup,ConnectionFieldsPlotGroup 
-from templates import plotgroup_templates
+from plotgroup import plotgroups
 
 import topo
 
@@ -28,7 +28,6 @@ class PlotGroupSaver(ParameterizedObject):
     """
     Allows a PlotGroup to be saved as a set of bitmap files on disk.
     """
-
     file_format = StringParameter(default="png",doc="""
         Bitmap image file format to use.""")
 
@@ -90,25 +89,21 @@ class PlotGroupSaver(ParameterizedObject):
 
 
 class TemplatePlotGroupSaver(PlotGroupSaver):
-
+    
     plotgroup_class = TemplatePlotGroup
 
-    # CEBALERT: pass pgt, or maybe nothing at all
-    def __init__(self,pgt_name,**params):
-        self.pgt = plotgroup_templates.get(pgt_name,None)
-        if not self.pgt:
-            raise(ValueError("No PlotGroupTemplate named %s found" % pgt_name))
-        super(TemplatePlotGroupSaver,self).__init__(pgt_name,**params)
-
     def generate_plotgroup(self,**params):
-        # CEBALERT: template Parameter stuff needs cleaning (but not just here).
-        params['template'] = self.pgt 
-	self.plotgroup = self.plotgroup_class(**params)
+        # tricky: use a named PlotGroup if one exists; otherwise,
+        # instatiate a new one (whole mechanism needs updating)
+        self.plotgroup = plotgroups.get(self.plotgroup_label) or \
+                         self.plotgroup_class()
 
+        for n,p in params.items(): setattr(self.plotgroup,n,p)
+
+    
 
 class ConnectionFieldsPlotGroupSaver(TemplatePlotGroupSaver):
     plotgroup_class = ConnectionFieldsPlotGroup
-
 
 
 # Could move this elsewhere if it will be useful.

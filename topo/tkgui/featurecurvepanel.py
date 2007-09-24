@@ -50,9 +50,8 @@ class FeatureCurvePanel(PlotGroupPanel):
             return False
 
 
-    def __init__(self,console,master,pgt,**params):       
-        self.pgt=pgt
-	PlotGroupPanel.__init__(self,console,master,pgt.name,**params)
+    def __init__(self,console,master,pg=None,**params):       
+	PlotGroupPanel.__init__(self,console,master,pg=pg,**params)
 
         self.pack_param("sheet",parent=self.control_frame_3,on_change=self.sheet_change)
         self.pack_param("x",parent=self.control_frame_3)
@@ -63,7 +62,7 @@ class FeatureCurvePanel(PlotGroupPanel):
         for name in ['Enlarge','Reduce','Back','Fwd']: self.hide_param(name)
 
         self.auto_refresh= False
-        if self.pgt.plot_immediately: self.refresh()
+        if self.plotgroup.plot_immediately: self.refresh()
 
         self.display_note()
 
@@ -100,12 +99,12 @@ class FeatureCurvePanel(PlotGroupPanel):
         p.sheet = sheets[0]
 
 
-    def generate_plotgroup(self):
+    def generate_plotgroup(self,pg=None):
         """
         Create the right Plot Key that will define the needed
         information for a FeatureCurvePlotGroup. 
         """
-        p = self.plotgroup_type(template=self.pgt)
+        p = pg or self.plotgroup_type()
         self.populate_sheet_param(p)
 	return p
 

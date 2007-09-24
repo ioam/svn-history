@@ -286,17 +286,17 @@ def specify_whisker_deflections():
 ###############################################################################
 # Deflection preference map plotting, based on measure_or_pref in analysis.py
 
-from topo.plotting.templates import new_pgt
-pgt= new_pgt(name='Deflection Preference',category="Preference Maps",
-             doc='Measure preference for direction stimulus for a lagged model.',
-             command='measure_deflection_pref()')
-pgt.add_plot('Deflection Preference',[('Hue','DeflectionPreference')])
-pgt.add_plot('Deflection Preference&Selectivity',[('Hue','DeflectionPreference'),
+from topo.plotting.plotgroup import new_pg
+pg= new_pg(name='Deflection Preference',category="Preference Maps",
+           doc='Measure preference for direction stimulus for a lagged model.',
+           update_command='measure_deflection_pref()')
+pg.add_plot('Deflection Preference',[('Hue','DeflectionPreference')])
+pg.add_plot('Deflection Preference&Selectivity',[('Hue','DeflectionPreference'),
 						   ('Confidence','DeflectionSelectivity')])
-pgt.add_plot('Deflection Selectivity',[('Strength','DeflectionSelectivity')])
-pgt.add_plot('Whisker Preference',[('Strength','WhiskerPreference')])
-pgt.add_plot('Whisker Selectivity',[('Strength','WhiskerSelectivity')])
-pgt.add_static_image('Color Key','examples/whiskers/dfl_key_white_vert.png')
+pg.add_plot('Deflection Selectivity',[('Strength','DeflectionSelectivity')])
+pg.add_plot('Whisker Preference',[('Strength','WhiskerPreference')])
+pg.add_plot('Whisker Selectivity',[('Strength','WhiskerSelectivity')])
+pg.add_static_image('Color Key','examples/whiskers/dfl_key_white_vert.png')
 
 def measure_deflection_pref(num_deflection=12,
                     scale=0.3,offset=0.0,display=False,weighted_average=False,

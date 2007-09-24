@@ -168,16 +168,17 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
     ## CB: Rather than passing params for the PlotGroup in **params, have plotgroup_params
     ## and pass those to generate_plotgroup(**params)?
-    def __init__(self,console,master,plotgroup_label,**params):
+    def __init__(self,console,master,pg=None,**params):
         """
         If your parameter should be available in history, add its name
         to the params_in_history list, otherwise it will be disabled
         in historical views.
         """
-        TkParameterizedObject.__init__(self,master,extraPO=self.generate_plotgroup(),**params)
+        TkParameterizedObject.__init__(self,master,
+                                       extraPO=self.generate_plotgroup(pg),**params)
         Frame.__init__(self,master)
 
-        self.plotgroup_label = plotgroup_label
+        self.plotgroup_label = self.plotgroup.name
 
         self.console=console
 
@@ -358,14 +359,16 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
 
     # CB: rename to _generate_plotgroup()
-    def generate_plotgroup(self):
+    # Whole generate_plotgroup() mechanism needs cleaning now we don't have
+    # PlotGroupTemplates.
+    def generate_plotgroup(self,pg=None):
 	"""
         Create this Panel's PlotGroup.
 
         Reimplement in subclasses that must perform additional setup of their
         PlotGroup (e.g. populating Parameter ranges).
 	"""
-        return self.plotgroup_type()
+        return pg or self.plotgroup_type()
 
  
     def set_auto_refresh(self):
@@ -863,8 +866,8 @@ class SheetPGPanel(PlotGroupPanel):
             return False
         
 
-    def __init__(self,console,master,plotgroup_label,**params):
-        super(SheetPGPanel,self).__init__(console,master,plotgroup_label,**params)
+    def __init__(self,console,master,pg=None,**params):
+        super(SheetPGPanel,self).__init__(console,master,pg=pg,**params)
 
         self.pack_param('normalize',parent=self.control_frame_1,
                         on_change=self.make_plots,side="right")
