@@ -27,7 +27,6 @@ import topo
 from topo.base.parameterclasses import BooleanParameter
 
 from plotgrouppanel import SheetPGPanel
-from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import TemplatePlotGroup
 
 from tkguiwindow import Menu
@@ -88,50 +87,41 @@ class TemplatePlotGroupPanel(SheetPGPanel):
     strength_only = BooleanParameter(default=False,doc="""If true, disables all but the Strength channel of each plot,
 disabling all color coding for Strength/Hue/Confidence plots.""")
 
-    # CEBHACKALERT: copied from previous tkgui; probably don't need to do all this.
-    # In any case, there will probably be some other mechanism for
-    # doing that from the command line, probably a global 'monochrome'
-    # parameter that all plots respect, and then people can modify the
-    # plot templates directly if they need more control than that.
-    # *** not actually working properly **
+    ####################################################################
+    # CEBALERT: Ugly hack!  Basic idea for method copied from previous
+    # tkgui.  Instead, we probably want a mechanism for doing this
+    # from the command line, probably a global 'monochrome' parameter
+    # that all plots respect, and then people can modify the plot
+    # templates directly if they need more control than that.
     def strength_only_fn(self):
         if self.strength_only:
-            for name,template in self.pgt.plot_templates:
-                if template.has_key('Hue'):
-                    del template['Hue']
-                if template.has_key('Confidence'):
-                    del template['Confidence']
+            for name,template in self.plotgroup.plot_templates:
+                for c in ['Confidence','Hue']:
+                    if c in template:
+                        self.__non_so_templates[name][c]=template[c]
+                        del template[c]
         else:
-            #if not 'Hue' and 'Confidence' in self.pgt:
-            self.pgt = plotgroup_templates[self.pgt.name]
-
-        # CEBALERT: but won't improve because will implement this
-        # method differently (alert above).
-        old_plotgroup_param_values = {}
-        for n in self.plotgroup.params().keys():
-            old_plotgroup_param_values[n]=getattr(self.plotgroup,n)
-
-        self.plotgroup=self.generate_plotgroup()
-
-        for n,v in old_plotgroup_param_values.items():
-            setattr(self.plotgroup,n,v)
-
-        super(TemplatePlotGroupPanel,self).update_plots()
-
-
-
-    ## CB: ** different arguments from superclass (pgt not pgt_name)
-    # haven't decided about pgt/pgtname
-    def __init__(self,console,master,pgt,**params):
+            for name,template in self.plotgroup.plot_templates:
+                for c in ['Confidence','Hue']:
+                    if c in self.__non_so_templates[name]:
+                        template[c]=self.__non_so_templates[name][c]
         
-        # copied because we modify it in strength_only_fn; see HACKALERT.
-        self.pgt=copy.deepcopy(pgt)
-        super(TemplatePlotGroupPanel,self).__init__(console,master,pgt.name,**params)
+        super(TemplatePlotGroupPanel,self).redraw_plots()
+    def __init_strength_only_hack(self):
+        self.__non_so_templates = copy.deepcopy(self.plotgroup.plot_templates)
+    ####################################################################
 
+
+
+    ## CB: update init args now we have no pgts.
+    def __init__(self,console,master,pg=None,**params):
+
+        super(TemplatePlotGroupPanel,self).__init__(console,master,pg=pg,**params)
 
         self.pack_param('strength_only',parent=self.control_frame_1,
                         on_change=self.strength_only_fn,side='right')
-               
+        self.__init_strength_only_hack()
+        
         # To make the auto-refresh button off by default except for
         # the Activity PlotGroup
 	if self.plotgroup_label == 'Activity':self.auto_refresh=True
@@ -139,7 +129,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
         # Display any plots that can be done with existing data, but
         # don't regenerate the SheetViews
-        self.refresh(update=self.pgt.plot_immediately)
+        self.refresh(update=self.plotgroup.plot_immediately)# self.pgt.plot_immediately)
 
 
 
@@ -218,8 +208,8 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         #################################################################
 
 
-    def generate_plotgroup(self):
-        return self.plotgroup_type(template=self.pgt)
+##     def generate_plotgroup(self):
+##         return self.plotgroup_type()
 
 
 
