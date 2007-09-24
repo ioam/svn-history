@@ -120,13 +120,15 @@ class FeatureCurvePanel(PlotGroupPanel):
 
     def display_note(self):
         self.plot_labels=[Label(self.plot_frame,text="""
-              Press Refresh to generate the plot, after modifying the
-              commands below if necessary.  Refreshing may take some
-              time.  Note that plots currently open in new windows.
-
-              Many commands accept 'display=True' so that the progress can
-              be viewed in an open Activity window,  e.g. for debugging.
-              """)]
+                        (Press Refresh on the update command to
+                        generate the plot, after modifying the
+                        commands below if necessary.  Refreshing may
+                        take some time.  Note that plots currently
+                        open in new windows.
+                        
+                        Many commands accept 'display=True' so that
+                        the progress can be viewed in an open Activity
+                        window, e.g. for debugging.)""")]
         self.plot_labels[0].grid(row=1,column=0,sticky='nsew')
         self.sizeright()
 

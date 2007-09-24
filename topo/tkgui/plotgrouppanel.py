@@ -294,16 +294,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         
 
         
-        # JAB: Because the Refresh, Reduce, and Enlarge buttons are
-        # present in nearly every window, and aren't particularly
-        # important, we should probably use small icons for them
-        # instead of text.  That way they will form a visual group
-        # that users can typically ignore.  Of course, the icons will
-        # need to announce their names as help text if the mouse
-        # lingers over them, so that the user can figure them out the
-        # first time.
-    
-
         self.pack_param('auto_refresh',parent=self.control_frame_1,
                         on_change=self.set_auto_refresh,
                         side=RIGHT)
@@ -673,13 +663,13 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         if len(self.canvases) == 0:
             # If there are no plots yet, tell the user what to do.
             self.plot_labels=[Label(self.plot_frame,text="""
-              (Press Refresh to generate the plot, after
-              modifying the commands below if necessary.
-              Refreshing may take some time.  Many
-              commands accept 'display=True' so that
-              the progress can be viewed in an open
-              Activity window, e.g. for debugging.)
-              """)]
+                        (Press Refresh on the update command to
+                        generate the plot, after modifying the
+                        commands below if necessary.  Refreshing may
+                        take some time.  Many commands accept
+                        'display=True' so that the progress can be
+                        viewed in an open Activity window, e.g. for
+                        debugging.)  """)]
             self.plot_labels[0].grid(row=1,column=0,sticky=NSEW)
 
         elif self._num_labels != len(self.canvases):
