@@ -56,10 +56,6 @@ fullfield' tuning curves.
 CB: would the tutorial benefit from being split up a little more?
 Maybe it's getting daunting?
 
-<H4>2007/04/20: Fix the code in PlotGroup for calculating the minimum
-plot sizes in the GUI</H4>
-[See SF bug tracker]
-
 <H4>2007/07/07: more tests </H4>
 We need a test with non-square input sheets, non-square LISSOM sheets, etc., 
 with both types of non-squareness...and we also need to test whatever
@@ -269,24 +265,15 @@ Strange Projection plots.
 Write simulation.SomeTimer cleanly, and test it.
 
 
-<H4>2007/08/31 (JB) Icons for buttons</H4> We should replace some of
-the most common buttons with icons, to make the windows less busy
-looking.  An easy option would be to take the BlueSphere 0.3.0 icons,
-freely available from http://svgicons.sourceforge.net/.  Examples
-include:
-
-<pre>
-  Enlarge   viewmag-_2.1.svg
-  Reduce    viewmag+_2.2.svg
-  Back      back-2.0.svg    
-  Forward   forward-2.0.svg
-</pre>
-
-
-Because the icons are distributed in SVG format, it should be easy to
-adapt them if we need ones that are not included, e.g. using the
-Inkscape editor.  In Inkscape, PNG bitmap images can be created using
-Export Bitmap, selecting the Page option.
+<H4>2007/09/24 (JB) Icons for buttons</H4> We've now added icons for
+the buttons in PlotGroupPanel.  These need to be used in the Model
+Editor as well for consistency, and it might also be useful to develop
+icons for the parameters in PlotGroupPanel, not just the buttons.
+That will require more work, i.e. finding a suitable starting icon in
+BlueSphere-SVG-snapshot-Nov-29-2002, editing it using Inkscape, and
+adding it to the distribution, plus making BooleanParameter support
+images.  But the result should be much cleaner-looking windows, with
+more screen space devoted to the images rather than the text.
 
 
 <H4>2007/05/29 (JP) Mac GUI cleanup</H4>
