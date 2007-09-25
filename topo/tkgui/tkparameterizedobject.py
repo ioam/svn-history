@@ -954,7 +954,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 # CEBALERT: setting colors like this is a hack: need some
                 # general method. Also this conflicts with tile.
                 if hasattr(self,'representations') and param_name in self.representations:
-                    self.representations[param_name]['widget'].config(background='systemWindowBody')
+                    self.representations[param_name]['widget'].config(background=topo.entry_background)
             except Exception, inst:
                 m = param_name+": "+str(sys.exc_info()[0])[11::]+" ("+str(inst)+")"
                 if hasattr(topo,'guimain'):
