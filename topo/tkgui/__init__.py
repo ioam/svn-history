@@ -111,7 +111,7 @@ elif platform.system()=='Windows':
 # be appended or overridden in .topographicarc, if the user has some
 # crazy input device.
 #
-if system_platform is 'mac':
+if system_platform=='mac':
     # if it's on the mac, these are the context-menu events
     right_click_events = ['<Button-2>','<Control-Button-1>']
     right_click_release_events = ['ButtonRelease-2', 'Control-ButtonRelease-1']
@@ -119,7 +119,16 @@ else:
     # everywhere else (I think) it's Button-3
     right_click_events = ['<Button-3>']
     right_click_release_events = ['ButtonRelease-2']
-    
+
+
+# CEBALERT: entry background color hack.
+# How to get the standard Frame background on all platforms?
+if system_platform=='mac':
+    topo.entry_background = 'SystemWindowBody'
+elif system_platform=='win':
+    topo.entry_backgroud = 'SystemWindowFrame'
+else:
+    topo.entry_background = '#d9d9d9'
 
 def show_cmd_prompt():
     """
