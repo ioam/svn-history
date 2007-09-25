@@ -208,15 +208,20 @@ class ButtonParameter(CallableParameter):
     def get_image(self):
         """
         Return an ImageTk.PhotoImage of the image at image_path
-        (or None if image_path is None).
+        (or None if image_path is None or an Image cannot be created).
         """
-        if not self.image_path:
-            return None
-        else:
-            i=ImageTk.PhotoImage(ImageOps.fit(
-                Image.open(self.image_path),self.size or (32,32)))
-            self._hack.append(i)
-            return i  
+        image = None
+        if self.image_path:
+            # CEBALERT: temporary fix for systems where the buttons
+            # don't exist
+            try:
+                image=ImageTk.PhotoImage(ImageOps.fit(
+                    Image.open(self.image_path),self.size or (32,32)))
+                self._hack.append(i)
+            except IOError:
+                self.size = None
+
+        return image
             
 
 
