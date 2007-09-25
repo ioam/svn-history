@@ -79,15 +79,19 @@ class TestPattern(SheetPGPanel):
         else:
             return False
 
-    def generate_plotgroup(self):
+    def generate_plotgroup(self,pg=None):
+        plotgroup = pg or self.plotgroup_type()
+        
         # CB: could copy the sheets instead (deleting connections etc)
-        sheets = [GeneratorSheet(name=gs.name,nominal_bounds=gs.nominal_bounds,
+        plotgroup.sheets = [GeneratorSheet(name=gs.name,nominal_bounds=gs.nominal_bounds,
                         nominal_density=gs.nominal_density) for gs in topo.sim.objects(GeneratorSheet).values()]
-        return self.plotgroup_type(sheets=sheets)
+
+        plotgroup.name = "Preview"
+        return plotgroup 
 
 
-    def __init__(self,console,master,label="Preview",**params):
-	super(TestPattern,self).__init__(console,master,label,**params)
+    def __init__(self,console,master,pg=None,**params):
+	super(TestPattern,self).__init__(console,master,pg=pg,**params)
 
         self.auto_refresh = True
 
