@@ -217,7 +217,7 @@ class ButtonParameter(CallableParameter):
             try:
                 image=ImageTk.PhotoImage(ImageOps.fit(
                     Image.open(self.image_path),self.size or (32,32)))
-                self._hack.append(i)
+                self._hack.append(image)
             except IOError:
                 self.size = None
 
