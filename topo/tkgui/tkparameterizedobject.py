@@ -1158,6 +1158,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         image = button_param.get_image()
         if image:
             b['image']=image
+            b['relief']='flat'
 
         # and set size from ButtonParameter
         size = button_param.size
