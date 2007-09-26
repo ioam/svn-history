@@ -355,25 +355,33 @@ class TemplatePlotGroup(SheetPlotGroup):
     # JABALERT: We should also be able to store a documentation string
     # describing each plot (for hovering help text) within each
     # plot template.
+    #
+    # JAB: Maybe add_template would be a better name, to contrast with add_static_image
     def add_plot(self,name,specification_tuple_list):
 	dict_={}
 	for key,value in specification_tuple_list:
 	    dict_[key]=value
 	self.plot_templates.append((name,dict_))
 
+
     def add_static_image(self,name,file_path):
-        self.image_location = file_path
-	self.static_images.append((name,self.image_location))
+        """
+        Construct a static image Plot (e.g. a color key for an Orientation Preference map).
+        """
+        image = Image.open(file_path)
+        plot = Plot(image,name=name)
+        self.plot_list.append(plot)
 
 
     def __init__(self,plot_templates=[],static_images=[],**params):
 	super(TemplatePlotGroup,self).__init__(**params)
 
 	self.plot_templates = KeyedList(plot_templates)
-	self.static_images = KeyedList(static_images)
                 
-	# Add static images to the added_plot_list, as specified by the template.
-        self._add_static_images()
+	# Add plots for the static images, if any
+        for image_name,file_path in static_images:
+            add_static_image(image_name,file_path)
+
 	
     def _plot_list(self):
         """
@@ -400,15 +408,6 @@ class TemplatePlotGroup(SheetPlotGroup):
         return [make_template_plot(pt,sheet.sheet_view_dict,sheet.xdensity,
                                    sheet.bounds,self.normalize,name=pt_name)]
 
-
-    def _add_static_images(self):
-        """
-        Construct a static image Plot (e.g. a color key for an Orientation Preference map).
-        """        
-        for image_name,file_path in self.static_images :
-            image = Image.open(file_path)
-	    plot = Plot(image,name=image_name)
-            self.plot_list.append(plot)
 
 
 
