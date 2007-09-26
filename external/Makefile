@@ -630,6 +630,7 @@ BLUESPHERE = BlueSphere-SVG-snapshot-Nov-29-2002
 BLUESPHERE_UNINSTALL += topo/tkgui/icons/*.png
 
 bluesphere: ${BLUESPHERE}.tar.gz
+	rm -rf ${BLUESPHERE}
 	mkdir ${BLUESPHERE}
 	cd ${BLUESPHERE}; tar xzf ../${BLUESPHERE}.tar.gz
 	cp ${BLUESPHERE}_Makefile ${BLUESPHERE}/Makefile
