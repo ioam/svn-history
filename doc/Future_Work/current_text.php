@@ -38,14 +38,12 @@ tracker rather than added to this list</B>.
 
 <H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
 
-<H4>2007/09/03 (CB): tkgui + plotgroup cleanup</H4>
+<H4>2007/09/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
-<li>why does tagged slider not go to 20000 on the console?</li>
-<li>Sort pattern generators in test pattern window</li>
+<li>Sort pattern generators in test pattern window (same for other combo/list boxes)</li>
 <li>Right click connection field on e.g. retina --> lots of errors.</li>
-<li>FixedPoint in PArametersFrame: refresh error</li>
+<li>FixedPoint in ParametersFrame: refresh error</li>
 <li>Cleanup of tkparameterizedobject.py, parametersframe.py, *panel.py files</li>
-<li>Change how slider resolution works.</li> 
 <li>Finish progress bar (close after stop)</li>
 <li>plotgroup.py cleanup</li>
 <li>Finish cleanup now that plotgrouptemplate has been removed</li>
@@ -54,24 +52,6 @@ ParametersFrame's Ok, Apply, Cancel, Reset, and Defaults buttons, and
 make them behave as expected for classes and instances. (Defaults should
 not also Apply.)</li>
 <li>Finish SelectorParameter</li>
-<li>Replace Pmw balloon and message bar with those from bwidget; remove
-Pmw</li>
-<li>Use parametersframe/tkparameterizedobject in more places (topoconsole, 
-model editor, right click menus...) </li>
-<li>Which widgets should expand (expand=YES ?), which should fill the
-space (fill=X ?) (e.g. in parameters frames sliders etc should
-expand), and so on. Switch to grid layout where it's more
-appropriate.</li>
-<li>Document some Tkinter tips. More tasks/notes in
-topo/tkgui/__init__.py</li>
-<li>Consider these old, forgotten tasks: SheetSelectorParameter so
-that the GUI (model editor) can display list of sheet classes etc from
-a Parameter; ClassSelectorParameter - find_classes_in_package() will
-become a method of ClassSelectorParameter.name should be constant:
-objects in the simulation are indexed by name, so name needs to be a
-constant Parameter (which <i>might</i> cause some other problems).
-There are some related hacks in ParametersFrame that would also need
-to be cleaned up.  </li>
 <li>scrollbars:
 If a plot window is resized vertically, the behavior is a bit odd, but
 I'm not sure whether it's good or bad.  Basically, it's surprising
@@ -145,6 +125,30 @@ getting out of control!
 <!-- ------------------------------------------------------------------------ -->
 
 <H2>Tasks to be addressed after the 0.9.4 release:</H2>
+
+<H4>2007/09/03 (CB): Less-urgent tkgui + plotgroup cleanup</H4>
+<ul>
+<li>why does tagged slider not go to 20000 on the console?</li>
+<li>Change how slider resolution works.</li> 
+<li>Replace Pmw balloon and message bar with those from bwidget; remove
+Pmw</li>
+<li>Use parametersframe/tkparameterizedobject in more places (topoconsole, 
+model editor, right click menus...) </li>
+<li>Which widgets should expand (expand=YES ?), which should fill the
+space (fill=X?) (e.g. in parameters frames sliders etc should
+expand), and so on. Switch to grid layout where it's more
+appropriate.</li>
+<li>Document some Tkinter tips. More tasks/notes in
+topo/tkgui/__init__.py</li>
+<li>Consider these old, forgotten tasks: SheetSelectorParameter so
+that the GUI (model editor) can display list of sheet classes etc from
+a Parameter; ClassSelectorParameter - find_classes_in_package() will
+become a method of ClassSelectorParameter.name should be constant:
+objects in the simulation are indexed by name, so name needs to be a
+constant Parameter (which <i>might</i> cause some other problems).
+There are some related hacks in ParametersFrame that would also need
+to be cleaned up.  </li>
+</ul>
 
 
 <H4>2006/05/24 (JB): Problems with examples/joublin_bc96.ty</H4>
