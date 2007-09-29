@@ -133,14 +133,6 @@ def save_snapshot(snapshot_name,xml=False):
     package. See the topo.base.PicklableClassAttributes class for more
     information.
     """
-    ## CEBHACKALERT: don't pickle receive_messages and
-    ## receive_progress: contain things that shouldn't be pickled when
-    ## topographica launched with -g (i.e. lists contain topoconsole
-    ## methods).  Really need to sort out how to avoid pickling
-    ## specific things.
-    topo.sim.timer.receive_messages = []
-    topo.sim.timer.receive_progress = []
-    
     # For now we just search topo, but could do same for other packages.
     topoPOclassattrs = PicklableClassAttributes(topo,exclusions=('plotting','tests','tkgui'),
                                                 startup_commands=topo.sim.startup_commands)
@@ -202,11 +194,6 @@ def load_snapshot(snapshot_name):
 
     # (part of HACKALERT above)
     Image.filename = fn
-
-
-    # CEBHACKALERT: see SomeTimer's __getstate__ method.
-    if hasattr(topo,'guimain'):
-        topo.guimain._add_to_lists()
 
 
 def save_script_repr(script_name):
