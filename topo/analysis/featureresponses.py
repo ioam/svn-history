@@ -183,10 +183,12 @@ class FeatureResponses(ParameterizedObject):
         # like topographica's stuck in a loop (because the counter goes
         # to 100% lots of times...e.g. hierarchical's orientation tuning fullfield.)
 
-            
         timer = copy.copy(topo.sim.timer)
         timer.func = self.present_permutation
-        timer.X(self.permutations)
+
+        if hasattr(topo,'guimain'): topo.guimain.open_progress_window(timer)
+            
+        timer.call_fixed_num_times(self.permutations)
 
         restore_input_generators()
 
