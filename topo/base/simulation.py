@@ -782,24 +782,17 @@ class SomeTimer(ParameterizedObject):
     real_time_fn = Parameter(default=time.time,instantiate=True,doc=
         """Function that returns the wallclock time.""")
 
-    receive_messages = Parameter(default=[],instantiate=True,doc=
-        """List of objects that will receive timing messages.
-        Each must have a timing_message() method.""")
-
-    receive_progress = Parameter(default=[],instantiate=True,doc=
-        """List of objects that will receive the current 'percentage complete'
-        value. Each must have a timing_value() method.""")
-
+    receive_info = Parameter(default=[],instantiate=True,doc=
+        """List of objects that will receive timing information.
+        Each must have a timing_info() method.""")
+                                 
     stop = BooleanParameter(default=False,doc=
         """If set to True, execution of func (and timing) will cease at the end of
         the current iteration.""")
 
 
-    def __pass_out_progress(self,val):
-        [thing(val) for thing in self.receive_progress]
-    
-    def __pass_out_message(self,message):
-        [thing(message) for thing in self.receive_messages]
+    def __pass_out_info(self,time,percent,name,duration,remaining):
+        [thing(time,percent,name,duration,remaining) for thing in self.receive_info]
 
 
     def __measure(self,fduration,step,arg_list=None):
@@ -832,15 +825,11 @@ class SomeTimer(ParameterizedObject):
 
             percent = 100.0*i/iters
             estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
-            self.__pass_out_progress(percent)
-
-            # Should say 'at current rate', since the calculation assumes linearity
-            message = 'Time ' + str(self.simulation_time_fn()) + ': ' + \
-                      str(int(percent)) + '% of ' + self.func.__name__ + ' ' + str(fduration) +\
-                      (' [%02d' % int(estimate/60))+':' + \
-                      ('%02d' % int(estimate%60))+ ' remaining]'
-                
-            self.__pass_out_message(message)
+            self.__pass_out_info(time=self.simulation_time_fn(),
+                                 percent=percent,
+                                 name=self.func.__name__,
+                                 duration=fduration,
+                                 remaining=estimate)
 
             if self.stop: break
 
@@ -852,20 +841,12 @@ class SomeTimer(ParameterizedObject):
                 leftover = fduration+simulation_starttime-self.simulation_time_fn()
                 if leftover>0: self.func(leftover)
             percent = 100   
-            self.__pass_out_progress(percent)
+        self.__pass_out_info(time=self.simulation_time_fn(),
+                             percent=percent,
+                             name=self.func.__name__,
+                             duration=fduration,
+                             remaining=estimate)
 
-
-            message = ('OK: %s (%0.2f) to time %0.2f  [%0.1f s]' %
-                       (self.func.__name__,
-                        max(self.simulation_time_fn()-simulation_starttime,fduration),
-                        self.simulation_time_fn(),
-                        self.real_time_fn()-starttime))
-        else:
-            message = "Interrupted %s at time %0.2f  [after %0.1f s]"%(self.func.__name__,
-                                                                       self.simulation_time_fn(),
-                                                                       self.real_time_fn()-starttime)
-
-        self.__pass_out_message(message)
 
               
     def call_fixed_num_times(self,args_for_iterations):
