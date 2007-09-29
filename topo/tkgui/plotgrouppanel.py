@@ -382,8 +382,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         # unexpected behavior for a preference map calculation
         # (where it would do unnecessary, and potentially lengthy,
         # recalculation).
-        # CB: not to mention the bad news of calling refresh before
-        # various subclasses have finished creating themselves!
 
 
     def __connection_fields_window(self):
@@ -391,7 +389,13 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             sheet = topo.sim[self._right_click_info['plot'].plot_src_name]
             x,y =  self._right_click_info['coords'][1]
             # CEBHACKALERT: should avoid requesting cf out of range.
-            self.console['Plots']["Connection Fields"](x=x,y=y,sheet=sheet)
+            # CEBALERT: need a simple, general system for controlling which menu
+            # items are active (instead of offering a menu choice which turns
+            # out to be useless).
+            try:
+                self.console['Plots']["Connection Fields"](x=x,y=y,sheet=sheet)
+            except TypeError:
+                topo.sim.warning("%s has no Connection fields."%sheet.name)
             
     def __receptive_field_window(self):
         if 'plot' in self._right_click_info:
