@@ -405,19 +405,6 @@ class TopoConsole(TkguiWindow):
         
         self.balloon.bind(go_button,"Run the simulation for the specified duration.")
 
-
-	self.stop_button = Button(run_frame,text="Stop",state=DISABLED,
-                                  command=lambda: self.set_stop())
-	self.stop_button.pack(side=LEFT)
-        self.balloon.bind(self.stop_button,"""
-            Stop a running simulation.
-
-            The simulation can be interrupted only on round integer
-            simulation times, e.g. at 3.0 or 4.0 but not 3.15.  This
-            ensures that stopping and restarting are safe for any
-            model set up to be in a consistent state at integer
-            boundaries, as the example Topographica models are.""")
-
         self.step_button = Button(run_frame,text="Step",command=self.run_step)
         self.balloon.bind(self.step_button,"Run the simulation through the time at which the next events are processed.")
         self.step_button.pack(side=LEFT)
@@ -508,12 +495,6 @@ class TopoConsole(TkguiWindow):
                               command=(lambda x=python_doc_locations: self.open_location(x)))
 
 
-
-
-    def set_stop(self):
-        """Declare that running should be interrupted."""
-        topo.sim.timer.stop=True
-        
 
             
     def quit_topographica(self,check=True):
@@ -707,52 +688,9 @@ class TopoConsole(TkguiWindow):
     # window created at start and just show/hide it. Otherwise need some way to
     # close a window when stop is pressed (can do that from set_stop method, if
     # we put the 'stop' button on the progress meter window...)
-    def progress_window(self,progress_var,title=""):
-        """
-        Simplistic (& demo) progress bar in a window.
-
-        Specify a Tkinter variable (e.g. IntVar) as progress_var and the progress
-        bar will remain in sync with the value, and will disappear when the value is 100.
 
 
-        For (untested!) example:
 
-         progval = Tkinter.IntVar(self)        
-         self.progress_window(progval)
-
-         for i in range(100):
-             progval.set(i)
-
-        should give a progress meter that goes from 0 to 100 then disappears.
-
-
-        ** Currently expects a 0-100 (percent) value ***        
-        """
-        # CB: could add more info to the window/bar, like time estimates...
-        # (elapsed,remaining,axis label)
-        
-        window = TkguiWindow()
-        window.title(title)
-
-        # trace the variable so that at 100 we can destroy the window
-        window.progress_trace_name = progress_var.trace_variable('w',lambda name,index,mode,x=window,y=progress_var: self.__close_progress_window_if_complete(x,y))
-
-        progress_bar = bwidget.ProgressBar(window,type="normal",
-                                           maximum=100,
-                                           height=20,
-                                           width=200,
-                                           variable=progress_var)
-        progress_bar.pack(padx=15,pady=15)
-
-
-    def __close_progress_window_if_complete(self,progress_window,progress_var):
-        """
-        Close the specified progress window if the value of progress_var has reached 100.
-        """
-        if progress_var.get()>=100:
-            # delete the variable trace (necessary?)
-            progress_var.trace_vdelete('w',progress_window.progress_trace_name)
-            progress_window.destroy()
 
 
 
@@ -786,10 +724,8 @@ class TopoConsole(TkguiWindow):
 
         # CB: clean up (+ docstring)
         # CEBALERT: that's just temporary
-        if fduration>9: self.progress_window(self.progval,title="Running Simulation")
-        self.stop_button.config(state=NORMAL) 
+        if fduration>9: ProgressWindow(self.progval,title="Running Simulation")
         topo.sim.run_and_time(fduration)
-        self.stop_button.config(state=DISABLED)
         self.auto_refresh()
         
     def run_step(self):
@@ -809,6 +745,84 @@ class TopoConsole(TkguiWindow):
             self.step_button.config(state=NORMAL)
         else:
             self.step_button.config(state=DISABLED)
+
+
+
+
+
+class ProgressWindow(TkguiWindow):
+    """
+    Simplistic (& demo) progress bar in a window.
+    
+    Specify a Tkinter variable (e.g. IntVar) as progress_var and the progress
+    bar will remain in sync with the value, and will disappear when the value is 100.
+    
+    
+    For (untested!) example:
+    
+    progval = Tkinter.IntVar(self)        
+    self.progress_window(progval)
+    
+    for i in range(100):
+        progval.set(i)
+    
+    should give a progress meter that goes from 0 to 100 then disappears.
+    
+    
+    ** Currently expects a 0-100 (percent) value ***        
+    """
+
+    def __init__(self,progress_var,title="",**config):
+        TkguiWindow.__init__(self,**config)
+        self.title(title)
+        self.balloon = Pmw.Balloon(self)
+
+        self.progress_var = progress_var
+        # trace the variable so that at 100 we can destroy the window
+        self.progress_trace_name = progress_var.trace_variable(
+            'w',lambda name,index,mode: self._close_if_complete())
+
+        progress_bar = bwidget.ProgressBar(self,type="normal",
+                                           maximum=100,
+                                           height=20,
+                                           width=200,
+                                           variable=progress_var)
+        progress_bar.pack(padx=15,pady=15)
+
+        stop_button = Tkinter.Button(self,text="Stop",command=self.set_stop)
+        stop_button.pack(side="bottom")
+        self.balloon.bind(stop_button,"""
+            Stop a running simulation.
+        
+            The simulation can be interrupted only on round integer
+            simulation times, e.g. at 3.0 or 4.0 but not 3.15.  This
+            ensures that stopping and restarting are safe for any
+            model set up to be in a consistent state at integer
+            boundaries, as the example Topographica models are.""")
+
+        
+
+    def _close_if_complete(self):
+        """
+        Close the specified progress window if the value of progress_var has reached 100.
+        """
+        if self.progress_var.get()>=100:
+            # delete the variable trace (necessary?)
+            self.progress_var.trace_vdelete('w',self.progress_trace_name)
+            TkguiWindow.destroy(self)
+
+    # CB: should allow interruption of whatever process it's timing
+    def set_stop(self):
+        """Declare that running should be interrupted."""
+        topo.sim.timer.stop=True
+        TkguiWindow.destroy(self)
+
+        
+
+
+
+
+
         
 if __name__ != '__main__':
     plotpanel_classes['Connection Fields'] = ConnectionFieldsPanel
