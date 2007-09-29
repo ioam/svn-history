@@ -314,18 +314,6 @@ class TopoConsole(TkguiWindow):
         ##########
 
 
-        # CEBALERT: there's only one progress variable (like only one message
-        # at a time can be displayed on messagebar).
-        self.progval = Tkinter.IntVar(self)
-        self._add_to_lists()
-
-        self.show_lots=False # testing: update plots at every iteration of timer code
-        # so to see your activity windows etc update in 'slow motion' (I think that
-        # term covers the slow-down and the apparent visual effect), try e.g.:
-        # topo.sim.timer.step=0.05; topo.guimain.show_lots=True
-        # then run for 1 iteration from the gui.
-
-
 # CB: example code for plot gallery
 ##         plots = []
 ##         for (label,obj) in plotgroup_templates.items():
@@ -335,17 +323,6 @@ class TopoConsole(TkguiWindow):
             
 ##         plot_gallery = Gallery(plots=plots,image_size=(50,50))
 ##         plot_gallery.title("Plots")
-
-
-
-
-    ## CEBHACKALERT: see SomeTimer ##
-    def _add_to_lists(self):
-        # should include adding to the warning list
-        topo.sim.timer.receive_messages.append(self.timing_message)
-        topo.sim.timer.receive_progress.append(self.timing_progress)
-
-        
 
 
     def _init_widgets(self):
@@ -681,31 +658,6 @@ class TopoConsole(TkguiWindow):
         self.messageBar.message('state',m)
 
 
-        # CB: window stays around after pressing stop
-
-    # CEBHACKALERT: need to decide what to do about multiple concurrent timed process, and
-    # clicking on Stop. If we'll only ever allow one progress meter, then have a
-    # window created at start and just show/hide it. Otherwise need some way to
-    # close a window when stop is pressed (can do that from set_stop method, if
-    # we put the 'stop' button on the progress meter window...)
-
-
-
-
-
-
-    def timing_message(self,message):
-        self.messageBar.message('state', message)
-        self.update()
-
-    def timing_progress(self,val):
-        if self.show_lots:
-            self.auto_refresh()
-            
-        self.progval.set(val)
-        self.update()
-        #self.update_idletasks()
-
 
     # CEB: Will add a method to allow other things to access the
     # timing stuff (e.g. progress bar) in a simple way. (Also
@@ -724,7 +676,7 @@ class TopoConsole(TkguiWindow):
 
         # CB: clean up (+ docstring)
         # CEBALERT: that's just temporary
-        if fduration>9: ProgressWindow(self.progval,title="Running Simulation")
+        if fduration>9: ProgressWindow()
         topo.sim.run_and_time(fduration)
         self.auto_refresh()
         
@@ -746,49 +698,58 @@ class TopoConsole(TkguiWindow):
         else:
             self.step_button.config(state=DISABLED)
 
+    def open_progress_window(self,timer,title=None):
+        return ProgressWindow(timer=timer,title=title)
 
 
 
 
+# CEB: working here; this is *not* finished
+# (needs to become tkparameterizedobject, so we can have some parameters
+#  to control formatting etc)
 class ProgressWindow(TkguiWindow):
     """
-    Simplistic (& demo) progress bar in a window.
-    
-    Specify a Tkinter variable (e.g. IntVar) as progress_var and the progress
-    bar will remain in sync with the value, and will disappear when the value is 100.
-    
-    
-    For (untested!) example:
-    
-    progval = Tkinter.IntVar(self)        
-    self.progress_window(progval)
-    
-    for i in range(100):
-        progval.set(i)
-    
-    should give a progress meter that goes from 0 to 100 then disappears.
-    
-    
     ** Currently expects a 0-100 (percent) value ***        
     """
 
-    def __init__(self,progress_var,title="",**config):
+    def __init__(self,timer=topo.sim.timer,progress_var=None,title=None,**config):
         TkguiWindow.__init__(self,**config)
-        self.title(title)
+        self.timer = timer
+        self.timer.receive_info.append(self.timing_info)
+        
+        self.title(title or self.timer.func.__name__.capitalize())
         self.balloon = Pmw.Balloon(self)
 
-        self.progress_var = progress_var
+        self.progress_var = progress_var or Tkinter.DoubleVar()
         # trace the variable so that at 100 we can destroy the window
-        self.progress_trace_name = progress_var.trace_variable(
+        self.progress_trace_name = self.progress_var.trace_variable(
             'w',lambda name,index,mode: self._close_if_complete())
 
         progress_bar = bwidget.ProgressBar(self,type="normal",
                                            maximum=100,
                                            height=20,
                                            width=200,
-                                           variable=progress_var)
+                                           variable=self.progress_var)
         progress_bar.pack(padx=15,pady=15)
 
+
+        progress_box = Frame(self,border=2,relief="sunken")
+        progress_box.pack()
+
+        Label(progress_box,text="Duration:").grid(row=0,column=0,sticky='w')
+        self.duration = Label(progress_box)
+        self.duration.grid(row=0,column=1,sticky='w')
+
+        Label(progress_box,text="Simulation time:").grid(row=1,column=0,sticky='w')
+        self.sim_time = Label(progress_box)
+        self.sim_time.grid(row=1,column=1,sticky='w')
+
+        # Should say 'at current rate', since the calculation assumes linearity
+        Label(progress_box,text="Remaining /s:").grid(row=2,column=0,sticky='w')
+        self.remaining = Label(progress_box)
+        self.remaining.grid(row=2,column=1,sticky='w')
+        
+        
         stop_button = Tkinter.Button(self,text="Stop",command=self.set_stop)
         stop_button.pack(side="bottom")
         self.balloon.bind(stop_button,"""
@@ -800,8 +761,6 @@ class ProgressWindow(TkguiWindow):
             model set up to be in a consistent state at integer
             boundaries, as the example Topographica models are.""")
 
-        
-
     def _close_if_complete(self):
         """
         Close the specified progress window if the value of progress_var has reached 100.
@@ -809,17 +768,29 @@ class ProgressWindow(TkguiWindow):
         if self.progress_var.get()>=100:
             # delete the variable trace (necessary?)
             self.progress_var.trace_vdelete('w',self.progress_trace_name)
-            TkguiWindow.destroy(self)
+            self._close_window(last_message="Finished %s"%self.timer.func.__name__)
 
     # CB: should allow interruption of whatever process it's timing
     def set_stop(self):
         """Declare that running should be interrupted."""
-        topo.sim.timer.stop=True
-        TkguiWindow.destroy(self)
-
+        self.timer.stop=True
+        self._close_window(last_message="Interrupted %s"%self.timer.func.__name__)
         
+    def _close_window(self,last_message=None):
+        self.timer.receive_info.remove(self.timing_info)
+        if last_message: topo.guimain.status_message(last_message)
+        TkguiWindow.destroy(self)
+        self.destroyed=True
 
+    def timing_info(self,time,percent,name,duration,remaining):
+        self.progress_var.set(percent)
 
+        # hack because i'm doing something in the wrong order
+        if not hasattr(self,'destroyed'):
+            self.duration['text'] = str(duration)
+            self.sim_time['text'] = str(time)
+            self.remaining['text'] = "%02d:%02d"%(int(remaining/60),int(remaining%60))
+            self.update()
 
 
 
