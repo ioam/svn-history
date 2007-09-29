@@ -80,8 +80,9 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
 
     def __init__(self,console,master,pg=None,**params):
         super(ProjectionSheetPGPanel,self).__init__(console,master,pg=pg,**params)
-        self.pack_param('sheet',parent=self.control_frame_3,on_modify=self.sheet_change)
-
+        self.pack_param('sheet',parent=self.control_frame_3,on_modify=self.sheet_change,
+                        widget_options={'sort_fn_args':
+                                        {'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
 
     def generate_plotgroup(self,pg=None):
         p = pg or self.plotgroup_type()
@@ -95,9 +96,8 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
         
     def populate_sheet_param(self,p):
         sheets = topo.sim.objects(self.sheet_type).values() 
-        sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
         p.params()['sheet'].Arange = sheets
-        p.sheet = sheets[0]
+        p.sheet = sheets[0] # CB: necessary?
 
 
 
@@ -218,7 +218,8 @@ class CFProjectionPGPanel(ProjectionSheetPGPanel):
 
     def __init__(self,console,master,pg=None,**params):
         super(CFProjectionPGPanel,self).__init__(console,master,pg=pg,**params)
-        self.pack_param('projection',parent=self.control_frame_3,on_modify=self.make_plots)
+        self.pack_param('projection',parent=self.control_frame_3,on_modify=self.make_plots,
+                        widget_options={'sort_fn_args':{'cmp':cmp_projections}})
         self.pack_param('density',parent=self.control_frame_3)
 
 
@@ -244,9 +245,8 @@ class CFProjectionPGPanel(ProjectionSheetPGPanel):
         # way of plotting them, they should be plotted.
         prjns = [x for x in p.sheet.projections().values()
                  if isinstance(x,CFProjection)]
-        prjns.sort(cmp_projections)
         p.params()['projection'].Arange = prjns
-        p.projection = prjns[0]        
+        p.projection = prjns[0] # CB: necessary?
 
     # CEBALERT: here and for other such lists, make things get sorted by precedence.
     def refresh_projections(self):
@@ -317,6 +317,11 @@ class CFProjectionPGPanel(ProjectionSheetPGPanel):
         pass
             
 
+
+
+## Need to add test file:
+# check projection, sheet ordering
+# check sheet changes, check projection changes
 
 
 

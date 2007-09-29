@@ -23,6 +23,8 @@ from tkparameterizedobject import ButtonParameter
 
 
 ## CEBALERT: same as for featurecurveplotgroup: shares code with templateplotgrouppanel
+# Should be changed to inherit from UnitPGPanel, or whatever is created to handle the PlotGroup
+# hierarchy.
 class FeatureCurvePanel(PlotGroupPanel):
 
     plotgroup_type = FeatureCurvePlotGroup
@@ -53,7 +55,11 @@ class FeatureCurvePanel(PlotGroupPanel):
     def __init__(self,console,master,pg=None,**params):       
 	PlotGroupPanel.__init__(self,console,master,pg=pg,**params)
 
-        self.pack_param("sheet",parent=self.control_frame_3,on_change=self.sheet_change)
+        self.pack_param("sheet",parent=self.control_frame_3,on_change=self.sheet_change,
+                        widget_options={'sort_fn_args':
+                                        {'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
+
+
         self.pack_param("x",parent=self.control_frame_3)
         self.pack_param("y",parent=self.control_frame_3)
 
@@ -94,9 +100,8 @@ class FeatureCurvePanel(PlotGroupPanel):
 
     def populate_sheet_param(self,p):
         sheets = topo.sim.objects(ProjectionSheet).values() 
-        sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
         p.params()['sheet'].Arange = sheets
-        p.sheet = sheets[0]
+        p.sheet = sheets[0] # CB: necessary?
 
 
     def generate_plotgroup(self,pg=None):

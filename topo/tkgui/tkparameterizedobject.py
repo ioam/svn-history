@@ -106,7 +106,7 @@ from topo.base.parameterclasses import BooleanParameter,StringParameter, \
 from topo.misc.utils import eval_atof
 
 from tkguiwindow import TkPOTaggedSlider
-
+    
 
 def lookup_by_class(dict_,class_):
     """
@@ -138,6 +138,18 @@ def find_key_from_value(dict_,val):
         if object_==val:
             key=name
     return key
+
+
+def keys_sorted_by_value(d, **sort_kwargs):
+    """
+    Return the keys of d, sorted by value.
+    
+    * Uses find_key_from_value(), so this function
+    is subject to the same limitation. *
+    """
+    values = d.values()
+    values.sort(**sort_kwargs)
+    return [find_key_from_value(d,val) for val in values]
 
 
 def parameters(parameterized_object):
@@ -758,24 +770,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
             
 ################################################
 
-
-############ CB: cleanup
-# - can't use this after pack_param() unless Tkinter.OptionMenu
-#   supports changing the list of items after widget creation - might
-#   need to use Pmw's OptionMenu (which does support that).
-# - need to update this; not currently used in any code except testing
-    def initialize_ranged_parameter(self,param_name,range_):
-        p = self.get_parameter(param_name)
-
-        if hasattr(range_,'__len__'):
-            [p.Arange.append(x) for x in range_]
-        else:
-            p.Arange.append(range_)
-
-        p.default = p.Arange[0]
-        self._update_translator(param_name,p)
-
-############ 
         
 
 ########## METHODS TO CREATE TRANSLATOR DICTIONARY ENTRIES ############
@@ -1171,11 +1165,33 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
 
     def _create_selector_widget(self,frame,name,widget_options):
+        """
+
+        If widget_options includes 'sort_fn_args', these are passed to
+        the sort() method of the list of *objects* available for the
+        parameter, and the names are displayed sorted in that order.
+        If 'sort_fn_args' is not present, the default is to sort the
+        list of names using its sort() method.
+        """
         param = self.get_parameter_object(name)
         self._update_translator(name,param)
-        
+
+        ## sort the range for display
+        # CEBALERT: extend OptionMenu so that it
+        # (a) supports changing its option list
+        # (b) support sorting of its option list
         new_range = self.translators[name].keys()        
+        if 'sort_fn_args' not in widget_options:
+            # no sort specified: defaults to sort()
+            new_range.sort()
+        else:
+            sort_fn_args = widget_options['sort_fn_args']
+            del widget_options['sort_fn_args']
+            if sort_fn_args is not None:
+                  new_range = keys_sorted_by_value(self.translators[name],**sort_fn_args)
+
         assert len(new_range)>0 # CB: remove
+            
         tk_var = self._tk_vars[name]
 
         current_value = self.object2string_ifrequired(name,self.get_parameter_value(name))
