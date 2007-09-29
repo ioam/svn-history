@@ -845,7 +845,7 @@ class SomeTimer(ParameterizedObject):
                              percent=percent,
                              name=self.func.__name__,
                              duration=fduration,
-                             remaining=estimate)
+                             remaining=0)
 
 
               
