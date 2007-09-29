@@ -40,7 +40,6 @@ tracker rather than added to this list</B>.
 
 <H4>2007/09/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
-<li>Sort pattern generators in test pattern window (same for other combo/list boxes)</li>
 <li>Right click connection field on e.g. retina --> lots of errors.</li>
 <li>Cleanup of tkparameterizedobject.py, parametersframe.py, *panel.py files</li>
 <li>Finish progress bar (close after stop)</li>
