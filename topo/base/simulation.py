@@ -855,11 +855,15 @@ class SomeTimer(ParameterizedObject):
             self.__pass_out_progress(percent)
 
 
-        message = ('OK: %s (%0.2f) to time %0.2f  [%0.1f s]' %
-                   (self.func.__name__,
-                    max(self.simulation_time_fn()-simulation_starttime,fduration),
-                    self.simulation_time_fn(),
-                    self.real_time_fn()-starttime))
+            message = ('OK: %s (%0.2f) to time %0.2f  [%0.1f s]' %
+                       (self.func.__name__,
+                        max(self.simulation_time_fn()-simulation_starttime,fduration),
+                        self.simulation_time_fn(),
+                        self.real_time_fn()-starttime))
+        else:
+            message = "Interrupted %s at time %0.2f  [after %0.1f s]"%(self.func.__name__,
+                                                                       self.simulation_time_fn(),
+                                                                       self.real_time_fn()-starttime)
 
         self.__pass_out_message(message)
 
