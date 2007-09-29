@@ -676,7 +676,12 @@ class TopoConsole(TkguiWindow):
 
         # CB: clean up (+ docstring)
         # CEBALERT: that's just temporary
-        if fduration>9: ProgressWindow()
+        if fduration>9:
+            display_progress=True
+        else:
+            display_progress=False
+
+        ProgressWindow(display=display_progress)
         topo.sim.run_and_time(fduration)
         self.auto_refresh()
         
@@ -712,8 +717,11 @@ class ProgressWindow(TkguiWindow):
     ** Currently expects a 0-100 (percent) value ***        
     """
 
-    def __init__(self,timer=topo.sim.timer,progress_var=None,title=None,**config):
+    def __init__(self,timer=topo.sim.timer,progress_var=None,title=None,display=True,**config):
         TkguiWindow.__init__(self,**config)
+
+        if not display:self.withdraw()
+        
         self.timer = timer
         self.timer.receive_info.append(self.timing_info)
         
@@ -768,7 +776,10 @@ class ProgressWindow(TkguiWindow):
         if self.progress_var.get()>=100:
             # delete the variable trace (necessary?)
             self.progress_var.trace_vdelete('w',self.progress_trace_name)
-            self._close_window(last_message="Finished %s"%self.timer.func.__name__)
+
+            self._close_window(last_message="Time %s: Finished %s"%(topo.sim.time(),
+                                                                    self.timer.func.__name__))
+                                                        
 
     # CB: should allow interruption of whatever process it's timing
     def set_stop(self):
