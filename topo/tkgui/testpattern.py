@@ -115,8 +115,7 @@ class TestPattern(SheetPGPanel):
 
         self.pack_param('edit_sheet',parent=self.pg_control_pane,on_modify=self.switch_sheet)
         self.pack_param('pattern_generator',parent=self.pg_control_pane,
-                        on_modify=self.change_pattern_generator,
-                        side="top")
+                        on_modify=self.change_pattern_generator,side="top")
         
         present_frame = Frame(self)
         present_frame.pack(side='bottom')
@@ -125,14 +124,6 @@ class TestPattern(SheetPGPanel):
         self.params_frame.pack(side='bottom',expand='yes',fill='x')
         self.pack_param('duration',parent=present_frame,side='left')
         self.pack_param('present',parent=present_frame,on_change=self.present_pattern,side="right")
-
-
-##     def sort_sheet_param(self,p):
-##         sheets = topo.sim.objects(self.sheet_type).values() 
-##         sheets.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
-##         p.params()['sheet'].Arange = sheets
-##         p.sheet = sheets[0]
-
 
 
     def switch_sheet(self):
