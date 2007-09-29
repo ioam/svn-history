@@ -431,9 +431,10 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
 
     def _check_sheet_type(self):
-        assert isinstance(self.sheet,self.sheet_type), \
-               "%s's sheet Parameter must be set to a %s instance (currently %s, type %s)." \
-               %(self,self.sheet_type,self.sheet,type(self.sheet)) 
+        if not isinstance(self.sheet,self.sheet_type):
+            raise TypeError(
+                "%s's sheet Parameter must be set to a %s instance (currently %s, type %s)." \
+                %(self,self.sheet_type,self.sheet,type(self.sheet))) 
 
     def _sheets(self):
         return [self.sheet]
@@ -540,9 +541,10 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
     
 
     def _check_projection_type(self):
-        assert isinstance(self.projection,self.projection_type), \
-               "%s's projection Parameter must be set to a %s instance (currently %s, type %s)." \
-               %(self,self.projection_type,self.projection,type(self.projection)) 
+        if not isinstance(self.projection,self.projection_type):
+            raise TypeError(
+                "%s's projection Parameter must be set to a %s instance (currently %s, type %s)." \
+                %(self,self.projection_type,self.projection,type(self.projection))) 
 
 
     def _update_command(self):
