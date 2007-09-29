@@ -40,7 +40,6 @@ tracker rather than added to this list</B>.
 
 <H4>2007/09/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
-<li>Right click connection field on e.g. retina --> lots of errors.</li>
 <li>Cleanup of tkparameterizedobject.py, parametersframe.py, *panel.py files</li>
 <li>Finish progress bar (close after stop)</li>
 <li>plotgroup.py cleanup</li>
@@ -122,6 +121,8 @@ getting out of control!
 
 <H4>2007/09/03 (CB): Less-urgent tkgui + plotgroup cleanup</H4>
 <ul>
+<li>Control which options are available on right-click menu (e.g. no
+'Connection Fields' for a Connection Fields plot).</li>
 <li>Replace Pmw balloon and message bar with those from bwidget; remove
 Pmw</li>
 <li>Use parametersframe/tkparameterizedobject in more places (topoconsole, 
