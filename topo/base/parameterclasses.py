@@ -615,33 +615,45 @@ class CompositeParameter(Parameter):
                 setattr(obj,a,v)
 
 
-
-########### CEB: currently working on SelectorParameters #########
+# CB: working on SelectorParameters
 
 class SelectorParameter(Parameter):
+    """
+    Abstract Parameter that...
+    """
+    # CEBALERT: should be abstract
+    
     __slots__=[]
     __doc__ = property((lambda self: self.doc))
 
-    def range(self):
-        pass
+    def get_range(self):
+        raise NotImplementedError("get_range() must be implemented in subclasses.")
+
     
 class ObjectSelectorParameter(SelectorParameter):
+    """
+    Parameter whose value is set to an object from its list of possible objects.
+    """
     __slots__ = ['Arange'] # Could generate range from a passed-in function, not sure yet.
-                           # In any case, won't stay as Arange.
+                           # In any case, won't stay as Arange. _objects?
     __doc__ = property((lambda self: self.doc))
 
-    def __init__(self, default=None, Arange=[],instantiate=True,**params):
+    def __init__(self,default=None,Arange=[],instantiate=True,**params):
         Parameter.__init__(self,default=default,instantiate=instantiate,**params)
         self.Arange = Arange
 
-    def range(self):
+    # CB: add _check_value()
+
+    def get_range(self):
         return dict([(i.name,i) for i in self.Arange])
+    range = get_range # CEBALERT: remove when callers updated
+
     
 class ClassSelectorParameter(SelectorParameter):
     """
     Parameter whose value is an instance of the specified class.
 
-    Offers a range() method to return possible types that the
+    Offers a get_range() method to return possible types that the
     value could be an instance of.
     """
     __slots__ = ['class_','suffix_to_lose']
@@ -649,65 +661,47 @@ class ClassSelectorParameter(SelectorParameter):
 
     def __init__(self,class_,default=None,instantiate=True,
                  suffix_to_lose='',**params):
-        
         self.class_ = class_
 
-        # CEBALERT: Currently offers the possibility to cut off the
-        # end of a class name (suffix_to_lose), but this could be
-        # extended to any processing of the class name.
+        # CEB: Currently offers the possibility to cut off the end of
+        # a class name (suffix_to_lose), but this could be extended to
+        # any processing of the class name.
         self.suffix_to_lose = suffix_to_lose
 
-        # CEBHACKALERT: check default's in range!
-        Parameter.__init__(self,default=default,instantiate=instantiate,
-                           **params)
+        self._check_value(default)
+        Parameter.__init__(self,default=default,instantiate=instantiate,**params)
+
+
+    # CB: sometime we should clean up all this getting of names in Parameter
+    # CB: is it really useful to do this type check?
+    def _check_value(self,val,obj=None):
+        """
+        val must be None or an instance of self.class_
+        """
+        if not (isinstance(val,self.class_) or val is None):
+            raise ValueError("Parameter " + `self.attrib_name(obj=obj)` + " (" + \
+                             `self.__class__.__name__` + ") must be an instance of " + \
+                             self.class_.__name__ + "; " + `val` + \
+                             " is " + `type(val)` + ".")
+        
 
     def __set__(self,obj,val):
-
-        if val in self.range().values():
-            # CEBHACKALERT: caller attempted to set to one of values from range(); i.e., a class
-            # instead of instantiating it...so we instantiate it.
-            val=val()
-        
-        if not (isinstance(val,self.class_)):
-            raise ValueError("Parameter " + `self.attrib_name(obj=obj)` + " (" + `self.__class__.__name__` +
-                             ") must be an instance of " + self.class_.__name__ +
-                             "; " + `val` + " is " + `type(val)` + ".")
+        self._check_value(val,obj)
         super(ClassSelectorParameter,self).__set__(obj,val)
 
-
-    # CB: temporary!
-    def in_range(self,val):
-
-        # val IS one of the classes = ok
-        if val in self.range().values():
-            return True
-        # val is an instance of one of the classes = ok
-        elif isinstance(val,self.class_):
-            return True
-        else:
-            return False
-
         
-    def range(self):
+    def get_range(self):
         """
-        Return {visible_name: <class>} for all classes in self.packages.
-        If self.packages is empty, return the default.
+        Return {visible_name: <class>} for all classes that are
+        concrete_descendents() of self.class_.
 
-        Only classes from already-imported modules are added.        
+        Only classes from modules that have been imported are added
+        (see concrete_descendents()).
         """
-        # CEBHACKALERT: e.g. PatternGenerators come out in GUI in the arbitrary
-        # order of the keys of this dict. They used to come out at least in the
-        # same order every time because it was a keyedlist. Don't forget to fix
-        # that.
-        k = {}
         classes = concrete_descendents(self.class_)
-        for (name,class_) in classes.items():
-            k[self.__classname_repr(name)] = class_
+        return dict([(self.__classname_repr(name),class_) for name,class_ in classes.items()])
+    range = get_range # CEBALERT: remove when callers updated
 
-        if len(k)==0:
-            return {self.__classname_repr(self.default.__class__.__name__):self.default}
-        else:
-            return k
 
     def __classname_repr(self, class_name):
         """
@@ -715,7 +709,7 @@ class ClassSelectorParameter(SelectorParameter):
         """
         return re.sub(self.suffix_to_lose+'$','',class_name)
 
-#################################################################################
+
 
 
 class ListParameter(Parameter):
