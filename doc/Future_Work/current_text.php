@@ -41,24 +41,12 @@ tracker rather than added to this list</B>.
 <H4>2007/09/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
 <li>Cleanup of tkparameterizedobject.py, parametersframe.py, *panel.py files</li>
-<li>Finish progress bar (close after stop)</li>
 <li>plotgroup.py cleanup</li>
 <li>Finish cleanup now that plotgrouptemplate has been removed</li>
 <li>Finish SelectorParameter</li>
-<li>scrollbars:
-If a plot window is resized vertically, the behavior is a bit odd, but
-I'm not sure whether it's good or bad.  Basically, it's surprising
-that the scrollbar doesn't appear until the widgets at the bottom are
-gone entirely.  That seems ok, but surprising, for the plot windows,
-because maybe it's helpful to be able to cover up those extra widgets
-and focus on the plots.  But for the Test Pattern window, it means
-that we still don't have any way to handle parameter lists that are
-too long for the current screen, which happens to me often on a
-relatively low-resolution laptop screen.  Only once the window is made
-so small that all the widgets are gone does a scrollbar appear, at
-which point it's too late.  So maybe a ParametersFrame should get its
-own scrollbar, having priority over the one for the plot?
-</li>
+<li>scrollbars: clean up behavior (can we stop bars coming on and going off
+when resize pressed? can we stop empty space when there are no bars?), clean
+up code. </li>
 </ul>
 
 
@@ -277,15 +265,16 @@ Measurement of numpy.sum(X)/X.sum()/sum(X) performance. Difference
 between simulation results on different platforms (for slow-tests in
 Makefile).
 
-<H4>2007/09/24 (JB) More icons for buttons</H4> We've now added icons for
-the buttons in PlotGroupPanel.  These need to be used in the Model
-Editor as well for consistency, and it might also be useful to develop
-icons for the parameters in PlotGroupPanel, not just the buttons.
-That will require more work, i.e. finding a suitable starting icon in
-BlueSphere-SVG-snapshot-Nov-29-2002, editing it using Inkscape, and
-adding it to the distribution, plus making BooleanParameter support
-images.  But the result should be much cleaner-looking windows, with
-more screen space devoted to the images rather than the text.
+<H4>2007/09/24 (JB) More icons for buttons</H4> 
+We've now added icons for the buttons in PlotGroupPanel.  These need
+to be used in the Model Editor as well for consistency, and it might
+also be useful to develop icons for the parameters in PlotGroupPanel,
+not just the buttons.  That will require more work, i.e. finding a
+suitable starting icon in BlueSphere-SVG-snapshot-Nov-29-2002, editing
+it using Inkscape, and adding it to the distribution, plus making
+BooleanParameter support images.  But the result should be much
+cleaner-looking windows, with more screen space devoted to the images
+rather than the text.
 
 <H4>2007/05/29 (JP) Mac GUI cleanup</H4>
 The Mac GUI needs a variety of things to make it more Mac-like.
