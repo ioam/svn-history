@@ -720,6 +720,8 @@ class TopoConsole(TkguiWindow):
 #  to control formatting etc)
 class ProgressWindow(TkguiWindow):
     """
+    Graphically displays progress information for a SomeTimer object.
+    
     ** Currently expects a 0-100 (percent) value ***        
     """
 

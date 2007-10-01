@@ -183,7 +183,7 @@ import ImageTk, Image, ImageOps
 
 class ButtonParameter(CallableParameter):
     """
-    Parameter used to represent a Button (something something).
+    Parameter whose graphical representation is a Button.
 
     Can be associated with an image when used in a
     TkParameterizedObject by specifying an image_path (i.e. location

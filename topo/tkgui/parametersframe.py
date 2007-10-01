@@ -1,5 +1,5 @@
 """
-Classes for manipulating all the Parameters of a ParameterizedObject.
+Classes for graphically manipulating all the Parameters of a ParameterizedObject.
 
 LiveParametersFrame and ParametersFrame display the Parameters of a
 supplied ParameterizedObject. Both allow these Parameters to be
@@ -328,8 +328,9 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
 # CB: names still seem strange...ParametersFrame inherits from
 # LiveParametersFrame?
 class ParametersFrame(LiveParametersFrame):
-
-    
+    """
+    Displays and allows editing of the Parameters of a supplied ParameterizedObject.
+    """
 
     Apply = ButtonParameter(doc="""Set object's Parameters to displayed values.
                                    When editing a class, sets the class defaults

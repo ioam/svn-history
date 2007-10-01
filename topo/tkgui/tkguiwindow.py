@@ -126,9 +126,7 @@ import topo.tkgui
 topo_dir = os.path.split(os.path.split(sys.executable)[0])[0]
 class TkguiWindow(Tkinter.Toplevel):
     """
-    The standard tkgui window (the parent of most other tkgui windows).
-
-    Defines attributes common to tkgui windows.
+    The standard tkgui window; defines attributes common to tkgui windows.
     """
     def __init__(self,**config):
         Tkinter.Toplevel.__init__(self,**config)
@@ -214,9 +212,11 @@ class ResizableScrollableFrame(Tkinter.Frame):
 ##         return X[1]-X[0],Y[1]-Y[0]
 
 
-
+# CB: needs significant cleanup
 class ScrolledTkguiWindow(TkguiWindow):
-
+    """
+    A TkguiWindow with automatic scrollbars.
+    """
     def __init__(self,**config):
         TkguiWindow.__init__(self,**config)
 
@@ -455,6 +455,9 @@ class TaggedSlider(Tkinter.Frame):
 # CB: haven't decided what to do. Might be temporary.
 class TkPOTaggedSlider(TaggedSlider):
     """
+    A TaggedSlider with extra features for use with
+    TkParameterizedObjects.
+    
     Adds extra ability to set slider when e.g. a variable
     name is in the tag.
     """
