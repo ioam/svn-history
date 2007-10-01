@@ -726,6 +726,8 @@ class ProgressWindow(TkguiWindow):
     def __init__(self,timer=topo.sim.timer,progress_var=None,title=None,display=True,**config):
         TkguiWindow.__init__(self,**config)
 
+        self.protocol("WM_DELETE_WINDOW",self.set_stop)
+
         if not display:self.withdraw()
         
         self.timer = timer
