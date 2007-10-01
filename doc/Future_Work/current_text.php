@@ -38,15 +38,15 @@ tracker rather than added to this list</B>.
 
 <H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
 
-<H4>2007/09/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
+<H4>2007/10/01 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
 <li>Cleanup of tkparameterizedobject.py, parametersframe.py, *panel.py files</li>
 <li>plotgroup.py cleanup</li>
 <li>Finish cleanup now that plotgrouptemplate has been removed</li>
 <li>Finish SelectorParameter</li>
 <li>scrollbars: clean up behavior (can we stop bars coming on and going off
-when resize pressed? can we stop empty space when there are no bars?), clean
-up code. </li>
+when resize pressed? can we stop empty space when there are no bars? can we stop
+bars being there when not required [a bwidget bug]), and clean up + doc code. </li>
 </ul>
 
 
@@ -76,8 +76,7 @@ Finishing cleaning up associated code (maybe mostly for Jim to do?).
 Could eventually use STRFPAK or a similar approach.
 
 <H4>2007/05/18 (CB): gradient plots </H4>
-[see SF bug tracker]
-
+[see SF bug tracker 1752465]
 
 <H4>2006/03/26 (CB): scheduled_actions in lissom examples</H4>
 Insert missing actions in case someone tries higher densities.
