@@ -252,8 +252,6 @@ class ScrolledTkguiWindow(TkguiWindow):
         extrah = 19 #self._scroll_frame._scrolled_window.winfo_reqheight() - \
                   #self._scroll_frame.scrolled_frame.winfo_reqheight() + 3
 
-        print "extra",extraw,extrah
-
         w = min(self.content.winfo_reqwidth()+extraw,self.winfo_screenwidth())
         # -60 for task bars etc on screen...how to find true viewable height?
         h = min(self.content.winfo_reqheight()+extrah,self.winfo_screenheight()-60)
