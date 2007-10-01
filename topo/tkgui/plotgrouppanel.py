@@ -1,9 +1,6 @@
 """
-Classes BasicPlotGroupPanel and PlotGroupPanel.
-
-These classes provide GUI windows for PlotGroups, allowing sets of
-related plots to be displayed.
-
+Classes providing GUI windows for PlotGroups, allowsing sets of related plots
+to be displayed.
 
 $Id$
 """
@@ -47,20 +44,6 @@ BORDERWIDTH = 1
 # the border will not be close, too small, and some of the image is
 # not displayed.  
 CANVASBUFFER = 1
-
-
-
-
-## CB: When I click off a text entry box after editing it (e.g. by
-## clicking on some bit of unused window), my change should be
-## applied. Currently, it is only applied if another widget gets the
-## focus. So do something like make the background get the focus if
-## it's clicked.
-## I don't want this behavior in the model editor, though. Although both use
-## ParametersFrame, a distinction is that in the Test Pattern window's
-## ParametersFrame, there is no 'Apply' button (because we want changes to be
-## applied immediately). So this indicates two different modes of use for
-## ParametersFrame.
 
 
 
@@ -114,18 +97,12 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         available.""")
     
     
-    # CB: Surely there's a better way?
-    # Maybe we don't need the plotgroup attribute, since all the
-    # plotgroup's attributes (e.g. self.plotgroup.a) are available via
-    # this object itself (e.g. self.a). Will address this later...
+    # CB: is there a better way than using a property?
     def get_plotgroup(self):
         return self._extraPO
     def set_plotgroup(self,new_pg):
         self._extraPO = new_pg
-        #del self._extra_pos[0]
-        #self.add_extra_po(new_pg)
-
-    plotgroup = property(get_plotgroup,set_plotgroup,"""something something.""")
+    plotgroup = property(get_plotgroup,set_plotgroup)
 
 
     def __init__(self,console,master,plotgroup,**params):
@@ -139,10 +116,9 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         
         TkParameterizedObject.__init__(self,master,extraPO=plotgroup,**params)
         Frame.__init__(self,master)
-
-        self.setup_plotgroup()
-
         self.console=console
+        
+        self.setup_plotgroup()
 
         self.canvases = []
         self.plot_labels = []
@@ -150,43 +126,14 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         ### JCALERT! Figure out why we need that!
         self._num_labels = 0
         
-
         self.plotgroups_history=[]
         self.history_index = 0
         self.params_in_history = [] # parameters valid to adjust in history
-                              
-            
+                                  
     	# Factor for reducing or enlarging the Plots (where 1.2 = 20% change)
 	self.zoom_factor = 1.2
         
-
-        # -----------------------
-        # | ------------------- |
-        # | | control_frame_1 | |
-        # | ------------------- |
-        # |                     |
-        # | ------------------- |
-        # | | control_frame_2 | |
-        # | ------------------- |
-        # |                     |
-        # | ------------------- |
-        # | |                 | |
-        # | |   plot_frame    | |
-        # | |                 | |
-        # | ------------------- |
-        # |                     |
-        # | ------------------- |
-        # | | control_frame_3 | |
-        # | ------------------- |
-        # |                     |
-        # |     messagebar      |
-        # -----------------------  
-
-
-
-
-
-        # CB: rename these frames
+        # CEBALERT: rename these frames
         self.control_frame_1 = Frame(self)
         self.control_frame_1.pack(side=TOP,expand=NO,fill=X)
 
@@ -194,27 +141,9 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         self.control_frame_2.pack(side=TOP,expand=NO,fill=X)
 
 
-        #################### PLOT AREA ####################
-        # Main Plot group title can be changed from a subclass with the
-        # command: self.plot_group.configure(tag_text='NewName')
 	self.plot_group_title = Pmw.Group(self,tag_text=self.plotgroup.name)
-        self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)
-        
-        # max window size (works on all platforms? os x?)
-        #self.master.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
-        #self.__scroll_frame = ResizableScrollableFrame(self.plot_group_title.interior())
-        #self.__scroll_frame.pack()
-        self.plot_frame = self.plot_group_title.interior() #self.__scroll_frame.contents
-        ###################################################       
-
-
-        # control_frame_3 is:
-        #
-        # -----------------------
-        # | updatecommand_frame |
-        # |---------------------|
-        # |  plotcommand_frame  |        
-        # -----------------------
+        self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)        
+        self.plot_frame = self.plot_group_title.interior() 
 
 
         self.control_frame_3 = Frame(self)
@@ -310,11 +239,24 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         # import __main__; __main__.__dict__['qqq']=self
 
     def setup_plotgroup(self):
+        """
+        Perform any necessary initialization of the plotgroup.
+
+        Subclasses can use this to set Parameters on their PlotGroups.
+        """
         pass
     
  
     def set_auto_refresh(self):
-        """Function called by Widget when check-box clicked."""
+        """
+        Add or remove this panel from the console's
+        auto_refresh_panels list.
+        """
+        # JAB: it might make sense for turning on auto-refresh
+        # to do a refresh automatically, though that might have
+        # unexpected behavior for a preference map calculation
+        # (where it would do unnecessary, and potentially lengthy,
+        # recalculation).
         if self.auto_refresh: 
             if not (self in self.console.auto_refresh_panels):
                 self.console.auto_refresh_panels.append(self)
@@ -322,18 +264,17 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             if self in self.console.auto_refresh_panels:
                 self.console.auto_refresh_panels.remove(self)
             
-        # JAB: it might make sense for turning on auto-refresh
-        # to do a refresh automatically, though that might have
-        # unexpected behavior for a preference map calculation
-        # (where it would do unnecessary, and potentially lengthy,
-        # recalculation).
 
 
     def __connection_fields_window(self):
+        """
+        Open a Connection Fields plot for the unit currently
+        identified by a right click.
+        """
         if 'plot' in self._right_click_info:
             sheet = topo.sim[self._right_click_info['plot'].plot_src_name]
             x,y =  self._right_click_info['coords'][1]
-            # CEBHACKALERT: should avoid requesting cf out of range.
+            # CEBERRORALERT: should avoid requesting cf out of range.
             # CEBALERT: need a simple, general system for controlling which menu
             # items are active (instead of offering a menu choice which turns
             # out to be useless).
@@ -343,13 +284,19 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
                 topo.sim.warning("%s has no Connection fields."%sheet.name)
             
     def __receptive_field_window(self):
+        """
+        Open a Receptive Fields plot for the unit currently
+        identified by a right click.
+        """
         if 'plot' in self._right_click_info:
             try:
                 plot = self._right_click_info['plot']
                 x,y =  self._right_click_info['coords'][0]
                 sheet = topo.sim[plot.plot_src_name]
-                # CB: not sure how title works for matrixplot - might need to be formatted better
-                matrixplot(topo.analysis.featureresponses.grid[sheet][x,y],title=("Receptive Field",sheet.name,x,y))
+                # CB: not sure how title works for matrixplot -
+                # might need to be formatted better
+                matrixplot(topo.analysis.featureresponses.grid[sheet][x,y],
+                           title=("Receptive Field",sheet.name,x,y))
             except KeyError:
                 topo.sim.warning("No RF measurements are available yet; run the Receptive Fields plot before accessing this right-click menu option.")
 
@@ -654,7 +601,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         
 
 ####################### HISTORY METHODS ##########################         
-    # CEBHACKALERT: currently, any click on refresh adds to history
+    # CEBERRORALERT: currently, any click on refresh adds to history
     def add_to_history(self):
         self.plotgroups_history.append(copy.copy(self.plotgroup))
         self.history_index=0
