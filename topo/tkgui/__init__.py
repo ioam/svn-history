@@ -50,7 +50,8 @@ from topoconsole import TopoConsole
 # are a bit of a mix. This needs to be cleaned up when we have a
 # final window organization method in mind.
 
-
+# the most bwidget screenshots i could find:
+# http://tcltk.free.fr/Bwidget/
 
 # When not using the GUI, Topographica does not ordinarily import any of
 # the classes in the separate Topographica packages. For example, none
