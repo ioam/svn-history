@@ -223,7 +223,7 @@ class ScrolledTkguiWindow(TkguiWindow):
         self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
         
         self._scroll_frame = ResizableScrollableFrame(self,borderwidth=2,
-                                                       relief="groove")
+                                                       relief="flat")
         self._scroll_frame.pack(expand="yes",fill="both")
         
         self.content = self._scroll_frame.contents
