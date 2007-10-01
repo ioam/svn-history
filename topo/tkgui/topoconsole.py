@@ -41,7 +41,7 @@ from topo.plotting.plotgroup import plotgroups
 
 
 import topo.tkgui 
-from tkguiwindow import TkguiWindow,TaggedSlider
+from tkguiwindow import TkguiWindow,TaggedSlider,ScrolledTkguiWindow
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from featurecurvepanel import FeatureCurvePanel
 from projectionpanel import CFProjectionPGPanel,ProjectionActivityPanel,ConnectionFieldsPanel
@@ -247,7 +247,7 @@ class PlotsMenuEntry(ParameterizedObject):
             class_ = plotpanel_classes.get(group.name,FeatureCurvePanel)
 
         self.class_ = plotpanel_classes.get(group.name,class_)
-
+        
 
     def __call__(self,event=None,**args):
         """
@@ -259,10 +259,12 @@ class PlotsMenuEntry(ParameterizedObject):
         """
         if self.class_.valid_context():
             # window hidden while being constructed to improve appearance
-            window = TkguiWindow(); window.withdraw()
-            panel = self.class_(self.console,window,pg=self.group,**args)
+            window = ScrolledTkguiWindow() ; window.withdraw()
+            panel = self.class_(self.console,window.content,pg=self.group,**args)
             panel.pack(expand='yes',fill='both')
-            window.deiconify()    
+            window.sizeright()
+            window.deiconify()
+            
             self.console.messageBar.message('state', 'OK')
             return panel
         else:
@@ -604,15 +606,19 @@ class TopoConsole(TkguiWindow):
 
 
 
+
     def open_test_pattern_window(self):
         """
         Test Pattern Window.  
         """
         if TestPattern.valid_context():
-            window = TkguiWindow(); window.withdraw()
-            panel = TestPattern(self,window)
+            window = ScrolledTkguiWindow() ; window.withdraw()
+            panel = TestPattern(self,window.content)
             panel.pack(expand='yes',fill='both')
+            window.sizeright()
             window.deiconify()
+
+
             self.messageBar.message('state', 'OK')
             return panel
         else:

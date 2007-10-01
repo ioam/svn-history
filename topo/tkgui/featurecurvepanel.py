@@ -135,7 +135,7 @@ class FeatureCurvePanel(PlotGroupPanel):
                         the progress can be viewed in an open Activity
                         window, e.g. for debugging.)""")]
         self.plot_labels[0].grid(row=1,column=0,sticky='nsew')
-        self.sizeright()
+        self.window_master.sizeright()
 
 
 

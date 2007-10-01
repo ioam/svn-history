@@ -155,6 +155,112 @@ class TkguiWindow(Tkinter.Toplevel):
 ######################################################################
 
 
+import bwidget
+# CB: move out of here + cleanup and document
+class ResizableScrollableFrame(Tkinter.Frame):
+    """
+    A scrollable frame that can also be manually resized.
+
+    Any normal scrollable frame will not resize automatically to
+    accommodate its contents, because that would defeat the
+    purpose of scrolling in the first place.  However, having a
+    scrollable frame that can be resized manually is useful; this
+    class adds easy resizing to a bwidget
+    ScrollableFrame/ScrolledWindow combination.
+    """
+    def __init__(self,master,**config):
+        """
+        The 'contents' attribute is the frame into which contents
+        should be placed (for the contents to be inside the
+        scrollable area), i.e. almost all use of
+        f=ResizableScrollableFrame(master) will be via f.contents.
+        """
+        Tkinter.Frame.__init__(self,master,**config)
+
+        # non-empty Frames ignore any specified width/height, so create two empty
+        # frames used purely for setting height & width
+        self.__height_sizer = Tkinter.Frame(self,height=0,width=0)
+        self.__height_sizer.pack(side="left")
+        self.__width_sizer = Tkinter.Frame(self,width=0,height=0)
+        self.__width_sizer.pack()
+
+        # the scrollable frame, with scrollbars
+        self._scrolled_window = bwidget.ScrolledWindow(self,auto="both",
+                                                       scrollbar="both")
+        # set small start height/width, will grow if necessary
+        scrolled_frame = bwidget.ScrollableFrame(self._scrolled_window,
+                                                 height=50,width=50)
+        self.scrolled_frame = scrolled_frame
+        self._scrolled_window.setwidget(scrolled_frame)
+        self._scrolled_window.pack(fill="both",expand='yes')
+
+        # CB: tk docs say getframe() not necessary? Where did I see that?
+        self.contents = scrolled_frame.getframe()
+
+
+    def set_size(self,width=None,height=None):
+        """
+        Manually specify the size of the scrollable frame area.
+        """
+        self._scrolled_window.pack_forget() # try to stop stray scrollbars        
+        if width:self.__width_sizer['width']=width
+        if height:self.__height_sizer['height']=height
+        self._scrolled_window.pack(fill="both",expand="yes")
+
+
+##     def _fractions_visible(self):
+##         X = [float(x) for x in self.scrolled_frame.xview().split(' ')]
+##         Y = [float(x) for x in self.scrolled_frame.xview().split(' ')]
+##         return X[1]-X[0],Y[1]-Y[0]
+
+
+
+class ScrolledTkguiWindow(TkguiWindow):
+
+    def __init__(self,**config):
+        TkguiWindow.__init__(self,**config)
+
+        self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
+        
+        self._scroll_frame = ResizableScrollableFrame(self,borderwidth=2,
+                                                       relief="groove")
+        self._scroll_frame.pack(expand="yes",fill="both")
+        
+        self.content = self._scroll_frame.contents
+
+
+# CB: will try to make the window know when to resize itself, rather
+# than having window users tell it
+##         self.bind("<Configure>",self.deal_with_configure)
+
+##     def deal_with_configure(self,e=None):
+##         print e
+
+
+    # CB: should be able to move to resizablescrollableframe
+    def sizeright(self):
+        # if user has changed window size, need to tell tkinter that it should take
+        # control again.
+        self.geometry('')
+
+        self.update_idletasks()
+
+        # extra for width of scrollbars
+        extraw = self._scroll_frame._scrolled_window.winfo_reqwidth() - \
+                 self._scroll_frame.scrolled_frame.winfo_reqwidth() + 3
+        extrah = self._scroll_frame._scrolled_window.winfo_reqheight() - \
+                 self._scroll_frame.scrolled_frame.winfo_reqheight() + 3
+
+        w = min(self.content.winfo_reqwidth()+extraw,self.winfo_screenwidth())
+        # -60 for task bars etc on screen...how to find true viewable height?
+        h = min(self.content.winfo_reqheight()+extrah,self.winfo_screenheight()-60)
+
+        if not hasattr(self,'oldsize') or self.oldsize!=(w,h): 
+            self._scroll_frame.set_size(w,h)
+            self.oldsize = (w,h)
+            
+
+
      
 
 ######################################################################
