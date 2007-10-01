@@ -78,26 +78,26 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
         return (not projections == [])
 
 
-    def __init__(self,console,master,pg=None,**params):
-        super(ProjectionSheetPGPanel,self).__init__(console,master,pg=pg,**params)
+    def __init__(self,console,master,plotgroup,**params):
+        super(ProjectionSheetPGPanel,self).__init__(console,master,plotgroup,**params)
         self.pack_param('sheet',parent=self.control_frame_3,on_modify=self.sheet_change,
-                        widget_options={'sort_fn_args':
-                                        {'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
+            widget_options={'sort_fn_args':
+                           {'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
 
-    def generate_plotgroup(self,pg=None):
-        p = pg or self.plotgroup_type()
-        self.populate_sheet_param(p)
-        return p
+        
+    def setup_plotgroup(self):
+        super(ProjectionSheetPGPanel,self).setup_plotgroup()
+        self.populate_sheet_param()
 
 
     def sheet_change(self):
         self.refresh()         
 
-        
-    def populate_sheet_param(self,p):
+
+    def populate_sheet_param(self):
         sheets = topo.sim.objects(self.sheet_type).values() 
-        p.params()['sheet'].Arange = sheets
-        p.sheet = sheets[0] # CB: necessary?
+        self.plotgroup.params()['sheet'].Arange = sheets
+        self.plotgroup.sheet = sheets[0] # CB: necessary?
 
 
 
@@ -107,11 +107,11 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
     plotgroup_type = ProjectionActivityPlotGroup
     
     
-    def __init__(self,console,master,pg=None,**params):       
-        super(ProjectionActivityPanel,self).__init__(console,master,pg=pg,**params)
+    def __init__(self,console,master,plotgroup,**params):       
+        super(ProjectionActivityPanel,self).__init__(console,master,plotgroup,**params)
         self.auto_refresh = True
         # CB: why do we do this?
-	self.plotgroup_label='ProjectionActivity'
+	self.plotgroup.name='ProjectionActivity'
 	
 
     # CEBALERT! Dynamic info doesn't work on projection activity windows!
@@ -135,11 +135,11 @@ class ConnectionFieldsPanel(ProjectionSheetPGPanel):
 
     plotgroup_type = ConnectionFieldsPlotGroup
 
-    def __init__(self,console,master,pg=None,**params):
+    def __init__(self,console,master,plotgroup,**params):
         self.initial_args=params # CEBALERT: store the initial arguments so we can get sheet,x,y in
                                  # sheet_change if any of them were specified. Isn't there a cleaner
                                  # way?
-        super(ConnectionFieldsPanel,self).__init__(console,master,pg,**params)
+        super(ConnectionFieldsPanel,self).__init__(console,master,plotgroup,**params)
 
         self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change)
         
@@ -216,41 +216,40 @@ class CFProjectionPGPanel(ProjectionSheetPGPanel):
 
     plotgroup_type = CFProjectionPlotGroup
 
-    def __init__(self,console,master,pg=None,**params):
-        super(CFProjectionPGPanel,self).__init__(console,master,pg=pg,**params)
+    def __init__(self,console,master,plotgroup,**params):
+        super(CFProjectionPGPanel,self).__init__(console,master,plotgroup,**params)
+        
         self.pack_param('projection',parent=self.control_frame_3,on_modify=self.make_plots,
                         widget_options={'sort_fn_args':{'cmp':cmp_projections}})
         self.pack_param('density',parent=self.control_frame_3)
-
-
-    def generate_plotgroup(self,pg=None):
-        p = super(CFProjectionPGPanel,self).generate_plotgroup(pg)        
-        self.populate_projection_param(p)
-        return p
 
 
     def _plot_title(self):
         return 'Projection ' + self.projection.name + ' from ' + self.projection.src.name + ' to ' \
                + self.sheet.name + ' at time ' + str(self.plotgroup.time)
 
+
+    def setup_plotgroup(self):
+        super(CFProjectionPGPanel,self).setup_plotgroup()
+        self.populate_projection_param()
+
+        
     def sheet_change(self):
         self.refresh_projections()
 
 
-    def populate_projection_param(self,p):
-        # JPALERT: What is p?
-
+    def populate_projection_param(self):
         # JPHACKALERT: Note that CFSheet can have projections that are not
         # CFProjections (e.g., OneToOneProjections), if there exists a
         # way of plotting them, they should be plotted.
-        prjns = [x for x in p.sheet.projections().values()
+        prjns = [x for x in self.plotgroup.sheet.projections().values()
                  if isinstance(x,CFProjection)]
-        p.params()['projection'].Arange = prjns
-        p.projection = prjns[0] # CB: necessary?
+        self.plotgroup.params()['projection'].Arange = prjns
+        self.plotgroup.projection = prjns[0] # CB: necessary?
 
     # CEBALERT: here and for other such lists, make things get sorted by precedence.
     def refresh_projections(self):
-        self.populate_projection_param(self.plotgroup)
+        self.populate_projection_param()
 
         #################
         # CEBALERT: How do you change list of tkinter.optionmenu options? Use pmw's optionmenu?

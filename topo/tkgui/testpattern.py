@@ -79,20 +79,10 @@ class TestPattern(SheetPGPanel):
         else:
             return False
 
-    def generate_plotgroup(self,pg=None):
-        plotgroup = pg or self.plotgroup_type()
+
+    def __init__(self,console,master,plotgroup=TestPatternPlotGroup(),**params):
+	super(TestPattern,self).__init__(console,master,plotgroup,**params)
         
-        # CB: could copy the sheets instead (deleting connections etc)
-        plotgroup.sheets = [GeneratorSheet(name=gs.name,nominal_bounds=gs.nominal_bounds,
-                        nominal_density=gs.nominal_density) for gs in topo.sim.objects(GeneratorSheet).values()]
-
-        plotgroup.name = "Preview"
-        return plotgroup 
-
-
-    def __init__(self,console,master,pg=None,**params):
-	super(TestPattern,self).__init__(console,master,pg=pg,**params)
-
         self.auto_refresh = True
 
         self.plotcommand_frame.pack_forget()
@@ -124,6 +114,17 @@ class TestPattern(SheetPGPanel):
         self.params_frame.pack(side='bottom',expand='yes',fill='x')
         self.pack_param('duration',parent=present_frame,side='left')
         self.pack_param('present',parent=present_frame,on_change=self.present_pattern,side="right")
+
+
+    def setup_plotgroup(self):
+        super(TestPattern,self).setup_plotgroup()
+        
+        # CB: could copy the sheets instead (deleting connections etc)
+        self.plotgroup.sheets = [GeneratorSheet(name=gs.name,
+                                                nominal_bounds=gs.nominal_bounds,
+                                                nominal_density=gs.nominal_density)
+                                 for gs in topo.sim.objects(GeneratorSheet).values()]
+        self.plotgroup.name = "Preview"
 
 
     def switch_sheet(self):

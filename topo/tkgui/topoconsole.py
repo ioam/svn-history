@@ -225,7 +225,7 @@ class PlotsMenuEntry(ParameterizedObject):
     Stores information about a Plots menu command
     (including the command itself, and the plotgroup template).
     """
-    def __init__(self,console,group,class_=TemplatePlotGroupPanel,**params):
+    def __init__(self,console,plotgroup,class_=TemplatePlotGroupPanel,**params):
         """
         Store the template, and set the class that will be created by this menu entry
 
@@ -238,15 +238,15 @@ class PlotsMenuEntry(ParameterizedObject):
         super(PlotsMenuEntry,self).__init__(**params)
         
         self.console = console
-        self.group = group
+        self.plotgroup = plotgroup
 
         # Special cases.  These classes are specific to the topo/tkgui
         # directory and therefore this link must be made within the tkgui
         # files.
-        if self.group.template_plot_type=='curve':
-            class_ = plotpanel_classes.get(group.name,FeatureCurvePanel)
+        if self.plotgroup.template_plot_type=='curve':
+            class_ = plotpanel_classes.get(plotgroup.name,FeatureCurvePanel)
 
-        self.class_ = plotpanel_classes.get(group.name,class_)
+        self.class_ = plotpanel_classes.get(plotgroup.name,class_)
         
 
     def __call__(self,event=None,**args):
@@ -260,7 +260,7 @@ class PlotsMenuEntry(ParameterizedObject):
         if self.class_.valid_context():
             # window hidden while being constructed to improve appearance
             window = ScrolledTkguiWindow() ; window.withdraw()
-            panel = self.class_(self.console,window.content,pg=self.group,**args)
+            panel = self.class_(self.console,window.content,self.plotgroup,**args)
             panel.pack(expand='yes',fill='both')
             window.sizeright()
             window.deiconify()
@@ -416,9 +416,9 @@ class TopoConsole(TkguiWindow):
         # create menu entries, and get list of categories
         entries=KeyedList() # keep the order of plotgroup_templates (which is also KL)
         categories = []
-        for label,group in plotgroups.items():
-            entries[label] = PlotsMenuEntry(self,group)
-            categories.append(group.category)
+        for label,plotgroup in plotgroups.items():
+            entries[label] = PlotsMenuEntry(self,plotgroup)
+            categories.append(plotgroup.category)
         categories = sorted(set(categories))
 
         # 'Plots' menu
@@ -428,7 +428,7 @@ class TopoConsole(TkguiWindow):
         # The Basic category items appear on the menu itself.
         assert 'Basic' in categories, "'Basic' is the category for the standard Plots menu entries."
         for label,entry in entries:
-            if entry.group.category=='Basic':
+            if entry.plotgroup.category=='Basic':
                     plots_menu.add_command(label=label,command=entry.command)
         categories.remove('Basic')
 
@@ -442,7 +442,7 @@ class TopoConsole(TkguiWindow):
 
             # could probably search more efficiently than this
             for label,entry in entries:
-                if entry.group.category==category:
+                if entry.plotgroup.category==category:
                     category_menu.add_command(label=label,command=entry.command)
 
             

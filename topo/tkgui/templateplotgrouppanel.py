@@ -111,9 +111,9 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
 
     ## CB: update init args now we have no pgts.
-    def __init__(self,console,master,pg=None,**params):
+    def __init__(self,console,master,plotgroup,**params):
 
-        super(TemplatePlotGroupPanel,self).__init__(console,master,pg=pg,**params)
+        super(TemplatePlotGroupPanel,self).__init__(console,master,plotgroup,**params)
 
         self.pack_param('strength_only',parent=self.control_frame_1,
                         on_change=self.strength_only_fn,side='right')
@@ -121,7 +121,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         
         # To make the auto-refresh button off by default except for
         # the Activity PlotGroup
-	if self.plotgroup_label == 'Activity':self.auto_refresh=True
+	if self.plotgroup.name == 'Activity':self.auto_refresh=True
 
 
         # Display any plots that can be done with existing data, but
@@ -203,10 +203,6 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         #self._sheet_menu.add_command(label="Print matrix values",
         #                             command=self.__print_matrix)
         #################################################################
-
-
-##     def generate_plotgroup(self):
-##         return self.plotgroup_type()
 
 
 

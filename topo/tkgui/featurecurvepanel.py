@@ -52,8 +52,10 @@ class FeatureCurvePanel(PlotGroupPanel):
             return False
 
 
-    def __init__(self,console,master,pg=None,**params):       
-	PlotGroupPanel.__init__(self,console,master,pg=pg,**params)
+    def __init__(self,console,master,plotgroup,**params):
+	PlotGroupPanel.__init__(self,console,master,plotgroup,**params)
+
+        
 
         self.pack_param("sheet",parent=self.control_frame_3,on_change=self.sheet_change,
                         widget_options={'sort_fn_args':
@@ -98,24 +100,19 @@ class FeatureCurvePanel(PlotGroupPanel):
 ##############################################################################
 
 
-    def populate_sheet_param(self,p):
+    def setup_plotgroup(self):
+        super(FeatureCurvePanel,self).setup_plotgroup()
+        self.populate_sheet_param()
+
+
+    def populate_sheet_param(self):
         sheets = topo.sim.objects(ProjectionSheet).values() 
-        p.params()['sheet'].Arange = sheets
-        p.sheet = sheets[0] # CB: necessary?
-
-
-    def generate_plotgroup(self,pg=None):
-        """
-        Create the right Plot Key that will define the needed
-        information for a FeatureCurvePlotGroup. 
-        """
-        p = pg or self.plotgroup_type()
-        self.populate_sheet_param(p)
-	return p
+        self.plotgroup.params()['sheet'].Arange = sheets
+        self.plotgroup.sheet = sheets[0] # CB: necessary?
 
     def _plot_title(self):
         # CEBHACKALERT: str()  (shouldn't lanbl be string already?)
-        return str(self.plotgroup_label)+' at time ' + str(self.plotgroup.time)
+        return str(self.plotgroup.name)+' at time ' + str(self.plotgroup.time)
 
 
     def display_labels(self):

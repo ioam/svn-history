@@ -127,9 +127,8 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
     plotgroup = property(get_plotgroup,set_plotgroup,"""something something.""")
 
-    ## CB: Rather than passing params for the PlotGroup in **params, have plotgroup_params
-    ## and pass those to generate_plotgroup(**params)?
-    def __init__(self,console,master,pg=None,**params):
+
+    def __init__(self,console,master,plotgroup,**params):
         """
         If your parameter should be available in history, add its name
         to the params_in_history list, otherwise it will be disabled
@@ -138,11 +137,10 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         # CEBALERT! To be cleaned up...
         self.window_master = master.master.master.master.master
         
-        TkParameterizedObject.__init__(self,master,
-                                       extraPO=self.generate_plotgroup(pg),**params)
+        TkParameterizedObject.__init__(self,master,extraPO=plotgroup,**params)
         Frame.__init__(self,master)
 
-        self.plotgroup_label = self.plotgroup.name
+        self.setup_plotgroup()
 
         self.console=console
 
@@ -199,7 +197,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         #################### PLOT AREA ####################
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
-	self.plot_group_title = Pmw.Group(self,tag_text=self.plotgroup_label)
+	self.plot_group_title = Pmw.Group(self,tag_text=self.plotgroup.name)
         self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)
         
         # max window size (works on all platforms? os x?)
@@ -311,19 +309,9 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         # CB: don't forget to include ctrl-q
         # import __main__; __main__.__dict__['qqq']=self
 
-
-    # CB: rename to _generate_plotgroup()
-    # Whole generate_plotgroup() mechanism needs cleaning now we don't have
-    # PlotGroupTemplates.
-    def generate_plotgroup(self,pg=None):
-	"""
-        Create this Panel's PlotGroup.
-
-        Reimplement in subclasses that must perform additional setup of their
-        PlotGroup (e.g. populating Parameter ranges).
-	"""
-        return pg or self.plotgroup_type()
-
+    def setup_plotgroup(self):
+        pass
+    
  
     def set_auto_refresh(self):
         """Function called by Widget when check-box clicked."""
@@ -750,7 +738,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
         Override in subclasses to provide more information.
         """
-        return "%s at time %s"%(self.plotgroup_label,self.plotgroup.time)
+        return "%s at time %s"%(self.plotgroup.name,self.plotgroup.time)
 
                 
     # rename to refresh_titles
@@ -798,8 +786,8 @@ class SheetPGPanel(PlotGroupPanel):
             return False
         
 
-    def __init__(self,console,master,pg=None,**params):
-        super(SheetPGPanel,self).__init__(console,master,pg=pg,**params)
+    def __init__(self,console,master,plotgroup,**params):
+        super(SheetPGPanel,self).__init__(console,master,plotgroup,**params)
 
         self.pack_param('normalize',parent=self.control_frame_1,
                         on_change=self.make_plots,side="right")
