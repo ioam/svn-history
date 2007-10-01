@@ -725,7 +725,7 @@ class PeriodicEventSequence(EventSequence):
 # CB: code that previously existed in various places now collected
 # together. The original timing code was not properly tested, and the
 # current code has not been tested either: needs writing cleanly and
-# testing.
+# testing. This whole class is pretty difficult to follow.
 #  
 ### JP: Is it possible that some or all of this can be more cleanly
 ### implemented using PeriodicEvents?
@@ -744,18 +744,16 @@ class SomeTimer(ParameterizedObject):
     1.0 steps for 100 iterations. See the Simulation class for an
     example of using the timer in this way.
 
-    The second, via X(), is for calling some function repeatedly a
-    specified number of times. A case to use X() would be timing
-    pattern presentations, where the number of times the
-    pattern_presenter will be called is known in
-    advance. Additionally, this method allows a list of arguments to
-    be passed to the function (in this case, the permutation for each
-    call).
+    The second, via call_fixed_num_times(), is for calling some
+    function repeatedly a specified number of times. A case to use
+    call_fixed_num_times() would be timing pattern presentations,
+    where the number of times the pattern_presenter will be called is
+    known in advance. Additionally, this method allows a list of
+    arguments to be passed to the function (in this case, the
+    permutation for each call).
     """
     # * parameters to control formatting?
     # * the parameter types for some of the following could be more specific
-    # * tried to use one message format whether X or call_and_time is being used;
-    #   could test for which (via if fixed_num_calls) if we do need two formats
     step = Parameter(default=None,doc=
         """Only relevant with call_fixed_duration(), not call_fixed_num_times(). 
         
@@ -866,13 +864,6 @@ class SomeTimer(ParameterizedObject):
         self.__measure(fduration,step)
     call_and_time=call_fixed_duration
         
-        
-# CB: use to get timing messages at the commandline:
-# from topo.base.simulation import MessagePrinter
-# topo.sim.timer.receive_messages.append(MessagePrinter().printm)
-class MessagePrinter(object):
-    def printm(self,x): print x
-
 ############ End of timer code ############
 
 
