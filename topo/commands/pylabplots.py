@@ -111,6 +111,9 @@ def matrixplot3d(mat,title=None,outputfilename="tmp.ps",aspect=None):
     would support 3d plots directly.
 
     Unlikely to work on non-UNIX systems.
+
+    Should return when it completes, but for some reason the Topographica
+    prompt is not available until this command finishes.
     """
     import Gnuplot
     import Numeric
@@ -136,12 +139,12 @@ def matrixplot3d(mat,title=None,outputfilename="tmp.ps",aspect=None):
     if outputfilename:
         g("set terminal postscript eps color solid 'Times-Roman' 14")
         g("set output '"+outputfilename+"'")
-        g.splot(Gnuplot.GridData(m,x,y, binary=0)) # Try binary=1
+        g.splot(Gnuplot.GridData(m,x,y, binary=1))
         #g.hardcopy(outputfilename, enhanced=1, color=1)
         system(psviewer+" "+outputfilename+" &")
 
     else:
-        g.splot(Gnuplot.GridData(m,x,y, binary=0)) # Try binary=1
+        g.splot(Gnuplot.GridData(m,x,y, binary=1))
         raw_input('Please press return to continue...\n')
 
 
