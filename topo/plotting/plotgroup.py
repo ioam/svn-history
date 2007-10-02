@@ -329,10 +329,6 @@ class TemplatePlotGroup(SheetPlotGroup):
     doc = StringParameter(default="",
       doc="Documentation string describing this type of plot.")
 
-
-    template_plot_type=Parameter('bitmap',
-      doc="Whether the plots are bitmap images or curves, to determine which GUI components are needed")
-
     plot_immediately=BooleanParameter(False,doc="""
       Whether to call the plot command at once or only when the user asks for a refresh.
 
@@ -731,15 +727,17 @@ plotgroup_types = {'Connection Fields': ConnectionFieldsPlotGroup,
                    'Projection Activity': ProjectionActivityPlotGroup}
 
 
-def new_pg(**params):
+def new_pg(template_plot_type='bitmap',**params):
     """
     Create a new PlotGroup and add it to the plotgroups list.
 
     Convenience function to make it simpler to use the name of the
     PlotGroup as the key in the plotgroups list.
+
+    template_plot_type: Whether the plots are bitmap images or curves ('curve')
+
     """
     name = params.get('name')
-    template_plot_type = params.get('template_plot_type')
 
     pg_type = TemplatePlotGroup
     if name:

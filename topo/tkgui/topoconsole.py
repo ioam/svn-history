@@ -37,7 +37,7 @@ from topo.misc.keyedlist import KeyedList
 from topo.base.parameterizedobject import ParameterizedObject
 import topo.base.simulation
 import topo.commands.basic
-from topo.plotting.plotgroup import plotgroups
+from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
 
 
 import topo.tkgui 
@@ -243,7 +243,7 @@ class PlotsMenuEntry(ParameterizedObject):
         # Special cases.  These classes are specific to the topo/tkgui
         # directory and therefore this link must be made within the tkgui
         # files.
-        if self.plotgroup.template_plot_type=='curve':
+        if isinstance(self.plotgroup,FeatureCurvePlotGroup):
             class_ = plotpanel_classes.get(plotgroup.name,FeatureCurvePanel)
 
         self.class_ = plotpanel_classes.get(plotgroup.name,class_)

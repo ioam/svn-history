@@ -731,13 +731,12 @@ def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequ
 
 
 ###############################################################################
-new_pg(name='Orientation Tuning Fullfield',category="Tuning Curves",doc="""
+new_pg(template_plot_type="curve",name='Orientation Tuning Fullfield',category="Tuning Curves",doc="""
             Plot orientation tuning curves for a specific unit, measured using full-field sine gratings.
             Although the data takes a long time to collect, once it is ready the plots
             are available immediately for any unit.""",
         update_command='measure_or_tuning_fullfield()',
-        plot_command='or_tuning_curve(x_axis="orientation", plot_type=pylab.plot, unit="degrees")',
-        template_plot_type="curve")
+        plot_command='or_tuning_curve(x_axis="orientation", plot_type=pylab.plot, unit="degrees")')
 
 
 def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4],
@@ -777,12 +776,11 @@ def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4
 	  
 
 ###############################################################################
-new_pg(name='Orientation Tuning',category="Tuning Curves",doc="""
+new_pg(template_plot_type="curve",name='Orientation Tuning',category="Tuning Curves",doc="""
             Measure orientation tuning for a specific unit at different contrasts,
             using a pattern chosen to match the preferences of that unit.""",
         update_command='measure_or_tuning()',
         plot_command='or_tuning_curve(x_axis="orientation",plot_type=pylab.plot,unit="degrees")',
-        template_plot_type="curve",
         prerequisites=['XPreference'])
 
 
@@ -839,11 +837,10 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
                
 
 ###############################################################################
-new_pg(name='Size Tuning',category="Tuning Curves",
+new_pg(template_plot_type="curve",name='Size Tuning',category="Tuning Curves",
         doc='Measure the size preference for a specific unit.',
         update_command='measure_size_response()',
         plot_command='tuning_curve(x_axis="size",plot_type=pylab.plot,unit="Diameter of stimulus")',
-        template_plot_type="curve",
         prerequisites=['OrientationPreference','XPreference'])
 
 
@@ -917,11 +914,10 @@ def measure_size_response(num_phase=18,
 
 
 ###############################################################################
-new_pg(name='Contrast Response',category="Tuning Curves",
+new_pg(template_plot_type="curve",name='Contrast Response',category="Tuning Curves",
         doc='Measure the contrast response function for a specific unit.',
         update_command='measure_contrast_response()',
         plot_command='tuning_curve(x_axis="contrast",plot_type=pylab.semilogx,unit="%")',
-        template_plot_type="curve",
         prerequisites=['OrientationPreference','XPreference'])
 
 
