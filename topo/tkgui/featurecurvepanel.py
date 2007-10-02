@@ -107,7 +107,7 @@ class FeatureCurvePanel(PlotGroupPanel):
 
     def populate_sheet_param(self):
         sheets = topo.sim.objects(ProjectionSheet).values() 
-        self.plotgroup.params()['sheet'].Arange = sheets
+        self.plotgroup.params()['sheet'].objects = sheets
         self.plotgroup.sheet = sheets[0] # CB: necessary?
 
     def _plot_title(self):

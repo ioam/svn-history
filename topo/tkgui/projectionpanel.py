@@ -96,7 +96,7 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
 
     def populate_sheet_param(self):
         sheets = topo.sim.objects(self.sheet_type).values() 
-        self.plotgroup.params()['sheet'].Arange = sheets
+        self.plotgroup.params()['sheet'].objects = sheets
         self.plotgroup.sheet = sheets[0] # CB: necessary?
 
 
@@ -244,7 +244,7 @@ class CFProjectionPGPanel(ProjectionSheetPGPanel):
         # way of plotting them, they should be plotted.
         prjns = [x for x in self.plotgroup.sheet.projections().values()
                  if isinstance(x,CFProjection)]
-        self.plotgroup.params()['projection'].Arange = prjns
+        self.plotgroup.params()['projection'].objects = prjns
         self.plotgroup.projection = prjns[0] # CB: necessary?
 
     # CEBALERT: here and for other such lists, make things get sorted by precedence.

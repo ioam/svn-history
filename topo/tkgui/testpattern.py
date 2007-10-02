@@ -90,7 +90,7 @@ class TestPattern(SheetPGPanel):
             self.hide_param(name)
 
         edit_sheet_param = self.get_parameter_object('edit_sheet')
-        edit_sheet_param.Arange = self.plotgroup._sheets()
+        edit_sheet_param.objects = self.plotgroup._sheets()
 
         self.pg_control_pane = Frame(self,bd=1,relief="sunken")
         self.pg_control_pane.pack(side="top",expand='yes',fill='x')

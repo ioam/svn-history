@@ -49,10 +49,10 @@ class TestParametersFrame(unittest.TestCase):
                          ParameterizedObject()]
         
         self.testpo1 = TestPO()
-        self.testpo1.params()['osp'].Arange = self.some_pos
+        self.testpo1.params()['osp'].objects = self.some_pos
 
         self.testpo2 = TestPO()
-        self.testpo1.params()['osp'].Arange = self.some_pos
+        self.testpo1.params()['osp'].objects = self.some_pos
         
         self.toplevel = Tkinter.Toplevel()
         self.f = ParametersFrame(self.toplevel,self.testpo1)

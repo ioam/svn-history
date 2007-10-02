@@ -284,7 +284,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
                     ParameterizedObject(name='rat'),
                     ParameterizedObject(name='bat')]
         osp_param = self.f.get_parameter('osp')
-        osp_param.Arange = some_pos
+        osp_param.objects = some_pos
         #self.f.r.default = some_pos[0]
 
         self.f.pack_param('osp')  # have to pack AFTER populating range for OptionMenu widget to work (see ALERT in tkparameterizedobject.py)
@@ -306,7 +306,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         self.assertEqual(self.f.translators['osp']['bat'],some_pos[2])
 
         gnat = ParameterizedObject(name='gnat')
-        osp_param.Arange.append(gnat)
+        osp_param.objects.append(gnat)
         self.f.pack_param('osp') # again, note the need to pack after updating range.
 ##         self.f.initialize_ranged_parameter('r',ParameterizedObject)
         self.assertEqual(self.f.translators['osp']['gnat'],gnat)

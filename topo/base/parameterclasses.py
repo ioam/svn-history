@@ -634,18 +634,23 @@ class ObjectSelectorParameter(SelectorParameter):
     """
     Parameter whose value is set to an object from its list of possible objects.
     """
-    __slots__ = ['Arange'] # Could generate range from a passed-in function, not sure yet.
+    __slots__ = ['objects'] # Could generate range from a passed-in function, not sure yet.
                            # In any case, won't stay as Arange. _objects?
     __doc__ = property((lambda self: self.doc))
 
-    def __init__(self,default=None,Arange=[],instantiate=True,**params):
+    def __init__(self,default=None,objects=[],instantiate=True,**params):
+        self.objects = objects
+        self._check_value(default)
         Parameter.__init__(self,default=default,instantiate=instantiate,**params)
-        self.Arange = Arange
-
-    # CB: add _check_value()
+        
+    # CB: add _check_value() for setting objects? All getting a bit too much checking...
+    def _check_value(self,val,obj=None):
+        if val is not None and val not in self.objects:
+            raise ValueError("%s not in Parameter %s's list of possible objects" \
+                             %(val,self.attrib_name(obj=obj)))
 
     def get_range(self):
-        return dict([(i.name,i) for i in self.Arange])
+        return dict([(obj.name,obj) for obj in self.objects])
     range = get_range # CEBALERT: remove when callers updated
 
     
