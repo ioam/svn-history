@@ -763,7 +763,7 @@ class ProgressWindow(TkguiWindow):
         self.sim_time.grid(row=1,column=1,sticky='w')
 
         # Should say 'at current rate', since the calculation assumes linearity
-        Label(progress_box,text="Remaining /s:").grid(row=2,column=0,sticky='w')
+        Label(progress_box,text="Remaining time:").grid(row=2,column=0,sticky='w')
         self.remaining = Label(progress_box)
         self.remaining.grid(row=2,column=1,sticky='w')
         
