@@ -102,6 +102,49 @@ def matrixplot(mat,title=None,aspect=None):
     pylab.show()
 
 
+def matrixplot3d(mat,title=None,outputfilename="tmp.ps",aspect=None):
+    """
+    Simple plotting for any matrix as a 3D surface with axes.
+
+    Currently requires the gnuplot-py package to be installed, plus
+    the external gnuplot program; it would be much nicer if Matplotlib
+    would support 3d plots directly.
+
+    Unlikely to work on non-UNIX systems.
+    """
+    import Gnuplot
+    import Numeric
+    from os import system
+    
+    psviewer="gv" # Should be a parameter, or handled better somehow
+    g = Gnuplot.Gnuplot(debug=0) #debug=1: output commands to stderr
+    r,c = mat.shape
+    x = arange(r*1.0)
+    y = arange(c*1.0)
+    z = mat.max()
+    # The .tolist() command is necessary to avoid bug in gnuplot-py,
+    # which will otherwise convert a 2D float array into integers (!)
+    m = numpy.asarray(mat,dtype="float32").tolist()
+    #g("set parametric")
+    g("set data style lines")
+    g("set hidden3d")
+    g("set xlabel 'R'")
+    g("set ylabel 'C'")
+    g("set zlabel 'Value'")
+    if title: g.title(title)
+    
+    if outputfilename:
+        g("set terminal postscript eps color solid 'Times-Roman' 14")
+        g("set output '"+outputfilename+"'")
+        g.splot(Gnuplot.GridData(m,x,y, binary=0)) # Try binary=1
+        #g.hardcopy(outputfilename, enhanced=1, color=1)
+        system(psviewer+" "+outputfilename+" &")
+
+    else:
+        g.splot(Gnuplot.GridData(m,x,y, binary=0)) # Try binary=1
+        raw_input('Please press return to continue...\n')
+
+
 def histogramplot(data,title=None,colors=None,*args,**kw):
     """
     Compute and plot the histogram of the supplied data.
