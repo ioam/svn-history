@@ -3,13 +3,13 @@ CC = gcc
 
 default: python jpeg pil numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis bwidget
 
-all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco
+all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
 
 dist: bluesphere
 
-clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean ctypes-clean pyaudiolab-clean tile-clean tilewrapper-clean bwidget-clean psyco-clean pyrex-clean hdf5-clean pytables-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean ctypes-clean pyaudiolab-clean tile-clean tilewrapper-clean bwidget-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall ctypes-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall ctypes-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall
 
 ##############################################################
 # Python (interpreted language)
@@ -642,6 +642,24 @@ bluesphere-clean:
 	rm -rf ${BLUESPHERE}
 bluesphere-uninstall:
 	rm -rf ${foreach f,${BLUESPHERE_UNINSTALL}, ${PREFIX}/${f}}
+
+##############################################################
+# Gnuplotpy
+#
+GNUPLOTPY = gnuplot-py-1.7
+
+GNUPLOTPY_UNINSTALL += ${PYTHON_LIB}/site-packages/Gnuplot
+
+gnuplotpy: ${GNUPLOTPY}.tar.gz
+	tar xzf ${GNUPLOTPY}.tar.gz
+	cd ${GNUPLOTPY}; ${PREFIX}/bin/python setup.py install
+	touch gnuplotpy
+
+gnuplotpy-clean:
+	rm -rf ${GNUPLOTPY}
+gnuplotpy-uninstall:
+	rm -rf gnuplotpy ${foreach f,${GNUPLOTPY_UNINSTALL}, ${PREFIX}/${f}}
+
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
