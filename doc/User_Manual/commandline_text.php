@@ -89,7 +89,8 @@ Topographica&gt;
 program:</A>
 
 <pre>
-$ ./topographica -g examples/cfsom_or.ty 
+$ ./topographica -g examples/cfsom_or.ty
+Topographica&gt; topo.sim.run(1)
 Topographica&gt; from topo.commands.pylabplots import *
 Topographica&gt; V1 = topo.sim['V1']
 Topographica&gt; matrixplot(V1.activity)
@@ -99,11 +100,27 @@ Topographica&gt; vectorplot(V1.activity[10])
 Topographica&gt;
 </pre>
 
-Result:
+<P>Result:
 
 <center>
 <IMG src="images/matrixvectorplot.png" WIDTH="420" HEIGHT="473">
 </center>
+
+<P><a name="gnuplotpy">3D plotting</a> is also available on some systems if you have installed
+<a href="http://gnuplot-py.sourceforge.net">gnuplotpy</a> (by running
+"make -C external gnuplotpy").  If you have it, then you can replace
+matrixplot with matrixplot3d:
+
+<pre>
+Topographica&gt; matrixplot3d(V1.activity)
+</pre>
+
+<P>Result:
+
+<center>
+<IMG src="images/matrixplot3d.png" WIDTH="444" HEIGHT="279">
+</center>
+
 
 <P>The prompt can also be used for any mathematical calculation or
 plotting one might wish to do, a la Matlab:

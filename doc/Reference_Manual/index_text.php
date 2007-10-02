@@ -200,15 +200,27 @@ You can either add that permanently to your path, or add it each time
 before using mlabwrap.
 </DD>
 
-<P><DT><A href="http://www.ar.media.kyoto-u.ac.jp/members/david/softwares/pyaudiolab/index.html">pyaudiolab</DT></A>
+<P><DT><A href="http://www.ar.media.kyoto-u.ac.jp/members/david/softwares/pyaudiolab/index.html">pyaudiolab</A></DT>
 <DD>
 pyaudiolab provides an easy way to read from and write to sound files (it wraps 
 <A href="http://www.mega-nerd.com/libsndfile/">libsndfile</A>).
-On linux, building should require nothing more than <code>make -C external pyaudiolab</code>.
+On Linux, building should require nothing more than <code>make -C external pyaudiolab</code>.
+<!--Currently: untested on OSX, not present on Windows-->
+</DD>
+
+<P><DT><A HREF="http://gnuplot-py.sourceforge.net">gnuplotpy</A></DT>
+<DD>
+The matplotlib package included with Topographica is currently lacking
+3D plotting support.  In the meantime, 3D plotting is available on
+some platforms (at least UNIX, and also probably Mac OS X) using
+the external program <code>gnuplot</code>.  On Linux or Mac, building
+should only require <code>make -C external gnuplotpy</code>.  At that
+point, just use
+<A href="../User_Manual/commandline.html#gnuplotpy">matrixplot3d()</A>
+in place of matrixplot().
 <!--Currently: untested on OSX, not present on Windows-->
 </DD>
 </DL>
-
 
 
 
