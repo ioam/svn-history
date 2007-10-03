@@ -80,7 +80,7 @@ def vectorplot(vec,title=None,style='-',label=None):
     """
     pylab.plot(vec, style, label=label)
     pylab.grid(True)
-    if (title): windowtitle(title)
+    if title: windowtitle(title)
     pylab.show._needmain = False
     pylab.show()
 
@@ -97,8 +97,8 @@ def matrixplot(mat,title=None,aspect=None,colorbar=True):
     pylab.gray()
     pylab.figure(figsize=(5,5))
     pylab.imshow(mat,interpolation='nearest',aspect=aspect)
-    if (title): windowtitle(title)
-    if (colorbar): pylab.colorbar()
+    if title: windowtitle(title)
+    if colorbar and (mat.min()!= mat.max()): pylab.colorbar()
     pylab.show._needmain = False     
     pylab.show()
 
@@ -145,7 +145,7 @@ def matrixplot3d(mat,title=None,type="wireframe"):
     ax.set_ylabel('C')
     ax.set_zlabel('Value')
 
-    if (title): windowtitle(title)
+    if title: windowtitle(title)
     pylab.show()
 
 
@@ -215,7 +215,7 @@ def histogramplot(data,title=None,colors=None,*args,**kw):
     # colors changed, or any extra colors will be ignored.
     if colors: [bar.set_fc(color) for bar,color in zip(bars,colors)]
     
-    if (title): windowtitle(title)
+    if title: windowtitle(title)
     pylab.show()
 
 
