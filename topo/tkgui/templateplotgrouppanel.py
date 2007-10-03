@@ -138,66 +138,19 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         self._unit_menu.add_command(label="Print info",
                                     command=self.__print_info)
 
+        # JABALERT: Shouldn't be assuming SHC here; should also work
+        # for RGB (or any other channels).
+        channel_menus={}
+        for chan in ['Strength','Hue','Confidence']:
+            newmenu = Menu(self._canvas_menu, tearoff=0)
+            self._canvas_menu.add_cascade(menu=newmenu,label=chan+' channel', indexname=chan)
 
-        ## Strength channel
-        self._strength_menu = Menu(self._canvas_menu, tearoff=0)
-        self._canvas_menu.add_cascade(menu=self._strength_menu,label='Strength channel',
-                                      indexname="Strength")
-        
-        ## Hue channel
-        self._hue_menu = Menu(self._canvas_menu, tearoff=0)
-        self._canvas_menu.add_cascade(menu=self._hue_menu,label='Hue channel',
-                                      indexname="Hue")
-
-        ## Confidence channel
-        self._conf_menu = Menu(self._canvas_menu, tearoff=0)
-        self._canvas_menu.add_cascade(menu=self._conf_menu,label='Confidence channel',
-                                      indexname="Confidence")
-
-
-        # CEBALERT: there doesn't seem to be any way within tkinter itself to let me
-        # know which submenu was used! (Hence the repetition.)
-        # http://mail.python.org/pipermail/python-list/1999-May/003482.html
-        # http://groups.google.com/group/comp.lang.python/browse_thread/thread/de5cf21073610446/7ce05db5dbc4c3f3%237ce05db5dbc4c3f3
-
-        # If the repetition here and elsewhere in this file (and tkgui
-        # in general) can't be avoided with loops, there is probably
-        # something else, like using a function to return the slightly
-        # different versions of the calls.
-        #
-        # In any case, shouldn't be assuming SHC here.
-
-        # CB: note that I've made Menu indexable by name (in tkguiwindow.py), so can now change this code.
-
-        self._strength_menu.add_command(label="Plot in new window",
-                                        command=lambda: self.__plot_matrix('Strength'))
-        self._strength_menu.add_command(label="Fourier transform",
-                                        command=lambda: self.__fft('Strength'))
-        self._strength_menu.add_command(label="Histogram",
-                                        command=lambda: self.__histogram('Strength'))
-        self._strength_menu.add_command(label="Gradient",
-                                        command=lambda: self.__gradient('Strength'))
-
-
-        self._hue_menu.add_command(label="Plot in new window",
-                                   command=lambda: self.__plot_matrix('Hue'))
-        self._hue_menu.add_command(label="Fourier transform",
-                                   command=lambda: self.__fft('Hue'))
-        self._hue_menu.add_command(label="Histogram",
-                                        command=lambda: self.__histogram('Hue'))
-        self._hue_menu.add_command(label="Gradient",
-                                   command=lambda: self.__gradient('Hue'))
-
-        
-        self._conf_menu.add_command(label="Plot in new window",
-                                    command=lambda: self.__plot_matrix('Confidence'))
-        self._conf_menu.add_command(label="Fourier transform",
-                                    command=lambda: self.__fft('Confidence'))
-        self._conf_menu.add_command(label="Histogram",
-                                        command=lambda: self.__histogram('Confidence'))
-        self._conf_menu.add_command(label="Gradient",
-                                        command=lambda: self.__gradient('Confidence'))
-
+            # The c=chan construction is required so that each lambda has its own copy of the string
+            newmenu.add_command(label="Plot in new window", command=lambda c=chan: self.__plot_matrix(c))
+            newmenu.add_command(label="Fourier transform",  command=lambda c=chan: self.__fft(c))
+            newmenu.add_command(label="Histogram",          command=lambda c=chan: self.__histogram(c))
+            newmenu.add_command(label="Gradient",           command=lambda c=chan: self.__gradient(c))
+            channel_menus[chan]=newmenu
 
         
         #self._sheet_menu.add_command(label="Print matrix values",
