@@ -236,6 +236,7 @@ class CFProjectionPGPanel(ProjectionSheetPGPanel):
         
     def sheet_change(self):
         self.refresh_projections()
+        super(CFProjectionPGPanel,self).sheet_change()
 
 
     def populate_projection_param(self):
