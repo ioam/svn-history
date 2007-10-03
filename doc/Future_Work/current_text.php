@@ -38,15 +38,16 @@ tracker rather than added to this list</B>.
 
 <H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
 
-<H4>2007/10/01 (CB): Urgent tkgui + plotgroup cleanup</H4>
+<H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
-<li>Cleanup of tkparameterizedobject.py, parametersframe.py, *panel.py files</li>
-<li>plotgroup.py cleanup</li>
-<li>Finish cleanup now that plotgrouptemplate has been removed</li>
+<li>Cleanup + doc of tkparameterizedobject.py, parametersframe.py,
+*panel.py files</li>
+<li>plotgroup.py cleanup + doc (remove plotgrouptemplate.py)</li>
 <li>Finish SelectorParameter</li>
 <li>scrollbars: clean up behavior (can we stop bars coming on and going off
 when resize pressed? can we stop empty space when there are no bars? can we stop
 bars being there when not required [a bwidget bug]), and clean up + doc code. </li>
+<li>finish basic developer manual tkgui intro</li>
 </ul>
 
 
@@ -95,9 +96,6 @@ fixedpoint" during unpickling. Importing fixedpoint works in Windows,
 and I can see it there in site-packages. So there's some confusion
 somewhere, and it could be difficult to solve. 
 
-<H4>2007/06/27 (CB): Documentation & cleanup</H4>
-Of all the things I've recently been working on. The ALERTs are 
-getting out of control!
 
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
