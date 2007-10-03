@@ -210,14 +210,15 @@ On Linux, building should require nothing more than <code>make -C external pyaud
 
 <P><DT><A HREF="http://gnuplot-py.sourceforge.net">gnuplotpy</A></DT>
 <DD>
-The matplotlib package included with Topographica is currently lacking
-3D plotting support.  In the meantime, 3D plotting is available on
-some platforms (at least UNIX, and also probably Mac OS X) using
-the external program <code>gnuplot</code>.  On Linux or Mac, building
-should only require <code>make -C external gnuplotpy</code>.  At that
-point, just use
-<A href="../User_Manual/commandline.html#gnuplotpy">matrixplot3d()</A>
-in place of matrixplot().
+You can use the external <code>gnuplot</code> command to generate plots on
+some platforms (at least UNIX, and also probably Mac OS X).  To build
+it on Linux or Mac, first install Numeric (e.g. using
+<code>cvs update -D 2007-04-15 external/Makefile external/Numeric-24.0.tar.gz; make -C external numeric ; cvs update -d -P -A external/Makefile external/Numeric-24.0.tar.gz</code>),
+and then do <code>make -C external gnuplotpy</code>.  At that point 
+you can e.g. use <code>matrixplot3d_gnuplot()</code> in place of 
+<A href="../User_Manual/commandline.html#gnuplotpy"><code>matrixplot3d()</code></A>
+or <code>matrixplot()</code>, or modify
+  <code>matrixplot3d_gnuplot()</code> to create any other gnuplot visualization.
 <!--Currently: untested on OSX, not present on Windows-->
 </DD>
 </DL>

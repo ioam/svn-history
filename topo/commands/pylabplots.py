@@ -102,13 +102,60 @@ def matrixplot(mat,title=None,aspect=None):
     pylab.show()
 
 
-def matrixplot3d(mat,title=None,outputfilename="tmp.ps",aspect=None):
+def matrixplot3d(mat,title=None,type="wireframe"):
+    """
+    Simple plotting for any matrix as a 3D wireframe with axes.
+
+    Uses Matplotlib's beta-quality features for 3D plotting.  These
+    usually work fine for wireframe plots, although they don't always
+    format the axis labels properly, and do not support removal of
+    hidden lines.
+
+    Other than the default "wireframe", the type can be "contour" to
+    get a contour plot, or "surface" to get a solid surface plot, but
+    surface plots currently fail in many cases, e.g. for small
+    matrices.
+
+    If you have trouble, you can try matrixplot3d_gnuplot instead.
+    """
+    from numpy import outer,arange,cos,sin,ones,zeros
+    from matplotlib import axes3d
+    
+    fig = pylab.figure()
+    ax = axes3d.Axes3D(fig)
+
+    # Construct matrices for r and c values
+    rn,cn = mat.shape
+    c = outer(ones(rn),arange(cn*1.0))
+    r = outer(arange(rn*1.0),ones(cn))
+
+    if type=="wireframe":
+        ax.plot_wireframe(r,c,mat)
+    elif type=="surface":
+        # Sometimes fails for no obvious reason
+        ax.plot_surface(r,c,mat)
+    elif type=="contour":
+        # Works but not usually very useful
+        ax.contour3D(r,c,mat)
+    else:
+        raise ValueError("Unknown plot type "+str(type))
+        
+    ax.set_xlabel('R')
+    ax.set_ylabel('C')
+    ax.set_zlabel('Value')
+
+    if (title): windowtitle(title)
+    pylab.show()
+
+
+
+def matrixplot3d_gnuplot(mat,title=None,outputfilename="tmp.ps"):
     """
     Simple plotting for any matrix as a 3D surface with axes.
 
     Currently requires the gnuplot-py package to be installed, plus
-    the external gnuplot program; it would be much nicer if Matplotlib
-    would support 3d plots directly.
+    the external gnuplot program; likely to be removed once Matplotlib
+    supports 3D plots better.
 
     Unlikely to work on non-UNIX systems.
 
@@ -124,7 +171,6 @@ def matrixplot3d(mat,title=None,outputfilename="tmp.ps",aspect=None):
     r,c = mat.shape
     x = arange(r*1.0)
     y = arange(c*1.0)
-    z = mat.max()
     # The .tolist() command is necessary to avoid bug in gnuplot-py,
     # which will otherwise convert a 2D float array into integers (!)
     m = numpy.asarray(mat,dtype="float32").tolist()

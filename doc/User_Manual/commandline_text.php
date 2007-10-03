@@ -106,10 +106,8 @@ Topographica&gt;
 <IMG src="images/matrixvectorplot.png" WIDTH="420" HEIGHT="473">
 </center>
 
-<P><a name="gnuplotpy">3D plotting</a> is also available on some systems if you have installed
-<a href="http://gnuplot-py.sourceforge.net">gnuplotpy</a> (by running
-"make -C external gnuplotpy").  If you have it, then you can replace
-matrixplot with matrixplot3d:
+<P>You can also try replacing matrixplot with matrixplot3d to get a 3D
+wireframe plot:
 
 <pre>
 Topographica&gt; matrixplot3d(V1.activity)
@@ -118,7 +116,7 @@ Topographica&gt; matrixplot3d(V1.activity)
 <P>Result:
 
 <center>
-<IMG src="images/matrixplot3d.png" WIDTH="444" HEIGHT="279">
+<IMG src="images/matrixplot3d_matplotlib.png" WIDTH="596" HEIGHT="499">
 </center>
 
 
