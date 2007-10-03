@@ -40,8 +40,16 @@ def cmp_plot(plot1,plot2):
 		   (plot2.plot_src_name+plot2.name))
 
 
-# CEB: working on this file (it's in an intermediate state: in the process of
-# removing PlotGroupTemplates and cleaning up).
+
+# CEBALERTs for this file:
+# * Clean up hierarchy (i.e. making methods as general as possible,
+#   and there are also missing classes - currently only CFProjections
+#   for CFSheets can be plotted).
+# * Clean up keyname stuff 
+# * Documentation needs updating
+# * There are no unit tests
+# * Commands in analysis.py should be re-written to avoid having to
+#   set global parameters
 
 
 class PlotGroup(ParameterizedObject):
@@ -49,9 +57,6 @@ class PlotGroup(ParameterizedObject):
     Container that has one or more Plots and also knows how to arrange
     the plots and other special parameters.
     """
-    ###JCALERT:
-    ### - clean up the doc.
-    ### - rewrite the test file.
 
     cmd_location = Parameter(default=__main__.__dict__,doc="""
     Namespace in which to execute the update_command and plot_command.""")
@@ -458,8 +463,6 @@ class TemplatePlotGroup(SheetPlotGroup):
 
 
 
-
-### CEBALERT: shouldn't contain any CF-related stuff. 
 class ProjectionSheetPlotGroup(TemplatePlotGroup):
     """
     Abstract PlotGroup for visualizations of the Projections of one ProjectionSheet.
@@ -470,7 +473,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
     """
     _abstract_class_name = "ProjectionSheetPlotGroup"
 
-    keyname = "ProjectionSheet" # CB: Make into a parameter and document what it is
+    keyname = "ProjectionSheet" 
 
     sheet = ObjectSelectorParameter(default=None,doc="""
     The Sheet from which to produce plots.""")
@@ -489,9 +492,6 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
     def _update_command(self):
         self._check_sheet_type()
-	### JCALERT: commands in analysis.py should be re-written to
-	### avoid setting these global parameters (ALERT applies
-	### elsewhere in this file, too).
 	topo.commands.analysis.sheet_name = self.sheet.name
         super(ProjectionSheetPlotGroup,self)._update_command()
         
@@ -672,11 +672,6 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
 
 
 
-
-
-
-# CB/JAB: Consider -- is this actually general enough to handle
-# anything related to a unit, rather than CF specifically?
 class UnitPlotGroup(ProjectionSheetPlotGroup):
     """
     Visualize anything related to a unit.
