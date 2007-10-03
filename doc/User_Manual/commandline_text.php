@@ -127,7 +127,7 @@ plotting one might wish to do, a la Matlab:
 <!-- JABALERT! Should include screenshots of what the plotting looks like -->
 <pre>
 $ ./topographica -g
-Topographica&gt; from Numeric import *
+Topographica&gt; from numpy import *
 Topographica&gt; 2*pi*exp(1.6)
 31.120820554943471
 Topographica&gt; t = arange(0.0, 1.0+0.01, 0.01)
