@@ -85,7 +85,7 @@ def vectorplot(vec,title=None,style='-',label=None):
     pylab.show()
 
 
-def matrixplot(mat,title=None,aspect=None):
+def matrixplot(mat,title=None,aspect=None,colorbar=True):
     """
     Simple plotting for any matrix as a bitmap with axes.
 
@@ -98,6 +98,7 @@ def matrixplot(mat,title=None,aspect=None):
     pylab.figure(figsize=(5,5))
     pylab.imshow(mat,interpolation='nearest',aspect=aspect)
     if (title): windowtitle(title)
+    if (colorbar): pylab.colorbar()
     pylab.show._needmain = False     
     pylab.show()
 
