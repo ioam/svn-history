@@ -46,7 +46,6 @@ BORDERWIDTH = 1
 CANVASBUFFER = 1
 
 
-# need some refreshing when changing params?
 
 class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
     """
