@@ -40,16 +40,16 @@ tracker rather than added to this list</B>.
 
 <H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
-<li>Cleanup + doc of tkparameterizedobject.py, parametersframe.py,
-*panel.py files</li>
-<li>plotgroup.py cleanup + doc (remove plotgrouptemplate.py)</li>
-<li>Finish SelectorParameter</li>
+<li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
+<li>Cleanup + doc of *panel.py files</li>
+<li>Cleanup + doc of plotgroup.py</li>
 <li>scrollbars: clean up behavior (can we stop bars coming on and going off
 when resize pressed? can we stop empty space when there are no bars? can we stop
 bars being there when not required [a bwidget bug]), and clean up + doc code. </li>
 <li>finish basic developer manual tkgui intro</li>
 </ul>
 
+<H4>2007/10/03 (CB): Finish SelectorParameter</H4>
 
 <H4>2007/09/01: timing code </H4>
 The timing object is nearly done, allowing progress bars, time
@@ -104,28 +104,26 @@ somewhere, and it could be difficult to solve.
 
 <H2>Tasks to be addressed after the 0.9.4 release:</H2>
 
-<H4>2007/09/03 (CB): Less-urgent tkgui + plotgroup cleanup</H4>
+<H4>2007/10/03 (CB): Plotting non-CFProjection Projections</H4>
+Modify PlotGroup and ProjectionPGPanels so that we can plot
+a wider variety of Projections.
+
+
+<H4>2007/10/03 (CB): Less-urgent tkgui cleanup</H4>
 <ul>
+<li>ModelEditor(PlotGroupPanel), and cleanup of model editor</li>
 <li>Control which options are available on right-click menu (e.g. no
 'Connection Fields' for a Connection Fields plot).</li>
 <li>Replace Pmw balloon and message bar with those from bwidget; remove
 Pmw</li>
 <li>Use parametersframe/tkparameterizedobject in more places (topoconsole, 
-model editor, right click menus...) </li>
+right click menus...) </li>
 <li>Which widgets should expand (expand=YES ?), which should fill the
 space (fill=X?) (e.g. in parameters frames sliders etc should
 expand), and so on. Switch to grid layout where it's more
 appropriate.</li>
 <li>Document some Tkinter tips. More tasks/notes in
 topo/tkgui/__init__.py</li>
-<li>Consider these old, forgotten tasks: SheetSelectorParameter so
-that the GUI (model editor) can display list of sheet classes etc from
-a Parameter; ClassSelectorParameter - find_classes_in_package() will
-become a method of ClassSelectorParameter.name should be constant:
-objects in the simulation are indexed by name, so name needs to be a
-constant Parameter (which <i>might</i> cause some other problems).
-There are some related hacks in ParametersFrame that would also need
-to be cleaned up.  </li>
 </ul>
 
 
