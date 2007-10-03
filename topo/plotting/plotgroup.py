@@ -125,9 +125,6 @@ class PlotGroup(ParameterizedObject):
         self._create_images(update)
         self.scale_images()
 
-    def draw_plots(self,**args):
-        raise
-
 
     def redraw_plots(self):
         self.make_plots(update=False)
@@ -320,10 +317,67 @@ class SheetPlotGroup(PlotGroup):
         return True
 
 
-# CB: added in PlotGroupTemplate's Parameters, so now a bit of a mess.
+
 class TemplatePlotGroup(SheetPlotGroup):
     """
-    PlotGroup that is built as specified by a PlotGroupTemplate.
+    Container that allows creation of different types of plots in a
+    way that is independent of particular models or Sheets.
+
+    A TemplatePlotGroup is constructed from a plot_templates list, an
+    optional command to run to generate the data, and other optional
+    parameters.
+    
+    The plot_templates list should contain tuples (plot_name,
+    plot_template).  Each plot_template is a list of (name, value)
+    pairs, where each name specifies a plotting channel (such as Hue
+    or Confidence), and the value is the name of a SheetView (such as
+    Activity or OrientationPreference).
+        
+    Various types of plots support different channels.  An SHC
+    plot supports Strength, Hue, and Confidence channels (with
+    Strength usually being visualized as luminance, Hue as a color
+    value, and Confidence as the saturation of the color).  An RGB
+    plot supports Red, Green, and Blue channels.  Other plot types
+    will be added eventually.
+
+    For instance, one could define an Orientation-colored Activity
+    plot as::
+        
+      plotgroups['Activity'] =
+          TemplatePlotGroup(name='Activity', category='Basic',
+              update_command='measure_activity()',
+              plot_templates=[('Activity',
+                  {'Strength': 'Activity', 'Hue': 'OrientationPreference', 'Confidence': None})])
+    
+    This specifies that the final TemplatePlotGroup will contain up to
+    one Plot named Activity per Sheet, although there could be no
+    plots at all if no Sheet has a SheetView named Activity once
+    'measure_activity()' has been run.  The Plot will be colored by
+    OrientationPreference if such a SheetView exists for that Sheet,
+    and the value (luminance) channel will be determined by the
+    SheetView Activity.  This plot will be listed in the category
+    'Basic' anywhere such categories are relevant (e.g. in the GUI).
+
+    
+    Here's a more complicated example specifying two different plots
+    in the same PlotGroup::
+
+      TemplatePlotGroup(name='Orientation Preference', category='Basic'
+          update_command='measure_or_pref()',
+          plot_templates=
+              [('Orientation Preference',
+                  {'Strength': None, 'Hue': 'OrientationPreference'}),
+               ('Orientation Selectivity',
+                  {'Strength': 'OrientationSelectivity'})])
+
+    Here the TemplatePlotGroup will contain up to two Plots per Sheet,
+    depending on which Sheets have OrientationPreference and
+    OrientationSelectivity SheetViews.
+
+
+    The function new_pg provides a convenient way to define plots using
+    TemplatePlotGroups; search for new_pg elsewhere in the code to see
+    examples. 
     """
 
     doc = StringParameter(default="",
@@ -335,8 +389,6 @@ class TemplatePlotGroup(SheetPlotGroup):
       Should be set to true for quick plots, but false for those that take a long time
       to calculate, so that the user can change the update command if necessary.""")
     
-    image_location = Filename(doc='Path to search for a user-specified image.')
-
     prerequisites=ListParameter([],
       doc="List of preference maps which must exist before this plot can be calculated.")
 
