@@ -1143,8 +1143,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # all skip translation etc. Instead should handle their
         # translation.)
 
-        b = Button(frame,text=self.pretty_print(name),
-                   command=command)
+        b = Button(frame,command=command)
 
         button_param = self.get_parameter_object(name)
 
@@ -1153,6 +1152,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         if image:
             b['image']=image
             b['relief']='flat'
+        else:
+            b['text']=self.pretty_print(name)
 
         # and set size from ButtonParameter
         size = button_param.size
