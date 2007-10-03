@@ -11,18 +11,19 @@ __version__='$Revision$'
 
 import numpy
 
-import topo.patterns.random
-import topo.patterns.basic
-
-from topo.base.cf import CFProjection
+from topo.base.cf import CFProjection, CFSheet
 from topo.base.parameterclasses import DynamicNumber, Number
 from topo.base.patterngenerator import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.basic import PiecewiseLinear
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.cf import CFSheet
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.numbergenerators import UniformRandom
+#from topo.projections.basic import OneToOneProjection
+from topo.patterns.basic import Line
+import topo.patterns.random
+
+
 
 
 topo.sim.name = "hierarchical"
@@ -37,14 +38,14 @@ GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0.25
 GeneratorSheet.nominal_density = 20
 
-left_input_pattern = topo.patterns.basic.Line(
+left_input_pattern = Line(
     thickness=0.02,
     bounds=BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
     x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
     y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
     orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
-right_input_pattern = topo.patterns.basic.Line(
+right_input_pattern = Line(
     thickness=0.02,
     bounds=BoundingBox(points=((-0.8,-1.05),(0.8,1.05))),
     x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=100)),
@@ -80,6 +81,7 @@ topo.sim['RightRetina'] = GeneratorSheet(input_generator=right_input_pattern,
 topo.sim['V1'] = CFSheet()
 topo.sim['V2'] = CFSheet(nominal_bounds = BoundingBox(points=((-0.4,-0.4),(0.4,0.6))))
 topo.sim['V3'] = CFSheet(nominal_density=5)
+#topo.sim['RegionX'] = CFSheet(nominal_density=4)
 
 # Projections to V1
 topo.sim.connect('LeftRetina','V1',delay=0.5,connection_type=CFProjection,name='AfferentLeft')
@@ -101,6 +103,10 @@ topo.sim.connect('V3','V2',delay=0.5,connection_type=CFProjection,
 topo.sim.connect('V2','V3',delay=0.5,connection_type=CFProjection,
                   name='Afferent')
 
+# Projections to RegionX
+#topo.sim.connect('V1','RegionX',delay=0.5,connection_type=OneToOneProjection)
+
+
 
 # example scheduled action
 topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
@@ -109,11 +115,13 @@ topo.sim.schedule_command(10,"""topo.sim['V1'].projections()['AfferentLeft'].cha
 
 
 # Set default locations for the Model Editor
+#topo.sim['RegionX'    ].layout_location=(135,130)
 topo.sim['V3'         ].layout_location=(500, 90)
 topo.sim['V2'         ].layout_location=(500,230)
 topo.sim['V1'         ].layout_location=(135,320)
 topo.sim['LeftRetina' ].layout_location=(151,520)
 topo.sim['RightRetina'].layout_location=(369,520)
 
+
 # set default input generator (e.g. for the GUI)
-GeneratorSheet.classparams()['input_generator'].default=topo.patterns.basic.Line()
+GeneratorSheet.classparams()['input_generator'].default=Line()
