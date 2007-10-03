@@ -52,6 +52,13 @@ from topoconsole import TopoConsole
 
 # the most bwidget screenshots i could find:
 # http://tcltk.free.fr/Bwidget/
+# some bwidget ref's/notes I'm using/going to use:
+# http://wiki.tcl.tk/1091 and 3909
+# http://tkinter.unpythonic.net/bwidget/BWman/
+# http://sourceforge.net/docman/display_doc.php?docid=17481&group_id=12883
+# https://stat.ethz.ch/pipermail/r-sig-gui/2004-April/000258.html
+# http://wiki.tcl.tk/8646
+# http://wiki.tcl.tk/2251
 
 # When not using the GUI, Topographica does not ordinarily import any of
 # the classes in the separate Topographica packages. For example, none
