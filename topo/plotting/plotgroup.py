@@ -41,12 +41,16 @@ def cmp_plot(plot1,plot2):
 
 
 
-# CEBALERTs for this file:
+# general CEBALERTs for this file:
+#
+# Before 0.9.4:
+# * Clean up keyname stuff 
+# * Update documentation
+#
+# After 0.9.4
 # * Clean up hierarchy (i.e. making methods as general as possible,
 #   and there are also missing classes - currently only CFProjections
 #   for CFSheets can be plotted).
-# * Clean up keyname stuff 
-# * Documentation needs updating
 # * There are no unit tests
 # * Commands in analysis.py should be re-written to avoid having to
 #   set global parameters
