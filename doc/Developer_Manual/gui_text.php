@@ -51,3 +51,57 @@ can ignore all of the GUI details, which are irrelevant to what
 Topographica actually computes.  Allowing users to focus on the core
 code is absolutely crucial for them to be able to understand and trust
 what they are actually simulating.
+
+
+<!--CB: work in progress-->
+
+<H2>Programming with tkgui</H2>
+
+<P>tkgui uses <a href="">Tkinter</a> to draw the GUI components, but
+simplifies GUI implementation by handling linkage of
+<code>ParameterizedObject</code>s with representations in the GUI.
+
+<!--(Tkinter is very flexible, but often quite a large amount of code
+is required to keep track of variables and display components
+('widgets') ).-->
+
+<P>The classes <a href="">TkParameterizedObject</a> and <a
+href="">ParametersFrame</a> are the ones most often of used for
+creating a new GUI representation of some Topographica
+component. Which to use depends on how much you wish to customize the
+display: a ParametersFrame displays all of a ParameterizedObject's
+Parameters as a list in one frame, whereas a TkParameterizedObject can
+display any number of the Parameters in any number of Frames (which
+you specify). Hence the PlotGroupPanels, which display Parameters from
+multiple ParameterizedObjects in a custom layout, are based on
+TkParameterizedObject, whereas editing properties of an object in the
+model editor simply brings up a ParametersFrame for that object.
+
+<H3>ParametersFrame</H3>
+
+<P>If you wish to display and/or edit the Parameters of a
+ParameterizedObject in the GUI, you can simply insert a
+ParametersFrame for that object into an existing container (a window
+such as a <a href="">tkgui.TkguiWindow</a>, or a frame such as a <a
+href="">Tkinter.Frame</a>):
+
+<pre>
+from topo.base.parameterizedobject import ParameterizedObject
+from topo.tkgui.parametersframe import ParametersFrame
+from topo.tkgui.tkguiwindow import TkguiWindow
+
+p = ParameterizedObject(name="PO")
+w = TkguiWindow()
+f = ParametersFrame(w,parameterized_object=p)
+</pre>
+
+<P>All the non-hidden Parameters of <code>p</code> will be displayed
+in a new Frame in <code>w</code>.
+
+<!--CB: mention buttons, two types of PF-->
+
+
+
+<H3>TkParameterizedObject</H3>
+
+<!--CB: don't duplicate tkparameterizedobject.py's docstring.-->
