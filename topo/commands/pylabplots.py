@@ -110,7 +110,9 @@ def matrixplot3d(mat,title=None,type="wireframe"):
     Uses Matplotlib's beta-quality features for 3D plotting.  These
     usually work fine for wireframe plots, although they don't always
     format the axis labels properly, and do not support removal of
-    hidden lines.
+    hidden lines.  Note that often the plot can be rotated within the
+    window to make such problems go away, and then the best result can
+    be saved if needed.
 
     Other than the default "wireframe", the type can be "contour" to
     get a contour plot, or "surface" to get a solid surface plot, but
@@ -119,7 +121,7 @@ def matrixplot3d(mat,title=None,type="wireframe"):
 
     If you have trouble, you can try matrixplot3d_gnuplot instead.
     """
-    from numpy import outer,arange,cos,sin,ones,zeros
+    from numpy import outer,arange,ones
     from matplotlib import axes3d
     
     fig = pylab.figure()

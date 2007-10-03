@@ -119,6 +119,7 @@ Topographica&gt; matrixplot3d(V1.activity)
 <IMG src="images/matrixplot3d_matplotlib.png" WIDTH="596" HEIGHT="499">
 </center>
 
+<P>Be sure to try clicking and dragging on the plot, to rotate the viewpoint.
 
 <P>The prompt can also be used for any mathematical calculation or
 plotting one might wish to do, a la Matlab:
