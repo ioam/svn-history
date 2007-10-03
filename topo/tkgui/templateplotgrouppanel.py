@@ -146,10 +146,11 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
             self._canvas_menu.add_cascade(menu=newmenu,label=chan+' channel', indexname=chan)
 
             # The c=chan construction is required so that each lambda has its own copy of the string
-            newmenu.add_command(label="Plot in new window", command=lambda c=chan: self.__plot_matrix(c))
-            newmenu.add_command(label="Fourier transform",  command=lambda c=chan: self.__fft(c))
-            newmenu.add_command(label="Histogram",          command=lambda c=chan: self.__histogram(c))
-            newmenu.add_command(label="Gradient",           command=lambda c=chan: self.__gradient(c))
+            newmenu.add_command(label="Plot with axis labels", command=lambda c=chan: self.__plot_matrix(c))
+            newmenu.add_command(label="Plot as 3D wireframe",  command=lambda c=chan: self.__plot_matrix3d(c))
+            newmenu.add_command(label="Fourier transform",     command=lambda c=chan: self.__fft(c))
+            newmenu.add_command(label="Histogram",             command=lambda c=chan: self.__histogram(c))
+            newmenu.add_command(label="Gradient",              command=lambda c=chan: self.__gradient(c))
             channel_menus[chan]=newmenu
 
         
@@ -239,6 +240,12 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
         m=plot._get_matrix(channel)
         topo.commands.pylabplots.matrixplot(m, title=description)
+
+    def __plot_matrix3d(self,channel):
+        plot = self._right_click_info['plot']
+        description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
+        m=plot._get_matrix(channel)
+        topo.commands.pylabplots.matrixplot3d(m, title=description)
 
     # CEBALERT: decide if and how to allow any of these functions to be used for getting as many
     # channels' info as possible.
