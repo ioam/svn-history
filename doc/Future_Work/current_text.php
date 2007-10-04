@@ -38,14 +38,22 @@ tracker rather than added to this list</B>.
 
 <H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
 
+<H4>2007/10/03 (CB): function to normalize path names</H4>
+Extract code from Filename parameter and ensure we're using the
+function everywhere that accepts a path (otherwise the Windows version
+won't work).
+
+
 <H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
 <li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
 <li>Cleanup + doc of *panel.py files</li>
 <li>Cleanup + doc of plotgroup.py</li>
+<li>Reorganize classes and filenames in tkgui</li>
 <li>scrollbars: clean up behavior (can we stop bars coming on and going off
 when resize pressed? can we stop empty space when there are no bars? can we stop
-bars being there when not required [a bwidget bug]), and clean up + doc code. </li>
+bars being there when not required [a bwidget bug])? why is 'press refresh to see
+plots...' text not centered? clean up + doc code. </li>
 <li>finish basic developer manual tkgui intro</li>
 </ul>
 
