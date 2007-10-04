@@ -144,8 +144,9 @@ different way.
 
 <P>The available plots are all specified in a general way that allows
 users to change the details of how the data is visualized.  Each plot
-has an associated template that specifies a command to run to generate
-the data, and then how to visualize the results.
+is part of a PlotGroup that specifies a command to run to generate
+the data, and then how to visualize the results for all the Sheets in
+the simulation at once.
 
 <P>The command used is shown in the plot window as "update command",
 where users can add or change parameters or command names as needed.
@@ -158,6 +159,13 @@ refreshed, the new value will be used instead.  To see what options
 are available for each command, see
 <A HREF="../Reference_Manual/topo.commands.analysis-module.html">
 topo/commands/analysis.py</A>.
+
+<P>Some plots also use a "plot command", called after the "update
+command" to actually visualize the results.  For instance,
+some commands generate data for all units in a Sheet, but the
+PlotGroup displays results from only a single sheet; in this case
+the "plot command" (usually much quicker than the "update command") is
+called whenever a new unit is selected.
 
 <P> If you often need to change the parameters for map or curve
 measurement, then you can do that easily without modifying your copy
@@ -173,8 +181,8 @@ which sine gratings are presented to 1.0, and turn on the response
 function by default:
 
 <pre>
-  from topo.plotting.templates import plotgroup_templates
-  plotgroup_templates["Orientation Preference"].command=
+  from topo.plotting.plotgroup import plotgroups
+  plotgroups["Orientation Preference"].command=
       "measure_or_pref(scale=0.75,offset=0.5,display=False,
        pattern_presenter=PatternPresenter(
            pattern_generator=SineGrating(),apply_output_fn=True,
@@ -190,9 +198,9 @@ and you can do it for any plot group.
 plot. For instance, you can remove the default OrientationPreference
 subplot from Activity plots using:
 <pre>
-  from topo.plotting.templates import plotgroup_templates
-  plotgroup_templates["Activity"].plot_templates["Activity"]["Hue"]=None
-  plotgroup_templates["Activity"].plot_templates["Activity"]["Confidence"]=None
+  from topo.plotting.plotgroup import plotgroups
+  plotgroups["Activity"].plot_templates["Activity"]["Hue"]=None
+  plotgroups["Activity"].plot_templates["Activity"]["Confidence"]=None
 </pre>
 
 
@@ -210,14 +218,14 @@ plot.  As a reference, here is an implementation of Orientation
 Preference plots:
   
 <font size=-1><pre>
-1. pgt= new_pgt(name='Orientation Preference',category="Preference Maps",
-                doc='Measure preference for sine grating orientation.',
-2.              command='measure_or_pref()')
-3. pgt.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
-4. pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
-                                                      ('Confidence','OrientationSelectivity')])
-5. pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
-6. pgt.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
+1. pg= new_pg(name='Orientation Preference',category="Preference Maps",
+              doc='Measure preference for sine grating orientation.',
+2.            command='measure_or_pref()')
+3. pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
+4. pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
+                                                     ('Confidence','OrientationSelectivity')])
+5. pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
+6. pg.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
    
    
 7. def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
@@ -236,7 +244,7 @@ Preference plots:
        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 </pre></font>
 
-<P>What the first part of this code (the PlotGroupTemplate) does is:
+<P>What the first part of this code (the PlotGroup specification) does is:
 
 <ol>
 <li>Declare that the Orientation Preference plot group should go on the
@@ -254,7 +262,7 @@ Preference plots:
 <li>Add a color key as a static image appended to every plot.
 </ol>
 
-<P>The rest of the code specifies actual procedure for measuring the
+<P>The rest of the code specifies the actual procedure for measuring the
 appropriate data:
 
 <ol start=7>
