@@ -119,11 +119,6 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
                         on_change=self.strength_only_fn,side='right')
         self.__init_strength_only_hack()
         
-        # To make the auto-refresh button off by default except for
-        # the Activity PlotGroup
-	if self.plotgroup.name == 'Activity':self.auto_refresh=True
-
-
         # Display any plots that can be done with existing data, but
         # don't regenerate the SheetViews
         self.refresh(update=self.plotgroup.plot_immediately)# self.pgt.plot_immediately)

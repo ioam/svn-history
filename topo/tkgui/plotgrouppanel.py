@@ -53,15 +53,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
     plotgroup_type = PlotGroup
 
-
-    # Default is to not have the window Auto-refresh, because some
-    # plots are very slow to generate (e.g. some preference map
-    # plots).
-    auto_refresh = BooleanParameter(default=False,
-        doc="Whether to regenerate this plot whenever the simulation time advances.")
-    # CEBALERT: (if someone clicks 'back' on a window, would
-    # they expect auto-refresh to become unchecked/disabled?)
-
     # Default size for images used on buttons
     button_image_size=(20,20)
 

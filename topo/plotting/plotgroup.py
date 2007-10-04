@@ -222,7 +222,13 @@ class SheetPlotGroup(PlotGroup):
         be correct, e.g. when using Sheet coordinates, which is often more
         important.""")
 
-    # CEBALERT: ifkeeping this, need to add to other contructors.
+    auto_refresh = BooleanParameter(default=False,doc="""
+        Whether to regenerate this plot whenever the simulation time advances.
+        The default is False, because many plots are slow to generate
+        (e.g. most preference map plots).""")
+
+
+    # CEBALERT: if keeping this, need to add to other contructors.
     def __init__(self,sheets=None,**params):
         self.sheets = sheets
         super(SheetPlotGroup,self).__init__(**params)

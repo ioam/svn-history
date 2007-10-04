@@ -251,7 +251,7 @@ proj_name =''
 
 
 pg = new_pg(name='Activity',category='Basic',
-             doc='Plot the activity for all Sheets.',
+             doc='Plot the activity for all Sheets.', auto_refresh=True,
              update_command='update_activity()', plot_immediately=True)
 pg.add_plot('Activity',[('Strength','Activity'),
                          ('Hue','OrientationPreference'),
@@ -326,7 +326,7 @@ def update_projections():
 pg =  new_pg(name='Projection Activity',category="Basic",
              doc='Plot the activity in each Projection that connects to a Sheet.',
              update_command='update_projectionactivity()',
-             plot_immediately=True, normalize=True)
+             plot_immediately=True, normalize=True,auto_refresh=True)
 pg.add_plot('ProjectionActivity',[('Strength','ProjectionActivity')])
 
 
