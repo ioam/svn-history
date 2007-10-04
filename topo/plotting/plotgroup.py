@@ -548,11 +548,12 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
 
     def _create_plots(self,pt_name,pt,sheet):
         return [make_template_plot(self._change_key(pt,sheet,proj),
-                                   proj.src.sheet_view_dict,
-                                   proj.src.xdensity,
+                                   proj.dest.sheet_view_dict,
+                                   proj.dest.xdensity,
                                    proj.dest.bounds,
                                    self.normalize,
                                    name=proj.name) for proj in sheet.in_connections]
+
 
 
 class ProjectionPlotGroup(ProjectionSheetPlotGroup):

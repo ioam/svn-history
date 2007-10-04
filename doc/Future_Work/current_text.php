@@ -38,8 +38,6 @@ tracker rather than added to this list</B>.
 
 <H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
 
-<H4>2007/10/04 (CB): projection activity panel's not working</H4>
-
 <H4>2007/10/03 (CB): function to normalize path names</H4>
 Extract code from Filename parameter and ensure we're using the
 function everywhere that accepts a path (otherwise the Windows version
