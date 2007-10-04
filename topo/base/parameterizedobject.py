@@ -86,7 +86,7 @@ class Parameter(object):
     read-only (constant) parameters, and type or range checking at
     assignment time.
 
-    For example, suppose someone wants to define two new kind of
+    For example, suppose someone wants to define two new kinds of
     objects Foo and Bar, such that Bar has a parameter delta, Foo is a
     subclass of Bar, and Foo has parameters alpha, sigma, and gamma
     (and delta inherited from Bar).  She would begin her class
@@ -142,8 +142,8 @@ class Parameter(object):
 
     4. The attributes associated with Parameters provide enough
        information for automatically generating property sheets in
-       graphical user interfaces, to allow Parameters
-       ParameterizedObjects to be edited by users.
+       graphical user interfaces, to allow ParameterizedObjects to be
+       edited by users.
     """
 
     # Because they implement __get__ and __set__, Parameters are
