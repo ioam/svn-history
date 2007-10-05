@@ -207,18 +207,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         self._sheet_menu = Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.add_cascade(menu=self._sheet_menu,state=DISABLED,
                                       indexname='sheet_menu') 
-        
-
-        ## CEBHACKALERT: got to control when menu options show. No good asking
-        ## for connection fields of a connection field! Or asking for connection
-        ## fields of a sheet that's not a cf sheet. And so on...
-        
-        self._unit_menu.add_command(label='Connection Fields',indexname='connection_fields',
-                                    command=self.__connection_fields_window)
-                                    
-        self._unit_menu.add_command(label='Receptive Field',indexname='receptive_field',
-                                    command=self.__receptive_field_window)                             
-                                    
+                                            
                                     
         #################################################################
 
@@ -233,59 +222,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         """
         pass
     
- 
-    def set_auto_refresh(self):
-        """
-        Add or remove this panel from the console's
-        auto_refresh_panels list.
-        """
-        # JAB: it might make sense for turning on auto-refresh
-        # to do a refresh automatically, though that might have
-        # unexpected behavior for a preference map calculation
-        # (where it would do unnecessary, and potentially lengthy,
-        # recalculation).
-        if self.auto_refresh: 
-            if not (self in self.console.auto_refresh_panels):
-                self.console.auto_refresh_panels.append(self)
-        else:
-            if self in self.console.auto_refresh_panels:
-                self.console.auto_refresh_panels.remove(self)
             
-
-
-    def __connection_fields_window(self):
-        """
-        Open a Connection Fields plot for the unit currently
-        identified by a right click.
-        """
-        if 'plot' in self._right_click_info:
-            sheet = topo.sim[self._right_click_info['plot'].plot_src_name]
-            x,y =  self._right_click_info['coords'][1]
-            # CEBERRORALERT: should avoid requesting cf out of range.
-            # CEBALERT: need a simple, general system for controlling which menu
-            # items are active (instead of offering a menu choice which turns
-            # out to be useless).
-            try:
-                self.console['Plots']["Connection Fields"](x=x,y=y,sheet=sheet)
-            except TypeError:
-                topo.sim.warning("%s has no Connection fields."%sheet.name)
-            
-    def __receptive_field_window(self):
-        """
-        Open a Receptive Fields plot for the unit currently
-        identified by a right click.
-        """
-        if 'plot' in self._right_click_info:
-            try:
-                plot = self._right_click_info['plot']
-                x,y =  self._right_click_info['coords'][0]
-                sheet = topo.sim[plot.plot_src_name]
-                # CB: not sure how title works for matrixplot -
-                # might need to be formatted better
-                matrixplot(topo.analysis.featureresponses.grid[sheet][x,y],
-                           title=("Receptive Field",sheet.name,x,y))
-            except KeyError:
-                topo.sim.warning("No RF measurements are available yet; run the Receptive Fields plot before accessing this right-click menu option.")
 
     def __process_canvas_event(self,event,func):
         """
@@ -373,19 +310,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         """
         return x
         
-
-    def conditional_refresh(self):
-        """
-        Only calls refresh() if auto_refresh is enabled.
-        """
-        if self.auto_refresh:self.refresh()
-
-    def conditional_redraw(self):
-        """
-        Only calls redraw_plots() if auto_refresh is enabled.
-        """
-        if self.auto_refresh:self.redraw_plots()
-
 
     def _display_plots_and_labels(self):
         # CEBALERT: probably results in display_labels being called
@@ -742,3 +666,80 @@ class SheetPGPanel(PlotGroupPanel):
         self.params_in_history.append('sheet_coords')
         self.params_in_history.append('integer_scaling')
 
+
+
+        ## CEBHACKALERT: got to control when menu options show. No good asking
+        ## for connection fields of a connection field! Or asking for connection
+        ## fields of a sheet that's not a cf sheet. And so on...
+        
+        self._unit_menu.add_command(label='Connection Fields',indexname='connection_fields',
+                                    command=self._connection_fields_window)
+                                    
+        self._unit_menu.add_command(label='Receptive Field',indexname='receptive_field',
+                                    command=self._receptive_field_window)                             
+
+
+    def set_auto_refresh(self):
+        """
+        Add or remove this panel from the console's
+        auto_refresh_panels list.
+        """
+        # JAB: it might make sense for turning on auto-refresh
+        # to do a refresh automatically, though that might have
+        # unexpected behavior for a preference map calculation
+        # (where it would do unnecessary, and potentially lengthy,
+        # recalculation).
+        if self.auto_refresh: 
+            if not (self in self.console.auto_refresh_panels):
+                self.console.auto_refresh_panels.append(self)
+        else:
+            if self in self.console.auto_refresh_panels:
+                self.console.auto_refresh_panels.remove(self)
+
+
+    def _connection_fields_window(self):
+        """
+        Open a Connection Fields plot for the unit currently
+        identified by a right click.
+        """
+        if 'plot' in self._right_click_info:
+            sheet = topo.sim[self._right_click_info['plot'].plot_src_name]
+            x,y =  self._right_click_info['coords'][1]
+            # CEBERRORALERT: should avoid requesting cf out of range.
+            # CEBALERT: need a simple, general system for controlling which menu
+            # items are active (instead of offering a menu choice which turns
+            # out to be useless).
+            try:
+                self.console['Plots']["Connection Fields"](x=x,y=y,sheet=sheet)
+            except TypeError:
+                topo.sim.warning("%s has no Connection fields."%sheet.name)
+            
+    def _receptive_field_window(self):
+        """
+        Open a Receptive Fields plot for the unit currently
+        identified by a right click.
+        """
+        if 'plot' in self._right_click_info:
+            try:
+                plot = self._right_click_info['plot']
+                x,y =  self._right_click_info['coords'][0]
+                sheet = topo.sim[plot.plot_src_name]
+                # CB: not sure how title works for matrixplot -
+                # might need to be formatted better
+                matrixplot(topo.analysis.featureresponses.grid[sheet][x,y],
+                           title=("Receptive Field",sheet.name,x,y))
+            except KeyError:
+                topo.sim.warning("No RF measurements are available yet; run the Receptive Fields plot before accessing this right-click menu option.")
+
+
+    def conditional_refresh(self):
+        """
+        Only calls refresh() if auto_refresh is enabled.
+        """
+        if self.auto_refresh:self.refresh()
+
+    def conditional_redraw(self):
+        """
+        Only calls redraw_plots() if auto_refresh is enabled.
+        """
+        if self.auto_refresh:self.redraw_plots()
