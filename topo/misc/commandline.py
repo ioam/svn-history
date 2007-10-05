@@ -187,7 +187,18 @@ def process_argv(argv):
         if os.path.exists(startup_file):
             if option.interactive or option.gui:
                 print "Executing user startup file %s" % (startup_file)
-            execfile(startup_file,__main__.__dict__)
+            try:
+                execfile(startup_file,__main__.__dict__)
+            except:
+                import traceback
+                # print any exception raised in the init files, and continue
+                print 'Exception executing startup file %s' % startup_file
+                typ,val,tb = sys.exc_info()
+                print traceback.print_tb(tb)
+                print '%s: %s'%(typ.__name__, str(val))
+                # JPALERT: Maybe instead of continuing, control should
+                # go straight to the command line here for debugging,
+                # skipping the rest of the startup process?
 
 
     ### Notes about choices for topographica.rc equivalents on different platforms
