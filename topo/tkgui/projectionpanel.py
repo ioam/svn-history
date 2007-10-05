@@ -113,12 +113,6 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
 	self.plotgroup.name='ProjectionActivity'
 	
 
-    # CEBALERT! Dynamic info doesn't work on projection activity windows!
-    # e.g. on hierarchical there is an error, on cfsom the dynamic info stops
-    # half way across the plot...
-    # So, dynamic info is disabled for now in proj. act. windows.
-    # This will be easier to fix when the class hierarchy is cleaned up
-    # (if it is still a problem then).
     def _update_dynamic_info(self,e):
         self.messageBar.message('state',"")
 
@@ -126,10 +120,6 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
         return "Activity in Projections to %s at time %s"%(self.plotgroup.sheet.name,self.plotgroup.time)
 
           
-
-
-# CEBHACKALERT: various parts of the dynamic info/right-click menu stuff
-# don't make sense at the moment when things like 'situate' are clicked.
 class ConnectionFieldsPanel(ProjectionSheetPGPanel):
 
     plotgroup_type = ConnectionFieldsPlotGroup
@@ -153,6 +143,9 @@ class ConnectionFieldsPanel(ProjectionSheetPGPanel):
             self.plotgroup.initial_plot=True
             self.plotgroup.height_of_tallest_plot = 1
         self.redraw_plots()
+
+    def _update_dynamic_info(self,e):
+        self.messageBar.message('state',"")
 
 
 
