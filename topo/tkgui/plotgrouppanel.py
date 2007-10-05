@@ -32,7 +32,7 @@ from topo.plotting.plotgroup import PlotGroup,SheetPlotGroup
 
 from topo.commands.pylabplots import matrixplot
 
-from tkguiwindow import TkguiWindow, Menu
+from widgets import Menu
 from tkparameterizedobject import ButtonParameter, TkParameterizedObject
 
 

@@ -1,19 +1,38 @@
-### This file has the unrelated Menu, TkguiWindow, and TaggedSlider
-### classes.
+"""
+Collection of compound widgets for Tkinter.
 
-### CEBALERT: need to re-organize files in tkgui.
+Widgets in this file only depend on Tkinter (or other general packages
+of widgets, such as bwidget) - they are not specific to Topographica.
+
+
+$Id$
+"""
+__version__='$Revision$'
 
 ### CEBALERT: there is at least one import problem in tkgui (probably
 ### caused by files importing each other). (Putting even a do-nothing,
 ### import-nothing version of the TkguiWindow class in any of the
 ### existing tkgui files and then trying to use it in
 ### plotgrouppanel.py generates an import error.)
+# CB: after reorganization, see if this problem persists.
+
+import copy
+import operator
+import decimal
+import Tkinter
+import traceback
+import code
+import StringIO
+
+import Pmw
+import bwidget
 
 
 
 
 ######################################################################
-import Tkinter
+######################################################################
+# CEBALERT: rename, bring in method from ControllableMenu
 class Menu(Tkinter.Menu):
     """
     Tkinter Menu, but with a way to access entries by name.
@@ -116,45 +135,14 @@ class ControllableMenu(Menu):
     def __getitem__(self,name):
         return self.entries[name]
 ######################################################################
-
-
-
-
 ######################################################################
-import os.path, sys
-import topo.tkgui
-topo_dir = os.path.split(os.path.split(sys.executable)[0])[0]
-class TkguiWindow(Tkinter.Toplevel):
-    """
-    The standard tkgui window; defines attributes common to tkgui windows.
-    """
-    def __init__(self,**config):
-        Tkinter.Toplevel.__init__(self,**config)
-
-        ### Window icon
-        if topo.tkgui.system_platform is 'mac':
-            # CB: To get a proper icon on OS X, we probably have to bundle into an application
-            # package or something like that.
-            pass # (don't know anything about the file format required)
-            # self.attributes("-titlepath","/Users/vanessa/topographica/AppIcon.icns")
-        else:
-            # CB: It may be possible for the icon be in color (using
-            # e.g. topo/tkgui/icons/topo.xpm), see http://www.thescripts.com/forum/thread43119.html
-            # or http://mail.python.org/pipermail/python-list/2005-March/314585.html
-            self.iconbitmap('@'+(os.path.join(topo_dir,'topo/tkgui/icons/topo.xbm')))
-
-
-        ### Universal right-click menu   CB: not currently used by anything but the plotgrouppanels
-        self.context_menu = Menu(self, tearoff=0)
-##         self.bind("<<right-click>>",self.display_context_menu)
-
-##     # CB: still to decide between frame/window; the right-click stuff will probably change.
     
+
+
+
 ######################################################################
-
-
-import bwidget
-# CB: move out of here + cleanup and document
+######################################################################
+# CB: cleanup and document
 class ResizableScrollableFrame(Tkinter.Frame):
     """
     A scrollable frame that can also be manually resized.
@@ -211,64 +199,14 @@ class ResizableScrollableFrame(Tkinter.Frame):
 ##         Y = [float(x) for x in self.scrolled_frame.xview().split(' ')]
 ##         return X[1]-X[0],Y[1]-Y[0]
 
-
-# CB: needs significant cleanup
-class ScrolledTkguiWindow(TkguiWindow):
-    """
-    A TkguiWindow with automatic scrollbars.
-    """
-    def __init__(self,**config):
-        TkguiWindow.__init__(self,**config)
-
-        self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
+######################################################################
+######################################################################
         
-        self._scroll_frame = ResizableScrollableFrame(self,borderwidth=2,
-                                                       relief="flat")
-        self._scroll_frame.pack(expand="yes",fill="both")
-        
-        self.content = self._scroll_frame.contents
 
 
-# CB: will try to make the window know when to resize itself, rather
-# than having window users tell it
-##         self.bind("<Configure>",self.deal_with_configure)
-
-##     def deal_with_configure(self,e=None):
-##         print e
-
-
-    # CB: should be able to move to resizablescrollableframe
-    def sizeright(self):
-        # if user has changed window size, need to tell tkinter that it should take
-        # control again.
-        self.geometry('')
-
-        self.update_idletasks()
-
-        # extra for width of scrollbars
-        # CEBALERT: the calculated values don't work on linux
-        extraw = 19 #self._scroll_frame._scrolled_window.winfo_reqwidth() - \
-                  #self._scroll_frame.scrolled_frame.winfo_reqwidth() + 3
-        extrah = 19 #self._scroll_frame._scrolled_window.winfo_reqheight() - \
-                  #self._scroll_frame.scrolled_frame.winfo_reqheight() + 3
-
-        w = min(self.content.winfo_reqwidth()+extraw,self.winfo_screenwidth())
-        # -60 for task bars etc on screen...how to find true viewable height?
-        h = min(self.content.winfo_reqheight()+extrah,self.winfo_screenheight()-60)
-
-        if not hasattr(self,'oldsize') or self.oldsize!=(w,h): 
-            self._scroll_frame.set_size(w,h)
-            self.oldsize = (w,h)
-            
-
-
-     
 
 ######################################################################
-import copy
-import operator
-import Tkinter
-from decimal import Decimal
+######################################################################
 class TaggedSlider(Tkinter.Frame):
     """
     Widget for manipulating a numeric value using either a slider or a
@@ -390,7 +328,6 @@ class TaggedSlider(Tkinter.Frame):
         return self.tag.get()
 
 
-
     # CEBALERT: three different events for max. flexibility...but
     # often a user will just want to know if the value was set. Could
     # also generate a "<<TaggedSliderSet>>" event each time, which a
@@ -413,7 +350,7 @@ class TaggedSlider(Tkinter.Frame):
 
     def _set_slider_resolution(self,value):
         # CEBALERT: how to find n. dp simply?
-        p = Decimal(str(value)).as_tuple()[2]
+        p = decimal.Decimal(str(value)).as_tuple()[2]
         self.slider['resolution']=10**p
 
 
@@ -448,48 +385,149 @@ class TaggedSlider(Tkinter.Frame):
         else:
             return False
 
-
-
-
-
-# CB: haven't decided what to do. Might be temporary.
-class TkPOTaggedSlider(TaggedSlider):
-    """
-    A TaggedSlider with extra features for use with
-    TkParameterizedObjects.
-    
-    Adds extra ability to set slider when e.g. a variable
-    name is in the tag.
-    """
-    def _try_to_set_slider_resolution(self):
-        if not TaggedSlider._try_to_set_slider_resolution(self):
-            # get the actual value as set on
-            # the object (which might be the "last good" value)
-            try:
-                self._set_slider_resolution(self.variable._true_val())
-            except: # probably tclerror
-                pass
-
-
-    def _try_to_set_slider(self):
-        if not TaggedSlider._try_to_set_slider(self):
-            v = self.variable._true_val()
-
-            if operator.isNumberType(v):
-                self.set_slider_bounds(min(self.bounds[0],v),
-                                       max(self.bounds[1],v))
-                self.slider.set(v)
-
-    
-    def refresh(self):
-        """Could anything survive in tkgui without a refresh() method?"""
-        self.tag_set()
-
-
-
-    
-
 ######################################################################
+######################################################################        
+
+
+
+
+
+class InterpreterComboBox(Pmw.ComboBox):
+
+    # Subclass of combobox to allow null strings to be passed to
+    # the interpreter.
+    
+    def _addHistory(self):
+        input = self._entryWidget.get()
+        if input == '':
+            self['selectioncommand'](input)
+        else:
+            Pmw.ComboBox._addHistory(self)
+
+
+class OutputText(Tkinter.Text):
+    """
+    A Tkinter Text widget but with some convenience methods.
+
+    (Notably the Text stays DISABLED (i.e. not editable)
+    except when we need to display new text).
+    """
+
+    def append_cmd(self,cmd,output):
+        """
+        Print out:
+        >>> cmd
+        output
+
+        And scroll to the end.
+        """
+        self.config(state=NORMAL)
+        self.insert(END,">>> "+cmd+"\n"+output)
+        self.insert(END,"\n")
+        self.config(state=DISABLED)        
+        self.see(END)
+
+    def append_text(self,text):
+        """
+        Print out:
+        text
+
+        And scroll to the end.
+        """
+        self.config(state=NORMAL)
+        self.insert(END,text)
+        self.insert(END,"\n")
+        self.config(state=DISABLED)
+        self.see(END)
+
+
+
+# CB: can we embed some shell or even ipython instead? Maybe not
+# ipython for a while:
+# http://lists.ipython.scipy.org/pipermail/ipython-user/2006-March/003352.html
+# If we were to use ipython as the default interpreter for
+# topographica, then we wouldn't need any of this, since all platforms
+# could have a decent command line (could users override what they
+# wanted to use as their interpreter in a config file?).  Otherwise
+# maybe we can turn this into something capable of passing input to
+# and from some program that the user can specify?
+class CommandPrompt(Tkinter.Frame):
+    """
+    A Tkinter Frame widget that provides simple access to python interpreter.
+
+    Useful when there is no decent system terminal (e.g. on Windows).
+
+    Provides status messages to any supplied msg_bar (which should be a Pmw.MessageBar).
+    """
+    def __init__(self,master,msg_bar=None,**config):
+        Tkinter.Frame.__init__(self,master,**config)
+
+
+        self.msg_bar=msg_bar
+        self.balloon = Pmw.Balloon(self)
+
+        # command interpreter for executing commands (used by exec_cmd).
+        self.interpreter = code.InteractiveConsole(__main__.__dict__)
         
+        ### Make a ComboBox (command_entry) for entering commands.
+        self.command_entry=InterpreterComboBox(self,autoclear=1,history=1,dropdown=1,
+                                               label_text='>>> ',labelpos='w',
+                                               # CB: if it's a long command, the gui obviously stops responding.
+                                               # On OS X, a spinning wheel appears. What about linux and win?
+                                               selectioncommand=self.exec_cmd)
+        
+        self.balloon.bind(self.command_entry,
+             """Accepts any valid Python command and executes it in main as if typed at a terminal window.""")
+
+        scrollbar = Scrollbar(self)
+        scrollbar.pack(side=RIGHT, fill=Y)
+        # CEBALERT: what length history is this going to keep?
+        self.command_output = OutputText(self,
+                                         state=DISABLED,
+                                         height=10,
+                                         yscrollcommand=scrollbar.set)
+        self.command_output.pack(side=TOP,expand=YES,fill=BOTH)
+        scrollbar.config(command=self.command_output.yview)
+
+        self.command_entry.pack(side=BOTTOM,expand=NO,fill=X)
 
 
+    def exec_cmd(self,cmd):
+        """
+        Pass cmd to the command interpreter.
+
+        Redirects sys.stdout and sys.stderr to the output text window
+        for the duration of the command.
+        """   
+        capture_stdout = StringIO.StringIO()
+        capture_stderr = StringIO.StringIO()
+
+        # capture output and errors
+        sys.stdout = capture_stdout
+        sys.stderr = capture_stderr
+
+        if self.interpreter.push(cmd):
+            self.command_entry.configure(label_text='... ')
+            result = 'Continue: ' + cmd
+        else:
+            self.command_entry.configure(label_text='>>> ')
+            result = 'OK: ' + cmd
+
+        output = capture_stdout.getvalue()
+        error = capture_stderr.getvalue()
+
+        self.command_output.append_cmd(cmd,output)
+        
+        if error:
+            self.command_output.append_text("*** Error:\n"+error)
+            
+        # stop capturing
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+                
+        capture_stdout.close()
+        capture_stderr.close()
+
+        if self.msg_bar: self.msg_bar.message('state', result)
+
+        self.command_entry.component('entryfield').clear()

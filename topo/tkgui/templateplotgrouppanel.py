@@ -26,7 +26,7 @@ from topo.base.parameterclasses import BooleanParameter
 from plotgrouppanel import SheetPGPanel
 from topo.plotting.plotgroup import TemplatePlotGroup
 
-from tkguiwindow import Menu
+from widgets import Menu
 
 ### We want to support any featuremap type defined in that file, and
 ### so import all of them here.

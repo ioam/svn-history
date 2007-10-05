@@ -105,7 +105,7 @@ from topo.base.parameterclasses import BooleanParameter,StringParameter, \
 
 from topo.misc.utils import eval_atof
 
-from tkguiwindow import TkPOTaggedSlider
+from topowidgets import TkPOTaggedSlider
     
 
 def lookup_by_class(dict_,class_):
@@ -183,7 +183,7 @@ import ImageTk, Image, ImageOps
 
 class ButtonParameter(CallableParameter):
     """
-    Parameter whose graphical representation is a Button.
+    Parameter representing all Parameter classes that are GUI-specific.
 
     Can be associated with an image when used in a
     TkParameterizedObject by specifying an image_path (i.e. location

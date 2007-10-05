@@ -7,19 +7,15 @@ $Id$
 __version__='$Revision$'
 
 
-
 # CB: does the status bar need to keep saying 'ok'? Sometimes
 # positive feedback is useful, but 'ok' doesn't seem too helpful.
 
 
 import os
 import sys
-import traceback
 import __main__
-import code
-import StringIO
-import time
 import webbrowser
+
 from math import fmod,floor
 from inspect import getdoc
 
@@ -29,26 +25,23 @@ from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
 import tkMessageBox
 import tkFileDialog
 import Pmw
-import bwidget
-
 
 import topo
 from topo.misc.keyedlist import KeyedList
 from topo.base.parameterizedobject import ParameterizedObject
-import topo.base.simulation
-import topo.commands.basic
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
-
+import topo.commands.basic
 
 import topo.tkgui 
-from tkguiwindow import TkguiWindow,TaggedSlider,ScrolledTkguiWindow
+from widgets import TaggedSlider,ControllableMenu
+from topowidgets import ScrolledTkguiWindow,TkguiWindow,ProgressWindow
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from featurecurvepanel import FeatureCurvePanel
 from projectionpanel import CFProjectionPGPanel,ProjectionActivityPanel,ConnectionFieldsPanel
 from testpattern import TestPattern
 from editorwindow import ModelEditor
 
-import tkguiwindow
+
 
 
 
@@ -78,143 +71,6 @@ plotpanel_classes = {}
 # CEBALERT: why are the other plotpanel_classes updates at the end of this file?
 
 
-class InterpreterComboBox(Pmw.ComboBox):
-
-    # Subclass of combobox to allow null strings to be passed to
-    # the interpreter.
-    
-    def _addHistory(self):
-        input = self._entryWidget.get()
-        if input == '':
-            self['selectioncommand'](input)
-        else:
-            Pmw.ComboBox._addHistory(self)
-
-
-class OutputText(Text):
-    """
-    A Tkinter Text widget but with some convenience methods.
-
-    (Notably the Text stays DISABLED (i.e. not editable)
-    except when we need to display new text).
-    """
-
-    def append_cmd(self,cmd,output):
-        """
-        Print out:
-        >>> cmd
-        output
-
-        And scroll to the end.
-        """
-        self.config(state=NORMAL)
-        self.insert(END,">>> "+cmd+"\n"+output)
-        self.insert(END,"\n")
-        self.config(state=DISABLED)        
-        self.see(END)
-
-    def append_text(self,text):
-        """
-        Print out:
-        text
-
-        And scroll to the end.
-        """
-        self.config(state=NORMAL)
-        self.insert(END,text)
-        self.insert(END,"\n")
-        self.config(state=DISABLED)
-        self.see(END)
-
-
-
-# CB: can we embed some shell or even ipython instead? Maybe not ipython for a while:
-# http://lists.ipython.scipy.org/pipermail/ipython-user/2006-March/003352.html
-# If we were to use ipython as the default interpreter for topographica, then we wouldn't need any of this,
-# since all platforms could have a decent command line (could users override what they wanted to use
-# as their interpreter in a config file?).
-# Otherwise maybe we can turn this into something capable of passing input to and from some program
-# that the user can specify?
-class CommandPrompt(Tkinter.Frame):
-    """
-    A Tkinter Frame widget that provides simple access to python interpreter.
-
-    Useful when there is no decent system terminal (e.g. on Windows).
-
-    Provides status messages to any supplied msg_bar (which should be a Pmw.MessageBar).
-    """
-    def __init__(self,master,msg_bar=None,**config):
-        Tkinter.Frame.__init__(self,master,**config)
-
-
-        self.msg_bar=msg_bar
-        self.balloon = Pmw.Balloon(self)
-
-        # command interpreter for executing commands (used by exec_cmd).
-        self.interpreter = code.InteractiveConsole(__main__.__dict__)
-        
-        ### Make a ComboBox (command_entry) for entering commands.
-        self.command_entry=InterpreterComboBox(self,autoclear=1,history=1,dropdown=1,
-                                               label_text='>>> ',labelpos='w',
-                                               # CB: if it's a long command, the gui obviously stops responding.
-                                               # On OS X, a spinning wheel appears. What about linux and win?
-                                               selectioncommand=self.exec_cmd)
-        
-        self.balloon.bind(self.command_entry,
-             """Accepts any valid Python command and executes it in main as if typed at a terminal window.""")
-
-        scrollbar = Scrollbar(self)
-        scrollbar.pack(side=RIGHT, fill=Y)
-        # CEBALERT: what length history is this going to keep?
-        self.command_output = OutputText(self,
-                                         state=DISABLED,
-                                         height=10,
-                                         yscrollcommand=scrollbar.set)
-        self.command_output.pack(side=TOP,expand=YES,fill=BOTH)
-        scrollbar.config(command=self.command_output.yview)
-
-        self.command_entry.pack(side=BOTTOM,expand=NO,fill=X)
-
-
-    def exec_cmd(self,cmd):
-        """
-        Pass cmd to the command interpreter.
-
-        Redirects sys.stdout and sys.stderr to the output text window
-        for the duration of the command.
-        """   
-        capture_stdout = StringIO.StringIO()
-        capture_stderr = StringIO.StringIO()
-
-        # capture output and errors
-        sys.stdout = capture_stdout
-        sys.stderr = capture_stderr
-
-        if self.interpreter.push(cmd):
-            self.command_entry.configure(label_text='... ')
-            result = 'Continue: ' + cmd
-        else:
-            self.command_entry.configure(label_text='>>> ')
-            result = 'OK: ' + cmd
-
-        output = capture_stdout.getvalue()
-        error = capture_stderr.getvalue()
-
-        self.command_output.append_cmd(cmd,output)
-        
-        if error:
-            self.command_output.append_text("*** Error:\n"+error)
-            
-        # stop capturing
-        sys.stdout = sys.__stdout__
-        sys.stderr = sys.__stderr__
-                
-        capture_stdout.close()
-        capture_stderr.close()
-
-        if self.msg_bar: self.msg_bar.message('state', result)
-
-        self.command_entry.component('entryfield').clear()
 
 
 
@@ -347,7 +203,7 @@ class TopoConsole(TkguiWindow):
         #  for implementing it are not available on all platforms. We used to
         #  have a Pmw Balloon bound to the menu, with its output directed to
         #  the status bar.)
-	self.menubar = tkguiwindow.ControllableMenu(self)       
+	self.menubar = ControllableMenu(self)       
         self.configure(menu=self.menubar)
 
         self.__simulation_menu()
@@ -391,7 +247,7 @@ class TopoConsole(TkguiWindow):
 
     def __simulation_menu(self):
         """Add the simulation menu options to the menubar."""
-        simulation_menu = tkguiwindow.ControllableMenu(self.menubar,tearoff=0)
+        simulation_menu = ControllableMenu(self.menubar,tearoff=0)
 
         self.menubar.add_cascade(label='Simulation',menu=simulation_menu)
 
@@ -422,7 +278,7 @@ class TopoConsole(TkguiWindow):
         categories = sorted(set(categories))
 
         # 'Plots' menu
-        plots_menu = tkguiwindow.ControllableMenu(self.menubar,tearoff=0)
+        plots_menu = ControllableMenu(self.menubar,tearoff=0)
         self.menubar.add_cascade(label='Plots',menu=plots_menu)
         
         # The Basic category items appear on the menu itself.
@@ -437,7 +293,7 @@ class TopoConsole(TkguiWindow):
         # Add the other categories to the menu as cascades, and the plots of each category to
         # their cascades.
         for category in categories:
-            category_menu = tkguiwindow.ControllableMenu(plots_menu,tearoff=0)
+            category_menu = ControllableMenu(plots_menu,tearoff=0)
             plots_menu.add_cascade(label=category,menu=category_menu)
 
             # could probably search more efficiently than this
@@ -454,7 +310,7 @@ class TopoConsole(TkguiWindow):
     def __help_menu(self):
         """Add the help menu options."""
 
-        help_menu = tkguiwindow.ControllableMenu(self.menubar,tearoff=0,name='help')
+        help_menu = ControllableMenu(self.menubar,tearoff=0,name='help')
         self.menubar.add_cascade(label='Help',menu=help_menu)
 
         help_menu.add_command(label='About',command=self.new_about_window)
@@ -715,103 +571,6 @@ class TopoConsole(TkguiWindow):
 
 
 
-# CEB: working here; this is *not* finished
-# (needs to become tkparameterizedobject, so we can have some parameters
-#  to control formatting etc)
-class ProgressWindow(TkguiWindow):
-    """
-    Graphically displays progress information for a SomeTimer object.
-    
-    ** Currently expects a 0-100 (percent) value ***        
-    """
-
-    def __init__(self,timer=topo.sim.timer,progress_var=None,title=None,display=True,**config):
-        TkguiWindow.__init__(self,**config)
-
-        self.protocol("WM_DELETE_WINDOW",self.set_stop)
-
-        if not display:self.withdraw()
-        
-        self.timer = timer
-        self.timer.receive_info.append(self.timing_info)
-        
-        self.title(title or self.timer.func.__name__.capitalize())
-        self.balloon = Pmw.Balloon(self)
-
-        self.progress_var = progress_var or Tkinter.DoubleVar()
-        # trace the variable so that at 100 we can destroy the window
-        self.progress_trace_name = self.progress_var.trace_variable(
-            'w',lambda name,index,mode: self._close_if_complete())
-
-        progress_bar = bwidget.ProgressBar(self,type="normal",
-                                           maximum=100,
-                                           height=20,
-                                           width=200,
-                                           variable=self.progress_var)
-        progress_bar.pack(padx=15,pady=15)
-
-
-        progress_box = Frame(self,border=2,relief="sunken")
-        progress_box.pack()
-
-        Label(progress_box,text="Duration:").grid(row=0,column=0,sticky='w')
-        self.duration = Label(progress_box)
-        self.duration.grid(row=0,column=1,sticky='w')
-
-        Label(progress_box,text="Simulation time:").grid(row=1,column=0,sticky='w')
-        self.sim_time = Label(progress_box)
-        self.sim_time.grid(row=1,column=1,sticky='w')
-
-        # Should say 'at current rate', since the calculation assumes linearity
-        Label(progress_box,text="Remaining time:").grid(row=2,column=0,sticky='w')
-        self.remaining = Label(progress_box)
-        self.remaining.grid(row=2,column=1,sticky='w')
-        
-        
-        stop_button = Tkinter.Button(self,text="Stop",command=self.set_stop)
-        stop_button.pack(side="bottom")
-        self.balloon.bind(stop_button,"""
-            Stop a running simulation.
-        
-            The simulation can be interrupted only on round integer
-            simulation times, e.g. at 3.0 or 4.0 but not 3.15.  This
-            ensures that stopping and restarting are safe for any
-            model set up to be in a consistent state at integer
-            boundaries, as the example Topographica models are.""")
-
-    def _close_if_complete(self):
-        """
-        Close the specified progress window if the value of progress_var has reached 100.
-        """
-        if self.progress_var.get()>=100:
-            # delete the variable trace (necessary?)
-            self.progress_var.trace_vdelete('w',self.progress_trace_name)
-
-            self._close_window(last_message="Time %s: Finished %s"%(topo.sim.time(),
-                                                                    self.timer.func.__name__))
-                                                        
-
-    # CB: should allow interruption of whatever process it's timing
-    def set_stop(self):
-        """Declare that running should be interrupted."""
-        self.timer.stop=True
-        self._close_window(last_message="Interrupted %s"%self.timer.func.__name__)
-        
-    def _close_window(self,last_message=None):
-        self.timer.receive_info.remove(self.timing_info)
-        if last_message: topo.guimain.status_message(last_message)
-        TkguiWindow.destroy(self)
-        self.destroyed=True
-
-    def timing_info(self,time,percent,name,duration,remaining):
-        self.progress_var.set(percent)
-
-        # hack because i'm doing something in the wrong order
-        if not hasattr(self,'destroyed'):
-            self.duration['text'] = str(duration)
-            self.sim_time['text'] = str(time)
-            self.remaining['text'] = "%02d:%02d"%(int(remaining/60),int(remaining%60))
-            self.update()
 
 
 

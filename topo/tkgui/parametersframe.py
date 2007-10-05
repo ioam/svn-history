@@ -28,7 +28,8 @@ from topo.base.parameterizedobject import ParameterizedObject, \
 
 from topo.misc.utils import keys_sorted_by_value
 
-from tkguiwindow import Menu,TkguiWindow
+from widgets import Menu
+from topowidgets import TkguiWindow
 from tkparameterizedobject import TkParameterizedObject, ButtonParameter, \
                                   parameters
 

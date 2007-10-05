@@ -15,7 +15,6 @@ from topo.plotting.plot import Plot
 from topo.plotting.plotgroup import PlotGroup
 from topo.tkgui.plotgrouppanel import PlotGroupPanel
 
-from topo.tkgui.tkguiwindow import ScrolledTkguiWindow
 
 # need to clean up stuff like this: do it all in one
 # place (start() modification as suggested by JAB).

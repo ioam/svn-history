@@ -18,7 +18,7 @@ from topo.commands.analysis import update_activity
 from topo.misc.utils import shortclassname
 
 from parametersframe import ParametersFrame
-from tkguiwindow import TkguiWindow
+from topowidgets import TkguiWindow
 
 
 class EditorObject(ParameterizedObject):
