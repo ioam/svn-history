@@ -103,7 +103,11 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         in historical views.
         """
         # CEBALERT! To be cleaned up...
-        self.window_master = master.master.master.master.master
+        try:
+            self.window_master = master.master.master.master.master
+        except:
+            self.window_master = None
+            
         
         TkParameterizedObject.__init__(self,master,extraPO=plotgroup,**params)
         Frame.__init__(self,master)
@@ -167,14 +171,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         self.pack_param('Redraw',parent=self.plotcommand_frame,
                         on_change=self.redraw_plots,side='right')
         
-
-        
-        self.pack_param('auto_refresh',parent=self.control_frame_1,
-                        on_change=self.set_auto_refresh,
-                        side=RIGHT)
-        self.params_in_history.append('auto_refresh')
-
-        if self.auto_refresh: self.console.auto_refresh_panels.append(self)
             
         self.pack_param('Enlarge',parent=self.control_frame_1,
                         on_change=self.enlarge_plots,side=LEFT)
@@ -397,7 +393,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         self.display_plots()
         self.display_labels()
         self.refresh_title()
-        self.window_master.sizeright()
+        if self.window_master: self.window_master.sizeright()
         
     def make_plots(self):
         """
@@ -580,7 +576,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             self.representations['Reduce']['widget']['state']=DISABLED
         self.representations['Enlarge']['widget']['state']=NORMAL
         self.display_plots()
-        self.window_master.sizeright()
+        if self.window_master: self.window_master.sizeright()
 
     def enlarge_plots(self):
         """Function called by widget to increase the plot size, when possible."""
@@ -588,7 +584,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             self.representations['Enlarge']['widget']['state']=DISABLED
         self.representations['Reduce']['widget']['state']=NORMAL
         self.display_plots()
-        self.window_master.sizeright()
+        if self.window_master: self.window_master.sizeright()
         
 
 ####################### HISTORY METHODS ##########################         
@@ -668,7 +664,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
     # CEBHACKALERT
     def title(self,t):
-        self.window_master.title(t)
+        if self.window_master: self.window_master.title(t)
 
     def _plot_title(self):
         """
@@ -726,6 +722,14 @@ class SheetPGPanel(PlotGroupPanel):
 
     def __init__(self,console,master,plotgroup,**params):
         super(SheetPGPanel,self).__init__(console,master,plotgroup,**params)
+
+        self.pack_param('auto_refresh',parent=self.control_frame_1,
+                        on_change=self.set_auto_refresh,
+                        side=RIGHT)
+        self.params_in_history.append('auto_refresh')
+
+        if self.auto_refresh: self.console.auto_refresh_panels.append(self)
+
 
         self.pack_param('normalize',parent=self.control_frame_1,
                         on_change=self.make_plots,side="right")
