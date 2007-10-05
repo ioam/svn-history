@@ -223,9 +223,10 @@ class SheetPlotGroup(PlotGroup):
         important.""")
 
     auto_refresh = BooleanParameter(default=False,doc="""
-        Whether to regenerate this plot whenever the simulation time advances.
-        The default is False, because many plots are slow to generate
-        (e.g. most preference map plots).""")
+        If this plot is being displayed regularly (e.g. in a GUI),
+        whether to regenerate it automatically whenever the simulation
+        time advances.  The default is False, because many plots are
+        slow to generate (e.g. most preference map plots).""")
 
 
     # CEBALERT: if keeping this, need to add to other contructors.
