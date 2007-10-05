@@ -21,7 +21,8 @@ $Id$
 """
 __version__ = '$Revision$'
 
-from numpy import dot,sin,cos,pi,array,asarray,argmax,nonzero,take,random
+from numpy import dot,sin,cos,pi,array,asarray,argmax,zeros
+from numpy import nonzero,take,random,alltrue,sometrue
 
 from topo.base.cf import CFSheet
 from topo.base.simulation import PeriodicEventSequence,FunctionEvent
@@ -203,11 +204,12 @@ class ShiftingGeneratorSheet(SequenceGeneratorSheet):
 
     def start(self):
         super(ShiftingGeneratorSheet,self).start()
-        now = self.simulation.time()
-        refix_event = PeriodicEventSequence(now+self.fixation_jitter_period,
-                                            self.fixation_jitter_period,
-                                            [FunctionEvent(0,self.refixate)])
-        self.simulation.enqueue_event(refix_event)
+        if self.fixation_jitter_period > 0:
+            now = self.simulation.time()
+            refix_event = PeriodicEventSequence(now+self.fixation_jitter_period,
+                                                self.fixation_jitter_period,
+                                                [FunctionEvent(0,self.refixate)])
+            self.simulation.enqueue_event(refix_event)
 
     def input_event(self,conn,data):
         if conn.dest_port == 'Saccade':
@@ -282,11 +284,16 @@ class ShiftingGeneratorSheet(SequenceGeneratorSheet):
         the parameter self.fixation_jitter.
         """
         self.debug("Refixating.")
-        if self.fixation_jitter > 0 or alltrue(self.bounds.centroid != self.fixation_point):
-            fix = asarray(self.fixation_point)
-            pos = asarray(self.bounds.centroid())
-            refix_vec = (fix - pos) + random.normal(0,self.fixation_jitter,(2,))
-            self.bounds.translate(*refix_vec)
+
+        if self.fixation_jitter > 0:
+            jitter_vec = random.normal(0,self.fixation_jitter,(2,))
+        else:
+            jitter_vec = zeros((2,))
+        
+        fix = asarray(self.fixation_point)
+        pos = asarray(self.bounds.centroid())
+        refix_vec = (fix - pos) + jitter_vec
+        self.bounds.translate(*refix_vec)
 
     def _translate(self,radius,angle):
         angle *= pi/180
