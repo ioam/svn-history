@@ -92,9 +92,6 @@ Insert missing actions in case someone tries higher densities.
 JAB 2007/04/25: Isn't this already done?
 
 
-<H4>2007/04/15 (CB): Dynamic info</H4>
-Doesn't work properly for projection activity windows (see ALERT).
-
 <H4>2007/04/15 (CB): test topographica-win</H4>
 Test that results from Windows version match those from the standard
 one. The "make compare_oo_or" test is fine. I can't run the other,
@@ -115,6 +112,14 @@ somewhere, and it could be difficult to solve.
 <H4>2007/10/03 (CB): Plotting non-CFProjection Projections</H4>
 Modify PlotGroup and ProjectionPGPanels so that we can plot
 a wider variety of Projections.
+
+
+<H4>2007/10/05 (CB): Dynamic info</H4>
+Dynamic info is currently disabled on projection panel windows
+because it hasn't been implemented for those classes. Need to 
+generalize coordinate-calculation method in plotgrouppanel.py
+and then add one or more specializations for the projection
+panels. (Plus ProjectionView needs some modification, probably.)
 
 
 <H4>2007/10/03 (CB): Less-urgent tkgui cleanup</H4>
