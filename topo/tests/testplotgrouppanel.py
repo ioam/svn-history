@@ -1,151 +1,82 @@
 """
-Unit test for PlotGroupPanel
+Unit test for PlotGroupPanel.
+
 $Id$
 """
 __version__='$Revision$'
 
-import unittest, os
-import topo
-from topo.sheets.generatorsheet import *
-from topo.tkgui import *
-from topo.base.patterngenerator import *
-from topo.base.simulation import *
-from PIL import Image
-from topo.base.cf import CFSheet
-from topo.base.sheetview import *
-from topo.plotting.bitmap import *
-from topo.projections.basic import CFProjection
-import topo.tkgui.topoconsole 
-import topo.tkgui.plotgrouppanel
+import unittest
 import Tkinter
-from math import pi
-from topo.base.parameterclasses import DynamicNumber
-from topo.misc.numbergenerators import UniformRandom
-import random
-import pdb #debugger
-import topo.patterns.basic
+import Image
+
+import topo
+
+from topo.plotting.plot import Plot
+from topo.plotting.plotgroup import PlotGroup
+from topo.tkgui.plotgrouppanel import PlotGroupPanel
+
+from topo.tkgui.tkguiwindow import ScrolledTkguiWindow
+
+# need to clean up stuff like this: do it all in one
+# place (start() modification as suggested by JAB).
+if not hasattr(topo,'guimain'):
+    from topo.tkgui.topoconsole import TopoConsole
+    TopoConsole()
 
 
 class TestPlotGroupPanel(unittest.TestCase):
 
     def setUp(self):
+
+        window = Tkinter.Toplevel()
+        
+        image = Image.open('examples/ellen_arthur.pgm')
+        self.plot = Plot(image,name='Ellen Arthur')
+        
+        self.plotgroup = PlotGroup()
+        self.plotgroup.plot_list.append(self.plot)
+        
+        self.pgpanel = PlotGroupPanel(topo.guimain,window,self.plotgroup)
+        self.pgpanel.pack()
+
+        #import __main__; __main__.__dict__['p']=self.pgpanel
+
+    def test_refresh(self):
         """
-        Create a Simulation self.s that has a couple of sheets within
-        it that have data within them that can then be used by the GUI
-        tests.
+        Check a plot gets created and displayed
         """
-        GeneratorSheet.period = 1.0
-        GeneratorSheet.nominal_density = 5
-#        base.print_level = topo.base.parameterizedobject.WARNING
-#        GeneratorSheet.print_level = topo.base.parameterizedobject.WARNING
-
-        gaussian_width = 0.02
-        gaussian_height = 0.9
-
-        self.input_pattern = topo.patterns.basic.Gaussian(
-            bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))),
-            scale=gaussian_height,
-            aspect_ratio=gaussian_width/gaussian_height,
-            x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=100)),
-            y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
-            orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=300)))
+        assert not(hasattr(self.pgpanel.plotgroup,'plots'))
+        self.pgpanel.Refresh()
+        self.assertEqual(self.pgpanel.plotgroup.plots[0],self.plot)
+        # CEBALERT: now should check the plot's actually on the canvas
+        # but plotgrouppanel doesn't store canvas item ids, so we
+        # can't check.
 
 
-        ###########################################
-        # build simulation
-        
-#        topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
-        
-        self.s = Simulation()
-        self.s.verbose("Creating simulation objects...")
+    # CEBALERT: still need to test the other panel functions...
 
-        # Uses testbitmap.jpg.
-        # Converts a JPG to a triple of arrays of [0 <= i <= 1].
-        miata = Image.open('topo/tests/testbitmap.jpg')
-        miata = miata.resize((miata.size[0]/2,miata.size[1]/2))
-        self.rIm, self.gIm, self.bIm = miata.split()
-        self.rseq = self.rIm.getdata()
-        self.gseq = self.gIm.getdata()
-        self.bseq = self.bIm.getdata()
-        self.rar = Numeric.array(self.rseq)
-        self.gar = Numeric.array(self.gseq)
-        self.bar = Numeric.array(self.bseq)
-        self.ra = Numeric.reshape(self.rar,miata.size) / 255.0
-        self.ga = Numeric.reshape(self.gar,miata.size) / 255.0
-        self.ba = Numeric.reshape(self.bar,miata.size) / 255.0
 
-        sheetR = Sheet()
-        sheetG = Sheet()
-        sheetB = Sheet()
-        retina = GeneratorSheet(input_generator=self.input_pattern)
-        retina.print_level = topo.base.parameterizedobject.WARNING
+class TestSheetPGPanel(unittest.TestCase):
 
-        # For a new sheet_group named Miata:
-        sviewR = SheetView((self.ra,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
-        sviewG = SheetView((self.ga,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
-        sviewB = SheetView((self.ba,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
-        sheetR.sheet_view_dict["Miata"]=sviewR
-        sheetG.sheet_view_dict["Miata"]=sviewG
-        sheetB.sheet_view_dict["Miata"]=sviewB
+    def setUp(self):
+        return
 
-        # To change the activation matrix so "Activity" plot_group
-        # will be different.
-        sheetR.activity = self.ra
-        sheetG.activity = self.ga
-        sheetB.activity = self.ba
+##         window = Tkinter.Toplevel()
 
-        # CEBALERT: I don't understand what this was supposed to
-        # test (i.e. how is it used by one of the tests?).
-##         self.s.add(sheetR)
-##         self.s.add(sheetG)
-##         self.s.add(sheetB)
-##         self.s.add(retina)
-
-        # s.run(1)
+##         self.plotgroup = SheetPlotGroup( ...
+                
+##         self.pgpanel = SheetPGPanel(topo.guimain,window,self.plotgroup)
+##         self.pgpanel.pack()
 
 
 
-    def test_weightspanel(self):
-        """
-        Here, we're not interested in the Activity plots, but we are
-        interested in the weights of the receptive fields.
-        """
-        topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
-        topo.tkgui.plotgrouppanel.PlotGroupPanel.print_level = topo.base.parameterizedobject.WARNING
-        # input generation params
-        GeneratorSheet.period = 1.0
-        GeneratorSheet.nominal_density = 5
-        
-        # cortical parameters
-        CFSheet.nominal_density = 5
-        
-        ###########################################
-        # build simulation
-        s = topo.base.simulation.Simulation()
-        
-        s['retina'] = GeneratorSheet(input_generator=self.input_pattern,nominal_density=3)
-        s['retina'].print_level = topo.base.parameterizedobject.WARNING
-        s['V1'] = CFSheet(nominal_density=3)
-        s['V1'].print_level = topo.base.parameterizedobject.WARNING
-        
-        s.connect('retina','V1',delay=1,connection_type=CFProjection)
-        s.print_level = topo.base.parameterizedobject.WARNING
-        
-        s.run(1)
 
-        
-        console = topo.tkgui.topoconsole.TopoConsole()
-        Pmw.initialise(console)
-        #console.new_weights_window()
-        # console.mainloop()
-        
-
+cases = [TestPlotGroupPanel,TestSheetPGPanel]
 
 suite = unittest.TestSuite()
-#  Uncomment the following line of code, to not run the test if
-#  $DISPLAY is undefined.  Used mainly for GUI testing.
 suite.requires_display = True
-suite.addTest(unittest.makeSuite(TestPlotGroupPanel))
+suite.addTests([unittest.makeSuite(case) for case in cases])
+
 
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite)
