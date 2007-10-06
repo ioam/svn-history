@@ -57,15 +57,15 @@ SAVED_FILETYPES = [('Topographica saved networks',
 
 
 # Documentation locations: locally built and web urls.
-user_manual_locations      = (abs_app_path('doc/User_Manual/index.html'),
+user_manual_locations      = ('doc/User_Manual/index.html',
                               'http://topographica.org/User_Manual/')
-tutorials_locations        = (abs_app_path('doc/Tutorials/index.html'),
+tutorials_locations        = ('doc/Tutorials/index.html',
                               'http://topographica.org/Tutorials/')
-reference_manual_locations = (abs_app_path('doc/Reference_Manual/index.html'),
+reference_manual_locations = ('doc/Reference_Manual/index.html',
                               'http://topographica.org/Reference_Manual/')
 python_doc_locations = ('http://www.python.org/doc/')
 topo_www_locations = ('http://www.topographica.org/')
-plotting_help_locations = (abs_app_path('doc/User_Manual/plotting.html'),
+plotting_help_locations = ('doc/User_Manual/plotting.html',
                            'http://topographica.org/User_Manual/plotting.html')
 
 # If a particular plotgroup_template needs (or works better with) a
@@ -508,15 +508,22 @@ class TopoConsole(TkguiWindow):
         # CB: could have been a list. This is only here because if locations is set
         # to a string, it will loop over the characters of the string.
         assert isinstance(locations,tuple),"locations must be a tuple."
-        
+
         for location in locations:
+            # a path on the disk might need converting
+            try:
+                location = abs_app_path(location)
+            except:
+                pass
+            
             try:
                 webbrowser.open(location,new=True,autoraise=True)
                 self.messageBar.message('state', 'Opened '+location+' in browser.')
                 return
-            # Since one of the possible exception appears to be a 'WindowsError' (at least
-            # on the Windows platform), just catch all exceptions.
-            except Exception:
+            # Since one of the possible exceptions when opening a
+            # browser appears to be a 'WindowsError' (at least on the
+            # Windows platform), just catch all exceptions.
+            except:
                 self.messageBar.message('state', "Couldn't open "+location+" in browser.")
 
 
