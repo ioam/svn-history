@@ -165,14 +165,6 @@ def load_snapshot(snapshot_name):
     """
     Load the simulation stored in snapshot_name.
     """
-    # CEBHACKALERT! Don't use pickled image location, in case
-    # snapshot comes from elsewhere. (Allows tutorial to work
-    # if the snapshot is taken from elsewhere.)
-    # See task in future work about not pickling Filename's search_path
-    from topo.patterns.image import Image
-    fn = Image.filename
-
-
     # unpickling the PicklableClassAttributes() executes startup_commands and
     # sets PO class parameters.
 
@@ -191,9 +183,6 @@ def load_snapshot(snapshot_name):
     except ExpatError:
         snapshot.seek(0) 
         pickle.load(snapshot)
-
-    # (part of HACKALERT above)
-    Image.filename = fn
 
 
 def save_script_repr(script_name):
