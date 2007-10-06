@@ -25,7 +25,7 @@ from topo.base.arrayutils import wrap
 from topo.patterns.basic import SineGrating, Gaussian
 from topo.patterns.teststimuli import SineGratingDisk
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.parameterclasses import Parameter, Filename
+from topo.base.parameterclasses import Parameter
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.plotfilesaver import plotsaving_classes
 from topo.plotting.plotgroup import new_pg
@@ -551,8 +551,7 @@ pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
 pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
-pg.add_static_image('Color Key',
-                    Filename('topo/commands/or_key_white_vert_small.png').default)
+pg.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
 
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
@@ -690,8 +689,7 @@ pg= new_pg(name='PhaseDisparity Preference',category="Preference Maps",
              update_command='measure_phasedisparity()')
 pg.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
 pg.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
-pg.add_static_image('Color Key',
-                    Filename('topo/commands/disp_key_white_vert_small.png').default)
+pg.add_static_image('Color Key','topo/commands/disp_key_white_vert_small.png')
 
 
 def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
