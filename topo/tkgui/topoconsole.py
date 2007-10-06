@@ -46,20 +46,27 @@ from editorwindow import ModelEditor
 
 
 
-SCRIPT_FILETYPES = [('Topographica scripts','*.ty'),('Python scripts','*.py'),('All files','*')]
+SCRIPT_FILETYPES = [('Topographica scripts','*.ty'),
+                    ('Python scripts','*.py'),
+                    ('All files','*')]
 SAVED_FILE_EXTENSION = '.typ'
-SAVED_FILETYPES = [('Topographica saved networks','*'+SAVED_FILE_EXTENSION),('All files','*')]
+SAVED_FILETYPES = [('Topographica saved networks',
+                    '*'+SAVED_FILE_EXTENSION),
+                   ('All files','*')]
 
 
 
 # Documentation locations: locally built and web urls.
-# CEBALERT: is it appropriate to use Filename parameter here in some way?
-user_manual_locations      = (abs_app_path('doc/User_Manual/index.html'),'http://topographica.org/User_Manual/')
-tutorials_locations        = (abs_app_path('doc/Tutorials/index.html'),'http://topographica.org/Tutorials/')
-reference_manual_locations = (abs_app_path('doc/Reference_Manual/index.html'),'http://topographica.org/Reference_Manual/')
+user_manual_locations      = (abs_app_path('doc/User_Manual/index.html'),
+                              'http://topographica.org/User_Manual/')
+tutorials_locations        = (abs_app_path('doc/Tutorials/index.html'),
+                              'http://topographica.org/Tutorials/')
+reference_manual_locations = (abs_app_path('doc/Reference_Manual/index.html'),
+                              'http://topographica.org/Reference_Manual/')
 python_doc_locations = ('http://www.python.org/doc/')
 topo_www_locations = ('http://www.topographica.org/')
-plotting_help_locations = (abs_app_path('doc/User_Manual/plotting.html'),'http://topographica.org/User_Manual/plotting.html')
+plotting_help_locations = (abs_app_path('doc/User_Manual/plotting.html'),
+                           'http://topographica.org/User_Manual/plotting.html')
 
 # If a particular plotgroup_template needs (or works better with) a
 # specific subclass of PlotPanel, the writer of the new subclass
@@ -231,8 +238,6 @@ class TopoConsole(TkguiWindow):
         # the simulation in this case.
         run_frame.optional_action=self.run_simulation
 
-        ## CEBALERT: ever tried pressing 'go' a couple of times while measuring e.g. an orientation preference map?
-        ## The various parts weren't designed to operate in parallel...
         go_button = Button(run_frame,text="Go",
                            command=self.run_simulation)
         go_button.pack(side=LEFT)
@@ -432,9 +437,11 @@ class TopoConsole(TkguiWindow):
 
         
 
-    ### CEBHACKALERT: why doesn't updatecommand("display=True") for an orientation preference map
-    ### measurement work with the hierarchical example? I guess this is the reason I thought
-    ### the updating never worked properly (or I really did break it recently - or I'm confused)...
+    ### CEBERRORALERT: why doesn't updatecommand("display=True") for an
+    ### orientation preference map measurement work with the
+    ### hierarchical example? I guess this is the reason I thought the
+    ### updating never worked properly (or I really did break it
+    ### recently - or I'm confused)...
     def refresh_activity_windows(self):
         """
         Update any windows with a plotgroup_key of 'Activity'.
@@ -442,7 +449,7 @@ class TopoConsole(TkguiWindow):
         Used primarily for debugging long scripts that present a lot of activity patterns.
         """
         for win in self.auto_refresh_panels:
-            if win.plotgroup_label=='Activity' or win.plotgroup_label=='ProjectionActivity' :
+            if win.plotgroup.name=='Activity' or win.plotgroup.name=='ProjectionActivity' :
                 win.refresh()
                 self.update_idletasks()
 
@@ -536,7 +543,6 @@ class TopoConsole(TkguiWindow):
         fduration = self.run_for_var.get()
 
         # CB: clean up (+ docstring)
-        # CEBALERT: that's just temporary
         if fduration>9:
             display_progress=True
         else:
