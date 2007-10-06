@@ -20,78 +20,83 @@ from parameterizedobject import Parameter, descendents
 # some repetition.
 # See JAB hackalert by Parameter's __doc__.
 
+
+
+# CB: what should these be called and where should they be?
+
+# CEBALERT: is there a more obvious way?  (Needs to work on unix
+# and windows.)
+# the topographica base directory
+app_base_path = os.path.split(os.path.split(sys.executable)[0])[0]
+
+def abs_app_path(path,search_paths=[]):
+    """
+    Create an absolute path to the file if the path is not
+    already absolute.
+
+    To turn a supplied relative path into an absolute one, the path is
+    appended to each path in (search_paths+the current working
+    directory+the application's base path) until the file is found.
+    
+    An IOError is raised if the file is not found anywhere.
+    """
+    path = os.path.normpath(path)
+
+    if os.path.isabs(path): return path
+
+    all_search_paths = search_paths + [os.getcwd()] + [app_base_path]
+
+    paths_tried = []
+    for prefix in set(all_search_paths): # does set() keep order?            
+        try_path = os.path.join(os.path.normpath(prefix),path)
+        if os.path.isfile(try_path): return try_path
+        paths_tried.append(try_path)
+
+    raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following places: '+str(paths_tried)+'.')
+
+
+
 class Filename(Parameter):
     """
-    Filename is a Parameter that takes a string specifying the
-    path of a file and stores it in the format of the user's operating system.
+    Filename is a Parameter that can be set to a string specifying the
+    path of a file (in any OS format) and returns it in the format of
+    the user's operating system.  Additionally, the specified path can
+    be absolute or relative to:
+    
+    * any of the paths specified in the search_paths attribute;
 
-    The path to the file can be absolute or relative to any paths
-    specified in search_paths.
+    * any of the paths searched by abs_app_path() (see doc for that
+      function).
 
-    To make your code work on all platforms, you should specify paths
-    in UNIX format (e.g. examples/ellen_arthur.pgm). You can specify
-    paths in your operating system's format, but only code that uses
-    UNIX-style paths will run on all operating systems.
+    The Parameter's default value can be None, but it can only
+    subsequently be __set__() to a valid path.
     """
-    __slots__ = ['search_paths']
+    __slots__ = ['search_paths'] 
     __doc__ = property((lambda self: self.doc))
 
-    def __init__(self,default=None,
-                 search_paths=[os.getcwd(),
-                               # CEBALERT: topographica base path. Must be a better way!
-                               # (Needs to work on unix and windows.)
-                               # Also, seems like this might be needed in several places.
-                               os.path.split(os.path.split(sys.executable)[0])[0]],
-                 **params):
-        """
-        Create a Filename Parameter with the specified string.
+    def __init__(self,default=None,search_paths=[],**params):
+        self.search_paths = search_paths
+        super(Filename,self).__init__(default,**params)
+
+    def check_valid_path(self,path):
+        abs_app_path(path,self.search_paths)
         
-        The string is stored in the path format of the user's
-        operating system.
-
-        See __construct_path() for details on path resolution
-        order.
-        """
-        self.search_paths = copy.copy(search_paths)
-        
-        if default==None:
-            path = None
-        else:
-            path = self.__construct_path(default)
-
-        Parameter.__init__(self,path,**params)
-
-
     def __set__(self,obj,val):
         """
-        Call Parameter's __set__, but constructing the path first
-        (see __construct_path()).
+        Call Parameter's __set__, but checking the path first (see
+        _construct_path()).
         """
-        super(Filename,self).__set__(obj,self.__construct_path(val))
+        self.check_valid_path(val)
+        super(Filename,self).__set__(obj,val)
 
-
-    def __construct_path(self,path):
+    def __get__(self,obj,objtype):
         """
-        Create an absolute path to the file if the path is not
-        already absolute.
-
-        A relative path is appended to the prefix paths held in
-        search_paths; at each point the presence of the file is tested
-        for and if there, its path is returned.
-
-        An IOError is raised if the file is not found in any of these places.
+        Return an absolute, normalized path (see abs_app_path).
         """
-        path = os.path.normpath(path)
-        
-        if os.path.isabs(path): return path
+        raw_path = super(Filename,self).__get__(obj,objtype)
+        return abs_app_path(raw_path,self.search_paths)
 
-        paths_tried = []
-        for prefix in self.search_paths:            
-            try_path = os.path.join(os.path.normpath(prefix),path)
-            if os.path.isfile(try_path): return try_path
-            paths_tried.append(try_path)
 
-        raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following places: '+str(paths_tried)+'.')
 
 
 # CEBHACKALERT: needs to be finished
