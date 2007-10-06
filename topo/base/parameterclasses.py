@@ -619,13 +619,14 @@ class CompositeParameter(Parameter):
                 setattr(obj,a,v)
 
 
-# CB: working on SelectorParameters
-
 class SelectorParameter(Parameter):
     """
-    Abstract Parameter that...
+    Parameter whose value is set to some form of one of the
+    possibilities in its range.
+
+    Subclasses must implement get_range().
     """
-    # CEBALERT: should be abstract
+    _abstract_class_name = "SelectorParameter"
     
     __slots__=[]
     __doc__ = property((lambda self: self.doc))
@@ -638,8 +639,7 @@ class ObjectSelectorParameter(SelectorParameter):
     """
     Parameter whose value is set to an object from its list of possible objects.
     """
-    __slots__ = ['objects'] # Could generate range from a passed-in function, not sure yet.
-                           # In any case, won't stay as Arange. _objects?
+    __slots__ = ['objects'] 
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=None,objects=[],instantiate=True,**params):
@@ -647,23 +647,39 @@ class ObjectSelectorParameter(SelectorParameter):
         self._check_value(default)
         Parameter.__init__(self,default=default,instantiate=instantiate,**params)
         
-    # CB: add _check_value() for setting objects? All getting a bit too much checking...
+    # CBNOTE: if the list of objects is changed, the current value for
+    # this parameter in existing POs could be out of the new range.
+    
     def _check_value(self,val,obj=None):
+        """
+        val must be None or one of the objects in self.objects.
+        """
         if val is not None and val not in self.objects:
             raise ValueError("%s not in Parameter %s's list of possible objects" \
                              %(val,self.attrib_name(obj=obj)))
 
+# CBNOTE: I think it's not helpful to do a type check for the value of
+# an ObjectSelectorParameter. If we did such type checking, any user
+# of this Parameter would have to be sure to update the list of possible
+# objects before setting the Parameter's value. As it is, only users who care about the
+# correct list of objects being displayed need to update the list.
+##     def __set__(self,obj,val):
+##         self._check_value(val,obj)
+##         super(ObjectSelectorParameter,self).__set__(obj,val)
+
+
     def get_range(self):
+        """
+        Return the possible objects to which this parameter could be set.
+
+        (Returns the dictionary {object.name:object}.)
+        """
         return dict([(obj.name,obj) for obj in self.objects])
-    range = get_range # CEBALERT: remove when callers updated
 
     
 class ClassSelectorParameter(SelectorParameter):
     """
-    Parameter whose value is an instance of the specified class.
-
-    Offers a get_range() method to return possible types that the
-    value could be an instance of.
+    Parameter whose value is an instance of the specified class.    
     """
     __slots__ = ['class_','suffix_to_lose']
     __doc__ = property((lambda self: self.doc))
@@ -672,17 +688,15 @@ class ClassSelectorParameter(SelectorParameter):
                  suffix_to_lose='',**params):
         self.class_ = class_
 
-        # CEB: Currently offers the possibility to cut off the end of
-        # a class name (suffix_to_lose), but this could be extended to
-        # any processing of the class name.
+        # CBENHANCEMENT: currently offers the possibility to cut off
+        # the end of a class name (suffix_to_lose), but this could be
+        # extended to any processing of the class name.
         self.suffix_to_lose = suffix_to_lose
 
         self._check_value(default)
         Parameter.__init__(self,default=default,instantiate=instantiate,**params)
 
 
-    # CB: sometime we should clean up all this getting of names in Parameter
-    # CB: is it really useful to do this type check?
     def _check_value(self,val,obj=None):
         """
         val must be None or an instance of self.class_
@@ -701,15 +715,16 @@ class ClassSelectorParameter(SelectorParameter):
         
     def get_range(self):
         """
-        Return {visible_name: <class>} for all classes that are
-        concrete_descendents() of self.class_.
+        Return the possible types for this parameter's value.
+
+        (I.e. return {visible_name: <class>} for all classes that are
+        concrete_descendents() of self.class_.)
 
         Only classes from modules that have been imported are added
         (see concrete_descendents()).
         """
         classes = concrete_descendents(self.class_)
         return dict([(self.__classname_repr(name),class_) for name,class_ in classes.items()])
-    range = get_range # CEBALERT: remove when callers updated
 
 
     def __classname_repr(self, class_name):

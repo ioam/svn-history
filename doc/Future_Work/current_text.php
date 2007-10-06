@@ -51,8 +51,6 @@ plots...' text not centered? clean up + doc code. </li>
 <li>finish basic developer manual tkgui intro</li>
 </ul>
 
-<H4>2007/10/03 (CB): Finish SelectorParameter</H4>
-
 <H4>2007/09/01: timing code </H4>
 The timing object is nearly done, allowing progress bars, time
 remaining estimates, etc., but Jim needs to look at it to finish it up

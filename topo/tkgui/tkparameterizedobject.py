@@ -789,7 +789,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
         Create a translator dictionary entry for the named ClassSelectorParameter.
 
-        Creates mappings between class names (from range()) and
+        Creates mappings between class names (from get_range()) and
         instances of those classes.
         """
         current_param_value = self.get_parameter_value(name)
@@ -803,7 +803,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         #  f.x=Gaussian()
         #  id(f.x)!=id(g.x)
         # Not sure what behavior's best.)
-        for class_name,class_ in param.range().items():
+        for class_name,class_ in param.get_range().items():
             translator[class_name] = class_()
 
         # we want the current_param_value to be in this dictionary, so we replace
@@ -818,13 +818,13 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
         Create a translator dictionary entry for the named ObjectSelectorParameter
 
-        Creates mappings between names of objects (from range()) and
+        Creates mappings between names of objects (from get_range()) and
         the objects themselves.
         """
         current_param_value = self.get_parameter_value(name)
         
         translator = self.translators[name]={}
-        for object_name,object_ in param.range().items():
+        for object_name,object_ in param.get_range().items():
             translator[object_name] = object_
 
 
