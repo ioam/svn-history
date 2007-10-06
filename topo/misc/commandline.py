@@ -15,7 +15,7 @@ from inlinec import import_weave
 from time import gmtime, strftime
 import datetime
 import string
-from topo.commands.basic import save_script_repr ;
+from topo.commands.basic import save_script_repr
 
 # Startup banner
 BANNER = """
@@ -26,6 +26,7 @@ information about Topographica, help(commandname) for info on a
 specific command, or topo.about() for info on this release, including
 licensing information.
 """
+
 
 class CommandPrompt(object):
     """
