@@ -78,8 +78,6 @@ Maybe it's getting daunting?
 Finishing cleaning up associated code (maybe mostly for Jim to do?).
 Could eventually use STRFPAK or a similar approach.
 
-<H4>2007/05/18 (CB): gradient plots </H4>
-[see SF bug tracker 1752465]
 
 <H4>2006/03/26 (CB): scheduled_actions in lissom examples</H4>
 Insert missing actions in case someone tries higher densities.
