@@ -23,9 +23,8 @@ from parameterizedobject import Parameter, descendents
 
 
 # CB: what should these be called and where should they be?
-
-# CEBALERT: is there a more obvious way?  (Needs to work on unix
-# and windows.)
+# Is there a more obvious way of getting this path?
+# (Needs to work on unix and windows.)
 # the topographica base directory
 app_base_path = os.path.split(os.path.split(sys.executable)[0])[0]
 
