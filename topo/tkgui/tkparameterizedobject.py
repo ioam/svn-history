@@ -124,32 +124,31 @@ def lookup_by_class(dict_,class_):
     return v
 
 
-def find_key_from_value(dict_,val):
+def inverse(dict_,):
     """
-    Return the key corresponding to val in the values() of dict_
-    (i.e. dict_[key]=val), or None if val is not found.
+    Return the inverse of dictionary dict_.
+    
+    (I.e. return a dictionary with keys that are the values of dict_,
+    and values that are the corresponding keys from dict_.)
 
-    Note that if there are multiple instances of val in the
-    values() of dict_, then any one of them could be
-    returned.
+    The values of dict_ must be unique.
     """
-    key = None
-    for name,object_ in dict_.items():
-        if object_==val:
-            key=name
-    return key
+    idict = dict([(value,key) for key,value in dict_.iteritems()])
+    if len(idict)!=len(dict_):
+        raise ValueError("Dictionary has no inverse (values not unique).")
+    return idict
 
 
 def keys_sorted_by_value(d, **sort_kwargs):
     """
     Return the keys of d, sorted by value.
-    
-    * Uses find_key_from_value(), so this function
-    is subject to the same limitation. *
+
+    The values of d must be unique (see inverse)
     """
     values = d.values()
     values.sort(**sort_kwargs)
-    return [find_key_from_value(d,val) for val in values]
+    i = inverse(d)
+    return [i[val] for val in values]
 
 
 def parameters(parameterized_object):
@@ -870,7 +869,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                     translator[name]=val # update translator
                     break
         else:
-            new_val = find_key_from_value(translator,val) or val
+            new_val = inverse(translator).get(val) or val
 
         return new_val
 
