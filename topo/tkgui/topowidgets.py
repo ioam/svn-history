@@ -19,11 +19,11 @@ import Tkinter
 import Pmw
 import bwidget
 
+from topo.base.parameterclasses import abs_app_path
 import topo.tkgui
 from widgets import TaggedSlider, ResizableScrollableFrame
 
 ######################################################################
-topo_dir = os.path.split(os.path.split(sys.executable)[0])[0]
 class TkguiWindow(Tkinter.Toplevel):
     """
     The standard tkgui window; defines attributes common to tkgui windows.
@@ -41,7 +41,7 @@ class TkguiWindow(Tkinter.Toplevel):
             # CB: It may be possible for the icon be in color (using
             # e.g. topo/tkgui/icons/topo.xpm), see http://www.thescripts.com/forum/thread43119.html
             # or http://mail.python.org/pipermail/python-list/2005-March/314585.html
-            self.iconbitmap('@'+(os.path.join(topo_dir,'topo/tkgui/icons/topo.xbm')))
+            self.iconbitmap('@'+(abs_app_path('topo/tkgui/icons/topo.xbm')))
 
 
         ### Universal right-click menu   CB: not currently used by anything but the plotgrouppanels

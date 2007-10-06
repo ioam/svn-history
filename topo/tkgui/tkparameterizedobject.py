@@ -101,7 +101,7 @@ from topo.base.parameterizedobject import ParameterizedObject,Parameter, \
      classlist,ParameterizedObjectMetaclass
 from topo.base.parameterclasses import BooleanParameter,StringParameter, \
      Number,SelectorParameter,ClassSelectorParameter,ObjectSelectorParameter, \
-     StringParameter,CallableParameter
+     Filename,CallableParameter,abs_app_path
 
 from topo.misc.utils import eval_atof
 
@@ -224,14 +224,9 @@ class ButtonParameter(CallableParameter):
         """
         image = None
         if self.image_path:
-            # CEBALERT: temporary fix for systems where the buttons
-            # don't exist
-            try:
-                image=ImageTk.PhotoImage(ImageOps.fit(
-                    Image.open(self.image_path),self.size or (32,32)))
-                self._hack.append(image)
-            except IOError:
-                self.size = None
+            image=ImageTk.PhotoImage(ImageOps.fit(
+                Image.open(abs_app_path(self.image_path)),self.size or (32,32)))
+            self._hack.append(image)
 
         return image
             
@@ -448,6 +443,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         self.obj2str_fn = {
             StringParameter: None,
+            Filename: None,
             BooleanParameter: None,
             Number: None,
             SelectorParameter: self.__selector_obj2str,
@@ -456,6 +452,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         self.str2obj_fn = {
             ButtonParameter: None,
             StringParameter: None,
+            Filename: None,
             BooleanParameter: None, 
             SelectorParameter: None,
             Number: eval_atof,

@@ -27,9 +27,10 @@ import tkFileDialog
 import Pmw
 
 import topo
-from topo.misc.keyedlist import KeyedList
+from topo.base.parameterclasses import abs_app_path
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
+from topo.misc.keyedlist import KeyedList
 import topo.commands.basic
 
 import topo.tkgui 
@@ -50,17 +51,15 @@ SAVED_FILE_EXTENSION = '.typ'
 SAVED_FILETYPES = [('Topographica saved networks','*'+SAVED_FILE_EXTENSION),('All files','*')]
 
 
-# Location of topographica main directory
-topo_dir = os.path.split(os.path.split(sys.executable)[0])[0]
 
 # Documentation locations: locally built and web urls.
 # CEBALERT: is it appropriate to use Filename parameter here in some way?
-user_manual_locations      = (os.path.join(topo_dir,'doc/User_Manual/index.html'),'http://topographica.org/User_Manual/')
-tutorials_locations        = (os.path.join(topo_dir,'doc/Tutorials/index.html'),'http://topographica.org/Tutorials/')
-reference_manual_locations = (os.path.join(topo_dir,'doc/Reference_Manual/index.html'),'http://topographica.org/Reference_Manual/')
+user_manual_locations      = (abs_app_path('doc/User_Manual/index.html'),'http://topographica.org/User_Manual/')
+tutorials_locations        = (abs_app_path('doc/Tutorials/index.html'),'http://topographica.org/Tutorials/')
+reference_manual_locations = (abs_app_path('doc/Reference_Manual/index.html'),'http://topographica.org/Reference_Manual/')
 python_doc_locations = ('http://www.python.org/doc/')
 topo_www_locations = ('http://www.topographica.org/')
-plotting_help_locations = (os.path.join(topo_dir,'doc/User_Manual/plotting.html'),'http://topographica.org/User_Manual/plotting.html')
+plotting_help_locations = (abs_app_path('doc/User_Manual/plotting.html'),'http://topographica.org/User_Manual/plotting.html')
 
 # If a particular plotgroup_template needs (or works better with) a
 # specific subclass of PlotPanel, the writer of the new subclass
