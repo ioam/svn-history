@@ -125,6 +125,7 @@ panels. (Plus ProjectionView needs some modification, probably.)
 Pmw</li>
 <li>Use parametersframe/tkparameterizedobject in more places (topoconsole, 
 right click menus...) </li>
+<li>Restriction on operations in parallel? (E.g. run and map measurement.)</li>
 <li>Which widgets should expand (expand=YES ?), which should fill the
 space (fill=X?) (e.g. in parameters frames sliders etc should
 expand), and so on. Switch to grid layout where it's more
