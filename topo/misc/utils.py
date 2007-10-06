@@ -184,6 +184,21 @@ def keys_sorted_by_value(d):
     return [ backitems[i][1] for i in range(0,len(backitems))]
 
 
+def inverse(dict_):
+    """
+    Return the inverse of dictionary dict_.
+    
+    (I.e. return a dictionary with keys that are the values of dict_,
+    and values that are the corresponding keys from dict_.)
+
+    The values of dict_ must be unique.
+    """
+    idict = dict([(value,key) for key,value in dict_.iteritems()])
+    if len(idict)!=len(dict_):
+        raise ValueError("Dictionary has no inverse (values not unique).")
+    return idict
+
+
 def shortclassname(x):
     """
     Returns the class name of x as a string with the leading package information removed.

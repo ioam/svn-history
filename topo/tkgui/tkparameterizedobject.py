@@ -103,7 +103,7 @@ from topo.base.parameterclasses import BooleanParameter,StringParameter, \
      Number,SelectorParameter,ClassSelectorParameter,ObjectSelectorParameter, \
      Filename,CallableParameter,abs_app_path
 
-from topo.misc.utils import eval_atof
+from topo.misc.utils import eval_atof, inverse
 
 from topowidgets import TkPOTaggedSlider
     
@@ -122,21 +122,6 @@ def lookup_by_class(dict_,class_):
             v = dict_[c] 
             break
     return v
-
-
-def inverse(dict_,):
-    """
-    Return the inverse of dictionary dict_.
-    
-    (I.e. return a dictionary with keys that are the values of dict_,
-    and values that are the corresponding keys from dict_.)
-
-    The values of dict_ must be unique.
-    """
-    idict = dict([(value,key) for key,value in dict_.iteritems()])
-    if len(idict)!=len(dict_):
-        raise ValueError("Dictionary has no inverse (values not unique).")
-    return idict
 
 
 def keys_sorted_by_value(d, **sort_kwargs):
