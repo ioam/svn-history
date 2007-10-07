@@ -205,7 +205,7 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
             
         # create the labels & widgets
         for name in self.displayed_params:
-            widget,label = self.create_widget(name,self._params_frame,on_change=on_change or self.on_change,
+            widget,label = self._create_widget(name,self._params_frame,on_change=on_change or self.on_change,
                                               on_modify=on_modify or self.on_modify)
             self.representations[name]={'widget':widget,'label':label}
 
