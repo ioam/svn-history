@@ -66,9 +66,6 @@ class Filename(Parameter):
 
     * any of the paths searched by abs_app_path() (see doc for that
       function).
-
-    The Parameter's default value can be None, but it can only
-    subsequently be __set__() to a valid path.
     """
     __slots__ = ['search_paths'] 
     __doc__ = property((lambda self: self.doc))
@@ -76,18 +73,7 @@ class Filename(Parameter):
     def __init__(self,default=None,search_paths=[],**params):
         self.search_paths = search_paths
         super(Filename,self).__init__(default,**params)
-
-    def check_valid_path(self,path):
-        abs_app_path(path,self.search_paths)
         
-    def __set__(self,obj,val):
-        """
-        Call Parameter's __set__, but checking the path first (see
-        _construct_path()).
-        """
-        self.check_valid_path(val)
-        super(Filename,self).__set__(obj,val)
-
     def __get__(self,obj,objtype):
         """
         Return an absolute, normalized path (see abs_app_path).
