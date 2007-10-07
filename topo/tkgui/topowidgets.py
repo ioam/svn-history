@@ -12,8 +12,6 @@ __version__='$Revision$'
 # topographica). We can probably move the remaining classes elsewhere,
 # and then remove this file.
 
-import os.path
-import sys
 import Tkinter
 
 import Pmw
@@ -27,33 +25,31 @@ from widgets import TaggedSlider, ResizableScrollableFrame
 class TkguiWindow(Tkinter.Toplevel):
     """
     The standard tkgui window; defines attributes common to tkgui windows.
+
+    Currently these attributes are:
+     - a window icon
+
+     
     """
     def __init__(self,**config):
         Tkinter.Toplevel.__init__(self,**config)
 
-        ### Window icon
-        if topo.tkgui.system_platform is 'mac':
-            # CB: To get a proper icon on OS X, we probably have to bundle into an application
-            # package or something like that.
-            pass # (don't know anything about the file format required)
-            # self.attributes("-titlepath","/Users/vanessa/topographica/AppIcon.icns")
-        else:
-            # CB: It may be possible for the icon be in color (using
-            # e.g. topo/tkgui/icons/topo.xpm), see http://www.thescripts.com/forum/thread43119.html
-            # or http://mail.python.org/pipermail/python-list/2005-March/314585.html
-            self.iconbitmap('@'+(abs_app_path('topo/tkgui/icons/topo.xbm')))
+        # CEBALERT: doesn't work on OS X, and is a strange color on
+        # Windows.  To get a proper icon on OS X, we probably have to
+        # bundle into an application package or something like that.
+        # On OS X, could possibly alter the small titlebar icon with something like:
+        # self.attributes("-titlepath","/Users/x/topographica/AppIcon.icns")
+        self.iconbitmap('@'+(abs_app_path('topo/tkgui/icons/topo.xbm')))
 
+        ### Universal right-click menu
+        # CB: not currently used by anything but the plotgrouppanels
+        # self.context_menu = Tkinter.Menu(self, tearoff=0)
+        # self.bind("<<right-click>>",self.display_context_menu)
 
-        ### Universal right-click menu   CB: not currently used by anything but the plotgrouppanels
-        self.context_menu = Tkinter.Menu(self, tearoff=0)
-##         self.bind("<<right-click>>",self.display_context_menu)
-
-##     # CB: still to decide between frame/window; the right-click stuff will probably change.
-    
 ######################################################################
 
 
-
+######################################################################
 # CB: needs significant cleanup
 class ScrolledTkguiWindow(TkguiWindow):
     """
@@ -101,7 +97,7 @@ class ScrolledTkguiWindow(TkguiWindow):
         if not hasattr(self,'oldsize') or self.oldsize!=(w,h): 
             self._scroll_frame.set_size(w,h)
             self.oldsize = (w,h)
-            
+######################################################################            
 
 
 # CB: haven't decided what to do. Might be temporary.
