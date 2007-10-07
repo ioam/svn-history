@@ -4,9 +4,17 @@ Classes linking ParameterizedObjects and Parameters to Tkinter.
 TkParameterizedObject allows graphical representation and manipulation
 of any ParameterizedObject's Parameters, in a flexible way. Usually,
 it is simply desired to display all the Parameters of a
-ParameterizedObject; for this, use ParametersFrame, which extends
-TkParameterizedObject. If more flexibility is required, though, it
-is possible to use TkParameterizedObject itself.
+ParameterizedObject; for this, use parametersframe.ParametersFrame,
+which extends TkParameterizedObject. If more flexibility is required,
+though, use TkParameterizedObject itself.
+
+TkParameterizedObject adds widget-drawing abilities to TkParameterizedObjectBase.
+Documentation begins in TkParameterizedObject (since it's not expected that
+TkParameterizedObjectBase will be used directly), but continues in more
+detail in TkParameterizedObjectBase. 
+
+
+
 
 A typical use of TkParameterizedObject might be in some subclass that
 is also a Tkinter.Frame. The Frame serves as the container into which
@@ -225,8 +233,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
     Optionally performs the same for an *additional* shadowed
     ParameterizedObject (extraPO). The Parameters of the extra
-    shadowed PO are available via this object (both via the usual
-    'dot' attribute access and via dedicated parameter accessors
+    shadowed PO are available via this object (via coth the usual
+    'dot' attribute access and dedicated parameter accessors
     declared in this class). 
 
     The Tkinter.Variable shadows for this ParameterizedObject and any
@@ -286,6 +294,12 @@ class TkParameterizedObjectBase(ParameterizedObject):
         of the Variable might display a stale value (until a GUI refresh
         takes place).
     """
+
+    # CEBNOTE: avoid (as far as possible) defining Parameters for this
+    # object because they might clash with Parameters of objects it
+    # eventually represents.
+
+
     # CEBNOTE: Regarding note 1a above...it would be possible - with
     # some extra work - to shadow Parameters that are duplicated on
     # this PO and extraPO. Among other changes, things like the
@@ -294,24 +308,25 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
     # CEBNOTE: Regarding note 1b...might be less confusing if we stop
     # parameters of shadowed POs being available as attributes (and
-    # use only the parameter access methods instead).
+    # use only the parameter access methods instead). But having them
+    # available as attributes is really convenient.
 
     # CEBNOTE: Regarding note 2 above...if the above becomes a
     # problem, we could have some autorefresh of the vars or a
     # callback of some kind in the parameterized object itself.
+    # (See note in TkParameterizedObject.__init__.)
 
     # CEB: because of note 1, attributes of this class should have
     # names that are unlikely to clash (or they should be private);
     # this will make it easier for creators and users of subclasses to
     # avoid name clashes.
 
-
     # must exist *before* an instance is init'd
     # (for __getattribute__)
     _extraPO = None
 
 
-    # CB: fix repr 
+    # CEBALERT: fix the more useful repr method
     def __repr__(self): return object.__repr__(self)    
 ##     def __repr__(self):
 ##         # Method adds the name of the _extraPO, plus avoids recursion problem (see note).
@@ -339,13 +354,11 @@ class TkParameterizedObjectBase(ParameterizedObject):
 ##         return self.__class__.__name__ + "(_extraPO=%s, "%extraPOstring + ", ".join(settings) + ")"
 
 
-    # overrides method from superclass
     def _setup_params(self,**params):
         """
         Parameters that are not in this object itself but are in the
-        extraPO get set on extraPO.
-
-        Then calls ParameterizedObject's _setup_params().
+        extraPO get set on extraPO. Then calls ParameterizedObject's
+        _setup_params().
         """
         ### a parameter might be passed in for one of the extra_pos;
         ### if a key in the params dict is not a *parameter* of this
@@ -358,7 +371,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         ParameterizedObject._setup_params(self,**params)
 
     # CEBALERT: rename extraPO...but to what?
-    # Rename change_PO().
+    # Rename change_PO() and anything else related.
     def __init__(self,extraPO=None,self_first=True,**params):
         """
 
@@ -384,25 +397,23 @@ class TkParameterizedObjectBase(ParameterizedObject):
         there is a name clash; if False, Parameters of extraPO take
         priority.
 
-        * param_to_tkvar
-        Dictionary indicating Tkinter Variable to use for particular
-        Parameter types.
 
         * param_has_modifyable_choices
         Some parameters are represented by widgets whose options
         can't be changed once created (e.g. OptionMenu), and some
         parameters have a fixed set of options (e.g. Boolean).
         
-
-        (Note that in the various dictionaries above, the entry for
-        Parameter serves as a default, since keys are looked up by
-        class, so any Parameter type not specifically listed will be
-        covered by the Parameter entry.)
         
 
         * obj2str_fn & str2obj_fn
 
         * translator_creators
+
+        (Note that in the various dictionaries above, the entry for
+        Parameter serves as a default, since keys are looked up by
+        class, so any Parameter type not specifically listed will be
+        covered by the Parameter entry.)
+
 
 
         * _tk_vars
@@ -415,16 +426,19 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         self.self_first = self_first
 
+        ## Which Tkinter Variable to use for each Parameter type
         # (Note that, for instance, we don't include Number:DoubleVar.
         # This is because we use Number to control the type, so we
         # don't need restrictions from DoubleVar.)
-        self.param_to_tkvar = {BooleanParameter:BooleanVar,
-                                     Parameter:StringVar}
+        self.__param_to_tkvar = {BooleanParameter:BooleanVar,
+                                 Parameter:StringVar}
 
         self.param_has_modifyable_choices = {BooleanParameter:False,
                                              SelectorParameter:False,
                                              Parameter:True}
 
+        # need to document somewhere that a new parameterclass that
+        # only has a string as its value should get None,None
         self.obj2str_fn = {
             StringParameter: None,
             Filename: None,
@@ -503,7 +517,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
         self._update_translator(name,param)
 
-        tk_var = lookup_by_class(self.param_to_tkvar,type(param))()
+        tk_var = lookup_by_class(self.__param_to_tkvar,type(param))()
         self._tk_vars[name] = tk_var
 
         # overwrite Variable's set() with one that will handle
@@ -652,8 +666,9 @@ class TkParameterizedObjectBase(ParameterizedObject):
     # CB: change with_location to with_source
     def get_parameter_object(self,name,parameterized_object=None,with_location=False):
         """
-        Return the Parameter specified by the name from the sources of
-        Parameters in this object (or the specified parameterized_object).
+        Return the Parameter *object* (not value) specified by name,
+        from the sources of Parameters in this object (or the
+        specified parameterized_object).
 
         If with_location=True, returns also the source parameterizedobject.
         """
@@ -970,67 +985,100 @@ import _tkinter # (required to get tcl exception class)
 
 class TkParameterizedObject(TkParameterizedObjectBase):
     """
-    A TkParameterizedObjectBase that can draw widgets representing the
-    Parameters of its ParameterizedObject(s).
+    Provide widgets for Parameters of itself and up to one additional
+    ParameterizedObject.
 
+    A subclass that defines a Parameter p can display it appropriately
+    for manipulation by the user simply by calling
+    pack_param('p'). The GUI display and the actual Parameter value
+    are automatically synchronized (though see technical notes for
+    TkParameterizedObjectBase for more details).
 
-    TkParameterizedObject.pretty_parameter
+    In general, pack_param() adds a Tkinter.Frame containing a label
+    and a widget: 
+
+    ---------------------                     The Parameter's
+    |                   |                     'representation'
+    | [label]  [widget] |<----frame
+    |                   |
+    ---------------------
+
+    In the same way, an instance of this class can be used to display
+    the Parameters of an existing ParameterizedObject. By passing in
+    extraPO=x, where x is an existing ParameterizedObject, a Parameter
+    q of x can be displayed in the GUI by calling pack_param('q').
+
+    For representation in the GUI, Parameter values might need to be
+    converted between their real values and strings used for display
+    (e.g. for a ClassSelectorParameter, the options are really class
+    objects, but the user must be presented with a list of strings to
+    choose from). Such translation is handled and documented in the
+    superclass; the default behaviors can be overridden if required.
+
+    
+    (This class simply adds widget drawing to
+    TkParameterizedObjectBase. More detail about the shadowing of
+    Parameters is available in the documentation for
+    TkParameterizedObjectBase.)
     """
 
-    pretty_parameters = BooleanParameter(default=True,doc=
-                                         """Whether to format parameter names, or display
-                                         the variable names instead.
+    # CEBNOTE: as for TkParameterizedObjectBase, avoid declaring
+    # Parameters here (to avoid name clashes with any additional
+    # Parameters this might eventually be representing).
 
-                                         Example use:
-                                         TkParameterizedObject.pretty_parameters=False
+    pretty_parameters = BooleanParameter(default=True, hidden=True,
+        doc="""Whether to format parameter names, or display the
+        variable names instead.
 
-                                         Have all Parameters displayed with variable names
-                                         (set on the class).""")
-
-
-    # CEBALERT: rename 'representations'
-    def _set_tk_val(self,param_name,val):
-        """
-        Calls superclass's version, adding help text for the currently selected item
-        of SelectorParameters.
-        """
-        super(TkParameterizedObject,self)._set_tk_val(param_name,val)
-
-        if isinstance(self.get_parameter_object(param_name),SelectorParameter):
-            try:
-                w = self.representations[param_name]['widget']
-                help_text =  getdoc(self.string2object_ifrequired(param_name,
-                                                                  self._tk_vars[param_name]._original_get()))
-
-
-                ######################################################
-                # CEBALERT: for projectionpanel, which currently has
-                # to destroy a widget (because Tkinter.OptionMenu's
-                # list of choices cannot easily be replaced). See ALERT
-                # 'How do you change list [...]' in projectionpanel.py.
-                try:
-                    self.balloon.bind(w,help_text)
-                except _tkinter.TclError:
-                    pass
-                ######################################################
-
-            except (AttributeError,KeyError):  # could be called before self.representations exists,
-                                               # or before param in _tk_vars dict
-                pass
+        Example use:
+          TkParameterizedObject.pretty_parameters=False
+    
+        (This causes all Parameters throughout the GUI to be displayed
+        with variable names.)
+        """)
 
 
     def __init__(self,master,extraPO=None,self_first=True,**params):
         """
+        Initialize this object with the arguments and attributes
+        described below:
+        
+        extraPO: optional ParameterizedObject for which to shadow
+        Parameters (in addition to Parameters of this object; see
+        superclass)
 
+        self_first: if True, Parameters on this object take precedence
+        over any ones with the same names in the extraPO (i.e. what
+        to do if there are name clashes; see superclass)
+
+
+        Important attributes
+        ====================
+        
         * param_immediately_apply_change
-        Some types of Parameter are represented with widgets where a
-        complete change can be instantaneous (e.g. when dragging a
-        slider for a number, the change at each instant should be
-        applied). Others, such as Parameter, are represented with
-        widgets that do not finish their changes instantaneously
-        (e.g. entry into a text box is not be considered finished
+
+        Some types of Parameter are represented with widgets where
+        a complete change can be instantaneous (e.g.  when
+        selecting from an option list, the selection should be
+        applied straightaway). Others are represented with widgets
+        that do not finish their changes instantaneously
+        (e.g. entry into a text box is not considered finished
         until Return is pressed).
 
+        * widget_creators
+
+        A dictionary of methods to create a widget for each Parameter
+        type. For special widget options (specific to each particular
+        parameter), see the corresponding method's docstring.
+
+        * representations
+
+        After pack_param() is called, a Parameter's representation
+        consists of the tuple (frame,widget,label,pack_options) - the
+        enclosing frame, the value-containing widget, the label
+        holding the Parameter's name, and any options supplied for
+        pack(). These can all be accessed through the representations
+        dictionary, under the Parameter's name.
         """
         self.master = master
         self.param_immediately_apply_change = {BooleanParameter:True,
@@ -1038,14 +1086,11 @@ class TkParameterizedObject(TkParameterizedObjectBase):
                                                Number:False,
                                                Parameter:False}
 
-        TkParameterizedObjectBase.__init__(self,extraPO=extraPO,self_first=self_first,**params)
+        TkParameterizedObjectBase.__init__(self,extraPO=extraPO,
+                                           self_first=self_first,**params)
 
         self.balloon = Balloon(master)
 
-
-
-
-        # map of Parameter classes to appropriate widget-creation method
         self.widget_creators = {
             BooleanParameter:self._create_boolean_widget,
             Number:self._create_number_widget,
@@ -1053,11 +1098,12 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             StringParameter:self._create_string_widget,
             SelectorParameter:self._create_selector_widget}
         
-        self.representations = {}  # to store (frame,widget,label) for each param
+        self.representations = {}  
         
-        # (a refresh-the-widgets-on-focus-in method could make the gui
-        # in sync with the actual object?)
-        
+        # CEBNOTE: a refresh-the-widgets-on-focus-in method could make the gui
+        # in sync with the actual object (so changes outside the gui could
+        # show up when a frame takes focus). Or there could be timer process.
+
 
     def pretty_print(self,s):
         """
@@ -1072,10 +1118,124 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             return n
 
 
+    def pack_param(self,name,parent=None,widget_options={},
+                   on_change=None,on_modify=None,**pack_options):
+        """
+        Create a widget for the Parameter name, configured according
+        to widget_options, and pack()ed according to the pack_options.
 
-### Methods to create widgets ###
+        Pop-up help is automatically set from the Parameter's doc.
 
-    def create_widget(self,name,master,widget_options={},on_change=None,on_modify=None):
+        The widget and label (if appropriate) are enlosed in a Frame
+        so they can be manipulated as a single unit (see the class
+        docstring). The representation
+        (frame,widget,label,pack_options) is returned (as well as
+        being stored in the representations dictionary).
+
+
+        * parent is the existing widget that is to be the parent
+        (master) of the widget created for this paramter. If no parent
+        is specified, defaults to the originally supplied master
+        (i.e. that set during __init__).
+
+        * on_change is an optional function to call whenever the
+        Parameter's corresponding Tkinter Variable's trace_variable
+        indicates that it has been set (this does not necessarily mean
+        that the widget's value has changed). When the widget is created,
+        the on_change method will be called (because the creation of the
+        widget triggers a set in Tkinter).
+
+        * on_modify is an optional function to call whenever the
+        corresponding Tkinter Variable is actually changed.
+        
+
+        widget_options specified here override anything that might have been
+        set elsewhere (e.g. ButtonParameter's size can be overridden here
+        if required).
+
+
+        
+        Examples of use:
+        pack_param(name)
+        pack_param(name,side='left')
+        pack_param(name,parent=frame3,on_change=some_func)
+        pack_param(name,widget_options={'width':50},side='top',expand='yes',fill='y')
+        """
+        frame = Frame(parent or self.master)
+
+        widget,label = self._create_widget(name,frame,widget_options,on_change,on_modify)
+
+        # checkbuttons are 'widget label' rather than 'label widget'
+        if widget.__class__ is Tkinter.Checkbutton:  # type(widget) doesn't seem to work
+            widget_side='left'; label_side='right'
+        else:
+            label_side='left'; widget_side='right'
+            
+        if label: label.pack(side=label_side) # label can be None (e.g. for Button)
+        widget.pack(side=widget_side,expand='yes',fill='x')
+
+        representation = {"frame":frame,"widget":widget,
+                          "label":label,"pack_options":pack_options}
+        self.representations[name] = representation
+                               
+
+        # If there's a label, balloon's bound to it - otherwise, bound
+        # to enclosing frame.
+        # (E.g. when there's [label] [text_box], only want balloon for
+        # label (because maybe more help will be present for what's in
+        # the box) but when there's [button], want popup help over the
+        # button.)
+        self.balloon.bind(label or frame,getdoc(self.get_parameter_object(name)))
+        
+        frame.pack(pack_options)
+        return representation
+
+
+    def hide_param(self,name):
+        """Hide the representation of Parameter 'name'."""
+        if name in self.representations:
+            self.representations[name]['frame'].pack_forget()
+        # CEBNOTE: forgetting label and widget rather than frame would
+        # just hide while still occupying space (i.e. the empty frame
+        # stays in place, and so widgets could later be inserted at
+        # exact same place)
+        #self.representations[name]['label'].pack_forget()
+        #self.representations[name]['widget'].pack_forget()
+        # unhide_param would need modifying too
+        
+
+    def unhide_param(self,name,new_pack_options={}):
+        """
+        Un-hide the representation of Parameter 'name'.
+
+        Any new pack options supplied overwrite the originally
+        supplied ones, but the parent of the widget remains the same.
+        """
+        # CEBNOTE: new_pack_options not really tested. Are they useful anyway?
+        if name in self.representations:
+            pack_options = self.representations[name]['pack_options']
+            pack_options.update(new_pack_options)
+            self.representations[name]['frame'].pack(pack_options)
+
+
+    def unpack_param(self,name):
+        """
+        Destroy the representation of Parameter 'name'.
+
+        (unpack and then pack a param if you want to put it in a different
+        frame; otherwise simply use hide and unhide)
+        """
+        f = self.representations[name]['frame']
+        w = self.representations[name]['widget']
+        l = self.representations[name]['label']
+
+        del self.representations[name]
+
+        for x in [f,w,l]:
+            x.destroy()
+
+
+    def _create_widget(self,name,master,widget_options={},on_change=None,on_modify=None):
         # select the appropriate widget-creation method;
         # default is self._create_string_widget... 
         widget_creation_fn = self._create_string_widget
@@ -1119,31 +1279,32 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # Calling the parameter (e.g. self.Apply()) is like pressing the button:
         self.__dict__["_%s_param_value"%name]=command
         # like setattr(self,name,command) but without tracing etc
-        # (...and so you can't edit a tkparameterizedobject w/buttons
-        # with a tkparameterizedobject because the button parameters
-        # all skip translation etc. Instead should handle their
-        # translation.)
 
-        b = Button(frame,command=command)
+        # (...CEBNOTE: and so you can't edit a tkparameterizedobject
+        # w/buttons with another tkparameterizedobject because the
+        # button parameters all skip translation etc. Instead should
+        # handle their translation. But we're not offering a GUI
+        # builder so it doesn't matter.)
+
+        button = Button(frame,command=command)
 
         button_param = self.get_parameter_object(name)
 
-        # now add image from ButtonParameter
         image = button_param.get_image()
         if image:
-            b['image']=image
-            b['relief']='flat'
+            button['image']=image
+            button['relief']='flat'
         else:
-            b['text']=self.pretty_print(name)
+            button['text']=self.pretty_print(name)
 
         # and set size from ButtonParameter
         size = button_param.size
         if size:
-            b['width']=size[0]
-            b['height']=size[1]
+            button['width']=size[0]
+            button['height']=size[1]
 
-        b.config(**widget_options) # widget_options override things from parameter
-        return b
+        button.config(**widget_options) # widget_options override things from parameter
+        return button
 
 
     def _create_selector_widget(self,frame,name,widget_options):
@@ -1160,8 +1321,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         ## sort the range for display
         # CEBALERT: extend OptionMenu so that it
-        # (a) supports changing its option list
-        # (b) support sorting of its option list
+        # (a) supports changing its option list (subject of a previous ALERT)
+        # (b) supports sorting of its option list
         new_range = self.translators[name].keys()        
         if 'sort_fn_args' not in widget_options:
             # no sort specified: defaults to sort()
@@ -1177,7 +1338,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         tk_var = self._tk_vars[name]
 
         current_value = self.object2string_ifrequired(name,self.get_parameter_value(name))
-        if current_value not in new_range:current_value = new_range[0] #whatever was there is out of date now
+        if current_value not in new_range:
+             current_value = new_range[0] # whatever was there is out of date now
 
         tk_var.set(current_value)
 
@@ -1218,126 +1380,69 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         return widget
 
-#################################
-
-
-    def hide_param(self,name):
-        """Hide the representation of Parameter 'name'."""
-        if name in self.representations:
-            self.representations[name]['frame'].pack_forget()
-        # CEBNOTE: forgetting label and widget would just hide while
-        # still occupying space (i.e. the empty frame stays in place)
-        #self.representations[name]['label'].pack_forget()
-        #self.representations[name]['widget'].pack_forget()
-        # unhide_param would need modifying too
-        
-
-
-    def unhide_param(self,name,new_pack_options={}):
-        """
-        Un-hide the previously hidden representation of Parameter 'name'.
-
-        Any new pack options supplied overwrite the originally
-        supplied ones, but the parent of the widget remains the same.
-        """
-        # CEBNOTE: new_pack_options not really tested - maybe remove them.
-        if name in self.representations:
-            pack_options = self.representations[name]['pack_options']
-            pack_options.update(new_pack_options)
-            self.representations[name]['frame'].pack(pack_options)
-
-
-    def unpack_param(self,name):
-        """
-        Destroy the representation of Parameter 'name'.
-
-        (unpack and then pack a param if you want to put it in a different
-        frame; otherwise use hide and unhide)
-        """
-        f = self.representations[name]['frame']
-        w = self.representations[name]['widget']
-        l = self.representations[name]['label']
-        o = self.representations[name]['pack_options']
-
-        del self.representations[name]
-
-        for x in [f,w,l]:
-            x.destroy()
 
 
     def _update_param(self,param_name,force=False):
         """
-        Only edit a non-immediate parameter type if force is True.
+        Prevents the superclass's _update_param() method from being
+        called unless:
+        
+        - param_name is a Parameter type that has changes immediately
+        applied (see doc for param_immediately_apply_change
+        dictionary);
+
+        - force is True.
+
+        (I.e. to update a parameter for which
+        param_immediately_apply_change[type(parameter)]==False, call
+        this method with force=True. E.g. when <Return> is pressed
+        in a text box, this method is called with force=True.)        
         """
-        param = self.get_parameter_object(param_name)
+        param_obj = self.get_parameter_object(param_name)
         
         if not lookup_by_class(self.param_immediately_apply_change,
-                               type(param)) and not force:
+                               type(param_obj)) and not force:
             return
         else:
             super(TkParameterizedObject,self)._update_param(param_name)
 
+
+    def _set_tk_val(self,param_name,val):
+        """
+        Calls superclass's version, but adds help text for the
+        currently selected item of SelectorParameters.
+        """
+        super(TkParameterizedObject,self)._set_tk_val(param_name,val)
+
+        if isinstance(self.get_parameter_object(param_name),SelectorParameter):
+            try:
+                w = self.representations[param_name]['widget']
+                help_text =  getdoc(self.string2object_ifrequired(
+                    param_name,
+                    self._tk_vars[param_name]._original_get()))
+
+
+                ######################################################
+                # CEBALERT: for projectionpanel, which currently has
+                # to destroy a widget (because Tkinter.OptionMenu's
+                # list of choices cannot easily be replaced). See ALERT
+                # 'How do you change list [...]' in projectionpanel.py.
+                try:
+                    self.balloon.bind(w,help_text)
+                except _tkinter.TclError:
+                    pass
+                ######################################################
+
+            except (AttributeError,KeyError):
+                # could be called before self.representations exists,
+                # or before param in _tk_vars dict
+                pass
+
+
+
+
         
     
-    # CB: packing might need to be better (check eg label-widget space)
-    def pack_param(self,name,parent=None,widget_options={},on_change=None,on_modify=None,**pack_options):
-        """
-        Create a widget for the Parameter name, configured according
-        to widget_options, and pack()ed according to the pack_options.
-
-        If no parent is specified, defaults to the originally supplied
-        master (i.e. that set during __init__).
-
-        on_change is an optional function to call whenever the Parameter's
-        corresponding Tkinter Variable's trace_variable indicates that it
-        has been set.
-
-        Balloon help is automatically set from the Parameter's doc.
-
-        The widget and label (if appropriate) are enlosed in a Frame
-        so they can be manipulated as a single unit.
-        
-        Returns the widget in case further processing of it is
-        required.
-
-        Note that the on_change function (if supplied) will be called
-        on creation of the widget.
-
-        widget_options override anything that's e.g. set on Parameter
-        like ButtonParameter size
-        
-        Examples:
-        self.pack_param(name)
-        self.pack_param(name,side='left')
-        self.pack_param(name,{'width':50},side='top',expand='yes',fill='y')
-        """
-        frame = Frame(parent or self.master)
-
-        widget,label = self.create_widget(name,frame,widget_options,on_change,on_modify)
-
-        # checkbuttons are 'widget label' rather than 'label widget'
-        if widget.__class__ is Tkinter.Checkbutton:  # type(widget) doesn't seem to work
-            widget_side='left'; label_side='right'
-        else:
-            label_side='left'; widget_side='right'
-            
-        if label: label.pack(side=label_side)
-        widget.pack(side=widget_side,expand='yes',fill='x')
-
-        representation = {"frame":frame,"widget":widget,"label":label,"pack_options":pack_options}
-        self.representations[name] = representation
-                               
-
-        # If there's a label, balloon's bound to it - otherwise, bound
-        # to enclosing frame.
-        # (E.g. when there's [label] [text_box], only want balloon for
-        # label (because maybe more help will be present for what's in
-        # the box) but when there's [button], want popup help over the
-        # button.)
-        self.balloon.bind(label or frame,getdoc(self.get_parameter_object(name)))
-        
-        frame.pack(pack_options)
-        return representation
 
 
 
