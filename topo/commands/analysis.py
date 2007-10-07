@@ -28,7 +28,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.parameterclasses import Parameter
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.plotfilesaver import plotsaving_classes
-from topo.plotting.plotgroup import new_pg
+from topo.plotting.plotgroup import create_plotgroup
 
 from topo.patterns.random import GaussianRandom
 
@@ -250,7 +250,7 @@ proj_name =''
 # be handled similarly.
 
 
-pg = new_pg(name='Activity',category='Basic',
+pg = create_plotgroup(name='Activity',category='Basic',
              doc='Plot the activity for all Sheets.', auto_refresh=True,
              update_command='update_activity()', plot_immediately=True)
 pg.add_plot('Activity',[('Strength','Activity'),
@@ -277,10 +277,10 @@ def update_activity():
 
 ###############################################################################
 from topo.plotting.plotgroup import ConnectionFieldsPlotGroup
-pg= new_pg(name='Connection Fields',category="Basic",
-           doc='Plot the weight strength in each ConnectionField of a specific unit of a Sheet.',
-           update_command='update_connectionfields()',
-           plot_immediately=True, normalize=True)
+pg= create_plotgroup(name='Connection Fields',category="Basic",
+                     doc='Plot the weight strength in each ConnectionField of a specific unit of a Sheet.',
+                     update_command='update_connectionfields()',
+                     plot_immediately=True, normalize=True)
 pg.add_plot('Connection Fields',[('Strength','Weights'),
                                  ('Hue','OrientationPreference'),
                                  ('Confidence','OrientationSelectivity')])
@@ -301,7 +301,7 @@ def update_connectionfields():
 
 
 ## ###############################################################################
-pg= new_pg(name='Projection',category="Basic",
+pg= create_plotgroup(name='Projection',category="Basic",
            doc='Plot the weights of an array of ConnectionFields in a Projection.',
            update_command='update_projections()',
            plot_immediately=True, normalize=True)
@@ -323,7 +323,7 @@ def update_projections():
 
 
 ## ###############################################################################
-pg =  new_pg(name='Projection Activity',category="Basic",
+pg =  create_plotgroup(name='Projection Activity',category="Basic",
              doc='Plot the activity in each Projection that connects to a Sheet.',
              update_command='update_projectionactivity()',
              plot_immediately=True, normalize=True,auto_refresh=True)
@@ -353,7 +353,7 @@ def update_projectionactivity():
 
 
 ###############################################################################
-pg= new_pg(name='Position Preference',category="Preference Maps",
+pg= create_plotgroup(name='Position Preference',category="Preference Maps",
            doc='Measure preference for the X and Y position of a Gaussian.',
            update_command='measure_position_pref()',
            plot_command='topographic_grid()',
@@ -396,7 +396,7 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
 
 
 ###############################################################################
-pg= new_pg(name='Receptive Fields',category="Other",
+pg= create_plotgroup(name='Receptive Fields',category="Other",
            doc='Measure receptive fields.',
            update_command='measure_rfs(input_sheet=topo.sim["Retina"])',
            plot_command='plotrctg()',
@@ -454,7 +454,7 @@ def measure_rfs(input_sheet,divisions=10,scale=30.0,offset=0.5,display=False,
      
 
 ###############################################################################
-pg= new_pg(name='Receptive Fields noise',category="Other",
+pg= create_plotgroup(name='Receptive Fields noise',category="Other",
            doc='Measure receptive fields by reverse correlation using random noise.',
            update_command='measure_rfs_noise(input_sheet=topo.sim["Retina"])',
            plot_command='plotrctg()',normalize=True)
@@ -484,7 +484,7 @@ def measure_rfs_noise(input_sheet,divisions=99,scale=0.5,offset=0.5,display=Fals
 
 
 ###############################################################################
-pg= new_pg(name='Center of Gravity',category="Preference Maps",
+pg= create_plotgroup(name='Center of Gravity',category="Preference Maps",
              doc='Measure the center of gravity of each ConnectionField in a Projection.',
              update_command='measure_cog(proj_name="Afferent")',
              plot_command='topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG")',
@@ -544,7 +544,7 @@ def measure_cog(proj_name ="Afferent"):
 ###############################################################################
 
 ###############################################################################
-pg= new_pg(name='Orientation Preference',category="Preference Maps",
+pg= create_plotgroup(name='Orientation Preference',category="Preference Maps",
              doc='Measure preference for sine grating orientation.',
              update_command='measure_or_pref()')
 pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
@@ -591,7 +591,7 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
 ###############################################################################
-pg= new_pg(name='Ocular Preference',category="Preference Maps",
+pg= create_plotgroup(name='Ocular Preference',category="Preference Maps",
              doc='Measure preference for sine gratings between two eyes.',
              update_command='measure_od_pref()')
 pg.add_plot('Ocular Preference',[('Strength','OcularPreference')])
@@ -638,7 +638,7 @@ def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
   
 
 ###############################################################################
-pg= new_pg(name='Spatial Frequency Preference',category="Preference Maps",
+pg= create_plotgroup(name='Spatial Frequency Preference',category="Preference Maps",
              doc='Measure preference for sine grating frequency.',
              update_command='measure_sf_pref(frequencies=frange(1.0,6.0,0.2),num_phase=15,num_orientation=4)')
 pg.add_plot('Spatial Frequency Preference',[('Strength','FrequencyPreference')])
@@ -684,7 +684,7 @@ def measure_sf_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
 
 ###############################################################################
-pg= new_pg(name='PhaseDisparity Preference',category="Preference Maps",
+pg= create_plotgroup(name='PhaseDisparity Preference',category="Preference Maps",
              doc='Measure preference for sine gratings differing in phase between two sheets.',
              update_command='measure_phasedisparity()')
 pg.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
@@ -731,7 +731,7 @@ def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequ
 
 
 ###############################################################################
-new_pg(template_plot_type="curve",name='Orientation Tuning Fullfield',category="Tuning Curves",doc="""
+create_plotgroup(template_plot_type="curve",name='Orientation Tuning Fullfield',category="Tuning Curves",doc="""
             Plot orientation tuning curves for a specific unit, measured using full-field sine gratings.
             Although the data takes a long time to collect, once it is ready the plots
             are available immediately for any unit.""",
@@ -776,7 +776,7 @@ def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4
 	  
 
 ###############################################################################
-new_pg(template_plot_type="curve",name='Orientation Tuning',category="Tuning Curves",doc="""
+create_plotgroup(template_plot_type="curve",name='Orientation Tuning',category="Tuning Curves",doc="""
             Measure orientation tuning for a specific unit at different contrasts,
             using a pattern chosen to match the preferences of that unit.""",
         update_command='measure_or_tuning()',
@@ -837,7 +837,7 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
                
 
 ###############################################################################
-new_pg(template_plot_type="curve",name='Size Tuning',category="Tuning Curves",
+create_plotgroup(template_plot_type="curve",name='Size Tuning',category="Tuning Curves",
         doc='Measure the size preference for a specific unit.',
         update_command='measure_size_response()',
         plot_command='tuning_curve(x_axis="size",plot_type=pylab.plot,unit="Diameter of stimulus")',
@@ -914,7 +914,7 @@ def measure_size_response(num_phase=18,
 
 
 ###############################################################################
-new_pg(template_plot_type="curve",name='Contrast Response',category="Tuning Curves",
+create_plotgroup(template_plot_type="curve",name='Contrast Response',category="Tuning Curves",
         doc='Measure the contrast response function for a specific unit.',
         update_command='measure_contrast_response()',
         plot_command='tuning_curve(x_axis="contrast",plot_type=pylab.semilogx,unit="%")',

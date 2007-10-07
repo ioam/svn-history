@@ -286,10 +286,10 @@ def specify_whisker_deflections():
 ###############################################################################
 # Deflection preference map plotting, based on measure_or_pref in analysis.py
 
-from topo.plotting.plotgroup import new_pg
-pg= new_pg(name='Deflection Preference',category="Preference Maps",
-           doc='Measure preference for direction stimulus for a lagged model.',
-           update_command='measure_deflection_pref()')
+from topo.plotting.plotgroup import create_plotgroup
+pg= create_plotgroup(name='Deflection Preference',category="Preference Maps",
+                     doc='Measure preference for direction stimulus for a lagged model.',
+                     update_command='measure_deflection_pref()')
 pg.add_plot('Deflection Preference',[('Hue','DeflectionPreference')])
 pg.add_plot('Deflection Preference&Selectivity',[('Hue','DeflectionPreference'),
 						   ('Confidence','DeflectionSelectivity')])

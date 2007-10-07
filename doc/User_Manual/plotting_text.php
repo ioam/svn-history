@@ -218,9 +218,9 @@ plot.  As a reference, here is an implementation of Orientation
 Preference plots:
   
 <font size=-1><pre>
-1. pg= new_pg(name='Orientation Preference',category="Preference Maps",
-              doc='Measure preference for sine grating orientation.',
-2.            command='measure_or_pref()')
+1. pg= create_plotgroup(name='Orientation Preference',category="Preference Maps",
+                        doc='Measure preference for sine grating orientation.',
+2.                      command='measure_or_pref()')
 3. pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 4. pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
                                                      ('Confidence','OrientationSelectivity')])

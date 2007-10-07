@@ -391,8 +391,8 @@ class TemplatePlotGroup(SheetPlotGroup):
     OrientationSelectivity SheetViews.
 
 
-    The function new_pg provides a convenient way to define plots using
-    TemplatePlotGroups; search for new_pg elsewhere in the code to see
+    The function create_plotgroup provides a convenient way to define plots using
+    TemplatePlotGroups; search for create_plotgroup elsewhere in the code to see
     examples. 
     """
 
@@ -786,7 +786,7 @@ plotgroup_types = {'Connection Fields': ConnectionFieldsPlotGroup,
                    'Projection Activity': ProjectionActivityPlotGroup}
 
 
-def new_pg(template_plot_type='bitmap',**params):
+def create_plotgroup(template_plot_type='bitmap',**params):
     """
     Create a new PlotGroup and add it to the plotgroups list.
 
