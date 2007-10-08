@@ -85,7 +85,11 @@ Could eventually use STRFPAK or a similar approach.
 
 <H4>2006/03/26 (CB): scheduled_actions in lissom examples</H4>
 Insert missing actions in case someone tries higher densities.
-JAB 2007/04/25: Isn't this already done?
+JAB 2007/10/08: I checked lissom_oo_or.ty (but not any other
+.ty scripts!), and I count just as many actions of each type
+as there are in commands/or_defs in C++ lissom.  So I think that
+this note is obsolete, unless there are other .ty scripts to check
+or some other reason to think this task is not done.
 
 
 <H4>2007/10/08 (CB): test topographica-win</H4>
