@@ -42,6 +42,10 @@ such a release, the steps we generally follow are:
   Emacs, and checking in the result), and summarize major changes in it
   for the release notes.
 
+<li><P>Update the remaining work lists in
+  Future_Work/index_text.php and Future_Work/current_text.php to
+  reflect completed tasks and changes in priority.
+
 <li><P>Check in any modified files into CVS.
    
 <li><P>Save all open files from within any editor, and do a "make dist"
