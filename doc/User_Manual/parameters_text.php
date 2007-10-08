@@ -46,7 +46,7 @@ been declared as a <code>Number</code> Parameter with bounds
 '(0,None)' (i.e. a minimum value of 0.0, and no maximum value). 
 
 <P>To provide reasonable checking for parameters of different types, a large number of
-<A HREF="../Reference_Manual/topo.base.parameterclasses.html">other
+<A HREF="../Reference_Manual/topo.base.parameterclasses-module.html">other
 Parameter types</A> are provided besides
 <?php classref('topo.base.parameterclasses','Number')?>,
 such as

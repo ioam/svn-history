@@ -63,7 +63,7 @@ Topographica&gt; matrixplot(input_pattern())
 </center>
 
 <P>There are many other types of patterns available already defined in
-the <A HREF="../Reference_Manual/topo.patterns.html">
+the <A HREF="../Reference_Manual/topo.patterns-module.html">
 topo/patterns</A> directory, and adding new patterns is
 straightforward.  Just find one from that directory to use as a
 starting point, then copy it to a new file, modify it, and put the new
