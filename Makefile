@@ -223,8 +223,8 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} examples/laminar_oo_or.ty*
 #@@	   ${RM} examples/leaky_lissom_or.ty
 #@@	   ${RM} examples/lgn_lateral.ty*
+#@@	   ${RM} examples/lissom_fsa.ty
 #@@	   ${RM} examples/lissom_oo_od.ty
-#@@	   ${RM} examples/lissom_oo_or_dy.ty
 #@@	   ${RM} examples/lissom_oo_or_dy_photo.ty
 #@@	   ${RM} examples/lissom_oo_or_homeomaxent.ty
 #@@	   ${RM} examples/lissom_oo_or_noshrinking_adapthomeo.ty
