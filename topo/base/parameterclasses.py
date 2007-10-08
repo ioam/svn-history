@@ -11,8 +11,7 @@ import os.path
 import sys
 import types
 
-from parameterizedobject import Parameter, descendents
-
+from parameterizedobject import Parameter, descendents, ParameterizedObject
 
 # CEBALERT: much of the documentation for Parameter subclasses
 # that ought to be in the class docstring is in the __init__
@@ -51,7 +50,7 @@ def abs_app_path(path,search_paths=[]):
         if os.path.isfile(try_path): return try_path
         paths_tried.append(try_path)
 
-    raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following places: '+str(paths_tried)+'.')
+    raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following place(s): '+str(paths_tried)+'.')
 
 
 
@@ -73,6 +72,18 @@ class Filename(Parameter):
     def __init__(self,default=None,search_paths=[],**params):
         self.search_paths = search_paths
         super(Filename,self).__init__(default,**params)
+
+        
+    def __set__(self,obj,val):
+        """
+        Call Parameter's __set__, but warn if the file cannot be found.
+        """
+        try:
+            abs_app_path(val,self.search_paths)
+        except IOError, e:
+            ParameterizedObject(name="%s.%s"%(str(obj),self.attrib_name(obj))).warning('%s'%(e.args[0]))
+
+        super(Filename,self).__set__(obj,val)
         
     def __get__(self,obj,objtype):
         """
