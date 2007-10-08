@@ -13,6 +13,7 @@ __version__='$Revision$'
 # and then remove this file.
 
 import Tkinter
+import operator
 
 import Pmw
 import bwidget
