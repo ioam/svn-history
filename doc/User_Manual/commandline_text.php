@@ -106,8 +106,9 @@ Topographica&gt;
 <IMG src="images/matrixvectorplot.png" WIDTH="420" HEIGHT="473">
 </center>
 
-<P>You can also try replacing matrixplot with matrixplot3d to get a 3D
-wireframe plot:
+<P>
+<A NAME="3d-plotting">You can also try replacing matrixplot with
+matrixplot3d to get a 3D wireframe plot</A>:
 
 <pre>
 Topographica&gt; matrixplot3d(V1.activity)
@@ -153,7 +154,7 @@ href="http://matplotlib.sourceforge.net/">MatPlotLib</A> documentation
 for how to make new plots and change their axes, labels, titles, line
 styles, etc.
 
-<H2>Saving Topographica bitmaps</H2>
+<H2><A NAME="saving-bitmaps">Saving Topographica bitmaps</A></H2>
 
 A command save_plotgroup is provided to allow you to automate the
 process of generating and saving the various bitmap images visible in
@@ -245,7 +246,7 @@ CommandPrompt.format = CommandPrompt.ansi_format
 </pre>
 
 
-<H2>Controlling the GUI from scripts or the command line</H2>
+<H2><A NAME="scripting-gui">Controlling the GUI from scripts or the command line</A></H2>
 
 <P>The code for the Topographica GUI is kept strictly separate from
 the non-GUI code, so that Topographica simulations can be run
