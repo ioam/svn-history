@@ -59,12 +59,12 @@ bib2html:
 	${MAKE} -C shared/bib2html/
 
 clean:
-	${RM} .??*~ *~ */*~ */.??*~ reference-manual
-	${RM} Reference_Manual/*.html Reference_Manual/*.css Reference_Manual/*.png Reference_Manual/*.js
 
 # Not removed by default, for people who do not have PHP locally
 clean_php:
 	${RM} ${PHPHTML}
+	${RM} .??*~ *~ */*~ */.??*~ reference-manual
+	${RM} Reference_Manual/*.html Reference_Manual/*.css Reference_Manual/*.png Reference_Manual/*.js
 
 .PHONY: default all clean clean-php
 
