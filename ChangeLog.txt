@@ -1,3 +1,4055 @@
+2007-10-08  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.283: Updated task
+
+2007-10-08  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterclasses.py 1.83: Filename warns if filename
+	can't be found on __set__().
+
+2007-10-08  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/pylabplots.py 1.40: Clarified authorship
+
+2007-10-08  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.282: Added task.
+
+	* doc/Future_Work/current_text.php 1.281: Updates to my tasks.
+
+	* topo/tests/test_script.py 1.21: Use abs_app_path on filenames
+	(for running these commands on Windows).
+
+	* topo/tkgui/__init__.py 1.40: Fixed typos. (I thought this fix
+	had been committed weeks ago?).
+
+	* topo/tkgui/topowidgets.py 1.4: Added missing import.
+
+	* topo/tkgui/widgets.py 1.2: Fixed imports.
+
+	* topo/tkgui/topoconsole.py 1.228: Added missing import.
+
+	* Makefile 1.119: Added test of command prompt to basic-gui-tests.
+
+2007-10-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topowidgets.py 1.3: Minor cleanup to TkguiWindow.
+
+	* topo/base/parameterclasses.py 1.82: Remove Filename's
+	requirement that a path is valid on __set__().
+
+	* topo/tkgui/parametersframe.py 1.138: Update method name to match
+	change to tkparameterizedobject.
+
+	* topo/tkgui/tkparameterizedobject.py 1.105: Cleanup (mainly to
+	documentation, but also to order methods are written in the file,
+	and some _/__ changes) - should be no visible change.
+
+	* doc/User_Manual/plotting_text.php 1.6,
+	examples/lissom_whisker_barrels.ty 1.17, topo/commands/analysis.py
+	1.112, topo/plotting/plotgroup.py 1.199: Renamed new_pg() to
+	create_plotgroup().
+
+2007-10-06  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/utils.py 1.46, topo/tkgui/tkparameterizedobject.py
+	1.104: Moved inverse() from topo.tkgui.tkparameterizedobject to
+	topo.misc.utils.
+
+	* topo/tkgui/tkparameterizedobject.py 1.103: Improved looking up
+	key by value from a dictionary.
+
+	* doc/Future_Work/current_text.php 1.280,
+	topo/tkgui/tkparameterizedobject.py 1.102,
+	topo/base/parameterclasses.py 1.81: Cleaned up SelectorParameters.
+
+	* doc/Future_Work/current_text.php 1.279: Removed task.
+
+	* topo/commands/basic.py 1.69: Removed hack that's no longer
+	necessary (Filename parameter now returns the correct path
+	(i.e. the path corrected for platform and to be absolute) on
+	__get__()).
+
+	* topo/tkgui/topoconsole.py 1.227: Fixed previous commit so that
+	help menu items work if local documentation not already built.
+
+	* doc/Future_Work/current_text.php 1.278: Added a task.
+
+	* topo/tkgui/topoconsole.py 1.226: Cleanup: no visible changes.
+
+	* doc/Future_Work/current_text.php 1.277: Removed file path task.
+
+	* topo/base/parameterclasses.py 1.80: Cleanup to comment.
+
+	* topo/commands/analysis.py 1.111: Reverted to version 1.109 after
+	update to TemplatePlotGroup so that it handles any necessary
+	filepath correction.
+
+	* topo/plotting/plotgroup.py 1.198,
+	topo/tkgui/tkparameterizedobject.py 1.101,
+	topo/tkgui/topoconsole.py 1.225, topo/tkgui/topowidgets.py 1.2:
+	Use abs_app_path.
+
+	* topo/misc/commandline.py 1.34: Minor syntax adjustment.
+
+	* topo/base/parameterclasses.py 1.79: Added abs_app_path(), which
+	used to be __construct_path() in Filename parameter. Filename
+	parameter now uses abs_app_path(). Change to Filename parameter is
+	that it now produces the correct path on __get__(), allowing
+	parameters where the paths were created on Windows to be
+	transferred to linux (in a snapshot). This means calling
+	abs_app_path() more often (every __get__()) instead of just on
+	__set__().
+
+2007-10-05  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/sheets/saccade.py 1.6: Fixed some problems with fixation
+	jitter in ShiftingGeneratorSheet.
+
+	* topo/misc/commandline.py 1.33: Caught exceptions in startup
+	files, so topographica will still start.
+
+	* topo/commands/analysis.py 1.110: Fixed relative paths problem.
+
+2007-10-05  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topowidgets.py 1.1, topo/tkgui/widgets.py 1.1,
+	topo/tests/testplotgrouppanel.py 1.15,
+	topo/tkgui/tkparameterizedobject.py 1.100,
+	topo/tkgui/topoconsole.py 1.224, topo/tkgui/editorobjects.py 1.56,
+	topo/tkgui/editorwindow.py 1.50, topo/tkgui/parametersframe.py
+	1.137, topo/tkgui/plotgrouppanel.py 1.231,
+	topo/tkgui/templateplotgrouppanel.py 1.90,
+	topo/tkgui/tkguiwindow.py 1.28: Some reorganization of tkgui
+	classes; should be no visible changes.
+
+2007-10-05  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.197: Clarified docstring
+
+2007-10-05  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.230: Started to move things into
+	more appropriate classes in the PlotGroupPanel hierarchy.
+
+	* topo/tkgui/projectionpanel.py 1.134: Don't display dynamic info
+	for connection fields plot (dynamic info not yet setup to handle
+	projection plots). Removed separate alerts about the same thing:
+	see task in current task list.
+
+	* topo/tkgui/plotgrouppanel.py 1.229: Added to window_master hack
+	(it will all be removed eventually).
+
+	* topo/tests/testplotgrouppanel.py 1.14: Started to implement
+	tests for the new panel classes.
+
+	* doc/Future_Work/current_text.php 1.276: Updated dynamic info
+	task (probably will not implement dynamic info for projection
+	panels until after 0.9.4.
+
+2007-10-04  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/plotting_text.php 1.5: Updated now that
+	plotgroup_templates has disappeared; still needs checking
+
+	* topo/tkgui/templateplotgrouppanel.py 1.89,
+	topo/commands/analysis.py 1.109, topo/tkgui/plotgrouppanel.py
+	1.228, topo/plotting/plotgroup.py 1.196: Moved auto_refresh
+	parameter up to the PlotGroup level to allow it to be specified
+	individually per PlotGroup type
+
+2007-10-04  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.275,
+	topo/plotting/plotgroup.py 1.195: Fixed mistake in
+	ProjectionActivityPlotGroup (introduced at some point during
+	earlier cleanup).
+
+	* doc/Future_Work/current_text.php 1.274: Added a task.
+
+	* topo/base/parameterizedobject.py 1.82: Minor corrections to
+	docstring text.
+
+2007-10-03  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/commandline_text.php 1.21: Minor fix to example,
+	to use Numeric instead of numpy
+
+	* doc/User_Manual/commandline_text.php 1.20,
+	topo/commands/pylabplots.py 1.39: Minor updates to text
+
+	* topo/commands/pylabplots.py 1.38: Added workaround to allow
+	empty bitmap plots
+
+	* topo/commands/pylabplots.py 1.37: Enabled color bars by default
+	for matrixplot
+
+	* topo/tkgui/templateplotgrouppanel.py 1.88: Added 3D wireframe
+	plots to right-click menu
+
+	* doc/Reference_Manual/index_text.php 1.26,
+	doc/User_Manual/commandline_text.php 1.19,
+	doc/User_Manual/images/matrixplot3d_matplotlib.png 1.1,
+	topo/commands/pylabplots.py 1.36: Reimplemented matrixplot3d using
+	undocumented matplotlib calls; gnuplot implementation moved to
+	matrixplot3d_gnuplot
+
+	* topo/tkgui/templateplotgrouppanel.py 1.87: Removed duplication
+	in right-click menu implementation
+
+2007-10-03  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.99: Only add text if
+	there's no image (otherwise text and image could appear on some
+	platforms).
+
+	* doc/Future_Work/current_text.php 1.272: Updated my task
+	organization.
+
+	* topo/plotting/plotgroup.py 1.194: Indicated tasks to complete
+	for 0.9.4.
+
+	* topo/tkgui/projectionpanel.py 1.133: Removed stray comment.
+
+	* topo/plotting/plotgroup.py 1.193: Collected some of the general
+	ALERTs together.
+
+	* examples/hierarchical.ty 1.70: Minor cleanup, and added
+	commented-out code for a new projection that's not a CFProjection.
+
+	* topo/tkgui/projectionpanel.py 1.132: Added missing super() call
+	(projection panel was not updating when changing sheet).
+
+	* topo/plotting/plotgroup.py 1.192, topo/plotting/templates.py
+	1.75: More cleanup of TemplatePlotGroup, including moving in
+	slightly modified documentation from templates.py.
+
+	* topo/tkgui/__init__.py 1.39: Added note to myself.
+
+	* doc/User_Manual/space_text.php 1.7: Minor correction to text.
+
+	* doc/Future_Work/current_text.php 1.271: Updates to my tasks.
+
+	* doc/Developer_Manual/gui_text.php 1.3: Began adding section
+	about programming with tkgui.
+
+2007-10-02  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* external/.cvsignore 1.31: More to ignore
+
+	* doc/Reference_Manual/index_text.php 1.25,
+	doc/User_Manual/commandline_text.php 1.18: Added mention of
+	matrixplot3d
+
+	* doc/User_Manual/images/matrixplot3d.png 1.1: Added example 3D
+	plot
+
+	* topo/commands/pylabplots.py 1.35: Added note
+
+	* topo/commands/pylabplots.py 1.34: Added matrixplot3d command
+
+	* external/gnuplot-py-1.7.tar.gz 1.1: Version 1.7 from
+	gnuplot-py.sourceforge.net
+
+	* external/Makefile 1.79: Reverted to version 1.77; discovered
+	workaround for gnuplot-py
+
+	* external/Makefile 1.78: Reverted to version 1.76; gnuplot-py too
+	buggy to use (converts 2D arrays to integers before plotting)
+
+2007-10-02  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.223: Changed ProgressWindow's
+	'Remaining /s' to 'Remaining time'.
+
+	* topo/commands/analysis.py 1.108, topo/plotting/plotgroup.py
+	1.191, topo/tkgui/topoconsole.py 1.222: template_plot_type is not
+	a Parameter of TemplatePlotGroup (but is an argument ofnew_pg() ).
+
+	* topo/tkgui/featurecurvepanel.py 1.28,
+	topo/tkgui/plotgrouppanel.py 1.227, topo/tkgui/projectionpanel.py
+	1.131, topo/tkgui/testpattern.py 1.95,
+	topo/base/parameterclasses.py 1.78,
+	topo/tests/testparametersframe.py 1.7,
+	topo/tests/testtkparameterizedobject.py 1.23: Renamed
+	ObjectSelectorParameter's 'Arange' attribute to 'objects'. (Also
+	added checking that the value is within the range.)
+
+2007-10-02  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* external/Makefile 1.77: Added optional gnuplot-py
+
+2007-10-01  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterclasses.py 1.77: Began cleanup of
+	SelectorParameters. Should be no effect on code currently using
+	SelectorParameters (ClassSelectorParameter now checks its default
+	value).
+
+	* topo/tkgui/parametersframe.py 1.136, topo/tkgui/tkguiwindow.py
+	1.27, topo/tkgui/tkparameterizedobject.py 1.98,
+	topo/tkgui/topoconsole.py 1.221: Updates to documentation.
+
+	* topo/tkgui/plotgrouppanel.py 1.226: Cleanup (should be no
+	visible change).
+
+	* topo/tkgui/testpattern.py 1.94, topo/tkgui/topoconsole.py 1.220,
+	topo/tkgui/templateplotgrouppanel.py 1.86,
+	topo/tkgui/featurecurvepanel.py 1.27, topo/tkgui/plotgrouppanel.py
+	1.225, topo/tkgui/projectionpanel.py 1.130: Cleanup of
+	PlotGroupPanel: require a plotgroup to be specified; simplified
+	generate_plotgroup() and renamed to setup_plotgroup().
+
+	* topo/tkgui/plotgrouppanel.py 1.224: Some cleanup of code
+	formatting.
+
+	* topo/base/simulation.py 1.94: Really minor cleanup of SomeTimer.
+
+	* doc/Future_Work/current_text.php 1.270: Updates to my tasks.
+
+	* topo/tkgui/tkguiwindow.py 1.26: Removed print statement
+	accidentally left behind.
+
+	* topo/tkgui/tkguiwindow.py 1.25: Hack to get the size for
+	scrollbars, since the current calculation works on Windows but not
+	linux.
+
+	* topo/tkgui/tkguiwindow.py 1.24: Scrolled frame's relief returned
+	to flat.
+
+	* topo/tkgui/__init__.py 1.38: Added note for myself.
+
+	* doc/Future_Work/current_text.php 1.269: Updated my tasks + minor
+	formatting change to icons task.
+
+	* topo/tkgui/topoconsole.py 1.219: Closing ProgressWindow same as
+	clicking stop.
+
+	* topo/tkgui/tkguiwindow.py 1.23, topo/tkgui/topoconsole.py 1.218,
+	topo/tkgui/projectionpanel.py 1.129,
+	topo/tkgui/featurecurvepanel.py 1.26, topo/tkgui/plotgrouppanel.py
+	1.223: ResizableScrollableFrame moved from plotgrouppanel.py to
+	tkguiwindow.py. Rather than scrolling only plot frames, whole
+	windows now have scrollbars.
+
+2007-09-29  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.217: Added more info to console when
+	progress completed.
+
+	* topo/base/simulation.py 1.93: Fixed error in previous checkin.
+
+	* topo/base/simulation.py 1.92: Simplified timer object (now only
+	one method for passing out timing information).
+
+	* topo/analysis/featureresponses.py 1.38: Open a progress window
+	for map measurement if there's a gui.
+
+	* topo/tkgui/topoconsole.py 1.216: Progress reporting all handled
+	in progress window. ProgressWindow supports any specified timer.
+
+	* topo/commands/basic.py 1.68: Removed hack that's no longer
+	necessary.
+
+	* topo/tkgui/topoconsole.py 1.215: Moved progress window code into
+	a new class. Try out Stop button on the progress window rather
+	than on the console.
+
+	* topo/base/simulation.py 1.91: Added timing message for
+	interruption.
+
+	* doc/Future_Work/current_text.php 1.268: Fixed errors when asking
+	for CFs of a sheet that doesn't have any, but still need a more
+	general solution. This task is now less urgent (moved to after
+	0.9.4 release).
+
+	* topo/tkgui/plotgrouppanel.py 1.222: Just warn if a connection
+	fields plot is requested for a sheet that doesn't have connection
+	fields. (Also removed outdated part of a comment.)
+
+	* topo/plotting/plotgroup.py 1.190: Changed wrong sheet type/wrong
+	projection type assertion errors to TypeErrors.
+
+	* topo/tkgui/templateplotgrouppanel.py 1.85: Removed outdated
+	ALERT.
+
+	* doc/Future_Work/current_text.php 1.267: Removed gui option menu
+	sorting task.
+
+	* topo/tkgui/testpattern.py 1.93: Removed commented-out
+	code. Minor change to code formatting.
+
+	* topo/tkgui/featurecurvepanel.py 1.25,
+	topo/tkgui/projectionpanel.py 1.128,
+	topo/tkgui/tkparameterizedobject.py 1.97: Added sorting options to
+	widget_options (for SelectorParameters).
+
+2007-09-28  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/Makefile 1.26: Fixed obermayer duration; added goodhill
+	target
+
+	* examples/goodhill_network90.ty 1.19: Updated now that
+	plotgroup_templates has been eliminated
+
+2007-09-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.266: Removed some tasks that
+	have already been finished.
+
+2007-09-27  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.265: Prioritized tkgui tasks
+
+	* doc/Future_Work/current_text.php 1.264: Prioritized tasks for
+	upcoming release
+
+2007-09-26  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.189: Fixed static images (like
+	color keys); had been broken since switch away from plot templates
+
+	* external/Makefile 1.76: Minor fix to bluesphere
+
+2007-09-25  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/buildbot/master.cfg 1.3: Add sake (ppc_darwin8.10.0) +
+	change to externally available port + cleanup.
+
+	* doc/buildbot/doozy-buildbot.tac 1.1: Initial version of doozy's
+	buildslave configuration.
+
+	* topo/tkgui/__init__.py 1.37, topo/tkgui/tkparameterizedobject.py
+	1.96: Hack to set topo.entry_background with the appropriate color
+	depending on the system.
+
+	* topo/tkgui/testpattern.py 1.92: Removed PlotGroupTemplate.
+
+	* topo/tkgui/tkparameterizedobject.py 1.95: Set Button relief to
+	FLAT when it's displaying and image.
+
+	* topo/tkgui/tkparameterizedobject.py 1.94: Corrected mistake in
+	previous commit.
+
+	* topo/tkgui/tkparameterizedobject.py 1.93: Added temporary fix
+	for systems where there are no button images.
+
+2007-09-24  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.263: Updated the icons task
+
+	* topo/tkgui/featurecurvepanel.py 1.24,
+	topo/tkgui/plotgrouppanel.py 1.221: Updated comments about the
+	Refresh button
+
+	* external/.cvsignore 1.30: More to ignore
+
+	* topo/tkgui/icons/redo-small.png 1.1,
+	topo/tkgui/icons/viewmag+_2.2.png 1.1,
+	topo/tkgui/icons/viewmag-_2.1.png 1.1,
+	topo/tkgui/icons/back-2.0.png 1.1,
+	topo/tkgui/icons/forward-2.0.png 1.1: 20x20 versions created by
+	make -C external bluesphere; edit external/BlueSphere*_Makefile
+	and rerun to change the size or choice of icons
+
+	* topo/tkgui/plotgrouppanel.py 1.220: Changed PlotGroupPanel to
+	use icons for common buttons
+
+	* external/BlueSphere-SVG-snapshot-Nov-29-2002.tar.gz 1.1,
+	external/BlueSphere-SVG-snapshot-Nov-29-2002_Makefile 1.1,
+	external/Makefile 1.75: Added bluesphere icons for use with the Tk
+	GUI
+
+	* topo/tkgui/topo.xbm 1.2, topo/tkgui/topo.xpm 1.2,
+	topo/tkgui/icons/topo.xbm 1.1, topo/tkgui/icons/topo.xpm 1.1,
+	topo/tkgui/tkguiwindow.py 1.22: Moved topo.xbm and topo.xpm into
+	an icons/ subdirectory
+
+2007-09-24  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/__init__.py 1.9, topo/tests/testplotgroup.py 1.29:
+	Removed PlotGroupTemplate.
+
+	* topo/tkgui/templateplotgrouppanel.py 1.84: Removed
+	PlotGroupTemplate. Fixed strength-only button (ugly, but it seems
+	to work...).
+
+	* examples/lissom_whisker_barrels.ty 1.16,
+	topo/tkgui/topoconsole.py 1.214: Removed PlotGroupTemplate.
+
+	* topo/tkgui/projectionpanel.py 1.127: (Multiple changes) (1)
+	Removed PlotGroupTemplate. (2) Removed CFPGPanel; situate button
+	code copied into classes that need it.
+
+	* topo/tkgui/featurecurvepanel.py 1.23,
+	topo/tkgui/plotgrouppanel.py 1.219: Removed PlotGroupTemplate.
+
+	* topo/plotting/templates.py 1.74: Commented out all
+	code. Features moved to TemplatePlotGroup (but need to adapt
+	documentation).
+
+	* topo/plotting/plotgroup.py 1.188: (Multiple changes) (1) Some
+	tidying of PlotGroup classes (removed some code duplication, began
+	to modify to the hierarchy of classes). (2) Removed
+	PlotGroupTemplate: TemplatePlotGroup gets PlotGroupTemplate's
+	Parameters and methods, with minor modifications.
+
+	* topo/plotting/plotfilesaver.py 1.51: Removed PlotGroupTemplate.
+
+	* topo/commands/analysis.py 1.107: Removed PlotGroupTemplate:
+	new_pgt() is replaced with new_pg().
+
+2007-09-23  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.92: Removed worst part of
+	Entry background hack: Tkinter has 'systemWindowBody' background
+	color.
+
+	* topo/tkgui/__init__.py 1.36, topo/tkgui/tkparameterizedobject.py
+	1.91: Moved entry background color hack back to
+	tkparameterizedobject from __init__. Now the tests pass ok. There
+	is a mysterious import problem somewhere in tkgui (as noted in
+	tkguiwindow.py).
+
+2007-09-22  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/modeleditor_text.php 1.6: Updated some text in
+	ParametersFrame section.
+
+	* doc/User_Manual/commandline_text.php 1.17: Added example of
+	edit_parameters().
+
+	* doc/User_Manual/modeleditor_text.php 1.5: Corrected anchor.
+
+	* topo/tkgui/tkparameterizedobject.py 1.90: Updated comments
+	related to ButtonParameter image size: presuming different units
+	for the button size depending on whether it's showing text or an
+	image is a Tkinter feature.
+
+	* topo/tkgui/tkparameterizedobject.py 1.89: Change ButtonParameter
+	to use size rather than image_size. Sizing of ButtonParameters is
+	not quite finished yet.
+
+	* topo/tkgui/tkparameterizedobject.py 1.88: Added image support to
+	ButtonParameter.
+
+	* topo/tkgui/__init__.py 1.35, topo/tkgui/tkparameterizedobject.py
+	1.87: Made the entry highlighting hack at least blend in with the
+	background color.
+
+	* topo/tkgui/parametersframe.py 1.135: Fixed bug where an old
+	method name was not being overidden in a subclass. Need to update
+	all these old names in callers, once the names are cleaned up.
+	Removed some commented-out code.
+
+	* topo/base/parameterizedobject.py 1.81: When instantiating a
+	Parameter, if that Parameter is a PO, make it uninitialized while
+	a new name is set.
+
+	* topo/base/simulation.py 1.90: Made EventProcessor's name be
+	constant.
+
+	* topo/tests/testparametersframe.py 1.6: Updates to match name
+	changes in ParametersFrame.
+
+	* topo/tkgui/parametersframe.py 1.134: Cleanup of some names.
+
+	* topo/tkgui/tkparameterizedobject.py 1.86: (Multiple changes.)
+	(1) Fixed bug (line 1087) where, on opening the model editor or
+	test pattern window, there was an error about attempting to set a
+	CallableParameter to a string. (2) Added get_source_po() method to
+	allow simplification of several others. (3) Returned repr to the
+	previous simple version, since the new one still does not work
+	properly.
+
+2007-09-21  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/testpattern.py 1.91: Hide the Refresh button, since
+	it's extremely unlikely anyone will be editing the
+	PatternGenerator on the commandline.
+
+	* topo/tkgui/parametersframe.py 1.133: Corrected mistake with
+	set_PO() method present in LiveParametersFrame and
+	ParametersFrame.
+
+	* topo/base/parameterclasses.py 1.76: Added a basic repr method to
+	InstanceMethodWrapper.
+
+	* doc/User_Manual/commandline_text.php 1.16: Minor update to text.
+
+	* topo/tkgui/tkparameterizedobject.py 1.85: Cleaned up
+	ButtonParameter handling. Now the command of a button of x named
+	'Button' can be invoked as x.Button(). Made a reasonable (but not
+	perfect) repr method. hide_param() and unhide_param() just do
+	nothing if the parameter is already hidden or already displayed,
+	respectively.
+
+	* topo/tkgui/parametersframe.py 1.132: Minor cleanup.
+
+	* topo/tkgui/parametersframe.py 1.131: Added some links discussing
+	button order.
+
+	* topo/tkgui/parametersframe.py 1.130: Clean up of Apply, Refresh,
+	Close, and Defaults buttons.
+
+	* topo/tkgui/topoconsole.py 1.213: Added a note.
+
+	* topo/tkgui/testpattern.py 1.90: Defaults button now works in
+	test pattern, so enable it.
+
+	* topo/tkgui/parametersframe.py 1.129: Updated to use
+	ParameterizedObject's defaults() method when Defaults button is
+	pressed.
+
+	* topo/tests/testparametersframe.py 1.5: Added note.
+
+	* topo/base/parameterizedobject.py 1.80: Replaced reset_params()
+	with defaults(), which returns default values for non-constant
+	parameters.
+
+2007-09-18  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/projectionpanel.py 1.126: This change got the
+	projections panel to stop raising exceptions when encountering
+	non-CF Projections, but it still doesn't really work right.
+
+	* topo/sheets/saccade.py 1.5: Added support for eye jitter in
+	ShiftingGeneratorSheet
+
+2007-09-18  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.84: Fix error: was not
+	storing objects for ClassSelectorParameter. (Still needs cleaning
+	up.)
+
+	* topo/tests/testparametersframe.py 1.4: Added another test.
+
+	* topo/tkgui/tkparameterizedobject.py 1.83: Fixed mistake causing
+	test failure in testparametersframe: was converting to string
+	twice.
+
+	* topo/tkgui/tkparameterizedobject.py 1.82: Minor reorganization.
+
+	* topo/tkgui/tkparameterizedobject.py 1.81: More cleanup: should
+	be no visible change.
+
+	* topo/tkgui/tkparameterizedobject.py 1.80: Cleanup: should be no
+	visible change.
+
+	* topo/tkgui/tkparameterizedobject.py 1.79: Cleanup - should be no
+	visible change.
+
+	* topo/tkgui/tkparameterizedobject.py 1.78: Minor cleanup: should
+	be no visible change.
+
+	* topo/tkgui/parametersframe.py 1.128: Added apply_button()
+	method.
+
+2007-09-17  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/traces.py 1.3: Miscellaneous minor improvements.
+
+	* topo/misc/commandline.py 1.32: Minor change to support using
+	IDLE in Topographica. --still doesn't work that great, though.
+
+2007-09-16  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testparametersframe.py 1.3: Added new test to expose
+	bug. Renamed the other test method.
+
+	* topo/tkgui/tkparameterizedobject.py 1.77: Added notes. Test for
+	guimain (hack).
+
+	* topo/tests/testparametersframe.py 1.2: Added test.
+
+	* topo/tkgui/tkguiwindow.py 1.21: Added get() method to
+	taggedslider (to match other widgets).
+
+	* topo/tests/testparametersframe.py 1.1: Initial version.
+
+	* Makefile 1.118: Added gui test: that connection fields window
+	opens with x and y as specified (i.e. test that right click
+	opening of connection fields window is working).
+
+	* topo/tkgui/topoconsole.py 1.212: Switched run_for_var to
+	DoubleVar. Get 'run for' value from variable rather than widget.
+
+	* topo/tkgui/tkparameterizedobject.py 1.76: Multiple improvements
+	to behavior. Entry-style widgets do not instantly apply their
+	changes (waiting instead until <Return> or equivalent). Corrected
+	already noted instance of not using
+	object2string_ifrequired(). Added highlighting of entry boxes with
+	errors (experimental, unfinished). Fixed bug where only text
+	widgets were being disabled for constant parameters.
+
+	* topo/tkgui/tkguiwindow.py 1.20: Improved TaggedSlider: removed a
+	variable and its trace, and made it generate events for use by
+	callers. Added TkPOTaggedSlider(TaggedSlider) for
+	TkParameterizedObject-specific features.
+
+	* topo/tkgui/projectionpanel.py 1.125: Added missing method call.
+
+	* topo/tests/testtkparameterizedobject.py 1.22: Added more tests
+	to simulate use in the GUI.
+
+2007-09-16  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Links/index_text.php 1.11: Added info on Emergent
+
+2007-09-15  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/utils.py 1.45: Added minor alert
+
+	* doc/Downloads/index_text.php 1.51: Listed more packages that may
+	be needed
+
+2007-09-15  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkguiwindow.py 1.19: TaggedSlider: handle background
+	and foreground options; don't try to set the slider from a
+	non-numeric value.
+
+	* topo/tkgui/__init__.py 1.34: Added another reference.
+
+	* topo/tkgui/__init__.py 1.33: Read options_database from
+	topo/tkgui/options_database.
+
+	* topo/tkgui/__init__.py 1.32: Added test support for reading
+	option_database file (for setting fonts etc).
+
+2007-09-14  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testtkparameterizedobject.py 1.21: Commented out code
+	that conditionally starts tkgui - still causes problems with other
+	tests.
+
+	* topo/tests/testtkparameterizedobject.py 1.20: Start()s tkgui if
+	console not already present. Added more tests. The tests in
+	TestParameterTypeRepresentations define how we expect the widgets
+	to behave; they simulate user input to the widgets.
+
+2007-09-12  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/cvs_text.php 1.16: Added tetex dependency
+
+2007-09-12  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.117: make tests returns an error code equal to the
+	number of errors plus the number of failures.
+
+	* topo/tests/testtkparameterizedobject.py 1.19: Cleaned up and
+	added more tests (one of which fails because there is currently an
+	error in TkParameterizedObject).
+
+	* topo/tests/testtkparameterizedobject.py 1.18: Corrected comment;
+	removed ERRORALERT.
+
+	* topo/tests/testtkparameterizedobject.py 1.17: Commented out line
+	that start()s tkgui and added ERRORALERT. (This test fails now.)
+
+	* topo/tests/testtkparameterizedobject.py 1.16: Explicitly start()
+	tkgui for these tests.
+
+	* topo/tests/testtkparameterizedobject.py 1.15: Updated method
+	names.
+
+2007-09-12  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/index_text.php 1.50: Minor rewriting
+
+2007-09-10  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/index_text.php 1.49: Added info about packages
+	needed to get docs to compile
+
+	* doc/User_Manual/images/Makefile 1.4: Added cleanup of generated
+	PDF and PNG files, in case of errors
+
+2007-09-08  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.75: Really minor cleanup.
+
+2007-09-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.127: Added edit_parameters()
+	function to allow inspection (and editing) of ParameterizedObjects
+	at the commandline (and elsewhere).
+
+	* topo/tkgui/parametersframe.py 1.126,
+	topo/tkgui/tkparameterizedobject.py 1.74: Adjusted leading doc
+	line for reference manual.
+
+	* topo/tkgui/tkparameterizedobject.py 1.73: Added an introduction.
+
+	* topo/tkgui/parametersframe.py 1.125, topo/tkgui/testpattern.py
+	1.89, topo/tkgui/tkparameterizedobject.py 1.72:
+	TkParameterizedObject/ParametersFrame cleanup.
+
+	* topo/tkgui/__init__.py 1.31: Added note.
+
+2007-09-06  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.218,
+	topo/tkgui/templateplotgrouppanel.py 1.83,
+	topo/tkgui/testpattern.py 1.88: Renamed XPGPanel to SheetPGPanel.
+
+	* topo/tkgui/parametersframe.py 1.124, topo/tkgui/testpattern.py
+	1.87: Renamed XParametersFrame to LiveParametersFrame.
+
+	* doc/Downloads/cvs_text.php 1.15: Added ALERT about packages
+	missing from the instructions for building the docs on OS X.
+
+	* doc/Developer_Manual/testing_text.php 1.5: Updated buildbot note
+	now we have an OSX buildslave.
+
+	* external/Makefile_OSX.diff 1.1: Initial version.
+
+	* doc/Future_Work/current_text.php 1.262: Added some references.
+
+	* doc/Future_Work/current_text.php 1.261: Minor revision to text.
+
+	* topo/tkgui/__init__.py 1.30: Slight cleanup to Tile stuff.
+
+	* doc/Future_Work/current_text.php 1.260: Updated Tile task.
+
+	* doc/Downloads/cvs_text.php 1.14: Updated Mac OS X instructions
+	based on building topographica on sake.csres.utexas.edu on
+	2007/09/05.
+
+	* doc/Downloads/cvs_text.php 1.13: Changed OS X instructions: just
+	get cvs, not cvsup+libraries.
+
+	* topo/base/simulation.py 1.89: Changed delay to be a Number.
+
+	* topo/base/parameterclasses.py 1.75: Changed is_number function
+	to be operator.isNumberType.
+
+2007-09-05  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/traces.py 1.2: Updated comments, docstrings, and
+	whitespace
+
+	* doc/Developer_Manual/coding_text.php 1.4: Added note about
+	whitespace convention
+
+2007-09-05  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.71: More cleanup; should
+	be no visible change.
+
+2007-09-05  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/traces.py 1.1: Added traces module for recording
+	timeseries data.
+
+2007-09-05  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.70: Removed unnecessary
+	class attributes.
+
+	* topo/tkgui/tkparameterizedobject.py 1.69: Fixed an ALERT.
+
+	* topo/tkgui/__init__.py 1.29: Pasted in code for using Tile from
+	an old copy of Topographica (here for reference).
+
+	* doc/Downloads/cvs_text.php 1.12: Updates to mac instructions
+	(comments plus removed gcc_select instruction).
+
+	* examples/lissom_or.ty 1.124: Removed unused import.
+
+	* topo/tkgui/parametersframe.py 1.123: Added ERRORALERT.
+
+	* examples/lissom_oo_or.ty 1.93: Removed unused import.
+
+	* doc/Future_Work/current_text.php 1.259: Updates to tkgui task.
+
+	* Makefile 1.116: Added ALERT.
+
+	* topo/tkgui/plotgrouppanel.py 1.217, topo/tkgui/topoconsole.py
+	1.211: Always use bwidget.
+
+	* external/Makefile 1.74: bwidget is part of the default target.
+
+	* topo/tkgui/topoconsole.py 1.210: Minor comment.
+
+2007-09-04  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.115: Combined gui tests into one command (because
+	buildbot only seems to run the first; for make-slow-tests, it runs
+	lots of separate topographica instances...is the problem the gui
+	quit?).
+
+	* doc/buildbot/master.cfg 1.2: Added basic-gui-tests. Updated
+	URL. (Also messed up some of the comments, but they still say the
+	same things.)
+
+	* Makefile 1.114: Removed more-gui-tests: just run those tests as
+	part of basic-gui-tests.
+
+	* Makefile 1.113: Added some more gui tests.
+
+	* topo/tkgui/topoconsole.py 1.209: Return the ModelEditor object
+	from the open method.
+
+	* topo/tkgui/parametersframe.py 1.122: Fixed ParametersFrame bug:
+	return statement was missing.
+
+2007-09-04  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testsimulation.py 1.12: Added a test to
+	TestSimulation.test_event_cmp.
+
+	* topo/tests/testsimulation.py 1.11: Added test to catch
+	duplication of events in Simulation.event_queue.
+
+	* topo/base/simulation.py 1.88: Fixed bug in event queueing.
+	Should fix 'make slow-tests' failures.
+
+2007-09-04  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.68: Began cleanup of
+	documentation. (Plus some minor tidying of code: should be no
+	visible change.)
+
+2007-09-03  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.106: Fixed offset for single-lag
+	case
+
+	* examples/lissom_whisker_barrels.ty 1.15: Updated comment
+
+	* examples/whiskers/README.txt 1.2: Added info from Stuart
+
+	* examples/whiskers/whiskerbot_frame.m 1.1: Final MSc version from
+	Stuart
+
+	* examples/whiskers/CoG_matrix_nf.m 1.2: Removed unused file
+
+2007-09-03  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.258: More in tkgui task.
+
+	* doc/Future_Work/current_text.php 1.257: Updated tkgui task.
+
+2007-09-03  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/projectionpanel.py 1.124: Removed outdated alert
+
+	* topo/tkgui/templateplotgrouppanel.py 1.82: Fixed typo in comment
+
+	* topo/tkgui/plotgrouppanel.py 1.216: Allowed sheet_coords and
+	integer_scaling in plot history
+
+	* topo/tkgui/__init__.py 1.28: Fixed typo
+
+	* doc/User_Manual/commandline_text.php 1.15: Added instructions
+	for turning off parameter pretty printing
+
+	* examples/lissom_whisker_barrels.ty 1.14,
+	topo/coordmapperfns/basic.py 1.14: Moved Grid into coordmapperfns/
+
+	* examples/lissom_whisker_barrels.ty 1.13: Generalized Grid
+	(formerly called XYModulo and XYGrid) to be suitable for general
+	mapping use
+
+	* topo/base/functionfamilies.py 1.19: Fixed minor error in
+	docstring
+
+	* examples/tiny.ty 1.30: Added command-line control over
+	default_density
+
+	* examples/lissom_whisker_barrels.ty 1.12: Cleaned up
+	documentation, comments, some class names, parameter types, unused
+	parameters, etc.
+
+	* topo/sheets/generatorsheet.py 1.56: Added alert
+
+	* topo/tkgui/topoconsole.py 1.208: Added initial value for
+	snapshot names
+
+	* examples/lissom_whisker_barrels.ty 1.11: Fixed apparent bug in
+	learning rates for afferent connections when num_lags>1
+
+	* topo/commands/analysis.py 1.105,
+	examples/lissom_whisker_barrels.ty 1.10: Removed hardcoded
+	limitation on number of lags
+
+	* examples/lissom_whisker_barrels_temporal.ty 1.3: Obsolete; just
+	call lissom_whisker_barrels.ty with the '-c num_lags=4 option
+	instead
+
+	* examples/lissom_whisker_barrels.ty 1.9: Generalized to cover
+	either the temporal or regular case from a single .ty file
+
+	* examples/lissom_whisker_barrels.ty 1.8: Changed to use
+	arrow-based color key instead
+
+	* examples/whiskers/dfl_key_white_vert.png 1.1: Initial version;
+	rotated and flipped copy of dir_key_white_vert.png
+
+	* examples/lissom_whisker_barrels.ty 1.7: Made
+	specify_whisker_deflections() avoid declaring a measurement time,
+	because the results are always the same, and to avoid staleness
+	warnings.  It's now enabled by default.
+
+2007-09-02  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.256: Added to task.
+
+	* doc/Future_Work/current_text.php 1.255: Updates to tasks.
+
+	* topo/tkgui/projectionpanel.py 1.123: Removed outdated
+	ERRORALERT.
+
+	* topo/tkgui/plotgrouppanel.py 1.215: Removed outdated HACKALERTs;
+	added ALERT about moving out ResizableScrollableFrame.
+
+	* topo/tkgui/plotgrouppanel.py 1.214: Added ALERT.
+
+	* topo/tkgui/plotgrouppanel.py 1.213: Added missing calls to
+	sizeright.
+
+	* topo/tkgui/plotgrouppanel.py 1.212: Cleaned up calling of
+	sizeright(). Should fix flickering on bwidget version.
+
+	* doc/Future_Work/current_text.php 1.254: Removed part of task.
+
+	* topo/tkgui/projectionpanel.py 1.122: Removed outdated
+	ERRORALERT.
+
+	* topo/tkgui/projectionpanel.py 1.121: Changed an on_change to
+	on_modify (which is what was really meant). Also fixes history in
+	projection window.
+
+	* topo/tkgui/projectionpanel.py 1.120: Changed an on_change to
+	on_modify (which is what was really meant). Also fixes history in
+	projection activity.
+
+	* topo/tkgui/plotgrouppanel.py 1.211: Removed duplicate call to
+	update_widgets() (should have no visible effect).
+
+	* topo/tkgui/tkguiwindow.py 1.18: Added fix to ensure slider
+	matches tag when TaggedSlider is created.
+
+	* topo/tkgui/testpattern.py 1.86: Also hide plot_command, for
+	consistency (already hidden from display by pack_forget on its
+	container).
+
+	* topo/tkgui/testpattern.py 1.85: Override refresh() method (no
+	history handling).
+
+	* topo/tkgui/plotgrouppanel.py 1.210: Clean up.
+
+	* topo/commands/analysis.py 1.104, topo/tests/testplotfilesaver.py
+	1.30, topo/tkgui/projectionpanel.py 1.119,
+	topo/tkgui/testpattern.py 1.84: Updated after changes to
+	plotgroup(panel).
+
+	* topo/tkgui/plotgrouppanel.py 1.209: Cleanup of display_plots,
+	update_plots etc.
+
+	* topo/plotting/plotgroup.py 1.187: Cleanup of names of
+	update_plots(), etc.
+
+	* topo/tkgui/plotgrouppanel.py 1.208: Minor change to comment.
+
+	* topo/tkgui/plotgrouppanel.py 1.207: Renamed variable for
+	clarity.
+
+	* topo/tkgui/projectionpanel.py 1.118,
+	topo/tkgui/plotgrouppanel.py 1.206: Removed apparently unused
+	bitmaps attribute.
+
+	* topo/tkgui/plotgrouppanel.py 1.205: Fixed what I think was a
+	bug: new canvases were being created every time, even when the
+	number of canvases and the size of each did not change. This ought
+	to reduce some flickering. Also added unrelated ERRORALERT.
+
+	* topo/tkgui/testpattern.py 1.83: Call correct method when
+	changing sliders. (Names of the methods in plotgrouppanel and
+	plotgroup will be cleaned up.)
+
+	* topo/tkgui/plotgrouppanel.py 1.204: In redraw_plots(), don't
+	call display_plots() again. The methods update_plots(),
+	redraw_plots(), and refresh() all need to be reviewed and cleaned
+	up (finally, and simultaneously with plotgroup).
+
+	* topo/tkgui/tkguiwindow.py 1.17: Removed outdated alert.
+
+	* topo/tkgui/tkparameterizedobject.py 1.67: Minor change to text.
+
+	* topo/tkgui/tkguiwindow.py 1.16: Minor clarifications in
+	TaggedSlider; should be no change.
+
+	* topo/tkgui/testpattern.py 1.82: Removed duplicate call to
+	change_pattern_generator().
+
+	* topo/base/patterngenerator.py 1.111: Hid size from Constant
+	pattern generator.
+
+	* topo/tkgui/tkguiwindow.py 1.15: Added some comments and removed
+	print statement.
+
+	* topo/tkgui/tkguiwindow.py 1.14: Added adjustment of slider range
+	based on tag value.
+
+	* topo/tkgui/tkguiwindow.py 1.13: TaggedSlider: corrected some
+	imports; cleaned up slightly.
+
+	* topo/tkgui/topoconsole.py 1.207: Update to use new TaggedSlider
+	class.
+
+	* topo/tkgui/tkparameterizedobject.py 1.66: Don't apply changes to
+	text variables immediately unless requested.
+
+	* topo/tkgui/tkguiwindow.py 1.12: Removed TaggedSlider and
+	replaced with TaggedSlider3. Improved TaggedSlider3 by having a
+	separate variable for the slider.
+
+	* topo/tkgui/parametersframe.py 1.121: Not-immediately-acting
+	ParametersFrame needs to update all types of Parameter when Apply
+	is pressed.
+
+	* topo/tkgui/projectionpanel.py 1.117: Removed outdated ALERT.
+
+2007-09-01  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/base/cf.py 1.99: Reverted a change to
+	CFProjection.input_buffer initialization
+
+2007-09-01  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkguiwindow.py 1.11: Restored option accidentally
+	removed from TaggedSlider and removed it from TaggedSlider3, as
+	originally intended.
+
+	* topo/tkgui/tkguiwindow.py 1.10: Removed original TaggedSlider
+	class. Makeshift TaggedSlider2 (what we are currently using)
+	becomes TaggedSlider. Added TaggedSlider3, a far simpler class
+	which appears to perform the same, but isn't quite finished.
+
+	* topo/tkgui/topoconsole.py 1.206: Moved TaggedSliders into
+	tkguiwindow from translatorwidgets.
+
+	* topo/tkgui/translatorwidgets.py 1.20: Removed unused file.
+
+	* topo/tkgui/tkguiwindow.py 1.9,
+	topo/tkgui/tkparameterizedobject.py 1.65: Moved TaggedSliders into
+	tkguiwindow from translatorwidgets.
+
+	* doc/Future_Work/current_text.php 1.253: Demoted
+	timing-code-cleanup task.
+
+	* topo/base/parameterclasses.py 1.74:
+	InstanceMethodWrapper.__name__ returns the function's name.
+
+	* topo/base/simulation.py 1.87: SomeTimer: renamed methods.
+
+	* topo/base/simulation.py 1.86: Simplification of SomeTimer. Note
+	that timing messages are now different, and are probably less
+	clear than before.
+
+2007-08-31  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulation.py 1.85: Added some documentation to
+	SomeTimer.
+
+	* topo/tkgui/testpattern.py 1.81: Hid Defaults button;
+	ParameterizedObject.reset_params() needs some work.
+
+2007-08-31  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_whisker_barrels_temporal.ty 1.2,
+	examples/lissom_whisker_barrels.ty 1.6: Made DeflectionPreference
+	be the default subplot
+
+	* doc/User_Manual/plotting_text.php 1.4: Fixed bizarre example of
+	how to turn off subplots
+
+	* topo/commands/analysis.py 1.103: Added hard-coded whisker
+	deflection support
+
+	* examples/lissom_whisker_barrels_temporal.ty 1.1,
+	examples/lissom_whisker_barrels.ty 1.5,
+	examples/whiskers/CoG_matrix_nf.m 1.1,
+	examples/whiskers/README.txt 1.1,
+	examples/whiskers/cheque_data.mat 1.1,
+	examples/whiskers/ganglion_labels.m 1.1,
+	examples/whiskers/generate_barrelettes.m 1.1,
+	examples/whiskers/key.png 1.1, examples/whiskers/pipe.m 1.1,
+	examples/whiskers/shuffle.m 1.1, examples/whiskers/sweep.m 1.1,
+	examples/whiskers/sweep_anticor.m 1.1,
+	examples/whiskers/sweep_random.m 1.1,
+	examples/whiskers/sweep_uncor.m 1.1,
+	examples/whiskers/test_deflections.m 1.1,
+	examples/whiskers/wbot_data.mat 1.1,
+	examples/whiskers/wbot_data_new.mat 1.1,
+	examples/whiskers/wbot_object_data.mat 1.1: Final MSc version from
+	Stuart
+
+	* topo/plotting/plotgroup.py 1.186: Added clarification
+
+	* topo/tkgui/__init__.py 1.27: Made coordmapperfns available in
+	the GUI
+
+	* topo/sheets/generatorsheet.py 1.55: Minor cleanup; removed
+	now-unused Trigger port
+
+	* topo/base/simulation.py 1.84: Fixed typos
+
+2007-08-31  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/projections/basic.py 1.62: Fixed small bug in
+	OneToOneProjection.
+
+	* topo/sheets/saccade.py 1.4: Rewrote ShiftingGeneratorSheet to
+	inherit from newly rewritten SequenceGeneratorSheet.
+
+	* topo/sheets/generatorsheet.py 1.54: Rewrote GeneratorSheet and
+	SequenceGeneratorSheet to use PeriodicSequenceEvent.
+
+	* topo/tests/testsimulation.py 1.10: added/fixed tests associated
+	with simulation events
+
+	* topo/base/simulation.py 1.83: Added several new event types and
+	made some associated changes to Events and how they're scheduled.
+	Schedulng semantics should be unchanged.
+
+	* topo/base/cf.py 1.98: Added initialization of
+	CFProjection.input_buffer to self.src.activity.
+
+	* topo/base/parameterclasses.py 1.73,
+	topo/base/parameterizedobject.py 1.79: * Better reporting of param
+	names in errors. (still not perfect) * warnings_as_errors ->
+	warnings_as_exceptions
+
+2007-08-31  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/testpattern.py 1.80: Added note.
+
+	* doc/Future_Work/current_text.php 1.252: Updated tkgui task;
+	removed duplicate.
+
+	* topo/base/parameterizedobject.py 1.78: reset_params(): tidied
+	ALERTs and dealt with instantiated Parameters. Still needs some
+	work.
+
+2007-08-31  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.203: Added note
+
+	* topo/plotting/plotgroup.py 1.185: Fixed bug in sheet coordinate
+	sizing
+
+2007-08-31  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.202: Moved conditional_refresh()
+	from test pattern.
+
+	* topo/tkgui/testpattern.py 1.79, topo/tkgui/testpattern2.py 1.17:
+	Replaced TestPattern with version from testpattern2.py.
+
+2007-08-31  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.251: Fixed typo
+
+	* doc/Future_Work/current_text.php 1.250: Added button icon task
+
+2007-08-31  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.120: Fixed a bug with tracking
+	displayed widgets. Rearranged some ALERTs.
+
+	* topo/base/parameterizedobject.py 1.77: Added and ALERT about
+	reset_params().
+
+2007-08-31  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Team_Members/index_text.php 1.12: Reorganized and updated
+
+2007-08-31  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/testpattern2.py 1.16: Addded some doc and softbounds.
+
+	* topo/tkgui/testpattern2.py 1.15: Continued cleanup.
+
+	* topo/plotting/plotgroup.py 1.184: Moved _sheets() method up to
+	SheetPlotGroup, and allowed specification of an arbitrary list of
+	sheets on construction (not definitely permanent changes).
+
+2007-08-30  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/testpattern2.py 1.14: Updates for using
+	XParametersFrame.
+
+	* topo/plotting/plotgroup.py 1.183: Removed outdated comment and
+	ALERT.
+
+2007-08-29  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testplotfilesaver.py 1.29: Updated after change to
+	PlotGroup.
+
+	* topo/commands/analysis.py 1.102: For save_plotgroup(): removed
+	two ALERTS; added an ERRORALERT; renamed a variable; added ability
+	to pass Parameters to the PlotFileSaver.
+
+	* topo/plotting/plotfilesaver.py 1.50: generate_plotgroup() sets
+	an attribute, rather than returning the PlotGroup.
+
+	* topo/plotting/plotgroup.py 1.182: Cleaned up type checking.
+
+	* topo/plotting/plotgroup.py 1.181: Removed redundant command.
+
+	* topo/plotting/templates.py 1.73: Changed 'command' Parameter to
+	'update_command'. Left 'command', a copy of 'update_command', to
+	allow current (possible user-written) code to continue working.
+
+	* topo/plotting/plotgroup.py 1.180: Removed old 'command'
+	Parameter.
+
+2007-08-29  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testpropertiesframe.py 1.3,
+	topo/tkgui/propertiesframe.py 1.28: Removed unused files
+
+	* topo/tkgui/translatorwidgets.py 1.19: Removed outdated
+	references to PropertiesFrame
+
+2007-08-29  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.179: Removed redundant code and
+	ALERT about plot_list.
+
+	* topo/plotting/plotgroup.py 1.178: Removed sheet_type from
+	TemplatePlotGroup.
+
+	* topo/plotting/plotgroup.py 1.177, topo/tkgui/plotgrouppanel.py
+	1.201, topo/tkgui/testpattern2.py 1.13: Renamed XPlotGroup to
+	SheetPlotGroup.
+
+	* topo/plotting/plotgroup.py 1.176: Minor cleanup.
+
+	* topo/base/parameterizedobject.py 1.76, topo/base/simulation.py
+	1.82, topo/misc/utils.py 1.44, topo/plotting/plotgroup.py 1.175,
+	topo/tkgui/editortools.py 1.43, topo/tkgui/parametersframe.py
+	1.119, topo/tkgui/projectionpanel.py 1.116,
+	topo/tkgui/propertiesframe.py 1.27, topo/tkgui/testpattern.py
+	1.78, topo/tkgui/tkparameterizedobject.py 1.64,
+	topo/tkgui/translatorwidgets.py 1.18: Merged in
+	parametersframe_replacement_branch (version of that branch as
+	tagged with parametersframe_replacement_branch_FINAL).
+
+	* doc/Future_Work/current_text.php 1.249: Added some links to
+	think about putting somewhere.
+
+2007-08-29  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.174: Added comments from phone
+	meeting
+
+	* topo/plotting/plotgroup.py 1.173: Fixed typos
+
+2007-08-29  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/projectionpanel.py 1.112.2.2: Added ALERT.
+
+	* topo/tkgui/testpattern.py 1.76.2.2: Updated to use
+	ParametersFrame version that sets values immediately (now some of
+	the refresh/optional_refresh and related code from round tkgui can
+	be deleted).
+
+	* topo/tkgui/tkparameterizedobject.py 1.62.2.10: Added
+	on_modify. (Intermediate checkin.)
+
+	* topo/tkgui/parametersframe.py 1.118.4.6: Separated
+	ParametersFrame into two classes. The second is the usual
+	ParametersFrame, but the first (the parent) applies changes made
+	to widgets to the underlying extraPO object immediately. (Hasty
+	split: needs cleaning, names need fixing, etc.)
+
+2007-08-29  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.171: Added alert
+
+	* topo/plotting/plotgroup.py 1.170: Simplified scale_images,
+	fixing integer scaling in the process
+
+	* topo/plotting/plot.py 1.103: Added set_scale option, to
+	complement rescale
+
+	* topo/plotting/plotgroup.py 1.169: Enforced bounds on sheet and
+	matrix coordinate cases separately, so that each will now be
+	appropriate.
+
+	* topo/tkgui/testpattern2.py 1.12: Removed stray import
+
+	* topo/tkgui/testpattern.py 1.77: Removed outdated references to
+	old PlotGroup code
+
+2007-08-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.62.2.9: Correction: use
+	Number's get_soft_bounds() method.
+
+	* topo/tkgui/tkparameterizedobject.py 1.62.2.8: Minor cleanup: no
+	visible change.
+
+2007-08-28  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.168: Localized minimum height
+	computation in one spot so that it can be fixed
+
+	* doc/Forums/.cvsignore 1.2: More to ignore
+
+	* topo/plotting/plotgroup.py 1.167: Removed obsolete initial_plot
+	flag, making initial sizes be computed automatically when the
+	plots are first created
+
+	* topo/plotting/plotgroup.py 1.166: Removed dependency on
+	initial_plot for suppressing color-key-only plots; this case can
+	be deduced from other information
+
+	* topo/plotting/plot.py 1.102: Clarified comment
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.29,
+	doc/Tutorials/lissom_or_text.php 1.9, topo/tkgui/topoconsole.py
+	1.205: Made examples subdirectory be selected by default for
+	loading snapshots
+
+2007-08-27  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.62.2.7,
+	topo/tkgui/parametersframe.py 1.118.4.5: Some trivial cleanup:
+	should be no visible change.
+
+2007-08-27  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.165: Removed redundant
+	INITIAL_PLOT_HEIGHT attribute
+
+	* topo/plotting/plotgroup.py 1.164: Removed code from
+	ProjectionPlotGroup that was nearly duplicated from XPlotGroup; no
+	ill effects apparent
+
+	* topo/plotting/plotgroup.py 1.163, topo/tkgui/plotgrouppanel.py
+	1.200: Fixed Projection plots to rescale properly from the
+	_orig_bitmap, not the scaled one
+
+	* topo/tkgui/plotgrouppanel.py 1.199: Moved enlarge and reduce
+	implementation to the plotgroup
+
+	* topo/plotting/plotgroup.py 1.162: Added zoom_factor option to
+	scale_images, to allow code to be eliminated in the GUI
+
+	* topo/tkgui/projectionpanel.py 1.115: Simplified slightly and
+	cleaned up
+
+2007-08-27  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/projectionpanel.py 1.112.2.1,
+	topo/tkgui/tkparameterizedobject.py 1.62.2.6,
+	topo/tkgui/topoconsole.py 1.203.2.1, topo/sheets/generatorsheet.py
+	1.52.2.1, topo/sheets/saccade.py 1.2.2.1, topo/tests/__init__.py
+	1.21.2.1, topo/tests/testfeaturemap.py 1.27.4.1,
+	topo/tkgui/editorwindow.py 1.47.2.1, topo/tkgui/plotgrouppanel.py
+	1.197.2.1, topo/misc/commandline.py 1.30.2.1,
+	topo/misc/distribution.py 1.5.4.1, topo/misc/utils.py 1.42.4.2,
+	topo/patterns/basic.py 1.121.2.1, topo/patterns/teststimuli.py
+	1.1.4.1, topo/plotting/plotgroup.py 1.159.2.2,
+	topo/base/arrayutils.py 1.24.2.1, topo/base/cf.py 1.96.2.1,
+	topo/base/parameterclasses.py 1.67.2.1,
+	topo/base/parameterizedobject.py 1.72.2.2,
+	topo/base/patterngenerator.py 1.106.4.1, topo/commands/analysis.py
+	1.99.2.1, topo/commands/pylabplots.py 1.31.2.1,
+	topo/coordmapperfns/basic.py 1.10.2.1, doc/FAQ/index_text.php
+	1.3.4.1, doc/Forums/index_text.php 1.2.2.1,
+	doc/Team_Members/index_text.php 1.10.4.1,
+	examples/sullivan_neurocomputing04.ty 1.21.4.1,
+	topo/analysis/featureresponses.py 1.36.2.1,
+	doc/Developer_Manual/alerts_text.php 1.1.6.1,
+	doc/Developer_Manual/testing_text.php 1.3.2.1, Makefile 1.111.2.1:
+	Merged in changes from HEAD (HEAD as tagged with
+	'before_merge_into_parametersframe_replacement_branch_200708271525BST').
+
+	* topo/base/simulation.py 1.81.2.1: Added a note.
+
+	* topo/tkgui/tkparameterizedobject.py 1.62.2.5: Continued to clean
+	up Parameter<->displayed value code; not yet finished.
+
+	* topo/tkgui/parametersframe.py 1.118.4.4: Updates to comments.
+
+	* topo/tkgui/parametersframe.py 1.118.4.3: Removed an alert, and
+	added another.
+
+	* topo/plotting/plotgroup.py 1.161: Added a docstring so I can see
+	balloon help working in the GUI.
+
+2007-08-27  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/cf.py 1.97: Minor clarification to comment
+
+2007-08-27  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/projectionpanel.py 1.114: Remove label as well as
+	widget before repacking projection param. Updated ALERT about
+	OptionMenu widget, and added ERRORALERT about projection selector
+	widget behavior.
+
+	* topo/tkgui/tkparameterizedobject.py 1.63: Added hack to prevent
+	'bad window path error' for projection panel.
+
+2007-08-26  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/FAQ/index_text.php 1.5: Minor change to text.
+
+	* topo/tkgui/translatorwidgets.py 1.17.2.1: Temporary alteration
+	to TaggedSlider2.
+
+	* topo/tkgui/tkparameterizedobject.py 1.62.2.4: Intermediate
+	checkin: began cleanup of translation between strings and
+	objects. Lots of temporary code.
+
+2007-08-25  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/sullivan_neurocomputing04.ty 1.22: Fixed broken import
+
+2007-08-25  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Forums/problems_text.php 1.1,
+	doc/User_Manual/problems_text.php 1.4: Moved problems.html to
+	Forums/ from User_Manual/.
+
+	* doc/FAQ/index_text.php 1.4: Added question about reporting
+	problems.
+
+	* doc/User_Manual/index_text.php 1.25, doc/Forums/index_text.php
+	1.4: Moved problems.html to Forums/ from User_Manual/.
+
+	* doc/Developer_Manual/alerts_text.php 1.2: Changed HACKALERT to
+	ERRORALERT because 'error' has a clearer meaning than
+	'hack'. (Existing HACKALERTs in the code have not yet been
+	replaced with ERRORALERTs.)
+
+2007-08-24  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.160: Added docstring
+
+	* topo/misc/utils.py 1.43, topo/tests/testfeaturemap.py 1.28,
+	topo/patterns/basic.py 1.122, topo/patterns/teststimuli.py 1.2:
+	Moved wrap to arrayutils, making it work for arrays in the process
+
+	* topo/commands/pylabplots.py 1.33: Removed inexplicable cosine
+	from gradient plots, replacing with sqrt, plus wrapping of cyclic
+	quantities
+
+	* topo/commands/analysis.py 1.101: Removed unused old_name_support
+	from save_group
+
+	* topo/misc/distribution.py 1.6, topo/base/arrayutils.py 1.25:
+	Moved wrap to arrayutils, making it work for arrays in the process
+
+2007-08-24  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/coordmapperfns/basic.py 1.13: minor fix to testing function
+
+	* topo/coordmapperfns/basic.py 1.12: Improvements to Ottes inverse
+	mapping.
+
+2007-08-24  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/pylabplots.py 1.32: Vastly simplified, correcting
+	swapped axes and division by zero problems
+
+	* topo/tkgui/topoconsole.py 1.204: Added status message so that
+	user knows that a snapshot is still loading
+
+	* topo/analysis/featureresponses.py 1.37: Restored HACKALERT
+	mistakenly deleted
+
+	* doc/Forums/index_text.php 1.3, doc/User_Manual/index_text.php
+	1.24: Added link to problems.html
+
+	* doc/User_Manual/problems_text.php 1.3: First complete version
+
+	* topo/coordmapperfns/basic.py 1.11: Cleaned up whitespace and
+	docstrings.  Fixed OttesSCMapper _abstract_class_name
+
+	* topo/base/parameterizedobject.py 1.75: Fixed some comments
+
+2007-08-22  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterclasses.py 1.72,
+	topo/base/patterngenerator.py 1.110: Set PatternGenerator.position
+	parameter to hidden.
+
+	* topo/tests/testCompositeParameter.txt 1.1,
+	topo/tests/testCompoundParameter.txt 1.2: Renamed
+	CompoundParameter to CompositeParameter.
+
+	* topo/base/patterngenerator.py 1.109: - Renamed CompoundParameter
+	as CompositeParameter.  - Made PatternGenerator.position parameter
+	hidden, to patch GUI bug til more comprehensive solution is found.
+
+	* topo/base/parameterclasses.py 1.71: Renamed CompoundParameter to
+	CompositeParameter
+
+	* topo/base/parameterizedobject.py 1.74: Added comments re
+	CompositeParameter.
+
+	* doc/Developer_Manual/testing_text.php 1.4: Added doctest
+	documentation.
+
+2007-08-22  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/patterngenerator.py 1.108: Clarified docstring,
+	hopefully correctly
+
+	* topo/tkgui/editorwindow.py 1.49: Removed obsolete alert
+
+	* doc/Team_Members/index_text.php 1.11: Updated Chris' role and
+	Jeff's position
+
+	* topo/base/parameterclasses.py 1.70: Fixed syntax error in assert
+	statement
+
+	* topo/base/parameterclasses.py 1.69: Made coordinate default be
+	floating-point, just in case
+
+	* topo/commands/analysis.py 1.100: Made more constants be
+	floating-point to avoid problems with integer division, especially
+	for measure_rfs().
+
+	* topo/tkgui/projectionpanel.py 1.113: Minor clarification to
+	label
+
+2007-08-22  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorwindow.py 1.48: Better warnings from model
+	editor when not all EPs/connections can be drawn.
+
+	* topo/tests/testCompoundParameter.txt 1.1: Test for the
+	CompoundParameter parameter type.
+
+	* topo/tests/__init__.py 1.22: Added support for tests written as
+	doctest files.
+
+	* topo/sheets/saccade.py 1.3: Updated ShiftingGeneratorSheet to
+	generate a new pattern every time there is an eye movement.  Added
+	output port to send out the bbox position if needed.
+
+	* topo/misc/commandline.py 1.31: Tiny change to comments.
+
+	* topo/sheets/generatorsheet.py 1.53: Improvements to
+	SequenceGeneratorSheet.
+
+	* topo/base/patterngenerator.py 1.107: Added compound 'position'
+	parameter to patterngenerators.
+
+	* topo/base/parameterclasses.py 1.68,
+	topo/base/parameterizedobject.py 1.73: - Added warnings_as_errors
+	flag in parameterizedobject module.  - Added CompoundParameter,
+	including support in ParameterizedObjectMetaClass.  - Added
+	XYCoordinates parameter type.
+
+2007-08-22  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.72.2.1: Added ALERT.
+
+	* topo/tkgui/tkparameterizedobject.py 1.62.2.3: Added handling of
+	StringParameters. Clarified an (implicit) ALERT.
+
+	* topo/plotting/plotgroup.py 1.159.2.1: Changed update_command and
+	plot_command parameters to StringParameters.
+
+	* topo/tkgui/plotgrouppanel.py 1.198: Added HACKALERT.
+
+	* Makefile 1.112: Added test pattern window to basic-gui-tests.
+
+	* topo/misc/utils.py 1.42.4.1: Removed dict_translator.
+
+	* topo/tkgui/parametersframe.py 1.118.4.2,
+	topo/tkgui/tkparameterizedobject.py 1.62.2.2: Moved
+	ParametersFrame2 from tkparameterizedobject.py into
+	parametersframe.py as ParametersFrame.
+
+	* topo/tkgui/propertiesframe.py 1.26.4.1: Added note.
+
+	* topo/tkgui/tkparameterizedobject.py 1.62.2.1: ParametersFrame2:
+	hack to correct operation of 'defaults' button plus minor
+	alterations.
+
+	* topo/tkgui/testpattern.py 1.76.2.1: Update to new
+	ParametersFrame.
+
+	* topo/tkgui/parametersframe.py 1.118.4.1: Import new
+	ParametersFrame in place of old one.
+
+	* topo/tkgui/editortools.py 1.42.4.1: Update to use new
+	ParametersFrame.
+
+2007-08-21  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.62: Packing separated from
+	widget creation in pack_param. Added pack_params() to
+	ParametersFrame2 to do what ParametersFrame.__new_widgets() does
+	(i.e. set the parameters out on a grid, ordered by precedence).
+
+	* topo/tkgui/featurecurvepanel.py 1.22,
+	topo/tkgui/projectionpanel.py 1.112: Update to match changes in
+	tkparameterizedobject.py.
+
+	* topo/tkgui/tkparameterizedobject.py 1.61: Cleaned up
+	_widgets/_furames ALERT.
+
+	* topo/tkgui/plotgrouppanel.py 1.197: Changed from
+	widgets_in_history to params_in_history (simpler - will be
+	switching more things from referring to widgets to referring to
+	parameters). Updates to match changes in tkparameterizedobject.
+
+	* topo/tkgui/projectionpanel.py 1.111: Added HACKALERT.
+
+	* topo/tkgui/testpattern.py 1.76: Switch to hide_param() from
+	manual destruction of widgets.
+
+	* topo/tkgui/tkparameterizedobject.py 1.60: Simplification to
+	pack_param.
+
+	* topo/tkgui/tkparameterizedobject.py 1.59: Correct version of
+	1.56-->1.57 checkin (i.e. this version is a corrected 1.57).
+
+	* topo/tkgui/tkparameterizedobject.py 1.58: Revert to version 1.56
+	(i.e. discard previous checkin) because of bug that would stop
+	everyone being able to open plots.
+
+	* topo/tkgui/tkparameterizedobject.py 1.57: Simplify code to
+	create button widgets.
+
+	* doc/Downloads/cvs_text.php 1.11: Added note about checking
+	buildbot.
+
+	* topo/tkgui/tkparameterizedobject.py 1.56: Correct bug where help
+	text was being displayed incorrectly for buttons, and was being
+	displayed at all for entry boxes.
+
+	* topo/tkgui/tkparameterizedobject.py 1.55: Corrected typo in
+	previous checkin.
+
+	* topo/tkgui/tkparameterizedobject.py 1.54: ParametersFrame2:
+	added show/hide parameter widget methods; confirm close if
+	unapplied changes; unimportant changes to buttons docs (only for
+	testing).
+
+2007-08-20  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.53: ParametersFrame2: to
+	match ParametersFrame, pack() itself and put parameters into an
+	inner frame.
+
+	* topo/tkgui/tkparameterizedobject.py 1.52: Simplified
+	AttributeError messages (don't print whole repr() of objects -
+	which led to pages of output - and cleaned up internally).
+
+	* topo/tkgui/tkparameterizedobject.py 1.51: ParametersFrame2:
+	Added some compatibility with model editor.
+
+	* topo/tests/testtkparameterizedobject.py 1.14: Add a constant
+	parameter among the test parameters.
+
+	* doc/Developer_Manual/testing_text.php 1.3: Added automatic
+	testing section.
+
+	* doc/buildbot/master.cfg 1.1: Initial version for doozy, with
+	only only slave (also on doozy).
+
+2007-08-20  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.92, examples/lissom_or.ty 1.123:
+	Added command-line control over retinal density
+
+	* topo/tests/testtkparameterizedobject.py 1.13: Minor spelling fix
+	in messages
+
+2007-08-20  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/commandline_text.php 1.14: Updated GUI scripting
+	section. (Plus removed unnecessary semi-colons from examples.)
+
+2007-08-20  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.196: Added catch for
+	right-clicking for an RF when Receptive Fields plot hasn't been
+	run yet.
+
+2007-08-20  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.203: Started to have menu commands
+	return their objects, so that the GUI can be scripted more. For
+	instance:
+	act_win=topo.guimain['Plots']['Activity']();act_win.normalize=False. At
+	some point soon, should be able to script enough in the activity
+	window to - for instance - simulate a right click for opening a
+	connection fields window, allowing us to add a test to ensure that
+	the right-click opening of connection fields windows does not get
+	broken.
+
+2007-08-20  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/commandline_text.php 1.13,
+	doc/User_Manual/index_text.php 1.23: Added instructions for
+	controlling the GUI from the command line
+
+	* doc/Links/index_text.php 1.10: Mentioned NEST interface
+
+	* topo/tkgui/editorwindow.py 1.47: Removed apparently unused
+	random_generator code
+
+2007-08-20  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.50: Corrected mistake:
+	need to convert object to string when checking if current value is
+	in range.
+
+2007-08-19  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.49: Don't try to set
+	constant parameters, unless they're in a
+	ParameterizedObjectMetaclass instance.
+
+	* Makefile 1.111: Update to syntax for invoking GUI menu items.
+
+	* topo/tkgui/plotgrouppanel.py 1.195: Update to accessing
+	Connection Fields menu item.
+
+	* topo/tkgui/topoconsole.py 1.202: Switch menus to
+	tkguiwindow.ControllableMenu, and add dictionary-style access to
+	TopoConsole's menubar. Removed plots_menu_entries, since the plot
+	menu item 'EntryName' can now be accessed by
+	topo.guimain['Plots']['EntryName'].
+
+	* topo/tkgui/tkguiwindow.py 1.8: Menu: take indexname to be label,
+	if indexname not supplied. Added comment about possibly removing
+	indexname, though there is probably some case where it would be
+	necessary.
+
+	* topo/tkgui/tkguiwindow.py 1.7: Menu class: renamed self.contents
+	to self.indexname2index; made actual item (if a menu or command)
+	available to access. Added ControllableMenu, which allows
+	dictionary-style access to menu items.
+
+	* topo/tkgui/tkguiwindow.py 1.6: Addition to comment.
+
+	* topo/tkgui/tkguiwindow.py 1.5: Corrected typo in previous
+	checkin.
+
+	* topo/tkgui/tkguiwindow.py 1.4: In Menu, override invoke() so
+	that commands can be invoke()d by name. (Plus cleanup: moved index
+	conversion into a general method so that it can be used by all
+	methods.)
+
+	* topo/tkgui/tkparameterizedobject.py 1.48: Switched order of two
+	lines in __init__ (so we add the shadowed PO before initializing
+	Parameter values; previously it was in this order, but got
+	switched accidentally during a recent cleanup). Not sure if
+	anything we currently do would have been affected by this.
+
+2007-08-18  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.110: Change syntax of command for basic GUI window
+	opening.
+
+	* topo/tkgui/topoconsole.py 1.201: Make PlotsMenuEntry call()able.
+
+	* topo/base/parameterizedobject.py 1.72: Removed system for
+	passing around warnings.
+
+	* topo/tkgui/topoconsole.py 1.200: Warnings not displayed in the
+	GUI.
+
+2007-08-15  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* external/Imaging.diff 1.1: Added patch for 64-bit ECDF machine,
+	to get rid of 'encoder zip not available' messages from tests that
+	use PIL
+
+	* external/Makefile 1.73: Added patch for 64-bit ECDF machine, to
+	get rid of 'encoder zip not available' messages from tests that
+	use PILexternal/Imaging.diff
+
+2007-08-14  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorwindow.py 1.46: Patched up a problem with
+	connections to EPs that are not sheets.  Temporary fix only --
+	eventually such EPs should appear in the editor.
+
+2007-08-13  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.47: Removed mistaken
+	if-test.
+
+	* doc/Forums/index_text.php 1.2: Added link to the Windows forum.
+
+	* topo/tkgui/tkparameterizedobject.py 1.46: Started to add ability
+	to change the shadowed ParameterizedObject, and methods to match
+	calls meant for parametersframe.ParametersFrame. Intermediate
+	checkin, and shouldn't affect existing code.
+
+2007-08-12  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.248: Added to task.
+
+	* doc/Future_Work/current_text.php 1.247: Updates to various
+	tasks.
+
+	* topo/tkgui/tkparameterizedobject.py 1.45: Added to note.
+
+	* topo/tests/hierarchical.ty_DATA 1.2: Data from 2007/04/25 03:53
+	GMT (i.e. after SOM changes).
+
+	* topo/tkgui/tkparameterizedobject.py 1.44: All Parameters except
+	Boolean are represented in the GUI by StringVar (because the
+	Parameters themselves take care of things like checking types, so
+	we don't want any restrictions from the GUI variable). Added
+	translation between __repr__ and objects so that widgets can
+	accept any valid Python expression, and repr()esentations are
+	displayed in the GUI for objects. Various cleanup. Not yet
+	finished, although I think ParametersFrame2 now has at least all
+	the features of ParametersFrame.
+
+	* topo/tkgui/translatorwidgets.py 1.17: Added TaggedSlider2:
+	TaggedSlider, but without some of the translation stuff. (Not
+	finished.)
+
+	* topo/tkgui/topoconsole.py 1.199: Added trivial method to display
+	a message on the status bar.
+
+2007-08-11  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.109: Added test to allow quick checking of GUI
+	windows.
+
+	* topo/tkgui/topoconsole.py 1.198: Added 'check' option to quit
+	method, so quit can be invoked without requiring someone to
+	confirm.
+
+	* topo/tkgui/tkparameterizedobject.py 1.43: Removed Refresh button
+	since Reset does the same.
+
+	* topo/tkgui/tkparameterizedobject.py 1.42: Uncommented section
+	mistakenly commented-out in previous checkin.
+
+	* topo/tkgui/tkparameterizedobject.py 1.41: Intermediate checkin
+	(should still be no change to existing GUI). Can reverse
+	precedence of TkParameterizedObject and its extraPO for finding
+	parameters. Continued to work on ParametersFrame2. General
+	cleanup.
+
+	* topo/analysis/featureresponses.py 1.36: Minor update to note.
+
+2007-08-10  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.40,
+	topo/tests/testtkparameterizedobject.py 1.12,
+	topo/tkgui/plotgrouppanel.py 1.194: TkParameterizedObject now only
+	supports one ParameterizedObject (previously it was any number,
+	but that was too confusing and probably unnecessary).
+
+2007-08-10  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Reference_Manual/.cvsignore 1.5: More to ignore
+
+	* doc/Developer_Manual/refactoring_text.php 1.2: Added more info
+	on refactoring
+
+2007-08-10  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.39: Intermediate checkin:
+	began trying to adapt TkparameteredObject to handle objects of
+	type ParameterizedObjectMetaclass as well as those of type
+	ParameterizedObject in extra_pos.
+
+2007-08-10  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.91: Minor tweak to get more info
+	during training
+
+2007-08-10  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.38: Added title to
+	ParametersFrame2. Added support to TkParameterizedObject for
+	displaying constant parameters.
+
+	* topo/tkgui/testpattern2.py 1.11: Replaced RangedParameter.
+
+2007-08-10  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.99: Split more plotting commands
+
+	* topo/commands/analysis.py 1.98: Split commands to have a
+	separate plot_command when appropriate
+
+2007-08-10  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.37: ParametersFrame2:
+	added right-click editing for OptionMenu. TkParameterizedObject:
+	added help text for current item in OptionMenu.
+
+2007-08-10  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* external/Makefile 1.72: Moved psyco out of default make targets,
+	as it is not available on 64-bit platforms
+
+	* doc/User_Manual/plotting_text.php 1.3: Small fix to
+	documentation
+
+	* doc/Future_Work/current_text.php 1.246: Various updates
+
+2007-08-10  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.36: Replaced
+	RangedParameter with ObjectSelectorParameter. Extended
+	TkParameterizedObject to handle ClassSelectorParameter. Updated
+	ParametersFrame2. Intermediate checkin (with everything still
+	working).
+
+	* topo/plotting/plotgroup.py 1.159,
+	topo/tests/testtkparameterizedobject.py 1.11,
+	topo/tkgui/featurecurvepanel.py 1.21,
+	topo/tkgui/projectionpanel.py 1.110: Replaced temporary
+	RangedParameter with ObjectSelectorParameter.
+
+	* topo/base/parameterclasses.py 1.67: Added
+	ObjectSelectorParameter, with SelectorParameter as a parent in
+	common with ClassSelectorParameter. Intermediate checkin.
+
+2007-08-09  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.35: Popup help bound to
+	label (if present), rather than the whole enclosing frame as
+	before. If there's no label, help is bound to the enclosing frame.
+
+	* topo/plotting/plotgroup.py 1.158: Added doc string.
+
+	* topo/tkgui/templateplotgrouppanel.py 1.81: Recovered doc for
+	strength-only parameter.
+
+	* topo/commands/analysis.py 1.97: Added input_sheet to the
+	displayed command to make it more obvious to users.
+
+	* topo/tkgui/projectionpanel.py 1.109: Added command to size
+	Projection windows (for bwidget version).
+
+	* topo/tkgui/topoconsole.py 1.197: Expand panel frames in windows,
+	so that contents expand when window sizes are increased.
+
+	* topo/tkgui/featurecurvepanel.py 1.20: Added note for users.
+
+	* topo/tkgui/topoconsole.py 1.196: Try to improve appearance when
+	opening panels with bwidget built by keeping the window hidden
+	until its construction is complete. Still a small window appears
+	just shortly before it's expanded to full size, but it seems to be
+	better.
+
+	* topo/tkgui/testpattern.py 1.75: Removed update_command,
+	plot_command, and redraw from Test Pattern window. Left Refresh
+	button, but it's not in a great position. Removed Back and Fwd
+	buttons.
+
+	* topo/tkgui/featurecurvepanel.py 1.19, topo/tkgui/topoconsole.py
+	1.195: Removed FullFieldFeatureCurvePanel, because with the
+	'redraw' button on PlotGroupPanel it is now redundant.
+
+	* topo/commands/analysis.py 1.96: Undo previous checkin, which was
+	mistaken.
+
+	* topo/tkgui/featurecurvepanel.py 1.18: Removed duplicate Redraw
+	button.
+
+	* topo/tkgui/plotgrouppanel.py 1.193: Moved Refresh button next to
+	update_command, and added Redraw button next to plot_command.
+
+	* topo/commands/analysis.py 1.95: Separated plot_command from
+	(update_)command.
+
+	* topo/tkgui/tkparameterizedobject.py 1.34: Minor addition to doc.
+
+	* topo/tkgui/tkparameterizedobject.py 1.33: Corrected method to
+	match Parameter class to widget-creation method (previously, could
+	not match subclasses of the widget_creators dictionary
+	key). Renamed __update_param to _update_param so that subclasses
+	can acces it. Added sketch of a replacement ParametersFrame (using
+	TkParameterizedObject), and temporarily modified
+	TkParameterizedObjectBase methods to work with
+	ClassSelectorParameter; RangedParameter needs to be turned into
+	something permanent.
+
+2007-08-08  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.157: Added a comment.
+
+	* topo/tkgui/tkparameterizedobject.py 1.32: Minor renaming and
+	changes to documentation. Should be no visible change.
+
+	* topo/commands/analysis.py 1.94, topo/plotting/plotgroup.py
+	1.156, topo/plotting/templates.py 1.72,
+	topo/tkgui/plotgrouppanel.py 1.192: Renamed plotcommand Parameter
+	to plot_command.
+
+	* topo/plotting/plotgroup.py 1.155, topo/tkgui/plotgrouppanel.py
+	1.191: Renamed updatecommand Parameter to update_command.
+
+	* topo/plotting/plotgroup.py 1.154, topo/tkgui/plotgrouppanel.py
+	1.190, topo/tkgui/testpattern.py 1.74: Renamed sheetcoords
+	Parameter to sheet_coords.
+
+	* topo/plotting/plotgroup.py 1.153, topo/tkgui/plotgrouppanel.py
+	1.189, topo/tkgui/testpattern.py 1.73: Renamed integerscaling
+	Parameter to integer_scaling.
+
+	* topo/tkgui/tkparameterizedobject.py 1.31: Changed creation of
+	widgets from Parameters to be more similar to how that works in
+	ParametersFrame; should be no visible change.
+
+	* topo/tkgui/translatorwidgets.py 1.16: Added option to refresh
+	the TaggedSlider widget when setting the bounds.
+
+2007-08-08  stuart_p_wilson  <stuart_p_wilson@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_whisker_barrels.ty 1.4: First version that seems
+	to work well
+
+2007-08-08  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.30: Removed provision for
+	packing hidden parameters (not necessary, since pack_param is
+	called manually). Clarified code for trying to set widget bounds.
+
+	* topo/tkgui/tkparameterizedobject.py 1.29: Moved some Parameter
+	name formatting into a method, and added capitalization. Renamed
+	variables in, and cleaned up, pack_param() (should be no visible
+	change from this).
+
+2007-08-01  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/cvs_text.php 1.10: Removed apparently unused and
+	unrecognized option to checkout
+
+2007-07-31  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/testpattern.py 1.72: Hack to make pattern generator
+	change update the plot to the right stage. (This TestPattern class
+	will be replaced with one from testpattern2.py.)
+
+	* topo/tkgui/projectionpanel.py 1.108: Fixed ConnectionFields
+	window: now opens with correct coordinates, if coordinates were
+	specified.
+
+	* topo/tkgui/tkparameterizedobject.py 1.28: Try to set widget's
+	bounds, if Parameter has bounds.
+
+2007-07-31  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.28,
+	doc/Tutorials/lissom_or_text.php 1.8,
+	doc/Tutorials/som_retinotopy_text.php 1.14: Put -g at the end of
+	command lines for safety
+
+	* topo/misc/commandline.py 1.30: Changed -g to work wherever it is
+	specified, instead of being reordered, to allow command-line
+	commands and scripts to control an open GUI.  Added indication
+	that startup files are being processed, since that recently caused
+	confusion regarding psyco
+
+	* topo/tkgui/topoconsole.py 1.194: Removed apparently unnecessary
+	check for topo.gui_cmdline_flag
+
+2007-07-31  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/projectionpanel.py 1.107: Renamed a variable; should
+	be no visible change.
+
+2007-07-30  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/projectionpanel.py 1.106: Minor cleanup; should be no
+	change.
+
+2007-07-28  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/__init__.py 1.4: Removed obsolete file
+
+2007-07-27  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/commandline.py 1.29: Moved GUI code after all
+	command-line arguments have been processed, to allow scripts to
+	add items that will be used in the GUI, and to avoid hiding
+	missing imports in the scripts
+
+	* doc/Future_Work/current_text.php 1.245: Added potentially useful
+	toolboxes
+
+2007-07-26  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/commandline_text.php 1.12: Added info about
+	save_plotgroup
+
+2007-07-24  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/.cvsignore 1.11: More to ignore
+
+2007-07-23  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_whisker_barrels.ty 1.3: Added minor note
+
+	* examples/lissom_whisker_barrels.ty 1.2: Added sketch of matlab
+	interface to external whisker code
+
+2007-07-23  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testtkparameterizedobject.py 1.10: Requires DISPLAY.
+
+2007-07-23  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_whisker_barrels.ty 1.1: Initial version, based
+	on converting lissom_oo_dr.ty 1.2 to have no on/off channels.  Not
+	yet tested at all.
+
+	* topo/patterns/basic.py 1.121: Added Sweeper class for wiping
+	patterns across a surface; not well tested yet
+
+	* examples/lissom_oo_dr.ty 1.2: Removed explicit delays and
+	instead implemented exactly as in the CMVC book
+
+	* examples/Makefile 1.25: Added lissom_oo_dr targets
+
+	* examples/lissom_oo_dr.ty 1.1: Initial version; parameters and
+	architecture set up to match the CMVC book, but untested and the
+	input pattern does not actually move
+
+	* doc/Future_Work/current_text.php 1.244: Minor addition
+
+2007-07-22  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/pylabplots.py 1.31: Clarified documentation and
+	simplified implementation
+
+	* topo/commands/pylabplots.py 1.30: Clarified docstring
+
+2007-07-20  yschoe  <yschoe@lodestar.inf.ed.ac.uk>
+
+	* topo/sheets/slissom.py 1.8: Added matrixplot facility for
+	visualizing membrane_potential_trace.
+
+	* topo/commands/pylabplots.py 1.29: Added named option "aspect" to
+	matrixplot() so that y/x aspect ratio can be adjusted for certain
+	plots like time series. Higher aspect ratio means taller y axis
+	relative to the x axis.
+
+2007-07-19  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testtkparameterizedobject.py 1.9: Removed mistaken
+	test. (I had forgotten that the default representation of a
+	Parameter (in the GUI) is by a string variable.)
+
+2007-07-19  yschoe  <yschoe@lodestar.inf.ed.ac.uk>
+
+	* examples/leaky_lissom_or.ty 1.20: Added one more membrane
+	potential trace to highlight withi-group synchronization.
+
+2007-07-18  yschoe  <yschoe@lodestar.inf.ed.ac.uk>
+
+	* examples/leaky_lissom_or.ty 1.19: Learning rate and membrane
+	potential trace locations changed a bit.
+
+	* examples/leaky_lissom_or.ty 1.18: First spiking LISSOM example
+	that shows rudimentary sync/desync behavior.  Much needs to be
+	cleaned up though.
+
+	* topo/sheets/slissom.py 1.7: Dynamic threshold and membrane
+	potential calculation/plotting facilities added.  Simply do, e.g.
+
+		 topo.sim["V1"].plot_trace()
+
+	in the example script.  This the a first rudimentary version that
+	showd synchronization/desynchronization behavior.
+
+	* topo/commands/pylabplots.py 1.28: Added "style" option in
+	vectorplot() so that data points can be plotted as points rather
+	than interpolated lines.
+
+2007-07-15  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.152: Instantiate RangedParameter
+	(RangedParameter is temporary, I hope). Added sheet_type to
+	XPlotGroup.
+
+	* topo/tests/testtkparameterizedobject.py 1.8: Added test to show
+	a bug (currently failing).
+
+	* topo/tkgui/tkparameterizedobject.py 1.27: Mofidications to
+	comments and docs. No visible changes.
+
+2007-07-14  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.243: Added note.
+
+2007-07-13  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testtkparameterizedobject.py 1.7: Modified comment
+	and added commented-out code.
+
+	* topo/tkgui/tkparameterizedobject.py 1.26: Added commented-out
+	method.
+
+	* topo/tkgui/tkparameterizedobject.py 1.25: Added minor note.
+
+	* topo/tkgui/templateplotgrouppanel.py 1.80: Added reminder.
+
+	* topo/tests/testtkparameterizedobject.py 1.6: No visible change -
+	slight simplification.
+
+	* topo/tkgui/tkparameterizedobject.py 1.24: Updated some
+	documentation.
+
+	* topo/tests/testtkparameterizedobject.py 1.5: Added to
+	range-handling test.
+
+	* topo/tests/testtkparameterizedobject.py 1.4: Test when a
+	parameter has a range.
+
+	* topo/tests/testtkparameterizedobject.py 1.3: Tests direct
+	get/set of Parameters.
+
+	* topo/tests/testtkparameterizedobject.py 1.2: Added test for
+	__getattribute__ and __setattr__.
+
+	* topo/tkgui/tkparameterizedobject.py 1.23: Removed commented-out
+	testing code (now in a test file) and modified check for Parameter
+	having a range.
+
+	* doc/User_Manual/problems_text.php 1.2: Minor addition to text.
+
+	* topo/tests/testtkparameterizedobject.py 1.1: Initial version.
+
+	* topo/tkgui/tkparameterizedobject.py 1.22: Classes have empty
+	name attribute, so just because 'name' attribute exists doesn't
+	mean it will be valid.
+
+	* topo/tkgui/testpattern2.py 1.10: Commented out unused
+	method. Added some debugging print statements. Corrected some
+	mistakes.
+
+2007-07-12  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/testpattern2.py 1.9: Pattern generator is now a
+	parameter (and deals with list of objects rather than classes so
+	that changes are kept - might revert that).
+
+	* topo/tkgui/testpattern2.py 1.8: Continued simplifying. 'Apply
+	to' buttons temporarily not functional.
+
+	* topo/tkgui/testpattern2.py 1.7: Corrected some mistakes.
+
+	* doc/Future_Work/current_text.php 1.242: Moved another task to
+	the bug tracker.
+
+	* doc/Future_Work/current_text.php 1.241: Moved some more tasks to
+	trackers.
+
+	* topo/tkgui/testpattern2.py 1.6: Continued cleaning. Temporarily
+	removed disparity support.
+
+	* topo/tkgui/testpattern2.py 1.5: Removed unused methods.
+
+	* topo/tkgui/testpattern2.py 1.4: Continued cleanup.
+
+	* topo/tkgui/testpattern2.py 1.3: Continued writing.
+
+	* doc/Future_Work/current_text.php 1.240: Added note about SF
+	trackers. Moved two tasks to SF trackers.
+
+	* topo/commands/analysis.py 1.93: Call grid plot in measure_rfs*()
+	rather than in ReverseCorrelation. measure_rfs_noise() updated to
+	accept input_sheet.
+
+	* topo/analysis/featureresponses.py 1.35,
+	topo/commands/pylabplots.py 1.27: Moved grid plotting from
+	ReverseCorrelation.
+
+2007-07-11  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.92: Minor modification to comment.
+
+	* topo/commands/analysis.py 1.91: measure_rfs() requires an
+	input_sheet argument (at least for the moment).
+
+	* topo/tkgui/plotgrouppanel.py 1.188: RF plot option displays plot
+	for specific sheet.
+
+	* topo/analysis/featureresponses.py 1.34: RFs are calculated for
+	all sheets for which measure_maps=True.
+
+	* topo/commands/analysis.py 1.90: Pass input sheet to
+	ReverseCorrelation.
+
+	* topo/analysis/featureresponses.py 1.33: Correction to
+	FeatureResponses.__init__ to accept params. Added input_sheet
+	parameter to ReverseCorrelation. ReverseCorrelation's grid is now
+	an array of arrays rather than a list of lists.
+
+	* topo/analysis/featureresponses.py 1.32: Cut out more duplicated
+	code.
+
+	* topo/analysis/featureresponses.py 1.31: Removed apparently
+	outdated JABHACKALERT.
+
+2007-06-27  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/problems_text.php 1.1: Initial version.
+
+	* topo/tkgui/testpattern2.py 1.2: Added some markers, reorganized,
+	removed ALERTs, removed a workaround (left note).
+
+	* topo/tkgui/testpattern2.py 1.1: Version 1.71 of
+	testpattern.py. Going to re-work the test pattern window in this
+	file (since the test pattern window is complex).
+
+	* topo/tkgui/testpattern.py 1.71: Minor simplifications, plus
+	removed a HACKALERT that was in the wrong place.
+
+	* topo/tkgui/projectionpanel.py 1.105: Minor simplifications, plus
+	added a HACKALERT.
+
+	* topo/tkgui/projectionpanel.py 1.104: All ProjectionSheetPGPanels
+	call refresh on sheet_change. Corrected bug in
+	ConnectionFieldsPanel's sheet_change method (if x and y not
+	specified, were not being reset to 0).
+
+	* topo/commands/analysis.py 1.89: Renamed some variables for
+	easier understanding - no visible change.
+
+	* topo/tests/testplotfilesaver.py 1.28: Uncommented a test, which
+	now works.
+
+	* topo/tests/testplotfilesaver.py 1.27: Plot file saving only
+	works for topo.sim (not some other Simulation with
+	register=False); removed ALERTs related to this.
+
+	* topo/tests/testsnapshots.py 1.15: Use a new topo.sim for the
+	tests.
+
+	* topo/tests/testsnapshots.py 1.14: Altered confusing
+	'Sheet.nominal_density' line, because if GeneratorSheet's
+	nominal_density is set in another test, setting Sheet's
+	nominal_density makes no difference. Added some commented-out
+	code. Added a HACKALERT.
+
+	* topo/tests/testsnapshots.py 1.13: Corrected bug introduced in
+	previous checkin: was loading different snapshot from that saved.
+
+2007-06-26  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.187: Added comment for cleanup.
+
+	* topo/base/simulation.py 1.81: Added ALERT, and note about how to
+	get timing messages at the commandline.
+
+	* doc/Future_Work/current_text.php 1.239: Added task.
+
+	* .cvsignore 1.11: No longer ignore testsnapshot.typ: moved to
+	topo/tests/
+
+	* topo/tests/.cvsignore 1.4: More to ignore.
+
+	* Makefile 1.108: Added more to clean: testplotfilesaver's output
+	images.
+
+	* Makefile 1.107: Changed location of testsnapshot.typ.
+
+	* topo/tests/testsnapshots.py 1.12: Added comment and changed save
+	location to be in tests directory.
+
+	* topo/analysis/featureresponses.py 1.30: Removed now-unnecessary
+	hack (since timer object's __getstate__ no longer removes contents
+	of the timer's lists).
+
+	* topo/base/simulation.py 1.80, topo/commands/basic.py 1.67: Moved
+	don't-pickle-receive*-lists hack from timer to
+	topo.commands.basic.save_snapshot().
+
+2007-06-25  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testsnapshots.py 1.11: Added test to make sure that
+	saving/loading snapshots doesn't break the ability to construct a
+	new simulaiton.
+
+	* topo/tests/__init__.py 1.21: Sorted the list of tests, so the
+	execute in the same order on all machines.
+
+	* topo/tests/testcf.py 1.2: Fixed a test interaction affecting
+	testcf.py
+
+2007-06-24  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/analysis/featureresponses.py 1.29: Intermediate
+	checkin. Made ReverseCorrelation be a subclass of FeatureResponses
+	to cut down on code duplication. Might need to think about the
+	proper class hierarchy.
+
+	* topo/commands/analysis.py 1.88: display=False by default for
+	measure_rfs().
+
+	* topo/tests/testplotfilesaver.py 1.26: Added ALERT. Added better
+	filename prefix.
+
+	* topo/base/simulation.py 1.79: Added to ALERT.
+
+	* topo/analysis/featureresponses.py 1.28: Use timer object rather
+	than local timing code.
+
+	* topo/tests/.cvsignore 1.3: More to ignore.
+
+	* topo/tests/testplotfilesaver.py 1.25: Named the simulation so
+	test's saved files always have the same name.
+
+	* topo/commands/pylabplots.py 1.26: Minor modification to comment.
+
+2007-06-23  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/analysis/featureresponses.py 1.27: Restored an ALERT.
+
+	* topo/base/simulation.py 1.78: Intermediate checkin: began to
+	merge slighly different timing methods.
+
+	* topo/tests/testplotfilesaver.py 1.24: Modified ALERT.
+
+	* topo/tests/testplotfilesaver.py 1.23: Re-wrote to match new
+	PlotGroupSavers. Currently doesn't work (see ALERT).
+
+	* topo/plotting/plotfilesaver.py 1.49: Added a comment.
+
+	* topo/plotting/plotgroup.py 1.151: Can control which dictionary
+	plot and update commands get executed in (might not want it to be
+	__main__.__dict__ if the commands are imported somewhere other
+	than __main__.__dict__).
+
+	* topo/commands/analysis.py 1.87: Removed stray print statement.
+
+	* topo/commands/analysis.py 1.86: Support previous syntax of
+	save_group command (i.e. requesting sheets and projections by
+	name).
+
+	* topo/plotting/plotfilesaver.py 1.48: Corrected oversight during
+	update of plotgroup classes (preventing projection plotgroup
+	saving).
+
+	* doc/Future_Work/current_text.php 1.238: Added more comments to
+	task.
+
+2007-06-22  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testcf.py 1.1: Tests for CFs and CFIters.
+
+	* topo/plotting/plotgroup.py 1.150, topo/tkgui/editorobjects.py
+	1.55, topo/tkgui/editorwindow.py 1.45: Changes and ALERTs to
+	dealing with sheets with very large bounds.
+
+	* topo/tkgui/topoconsole.py 1.193: Added 'Step' button to console.
+
+	* topo/projections/basic.py 1.61: Fixed bug with
+	OneToOneProjection.learning_fn
+
+	* topo/misc/numbergenerators.py 1.20: Changed time_fn of
+	ExponentialDecay to a CallableParameter, now that the pickling
+	problem is seeminglyfixed.
+
+	* topo/coordmapperfns/basic.py 1.10: Added Pipeline,
+	Polar2Cartesian, and Cartesian2Polar mappings.  Fixed bugs with
+	AffineTransform subclasses.
+
+	* topo/base/simulation.py 1.77: Fixed bug with
+	Simulator.run(until=...), added some ALERTs
+
+2007-06-22  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/analysis/featureresponses.py 1.26: Moved timing code to
+	SomeTimer.
+
+	* topo/base/simulation.py 1.76: Intermediate checkin. Added a
+	second timing method to SomeTimer that in order to support
+	slightly different timing use in featureresponses.
+
+	* topo/tkgui/topoconsole.py 1.192: Added update() call in
+	timing_message() in case it's used without timing_progress().
+
+	* topo/tkgui/projectionpanel.py 1.103: Added support to
+	ConnectionFieldsPanel for specifying a sheet on creation.
+
+	* topo/tkgui/plotgrouppanel.py 1.186: Right-click opening of
+	Connection Fields plot now includes the sheet.
+
+	* topo/tkgui/projectionpanel.py 1.102: Fixed bug in
+	ConnectionFieldsPanel causing it to ignore any requested x and y
+	coordinates on creation.
+
+	* topo/tkgui/plotgrouppanel.py 1.185: Update titles when updating
+	plots.
+
+	* topo/plotting/plotgroup.py 1.149: Corrected typos (supposed to
+	have been checked in several days ago).
+
+	* topo/tkgui/topoconsole.py 1.191: Added ALERT.
+
+	* topo/tkgui/connectionfieldspanel.py 1.53: Moved
+	ConnectionFieldsPanel into projectionpanel.py.
+
+	* topo/tkgui/featurecurvepanel.py 1.17: Updated titling.
+
+	* topo/tkgui/topoconsole.py 1.190: Updated import locations.
+
+	* topo/tkgui/projectionpanel.py 1.101: Moved ConnectionFieldsPanel
+	into projectionpanel.py.
+
+	* topo/tkgui/projectionactivitypanel.py 1.16,
+	topo/tkgui/projectionpanel.py 1.100: Moved ProjectionActivityPanel
+	into projectionpanel.py (and corrected a mistake in the titling).
+
+	* topo/tkgui/connectionfieldspanel.py 1.52,
+	topo/tkgui/plotgrouppanel.py 1.184,
+	topo/tkgui/projectionactivitypanel.py 1.15,
+	topo/tkgui/projectionpanel.py 1.99,
+	topo/tkgui/templateplotgrouppanel.py 1.79: Simplified titling.
+
+2007-06-21  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/__init__.py 1.26: Added to comment.
+
+2007-06-20  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.189: Added (test) option of having
+	auto-refresh panels update once per timing object iteration:
+	allows one to see model in 'slow motion' without having to press
+	the 'Go' button over and over.
+
+	* topo/tests/testtemplateplotgrouppanel.py 1.12: Commented out
+	test that isn't testing anything but did start failing...
+
+	* doc/Future_Work/current_text.php 1.237: Added to note.
+
+	* topo/base/parameterclasses.py 1.66: Added ALERT.
+
+	* topo/base/parameterizedobject.py 1.71: Added HACKALERT.
+
+	* topo/tkgui/topoconsole.py 1.188: Use simulation's timing object
+	rather than local timing code. Only open progress window for
+	durations of 10 or more. Added some notes about progress window.
+
+	* topo/commands/basic.py 1.66: Added hack for pickling of timer
+	object.
+
+	* topo/base/simulation.py 1.75: Integrated timing object with a
+	'run_and_time' method of Simulation.
+
+	* topo/base/parameterizedobject.py 1.70: Added some notes.
+
+	* topo/base/arrayutils.py 1.24: Added HACKALERT.
+
+	* topo/tests/__init__.py 1.20: Added to note.
+
+	* topo/base/simulation.py 1.74: Added some ALERTs.
+
+	* doc/Future_Work/current_text.php 1.236: Added note about decimal
+	module.
+
+	* topo/base/simulation.py 1.73: Added HACKALERT.
+
+	* topo/base/simulation.py 1.72: Intermediate checkin. Made timing
+	object a ParameterizedObject.
+
+	* doc/Future_Work/current_text.php 1.235: Added note.
+
+	* doc/Future_Work/current_text.php 1.234: Added some notes.
+
+2007-06-19  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/projections/basic.py 1.60: Cleaned up typos and formatting
+
+2007-06-18  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulation.py 1.71: Added first draft of a Timing
+	object. Needs some more features before using it to replace
+	various bits of timing code around topographica.
+
+	* topo/tkgui/featurecurvepanel.py 1.16,
+	topo/tkgui/plotgrouppanel.py 1.183,
+	topo/tkgui/templateplotgrouppanel.py 1.78,
+	topo/plotting/plotgroup.py 1.148: Some more refactoring of GUI
+	classes (still not finished). Removed Parameters from
+	FeatureCurvePlotGroup that are now unnecessary.
+
+	* topo/tkgui/tkparameterizedobject.py 1.21: Removed a stray print
+	statement.
+
+2007-06-17  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.182: Added to comment.
+
+	* topo/plotting/plotgroup.py 1.147,
+	topo/tkgui/templateplotgrouppanel.py 1.77: Removed stray print
+	statements.
+
+	* topo/tkgui/topoconsole.py 1.187: Updates for changes to
+	PlotGroupPanel classes.
+
+	* topo/tkgui/tkparameterizedobject.py 1.20: Multiple changes, but
+	2 significant ones: (1) Brought in changes from
+	tkgui_parameterization_branch; (2) RangedParameters get
+	translation between name and object for display in GUI. Whole file
+	now needs a review.
+
+	* topo/tkgui/testpattern.py 1.70: Patchwork of updates to keep
+	current TestPattern class working with new plotgroups. (At least
+	it opens without crashing and seems to work as well as before.)
+
+	* topo/tkgui/projectionpanel.py 1.98: Brought in changes from
+	tkgui_parameterization_branch, with additional changes to
+	generate_plotgroup mechanism and sheet+projection changing.
+
+	* topo/tkgui/connectionfieldspanel.py 1.51,
+	topo/tkgui/projectionactivitypanel.py 1.14,
+	topo/tkgui/templateplotgrouppanel.py 1.76: Brought in changes from
+	tkgui_parameterization_branch, with additional changes to
+	generate_plotgroup mechanism.
+
+	* topo/tkgui/plotgrouppanel.py 1.181: Brought in changes from
+	tkgui_parameterization_branch. Began to simplify updating vs
+	drawing plots.
+
+	* topo/tkgui/featurecurvepanel.py 1.15: Brought in changes from
+	tkgui_parameterization_branch. Trying 'redraw' button on
+	full-field version.
+
+	* topo/plotting/plotgroup.py 1.146: Brought in changes from
+	tkgui_parameterization_branch. Further improved separation of
+	drawing and updating plots.
+
+	* topo/plotting/plotfilesaver.py 1.47: Rather than having
+	parameters on the *Saver objects shadowing those on the underlying
+	PlotGroups, just pass parameters to the PlotGroups. Added
+	Connection Fields saver.
+
+	* topo/commands/analysis.py 1.85: Set parameters directly on
+	PlotGroup rather than on PlotFileSaver.
+
+	* topo/tkgui/translatorwidgets.py 1.15: Added set_bounds() method
+	to taggedslider.
+
+	* topo/base/boundingregion.py 1.38,
+	topo/base/parameterizedobject.py 1.69: Added some comments about
+	__getstate__ and friends.
+
+2007-06-16  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/projection.py 1.96: Fixed typos in comments
+
+2007-06-15  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.68: Removed deepcopy() of
+	Parameters.
+
+	* topo/tkgui/editorobjects.py 1.54: Fixed minor bug with doc
+	strings.
+
+	* topo/projections/basic.py 1.59: Added OneToOneProjection
+
+	* topo/patterns/basic.py 1.120: Added Null pattern generator, a
+	subclass of Constant
+
+	* topo/sheets/saccade.py 1.2: Fixed activity_centroid() to handle
+	the case where all activity is zero.
+
+	* topo/sheets/generatorsheet.py 1.52: Added SequenceGeneratorSheet
+	for generating timed sequences of inputs.
+
+	* topo/base/projection.py 1.95: Updated
+	ProjectionSheet.projections() to save a few keystrokes when
+	getting a single named projection.
+
+	* topo/base/parameterclasses.py 1.65: Updated some error messages
+	to better show the attribute name.
+
+	* topo/base/parameterizedobject.py 1.67: Added
+	Parameter.attrib_name() for generating error messages.
+
+	* topo/base/cf.py 1.96: Added hack alert.
+
+2007-06-15  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.176.2.11: Updates to
+	still-unfinished (and possibly temporary plus not-yet-named)
+	XPGPanel.
+
+	* topo/tkgui/testpattern.py 1.68.2.1: Temporary fixes to work with
+	new plotgroups and panels. Test pattern window needs substantial
+	overhaul to work well.
+
+	* topo/tkgui/topoconsole.py 1.184.2.6: Pack the test pattern
+	frame.
+
+	* topo/tkgui/topoconsole.py 1.186: Added HACKALERT.
+
+2007-06-14  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/cf.py 1.95: Fixed bug since version 1.85: the
+	projection's output_fn was effectively being ignored because it
+	was called not on the Projection activity but on a stray throwaway
+	object.  I don't know of any case where the Projection output_fn
+	was being used, so it hasn't been noticed
+
+	* topo/base/cf.py 1.94: Removed mistaken alert
+
+2007-06-14  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.176.2.10: Fixed history: when
+	coming out of history, keeps settings from plotgroup that was
+	being used before history research began.
+
+	* topo/tkgui/templateplotgrouppanel.py 1.74.2.4: Corrected typo.
+
+	* topo/tkgui/plotgrouppanel.py 1.176.2.9: Added HACKALERT.
+
+2007-06-13  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/base/cf.py 1.93: Added some ALERTs, and a typecheck.
+
+2007-06-13  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulation.py 1.70: Added more to an error
+	message. Added an alert.
+
+	* topo/base/parameterclasses.py 1.64: Added some comments.
+
+	* topo/base/parameterizedobject.py 1.66: __setup_params() renamed
+	to _setup_params() so it can be overridden in subclasses. Added
+	hack to allow some kind of a system for passing warnings around
+	(...to the gui).
+
+	* topo/plotting/plotfilesaver.py 1.41.2.1: Update to match class
+	name change.
+
+	* topo/tkgui/connectionfieldspanel.py 1.50.2.10,
+	topo/tkgui/projectionpanel.py 1.97.2.10,
+	topo/plotting/plotgroup.py 1.145.2.16: Reverted some parameter
+	locations (I got confused).
+
+	* topo/tkgui/tkparameterizedobject.py 1.19.2.12: Removed most of
+	the print statements. Removed no-longer-required try/except.
+
+	* topo/tkgui/featurecurvepanel.py 1.14.2.5: Restored str() in
+	refresh_title().
+
+	* topo/tkgui/templateplotgrouppanel.py 1.74.2.3: Various changes
+	to match plotgroups and populate parameter ranges.
+
+	* topo/tkgui/topoconsole.py 1.184.2.5: Updated class names.
+
+	* topo/tkgui/connectionfieldspanel.py 1.50.2.9,
+	topo/tkgui/featurecurvepanel.py 1.14.2.4,
+	topo/tkgui/projectionactivitypanel.py 1.13.2.3,
+	topo/tkgui/plotgrouppanel.py 1.176.2.8,
+	topo/tkgui/projectionpanel.py 1.97.2.9: Various changes to match
+	plotgroups and populate parameter ranges.
+
+	* topo/tkgui/tkparameterizedobject.py 1.19.2.11: Various changes,
+	including a translator for text representations of objects (for
+	option menus).
+
+	* topo/plotting/plotgroup.py 1.145.2.15: Continued reorganizing:
+	changed location of some parameters; does not populate any
+	parameter ranges.
+
+2007-06-11  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.233: Minor update to task.
+
+	* topo/tests/testparameterizedobject.py 1.3: Changes to some
+	comments.
+
+	* topo/tests/testparameterizedobject.py 1.2: Added another test,
+	plus an ALERT.
+
+	* topo/tests/testparameterizedobject.py 1.1: Initial version.
+
+2007-06-10  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/projectionpanel.py 1.97.2.8,
+	topo/plotting/plotgroup.py 1.145.2.14: Parameters are 'sheet' and
+	'projection' rather than 'sheet_name' and 'projection_name';
+	i.e. they are references to actual objects, not string names.
+
+	* topo/tkgui/featurecurvepanel.py 1.14.2.3: Removed irrelevant
+	widgets.
+
+	* topo/tkgui/topoconsole.py 1.184.2.4: Added comment.
+
+	* topo/plotting/plotgroup.py 1.145.2.13,
+	topo/tkgui/projectionpanel.py 1.97.2.7: Situate stuff back to
+	tkgui. (And FeatureCurvesPlotGroup gets default sheet that's not
+	None.)
+
+	* doc/Future_Work/current_text.php 1.232: Update to task about
+	test results on web.
+
+	* topo/tests/__init__.py 1.19: Return the TestResult instance from
+	run().
+
+2007-06-08  antolikjan  <antolikjan@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/default_plottingscript.py 1.1: This is the default
+	plotting script that is used by run_batch command
+
+	* topo/misc/commandline.py 1.28: Added the new run_batch commands
+	that allows running Topographica simulation in batch mode
+
+2007-06-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.231: Added notes to mac task.
+
+	* topo/tests/som_retinotopy.ty_DATA 1.4: Data from 2007/05/05
+	06:00 GMT CVS version of topographica. Updated because density of
+	example was changed.
+
+	* doc/Future_Work/current_text.php 1.230: Added some tasks, and
+	updated others.
+
+2007-06-06  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/coordmapperfns/basic.py 1.9: Added AffineTransform mapper.
+
+	* topo/base/projection.py 1.94: Removed unnecessary reference to
+	topo.sim
+
+	* topo/base/simulation.py 1.69: - Removed redundant type checking
+	on EPConnection src and dest.  - Allowed Simulation.grid_layout to
+	take references to simulation objects, not just names.
+
+	* topo/base/parameterclasses.py 1.63: - Small change to instance
+	method wrapping in CallableParameter - Added DictParameter.
+
+	* topo/base/cf.py 1.92: Added (optional) support for null CFs
+
+	* doc/Future_Work/current_text.php 1.229: Added item for Mac GUI
+	cleanup.
+
+2007-06-06  chrispalmer  <chrispalmer@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.84: defaults at a high scale to
+	allow mapping of rfs for lissom_oo_or.ty, this model currently
+	recieves very week input to V1 and should probably be modified
+
+2007-06-06  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.145.2.12,
+	topo/tkgui/templateplotgrouppanel.py 1.74.2.2: Returned
+	strength-only to tkgui.
+
+	* topo/plotting/plotgroup.py 1.145.2.11: integerscaling's
+	sizeconvertfn is determined by a function.
+
+	* topo/tkgui/connectionfieldspanel.py 1.50.2.8: Use bounds instead
+	of softbounds.
+
+	* topo/tkgui/tkparameterizedobject.py 1.19.2.10: Don't set
+	parameter while user's typing. Use set_in_bounds() if Parameter
+	has such a method.
+
+	* topo/plotting/plotgroup.py 1.145.2.10: Removed value checking on
+	x and y coordinates.
+
+	* topo/base/parameterizedobject.py 1.65.2.5: Removed 'pre_set_fn'.
+
+	* topo/tkgui/connectionfieldspanel.py 1.50.2.7: Continued trying
+	out handling the sliders for coordinates.
+
+	* topo/tkgui/tkparameterizedobject.py 1.19.2.9: Added HACKALERT.
+
+	* topo/tkgui/templateplotgrouppanel.py 1.75: Hack to get normalize
+	from the template.
+
+2007-06-05  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/connectionfieldspanel.py 1.50.2.6,
+	topo/tkgui/projectionpanel.py 1.97.2.6: Experimenting with
+	updating sliders.
+
+	* topo/tkgui/translatorwidgets.py 1.14.2.1: Allow TaggedSlider
+	bounds to be set after creation.
+
+	* topo/tkgui/tkparameterizedobject.py 1.19.2.8: Revert tkgui
+	variables immediately if setting their corresponding parameter
+	failed.
+
+	* topo/base/parameterizedobject.py 1.65.2.4,
+	topo/base/simulation.py 1.68.2.4, topo/tkgui/topoconsole.py
+	1.184.2.3: Moved warning-passing code all into
+	ParameterizedObject.
+
+	* topo/plotting/plotgroup.py 1.145.2.9: Try enforcing bounds on
+	ConnectionFieldsPlotGroup's x and y Parameters.
+
+	* topo/base/parameterizedobject.py 1.65.2.3: Try out allowing
+	arbitrary function to be called before setting Parameter value.
+
+	* topo/base/parameterclasses.py 1.62.2.1: Added some comments.
+
+	* topo/tkgui/topoconsole.py 1.185: Updated to use plotgroup_label,
+	not plotgroup_key. Updated open_test_pattern_window()
+
+	* topo/tkgui/testpattern.py 1.69: Hacked to work with changes to
+	PlotGroupPanel: needs major overhaul. These changes don't need to
+	copied to tkgui_parameterization_branch (that's where the major
+	overhaul will occur.
+
+	* topo/plotting/plotgroup.py 1.145.2.8: More to add.
+
+	* topo/tkgui/featurecurvepanel.py 1.14.2.2: Cleanup.
+
+	* topo/tkgui/plotgrouppanel.py 1.176.2.7: Added reminder to
+	myself.
+
+	* topo/tkgui/projectionactivitypanel.py 1.13.2.2: Clean up.
+
+	* topo/tkgui/topoconsole.py 1.184.2.2,
+	topo/base/parameterizedobject.py 1.65.2.2, topo/base/simulation.py
+	1.68.2.3: Added hack to have warnings passed to topo.sim and then
+	to tkgui. Needs more general implementation, but saves a lot of
+	duplication of checking conditions (in tkgui)
+
+	* topo/plotting/plotgroup.py 1.145.2.7: More to add.
+
+	* topo/tkgui/plotgrouppanel.py 1.176.2.6: Added comment.
+
+	* topo/tkgui/projectionpanel.py 1.97.2.5: Cleanup.
+
+	* topo/tkgui/tkparameterizedobject.py 1.19.2.7: Added comment.
+
+	* topo/tkgui/tkparameterizedobject.py 1.19.2.6: Added alert.
+
+	* topo/plotting/plotgroup.py 1.145.2.6: More note to myself.
+
+	* topo/tkgui/connectionfieldspanel.py 1.50.2.5: Cleanup.
+
+	* topo/tkgui/topoconsole.py 1.184.2.1: Updated plotgroup_key to be
+	plotgroup_label.
+
+	* topo/tkgui/tkparameterizedobject.py 1.19.2.5: Checkbuttons are
+	'widget label', other widgets are 'label widget'. Minor
+	improvement to name formatting (needs general solution).
+
+	* topo/tkgui/plotgrouppanel.py 1.176.2.5: *command widgets fill X.
+
+	* topo/tkgui/tkparameterizedobject.py 1.19.2.4: Expand widget
+	inside its frame.
+
+	* topo/plotting/plotgroup.py 1.145.2.5: More to add.
+
+	* topo/tkgui/connectionfieldspanel.py 1.50.2.4: x and y are
+	parameters, and appear in **params. Updated some comments.
+
+	* topo/tkgui/tkparameterizedobject.py 1.19.2.3: Allow paramters of
+	extra_pos to be setup when the object is created.
+
+	* topo/base/parameterizedobject.py 1.65.2.1: Changed
+	__setup_params() to _setup_params(), so it can be overridden in
+	subclasses.
+
+	* topo/tkgui/connectionfieldspanel.py 1.50.2.3: refresh() when
+	opened. Removed outdated comment.
+
+	* topo/tkgui/plotgrouppanel.py 1.176.2.4: When disabling widgets,
+	do not assume they have 'state'. Also added alert, and some code
+	to help debugging.
+
+2007-06-04  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/analysis/featureresponses.py 1.25: Cleaned up comments and
+	added alerts
+
+	* topo/commands/pylabplots.py 1.25: Minor space cleanup
+
+	* topo/analysis/featureresponses.py 1.24: Minor improvement to
+	docstring
+
+	* topo/commands/analysis.py 1.83: Turned off display by default
+
+	* topo/analysis/featureresponses.py 1.23: Cleaned up cruft left in
+	previous checkin.  Localized temporary code for ReverseCorrelation
+	into a small area so that it can be moved later
+
+	* topo/commands/analysis.py 1.82: Cleaned up cruft left in
+	previous checkin
+
+	* topo/tkgui/plotgrouppanel.py 1.180: Trivial change to title
+	string
+
+	* topo/plotting/plotfilesaver.py 1.46: Removed space and ampersand
+	characters from filenames
+
+	* topo/plotting/plotfilesaver.py 1.45: Added exception for common
+	error condition
+
+	* topo/commands/analysis.py 1.81, topo/commands/basic.py 1.65,
+	topo/plotting/plotfilesaver.py 1.44: Moved save_plotgroup command
+	from basic.py to analysis.py because it only works if other things
+	from analysis.py are loaded
+
+	* topo/plotting/plotfilesaver.py 1.43: Added filename_format
+	parameter and cleaned up
+
+	* topo/plotting/plotfilesaver.py 1.42, topo/commands/basic.py
+	1.64: Moved save_plotgroup command from
+	topo/plotting/plotfilesaver.py to topo/commands/basic.py; cleaned
+	up formatting and organization
+
+	* topo/analysis/featureresponses.py 1.22: Removed bogus spaces
+
+2007-06-04  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.179: Corrected bug in bwidget
+	version: after changing PlotGroupPanel back to being a Frame,
+	forgot to set certain attributes on its master (the window) rather
+	than on itself.
+
+2007-06-04  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.80: Fixed defaults mistakenly
+	changed.
+
+	* topo/tkgui/plotgrouppanel.py 1.178: Fixed newline at end of file
+
+2007-06-04  chrispalmer  <chrispalmer@lodestar.inf.ed.ac.uk>
+
+	* topo/analysis/featureresponses.py 1.21: adds method for figuring
+	out receptive fileds using reverse correlation
+
+	* topo/commands/analysis.py 1.79: adds options to map receptive
+	fileds using reverse correlation
+
+	* topo/tkgui/plotgrouppanel.py 1.177: adds option to view
+	receptive fields for individual units
+
+2007-06-04  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulation.py 1.68.2.2: Improved error message.
+
+	* topo/tkgui/projectionpanel.py 1.97.2.4: Removed comment.
+
+	* topo/tkgui/connectionfieldspanel.py 1.50.2.2: Draw parameters in
+	bottom frame.
+
+	* topo/tkgui/plotgrouppanel.py 1.176.2.2: Widgets are all disabled
+	in history, unless explicitly excluded.
+
+	* topo/tkgui/projectionpanel.py 1.97.2.3: Draw widgets in bottom
+	frame.
+
+	* topo/plotting/plotgroup.py 1.145.2.4: Corrected typo.
+
+	* topo/tkgui/projectionactivitypanel.py 1.13.2.1: Began using
+	parameters.
+
+	* topo/tkgui/tkparameterizedobject.py 1.19.2.2: Added OptionMenu
+	for 'SomeEnumerationParameter'.
+
+	* topo/tkgui/projectionpanel.py 1.97.2.2: ProjectionPanel
+	refresh()es when it opens.
+
+	* topo/plotting/plotgroup.py 1.145.2.3: Added
+	SomeEnumerationParameter, to allow me to work on the GUI option
+	menus.
+
+	* topo/base/simulation.py 1.68.2.1: Added comment.
+
+	* topo/plotting/plotgroup.py 1.145.2.2: Added comment. Minor
+	corrections.
+
+2007-06-03  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/connectionfieldspanel.py 1.50.2.1: Began using
+	parameters.
+
+	* topo/tkgui/projectionpanel.py 1.97.2.1: Began to use parameters.
+
+	* topo/tkgui/plotgrouppanel.py 1.176.2.1: Added updatecommand and
+	plotcommand.
+
+	* topo/tkgui/templateplotgrouppanel.py 1.74.2.1: Change to match
+	new TemplatePlotGroup.
+
+	* topo/tkgui/featurecurvepanel.py 1.14.2.1: Began to convert to
+	using Parameters.
+
+	* topo/tkgui/tkparameterizedobject.py 1.19.2.1: Temporary change
+	to stop packing of hidden Parameters.
+
+	* topo/plotting/plotgroup.py 1.145.2.1: Began tidying up the
+	PlotGroup class hierarchy.
+
+	* topo/tests/utils.py 1.9: Added note to myself.
+
+	* topo/tkgui/topoconsole.py 1.184: Panels are back to being
+	Frames.
+
+	* topo/tkgui/connectionfieldspanel.py 1.50,
+	topo/tkgui/featurecurvepanel.py 1.14, topo/tkgui/plotgrouppanel.py
+	1.176, topo/tkgui/projectionactivitypanel.py 1.13,
+	topo/tkgui/projectionpanel.py 1.97,
+	topo/tkgui/templateplotgrouppanel.py 1.74: Began switching to
+	using new style Panel classes; users might notice some problems
+	until the updates are complete.
+
+	* topo/tkgui/plotgrouppanel.py 1.175: Added comment.
+
+2007-06-02  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotfilesaver.py 1.41: Added assertion statements
+	to catch misnamed projections/sheets. (The errors raised by the
+	PlotGroups are too cryptic to realize what's going wrong if you
+	specify a projection that doesn't exist for a sheet.)
+
+2007-05-31  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotfilesaver.py 1.40: Removed bogus print
+	statement
+
+	* topo/plotting/plotfilesaver.py 1.39: Added save_plotgroup
+	command as a simple interface.  Changed file format from PNG to
+	png.
+
+2007-05-31  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotfilesaver.py 1.38: Various changes that were
+	not present in previous checkins but should have been (i.e. were
+	listed in the log messages). Started ImageCompositor class.
+
+	* topo/plotting/plotfilesaver.py 1.37: Added a comment.
+
+	* topo/plotting/plotfilesaver.py 1.36: Continued writing. The
+	projection saver now probably works for projection plots where the
+	images are different sizes.
+
+2007-05-30  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotfilesaver.py 1.35: Added some notes.
+
+	* topo/plotting/plotfilesaver.py 1.34: Added beginning of
+	CFProjectionPlotGroupSaver. Removed old, commented-out code. This
+	version isn't suitable for anyone to use.
+
+	* topo/plotting/plotfilesaver.py 1.33: Added temporary filename
+	prefix parameter.
+
+	* topo/plotting/plotfilesaver.py 1.32: Changes to comments.
+
+	* topo/plotting/plotfilesaver.py 1.31: Commented out existing
+	code. Added quick first implementation to allow saving of
+	templateplotgroups (e.g. activity, orientation preference).
+
+	* topo/tkgui/templateplotgrouppanel.py 1.73: (Re. new class.)
+	Update command appears in the correct location.
+
+	* topo/tkgui/plotgrouppanel.py 1.174,
+	topo/tkgui/templateplotgrouppanel.py 1.72: (Re. new classes.)
+	Updated with changes to right-click menu.
+
+	* topo/tkgui/templateplotgrouppanel.py 1.71: Added saving of any
+	canvas (to postscript).
+
+	* topo/tkgui/tkguiwindow.py 1.3: Change to comments and imports:
+	no visible changes.
+
+	* topo/tkgui/plotgrouppanel.py 1.173,
+	topo/tkgui/templateplotgrouppanel.py 1.70: Use indexing-by-name
+	Menu class.
+
+	* topo/tkgui/tkguiwindow.py 1.2: Made a subclass of Tkinter.Menu
+	that allows indexing by some (fixed) name, rather than just by
+	current position.
+
+	* topo/tkgui/plotgrouppanel.py 1.172: (Re. new, unused class.)
+	Continued matching behavior of current panel.
+
+2007-05-29  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.171: (Re. new, unused classes.)
+	Minor changes: some rearranging and some fixes.
+
+2007-05-27  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.170,
+	topo/tkgui/tkparameterizedobject.py 1.19: Removed '_widgets2' and
+	made _widgets a dictionary.
+
+2007-05-26  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.169,
+	topo/tkgui/templateplotgrouppanel.py 1.69: (Re. new, unused
+	classes.) Changes to match alterations to tkparameterizedobject
+	(which has become a ParameterizedObject).
+
+	* topo/tkgui/tkparameterizedobject.py 1.18: Renamed TkPO to
+	TkParameterizedObjectBase, and WidgetDrawingTkPO to
+	TkParameterizedObject. TkParameterizedObjectBase is back to being
+	a ParamterizedObject that creates Tkinter.Variable shadows of its
+	Parameters, but now it also shadows Parameters of any optional
+	additional ParameterizedObjects it is given.
+
+2007-05-24  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/templateplotgrouppanel.py 1.68: (re. new, unused
+	class) Minor change to match plotgrouppanel becoming a
+	ParameterizedObject.
+
+	* topo/tkgui/plotgrouppanel.py 1.168: (re. new, unused classes)
+	Made PlotGroupPanel2 be a ParameterizedObject and have
+	parameters. Stores another WidgetDrawingTkPO to edit those
+	parameters (can't stay like that).
+
+	* topo/tkgui/tkparameterizedobject.py 1.17: Added (trial)
+	ButtonParameter. WidgetDrawingTkPO is not a Frame anymore (since
+	it could be drawing its widgets on anything, so there is no
+	benefit that it's a Frame).
+
+2007-05-23  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.167: (Re. new, unused classes.)
+	Added some notes. Removed special code for integer scaling
+	(there's an alert in plotgroup now about that).
+
+	* topo/plotting/plotgroup.py 1.145: Added strength-only parameter
+	to TemplatePlotGroup, but it currently does nothing. Added
+	hackalerts about that and PlotGroup's integerscaling parameter.
+
+	* topo/tkgui/plotgrouppanel.py 1.166: (Re. new, unused classes.)
+	Reduce/enlarge buttons work in history. Removed alert that is
+	covered by one in plotgroup itself.
+
+	* topo/tkgui/plotgrouppanel.py 1.165: (Re. new, unused classes.)
+	Updated (and simplified a little) the history code to work with
+	new panel.
+
+	* topo/tkgui/tkparameterizedobject.py 1.16: Added possibly
+	temporary list for accessing widgets of WidgetDrawingTkPO.
+
+	* topo/tkgui/tkparameterizedobject.py 1.15: Added comment.
+
+	* topo/tkgui/plotgrouppanel.py 1.164,
+	topo/tkgui/templateplotgrouppanel.py 1.67: Made new panels look
+	more like the old ones. Added some comments to help my reading
+	(temporary).
+
+	* topo/tkgui/plotgrouppanel.py 1.163,
+	topo/tkgui/templateplotgrouppanel.py 1.66: (Re. new, unused
+	classes.) Began to clean up some naming. Also additional minor
+	changes.
+
+	* topo/tkgui/tkparameterizedobject.py 1.14: Added mechanism to
+	allow a callback when a tk variable is set (e.g. to allow a panel
+	to have a function called when the parameter is changed). Also,
+	widget can optionally be drawn inside a supplied frame (untested).
+
+	* topo/tkgui/plotgrouppanel.py 1.162,
+	topo/tkgui/templateplotgrouppanel.py 1.65: Continued working on
+	new versions of PlotGroupPanel and TemplatePlotGroupPanel; should
+	be no change to code of existing panels. (New versions are
+	currently a mess.)
+
+2007-05-22  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/analysis/featureresponses.py 1.20: Fixed bug introduced in
+	revision 1.12 on 15 March 2007; as part of timing code added to
+	show progress on measuring maps, input patterns were being
+	presented twice instead of only once.  This did not affect the
+	normal process of measuring maps, but for some networks that keep
+	track of activation counts or have some other unusual
+	architectures, there may have been some effect on the results of
+	map or curve measurement
+
+2007-05-20  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.161,
+	topo/tkgui/templateplotgrouppanel.py 1.64: Working on making
+	PlotGroupPanel and TemplatePlotGroupPanel WidgetDrawingTkPOs. The
+	existing classes are not changed (i.e. no visible changes).
+
+	* topo/tkgui/tkparameterizedobject.py 1.13: Labels are added by
+	WidgetDrawingTkPO. Commented out demo code.
+
+	* topo/tkgui/tkparameterizedobject.py 1.12: Use get_param and
+	set_param methods to access TKPO's parameterized_object's
+	parameters (if that's even going to be necessary...).
+
+2007-05-19  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.11: t=TkPO() provides
+	access to its parameterized_object's parameter p via t.p__param,
+	rather than as t.p (since t could also be another type of object
+	with its own attributes). This is just for testing: might
+	revert. Also, Tkinter Variables (shadows of Parameters) are now
+	guaranteed never to return out-of-date values. Adding a refresh
+	method that gets called e.g. on focus in for a WidgetDrawingTkPO
+	would keep the GUI pretty well in sync with the underlying
+	ParameterizedObject.
+
+	* topo/tkgui/connectionfieldspanel.py 1.49: Added comment.
+
+	* topo/tkgui/tkparameterizedobject.py 1.10: WidgetDrawingTkPO is a
+	Frame, too. Added plotgroup template example.
+
+	* topo/tkgui/tkparameterizedobject.py 1.9: No longer pass through
+	unused **params.
+
+	* topo/tkgui/tkparameterizedobject.py 1.8: Commented out demo
+	code, and added a docstring.
+
+	* topo/tkgui/tkparameterizedobject.py 1.7: Change to comment.
+
+	* topo/tkgui/tkparameterizedobject.py 1.6: Updates to
+	documentation, some renaming, and some cleaning.
+
+	* topo/tkgui/propertiesframe.py 1.26, topo/tkgui/topoconsole.py
+	1.183, topo/tkgui/translatorwidgets.py 1.14: Renamed
+	TaggedSlider's 'tagvariable' to 'variable'.
+
+2007-05-18  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Developer_Manual/optimization_text.php 1.17: Added notes
+	about optimizing Python
+
+2007-05-18  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.5: Removed some irrelevant
+	docstrings. Corrected comment.
+
+	* topo/tkgui/tkparameterizedobject.py 1.4: No visible change:
+	altered variable name and added comment.
+
+	* topo/tkgui/tkparameterizedobject.py 1.3: First pass at using a
+	subobject to proxy Parameters.
+
+2007-05-18  rczhao  <rczhao@lodestar.inf.ed.ac.uk>
+
+	* external/.cvsignore 1.29, external/Makefile 1.71: Added
+	pytables, which required adding pyrex and hdf5.  hdf5 doesn't
+	compile yet, but it's possible to get things working with an
+	external hdf5 library for now
+
+2007-05-18  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.2: Minor change to have
+	correct widget chosen automatically.
+
+2007-05-18  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.78, topo/patterns/image.py 1.62:
+	Changed location of imports; moved FaceSpace2Dfromfile into
+	face-space/face_space_patterns.py and Caricaturization Preference
+	maps into face-space/analysis.py
+
+	* doc/Future_Work/current_text.php 1.228: Added to-do item
+
+2007-05-18  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.1: Initial version;
+	currently just to test out mechanisms for Tkinter
+	Variable/Topographica Parameter coupling (tkpo.py as sent by
+	e-mail to JAB 2006/05/17, slightly modified for Topographica).
+
+2007-05-18  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/face.py 1.2, examples/face_space.ty 1.10: Moved
+	examples/face_space.ty to face-space/face_space.ty,
+	facedb/aam_fit_data.h5 to face-space/aam_fit_data.h5, and
+	topo/patterns/face.py to face-space/face_space_patterns.ty
+
+2007-05-18  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.160: Removed auto-resize
+	checkbutton. Window automatically resized whenever a user does
+	something to change the size (e.g. enlarges the plots).
+
+2007-05-18  rczhao  <rczhao@lodestar.inf.ed.ac.uk>
+
+	* external/Pyrex-0.9.5.1a.tar.gz 1.1: A C extension for Python,
+	required for PyTables compilation
+
+	* external/pytables-20070518.tar.gz 1.1: A Python-HDF5 interface,
+	enabling hierarchical dataset for handling large amounts of
+	datasets
+
+	* examples/face_space.ty 1.9: Reverted to r 1.7 and modified codes
+	based on r 1.7
+
+	* examples/face_space.ty 1.8: Used a new class FaceSpace2D defined
+	in patterns/face.py
+
+	* topo/patterns/face.py 1.1: Face Generator based on shapes and
+	textures stored in hdf5 database.
+
+2007-05-16  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.159: Using bwidget, scrollbars
+	should no longer appear when reducing the plot sizes in a fixed
+	window (untested so far).
+
+	* topo/tkgui/plotgrouppanel.py 1.158: Removed alert about message
+	bar (since it matches topoconsole's). Added question about button
+	configuration when looking at history.
+
+	* topo/tkgui/plotgrouppanel.py 1.157: Removed borders from
+	invisible sizing frames (left on by mistake).
+
+	* topo/tkgui/plotgrouppanel.py 1.156: Made
+	ResizableScrollableFrame out of the scrollable frame code in
+	BasicPlotGroupPanel. Also fixed centering problem (i.e. plots are
+	centered now when using the bwidget version).
+
+	* topo/tkgui/testpattern.py 1.68: Renamed auto_refresh to
+	auto_refresh_var.
+
+	* topo/base/simulation.py 1.68: Minor change to argument name for
+	consistency.
+
+	* topo/base/parameterclasses.py 1.62: Added question.
+
+	* topo/base/simulation.py 1.67: Minor change to a docstring.
+
+2007-05-13  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.155,
+	topo/tkgui/projectionactivitypanel.py 1.12,
+	topo/tkgui/projectionpanel.py 1.96,
+	topo/tkgui/templateplotgrouppanel.py 1.63: Renamed
+	self.auto_resize to self.auto_resize_var, and self.auto_refresh to
+	self.auto_refresh_var.
+
+	* topo/tkgui/projectionpanel.py 1.95: Intermediate (temporary)
+	class hierarchy: the abstract
+	ProjectionRelatedPanel(TemplatePlotGroupPanel); the abstract
+	CFRelatedPanel(ProjectionRelatedPanel);
+	CFProjectionPanel(CFRelatedPanel);
+	ConnectionFieldsPanel(CFRelatedPanel);
+	ProjectionActivityPanel(ProjectionRelatedPanel).
+
+	* topo/tkgui/projectionactivitypanel.py 1.11: Use
+	ProjectionRelatedPanel as the parent.
+
+	* topo/tkgui/connectionfieldspanel.py 1.48: Use CFPRelatedPanel as
+	the parent.
+
+	* topo/tkgui/connectionfieldspanel.py 1.47,
+	topo/tkgui/projectionpanel.py 1.94: Moved history button updates
+	up to parent of the projection panels.
+
+	* topo/tkgui/templateplotgrouppanel.py 1.62: Added a HACKALERT.
+
+	* topo/tkgui/connectionfieldspanel.py 1.46,
+	topo/tkgui/projectionpanel.py 1.93: Moved
+	restore_panel_environment() up to SomethingPanel (even thought the
+	classes are going to change, this reduces duplication.
+
+	* topo/tkgui/connectionfieldspanel.py 1.45,
+	topo/tkgui/projectionpanel.py 1.92: Don't set the situate status
+	(temporary; avoids the request-projection-views-from-non-cfsheets
+	bug described in a CEBHACKALERT in projectionpanel).
+
+	* topo/tkgui/projectionpanel.py 1.91, topo/tkgui/topoconsole.py
+	1.182: Renamed ProjectionPanel to CFProjectionPanel.
+
+	* topo/tkgui/projectionpanel.py 1.90: Corrected a presumable
+	indentation error. Updated comment.
+
+	* topo/tkgui/projectionpanel.py 1.89: Removed stray print
+	statement.
+
+	* topo/tkgui/projectionpanel.py 1.88: Fix mistake in a previous
+	checkin: display sheet names in the sheet menu, rather than sheets
+	themselves.
+
+	* topo/tkgui/connectionfieldspanel.py 1.44,
+	topo/tkgui/projectionactivitypanel.py 1.10,
+	topo/tkgui/projectionpanel.py 1.87: Renamed self.situate to
+	self.situate_var. Restored previous default situate and
+	auto-refresh states to various panels (differences between them
+	had been lost).
+
+	* topo/tkgui/projectionpanel.py 1.86: valid_context() checks for
+	CFProjections, not just Projections (since the classes expect
+	CFs).
+
+	* topo/tkgui/connectionfieldspanel.py 1.43,
+	topo/tkgui/projectionactivitypanel.py 1.9,
+	topo/tkgui/projectionpanel.py 1.85: One valid_context() method for
+	ConnectionFieldsPanel, ProjectionPanel,
+	ProjectionActivityPanel. (I assume that the valid_context()
+	methods were out of date for ConnectionFieldsPanel and
+	ProjectionActivityPanel; if that assumption is wrong, then the
+	differences should be restored.)
+
+2007-05-12  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/projectionpanel.py 1.84: Added alert. Removed
+	outdated docstring.
+
+	* topo/tkgui/plotgrouppanel.py 1.154: Auto-refresh and auto-resize
+	variables are traced, allowing the corresponding methods to be
+	called whenever the variables change (rather than when a widget
+	representing the variables changes).
+
+	* topo/tkgui/plotgrouppanel.py 1.153: Removed unused import.
+
+	* topo/tkgui/connectionfieldspanel.py 1.42: Simplification of
+	update_plotgroup_variables().
+
+	* topo/tkgui/connectionfieldspanel.py 1.41: Removed self.x,
+	self.y. Renamed self.x_str to self.x_var.
+
+	* topo/tkgui/connectionfieldspanel.py 1.40: Use float() to convert
+	x,y rather than eval()ing in __main__.
+
+	* topo/tkgui/projectionpanel.py 1.83: Commented out seemingly
+	unused import.
+
+	* topo/tkgui/projectionpanel.py 1.82: Just change density_var to
+	float, rather than eval()ing in __main__.
+
+	* topo/tkgui/projectionactivitypanel.py 1.8: Cleaned up imports.
+
+	* topo/tkgui/projectionactivitypanel.py 1.7: Intermediate checkin:
+	started to move common code from ConnectionFieldsPanel,
+	ProjectionPanel, and ProjectionActivityPanel into a shared parent
+	class.
+
+	* topo/tkgui/connectionfieldspanel.py 1.39,
+	topo/tkgui/projectionpanel.py 1.81: Intermediate checkin: started
+	to move common code from ConnectionFieldsPanel and ProjectionPanel
+	into a shared parent class.
+
+	* topo/tkgui/projectionpanel.py 1.80: Mover super() call to the
+	start of __init__.
+
+	* topo/tkgui/projectionpanel.py 1.79: Removed individual alerts
+	about things only being valid for CFs: they are covered by the
+	general JABALERT. Minor simplification to _add_sheet_menu.
+
+	* topo/tkgui/projectionpanel.py 1.78: More renaming: should be no
+	visible change.
+
+	* topo/tkgui/projectionpanel.py 1.77: Removed projection_refresh()
+	method since it doesn't do anything.
+
+	* topo/tkgui/projectionpanel.py 1.76: Replaced self.density with a
+	method to return the float density from its Tkinter string
+	variable.
+
+	* topo/tkgui/projectionpanel.py 1.75: More renaming and cleaning;
+	should be no visible changes.
+
+	* topo/tkgui/projectionpanel.py 1.74: More renaming: should be no
+	visible change.
+
+	* topo/tkgui/projectionpanel.py 1.73: Renamed 'region' to 'sheet'
+	wherever it appeared. Removed unused imports.
+
+	* topo/misc/keyedlist.py 1.5: Added comment about alternatives to
+	KeyedList.
+
+	* topo/base/projection.py 1.93: Removed comment left in by
+	mistake.
+
+	* topo/tkgui/projectionpanel.py 1.72: Simplified
+	_create_projection_dict(). Should be no visible change.
+
+2007-05-11  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/projectionpanel.py 1.71: Replaced HACKALERT with
+	ALERT: ProjectionPanel now at least checks that the Projections
+	are CFProjections.
+
+	* topo/tkgui/projectionpanel.py 1.70: Minor simplifications to
+	_create_projection_dict() (should be no visible change).
+
+	* topo/base/projection.py 1.92: Minor modification to docstring.
+
+	* topo/tkgui/projectionactivitypanel.py 1.6,
+	topo/tkgui/projectionpanel.py 1.69,
+	topo/tkgui/connectionfieldspanel.py 1.38,
+	topo/plotting/plotgroup.py 1.144: Where we just want a list of the
+	Projections into a ProjectionSheet, use the sheet's list of
+	in_connections (i.e. replace projections().values() with
+	in_connections).
+
+	* topo/base/projection.py 1.91: Removed redundant assertion
+	(connections are guaranteed to be Projections at connection time).
+
+	* topo/base/simulation.py 1.66: Minor change to comment.
+
+	* topo/base/projection.py 1.90: Corrected mistake in previous
+	checkin.
+
+	* topo/base/projection.py 1.89: Updated numpy import statement (no
+	visible change).
+
+	* topo/tkgui/plotgrouppanel.py 1.152: Added a comment.
+
+2007-05-09  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.181: Changed CommandPrompt to be a
+	Tkinter.Frame.
+
+	* doc/Future_Work/current_text.php 1.227: Rearranged some tasks
+	and removed comment at the start.
+
+	* doc/Future_Work/current_text.php 1.226: Updates to some tasks,
+	plus some new ones.
+
+2007-05-07  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/som_retinotopy_text.php 1.13,
+	examples/som_retinotopy.ty 1.57: Made default size be more
+	practical
+
+	* doc/Future_Work/current_text.php 1.225: More to do
+
+2007-05-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.180: Some renaming (no visible
+	changes).
+
+	* topo/tkgui/plotgrouppanel.py 1.151: Added comment.
+
+	* topo/tkgui/topoconsole.py 1.179: Removed comment, changed relief
+	of learning_frame, changed title of progress bar.
+
+	* topo/tkgui/plotgrouppanel.py 1.150: Uncommented maxsize (works
+	on linux, at least), and reduced the maximum size of the plot
+	frame.
+
+2007-05-06  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.149: Initial scrolled frame size
+	is now small (it can grow if required).
+
+	* topo/tkgui/plotgrouppanel.py 1.148: Replaced Pmw's scrollable
+	frame with one from bwidget. If bwidget is built, scrollbars are
+	used - if not, then the behavior is as before. The scrolling and
+	resizing still isn't perfect, and it's a bit complex. Restored
+	auto-resize check button code.
+
+	* topo/tkgui/__init__.py 1.25: Added a note.
+
+	* doc/Future_Work/current_text.php 1.224: Minor updates.
+
+	* topo/tkgui/topoconsole.py 1.178: Added demo progress bar for
+	learning (for anyone who has done 'make -C external bwidget').
+
+2007-05-05  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/templates.py 1.71: Corrected variable name.
+
+	* topo/tkgui/templateplotgrouppanel.py 1.61: Added 'Histogram' &
+	'Gradient' to plot titles.
+
+	* topo/tkgui/templateplotgrouppanel.py 1.60: Added a comment.
+
+	* topo/tkgui/templateplotgrouppanel.py 1.59: Added gradient plot
+	to right-click menu.
+
+	* topo/commands/pylabplots.py 1.24: Added gradient plot (from JB's
+	octave code).
+
+	* topo/tkgui/topoconsole.py 1.177: Took the command prompt off
+	TopoConsole, which allowed a lot of simplification of the
+	code. (Unfortunately now TopoConsole looks a little spartan.) The
+	command prompt is now a class, and a command prompt window can be
+	opened from the simulation menu.
+
+	* topo/tkgui/topoconsole.py 1.176: Removed messagebar's outer
+	frame, and replaced learning_group's with a Tkinter frame.
+
+	* topo/tkgui/topoconsole.py 1.175: Added a comment about status
+	bar.
+
+	* topo/tkgui/topoconsole.py 1.174: Tried to document
+	PlotsMenuEntry.
+
+	* topo/tkgui/topoconsole.py 1.173: Minor cleanup - no visible
+	change.
+
+	* topo/tkgui/topoconsole.py 1.172: Clean up of
+	PlotsMenuEntry. Minor cleanup elsewhere.
+
+	* topo/tkgui/topoconsole.py 1.171: Removed code to track number of
+	windows.
+
+	* topo/tests/testtopoconsole.py 1.6: Added some notes.
+
+	* topo/tkgui/testpattern.py 1.67: Added title, since I removed it
+	from being set by topoconsole.
+
+	* topo/tkgui/topoconsole.py 1.170: Corrected a previous oversight.
+
+	* topo/tkgui/topoconsole.py 1.169: Renamed and tidied up things
+	related to the test pattern window. Renamed __plot_menu() to
+	__plots_menu().
+
+	* topo/tkgui/topoconsole.py 1.168: Removed unused
+	variable. Removed reset_network() (which didn't do anything).
+
+	* topo/tkgui/topoconsole.py 1.167: Cleaned up the run_script
+	method.
+
+	* topo/tkgui/topoconsole.py 1.166: Corrected typos in
+	simulation_menu. Renamed load_script to run_script, and began to
+	tidy that up.
+
+	* topo/tkgui/topoconsole.py 1.165: Use Tkinter.Menu instead of
+	Pmw.MainMenuBar. There should be no visible change to the
+	TopoConsole GUI.
+
+	* topo/tkgui/__init__.py 1.24: Added some notes.
+
+2007-05-04  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/templateplotgrouppanel.py 1.58: Added
+	not-yet-configurable histogram plot to right-click menu.
+
+	* topo/commands/pylabplots.py 1.23: Added histogramplot().
+
+	* topo/commands/pylabplots.py 1.22: Fixed minor typo.
+
+2007-05-03  rczhao  <rczhao@lodestar.inf.ed.ac.uk>
+
+	* examples/face_space.ty 1.7: Removed PiecewiseLinear_debug class
+	and replaced all PiecewiseLinear_debug invokes with
+	PiecewiseLinear.
+
+2007-05-03  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/index_text.php 1.48: Minor cleanup
+
+	* doc/Downloads/index_text.php 1.47: Updated Mac instructions
+
+2007-05-03  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.164: About window is a TkguiWindow
+	rather than a Toplevel.
+
+	* doc/Future_Work/current_text.php 1.223: Added 'cross
+	normalization' and 'plot histograms' tasks.
+
+	* topo/tkgui/parametersframe.py 1.118: Parameter window opens in
+	TkguiWindow rather than Toplevel.
+
+	* topo/tkgui/plotgrouppanel.py 1.147: Corrected an earlier
+	oversight: changed 'Toplevel' to 'TkguiWindow' in destroy().
+
+	* topo/tkgui/editorobjects.py 1.53: Parameter window opens in
+	TkguiWindow rather than Toplevel.
+
+	* topo/tkgui/editortools.py 1.42: Removed unused import.
+
+	* topo/tkgui/editorwindow.py 1.44: Make the model editor use a
+	TkguiWindow rather than a Tkinter.Toplevel.
+
+2007-05-02  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or_noshrinking_adapthomeo.ty 1.6: no longer
+	required, merged with lissom_oo_or_noshrinking.ty
+
+	* topo/outputfns/homeostatic.py 1.14: removed
+	piecewiselinear_debug functions and added averaging over
+	parameters to OutputFnDebugger
+
+	* examples/lissom_oo_or_noshrinking.ty 1.11: changed
+	OutputFnDebugger to include averaging over parameters
+
+	* examples/lissom_or_homeoscale.ty 1.16: added
+	PiecewiseLinear_debug2 function to this file so that it could be
+	removed from outputfns/homeostatic.py
+
+	* examples/face_space.ty 1.6: added PiecewiseLinear_debug function
+	to this file so that it could be removed from
+	outputfns/homeostatic.py
+
+	* examples/laminar_oo_or.ty 1.13: changed strengths, changed
+	output_fn back to HomeostaticMaxEnt, best version so far but still
+	work in progress
+
+2007-04-30  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/index_text.php 1.46: Updated with guess as to what
+	to do on the Mac.
+
+2007-04-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.163: Icon-setting code moved to
+	TkguiWindow; TkguiWindow moved to tkguiwindow.py.
+
+	* topo/tkgui/plotgrouppanel.py 1.146: Plotgroup panels are
+	TkguiWindows (so get an icon).
+
+	* topo/tkgui/tkguiwindow.py 1.1: Initial version.
+
+	* topo/tkgui/translatorwidgets.py 1.13, topo/plotting/templates.py
+	1.70: Added ALERT.
+
+	* topo/tkgui/featurecurvepanel.py 1.13: Removed unused import.
+
+	* topo/tkgui/connectionfieldspanel.py 1.37: Removed unused import
+	statement.
+
+	* topo/tkgui/topoconsole.py 1.162: Minor updates to
+	docstrings/comments.
+
+	* topo/tkgui/editortools.py 1.41: Removed unused import.
+
+	* topo/tkgui/__init__.py 1.23: Change to import statement.
+
+	* topo/tkgui/topoconsole.py 1.161: Tidied imports, updated/added
+	some comments.
+
+	* topo/tkgui/plotgrouppanel.py 1.145: Added ALERT.
+
+	* topo/tkgui/topoconsole.py 1.160: Added TkguiWindow class.
+
+	* topo/tkgui/__init__.py 1.22, topo/tkgui/topoconsole.py 1.159:
+	TopoConsole is a subclass of Toplevel rather than Tk (so that we
+	can have a hierachy of windows with a common parent).
+
+2007-04-27  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or_noshrinking.ty 1.10: further simplified
+	file
+
+2007-04-27  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/images/topographica-0.9.3_modeleditor_ubuntu.png 1.1,
+	doc/images/topographica-0.9.3_ubuntu.png 1.1, doc/shared/index.php
+	1.31: Added screenshots
+
+2007-04-27  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/commandline_text.php 1.11: Indicate where
+	%APPDATA% is likely to be on Windows.
+
+2007-04-26  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or_noshrinking.ty 1.9: Added options for
+	Outputfn_type and num_inputs that can be read in from command
+	line, lissom_oo_or_noshrinking_adapthomeo.ty no longer required
+
+2007-04-26  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/index_text.php 1.45: Updated path info for
+	compiled code on Windows.
+
+	* doc/User_Manual/commandline_text.php 1.10: Updated site-specific
+	customization with the various startup file choices.
+
+	* topo/misc/commandline.py 1.27: Try to execute commands in
+	~/.topographicarc, then ~/Library/Application
+	Support/Topographica/topographica.config, then
+	%APPDATA$\Topographica\topographica.ini.
+
+	* external/Makefile 1.70: Added tilewrapper to uninstall and clean
+	targets.
+
+2007-04-25  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/index_text.php 1.44: Minor improvement to Mac
+	instructions
+
+	* doc/Future_Work/index_text.php 1.29: Changed date
+
+	* doc/Future_Work/current_text.php 1.222: Updated to-do list
+
+	* doc/User_Manual/commandline_text.php 1.9,
+	doc/User_Manual/plotting_text.php 1.2: Updated to match change in
+	search path for topographicarc
+
+	* doc/Downloads/index_text.php 1.43: Removed change to space
+	requirements
+
+2007-04-25  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_or_homeoscale.ty 1.15: reverted back to previous
+	version using PiecewiseLinear_debug2
+
+	* topo/outputfns/homeostatic.py 1.13: re-added
+	PeicewiseLinear_debug2 function for use with example files
+
+2007-04-25  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.221: Removed psyco-on-win
+	task.
+
+	* topo/tkgui/topoconsole.py 1.158: Use tkgui's detection of
+	platform.
+
+	* topo/tkgui/topoconsole.py 1.157: Don't run 'stty sane' on
+	Windows, since it causes an error message (and isn't required on
+	Windows anyway).
+
+	* topo/misc/commandline.py 1.26: Changed method of finding user's
+	home dir so that it works on Windows (os.getenv('HOME') returns an
+	empty string).
+
+2007-04-25  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/shared/index.php 1.30: Minor fix
+
+	* Makefile 1.106: More to delete
+
+	* doc/Downloads/index_text.php 1.42: Added note for mac
+
+	* topo/tests/testfeaturemap.py 1.27: Removed dependence on old SOM
+	support
+
+	* doc/shared/index.php 1.29: Updated for the release
+
+	* Makefile 1.105: Minor change to list of distributed examples
+
+	* ChangeLog.txt 1.19: Added recent changes
+
+	* topo/tests/testfeaturemap.py 1.26,
+	topo/tests/testpatternpresent.py 1.18,
+	topo/tests/testplotfilesaver.py 1.22, topo/tests/testplotgroup.py
+	1.28, topo/tests/testplotgrouppanel.py 1.13,
+	topo/tests/testcfsom.py 1.36: Converted tests to use CFSheet
+	instead of CFSOM
+
+	* topo/learningfns/som.py 1.20, topo/sheets/cfsom.py 1.36: Added
+	deprecation warning
+
+	* examples/hierarchical.ty 1.69: Switched to CFSheet instead of
+	obsolete CFSOM
+
+	* topo/tests/test_script.py 1.20: Trivial cleanup to output
+
+	* topo/tests/som_retinotopy.ty_DATA 1.3,
+	topo/tests/sullivan_neurocomputing04.ty_DATA 1.2,
+	topo/tests/sullivan_nn06.ty_DATA 1.2: Updated to match changes in
+	SOM support
+
+	* topo/commands/analysis.py 1.77: Fixed import
+
+	* external/Makefile 1.69: Restored -Wl option to python's
+	configure, so that Topographica would compile under Ubuntu 6.10.
+
+2007-04-25  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/shared/index.php 1.28: Correct minor typo.
+
 2007-04-25  James A. Bednar  <jbednar@lincoln>
 
 	* topo/tests/testfeaturemap.py 1.26,
@@ -110,17 +4162,18 @@
 
 2007-04-23  ceball  <ceball@lincoln>
 
-	* doc/Future_Work/current_text.php 1.219:
-	Updated tkinter problem (and merged note+task). Added psyco on Windows task.
+	* doc/Future_Work/current_text.php 1.219: Updated tkinter problem
+	(and merged note+task). Added psyco on Windows task.
 
 2007-04-23  James A. Bednar  <jbednar@lincoln>
 
-	* doc/Downloads/index_text.php 1.41: Updated disk space requirements
+	* doc/Downloads/index_text.php 1.41: Updated disk space
+	requirements
 
 2007-04-23  judelaw  <judelaw@lincoln>
 
-	* topo/responsefns/projfns.py 1.23:
-	fixed documentation for CFPRF_ActivityBased
+	* topo/responsefns/projfns.py 1.23: fixed documentation for
+	CFPRF_ActivityBased
 
 2007-04-23  James A. Bednar  <jbednar@lincoln>
 
@@ -140,18 +4193,6 @@
 
 	* ChangeLog.txt 1.18: Updated with recent changes
 
-	* topo/outputfns/basic.py 1.61:
-	Fixed serious bug in KernelMax: the coordinates of the center of the kernel function were incorrect, with y reversed.
-
-	* topo/learningfns/som.py 1.18:
-	Trivial reformatting to match new SOM support; no change in function
-
-	* topo/analysis/featureresponses.py 1.19: Trivial fix to comment
-
-	* doc/Links/index_text.php 1.9: Minor fixes
-
-2007-04-23  James A. Bednar  <jbednar@lincoln>
-
 	* topo/outputfns/basic.py 1.61: Fixed serious bug in KernelMax:
 	the coordinates of the center of the kernel function were
 	incorrect, with y reversed.
@@ -162,11 +4203,6 @@
 	* topo/analysis/featureresponses.py 1.19: Trivial fix to comment
 
 	* doc/Links/index_text.php 1.9: Minor fixes
-
-	* examples/lissom_oo_or.ty 1.90, topo/base/simulation.py 1.65: At
-	Jeff's suggestion, changed grid_layout to be a method on
-	Simulation so that it can accept strings rather than paths to the
-	complete objects
 
 	* doc/Developer_Manual/releases_text.php 1.3: Minor addition
 
