@@ -49,16 +49,14 @@
 <dt>General improvements:</dt>
 <dd>
   numerous bugfixes<br>
-  set up automatic builds at buildbot.topographica.org<br>
+  set up <A target="_top" href="http://buildbot.topographica.org">automatic daily builds</A><br>
 </dd>
 <dt>Component library:</dt>
 <dd>
   new
   <A HREF="../Reference_Manual/topo.coordmapperfns-module.html">
-  <?php classref('topo.coordmapperns,'CoordinateMapperFn')?> 
-  coordmapperfns (Grid, Pipeline, Polar/Cartesian)<br>
-  OutputFnDebugger for keeping track of statistics<br>
-  grid_layout command to simplify model diagrams<br>
+  coordmapperfns</A> (Grid, Pipeline, Polar/Cartesian)<br>
+  <!-- OutputFnDebugger for keeping track of statistics<br> -->
 </dd>
 <dt>Example scripts:</dt>
 <dd>
@@ -79,25 +77,24 @@
   <!--  added GUI tests<br> -->
   <!--  added optional pretty-printing for parameter names in GUI<br> -->
   added progress bars, scroll bars, window icons<br>
-  new Step button on console<br>
-  <!-- changed -g to launch the GUI where it is specified, to allow more control --><br>
-  <!-- added categories for plots to simplify GUI --><br>
+  new Step button on console
+  <!-- changed -g to launch the GUI where it is specified, to allow more control<br> -->
+  <!-- added categories for plots to simplify GUI<br> -->
 </dd>
-<dt><A target="_top" href="../User_Manual/commandline.html">Command-line and batch</A>:</dt>
+<dt>Command-line and batch:</dt>
 <dd>
   <A target="_top" href="../User_Manual/commandline.html#saving-bitmaps">saving 
-  bitmaps from script/command-line (for batch runs)</A><br>
-  <A target="_top" href="../User_Manual/commandline.html#scripting-gui">script/command-line 
-  control over GUI</A><br>
+  bitmaps</A> from script/command-line (for batch runs)<br>
+  script/command-line <A target="_top" href="../User_Manual/commandline.html#scripting-gui">control over GUI</A><br>
+  <!-- grid_layout command to simplify model diagrams<br> -->
 </dd>
 <dt>Plotting:</dt>
 <dd>
   reverse-correlation RF mapping<br>
   <A target="_top" href="../User_Manual/commandline.html#3d-plotting">3D 
-  wireframeplotting (in right-click menu)</A><br>
-  <br>
+  wireframe plotting</A> (in right-click menu)<br>
   gradient plots, histogram plots (in right-click menu)<br>
-  <A target="_top" href="../User_Manual/commandline.html#measuring-preference-maps">simplified
+  <A target="_top" href="../User_Manual/plotting.html#measuring-preference-maps">simplified
   bitmap plotting</A> (removed template classes)<br>
 </dd>
 </font>
