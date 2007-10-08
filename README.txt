@@ -31,12 +31,16 @@ To read more about Topographica before trying to build it, you can
 build the documentation separately from compiling Topographica itself.
 If PHP4, m4, bibtex, convert, and fig2dev are installed on your system
 (as in most Linux distributions), just change to the topographica
-directory and type "make doc reference-manual", then load
-doc/index.html into your web browser.  If there are any problems
-generating the local copy, you can instead use the web-based
-documentation at www.topographica.org.  (The doc/ directory is just a
-copy of the www.topographica.org site, although the web site will not
-necessarily match this particular copy of Topographica.)
+directory and type "make doc reference-manual".  (This step is only
+necessary when building from CVS; released versions include the
+documentation already built.)  
+
+Once the documentation has been built, load doc/index.html into your
+web browser.  If there are any problems generating or reading the
+local copy, you can instead use the web-based documentation at
+www.topographica.org.  (The doc/ directory is just a copy of the
+www.topographica.org site, although the web site will not necessarily
+match this particular copy of Topographica.)
 
 
 BUILDING TOPOGRAPHICA
