@@ -5,7 +5,7 @@ another.
 Coordinate mapper functions are useful for defining magnifications and
 other kinds of transformations on sheet coordinates, e.g. for defining
 retinal magnification using a CFProjection.  A CoordinateMapperFn
-(e.g. MagnifyingMapper, applied to an (x,y) pair and returns a new
+(e.g. MagnifyingMapper), is applied to an (x,y) pair and returns a new
 (x,y) pair.  To apply a mapping to a CF projection, set the
 CFProjection's coord_mapper parameter to an instance of the desired
 CoordinateMapperFn.
