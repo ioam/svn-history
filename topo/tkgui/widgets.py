@@ -23,6 +23,7 @@ import Tkinter
 import traceback
 import code
 import StringIO
+import __main__
 
 import Pmw
 import bwidget
@@ -479,17 +480,17 @@ class CommandPrompt(Tkinter.Frame):
         self.balloon.bind(self.command_entry,
              """Accepts any valid Python command and executes it in main as if typed at a terminal window.""")
 
-        scrollbar = Scrollbar(self)
-        scrollbar.pack(side=RIGHT, fill=Y)
+        scrollbar = Tkinter.Scrollbar(self)
+        scrollbar.pack(side='right', fill='y')
         # CEBALERT: what length history is this going to keep?
         self.command_output = OutputText(self,
-                                         state=DISABLED,
+                                         state='disabled',
                                          height=10,
                                          yscrollcommand=scrollbar.set)
-        self.command_output.pack(side=TOP,expand=YES,fill=BOTH)
+        self.command_output.pack(side='top',expand='yes',fill='both')
         scrollbar.config(command=self.command_output.yview)
 
-        self.command_entry.pack(side=BOTTOM,expand=NO,fill=X)
+        self.command_entry.pack(side='bottom',expand='no',fill='x')
 
 
     def exec_cmd(self,cmd):
