@@ -38,6 +38,10 @@ tracker rather than added to this list</B>.
 
 <H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
 
+<H4>2007/10/08 (CB): gui bugs</H4>
+Clicking "Normalize" on a pref window causes refresh (re-measurement).
+"Strength only" is messed up on a pref window.
+
 <H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
 <li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
@@ -82,14 +86,15 @@ Insert missing actions in case someone tries higher densities.
 JAB 2007/04/25: Isn't this already done?
 
 
-<H4>2007/04/15 (CB): test topographica-win</H4>
+<H4>2007/10/08 (CB): test topographica-win</H4>
 Test that results from Windows version match those from the standard
-one. The "make compare_oo_or" test is fine. I can't run the other,
-smaller tests of all the networks because the checked in _DATA files
-don't seem to work on Windows. I get "ImportError: no module named
-fixedpoint" during unpickling. Importing fixedpoint works in Windows,
-and I can see it there in site-packages. So there's some confusion
-somewhere, and it could be difficult to solve. 
+one. The unit tests and the "make compare_oo_or" test are fine, but I
+can't run the other, smaller tests of all the networks because the
+checked in _DATA files don't seem to work on Windows. I get
+"ImportError: no module named fixedpoint" during unpickling. Importing
+fixedpoint works in Windows, and I can see it there in
+site-packages. So there's some confusion somewhere, and it could be
+difficult to solve. I have no idea whatever about this problem.
 
 
 <!-- ------------------------------------------------------------------------ -->
