@@ -4,7 +4,7 @@
 Windows and Mac OS X.  It should work on non-Linux versions of UNIX as
 well, as long as standard GNU tools like make and GCC are installed.
 You will need a writable directory with a large amount of space
-available, about 500 megabytes as of 3/2007.
+available, about 500 megabytes as of 10/2007.
 
 <P>There are two ways to obtain Topographica: as downloadable
 installation packages, or via
@@ -48,7 +48,7 @@ as below.
 
 <P>On other systems, just type <code>make</code> (which may be called
 <code>gmake</code> on some systems) from within the
-<code>topographica/</code> directory.  You will currently (3/2007)
+<code>topographica/</code> directory.  You will currently (10/2007)
 need to do this on a machine with a functioning DISPLAY, not on a
 remote text-only windowless session, because of build requirements for
 the MatPlotLib library.  The build process will take a
