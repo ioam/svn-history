@@ -134,9 +134,13 @@ else:
 if system_platform=='mac':
     topo.entry_background = 'SystemWindowBody'
 elif system_platform=='win':
-    topo.entry_backgroud = 'SystemWindowFrame'
+    topo.entry_background = 'SystemWindow'
 else:
     topo.entry_background = '#d9d9d9'
+
+
+
+
 
 def show_cmd_prompt():
     """
