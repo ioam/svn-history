@@ -34,7 +34,7 @@ from topo.misc.keyedlist import KeyedList
 import topo.commands.basic
 
 import topo.tkgui 
-from widgets import TaggedSlider,ControllableMenu
+from widgets import TaggedSlider,ControllableMenu, CommandPrompt
 from topowidgets import ScrolledTkguiWindow,TkguiWindow,ProgressWindow
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from featurecurvepanel import FeatureCurvePanel
