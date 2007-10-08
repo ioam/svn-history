@@ -224,7 +224,7 @@ def histogramplot(data,title=None,colors=None,*args,**kw):
 def gradientplot(data,cyclic=True,cyclic_range=1.0,title=None):
     """
     Compute and show the gradient plot of the supplied data.
-    Translated from Octave code by Yoonsuck Choe.
+    Translated from Octave code originally written by Yoonsuck Choe.
 
     If the data is specified to be cyclic, negative differences will
     be wrapped into the range specified (1.0 by default).
