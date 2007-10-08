@@ -35,8 +35,10 @@
 <i>
 <b>News:</b>
 
-<p><b>23 April 2007:</b> Version 0.9.3 
-<A target="_top" href="../Downloads/index.html">released</A>, including:
+
+
+<p><b>8 Oct 2007:</b> Version 0.9.4 nearly ready for 
+<A target="_top" href="../Downloads/index.html">release</A>, including:
 
 <center>
 <table width="100%" cellpadding="5">
@@ -47,28 +49,23 @@
 <dt>General improvements:</dt>
 <dd>
   numerous bugfixes<br>
-  significant optimizations (~5 times faster)<br>
-  <!-- (about 5 times faster than 0.9.2 for most scripts, with more improvements to come)<br>  -->
-  compressed snapshots (1/3 as large)<br>
-  <!-- more comprehensive test suite checking both speed and functionality<br> -->
-  much-improved reference manual<br>
-  <!-- arrays based on Numpy rather than Numeric<br> -->
+  set up automatic builds at buildbot.topographica.org<br>
 </dd>
 <dt>Component library:</dt>
 <dd>
-  adding noise to any calculation<br>
-  lesioning units and non-rectangular sheet shapes (see PatternCombine)<br>
-  basic auditory pattern generation<br>
-<!--  greatly simplified convolutions<br>--> <!-- SharedWeightCFProjection -->
-  greatly simplified SOM support<br> <!-- now can be mixed and matched with any other components<br> -->
-  more dynamic parameters (such as ExponentialDecay)<br> 
-  flexible mapping of ConnectionField centers between sheets<br>
+  new
+  <A HREF="../Reference_Manual/topo.coordmapperfns-module.html">
+  <?php classref('topo.coordmapperns,'CoordinateMapperFn')?> 
+  coordmapperfns (Grid, Pipeline, Polar/Cartesian)<br>
+  OutputFnDebugger for keeping track of statistics<br>
+  grid_layout command to simplify model diagrams<br>
 </dd>
 <dt>Example scripts:</dt>
 <dd>
-  examples that more closely match published simulations<br>
-  new simulations for face processing and for
-  self-organization from natural images<br>
+  new whisker barrel cortex simulation (lissom_whisker_barrels.ty)<br>
+  (also works as example of calling Matlab code transparently via mlabwrap)<br>
+  new elastic net ocular dominance simulation<br>
+  new spiking example; still needs generalizing<br>
 </dd>
 </font>
 </dl>
@@ -78,26 +75,30 @@
 <font size="-1">
 <dt>GUI:</dt>
 <dd>
-  Better OS X and Windows support<br>
-  progress reporting for map measurement<br>
-  dynamic display of coordinates in plots<br>
-  stop button to interrupt training safely<br>
-  ability to plot and analyze during training<br>
-  right-click menu for analysis of bitmap plots<br>
-  saving current simulation as an editable .ty script<br>
+  greatly simplified adding GUI code<br>
+  <!--  added GUI tests<br> -->
+  <!--  added optional pretty-printing for parameter names in GUI<br> -->
+  added progress bars, scroll bars, window icons<br>
+  new Step button on console<br>
+  <!-- changed -g to launch the GUI where it is specified, to allow more control --><br>
+  <!-- added categories for plots to simplify GUI --><br>
 </dd>
-<dt>Command-line and batch:</dt>
+<dt><A target="_top" href="../User_Manual/commandline.html">Command-line and batch</A>:</dt>
 <dd>
-<!--  more-informative command prompt<br> -->
-  site-specific commands in ~/.topographicarc<br>
-  simple functions for doing optimization<br>
-<!--  saving of plot data with snapshots<br> -->
+  <A target="_top" href="../User_Manual/commandline.html#saving-bitmaps">saving 
+  bitmaps from script/command-line (for batch runs)</A><br>
+  <A target="_top" href="../User_Manual/commandline.html#scripting-gui">script/command-line 
+  control over GUI</A><br>
 </dd>
 <dt>Plotting:</dt>
 <dd>
-  spatial frequency map plots<br>
-  tuning curve plots<br>
-  FFT transforms (in right-click menu)<br>
+  reverse-correlation RF mapping<br>
+  <A target="_top" href="../User_Manual/commandline.html#3d-plotting">3D 
+  wireframeplotting (in right-click menu)</A><br>
+  <br>
+  gradient plots, histogram plots (in right-click menu)<br>
+  <A target="_top" href="../User_Manual/commandline.html#measuring-preference-maps">simplified
+  bitmap plotting</A> (removed template classes)<br>
 </dd>
 </font>
 </dl>
