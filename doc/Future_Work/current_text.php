@@ -53,6 +53,8 @@ when resize pressed? can we stop empty space when there are no bars? can we stop
 bars being there when not required [a bwidget bug])? why is 'press refresh to see
 plots...' text not centered? clean up + doc code. </li>
 <li>finish basic developer manual tkgui intro</li>
+<li>on windows, progress  bar always flicks on for a small fraction of a second
+(even for runs of 1).</li>
 </ul>
 
 <H4>2007/09/01: timing code </H4>
