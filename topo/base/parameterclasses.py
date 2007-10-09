@@ -809,14 +809,23 @@ class InstanceMethodWrapper(object):
 # the application base directory
 application_path = os.path.split(os.path.split(sys.executable)[0])[0]
 
+# For portable code: specify paths in unix (rather than Windows) style; use
+# resolve_filename() for reading paths, and normalize_path() for
+# writing them.
+
 def resolve_filename(path,search_paths=[]):
     """
-    Create an absolute path to the file if the path is not
-    already absolute.
+    Convert a unix-style path to the current OS's format, and create
+    an absolute path to the file if the supplied one is not already
+    absolute.
 
     To turn a supplied relative path into an absolute one, the path is
     appended to each path in (search_paths+the current working
-    directory+the application's base path) until the file is found.
+    directory+the application's base path), in that order, until the
+    file is found.
+
+    (Similar to Python's os.path.abspath(), except more search paths
+    than just os.getcwd() can be used, and the file must exist.)
     
     An IOError is raised if the file is not found anywhere.
     """
@@ -835,3 +844,16 @@ def resolve_filename(path,search_paths=[]):
     raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following place(s): '+str(paths_tried)+'.')
 
 
+def normalize_path(path,prefix=application_path):
+    """
+    Convert a unix-style path to the current OS's format, and create
+    an absolute path (using prefix) if it's not already absolute.
+
+    (Should do the same as Python's os.path.abspath(), except
+    using the specified prefix rather than os.getcwd().)
+    """
+
+    if not os.path.isabs(path):
+        path = os.path.join(os.path.normpath(prefix),path)
+
+    return os.path.normpath(path)
