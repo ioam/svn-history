@@ -52,8 +52,6 @@ def cmp_plot(plot1,plot2):
 #   and there are also missing classes - currently only CFProjections
 #   for CFSheets can be plotted).
 # * There are no unit tests
-# * Commands in analysis.py should be re-written to avoid having to
-#   set global parameters
 
 
 class PlotGroup(ParameterizedObject):
