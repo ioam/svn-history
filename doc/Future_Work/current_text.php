@@ -48,6 +48,7 @@ is not fixed.
 <li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
 <li>Cleanup + doc of *panel.py files</li>
 <li>Cleanup + doc of plotgroup.py</li>
+<li>Eliminate space on left of e.g. orientation preference panel plot area.</li>
 <li>Reorganize classes and filenames in tkgui</li>
 <li>scrollbars: clean up behavior (can we stop bars coming on and going off
 when resize pressed? can we stop empty space when there are no bars? can we stop
