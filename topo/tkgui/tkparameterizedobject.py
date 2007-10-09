@@ -4,7 +4,7 @@ Classes linking ParameterizedObjects and Parameters to Tkinter.
 TkParameterizedObject allows graphical representation and manipulation
 of any ParameterizedObject's Parameters, in a flexible way. Usually,
 it is simply desired to display all the Parameters of a
-ParameterizedObject; for this, use parametersframe.ParametersFrame,
+ParameterizedObject; for this, use parametersframe.ParametersFrameWithApply,
 which extends TkParameterizedObject. If more flexibility is required,
 though, use TkParameterizedObject itself.
 
@@ -69,7 +69,7 @@ function calls, display true Parameter variable names, and more (umm
 like what) - see the detailed documentation.
 
 Examples of TkParameterizedObject usage can be found in
-parametersframe.ParametersFrame (as mentioned above) and
+parametersframe.ParametersFrameWithApply (as mentioned above) and
 in plotgrouppanel.PlotGroupPanel (where it is used to
 allow editing of PlotGroups).
 
@@ -796,7 +796,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         translator = self.translators[name]={}
         # store list of OBJECTS (not classes) for ClassSelectorParameter's range
         # (Although CSParam's range uses classes; allows parameters set on the
-        # options to persist - matches parametersframe.ParametersFrame.)
+        # options to persist - matches parametersframe.ParametersFrameWithApply.)
         # (But note, with f as a TkParameterizedObject with CSP x,
         #  g=Gaussian()
         #  f.x=Gaussian()

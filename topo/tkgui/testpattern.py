@@ -30,7 +30,7 @@ from topo.misc.keyedlist import KeyedList
 from topo.plotting.plot import make_template_plot
 from topo.plotting.plotgroup import SheetPlotGroup
 
-from parametersframe import LiveParametersFrame
+from parametersframe import ParametersFrame
 from plotgrouppanel import SheetPGPanel
 from tkparameterizedobject import ButtonParameter
 
@@ -95,7 +95,7 @@ class TestPattern(SheetPGPanel):
         self.pg_control_pane = Frame(self,bd=1,relief="sunken")
         self.pg_control_pane.pack(side="top",expand='yes',fill='x')
         
-        self.params_frame = LiveParametersFrame(
+        self.params_frame = ParametersFrame(
             self.pg_control_pane,
             parameterized_object=self.pattern_generator,
             on_modify=self.conditional_refresh)
@@ -135,7 +135,7 @@ class TestPattern(SheetPGPanel):
     def change_pattern_generator(self):
         """
         Set the current PatternGenerator to the one selected and get the
-        ParametersFrame to draw the relevant widgets
+        ParametersFrameWithApply to draw the relevant widgets
         """
         self.params_frame.set_PO(self.pattern_generator)
 

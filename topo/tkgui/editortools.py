@@ -19,7 +19,7 @@ from topo.projections import *
 from topo.base.projection import Projection
 
 from editorobjects import EditorSheet, EditorProjection
-from parametersframe import ParametersFrame
+from parametersframe import ParametersFrameWithApply
 
 class ArrowTool(Frame):
     """
@@ -133,7 +133,7 @@ class NodeTool(Frame):
 
         # CEBHACKALERT: because ParameterizedObject overwrites the name
         # unless it's passed in params when the object is created, I
-        # pass the class name (set by ParametersFrame) here.
+        # pass the class name (set by ParametersFrameWithApply) here.
         # Same goes for projections.
         sheet_name=self.sheet_list[self.current_option].name
         if sheet_name is not None:
@@ -272,7 +272,7 @@ class ParametersTool(Frame):
 
         # CEBALERT: will the users think they have to press 'apply' rather than just clicking
         # on the canvas to get the new object?
-        self.parameter_frame = ParametersFrame(self)#,buttons_to_remove=['Close','Defaults'])
+        self.parameter_frame = ParametersFrameWithApply(self)#,buttons_to_remove=['Close','Defaults'])
         self.parameter_frame.hide_param('Close')
         self.parameter_frame.hide_param('Defaults')         
         self.parameter_frame.pack(side=BOTTOM)

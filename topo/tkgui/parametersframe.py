@@ -1,10 +1,10 @@
 """
 Classes for graphically manipulating all the Parameters of a ParameterizedObject.
 
-LiveParametersFrame and ParametersFrame display the Parameters of a
+ParametersFrame and ParametersFrameWithApply display the Parameters of a
 supplied ParameterizedObject. Both allow these Parameters to be
-edited; LiveParametersFrame applies changes immediately as they are
-made, whereas ParametersFrame makes no changes until a confirmation is
+edited; ParametersFrame applies changes immediately as they are
+made, whereas ParametersFrameWithApply makes no changes until a confirmation is
 given (by pressing the 'Apply' button, for instance).
 
 
@@ -35,7 +35,7 @@ from tkparameterizedobject import TkParameterizedObject, ButtonParameter, \
 
 
 
-class LiveParametersFrame(TkParameterizedObject,Frame):
+class ParametersFrame(TkParameterizedObject,Frame):
     """
     Displays and allows instantaneous editing of the Parameters
     of a supplied ParameterizedObject.
@@ -55,7 +55,7 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
     def __init__(self,master,parameterized_object=None,on_change=None,
                  on_modify=None,**params):
         """
-        Create a LiveParametersFrame with the specifed master, and
+        Create a ParametersFrame with the specifed master, and
         representing the Parameters of parameterized_object.
 
         on_change is an optional function to call whenever any of the
@@ -183,7 +183,7 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
     def pack_displayed_params(self,on_change=None,on_modify=None):
 
 
-        # basically original ParametersFrame.__new_widgets
+        # basically original ParametersFrameWithApply.__new_widgets
 
 
         # wipe old labels and widgets from screen
@@ -290,7 +290,7 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
     # rename
     def __edit_PO_in_currently_selected_widget(self):
         """
-        Open a new window containing a ParametersFrame for the 
+        Open a new window containing a ParametersFrameWithApply for the 
         PO in __currently_selected_widget.
         """
         ### simplify this lookup-by-value!
@@ -320,15 +320,13 @@ class LiveParametersFrame(TkParameterizedObject,Frame):
     def unpack_param(self,param_name):
         raise NotImplementedError
     # because it's unfinished (need to remove from list of displayed params)
-    # super(ParametersFrame,self).unpack_param(param_name)
+    # super(ParametersFrameWithApply,self).unpack_param(param_name)
     # also need to do hide,unhide - probably
 
 
 
 
-# CB: names still seem strange...ParametersFrame inherits from
-# LiveParametersFrame?
-class ParametersFrame(LiveParametersFrame):
+class ParametersFrameWithApply(ParametersFrame):
     """
     Displays and allows editing of the Parameters of a supplied ParameterizedObject.
     """
@@ -338,7 +336,7 @@ class ParametersFrame(LiveParametersFrame):
                                    (i.e. acts on the class object).""")
     
     def __init__(self,master,parameterized_object=None,on_change=None,on_modify=None,**params):        
-        super(ParametersFrame,self).__init__(master,parameterized_object,on_change,on_modify,**params)
+        super(ParametersFrameWithApply,self).__init__(master,parameterized_object,on_change,on_modify,**params)
 
         for p in self.param_immediately_apply_change: self.param_immediately_apply_change[p]=True
             
@@ -347,14 +345,14 @@ class ParametersFrame(LiveParametersFrame):
 
 
     def _create_string_widget(self,frame,name,widget_options):
-        w= super(ParametersFrame,self)._create_string_widget(frame,name,widget_options)
+        w= super(ParametersFrameWithApply,self)._create_string_widget(frame,name,widget_options)
         w.unbind('<Return>')
         return w
 
 
     def set_PO(self,parameterized_object,on_change=None,on_modify=None):
 
-        super(ParametersFrame,self).set_PO(parameterized_object,on_change=on_change,
+        super(ParametersFrameWithApply,self).set_PO(parameterized_object,on_change=on_change,
                                            on_modify=on_modify)
         ### Delete all variable traces
         # (don't want to update parameters immediately)
@@ -377,7 +375,7 @@ class ParametersFrame(LiveParametersFrame):
         # CEBALERT: dialog box should include a cancel button
         if self.has_unapplied_change() and tkMessageBox.askyesno("Close","Apply changes before closing?"):
             self.update_parameters()
-        super(ParametersFrame,self)._close_button()
+        super(ParametersFrameWithApply,self)._close_button()
 
 
     __value_changed = TkParameterizedObject.value_changed
@@ -415,19 +413,19 @@ def edit_parameters(parameterized_object,live=False,**params):
     """
     Edit the Parameters of parameterized_object.
 
-    Specify live=True for a LiveParametersFrame (immediately
+    Specify live=True for a ParametersFrame (immediately
     updates the object - no need to press the Apply button).
 
-    Extra params are passed to the ParametersFrame constructor.
+    Extra params are passed to the ParametersFrameWithApply constructor.
     """
     if not (isinstance(parameterized_object,ParameterizedObject) or \
            isinstance(parameterized_object,ParameterizedObjectMetaclass)):
         raise ValueError("Can only edit parameters of a ParameterizedObject.")
 
     if live:
-        pf_class = LiveParametersFrame
-    else:
         pf_class = ParametersFrame
+    else:
+        pf_class = ParametersFrameWithApply
 
     return pf_class(Tkinter.Toplevel(),parameterized_object,**params)
 

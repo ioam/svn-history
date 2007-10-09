@@ -1,5 +1,5 @@
 """
-Tests for the ParametersFrame classes.
+Tests for the ParametersFrameWithApply classes.
 
 $Id$
 """
@@ -17,7 +17,7 @@ from topo.base.parameterclasses import BooleanParameter,Number,Parameter, \
 
 from topo.base.patterngenerator import PatternGenerator
 
-from topo.tkgui.parametersframe import ParametersFrame
+from topo.tkgui.parametersframe import ParametersFrameWithApply
 
 
 # CEBALERT: can't have this code present when doing "make tests" - why?
@@ -40,7 +40,7 @@ class TestPO(ParameterizedObject):
 
     
 
-class TestParametersFrame(unittest.TestCase):
+class TestParametersFrameWithApply(unittest.TestCase):
 
 
     def setUp(self):
@@ -55,7 +55,7 @@ class TestParametersFrame(unittest.TestCase):
         self.testpo1.params()['osp'].objects = self.some_pos
         
         self.toplevel = Tkinter.Toplevel()
-        self.f = ParametersFrame(self.toplevel,self.testpo1)
+        self.f = ParametersFrameWithApply(self.toplevel,self.testpo1)
 
 
 
@@ -151,7 +151,7 @@ class TestParametersFrame(unittest.TestCase):
 
 ###########################################################
 
-cases = [TestParametersFrame]
+cases = [TestParametersFrameWithApply]
 
 suite = unittest.TestSuite()
 suite.addTests([unittest.makeSuite(case) for case in cases])

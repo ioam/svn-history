@@ -42,7 +42,7 @@ from topoconsole import TopoConsole
 # update() and update_idletasks()...
 #
 ## Window or Frame?
-# Maybe one day everything (PlotGroupPanels, ParametersFrames,
+# Maybe one day everything (PlotGroupPanels, ParametersFrameWithApplys,
 # ModelEditor, ...) will be Frames inside one master window (for
 # e.g. a matlab-like workspace).  Nobody's been worrying too much
 # about whether something's a Frame or a window when they've been

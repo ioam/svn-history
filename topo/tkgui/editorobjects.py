@@ -17,7 +17,7 @@ from topo.base.parameterclasses import Enumeration,BooleanParameter
 from topo.commands.analysis import update_activity
 from topo.misc.utils import shortclassname
 
-from parametersframe import ParametersFrame
+from parametersframe import ParametersFrameWithApply
 from topowidgets import TkguiWindow
 
 
@@ -57,7 +57,7 @@ class EditorObject(ParameterizedObject):
 
         title = Label(parameter_window, text = self.name)
         title.pack(side = TOP)
-        self.parameter_frame = ParametersFrame(parameter_window)
+        self.parameter_frame = ParametersFrameWithApply(parameter_window)
         balloon.bind(title,self.objdoc())
         self.parameter_window = parameter_window
 
