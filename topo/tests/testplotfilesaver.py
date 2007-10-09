@@ -14,12 +14,9 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.plotting.plotfilesaver import PlotGroupSaver,TemplatePlotGroupSaver,ConnectionFieldsPlotGroupSaver,CFProjectionPlotGroupSaver
 
 from topo.plotting.plotgroup import PlotGroup
-PlotGroup.cmd_location = locals()
 
-# CEBHACKALERT: seems like I'm testing these commands...i.e. I should have written
+# CEBHACKALERT: seems like I'm testing analysis commands...i.e. I should have written
 # a different test file...
-from topo.commands.analysis import update_activity,measure_or_pref,update_projections,update_connectionfields
-
 
 PlotGroupSaver.filename_prefix="topo/tests/testplotfilesaver"
 
