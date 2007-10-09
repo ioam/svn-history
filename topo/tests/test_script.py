@@ -43,7 +43,7 @@ __version__='$Revision$'
 
 import pickle, copy, __main__, timeit
 
-from topo.base.parameterclasses import resolve_filename
+from topo.base.parameterclasses import resolve_filename, normalize_path
 
 import topo
 from topo.tests.utils import assert_array_equal, assert_array_almost_equal
@@ -78,7 +78,7 @@ def GenerateData(script="examples/lissom_oo_or.ty",data_filename=None,look_at='V
     data['density']=density
     data['look_at']=look_at
     
-    pickle.dump(data,open(resolve_filename(data_filename),'wb'),2)
+    pickle.dump(data,open(normalize_path(data_filename),'wb'),2)
 
 
 
@@ -163,7 +163,7 @@ def generate_speed_data(script="examples/lissom_oo_or.ty",iterations=100,data_fi
 
     how_long = time_sim_run(script,iterations)
 
-    speed_data_file = open(resolve_filename(data_filename),'w')
+    speed_data_file = open(normalize_path(data_filename),'w')
     speed_data_file.write("%s=%s"%(iterations,how_long))
     speed_data_file.close()
 
