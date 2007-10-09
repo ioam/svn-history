@@ -43,7 +43,7 @@ __version__='$Revision$'
 
 import pickle, copy, __main__, timeit
 
-from topo.base.parameterclasses import abs_app_path
+from topo.base.parameterclasses import resolve_filename
 
 import topo
 from topo.tests.utils import assert_array_equal, assert_array_almost_equal
@@ -78,7 +78,7 @@ def GenerateData(script="examples/lissom_oo_or.ty",data_filename=None,look_at='V
     data['density']=density
     data['look_at']=look_at
     
-    pickle.dump(data,open(abs_app_path(data_filename),'wb'),2)
+    pickle.dump(data,open(resolve_filename(data_filename),'wb'),2)
 
 
 
@@ -99,7 +99,7 @@ def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None
         data_filename=script+"_DATA"
         
     try:
-        data = pickle.load(open(abs_app_path(data_filename),"rb"))
+        data = pickle.load(open(resolve_filename(data_filename),"rb"))
     except IOError:
         print "\nData file '"+data_filename+"' could not be opened; run GenerateData() to create a data file before making changes to the script you wish to check."
         raise
@@ -163,7 +163,7 @@ def generate_speed_data(script="examples/lissom_oo_or.ty",iterations=100,data_fi
 
     how_long = time_sim_run(script,iterations)
 
-    speed_data_file = open(abs_app_path(data_filename),'w')
+    speed_data_file = open(resolve_filename(data_filename),'w')
     speed_data_file.write("%s=%s"%(iterations,how_long))
     speed_data_file.close()
 
@@ -176,7 +176,7 @@ def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
     if data_filename==None:
         data_filename=script+"_SPEEDDATA"
 
-    speed_data_file = open(abs_app_path(data_filename),'r')
+    speed_data_file = open(resolve_filename(data_filename),'r')
         
     info = speed_data_file.readline()
     speed_data_file.close()

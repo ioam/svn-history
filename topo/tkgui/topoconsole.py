@@ -27,7 +27,7 @@ import tkFileDialog
 import Pmw
 
 import topo
-from topo.base.parameterclasses import abs_app_path
+from topo.base.parameterclasses import resolve_filename
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
 from topo.misc.keyedlist import KeyedList
@@ -512,7 +512,7 @@ class TopoConsole(TkguiWindow):
         for location in locations:
             # a path on the disk might need converting
             try:
-                location = abs_app_path(location)
+                location = resolve_filename(location)
             except:
                 pass
             

@@ -109,7 +109,7 @@ from topo.base.parameterizedobject import ParameterizedObject,Parameter, \
      classlist,ParameterizedObjectMetaclass
 from topo.base.parameterclasses import BooleanParameter,StringParameter, \
      Number,SelectorParameter,ClassSelectorParameter,ObjectSelectorParameter, \
-     Filename,CallableParameter,abs_app_path
+     Filename,CallableParameter,resolve_filename
 
 from topo.misc.utils import eval_atof, inverse
 
@@ -217,7 +217,7 @@ class ButtonParameter(CallableParameter):
         image = None
         if self.image_path:
             image=ImageTk.PhotoImage(ImageOps.fit(
-                Image.open(abs_app_path(self.image_path)),self.size or (32,32)))
+                Image.open(resolve_filename(self.image_path)),self.size or (32,32)))
             self._hack.append(image)
 
         return image
