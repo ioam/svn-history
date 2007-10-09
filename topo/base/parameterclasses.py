@@ -21,13 +21,13 @@ from parameterizedobject import Parameter, descendents, ParameterizedObject
 
 
 
-# CB: what should these be called and where should they be?
+
 # Is there a more obvious way of getting this path?
 # (Needs to work on unix and windows.)
-# the topographica base directory
-app_base_path = os.path.split(os.path.split(sys.executable)[0])[0]
+# the application base directory
+application_path = os.path.split(os.path.split(sys.executable)[0])[0]
 
-def abs_app_path(path,search_paths=[]):
+def resolve_filename(path,search_paths=[]):
     """
     Create an absolute path to the file if the path is not
     already absolute.
@@ -42,7 +42,7 @@ def abs_app_path(path,search_paths=[]):
 
     if os.path.isabs(path): return path
 
-    all_search_paths = search_paths + [os.getcwd()] + [app_base_path]
+    all_search_paths = search_paths + [os.getcwd()] + [application_path]
 
     paths_tried = []
     for prefix in set(all_search_paths): # does set() keep order?            
@@ -63,7 +63,7 @@ class Filename(Parameter):
     
     * any of the paths specified in the search_paths attribute;
 
-    * any of the paths searched by abs_app_path() (see doc for that
+    * any of the paths searched by resolve_filename() (see doc for that
       function).
     """
     __slots__ = ['search_paths'] 
@@ -79,7 +79,7 @@ class Filename(Parameter):
         Call Parameter's __set__, but warn if the file cannot be found.
         """
         try:
-            abs_app_path(val,self.search_paths)
+            resolve_filename(val,self.search_paths)
         except IOError, e:
             ParameterizedObject(name="%s.%s"%(str(obj),self.attrib_name(obj))).warning('%s'%(e.args[0]))
 
@@ -87,10 +87,10 @@ class Filename(Parameter):
         
     def __get__(self,obj,objtype):
         """
-        Return an absolute, normalized path (see abs_app_path).
+        Return an absolute, normalized path (see resolve_filename).
         """
         raw_path = super(Filename,self).__get__(obj,objtype)
-        return abs_app_path(raw_path,self.search_paths)
+        return resolve_filename(raw_path,self.search_paths)
 
 
 
