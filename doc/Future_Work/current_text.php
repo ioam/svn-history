@@ -38,9 +38,10 @@ tracker rather than added to this list</B>.
 
 <H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
 
-<H4>2007/10/08 (CB): gui bugs</H4>
+<H4>2007/10/09 (CB): gui bugs</H4>
 Clicking "Normalize" on a pref window causes refresh (re-measurement).
-"Strength only" is messed up on a pref window.
+"Strength only" is messed up on a pref window. Right click > Connection Fields
+is not fixed.
 
 <H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
