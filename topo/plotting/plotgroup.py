@@ -10,8 +10,6 @@ __version__='$Revision$'
 
 import copy
 import Image
-import numpy
-
 import __main__
 
 import topo
@@ -59,11 +57,6 @@ class PlotGroup(ParameterizedObject):
     Container that has one or more Plots and also knows how to arrange
     the plots and other special parameters.
     """
-
-    # CEBALERT: Do we need this? We don't offer this kind of thing elsewhere.
-    cmd_location = Parameter(default=__main__.__dict__,doc="""
-    Namespace in which to execute the update_command and plot_command.""")
-
     update_command = StringParameter(default="",doc="""
     Command to execute before updating this plot, e.g. to calculate sheet views.
     
@@ -105,13 +98,12 @@ class PlotGroup(ParameterizedObject):
 	self.time = None
 
 
-
+    # CB: (subclasses add more commands)
     def _exec_update_command(self):
-        exec self.update_command in self.cmd_location
-
+        exec self.update_command in __main__.__dict__
 
     def _exec_plot_command(self):
-        exec self.plot_command in self.cmd_location
+        exec self.plot_command in __main__.__dict__
 
         
     def _plot_list(self):
