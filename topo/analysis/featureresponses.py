@@ -315,6 +315,8 @@ class FeatureMaps(FeatureResponses):
             ### I guess it is always cyclic value that we will color with hue in an hsv plot
             ### but still we should catch the error.
             ### Also, what happens in case of negative values?
+            # CB: (see also note below about multiplication by 17, and ALERT by
+            # SheetView's norm_factor.)
                 cyclic = self._featureresponses[sheet][feature].distribution_matrix[0,0].cyclic
                 if cyclic:
                     norm_factor = self._featureresponses[sheet][feature].distribution_matrix[0,0].axis_range

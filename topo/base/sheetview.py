@@ -57,7 +57,7 @@ class SheetView(ParameterizedObject):
     # CB: Should call this cyclic_range, I think. Unless norm_factor
     # is ever going to be anything but 1.0 for non-cyclic
     # quantities...but I'm not sure it makes sense to store anything
-    # but the cyclic range here.
+    # but the cyclic range here. See ALERT in featureresponses.py.
     norm_factor = Parameter(None,doc="""If cyclic is True, this value is the cyclic range.""")
     
     ### JCALERT! term_1 and term_2 should be more explicit...
