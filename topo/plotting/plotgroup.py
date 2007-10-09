@@ -60,6 +60,7 @@ class PlotGroup(ParameterizedObject):
     the plots and other special parameters.
     """
 
+    # CEBALERT: Do we need this? We don't offer this kind of thing elsewhere.
     cmd_location = Parameter(default=__main__.__dict__,doc="""
     Namespace in which to execute the update_command and plot_command.""")
 
@@ -115,8 +116,9 @@ class PlotGroup(ParameterizedObject):
         
     def _plot_list(self):
 	"""
-	function that returns the plot_list.
-	Re-implemented by TemplatePlotGroup to construct the plot list as specified by the template.
+        Return the list of plots.
+
+	Re-implemented by TemplatePlotGroup to construct a list of plots as specified by the template.
 	"""
 	return self.plot_list
 
