@@ -443,9 +443,6 @@ class TemplatePlotGroup(SheetPlotGroup):
 
 
     def _create_plots(self,pt_name,pt,sheet):
-	""" 
-	Create a plot corresponding to a plot_template, its name, and a sheet.
-	"""
         return [make_template_plot(pt,sheet.sheet_view_dict,sheet.xdensity,
                                    sheet.bounds,self.normalize,name=pt_name)]
 
@@ -505,7 +502,6 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
         return plot_channels
 
     def _create_plots(self,pt_name,pt,sheet):
-	"""Creates plots as specified by the plot_template."""
         # Note: the UnitView is in the src_sheet view_dict,
         # and the name in the key is the destination sheet.
         return [make_template_plot(self._change_key(pt,sheet,proj),
@@ -517,7 +513,6 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
  
     def generate_labels(self):
-	""" Function used for generating the labels."""
 	self.labels = []
 	for plot in self.plots:
 	    self.labels.append(plot.name + '\n(from ' + plot.plot_src_name+')')
@@ -528,7 +523,6 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
     """Visualize the activity of all Projections into a ProjectionSheet."""
 
     keyname='ProjectionActivity' 
-
 
     def _create_plots(self,pt_name,pt,sheet):
         return [make_template_plot(self._change_key(pt,sheet,proj),
@@ -601,11 +595,6 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
 
 		
     def _create_plots(self,pt_name,pt,sheet):
-	""" 
-	Sub-function of _plot_list().
-	Creates a plot as specified by a Projection plot_template:
-	Built a projection Plot from corresponding UnitViews.
-	"""
 	projection = self.projection
         plot_list=[]
         src_sheet=projection.src
@@ -700,9 +689,6 @@ class ConnectionFieldsPlotGroup(UnitPlotGroup):
 
 
     def _create_plots(self,pt_name,pt,sheet):
-	""" 
-	Creates a plot as specified by a Connection Field plot_template:
-	"""
         plot_list = []
         for p in sheet.in_connections:
             plot_channels = self._change_key(pt,sheet,p,self.x,self.y)
@@ -751,14 +737,12 @@ class FeatureCurvePlotGroup(UnitPlotGroup):
 
 plotgroups = KeyedList()
 """
-Global repository of PlotGroups, to which users can add
-their own as needed.
+Global repository of PlotGroups, to which users can add their own as
+needed.
 """
 
 
 plotgroup_types = {'Connection Fields': ConnectionFieldsPlotGroup,
-                   # CB: and here's where to start with being able to plot any type
-                   # of projection
                    'Projection': CFProjectionPlotGroup,
                    'Projection Activity': ProjectionActivityPlotGroup}
 
@@ -770,8 +754,8 @@ def create_plotgroup(template_plot_type='bitmap',**params):
     Convenience function to make it simpler to use the name of the
     PlotGroup as the key in the plotgroups list.
 
-    template_plot_type: Whether the plots are bitmap images or curves ('curve')
-
+    template_plot_type: Whether the plots are bitmap images or curves
+    ('curve').
     """
     name = params.get('name')
 
