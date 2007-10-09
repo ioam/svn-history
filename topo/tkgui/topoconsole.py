@@ -578,6 +578,12 @@ class TopoConsole(TkguiWindow):
             self.step_button.config(state=DISABLED)
 
 
+    def open_progress_window(self,timer,title=None):
+        """
+        Provide a convenient link to progress bars.
+        """
+        return ProgressWindow(timer=timer,title=title)
+
 
 
 
