@@ -109,6 +109,9 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             self.window_master = None
 
 
+        # Label does have a wraplength option...but it's in screen
+        # units. Surely tk has a function to convert between
+        # text and screen units?
         self.no_plot_note_text = """
 (Press Refresh on the update command to generate
 the plot, after modifying the commands below if
