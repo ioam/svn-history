@@ -154,14 +154,14 @@ class ProgressWindow(TkguiWindow):
     ** Currently expects a 0-100 (percent) value ***        
     """
 
-    def __init__(self,timer=topo.sim.timer,progress_var=None,title=None,display=True,**config):
+    def __init__(self,timer=None,progress_var=None,title=None,display=True,**config):
         TkguiWindow.__init__(self,**config)
 
         self.protocol("WM_DELETE_WINDOW",self.set_stop)
 
         if not display:self.withdraw()
         
-        self.timer = timer
+        self.timer = timer or topo.sim.timer
         self.timer.receive_info.append(self.timing_info)
         
         self.title(title or self.timer.func.__name__.capitalize())
