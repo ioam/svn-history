@@ -315,17 +315,24 @@ class FeatureMaps(FeatureResponses):
             ### I guess it is always cyclic value that we will color with hue in an hsv plot
             ### but still we should catch the error.
             ### Also, what happens in case of negative values?
-                if self._featureresponses[sheet][feature].distribution_matrix[0,0].cyclic == True:
+                cyclic = self._featureresponses[sheet][feature].distribution_matrix[0,0].cyclic
+                if cyclic:
                     norm_factor = self._featureresponses[sheet][feature].distribution_matrix[0,0].axis_range
                 else:
                     norm_factor = 1.0
                     
-                if weighted_average==True:
-                    preference_map = SheetView(((self._featureresponses[sheet][feature].weighted_average())/norm_factor,
-                                                bounding_box), sheet.name, sheet.precedence, topo.sim.time())
+                if weighted_average:
+                    preference_map = SheetView(
+                        ((self._featureresponses[sheet][feature].weighted_average())/norm_factor,
+                         bounding_box), sheet.name, sheet.precedence, topo.sim.time())
                 else:
-                    preference_map = SheetView(((self._featureresponses[sheet][feature].max_value_bin())/norm_factor,
-                                                bounding_box), sheet.name, sheet.precedence, topo.sim.time())
+                    preference_map = SheetView(
+                        ((self._featureresponses[sheet][feature].max_value_bin())/norm_factor,
+                         bounding_box), sheet.name, sheet.precedence, topo.sim.time())
+
+                preference_map.cyclic = cyclic
+                preference_map.norm_factor = norm_factor
+                    
                 sheet.sheet_view_dict[feature.capitalize()+'Preference']=preference_map
                 
                 # note the temporary multiplication by 17
