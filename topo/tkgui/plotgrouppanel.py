@@ -107,7 +107,17 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             self.window_master = master.master.master.master.master
         except:
             self.window_master = None
-            
+
+
+        self.no_plot_note_text = """
+(Press Refresh on the update command to generate
+the plot, after modifying the commands below if
+necessary.  Refreshing may take some time.
+
+Many commands accept 'display=True' so that the
+progress can be viewed in an open Activity window,
+e.g. for debugging.)
+"""
         
         TkParameterizedObject.__init__(self,master,extraPO=plotgroup,**params)
         Frame.__init__(self,master)
@@ -459,7 +469,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         
         
 
-
     def display_labels(self):
         """
         This function should be redefined by subclasses to match any
@@ -470,14 +479,10 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         
         if len(self.canvases) == 0:
             # If there are no plots yet, tell the user what to do.
-            self.plot_labels=[Label(self.plot_frame,text="""
-                        (Press Refresh on the update command to
-                        generate the plot, after modifying the
-                        commands below if necessary.  Refreshing may
-                        take some time.  Many commands accept
-                        'display=True' so that the progress can be
-                        viewed in an open Activity window, e.g. for
-                        debugging.)  """)]
+            self.plot_labels=[Label(self.plot_frame,
+                                    text=self.no_plot_note_text,
+                                    justify='center')]
+
             self.plot_labels[0].grid(row=1,column=0,sticky=NSEW)
 
         elif self._num_labels != len(self.canvases):
