@@ -72,6 +72,12 @@ i.e. "'Hello'", not '"Hello"'<BR>
 We might also want to add notes about omitting './' and changing
 '/' to '\' in general (currently on the downloads page).
 
+<H4>2007/10/09: Note for Windows developers</H4>
+Paths in the code *must* be unix-style paths. The functions
+resolve_filename and normalize_path both handle conversion to
+Windows format. (Note for all developers: use resolve_filename()
+and normalize_path() for code that works on Windows and linux.) 
+
 <H4>2007/03/28 (?): Update tutorial</H4>
 Update the lissom_oo_or tutorial page to include how to start and stop
 training and to add a section about plotting 'Orientation tuning
