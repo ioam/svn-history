@@ -577,9 +577,6 @@ class TopoConsole(TkguiWindow):
         else:
             self.step_button.config(state=DISABLED)
 
-    def open_progress_window(self,timer,title=None):
-        return ProgressWindow(timer=timer,title=title)
-
 
 
 
