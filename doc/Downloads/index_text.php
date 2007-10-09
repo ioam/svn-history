@@ -42,9 +42,13 @@ directory after checking out the code.
 
 <P>On Mac OS X, you will first need to edit the file external/Makefile
 and remove the string <code>LDFLAGS=-Wl,-rpath,${PREFIX}/lib</code>,
-because the <code>-rpath</code> option is required on Linux but
-neither needed nor supported on the Mac. Then type <code>make</code>
-as below.
+because the <code>-rpath</code> option is required on Linux but not
+supported on the Mac.  After making this change, type
+<code>make</code> as usual below.  Note that the lack of
+<code>-rpath</code> appears to mean that system Tcl/Tk
+libraries will be used if those are present; we are looking into
+whether the ones in the Topographica distribution can be used
+instead.
 
 <P>On other systems, just type <code>make</code> (which may be called
 <code>gmake</code> on some systems) from within the
