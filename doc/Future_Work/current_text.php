@@ -39,7 +39,6 @@ tracker rather than added to this list</B>.
 <H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
 
 <H4>2007/10/09 (CB): gui bugs</H4>
-Clicking "Normalize" on a pref window causes refresh (re-measurement).
 "Strength only" is messed up on a pref window. Right click > Connection Fields
 is not fixed.
 
@@ -48,7 +47,6 @@ is not fixed.
 <li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
 <li>Cleanup + doc of *panel.py files</li>
 <li>Cleanup + doc of plotgroup.py</li>
-<li>Eliminate space on left of e.g. orientation preference panel plot area.</li>
 <li>Reorganize classes and filenames in tkgui</li>
 <li>scrollbars: clean up behavior (can we stop bars coming on and going off
 when resize pressed? can we stop empty space when there are no bars? can we stop
@@ -117,6 +115,11 @@ difficult to solve. I have no idea whatever about this problem.
 <!-- ------------------------------------------------------------------------ -->
 
 <H2>Tasks to be addressed after the 0.9.4 release:</H2>
+
+<H4>2007/10/08 (CB): buildbot: make slow-tests</H4>
+Separate make slow-tests into a separate process from 
+building, so that the speed tests are useful on buildbot.
+
 
 <H4>2007/10/03 (CB): Plotting non-CFProjection Projections</H4>
 Modify PlotGroup and ProjectionPGPanels so that we can plot
