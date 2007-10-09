@@ -43,20 +43,11 @@ exec "from topo.commands.pylabplots import *" in __main__.__dict__
 
 ### CEBALERT: additional dynamic info/right-click problems:
 #
-# 1: If I open an Activity plot and then measure an orientation map,
+# If I open an Activity plot and then measure an orientation map,
 # the plot only shows Activity, but the dynamic info includes the or
 # pref and selectivity.  That makes sense, given that the plot would
 # show that if it were refreshed, but it's confusing. 
-#
-# 2. Once I've measured an orientation map, the dynamic info in the
-# cfsom_or.ty Activity window is very long, and it causes the window
-# size to change dynamically as I drag the mouse around.  That's very
-# distracting.  Is there any way to make the window enlarge only once,
-# and then keep it big? How to do that without disrupting
-# enlarge/reduce etc.?
-#
-# 3. Formatting of plot name (a tuple) in CF window (e.g. cfsom_or,
-# Unit X: 0.3).
+
 
 
 
