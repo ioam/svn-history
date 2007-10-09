@@ -83,15 +83,15 @@ class PlotGroup(ParameterizedObject):
     (as if it were typed into a .ty script).  The initial value is determined by
     the template for this plot, but various arguments can be passed, a modified
        version substituted, etc.""")
+
+
+    # CB: make clear the distinction between self.plots and self.plot_list
     
     def __init__(self,**params):
-        """
-        Initialize using a static list of Plots that will make up this PlotGroup.
-        """
         super(PlotGroup,self).__init__(**params)
 
         self.plot_list = []
-	self.labels = [] # List of plot labels
+	self.labels = [] 
 
         # In the future, it might be good to be able to specify the
         # plot rows and columns using tuples.  For instance, if three
@@ -106,12 +106,12 @@ class PlotGroup(ParameterizedObject):
 
 
 
-    def _plot_command(self):
-        exec self.plot_command in self.cmd_location
-
-
-    def _update_command(self):
+    def _exec_update_command(self):
         exec self.update_command in self.cmd_location
+
+
+    def _exec_plot_command(self):
+        exec self.plot_command in self.cmd_location
 
         
     def _plot_list(self):
@@ -125,12 +125,11 @@ class PlotGroup(ParameterizedObject):
 
     def make_plots(self,update=True):
 	"""
-
-	If update=True, execute the command associated with the template
-	(e.g. generating the Sheetviews necessary to create the PlotGroup's Plots).
+        Create and scale the plots, after first executing the PlotGroup's update_command
+        (if update is True) and plot_command.
 	"""
-        if update: self._update_command()
-        self._plot_command()
+        if update: self._exec_update_command()
+        self._exec_plot_command()
         self._create_images(update)
         self.scale_images()
 
@@ -139,7 +138,6 @@ class PlotGroup(ParameterizedObject):
         """
         Generate the sorted and scaled list of plots constituting the PlotGroup.
         """
-
         self.plots = [plot for plot in self._plot_list() if plot != None]
 
         # Suppress plots in the special case of plots not being updated 
@@ -161,12 +159,14 @@ class PlotGroup(ParameterizedObject):
 	self._sort_plots()	
 	self.generate_labels()
 
+
     def scale_images(self,zoom_factor=None):
         """Scale the images by the given zoom factor, if appropriate; default is to do nothing."""
         pass
+
     
     def generate_labels(self):
-	""" Function used for generating the labels."""
+	"""Generate labels for the plots."""
 	self.labels = []
 	for plot in self.plots:
 	    self.labels.append(plot.plot_src_name + '\n' + plot.name)
@@ -174,8 +174,7 @@ class PlotGroup(ParameterizedObject):
 
     def _sort_plots(self):
 	"""
-	Function called to sort the Plots in order.
-	They are ordered according to their precedence number first, and then by alphabetical order.
+        Sort plots according to their precedence, then alphabetically.
 	"""
 	self.plots.sort(cmp_plot)
 
@@ -444,15 +443,6 @@ class TemplatePlotGroup(SheetPlotGroup):
 
 	
     def _plot_list(self):
-        """
-        Procedure that is called when creating a PlotGroup.
-
-        Returns the plot_list attribute, i.e., the list of plots that
-        are specified by the PlotGroup template.
-
-        This function calls create_plots, which is implemented in each
-        TemplatePlotGroup subclass.
-        """   
 	plot_list = self.plot_list
         for each in self._sheets():
 	    for (pt_name,pt) in self.plot_templates:
@@ -462,8 +452,7 @@ class TemplatePlotGroup(SheetPlotGroup):
 
     def _create_plots(self,pt_name,pt,sheet):
 	""" 
-	Sub-function of _plot_list().
-	Creates a plot corresponding to a plot_template, its name, and a sheet.
+	Create a plot corresponding to a plot_template, its name, and a sheet.
 	"""
         return [make_template_plot(pt,sheet.sheet_view_dict,sheet.xdensity,
                                    sheet.bounds,self.normalize,name=pt_name)]
@@ -497,10 +486,10 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
     def _sheets(self):
         return [self.sheet]
 
-    def _update_command(self):
+    def _exec_update_command(self):
         self._check_sheet_type()
 	topo.commands.analysis.sheet_name = self.sheet.name
-        super(ProjectionSheetPlotGroup,self)._update_command()
+        super(ProjectionSheetPlotGroup,self)._exec_update_command()
         
 
 
@@ -603,13 +592,13 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
                 %(self,self.projection_type,self.projection,type(self.projection))) 
 
 
-    def _update_command(self):
+    def _exec_update_command(self):
         self._check_projection_type()
 	### JCALERT: commands in analysis have to be re-written so that to avoid
 	### setting all these global parameters.
         topo.commands.analysis.proj_coords = self.generate_coords()
         topo.commands.analysis.proj_name = self.projection.name
-        super(CFProjectionPlotGroup,self)._update_command()
+        super(CFProjectionPlotGroup,self)._exec_update_command()
 
 
     def _change_key(self,plotgroup_template,sheet,proj,x,y):
@@ -692,9 +681,9 @@ class UnitPlotGroup(ProjectionSheetPlotGroup):
 ## It is an error to request a unit outside the area of the Sheet.""")
 
         
-    def _update_command(self):
+    def _exec_update_command(self):
 	topo.commands.analysis.coordinate = (self.x,self.y)
-	super(UnitPlotGroup,self)._update_command()
+	super(UnitPlotGroup,self)._exec_update_command()
 
 
 
@@ -741,12 +730,12 @@ class ConnectionFieldsPlotGroup(UnitPlotGroup):
 
 class FeatureCurvePlotGroup(UnitPlotGroup):
 
-    def _update_command(self):
-        super(FeatureCurvePlotGroup,self)._update_command()          
+    def _exec_update_command(self):
+        super(FeatureCurvePlotGroup,self)._exec_update_command()          
         self.get_curve_time()
 
-    def _plot_command(self):
-        super(FeatureCurvePlotGroup,self)._plot_command()
+    def _exec_plot_command(self):
+        super(FeatureCurvePlotGroup,self)._exec_plot_command()
         self.get_curve_time()
 
     def get_curve_time(self):
