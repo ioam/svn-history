@@ -21,39 +21,6 @@ from parameterizedobject import Parameter, descendents, ParameterizedObject
 
 
 
-
-# Is there a more obvious way of getting this path?
-# (Needs to work on unix and windows.)
-# the application base directory
-application_path = os.path.split(os.path.split(sys.executable)[0])[0]
-
-def resolve_filename(path,search_paths=[]):
-    """
-    Create an absolute path to the file if the path is not
-    already absolute.
-
-    To turn a supplied relative path into an absolute one, the path is
-    appended to each path in (search_paths+the current working
-    directory+the application's base path) until the file is found.
-    
-    An IOError is raised if the file is not found anywhere.
-    """
-    path = os.path.normpath(path)
-
-    if os.path.isabs(path): return path
-
-    all_search_paths = search_paths + [os.getcwd()] + [application_path]
-
-    paths_tried = []
-    for prefix in set(all_search_paths): # does set() keep order?            
-        try_path = os.path.join(os.path.normpath(prefix),path)
-        if os.path.isfile(try_path): return try_path
-        paths_tried.append(try_path)
-
-    raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following place(s): '+str(paths_tried)+'.')
-
-
-
 class Filename(Parameter):
     """
     Filename is a Parameter that can be set to a string specifying the
@@ -833,5 +800,38 @@ class InstanceMethodWrapper(object):
     def __call__(self,*args,**kw):
         return self.im(*args,**kw)
 
+
+
+
+
+# Is there a more obvious way of getting this path?
+# (Needs to work on unix and windows.)
+# the application base directory
+application_path = os.path.split(os.path.split(sys.executable)[0])[0]
+
+def resolve_filename(path,search_paths=[]):
+    """
+    Create an absolute path to the file if the path is not
+    already absolute.
+
+    To turn a supplied relative path into an absolute one, the path is
+    appended to each path in (search_paths+the current working
+    directory+the application's base path) until the file is found.
+    
+    An IOError is raised if the file is not found anywhere.
+    """
+    path = os.path.normpath(path)
+
+    if os.path.isabs(path): return path
+
+    all_search_paths = search_paths + [os.getcwd()] + [application_path]
+
+    paths_tried = []
+    for prefix in set(all_search_paths): # does set() keep order?            
+        try_path = os.path.join(os.path.normpath(prefix),path)
+        if os.path.isfile(try_path): return try_path
+        paths_tried.append(try_path)
+
+    raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following place(s): '+str(paths_tried)+'.')
 
 
