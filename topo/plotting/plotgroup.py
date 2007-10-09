@@ -135,10 +135,6 @@ class PlotGroup(ParameterizedObject):
         self.scale_images()
 
 
-    def redraw_plots(self):
-        self.make_plots(update=False)
-
-
     def _create_images(self,update):
         """
         Generate the sorted and scaled list of plots constituting the PlotGroup.

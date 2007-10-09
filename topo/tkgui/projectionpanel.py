@@ -132,8 +132,8 @@ class ConnectionFieldsPanel(ProjectionSheetPGPanel):
 
         self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change)
         
-        self.pack_param('x',parent=self.control_frame_3,on_change=self.make_plots)
-        self.pack_param('y',parent=self.control_frame_3,on_change=self.make_plots)
+        self.pack_param('x',parent=self.control_frame_3,on_change=self.refresh_plots)
+        self.pack_param('y',parent=self.control_frame_3,on_change=self.refresh_plots)
 
         self.sheet_change()
 
@@ -211,7 +211,7 @@ class CFProjectionPGPanel(ProjectionSheetPGPanel):
     def __init__(self,console,master,plotgroup,**params):
         super(CFProjectionPGPanel,self).__init__(console,master,plotgroup,**params)
         
-        self.pack_param('projection',parent=self.control_frame_3,on_modify=self.make_plots,
+        self.pack_param('projection',parent=self.control_frame_3,on_modify=self.refresh_plots,
                         widget_options={'sort_fn_args':{'cmp':cmp_projections}})
         self.pack_param('density',parent=self.control_frame_3)
 

@@ -318,27 +318,28 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         self.display_labels()
         self.refresh_title()
         if self.window_master: self.window_master.sizeright()
+
         
-    def make_plots(self):
+    def refresh_plots(self):
         """
-        Call plotgroup's make_plots (i.e. run update_command and
-        plot_command), then display the result.
+        Call plotgroup's make_plots with update=True (i.e. run
+        update_command and plot_command), then display the result.
         """
         # shouldn't call this from within history unless you've copied
         # the plotgroup (as in refresh)
         # assert self.history_index==0,"Programming error: can't
         # update plotgroup while looking in history." # (never update
         # plots in the history, or they go to current activity)
-        self.plotgroup.make_plots()
+        self.plotgroup.make_plots(update=True)
         self._display_plots_and_labels()
 
 
     def redraw_plots(self):
         """
-        Only call plotgroup's redraw_plots (i.e. run only plot_command,
-        not update_command), then display the result.
+        Call plotgroup's make_plots with update=False (i.e. run only
+        plot_command, not update_command), then display the result.
         """
-        self.plotgroup.redraw_plots()
+        self.plotgroup.make_plots(update=False)
         self._display_plots_and_labels()
         
 
@@ -357,7 +358,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
             self.plotgroup = copy.copy(self.plotgroups_history[-1])
 
         if update:
-            self.make_plots()            
+            self.refresh_plots()            
         else:
             self.redraw_plots()
 
