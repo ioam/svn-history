@@ -27,6 +27,7 @@ import topo
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import BooleanParameter
 from topo.base.sheet import Sheet
+from topo.base.cf import CFSheet
 
 from topo.plotting.plotgroup import PlotGroup,SheetPlotGroup
 
@@ -216,11 +217,17 @@ e.g. for debugging.)
         self._unit_menu = Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.add_cascade(menu=self._unit_menu,state=DISABLED,
                                       indexname='unit_menu')
+
+        # CEBALERT: scheme for enabling/disabling menu items ('disable
+        # items hack') needs to be generalized. What we have now is
+        # just a mechanism to disable/enable cfs/rfs plots as
+        # necessary. Hack includes the attribute below as well as
+        # other items marked 'disable items hack'.
+        self._unit_menu_updaters = {}
         
         self._sheet_menu = Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.add_cascade(menu=self._sheet_menu,state=DISABLED,
                                       indexname='sheet_menu') 
-                                            
                                     
         #################################################################
 
@@ -235,7 +242,9 @@ e.g. for debugging.)
         """
         pass
     
-            
+
+    
+
 
     def __process_canvas_event(self,event,func):
         """
@@ -290,15 +299,24 @@ e.g. for debugging.)
         if 'plot' in event_info:
             plot = event_info['plot']
 
-            self._canvas_menu.entryconfig(1,label="Combined plot: %s %s"%(plot.plot_src_name,plot.name),state=NORMAL)            
+            self._canvas_menu.entryconfig(1,
+                label="Combined plot: %s %s"%(plot.plot_src_name,plot.name),
+                state=NORMAL)            
             (r,c),(x,y) = event_info['coords']
-            self._canvas_menu.entryconfig(0,label="Single unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),state=NORMAL)
+            self._canvas_menu.entryconfig(0,
+                label="Single unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),
+                state=NORMAL)
             self._right_click_info = event_info
+
+            # CB: part of disable items hack
+            for v in self._unit_menu_updaters.values(): v(plot)
 
             if show_menu:
                 self._canvas_menu.tk_popup(event_info['event'].x_root,
                                            event_info['event'].y_root)
 
+
+            
 
     def _update_dynamic_info(self,event_info):
         """
@@ -676,16 +694,42 @@ class SheetPGPanel(PlotGroupPanel):
         self.params_in_history.append('integer_scaling')
 
 
-
-        ## CEBHACKALERT: got to control when menu options show. No good asking
-        ## for connection fields of a connection field! Or asking for connection
-        ## fields of a sheet that's not a cf sheet. And so on...
         
         self._unit_menu.add_command(label='Connection Fields',indexname='connection_fields',
                                     command=self._connection_fields_window)
                                     
-        self._unit_menu.add_command(label='Receptive Field',indexname='receptive_field',
-                                    command=self._receptive_field_window)                             
+        self._unit_menu.add_command(label='Receptive Field',
+                                    indexname='receptive_field',
+                                    command=self._receptive_field_window)
+
+###### part of disable items hack #####
+        self._unit_menu_updaters['connection_fields'] = self.check_for_cfs
+        self._unit_menu_updaters['receptive_field'] = self.check_for_rfs        
+
+    def check_for_cfs(self,plot):
+        show_cfs = False
+        if plot.plot_src_name in topo.sim.objects():
+            if isinstance(topo.sim[plot.plot_src_name],CFSheet):
+                show_cfs = True
+        self.__showhide("connection_fields",show_cfs)
+
+    def check_for_rfs(self,plot):
+        # Note we've lost this prompt for the user:
+        # "No RF measurements are available yet; run the Receptive Fields plot before accessing this right-click menu option.")
+        show_rfs = False
+        if plot.plot_src_name in topo.sim.objects():
+            sheet = topo.sim[plot.plot_src_name]
+            if sheet in topo.analysis.featureresponses.grid:
+                show_rfs = True
+        self.__showhide("receptive_field",show_rfs)
+
+    def __showhide(self,name,show):
+        if show:
+            state = 'normal'            
+        else:
+            state = 'disabled'
+        self._unit_menu.entryconfig(name,state=state)
+#######################################
 
 
     def set_auto_refresh(self):
@@ -715,13 +759,7 @@ class SheetPGPanel(PlotGroupPanel):
             sheet = topo.sim[self._right_click_info['plot'].plot_src_name]
             x,y =  self._right_click_info['coords'][1]
             # CEBERRORALERT: should avoid requesting cf out of range.
-            # CEBALERT: need a simple, general system for controlling which menu
-            # items are active (instead of offering a menu choice which turns
-            # out to be useless).
-            try:
-                self.console['Plots']["Connection Fields"](x=x,y=y,sheet=sheet)
-            except TypeError:
-                topo.sim.warning("%s has no Connection fields."%sheet.name)
+            self.console['Plots']["Connection Fields"](x=x,y=y,sheet=sheet)
             
     def _receptive_field_window(self):
         """
@@ -729,16 +767,13 @@ class SheetPGPanel(PlotGroupPanel):
         identified by a right click.
         """
         if 'plot' in self._right_click_info:
-            try:
-                plot = self._right_click_info['plot']
-                x,y =  self._right_click_info['coords'][0]
-                sheet = topo.sim[plot.plot_src_name]
-                # CB: not sure how title works for matrixplot -
-                # might need to be formatted better
-                matrixplot(topo.analysis.featureresponses.grid[sheet][x,y],
-                           title=("Receptive Field",sheet.name,x,y))
-            except KeyError:
-                topo.sim.warning("No RF measurements are available yet; run the Receptive Fields plot before accessing this right-click menu option.")
+            plot = self._right_click_info['plot']
+            x,y =  self._right_click_info['coords'][0]
+            sheet = topo.sim[plot.plot_src_name]
+            # CB: not sure how title works for matrixplot -
+            # might need to be formatted better
+            matrixplot(topo.analysis.featureresponses.grid[sheet][x,y],
+                       title=("Receptive Field",sheet.name,x,y))
 
 
     def conditional_refresh(self):
