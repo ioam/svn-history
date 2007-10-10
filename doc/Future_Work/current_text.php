@@ -70,12 +70,6 @@ i.e. "'Hello'", not '"Hello"'<BR>
 We might also want to add notes about omitting './' and changing
 '/' to '\' in general (currently on the downloads page).
 
-<H4>2007/10/09: Note for Windows developers</H4>
-Paths in the code *must* be unix-style paths. The functions
-resolve_filename and normalize_path both handle conversion to
-Windows format. (Note for all developers: use resolve_filename()
-and normalize_path() for code that works on Windows and linux.) 
-
 <H4>2007/03/28 (?): Update tutorial</H4>
 Update the lissom_oo_or tutorial page to include how to start and stop
 training and to add a section about plotting 'Orientation tuning
@@ -97,17 +91,6 @@ this note is obsolete, unless there are other .ty scripts to check
 or some other reason to think this task is not done.
 I couldn't remember doing it, that's all. Seems like you did
 it, so we can remove this task.
-
-
-<H4>2007/10/08 (CB): test topographica-win</H4>
-Test that results from Windows version match those from the standard
-one. The unit tests and the "make compare_oo_or" test are fine, but I
-can't run the other, smaller tests of all the networks because the
-checked in _DATA files don't seem to work on Windows. I get
-"ImportError: no module named fixedpoint" during unpickling. Importing
-fixedpoint works in Windows, and I can see it there in
-site-packages. So there's some confusion somewhere, and it could be
-difficult to solve. I have no idea whatever about this problem.
 
 
 <!-- ------------------------------------------------------------------------ -->
@@ -133,6 +116,17 @@ because it hasn't been implemented for those classes. Need to
 generalize coordinate-calculation method in plotgrouppanel.py
 and then add one or more specializations for the projection
 panels. (Plus ProjectionView needs some modification, probably.)
+
+
+<H4>2007/10/08 (CB): test topographica-win</H4>
+Test that results from Windows version match those from the standard
+one. The unit tests and the "make compare_oo_or" test are fine, but I
+can't run the other, smaller tests of all the networks because the
+checked in _DATA files don't seem to work on Windows. I get
+"ImportError: no module named fixedpoint" during unpickling. Importing
+fixedpoint works in Windows, and I can see it there in
+site-packages. So there's some confusion somewhere, and it could be
+difficult to solve. I have no idea whatever about this problem.
 
 
 <H4>2007/10/03 (CB): Less-urgent tkgui cleanup</H4>
