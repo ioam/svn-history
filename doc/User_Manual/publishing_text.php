@@ -145,6 +145,7 @@ than necessary.  Once you have an Encapsulated PostScript image, you
 can convert it to PDF for use in a document using
 <code>epstopdf</code> (free) or Adobe Acrobat Distiller (expensive).
 
+<!--CEBALERT: some info re. plot saving is out of date-->
 
 <H4>Projection plots</H4>
 
