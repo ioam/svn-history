@@ -809,6 +809,9 @@ class Filename(Parameter):
 # the application base directory
 application_path = os.path.split(os.path.split(sys.executable)[0])[0]
 
+# Location in which to create files; defaults to application_path
+output_path = application_path
+
 # For portable code: specify paths in unix (rather than Windows) style; use
 # resolve_filename() for reading paths, and normalize_path() for
 # writing them.
@@ -844,7 +847,7 @@ def resolve_filename(path,search_paths=[]):
     raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following place(s): '+str(paths_tried)+'.')
 
 
-def normalize_path(path,prefix=application_path):
+def normalize_path(path,prefix=output_path):
     """
     Convert a unix-style path to the current OS's format, and create
     an absolute path (using prefix) if it's not already absolute.
