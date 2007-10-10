@@ -129,9 +129,12 @@ class Menu(Tkinter.Menu):
     # other methods can be overriden if they're needed
     
 
-# CEBALERT: not sure if, internally, Tkinter uses dictionary access to
-# do things. So testing this class out, but methods would otherwise be
-# in the Menu class above.
+# CEBALERT: of course dictionary access is used as an alternative to
+# the config method or whatever it's called! So this could cause
+# serious confusion to someone trying to set config options using the
+# dictionary style access rather than .config()! Either document
+# clearly or abandon, and get() and set() to access menu entries by
+# name.
 class ControllableMenu(Menu):
     def __getitem__(self,name):
         return self.entries[name]
