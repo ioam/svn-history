@@ -21,47 +21,6 @@ from parameterizedobject import Parameter, descendents, ParameterizedObject
 
 
 
-class Filename(Parameter):
-    """
-    Filename is a Parameter that can be set to a string specifying the
-    path of a file (in any OS format) and returns it in the format of
-    the user's operating system.  Additionally, the specified path can
-    be absolute or relative to:
-    
-    * any of the paths specified in the search_paths attribute;
-
-    * any of the paths searched by resolve_filename() (see doc for that
-      function).
-    """
-    __slots__ = ['search_paths'] 
-    __doc__ = property((lambda self: self.doc))
-
-    def __init__(self,default=None,search_paths=[],**params):
-        self.search_paths = search_paths
-        super(Filename,self).__init__(default,**params)
-
-        
-    def __set__(self,obj,val):
-        """
-        Call Parameter's __set__, but warn if the file cannot be found.
-        """
-        try:
-            resolve_filename(val,self.search_paths)
-        except IOError, e:
-            ParameterizedObject(name="%s.%s"%(str(obj),self.attrib_name(obj))).warning('%s'%(e.args[0]))
-
-        super(Filename,self).__set__(obj,val)
-        
-    def __get__(self,obj,objtype):
-        """
-        Return an absolute, normalized path (see resolve_filename).
-        """
-        raw_path = super(Filename,self).__get__(obj,objtype)
-        return resolve_filename(raw_path,self.search_paths)
-
-
-
-
 # CEBHACKALERT: needs to be finished
 class Enumeration(Parameter):
     """
@@ -800,6 +759,47 @@ class InstanceMethodWrapper(object):
     def __call__(self,*args,**kw):
         return self.im(*args,**kw)
 
+
+
+
+
+class Filename(Parameter):
+    """
+    Filename is a Parameter that can be set to a string specifying the
+    path of a file (in any OS format) and returns it in the format of
+    the user's operating system.  Additionally, the specified path can
+    be absolute or relative to:
+    
+    * any of the paths specified in the search_paths attribute;
+
+    * any of the paths searched by resolve_filename() (see doc for that
+      function).
+    """
+    __slots__ = ['search_paths'] 
+    __doc__ = property((lambda self: self.doc))
+
+    def __init__(self,default=None,search_paths=[],**params):
+        self.search_paths = search_paths
+        super(Filename,self).__init__(default,**params)
+
+        
+    def __set__(self,obj,val):
+        """
+        Call Parameter's __set__, but warn if the file cannot be found.
+        """
+        try:
+            resolve_filename(val,self.search_paths)
+        except IOError, e:
+            ParameterizedObject(name="%s.%s"%(str(obj),self.attrib_name(obj))).warning('%s'%(e.args[0]))
+
+        super(Filename,self).__set__(obj,val)
+        
+    def __get__(self,obj,objtype):
+        """
+        Return an absolute, normalized path (see resolve_filename).
+        """
+        raw_path = super(Filename,self).__get__(obj,objtype)
+        return resolve_filename(raw_path,self.search_paths)
 
 
 
