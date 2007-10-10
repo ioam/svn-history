@@ -87,4 +87,10 @@ goodhill_network90_1000.typ: goodhill_network90.ty ../topo/*/*.py
 som_retinotopy_40000.typ: som_retinotopy.ty ../topo/*/*.py
 	../topographica ${TOPOCMD} som_retinotopy.ty -c "topo.sim.run(40000)" ${RETINOTOPY_ANALYSIS} ${SNAPSHOT}"('$@')"
 
+# Paths handled a bit differently because lissom_whisker_barrels.ty refers to examples/
+lissom_whisker_barrels_20000.typ: lissom_whisker_barrels.ty ../topo/*/*.py
+	cd .. ; ./topographica ${TOPOCMD} examples/lissom_whisker_barrels.ty -c "topo.sim.run(20000)" ${SNAPSHOT}"('$@')"
+	mv lissom_whisker_barrels_20000.typ examples/
+
+
 
