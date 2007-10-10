@@ -39,8 +39,7 @@ tracker rather than added to this list</B>.
 <H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
 
 <H4>2007/10/09 (CB): gui bugs</H4>
-"Strength only" is messed up on a pref window. Right click > Connection Fields
-is not fixed.
+"Strength only" is messed up on a pref window. 
 
 <H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
@@ -96,6 +95,8 @@ JAB 2007/10/08: I checked lissom_oo_or.ty (but not any other
 as there are in commands/or_defs in C++ lissom.  So I think that
 this note is obsolete, unless there are other .ty scripts to check
 or some other reason to think this task is not done.
+I couldn't remember doing it, that's all. Seems like you did
+it, so we can remove this task.
 
 
 <H4>2007/10/08 (CB): test topographica-win</H4>
