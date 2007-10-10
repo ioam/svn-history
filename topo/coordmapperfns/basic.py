@@ -48,11 +48,11 @@ class ConstantMapper(CoordinateMapperFn):
 
 class Pipeline(CoordinateMapperFn):
     """
-    Applies a sequence of coordmappers,  left to right.
+    Applies a sequence of coordmappers, left to right.
     """
     
     mappers=ListParameter(default=[],
-        doc="The sequence of mappers  to apply.")
+        doc="The sequence of mappers to apply.")
 
     def __call__(self,x,y):
         return reduce( lambda args,f: apply(f,args),
