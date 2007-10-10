@@ -748,7 +748,8 @@ def measure_sf_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
-
+    Subplotting.set_subplots("Orientation",force=False)
+    
 ###############################################################################
 pg= create_plotgroup(name='PhaseDisparity Preference',category="Preference Maps",
              doc='Measure preference for sine gratings differing in phase between two sheets.',
