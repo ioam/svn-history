@@ -417,6 +417,8 @@ class TopoConsole(TkguiWindow):
             if not snapshot_name.endswith('.typ'):
                 snapshot_name = snapshot_name + SAVED_FILE_EXTENSION
                 
+            self.messageBar.message('state', 'Saving snapshot (may take some time)...')
+            self.update_idletasks()            
             topo.commands.basic.save_snapshot(snapshot_name)
             self.messageBar.message('state', 'Snapshot saved to ' + snapshot_name)
     
