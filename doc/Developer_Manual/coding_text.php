@@ -277,3 +277,60 @@ class Sheet and some associated functions.  Often files will include
 not just one class but a superclass and several subclasses; such files
 are named after the superclass.
 
+
+<H2><A NAME="paths">Accessing files and handling paths</A></H2>
+
+<P>There are two points to consider when referring to files
+or paths on the filesystem (which you would do, for instance,
+to open a file). The first is how relative paths are processed,
+and the second is differences in schemes for referring to paths
+on different operating systems.
+
+<H3>Relative paths</H3>
+
+<P>While programming Topographica, you might wish to refer to a file
+somewhere within the Topographica distribution. For instance, the
+Topographica window icon is <code>topo/tkgui/icons/topo.xbm</code>.
+This path is relative to the topographica base path, so
+<code>open('topo/tkgui/icons/topo.xbm')</code> will successfully open
+the file only when the topographica base path is the operating
+system's current working directory (e.g. when topographica was started
+from within its own directory, and the current working directory has
+not subsequently been changed).
+
+<P>To avoid this problem, simply use the functions
+<code>topo.base.parameterclasses.resolve_path()</code> (to locate an
+existing file) or
+<code>topo.base.parameterclasses.normalize_path()</code> (to prepare a
+path for writing). The example above would become
+<code>open(resolve_path('topo/tkgui/icons/topo.xbm'))</code>; to
+create a file for writing, one could write
+<code>open(normalize_path('topo/new_file.txt'))</code>.
+See the documentation for the two functions for more information.
+
+
+<H3>Operating system differences</H3>
+
+<P>Topographica is used on various platforms, and one of these is
+Windows, which uses a different scheme for paths from the one used by
+linux and OS X. For instance, the path <code>topo/tkgui/</code> is
+<code>topo\tkgui\</code> on Windows. To ensure that Topographica runs
+on all platforms: 
+<ol>
+<li>Do not attempt to perform operations such as <code>open</code> on
+'raw' linux-style paths. Instead, use one of the functions
+<code>topo.base.parameterclasses.normalize_path()</code> or
+<code>topo.base.parameterclasses.resolve_path()</code> (as described
+above).</li>
+<li>(For Windows developers) Never use Windows-style paths within the
+code: always specify paths in linux format. The above-mentioned
+functions correctly convert paths from linux to Windows, but do not
+handle the inverse conversion (in common with Python's own
+path-handling functions).</li>
+</ol>
+
+<P>Python itself provides a number of functions for dealing with paths
+in its <A HREF="docs.python.org/lib/module-os.path.html">os.path</A> 
+module. The functions above are based on those, but facilitate
+the use of 'search paths', allowing users to specify prefixes to search
+for relative paths.
