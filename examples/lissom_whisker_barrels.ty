@@ -487,9 +487,9 @@ topo.sim.grid_layout([[None, 'S1'],
                      xstart=150, xstep=150)
 
 # Make DeflectionPreference be the default subplot
-from topo.plotting.templates import plotgroup_templates
+from topo.plotting.plotgroup import plotgroups
 for name in ["Activity", "Connection Fields", "Projection"]:
-    plotgroup_templates[name].plot_templates[name]["Hue"]="DeflectionPreference"
-    plotgroup_templates[name].plot_templates[name]["Confidence"]="DeflectionSelectivity"
+    plotgroups[name].plot_templates[name]["Hue"]="DeflectionPreference"
+    plotgroups[name].plot_templates[name]["Confidence"]="DeflectionSelectivity"
 
 
