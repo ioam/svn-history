@@ -14,7 +14,7 @@ import topo
 from topo.base.arrayutils import octave_output, centroid
 from topo.base.cf import CFSheet, CFProjection, Projection
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import DynamicNumber
+from topo.base.parameterclasses import DynamicNumber,ListParameter, BooleanParameter
 from topo.base.projection import ProjectionSheet
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
@@ -28,7 +28,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.parameterclasses import Parameter
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.plotfilesaver import plotsaving_classes
-from topo.plotting.plotgroup import create_plotgroup
+from topo.plotting.plotgroup import create_plotgroup, plotgroups
 
 from topo.patterns.random import GaussianRandom
 
@@ -213,6 +213,81 @@ def save_plotgroup(name,saver_params={},**params):
 
 
 
+class Subplotting(ParameterizedObject):
+    """
+    Convenience functions for handling subplots (such as colorized Activity plots).
+    Only needed for avoiding typing, as plots can be declared with their own
+    specific subplots without using these functions.
+    """
+    
+    plotgroups_to_subplot=ListParameter(default=
+        ["Activity", "Connection Fields", "Projection", "Projection Activity"],
+        doc="List of plotgroups for which to set subplots.")
+
+    subplotting_declared = BooleanParameter(default=False,
+        doc="Whether set_subplots has previously been called")
+    
+    @staticmethod    
+    def set_subplots(prefix=None,hue="",confidence="",force=True):
+        """
+        Define Hue and Confidence subplots for each of the plotgroups_to_subplot.  
+        Typically used to make activity or weight plots show a
+        preference value as the hue, and a selectivity as the
+        confidence.
+
+        The specified hue, if any, should be the name of a SheetView,
+        such as OrientationPreference.  The specified confidence, if
+        any, should be the name of a (usually) different SheetView,
+        such as OrientationSelectivity.
+
+        The prefix option is a shortcut making the usual case easier
+        to type; it sets hue to prefix+"Preference" and confidence to
+        prefix+"Selectivity".
+
+        If force=False, subplots are changed only if no subplot is
+        currently defined.  Force=False is useful for setting up
+        subplots automatically when maps are measured, without
+        overwriting any subplots set up specifically by the user.
+
+        Currently works only for plotgroups that have a plot
+        with the same name as the plotgroup, though this could
+        be changed easily.
+
+        Examples::
+        
+           Subplotting.set_subplots("Orientation")
+             - Set the default subplots to OrientationPreference and OrientationSelectivity
+
+           Subplotting.set_subplots(hue="OrientationPreference")
+             - Set the default hue subplot to OrientationPreference with no selectivity
+
+           Subplotting.set_subplots()
+             - Remove subplots from all the plotgroups_to_subplot.
+        """
+        
+        if Subplotting.subplotting_declared and not force:
+            return
+        
+        if prefix:
+            hue=prefix+"Preference"
+            confidence=prefix+"Selectivity"
+        
+        for name in Subplotting.plotgroups_to_subplot:
+            if plotgroups.has_key(name):
+                pg=plotgroups[name]
+                if pg.plot_templates.has_key(name):
+                    pt=pg.plot_templates[name]
+                    pt["Hue"]=hue
+                    pt["Confidence"]=confidence
+                else:
+                    Subplotting().warning("No template %s defined for plotgroup %s" % (name,name))
+            else:
+                Subplotting().warning("No plotgroup %s defined" % name)
+
+        Subplotting.subplotting_declared=True
+
+
+
 # Module variables for passing values to the commands.
 coordinate = (0,0)
 sheet_name = ''
@@ -244,18 +319,11 @@ proj_name =''
 
 
 ###############################################################################
-# JABALERT: Should probably change these defaults not to mention
-# Orientation, and instead change measure_or_pref or something related
-# to install Orientation as the subplot.  That way other subplots can
-# be handled similarly.
-
 
 pg = create_plotgroup(name='Activity',category='Basic',
              doc='Plot the activity for all Sheets.', auto_refresh=True,
              update_command='update_activity()', plot_immediately=True)
-pg.add_plot('Activity',[('Strength','Activity'),
-                         ('Hue','OrientationPreference'),
-                         ('Confidence','OrientationSelectivity')])
+pg.add_plot('Activity',[('Strength','Activity')])
 
 
 
@@ -281,9 +349,7 @@ pg= create_plotgroup(name='Connection Fields',category="Basic",
                      doc='Plot the weight strength in each ConnectionField of a specific unit of a Sheet.',
                      update_command='update_connectionfields()',
                      plot_immediately=True, normalize=True)
-pg.add_plot('Connection Fields',[('Strength','Weights'),
-                                 ('Hue','OrientationPreference'),
-                                 ('Confidence','OrientationSelectivity')])
+pg.add_plot('Connection Fields',[('Strength','Weights')])
 
 
 def update_connectionfields():
@@ -305,9 +371,7 @@ pg= create_plotgroup(name='Projection',category="Basic",
            doc='Plot the weights of an array of ConnectionFields in a Projection.',
            update_command='update_projections()',
            plot_immediately=True, normalize=True)
-pg.add_plot('Projection',[('Strength','Weights'),
-                          ('Hue','OrientationPreference'),
-                          ('Confidence','OrientationSelectivity')])
+pg.add_plot('Projection',[('Strength','Weights')])
 
 
 def update_projections():
@@ -327,7 +391,7 @@ pg =  create_plotgroup(name='Projection Activity',category="Basic",
              doc='Plot the activity in each Projection that connects to a Sheet.',
              update_command='update_projectionactivity()',
              plot_immediately=True, normalize=True,auto_refresh=True)
-pg.add_plot('ProjectionActivity',[('Strength','ProjectionActivity')])
+pg.add_plot('Projection Activity',[('Strength','ProjectionActivity')])
 
 
 def update_projectionactivity():
@@ -589,6 +653,8 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         param_dict = {"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+
+    Subplotting.set_subplots("Orientation",force=False)
 
 ###############################################################################
 pg= create_plotgroup(name='Ocular Preference',category="Preference Maps",
