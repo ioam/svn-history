@@ -163,7 +163,7 @@ class SimSingleton(Singleton):
         self.actual_sim=new_sim
 
 
-    ## CEBALERT: syntax like "'V1' in topo.sim" does not work
+    ## CEBERRORALERT: syntax like "'V1' in topo.sim" does not work
     def __getitem__(self,item_name):
         """Allow dictionary-style access to the simulation."""
         return self.actual_sim[item_name]
