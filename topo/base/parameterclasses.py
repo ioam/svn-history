@@ -762,6 +762,9 @@ class InstanceMethodWrapper(object):
 
 
 
+# JABALERT: The remaining code should all move to a new file, probably
+# topo.misc.filepaths.py.  resolve_filename and normalize_path need to
+# change names, perhaps to find_file and full_path.
 
 class Filename(Parameter):
     """
