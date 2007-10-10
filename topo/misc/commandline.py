@@ -74,6 +74,8 @@ class CommandPrompt2(CommandPrompt):
 
     def __str__(self): return str(eval(self.format.replace('>>>','...'),__main__.__dict__))
 
+
+
 # Use to define global constants
 global_constants = {'pi':math.pi}
 
@@ -184,6 +186,7 @@ def process_argv(argv):
     inipath = os.path.join(appdata,'Topographica','topographica.ini')
     configpath = os.path.join(appsupport,'Topographica','topographica.config')
 
+    startup_exceptions_found=False
     for startup_file in (rcpath,configpath,inipath):
         if os.path.exists(startup_file):
             if option.interactive or option.gui:
@@ -200,7 +203,7 @@ def process_argv(argv):
                 # JPALERT: Maybe instead of continuing, control should
                 # go straight to the command line here for debugging,
                 # skipping the rest of the startup process?
-
+                startup_exceptions_found=True
 
     ### Notes about choices for topographica.rc equivalents on different platforms
     #
@@ -226,7 +229,6 @@ def process_argv(argv):
     # Name -- there are many different extensions (e.g. dat, config, cfg, ini), none of which
     # opens with any application by default. Some applications use xml.
 
-
     # Provide an interactive prompt unless running in batch mode
     if option.interactive:
         print BANNER
@@ -242,6 +244,9 @@ def process_argv(argv):
             import rlcompleter
             readline.parse_and_bind("tab: complete")
 
+    if startup_exceptions_found:
+        print "ERROR: Exceptions encountered when processing startup files; not executing any command-line arguments."
+        return
     
      # catch the first filenames arguments (before any options) and execute them.
     filename_arg = topo_parser.largs
@@ -262,7 +267,7 @@ def process_argv(argv):
 	exec cmd in __main__.__dict__
 
 
-
+# JABALERT: This function needs documentation and cleanup!
 def run_batch(script_file,output_directory="./Data",plotting_script="topo/plotting/default_plottingscript.py", recording_times = (50,100,500,1000,2000,3000,4000,5000), **params):
     """
     Any parameters supplied will be set in the main namespace before
