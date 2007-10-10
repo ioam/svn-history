@@ -33,7 +33,7 @@ import bwidget
 
 ######################################################################
 ######################################################################
-# CEBALERT: rename, bring in method from ControllableMenu
+# CEBALERT: rename!
 class Menu(Tkinter.Menu):
     """
     Tkinter Menu, but with a way to access entries by name.
@@ -127,7 +127,7 @@ class Menu(Tkinter.Menu):
         return Tkinter.Menu.invoke(self,self.index_convert(index))
 
     # other methods can be overriden if they're needed
-    
+
 
 # CEBALERT: of course dictionary access is used as an alternative to
 # the config method or whatever it's called! So this could cause
