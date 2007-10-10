@@ -150,7 +150,7 @@ class TestPattern(SheetPGPanel):
         """
         Simply update the plots: skip all handling of history.
         """
-        self.make_plots()
+        self.refresh_plots()
 
         
     def present_pattern(self):
