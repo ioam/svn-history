@@ -97,7 +97,7 @@ class ScrolledTkguiWindow(TkguiWindow):
     def handle_configure_event(self,e=None):
         self.__last_config_event_time = time.time()
         #self.after_idle(self.sizeright)
-        self.after(2,self.delayed_sizeright)
+        self.after(1,self.delayed_sizeright)
         #return ""
 
     def _has_bars(self):
@@ -110,7 +110,7 @@ class ScrolledTkguiWindow(TkguiWindow):
     
 
     def delayed_sizeright(self):
-        if time.time()-self.__last_config_event_time > 0.001:
+        if time.time()-self.__last_config_event_time > 0.00099:
             self.sizeright()
 ### hacktastic
 
@@ -127,9 +127,9 @@ class ScrolledTkguiWindow(TkguiWindow):
 
         # extra for width of scrollbars
         # CEBALERT: the calculated values don't work on linux
-        extraw = 19 #self._scroll_frame._scrolled_window.winfo_reqwidth() - \
+        extraw = 16#self._scroll_frame._scrolled_window.winfo_reqwidth() - \
                   #self._scroll_frame.scrolled_frame.winfo_reqwidth() + 3
-        extrah = 19 #self._scroll_frame._scrolled_window.winfo_reqheight() - \
+        extrah = 16#self._scroll_frame._scrolled_window.winfo_reqheight() - \
                   #self._scroll_frame.scrolled_frame.winfo_reqheight() + 3
 
         w = min(self.content.winfo_reqwidth()+extraw,self.winfo_screenwidth())
@@ -152,10 +152,10 @@ class ScrolledTkguiWindow(TkguiWindow):
     def _need_bars(self):
         need_x,need_y = False,False
         if self._scroll_frame._scrolled_window.winfo_width()<self.content.winfo_reqwidth() \
-           or self.content.winfo_reqwidth()-self.winfo_reqwidth()>19+5:  
+           or self.content.winfo_reqwidth()-self.winfo_reqwidth()>16+5:  
             need_x=True
         if self._scroll_frame._scrolled_window.winfo_height()<self.content.winfo_reqheight() \
-           or self.content.winfo_reqheight()-self.winfo_reqheight()>19+5:  
+           or self.content.winfo_reqheight()-self.winfo_reqheight()>16+5:  
             need_y=True
         return need_x,need_y
 
