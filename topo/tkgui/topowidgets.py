@@ -101,10 +101,13 @@ class ScrolledTkguiWindow(TkguiWindow):
         #return ""
 
     def _has_bars(self):
+        has_x_bar,has_y_bar = False,False
         if self._scroll_frame._scrolled_window.winfo_reqwidth() > 50:
-            return True
-        else:
-            return False
+            has_x_bar=True
+        if self._scroll_frame._scrolled_window.winfo_reqheight() > 50:
+            has_y_bar=True
+        return has_x_bar,has_y_bar
+    
 
     def delayed_sizeright(self):
         if time.time()-self.__last_config_event_time > 0.001:
@@ -137,19 +140,24 @@ class ScrolledTkguiWindow(TkguiWindow):
             self._scroll_frame.set_size(w,h)
             self.oldsize = (w,h)
 
-        if not self._need_bars():
-            self._scroll_frame.scrolled_frame.xview('scroll',1,'units')            
+        need_x,need_y = self._need_bars()
+        if not need_x:
+            self._scroll_frame.scrolled_frame.xview('scroll',1,'units')
+        if not need_y:
+            self._scroll_frame.scrolled_frame.yview('scroll',1,'units')
             #new_w,new_h = w-19,h-19
             #self._scroll_frame.set_size(new_w,new_h)
             #self.oldsize = (new_w,new_h)
         
     def _need_bars(self):
-        if self._scroll_frame._scrolled_window.winfo_width()<self.content.winfo_reqwidth():
-            return True
-        elif self.content.winfo_reqwidth()-self.winfo_reqwidth()>19+5:  
-            return True
-        else:
-            return False
+        need_x,need_y = False,False
+        if self._scroll_frame._scrolled_window.winfo_width()<self.content.winfo_reqwidth() \
+           or self.content.winfo_reqwidth()-self.winfo_reqwidth()>19+5:  
+            need_x=True
+        if self._scroll_frame._scrolled_window.winfo_height()<self.content.winfo_reqheight() \
+           or self.content.winfo_reqheight()-self.winfo_reqheight()>19+5:  
+            need_y=True
+        return need_x,need_y
 
 ######################################################################            
 
