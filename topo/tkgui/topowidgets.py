@@ -69,8 +69,8 @@ class ScrolledTkguiWindow(TkguiWindow):
         # provide route to title() method for convenience
         self.content.title = self.title
 
-        #import __main__;__main__.__dict__['q']=self
-
+        #import __main__;__main__.__dict__['ab']=self
+        
 ### hacktastic
 # (Here's why:
 # The ScrolledTkguiWindow receives 100s of <Configure> events in a
@@ -86,20 +86,32 @@ class ScrolledTkguiWindow(TkguiWindow):
 # because it would be too expensive. So the code below schedules
 # delayed_sizeright() to be called a time t after a <Configure> event;
 # delayed_sizeright() in turn only calls sizeright() if the time
-# since the last <Configure> is (about) the same as t. 
+# since the last <Configure> is (about) the same as t.
+#
+# We could achive the same thing with after_idle(), which waits until
+# the Tkinter event queue is empty before executing its callback.
+# But it turns out the technique above has a useful side effect:
+# when a user resizes the window, ... 
         self.bind("<Configure>",self.handle_configure_event)
 
     def handle_configure_event(self,e=None):
         self.__last_config_event_time = time.time()
-        self.after(100,self.delayed_sizeright)
+        #self.after_idle(self.sizeright)
+        self.after(2,self.delayed_sizeright)
+        #return ""
 
+    def _has_bars(self):
+        if self._scroll_frame._scrolled_window.winfo_reqwidth() > 50:
+            return True
+        else:
+            return False
 
     def delayed_sizeright(self):
-        if time.time()-self.__last_config_event_time > 0.098:
+        if time.time()-self.__last_config_event_time > 0.001:
             self.sizeright()
 ### hacktastic
 
-        
+
 
     # CB: should be able to move to resizablescrollableframe &
     # needs to be renamed.
@@ -112,9 +124,9 @@ class ScrolledTkguiWindow(TkguiWindow):
 
         # extra for width of scrollbars
         # CEBALERT: the calculated values don't work on linux
-        extraw = 19#19 #self._scroll_frame._scrolled_window.winfo_reqwidth() - \
+        extraw = 19 #self._scroll_frame._scrolled_window.winfo_reqwidth() - \
                   #self._scroll_frame.scrolled_frame.winfo_reqwidth() + 3
-        extrah = 19#19 #self._scroll_frame._scrolled_window.winfo_reqheight() - \
+        extrah = 19 #self._scroll_frame._scrolled_window.winfo_reqheight() - \
                   #self._scroll_frame.scrolled_frame.winfo_reqheight() + 3
 
         w = min(self.content.winfo_reqwidth()+extraw,self.winfo_screenwidth())
@@ -126,14 +138,15 @@ class ScrolledTkguiWindow(TkguiWindow):
             self.oldsize = (w,h)
 
         if not self._need_bars():
-            self._scroll_frame.scrolled_frame.xview('scroll',1,'units')
-            #new_w,new_h = w-5,h-5
+            self._scroll_frame.scrolled_frame.xview('scroll',1,'units')            
+            #new_w,new_h = w-19,h-19
             #self._scroll_frame.set_size(new_w,new_h)
             #self.oldsize = (new_w,new_h)
-
-
+        
     def _need_bars(self):
-        if abs(self.winfo_reqwidth()-self.content.winfo_reqwidth())>19+5:
+        if self._scroll_frame._scrolled_window.winfo_width()<self.content.winfo_reqwidth():
+            return True
+        elif self.content.winfo_reqwidth()-self.winfo_reqwidth()>19+5:  
             return True
         else:
             return False
