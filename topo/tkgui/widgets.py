@@ -192,10 +192,8 @@ class ResizableScrollableFrame(Tkinter.Frame):
         """
         Manually specify the size of the scrollable frame area.
         """
-        self._scrolled_window.pack_forget() # try to stop stray scrollbars        
         if width:self.__width_sizer['width']=width
         if height:self.__height_sizer['height']=height
-        self._scrolled_window.pack(fill="both",expand="yes")
 
 
 ##     def _fractions_visible(self):
