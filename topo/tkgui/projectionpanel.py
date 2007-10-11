@@ -299,8 +299,6 @@ class CFProjectionPGPanel(ProjectionSheetPGPanel):
         for c in old_canvases:
             c.grid_forget()
 
-        self.window_master.sizeright()
-    
 
     def display_labels(self):
         """

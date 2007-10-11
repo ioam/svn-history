@@ -49,6 +49,7 @@ class TkguiWindow(Tkinter.Toplevel):
 
 ######################################################################
 
+import time
 
 ######################################################################
 # CB: needs significant cleanup
@@ -60,23 +61,47 @@ class ScrolledTkguiWindow(TkguiWindow):
         TkguiWindow.__init__(self,**config)
 
         self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
-        
         self._scroll_frame = ResizableScrollableFrame(self,borderwidth=2,
                                                        relief="flat")
         self._scroll_frame.pack(expand="yes",fill="both")
-        
         self.content = self._scroll_frame.contents
 
-
-# CB: will try to make the window know when to resize itself, rather
-# than having window users tell it
-##         self.bind("<Configure>",self.deal_with_configure)
-
-##     def deal_with_configure(self,e=None):
-##         print e
+        self.content.window_title = self.title
 
 
-    # CB: should be able to move to resizablescrollableframe
+
+### hacktastic
+# (Here's why:
+# The ScrolledTkguiWindow receives 100s of <Configure> events in a
+# short time when a button like "Enlarge" is pressed.  I *guess* this
+# is because there are lots of widgets in the window, and each time
+# some <Configure> event is generated for a certain one of them,
+# pack() goes through all the widgets, which generates a <Configure>
+# for each. In turn, each of those <Configure> events goes up to this
+# window, generating a <Configure> from it each time. So there's a
+# whole slew of <Configure> events.
+# 
+# We do *not* want to call sizeright() for every <Configure> event,
+# because it would be too expensive. So the code below schedules
+# delayed_sizeright() to be called a time t after a <Configure> event;
+# delayed_sizeright() in turn only calls sizeright() if the time
+# since the last <Configure> is (about) the same as t. 
+        self.bind("<Configure>",self.handle_configure_event)
+
+    def handle_configure_event(self,e=None):
+        self.__last_config_event_time = time.time()
+        self.after(100,self.delayed_sizeright)
+
+
+    def delayed_sizeright(self):
+        if time.time()-self.__last_config_event_time > 0.098:
+            self.sizeright()
+### hacktastic
+
+        
+
+    # CB: should be able to move to resizablescrollableframe &
+    # needs to be renamed.
     def sizeright(self):
         # if user has changed window size, need to tell tkinter that it should take
         # control again.

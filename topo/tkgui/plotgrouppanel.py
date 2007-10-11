@@ -103,13 +103,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         to the params_in_history list, otherwise it will be disabled
         in historical views.
         """
-        # CEBALERT! To be cleaned up...
-        try:
-            self.window_master = master.master.master.master.master
-        except:
-            self.window_master = None
-
-
         # Label does have a wraplength option...but it's in screen
         # units. Surely tk has a function to convert between
         # text and screen units?
@@ -348,7 +341,6 @@ e.g. for debugging.)
         self.display_plots()
         self.display_labels()
         self.refresh_title()
-        if self.window_master: self.window_master.sizeright()
 
         
     def refresh_plots(self):
@@ -527,7 +519,6 @@ e.g. for debugging.)
             self.representations['Reduce']['widget']['state']=DISABLED
         self.representations['Enlarge']['widget']['state']=NORMAL
         self.display_plots()
-        if self.window_master: self.window_master.sizeright()
 
     def enlarge_plots(self):
         """Function called by widget to increase the plot size, when possible."""
@@ -535,7 +526,6 @@ e.g. for debugging.)
             self.representations['Enlarge']['widget']['state']=DISABLED
         self.representations['Reduce']['widget']['state']=NORMAL
         self.display_plots()
-        if self.window_master: self.window_master.sizeright()
         
 
 ####################### HISTORY METHODS ##########################         
@@ -612,11 +602,6 @@ e.g. for debugging.)
         
 ###########################################################         
 
-
-    # CEBHACKALERT
-    def title(self,t):
-        if self.window_master: self.window_master.title(t)
-
     def _plot_title(self):
         """
         Provide a string describing the current plot.
@@ -634,8 +619,7 @@ e.g. for debugging.)
         title = self._plot_title()
         
         self.plot_group_title.configure(tag_text=title)
-        window_title = "%s: %s"%(topo.sim.name,title)
-        self.title(window_title)
+        self.master.window_title("%s: %s"%(topo.sim.name,title))
 
           
     def destroy(self):
