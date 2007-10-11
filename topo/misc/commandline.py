@@ -287,7 +287,7 @@ def default_analysis_function():
 
 def run_batch(script_file,output_directory="Output",
               analysis_fn = default_analysis_function,
-              recording_times = [50,100,500,1000,2000,3000,4000,5000],
+              analysis_times = [50,100,500,1000,2000,3000,4000,5000,10000],
               **params):
     """
     Run a Topographica simulation in batch mode.
@@ -317,7 +317,7 @@ def run_batch(script_file,output_directory="Output",
     which a unique individual directory will be created for this
     particular run.  The optional analysis_fn can be any python
     function to be called at each of the simulation iterations defined
-    in the recording_times list.  This function should perform
+    in the analysis_times list.  This function should perform
     whatever analysis of the simulation you want to perform, such as
     plotting or calculating some statistics.  The analysis_fn should
     avoid using any GUI functions (i.e., should not import anything
@@ -385,22 +385,20 @@ def run_batch(script_file,output_directory="Output",
     # JABALERT: Temporary -- make sure that the various commands
     # required by PlotGroups are available when needed.  Need to find
     # a better way.
-    exec "from topo.commands.analysis import *" in __main__.__dict__
+    exec "from topo.commands.analysis   import *" in __main__.__dict__
     exec "from topo.commands.pylabplots import *" in __main__.__dict__
 
     # Run each segment, doing the analysis and saving the script state each time
-    for run_to in recording_times:
+    for run_to in analysis_times:
         topo.sim.run(run_to - topo.sim.time())
 	analysis_fn()
 	simtime_formatted = '%06d' % topo.sim.time()
         save_script_repr(topo.sim.name + "_" + simtime_formatted + ".params")
+        elapsedtime=time.time()-starttime
+        print "Simulation time %06d, elapsed real time %02d:%02d." % \
+              (topo.sim.time(),int(elapsedtime/60),int(elapsedtime%60))
 
-    endtime=time.time()
-    elapsedtime=endtime-starttime
-    
     print "Batch run completed at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000", time.gmtime())
-    print "Final simulation time %06d, elapsed real time %02d:%02d." % \
-          (topo.sim.time(),int(elapsedtime/60),int(elapsedtime%60))
     
     
     
