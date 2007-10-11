@@ -74,16 +74,11 @@ Maybe it's getting daunting?
 Finishing cleaning up associated code (maybe mostly for Jim to do?).
 Could eventually use STRFPAK or a similar approach.
 
+<H4>2007/10/11: Update User_Manual/publishing.html</H4>
+Right now, it says to use screenshots, but actually most
+plots can now be saved in native format by right clicking or using
+save_plotgroup, e.g. from run_batch.
 
-<H4>2006/03/26 (CB): scheduled_actions in lissom examples</H4>
-Insert missing actions in case someone tries higher densities.
-JAB 2007/10/08: I checked lissom_oo_or.ty (but not any other
-.ty scripts!), and I count just as many actions of each type
-as there are in commands/or_defs in C++ lissom.  So I think that
-this note is obsolete, unless there are other .ty scripts to check
-or some other reason to think this task is not done.
-I couldn't remember doing it, that's all. Seems like you did
-it, so we can remove this task.
 
 
 <!-- ------------------------------------------------------------------------ -->
