@@ -53,7 +53,6 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
     """
     _abstract_class_name = "ProjectionSheetPGPanel"
 
-    plotgroup_type = ProjectionSheetPlotGroup
     sheet_type = ProjectionSheet
 
     auto_refresh = BooleanParameter(False) # these panels can be slow to refresh
@@ -103,9 +102,6 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
 
 class ProjectionActivityPanel(ProjectionSheetPGPanel):
 
-    plotgroup_type = ProjectionActivityPlotGroup
-    
-    
     def __init__(self,console,master,plotgroup,**params):       
         super(ProjectionActivityPanel,self).__init__(console,master,plotgroup,**params)
         self.auto_refresh = True
@@ -121,8 +117,6 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
 
           
 class ConnectionFieldsPanel(ProjectionSheetPGPanel):
-
-    plotgroup_type = ConnectionFieldsPlotGroup
 
     def __init__(self,console,master,plotgroup,**params):
         self.initial_args=params # CEBALERT: store the initial arguments so we can get sheet,x,y in
@@ -205,8 +199,6 @@ class CFProjectionPGPanel(ProjectionSheetPGPanel):
     """
     Panel for displaying CFProjections.
     """
-
-    plotgroup_type = CFProjectionPlotGroup
 
     def __init__(self,console,master,plotgroup,**params):
         super(CFProjectionPGPanel,self).__init__(console,master,plotgroup,**params)

@@ -52,8 +52,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 
     _abstract_class_name = "PlotGroupPanel"
 
-    plotgroup_type = PlotGroup
-
     # Default size for images used on buttons
     button_image_size=(20,20)
 
@@ -630,10 +628,7 @@ e.g. for debugging.)
             
 
 
-class SheetPGPanel(PlotGroupPanel):
-
-    plotgroup_type = SheetPlotGroup
-    
+class SheetPGPanel(PlotGroupPanel):    
 
     @staticmethod
     def valid_context():

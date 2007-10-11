@@ -27,8 +27,6 @@ from tkparameterizedobject import ButtonParameter
 # hierarchy.
 class FeatureCurvePanel(PlotGroupPanel):
 
-    plotgroup_type = FeatureCurvePlotGroup
-
 
     # CEBHACKALERT: to which types of sheet is this plotgroup supposed to be applicable?
     # Also applies to populate_sheet_param() below.
