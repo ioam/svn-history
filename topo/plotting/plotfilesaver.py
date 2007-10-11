@@ -14,11 +14,12 @@ import numpy
 
 from topo.base.parameterizedobject import ParameterizedObject,Parameter
 from topo.base.parameterclasses import Number, StringParameter
+from topo.base.parameterclasses import normalize_path
 
 from plotgroup import PlotGroup,TemplatePlotGroup
 from plotgroup import CFProjectionPlotGroup,ConnectionFieldsPlotGroup 
 from plotgroup import plotgroups
-
+    
 import topo
 
 # Consider using PIL's ImageFont module
@@ -84,7 +85,7 @@ class PlotGroupSaver(ParameterizedObject):
 
     def save_to_disk(self):
         for p,l in zip(self.plotgroup.plots,self.plotgroup.labels):
-            p.bitmap.image.save(self.filename(l))
+            p.bitmap.image.save(normalize_path(self.filename(l)))
 
 
 
@@ -171,7 +172,7 @@ class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
     def save_to_disk(self):
         imgs = numpy.array([p.bitmap.image for p in self.plotgroup.plots]).reshape(self.plotgroup.proj_plotting_shape)
         img = make_contact_sheet(imgs, (3,3,3,3), 3)
-        img.save(self.filename(self.plotgroup.sheet.name+"_"+self.plotgroup.projection.name))
+        img.save(normalize_path(self.filename(self.plotgroup.sheet.name+"_"+self.plotgroup.projection.name)))
 
 
 

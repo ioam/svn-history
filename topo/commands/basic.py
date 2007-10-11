@@ -26,6 +26,7 @@ from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 from topo.base.projection import ProjectionSheet
 from topo.sheets.generatorsheet import GeneratorSheet
+from topo.base.parameterclasses import normalize_path
 
 def save_input_generators():
     """Save a copy of the active_sim's current input_generators for all GeneratorSheets."""
@@ -142,7 +143,7 @@ def save_snapshot(snapshot_name,xml=False):
     try:
         snapshot_file=gzip.open(snapshot_name,'w',compresslevel=5)
     except NameError:
-        snapshot_file=open(snapshot_name,'w')
+        snapshot_file=open(normalize_path(snapshot_name),'w')
  
 
     # CEBALERT: gnosis.xml.pickle is currently being updated to work
@@ -206,5 +207,5 @@ def save_script_repr(script_name):
               (topo.release,strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())))
     script = header+topo.sim.script_repr()
     
-    script_file = open(script_name,'w')
+    script_file = open(normalize_path(script_name),'w')
     script_file.write(script)
