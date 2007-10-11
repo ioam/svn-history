@@ -861,11 +861,7 @@ def normalize_path(path,prefix=None):
     if not prefix:
         prefix = output_path
         
-    print prefix
-
     if not os.path.isabs(path):
         path = os.path.join(os.path.normpath(prefix),path)
-
-    print os.path.normpath(path)
 
     return os.path.normpath(path)
