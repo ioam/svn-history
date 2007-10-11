@@ -83,6 +83,8 @@
 </dd>
 <dt>Command-line and batch:</dt>
 <dd>
+  <A target="_top" href="../User_Manual/batch.html">batch 
+  mode</A> for running multiple similar simulations<br>
   <A target="_top" href="../User_Manual/commandline.html#saving-bitmaps">saving 
   bitmaps</A> from script/command-line (for batch runs)<br>
   script/command-line <A target="_top" href="../User_Manual/commandline.html#scripting-gui">control over GUI</A><br>
