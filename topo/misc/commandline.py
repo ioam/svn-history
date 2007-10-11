@@ -267,38 +267,88 @@ def process_argv(argv):
 	exec cmd in __main__.__dict__
 
 
-# JABALERT: This function needs documentation and cleanup!
-def run_batch(script_file,output_directory="./Data",plotting_script="topo/plotting/default_plottingscript.py", recording_times = (50,100,500,1000,2000,3000,4000,5000), **params):
+def default_analysis_function():
     """
-    Any parameters supplied will be set in the main namespace before
-    any scripts are run, and will be used to construct a unique
-    topo.sim.name for the file.
+    Example of an analysis command for run_batch; users are likely to need something
+    similar but highly customized.
     """
+    import topo
+    from topo.commands.analysis import save_plotgroup
+    topo.commands.analysis.coordinates=[0,0]
+    topo.commands.analysis.sheet_name="V1"
+    save_plotgroup("Orientation Preference")
+    save_plotgroup("Activity")
+
+
+def run_batch(script_file,output_directory="./Data",analysis_fn = default_analysis_function, recording_times = [50,100,500,1000,2000,3000,4000,5000], **params):
+    """
+    The purpose of this routine is to run Topographica simulations in
+    a batch mode in a standardized way, which includes a standardized
+    and uniqe naming of 'experiments' (or runs if you want), command
+    line parameter handling, simulation 'checkpointing' for safe
+    reproduction of old experiments, and more organized way for doing
+    simulation analysis. A typical usage of this routine is for remote
+    execution of large numbers of simulations with different parameters
+    on remote machines (such as clusters).
+    
+    The script_file parameter defines the script we want to run in
+    batch mode. The output_directory defines the root directory in
+    which all the results will be placed (this is mainly intended for
+    the case when multiple jobs are run, to keep all the results
+    together).  The optional analysisfn should be a short python
+    function that will be called at each of the simulation iterations
+    defined in the recording_times array.  This function should perform
+    whichever analysis of the simulation you want to perform.  It
+    should do this without using a GUI, and should save all its
+    results into files.
+    
+    Important note: any parameters supplied will be set in the main
+    namespace before any scripts are run, and will be used to
+    construct a unique topo.sim.name for the file (and will be encoded
+    into the simulation directory name).
+    """
+
     from topo.base.parameterizedobject import script_repr_suppress_defaults
     script_repr_suppress_defaults=False
     import matplotlib 
-    matplotlib.use('GD')
+    matplotlib.use('Agg') # Is 'GD' required on some platforms?
 
-    
     prefix = ""
-    prefix = prefix + strftime("%H%M%d%m%y")
+    prefix = prefix + strftime("%Y%m%d%H%M")
 
-    prefix = prefix + ":" + os.path.basename(script_file) + ">"
+    prefix = prefix + "_" + os.path.basename(script_file) + ":"
     
     for a in params.keys():
         prefix = prefix + a + "=" + str(params[a]) + ",";
         
     for a in params.keys():
         __main__.__dict__[a] = params[a]
+
+    from topo.base.parameterclasses import normalize_path, output_path
+
+    if os.path.isdir(normalize_path(output_directory)):
+	pass
+    else:    
+        os.mkdir(normalize_path(output_directory))
+
+    topo.base.parameterclasses.output_path = normalize_path(os.path.join(output_directory,prefix))
     
-    os.mkdir(output_directory+prefix)
+    if os.path.isdir(topo.base.parameterclasses.output_path):
+	print "BatchRun: Warning, directory: " +  topo.base.parameterclasses.output_path + " already exists! Potential error!"
+    else:
+	os.mkdir(topo.base.parameterclasses.output_path)
+
     execfile(script_file,__main__.__dict__)
-    topo.sim.name = prefix
-    __main__.__dict__["output_directory"] = output_directory
-    
-    while len(recording_times) != 0:
-        run_to = recording_times.pop(0)
+
+    # JABALERT: Temporary -- make sure that the various commands
+    # required by PlotGroups are available when needed.  Need to find
+    # a better way.
+    exec "from topo.commands.analysis import *" in __main__.__dict__
+    exec "from topo.commands.pylabplots import *" in __main__.__dict__
+
+    for run_to in recording_times:
         topo.sim.run(run_to - topo.sim.time())
-        execfile(plotting_script,__main__.__dict__)
-        save_script_repr("./"+ output_directory + prefix + "/" + prefix + "." +str(topo.sim.time())+ ".params")
+	analysis_fn()
+	simtime_formatted = '%06d' % topo.sim.time()
+        save_script_repr(prefix + "." + simtime_formatted + ".params")
 
