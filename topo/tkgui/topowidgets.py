@@ -66,7 +66,8 @@ class ScrolledTkguiWindow(TkguiWindow):
         self._scroll_frame.pack(expand="yes",fill="both")
         self.content = self._scroll_frame.contents
 
-        self.content.window_title = self.title
+        # provide route to title() method for convenience
+        self.content.title = self.title
 
 
 

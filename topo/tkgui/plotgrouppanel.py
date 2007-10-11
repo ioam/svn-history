@@ -619,7 +619,7 @@ e.g. for debugging.)
         title = self._plot_title()
         
         self.plot_group_title.configure(tag_text=title)
-        self.master.window_title("%s: %s"%(topo.sim.name,title))
+        self.master.title("%s: %s"%(topo.sim.name,title))
 
           
     def destroy(self):
