@@ -69,7 +69,7 @@ class ScrolledTkguiWindow(TkguiWindow):
         # provide route to title() method for convenience
         self.content.title = self.title
 
-
+        #import __main__;__main__.__dict__['q']=self
 
 ### hacktastic
 # (Here's why:
@@ -112,9 +112,9 @@ class ScrolledTkguiWindow(TkguiWindow):
 
         # extra for width of scrollbars
         # CEBALERT: the calculated values don't work on linux
-        extraw = 19 #self._scroll_frame._scrolled_window.winfo_reqwidth() - \
+        extraw = 19#19 #self._scroll_frame._scrolled_window.winfo_reqwidth() - \
                   #self._scroll_frame.scrolled_frame.winfo_reqwidth() + 3
-        extrah = 19 #self._scroll_frame._scrolled_window.winfo_reqheight() - \
+        extrah = 19#19 #self._scroll_frame._scrolled_window.winfo_reqheight() - \
                   #self._scroll_frame.scrolled_frame.winfo_reqheight() + 3
 
         w = min(self.content.winfo_reqwidth()+extraw,self.winfo_screenwidth())
@@ -124,6 +124,20 @@ class ScrolledTkguiWindow(TkguiWindow):
         if not hasattr(self,'oldsize') or self.oldsize!=(w,h): 
             self._scroll_frame.set_size(w,h)
             self.oldsize = (w,h)
+
+        if not self._need_bars():
+            self._scroll_frame.scrolled_frame.xview('scroll',1,'units')
+            #new_w,new_h = w-5,h-5
+            #self._scroll_frame.set_size(new_w,new_h)
+            #self.oldsize = (new_w,new_h)
+
+
+    def _need_bars(self):
+        if abs(self.winfo_reqwidth()-self.content.winfo_reqwidth())>19+5:
+            return True
+        else:
+            return False
+
 ######################################################################            
 
 
