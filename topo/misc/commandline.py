@@ -352,8 +352,10 @@ def run_batch(script_file,output_directory="Output",
     
     if params.keys():
         prefix += ":"
-    for a in params.keys():
-        prefix += a + "=" + str(params[a]) + ","
+        for a in params.keys():
+           prefix += a + "=" + str(params[a]) + ","
+        prefix= re.sub('.$','',prefix)
+
 
     # Set provided parameter values in main namespace
     for a in params.keys():
