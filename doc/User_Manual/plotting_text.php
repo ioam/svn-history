@@ -43,7 +43,7 @@ shown (usually control-click on a 1-button Mac system) would allow the
 user to open a ConnectionField plot for the indicated unit, as well as
 run other analyses or visualizations of this unit or Sheet.
 
-<P>By default, the Activity plot typically shows other information as well:
+<P>If you have measured an orientation map, the Activity plot shows other information as well:
 
 <center>
 <img src="images/lissom_oo_or_10000_activity.png" WIDTH="676" HEIGHT="366">
@@ -51,8 +51,9 @@ run other analyses or visualizations of this unit or Sheet.
 
 <P>Here the color of each unit in V1 is determined by that unit's
 orientation preference, so that one can see that different input
-orientations result in different types of neurons activated.  The
-"Activity" plot is actually specified as a combination of three
+orientations result in different types of neurons activated.
+measure_or_pref() changes the activity plot so that it is actually
+specified as a combination of three 
 SheetViews on different <i>channels</i>:
 
 <ul>
@@ -67,12 +68,27 @@ amount of colorization depends on the OrientationSelectivity (the
 Confidence channel), which is appropriate because unselective neurons
 then show up white.  The monochrome plot shown first above was
 obtained by toggling the "Strength only" button, which disables Hue and
-Confidence.
+Confidence so that the result is as it was before running measure_or_pref().
 
 <P>For a plot with multiple channels, moving the mouse over the bitmap
 will show the values in all of the available channels, and the
 right-click menu will allow you to see what channels are available,
 and to plot or analyze any of the channels independently.
+
+<P>The color coding can be changed to some other plot using the convenience
+function Subplotting.set_subplots:
+
+<pre>
+  from topo.commands.analysis import Subplotting
+  Subplotting.set_subplots("Direction")
+</pre>
+
+or disabled entirely:
+
+<pre>
+  from topo.commands.analysis import Subplotting
+  Subplotting.set_subplots()
+</pre>
 
 
 <H2>Preference map plots</H2>
@@ -203,6 +219,8 @@ subplot from Activity plots using:
   plotgroups["Activity"].plot_templates["Activity"]["Confidence"]=None
 </pre>
 
+(which is what Subplotting.set_subplots() does, for Activity and
+several other types of plots).
 
 <P>You can also put lines like these into
 <a href="commandline.html#toporc">~/.topographicarc</a>, if you find
