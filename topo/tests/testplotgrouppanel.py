@@ -18,7 +18,8 @@ from topo.tkgui.plotgrouppanel import PlotGroupPanel
 
 # need to clean up stuff like this: do it all in one
 # place (start() modification as suggested by JAB).
-if not hasattr(topo,'guimain'):
+import os
+if not hasattr(topo,'guimain') and os.getenv('DISPLAY'):
     from topo.tkgui.topoconsole import TopoConsole
     TopoConsole()
 
