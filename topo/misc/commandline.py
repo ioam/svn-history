@@ -349,7 +349,9 @@ def run_batch(script_file,output_directory="Output",
     prefix += "_" + scriptbase
 
     simname = prefix
-    
+
+    # CEBERRORALERT: I'm pretty sure you can't have a colon in
+    # a filename on Windows.
     if params.keys():
         prefix += ":"
         for a in params.keys():
@@ -372,7 +374,7 @@ def run_batch(script_file,output_directory="Output",
     if os.path.isdir(topo.base.parameterclasses.output_path):
 	print "Batch run: Warning -- directory: " +  \
               topo.base.parameterclasses.output_path + \
-              " already exists! Run aborted; rename directory or wait one minute before continuing."
+              " already exists! Run aborted; rename directory or wait one minute before trying again."
         import sys
         sys.exit(-1)
     else:
