@@ -850,7 +850,7 @@ def resolve_filename(path,search_paths=[]):
     raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following place(s): '+str(paths_tried)+'.')
 
 
-def normalize_path(path,prefix=None):
+def normalize_path(path="",prefix=None):
     """
     Convert a unix-style path to the current OS's format, and create
     an absolute path (using prefix) if it's not already absolute.
