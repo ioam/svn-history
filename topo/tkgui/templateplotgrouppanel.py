@@ -193,7 +193,8 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         filename = self.plotgroup.filesaver(self.plotgroup).filename(plot.label(),file_format="png")
         PNG_FILETYPES = [('PNG images','*.png'),('All files','*')]
         snapshot_name = asksaveasfilename(filetypes=PNG_FILETYPES,
-                                          initialfile=normalize_path(filename))
+                                          initialdir=normalize_path(),
+                                          initialfile=filename)
 
         if snapshot_name:
             plot.bitmap.image.save(filename)
@@ -206,7 +207,8 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         POSTSCRIPT_FILETYPES = [('Encapsulated PostScript images','*.eps'),
                                 ('PostScript images','*.ps'),('All files','*')]
         snapshot_name = asksaveasfilename(filetypes=POSTSCRIPT_FILETYPES,
-                                          initialfile=normalize_path(filename))
+                                          initialdir=normalize_path(),
+                                          initialfile=filename)
 
         if snapshot_name:
             canvas.postscript(file=snapshot_name)

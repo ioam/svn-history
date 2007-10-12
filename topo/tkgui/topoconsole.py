@@ -23,11 +23,12 @@ import Tkinter
 from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
      LEFT, RIGHT, YES, NO, BOTH, Label, Text, END, DISABLED, NORMAL, Scrollbar, Y
 import tkMessageBox
-import tkFileDialog
+from tkFileDialog import asksaveasfilename,askopenfilename
 import Pmw
 
 import topo
 from topo.base.parameterclasses import resolve_filename
+from topo.base.parameterclasses import normalize_path
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
 from topo.misc.keyedlist import KeyedList
@@ -365,7 +366,7 @@ class TopoConsole(TkguiWindow):
 
         The script is exec'd in __main__.__dict__ (i.e. as if it were specified on the commandline.)
         """
-        script = tkFileDialog.askopenfilename(filetypes=SCRIPT_FILETYPES)
+        script = askopenfilename(filetypes=SCRIPT_FILETYPES)
         if script in ('',(),None): # (representing the various ways no script was selected in the dialog)
             self.messageBar.message('state', 'Run canceled')
         else:
@@ -379,7 +380,9 @@ class TopoConsole(TkguiWindow):
         
 
     def save_script_repr(self):
-        script_name = tkFileDialog.asksaveasfilename(filetypes=SCRIPT_FILETYPES,initialfile=topo.sim.basename()+"_script_repr.ty")
+        script_name = asksaveasfilename(filetypes=SCRIPT_FILETYPES,
+                                        initialdir=normalize_path(),
+                                        initialfile=topo.sim.basename()+"_script_repr.ty")
         
         if script_name:
             topo.commands.basic.save_script_repr(script_name)
@@ -390,7 +393,7 @@ class TopoConsole(TkguiWindow):
         """
         Dialog to load a user-selected snapshot (see topo.commands.basic.load_snapshot() ).
         """
-        snapshot_name = tkFileDialog.askopenfilename(filetypes=SAVED_FILETYPES,initialdir="examples")
+        snapshot_name = askopenfilename(filetypes=SAVED_FILETYPES,initialdir="examples")
 
         if snapshot_name in ('',(),None):
             self.messageBar.message('state','No snapshot loaded.')
@@ -409,8 +412,9 @@ class TopoConsole(TkguiWindow):
         
         Adds the file extension .typ if not already present.
         """
-        snapshot_name = tkFileDialog.asksaveasfilename(filetypes=SAVED_FILETYPES,
-            initialfile=topo.sim.basename()+".typ")
+        snapshot_name = asksaveasfilename(filetypes=SAVED_FILETYPES,
+                                          initialdir=normalize_path(),
+                                          initialfile=topo.sim.basename()+".typ")
         
         if snapshot_name in ('',(),None):
             self.messageBar.message('state','No snapshot saved.')
