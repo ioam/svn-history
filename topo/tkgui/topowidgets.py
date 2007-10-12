@@ -98,6 +98,8 @@ class ScrolledTkguiWindow(TkguiWindow):
 
     def handle_configure_event(self,e=None):
         self.__last_config_event_time = time.time()
+        # after_idle() is unlikely to work on OS X, according to
+        # various sources on the web
         #self.after_idle(self.sizeright)
 
         # after() is unlikely to work on OS X, according to
