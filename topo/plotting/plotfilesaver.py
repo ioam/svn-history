@@ -147,11 +147,11 @@ class CFProjectionPlotGroupSaver(PlotGroupSaver):
     Allows a CFProjectionPlotGroup to be saved as a bitmap file,
     concatenating all the CF plots into a single image.
     """
-    def save_to_disk(self):
+    def save_to_disk(self,**params):
         imgs = numpy.array([p.bitmap.image
                             for p in self.plotgroup.plots]).reshape(
             self.plotgroup.proj_plotting_shape)
         img = make_contact_sheet(imgs, (3,3,3,3), 3)
         img.save(normalize_path(self.filename(
             self.plotgroup.sheet.name+"_"+
-            self.plotgroup.projection.name)))
+            self.plotgroup.projection.name,**params)))
