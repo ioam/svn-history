@@ -75,9 +75,9 @@ class PlotGroupSaver(ParameterizedObject):
         return self.strip(self.filename_format % vars)
 
 
-    def save_to_disk(self):
+    def save_to_disk(self,**params):
         for p,l in zip(self.plotgroup.plots,self.plotgroup.labels):
-            p.bitmap.image.save(normalize_path(self.filename(l)))
+            p.bitmap.image.save(normalize_path(self.filename(l,**params)))
 
 
 
