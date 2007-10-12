@@ -473,7 +473,9 @@ class EditorCanvas(Canvas):
     def save_snapshot(self):
         POSTSCRIPT_FILETYPES = [('Encapsulated PostScript images','*.eps'),
                                 ('PostScript images','*.ps'),('All files','*')]
-        snapshot_name = asksaveasfilename(filetypes=POSTSCRIPT_FILETYPES)
+        snapshot_name = asksaveasfilename(filetypes=POSTSCRIPT_FILETYPES,
+            initialfile=topo.sim.basename()+".ps")
+        
         if snapshot_name:
             self.postscript(file=snapshot_name)
 
