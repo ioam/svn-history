@@ -529,7 +529,7 @@ tilewrapper-uninstall:
 ##############################################################
 # BWIDGET
 #
-BWIDGET = pybwidget-0.1.2_1.7.0
+BWIDGET = pybwidget-0.1.2_1.8.0
 
 BWIDGET_UNINSTALL += share/pybwidget 
 BWIDGET_UNINSTALL += ${PYTHON_LIB}/site-packages/bwidget
