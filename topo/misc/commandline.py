@@ -350,8 +350,6 @@ def run_batch(script_file,output_directory="Output",
 
     simname = prefix
 
-    # CEBERRORALERT: I'm pretty sure you can't have a colon in
-    # a filename on Windows.
     if params.keys():
         for a in params.keys():
            prefix += "," + a + "=" + str(params[a])
@@ -393,8 +391,7 @@ def run_batch(script_file,output_directory="Output",
     for run_to in analysis_times:
         topo.sim.run(run_to - topo.sim.time())
 	analysis_fn()
-	simtime_formatted = '%06d' % topo.sim.time()
-        save_script_repr(topo.sim.name + "_" + simtime_formatted + ".params")
+        save_script_repr()
         elapsedtime=time.time()-starttime
         print "Simulation time %06d, elapsed real time %02d:%02d." % \
               (topo.sim.time(),int(elapsedtime/60),int(elapsedtime%60))
