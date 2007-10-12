@@ -164,7 +164,7 @@ class PlotGroup(ParameterizedObject):
 	"""Generate labels for the plots."""
 	self.labels = []
 	for plot in self.plots:
-	    self.labels.append(plot.plot_src_name + '\n' + plot.name)
+	    self.labels.append(plot.label())
 
 
     def _sort_plots(self):

@@ -94,6 +94,10 @@ class Plot(ParameterizedObject):
               self.bitmap = copy.copy(self._orig_bitmap)
               self.bitmap.image = self._orig_bitmap.zoom(self.scale_factor)
 
+     def label(self):
+          """Return a label for this plot."""
+          return self.plot_src_name + '\n' + self.name
+
 
 def make_template_plot(channels,sheet_view_dict,density=None,
               plot_bounding_box=None,normalize=False,name='None'):
