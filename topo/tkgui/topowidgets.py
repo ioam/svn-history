@@ -100,13 +100,6 @@ class ScrolledTkguiWindow(TkguiWindow):
         self.after(1,self.delayed_sizeright)
         #return ""
 
-    def _has_bars(self):
-        has_x_bar,has_y_bar = False,False
-        if self._scroll_frame._scrolled_window.winfo_reqwidth() > 50:
-            has_x_bar=True
-        if self._scroll_frame._scrolled_window.winfo_reqheight() > 50:
-            has_y_bar=True
-        return has_x_bar,has_y_bar
     
 
     def delayed_sizeright(self):
@@ -127,9 +120,9 @@ class ScrolledTkguiWindow(TkguiWindow):
 
         # extra for width of scrollbars
         # CEBALERT: the calculated values don't work on linux
-        extraw = 16#self._scroll_frame._scrolled_window.winfo_reqwidth() - \
+        extraw = 19#self._scroll_frame._scrolled_window.winfo_reqwidth() - \
                   #self._scroll_frame.scrolled_frame.winfo_reqwidth() + 3
-        extrah = 16#self._scroll_frame._scrolled_window.winfo_reqheight() - \
+        extrah = 19#self._scroll_frame._scrolled_window.winfo_reqheight() - \
                   #self._scroll_frame.scrolled_frame.winfo_reqheight() + 3
 
         w = min(self.content.winfo_reqwidth()+extraw,self.winfo_screenwidth())
@@ -141,21 +134,25 @@ class ScrolledTkguiWindow(TkguiWindow):
             self.oldsize = (w,h)
 
         need_x,need_y = self._need_bars()
-        if not need_x:
-            self._scroll_frame.scrolled_frame.xview('scroll',1,'units')
-        if not need_y:
-            self._scroll_frame.scrolled_frame.yview('scroll',1,'units')
-            #new_w,new_h = w-19,h-19
-            #self._scroll_frame.set_size(new_w,new_h)
-            #self.oldsize = (new_w,new_h)
+        if need_x and need_y:
+            scrollbar = 'both'
+        elif need_x and not need_y:
+            scrollbar = 'horizontal'
+        elif not need_x and need_y:
+            scrollbar = 'vertical'
+        elif not need_x and not need_y:
+            scrollbar = 'none'
+               
+        self._scroll_frame._scrolled_window.config(scrollbar=scrollbar)
+
         
     def _need_bars(self):
         need_x,need_y = False,False
         if self._scroll_frame._scrolled_window.winfo_width()<self.content.winfo_reqwidth() \
-           or self.content.winfo_reqwidth()-self.winfo_reqwidth()>16+5:  
+           or self.content.winfo_reqwidth()-self.winfo_reqwidth()>19+5:  
             need_x=True
         if self._scroll_frame._scrolled_window.winfo_height()<self.content.winfo_reqheight() \
-           or self.content.winfo_reqheight()-self.winfo_reqheight()>16+5:  
+           or self.content.winfo_reqheight()-self.winfo_reqheight()>19+5:  
             need_y=True
         return need_x,need_y
 
