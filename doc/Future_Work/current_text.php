@@ -74,12 +74,6 @@ Maybe it's getting daunting?
 Finishing cleaning up associated code (maybe mostly for Jim to do?).
 Could eventually use STRFPAK or a similar approach.
 
-<H4>2007/10/11 (CB): Update User_Manual/publishing.html</H4>
-Right now, it says to use screenshots, but actually most
-plots can now be saved in native format by right clicking or using
-save_plotgroup, e.g. from run_batch.
-
-
 
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
