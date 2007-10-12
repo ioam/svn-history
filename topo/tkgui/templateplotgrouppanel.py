@@ -22,6 +22,7 @@ from tkFileDialog import asksaveasfilename
 import topo
 
 from topo.base.parameterclasses import BooleanParameter
+from topo.base.parameterclasses import normalize_path
 
 from plotgrouppanel import SheetPGPanel
 from topo.plotting.plotgroup import TemplatePlotGroup
@@ -117,7 +118,11 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
 
         #################### RIGHT-CLICK MENU STUFF ####################
-        self._sheet_menu.add_command(label="Save image",
+        self._sheet_menu.add_command(label="Save image as PNG",
+                                     command=self.__save_to_png)
+
+        
+        self._sheet_menu.add_command(label="Save image as EPS",
                                      command=self.__save_to_postscript)
 
         
@@ -183,17 +188,26 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
                                        event_info['event'].y_root)
 
 
+    def __save_to_png(self):
+        plot   = self._right_click_info['plot']
+        filename = self.plotgroup.filesaver(self.plotgroup).filename(plot.label(),file_format="png")
+        PNG_FILETYPES = [('PNG images','*.png'),('All files','*')]
+        snapshot_name = asksaveasfilename(filetypes=PNG_FILETYPES,
+                                          initialfile=normalize_path(filename))
+
+        if snapshot_name:
+            plot.bitmap.image.save(filename)
+
     # based on routine in editorwindow.py
     def __save_to_postscript(self):
         plot   = self._right_click_info['plot']
         canvas = self._right_click_info['event'].widget
         filename = self.plotgroup.filesaver(self.plotgroup).filename(plot.label(),file_format="eps")
-        
         POSTSCRIPT_FILETYPES = [('Encapsulated PostScript images','*.eps'),
                                 ('PostScript images','*.ps'),('All files','*')]
         snapshot_name = asksaveasfilename(filetypes=POSTSCRIPT_FILETYPES,
-                                          initialfile=filename)
-        
+                                          initialfile=normalize_path(filename))
+
         if snapshot_name:
             canvas.postscript(file=snapshot_name)
 
