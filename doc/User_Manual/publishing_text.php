@@ -2,26 +2,22 @@
 
 <P>While many people will want to use Topographica for demonstrations,
 class tutorials, small projects, etc., other projects are expected to
-lead to a publication eventually.  There is still substantial work to
-be done to make Topographica output more useful for publications
-(volunteers welcome!); many of the visualizations, etc. are currently
-most appropriate on screen rather than in a printout.  This section
-describes how to produce publication-quality results from the current
-simulator.  If you follow these guidelines, you should end up with
-smaller file sizes, faster document generation, and better quality.
+lead to a publication eventually.  This section describes how to
+produce publication-quality results, rather than screen images.  If
+you follow these guidelines, you should end up with smaller file
+sizes, faster document generation, and better quality.
 
 <P>Before discussing Topographica-specific tips, we first provide
 background on image formats and image plotting in general.  These
 considerations apply to any image displayed on screen or in a paper.
 
 
-<H2>Image types: photos, bitmaps, and vector graphics</H2>
+<H2><A NAME="image-types">Image types: photos, bitmaps, and vector graphics</A></H2>
 
 <P>Before working with any graphical software, it is crucial to
 understand the three basic types of computer graphics images, which
 determine the file formats and programs that are appropriate for a
 particular task.  The three types and the recommended formats are:
-
 
 <P>
 <TABLE>
@@ -115,7 +111,7 @@ colors and fine lines be clear and visible.
 
 <P>Unfortunately, Topographica so far has only partial support for
 black-on-white diagrams suitable for printing; in other cases support
-is planned but not yet implemented.  In the worst case, it is possible
+is planned but not yet implemented.  In some cases, it is possible
 to swap the Saturation and Value channels of plots using
 <A HREF="http://www.gimp.org">the Gimp</A>, but in others programming
 support will be necessary.
@@ -135,7 +131,7 @@ architecture diagrams for modeling papers.  Just arrange the Sheets as
 clearly as possible, make sure everything is named appropriately, and
 then export this diagram to a file for use in your paper by
 right-clicking and selecting <code>Export PostScript image</code>.
-You will probably want to select <code>Printing</code> mode also, to
+You will probably want to select <code>Printing</code> mode first, to
 plot each sheet in white instead of black.
 
 <P>Of course, it is possible to grab a screenshot of the Model Editor
@@ -147,13 +143,42 @@ can convert it to PDF for use in a document using
 
 <!--CEBALERT: some info re. plot saving is out of date-->
 
+<H4>Preference Map plots</H4>
+
+<P>In the GUI, plots in one of these windows can be saved by right
+clicking on one and selecting <code>Save as PNG</code>.  A unique
+filename is generated automatically.  You can also save these images
+from a script, e.g. in batch mode, using
+<a href="commandline.html#saving-bitmaps">save_plotgroup</a>.
+
+<H4>Activity and ConnectionField plots</H4>
+
+<P>Plots in these windows can be saved just as for Preference Map
+plots, using
+<a href="commandline.html#saving-bitmaps">save_plotgroup</a>.
+
+<p> Note that if you plan to show plots from different Sheets in your
+paper (e.g. multiple ConnectionFields side by side, or Activity in
+each Sheet), you will usually want to ensure that each plot is plotted
+at the same size scale, so that their sizes will faithfully reflect
+their Sheet coordinate sizes.  To do this, you would turn <code>Sheet
+Coordinates</code> on and <code>Integer Scaling</code> off.  This way,
+the relative sizes of the sheets will be preserved, at the expense of
+individual units being slightly different sizes and the overall image
+size being larger.  You will still need to ensure that the relative
+sizes are preserved when presenting the images in a paper, of course.
+Otherwise, the reader is likely to be confused about what part of each
+plot corresponds to the others.
+
 <H4>Projection plots</H4>
 
-<P>There is not currently any support for saving these directly to disk.
-Instead, they can be selected by taking a screenshot using your
-favorite such utility.  
+<P>The GUI does not yet support saving Projection plots from the
+right-click menu.  However, they can be saved in PNG format from the
+command line using <a href="commandline.html#saving-bitmaps">save_plotgroup</a>.
 
-<P>First, be sure to make the CFs be as small as possible on screen;
+<P>Alternatively, they can be selected by taking a screenshot using
+your favorite such utility.
+First, be sure to make the CFs be as small as possible on screen;
 there is no need to store many bytes of data for each weight value
 (unless you want very thin outlines around the weights).  Also, be
 sure that each pixel represents one unit, by turning on <code>Integer
@@ -163,36 +188,9 @@ to reach a certain fixed overall plot size.  Be sure to hit
 <code>Reduce</code> as many times as you can, to get down to 1 pixel
 per unit, and turn off Sheet Coordinates.  It does not matter that the
 plot will be too small on screen at that point; it will be fine in
-the final document if it is scaled appropriately.
-
-
-<H4>Map plots</H4>
-
-<P>Again, these plots must currently be saved using a screenshot
-utility. 
-
-<P>For preference maps (or any plot that includes images from only a
-single Sheet), you should turn on <code>Integer Scaling</code> and
-turn off <code>Sheet Coordinates</code>.  (Sheet coordinates are not
-necessary or useful when all plots are of the same region, because the
-relative sizes are then guaranteed to be accurate in all cases.)  If
-you are only grabbing the image and not the label, then you should
-make the plots as small as possible.  Otherwise, just pick a size that
-looks nice with the label.
-
-
-<H4>Activity and ConnectionField plots</H4>
-
-<P>Again, these plots must currently be saved using a screenshot
-utility. 
-
-<P>For <code>Activity</code> plots and any other plot that includes
-multiple Sheets, be sure to leave <code>Sheet Coordinates</code> on
-and <code>Integer Scaling</code> off.  This way, the relative sizes of
-the sheets will be preserved, at the expense of individual units being
-slightly different sizes and the overall image size being larger.  The
-reader is likely to be confused if the relative sizes are not correct
-whenever there are multiple sheets in the same plot.
+the final document if it is scaled appropriately.  Be sure to save in
+PNG or another <A HREF="#image-types">appropriate bitmap format</A>,
+rather than GIF or JPG.
 
 
 <H2>Citations</H2>
