@@ -154,21 +154,3 @@ class CFProjectionPlotGroupSaver(PlotGroupSaver):
         img.save(normalize_path(self.filename(
             self.plotgroup.sheet.name+"_"+
             self.plotgroup.projection.name)))
-
-
-
-
-
-# Data structure to allow anyone to add special plotsaving_classes for
-# any particular PlotGroup, or to override those defined here.  See
-# plotpanel_classes in tkgui/topoconsole.py for a related structure
-# used in the GUI.
-# 
-# By default, everything uses TemplatePlotGroupSaver unless that is
-# overridden explicitly for a particular PlotGroup using this data
-# structure.  This default is stored in plotsaving_classes[None], by
-# convention.
-plotsaving_classes = {}
-plotsaving_classes[None] = PlotGroupSaver
-plotsaving_classes['Projection'] = CFProjectionPlotGroupSaver
-
