@@ -190,7 +190,9 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         
         POSTSCRIPT_FILETYPES = [('Encapsulated PostScript images','*.eps'),
                                 ('PostScript images','*.ps'),('All files','*')]
-        snapshot_name = asksaveasfilename(filetypes=POSTSCRIPT_FILETYPES)
+        snapshot_name = asksaveasfilename(filetypes=POSTSCRIPT_FILETYPES,
+                                          initialfile=topo.sim.basename()+"_image.ps")
+        
         if snapshot_name:
             canvas.postscript(file=snapshot_name)
 
