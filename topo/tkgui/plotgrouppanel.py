@@ -208,7 +208,9 @@ e.g. for debugging.)
         self._unit_menu = Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.add_cascade(menu=self._unit_menu,state=DISABLED,
                                       indexname='unit_menu')
-
+        # JAB: Why doesn't this work?
+        #self._canvas_menu.add_separator()
+        
         # CEBALERT: scheme for enabling/disabling menu items ('disable
         # items hack') needs to be generalized. What we have now is
         # just a mechanism to disable/enable cfs/rfs plots as
@@ -218,7 +220,10 @@ e.g. for debugging.)
         
         self._sheet_menu = Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.add_cascade(menu=self._sheet_menu,state=DISABLED,
-                                      indexname='sheet_menu') 
+                                      indexname='sheet_menu')
+        # JAB: Why doesn't this work?
+        #self._canvas_menu.add_separator()
+        
                                     
         #################################################################
 
