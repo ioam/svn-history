@@ -98,6 +98,7 @@
   gradient plots, histogram plots (in right-click menu)<br>
   <A target="_top" href="../User_Manual/plotting.html#measuring-preference-maps">simplified
   bitmap plotting</A> (removed template classes)<br>
+  GUI plots can be saved as PNG or EPS (in right-click menu)<br>
 </dd>
 </font>
 </dl>
