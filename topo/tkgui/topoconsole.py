@@ -379,7 +379,8 @@ class TopoConsole(TkguiWindow):
         
 
     def save_script_repr(self):
-        script_name = tkFileDialog.asksaveasfilename(filetypes=SCRIPT_FILETYPES,initialfile=topo.sim.name+"_script_repr.ty")
+        script_name = tkFileDialog.asksaveasfilename(filetypes=SCRIPT_FILETYPES,initialfile=topo.sim.basename()+"_script_repr.ty")
+        
         if script_name:
             topo.commands.basic.save_script_repr(script_name)
             self.messageBar.message('state', 'Script saved to ' + script_name)
@@ -409,7 +410,7 @@ class TopoConsole(TkguiWindow):
         Adds the file extension .typ if not already present.
         """
         snapshot_name = tkFileDialog.asksaveasfilename(filetypes=SAVED_FILETYPES,
-            initialfile="%s_%05d.typ" % (topo.sim.name,int(topo.sim.time())))
+            initialfile=topo.sim.basename()+".typ")
         
         if snapshot_name in ('',(),None):
             self.messageBar.message('state','No snapshot saved.')
