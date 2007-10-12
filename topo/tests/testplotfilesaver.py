@@ -14,7 +14,7 @@ from topo.base.parameterclasses import resolve_filename,normalize_path
 
 from topo.sheets.generatorsheet import GeneratorSheet
 
-from topo.plotting.plotfilesaver import PlotGroupSaver,plotsaving_classes
+from topo.plotting.plotfilesaver import PlotGroupSaver
 
 from topo.plotting.plotgroup import PlotGroup,plotgroups
 
