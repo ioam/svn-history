@@ -22,6 +22,7 @@ from plotgroup import plotgroups
     
 import topo
 
+
 # Consider using PIL's ImageFont module
 
 class PlotGroupSaver(ParameterizedObject):
@@ -110,7 +111,7 @@ def make_contact_sheet(imgs, (marl,mart,marr,marb), padding):
     
     # CB: *** should do this in numpy without the conversion to list and back! ***
     nrows,ncols = imgs.shape
-    i_widths = numpy.array([i.size[0] for i in imgs.ravel()]).reshape(nrows,ncols)
+    i_widths  = numpy.array([i.size[0] for i in imgs.ravel()]).reshape(nrows,ncols)
     i_heights = numpy.array([i.size[1] for i in imgs.ravel()]).reshape(nrows,ncols)
 
     col_widths = i_widths.max(axis=0)
@@ -146,11 +147,18 @@ def make_contact_sheet(imgs, (marl,mart,marr,marb), padding):
 
 
 class CFProjectionPlotGroupSaver(PlotGroupSaver):
-
+    """
+    Allows a CFProjectionPlotGroup to be saved as a bitmap file,
+    concatenating all the CF plots into a single image.
+    """
     def save_to_disk(self):
-        imgs = numpy.array([p.bitmap.image for p in self.plotgroup.plots]).reshape(self.plotgroup.proj_plotting_shape)
+        imgs = numpy.array([p.bitmap.image
+                            for p in self.plotgroup.plots]).reshape(
+            self.plotgroup.proj_plotting_shape)
         img = make_contact_sheet(imgs, (3,3,3,3), 3)
-        img.save(normalize_path(self.filename(self.plotgroup.sheet.name+"_"+self.plotgroup.projection.name)))
+        img.save(normalize_path(self.filename(
+            self.plotgroup.sheet.name+"_"+
+            self.plotgroup.projection.name)))
 
 
 
