@@ -36,12 +36,13 @@ class PlotGroupSaver(ParameterizedObject):
         to disambiguate different simulations or conditions.""")
 
     filename_format = StringParameter(default=
-        "%(filename_prefix)s%(sim_name)s_%(time)09.2f_%(plot_label)s.%(file_format)s",doc="""
+        "%(filename_prefix)s%(basename)s_%(plot_label)s.%(file_format)s",doc="""
         Format string to use for generating filenames for plots.  This
         string will be evaluated in the context of a dictionary that
         defines various items commonly used when generating filenames,
         including::
 
+          basename:    the default sim.basename(), usually name+time()
           time:        the current simulation time (topo.sim.time())
           sim_name:    the name of the current simulation (topo.sim.name)
           plot_label:  the label specfied in the PlotGroup for this plot
@@ -67,6 +68,7 @@ class PlotGroupSaver(ParameterizedObject):
 
     def filename(self,label):
         """Calculate a specific filename from the filename_format."""
+        self.basename = topo.sim.basename()
         self.sim_name = topo.sim.name
         self.time = topo.sim.time()
         self.plot_label=label

@@ -62,7 +62,7 @@ $Id$
 __version__='$Revision$'
 
 from parameterizedobject import ParameterizedObject, Parameter
-from parameterclasses import Number, BooleanParameter,wrap_callable
+from parameterclasses import Number, BooleanParameter, StringParameter, wrap_callable
 from copy import copy, deepcopy
 from fixedpoint import FixedPoint
 import bisect
@@ -887,31 +887,43 @@ class Simulation(ParameterizedObject):
     """
     register = BooleanParameter(default=True)
 
-    startup_commands = Parameter(
-        instantiate=True,
-        default=[],
-        doc="""
-            List of string commands that will be exec'd in
-            __main__.__dict__ (i.e. as if they were entered at the
-            command prompt) every time this simulation is unpickled
-            (and will be executed before the simulation is itself
-            unpickled).
+    startup_commands = Parameter(instantiate=True,default=[],doc="""
+        List of string commands that will be exec'd in
+        __main__.__dict__ (i.e. as if they were entered at the
+        command prompt) every time this simulation is unpickled
+        (and will be executed before the simulation is itself
+        unpickled).
 
-            For example, allows items to be imported before
-            scheduled_commands are run.
-            """)
+        For example, allows items to be imported before
+        scheduled_commands are run.
+        """)
 
     # CB: Is this the simplest way to do this?
     # If we want this to be 'initial_commands' or something similar,
     # then check _time==0 in run() or something like that.
-    execute_next = Parameter(
-        instantiate=True,
-        default=[],
-        doc="""
+    # JB: checking _time==0 won't work, because objects can be added
+    # to a running simulation, and we still need their initial commands
+    # to be run once and only once.  So I don't currently see any
+    # better way.
+    execute_next = Parameter(instantiate=True,default=[],doc="""
         List of string commands that will be exec'd in __main__.__dict__
         (i.e. as if they were entered at the command prompt) when the
         simulation is next run(). These commands will run before any others,
         and are guaranteed only to run once (before being destroyed).
+        """)
+
+    time_printing_format = StringParameter("%(_time)09.2f",doc="""
+        Format string to be used when the simulation time must be
+        formatted as a string, e.g. for display or for basename().
+        When the string is evaluated, the time will be available as
+        the attribute '_time'.
+        """)
+
+    basename_format = StringParameter("%(name)s_%(timestr)s",doc="""
+        Format string to be used by the basename() function.
+        When the string is evaluated, the formatted time from
+        time_printing_format will be available as the attribute
+        'timestr'.
         """)
 
     def __init__(self,**params):
@@ -1028,11 +1040,38 @@ class Simulation(ParameterizedObject):
         """
         Return the current simulation time as a FixedPoint object.
         
-	If the time returned will be used in the computation of a
+        If the time returned will be used in the computation of a
         floating point variable, it should be cast into a floating
         point number by float().
         """
         return self._time
+
+
+    def timestr(self):
+        """
+        Returns the current time formatted using time_printing_format,
+        which allows users to control how much precision, etc. is used
+        for time displays.
+        """
+        vars = dict(self.get_param_values())
+        vars.update(self.__dict__)
+        timestr = self.time_printing_format % vars
+        return timestr
+
+
+    def basename(self):
+        """
+        Return a string suitable for labeling an object created
+        by the current simulation at the current time.  By default
+        this is simply the name of the simulation + " " +
+        the result from evaluating the time_printing_format parameter.
+        """
+        vars = dict(self.get_param_values())
+        vars.update(self.__dict__)
+        vars['timestr']=self.timestr()
+        
+        return self.basename_format % vars
+
 
 
     # Change current run() to _run(), and current run_and_time() to run()?
