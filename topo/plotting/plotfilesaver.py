@@ -12,14 +12,9 @@ import Image
 import ImageOps
 import numpy
 
-from topo.base.parameterizedobject import ParameterizedObject,Parameter
-from topo.base.parameterclasses import Number, StringParameter
-from topo.base.parameterclasses import normalize_path
+from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.parameterclasses import StringParameter, normalize_path
 
-from plotgroup import PlotGroup,TemplatePlotGroup
-from plotgroup import CFProjectionPlotGroup,ConnectionFieldsPlotGroup 
-from plotgroup import plotgroups
-    
 import topo
 
 
