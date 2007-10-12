@@ -3,7 +3,7 @@ below, a large number of changes and new features are scheduled over
 the next few months, as well as over the next few years.  Our current
 <a href="current.html">lower-level list of tasks</a> is kept separately.
 
-<H2>Most urgent (Summer 2007):</H2>
+<H2>Most urgent (Autumn 2007):</H2>
 <DL COMPACT>
 <DT>ALERTs</DT><DD>
 There are a large number of relatively small problems noted in the
@@ -21,15 +21,6 @@ possible to build add-in components and model scripts and expect them
 to be usable in future versions (or to have a conversion program
 available for them).
 
-<P><DT>Command-line and batch interfaces</DT><DD>
-Although Topographica is written to be independent of the type of
-interface, and does not require a GUI or other interactive console,
-some functions are currently implemented only in the GUI.  Others are
-currently more difficult to use in batch mode, requiring longer and
-more complex commands than necessary.  These items will be simplified
-and made more appropriate for command-line and batch use, to make
-using larger networks more practical.
-
 <P><DT>Spiking support</DT><DD>
 Topographica primarily supports firing-rate (scalar) units, but
 spiking models are currently under development, and preliminary
@@ -37,7 +28,7 @@ versions are included already.  We will be developing interfaces
 between spiking and non-spiking Sheets and analysis tools for spiking
 neurons.  We primarily expect to support integrate-and-fire and
 related computationally tractable spiking unit models.  More detailed
-compartmental models can be simulated in Neuron or Genesis instead,
+compartmental models can be simulated in NEST, Neuron or Genesis instead,
 and packaged up using the Sheet interface so that they can be used
 in Topographica.
 
@@ -46,7 +37,7 @@ The Topographica model editor allows a model to be constructed,
 modified, visualized, and edited.  However, there are a few operations
 not currently supported, such as setting a parameter to a random
 stream of numbers.  These limitations mean that in most cases
-some editing of the .ty script file will be necessary.
+some editing of the generated .ty script file will be necessary.
 </DL>
 
 
@@ -92,15 +83,6 @@ Topographica, and should be considered temporary.
 							 
 <!-- Should consider sparse layers with patchy distribution of units -->
 
-<P><DT>More example models</DT><DD>
-Topographica currently includes a small sampling of example models,
-primarily from the visual system.  Additional models are being implemented
-in Topographica, including somatosensory models and additional visual
-models from our labs and elsewhere (including motion direction, eye
-preference, and color map simulations) as well as other sample visual
-system models from the literature.  These will act as starting points
-for developing models in Topographica.
-
 <P><DT>Bitmap plotting enhancements</DT><DD>
 
 The current basic support for two-dimensional bitmap plotting will
@@ -110,8 +92,8 @@ indicator to show if some values are too large to be displayed in the
 selected range.
 
 <P><DT>Automatic line-based 2D plotting</DT><DD>
-We have recently added 1D (line) and 2D (contour or vector field)
-plots based on
+There are currently 1D (line), 2D (contour or vector field),
+and 3D (wireframe mesh) plots available based on
 <A HREF="http://matplotlib.sourceforge.net/">MatPlotLib</A> for any
 program object selected by the user.  We will also eventually be
 making the general-purpose template-based plotting use the 2D plots,
@@ -119,7 +101,7 @@ which will make it possible to do
 <A HREF="http://matplotlib.sourceforge.net/screenshots/pcolor_demo_large.png">contour</A>
 plots, as well as matrix plots showing axis ticks and labels.  We
 also plan to use MatPlotLib 2D plots to allow any SheetView(s) to be
-used as a or vector field overlay on top of a bitmap, e.g. for joint
+used as a contour or vector field overlay on top of a bitmap, e.g. for joint
 preference maps (such as direction arrows on topo of an orientation
 bitmap plot).
 <!-- Plan: Templates accept a Contours parameter, which can be a list
@@ -225,16 +207,16 @@ Most of the specific support in Topographica is designed with visual
 areas in mind, but is written generally so that it applies to any
 topographically organized region.  We plan to implement specific
 models of non-visual areas, providing input generation, models of
-subcortical processing, and appropriate visualizations.  We also plan
-to add similar support for motor areas.  Contributions from
-Topographica users with experience in these domains will be
-particularly helpful.
+subcortical processing, and appropriate visualizations.  For instance,
+there are now models of somatosensory areas, such as hand surfaces and
+rat whisker barrels, and motor areas controlling eye movements.
+Additional contributions from Topographica users with experience in
+these domains will be particularly helpful.
 
-<P><DT>Data import/export</DT><DD> It will be crucial to provide
+<P><DT>Data import/export</DT><DD>   It will be crucial to provide
 easy-to-use interfaces for exchanging data and calling code in other
 simulators, such as Matlab (see the optional external package
-<A HREF="../Reference_Manual/index.html#mlabwrap">mlabwrap</A>, or
-<A HREF="http://pymat.sourceforge.net">pymat.sourceforge.net</A>).
+<A HREF="../Reference_Manual/index.html#mlabwrap">mlabwrap</A>).
 These will be used both for analyzing Topographica data, and for
 allowing connection patterns and/or map organization to be specified
 from experimental data.  Meanwhile, the Python command-line interface
@@ -254,3 +236,12 @@ LearningFunctions, and PatternGenerators.  However, many other types
 are used in the literature, and as these are implemented in
 Topographica they will be added to the library.  Again, user
 contributions are very welcome!
+
+<P><DT>More example models</DT><DD>
+Topographica currently includes a number of example models,
+mostly from the visual system but also from somatosensory,
+auditory, and motor areas.  As additional models are implemented,
+they will be added as examples and starting points.  Again, user
+contributions are very welcome!
+
+</DL>
