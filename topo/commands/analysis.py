@@ -27,7 +27,6 @@ from topo.patterns.teststimuli import SineGratingDisk
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.parameterclasses import Parameter
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
-from topo.plotting.plotfilesaver import plotsaving_classes
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 
 from topo.patterns.random import GaussianRandom
@@ -190,6 +189,7 @@ class PatternPresenter(ParameterizedObject):
 
 
 
+# JABALERT: Why does a Projection plot need a Sheet parameter?
 def save_plotgroup(name,saver_params={},**params):
     """
     Convenience command for saving a set of plots to disk.  Examples:
@@ -205,10 +205,11 @@ def save_plotgroup(name,saver_params={},**params):
     (To pass an optional parameter to the PlotFileSaver itself, the
     saver_params dictionary can be used.)
     """
-    saver_class = plotsaving_classes.get(name,plotsaving_classes[None])
     plotgroup = plotgroups[name]
     if not plotgroup:
         raise ValueError("No plotgroup named %s in plotgroups repository."%name)
+
+    saver_class = plotgroup.filesaver
 
     # save_plotgroup's **params are passed to the plotgroup
     params['name'] = name
