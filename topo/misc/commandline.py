@@ -353,11 +353,8 @@ def run_batch(script_file,output_directory="Output",
     # CEBERRORALERT: I'm pretty sure you can't have a colon in
     # a filename on Windows.
     if params.keys():
-        prefix += ":"
         for a in params.keys():
-           prefix += a + "=" + str(params[a]) + ","
-        prefix= re.sub('.$','',prefix)
-
+           prefix += "," + a + "=" + str(params[a])
 
     # Set provided parameter values in main namespace
     for a in params.keys():
