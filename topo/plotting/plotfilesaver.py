@@ -62,14 +62,15 @@ class PlotGroupSaver(ParameterizedObject):
             .replace('&','And')
 
 
-    def filename(self,label):
+    def filename(self,label,**params):
         """Calculate a specific filename from the filename_format."""
-        self.basename = topo.sim.basename()
-        self.sim_name = topo.sim.name
-        self.time = topo.sim.time()
-        self.plot_label=label
         vars = dict(self.get_param_values())
         vars.update(self.__dict__)
+        vars['basename']= topo.sim.basename()
+        vars['sim_name']= topo.sim.name
+        vars['time']=topo.sim.time()
+        vars['plot_label']=label
+        vars.update(params)
         
         return self.strip(self.filename_format % vars)
 
