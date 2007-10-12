@@ -18,6 +18,8 @@ __version__='$Revision$'
 # Sometimes having a KeyedList is confusing, because you can't use
 # natural syntax such as "x in y" when y is a KeyedList. 
 
+# CEBERRORALERT: when a requested key's not present, ought to raise a
+# KeyError rather than returning None.
 
 class KeyedList(list):
     """
