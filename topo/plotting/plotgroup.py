@@ -81,6 +81,7 @@ class PlotGroup(ParameterizedObject):
     # CB: make clear the distinction between self.plots and self.plot_list
     
     def __init__(self,**params):
+
         super(PlotGroup,self).__init__(**params)
 
         self.plot_list = []
@@ -120,7 +121,7 @@ class PlotGroup(ParameterizedObject):
         Create and scale the plots, after first executing the PlotGroup's update_command
         (if update is True) and plot_command.
 	"""
-        if update: self._exec_update_command()
+        if update:self._exec_update_command()
         self._exec_plot_command()
         self._create_images(update)
         self.scale_images()
@@ -740,7 +741,6 @@ plotgroups = KeyedList()
 Global repository of PlotGroups, to which users can add their own as
 needed.
 """
-
 
 plotgroup_types = {'Connection Fields': ConnectionFieldsPlotGroup,
                    'Projection': CFProjectionPlotGroup,

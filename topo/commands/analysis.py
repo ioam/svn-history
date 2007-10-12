@@ -205,9 +205,17 @@ def save_plotgroup(name,saver_params={},**params):
     (To pass an optional parameter to the PlotFileSaver itself, the
     saver_params dictionary can be used.)
     """
-    p_class = plotsaving_classes.get(name,plotsaving_classes[None])
-    saver = p_class(name,**saver_params)
-    saver.generate_plotgroup(**params)
+    saver_class = plotsaving_classes.get(name,plotsaving_classes[None])
+    plotgroup = plotgroups[name]
+    if not plotgroup:
+        raise ValueError("No plotgroup named %s in plotgroups repository."%name)
+
+    # save_plotgroup's **params are passed to the plotgroup
+    params['name'] = name
+    for param,val in params.items():
+        setattr(plotgroup,param,val)
+
+    saver = saver_class(plotgroup,**saver_params)
     saver.plotgroup.make_plots()
     saver.save_to_disk()
 

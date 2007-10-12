@@ -24,7 +24,6 @@ import topo
 
 # Consider using PIL's ImageFont module
 
-
 class PlotGroupSaver(ParameterizedObject):
     """
     Allows a PlotGroup to be saved as a set of bitmap files on disk.
@@ -52,14 +51,9 @@ class PlotGroupSaver(ParameterizedObject):
     # Should also allow each template in topo/commands/analysis.py to have a nice
     # short filename format, perhaps as an option.
 
-
-    def __init__(self,plotgroup_label,**params):
+    def __init__(self,plotgroup,**params):
         super(PlotGroupSaver,self).__init__(**params)
-        self.plotgroup_label = plotgroup_label
-
-
-    def generate_plotgroup(self,**params):
-	self.plotgroup = PlotGroup(**params)
+        self.plotgroup = plotgroup 
 
 
     def strip(self,filename):
@@ -73,7 +67,6 @@ class PlotGroupSaver(ParameterizedObject):
 
     def filename(self,label):
         """Calculate a specific filename from the filename_format."""
-        
         self.sim_name = topo.sim.name
         self.time = topo.sim.time()
         self.plot_label=label
@@ -89,22 +82,7 @@ class PlotGroupSaver(ParameterizedObject):
 
 
 
-class TemplatePlotGroupSaver(PlotGroupSaver):
-    
-    plotgroup_class = TemplatePlotGroup
 
-    def generate_plotgroup(self,**params):
-        # tricky: use a named PlotGroup if one exists; otherwise,
-        # instatiate a new one (whole mechanism needs updating)
-        self.plotgroup = plotgroups.get(self.plotgroup_label) or \
-                         self.plotgroup_class()
-
-        for n,p in params.items(): setattr(self.plotgroup,n,p)
-
-    
-
-class ConnectionFieldsPlotGroupSaver(TemplatePlotGroupSaver):
-    plotgroup_class = ConnectionFieldsPlotGroup
 
 
 # Could move this elsewhere if it will be useful.
@@ -165,20 +143,13 @@ def make_contact_sheet(imgs, (marl,mart,marr,marb), padding):
 
 
 
-class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
-
-    plotgroup_class = CFProjectionPlotGroup
+class CFProjectionPlotGroupSaver(PlotGroupSaver):
 
     def save_to_disk(self):
         imgs = numpy.array([p.bitmap.image for p in self.plotgroup.plots]).reshape(self.plotgroup.proj_plotting_shape)
         img = make_contact_sheet(imgs, (3,3,3,3), 3)
         img.save(normalize_path(self.filename(self.plotgroup.sheet.name+"_"+self.plotgroup.projection.name)))
 
-
-
-
-
-    
 
 
 
@@ -193,6 +164,6 @@ class CFProjectionPlotGroupSaver(TemplatePlotGroupSaver):
 # structure.  This default is stored in plotsaving_classes[None], by
 # convention.
 plotsaving_classes = {}
-plotsaving_classes[None] = TemplatePlotGroupSaver
+plotsaving_classes[None] = PlotGroupSaver
 plotsaving_classes['Projection'] = CFProjectionPlotGroupSaver
-plotsaving_classes['Connection Fields'] = ConnectionFieldsPlotGroupSaver
+
