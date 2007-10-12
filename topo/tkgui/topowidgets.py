@@ -52,7 +52,10 @@ class TkguiWindow(Tkinter.Toplevel):
 import time
 
 ######################################################################
-# CB: needs significant cleanup
+# CB: needs significant cleanup. Some methods will move to
+# the resizable frame. Remaining problem: resizing by hand
+# "too fast" causes window to jump back to automatic size.
+# Probably need to consider performance in the cleanup.
 class ScrolledTkguiWindow(TkguiWindow):
     """
     A TkguiWindow with automatic scrollbars.
@@ -69,7 +72,6 @@ class ScrolledTkguiWindow(TkguiWindow):
         # provide route to title() method for convenience
         self.content.title = self.title
 
-        #import __main__;__main__.__dict__['ab']=self
         
 ### hacktastic
 # (Here's why:
@@ -108,31 +110,20 @@ class ScrolledTkguiWindow(TkguiWindow):
 ### hacktastic
 
 
+    def _need_bars(self):
+        sw = self._scroll_frame._scrolled_window
+        c = self.content
+        need_x,need_y = False,False
+        if sw.winfo_width()<c.winfo_reqwidth() and \
+               abs(sw.winfo_width()-c.winfo_reqwidth())>1: 
+            need_x=True
+        if sw.winfo_height()<c.winfo_reqheight() and \
+               abs(sw.winfo_height()-c.winfo_reqheight())>1:
+            need_y=True
+        return need_x,need_y
 
-    # CB: should be able to move to resizablescrollableframe &
-    # needs to be renamed.
-    def sizeright(self):
-        # if user has changed window size, need to tell tkinter that it should take
-        # control again.
-        self.geometry('')
 
-        self.update_idletasks()
-
-        # extra for width of scrollbars
-        # CEBALERT: the calculated values don't work on linux
-        extraw = 19#self._scroll_frame._scrolled_window.winfo_reqwidth() - \
-                  #self._scroll_frame.scrolled_frame.winfo_reqwidth() + 3
-        extrah = 19#self._scroll_frame._scrolled_window.winfo_reqheight() - \
-                  #self._scroll_frame.scrolled_frame.winfo_reqheight() + 3
-
-        w = min(self.content.winfo_reqwidth()+extraw,self.winfo_screenwidth())
-        # -60 for task bars etc on screen...how to find true viewable height?
-        h = min(self.content.winfo_reqheight()+extrah,self.winfo_screenheight()-60)
-
-        if not hasattr(self,'oldsize') or self.oldsize!=(w,h): 
-            self._scroll_frame.set_size(w,h)
-            self.oldsize = (w,h)
-
+    def _which_scrollbars(self):
         need_x,need_y = self._need_bars()
         if need_x and need_y:
             scrollbar = 'both'
@@ -142,19 +133,43 @@ class ScrolledTkguiWindow(TkguiWindow):
             scrollbar = 'vertical'
         elif not need_x and not need_y:
             scrollbar = 'none'
-               
-        self._scroll_frame._scrolled_window.config(scrollbar=scrollbar)
+        return scrollbar
+
+    def sizeright(self):
+        # if user has changed window size, need to tell tkinter that it should take
+        # control again.
+        self.geometry('')
+        self.update_idletasks()
+
+        # Extra for width of scrollbars; should be found programmatically. But how?
+        extraw = 19
+        extrah = 19
+
+        w = min(self.content.winfo_reqwidth(),self.winfo_screenwidth())
+        # -60 for task bars etc on screen...how to find true viewable height?
+        h = min(self.content.winfo_reqheight(),self.winfo_screenheight()-60)
+
+        if not hasattr(self,'oldsize') or self.oldsize!=(w,h):
+            self._scroll_frame.set_size(w,h)
+            self.oldsize = (w,h)
+            scrollbars = self._which_scrollbars()
+            self._scroll_frame._scrolled_window.config(scrollbar=scrollbars)
+
+            if scrollbars!="none": 
+                w+=extraw
+                h+=extrah
+                
+            self._scroll_frame.set_size(w,h)
+            self.update_idletasks()
+            self.oldsize = (w,h)
+        else:
+            self._scroll_frame._scrolled_window.config(scrollbar=self._which_scrollbars())
+            self.update_idletasks()
+            
+        
+
 
         
-    def _need_bars(self):
-        need_x,need_y = False,False
-        if self._scroll_frame._scrolled_window.winfo_width()<self.content.winfo_reqwidth() \
-           or self.content.winfo_reqwidth()-self.winfo_reqwidth()>19+5:  
-            need_x=True
-        if self._scroll_frame._scrolled_window.winfo_height()<self.content.winfo_reqheight() \
-           or self.content.winfo_reqheight()-self.winfo_reqheight()>19+5:  
-            need_y=True
-        return need_x,need_y
 
 ######################################################################            
 
