@@ -183,15 +183,16 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
                                        event_info['event'].y_root)
 
 
-     # just about copied from editorwindow.py
+    # based on routine in editorwindow.py
     def __save_to_postscript(self):
-
+        plot   = self._right_click_info['plot']
         canvas = self._right_click_info['event'].widget
+        filename = self.plotgroup.filesaver(self.plotgroup).filename(plot.label(),file_format="eps")
         
         POSTSCRIPT_FILETYPES = [('Encapsulated PostScript images','*.eps'),
                                 ('PostScript images','*.ps'),('All files','*')]
         snapshot_name = asksaveasfilename(filetypes=POSTSCRIPT_FILETYPES,
-                                          initialfile=topo.sim.basename()+"_image.ps")
+                                          initialfile=filename)
         
         if snapshot_name:
             canvas.postscript(file=snapshot_name)
