@@ -25,6 +25,7 @@ from topo.misc.keyedlist import KeyedList
 
 from plot import make_template_plot, Plot
 
+from plotfilesaver import PlotGroupSaver,CFProjectionPlotGroupSaver
 
 def cmp_plot(plot1,plot2):
     """
@@ -77,7 +78,8 @@ class PlotGroup(ParameterizedObject):
     the template for this plot, but various arguments can be passed, a modified
        version substituted, etc.""")
 
-
+    filesaver = PlotGroupSaver
+    
     # CB: make clear the distinction between self.plots and self.plot_list
     
     def __init__(self,**params):
@@ -562,6 +564,8 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
                      
     sheet_type = CFSheet
     projection_type = CFProjection
+
+    filesaver = CFProjectionPlotGroupSaver
 
     def __init__(self,**params):
         super(CFProjectionPlotGroup,self).__init__(**params)
