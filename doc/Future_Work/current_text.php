@@ -54,7 +54,7 @@ The timing object is nearly done, allowing progress bars, time
 remaining estimates, etc., but Jim needs to look at it to finish it up
 (and then close tracker 1432101).
 
-<H4>2007/04/21: Note for Windows users</H4>
+<H4>2007/04/21 (CB): Note for Windows users</H4>
 Where to put this note? Working from the cmd.exe on Windows, single
 quotes must appear inside double quotes: it can't be the other way
 round. Applies to anywhere in topographica that there are commandline
@@ -74,7 +74,7 @@ Maybe it's getting daunting?
 Finishing cleaning up associated code (maybe mostly for Jim to do?).
 Could eventually use STRFPAK or a similar approach.
 
-<H4>2007/10/11: Update User_Manual/publishing.html</H4>
+<H4>2007/10/11 (CB): Update User_Manual/publishing.html</H4>
 Right now, it says to use screenshots, but actually most
 plots can now be saved in native format by right clicking or using
 save_plotgroup, e.g. from run_batch.
