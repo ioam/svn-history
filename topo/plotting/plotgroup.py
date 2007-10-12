@@ -78,8 +78,6 @@ class PlotGroup(ParameterizedObject):
     the template for this plot, but various arguments can be passed, a modified
        version substituted, etc.""")
 
-    filesaver = PlotGroupSaver
-    
     # CB: make clear the distinction between self.plots and self.plot_list
     
     def __init__(self,**params):
@@ -100,6 +98,8 @@ class PlotGroup(ParameterizedObject):
         
 	self.time = None
 
+        self.filesaver = PlotGroupSaver(self)
+    
 
     # CB: (subclasses add more commands)
     def _exec_update_command(self):
@@ -565,8 +565,6 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
     sheet_type = CFSheet
     projection_type = CFProjection
 
-    filesaver = CFProjectionPlotGroupSaver
-
     def __init__(self,**params):
         super(CFProjectionPlotGroup,self).__init__(**params)
         self.height_of_tallest_plot = 5 # Initial value
@@ -575,6 +573,8 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
         ### This is set by self.generate_coords()
         self.proj_plotting_shape = (0,0)
     
+        self.filesaver = CFProjectionPlotGroupSaver(self)
+
 
     def _check_projection_type(self):
         if not isinstance(self.projection,self.projection_type):

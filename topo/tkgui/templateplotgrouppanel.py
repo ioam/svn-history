@@ -190,7 +190,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
     def __save_to_png(self):
         plot   = self._right_click_info['plot']
-        filename = self.plotgroup.filesaver(self.plotgroup).filename(plot.label(),file_format="png")
+        filename = self.plotgroup.filesaver.filename(plot.label(),file_format="png")
         PNG_FILETYPES = [('PNG images','*.png'),('All files','*')]
         snapshot_name = asksaveasfilename(filetypes=PNG_FILETYPES,
                                           initialdir=normalize_path(),
@@ -203,7 +203,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
     def __save_to_postscript(self):
         plot   = self._right_click_info['plot']
         canvas = self._right_click_info['event'].widget
-        filename = self.plotgroup.filesaver(self.plotgroup).filename(plot.label(),file_format="eps")
+        filename = self.plotgroup.filesaver.filename(plot.label(),file_format="eps")
         POSTSCRIPT_FILETYPES = [('Encapsulated PostScript images','*.eps'),
                                 ('PostScript images','*.ps'),('All files','*')]
         snapshot_name = asksaveasfilename(filetypes=POSTSCRIPT_FILETYPES,

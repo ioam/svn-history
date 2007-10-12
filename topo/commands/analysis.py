@@ -209,17 +209,13 @@ def save_plotgroup(name,saver_params={},**params):
     if not plotgroup:
         raise ValueError("No plotgroup named %s in plotgroups repository."%name)
 
-    saver_class = plotgroup.filesaver
-
     # save_plotgroup's **params are passed to the plotgroup
     params['name'] = name
     for param,val in params.items():
         setattr(plotgroup,param,val)
-
-    saver = saver_class(plotgroup,**saver_params)
-    saver.plotgroup.make_plots()
-    saver.save_to_disk()
-
+    
+    plotgroup.make_plots()
+    plotgroup.filesaver.save_to_disk(**saver_params)
 
 
 class Subplotting(ParameterizedObject):
