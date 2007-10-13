@@ -121,7 +121,7 @@ support will be necessary.
 <H2>Topographica plots</H2>
 
 <P>These sections describe how to generate publication figures from each
-of the various Topographica plotting or display windows.
+of the various Topographica plots and display windows. 
 
 
 <H4>Model architecture</H4>
@@ -141,7 +141,6 @@ than necessary.  Once you have an Encapsulated PostScript image, you
 can convert it to PDF for use in a document using
 <code>epstopdf</code> (free) or Adobe Acrobat Distiller (expensive).
 
-<!--CEBALERT: some info re. plot saving is out of date-->
 
 <H4>Preference Map plots</H4>
 
@@ -178,7 +177,7 @@ command line using <a href="commandline.html#saving-bitmaps">save_plotgroup</a>.
 
 <P>Alternatively, they can be selected by taking a screenshot using
 your favorite such utility.
-First, be sure to make the CFs be as small as possible on screen;
+First, be sure to make the CFs as small as possible on screen;
 there is no need to store many bytes of data for each weight value
 (unless you want very thin outlines around the weights).  Also, be
 sure that each pixel represents one unit, by turning on <code>Integer
