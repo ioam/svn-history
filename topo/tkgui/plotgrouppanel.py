@@ -209,8 +209,7 @@ e.g. for debugging.)
         self._canvas_menu.add_cascade(menu=self._unit_menu,state=DISABLED,
                                       indexname='unit_menu')
 
-        #CEB1
-        #self._canvas_menu.add_separator()
+        self._canvas_menu.add_separator()
         
         # CEBALERT: scheme for enabling/disabling menu items ('disable
         # items hack') needs to be generalized. What we have now is
@@ -222,8 +221,7 @@ e.g. for debugging.)
         self._sheet_menu = Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.add_cascade(menu=self._sheet_menu,state=DISABLED,
                                       indexname='sheet_menu')
-        #CEB1
-        #self._canvas_menu.add_separator()
+        self._canvas_menu.add_separator()
         
                                     
         #################################################################
@@ -296,13 +294,11 @@ e.g. for debugging.)
         if 'plot' in event_info:
             plot = event_info['plot']
 
-            # CEBALERT: still using hardcoded menu position rather than indexname.
-            # (After fixing, uncomment code lines marked with "CEB1".)
-            self._canvas_menu.entryconfig(1,
+            self._canvas_menu.entryconfig("sheet_menu",
                 label="Combined plot: %s %s"%(plot.plot_src_name,plot.name),
                 state=NORMAL)            
             (r,c),(x,y) = event_info['coords']
-            self._canvas_menu.entryconfig(0,
+            self._canvas_menu.entryconfig("unit_menu",
                 label="Single unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),
                 state=NORMAL)
             self._right_click_info = event_info
