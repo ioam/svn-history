@@ -307,6 +307,8 @@ def run_batch(script_file,output_directory="Output",
 
       - Can perform user-specified analysis routines periodically,
         to monitor the simulation as it progresses.
+
+      - Stores commandline output (stdout) in the output directory
         
     A typical use of this function is for remote execution of a large
     number of simulations with different parameters, often on remote
@@ -329,10 +331,14 @@ def run_batch(script_file,output_directory="Output",
     encoded into the simulation directory name, to make it clear how
     each simulation differs from the others.
     """
-
-    starttime=time.time()
-    print "Batch run started at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000", time.gmtime())
+    import sys # CEBALERT: why I have to import this again? (Also done elsewhere below.)
+    command_used_to_start = string.join(sys.argv)
     
+    starttime=time.time()
+    startnote = "Batch run started at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000",
+                                                           time.gmtime())
+    print startnote
+
     # Ensure that saved state includes all parameter values
     from topo.commands.basic import save_script_repr
     from topo.base.parameterizedobject import script_repr_suppress_defaults
@@ -360,7 +366,7 @@ def run_batch(script_file,output_directory="Output",
 
 
     # Create output directories
-    from topo.base.parameterclasses import normalize_path, output_path
+    from topo.base.parameterclasses import output_path, normalize_path
     if not os.path.isdir(normalize_path(output_directory)):
         os.mkdir(normalize_path(output_directory))
 
@@ -376,27 +382,56 @@ def run_batch(script_file,output_directory="Output",
 	os.mkdir(topo.base.parameterclasses.output_path)
         print "Batch run output will be in " + topo.base.parameterclasses.output_path
 
+    ##################################
+    # capture stdout
+    #
+    import StringIO
+    stdout = StringIO.StringIO()
+    sys.stdout = stdout
+    ##################################
+
+
     # Run script in main
-    execfile(script_file,__main__.__dict__)
+    try:
+        execfile(script_file,__main__.__dict__)
 
-    topo.sim.name=simname
+        topo.sim.name=simname
 
-    # JABALERT: Temporary -- make sure that the various commands
-    # required by PlotGroups are available when needed.  Need to find
-    # a better way.
-    exec "from topo.commands.analysis   import *" in __main__.__dict__
-    exec "from topo.commands.pylabplots import *" in __main__.__dict__
+        # JABALERT: Temporary -- make sure that the various commands
+        # required by PlotGroups are available when needed.  Need to find
+        # a better way.
+        exec "from topo.commands.analysis   import *" in __main__.__dict__
+        exec "from topo.commands.pylabplots import *" in __main__.__dict__
 
-    # Run each segment, doing the analysis and saving the script state each time
-    for run_to in analysis_times:
-        topo.sim.run(run_to - topo.sim.time())
-	analysis_fn()
-        save_script_repr()
-        elapsedtime=time.time()-starttime
-        print "Simulation time %06d, elapsed real time %02d:%02d." % \
-              (topo.sim.time(),int(elapsedtime/60),int(elapsedtime%60))
+        # Run each segment, doing the analysis and saving the script state each time
+        for run_to in analysis_times:
+            topo.sim.run(run_to - topo.sim.time())
+            analysis_fn()
+            save_script_repr()
+            elapsedtime=time.time()-starttime
+            print "Simulation time %06d, elapsed real time %02d:%02d." % \
+                  (topo.sim.time(),int(elapsedtime/60),int(elapsedtime%60))
+    except:
+        import traceback
+        traceback.print_exc(file=sys.stdout)
+        sys.stderr.write("Warning -- Error detected: execution halted.\n")
 
-    print "Batch run completed at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000", time.gmtime())
+
+    endnote = "Batch run completed at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000",
+                                                           time.gmtime())
+
+    ##################################
+    # Write stdout to output file and restore original stdout
+    stdout_file = open(os.path.join(topo.base.parameterclasses.output_path,"stdout"),'w')
+    stdout_file.write(command_used_to_start+"\n")
+    stdout_file.write(startnote+"\n")
+    stdout_file.write(stdout.getvalue())
+    stdout_file.write(endnote+"\n")
+    stdout.close()
+    sys.stdout = sys.__stdout__
+    ##################################
     
+    print endnote
+
     
     
