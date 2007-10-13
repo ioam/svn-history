@@ -3,8 +3,12 @@ Functions and classes to simplify dealing with paths.
 
 For portable code:
   - specify paths in unix (rather than Windows) style;
-  - use resolve_path() for reading paths, and normalize_path() for
-    writing them.
+  - use resolve_path() for paths to existing files to be read, 
+    and normalize_path() for paths to new files to be written.
+
+The location in which new files are created by default can be
+controlled by the output_path module attribute, which applies
+whenever a particular location is not specified explicitly.
 
 $Id$
 """
