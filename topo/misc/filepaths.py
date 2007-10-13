@@ -67,9 +67,9 @@ output_path = application_path
 
 def resolve_path(path,search_paths=[]):
     """
-    Convert a unix-style path to the current OS's format, and create
-    an absolute path to the file if the supplied one is not already
-    absolute.
+    Find the path to an existing file, searching in the specified
+    search paths if the filename is not absolute, and converting a
+    UNIX-style path to the current OS's format if necessary.
 
     To turn a supplied relative path into an absolute one, the path is
     appended to each path in (search_paths+the current working
@@ -98,9 +98,12 @@ def resolve_path(path,search_paths=[]):
 
 def normalize_path(path="",prefix=None):
     """
-    Convert a unix-style path to the current OS's format, making it
-    absolute (using prefix) in the process (if it's not already
-    absolute).
+    Convert a UNIX-style path to the current OS's format,
+    typically for creating a new file or directory.
+
+    If the path is not already absolute, it will be made
+    absolute (using the specified prefix, which defaults
+    to filepaths.output_path) in the process.
 
     (Should do the same as Python's os.path.abspath(), except
     using the specified prefix rather than os.getcwd().)
