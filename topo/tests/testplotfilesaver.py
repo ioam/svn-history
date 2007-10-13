@@ -64,7 +64,7 @@ class TestPlotGroupSaver(unittest.TestCase):
 class TestCFProjectionPlotGroupSaver(TestPlotGroupSaver):
 
     def test_cfprojection_saving(self):
-        self.save('Projection',sheet=self.sim['B'],
+        self.save('Projection',
                   projection=self.sim['B'].projections('Afferent'))
         resolve_filename("topo/tests/testplotfilesaverPGS_test_000000.00_B_Afferent.png")
 

@@ -189,22 +189,17 @@ class PatternPresenter(ParameterizedObject):
 
 
 
-# JABALERT: Why does a Projection plot need a Sheet parameter?
-# CB: It shouldn't, of course, since we know the sheet when we have
-# the projection object - it's just leftover from when we passed the
-# names instead. There should be an ALERT already about this somewhere
-# in the GUI or plotgroup.py.
 def save_plotgroup(name,saver_params={},**params):
     """
     Convenience command for saving a set of plots to disk.  Examples:
 
       save_plotgroup("Activity")
       save_plotgroup("Orientation Preference")
-      save_plotgroup("Projection",sheet=topo.sim['V1'],
-                                  projection=topo.sim['V1'].projections('Afferent'))
+      save_plotgroup("Projection",projection=topo.sim['V1'].projections('Afferent'))
+                                  
 
     Some plotgroups accept optional parameters, which can be passed
-    like sheet and projection above.
+    like projection above.
 
     (To pass an optional parameter to the PlotFileSaver itself, the
     saver_params dictionary can be used.)
@@ -212,6 +207,14 @@ def save_plotgroup(name,saver_params={},**params):
     plotgroup = plotgroups[name]
     if not plotgroup:
         raise ValueError("No plotgroup named %s in plotgroups repository."%name)
+
+    # JABALERT: Why does a Projection plot need a Sheet parameter?
+    # CB: It shouldn't, of course, since we know the sheet when we have
+    # the projection object - it's just leftover from when we passed the
+    # names instead. There should be an ALERT already about this somewhere
+    # in projectionpanel.py or plotgroup.py (both need to be changed).
+    if 'projection' in params:
+        params['sheet'] = params['projection'].dest
 
     # save_plotgroup's **params are passed to the plotgroup
     params['name'] = name
