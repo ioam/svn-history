@@ -179,13 +179,12 @@ images, and saves them to disk.
 
 <pre>
 save_plotgroup("Activity")
-save_plotgroup("Projection",projection_name='Afferent',sheet_name='V1')
+save_plotgroup("Projection",projection=topo.sim['V1'].projections('Afferent'))
 </pre>
 
-<P>Some plotgroups (such as Projection) accept optional parameters
-like projection_name and sheet_name.  Using these commands makes it
-possible to run simulations without any GUI, for batch or remote
-processing.
+<P>As shown above, some plotgroups (such as Projection) accept
+optional parameters.  Using these commands makes it possible to run
+simulations without any GUI, for batch or remote processing.
 
 
 <H2>Customizing the command prompt</H2>
