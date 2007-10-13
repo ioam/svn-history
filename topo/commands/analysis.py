@@ -190,6 +190,10 @@ class PatternPresenter(ParameterizedObject):
 
 
 # JABALERT: Why does a Projection plot need a Sheet parameter?
+# CB: It shouldn't, of course, since we know the sheet when we have
+# the projection object - it's just leftover from when we passed the
+# names instead. There should be an ALERT already about this somewhere
+# in the GUI or plotgroup.py.
 def save_plotgroup(name,saver_params={},**params):
     """
     Convenience command for saving a set of plots to disk.  Examples:
