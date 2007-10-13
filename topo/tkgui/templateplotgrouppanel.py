@@ -22,7 +22,7 @@ from tkFileDialog import asksaveasfilename
 import topo
 
 from topo.base.parameterclasses import BooleanParameter
-from topo.base.parameterclasses import normalize_path
+from topo.misc.filepaths import normalize_path
 
 from plotgrouppanel import SheetPGPanel
 from topo.plotting.plotgroup import TemplatePlotGroup

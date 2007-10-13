@@ -366,21 +366,21 @@ def run_batch(script_file,output_directory="Output",
 
 
     # Create output directories
-    from topo.base.parameterclasses import output_path, normalize_path
+    from filepaths import output_path, normalize_path
     if not os.path.isdir(normalize_path(output_directory)):
         os.mkdir(normalize_path(output_directory))
 
-    topo.base.parameterclasses.output_path = normalize_path(os.path.join(output_directory,prefix))
+    filepaths.output_path = normalize_path(os.path.join(output_directory,prefix))
     
-    if os.path.isdir(topo.base.parameterclasses.output_path):
+    if os.path.isdir(filepaths.output_path):
 	print "Batch run: Warning -- directory: " +  \
-              topo.base.parameterclasses.output_path + \
+              filepaths.output_path + \
               " already exists! Run aborted; rename directory or wait one minute before trying again."
         import sys
         sys.exit(-1)
     else:
-	os.mkdir(topo.base.parameterclasses.output_path)
-        print "Batch run output will be in " + topo.base.parameterclasses.output_path
+	os.mkdir(filepaths.output_path)
+        print "Batch run output will be in " + filepaths.output_path
 
     ##################################
     # capture stdout
@@ -422,7 +422,7 @@ def run_batch(script_file,output_directory="Output",
 
     ##################################
     # Write stdout to output file and restore original stdout
-    stdout_file = open(os.path.join(topo.base.parameterclasses.output_path,"stdout"),'w')
+    stdout_file = open(os.path.join(filepaths.output_path,"stdout"),'w')
     stdout_file.write(command_used_to_start+"\n")
     stdout_file.write(startnote+"\n")
     stdout_file.write(stdout.getvalue())

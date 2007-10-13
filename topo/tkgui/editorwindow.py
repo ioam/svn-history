@@ -12,7 +12,7 @@ from random import Random, random
 
 import topo
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import normalize_path
+from topo.misc.filepaths import normalize_path
 from topo.base.sheet import Sheet
 from topo.base.projection import Projection
 

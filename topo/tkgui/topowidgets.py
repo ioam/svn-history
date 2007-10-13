@@ -18,7 +18,7 @@ import operator
 import Pmw
 import bwidget
 
-from topo.base.parameterclasses import resolve_filename
+from topo.misc.filepaths import resolve_path
 import topo.tkgui
 from widgets import TaggedSlider, ResizableScrollableFrame
 
@@ -40,7 +40,7 @@ class TkguiWindow(Tkinter.Toplevel):
         # bundle into an application package or something like that.
         # On OS X, could possibly alter the small titlebar icon with something like:
         # self.attributes("-titlepath","/Users/x/topographica/AppIcon.icns")
-        self.iconbitmap('@'+(resolve_filename('topo/tkgui/icons/topo.xbm')))
+        self.iconbitmap('@'+(resolve_path('topo/tkgui/icons/topo.xbm')))
 
         ### Universal right-click menu
         # CB: not currently used by anything but the plotgrouppanels

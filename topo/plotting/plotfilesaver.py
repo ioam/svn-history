@@ -13,7 +13,9 @@ import ImageOps
 import numpy
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import StringParameter, normalize_path
+from topo.base.parameterclasses import StringParameter
+
+from topo.misc.filepaths import normalize_path
 
 import topo
 

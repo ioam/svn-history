@@ -10,7 +10,7 @@ import os
 
 from topo.base.simulation import Simulation
 from topo.base.cf import CFSheet, CFProjection
-from topo.base.parameterclasses import resolve_filename,normalize_path
+from topo.misc.filepaths import resolve_path,normalize_path
 
 from topo.sheets.generatorsheet import GeneratorSheet
 
@@ -46,19 +46,19 @@ class TestPlotGroupSaver(unittest.TestCase):
 
     def test_activity_saving(self):
         self.save('Activity')
-        resolve_filename("topo/tests/testplotfilesaverPGS_test_000000.00_A_Activity.png")
-        resolve_filename("topo/tests/testplotfilesaverPGS_test_000000.00_B_Activity.png")
+        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_A_Activity.png")
+        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_B_Activity.png")
 
     def test_orientation_preference_saving(self):
         self.save('Orientation Preference')
-        resolve_filename("topo/tests/testplotfilesaverPGS_test_000000.00_B_Orientation_Preference.png")
-        resolve_filename("topo/tests/testplotfilesaverPGS_test_000000.00_B_Orientation_PreferenceAndSelectivity.png")
-        resolve_filename("topo/tests/testplotfilesaverPGS_test_000000.00_B_Orientation_Selectivity.png")
-        resolve_filename("topo/tests/testplotfilesaverPGS_test_000000.00__Color_Key.png")
+        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_B_Orientation_Preference.png")
+        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_B_Orientation_PreferenceAndSelectivity.png")
+        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_B_Orientation_Selectivity.png")
+        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00__Color_Key.png")
 
     def test_cf_saving(self):
         self.save("Connection Fields",sheet=self.sim['B'])
-        resolve_filename("topo/tests/testplotfilesaverPGS_test_000000.00_Afferent_(from_A).png")
+        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_Afferent_(from_A).png")
 
         
 class TestCFProjectionPlotGroupSaver(TestPlotGroupSaver):
@@ -66,7 +66,7 @@ class TestCFProjectionPlotGroupSaver(TestPlotGroupSaver):
     def test_cfprojection_saving(self):
         self.save('Projection',
                   projection=self.sim['B'].projections('Afferent'))
-        resolve_filename("topo/tests/testplotfilesaverPGS_test_000000.00_B_Afferent.png")
+        resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_B_Afferent.png")
 
 
 ###########################################################

@@ -16,12 +16,13 @@ import topo
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter,BooleanParameter, \
-     StringParameter,Number,ObjectSelectorParameter, ListParameter, resolve_filename
+     StringParameter,Number,ObjectSelectorParameter, ListParameter
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet,CFProjection
 from topo.base.projection import ProjectionSheet
 
 from topo.misc.keyedlist import KeyedList
+from topo.misc.filepaths import resolve_path
 
 from plot import make_template_plot, Plot
 
@@ -422,7 +423,7 @@ class TemplatePlotGroup(SheetPlotGroup):
         """
         Construct a static image Plot (e.g. a color key for an Orientation Preference map).
         """
-        image = Image.open(resolve_filename(file_path))
+        image = Image.open(resolve_path(file_path))
         plot = Plot(image,name=name)
         self.plot_list.append(plot)
 

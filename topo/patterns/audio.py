@@ -11,7 +11,9 @@ __version__='$Revision$'
 import pyaudiolab
 import numpy
 
-from topo.base.parameterclasses import Filename,Integer,Parameter
+from topo.base.parameterclasses import Integer,Parameter
+
+from topo.misc.filepaths import Filename
 
 from topo.patterns.basic import OneDPowerSpectrum
 

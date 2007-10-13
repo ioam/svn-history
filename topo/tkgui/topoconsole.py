@@ -27,11 +27,10 @@ from tkFileDialog import asksaveasfilename,askopenfilename
 import Pmw
 
 import topo
-from topo.base.parameterclasses import resolve_filename
-from topo.base.parameterclasses import normalize_path
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
 from topo.misc.keyedlist import KeyedList
+from topo.misc.filepaths import resolve_path,normalize_path
 import topo.commands.basic
 
 import topo.tkgui 
@@ -519,7 +518,7 @@ class TopoConsole(TkguiWindow):
         for location in locations:
             # a path on the disk might need converting
             try:
-                location = resolve_filename(location)
+                location = resolve_path(location)
             except:
                 pass
             

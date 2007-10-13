@@ -43,7 +43,7 @@ __version__='$Revision$'
 
 import pickle, copy, __main__, timeit
 
-from topo.base.parameterclasses import resolve_filename, normalize_path
+from topo.misc.filepaths import resolve_path, normalize_path
 
 import topo
 from topo.tests.utils import assert_array_equal, assert_array_almost_equal
@@ -99,7 +99,7 @@ def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None
         data_filename=script+"_DATA"
         
     try:
-        data = pickle.load(open(resolve_filename(data_filename),"rb"))
+        data = pickle.load(open(resolve_path(data_filename),"rb"))
     except IOError:
         print "\nData file '"+data_filename+"' could not be opened; run GenerateData() to create a data file before making changes to the script you wish to check."
         raise
@@ -176,7 +176,7 @@ def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
     if data_filename==None:
         data_filename=script+"_SPEEDDATA"
 
-    speed_data_file = open(resolve_filename(data_filename),'r')
+    speed_data_file = open(resolve_path(data_filename),'r')
         
     info = speed_data_file.readline()
     speed_data_file.close()

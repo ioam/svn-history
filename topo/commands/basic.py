@@ -26,7 +26,7 @@ from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 from topo.base.projection import ProjectionSheet
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.parameterclasses import normalize_path
+from topo.misc.filepaths import normalize_path
 
 def save_input_generators():
     """Save a copy of the active_sim's current input_generators for all GeneratorSheets."""
