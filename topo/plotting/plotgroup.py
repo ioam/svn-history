@@ -585,8 +585,6 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
 
     def _exec_update_command(self):
         self._check_projection_type()
-	### JCALERT: commands in analysis have to be re-written so that to avoid
-	### setting all these global parameters.
         topo.commands.analysis.proj_coords = self.generate_coords()
         topo.commands.analysis.proj_name = self.projection.name
         super(CFProjectionPlotGroup,self)._exec_update_command()
