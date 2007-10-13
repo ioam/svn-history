@@ -29,7 +29,7 @@ run_batch:
 
 <p>To help you keep the options straight, they will be encoded into
 the directory name (as
-<code>200710112056_tiny:default_density=3</code> in this case).
+<code>200710112056_tiny,default_density=3</code> in this case).
 
 <p>run_batch also accepts a parameter <code>analysis_fn</code>, which
 can be any callable Python object (e.g. the name of a function).  The
