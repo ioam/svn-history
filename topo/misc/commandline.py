@@ -285,6 +285,12 @@ def default_analysis_function():
     save_plotgroup("Activity")
 
 
+# JAB: Should also have some sort of time scaling, so that sims with
+# different lengths don't need an entirely new set of analysis times.
+# Should encode the cvs state somehow in the output directory, in a
+# form that could be used to recreate the CVS version of each file
+# used.  Should at least copy the script file into the output directory,
+# in any case.
 def run_batch(script_file,output_directory="Output",
               analysis_fn = default_analysis_function,
               analysis_times = [50,100,500,1000,2000,3000,4000,5000,10000],
