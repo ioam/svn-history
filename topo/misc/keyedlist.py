@@ -17,9 +17,10 @@ __version__='$Revision$'
 #
 # Sometimes having a KeyedList is confusing, because you can't use
 # natural syntax such as "x in y" when y is a KeyedList. 
+#
+# JB: Sure, we could use one of those instead; no good reason to
+# maintain our own not-quite-full-featured version.
 
-# CEBERRORALERT: when a requested key's not present, ought to raise a
-# KeyError rather than returning None.
 
 class KeyedList(list):
     """
@@ -46,11 +47,19 @@ class KeyedList(list):
         keys
         items
         update
+
+    Key values are not allowed to be None, because None is a
+    default return value for get() when there is no object
+    by that name.
     """
 
     def __getitem__(self,k):
         """The bracket [] accessor."""
-        return self.get(k)
+        val = self.get(k)
+        if val:
+            return val
+        else:
+            raise KeyError(k)
 
 
     def __setitem__(self,k,v):
@@ -74,6 +83,10 @@ class KeyedList(list):
         super(KeyedList,self).append(tuple((key,value)))
 
 
+    # JABALERT: Should None really be returned, rather than raising
+    # KeyError, when there is no item by that name?  Is that often
+    # useful?  If not, change this to raise a KeyError, and remove
+    # the one raised in __getitem__.
     def get(self, key, default=None):
         """
         Get the value with the specified key.
