@@ -34,7 +34,7 @@ class PlotGroupSaver(ParameterizedObject):
         to disambiguate different simulations or conditions.""")
 
     filename_format = StringParameter(default=
-        "%(filename_prefix)s%(basename)s_%(plotgroup_name)s_%(plot_label)s.%(file_format)s",doc="""
+        "%(filename_prefix)s%(basename)s_%(plot_label)s.%(file_format)s",doc="""
         Format string to use for generating filenames for plots.  This
         string will be evaluated in the context of a dictionary that
         defines various items commonly used when generating filenames,
