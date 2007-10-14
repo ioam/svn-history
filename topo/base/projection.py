@@ -281,7 +281,7 @@ class ProjectionSheet(Sheet):
         {projection_name, projection} of all the in_connections for
         this ProjectionSheet.
 
-        A minor convenience function for finding projetions by name;
+        A minor convenience function for finding projections by name;
         the sheet's list of in_connections usually provides simpler
         access to the Projections.
         """
@@ -291,6 +291,7 @@ class ProjectionSheet(Sheet):
             for c in self.in_connections:
                 if c.name == name:
                     return c
+            raise KeyError(name)
 
 
   
