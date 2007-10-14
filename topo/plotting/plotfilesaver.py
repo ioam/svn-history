@@ -34,7 +34,7 @@ class PlotGroupSaver(ParameterizedObject):
         to disambiguate different simulations or conditions.""")
 
     filename_format = StringParameter(default=
-        "%(filename_prefix)s%(basename)s_%(plot_label)s.%(file_format)s",doc="""
+        "%(filename_prefix)s%(basename)s_%(plotgroup_name)s_%(plot_label)s.%(file_format)s",doc="""
         Format string to use for generating filenames for plots.  This
         string will be evaluated in the context of a dictionary that
         defines various items commonly used when generating filenames,
@@ -45,6 +45,7 @@ class PlotGroupSaver(ParameterizedObject):
           sim_name:    the name of the current simulation (topo.sim.name)
           plot_label:  the label specfied in the PlotGroup for this plot
           file_format: the bitmap image file format for this type of plot
+          plotgroup_name: the name of this PlotGroup
       """)
     # Should move this out of plotfilesaver to get the same filenames in the GUI.
     # Should also allow each template in topo/commands/analysis.py to have a nice
@@ -72,6 +73,7 @@ class PlotGroupSaver(ParameterizedObject):
         vars['sim_name']= topo.sim.name
         vars['time']=topo.sim.time()
         vars['plot_label']=label
+        vars['plotgroup_name']=self.plotgroup.name
         vars.update(params)
         
         return self.strip(self.filename_format % vars)
