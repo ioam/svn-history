@@ -366,7 +366,8 @@ def run_batch(script_file,output_directory="Output",
 
 
     # Create output directories
-    from filepaths import output_path, normalize_path
+    import filepaths
+    from filepaths import normalize_path
     if not os.path.isdir(normalize_path(output_directory)):
         os.mkdir(normalize_path(output_directory))
 
@@ -422,7 +423,7 @@ def run_batch(script_file,output_directory="Output",
 
     ##################################
     # Write stdout to output file and restore original stdout
-    stdout_file = open(os.path.join(filepaths.output_path,"stdout"),'w')
+    stdout_file = open(normalize_path(prefix+".out"),'w')
     stdout_file.write(command_used_to_start+"\n")
     stdout_file.write(startnote+"\n")
     stdout_file.write(stdout.getvalue())
