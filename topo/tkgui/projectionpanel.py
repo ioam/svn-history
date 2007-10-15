@@ -259,6 +259,7 @@ class RFProjectionPanel(TwoDThingPanel):
     def __init__(self,console,master,plotgroup,**params):
         super(TwoDThingPanel,self).__init__(console,master,plotgroup,**params)
         self.pack_param('input_sheet',parent=self.control_frame_3,on_modify=self.redraw_plots)
+        self.pack_param('density',parent=self.control_frame_3)
 
     def setup_plotgroup(self):
         super(RFProjectionPanel,self).setup_plotgroup()
