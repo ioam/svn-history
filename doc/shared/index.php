@@ -92,7 +92,7 @@
 </dd>
 <dt>Plotting:</dt>
 <dd>
-  reverse-correlation RF mapping<br>
+  <A target="_top" href="../User_Manual/plotting.html#rfplots">reverse-correlation RF mapping</A><br>
   <A target="_top" href="../User_Manual/commandline.html#3d-plotting">3D 
   wireframe plotting</A> (in right-click menu)<br>
   gradient plots, histogram plots (in right-click menu)<br>
