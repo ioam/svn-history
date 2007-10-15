@@ -605,10 +605,15 @@ class CommandEvent(Event):
         
         try:
             exec self.command_string in __main__.__dict__
+        except:
+            import traceback
+            ParameterizedObject(name="CommandEvent").warning("%s was not executed because it would have caused an error:"%(self))
+            # CEBALERT: need to print only for warning level, etc. (Same alert below in __test.)
+            print "----------"
+            traceback.print_exc()
+            print "----------"
+
             
-        except Exception, err:
-            ParameterizedObject(name='CommandEvent').warning(`self`+' was not executed because it would cause an error - '+`err`+': "' +`err[0]`+'".')
-        
     def __test(self):
         """
         Check for SyntaxErrors in the command.
@@ -624,14 +629,17 @@ class CommandEvent(Event):
         # But I don't think we should actually do that (e.g. someone could be catching
         # divide-by-zero errors later in their simulation).
 
+        # CEBALERT: isn't this a bad idea? What if the command takes ages to run?
         try:
             exec self.command_string in {}
-        except SyntaxError, err :
-            # CEBALERT: why don't the offset and text attributes contain anything?
-            # print err.filename,err.lineno,err.offset,err.text
-            # (same above in __call__() - why don't some of the attributes contain anything?)
-            ParameterizedObject(name='CommandEvent').warning('The scheduled command "'+self.command_string+'" will not be executed because it contains a syntax error: "'+`err[0]`+'".')
-        except:
+        except SyntaxError:
+            ParameterizedObject(name='CommandEvent').warning('The scheduled command "'+self.command_string+'" will not be executed because it contains a syntax error:')
+            import traceback
+            print "----------"
+            traceback.print_exc()
+            print "----------"
+
+        except: # errors that aren't syntax errors don't mean anything here
             pass
         
 
