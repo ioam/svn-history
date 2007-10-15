@@ -347,8 +347,8 @@ def run_batch(script_file,output_directory="Output",
 
     # Ensure that saved state includes all parameter values
     from topo.commands.basic import save_script_repr
-    from topo.base.parameterizedobject import script_repr_suppress_defaults
-    script_repr_suppress_defaults=False
+    from topo.base import parameterizedobject
+    parameterizedobject.script_repr_suppress_defaults=False
 
     # Make sure pylab plots are saved to disk
     import matplotlib 
@@ -416,8 +416,8 @@ def run_batch(script_file,output_directory="Output",
             analysis_fn()
             save_script_repr()
             elapsedtime=time.time()-starttime
-            print "Simulation time %s, elapsed real time %02d:%02d." % \
-                  (topo.sim.timestr(),int(elapsedtime/60),int(elapsedtime%60))
+            parameterizedobject.ParameterizedObject(name="run_batch").message(
+                "Elapsed real time %02d:%02d." % (int(elapsedtime/60),int(elapsedtime%60)))
     except:
         import traceback
         traceback.print_exc(file=sys.stdout)
