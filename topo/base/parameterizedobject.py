@@ -779,7 +779,7 @@ class ParameterizedObject(object):
         if level <= max(min_print_level,self.print_level):
             s = ' '.join([str(x) for x in args])
             
-            if dbprint_prefix:
+            if dbprint_prefix and callable(dbprint_prefix):
                 prefix=dbprint_prefix()
             else:
                 prefix=""
