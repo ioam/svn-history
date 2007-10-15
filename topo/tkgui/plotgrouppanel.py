@@ -698,12 +698,13 @@ class SheetPGPanel(PlotGroupPanel):
 
     def check_for_rfs(self,plot):
         # Note we've lost this prompt for the user:
-        # "No RF measurements are available yet; run the Receptive Fields plot before accessing this right-click menu option.")
+        # "No RF measurements are available yet; run the Receptive Field plot before accessing this right-click menu option.")
         show_rfs = False
         if plot.plot_src_name in topo.sim.objects():
             sheet = topo.sim[plot.plot_src_name]
-            if sheet in topo.analysis.featureresponses.grid:
-                show_rfs = True
+            # RFHACK: if a generatorsheet has RF views, then enable the menu option
+            #if sheet in topo.analysis.featureresponses.grid:
+            show_rfs = True
         self.__showhide("receptive_field",show_rfs)
 
     def __showhide(self,name,show):
@@ -746,17 +747,25 @@ class SheetPGPanel(PlotGroupPanel):
             
     def _receptive_field_window(self):
         """
-        Open a Receptive Fields plot for the unit currently
+        Open a Receptive Field plot for the unit currently
         identified by a right click.
         """
         if 'plot' in self._right_click_info:
             plot = self._right_click_info['plot']
-            x,y =  self._right_click_info['coords'][0]
+            x,y = self._right_click_info['coords'][1]
             sheet = topo.sim[plot.plot_src_name]
-            # CB: not sure how title works for matrixplot -
-            # might need to be formatted better
-            matrixplot(topo.analysis.featureresponses.grid[sheet][x,y],
-                       title=("Receptive Field",sheet.name,x,y))
+            r,c = sheet.sheet2matrixidx(x,y)
+            new_x,new_y= sheet.matrixidx2sheet(r,c)
+
+            # RFHACK:
+##                         matrixplot(topo.analysis.featureresponses.grid[sheet][x,y],
+##                        title=("Receptive Field",sheet.name,x,y))
+
+            # matrixplot for whatever generatorsheets ahve the views
+##             for g in topo.sim.objects(GeneratorSheet):
+##                 try:
+##                     matrixplot(g)
+                       
 
 
     def conditional_refresh(self):
