@@ -96,7 +96,7 @@ class GeneratorSheet(Sheet):
         """
         Generate the output and send it out the Activity port.
         """
-        self.verbose("Time %0.4f: Generating a new pattern" % (self.simulation.time()))
+        self.verbose("Time %s: Generating a new pattern" % (self.simulation.timestr()))
 
         ### JABALERT: Would it be more efficient to re-use the same
         ### bit of memory each time?  This way allocates a new block

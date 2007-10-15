@@ -294,7 +294,7 @@ class ProgressWindow(TkguiWindow):
             # delete the variable trace (necessary?)
             self.progress_var.trace_vdelete('w',self.progress_trace_name)
 
-            self._close_window(last_message="Time %s: Finished %s"%(topo.sim.time(),
+            self._close_window(last_message="Time %s: Finished %s"%(topo.sim.timestr(),
                                                                     self.timer.func.__name__))
                                                         
 

@@ -36,7 +36,7 @@ class PulseGenerator(EventProcessor):
 
     def input_event(self,conn,data):
         """On input from self, generate output. Ignore all other inputs."""
-        self.verbose("Time " + str(self.simulation.time()) + ":" +
+        self.verbose("Time " + str(self.simulation.timestr()) + ":" +
                      " Received event from ",conn.src,'on port',conn.dest_port,'with data',data)
         self.send_output(data=self.amplitude)
 

@@ -600,8 +600,8 @@ class CommandEvent(Event):
         # Presumably here to avoid importing __main__ into the rest of the file
         import __main__
 
-        ParameterizedObject(name='CommandEvent').message("Time %08.2f: Running command %s" \
-                                                         % (self.time,self.command_string))
+        ParameterizedObject(name='CommandEvent').message("Time %s: Running command %s" \
+                                                         % (sim.timestr(),self.command_string))
         
         try:
             exec self.command_string in __main__.__dict__
@@ -1055,14 +1055,17 @@ class Simulation(ParameterizedObject):
         return self._time
 
 
-    def timestr(self):
+    def timestr(self,specified_time=None):
         """
-        Returns the current time formatted using time_printing_format,
-        which allows users to control how much precision, etc. is used
-        for time displays.
+        Returns the specified time (or the current time, if none
+        specified) formatted using time_printing_format, which allows
+        users to control how much precision, etc. is used for time
+        displays.
         """
         vars = dict(self.get_param_values())
         vars.update(self.__dict__)
+        if specified_time:
+            vars['_time']=specified_time
         timestr = self.time_printing_format % vars
         return timestr
 

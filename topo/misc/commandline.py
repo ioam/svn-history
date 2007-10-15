@@ -416,8 +416,8 @@ def run_batch(script_file,output_directory="Output",
             analysis_fn()
             save_script_repr()
             elapsedtime=time.time()-starttime
-            print "Simulation time %06d, elapsed real time %02d:%02d." % \
-                  (topo.sim.time(),int(elapsedtime/60),int(elapsedtime%60))
+            print "Simulation time %s, elapsed real time %02d:%02d." % \
+                  (topo.sim.timestr(),int(elapsedtime/60),int(elapsedtime%60))
     except:
         import traceback
         traceback.print_exc(file=sys.stdout)
@@ -429,7 +429,7 @@ def run_batch(script_file,output_directory="Output",
 
     ##################################
     # Write stdout to output file and restore original stdout
-    stdout_file = open(normalize_path(prefix+".out"),'w')
+    stdout_file = open(normalize_path(simname+".out"),'w')
     stdout_file.write(command_used_to_start+"\n")
     stdout_file.write(startnote+"\n")
     stdout_file.write(stdout.getvalue())

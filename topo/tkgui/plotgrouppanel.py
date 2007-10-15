@@ -606,11 +606,11 @@ e.g. for debugging.)
 
     def _plot_title(self):
         """
-        Provide a string describing the current plot.
+        Provide a string describing the current set of plots.
 
         Override in subclasses to provide more information.
         """
-        return "%s at time %s"%(self.plotgroup.name,self.plotgroup.time)
+        return "%s at time %s"%(self.plotgroup.name,topo.sim.timestr(self.plotgroup.time))
 
                 
     # rename to refresh_titles
