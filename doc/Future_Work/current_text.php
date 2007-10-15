@@ -43,7 +43,7 @@ tracker rather than added to this list</B>.
 <li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
 <li>Cleanup + doc of *panel.py files</li>
 <li>Cleanup + doc of plotgroup.py</li>
-<li>scrollbars: can we stop empty space when there are no bars? clean up + doc code. What to do about user resizing window?</li>
+<li>Fix scrollbars!</li>
 <li>finish basic developer manual tkgui intro</li>
 <li>on windows, progress  bar always flicks on for a small fraction of a second
 (even for runs of 1).</li>
