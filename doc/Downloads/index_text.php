@@ -55,7 +55,9 @@ instead.
 <code>topographica/</code> directory.  You will currently (10/2007)
 need to do this on a machine with a functioning DISPLAY, not on a
 remote text-only windowless session, because of build requirements for
-the MatPlotLib library.  The build process will take a
+the MatPlotLib library.  (Note that many systems provide xfvb for this
+very purpose, and in such cases you can simply do "xvfb-run make" to
+build using a virtual display instead.)  The build process will take a
 while to complete (e.g. about 5-10 minutes on a 1.5GHz Pentium IV
 machine with a local disk).
 
