@@ -53,13 +53,23 @@ class KeyedList(list):
     by that name.
     """
 
-    def __getitem__(self,k):
+    def __getitem__(self,key):
         """The bracket [] accessor."""
-        val = self.get(k)
-        if val:
-            return val
-        else:
-            raise KeyError(k)
+        for (name,value) in self:
+            if name == key:
+                return value
+            
+        # Support indexing by integer, where e.g. keydlist[2] returns the
+        # third element.  Is this really required by any calling code?
+        if isinstance(key,int):
+            for (index,(name,value)) in enumerate(self):
+                if index == key:
+                    print """Please email jbednar at inf.ed. ac.uk with
+                             the command you used to generate this message so that
+                             he can see whether this code is used anywhere"""
+                    return value
+
+        raise KeyError(k)
 
 
     def __setitem__(self,k,v):
@@ -83,13 +93,6 @@ class KeyedList(list):
         super(KeyedList,self).append(tuple((key,value)))
 
 
-    # JABALERT: Should None really be returned, rather than raising
-    # KeyError, when there is no item by that name?  Is that often
-    # useful?  If not, change this to raise a KeyError, and remove
-    # the one raised in __getitem__.
-    # CB: shouldn't this method match dict.get(), which does return
-    # None (or some other specified default value) when there's no
-    # matching key?
     def get(self, key, default=None):
         """
         Get the value with the specified key.
@@ -99,13 +102,6 @@ class KeyedList(list):
         for (name,value) in self:
             if name == key:
                 return value
-        if isinstance(key,int):
-            index = 0
-            for (name,value) in self:
-                if index == key:
-                    return value
-                else:
-                    index = index + 1
             
         return default
 
