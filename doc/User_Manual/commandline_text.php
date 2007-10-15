@@ -245,6 +245,25 @@ CommandPrompt.format = CommandPrompt.ansi_format
 </pre>
 
 
+<H2><A NAME="min_print_level">Debugging or verbose messaging</A></H2>
+
+If you want to study exactly how Topographica is operating, e.g. to
+extend it or control it from the command line, you can consider
+changing the <code>topo.base.parameterizedobject.min_print_level</code>
+parameter so that messages will be printed whenever Topographica
+performs an action.  For instance, you can enable verbose messaging
+by starting Topographica as:
+
+<pre>
+  ./topographica -c "from topo.base import parameterizedobject" \
+  -c "parameterizedobject.min_print_level=parameterizedobject.VERBOSE" ...
+</pre>
+
+Instead of VERBOSE, you can use any of the other message levels
+defined in parameterizedobject.py, such as DEBUG, which gives even
+more information (typically much more than is useful).
+
+
 <H2><A NAME="scripting-gui">Controlling the GUI from scripts or the command line</A></H2>
 
 <P>The code for the Topographica GUI is kept strictly separate from
