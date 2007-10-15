@@ -309,7 +309,7 @@ class SheetPlotGroup(PlotGroup):
         # Scale the images so that each has a size up to the height_of_tallest_plot
 	for plot in resizeable_plots:
 	    if self.sheet_coords:
-                s = topo.sim.objects(Sheet)[p.plot_src_name]
+                s = topo.sim.objects(Sheet)[plot.plot_src_name]
 	        scaling_factor=self.height_of_tallest_plot/float(s.xdensity)/max_sheet_height
 	    else:
 	        scaling_factor=self.height_of_tallest_plot/float(plot._orig_bitmap.height())
