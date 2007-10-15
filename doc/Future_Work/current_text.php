@@ -91,6 +91,12 @@ building, so that the speed tests are useful on buildbot.
 Modify PlotGroup and ProjectionPGPanels so that we can plot
 a wider variety of Projections.
 
+<H4>2007/10/15: Embed matplotlib windows</H4>
+Is there some simple way to specify the frame where subsequent Pylab
+plots will appear, instead of having them in a separate window?
+If so, should unify the icons, placement, etc. to make Matplotlib and
+Plot windows to look and work similarly, and to be able to mix and
+match Matplotlib and Plot plots in the same window.
 
 <H4>2007/10/05 (CB): Dynamic info</H4>
 Dynamic info is currently disabled on projection panel windows
