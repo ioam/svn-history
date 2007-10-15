@@ -18,7 +18,7 @@ from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter,BooleanParameter, \
      StringParameter,Number,ObjectSelectorParameter, ListParameter
 from topo.base.sheet import Sheet
-from topo.base.cf import CFSheet,CFProjection
+from topo.base.cf import CFSheet,CFProjection,Projection
 from topo.base.projection import ProjectionSheet
 
 from topo.misc.keyedlist import KeyedList
@@ -44,11 +44,11 @@ def cmp_plot(plot1,plot2):
 # general CEBALERTs for this file:
 #
 # Before 0.9.4:
+# * Clean up what's here: names and doc
 # * Clean up keyname stuff 
-# * Update documentation
 #
 # After 0.9.4
-# * Clean up hierarchy (i.e. making methods as general as possible,
+# * Improve hierarchy (i.e. making methods as general as possible,
 #   and there are also missing classes - currently only CFProjections
 #   for CFSheets can be plotted).
 # * There are no unit tests
@@ -538,20 +538,7 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
 
 
 
-class ProjectionPlotGroup(ProjectionSheetPlotGroup):
-    projection = ObjectSelectorParameter(default=None,doc="The projection to visualize.")
-    
-    
-
-class CFProjectionPlotGroup(ProjectionPlotGroup):
-    """Visualize one CFProjection."""
-
-    keyname='Weights'
-
-    situate = BooleanParameter(default=False,doc="""
-    If True, plots the weights on the entire source sheet, using zeros
-    for all weights outside the ConnectionField.  If False, plots only
-    the actual weights that are stored.""")
+class TwoDThingPlotGroup(ProjectionSheetPlotGroup):
 
 
     ### JPALERT: The bounds are meaningless for large sheets anyway.  If a sheet
@@ -562,17 +549,157 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
     density = Number(default=10.0,
                      softbounds=(5.0,50.0),doc="""
                      Number of units to plot per 1.0 distance in sheet coordinates""")
+
+
+    def __init__(self,**params):
+        super(TwoDThingPlotGroup,self).__init__(**params)
+        self.height_of_tallest_plot = 5 # Initial value
+        
+
+        ### JCALERT! shape determined by the plotting density
+        ### This is set by self.generate_coords()
+        self.proj_plotting_shape = (0,0)
+
+
+    def generate_coords(self):
+        """
+        Evenly space out the units within the sheet bounding box, so
+        that it doesn't matter which corner the measurements start
+        from.  A 4 unit grid needs 5 segments.  List is in left-to-right,
+        from top-to-bottom.
+        """
+        def rev(x): y = x; y.reverse(); return y
+
+        (l,b,r,t) = self.sheet.bounds.lbrt()
+        x = float(r - l) 
+        y = float(t - b)
+        x_step = x / (int(x * self.density) + 1)
+        y_step = y / (int(y * self.density) + 1)
+        l = l + x_step
+        b = b + y_step
+        coords = []
+        self.proj_plotting_shape = (int(x * self.density), int(y * self.density))
+        for j in rev(range(self.proj_plotting_shape[1])):
+            for i in range(self.proj_plotting_shape[0]):
+                coords.append((x_step*i + l, y_step*j + b))
+
+        return coords
+
+    def _sort_plots(self):
+	"""Skips plot sorting for Projections to keep the units in order."""
+	pass
+
+
+
+class RFProjectionPlotGroup(TwoDThingPlotGroup):
+
+    keyname='RFs'
+
+    input_sheet = ObjectSelectorParameter(default=None)
+
+
+    def _exec_update_command(self): # RFHACK
+	topo.commands.analysis.input_sheet_name = self.input_sheet.name
+        super(RFProjectionPlotGroup,self)._exec_update_command()
+
+
+    def _change_key(self,plotgroup_template,sheet,x,y):
+        plot_channels = copy.deepcopy(plotgroup_template)
+        key = (self.keyname,sheet.name,x,y)
+        plot_channels['Strength']=key
+        return plot_channels
+
+
+    def _create_plots(self,pt_name,pt,sheet):
+
+        plot_list=[]
+
+        for x,y in self.generate_coords():
+
+            input_sheet = self.input_sheet
+
+            r,c = sheet.sheet2matrixidx(x,y)
+            x1,y1 = sheet.matrixidx2sheet(r,c)
+            plot_channels = self._change_key(pt,sheet,x1,y1)
+            plot_list.append(make_template_plot(plot_channels,
+                                                input_sheet.sheet_view_dict,
+                                                input_sheet.xdensity,
+                                                input_sheet.bounds,
+                                                self.normalize))
+        return plot_list
+
+
+
+class ProjectionPlotGroup(TwoDThingPlotGroup):
+
+    projection = ObjectSelectorParameter(default=None,doc="The projection to visualize.")
+
+    keyname='Weights'                     
+    sheet_type = Sheet
+    projection_type = Projection
+
+
+    def _check_projection_type(self):
+        pass
+
+
+    def _exec_update_command(self):
+        self._check_projection_type()
+        topo.commands.analysis.proj_coords = self.generate_coords()
+        topo.commands.analysis.proj_name = self.projection.name
+        super(ProjectionPlotGroup,self)._exec_update_command()
+
+
+    def _change_key(self,plotgroup_template,sheet,proj,x,y):
+        plot_channels = copy.deepcopy(plotgroup_template)
+        key = (self.keyname,sheet.name,proj.name,x,y)
+        plot_channels['Strength']=key
+        return plot_channels
+
+
+    # needsupdate
+    def _create_plots(self,pt_name,pt,sheet):
+	projection = self.projection
+        plot_list=[]
+        src_sheet=projection.src
+
+        for x,y in self.generate_coords():
+            
+            # JC: we might consider allowing the construction of 'projection type' plots
+            # with other things than UnitViews.
+            plot_channels = self._change_key(pt,sheet,projection,x,y)
+            
+            (r,c) = projection.dest.sheet2matrixidx(x,y)
+            bounds = projection.cf(r,c).bounds
+                                                    
+            plot_list.append(make_template_plot(plot_channels,
+                                                src_sheet.sheet_view_dict,
+                                                src_sheet.xdensity,
+                                                bounds,
+                                                self.normalize))
+        return plot_list
+
+
+
+
+
+
+
+
+
+class CFProjectionPlotGroup(ProjectionPlotGroup):
+    """Visualize one CFProjection."""
+
+    situate = BooleanParameter(default=False,doc="""
+    If True, plots the weights on the entire source sheet, using zeros
+    for all weights outside the ConnectionField.  If False, plots only
+    the actual weights that are stored.""")
                      
     sheet_type = CFSheet
     projection_type = CFProjection
 
     def __init__(self,**params):
         super(CFProjectionPlotGroup,self).__init__(**params)
-        self.height_of_tallest_plot = 5 # Initial value
-        
-        ### JCALERT! shape determined by the plotting density
-        ### This is set by self.generate_coords()
-        self.proj_plotting_shape = (0,0)
     
         self.filesaver = CFProjectionPlotGroupSaver(self)
 
@@ -582,20 +709,6 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
             raise TypeError(
                 "%s's projection Parameter must be set to a %s instance (currently %s, type %s)." \
                 %(self,self.projection_type,self.projection,type(self.projection))) 
-
-
-    def _exec_update_command(self):
-        self._check_projection_type()
-        topo.commands.analysis.proj_coords = self.generate_coords()
-        topo.commands.analysis.proj_name = self.projection.name
-        super(CFProjectionPlotGroup,self)._exec_update_command()
-
-
-    def _change_key(self,plotgroup_template,sheet,proj,x,y):
-        plot_channels = copy.deepcopy(plotgroup_template)
-        key = (self.keyname,sheet.name,proj.name,x,y)
-        plot_channels['Strength']=key
-        return plot_channels
 
 		
     def _create_plots(self,pt_name,pt,sheet):
@@ -623,35 +736,6 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
         return plot_list
 
 
-    def generate_coords(self):
-        """
-        Evenly space out the units within the sheet bounding box, so
-        that it doesn't matter which corner the measurements start
-        from.  A 4 unit grid needs 5 segments.  List is in left-to-right,
-        from top-to-bottom.
-        """
-        def rev(x): y = x; y.reverse(); return y
-
-        (l,b,r,t) = self.sheet.bounds.lbrt()
-        x = float(r - l) 
-        y = float(t - b)
-        x_step = x / (int(x * self.density) + 1)
-        y_step = y / (int(y * self.density) + 1)
-        l = l + x_step
-        b = b + y_step
-        coords = []
-        self.proj_plotting_shape = (int(x * self.density), int(y * self.density))
-        for j in rev(range(self.proj_plotting_shape[1])):
-            for i in range(self.proj_plotting_shape[0]):
-                coords.append((x_step*i + l, y_step*j + b))
-
-        return coords
-
-
-    def _sort_plots(self):
-	"""Skips plot sorting for Projections to keep the units in order."""
-	pass
-
 
 
 class UnitPlotGroup(ProjectionSheetPlotGroup):
@@ -664,6 +748,12 @@ class UnitPlotGroup(ProjectionSheetPlotGroup):
     y = Number(default=0.0,doc="""y-coordinate of the unit to plot""")
 ## """Sheet coordinate location desired.  The unit nearest this location will be returned.
 ## It is an error to request a unit outside the area of the Sheet.""")
+
+    def _change_key(self,plotgroup_template,sheet,x,y):
+        plot_channels = copy.deepcopy(plotgroup_template)
+        key = (self.keyname,sheet.name,x,y)
+        plot_channels['Strength']=key
+        return plot_channels
 
         
     def _exec_update_command(self):
@@ -710,6 +800,7 @@ class ConnectionFieldsPlotGroup(UnitPlotGroup):
         return plot_list
 
 
+
 class FeatureCurvePlotGroup(UnitPlotGroup):
 
     def _exec_update_command(self):
@@ -747,6 +838,7 @@ needed.
 
 plotgroup_types = {'Connection Fields': ConnectionFieldsPlotGroup,
                    'Projection': CFProjectionPlotGroup,
+                   'RF Projection':RFProjectionPlotGroup,
                    'Projection Activity': ProjectionActivityPlotGroup}
 
 
