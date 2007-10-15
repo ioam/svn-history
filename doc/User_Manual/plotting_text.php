@@ -121,6 +121,28 @@ topo/commands/analysis.py</A>. The available plots include:
 </dl>
 
 
+<H2><a name="rfplots">Receptive fields plots</a></H2>
+
+<P>Often, rather than a Connection Field (a set of weights from one
+Projection between two Sheets), you will want to know the Receptive
+Field (RF) of a unit -- the locations to which it responds on an input
+sheet, even across multiple projections (i.e., multiple synapses).
+
+<P>Such plots can be measured using the RF Projection plot, which uses
+reverse correlation to estimate which units on an input sheet cause
+the strongest response of a unit in a later sheet.  It works 
+just like a <A
+HREF="../Tutorials/lissom_oo_or.html#Projection-plot">Projection</A></dt>
+plot, except that it takes much longer to measure (as it requires
+presenting a large number of test patterns), is not specific to any
+particular Projection, and is an estimate rather than a
+visualization of a set of weights.  Once the RFs have been measured,
+the RF can be visualized for a particular unit by right clicking on
+that unit in any plot window, and selecting a Receptive Fields plot.
+
+<!-- Need to add an example plot! -->
+
+
 <H2>Tuning curve plots</H2>
 
 <P>The above plots are all visualized as a two-dimensional array of
