@@ -508,7 +508,8 @@ def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
     input_sheet = topo.sim[input_sheet_name]
 
     # CBERRORALERT: pattern's actually being presented on all GeneratorSheets.
-    # NEed to alter PatternPresenter to accpet an input sheet.
+    # NEed to alter PatternPresenter to accpet an input sheet. For 0.9.4 need
+    # to document that same pattern is drawn on all generator sheets.
 
     # CEBALERT: various things in here need to be arguments
 
