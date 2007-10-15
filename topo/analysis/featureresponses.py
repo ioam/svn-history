@@ -19,6 +19,7 @@ import topo.base.sheetcoords
 from topo.base.sheet import Sheet, activity_type
 from topo.base.sheetview import SheetView
 from topo.base.parameterizedobject import ParameterizedObject,Parameter
+from topo.base.parameterclasses import Number
 from topo.misc.utils import cross_product, frange
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.commands.basic import restore_input_generators, save_input_generators
@@ -285,6 +286,13 @@ class FeatureMaps(FeatureResponses):
     or selectivity maps.
     """
     
+    selectivity_multiplier = Number(default=17,bounds=(0.0,None),doc="""
+        Factor by which to multiply the calculated selectivity values
+        before plotting them.  Usually set much greater than 1.0 to
+        highlight particularly unselective areas, especially when
+        combining selectivity with other plots as using Confidence
+        subplots.""")
+    
     def __init__(self,features):
 	super(FeatureMaps,self).__init__(features)
         self.features=features
@@ -329,8 +337,7 @@ class FeatureMaps(FeatureResponses):
             ### I guess it is always cyclic value that we will color with hue in an hsv plot
             ### but still we should catch the error.
             ### Also, what happens in case of negative values?
-            # CB: (see also note below about multiplication by 17, and ALERT by
-            # SheetView's norm_factor.)
+            # CB: (see also ALERT by SheetView's norm_factor.)
                 cyclic = self._featureresponses[sheet][feature].distribution_matrix[0,0].cyclic
                 if cyclic:
                     norm_factor = self._featureresponses[sheet][feature].distribution_matrix[0,0].axis_range
@@ -351,9 +358,8 @@ class FeatureMaps(FeatureResponses):
                     
                 sheet.sheet_view_dict[feature.capitalize()+'Preference']=preference_map
                 
-                # note the temporary multiplication by 17
-                # (just because I remember JAB saying it was something like that in LISSOM)
-                selectivity_map = SheetView((17*self._featureresponses[sheet][feature].selectivity(),
+                selectivity_map = SheetView((self.selectivity_multiplier*
+                                             self._featureresponses[sheet][feature].selectivity(),
                                              bounding_box), sheet.name , sheet.precedence, topo.sim.time())
                 sheet.sheet_view_dict[feature.capitalize()+'Selectivity']=selectivity_map
 
