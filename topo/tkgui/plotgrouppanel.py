@@ -370,6 +370,15 @@ e.g. for debugging.)
         self._display_plots_and_labels()
         
 
+    def rescale_plots(self):
+        """
+        Rescale the existing plots, without calling either the
+        plot_command or the update_command, then display the result.
+        """
+        self.plotgroup.scale_images()
+        self._display_plots_and_labels()
+        
+
     def refresh(self,update=True):
         """
         Main steps for generating plots in the Frame. 
@@ -669,11 +678,10 @@ class SheetPGPanel(PlotGroupPanel):
 
         self.pack_param('normalize',parent=self.control_frame_1,
                         on_change=self.redraw_plots,side="right")
-        # Actually, these could simply call scale_images(), skipping redrawing...
         self.pack_param('integer_scaling',parent=self.control_frame_2,
-                        on_change=self.redraw_plots,side='right')
+                        on_change=self.rescale_plots,side='right')
         self.pack_param('sheet_coords',parent=self.control_frame_2,
-                        on_change=self.redraw_plots,side='right')
+                        on_change=self.rescale_plots,side='right')
 
         self.params_in_history.append('sheet_coords')
         self.params_in_history.append('integer_scaling')
@@ -726,11 +734,6 @@ class SheetPGPanel(PlotGroupPanel):
         Add or remove this panel from the console's
         auto_refresh_panels list.
         """
-        # JAB: it might make sense for turning on auto-refresh
-        # to do a refresh automatically, though that might have
-        # unexpected behavior for a preference map calculation
-        # (where it would do unnecessary, and potentially lengthy,
-        # recalculation).
         if self.auto_refresh: 
             if not (self in self.console.auto_refresh_panels):
                 self.console.auto_refresh_panels.append(self)
