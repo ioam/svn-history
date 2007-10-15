@@ -285,12 +285,17 @@ class ProjectionPGPanel(TwoDThingPanel):
         self.pack_param('projection',parent=self.control_frame_3,on_modify=self.refresh_plots,
                         widget_options={'sort_fn_args':{'cmp':cmp_projections}})
         self.pack_param('density',parent=self.control_frame_3)
-
+        self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change)
+        
+    def situate_change(self):
+        if self.situate:
+            self.plotgroup.initial_plot=True
+            self.plotgroup.height_of_tallest_plot = 1
+        self.redraw_plots()
 
     def _plot_title(self):
         return 'Projection ' + self.projection.name + ' from ' + self.projection.src.name + ' to ' \
                + self.sheet.name + ' at time ' + str(self.plotgroup.time)
-
 
     def setup_plotgroup(self):
         super(ProjectionPGPanel,self).setup_plotgroup()
