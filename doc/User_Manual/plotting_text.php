@@ -304,7 +304,17 @@ you will need to know the range and number of steps you want to test,
 plus whether it is cyclic (i.e. wraps back around to zero eventually,
 and is thus best visualized as a Hue).
 
-<P>The data for plotting can also be calculated in any other way
+<P>Note that the selectivity is by default boosted significantly so
+that combined plots will be visible, because the selectivity scales
+are essentially arbitrary.  To change the scaling in specific cases,
+you can adjust the FeatureMaps.selectivity_multiplier parameter:
+
+<pre>
+  from topo.analysis.featureresponses import FeatureMaps
+  FeatureMaps.selectivity_multiplier=1.0
+</pre>
+
+<P>Also note that the data for plotting can also be calculated in any other way
 (ignoring FeatureMaps and PatternPresenter altogether), as long as it
 results in a SheetView added to the appropriate sheet_view_dict and
 specified in the template.  For instance, the
@@ -313,3 +323,4 @@ measure_cog</A> command used in Center of Gravity plots simply looks
 at each ConnectionField individually, computes its center of gravity,
 and builds a SheetView out of that (rather than presenting any input
 patterns).
+
