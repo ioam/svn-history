@@ -89,13 +89,17 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
 
 
     def sheet_change(self):
-        self.refresh()         
+        self.refresh_plots()
 
 
     def populate_sheet_param(self):
         sheets = topo.sim.objects(self.sheet_type).values() 
         self.plotgroup.params()['sheet'].objects = sheets
         self.plotgroup.sheet = sheets[0] # CB: necessary?
+
+
+    def _update_dynamic_info(self,e):
+        self.messageBar.message('state',"")
 
 
 
@@ -107,41 +111,23 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
         self.auto_refresh = True
         # CB: why do we do this?
 	self.plotgroup.name='ProjectionActivity'
-	
-
-    def _update_dynamic_info(self,e):
-        self.messageBar.message('state',"")
 
     def _plot_title(self):
         return "Activity in Projections to %s at time %s"%(self.plotgroup.sheet.name,self.plotgroup.time)
 
-          
-class ConnectionFieldsPanel(ProjectionSheetPGPanel):
+
+
+class UnitsPanel(ProjectionSheetPGPanel):
+
 
     def __init__(self,console,master,plotgroup,**params):
         self.initial_args=params # CEBALERT: store the initial arguments so we can get sheet,x,y in
                                  # sheet_change if any of them were specified. Isn't there a cleaner
                                  # way?
-        super(ConnectionFieldsPanel,self).__init__(console,master,plotgroup,**params)
-
-        self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change)
-        
+        super(UnitsPanel,self).__init__(console,master,plotgroup,**params)
         self.pack_param('x',parent=self.control_frame_3,on_change=self.refresh_plots)
         self.pack_param('y',parent=self.control_frame_3,on_change=self.refresh_plots)
-
         self.sheet_change()
-
-
-    def situate_change(self):
-        if self.situate:
-            self.plotgroup.initial_plot=True
-            self.plotgroup.height_of_tallest_plot = 1
-        self.redraw_plots()
-
-    def _update_dynamic_info(self,e):
-        self.messageBar.message('state',"")
-
-
 
 
 ##############################################################################
@@ -184,9 +170,21 @@ class ConnectionFieldsPanel(ProjectionSheetPGPanel):
                 w.refresh()
 
         self.initial_args = {} # reset now we've used them
-        super(ConnectionFieldsPanel,self).sheet_change()
+        super(UnitsPanel,self).sheet_change()
 ##############################################################################
 
+          
+class ConnectionFieldsPanel(UnitsPanel):
+
+    def __init__(self,console,master,plotgroup,**params):
+        super(ConnectionFieldsPanel,self).__init__(console,master,plotgroup,**params)
+        self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change)
+        
+    def situate_change(self):
+        if self.situate:
+            self.plotgroup.initial_plot=True
+            self.plotgroup.height_of_tallest_plot = 1
+        self.redraw_plots()
 
     def _plot_title(self):
         return 'Connection Fields of ' + self.sheet.name + \
@@ -194,62 +192,17 @@ class ConnectionFieldsPanel(ProjectionSheetPGPanel):
                + str(self.plotgroup.time)
 
 
+## class ReceptiveFieldPanel(UnitsPanel):
 
-class CFProjectionPGPanel(ProjectionSheetPGPanel):
-    """
-    Panel for displaying CFProjections.
-    """
-
-    def __init__(self,console,master,plotgroup,**params):
-        super(CFProjectionPGPanel,self).__init__(console,master,plotgroup,**params)
-        
-        self.pack_param('projection',parent=self.control_frame_3,on_modify=self.refresh_plots,
-                        widget_options={'sort_fn_args':{'cmp':cmp_projections}})
-        self.pack_param('density',parent=self.control_frame_3)
+##     def _plot_title(self):
+##         return 'RF %s,%s of %s on %s at time %s'%(self.plotgroup.x,self.plotgroup.y,
+##                                                   self.sheet.name,self.plotgroup.input_sheet.name,
+##                                              self.plotgroup.time)
 
 
-    def _plot_title(self):
-        return 'Projection ' + self.projection.name + ' from ' + self.projection.src.name + ' to ' \
-               + self.sheet.name + ' at time ' + str(self.plotgroup.time)
 
-
-    def setup_plotgroup(self):
-        super(CFProjectionPGPanel,self).setup_plotgroup()
-        self.populate_projection_param()
-
-        
-    def sheet_change(self):
-        self.refresh_projections()
-        super(CFProjectionPGPanel,self).sheet_change()
-
-
-    def populate_projection_param(self):
-        # JPHACKALERT: Note that CFSheet can have projections that are not
-        # CFProjections (e.g., OneToOneProjections), if there exists a
-        # way of plotting them, they should be plotted.
-        prjns = [x for x in self.plotgroup.sheet.projections().values()
-                 if isinstance(x,CFProjection)]
-        self.plotgroup.params()['projection'].objects = prjns
-        self.plotgroup.projection = prjns[0] # CB: necessary?
-
-    # CEBALERT: here and for other such lists, make things get sorted by precedence.
-    def refresh_projections(self):
-        self.populate_projection_param()
-
-        #################
-        # CEBALERT: How do you change list of tkinter.optionmenu options? Use pmw's optionmenu?
-        # Or search the web for a way to alter the list in the tkinter one.
-        # Currently, replace widget completely: looks bad and is complex.
-        # When fixing, remove try/except marked by the 'for projectionpanel' CEBALERT in
-        # tkparameterizedobject.py
-        if 'projection' in self.representations:
-            w  = self.representations['projection']['widget']
-            l  = self.representations['projection']['label']
-            l.destroy()
-            w.destroy()
-            self.pack_param('projection',parent=self.representations['projection']['frame'])
-        #################
-
+# CEBALERT: change the name
+class TwoDThingPanel(ProjectionSheetPGPanel):
 
     def display_plots(self):
         """
@@ -297,7 +250,99 @@ class CFProjectionPGPanel(ProjectionSheetPGPanel):
         Do not display a label for each plot.
         """
         pass
+
+
+
+# RFHACK: neeed to display 'press refresh' text if there's no data 
+class RFProjectionPanel(TwoDThingPanel):
+
+    def __init__(self,console,master,plotgroup,**params):
+        super(TwoDThingPanel,self).__init__(console,master,plotgroup,**params)
+        self.pack_param('input_sheet',parent=self.control_frame_3,on_modify=self.redraw_plots)
+
+    def setup_plotgroup(self):
+        super(RFProjectionPanel,self).setup_plotgroup()
+        self.populate_input_sheet_param()
+
+    def populate_input_sheet_param(self):
+        from topo.sheets.generatorsheet import GeneratorSheet
+        sheets = topo.sim.objects(GeneratorSheet).values()
+        self.plotgroup.params()['input_sheet'].objects = sheets
+        self.plotgroup.input_sheet=sheets[0]
+
+    
+    def sheet_change(self): # don't want to refresh_plots (measure new data) each time
+        self.redraw_plots()
+
+    def _plot_title(self):
+        return 'RFs of %s on %s at time %s'%(self.sheet.name,self.plotgroup.input_sheet.name,
+                                             self.plotgroup.time)
+    
+
+class ProjectionPGPanel(TwoDThingPanel):
+    def __init__(self,console,master,plotgroup,**params):
+        super(ProjectionPGPanel,self).__init__(console,master,plotgroup,**params)
+        self.pack_param('projection',parent=self.control_frame_3,on_modify=self.refresh_plots,
+                        widget_options={'sort_fn_args':{'cmp':cmp_projections}})
+        self.pack_param('density',parent=self.control_frame_3)
+
+
+    def _plot_title(self):
+        return 'Projection ' + self.projection.name + ' from ' + self.projection.src.name + ' to ' \
+               + self.sheet.name + ' at time ' + str(self.plotgroup.time)
+
+
+    def setup_plotgroup(self):
+        super(ProjectionPGPanel,self).setup_plotgroup()
+        self.populate_projection_param()
+
+        
+    def sheet_change(self):
+        self.refresh_projections()
+        super(ProjectionPGPanel,self).sheet_change()
+
+
+    def populate_projection_param(self):
+        prjns = [x for x in self.plotgroup.sheet.projections().values()]
+        self.plotgroup.params()['projection'].objects = prjns
+        self.plotgroup.projection = prjns[0]
+
+    # CEBALERT: here and for other such lists, make things get sorted by precedence.
+    def refresh_projections(self):
+        self.populate_projection_param()
+
+        #################
+        # CEBALERT: How do you change list of tkinter.optionmenu options? Use pmw's optionmenu?
+        # Or search the web for a way to alter the list in the tkinter one.
+        # Currently, replace widget completely: looks bad and is complex.
+        # When fixing, remove try/except marked by the 'for projectionpanel' CEBALERT in
+        # tkparameterizedobject.py
+        if 'projection' in self.representations:
+            w  = self.representations['projection']['widget']
+            l  = self.representations['projection']['label']
+            l.destroy()
+            w.destroy()
+            self.pack_param('projection',parent=self.representations['projection']['frame'])
+        #################
+
+
             
+
+
+
+class CFProjectionPGPanel(ProjectionPGPanel):
+    """
+    Panel for displaying CFProjections.
+    """
+    def populate_projection_param(self):
+        # JPHACKALERT: Note that CFSheet can have projections that are not
+        # CFProjections (e.g., OneToOneProjections), if there exists a
+        # way of plotting them, they should be plotted.
+        prjns = [x for x in self.plotgroup.sheet.projections().values()
+                 if isinstance(x,CFProjection)]
+        self.plotgroup.params()['projection'].objects = prjns
+        self.plotgroup.projection = prjns[0] # CB: necessary?
+
 
 
 
