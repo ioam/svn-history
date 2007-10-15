@@ -478,6 +478,7 @@ def plot_coord_mapping(mapper,sheet,style='b-'):
     hold(hold_on)
     
 
+# RFHACK
 ### JABHACKALERT: rename & should be called from the 'Receptive
 ### Fields*' pgts in topo/commands/analysis.py & should share the
 ### implementation of topographic_grid (because that's what is
