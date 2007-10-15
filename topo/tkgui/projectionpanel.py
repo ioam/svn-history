@@ -113,7 +113,7 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
 	self.plotgroup.name='ProjectionActivity'
 
     def _plot_title(self):
-        return "Activity in Projections to %s at time %s"%(self.plotgroup.sheet.name,self.plotgroup.time)
+        return "Activity in Projections to %s at time %s"%(self.plotgroup.sheet.name,topo.sim.timestr(self.plotgroup.time))
 
 
 
@@ -189,7 +189,7 @@ class ConnectionFieldsPanel(UnitsPanel):
     def _plot_title(self):
         return 'Connection Fields of ' + self.sheet.name + \
                ' unit (' + str(self.plotgroup.x) + ',' + str(self.plotgroup.y) + ') at time '\
-               + str(self.plotgroup.time)
+               + topo.sim.timestr(self.plotgroup.time)
 
 
 ## class ReceptiveFieldPanel(UnitsPanel):
@@ -197,7 +197,7 @@ class ConnectionFieldsPanel(UnitsPanel):
 ##     def _plot_title(self):
 ##         return 'RF %s,%s of %s on %s at time %s'%(self.plotgroup.x,self.plotgroup.y,
 ##                                                   self.sheet.name,self.plotgroup.input_sheet.name,
-##                                              self.plotgroup.time)
+##                                              topo.sim.timestr(self.plotgroup.time))
 
 
 
@@ -277,7 +277,7 @@ class RFProjectionPanel(TwoDThingPanel):
 
     def _plot_title(self):
         return 'RFs of %s on %s at time %s'%(self.sheet.name,self.plotgroup.input_sheet.name,
-                                             self.plotgroup.time)
+                                             topo.sim.timestr(self.plotgroup.time))
     
 
 class ProjectionPGPanel(TwoDThingPanel):
@@ -296,7 +296,7 @@ class ProjectionPGPanel(TwoDThingPanel):
 
     def _plot_title(self):
         return 'Projection ' + self.projection.name + ' from ' + self.projection.src.name + ' to ' \
-               + self.sheet.name + ' at time ' + str(self.plotgroup.time)
+               + self.sheet.name + ' at time ' + topo.sim.timestr(self.plotgroup.time)
 
     def setup_plotgroup(self):
         super(ProjectionPGPanel,self).setup_plotgroup()
