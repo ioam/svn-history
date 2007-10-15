@@ -210,12 +210,6 @@ class FeatureResponses(ParameterizedObject):
         
 
 
-
-grid={} # CB: why's this here? Is it built up over time somewhere else? Can't it be
-        # an attribute like _featureresponses in FeatureResponses?
-        # (Ah, I see it's accessed for plotting from the GUI (or wherever)...surely
-        #  there's a better way.)
-
 class ReverseCorrelation(FeatureResponses):
     """
     Calculate the receptive fields for all neurons using reverse correlation.
@@ -226,17 +220,37 @@ class ReverseCorrelation(FeatureResponses):
 
     def initialize_featureresponses(self,features): # CB: doesn't need features!
 
+        self._featureresponses = {}
         assert hasattr(self.input_sheet,'shape')
         
         # surely there's a way to get an array of 0s for each element without
         # looping? (probably had same question for distributionmatrix).
         for sheet in self.sheets_to_measure():
-            grid[sheet]= numpy.ones(sheet.activity.shape,dtype=object) 
+            self._featureresponses[sheet]= numpy.ones(sheet.activity.shape,dtype=object) 
             rows,cols = sheet.activity.shape
             for r in range(rows):
                 for c in range(cols):
-                    grid[sheet][r,c] = numpy.zeros(self.input_sheet.shape) # need to specify dtype?
+                    self._featureresponses[sheet][r,c] = numpy.zeros(self.input_sheet.shape) # need to specify dtype?
         
+
+    def collect_feature_responses(self,pattern_presenter,param_dict,display,feature_values):
+        self.measure_responses(pattern_presenter,param_dict,feature_values,display)
+
+        for sheet in self.sheets_to_measure():
+            rows,cols = sheet.activity.shape
+            input_bounds = self.input_sheet.bounds
+            input_sheet_view_dict = self.input_sheet.sheet_view_dict
+
+            for ii in range(rows):
+                for jj in range(cols):
+                    view = SheetView((self._featureresponses[sheet][ii,jj],input_bounds),
+                                     sheet.name,sheet.precedence,topo.sim.time())
+                    x,y = sheet.matrixidx2sheet(ii,jj)
+                    key = ('RFs',sheet.name,x,y)
+                    input_sheet_view_dict[key]=view
+
+                    
+    
 
     def measure_responses(self,pattern_presenter,param_dict,features,display):
         """Present the given input patterns and collate the responses."""
@@ -256,7 +270,7 @@ class ReverseCorrelation(FeatureResponses):
             rows,cols = sheet.activity.shape
             for ii in range(rows): 
                 for jj in range(cols):
-                    grid[sheet][ii,jj]+=sheet.activity[ii,jj]*self.input_sheet.activity
+                    self._featureresponses[sheet][ii,jj]+=sheet.activity[ii,jj]*self.input_sheet.activity
 
 
 

@@ -303,6 +303,7 @@ class Subplotting(ParameterizedObject):
 # Module variables for passing values to the commands.
 coordinate = (0,0)
 sheet_name = ''
+input_sheet_name = ''
 proj_coords=[(0,0)]
 proj_name =''
 
@@ -353,7 +354,7 @@ def update_activity():
         new_view = SheetView((activity_copy,sheet.bounds),
                               sheet.name,sheet.precedence,topo.sim.time())
         sheet.sheet_view_dict['Activity']=new_view
-    
+
 
 ###############################################################################
 from topo.plotting.plotgroup import ConnectionFieldsPlotGroup
@@ -472,16 +473,17 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
 
 
 ###############################################################################
-pg= create_plotgroup(name='Receptive Fields',category="Other",
-           doc='Measure receptive fields.',
-           update_command='measure_rfs(input_sheet=topo.sim["Retina"])',
-           plot_command='plotrctg()',
-           normalize=True)
+pg= create_plotgroup(name='RF Projection',category="Other",
+    doc='Measure receptive fields.',
+    update_command='measure_rfs()',
+    plot_command='',
+    normalize=True)
+pg.add_plot('RFs',[('Strength','RFs')])
 
-# CEB: Could provide a default option for the input_sheet by making it
-# accept input_sheet_name instead, defaulting to 'Retina'.  We would
-# then look up the sheet with topo.sim[input_sheet_name].
-def measure_rfs(input_sheet,divisions=10,scale=30.0,offset=0.5,display=False,
+
+# RFHACK: good luck figuring out that you have to set topo.commands.analysis.input_sheet_name
+# to use this command...
+def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
                 pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),True,duration=1.0),
                 x_range=(-0.2,0.2),y_range=(-0.2,0.2)):
     """
@@ -503,6 +505,10 @@ def measure_rfs(input_sheet,divisions=10,scale=30.0,offset=0.5,display=False,
     should be set high enough that the target units activate at least
     some of the time there is a pattern on the input.
     """
+    input_sheet = topo.sim[input_sheet_name]
+
+    # CBERRORALERT: pattern's actually being presented on all GeneratorSheets.
+    # NEed to alter PatternPresenter to accpet an input sheet.
 
     # CEBALERT: various things in here need to be arguments
 
@@ -526,11 +532,13 @@ def measure_rfs(input_sheet,divisions=10,scale=30.0,offset=0.5,display=False,
         param_dict = {"size":size,"scale":scale,"offset":offset}
 
         x=ReverseCorrelation(feature_values,input_sheet=input_sheet) #+change argument
-        x.measure_responses(pattern_presenter,param_dict,feature_values,display)
-     
+        x.collect_feature_responses(pattern_presenter,param_dict,display,feature_values)
+
+
 
 ###############################################################################
-pg= create_plotgroup(name='Receptive Fields noise',category="Other",
+# RFHACK: not updated
+pg= create_plotgroup(name='Receptive Field noise',category="Other",
            doc='Measure receptive fields by reverse correlation using random noise.',
            update_command='measure_rfs_noise(input_sheet=topo.sim["Retina"])',
            plot_command='plotrctg()',normalize=True)
