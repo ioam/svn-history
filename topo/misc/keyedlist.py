@@ -87,6 +87,9 @@ class KeyedList(list):
     # KeyError, when there is no item by that name?  Is that often
     # useful?  If not, change this to raise a KeyError, and remove
     # the one raised in __getitem__.
+    # CB: shouldn't this method match dict.get(), which does return
+    # None (or some other specified default value) when there's no
+    # matching key?
     def get(self, key, default=None):
         """
         Get the value with the specified key.
