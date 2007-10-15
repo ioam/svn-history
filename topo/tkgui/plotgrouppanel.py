@@ -33,6 +33,8 @@ from topo.plotting.plotgroup import PlotGroup,SheetPlotGroup
 
 from topo.commands.pylabplots import matrixplot
 
+from topo.sheets.generatorsheet import GeneratorSheet
+
 from widgets import Menu
 from tkparameterizedobject import ButtonParameter, TkParameterizedObject
 
@@ -697,14 +699,17 @@ class SheetPGPanel(PlotGroupPanel):
         self.__showhide("connection_fields",show_cfs)
 
     def check_for_rfs(self,plot):
-        # Note we've lost this prompt for the user:
-        # "No RF measurements are available yet; run the Receptive Field plot before accessing this right-click menu option.")
         show_rfs = False
         if plot.plot_src_name in topo.sim.objects():
             sheet = topo.sim[plot.plot_src_name]
-            # RFHACK: if a generatorsheet has RF views, then enable the menu option
-            #if sheet in topo.analysis.featureresponses.grid:
-            show_rfs = True
+
+            # RFHACK: if any one generatorsheet has RF views for this sheet, then enable the menu option
+            # At the moemnt, njust a hack to prevent menu option for generator sheets.
+            if not isinstance(sheet,GeneratorSheet):
+                show_rfs = True
+            else:
+                show_rfs = False
+
         self.__showhide("receptive_field",show_rfs)
 
     def __showhide(self,name,show):
@@ -756,17 +761,16 @@ class SheetPGPanel(PlotGroupPanel):
             sheet = topo.sim[plot.plot_src_name]
             r,c = sheet.sheet2matrixidx(x,y)
             new_x,new_y= sheet.matrixidx2sheet(r,c)
-
+            
             # RFHACK:
-##                         matrixplot(topo.analysis.featureresponses.grid[sheet][x,y],
-##                        title=("Receptive Field",sheet.name,x,y))
-
-            # matrixplot for whatever generatorsheets ahve the views
-##             for g in topo.sim.objects(GeneratorSheet):
-##                 try:
-##                     matrixplot(g)
-                       
-
+            # just matrixplot for whatever generatorsheets ahve the views
+            for g in topo.sim.objects(GeneratorSheet).values():
+                try:
+                    matrixplot(g.sheet_view_dict[('RFs',sheet.name,new_x,new_y)].view()[0],
+                               title=("Receptive Field",sheet.name,new_x,new_y))                       
+                except:
+                    # maybe lose this warning
+                    topo.sim.warning("No RF measurements are available yet for input_sheet %s; run the Receptive Field plot for that input_sheet to see the RF."%g.name)
 
     def conditional_refresh(self):
         """
