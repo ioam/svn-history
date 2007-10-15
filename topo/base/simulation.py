@@ -65,6 +65,8 @@ from parameterizedobject import ParameterizedObject, Parameter
 from parameterclasses import Number, BooleanParameter, StringParameter, wrap_callable
 from copy import copy, deepcopy
 from fixedpoint import FixedPoint
+
+import parameterizedobject
 import bisect
 
 SLEEP_EXCEPTION = "Sleep Exception"
@@ -946,6 +948,9 @@ class Simulation(ParameterizedObject):
 
         if self.register:
             SimSingleton().change_sim(self)
+            # Set up debugging messages to include the simulator time
+            parameterizedobject.dbprint_prefix= \
+               (lambda: "Time: "+self.timestr()+" ")
 
         self.events = []
         self._events_stack = []

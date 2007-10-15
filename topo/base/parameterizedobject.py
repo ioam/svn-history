@@ -611,6 +611,15 @@ class ParameterizedObjectMetaclass(type):
 script_repr_suppress_defaults=Parameter(True, hidden=True, doc="""
     Whether script_repr should avoid reporting the values of parameters
     that are just inheriting their values from the class defaults.""")
+
+
+dbprint_prefix=Parameter(None, hidden=True, doc="""
+    If not None, the value of this Parameter will be called (using '()')
+    before every call to __db_print, and is expected to evaluate to a
+    string that is suitable for prefixing messages and warnings (such
+    as some indicator of the global state).""")
+
+
     
 
 class ParameterizedObject(object):
@@ -769,7 +778,14 @@ class ParameterizedObject(object):
         """
         if level <= max(min_print_level,self.print_level):
             s = ' '.join([str(x) for x in args])
-            print "%s: %s" % (self.name,s)
+            
+            if dbprint_prefix:
+                prefix=dbprint_prefix()
+            else:
+                prefix=""
+                
+            print "%s%s: %s" % (prefix,self.name,s)
+            
         sys.stdout.flush()
 
 
