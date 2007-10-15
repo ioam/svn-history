@@ -481,8 +481,6 @@ pg= create_plotgroup(name='RF Projection',category="Other",
 pg.add_plot('RFs',[('Strength','RFs')])
 
 
-# RFHACK: good luck figuring out that you have to set topo.commands.analysis.input_sheet_name
-# to use this command...
 def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
                 pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),True,duration=1.0),
                 x_range=(-0.2,0.2),y_range=(-0.2,0.2)):
@@ -505,10 +503,16 @@ def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
     should be set high enough that the target units activate at least
     some of the time there is a pattern on the input.
     """
+    
+    # RFHACK: Should improve how parameters are passed, and add a
+    # default value for this parameter
+    if not input_sheet_name:
+        raise ValueError("Must set topo.commands.analysis.input_sheet_name before calling measure_rfs")
+    
     input_sheet = topo.sim[input_sheet_name]
 
     # CBERRORALERT: pattern's actually being presented on all GeneratorSheets.
-    # NEed to alter PatternPresenter to accpet an input sheet. For 0.9.4 need
+    # Need to alter PatternPresenter to accept an input sheet. For 0.9.4 need
     # to document that same pattern is drawn on all generator sheets.
 
     # CEBALERT: various things in here need to be arguments
@@ -585,7 +589,7 @@ def measure_cog(proj_name ="Afferent"):
     Calculate center of gravity (CoG) for each CF of each unit in each CFSheet.
 
     Unlike measure_position_pref and other measure commands, this one
-    does not work by collate the responses to a set of input patterns.
+    does not work by collating the responses to a set of input patterns.
     Instead, the CoG is calculated directly from each set of afferent
     weights.  The CoG value thus is an indirect estimate of what
     patterns the neuron will prefer, but is not limited by the finite
