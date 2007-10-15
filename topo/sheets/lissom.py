@@ -143,8 +143,7 @@ class JointNormalizingCFSheet(CFSheet):
                 normtype='Joint'
                 self.compute_joint_norm_totals(projlist,mask)
 
-            self.debug("Time " + self.simulation.timestr() + ": " + normtype +
-                       "ly normalizing:")
+            self.debug(normtype + "ly normalizing:")
 
             for p in projlist:
                 p.apply_learn_output_fn(mask)

@@ -36,8 +36,7 @@ class PulseGenerator(EventProcessor):
 
     def input_event(self,conn,data):
         """On input from self, generate output. Ignore all other inputs."""
-        self.verbose("Time " + str(self.simulation.timestr()) + ":" +
-                     " Received event from ",conn.src,'on port',conn.dest_port,'with data',data)
+        self.verbose("Received event from ",conn.src,'on port',conn.dest_port,'with data',data)
         self.send_output(data=self.amplitude)
 
     def start(self):
@@ -68,8 +67,7 @@ class ThresholdUnit(EventProcessor):
     def input_event(self,conn,data):
         if conn.dest_port == 'input':
             self.accum += data
-            self.verbose("Time " + str(self.simulation.time()) + ":" +
-                         " Received ",data,"; accumulator now",self.accum)
+            self.verbose("Received ",data,"; accumulator now",self.accum)
             if self.accum > self.threshold:
                 self.send_output(data=self.amplitude)
                 self.accum = 0

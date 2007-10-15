@@ -206,8 +206,7 @@ class ProjectionSheet(Sheet):
         Accept input from some sheet.  Call .present_input() to
         compute the stimulation from that sheet.
         """
-        self.verbose("Time " + str(self.simulation.time()) + ":" +
-                     " Received input from " + str(conn.src.name) +
+        self.verbose("Received input from " + str(conn.src.name) +
                      " on dest_port " + str(conn.dest_port) +
                      " via connection " + conn.name + ".")
         self.present_input(data,conn)

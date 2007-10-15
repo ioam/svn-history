@@ -306,8 +306,7 @@ class EventProcessor(ParameterizedObject):
                                  if self._port_match(conn.src_port,[src_port])]
 
         for conn in out_conns_on_src_port:
-            self.verbose("Time " + str(self.simulation.time()) + ":" +
-                         " Sending output on src_port " + str(src_port) +
+            self.verbose("Sending output on src_port " + str(src_port) +
                          " via connection " + conn.name +
                          " to " + conn.dest.name + ".")
             e=EPConnectionEvent(conn.delay+self.simulation.time(),conn,data)
@@ -602,8 +601,8 @@ class CommandEvent(Event):
         # Presumably here to avoid importing __main__ into the rest of the file
         import __main__
 
-        ParameterizedObject(name='CommandEvent').message("Time %s: Running command %s" \
-                                                         % (sim.timestr(),self.command_string))
+        ParameterizedObject(name='CommandEvent').message("Running command %s" \
+                                                         % (self.command_string))
         
         try:
             exec self.command_string in __main__.__dict__
@@ -1149,8 +1148,7 @@ class Simulation(ParameterizedObject):
 
                 if did_event:
                     did_event = False
-                    self.debug("Time to sleep. Current time =",self._time,
-                               ".  Next event time =",self.events[0].time)
+                    self.debug("Time to sleep; next event time: %s",self.timestr(self.events[0].time))
                     for ep in self._event_processors.values():
                         ep.process_current_time()
                     
