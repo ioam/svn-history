@@ -9,7 +9,7 @@ __version__='$Revision$'
 import ImageTk
 ### JCALERT! Try not to have to use chain and delete this import.
 from itertools import chain
-from Tkinter import Canvas, FLAT 
+from Tkinter import Canvas, FLAT, Label, NSEW
 
 import topo
 
@@ -249,7 +249,20 @@ class TwoDThingPanel(ProjectionSheetPGPanel):
         """
         Do not display a label for each plot.
         """
-        pass
+
+        if len(self.canvases) == 0:
+            # If there are no plots yet, tell the user what to do.
+            self.plot_labels=[Label(self.plot_frame,
+                                    text=self.no_plot_note_text,
+                                    justify='center')]
+
+            self.plot_labels[0].grid(row=1,column=0,sticky=NSEW)
+        else:
+            # else remove the instruction
+            for l in self.plot_labels:
+                l.grid_forget()
+            self.plot_labels=[]
+            
 
 
 
