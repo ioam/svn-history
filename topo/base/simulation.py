@@ -607,7 +607,7 @@ class CommandEvent(Event):
             exec self.command_string in __main__.__dict__
             
         except Exception, err:
-            ParameterizedObject(name='CommandEvent').warning(`self`+' was not executed because it would cause an error - '+`err`+': "' +err[0]+'".')
+            ParameterizedObject(name='CommandEvent').warning(`self`+' was not executed because it would cause an error - '+`err`+': "' +`err[0]`+'".')
         
     def __test(self):
         """
@@ -630,7 +630,7 @@ class CommandEvent(Event):
             # CEBALERT: why don't the offset and text attributes contain anything?
             # print err.filename,err.lineno,err.offset,err.text
             # (same above in __call__() - why don't some of the attributes contain anything?)
-            ParameterizedObject(name='CommandEvent').warning('The scheduled command "'+self.command_string+'" will not be executed because it contains a syntax error: "'+err[0]+'".')
+            ParameterizedObject(name='CommandEvent').warning('The scheduled command "'+self.command_string+'" will not be executed because it contains a syntax error: "'+`err[0]`+'".')
         except:
             pass
         
