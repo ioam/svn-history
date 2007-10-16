@@ -304,6 +304,14 @@ class SheetCoordinateSystem(object):
         return round(x,10),round(y,10)
 
 
+    def closest_cell_center(self,x,y):
+        """
+        Given arbitary sheet coordinates, return the sheet coordinates
+        of the center of the closest unit.
+        """
+        return self.matrixidx2sheet(self.sheet2matrixidx(x,y))
+
+
     def matrixidx2sheet_array(self,row,col):
         """
         matrixidx2sheet() but for arrays.
