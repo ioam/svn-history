@@ -74,6 +74,10 @@ Maybe it's getting daunting?
 Finishing cleaning up associated code (maybe mostly for Jim to do?).
 Could eventually use STRFPAK or a similar approach.
 
+<H4>2007/10/16: Prepare windows version</H4>
+Need to make python_topo and upload it (since external packages have
+changed). For some reason, the new pybwidget won't unzip on Windows.
+
 
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
