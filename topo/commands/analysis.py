@@ -508,9 +508,9 @@ def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
     # default value for this parameter
     if not input_sheet_name:
         raise ValueError("Must set topo.commands.analysis.input_sheet_name before calling measure_rfs")
-    
-    input_sheet = topo.sim[input_sheet_name]
 
+    input_sheet = topo.sim[input_sheet_name]
+    
     # CBERRORALERT: pattern's actually being presented on all GeneratorSheets.
     # Need to alter PatternPresenter to accept an input sheet. For 0.9.4 need
     # to document that same pattern is drawn on all generator sheets.
@@ -528,7 +528,6 @@ def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
     
     if divisions <= 0:
         raise ValueError("Divisions must be greater than 0")
-
     else:
         feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
                           Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
@@ -542,23 +541,27 @@ def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
 
 
 ###############################################################################
-# RFHACK: not updated
-pg= create_plotgroup(name='Receptive Field noise',category="Other",
+pg= create_plotgroup(name='RF Projection (noise)',category="Other",
            doc='Measure receptive fields by reverse correlation using random noise.',
-           update_command='measure_rfs_noise(input_sheet=topo.sim["Retina"])',
-           plot_command='plotrctg()',normalize=True)
-
+           update_command='measure_rfs_noise()',
+           plot_command='',normalize=True)
+pg.add_plot('RFs',[('Strength','RFs')])
 
 ### JABALERT: Why is the scale and offset set twice?                                    
-def measure_rfs_noise(input_sheet,divisions=99,scale=0.5,offset=0.5,display=False,
+def measure_rfs_noise(divisions=99,scale=0.5,offset=0.5,display=False,
                       pattern_presenter=PatternPresenter(GaussianRandom(scale=0.5,offset=0.5),True,duration=1.0),
                       x_range=(-1.0,1.0),y_range=(-1.0,1.0)):
     """Map receptive field on a GeneratorSheet using Gaussian noise inputs."""
 
+    # RFHACK: Should improve how parameters are passed, and add a
+    # default value for this parameter
+    if not input_sheet_name:
+        raise ValueError("Must set topo.commands.analysis.input_sheet_name before calling measure_rfs")
 
+    input_sheet = topo.sim[input_sheet]
+    
     if divisions <= 0:
         raise ValueError("Divisions must be greater than 0")
-
     else:
         feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
                           Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]   
@@ -566,8 +569,7 @@ def measure_rfs_noise(input_sheet,divisions=99,scale=0.5,offset=0.5,display=Fals
         param_dict = {"scale":scale,"offset":offset}
 
         x=ReverseCorrelation(feature_values,input_sheet=input_sheet)
-        x.measure_responses(pattern_presenter,param_dict,feature_values,display)
-
+        x.collect_feature_responses(pattern_presenter,param_dict,display,feature_values)
 
 
 
