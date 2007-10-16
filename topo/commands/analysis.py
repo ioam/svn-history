@@ -640,7 +640,7 @@ pg= create_plotgroup(name='RF Center of Gravity',category="Preference Maps",
             doc="""Measure the center of gravity of each Receptive
             Field of a sheet.  Requires measure_rfs() to have been
             called previously for that sheet.""",
-            update_command='measure_rfcog()',
+            update_command='measure_rfcog(sheet_name="V1",input_sheet_name="Retina")',
             plot_command='topographic_grid(xsheet_view_name="XRFCoG",ysheet_view_name="YRFCoG")',
             normalize=True)
 pg.add_plot('X RF CoG',[('Strength','XRFCoG')])
@@ -649,7 +649,7 @@ pg.add_plot('RFCoG',[('Red','XRFCoG'),('Green','YRFCoG')])
 
 
 
-def measure_rfcog():
+def measure_rfcog(sheet_name='V1',input_sheet_name='Retina'):
    """
    Calculate center of gravity (CoG) for each RF of the specified sheet.
 
@@ -657,8 +657,8 @@ def measure_rfcog():
    measure_rfs().  The CoG is then calculated as in measure_cog().
 
    At present, the names of the input and target sheets to use must
-   be specified in the argument to this function, and a model using
-   any other name must specify that explicitly when this function is
+   be specified in the arguments to this function, and a model using
+   any other names must specify those explicitly when this function is
    called.
    """
    sheet = topo.sim.objects(CFSheet)[sheet_name]
@@ -671,11 +671,14 @@ def measure_rfcog():
    for r in xrange(rows):
        for c in xrange(cols):
            x,y = sheet.matrixidx2sheet(r,c)
-           rf=input_sheet.sheet_view_dict[('RFs',sheet.name,x,y)].view()[0]
-           import __main__; __main__.__dict__['RF']=rf
+           sv = input_sheet.sheet_view_dict.get(('RFs',sheet.name,x,y))
+           if sv is None:
+              topo.sim.warning("measure_rfs() must first be called for input_sheet %s"%input_sheet.name)
+              return
+           
+           rf=sv.view()[0]
            
            row_centroid,col_centroid = centroid(rf)
-
            xcentroid,ycentroid =input_sheet.matrix2sheet(row_centroid+0.5,
                                                          col_centroid+0.5)
            
