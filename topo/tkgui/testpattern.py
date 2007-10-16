@@ -57,8 +57,6 @@ class TestPatternPlotGroup(SheetPlotGroup):
 
 class TestPattern(SheetPanel):
 
-    plotgroup_type = TestPatternPlotGroup
-
     edit_sheet = ObjectSelectorParameter(doc="""Sheet for which to edit pattern properties.""")
 
     learning = BooleanParameter(default=False,doc="""Whether to enable learning during presentation.""")
