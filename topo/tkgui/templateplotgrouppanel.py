@@ -216,20 +216,20 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
     # CB: these methods assume channel has a view (the menu only displays those that do)
     def __fft(self,channel):
         plot = self._right_click_info['plot']
-        description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
+        description = "%s %s at time %s" % (plot.plot_src_name, plot.name, topo.sim.timestr())
         m=plot._get_matrix(channel)
         fft_plot=1-abs(fftshift(fft2(m-0.5, s=None, axes=(-2,-1))))
         topo.commands.pylabplots.matrixplot(fft_plot, title="FFT Plot: " + description)        
 
     def __histogram(self,channel):
         plot = self._right_click_info['plot']
-        description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
+        description = "%s %s at time %s" % (plot.plot_src_name, plot.name, topo.sim.timestr())
         m=plot._get_matrix(channel)
         topo.commands.pylabplots.histogramplot(m,title="Histogram: "+ description)
 
     def __gradient(self,channel):
         plot = self._right_click_info['plot']
-        description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
+        description = "%s %s at time %s" % (plot.plot_src_name, plot.name, topo.sim.timestr())
         m=plot._get_matrix(channel)
         view = plot.view_dict[plot.channels[channel]]
         topo.commands.pylabplots.gradientplot(m,title="Gradient: " + description,
@@ -237,20 +237,20 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
     def __print_matrix(self,channel):
         plot = self._right_click_info['plot']
-        description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
+        description = "%s %s at time %s" % (plot.plot_src_name, plot.name, topo.sim.timestr())
         print ("#" + description)
         m=plot._get_matrix(channel)
         print m
 
     def __plot_matrix(self,channel):
         plot = self._right_click_info['plot']
-        description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
+        description = "%s %s at time %s" % (plot.plot_src_name, plot.name, topo.sim.timestr())
         m=plot._get_matrix(channel)
         topo.commands.pylabplots.matrixplot(m, title=description)
 
     def __plot_matrix3d(self,channel):
         plot = self._right_click_info['plot']
-        description = "%s %s at time %0.2f" % (plot.plot_src_name, plot.name, topo.sim.time())
+        description = "%s %s at time %s" % (plot.plot_src_name, plot.name, topo.sim.timestr())
         m=plot._get_matrix(channel)
         topo.commands.pylabplots.matrixplot3d(m, title=description)
 
@@ -260,7 +260,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
     def __print_info(self,channel=None):
         plot = self._right_click_info['plot']
         (r,c),(x,y) = self._right_click_info['coords']
-        description ="%s %s, row %d, col %d at time %0.2f: " % (plot.plot_src_name, plot.name, r, c, topo.sim.time())
+        description ="%s %s, row %d, col %d at time %s: " % (plot.plot_src_name, plot.name, r, c, topo.sim.timestr())
 
         channels_info = ""
         if channel is None:

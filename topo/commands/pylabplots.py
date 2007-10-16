@@ -296,7 +296,7 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
             # what the actual possible range is for this simulation (which would presumably
             # be the maximum size of any GeneratorSheet?).
             pylab.axis(axis)
-            windowtitle('Topographic mapping to '+sheet.name+' at time '+str(topo.sim.time()))
+            windowtitle('Topographic mapping to '+sheet.name+' at time '+topo.sim.timestr())
 
             # Will need to provide a way to save this output
             # when there is no GUI
@@ -357,7 +357,7 @@ def or_tuning_curve(x_axis,plot_type,unit):
     pylab.ylabel('Response')
     pylab.xlabel(x_axis.capitalize()+' ('+unit+')')
     pylab.title('Sheet '+topo.commands.analysis.sheet_name+', coordinate(x,y)='+'('+
-	 	str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+str(topo.sim.time()))
+	 	str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+topo.sim.timestr())
     manager.window.title(topo.sim.name+': '+x_axis.capitalize()+' Tuning Curve')
 
     def rotate(seq, n=1):
@@ -418,7 +418,7 @@ def tuning_curve(x_axis,plot_type,unit):
     pylab.ylabel('Response')
     pylab.xlabel(x_axis.capitalize()+' ('+unit+')')
     pylab.title('Sheet '+topo.commands.analysis.sheet_name+', coordinate(x,y)='+'('+
-	 	str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+str(topo.sim.time()))
+	 	str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+topo.sim.timestr())
     manager.window.title(topo.sim.name+': '+x_axis.capitalize()+' Tuning Curve')
 
 
