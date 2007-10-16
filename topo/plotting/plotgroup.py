@@ -25,8 +25,8 @@ from topo.misc.keyedlist import KeyedList
 from topo.misc.filepaths import resolve_path
 
 from plot import make_template_plot, Plot
-
 from plotfilesaver import PlotGroupSaver,CFProjectionPlotGroupSaver
+
 
 def cmp_plot(plot1,plot2):
     """
@@ -440,9 +440,9 @@ class TemplatePlotGroup(SheetPlotGroup):
 	
     def _plot_list(self):
 	plot_list = self.plot_list
-        for each in self._sheets():
+        for sheet in self._sheets():
 	    for (pt_name,pt) in self.plot_templates:
-		plot_list = plot_list + self._create_plots(pt_name,pt,each)
+		plot_list = plot_list + self._create_plots(pt_name,pt,sheet)
     	return plot_list
 
 
@@ -462,13 +462,12 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
     """
     _abstract_class_name = "ProjectionSheetPlotGroup"
 
-    keyname = "ProjectionSheet" 
+    keyname = "ProjectionSheet" # CB: what is this keyname?
 
     sheet = ObjectSelectorParameter(default=None,doc="""
     The Sheet from which to produce plots.""")
 
     sheet_type = ProjectionSheet
-
 
     def _check_sheet_type(self):
         if not isinstance(self.sheet,self.sheet_type):
@@ -555,7 +554,6 @@ class TwoDThingPlotGroup(ProjectionSheetPlotGroup):
         super(TwoDThingPlotGroup,self).__init__(**params)
         self.height_of_tallest_plot = 5 # Initial value
         
-
         ### JCALERT! shape determined by the plotting density
         ### This is set by self.generate_coords()
         self.proj_plotting_shape = (0,0)
@@ -638,13 +636,7 @@ class ProjectionPlotGroup(TwoDThingPlotGroup):
     sheet_type = Sheet
     projection_type = Projection
 
-
-    def _check_projection_type(self):
-        pass
-
-
     def _exec_update_command(self):
-        self._check_projection_type()
         topo.commands.analysis.proj_coords = self.generate_coords()
         topo.commands.analysis.proj_name = self.projection.name
         super(ProjectionPlotGroup,self)._exec_update_command()
@@ -657,7 +649,7 @@ class ProjectionPlotGroup(TwoDThingPlotGroup):
         return plot_channels
 
 
-    # needsupdate
+    # CEBALERT: untried
     def _create_plots(self,pt_name,pt,sheet):
 	projection = self.projection
         plot_list=[]
