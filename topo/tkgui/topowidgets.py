@@ -49,13 +49,11 @@ class TkguiWindow(Tkinter.Toplevel):
 
 ######################################################################
 
-import time
 
 ######################################################################
 # CB: needs significant cleanup. Some methods will move to
-# the resizable frame. Remaining problem: resizing by hand
-# "too fast" causes window to jump back to automatic size.
-# Probably need to consider performance in the cleanup.
+# the resizable frame. 
+# Also see current task list.
 class ScrolledTkguiWindow(TkguiWindow):
     """
     A TkguiWindow with automatic scrollbars.
@@ -73,8 +71,6 @@ class ScrolledTkguiWindow(TkguiWindow):
         self.content.title = self.title
 
         
-### hacktastic
-# (Here's why:
 # The ScrolledTkguiWindow receives 100s of <Configure> events in a
 # short time when a button like "Enlarge" is pressed.  I *guess* this
 # is because there are lots of widgets in the window, and each time
@@ -89,31 +85,11 @@ class ScrolledTkguiWindow(TkguiWindow):
 # delayed_sizeright() to be called a time t after a <Configure> event;
 # delayed_sizeright() in turn only calls sizeright() if the time
 # since the last <Configure> is (about) the same as t.
-#
-# We could achive the same thing with after_idle(), which waits until
-# the Tkinter event queue is empty before executing its callback.
-# But it turns out the technique above has a useful side effect:
-# when a user resizes the window, ... 
         self.bind("<Configure>",self.handle_configure_event)
 
     def handle_configure_event(self,e=None):
-        self.__last_config_event_time = time.time()
-        # after_idle() is unlikely to work on OS X, according to
-        # various sources on the web
-        #self.after_idle(self.sizeright)
-
-        # after() is unlikely to work on OS X, according to
-        # various sources on the web
-        # self.after(1,self.delayed_sizeright)
-        #return ""
-
-    
-
-    def delayed_sizeright(self):
-        if time.time()-self.__last_config_event_time > 0.00099:
-            self.sizeright()
-### hacktastic
-
+        self.after_idle(self.sizeright)
+        #return ""    
 
     def _need_bars(self):
         sw = self._scroll_frame._scrolled_window
@@ -126,7 +102,6 @@ class ScrolledTkguiWindow(TkguiWindow):
                abs(sw.winfo_height()-c.winfo_reqheight())>1:
             need_y=True
         return need_x,need_y
-
 
     def _which_scrollbars(self):
         need_x,need_y = self._need_bars()
