@@ -219,8 +219,12 @@ class SheetPlotGroup(PlotGroup):
         time advances.  The default is False, because many plots are
         slow to generate (e.g. most preference map plots).""")
 
-
-    # CEBALERT: if keeping this, need to add to other contructors.
+    # CEBALERT: SheetPlotGroup works on a list of sheets, and so does TemplatePlotGroup.
+    # (TestPattern uses this to set its own list of sheets.) The classes after TemplatePlotGroup
+    # (ProjectionSheetPlotGroup onwards) work on a *single* sheet. Having a sheets attribute is
+    # confusing. How do we get round this?
+    # is either the list of sheets passed in to __init__, or all the sheets in the
+    # simulation by default. (TestPattern uses
     def __init__(self,sheets=None,**params):
         self.sheets = sheets
         super(SheetPlotGroup,self).__init__(**params)
@@ -286,7 +290,7 @@ class SheetPlotGroup(PlotGroup):
             ### Specifically, a weights plot with situate=False
             ### doesn't use the Sheet bounds, and so the
             ### minimum_height is significantly overstated.
-            sheets = topo.sim.objects(Sheet)
+            sheets = dict([(sheet.name,sheet) for sheet in self._sheets()])
             max_sheet_height = max([(sheets[p.plot_src_name].bounds.lbrt()[3]-
                                      sheets[p.plot_src_name].bounds.lbrt()[1])
                                    for p in resizeable_plots])
