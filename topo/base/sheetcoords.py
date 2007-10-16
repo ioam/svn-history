@@ -309,7 +309,7 @@ class SheetCoordinateSystem(object):
         Given arbitary sheet coordinates, return the sheet coordinates
         of the center of the closest unit.
         """
-        return self.matrixidx2sheet(self.sheet2matrixidx(x,y))
+        return self.matrixidx2sheet(*self.sheet2matrixidx(x,y))
 
 
     def matrixidx2sheet_array(self,row,col):
