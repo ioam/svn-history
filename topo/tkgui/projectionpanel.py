@@ -9,16 +9,13 @@ __version__='$Revision$'
 import ImageTk
 ### JCALERT! Try not to have to use chain and delete this import.
 from itertools import chain
-from Tkinter import Canvas, FLAT, Label, NSEW
+from Tkinter import Canvas, Label
 
 import topo
 
-from topo.base.cf import CFSheet, CFProjection
+from topo.base.cf import CFProjection
 from topo.base.projection import ProjectionSheet
 from topo.base.parameterclasses import BooleanParameter
-
-from topo.plotting.plotgroup import CFProjectionPlotGroup,ProjectionSheetPlotGroup, \
-     ProjectionActivityPlotGroup,ConnectionFieldsPlotGroup
 
 from templateplotgrouppanel import TemplatePlotGroupPanel
 
@@ -98,6 +95,7 @@ class ProjectionSheetPanel(TemplatePlotGroupPanel):
         self.plotgroup.sheet = sheets[0] # CB: necessary?
 
 
+    # CB: dynamic info not finished: see current tasks
     def _update_dynamic_info(self,e):
         self.messageBar.message('state',"")
 
@@ -109,8 +107,6 @@ class ProjectionActivityPanel(ProjectionSheetPanel):
     def __init__(self,console,master,plotgroup,**params):       
         super(ProjectionActivityPanel,self).__init__(console,master,plotgroup,**params)
         self.auto_refresh = True
-        # CB: why do we do this?
-	self.plotgroup.name='ProjectionActivity'
 
     def _plot_title(self):
         return "Activity in Projections to %s at time %s"%(self.plotgroup.sheet.name,topo.sim.timestr(self.plotgroup.time))
@@ -192,14 +188,6 @@ class ConnectionFieldsPanel(UnitsPanel):
                + topo.sim.timestr(self.plotgroup.time)
 
 
-## class ReceptiveFieldPanel(UnitsPanel):
-
-##     def _plot_title(self):
-##         return 'RF %s,%s of %s on %s at time %s'%(self.plotgroup.x,self.plotgroup.y,
-##                                                   self.sheet.name,self.plotgroup.input_sheet.name,
-##                                              topo.sim.timestr(self.plotgroup.time))
-
-
 
 # CEBALERT: change the name
 class TwoDThingPanel(ProjectionSheetPanel):
@@ -234,7 +222,7 @@ class TwoDThingPanel(ProjectionSheetPanel):
             canvas.create_image(image.width()/2+BORDERWIDTH+1,
                                 image.height()/2+BORDERWIDTH+1,
                                 image=image)
-            canvas.config(highlightthickness=0,borderwidth=0,relief=FLAT)
+            canvas.config(highlightthickness=0,borderwidth=0,relief='flat')
             canvas.create_rectangle(1, 1, image.width()+BORDERWIDTH*2,
                                     image.height()+BORDERWIDTH*2,
                                     width=BORDERWIDTH,outline="black")
@@ -256,7 +244,7 @@ class TwoDThingPanel(ProjectionSheetPanel):
                                     text=self.no_plot_note_text,
                                     justify='center')]
 
-            self.plot_labels[0].grid(row=1,column=0,sticky=NSEW)
+            self.plot_labels[0].grid(row=1,column=0,sticky='nsew')
         else:
             # else remove the instruction
             for l in self.plot_labels:
@@ -265,8 +253,6 @@ class TwoDThingPanel(ProjectionSheetPanel):
             
 
 
-
-# RFHACK: neeed to display 'press refresh' text if there's no data 
 class RFProjectionPanel(TwoDThingPanel):
 
     def __init__(self,console,master,plotgroup,**params):
@@ -326,7 +312,7 @@ class ProjectionPanel(TwoDThingPanel):
         self.plotgroup.params()['projection'].objects = prjns
         self.plotgroup.projection = prjns[0]
 
-    # CEBALERT: here and for other such lists, make things get sorted by precedence.
+
     def refresh_projections(self):
         self.populate_projection_param()
 
@@ -335,7 +321,7 @@ class ProjectionPanel(TwoDThingPanel):
         # Or search the web for a way to alter the list in the tkinter one.
         # Currently, replace widget completely: looks bad and is complex.
         # When fixing, remove try/except marked by the 'for projectionpanel' CEBALERT in
-        # tkparameterizedobject.py
+        # tkparameterizedobject.py.
         if 'projection' in self.representations:
             w  = self.representations['projection']['widget']
             l  = self.representations['projection']['label']
@@ -346,17 +332,11 @@ class ProjectionPanel(TwoDThingPanel):
 
 
             
-
-
-
 class CFProjectionPanel(ProjectionPanel):
     """
     Panel for displaying CFProjections.
     """
     def populate_projection_param(self):
-        # JPHACKALERT: Note that CFSheet can have projections that are not
-        # CFProjections (e.g., OneToOneProjections), if there exists a
-        # way of plotting them, they should be plotted.
         prjns = [x for x in self.plotgroup.sheet.projections().values()
                  if isinstance(x,CFProjection)]
         self.plotgroup.params()['projection'].objects = prjns
