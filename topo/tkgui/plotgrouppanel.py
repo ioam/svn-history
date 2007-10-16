@@ -764,14 +764,14 @@ class SheetPanel(PlotGroupPanel):
             sheet = topo.sim[plot.plot_src_name]
             r,c = sheet.sheet2matrixidx(x,y)
             new_x,new_y= sheet.matrixidx2sheet(r,c)
-            
+
             # RFHACK:
             # just matrixplot for whatever generatorsheets have the views
             for g in topo.sim.objects(GeneratorSheet).values():
                 try:
                     view=g.sheet_views[('RFs',sheet.name,new_x,new_y)]
                     matrixplot(view.view()[0],
-                               title=("Receptive Field of %s unit (%d,%d) at time %s"% (sheet.name,new_x,new_y,topo.sim.timestr(view.timestamp))))
+                               title=("Receptive Field of %s unit (%s,%s) at time %s"% (sheet.name,new_x,new_y,topo.sim.timestr(view.timestamp))))
                 except KeyError:
                     # maybe lose this warning
                     topo.sim.warning("No RF measurements are available yet for input_sheet %s; run the Receptive Field plot for that input_sheet to see the RF."%g.name)
