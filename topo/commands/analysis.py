@@ -558,7 +558,7 @@ def measure_rfs_noise(divisions=99,scale=0.5,offset=0.5,display=False,
     if not input_sheet_name:
         raise ValueError("Must set topo.commands.analysis.input_sheet_name before calling measure_rfs")
 
-    input_sheet = topo.sim[input_sheet]
+    input_sheet = topo.sim[input_sheet_name]
     
     if divisions <= 0:
         raise ValueError("Divisions must be greater than 0")
