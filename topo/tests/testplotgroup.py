@@ -57,14 +57,14 @@ class TestPlotGroup(unittest.TestCase):
 #         self.s.activity = Numeric.array([[1,2],[3,4]])
 #         # Call s.sheet_view(..) with a parameter
 #         sv2 = self.s.sheet_view('Activity')
-#         self.s.sheet_view_dict['key']=sv2
-#         self.assertEqual(len(self.s.sheet_view_dict.keys()),1)
+#         self.s.sheet_views['key']=sv2
+#         self.assertEqual(len(self.s.sheet_views.keys()),1)
 #         y = plot.Plot(('key',None,None),plot.HSV,self.s)
 #         z = plot.Plot(('key',None,None),plot.HSV,self.s)
 #         self.pg1 = PlotGroup(plot_list=[y,z])
 #         tuples = self.pg1.plots()
 #         self.pg1.release_sheetviews()
-#         self.assertEqual(len(self.s.sheet_view_dict.keys()),0)
+#         self.assertEqual(len(self.s.sheet_views.keys()),0)
         
 
 

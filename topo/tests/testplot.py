@@ -161,13 +161,13 @@ class TestPlot(unittest.TestCase):
 	### also makes a sheet to test realease_sheetviews
 
 	self.sheet = Sheet()
-	self.sheet.sheet_view_dict[self.key1]=self.sheet_view1
-	self.sheet.sheet_view_dict[self.key2]=self.sheet_view2
-	self.sheet.sheet_view_dict[self.key3]=self.sheet_view3
-	self.sheet.sheet_view_dict[self.key4]=self.sheet_view4
+	self.sheet.sheet_views[self.key1]=self.sheet_view1
+	self.sheet.sheet_views[self.key2]=self.sheet_view2
+	self.sheet.sheet_views[self.key3]=self.sheet_view3
+	self.sheet.sheet_views[self.key4]=self.sheet_view4
 
 	plot_channels9 = {'Strength':self.key1,'Hue':self.key2,'Confidence':self.key3}
-	self.plot9 = make_template_plot(plot_channels9,self.sheet.sheet_view_dict,density=10.0,name='plot9')
+	self.plot9 = make_template_plot(plot_channels9,self.sheet.sheet_views,density=10.0,name='plot9')
 
 	
 	
@@ -277,13 +277,13 @@ class TestPlot(unittest.TestCase):
 
 # 	self.plot9.release_sheetviews()
 
-# 	test=self.sheet.sheet_view_dict.get(self.key1,None)
+# 	test=self.sheet.sheet_views.get(self.key1,None)
 # 	self.assertEqual(test,None)
-# 	test=self.sheet.sheet_view_dict.get(self.key2,None)
+# 	test=self.sheet.sheet_views.get(self.key2,None)
 # 	self.assertEqual(test,None)
-# 	test=self.sheet.sheet_view_dict.get(self.key3,None)
+# 	test=self.sheet.sheet_views.get(self.key3,None)
 # 	self.assertEqual(test,None)
-# 	test=self.sheet.sheet_view_dict.get(self.key4,None)
+# 	test=self.sheet.sheet_views.get(self.key4,None)
 # 	self.assertEqual(test,self.sheet_view4)
 
 

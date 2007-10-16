@@ -132,7 +132,7 @@ class SheetView(ParameterizedObject):
         for tup in self._view_list:
             (term_1, term_2) = tup
             if isinstance(term_1,sheet.Sheet):
-                maps.append(term_1.sheet_view_dict[term_2])
+                maps.append(term_1.sheet_views[term_2])
             elif isinstance(term_1,SheetView):
                 maps.append(term_1.view())         # Don't care about term_2
             else:

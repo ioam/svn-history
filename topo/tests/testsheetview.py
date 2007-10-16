@@ -35,11 +35,11 @@ class TestSheetView(unittest.TestCase):
 	sv1 = SheetView((self.s.activity,self.s.bounds),
                           src_name=self.s.name)
         # s.sheet_view() returns a SheetView
-        self.s.sheet_view_dict['sv1']=sv1
+        self.s.sheet_views['sv1']=sv1
 	sv2 = SheetView((self.s.activity,self.s.bounds),
                                  src_name=self.s.name)
         # s.sheet_view() returns a SheetView
-        self.s.sheet_view_dict['sv2']=sv2
+        self.s.sheet_views['sv2']=sv2
 	
         # Define a type 1 SheetView, with matrix and bounding box.
         sv3 = SheetView((self.s.activity, self.s.bounds))
@@ -69,7 +69,7 @@ class TestSheetView(unittest.TestCase):
 ##         input = ImageGenerator(filename='topo/tests/testsheetview.ppm')
 ## 	sv = SheetView((input.activity,input.bounds),
 ##                           src_name=input.name)
-##         input.sheet_view_dict['Activity']=sv
+##         input.sheet_views['Activity']=sv
 ##         sv_tuple = sv.view()
 ##         map = PaletteBitmap(sv_tuple[0])
 ##         # map.show()

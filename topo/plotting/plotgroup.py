@@ -451,7 +451,7 @@ class TemplatePlotGroup(SheetPlotGroup):
 
 
     def _create_plots(self,pt_name,pt,sheet):
-        return [make_template_plot(pt,sheet.sheet_view_dict,sheet.xdensity,
+        return [make_template_plot(pt,sheet.sheet_views,sheet.xdensity,
                                    sheet.bounds,self.normalize,name=pt_name)]
 
 
@@ -515,7 +515,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
         # Note: the UnitView is in the src_sheet view_dict,
         # and the name in the key is the destination sheet.
         return [make_template_plot(self._change_key(pt,sheet,proj),
-                                   proj.src.sheet_view_dict,
+                                   proj.src.sheet_views,
                                    proj.src.xdensity,
                                    None,
                                    self.normalize,
@@ -536,7 +536,7 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
 
     def _create_plots(self,pt_name,pt,sheet):
         return [make_template_plot(self._change_key(pt,sheet,proj),
-                                   proj.dest.sheet_view_dict,
+                                   proj.dest.sheet_views,
                                    proj.dest.xdensity,
                                    proj.dest.bounds,
                                    self.normalize,
@@ -601,7 +601,7 @@ class TwoDThingPlotGroup(ProjectionSheetPlotGroup):
             x_center,y_center = sheet.closest_cell_center(x,y)
             plot_channels = self._change_key(pt,sheet,x_center,y_center)
             plot_list.append(make_template_plot(plot_channels,
-                                                self.input_sheet.sheet_view_dict,
+                                                self.input_sheet.sheet_views,
                                                 self.input_sheet.xdensity,
                                                 self.input_sheet.bounds,
                                                 self.normalize))
@@ -685,7 +685,7 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
                 bounds = projection.cf(r,c).bounds
                                                     
             plot_list.append(make_template_plot(plot_channels,
-                                                src_sheet.sheet_view_dict,
+                                                src_sheet.sheet_views,
                                                 src_sheet.xdensity,
                                                 bounds,
                                                 self.normalize))
@@ -748,7 +748,7 @@ class ConnectionFieldsPlotGroup(UnitPlotGroup):
                 (r,c) = p.dest.sheet2matrixidx(self.x,self.y)
                 bounds = p.cf(r,c).bounds
             plot_list.append(make_template_plot(plot_channels,
-                                                p.src.sheet_view_dict,
+                                                p.src.sheet_views,
                                                 p.src.xdensity,
                                                 bounds,
                                                 self.normalize,

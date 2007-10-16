@@ -973,7 +973,7 @@ class CFSheet(ProjectionSheet):
 	Creates the list of UnitView objects for a particular unit in this CFSheet.
 	(There is one UnitView for each Projection to this CFSheet).
 
-	Each UnitView is then added to the sheet_view_dict of its source sheet.
+	Each UnitView is then added to the sheet_views of its source sheet.
 	It returns the list of all UnitView for the given unit.
 	"""     
         for p in self.in_connections:
@@ -983,7 +983,7 @@ class CFSheet(ProjectionSheet):
                 v = p.get_view(x,y,self.simulation.time())
                 src = v.projection.src
                 key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
-                src.sheet_view_dict[key] = v
+                src.sheet_views[key] = v
 
 
     ### JCALERT! This should probably be deleted...

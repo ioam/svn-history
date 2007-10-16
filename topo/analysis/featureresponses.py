@@ -240,7 +240,7 @@ class ReverseCorrelation(FeatureResponses):
         for sheet in self.sheets_to_measure():
             rows,cols = sheet.activity.shape
             input_bounds = self.input_sheet.bounds
-            input_sheet_view_dict = self.input_sheet.sheet_view_dict
+            input_sheet_views = self.input_sheet.sheet_views
 
             for ii in range(rows):
                 for jj in range(cols):
@@ -248,7 +248,7 @@ class ReverseCorrelation(FeatureResponses):
                                      sheet.name,sheet.precedence,topo.sim.time())
                     x,y = sheet.matrixidx2sheet(ii,jj)
                     key = ('RFs',sheet.name,x,y)
-                    input_sheet_view_dict[key]=view
+                    input_sheet_views[key]=view
 
                     
     
@@ -282,7 +282,7 @@ class FeatureMaps(FeatureResponses):
 
     For each feature and each sheet, the results are stored as a
     preference matrix and selectivity matrix in the sheet's
-    sheet_view_dict; these can then be plotted as preference
+    sheet_views; these can then be plotted as preference
     or selectivity maps.
     """
     
@@ -356,12 +356,12 @@ class FeatureMaps(FeatureResponses):
                 preference_map.cyclic = cyclic
                 preference_map.norm_factor = norm_factor
                     
-                sheet.sheet_view_dict[feature.capitalize()+'Preference']=preference_map
+                sheet.sheet_views[feature.capitalize()+'Preference']=preference_map
                 
                 selectivity_map = SheetView((self.selectivity_multiplier*
                                              self._featureresponses[sheet][feature].selectivity(),
                                              bounding_box), sheet.name , sheet.precedence, topo.sim.time())
-                sheet.sheet_view_dict[feature.capitalize()+'Selectivity']=selectivity_map
+                sheet.sheet_views[feature.capitalize()+'Selectivity']=selectivity_map
 
 
 class FeatureCurves(FeatureResponses):

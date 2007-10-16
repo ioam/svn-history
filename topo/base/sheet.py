@@ -91,7 +91,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         Initialize this object as an EventProcessor, then also as
         a SheetCoordinateSystem with equal xdensity and ydensity.
 
-        sheet_view_dict is a dictionary that stores SheetViews,
+        sheet_views is a dictionary that stores SheetViews,
         i.e. representations of the sheet for use by analysis or plotting
         code.    
         """
@@ -114,10 +114,10 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         self.__saved_activity = []          
 
         ### JABALERT: Should perhaps rename this to view_dict
-        self.sheet_view_dict = {}
+        self.sheet_views = {}
 
 
-    ### JABALERT: This should be deleted now that sheet_view_dict is public
+    ### JABALERT: This should be deleted now that sheet_views is public
     ### JC: shouldn't we keep that, or at least write a function in
     ### utils that deletes a value in a dictinnary without returning an
     ### error if the key is not in the dict?  I leave for the moment,
@@ -127,8 +127,8 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         Delete the dictionary entry with key entry 'view_name' to save
         memory.
         """
-	if self.sheet_view_dict.has_key(view_name):   
-	    del self.sheet_view_dict[view_name]
+	if self.sheet_views.has_key(view_name):   
+	    del self.sheet_views[view_name]
 
 
     def sheet_offset(self):

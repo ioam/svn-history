@@ -86,9 +86,9 @@ class TestActivityPanel(unittest.TestCase):
         sviewR = SheetView((self.ra,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
         sviewG = SheetView((self.ga,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
         sviewB = SheetView((self.ba,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
-        sheetR.sheet_view_dict["Miata"]=sviewR
-        sheetG.sheet_view_dict["Miata"]=sviewG
-        sheetB.sheet_view_dict["Miata"]=sviewB
+        sheetR.sheet_views["Miata"]=sviewR
+        sheetG.sheet_views["Miata"]=sviewG
+        sheetB.sheet_views["Miata"]=sviewB
 
         # To change the activity matrix so "Activity" plot_group
         # will be different.

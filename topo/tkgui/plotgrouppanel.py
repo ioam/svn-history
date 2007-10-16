@@ -769,7 +769,7 @@ class SheetPanel(PlotGroupPanel):
             # just matrixplot for whatever generatorsheets have the views
             for g in topo.sim.objects(GeneratorSheet).values():
                 try:
-                    view=g.sheet_view_dict[('RFs',sheet.name,new_x,new_y)]
+                    view=g.sheet_views[('RFs',sheet.name,new_x,new_y)]
                     matrixplot(view.view()[0],
                                title=("Receptive Field of %s unit (%d,%d) at time %s"% (sheet.name,new_x,new_y,topo.sim.timestr(view.timestamp))))
                 except KeyError:

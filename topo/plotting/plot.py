@@ -25,7 +25,7 @@ from topo.base.sheetcoords import SheetCoordinateSystem
 ### - Re-write the test file, taking the new changes into account.
 ### - I have to change the order: situate, plot_bb and (normalize)
 ### - There should be a way to associate the density explicitly
-###   with the sheet_view_dict, because it must match all SheetViews
+###   with the sheet_views, because it must match all SheetViews
 ###   in that dictionary.  Maybe as a tuple?
 ### - Fix the plot name handling along with the view_info sheetview attribute
 ### - Get rid of release_sheetviews.
@@ -99,7 +99,7 @@ class Plot(ParameterizedObject):
           return self.plot_src_name + '\n' + self.name
 
 
-def make_template_plot(channels,sheet_view_dict,density=None,
+def make_template_plot(channels,sheet_views,density=None,
               plot_bounding_box=None,normalize=False,name='None'):
      """
      Factory function for constructing a Plot object whose type is not yet known.
@@ -111,7 +111,7 @@ def make_template_plot(channels,sheet_view_dict,density=None,
      """
      plot_types=[SHCPlot,RGBPlot,PalettePlot]
      for pt in plot_types:
-         plot = pt(channels,sheet_view_dict,density,plot_bounding_box,normalize,name=name)
+         plot = pt(channels,sheet_views,density,plot_bounding_box,normalize,name=name)
          if plot.bitmap != None:
 	     return plot
      
@@ -125,7 +125,7 @@ class TemplatePlot(Plot):
     A bitmap-based plot as specified by a plot template (or plot channels).
     """
     
-    def __init__(self,channels,sheet_view_dict,density,
+    def __init__(self,channels,sheet_views,density,
                  plot_bounding_box,normalize,**params):
 	"""
         Build a plot out of a set of SheetViews as determined by a plot_template.
@@ -133,15 +133,15 @@ class TemplatePlot(Plot):
         channels is a plot_template, i.e. a dictionary with keys
         (i.e. 'Strength','Hue','Confidence' ...).  Each key typically
         has a string value naming specifies a SheetView in
-        sheet_view_dict, though specific channels may contain other
+        sheet_views, though specific channels may contain other
         types of information as required by specific Plot subclasses.
         channels that are not used by a particular Plot subclass will
         silently be ignored.
 
-	sheet_view_dict is a dictionary of SheetViews, generally (but
+	sheet_views is a dictionary of SheetViews, generally (but
         not necessarily) belonging to a Sheet object.
 
-	density is the density of the Sheet whose sheet_view_dict was
+	density is the density of the Sheet whose sheet_views was
 	passed.
 
 	plot_bounding_box is the outer bounding_box of the plot to
@@ -164,7 +164,7 @@ class TemplatePlot(Plot):
         
 
 	self.channels = channels
-	self.view_dict = sheet_view_dict
+	self.view_dict = sheet_views
 	# bounds of the situated plotting area 
 	self.plot_bounding_box = plot_bounding_box
 
@@ -304,9 +304,9 @@ class SHCPlot(TemplatePlot):
     the appropriate matrix for each channel.
     """
 
-    def __init__(self,channels,sheet_view_dict,density,
+    def __init__(self,channels,sheet_views,density,
                  plot_bounding_box,normalize,**params):
-	super(SHCPlot,self).__init__(channels,sheet_view_dict,density, 
+	super(SHCPlot,self).__init__(channels,sheet_views,density, 
 				   plot_bounding_box,normalize,**params)
         
 	# catching the empty plot exception
@@ -379,10 +379,10 @@ class RGBPlot(TemplatePlot):
   Construct an RGB (red, green, and blue) plot from the Red, Green,
   and Blue channels.
   """
-  def __init__(self,channels,sheet_view_dict,density,
+  def __init__(self,channels,sheet_views,density,
                  plot_bounding_box,normalize,**params):
 
-       super(RGBPlot,self).__init__(channels,sheet_view_dict,density, 
+       super(RGBPlot,self).__init__(channels,sheet_views,density, 
 				   plot_bounding_box,normalize,**params)
 
 
@@ -453,10 +453,10 @@ class PalettePlot(TemplatePlot):
      optionally colorized using a specified Palette.
      """
   
-     def __init__(self,channels,sheet_view_dict,density,
+     def __init__(self,channels,sheet_views,density,
                   plot_bounding_box,normalize,**params):
 
-          super(PalettePlot,self).__init__(channels,sheet_view_dict,density, 
+          super(PalettePlot,self).__init__(channels,sheet_views,density, 
                                            plot_bounding_box,normalize,**params)
 
           ### JABHACKALERT: To implement the class: If Strength is present,

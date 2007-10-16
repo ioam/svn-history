@@ -46,11 +46,11 @@ class TestPatternPlotGroup(SheetPlotGroup):
     def _create_plot(self,sheet):
         new_view = SheetView((sheet.input_generator(),sheet.bounds),
                               sheet.name,sheet.precedence,topo.sim.time())        
-        sheet.sheet_view_dict['Activity']=new_view
+        sheet.sheet_views['Activity']=new_view
         channels = {'Strength':'Activity','Hue':None,'Confidence':None}
 
         ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
-        return make_template_plot(channels,sheet.sheet_view_dict,
+        return make_template_plot(channels,sheet.sheet_views,
                                   sheet.xdensity,sheet.bounds,self.normalize,name='')
 
 

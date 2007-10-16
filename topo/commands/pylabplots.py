@@ -269,11 +269,11 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
     the names of these can be passed in as arguments.
     """
     for sheet in topo.sim.objects(Sheet).values():
-        if ((xsheet_view_name in sheet.sheet_view_dict) and
-            (ysheet_view_name in sheet.sheet_view_dict)):
+        if ((xsheet_view_name in sheet.sheet_views) and
+            (ysheet_view_name in sheet.sheet_views)):
 
-            x = sheet.sheet_view_dict[xsheet_view_name].view()[0]
-            y = sheet.sheet_view_dict[ysheet_view_name].view()[0]
+            x = sheet.sheet_views[xsheet_view_name].view()[0]
+            y = sheet.sheet_views[ysheet_view_name].view()[0]
 
             pylab.figure(figsize=(5,5))
 

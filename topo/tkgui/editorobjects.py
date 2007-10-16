@@ -227,9 +227,9 @@ class EditorSheet(EditorNode):
                 colour = ''
                 x, y = self.x - w + h, self.y - h
                 # AL, the idea will be to allow any available plots to be shown on the sheet.
-                # eg m = self.sheet.sheet_view_dict['OrientationPreference'].view()[0]
+                # eg m = self.sheet.sheet_views['OrientationPreference'].view()[0]
                 update_activity()
-                m = self.sheet.sheet_view_dict['Activity'].view()[0]
+                m = self.sheet.sheet_views['Activity'].view()[0]
                 if self.normalize == True:
                     m = self.normalize_plot(m)
                 matrix_width, matrix_height = self.element_count

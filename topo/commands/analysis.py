@@ -322,7 +322,7 @@ proj_name =''
 # update_activity() plus the Activity PlotGroupTemplate.  The
 # update_activity() command reads the activity array of each Sheet and
 # makes a corresponding SheetView to put in the Sheet's
-# sheet_view_dict, while the Activity PlotGroupTemplate specifies
+# sheet_views, while the Activity PlotGroupTemplate specifies
 # which SheetViews should be plotted in which combination.  See the
 # help for PlotGroupTemplate for more information.
 
@@ -353,7 +353,7 @@ def update_activity():
         activity_copy = array(sheet.activity)
         new_view = SheetView((activity_copy,sheet.bounds),
                               sheet.name,sheet.precedence,topo.sim.time())
-        sheet.sheet_view_dict['Activity']=new_view
+        sheet.sheet_views['Activity']=new_view
 
 
 ###############################################################################
@@ -421,7 +421,7 @@ def update_projectionactivity():
                 else:
                     v = p.get_projection_view(topo.sim.time())
                     key = ('ProjectionActivity',v.projection.dest.name,v.projection.name)
-                    v.projection.dest.sheet_view_dict[key] = v
+                    v.projection.dest.sheet_views[key] = v
 
 
 
@@ -624,9 +624,9 @@ def measure_cog(proj_name ="Afferent"):
 			ypref[r][c]= ycentroid
                     
 			new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
-			sheet.sheet_view_dict['XCoG']=new_view
+			sheet.sheet_views['XCoG']=new_view
 			new_view = SheetView((ypref,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
-			sheet.sheet_view_dict['YCoG']=new_view
+			sheet.sheet_views['YCoG']=new_view
            
 
 ###############################################################################
@@ -671,7 +671,7 @@ def measure_rfcog(sheet_name='V1',input_sheet_name='Retina'):
    for r in xrange(rows):
        for c in xrange(cols):
            x,y = sheet.matrixidx2sheet(r,c)
-           sv = input_sheet.sheet_view_dict.get(('RFs',sheet.name,x,y))
+           sv = input_sheet.sheet_views.get(('RFs',sheet.name,x,y))
            if sv is None:
               topo.sim.warning("measure_rfs() must first be called for input_sheet %s"%input_sheet.name)
               return
@@ -686,9 +686,9 @@ def measure_rfcog(sheet_name='V1',input_sheet_name='Retina'):
            ypref[r][c]= ycentroid
 
            new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
-           sheet.sheet_view_dict['XRFCoG']=new_view
+           sheet.sheet_views['XRFCoG']=new_view
            new_view = SheetView((ypref,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
-           sheet.sheet_view_dict['YRFCoG']=new_view
+           sheet.sheet_views['YRFCoG']=new_view
 
 
 
@@ -957,10 +957,10 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
     sheet=topo.sim[sheet_name]
     sheet_x,sheet_y = coordinate
     matrix_coords = sheet.sheet2matrixidx(sheet_x,sheet_y)
-    if(('XPreference' in sheet.sheet_view_dict) and
-       ('YPreference' in sheet.sheet_view_dict)):
-	x_pref = sheet.sheet_view_dict['XPreference'].view()[0]
-	y_pref = sheet.sheet_view_dict['YPreference'].view()[0]
+    if(('XPreference' in sheet.sheet_views) and
+       ('YPreference' in sheet.sheet_views)):
+	x_pref = sheet.sheet_views['XPreference'].view()[0]
+	y_pref = sheet.sheet_views['YPreference'].view()[0]
 	x_value=x_pref[matrix_coords]
 	y_value=y_pref[matrix_coords]
     else:
@@ -1026,8 +1026,8 @@ def measure_size_response(num_phase=18,
     sheet=topo.sim[sheet_name]
 
     matrix_coords = sheet.sheet2matrixidx(coordinate[0],coordinate[1])
-    if('OrientationPreference' in sheet.sheet_view_dict):
-        or_pref = sheet.sheet_view_dict['OrientationPreference'].view()[0]
+    if('OrientationPreference' in sheet.sheet_views):
+        or_pref = sheet.sheet_views['OrientationPreference'].view()[0]
         or_value = or_pref[matrix_coords]*pi # Orientations are stored as a normalized value beween 0 and 1.
                                              # The factor of pi is the norm_factor and is the range of orientation in measure_or_pref.
     else:
@@ -1036,10 +1036,10 @@ def measure_size_response(num_phase=18,
 
   
 
-    if(('XPreference' in sheet.sheet_view_dict) and
-       ('YPreference' in sheet.sheet_view_dict)):
-        x_pref = sheet.sheet_view_dict['XPreference'].view()[0]
-        y_pref = sheet.sheet_view_dict['YPreference'].view()[0]
+    if(('XPreference' in sheet.sheet_views) and
+       ('YPreference' in sheet.sheet_views)):
+        x_pref = sheet.sheet_views['XPreference'].view()[0]
+        y_pref = sheet.sheet_views['YPreference'].view()[0]
         x_value=x_pref[matrix_coords]
         y_value=y_pref[matrix_coords]
     else:
@@ -1100,8 +1100,8 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relativ
     sheet=topo.sim[sheet_name]
     matrix_coords = sheet.sheet2matrixidx(coordinate[0],coordinate[1])
 
-    if('OrientationPreference' in sheet.sheet_view_dict):
-        or_pref = sheet.sheet_view_dict['OrientationPreference'].view()[0]
+    if('OrientationPreference' in sheet.sheet_views):
+        or_pref = sheet.sheet_views['OrientationPreference'].view()[0]
         or_value = or_pref[matrix_coords]*pi # Orientations are stored as a normalized value beween 0 and 1.
                                              # The factor of pi is the norm_factor and is the range of orientation in measure_or_pref.
     else:
@@ -1109,10 +1109,10 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relativ
         or_value = 0.0
    
 
-    if(('XPreference' in sheet.sheet_view_dict) and
-       ('YPreference' in sheet.sheet_view_dict)):
-        x_pref = sheet.sheet_view_dict['XPreference'].view()[0]
-        y_pref = sheet.sheet_view_dict['YPreference'].view()[0]
+    if(('XPreference' in sheet.sheet_views) and
+       ('YPreference' in sheet.sheet_views)):
+        x_pref = sheet.sheet_views['XPreference'].view()[0]
+        y_pref = sheet.sheet_views['YPreference'].view()[0]
         x_value=x_pref[matrix_coords]
         y_value=y_pref[matrix_coords]
     else:
