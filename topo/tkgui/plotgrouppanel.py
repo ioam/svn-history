@@ -770,7 +770,7 @@ class SheetPanel(PlotGroupPanel):
                 try:
                     view=g.sheet_views[('RFs',sheet.name,center_x,center_y)]
                     matrixplot(view.view()[0],
-                               title=("Receptive Field of %s unit (%s,%s) at time %s"% (sheet.name,center_x,center_y,topo.sim.timestr(view.timestamp))))
+                               title=("Receptive Field of %s unit (%2.2f,%2.2f) at time %s"% (sheet.name,center_x,center_y,topo.sim.timestr(view.timestamp))))
                 except KeyError:
                     # maybe lose this warning
                     topo.sim.warning("No RF measurements are available yet for input_sheet %s; run the Receptive Field plot for that input_sheet to see the RF."%g.name)
