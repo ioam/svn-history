@@ -286,13 +286,8 @@ class ProjectionPanel(TwoDThingPanel):
                         widget_options={'sort_fn_args':{'cmp':cmp_projections}})
         self.pack_param('density',parent=self.control_frame_3) 
         self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change)
-        
-    def situate_change(self):
-        if self.situate:
-            self.plotgroup.initial_plot=True
-            self.plotgroup.height_of_tallest_plot = 1
-        self.redraw_plots()
 
+        
     def _plot_title(self):
         return 'Projection ' + self.projection.name + ' from ' + self.projection.src.name + ' to ' \
                + self.sheet.name + ' at time ' + topo.sim.timestr(self.plotgroup.time)
@@ -336,6 +331,16 @@ class CFProjectionPanel(ProjectionPanel):
     """
     Panel for displaying CFProjections.
     """
+    def __init__(self,console,master,plotgroup,**params):
+        super(CFProjectionPanel,self).__init__(console,master,plotgroup,**params)
+        self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change)
+
+    def situate_change(self):
+        if self.situate:
+            self.plotgroup.initial_plot=True
+            self.plotgroup.height_of_tallest_plot = 1
+        self.redraw_plots()
+    
     def populate_projection_param(self):
         prjns = [x for x in self.plotgroup.sheet.projections().values()
                  if isinstance(x,CFProjection)]
