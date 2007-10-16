@@ -763,7 +763,7 @@ class SomeTimer(ParameterizedObject):
     """
     # * parameters to control formatting?
     # * the parameter types for some of the following could be more specific
-    step = Parameter(default=None,doc=
+    step = Parameter(default=2,doc=
         """Only relevant with call_fixed_duration(), not call_fixed_num_times(). 
         
            Each iteration, func is called as func(step).
@@ -961,7 +961,7 @@ class Simulation(ParameterizedObject):
         # e.g. leaving it as None would result in info at 2% increments of requested run duration,
         # no matter what duration (0.005 or 5, etc).
         self.timer = SomeTimer(func=wrap_callable(self.run),
-                               simulation_time_fn=wrap_callable(self.time),step=2)
+                               simulation_time_fn=wrap_callable(self.time))
 
         
 
