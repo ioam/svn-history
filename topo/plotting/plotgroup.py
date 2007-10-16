@@ -795,6 +795,7 @@ needed.
 plotgroup_types = {'Connection Fields': ConnectionFieldsPlotGroup,
                    'Projection': CFProjectionPlotGroup,
                    'RF Projection':RFProjectionPlotGroup,
+                   'RF Projection (noise)':RFProjectionPlotGroup,                   
                    'Projection Activity': ProjectionActivityPlotGroup}
 
 
