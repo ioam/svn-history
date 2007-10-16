@@ -643,7 +643,7 @@ e.g. for debugging.)
             
 
 
-class SheetPGPanel(PlotGroupPanel):    
+class SheetPanel(PlotGroupPanel):    
 
     @staticmethod
     def valid_context():
@@ -666,7 +666,7 @@ class SheetPGPanel(PlotGroupPanel):
         
 
     def __init__(self,console,master,plotgroup,**params):
-        super(SheetPGPanel,self).__init__(console,master,plotgroup,**params)
+        super(SheetPanel,self).__init__(console,master,plotgroup,**params)
 
         self.pack_param('auto_refresh',parent=self.control_frame_1,
                         on_change=self.set_auto_refresh,

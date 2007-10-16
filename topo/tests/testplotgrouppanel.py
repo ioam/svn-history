@@ -56,7 +56,7 @@ class TestPlotGroupPanel(unittest.TestCase):
     # CEBALERT: still need to test the other panel functions...
 
 
-class TestSheetPGPanel(unittest.TestCase):
+class TestSheetPanel(unittest.TestCase):
 
     def setUp(self):
         return
@@ -65,13 +65,13 @@ class TestSheetPGPanel(unittest.TestCase):
 
 ##         self.plotgroup = SheetPlotGroup( ...
                 
-##         self.pgpanel = SheetPGPanel(topo.guimain,window,self.plotgroup)
+##         self.pgpanel = SheetPanel(topo.guimain,window,self.plotgroup)
 ##         self.pgpanel.pack()
 
 
 
 
-cases = [TestPlotGroupPanel,TestSheetPGPanel]
+cases = [TestPlotGroupPanel,TestSheetPanel]
 
 suite = unittest.TestSuite()
 suite.requires_display = True

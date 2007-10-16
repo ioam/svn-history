@@ -47,11 +47,11 @@ CANVASBUFFER = 1
 
 
 
-class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
+class ProjectionSheetPanel(TemplatePlotGroupPanel):
     """
     Abstract base class for panels relating to ProjectionSheets.
     """
-    _abstract_class_name = "ProjectionSheetPGPanel"
+    _abstract_class_name = "ProjectionSheetPanel"
 
     sheet_type = ProjectionSheet
 
@@ -77,14 +77,14 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
 
 
     def __init__(self,console,master,plotgroup,**params):
-        super(ProjectionSheetPGPanel,self).__init__(console,master,plotgroup,**params)
+        super(ProjectionSheetPanel,self).__init__(console,master,plotgroup,**params)
         self.pack_param('sheet',parent=self.control_frame_3,on_modify=self.sheet_change,
             widget_options={'sort_fn_args':
                            {'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
 
         
     def setup_plotgroup(self):
-        super(ProjectionSheetPGPanel,self).setup_plotgroup()
+        super(ProjectionSheetPanel,self).setup_plotgroup()
         self.populate_sheet_param()
 
 
@@ -104,7 +104,7 @@ class ProjectionSheetPGPanel(TemplatePlotGroupPanel):
 
 
 
-class ProjectionActivityPanel(ProjectionSheetPGPanel):
+class ProjectionActivityPanel(ProjectionSheetPanel):
 
     def __init__(self,console,master,plotgroup,**params):       
         super(ProjectionActivityPanel,self).__init__(console,master,plotgroup,**params)
@@ -117,7 +117,7 @@ class ProjectionActivityPanel(ProjectionSheetPGPanel):
 
 
 
-class UnitsPanel(ProjectionSheetPGPanel):
+class UnitsPanel(ProjectionSheetPanel):
 
 
     def __init__(self,console,master,plotgroup,**params):
@@ -202,7 +202,7 @@ class ConnectionFieldsPanel(UnitsPanel):
 
 
 # CEBALERT: change the name
-class TwoDThingPanel(ProjectionSheetPGPanel):
+class TwoDThingPanel(ProjectionSheetPanel):
 
     def display_plots(self):
         """
@@ -293,12 +293,12 @@ class RFProjectionPanel(TwoDThingPanel):
                                              topo.sim.timestr(self.plotgroup.time))
     
 
-class ProjectionPGPanel(TwoDThingPanel):
+class ProjectionPanel(TwoDThingPanel):
     def __init__(self,console,master,plotgroup,**params):
-        super(ProjectionPGPanel,self).__init__(console,master,plotgroup,**params)
+        super(ProjectionPanel,self).__init__(console,master,plotgroup,**params)
         self.pack_param('projection',parent=self.control_frame_3,on_modify=self.refresh_plots,
                         widget_options={'sort_fn_args':{'cmp':cmp_projections}})
-        self.pack_param('density',parent=self.control_frame_3)
+        self.pack_param('density',parent=self.control_frame_3) 
         self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change)
         
     def situate_change(self):
@@ -312,13 +312,13 @@ class ProjectionPGPanel(TwoDThingPanel):
                + self.sheet.name + ' at time ' + topo.sim.timestr(self.plotgroup.time)
 
     def setup_plotgroup(self):
-        super(ProjectionPGPanel,self).setup_plotgroup()
+        super(ProjectionPanel,self).setup_plotgroup()
         self.populate_projection_param()
 
         
     def sheet_change(self):
         self.refresh_projections()
-        super(ProjectionPGPanel,self).sheet_change()
+        super(ProjectionPanel,self).sheet_change()
 
 
     def populate_projection_param(self):
@@ -349,7 +349,7 @@ class ProjectionPGPanel(TwoDThingPanel):
 
 
 
-class CFProjectionPGPanel(ProjectionPGPanel):
+class CFProjectionPanel(ProjectionPanel):
     """
     Panel for displaying CFProjections.
     """

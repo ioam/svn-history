@@ -24,7 +24,7 @@ import topo
 from topo.base.parameterclasses import BooleanParameter
 from topo.misc.filepaths import normalize_path
 
-from plotgrouppanel import SheetPGPanel
+from plotgrouppanel import SheetPanel
 from topo.plotting.plotgroup import TemplatePlotGroup
 
 from widgets import Menu
@@ -69,7 +69,7 @@ def available_plot_channels(plot):
 
 ### CB: I'm working here at the moment.
 
-class TemplatePlotGroupPanel(SheetPGPanel):
+class TemplatePlotGroupPanel(SheetPanel):
 
     plotgroup_type = TemplatePlotGroup
 

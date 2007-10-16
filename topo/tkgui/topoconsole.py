@@ -38,7 +38,7 @@ from widgets import TaggedSlider,ControllableMenu, CommandPrompt
 from topowidgets import ScrolledTkguiWindow,TkguiWindow,ProgressWindow
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from featurecurvepanel import FeatureCurvePanel
-from projectionpanel import CFProjectionPGPanel,ProjectionActivityPanel,ConnectionFieldsPanel,RFProjectionPanel
+from projectionpanel import CFProjectionPanel,ProjectionActivityPanel,ConnectionFieldsPanel,RFProjectionPanel
 from testpattern import TestPattern
 from editorwindow import ModelEditor
 
@@ -599,7 +599,7 @@ class TopoConsole(TkguiWindow):
 if __name__ != '__main__':
     plotpanel_classes['Connection Fields'] = ConnectionFieldsPanel
     plotpanel_classes['RF Projection'] = RFProjectionPanel
-    plotpanel_classes['Projection'] = CFProjectionPGPanel 
+    plotpanel_classes['Projection'] = CFProjectionPanel 
     plotpanel_classes['Projection Activity'] = ProjectionActivityPanel
 
 
