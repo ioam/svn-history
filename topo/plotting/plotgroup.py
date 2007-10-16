@@ -219,12 +219,12 @@ class SheetPlotGroup(PlotGroup):
         time advances.  The default is False, because many plots are
         slow to generate (e.g. most preference map plots).""")
 
-    # CEBALERT: SheetPlotGroup works on a list of sheets, and so does TemplatePlotGroup.
-    # (TestPattern uses this to set its own list of sheets.) The classes after TemplatePlotGroup
-    # (ProjectionSheetPlotGroup onwards) work on a *single* sheet. Having a sheets attribute is
-    # confusing. How do we get round this?
-    # is either the list of sheets passed in to __init__, or all the sheets in the
-    # simulation by default. (TestPattern uses
+    # CEBALERT: SheetPlotGroup works on a list of sheets, and so does
+    # TemplatePlotGroup.  (TestPattern uses this to set its own list
+    # of sheets.) The classes after TemplatePlotGroup
+    # (ProjectionSheetPlotGroup onwards) work on a *single*
+    # sheet. Having a sheets attribute is confusing. How do we get
+    # round this?
     def __init__(self,sheets=None,**params):
         self.sheets = sheets
         super(SheetPlotGroup,self).__init__(**params)
