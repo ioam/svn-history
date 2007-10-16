@@ -473,6 +473,9 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
     sheet_type = ProjectionSheet
 
+    # CB: this isn't really necessary for these classes
+    # themselves. Right now we have it provide a useful error message
+    # to users (which is useful).
     def _check_sheet_type(self):
         if not isinstance(self.sheet,self.sheet_type):
             raise TypeError(
@@ -542,8 +545,9 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
 
 
 class TwoDThingPlotGroup(ProjectionSheetPlotGroup):
-
-
+    """
+    A ProjectionSheetPlotGroup capable of generating coordinates on a 2D grid.
+    """
     ### JPALERT: The bounds are meaningless for large sheets anyway.  If a sheet
     ### is specified in, say, visual angle coordinates (e.g., -60 to +60 degrees), then
     ### the soft min of 5.0/unit will still give a 600x600 array of CFs!
@@ -557,10 +561,6 @@ class TwoDThingPlotGroup(ProjectionSheetPlotGroup):
     def __init__(self,**params):
         super(TwoDThingPlotGroup,self).__init__(**params)
         self.height_of_tallest_plot = 5 # Initial value
-        
-        ### JCALERT! shape determined by the plotting density
-        ### This is set by self.generate_coords()
-        self.proj_plotting_shape = (0,0)
 
 
     def generate_coords(self):
@@ -587,23 +587,6 @@ class TwoDThingPlotGroup(ProjectionSheetPlotGroup):
 
         return coords
 
-    def _sort_plots(self):
-	"""Skips plot sorting for Projections to keep the units in order."""
-	pass
-
-
-
-class RFProjectionPlotGroup(TwoDThingPlotGroup):
-
-    keyname='RFs'
-
-    input_sheet = ObjectSelectorParameter(default=None)
-
-
-    def _exec_update_command(self): # RFHACK
-	topo.commands.analysis.input_sheet_name = self.input_sheet.name
-        super(RFProjectionPlotGroup,self)._exec_update_command()
-
 
     def _change_key(self,plotgroup_template,sheet,x,y):
         plot_channels = copy.deepcopy(plotgroup_template)
@@ -613,38 +596,39 @@ class RFProjectionPlotGroup(TwoDThingPlotGroup):
 
 
     def _create_plots(self,pt_name,pt,sheet):
-
         plot_list=[]
-
         for x,y in self.generate_coords():
-
-            input_sheet = self.input_sheet
-
-            r,c = sheet.sheet2matrixidx(x,y)
-            x1,y1 = sheet.matrixidx2sheet(r,c)
-            plot_channels = self._change_key(pt,sheet,x1,y1)
+            x_center,y_center = sheet.closest_cell_center(x,y)
+            plot_channels = self._change_key(pt,sheet,x_center,y_center)
             plot_list.append(make_template_plot(plot_channels,
-                                                input_sheet.sheet_view_dict,
-                                                input_sheet.xdensity,
-                                                input_sheet.bounds,
+                                                self.input_sheet.sheet_view_dict,
+                                                self.input_sheet.xdensity,
+                                                self.input_sheet.bounds,
                                                 self.normalize))
         return plot_list
+
+
+    def _sort_plots(self):
+	"""Skips plot sorting for to keep the generated order."""
+	pass
+
+
+
+class RFProjectionPlotGroup(TwoDThingPlotGroup):
+
+    keyname='RFs'
+    input_sheet = ObjectSelectorParameter(default=None,doc="The sheet on which to measure the RFs.")
+
+    def _exec_update_command(self): # RFHACK
+	topo.commands.analysis.input_sheet_name = self.input_sheet.name
+        super(RFProjectionPlotGroup,self)._exec_update_command()
 
 
 
 class ProjectionPlotGroup(TwoDThingPlotGroup):
 
     projection = ObjectSelectorParameter(default=None,doc="The projection to visualize.")
-
     keyname='Weights'                     
-    sheet_type = Sheet
-    projection_type = Projection
-
-    def _exec_update_command(self):
-        topo.commands.analysis.proj_coords = self.generate_coords()
-        topo.commands.analysis.proj_name = self.projection.name
-        super(ProjectionPlotGroup,self)._exec_update_command()
-
 
     def _change_key(self,plotgroup_template,sheet,proj,x,y):
         plot_channels = copy.deepcopy(plotgroup_template)
@@ -652,34 +636,10 @@ class ProjectionPlotGroup(TwoDThingPlotGroup):
         plot_channels['Strength']=key
         return plot_channels
 
-
-    # CEBALERT: untried
-    def _create_plots(self,pt_name,pt,sheet):
-	projection = self.projection
-        plot_list=[]
-        src_sheet=projection.src
-
-        for x,y in self.generate_coords():
-            
-            # JC: we might consider allowing the construction of 'projection type' plots
-            # with other things than UnitViews.
-            plot_channels = self._change_key(pt,sheet,projection,x,y)
-            
-            (r,c) = projection.dest.sheet2matrixidx(x,y)
-            bounds = projection.cf(r,c).bounds
-                                                    
-            plot_list.append(make_template_plot(plot_channels,
-                                                src_sheet.sheet_view_dict,
-                                                src_sheet.xdensity,
-                                                bounds,
-                                                self.normalize))
-        return plot_list
-
-
-
-
-
-
+    def _exec_update_command(self):
+        topo.commands.analysis.proj_coords = self.generate_coords()
+        topo.commands.analysis.proj_name = self.projection.name
+        super(ProjectionPlotGroup,self)._exec_update_command()
 
 
 
@@ -692,16 +652,18 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
     the actual weights that are stored.""")
                      
     sheet_type = CFSheet
-    projection_type = CFProjection
 
     def __init__(self,**params):
-        super(CFProjectionPlotGroup,self).__init__(**params)
-    
+        super(CFProjectionPlotGroup,self).__init__(**params)    
         self.filesaver = CFProjectionPlotGroupSaver(self)
 
+    def _exec_update_command(self): 
+        self._check_projection_type()
+        super(CFProjectionPlotGroup,self)._exec_update_command()
 
+    # CB: same comment for ProjectionSheetPlotGroup's _check_sheet_type.
     def _check_projection_type(self):
-        if not isinstance(self.projection,self.projection_type):
+        if not isinstance(self.projection,CFProjection):
             raise TypeError(
                 "%s's projection Parameter must be set to a %s instance (currently %s, type %s)." \
                 %(self,self.projection_type,self.projection,type(self.projection))) 
@@ -714,8 +676,6 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
 
         for x,y in self.generate_coords():
             
-            # JC: we might consider allowing the construction of 'projection type' plots
-            # with other things than UnitViews.
             plot_channels = self._change_key(pt,sheet,projection,x,y)
             
             if self.situate:
