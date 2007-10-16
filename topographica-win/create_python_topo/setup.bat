@@ -22,9 +22,9 @@ REM Pmw
 copy ..\..\external\Pmw .
 
 REM bwidget
-..\util\gunzip -c ..\..\external\pybwidget-0.1.2_1.7.0.tar.gz > ..\..\external\pybwidget-0.1.2_1.7.0.tar
-..\util\tar xvf ..\..\external\pybwidget-0.1.2_1.7.0.tar
-copy ..\..\external\pybwidget-0.1.2_1.7.0 .
+..\util\gunzip -c ..\..\external\pybwidget-0.1.2_1.8.0.tar.gz > ..\..\external\pybwidget-0.1.2_1.8.0.tar
+..\util\tar xvf ..\..\external\pybwidget-0.1.2_1.8.0.tar
+copy ..\..\external\pybwidget-0.1.2_1.8.0 .
 
 REM Gnosis_Utils
 ..\util\gunzip -c ..\..\external\Gnosis_Utils-1.2.1.tar.gz > ..\..\external\Gnosis_Utils-1.2.1.tar
@@ -85,7 +85,7 @@ REM * PMW
 move Pmw c:\python24\Lib\site-packages
 
 REM * bwidget
-cd pybwidget-0.1.2_1.7.0\
+cd pybwidget-0.1.2_1.8.0\
 c:\python24\python.exe setup.py install
 cd..
 
