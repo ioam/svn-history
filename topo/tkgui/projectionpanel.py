@@ -233,6 +233,8 @@ class TwoDThingPanel(ProjectionSheetPanel):
             c.grid_forget()
 
 
+    # CEBALERT: seems like the label isn't always being removed.
+    # Need to find a sequence of commands that reliably shows this.
     def display_labels(self):
         """
         Do not display a label for each plot.
