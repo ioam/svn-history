@@ -729,8 +729,6 @@ class PeriodicEventSequence(EventSequence):
         return 'PeriodicEventSequence(%s,%s,%s)' % (`self.time`,`self.period`,`self.sequence`)
 
 
-############ Timer code ############
-#
 # CB: code that previously existed in various places now collected
 # together. The original timing code was not properly tested, and the
 # current code has not been tested either: needs writing cleanly and
@@ -764,7 +762,7 @@ class SomeTimer(ParameterizedObject):
     # * parameters to control formatting?
     # * the parameter types for some of the following could be more specific
     step = Parameter(default=2,doc=
-        """Only relevant with call_fixed_duration(), not call_fixed_num_times(). 
+        """Only relevant with call_and_time(), not call_fixed_num_times(). 
         
            Each iteration, func is called as func(step).
     
@@ -772,7 +770,7 @@ class SomeTimer(ParameterizedObject):
            the simulation time to advance once per iteration.
 
            The default value (None) gives 50 iterations for any value of simulation_duration
-           passed to call_fixed_duration(simulation_duration).""")
+           passed to call_and_time(simulation_duration).""")
     
     estimate_interval = Number(default=50,doc=
         """Interval in simulation time between estimates.""") 
@@ -861,20 +859,15 @@ class SomeTimer(ParameterizedObject):
         Call self.func(args_for_iterations[i]) for all i in args_for_iterations.
         """
         self.__measure(len(args_for_iterations),1.0,arg_list=args_for_iterations)
-    X=call_fixed_num_times
         
     
-    def call_fixed_duration(self,fduration):
+    def call_and_time(self,fduration):
         """
         Call self.func(self.step or fduration/50.0) for fduration.
         """
         # default to 50 steps unless someone set otherwise
         step = self.step or fduration/50.0
         self.__measure(fduration,step)
-    call_and_time=call_fixed_duration
-        
-############ End of timer code ############
-
 
 
 
