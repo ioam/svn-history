@@ -119,7 +119,6 @@ class ScrolledTkguiWindow(TkguiWindow):
         # if user has changed window size, need to tell tkinter that it should take
         # control again.
         self.geometry('')
-        self.update_idletasks()
 
         # Extra for width of scrollbars; should be found programmatically. But how?
         extraw = 19
@@ -140,15 +139,9 @@ class ScrolledTkguiWindow(TkguiWindow):
                 h+=extrah
                 
             self._scroll_frame.set_size(w,h)
-            self.update_idletasks()
             self.oldsize = (w,h)
         else:
             self._scroll_frame._scrolled_window.config(scrollbar=self._which_scrollbars())
-            self.update_idletasks()
-            
-        
-
-
         
 
 ######################################################################            
