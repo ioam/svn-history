@@ -264,7 +264,7 @@ def default_analysis_function():
 # in any case.
 def run_batch(script_file,output_directory="Output",
               analysis_fn = default_analysis_function,
-              analysis_times = [50,100,500,1000,2000,3000,4000,5000,10000],
+              times = [50,100,500,1000,2000,3000,4000,5000,10000],
               **params):
     """
     Run a Topographica simulation in batch mode.
@@ -296,11 +296,11 @@ def run_batch(script_file,output_directory="Output",
     which a unique individual directory will be created for this
     particular run.  The optional analysis_fn can be any python
     function to be called at each of the simulation iterations defined
-    in the analysis_times list.  This function should perform
-    whatever analysis of the simulation you want to perform, such as
-    plotting or calculating some statistics.  The analysis_fn should
-    avoid using any GUI functions (i.e., should not import anything
-    from topo.tkgui), and it should save all of its results into files.
+    in the analysis times list.  This function should perform whatever
+    analysis of the simulation you want to perform, such as plotting
+    or calculating some statistics.  The analysis_fn should avoid
+    using any GUI functions (i.e., should not import anything from
+    topo.tkgui), and it should save all of its results into files.
 
     Any other optional parameters supplied will be set in the main
     namespace before any scripts are run.  They will also be used to
@@ -374,7 +374,7 @@ def run_batch(script_file,output_directory="Output",
         topo.sim.name=simname
 
         # Run each segment, doing the analysis and saving the script state each time
-        for run_to in analysis_times:
+        for run_to in times:
             topo.sim.run(run_to - topo.sim.time())
             analysis_fn()
             save_script_repr()
