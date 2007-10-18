@@ -37,7 +37,7 @@
 
 
 
-<p><b>8 Oct 2007:</b> Version 0.9.4 nearly ready for 
+<p><b>18 Oct 2007:</b> Version 0.9.4 is nearly ready for 
 <A target="_top" href="../Downloads/index.html">release</A>, including:
 
 <center>
@@ -51,19 +51,24 @@
   numerous bugfixes<br>
   set up <A target="_top" href="http://buildbot.topographica.org">automatic daily builds</A><br>
 </dd>
-<dt>Component library:</dt>
-<dd>
-  new
-  <A HREF="../Reference_Manual/topo.coordmapperfns-module.html">
-  coordmapperfns</A> (Grid, Pipeline, Polar/Cartesian)<br>
-  <!-- OutputFnDebugger for keeping track of statistics<br> -->
-</dd>
 <dt>Example scripts:</dt>
 <dd>
-  new whisker barrel cortex simulation (lissom_whisker_barrels.ty)<br>
-  (also works as example of calling Matlab code transparently via mlabwrap)<br>
+  new whisker barrel cortex simulation<br>
+  &nbsp;&nbsp;(using transparent Matlab wrapper)<br>
   new elastic net ocular dominance simulation<br>
   new spiking example; still needs generalizing<br>
+</dd>
+<dt>Command-line and batch:</dt>
+<dd>
+  <!-- <A target="_top" href="../User_Manual/commandline.html#option-a">-a
+  option to import commands automatically<br> -->
+  <A target="_top" href="../User_Manual/batch.html">batch 
+  mode</A> for running multiple similar simulations<br>
+  <A target="_top" href="../User_Manual/commandline.html#saving-bitmaps">saving 
+  bitmaps</A> from script/command-line (for batch runs)<br>
+  script/command-line <A target="_top" href="../User_Manual/commandline.html#scripting-gui">control over GUI</A><br>
+  <!-- grid_layout command to simplify model diagrams<br> -->
+  <!-- options for controlling plot sizing<br> -->
 </dd>
 </font>
 </dl>
@@ -81,17 +86,6 @@
   <!-- changed -g to launch the GUI where it is specified, to allow more control<br> -->
   <!-- added categories for plots to simplify GUI<br> -->
 </dd>
-<dt>Command-line and batch:</dt>
-<dd>
-  <!-- <A target="_top" href="../User_Manual/commandline.html#option-a">-a
-  option to import commands automatically<br> -->
-  <A target="_top" href="../User_Manual/batch.html">batch 
-  mode</A> for running multiple similar simulations<br>
-  <A target="_top" href="../User_Manual/commandline.html#saving-bitmaps">saving 
-  bitmaps</A> from script/command-line (for batch runs)<br>
-  script/command-line <A target="_top" href="../User_Manual/commandline.html#scripting-gui">control over GUI</A><br>
-  <!-- grid_layout command to simplify model diagrams<br> -->
-</dd>
 <dt>Plotting:</dt>
 <dd>
   <A target="_top" href="../User_Manual/plotting.html#rfplots">reverse-correlation RF mapping</A><br>
@@ -100,7 +94,14 @@
   gradient plots, histogram plots (in right-click menu)<br>
   <A target="_top" href="../User_Manual/plotting.html#measuring-preference-maps">simplified
   bitmap plotting</A> (removed template classes)<br>
-  GUI plots can be saved as PNG or EPS (in right-click menu)<br>
+  GUI plots can be saved as PNG or EPS (right-click menu)<br>
+</dd>
+<dt>Component library:</dt>
+<dd>
+  new
+  <A HREF="../Reference_Manual/topo.coordmapperfns-module.html">
+  coordmapperfns</A> (Grid, Pipeline, Polar/Cartesian)<br>
+  <!-- OutputFnDebugger for keeping track of statistics<br> -->
 </dd>
 </font>
 </dl>
@@ -109,9 +110,14 @@
 </table>
 </center>
 
-<P>Screenshots: 
-<A target="_top" href="../images/topographica-0.9.3_ubuntu.png">Plotting</A>, 
-<A target="_top" href="../images/topographica-0.9.3_modeleditor_ubuntu.png">Model editor</A>.
+Screenshots: 
+<A target="_top" href="../images/071018_plotting1_ubuntu.png">plotting 1</A>, 
+<A target="_top" href="../images/071018_plotting2_ubuntu.png">plotting 2</A>, 
+<A target="_top" href="../images/071018_modeleditor_ubuntu.png">model editor</A>.
+For now, the best way to get the 0.9.4 features is by downloading the  
+<A target="_top" href="../Downloads/cvs.html">CVS
+version</A>, but we will be releasing executables sometime in the
+coming week.
 
 <p><A target="_top" href="../Home/oldnews.html"><i>Older news</i></A>
 </i>
