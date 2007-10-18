@@ -16,7 +16,7 @@ import topo
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter,BooleanParameter, \
-     StringParameter,Number,ObjectSelectorParameter, ListParameter
+     StringParameter,Number,ObjectSelectorParameter, ListParameter, Integer
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet,CFProjection,Projection
 from topo.base.projection import ProjectionSheet
@@ -187,14 +187,13 @@ class PlotGroup(ParameterizedObject):
 
 class SheetPlotGroup(PlotGroup):
 
-
     sheet_coords = BooleanParameter(default=False,doc="""
-    Whether to scale plots based on their relative sizes in sheet
-    coordinates.  If true, plots are scaled so that their sizes are
-    proportional to their area in sheet coordinates, so that one can
-    compare corresponding areas.  If false, plots are scaled to have
-    similar sizes on screen, regardless of their corresponding
-    sheet areas, which maximizes the size of each plot.""")
+        Whether to scale plots based on their relative sizes in sheet
+        coordinates.  If true, plots are scaled so that their sizes are
+        proportional to their area in sheet coordinates, so that one can
+        compare corresponding areas.  If false, plots are scaled to have
+        similar sizes on screen, regardless of their corresponding
+        sheet areas, which maximizes the size of each plot.""")
 
     normalize = BooleanParameter(default=False,doc="""
         Whether to scale plots so that the peak value will be white
@@ -214,10 +213,33 @@ class SheetPlotGroup(PlotGroup):
         important.""")
 
     auto_refresh = BooleanParameter(default=False,doc="""
-        If this plot is being displayed regularly (e.g. in a GUI),
+        If this plot is being displayed persistently (e.g. in a GUI),
         whether to regenerate it automatically whenever the simulation
         time advances.  The default is False, because many plots are
-        slow to generate (e.g. most preference map plots).""")
+        slow to generate (including most preference map plots).""")
+
+    desired_maximum_plot_height = Integer(default=0,bounds=(0,None),doc="""
+        User-specified height of the tallest plot in this PlotGroup.
+        Other plots will generally be scaled as appropriate, either
+        to match this size (when sheet_coords is False), or to
+        have the appropriate relative size (when sheet_coords is True).
+
+        If enforce_minimum_plot_height is True, the actual maximum
+        plot height may be larger than this parameter's value.  In
+        particular, with enforce_minimum_plot_height=True, the default
+        value of 0 gives plots that are the size of the underlying
+        matrix, which is the most efficient size for saving plots
+        directly to disk.  Larger values (e.g. 150) are suitable when
+        displaying plots on screen.""")
+        
+    enforce_minimum_plot_height = BooleanParameter(default=True,doc="""
+        If true, ensure that plots are never shown smaller than their
+        native size, i.e. with fewer than one pixel per matrix unit.
+        This option is normally left on for safety, so that no
+        visualization will be missing any units.  However, it may be
+        acceptable to turn this check off when working with matrix
+        sizes much larger than your screen resolution.""")
+
 
     # CEBALERT: SheetPlotGroup works on a list of sheets, and so does
     # TemplatePlotGroup.  (TestPattern uses this to set its own list
@@ -228,18 +250,18 @@ class SheetPlotGroup(PlotGroup):
     def __init__(self,sheets=None,**params):
         self.sheets = sheets
         super(SheetPlotGroup,self).__init__(**params)
-        self.height_of_tallest_plot = 150.0 # Initial value
 
     def _sheets(self):
         return self.sheets or topo.sim.objects(Sheet).values()
 
+    def make_plots(self,update=True):
+        self.height_of_tallest_plot = self.desired_maximum_plot_height
+        super(SheetPlotGroup,self).make_plots(update)
+
+
     ### CEB: At least some of this scaling would be common to all
     ### plotgroups, if some (e.g. featurecurve) didn't open new
     ### windows.
-    ###
-    ### JAB: Isn't there some way to have the GUI take care of the
-    ### actual scaling, without us having to change the bitmaps
-    ### ourselves?
     ###
     ### Could strip out the matrix-coord scaling and put it into
     ### PlotGroup
@@ -249,7 +271,7 @@ class SheetPlotGroup(PlotGroup):
 
         The calculated sizes will be multiplied by the given
         zoom_factor, if it is not None.
-
+        
         A minimum size (and potentially a maximum size) are enforced,
         as described below.
 
@@ -274,49 +296,50 @@ class SheetPlotGroup(PlotGroup):
         bounds, and the size of that plot will be the maximum density
         times the largest sheet bounds.
         """
-        
+
+        new_height=self.height_of_tallest_plot
+
+        # No scaling to do if there are no scalable plots, or no desired size
         resizeable_plots = [p for p in self.plots if p.resize]
-        if not resizeable_plots:
+        if not resizeable_plots or not new_height:
             return False
+
+        # Apply optional scaling to the overall size
+        if zoom_factor:
+            new_height *= zoom_factor
 
         # Determine which plot will be the largest, to ensure that
         # no plot is missing any pixels.
-        if not self.sheet_coords:
-            bitmap_heights = [p._orig_bitmap.height() for p in resizeable_plots]
-            minimum_height_of_tallest_plot = max(bitmap_heights)
-            
-        else:           
-            ### JABALERT: Should take the plot bounds instead of the sheet bounds
-            ### Specifically, a weights plot with situate=False
-            ### doesn't use the Sheet bounds, and so the
-            ### minimum_height is significantly overstated.
-            sheets = dict([(sheet.name,sheet) for sheet in self._sheets()])
-            max_sheet_height = max([(sheets[p.plot_src_name].bounds.lbrt()[3]-
-                                     sheets[p.plot_src_name].bounds.lbrt()[1])
-                                   for p in resizeable_plots])
-            max_sheet_density = max([sheets[p.plot_src_name].xdensity
-                                     for p in resizeable_plots])
-            minimum_height_of_tallest_plot = max_sheet_height*max_sheet_density
-            
-        if (self.height_of_tallest_plot < minimum_height_of_tallest_plot):
-            self.height_of_tallest_plot = minimum_height_of_tallest_plot
-            
-        # Apply optional scaling to the overall size
-        if zoom_factor:
-            new_height = self.height_of_tallest_plot * zoom_factor
-            # Currently enforces only a minimum, but could enforce maximum height
-            if new_height >= minimum_height_of_tallest_plot:
-                self.height_of_tallest_plot = new_height
-            else:
-                return False
+        if (self.enforce_minimum_plot_height):
+            if not self.sheet_coords:
+                bitmap_heights = [p._orig_bitmap.height() for p in resizeable_plots]
+                minimum_height_of_tallest_plot = max(bitmap_heights)
+                
+            else:           
+                ### JABALERT: Should take the plot bounds instead of the sheet bounds
+                ### Specifically, a weights plot with situate=False
+                ### doesn't use the Sheet bounds, and so the
+                ### minimum_height is significantly overstated.
+                sheets = dict([(sheet.name,sheet) for sheet in self._sheets()])
+                max_sheet_height = max([(sheets[p.plot_src_name].bounds.lbrt()[3]-
+                                         sheets[p.plot_src_name].bounds.lbrt()[1])
+                                       for p in resizeable_plots])
+                max_sheet_density = max([sheets[p.plot_src_name].xdensity
+                                         for p in resizeable_plots])
+                minimum_height_of_tallest_plot = max_sheet_height*max_sheet_density
 
+            if (new_height < minimum_height_of_tallest_plot):
+                new_height = minimum_height_of_tallest_plot
+                if zoom_factor:
+                    return False
+            
         # Scale the images so that each has a size up to the height_of_tallest_plot
 	for plot in resizeable_plots:
 	    if self.sheet_coords:
                 s = topo.sim.objects(Sheet)[plot.plot_src_name]
-	        scaling_factor=self.height_of_tallest_plot/float(s.xdensity)/max_sheet_height
+	        scaling_factor=new_height/float(s.xdensity)/max_sheet_height
 	    else:
-	        scaling_factor=self.height_of_tallest_plot/float(plot._orig_bitmap.height())
+	        scaling_factor=new_height/float(plot._orig_bitmap.height())
             
             if self.integer_scaling:
                 scaling_factor=max(1,int(scaling_factor))
@@ -325,6 +348,7 @@ class SheetPlotGroup(PlotGroup):
             
             #print "Scaled %s %s: %d->%d (x %f)" % (plot.plot_src_name, plot.name, plot._orig_bitmap.height(), plot.bitmap.height(), scaling_factor)
 
+        self.height_of_tallest_plot = new_height
         return True
 
 
@@ -560,8 +584,6 @@ class TwoDThingPlotGroup(ProjectionSheetPlotGroup):
 
     def __init__(self,**params):
         super(TwoDThingPlotGroup,self).__init__(**params)
-        self.height_of_tallest_plot = 5 # Initial value
-
 
     def generate_coords(self):
         """

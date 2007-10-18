@@ -25,7 +25,7 @@ from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
 import topo
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import BooleanParameter
+from topo.base.parameterclasses import BooleanParameter, Integer
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 
@@ -88,6 +88,10 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         will be disabled, because the original data is no longer
         available.""")
     
+    gui_desired_maximum_plot_height = Integer(default=150,bounds=(0,None),doc="""
+        Value to provide for PlotGroup.desired_maximum_plot_height for
+        PlotGroups opened by the GUI.  Determines the initial, default
+        scaling for the PlotGroup.""")
     
     # CB: is there a better way than using a property?
     def get_plotgroup(self):
@@ -237,11 +241,7 @@ e.g. for debugging.)
 
         Subclasses can use this to set Parameters on their PlotGroups.
         """
-        pass
-    
-
-    
-
+        self.plotgroup.desired_maximum_plot_height=self.gui_desired_maximum_plot_height
 
     def __process_canvas_event(self,event,func):
         """

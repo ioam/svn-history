@@ -191,6 +191,10 @@ class ConnectionFieldsPanel(UnitsPanel):
 
 # CEBALERT: change the name
 class TwoDThingPanel(ProjectionSheetPanel):
+    def setup_plotgroup(self):
+        super(TwoDThingPanel,self).setup_plotgroup()
+        # Force Projection-like plots to be individually small
+        self.plotgroup.desired_maximum_plot_height=1
 
     def display_plots(self):
         """
