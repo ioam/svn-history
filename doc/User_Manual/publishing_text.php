@@ -120,8 +120,13 @@ support will be necessary.
 
 <H2>Topographica plots</H2>
 
-<P>These sections describe how to generate publication figures from each
-of the various Topographica plots and display windows. 
+<P>These sections describe how to generate publication-quality figures
+from each of the various Topographica plots and display windows.  Note
+that in most cases, it is best to automate these commands by doing
+them in <a href="batch.html">batch mode, so that you have a permanent
+record of all of the commands and options used to generate your
+results, and so that they will be stored in a uniquely identifiable
+directory that you can access reliably later.
 
 
 <H4>Model architecture</H4>
