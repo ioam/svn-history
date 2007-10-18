@@ -187,6 +187,24 @@ optional parameters.  Using these commands makes it possible to run
 simulations without any GUI, for batch or remote processing.
 
 
+<H2><a name="option-a">Simplifying imports during interactive runs</a></H2>
+
+In the sample code above, each command is imported (i.e., loaded and
+declared) from the appropriate file before it is used.  Python
+requires such importing to avoid confusion between similar commands
+defined in different files.  Still, typing these lines when working
+interactively at the command line can be tedious, so Topographica
+provides the "-a" command-line option, which automatically imports
+every command in topo/commands/*.py.  The "-g" option also
+automatically enables "-a", so that the commands will be available in
+the GUI as well.  Thus if you start Topographica as "./topographica
+-a" or "./topographica -g", then you can omit the <code>from
+topo.commands... import ...</code> lines above.  Still, it is best
+never to rely on this behavior when writing .ty script files or .py
+code, because of the great potential for confusion, so please use "-a"
+only for interactive debugging.
+
+
 <H2>Customizing the command prompt</H2>
 
 <P>The contents of the command prompt itself are controlled by
