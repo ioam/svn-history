@@ -238,6 +238,7 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} examples/sullivan_neurocomputing04.ty
 #@@	   ${RM} examples/sullivan_nn06.ty
 #@@	   ${RM} examples/*.typ
+#@@	   ${RM} -r Output
 #@@	   ${RM} -r images
 #@@	   ${RM} -r topographica-win
 #@@	   ${RM} -r tmp/
