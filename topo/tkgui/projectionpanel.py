@@ -241,26 +241,20 @@ class PlotMatrixPanel(ProjectionSheetPanel):
             c.grid_forget()
 
 
-    # CEBALERT: seems like the label isn't always being removed.
-    # Need to find a sequence of commands that reliably shows this.
     def display_labels(self):
-        """
-        Do not display a label for each plot.
-        """
+        """Do not display labels for these plots, but do display help text."""
 
         if len(self.canvases) == 0:
             # If there are no plots yet, tell the user what to do.
             self.plot_labels=[Label(self.plot_frame,
-                                    text=self.no_plot_note_text,
-                                    justify='center')]
-
+                text=self.no_plot_note_text,justify='center')]
             self.plot_labels[0].grid(row=1,column=0,sticky='nsew')
         else:
-            # else remove the instruction
+            # else remove the instructions
             for l in self.plot_labels:
                 l.grid_forget()
             self.plot_labels=[]
-            
+            self._num_labels = 0
 
 
 class RFProjectionPanel(PlotMatrixPanel):
