@@ -210,6 +210,7 @@ def histogramplot(data,title=None,colors=None,*args,**kw):
     Example use:
      histplot([1,1,1,2,2,3,4,5],title='hist',colors='rgb',bins=3,normed=1)
     """
+    pylab.figure(figsize=(4,2))
     pylab.show._needmain=False
     n,bins,bars = pylab.hist(data,*args,**kw)
 
