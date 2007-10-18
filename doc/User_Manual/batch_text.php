@@ -37,7 +37,7 @@ the directory name (as
 <p>run_batch also accepts a parameter <code>analysis_fn</code>, which
 can be any callable Python object (e.g. the name of a function).  The
 analysis_fn will be called periodically during the run, at times
-specified by a parameter <code>analysis_times</code> (e.g.
+specified by a parameter <code>times</code> (e.g.
 <code>[0.5,2.8,100,500,1000,5000]</code>).  The simulation will
 complete after the last analysis time.
 
@@ -69,7 +69,9 @@ save_script_repr() command will go into the default output directory.
 Also note that when a parameter is set before run_batch (as
 default_density is in this example), it will not be encoded into the
 directory filename, because run_batch will not be aware that it has
-changed.  Thus in most cases it is best to provide such parameter
-values directly to run_batch, and to do analysis through run_batch's
-analysis_fn.
+changed.  Similarly, any errors in the commands provided before or
+after run_batch will not show up in the .out file stored in the
+simulation directory, because that is closed when run_batch completes.
+Thus it's usually best to use run_batch's options rather than
+separate commands as shown here.
 
