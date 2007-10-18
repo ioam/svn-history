@@ -354,12 +354,6 @@ def run_batch(script_file,output_directory="Output",
 
         topo.sim.name=simname
 
-        # JABALERT: Temporary -- make sure that the various commands
-        # required by PlotGroups are available when needed.  Need to find
-        # a better way.
-        exec "from topo.commands.analysis   import *" in __main__.__dict__
-        exec "from topo.commands.pylabplots import *" in __main__.__dict__
-
         # Run each segment, doing the analysis and saving the script state each time
         for run_to in analysis_times:
             topo.sim.run(run_to - topo.sim.time())
