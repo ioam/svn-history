@@ -320,7 +320,8 @@ class SheetPlotGroup(PlotGroup):
                 ### Specifically, a weights plot with situate=False
                 ### doesn't use the Sheet bounds, and so the
                 ### minimum_height is significantly overstated.
-                sheets = dict([(sheet.name,sheet) for sheet in self._sheets()])
+                
+                sheets = topo.sim.objects(Sheet)
                 max_sheet_height = max([(sheets[p.plot_src_name].bounds.lbrt()[3]-
                                          sheets[p.plot_src_name].bounds.lbrt()[1])
                                        for p in resizeable_plots])
