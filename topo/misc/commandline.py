@@ -136,13 +136,17 @@ def g_action(option,opt_str,value,parser):
         setattr(parser.values,"commands",list_command)
 
     boolean_option_action(option,opt_str,value,parser)
-
-topo_parser.add_option("-g","--gui",action="callback",callback=g_action,dest="gui",
-		       default=False,help="launch an interactive graphical user interface; equivalent to -c 'import topo.tkgui ; topo.tkgui.start()'.")
+    a_action(option,opt_str,value,parser)
+    
+topo_parser.add_option("-g","--gui",action="callback",callback=g_action,dest="gui",default=False,help="""
+    launch an interactive graphical user interface; \
+    equivalent to -c 'import topo.tkgui ; topo.tkgui.start()'.\
+    Implies -a.""")
 
 
 def c_action(option,opt_str,value,parser):
-    """Callback function for the -c option.""" 
+    """Callback function for the -c option."""
+    
     list_command=getattr(parser.values,option.dest)
     list_command += [value]
     setattr(parser.values,option.dest,list_command) 
@@ -151,6 +155,21 @@ def c_action(option,opt_str,value,parser):
 topo_parser.add_option("-c","--command",action = "callback",callback=c_action,type="string",
 		       default=[],dest="commands",metavar="\"<command>\"",
 		       help="commands passed in as a string and followed by files to be executed.")
+
+
+def a_action(option,opt_str,value,parser):
+    """Callback function for the -a option."""
+    import re,os
+    from filepaths import application_path
+    import __main__
+
+    for f in os.listdir(os.path.join(application_path,"topo/commands")):
+        if re.match('^[^_].*\.py$',f):
+            modulename = re.sub('\.py$','',f)
+            exec "from topo.commands."+modulename+" import *" in __main__.__dict__
+    
+topo_parser.add_option("-a","--auto-import-commands",action="callback",callback=a_action,
+		       help="import everything from commands/*.py into the main namespace, for convenience.")
 
 
 
