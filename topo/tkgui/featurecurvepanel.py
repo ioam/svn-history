@@ -53,15 +53,12 @@ class FeatureCurvePanel(PlotGroupPanel):
     def __init__(self,console,master,plotgroup,**params):
 	PlotGroupPanel.__init__(self,console,master,plotgroup,**params)
 
-        
-
-        self.pack_param("sheet",parent=self.control_frame_3,on_change=self.sheet_change,
+        self.pack_param("sheet",parent=self.control_frame_3,on_change=self.sheet_change,side='left',expand=1,
                         widget_options={'sort_fn_args':
                                         {'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
 
-
-        self.pack_param("x",parent=self.control_frame_3)
-        self.pack_param("y",parent=self.control_frame_3)
+        self.pack_param("x",parent=self.control_frame_4)
+        self.pack_param("y",parent=self.control_frame_4)
 
         # remove currently irrelevant widgets (plots are drawn in a separate window by pylab)
         # CEBNOTE: when plots are in this window, remove this line.
@@ -72,11 +69,11 @@ class FeatureCurvePanel(PlotGroupPanel):
 
         self.display_note()
 
-
-##############################################################################
         self.sheet_change()
-    def sheet_change(self):
 
+
+        
+    def sheet_change(self):
         s = self.sheet
         l,b,r,t = s.bounds.lbrt()
 
@@ -95,7 +92,7 @@ class FeatureCurvePanel(PlotGroupPanel):
             w2.set_bounds(*y.bounds)
             
             w1.refresh();w2.refresh()
-##############################################################################
+
 
 
     def setup_plotgroup(self):
@@ -109,12 +106,11 @@ class FeatureCurvePanel(PlotGroupPanel):
         self.plotgroup.sheet = sheets[0] # CB: necessary?
 
     def _plot_title(self):
-        # CEBHACKALERT: str()  (shouldn't lanbl be string already?)
-        return str(self.plotgroup.name)+' at time ' + str(self.plotgroup.time)
+        return self.plotgroup.name+' at time ' + topo.sim.timestr(self.plotgroup.time)
 
 
     def display_labels(self):
-        """plots are displayed in new windows, so don't add any labels"""
+        """Plots are displayed in new windows, so do not add any labels."""
         pass
 
 

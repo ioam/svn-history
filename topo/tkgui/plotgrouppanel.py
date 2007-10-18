@@ -146,14 +146,15 @@ e.g. for debugging.)
 	self.control_frame_2 = Frame(self)
         self.control_frame_2.pack(side=TOP,expand=NO,fill=X)
 
-
 	self.plot_group_title = Pmw.Group(self,tag_text=self.plotgroup.name)
         self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)        
         self.plot_frame = self.plot_group_title.interior() 
 
-
         self.control_frame_3 = Frame(self)
         self.control_frame_3.pack(side=TOP,expand=NO,fill=X)
+
+        self.control_frame_4 = Frame(self)
+        self.control_frame_4.pack(side=TOP,expand=NO,fill=NONE)
 
         self.updatecommand_frame = Frame(self.control_frame_3)
         self.updatecommand_frame.pack(side=TOP,expand=YES,fill=X)

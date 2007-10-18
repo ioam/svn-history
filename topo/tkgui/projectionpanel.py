@@ -75,7 +75,7 @@ class ProjectionSheetPanel(TemplatePlotGroupPanel):
 
     def __init__(self,console,master,plotgroup,**params):
         super(ProjectionSheetPanel,self).__init__(console,master,plotgroup,**params)
-        self.pack_param('sheet',parent=self.control_frame_3,on_modify=self.sheet_change,
+        self.pack_param('sheet',parent=self.control_frame_3,on_modify=self.sheet_change,side='left',expand=1,
             widget_options={'sort_fn_args':
                            {'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
 
@@ -121,8 +121,8 @@ class UnitsPanel(ProjectionSheetPanel):
                                  # sheet_change if any of them were specified. Isn't there a cleaner
                                  # way?
         super(UnitsPanel,self).__init__(console,master,plotgroup,**params)
-        self.pack_param('x',parent=self.control_frame_3,on_change=self.refresh_plots)
-        self.pack_param('y',parent=self.control_frame_3,on_change=self.refresh_plots)
+        self.pack_param('x',parent=self.control_frame_4,on_change=self.refresh_plots)
+        self.pack_param('y',parent=self.control_frame_4,on_change=self.refresh_plots)
         self.sheet_change()
 
 
@@ -174,7 +174,7 @@ class ConnectionFieldsPanel(UnitsPanel):
 
     def __init__(self,console,master,plotgroup,**params):
         super(ConnectionFieldsPanel,self).__init__(console,master,plotgroup,**params)
-        self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change)
+        self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change,side='left',expand=1)
         
     def situate_change(self):
         if self.situate:
@@ -261,8 +261,8 @@ class RFProjectionPanel(PlotMatrixPanel):
 
     def __init__(self,console,master,plotgroup,**params):
         super(PlotMatrixPanel,self).__init__(console,master,plotgroup,**params)
-        self.pack_param('input_sheet',parent=self.control_frame_3,on_modify=self.redraw_plots)
-        self.pack_param('density',parent=self.control_frame_3)
+        self.pack_param('input_sheet',parent=self.control_frame_3,on_modify=self.redraw_plots,side='left',expand=1)
+        self.pack_param('density',parent=self.control_frame_4)
 
     def setup_plotgroup(self):
         super(RFProjectionPanel,self).setup_plotgroup()
@@ -286,9 +286,9 @@ class RFProjectionPanel(PlotMatrixPanel):
 class ProjectionPanel(PlotMatrixPanel):
     def __init__(self,console,master,plotgroup,**params):
         super(ProjectionPanel,self).__init__(console,master,plotgroup,**params)
-        self.pack_param('projection',parent=self.control_frame_3,on_modify=self.refresh_plots,
+        self.pack_param('projection',parent=self.control_frame_3,on_modify=self.refresh_plots,side='left',expand=1,
                         widget_options={'sort_fn_args':{'cmp':cmp_projections}})
-        self.pack_param('density',parent=self.control_frame_3) 
+        self.pack_param('density',parent=self.control_frame_4) 
 
         
     def _plot_title(self):
@@ -336,7 +336,7 @@ class CFProjectionPanel(ProjectionPanel):
     """
     def __init__(self,console,master,plotgroup,**params):
         super(CFProjectionPanel,self).__init__(console,master,plotgroup,**params)
-        self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change)
+        self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change,side='left',expand=1)
 
     def situate_change(self):
         if self.situate:
