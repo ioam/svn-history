@@ -71,7 +71,7 @@
 </table>
 </center>
 
-<P>Screenshots: 
+Screenshots: 
 <A target="_top" href="../images/topographica-0.9.3_ubuntu.png">Plotting</A>, 
 <A target="_top" href="../images/topographica-0.9.3_modeleditor_ubuntu.png">Model editor</A>.
 
