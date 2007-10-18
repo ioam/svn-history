@@ -222,19 +222,38 @@ def save_script_repr(script_name=None):
     script_file.write(script)
 
 
+# Used only by default_analysis_function
+default_analysis_plotgroups=["Activity","Orientation Preference"]
 
 def default_analysis_function():
     """
-    Simple example of an analysis command for run_batch; users are
+    Basic example of an analysis command for run_batch; users are
     likely to need something similar but highly customized.
     """
     import topo
     from topo.commands.analysis import save_plotgroup
-    topo.commands.analysis.coordinates=[0,0]
-    topo.commands.analysis.sheet_name="V1"
-    save_plotgroup("Activity")
-    #save_plotgroup("Projection",projection=topo.sim['V1'].projections('Afferent'))
-    save_plotgroup("Orientation Preference")
+    from topo.base.projection import ProjectionSheet
+    from topo.sheets.generatorsheet import GeneratorSheet
+
+    # Build a list of all sheets worth measuring
+    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
+    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
+    input_sheets = topo.sim.objects(GeneratorSheet).values()
+    
+    # Set potentially reasonable defaults; not necessarily useful
+    topo.commands.analysis.coordinate=(0.0,0.0)
+    if input_sheets:    topo.commands.analysis.input_sheet_name=input_sheets[0].name
+    if measured_sheets: topo.commands.analysis.sheet_name=measured_sheets[0].name
+
+    # Save all plotgroups listed in default_analysis_plotgroups
+    for pg in default_analysis_plotgroups:
+        save_plotgroup(pg)
+
+    # Plot all projections for all measured_sheets
+    for s in measured_sheets:
+        for p in s.projections().values():
+            save_plotgroup("Projection",projection=p)
+
 
 
 # JAB: Should also have some sort of time scaling, so that sims with
