@@ -11,7 +11,7 @@ so that all results will be placed into a uniquely identifiable
 directory that records the options used for the run.  Example:
 
 <pre>
-  ./topographica -c "from topo.misc.commandline import run_batch" \
+  ./topographica -c "from topo.commands.basic import run_batch" \
     -c "run_batch('examples/tiny.ty')"
 </pre>
 
@@ -23,7 +23,7 @@ of the options accepted by tiny.ty, you can do that when you call
 run_batch:
 
 <pre>
-  ./topographica -c "from topo.misc.commandline import run_batch" \
+  ./topographica -c "from topo.commands.basic import run_batch" \
     -c "run_batch('examples/tiny.ty',default_density=3)"
 </pre>
 
