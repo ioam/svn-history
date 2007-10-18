@@ -632,22 +632,19 @@ def measure_cog(proj_name ="Afferent"):
            
 
 ###############################################################################
-###############################################################################
-
-
-
-
-###############################################################################
-pg= create_plotgroup(name='RF Center of Gravity',category="Preference Maps",
-            doc="""Measure the center of gravity of each Receptive
-            Field of a sheet.  Requires measure_rfs() to have been
-            called previously for that sheet.""",
-            update_command='measure_rfcog(sheet_name="V1",input_sheet_name="Retina")',
-            plot_command='topographic_grid(xsheet_view_name="XRFCoG",ysheet_view_name="YRFCoG")',
-            normalize=True)
-pg.add_plot('X RF CoG',[('Strength','XRFCoG')])
-pg.add_plot('Y RF CoG',[('Strength','YRFCoG')])
-pg.add_plot('RFCoG',[('Red','XRFCoG'),('Green','YRFCoG')])
+## JABALERT: Currently disabled, because it is not useful while the
+## RFs have a large constant offset value.
+#
+#pg= create_plotgroup(name='RF Center of Gravity',category="Preference Maps",
+#            doc="""Measure the center of gravity of each Receptive
+#            Field of a sheet.  Requires measure_rfs() to have been
+#            called previously for that sheet.""",
+#            update_command='measure_rfcog(sheet_name="V1",input_sheet_name="Retina")',
+#            plot_command='topographic_grid(xsheet_view_name="XRFCoG",ysheet_view_name="YRFCoG")',
+#            normalize=True)
+#pg.add_plot('X RF CoG',[('Strength','XRFCoG')])
+#pg.add_plot('Y RF CoG',[('Strength','YRFCoG')])
+#pg.add_plot('RFCoG',[('Red','XRFCoG'),('Green','YRFCoG')])
 
 
 
