@@ -189,10 +189,14 @@ class ConnectionFieldsPanel(UnitsPanel):
 
 
 
-# CEBALERT: change the name
-class TwoDThingPanel(ProjectionSheetPanel):
+class PlotMatrixPanel(ProjectionSheetPanel):
+    """
+    PlotGroupPanel for visualizing an array of bitmaps, such as for
+    a projection involving a matrix of units.
+    """
+    
     def setup_plotgroup(self):
-        super(TwoDThingPanel,self).setup_plotgroup()
+        super(PlotMatrixPanel,self).setup_plotgroup()
         # Force Projection-like plots to be individually small
         self.plotgroup.desired_maximum_plot_height=1
 
@@ -259,10 +263,10 @@ class TwoDThingPanel(ProjectionSheetPanel):
             
 
 
-class RFProjectionPanel(TwoDThingPanel):
+class RFProjectionPanel(PlotMatrixPanel):
 
     def __init__(self,console,master,plotgroup,**params):
-        super(TwoDThingPanel,self).__init__(console,master,plotgroup,**params)
+        super(PlotMatrixPanel,self).__init__(console,master,plotgroup,**params)
         self.pack_param('input_sheet',parent=self.control_frame_3,on_modify=self.redraw_plots)
         self.pack_param('density',parent=self.control_frame_3)
 
@@ -285,7 +289,7 @@ class RFProjectionPanel(TwoDThingPanel):
                                              topo.sim.timestr(self.plotgroup.time))
     
 
-class ProjectionPanel(TwoDThingPanel):
+class ProjectionPanel(PlotMatrixPanel):
     def __init__(self,console,master,plotgroup,**params):
         super(ProjectionPanel,self).__init__(console,master,plotgroup,**params)
         self.pack_param('projection',parent=self.control_frame_3,on_modify=self.refresh_plots,
