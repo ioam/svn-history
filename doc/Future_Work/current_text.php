@@ -223,6 +223,14 @@ breakpoint occurred.  Also consider an alternative debugger,
 http://www.digitalpeers.com/pythondebugger/.
 
 
+<H4>2007/10/18: Enforce maximum projection plot size</H4>
+Right now, Projections can be plotted with any density, even one
+higher than the number of units in the projection.  This can be
+confusing when visualizing very small networks (e.g. 5x5), as the
+default density of 10 leads to a display with four copies of each CF.
+By default, we should probably only show 5x5 CFs in such cases.
+
+
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
