@@ -1336,12 +1336,14 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         assert len(new_range)>0 # CB: remove    
 
+        tk_var = self._tk_vars[name]
+        
         # set to the item with highest precedence
         # (i.e. don't respect current value; why was I doing that before?)
-        self._tk_vars[name].set(new_range[0])
+        tk_var.set(new_range[0])
 
         w = OptionMenu(frame,tk_var,*new_range,**widget_options)
-        help_text = getdoc(self.string2object_ifrequired(name,self._tk_vars[name]._original_get()))
+        help_text = getdoc(self.string2object_ifrequired(name,tk_var._original_get()))
         self.balloon.bind(w,help_text)
         return w
     
