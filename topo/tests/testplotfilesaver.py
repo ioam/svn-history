@@ -16,7 +16,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 
 from topo.plotting.plotfilesaver import PlotGroupSaver
 
-from topo.plotting.plotgroup import PlotGroup,plotgroups
+from topo.plotting.plotgroup import PlotGroup
 
 from topo.commands.analysis import save_plotgroup
 
