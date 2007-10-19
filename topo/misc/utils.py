@@ -351,3 +351,63 @@ def signabs(x):
         sgn = 1
 
     return sgn,abs(x)
+
+
+
+# CEBALERT: would it be simpler just to have a dictionary/list
+# somewhere of extra things to pickle, and pickle that in
+# save_snapshot()? What about supporting things other than
+# module-level attributes?
+from topo.base.simulation import Singleton
+class ExtraPickler(Singleton):
+    """
+    Provides a simple means to include arbitrary attributes from
+    modules when pickling.
+
+    To include a variable z of module x.y (i.e. x.y.z) in a snapshot (and have
+    it put back as x.y.z on loading), do:
+        ExtraPickler().add( ('x.y','z') )
+    """
+    extras = []
+
+    def add(self,item):
+        self.extras.append(item)
+    
+    def __getstate__(self):
+        states = {}
+        for extra in self.extras:
+            d = {}
+            exec "from %s import %s"%(extra[0],extra[1]) in d
+            states[extra] = d[extra[1]]
+        return {'extras':self.extras,'states':states}
+                
+    def __setstate__(self,state):
+        import __main__
+        
+        self.extras = state['extras']
+        states = state['states']
+
+        for extra in set(self.extras):
+            item = states[extra]
+            module = extra[0]
+            attribute = extra[1]
+            
+            __main__.__dict__['val']=item
+
+            exec "import %s"%module in __main__.__dict__
+
+            # complication: we're about to set x.y.z=item, but
+            # the same thing might also be __main__.__dict__['z']
+            # (i.e. main's z might BE x.y.z; when we write over x.y.z,
+            # we then also need to write over main's z)
+            update_main=False
+            if attribute in __main__.__dict__:
+                full_path_item = eval("%s.%s"%(module,attribute),__main__.__dict__)
+                if __main__.__dict__[attribute] is full_path_item: # can't just check name!
+                    update_main=True
+
+            exec "%s.%s=val"%(module,attribute) in __main__.__dict__
+
+            if update_main:
+                exec "%s=val"%(attribute) in __main__.__dict__
+                

@@ -28,7 +28,10 @@ from topo.base.functionfamilies import OutputFn
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 from topo.base.projection import ProjectionSheet
+
 from topo.sheets.generatorsheet import GeneratorSheet
+
+from topo.misc.utils import ExtraPickler
 from topo.misc.filepaths import normalize_path
 from topo.misc import filepaths
 
@@ -140,7 +143,7 @@ def save_snapshot(snapshot_name=None,xml=False):
     information.
     """
     if not snapshot_name:
-        snapshot_name = topo.sim.basename() + ".typ"
+        snapshot_name = topo.sim.basename() + ".typ" # CB: how about including the time?
 
     # For now we just search topo, but could do same for other packages.
     topoPOclassattrs = PicklableClassAttributes(topo,exclusions=('plotting','tests','tkgui'),
@@ -166,7 +169,7 @@ def save_snapshot(snapshot_name=None,xml=False):
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
-    pickle_fn((topoPOclassattrs,topo.sim),snapshot_file,2)
+    pickle_fn((topoPOclassattrs,ExtraPickler(),topo.sim),snapshot_file,2)
     snapshot_file.close()
 
 
