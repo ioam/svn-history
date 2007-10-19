@@ -38,7 +38,8 @@ class TestPO(ParameterizedObject):
     st = StringParameter("string1")
 
 
-    
+cannot_get_value = [Tkinter.OptionMenu] #OptionMenu has no get()    
+
 
 class TestParametersFrameWithApply(unittest.TestCase):
 
@@ -86,12 +87,11 @@ class TestParametersFrameWithApply(unittest.TestCase):
         orig_values = {}
         for param_name,representation in self.f.representations.items():
             widget = representation['widget']
-
-            # (not possible to get value from these widgets)
-            if widget.__class__ is not Tkinter.Button and \
-               widget.__class__ is not Tkinter.OptionMenu and \
-               widget.__class__ is not Tkinter.Checkbutton:
-
+            
+            # button-type widgets don't have a value
+            widget_has_value = not 'command' in widget.config()
+                            
+            if widget.__class__ not in cannot_get_value and widget_has_value:
                 orig_values[param_name] = widget.get()
         
         self.f.Apply()
