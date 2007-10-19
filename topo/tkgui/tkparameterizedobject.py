@@ -1258,10 +1258,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
 
         # Is widget a button (but not a checkbutton)? If so, no label wanted.
-        try:
-            widget_is_a_button = 'command' in widget.config() and not hasattr(widget,'toggle')
-        except:
-            widget_is_a_button = False
+        widget_is_a_button = 'command' in widget.config() and not hasattr(widget,'toggle')
 
         # CEBALERT: change to have a label with no text
         if widget_is_a_button: 
