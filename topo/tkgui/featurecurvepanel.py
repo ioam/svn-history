@@ -65,7 +65,11 @@ class FeatureCurvePanel(PlotGroupPanel):
         for name in ['Enlarge','Reduce','Back','Fwd']: self.hide_param(name)
 
         self.auto_refresh= False
-        if self.plotgroup.plot_immediately: self.refresh()
+        if self.plotgroup.plot_immediately:
+            self.refresh()
+        else:
+            # no plots, but at least add a title
+            self.refresh_title()
 
         self.display_note()
 
