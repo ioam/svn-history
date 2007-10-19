@@ -320,6 +320,8 @@ class TaggedSlider(Tkinter.Frame):
                 currently supported for this widget; set options on
                 either the component tag or slider instead.""")
 
+        return {} # CEBALERT: need to return as Tkinter does!
+
 
     def get(self):
         """
@@ -546,5 +548,4 @@ class FocusTakingButton(Tkinter.Button):
     def __init__(self, master=None, cnf={}, **kw):
         Tkinter.Button.__init__(self,master=master,cnf=cnf,**kw)
         self.bind("<Enter>", lambda e=None,x=self: x.focus_set())
-                  
-    
+
