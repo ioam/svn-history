@@ -8,7 +8,7 @@ __version__='$Revision$'
 
 from numpy.oldnumeric import array, zeros, Float,size, shape
 from math import pi
-from copy import deepcopy
+import copy
 
 import topo
 from topo.base.arrayutils import octave_output, centroid
@@ -92,7 +92,7 @@ class PatternPresenter(ParameterizedObject):
         # Copy the given generator once for every GeneratorSheet
         inputs = dict().fromkeys(gen_list)
         for k in inputs.keys():
-            inputs[k]=deepcopy(self.gen)
+            inputs[k]=copy.deepcopy(self.gen)
 
         ### JABALERT: Should replace these special cases with general
         ### support for having meta-parameters controlling the
@@ -204,7 +204,7 @@ def save_plotgroup(name,saver_params={},**params):
     (To pass an optional parameter to the PlotFileSaver itself, the
     saver_params dictionary can be used.)
     """
-    plotgroup = plotgroups[name]
+    plotgroup = copy.copy(plotgroups[name])
     if not plotgroup:
         raise ValueError("No plotgroup named %s in plotgroups repository."%name)
 
