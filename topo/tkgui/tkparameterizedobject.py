@@ -1324,7 +1324,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # CEBALERT: extend OptionMenu so that it
         # (a) supports changing its option list (subject of a previous ALERT)
         # (b) supports sorting of its option list
-        new_range = self.translators[name].keys()        
+        new_range = self.translators[name].keys()
         if 'sort_fn_args' not in widget_options:
             # no sort specified: defaults to sort()
             new_range.sort()
@@ -1332,17 +1332,13 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             sort_fn_args = widget_options['sort_fn_args']
             del widget_options['sort_fn_args']
             if sort_fn_args is not None:
-                  new_range = keys_sorted_by_value(self.translators[name],**sort_fn_args)
+                new_range = keys_sorted_by_value(self.translators[name],**sort_fn_args)
 
-        assert len(new_range)>0 # CB: remove
-            
-        tk_var = self._tk_vars[name]
+        assert len(new_range)>0 # CB: remove    
 
-        current_value = self.object2string_ifrequired(name,self.get_parameter_value(name))
-        if current_value not in new_range:
-             current_value = new_range[0] # whatever was there is out of date now
-
-        tk_var.set(current_value)
+        # set to the item with highest precedence
+        # (i.e. don't respect current value; why was I doing that before?)
+        self._tk_vars[name].set(new_range[0])
 
         w = OptionMenu(frame,tk_var,*new_range,**widget_options)
         help_text = getdoc(self.string2object_ifrequired(name,self._tk_vars[name]._original_get()))
