@@ -533,3 +533,18 @@ class CommandPrompt(Tkinter.Frame):
         if self.msg_bar: self.msg_bar.message('state', result)
 
         self.command_entry.component('entryfield').clear()
+
+
+
+class FocusTakingButton(Tkinter.Button):
+    """
+    A Tkinter Button that takes the focus when the mouse <Enter>s.
+
+    (Tkinter.Button doesn't get focus even when it's clicked,
+    and only <Enter> and <Leave> events work for buttons.)
+    """
+    def __init__(self, master=None, cnf={}, **kw):
+        Tkinter.Button.__init__(self,master=master,cnf=cnf,**kw)
+        self.bind("<Enter>", lambda e=None,x=self: x.focus_set())
+                  
+    
