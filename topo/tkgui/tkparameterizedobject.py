@@ -100,7 +100,7 @@ import Tkinter, Pmw
 
 from inspect import getdoc
 from Tkinter import BooleanVar, StringVar, Frame, Checkbutton, \
-     Entry, Button, OptionMenu
+     Entry, OptionMenu
 from Pmw import Balloon
 
 import topo
@@ -114,6 +114,7 @@ from topo.base.parameterclasses import BooleanParameter,StringParameter, \
 from topo.misc.utils import eval_atof, inverse
 from topo.misc.filepaths import Filename, resolve_path
 
+from widgets import FocusTakingButton as Button2
 from topowidgets import TkPOTaggedSlider
     
 
@@ -1082,6 +1083,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         dictionary, under the Parameter's name.
         """
         self.master = master
+        
         self.param_immediately_apply_change = {BooleanParameter:True,
                                                SelectorParameter:True,
                                                Number:False,
@@ -1254,8 +1256,15 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         widget=widget_creation_fn(master,name,widget_options)
 
+
+        # Is widget a button (but not a checkbutton)? If so, no label wanted.
+        try:
+            widget_is_a_button = 'command' in widget.config() and not hasattr(widget,'toggle')
+        except:
+            widget_is_a_button = False
+
         # CEBALERT: change to have a label with no text
-        if widget.__class__ is Tkinter.Button:
+        if widget_is_a_button: 
             label = None
         else:
             label = Tkinter.Label(master,text=self.pretty_print(name))
@@ -1287,7 +1296,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # handle their translation. But we're not offering a GUI
         # builder so it doesn't matter.)
 
-        button = Button(frame,command=command)
+        button = Button2(frame,command=command)
 
         button_param = self.get_parameter_object(name)
 
