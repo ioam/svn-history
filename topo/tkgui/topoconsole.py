@@ -12,6 +12,7 @@ __version__='$Revision$'
 
 
 import os
+import copy
 import sys
 import __main__
 import webbrowser
@@ -277,7 +278,7 @@ class TopoConsole(TkguiWindow):
         entries=KeyedList() # keep the order of plotgroup_templates (which is also KL)
         categories = []
         for label,plotgroup in plotgroups.items():
-            entries[label] = PlotsMenuEntry(self,plotgroup)
+            entries[label] = PlotsMenuEntry(self,copy.copy(plotgroup))
             categories.append(plotgroup.category)
         categories = sorted(set(categories))
 
