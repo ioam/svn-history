@@ -320,8 +320,8 @@ class TaggedSlider(Tkinter.Frame):
                 currently supported for this widget; set options on
                 either the component tag or slider instead.""")
 
-        return {} # CEBALERT: need to return as Tkinter does!
-
+        return {} # CEBALERT: need to return same object as Tkinter would.
+    
 
     def get(self):
         """
