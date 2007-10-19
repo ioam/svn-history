@@ -69,7 +69,7 @@ class KeyedList(list):
                              he can see whether this code is used anywhere"""
                     return value
 
-        raise KeyError(k)
+        raise KeyError(key)
 
 
     def __setitem__(self,k,v):
