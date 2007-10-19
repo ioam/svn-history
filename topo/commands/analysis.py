@@ -205,8 +205,6 @@ def save_plotgroup(name,saver_params={},**params):
     saver_params dictionary can be used.)
     """
     plotgroup = copy.copy(plotgroups[name])
-    if not plotgroup:
-        raise ValueError("No plotgroup named %s in plotgroups repository."%name)
 
     # JABALERT: Why does a Projection plot need a Sheet parameter?
     # CB: It shouldn't, of course, since we know the sheet when we have
