@@ -260,7 +260,7 @@ class TaggedSlider(Tkinter.Frame):
                     showvalue=0,orient='horizontal',length=slider_length,
                     **slider_extra_config)
         
-        self.slider.pack(side='right')
+        self.slider.pack(side='right',expand="yes",fill='x')
         self.slider.bind('<ButtonRelease-1>', self._slider_used)
         self.slider.bind('<B1-Motion>', self._slider_used)
 
