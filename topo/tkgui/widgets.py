@@ -168,8 +168,8 @@ class ResizableScrollableFrame(Tkinter.Frame):
         f=ResizableScrollableFrame(master) will be via f.contents.
         """
         Tkinter.Frame.__init__(self,master,**config)
-
         self.master = master
+
         # non-empty Frames ignore any specified width/height, so create two empty
         # frames used purely for setting height & width
         self.__height_sizer = Tkinter.Frame(self,height=0,width=0)#2,borderwidth=2,relief='sunken',background="blue")
@@ -223,7 +223,8 @@ class ResizableScrollableFrame(Tkinter.Frame):
         scrollbar = self._which_scrollbars()
 
         dw = extraw-3; dh = extrah-3
-        
+
+        #self._scrolled_window.config(scrollbar=scrollbar)
         if scrollbar=="none":
             w-=dw
             h-=dh
