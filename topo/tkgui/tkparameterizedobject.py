@@ -1344,9 +1344,12 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         tk_var = self._tk_vars[name]
         
-        # set to the item with highest precedence
-        # (i.e. don't respect current value; why was I doing that before?)
-        tk_var.set(new_range[0])
+
+        # respect current value, so long as it's in the list
+        current_value = self.object2string_ifrequired(name,self.get_parameter_value(name))
+        if current_value not in new_range:
+            current_value = new_range[0] # whatever was there is out of date now
+        tk_var.set(current_value)
 
         w = OptionMenu(frame,tk_var,*new_range,**widget_options)
         help_text = getdoc(self.string2object_ifrequired(name,tk_var._original_get()))
