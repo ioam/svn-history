@@ -122,11 +122,11 @@ class PlotsMenuEntry(ParameterizedObject):
         """
         if self.class_.valid_context():
             # window hidden while being constructed to improve appearance
-            window = ScrolledTkguiWindow() ; window.withdraw()
+            window = ScrolledTkguiWindow(); window.withdraw()
             panel = self.class_(self.console,window.content,self.plotgroup,**args)
             panel.pack(expand='yes',fill='both')
-            window.sizeright()
             window.deiconify()
+            window._scroll_frame.sizeright()
             
             self.console.messageBar.message('state', 'OK')
             return panel
@@ -484,8 +484,8 @@ class TopoConsole(TkguiWindow):
             window = ScrolledTkguiWindow() ; window.withdraw()
             panel = TestPattern(self,window.content)
             panel.pack(expand='yes',fill='both')
-            window.sizeright()
             window.deiconify()
+            window._scroll_frame.sizeright()
 
 
             self.messageBar.message('state', 'OK')

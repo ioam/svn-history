@@ -46,31 +46,12 @@ class TkguiWindow(Tkinter.Toplevel):
         # CB: not currently used by anything but the plotgrouppanels
         # self.context_menu = Tkinter.Menu(self, tearoff=0)
         # self.bind("<<right-click>>",self.display_context_menu)
-
 ######################################################################
 
 
 ######################################################################
-# CB: needs significant cleanup. Some methods will move to
-# the resizable frame. 
-# Also see current task list.
-class ScrolledTkguiWindow(TkguiWindow):
-    """
-    A TkguiWindow with automatic scrollbars.
-    """
-    def __init__(self,**config):
-        TkguiWindow.__init__(self,**config)
 
-        self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
-        self._scroll_frame = ResizableScrollableFrame(self,borderwidth=2,
-                                                       relief="flat")
-        self._scroll_frame.pack(expand="yes",fill="both")
-        self.content = self._scroll_frame.contents
-
-        # provide route to title() method for convenience
-        self.content.title = self.title
-
-        
+# might wonder why not bind configure?
 # The ScrolledTkguiWindow receives 100s of <Configure> events in a
 # short time when a button like "Enlarge" is pressed.  I *guess* this
 # is because there are lots of widgets in the window, and each time
@@ -85,64 +66,26 @@ class ScrolledTkguiWindow(TkguiWindow):
 # delayed_sizeright() to be called a time t after a <Configure> event;
 # delayed_sizeright() in turn only calls sizeright() if the time
 # since the last <Configure> is (about) the same as t.
-        self.bind("<Configure>",self.handle_configure_event)
 
-    def handle_configure_event(self,e=None):
-        self.after_idle(self.sizeright)
-        #return ""    
-
-    def _need_bars(self):
-        sw = self._scroll_frame._scrolled_window
-        c = self.content
-        need_x,need_y = False,False
-        if sw.winfo_width()<c.winfo_reqwidth() and \
-               abs(sw.winfo_width()-c.winfo_reqwidth())>1: 
-            need_x=True
-        if sw.winfo_height()<c.winfo_reqheight() and \
-               abs(sw.winfo_height()-c.winfo_reqheight())>1:
-            need_y=True
-        return need_x,need_y
-
-    def _which_scrollbars(self):
-        need_x,need_y = self._need_bars()
-        if need_x and need_y:
-            scrollbar = 'both'
-        elif need_x and not need_y:
-            scrollbar = 'horizontal'
-        elif not need_x and need_y:
-            scrollbar = 'vertical'
-        elif not need_x and not need_y:
-            scrollbar = 'none'
-        return scrollbar
-
-    def sizeright(self):
-        # if user has changed window size, need to tell tkinter that it should take
-        # control again.
-        self.geometry('')
-
-        # Extra for width of scrollbars; should be found programmatically. But how?
-        extraw = 19
-        extrah = 19
-
-        w = min(self.content.winfo_reqwidth(),self.winfo_screenwidth())
-        # -60 for task bars etc on screen...how to find true viewable height?
-        h = min(self.content.winfo_reqheight(),self.winfo_screenheight()-60)
-
-        if not hasattr(self,'oldsize') or self.oldsize!=(w,h):
-            self._scroll_frame.set_size(w,h)
-            self.oldsize = (w,h)
-            scrollbars = self._which_scrollbars()
-            self._scroll_frame._scrolled_window.config(scrollbar=scrollbars)
-
-            if scrollbars!="none": 
-                w+=extraw
-                h+=extrah
+# CB: Working here
+# needs significant cleanup; merging with widgets' RSFrame
+class ScrolledTkguiWindow(TkguiWindow):
+    """
+    A TkguiWindow with automatic scrollbars.
+    """
+    def __init__(self,**config):
+        TkguiWindow.__init__(self,**config)
                 
-            self._scroll_frame.set_size(w,h)
-            self.oldsize = (w,h)
-        else:
-            self._scroll_frame._scrolled_window.config(scrollbar=self._which_scrollbars())
-        
+        self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
+        self._scroll_frame = ResizableScrollableFrame(self,borderwidth=2,
+                                                       relief="flat")
+        self._scroll_frame.pack(expand="yes",fill="both")
+        self.bind("<<SizeRight>>",self._scroll_frame.sizeright)
+
+        self.content = self._scroll_frame.contents
+
+        # provide route to title() method for convenience
+        self.content.title = self.title
 
 ######################################################################            
 

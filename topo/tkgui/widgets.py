@@ -146,7 +146,9 @@ class ControllableMenu(Menu):
 
 ######################################################################
 ######################################################################
-# CB: cleanup and document
+# CB: Working here
+# cleanup and document
+# becoming a window; started as a frame
 class ResizableScrollableFrame(Tkinter.Frame):
     """
     A scrollable frame that can also be manually resized.
@@ -167,16 +169,17 @@ class ResizableScrollableFrame(Tkinter.Frame):
         """
         Tkinter.Frame.__init__(self,master,**config)
 
+        self.master = master
         # non-empty Frames ignore any specified width/height, so create two empty
         # frames used purely for setting height & width
-        self.__height_sizer = Tkinter.Frame(self,height=0,width=0)
+        self.__height_sizer = Tkinter.Frame(self,height=0,width=0)#2,borderwidth=2,relief='sunken',background="blue")
         self.__height_sizer.pack(side="left")
-        self.__width_sizer = Tkinter.Frame(self,width=0,height=0)
+        self.__width_sizer = Tkinter.Frame(self,width=0,height=0)#2,background="red",borderwidth=2,relief="sunken")
         self.__width_sizer.pack()
 
         # the scrollable frame, with scrollbars
-        self._scrolled_window = bwidget.ScrolledWindow(self,auto="both",
-                                                       scrollbar="both")
+        self._scrolled_window = bwidget.ScrolledWindow(self,scrollbar="both") #auto="both") #*shscrollbar="none")#,,
+                                                       #scrollbar="both")
         # set small start height/width, will grow if necessary
         scrolled_frame = bwidget.ScrollableFrame(self._scrolled_window,
                                                  height=50,width=50)
@@ -187,7 +190,10 @@ class ResizableScrollableFrame(Tkinter.Frame):
         # CB: tk docs say getframe() not necessary? Where did I see that?
         self.contents = scrolled_frame.getframe()
 
+        self.oldsize=(-1,-1)
 
+
+        
     def set_size(self,width=None,height=None):
         """
         Manually specify the size of the scrollable frame area.
@@ -195,7 +201,66 @@ class ResizableScrollableFrame(Tkinter.Frame):
         if width:self.__width_sizer['width']=width
         if height:self.__height_sizer['height']=height
 
+    # CB: rename, rename event
+    def sizeright(self,e=None):
+        self.master.geometry('')
 
+        # Extra for width of scrollbars; should be found programmatically. But how?
+        extraw = 19; extrah = 19
+
+        self.update_idletasks()
+        
+        w = min(self.contents.winfo_reqwidth()+extraw,
+                self.winfo_screenwidth()-extraw)
+        # -60 for task bars etc on screen...how to find true viewable height?
+        h = min(self.contents.winfo_reqheight()+extrah,
+                self.winfo_screenheight()-60-extrah)
+
+        if self.oldsize!=(w,h):
+            self.set_size(w,h)
+            self.oldsize = (w,h)
+
+        scrollbar = self._which_scrollbars()
+
+        dw = extraw-3; dh = extrah-3
+        
+        if scrollbar=="none":
+            w-=dw
+            h-=dh
+        elif scrollbar=="vertical":
+            h-=dh
+        elif scrollbar=="horizontal":
+            w-=dw
+
+        self.set_size(w,h)
+        # don't set self.oldsize=(w,h)
+
+
+    def _need_bars(self):
+        sw = self._scrolled_window
+        c = self.contents
+        need_x,need_y = False,False
+        self.update_idletasks()
+        if sw.winfo_width()<c.winfo_reqwidth() and \
+               abs(sw.winfo_width()-c.winfo_reqwidth())>1: 
+            need_x=True
+        if sw.winfo_height()<c.winfo_reqheight() and \
+               abs(sw.winfo_height()-c.winfo_reqheight())>1:
+            need_y=True
+        return need_x,need_y
+
+    def _which_scrollbars(self):
+        need_x,need_y = self._need_bars()
+        if need_x and need_y:
+            scrollbar = 'both'
+        elif need_x and not need_y:
+            scrollbar = 'horizontal'
+        elif not need_x and need_y:
+            scrollbar = 'vertical'
+        elif not need_x and not need_y:
+            scrollbar = 'none'
+        return scrollbar
+    
 ##     def _fractions_visible(self):
 ##         X = [float(x) for x in self.scrolled_frame.xview().split(' ')]
 ##         Y = [float(x) for x in self.scrolled_frame.xview().split(' ')]
