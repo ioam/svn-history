@@ -809,6 +809,11 @@ class FeatureCurvePlotGroup(UnitPlotGroup):
 
 
 
+# CEBALERT: most uses of an entry (PlotGroup) from plotgroups mean to
+# take a *copy* of that entry. Should we provide access methods to do
+# this?
+# E.g. save_plotgroup() ought to be taking copies of plotgroups
+# from here.
 plotgroups = KeyedList()
 """
 Global repository of PlotGroups, to which users can add their own as
