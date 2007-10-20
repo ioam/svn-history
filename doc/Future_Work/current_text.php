@@ -41,8 +41,6 @@ tracker rather than added to this list</B>.
 <H4>2007/10/20: bugs to fix for 0.9.4 binaries</H4>
 <ul>
 
-<li>Saving plotgroups doesn't work - at least fix subplots</li>
-
 <li>Click +/- for a plot and it resizes. But then press refresh and it 
 reverts to the original size</li>
 
