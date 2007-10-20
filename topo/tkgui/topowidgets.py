@@ -134,40 +134,67 @@ class TkPOTaggedSlider(TaggedSlider):
 
 
 # CEB: working here; this is *not* finished
-# (needs to become tkparameterizedobject, so we can have some parameters
+# (+ needs to become tkparameterizedobject, so we can have some parameters
 #  to control formatting etc)
-class ProgressWindow(TkguiWindow):
-    """
-    Graphically displays progress information for a SomeTimer object.
-    
-    ** Currently expects a 0-100 (percent) value ***        
-    """
+# Split up to solve a problem on windows for release 0.9.4.
+# Wait until we've decided what to do with SomeTimer before recoding.
 
-    def __init__(self,timer=None,progress_var=None,title=None,display=True,**config):
-        TkguiWindow.__init__(self,**config)
+class ProgressController(object):
+    def __init__(self,timer=None,progress_var=None):
 
-        self.protocol("WM_DELETE_WINDOW",self.set_stop)
-
-        if not display:self.withdraw()
-        
         self.timer = timer or topo.sim.timer
         self.timer.receive_info.append(self.timing_info)
-        
-        self.title(title or self.timer.func.__name__.capitalize())
-        self.balloon = Pmw.Balloon(self)
 
         self.progress_var = progress_var or Tkinter.DoubleVar()
         # trace the variable so that at 100 we can destroy the window
         self.progress_trace_name = self.progress_var.trace_variable(
             'w',lambda name,index,mode: self._close_if_complete())
 
+
+    def _close_if_complete(self):
+        """
+        Close the specified progress window if the value of progress_var has reached 100.
+        """
+        if self.progress_var.get()>=100:
+            # delete the variable trace (necessary?)
+            self.progress_var.trace_vdelete('w',self.progress_trace_name)
+
+            self._close(last_message="Time %s: Finished %s"%(topo.sim.timestr(),
+                                                             self.timer.func.__name__))
+            
+    # CB: should allow interruption of whatever process it's timing
+    def _close(self,last_message=None):
+        self.timer.receive_info.remove(self.timing_info)
+        if last_message: topo.guimain.status_message(last_message)
+
+    def timing_info(self,time,percent,name,duration,remaining):
+        self.progress_var.set(percent)
+
+    # CB: should allow interruption of whatever process it's timing
+    def set_stop(self):
+        """Declare that running should be interrupted."""
+        self.timer.stop=True
+
+
+class ProgressWindow(ProgressController,TkguiWindow):
+    """
+    Graphically displays progress information for a SomeTimer object.
+    
+    ** Currently expects a 0-100 (percent) value ***        
+    """
+
+    def __init__(self,timer=None,progress_var=None,title=None):
+        ProgressController.__init__(self,timer,progress_var)
+        TkguiWindow.__init__(self)
+
+        self.protocol("WM_DELETE_WINDOW",self.set_stop)
+        self.title(title or self.timer.func.__name__.capitalize())
+        self.balloon = Pmw.Balloon(self)
+
         progress_bar = bwidget.ProgressBar(self,type="normal",
-                                           maximum=100,
-                                           height=20,
-                                           width=200,
+                                           maximum=100,height=20,width=200,
                                            variable=self.progress_var)
         progress_bar.pack(padx=15,pady=15)
-
 
         progress_box = Tkinter.Frame(self,border=2,relief="sunken")
         progress_box.pack()
@@ -189,41 +216,23 @@ class ProgressWindow(TkguiWindow):
         stop_button = Tkinter.Button(self,text="Stop",command=self.set_stop)
         stop_button.pack(side="bottom")
         self.balloon.bind(stop_button,"""
-            Stop a running simulation.
+        Stop a running simulation.
+            
+        The simulation can be interrupted only on round integer
+        simulation times, e.g. at 3.0 or 4.0 but not 3.15.  This
+        ensures that stopping and restarting are safe for any
+        model set up to be in a consistent state at integer
+        boundaries, as the example Topographica models are.""")
+            
         
-            The simulation can be interrupted only on round integer
-            simulation times, e.g. at 3.0 or 4.0 but not 3.15.  This
-            ensures that stopping and restarting are safe for any
-            model set up to be in a consistent state at integer
-            boundaries, as the example Topographica models are.""")
-
-    def _close_if_complete(self):
-        """
-        Close the specified progress window if the value of progress_var has reached 100.
-        """
-        if self.progress_var.get()>=100:
-            # delete the variable trace (necessary?)
-            self.progress_var.trace_vdelete('w',self.progress_trace_name)
-
-            self._close_window(last_message="Time %s: Finished %s"%(topo.sim.timestr(),
-                                                                    self.timer.func.__name__))
-                                                        
-
-    # CB: should allow interruption of whatever process it's timing
-    def set_stop(self):
-        """Declare that running should be interrupted."""
-        self.timer.stop=True
-        self._close_window(last_message="Interrupted %s"%self.timer.func.__name__)
-        
-    def _close_window(self,last_message=None):
-        self.timer.receive_info.remove(self.timing_info)
-        if last_message: topo.guimain.status_message(last_message)
+    def _close(self,last_message=None):
+        ProgressController._close(self,last_message)
         TkguiWindow.destroy(self)
         self.destroyed=True
 
     def timing_info(self,time,percent,name,duration,remaining):
-        self.progress_var.set(percent)
-
+        ProgressController.timing_info(self,time,percent,name,duration,remaining)
+        
         # hack because i'm doing something in the wrong order
         if not hasattr(self,'destroyed'):
             self.duration['text'] = str(duration)

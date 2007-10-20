@@ -36,7 +36,7 @@ import topo.commands.basic
 
 import topo.tkgui 
 from widgets import TaggedSlider,ControllableMenu, CommandPrompt
-from topowidgets import ScrolledTkguiWindow,TkguiWindow,ProgressWindow
+from topowidgets import ScrolledTkguiWindow,TkguiWindow,ProgressWindow,ProgressController
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from featurecurvepanel import FeatureCurvePanel
 from projectionpanel import CFProjectionPanel,ProjectionActivityPanel,ConnectionFieldsPanel,RFProjectionPanel
@@ -558,11 +558,10 @@ class TopoConsole(TkguiWindow):
 
         # CB: clean up (+ docstring)
         if fduration>9:
-            display_progress=True
+            ProgressWindow()
         else:
-            display_progress=False
-
-        ProgressWindow(display=display_progress)
+            ProgressController()
+            
         topo.sim.run_and_time(fduration)
         self.auto_refresh()
         
