@@ -224,7 +224,12 @@ class ResizableScrollableFrame(Tkinter.Frame):
 
         dw = extraw-3; dh = extrah-3
 
-        #self._scrolled_window.config(scrollbar=scrollbar)
+        # can't seem to do this anywhere but right here
+        # (get attributeerror otherwise)
+        import topo.tkgui
+        if topo.tkgui.system_platform!="mac":
+            self._scrolled_window.config(scrollbar=scrollbar)
+
         if scrollbar=="none":
             w-=dw
             h-=dh
