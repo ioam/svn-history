@@ -366,6 +366,8 @@ e.g. for debugging.)
             self.no_plot_note.grid(row=1,column=0,sticky='nsew')
         else:
             self.no_plot_note.grid_forget()
+
+        self.event_generate("<<SizeRight>>")
         
         
     def refresh_plots(self):
