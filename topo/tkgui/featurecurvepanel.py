@@ -53,9 +53,10 @@ class FeatureCurvePanel(PlotGroupPanel):
     def __init__(self,console,master,plotgroup,**params):
 	PlotGroupPanel.__init__(self,console,master,plotgroup,**params)
 
-        self.pack_param("sheet",parent=self.control_frame_3,on_change=self.sheet_change,side='left',expand=1,
-                        widget_options={'sort_fn_args':
-                                        {'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
+        self.pack_param("sheet",parent=self.control_frame_3,
+            on_change=self.sheet_change,side='left',expand=1,
+            widget_options={'new_default':True,
+                            'sort_fn_args':{'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
 
         self.pack_param("x",parent=self.control_frame_4)
         self.pack_param("y",parent=self.control_frame_4)

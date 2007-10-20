@@ -75,9 +75,10 @@ class ProjectionSheetPanel(TemplatePlotGroupPanel):
 
     def __init__(self,console,master,plotgroup,**params):
         super(ProjectionSheetPanel,self).__init__(console,master,plotgroup,**params)
-        self.pack_param('sheet',parent=self.control_frame_3,on_modify=self.sheet_change,side='left',expand=1,
-            widget_options={'sort_fn_args':
-                           {'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
+        self.pack_param('sheet',parent=self.control_frame_3,
+            on_modify=self.sheet_change,side='left',expand=1,
+            widget_options={'new_default':True,
+                            'sort_fn_args':{'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
 
         
     def setup_plotgroup(self):
@@ -250,7 +251,10 @@ class RFProjectionPanel(PlotMatrixPanel):
 
     def __init__(self,console,master,plotgroup,**params):
         super(PlotMatrixPanel,self).__init__(console,master,plotgroup,**params)
-        self.pack_param('input_sheet',parent=self.control_frame_3,on_modify=self.redraw_plots,side='left',expand=1)
+        self.pack_param('input_sheet',parent=self.control_frame_3,
+                        on_modify=self.redraw_plots,side='left',expand=1,
+                        widget_options={'new_default':True})
+                        
         self.pack_param('density',parent=self.control_frame_4)
 
     def setup_plotgroup(self):
@@ -275,8 +279,11 @@ class RFProjectionPanel(PlotMatrixPanel):
 class ProjectionPanel(PlotMatrixPanel):
     def __init__(self,console,master,plotgroup,**params):
         super(ProjectionPanel,self).__init__(console,master,plotgroup,**params)
-        self.pack_param('projection',parent=self.control_frame_3,on_modify=self.refresh_plots,side='left',expand=1,
-                        widget_options={'sort_fn_args':{'cmp':cmp_projections}})
+        self.pack_param('projection',parent=self.control_frame_3,
+                        on_modify=self.refresh_plots,side='left',expand=1,
+                        widget_options={'sort_fn_args':{'cmp':cmp_projections},
+                                        'new_default':True})
+        
         self.pack_param('density',parent=self.control_frame_4) 
 
         
@@ -314,7 +321,10 @@ class ProjectionPanel(PlotMatrixPanel):
             l  = self.representations['projection']['label']
             l.destroy()
             w.destroy()
-            self.pack_param('projection',parent=self.representations['projection']['frame'])
+            self.pack_param('projection',parent=self.representations['projection']['frame'],
+                            on_modify=self.refresh_plots,side='left',expand=1,
+                            widget_options={'sort_fn_args':{'cmp':cmp_projections},
+                                            'new_default':True})
         #################
 
 
