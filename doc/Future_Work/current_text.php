@@ -44,11 +44,7 @@ tracker rather than added to this list</B>.
 <li>Click +/- for a plot and it resizes. But then press refresh and it 
 reverts to the original size</li>
 
-<li>Scrollbars: broken on OSX, strange on FC5</li>
-
-<li>On windows, progress  bar always flicks on for a small fraction of a second
-(even for runs of 1)</li>
-
+<li>Scrollbars: still strange on FC5?</li>
 <li>OS X buildbot needs a display</li>
 </ul>
 
@@ -90,6 +86,9 @@ Maybe it's getting daunting?
 <!-- ------------------------------------------------------------------------ -->
 
 <H2>Tasks to be addressed after the 0.9.4 release:</H2>
+
+<H4>2007/09/20: copying plotgroup from plotgroups</H4>
+See ALERT next to plotgroups in plotgroup.py.
 
 <H4>2007/09/01: timing code </H4>
 The timing object is nearly done, allowing progress bars, time
