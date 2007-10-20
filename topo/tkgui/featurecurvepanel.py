@@ -67,9 +67,6 @@ class FeatureCurvePanel(PlotGroupPanel):
         self.auto_refresh= False
         if self.plotgroup.plot_immediately:
             self.refresh()
-        else:
-            self.display_no_plot_note()
-            self.refresh_title()
 
         self.sheet_change()
 

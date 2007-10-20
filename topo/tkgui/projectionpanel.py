@@ -242,19 +242,10 @@ class PlotMatrixPanel(ProjectionSheetPanel):
 
 
     def display_labels(self):
-        """Do not display labels for these plots, but do display help text."""
+        """Do not display labels for these plots."""
+        pass
 
-        if len(self.canvases) == 0:
-            # If there are no plots yet, tell the user what to do.
-            self.display_no_plot_note()
-        else:
-            # else remove the instructions
-            for l in self.plot_labels:
-                l.grid_forget()
-            self.plot_labels=[]
-            self._num_labels = 0
-
-
+    
 class RFProjectionPanel(PlotMatrixPanel):
 
     def __init__(self,console,master,plotgroup,**params):

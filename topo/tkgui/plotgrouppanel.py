@@ -114,6 +114,10 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         
         self.setup_plotgroup()
 
+
+
+
+
         self.canvases = []
         self.plot_labels = []
 
@@ -137,6 +141,23 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 	self.plot_group_title = Pmw.Group(self,tag_text=self.plotgroup.name)
         self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)        
         self.plot_frame = self.plot_group_title.interior() 
+
+
+        # Label does have a wraplength option...but it's in screen
+        # units. Surely tk has a function to convert between
+        # text and screen units?
+        no_plot_note_text = """
+(Press Refresh on the update command to generate
+the plot, after modifying the commands below if
+necessary.  Refreshing may take some time.
+
+Many commands accept 'display=True' so that the
+progress can be viewed in an open Activity window,
+e.g. for debugging.)
+"""        
+        self.no_plot_note=Label(self.plot_frame,text=no_plot_note_text,justify='center')
+
+
 
         self.control_frame_3 = Frame(self)
         self.control_frame_3.pack(side=TOP,expand=NO,fill=X)
@@ -217,12 +238,18 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         self._canvas_menu.add_cascade(menu=self._sheet_menu,state=DISABLED,
                                       indexname='sheet_menu')
         self._canvas_menu.add_separator()
-        
+
+
+        self.update_plot_frame(plots=False)
                                     
         #################################################################
 
         # CB: don't forget to include ctrl-q
         # import __main__; __main__.__dict__['qqq']=self
+
+
+
+
 
     def setup_plotgroup(self):
         """
@@ -328,31 +355,17 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         return x
 
 
-    def display_no_plot_note(self):
-
-        # Label does have a wraplength option...but it's in screen
-        # units. Surely tk has a function to convert between
-        # text and screen units?
-        no_plot_note_text = """
-(Press Refresh on the update command to generate
-the plot, after modifying the commands below if
-necessary.  Refreshing may take some time.
-
-Many commands accept 'display=True' so that the
-progress can be viewed in an open Activity window,
-e.g. for debugging.)
-"""
-        
-        self.plot_labels=[Label(self.plot_frame,text=no_plot_note_text,
-                                justify='center')]
-        self.plot_labels[0].grid(row=1,column=0,sticky='nsew')
-
 
     # document, and make display_* methods semi-private methods
     def update_plot_frame(self,plots=True,labels=True):
         if plots:self.display_plots()
         if labels:self.display_labels()
         self.refresh_title()
+
+        if len(self.canvases)==0:
+            self.no_plot_note.grid(row=1,column=0,sticky='nsew')
+        else:
+            self.no_plot_note.grid_forget()
         
         
     def refresh_plots(self):
@@ -512,9 +525,7 @@ e.g. for debugging.)
         """
         
         if len(self.canvases) == 0:
-            # If there are no plots yet, tell the user what to do.
-            self.display_no_plot_note()
-
+            pass
         elif self._num_labels != len(self.canvases):
             old_labels = self.plot_labels
             self.plot_labels = [Label(self.plot_frame,text=each)
