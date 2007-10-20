@@ -107,18 +107,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         to the params_in_history list, otherwise it will be disabled
         in historical views.
         """
-        # Label does have a wraplength option...but it's in screen
-        # units. Surely tk has a function to convert between
-        # text and screen units?
-        self.no_plot_note_text = """
-(Press Refresh on the update command to generate
-the plot, after modifying the commands below if
-necessary.  Refreshing may take some time.
-
-Many commands accept 'display=True' so that the
-progress can be viewed in an open Activity window,
-e.g. for debugging.)
-"""
         
         TkParameterizedObject.__init__(self,master,extraPO=plotgroup,**params)
         Frame.__init__(self,master)
@@ -338,7 +326,27 @@ e.g. for debugging.)
         Subclasses can override to add extra relevant information.
         """
         return x
+
+
+    def display_no_plot_note(self):
+
+        # Label does have a wraplength option...but it's in screen
+        # units. Surely tk has a function to convert between
+        # text and screen units?
+        no_plot_note_text = """
+(Press Refresh on the update command to generate
+the plot, after modifying the commands below if
+necessary.  Refreshing may take some time.
+
+Many commands accept 'display=True' so that the
+progress can be viewed in an open Activity window,
+e.g. for debugging.)
+"""
         
+        self.plot_labels=[Label(self.plot_frame,text=no_plot_note_text,
+                                justify='center')]
+        self.plot_labels[0].grid(row=1,column=0,sticky='nsew')
+
 
     def _display_plots_and_labels(self):
         # CEBALERT: probably results in display_labels being called
@@ -506,11 +514,7 @@ e.g. for debugging.)
         
         if len(self.canvases) == 0:
             # If there are no plots yet, tell the user what to do.
-            self.plot_labels=[Label(self.plot_frame,
-                                    text=self.no_plot_note_text,
-                                    justify='center')]
-
-            self.plot_labels[0].grid(row=1,column=0,sticky=NSEW)
+            self.display_no_plot_note()
 
         elif self._num_labels != len(self.canvases):
             old_labels = self.plot_labels

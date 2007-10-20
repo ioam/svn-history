@@ -68,10 +68,8 @@ class FeatureCurvePanel(PlotGroupPanel):
         if self.plotgroup.plot_immediately:
             self.refresh()
         else:
-            # no plots, but at least add a title
+            self.display_no_plot_note()
             self.refresh_title()
-
-        self.display_note()
 
         self.sheet_change()
 
@@ -118,10 +116,6 @@ class FeatureCurvePanel(PlotGroupPanel):
         pass
 
 
-    def display_note(self):
-        self.plot_labels=[Label(self.plot_frame,text=self.no_plot_note_text,
-                                justify='center')]
-        self.plot_labels[0].grid(row=1,column=0,sticky='nsew')
 
 
 

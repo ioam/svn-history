@@ -246,9 +246,7 @@ class PlotMatrixPanel(ProjectionSheetPanel):
 
         if len(self.canvases) == 0:
             # If there are no plots yet, tell the user what to do.
-            self.plot_labels=[Label(self.plot_frame,
-                text=self.no_plot_note_text,justify='center')]
-            self.plot_labels[0].grid(row=1,column=0,sticky='nsew')
+            self.display_no_plot_note()
         else:
             # else remove the instructions
             for l in self.plot_labels:
