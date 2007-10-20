@@ -348,13 +348,12 @@ e.g. for debugging.)
         self.plot_labels[0].grid(row=1,column=0,sticky='nsew')
 
 
-    def _display_plots_and_labels(self):
-        # CEBALERT: probably results in display_labels being called
-        # more often than needed (is it needed for redraw_plots?).
-        self.display_plots()
-        self.display_labels()
+    # document, and make display_* methods semi-private methods
+    def update_plot_frame(self,plots=True,labels=True):
+        if plots:self.display_plots()
+        if labels:self.display_labels()
         self.refresh_title()
-
+        
         
     def refresh_plots(self):
         """
@@ -367,7 +366,7 @@ e.g. for debugging.)
         # update plotgroup while looking in history." # (never update
         # plots in the history, or they go to current activity)
         self.plotgroup.make_plots(update=True)
-        self._display_plots_and_labels()
+        self.update_plot_frame()
 
 
     def redraw_plots(self):
@@ -376,7 +375,7 @@ e.g. for debugging.)
         plot_command, not update_command), then display the result.
         """
         self.plotgroup.make_plots(update=False)
-        self._display_plots_and_labels()
+        self.update_plot_frame(labels=False)
         
 
     def rescale_plots(self):
@@ -385,7 +384,7 @@ e.g. for debugging.)
         plot_command or the update_command, then display the result.
         """
         self.plotgroup.scale_images()
-        self._display_plots_and_labels()
+        self.update_plot_frame(labels=False)
         
 
     def refresh(self,update=True):
@@ -410,7 +409,6 @@ e.g. for debugging.)
         self.add_to_history()                     
                 
         Pmw.hidebusycursor()
-
 
 
     # CEBALERT: this method needs cleaning, along with its versions in subclasses.
@@ -500,6 +498,7 @@ e.g. for debugging.)
             canvas.bind('<Button-1>',lambda event: \
                         self.__process_canvas_event(event,self._update_dynamic_info))
 
+        
 
         
         
@@ -536,14 +535,14 @@ e.g. for debugging.)
         if (not self.plotgroup.scale_images(1.0/self.zoom_factor)):
             self.representations['Reduce']['widget']['state']=DISABLED
         self.representations['Enlarge']['widget']['state']=NORMAL
-        self.display_plots()
+        self.update_plot_frame(labels=False)
 
     def enlarge_plots(self):
         """Function called by widget to increase the plot size, when possible."""
         if (not self.plotgroup.scale_images(self.zoom_factor)):
             self.representations['Enlarge']['widget']['state']=DISABLED
         self.representations['Reduce']['widget']['state']=NORMAL
-        self.display_plots()
+        self.update_plot_frame(labels=False)
         
 
 ####################### HISTORY METHODS ##########################         
@@ -610,12 +609,9 @@ e.g. for debugging.)
     # number you want to view, or perhaps how many you want to jump...
     def navigate_pg_history(self,steps):
         self.history_index+=steps
-        
         self.plotgroup = self.plotgroups_history[len(self.plotgroups_history)-1+self.history_index]
-
         self.update_widgets()
-
-        self._display_plots_and_labels()
+        self.update_plot_frame()
 
         
 ###########################################################         
