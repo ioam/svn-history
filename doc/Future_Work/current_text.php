@@ -38,21 +38,22 @@ tracker rather than added to this list</B>.
 
 <H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
 
-<H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
+<H4>2007/10/20: bugs to fix for 0.9.4 binaries</H4>
 <ul>
-<li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
-<li>Cleanup + doc of *panel.py files</li>
-<li>Cleanup + doc of plotgroup.py</li>
-<li>Fix scrollbars!</li>
-<li>finish basic developer manual tkgui intro</li>
-<li>on windows, progress  bar always flicks on for a small fraction of a second
-(even for runs of 1).</li>
+
+<li>Saving plotgroups doesn't work - at least fix subplots</li>
+
+<li>Click +/- for a plot and it resizes. But then press refresh and it 
+reverts to the original size</li>
+
+<li>Scrollbars: broken on OSX, strange on FC5</li>
+
+<li>On windows, progress  bar always flicks on for a small fraction of a second
+(even for runs of 1)</li>
+
+<li>OS X buildbot needs a display</li>
 </ul>
 
-<H4>2007/09/01: timing code </H4>
-The timing object is nearly done, allowing progress bars, time
-remaining estimates, etc., but Jim needs to look at it to finish it up
-(and then close tracker 1432101).
 
 <H4>2007/04/21 (CB): Note for Windows users</H4>
 Where to put this note? Working from the cmd.exe on Windows, single
@@ -63,20 +64,26 @@ i.e. "'Hello'", not '"Hello"'<BR>
 We might also want to add notes about omitting './' and changing
 '/' to '\' in general (currently on the downloads page).
 
+
+<H4>2007/08/12: Finish support for measuring receptive fields</H4>
+Finishing cleaning up associated code (maybe mostly for Jim to do?).
+Could eventually use STRFPAK or a similar approach.
+
+
+<H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
+<ul>
+<li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
+<li>Cleanup + doc of *panel.py files</li>
+<li>Cleanup + doc of plotgroup.py</li>
+<li>finish basic developer manual tkgui intro</li>
+</ul>
+
 <H4>2007/03/28 (?): Update tutorial</H4>
 Update the lissom_oo_or tutorial page to include how to start and stop
 training and to add a section about plotting 'Orientation tuning
 fullfield' tuning curves.
 CB: would the tutorial benefit from being split up a little more?
 Maybe it's getting daunting?
-
-<H4>2007/08/12: Finish support for measuring receptive fields</H4>
-Finishing cleaning up associated code (maybe mostly for Jim to do?).
-Could eventually use STRFPAK or a similar approach.
-
-<H4>2007/10/16: Prepare windows version</H4>
-Need to make python_topo and upload it (since external packages have
-changed). For some reason, the new pybwidget won't unzip on Windows.
 
 
 <!-- ------------------------------------------------------------------------ -->
@@ -85,6 +92,11 @@ changed). For some reason, the new pybwidget won't unzip on Windows.
 <!-- ------------------------------------------------------------------------ -->
 
 <H2>Tasks to be addressed after the 0.9.4 release:</H2>
+
+<H4>2007/09/01: timing code </H4>
+The timing object is nearly done, allowing progress bars, time
+remaining estimates, etc., but Jim needs to look at it to finish it up
+(and then close tracker 1432101).
 
 <H4>2007/10/16 (CB): buildbot</H4>
 Separate make slow-tests into a separate process from 
