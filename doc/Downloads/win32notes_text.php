@@ -28,5 +28,12 @@
 </TABLE>
 
 
+<P>There are, additionally, some less-often-needed or more complex translations that might be required:
+<ul>
+<li>Replace <code>~</code> in a path with the path to your <code>My Documents</code> folder
+(e.g. <code>~/cnv</code> might become <code>"%HOMEPATH%\My Documents\cnv"</code>)</li>
+<li>Unix commands such as <code>cp</code> usually have equivalents (<code>copy</code> in this case); see one of the references on the web, e.g. <A HREF="http://www.yolinux.com/TUTORIALS/unix_for_dos_users.html">UNIX for DOS Users</A></li>
+</ul>
+
 
 
