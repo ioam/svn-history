@@ -13,7 +13,8 @@ extensible for models not yet supported.
 
 <p>This tutorial assumes that you have already followed the
 instructions for <a href="../Downloads/index.html">obtaining and
-installing</a> Topographica.</p>
+installing</a> Topographica. Windows users might also need to refer
+to the notes about <A HREF="../Downloads/win32notes.html#unix-commands-on-win">translating Unix commands</A>.</p>
 
 
 <h2>Self-organization</h2>
