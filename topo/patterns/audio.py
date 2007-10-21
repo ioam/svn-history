@@ -8,7 +8,11 @@ __version__='$Revision$'
 
 # CEBALERT: you need to build pyaudiolab to use this file.
 # (Not tested it on Windows or OS X.)
-import pyaudiolab
+try:
+    import pyaudiolab
+except ImportError:
+    print "Warning: pyaudiolab must be built to use audio.py"
+    
 import numpy
 
 from topo.base.parameterclasses import Integer,Parameter
