@@ -543,6 +543,11 @@ e.g. for debugging.)
 
       
 
+    # CEBERRORALERT (minor): if no plot's displayed and I click
+    # enlarge, then the enlarge button gets disabled. If I then press
+    # refresh to get a plot, I can't enlarge it because the button's
+    # disabled. Probably need to reset button status if the plots
+    # change.
     def reduce_plots(self):
         """Function called by widget to reduce the plot size, when possible."""
         if (not self.plotgroup.scale_images(1.0/self.zoom_factor)):
