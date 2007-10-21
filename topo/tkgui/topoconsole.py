@@ -99,7 +99,7 @@ class PlotsMenuEntry(ParameterizedObject):
         The class_ is overridden for any special cases listed in this method.
         """
         super(PlotsMenuEntry,self).__init__(**params)
-        
+
         self.console = console
         self.plotgroup = plotgroup
 
@@ -123,7 +123,7 @@ class PlotsMenuEntry(ParameterizedObject):
         if self.class_.valid_context():
             # window hidden while being constructed to improve appearance
             window = ScrolledTkguiWindow(); window.withdraw()
-            panel = self.class_(self.console,window.content,self.plotgroup,**args)
+            panel = self.class_(self.console,window.content,copy.deepcopy(self.plotgroup),**args)
             panel.pack(expand='yes',fill='both')
             window.deiconify()
             window._scroll_frame.sizeright()
@@ -278,7 +278,7 @@ class TopoConsole(TkguiWindow):
         entries=KeyedList() # keep the order of plotgroup_templates (which is also KL)
         categories = []
         for label,plotgroup in plotgroups.items():
-            entries[label] = PlotsMenuEntry(self,copy.copy(plotgroup))
+            entries[label] = PlotsMenuEntry(self,plotgroup)
             categories.append(plotgroup.category)
         categories = sorted(set(categories))
 
