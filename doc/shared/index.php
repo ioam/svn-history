@@ -78,7 +78,7 @@
 <font size="-1">
 <dt>GUI:</dt>
 <dd>
-  greatly simplified adding GUI code<br>
+  greatly simplified adding GUI code <!--<A target="_top" href="../Developer_Manual/gui.html#programming-tkgui">adding GUI code</A>--><br>
   <!--  added GUI tests<br> -->
   <!--  added optional pretty-printing for parameter names in GUI<br> -->
   added progress bars, scroll bars, window icons<br>
