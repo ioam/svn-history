@@ -7,10 +7,10 @@ $Id$
 __version__='$Revision$'
 
 
-# CEBALERT: could be possible to clean up some of these and then move
-# them to widgets.py (i.e. some are not really tied to
-# topographica). We can probably move the remaining classes elsewhere,
-# and then remove this file.
+# CEBALERT: we can clean up some of these and then move them to
+# widgets.py (i.e. some are not really tied to topographica). We can
+# probably move the remaining classes elsewhere, and then remove this
+# file.
 
 import Tkinter
 import operator
@@ -22,15 +22,20 @@ from topo.misc.filepaths import resolve_path
 import topo.tkgui
 from widgets import TaggedSlider, ResizableScrollableFrame
 
+
+
+
+######################################################################            
 ######################################################################
+# CB: Working here; *TkguiWindows need significant cleanup.
+# Merge TkguiWindow and ScrolledTkguiWindow because scrollbars are automatic now.
+# Clearly separate ResizableScrollableFrame.
 class TkguiWindow(Tkinter.Toplevel):
     """
     The standard tkgui window; defines attributes common to tkgui windows.
 
     Currently these attributes are:
      - a window icon
-
-     
     """
     def __init__(self,**config):
         Tkinter.Toplevel.__init__(self,**config)
@@ -46,29 +51,8 @@ class TkguiWindow(Tkinter.Toplevel):
         # CB: not currently used by anything but the plotgrouppanels
         # self.context_menu = Tkinter.Menu(self, tearoff=0)
         # self.bind("<<right-click>>",self.display_context_menu)
-######################################################################
 
 
-######################################################################
-
-# might wonder why not bind configure?
-# The ScrolledTkguiWindow receives 100s of <Configure> events in a
-# short time when a button like "Enlarge" is pressed.  I *guess* this
-# is because there are lots of widgets in the window, and each time
-# some <Configure> event is generated for a certain one of them,
-# pack() goes through all the widgets, which generates a <Configure>
-# for each. In turn, each of those <Configure> events goes up to this
-# window, generating a <Configure> from it each time. So there's a
-# whole slew of <Configure> events.
-# 
-# We do *not* want to call sizeright() for every <Configure> event,
-# because it would be too expensive. So the code below schedules
-# delayed_sizeright() to be called a time t after a <Configure> event;
-# delayed_sizeright() in turn only calls sizeright() if the time
-# since the last <Configure> is (about) the same as t.
-
-# CB: Working here
-# needs significant cleanup; merging with widgets' RSFrame
 class ScrolledTkguiWindow(TkguiWindow):
     """
     A TkguiWindow with automatic scrollbars.
@@ -87,11 +71,14 @@ class ScrolledTkguiWindow(TkguiWindow):
 
         # provide route to title() method for convenience
         self.content.title = self.title
-
+######################################################################
 ######################################################################            
 
 
-# CB: haven't decided what to do. Might be temporary.
+
+######################################################################
+######################################################################            
+# CEBALERT: haven't decided what to do; might be temporary.
 class TkPOTaggedSlider(TaggedSlider):
     """
     A TaggedSlider with extra features for use with
@@ -124,22 +111,23 @@ class TkPOTaggedSlider(TaggedSlider):
         """Could anything survive in tkgui without a refresh() method?"""
         self.tag_set()
 
+######################################################################
+######################################################################            
+
+
+
+
 
 
     
 
 ######################################################################
-        
-
-
-
-
-# CEB: working here; this is *not* finished
-# (+ needs to become tkparameterizedobject, so we can have some parameters
+######################################################################
+# CEB: working here - not finished
+# (needs to become tkparameterizedobject, so we can have some parameters
 #  to control formatting etc)
 # Split up to solve a problem on windows for release 0.9.4.
 # Wait until we've decided what to do with SomeTimer before recoding.
-
 class ProgressController(object):
     def __init__(self,timer=None,progress_var=None):
 
@@ -240,7 +228,8 @@ class ProgressWindow(ProgressController,TkguiWindow):
             self.sim_time['text'] = str(time)
             self.remaining['text'] = "%02d:%02d"%(int(remaining/60),int(remaining%60))
             self.update()
-
+######################################################################
+######################################################################
 
 
 

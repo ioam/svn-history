@@ -38,9 +38,10 @@ class Menu(Tkinter.Menu):
     """
     Tkinter Menu, but with a way to access entries by name.
 
-    Supply indexname to any of the add/insert/delete methods
-    and that indexname can be used to get the index of the entry
-    later on (if 'indexname' not supplied, uses 'label' instead, if that was supplied).
+    Supply indexname to any of the add/insert/delete methods and that
+    indexname can be used to get the index of the entry later on (if
+    'indexname' not supplied, uses 'label' instead, if that was
+    supplied).
     """
     ## (Original Menu class is in lib/python2.4/lib-tk/Tkinter.py)
     
@@ -136,6 +137,12 @@ class Menu(Tkinter.Menu):
 # clearly or abandon, and get() and set() to access menu entries by
 # name.
 class ControllableMenu(Menu):
+    """
+    A Menu, but where entries are accessible by name (using
+    dictionary-style access).
+
+    ** Not truly compatible with Tkinter; work in progress **
+    """
     def __getitem__(self,name):
         return self.entries[name]
 ######################################################################
@@ -146,9 +153,11 @@ class ControllableMenu(Menu):
 
 ######################################################################
 ######################################################################
-# CB: Working here
-# cleanup and document
-# becoming a window; started as a frame
+# CB: Working here.  cleanup and document. 
+
+# Might wonder why we need <<SizeRight>> event, and don't just use the
+# <Configure> event for calling sizeright: Can't distinguish manual
+# resize from autoresizing.
 class ResizableScrollableFrame(Tkinter.Frame):
     """
     A scrollable frame that can also be manually resized.
@@ -159,6 +168,8 @@ class ResizableScrollableFrame(Tkinter.Frame):
     scrollable frame that can be resized manually is useful; this
     class adds easy resizing to a bwidget
     ScrollableFrame/ScrolledWindow combination.
+
+    ** BEING CONSTRUCTED: not currently suitable for standalone use **
     """
     def __init__(self,master,**config):
         """
@@ -478,10 +489,10 @@ class TaggedSlider(Tkinter.Frame):
 
 
 class InterpreterComboBox(Pmw.ComboBox):
-
-    # Subclass of combobox to allow null strings to be passed to
-    # the interpreter.
-    
+    """
+    Subclass of Pmw.ComboBox to allow null strings to be passed to
+    the interpreter.
+    """
     def _addHistory(self):
         input = self._entryWidget.get()
         if input == '':
@@ -538,7 +549,7 @@ class OutputText(Tkinter.Text):
 # and from some program that the user can specify?
 class CommandPrompt(Tkinter.Frame):
     """
-    A Tkinter Frame widget that provides simple access to python interpreter.
+    A Tkinter Frame that provides simple access to python interpreter.
 
     Useful when there is no decent system terminal (e.g. on Windows).
 
