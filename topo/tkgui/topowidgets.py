@@ -81,7 +81,8 @@ class ScrolledTkguiWindow(TkguiWindow):
                                                        relief="flat")
         self._scroll_frame.pack(expand="yes",fill="both")
         self.bind("<<SizeRight>>",self._scroll_frame.sizeright)
-
+        self.bind("<Configure>",self._scroll_frame.barz)
+        
         self.content = self._scroll_frame.contents
 
         # provide route to title() method for convenience

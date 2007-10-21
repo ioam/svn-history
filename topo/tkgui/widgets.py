@@ -178,7 +178,7 @@ class ResizableScrollableFrame(Tkinter.Frame):
         self.__width_sizer.pack()
 
         # the scrollable frame, with scrollbars
-        self._scrolled_window = bwidget.ScrolledWindow(self,scrollbar="both",auto="both") #auto="both") #*shscrollbar="none")#,,
+        self._scrolled_window = bwidget.ScrolledWindow(self,auto="both",scrollbar="both") #auto="both") #*shscrollbar="none")#,,
                                                        #scrollbar="both")
         # set small start height/width, will grow if necessary
         scrolled_frame = bwidget.ScrollableFrame(self._scrolled_window,
@@ -193,6 +193,15 @@ class ResizableScrollableFrame(Tkinter.Frame):
         self.oldsize=(-1,-1)
 
 
+    def barz(self,e=None):
+        self.after_idle(self.barz2)
+
+    def barz2(self,e=None):
+        import topo.tkgui
+        if topo.tkgui.system_platform!="mac":
+            scrollbar = self._which_scrollbars()
+            self._scrolled_window.config(scrollbar=scrollbar)
+        
         
     def set_size(self,width=None,height=None):
         """
@@ -247,6 +256,7 @@ class ResizableScrollableFrame(Tkinter.Frame):
         c = self.contents
         need_x,need_y = False,False
         self.update_idletasks()
+
         if sw.winfo_width()<c.winfo_reqwidth() and \
                abs(sw.winfo_width()-c.winfo_reqwidth())>1: 
             need_x=True
