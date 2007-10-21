@@ -105,3 +105,14 @@ in a new Frame in <code>w</code>.
 <H3>TkParameterizedObject</H3>
 
 <!--CB: don't duplicate tkparameterizedobject.py's docstring.-->
+
+
+
+Links:
+lundh - http://www.pythonware.com/library/index.htm   http://effbot.org/tkinterbook/
+my main ref - http://www.nmt.edu/tcc/help/lang/python/tkinter.html
+http://www.ferg.org/thinking_in_tkinter/index.html (contains all the main further links
+http://sebsauvage.net/python/gui/
+http://tkinter.unpythonic.net/wiki/
+http://wiki.tcl.tk/
+tkinter mailing list
