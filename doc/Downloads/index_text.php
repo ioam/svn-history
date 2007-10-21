@@ -108,36 +108,35 @@ Topographica on the example models.  On most systems (including Linux,
 Unix, and Mac), just open a terminal window, go to your topographica/
 directory, and type e.g.:
 
-<!--CEBALERT: could consider automatic addition of title attribute for
-code tags with 'shellcmd' id in php, or something similar-->
-
-<pre title="topographica -g examples\cfsom_or.ty">
+<pre title="Win: topographica -g examples\cfsom_or.ty">
   ./topographica -g examples/cfsom_or.ty
 </pre>
 
 or
 
-<pre title="topographica -g examples\hierarchical.ty">
+<pre title="Win: topographica -g examples\hierarchical.ty">
   ./topographica -g examples/hierarchical.ty
 </pre>
 
 or
 
-<pre title="topographica -g examples\som_retinotopy.ty">
+<pre title="Win: topographica -g examples\som_retinotopy.ty">
   ./topographica -g examples/som_retinotopy.ty
 </pre>
 
 or
 
-<pre title="topographica -g examples\lissom_oo_or.ty">
+<pre title="Win: topographica -g examples\lissom_oo_or.ty">
   ./topographica -g examples/lissom_oo_or.ty
 </pre>
 
 (Windows users can type similar commands at a Windows command prompt:
-hold your mouse over a command above to see the Windows equivalent.
-Alternatively, Windows users can double click on one of the
-<code>.ty</code> scripts in the examples directory; <code>.ty</code>
-files are associated with Topographica.)
+hold your mouse over a command above to see the Windows equivalent, or
+see our note about <A
+HREF="win32notes.html#unix-commands-on-win">translating Unix shell
+commands to Windows</A>.  Alternatively, Windows users can double
+click on one of the <code>.ty</code> scripts in the examples
+directory; <code>.ty</code> files are associated with Topographica.)
 
 <P>Note that the first time Topographica is run on a given example,
 there may be a short pause while the program compiles some of the

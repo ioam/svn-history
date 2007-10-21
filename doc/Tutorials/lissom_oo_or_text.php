@@ -18,9 +18,8 @@ installing</a> Topographica.  Also, you will need to generate a saved
 orientation map network, which can be done by running
 <blockquote><code class='to_type'>./topographica -c "targets=['lissom_oo_or_10000.typ']" examples/run.py</code></blockquote>
 
-(on Unix or Mac systems; Windows users should omit the initial
-'<code>./</code>' and should replace the second forward slash
-'<code>/</code>' with a backslash '<code>\</code>').
+(on Unix or Mac systems; on Windows, the syntax is slightly different&mdash;see the note about
+<A HREF="../Downloads/win32notes.html#unix-commands-on-win">translating Unix shell commands</A>).
 
 <P>Depending on the speed of your machine, you may want to go get a
 snack at this point; on a 3GHz 512MB machine this training process
