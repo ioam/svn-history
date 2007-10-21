@@ -1,28 +1,24 @@
 """
 Classes linking ParameterizedObjects and Parameters to Tkinter.
 
-TkParameterizedObject allows graphical representation and manipulation
-of any ParameterizedObject's Parameters, in a flexible way. Usually,
-it is simply desired to display all the Parameters of a
-ParameterizedObject; for this, use parametersframe.ParametersFrameWithApply,
-which extends TkParameterizedObject. If more flexibility is required,
-though, use TkParameterizedObject itself.
+TkParameterizedObject allows flexible graphical representation and
+manipulation of any ParameterizedObject's Parameters.
 
-TkParameterizedObject adds widget-drawing abilities to TkParameterizedObjectBase.
-Documentation begins in TkParameterizedObject (since it's not expected that
-TkParameterizedObjectBase will be used directly), but continues in more
-detail in TkParameterizedObjectBase. 
-
+Note that TkParameterizedObject extends TkParameterizedObjectBase by
+adding widget-drawing abilities; documentation for using these classes
+begins at a more useful and simple level in TkParameterizedObject, and
+continues in more detail in TkParameterizedObjectBase (an abstract
+class).
 
 
 
 A typical use of TkParameterizedObject might be in some subclass that
-is also a Tkinter.Frame. The Frame serves as the container into which
-the representations of the Parameters are placed - although any
-suitable Tkinter widget can be used, and there is in fact no need to
-sublass TkParameterizedObject. The following example shows this,
-displaying the Parameters from two different ParameterizedObjects in a
-window:
+is also a Tkinter.Frame (e.g. PlotGroupPanel). The Frame serves as the
+container into which the representations of the Parameters are placed
+- although any suitable Tkinter widget can be used, and there is in
+fact no need to sublass TkParameterizedObject. The following example
+shows this, displaying the Parameters from two different
+ParameterizedObjects in a window:
 
 
  ## Existing, non-GUI code
@@ -68,7 +64,7 @@ Additionally, it is possible to associate changes to variables with
 function calls, display true Parameter variable names, and more (umm
 like what) - see the detailed documentation.
 
-Examples of TkParameterizedObject usage can be found in
+Existing examples of TkParameterizedObject usage can be found in
 parametersframe.ParametersFrameWithApply (as mentioned above) and
 in plotgrouppanel.PlotGroupPanel (where it is used to
 allow editing of PlotGroups).
@@ -76,9 +72,6 @@ allow editing of PlotGroups).
 
 $Id$
 """
-
-# CB: this file has now gone beyond the maximum complexity limit
-
 
 # CEBALERT: in the same way that parameterizedobject.py does not
 # import much, this file should import as little as possible from
@@ -89,14 +82,18 @@ $Id$
 # pass in the console as an optional argument, and only use it if it's
 # not None.  (Also applies to parametersframe.py.)
 
+# CEB: currently working on this file (still have to attend to
+# simple ALERTs; documentation finished for TkParameterizedObject
+# but not for TkParameterizedObjectBase)
 
-
-### CEB: currently working on this file (still have to attend to
-# simple ALERTs).
+# CB: it's quite likely that the way TkParameterizedObjectBase is
+# implemented could be simplified. Right now, it still contains
+# leftovers of various attempts to get everything working. But
+# it does seem to work!
 
 
 import __main__, sys
-import Tkinter, Pmw
+import Tkinter
 
 from inspect import getdoc
 from Tkinter import BooleanVar, StringVar, Frame, Checkbutton, \
@@ -174,7 +171,6 @@ def parameters(parameterized_object):
 # have TopoButton, or something like that...
 import ImageTk, Image, ImageOps
 
-
 class ButtonParameter(CallableParameter):
     """
     Parameter representing all Parameter classes that are GUI-specific.
@@ -235,7 +231,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
     Optionally performs the same for an *additional* shadowed
     ParameterizedObject (extraPO). The Parameters of the extra
-    shadowed PO are available via this object (via coth the usual
+    shadowed PO are available via this object (via both the usual
     'dot' attribute access and dedicated parameter accessors
     declared in this class). 
 
@@ -354,6 +350,9 @@ class TkParameterizedObjectBase(ParameterizedObject):
 ##             settings.append("%s=%s"%(name,r))
             
 ##         return self.__class__.__name__ + "(_extraPO=%s, "%extraPOstring + ", ".join(settings) + ")"
+
+
+
 
 
     def _setup_params(self,**params):
@@ -581,7 +580,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         return po_val         
             
 
-    def value_changed(self,name):
+    def _value_changed(self,name):
         """
         Return True if the displayed value does not equal the object's
         value (and False otherwise).
@@ -616,7 +615,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         ### before we set the parameter, record if the value has actually changed
         # CB: skip setting if it hasn't changed!
-        if self.value_changed(param_name):
+        if self._value_changed(param_name):
 
             # tk_var could be ahead of parameter (set in GUI), so use
             # _original_get()
@@ -966,20 +965,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
 
-
-
-##         Example 2: consider the class:
-##             class SomeFrame(TkParameterizedObjectBase,Tkinter.Frame)
-
-##         Additionally, creators of subclasses of TkParameterizedObjectBase
-##         must consider if any attributes of their new class will block
-##         attributes or Parameters of TkParameterizedObjectBase or any
-##         shadowed PO.
-
-##         Tkinter.Frame has a number of attributes, some of which have
-##         generic names ('size', for instance). If SomeFrame
-##         shadows a ParameterizedObject that has a 'size' Parameter,
-##         SomeFrame()
         
 
 
@@ -993,8 +978,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     A subclass that defines a Parameter p can display it appropriately
     for manipulation by the user simply by calling
     pack_param('p'). The GUI display and the actual Parameter value
-    are automatically synchronized (though see technical notes for
-    TkParameterizedObjectBase for more details).
+    are automatically synchronized (though see technical notes in
+    TkParameterizedObjectBase's documentation for more details).
 
     In general, pack_param() adds a Tkinter.Frame containing a label
     and a widget: 
@@ -1015,10 +1000,10 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     (e.g. for a ClassSelectorParameter, the options are really class
     objects, but the user must be presented with a list of strings to
     choose from). Such translation is handled and documented in the
-    superclass; the default behaviors can be overridden if required.
+    TkParameterizedObjectBase; the default behaviors can be overridden
+    if required.
 
-    
-    (This class simply adds widget drawing to
+    (Note that this class simply adds widget drawing to
     TkParameterizedObjectBase. More detail about the shadowing of
     Parameters is available in the documentation for
     TkParameterizedObjectBase.)
@@ -1108,7 +1093,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # show up when a frame takes focus). Or there could be timer process.
 
 
-    def pretty_print(self,s):
+    def __pretty_print(self,s):
         """
         Convert a Parameter name s to a string suitable for display,
         if pretty_parameters is True.
@@ -1120,7 +1105,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             n = n.capitalize()
             return n
 
-
+    # CEBALERT: rename on_change and on_modify
     def pack_param(self,name,parent=None,widget_options={},
                    on_change=None,on_modify=None,**pack_options):
         """
@@ -1136,7 +1121,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         being stored in the representations dictionary).
 
 
-        * parent is the existing widget that is to be the parent
+        * parent is an existing widget that is to be the parent
         (master) of the widget created for this paramter. If no parent
         is specified, defaults to the originally supplied master
         (i.e. that set during __init__).
@@ -1239,6 +1224,13 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
 
     def _create_widget(self,name,master,widget_options={},on_change=None,on_modify=None):
+        """
+        Return widget,label for parameter 'name', each having the master supplied
+
+        The appropriate widget creation method is found from the
+        widget_creators dictionary; see individual widget creation
+        methods for details to each type of widget.
+        """
         # select the appropriate widget-creation method;
         # default is self._create_string_widget... 
         widget_creation_fn = self._create_string_widget
@@ -1256,15 +1248,14 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         widget=widget_creation_fn(master,name,widget_options)
 
-
         # Is widget a button (but not a checkbutton)? If so, no label wanted.
         widget_is_a_button = 'command' in widget.config() and not hasattr(widget,'toggle')
 
-        # CEBALERT: change to have a label with no text
+        # CEBALERT 'notNonelabel': change to have a label with no text
         if widget_is_a_button: 
             label = None
         else:
-            label = Tkinter.Label(master,text=self.pretty_print(name))
+            label = Tkinter.Label(master,text=self.__pretty_print(name))
 
         # disable widgets for constant params
         param,location = self.get_parameter_object(name,with_location=True)
@@ -1276,6 +1267,19 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
     
     def _create_button_widget(self,frame,name,widget_options):
+        """
+        Return a FocusTakingButton to represent Parameter 'name'.
+
+        Buttons require a command, which should have been specified as the
+        'on_change' function passed to pack_param().
+
+        After creating a button for a Parameter param, self.param() also
+        executes the button's command.
+
+        If the ButtonParameter was declared with an image, the button will
+        have that image (and no text); otherwise, the button will display
+        the (possibly pretty_print()ed) name of the Parameter.        
+        """
         try:
             command = self._tk_vars[name]._on_change
         except AttributeError:
@@ -1302,7 +1306,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             button['image']=image
             button['relief']='flat'
         else:
-            button['text']=self.pretty_print(name)
+            button['text']=self.__pretty_print(name)
 
         # and set size from ButtonParameter
         size = button_param.size
@@ -1316,12 +1320,23 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
     def _create_selector_widget(self,frame,name,widget_options):
         """
+        Return a Tkinter.OptionMenu to represent Parameter 'name'.
 
-        If widget_options includes 'sort_fn_args', these are passed to
-        the sort() method of the list of *objects* available for the
-        parameter, and the names are displayed sorted in that order.
-        If 'sort_fn_args' is not present, the default is to sort the
-        list of names using its sort() method.
+        In addition to Tkinter.OptionMenu's usual options, the
+        following additional ones may be included in widget_options:
+
+        * sort_fn_args: if widget_options includes 'sort_fn_args',
+          these are passed to the sort() method of the list of
+          *objects* available for the parameter, and the names are
+          displayed sorted in that order.  If 'sort_fn_args' is not
+          present, the default is to sort the list of names using its
+          sort() method.
+
+        * new_default: if widget_options includes 'new_default':True,
+          the currently selected value for the widget will be set
+          to the first item in the (possibly sorted as above) range.
+          Otherwise, the currently selected value will be left as the
+          current value.
         """
         param = self.get_parameter_object(name)
         self._update_translator(name,param)
@@ -1364,6 +1379,11 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     
 
     def _create_number_widget(self,frame,name,widget_options):
+        """
+        Return a TaggedSlider to represent parameter 'name'.
+
+        The slider's bounds are set to those of the Parameter.
+        """
         w = TkPOTaggedSlider(frame,variable=self._tk_vars[name],**widget_options)
         param = self.get_parameter_object(name)
 
@@ -1371,7 +1391,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         if upper_bound is not None and lower_bound is not None:
             # TaggedSlider needs BOTH bounds (neither can be None)
             w.set_bounds(lower_bound,upper_bound) 
-        param = self.get_parameter_object(name)
+
+        # have to do the lookup because subclass might override default
         if not lookup_by_class(self.param_immediately_apply_change,type(param)):
             w.bind('<<TagReturn>>', lambda e=None,x=name: self._update_param(x,force=True))
             w.bind('<<TagFocusOut>>', lambda e=None,x=name: self._update_param(x,force=True))
@@ -1381,19 +1402,18 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
 
     def _create_boolean_widget(self,frame,name,widget_options):
+        """Return a Tkinter.Checkbutton to represent parameter 'name'."""
         return Checkbutton(frame,variable=self._tk_vars[name],**widget_options)
 
         
     def _create_string_widget(self,frame,name,widget_options):
+        """Return a Tkinter.Entry to represent parameter 'name'."""
         widget = Entry(frame,textvariable=self._tk_vars[name],**widget_options)
-
         param = self.get_parameter_object(name)
         if not lookup_by_class(self.param_immediately_apply_change,type(param)):
             widget.bind('<Return>', lambda e=None,x=name: self._update_param(x,force=True))
             widget.bind('<FocusOut>', lambda e=None,x=name: self._update_param(x,force=True))
-
         return widget
-
 
 
     def _update_param(self,param_name,force=False):
@@ -1401,16 +1421,16 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         Prevents the superclass's _update_param() method from being
         called unless:
         
-        - param_name is a Parameter type that has changes immediately
-        applied (see doc for param_immediately_apply_change
-        dictionary);
+        * param_name is a Parameter type that has changes immediately
+          applied (see doc for param_immediately_apply_change
+          dictionary);
 
-        - force is True.
+        * force is True.
 
         (I.e. to update a parameter for which
         param_immediately_apply_change[type(parameter)]==False, call
-        this method with force=True. E.g. when <Return> is pressed
-        in a text box, this method is called with force=True.)        
+        this method with force=True. E.g. when <Return> is pressed in
+        a text box, this method is called with force=True.)
         """
         param_obj = self.get_parameter_object(param_name)
         
@@ -1453,17 +1473,5 @@ class TkParameterizedObject(TkParameterizedObjectBase):
                 pass
 
 
-
-
-        
-    
-
-
-
-    # For convenience. Maybe should offer a way to access any attribute on master.
-    # Probably too confusing - might remove this, too.
-    def title(self,t):
-        self.master.title(t)
-        
 
 
