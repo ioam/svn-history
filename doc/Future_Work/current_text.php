@@ -43,20 +43,12 @@ tracker rather than added to this list</B>.
 
 <li>Click +/- for a plot and it resizes. But then press refresh and it 
 reverts to the original size</li>
-
-<li>Scrollbars: still strange on FC5?</li>
+<li>Projection window: auto-refresh off, click SheetCoords, switches
+to most recent time. When did that start?</li>
+<li>Scrollbars: check on FC5</li>
 <li>OS X buildbot needs a display</li>
 </ul>
 
-
-<H4>2007/04/21 (CB): Note for Windows users</H4>
-Where to put this note? Working from the cmd.exe on Windows, single
-quotes must appear inside double quotes: it can't be the other way
-round. Applies to anywhere in topographica that there are commandline
-instructions that might include one string inside another.
-i.e. "'Hello'", not '"Hello"'<BR>
-We might also want to add notes about omitting './' and changing
-'/' to '\' in general (currently on the downloads page).
 
 
 <H4>2007/08/12: Finish support for measuring receptive fields</H4>
