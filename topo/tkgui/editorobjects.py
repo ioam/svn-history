@@ -62,7 +62,7 @@ class EditorObject(ParameterizedObject):
         self.parameter_window = parameter_window
 
     def update_parameters(self):
-        self.parameter_frame.set_parameters()
+        self.parameter_frame.update_parameters()
 
     def okay_parameters(self, parameter_window):
         self.update_parameters()
@@ -138,7 +138,7 @@ class EditorNode(EditorObject):
 
     def show_properties(self):
         EditorObject.show_properties(self)
-        self.parameter_frame.create_widgets(self.sheet)
+        self.parameter_frame.set_PO(self.sheet)
         Label(self.parameter_window, text = '\n\nConnections').pack(side = TOP)
         connections = list(set(self.to_connections).union(set(self.from_connections)))
         connection_list = [con.name for con in connections]
@@ -500,7 +500,7 @@ class EditorConnection(EditorObject):
     
     def show_properties(self):
         EditorObject.show_properties(self)
-        self.parameter_frame.create_widgets(self.connection)
+        self.parameter_frame.set_PO(self.connection)
 
 class EditorProjection(EditorConnection):
 

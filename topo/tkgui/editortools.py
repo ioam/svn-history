@@ -278,7 +278,7 @@ class ParametersTool(Frame):
         self.parameter_frame.pack(side=BOTTOM)
 
     def update_parameters(self):
-        self.parameter_frame.set_parameters()
+        self.parameter_frame.update_parameters()
 
 
     def set_focus(self, name, focus_class, doc = ''):
@@ -289,7 +289,7 @@ class ParametersTool(Frame):
         self.doc_label.config(text = doc)
 
         if focus_class:
-            self.parameter_frame.create_widgets(focus_class)
+            self.parameter_frame.set_PO(focus_class)
             
         
             
