@@ -38,24 +38,6 @@ tracker rather than added to this list</B>.
 
 <H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
 
-<H4>2007/10/20: bugs to fix for 0.9.4 binaries</H4>
-<ul>
-
-<li>Scaling plots in the GUI doesn't stick:
-<pre>
-./topographica -g examples/hierarchical.ty -c "a=topo.guimain['Plots']['Activity'](); a.Enlarge()"
-</pre>
-then press "Go"; the plots shrink.
-</li>
-
-<li>Strange behavior for sheet coords on/off in Projection window:
-<pre>
-./topographica -g examples/hierarchical.ty -c "p=topo.guimain['Plots']['Projection']()"
-</pre>
-then click "sheet coords" to on (plots change ok to sheet coords), then click to turn sheet coords off (plots change to larger version of the sheet-coords-off original).
-</li>
-
-
 <H4>2007/08/12: Finish support for measuring receptive fields</H4>
 Finishing cleaning up associated code (maybe mostly for Jim to do?).
 Could eventually use STRFPAK or a similar approach.
@@ -74,6 +56,21 @@ Maybe it's getting daunting?
 <!-- ------------------------------------------------------------------------ -->
 
 <H2>Tasks to be addressed after the 0.9.4 release:</H2>
+
+
+<H4>2007/10/21 (JAB): Scaling plots in the GUI doesn't stick</H4>
+Remove 'scaling hack' CEBALERT code from plotgroup.py, then:
+<pre>
+./topographica -g examples/hierarchical.ty -c "a=topo.guimain['Plots']['Activity'](); a.Enlarge()"
+</pre>
+then press "Go"; the plots shrink.
+
+<H4>2007/10/21 (JAB): Strange behavior for sheet coords on/off in Projection window</H4>
+<pre>
+./topographica -g examples/hierarchical.ty -c "p=topo.guimain['Plots']['Projection']()"
+</pre>
+then click "sheet coords" to on (plots change ok to sheet coords), then click to turn sheet coords off (plots change to larger version of the sheet-coords-off original).
+
 
 <H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
