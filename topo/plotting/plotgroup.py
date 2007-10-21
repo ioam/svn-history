@@ -295,8 +295,7 @@ class SheetPlotGroup(PlotGroup):
         largest plot will then be the one with the largest sheet
         bounds, and the size of that plot will be the maximum density
         times the largest sheet bounds.
-        """
-
+        """            
         new_height=self.height_of_tallest_plot
 
         # No scaling to do if there are no scalable plots, or no desired size
@@ -304,9 +303,20 @@ class SheetPlotGroup(PlotGroup):
         if not resizeable_plots or not new_height:
             return False
 
+        ### CEBALERT 'scaling hack': stop plots changing size in GUI ###
+        if zoom_factor:
+            self._zoom_factor=zoom_factor
+        ################################################################
+
+
         # Apply optional scaling to the overall size
         if zoom_factor:
             new_height *= zoom_factor
+        ### CEBALERT 'scaling hack' ####################################
+        elif hasattr(self,'_zoom_factor') and self._zoom_factor:
+            new_height *= self._zoom_factor
+        ################################################################
+            
 
         # Determine which plot will be the largest, to ensure that
         # no plot is missing any pixels.
