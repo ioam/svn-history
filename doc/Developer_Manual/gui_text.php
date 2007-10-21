@@ -55,11 +55,11 @@ what they are actually simulating.
 
 <!--CB: work in progress-->
 
-<H2>Programming with tkgui</H2>
+<H2><A NAME='programming-tkgui'>Programming with tkgui</H2>
 
 <P>tkgui uses <a href="">Tkinter</a> to draw the GUI components, but
 simplifies GUI implementation by handling linkage of
-<code>ParameterizedObject</code>s with representations in the GUI.
+Parameters with their representations in the GUI.
 
 <!--(Tkinter is very flexible, but often quite a large amount of code
 is required to keep track of variables and display components
@@ -70,7 +70,7 @@ href="">ParametersFrame</a> are the ones most often of used for
 creating a new GUI representation of some Topographica
 component. Which to use depends on how much you wish to customize the
 display: a ParametersFrame displays all of a ParameterizedObject's
-Parameters as a list in one frame, whereas a TkParameterizedObject can
+Parameters as a list in one Frame, whereas a TkParameterizedObject can
 display any number of the Parameters in any number of Frames (which
 you specify). Hence the PlotGroupPanels, which display Parameters from
 multiple ParameterizedObjects in a custom layout, are based on
@@ -82,37 +82,76 @@ model editor simply brings up a ParametersFrame for that object.
 <P>If you wish to display and/or edit the Parameters of a
 ParameterizedObject in the GUI, you can simply insert a
 ParametersFrame for that object into an existing container (a window
-such as a <a href="">tkgui.TkguiWindow</a>, or a frame such as a <a
-href="">Tkinter.Frame</a>):
+such as a tkgui.topowidgets.TkguiWindow or a Tkinter.Toplevel, or a frame such as a
+Tkinter.Frame):
 
 <pre>
-from topo.base.parameterizedobject import ParameterizedObject
-from topo.tkgui.parametersframe import ParametersFrame
-from topo.tkgui.tkguiwindow import TkguiWindow
+from topo.patterns.basic import Gaussian
+from topo.tkgui.topowidgets import TkguiWindow
 
-p = ParameterizedObject(name="PO")
+# existing component and existing window
+g = Gaussian()
 w = TkguiWindow()
-f = ParametersFrame(w,parameterized_object=p)
-</pre>
 
-<P>All the non-hidden Parameters of <code>p</code> will be displayed
-in a new Frame in <code>w</code>.
+# display all parameters of g in w
+from topo.tkgui.parametersframe import ParametersFrame
+f = ParametersFrame(w,g)
+</pre>
+ 
+<P>All the non-hidden Parameters of <code>p</code> will be displayed in a
+new Frame in <code>w</code>. Changing the Parameter's value in the GUI
+immediately changes the actual Parameter value; the class
+topo.tkgui.parametersframe.ParametersFrameWithApply is a version of
+ParametersFrame that does not immediately apply changes, instead
+waiting for confirmation via an Apply button.
+
 
 <!--CB: mention buttons, two types of PF-->
 
 
-
 <H3>TkParameterizedObject</H3>
 
-<!--CB: don't duplicate tkparameterizedobject.py's docstring.-->
+<P>ParametersFrame extends TkParameterizedObject, the basic class for
+representing Parameters in the GUI. TkParameterizedObject is more
+flexible, but also slightly more complex to use. In the ParametersFrame
+example above, we display all the Parameters of the Gaussian pattern;
+if instead we wanted to display only its size, x, and y Parameters, we
+could do the following:
+
+<pre>
+from topo.patterns.basic import Gaussian
+from topo.tkgui.topowidgets import TkguiWindow
+
+# existing component and existing window
+g = Gaussian()
+w = TkguiWindow()
+
+# display selected parameters of g in w
+from topo.tkgui.tkparameterizedobject import TkParameterizedObject
+t = TkParameterizedObject(w,g)
+t.pack_param('size')
+t.pack_param('x')
+t.pack_param('y')
+</pre>
+
+<P>As for ParametersFrame, changes to values in the GUI are
+immediately reflected in the actual
+Parameters. TkParameterizedObject's flexibility for custom
+arrangements comes from the pack_param() method, which takes several
+optional arguments to control the positioning of the Parameter.
 
 
+<H2>Tkinter references</H2>
 
-Links:
-lundh - http://www.pythonware.com/library/index.htm   http://effbot.org/tkinterbook/
-my main ref - http://www.nmt.edu/tcc/help/lang/python/tkinter.html
-http://www.ferg.org/thinking_in_tkinter/index.html (contains all the main further links
-http://sebsauvage.net/python/gui/
-http://tkinter.unpythonic.net/wiki/
-http://wiki.tcl.tk/
-tkinter mailing list
+<P>The following links provide useful reference material for programming with 
+Tkinter and Tk:
+
+<ul>
+<li><A HREF="http://effbot.org/tkinterbook/">An Introduction to Tkinter</A></li>
+<li><A HREF="http://www.nmt.edu/tcc/help/lang/python/tkinter.html">Tkinter: GUI programming with Python</A></li>
+<li><A HREF="http://www.ferg.org/thinking_in_tkinter/index.html">Thinking in Tkinter</A></li>
+<li><A HREF="http://wiki.tcl.tk/">The Tcler's Wiki</A></li>
+<li><A HREF="http://sebsauvage.net/python/gui/">Building a basic GUI application step-by-step in Python with Tkinter and wxWidgets</A></li>
+<li><A HREF="http://tkinter.unpythonic.net/wiki/">Tkinter Wiki</A></li>
+<li><A HREF="http://news.gmane.org/group/gmane.comp.python.tkinter">comp.python.tkinter</A></li>
+</ul>
