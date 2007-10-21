@@ -1,7 +1,5 @@
 """
-class FeatureCurvePanel and FullFieldFeatureCurvePanel
-
-Panel for displaying tuning curves.
+Panels for displaying tuning curves.
 
 Uses a PlotGroup to generate the pylab plots 
 which are currently displayed separately from the gui.

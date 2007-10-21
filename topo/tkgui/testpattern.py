@@ -1,5 +1,5 @@
 """
-The Test Pattern window...
+The Test Pattern window allows input patterns to be previewed.
 
 $Id$
 """
