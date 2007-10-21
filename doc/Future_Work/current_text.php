@@ -45,8 +45,6 @@ tracker rather than added to this list</B>.
 reverts to the original size</li>
 <li>Projection window: auto-refresh off, click SheetCoords, switches
 to most recent time. When did that start?</li>
-<li>Scrollbars: check on FC5</li>
-<li>OS X buildbot needs a display</li>
 </ul>
 
 
