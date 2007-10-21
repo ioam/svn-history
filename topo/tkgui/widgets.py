@@ -178,7 +178,7 @@ class ResizableScrollableFrame(Tkinter.Frame):
         self.__width_sizer.pack()
 
         # the scrollable frame, with scrollbars
-        self._scrolled_window = bwidget.ScrolledWindow(self,scrollbar="both") #auto="both") #*shscrollbar="none")#,,
+        self._scrolled_window = bwidget.ScrolledWindow(self,scrollbar="both",auto="both") #auto="both") #*shscrollbar="none")#,,
                                                        #scrollbar="both")
         # set small start height/width, will grow if necessary
         scrolled_frame = bwidget.ScrollableFrame(self._scrolled_window,
