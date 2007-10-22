@@ -565,6 +565,10 @@ e.g. for debugging.)
 
 ####################### HISTORY METHODS ##########################         
     # CEBERRORALERT: currently, any click on refresh adds to history
+    # CEBERRORALERT: history grows and grows! Consider what happens when
+    # a window's open with auto-refresh and many plots are generated
+    # (e.g. measure_rfs). And plotgroups might be much bigger than they
+    # need to be.
     def add_to_history(self):
         self.plotgroups_history.append(copy.copy(self.plotgroup))
         self.history_index=0
