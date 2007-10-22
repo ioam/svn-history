@@ -143,7 +143,7 @@ def save_snapshot(snapshot_name=None,xml=False):
     information.
     """
     if not snapshot_name:
-        snapshot_name = topo.sim.basename() + ".typ" # CB: how about including the time?
+        snapshot_name = topo.sim.basename() + ".typ"
 
     # For now we just search topo, but could do same for other packages.
     topoPOclassattrs = PicklableClassAttributes(topo,exclusions=('plotting','tests','tkgui'),
