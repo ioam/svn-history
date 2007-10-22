@@ -133,14 +133,24 @@ reverse correlation to estimate which units on an input sheet cause
 the strongest response of a unit in a later sheet.  It works 
 just like a <A
 HREF="../Tutorials/lissom_oo_or.html#Projection-plot">Projection</A></dt>
-plot, except that it takes much longer to measure (as it requires
+plot, except that it takes much, much longer to measure (as it requires
 presenting a large number of test patterns), is not specific to any
 particular Projection, and is an estimate rather than a
-visualization of a set of weights.  Once the RFs have been measured,
+visualization of a set of weights.  Example result for an ON/OFF
+LISSOM network trained on oriented Gaussians:
+
+<center>
+<img src="images/rf_projection.png" WIDTH="628" HEIGHT="705">
+</center>
+
+<P>Once the RFs have been measured,
 the RF can be visualized for a particular unit by right clicking on
 that unit in any plot window, and selecting a Receptive Fields plot.
+Sample result:
 
-<!-- Need to add an example plot! -->
+<center>
+<img src="images/rf_matrixplot.png" WIDTH="310" HEIGHT="328">
+</center>
 
 
 <H2>Tuning curve plots</H2>
