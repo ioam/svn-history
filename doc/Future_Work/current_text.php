@@ -38,25 +38,12 @@ tracker rather than added to this list</B>.
 
 <H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
 
-<H4>2007/08/12: Finish support for measuring receptive fields</H4>
-Finishing cleaning up associated code (maybe mostly for Jim to do?).
-Could eventually use STRFPAK or a similar approach.
-
 <H4>2007/03/28 (?): Update tutorial</H4>
 Update the lissom_oo_or tutorial page to include how to start and stop
 training and to add a section about plotting 'Orientation tuning
 fullfield' tuning curves. Also, in step 13, should mention the step button.
 CB: would the tutorial benefit from being split up a little more?
 Maybe it's getting daunting?
-
-
-<!-- ------------------------------------------------------------------------ -->
-<!-- ------------------------------------------------------------------------ -->
-<!-- ------------------------------------------------------------------------ -->
-<!-- ------------------------------------------------------------------------ -->
-
-<H2>Tasks to be addressed after the 0.9.4 release:</H2>
-
 
 <H4>2007/10/21 (JAB): Scaling plots in the GUI doesn't stick</H4>
 Remove 'scaling hack' CEBALERT code from plotgroup.py, then:
@@ -70,6 +57,15 @@ then press "Go"; the plots shrink.
 ./topographica -g examples/hierarchical.ty -c "p=topo.guimain['Plots']['Projection']()"
 </pre>
 then click "sheet coords" to on (plots change ok to sheet coords), then click to turn sheet coords off (plots change to larger version of the sheet-coords-off original).
+
+
+
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+
+<H2>Tasks to be addressed after the 0.9.4 release:</H2>
 
 
 <H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
@@ -144,6 +140,12 @@ appropriate.</li>
 <li>Document some Tkinter tips. More tasks/notes in
 topo/tkgui/__init__.py</li>
 </ul>
+
+
+<H4>2007/08/12: Speed up measuring receptive fields</H4>
+Should set the defaults to be a bit faster.  Should also
+finishing cleaning up associated code (maybe mostly for Jim to do?).
+Could eventually use STRFPAK or a similar approach.
 
 
 <H4>2006/05/24 (JB): Problems with examples/joublin_bc96.ty</H4>
