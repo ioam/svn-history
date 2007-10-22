@@ -45,7 +45,7 @@ Could eventually use STRFPAK or a similar approach.
 <H4>2007/03/28 (?): Update tutorial</H4>
 Update the lissom_oo_or tutorial page to include how to start and stop
 training and to add a section about plotting 'Orientation tuning
-fullfield' tuning curves.
+fullfield' tuning curves. Also, in step 13, should mention the step button.
 CB: would the tutorial benefit from being split up a little more?
 Maybe it's getting daunting?
 
