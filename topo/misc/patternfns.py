@@ -51,7 +51,7 @@ def gabor(x, y, xsigma, ysigma, frequency, phase):
     y_h = divide(y,ysigma)
     p = exp(-0.5*x_w*x_w + -0.5*y_h*y_h)
     seterr(**oldsettings)
-    return p * (0.5 + 0.5*cos(2*pi*frequency*y + phase))
+    return p * 0.5*cos(2*pi*frequency*y + phase)
 
 
 # JABHACKALERT: Shouldn't this use 'size' instead of 'thickness',
