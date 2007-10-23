@@ -303,21 +303,10 @@ class SheetPlotGroup(PlotGroup):
         if not resizeable_plots or not new_height:
             return False
 
-        ### CEBALERT 'scaling hack': stop plots changing size in GUI ###
-        if zoom_factor:
-            self.zoom_factor=zoom_factor
-        ################################################################
-
-
         # Apply optional scaling to the overall size
         if zoom_factor:
             new_height *= zoom_factor
-        ### CEBALERT 'scaling hack' ####################################
-        elif hasattr(self,'zoom_factor') and self.zoom_factor:
-            new_height *= self.zoom_factor
-        ################################################################
             
-
         # Determine which plot will be the largest, to ensure that
         # no plot is missing any pixels.
         if (self.enforce_minimum_plot_height):
