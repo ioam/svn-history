@@ -178,6 +178,7 @@ class ResizableScrollableFrame(Tkinter.Frame):
         scrollable area), i.e. almost all use of
         f=ResizableScrollableFrame(master) will be via f.contents.
         """
+        self.__hack=False
         Tkinter.Frame.__init__(self,master,**config)
         self.master = master
 
@@ -210,7 +211,11 @@ class ResizableScrollableFrame(Tkinter.Frame):
     def barz2(self,e=None):
         import topo.tkgui
         if topo.tkgui.system_platform!="mac":
+            self.__hack=True # can't call update_idletasks() in after_idle().
+            # fortunately we only need to call update_idletasks() for
+            # autoresize not to put extra space round the side; this method only needs to get things exactly correct for manual resize.
             scrollbar = self._which_scrollbars()
+            self.__hack=False
             self._scrolled_window.config(scrollbar=scrollbar)
         
         
@@ -266,7 +271,8 @@ class ResizableScrollableFrame(Tkinter.Frame):
         sw = self._scrolled_window
         c = self.contents
         need_x,need_y = False,False
-        self.update_idletasks()
+
+        if not self.__hack: self.update_idletasks()
 
         if sw.winfo_width()<c.winfo_reqwidth() and \
                abs(sw.winfo_width()-c.winfo_reqwidth())>1: 
