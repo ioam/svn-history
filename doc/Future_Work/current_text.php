@@ -38,6 +38,11 @@ tracker rather than added to this list</B>.
 
 <H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
 
+<H4>2007/10/23: plotgroups</H4>
+Sometimes we assume there's just one named e.g. Activity, othertimes we
+assume we have independent objects.
+
+
 <H4>2007/03/28 (?): Update tutorial</H4>
 Update the lissom_oo_or tutorial page to include how to start and stop
 training and to add a section about plotting 'Orientation tuning
@@ -46,7 +51,6 @@ CB: would the tutorial benefit from being split up a little more?
 Maybe it's getting daunting?
 
 <H4>2007/10/21 (JAB): Scaling plots in the GUI doesn't stick</H4>
-Remove 'scaling hack' CEBALERT code from plotgroup.py, then:
 <pre>
 ./topographica -g examples/hierarchical.ty -c "a=topo.guimain['Plots']['Activity'](); a.Enlarge()"
 </pre>
