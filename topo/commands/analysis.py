@@ -278,7 +278,6 @@ class Subplotting(ParameterizedObject):
         if Subplotting.subplotting_declared and not force:
             return
 
-        # CEBALERT: if prefix is None, couldn't hue and confidence be undefined later?
         if prefix:
             hue=prefix+"Preference"
             confidence=prefix+"Selectivity"
