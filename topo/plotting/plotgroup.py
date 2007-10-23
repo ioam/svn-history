@@ -305,7 +305,7 @@ class SheetPlotGroup(PlotGroup):
 
         ### CEBALERT 'scaling hack': stop plots changing size in GUI ###
         if zoom_factor:
-            self._zoom_factor=zoom_factor
+            self.zoom_factor=zoom_factor
         ################################################################
 
 
@@ -313,8 +313,8 @@ class SheetPlotGroup(PlotGroup):
         if zoom_factor:
             new_height *= zoom_factor
         ### CEBALERT 'scaling hack' ####################################
-        elif hasattr(self,'_zoom_factor') and self._zoom_factor:
-            new_height *= self._zoom_factor
+        elif hasattr(self,'zoom_factor') and self.zoom_factor:
+            new_height *= self.zoom_factor
         ################################################################
             
 
