@@ -358,7 +358,9 @@ e.g. for debugging.)
 
     # document, and make display_* methods semi-private methods
     def update_plot_frame(self,plots=True,labels=True):
-        if plots:self.display_plots()
+        if plots:
+            self.plotgroup.scale_images()
+            self.display_plots() 
         if labels:self.display_labels()
         self.refresh_title()
 
@@ -414,7 +416,7 @@ e.g. for debugging.)
         # if we've been looking in the history, now need to return to the "current time"
         # plotgroup (but copy it: don't update the old one, which is a record of the previous state)
         if self.history_index!=0:
-            self.plotgroup = copy.copy(self.plotgroups_history[-1])
+            self._switch_plotgroup(copy.copy(self.plotgroups_history[-1]))
 
         if update:
             self.refresh_plots()            
@@ -625,18 +627,32 @@ e.g. for debugging.)
         else:
             forward_button['state']='disabled'
 
+    def _switch_plotgroup(self,newpg):
+        """
+        Switch to a different plotgroup, e.g. one from the history buffer.
+        Preserves some attributes from the current plotgroup that can apply
+        across history, but leaves the others as-is.
+        """
+        oldpg=self.plotgroup
         
+        newpg.desired_maximum_plot_height=oldpg.desired_maximum_plot_height
+        newpg.sheet_coords=oldpg.sheet_coords
+        newpg.integer_scaling=oldpg.integer_scaling
+        
+        self.plotgroup=newpg
+
     # JLENHANCEMENT: It would be nice to be able to scroll back through many
     # iterations.  Could put in a box for entering either the iteration
     # number you want to view, or perhaps how many you want to jump...
     def navigate_pg_history(self,steps):
         self.history_index+=steps
-        self.plotgroup = self.plotgroups_history[len(self.plotgroups_history)-1+self.history_index]
+        self._switch_plotgroup(self.plotgroups_history[len(self.plotgroups_history)-1+self.history_index])
         self.update_widgets()
         self.update_plot_frame()
 
-        
 ###########################################################         
+
+
 
     def _plot_title(self):
         """

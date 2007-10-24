@@ -15,7 +15,7 @@ import topo
 
 from topo.base.cf import CFProjection
 from topo.base.projection import ProjectionSheet
-from topo.base.parameterclasses import BooleanParameter
+from topo.base.parameterclasses import BooleanParameter, Integer
 
 from templateplotgrouppanel import TemplatePlotGroupPanel
 
@@ -178,9 +178,6 @@ class ConnectionFieldsPanel(UnitsPanel):
         self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change,side='left',expand=1)
         
     def situate_change(self):
-        if self.situate:
-            self.plotgroup.initial_plot=True
-            self.plotgroup.height_of_tallest_plot = 1
         self.redraw_plots()
 
     def _plot_title(self):
@@ -196,10 +193,21 @@ class PlotMatrixPanel(ProjectionSheetPanel):
     a projection involving a matrix of units.
     """
     
+    gui_desired_maximum_plot_height = Integer(default=5,bounds=(0,None),doc="""
+        Value to provide for PlotGroup.desired_maximum_plot_height for
+        PlotGroups opened by the GUI.  Determines the initial, default
+        scaling for the PlotGroup.""")
+
+
+    def __init__(self,console,master,plotgroup,**params):
+        super(PlotMatrixPanel,self).__init__(console,master,plotgroup,**params)
+        # Take the starting size of the plot as the desired size, whatever that is.
+        self.plotgroup.update_maximum_plot_height()
+        self.desired_maximum_plot_height = self.plotgroup.maximum_plot_height
+
+    
     def setup_plotgroup(self):
         super(PlotMatrixPanel,self).setup_plotgroup()
-        # Force Projection-like plots to be individually small
-        self.plotgroup.desired_maximum_plot_height=1
 
     def display_plots(self):
         """
@@ -338,9 +346,6 @@ class CFProjectionPanel(ProjectionPanel):
         self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change,side='left',expand=1)
 
     def situate_change(self):
-        if self.situate:
-            self.plotgroup.initial_plot=True
-            self.plotgroup.height_of_tallest_plot = 1
         self.redraw_plots()
     
     def populate_projection_param(self):

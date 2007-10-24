@@ -218,7 +218,7 @@ class SheetPlotGroup(PlotGroup):
         time advances.  The default is False, because many plots are
         slow to generate (including most preference map plots).""")
 
-    desired_maximum_plot_height = Integer(default=0,bounds=(0,None),doc="""
+    desired_maximum_plot_height = Number(default=0,bounds=(0,None),doc="""
         User-specified height of the tallest plot in this PlotGroup.
         Other plots will generally be scaled as appropriate, either
         to match this size (when sheet_coords is False), or to
@@ -255,32 +255,20 @@ class SheetPlotGroup(PlotGroup):
         return self.sheets or topo.sim.objects(Sheet).values()
 
     def make_plots(self,update=True):
-        self.height_of_tallest_plot = self.desired_maximum_plot_height
         super(SheetPlotGroup,self).make_plots(update)
 
 
-    ### CEB: At least some of this scaling would be common to all
-    ### plotgroups, if some (e.g. featurecurve) didn't open new
-    ### windows.
-    ###
-    ### Could strip out the matrix-coord scaling and put it into
-    ### PlotGroup
-    def scale_images(self,zoom_factor=None):
+    def update_maximum_plot_height(self,zoom_factor=None):
         """
-        Enlarge or reduce the bitmaps as needed for display.
-
-        The calculated sizes will be multiplied by the given
-        zoom_factor, if it is not None.
+        Determine which plot will be the largest, based on the
+        settings for minimum plot heights, the specified zoom factor
+        (if not None), etc.
         
         A minimum size (and potentially a maximum size) are enforced,
         as described below.
 
-        If the scaled sizes would be outside of the allowed range, no
-        scaling is done, and False is returned.  (One might
-        conceivably instead want the scaling to reach the actual
-        minimum or maximum allowed, but if we did this, then repeated
-        enlargements and reductions would not be reversible, unless we
-        were very tricky about how we did it.)
+        If the scaled sizes would be outside of the allowed range,
+        False is returned.  
 
         For matrix coordinate plots (sheet_coords=False), the minimum
         size is calculated as the native size of the largest bitmap to
@@ -295,21 +283,16 @@ class SheetPlotGroup(PlotGroup):
         largest plot will then be the one with the largest sheet
         bounds, and the size of that plot will be the maximum density
         times the largest sheet bounds.
-        """            
-        new_height=self.height_of_tallest_plot
-
-        # No scaling to do if there are no scalable plots, or no desired size
-        resizeable_plots = [p for p in self.plots if p.resize]
-        if not resizeable_plots or not new_height:
-            return False
-
+        """
+        
         # Apply optional scaling to the overall size
         if zoom_factor:
-            new_height *= zoom_factor
+            self.desired_maximum_plot_height*=zoom_factor
             
-        # Determine which plot will be the largest, to ensure that
-        # no plot is missing any pixels.
+        self.maximum_plot_height=self.desired_maximum_plot_height
+
         if (self.enforce_minimum_plot_height):
+            resizeable_plots = [p for p in self.plots if p.resize]
             if not self.sheet_coords:
                 bitmap_heights = [p._orig_bitmap.height() for p in resizeable_plots]
                 minimum_height_of_tallest_plot = max(bitmap_heights)
@@ -327,19 +310,56 @@ class SheetPlotGroup(PlotGroup):
                 max_sheet_density = max([sheets[p.plot_src_name].xdensity
                                          for p in resizeable_plots])
                 minimum_height_of_tallest_plot = max_sheet_height*max_sheet_density
-
-            if (new_height < minimum_height_of_tallest_plot):
-                new_height = minimum_height_of_tallest_plot
+                self.max_sheet_height=max_sheet_height
+                    
+            if (self.maximum_plot_height < minimum_height_of_tallest_plot):
+                self.maximum_plot_height = minimum_height_of_tallest_plot
+                # Return failure if trying to reduce but hit the minumum
                 if zoom_factor:
-                    return False
+                    return zoom_factor>0
+
+#       print zoom_factor, self.maximum_plot_height, self.desired_maximum_plot_height
+        return True
             
-        # Scale the images so that each has a size up to the height_of_tallest_plot
+
+
+    ### CEB: At least some of this scaling would be common to all
+    ### plotgroups, if some (e.g. featurecurve) didn't open new
+    ### windows.
+    ###
+    ### Could strip out the matrix-coord scaling and put it into
+    ### PlotGroup
+    def scale_images(self,zoom_factor=None):
+        """
+        Enlarge or reduce the bitmaps as needed for display.
+
+        The calculated sizes will be multiplied by the given
+        zoom_factor, if it is not None.
+        
+        If the scaled sizes would be outside of the allowed range, no
+        scaling is done, and False is returned.  (One might
+        conceivably instead want the scaling to reach the actual
+        minimum or maximum allowed, but if we did this, then repeated
+        enlargements and reductions would not be reversible, unless we
+        were very tricky about how we did it.)
+        """
+
+        # No scaling to do if there are no scalable plots, or no desired size
+        resizeable_plots = [p for p in self.plots if p.resize]
+        if not resizeable_plots or not self.desired_maximum_plot_height:
+            return False
+
+        # Calculate maximum_plot_height, and abort if not feasible
+        if not self.update_maximum_plot_height(zoom_factor) and zoom_factor:
+            return False
+            
+        # Scale the images so that each has a size up to the self.maximum_plot_height
 	for plot in resizeable_plots:
 	    if self.sheet_coords:
                 s = topo.sim.objects(Sheet)[plot.plot_src_name]
-	        scaling_factor=new_height/float(s.xdensity)/max_sheet_height
+	        scaling_factor=self.maximum_plot_height/float(s.xdensity)/self.max_sheet_height
 	    else:
-	        scaling_factor=new_height/float(plot._orig_bitmap.height())
+	        scaling_factor=self.maximum_plot_height/float(plot._orig_bitmap.height())
             
             if self.integer_scaling:
                 scaling_factor=max(1,int(scaling_factor))
@@ -348,7 +368,6 @@ class SheetPlotGroup(PlotGroup):
             
             #print "Scaled %s %s: %d->%d (x %f)" % (plot.plot_src_name, plot.name, plot._orig_bitmap.height(), plot.bitmap.height(), scaling_factor)
 
-        self.height_of_tallest_plot = new_height
         return True
 
 
