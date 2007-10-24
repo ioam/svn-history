@@ -148,6 +148,7 @@ def matrixplot3d(mat,title=None,type="wireframe"):
     ax.set_zlabel('Value')
 
     if title: windowtitle(title)
+    pylab.show._needmain=False
     pylab.show()
 
 
