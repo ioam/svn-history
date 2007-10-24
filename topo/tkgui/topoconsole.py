@@ -124,6 +124,8 @@ class PlotsMenuEntry(ParameterizedObject):
             # window hidden while being constructed to improve appearance
             window = ScrolledTkguiWindow(); window.withdraw()
             panel = self.class_(self.console,window.content,copy.deepcopy(self.plotgroup),**args)
+            # share plot_templates across all instances
+            panel.plotgroup.plot_templates = self.plotgroup.plot_templates
             panel.pack(expand='yes',fill='both')
             window.deiconify()
             window._scroll_frame.sizeright()
