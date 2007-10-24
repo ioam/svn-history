@@ -38,10 +38,17 @@ tracker rather than added to this list</B>.
 
 <H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
 
-<H4>2007/10/23: plotgroups</H4>
-Sometimes we assume there's just one named e.g. Activity, othertimes we
-assume we have independent objects.
+<H4>2007/10/24: projection history bug</H4>
+See error messages from:
+<pre>
+./topographica -g -c default_density=3 examples/lissom_oo_or.ty \
+-c "p=topo.guimain['Plots']['Projection'](); p.density=2; p.Refresh()" \
+-c "topo.sim.run(2)" -c "p.Refresh()" -c "p.Back() ; p.Back()"
+</pre>
 
+<H4>2007/10/24: scrollbars</H4>
+Don't work on lodestar (FC5); they are always present, and overwrite
+the window content.
 
 <H4>2007/03/28 (?): Update tutorial</H4>
 Update the lissom_oo_or tutorial page to include how to start and stop
@@ -49,18 +56,6 @@ training and to add a section about plotting 'Orientation tuning
 fullfield' tuning curves. Also, in step 13, should mention the step button.
 CB: would the tutorial benefit from being split up a little more?
 Maybe it's getting daunting?
-
-<H4>2007/10/21 (JAB): Scaling plots in the GUI doesn't stick</H4>
-<pre>
-./topographica -g examples/hierarchical.ty -c "a=topo.guimain['Plots']['Activity'](); a.Enlarge()"
-</pre>
-then press "Go"; the plots shrink.
-
-<H4>2007/10/21 (JAB): Strange behavior for sheet coords on/off in Projection window</H4>
-<pre>
-./topographica -g examples/hierarchical.ty -c "p=topo.guimain['Plots']['Projection']()"
-</pre>
-then click "sheet coords" to on (plots change ok to sheet coords), then click to turn sheet coords off (plots change to larger version of the sheet-coords-off original).
 
 
 
