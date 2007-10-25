@@ -592,14 +592,8 @@ e.g. for debugging.)
                              for p_name in self.representations
                              if p_name not in self.params_in_history]
 
-        # CB: can remove now - ts supports state now
         for widget in widgets_to_update:
-            try:  ### CEBHACKALERT re TaggedSlider: doesn't support state! Need to be
-                  ### able to disable taggedsliders, so that class needs modifying.
-                  ### Plus, when TSs are changed, need to handle refreshing properly.
-                widget['state']=state
-            except _tkinter.TclError:
-                pass        
+            widget.config(state=state)
 
         self.update_history_buttons()
 
