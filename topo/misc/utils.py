@@ -391,7 +391,10 @@ class ExtraPickler(Singleton):
             item = states[extra]
             module = extra[0]
             attribute = extra[1]
-            
+
+            # CEBALERT: same alert about setting val in main as for
+            # the parameter pickler. surely it's not required? at least
+            # prefix __ or something. 
             __main__.__dict__['val']=item
 
             exec "import %s"%module in __main__.__dict__
