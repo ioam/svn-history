@@ -388,7 +388,9 @@ class TaggedSlider(Tkinter.Frame):
         self.slider.config(from_=lower,to=upper)
     set_bounds = set_slider_bounds
         
-                     
+ 
+    # CB: why isn't this used for [] access? What should this
+    # be called? Is it configure?
     def config(self,**options):
         """
         TaggedSlider is a compound widget. In most cases, config
