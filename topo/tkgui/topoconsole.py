@@ -107,9 +107,9 @@ class PlotsMenuEntry(ParameterizedObject):
         # directory and therefore this link must be made within the tkgui
         # files.
         if isinstance(self.plotgroup,FeatureCurvePlotGroup):
-            class_ = plotpanel_classes.get(plotgroup.name,FeatureCurvePanel)
+            class_ = plotpanel_classes.get(self.plotgroup.name,FeatureCurvePanel)
 
-        self.class_ = plotpanel_classes.get(plotgroup.name,class_)
+        self.class_ = plotpanel_classes.get(self.plotgroup.name,class_)
         
 
     def __call__(self,event=None,**args):
@@ -123,13 +123,15 @@ class PlotsMenuEntry(ParameterizedObject):
         if self.class_.valid_context():
             # window hidden while being constructed to improve appearance
             window = ScrolledTkguiWindow(); window.withdraw()
-            panel = self.class_(self.console,window.content,copy.deepcopy(self.plotgroup),**args)
-            # share plot_templates across all instances
-            panel.plotgroup.plot_templates = self.plotgroup.plot_templates
+            new_plotgroup = copy.deepcopy(self.plotgroup)
+
+            # CB: hack to share plot_templates with the current plotgroup in plotgroups
+            new_plotgroup.plot_templates = topo.plotting.plotgroup.plotgroups[self.plotgroup.name].plot_templates
+            panel = self.class_(self.console,window.content,new_plotgroup,**args)
             panel.pack(expand='yes',fill='both')
             window.deiconify()
             window._scroll_frame.sizeright()
-            
+
             self.console.messageBar.message('state', 'OK')
             return panel
         else:
