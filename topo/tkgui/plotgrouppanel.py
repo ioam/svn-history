@@ -97,7 +97,8 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
     def get_plotgroup(self):
         return self._extraPO
     def set_plotgroup(self,new_pg):
-        self._extraPO = new_pg
+        self.change_PO(new_pg)
+        
     plotgroup = property(get_plotgroup,set_plotgroup)
 
 
@@ -246,8 +247,6 @@ e.g. for debugging.)
 
         # CB: don't forget to include ctrl-q
         # import __main__; __main__.__dict__['qqq']=self
-
-
 
 
 
@@ -572,6 +571,8 @@ e.g. for debugging.)
     # (e.g. measure_rfs). And plotgroups might be much bigger than they
     # need to be.
     def add_to_history(self):
+        # CEBALERT: note that there's an irrelevant pg in the list at
+        # position 0 (added when panel opens)
         self.plotgroups_history.append(copy.copy(self.plotgroup))
         self.history_index=0
         self.update_widgets() 
@@ -591,28 +592,21 @@ e.g. for debugging.)
                              for p_name in self.representations
                              if p_name not in self.params_in_history]
 
+        # CB: can remove now - ts supports state now
         for widget in widgets_to_update:
             try:  ### CEBHACKALERT re TaggedSlider: doesn't support state! Need to be
                   ### able to disable taggedsliders, so that class needs modifying.
                   ### Plus, when TSs are changed, need to handle refreshing properly.
                 widget['state']=state
             except _tkinter.TclError:
-                pass
-
-        ## CEBHACKALERT: necessary to update the gui.
-        ## Instead of this, need to handle replacing an extra PO properly in
-        ## tkparameterizedobject.
-        ## CB: huh?
-        for n in self.representations:
-            self._tk_vars[n].get() 
-        
+                pass        
 
         self.update_history_buttons()
 
 
     def update_history_buttons(self):
         space_back = len(self.plotgroups_history)-1+self.history_index
-        space_fwd  = -self.history_index 
+        space_fwd  = -self.history_index
 
         back_button = self.representations['Back']['widget']
         forward_button = self.representations['Fwd']['widget']
