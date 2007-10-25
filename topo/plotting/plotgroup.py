@@ -707,7 +707,7 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
         if not isinstance(self.projection,CFProjection):
             raise TypeError(
                 "%s's projection Parameter must be set to a %s instance (currently %s, type %s)." \
-                %(self,self.projection_type,self.projection,type(self.projection))) 
+                %(self,CFProjection,self.projection,type(self.projection))) 
 
 		
     def _create_plots(self,pt_name,pt,sheet):
