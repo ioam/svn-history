@@ -21,7 +21,7 @@ manually.
   I get errors when loading a saved snapshot.</i>
 
 <P><B>A:</B>
-As of 0.9.3, Topographica saves the state by using Python's pickling
+As of 0.9.4, Topographica saves the state by using Python's pickling
 procedure, which saves <em>everything</em> in the current simulation.
 The disadvantage of this approach is that most changes in the
 definition of any of the classes used (apart from changing parameter
