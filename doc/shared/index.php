@@ -36,9 +36,8 @@
 <b>News:</b>
 
 
-
-<p><b>18 Oct 2007:</b> Version 0.9.4 is nearly ready for 
-<A target="_top" href="../Downloads/index.html">release</A>, including:
+<p><b>26 Oct 2007:</b> Version 0.9.4 
+<A target="_top" href="../Downloads/index.html">released</A>, including:
 
 <center>
 <table width="100%" cellpadding="5">
@@ -69,6 +68,7 @@
   script/command-line <A target="_top" href="../User_Manual/commandline.html#scripting-gui">control over GUI</A><br>
   <!-- grid_layout command to simplify model diagrams<br> -->
   <!-- options for controlling plot sizing<br> -->
+  added auto-import option (-a and -g) to save typing<br>
 </dd>
 </font>
 </dl>
@@ -114,10 +114,6 @@ Screenshots:
 <A target="_top" href="../images/071018_plotting1_ubuntu.png">plotting 1</A>, 
 <A target="_top" href="../images/071018_plotting2_ubuntu.png">plotting 2</A>, 
 <A target="_top" href="../images/071018_modeleditor_ubuntu.png">model editor</A>.
-For now, the best way to get the 0.9.4 features is by downloading the  
-<A target="_top" href="../Downloads/cvs.html">CVS
-version</A>, but we will be releasing executables sometime in the
-coming week.
 
 <p><A target="_top" href="../Home/oldnews.html"><i>Older news</i></A>
 </i>
