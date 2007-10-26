@@ -257,6 +257,7 @@ e.g. for debugging.)
         Subclasses can use this to set Parameters on their PlotGroups.
         """
         self.plotgroup.desired_maximum_plot_height=self.gui_desired_maximum_plot_height
+        
 
     def __process_canvas_event(self,event,func):
         """
@@ -565,7 +566,6 @@ e.g. for debugging.)
         
 
 ####################### HISTORY METHODS ##########################         
-    # CEBERRORALERT: currently, any click on refresh adds to history
     # CEBERRORALERT: history grows and grows! Consider what happens when
     # a window's open with auto-refresh and many plots are generated
     # (e.g. measure_rfs). And plotgroups might be much bigger than they
