@@ -50,7 +50,7 @@ Topographica is installed in <code>/home/jbednar/public/topographica/</code>.
   
 <p class='center'>
 <img src="images/topographica_console.png" alt="Console Window"
-align="middle" width="438" height="249">
+align="middle" width="426" height="149">
 </p>
 <p>
 The window and button style will differ on different platforms, but
@@ -78,7 +78,12 @@ align="middle" width="569" height="413">
 </li>
 
 <li> To see how this network responds to a simple visual image,
-select <span class='t_item'>Test pattern</span> from the <span class='t_item'>Simulation</span> menu to get the
+first open an select <a name="Activity-plot"><span
+class='t_item'>Activity</span></a> window from
+the <span class='t_item'>Plots</span> menu on the <span
+class='w_title'>Topographica Console</span>, then 
+select <span class='t_item'>Test pattern</span> from the <span
+class='t_item'>Simulation</span> menu to get the 
 <span class='w_title'>Test Pattern</span> window:
 
 <p class='center'>
@@ -96,8 +101,8 @@ network.
 <p></p>
 </li>
 
-<li>To see the result, select <a name="Activity-plot"><span class='t_item'>Activity</span></a> from
-the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topographica Console</span> to get:
+<li>The <a name="Activity-plot"><span class='t_item'>Activity</span></a> 
+window should then show the result:
 <p class='center'>
 <img src="images/activity_line_oo.png" alt="Response to a line" align="middle" width="676" height="372">
 </p>
@@ -158,9 +163,9 @@ only</span> is turned on; it is usually off by default.
 the ON and OFF channels of the LGN), followed by the lateral excitatory
 and lateral inhibitory weights to that neuron from nearby neurons in
 V1. The afferent weights represent the retinal pattern that would most
-excite the neuron.  For this particular neuron, the optimal retinal
-stimulus would be a short, bright line oriented at about 180 degrees
-(horizontal) in the center of the retina.  </p><p></p></li>
+excite the neuron.  For the particular neuron shown above, the optimal
+retinal stimulus would be a short, bright line oriented at about 180
+degrees (horizontal) in the center of the retina.  </p><p></p></li>
 
 <li>If all neurons had the same weight pattern, the response
 would not be patchy -- it would just be a blurred version of the
@@ -323,7 +328,11 @@ by LISSOM:
 
 </li>
 
-
+<P>Other right-click options allow you to look at the gradient of each
+plot (showing where the values change most quickly across the
+surface) or the histogram (showing the distribution of values in the
+plot), plot it in a separate window or as a 3D wireframe, or to save
+the images to disk.
 
 <li> Now that you have a feel for the various plots, you can try
 different input patterns, seeing how the cortex responds to each one.
@@ -370,8 +379,9 @@ own (in e.g. PNG, JPG, TIFF, or PGM format) in the <span
 class='t_item'>filename</span> box.) For most photographs you will 
 need to change the <span class='t_item'>scale</span> to something like
 2.0 to see a reasonable
-response from this model V1.  A much larger (and slower) map would
-be required to see detailed patterns in the response to most images,
+response from this model V1, and you may want to enlarge the image
+size to look at details.  A much larger (and slower) map would
+be required to see interesting patterns in the response to most images,
 but even with this network you may be able to see some
 orientation-specific responses to large contours in the image:
 </p>
@@ -396,11 +406,15 @@ the input and the final response after the cortex has settled due to
 the lateral connections.  If you want to understand the settling
 process itself, you can also visualize how the activity propagates
 from the retina to the LGN, from the LGN to V1, and then within V1.
-To do this, go to the console window and change the "Run for" value
-from 1.0 to 0.05.  Also make sure that there is an <span
+To do this, first make sure that there is an <span
 class='t_item'>Activity</span> window open, with Auto-refresh enabled.
-Now if you hit "Go" repeatedly, you will see the activity arrive first
-in the LGN, then in V1, and then gradually change within V1.
+Then go to the console window and hit "Step" repeatedly, you will see
+the activity arrive first in the LGN, then in V1, and then gradually
+change within V1.  The Step button moves to the next scheduled event
+in the simulation, which are at even multiples of 0.05 for this
+particular simulation.  You can also type in the specific duration
+(e.g. 0.05) to move forward into the "Run for:" box, and hit "Go"
+instead.
 
 <P>As explained in the
 <A HREF="../User_Manual/time.html">User Manual</A>,
@@ -416,9 +430,10 @@ is first activated at time 0.15.  V1 also has self-connections with a
 delay of 0.05, and so V1 is then repeatedly activated every 0.05 timesteps.
 Eventually, the number of V1 activations reaches a fixed limit for LISSOM
 (usually about 10 timesteps), and no further events are generated or consumed
-until the next input is generated at time 1.05.  Thus the usual
+until the next input is generated at time 1.05.  Thus the default
 stepsize of 1.0 lets the user see the results after each input pattern
-has been presented and the cortex has come to a steady state.
+has been presented and the cortex has come to a steady state, but
+results can also be examined at a finer timescale.
 </li>
 </ol>
 
@@ -458,58 +473,54 @@ the random input(s) and the response to them in the
 learning this input can be seen in the <span class='w_title'>Projection</span>
 window.
 
-<p></p></li><li>With each new input, you should be able to see small changes in the
+<p></p></li><li>With each new input, you may be able to see small changes in the
 weights of a few neurons in the <span
-class='t_item'>LGNOnAfferent</span> array (by peering closely).  If the changes are too subtle for your taste,
-you can make each input have a obvious effect by speeding up learning
-to a highly implausible level.  To do this, type: 
+class='t_item'>LGNOnAfferent</span> array (by peering closely).  If
+the changes are too subtle for your taste, you can make each input
+have a obvious effect by speeding up learning to a highly implausible
+level.  To do this, open the <span class='w_title'>Model Editor</span>
+window, right click on the LGNOnAfferent projection, and change
+Learning Rate from the default 0.48 to 200, and then do the same for
+the LGNOffAfferent projection.  You can also do the same from the
+terminal, or from the <span class='w_title'>Command Prompt</span>
+window available from the <span class='t_item'>Simulation</span> menu:
 
 <blockquote><code class='to_type'>
-topo.sim['V1'].projections()['LGNOnAfferent'].learning_rate
-</code></blockquote>
-
-in the <span class='t_item'>Command</span> box or at the Topographica
-terminal prompt. (You may need to activate the "Command Prompt" by
-clicking on it first).  The current learning rate will be displayed in
-your terminal window. Next, type:
-
-<blockquote><code class='to_type'>
-topo.sim['V1'].projections()['LGNOnAfferent'].learning_rate=200
-topo.sim['V1'].projections()['LGNOffAfferent'].learning_rate=200
+topo.sim['V1'].projections('LGNOnAfferent').learning_rate=200
+topo.sim['V1'].projections('LGNOffAfferent').learning_rate=200
 </code></blockquote>
 
 Now each new pattern generated in a
 training iteration will nearly wipe out any existing weights.
-(It should also be possible to view and change the learning_rate in the
-<span class='w_title'>Model Editor</span> window.)
 
-<p></p></li><li>For more control over the training inputs, open the
+<p></p></li><li>For more control over the training inputs, open the 
 <span class='w_title'>Test Pattern</span> window, select a
 <span class='t_item'>Pattern generator</span>, e.g. <span class='t_item'>Disk</span>, and other
-parameters as desired.  Then enable <span class='t_item'>Network learning</span> in that
+parameters as desired.  Then enable <span class='t_item'>Learning</span> in that
 window, and hit <span class='b_press'>Present</span>.  You should again see how
 this input changes the weights, and can experiment with different inputs.
 
-
-<!--CEBHACKALERT: use for learning button not complete -->
+<!--CEBHACKALERT: need to support dynamic params in the ME for this to be useful -->
 <!--
 <p><li>Once you have a particular input pattern designed, you can see
 how that pattern would affect the cortex over many iterations.  To do
-so, press the <span class='b_press'>Use for Training</span> button.  Now when you
-train for more iterations you'll see the new pattern and its effect on
-the weights.  (Note that the position and orientation of the new
-training pattern will always be (**FIXED!) for this simulation, and that
-training with (**UPDATE:) a photograph works only for photos named image.pgm.)</li></p>
+so, right click on the Retina and select a new pattern for the <span
+class='t_item'>Input Generator</span> item, then right click on that
+item and modify any of its parameters you like.  At present the Model
+Editor does not support dynamic parameters (such as random positions
+and orientations); to choose those you will need to edit the .ty
+script file for the simulation.
 -->
 
-<p></p></li><li>After a few steps
+<p></p></li><li>After a few steps,
 <!--
 (or to do e.g. 20 steps in a row, change
 <span class='t_item'>Learning iterations</span> to 20 and press return)
--->, you can
+-->you can
 plot (or refresh) an <span class='w_title'>Orientation
 Preference</span> map to see what sort of
-orientation map has developed.  (Press 'Refresh' if no plot is visible when
+orientation map has developed.  (Press the 'Refresh' button next to
+the <span class='t_item'>Update command</span> item if no plot is visible when
 first opening the window.  Measuring a new map will usually take about 15
 seconds to complete.)  If you've changed the learning rate to
 a high value, or haven't presented many inputs, the map will not
