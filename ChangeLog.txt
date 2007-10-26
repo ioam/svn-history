@@ -1,5 +1,12 @@
 2007-10-26  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
+	* topo/tkgui/topoconsole.py 1.245: Removed initial directory for
+	loading snapshots, now that they may be in Output instead
+
+	* doc/shared/index.php 1.40: Updated announcement
+
+	* ChangeLog.txt 1.22: Added recent updates
+
 	* doc/Tutorials/images/som_projection_010000.png 1.2,
 	doc/Tutorials/images/som_projection_040000.png 1.4,
 	doc/Tutorials/som_retinotopy_text.php 1.16,
