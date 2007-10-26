@@ -359,7 +359,7 @@ from topo.plotting.plotgroup import ConnectionFieldsPlotGroup
 pg= create_plotgroup(name='Connection Fields',category="Basic",
                      doc='Plot the weight strength in each ConnectionField of a specific unit of a Sheet.',
                      update_command='update_connectionfields()',
-                     plot_immediately=True, normalize=True)
+                     plot_immediately=True, normalize=True, situate=True)
 pg.add_plot('Connection Fields',[('Strength','Weights')])
 
 
