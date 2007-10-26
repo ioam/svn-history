@@ -1,4 +1,381 @@
+2007-10-26  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/images/som_projection_010000.png 1.2,
+	doc/Tutorials/images/som_projection_040000.png 1.4,
+	doc/Tutorials/som_retinotopy_text.php 1.16,
+	doc/Tutorials/images/som_activity_000000.png 1.4,
+	doc/Tutorials/images/som_activity_000001.png 1.4,
+	doc/Tutorials/images/som_activity_000005.png 1.2,
+	doc/Tutorials/images/som_activity_040000.png 1.2,
+	doc/Tutorials/images/som_cog_000000.png 1.4,
+	doc/Tutorials/images/som_cog_005000.png 1.2,
+	doc/Tutorials/images/som_cog_010000.png 1.2,
+	doc/Tutorials/images/som_cog_040000.png 1.2,
+	doc/Tutorials/images/som_grid_000000.png 1.5,
+	doc/Tutorials/images/som_grid_005000.png 1.2,
+	doc/Tutorials/images/som_grid_010000.png 1.4,
+	doc/Tutorials/images/som_grid_040000.png 1.4,
+	doc/Tutorials/images/som_network_diagram.png 1.3,
+	doc/Tutorials/images/som_projection_000000.png 1.4,
+	doc/Tutorials/images/som_projection_000001.png 1.4,
+	doc/Tutorials/images/som_projection_000005.png 1.2,
+	doc/Tutorials/images/som_projection_activity_000001.png 1.1:
+	Updated SOM tutorial, mainly to get new images
+
+	* doc/Future_Work/current_text.php 1.312: Updated to show nearly
+	completed tasks
+
+	* topo/commands/analysis.py 1.134: Turned on situate by default
+
+	* doc/Tutorials/images/lissom_oo_or_activity_rightclick.png 1.2:
+	Added transparency
+
+	* doc/Tutorials/images/topographica_console.png 1.4,
+	doc/Tutorials/lissom_oo_or_text.php 1.31: Updated to match current
+	version
+
+	* doc/FAQ/index_text.php 1.6: Minor update
+
+2007-10-26  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.264: Removed ALERT that describes
+	expected behavior.
+
+	* doc/Future_Work/current_text.php 1.311: Removed completed
+	scrollbar and projection history tasks.
+
+	* topo/tkgui/widgets.py 1.19: Added EditableOptionMenu.
+
+2007-10-25  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.244: Get plot_templates from the
+	current plotgroups dictionary.
+
+	* topo/misc/utils.py 1.48: Added ALERT.
+
+	* topo/tkgui/widgets.py 1.18: Added note.
+
+	* topo/tkgui/plotgrouppanel.py 1.263: Removed no-longer-necessary
+	try/except (TaggedSlider support 'state' option).
+
+	* topo/tkgui/plotgrouppanel.py 1.262: Removed unnecessary code to
+	update widgetswhen navigating history.
+
+	* topo/plotting/plotgroup.py 1.233: Fixed error message.
+
+2007-10-24  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* external/.cvsignore 1.33, external/Makefile 1.82: Upgraded
+	Matplotlib to 0.90.1 to fix problem on FC7
+
+	* doc/Future_Work/current_text.php 1.310: Updated tasks
+
+	* topo/tkgui/plotgrouppanel.py 1.261,
+	topo/tkgui/projectionpanel.py 1.155, topo/plotting/plotgroup.py
+	1.232: Fixed some bugs in plot scaling, hopefully without
+	introducing many more.  Now plot histories should respect the
+	current size scaling options, rather than keeping their own sizes.
+
+2007-10-24  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topographica-win/common/python_topo.tar.gz 1.8: Updated to
+	matplotlib 0.90.1
+
+	* topo/commands/pylabplots.py 1.45: Added needmain=False for
+	wireframe plot.
+
+	* topo/tkgui/topoconsole.py 1.243: Make plot_templates be shared
+	across all instances of plotgroups that same a name.
+
+	*
+	topographica-win/create_python_topo/matplotlib-0.90.1.win32-py2.4.exe
+	1.1: From sf.net
+
+2007-10-23  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.133: Removed alert
+
+2007-10-23  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.132: Added question.
+
+	* doc/Future_Work/current_text.php 1.309: Updates to tasks.
+
+	* topo/plotting/plotgroup.py 1.231: Removed useless scaling hack.
+
+	* topo/plotting/plotgroup.py 1.230: Fixed underscore error (forgot
+	about name mangling).
+
+	* topo/tkgui/widgets.py 1.17: Fixed recursion bug
+	(update_idletasks() was being called inside an after_idle()).
+
+2007-10-22  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.308: Reordered remaining
+	tasks
+
+	* external/matplotlib-0.90.1.tar.gz 1.1: Version from SourceForge
+
+	* doc/Developer_Manual/gui_text.php 1.6: Added missing newline
+
+	* topo/commands/basic.py 1.79: Removed obsolete note
+
+	* topo/misc/patternfns.py 1.13: Added fix from Jan; gabor was
+	using incorrect sine grating offset.
+
+	* doc/User_Manual/plotting_text.php 1.10: Added example RF plots
+
+	* doc/User_Manual/images/rf_matrixplot.png 1.1,
+	doc/User_Manual/images/rf_projection.png 1.1: Screen grab from
+	Topographica 0.9.4
+
+2007-10-22  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.260: Added ALERT about unbounded
+	history.
+
+	* topographica-win/common/python_topo.tar.gz 1.7: Updated to
+	current external packages.
+
+	* doc/Future_Work/current_text.php 1.307: Added note to tutorial
+	task.
+
+2007-10-21  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.306: Updated tasks (first bug
+	temporarily fixed; second not too serious so moved to after 0.9.4.
+
+	* topo/plotting/plotgroup.py 1.229: Fixed plot sizes not sticking
+	in the GUI with a hack (to get things working for the release; see
+	task in current tasks.
+
+	* external/pybwidget-0.1.2_1.8.0.tar.gz 1.3: Reverted to previous
+	gzip'd version of tar now windows' python_topo/ has been built. No
+	idea why the gzip'd version is incompatible between linux and
+	Windows (linux gzip'd one won't gunzip on Windows; Windows gzip'd
+	one won't gunzip on linux).
+
+	* external/pybwidget-0.1.2_1.8.0.tar.gz 1.2: Same tar file as
+	before, but gzip'd on Windows since I couldn't get the original
+	one to gunzip on Windows.
+
+	* doc/Future_Work/current_text.php 1.305: Clarified 0.9.4
+	bugs. Moved tkgui cleanup task to after 0.9.4.
+
+	* topo/tkgui/topoconsole.py 1.242: Corrected when to do the
+	plotgroup copy (we want an independent plotgroup for each panel,
+	and made the copy be a deepcopy.
+
+	* doc/Developer_Manual/gui_text.php 1.5: Finished brief
+	introduction to tkgui programming.
+
+	* doc/shared/index.php 1.39: Added commented-out link to relevant
+	manual page for adding GUI code. Commented out because I'm not
+	sure we want to lead people reading the news into the developer
+	manual.
+
+	* topo/patterns/audio.py 1.8: Print a warning when trying to
+	import topo.patterns.audio if pyaudiolab can't be imported.
+
+	* topo/tkgui/featurecurvepanel.py 1.37, topo/tkgui/testpattern.py
+	1.102: Minor update to doc.
+
+	* topo/tkgui/topowidgets.py 1.24, topo/tkgui/widgets.py 1.16: Some
+	cleanup to comments (including warnings that will be visible in
+	the reference manual) about some things that aren't finished.
+
+	* doc/Future_Work/current_text.php 1.304: Removed scrollbar and
+	OSX/vnc tasks.
+
+	* topo/tkgui/topowidgets.py 1.23, topo/tkgui/widgets.py 1.15: Make
+	scrollbars appear for manual resizing on linux.
+
+	* topo/tkgui/plotgrouppanel.py 1.259: Added ALERT.
+
+	* topo/tkgui/widgets.py 1.14: Restored missing 'auto' option for
+	the scrollbars: seems to be required for FC5 but not Ubuntu and
+	OSX (should be required on all...).
+
+	* doc/Downloads/.cvsignore 1.4: More to ignore.
+
+	* doc/Developer_Manual/gui_text.php 1.4: Added links
+	(unformatted).
+
+	* doc/Future_Work/current_text.php 1.303: Updated tasks.
+
+	* doc/Tutorials/som_retinotopy_text.php 1.15: Mentioned
+	translations for Windows.
+
+	* doc/Downloads/win32notes_text.php 1.2: Added more conversions.
+
+	* doc/Downloads/index_text.php 1.56,
+	doc/Downloads/win32notes_text.php 1.1,
+	doc/Tutorials/lissom_oo_or_text.php 1.30: Added note about
+	translating Unix commands to Windows.
+
+	* topo/tkgui/editorobjects.py 1.59, topo/tkgui/editortools.py
+	1.45: Updated method names for ParametersFrame.
+
+	* topo/tkgui/tkparameterizedobject.py 1.115,
+	topo/tkgui/parametersframe.py 1.140: Cleanup.
+
+2007-10-20  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/index_text.php 1.55: Try 'tool-tip' popup using
+	title attribute for displaying Windows equivalent of commands.
+
+	* doc/Future_Work/current_text.php 1.302: Updated tasks.
+
+	* topo/tkgui/topoconsole.py 1.241, topo/tkgui/topowidgets.py 1.22:
+	Hacked ProgressWindow in half to solve the problem with it
+	flickering on in Windows.
+
+	* topo/tkgui/widgets.py 1.13: Stop buttons having black outline
+	when mouse moves over them (since it doesn't go away until another
+	widget's clicked on).
+
+	* topo/tkgui/featurecurvepanel.py 1.36,
+	topo/tkgui/projectionpanel.py 1.154: Ask that sheet/projection
+	which is top after sorting is selected by default.
+
+	* topo/tkgui/tkparameterizedobject.py 1.114: Allow to request a
+	new default value when packing a parameter.
+
+	* topo/tkgui/tkparameterizedobject.py 1.113: Undo a previous
+	change: gui should not change value of all SelectorParameters to
+	the item with the highest precedence. (Need to alter so it's only
+	done for GUI parameters.)
+
+	* topo/tkgui/widgets.py 1.12: Added test for OSX to manual control
+	of scrollbars (manual control doesn't work on OSX and isn't
+	needed).
+
+	* topo/tkgui/widgets.py 1.11: Added commented-out line that (when
+	uncommented) makes scrollbars work properly on Ubuntu linux. Need
+	to test platform is not mac before calling.
+
+	* topo/tkgui/topoconsole.py 1.240, topo/tkgui/topowidgets.py 1.21,
+	topo/tkgui/widgets.py 1.10: Moved some methods from
+	ScrolledTkguiWindow to ResizeableScrollableFrame. Simplified
+	resizing methods. Window scrollbars work perfectly on OSX, but
+	will need modification for linux.
+
+	* topo/tkgui/plotgrouppanel.py 1.258: PlotGroupPanel generates a
+	<<SizeRight>> event whenever its contents might have changed size.
+
+	* topo/tkgui/widgets.py 1.9: TaggedSlider: make slider expand if
+	necessary.
+
+	* topo/tkgui/plotgrouppanel.py 1.257,
+	topo/tkgui/projectionpanel.py 1.153,
+	topo/tkgui/featurecurvepanel.py 1.35: Simplified displaying
+	no-plot note.
+
+	* topo/tkgui/plotgrouppanel.py 1.256: Simplified calling
+	display_plots() and display_labels().
+
+	* doc/Future_Work/current_text.php 1.301: Removed plotgroup-saving
+	task.
+
+	* topo/plotting/plotgroup.py 1.228: Added ALERT.
+
+	* topo/plotting/plotgroup.py 1.227: Images can be pickled, so
+	plotgroup pickling should now be ok.
+
+	* topo/plotting/bitmap.py 1.36: Allow pickling of any stored
+	Image.
+
+	* topo/tkgui/featurecurvepanel.py 1.34,
+	topo/tkgui/plotgrouppanel.py 1.255, topo/tkgui/projectionpanel.py
+	1.152: Simplified no-plot note.
+
+	* doc/Future_Work/current_text.php 1.300: Added list of bugs to
+	fix before 0.9.4, and moved around some other tasks.
+
+2007-10-19  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testplotfilesaver.py 1.37: Removed unused import.
+
+	* topo/commands/analysis.py 1.131: Don't copy the plotgroup in
+	save_plotgroup() (at least until the filesaver attribute is
+	changed from an object to just the class, for instantiation later
+	- or some other correction is made).
+
+	* topo/plotting/plotgroup.py 1.226: Disable plotgroups saving
+	(still more problems pickling plotgroup.
+
+	* topo/commands/analysis.py 1.130: Removed unnecessary error
+	raising (KeyedList raises an error now).
+
+	* topo/plotting/plotgroup.py 1.225: Store plotgroups with
+	snapshots now problems have been fixed.
+
+	* topo/commands/analysis.py 1.129: When saving a plotgroup, work
+	on a copy of the original from plotgroups.
+
+	* topo/tkgui/topoconsole.py 1.239: Panels take a *copy* of a
+	plotgroup from plotgroups, rather than the original object.
+
+	* topo/plotting/plotgroup.py 1.224: Temporarily disabled
+	plotgroups saving (since plotgroups themselves actually won't
+	pickle).
+
+	* topo/tkgui/widgets.py 1.8: Clarified ALERT.
+
+	* topo/tests/testparametersframe.py 1.9: Simplified finding out
+	whether or not a widget has a value which we can get().
+
+	* topo/tkgui/tkparameterizedobject.py 1.112: Removed unnecessary
+	try/except.
+
+	* topo/tkgui/widgets.py 1.7: Made TaggedSlider's config() method
+	return the correct type (but needs to return the correct thing
+	eventually).
+
+	* topo/tkgui/tkparameterizedobject.py 1.111: Use FocusTakingButton
+	rather than Button so that any non-button widget correctly
+	receives <FocusOut> if a button is clicked.
+
+	* topo/tkgui/widgets.py 1.6: Added FocusTakingButton.
+
+	* topo/tkgui/tkparameterizedobject.py 1.110: Corrected error in
+	previous checkin.
+
+	* topo/tkgui/tkparameterizedobject.py 1.109: SelectorParameters
+	defaults to displaying the first item in its sorted lists.
+
+	* topo/plotting/plotgroup.py 1.223: Save plotgroups when pickling.
+
+	* topo/commands/basic.py 1.78, topo/misc/utils.py 1.47: Added
+	ExtraPickler to allow module-level attributes to be pickled
+	(specifically, lets us save plotgroups repository). Might not be
+	the best way to do this.
+
+	* topo/misc/keyedlist.py 1.10: Fixed typo.
+
+	* topo/tkgui/featurecurvepanel.py 1.33: Display a title when first
+	opened.
+
+2007-10-19  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/__init__.py 1.5: Updated docs and list of packages
+
 2007-10-18  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/shared/index.php 1.38: Updated announcement and added
+	screenshots
+
+	* doc/Home/oldnews_text.php 1.6: Tightened spacing
+
+	* doc/images/071018_modeleditor_ubuntu.png 1.1,
+	doc/images/071018_plotting1_ubuntu.png 1.1,
+	doc/images/071018_plotting2_ubuntu.png 1.1: Screenshots from 0.9.4
+	Ubuntu version
+
+	* topo/commands/analysis.py 1.128: Disabled RF CoG plots pending
+	study
+
+	* ChangeLog.txt 1.21: Updated with recent changes
 
 	* topo/commands/basic.py 1.77: Shortened analysis_times to times
 
