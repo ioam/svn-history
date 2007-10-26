@@ -36,17 +36,7 @@ tracker rather than added to this list</B>.
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
 
-<H2>Tasks to be addressed before the upcoming 0.9.4 release:</H2>
-
-
-<H4>2007/03/28 (?): Update tutorial</H4>
-Update the lissom_oo_or tutorial page to include how to start and stop
-training and to add a section about plotting 'Orientation tuning
-fullfield' tuning curves. Also, in step 13, should mention the step button.
-CB: would the tutorial benefit from being split up a little more?
-Maybe it's getting daunting?
-
-
+<!-- <H2>Tasks to be addressed before the next release (0.9.5 or 1.0) :</H2> -->
 
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
@@ -70,6 +60,12 @@ See ALERT next to plotgroups in plotgroup.py.
 The timing object is nearly done, allowing progress bars, time
 remaining estimates, etc., but Jim needs to look at it to finish it up
 (and then close tracker 1432101).
+
+<H4>2007/10/26: Update tutorial</H4>
+Update the lissom_oo_or tutorial page to include fresh figures; some
+are a bit out of date.  Add a section about plotting 'Orientation
+tuning fullfield' tuning curves.  CB: would the tutorial benefit from
+being split up a little more?  Maybe it's getting daunting?
 
 <H4>2007/10/16 (CB): buildbot</H4>
 Separate make slow-tests into a separate process from 
