@@ -199,16 +199,13 @@ class PlotMatrixPanel(ProjectionSheetPanel):
         scaling for the PlotGroup.""")
 
 
-    def __init__(self,console,master,plotgroup,**params):
-        super(PlotMatrixPanel,self).__init__(console,master,plotgroup,**params)
-        # Take the starting size of the plot as the desired size, whatever that is.
+    def refresh(self,update=True):
+        super(PlotMatrixPanel,self).refresh(update)
+        # take the size of the plot as the desired size
         self.plotgroup.update_maximum_plot_height()
         self.desired_maximum_plot_height = self.plotgroup.maximum_plot_height
 
     
-    def setup_plotgroup(self):
-        super(PlotMatrixPanel,self).setup_plotgroup()
-
     def display_plots(self):
         """
         CFProjectionPanel requires a 2D grid of plots.
@@ -258,7 +255,7 @@ class PlotMatrixPanel(ProjectionSheetPanel):
 class RFProjectionPanel(PlotMatrixPanel):
 
     def __init__(self,console,master,plotgroup,**params):
-        super(PlotMatrixPanel,self).__init__(console,master,plotgroup,**params)
+        super(RFProjectionPanel,self).__init__(console,master,plotgroup,**params)
         self.pack_param('input_sheet',parent=self.control_frame_3,
                         on_modify=self.redraw_plots,side='left',expand=1,
                         widget_options={'new_default':True})
