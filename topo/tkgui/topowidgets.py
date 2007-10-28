@@ -163,6 +163,9 @@ class ProgressController(object):
     def set_stop(self):
         """Declare that running should be interrupted."""
         self.timer.stop=True
+        last_message = "Time %s: Interrupted %s"%(topo.sim.timestr(),
+                                                  self.timer.func.__name__)
+        self._close(last_message)
 
 
 class ProgressWindow(ProgressController,TkguiWindow):
