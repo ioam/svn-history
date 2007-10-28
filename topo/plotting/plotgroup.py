@@ -284,7 +284,6 @@ class SheetPlotGroup(PlotGroup):
         bounds, and the size of that plot will be the maximum density
         times the largest sheet bounds.
         """
-        
         # Apply optional scaling to the overall size
         if zoom_factor:
             self.desired_maximum_plot_height*=zoom_factor
@@ -293,6 +292,11 @@ class SheetPlotGroup(PlotGroup):
 
         if (self.enforce_minimum_plot_height):
             resizeable_plots = [p for p in self.plots if p.resize]
+
+            # CEBALERT: not sure how I should have handled this...
+            if len(resizeable_plots)<1:
+                return True # seems like it should be False, but I guess it doesn't matter at the moment
+
             if not self.sheet_coords:
                 bitmap_heights = [p._orig_bitmap.height() for p in resizeable_plots]
                 minimum_height_of_tallest_plot = max(bitmap_heights)
