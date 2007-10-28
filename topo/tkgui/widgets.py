@@ -526,11 +526,11 @@ class OutputText(Tkinter.Text):
 
         And scroll to the end.
         """
-        self.config(state=NORMAL)
-        self.insert(END,">>> "+cmd+"\n"+output)
-        self.insert(END,"\n")
-        self.config(state=DISABLED)        
-        self.see(END)
+        self.config(state="normal")
+        self.insert("end",">>> "+cmd+"\n"+output)
+        self.insert("end","\n")
+        self.config(state="disabled")        
+        self.see("end")
 
     def append_text(self,text):
         """
@@ -539,11 +539,11 @@ class OutputText(Tkinter.Text):
 
         And scroll to the end.
         """
-        self.config(state=NORMAL)
-        self.insert(END,text)
-        self.insert(END,"\n")
-        self.config(state=DISABLED)
-        self.see(END)
+        self.config(state="normal")
+        self.insert("end",text)
+        self.insert("end","\n")
+        self.config(state="disabled")
+        self.see("end")
 
 
 
