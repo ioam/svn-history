@@ -21,7 +21,8 @@ Making a Windows installation package
     luck with that).  The doc directory should be cleaned up before it
     is copied in, by removing any CVS files, including the CVS
     subdirectory of each directory, plus .cvsignore and cvs temporary
-    files.
+    files (so take the doc/ directory from the results of a "make dist"
+    on linux).
 
 (6) I use 'Inno Setup 5', an open-source installation package creator
     (see http://www.jrsoftware.org/isinfo.php).
