@@ -16,6 +16,7 @@ __version__='$Revision$'
 ### plotgrouppanel.py generates an import error.)
 # CB: after reorganization, see if this problem persists.
 
+import sys
 import copy
 import operator
 import decimal
