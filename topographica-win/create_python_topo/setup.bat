@@ -73,7 +73,7 @@ cd c:\python24\Lib\site-packages
 cd %storecpt%
 
 REM * matplotlib
-start /w matplotlib-0.90.0.win32-py2.4.exe
+start /w matplotlib-0.90.1.win32-py2.4.exe
 
 REM * PIL (has jpeg already)
 start /w PIL-1.1.5.win32-py2.4.exe
