@@ -67,12 +67,6 @@ are a bit out of date.  Add a section about plotting 'Orientation
 tuning fullfield' tuning curves.  CB: would the tutorial benefit from
 being split up a little more?  Maybe it's getting daunting?
 
-<H4>2007/10/16 (CB): buildbot</H4>
-Separate make slow-tests into a separate process from 
-building, so that the speed tests are useful on buildbot.
-buildbot automatic restarting on doozy and sake. How to use
-Xvfb on sake?
-
 <H4>2007/10/03 (CB): Plotting non-CFProjection Projections</H4>
 Modify PlotGroup and ProjectionPanels so that we can plot
 a wider variety of Projections.
