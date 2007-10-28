@@ -198,6 +198,8 @@ class PlotMatrixPanel(ProjectionSheetPanel):
         PlotGroups opened by the GUI.  Determines the initial, default
         scaling for the PlotGroup.""")
 
+    def sheet_change(self): # don't want to refresh_plots (measure new data) each time
+        self.redraw_plots()
 
     def refresh(self,update=True):
         super(PlotMatrixPanel,self).refresh(update)
@@ -272,9 +274,6 @@ class RFProjectionPanel(PlotMatrixPanel):
         self.plotgroup.params()['input_sheet'].objects = sheets
         self.plotgroup.input_sheet=sheets[0]
 
-    
-    def sheet_change(self): # don't want to refresh_plots (measure new data) each time
-        self.redraw_plots()
 
     def _plot_title(self):
         return 'RFs of %s on %s at time %s'%(self.sheet.name,self.plotgroup.input_sheet.name,
@@ -285,7 +284,7 @@ class ProjectionPanel(PlotMatrixPanel):
     def __init__(self,console,master,plotgroup,**params):
         super(ProjectionPanel,self).__init__(console,master,plotgroup,**params)
         self.pack_param('projection',parent=self.control_frame_3,
-                        on_modify=self.refresh_plots,side='left',expand=1,
+                        on_modify=self.redraw_plots,side='left',expand=1,
                         widget_options={'sort_fn_args':{'cmp':cmp_projections},
                                         'new_default':True})
         
