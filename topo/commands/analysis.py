@@ -381,7 +381,7 @@ def update_connectionfields():
 pg= create_plotgroup(name='Projection',category="Basic",
            doc='Plot the weights of an array of ConnectionFields in a Projection.',
            update_command='update_projections()',
-           plot_immediately=True, normalize=True)
+           plot_immediately=False, normalize=True)
 pg.add_plot('Projection',[('Strength','Weights')])
 
 
