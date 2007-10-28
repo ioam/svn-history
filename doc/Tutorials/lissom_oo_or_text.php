@@ -408,7 +408,7 @@ process itself, you can also visualize how the activity propagates
 from the retina to the LGN, from the LGN to V1, and then within V1.
 To do this, first make sure that there is an <span
 class='t_item'>Activity</span> window open, with Auto-refresh enabled.
-Then go to the console window and hit "Step" repeatedly, you will see
+Then go to the console window and hit "Step" repeatedly. You will see
 the activity arrive first in the LGN, then in V1, and then gradually
 change within V1.  The Step button moves to the next scheduled event
 in the simulation, which are at even multiples of 0.05 for this
