@@ -23,9 +23,15 @@ installed at once.
     click 'next' or 'finish' whenever prompted.
 
 (2) As suggested by the script file, check that the new python_topo\
-    directory works.
+    directory works. 
 
-(3) If it does, turn it into a tar.gz file and commit to the repository
+(3) Ensure python24.dll is present in python_topo\. If it's not (which
+    seems to happen sometimes if the python installer detects your 
+    system copy is the same as the one about to be installed), copy
+    it in (from c:\windows\system32\).
+
+(4) If the new python_topo\ works, turn it into a tar.gz file and 
+    commit to the repository
     (topographica-win\common\python_topo.tar.gz)
 
 
