@@ -294,8 +294,8 @@ class SheetPlotGroup(PlotGroup):
             resizeable_plots = [p for p in self.plots if p.resize]
 
             # CEBALERT: not sure how I should have handled this...
-            if len(resizeable_plots)<1:
-                return True # seems like it should be False, but I guess it doesn't matter at the moment
+            if not resizeable_plots:
+                return False
 
             if not self.sheet_coords:
                 bitmap_heights = [p._orig_bitmap.height() for p in resizeable_plots]
@@ -318,9 +318,9 @@ class SheetPlotGroup(PlotGroup):
                     
             if (self.maximum_plot_height < minimum_height_of_tallest_plot):
                 self.maximum_plot_height = minimum_height_of_tallest_plot
-                # Return failure if trying to reduce but hit the minumum
+                # Return failure if trying to reduce but hit the minimum
                 if zoom_factor:
-                    return zoom_factor>0
+                    return zoom_factor>1.0
 
 #       print zoom_factor, self.maximum_plot_height, self.desired_maximum_plot_height
         return True
