@@ -44,10 +44,11 @@ del /Q /F topographica
 del /Q /F topographica.bat
 
 
-REM **** Things the Makefile deletes CEBHACKALERT: this line doesn't seem to be working any more!
-del /S /Q /F .#* *\.#* *\*~ .cvsignore ChangeLog.txt *\.cvsignore *\*\.cvsignore *\*\*\.cvsignore
+REM **** Things the Makefile deletes
+del /s /Q /F .#* *~ .cvsignore 
+del ChangeLog.txt
 del etc\topographica.elc ImageSaver*.ppm countalerts* annotate.out emacslog
-del current_profile testsnapshot.typ script topo\tests\*.ty_*DATA timing*
+del current_profile topo\tests\testsnapshot.typ script topo\tests\*.ty_*DATA timing* topo\tests\testplotfilesaver*.png
 del examples\disparity_energy.ty
 del examples\face_space.ty
 del examples\goodhill_network90.ty
@@ -61,7 +62,7 @@ del examples\laminar_oo_or.ty*
 del examples\leaky_lissom_or.ty
 del examples\lgn_lateral.ty*
 del examples\lissom_oo_od.ty
-del examples\lissom_oo_or_dy.ty
+del examples\lissom_oo_or_dy_photo.ty
 del examples\lissom_oo_or_noshrinking_adapthomeo.ty
 del examples\lissom_oo_or_noshrinking_latswitch.ty
 del examples\lissom_or_homeomaxent.ty
@@ -74,6 +75,9 @@ del examples\saccade_demo.ty
 del examples\sullivan_neurocomputing04.ty
 del examples\sullivan_nn06.ty
 del examples\*.typ
+rmdir /Q /S Output
+rmdir /Q /S images
+
 
 
 REM CEBHACKALERT: need to make clean topo/tests/reference
