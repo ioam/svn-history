@@ -45,6 +45,8 @@ del /Q /F topographica.bat
 
 
 REM **** Things the Makefile deletes
+REM CEBERRORALERT: no idea how to recursively delete .cvsignore files on windows:
+REM says it can't find them when they really are there...
 del /s /Q /F .#* *~ .cvsignore 
 del ChangeLog.txt
 del etc\topographica.elc ImageSaver*.ppm countalerts* annotate.out emacslog
