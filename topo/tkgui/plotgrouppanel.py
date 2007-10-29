@@ -157,7 +157,7 @@ progress can be viewed in an open Activity window,
 e.g. for debugging.)
 """        
         self.no_plot_note=Label(self.plot_frame,text=no_plot_note_text,justify='center')
-
+        self.no_plot_note_enabled=False
 
 
         self.control_frame_3 = Frame(self)
@@ -366,9 +366,16 @@ e.g. for debugging.)
 
         if len(self.canvases)==0:
             self.no_plot_note.grid(row=1,column=0,sticky='nsew')
-        else:
+            self.no_plot_note_enabled=True
+            self.representations['Enlarge']['widget']['state']=DISABLED
+            self.representations['Reduce' ]['widget']['state']=DISABLED
+            
+        elif self.no_plot_note_enabled:
             self.no_plot_note.grid_forget()
-
+            self.no_plot_note_enabled=False
+            self.representations['Enlarge']['widget']['state']=NORMAL
+            self.representations['Reduce' ]['widget']['state']=NORMAL
+    
         self.event_generate("<<SizeRight>>")
         
         
