@@ -1,4 +1,64 @@
+2007-10-29  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.265: Disable enlarge and reduce
+	when there are no plots
+
+	* topo/plotting/plotgroup.py 1.235: Minor cleanup, plus fixed bug
+	in return value that was preventing Reduce button from ever being
+	disabled
+
+2007-10-29  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topographica-win/create_installer/prepare_for_installer.bat
+	1.11: Added ALERT.
+
+	* topographica-win/create_installer/prepare_for_installer.bat
+	1.10: Corrections and updates to match Makefile.
+
+	* topographica-win/create_python_topo/README.txt 1.7: Added a
+	note.
+
+2007-10-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/projectionpanel.py 1.157: PlotMatrixPanels only
+	redraw when the sheet changes (previously only RFProjection panels
+	did a redraw - the rest did a refresh).
+
+	* topo/plotting/plotgroup.py 1.234: update_maximum_plot_height()
+	handles the case where there are no resizeable plots. Probably
+	needs correcting.
+
+	* topo/commands/analysis.py 1.135: Don't plot projection plots
+	immediately.
+
+	* topo/tkgui/projectionpanel.py 1.156: Override refresh():
+	additionally sets desired size from current one each time. Removed
+	unnecessary setup_plotgroup and __init__ methods.
+
+	* doc/Future_Work/current_text.php 1.313: Removed completed
+	buildbot task. (The part about automatic restarting and xvfb is
+	covered by the feature request on sf.net).
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.32: Change to punctuation.
+
+	* topographica-win/create_installer/README.txt 1.8: Clarified
+	text.
+
+	* topo/tkgui/topowidgets.py 1.25: Fixed bug: window wasn't closing
+	(introduced when classes split).
+
+	* topo/tkgui/widgets.py 1.21: Fixed Tkinter constants (command
+	prompt was broken at the point of entering a command).
+
+	* topo/tkgui/widgets.py 1.20: Added missing import (command prompt
+	was broken at the point of entering a command.
+
+	* topographica-win/create_python_topo/setup.bat 1.22: Use
+	matplotlib 0.90.1
+
 2007-10-26  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* ChangeLog.txt 1.23: Added recent updates
 
 	* topo/tkgui/topoconsole.py 1.245: Removed initial directory for
 	loading snapshots, now that they may be in Output instead
