@@ -460,6 +460,17 @@ class TaggedSlider(Tkinter.Frame):
 
 
     def _try_to_set_slider_resolution(self):
+        """
+        Use the actual number in the box to set the slider's resolution,
+        so that user-entered resolutions are respected (e.g. 0.1 vs 0.1000).
+
+        If that's not possible (e.g. there's text in the box), use the
+        value contained in the variable (because whatever owns the
+        variable could have performed a conversion of the text -
+        TkParameterizedObject does this, for instance).
+
+        Leaves the resolution as it was if no number is available.
+        """
         try:
             # 1st choice is to get the actual number in the box:
             # allows us to respect user-entered resolution
@@ -478,17 +489,17 @@ class TaggedSlider(Tkinter.Frame):
 
     def _try_to_set_slider(self):
         """
-        expand bounds if necessary
+        If the value in the box can't be converted to a float, the slider doesn't get set.
         """
         tagvar_val = self.variable.get()
-        
-        if operator.isNumberType(tagvar_val):
-            self.set_slider_bounds(min(self.bounds[0],tagvar_val),
-                                   max(self.bounds[1],tagvar_val))
-            self.slider.set(tagvar_val)
-            return True
-        else:
-            return False
+        try:
+            val = float(tagvar_val)
+            self.set_slider_bounds(min(self.bounds[0],val),
+                                   max(self.bounds[1],val))
+            self.slider.set(val)
+        except ValueError:
+            pass
+
 
 ######################################################################
 ######################################################################        
