@@ -238,6 +238,7 @@ class TopoConsole(TkguiWindow):
                                bounds=(0,20000))
         self.balloon.bind(run_for,"Duration to run the simulation, e.g. 0.0500, 1.0, or 20000.")
         run_for.pack(side=LEFT,fill='x',expand=YES)
+        run_for.tag.bind("<Return>",self.run_simulation)
 
         # When return is pressed, the TaggedSlider updates itself...but we also want to run
         # the simulation in this case.
@@ -551,7 +552,7 @@ class TopoConsole(TkguiWindow):
     # for multiple things getting timed.
 
     
-    def run_simulation(self):
+    def run_simulation(self,event=None): # event=None allows use as callback
         """
         Run the simulation for the duration specified in the
         'run for' taggedslider.        
