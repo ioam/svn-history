@@ -408,6 +408,9 @@ class ParametersFrameWithApply(ParametersFrame):
     def _refresh_button(self):
         for name in self.displayed_params.keys():
             self._tk_vars[name]._checking_get()
+            # CEBALERT: taggedsliders need to have tag_set() called to update slider
+            w = self.representations[name]['widget']
+            if hasattr(w,'tag_set'):w.tag_set()
 
 
     def __delete_trace(self,var): var.trace_vdelete(*var.trace_vinfo()[0])
