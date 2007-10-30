@@ -78,7 +78,7 @@ class ScrolledTkguiWindow(TkguiWindow):
 
 ######################################################################
 ######################################################################            
-# CEBALERT: haven't decided what to do; might be temporary.
+# CEBALERT: need to remove this class - does anything still use refresh()
 class TkPOTaggedSlider(TaggedSlider):
     """
     A TaggedSlider with extra features for use with
@@ -86,27 +86,7 @@ class TkPOTaggedSlider(TaggedSlider):
     
     Adds extra ability to set slider when e.g. a variable
     name is in the tag.
-    """
-    def _try_to_set_slider_resolution(self):
-        if not TaggedSlider._try_to_set_slider_resolution(self):
-            # get the actual value as set on
-            # the object (which might be the "last good" value)
-            try:
-                self._set_slider_resolution(self.variable._true_val())
-            except: # probably tclerror
-                pass
-
-
-    def _try_to_set_slider(self):
-        if not TaggedSlider._try_to_set_slider(self):
-            v = self.variable._true_val()
-
-            if operator.isNumberType(v):
-                self.set_slider_bounds(min(self.bounds[0],v),
-                                       max(self.bounds[1],v))
-                self.slider.set(v)
-
-    
+    """    
     def refresh(self):
         """Could anything survive in tkgui without a refresh() method?"""
         self.tag_set()
