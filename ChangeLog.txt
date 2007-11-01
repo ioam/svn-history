@@ -1,3 +1,73 @@
+2007-11-01  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/images/topographica_console.png 1.5,
+	doc/Tutorials/images/unit_weights_0_0_oo.png 1.6,
+	doc/Tutorials/images/unit_weights_0_0_oo_or.png 1.6,
+	doc/Tutorials/images/unit_weights_41_24_oo_or.png 1.2,
+	doc/Tutorials/images/activity_line_oo.png 1.7,
+	doc/Tutorials/images/activity_line_oo_or.png 1.7,
+	doc/Tutorials/images/lissom_oo_or_orpref_ft.png 1.2,
+	doc/Tutorials/images/natural_image_oo_or.png 1.6,
+	doc/Tutorials/images/natural_image_projact_oo_or.png 1.2,
+	doc/Tutorials/images/oo_or_map.png 1.6,
+	doc/Tutorials/images/projection_oo.png 1.6,
+	doc/Tutorials/images/test_pattern_oo.png 1.6,
+	doc/Tutorials/lissom_oo_or_text.php 1.33: Updated lissom_oo_or
+	tutorial images
+
+2007-11-01  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulation.py 1.104: Corrected test for None in
+	timestr(). (Fix incorrect time in plotgroups history.)
+
+2007-10-31  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topographica-win/common/python_topo.tar.gz 1.9: Added
+	python24.dll from the .exe distribution
+
+2007-10-30  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/buildbot/master.cfg 1.5: Simplified file and added
+	descriptions for web page.
+
+	* doc/buildbot/master.cfg 1.4: Split builds into parts. Added
+	email notifications.
+
+	* topo/tkgui/topoconsole.py 1.246: Restored <Return> in run-for
+	box to run simulation.
+
+	* topo/tkgui/widgets.py 1.22: (TaggedSlider) Fixed test for
+	something being a number; added some documentation.
+
+	* topo/tkgui/parametersframe.py 1.141: On pressing Apply,
+	TaggedSliders have their sliders updated (needs to move into
+	TaggedSlider, but this problem only shows up when changes are not
+	applied immediately).
+
+	* topo/tkgui/topowidgets.py 1.26: Removed useless methods from
+	tkparameterizedobject-specialized version of TaggedSlider. Will
+	eventually remove the whole class.
+
+2007-10-29  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* ChangeLog.txt 1.24: Added recent changes
+
+	* topo/tkgui/plotgrouppanel.py 1.265:
+	Disable enlarge and reduce when there are no plots
+
+	* topo/plotting/plotgroup.py 1.235:
+	Minor cleanup, plus fixed bug in return value that was preventing Reduce button from ever being disabled
+
+2007-10-29  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topographica-win/create_installer/prepare_for_installer.bat 1.11:
+	Added ALERT.
+
+	* topographica-win/create_installer/prepare_for_installer.bat 1.10:
+	Corrections and updates to match Makefile.
+
+	* topographica-win/create_python_topo/README.txt 1.7: Added a note.
+
 2007-10-29  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
 	* topo/tkgui/plotgrouppanel.py 1.265: Disable enlarge and reduce
