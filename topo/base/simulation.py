@@ -1061,7 +1061,7 @@ class Simulation(ParameterizedObject):
         """
         vars = dict(self.get_param_values())
         vars.update(self.__dict__)
-        if specified_time:
+        if specified_time is not None:
             vars['_time']=specified_time
         timestr = self.time_printing_format % vars
         return timestr
