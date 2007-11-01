@@ -50,7 +50,7 @@ Topographica is installed in <code>/home/jbednar/public/topographica/</code>.
   
 <p class='center'>
 <img src="images/topographica_console.png" alt="Console Window"
-align="middle" width="426" height="149">
+align="middle" WIDTH="426" HEIGHT="149">
 </p>
 <p>
 The window and button style will differ on different platforms, but
@@ -71,7 +71,7 @@ the <span class='t_item'>Simulation</span> menu), but is also shown
 below:
 <p class='center'>
 <img src="images/lissom_network_diagram_oo.png" alt="LISSOM network"
-align="middle" width="569" height="413">
+align="middle" WIDTH="569" HEIGHT="413">
 </p>
 
 <p></p>
@@ -88,7 +88,7 @@ class='t_item'>Simulation</span> menu to get the
 
 <p class='center'>
 <img src="images/test_pattern_oo.png" alt="Test Pattern window"
-align="middle" WIDTH="450" HEIGHT="758">
+align="middle" WIDTH="332" HEIGHT="774">
 </p>
 
 <p>
@@ -104,7 +104,8 @@ network.
 <li>The <a name="Activity-plot"><span class='t_item'>Activity</span></a> 
 window should then show the result:
 <p class='center'>
-<img src="images/activity_line_oo.png" alt="Response to a line" align="middle" width="676" height="372">
+<img src="images/activity_line_oo.png" alt="Response to a line"
+align="middle" WIDTH="490" HEIGHT="342">
 </p>
 
 <P>This window shows the response for each neural area.  For now, please
@@ -152,8 +153,8 @@ drop-down list. This will plot the synaptic strengths of connections
 to the neuron in the center of the cortex (by default):
 
 <p class="center">
-<img src="images/unit_weights_0_0_oo.png" alt="Weights of one
-neuron" align="middle" WIDTH="676" HEIGHT="404">
+<img src="images/unit_weights_0_0_oo.png" alt="Weights of one neuron"
+align="middle" WIDTH="490" HEIGHT="421">
 </p>
 
 <P>Again, please make sure for now that <span class='t_item'>Strength
@@ -178,8 +179,8 @@ class='t_item'>Projection</span> list:
   
 
 <p class="center">
-<img src="images/projection_oo.png" alt="Afferent weights of many
-neurons" align="middle" WIDTH="669" HEIGHT="627">
+<img src="images/projection_oo.png" alt="Afferent weights of many neurons"
+align="middle" WIDTH="396" HEIGHT="475">
 </p>
 
 This plot shows the afferent weights from the LGN ON sheet for every fifth neuron in each
@@ -200,7 +201,8 @@ neuron.  The results of a similar procedure can be viewed by selecting
 <a name="OrientationPreference-plot"><span class='t_item'>Orientation Preference</span></a>:
 
 <p class="center">
-<img src="images/oo_or_map.png" alt="Orientation map" width="629" height="413">
+<img src="images/oo_or_map.png" alt="Orientation map"
+align="middle" WIDTH="583" HEIGHT="428">
 </p><br>
 
 <P>
@@ -233,7 +235,8 @@ class='t_item'>Strength only</span> is turned off in the
 <span class='w_title'>Activity</span> window:
 
 <p class="center">
-<img src="images/activity_line_oo_or.png" alt="Color-coded response to a line" width="676" height="372" ><br />
+<img src="images/activity_line_oo_or.png" alt="Color-coded response to a line"
+align="middle" WIDTH="490" HEIGHT="342"><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
@@ -260,8 +263,8 @@ window, you can see that the neuron whose weights we plotted is
 located in a patch of neurons with similar orientation preferences: 
 
 <p class="center">
-<img src="images/unit_weights_0_0_oo_or.png" alt="Colorized weights of
-one neuron" align="middle" width="676" height="404" ><br />
+<img src="images/unit_weights_0_0_oo_or.png" alt="Colorized weights of one neuron"
+align="middle" WIDTH="490" HEIGHT="421"><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
@@ -278,7 +281,8 @@ on one of the cyan-colored patches of activity (for instance, around unit
 41,24). This will bring up a menu:
 
 <p class="center">
-<img src="images/lissom_oo_or_activity_rightclick.png" alt="Right-click menu" align="middle" width="424" height="109" >
+<img src="images/lissom_oo_or_activity_rightclick.png" alt="Right-click menu"
+align="middle" WIDTH="424" HEIGHT="109" >
 </p><br>
 
 <!--CB: should probably be a list-->
@@ -293,8 +297,8 @@ so we choose <span class='t_item'>Connection Fields</span> from the
 <span class='t_item'>Single unit</span> submenu to get a new plot:
 
 <p class="center">
-<img src="images/unit_weights_41_24_oo_or.png" alt="Colorized weights of
-one neuron" align="middle" width="676" height="404" ><br />
+<img src="images/unit_weights_41_24_oo_or.png" alt="Colorized weights of one neuron"
+align="middle" WIDTH="490" HEIGHT="421"><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
@@ -312,6 +316,7 @@ allowing one to see the connection fields of units around different features of 
 <!-- ...do we want to go further or is this tutorial already ready to split into
 more optional sections? -->
 
+
 <P>As another example, an interesting property of orientation maps
 measured in animals is that their Fourier spectrums usually show a
 ring shape, because the orientations repeat at a constant spatial
@@ -323,7 +328,8 @@ by LISSOM:
 
 
 <p class="center">
-<img src="images/lissom_oo_or_orpref_ft.png" alt="FT of orientation preference map" align="middle" width="420" height="475" >
+<img src="images/lissom_oo_or_orpref_ft.png" alt="FT of orientation preference map"
+align="middle" WIDTH="310" HEIGHT="329">
 </p><br>
 
 </li>
@@ -336,7 +342,8 @@ the images to disk.
 
 <li> Now that you have a feel for the various plots, you can try
 different input patterns, seeing how the cortex responds to each one.
-Just select a <span class='t_item'>Pattern generator</span>, e.g.  <span class='t_item'>Gaussian</span>,
+Just select a <span class='t_item'>Pattern generator</span>, e.g.
+<span class='t_item'>Gaussian</span>,
 <span class='t_item'>Disk</span>, or <span
 class='t_item'>SineGrating</span>, and then hit
 <span class='b_press'>Present</span>.
@@ -380,26 +387,28 @@ class='t_item'>filename</span> box.) For most photographs you will
 need to change the <span class='t_item'>scale</span> to something like
 2.0 to see a reasonable
 response from this model V1, and you may want to enlarge the image
-size to look at details.  A much larger (and slower) map would
+size to look at details.  A much larger, more complicated, and slower map would
 be required to see interesting patterns in the response to most images,
 but even with this network you may be able to see some
 orientation-specific responses to large contours in the image:
 </p>
 
 <p class="center">
-<img src="images/natural_image_oo_or.png" alt="Ellen Arthur" align="middle" width="676" height="372" ><br />
+<img src="images/natural_image_oo_or.png" alt="Ellen Arthur"
+align="middle" WIDTH="379" HEIGHT="346"><br />
 </p>
 
-<P>Be aware when comparing the Retina and V1 plots for a photograph
-that each processing stage eliminates some of the outer edges of the
-image, so that V1 is only looking at the center of the image on the
-LGN.  You can see the relative sizes by enabling
-<span class='t_item'>Sheet coordinates</span>,
-which will plot V1 at its true size relative to the LGN, and likewise
-for the LGN with respect to the Retina.  (This option is normally
-turned off because it makes the plots smaller, but it can be very
-helpful for understanding how the sheets relate to each other.)
-</p></li>
+<P>Here we have enabled <span class='t_item'>Sheet coords</span>
+so that each plot will be at the correct size relative to each other.
+That way, the location of a given feature can be compared between
+images.  In this particular network, the Retina and LGN stages each
+have an extra "buffer" region around the outside so that no V1 neuron
+will have its CF cut off, and the result is that V1 sees only the
+central region of the image in the LGN, and the LGN sees only the
+central region of the retina.  (Sheet coordinates are normally
+turned off because they make the cortical plots smaller, but they can
+be very helpful for understanding how the sheets relate to each
+other.)  </p></li>
 
 <li>The procedure above allows you to explore the relationship between
 the input and the final response after the cortex has settled due to
