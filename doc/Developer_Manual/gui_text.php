@@ -66,7 +66,7 @@ is required to keep track of variables and display components
 ('widgets') ).-->
 
 <P>The classes <a href="">TkParameterizedObject</a> and <a
-href="">ParametersFrame</a> are the ones most often of used for
+href="">ParametersFrame</a> are the ones most often used for
 creating a new GUI representation of some Topographica
 component. Which to use depends on how much you wish to customize the
 display: a ParametersFrame displays all of a ParameterizedObject's

@@ -102,7 +102,7 @@ which will make it possible to do
 plots, as well as matrix plots showing axis ticks and labels.  We
 also plan to use MatPlotLib 2D plots to allow any SheetView(s) to be
 used as a contour or vector field overlay on top of a bitmap, e.g. for joint
-preference maps (such as direction arrows on topo of an orientation
+preference maps (such as direction arrows on top of an orientation
 bitmap plot).
 <!-- Plan: Templates accept a Contours parameter, which can be a list
 of (sheetview, threshold) pairs, which will be drawn in order. -->
