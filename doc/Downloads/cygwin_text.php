@@ -13,9 +13,11 @@
 
 Build of all default targets completed without errors with the
 changes listed below. Only major change is for python. 
+make tests gives no error, simulations appear to work
+(with and without weave), and the plots seem ok (except for
+matplotlib ones, which give a file not found error).
 
-* GUI starts without error with -g but no actual GUI appears! 
-* make tests passes (including the gui unit tests, though I see nothing)
+* To see the GUI, have to call mainloop. Otherwise nothing appears.
 
 
 
