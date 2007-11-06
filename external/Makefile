@@ -7,9 +7,9 @@ all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
 
 dist: bluesphere
 
-clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean ctypes-clean pyaudiolab-clean tile-clean tilewrapper-clean bwidget-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean
+clean: python-clean jpeg-clean pil-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean ctypes-clean pyaudiolab-clean tile-clean tilewrapper-clean bwidget-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall ctypes-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall ctypes-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall
 
 ##############################################################
 # Python (interpreted language)
@@ -150,18 +150,6 @@ pil-clean:
 	rm -rf ${PIL} 
 pil-uninstall:
 	rm -rf pil $(foreach f, ${PIL_UNINSTALL}, ${PREFIX}/${f})
-
-
-##############################################################
-# Numeric (matrix library)
-# CB: will remove this section shortly...
-NUMERIC = Numeric-24.0
-NUMERIC_UNINSTALL =  ${PYTHON_LIB}/site-packages/Numeric
-
-numeric-clean:
-	rm -rf ${NUMERIC} 
-numeric-uninstall:
-	rm -rf numeric $(foreach f, ${NUMERIC_UNINSTALL}, ${PREFIX}/${f})
 
 
 ##############################################################
