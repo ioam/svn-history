@@ -3,6 +3,14 @@
 <P>Some kind of introduction.
 
 
+Could host a "local directory" with the right packages, which
+people could use to install a cygwin setup that would build
+topographica without any extra work. Unless there's some
+way to pass a list of packages into cygwin's setup.exe.
+
+http://cygwin.com/faq/faq.setup.html#faq.setup.cli
+
+
 
 <H4>Notes</H4>
 
@@ -18,6 +26,10 @@ make tests gives no error, simulations appear to work
 matplotlib ones, which give a file not found error).
 
 * To see the GUI, have to call mainloop. Otherwise nothing appears.
+
+
+
+
 
 
 
