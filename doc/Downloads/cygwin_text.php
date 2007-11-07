@@ -27,7 +27,7 @@ matplotlib ones, which give a file not found error).
 
 * To see the GUI, have to call mainloop. Otherwise nothing appears.
 
-
+<a href="cygwin_packages">Cygwin packages</a> I used
 
 
 
