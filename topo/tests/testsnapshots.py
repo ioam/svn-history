@@ -39,6 +39,10 @@ class TestSnapshots(unittest.TestCase):
 
 
     def basic_save_load_snapshot(self,xml=False):
+        """
+        Very basic test to check the activity matrix of a GeneratorSheet
+        comes back ok, and that class attributes are pickled.
+        """
         assert topo.sim.name==SIM_NAME
          
         topo.sim['R']=GeneratorSheet(input_generator=Gaussian(),nominal_density=2)
@@ -70,11 +74,13 @@ class TestSnapshots(unittest.TestCase):
         
 
     def test_basic_save_load_snapshot(self):
-        """
-        Very basic test to check the activity matrix of a GeneratorSheet
-        comes back ok, and that class attributes are pickled.
-        """
         self.basic_save_load_snapshot()
+
+
+# CB: all the subsequent tests fail if this runs!!
+# I'm working on it...
+#    def test_xml_basic_save_load_snapshot(self):
+#        self.basic_save_load_snapshot(xml=True)
 
 
     def test_new_simulation_still_works(self):
