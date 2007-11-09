@@ -373,7 +373,7 @@ docutils-uninstall:
 ##############################################################
 # gnosis (xml tools)
 #
-GNOSIS = Gnosis_Utils-1.2.1
+GNOSIS = Gnosis_Utils-1.3.0-alpha-7
 GNOSIS_UNINSTALL =  ${PYTHON_LIB}/site-packages/gnosis
 
 gnosis: ${GNOSIS}.tar.gz python
