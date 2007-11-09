@@ -38,11 +38,7 @@ class TestSnapshots(unittest.TestCase):
         Simulation(register=True,name=SIM_NAME)
 
 
-    def test_basic_save_load_snapshot(self):
-        """
-        Very basic test to check the activity matrix of a GeneratorSheet
-        comes back ok, and that class attributes are pickled.
-        """
+    def basic_save_load_snapshot(self,xml=False):
         assert topo.sim.name==SIM_NAME
          
         topo.sim['R']=GeneratorSheet(input_generator=Gaussian(),nominal_density=2)
@@ -53,7 +49,7 @@ class TestSnapshots(unittest.TestCase):
         Line.x = 12.0
         topo.sim.startup_commands.append("z=99")
 
-        save_snapshot(SNAPSHOT_LOCATION)
+        save_snapshot(SNAPSHOT_LOCATION,xml)
 
 
         Line.x = 9.0
@@ -71,9 +67,26 @@ class TestSnapshots(unittest.TestCase):
         self.assertEqual(Line.x,12.0)
         self.assertEqual(__main__.__dict__['z'],99)
 
+        
+
+    def test_basic_save_load_snapshot(self):
+        """
+        Very basic test to check the activity matrix of a GeneratorSheet
+        comes back ok, and that class attributes are pickled.
+        """
+        self.basic_save_load_snapshot()
+
+
+    def test_new_simulation_still_works(self):
+
         #  Test to make sure the above tests haven't screwed up
         # the ability to construct new simulation objects
         topo.base.simulation.Simulation()
+
+
+
+
+
 
         # CB: add xml pickling test. Certainly seems like
         # gnosis.xml.pickle is not the drop-in replacement
