@@ -151,26 +151,25 @@ def save_snapshot(snapshot_name=None,xml=False):
 
     topo.sim.RELEASE=topo.release
 
-    try:
-        snapshot_file=gzip.open(normalize_path(snapshot_name),'w',compresslevel=5)
-    except NameError:
-        snapshot_file=open(normalize_path(snapshot_name),'w')
- 
-
-    # CEBALERT: gnosis.xml.pickle is currently being updated to work
-    # with numpy.  However, you can test saving a simulation that does
-    # not import numpy to see what the xml looks like.
-    pickle_fn=pickle.dump
-    if xml:
-        ParameterizedObject(name="save_snapshot").warning("XML snapshots are only experimental at present.")
-        pickle_fn=gnosis.xml.pickle.dump
-
 
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
     # the simulation is unpickled
-    pickle_fn((topoPOclassattrs,ExtraPickler(),topo.sim),snapshot_file,2)
+    to_save = (topoPOclassattrs,ExtraPickler(),topo.sim)
+
+    if not xml:
+        try:
+            snapshot_file=gzip.open(normalize_path(snapshot_name),'w',compresslevel=5)
+        except NameError:
+            snapshot_file=open(normalize_path(snapshot_name),'w')
+
+        pickle.dump(to_save,snapshot_file,2)
+    else:
+        snapshot_file=open(normalize_path(snapshot_name),'w')
+        gnosis.xml.pickle.dump(to_save,snapshot_file,2,allow_rawpickles=True)
+    
     snapshot_file.close()
+
 
 
 def load_snapshot(snapshot_name):
@@ -191,7 +190,7 @@ def load_snapshot(snapshot_name):
 
     # If it's not xml, open as a normal pickle.
     try:
-        gnosis.xml.pickle.load(snapshot)
+        gnosis.xml.pickle.load(snapshot,allow_rawpickles=True,class_search=gnosis.xml.pickle.SEARCH_ALL)
     except ExpatError:
         snapshot.seek(0) 
         pickle.load(snapshot)
