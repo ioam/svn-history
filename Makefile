@@ -76,7 +76,13 @@ topographica: external Makefile
 	echo "from sys import argv" >> topographica
 	echo "from topo.misc.commandline import process_argv" >> topographica
 	echo "process_argv(argv[1:])" >> topographica
-
+	echo "" >> topographica
+	echo "# use ipython shell if available" >> topographica
+	echo "try:" >> topographica
+	echo "    from IPython.Shell import IPShellEmbed" >> topographica
+	echo "    IPShellEmbed([])()" >> topographica
+	echo "    import sys; sys.exit(1)" >> topographica
+	echo "except ImportError: pass" >> topographica
 	chmod a+x ${PREFIX}topographica
 
 
