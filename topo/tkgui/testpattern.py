@@ -77,7 +77,9 @@ class TestPattern(SheetPanel):
             return False
 
 
-    def __init__(self,console,master,plotgroup=TestPatternPlotGroup(),**params):
+    def __init__(self,console,master,**params):
+        plotgroup = TestPatternPlotGroup()
+        
 	super(TestPattern,self).__init__(console,master,plotgroup,**params)
         
         self.auto_refresh = True
@@ -121,7 +123,7 @@ class TestPattern(SheetPanel):
                                                 nominal_bounds=gs.nominal_bounds,
                                                 nominal_density=gs.nominal_density)
                                  for gs in topo.sim.objects(GeneratorSheet).values()]
-        self.plotgroup.name = "Preview"
+        self.plotgroup.name = "Test Pattern"
 
 
     def switch_sheet(self):
