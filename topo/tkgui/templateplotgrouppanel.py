@@ -105,9 +105,13 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         self.__init_strength_only_hack()
         
         # Display any plots that can be done with existing data, but
-        # don't regenerate the SheetViews
-        self.refresh(update=self.plotgroup.plot_immediately)# self.pgt.plot_immediately)
-
+        # don't regenerate the SheetViews unless requested
+        if self.plotgroup.plot_immediately:
+            self.refresh_plots()
+        else:
+            self.redraw_plots()
+            self.display_labels() # should this be called for any redraw? genuninely needs to be
+            # called here because labels might never have been drawn.
 
 
         #################### RIGHT-CLICK MENU STUFF ####################
