@@ -28,12 +28,8 @@ from topo.outputfns.basic import PiecewiseLinear
 
 from topo.tkgui.tkparameterizedobject import TkParameterizedObject
 
-
-# CEBALERT: can't have this code present when doing "make tests" - why?
-## # In case this test is run alone, start tkgui
-## # (otherwise simulation of gui set()s and get()s doesn't work)
-## if not hasattr(topo,'guimain'):
-##     import topo.tkgui; topo.tkgui.start()
+# In case this test is run alone, start tkgui
+import topo.tkgui; topo.tkgui.start()
 
 
 class SomeFrame(TkParameterizedObject,Frame):

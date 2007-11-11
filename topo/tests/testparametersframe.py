@@ -20,11 +20,9 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.tkgui.parametersframe import ParametersFrameWithApply
 
 
-# CEBALERT: can't have this code present when doing "make tests" - why?
 ## # In case this test is run alone, start tkgui
 ## # (otherwise simulation of gui set()s and get()s doesn't work)
-## if not hasattr(topo,'guimain'):
-##     import topo.tkgui; topo.tkgui.start()
+import topo.tkgui; topo.tkgui.start()
 
 
 
