@@ -67,28 +67,6 @@ are a bit out of date.  Add a section about plotting 'Orientation
 tuning fullfield' tuning curves.  CB: would the tutorial benefit from
 being split up a little more?  Maybe it's getting daunting?
 
-<H4>2007/10/03 (CB): Plotting non-CFProjection Projections</H4>
-Modify PlotGroup and ProjectionPanels so that we can plot
-a wider variety of Projections.
-
-
-<H4>2007/10/15: Embed matplotlib windows</H4>
-Is there some simple way to specify the frame where subsequent Pylab
-plots will appear, instead of having them in a separate window?
-If so, should unify the icons, placement, etc. to make Matplotlib and
-Plot windows to look and work similarly, and to be able to mix and
-match Matplotlib and Plot plots in the same window.<BR>
-CB: sometime I found information about this; there should be
-something on my email.
-
-
-<H4>2007/10/05 (CB): Dynamic info</H4>
-Dynamic info is currently disabled on projection panel windows
-because it hasn't been implemented for those classes. Need to 
-generalize coordinate-calculation method in plotgrouppanel.py
-and then add one or more specializations for the projection
-panels. (Plus ProjectionView needs some modification, probably.)
-
 
 <H4>2007/10/08 (CB): test topographica-win</H4>
 Test that results from Windows version match those from the standard
@@ -103,9 +81,10 @@ difficult to solve. I have no idea whatever about this problem.
 
 <H4>2007/10/03 (CB): Less-urgent tkgui cleanup</H4>
 <ul>
-<li>ModelEditor(PlotGroupPanel), and cleanup of model editor</li>
 <li>Control which options are available on right-click menu (e.g. no
-'Connection Fields' for a Connection Fields plot).</li>
+'Connection Fields' for a Connection Fields plot).The menus need to be
+dynamic, adapting to whatever channels are present, rather than always
+assuming that plots are SHC plots.</li>
 <li>Replace Pmw balloon and message bar with those from bwidget; remove
 Pmw</li>
 <li>Use parametersframe/tkparameterizedobject in more places (topoconsole, 
@@ -126,8 +105,6 @@ finishing cleaning up associated code (maybe mostly for Jim to do?).
 Could eventually use STRFPAK or a similar approach.
 
 
-<H4>2006/05/24 (JB): Problems with examples/joublin_bc96.ty</H4>
-Strange Projection plots.
 
 <H4>2007/03/29 (CB): connectionfield/slice/sheetcoords</H4>
 HACKALERTs relating to connection fields; test file for
@@ -140,34 +117,10 @@ needs better than Numeric's did.
 
 <H4>2006/07/07 (CP): Fix normalization to allow negative weights.</H4> 
 
-<H4>2007/05/03: Cross normalization</H4>
-Need a button you can press that will normalize maps against each
-other (to view plots on the same scale).  Maybe we can automatically
-joint normalize plots for any joint-normalized projections?  That's
-presumably how we want it to behave with multiplicative normalization,
-because the sum is constant for each independent normalization, and
-thus the relative values are not very interesting unless the sums are
-normalized together.
-
-<H4>2007/03/27 (CB): abstract classes</H4>
-given how private attributes work in Python, it seems like we can just
-have a parameter __abstract_class=True for abstract classes, and then
-__is_abstract can check to see if there is such an attribute (and that
-it is True, just in case).
-
-
-<H4>2007/09/26: Better spiking support </H4>
-There is a spiking network implemented now (see leaky_lissom_or.ty),
-but it needs to be generalized to support a large family of spiking
-algorithms. 
-
 <H4>2007/07/07: more tests </H4>
 We need a test with non-square input sheets, non-square LISSOM sheets, etc., 
 with both types of non-squareness...and we also need to test whatever
 map measurement that we can (e.g. or maps).
-
-<H4>2007/04/29: Weight seeds</H4>
-[See SF feature tracker]
 
 <H4>2007/04/10 (JB): Add an example that is a good starting point for</H4>
 wrapping an external simulation as a Sheet in Topographica.  A
@@ -175,23 +128,6 @@ first pass wrapping a spiking retina simulation written in PyNN/PyNEST
 was done at the FACETS CodeJam in March 2007, but a cleaner example
 can be made.
 
-<H4>2007/03/26 (CB): right-click menus</H4>
-Tidy code, then make it possible to add things to the menu without
-changing the tkgui files, like the templates work for activity plots.
-The menus need to be dynamic, adapting to whatever channels
-are present, rather than always assuming that plots are SHC plots.
-
-<H4>2006/02/21: ReadOnlyParameter</H4>
-To allow declaration of something but not let it be set anywhere else,
-even in a ParameterizedObject constructor.
-
-<H4>2006/06/19 (JB): Number, DynamicNumber</H4>
-- Need to replace the current implementation with one where Number has a
-'dynamic' slot that can be turned on or off, so that any Number could
-be dynamic.  Includes making sure something sensible happens in model
-editor, and (eventually) making it possible to set their values and
-(hopefully) change any Number to be dynamic.
-- Need to make sure DynamicNumbers are advanced only once per simulation time.
 
 <H4>2007/02/26: Move to IPython</H4>
 Would get command-prompt completion in the local namespace, debugging
@@ -202,14 +138,6 @@ session logging.  Combined with ipython.el, Emacs users will then
 be able to see the line of the source code where the error or
 breakpoint occurred.  Also consider an alternative debugger,
 http://www.digitalpeers.com/pythondebugger/.
-
-
-<H4>2007/10/18: Enforce maximum projection plot size</H4>
-Right now, Projections can be plotted with any density, even one
-higher than the number of units in the projection.  This can be
-confusing when visualizing very small networks (e.g. 5x5), as the
-default density of 10 leads to a display with four copies of each CF.
-By default, we should probably only show 5x5 CFs in such cases.
 
 
 <!-- ------------------------------------------------------------------------ -->
@@ -238,12 +166,6 @@ should clean up how the window titles are initialized, so that it is
 done after a .ty script is loaded (whether on the initial command line
 or from the GUI).  (Right now the name is updated only when a window
 is first opened, or when learning is done in the topoconsole.)
-
-
-<H4>2007/05/06 (CB): plot histograms</H4>
-Histograms for the plots, with easy control over the number or bars,
-scale, etc.<BR>
-Need to add some controls and reasonable defaults for various plots.
 
 
 <H4>2007/03/29 (CB): Makefiles to python scripts</H4>
@@ -320,7 +242,7 @@ Finish the two classes. Make a demo with Audio. Both currently don't work
 with test pattern window because plotting expects 2d arrays.
 
 
-<H4>2007/03/30 (CB): PatternGenerator, PatternGenerator2D</H4>
+<H4>2007/03/30: PatternGenerator, PatternGenerator2D</H4>
 Have a second abstract class so that the base PatternGenerator is
 simpler.
 
@@ -695,7 +617,7 @@ Numeric documentation for our users, as we find these differences.
 This doesn't seem very urgent any more, as the online Numpy
 documentation has gotten much better.
 
-<H4>2006/04/10 (CB): optional external packages on platforms other than linux</H4>
+<H4>2006/04/10: optional external packages on platforms other than linux</H4>
 Optional packages (e.g. mlabwrap, pyaudio) on Windows and OS X.
 
 
@@ -725,7 +647,7 @@ Needs to be updated for numpy. I'm working with module's author at the
 moment.
 
 
-<H4>2007/03/14 (CB): building scipy</H4>
+<H4>2007/03/14: building scipy</H4>
 how to build scipy without requiring any of the external linear
 algebra libraries, etc? Then scipy would at least build easily, and
 users could install the optimized versions if they wished.
@@ -826,12 +748,6 @@ _________________________________________________________
 
 Has anyone looked at the (new to python 2.4) decimal module? 
 http://docs.python.org/lib/module-decimal.html
-
-
-_________________________________________________________
-
-
-(CB) embed matplotlib windows / "histograms" conversation
 
 
 _________________________________________________________
