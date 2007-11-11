@@ -10,7 +10,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import Pmw, sys, Tkinter, platform, _tkinter,os
+import Pmw, sys, Tkinter, _tkinter,os
 import topo.base.parameterizedobject
 
 from topoconsole import TopoConsole
@@ -83,35 +83,6 @@ from topo.base.functionfamilies import LearningFnParameter,OutputFnParameter,Res
 from topo.base.patterngenerator import PatternGeneratorParameter
 
 
-##########
-### Which os is being used (for gui purposes)?
-#
-# system_plaform can be:
-# "linux"
-# "mac"
-# "win"
-# "unknown"
-#
-# If you are programming tkgui and need to do something special
-# for some other platform (or to further distinguish the above
-# platforms), please modify this code.
-#
-# Right now tkgui only needs to detect if the platform is linux (do I
-# mean any kind of non-OS X unix*?) or mac, because there is some
-# special-purpose code for both those two: the mac code below, and the
-# menu-activating code in topoconsole.  We might have some Windows-
-# specific code for the window icons later on, too.
-# * actually it's the window manager that's important, right?
-# Does tkinter/tk itself give any useful information?
-# What about root.tk.call("tk","windowingsystem")?
-system_platform = 'unknown'
-if platform.system()=='Linux':
-    system_platform = 'linux'
-elif platform.system()=='Darwin' or platform.mac_ver()[0]:
-    system_platform = 'mac'
-elif platform.system()=='Windows':
-    system_platform = 'win'
-##########
 
 
 #
@@ -119,6 +90,8 @@ elif platform.system()=='Windows':
 # be appended or overridden in .topographicarc, if the user has some
 # crazy input device.
 #
+from widgets import system_platform
+
 if system_platform=='mac':
     # if it's on the mac, these are the context-menu events
     right_click_events = ['<Button-2>','<Control-Button-1>']
@@ -127,33 +100,37 @@ else:
     # everywhere else (I think) it's Button-3
     right_click_events = ['<Button-3>']
     right_click_release_events = ['ButtonRelease-2']
-
-
-# CEBALERT: entry background color hack.
-# How to get the standard Frame background on all platforms?
-if system_platform=='mac':
-    topo.entry_background = 'SystemWindowBody'
-elif system_platform=='win':
-    topo.entry_background = 'SystemWindow'
-else:
-    topo.entry_background = '#d9d9d9'
-
-
+    
 
 def __ttkify(root,widget):
     """Take widget from ttk instead of Tkinter"""
     la = "ttk::"+widget
     root.tk.call('namespace', 'import', '-force', la) # overwrites the current Tkinter one
 
-    
+
+
+# gets set to the TopoConsole instance created by start.
+console = None
+
 def start(mainloop=False):
     """
-    Startup code for GUI.
+    Start Tk and read in an options_database file (if present), then
+    open a TopoConsole.
+
+    Does nothing if the method has previously been called (i.e. the
+    module-level console variable is not None).
 
     mainloop: If True, then the command-line is frozen while the GUI
     is open.  If False, then commands can be entered at the command-line
     even while the GUI is operational.  Default is False.
     """
+    global console
+
+    ### Return immediately if console already set
+    # (console itself might have been destroyed but we still want to
+    # quit this function before starting another Tk instance, etc)
+    if console is not None: return
+
 
     # Creating an initial Tk() instance and then withdrawing the
     # window is a common technique. Instead of doing this, having
@@ -185,15 +162,15 @@ def start(mainloop=False):
     # CB: comment out for Tile
     Pmw.initialise(root)
     
-    console = TopoConsole()
+    topoconsole = TopoConsole()
+    console = topoconsole
     
     # This alows context menus to work on the Mac.  Widget code should bind
     # contextual menus to the virtual event <<right-click>>, not
     # <Button-3>.
-    console.event_add('<<right-click>>',*right_click_events)
-    console.event_add('<<right-click-release>>',*right_click_release_events)
+    topoconsole.event_add('<<right-click>>',*right_click_events)
+    topoconsole.event_add('<<right-click-release>>',*right_click_release_events)
     
-
 
     # GUI/threads:
     # http://thread.gmane.org/gmane.comp.python.scientific.user/4153
@@ -202,10 +179,9 @@ def start(mainloop=False):
 
     # mainloop() freezes the commandline until the GUI window exits.
     # Without this line the command-line remains responsive.
-    if mainloop:
-        console.mainloop()
+    if mainloop: root.mainloop()
 
-    return console
+    return topoconsole
 
 
 
