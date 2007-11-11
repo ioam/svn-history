@@ -280,8 +280,12 @@ def process_argv(argv):
         filedir = os.path.dirname(os.path.abspath(filename))
         sys.path.insert(0,filedir)
 	execfile(filename,__main__.__dict__)
+        
 
     # execute remaining commands.
     for cmd in option.commands:
 	exec cmd in __main__.__dict__
     
+
+    # if the gui is running, set the console name
+    if gui_started: topo.guimain.title(topo.sim.name)
