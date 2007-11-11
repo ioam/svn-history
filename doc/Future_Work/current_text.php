@@ -160,14 +160,6 @@ maps, e.g. for estimating perceived quantities.
 <H4>2006/11/09 (JA): optimizations from c++</H4>
 Need to implement more of the optimizations from the C++ LISSOM code.
 
-<H4>2006/11/09 (CP): Add automatic assignment of topo.sim.name</H4>
-Take the base name of the first .ty file in sys.argv (if any).  Also
-should clean up how the window titles are initialized, so that it is
-done after a .ty script is loaded (whether on the initial command line
-or from the GUI).  (Right now the name is updated only when a window
-is first opened, or when learning is done in the topoconsole.)
-
-
 <H4>2007/03/29 (CB): Makefiles to python scripts</H4>
 Control tests from a python file rather than the Makefile.  Can then include
 more tests of examples, by specifying sheet to look at etc.  And importantly,
