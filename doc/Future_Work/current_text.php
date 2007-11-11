@@ -858,6 +858,34 @@ http://scipy.org/NumPy_for_Matlab_Users
 _________________________________________________________
 
 
+Effective logging
+
+A very useful suggestion sent in by Robert Kern follows:
+
+I recently happened on a nifty way to keep tidy per-project log files. I made a profile for my project (which is called "parkfield").
+
+    include ipythonrc
+
+    # cancel earlier logfile invocation:
+
+    logfile ''
+
+    execute import time
+
+    execute __cmd = '/Users/kern/research/logfiles/parkfield-%s.log rotate'
+
+    execute __IP.magic_logstart(__cmd % time.strftime('%Y-%m-%d')) 
+
+I also added a shell alias for convenience:
+
+    alias parkfield="ipython -pylab -profile parkfield" 
+
+Now I have a nice little directory with everything I ever type in, organized by project and date.
+
+
+Enhanced Interactive Python with IPython
+http://www.onlamp.com/pub/a/python/2005/01/27/ipython.html?page=1
 
 -->
+
 
