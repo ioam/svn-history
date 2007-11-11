@@ -215,5 +215,12 @@ class ProgressWindow(ProgressController,TkguiWindow):
 ######################################################################
 
 
-
-
+# CEBALERT: entry background color hack.
+# How to get the standard Frame background on all platforms?
+from widgets import system_platform
+entry_background = '#d9d9d9'
+if system_platform=='mac':
+    entry_background = 'SystemWindowBody'
+elif system_platform=='win':
+    entry_background = 'SystemWindow'
+    
