@@ -76,11 +76,7 @@ $Id$
 # CEBALERT: in the same way that parameterizedobject.py does not
 # import much, this file should import as little as possible from
 # outside basic gui files and topo/base so that it can be used
-# independently of as much of topographica as possible.  Right now,
-# the only real violation is 'import topo', and the place topo.guimain
-# is used (just to pass a message to the messagebar). Instead, should
-# pass in the console as an optional argument, and only use it if it's
-# not None.  (Also applies to parametersframe.py.)
+# independently of as much of topographica as possible.
 
 # CEB: currently working on this file (still have to attend to
 # simple ALERTs; documentation finished for TkParameterizedObject
@@ -100,20 +96,19 @@ from Tkinter import BooleanVar, StringVar, Frame, Checkbutton, \
      Entry, OptionMenu
 from Pmw import Balloon
 
-import topo
-
 from topo.base.parameterizedobject import ParameterizedObject,Parameter, \
      classlist,ParameterizedObjectMetaclass
 from topo.base.parameterclasses import BooleanParameter,StringParameter, \
      Number,SelectorParameter,ClassSelectorParameter,ObjectSelectorParameter, \
      CallableParameter
 
+import topo # for topo.guimain only
+
 from topo.misc.utils import eval_atof, inverse
 from topo.misc.filepaths import Filename, resolve_path
 
 from widgets import FocusTakingButton as Button2
-from topowidgets import TkPOTaggedSlider
-    
+from topowidgets import TkPOTaggedSlider, entry_background
 
 def lookup_by_class(dict_,class_):
     """
@@ -205,7 +200,7 @@ class ButtonParameter(CallableParameter):
 # attribute, except that it gives "RuntimeError: Too early to create
 # image". Must be happening before tk starts, or something. So
 # instead, return image on demand. Also, because of PIL bug (see
-# topoconsole.py "got to keep references to the images") we also store
+# topoconsole.py "got to keep references to the images") we store
 # a reference to the image each time.
     def get_image(self):
         """
@@ -476,7 +471,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         self._tk_vars = {}
         self.translators = {}
 
-        # always respect the precedence
+        # (reverse list to respect precedence)
         for PO in self._source_POs()[::-1]:
             self._init_tk_vars(PO)
 
@@ -484,10 +479,10 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
     def _source_POs(self):
         """
-        Return a correctly ordered* list of ParameterizedObjects in
-        which to find Parameters.
-
-        (* ordered by precedence, as defined by self_first)
+        Return a list of ParameterizedObjects in which to find
+        Parameters.
+        
+        The list is ordered by precedence, as defined by self_first.
         """
         if not self._extraPO:
             sources = [self]
@@ -542,9 +537,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # be surprised by the result from get()?
         tk_var._original_get = tk_var.get
         tk_var.get = lambda x=name: self._get_tk_val(x)
-        # CEB: document or remove (for TaggedSlider - allows
-        # slider to get value when only a string is present)
-        tk_var._true_val = lambda x=name: self.get_parameter_value(x)
         
 
     def _set_tk_val(self,param_name,val):
@@ -653,7 +645,9 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
     def get_source_po(self,name):
-        
+        """
+        Return the ParameterizedObject which contains the parameter 'name'.
+        """
         sources = self._source_POs()
         
         for po in sources:
@@ -668,7 +662,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
     def get_parameter_object(self,name,parameterized_object=None,with_location=False):
         """
         Return the Parameter *object* (not value) specified by name,
-        from the sources of Parameters in this object (or the
+        from the source_POs in this object (or the
         specified parameterized_object).
 
         If with_location=True, returns also the source parameterizedobject.
@@ -680,14 +674,15 @@ class TkParameterizedObjectBase(ParameterizedObject):
             return parameter_object
         else:
             return parameter_object,source
-    get_parameter = get_parameter_object # CEBALERT: remove
-        
 
 
 ##### these guarantee only to get/set parameters #####
     def get_parameter_value(self,name,parameterized_object=None):
         """
-        Get the value of the parameter specified by name.
+        Return the value of the parameter specified by name.
+
+        If a parameterized_object is specified, looks for the parameter there.
+        Otherwise, looks in the source_POs of this object.
         """
         source = parameterized_object or self.get_source_po(name)
         return getattr(source,name) 
@@ -703,16 +698,10 @@ class TkParameterizedObjectBase(ParameterizedObject):
 #######################################################        
 
 
-###### these lookup attributes in order #####
-# (i.e. you could get attribute of self rather than a parameter)
-# (might remove these to save confusion: they are useful except when 
-#  someone would be surprised to get an attribute of e.g. a Frame (like 'size') when
-#  they were expecting to get one of their parameters. Also, means you can't set
-#  an attribute a on self if a exists on one of the shadowed objects)
-
-# (also they ignore self_first)
-
     def __attr_err_msg(self,attr_name,objects):
+        """
+        Helper method: return the 'attr_name is not in objects' message.
+        """
         if not hasattr(objects,'__len__'):objects=[objects]
 
         error_string = "'%s' not in %s"%(attr_name,str(objects.pop(0)))
@@ -721,13 +710,23 @@ class TkParameterizedObjectBase(ParameterizedObject):
             error_string+=" or %s"%str(o)
             
         return error_string
+
+
+###### these lookup attributes in order #####
+# (i.e. you could get attribute of self rather than a parameter)
+# (might remove these to save confusion: they are useful except when 
+#  someone would be surprised to get an attribute of e.g. a Frame (like 'size') when
+#  they were expecting to get one of their parameters. Also, means you can't set
+#  an attribute a on self if a exists on one of the shadowed objects)
+
+# (also they (have to) ignore self_first)
     
 
     def __getattribute__(self,name):
         """
         If the attribute is found on this object, return it. Otherwise,
         search the list of shadow POs and return from the first match.
-        If no match, get attribute error.
+        If there is no match, raise an attribute error.
         """
         try:
             return object.__getattribute__(self,name)
@@ -785,6 +784,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
     # CEBNOTE: shouldn't have to distinguish SelectorParameters, but
     # since we want to instantiate the choices for
     # ClassSelectorParameter, we have to.
+    # CEBALERT: let's not instantiate the choices in the list until we
+    # have to. (See note below.)
     def csp_thing(self,name,param):
         """
         Create a translator dictionary entry for the named ClassSelectorParameter.
@@ -797,12 +798,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         translator = self.translators[name]={}
         # store list of OBJECTS (not classes) for ClassSelectorParameter's range
         # (Although CSParam's range uses classes; allows parameters set on the
-        # options to persist - matches parametersframe.ParametersFrameWithApply.)
-        # (But note, with f as a TkParameterizedObject with CSP x,
-        #  g=Gaussian()
-        #  f.x=Gaussian()
-        #  id(f.x)!=id(g.x)
-        # Not sure what behavior's best.)
+        # options to persist - matches original parametersframe.)
         for class_name,class_ in param.get_range().items():
             translator[class_name] = class_()
 
@@ -929,6 +925,9 @@ class TkParameterizedObjectBase(ParameterizedObject):
         return obj
 
 
+    def __pass_out_msg(self,msg):
+        if hasattr(topo,'guimain'): topo.guimain.status_message(msg)
+
     # clean up test for guimain (see note at top of file)
     def convert_string2obj(self,param_name,string):
         param=self.get_parameter_object(param_name)
@@ -940,16 +939,17 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 # should take param_name as well as string
                 obj = string2obj_fn(string)
                 #topo.guimain.status_message("OK: %s -> %s"%(string,obj))
-                if hasattr(topo,'guimain'):
-                    topo.guimain.status_message("OK")
+
+                self.__pass_out_msg("OK")
+
                 # CEBALERT: setting colors like this is a hack: need some
                 # general method. Also this conflicts with tile.
                 if hasattr(self,'representations') and param_name in self.representations:
-                    self.representations[param_name]['widget'].config(background=topo.entry_background)
+                    self.representations[param_name]['widget'].config(background=entry_background)
             except Exception, inst:
                 m = param_name+": "+str(sys.exc_info()[0])[11::]+" ("+str(inst)+")"
-                if hasattr(topo,'guimain'):
-                    topo.guimain.status_message(m)
+                self.__pass_out_msg(m)
+
                 obj = string
 
                 if hasattr(self,'representations') and param_name in self.representations:
@@ -1075,7 +1075,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
                                                Parameter:False}
 
         TkParameterizedObjectBase.__init__(self,extraPO=extraPO,
-                                           self_first=self_first,**params)
+                                           self_first=self_first,
+                                           **params)
 
         self.balloon = Balloon(master)
 
