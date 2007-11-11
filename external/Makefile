@@ -371,12 +371,14 @@ docutils-uninstall:
 
 
 ##############################################################
-# gnosis (xml tools)
+# gnosis (xml tools: we use for xml pickle)
 #
 GNOSIS = Gnosis_Utils-1.3.0-alpha-7
 GNOSIS_UNINSTALL =  ${PYTHON_LIB}/site-packages/gnosis
 
+# uninstalls previous version first (could i just call 'gnosis-uninstall'?)
 gnosis: ${GNOSIS}.tar.gz python
+	rm -rf $(foreach f, ${GNOSIS_UNINSTALL}, ${PREFIX}/${f})
 	tar xzf ${GNOSIS}.tar.gz
 	cd ${GNOSIS}; ${PREFIX}/bin/python setup.py install
 	touch gnosis
