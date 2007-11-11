@@ -140,20 +140,6 @@ else:
 
 
 
-
-
-def show_cmd_prompt():
-    """
-    Small helper to print the sys.ps1 prompt to the command-line.
-    Useful after a bunch of output has been displayed to stdout,
-    so as to let the user know that the command-line is still
-    active.
-    """
-    if topo.base.parameterizedobject.min_print_level >= topo.base.parameterizedobject.MESSAGE:
-        print "\n", sys.ps1,
-        sys.stdout.flush()
-
-
 def __ttkify(root,widget):
     """Take widget from ttk instead of Tkinter"""
     la = "ttk::"+widget
