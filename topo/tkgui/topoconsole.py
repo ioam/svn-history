@@ -141,7 +141,7 @@ class PlotsMenuEntry(ParameterizedObject):
     command = __call__        
 
 
-
+# when this becomes a TkPO, we can have parameters for various things (e.g. title base)
 class TopoConsole(TkguiWindow):
     """
     Main window for the Tk-based GUI.
@@ -158,7 +158,8 @@ class TopoConsole(TkguiWindow):
 
         self.auto_refresh_panels = []
         self._init_widgets()
-        self.title("Topographica Console")
+        self.title(topo.sim.name) # If -g passed *before* scripts on commandline, this is useless.
+                                  # So topo.misc.commandline sets the title as its last action (if -g)
 
 
         # Provide a way for other code to access the GUI when necessary
@@ -182,6 +183,10 @@ class TopoConsole(TkguiWindow):
             self.bind_class("Menu", "<<MenuSelect>>", activate_cascade)
         ##########
 
+    def title(self,t):
+        TkguiWindow.title(self,"Topographica: %s"%t)
+
+        
 
 # CB: example code for plot gallery
 ##         plots = []
@@ -559,8 +564,6 @@ class TopoConsole(TkguiWindow):
         Run the simulation for the duration specified in the
         'run for' taggedslider.        
         """
-        self.title(topo.sim.name) # ALERT: Temporary
-
         fduration = self.run_for_var.get()
 
         # CB: clean up (+ docstring)
