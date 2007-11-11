@@ -35,7 +35,7 @@ from topo.misc.filepaths import resolve_path,normalize_path
 import topo.commands.basic
 
 import topo.tkgui 
-from widgets import TaggedSlider,ControllableMenu, CommandPrompt
+from widgets import TaggedSlider,ControllableMenu, CommandPrompt, system_platform
 from topowidgets import ScrolledTkguiWindow,TkguiWindow,ProgressWindow,ProgressController
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from featurecurvepanel import FeatureCurvePanel
@@ -173,7 +173,7 @@ class TopoConsole(TkguiWindow):
         ### is over the menu title.
         ### [Tkinter-discuss] Cascade menu issue
         ### http://mail.python.org/pipermail/tkinter-discuss/2006-August/000864.html
-        if topo.tkgui.system_platform is 'linux':
+        if system_platform is 'linux':
             activate_cascade = """\
             if {[%W cget -type] != {menubar} && [%W type active] == {cascade}} {
                 %W postcascade active

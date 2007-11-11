@@ -721,3 +721,37 @@ class EditableOptionMenu(Tkinter.OptionMenu):
         is changed, fixing this is left as an exercise to the reader"""
         self.menu.entryconfigure(index, label=new_text,
             command=Tkinter._setit(self.variable, new_text, self.callback))
+
+
+
+# CEBALERT: should probably be in __init__.py
+##########
+### Which os is being used (for gui purposes)?
+#
+# system_plaform can be:
+# "linux"
+# "mac"
+# "win"
+# "unknown"
+#
+# If you are programming tkgui and need to do something special
+# for some other platform (or to further distinguish the above
+# platforms), please modify this code.
+#
+# Right now tkgui only needs to detect if the platform is linux (do I
+# mean any kind of non-OS X unix*?) or mac, because there is some
+# special-purpose code for both those two: the mac code below, and the
+# menu-activating code in topoconsole.  We might have some Windows-
+# specific code for the window icons later on, too.
+# * actually it's the window manager that's important, right?
+# Does tkinter/tk itself give any useful information?
+# What about root.tk.call("tk","windowingsystem")?
+import platform
+system_platform = 'unknown'
+if platform.system()=='Linux':
+    system_platform = 'linux'
+elif platform.system()=='Darwin' or platform.mac_ver()[0]:
+    system_platform = 'mac'
+elif platform.system()=='Windows':
+    system_platform = 'win'
+##########
