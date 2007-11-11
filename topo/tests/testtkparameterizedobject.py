@@ -283,7 +283,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         some_pos = [ParameterizedObject(name='cat'),
                     ParameterizedObject(name='rat'),
                     ParameterizedObject(name='bat')]
-        osp_param = self.f.get_parameter('osp')
+        osp_param = self.f.get_parameter_object('osp')
         osp_param.objects = some_pos
         #self.f.r.default = some_pos[0]
 
