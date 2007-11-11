@@ -378,6 +378,7 @@ class TopoConsole(TkguiWindow):
             try:
                 execfile(script,__main__.__dict__)
                 self.messageBar.message('state', 'Ran ' + script)
+                self.title(topo.sim.name)
             except:
                 self.messageBar.message('state', 'Failed to run ' + script)
                 raise # at least display the error somewhere 
@@ -407,6 +408,7 @@ class TopoConsole(TkguiWindow):
             self.update_idletasks()            
             topo.commands.basic.load_snapshot(snapshot_name)
             self.messageBar.message('state', 'Loaded snapshot ' + snapshot_name)
+            self.title(topo.sim.name)
 
         self.auto_refresh()
 
