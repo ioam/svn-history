@@ -32,6 +32,7 @@ from topo.base.parameterizedobject import ParameterizedObject
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
 from topo.misc.keyedlist import KeyedList
 from topo.misc.filepaths import resolve_path,normalize_path
+from topo.misc.commandline import sim_title_from_filename
 import topo.commands.basic
 
 import topo.tkgui 
@@ -183,9 +184,12 @@ class TopoConsole(TkguiWindow):
             self.bind_class("Menu", "<<MenuSelect>>", activate_cascade)
         ##########
 
-    def title(self,t):
-        TkguiWindow.title(self,"Topographica: %s"%t)
-
+    def title(self,t=None):
+        if t is None:
+            newtitle = "Topographica"
+        else:
+            newtitle = "Topographica: %s" % t
+        TkguiWindow.title(self,newtitle)
         
 
 # CB: example code for plot gallery
@@ -383,6 +387,7 @@ class TopoConsole(TkguiWindow):
             try:
                 execfile(script,__main__.__dict__)
                 self.messageBar.message('state', 'Ran ' + script)
+                sim_title_from_filename(script)
                 self.title(topo.sim.name)
             except:
                 self.messageBar.message('state', 'Failed to run ' + script)

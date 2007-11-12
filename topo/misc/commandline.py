@@ -12,7 +12,7 @@ __version__='$Revision$'
 from optparse import OptionParser
 from inlinec import import_weave
 
-import sys, __main__, math, os
+import sys, __main__, math, os, re
 
 import topo
 
@@ -85,8 +85,16 @@ where any combination of options and Python script filenames will be\n\
 processed in order left to right."
 topo_parser = OptionParser(usage=usage)
 
-### Define option processing
+def sim_title_from_filename(filename):
+    """
+    Set the simulation title from the given filename, if none has been
+    set already.
+    """
+    if topo.sim.name is None:
+        topo.sim.name=re.sub('.ty$','',os.path.basename(filename))
 
+
+### Define option processing
 
 ### JABALERT: It might be possible to eliminate this; how it is used seems clunky.
 def get_filenames(parser):
@@ -107,6 +115,9 @@ def get_filenames(parser):
             abs_arg = os.path.abspath(arg)
 	    list_command = list_command + ['import sys; sys.path.insert(0,"%s")'%os.path.dirname(abs_arg),
                                            'execfile(' + repr(abs_arg) + ')']
+
+            sim_title_from_filename(arg)
+            
 	    del rargs[0]
     setattr(parser.values,"commands",list_command) 
 
@@ -277,6 +288,7 @@ def process_argv(argv):
         # the command line into execfile commands, there are no files left to
         # process here.  So this code is never called.  Still I updated it to add
         # the file directory to sys.path, just in case.
+        print "Note: Please send the command you used to start this run of Topographica to jbednar at inf.ed.ac.uk, showing how to reproduce this message, for debugging purposes."
         filedir = os.path.dirname(os.path.abspath(filename))
         sys.path.insert(0,filedir)
 	execfile(filename,__main__.__dict__)

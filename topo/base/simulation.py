@@ -940,6 +940,8 @@ class Simulation(ParameterizedObject):
 
         if self.register:
             SimSingleton().change_sim(self)
+            # Indicate that no specific name has been set
+            self.name=None
             # Set up debugging messages to include the simulator time
             parameterizedobject.dbprint_prefix= \
                (lambda: "Time: "+self.timestr()+" ")
