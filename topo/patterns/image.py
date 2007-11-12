@@ -4,14 +4,14 @@ PatternGenerators based on bitmap images stored in files.
 $Id$
 """
 
-# PIL Image is imported as pImage because we have our own Image PatternGenerator
-import Image as pImage
+# PIL Image is imported as PIL because we have our own Image PatternGenerator
+import Image as PIL
 import ImageOps
 
 from numpy.oldnumeric import array, Float, sum, ravel, ones
 
 from topo.base.boundingregion import BoundingBox
-from topo.base.parameterclasses import Number, Parameter, Enumeration
+from topo.base.parameterclasses import Number, Parameter, Enumeration, Integer
 from topo.base.parameterclasses import DynamicNumber, StringParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGenerator
@@ -34,7 +34,7 @@ class PatternSampler(ParameterizedObject):
     background value.
     """
 
-    def __init__(self, pattern_array, whole_pattern_output_fn=IdentityOF(), background_value_fn=None):
+    def __init__(self, pattern_array=None, image=None, whole_pattern_output_fn=IdentityOF(), background_value_fn=None):
         """
         Create a SheetCoordinateSystem whose activity is pattern_array
         (where pattern_array is a Numeric array), modified in place by
@@ -45,8 +45,17 @@ class PatternSampler(ParameterizedObject):
         """
         super(PatternSampler,self).__init__()
 
-        self.pattern_array=pattern_array
-        rows,cols=pattern_array.shape
+        if pattern_array and image:
+            raise ValueError("PatternSampler instances can have a pattern or an image, but not both.")    
+        elif pattern_array is not None:
+            pass
+        elif image is not None:
+            pattern_array = array(image.getdata(),Float)
+            pattern_array.shape = (image.size[::-1]) # getdata() returns transposed image?
+        else:
+            raise ValueError("PatternSampler instances must have a pattern or an image.")
+
+        rows,cols = pattern_array.shape
 
         self.pattern_sheet = SheetCoordinateSystem(xdensity=1.0,ydensity=1.0,
             bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
@@ -184,14 +193,53 @@ def edge_average(a):
         return float(edge_sum)/num_values
 
 
-
-class Image(PatternGenerator):
+class FastPatternSampler(ParameterizedObject):
     """
-    2D image generator.
+    A fast-n-dirty pattern sampler using Python Imaging Library
+    routines.  Currently this sampler doesn't support user-specified
+    scaling or cropping but rather simply scales and crops the image
+    to fit the given matrix size without distorting the aspect ratio
+    of the original picture.
+    """
+    sampling_method = Integer(default=PIL.NEAREST,doc="""
+       Python Imaging Library sampling method for resampling an image.
+       Defaults to Image.NEAREST.""")
+       
+    def __init__(self, pattern=None, image=None, whole_pattern_output_fn=IdentityOF(), background_value_fn=None):
+        super(FastPatternSampler,self).__init__()
 
-    The image at the supplied filename is converted to grayscale if it
-    is not already a grayscale image. See PIL's Image class for
-    details of supported image file formats.
+        if pattern and image:
+            raise ValueError("PatternSampler instances can have a pattern or an image, but not both.")    
+        elif pattern is not None:
+            self.image = PIL.new('L',pattern.shape)
+            self.image.putdata(pattern.ravel())
+        elif image is not None:
+            self.image = image
+        else:
+            raise ValueError("PatternSampler instances must have a pattern or an image.")
+
+    def __call__(self, x, y, sheet_xdensity, sheet_ydensity, scaling, width=1.0, height=1.0):
+
+        # JPALERT: Right now this ignores all options and just fits the image into given array.
+        # It needs to be fleshed out to properly size and crop the
+        # image given the options. (maybe this class needs to be
+        # redesigned?  The interface to this function is pretty inscrutable.)
+
+        im = ImageOps.fit(self.image,x.shape,self.sampling_method)
+
+        result = array(im.getdata(),dtype=Float)
+        result.shape = im.size[::-1]
+
+        return result
+        
+
+class GenericImage(PatternGenerator):
+    """
+    Generic 2D image generator.
+
+    Generates a pattern from a Python Imaging Library image object.
+    Subclasses should override the _get_image method to produce the
+    image object.
 
     The background value is calculated as an edge average: see edge_average().
     Black-bordered images therefore have a black background, and
@@ -203,6 +251,12 @@ class Image(PatternGenerator):
     to support some interpolation options as well.
     """
 
+    # JPALERT: I think that this class should be called "Image" and
+    # the "Image" class below should be called "FileImage" or
+    # something.  That would break backward compatibility, though.
+    
+    _abstract_class_name = 'GenericImage'
+    
     output_fn = OutputFnParameter(default=IdentityOF())
     
     aspect_ratio  = Number(default=1.0,bounds=(0.0,None),
@@ -211,13 +265,7 @@ class Image(PatternGenerator):
 
     size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
                    precedence=0.30,doc="Height of the image.")
-    
-    filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9,doc=
-        """
-        File path (can be relative to Topographica's base path) to a bitmap image.
-        The image can be in any format accepted by PIL, e.g. PNG, JPG, TIFF, or PGM.
-        """)
-    
+        
     size_normalization = Enumeration(default='fit_shortest',
         available=['fit_shortest','fit_longest','stretch_to_fit','original'],
         precedence=0.95,doc=
@@ -227,6 +275,66 @@ class Image(PatternGenerator):
         precedence=0.96,doc=
         "Function applied to the whole, original image array (before any cropping).")
 
+    pattern_sampler_type = Parameter(default=PatternSampler, doc="""
+       The type of PatternSampler to use to resample/resize the image.""")
+
+
+    def __setup_pattern_sampler(self):
+        """
+        If a new filename or whole_image_output_fn is supplied, create a
+        PatternSampler based on the image found at filename.        
+
+        The PatternSampler is given the whole image array after it has
+        been converted to grayscale.
+        """
+        self.ps = self.pattern_sampler_type(image=self._image,
+                                            whole_pattern_output_fn=self.last_wiof,
+                                            background_value_fn=edge_average)
+
+
+    def function(self,**params):
+        xdensity = params.get('xdensity', self.xdensity)
+        ydensity = params.get('ydensity', self.ydensity)
+        x        = params.get('pattern_x',self.pattern_x)
+        y        = params.get('pattern_y',self.pattern_y)
+        size_normalization = params.get('scaling',self.size_normalization)
+
+        height = params.get('size',self.size)
+        width = (params.get('aspect_ratio',self.aspect_ratio))*height
+
+        whole_image_output_fn = params.get('whole_image_output_fn',self.whole_image_output_fn)
+
+        if self._get_image(params) or whole_image_output_fn != self.last_wiof:
+            self.last_wiof = whole_image_output_fn
+            self.__setup_pattern_sampler()
+        return self.ps(x,y,float(xdensity),float(ydensity),size_normalization,float(width),float(height))
+
+
+    def _get_image(self,params):
+        """
+        Get a new image, if necessary.
+
+        If necessary as indicated by the parameters, get a new image,
+        assign it to self._image and return True.  If no new image is
+        needed, return False.
+        """
+        raise NotImplementedError
+
+
+class Image(GenericImage):
+    """
+    2D Image generator that reads the image from a file.
+    
+    The image at the supplied filename is converted to grayscale if it
+    is not already a grayscale image. See PIL's Image class for
+    details of supported image file formats.
+    """
+
+    filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9,doc=
+        """
+        File path (can be relative to Topographica's base path) to a bitmap image.
+        The image can be in any format accepted by PIL, e.g. PNG, JPG, TIFF, or PGM.
+        """)
 
     def __init__(self, **params):
         """
@@ -239,37 +347,12 @@ class Image(PatternGenerator):
         self.last_filename = None
         self.last_wiof = None
 
-
-    def __setup_pattern_sampler(self, filename, whole_image_output_fn):
-        """
-        If a new filename or whole_image_output_fn is supplied, create a
-        PatternSampler based on the image found at filename.        
-
-        The PatternSampler is given the whole image array after it has
-        been converted to grayscale.
-        """
-        if filename!=self.last_filename or whole_image_output_fn!=self.last_wiof:
-            self.last_filename=filename
-            self.last_wiof=whole_image_output_fn
-            image = ImageOps.grayscale(pImage.open(self.filename))
-            image_array = array(image.getdata(),Float)
-            image_array.shape = (image.size[::-1]) # getdata() returns transposed image?
-            self.ps = PatternSampler(image_array,whole_image_output_fn,edge_average)
-
-
-    def function(self,**params):
-        xdensity = params.get('xdensity', self.xdensity)
-        ydensity = params.get('ydensity', self.ydensity)
-        x        = params.get('pattern_x',self.pattern_x)
-        y        = params.get('pattern_y',self.pattern_y)
+    def _get_image(self,params):
         filename = params.get('filename',self.filename)
-        size_normalization = params.get('scaling',self.size_normalization)
-        whole_image_output_fn = params.get('whole_image_output_fn',self.whole_image_output_fn)
 
-        height = params.get('size',self.size)
-        width = (params.get('aspect_ratio',self.aspect_ratio))*height
-
-        self.__setup_pattern_sampler(filename,whole_image_output_fn)
-        return self.ps(x,y,float(xdensity),float(ydensity),size_normalization,float(width),float(height))
-
-
+        if filename!=self.last_filename:
+            self.last_filename=filename
+            self._image = ImageOps.grayscale(PIL.open(self.filename))
+            return True
+        else:
+            return False
