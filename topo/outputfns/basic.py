@@ -12,7 +12,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import numpy
+import numpy, numpy.random
 import numpy.oldnumeric as Numeric
 import copy
 
@@ -29,8 +29,9 @@ from topo.base.boundingregion import BoundingBox
 from topo.patterns.basic import Gaussian
 
 # Imported here so that all OutputFns will be in the same package
-from topo.base.functionfamilies import IdentityOF
+from topo.base.functionfamilies import IdentityOF,PipelineOF
 
+Pipeline = PipelineOF
 
 # CEBHACKALERT: these need to respect the mask - which will be passed in.
 
@@ -228,19 +229,6 @@ class BinaryThreshold(OutputFn):
         x += above_threshold
 
 
-class Pipeline(OutputFn):
-    """
-    Applies a list of other OutputFns in order, to combine their effects.
-    """
-    output_fns = ListParameter(default=[],class_=OutputFn,doc="""
-        List of OutputFns to apply, in order.  The default is an empty list, 
-        which should be overridden for any useful work.""")
-
-    def __call__(self,x):
-        for of in self.output_fns:
-            of(x)
-
-
 ### JABALERT: Is this the right location for this class?  It brings in
 ### dependencies on PatternGenerator, which is not something that many
 ### OutputFns will need.
@@ -336,4 +324,25 @@ class KernelMax(OutputFn):
                                                     size=2*radius,x=wc+0.5,y=wy+0.5)
         x *= 0.0
         x[rmin:rmax,cmin:cmax] = kernel
+
+
+
+
+class PoissonSample(OutputFn):
+
+    in_scale = Number(default=1.0,doc="""An amount to scale the input by.""")
+    baseline_rate = Number(default=0.0,doc="""
+       An constant to add to the input after scaling, resulting in a baseline
+       Poisson process rate.""")
+    out_scale = Number(default=1.0,doc="""
+      An amount to scale the output by (e.g. 1/in_scale)""")
+
+    def __call__(self,x):
         
+        x *= self.in_scale
+        x += self.baseline_rate
+        sample = numpy.random.poisson(x,x.shape)
+        x *= 0.0
+        x += sample
+        x *= self.out_scale
+                           
