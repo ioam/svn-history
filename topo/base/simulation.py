@@ -1150,7 +1150,8 @@ class Simulation(ParameterizedObject):
                 # Set the time to the frontmost event.  Bear in mind
                 # that the front event may have been changed by the
                 # .process_current_time() calls.
-                self._time = self.events[0].time
+                if self.events[0].time > self._time:
+                    self.sleep(self.events[0].time-self._time)
                 
             else:
                 # Pop and call the event at the head of the queue.
@@ -1170,7 +1171,8 @@ class Simulation(ParameterizedObject):
         if stop_time != Forever :
             self._time = stop_time
 
-
+    def sleep(self,delay):
+        self._time += delay
 
     def enqueue_event(self,event):
         """
