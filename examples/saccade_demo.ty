@@ -74,13 +74,13 @@ saccade_generator = topo.patterns.basic.Gaussian(
     aspect_ratio=1.0,
     bounds = BoundingBox(radius = 0.5))
 
-scene_generator = topo.patterns.image.Image()
+scene_seq = [(1,topo.patterns.image.Image())]
 
 ##########################################################################
 # Sheets: A movable eye, a SuperiorColliculus generating eye movements,
 # and a SaccadeController to decode SC activity into eye movement commands.
 
-topo.sim['Eye'] = ShiftingGeneratorSheet(input_generator=scene_generator)
+topo.sim['Eye'] = ShiftingGeneratorSheet(input_sequence=scene_seq)
 
 decoder = topo.sim['SaccadeControl'] = SaccadeController()
 
