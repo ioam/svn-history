@@ -15,7 +15,7 @@ import numpy.oldnumeric as Numeric
 import numpy
 
 from topo.base.parameterizedobject import ParameterizedObject,Parameter
-from topo.base.parameterclasses import ClassSelectorParameter
+from topo.base.parameterclasses import ClassSelectorParameter, ListParameter
 
 
 class OutputFn(ParameterizedObject):
@@ -37,6 +37,11 @@ class OutputFn(ParameterizedObject):
     def __call__(self,x):
         raise NotImplementedError
 
+    def __add__(self,of):
+
+        assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
+        return PipelineOF(output_fns=[self,of])
+
 
 # Trivial example of an OutputFn, provided for when a default
 # is needed.  The other concrete OutputFunction classes are stored
@@ -53,6 +58,22 @@ class IdentityOF(OutputFn):
 
     def __call__(self,x,sum=None):
         pass
+
+class PipelineOF(OutputFn):
+    """
+    Applies a list of other OutputFns in order, to combine their effects.
+    """
+    output_fns = ListParameter(default=[],class_=OutputFn,doc="""
+        List of OutputFns to apply, in order.  The default is an empty list, 
+        which should be overridden for any useful work.""")
+
+    def __call__(self,x):
+        for of in self.output_fns:
+            of(x)
+
+    def __iadd__(self,of):
+        assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
+        self.output_fns.append(of)
 
 
 class OutputFnParameter(ClassSelectorParameter):
