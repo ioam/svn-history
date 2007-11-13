@@ -263,16 +263,13 @@ def process_argv(argv):
 
     if option.interactive or option.gui:
 	os.environ["PYTHONINSPECT"] = "1"
-        interactive=True
-    else:
-        interactive=False
     
     exec_startup_files()
 
     if option.interactive:
         print BANNER  # not printed when there's a GUI
 
-    if interactive:
+    if option.interactive or option.gui:
         try:
             import readline
         except ImportError:
