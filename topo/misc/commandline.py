@@ -184,38 +184,10 @@ topo_parser.add_option("-a","--auto-import-commands",action="callback",callback=
 
 
 
-### Execute what is specified by the options.
-
-def process_argv(argv):
+def exec_startup_files():
     """
-    Process command-line arguments (minus argv[0]!), rearrange and execute.
+    exec one or more (possibly platform-specific) startup files
     """
-    (option,args) = topo_parser.parse_args(argv)
-    # If no scripts and no commands were given, pretend -i was given.
-    if len(args)==0 and len(option.commands)==0:
-        option.interactive=True
-        
-    # JBDALERT: (As of 12/2005) With Python 2.4 compiled and run on
-    # Windows XP, trying to import Weave after starting the topo
-    # command-line will generate a serious system error.  However,
-    # importing weave first does not cause problems.
-    # CB: can we remove this ALERT? We want to import weave before
-    # running a user's commands and scripts anyway. Plus, I can't
-    # reproduce the error by doing the following:
-    # - comment out code line below
-    # - $ ./topographica
-    # - $ import weave
-    # (using both cygwin-compiled topographica and topographica from
-    # binary packages).
-    if import_weave: exec "import weave" in __main__.__dict__    
-
-    sys.ps1 = CommandPrompt()
-    sys.ps2 = CommandPrompt2()
-    
-    for (k,v) in global_constants.items():
-        exec '%s = %s' % (k,v) in __main__.__dict__
-
-    ### exec one or more (possibly platform-specific) startup files 
     home = os.path.expanduser("~")  # dotfiles on unix
     appdata = os.path.expandvars("$APPDATA") # application data on windows
     appsupport = os.path.join(home,"Library","Application Support") # application support on OS X  
@@ -224,24 +196,11 @@ def process_argv(argv):
     inipath = os.path.join(appdata,'Topographica','topographica.ini')
     configpath = os.path.join(appsupport,'Topographica','topographica.config')
 
-    startup_exceptions_found=False
     for startup_file in (rcpath,configpath,inipath):
         if os.path.exists(startup_file):
-            if option.interactive or option.gui:
-                print "Executing user startup file %s" % (startup_file)
-            try:
-                execfile(startup_file,__main__.__dict__)
-            except:
-                import traceback
-                # print any exception raised in the init files, and continue
-                print 'Exception executing startup file %s' % startup_file
-                typ,val,tb = sys.exc_info()
-                print traceback.print_tb(tb)
-                print '%s: %s'%(typ.__name__, str(val))
-                # JPALERT: Maybe instead of continuing, control should
-                # go straight to the command line here for debugging,
-                # skipping the rest of the startup process?
-                startup_exceptions_found=True
+            print "Executing user startup file %s" % (startup_file)
+            execfile(startup_file,__main__.__dict__)
+                
 
     ### Notes about choices for topographica.rc equivalents on different platforms
     #
@@ -267,12 +226,53 @@ def process_argv(argv):
     # Name -- there are many different extensions (e.g. dat, config, cfg, ini), none of which
     # opens with any application by default. Some applications use xml.
 
-    # Provide an interactive prompt unless running in batch mode
-    if option.interactive:
-        print BANNER
+
+
+
+### Execute what is specified by the options.
+
+def process_argv(argv):
+    """
+    Process command-line arguments (minus argv[0]!), rearrange and execute.
+    """
+    (option,args) = topo_parser.parse_args(argv)
+    
+    # If no scripts and no commands were given, pretend -i was given.
+    if len(args)==0 and len(option.commands)==0:
+        option.interactive=True
+        
+    # JBDALERT: (As of 12/2005) With Python 2.4 compiled and run on
+    # Windows XP, trying to import Weave after starting the topo
+    # command-line will generate a serious system error.  However,
+    # importing weave first does not cause problems.
+    # CB: can we remove this ALERT? We want to import weave before
+    # running a user's commands and scripts anyway. Plus, I can't
+    # reproduce the error by doing the following:
+    # - comment out code line below
+    # - $ ./topographica
+    # - $ import weave
+    # (using both cygwin-compiled topographica and topographica from
+    # binary packages).
+    if import_weave: exec "import weave" in __main__.__dict__    
+
+    sys.ps1 = CommandPrompt()
+    sys.ps2 = CommandPrompt2()
+    
+    for (k,v) in global_constants.items():
+        exec '%s = %s' % (k,v) in __main__.__dict__
 
     if option.interactive or option.gui:
 	os.environ["PYTHONINSPECT"] = "1"
+        interactive=True
+    else:
+        interactive=False
+    
+    exec_startup_files()
+
+    if option.interactive:
+        print BANNER  # not printed when there's a GUI
+
+    if interactive:
         try:
             import readline
         except ImportError:
@@ -282,10 +282,6 @@ def process_argv(argv):
             import rlcompleter
             readline.parse_and_bind("tab: complete")
 
-    if startup_exceptions_found:
-        print "ERROR: Exceptions encountered when processing startup files; not executing any command-line arguments."
-        return
-    
      # catch the first filenames arguments (before any options) and execute them.
     filename_arg = topo_parser.largs
 
