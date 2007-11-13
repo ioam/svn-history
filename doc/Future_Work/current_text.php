@@ -81,10 +81,9 @@ difficult to solve. I have no idea whatever about this problem.
 
 <H4>2007/10/03 (CB): Less-urgent tkgui cleanup</H4>
 <ul>
-<li>Control which options are available on right-click menu (e.g. no
-'Connection Fields' for a Connection Fields plot).The menus need to be
-dynamic, adapting to whatever channels are present, rather than always
-assuming that plots are SHC plots.</li>
+<li>Control which options are available on right-click menu.
+The menus need to be dynamic, adapting to whatever channels are
+present, rather than always assuming that plots are SHC plots.</li>
 <li>Replace Pmw balloon and message bar with those from bwidget; remove
 Pmw</li>
 <li>Use parametersframe/tkparameterizedobject in more places (topoconsole, 
