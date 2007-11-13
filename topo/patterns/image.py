@@ -45,7 +45,7 @@ class PatternSampler(ParameterizedObject):
         """
         super(PatternSampler,self).__init__()
 
-        if pattern_array and image:
+        if pattern_array is not None and image is not None:
             raise ValueError("PatternSampler instances can have a pattern or an image, but not both.")    
         elif pattern_array is not None:
             pass
