@@ -47,8 +47,6 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
 
-topo.sim.name = "lissom_or"
-
 num_inputs=2
 input_type=Gaussian
 inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),

@@ -25,10 +25,6 @@ import topo.patterns.random
 
 
 
-
-topo.sim.name = "hierarchical"
-
-
 ###########################################
 # Set parameters
 

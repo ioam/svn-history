@@ -27,8 +27,6 @@ from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.numbergenerators import UniformRandom,ExponentialDecay
 
-topo.sim.name = "cfsom_or"
-
 # Weight seed
 numpy.random.seed((500,500))
 

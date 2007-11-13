@@ -23,8 +23,6 @@ from topo.base.parameterclasses import DynamicNumber,Number,Integer
 from topo.base.sheet import Sheet
 from topo.sheets.generatorsheet import GeneratorSheet
 
-topo.sim.name = "goodhill_network90"
-
 class point(object):
     "An object used to store x,y,z of retinas and V1"
     x=0.0
