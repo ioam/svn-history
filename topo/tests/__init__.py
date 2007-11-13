@@ -123,3 +123,20 @@ def run(verbosity=1,test_modules=None):
 
     return unittest.TextTestRunner(verbosity=verbosity).run(suite)
 
+
+# CB: if the unit tests were faster, I wouldn't keep needing this...
+def run_named(name,verbosity=1):
+    """
+    Run the named test module.
+
+    Convenience function to make it easy to run a single test module.
+
+    Example:
+    ./topographica -c 'import topo.tests; topo.tests.run_named("topo.tests.testsnapshots")'
+    """
+    import __main__
+    exec "import %s"%name in __main__.__dict__
+    m = eval(name,__main__.__dict__)
+
+    run(verbosity,test_modules=[m])
+        
