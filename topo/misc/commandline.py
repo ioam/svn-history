@@ -115,7 +115,7 @@ def get_postoption_filenames(parser):
     while rargs:
 	arg = rargs[0]
 	if ((arg[:2] == "--" and len(arg) > 2) or
-            (arg[:1] == "-" and len(arg) > 1 and arg[1] != "-")):
+            (arg[:1] == "-"  and len(arg) > 1 and arg[1] != "-")):
             break
 	else:
             # Adds commands for opening a script; also adds the location
@@ -199,7 +199,7 @@ topo_parser.add_option("-a","--auto-import-commands",action="callback",callback=
 
 def exec_startup_files():
     """
-    exec one or more (possibly platform-specific) startup files
+    Execute startup files, looking at appropriate locations for many different platforms.
     """
     home = os.path.expanduser("~")  # dotfiles on unix
     appdata = os.path.expandvars("$APPDATA") # application data on windows
