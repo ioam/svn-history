@@ -110,7 +110,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
             self.refresh_plots()
         else:
             self.redraw_plots()
-            self.display_labels() # should this be called for any redraw? genuninely needs to be
+            self.display_labels() # should this be called for any redraw? genuinely needs to be
             # called here because labels might never have been drawn.
 
 
