@@ -85,7 +85,12 @@ where any combination of options and Python script filenames will be\n\
 processed in order left to right."
 topo_parser = OptionParser(usage=usage)
 
-def sim_title_from_filename(filename):
+
+
+
+
+
+def sim_name_from_filename(filename):
     """
     Set the simulation title from the given filename, if none has been
     set already.
@@ -94,12 +99,16 @@ def sim_title_from_filename(filename):
         topo.sim.name=re.sub('.ty$','',os.path.basename(filename))
 
 
+# Gets set to first filename following first option. Can we store/pass this somewhere better?
+first_postoption_filename = None
+
+
 ### Define option processing
 
 ### JABALERT: It might be possible to eliminate this; how it is used seems clunky.
-def get_filenames(parser):
+def get_postoption_filenames(parser):
     """
-    Sub-function used to catch any filenames following any options.
+    Sub-function used to catch all filenames that appear *after* the first option appears.
     """
     list_command=getattr(parser.values,"commands")
     rargs = parser.rargs
@@ -116,16 +125,20 @@ def get_filenames(parser):
 	    list_command = list_command + ['import sys; sys.path.insert(0,"%s")'%os.path.dirname(abs_arg),
                                            'execfile(' + repr(abs_arg) + ')']
 
-            sim_title_from_filename(arg)
-            
+            # store the first filename 
+            global first_postoption_filename
+            first_postoption_filename = first_postoption_filename or arg
+
 	    del rargs[0]
-    setattr(parser.values,"commands",list_command) 
+        
+    setattr(parser.values,"commands",list_command) #what's wrong with parser.values.commands=list_command ?
+                             
 
 
 def boolean_option_action(option,opt_str,value,parser):
     """Callback function for boolean-valued options that apply to the entire run.""" 
     setattr(parser.values,option.dest,True) 
-    get_filenames(parser)
+    get_postoption_filenames(parser)
 
 
 topo_parser.add_option("-i","--interactive",action="callback",callback=boolean_option_action,
@@ -161,7 +174,7 @@ def c_action(option,opt_str,value,parser):
     list_command=getattr(parser.values,option.dest)
     list_command += [value]
     setattr(parser.values,option.dest,list_command) 
-    get_filenames(parser)
+    get_postoption_filenames(parser)
 
 topo_parser.add_option("-c","--command",action = "callback",callback=c_action,type="string",
 		       default=[],dest="commands",metavar="\"<command>\"",
@@ -279,26 +292,19 @@ def process_argv(argv):
             import rlcompleter
             readline.parse_and_bind("tab: complete")
 
-     # catch the first filenames arguments (before any options) and execute them.
-    filename_arg = topo_parser.largs
-
-    for filename in filename_arg:
-        # CB: this is going to need converting too, I don't know when it's used yet.
-        # JABALERT: What do you mean?  It looks fine to me.
-        # JPALERT: Because topo_parser.parse_args(argv) converts all the files on
-        # the command line into execfile commands, there are no files left to
-        # process here.  So this code is never called.  Still I updated it to add
-        # the file directory to sys.path, just in case.
-        #print "Note: Please send the command you used to start this run of Topographica to jbednar at inf.ed.ac.uk, showing how to reproduce this message, for debugging purposes."
+    # get filenames supplied *before* the first option and execute them
+    for filename in topo_parser.largs:
         filedir = os.path.dirname(os.path.abspath(filename))
         sys.path.insert(0,filedir)
 	execfile(filename,__main__.__dict__)
-        
+        sim_name_from_filename(filename)
 
-    # execute remaining commands.
+    # sim name, if it wasn't set to a pre-options filename, gets set to first post-option filename
+    if first_postoption_filename: sim_name_from_filename(first_postoption_filename)
+
+    # execute remaining commands (options, commands, filenames that appear after the first option)
     for cmd in option.commands:
 	exec cmd in __main__.__dict__
-    
 
     # if the gui is running, set the console name
     if gui_started: topo.guimain.title(topo.sim.name)
