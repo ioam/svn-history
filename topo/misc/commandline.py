@@ -288,7 +288,7 @@ def process_argv(argv):
         # the command line into execfile commands, there are no files left to
         # process here.  So this code is never called.  Still I updated it to add
         # the file directory to sys.path, just in case.
-        print "Note: Please send the command you used to start this run of Topographica to jbednar at inf.ed.ac.uk, showing how to reproduce this message, for debugging purposes."
+        #print "Note: Please send the command you used to start this run of Topographica to jbednar at inf.ed.ac.uk, showing how to reproduce this message, for debugging purposes."
         filedir = os.path.dirname(os.path.abspath(filename))
         sys.path.insert(0,filedir)
 	execfile(filename,__main__.__dict__)
