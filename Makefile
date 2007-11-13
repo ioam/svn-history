@@ -80,7 +80,8 @@ topographica: external Makefile
 	echo "# use ipython shell if available" >> topographica
 	echo "try:" >> topographica
 	echo "    from IPython.Shell import IPShellEmbed" >> topographica
-	echo "    IPShellEmbed(['-colors','NoColor','-pi1','Topographica_t\$${topo.sim.time()}_c\#>>> '])()" >> topographica
+	echo "    import __main__" >> topographica
+	echo "    IPShellEmbed(['-colors','NoColor','-pi1','Topographica_t\$${topo.sim.time()}_c\#>>> '],user_ns=__main__.__dict__)()" >> topographica
 	echo "    import sys; sys.exit(1)" >> topographica
 	echo "except ImportError: pass" >> topographica
 	chmod a+x ${PREFIX}topographica
