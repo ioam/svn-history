@@ -284,8 +284,8 @@ def process_argv(argv):
     for filename in topo_parser.largs:
         filedir = os.path.dirname(os.path.abspath(filename))
         sys.path.insert(0,filedir)
-	execfile(filename,__main__.__dict__)
         sim_name_from_filename(filename)
+	execfile(filename,__main__.__dict__)
 
     # sim name, if it wasn't set to a pre-options filename, gets set to first post-option filename
     if first_postoption_filename: sim_name_from_filename(first_postoption_filename)
