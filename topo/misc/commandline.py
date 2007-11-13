@@ -254,18 +254,6 @@ def process_argv(argv):
     if len(args)==0 and len(option.commands)==0:
         option.interactive=True
         
-    # JBDALERT: (As of 12/2005) With Python 2.4 compiled and run on
-    # Windows XP, trying to import Weave after starting the topo
-    # command-line will generate a serious system error.  However,
-    # importing weave first does not cause problems.
-    # CB: can we remove this ALERT? We want to import weave before
-    # running a user's commands and scripts anyway. Plus, I can't
-    # reproduce the error by doing the following:
-    # - comment out code line below
-    # - $ ./topographica
-    # - $ import weave
-    # (using both cygwin-compiled topographica and topographica from
-    # binary packages).
     if import_weave: exec "import weave" in __main__.__dict__    
 
     sys.ps1 = CommandPrompt()
