@@ -48,7 +48,6 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.commands.basic import pattern_present
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 
-topo.sim.name = "sullivan_nn06.ty"
 
 ### JABHACKALERT: Missing the lateral projection; should be
 ### a SharedWeightCFProjection

@@ -51,7 +51,6 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
-topo.sim.name = "lissom_photo_or"
 
 input_type=topo.patterns.image.Image
 inputs=[input_type(filename="images/shouval/"+f,

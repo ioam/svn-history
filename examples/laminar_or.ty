@@ -40,10 +40,6 @@ from topo.misc.numbergenerators import UniformRandom
 from topo.patterns.basic import Gaussian
 
 
-topo.sim.name = "laminar_or"
-
-
-
 input_pattern = topo.patterns.basic.Gaussian(
           scale=1.0, size=0.08333, aspect_ratio=4.6666,
           x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12)),

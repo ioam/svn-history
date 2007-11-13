@@ -30,7 +30,6 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
-topo.sim.name = "lgn_lateral"
 
 input_pattern = topo.patterns.basic.Gaussian(
           scale=1.0, size=0.08333, aspect_ratio=4.6666,

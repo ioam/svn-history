@@ -51,8 +51,6 @@ from topo.misc.patternfns import gaussian,gabor,line,disk,ring
 from topo.base.arrayutils import wrap
 from topo.misc.numbergenerators import UniformRandom
 
-topo.sim.name = "sullivan_neurocomputing04"
-
 
 class XYModulo(CoordinateMapperFn):
     """Return the x coordinate of the given coordinate, modulo the specified step distance."""

@@ -44,9 +44,6 @@ from topo.outputfns.homeostatic import HomeostaticMaxEnt
 from topo.patterns.basic import Gaussian
 
 
-topo.sim.name = "homeo_lissom_or_noshrinking_latswitch"
-
-
 class Activity_based(CFPResponseFn):
     """
     Response function which calculates the activity of each unit individually based on the input activity, the weights and

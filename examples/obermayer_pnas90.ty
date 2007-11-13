@@ -38,7 +38,6 @@ from topo.base.parameterizedobject import ParameterizedObject
 import topo.patterns.basic
 import topo.patterns.random
 
-topo.sim.name = "obermayer_pnas90"
 
 class LinearDecay(ParameterizedObject):
     """Linear function decreasing from the starting_value to the ending_value."""

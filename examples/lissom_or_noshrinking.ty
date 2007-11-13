@@ -37,8 +37,6 @@ from topo.outputfns.homeostatic import HomeostaticMaxEnt
 from topo.patterns.basic import Gaussian,Composite,SeparatedComposite
 
 
-topo.sim.name = "lissom_or_noshrinking"
-    
 num_inputs=2
 input_type=topo.patterns.basic.Gaussian
 inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),

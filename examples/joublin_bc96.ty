@@ -57,7 +57,6 @@ from topo.misc.inlinec import inline, optimized
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.patternfns import gaussian
     
-topo.sim.name = "joublin_bc96"
 
 # Specified explicitly when creating weights matrix - required
 # for optimized C functions.

@@ -36,8 +36,6 @@ from topo.outputfns.homeostatic import AdaptingHomeostaticMaxEnt
 from topo.patterns.basic import Gaussian, Composite, SeparatedComposite
 from topo.responsefns.projfns import CFPRF_ActivityBased
 
-topo.sim.name = "lissom_oo_or_noshrinking_latswitch"
-
 
 num_inputs=2
 input_type=topo.patterns.basic.Gaussian

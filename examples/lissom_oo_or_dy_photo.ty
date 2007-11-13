@@ -57,9 +57,6 @@ from pylab import fix,ceil
 from numpy.oldnumeric.random_array import randint,seed,uniform
 
 
-topo.sim.name = "lissom_oo_or_dy_photo"
-
-
 class ImageSeq(PatternGenerator):
     """
     Given a path where set of images are stored, 

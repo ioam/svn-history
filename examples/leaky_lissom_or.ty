@@ -26,7 +26,6 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1
 from topo.learningfns.projfns import CFPLF_OutstarHebbian
 from topo.misc.numbergenerators import UniformRandom
 
-topo.sim.name = "slissom_sync"
 
 # CEBHACKALERT: should be changed over to use circular connection fields.
 # (This requires that the learning rates be adjusted.)

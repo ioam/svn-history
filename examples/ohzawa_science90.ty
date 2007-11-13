@@ -35,8 +35,6 @@ from topo.base.arrayutils import clip_in_place
 from topo.misc.numbergenerators import UniformRandom,UniformRandomInt
 from topo.commands.pylabplots import *
 
-topo.sim.name = "ohzawa_science90"
-
 
 input_pattern = topo.patterns.rds.RandomDotStereogram(dotsize=DynamicNumber(UniformRandom(lbound=0.05,ubound=0.15,seed=100)),
                                         xdisparity=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
