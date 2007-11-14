@@ -87,9 +87,6 @@ topo_parser = OptionParser(usage=usage)
 
 
 
-
-
-
 def sim_name_from_filename(filename):
     """
     Set the simulation title from the given filename, if none has been
@@ -99,11 +96,10 @@ def sim_name_from_filename(filename):
         topo.sim.name=re.sub('.ty$','',os.path.basename(filename))
 
 
+
 # Gets set to first filename following first option. Can we store/pass this somewhere better?
 first_postoption_filename = None
 
-
-### Define option processing
 
 ### JABALERT: It might be possible to eliminate this; how it is used seems clunky.
 def get_postoption_filenames(parser):
@@ -146,26 +142,31 @@ topo_parser.add_option("-i","--interactive",action="callback",callback=boolean_o
                        help="provide an interactive prompt even if stdin does not appear to be a terminal.")
 
 
+
 gui_started=False
 
-def g_action(option,opt_str,value,parser):
-    """Callback function for the -g option."""
+def gui():
+    """Start the GUI as if -g were supplied in the command used to launch Topographica."""
+    auto_import_commands()
 
-    # The first time -g is encountered (only), adds a command to the -c list to start the GUI
     global gui_started
     if not gui_started:
-        gui_started = True
-        list_command=getattr(parser.values,"commands")
-        list_command += ["print 'Launching GUI'; import topo.tkgui ; topo.tkgui.start()"]
-        setattr(parser.values,"commands",list_command)
-
-    boolean_option_action(option,opt_str,value,parser)
-    a_action(option,opt_str,value,parser)
+        print 'Launching GUI'
+        import topo.tkgui
+        topo.tkgui.start()
     
-topo_parser.add_option("-g","--gui",action="callback",callback=g_action,dest="gui",default=False,help="""
-    launch an interactive graphical user interface; \
-    equivalent to -c 'import topo.tkgui ; topo.tkgui.start()'.\
-    Implies -a.""")
+def g_action(option,opt_str,value,parser):
+    """Callback function for the -g option."""
+    list_command=getattr(parser.values,"commands")
+    list_command += ["from topo.misc.commandline import gui ; gui()"]
+    setattr(parser.values,"commands",list_command)
+    boolean_option_action(option,opt_str,value,parser)
+    
+topo_parser.add_option("-g","--gui",action="callback",callback=g_action,dest="gui",default=False,help="""\
+launch an interactive graphical user interface; \
+equivalent to -c 'from topo.misc.commandline import gui ; gui()'. \
+Implies -a.""")
+
 
 
 def c_action(option,opt_str,value,parser):
@@ -178,11 +179,12 @@ def c_action(option,opt_str,value,parser):
 
 topo_parser.add_option("-c","--command",action = "callback",callback=c_action,type="string",
 		       default=[],dest="commands",metavar="\"<command>\"",
-		       help="commands passed in as a string and followed by files to be executed.")
+		       help="string of arbitrary Python code to be executed in the main namespace.")
 
 
-def a_action(option,opt_str,value,parser):
-    """Callback function for the -a option."""
+
+def auto_import_commands():
+    """Import the contents of all files in the topo/commands/ directory."""
     import re,os
     from filepaths import application_path
     import __main__
@@ -192,8 +194,13 @@ def a_action(option,opt_str,value,parser):
             modulename = re.sub('\.py$','',f)
             exec "from topo.commands."+modulename+" import *" in __main__.__dict__
     
-topo_parser.add_option("-a","--auto-import-commands",action="callback",callback=a_action,
-		       help="import everything from commands/*.py into the main namespace, for convenience.")
+def a_action(option,opt_str,value,parser):
+    """Callback function for the -a option."""
+    auto_import_commands()
+    
+topo_parser.add_option("-a","--auto-import-commands",action="callback",callback=a_action,help="""\
+import everything from commands/*.py into the main namespace, for convenience; \
+equivalent to -c 'from topo.misc.commandline import auto_import_commands ; auto_import_commands()'.""")
 
 
 
