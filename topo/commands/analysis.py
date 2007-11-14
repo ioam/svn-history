@@ -1139,21 +1139,37 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relativ
 	    x.collect_feature_responses(feature_values,pattern_presenter, param_dict, curve_label,display)
 
 
-def decode_feature(sheet, feature = "orientation", axis_bounds = (0.0, 1.0), cyclic = True):
-	"""
-	Decode weighted average feature values given a measured feature map and sheet activity.
-
-	This routine assumes that a feature map (e.g., orientation preference map)
-	has been measured. It also assumes the current activity level on the sheet.
-	"""
-
-	map_name = feature.capitalize() + 'Preference'
-	d = Distribution(axis_bounds, cyclic)
-
-	if not (map_name in sheet.sheet_views):
-		topo.sim.warning(map_name + " should be measured before calling decode_orientations.")
-	else:
-		map = sheet.sheet_views[map_name]
-		d.add(dict(zip(map.view()[0].ravel(), sheet.activity.ravel())))
-
-	return d.weighted_average()  
+def decode_feature(sheet, preference_map = "OrientationPreference", axis_bounds=(0.0,1.0), cyclic=True, weighted_average=True):
+    """
+    Estimate the value of a feature from the current activity pattern on a sheet.
+    
+    The specified preference_map should be measured before this
+    function is called.
+    
+    If weighted_average is False, the feature value returned is the
+    value of the preference_map at the maximally active location.
+    
+    If weighted_average is True, the feature value is estimated by
+    weighting the preference_map by the current activity level, and
+    averaging the result across all units in the sheet.  The
+    axis_bounds specify the allowable range of the feature values in
+    the preference_map.  If cyclic is true, a vector average is used;
+    otherwise an arithmetic weighted average is used.
+    
+    For instance, if preference_map is OrientationPreference (a cyclic
+    quantity), then the result will be the vector average of the
+    activated orientations.  For an orientation map this value should
+    be an estimate of the orientation present on the input.
+    """
+    d = Distribution(axis_bounds, cyclic)
+    
+    if not (preference_map in sheet.sheet_views):
+        topo.sim.warning(preference_map + " should be measured before calling decode_orientations.")
+    else:
+        map = sheet.sheet_views[preference_map]
+        d.add(dict(zip(map.view()[0].ravel(), sheet.activity.ravel())))
+    
+    if weighted_average:
+        return d.weighted_average()
+    else:
+        return d.max_value_bin()
