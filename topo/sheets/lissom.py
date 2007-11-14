@@ -53,13 +53,7 @@ class JointNormalizingCFSheet(CFSheet):
     # group, it has the same no of cfs as the existing connections.
 
     def start(self):
-        # Force the weights to be normalized before this sheet takes
-        # part in any simulation event processing.
-        assert self.simulation
-        self.simulation.execute_next.append(
-            'topo.sim["' + self.name + '"]._normalize_weights()')
-
-
+        self._normalize_weights()        
 
     def _port_match(self,key,portlist):
         """

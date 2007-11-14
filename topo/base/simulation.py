@@ -900,20 +900,6 @@ class Simulation(ParameterizedObject):
         scheduled_commands are run.
         """)
 
-    # CB: Is this the simplest way to do this?
-    # If we want this to be 'initial_commands' or something similar,
-    # then check _time==0 in run() or something like that.
-    # JB: checking _time==0 won't work, because objects can be added
-    # to a running simulation, and we still need their initial commands
-    # to be run once and only once.  So I don't currently see any
-    # better way.
-    execute_next = Parameter(instantiate=True,default=[],doc="""
-        List of string commands that will be exec'd in __main__.__dict__
-        (i.e. as if they were entered at the command prompt) when the
-        simulation is next run(). These commands will run before any others,
-        and are guaranteed only to run once (before being destroyed).
-        """)
-
     time_printing_format = StringParameter("%(_time)09.2f",doc="""
         Format string to be used when the simulation time must be
         formatted as a string, e.g. for display or for basename().
@@ -948,7 +934,8 @@ class Simulation(ParameterizedObject):
 
         self.events = []
         self._events_stack = []
-
+        self.eps_to_start = []
+            
         # CB: make this a parameter for documentation? Otherwise nobody will know
         # about being able to adjust step.
         from topo.base.parameterclasses import wrap_callable # CEBALERT: remove with python 2.5
@@ -1005,7 +992,7 @@ class Simulation(ParameterizedObject):
                 
             self._event_processors[ep_name] = ep
             ep.simulation = self
-            ep.start()
+            self.eps_to_start.append(ep)
 
 
     def __delitem__(self,ep_name):
@@ -1114,9 +1101,11 @@ class Simulation(ParameterizedObject):
         # JP: This because of the weird sim._time = stop_time line at the end of this method.
         # see my HACKALERT below.
         
-        # Execute any commands in execute_next, and then remove them.
-        [CommandEvent(time=self._time,command_string=cmd)(self) for cmd in self.execute_next]
-        self.execute_next=[]
+        # Initialize any EPs that haven't been started yet
+        for e in self.eps_to_start:
+	    e.start()
+        self.eps_to_start=[]
+
         
         # Complicated expression for min(time+duration,until)
         if duration == Forever:
@@ -1327,7 +1316,7 @@ class Simulation(ParameterizedObject):
         imps  = sorted(set(imports))
 
         vals  = [simulation_path + "." + p + "=" + repr(getattr(self,p)) for p in
-                 ["name","startup_commands","execute_next"]
+                 ["name","startup_commands"]
                  if getattr(self,p)]
 
         return "\n\n# Imports:\n\n"                +     '\n'.join(imps)  + \
