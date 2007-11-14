@@ -1138,4 +1138,20 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relativ
 	    x.collect_feature_responses(feature_values,pattern_presenter, param_dict, curve_label,display)
 
             
+def decode_feature(sheet, feature = "orientation", axis_bounds = (0.0, 1.0), cyclic = True):
+    """
+    Decode weighted average feature values given a measured feature map and sheet activity.
 
+    This routine assumes that a feature map (e.g., orientation preference map)
+    has been measured. It also assumes the current activity level on the sheet.
+    """
+	map_name = feature.capitalize() + 'Preference'
+	map = sheet.sheet_views[map_name]
+	d = Distribution(axis_bounds, cyclic)
+
+	if not (map_name in sheet.sheet_views):
+		topo.sim.warning(map_name + " should be measured before calling decode_orientations.")
+	else:
+		d.add(dict(zip(map.view()[0].ravel(), sheet.activity.ravel())))
+
+	return d.weighted_average()  
