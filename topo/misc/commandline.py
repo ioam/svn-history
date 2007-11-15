@@ -86,7 +86,6 @@ processed in order left to right."
 topo_parser = OptionParser(usage=usage)
 
 
-
 def sim_name_from_filename(filename):
     """
     Set the simulation title from the given filename, if none has been
@@ -96,51 +95,14 @@ def sim_name_from_filename(filename):
         topo.sim.name=re.sub('.ty$','',os.path.basename(filename))
 
 
-
-# Gets set to first filename following first option. Can we store/pass this somewhere better?
-first_postoption_filename = None
-
-
-### JABALERT: It might be possible to eliminate this; how it is used seems clunky.
-def get_postoption_filenames(parser):
-    """
-    Sub-function used to catch all filenames that appear *after* the first option appears.
-    """
-    list_command=getattr(parser.values,"commands")
-    rargs = parser.rargs
-    while rargs:
-	arg = rargs[0]
-	if ((arg[:2] == "--" and len(arg) > 2) or
-            (arg[:1] == "-"  and len(arg) > 1 and arg[1] != "-")):
-            break
-	else:
-            # Adds commands for opening a script; also adds the location
-            # of the file to sys.path so that imports relative to the
-            # script's location will work
-            abs_arg = os.path.abspath(arg)
-	    list_command = list_command + ['import sys; sys.path.insert(0,"%s")'%os.path.dirname(abs_arg),
-                                           'execfile(' + repr(abs_arg) + ')']
-
-            # store the first filename 
-            global first_postoption_filename
-            first_postoption_filename = first_postoption_filename or arg
-
-	    del rargs[0]
-        
-    setattr(parser.values,"commands",list_command) #what's wrong with parser.values.commands=list_command ?
-                             
-
-
 def boolean_option_action(option,opt_str,value,parser):
     """Callback function for boolean-valued options that apply to the entire run.""" 
-    setattr(parser.values,option.dest,True) 
-    get_postoption_filenames(parser)
-
+    #print "Processing %s" % (opt_str)
+    setattr(parser.values,option.dest,True)
 
 topo_parser.add_option("-i","--interactive",action="callback",callback=boolean_option_action,
                        dest="interactive",default=False,
                        help="provide an interactive prompt even if stdin does not appear to be a terminal.")
-
 
 
 gui_started=False
@@ -154,13 +116,12 @@ def gui():
         print 'Launching GUI'
         import topo.tkgui
         topo.tkgui.start()
-    
+        gui_started=True
+            
 def g_action(option,opt_str,value,parser):
     """Callback function for the -g option."""
-    list_command=getattr(parser.values,"commands")
-    list_command += ["from topo.misc.commandline import gui ; gui()"]
-    setattr(parser.values,"commands",list_command)
     boolean_option_action(option,opt_str,value,parser)
+    gui()
     
 topo_parser.add_option("-g","--gui",action="callback",callback=g_action,dest="gui",default=False,help="""\
 launch an interactive graphical user interface; \
@@ -168,15 +129,16 @@ equivalent to -c 'from topo.misc.commandline import gui ; gui()'. \
 Implies -a.""")
 
 
+# Keeps track of whether something has been performed, when deciding whether to assume -i
+something_executed=False
 
 def c_action(option,opt_str,value,parser):
     """Callback function for the -c option."""
-    
-    list_command=getattr(parser.values,option.dest)
-    list_command += [value]
-    setattr(parser.values,option.dest,list_command) 
-    get_postoption_filenames(parser)
-
+    #print "Processing %s '%s'" % (opt_str,value)
+    exec value in __main__.__dict__
+    global something_executed
+    something_executed=True
+            
 topo_parser.add_option("-c","--command",action = "callback",callback=c_action,type="string",
 		       default=[],dest="commands",metavar="\"<command>\"",
 		       help="string of arbitrary Python code to be executed in the main namespace.")
@@ -255,27 +217,49 @@ def process_argv(argv):
     """
     Process command-line arguments (minus argv[0]!), rearrange and execute.
     """
-    (option,args) = topo_parser.parse_args(argv)
-    
-    # If no scripts and no commands were given, pretend -i was given.
-    if len(args)==0 and len(option.commands)==0:
-        option.interactive=True
-        
+
+    # Initial preparation
+    for (k,v) in global_constants.items():
+        exec '%s = %s' % (k,v) in __main__.__dict__
+
     if import_weave: exec "import weave" in __main__.__dict__    
 
     sys.ps1 = CommandPrompt()
     sys.ps2 = CommandPrompt2()
     
-    for (k,v) in global_constants.items():
-        exec '%s = %s' % (k,v) in __main__.__dict__
+    exec_startup_files()
 
+    # Repeatedly process options, if any, followed by filenames, if any, until nothing is left
+    topo_parser.disable_interspersed_args()
+    args=argv
+    option=None
+    global something_executed
+    while True:
+        # Process options up until the first filename
+        (option,args) = topo_parser.parse_args(args,option)
+
+        # Handle filename
+        if args:
+            filename=args.pop(0)
+            #print "Executing %s" % (filename)
+            filedir = os.path.dirname(os.path.abspath(filename))
+            sys.path.insert(0,filedir) # Allow imports relative to this file's path
+            sim_name_from_filename(filename) # Default value of topo.sim.name
+            execfile(filename,__main__.__dict__)
+            something_executed=True
+            
+        if not args:
+            break
+        
+    # If no scripts and no commands were given, pretend -i was given.
+    if not something_executed:
+        option.interactive=True
+        
     if option.interactive or option.gui:
 	os.environ["PYTHONINSPECT"] = "1"
     
-    exec_startup_files()
-
     if option.interactive:
-        print BANNER  # not printed when there's a GUI
+        print BANNER
 
     if option.interactive or option.gui:
         try:
@@ -287,19 +271,6 @@ def process_argv(argv):
             import rlcompleter
             readline.parse_and_bind("tab: complete")
 
-    # get filenames supplied *before* the first option and execute them
-    for filename in topo_parser.largs:
-        filedir = os.path.dirname(os.path.abspath(filename))
-        sys.path.insert(0,filedir)
-        sim_name_from_filename(filename)
-	execfile(filename,__main__.__dict__)
-
-    # sim name, if it wasn't set to a pre-options filename, gets set to first post-option filename
-    if first_postoption_filename: sim_name_from_filename(first_postoption_filename)
-
-    # execute remaining commands (options, commands, filenames that appear after the first option)
-    for cmd in option.commands:
-	exec cmd in __main__.__dict__
-
     # if the gui is running, set the console name
+    global gui_started
     if gui_started: topo.guimain.title(topo.sim.name)
