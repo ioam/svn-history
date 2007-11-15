@@ -54,8 +54,7 @@ def windowtitle(title):
     except:
         pass
 
-
-def vectorplot(vec,title=None,style='-',label=None):
+def vectorplot(vec,xvalues=None,title=None,style='-',label=None):
     """
     Simple line plotting for any vector or list of numbers.
 
@@ -75,10 +74,17 @@ def vectorplot(vec,title=None,style='-',label=None):
 
     The label argument can be used to identify the line in a figure legend.
 
+    Ordinarily, the x value for each point on the line is the index of
+    that point in the vec array, but a explicit list of xvalues can be
+    supplied; it should be the same length as vec.
+
     Execution of multiple vectorplot() commands with different styles
-    will result in all those styles overlayed on a single plot window.
+    will result in all those styles overlaid on a single plot window.
     """
-    pylab.plot(vec, style, label=label)
+    if xvalues is not None:
+        pylab.plot(xvalues, vec, style, label=label)
+    else:
+        pylab.plot(vec, style, label=label)
     pylab.grid(True)
     if title: windowtitle(title)
     pylab.show._needmain = False
