@@ -913,7 +913,9 @@ class Simulation(ParameterizedObject):
         time_printing_format will be available as the attribute
         'timestr'.
         """)
-
+    
+    eps_to_start = []
+    
     def __init__(self,**params):
         """
         Create the Simulation and register it with SimSingleton unless
