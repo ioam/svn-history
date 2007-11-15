@@ -140,8 +140,12 @@ class KeyedList(list):
 
     def keys(self):
         """A copy of the list of keys."""
-        l = [k for (k,v) in self.items()]
-        return l
+        return [k for (k,v) in self.items()]
+
+
+    def values(self):
+        """A copy of the list of values."""
+        return [v for (k,v) in self.items()]
 
 
     def update(self,b):
