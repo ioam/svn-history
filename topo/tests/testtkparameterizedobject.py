@@ -28,9 +28,6 @@ from topo.outputfns.basic import PiecewiseLinear
 
 from topo.tkgui.tkparameterizedobject import TkParameterizedObject
 
-# In case this test is run alone, start tkgui
-import topo.tkgui; topo.tkgui.start()
-
 
 class SomeFrame(TkParameterizedObject,Frame):
     boo = BooleanParameter(default=True)

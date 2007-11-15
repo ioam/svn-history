@@ -20,12 +20,6 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.tkgui.parametersframe import ParametersFrameWithApply
 
 
-## # In case this test is run alone, start tkgui
-## # (otherwise simulation of gui set()s and get()s doesn't work)
-import topo.tkgui; topo.tkgui.start()
-
-
-
 class TestPO(ParameterizedObject):
     boo = BooleanParameter(default=True)
     osp = ObjectSelectorParameter()
