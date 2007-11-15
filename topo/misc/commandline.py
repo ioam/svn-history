@@ -255,13 +255,14 @@ def process_argv(argv):
     if not something_executed:
         option.interactive=True
         
-    if option.interactive or option.gui:
-	os.environ["PYTHONINSPECT"] = "1"
-    
     if option.interactive:
         print BANNER
 
     if option.interactive or option.gui:
+        # Provide Python prompt even after execution completes
+	os.environ["PYTHONINSPECT"] = "1"
+
+        # Use readline if available
         try:
             import readline
         except ImportError:
