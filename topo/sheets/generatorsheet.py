@@ -60,7 +60,7 @@ class GeneratorSheet(Sheet):
         """
 
         if push_existing:
-            push_input_generator(self.input_generator)
+            self.push_input_generator()
 
         self.input_generator = new_ig
 
