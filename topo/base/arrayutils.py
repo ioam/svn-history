@@ -150,9 +150,9 @@ def array_argmax(mat):
 
 def __numpy_ufunc_pickle_support():
     """
-    CEBALERT: Allow instances of numpy.ufunc to pickle. We should be able to remove
-    this when numpy.ufuncs themselves support pickling.
+    Allow instances of numpy.ufunc to pickle.
 
+    Remove this when numpy.ufuncs themselves support pickling.
     See http://news.gmane.org/find-root.php?group=gmane.comp.python.numeric.general&article=13400
     """
     # Code from Robert Kern
@@ -165,14 +165,14 @@ def __numpy_ufunc_pickle_support():
     def ufunc_pickler(ufunc):
 	return ufunc.__name__
 
-    ## CEBHACKALERT! How can this work? It should be ufunc_unpickler(name)!
-    ## And *return* getattr(numpy,name)!! How is any of this working?
-    def ufunc_unpickler(ufunc):
-	import numpy
-	getattr(numpy,name)
+##     # CEBALERT: I think we don't need this method
+##     def ufunc_unpickler(name):
+##         print "To help with debugging, please email ceball@users.sf.net if you see this message, and include as much information as possible about what you were doing."
+## 	import numpy
+## 	return getattr(numpy,name)
 
     import numpy
-    copy_reg.pickle(numpy.ufunc,ufunc_pickler,ufunc_unpickler)
+    copy_reg.pickle(numpy.ufunc,ufunc_pickler)#,ufunc_unpickler)
 
 
 __numpy_ufunc_pickle_support()
