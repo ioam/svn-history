@@ -102,17 +102,26 @@ scaling equations that underlie Sheet coordinates
     for more details if you are interested.
     <BR><BR>
 
+  <dt><A TARGET="_top" HREF="http://brain.unr.edu/ncsDocs/">NCS</A></dt>
+  <dd>The NCS simulator focuses on large-scale simulation of networks
+    of spiking neurons, using C/C++ with a custom specification
+    language rather than an extensible scripting language.  Thus it is
+    likely to be useful primarily for running simulations very similar
+    to those built by the developers, rather than being fully
+    extensible as Topographica is.
+    <BR><BR>
+    
   <dt><A TARGET="_top" HREF="http://ilab.usc.edu/toolkit/documentation.shtml">iNVT</A></dt>
   <dd>iLab Neuromorphic Vision Toolkit is a high-performance
     computer-vision oriented C++ toolkit from Koch and Itti with support
     for saliency maps for modeling attention.  It has a strong focus
     on topographically organized regions, but at a high level of
     abstraction, and without specific support for learning and
-    development.  It also requires more time-consuming and less
-    flexible development in C++.<BR><BR>
+    development.  As for NCS, it also requires more time-consuming and
+    less flexible development in C++.<BR><BR>
 
   <dt><A TARGET="_top" HREF="http://grey.colorado.edu/emergent/index.php/Main_Page">Emergent</A></dt>
-  <dd>Formerly called PDP++, Emergent focuses on simulating neural
+  <dd>Formerly called <b>PDP++</b>, Emergent focuses on simulating neural
     networks of various types, for either engineering or cognitive
     science applications.  Although there is support for networks
     arranged as maps (e.g. Kohonen SOMs), the interface is designed to
