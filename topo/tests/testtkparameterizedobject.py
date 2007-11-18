@@ -74,13 +74,13 @@ class TestTkParameterizedObject(unittest.TestCase):
         f.boo = False
         self.assertEqual(f.boocount,1) # check that on_change was called
         self.assertEqual(f.boo,False)  # check that f.boo was set
-        self.assertEqual(f._tk_vars['boo'].get(),False) # simulate GUI get & check result
+        self.assertEqual(f._tkvars['boo'].get(),False) # simulate GUI get & check result
 
 
-        f._tk_vars['boo'].set(True) # simulate GUI set
+        f._tkvars['boo'].set(True) # simulate GUI set
         self.assertEqual(f.boocount,2) # check that on_change was called
         self.assertEqual(f.boo,True) # check that f.boo was actually set
-        self.assertEqual(f._tk_vars['boo'].get(),True) # simulate GUI get
+        self.assertEqual(f._tkvars['boo'].get(),True) # simulate GUI get
 
           
         
@@ -102,7 +102,7 @@ class TestTkParameterizedObject(unittest.TestCase):
 
         # simulate a GUI set (typing then Return) & then and check
         # g.bool_param is set
-        f._tk_vars['bool_param'].set(False)
+        f._tkvars['bool_param'].set(False)
         self.assertEqual(t.bool_param,False) 
 
         # check that up-to-date value is returned when g got changed elsewhere
@@ -111,7 +111,7 @@ class TestTkParameterizedObject(unittest.TestCase):
 
         # simulate a GUI get & check up-to-date value returned
         t.bool_param=False
-        self.assertEqual(f._tk_vars['bool_param'].get(),False) 
+        self.assertEqual(f._tkvars['bool_param'].get(),False) 
 
 
         # CEB: the following doesn't work:
@@ -142,7 +142,7 @@ class TestTkParameterizedObject(unittest.TestCase):
         f.boo=True
         self.assertEqual(self.z,1)
         
-        f._tk_vars['boo'].set(True)
+        f._tkvars['boo'].set(True)
         self.assertEqual(self.z,2)
 
 
@@ -153,10 +153,10 @@ class TestTkParameterizedObject(unittest.TestCase):
         self.z = 0
         f.pack_param('boo',on_modify=self.upzcount)
 
-        f._tk_vars['boo'].set(True)
+        f._tkvars['boo'].set(True)
         self.assertEqual(self.z,0)
         
-        f._tk_vars['boo'].set(False)
+        f._tkvars['boo'].set(False)
         self.assertEqual(self.z,1)
         
 
@@ -204,6 +204,8 @@ class TestParameterTypeRepresentations(unittest.TestCase):
 
     def setUp(self):
         self.f = SomeFrame(Toplevel())
+        import __main__
+        __main__.__dict__['f']=self.f
 
 
     def test_number_parameter(self):
@@ -211,7 +213,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         self.f.pack_param('nu')
         
         nu_param = self.f.get_parameter_object('nu')
-        nu_tkvar = self.f._tk_vars['nu']
+        nu_tkvar = self.f._tkvars['nu']
         nu_widget = self.f.representations['nu']['widget']
         
         # check standard gui setting (includes resolution test)
@@ -232,7 +234,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         self.assertEqual(self.f.nu,0.8)        
         self.assertEqual(nu_widget.slider.get(),0.8)
         self.assertEqual(nu_widget.tag.get(),'0.8')
-        self.assertEqual(nu_tkvar.get(),0.8)
+        self.assertEqual(nu_tkvar.get(),'0.8')
 
         # now make immediate and test that
         self.f.param_immediately_apply_change[Number]=True        
@@ -244,7 +246,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
 
         # check gui getting
         self.f.nu = 0.2
-        self.assertEqual(nu_tkvar.get(),0.2)
+        self.assertEqual(nu_tkvar.get(),'0.2')
 
         # try to set tag beyond the 1 upper bound
         nu_tkvar.set(40.0)
@@ -277,6 +279,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
                     ParameterizedObject(name='rat'),
                     ParameterizedObject(name='bat')]
         osp_param = self.f.get_parameter_object('osp')
+
         osp_param.objects = some_pos
         #self.f.r.default = some_pos[0]
 
@@ -294,23 +297,25 @@ class TestParameterTypeRepresentations(unittest.TestCase):
 ##         f.initialize_ranged_parameter('r',
 ##                                       [ParameterizedObject(name='cat'),ParameterizedObject(name='rat'),ParameterizedObject(name='bat')])
 
-        self.assertEqual(self.f.translators['osp']['cat'],some_pos[0])
-        self.assertEqual(self.f.translators['osp']['rat'],some_pos[1])
-        self.assertEqual(self.f.translators['osp']['bat'],some_pos[2])
+        self.assertEqual(self.f.translators['osp'].string2object('cat'),some_pos[0])
+        self.assertEqual(self.f.translators['osp'].string2object('rat'),some_pos[1])
+        self.assertEqual(self.f.translators['osp'].string2object('bat'),some_pos[2])
 
         gnat = ParameterizedObject(name='gnat')
         osp_param.objects.append(gnat)
+
+        self.f.unpack_param('osp')
         self.f.pack_param('osp') # again, note the need to pack after updating range.
 ##         self.f.initialize_ranged_parameter('r',ParameterizedObject)
-        self.assertEqual(self.f.translators['osp']['gnat'],gnat)
+        self.assertEqual(self.f.translators['osp'].string2object('gnat'),gnat)
 
-        self.assertEqual(self.f.object2string_ifrequired('osp',some_pos[0]),'cat')
-        self.assertEqual(self.f.object2string_ifrequired('osp',some_pos[1]),'rat')
-        self.assertEqual(self.f.object2string_ifrequired('osp',some_pos[2]),'bat')
+        self.assertEqual(self.f._object2string('osp',some_pos[0]),'cat')
+        self.assertEqual(self.f._object2string('osp',some_pos[1]),'rat')
+        self.assertEqual(self.f._object2string('osp',some_pos[2]),'bat')
 
 
         # Simulate a GUI set
-        self.f._tk_vars['osp'].set('bat')
+        self.f._tkvars['osp'].set('bat')
         self.assertEqual(self.f.osp,some_pos[2])
 
         # Test sorting
@@ -321,7 +326,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         self.f.pack_param('csp')
 
         csp_param = self.f.get_parameter_object('csp')
-        csp_tkvar = self.f._tk_vars['csp']
+        csp_tkvar = self.f._tkvars['csp']
 
         # For class selector parameters, the tkpo should instantiate
         # all choices on pack()ing of the parameter and then maintain
@@ -353,7 +358,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
             test_string = "new test string"
             w.delete(0,"end")
             w.insert(0,test_string)
-            self.f._update_param(param_name,force=True)
+            self.f._update_param_from_tkvar(param_name,force=True)
             
             self.assertEqual(getattr(self.f,param_name),test_string)
             self.assertEqual(w.get(),test_string)
@@ -372,6 +377,12 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         else:
             raise("Test should fail for Parameter")
 
+
+# CB: need to add test
+##     def test_boolean_parameter(self):
+
+##         self.f.pack_param('boo')
+        
         
 
 
@@ -380,14 +391,14 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         w = self.f.representations['pa']['widget']
         w.delete(0,"end")
         w.insert(0,"AnObjectNamedThisWillNotExist")
-        self.f._update_param('pa',True)
-        self.assertEqual(self.f.pa,"AnObjectNamedThisWillNotExist")
+        self.f._update_param_from_tkvar('pa',True)
+        self.assertEqual(self.f.pa,'test') # didn't get set to wrong value
 
         # Check that we can create an object from a class in __main__
         exec "from topo.outputfns.basic import IdentityOF" in __main__.__dict__
         w.delete(0,"end")
         w.insert(0,"IdentityOF()")
-        self.f._update_param('pa',force=True)
+        self.f._update_param_from_tkvar('pa',force=True)
         import topo.outputfns.basic
         self.assertEqual(type(self.f.pa),topo.outputfns.basic.IdentityOF)
 

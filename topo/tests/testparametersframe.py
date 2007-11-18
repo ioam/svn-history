@@ -67,13 +67,13 @@ class TestParametersFrameWithApply(unittest.TestCase):
         """
         ## check that update doesn't affect the variable values
         orig_values = {}
-        for param_name,tkvar in self.f._tk_vars.items():
+        for param_name,tkvar in self.f._tkvars.items():
             orig_values[param_name] = tkvar._original_get()
 
         self.f.Apply()
 
         for param_name,val in orig_values.items():
-            self.assertEqual(self.f._tk_vars[param_name].get(),val)
+            self.assertEqual(self.f._tkvars[param_name].get(),val)
 
         ## and check that *displayed* values don't change 
         orig_values = {}
