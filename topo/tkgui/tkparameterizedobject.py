@@ -107,8 +107,8 @@ import topo # for topo.guimain only
 from topo.misc.utils import eval_atof, inverse
 from topo.misc.filepaths import Filename, resolve_path
 
-from widgets import FocusTakingButton as Button2
-from topowidgets import TaggedSlider, entry_background
+from widgets import FocusTakingButton as Button2, TaggedSlider
+from topowidgets import entry_background
 
 def lookup_by_class(dict_,class_):
     """
