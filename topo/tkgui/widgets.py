@@ -156,6 +156,10 @@ class ControllableMenu(Menu):
 ######################################################################
 # CB: Working here.  cleanup and document. 
 
+# Before trying to simplify, see if bwidget has been updated
+# (most of the complications come from bwidget bugs).
+# Otherwise, consider wrapping scrodget to get a better scrolledframe.
+
 # Might wonder why we need <<SizeRight>> event, and don't just use the
 # <Configure> event for calling sizeright: Can't distinguish manual
 # resize from autoresizing.
