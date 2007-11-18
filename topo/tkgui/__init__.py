@@ -109,6 +109,8 @@ def __ttkify(root,widget):
 
 
 
+# CEBALERT: this function needs some cleaning up
+
 # gets set to the TopoConsole instance created by start.
 console = None
 
@@ -131,6 +133,7 @@ def start(mainloop=False):
     # quit this function before starting another Tk instance, etc)
     if console is not None: return
 
+    print 'Launching GUI'
 
     # Creating an initial Tk() instance and then withdrawing the
     # window is a common technique. Instead of doing this, having
