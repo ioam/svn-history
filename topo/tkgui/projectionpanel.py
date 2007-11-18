@@ -150,7 +150,7 @@ class UnitsPanel(ProjectionSheetPanel):
         if 'sheet' in self.initial_args: self.sheet=self.initial_args['sheet']
 
         for coord in ['x','y']:
-            self._tk_vars[coord].set(self.initial_args.get(coord,0.0))
+            self._tkvars[coord].set(self.initial_args.get(coord,0.0))
           
         l,b,r,t = self.sheet.bounds.lbrt()
         bounds = {'x':(l,r),
