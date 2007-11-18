@@ -20,6 +20,9 @@ __version__='$Revision$'
 # CEB: still working on this file
 
 
+# Fixing next:
+# - defaults button doesn't restore some things to default value?
+
 import Tkinter, tkMessageBox, _tkinter
 
 from Tkinter import Frame, E,W, Label
