@@ -20,13 +20,7 @@ __version__='$Revision$'
 # CEB: still working on this file
 
 
-# CEBNOTE: now we can consider having something that indicates if a
-# value has changed, and greying out irrelevant buttons (e.g. Apply
-# when there are no differences). Just depends on having a refresh
-# occur at the right time.
-
-
-import Tkinter, tkMessageBox
+import Tkinter, tkMessageBox, _tkinter
 
 from Tkinter import Frame, E,W, Label
 from inspect import getdoc
@@ -42,6 +36,8 @@ from tkparameterizedobject import TkParameterizedObject, ButtonParameter, \
                                   parameters
 
 
+
+# CB: color buttons to match? deactivate irrelevant buttons?
 
 class ParametersFrame(TkParameterizedObject,Frame):
     """
@@ -162,7 +158,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
     def _refresh_button(self):
         """See Refresh parameter."""
         for name in self.displayed_params.keys():
-            self._tk_vars[name].get()
+            self._tkvars[name].get()
 
 
     def _defaults_button(self):
@@ -173,7 +169,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
 
         for param_name,val in defaults.items():
             if not self.get_parameter_object(param_name).hidden:
-                self._tk_vars[param_name].set(val)
+                self._tkvars[param_name].set(val)
 
         if self.on_modify: self.on_modify()
         if self.on_change: self.on_change()
@@ -190,15 +186,23 @@ class ParametersFrame(TkParameterizedObject,Frame):
     # CEBALERT: all these 'on_change=None's mean someone could lose
     # their initial setting: cleanup
     def set_PO(self,parameterized_object,on_change=None,on_modify=None):
+        """
+
+        """
 
         self.change_PO(parameterized_object)
 
+        title = "Parameters of "+ (parameterized_object.name or str(parameterized_object)) # (name for class is None)
+
         try:
-            self.master.title("Parameters of "+ \
-                (parameterized_object.name or str(parameterized_object))) # name for class is None 
+            self.master.title(title)
         except AttributeError:
             # can only set window title on a window (model editor puts frame in another frame)
             pass
+
+        # CB: need a method for this!
+        self.__dict__['_name_param_value'] = title
+        
         
         ### Pack all of the non-hidden Parameters
         self.displayed_params = {}
@@ -245,6 +249,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
                                                on_change=on_change or self.on_change,
                                                on_modify=on_modify or self.on_modify)
             self.representations[name]={'widget':widget,'label':label}
+            self._indicate_tkvar_status(name)
         
         ### add widgets & labels to screen in a grid
         rows = range(len(sorted_parameter_names))
@@ -300,7 +305,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
                 break
 
         # CEBALERT: should have used get_parameter_value(param_name)?
-        PO_to_edit = self.string2object_ifrequired(param_name,self._tk_vars[param_name].get()) 
+        PO_to_edit = self._string2object(param_name,self._tkvars[param_name].get()) 
 
         parameter_window = TkguiWindow()
         parameter_window.title(PO_to_edit.name+' parameters')
@@ -323,6 +328,33 @@ class ParametersFrame(TkParameterizedObject,Frame):
     # also need to do hide,unhide - probably
 
 
+    def _indicate_tkvar_status(self,param_name):
+        """
+        Calls the superclass's method, then additionally indicates if a parameter
+        differs from the class default (by giving label green background).
+        """
+        TkParameterizedObject._indicate_tkvar_status(self,param_name)
+
+        b = 'white'
+        
+        param,sourcePO = self.get_parameter_object(param_name,with_location=True)
+
+        if sourcePO is not self and self.get_parameter_value(param_name) is not self.get_parameter_object(param_name).default:
+            b = "green"
+
+
+        if hasattr(self,'representations') and param_name in self.representations:
+            try:
+                label = self.representations[param_name]['label']
+                if label is None:  # HACK about the label being none
+                    return
+                label['background']=b
+            except _tkinter.TclError:
+                pass
+
+
+
+
 
 
 class ParametersFrameWithApply(ParametersFrame):
@@ -334,13 +366,16 @@ class ParametersFrameWithApply(ParametersFrame):
     applied to the underlying object until Apply is pressed.
     """
 
-    Apply = ButtonParameter(doc="""Set object's Parameters to displayed values.
+    # CB: might be nice to make Apply button blue like the unapplied changes,
+    # but can't currently set button color
+    Apply = ButtonParameter(doc="""Set object's Parameters to displayed values.\n
                                    When editing a class, sets the class defaults
                                    (i.e. acts on the class object).""")
     
     def __init__(self,master,parameterized_object=None,on_change=None,on_modify=None,**params):        
         super(ParametersFrameWithApply,self).__init__(master,parameterized_object,
                                                       on_change,on_modify,**params)
+        self._live_update = False
 
         ### CEBALERT: describe why this apply is different from Apply
         for p in self.param_immediately_apply_change:
@@ -366,7 +401,7 @@ class ParametersFrameWithApply(ParametersFrame):
                                                     on_modify=on_modify)
         ### Delete all variable traces
         # (don't want to update parameters immediately)
-        for v in self._tk_vars.values():
+        for v in self._tkvars.values():
             self.__delete_trace(v)
             v._checking_get = v.get
             v.get = v._original_get
@@ -376,7 +411,7 @@ class ParametersFrameWithApply(ParametersFrame):
         """Return True if any one of the packed parameters' displayed values is different from
         that on the object."""
         for name in self.displayed_params.keys():
-            if self._value_changed(name):
+            if self._tkvar_changed(name):
                 return True
         return False
 
@@ -392,30 +427,41 @@ class ParametersFrameWithApply(ParametersFrame):
     def update_parameters(self):
         if isinstance(self._extraPO,ParameterizedObjectMetaclass):
             for name in self.displayed_params.keys():
-                if self._value_changed(name):
-                    self._update_param(name)
+                #if self._tkvar_changed(name):
+                self._update_param_from_tkvar(name)
         else:
             for name,param in self.displayed_params.items():
-                if not param.constant and self._value_changed(name):
-                    self._update_param(name)
+                if not param.constant:  #and self._tkvar_changed(name):
+                    self._update_param_from_tkvar(name)
 
 
     def _apply_button(self):
         self.update_parameters()
-        self._refresh_button()
+        self._refresh_button(overwrite_error=False)
+
+    def _refresh_value(self,param_name):
+        po_val = self.get_parameter_value(param_name)
+        po_stringrep = self._object2string(param_name,po_val)
+        self._tkvars[param_name]._original_set(po_stringrep)
 
         
-    def _refresh_button(self):
+    def _refresh_button(self,overwrite_error=True):
         for name in self.displayed_params.keys():
-            self._tk_vars[name]._checking_get()
-            # CEBALERT: taggedsliders need to have tag_set() called to update slider
-            w = self.representations[name]['widget']
-            if hasattr(w,'tag_set'):w.tag_set()
+            if self.translators[name].last_string2object_failed and not overwrite_error:
+                pass
+            else:
+                self._refresh_value(name)
+                #print self._tkvars[name]._checking_get()
+                # CEBALERT: taggedsliders need to have tag_set() called to update slider
+                w = self.representations[name]['widget']
+                if hasattr(w,'tag_set'):w.tag_set()
 
 
-    def __delete_trace(self,var): var.trace_vdelete(*var.trace_vinfo()[0])
+    def __delete_trace(self,var): pass #var.trace_vdelete(*var.trace_vinfo()[0])
 
 
+
+# CB: can override tracefn so that Apply/Refresh buttons are enabled/disabled as appropriate
 
 
 
