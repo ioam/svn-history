@@ -321,6 +321,42 @@ class GenericImage(PatternGenerator):
         raise NotImplementedError
 
 
+    ### support pickling of PIL.Image
+
+    # CEBALERT: almost identical code to that in topo.plotting.bitmap.Bitmap...
+    # CEB: by converting to string and back, we probably incur some speed
+    # penalty on copy()ing GenericImages (since __getstate__ and __setstate__ are
+    # used for copying, unless __copy__ and __deepcopy__ are defined instead).
+    def __getstate__(self):
+        """
+        Return the object's state (as in the superclass), but replace
+        the '_image' attribute's Image with a string representation.
+        """
+        state = super(GenericImage,self).__getstate__()
+
+        if '_image' in state:
+            import StringIO
+            f = StringIO.StringIO()
+            image = state['_image']
+            image.save(f,format=image.format or 'TIFF') # format could be None (we should probably just not save in that case)
+            state['_image'] = f.getvalue()
+            f.close()
+
+        return state
+
+    def __setstate__(self,state):
+        """
+        Load the object's state (as in the superclass), but replace
+        the '_image' string with an actual Image object.
+        """
+        if '_image' in state:
+            import StringIO
+            state['_image'] = Image.open(StringIO.StringIO(state['_image']))
+        super(GenericImage,self).__setstate__(state)
+
+
+
+
 class Image(GenericImage):
     """
     2D Image generator that reads the image from a file.
@@ -356,3 +392,6 @@ class Image(GenericImage):
             return True
         else:
             return False
+
+
+
