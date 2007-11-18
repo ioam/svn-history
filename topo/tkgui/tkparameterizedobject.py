@@ -108,7 +108,7 @@ from topo.misc.utils import eval_atof, inverse
 from topo.misc.filepaths import Filename, resolve_path
 
 from widgets import FocusTakingButton as Button2
-from topowidgets import TkPOTaggedSlider, entry_background
+from topowidgets import TaggedSlider, entry_background
 
 def lookup_by_class(dict_,class_):
     """
@@ -1265,7 +1265,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         The slider's bounds are set to those of the Parameter.
         """
-        w = TkPOTaggedSlider(frame,variable=self._tkvars[name],**widget_options)
+        w = TaggedSlider(frame,variable=self._tkvars[name],**widget_options)
         param = self.get_parameter_object(name)
 
         lower_bound,upper_bound = param.get_soft_bounds()

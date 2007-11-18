@@ -20,7 +20,7 @@ import bwidget
 
 from topo.misc.filepaths import resolve_path
 import topo.tkgui
-from widgets import TaggedSlider, ResizableScrollableFrame
+from widgets import ResizableScrollableFrame
 
 
 
@@ -73,27 +73,6 @@ class ScrolledTkguiWindow(TkguiWindow):
         self.content.title = self.title
 ######################################################################
 ######################################################################            
-
-
-
-######################################################################
-######################################################################            
-# CEBALERT: need to remove this class - does anything still use refresh()
-class TkPOTaggedSlider(TaggedSlider):
-    """
-    A TaggedSlider with extra features for use with
-    TkParameterizedObjects.
-    
-    Adds extra ability to set slider when e.g. a variable
-    name is in the tag.
-    """    
-    def refresh(self):
-        """Could anything survive in tkgui without a refresh() method?"""
-        self.tag_set()
-
-######################################################################
-######################################################################            
-
 
 
 
