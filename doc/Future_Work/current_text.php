@@ -793,6 +793,13 @@ Now I have a nice little directory with everything I ever type in, organized by 
 Enhanced Interactive Python with IPython
 http://www.onlamp.com/pub/a/python/2005/01/27/ipython.html?page=1
 
+
+
+_________________________________________________________
+working with matlab: scipy's io.loadmat 
+
 -->
+
+
 
 
