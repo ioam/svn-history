@@ -269,7 +269,14 @@ def process_argv(argv):
             #set up command completion
             import rlcompleter
             readline.parse_and_bind("tab: complete")
-
+    else:
+        # IPython (unlike Python) stays open no matter what interactive is set to,
+        # so we need to call exit
+        sys.exit()
+        
     # if the gui is running, set the console name
     global gui_started
     if gui_started: topo.guimain.title(topo.sim.name)
+
+    
+        
