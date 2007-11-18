@@ -105,18 +105,12 @@ topo_parser.add_option("-i","--interactive",action="callback",callback=boolean_o
                        help="provide an interactive prompt even if stdin does not appear to be a terminal.")
 
 
-gui_started=False
 
 def gui():
     """Start the GUI as if -g were supplied in the command used to launch Topographica."""
     auto_import_commands()
-
-    global gui_started
-    if not gui_started:
-        print 'Launching GUI'
-        import topo.tkgui
-        topo.tkgui.start()
-        gui_started=True
+    import topo.tkgui
+    topo.tkgui.start()
             
 def g_action(option,opt_str,value,parser):
     """Callback function for the -g option."""
@@ -273,10 +267,9 @@ def process_argv(argv):
         # IPython (unlike Python) stays open no matter what interactive is set to,
         # so we need to call exit
         sys.exit()
-        
-    # if the gui is running, set the console name
-    global gui_started
-    if gui_started: topo.guimain.title(topo.sim.name)
+
+    if option.gui:
+        topo.guimain.title(topo.sim.name)
 
     
         
