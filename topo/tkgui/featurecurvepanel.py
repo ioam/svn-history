@@ -89,7 +89,7 @@ class FeatureCurvePanel(PlotGroupPanel):
             w1.set_bounds(*x.bounds)
             w2.set_bounds(*y.bounds)
             
-            w1.refresh();w2.refresh()
+            w1.tag_set();w2.tag_set()
 
 
 

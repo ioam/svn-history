@@ -164,7 +164,7 @@ class UnitsPanel(ProjectionSheetPanel):
             if coord in self.representations:
                 w=self.representations[coord]['widget']
                 w.set_bounds(*param_obj.bounds)
-                w.refresh()
+                w.tag_set()
 
         self.initial_args = {} # reset now we've used them
         super(UnitsPanel,self).sheet_change()
