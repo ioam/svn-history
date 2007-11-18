@@ -222,8 +222,6 @@ def process_argv(argv):
     for (k,v) in global_constants.items():
         exec '%s = %s' % (k,v) in __main__.__dict__
 
-    if import_weave: exec "import weave" in __main__.__dict__    
-
     sys.ps1 = CommandPrompt()
     sys.ps2 = CommandPrompt2()
     
