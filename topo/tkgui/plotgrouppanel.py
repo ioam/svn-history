@@ -242,7 +242,7 @@ e.g. for debugging.)
 
 
         self.update_plot_frame(plots=False)
-                                    
+
         #################################################################
 
         # CB: don't forget to include ctrl-q
@@ -355,12 +355,12 @@ e.g. for debugging.)
         return x
 
 
-
+    # rename (not specific to plot_frame)
     # document, and make display_* methods semi-private methods
     def update_plot_frame(self,plots=True,labels=True):
         if plots:
             self.plotgroup.scale_images()
-            self.display_plots() 
+            self.display_plots()
         if labels:self.display_labels()
         self.refresh_title()
 
@@ -375,7 +375,8 @@ e.g. for debugging.)
             self.no_plot_note_enabled=False
             self.representations['Enlarge']['widget']['state']=NORMAL
             self.representations['Reduce' ]['widget']['state']=NORMAL
-    
+
+        self.__update_widgets_for_history() # have a general update_widgets method instead (that calls update_widgets_for_history; can it also include enlarge/reduce alterations?)
         self.event_generate("<<SizeRight>>")
         
         
@@ -384,14 +385,10 @@ e.g. for debugging.)
         Call plotgroup's make_plots with update=True (i.e. run
         update_command and plot_command), then display the result.
         """
-        # shouldn't call this from within history unless you've copied
-        # the plotgroup (as in refresh)
-        # assert self.history_index==0,"Programming error: can't
-        # update plotgroup while looking in history." # (never update
-        # plots in the history, or they go to current activity)
         self.plotgroup.make_plots(update=True)
-        self.update_plot_frame()
-
+        self.update_plot_frame()        
+        self.add_to_plotgroups_history()
+        
 
     def redraw_plots(self):
         """
@@ -414,7 +411,6 @@ e.g. for debugging.)
     def refresh(self,update=True):
         """
         Main steps for generating plots in the Frame. 
-	Must be re-implemented in sub-classes which save a history of the plots.
 
         # if update is True, the SheetViews are re-generated
         """
@@ -424,14 +420,13 @@ e.g. for debugging.)
         # plotgroup (but copy it: don't update the old one, which is a record of the previous state)
         if self.history_index!=0:
             self._switch_plotgroup(copy.copy(self.plotgroups_history[-1]))
+            self.history_index = 0
 
         if update:
             self.refresh_plots()            
         else:
             self.redraw_plots()
 
-        self.add_to_history()                     
-                
         Pmw.hidebusycursor()
 
 
@@ -572,19 +567,27 @@ e.g. for debugging.)
         self.update_plot_frame(labels=False)
         
 
-####################### HISTORY METHODS ##########################         
+######################################################################
+### HISTORY METHODS
+
     # CEBERRORALERT: history grows and grows! Consider what happens when
     # a window's open with auto-refresh and many plots are generated
     # (e.g. measure_rfs). And plotgroups might be much bigger than they
     # need to be.
-    def add_to_history(self):
-        # CEBALERT: note that there's an irrelevant pg in the list at
-        # position 0 (added when panel opens)
-        self.plotgroups_history.append(copy.copy(self.plotgroup))
-        self.history_index=0
-        self.update_widgets() 
 
-    def update_widgets(self):
+    # CEBALERT: in a history research, a disabled widget does not display
+    # up-to-date information (e.g. normalize checkbutton doesn't change).
+    def add_to_plotgroups_history(self):
+        """
+        If there are plots on display, and we're not doing a history research,
+        the plotgroup is stored in the history.
+        """
+        if self.history_index==0 and not len(self.canvases)==0:
+            self.plotgroups_history.append(copy.copy(self.plotgroup))
+        self.__update_widgets_for_history() 
+
+        
+    def __update_widgets_for_history(self):
         """
         The plotgroup's non-history widgets are all irrelevant when the plotgroup's from
         history.
@@ -593,7 +596,6 @@ e.g. for debugging.)
             state= 'disabled'
         else:
             state = 'normal'
-
         
         widgets_to_update = [self.representations[p_name]['widget']
                              for p_name in self.representations
@@ -602,11 +604,15 @@ e.g. for debugging.)
         for widget in widgets_to_update:
             widget.config(state=state)
 
-        self.update_history_buttons()
+        self.__update_history_buttons()
 
 
-    def update_history_buttons(self):
-        space_back = len(self.plotgroups_history)-1+self.history_index
+    def __update_history_buttons(self):
+        """
+        Enable/disable the back and forward buttons depending on
+        where we are in a history research.
+        """
+        space_back = len(self.plotgroups_history)+self.history_index-1
         space_fwd  = -self.history_index
 
         back_button = self.representations['Back']['widget']
@@ -622,6 +628,17 @@ e.g. for debugging.)
         else:
             forward_button['state']='disabled'
 
+    # JLENHANCEMENT: It would be nice to be able to scroll back through many
+    # iterations.  Could put in a box for entering either the iteration
+    # number you want to view, or perhaps how many you want to jump...
+    def navigate_pg_history(self,steps):
+        self.history_index+=steps
+        self._switch_plotgroup(self.plotgroups_history[len(self.plotgroups_history)+self.history_index-1])
+        self.update_plot_frame()
+
+######################################################################
+
+
     def _switch_plotgroup(self,newpg):
         """
         Switch to a different plotgroup, e.g. one from the history buffer.
@@ -636,14 +653,6 @@ e.g. for debugging.)
         
         self.plotgroup=newpg
 
-    # JLENHANCEMENT: It would be nice to be able to scroll back through many
-    # iterations.  Could put in a box for entering either the iteration
-    # number you want to view, or perhaps how many you want to jump...
-    def navigate_pg_history(self,steps):
-        self.history_index+=steps
-        self._switch_plotgroup(self.plotgroups_history[len(self.plotgroups_history)-1+self.history_index])
-        self.update_widgets()
-        self.update_plot_frame()
 
 ###########################################################         
 
