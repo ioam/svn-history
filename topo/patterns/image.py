@@ -351,7 +351,7 @@ class GenericImage(PatternGenerator):
         """
         if '_image' in state:
             import StringIO
-            state['_image'] = Image.open(StringIO.StringIO(state['_image']))
+            state['_image'] = PIL.open(StringIO.StringIO(state['_image']))
         super(GenericImage,self).__setstate__(state)
 
 
