@@ -98,13 +98,6 @@ topo/tkgui/__init__.py</li>
 </ul>
 
 
-<H4>2007/08/12: Speed up measuring receptive fields</H4>
-Should set the defaults to be a bit faster.  Should also
-finishing cleaning up associated code (maybe mostly for Jim to do?).
-Could eventually use STRFPAK or a similar approach.
-
-
-
 <H4>2007/03/29 (CB): connectionfield/slice/sheetcoords</H4>
 HACKALERTs relating to connection fields; test file for
 connectionfield; cleaning up cf.py and projections/basic.py along with
@@ -113,20 +106,10 @@ simplifications that can be made).  Maybe we can use masked arrays,
 now that Numpy has support for several varieties that might meet our
 needs better than Numeric's did.
 
-
-<H4>2006/07/07 (CP): Fix normalization to allow negative weights.</H4> 
-
 <H4>2007/07/07: more tests </H4>
 We need a test with non-square input sheets, non-square LISSOM sheets, etc., 
 with both types of non-squareness...and we also need to test whatever
 map measurement that we can (e.g. or maps).
-
-<H4>2007/04/10 (JB): Add an example that is a good starting point for</H4>
-wrapping an external simulation as a Sheet in Topographica.  A
-first pass wrapping a spiking retina simulation written in PyNN/PyNEST
-was done at the FACETS CodeJam in March 2007, but a cleaner example
-can be made.
-
 
 <H4>2007/02/26: Move to IPython</H4>
 Would get command-prompt completion in the local namespace, debugging
@@ -147,10 +130,6 @@ http://www.digitalpeers.com/pythondebugger/.
 <!-- ------------------------------------------------------------------------ -->
 
 <H2>Things we hope to take care of eventually</H2>
-
-<H4>2006/11/09: plot outstar connections</H4>
-Add support for plotting outstar connections, i.e. outgoing
-ConnectionFields.
 
 <H4>2006/11/09 (RZ): map statistics</H4>
 Add support for automatic generation of reports with statistics about
@@ -764,6 +743,17 @@ http://scipy.org/NumPy_for_Matlab_Users
 
 _________________________________________________________
 
+> Second, is there any way to prevent obscure errors like this by
+> checking to make sure that a Parameter is owned by a
+> ParameterizedObject? I can't quite imagine how to do this, because
+> when the Parameter is constructed it's not owned by anything at all.
+
+Unfortunately you can't patch __setattr__ on <type> or
+<object>.  Seems like there should be some clever way, but I can't think
+of anything off the top of my head.
+
+
+_________________________________________________________
 
 Effective logging
 
@@ -790,8 +780,11 @@ I also added a shell alias for convenience:
 Now I have a nice little directory with everything I ever type in, organized by project and date.
 
 
+_________________________________________________________
 Enhanced Interactive Python with IPython
 http://www.onlamp.com/pub/a/python/2005/01/27/ipython.html?page=1
+
+
 
 
 
