@@ -159,17 +159,6 @@ Measurement of numpy.sum(X)/X.sum()/sum(X) performance. Difference
 between simulation results on different platforms (for slow-tests in
 Makefile).
 
-<H4>2007/09/24 (JB) More icons for buttons</H4> 
-We've now added icons for the buttons in PlotGroupPanel.  These need
-to be used in the Model Editor as well for consistency, and it might
-also be useful to develop icons for the parameters in PlotGroupPanel,
-not just the buttons.  That will require more work, i.e. finding a
-suitable starting icon in BlueSphere-SVG-snapshot-Nov-29-2002, editing
-it using Inkscape, and adding it to the distribution, plus making
-BooleanParameter support images.  But the result should be much
-cleaner-looking windows, with more screen space devoted to the images
-rather than the text.
-
 <H4>2007/05/29 (JP) Mac GUI cleanup</H4>
 The Mac GUI needs a variety of things to make it more Mac-like.
 <ul>
@@ -221,12 +210,6 @@ simpler.
 Can we have a matlab-like workspace?
 
 
-<H4>2007/03/26: wrap MDP</H4>
-Add a wrapper around the Modular Data Processing (MDP) toolkit
-(http://mdp-toolkit.sourceforge.net) to provide easy access to the
-PCA, ICA, SFA, ISFA, etc. algorithms.
-
-
 <H4>2005/01/01: components from external packages </H4>
 Could consider using or taking components from: SciPy,
 ScientificPython, Chaco, Pyro (the robotics package), g, logger
@@ -246,79 +229,6 @@ ScientificPython, Chaco, Pyro (the robotics package), g, logger
 ...   print "Not using blas/lapack!"
 </pre>
 
-
-<H4>2006/02/04 (JAB): tune non-inline-optimtized components</H4>
-Should work through some of the most commonly used
-non-inline-optimized components to see if the implementation can be
-tuned slightly for better performance.  For instance, numpy.dot()
-appears to be much faster than the current sum(x*y) implementation of
-DotProduct:
-
-<pre>
-Topographica_t0> import time,numpy,Numeric
-Topographica_t0> def runtime(code): start = time.time() ; 
-... z = eval(code) ; end = time.time() ; print z, end-start
-Topographica_t0> x=2*numpy.ones((1000,10000))
-Topographica_t0> y=numpy.ones((1000,10000))
-Topographica_t0> runtime("numpy.dot(x.ravel(),y.ravel())")
-20000000.0 0.122502088547
-Topographica_t0> runtime("numpy.sum(x.ravel()*y.ravel())")
-20000000.0 0.312201976776
-Topographica_t0> 
-Topographica_t0> 
-Topographica_t0> x=2*Numeric.ones((1000,10000))
-Topographica_t0> y=Numeric.ones((1000,10000))
-Topographica_t0> runtime("Numeric.dot(x.flat,y.flat)")
-20000000 0.0919671058655
-Topographica_t0> runtime("Numeric.sum(x.flat*y.flat)")
-20000000 0.358192205429
-</pre>
-
-After this, it would be interesting to get some hard numbers about how
-much faster the inline-optimized components are than those using numpy
-primitives.
-
-
-<H4>2006/11/09 (JA): parameter spaces</H4>
-Add better support for exploring and optimizing parameter spaces.
-
-
-<H4>2006/12/21: lock to real time?</H4>
-Could add an option to lock Topographica to real time, so that once
-processing is done at a particular virtual time, it waits until the
-next real time before moving to the next event (which may be different
-due to real-time input arriving by then).  On the other hand, maybe
-this isn't necessary?  E.g. everything could be driven from a
-PatternGenerator that produces a new pattern whenever some real-world
-input arrives, and then the rest of the processing can be triggered
-from that, as fast as it can compute.  Worth thinking about, e.g. to
-handle simple webcam input.
-
-
-<H4>2006/06/03: zero-sized CFs</H4>
-Allow min_matrix_radius to be set to zero, and then say that if no
-unit ends up in the CF, then there will be no CF for that unit.  But
-that's going to make the rest of the code hard to write, because we'll
-either have to deal with CFs with empty matrices, or deal with CFs
-missing altogether.  (As an example, the problem of zero-sized CFs
-arises in examples/joublin_bc96.ty.)  Maybe it would be simplest to
-use a non-zero CF size, but with a mask making no unit visible; not
-sure.
-
-
-<H4>2006/05/19: pychecker</H4>
-look at the output from:
-bin/python lib/python2.4/site-packages/pychecker/checker.py topo/base/*.py
-Decide which ones of the messages are real problems.  Running it
-right now gives 86 warnings, which isn't too hard to imagine looking
-at.  Some of them look like things that could be genuinely confusing,
-and would be easy to fix (like having local variables named min or
-max), and at least one detected an existing hackalert.  Some others
-are clearly not problems, but then there is a huge category that I
-don't quite understand (like "Function (__init__) uses named
-arguments" or "__set__ is not a special method"); those would be worth
-understanding.  Once that's done for base/, the rest should be much
-easier.
 
 
 <H4>2006/05/15: array type</H4>
