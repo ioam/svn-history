@@ -252,9 +252,6 @@ topo/base/simulation.py:657: Parameter (sim) not used
 topo/base/parameterizedobject.py:540: Passing a constant string to setattr, consider direct reference
 
 
-topo/base/cf.py:763: Unpacking a non-sequence (weights_slice) of type Slice
-
-
 topo/base/cf.py:34: Using import and from ... import for (patterngenerator)
 
 
