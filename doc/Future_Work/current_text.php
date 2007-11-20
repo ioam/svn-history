@@ -479,7 +479,12 @@ Display issues;
    like this, because the simulator is not limited to vision only, and so
    the underlying units have to be very general.
    See http://ipython.scipy.org/doc/manual/node11.html
-   for bg on handling arbitrary units.
+   for bg on handling arbitrary units.  For example:
+     ipython -p physics
+       In [1]: x = 3 m/s^2
+       In [2]: y = 15 s
+       In [3]: x*y
+       Out[3]: 45 m/s
  )
 
 Minor
@@ -602,11 +607,14 @@ http://www.psych.ndsu.nodak.edu/brady/downloads.html
 
 <!-- NOTES NEEDING TO BE TURNED INTO TASKS 
 
+The DAVIS visualization system might be useful to study, especially when moving
+to 2-photon-imaging-like models: http://vip.cs.utsa.edu/research/Davis
 
 Any idea what this does?
 alterdot()
 numpy.alterdot(...)
 alterdot() changes all dot functions to use blas.
+(but note that dot() is, for some reason, not a dot product.)
 
 _________________________________________________________
 
