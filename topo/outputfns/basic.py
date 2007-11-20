@@ -338,7 +338,7 @@ class PoissonSample(OutputFn):
        Poisson process rate.""")
     
     out_scale = Number(default=1.0,doc="""
-       Amount by which to scale the output (e.g. 1.0/in_scale)""")
+       Amount by which to scale the output (e.g. 1.0/in_scale).""")
 
     def __call__(self,x):
         
