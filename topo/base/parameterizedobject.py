@@ -307,7 +307,7 @@ class Parameter(object):
         """
         Delete a parameter.  Raises an exception.
         """
-        raise "Deleting parameters is not allowed."
+        raise TypeError("Deleting parameters is not allowed.")
 
 
     def get_name(self,obj):
@@ -884,7 +884,7 @@ class ParameterizedObject(object):
 
         Same as getattr() except for DynamicNumbers
         """
-        from parameterclasses import DynamicNumber
+        from parameterclasses import DynamicNumber 
         
         # Avoids getting a new value for a DynamicNumber. Otherwise,
         # all that would be here is value=getattr(self,name).)
