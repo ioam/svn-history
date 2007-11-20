@@ -35,13 +35,12 @@ PHPHTML = ${subst _text.php,.html,${PHPBASE}}
 %.php : %.php.m4 shared/bib2html.m4
 	${M4} $< > $@
 
-# Extra dependency
-Home/index.html: Home/news_text.php
-
 # Generate HTML files from source versions
 default: bib2html imagedirs all
 all: ${PHPHTML}
 
+# Extra dependency
+Home/index.html: Home/news_text.php
 
 # Can also add --graph=classtree for graphical class diagrams
 reference-manual: Reference_Manual/toc.html
