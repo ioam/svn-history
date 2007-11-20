@@ -1,3 +1,465 @@
+2007-11-20  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.326: Removed all the
+	pychecker output and restored general task description.
+
+	* topo/base/sheet.py 1.122: Added to comment.
+
+	* Makefile 1.131: check-base: added --stdlib to ignore warnings
+	from files in standard library (I think that includes
+	site-packages/)
+
+	* Makefile 1.130: Added check-base section for running pychecker
+	on topo.base.
+
+	* doc/buildbot/.pycheckrc 1.1: Initial version.
+
+	* doc/Future_Work/current_text.php 1.325: Removed bogus pychecker
+	output: the Slice class implements __iter__, which is enough for
+	unpacking.
+
+	* topo/base/sheet.py 1.121: Added note.
+
+	* topo/base/cf.py 1.102: What should have happened in the previous
+	commit.
+
+	* doc/Future_Work/current_text.php 1.324: Fixed pychecker problem.
+
+	* topo/base/arrayutils.py 1.27: Explicity pass 0,0 to complex()
+	(at least currently, complex()==complex(0,0)).
+
+	* topo/tkgui/parametersframe.py 1.144: Altered a comment.
+
+	* doc/Future_Work/current_text.php 1.323: Fixed pychecker
+	problems.
+
+	* topo/base/parameterclasses.py 1.94: Fixed comparisons with True
+	and False.
+
+	* topo/base/cf.py 1.101: Fixed comparison with True.
+
+	* doc/Future_Work/current_text.php 1.322: Fixed a pychecker
+	problem in parameterizedobject.py (v1.85).
+
+	* doc/Future_Work/current_text.php 1.321: Added back revised
+	pychecker task.
+
+	* topo/base/parameterizedobject.py 1.86: Removed unused
+	abtract_class argument from ParameterizedObject.__init__.
+
+	* topo/base/parameterizedobject.py 1.85: Changed
+	parameter-deletion's string error to TypeError.
+
+2007-11-19  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/image.py 1.67: Fixed copy-and-paste error; Image
+	is called PIL in this file to avoid name conflict.  Loading a
+	snapshot with an image should work now.
+
+2007-11-19  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.320: Moved tasks to trackers
+	on sf.net.
+
+	* doc/Future_Work/current_text.php 1.319: Moved items to
+	tracker. Added some notes.
+
+2007-11-18  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/widgets.py 1.24: Added a comment.
+
+	* topo/tkgui/featurecurvepanel.py 1.38,
+	topo/tkgui/projectionpanel.py 1.159: Use tag_set() rather than
+	refresh() for TaggedSlider.
+
+	* topo/tkgui/tkparameterizedobject.py 1.119: Corrected import.
+
+	* topo/tkgui/tkparameterizedobject.py 1.118,
+	topo/tkgui/topowidgets.py 1.28: Removed TkPOTaggedSlider (does
+	nothing more than TaggedSlider).
+
+	* topo/tkgui/plotgrouppanel.py 1.266: Fixed bug with history
+	mechanism: plotgroup now added to history whenever refresh_plots()
+	called, and is only added if there are actually plots.
+
+	* topo/tkgui/parametersframe.py 1.143: Added note for myself.
+
+	* topo/misc/commandline.py 1.66: Simplification to gui starting.
+
+	* topo/tkgui/__init__.py 1.44: start() prints 'Launching GUI'
+	message.
+
+	* topo/misc/commandline.py 1.65: Make sure IPython quits when
+	topographica not started for interactive use.
+
+	* Makefile 1.129: (topographica script) When using IPython, Ctrl+D
+	now quits immediately (as for python).
+
+	* doc/Future_Work/current_text.php 1.318: Added note.
+
+	* topo/tests/testparametersframe.py 1.12,
+	topo/tests/testtkparameterizedobject.py 1.27: Updates to match
+	tkparameterizedobject 1.117.
+
+	* topo/tkgui/projectionpanel.py 1.158: Renamed tk_vars to tkvars.
+
+	* topo/tkgui/parametersframe.py 1.142: Updates to match
+	tkparameterizedobject.py 1.117.
+
+	* topo/tkgui/tkparameterizedobject.py 1.117: Improvements to
+	Parameter-Tkinter linkage.
+
+	Major: - unapplied changes to parameter values are indicated with
+	blue labels - parameters that are not set to class defaults have a
+	green label background - an error in a parameter value is
+	indicated with red labels (note that the above indication styles
+	are temporary)
+
+	Minor: - fixed _get_tk_val to return gui variable value - no
+	attempt to set Parameter if string-to-value translation fails
+
+	Internal: - simplified handling of GUI editing of variables -
+	translation code moved from TkParameterizedObjectBase to separate
+	classes - renamed tk_var to tkvar - renamed
+	object2string_ifrequired to _object2string - renamed
+	string2object_ifrequired to _string2object (also added some debug
+	messages)
+
+	* topo/patterns/image.py 1.66: Added support for pickling
+	GenericImage (PIL's Image cannot be pickled).
+
+	* Makefile 1.128: (topographica script) Start ipython as in
+	bin/ipython.
+
+	* topo/misc/commandline.py 1.64: Removed import of weave (was
+	originally required for Windows version, but seems no longer to be
+	needed).
+
+2007-11-16  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Links/index_text.php 1.12: Added some info about NCS; not
+	much info seems available.
+
+2007-11-16  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/arrayutils.py 1.26: Commented out code that I think is
+	never being called.
+
+2007-11-16  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/sheets/generatorsheet.py 1.59: Fixed longstanding typos in
+	apparently never-used line of code
+
+2007-11-15  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulation.py 1.110: Made eps_to_start backwards
+	compatible with 0.9.4 so that 0.9.4 saved snapshots can be loaded.
+
+	* topo/misc/keyedlist.py 1.11: Added values() method to match a
+	regular dictionary
+
+	* topo/commands/pylabplots.py 1.46: Added ability to specify the x
+	values of a vectorplot
+
+	* topo/misc/commandline.py 1.63: Minor simplification
+
+	* topo/misc/commandline.py 1.62: Drastically simplified so that
+	all options are processed as they are encountered, without any
+	list of commands to execute later
+
+2007-11-15  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testparametersframe.py 1.11,
+	topo/tests/testtkparameterizedobject.py 1.26: Starting tkgui when
+	this test is imported causes problems if there's no DISPLAY. Only
+	need to start tkgui if the test is run alone, so having the code
+	isn't important anyway (can just pass -g).
+
+2007-11-14  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.138: Cleaned up decode_feature
+
+	* topo/base/simulation.py 1.109, topo/sheets/lissom.py 1.75:
+	Removed Simulation.execute_next, and instead made EP.start() be
+	called just before the simulation begins processing events.
+
+2007-11-14  rczhao  <rczhao@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.137: Fixed an indentation error.
+
+	* topo/commands/analysis.py 1.136: Added a decode_feature
+	function.
+
+2007-11-14  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/commandline.py 1.61: Added gui() and
+	auto_import_commands() functions to allow -g and -a options to be
+	run explicitly even after Topographica has started
+
+2007-11-13  rczhao  <rczhao@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/image.py 1.65: Fixed a boolean comparison problem
+	caused by new version of numpy.
+
+2007-11-13  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/templateplotgrouppanel.py 1.103: Trivial fix to typo
+	in comment
+
+	* examples/joublin_bc96.ty 1.21, examples/laminar_oo_or.ty 1.14,
+	examples/laminar_or.ty 1.9, examples/leaky_lissom_or.ty 1.21,
+	examples/lgn_lateral.ty 1.4, examples/lissom_fsa.ty 1.21,
+	examples/lissom_oo_dr.ty 1.3, examples/lissom_oo_od.ty 1.16,
+	examples/lissom_oo_or_dy_photo.ty 1.9,
+	examples/lissom_oo_or_homeomaxent.ty 1.14,
+	examples/lissom_oo_or_noshrinking_latswitch.ty 1.6,
+	examples/lissom_or_homeomaxent.ty 1.13,
+	examples/lissom_or_homeoscale.ty 1.17,
+	examples/lissom_or_noshrinking.ty 1.13,
+	examples/lissom_or_noshrinking_latswitch.ty 1.12,
+	examples/lissom_photo_or.ty 1.11,
+	examples/lissom_whisker_barrels.ty 1.20,
+	examples/obermayer_pnas90.ty 1.53, examples/ohzawa_science90.ty
+	1.10, examples/som_retinotopy.ty 1.58,
+	examples/sullivan_neurocomputing04.ty 1.23,
+	examples/sullivan_nn06.ty 1.21: Removed now-unnecessary setting of
+	topo.sim.name
+
+	* topo/misc/commandline.py 1.60: Trivial doc cleanup
+
+2007-11-13  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulation.py 1.108: Removed unnecessary 'or' (no
+	visible change).
+
+2007-11-13  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/commandline.py 1.59: Moved sim name setting to before
+	the .ty file is executed, so that the .ty file can override it.
+
+2007-11-13  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.127: (topographica script) Make IPython's user
+	namespace be __main__.
+
+	* topo/base/simulation.py 1.107: Do set Simulation name if one is
+	passed to Simulation.__init__. (Fixes failing tests that expect
+	Simulations with specific names.)
+
+	* topo/tests/__init__.py 1.23: Added convenience function (for
+	me): run a single test.
+
+	* examples/cfsom_or.ty 1.64, examples/goodhill_network90.ty 1.20,
+	examples/hierarchical.ty 1.71, examples/lissom_oo_or.ty 1.94,
+	examples/lissom_or.ty 1.125, examples/tiny.ty 1.32: Removed
+	assignment of topo.sim.name.
+
+	* topo/misc/commandline.py 1.58: Removed apparently out-of-date
+	ALERT.
+
+	* topo/tkgui/topoconsole.py 1.251: Renamed sim_title_from_filename
+	to sim_name_from_filename.
+
+	* topo/misc/commandline.py 1.57: Automatic simulation naming now
+	takes account of filenames supplied *before* the first commandline
+	option. (Also: renamed sim_title_from_filename to
+	sim_name_from_filename; renamed get_filenames to
+	get_postoption_filenames.
+
+	* topo/misc/commandline.py 1.56: Minor change to code style - no
+	visible change.
+
+	* topo/misc/commandline.py 1.55: Moved execution of startup
+	file(s) into a function, and made two changes: (1) 'Executing
+	startup file...' message printed whether option.interactive/gui or
+	not (although if not interactive, print statement will not show up
+	anywhere); (2) if there is an error in a startup file, execution
+	stops at that point (and if interactive, returns to a prompt).
+
+	* topo/misc/commandline.py 1.54: Added comment to ALERT about
+	weave on Windows.
+
+	* topo/misc/commandline.py 1.53: Commented out print statement
+	(otherwise, if you pass -g at the end of the command used to start
+	topographica it would be printed).
+
+	* doc/Future_Work/current_text.php 1.317: Removed erroneous
+	example of not needing a Connection Fields plot.
+
+2007-11-12  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/robotics.py 1.1: Robotics-related classes for
+	topographica.
+
+	* topo/misc/playerrobot.py 1.1: High-level interface to the Player
+	client libraries.  This is a temporary home for this file until it
+	finds a permanent home (maybe in the PlayerStage project or in
+	PLASTK?)
+
+	* examples/saccade_demo.ty 1.10: Updated to support image
+	sequences in ShiftingGeneratorSheet.
+
+	* topo/patterns/image.py 1.64: Refactored the Image class to allow
+	images that are generated through other means than reading a file.
+	(e.g. from a camera)
+
+	* topo/outputfns/basic.py 1.63: Moved Pipeline class to
+	base/functionfamilies.py.  Added PoissonSample OF class.
+
+	* topo/base/functionfamilies.py 1.20: Added operator support to
+	OutputFn class to allow construction of Pipelines using '+'
+	operator.  Moved Pipeline class in from outputfns/basic.py, as
+	PipelineOF.
+
+	* topo/base/simulation.py 1.106: Minor refactoring to allow
+	real-time (and other) simulation subclasses.
+
+2007-11-12  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulation.py 1.105, topo/misc/commandline.py 1.52,
+	topo/tkgui/topoconsole.py 1.250: Change default Simulation name to
+	be None, instead of Simulation00001, but have it be set
+	automatically based on the first script run (from the command line
+	or from Run Script).
+
+2007-11-11  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.316: Removed topoconsole
+	title task.
+
+	* topo/tkgui/topoconsole.py 1.249: Minor modification to title,
+	plus remove set-title-on-run hack.
+
+	* topo/misc/commandline.py 1.51: Set the console name if starting
+	the gui.
+
+	* topo/tkgui/topoconsole.py 1.248: Update the title after loading
+	a script or snapshot.
+
+	* doc/Future_Work/current_text.php 1.315: Moved some tasks out to
+	the sf.net feature requests tracker.
+
+	* topo/tests/testparametersframe.py 1.10,
+	topo/tests/testtkparameterizedobject.py 1.25: Start tkgui before
+	running the tests.
+
+	* Makefile 1.126: (Topographica script) Added colors=NoColor for
+	ipython.
+
+	* topo/tkgui/tkparameterizedobject.py 1.116: Minor cleanup of
+	mechanism for passing messages to the console. Also, minor cleanup
+	of some docstrings.
+
+	* topo/tkgui/__init__.py 1.43: (1) Moved system_platform code to
+	widgets.py because of circular import problems (when trying to use
+	topo.tkgui from several of the files in topo/tkgui, get 'module
+	does not contain tkgui' attribute error). (2) Moved 'entry
+	background hack to topowidgets.py. (3) Made start() return
+	immediately if a console already exists.
+
+	* topo/tkgui/widgets.py 1.23: Moved system_platform from __init__
+	to widgets.
+
+	* topo/tkgui/topowidgets.py 1.27: Moved entry background hack from
+	__init__ to topowidgets.
+
+	* topo/tkgui/topoconsole.py 1.247: Moved system_platform from
+	__init__ to widgets.
+
+	* topo/tkgui/__init__.py 1.42: Removed function that doesn't seem
+	to be used in any existing code.
+
+	* Makefile 1.125: Added starting point to show how to change
+	ipython's command prompt. (Haven't figured out if it's possible to
+	change the prompt once ipython has started.)
+
+	* doc/Future_Work/current_text.php 1.314: Added some notes.
+
+	* topo/tests/testtkparameterizedobject.py 1.24: Stop using the
+	alias get_parameter (use get_parameter_object).
+
+	* external/Makefile 1.85: Uninstall current gnosis before making
+	it.
+
+2007-11-10  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/templateplotgrouppanel.py 1.102: Fixed bug where
+	labels were not being drawn when a panel was first opened if the
+	plot data came from e.g. a snapshot.
+
+	* topo/tkgui/testpattern.py 1.103: TestPattern windows no longer
+	all share the same PlotGroup (a bug). Renamed TestPattern's
+	PlotGroup to 'Test Pattern' (from outdated 'Preview').
+
+2007-11-09  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testsnapshots.py 1.17: Added commented-out xml
+	snapshot test.
+
+	* topo/tests/testsnapshots.py 1.16: Refactor to allow tests to be
+	duplicated for xml pickles.
+
+	* external/Makefile 1.84: Switch to 1.3.0-alpha-7 version of
+	Gnosis Utils.
+
+	* topo/commands/basic.py 1.80: Updated commands to work with
+	changed gnosis.xml.pickle module.
+
+	* external/Gnosis_Utils-1.3.0-alpha-7.tar.gz 1.1: Test version
+	(for xml pickling problems with numpy) direct from author.
+
+	* Makefile 1.124: topographica script: try to use IPython shell if
+	IPython has been built.
+
+2007-11-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/cygwin_text.php 1.4: Added link to packages list.
+
+2007-11-06  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/cygwin_text.php 1.3: Added a note.
+
+	* doc/Downloads/cygwin_packages 1.1: Cygwin packages present when
+	I built pre-March 2007 topographica. Needs to be pared down and
+	updated. (Created with 'cygcheck -c'.)
+
+	* doc/Downloads/cygwin_text.php 1.2: Updated information about
+	GUI.
+
+	* external/Makefile 1.83: Removed Numeric section.
+
+	* doc/Downloads/cygwin_text.php 1.1: Initial version (originally
+	produced in March 2007).
+
+2007-11-05  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Developer_Manual/gui_text.php 1.7,
+	doc/Future_Work/index_text.php 1.31: Fixed typo.
+
+2007-11-01  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* ChangeLog.txt 1.25: Updated with recent changes
+
+	* doc/Tutorials/images/topographica_console.png 1.5,
+	doc/Tutorials/images/unit_weights_0_0_oo.png 1.6,
+	doc/Tutorials/images/unit_weights_0_0_oo_or.png 1.6,
+	doc/Tutorials/images/unit_weights_41_24_oo_or.png 1.2,
+	doc/Tutorials/images/activity_line_oo.png 1.7,
+	doc/Tutorials/images/activity_line_oo_or.png 1.7,
+	doc/Tutorials/images/lissom_oo_or_orpref_ft.png 1.2,
+	doc/Tutorials/images/natural_image_oo_or.png 1.6,
+	doc/Tutorials/images/natural_image_projact_oo_or.png 1.2,
+	doc/Tutorials/images/oo_or_map.png 1.6,
+	doc/Tutorials/images/projection_oo.png 1.6,
+	doc/Tutorials/images/test_pattern_oo.png 1.6,
+	doc/Tutorials/lissom_oo_or_text.php 1.33: Updated lissom_oo_or
+	tutorial images
+
+2007-11-01  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulation.py 1.104: Corrected test for None in
+	timestr(). (Fix incorrect time in plotgroups history.)
+
 2007-11-01  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
 	* doc/Tutorials/images/topographica_console.png 1.5,
@@ -51,24 +513,6 @@
 2007-10-29  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
 	* ChangeLog.txt 1.24: Added recent changes
-
-	* topo/tkgui/plotgrouppanel.py 1.265:
-	Disable enlarge and reduce when there are no plots
-
-	* topo/plotting/plotgroup.py 1.235:
-	Minor cleanup, plus fixed bug in return value that was preventing Reduce button from ever being disabled
-
-2007-10-29  ceball  <ceball@lodestar.inf.ed.ac.uk>
-
-	* topographica-win/create_installer/prepare_for_installer.bat 1.11:
-	Added ALERT.
-
-	* topographica-win/create_installer/prepare_for_installer.bat 1.10:
-	Corrections and updates to match Makefile.
-
-	* topographica-win/create_python_topo/README.txt 1.7: Added a note.
-
-2007-10-29  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
 	* topo/tkgui/plotgrouppanel.py 1.265: Disable enlarge and reduce
 	when there are no plots
