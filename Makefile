@@ -89,6 +89,9 @@ topographica: external Makefile
 check:
 	${PYCHECKER} topo/*.py topo/*/*.py
 
+check-base:
+	${PYCHECKER} --config doc/buildbot/.pycheckrc topo/base/*.py 
+
 lint:
 	${PYLINT} topo/*.py topo/*/*.py
 
