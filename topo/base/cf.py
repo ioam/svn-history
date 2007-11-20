@@ -94,7 +94,7 @@ class ConnectionField(ParameterizedObject):
         See the norm_total property for more details.
         """
         # The actual value is cached in _norm_total.
-        if self._has_norm_total == True:
+        if self._has_norm_total is True:
             return self._norm_total
         else:
             return abs(self.weights).sum()
