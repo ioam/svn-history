@@ -678,7 +678,7 @@ class ParameterizedObject(object):
     print_level = Parameter(default=MESSAGE,hidden=True)
 
     
-    def __init__(self,abstract_class=None,**params):
+    def __init__(self,**params):
         """
         Initialize this ParameterizedObject.
 
