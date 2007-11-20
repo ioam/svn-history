@@ -260,9 +260,6 @@ topo/base/simulation.py:657: Parameter (sim) not used
 topo/base/parameterizedobject.py:540: Passing a constant string to setattr, consider direct reference
 
 
-topo/base/parameterizedobject.py:310: Raising string exceptions are deprecated (Deleting parameters is not allowed.)
-
-
 topo/base/cf.py:763: Unpacking a non-sequence (weights_slice) of type Slice
 
 
