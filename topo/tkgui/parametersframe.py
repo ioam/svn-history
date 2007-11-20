@@ -20,8 +20,11 @@ __version__='$Revision$'
 # CEB: still working on this file
 
 
-# Fixing next:
-# - defaults button doesn't restore some things to default value?
+# KNOWN ISSUES
+#
+# - Defaults button doesn't work for SelectorParameters (need to insert
+#   new (class default) object into the list).
+#
 
 import Tkinter, tkMessageBox, _tkinter
 
