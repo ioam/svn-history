@@ -243,7 +243,8 @@ class Slice(object):
         return (r1,r2,c1,c2)
 
 
-    # CBENHANCEMENT: might want to add __getitem__ for []-style access
+    # CBENHANCEMENT: might want to add __getitem__ for []-style access,
+    # along with other sequence-like methods.
     def __iter__(self):
         """
         Make this object behave like a sequence.
