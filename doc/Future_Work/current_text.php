@@ -161,12 +161,6 @@ topo/base/cf.py:386: __slots__ are empty in CFPResponseFnParameter
 topo/base/cf.py:440: __slots__ are empty in CFPLearningFnParameter
 topo/base/cf.py:529: __slots__ are empty in CFPOutputFnParameter
 
-
-topo/base/cf.py:97: Comparisons with True are not necessary and may not work as expected
-topo/base/parameterclasses.py:276: Comparisons with False are not necessary and may not work as expected
-topo/base/parameterclasses.py:276: Comparisons with True are not necessary and may not work as expected
-topo/base/parameterclasses.py:501: Comparisons with True are not necessary and may not work as expected
-
 topo/base/boundingregion.py:388: Function (__init__) doesn't support **kwArgs
 
 topo/base/arrayutils.py:14: Function (set_printoptions) uses named arguments
