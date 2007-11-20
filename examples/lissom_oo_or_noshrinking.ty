@@ -38,7 +38,7 @@ from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear,DivisiveNormalizeL1, Pipeline
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
-from topo.outputfns.homeostatic import HomeostaticMaxEnt, AdaptingHomeostaticMaxEnt, OutputFnDebugger
+from topo.outputfns.homeostatic import HomeostaticMaxEnt, OutputFnDebugger
 from topo.patterns.basic import Gaussian
 
 
@@ -72,24 +72,12 @@ if output_fn_type  == 'Homeostatic':
     topo.sim.name = "lissom_oo_or_noshrinking"
     output_fn = HomeostaticMaxEnt(eta=0.0002, **shared_params) 
 
-elif output_fn_type == 'AdaptingHomeostatic':
-
-    topo.sim.name = "lissom_oo_or_noshrinking_adapthomeo"
-    output_fn =AdaptingHomeostaticMaxEnt(eta_init=0.0002, lstep=8, rate_factor=0.1, **shared_params)
-
 elif output_fn_type == "Homeostatic_debug":
 
     topo.sim.name = "lissom_oo_or_noshrinking_debug"
     HE=HomeostaticMaxEnt(eta=0.0002, **shared_params )
     OD=OutputFnDebugger(function=HE, **shared_debug_params)
     output_fn=Pipeline(output_fns=[HE, OD])
-
-elif output_fn_type == 'AdaptingHomeostatic_debug':
-
-    topo.sim.name = "lissom_oo_or_noshrinking_adapthomeo_debug"
-    AH = AdaptingHomeostaticMaxEnt(eta_init=0.0002,lstep=8, rate_factor=0.1,**shared_params)
-    OD=OutputFnDebugger(function=AH,**shared_debug_params )
-    output_fn=Pipeline(output_fns=[AH, OD])
 
 
 
