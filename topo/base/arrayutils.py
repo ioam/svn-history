@@ -56,7 +56,7 @@ def arg(z):
     Return the complex argument (phase) of z.
     (z in radians.)
     """
-    z = z + complex()  # so that arg(z) also works for real z
+    z = z + complex(0,0)  # so that arg(z) also works for real z
     return arctan2(z.imag, z.real)
 
 
