@@ -122,6 +122,153 @@ breakpoint occurred.  Also consider an alternative debugger,
 http://www.digitalpeers.com/pythondebugger/.
 
 
+<H4>2007/11/20: output from pychecker in topo.base</H4>
+
+topo/base/cf.py:30: (abs) shadows builtin
+topo/base/parameterclasses.py:702: (max) shadows builtin
+topo/base/parameterclasses.py:702: (min) shadows builtin
+topo/base/arrayutils.py:136: (range) shadows builtin
+topo/base/arrayutils.py:10: (sum) shadows builtin
+topo/base/simulation.py:1053: (vars) shadows builtin
+topo/base/simulation.py:1068: (vars) shadows builtin
+
+
+topo/base/parameterizedobject.py:306: __delete__ is not a special method
+topo/base/parameterclasses.py:110: __get__ is not a special method
+topo/base/parameterclasses.py:394: __get__ is not a special method
+topo/base/parameterclasses.py:449: __get__ is not a special method
+topo/base/parameterclasses.py:522: __get__ is not a special method
+topo/base/parameterizedobject.py:259: __get__ is not a special method
+topo/base/boundingregion.py:182: __set__ is not a special method
+topo/base/boundingregion.py:415: __set__ is not a special method
+topo/base/parameterclasses.py:138: __set__ is not a special method
+topo/base/parameterclasses.py:246: __set__ is not a special method
+topo/base/parameterclasses.py:272: __set__ is not a special method
+topo/base/parameterclasses.py:290: __set__ is not a special method
+topo/base/parameterclasses.py:326: __set__ is not a special method
+topo/base/parameterclasses.py:354: __set__ is not a special method
+topo/base/parameterclasses.py:45: __set__ is not a special method
+topo/base/parameterclasses.py:531: __set__ is not a special method
+topo/base/parameterclasses.py:634: __set__ is not a special method
+topo/base/parameterclasses.py:684: __set__ is not a special method
+topo/base/parameterizedobject.py:277: __set__ is not a special method
+topo/base/simulation.py:371: __set__ is not a special method
+
+
+topo/base/boundingregion.py:179: __slots__ are empty in Cartesian2DPoint
+topo/base/boundingregion.py:409: __slots__ are empty in BoundingRegionParameter
+topo/base/cf.py:386: __slots__ are empty in CFPResponseFnParameter
+topo/base/cf.py:440: __slots__ are empty in CFPLearningFnParameter
+topo/base/cf.py:529: __slots__ are empty in CFPOutputFnParameter
+
+
+topo/base/cf.py:97: Comparisons with True are not necessary and may not work as expected
+topo/base/parameterclasses.py:276: Comparisons with False are not necessary and may not work as expected
+topo/base/parameterclasses.py:276: Comparisons with True are not necessary and may not work as expected
+topo/base/parameterclasses.py:501: Comparisons with True are not necessary and may not work as expected
+
+topo/base/boundingregion.py:388: Function (__init__) doesn't support **kwArgs
+
+topo/base/arrayutils.py:14: Function (set_printoptions) uses named arguments
+topo/base/boundingregion.py:217: Function (__init__) uses named arguments
+topo/base/cf.py:369: Function (__init__) uses named arguments
+topo/base/cf.py:428: Function (__init__) uses named arguments
+topo/base/cf.py:450: Function (__init__) uses named arguments
+topo/base/cf.py:488: Function (__init__) uses named arguments
+topo/base/cf.py:516: Function (__init__) uses named arguments
+topo/base/cf.py:556: Function (__init__) uses named arguments
+topo/base/cf.py:559: Function (__init__) uses named arguments
+topo/base/cf.py:565: Function (__init__) uses named arguments
+topo/base/cf.py:567: Function (__init__) uses named arguments
+topo/base/cf.py:574: Function (__init__) uses named arguments
+topo/base/cf.py:579: Function (__init__) uses named arguments
+topo/base/cf.py:584: Function (__init__) uses named arguments
+topo/base/cf.py:593: Function (__init__) uses named arguments
+topo/base/cf.py:596: Function (__init__) uses named arguments
+topo/base/cf.py:602: Function (__init__) uses named arguments
+topo/base/cf.py:606: Function (__init__) uses named arguments
+topo/base/cf.py:608: Function (__init__) uses named arguments
+topo/base/cf.py:611: Function (__init__) uses named arguments
+topo/base/cf.py:618: Function (__init__) uses named arguments
+topo/base/cf.py:70: Function (__init__) uses named arguments
+topo/base/cf.py:75: Function (__init__) uses named arguments
+topo/base/parameterclasses.py:258: Function (__init__) uses named arguments
+topo/base/parameterclasses.py:535: Function (attrib_name) uses named arguments
+topo/base/parameterclasses.py:571: Function (__init__) uses named arguments
+topo/base/parameterclasses.py:581: Function (attrib_name) uses named arguments
+topo/base/parameterclasses.py:620: Function (__init__) uses named arguments
+topo/base/parameterclasses.py:628: Function (attrib_name) uses named arguments
+topo/base/parameterclasses.py:678: Function (__init__) uses named arguments
+topo/base/parameterizedobject.py:1064: Function (get_PO_class_attributes) uses named arguments
+topo/base/parameterizedobject.py:740: Function (get_param_values) uses named arguments
+topo/base/projection.py:231: Function (send_output) uses named arguments
+topo/base/simulation.py:1197: Function (__init__) uses named arguments
+
+
+topo/base/arrayutils.py:59: Invalid arguments to (complex), got 0, expected between 1 and 2
+
+
+topo/base/cf.py:501: Local variable (norm_value) not used
+topo/base/cf.py:676: Local variable (e) not used
+topo/base/simulation.py:812: Local variable (remain) not used
+topo/base/simulation.py:817: Local variable (starttime) not used
+
+
+topo/base/boundingregion.py:412: Methods (rotate, scale) in BoundingBox need to be overridden in a subclass
+topo/base/cf.py:567: Methods (rotate, scale) in BoundingBox need to be overridden in a subclass
+topo/base/cf.py:572: Methods (function) in patterngenerator.Constant need to be overridden in a subclass
+topo/base/cf.py:577: Methods (function) in patterngenerator.Constant need to be overridden in a subclass
+topo/base/sheetcoords.py:206: Methods (rotate, scale) in BoundingBox need to be overridden in a subclass
+topo/base/sheetcoords.py:373: Methods (rotate, scale) in BoundingBox need to be overridden in a subclass
+
+
+topo/base/boundingregion.py:70: Modifying parameter (imports) with a default value may have unexpected consequences
+topo/base/parameterizedobject.py:763: Modifying parameter (imports) with a default value may have unexpected consequences
+topo/base/simulation.py:486: Modifying parameter (imports) with a default value may have unexpected consequences
+topo/base/simulation.py:501: Modifying parameter (imports) with a default value may have unexpected consequences
+
+
+topo/base/cf.py:41: Module member (from parameterclasses import BooleanParameter) re-imported
+
+
+topo/base/parameterizedobject.py:887: Module (parameterclasses) imports itself
+
+
+topo/base/parameterizedobject.py:460: No class attribute (_abstract_class_name) found
+
+
+topo/base/cf.py:371: Overridden method (__call__) doesn't match signature in class (<class 'cf.CFPResponseFn'>)
+topo/base/functionfamilies.py:59: Overridden method (__call__) doesn't match signature in class (<class 'functionfamilies.OutputFn'>)
+topo/base/simulation.py:125: Overridden method (init) doesn't match signature in class (<class 'simulation.Singleton'>)
+
+
+topo/base/boundingregion.py:66: Parameter (prefix) not used
+topo/base/cf.py:451: Parameter (params) not used
+topo/base/cf.py:490: Parameter (params) not used
+topo/base/parameterclasses.py:394: Parameter (objtype) not used
+topo/base/parameterclasses.py:449: Parameter (objtype) not used
+topo/base/parameterizedobject.py:259: Parameter (objtype) not used
+topo/base/parameterizedobject.py:681: Parameter (abstract_class) not used
+topo/base/simulation.py:1308: Parameter (prefix) not used
+topo/base/simulation.py:558: Parameter (sim) not used
+topo/base/simulation.py:582: Parameter (imports) not used
+topo/base/simulation.py:582: Parameter (prefix) not used
+topo/base/simulation.py:590: Parameter (sim) not used
+topo/base/simulation.py:657: Parameter (sim) not used
+
+
+topo/base/parameterizedobject.py:540: Passing a constant string to setattr, consider direct reference
+
+
+topo/base/parameterizedobject.py:310: Raising string exceptions are deprecated (Deleting parameters is not allowed.)
+
+
+topo/base/cf.py:763: Unpacking a non-sequence (weights_slice) of type Slice
+
+
+topo/base/cf.py:34: Using import and from ... import for (patterngenerator)
+
+
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
