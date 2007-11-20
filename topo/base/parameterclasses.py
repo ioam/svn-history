@@ -273,7 +273,7 @@ class BooleanParameter(Parameter):
         if not isinstance(val,bool):
             raise ValueError("BooleanParameter only takes a Boolean value.")
 
-        if val != True and val != False:
+        if val is not True and val is not False:
             raise ValueError("BooleanParameter must be True or False.")
 
         super(BooleanParameter,self).__set__(obj,val)
@@ -499,7 +499,7 @@ def concrete_descendents(parentclass):
     class will not be included.
     """
     return dict([(c.__name__,c) for c in descendents(parentclass)
-                 if not (hasattr(c,'abstract') and c.abstract==True)])
+                 if not (hasattr(c,'abstract') and c.abstract)])
 
 
 class CompositeParameter(Parameter):
