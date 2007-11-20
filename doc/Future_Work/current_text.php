@@ -199,8 +199,6 @@ topo/base/projection.py:231: Function (send_output) uses named arguments
 topo/base/simulation.py:1197: Function (__init__) uses named arguments
 
 
-topo/base/arrayutils.py:59: Invalid arguments to (complex), got 0, expected between 1 and 2
-
 
 topo/base/cf.py:501: Local variable (norm_value) not used
 topo/base/cf.py:676: Local variable (e) not used
