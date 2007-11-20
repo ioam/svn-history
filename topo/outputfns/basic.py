@@ -327,15 +327,18 @@ class KernelMax(OutputFn):
 
 
 
-
+# JABALERT: Needs class documentation
 class PoissonSample(OutputFn):
-
-    in_scale = Number(default=1.0,doc="""An amount to scale the input by.""")
+    
+    in_scale = Number(default=1.0,doc="""
+       Amount by which to scale the input.""")
+    
     baseline_rate = Number(default=0.0,doc="""
-       An constant to add to the input after scaling, resulting in a baseline
+       Constant to add to the input after scaling, resulting in a baseline
        Poisson process rate.""")
+    
     out_scale = Number(default=1.0,doc="""
-      An amount to scale the output by (e.g. 1/in_scale)""")
+       Amount by which to scale the output (e.g. 1.0/in_scale)""")
 
     def __call__(self,x):
         
