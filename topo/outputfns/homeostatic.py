@@ -11,15 +11,19 @@ __version__='$Revision$'
 import copy
 
 from numpy import exp,zeros,ones
-
+import matplotlib
 import topo
+import pylab
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 
+from pylab import save
 from topo.base.arrayutils import clip_in_place
 from topo.base.functionfamilies import OutputFn, OutputFnParameter, IdentityOF
 from topo.base.parameterclasses import Number, BooleanParameter, ListParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import activity_type
-
+from topo.commands.pylabplots import vectorplot
 
 class HomeostaticMaxEnt(OutputFn):
     """
@@ -86,10 +90,7 @@ class HomeostaticMaxEnt(OutputFn):
 class AdaptingHomeostaticMaxEnt(OutputFn):
     """
     Similar to HomeoMaxEnt, except that the learning rate (eta) also
-    changes depending on the current average activity.  This helps
-    make it safer to use large learning rates when input is sparse and
-    uneven, because it avoids oscillations caused by the thresholds
-    dropping for inactive neurons.
+    changes depending on the current average activity.
     
     The average activity is calculated as an exponential moving
     average with a smoothing factor (smoothing).  For more information
@@ -151,6 +152,9 @@ class AdaptingHomeostaticMaxEnt(OutputFn):
             self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
             self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
 
+
+
+
 class OutputFnDebugger(OutputFn):
     """
     Collates information for debugging as specifed by the
@@ -164,13 +168,13 @@ class OutputFnDebugger(OutputFn):
     function = OutputFnParameter(default=IdentityOF(), doc="""
     Output function whose parameters will be tracked.""")
     
-    debug_params = ListParameter(default=[], doc="""
+    debug_params = ListParameter(default=['a', 'b'], doc="""
     List of the function object's parameters that should be stored.""")
     
-    avg_params = ListParameter(default=[], doc="""
+    avg_params = ListParameter(default=['x'], doc="""
     List of the function object's parameters that should be averaged and stored.""")
     
-    units= ListParameter(default=[], doc="""
+    units= ListParameter(default=[(0,0)], doc="""
     Units for which parameter values are stored.""")
     
     step=Number(default=8, doc="How often to update debugging information and calculate averages")
@@ -191,62 +195,65 @@ class OutputFnDebugger(OutputFn):
     
         
     def __call__(self,x):
+      
+        x_copy=x
         if self.first_call:
 	    self.first_call = False
             self.avg_values={}
             for ap in self.avg_params:
-                self.avg_values[ap]=zeros(x.shape, x.dtype.char)
+                self.avg_values[ap]=zeros(x_copy.shape, x_copy.dtype.char)
         self.n_step += 1
         if self.n_step == self.step:
             self.n_step = 0
             for dp in self.debug_params:
                 for u in self.units:
-                    value_matrix= getattr(self.function, dp)
-                    value=value_matrix[u]
-                    self.debug_dict[dp][self.units.index(u)][topo.sim.time()]=value
+                    if dp=="x":
+                        self.debug_dict[dp][self.units.index(u)][topo.sim.time()]=x_copy[u]
+                    else:
+                        value_matrix= getattr(self.function, dp)
+                        value=value_matrix[u]
+                        self.debug_dict[dp][self.units.index(u)][topo.sim.time()]=value
             for ap in self.avg_params:
+            
                 for u in self.units:
                     if ap=="x":
-                        self.avg_values[ap] = self.smoothing*x + (1.0-self.smoothing)*self.avg_values[ap]
+                        self.avg_values[ap] = self.smoothing*x_copy + (1.0-self.smoothing)*self.avg_values[ap]
                         self.avg_dict[ap][self.units.index(u)][topo.sim.time()]=self.avg_values[ap][u]
                     else:
                         value_matrix= getattr(self.function, ap)
                         self.avg_values[ap] = self.smoothing*value + (1.0-self.smoothing)*self.avg_values[ap]
                         self.avg_dict[ap][self.units.index(u)][topo.sim.time()]=self.avg_values[ap][u]
-
-
+            
                          
-    def plot_debug_graphs(self,debug_params,avg_params, unit_list, init_time, final_time):
+    def plot_debug_graphs(self,init_time, final_time):
         """
-        Plots parameter values this object has been storing over time.
+        Plots parameter values the OutputFnDebugger object has been storing over time.
 
         Example call::
-
-          HE = HomeostaticMaxEnt(a_init=14.5, b_init=-4, eta=0.0002, mu=0.01)
-          ...
-          OutputFnDebugger.plot_debug_graphs(['a', 'b','eta'],[x],[(0,0),(11,11)],1,10000)
-          
-        or, if you want to plot graphs for all stored values for all units::
+        ODH.plot_debug_graphs(1,10000,debug_params=['a', 'b','eta'],avg_params=[x],units=[(0,0),(11,11)])
         
-          HE = HomeostaticMaxEnt(a_init=14.5, b_init=-4, eta=0.0002, mu=0.01)
-          OFD = OutputFnDebugger(function=HE,...)
-          ...
-          OutputFnDebugger.plot_debug_graphs(OFD.debug_params,OFD.units,1,10000)
         """
-
-        import pylab
-        from topo.commands.pylabplots import vectorplot
-
-        for dp in debug_params:
+              
+        debug_params = ListParameter(default=self.debug_params, doc="""
+        List of the function object's parameters that should be plotted""")
+        
+        avg_params = ListParameter(default=self.avg_params, doc="""
+        List of the function object's parameters that should be averaged and plotted""")
+        
+        units= ListParameter(default=self.units, doc="""
+        Units for which parameter values are plotted""")
+    
+            
+        for dp in self.debug_params:
             pylab.figure()
             isint=pylab.isinteractive()
             pylab.ioff()
             manager = pylab.get_current_fig_manager()
             pylab.ylabel(dp)
-            pylab.xlabel('Time')
+            pylab.xlabel('Iteration Number')
             manager.window.title(topo.sim.name+': '+dp)
             
-            for unit in unit_list:
+            for unit in self.units:
                 index=self.units.index(unit)
                 plot_data=self.debug_dict[dp][index][init_time:final_time]
                 vectorplot(plot_data, label='Unit'+str(unit))
@@ -254,17 +261,18 @@ class OutputFnDebugger(OutputFn):
             pylab.legend(loc=0)
             pylab.show._needmain = False 
             pylab.show()
+	    
 
-        for ap in avg_params:
+        for ap in self.avg_params:
             pylab.figure()
             isint=pylab.isinteractive()
             pylab.ioff()
             manager = pylab.get_current_fig_manager()
-            pylab.ylabel(ap)
-            pylab.xlabel('Time')
+            pylab.ylabel("Average "+ap)
+            pylab.xlabel('Iteration Number')
             manager.window.title(topo.sim.name+': '+ap)
             
-            for unit in unit_list:
+            for unit in self.units:
                 index=self.units.index(unit)
                 plot_data=self.avg_dict[ap][index][init_time:final_time]
                 vectorplot(plot_data, label='Unit'+str(unit))   
@@ -273,6 +281,69 @@ class OutputFnDebugger(OutputFn):
             pylab.legend(loc=0)
             pylab.show._needmain = False 
             pylab.show()
+                       
+                              
+
+    def save_debug_graphs(self,filename,init_time,final_time):
+        """
+        Saves plots of parameter values the OutputFnDebugger object has been storing over time. 
+
+        Example call::
+        ODH.save_debug_graphs("V1_graphs",1,10000)
+
+        Can adjust this function to produce desired plots as described in comments.
+        """
+              
+        debug_params = ListParameter(default=self.debug_params, doc="""
+        List of the function object's parameters that should be plotted""")
+        
+        avg_params = ListParameter(default=self.avg_params, doc="""
+        List of the function object's parameters that should be averaged and plotted""")
+        
+        units= ListParameter(default=self.units, doc="""
+        Units for which parameter values are plotted""")
+
+        
+               
+        for dp in self.debug_params:
+            fig = matplotlib.figure.Figure(figsize=(6,4)) # can change this to change the figure size and shape
+            ax = fig.add_subplot(111)
+            ax.set_xlabel("Iteration Number")
+            ax.set_ylabel(dp)
+            #ax.set_ylim( 0, 0.03 ) #specify axis limits
+            #ax.set_xlim( 0, 10000)
+            for unit in self.units:
+                index=self.units.index(unit)
+                plot_data=self.debug_dict[dp][index][init_time:final_time]
+                #save("Debug"+filename+dp+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=',') # uncomment if you also want to save the raw data
+                ax.plot(plot_data, label='Unit'+str(unit))
+            ax.legend(loc=0)
+            # Make the PNG
+            canvas = FigureCanvasAgg(fig)
+            # The size * the dpi gives the final image size
+            #   a4"x4" image * 80 dpi ==> 320x320 pixel image
+            canvas.print_figure(filename+dp+str(topo.sim.time())+".png", dpi=100)
+                     
+        for ap in self.avg_params:
+            fig = matplotlib.figure.Figure(figsize=(6,4))
+            ax = fig.add_subplot(111)
+            ax.set_xlabel("Iteration Number")
+            ax.set_ylabel("Average "+ap)
+            #ax.set_ylim( 0, 0.03 )
+            #ax.set_xlim( 0, 10000)
+            for unit in self.units:
+                index=self.units.index(unit)
+                plot_data=self.avg_dict[ap][index][init_time:final_time]
+                #save("Average"+filename+ap+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=',') # uncomment if you also want to save the raw data
+                ax.plot(plot_data, label='Unit'+str(unit))
+            ax.legend(loc=0)
+            # Make the PNG
+            canvas = FigureCanvasAgg(fig)
+            # The size * the dpi gives the final image size
+            #   a4"x4" image * 80 dpi ==> 320x320 pixel image
+            canvas.print_figure(filename+ap+str(topo.sim.time())+".png", dpi=100)
+
+
                        
                               
                        
