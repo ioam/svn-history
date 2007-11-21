@@ -78,7 +78,7 @@ align="middle" WIDTH="569" HEIGHT="413">
 </li>
 
 <li> To see how this network responds to a simple visual image,
-first open an select <a name="Activity-plot"><span
+first open an <a name="Activity-plot"><span
 class='t_item'>Activity</span></a> window from
 the <span class='t_item'>Plots</span> menu on the <span
 class='w_title'>Topographica Console</span>, then 
