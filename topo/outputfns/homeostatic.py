@@ -221,7 +221,7 @@ class OutputFnDebugger(OutputFn):
                         self.avg_dict[ap][self.units.index(u)][topo.sim.time()]=self.avg_values[ap][u]
                     else:
                         value_matrix= getattr(self.function, ap)
-                        self.avg_values[ap] = self.smoothing*value + (1.0-self.smoothing)*self.avg_values[ap]
+                        self.avg_values[ap] = self.smoothing*value_matrix + (1.0-self.smoothing)*self.avg_values[ap]
                         self.avg_dict[ap][self.units.index(u)][topo.sim.time()]=self.avg_values[ap][u]
             
                          
