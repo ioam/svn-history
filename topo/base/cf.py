@@ -673,7 +673,7 @@ class CFProjection(Projection):
                                                 copy.copy(self.mask_template), 
                                                 output_fn=self.weights_output_fn.single_cf_fn,
                                                 slice_=slice_))
-                    except NullCFError,e:
+                    except NullCFError:
                         if self.allow_null_cfs:
                             row.append(None)
                         else:
