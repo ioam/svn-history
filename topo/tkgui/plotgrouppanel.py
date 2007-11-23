@@ -52,7 +52,7 @@ CANVASBUFFER = 1
 
 class PlotGroupPanel(TkParameterizedObject,Frame):
 
-    _abstract_class_name = "PlotGroupPanel"
+    __abstract = True
 
     # Default size for images used on buttons
     button_image_size=(20,20)

@@ -48,7 +48,7 @@ class ProjectionSheetPanel(TemplatePlotGroupPanel):
     """
     Abstract base class for panels relating to ProjectionSheets.
     """
-    _abstract_class_name = "ProjectionSheetPanel"
+    __abstract = True
 
     sheet_type = ProjectionSheet
 
