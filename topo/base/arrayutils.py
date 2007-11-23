@@ -61,25 +61,25 @@ def arg(z):
 
 
 def octave_str(mat,name="mat",owner=""):
-   """
-   Print the given Numeric matrix in Octave format, listing the given
-   matrix name and the object that owns it (if any).
-   """
-   # This just prints the string version of the matrix and does search/replace
-   # to convert it; there may be a faster or easier way.
-   mstr=array2string(mat)
-   mstr=re.sub('\n','',mstr)
-   mstr=re.sub('[[]','',mstr)
-   mstr=re.sub('[]]','\n',mstr)
-   return ("# Created from %s %s\n# name: %s\n# type: matrix\n# rows: %s\n# columns: %s\n%s" %
-          (owner,name,name,mat.shape[0],mat.shape[1],mstr))
+    """
+    Print the given Numeric matrix in Octave format, listing the given
+    matrix name and the object that owns it (if any).
+    """
+    # This just prints the string version of the matrix and does search/replace
+    # to convert it; there may be a faster or easier way.
+    mstr=array2string(mat)
+    mstr=re.sub('\n','',mstr)
+    mstr=re.sub('[[]','',mstr)
+    mstr=re.sub('[]]','\n',mstr)
+    return ("# Created from %s %s\n# name: %s\n# type: matrix\n# rows: %s\n# columns: %s\n%s" %
+           (owner,name,name,mat.shape[0],mat.shape[1],mstr))
 
 
 def octave_output(filename,mat,name="mat",owner=""):
-   """Writes the given matrix to a new file of the given name, in Octave format."""
-   f = open(filename,'w')
-   f.write(octave_str(mat,name,owner))
-   f.close()
+    """Writes the given matrix to a new file of the given name, in Octave format."""
+    f = open(filename,'w')
+    f.write(octave_str(mat,name,owner))
+    f.close()
 
 
 def centroid(array_2D):
