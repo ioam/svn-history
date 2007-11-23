@@ -511,7 +511,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
     SheetView that will be replaced with a key that is unique to a
     particular Projection of the current Sheet.
     """
-    _abstract_class_name = "ProjectionSheetPlotGroup"
+    __abstract = True
 
     keyname = "ProjectionSheet" # CB: what is this keyname?
 

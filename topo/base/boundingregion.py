@@ -21,7 +21,7 @@ class BoundingRegion(ParameterizedObject):
 
     Only subclasses can be instantiated directly.
     """
-    _abstract_class_name = "BoundingRegion"
+    __abstract = True
     
     def __init__(self,**args):
         super(BoundingRegion,self).__init__(**args)

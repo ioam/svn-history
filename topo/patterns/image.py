@@ -255,7 +255,7 @@ class GenericImage(PatternGenerator):
     # the "Image" class below should be called "FileImage" or
     # something.  That would break backward compatibility, though.
     
-    _abstract_class_name = 'GenericImage'
+    __abstract = True
     
     output_fn = OutputFnParameter(default=IdentityOF())
     

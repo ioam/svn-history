@@ -414,12 +414,8 @@ class ParameterizedObjectMetaclass(type):
     each new instance of that class.
 
     Additionally, a class can declare itself abstract by having an
-    attribute _abstract_class_name set equal to its class name
-    (e.g. PatternGenerator is abstract, and has
-    _abstract_class_name='PatternGenerator').
-
-    The 'abstract' attribute can be used to find out if a class
-    is abstract or not.
+    attribute __abstract set to True. The 'abstract' attribute can be
+    used to find out if a class is abstract or not.
     """
     abstract = property(lambda self: self.__is_abstract())
 
@@ -450,16 +446,11 @@ class ParameterizedObjectMetaclass(type):
 
     def __is_abstract(self):
         """
-        Return True if this class has an _abstract_class_name attribute,
-        and it's equal to this class' __name__. Otherwise, return False.
-
-        Allows detection of abstract classes, since a concrete subclass
-        of an abstract class will have a name not equal to the
-        _abstract_class_name.
+        Return True if the class has an attribute __abstract set to True.
         """
-        if hasattr(self,'_abstract_class_name') and self.__name__==self._abstract_class_name:
-            return True
-        else:
+        try:
+            return getattr(self,'_%s__abstract'%self.__name__)
+        except AttributeError:
             return False
 
 

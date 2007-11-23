@@ -63,7 +63,7 @@ class DataRecorder(EventProcessor):
     automatically record all activity sent from the sheet 'V1'.
     """
 
-    _abstract_class_name = "DataRecorder"
+    __abstract = True
 
 
     def __init__(self,**params):
@@ -218,7 +218,7 @@ class TraceSpecification(ParameterizedObject):
     sequence of data.
     """
     
-    _abstract_class_name = "TraceSpecification"
+    __abstract = True
 
     data_name = StringParameter(default=None,doc="""
         Name of the timeseries from which the trace is generated.

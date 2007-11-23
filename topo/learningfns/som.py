@@ -30,7 +30,7 @@ class CFPLF_SOM(CFPLearningFn):
     This implementation is obsolete and will be removed soon.
     Please see examples/cfsom_or.ty for current SOM support.
     """
-    _abstract_class_name = "CFPLF_SOM"
+    __abstract = True
 
     learning_radius = Number(default=0.0,doc=
         """

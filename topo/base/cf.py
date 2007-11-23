@@ -344,7 +344,7 @@ class CFPResponseFn(ParameterizedObject):
     the arguments specified below, and are assumed to modify the
     activity matrix in place.
     """
-    _abstract_class_name = "CFPResponseFn"
+    __abstract=True
 
     def __call__(self, iterator, input_activity, activity, strength, **params):
         raise NotImplementedError
@@ -402,7 +402,7 @@ class CFPLearningFn(ParameterizedObject):
     Objects in this class must support being called as a function with
     the arguments specified below.
     """
-    _abstract_class_name = "CFPLearningFn"
+    __abstract = True
         
 
     def constant_sum_connection_rate(self,proj,learning_rate):
@@ -468,7 +468,7 @@ class CFPOutputFn(ParameterizedObject):
     mask (typically the activity at the destination of this projection)
     is nonzero.
     """
-    _abstract_class_name = "CFPOutputFn"
+    __abstract = True
 
     # JABALERT: Shouldn't the mask parameter be dropped now that
     # we can pass in a masked iterator?  A NeighborhoodMask iterator

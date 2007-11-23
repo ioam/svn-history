@@ -499,7 +499,7 @@ def concrete_descendents(parentclass):
     class will not be included.
     """
     return dict([(c.__name__,c) for c in descendents(parentclass)
-                 if not (hasattr(c,'abstract') and c.abstract)])
+                 if not c.abstract])
 
 
 class CompositeParameter(Parameter):
@@ -549,7 +549,7 @@ class SelectorParameter(Parameter):
 
     Subclasses must implement get_range().
     """
-    _abstract_class_name = "SelectorParameter"
+    __abstract = True
     
     __slots__=[]
     __doc__ = property((lambda self: self.doc))

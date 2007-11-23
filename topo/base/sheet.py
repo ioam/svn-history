@@ -39,7 +39,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
     See SheetCoordinateSystem for how Sheet represents space, and
     EventProcessor for how Sheet handles time.
     """
-    _abstract_class_name = "Sheet"
+    __abstract = True
 
     nominal_bounds = BoundingRegionParameter(
         BoundingBox(radius=0.5),constant=True,

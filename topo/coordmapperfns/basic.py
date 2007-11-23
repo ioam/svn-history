@@ -252,7 +252,7 @@ class SingleDimensionMapper(CoordinateMapperFn):
     based on the radius, x, or y individually. Subclasses should override
     _map_fn(self,z). 
     """
-    _abstract_class_name = "SingleDimensionMapper"
+    __abstract = True
 
     in_range = Number(default=0.5*sqrt(2),bounds=(0,None),doc="""
        The maximum range of the mapping input.""")
@@ -331,7 +331,7 @@ class OttesSCMapper(CoordinateMapperFn):
     
     Default constant values are from Table 1, ibid.  
     """
-    _abstract_class_name = "OttesSCMapper"
+    __abstract = True 
 
     
     A = Number(default=5.3, doc="""

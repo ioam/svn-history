@@ -51,9 +51,7 @@ class PatternGenerator(ParameterizedObject):
     Constant patterns, to allow PatternGenerators to be scaled, rotated,
     translated, etc. uniformly.
     """
-
-    # Declare that this class is abstract
-    _abstract_class_name = "PatternGenerator"
+    __abstract = True
     
     bounds  = BoundingRegionParameter(
         default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True,

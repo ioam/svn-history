@@ -28,7 +28,7 @@ class OutputFn(ParameterizedObject):
     Objects in this class must support being called as a function with
     one matrix argument, and are expected to change that matrix in place.
     """
-    _abstract_class_name = "OutputFn"
+    __abstract = True
     
     # CEBALERT: can we have this here - is there a more appropriate
     # term for it, general to output functions?
@@ -96,7 +96,7 @@ class LearningFn(ParameterizedObject):
     CFPLF_Plugin.
     """
 
-    _abstract_class_name = "LearningFn"
+    __abstract = True
 
     # JABALERT: Shouldn't the single_connection_learning_rate be
     # omitted from the call and instead made into a class parameter?
@@ -153,7 +153,7 @@ class LearningFnParameter(ClassSelectorParameter):
 class ResponseFn(ParameterizedObject):
     """Abstract base class for response functions that plug into CFPRF_Plugin."""
 
-    _abstract_class_name = "ResponseFn"
+    __abstract = True
 
     def __call__(self,m1,m2):
         """
@@ -189,7 +189,7 @@ class ResponseFnParameter(ClassSelectorParameter):
 class CoordinateMapperFn(ParameterizedObject):
     """Abstract base class for functions mapping from a 2D coordinate into another one."""
 
-    _abstract_class_name = "CoordinateMapperFn"
+    __abstract = True
 
     def __call__(self,x,y):
         """

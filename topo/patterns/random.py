@@ -17,7 +17,7 @@ from topo.outputfns.basic import IdentityOF
 class RandomGenerator(PatternGenerator):
     """2D random noise pattern generator abstract class."""
 
-    _abstract_class_name = "RandomGenerator"
+    __abstract = True
 
     # The standard x, y, and orientation variables are currently ignored,
     # so they aren't shown in auto-generated lists of parameters (e.g. in the GUI)

@@ -206,7 +206,7 @@ class EventProcessor(ParameterizedObject):
     Similarly, the src_ports attribute specifies which src_ports will
     be given output by this class.
     """
-    _abstract_class_name = "EventProcessor"
+    __abstract = True
 
     src_ports=[None]
     
@@ -507,7 +507,7 @@ class EPConnection(ParameterizedObject):
 
 class Event(object):
     """Hierarchy of classes for storing simulation events of various types."""
-    _abstract_class_name = "Event"
+    __abstract = True 
 
     def __init__(self,time):
         self.time = time

@@ -97,7 +97,7 @@ class Projection(EPConnection):
     ProjectionSheet, from an input matrix of activity from the source
     Sheet.  Other than that, a Projection may be of any type.
     """
-    _abstract_class_name = "Projection"
+    __abstract=True
     
     strength = Number(default=1.0)
 
