@@ -3,7 +3,10 @@
 #       { 'module1': 'no-namedargs maxlines=0',
 #	  'module2.my_func': 'argsused',
 #	  'module3.my_class': 'no-initreturn', }
-suppressions = {'topo.base.CFProjection': 'no-unpack'}
+suppressions = {'topo.base.CFProjection.initialize_bounds': 'no-unpack'}
+
+
+# topo.base.simulation.Event.__call__ for various subclasses: Parameter (sim) not used
 
 
  
