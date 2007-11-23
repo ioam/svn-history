@@ -809,7 +809,7 @@ class SomeTimer(ParameterizedObject):
             fixed_num_calls = True
             
         iters  = int(floor(fduration/step))
-        remain = fmod(fduration, step)
+
         recenttimes=[]
 
         if not fixed_num_calls: arg_list=[step]*iters
