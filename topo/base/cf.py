@@ -490,15 +490,9 @@ class CFPOF_Plugin(CFPOutputFn):
     def __call__(self, iterator, mask, **params):
         """
         Apply the single_cf_fn to each CF for which the mask is nonzero.
-
-        For each CF, the sum of the weights is passed as the current
-        value of the norm. Following application of the output
-        function, the cf's sum is then set equal to the single_cf_fn's
-        norm_value.
         """
         if type(self.single_cf_fn) is not IdentityOF:
             single_cf_fn = self.single_cf_fn
-            norm_value = self.single_cf_fn.norm_value                
 
             for cf,r,c in iterator():
               if (mask[r][c] != 0):
@@ -551,6 +545,9 @@ class CFProjection(Projection):
     activate(self,input_activity) that computes the response from the
     input and stores it in the activity array.
     """
+
+    
+    
     response_fn = CFPResponseFnParameter(
         default=CFPRF_Plugin(),
         doc='Function for computing the Projection response to an input pattern.')
