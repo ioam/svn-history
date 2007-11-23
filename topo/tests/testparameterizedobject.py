@@ -24,7 +24,7 @@ class AnotherTestPO(ParameterizedObject):
 
 
 class TestAbstractPO(ParameterizedObject):
-    _abstract_class_name="TestAbstractPO"
+    __abstract = True
 
 
 class TestParameterizedObject(unittest.TestCase):
@@ -62,7 +62,8 @@ class TestParameterizedObject(unittest.TestCase):
     def test_abstract_class(self):
         """Check that a class declared abstract actually shows up as abstract."""
         self.assertEqual(TestAbstractPO.abstract,True)
-        
+        self.assertEqual(TestPO.abstract,False)
+
 
 suite = unittest.TestSuite()
 suite.addTest(unittest.makeSuite(TestParameterizedObject))
