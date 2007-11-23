@@ -1,6 +1,7 @@
 # $Id$
 PREFIX =  ${CURDIR}/
-PYLINT = bin/pylint --parseable=yes --required-attributes=__version__ --min-name-length=1 --notes=FIXME,XXX,TODO,ALERT --max-line-length=200 --disable-msg=C0324
+PYLINT = bin/pylint --parseable=yes --required-attributes=__version__ --min-name-length=1 --notes=FIXME,XXX,TODO,ALERT --max-line-length=200 --disable-msg=C0322,C0323,C0324,C0103,W0131
+
 PYCHECKER = bin/pychecker
 
 RELEASE = 0.9.4
@@ -94,6 +95,9 @@ check-base:
 
 lint:
 	${PYLINT} topo/*.py topo/*/*.py
+
+lint-base:
+	${PYLINT} topo/base/*.py
 
 
 # Compare topographica and C++ lissom output
