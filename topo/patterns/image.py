@@ -41,8 +41,8 @@ class PatternSampler(ParameterizedObject):
         whole_pattern_output_fn.
 
         If supplied, background_value_fn must accept an array and return a scalar.
-
         """
+        
         super(PatternSampler,self).__init__()
 
         if pattern_array is not None and image is not None:
@@ -99,6 +99,7 @@ class PatternSampler(ParameterizedObject):
 
         The pattern is further scaled according to the supplied width and height.
         """
+        
         # create new pattern sample, filled initially with the background value
         pattern_sample = ones(x.shape, Float)*self.background_value
 
@@ -136,10 +137,12 @@ class PatternSampler(ParameterizedObject):
 
         return pattern_sample
 
+
     # Added by Tikesh for presenting stereo images; may not be needed anymore
     def get_image_size(self):
         r,c=self.pattern_array.shape
         return r,c
+
 
     def __apply_size_normalization(self,x,y,sheet_xdensity,sheet_ydensity,scaling):
         """
@@ -201,9 +204,11 @@ class FastPatternSampler(ParameterizedObject):
     to fit the given matrix size without distorting the aspect ratio
     of the original picture.
     """
+    
     sampling_method = Integer(default=PIL.NEAREST,doc="""
        Python Imaging Library sampling method for resampling an image.
        Defaults to Image.NEAREST.""")
+
        
     def __init__(self, pattern=None, image=None, whole_pattern_output_fn=IdentityOF(), background_value_fn=None):
         super(FastPatternSampler,self).__init__()
@@ -218,6 +223,7 @@ class FastPatternSampler(ParameterizedObject):
         else:
             raise ValueError("PatternSampler instances must have a pattern or an image.")
 
+
     def __call__(self, x, y, sheet_xdensity, sheet_ydensity, scaling, width=1.0, height=1.0):
 
         # JPALERT: Right now this ignores all options and just fits the image into given array.
@@ -231,6 +237,7 @@ class FastPatternSampler(ParameterizedObject):
         result.shape = im.size[::-1]
 
         return result
+
         
 
 class GenericImage(PatternGenerator):
@@ -260,23 +267,23 @@ class GenericImage(PatternGenerator):
     output_fn = OutputFnParameter(default=IdentityOF())
     
     aspect_ratio  = Number(default=1.0,bounds=(0.0,None),
-        softbounds=(0.0,2.0),precedence=0.31,doc=
-        "Ratio of width to height; size*aspect_ratio gives the width.")
+        softbounds=(0.0,2.0),precedence=0.31,doc="""
+        Ratio of width to height; size*aspect_ratio gives the width.""")
 
     size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
                    precedence=0.30,doc="Height of the image.")
         
     size_normalization = Enumeration(default='fit_shortest',
         available=['fit_shortest','fit_longest','stretch_to_fit','original'],
-        precedence=0.95,doc=
-        "How to scale the initial image size relative to the default area of 1.0.")
+        precedence=0.95,doc="""
+        How to scale the initial image size relative to the default area of 1.0.""")
 
     whole_image_output_fn = OutputFnParameter(default=DivisiveNormalizeLinf(),
-        precedence=0.96,doc=
-        "Function applied to the whole, original image array (before any cropping).")
+        precedence=0.96,doc="""
+        Function applied to the whole, original image array (before any cropping).""")
 
     pattern_sampler_type = Parameter(default=PatternSampler, doc="""
-       The type of PatternSampler to use to resample/resize the image.""")
+        The type of PatternSampler to use to resample/resize the image.""")
 
 
     def __setup_pattern_sampler(self):
@@ -318,6 +325,7 @@ class GenericImage(PatternGenerator):
         assign it to self._image and return True.  If no new image is
         needed, return False.
         """
+        
         raise NotImplementedError
 
 
@@ -356,8 +364,7 @@ class GenericImage(PatternGenerator):
 
 
 
-
-class Image(GenericImage):
+class FileImage(GenericImage):
     """
     2D Image generator that reads the image from a file.
     
@@ -366,11 +373,11 @@ class Image(GenericImage):
     details of supported image file formats.
     """
 
-    filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9,doc=
-        """
+    filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9,doc="""
         File path (can be relative to Topographica's base path) to a bitmap image.
         The image can be in any format accepted by PIL, e.g. PNG, JPG, TIFF, or PGM.
         """)
+
 
     def __init__(self, **params):
         """
@@ -379,9 +386,10 @@ class Image(GenericImage):
 
         This allows reloading an existing image to be avoided.
         """
-        super(Image,self).__init__(**params)
+        super(FileImage,self).__init__(**params)
         self.last_filename = None
         self.last_wiof = None
+
 
     def _get_image(self,params):
         filename = params.get('filename',self.filename)
@@ -393,5 +401,7 @@ class Image(GenericImage):
         else:
             return False
 
+# Temporary as of 12/2007, for backwards compatibility
+Image=FileImage
 
 
