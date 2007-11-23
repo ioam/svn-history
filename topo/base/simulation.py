@@ -799,6 +799,7 @@ class SomeTimer(ParameterizedObject):
     def __pass_out_info(self,time,percent,name,duration,remaining):
         [thing(time,percent,name,duration,remaining) for thing in self.receive_info]
 
+    # CB: this used to say how long the operation took (in wallclock time)
 
     def __measure(self,fduration,step,arg_list=None):
 
@@ -814,7 +815,6 @@ class SomeTimer(ParameterizedObject):
 
         if not fixed_num_calls: arg_list=[step]*iters
         
-        starttime=self.real_time_fn()
         simulation_starttime = self.simulation_time_fn()
 
         self.stop = False
