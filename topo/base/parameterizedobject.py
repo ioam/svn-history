@@ -417,7 +417,6 @@ class ParameterizedObjectMetaclass(type):
     attribute __abstract set to True. The 'abstract' attribute can be
     used to find out if a class is abstract or not.
     """
-    abstract = property(lambda self: self.__is_abstract())
 
     # The other methods get_param_descriptor and print_param_defaults
     # could perhaps be made into static functions, because all they
@@ -452,6 +451,9 @@ class ParameterizedObjectMetaclass(type):
             return getattr(self,'_%s__abstract'%self.__name__)
         except AttributeError:
             return False
+        
+    abstract = property(__is_abstract)
+
 
 
     def __setattr__(self,attribute_name,value):
