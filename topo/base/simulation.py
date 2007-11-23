@@ -1050,11 +1050,11 @@ class Simulation(ParameterizedObject):
         users to control how much precision, etc. is used for time
         displays.
         """
-        vars = dict(self.get_param_values())
-        vars.update(self.__dict__)
+        all_vars = dict(self.get_param_values())
+        all_vars.update(self.__dict__)
         if specified_time is not None:
-            vars['_time']=specified_time
-        timestr = self.time_printing_format % vars
+            all_vars['_time']=specified_time
+        timestr = self.time_printing_format % all_vars
         return timestr
 
 
@@ -1065,11 +1065,11 @@ class Simulation(ParameterizedObject):
         this is simply the name of the simulation + " " +
         the result from evaluating the time_printing_format parameter.
         """
-        vars = dict(self.get_param_values())
-        vars.update(self.__dict__)
-        vars['timestr']=self.timestr()
+        all_vars = dict(self.get_param_values())
+        all_vars.update(self.__dict__)
+        all_vars['timestr']=self.timestr()
         
-        return self.basename_format % vars
+        return self.basename_format % all_vars
 
 
 
