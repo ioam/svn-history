@@ -22,6 +22,11 @@ class AnotherTestPO(ParameterizedObject):
     instPO = Parameter(default=TestPO(),instantiate=True)
     notinstPO = Parameter(default=TestPO(),instantiate=False)
 
+
+class TestAbstractPO(ParameterizedObject):
+    _abstract_class_name="TestAbstractPO"
+
+
 class TestParameterizedObject(unittest.TestCase):
 
 
@@ -51,7 +56,12 @@ class TestParameterizedObject(unittest.TestCase):
         TestPO.notinst[1]=7
         # (if you thought your instPO was completely an independent object, you
         # might be expecting [1,2,3] here)
-        self.assertEqual(anothertestpo.instPO.notinst,[1,7,3]) 
+        self.assertEqual(anothertestpo.instPO.notinst,[1,7,3])
+
+
+    def test_abstract_class(self):
+        """Check that a class declared abstract actually shows up as abstract."""
+        self.assertEqual(TestAbstractPO.abstract,True)
         
 
 suite = unittest.TestSuite()
