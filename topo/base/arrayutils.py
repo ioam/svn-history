@@ -133,8 +133,8 @@ def wrap(lower, upper, x):
     Valid for cyclic quantities like orientations or hues.
     """
     #I have no idea how I came up with this algorithm; it should be simplified.
-    range=upper-lower
-    return lower + fmod(x-lower + 2*range*(1-floor(x/(2*range))), range)
+    range_=upper-lower
+    return lower + fmod(x-lower + 2*range_*(1-floor(x/(2*range_))), range_)
 
 
 # There might already be a function for this in Numeric...
