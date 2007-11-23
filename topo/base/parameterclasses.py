@@ -699,17 +699,17 @@ class ListParameter(Parameter):
             raise ValueError("Parameter " + `self.attrib_name()` + " (" + `self.__class__.__name__` + ") must be a list.")
 
         if self.bounds!=None:
-            min,max = self.bounds
+            min_length,max_length = self.bounds
             l=len(val)
-            if min != None and max != None:
-                if not (min <= l <= max):
-                    raise ValueError("List length must be between " + `min` + ' and ' + `max` + ' (inclusive).')
-            elif min != None:
-                if not min <= l: 
-                    raise ValueError("List length must be at least " + `min` + '.')
-            elif max != None:
-                if not l <= max:
-                    raise ValueError("List length must be at most " + `max` + '.')
+            if min_length != None and max_length != None:
+                if not (min_length <= l <= max_length):
+                    raise ValueError("List length must be between " + `min_length` + ' and ' + `max_length` + ' (inclusive).')
+            elif min_length != None:
+                if not min_length <= l: 
+                    raise ValueError("List length must be at least " + `min_length` + '.')
+            elif max_length != None:
+                if not l <= max_length:
+                    raise ValueError("List length must be at most " + `max_length` + '.')
 
         if self.class_!=None:
             for v in val:
