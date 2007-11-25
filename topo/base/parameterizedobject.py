@@ -447,6 +447,10 @@ class ParameterizedObjectMetaclass(type):
         """
         Return True if the class has an attribute __abstract set to True.
         """
+        # Can't just do ".__abstract", because that is mangled to
+        # _ParameterizedObjectMetaclass__abstract before running, but
+        # the actual class object will have an attribute
+        # _ClassName__abstract.  So, we have to mangle later.
         try:
             return getattr(self,'_%s__abstract'%self.__name__)
         except AttributeError:
