@@ -24,7 +24,7 @@ from numpy.oldnumeric import array,Float,pi
 ## from numpy.oldnumeric.mlab import rot90
 
 from topo.base.boundingregion import BoundingBox
-from topo.patterns.image import Image
+from topo.patterns.image import FileImage
 from topo.outputfns.basic import IdentityOF
 
 
@@ -55,7 +55,7 @@ class TestImage(unittest.TestCase):
          96.59090909,  96.59090909,  96.59090909,]],Float)
 
         
-        image = Image(filename = 'topo/tests/testimage.pgm',
+        image = FileImage(filename = 'topo/tests/testimage.pgm',
                       xdensity=8,
                       ydensity=8,
                       bounds=BoundingBox(radius=0.5),
@@ -74,7 +74,7 @@ class TestImage(unittest.TestCase):
         Test vertical centering for odd sheet, odd image, and horizontal
         centering for odd sheet, even image.
 
-        Image is smaller than Sheet on which it's displayed.
+        FileImage is smaller than Sheet on which it's displayed.
         """
         pass
 ##         image_array = array(
@@ -98,7 +98,7 @@ class TestImage(unittest.TestCase):
 ##          96.59090909,  96.59090909,  96.59090909,  96.59090909,]],Float)
 
         
-##         image = Image(filename = 'topo/tests/testimage.pgm',
+##         image = FileImage(filename = 'topo/tests/testimage.pgm',
 ##                       xdensity=9,
 ##                       ydensity=9,
 ##                       output_fn=IdentityOF(),
@@ -183,7 +183,7 @@ class TestImage(unittest.TestCase):
          96.59090909,]],Float)
 
 
-        image = Image(filename = 'topo/tests/testimage.pgm',
+        image = FileImage(filename = 'topo/tests/testimage.pgm',
                       xdensity=8,
                       ydensity=8,
                       size=2.0,
@@ -269,7 +269,7 @@ class TestImage(unittest.TestCase):
          96.59090909,]])
         
 
-        image = Image(filename = 'topo/tests/testimage.pgm',
+        image = FileImage(filename = 'topo/tests/testimage.pgm',
                       xdensity=8,
                       ydensity=8,
                       output_fn=IdentityOF(),
@@ -320,7 +320,7 @@ class TestImage(unittest.TestCase):
             0.,   0.,]])
 
 
-        image = Image(filename = 'topo/tests/testimage.pgm',
+        image = FileImage(filename = 'topo/tests/testimage.pgm',
                       xdensity=15,
                       ydensity=15,
                       output_fn=IdentityOF(),
@@ -352,7 +352,7 @@ class TestImage(unittest.TestCase):
 ##  [  96.59090909,  96.59090909,  96.59090909,  96.59090909,  96.59090909,
 ##          96.59090909,  96.59090909,  96.59090909,]],Float)
         
-##         image = Image(filename = 'topo/tests/testimage.pgm',
+##         image = FileImage(filename = 'topo/tests/testimage.pgm',
 ##                       density=8,
 ##                       bounds=BoundingBox(radius=0.5),
 ##                       output_fn=IdentityOF(),

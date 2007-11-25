@@ -61,7 +61,7 @@ class TestSheetView(unittest.TestCase):
             sv6.message(sv6.view())
 
 
-# CEBALERT: replace with test using Image
+# CEBALERT: replace with test using FileImage
 ##     def test_view(self):
 ##         ImageGenerator.nominal_bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 ##         ImageGenerator.nominal_density = 100

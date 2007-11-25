@@ -239,7 +239,7 @@ class FastPatternSampler(ParameterizedObject):
         return result
 
         
-
+# Would be best called Image, but that causes confusion with PIL's Image
 class GenericImage(PatternGenerator):
     """
     Generic 2D image generator.
@@ -258,10 +258,6 @@ class GenericImage(PatternGenerator):
     to support some interpolation options as well.
     """
 
-    # JPALERT: I think that this class should be called "Image" and
-    # the "Image" class below should be called "FileImage" or
-    # something.  That would break backward compatibility, though.
-    
     __abstract = True
     
     output_fn = OutputFnParameter(default=IdentityOF())

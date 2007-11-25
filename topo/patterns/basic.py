@@ -330,7 +330,7 @@ class Composite(PatternGenerator):
 
     # The Accum_Replace operator from LISSOM is not yet supported,
     # but it should be added once PatternGenerator bounding boxes
-    # are respected and/or Image patterns support transparency.
+    # are respected and/or GenericImage patterns support transparency.
     operator = Parameter(numpy.maximum,precedence=0.98,doc="""
         Binary Numeric function used to combine the individual patterns.
 

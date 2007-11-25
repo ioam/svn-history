@@ -40,7 +40,7 @@ import topo.patterns.image
 
 topo.base.sheet.Sheet.nominal_density = 48
 topo.base.sheet.Sheet.nominal_bounds = BoundingBox(radius=0.5)
-topo.patterns.image.Image.size = 2.0
+topo.patterns.image.FileImage.size = 2.0
 
 SaccadeController.print_level = NORMAL
 
@@ -74,7 +74,7 @@ saccade_generator = topo.patterns.basic.Gaussian(
     aspect_ratio=1.0,
     bounds = BoundingBox(radius = 0.5))
 
-scene_seq = [(1,topo.patterns.image.Image())]
+scene_seq = [(1,topo.patterns.image.FileImage())]
 
 ##########################################################################
 # Sheets: A movable eye, a SuperiorColliculus generating eye movements,

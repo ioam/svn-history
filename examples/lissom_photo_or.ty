@@ -52,7 +52,7 @@ from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
 
-input_type=topo.patterns.image.Image
+input_type=topo.patterns.image.FileImage
 inputs=[input_type(filename="images/shouval/"+f,
                    size_normalization='original',
                    x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12)),
