@@ -590,10 +590,10 @@ class CommandEvent(Event):
         """Generate a runnable command for creating this CommandEvent."""
         return simulation_path+".schedule_command("+`self.time`+",'"+ self.command_string+"')"
 
-
     # CEBALERT: should we stop execution after detecting errors
     # (rather than just printing a warning) in __call__() and
     # __test()? After deciding, make docstrings match behavior.
+
     def __call__(self,sim):
         """
         exec's the command_string in __main__.__dict__.
@@ -609,18 +609,20 @@ class CommandEvent(Event):
         import __main__
 
         ParameterizedObject(name='CommandEvent').message("Running command %s" \
-                                                         % (self.command_string))
-        
+                                                         % (self.command_string))        
         try:
             exec self.command_string in __main__.__dict__
         except:
-            import traceback
-            ParameterizedObject(name="CommandEvent").warning("%s was not executed because it would have caused an error:"%(self))
-            # CEBALERT: need to print only for warning level, etc. (Same alert below in __test.)
-            print "----------"
-            traceback.print_exc()
-            print "----------"
+            ParameterizedObject(name="CommandEvent").warning('%s was not executed because it would have caused an error: \n%s'%(self,self.__traceback_string()))
 
+
+    def __traceback_string(self):
+        """
+        Return traceback.format_exc() surrounded by markers to indicate that the
+        exception is different from normal: it did not actually occur.
+        """
+        import traceback
+        return "----------\n" + traceback.format_exc() + "----------\n"
             
     def __test(self):
         """
@@ -641,12 +643,7 @@ class CommandEvent(Event):
         try:
             exec self.command_string in {}
         except SyntaxError:
-            ParameterizedObject(name='CommandEvent').warning('The scheduled command "'+self.command_string+'" will not be executed because it contains a syntax error:')
-            import traceback
-            print "----------"
-            traceback.print_exc()
-            print "----------"
-
+            ParameterizedObject(name='CommandEvent').warning('The scheduled command "%s" will not be executed because it contains a syntax error:\n%s'%(self.command_string,self.__traceback_string()))
         except: # errors that aren't syntax errors don't mean anything here
             pass
         
