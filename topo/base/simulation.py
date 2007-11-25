@@ -168,15 +168,15 @@ class SimSingleton(Singleton):
     ## Container-like access
     def __getitem__(self,item_name):
         """Allow dictionary-style access to the simulation."""
-        return self.actual_sim[item_name]
+        return self.actual_sim.__getitem__(item_name)
 
     def __setitem__(self,item_name,item_value):
         """Allow dictionary-style access to the simulation."""
-        self.actual_sim[item_name]=item_value
+        self.actual_sim.__setitem__(item_name,item_value)
 
     def __delitem__(self,item_name):
         """Allow dictionary-style deletion of objects from the simulation."""
-        del self.actual_sim[item_name]
+        self.actual_sim.__delitem__(item_name)
 
     def __iter__(self):
         """Return an iterator of the simulation's objects()."""
