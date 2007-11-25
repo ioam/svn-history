@@ -166,6 +166,7 @@ class SimSingleton(Singleton):
 
 
     ## Container-like access
+    # (__getattribute__ is not used to find these methods, so we have to provide access.)
     def __getitem__(self,item_name):
         """Allow dictionary-style access to the simulation."""
         return self.actual_sim.__getitem__(item_name)
