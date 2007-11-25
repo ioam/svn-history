@@ -3,7 +3,7 @@ Patterns based on patches of Sine Gratings as used in experiments.
 
 $Id$
 """
-__version__='$$'
+__version__='$Revision$'
 
 ### JABALERT: These classes should not be necessary, if we can provide a way
 ### to control the parameters of subparts of Composite objects
