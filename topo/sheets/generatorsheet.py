@@ -10,7 +10,7 @@ from topo.base.sheet import Sheet
 from topo.base.sheet import BoundingBox
 from topo.misc.utils import NxN
 
-from topo.base.parameterclasses import Number, Dynamic, ListParameter
+from topo.base.parameterclasses import Number, ListParameter
 
 import topo.base.patterngenerator
 import topo.patterns.basic

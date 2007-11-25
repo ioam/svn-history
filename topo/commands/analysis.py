@@ -14,7 +14,7 @@ import topo
 from topo.base.arrayutils import octave_output, centroid
 from topo.base.cf import CFSheet, CFProjection, Projection
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import DynamicNumber,ListParameter, BooleanParameter
+from topo.base.parameterclasses import ListParameter, BooleanParameter
 from topo.base.projection import ProjectionSheet
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
