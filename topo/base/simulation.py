@@ -165,7 +165,7 @@ class SimSingleton(Singleton):
         self.actual_sim=new_sim
 
 
-    ## CEBERRORALERT: syntax like "'V1' in topo.sim" does not work
+    ## Container-like access
     def __getitem__(self,item_name):
         """Allow dictionary-style access to the simulation."""
         return self.actual_sim[item_name]
@@ -178,6 +178,12 @@ class SimSingleton(Singleton):
         """Allow dictionary-style deletion of objects from the simulation."""
         del self.actual_sim[item_name]
 
+    def __iter__(self):
+        """Return an iterator of the simulation's objects()."""
+        return self.actual_sim.__iter__()
+
+
+    ## pickling & copying
     def __getstate__(self):
         """Avoid calling actual_sim's __getstate__ directly.""" 
         return {'actual_sim':self.actual_sim}
@@ -1030,6 +1036,9 @@ class Simulation(ParameterizedObject):
         # remove in_connections that come from this ep
         for conn in ep.out_connections:
             conn.remove()
+
+    def __iter__(self):
+        for obj in self.objects(): yield obj
 
 
     def time(self):
