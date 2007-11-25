@@ -125,9 +125,9 @@ class Parameter(object):
        ParameterizedObject constructor will process the keywords.
 
     2. A ParameterizedObject need specify only the attributes of a
-       Parameter whose values differ those declared in superclasses of
-       the ParameterizedObject; the other values will be inherited.
-       E.g. if Foo declares
+       Parameter whose values differ from those declared in
+       superclasses of the ParameterizedObject; the other values will
+       be inherited.  E.g. if Foo declares
 
         delta = Parameter(default=0.2) 
 
