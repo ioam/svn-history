@@ -48,11 +48,12 @@ import ImageOps
 
 from topo.patterns.image import edge_average
 from topo.base.patterngenerator import PatternGenerator
-from topo.base.parameterclasses import Filename, Number, Parameter, Enumeration
+from topo.base.parameterclasses import Number, Parameter, Enumeration
 from topo.base.projection import OutputFnParameter
 from topo.outputfns.basic import DivisiveNormalizeLinf,IdentityOF
 from topo.patterns.image import PatternSampler
 from topo.misc.numbergenerators import UniformRandom
+from topo.misc.filepaths import Filename
 from pylab import fix,ceil
 from numpy.oldnumeric.random_array import randint,seed,uniform
 
