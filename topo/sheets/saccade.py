@@ -137,11 +137,9 @@ class SaccadeController(CFSheet):
 
 
     decode_fn = CallableParameter(default=activity_centroid,
-                                instantiate=False,
-                                doc="""
+                                  instantiate=False,doc="""
         The function for extracting a single point from sheet activity.
-        Should take a sheet as the first argument, and return (x,y).        
-        """)
+        Should take a sheet as the first argument, and return (x,y).""")
 
 
 
