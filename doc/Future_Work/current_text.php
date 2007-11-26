@@ -53,6 +53,120 @@ tracker rather than added to this list</B>.
 <li>Cleanup + doc of plotgroup.py</li>
 </ul>
 
+<H4>2007/11/26: move to Subversion</H4>
+
+Procedure to convert from CVS to SVN:
+
+(mainly from "Making a Subversion dump file from CVS content"
+(http://sourceforge.net/docman/display_doc.php?docid=31070&group_id=1))
+
+
+1. Make sure people check in all outstanding work? Or maybe instead
+we'll give some instruction for converting what they have to some
+format they can apply to the new svn repository. (E.g. using diff and
+patch - you probably have a better idea.)
+
+
+
+2. Download and install a copy of cvs2svn.
+
+
+
+3. Get a copy of the RCS files for the CVS repository
+
+rsync -av rsync://topographica.cvs.sourceforge.net/cvsroot/topographica/*
+topographica-cvsbackup
+
+
+
+4. Clean up topographica-cvsbackup archive
+
+Not sure what (if anything) needs to go. I haven't really looked at
+the full repository directory before. When I see it, I might realize
+things that should go. But do we need to take this opportunity to
+change anything? Whatever is done, make a script to do it again.
+
+
+
+5. Convert the repository to an SVN dump file with cvs2svn by going to
+the directory at the root of the repository and running the following
+command: "cvs2svn --dumpfile=svndump .".
+(--trunk-only will drop all branches and tags, but will likely make
+the process painless)
+
+Do we want all the branches and tages? If the cvs repository is going
+to hang around, maybe we can lose them now?
+
+
+
+6. If the conversion generates an error message, follow the prompts
+indicating what the problem is, and attempt to resolve them using one
+of the various options for cvs2svn . Do I need to worry about file
+types? (binary etc...I assume not)
+
+
+
+7. use svndumpfilter to remove CVSROOT from repository
+
+
+
+8. Compress the resulting SVN dump file (svndump) if so desired, using
+zip, gzip or bzip2 (but do not tar it).
+
+
+
+-------------------------------------------------------------------------
+
+
+9. Tell people to stop CVS commits
+
+
+
+10. Repeat steps 3-8
+
+
+-------------------------------------------------------------------------
+
+
+
+11 Name the file using only alphanumeric characters and a period
+(Example: svndump.gz -- good; projectname-svndump.gz -- bad).
+
+
+
+12 Upload the dump file into the root of your project group directory
+on the shell server
+scp filename.gz ceball@shell.sourceforge.net:/home/groups/t/to/topographica/filename.gz).
+
+
+
+13
+- Login to the SourceForge.net website.
+- Go to the project summary page (https://www.sf.net/projects/topographica).
+- Click on the 'Admin' link.
+- Click on the 'Subversion' admin page link.
+- Click on the 'migrate' link on the 'Migration Instructions' section
+of the page.
+- Key in the filename of the archive into the 'Source path' field,
+noting that it must comply with the filename restrictions previously
+described.
+- Check the 'Replace' check box in the same column (replaces the
+existing content with the new content to be added).
+- leave the "Destination" field blank (what you want passed to the
+--parent-dir argument of the "svnadmin load" command - For most users,
+this would be left blank. Note that the destionation directory must be
+created but empty for this to work).
+- Click on the 'Submit' button.
+- Wait for however long it takes (e.g. a day)
+
+
+14. what extra setup? e.g. mail on checkins, etc
+Plus people seem to mention a case-insensitivity script, but we do use
+case (e.g. Doc)
+
+
+
+
 <H4>2007/09/20: copying plotgroup from plotgroups</H4>
 See ALERT next to plotgroups in plotgroup.py.
 
