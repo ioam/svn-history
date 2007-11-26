@@ -69,6 +69,7 @@ patch - you probably have a better idea.)
 
 
 2. Download and install a copy of cvs2svn.
+[DONE on doozy]
 
 
 
@@ -76,6 +77,8 @@ patch - you probably have a better idea.)
 
 rsync -av rsync://topographica.cvs.sourceforge.net/cvsroot/topographica/*
 topographica-cvsbackup
+[on doozy, the current CVS is rsync'ing to /home/ceball/topographica-cvsbackup/
+to see how big, what's there, etc]
 
 
 
