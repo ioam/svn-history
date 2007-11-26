@@ -445,12 +445,19 @@ class ParameterizedObjectMetaclass(type):
 
     def __is_abstract(self):
         """
-        Return True if the class has an attribute __abstract set to True.
+        Return True if the class has an attribute __abstract set to True.  
+        Subclasses will return False unless they themselves have
+        __abstract set to true.  This mechanism allows a class to
+        declare itself to be abstract (e.g. to avoid it being offered
+        as an option in a GUI), without the "abstract" property being
+        inherited by its subclasses (at least one of which is
+        presumably not abstract).
         """
         # Can't just do ".__abstract", because that is mangled to
         # _ParameterizedObjectMetaclass__abstract before running, but
         # the actual class object will have an attribute
-        # _ClassName__abstract.  So, we have to mangle later.
+        # _ClassName__abstract.  So, we have to mangle it ourselves at
+        # runtime.
         try:
             return getattr(self,'_%s__abstract'%self.__name__)
         except AttributeError:
