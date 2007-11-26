@@ -43,6 +43,11 @@ clean: clean-doc clean-ext-packages clean-pyc
 	${RM} .#??*.* */.#??*.* */*/.#??*.* */*/*/.#??*.* current_profile ./topo/tests/testsnapshot.typ ./topo/tests/testplotfilesaver*.png
 	${RM} -r bin include share lib man topographica ImageSaver*.jpeg python_topo
 
+osx-patch: 
+	patch --force external/Makefile external/Makefile_OSX.diff
+	touch osx-patch
+
+
 saved-examples: 
 	make -C examples saved-examples
 
