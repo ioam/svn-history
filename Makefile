@@ -45,11 +45,11 @@ clean: clean-doc clean-ext-packages clean-pyc
 
 osx-patch: 
 	patch --force external/Makefile external/Makefile_OSX.diff
-	touch external/osx-patch
+	touch osx-patch
 
 osx-patch-clean:
 	patch --force --reverse external/Makefile external/Makefile_OSX.diff
-	${RM} external/osx-patch
+	${RM} osx-patch
 
 
 saved-examples: 
