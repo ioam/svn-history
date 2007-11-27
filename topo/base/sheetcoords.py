@@ -131,36 +131,34 @@ class SheetCoordinateSystem(object):
     ### use xstep and ystep so that the repeatedly performed
     ### calculations in matrix2sheet() use multiplications rather than
     ### divisions, for speed.
-    def set_xdensity(self,density):
+    def __set_xdensity(self,density):
         self.__xdensity=density
         self.__xstep = 1.0/density
         
-    def set_ydensity(self,density):
+    def __set_ydensity(self,density):
         self.__ydensity=density
         self.__ystep = 1.0/density
 
-    def get_xdensity(self): return self.__xdensity
-    def get_ydensity(self): return self.__ydensity
+    def __get_xdensity(self): return self.__xdensity
+    def __get_ydensity(self): return self.__ydensity
     
-    xdensity = property(get_xdensity,
-                        set_xdensity,
-                        None,
-                        """The spacing between elements in an underlying
+    xdensity = property(__get_xdensity,
+                        __set_xdensity,
+                        doc="""The spacing between elements in an underlying
                         matrix representation, in the x direction.""")
 
-    ydensity = property(get_ydensity,
-                        set_ydensity,
-                        None,
-                        """The spacing between elements in an underlying
+    ydensity = property(__get_ydensity,
+                        __set_ydensity,
+                        doc="""The spacing between elements in an underlying
                         matrix representation, in the y direction.""")
 
     ### CEBHACKALERT: temporary implementation.  JAB: In what way?
-    def get_shape(self):
+    def __get_shape(self):
         r1,r2,c1,c2 = self.bounds2slice(self.bounds)
         return (r2-r1,c2-c1)
 
-    ### shape is a property so that it's like Numeric.array.shape
-    shape = property(get_shape)
+    ### shape is a property so that it's like numpy.array.shape
+    shape = property(__get_shape)
 
 
     def __init__(self,bounds,xdensity,ydensity=None):
