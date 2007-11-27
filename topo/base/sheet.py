@@ -199,63 +199,51 @@ class Slice(object):
     array specifying the row and column start and end points
     for a submatrix of the SheetCoordinateSystem.
 
-    A Slice() is created from the specified slice_bounds by
-    calculating the slice that corresponds to the bounds (see
-    SheetCoordinateSystem.bounds2slice).
+    The slice is created from the supplied slice_bounds by calculating
+    the slice that corresponds most closely to the specified bounds.
+    Therefore, the slice does not necessarily correspond exactly to
+    the specified bounds. Slice stores the bounds that do exactly
+    correspond to the slice in the 'bounds' attribute.
 
     The slice elements can be recovered by unpacking an instance
-    (e.g. k = Slice(); r1,r2,c1,c2 = k).
+    (e.g. k = Slice(); r1,r2,c1,c2 = k) or using bracket access
+    (e.g. r1,r2 = k[0:2])
 
-    The exact bounds corresponding to the calculated slice are
-    available as the 'bounds' attribute.
-
-    Actions such as translate() do not respect the bounds of the
-    SheetCoordinateSystem; to have the slice cropped to the
+    Note that the slice does not respect the bounds of the
+    SheetCoordinateSystem, and that actions such as translate() also
+    do not respect the bounds. To ensure that the slice is within the
     SheetCoordinateSystem's bounds, use crop_to_sheet().
     """
-    ### Allows shape to work like Numeric.array's
-    # CEBALERT: can this method be made private?
-    def get_shape(self):
+    # Have a shape attribute (like numpy.array)
+    def __get_shape(self):
         """Return the shape of the slice."""
         r1,r2,c1,c2 = self.__slice
         return (r2-r1,c2-c1)
-    shape = property(get_shape)
+    shape = property(__get_shape)
 
-    def __init__(self,slice_bounds,coordinate_transformer):
-        """
-        Store the coordinate_transformer, calculate the
-        slice corresponding to the specified slice_bounds
-        (see SheetCoordinateSystem.bounds2slice()), and
-        store the bounds that exactly correspond to that
-        calculated slice.
-
-        The slice_bounds do not have to be within the
-        bounds of the coordinate_transformer. The method
-        crop_to_bounds() can be called to ensure this
-        is true.
-        """
-        self.__ct = coordinate_transformer
-        self.__slice = self.__ct.bounds2slice(slice_bounds)
-        self.bounds = self.__ct.slice2bounds(self.__slice)
-
-    def tuple(self):
-        r1,r2,c1,c2 = self.__slice
-        return (r1,r2,c1,c2)
-
-
-    # CBENHANCEMENT: might want to add __getitem__ for []-style access,
-    # along with other sequence-like methods.
+    # Allow unpacking and [] access
     def __iter__(self):
-        """
-        Make this object behave like a sequence.
-
-        Specifically, allows unpacking:
-        k = Slice()
-        r1,r2,c1,c2 = k
-        """
         return iter(self.__slice)
 
+    def __getitem__(self,index):
+        return self.__slice[index]
 
+
+    def __init__(self,slice_bounds,sheet_coordinate_system):
+        """
+        Create a slice of the given sheet_coordinate_system from the
+        specified bounds, and store the bounds that exactly correspond
+        to the created slice in the 'bounds' attribute.
+        """
+        self.__scs = sheet_coordinate_system
+        self.__slice = self.__scs.bounds2slice(slice_bounds)
+        self.bounds = self.__scs.slice2bounds(self.__slice)
+
+    def as_tuple(self):
+        """Return the slice as a 4-tuple."""
+        r1,r2,c1,c2 = self.__slice
+        return (r1,r2,c1,c2)
+    
     def translate(self, r, c):
         """
         Translate the slice by the specified number of rows
@@ -275,12 +263,12 @@ class Slice(object):
             self.__slice = array(slice_)
         else:
             self.__slice = slice_
-        self.bounds = self.__ct.slice2bounds(self.__slice)
+        self.bounds = self.__scs.slice2bounds(self.__slice)
 
 
     def submatrix(self,matrix):
         """
-        Return the submatrix of the specified matrix specified by this
+        Return the submatrix of the given matrix specified by this
         slice.
 
         Equivalent to computing the intersection between the
@@ -292,18 +280,17 @@ class Slice(object):
         """
         r1,r2,c1,c2 = self.__slice
         return matrix[r1:r2,c1:c2]
-
-    ## CEBALERT: should be renamed to crop_to_bounds Because
-    ## crop_to_sheet and translate are both called many, many times
-    ## during CFProjection initialization, it might be worth making
-    ## the bounds be accessed as a property so that it wouldn't be
-    ## updated twice as it is now, and would instead be cached and
-    ## reused.
-    def crop_to_sheet(self):
+    
+    ## CB: Because crop_to_sheet and translate are both called many,
+    ## many times during CFProjection initialization, it might be
+    ## worth making the bounds be accessed as a property so that it
+    ## wouldn't be updated twice as it is now, and would instead be
+    ## cached and reused.
+    def crop_to_sheet(self): # CEBALERT: crop_to_sheet_coordinate_system_bounds?
         """
         Crop the slice to the SheetCoordinateSystem's bounds.
         """
-        r1,r2,c1,c2 = self.__ct.bounds2slice(self.__ct.bounds)
+        r1,r2,c1,c2 = self.__scs.bounds2slice(self.__scs.bounds)
         maxrow,maxcol = r2-r1,c2-c1
                         
         t_idx,b_idx,l_idx,r_idx = self.__slice
@@ -314,6 +301,7 @@ class Slice(object):
         cbound = min(maxcol,r_idx)
         
         self._set_slice((rstart,rbound,cstart,cbound))
+
 
 
 
