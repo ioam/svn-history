@@ -456,7 +456,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         slice_.crop_to_sheet()
 
         # check it's been cropped to fit onto sheet...
-        self.assertEqual(slice_.tuple(),(0,2,8,10))
+        self.assertEqual(slice_.as_tuple(),(0,2,8,10))
 
         # now check that it gives the correct bounds...
         cropped_bounds = slice_.bounds
