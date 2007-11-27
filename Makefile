@@ -38,14 +38,18 @@ default: ext-packages topographica
 
 all: default reference-manual doc tests examples 
 
-clean: clean-doc clean-ext-packages clean-pyc
+clean: clean-doc clean-ext-packages clean-pyc 
 	${RM} .??*~ *~ */*~ */.??*~ */*/*~ */*/.??*~ */*/*/*~ */*/*/.??*~ *.bak
 	${RM} .#??*.* */.#??*.* */*/.#??*.* */*/*/.#??*.* current_profile ./topo/tests/testsnapshot.typ ./topo/tests/testplotfilesaver*.png
 	${RM} -r bin include share lib man topographica ImageSaver*.jpeg python_topo
 
 osx-patch: 
 	patch --force external/Makefile external/Makefile_OSX.diff
-	touch osx-patch
+	touch external/osx-patch
+
+osx-patch-clean:
+	patch --force --reverse external/Makefile external/Makefile_OSX.diff
+	${RM} external/osx-patch
 
 
 saved-examples: 
