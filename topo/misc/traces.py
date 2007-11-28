@@ -2,7 +2,7 @@
 Object classes for recording and plotting time-series data.
 
 This module defines a set of DataRecorder object types for recording
-time-series data, a set of TraceSpecification object types for
+time-series data, a set of Trace object types for
 specifying ways of generating 1D-vs-time traces from recorded data,
 and a TraceGroup object that will plot a set of traces on stacked,
 aligned axes.
@@ -199,21 +199,17 @@ class InMemoryRecorder(DataRecorder):
 
 
 
-# JB: Is there some reason not to simply call it a Trace?  Or maybe a
-# TraceExtractor, if we view it not as an object that is a trace, but
-# as one that extracts a trace from some data?  TraceSpecification
-# seems a bit dry...
-class TraceSpecification(ParameterizedObject):
+class Trace(ParameterizedObject):
     """
     A specification for generating 1D traces of data from recorded
     timeseries.
 
-    A TraceSpecification object is a callable object that encapsulates
+    A Trace object is a callable object that encapsulates
     a method for generating a 1-dimensional trace from possibly
     multidimensional timeseries data, along with a specification for
     how to plot that data, including Y-axis boundaries and plotting arguments.
     
-    TracesSpecification is an abstract class.  Subclasses implement
+    Trace is an abstract class.  Subclasses implement
     the __call__ method to define how to extract a 1D trace from a
     sequence of data.
     """
@@ -268,8 +264,7 @@ class TraceSpecification(ParameterizedObject):
         return ymin,ymax
 
 
-# JB: Should it say TraceSpecification here and below where it says Trace?
-class IdentityTrace(TraceSpecification):
+class IdentityTrace(Trace):
     """
     A Trace that returns the data, unmodified.
     """
@@ -278,7 +273,7 @@ class IdentityTrace(TraceSpecification):
 
 
 
-class IndexTrace(TraceSpecification):
+class IndexTrace(Trace):
     """
     A Trace that assumes that each data item is a sequence that can be
     indexed with a single integer, and traces the value of one indexed element.
@@ -292,7 +287,7 @@ class IndexTrace(TraceSpecification):
 
 
 
-class SheetPositionTrace(TraceSpecification):
+class SheetPositionTrace(Trace):
     """
     A trace that assumes that the data are sheet activity matrices,
     and traces the value of a given (x,y) position on the sheet.
@@ -327,7 +322,7 @@ class TraceGroup(ParameterizedObject):
     A TraceGroup defines a set of associated data traces and allows
     them to be plotted on stacked, aligned axes.  The constructor
     takes a DataRecorder object as a data source, and a list of
-    TraceSpecification objects that indicate the traces to plot.  The
+    Trace objects that indicate the traces to plot.  The
     trace specifications are stored in the attribute self.traces,
     which can be modified at any time.
     """
