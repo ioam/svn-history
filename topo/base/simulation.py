@@ -1170,6 +1170,12 @@ class Simulation(ParameterizedObject):
             self._time = stop_time
 
     def sleep(self,delay):
+        """
+        Advance the simulator time by the specified amount.
+        By default simply increments the _time value, but subclasses can
+        override this method as they wish, e.g. to wait for an
+        external real time clock to advance first.
+        """
         self._time += delay
 
     def enqueue_event(self,event):
