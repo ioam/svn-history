@@ -1,0 +1,54 @@
+>>> from topo.base.parameterizedobject import ParameterizedObject
+>>> from topo.base.parameterclasses import Number, DynamicNumber
+>>> from topo.misc.numbergenerators import UniformRandom
+
+
+## New syntax (in fact also used previously)
+
+>>> class TestPO1(ParameterizedObject):
+...    x = DynamicNumber(default=UniformRandom(lbound=-1,ubound=1,seed=1)) # *changes to Number*
+
+
+>>> t2 = TestPO1(x=UniformRandom(lbound=-1,ubound=1,seed=10))
+>>> t3 = TestPO1(x=UniformRandom(lbound=-1,ubound=1,seed=10))
+
+>>> t2.x==t3.x  # t2 and t3 have identical streams...
+True
+
+>>> forget = t2.x  # advance t2
+>>> t2.x==t3.x  # ...but do not share UniformRandom objects
+False
+
+
+>>> forget=t2.x;forget=t2.x;t2_last_value=t2.x  # advance t2 beyond t3
+>>> t2.inspect_value('x')==t2_last_value  # inspect_value() should return last generated value
+True
+>>> t3.inspect_value('x')==t2_last_value  # catch new bug caused by shared Parameter object (shared last_value)
+False
+
+
+
+## Repeat tests above to check old-style uses (previous syntax in example scripts) still work ok
+
+>>> class TestPO2(ParameterizedObject):
+...    x = Number(default=0.0)
+
+
+>>> t4 = TestPO2(x = DynamicNumber(UniformRandom(lbound=-1,ubound=1,seed=20)))
+>>> t5 = TestPO2(x = DynamicNumber(UniformRandom(lbound=-1,ubound=1,seed=20)))
+
+>>> t4.x==t5.x  # t4 and t5 have identical streams...
+True
+
+>>> forget = t4.x  # advance t4
+>>> t4.x==t5.x  # ...but do not share UniformRandom objects
+False
+
+
+>>> forget=t4.x;forget=t4.x;t4_last_value=t4.x  # advance t4 beyond t3
+>>> t4.inspect_value('x')==t4_last_value  # inspect_value() should return last generated value 
+True
+>>> t5.inspect_value==t4_last_value # catch new bug caused by shared Parameter object (shared last_value)
+False
+
+
