@@ -94,7 +94,8 @@ def run(verbosity=1,test_modules=None):
     To run only a subset of the tests, specify the module names in
     test_modules. For example:
     
-      ./topographica -c 'import topo.tests.testimage; topo.tests.run(test_modules=[topo.tests.testimage])'    
+      ./topographica -c 'import topo.tests.testimage; topo.tests.run(test_modules=[topo.tests.testimage])'
+      ./topographica -c 'import topo.tests; topo.tests.run(test_modules=["testDynamicParameter.txt"])'
     """
 
     import types
@@ -125,6 +126,9 @@ def run(verbosity=1,test_modules=None):
 
 
 # CB: if the unit tests were faster, I wouldn't keep needing this...
+# Also need to clean up so it just takes a filename or something - right
+# now it's not consistent for doctest/module. But we shouldn't need to
+# keep this function anyway.
 def run_named(name,verbosity=1):
     """
     Run the named test module.
@@ -133,10 +137,14 @@ def run_named(name,verbosity=1):
 
     Example:
     ./topographica -c 'import topo.tests; topo.tests.run_named("topo.tests.testsnapshots")'
+    ./topographica -c 'import topo.tests; topo.tests.run_named("testDynamicParameter.txt")'
     """
-    import __main__
-    exec "import %s"%name in __main__.__dict__
-    m = eval(name,__main__.__dict__)
+    if isinstance(name,str):
+        test_module = name
+    else:
+        import __main__
+        exec "import %s"%name in __main__.__dict__
+        test_module = eval(name,__main__.__dict__)
 
-    run(verbosity,test_modules=[m])
+    run(verbosity,test_modules=[test_module])
         
