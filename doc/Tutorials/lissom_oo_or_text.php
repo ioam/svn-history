@@ -474,7 +474,7 @@ class='t_item'>LGNOnAfferent</span>.  On a very fast machine you could
 even <span class='t_item'>Auto-refresh</span> an <span class='w_title'>Orientation Preference</span> window
 (probably practical only if you reduce the nominal_density of V1).
 
-<p></p></li><li>Now click the mouse into the <span class='t_item'>Learning iterations</span> field
+<p></p></li><li>Now click the mouse into the <span class='t_item'>Run for</span> field
 of the <span class='w_title'>Topographica Console</span> window, and hit Go a few
 times, each time looking at
 the random input(s) and the response to them in the
@@ -482,21 +482,22 @@ the random input(s) and the response to them in the
 learning this input can be seen in the <span class='w_title'>Projection</span>
 window.
 
-<p></p></li><li>With each new input, you may be able to see small changes in the
-weights of a few neurons in the <span
+<p></p></li><li>With each new input, you may be able to see small
+changes in the weights of a few neurons in the <span
 class='t_item'>LGNOnAfferent</span> array (by peering closely).  If
 the changes are too subtle for your taste, you can make each input
 have a obvious effect by speeding up learning to a highly implausible
 level.  To do this, open the <span class='w_title'>Model Editor</span>
-window, right click on the LGNOnAfferent projection, and change
-Learning Rate from the default 0.48 to 200, and then do the same for
+window, right click on the LGNOnAfferent projection (the cone-shaped
+lines from LGNOn to V1), select Properties, and change Learning Rate
+from the default 0.48 to 100, press Apply, and then do the same for
 the LGNOffAfferent projection.  You can also do the same from the
 terminal, or from the <span class='w_title'>Command Prompt</span>
 window available from the <span class='t_item'>Simulation</span> menu:
 
 <blockquote><code class='to_type'>
-topo.sim['V1'].projections('LGNOnAfferent').learning_rate=200
-topo.sim['V1'].projections('LGNOffAfferent').learning_rate=200
+topo.sim['V1'].projections('LGNOnAfferent').learning_rate=100
+topo.sim['V1'].projections('LGNOffAfferent').learning_rate=100
 </code></blockquote>
 
 Now each new pattern generated in a
