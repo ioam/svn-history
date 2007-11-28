@@ -11,7 +11,7 @@ import unittest
 from numpy.oldnumeric import array, pi
 from numpy.oldnumeric.mlab import rot90
 
-from topo.base.patterngenerator import Constant
+from topo.base.patterngenerator import Constant,PatternGenerator
 from topo.base.boundingregion import BoundingBox
 
 from topo.patterns.basic import Rectangle,Gaussian,Composite
@@ -202,8 +202,26 @@ class TestPatternGenerator(unittest.TestCase):
     # Should also test rotating, resizing...
 
 
+    def test_bug__dynamic_param_advanced_by_repr(self):
+        """Check for bug where repr of a PatternGenerator causes a DynamicNumber to change."""
+        # to do with position?
+        from topo.base.parameterclasses import DynamicNumber
+        from topo.misc.numbergenerators import UniformRandom
+
+        d=DynamicNumber(UniformRandom(lbound=-1,ubound=1,seed=1))
+        p=PatternGenerator(x=DynamicNumber(UniformRandom(lbound=-1,ubound=1,seed=1)))
+
+        x0 = p.x
+        x1 = p.x
+        self.assertNotEqual(x0,x1) # check we have setup something that actually changes
+
+        x2 = p.inspect_value('x')
+        repr(p)
+        x3 = p.inspect_value('x')
+        self.assertEqual(x2,x3) # value of x should not have been changed by repr(p)
+
+
+
+
 suite = unittest.TestSuite()
-#  Uncomment the following line of code, to disable the test if
-#  $DISPLAY is undefined.  Used mainly for GUI testing.
-# suite.requires_display = True
 suite.addTest(unittest.makeSuite(TestPatternGenerator))
