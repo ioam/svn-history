@@ -329,7 +329,7 @@ class KernelMax(OutputFn):
 
 class PoissonSample(OutputFn):
     """
-    Return samples from the Poisson distribution with the specified means.
+    Return samples from Poisson distributions with the specified means.
 
     This output function interprets each matrix value as the
     (potentially scaled) rate of a Poisson process and replaces it
