@@ -761,7 +761,7 @@ class DynamicNumber(object):
         """
         if len(params)>0:
             ####################
-            m = "\n------------------------------------------------------------\nPlease update your code - instead of using the 'DynamicNumber' Parameter in the code for your class, please use the 'Number' Parameter instead; the Number Parameter now supports dynamic values automatically.\n\nE.g. change\n\nclass X(ParameterizedObject):\n    y=DynamicNumber(NumberGenerator())\n\nto\n\n\nclass X(ParameterizedObject):\n    y=Number(NumberGenerator())\n------------------------------------------------------------\n"
+            m = "\n------------------------------------------------------------\nPlease update your code - instead of using the 'DynamicNumber' Parameter in the code for your class, please use the 'Number' Parameter; the Number Parameter now supports dynamic values automatically.\n\nE.g. change\n\nclass X(ParameterizedObject):\n    y=DynamicNumber(NumberGenerator())\n\nto\n\n\nclass X(ParameterizedObject):\n    y=Number(NumberGenerator())\n------------------------------------------------------------\n"
             if not cls.warnedA:
                 ParameterizedObject().warning(m)
                 cls.warnedA=True
