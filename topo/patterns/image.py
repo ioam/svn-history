@@ -12,7 +12,7 @@ from numpy.oldnumeric import array, Float, sum, ravel, ones
 
 from topo.base.boundingregion import BoundingBox
 from topo.base.parameterclasses import Number, Parameter, Enumeration, Integer
-from topo.base.parameterclasses import DynamicNumber, StringParameter
+from topo.base.parameterclasses import StringParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.projection import OutputFnParameter
