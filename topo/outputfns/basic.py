@@ -22,7 +22,7 @@ from math import ceil
 from topo.base.arrayutils import clip_in_place,clip_lower
 from topo.base.arrayutils import L2norm, norm, array_argmax
 from topo.base.functionfamilies import OutputFn
-from topo.base.parameterclasses import Parameter,Number,DynamicNumber,ListParameter
+from topo.base.parameterclasses import Parameter,Number,ListParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGeneratorParameter,Constant
 from topo.base.boundingregion import BoundingBox
@@ -282,7 +282,7 @@ class KernelMax(OutputFn):
     instance, or any function accepting bounds, density, radius, and
     height to return a kernel matrix.
     """
-    kernel_radius = DynamicNumber(default=0.0,bounds=(0,None),doc="""
+    kernel_radius = Number(default=0.0,bounds=(0,None),doc="""
         Kernel radius in Sheet coordinates.""")
     
     neighborhood_kernel_generator = PatternGeneratorParameter(

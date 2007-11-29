@@ -12,7 +12,7 @@ from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy import alltrue
 
 from topo.base.parameterclasses import Integer, Number, Parameter, Enumeration
-from topo.base.parameterclasses import DynamicNumber, ListParameter
+from topo.base.parameterclasses import ListParameter
 from topo.base.functionfamilies import OutputFnParameter
 from topo.base.patterngenerator import PatternGenerator
 
@@ -517,11 +517,11 @@ class Selector(PatternGenerator):
 
     size  = Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
 
-    index = DynamicNumber(default=UniformRandom(lbound=0,ubound=1.0,seed=76),
+    index = Number(default=UniformRandom(lbound=0,ubound=1.0,seed=76),
         bounds=(-1.0,1.0),precedence=0.20,doc="""
         Index into the list of pattern generators, on a scale from 0
         (start of the list) to 1.0 (end of the list).  Typically a
-        random value or other DynamicNumber, to allow a different item
+        random value or other number generator, to allow a different item
         to be selected each time.""")
 
     def __init__(self,generators=[Disk(x=-0.3,aspect_ratio=0.5),
