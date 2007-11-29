@@ -884,49 +884,65 @@ class ParameterizedObject(object):
         return vals
 
 
-    # CB: still working on these two
 
     # CEBALERT: the class equivalents of these are missing
     # (i.e. one can't yet do Gaussian.inspect_value('x') )
     
-    # wrong name we're not actually returning the repr
+    # CEBALERT: can someone make this more elegant? Or at least
+    # suggest some better names and help with the documentation?
+    # Maybe it was better with the duplicated code?
+    #
+    # do I have to pass the method? Can't I get it somehow?
     def repr_value(self,name):
-        # return value in a form that allows the thing to be recreated
-        param_obj = self.params().get(name)
+        """
+        Return the object that generates the value of the named attribute.
 
-        if not param_obj:
-            value = getattr(self,name)
-        elif hasattr(param_obj,'attribs'):
-            value = [self.repr_value(a) for a in param_obj.attribs]
-        elif not hasattr(param_obj,'_dynamic'):
-            value = getattr(self,name)
-        else:
-            # get the callable from this obj or from the class
-            try:
-                value = self.__dict__["_%s_param_value"%name]
-            except KeyError:
-                value = param_obj.default
-
-        return value
+        Same as getattr() except for Dynamic parameters, which have their
+        value-generating object returned.
+        """
+        return self.__shenma(name,self.repr_value,"_%s_param_value"%name,'default')
 
 
     def inspect_value(self,name):
         """
-        Return the value of the specified parameter without modifying it.
+        Return the current value of the named attribute without modifying it.
 
         Same as getattr() except for Dynamic parameters, which have their
-        'last_value' returned
+        last value returned.
         """
-        parameter_obj = self.params().get(name)
+        return self.__shenma(name,self.inspect_value,"_%s_param_value_last"%name,'last_value')
 
-        if not parameter_obj:
+
+    def __shenma(self,name,mthd,local_attr_name,param_attr_name):
+        """
+        Get the attribute specified by name; for non-parameters, this is the same
+        as getattr(), but for Parameters:-
+
+        * CompositeParameter: mthd is called for all attribs (recursive) 
+        * Dynamic Parameters: look for local_attr_name in this object's dictionary;
+          if that's not found, find param_attr_name on the Parameter itself.
+        """
+        param_obj = self.params().get(name)
+
+        if not param_obj:
             value = getattr(self,name)
-        elif hasattr(parameter_obj,'attribs'):
-            value = [self.inspect_value(a) for a in parameter_obj.attribs]
-        elif not hasattr(parameter_obj,'_dynamic'):
+
+        # CompositeParameter detected by being a Parameter and having 'attribs'
+        elif hasattr(param_obj,'attribs'):
+            value = [mthd(a) for a in param_obj.attribs]
+
+        # not a Dynamic Parameter 
+        elif not hasattr(param_obj,'_dynamic'):
             value = getattr(self,name)
+
+        # Dynamic Parameter...
         else:
-            value = self.__dict__.get("_%s_param_value_last"%name,parameter_obj.last_value)
+            try:
+                # ...which had been set on this object
+                value = self.__dict__[local_attr_name]
+            except KeyError:
+                # ...which had been set on a class
+                value = getattr(param_obj,param_attr_name)
 
         return value
 
