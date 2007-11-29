@@ -61,8 +61,109 @@ class Enumeration(Parameter):
 
 
 
+
+
+
+
+
+def produce_value(value_obj):
+    """
+    A helper function that produces an actual parameter from a stored
+    object.  If the object is callable, call it, else if it's an
+    iterator, call its .next(), otherwise return the object.
+    """
+    if callable(value_obj):
+        return value_obj()
+    if is_iterator(value_obj):
+        return value_obj.next()
+    return value_obj
+
+
+def is_iterator(obj):
+    """
+    Predicate that returns whether an object is an iterator.
+    """
+    import types
+    return type(obj) == types.GeneratorType or ('__iter__' in dir(obj) and 'next' in dir(obj))
+
+
+def is_dynamic(value):
+    if callable(value) or is_iterator(value):
+        return True
+    else:
+        return False
+
+
+
+import operator
+is_number = operator.isNumberType
+
+
+
+# CB: doc out of date!
+class Dynamic(Parameter):
+    """
+    Parameter whose value can be generated dynamically by a callable object.
+    
+    If a Parameter is declared as Dynamic, it can be set to be a
+    callable object (such as a function), and getting the parameter's
+    value will call that callable.  E.g., to cause all objects of type
+    Foo to draw the value of Parameter gammas from a Gaussian
+    distribution, you'd write something like:
+
+      from random import gauss
+      Foo.sigma = Dynamic(lambda:gauss(0.5,0.1))
+
+    If a Dynamic Parameter's value is set to a Python generator or iterator,
+    then when the Parameter is accessed, the iterator's .next() method
+    is called.  So to get a parameter that cycles through a sequence,
+    you could write:
+        
+      from itertools import cycle
+      Foo.sigma = Dynamic(cycle([0.1,0.5,0.9]))
+
+    Note that at present, the callable object must be an instance of a
+    callable class, rather than a named function or a lambda function,
+    or else this object will not be picklable.
+    """
+    __slots__ = ['last_value','_dynamic']
+    __doc__ = property((lambda self: self.doc))
+    
+    def __init__(self,**params):
+        super(Dynamic,self).__init__(instantiate=True,**params)  # CB: wait, do we always need to instantiate?
+        self.last_value = self.default # was None
+        self._dynamic = is_dynamic(self.default)
+
+    def __get__(self,obj,objtype):
+
+        if not obj:
+            result = produce_value(self.default)
+            self.last_value = result
+        else:
+            # complication: if value set on object, have to store last
+            # value in the *object*; if value set on class, just store
+            # last value in here (as before for DynamicNumber)
+            obj_name_for_param = self.get_name(obj)
+
+            if obj_name_for_param in obj.__dict__:
+                result = produce_value(obj.__dict__[obj_name_for_param])
+                obj.__dict__[obj_name_for_param+"_last"] = result
+            else:
+                result = produce_value(self.default)
+                self.last_value = result
+                        
+        return result
+
+
+    def __set__(self,obj,val):
+        super(Dynamic,self).__set__(obj,val)
+        self._dynamic = is_dynamic(val)
+
+
+
 # CEBALERT: Now accepts FixedPoint, but not fully tested.
-class Number(Parameter):
+# CB: doc out of date
+class Number(Dynamic):
     """
     """
     __slots__ = ['bounds','_softbounds']
@@ -98,40 +199,21 @@ class Number(Parameter):
         
           AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
         """
-        Parameter.__init__(self,default=default,**params)
+        super(Number,self).__init__(default=default,**params)
+        
         self.bounds = bounds
         self._softbounds = softbounds  
-        self._check_bounds(default)  # only create this number if the default value and bounds are consistent
+        if not self._dynamic: self._check_bounds(default)  
+        
 
-
-    ### JCALERT! The __get__ method is momentarily re-implemented in Number so that to deal
-    ### with the DynamicNumber. It will probably be deleted again when DynamicNumber will be
-    ### removed from the Parameter class hierarchy.
     def __get__(self,obj,objtype):
         """
         Get a parameter value.  If called on the class, produce the
         default value.  If called on an instance, produce the instance's
         value, if one has been set, otherwise produce the default value.
         """
-        # For documentation on __get__() see 'Implementing Descriptors'
-        # in the Python reference manual
-        # (http://www.python.org/doc/2.4.2/ref/descriptors.html)
-
-        if not obj:
-            result = self.default
-        else:
-            result = obj.__dict__.get(self.get_name(obj),self.default)
-
-            # CEBHACKALERT: allows a DynamicNumber to have been set as the
-            # value of a Number parameter of a ParameterizedObject. If we will
-            # continue to do this, we probably want one DynamicValue parameter
-            # and not DynamicNumber etc.
-            # This code shouldn't have any effect on existing uses of
-            # DynamicNumber - they all overwrite the original Number
-            # parameter anyway.
-            # (See also Number.__set__().)
-            if type(result)==DynamicNumber:
-                result=result.__get__(obj,objtype)
+        result = super(Number,self).__get__(obj,objtype)
+        if self._dynamic: self._check_bounds(result)
         return result
 
 
@@ -139,12 +221,10 @@ class Number(Parameter):
         """
         Set to the given value, raising an exception if out of bounds.
         """
-        # CEBHACKALERT: see Parameter.__get__().
-        # A DynamicNumber does not currently respect the bounds
-        # of the Number. (Before it couldn't have bounds at all.)
-        if type(val)!=DynamicNumber:
-            self._check_bounds(val)
+        dynamic = is_dynamic(val) # results in two calls to is_dynamic (there's one in super's set)
+        if not dynamic: self._check_bounds(val)
         super(Number,self).__set__(obj,val)
+        
 
     def set_in_bounds(self,obj,val):
         """
@@ -152,8 +232,13 @@ class Number(Parameter):
         All objects are accepted, and no exceptions will be raised.  See
         crop_to_bounds for details on how cropping is done.
         """
-        bounded_val = self.crop_to_bounds(val)
+        if not self._dynamic:
+            bounded_val = self.crop_to_bounds(val)
+        else:
+            bounded_val = val
+            
         super(Number,self).__set__(obj,bounded_val)
+
 
     def crop_to_bounds(self,val):
         """
@@ -189,13 +274,13 @@ class Number(Parameter):
         return val
 
 
-
+    # CB: rename to _check_value or something because it also checks the type
+    # and gets hijacked to do that more in subclasses (e.g. Integer)
     def _check_bounds(self,val):
         """
         Checks that the value is numeric and that it is within the hard
         bounds; if not, an exception is raised.
         """
-
         # CEB: all the following error messages should probably print out the parameter's name
         # ('x', 'theta', or whatever)
         if not (is_number(val)):
@@ -243,11 +328,10 @@ class Integer(Number):
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
-    def __set__(self,obj,val):
-        ###JABALERT: Should make sure the DynamicNumber is an integer
-        if not isinstance(val,int) and not isinstance(val,DynamicNumber):
+    def _check_bounds(self,val):
+        if not isinstance(val,int):
             raise ValueError("Parameter must be an integer.")
-        super(Integer,self).__set__(obj,val)
+        super(Integer,self)._check_bounds(val)
 
 
 class Magnitude(Number):
@@ -369,122 +453,6 @@ def wrap_callable(c):
     else:
         return c
         
-
-# This could multiply inherit from Dynamic and Number, but it's
-# currently mixed together by hand for simplicity.
-class DynamicNumber(Number):
-    __slots__ = ['last_value']
-    __doc__ = property((lambda self: self.doc))
-
-    def __init__(self,default=0.0,bounds=None,softbounds=None,**params):
-        """
-        Create Dynamic version of a Number parameter.
-
-        If set with a callable or iterable object, the bounds are checked when the
-        number is retrieved (generated), rather than when it is set.
-        """
-        Parameter.__init__(self,default=default,**params)
-        self.bounds = bounds
-        self._softbounds = softbounds  
-        self._check_bounds(default)  # only create this number if the default value and bounds are consistent
-
-        # Provides a way to display a value without changing it
-        self.last_value = None
-
-    def __get__(self,obj,objtype):
-        """
-        Get a parameter value.  If called on the class, produce the
-        default value.  If called on an instance, produce the instance's
-        value, if one has been set, otherwise produce the default value.
-        """
-        if not obj:
-            result = produce_value(self.default)
-        else:
-            result = produce_value(obj.__dict__.get(self.get_name(obj),self.default))
-        self._check_bounds(result)
-
-        self.last_value = result
-        return result
-
-    def _check_bounds(self,val):
-        """
-        Except for callable values (assumed to be checked at get time), checks against bounds.
-
-        Non-callable, non-iterable values are checked to be numeric and within the hard
-        bounds.  If they are not, an exception is raised.
-        """
-
-        if not (callable(val) or is_iterator(val)):
-            super(DynamicNumber,self)._check_bounds(val)
-
-
-class Dynamic(Parameter):
-    """
-    Parameter whose value is generated dynamically by a callable object.
-    
-    If a Parameter is declared as Dynamic, it can be set to be a
-    callable object (such as a function), and getting the parameter's
-    value will call that callable.  E.g., to cause all objects of type
-    Foo to draw the value of Parameter gammas from a Gaussian
-    distribution, you'd write something like:
-
-      from random import gauss
-      Foo.sigma = Dynamic(lambda:gauss(0.5,0.1))
-
-    If a Dynamic Parameter's value is set to a Python generator or iterator,
-    then when the Parameter is accessed, the iterator's .next() method
-    is called.  So to get a parameter that cycles through a sequence,
-    you could write:
-        
-      from itertools import cycle
-      Foo.sigma = Dynamic(cycle([0.1,0.5,0.9]))
-
-    Note that at present, the callable object must be an instance of a
-    callable class, rather than a named function or a lambda function,
-    or else this object will not be picklable.
-    """
-    __slots__ = []
-    __doc__ = property((lambda self: self.doc))
-    
-    def __get__(self,obj,objtype):
-        """
-        Get a parameter value.  If called on the class, produce the
-        default value.  If called on an instance, produce the instance's
-        value, if one has been set, otherwise produce the default value.
-        """
-        
-        if not obj:
-            result = produce_value(self.default)
-        else:
-            result = produce_value(obj.__dict__.get(self.get_name(obj),self.default))
-        return result
-
-
-
-def produce_value(value_obj):
-    """
-    A helper function that produces an actual parameter from a stored
-    object.  If the object is callable, call it, else if it's an
-    iterator, call its .next(), otherwise return the object.
-    """
-    if callable(value_obj):
-        return value_obj()
-    if is_iterator(value_obj):
-        return value_obj.next()
-    return value_obj
-
-
-def is_iterator(obj):
-    """
-    Predicate that returns whether an object is an iterator.
-    """
-    import types
-    return type(obj) == types.GeneratorType or ('__iter__' in dir(obj) and 'next' in dir(obj))
-
-
-import operator
-is_number = operator.isNumberType
-
 
 # CEBALERT: this should be a method of ClassSelectorParameter.
 def concrete_descendents(parentclass):
@@ -683,7 +651,10 @@ class ListParameter(Parameter):
 
     def __set__(self,obj,val):
         """Set to the given value, raising an exception if out of bounds."""
-        if type(val)!=DynamicNumber:
+
+        # CB: think this is ok
+        if not (hasattr(val,'_dynamic') and val._dynamic):
+        #if type(val)!=DynamicNumber:
             self._check_bounds(val)
         super(ListParameter,self).__set__(obj,val)
 
@@ -760,3 +731,55 @@ class InstanceMethodWrapper(object):
         return self.im(*args,**kw)
 
 
+
+
+
+## CEB: this whole chunk awaiting removal.
+class DynamicNumber(object):
+    """
+    Provide support for exising code that uses DynamicNumber: see __new__().
+    """
+    warnedA = False
+    warnedB = False
+    
+    def __new__(cls,default=None,**params):
+        """
+        If bounds or softbounds or any params are supplied, assume we're dealing
+        with DynamicNumber declared as a parameter of a ParameterizedObject class.
+        In this case, return a new *Number* parameter instead.
+
+        Otherwise, assume we're dealing with DynamicNumber supplied as the value
+        of a Number Parameter. In this case, return a DynamicNumber (but one which is
+        not a Parameter, just a simple wrapper).
+
+        * Of course, this is not 100% reliable: if someone defines a class with
+        * a DynamicNumber but doesn't pass any doc or bounds or whatever. But in such
+        * cases, they'll get the ParameterizedObject warning about being unable to
+        * set a class attribute.
+
+        Most of the code is to generate warning messages.
+        """
+        if len(params)>0:
+            ####################
+            m = "\n------------------------------------------------------------\nPlease update your code - instead of using the 'DynamicNumber' Parameter in the code for your class, please use the 'Number' Parameter instead; the Number Parameter now supports dynamic values automatically.\n\nE.g. change\n\nclass X(ParameterizedObject):\n    y=DynamicNumber(NumberGenerator())\n\nto\n\n\nclass X(ParameterizedObject):\n    y=Number(NumberGenerator())\n------------------------------------------------------------\n"
+            if not cls.warnedA:
+                ParameterizedObject().warning(m)
+                cls.warnedA=True
+            ####################
+
+            n = Number(default,**params)
+            return n
+        else:
+            ####################
+            m = "\n------------------------------------------------------------\nPlease update your code - instead of using DynamicNumber to contain a number generator, pass the number generator straight to the Number parameter:\n\nE.g. in code using the class below...\n\nclass X(ParameterizedObject):\n    y=Number(0.0)\n\n\nchange\n\nx = X(y=DynamicNumber(NumberGenerator()))\n\nto\n\nx = X(y=NumberGenerator())\n------------------------------------------------------------\n"
+            if not cls.warnedB:
+                ParameterizedObject().warning(m)
+                cls.warnedB=True
+            ####################
+            return object.__new__(cls,default)
+
+    
+    def __init__(self,default=0.0,bounds=None,softbounds=None,**params):        
+        self.val = default
+    def __call__(self):
+        return self.val()
