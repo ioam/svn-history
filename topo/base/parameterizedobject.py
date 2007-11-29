@@ -73,7 +73,6 @@ def descendents(class_):
 
 
 
-
 class Parameter(object):
     """
     An attribute descriptor for declaring parameters.
@@ -265,14 +264,12 @@ class Parameter(object):
         # For documentation on __get__() see 'Implementing Descriptors'
         # in the Python reference manual
         # (http://www.python.org/doc/2.4.2/ref/descriptors.html)
-
         if not obj:
             result = self.default
         else:
             result = obj.__dict__.get(self.get_name(obj),self.default)
-
         return result
-
+        
 
     def __set__(self,obj,val):
         """
@@ -353,6 +350,9 @@ class Parameter(object):
                     if desc is self:
                         return attrib_name
 
+        #CB: note to myself: what's this, do I need to change after
+        #CB: Dynamic changes...
+                    
         # If things fall through to here without finding
         # the descriptor, then check in the object dictionary.
         # Dynamic parameters set in the object constructor are stored there.
@@ -360,6 +360,10 @@ class Parameter(object):
             for name,value in obj.__dict__.iteritems():
                 if value is self:
                     return name
+
+        #CB:  ...and check that things like get_name don't die if this
+        #CB: returns None etc (i.e. might need an ALERT here but I
+        #CB: haven't actually investigated).
 
         # if we get this far, we couldn't find the name
         return None
@@ -736,10 +740,6 @@ class ParameterizedObject(object):
         Variant of __repr__ designed for generating a runnable script.
         """
         # Suppresses automatically generated names and print_levels.
-        #
-        # JABHACKALERT: Dynamic parameters are currently silently
-        # reported as their current value; they should instead get a
-        # representation that allows them to be regenerated.
         settings=[]
         for name,val in self.get_param_values(onlychanged=script_repr_suppress_defaults):
             if name == 'name' and re.match('^'+self.__class__.__name__+'[0-9]+$',val):
@@ -833,7 +833,7 @@ class ParameterizedObject(object):
         for class_ in classlist(type(self)):
             for (k,v) in class_.__dict__.items():
                 if isinstance(v,Parameter) and v.instantiate:
-                    parameter_name = v.get_name(self) 
+                    parameter_name = v.get_name(self)
                     new_object = copy.deepcopy(v.default)
                     self.__dict__[parameter_name]=new_object
 
@@ -874,7 +874,7 @@ class ParameterizedObject(object):
         """Return a list of name,value pairs for all Parameters of this object"""
         vals = []
         for name,val in self.params().items():
-            value = self.inspect_value(name)
+            value = self.repr_value(name)
             if (not onlychanged or value != val.default):
                 vals.append((name,value))
 
@@ -882,24 +882,35 @@ class ParameterizedObject(object):
         return vals
 
 
+    # CB: still working on these two
+    
+    # wrong name we're not actually returning the repr
+    def repr_value(self,name):
+        # return value in a form that allows the thing to be recreated
+        param_obj = self.params().get(name)
+
+        if not param_obj or not hasattr(param_obj,'_dynamic'):
+            value = getattr(self,name)
+        else:
+            # CB**: check what happens to dynamic param that's in *class* not obj (i.e. is getattr right?)
+            k = "_%s_param_value"%name
+            value = self.__dict__.get(k,getattr(self,name))
+
+        return value
+
     def inspect_value(self,name):
         """
         Return the value of the specified parameter without modifying it.
 
-        Same as getattr() except for DynamicNumbers
+        Same as getattr() except for Dynamic parameters, which have their
+        'last_value' returned
         """
-        from parameterclasses import DynamicNumber 
-        
-        # Avoids getting a new value for a DynamicNumber. Otherwise,
-        # all that would be here is value=getattr(self,name).)
-        k = "_%s_param_value"%(name)
-        if k in self.__dict__:
-            if isinstance(self.__dict__[k],DynamicNumber):
-                value = self.__dict__[k].last_value
-            else:
-                value = getattr(self,name)
+        parameter_obj = self.params().get(name)
+
+        if not parameter_obj or not hasattr(parameter_obj,'_dynamic'):
+            value = getattr(self,name)
         else:
-            value = getattr(self,name)                    
+            value = self.__dict__.get("_%s_param_value_last"%name,parameter_obj.last_value)
 
         return value
 
