@@ -88,6 +88,13 @@ $Id$
 # it does seem to work!
 
 
+
+# ERROR: (checking for number equality not correct because of precision,
+# so they're listed as 'changed' when in fact they haven't been...at least
+# by the user...check that we don't actually introduce a change here by
+# displaying numbers!)
+
+
 import __main__, sys
 import Tkinter, _tkinter
 
@@ -100,7 +107,7 @@ from topo.base.parameterizedobject import ParameterizedObject,Parameter, \
      classlist,ParameterizedObjectMetaclass
 from topo.base.parameterclasses import BooleanParameter,StringParameter, \
      Number,SelectorParameter,ClassSelectorParameter,ObjectSelectorParameter, \
-     CallableParameter
+     CallableParameter,Dynamic
 
 import topo # for topo.guimain only
 
@@ -440,6 +447,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # at least need a test that will fail when a new param type added
         # Rename
         self.trans={Parameter:Eval_ReprTranslator,
+                    Dynamic:Eval_ReprTranslator,
                     ObjectSelectorParameter:String_ObjectTranslator,
                     ClassSelectorParameter:CSPTranslator,
                     Number:EvalToFloatTranslator,
@@ -495,6 +503,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         if self._live_update: self._update_param_from_tkvar(p_name)
 
 
+    # rename param to param_obj
     def _create_tkvar(self,PO,name,param):
         """
         Add _tkvars[name] to represent param.
@@ -505,6 +514,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         values in sync, and updates the translator dictionary to map
         string representations to the objects themselves.
         """
+        # CEBALERT: should probably delete any existing tkvar for name
         self._create_translator(name,param)
 
         tkvar = lookup_by_class(self.__param_to_tkvar,type(param))()
@@ -515,7 +525,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         tkvar._original_set = tkvar.set
         tkvar.set = lambda v,x=name: self._tkvar_set(x,v)
 
-        tkvar.set(getattr(PO,name))
+        tkvar.set(self.get_parameter_value(name,PO))
         tkvar._last_good_val=tkvar.get() # for reverting
         tkvar.trace_variable('w',lambda a,b,c,p_name=name: self._handle_gui_set(p_name))
         # CB: Instead of a trace, could we override the Variable's
@@ -685,7 +695,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
         Otherwise, looks in the source_POs of this object.
         """
         source = parameterized_object or self.get_source_po(name)
-        return getattr(source,name) 
+        return source.repr_value(name) #getattr(source,name) #.inspect_value(name)
+    #return getattr(source,name) 
 
         
     def set_parameter_value(self,name,val,parameterized_object=None):
@@ -710,6 +721,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         search the list of shadow POs and return from the first match.
         If there is no match, raise an attribute error.
         """
+        # ERROR: make this use the get_parameter_value method when it's getting a parameter!
         try:
             return object.__getattribute__(self,name)
         except AttributeError:
@@ -727,6 +739,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         is found on a shadow PO (searched in order), set it there. Otherwise, set the
         attribute on this object (i.e. add a new attribute).
         """
+        # ERROR: make this use the set_parameter_value method when it's getting a parameter!
         try:
             object.__getattribute__(self,name)
             object.__setattr__(self,name,val)
@@ -753,7 +766,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
 
-
 ######################################################################
 # Translation between GUI (strings) and true values
 
@@ -763,6 +775,18 @@ class TkParameterizedObjectBase(ParameterizedObject):
         param_value = self.get_parameter_value(name)
 
         translator_type = lookup_by_class(self.trans,type(param))
+
+        # Dynamic parameters only *might* contain a 
+        # dynamic value; if such a parameter really is dynamic, we
+        # overwrite any more specific class found above
+        # (e.g. a Number with a dynamic value will have a numeric
+        # translator from above, so we replace that)
+        # (test for Dynamic could be just looking for last_value attribute)
+        try:
+            if param._dynamic: translator_type = self.trans[Dynamic]
+        except AttributeError:
+            pass # non-Dynamic Parameter
+            
         self.translators[name]=translator_type(param,initial_value=param_value)#,original_string)        
 
 
@@ -925,6 +949,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         self.widget_creators = {
             BooleanParameter:self._create_boolean_widget,
+            Dynamic:self._create_string_widget,
             Number:self._create_number_widget,
             ButtonParameter:self._create_button_widget,
             StringParameter:self._create_string_widget,
@@ -1007,9 +1032,9 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         widget.pack(side=widget_side,expand='yes',fill='x')
 
         representation = {"frame":frame,"widget":widget,
-                          "label":label,"pack_options":pack_options}
+                          "label":label,"pack_options":pack_options,
+                          "on_change":on_change,"on_modify":on_modify}                       
         self.representations[name] = representation
-                               
 
         # If there's a label, balloon's bound to it - otherwise, bound
         # to enclosing frame.
@@ -1069,6 +1094,23 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             x.destroy()
 
 
+    def repack_param(self,name):
+
+        f = self.representations[name]['frame']
+        w = self.representations[name]['widget']
+        l = self.representations[name]['label']
+        o = self.representations[name]['pack_options']
+        on_change = self.representations[name]['on_change']
+        on_modify = self.representations[name]['on_modify']
+        
+        w.destroy(); l.destroy()        
+
+        param_obj,PO = self.get_parameter_object(name,with_location=True)
+        self._create_tkvar(PO,name,param_obj)
+        
+        self.pack_param(name,f,on_change=on_change,on_modify=on_modify,**o)
+
+
     def _create_widget(self,name,master,widget_options={},on_change=None,on_modify=None):
         """
         Return widget,label for parameter 'name', each having the master supplied
@@ -1077,14 +1119,19 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         widget_creators dictionary; see individual widget creation
         methods for details to each type of widget.
         """
+        # HACK: two places now look at dynamic; should use trans type or whatever
+        
         # select the appropriate widget-creation method;
         # default is self._create_string_widget... 
         widget_creation_fn = self._create_string_widget
-        # ...but overwrite that with a more specific one, if possible
-        for c in classlist(type(self.get_parameter_object(name)))[::-1]:
-            if self.widget_creators.has_key(c):
-                widget_creation_fn = self.widget_creators[c]
-                break
+
+        param_obj = self.get_parameter_object(name)
+        if not hasattr(param_obj,'_dynamic') or not param_obj._dynamic:
+            # ...but overwrite that with a more specific one, if possible
+            for c in classlist(type(self.get_parameter_object(name)))[::-1]:
+                if self.widget_creators.has_key(c):
+                    widget_creation_fn = self.widget_creators[c]
+                    break
             
         if on_change is not None:
             self._tkvars[name]._on_change=on_change
@@ -1458,7 +1505,6 @@ class Eval_ReprTranslator(Translator):
 
     # the whole last_string deal is required because of execing in main
     def string2object(self,string_):
-
         if string_!=self.last_string:
             try:
                 self.last_object = eval(string_,__main__.__dict__)
@@ -1480,6 +1526,8 @@ class Eval_ReprTranslator(Translator):
         else:
             return repr(object_)
 
+
+        
 
 class String_ObjectTranslator(Translator):
 
