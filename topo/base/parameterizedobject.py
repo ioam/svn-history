@@ -892,13 +892,12 @@ class ParameterizedObject(object):
         if not param_obj or not hasattr(param_obj,'_dynamic'):
             value = getattr(self,name)
         else:
-            k = "_%s_param_value"%name
-
-            if k in self.__dict__:
-                value = self.__dict__[k]
-            else:
-                # CB**: check what happens to dynamic param that's in *class* not obj (i.e. is getattr right - presumably not)
-                value = getattr(self,name)
+            # get the callable from this obj or from the class
+            try:
+                value = self.__dict__["_%s_param_value"%name]
+            except KeyError:
+                # CB should replace below with simpler way to get it (i can't think of it right now)
+                value = type(self).__dict__[name].default
 
         return value
 
