@@ -52,3 +52,19 @@ True
 False
 
 
+
+## Check class-level Dynamic parameter works ok
+
+>>> class TestPO3(ParameterizedObject):
+...    x = Number(default=UniformRandom(lbound=-1,ubound=1,seed=30))
+
+>>> t6 = TestPO3()
+>>> t7 = TestPO3()
+
+# advancing t6 advances t7 because it's the same
+>>> t6_first_value = t6.x
+>>> t7.inspect_value('x')==t6_first_value
+True
+
+
+
