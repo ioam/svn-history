@@ -166,21 +166,24 @@ class OutputFnDebugger(OutputFn):
     """
     
     function = OutputFnParameter(default=IdentityOF(), doc="""
-    Output function whose parameters will be tracked.""")
+        Output function whose parameters will be tracked.""")
     
     debug_params = ListParameter(default=['a', 'b'], doc="""
-    List of the function object's parameters that should be stored.""")
+        List of the function object's parameters that should be stored.""")
     
     avg_params = ListParameter(default=['x'], doc="""
-    List of the function object's parameters that should be averaged and stored.""")
+        List of the function object's parameters that should be averaged and stored.""")
     
     units= ListParameter(default=[(0,0)], doc="""
-    Units for which parameter values are stored.""")
+        Units for which parameter values are stored.""")
     
-    step=Number(default=8, doc="How often to update debugging information and calculate averages")
+    step=Number(default=8, doc="How often to update debugging information and calculate averages.")
 
     smoothing = Number(default=0.0003, doc="""
-    Determines the degree of weighting of current vs previous values when calculating the average.""")
+        Determines the relative weighting of current and previous values when calculating the average.
+        The average is then an exponentially smoothed version of the
+        value, using this value as the time constant.""")
+
     
     def __init__(self,**params):
         super(OutputFnDebugger,self).__init__(**params)
@@ -191,20 +194,25 @@ class OutputFnDebugger(OutputFn):
         for dp in self.debug_params:
             self.debug_dict[dp]= zeros([len(self.units),30000],activity_type)
         for ap in self.avg_params:
-            self.avg_dict[ap]=zeros([len(self.units),30000],activity_type) 
+            self.avg_dict[ap]=zeros([len(self.units),30000],activity_type)
     
         
     def __call__(self,x):
       
         x_copy=x
+        
         if self.first_call:
 	    self.first_call = False
             self.avg_values={}
             for ap in self.avg_params:
                 self.avg_values[ap]=zeros(x_copy.shape, x_copy.dtype.char)
+                
         self.n_step += 1
+        
         if self.n_step == self.step:
+            
             self.n_step = 0
+            
             for dp in self.debug_params:
                 for u in self.units:
                     if dp=="x":
@@ -213,8 +221,8 @@ class OutputFnDebugger(OutputFn):
                         value_matrix= getattr(self.function, dp)
                         value=value_matrix[u]
                         self.debug_dict[dp][self.units.index(u)][topo.sim.time()]=value
+
             for ap in self.avg_params:
-            
                 for u in self.units:
                     if ap=="x":
                         self.avg_values[ap] = self.smoothing*x_copy + (1.0-self.smoothing)*self.avg_values[ap]
@@ -225,25 +233,25 @@ class OutputFnDebugger(OutputFn):
                         self.avg_dict[ap][self.units.index(u)][topo.sim.time()]=self.avg_values[ap][u]
             
                          
+    # JABALERT: This function should be merged with save_debug_graphs, if possible
     def plot_debug_graphs(self,init_time, final_time):
         """
-        Plots parameter values the OutputFnDebugger object has been storing over time.
+        Plots parameter values accumulated by the OutputFnDebugger.
 
         Example call::
         ODH.plot_debug_graphs(1,10000,debug_params=['a', 'b','eta'],avg_params=[x],units=[(0,0),(11,11)])
-        
         """
               
         debug_params = ListParameter(default=self.debug_params, doc="""
-        List of the function object's parameters that should be plotted""")
+            List of the function object's parameters that should be plotted.""")
         
         avg_params = ListParameter(default=self.avg_params, doc="""
-        List of the function object's parameters that should be averaged and plotted""")
+            List of the function object's parameters that should be averaged and plotted.""")
         
-        units= ListParameter(default=self.units, doc="""
-        Units for which parameter values are plotted""")
+        units = ListParameter(default=self.units, doc="""
+            Units for which parameter values are plotted.""")
     
-            
+        # JABALERT: This for loop should be merged with the one below
         for dp in self.debug_params:
             pylab.figure()
             isint=pylab.isinteractive()
@@ -257,6 +265,7 @@ class OutputFnDebugger(OutputFn):
                 index=self.units.index(unit)
                 plot_data=self.debug_dict[dp][index][init_time:final_time]
                 vectorplot(plot_data, label='Unit'+str(unit))
+                
             if isint: pylab.ion()
             pylab.legend(loc=0)
             pylab.show._needmain = False 
@@ -275,7 +284,7 @@ class OutputFnDebugger(OutputFn):
             for unit in self.units:
                 index=self.units.index(unit)
                 plot_data=self.avg_dict[ap][index][init_time:final_time]
-                vectorplot(plot_data, label='Unit'+str(unit))   
+                vectorplot(plot_data, label='Unit'+str(unit))
 
             if isint: pylab.ion()
             pylab.legend(loc=0)
@@ -284,14 +293,17 @@ class OutputFnDebugger(OutputFn):
                        
                               
 
+    # JABALERT: This function should be merged with plot_debug_graphs, if possible
     def save_debug_graphs(self,filename,init_time,final_time):
         """
-        Saves plots of parameter values the OutputFnDebugger object has been storing over time. 
-
+        Saves plots of parameter values accumulated by the OutputFnDebugger.
+        
         Example call::
-        ODH.save_debug_graphs("V1_graphs",1,10000)
+        
+          ODH.save_debug_graphs("V1_graphs",1,10000)
 
-        Can adjust this function to produce desired plots as described in comments.
+        Can adjust this function to produce different plots, as
+        described in the comments.
         """
               
         debug_params = ListParameter(default=self.debug_params, doc="""
@@ -303,8 +315,8 @@ class OutputFnDebugger(OutputFn):
         units= ListParameter(default=self.units, doc="""
         Units for which parameter values are plotted""")
 
-        
                
+        # JABALERT: This for loop should be merged with the one below
         for dp in self.debug_params:
             fig = matplotlib.figure.Figure(figsize=(6,4)) # can change this to change the figure size and shape
             ax = fig.add_subplot(111)
@@ -312,6 +324,7 @@ class OutputFnDebugger(OutputFn):
             ax.set_ylabel(dp)
             #ax.set_ylim( 0, 0.03 ) #specify axis limits
             #ax.set_xlim( 0, 10000)
+            
             for unit in self.units:
                 index=self.units.index(unit)
                 plot_data=self.debug_dict[dp][index][init_time:final_time]
