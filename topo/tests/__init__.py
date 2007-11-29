@@ -126,25 +126,28 @@ def run(verbosity=1,test_modules=None):
 
 
 # CB: if the unit tests were faster, I wouldn't keep needing this...
-# Also need to clean up so it just takes a filename or something - right
-# now it's not consistent for doctest/module. But we shouldn't need to
-# keep this function anyway.
-def run_named(name,verbosity=1):
+#
+# Also, some of the test modules actually have code to handle running
+# them, e.g. ./topographica topo/tests/testsheet.py works to run the
+# sheet tests. But not all the modules have the required code - it
+# must be typed into each new file. None of the doctests have it.
+def run_named(name,verbosity=2):
     """
     Run the named test module.
 
     Convenience function to make it easy to run a single test module.
 
     Example:
-    ./topographica -c 'import topo.tests; topo.tests.run_named("topo.tests.testsnapshots")'
+    ./topographica -c 'import topo.tests; topo.tests.run_named("testsnapshots.py")'
     ./topographica -c 'import topo.tests; topo.tests.run_named("testDynamicParameter.txt")'
     """
-    if isinstance(name,str):
+    if name.endswith('.txt'):
         test_module = name
-    else:
+    elif name.endswith('.py'):
+        module_name = "topo.tests."+name[0:-3]
         import __main__
-        exec "import %s"%name in __main__.__dict__
-        test_module = eval(name,__main__.__dict__)
+        exec "import %s"%module_name in __main__.__dict__
+        test_module = eval(module_name,__main__.__dict__)
 
     run(verbosity,test_modules=[test_module])
         
