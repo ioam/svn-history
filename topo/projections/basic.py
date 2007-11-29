@@ -12,7 +12,6 @@ __version__ = "$Revision$"
 import topo
 import copy
 import numpy
-import matplotlib
 from math import exp
 from numpy import exp,zeros,ones
 # So all Projections are present in this package
@@ -26,8 +25,6 @@ from topo.base.patterngenerator import PatternGeneratorParameter,Constant
 from topo.base.sheetview import UnitView
 from topo.base.cf import ConnectionField, CFPRF_Plugin, MaskedCFIter
 from topo.base.functionfamilies import CoordinateMapperFnParameter,IdentityMF
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_agg import FigureCanvasAgg
 from topo.misc.utils import rowcol2idx
 from topo.outputfns.basic import IdentityOF
 
@@ -278,70 +275,4 @@ class OneToOneProjection(Projection):
                              self.learning_rate)
 
 
-class DebugCFProjection(CFProjection):
-    """
-    CFProjection which calculates and keeps track of it's own average activity (other parameters ccan also be
-    stored if listed in debug_params) so they can be plotted or used for e.g. synaptic scaling.
-    
-    """
-    learning = BooleanParameter(True,doc="""If false disables the averaging e.g. during map measurement """)
-
-    smoothing = Number(default=0.0003, doc="""
-    Determines the degree of weighting of current vs previous values when calculating the average.""")
-
-    debug_params = ListParameter(default=['y_avg'], doc="""
-    List of the function object's parameters that should be stored.""")
-
-    units= ListParameter(default=[(0,0)], doc="""
-    Units for which parameter values are stored.""")
-    
-    def __init__(self,**params):
-        super(DebugCFProjection,self).__init__(**params)
-        self.y_avg = numpy.zeros(self.activity.shape)
-        self.debug_dict={}
-        for dp in self.debug_params:
-            self.debug_dict[dp]= zeros([len(self.units),30000],activity_type)
-
-    def activate(self,input_activity):
-        """
-        Retain input_activity from the previous step in leaky_input_buffer
-        and add a leaked version of it to the current input_activity. This
-        function needs to deal with a finer time-scale.
-        """
-        super(DebugCFProjection,self).activate(input_activity)
-        if self.dest.learning:
-            self.get_yavg(self.activity)
-           
-
-    def get_yavg(self, activity):
-
-        self.y_avg = self.smoothing*self.activity + (1.0-self.smoothing)*self.y_avg
-        for dp in self.debug_params:
-                for u in self.units:
-                    value_matrix= getattr(self, dp)
-                    value=value_matrix[u]
-                    self.debug_dict[dp][self.units.index(u)][topo.sim.time()]=value
-        
-
-    def save_graphs(self,init_time,final_time):
-        """
-        Saves graphs of the projection debug_params between the specified iteration numbers.
-        """
-        for dp in self.debug_params:
-            fig = matplotlib.figure.Figure(figsize=(6,4))
-            ax = fig.add_subplot(111)
-            ax.set_xlabel("Iteration Number")
-            ax.set_ylabel(dp)
-            #ax.set_xlim( 0, 10000)
-            for u in self.units:
-                index=self.units.index(u)
-                plot_data=self.debug_dict[dp][index][init_time:final_time]
-                #save(dp+str(u[0])+"_"+str(u[1]),plot_data,fmt='%.6f', delimiter=',') # uncomment if you also want to save the raw data
-                ax.plot(plot_data, label='Unit'+str(u))
-            ax.legend(loc=0) 
-            # Make the PNG
-            canvas = FigureCanvasAgg(fig)
-            # The size * the dpi gives the final image size
-            #   a4"x4" image * 80 dpi ==> 320x320 pixel image
-            canvas.print_figure(dp+self.name+str(topo.sim.time())+".png", dpi=100)
             
