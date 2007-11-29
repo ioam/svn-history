@@ -20,7 +20,6 @@ from topo.base.sheetview import *
 from topo.tkgui.templateplotgrouppanel import *
 import topo.patterns.basic
 
-from topo.base.parameterclasses import DynamicNumber
 from topo.misc.numbergenerators import UniformRandom
 
 ### JCALERT: This test has to be written in order to test the new change in
@@ -48,9 +47,9 @@ class TestActivityPanel(unittest.TestCase):
             bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))),
             scale=gaussian_height,
             aspect_ratio=gaussian_width/gaussian_height,
-            x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=100)),
-            y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
-            orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=300)))
+            x=UniformRandom(lbound=-0.5,ubound=0.5,seed=100),
+            y=UniformRandom(lbound=-0.5,ubound=0.5,seed=200),
+            orientation=UniformRandom(lbound=-pi,ubound=pi,seed=300))
 
 
         ###########################################

@@ -205,11 +205,9 @@ class TestPatternGenerator(unittest.TestCase):
     def test_bug__dynamic_param_advanced_by_repr(self):
         """Check for bug where repr of a PatternGenerator causes a DynamicNumber to change."""
         # to do with position?
-        from topo.base.parameterclasses import DynamicNumber
         from topo.misc.numbergenerators import UniformRandom
 
-        d=DynamicNumber(UniformRandom(lbound=-1,ubound=1,seed=1))
-        p=PatternGenerator(x=DynamicNumber(UniformRandom(lbound=-1,ubound=1,seed=1)))
+        p=PatternGenerator(x=UniformRandom(lbound=-1,ubound=1,seed=1))
 
         x0 = p.x
         x1 = p.x

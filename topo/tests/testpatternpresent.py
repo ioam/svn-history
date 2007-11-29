@@ -7,7 +7,6 @@ __version__='$Revision$'
 
 import unittest, random
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.parameterclasses import DynamicNumber
 import topo.patterns.basic
 from topo.base.boundingregion import BoundingBox
 import topo.patterns.random
@@ -28,16 +27,16 @@ class TestPatternPresent(unittest.TestCase):
         input_pattern1 = topo.patterns.basic.Line(
             thickness=0.02,
             bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))),
-            x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=100)),
-            y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
-            orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=300)))
+            x=UniformRandom(lbound=-0.5,ubound=0.5,seed=100),
+            y=UniformRandom(lbound=-0.5,ubound=0.5,seed=200),
+            orientation=UniformRandom(lbound=-pi,ubound=pi,seed=300))
 
         input_pattern2 = topo.patterns.basic.Line(
             thickness=0.02,
             bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))),
-            x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=100)),
-            y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
-            orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=300)))
+            x=UniformRandom(lbound=-0.5,ubound=0.5,seed=100),
+            y=UniformRandom(lbound=-0.5,ubound=0.5,seed=200),
+            orientation=UniformRandom(lbound=-pi,ubound=pi,seed=300))
 
         CFSheet.nominal_density = 4
         CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
