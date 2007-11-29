@@ -237,6 +237,51 @@ class ParametersFrame(TkParameterizedObject,Frame):
                 rep['widget'].destroy()
         
 
+##     def pack_param(self):
+##         raise TypeError("ParametersFrame arranges all parameters together in a grid.")
+
+
+    def __grid_param(self,parameter_name,row):
+        widget = self.representations[parameter_name]['widget']
+        label = self.representations[parameter_name]['label']
+        help_text = getdoc(self.get_parameter_object(parameter_name))
+
+        label.grid(row=row,column=0,
+                   padx=2,pady=2,sticky=E)
+
+        self.balloon.bind(label, help_text)
+
+        # We want widgets to stretch to both sides...
+        posn=E+W
+        # ...except Checkbuttons, which should be left-aligned.
+        if widget.__class__==Tkinter.Checkbutton:
+            posn=W
+
+        widget.grid(row=row,
+                    column=1,
+                    padx=2,
+                    pady=2,
+                    sticky=posn)
+
+        self.representations[parameter_name]['row']=row
+
+
+    def switch_dynamic(self,name):
+        # here: need to switch widget etc
+        self.repack_param(x)
+
+
+    def __make_representation(self,name,on_change=None,on_modify=None):
+        widget,label = self._create_widget(name,self._params_frame,
+                                           on_change=on_change or self.on_change,
+                                           on_modify=on_modify or self.on_modify)
+
+        label.bind("<Double-Button-1>",lambda event=None,x=name: self.switch_dynamic(x))
+        self.representations[name]={'widget':widget,'label':label}
+        self._indicate_tkvar_status(name)
+
+        
+
     # CEBALERT: name doesn't make sense! change displayed_params to
     # something else e.g. params_to_display
     def pack_displayed_params(self,on_change=None,on_modify=None):
@@ -251,32 +296,12 @@ class ParametersFrame(TkParameterizedObject,Frame):
             
         ### create the labels & widgets
         for name in self.displayed_params:
-            widget,label = self._create_widget(name,self._params_frame,
-                                               on_change=on_change or self.on_change,
-                                               on_modify=on_modify or self.on_modify)
-            self.representations[name]={'widget':widget,'label':label}
-            self._indicate_tkvar_status(name)
-        
+            self.__make_representation(name,on_change,on_modify)
+            
         ### add widgets & labels to screen in a grid
         rows = range(len(sorted_parameter_names))
         for row,parameter_name in zip(rows,sorted_parameter_names): 
-            widget = self.representations[parameter_name]['widget']
-            label = self.representations[parameter_name]['label']
-            help_text = getdoc(self.get_parameter_object(parameter_name))
-            label.grid(row=row,column=0,
-                       padx=2,pady=2,sticky=E)
-            self.balloon.bind(label, help_text)
-            # We want widgets to stretch to both sides...
-            posn=E+W
-            # ...except Checkbuttons, which should be left-aligned.
-            if widget.__class__==Tkinter.Checkbutton:
-                posn=W
-                
-            widget.grid(row=row,
-                        column=1,
-                        padx=2,
-                        pady=2,
-                        sticky=posn)
+            self.__grid_param(parameter_name,row)
 
         self.currently_displaying = dict([(param_name,self.representations[param_name])
                                           for param_name in self.displayed_params])
@@ -326,13 +351,45 @@ class ParametersFrame(TkParameterizedObject,Frame):
         parameter_frame.pack()
 
 
-    # CEBALERT: clean this up.
-    def unpack_param(self,param_name):
-        raise NotImplementedError # unfinished
-    # because it's unfinished (need to remove from list of displayed params)
-    # super(ParametersFrameWithApply,self).unpack_param(param_name)
-    # also need to do hide,unhide - probably
+##     def unpack_param(self,param_name):
+##         if param_name in self.currently_displaying:
+##             raise NotImplementedError("yet")
+##         super(ParametersFrame,self).unpack_param(param_name)
+        
+##     def hide_param(self,param_name):
+##         if param_name in self.currently_displaying:
+##             raise NotImplementedError("yet")
+##         super(ParametersFrame,self).hide_param(param_name)
 
+##     def unhide_param(self,param_name):
+##         if param_name in self.currently_displaying:
+##             raise NotImplementedError("yet")
+##         super(ParametersFrame,self).unhide_param(param_name)    
+
+
+    # ERROR need to sort out all this stuff in the tkpo/pf hierarchy
+    
+    def repack_param(self,param_name):
+
+        self._refresh_value(param_name)
+        
+        r = self.representations[param_name]
+        widget,label,row = r['widget'],r['label'],r['row']
+
+        widget.destroy()
+        label.destroy()
+
+        param = self.get_parameter_object(param_name)
+        
+        self._create_translator(param_name,param)
+        self.__make_representation(param_name)
+        self.__grid_param(param_name,row)
+
+        
+
+        
+
+    
 
     def _indicate_tkvar_status(self,param_name):
         """
@@ -357,6 +414,10 @@ class ParametersFrame(TkParameterizedObject,Frame):
                 label['background']=b
             except _tkinter.TclError:
                 pass
+
+
+    def _refresh_value(self,param_name):
+        pass
 
 
 
