@@ -327,26 +327,26 @@ class KernelMax(OutputFn):
 
 
 
-# JABALERT: Needs class documentation
 class PoissonSample(OutputFn):
     """
-    Sample the activity from a Poisson distribution.
+    Return samples from the Poisson distribution with the specified means.
 
-    This output function interprets each activity value as the
+    This output function interprets each matrix value as the
     (potentially scaled) rate of a Poisson process and replaces it
     with a sample from the appropriate Poisson distribution.
 
-    To allow simulations to maintain activity values in the range
-    [0,1], the input activity is scaled by the parameter
-    in_scale, and the baseline_rate is added before sampling.  After
-    sampling, the output value is then scaled by out_scale.  The
-    function thus performs this transformation:
+    To allow simulations to maintain activity values in a suitable
+    range such as [0.0,1.0], the input activity is scaled by the
+    parameter in_scale, and the baseline_rate is added before
+    sampling.  After sampling, the output value is then scaled by
+    out_scale.  The function thus performs this transformation::
 
       x <- P(in_scale * x + baseline_rate) * out_scale
 
-    Where x is an activity value and P(r) samples from a Poisson
+    where x is an activity value and P(r) samples from a Poisson
     distribution with rate r.
     """
+    
     in_scale = Number(default=1.0,doc="""
        Amount by which to scale the input.""")
     
