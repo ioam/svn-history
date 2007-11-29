@@ -7,12 +7,9 @@ __version__='$Revision$'
 
 import numpy.oldnumeric as Numeric
 import numpy
-import matplotlib
 from numpy import abs,zeros,ones
 import topo
 
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_agg import FigureCanvasAgg
 from topo.base.cf import CFSheet
 from topo.base.parameterclasses import BooleanParameter, Number, Integer, ListParameter
 from topo.base.projection import OutputFnParameter, Projection
@@ -268,124 +265,4 @@ class LISSOM(JointNormalizingCFSheet):
         self.activation_count,self.new_iteration=self.__counter_stack.pop()
   
 
-class SLISSOM(LISSOM):
-    """
-    A lissom sheet which allows for scaling of strengths of some projections
-    based on the average input activity from input projections.
-    Must be used with DebugCFProjections (which keep track of average activity)
-    Also has a function for saving graphs of average projection activities after scaling for debugging purposes.
-    Won't work yet for scaling individual projections based on their own average activity,
-    might be easier to do this with a new projection type.
-    """
-    scaled_projections = ListParameter(default=[], doc="""
-    Units for which parameter values are stored.""")
 
-    input_projections = ListParameter(default=[], doc="""
-    Units for which parameter values are stored.""")
-
-    target = Number(default=0.01, doc="""
-    Target value for scaling_factor, ie. value at which scaling_factor=1""")
-
-    smoothing = Number(default=0.0003, doc="""
-    Determines the degree of weighting of current vs previous values when calculating averages""")
- 
-    units= ListParameter(default=[(0,0)], doc="""
-    Units for which parameter values are stored.""")
-    
-    def __init__(self,**params):
-        super(SLISSOM,self).__init__(**params)
-        self.scaling_factor=numpy.zeros(self.activity.shape)     
-        self.avg_dict={}
-        self.avg_values={}
-                    
-    def start(self):
-        self._normalize_weights()
-        for proj in self.in_connections:
-            self.avg_dict[proj.name]= zeros([len(self.units),30000],activity_type)
-            self.avg_values[proj.name]=zeros(self.activity.shape, self.activity.dtype.char)
-            
-    def activate(self):
-        """
-        Collect activity from each projection, scale each scaled_projection based on the scaling factor
-        (calculated in get_scaling_factor), combine the projection activites and send the result out.
-        """
-        self.activity *= 0.0
-        self.do_scaling()
-        self.save_data()
-        
-        for proj in self.in_connections:
-            self.activity += proj.activity
-            
-        if self.apply_output_fn:
-            self.output_fn(self.activity)
-
-        self.send_output(src_port='Activity',data=self.activity)
-
-    def get_scaling_factor(self):
-        """
-        Method for calculating the scaling factor, in this case the total afferent activity is
-        used to calculate a factor which is >1 if the total activity is >target, <1 if <target.
-        Can be overwritten by subclasses if scaling factor is different.
-        """
-        avg_act=numpy.zeros(self.activity.shape)
-        for proj in self.in_connections:
-            if proj.name in self.input_projections:
-                avg_act+=proj.y_avg
-      
-        self.scaling_factor = avg_act/self.target
-       
-    def do_scaling(self):
-        """
-        Scales scaled_projections by the scaling factor. Can overwrite in a subclass to e.g. scale individual projections
-        by different scaling factors. 
-        """
-        
-        self.scaling_factor *=0.0
-
-        self.get_scaling_factor()
-
-        if self.activation_count == self.tsettle-1:
-            for proj in self.in_connections:
-                if proj.name in self.scaled_projections:
-                    proj.activity *= self.scaling_factor
-                    for u in self.units:
-                        value=proj.activity
-                        self.avg_values[proj.name] = self.smoothing*value + (1.0-self.smoothing)*self.avg_values[proj.name]
-                        self.avg_dict[proj.name][self.units.index(u)][topo.sim.time()]=self.avg_values[proj.name][u]
-
-    def save_data(self):
-        """
-        Use this function to save the average parameters, can add parameters to be averaged or stored as necessary
-        although would need to add empty dictionaries to __init__ and start()
-        """
-        for proj in self.in_connections:
-            for u in self.units:
-                value=proj.activity
-                self.avg_values[proj.name] = self.smoothing*value + (1.0-self.smoothing)*self.avg_values[proj.name]
-                self.avg_dict[proj.name][self.units.index(u)][topo.sim.time()]=self.avg_values[proj.name][u]
-
-    def save_graphs(self, init_time, final_time):
-        """
-        Save graphs of all average projection activities after scaling.Could add to this to also save
-        graphs of other parameters.
-        """
-        
-        for proj in self.in_connections:
-            fig = matplotlib.figure.Figure(figsize=(6,4))
-            ax = fig.add_subplot(111)
-            ax.set_xlabel("Iteration Number")
-            ax.set_ylabel("Average Scaled Projection Activity")
-            #ax.set_xlim( 0, 10000)
-        
-            for u in self.units:
-                index=self.units.index(u)
-                plot_data=self.avg_dict[proj.name][index][init_time:final_time]
-                #save(proj.name,plot_data,fmt='%.6f', delimiter=',') # uncomment if you want to save the raw data
-                ax.plot(plot_data, label="Unit "+str(u))
-
-            ax.legend(loc=0) 
-            # Make the PNG
-            canvas = FigureCanvasAgg(fig)
-            # The size * the dpi gives the final image size
-            #   a4"x4" image * 80 dpi ==> 320x320 pixel image
-            canvas.print_figure("AfterScaling"+proj.name+str(topo.sim.time())+".png", dpi=100)
