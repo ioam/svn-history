@@ -209,9 +209,8 @@ def save_script_repr(script_name=None):
 
     Note that the result of this operation is usually just a starting
     point for further editing, because it will not usually be runnable
-    as-is.  For instance, DynamicParameters currently show only their
-    current value, and some other parameters may not have runnable
-    representations.  Even so, this is usually a good start.
+    as-is (for instance, some parameters may not have runnable
+    representations).  Even so, this is usually a good start.
     """
     if not script_name:
         script_name = topo.sim.basename() + "_script_repr.ty"
