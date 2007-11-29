@@ -491,6 +491,7 @@ class CompositeParameter(Parameter):
         """
         Return the values of all the attribs, as a list.
         """
+        # CBERRORALERT: advances Dynamic parameters
         if not obj:
             return [getattr(objtype,a) for a in self.attribs]
         else:
