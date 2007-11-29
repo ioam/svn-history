@@ -611,6 +611,7 @@ class ParameterizedObjectMetaclass(type):
 
 
 
+
 # JABALERT: Only partially achieved so far -- objects of the same
 # type and parameter values are treated as different, so anything
 # for which instantiate == True is reported as being non-default.
@@ -884,13 +885,20 @@ class ParameterizedObject(object):
 
 
     # CB: still working on these two
+
+    # CEBALERT: the class equivalents of these are missing
+    # (i.e. one can't yet do Gaussian.inspect_value('x') )
     
     # wrong name we're not actually returning the repr
     def repr_value(self,name):
         # return value in a form that allows the thing to be recreated
         param_obj = self.params().get(name)
 
-        if not param_obj or not hasattr(param_obj,'_dynamic'): 
+        if not param_obj:
+            value = getattr(self,name)
+        elif hasattr(param_obj,'attribs'):
+            value = [self.repr_value(a) for a in param_obj.attribs]
+        elif not hasattr(param_obj,'_dynamic'):
             value = getattr(self,name)
         else:
             # get the callable from this obj or from the class
@@ -911,7 +919,11 @@ class ParameterizedObject(object):
         """
         parameter_obj = self.params().get(name)
 
-        if not parameter_obj or not hasattr(parameter_obj,'_dynamic'):
+        if not parameter_obj:
+            value = getattr(self,name)
+        elif hasattr(parameter_obj,'attribs'):
+            value = [self.inspect_value(a) for a in parameter_obj.attribs]
+        elif not hasattr(parameter_obj,'_dynamic'):
             value = getattr(self,name)
         else:
             value = self.__dict__.get("_%s_param_value_last"%name,parameter_obj.last_value)
