@@ -130,7 +130,7 @@ class Dynamic(Parameter):
     __doc__ = property((lambda self: self.doc))
     
     def __init__(self,**params):
-        super(Dynamic,self).__init__(instantiate=True,**params)  # CB: wait, do we always need to instantiate?
+        super(Dynamic,self).__init__(**params)  
         self.last_value = self.default # was None
         self._dynamic = is_dynamic(self.default)
 
