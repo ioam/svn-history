@@ -193,8 +193,10 @@ class StringBasedPalette(ParameterizedObject):
 ###    interpolate(start, colors.size(),color(spec[i]), color(spec[steps-1]))
 
 
-
-
+# CB: lazy hack around the lambda that was in Palette.colors_
+class F(object):
+    def __call__(self):
+        return [(i,i,i) for i in range(256)]
 
 ### JABHACKALERT: Needs significant cleanup -- should be much more
 ### straightforward, taking some specification and immediately
@@ -223,7 +225,7 @@ class Palette(ParameterizedObject):
 
     """
     background = Dynamic(default=BLACK_BACKGROUND)
-    colors_ = Dynamic(default=(lambda:[(i,i,i) for i in range(256)]))
+    colors_ = Dynamic(default=F())    #(lambda:[(i,i,i) for i in range(256)])
 
     def __init__(self,**params):
         """
