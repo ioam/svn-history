@@ -889,17 +889,18 @@ class ParameterizedObject(object):
         # return value in a form that allows the thing to be recreated
         param_obj = self.params().get(name)
 
-        if not param_obj or not hasattr(param_obj,'_dynamic'):
+        if not param_obj or not hasattr(param_obj,'_dynamic'): 
             value = getattr(self,name)
         else:
             # get the callable from this obj or from the class
             try:
                 value = self.__dict__["_%s_param_value"%name]
             except KeyError:
-                # CB should replace below with simpler way to get it (i can't think of it right now)
-                value = type(self).__dict__[name].default
+                param,cls_ = type(self).get_param_descriptor(name)                            
+                value = param.default 
 
         return value
+
 
     def inspect_value(self,name):
         """
