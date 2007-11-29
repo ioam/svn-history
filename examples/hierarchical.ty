@@ -12,7 +12,7 @@ __version__='$Revision$'
 import numpy
 
 from topo.base.cf import CFProjection, CFSheet
-from topo.base.parameterclasses import DynamicNumber, Number
+from topo.base.parameterclasses import Number
 from topo.base.patterngenerator import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.basic import PiecewiseLinear
@@ -37,16 +37,16 @@ GeneratorSheet.nominal_density = 20
 left_input_pattern = Line(
     thickness=0.02,
     bounds=BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
-    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
-    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
-    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+    x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
+    y=UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
+    orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
 right_input_pattern = Line(
     thickness=0.02,
     bounds=BoundingBox(points=((-0.8,-1.05),(0.8,1.05))),
-    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=100)),
-    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
-    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=300)))
+    x=UniformRandom(lbound=-0.5,ubound=0.5,seed=100),
+    y=UniformRandom(lbound=-0.5,ubound=0.5,seed=200),
+    orientation=UniformRandom(lbound=-pi,ubound=pi,seed=300))
 
 
 # cortical sheet
