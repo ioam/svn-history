@@ -268,8 +268,7 @@ class PatternCombine(OutputFn):
 ### not things that many OutputFns will need.  Perhaps move to som.py?
 class KernelMax(OutputFn):
     """
-    Finds the maximum activity and replaces the output with a kernel
-    function centered around the max.
+    Replaces the given matrix with a kernel function centered around the maximum value.
 
     This operation is usually part of the Kohonen SOM algorithm, and
     approximates a series of lateral interactions resulting in a
@@ -319,7 +318,7 @@ class KernelMax(OutputFn):
         bb = BoundingBox(points=((cmin,ymin), (cmax,ymax)))
         
         # generate the kernel matrix and insert it into the correct
-        # part of the output activity array
+        # part of the output array
         kernel = self.neighborhood_kernel_generator(bounds=bb,xdensity=1,ydensity=1,
                                                     size=2*radius,x=wc+0.5,y=wy+0.5)
         x *= 0.0
@@ -329,21 +328,21 @@ class KernelMax(OutputFn):
 
 class PoissonSample(OutputFn):
     """
-    Return samples from Poisson distributions with the specified means.
-
+    Simulate Poisson-distributed activity with specified mean values.
+    
     This output function interprets each matrix value as the
     (potentially scaled) rate of a Poisson process and replaces it
     with a sample from the appropriate Poisson distribution.
 
-    To allow simulations to maintain activity values in a suitable
-    range such as [0.0,1.0], the input activity is scaled by the
-    parameter in_scale, and the baseline_rate is added before
-    sampling.  After sampling, the output value is then scaled by
-    out_scale.  The function thus performs this transformation::
+    To allow the matrix to contain values in a suitable range (such as
+    [0.0,1.0]), the input matrix is scaled by the parameter in_scale,
+    and the baseline_rate is added before sampling.  After sampling,
+    the output value is then scaled by out_scale.  The function thus
+    performs this transformation::
 
       x <- P(in_scale * x + baseline_rate) * out_scale
 
-    where x is an activity value and P(r) samples from a Poisson
+    where x is a matrix value and P(r) samples from a Poisson
     distribution with rate r.
     """
     
