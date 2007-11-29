@@ -2,15 +2,20 @@
 >>> from topo.base.parameterclasses import Number, DynamicNumber
 >>> from topo.misc.numbergenerators import UniformRandom
 
+# suppress warnings
+>>> DynamicNumber.warnedA=True 
+>>> DynamicNumber.warnedB=True
+
 
 ## New syntax (in fact also used previously)
 
 >>> class TestPO1(ParameterizedObject):
-...    x = DynamicNumber(default=UniformRandom(lbound=-1,ubound=1,seed=1)) # *changes to Number*
+...    x = DynamicNumber(default=UniformRandom(lbound=-1,ubound=1,seed=1),doc="nothing") # *changes to Number*
 
 
 >>> t2 = TestPO1(x=UniformRandom(lbound=-1,ubound=1,seed=10))
 >>> t3 = TestPO1(x=UniformRandom(lbound=-1,ubound=1,seed=10))
+
 
 >>> t2.x==t3.x  # t2 and t3 have identical streams...
 True
