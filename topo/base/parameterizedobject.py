@@ -892,9 +892,13 @@ class ParameterizedObject(object):
         if not param_obj or not hasattr(param_obj,'_dynamic'):
             value = getattr(self,name)
         else:
-            # CB**: check what happens to dynamic param that's in *class* not obj (i.e. is getattr right?)
             k = "_%s_param_value"%name
-            value = self.__dict__.get(k,getattr(self,name))
+
+            if k in self.__dict__:
+                value = self.__dict__[k]
+            else:
+                # CB**: check what happens to dynamic param that's in *class* not obj (i.e. is getattr right - presumably not)
+                value = getattr(self,name)
 
         return value
 
