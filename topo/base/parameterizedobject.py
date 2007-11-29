@@ -610,6 +610,7 @@ class ParameterizedObjectMetaclass(type):
 
 
 
+
 # JABALERT: Only partially achieved so far -- objects of the same
 # type and parameter values are treated as different, so anything
 # for which instantiate == True is reported as being non-default.
@@ -896,8 +897,7 @@ class ParameterizedObject(object):
             try:
                 value = self.__dict__["_%s_param_value"%name]
             except KeyError:
-                param,cls_ = type(self).get_param_descriptor(name)                            
-                value = param.default 
+                value = param_obj.default
 
         return value
 
