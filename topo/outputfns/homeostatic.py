@@ -11,13 +11,7 @@ __version__='$Revision$'
 import copy
 
 from numpy import exp,zeros,ones
-import matplotlib
-import topo
-import pylab
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_agg import FigureCanvasAgg
 
-from pylab import save
 from topo.base.arrayutils import clip_in_place
 from topo.base.functionfamilies import OutputFn, OutputFnParameter, IdentityOF
 from topo.base.parameterclasses import Number, BooleanParameter, ListParameter
@@ -234,10 +228,10 @@ class OutputFnDebugger(OutputFn):
             
                          
     # JABALERT: This function should be merged with save_debug_graphs, if possible
-    def plot_debug_graphs(self,init_time, final_time):
+    def plot_debug_graphs(self,init_time, final_time, save=True):
         """
         Plots parameter values accumulated by the OutputFnDebugger.
-
+        Saves as .png files if save=True
         Example call::
         ODH.plot_debug_graphs(1,10000,debug_params=['a', 'b','eta'],avg_params=[x],units=[(0,0),(11,11)])
         """
