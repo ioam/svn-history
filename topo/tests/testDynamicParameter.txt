@@ -11,6 +11,9 @@
 >>> t2 = TestPO1(x=UniformRandom(lbound=-1,ubound=1,seed=10))
 >>> t3 = TestPO1(x=UniformRandom(lbound=-1,ubound=1,seed=10))
 
+# check repr_value is ok
+>>> isinstance(t2.repr_value('x'),UniformRandom)
+True
 
 >>> t2.x==t3.x  # t2 and t3 have identical streams...
 True
@@ -66,5 +69,6 @@ False
 >>> t7.inspect_value('x')==t6_first_value
 True
 
-
+>>> isinstance(t6.repr_value('x'),UniformRandom)
+True
 
