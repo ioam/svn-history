@@ -1,5 +1,5 @@
 """
-Classes support robotics using Topographica.
+Classes for using robotic or other hardware using Topographica.
 
 This module contains several classes for constructing robotics
 interfaces to Topographica simulations.  It includes modules that read
@@ -7,13 +7,19 @@ input from or send output to robot devices, and a (quasi) real-time
 simulation object that attempts to maintain a correspondence between
 simulation time and real time.
 
-This module requires the PlayerStage robot interface system, and the
-playerrobot module for high-level communications with Player robots.
+This module requires the PlayerStage robot interface system (from
+playerstage.sourceforge.net), and the playerrobot module for
+high-level communications with Player robots.
 
 $Id$
 """
+__version__ = '$Revision$'
 
-__version__ = $Revision$
+
+import time
+import Image,ImageOps
+
+from math import pi,cos,sin
 
 from topo.base.simulation import Simulation,EventProcessor
 from topo.base.parameterclasses import Integer,Number,ClassSelectorParameter
@@ -21,9 +27,6 @@ from topo.patterns.image import GenericImage
 
 from playerrobot import CameraDevice,PTZDevice
 
-import Image,ImageOps
-from math import pi,cos,sin
-import time
 
 class CameraImage(GenericImage):
     """
@@ -49,6 +52,8 @@ class CameraImage(GenericImage):
             self._image = ImageOps.grayscale(rgb_im)
         return True
 
+
+
 class PTZ(EventProcessor):
     """
     Pan/Tilt/Zoom control.
@@ -71,12 +76,12 @@ class PTZ(EventProcessor):
        Desired max pan/tilt speed in deg/sec.""")
 
     dest_ports = ["Saccade"]
-    src_ports = ['State']
+    src_ports = ["State"]
 
     def start(self):
         pass 
     def input_event(self,conn,data):
-        if conn.dest_port == 'Saccade':
+        if conn.dest_port == "Saccade":
             # the data should be (amplitude,direction)
             amplitude,direction = data
             self.shift(amplitude,direction)
@@ -103,7 +108,7 @@ class RealTimeSimulation(Simulation):
     This subclass of Simulation attempts to maintain a correspondence
     between simulation time and real time, as defined by the timescale
     parameter.  Real time simulation instances still maintain a
-    nominal, discete simulation time that determines the order of
+    nominal, discrete simulation time that determines the order of
     event delivery.
 
     At the beginning of each simulation time epoch, the simulation
@@ -111,12 +116,13 @@ class RealTimeSimulation(Simulation):
     epoch has ended, the simulation calculates the amount of
     computation time used for event processing, and executes a real
     sleep for the remainder of the epoch.  If the computation time for
-    the epoch exceeded the real time , a warning is issued and
+    the epoch exceeded the real time, a warning is issued and
     processing proceeds immediately to the next simulation time epoch.
     """
+    
     timescale = Number(default=1.0,bounds=(0,None),doc="""
-       The desired real length of one simulation time unit, in milliseconds.
-       """)
+       The desired real length of one simulation time unit, in milliseconds.""")
+
 
     def __init__(self,**params):
         super(RealTimeSimulation,self).__init__(**params)
