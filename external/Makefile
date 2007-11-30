@@ -7,9 +7,9 @@ all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
 
 dist: bluesphere
 
-clean: python-clean jpeg-clean pil-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean ctypes-clean pyaudiolab-clean tile-clean tilewrapper-clean bwidget-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean
+clean: python-clean jpeg-clean pil-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean ctypes-clean pyaudiolab-clean tile-clean tilewrapper-clean bwidget-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall ctypes-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall ctypes-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall
 
 ##############################################################
 # Python (interpreted language)
@@ -649,6 +649,25 @@ gnuplotpy-clean:
 	rm -rf ${GNUPLOTPY}
 gnuplotpy-uninstall:
 	rm -rf gnuplotpy ${foreach f,${GNUPLOTPY_UNINSTALL}, ${PREFIX}/${f}}
+
+##############################################################
+# Player
+#
+PLAYER = player-2.0.4
+
+# Not a completely clean install yet; needs more files
+PLAYER_UNINSTALL += ${PYTHON_LIB}/site-packages/playerc.py ${PYTHON_LIB}/../libplayer*
+
+player: ${PLAYER}.tar.bz2
+	tar xjf ${PLAYER}.tar.bz2
+	cd ${PLAYER}; ./configure --prefix=${PREFIX}
+	make -C ${PLAYER} install
+	touch player
+
+player-clean:
+	rm -rf ${PLAYER}
+player-uninstall:
+	rm -rf player ${foreach f,${PLAYER_UNINSTALL}, ${PREFIX}/${f}}
 
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #

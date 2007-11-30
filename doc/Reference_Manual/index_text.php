@@ -221,6 +221,20 @@ or <code>matrixplot()</code>, or modify
   <code>matrixplot3d_gnuplot()</code> to create any other gnuplot visualization.
 <!--Currently: untested on OSX, not present on Windows-->
 </DD>
+
+<P><DT><A HREF="http://playerstage.sf.net">Player/Stage/Gazebo</A></DT>
+<DD>
+The Player/Stage/Gazebo project provides interfaces for a large
+variety of external hardware and simulation software, such as cameras,
+digitizers, and robots.  A connection to Player is provided in
+topo/misc/robotics.py, but the Player software is not distributed
+directly with Topographica.  To install it, just download
+player-2.0.4.tar.bz2 from playerstage.sf.net, put it in the externals/
+subdirectory, and do <code>make -C external player</code>.  
+<!--Currently: untested on OSX, not present on Windows-->
+The Gazebo and Stage simulators that support the Player interface
+can also be used, as described on the Player site.
+</DD>
 </DL>
 
 
