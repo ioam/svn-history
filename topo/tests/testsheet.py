@@ -1,30 +1,32 @@
 """
-Unit tests for sheet.py module.
+Unit tests for sheet and sheetcoords.
 
 $Id$
 """
 __version__='$Revision$'
 
 import unittest
-import topo
+from numpy import array
+
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.base.sheet import *
-import topo.base.parameterizedobject
-import numpy.oldnumeric as Numeric
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheetview import SheetView
 
+
 # CEBALERT: 
 # Changes that need to be made to this file:
-# - stop various tests running twice, identically (see alert later on)
 # - don't create a new ct every time, just change its density
 # - test array versions of coordinate transform functions
 # - ensure methods of Slice are tested
 
 
-
 class TestCoordinateTransforms(unittest.TestCase):
-    """    
+    """
+    Tests for sheet.
+
+    Subclassed for use; the subclasses have a setUp method to create
+    the particular coordinates to use each time.
     """    
     def makeBox(self):
         self.box = BoundingBox(points=((self.left,self.bottom),
@@ -337,338 +339,10 @@ class TestCoordinateTransforms(unittest.TestCase):
         bottom_row,left_col = self.ct.sheet2matrixidx(x,y)
         self.assertEqual((bottom_row,left_col),(float(self.last_row),float(0)))
 
-    ### JC This test might have to be re-written
-    # CEBALERT: it's not too important, but this test (like
-    # test_coordinate_position() below) will run three times,
-    # identically.  All these test_* functions are run for each of the
-    # classes in the cases list below. So, this should be re-written
-    # as Julien says.  However, my opinion is that this kind of setup
-    # is restrictive (Julien and whoever wrote
-    # test_coordinate_position() must agree because they ignored it!),
-    # so it might be better not to rewrite this function and to use a
-    # different format for the testing in the first place.
-    def test_slice2bounds_bounds2slice(self):
 
-	bb = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
-        ct = SheetCoordinateSystem(bb,10)
-
-	slice =(0,3,7,8)
-	bounds = ct.slice2bounds(slice)
-        test_slice = ct.bounds2slice(bounds)
-
-	for a,b in zip(slice,test_slice):
-	    self.assertEqual(a,b)
-
-	slice =(4,7,8,10)
-	bounds = ct.slice2bounds(slice)
-        test_slice = ct.bounds2slice(bounds)
-
-	for a,b in zip(slice,test_slice):
-	    self.assertEqual(a,b)
-
-	slice =(2,3,4,8)
-	bounds = ct.slice2bounds(slice)
-        test_slice = ct.bounds2slice(bounds)
-
-	for a,b in zip(slice,test_slice):
-	    self.assertEqual(a,b)
-
-	slice =(0,3,9,10)
-	bounds = ct.slice2bounds(slice)
-        test_slice = ct.bounds2slice(bounds)
-
-	for a,b in zip(slice,test_slice):
-	    self.assertEqual(a,b)
-
-	bb = BoundingBox(points=((-0.75,-0.5),(0.75,0.5)))
-        ct = SheetCoordinateSystem(bb,20,20)
-
-	slice =(9,14,27,29)
-	bounds = ct.slice2bounds(slice)
-        test_slice = ct.bounds2slice(bounds)
-
-	for a,b in zip(slice,test_slice):
-	    self.assertEqual(a,b)
-
-	slice =(0,6,0,7)
-	bounds = ct.slice2bounds(slice)
-        test_slice = ct.bounds2slice(bounds)
-
-	for a,b in zip(slice,test_slice):
-	    self.assertEqual(a,b)
-
-	slice =(6,10,11,29)
-	bounds = ct.slice2bounds(slice)
-        test_slice = ct.bounds2slice(bounds)
-
-	for a,b in zip(slice,test_slice):
-	    self.assertEqual(a,b)
-
-	bb = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
-        ct = SheetCoordinateSystem(bb,7)
-
-	slice =(4,7,2,3)
-	bounds = ct.slice2bounds(slice)
-        test_slice = ct.bounds2slice(bounds)
-
-	for a,b in zip(slice,test_slice):
-	    self.assertEqual(a,b)
-
-	slice =(0,7,0,7)
-	bounds = ct.slice2bounds(slice)
-        test_slice = ct.bounds2slice(bounds)
-
-	for a,b in zip(slice,test_slice):
-	    self.assertEqual(a,b)
-
-
-    def test_Sheet_creation(self):
-
-        # Example where the nominal x and y densities would not be equal.
-        # density along x =10
-        # density along y <10
-        # The density along y should become 10, by adjusting the height to be 2.0
-        # in this case.
-        # The y center of the bounds should remain -0.0025. Hence we should get
-        # a bottom bound of -1.0025 and a top one of 0.9975.
-        sheet = Sheet(nominal_density=10,
-                      nominal_bounds=BoundingBox(points=((-0.5,-1.005),(0.5,1.0))))
-
-        self.assertEqual(sheet.xdensity,10)
-        self.assertEqual(sheet.xdensity,sheet.ydensity)
-
-        l,b,r,t = sheet.lbrt
-        self.assertEqual(l,-0.5)
-        self.assertEqual(r,0.5)                      
-        self.assertAlmostEqual(t,0.9975)
-        self.assertAlmostEqual(b,-1.0025)
-
-
-
-    # CEBALERT: this test should probably be somewhere else and
-    # called something different
-    def test_connection_field_like(self):
-        # test a ConnectionField-like example
-        sheet = Sheet(nominal_density=10,nominal_bounds=BoundingBox(radius=0.5))
-        cf_bounds = BoundingBox(points=((0.3,0.3),(0.6,0.6)))
-
-        slice_ = Slice(cf_bounds,sheet)
-        slice_.crop_to_sheet()
-
-        # check it's been cropped to fit onto sheet...
-        self.assertEqual(slice_.as_tuple(),(0,2,8,10))
-
-        # now check that it gives the correct bounds...
-        cropped_bounds = slice_.bounds
-        
-        true_cropped_bounds = BoundingBox(points=((0.3,0.3),(0.5,0.5)))
-        for a,b in zip(cropped_bounds.lbrt(),true_cropped_bounds.lbrt()):
-            self.assertAlmostEqual(a,b)
-
-        # and that bounds2shape() gets the correct size
-#        rows,cols = bounds2shape(cropped_bounds,sheet.density,sheet.ydensity)
-#        self.assertEqual((rows,cols),(2,2))
-
-# CEBALERT: slice is a Python type
-    def test_bounds2slice(self):
-        
-        # test that if you ask to slice the matrix with the sheet's BoundingBox, you
-        # get back the whole matrix
-        sheet_bb = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
-        ct = SheetCoordinateSystem(sheet_bb,10)
-        
-        slice_ = ct.bounds2slice(sheet_bb)
-        true_slice = (0,10,0,10) # inclusive left boundary, exclusive right boundary
-        self.assertEqual(slice_,true_slice) 
-
-	# for the following tests, the values have been all computed by hand and then
-        # tested (by JC). The boundingbox and density tested have been chosen randomly,
-        # then drawn to get the slice from it.
-       
-	# Test with 20 density. 
-        ct = SheetCoordinateSystem(sheet_bb,20,20)
-        bb = BoundingBox(points=((-0.05,-0.20),(0.20,0.05)))
-        slice = ct.bounds2slice(bb)
-
-        true_slice = (9,14,9,14) 
-        self.assertEqual(slice,true_slice)
-
-	bb = BoundingBox(points=((-0.40,0),(-0.30,0.30)))
-        slice = ct.bounds2slice(bb)
-        true_slice = (4,10,2,4) 
-        self.assertEqual(slice,true_slice)
-
-	bb = BoundingBox(points=((0.15,0.10),(0.30,0.30)))
-        slice = ct.bounds2slice(bb)
-        true_slice = (4,8,13,16) 
-        self.assertEqual(slice,true_slice)
-
-	bb = BoundingBox(points=((-0.05,-0.45),(0.10,-0.25)))
-        slice = ct.bounds2slice(bb)
-        true_slice = (15,19,9,12) 
-        self.assertEqual(slice,true_slice)
-	
-	# test with 7 density sheet.
-	
-	bb = BoundingBox(points=((-0.5+2.0/7.0,0.5-2.0/7.0),(-0.5+4.0/7.0,0.5)))
-        ct = SheetCoordinateSystem(sheet_bb,7)
-        
-        slice = ct.bounds2slice(bb)
-        true_slice = (0,2,2,4) 
-        self.assertEqual(slice,true_slice)
-
-        #(4x4 matrix)
-        ct = SheetCoordinateSystem(BoundingBox(radius=0.2),xdensity=10,ydensity=10)
-        test_bounds = BoundingBox(radius=0.1)
-        r1,r2,c1,c2 = ct.bounds2slice(test_bounds)
-        self.assertEqual((r1,r2,c1,c2),(1,3,1,3))
-
-        # Note: this test fails because units that fall on the
-        # boundaries should all be included; bounds2slice does not
-        # include the ones on the left boundary because of floating point
-        # representation.
-        #test_bounds.translate(0.05,-0.05)
-        #r1,r2,c1,c2 = ct.bounds2slice(test_bounds)
-        #self.assertEqual((r1,r2,c1,c2),(1,4,1,4))
-        
-	
-    def test_slice2bounds(self):
-
-	# test that if you ask to slice the matrix with the sheet's BoundingBox, you
-        # get back the whole matrix 
-        # (I chose to use a 7 density, I don't know why I like 7 so much, it is kind of mystical)
-	
-	sheet_bb = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
-        ct = SheetCoordinateSystem(sheet_bb,7)
-	slice = (0,7,0,7)
-	bounds = ct.slice2bounds(slice)
-	true_bounds_lbrt = (-0.5,-0.5,0.5,0.5)
-	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
-	    self.assertAlmostEqual(a,b)
-
-	# for the following tests, the values have been all computed
-        # by hand and then tested (by JC). The boundingbox and density
-        # tested have been chosen randomly, then drawn to get the slice
-        # from it.
-       	
-	# Test for 10 density
-        ct = SheetCoordinateSystem(sheet_bb,10)
-	slice = (0,9,1,5)
-	bounds = ct.slice2bounds(slice)
-	true_bounds_lbrt = (-0.4,-0.4,0,0.5)
-	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
-	    self.assertAlmostEqual(a,b)
-
-	slice = (2,3,7,10)
-	bounds = ct.slice2bounds(slice)
-	true_bounds_lbrt = (0.2,0.2,0.5,0.3)
-	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
-	    self.assertAlmostEqual(a,b)
-	
-       	# Test for 7 density
-        ct = SheetCoordinateSystem(sheet_bb,7)
-	slice = (3,7,2,5)
-	bounds = ct.slice2bounds(slice)
-	true_bounds_lbrt = (-0.5+2.0/7.0,-0.5,-0.5+5.0/7.0,0.5-3.0/7.0)
-	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
-	    self.assertAlmostEqual(a,b)
-
-	slice = (2,6,0,1)
-	bounds = ct.slice2bounds(slice)
-	true_bounds_lbrt = (-0.5,0.5-6.0/7.0,-0.5+1.0/7.0,0.5-2.0/7.0)
-	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
-	    self.assertAlmostEqual(a,b)
-
-	# Test for 25 density
-        ct = SheetCoordinateSystem(sheet_bb,25)
-	slice = (0,25,4,10)
-	bounds = ct.slice2bounds(slice)
-	true_bounds_lbrt = (-0.5+4.0/25.0,-0.5,-0.5+10.0/25.0,0.5)
-	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
-	    self.assertAlmostEqual(a,b)
-	
-
-	slice = (7,18,3,11)
-	bounds = ct.slice2bounds(slice)
-	true_bounds_lbrt = (-0.5+3.0/25.0,0.5-18.0/25.0,-0.5+11.0/25.0,0.5-7.0/25.0)
-	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
-	    self.assertAlmostEqual(a,b)
-	    
-
-##     # bounds2shape() tests
-##     #
-##     def test_bounds2shape(self):
-##         """
-##         Check that the shape of the matrix based on the BoundingBox and
-##         density is correct.
-##         """
-##         n_rows,n_cols = bounds2shape(self.box,self.density)
-##         self.assertEqual((n_rows,n_cols),(self.last_row+1,self.last_col+1))
-
-        
-
-
-
-    def test_sheetview_release(self):
-        self.s = Sheet()
-        self.s.activity = Numeric.array([[1,2],[3,4]])
-        # Call s.sheet_view(..) with a parameter
-	sv2 = SheetView((self.s.activity,self.s.bounds),
-                          src_name=self.s.name)
-        self.assertEqual(len(self.s.sheet_views.keys()),0)
-        self.s.sheet_views['Activity']=sv2
-        self.assertEqual(len(self.s.sheet_views.keys()),1)
-        self.s.release_sheet_view('Activity')
-        self.assertEqual(len(self.s.sheet_views.keys()),0)
 
 
         
-    ####
-    #
-    def test_coordinate_position(self):
-        """
-        CEBALERT: these tests duplicate those above
-        except these use a matrix with non-integer
-        (right-left) and (top-bottom). This is an important
-        test case for the definition of density; without it,
-        the tests above could be passed by a variety of
-        sheet2matrix, bounds2shape functions, etc.
-        So, transfer the box to TestBox3Coordinates and have
-        these tests run like the others.
-        """
-        l,b,r,t = (-0.8,-0.8,0.8,0.8)
-        # mimics that a sheet recalculates its density)
-        density = int(16*(r-l)) / float(r-l)
-
-        bounds = BoundingBox(points=((l,b),(r,t)))
-
-        ct = SheetCoordinateSystem(bounds,density,density)
-        
-        self.assertEqual(ct.sheet2matrixidx(0.8,0.8),(0,24+1))
-        self.assertEqual(ct.sheet2matrixidx(0.0,0.0),(12,12))
-        self.assertEqual(ct.sheet2matrixidx(-0.8,-0.8),(24+1,0))
-        self.assertEqual(ct.matrixidx2sheet(24,0),
-                         (((r-l) / int(density*(r-l)) / 2.0) + l,
-                          (t-b) / int(density*(t-b)) / 2.0 + b))
-        self.assertEqual(ct.matrixidx2sheet(0,0),
-                         (((r-l) / int(density*(r-l)) / 2.0) + l ,
-                          (t-b) / int(density*(t-b)) * (int(density*(t-b)) - 0.5) + b))
-
-        x,y = ct.matrixidx2sheet(0,0)
-        self.assertTrue(bounds.contains(x,y))
-        self.assertEqual((0,0),ct.sheet2matrixidx(x,y))
-
-        x,y = ct.matrixidx2sheet(25,25)
-        self.assertFalse(bounds.contains(x,y))
-        self.assertNotEqual((24,24),ct.sheet2matrixidx(x,y))
-
-        x,y = ct.matrixidx2sheet(0,24)
-        self.assertTrue(bounds.contains(x,y))
-        self.assertEqual((0,24),ct.sheet2matrixidx(x,y))
-
-        x,y = ct.matrixidx2sheet(24,0)
-        self.assertTrue(bounds.contains(x,y))
-        self.assertEqual((24,0),ct.sheet2matrixidx(x,y))
 
 
 
@@ -720,10 +394,9 @@ class TestBox2Coordinates(TestCoordinateTransforms):
         self.makeBox()
 
 
-
+# CEB: unfinished and unused - still making tests for TestBox3Coordinates...
 class TestBox3Coordinates(TestCoordinateTransforms):
-    """
-    """
+
     def setUp(self):        
         self.left = -0.8
         self.bottom = -0.8
@@ -741,15 +414,348 @@ class TestBox3Coordinates(TestCoordinateTransforms):
         self.makeBox()
 
 
-# CEB: still making tests for TestBox3Coordinates...
-cases = [TestBox1Coordinates,
-         TestBox2Coordinates]
-#         TestBox3Coordinates]
-         
-
 
 suite = unittest.TestSuite()
+
+cases = [TestBox1Coordinates,TestBox2Coordinates]#,TestBox3Coordinates]
 suite.addTests([unittest.makeSuite(case) for case in cases])
+
+
+
+class ExtraSheetTests(unittest.TestCase):
+    """
+    sheet tests that were written independently of the framework above.
+
+    Each of these tests runs once and is independent of the rest of the file.
+    """
+
+    def test_slice2bounds_bounds2slice(self):
+
+	bb = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+        ct = SheetCoordinateSystem(bb,10)
+
+	slice_ =(0,3,7,8)
+	bounds = ct.slice2bounds(slice_)
+        test_slice = ct.bounds2slice(bounds)
+
+	for a,b in zip(slice_,test_slice):
+	    self.assertEqual(a,b)
+
+	slice_ =(4,7,8,10)
+	bounds = ct.slice2bounds(slice_)
+        test_slice = ct.bounds2slice(bounds)
+
+	for a,b in zip(slice_,test_slice):
+	    self.assertEqual(a,b)
+
+	slice_ =(2,3,4,8)
+	bounds = ct.slice2bounds(slice_)
+        test_slice = ct.bounds2slice(bounds)
+
+	for a,b in zip(slice_,test_slice):
+	    self.assertEqual(a,b)
+
+	slice_ =(0,3,9,10)
+	bounds = ct.slice2bounds(slice_)
+        test_slice = ct.bounds2slice(bounds)
+
+	for a,b in zip(slice_,test_slice):
+	    self.assertEqual(a,b)
+
+	bb = BoundingBox(points=((-0.75,-0.5),(0.75,0.5)))
+        ct = SheetCoordinateSystem(bb,20,20)
+
+	slice_ =(9,14,27,29)
+	bounds = ct.slice2bounds(slice_)
+        test_slice = ct.bounds2slice(bounds)
+
+	for a,b in zip(slice_,test_slice):
+	    self.assertEqual(a,b)
+
+	slice_ =(0,6,0,7)
+	bounds = ct.slice2bounds(slice_)
+        test_slice = ct.bounds2slice(bounds)
+
+	for a,b in zip(slice_,test_slice):
+	    self.assertEqual(a,b)
+
+	slice_ =(6,10,11,29)
+	bounds = ct.slice2bounds(slice_)
+        test_slice = ct.bounds2slice(bounds)
+
+	for a,b in zip(slice_,test_slice):
+	    self.assertEqual(a,b)
+
+	bb = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+        ct = SheetCoordinateSystem(bb,7)
+
+	slice_ =(4,7,2,3)
+	bounds = ct.slice2bounds(slice_)
+        test_slice = ct.bounds2slice(bounds)
+
+	for a,b in zip(slice_,test_slice):
+	    self.assertEqual(a,b)
+
+	slice_ =(0,7,0,7)
+	bounds = ct.slice2bounds(slice_)
+        test_slice = ct.bounds2slice(bounds)
+
+	for a,b in zip(slice_,test_slice):
+	    self.assertEqual(a,b)
+
+
+    def test_coordinate_position(self):
+        """
+        these tests duplicate some of the earlier ones,
+        except these use a matrix with non-integer
+        (right-left) and (top-bottom). This is an important
+        test case for the definition of density; without it,
+        the tests above could be passed by a variety of
+        sheet2matrix, bounds2shape functions, etc.
+        
+        CEBALERT: transfer the box to TestBox3Coordinates and have
+        these tests run in the framework.
+        """
+        l,b,r,t = (-0.8,-0.8,0.8,0.8)
+        # mimics that a sheet recalculates its density)
+        density = int(16*(r-l)) / float(r-l)
+
+        bounds = BoundingBox(points=((l,b),(r,t)))
+
+        ct = SheetCoordinateSystem(bounds,density,density)
+        
+        self.assertEqual(ct.sheet2matrixidx(0.8,0.8),(0,24+1))
+        self.assertEqual(ct.sheet2matrixidx(0.0,0.0),(12,12))
+        self.assertEqual(ct.sheet2matrixidx(-0.8,-0.8),(24+1,0))
+        self.assertEqual(ct.matrixidx2sheet(24,0),
+                         (((r-l) / int(density*(r-l)) / 2.0) + l,
+                          (t-b) / int(density*(t-b)) / 2.0 + b))
+        self.assertEqual(ct.matrixidx2sheet(0,0),
+                         (((r-l) / int(density*(r-l)) / 2.0) + l ,
+                          (t-b) / int(density*(t-b)) * (int(density*(t-b)) - 0.5) + b))
+
+        x,y = ct.matrixidx2sheet(0,0)
+        self.assertTrue(bounds.contains(x,y))
+        self.assertEqual((0,0),ct.sheet2matrixidx(x,y))
+
+        x,y = ct.matrixidx2sheet(25,25)
+        self.assertFalse(bounds.contains(x,y))
+        self.assertNotEqual((24,24),ct.sheet2matrixidx(x,y))
+
+        x,y = ct.matrixidx2sheet(0,24)
+        self.assertTrue(bounds.contains(x,y))
+        self.assertEqual((0,24),ct.sheet2matrixidx(x,y))
+
+        x,y = ct.matrixidx2sheet(24,0)
+        self.assertTrue(bounds.contains(x,y))
+        self.assertEqual((24,0),ct.sheet2matrixidx(x,y))
+
+
+    def test_Sheet_creation(self):
+
+        # Example where the nominal x and y densities would not be equal.
+        # density along x =10
+        # density along y <10
+        # The density along y should become 10, by adjusting the height to be 2.0
+        # in this case.
+        # The y center of the bounds should remain -0.0025. Hence we should get
+        # a bottom bound of -1.0025 and a top one of 0.9975.
+        sheet = Sheet(nominal_density=10,
+                      nominal_bounds=BoundingBox(points=((-0.5,-1.005),(0.5,1.0))))
+
+        self.assertEqual(sheet.xdensity,10)
+        self.assertEqual(sheet.xdensity,sheet.ydensity)
+
+        l,b,r,t = sheet.lbrt
+        self.assertEqual(l,-0.5)
+        self.assertEqual(r,0.5)                      
+        self.assertAlmostEqual(t,0.9975)
+        self.assertAlmostEqual(b,-1.0025)
+
+
+
+    # CEBALERT: this test should probably be somewhere else and
+    # called something different
+    def test_connection_field_like(self):
+        # test a ConnectionField-like example
+        sheet = Sheet(nominal_density=10,nominal_bounds=BoundingBox(radius=0.5))
+        cf_bounds = BoundingBox(points=((0.3,0.3),(0.6,0.6)))
+
+        slice_ = Slice(cf_bounds,sheet)
+        slice_.crop_to_sheet()
+
+        # check it's been cropped to fit onto sheet...
+        self.assertEqual(slice_.as_tuple(),(0,2,8,10))
+
+        # now check that it gives the correct bounds...
+        cropped_bounds = slice_.bounds
+        
+        true_cropped_bounds = BoundingBox(points=((0.3,0.3),(0.5,0.5)))
+        for a,b in zip(cropped_bounds.lbrt(),true_cropped_bounds.lbrt()):
+            self.assertAlmostEqual(a,b)
+
+        # and that bounds2shape() gets the correct size
+#        rows,cols = bounds2shape(cropped_bounds,sheet.density,sheet.ydensity)
+#        self.assertEqual((rows,cols),(2,2))
+
+
+    def test_bounds2slice(self):
+        
+        # test that if you ask to slice the matrix with the sheet's BoundingBox, you
+        # get back the whole matrix
+        sheet_bb = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+        ct = SheetCoordinateSystem(sheet_bb,10)
+        
+        slice_ = ct.bounds2slice(sheet_bb)
+        true_slice = (0,10,0,10) # inclusive left boundary, exclusive right boundary
+        self.assertEqual(slice_,true_slice) 
+
+	# for the following tests, the values have been all computed by hand and then
+        # tested (by JC). The boundingbox and density tested have been chosen randomly,
+        # then drawn to get the slice from it.
+       
+	# Test with 20 density. 
+        ct = SheetCoordinateSystem(sheet_bb,20,20)
+        bb = BoundingBox(points=((-0.05,-0.20),(0.20,0.05)))
+        slice_ = ct.bounds2slice(bb)
+
+        true_slice = (9,14,9,14) 
+        self.assertEqual(slice_,true_slice)
+
+	bb = BoundingBox(points=((-0.40,0),(-0.30,0.30)))
+        slice_ = ct.bounds2slice(bb)
+        true_slice = (4,10,2,4) 
+        self.assertEqual(slice_,true_slice)
+
+	bb = BoundingBox(points=((0.15,0.10),(0.30,0.30)))
+        slice_ = ct.bounds2slice(bb)
+        true_slice = (4,8,13,16) 
+        self.assertEqual(slice_,true_slice)
+
+	bb = BoundingBox(points=((-0.05,-0.45),(0.10,-0.25)))
+        slice_ = ct.bounds2slice(bb)
+        true_slice = (15,19,9,12) 
+        self.assertEqual(slice_,true_slice)
+	
+	# test with 7 density sheet.
+	
+	bb = BoundingBox(points=((-0.5+2.0/7.0,0.5-2.0/7.0),(-0.5+4.0/7.0,0.5)))
+        ct = SheetCoordinateSystem(sheet_bb,7)
+        
+        slice_ = ct.bounds2slice(bb)
+        true_slice = (0,2,2,4) 
+        self.assertEqual(slice_,true_slice)
+
+        #(4x4 matrix)
+        ct = SheetCoordinateSystem(BoundingBox(radius=0.2),xdensity=10,ydensity=10)
+        test_bounds = BoundingBox(radius=0.1)
+        r1,r2,c1,c2 = ct.bounds2slice(test_bounds)
+        self.assertEqual((r1,r2,c1,c2),(1,3,1,3))
+
+        # Note: this test fails because units that fall on the
+        # boundaries should all be included; bounds2slice does not
+        # include the ones on the left boundary because of floating point
+        # representation.
+        #test_bounds.translate(0.05,-0.05)
+        #r1,r2,c1,c2 = ct.bounds2slice(test_bounds)
+        #self.assertEqual((r1,r2,c1,c2),(1,4,1,4))
+        
+	
+    def test_slice2bounds(self):
+
+	# test that if you ask to slice the matrix with the sheet's BoundingBox, you
+        # get back the whole matrix 
+        # (I chose to use a 7 density, I don't know why I like 7 so much, it is kind of mystical)
+	
+	sheet_bb = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+        ct = SheetCoordinateSystem(sheet_bb,7)
+	slice_ = (0,7,0,7)
+	bounds = ct.slice2bounds(slice_)
+	true_bounds_lbrt = (-0.5,-0.5,0.5,0.5)
+	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
+	    self.assertAlmostEqual(a,b)
+
+	# for the following tests, the values have been all computed
+        # by hand and then tested (by JC). The boundingbox and density
+        # tested have been chosen randomly, then drawn to get the slice
+        # from it.
+       	
+	# Test for 10 density
+        ct = SheetCoordinateSystem(sheet_bb,10)
+	slice_ = (0,9,1,5)
+	bounds = ct.slice2bounds(slice_)
+	true_bounds_lbrt = (-0.4,-0.4,0,0.5)
+	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
+	    self.assertAlmostEqual(a,b)
+
+	slice_ = (2,3,7,10)
+	bounds = ct.slice2bounds(slice_)
+	true_bounds_lbrt = (0.2,0.2,0.5,0.3)
+	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
+	    self.assertAlmostEqual(a,b)
+	
+       	# Test for 7 density
+        ct = SheetCoordinateSystem(sheet_bb,7)
+	slice_ = (3,7,2,5)
+	bounds = ct.slice2bounds(slice_)
+	true_bounds_lbrt = (-0.5+2.0/7.0,-0.5,-0.5+5.0/7.0,0.5-3.0/7.0)
+	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
+	    self.assertAlmostEqual(a,b)
+
+	slice_ = (2,6,0,1)
+	bounds = ct.slice2bounds(slice_)
+	true_bounds_lbrt = (-0.5,0.5-6.0/7.0,-0.5+1.0/7.0,0.5-2.0/7.0)
+	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
+	    self.assertAlmostEqual(a,b)
+
+	# Test for 25 density
+        ct = SheetCoordinateSystem(sheet_bb,25)
+	slice_ = (0,25,4,10)
+	bounds = ct.slice2bounds(slice_)
+	true_bounds_lbrt = (-0.5+4.0/25.0,-0.5,-0.5+10.0/25.0,0.5)
+	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
+	    self.assertAlmostEqual(a,b)
+	
+
+	slice_ = (7,18,3,11)
+	bounds = ct.slice2bounds(slice_)
+	true_bounds_lbrt = (-0.5+3.0/25.0,0.5-18.0/25.0,-0.5+11.0/25.0,0.5-7.0/25.0)
+	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
+	    self.assertAlmostEqual(a,b)
+	    
+
+##     # bounds2shape() tests
+##     #
+##     def test_bounds2shape(self):
+##         """
+##         Check that the shape of the matrix based on the BoundingBox and
+##         density is correct.
+##         """
+##         n_rows,n_cols = bounds2shape(self.box,self.density)
+##         self.assertEqual((n_rows,n_cols),(self.last_row+1,self.last_col+1))
+
+        
+    def test_sheetview_release(self):
+        s = Sheet()
+        s.activity = array([[1,2],[3,4]])
+        # Call s.sheet_view(..) with a parameter
+	sv2 = SheetView((s.activity,s.bounds),
+                          src_name=s.name)
+        self.assertEqual(len(s.sheet_views.keys()),0)
+        s.sheet_views['Activity']=sv2
+        self.assertEqual(len(s.sheet_views.keys()),1)
+        s.release_sheet_view('Activity')
+        self.assertEqual(len(s.sheet_views.keys()),0)
+
+
+
+
+suite.addTest(unittest.makeSuite(ExtraSheetTests))
+
+
+
+
+
 
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite)
