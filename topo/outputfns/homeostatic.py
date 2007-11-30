@@ -238,28 +238,6 @@ class OutputFnDebugger(OutputFn):
                         self.avg_dict[ap][self.units.index(u)][topo.sim.time()]=self.avg_values[ap][u]
             
 
-    def _plot_debug_graphs(self, init_time, final_time, **params):
-        for p in params.get('debug_params',self.debug_params):
-            pylab.figure()
-            isint=pylab.isinteractive()
-            pylab.ioff()
-            manager = pylab.get_current_fig_manager()
-            pylab.ylabel(p)
-            pylab.xlabel('Iteration Number')
-            manager.window.title(topo.sim.name+': '+p)
-
-            for unit in params.get('units',self.units):
-                index=self.units.index(unit)
-                plot_data=self.debug_dict[p][index][init_time:final_time]
-                vectorplot(plot_data, label='Unit'+str(unit))
-                
-            if isint: pylab.ion()
-            pylab.legend(loc=0)
-            pylab.show._needmain = False 
-            pylab.show()
-	    
-
-
     def plot_debug_graphs(self,init_time, final_time, filename=None, **params):
         """
         Plots parameter values accumulated by the OutputFnDebugger.
