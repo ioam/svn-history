@@ -1,10 +1,111 @@
 """
 Unit tests for Topographica.
 
-Sets up all tests in any file in this directory whose name begins with
-'test' and ends '.py', if it define the 'suite' attribute.
+Use the 'run' function to run all the tests.
 
-Use the 'run' function to run the tests.
+
+We use unittest and doctest to create tests. The run() function calls
+tests in files in topo/tests/ that:
+
+* have a name beginning with 'test' and ending with '.py', if the file
+defines the 'suite' attribute;
+* have a name beginning with 'test' and ending with '.txt'.
+
+
+
+unittest
+========
+
+We use unittest in two different ways. The first is simply
+to run a series of tests:
+
+
+class TestSomething(unittest.TestCase):
+
+    def setUp(self):
+        ...
+
+    def test_x(self):
+        ...
+
+    def test_y(self):
+        ...
+
+    def extra(self):
+        ...
+        
+
+suite = unittest.TestSuite()
+suite.addTest(unittest.makeSuite(TestSomething))
+
+
+In the example above, setUp will be called, followed by test_x and
+test_y (i.e. the methods setUp and test_* are called automatically);
+the extra() method will not be called (unless your code calls it).
+setUp does not have to exist.
+
+
+The second way we use unittest is to pass a series of scenarios
+through one battery of tests:
+
+
+class TestSomething(unittest.TestCase):
+
+    def test_x(self):
+        ...
+
+    def test_y(self):
+        ...
+
+
+class TestCase1(TestSomething):
+
+    def setUp(self):
+        ...
+
+
+class TestCase2(TestSomething):
+
+    def setUp(self):
+        ...
+
+
+suite = unittest.TestSuite()
+
+cases = [TestScenario1,TestScenario2]
+suite.addTests([unittest.makeSuite(case) for case in cases])
+
+
+In this second example, TestScenario1.setUp will be called, followed
+by test_x and test_y. After this, TestScenario2.setUp will be called,
+followed again by test_x and test_y. setUp in the two TestScenarios is
+therefore used to create some different data or situations to pass
+through the tests.
+
+
+
+To be run() automatically, unittest files must (a) be named test*.py, and
+(b) must define the 'suite' attribute.
+
+
+Additionally, unittest files should:
+
+(a) contain the following code to allow the file to be run on its own:
+
+if __name__ == '__main__':
+    unittest.TextTestRunner(verbosity=2).run(suite)
+
+    
+(b) set suite.requires_display=True if the tests require a DISPLAY.
+
+
+
+
+
+doctest
+=======
+
+
 
 
 $Id$
@@ -18,16 +119,13 @@ __version__='$Revision$'
 # testing, which could make it simpler to find the right test file.
 
 
-# CEBALERT: the tests need to be cleaned up. In each test file,
-# setup() is to setup something that a series of tests can then all use.
-# That saves on duplication, etc.
-# We should at least start doing it right from now, or this problem
-# is going to grow.
-#
-# Additionally, tests often affect each other. Instead of creating
-# independent objects, they often share them (in particular, they
-# often share topo.sim). 
+# CEBALERT: tests often affect each other. Make sure test authors
+# are aware of that, and have some kind of policy.
+# (Setting class attributes, sharing a sim, etc)
 
+
+
+# CB: working on this file - haven't finished cleanup
 
 
 import unittest,doctest,os,re,fnmatch
@@ -39,36 +137,40 @@ __all__ = [re.sub('\.py$','',f)
 all_doctest = sorted(fnmatch.filter(os.listdir(__path__[0]),'test*.txt'))
 
 
-# Remove any test that for now we don't want to run with the others
-__all__.remove('test_script')   # this is a slower test & should have a different
-                                # calling mechanism (see Future_Work/current)
-
+# CEBALERT: we need to rename test_script.py
+__all__.remove('test_script')   
+                                
 
 __all__.sort()
 
 
 def all_suite():
     """
-    For each test module that defines a 'suite' attribute, add its tests.
-    Only adds tests requiring a display if the DISPLAY environment
-    variable is set.
+    __all__:
+    For each test module that defines a 'suite' attribute, add its
+    tests.  Only adds tests requiring a display if the DISPLAY
+    environment variable is set.
+
+    all_doctest:
+    Add each doctest file to the suite.
     """
     suite = unittest.TestSuite()
-    display_loc = os.getenv('DISPLAY')    
+
     for test_name in __all__:
         # import the module
         exec 'import '+test_name
 
         test_module = locals()[test_name]
         try:        
-            print 'Checking module %s for test suite...' % test_name,
+            print 'Loading suite from module %s ...' % test_name,
             new_test = getattr(test_module,'suite')
 
-            if hasattr(new_test,'requires_display') and not display_loc:
-                print 'skipped: No $DISPLAY.'
-            else:
-                print 'found.'
+            if check_for_display(new_test):
+                print 'ok.'
                 suite.addTest(new_test)
+            else:
+                print 'skipped: No $DISPLAY.'
+                
         except AttributeError,err:
             print err
 
@@ -78,51 +180,62 @@ def all_suite():
     return suite
 
 
+def check_for_display(suite):
+    """
+    Return True if no DISPLAY required or DISPLAY is required and it exists,
+    otherwise return False.
+    """
+    if not hasattr(suite,'requires_display'):
+        return True
+    elif os.getenv('DISPLAY'):
+        return True
+    else:
+        return False    
+
+
 def run(verbosity=1,test_modules=None):
     """
-    By default, run all tests in any file in this directory whose name
-    begins with 'test' and ends '.py', if it define the 'suite'
-    attribute.
+    Run tests in all test_modules; test_modules defaults to all_suit().
 
-    Example usage:
-      ./topographica -c 'import topo.tests; topo.tests.run()'
+    E.g. to run all tests:
+      ./topographica -c 'from topo.tests import run; run()'
 
     
     verbosity specifies the level of information printed during the
     tests (see unittest.TextTestRunner).
 
-    To run only a subset of the tests, specify the module names in
-    test_modules. For example:
-    
-      ./topographica -c 'import topo.tests.testimage; topo.tests.run(test_modules=[topo.tests.testimage])'
-      ./topographica -c 'import topo.tests; topo.tests.run(test_modules=["testDynamicParameter.txt"])'
-    """
 
+    To run only a subset of the tests, specify a list of test modules or doctest
+    file names. For example:
+
+      ./topographica -c 'from topo.tests import run, testimage, testsheet; run(test_modules=[testimage,testsheet,"testDynamicParameter.txt"])'
+    """
     import types
-    
-    suite = None
-    
+         
     if not test_modules:
-        suite = all_suite()
+        run_suite = all_suite()
     else:
         assert isinstance(test_modules,list), 'test_modules argument must be a list of test modules or doctest filenames.'
         
-        suite = unittest.TestSuite()
+        run_suite = unittest.TestSuite()
+        
         for test_module in test_modules:
             if isinstance(test_module,types.ModuleType):
-                suite.addTest(getattr(test_module,'suite'))
+                if check_for_display(test_module.suite):
+                    run_suite.addTest(test_module.suite)
+                else:
+                    raise Exception("Cannot run test without a valid DISPLAY.")
             elif isinstance(test_module,str):
                 if test_module in all_doctest:
-                    suite.addTest(doctest.DocFileSuite(test_module))
-                elif test_module+'.txt' in all_doctest:
-                    suite.addTest(doctest.DocFileSuite(test_module+'.txt'))
+                    run_suite.addTest(doctest.DocFileSuite(test_module))
                 else:
                     raise ValueError, '"%s" is not an available doctest file.' % test_module
             else:
                 raise ValueError, '%s is not a valid test module' % str(test_module)
                                  
 
-    return unittest.TextTestRunner(verbosity=verbosity).run(suite)
+    return unittest.TextTestRunner(verbosity=verbosity).run(run_suite)
+
 
 
 # CB: if the unit tests were faster, I wouldn't keep needing this...
@@ -137,17 +250,35 @@ def run_named(name,verbosity=2):
 
     Convenience function to make it easy to run a single test module.
 
-    Example:
-    ./topographica -c 'import topo.tests; topo.tests.run_named("testsnapshots.py")'
-    ./topographica -c 'import topo.tests; topo.tests.run_named("testDynamicParameter.txt")'
+    Examples:
+      ./topographica -c 'import topo.tests; topo.tests.run_named("testsnapshots.py")'
+      ./topographica -c 'import topo.tests; topo.tests.run_named("testDynamicParameter.txt")'
     """
-    if name.endswith('.txt'):
-        test_module = name
-    elif name.endswith('.py'):
+    if name.endswith('.py'):
         module_name = "topo.tests."+name[0:-3]
         import __main__
         exec "import %s"%module_name in __main__.__dict__
         test_module = eval(module_name,__main__.__dict__)
-
+    else:
+        test_module = name
+    
     run(verbosity,test_modules=[test_module])
+        
+
+
+def start_tkgui():
+    """
+    Starts tkgui silently if $DISPLAY is set, otherwise raises an Exception.
+
+    (Raises the exception for the benefit of single tests run from the
+    commandline; tests loaded through run() will not be executed
+    without a DISPLAY anyway.)
+
+    Used in tests that require tkgui to be running.
+    """
+    if os.getenv("DISPLAY"):
+        import topo.tkgui; topo.tkgui.start(banner=False)
+    else:
+        raise Exception("Cannot run test without a valid DISPLAY.")
+        
         
