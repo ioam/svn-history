@@ -260,9 +260,7 @@ class OutputFnDebugger(OutputFn):
 	    
 
 
-                         
-    # JABALERT: This function should be merged with save_debug_graphs, if possible
-    def plot_debug_graphs(self,init_time, final_time, **params):
+    def plot_debug_graphs(self,init_time, final_time, filename=None, **params):
         """
         Plots parameter values accumulated by the OutputFnDebugger.
         Example call::
@@ -271,15 +269,18 @@ class OutputFnDebugger(OutputFn):
               
         for p in params.get('debug_params',self.debug_params) + params.get('avg_params',self.avg_params):
             avg=p in self.avg_params
-            pylab.figure()
+            pylab.figure() # could add something like figsize=(6,4)?
             isint=pylab.isinteractive()
             pylab.ioff()
-            manager = pylab.get_current_fig_manager()
+            pylab.grid(True)
+            #pylab.ylim( 0, 0.03 ) #specify axis limits ; may not work yet
+            #pylab.xlim( 0, 10000)
             if avg:
                 pylab.ylabel("Average "+p)
             else:
                 pylab.ylabel(p)
             pylab.xlabel('Iteration Number')
+            manager = pylab.get_current_fig_manager()
             manager.window.title(topo.sim.name+': '+p)
             
             for unit in params.get('units',self.units):
@@ -288,59 +289,20 @@ class OutputFnDebugger(OutputFn):
                     plot_data=self.avg_dict[p][index][init_time:final_time]
                 else:
                     plot_data=self.debug_dict[p][index][init_time:final_time]                    
-                vectorplot(plot_data, label='Unit'+str(unit))
 
+                #save(normalize_path("Average???"+filename+p+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=',')) # uncomment if you also want to save the raw data
+                pylab.plot(plot_data, label='Unit'+str(unit))
+                
             if isint: pylab.ion()
             pylab.legend(loc=0)
-            pylab.show._needmain = False 
-            pylab.show()
-                       
-                              
-
-    # JABALERT: This function should be merged with plot_debug_graphs, if possible
-    def save_debug_graphs(self,filename,init_time,final_time,**params):
-        """
-        Saves plots of parameter values accumulated by the OutputFnDebugger.
-        
-        Example call::
-        
-          ODH.save_debug_graphs("V1_graphs",1,10000)
-
-        Can adjust this function to produce different plots, as
-        described in the comments.
-        """
-              
-        for p in params.get('debug_params',self.debug_params) + params.get('avg_params',self.avg_params):
-            avg=p in self.avg_params
-            fig = matplotlib.figure.Figure(figsize=(6,4))
-            ax = fig.add_subplot(111)
-            ax.set_xlabel("Iteration Number")
-            if avg:
-                pylab.ylabel("Average "+p)
-            else:
-                pylab.ylabel(p)
-            #ax.set_ylim( 0, 0.03 ) #specify axis limits
-            #ax.set_xlim( 0, 10000)
-            
-            for unit in params.get('units',self.units):
-                index=self.units.index(unit)
-                if avg:
-                    plot_data=self.avg_dict[p][index][init_time:final_time]
-                else:
-                    plot_data=self.debug_dict[p][index][init_time:final_time]                    
-                
-                #save(normalize_path("Average"+filename+p+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=',')) # uncomment if you also want to save the raw data
-                ax.plot(plot_data, label='Unit'+str(unit))
-            ax.legend(loc=0)
-            # Make the PNG
-            canvas = FigureCanvasAgg(fig)
+            pylab.show._needmain = False
             # The size * the dpi gives the final image size
-            #   a4"x4" image * 80 dpi ==> 320x320 pixel image
-            canvas.print_figure(normalize_path(filename+p+str(topo.sim.time())+".png"), dpi=100)
+            #   a 4"x4" image * 80 dpi ==> 320x320 pixel image
+            if filename is not None:
+                pylab.savefig(normalize_path(filename+p+str(topo.sim.time())+".png"), dpi=100)
+            else:
+                pylab.show()
 
-
-                       
-                              
                        
 
 
