@@ -1,3 +1,17 @@
+"""
+High-level interface to the Player client libraries.
+
+The Player client libraries allow Python code to communicate with
+hardware devices such as robots, cameras, and range sensors.
+
+This is a temporary home for this file until it finds a permanent home
+(maybe in the PlayerStage project or in PLASTK?)
+
+$Id$
+"""
+__version__='$Revision$'
+
+
 import time,threading,array
 import playerc
 
@@ -13,6 +27,7 @@ playerc.PLAYERC_OPEN_MODE = 1
 class PlayerException(Exception):
     pass
     
+
 def player_fn(error_op=ne,error_val=0):
     """
     Player function decorator.  Adds error checking.
@@ -30,9 +45,10 @@ def player_fn(error_op=ne,error_val=0):
         return new_fn
     return wrap
 
+
 def synchronized(lock):
     """
-    Simple Synchronization decorator.
+    Simple synchronization decorator.
 
     Takes an existing lock and synchronizes a function or
     method on that lock.  Code taken from the Python Wiki
@@ -49,6 +65,7 @@ def synchronized(lock):
                 lock.release()
         return newFunction
     return wrap
+
 
 def synched_method(f):
     """
@@ -99,6 +116,8 @@ class PlayerObject(object):
             if name not in dir(self) and name[:2] != '__' and callable(attr):
                 setattr(self,name,synchronized(lock)(player_fn()(attr)))
 
+
+
 class PlayerClient(PlayerObject):
     """
     Player object wrapper for playerc.client objects.
@@ -110,6 +129,8 @@ class PlayerClient(PlayerObject):
         # "no error."
         self.read = synchronized(lock)(player_fn(eq,None)(proxy.read))
         super(PlayerClient,self).__init__(proxy,lock)
+
+
 
 class PlayerDevice(PlayerObject):
     """
@@ -123,6 +144,8 @@ class PlayerDevice(PlayerObject):
     @player_fn()
     def subscribe(self,mode=playerc.PLAYERC_OPEN_MODE):
         return self.proxy.subscribe(mode)
+
+
 
 class PTZDevice(PlayerDevice):
     """
@@ -153,11 +176,12 @@ class PTZDevice(PlayerDevice):
         
     def set_ws_deg(self,pan,tilt,zoom,pan_speed,tilt_speed):
         self.set_ws(pan*pi/180, tilt*pi/180, zoom*pi/180,pan_speed*pi/180,tilt_speed*pi/180)
-    
+
+
 
 class CameraDevice(PlayerDevice):
     """
-    A player camera device.
+    A Player camera device.
 
     The synchronized method get_image grabs an uncompressed snapshot,
     along with the additional formatting information needed to make an
@@ -200,6 +224,7 @@ class CameraDevice(PlayerDevice):
 device_table = {'ptz'     :PTZDevice,
                 'camera'  :CameraDevice,
                 }
+
 
 
 class PlayerRobot(object):
