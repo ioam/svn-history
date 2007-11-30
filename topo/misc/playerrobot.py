@@ -149,8 +149,9 @@ class PlayerDevice(PlayerObject):
 
 class PTZDevice(PlayerDevice):
     """
-    Player PTZ device.  Adds the following to the original proxy
-    interface:
+    Player Pan/Tilt/Zoom (PTZ) device.
+
+    Adds the following to the original proxy interface:
 
     state = The tuple (pan,tilt,zoom) indicating the current state of
     the PTZ device.
