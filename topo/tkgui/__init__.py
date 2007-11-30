@@ -114,7 +114,7 @@ def __ttkify(root,widget):
 # gets set to the TopoConsole instance created by start.
 console = None
 
-def start(mainloop=False):
+def start(mainloop=False,banner=True):
     """
     Start Tk and read in an options_database file (if present), then
     open a TopoConsole.
@@ -133,7 +133,7 @@ def start(mainloop=False):
     # quit this function before starting another Tk instance, etc)
     if console is not None: return
 
-    print 'Launching GUI'
+    if banner: print 'Launching GUI'
 
     # Creating an initial Tk() instance and then withdrawing the
     # window is a common technique. Instead of doing this, having
