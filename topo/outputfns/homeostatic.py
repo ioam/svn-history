@@ -19,6 +19,14 @@ from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import activity_type
 from topo.commands.pylabplots import vectorplot
 
+import matplotlib
+import topo
+import pylab
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+
+from pylab import save
+
 class HomeostaticMaxEnt(OutputFn):
     """
     Implementation of homeostatic intrinsic plasticity from Jochen Triesch,
@@ -206,7 +214,7 @@ class OutputFnDebugger(OutputFn):
         if self.n_step == self.step:
             
             self.n_step = 0
-            
+
             for dp in self.debug_params:
                 for u in self.units:
                     if dp=="x":
@@ -228,10 +236,9 @@ class OutputFnDebugger(OutputFn):
             
                          
     # JABALERT: This function should be merged with save_debug_graphs, if possible
-    def plot_debug_graphs(self,init_time, final_time, save=True):
+    def plot_debug_graphs(self,init_time, final_time):
         """
         Plots parameter values accumulated by the OutputFnDebugger.
-        Saves as .png files if save=True
         Example call::
         ODH.plot_debug_graphs(1,10000,debug_params=['a', 'b','eta'],avg_params=[x],units=[(0,0),(11,11)])
         """
