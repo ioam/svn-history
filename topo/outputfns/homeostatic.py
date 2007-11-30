@@ -18,6 +18,7 @@ from topo.base.parameterclasses import Number, BooleanParameter, ListParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import activity_type
 from topo.commands.pylabplots import vectorplot
+from topo.misc.filepaths import normalize_path
 
 import matplotlib
 import topo
@@ -236,35 +237,27 @@ class OutputFnDebugger(OutputFn):
             
                          
     # JABALERT: This function should be merged with save_debug_graphs, if possible
-    def plot_debug_graphs(self,init_time, final_time):
+    def plot_debug_graphs(self,init_time, final_time, **params):
         """
         Plots parameter values accumulated by the OutputFnDebugger.
         Example call::
         ODH.plot_debug_graphs(1,10000,debug_params=['a', 'b','eta'],avg_params=[x],units=[(0,0),(11,11)])
         """
               
-        debug_params = ListParameter(default=self.debug_params, doc="""
-            List of the function object's parameters that should be plotted.""")
-        
-        avg_params = ListParameter(default=self.avg_params, doc="""
-            List of the function object's parameters that should be averaged and plotted.""")
-        
-        units = ListParameter(default=self.units, doc="""
-            Units for which parameter values are plotted.""")
-    
         # JABALERT: This for loop should be merged with the one below
-        for dp in self.debug_params:
+
+        for p in params.get('debug_params',self.debug_params):
             pylab.figure()
             isint=pylab.isinteractive()
             pylab.ioff()
             manager = pylab.get_current_fig_manager()
-            pylab.ylabel(dp)
+            pylab.ylabel(p)
             pylab.xlabel('Iteration Number')
-            manager.window.title(topo.sim.name+': '+dp)
-            
-            for unit in self.units:
+            manager.window.title(topo.sim.name+': '+p)
+
+            for unit in params.get('units',self.units):
                 index=self.units.index(unit)
-                plot_data=self.debug_dict[dp][index][init_time:final_time]
+                plot_data=self.debug_dict[p][index][init_time:final_time]
                 vectorplot(plot_data, label='Unit'+str(unit))
                 
             if isint: pylab.ion()
@@ -273,18 +266,18 @@ class OutputFnDebugger(OutputFn):
             pylab.show()
 	    
 
-        for ap in self.avg_params:
+        for p in params.get('avg_params',self.avg_params):
             pylab.figure()
             isint=pylab.isinteractive()
             pylab.ioff()
             manager = pylab.get_current_fig_manager()
-            pylab.ylabel("Average "+ap)
+            pylab.ylabel("Average "+p)
             pylab.xlabel('Iteration Number')
-            manager.window.title(topo.sim.name+': '+ap)
+            manager.window.title(topo.sim.name+': '+p)
             
-            for unit in self.units:
+            for unit in params.get('units',self.units):
                 index=self.units.index(unit)
-                plot_data=self.avg_dict[ap][index][init_time:final_time]
+                plot_data=self.avg_dict[p][index][init_time:final_time]
                 vectorplot(plot_data, label='Unit'+str(unit))
 
             if isint: pylab.ion()
@@ -295,7 +288,7 @@ class OutputFnDebugger(OutputFn):
                               
 
     # JABALERT: This function should be merged with plot_debug_graphs, if possible
-    def save_debug_graphs(self,filename,init_time,final_time):
+    def save_debug_graphs(self,filename,init_time,final_time,**params):
         """
         Saves plots of parameter values accumulated by the OutputFnDebugger.
         
@@ -307,55 +300,46 @@ class OutputFnDebugger(OutputFn):
         described in the comments.
         """
               
-        debug_params = ListParameter(default=self.debug_params, doc="""
-        List of the function object's parameters that should be plotted""")
-        
-        avg_params = ListParameter(default=self.avg_params, doc="""
-        List of the function object's parameters that should be averaged and plotted""")
-        
-        units= ListParameter(default=self.units, doc="""
-        Units for which parameter values are plotted""")
-
-               
         # JABALERT: This for loop should be merged with the one below
-        for dp in self.debug_params:
+        for p in params.get('debug_params',self.debug_params):
             fig = matplotlib.figure.Figure(figsize=(6,4)) # can change this to change the figure size and shape
             ax = fig.add_subplot(111)
             ax.set_xlabel("Iteration Number")
-            ax.set_ylabel(dp)
+            ax.set_ylabel(p)
             #ax.set_ylim( 0, 0.03 ) #specify axis limits
             #ax.set_xlim( 0, 10000)
             
-            for unit in self.units:
+            for unit in params.get('units',self.units):
                 index=self.units.index(unit)
-                plot_data=self.debug_dict[dp][index][init_time:final_time]
-                #save("Debug"+filename+dp+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=',') # uncomment if you also want to save the raw data
+                plot_data=self.debug_dict[p][index][init_time:final_time]
+                #save(normalize_path("Debug"+filename+p+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=',')) # uncomment if you also want to save the raw data
                 ax.plot(plot_data, label='Unit'+str(unit))
             ax.legend(loc=0)
             # Make the PNG
             canvas = FigureCanvasAgg(fig)
             # The size * the dpi gives the final image size
             #   a4"x4" image * 80 dpi ==> 320x320 pixel image
-            canvas.print_figure(filename+dp+str(topo.sim.time())+".png", dpi=100)
+            canvas.print_figure(normalize_path(filename+p+str(topo.sim.time())+".png"), dpi=100)
                      
-        for ap in self.avg_params:
+        for p in params.get('avg_params',self.avg_params):
             fig = matplotlib.figure.Figure(figsize=(6,4))
             ax = fig.add_subplot(111)
             ax.set_xlabel("Iteration Number")
-            ax.set_ylabel("Average "+ap)
+            ax.set_ylabel("Average "+p)
             #ax.set_ylim( 0, 0.03 )
             #ax.set_xlim( 0, 10000)
-            for unit in self.units:
+            
+            for unit in params.get('units',self.units):
                 index=self.units.index(unit)
-                plot_data=self.avg_dict[ap][index][init_time:final_time]
-                #save("Average"+filename+ap+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=',') # uncomment if you also want to save the raw data
+                plot_data=self.avg_dict[p][index][init_time:final_time]
+                #save(normalize_path("Average"+filename+p+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=',')) # uncomment if you also want to save the raw data
                 ax.plot(plot_data, label='Unit'+str(unit))
             ax.legend(loc=0)
             # Make the PNG
             canvas = FigureCanvasAgg(fig)
             # The size * the dpi gives the final image size
             #   a4"x4" image * 80 dpi ==> 320x320 pixel image
-            canvas.print_figure(filename+ap+str(topo.sim.time())+".png", dpi=100)
+            canvas.print_figure(normalize_path(filename+p+str(topo.sim.time())+".png"), dpi=100)
 
 
                        
