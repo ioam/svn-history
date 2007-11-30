@@ -100,7 +100,7 @@ is_number = operator.isNumberType
 
 
 
-# CB: doc out of date!
+# CB: doc out of date! (I'm updating it.)
 class Dynamic(Parameter):
     """
     Parameter whose value can be generated dynamically by a callable object.
