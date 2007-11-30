@@ -11,22 +11,18 @@ import Image
 
 import topo
 
+from topo.tests import start_tkgui
+
 from topo.plotting.plot import Plot
 from topo.plotting.plotgroup import PlotGroup
 from topo.tkgui.plotgrouppanel import PlotGroupPanel
 
 
-# need to clean up stuff like this: do it all in one
-# place (start() modification as suggested by JAB).
-import os
-if not hasattr(topo,'guimain') and os.getenv('DISPLAY'):
-    from topo.tkgui.topoconsole import TopoConsole
-    TopoConsole()
-
-
 class TestPlotGroupPanel(unittest.TestCase):
 
     def setUp(self):
+
+        start_tkgui() # this test needs the console
 
         window = Tkinter.Toplevel()
         
