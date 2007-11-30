@@ -168,22 +168,24 @@ class OutputFnDebugger(OutputFn):
       topo.sim['V1'].output_fn=Pipeline(output_fns=[HE, ODH])
     """
     
-    function = OutputFnParameter(default=IdentityOF(), doc="""
+    function = OutputFnParameter(default=None, doc="""
         Output function whose parameters will be tracked.""")
     
-    debug_params = ListParameter(default=['a', 'b'], doc="""
-        List of the function object's parameters that should be stored.""")
+    debug_params = ListParameter(default=[], doc="""
+        List of names of the function object's parameters that should be stored.""")
     
     avg_params = ListParameter(default=['x'], doc="""
-        List of the function object's parameters that should be averaged and stored.""")
+        List of names of the function object's parameters that should be averaged and stored.
+        The name 'x' is a special case, referring to the values of the
+        matrix supplied to the OutputFnDebugger on each call.""")
     
     units= ListParameter(default=[(0,0)], doc="""
-        Units for which parameter values are stored.""")
+        Matrix coordinates of the unit(s) for which parameter values will be stored.""")
     
     step=Number(default=8, doc="How often to update debugging information and calculate averages.")
 
     smoothing = Number(default=0.0003, doc="""
-        Determines the relative weighting of current and previous values when calculating the average.
+        The relative weighting of current and previous values when calculating the average.
         The average is then an exponentially smoothed version of the
         value, using this value as the time constant.""")
 
@@ -192,14 +194,18 @@ class OutputFnDebugger(OutputFn):
         super(OutputFnDebugger,self).__init__(**params)
         # JABALERT: Should probably combine debug_dict and avg_dict,
         # instead storing x and x_avg in the same dict
-        self.debug_dict={}
-        self.avg_dict={}
+        self.values={}
         self.n_step = 0
         self.first_call = True
+        # JABALERT:
+        # Should change from zeros() to just a list, so that there's no maximum bound on items
+        # JABERRORALERT:
+        # Also, should probably just be a list of (time, value) pairs, so that time can be a
+        # float, rather than an array indexed by an integer time
         for dp in self.debug_params:
-            self.debug_dict[dp]= zeros([len(self.units),30000],activity_type)
+            self.values[dp]= zeros([len(self.units),30000],activity_type)
         for ap in self.avg_params:
-            self.avg_dict[ap]=zeros([len(self.units),30000],activity_type)
+            self.values[ap+"_avg"]=zeros([len(self.units),30000],activity_type)
     
         
     def __call__(self,x):
@@ -210,7 +216,7 @@ class OutputFnDebugger(OutputFn):
 	    self.first_call = False
             self.avg_values={}
             for ap in self.avg_params:
-                self.avg_values[ap]=zeros(x_copy.shape, x_copy.dtype.char)
+                self.avg_values[ap]=zeros(x_copy.shape, activity_type)
                 
         self.n_step += 1
         
@@ -221,21 +227,21 @@ class OutputFnDebugger(OutputFn):
             for dp in self.debug_params:
                 for u in self.units:
                     if dp=="x":
-                        self.debug_dict[dp][self.units.index(u)][topo.sim.time()]=x_copy[u]
+                        self.values[dp][self.units.index(u)][topo.sim.time()]=x_copy[u]
                     else:
                         value_matrix= getattr(self.function, dp)
                         value=value_matrix[u]
-                        self.debug_dict[dp][self.units.index(u)][topo.sim.time()]=value
+                        self.values[dp][self.units.index(u)][topo.sim.time()]=value
 
             for ap in self.avg_params:
                 for u in self.units:
                     if ap=="x":
                         self.avg_values[ap] = self.smoothing*x_copy + (1.0-self.smoothing)*self.avg_values[ap]
-                        self.avg_dict[ap][self.units.index(u)][topo.sim.time()]=self.avg_values[ap][u]
+                        self.values[ap+"_avg"][self.units.index(u)][topo.sim.time()]=self.avg_values[ap][u]
                     else:
                         value_matrix= getattr(self.function, ap)
                         self.avg_values[ap] = self.smoothing*value_matrix + (1.0-self.smoothing)*self.avg_values[ap]
-                        self.avg_dict[ap][self.units.index(u)][topo.sim.time()]=self.avg_values[ap][u]
+                        self.values[ap+"_avg"][self.units.index(u)][topo.sim.time()]=self.avg_values[ap][u]
             
 
     def plot_debug_graphs(self,init_time, final_time, filename=None, **params):
@@ -254,19 +260,20 @@ class OutputFnDebugger(OutputFn):
             #pylab.ylim( 0, 0.03 ) #specify axis limits ; may not work yet
             #pylab.xlim( 0, 10000)
             if avg:
-                pylab.ylabel("Average "+p)
+                data_name="Average "+p
             else:
-                pylab.ylabel(p)
+                data_name=p
+            pylab.ylabel(data_name)
             pylab.xlabel('Iteration Number')
             manager = pylab.get_current_fig_manager()
-            manager.window.title(topo.sim.name+': '+p)
+            manager.window.title(topo.sim.name+': '+data_name)
             
             for unit in params.get('units',self.units):
                 index=self.units.index(unit)
                 if avg:
-                    plot_data=self.avg_dict[p][index][init_time:final_time]
+                    plot_data=self.values[p+"_avg"][index][init_time:final_time]
                 else:
-                    plot_data=self.debug_dict[p][index][init_time:final_time]                    
+                    plot_data=self.values[p][index][init_time:final_time]                    
 
                 #save(normalize_path("Average???"+filename+p+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=',')) # uncomment if you also want to save the raw data
                 pylab.plot(plot_data, label='Unit'+str(unit))
@@ -280,7 +287,3 @@ class OutputFnDebugger(OutputFn):
                 pylab.savefig(normalize_path(filename+p+str(topo.sim.time())+".png"), dpi=100)
             else:
                 pylab.show()
-
-                       
-
-
