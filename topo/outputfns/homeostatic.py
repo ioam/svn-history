@@ -182,7 +182,7 @@ class OutputFnDebugger(OutputFn):
     units= ListParameter(default=[(0,0)], doc="""
         Matrix coordinates of the unit(s) for which parameter values will be stored.""")
     
-    step=Number(default=8, doc="How often to update debugging information and calculate averages.")
+    step=Number(default=1, doc="How often to update debugging information and calculate averages.")
 
     smoothing = Number(default=0.0003, doc="""
         The relative weighting of current and previous values when calculating the average.
@@ -192,20 +192,17 @@ class OutputFnDebugger(OutputFn):
     
     def __init__(self,**params):
         super(OutputFnDebugger,self).__init__(**params)
-        # JABALERT: Should probably combine debug_dict and avg_dict,
-        # instead storing x and x_avg in the same dict
         self.values={}
         self.n_step = 0
         self.first_call = True
-        # JABALERT:
-        # Should change from zeros() to just a list, so that there's no maximum bound on items
-        # JABERRORALERT:
-        # Also, should probably just be a list of (time, value) pairs, so that time can be a
-        # float, rather than an array indexed by an integer time
         for dp in self.debug_params:
-            self.values[dp]= zeros([len(self.units),30000],activity_type)
+            self.values[dp]={}
+            for u in self.units:
+                self.values[dp][self.units.index(u)]=[]
         for ap in self.avg_params:
-            self.values[ap+"_avg"]=zeros([len(self.units),30000],activity_type)
+            self.values[ap+"_avg"]={}
+            for u in self.units:
+                self.values[ap+"_avg"][self.units.index(u)]=[]
     
         
     def __call__(self,x):
@@ -223,67 +220,25 @@ class OutputFnDebugger(OutputFn):
         if self.n_step == self.step:
             
             self.n_step = 0
-
-            for dp in self.debug_params:
+            for p in self.debug_params+self.avg_params:
+                avg=p in self.avg_params
                 for u in self.units:
-                    if dp=="x":
-                        self.values[dp][self.units.index(u)][topo.sim.time()]=x_copy[u]
-                    else:
-                        value_matrix= getattr(self.function, dp)
-                        value=value_matrix[u]
-                        self.values[dp][self.units.index(u)][topo.sim.time()]=value
-
-            for ap in self.avg_params:
-                for u in self.units:
-                    if ap=="x":
-                        self.avg_values[ap] = self.smoothing*x_copy + (1.0-self.smoothing)*self.avg_values[ap]
-                        self.values[ap+"_avg"][self.units.index(u)][topo.sim.time()]=self.avg_values[ap][u]
-                    else:
-                        value_matrix= getattr(self.function, ap)
-                        self.avg_values[ap] = self.smoothing*value_matrix + (1.0-self.smoothing)*self.avg_values[ap]
-                        self.values[ap+"_avg"][self.units.index(u)][topo.sim.time()]=self.avg_values[ap][u]
-            
-
-    def plot_debug_graphs(self,init_time, final_time, filename=None, **params):
-        """
-        Plots parameter values accumulated by the OutputFnDebugger.
-        Example call::
-        ODH.plot_debug_graphs(1,10000,debug_params=['a', 'b','eta'],avg_params=[x],units=[(0,0),(11,11)])
-        """
-              
-        for p in params.get('debug_params',self.debug_params) + params.get('avg_params',self.avg_params):
-            avg=p in self.avg_params
-            pylab.figure() # could add something like figsize=(6,4)?
-            isint=pylab.isinteractive()
-            pylab.ioff()
-            pylab.grid(True)
-            #pylab.ylim( 0, 0.03 ) #specify axis limits ; may not work yet
-            #pylab.xlim( 0, 10000)
-            if avg:
-                data_name="Average "+p
-            else:
-                data_name=p
-            pylab.ylabel(data_name)
-            pylab.xlabel('Iteration Number')
-            manager = pylab.get_current_fig_manager()
-            manager.window.title(topo.sim.name+': '+data_name)
-            
-            for unit in params.get('units',self.units):
-                index=self.units.index(unit)
-                if avg:
-                    plot_data=self.values[p+"_avg"][index][init_time:final_time]
-                else:
-                    plot_data=self.values[p][index][init_time:final_time]                    
-
-                #save(normalize_path("Average???"+filename+p+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=',')) # uncomment if you also want to save the raw data
-                pylab.plot(plot_data, label='Unit'+str(unit))
+                    if avg:
+                        if p=="x":
+                            self.avg_values[p] = self.smoothing*x_copy + (1.0-self.smoothing)*self.avg_values[p]
+                            self.values[p+"_avg"][self.units.index(u)].append((topo.sim.time(),self.avg_values[p][u]))
                 
-            if isint: pylab.ion()
-            pylab.legend(loc=0)
-            pylab.show._needmain = False
-            # The size * the dpi gives the final image size
-            #   a 4"x4" image * 80 dpi ==> 320x320 pixel image
-            if filename is not None:
-                pylab.savefig(normalize_path(filename+p+str(topo.sim.time())+".png"), dpi=100)
-            else:
-                pylab.show()
+                        else:
+                            value_matrix= getattr(self.function, p)
+                            self.avg_values[p] = self.smoothing*value_matrix + (1.0-self.smoothing)*self.avg_values[p]
+                            self.values[p+"_avg"][self.units.index(u)].append((topo.sim.time(),self.avg_values[p][u]))
+                    else:
+                        if p=="x":
+                            self.values[p][self.units.index(u)].append((topo.sim.time(),x_copy[u]))
+                        else:
+                            value_matrix= getattr(self.function, p)
+                            value=value_matrix[u]
+                            self.values[p][self.units.index(u)].append((topo.sim.time(),value))
+
+          
+
