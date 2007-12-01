@@ -100,7 +100,7 @@ import Tkinter, _tkinter
 
 from inspect import getdoc
 from Tkinter import BooleanVar, StringVar, Frame, Checkbutton, \
-     Entry, OptionMenu
+     Entry
 from Pmw import Balloon
 
 from topo.base.parameterizedobject import ParameterizedObject,Parameter, \
@@ -114,7 +114,8 @@ import topo # for topo.guimain only
 from topo.misc.utils import eval_atof, inverse
 from topo.misc.filepaths import Filename, resolve_path
 
-from widgets import FocusTakingButton as Button2, TaggedSlider
+from widgets import FocusTakingButton as Button2, TaggedSlider, \
+     EditableOptionMenu as OptionMenu
 from topowidgets import entry_background
 
 def lookup_by_class(dict_,class_):
@@ -541,7 +542,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # be surprised by the result from get()?
         tkvar._original_get = tkvar.get
         tkvar.get = lambda x=name: self._tkvar_get(x)
-        
+
 
     def _tkvar_set(self,param_name,val):
         """
@@ -695,8 +696,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         Otherwise, looks in the source_POs of this object.
         """
         source = parameterized_object or self.get_source_po(name)
-        return source.repr_value(name) #getattr(source,name) #.inspect_value(name)
-    #return getattr(source,name) 
+        return source.repr_value(name) 
 
         
     def set_parameter_value(self,name,val,parameterized_object=None):
@@ -1411,6 +1411,17 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         self._indicate_tkvar_status(p_name)
 
+
+
+
+    def gui_set_param(self,param_name,val):
+        """Simulate setting the parameter in the GUI."""
+        self._tkvar_set(param_name,val)  # ERROR: presumably calls trace stuff twice
+        self._handle_gui_set(param_name,force=True)
+
+    def gui_get_param(self,param_name):
+        """Simulate getting the parameter in the GUI."""
+        return self._tkvars[param_name].get()
 
 
 
