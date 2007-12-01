@@ -1,5 +1,5 @@
 """
-Tests for the ParametersFrameWithApply classes.
+Tests for the ParametersFrame classes.
 
 $Id$
 """
@@ -29,8 +29,6 @@ class TestPO(ParameterizedObject):
     nu = Number(default=1.0,bounds=(-1,1))
     st = StringParameter("string1")
 
-
-cannot_get_value = [Tkinter.OptionMenu] #OptionMenu has no get()    
 
 
 class TestParametersFrameWithApply(unittest.TestCase):
@@ -83,7 +81,7 @@ class TestParametersFrameWithApply(unittest.TestCase):
             # button-type widgets don't have a value
             widget_has_value = not 'command' in widget.config()
                             
-            if widget.__class__ not in cannot_get_value and widget_has_value:
+            if widget_has_value:
                 orig_values[param_name] = widget.get()
         
         self.f.Apply()
