@@ -169,14 +169,12 @@ snapshot-tests:
 	rm -f 'snapshot-tests.typ'
 
 
-# CEBALERT: run these tests using a script in tests/
 basic-gui-tests:
-# Check the basic types of window open without errors (because the unit tests don't yet do this).
-# Also check Model Editor works (including opening parameters frames).
-# (CB: using the model editor from the commandline will change when it's converted)
-# Check that connection fields window opens with correct x and y (for right click) 
-	./topographica examples/hierarchical.ty -g -c "g=topo.guimain;g['Simulation']['Test Pattern'](); p=g['Plots']; p['Activity'](); p['Connection Fields'](); p['Projection'](); p['Projection Activity'](); p['Preference Maps']['Orientation Preference'](); p['Tuning Curves']['Orientation Tuning'](); e=g['Simulation']['Model Editor'](); [X.show_properties() for X in e.canvas.object_list] # tests various parametersframes" -c "cf = p['Connection Fields'](x=0.125,y=0.250); assert cf.x==0.125; assert cf.y==0.250" -c "g['Simulation']['Command prompt']()" -c "g.quit_topographica(check=False)"
-# (It should be a for loop above, not a comprehension, but I couldn't make the syntax work...)
+	./topographica -g -c "from topo.tests.gui_tests import run_basic; run_basic(); topo.guimain.quit_topographica(check=False)"
+
+detailed-gui-tests:
+	./topographica -g -c "from topo.tests.gui_tests import run_detailed; run_detailed(); topo.guimain.quit_topographica(check=False)"
+
 
 clean-pyc:
 	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc examples/*.pyc
