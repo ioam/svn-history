@@ -242,6 +242,10 @@ def process_argv(argv):
             
         if not args:
             break
+
+    # CEBALERT: topographica doesn't stay open if there's an error
+    # in commands executed - try:
+    #  ./topographica -i -c "raise"
         
     # If no scripts and no commands were given, pretend -i was given.
     if not something_executed:
