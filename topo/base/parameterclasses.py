@@ -126,6 +126,8 @@ class Dynamic(Parameter):
     callable class, rather than a named function or a lambda function,
     or else this object will not be picklable.
     """
+    # CEBERRORALERT: using the '_dynamic' to store whether or not the
+    # value is dynamic doesn't work because it's shared (like bounds, etc).
     __slots__ = ['last_value','_dynamic']
     __doc__ = property((lambda self: self.doc))
     
