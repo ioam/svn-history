@@ -169,6 +169,8 @@ snapshot-tests:
 	rm -f 'snapshot-tests.typ'
 
 
+gui-tests: basic-gui-tests detailed-gui-tests
+
 basic-gui-tests:
 	./topographica -g -c "from topo.tests.gui_tests import run_basic; run_basic(); topo.guimain.quit_topographica(check=False)"
 
