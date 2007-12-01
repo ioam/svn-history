@@ -72,3 +72,24 @@ True
 >>> isinstance(t6.repr_value('x'),UniformRandom)
 True
 
+
+
+## Check that indication of dynamic value works
+# i.e. add failing test on purpose to show things aren't yet working
+
+>>> t8 = TestPO3()
+>>> t9 = TestPO3()
+
+>>> t8.x = 1.0; t9.x = 1.0
+>>> t8.params()['x']._dynamic
+False
+>>> t9.params()['x']._dynamic
+False
+
+>>> t8.x = UniformRandom()
+>>> t8.params()['x']._dynamic
+True
+>>> t9.params()['x']._dynamic  # _dynamic shared, so this test fails
+False
+
+
