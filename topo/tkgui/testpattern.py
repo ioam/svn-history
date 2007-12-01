@@ -63,7 +63,7 @@ class TestPattern(SheetPanel):
     duration = Number(default=1.0,doc="""How long to run the simulator when presenting.""",
                       softbounds=(0.0,10.0))
 
-    present = ButtonParameter(doc="""Present this pattern to the simulation.""")
+    Present = ButtonParameter(doc="""Present this pattern to the simulation.""")
 
     pattern_generator = ClassSelectorParameter(class_=PatternGenerator, doc="""Type of pattern to present. Each type has various parameters that can be changed.""")
 
@@ -112,7 +112,7 @@ class TestPattern(SheetPanel):
         self.pack_param('learning',side='bottom',parent=present_frame)
         self.params_frame.pack(side='bottom',expand='yes',fill='x')
         self.pack_param('duration',parent=present_frame,side='left')
-        self.pack_param('present',parent=present_frame,on_change=self.present_pattern,side="right")
+        self.pack_param('Present',parent=present_frame,on_change=self.present_pattern,side="right")
 
 
     def setup_plotgroup(self):
@@ -161,7 +161,7 @@ class TestPattern(SheetPanel):
 	topo.sim.state_push()
 
         input_dict = dict([(sheet.name,sheet.input_generator) for sheet in self.plotgroup._sheets()])
-        
+
         pattern_present(input_dict,self.duration,
                         learning=self.learning,overwrite_previous=False)
 
