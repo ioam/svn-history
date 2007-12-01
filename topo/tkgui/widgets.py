@@ -668,6 +668,8 @@ class FocusTakingButton(Tkinter.Button):
 
 
 
+# CEB: I need to make this better, or subclass Tkinter.OptionMenu myself.
+# Need to 
 # Copied straight from http://mail.python.org/pipermail/tutor/2003-June/023004.html
 class EditableOptionMenu(Tkinter.OptionMenu):
     """OptionMenu which allows editing of menu items
@@ -725,6 +727,14 @@ class EditableOptionMenu(Tkinter.OptionMenu):
         is changed, fixing this is left as an exercise to the reader"""
         self.menu.entryconfigure(index, label=new_text,
             command=Tkinter._setit(self.variable, new_text, self.callback))
+
+    # CEB: my additions
+    def get(self):
+        return self.variable.get()
+
+    def set(self,val):
+        # should check val is in list
+        self.variable.set(val)
 
 
 
