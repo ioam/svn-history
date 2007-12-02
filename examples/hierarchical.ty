@@ -120,4 +120,4 @@ topo.sim['RightRetina'].layout_location=(369,520)
 
 
 # set default input generator (e.g. for the GUI)
-GeneratorSheet.classparams()['input_generator'].default=Line()
+GeneratorSheet.params()['input_generator'].default=Line()
