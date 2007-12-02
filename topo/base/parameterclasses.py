@@ -99,7 +99,10 @@ import operator
 is_number = operator.isNumberType
 
 
+def always_update(): return True
 
+
+# CB: "last" should be "current"
 # CB: doc out of date! (I'm updating it.)
 class Dynamic(Parameter):
     """
@@ -126,41 +129,95 @@ class Dynamic(Parameter):
     callable class, rather than a named function or a lambda function,
     or else this object will not be picklable.
     """
-    # CEBERRORALERT: using the '_dynamic' to store whether or not the
-    # value is dynamic doesn't work because it's shared (like bounds, etc).
-    __slots__ = ['last_value','_dynamic']
+    __slots__ = ['last_default','update_fn']
     __doc__ = property((lambda self: self.doc))
-    
+
+        
     def __init__(self,**params):
-        super(Dynamic,self).__init__(**params)  
-        self.last_value = self.default # was None
-        self._dynamic = is_dynamic(self.default)
+        super(Dynamic,self).__init__(**params)
+
+        self.update_fn = always_update
+
+        # do we need to update instantiate later on if the parameter
+        # is set? right now I think we only use instantiate when a
+        # parameterizedobject is created, so it should be ok. If the
+        # parameter gets set on a PO, the value is set on the PO, so
+        # instantiate is no longer relevant.  But need to consider
+        # pickling and copying.
+        
+        if is_dynamic(self.default):
+            self.last_default = None
+            self.instantiate = True
+        else:
+            self.last_default = self.default
+
+
 
     def __get__(self,obj,objtype):
 
-        if not obj:
-            result = produce_value(self.default)
-            self.last_value = result
-        else:
-            # complication: if value set on object, have to store last
-            # value in the *object*; if value set on class, just store
-            # last value in here (as before for DynamicNumber)
-            obj_name_for_param = self.get_name(obj)
+        # CB: to store last default value etc on the class, put it in
+        # objtype.__dict__ instead of setting on the parameter object.
+        # But then need to explain why 'default' and all the rest are
+        # stored on the parameter object rather than the owning class.
 
-            if obj_name_for_param in obj.__dict__:
-                result = produce_value(obj.__dict__[obj_name_for_param])
-                obj.__dict__[obj_name_for_param+"_last"] = result
-            else:
-                result = produce_value(self.default)
-                self.last_value = result
-                        
-        return result
+        if self.update_fn():
+            value = self._produce_value(obj)
+        else:
+            value =  self._last_value(obj)
+
+        return value
 
 
     def __set__(self,obj,val):
         super(Dynamic,self).__set__(obj,val)
-        self._dynamic = is_dynamic(val)
 
+        if not is_dynamic(val):
+            if not obj:
+                self.last_default = self.default
+            else:
+                obj.__dict__[self.get_name(obj)+'_last']=val
+
+
+    def _last_value(self,obj):
+        if not obj:
+            value = self.last_default
+        else:
+            try:
+                value = obj.__dict__[self.get_name(obj)+'_last']
+            except KeyError:
+                value = self.last_default
+
+        return last_value
+    
+
+    def _produce_value(self,obj):
+
+        if not obj:
+            value = produce_value(self.default)
+            self.last_default = value
+        else:
+            try:
+                name = self.get_name(obj)
+                value = produce_value(obj.__dict__[name])
+                obj.__dict__[name+'_last']=value
+            except KeyError:
+                value = produce_value(self.default)
+                self.last_default = value
+
+        return value
+
+
+##     def _value_is_dynamic(self,obj):
+##         if not obj:
+##             dynamic = is_dynamic(self.default)
+##         else:
+##             try:
+##                 dynamic = is_dynamic(obj.__dict__[self.get_name(obj)])
+##             except KeyError:
+##                 dynamic = is_dynamic(self.default)
+
+##         return dynamic
+        
 
 
 # CEBALERT: Now accepts FixedPoint, but not fully tested.
@@ -205,7 +262,7 @@ class Number(Dynamic):
         
         self.bounds = bounds
         self._softbounds = softbounds  
-        if not self._dynamic: self._check_bounds(default)  
+        if not is_dynamic(default): self._check_bounds(default)  
         
 
     def __get__(self,obj,objtype):
@@ -215,7 +272,7 @@ class Number(Dynamic):
         value, if one has been set, otherwise produce the default value.
         """
         result = super(Number,self).__get__(obj,objtype)
-        if self._dynamic: self._check_bounds(result)
+        if is_dynamic(result): self._check_bounds(result)
         return result
 
 
@@ -223,8 +280,7 @@ class Number(Dynamic):
         """
         Set to the given value, raising an exception if out of bounds.
         """
-        dynamic = is_dynamic(val) # results in two calls to is_dynamic (there's one in super's set)
-        if not dynamic: self._check_bounds(val)
+        if not is_dynamic(val): self._check_bounds(val)
         super(Number,self).__set__(obj,val)
         
 
@@ -234,7 +290,7 @@ class Number(Dynamic):
         All objects are accepted, and no exceptions will be raised.  See
         crop_to_bounds for details on how cropping is done.
         """
-        if not self._dynamic:
+        if not is_dynamic(val):
             bounded_val = self.crop_to_bounds(val)
         else:
             bounded_val = val
