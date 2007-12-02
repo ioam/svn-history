@@ -31,6 +31,9 @@ warnings_as_exceptions = False
 object_count = 0
 
 
+# CEBALERT: isn't this the same as our current classlist()?
+#  def classlist: return inspect.getmro(class_)[::-1]
+# Also, classlist() has almost identical code as descendents().
 
 def classlist(class_):
     """
@@ -242,7 +245,6 @@ class Parameter(object):
         self._name = None
         self.hidden=hidden
         self.precedence = precedence
-        Parameter.count += 1
         self.default = default
         self.doc = doc
         self.constant = constant
@@ -254,6 +256,8 @@ class Parameter(object):
         else:
             self.instantiate = instantiate
 
+        Parameter.count += 1
+        
         
     def __get__(self,obj,objtype):
         """
@@ -261,6 +265,9 @@ class Parameter(object):
         default value.  If called on an instance, produce the instance's
         value, if one has been set, otherwise produce the default value.
         """
+        # CB: obj can be None, objtype is never None
+        # (I think, anyway: http://docs.python.org/ref/descriptor-invocation.html)
+
         # For documentation on __get__() see 'Implementing Descriptors'
         # in the Python reference manual
         # (http://www.python.org/doc/2.4.2/ref/descriptors.html)
@@ -310,11 +317,14 @@ class Parameter(object):
     def get_name(self,obj):
         """
         Return the name that the specified object has for this parameter.
+
+        (I.e. something like _X_param_value.)
         """
         if not hasattr(self,'_name') or not self._name:
             self._name = '_%s_param_value'%self._discover_attrib_name(obj,None)
 
         return self._name
+
 
     def attrib_name(self,obj=None,objtype=None):
         """
@@ -427,6 +437,11 @@ class ParameterizedObjectMetaclass(type):
     # (appear to) do is to provide a way to call the functions without
     # having a specific object available.  Perhaps they do something
     # else that requires them to be in the metaclass, though?
+
+    # CB: get_param_descriptor() needs to be in this object (the
+    # metaclass) because it's used here. classparams() and
+    # print_param_defaults, however, could be static methods of
+    # ParameterizedObject.
     
     def __init__(self,name,bases,dict):
         """
@@ -485,7 +500,6 @@ class ParameterizedObjectMetaclass(type):
         been set we make sure that the value is inherited from
         ParameterizedObject superclasses as described in __param_inheritance().
         """        
-
         # Find out if there's a Parameter called attribute_name as a
         # class attribute of this class - if not, parameter is None.
         parameter,owning_class = self.get_param_descriptor(attribute_name)
@@ -827,7 +841,7 @@ class ParameterizedObject(object):
         First, ensures that all Parameters with 'instantiate=True'
         (typically used for mutable Parameters) are copied directly
         into each object, to ensure that there is an independent copy
-        (to avoid strange aliasing errors).  Then sets each of the
+        (to avoid suprising aliasing errors).  Then sets each of the
         keyword arguments, warning when any of them are not defined as
         parameters.
         """
@@ -910,7 +924,7 @@ class ParameterizedObject(object):
         Same as getattr() except for Dynamic parameters, which have their
         last value returned.
         """
-        return self.__shenma(name,self.inspect_value,"_%s_param_value_last"%name,'last_value')
+        return self.__shenma(name,self.inspect_value,"_%s_param_value_last"%name,'last_default')
 
 
     def __shenma(self,name,mthd,local_attr_name,param_attr_name):
@@ -932,7 +946,7 @@ class ParameterizedObject(object):
             value = [mthd(a) for a in param_obj.attribs]
 
         # not a Dynamic Parameter 
-        elif not hasattr(param_obj,'_dynamic'):
+        elif not hasattr(param_obj,'last_default'):
             value = getattr(self,name)
 
         # Dynamic Parameter...
@@ -941,7 +955,7 @@ class ParameterizedObject(object):
                 # ...which had been set on this object
                 value = self.__dict__[local_attr_name]
             except KeyError:
-                # ...which had been set on a class
+                # ...not set on object:
                 value = getattr(param_obj,param_attr_name)
 
         return value
@@ -1044,6 +1058,7 @@ class ParameterizedObject(object):
         for param_name,param in self.params().items():
             if param.constant or param_name=='name': # fake constant name
                 pass
+            # CEBHACKALERT
             elif param.instantiate:
                 # should use other code to instantiate. missing
                 # object count increase, etc? need some method to
