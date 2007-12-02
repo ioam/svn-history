@@ -82,6 +82,7 @@ Forever = FixedPoint(-1)
 # a runnable script
 simulation_path="topo.sim"
 
+
 class Singleton(object):
     """
     The singleton pattern.
@@ -927,6 +928,9 @@ class Simulation(ParameterizedObject):
         """
         super(Simulation,self).__init__(**params)
 
+        #from topo.base.parameterclasses import Dynamic
+        #Dynamic.time_fn = self.time
+
         self._time = FixedPoint("0.0",4)
         self._event_processors = {}
 
@@ -951,7 +955,6 @@ class Simulation(ParameterizedObject):
         self.timer = SomeTimer(func=wrap_callable(self.run),
                                simulation_time_fn=wrap_callable(self.time))
 
-        
 
     def __getitem__(self,item_name):
         """
