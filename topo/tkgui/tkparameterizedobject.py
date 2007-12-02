@@ -146,23 +146,9 @@ def keys_sorted_by_value(d, **sort_kwargs):
     return [i[val] for val in values]
 
 
+# CEBALERT: remove this function
 def parameters(parameterized_object):
-    """
-    Return a dictionary {name:parameter} of the parameters of
-    parameterized_object, where parameterized_object can be an
-    instance of ParameterizedObject or ParameterizedObjectMetaclass.
-    
-    (To list the Parameters, ParameterizedObjectMetaclass has
-    classparams(), whereas ParameterizedObject has params();  this
-    function selects the appropriate one.)
-    """
-    if isinstance(parameterized_object,ParameterizedObjectMetaclass):
-        return parameterized_object.classparams()
-    elif isinstance(parameterized_object,ParameterizedObject):
-        return parameterized_object.params()
-    else:
-        raise TypeError(`parameterized_object`+ \
-            " is not a ParameterizedObject or ParameterizedObjectMetaclass.")
+    return parameterized_object.params()
 
 
 
