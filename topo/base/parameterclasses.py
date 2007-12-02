@@ -99,8 +99,8 @@ import operator
 is_number = operator.isNumberType
 
 
-def always_update(): return True
 
+# CB: make sure e.g. 'UniformRandom...' shows up in help(PO)
 
 # CB: "last" should be "current"
 # CB: doc out of date! (I'm updating it.)
@@ -129,14 +129,15 @@ class Dynamic(Parameter):
     callable class, rather than a named function or a lambda function,
     or else this object will not be picklable.
     """
-    __slots__ = ['last_default','update_fn']
+    time_fn = None
+    
+    __slots__ = ['last_default','last_time']
     __doc__ = property((lambda self: self.doc))
 
         
     def __init__(self,**params):
         super(Dynamic,self).__init__(**params)
 
-        self.update_fn = always_update
 
         # do we need to update instantiate later on if the parameter
         # is set? right now I think we only use instantiate when a
@@ -144,13 +145,32 @@ class Dynamic(Parameter):
         # parameter gets set on a PO, the value is set on the PO, so
         # instantiate is no longer relevant.  But need to consider
         # pickling and copying.
-        
+
+        self.last_time = None 
         if is_dynamic(self.default):
             self.last_default = None
             self.instantiate = True
         else:
             self.last_default = self.default
 
+
+    def _needs_update(self,obj):
+
+        if self.time_fn is None: return True
+        time =  self.time_fn()
+        
+        if not obj:
+            needs = time>(self.last_time or -1)
+        else:
+            name = self.get_name(obj)
+            try:
+                needs = time>obj.__dict__[name+'_time']
+            except KeyError:
+                needs = time>(self.last_time or -1)
+
+        return needs
+                
+        
 
 
     def __get__(self,obj,objtype):
@@ -160,7 +180,8 @@ class Dynamic(Parameter):
         # But then need to explain why 'default' and all the rest are
         # stored on the parameter object rather than the owning class.
 
-        if self.update_fn():
+
+        if self._needs_update(obj):
             value = self._produce_value(obj)
         else:
             value =  self._last_value(obj)
@@ -187,22 +208,29 @@ class Dynamic(Parameter):
             except KeyError:
                 value = self.last_default
 
-        return last_value
+        return value
     
 
     def _produce_value(self,obj):
+        if self.time_fn:
+            time = self.time_fn()
+        else:
+            time = -1
 
         if not obj:
             value = produce_value(self.default)
             self.last_default = value
+            self.last_time = time
         else:
             try:
                 name = self.get_name(obj)
                 value = produce_value(obj.__dict__[name])
                 obj.__dict__[name+'_last']=value
+                obj.__dict__[name+'_time']=time
             except KeyError:
                 value = produce_value(self.default)
                 self.last_default = value
+                self.last_time = time
 
         return value
 
