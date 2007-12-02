@@ -1,37 +1,84 @@
 >>> from topo.base.parameterizedobject import ParameterizedObject
->>> from topo.base.parameterclasses import Number, DynamicNumber
+>>> from topo.base.parameterclasses import Dynamic, DynamicNumber
 >>> from topo.misc.numbergenerators import UniformRandom
 
-## New syntax (in fact also used previously)
+
+
+## Basic tests of Dynamic parameters (__get__ & __set__,
+## and that inspect_value() and repr_value() work).
 
 >>> class TestPO1(ParameterizedObject):
-...    x = Number(default=UniformRandom(lbound=-1,ubound=1,seed=1),doc="nothing") 
+...    x = Dynamic(default=UniformRandom(lbound=-1,ubound=1,seed=1),doc="nothing")
+...    y = Dynamic(default=1)
+
+
+>>> t1 = TestPO1()
+>>> t1.inspect_value('x')  # no value generated yet
+
+>>> t1.inspect_value('y')  # not dynamic
+1
+
+>>> t1.y = 2
+>>> t1.inspect_value('y')  # check it's updated
+2
+
 
 
 >>> t2 = TestPO1(x=UniformRandom(lbound=-1,ubound=1,seed=10))
 >>> t3 = TestPO1(x=UniformRandom(lbound=-1,ubound=1,seed=10))
 
-# check repr_value is ok
->>> isinstance(t2.repr_value('x'),UniformRandom)
+
+>>> isinstance(t2.repr_value('x'),UniformRandom)  # check repr_value()
 True
 
->>> t2.x==t3.x  # t2 and t3 have identical streams...
+
+>>> t2.x==t3.x  # check that t2 and t3 have identical streams
 True
 
 >>> forget = t2.x  # advance t2
->>> t2.x==t3.x  # ...but do not share UniformRandom objects
+>>> t2.inspect_value('x')==t3.inspect_value('x')  # check t2 and t3 do not share UniformRandom objects
 False
 
 
 >>> forget=t2.x;forget=t2.x;t2_last_value=t2.x  # advance t2 beyond t3
 >>> t2.inspect_value('x')==t2_last_value  # inspect_value() should return last generated value
 True
->>> t3.inspect_value('x')==t2_last_value  # catch new bug caused by shared Parameter object (shared last_value)
+
+
+>>> t3.inspect_value('x')==t2_last_value  # catch bug caused by shared last_value
 False
 
 
 
-## Repeat tests above to check old-style uses (previous syntax in example scripts) still work ok
+
+
+## Check instantiation of Dynamic parameter
+
+>>> class TestPO3(ParameterizedObject):
+...    x = Dynamic(default=UniformRandom(lbound=-1,ubound=1,seed=30))
+...    y = Dynamic(default=1.0)
+
+>>> t6 = TestPO3()
+>>> t7 = TestPO3()
+
+>>> t6_first_value = t6.x
+>>> t7.inspect_value('x')==t6_first_value  # dynamic values are instantiated
+False
+
+
+>>> TestPO3.y = 4
+>>> t6.y  # non-dynamic value not instantiated
+4
+>>> t7.y  # non-dynamic value not instantiated
+4
+
+
+
+
+
+## Repeat some earlier tests to check old-style uses (previous syntax
+## in example scripts) still work ok
+>>> from topo.base.parameterclasses import Number
 
 >>> class TestPO2(ParameterizedObject):
 ...    x = Number(default=0.0)
@@ -55,41 +102,6 @@ True
 False
 
 
-
-## Check class-level Dynamic parameter works ok
-
->>> class TestPO3(ParameterizedObject):
-...    x = Number(default=UniformRandom(lbound=-1,ubound=1,seed=30))
-
->>> t6 = TestPO3()
->>> t7 = TestPO3()
-
-# advancing t6 advances t7 because it's the same
->>> t6_first_value = t6.x
->>> t7.inspect_value('x')==t6_first_value
-True
-
->>> isinstance(t6.repr_value('x'),UniformRandom)
-True
-
-
-
-## Check that indication of dynamic value works
-# i.e. add failing test on purpose to show things aren't yet working
-
->>> t8 = TestPO3()
->>> t9 = TestPO3()
-
->>> t8.x = 1.0; t9.x = 1.0
->>> t8.params()['x']._dynamic
-False
->>> t9.params()['x']._dynamic
-False
-
->>> t8.x = UniformRandom()
->>> t8.params()['x']._dynamic
-True
->>> t9.params()['x']._dynamic  # _dynamic shared, so this test fails
-False
-
+>>> print "Dynamic is not finished"
+"Dynamic is finished"
 
