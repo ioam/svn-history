@@ -600,10 +600,6 @@ class ParameterizedObjectMetaclass(type):
                 return attribute,c
         return None,None
 
-    def print_param_defaults(self):
-        for key,val in self.__dict__.items():
-            if isinstance(val,Parameter):
-                print self.__name__+'.'+key, '=', repr(val.default)
 
 
 
@@ -1032,7 +1028,14 @@ class ParameterizedObject(object):
                 if isinstance(val,Parameter):
                     paramdict[name] = val
         return paramdict
-    
+
+
+    @classmethod
+    def print_param_defaults(cls):
+        for key,val in cls.__dict__.items():
+            if isinstance(val,Parameter):
+                print cls.__name__+'.'+key, '=', repr(val.default)
+
 
 
 
