@@ -359,17 +359,7 @@ class Parameter(object):
                     desc,desctype = class_.get_param_descriptor(attrib_name)
                     if desc is self:
                         return attrib_name
-
-        #CB: note to myself: what's this, do I need to change after
-        #CB: Dynamic changes...
                     
-        # If things fall through to here without finding
-        # the descriptor, then check in the object dictionary.
-        # Dynamic parameters set in the object constructor are stored there.
-        if obj:
-            for name,value in obj.__dict__.iteritems():
-                if value is self:
-                    return name
 
         #CB:  ...and check that things like get_name don't die if this
         #CB: returns None etc (i.e. might need an ALERT here but I
