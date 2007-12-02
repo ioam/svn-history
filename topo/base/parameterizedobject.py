@@ -606,21 +606,6 @@ class ParameterizedObjectMetaclass(type):
                 print self.__name__+'.'+key, '=', repr(val.default)
 
 
-    def classparams(self):
-        """
-        Return the Parameters of this class as the
-        dictionary {name: Parameter}, where Parameter
-        is the Parameter object rather than its value.
-
-        Includes Parameters from this class and its
-        superclasses.
-        """
-        paramdict = {}
-        for class_ in classlist(self):
-            for name,val in class_.__dict__.items():
-                if isinstance(val,Parameter):
-                    paramdict[name] = val
-        return paramdict
 
 
 
@@ -1032,13 +1017,23 @@ class ParameterizedObject(object):
         self.initialized=True
 
 
-    def params(self):
+    @classmethod
+    def params(cls):
+        """
+        Return the Parameters of this class as the
+        dictionary {name: parameter_object}
 
+        Includes Parameters from this class and its
+        superclasses.
         """
-        See ParameterizedObjectMetaClass.classparams(),
-        which this method calls on the class of this object.
-        """
-        return type(self).classparams()
+        paramdict = {}
+        for class_ in classlist(cls):
+            for name,val in class_.__dict__.items():
+                if isinstance(val,Parameter):
+                    paramdict[name] = val
+        return paramdict
+    
+
 
 
     # CEBALERTs:
