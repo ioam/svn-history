@@ -107,7 +107,7 @@ from topo.base.parameterizedobject import ParameterizedObject,Parameter, \
      classlist,ParameterizedObjectMetaclass
 from topo.base.parameterclasses import BooleanParameter,StringParameter, \
      Number,SelectorParameter,ClassSelectorParameter,ObjectSelectorParameter, \
-     CallableParameter,Dynamic
+     CallableParameter,Dynamic,is_dynamic
 
 import topo # for topo.guimain only
 
@@ -782,10 +782,12 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # (e.g. a Number with a dynamic value will have a numeric
         # translator from above, so we replace that)
         # (test for Dynamic could be just looking for last_value attribute)
-        try:
-            if param._dynamic: translator_type = self.trans[Dynamic]
-        except AttributeError:
-            pass # non-Dynamic Parameter
+        if self._param_is_dynamic(name):
+            translator_type = self.trans[Dynamic]
+##         try:
+##             if param._dynamic: translator_type = self.trans[Dynamic]
+##         except AttributeError:
+##             pass # non-Dynamic Parameter
             
         self.translators[name]=translator_type(param,initial_value=param_value)#,original_string)        
 
@@ -1111,6 +1113,17 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         self.pack_param(name,f,on_change=on_change,on_modify=on_modify,**o)
 
 
+    # CB: temporary
+    def _param_is_dynamic(self,name):
+        param_obj,PO = self.get_parameter_object(name,with_location=True)
+
+        if hasattr(param_obj,'last_default'):
+            if is_dynamic(PO.repr_value(name)):
+                return True
+
+        return False
+    
+
     def _create_widget(self,name,master,widget_options={},on_change=None,on_modify=None):
         """
         Return widget,label for parameter 'name', each having the master supplied
@@ -1125,10 +1138,11 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # default is self._create_string_widget... 
         widget_creation_fn = self._create_string_widget
 
-        param_obj = self.get_parameter_object(name)
-        if not hasattr(param_obj,'_dynamic') or not param_obj._dynamic:
+        param_obj,source_po = self.get_parameter_object(name,with_location=True)
+
+        if not self._param_is_dynamic(name):
             # ...but overwrite that with a more specific one, if possible
-            for c in classlist(type(self.get_parameter_object(name)))[::-1]:
+            for c in classlist(type(param_obj))[::-1]:
                 if self.widget_creators.has_key(c):
                     widget_creation_fn = self.widget_creators[c]
                     break
@@ -1151,9 +1165,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             label = Tkinter.Label(master,text=self.__pretty_print(name))
 
         # disable widgets for constant params
-        param,location = self.get_parameter_object(name,with_location=True)
-        if param.constant and isinstance(location,ParameterizedObject):
-            # (need to be able to set on class, hence location)
+        if param_obj.constant and isinstance(source_po,ParameterizedObject):
+            # (need to be able to set on class, hence check it's PO not POMetaclass
             widget.config(state='disabled')
 
         return widget,label
