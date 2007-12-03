@@ -15,13 +15,17 @@ __version__='$Revision$'
 import numpy, numpy.random
 import numpy.oldnumeric as Numeric
 import copy
+import topo
 
+from numpy import exp,zeros,ones
 from numpy.oldnumeric import dot, exp
 from math import ceil
 
+
+from topo.base.sheet import activity_type
 from topo.base.arrayutils import clip_in_place,clip_lower
 from topo.base.arrayutils import L2norm, norm, array_argmax
-from topo.base.functionfamilies import OutputFn
+from topo.base.functionfamilies import OutputFn, OutputFnParameter
 from topo.base.parameterclasses import Parameter,Number,ListParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGeneratorParameter,Constant
@@ -365,3 +369,81 @@ class PoissonSample(OutputFn):
         x += sample
         x *= self.out_scale
                            
+
+class AttributeTrackingOF(OutputFn):
+    """
+    Output function which keeps track of individual attributes of an output function (param_names),
+    over time, for specified units. Attributes can be tracked if they are the same size as the activity matrix.
+    If no function is specified this function will keep track of activity over time.
+    The values dictionary stores (time, value) pairs indexed by the parameter name and unit,
+    i.e. values['x'][(0,0)]=(time=t,value of x at time=t)
+    """
+    
+    function = OutputFnParameter(default=None, doc="""
+        Output function whose parameters will be tracked.""")
+    
+    param_names = ListParameter(default=[], doc="""
+        List of names of the function object's parameters that should be stored.""")
+    
+    units = ListParameter(default=[(0,0)], doc="""
+        Matrix coordinates of the unit(s) for which parameter values will be stored.""")
+    
+    step = Number(default=1, doc="How often to update parameter information")
+
+    
+    def __init__(self,**params):
+        super(AttributeTrackingOF,self).__init__(**params)
+        self.values={}
+        self.n_step = 0
+        for p in self.param_names:
+            self.values[p]={}
+            for u in self.units:
+                self.values[p][u]=[]
+         
+        
+    def __call__(self,x):
+
+        #collect values on each appropriate step
+        self.n_step += 1
+        
+        if self.n_step == self.step:
+            self.n_step = 0
+            for p in self.param_names:
+                if p=="x":
+                    value_matrix=x
+                else:
+                    value_matrix= getattr(self.function, p)
+
+                for u in self.units:
+                    self.values[p][u].append((topo.sim.time(),value_matrix[u]))
+
+          
+
+class ActivityAveragingOF(OutputFn):
+    """
+    Calculates the average of the input activity. The average is calculated as an 
+    exponential moving average. The weighting for each older data point decreases exponentially,
+    giving more importance to recent values while not discarding older observations entirely.
+    The degree of weighing decrease is expressed as a constant smoothing factor (smoothing).
+    """
+    step=Number(default=1, doc="How often to calculate average activity")
+    
+    smoothing = Number(default=0.0003, doc="""
+    The degree of weighting decrease for older values when calculating the average""")
+
+    
+    def __init__(self,**params):
+        super(ActivityAveragingOF,self).__init__(**params)
+        self.n_step = 0
+        self.x_avg=None
+           
+
+    def __call__(self,x):
+        if self.x_avg is None:
+            self.x_avg=zeros(x.shape, activity_type)         
+
+        # Collect values on each appropriate step
+        self.n_step += 1
+        if self.n_step == self.step:
+            self.n_step = 0
+            self.x_avg = self.smoothing*x + (1.0-self.smoothing)*self.x_avg
