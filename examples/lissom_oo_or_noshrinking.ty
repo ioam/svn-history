@@ -36,19 +36,14 @@ from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfns.basic import PiecewiseLinear,DivisiveNormalizeL1, Pipeline
+from topo.outputfns.basic import PiecewiseLinear,DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
-from topo.outputfns.homeostatic import HomeostaticMaxEnt, OutputFnDebugger
+from topo.outputfns.homeostatic import HomeostaticMaxEnt, ValueTrackingOutputFn 
 from topo.patterns.basic import Gaussian
 
 
-
+#Inputs
 num_inputs=locals().get('num_inputs',2)
-output_fn_type=locals().get('output_fn_type','Homeostatic')
-
-
-shared_params = {"a_init":14.5, "b_init":-4, "mu":0.01, "smoothing":0.0003}
-shared_debug_params = {"debug_params":["a", "b"] , "avg_params":["x"], "units":[(0,0),(11,11),(23,23)]}
 
 input_type=topo.patterns.basic.Gaussian
 inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),
@@ -68,6 +63,10 @@ CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
+#V1 Output function
+output_fn_type=locals().get('output_fn_type','Homeostatic')
+shared_params = {"a_init":14.5, "b_init":-4, "mu":0.01, "smoothing":0.0003}
+
 if output_fn_type  == 'Homeostatic':
     topo.sim.name = "lissom_oo_or_noshrinking"
     output_fn = HomeostaticMaxEnt(eta=0.0002, **shared_params) 
@@ -76,8 +75,8 @@ elif output_fn_type == "Homeostatic_debug":
 
     topo.sim.name = "lissom_oo_or_noshrinking_debug"
     HE=HomeostaticMaxEnt(eta=0.0002, **shared_params )
-    OD=OutputFnDebugger(function=HE, **shared_debug_params)
-    output_fn=Pipeline(output_fns=[HE, OD])
+    VT=ValueTrackingOutputFn(function=HE, debug_params=['a','b', 'y_avg'], units=[(0, 47), (12, 36),(24, 24), (36, 12),(47, 0)], step=8)
+    output_fn=HE+VT
 
 
 
