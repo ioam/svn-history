@@ -545,19 +545,14 @@ def plot_values(output_fn, init_time, final_time, filename=None, **params):
         
         for unit in params.get('units',output_fn.units):
             index=output_fn.units.index(unit)
-            x_values = [x for (x,y) in output_fn.values[p][index]]
-            y_values = [y for (x,y) in output_fn.values[p][index]]
-            init_index=x_values.index(init_time)
-            final_index=x_values.index(final_time)
-            plot_data=y_values[init_index:final_index]
-           
+            plot_data=[y for (x,y) in output_fn.values[p][index]]
             #save(normalize_path("Filename+p+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=','))
             # uncomment if you also want to save the raw data
             
             pylab.plot(plot_data, label='Unit'+str(unit))
             ymin=params.get('ymin',None)
             ymax=params.get('ymax',None)
-            pylab.axis(xmin=x_values[init_index],xmax=x_values[final_index], ymin=ymin, ymax=ymax) 
+            pylab.axis(xmin=init_time,xmax=final_time, ymin=ymin, ymax=ymax) 
                 
         if isint: pylab.ion()
         pylab.legend(loc=0)
