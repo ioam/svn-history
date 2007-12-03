@@ -9,7 +9,7 @@ $Id$
 __version__='$Revision$'
 
 import copy
-
+import topo
 from numpy import exp,zeros,ones
 
 from topo.base.arrayutils import clip_in_place
@@ -19,14 +19,6 @@ from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import activity_type
 from topo.commands.pylabplots import vectorplot
 from topo.misc.filepaths import normalize_path
-
-import matplotlib
-import topo
-import pylab
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_agg import FigureCanvasAgg
-
-from pylab import save
 
 class HomeostaticMaxEnt(OutputFn):
     """
@@ -223,22 +215,15 @@ class OutputFnDebugger(OutputFn):
             for p in self.debug_params+self.avg_params:
                 avg=p in self.avg_params
                 for u in self.units:
-                    if avg:
-                        if p=="x":
-                            self.avg_values[p] = self.smoothing*x_copy + (1.0-self.smoothing)*self.avg_values[p]
-                            self.values[p+"_avg"][self.units.index(u)].append((topo.sim.time(),self.avg_values[p][u]))
-                
-                        else:
-                            value_matrix= getattr(self.function, p)
-                            self.avg_values[p] = self.smoothing*value_matrix + (1.0-self.smoothing)*self.avg_values[p]
-                            self.values[p+"_avg"][self.units.index(u)].append((topo.sim.time(),self.avg_values[p][u]))
+                    if p=="x":
+                        value_matrix=x_copy
                     else:
-                        if p=="x":
-                            self.values[p][self.units.index(u)].append((topo.sim.time(),x_copy[u]))
-                        else:
-                            value_matrix= getattr(self.function, p)
-                            value=value_matrix[u]
-                            self.values[p][self.units.index(u)].append((topo.sim.time(),value))
+                        value_matrix= getattr(self.function, p)
+                    if avg:
+                        self.avg_values[p] = self.smoothing*value_matrix + (1.0-self.smoothing)*self.avg_values[p]
+                        self.values[p+"_avg"][self.units.index(u)].append((topo.sim.time(),self.avg_values[p][u]))
+                    else:
+                        self.values[p][self.units.index(u)].append((topo.sim.time(),value_matrix[u]))
 
           
 
