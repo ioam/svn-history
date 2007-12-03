@@ -150,14 +150,12 @@ class AdaptingHomeostaticMaxEnt(OutputFn):
 
 
 
-class OutputFnDebugger(OutputFn):
+class ValueTrackingOutputFn(OutputFn):
     """
-    Collates information for debugging as specifed by the
-    parameter_list. Should be called as eg.::
-    
-      HE = HomeostaticMaxEnt(a_init=14.5, b_init=-4, eta=0.0002, mu=0.01)
-      ODH=OutputFnDebugger(function=HE, debug_params=['a', 'b'], avg_params=['x'], units=[(0,0),(11,11)])
-      topo.sim['V1'].output_fn=Pipeline(output_fns=[HE, ODH])
+    Output function which keeps track of individual parameters (debug_params) over time
+    for specified units. If no function is specified will just keep track of activity over time.
+    Values are stored in the values dictionary as (time, value) pairs indexed by the parameter name
+    and the unit index in a given list of units. 
     """
     
     function = OutputFnParameter(default=None, doc="""
@@ -166,59 +164,82 @@ class OutputFnDebugger(OutputFn):
     debug_params = ListParameter(default=[], doc="""
         List of names of the function object's parameters that should be stored.""")
     
-    avg_params = ListParameter(default=['x'], doc="""
-        List of names of the function object's parameters that should be averaged and stored.
-        The name 'x' is a special case, referring to the values of the
-        matrix supplied to the OutputFnDebugger on each call.""")
-    
     units= ListParameter(default=[(0,0)], doc="""
         Matrix coordinates of the unit(s) for which parameter values will be stored.""")
     
-    step=Number(default=1, doc="How often to update debugging information and calculate averages.")
-
-    smoothing = Number(default=0.0003, doc="""
-        The relative weighting of current and previous values when calculating the average.
-        The average is then an exponentially smoothed version of the
-        value, using this value as the time constant.""")
+    step=Number(default=1, doc="How often to update parameter information")
 
     
     def __init__(self,**params):
-        super(OutputFnDebugger,self).__init__(**params)
+        super(ValueTrackingOutputFn,self).__init__(**params)
         self.values={}
         self.n_step = 0
-        self.first_call=True
-        
-        param_names=self.debug_params + [p+"_avg" for p in self.avg_params]
-        for p in param_names:
-            self.values[p]={}
+        for dp in self.debug_params:
+            self.values[dp]={}
             for u in self.units:
-                self.values[p][self.units.index(u)]=[]
+                self.values[dp][self.units.index(u)]=[]
+         
+        
+    def __call__(self,x):
+
+        #collect values on each appropriate step
+        self.n_step += 1
+        
+        if self.n_step == self.step:
+            self.n_step = 0
+            for p in self.debug_params:
+                for u in self.units:
+                    if p=="x":
+                        value_matrix=x
+                    else:
+                        value_matrix= getattr(self.function, p)
+
+                    self.values[p][self.units.index(u)].append((topo.sim.time(),value_matrix[u]))
+
+          
+
+class AvgScalingOutputFn(OutputFn):
+    """
+    Calculates average activity and a scaling factor based on this average activity which
+    can be used to scale activity in order to bring it closer to the target value. 
+    """
+    step=Number(default=1, doc="How often to calculate average activity")
     
+    smoothing = Number(default=0.0003, doc="""
+    The relative weighting of current and previous values when calculating the average.
+    The average is then an exponentially smoothed version of the
+    value, using this value as the time constant.""")
+
+    target = Number(default=0.1, doc="""
+    The target value for the average activity , used to calculate the scaling_factor """)
+
+    
+    def __init__(self,**params):
+        super(AvgScalingOutputFn,self).__init__(**params)
+        self.n_step = 0
+        self.first_call = True
+           
         
     def __call__(self,x):
         if self.first_call:
-            self.first_call=False
-            self.avg_values={}
-            for p in self.avg_params:
-                self.avg_values[p]=zeros(x.shape,activity_type)
+	    self.first_call = False
+            self.x_avg=zeros(x.shape, activity_type)         
 
         # Collect values on each appropriate step
         self.n_step += 1
         if self.n_step == self.step:
             self.n_step = 0
-            
-            for p in self.debug_params+self.avg_params:
-                for u in self.units:
-                    if p=="x":
-                        value_matrix=x
-                    else:
-                        value_matrix=getattr(self.function,p)
-                        
-                    if p in self.avg_params:
-                        self.avg_values[p] = self.smoothing*value_matrix + (1.0-self.smoothing)*self.avg_values[p]
-                        self.values[p+"_avg"][self.units.index(u)].append((topo.sim.time(),self.avg_values[p][u]))
-                    else:
-                        self.values[p][self.units.index(u)].append((topo.sim.time(),value_matrix[u]))
+            self.x_avg = self.smoothing*x + (1.0-self.smoothing)*self.x_avg
 
+
+    def get_scaling_factor(self):
+        """
+        Method for calculating the scaling factor, in this case the average activity is
+        used to calculate a factor which is greater than 1 if the average activity is less
+        than the target and less than 1 if the average activity is greater than the target.
+        Can be overwritten by subclasses to calculate a different scaling factor.
+        """
           
-
+        self.scaling_factor = self.target/self.x_avg
+        return self.scaling_factor
+        
