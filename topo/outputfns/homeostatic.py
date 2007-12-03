@@ -33,7 +33,7 @@ class HomeostaticMaxEnt(OutputFn):
     will affect future behavior.
     
     Also calculates average activity as useful debugging information,
-    for use with OutputFnDebugger.  Average activity is calculated as
+    for use with ValueTrackingOutoutFn  Average activity is calculated as
     an exponential moving average with a smoothing factor (smoothing).
     For more information see:
     NIST/SEMATECH e-Handbook of Statistical Methods, Single Exponential Smoothing
