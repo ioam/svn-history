@@ -526,33 +526,27 @@ def plotrctg():
 
 def plot_values(output_fn, init_time, final_time, filename=None, **params):
     """
-    Plots parameter values associated with an output function.
+    Plots parameter values associated with a ValueTrackingOutputFn output function.
     Example call:
-    plot_values(topo.sim['V1'].output_fn,0,10000,debug_params=['a', 'b','eta'],avg_params=[x],units=[(0,0),(11,11)], filename='V1')
+    VT=ValueTrackingOutputFn(function=HE, debug_params=['a', 'b',], units=[(0,0),(1,1)], step=1)
+    plot_values(VT,0,10000,debug_params=['a'],units=[(0,0)], filename='V1')
     """
 
     
-    for p in params.get('debug_params',output_fn.debug_params) + params.get('avg_params',output_fn.avg_params):
-        avg=p in output_fn.avg_params
-        if avg:
-            data_name="Average "+p
-            param_index=p+"_avg"
-        else:
-            data_name=p
-            param_index=p
-        pylab.figure(figsize=(8,8))
+    for p in params.get('debug_params',output_fn.debug_params):
+        pylab.figure(figsize=(6,6))
         isint=pylab.isinteractive()
         pylab.ioff()
         pylab.grid(True)
-        pylab.ylabel(data_name)
+        pylab.ylabel(p)
         pylab.xlabel('Iteration Number')
         manager = pylab.get_current_fig_manager()
-        manager.window.title(topo.sim.name+': '+data_name)
+        manager.window.title(topo.sim.name+': '+p)
         
         for unit in params.get('units',output_fn.units):
             index=output_fn.units.index(unit)
-            x_values = [x for (x,y) in output_fn.values[param_index][index]]
-            y_values = [y for (x,y) in output_fn.values[param_index][index]]
+            x_values = [x for (x,y) in output_fn.values[p][index]]
+            y_values = [y for (x,y) in output_fn.values[p][index]]
             init_index=x_values.index(init_time)
             final_index=x_values.index(final_time)
             plot_data=y_values[init_index:final_index]
