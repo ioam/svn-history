@@ -524,7 +524,7 @@ def plotrctg():
         pylab.scatter(xx,yy)
         pylab.show()
 
-def plot_values(output_fn, init_time, final_time, filename=None, **params):
+def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **params):
     """
     Plots parameter values associated with a ValueTrackingOutputFn output function.
     Example call:
@@ -533,7 +533,7 @@ def plot_values(output_fn, init_time, final_time, filename=None, **params):
     """
 
     
-    for p in params.get('debug_params',output_fn.debug_params):
+    for p in params.get('param_names',output_fn.param_names):
         pylab.figure(figsize=(6,6))
         isint=pylab.isinteractive()
         pylab.ioff()
@@ -544,14 +544,12 @@ def plot_values(output_fn, init_time, final_time, filename=None, **params):
         manager.window.title(topo.sim.name+': '+p)
         
         for unit in params.get('units',output_fn.units):
-            index=output_fn.units.index(unit)
-            plot_data=[y for (x,y) in output_fn.values[p][index]]
+            plot_data=[y for (x,y) in output_fn.values[p][unit]]
             #save(normalize_path("Filename+p+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=','))
             # uncomment if you also want to save the raw data
             
             pylab.plot(plot_data, label='Unit'+str(unit))
-            ymin=params.get('ymin',None)
-            ymax=params.get('ymax',None)
+            (ymin,ymax)=params.get('ybounds',(None,None))
             pylab.axis(xmin=init_time,xmax=final_time, ymin=ymin, ymax=ymax) 
                 
         if isint: pylab.ion()
