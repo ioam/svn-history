@@ -186,40 +186,35 @@ class OutputFnDebugger(OutputFn):
         super(OutputFnDebugger,self).__init__(**params)
         self.values={}
         self.n_step = 0
-        self.first_call = True
-        for dp in self.debug_params:
-            self.values[dp]={}
+        self.first_call=True
+        
+        param_names=self.debug_params + [p+"_avg" for p in self.avg_params]
+        for p in param_names:
+            self.values[p]={}
             for u in self.units:
-                self.values[dp][self.units.index(u)]=[]
-        for ap in self.avg_params:
-            self.values[ap+"_avg"]={}
-            for u in self.units:
-                self.values[ap+"_avg"][self.units.index(u)]=[]
+                self.values[p][self.units.index(u)]=[]
     
         
     def __call__(self,x):
-      
-        x_copy=x
-        
         if self.first_call:
-	    self.first_call = False
+            self.first_call=False
             self.avg_values={}
-            for ap in self.avg_params:
-                self.avg_values[ap]=zeros(x_copy.shape, activity_type)
-                
+            for p in self.avg_params:
+                self.avg_values[p]=zeros(x.shape,activity_type)
+
+        # Collect values on each appropriate step
         self.n_step += 1
-        
         if self.n_step == self.step:
-            
             self.n_step = 0
+            
             for p in self.debug_params+self.avg_params:
-                avg=p in self.avg_params
                 for u in self.units:
                     if p=="x":
-                        value_matrix=x_copy
+                        value_matrix=x
                     else:
-                        value_matrix= getattr(self.function, p)
-                    if avg:
+                        value_matrix=getattr(self.function,p)
+                        
+                    if p in self.avg_params:
                         self.avg_values[p] = self.smoothing*value_matrix + (1.0-self.smoothing)*self.avg_values[p]
                         self.values[p+"_avg"][self.units.index(u)].append((topo.sim.time(),self.avg_values[p][u]))
                     else:
