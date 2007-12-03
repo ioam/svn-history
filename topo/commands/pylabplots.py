@@ -33,6 +33,9 @@ from topo.base.arrayutils import octave_output
 from topo.base.sheet import Sheet
 from topo.base.arrayutils import wrap
 
+from topo.misc.filepaths import normalize_path
+
+from pylab import save
 
 
 
@@ -520,4 +523,55 @@ def plotrctg():
 
         pylab.scatter(xx,yy)
         pylab.show()
+
+def plot_values(output_fn, init_time, final_time, filename=None, **params):
+    """
+    Plots parameter values associated with an output function.
+    Example call:
+    plot_values(topo.sim['V1'].output_fn,0,10000,debug_params=['a', 'b','eta'],avg_params=[x],units=[(0,0),(11,11)], filename='V1')
+    """
+
+    
+    for p in params.get('debug_params',output_fn.debug_params) + params.get('avg_params',output_fn.avg_params):
+        avg=p in output_fn.avg_params
+        if avg:
+            data_name="Average "+p
+            param_index=p+"_avg"
+        else:
+            data_name=p
+            param_index=p
+        pylab.figure(figsize=(8,8))
+        isint=pylab.isinteractive()
+        pylab.ioff()
+        pylab.grid(True)
+        pylab.ylabel(data_name)
+        pylab.xlabel('Iteration Number')
+        manager = pylab.get_current_fig_manager()
+        manager.window.title(topo.sim.name+': '+data_name)
+        
+        for unit in params.get('units',output_fn.units):
+            index=output_fn.units.index(unit)
+            x_values = [x for (x,y) in output_fn.values[param_index][index]]
+            y_values = [y for (x,y) in output_fn.values[param_index][index]]
+            init_index=x_values.index(init_time)
+            final_index=x_values.index(final_time)
+            plot_data=y_values[init_index:final_index]
+           
+            #save(normalize_path("Filename+p+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=','))
+            # uncomment if you also want to save the raw data
+            
+            pylab.plot(plot_data, label='Unit'+str(unit))
+            ymin=params.get('ymin',None)
+            ymax=params.get('ymax',None)
+            pylab.axis(xmin=x_values[init_index],xmax=x_values[final_index], ymin=ymin, ymax=ymax) 
+                
+        if isint: pylab.ion()
+        pylab.legend(loc=0)
+        pylab.show._needmain = False
+        # The size * the dpi gives the final image size
+        #   a 4"x4" image * 80 dpi ==> 320x320 pixel image
+        if filename is not None:
+            pylab.savefig(normalize_path(filename+p+str(topo.sim.time())+".png"), dpi=100)
+        else:
+            pylab.show()
 
