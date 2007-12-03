@@ -275,7 +275,10 @@ functions in <CODE>topo/</CODE>, i.e. they should respect the
 the lowercase version of that main class.  E.g. sheet.py contains
 class Sheet and some associated functions.  Often files will include
 not just one class but a superclass and several subclasses; such files
-are named after the superclass.
+are named after the superclass.  Other files contain a number of
+thematically linked functions or classes, not necessarily a class
+hierarchy; these should be named for the principle or theme that
+relates them (as in arrayutils.py).
 
 
 <H2><A NAME="paths">Accessing files and handling paths</A></H2>
