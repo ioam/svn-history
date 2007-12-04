@@ -76,6 +76,11 @@ def descendents(class_):
 
 
 
+# CB: what does gensym mean? 
+
+        
+
+
 class Parameter(object):
     """
     An attribute descriptor for declaring parameters.
@@ -145,15 +150,57 @@ class Parameter(object):
     4. The attributes associated with Parameters provide enough
        information for automatically generating property sheets in
        graphical user interfaces, to allow ParameterizedObjects to be
-       edited by users.
+       edited by users.       
     """
-
-    # Because they implement __get__ and __set__, Parameters are
-    # known as 'descriptors' in Python.  See 
-    # http://users.rcn.com/python/download/Descriptor.htm
-    # (and the other items on http://www.python.org/doc/newstyle.html)
-    # for more information.
+    # Because they implement __get__ and __set__, Parameters are known
+    # as 'descriptors' in Python; see "Implementing Descriptors" and
+    # "Invoking Descriptors" in the 'Customizing attribute access'
+    # section of the Python reference manual:
+    # http://docs.python.org/ref/attribute-access.html
     #
+    #
+    #
+    #
+    # Overview of Parameters for programmers
+    # ======================================
+    #
+    # Consider the following code:
+    #
+    #
+    # class A(ParameterizedObject):
+    #     p = Parameter(default=1)
+    #
+    # a1 = A()
+    # a2 = A()
+    #
+    #
+    # * a1 and a2 share one Parameter object (A.__dict__['p']).
+    #
+    # * The default (class) value of p is stored in this Parameter
+    #   object (A.__dict__['p'].default).
+    #
+    # * If the value of p is set on a1 (e.g. a1.p=2), a1's value of p
+    #   is stored in a1 itself (a1.__dict__['_p_param_value'])
+    #
+    # * When a1.p is requested, a1.__dict__['_p_param_value'] is
+    #   returned. When a2.p is requested, '_p_param_value' is not
+    #   found in a2.__dict__, so A.__dict__['p'].default (i.e. A.p) is
+    #   returned instead.
+    #
+    #
+    # Be careful when referring to the 'name' of a Parameter:
+    #                                                   
+    # * A ParameterizedObject class has a name for the attribute which
+    #   is being represented by the Parameter ('p' in the example above);
+    #   in the code, this is called the 'attrib_name'.
+    #
+    # * When a ParameterizedObject instance has its own local value
+    #   for a parameter, it is stored as '_X_param_value' (where X is
+    #   the attrib_name for the Parameter); in the code, this is
+    #   called the internal_name.
+
+
+
     # So that the extra features of Parameters do not require a lot of
     # overhead, Parameters are implemented using __slots__ (see
     # http://www.python.org/doc/2.4/ref/slots.html).  Instead of having
@@ -164,21 +211,20 @@ class Parameter(object):
     # operations to copy and restore Parameters (e.g. for Python
     # persistent storage pickling); see __getstate__ and __setstate__.
     # 
-    # Note that the actual value of a Parameter is not stored in the
-    # Parameter object itself, but in the owning
-    # ParameterizedObject's __dict__.
-    # 
     # To get the benefit of slots, subclasses must themselves define
     # __slots__, whether or not they define attributes not present in
     # the base Parameter class.  That's because a subclass will have
     # a __dict__ unless it also defines __slots__.
+    __slots__ = ['_internal_name','_attrib_name','default','doc','hidden','precedence','instantiate','constant']
 
     ### JABALERT: hidden could perhaps be replaced with a very low
     ### (e.g. negative) precedence value.  That way by default the
     ### GUI could display those with precedence >0, but the user could
     ### select a level.
-    __slots__ = ['_name','default','doc','hidden','precedence','instantiate','constant']
-    count = 0
+                                                  
+    count = 0 # stores the number of Parameters created
+    # CEBALERT: ...but unused
+                                                   
 
     __doc__ = property((lambda self: self.doc))
     # When a Parameter is owned by a ParameterizedObject, we want the
@@ -207,21 +253,15 @@ class Parameter(object):
     # describes X's specific Parameters).  Seems difficult, though.
 
 
-    # CEBALERT: I think this can be made simpler
-    def __init__(self,default=None,doc=None,hidden=False,precedence=None,instantiate=False,constant=False):
+
+    def __init__(self,default=None,doc=None,hidden=False,
+                 precedence=None,instantiate=False,constant=False):
         """
-        Initialize a new parameter.
+        Initialize a new Parameter object: store the supplied attributes.
 
-        Set the name of the parameter to a gensym, and initialize
-        the default value.
 
-        _name stores the Parameter's name. This is
-        created automatically by ParameterizedObject, but can also be passed in
-        (see ParameterizedObject).
-
-        default is the value of Parameter p that is returned if
-        ParameterizedObject_class.p is requested, or if ParameterizedObject_object.p is
-        requested but has not been set.
+        default: the owning class's value for the attribute
+        represented by this Parameter.
 
         hidden is a flag that allows objects using Parameters to know
         whether or not to display them to the user (e.g. in GUI menus).
@@ -234,122 +274,137 @@ class Parameter(object):
         inheritance of Parameter slots (attributes) from the owning-class'
         class hierarchy (see ParameterizedObjectMetaclass).
         """
-        # Make sure subclass authors read all the documentation...
+        # CEBALERT: make sure that subclass authors have also declared
+        # __slots__, so we get the optimization of no
+        # dictionaries. Ideally, we'd like to check this with
+        # something like pychecker instead.
+        # We also need to check that subclasses have a __doc__ attribute.
         assert not hasattr(self,'__dict__'), \
                "Subclasses of Parameter should define __slots__; " \
                + `type(self)` + " does not."
 
-        # CEBHACKALERT: not sure how to check that a subclass has
-        # __doc__ as a class attribute.
 
-        self._name = None
+        self._internal_name = None  # used to cache internal_name
+        self._attrib_name = None  # used to cache attrib_name
+        
         self.hidden=hidden
         self.precedence = precedence
         self.default = default
         self.doc = doc
         self.constant = constant
-
-        # CEBALERT: constants must be instantiated: should this
-        # instead be a check and raise an error to inform the user?
-        if self.constant:
-            self.instantiate = True
-        else:
-            self.instantiate = instantiate
+        # constant => instantiate
+        self.instantiate = instantiate or constant
 
         Parameter.count += 1
         
         
     def __get__(self,obj,objtype):
         """
-        Get a parameter value.  If called on the class, produce the
-        default value.  If called on an instance, produce the instance's
-        value, if one has been set, otherwise produce the default value.
-        """
-        # CB: obj can be None, objtype is never None
-        # (I think, anyway: http://docs.python.org/ref/descriptor-invocation.html)
+        Return the value for this Parameter.
 
-        # For documentation on __get__() see 'Implementing Descriptors'
-        # in the Python reference manual
-        # (http://www.python.org/doc/2.4.2/ref/descriptors.html)
+        If called for a ParameterizedObject class, produce that
+        class's value (i.e. this Parameter object's 'default'
+        attribute).
+
+        If called for a ParameterizedObject instance, produce that
+        instance's value, if one has been set - otherwise produce the
+        class's value (default).
+        """
+        # NB: obj can be None (when __get__ called for a
+        # ParameterizedObject class); objtype is never None
+        
         if not obj:
             result = self.default
         else:
-            result = obj.__dict__.get(self.get_name(obj),self.default)
+            result = obj.__dict__.get(self.internal_name(obj),self.default)
         return result
         
 
     def __set__(self,obj,val):
         """
-        Set a parameter value.  If called on a class parameter,
-        set the default value, if on an instance, set the value of the
-        parameter in the object, where the value is stored in the
-        instance's dictionary under the parameter's _name gensym.
+        Set the value for this Parameter.
 
-        If the Parameter's constant attribute is True, does not allow
-        set commands except on the classobj or on an uninitialized
-        ParameterizedObject.  Note that until Topographica supports
-        some form of read-only object, it is still possible to change
-        the attributes of the object stored in a constant (e.g. the
-        left bound of a BoundingBox).
+        If called for a ParameterizedObject class, set that class's
+        value (i.e. set this Parameter object's 'default' attribute).
+
+        If called for a ParameterizedObject instance, set the value of
+        this Parameter on that instance (i.e. in the instance's
+        __dict__, under the parameter's internal_name). 
+
+        
+        If the Parameter's constant attribute is True, only allows
+        the value to be set for a ParameterizedObject class or on
+        uninitialized ParameterizedObject instances.
+        
+        Note that until Topographica supports some form of read-only
+        object, it is still possible to change the attributes of the
+        object stored in a constant (e.g. the left bound of a
+        BoundingBox).
         """
+        # NB: obj is None if called for a ParameterizedObject class
+        
         if self.constant:
             if not obj:
                 self.default = val
             elif not obj.initialized:
-                obj.__dict__[self.get_name(obj)] = val
+                obj.__dict__[self.internal_name(obj)] = val
             else:
-                raise TypeError("Constant parameter cannot be modified")
+                raise TypeError("Constant parameter %s cannot be modified"%self.attrib_name)
 
         else:
             if not obj:
                 self.default = val
             else:
-                obj.__dict__[self.get_name(obj)] = val
+                obj.__dict__[self.internal_name(obj)] = val
                 
 
     def __delete__(self,obj):
-        """
-        Delete a parameter.  Raises an exception.
-        """
-        raise TypeError("Deleting parameters is not allowed.")
+        raise TypeError("Cannot delete %s: Parameters deletion not allowed."%self.attrib_name)
 
 
-    def get_name(self,obj):
+    # CEB: Right now I cache internal_name and attrib_name, but really it's only
+    # necessary to cache attrib_name. Probably storing the strings is worse
+    # than creating "_%s_param_name" each time (in terms of performance). 
+    def internal_name(self,obj):
         """
-        Return the name that the specified object has for this parameter.
+        Return the internal name (e.g. _X_param_name for attrib_name
+        X) that the specified ParameterizedObject instance has (or
+        would have*) for this parameter.
 
-        (I.e. something like _X_param_value.)
+        * if the Parameter has not actually been set on ths instance,
+        then internal_name will not be in the instance's __dict__
         """
-        if not hasattr(self,'_name') or not self._name:
-            self._name = '_%s_param_value'%self._discover_attrib_name(obj,None)
-
-        return self._name
+        if self._internal_name is None:
+            self._internal_name = '_%s_param_value'%self.attrib_name(obj,None)
+            
+        return self._internal_name
 
 
     def attrib_name(self,obj=None,objtype=None):
         """
-        Return the attribute name (not the internal name) for this
-        parameter, for use in generating error messages.  If
-        self._name isn't set (i.e., .get_name() hasn't been called
-        yet), it is only generated if either obj or objtype is set,
-        otherwise an empty string is returned.
+        Return the attribute name represented by this Parameter.
+        
+        Guarantees to return the attrib_name if at least one of obj
+        and objtype is supplied; if neither obj nor objtype is
+        supplied, and _discover_attrib_name has not previously been
+        called successfully, an empty string will be returned.
         """
-        if not (obj or objtype):
-            if hasattr(self,'_name') and self._name:
-                return self._name.split('_param_value')[0][1:]
-            else:
-                return ''
+        return self._attrib_name or self._discover_attrib_name(obj,objtype)
 
-        return self._discover_attrib_name(obj,objtype)
 
     def _discover_attrib_name(self,obj,objtype):
         """
-        The parameter instance itself does not initially know its
-        name.  However, it can discover the name if the owning object
-        or object type is passed to this function, which looks for
-        itself in the owning class hierarchy and returns the name
-        assigned to it.
+        Discover the name of the attribute this Parameter is
+        representing (and cache a successful result in _attrib_name).
+
+        Guarantees to return the attrib_name if at least one of obj
+        and objtype is supplied; if neither obj nor objtype is
+        supplied, an empty string will be returned.
         """
+        # The parameter object itself does not initially know the name
+        # of the attribute that it is representing, but it can discover
+        # that name by looking for itself in the owning class hierarchy.
+
         if obj and not objtype: objtype = type(obj)
 
         classes = classlist(objtype)[::-1]
@@ -358,16 +413,11 @@ class Parameter(object):
                 if hasattr(class_,'get_param_descriptor'):
                     desc,desctype = class_.get_param_descriptor(attrib_name)
                     if desc is self:
+                        self._attrib_name = attrib_name
                         return attrib_name
                     
-
-        #CB:  ...and check that things like get_name don't die if this
-        #CB: returns None etc (i.e. might need an ALERT here but I
-        #CB: haven't actually investigated).
-
-        # if we get this far, we couldn't find the name
-        return None
-        
+        return '' # could maybe rewrite this method so it's clearer
+    
 
     def __getstate__(self):
         """
@@ -390,7 +440,7 @@ class Parameter(object):
 
         return state
 
-
+    # CEB: check then delete this
     def __setstate__(self,state):
         """See __getstate__()"""
         for (k,v) in state.items():
@@ -420,19 +470,7 @@ class ParameterizedObjectMetaclass(type):
     Additionally, a class can declare itself abstract by having an
     attribute __abstract set to True. The 'abstract' attribute can be
     used to find out if a class is abstract or not.
-    """
-
-    # The other methods get_param_descriptor and print_param_defaults
-    # could perhaps be made into static functions, because all they
-    # (appear to) do is to provide a way to call the functions without
-    # having a specific object available.  Perhaps they do something
-    # else that requires them to be in the metaclass, though?
-
-    # CB: get_param_descriptor() needs to be in this object (the
-    # metaclass) because it's used here. classparams() and
-    # print_param_defaults, however, could be static methods of
-    # ParameterizedObject.
-    
+    """    
     def __init__(self,name,bases,dict):
         """
         Initialize the class object (not an instance of the class, but the class itself).
@@ -820,7 +858,7 @@ class ParameterizedObject(object):
         for class_ in classlist(type(self)):
             for (k,v) in class_.__dict__.items():
                 if isinstance(v,Parameter) and v.instantiate:
-                    parameter_name = v.get_name(self)
+                    parameter_name = v.internal_name(self)
                     new_object = copy.deepcopy(v.default)
                     self.__dict__[parameter_name]=new_object
 
