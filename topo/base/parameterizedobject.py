@@ -632,6 +632,15 @@ class ParameterizedObjectMetaclass(type):
 # Note that this module-level Parameter won't actually do most 
 # of the things a Parameter does, but using a Parameter here
 # should be more readable anyway.
+
+# CBERRORALERT: Parameters only work as expected inside ParameterizedObjects:
+# >>> topo.base.parameterizedobject.script_repr_suppress_defaults=(Parameter=False)
+# >>> topo.base.parameterizedobject.script_repr_suppress_defaults is True
+# True
+# In the case below, the behavior probably turns out ok because
+# "if Parameter()" is True, and setting
+# topo.base.parameterizedobject.script_repr_suppress_defaults=False
+# just writes over the Parameter object anyway.
 script_repr_suppress_defaults=Parameter(True, hidden=True, doc="""
     Whether script_repr should avoid reporting the values of parameters
     that are just inheriting their values from the class defaults.""")
