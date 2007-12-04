@@ -341,8 +341,8 @@ class Parameter(object):
         object stored in a constant (e.g. the left bound of a
         BoundingBox).
         """
-        # NB: obj is None if called for a ParameterizedObject class
-        
+        # NB: obj can be None (when __set__ called for a
+        # ParameterizedObject class)
         if self.constant:
             if not obj:
                 self.default = val
@@ -440,7 +440,6 @@ class Parameter(object):
 
         return state
 
-    # CEB: check then delete this
     def __setstate__(self,state):
         """See __getstate__()"""
         for (k,v) in state.items():
