@@ -162,7 +162,7 @@ class Dynamic(Parameter):
         if not obj:
             needs = time>(self.last_time or -1)
         else:
-            name = self.get_name(obj)
+            name = self.internal_name(obj)
             try:
                 needs = time>obj.__dict__[name+'_time']
             except KeyError:
@@ -180,7 +180,6 @@ class Dynamic(Parameter):
         # But then need to explain why 'default' and all the rest are
         # stored on the parameter object rather than the owning class.
 
-
         if self._needs_update(obj):
             value = self._produce_value(obj)
         else:
@@ -196,7 +195,7 @@ class Dynamic(Parameter):
             if not obj:
                 self.last_default = self.default
             else:
-                obj.__dict__[self.get_name(obj)+'_last']=val
+                obj.__dict__[self.internal_name(obj)+'_last']=val
 
 
     def _last_value(self,obj):
@@ -204,7 +203,7 @@ class Dynamic(Parameter):
             value = self.last_default
         else:
             try:
-                value = obj.__dict__[self.get_name(obj)+'_last']
+                value = obj.__dict__[self.internal_name(obj)+'_last']
             except KeyError:
                 value = self.last_default
 
@@ -223,7 +222,7 @@ class Dynamic(Parameter):
             self.last_time = time
         else:
             try:
-                name = self.get_name(obj)
+                name = self.internal_name(obj)
                 value = produce_value(obj.__dict__[name])
                 obj.__dict__[name+'_last']=value
                 obj.__dict__[name+'_time']=time
@@ -240,7 +239,7 @@ class Dynamic(Parameter):
 ##             dynamic = is_dynamic(self.default)
 ##         else:
 ##             try:
-##                 dynamic = is_dynamic(obj.__dict__[self.get_name(obj)])
+##                 dynamic = is_dynamic(obj.__dict__[self.internal_name(obj)])
 ##             except KeyError:
 ##                 dynamic = is_dynamic(self.default)
 
