@@ -215,7 +215,7 @@ class Parameter(object):
     # __slots__, whether or not they define attributes not present in
     # the base Parameter class.  That's because a subclass will have
     # a __dict__ unless it also defines __slots__.
-    __slots__ = ['_internal_name','_attrib_name','default','doc','hidden','precedence','instantiate','constant']
+    __slots__ = ['_attrib_name','default','doc','hidden','precedence','instantiate','constant']
 
     ### JABALERT: hidden could perhaps be replaced with a very low
     ### (e.g. negative) precedence value.  That way by default the
@@ -284,9 +284,7 @@ class Parameter(object):
                + `type(self)` + " does not."
 
 
-        self._internal_name = None  # used to cache internal_name
-        self._attrib_name = None  # used to cache attrib_name
-        
+        self._attrib_name = None  # used to cache attrib_name        
         self.hidden=hidden
         self.precedence = precedence
         self.default = default
@@ -362,9 +360,6 @@ class Parameter(object):
         raise TypeError("Cannot delete %s: Parameters deletion not allowed."%self.attrib_name)
 
 
-    # CEB: Right now I cache internal_name and attrib_name, but really it's only
-    # necessary to cache attrib_name. Probably storing the strings is worse
-    # than creating "_%s_param_name" each time (in terms of performance). 
     def internal_name(self,obj):
         """
         Return the internal name (e.g. _X_param_name for attrib_name
@@ -374,10 +369,7 @@ class Parameter(object):
         * if the Parameter has not actually been set on ths instance,
         then internal_name will not be in the instance's __dict__
         """
-        if self._internal_name is None:
-            self._internal_name = '_%s_param_value'%self.attrib_name(obj,None)
-            
-        return self._internal_name
+        return '_%s_param_value'%self.attrib_name(obj,None)
 
 
     def attrib_name(self,obj=None,objtype=None):
