@@ -75,7 +75,7 @@ elif output_fn_type == "Homeostatic_debug":
 
     topo.sim.name = "lissom_oo_or_noshrinking_debug"
     HE=HomeostaticMaxEnt(eta=0.0002, **shared_params )
-    TF=AttributeTrackingOF(function=HE, param_names=['a','b', 'y_avg'], units=[(0, 47), (12, 36),(24, 24), (36, 12),(47, 0)], step=1)
+    TF=AttributeTrackingOF(function=HE, attrib_names=['a','b', 'y_avg'], units=[(0, 47), (12, 36),(24, 24), (36, 12),(47, 0)], step=1)
     output_fn=HE+TF
 
 
