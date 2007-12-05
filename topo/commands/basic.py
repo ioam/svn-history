@@ -85,12 +85,20 @@ def pattern_present(inputs={},duration=1.0,learning=False,overwrite_previous=Fal
     # turn off sheets' learning and output function learning
     #(e.g. in Homeostatic output functions) if learning=False
     if not learning:
-        for each in topo.sim.objects(Sheet).values():
-             each.learning = False
-        for each in topo.sim.objects(ProjectionSheet).values():
-            each.output_fn.learning = False
-                              
-       
+        for sheet in topo.sim.objects(Sheet).values():
+             sheet.learning = False
+        for sheet in topo.sim.objects(ProjectionSheet).values():
+            sheet.output_fn.learning=False
+            if hasattr(sheet.output_fn,'output_fns'):
+                for of in sheet.output_fn.output_fns:
+                    of.learning=False
+            for proj in topo.sim[sheet.name].projections().values():
+                proj.output_fn.learning = False
+                if hasattr(proj.output_fn,'output_fns'):
+                    for of in proj.output_fn.output_fns:
+                        of.learning=False
+
+
     if not apply_output_fn:
         for each in topo.sim.objects(Sheet).values():
              each.apply_output_fn = False
@@ -110,12 +118,21 @@ def pattern_present(inputs={},duration=1.0,learning=False,overwrite_previous=Fal
     topo.sim.event_pop()
 
     # turn sheets' learning and output_fn learning back on if we turned it off before
+
     if not learning:
-        for each in topo.sim.objects(Sheet).values():
-            each.learning = True
-        for each in topo.sim.objects(ProjectionSheet).values():
-            each.output_fn.learning = True
-                              
+        for sheet in topo.sim.objects(Sheet).values():
+             sheet.learning = True
+        for sheet in topo.sim.objects(ProjectionSheet).values():
+            sheet.output_fn.learning=True
+            if hasattr(sheet.output_fn,'output_fns'):
+                for of in sheet.output_fn.output_fns:
+                    of.learning=True
+            for proj in topo.sim[sheet.name].projections().values():
+                proj.output_fn.learning = True
+                if hasattr(proj.output_fn,'output_fns'):
+                    for of in proj.output_fn.output_fns:
+                        of.learning=True
+   
     if not apply_output_fn:
         for each in topo.sim.objects(Sheet).values():
             each.apply_output_fn = True
