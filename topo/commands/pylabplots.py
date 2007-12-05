@@ -533,7 +533,7 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
     """
 
     
-    for p in params.get('param_names',output_fn.param_names):
+    for p in params.get('attrib_names',output_fn.attrib_names):
         pylab.figure(figsize=(6,6))
         isint=pylab.isinteractive()
         pylab.ioff()
