@@ -26,7 +26,7 @@ from topo.base.sheet import activity_type
 from topo.base.arrayutils import clip_in_place,clip_lower
 from topo.base.arrayutils import L2norm, norm, array_argmax
 from topo.base.functionfamilies import OutputFn, OutputFnParameter
-from topo.base.parameterclasses import Parameter,Number,ListParameter
+from topo.base.parameterclasses import Parameter,Number,ListParameter,BooleanParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGeneratorParameter,Constant
 from topo.base.boundingregion import BoundingBox
@@ -372,7 +372,7 @@ class PoissonSample(OutputFn):
 
 class AttributeTrackingOF(OutputFn):
     """
-    Output function which keeps track of individual attributes of an output function (param_names),
+    Output function which keeps track of individual attributes of an output function (attrib_names),
     over time, for specified units. Attributes can be tracked if they are the same size as the activity matrix.
     If no function is specified this function will keep track of activity over time.
     The values dictionary stores (time, value) pairs indexed by the parameter name and unit,
@@ -382,7 +382,7 @@ class AttributeTrackingOF(OutputFn):
     function = OutputFnParameter(default=None, doc="""
         Output function whose parameters will be tracked.""")
     
-    param_names = ListParameter(default=[], doc="""
+    attrib_names = ListParameter(default=[], doc="""
         List of names of the function object's parameters that should be stored.""")
     
     units = ListParameter(default=[(0,0)], doc="""
@@ -390,12 +390,14 @@ class AttributeTrackingOF(OutputFn):
     
     step = Number(default=1, doc="How often to update parameter information")
 
+    learning = BooleanParameter(default=True, doc="""
+    Whether or not to track parameters, allows tracking to be turned off during e.g. map measurement""")
     
     def __init__(self,**params):
         super(AttributeTrackingOF,self).__init__(**params)
         self.values={}
         self.n_step = 0
-        for p in self.param_names:
+        for p in self.attrib_names:
             self.values[p]={}
             for u in self.units:
                 self.values[p][u]=[]
@@ -403,20 +405,21 @@ class AttributeTrackingOF(OutputFn):
         
     def __call__(self,x):
 
-        #collect values on each appropriate step
-        self.n_step += 1
+        if self.learning:
+            #collect values on each appropriate step
+            self.n_step += 1
         
-        if self.n_step == self.step:
-            self.n_step = 0
-            for p in self.param_names:
-                if p=="x":
-                    value_matrix=x
-                else:
-                    value_matrix= getattr(self.function, p)
-
-                for u in self.units:
-                    self.values[p][u].append((topo.sim.time(),value_matrix[u]))
-
+            if self.n_step == self.step:
+                self.n_step = 0
+                for p in self.attrib_names:
+                    if p=="x":
+                        value_matrix=x
+                    else:
+                        value_matrix= getattr(self.function, p)
+                        
+                    for u in self.units:
+                        self.values[p][u].append((topo.sim.time(),value_matrix[u]))
+                            
           
 
 class ActivityAveragingOF(OutputFn):
@@ -431,6 +434,8 @@ class ActivityAveragingOF(OutputFn):
     smoothing = Number(default=0.0003, doc="""
     The degree of weighting decrease for older values when calculating the average""")
 
+    learning = BooleanParameter(default=True, doc="""
+    Whether or not to average activity, allows averaging to be turned off during e.g. map measurement""")
     
     def __init__(self,**params):
         super(ActivityAveragingOF,self).__init__(**params)
@@ -443,7 +448,8 @@ class ActivityAveragingOF(OutputFn):
             self.x_avg=zeros(x.shape, activity_type)         
 
         # Collect values on each appropriate step
-        self.n_step += 1
-        if self.n_step == self.step:
-            self.n_step = 0
-            self.x_avg = self.smoothing*x + (1.0-self.smoothing)*self.x_avg
+        if self.learning:
+            self.n_step += 1
+            if self.n_step == self.step:
+                self.n_step = 0
+                self.x_avg = self.smoothing*x + (1.0-self.smoothing)*self.x_avg
