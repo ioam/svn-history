@@ -105,7 +105,6 @@ def eval_atof(str):
     return string.atof(eval(str,__main__.__dict__))
     
 
-# JABALERT: Should frange be replaced with numpy.arange or numpy.linspace?
 """
 Return the cross-product of a variable number of lists (e.g. of a list of lists).
 
@@ -124,6 +123,9 @@ cross_product=lambda ss,row=[],level=0: len(ss)>1 \
    and reduce(lambda x,y:x+y,[cross_product(ss[1:],row+[i],level+1) for i in ss[0]]) \
    or [row+[i] for i in ss[0]]
 
+
+
+# JABALERT: Should frange be replaced with numpy.arange or numpy.linspace?
 def frange(start, end=None, inc=1.0, inclusive=False):
     """
     A range function that accepts float increments.
