@@ -126,7 +126,7 @@ class Dynamic(Parameter):
     callable class, rather than a named function or a lambda function,
     or else this object will not be picklable.
     """
-    time_fn = None
+    time_fn = None  # time_fn assumed to give time with earliest value of 0
     
     __slots__ = ['last_default','last_time']
     __doc__ = property((lambda self: self.doc))
@@ -151,9 +151,8 @@ class Dynamic(Parameter):
         if not obj:
             needs = time>(self.last_time or -1)
         else:
-            name = self.internal_name(obj)
             try:
-                needs = time>obj.__dict__[name+'_time']
+                needs = time>obj.__dict__[self.internal_name(obj)+'_time']
             except KeyError:
                 needs = time>(self.last_time or -1)
 
