@@ -854,9 +854,8 @@ class ParameterizedObject(object):
         for class_ in classlist(type(self)):
             for (k,v) in class_.__dict__.items():
                 if isinstance(v,Parameter) and v.instantiate:
-                    parameter_name = v.internal_name(self)
                     new_object = copy.deepcopy(v.default)
-                    self.__dict__[parameter_name]=new_object
+                    self.__dict__[v.internal_name(self)]=new_object
 
                     # a new ParameterizedObject needs a new name
                     # CEBHACKALERT: this will write over any name given
