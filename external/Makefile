@@ -399,6 +399,7 @@ GNOSIS_UNINSTALL =  ${PYTHON_LIB}/site-packages/gnosis
 gnosis: ${GNOSIS}.tar.gz python
 	rm -rf $(foreach f, ${GNOSIS_UNINSTALL}, ${PREFIX}/${f})
 	tar xzf ${GNOSIS}.tar.gz
+	cd ${GNOSIS}; patch -p0 < ../Gnosis_Utils.diff
 	cd ${GNOSIS}; ${PREFIX}/bin/python setup.py install
 	touch gnosis
 
