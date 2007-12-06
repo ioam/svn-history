@@ -3,6 +3,8 @@
 >>> from topo.misc.numbergenerators import UniformRandom
 
 
+>>> Dynamic.time_fn = None
+
 
 ## Basic tests of Dynamic parameters (__get__ & __set__,
 ## and that inspect_value() and repr_value() work).
@@ -47,8 +49,6 @@ True
 
 >>> t3.inspect_value('x')==t2_last_value  # catch bug caused by shared last_value
 False
-
-
 
 
 
@@ -119,6 +119,29 @@ False
 >>> t4.inspect_value('x')==t4_last_value  # inspect_value() should return last generated value 
 True
 >>> t5.inspect_value==t4_last_value # catch new bug caused by shared Parameter object (shared last_value)
+False
+
+
+
+### Check that time_fn works
+>>> import topo; Dynamic.time_fn = topo.sim.time
+>>> t10 = TestPO1()
+>>> a = t10.x; b = t10.x; c = t10.x
+>>> a==b==c
+True
+
+>>> topo.sim.run(0.0001)
+>>> d = t10.x
+>>> d==a
+False
+
+>>> a = TestPO1.x; b = TestPO1.x
+>>> a==b
+True
+
+>>> topo.sim.run(0.0001)
+>>> c = TestPO1.x
+>>> c==b
 False
 
 
