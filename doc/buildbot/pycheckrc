@@ -1,5 +1,6 @@
 # (convert commandline options to options in here using external/{pychecker}/pychecker/Config.py)
 
+limit = 100
 
 # dict: suppress warnings, key is module.class.method or module.function
 #	value is a string of command line arguments (can omit -- for long args)
@@ -15,18 +16,6 @@ suppressionRegexs = {}
 
 
 ignoreStandardLibrary = 1
-
-
-
-# CEBALERT: if pychecker is updated, maybe __get__ and __set__ will be
-# added? In that case, remove the checkSpecialMethods suppression. (At
-# the moment, we'll miss a warning if someone names a non-special
-# method as __X__.)
-
-# Says many, many times that "__set__" and "__get__" are not
-# special methods, but they're called special methods in the python
-# reference manual.
-checkSpecialMethods = 0  
 
 # we use __slots__ for optimization; I think there is nothing wrong
 # with us having empty __slots__ in subclasses of Parameter. Maybe 
