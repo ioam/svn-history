@@ -88,10 +88,7 @@ def is_iterator(obj):
 
 
 def is_dynamic(value):
-    if callable(value) or is_iterator(value):
-        return True
-    else:
-        return False
+    return callable(value) or is_iterator(value)
 
 
 
@@ -138,14 +135,6 @@ class Dynamic(Parameter):
     def __init__(self,**params):
         super(Dynamic,self).__init__(**params)
 
-
-        # do we need to update instantiate later on if the parameter
-        # is set? right now I think we only use instantiate when a
-        # parameterizedobject is created, so it should be ok. If the
-        # parameter gets set on a PO, the value is set on the PO, so
-        # instantiate is no longer relevant.  But need to consider
-        # pickling and copying.
-
         self.last_time = None 
         if is_dynamic(self.default):
             self.last_default = None
@@ -189,13 +178,18 @@ class Dynamic(Parameter):
 
 
     def __set__(self,obj,val):
+        # 'instantiate' is kept up to date for the default value.
         super(Dynamic,self).__set__(obj,val)
 
         if not is_dynamic(val):
             if not obj:
                 self.last_default = self.default
+                self.instantiate = False
             else:
                 obj.__dict__[self.internal_name(obj)+'_last']=val
+        else:
+            if not obj:
+                self.instantiate = True
 
 
     def _last_value(self,obj):
