@@ -76,11 +76,6 @@ def descendents(class_):
 
 
 
-# CB: what does gensym mean? 
-
-        
-
-
 class Parameter(object):
     """
     An attribute descriptor for declaring parameters.
@@ -284,7 +279,7 @@ class Parameter(object):
                + `type(self)` + " does not."
 
 
-        self._attrib_name = None  # used to cache attrib_name        
+        self._attrib_name = None  # used to cache attrib_name
         self.hidden=hidden
         self.precedence = precedence
         self.default = default
@@ -720,8 +715,8 @@ class ParameterizedObject(object):
         values will override the class default values for this one
         instance.
 
-        If no 'name' parameter is supplied, self.name defaults to a
-        gensym formed from the object's type name and a unique number.
+        If no 'name' parameter is supplied, self.name defaults to the
+        object's class name with a unique number appended to it.
         """
         global object_count
 
@@ -742,7 +737,8 @@ class ParameterizedObject(object):
 
     def __generate_name(self):
         """
-        Sets name to a gensym formed from the object's type name and a unique number.
+        Set name to a gensym formed from the object's type name and
+        the object_count.
         """
         self.name = '%s%05d' % (self.__class__.__name__ ,object_count)
 
