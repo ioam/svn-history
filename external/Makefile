@@ -282,7 +282,7 @@ fixedpoint-uninstall:
 ##############################################################
 # pychecker (optional source code checker)
 #
-PYCHECKER = pychecker-0.8.16
+PYCHECKER = pychecker-0.8.18-CVS-200712061936
 PYCHECKER_UNINSTALL = ${PYTHON_LIB}/site-packages/pychecker
 
 pychecker: ${PYCHECKER}.tar.gz python
