@@ -340,7 +340,7 @@ pylint-uninstall:
 EPYDOC = epydoc-3.0beta1
 EPYDOC_UNINSTALL = ${PYTHON_LIB}/site-packages/epydoc
 
-epydoc: ${EPYDOC}.tar.gz python common
+epydoc: ${EPYDOC}.tar.gz python
 	tar xzf ${EPYDOC}.tar.gz
 	cd ${EPYDOC}; cd epydoc ; patch -p0 < ../../epydoc.diff; cd .. ; ${PREFIX}/bin/python setup.py install
 	touch epydoc
@@ -358,7 +358,7 @@ epydoc-uninstall:
 DOCUTILS = docutils-0.4
 DOCUTILS_UNINSTALL = ${PYTHON_LIB}/site-packages/docutils
 
-docutils: ${DOCUTILS}.tar.gz python common
+docutils: ${DOCUTILS}.tar.gz python
 	tar xzf ${DOCUTILS}.tar.gz
 	cd ${DOCUTILS}; ${PREFIX}/bin/python setup.py install
 	touch docutils
