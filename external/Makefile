@@ -316,6 +316,25 @@ common-uninstall:
 
 
 
+################################################################
+### logilab astng, required for pylint (but should be 
+### removed if pylint is removed)
+###
+##ASTNG = common-0.12.0
+##ASTNG_UNINSTALL = ${PYTHON_LIB}/site-packages/logilab/common
+##
+##common: ${ASTNG}.tar.gz python
+##	tar xzf ${ASTNG}.tar.gz
+##	cd ${ASTNG}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
+##	touch common
+##
+##common-clean:
+##	rm -rf ${ASTNG} 
+##common-uninstall:
+##	rm -rf common ${ASTNG} $(foreach f, ${ASTNG_UNINSTALL}, ${PREFIX}/${f})
+##
+##
+
 ##############################################################
 # pylint (optional source-code checker)
 #
