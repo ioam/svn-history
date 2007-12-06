@@ -72,6 +72,26 @@ False
 >>> t7.y  # non-dynamic value not instantiated
 4
 
+>>> t6.y = UniformRandom()
+>>> t8 = TestPO3()
+>>> TestPO3.y = 10
+>>> t8.y==10  # t6 got a dynamic value, but shouldn't have changed Parameter's instantiate
+True
+
+>>> TestPO3.y=UniformRandom()  # now the Parameter instantiate should be true
+>>> t9 = TestPO3()
+>>> '_y_param_value' in t9.__dict__
+True
+
+# but now all existing instances of TestPO3 that don't have their own value for
+# the parameter share one UniformRandom object!
+>>> t7.repr_value('y') is TestPO3().params()['y'].default
+True
+
+>>> import copy
+>>> t9 = copy.deepcopy(t7)  
+>>> t9.repr_value('y') is TestPO3().params()['y'].default  # check a copy is the same
+True
 
 
 
@@ -102,6 +122,4 @@ True
 False
 
 
->>> print "Dynamic is not finished"
-"Dynamic is finished"
 
