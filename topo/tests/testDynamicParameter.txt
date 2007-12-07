@@ -15,6 +15,12 @@
 
 
 >>> t1 = TestPO1()
+
+>>> t1.is_dynamically_generated('x')
+True
+>>> t1.is_dynamically_generated('y')
+False
+
 >>> t1.inspect_value('x')  # no value generated yet
 
 >>> t1.inspect_value('y')  # not dynamic
