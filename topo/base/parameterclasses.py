@@ -90,7 +90,7 @@ def is_iterator(obj):
 def is_dynamic(value):
     return callable(value) or is_iterator(value)
 
-
+    
 
 import operator
 is_number = operator.isNumberType
@@ -196,17 +196,19 @@ class Dynamic(Parameter):
         Call super's set, keep instantiate up to date for the default
         value, and keep last value up to date for non-dynamic values.
         """
+        # CB: working here
         super(Dynamic,self).__set__(obj,val)
 
         if not is_dynamic(val):
             if not obj:
                 self.last_default = self.default
-                self.instantiate = False
+                #self.instantiate = False
             else:
                 obj.__dict__[self.internal_name(obj)+'_last']=val
         else:
             if not obj:
-                self.instantiate = True
+                pass
+                #self.instantiate = True
 
 
     def _last_value(self,obj):
