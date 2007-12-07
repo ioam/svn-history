@@ -272,11 +272,33 @@ class Dynamic(Parameter):
         return value
 
 
+    def _value_is_dynamic(self,obj):
+        """
+        Return True if the parameter is actually dynamic (i.e. the
+        value is being generated).
+
+        If called on a class (obj is None), inspects the parameter
+        default value.
+
+        If called on an instance, inspects the instance's value if it
+        has one, otherwise inspects the parameter default value.
+        """
+        if not obj:
+            dynamic = is_dynamic(self.default)
+        else:
+            try:
+                dynamic = is_dynamic(obj.__dict__[self.internal_name(obj)])
+            except KeyError:
+                dynamic = is_dynamic(self.default)
+                
+        return dynamic
+
         
 
 
 # CEBALERT: Now accepts FixedPoint, but not fully tested.
 # CB: doc out of date
+# CB: need to evaluate performance impact from Dynamic
 class Number(Dynamic):
     """
     """
@@ -327,9 +349,7 @@ class Number(Dynamic):
         value, if one has been set, otherwise produce the default value.
         """
         result = super(Number,self).__get__(obj,objtype)
-        # CEBERRORALERT: this doesn't work because by now it's the actual
-        # value, not a generator
-        if is_dynamic(result): self._check_bounds(result)
+        if self._value_is_dynamic(obj): self._check_bounds(result)
         return result
 
 
