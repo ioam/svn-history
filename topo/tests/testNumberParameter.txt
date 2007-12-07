@@ -1,0 +1,34 @@
+>>> from topo.base.parameterizedobject import ParameterizedObject
+>>> from topo.base.parameterclasses import Number 
+>>> from topo.misc.numbergenerators import UniformRandom
+
+
+>>> class TestPO1(ParameterizedObject):
+...    x = Number(default=UniformRandom(lbound=-1,ubound=1,seed=1),bounds=(-1,1))
+...    y = Number(default=1,bounds=(-1,1))
+
+
+>>> t1 = TestPO1()
+
+
+### Test bounds (non-dynamic number)
+>>> try:
+...     t1.y = 10
+... except ValueError:
+...     pass
+... else:
+...     assert False, "Should raise ValueError."
+
+
+### Test bounds (dynamic number)
+>>> t1.x = UniformRandom(lbound=2,ubound=3)  # bounds not checked on set 
+>>> try:
+...     v1 = t1.x
+... except ValueError:
+...     pass
+... else:
+...     assert False, "Should raise ValueError."
+
+
+
+
