@@ -926,6 +926,20 @@ class ParameterizedObject(object):
         return self.__shenma(name,self.inspect_value,"_%s_param_value_last"%name,'last_default')
 
 
+    def is_dynamically_generated(self,name):
+        """
+        Return True if the attribute is a parameter being dynamically
+        generated, otherwise return False.
+        """
+        # this method is for convenience: just avoids people having to investigate Dynamic
+        param_obj = self.params().get(name)
+        
+        if not param_obj:
+            return False
+        else:
+            return param_obj._value_is_dynamically_generated(self)
+        
+
     def __shenma(self,name,mthd,local_attr_name,param_attr_name):
         """
         Get the attribute specified by name; for non-parameters, this is the same
