@@ -327,6 +327,8 @@ class Number(Dynamic):
         value, if one has been set, otherwise produce the default value.
         """
         result = super(Number,self).__get__(obj,objtype)
+        # CEBERRORALERT: this doesn't work because by now it's the actual
+        # value, not a generator
         if is_dynamic(result): self._check_bounds(result)
         return result
 
