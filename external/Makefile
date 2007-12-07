@@ -616,12 +616,12 @@ hdf5-uninstall:
 ##############################################################
 # PyTables
 #
-PYTABLES = pytables-2.0.2
+PYTABLES = pytables
 
 PYTABLES_UNINSTALL += ${PYTHON_LIB}/site-packages/tables
 
-pytables: ${PYTABLES}.tar.gz pyrex hdf5
-	tar xzf ${PYTABLES}.tar.gz
+pytables: ${PYTABLES}-20070518.tar.gz pyrex hdf5
+	tar xzf ${PYTABLES}-20070518.tar.gz
 	cd ${PYTABLES}; ${PREFIX}/bin/python setup.py install --hdf5=${PREFIX}
 	touch pytables
 
