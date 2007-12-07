@@ -26,9 +26,9 @@ __version__='$Revision$'
 #   new (class default) object into the list).
 #
 
-import Tkinter, tkMessageBox, _tkinter
+import Tkinter, tkMessageBox
 
-from Tkinter import Frame, E,W, Label
+from Tkinter import Frame, E,W, Label, TclError
 from inspect import getdoc
 
 from topo.base.parameterizedobject import ParameterizedObject, \
@@ -411,7 +411,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
                 if label is None:  # HACK about the label being none
                     return
                 label['background']=b
-            except _tkinter.TclError:
+            except TclError:
                 pass
 
 
