@@ -597,13 +597,13 @@ pyrex-uninstall:
 ##############################################################
 # HDF5 library (required by PyTables)
 #
-HDF5 = hdf5-1.6.5
+HDF5 = hdf5-1.6.6
 
 HDF5_UNINSTALL += 
 
 hdf5: ${HDF5}.tar.gz
 	tar xzf ${HDF5}.tar.gz
-	cd ${HDF5}; ./configure --prefix=${PREFIX}
+	cd ${HDF5}; ./configure --enable-cxx --prefix=${PREFIX}
 	make -C ${HDF5} install
 	touch hdf5
 
@@ -616,13 +616,13 @@ hdf5-uninstall:
 ##############################################################
 # PyTables
 #
-PYTABLES = pytables
+PYTABLES = pytables-2.0.2
 
 PYTABLES_UNINSTALL += ${PYTHON_LIB}/site-packages/tables
 
-pytables: ${PYTABLES}-20070518.tar.gz pyrex hdf5
-	tar xzf ${PYTABLES}-20070518.tar.gz
-	cd ${PYTABLES}; ${PREFIX}/bin/python setup.py install
+pytables: ${PYTABLES}.tar.gz pyrex hdf5
+	tar xzf ${PYTABLES}.tar.gz
+	cd ${PYTABLES}; ${PREFIX}/bin/python setup.py install --hdf5=${PREFIX}
 	touch pytables
 
 pytables-clean:
