@@ -271,8 +271,8 @@ class Dynamic(Parameter):
 
         return value
 
-
-    def _value_is_dynamic(self,obj):
+    
+    def _value_is_dynamically_generated(self,obj):
         """
         Return True if the parameter is actually dynamic (i.e. the
         value is being generated).
@@ -293,7 +293,6 @@ class Dynamic(Parameter):
                 
         return dynamic
 
-        
 
 
 # CEBALERT: Now accepts FixedPoint, but not fully tested.
@@ -349,7 +348,7 @@ class Number(Dynamic):
         value, if one has been set, otherwise produce the default value.
         """
         result = super(Number,self).__get__(obj,objtype)
-        if self._value_is_dynamic(obj): self._check_bounds(result)
+        if self._value_is_dynamically_generated(obj): self._check_bounds(result)
         return result
 
 
