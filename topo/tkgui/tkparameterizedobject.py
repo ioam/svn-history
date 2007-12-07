@@ -96,11 +96,11 @@ $Id$
 
 
 import __main__, sys
-import Tkinter, _tkinter
+import Tkinter
 
 from inspect import getdoc
 from Tkinter import BooleanVar, StringVar, Frame, Checkbutton, \
-     Entry
+     Entry, TclError
 from Pmw import Balloon
 
 from topo.base.parameterizedobject import ParameterizedObject,Parameter, \
@@ -753,8 +753,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
     def _create_translator(self,name,param):
         self.debug("_create_translator(%s,%s)"%(name,param))
         
-        param_value = self.get_parameter_value(name)
-
         translator_type = lookup_by_class(self.trans,type(param))
 
         # Dynamic parameters only *might* contain a 
@@ -765,7 +763,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         if self.get_source_po(name).is_dynamically_generated(name):
             translator_type = self.trans[Dynamic]
             
-        self.translators[name]=translator_type(param,initial_value=param_value)#,original_string)        
+        self.translators[name]=translator_type(param,initial_value=self.get_parameter_value(name))
 
 
     def _object2string(self,param_name,obj):
@@ -774,7 +772,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
         translate to the string.
         """
         self.debug("object2string_ifreq(%s,%s)"%(param_name,obj))
-        param=self.get_parameter_object(param_name)
         translator = self.translators[param_name]
         return translator.object2string(obj)              
 
@@ -788,7 +785,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
         string.
         """
         self.debug("string2object_ifreq(%s,%s)"%(param_name,string))
-        param=self.get_parameter_object(param_name)
         translator = self.translators[param_name]
         o = translator.string2object(string)
         self.debug("...s2o return %s, type %s"%(o,type(o)))
@@ -812,8 +808,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
 
-
-import _tkinter # (required to get tcl exception class)
 
 class TkParameterizedObject(TkParameterizedObjectBase):
     """
@@ -1157,7 +1151,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
                 if label is None:  # see HACK about the label being none
                     return
                 label['foreground']=f
-            except _tkinter.TclError:
+            except TclError:
                 pass
 
 
@@ -1370,7 +1364,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
                 # 'How do you change list [...]' in projectionpanel.py.
                 try:
                     self.balloon.bind(w,help_text)
-                except _tkinter.TclError:
+                except TclError:
                     pass
                 ######################################################
 
