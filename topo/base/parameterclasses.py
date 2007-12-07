@@ -126,16 +126,21 @@ class Dynamic(Parameter):
     callable class, rather than a named function or a lambda function,
     or else this object will not be picklable.
     """
-    time_fn = None  # time_fn assumed to give time with earliest value of 0
+    time_fn = None  
     
     __slots__ = ['last_default','last_time']
     __doc__ = property((lambda self: self.doc))
 
         
     def __init__(self,**params):
+        """
+        Call the superclass's __init__ and set instantiate=True if the
+        default is dynamic.
+        """
         super(Dynamic,self).__init__(**params)
 
-        self.last_time = None 
+        self.last_time = -1  # time assumed to have earliest value of 0 (actually -0.99...)
+
         if is_dynamic(self.default):
             self.last_default = None
             self.instantiate = True
@@ -144,40 +149,53 @@ class Dynamic(Parameter):
 
 
     def _needs_update(self,obj):
+        """
+        Return True if the current time is greater than the last time.
 
+        If called on a class (obj is None), gets the last value from the
+        parameter object.
+
+        If called on an instance (obj is not None), gets the last time
+        from the instance's __dict__. If the last time is not in the
+        instance's __dict__, then the instance is using the class
+        (default) value, so the same is done as when called on a
+        class.
+
+        If Dynamic has no time_fn, always returns True.
+        """
         if self.time_fn is None: return True
-        time =  self.time_fn()
+
+        time = self.time_fn()
         
         if not obj:
-            needs = time>(self.last_time or -1)
+            update = time>self.last_time
         else:
             try:
-                needs = time>obj.__dict__[self.internal_name(obj)+'_time']
+                update = time>obj.__dict__[self.internal_name(obj)+'_time']
             except KeyError:
-                needs = time>(self.last_time or -1)
+                update = time>self.last_time
 
-        return needs
+        return update
                 
         
-
-
     def __get__(self,obj,objtype):
-
-        # CB: to store last default value etc on the class, put it in
-        # objtype.__dict__ instead of setting on the parameter object.
-        # But then need to explain why 'default' and all the rest are
-        # stored on the parameter object rather than the owning class.
-
+        """
+        Produce and return a new value if _needs_update(), otherwise
+        return the last value.
+        """
+        # note that this code results in more loops than are
+        # necessary, but it's simpler to understand.
         if self._needs_update(obj):
-            value = self._produce_value(obj)
+            return self._produce_value(obj)
         else:
-            value =  self._last_value(obj)
-
-        return value
+            return self._last_value(obj)
 
 
     def __set__(self,obj,val):
-        # 'instantiate' is kept up to date for the default value.
+        """
+        Call super's set, keep instantiate up to date for the default
+        value, and keep last value up to date for non-dynamic values.
+        """
         super(Dynamic,self).__set__(obj,val)
 
         if not is_dynamic(val):
@@ -192,6 +210,18 @@ class Dynamic(Parameter):
 
 
     def _last_value(self,obj):
+        """
+        Return the last value produced for this parameter.
+        
+        If called on a class (obj is None), return the last class
+        value (this Parameter object's last_default).
+
+        If called on an instance (obj is not None), return the
+        last value produced by the instance (stored in the instance's
+        __dict__). If the instance's __dict__ does not contain a last value,
+        then the instance is using the class value (default), so the
+        same is done as for when called on a class.
+        """
         if not obj:
             value = self.last_default
         else:
@@ -204,6 +234,21 @@ class Dynamic(Parameter):
     
 
     def _produce_value(self,obj):
+        """
+        Return a new value for this parameter.
+
+        If called on a class (obj is None), produces a value from the
+        default (and stores it (in last_default) along with the time
+        (in last_time)).
+
+        If called on an instance (obj is not None), and this parameter
+        has been set on the instance (i.e. the instance has a dynamic
+        value generator set in its __dict__), produces a new value
+        from the instance's dynamic value generator (and stores that
+        value, along with the time) in the instance's dict. If the
+        parameter has not been set on the instance, does the same as
+        when called on a class.
+        """
         if self.time_fn:
             time = self.time_fn()
         else:
@@ -227,16 +272,6 @@ class Dynamic(Parameter):
         return value
 
 
-##     def _value_is_dynamic(self,obj):
-##         if not obj:
-##             dynamic = is_dynamic(self.default)
-##         else:
-##             try:
-##                 dynamic = is_dynamic(obj.__dict__[self.internal_name(obj)])
-##             except KeyError:
-##                 dynamic = is_dynamic(self.default)
-
-##         return dynamic
         
 
 
