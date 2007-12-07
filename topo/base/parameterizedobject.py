@@ -934,7 +934,7 @@ class ParameterizedObject(object):
         # this method is for convenience: just avoids people having to investigate Dynamic
         param_obj = self.params().get(name)
         
-        if not param_obj:
+        if not param_obj or not hasattr(param_obj,'_value_is_dynamically_generated'):
             return False
         else:
             return param_obj._value_is_dynamically_generated(self)
