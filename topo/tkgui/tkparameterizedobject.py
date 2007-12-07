@@ -767,13 +767,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # overwrite any more specific class found above
         # (e.g. a Number with a dynamic value will have a numeric
         # translator from above, so we replace that)
-        # (test for Dynamic could be just looking for last_value attribute)
-        if self._param_is_dynamic(name):
+        if self.get_source_po(name).is_dynamically_generated(name):
             translator_type = self.trans[Dynamic]
-##         try:
-##             if param._dynamic: translator_type = self.trans[Dynamic]
-##         except AttributeError:
-##             pass # non-Dynamic Parameter
             
         self.translators[name]=translator_type(param,initial_value=param_value)#,original_string)        
 
@@ -1097,17 +1092,6 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         self._create_tkvar(PO,name,param_obj)
         
         self.pack_param(name,f,on_change=on_change,on_modify=on_modify,**o)
-
-
-    # CB: temporary
-    def _param_is_dynamic(self,name):
-        param_obj,PO = self.get_parameter_object(name,with_location=True)
-
-        if hasattr(param_obj,'last_default'):
-            if is_dynamic(PO.repr_value(name)):
-                return True
-
-        return False
     
 
     def _create_widget(self,name,master,widget_options={},on_change=None,on_modify=None):
@@ -1118,15 +1102,13 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         widget_creators dictionary; see individual widget creation
         methods for details to each type of widget.
         """
-        # HACK: two places now look at dynamic; should use trans type or whatever
-        
         # select the appropriate widget-creation method;
         # default is self._create_string_widget... 
         widget_creation_fn = self._create_string_widget
 
         param_obj,source_po = self.get_parameter_object(name,with_location=True)
 
-        if not self._param_is_dynamic(name):
+        if not source_po.is_dynamically_generated(name):
             # ...but overwrite that with a more specific one, if possible
             for c in classlist(type(param_obj))[::-1]:
                 if self.widget_creators.has_key(c):
