@@ -146,10 +146,6 @@ def keys_sorted_by_value(d, **sort_kwargs):
     return [i[val] for val in values]
 
 
-# CEBALERT: remove this function
-def parameters(parameterized_object):
-    return parameterized_object.params()
-
 
 
 # Buttons are not naturally represented by parameters?
@@ -479,7 +475,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         """
         Create Tkinter Variable shadows of all Parameters of PO.        
         """
-        for name,param in parameters(PO).items():
+        for name,param in PO.params().items():
             self._create_tkvar(PO,name,param)
 
 
@@ -644,8 +640,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         sources = self._source_POs()
         
         for po in sources:
-            params = parameters(po)
-            if name in params:
+            if name in po.params():
                 return po
 
         raise AttributeError(self.__attr_err_msg(name,sources))
@@ -661,7 +656,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         If with_location=True, returns also the source parameterizedobject.
         """
         source = parameterized_object or self.get_source_po(name)
-        parameter_object = parameters(source)[name]
+        parameter_object = source.params()[name]
 
         if not with_location:
             return parameter_object

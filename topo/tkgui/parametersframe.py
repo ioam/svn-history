@@ -38,8 +38,7 @@ from topo.misc.utils import keys_sorted_by_value
 
 from widgets import Menu
 from topowidgets import TkguiWindow
-from tkparameterizedobject import TkParameterizedObject, ButtonParameter, \
-                                  parameters
+from tkparameterizedobject import TkParameterizedObject, ButtonParameter
 
 
 
@@ -212,7 +211,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
         
         ### Pack all of the non-hidden Parameters
         self.displayed_params = {}
-        for n,p in parameters(parameterized_object).items():
+        for n,p in parameterized_object.params().items():
             if not p.hidden:
                 self.displayed_params[n]=p
                     
