@@ -47,7 +47,7 @@ osx-patch:
 	patch --force external/Makefile external/Makefile_OSX.diff
 	touch osx-patch
 
-osx-patch-clean:
+osx-patch-uninstall:
 	patch --force --reverse external/Makefile external/Makefile_OSX.diff
 	${RM} osx-patch
 
