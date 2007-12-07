@@ -216,10 +216,7 @@ class Parameter(object):
     ### (e.g. negative) precedence value.  That way by default the
     ### GUI could display those with precedence >0, but the user could
     ### select a level.
-                                                  
-    count = 0 # stores the number of Parameters created
-    # CEBALERT: ...but unused
-                                                   
+                                                                                                     
 
     __doc__ = property((lambda self: self.doc))
     # When a Parameter is owned by a ParameterizedObject, we want the
@@ -288,8 +285,6 @@ class Parameter(object):
         # constant => instantiate
         self.instantiate = instantiate or constant
 
-        Parameter.count += 1
-        
         
     def __get__(self,obj,objtype):
         """
