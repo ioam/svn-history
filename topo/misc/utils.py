@@ -457,6 +457,6 @@ def old_profile(command,n=50,sorting=('cumulative','time'),strip_dirs=True):
 
 
 try:
-    import cProfile2
+    import cProfile
 except ImportError:
     profile = old_profile
