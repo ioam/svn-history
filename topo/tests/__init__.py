@@ -98,6 +98,8 @@ if __name__ == '__main__':
     
 (b) set suite.requires_display=True if the tests require a DISPLAY.
 
+(c) call topo.tests.start_tkgui() before running tests (e.g. in
+    setUP()) if they require the GUI to be running
 
 
 
@@ -118,14 +120,13 @@ __version__='$Revision$'
 # and we could also simply name the files the same as what they are
 # testing, which could make it simpler to find the right test file.
 
+# CEBALERT: tests often affect each other. Make sure test authors are
+# aware of that, and have some kind of policy.  (Setting class
+# attributes, sharing a sim, etc)
 
-# CEBALERT: tests often affect each other. Make sure test authors
-# are aware of that, and have some kind of policy.
-# (Setting class attributes, sharing a sim, etc)
+# CEBALERT: some of the test modules are missing code to handle running
+# (i.e. running as './topographica topo/tests/testsheet.py').
 
-
-
-# CB: working on this file - haven't finished cleanup
 
 
 import unittest,doctest,os,re,fnmatch
@@ -165,7 +166,7 @@ def all_suite():
             print 'Loading suite from module %s ...' % test_name,
             new_test = getattr(test_module,'suite')
 
-            if check_for_display(new_test):
+            if _check_for_display(new_test):
                 print 'ok.'
                 suite.addTest(new_test)
             else:
@@ -180,7 +181,7 @@ def all_suite():
     return suite
 
 
-def check_for_display(suite):
+def _check_for_display(suite):
     """
     Return True if no DISPLAY required or DISPLAY is required and it exists,
     otherwise return False.
@@ -221,7 +222,7 @@ def run(verbosity=1,test_modules=None):
         
         for test_module in test_modules:
             if isinstance(test_module,types.ModuleType):
-                if check_for_display(test_module.suite):
+                if _check_for_display(test_module.suite):
                     run_suite.addTest(test_module.suite)
                 else:
                     raise Exception("Cannot run test without a valid DISPLAY.")
@@ -239,11 +240,6 @@ def run(verbosity=1,test_modules=None):
 
 
 # CB: if the unit tests were faster, I wouldn't keep needing this...
-#
-# Also, some of the test modules actually have code to handle running
-# them, e.g. ./topographica topo/tests/testsheet.py works to run the
-# sheet tests. But not all the modules have the required code - it
-# must be typed into each new file. None of the doctests have it.
 def run_named(name,verbosity=2):
     """
     Run the named test module.
