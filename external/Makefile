@@ -14,14 +14,14 @@ uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall pmw-uni
 ##############################################################
 # Python (interpreted language)
 #
-PYTHON = Python-2.4.4
+PYTHON = Python-2.5.1
 
-PYTHON_LIB  = lib/python2.4
-PYTHON_INC  = include/python2.4
-PYTHON_CONF = lib/python2.4/config
+PYTHON_LIB  = lib/python2.5
+PYTHON_INC  = include/python2.5
+PYTHON_CONF = lib/python2.5/config
 
-PYTHON_UNINSTALL += bin/idle bin/python bin/pydoc bin/python2.4 
-PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.4
+PYTHON_UNINSTALL += bin/idle bin/python bin/pydoc bin/python2.5 
+PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.5
 
 
 # LDFLAGS sets ${PREFIX}/lib as the LD_LIBRARY in the binary
