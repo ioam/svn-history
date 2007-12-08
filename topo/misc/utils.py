@@ -211,12 +211,6 @@ def shortclassname(x):
     return re.sub("'>","",re.sub(".*[.]","",repr(type(x))))
 
 
-# CEBALERT: we should consider switching to cProfile when we update python
-# to 2.5, because the hotshot module is not going to be maintained.
-
-# CEBHACKALERT: the current timings might not be 'meaningful', because
-# 'the timing core [contains] a critical bug' (see
-# http://www.python.org/doc/lib/module-hotshot.html).
 
 def profile(command,n=50,sorting=('cumulative','time'),strip_dirs=True):
     """
@@ -247,25 +241,24 @@ def profile(command,n=50,sorting=('cumulative','time'),strip_dirs=True):
     - profile running a simulation, but from the commandline:
     ./topographica examples/hierarchical.ty -c "from topo.misc.utils import profile; profile('topo.sim.run(10)')"
     """
-    # This function simply wraps some functions from the hotshot
+    # This function simply wraps some functions from the cProfile
     # module, making profiling easier.
-    import hotshot,hotshot.stats
+    import cProfile, pstats
     
-    prof = hotshot.Profile('current_profile')
-    prof.run(command)
-    prof.close()
-    
-    prof_stats = hotshot.stats.load('current_profile')
+    prof = cProfile.run(command,'filename')
+    prof_stats = pstats.Stats('filename')
 
     if strip_dirs:prof_stats.strip_dirs()
-    prof_stats.sort_stats(*sorting).print_stats(n)
+    
+    prof_stats.sort_stats(*sorting).print_callees(n)
 
-    ### JABALERT: Should enable this after switching to cProfile under
-    ### Python 2.5, as it will let us see which times are due to which
-    ### calls unambiguously.  The 2.4 hotshot version only reports
-    ### total time spent in each object, not the time due to that
-    ### particular call.
-    #prof_stats.sort_stats(*sorting).print_callees(n)
+    ### the above lets us see which times are due to which calls
+    ### unambiguously, while the version below only reports total time
+    ### spent in each object, not the time due to that particular
+    ### call.
+    # prof_stats.sort_stats(*sorting).print_stats(n)
+
+    
 
 
 def weighted_sample(seq,weights=[]):
@@ -416,3 +409,54 @@ class ExtraPickler(Singleton):
             if update_main:
                 exec "%s=val"%(attribute) in __main__.__dict__
                 
+
+
+
+# CB: will be removed
+def old_profile(command,n=50,sorting=('cumulative','time'),strip_dirs=True):
+    """
+    Profile the given command (supplied as a string), printing
+    statistics about the top n functions when ordered according to
+    sorting.
+
+    sorting defaults to ordering by cumulative time and then internal
+    time; see http://docs.python.org/lib/profile-stats.html for other
+    sorting options.
+
+    By default, the complete paths of files are not shown. If there
+    are multiple files with the same name, you might wish to set
+    strip_dirs=False to make it easier to follow the output.
+
+
+    Examples:
+
+    - profile loading a simulation:
+    profile('execfile("examples/hierarchical.ty")')
+
+    - profile running an already loaded simulation:
+    profile('topo.sim.run(10)')
+
+    - profile running a whole simulation:
+    profile('execfile("examples/lissom_oo_or.ty");topo.sim.run(20000)')
+
+    - profile running a simulation, but from the commandline:
+    ./topographica examples/hierarchical.ty -c "from topo.misc.utils import profile; profile('topo.sim.run(10)')"
+    """
+    # This function simply wraps some functions from the hotshot
+    # module, making profiling easier.
+    import hotshot,hotshot.stats
+    
+    prof = hotshot.Profile('current_profile')
+    prof.run(command)
+    prof.close()
+    
+    prof_stats = hotshot.stats.load('current_profile')
+
+    if strip_dirs:prof_stats.strip_dirs()
+    prof_stats.sort_stats(*sorting).print_stats(n)
+
+
+try:
+    import cProfile2
+except ImportError:
+    profile = old_profile
