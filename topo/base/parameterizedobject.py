@@ -282,9 +282,12 @@ class Parameter(object):
         self.default = default
         self.doc = doc
         self.constant = constant
-        # constant => instantiate
-        self.instantiate = instantiate or constant
+        self._set_instantiate(instantiate)
 
+
+    def _set_instantiate(self,instantiate):
+        # constant => instantiate
+        self.instantiate = instantiate or self.constant
         
     def __get__(self,obj,objtype):
         """
