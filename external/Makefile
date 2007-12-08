@@ -301,7 +301,7 @@ pychecker-uninstall:
 # logilab common files, required for pylint (but should be 
 # removed if pylint is removed)
 #
-COMMON = common-0.12.0
+COMMON = logilab-common-0.25.0
 COMMON_UNINSTALL = ${PYTHON_LIB}/site-packages/logilab/common
 
 common: ${COMMON}.tar.gz python
@@ -338,10 +338,10 @@ astng-uninstall:
 ##############################################################
 # pylint (optional source-code checker)
 #
-PYLINT = pylint-0.7.0
+PYLINT = pylint-0.13.2
 PYLINT_UNINSTALL = ${PYTHON_LIB}/site-packages/pylint
 
-pylint: ${PYLINT}.tar.gz python common
+pylint: ${PYLINT}.tar.gz python common astng
 	tar xzf ${PYLINT}.tar.gz
 	cd ${PYLINT}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch pylint
