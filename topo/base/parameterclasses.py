@@ -74,21 +74,14 @@ def produce_value(value_obj):
     """
     if callable(value_obj):
         return value_obj()
-    if is_iterator(value_obj):
+    elif hasattr(value_obj,'next'):
         return value_obj.next()
-    return value_obj
-
-
-def is_iterator(obj):
-    """
-    Predicate that returns whether an object is an iterator.
-    """
-    import types
-    return type(obj) == types.GeneratorType or (hasattr(obj,'__iter__') and hasattr(obj,'next'))
+    else:
+        return value_obj
 
 
 def is_dynamic(value):
-    return callable(value) or is_iterator(value)
+    return callable(value) or hasattr(value,'next')
 
     
 
