@@ -84,7 +84,7 @@ def is_iterator(obj):
     Predicate that returns whether an object is an iterator.
     """
     import types
-    return type(obj) == types.GeneratorType or ('__iter__' in dir(obj) and 'next' in dir(obj))
+    return type(obj) == types.GeneratorType or (hasattr(obj,'__iter__') and hasattr(obj,'next'))
 
 
 def is_dynamic(value):
