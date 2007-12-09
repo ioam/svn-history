@@ -244,7 +244,9 @@ def profile(command,n=50,sorting=('cumulative','time'),strip_dirs=True):
     # This function simply wraps some functions from the cProfile
     # module, making profiling easier.
     import cProfile, pstats
-    
+
+    # CB: leaves around "filename": should give this a proper name and maybe
+    # put in /tmp/ and maybe allow someone to choose where to save it
     prof = cProfile.run(command,'filename')
     prof_stats = pstats.Stats('filename')
 
