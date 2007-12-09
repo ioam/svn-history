@@ -178,6 +178,11 @@ class Dynamic(Parameter):
         """
         # note that this code results in more loops than are
         # necessary, but it's simpler to understand.
+
+        # 2007/12/09 1540 CST: probably accounts for most of the
+        # current 7% difference in performance between lissom_oo_or
+        # now vs. before Number was changed to inherit from Dynamic
+        
         if self._needs_update(obj):
             return self._produce_value(obj)
         else:
@@ -779,7 +784,7 @@ class ListParameter(Parameter):
     def __set__(self,obj,val):
         """Set to the given value, raising an exception if out of bounds."""
 
-        # CB: think this is ok
+        # CEBERRORALERT: needs updating
         if not (hasattr(val,'_dynamic') and val._dynamic):
         #if type(val)!=DynamicNumber:
             self._check_bounds(val)
