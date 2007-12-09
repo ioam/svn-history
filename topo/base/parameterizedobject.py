@@ -740,7 +740,7 @@ class ParameterizedObject(object):
         """
         self.name = '%s%05d' % (self.__class__.__name__ ,object_count)
 
-
+    # CB: __repr__ is called often; methods it uses should not be too slow
     def __repr__(self):
         """
         Provide a nearly valid Python representation that could be used to recreate
@@ -1057,12 +1057,20 @@ class ParameterizedObject(object):
         Includes Parameters from this class and its
         superclasses.
         """
-        paramdict = {}
-        for class_ in classlist(cls):
-            for name,val in class_.__dict__.items():
-                if isinstance(val,Parameter):
-                    paramdict[name] = val
-        return paramdict
+        # CB: we cache the parameters in cls._params because this
+        # method is called often, and new parameters cannot be added
+        # (or deleted)
+        try:
+            return cls._params
+        except AttributeError:
+            paramdict = {}
+            for class_ in classlist(cls):
+                for name,val in class_.__dict__.items():
+                    if isinstance(val,Parameter):
+                        paramdict[name] = val
+            type.__setattr__(cls,'_params',paramdict)
+            return paramdict
+        
 
 
     @classmethod
