@@ -14,11 +14,12 @@ from numpy import exp,zeros,ones
 
 from topo.base.arrayutils import clip_in_place
 from topo.base.functionfamilies import OutputFn, OutputFnParameter, IdentityOF
-from topo.base.parameterclasses import Number, BooleanParameter, ListParameter
+from topo.base.parameterclasses import Number, BooleanParameter, ListParameter, StringParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import activity_type
 from topo.commands.pylabplots import vectorplot
 from topo.misc.filepaths import normalize_path
+
 
 class HomeostaticMaxEnt(OutputFn):
     """
@@ -40,7 +41,7 @@ class HomeostaticMaxEnt(OutputFn):
     http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc431.htm
     """
 
-    learning = BooleanParameter(True,doc="""
+    updating = BooleanParameter(True,doc="""
         If False, disables the dynamic adjustment of threshold levels.""")
     
     a_init = Number(default=13,doc="Multiplicative parameter controlling the exponential.")
@@ -58,9 +59,10 @@ class HomeostaticMaxEnt(OutputFn):
     def __init__(self,**params):
         super(HomeostaticMaxEnt,self).__init__(**params)
 	self.first_call = True
+        self._updating_state = []
 
     def __call__(self,x):
-	
+        
 	if self.first_call:
 	    self.first_call = False
 	    self.a = ones(x.shape, x.dtype.char) * self.a_init
@@ -72,7 +74,7 @@ class HomeostaticMaxEnt(OutputFn):
         x *= 0.0
 	x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
 
-        if self.learning:
+        if self.updating:
 
             self.y_avg = self.smoothing*x + (1.0-self.smoothing)*self.y_avg #Calculate average for use in debugging only
 
@@ -80,6 +82,21 @@ class HomeostaticMaxEnt(OutputFn):
             self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
             self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
 
+    def stop_updating(self):
+        """
+        Save the current state of the adapting parameter to an internal stack. 
+        Turn updating off for the output_fn.
+        """
+
+        self._updating_state.append(self.updating)
+        self.updating=False
+
+
+    def restore_updating(self):
+        """Pop the most recently saved adapting parameter off the stack"""
+
+        self.updating = self._updating_state.pop()                        
+          
 
 
 class AdaptingHomeostaticMaxEnt(OutputFn):
@@ -94,7 +111,7 @@ class AdaptingHomeostaticMaxEnt(OutputFn):
     http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc431.htm
     """
     
-    learning = BooleanParameter(True,doc="""
+    updating = BooleanParameter(True,doc="""
       If False, disables the dynamic adjustment of threshold levels.""")
     
     lstep = Number(default=8,doc="How often to update learning rate")
@@ -119,6 +136,7 @@ class AdaptingHomeostaticMaxEnt(OutputFn):
         super(AdaptingHomeostaticMaxEnt,self).__init__(**params)
 	self.first_call = True
 	self.n_step = 0
+        self._updating_state = []
 
     def __call__(self,x):
 	
@@ -134,7 +152,7 @@ class AdaptingHomeostaticMaxEnt(OutputFn):
         x *= 0.0
 	x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
         	        
-        if self.learning:
+        if self.updating:
             self.n_step += 1
             if self.n_step == self.lstep:
                 self.n_step = 0
@@ -147,7 +165,159 @@ class AdaptingHomeostaticMaxEnt(OutputFn):
             self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
             self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
 
+    def stop_updating(self):
+        """
+        Save the current state of the updating parameter to an internal stack. 
+        Turn updating off for the output_fn.
+        """
+
+        self._updating_state.append(self.updating)
+        self.updating=False
 
 
+    def restore_updating(self):
+        """Pop the most recently saved updating parameter off the stack"""
 
-   
+        self.updating = self._updating_state.pop()                        
+          
+
+
+class ScalingOF(OutputFn):
+    """
+    Scales input activity based on the current average activity (x_avg) in order to bring
+    x_avg closer to a specified target average for each individual unit in the sheet.
+    Calculates a scaling factor which is greater than 1 if x_avg is less than the target
+    and less than 1 if x_avg is greater than the target and multiplies the input activity
+    by this scaling factor.
+    """
+    target = Number(default=0.01, doc="""
+    Target average activity for each unit""")
+
+    step=Number(default=1, doc="How often to calculate average activity and scaling factor")
+    
+    smoothing = Number(default=0.0003, doc="""
+    The degree of weighting decrease for older values when calculating the average""")
+
+    updating = BooleanParameter(default=True, doc="""
+    Whether or not to update average, allows averaging to be turned off during e.g. map measurement""")
+    
+    def __init__(self,**params):
+        super(ScalingOF,self).__init__(**params)
+        self.n_step = 0
+        self.x_avg=None
+        self.sf=None
+        self.scaled_x_avg=None
+        self._updating_state = []
+
+    def __call__(self,x):
+    
+        if self.x_avg is None:
+            self.x_avg=self.target*ones(x.shape, activity_type)         
+        if self.scaled_x_avg is None:
+            self.scaled_x_avg=self.target*ones(x.shape, activity_type) 
+
+        # Collect values on each appropriate step
+        self.n_step += 1
+        if self.n_step == self.step:
+            self.n_step = 0
+            if self.updating:
+                self.x_avg = self.smoothing*x + (1.0-self.smoothing)*self.x_avg
+                self.sf=self.target/self.x_avg
+
+        x *= self.sf
+        self.scaled_x_avg = self.smoothing*x + (1.0-self.smoothing)*self.scaled_x_avg
+        
+    def stop_updating(self):
+        """
+        Save the current state of the updating parameter to an internal stack. 
+        Turn updating off for the output_fn.
+        """
+
+        self._updating_state.append(self.updating)
+        self.updating=False
+
+
+    def restore_updating(self):
+        """Pop the most recently saved updating parameter off the stack"""
+
+        self.updating = self._updating_state.pop() 
+        
+
+class JointScalingOF(OutputFn):
+    """
+    Allows two or more projections to compute the average of their total activity.
+    Total input activity is scaled based on the current average activity (x_avg) in order to bring
+    x_avg closer to a specified target average for each individual unit in the sheet.
+    Calculates a scaling factor which is greater than 1 if x_avg is less than the target
+    and less than 1 if x_avg is greater than the target and multiplies the input activity
+    by this scaling factor. The new scaled total activity is then divided equally amongst the
+    jointly scaled projections.
+    """
+    target = Number(default=0.01, doc="""
+    Target average activity for each unit""")
+
+    step=Number(default=1, doc="How often to calculate average activity and scale the input activity")
+    
+    smoothing = Number(default=0.0003, doc="""
+    The degree of weighting decrease for older values when calculating the average""")
+
+    updating = BooleanParameter(default=True, doc="""
+    Whether or not to update average, allows averaging to be turned off during e.g. map measurement""")
+
+    joint_projections = ListParameter(default=[], doc="""Names of the projections to be jointly scaled with
+    the current projection""")
+
+    sheet = StringParameter(default=None)
+    
+    def __init__(self,**params):
+        super(JointScalingOF,self).__init__(**params)
+        self.n_step = 0
+        self.x_avg=None
+        self.sf=None
+        self.scaled_x_avg=None
+        self._updating_state = []
+        
+    def __call__(self,x):
+    
+        if self.x_avg is None:
+            self.x_avg=self.target*ones(x.shape, activity_type)         
+        if self.scaled_x_avg is None:
+            self.scaled_x_avg=self.target*ones(x.shape, activity_type) 
+        if self.sf is None:
+            self.sf=ones(x.shape, activity_type)
+
+
+        for each in self.joint_projections:
+            proj = topo.sim[self.sheet].projections()[each]
+            x += proj.activity 
+
+
+        proj_number = 1+len(self.joint_projections)
+
+        # Collect values on each appropriate step
+        self.n_step += 1
+        if self.n_step == self.step:
+            self.n_step = 0
+            if self.updating:
+                self.sf *= 0.0
+                self.x_avg = self.smoothing*x + (1.0-self.smoothing)*self.x_avg
+
+                self.sf += self.target/self.x_avg
+        x *= self.sf
+        self.scaled_x_avg = self.smoothing*x + (1.0-self.smoothing)*self.scaled_x_avg
+        x *= 1.0/proj_number
+
+    def stop_updating(self):
+        """
+        Save the current state of the updating parameter to an internal stack. 
+        Turn updating off for the output_fn.
+        """
+
+        self._updating_state.append(self.updating)
+        self.updating=False
+
+
+    def restore_updating(self):
+        """Pop the most recently saved updating parameter off the stack"""
+
+        self.updating = self._updating_state.pop() 
