@@ -33,7 +33,8 @@ class OutputFn(ParameterizedObject):
     # CEBALERT: can we have this here - is there a more appropriate
     # term for it, general to output functions?
     norm_value = Parameter(default=None)
-    
+
+
     def __call__(self,x):
         raise NotImplementedError
 
@@ -42,6 +43,11 @@ class OutputFn(ParameterizedObject):
         assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
         return PipelineOF(output_fns=[self,of])
 
+    def stop_updating(self):
+        pass
+        
+    def restore_updating(self):
+        pass    
 
 # Trivial example of an OutputFn, provided for when a default
 # is needed.  The other concrete OutputFunction classes are stored
@@ -75,7 +81,20 @@ class PipelineOF(OutputFn):
         assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
         self.output_fns.append(of)
 
+    def stop_updating(self):
+        """
+        Call the stop_updating function for each output_fn.
+        """
+        for of in self.output_fns:
+            of.stop_updating()
+        
+    def restore_updating(self):
+        """Call the restore_updating function for each output_fn.
+        """
 
+        for of in self.output_fns:
+            of.restore_updating()
+                 
 class OutputFnParameter(ClassSelectorParameter):
     """
     Parameter whose value can be any OutputFn, i.e., a function
