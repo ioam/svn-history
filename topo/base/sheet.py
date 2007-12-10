@@ -111,7 +111,8 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         self.activity = zeros(self.shape,activity_type)
 
         # For non-learning inputs
-        self.__saved_activity = []          
+        self.__saved_activity = []
+        self._updating_state = []  
 
         ### JABALERT: Should perhaps rename this to view_dict
         self.sheet_views = {}
@@ -190,7 +191,20 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
     def activity_len(self):
         """Return the number of items that have been saved by state_push()."""
         return len(self.__saved_activity)
-        
+
+    def stop_updating(self):
+        """
+        Save the current state of the learning parameter to an internal stack. 
+        Turn learning off for the sheet.
+        """
+
+        self._updating_state.append(self.learning)
+        self.learning=False
+
+    def restore_updating(self):
+        """Pop the most recently saved learning parameter off the stack"""
+
+        self.learning = self._updating_state.pop()
 
 
 class Slice(object):
