@@ -266,3 +266,24 @@ class LISSOM(JointNormalizingCFSheet):
   
 
 
+class OPTNORM(LISSOM):
+    """
+    LISSOM Sheet which can optionally turn off weight normalization after an initial normalization step.
+    """
+    norm_weights = BooleanParameter(default=True, doc="""
+       Whether or not to nomalize the weights after the initial normalization""")
+
+    def __init__(self,**params):
+        super(OPTNORM,self).__init__(**params)
+        
+    def start(self):
+        self._normalize_weights()
+        for proj in self.in_connections:
+            if not isinstance(proj,Projection):
+                self.debug("Skipping non-Projection ")
+            else:
+                if self.norm_weights == False:
+                    proj.weights_output_fn=topo.base.cf.CFPOF_Plugin(single_cf_fn=topo.outputfns.basic.IdentityOF())
+
+                    
+
