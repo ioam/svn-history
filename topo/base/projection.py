@@ -105,11 +105,12 @@ class Projection(EPConnection):
     
     dest_port = Parameter(default='Activity')
 
-
+       
     def __init__(self,**params):
         super(Projection,self).__init__(**params)
         self.activity = array(self.dest.activity)
-
+        self._updating_state = []
+        
     def activate(self,input_activity):
         raise NotImplementedError
 
@@ -135,6 +136,26 @@ class Projection(EPConnection):
         """
         pass
 
+    def stop_updating(self):
+        """
+        Save the current state of the updating parameter to an internal stack.
+        Call the stop_updating function for the projection output_fn.
+        Will need to be overwritten in subclasses which have a updating parameter
+        or some other state changes which should be frozen.  
+        """
+
+        self.output_fn.stop_updating()
+      
+
+    def restore_updating(self):
+        """
+        Pop the most recently saved updating parameter off the stack.
+        Call the restore_updating function for the projection output_fn.
+        Will need to be overwritten in subclasses which have a updating parameter
+        or some other state changes which should be frozen.
+        """
+        self.output_fn.restore_updating()
+           
 
 class ProjectionSheet(Sheet):
     """
@@ -229,7 +250,7 @@ class ProjectionSheet(Sheet):
             self.output_fn(self.activity)
 
         self.send_output(src_port='Activity',data=self.activity)
-
+    
 
     def process_current_time(self):
         """
@@ -293,9 +314,40 @@ class ProjectionSheet(Sheet):
             raise KeyError(name)
 
 
-  
+    def stop_updating(self):
+        """
+        Save the current state of the learning parameter to an internal stack.
+        Turn off the updating and call the stop_updating function for each
+        projection and for the sheet output function.
+        """
+
+        self._updating_state.append(self.learning)
+        self.learning=False
+        self.output_fn.stop_updating()
+        for proj in self.in_connections:
+            if not isinstance(proj,Projection):
+                self.debug("Skipping non-Projection "+proj.name)
+            else:
+                proj.stop_updating()
+
+
+    def restore_updating(self):
+        """
+        Pop the most recently saved learning parameter off the stack.
+        Call the restore_updating function for each projection and for
+        the sheet output function.
+        """
+
+        self.learning = self._updating_state.pop()
+        self.output_fn.restore_updating()
+        for proj in self.in_connections:
+            if not isinstance(proj,Projection):
+                self.debug("Skipping non-Projection "+proj.name)
+            else:
+                proj.restore_updating()
+        
     
-    
+
 class NeighborhoodMask(SheetMask):
     """
     A SheetMask where the mask includes a neighborhood around active neurons.
