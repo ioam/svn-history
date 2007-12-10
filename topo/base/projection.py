@@ -139,20 +139,19 @@ class Projection(EPConnection):
     def stop_updating(self):
         """
         Save the current state of the updating parameter to an internal stack.
-        Call the stop_updating function for the projection output_fn.
-        Will need to be overwritten in subclasses which have a updating parameter
-        or some other state changes which should be frozen.  
+        Calls the stop_updating function for the projection output_fn.
+        Will need to be overwritten in subclasses that have a updating parameter,
+        or some other potential state change which should be frozen.  
         """
-
         self.output_fn.stop_updating()
       
 
     def restore_updating(self):
         """
         Pop the most recently saved updating parameter off the stack.
-        Call the restore_updating function for the projection output_fn.
-        Will need to be overwritten in subclasses which have a updating parameter
-        or some other state changes which should be frozen.
+        Calls the restore_updating function for the projection output_fn.
+        Will need to be overwritten in subclasses that have a updating parameter
+        or some other potential state change which should be frozen.
         """
         self.output_fn.restore_updating()
            
@@ -317,7 +316,7 @@ class ProjectionSheet(Sheet):
     def stop_updating(self):
         """
         Save the current state of the learning parameter to an internal stack.
-        Turn off the updating and call the stop_updating function for each
+        Turns off the updating and calls the stop_updating function for each
         projection and for the sheet output function.
         """
 
@@ -334,7 +333,7 @@ class ProjectionSheet(Sheet):
     def restore_updating(self):
         """
         Pop the most recently saved learning parameter off the stack.
-        Call the restore_updating function for each projection and for
+        Calls the restore_updating function for each projection and for
         the sheet output function.
         """
 

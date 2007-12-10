@@ -58,7 +58,6 @@ class PiecewiseLinear(OutputFn):
         clip_in_place(x,0.0,1.0)
 
 
-
 class Sigmoid(OutputFn):
     """ 
     Sigmoidal (logistic) output function 1/(1+exp-(r*x+k)).
@@ -368,7 +367,7 @@ class PoissonSample(OutputFn):
         x *= 0.0
         x += sample
         x *= self.out_scale
-                           
+
 
 class AttributeTrackingOF(OutputFn):
     """
@@ -391,7 +390,9 @@ class AttributeTrackingOF(OutputFn):
     step = Number(default=1, doc="How often to update parameter information")
 
     updating = BooleanParameter(default=True, doc="""
-    Whether or not to track parameters, allows tracking to be turned off during e.g. map measurement""")
+        Whether or not to track parameters.
+        Allows tracking to be turned off during analysis, and then re-enabled.""")
+    
 
     def __init__(self,**params):
         super(AttributeTrackingOF,self).__init__(**params)
@@ -485,4 +486,3 @@ class ActivityAveragingOF(OutputFn):
         """Pop the most recently saved updating parameter off the stack"""
 
         self.updating = self._updating_state.pop()                        
-          

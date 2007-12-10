@@ -195,15 +195,13 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
     def stop_updating(self):
         """
         Save the current state of the learning parameter to an internal stack. 
-        Turn learning off for the sheet.
+        Turns off the updating parameter for the sheet.
         """
-
         self._updating_state.append(self.learning)
         self.learning=False
 
     def restore_updating(self):
-        """Pop the most recently saved learning parameter off the stack"""
-
+        """Pop the most recently saved learning parameter off the stack."""
         self.learning = self._updating_state.pop()
 
 
