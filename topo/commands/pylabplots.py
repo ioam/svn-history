@@ -534,7 +534,7 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
 
     
     for p in params.get('attrib_names',output_fn.attrib_names):
-        pylab.figure(figsize=(6,6))
+        pylab.figure(figsize=(6,4))
         isint=pylab.isinteractive()
         pylab.ioff()
         pylab.grid(True)
@@ -544,11 +544,12 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
         manager.window.title(topo.sim.name+': '+p)
         
         for unit in params.get('units',output_fn.units):
-            plot_data=[y for (x,y) in output_fn.values[p][unit]]
+            y_data=[y for (x,y) in output_fn.values[p][unit]]
+            x_data=[x for (x,y) in output_fn.values[p][unit]]
             #save(normalize_path("Filename+p+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=','))
             # uncomment if you also want to save the raw data
             
-            pylab.plot(plot_data, label='Unit'+str(unit))
+            pylab.plot(x_data,y_data, label='Unit'+str(unit))
             (ymin,ymax)=params.get('ybounds',(None,None))
             pylab.axis(xmin=init_time,xmax=final_time, ymin=ymin, ymax=ymax) 
                 
