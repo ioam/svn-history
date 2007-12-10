@@ -390,12 +390,13 @@ class AttributeTrackingOF(OutputFn):
     
     step = Number(default=1, doc="How often to update parameter information")
 
-    learning = BooleanParameter(default=True, doc="""
+    updating = BooleanParameter(default=True, doc="""
     Whether or not to track parameters, allows tracking to be turned off during e.g. map measurement""")
-    
+
     def __init__(self,**params):
         super(AttributeTrackingOF,self).__init__(**params)
         self.values={}
+        self._updating_state = []
         self.n_step = 0
         for p in self.attrib_names:
             self.values[p]={}
@@ -405,7 +406,7 @@ class AttributeTrackingOF(OutputFn):
         
     def __call__(self,x):
 
-        if self.learning:
+        if self.updating:
             #collect values on each appropriate step
             self.n_step += 1
         
@@ -419,7 +420,21 @@ class AttributeTrackingOF(OutputFn):
                         
                     for u in self.units:
                         self.values[p][u].append((topo.sim.time(),value_matrix[u]))
-                            
+
+    def stop_updating(self):
+        """
+        Save the current state of the updating parameter to an internal stack. 
+        Turn updating off for the output_fn.
+        """
+
+        self._updating_state.append(self.updating)
+        self.updating=False
+
+
+    def restore_updating(self):
+        """Pop the most recently saved updating parameter off the stack"""
+
+        self.updating = self._updating_state.pop()                        
           
 
 class ActivityAveragingOF(OutputFn):
@@ -434,22 +449,40 @@ class ActivityAveragingOF(OutputFn):
     smoothing = Number(default=0.0003, doc="""
     The degree of weighting decrease for older values when calculating the average""")
 
-    learning = BooleanParameter(default=True, doc="""
+    updating = BooleanParameter(default=True, doc="""
     Whether or not to average activity, allows averaging to be turned off during e.g. map measurement""")
+
+    initial_average=Number(default=0, doc="Initial value for x_avg")
     
     def __init__(self,**params):
         super(ActivityAveragingOF,self).__init__(**params)
         self.n_step = 0
         self.x_avg=None
-           
+        self._updating_state = []   
 
     def __call__(self,x):
         if self.x_avg is None:
-            self.x_avg=zeros(x.shape, activity_type)         
+            self.x_avg=self.initial_average*ones(x.shape, activity_type)         
 
         # Collect values on each appropriate step
-        if self.learning:
+        if self.updating:
             self.n_step += 1
             if self.n_step == self.step:
                 self.n_step = 0
                 self.x_avg = self.smoothing*x + (1.0-self.smoothing)*self.x_avg
+
+    def stop_updating(self):
+        """
+        Save the current state of the updating parameter to an internal stack. 
+        Turn updating off for the output_fn.
+        """
+
+        self._updating_state.append(self.updating)
+        self.updating=False
+
+
+    def restore_updating(self):
+        """Pop the most recently saved updating parameter off the stack"""
+
+        self.updating = self._updating_state.pop()                        
+          
