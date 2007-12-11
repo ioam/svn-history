@@ -211,27 +211,27 @@ class ScalingOF(OutputFn):
         self.n_step = 0
         self.x_avg=None
         self.sf=None
-        self.scaled_x_avg=None
         self._updating_state = []
 
     def __call__(self,x):
     
         if self.x_avg is None:
             self.x_avg=self.target*ones(x.shape, activity_type)         
-        if self.scaled_x_avg is None:
-            self.scaled_x_avg=self.target*ones(x.shape, activity_type) 
+        if self.sf is None:
+            self.sf=ones(x.shape, activity_type)
 
         # Collect values on each appropriate step
         self.n_step += 1
         if self.n_step == self.step:
             self.n_step = 0
             if self.updating:
+                self.sf *= 0.0
+                self.sf += self.target/self.x_avg # Calculate scaling factor based on old average
                 self.x_avg = self.smoothing*x + (1.0-self.smoothing)*self.x_avg
-                self.sf=self.target/self.x_avg
+               
 
         x *= self.sf
-        self.scaled_x_avg = self.smoothing*x + (1.0-self.smoothing)*self.scaled_x_avg
-        
+              
 
     def stop_updating(self):
         """
@@ -292,32 +292,27 @@ class JointScalingOF(OutputFn):
     
         if self.x_avg is None:
             self.x_avg=self.target*ones(x.shape, activity_type)         
-        if self.scaled_x_avg is None:
-            self.scaled_x_avg=self.target*ones(x.shape, activity_type) 
         if self.sf is None:
             self.sf=ones(x.shape, activity_type)
 
-
+        total_x = copy.copy(x)
+      
         for each in self.joint_projections:
             proj = topo.sim[self.sheet].projections()[each]
-            x += proj.activity 
+            total_x += proj.activity 
 
-
-        proj_number = 1+len(self.joint_projections)
-
+       
         # Collect values on each appropriate step
         self.n_step += 1
         if self.n_step == self.step:
             self.n_step = 0
             if self.updating:
                 self.sf *= 0.0
-                self.x_avg = self.smoothing*x + (1.0-self.smoothing)*self.x_avg
+                self.sf += self.target/self.x_avg #Calculate scaling factor based on old average
+                self.x_avg = self.smoothing*total_x + (1.0-self.smoothing)*self.x_avg
 
-                self.sf += self.target/self.x_avg
         x *= self.sf
-        self.scaled_x_avg = self.smoothing*x + (1.0-self.smoothing)*self.scaled_x_avg
-        x *= 1.0/proj_number
-
+        
     def stop_updating(self):
         """
         Save the current state of the updating parameter to an internal stack. 
