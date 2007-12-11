@@ -1,0 +1,12 @@
+--- Makefile	2007-12-11 12:49:46.000000000 +0800
++++ Makefile.new	2007-12-11 12:49:16.000000000 +0800
+@@ -29,7 +29,8 @@
+ python: ${PYTHON}.tgz tk
+ 	echo ${PREFIX}
+ 	tar xzf ${PYTHON}.tgz
+-	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
++	cd ${PYTHON}; patch -p0 < ../Python_OSX_X11.diff		
++	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-rpath,${PREFIX}/lib
+ 	cd ${PYTHON}; env PREFIX=${PREFIX} make 
+ 	cd ${PYTHON}; env PREFIX=${PREFIX} make install
+ 	touch python
