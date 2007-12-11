@@ -43,6 +43,13 @@ clean: clean-doc clean-ext-packages clean-pyc
 	${RM} .#??*.* */.#??*.* */*/.#??*.* */*/*/.#??*.* current_profile ./topo/tests/testsnapshot.typ ./topo/tests/testplotfilesaver*.png
 	${RM} -r bin include share lib man topographica ImageSaver*.jpeg python_topo
 
+
+# CB: this first one should maybe be osx-aqua-patch, and these osx
+# patches are now a bit obtrusive.  Also note that for this first one,
+# the diff should probably include commented-out sections for tk and tcl,
+# since they're unused (the frameworks get used instead).
+
+# Mac OS X: to build python with Aqua Tkinter
 osx-patch: 
 	patch --force external/Makefile external/Makefile_OSX.diff
 	touch osx-patch
@@ -50,6 +57,15 @@ osx-patch:
 osx-patch-uninstall:
 	patch --force --reverse external/Makefile external/Makefile_OSX.diff
 	${RM} osx-patch
+
+# Mac OS X: to build python with X11 Tkinter
+osx-x11-patch: 
+	patch --force external/Makefile external/Makefile_OSX_X11.diff
+	touch osx-x11-patch
+
+osx-x11-patch-uninstall:
+	patch --force --reverse external/Makefile external/Makefile_OSX_X11.diff
+	${RM} osx-x11-patch
 
 
 saved-examples: 
