@@ -10,7 +10,7 @@ import numpy
 from numpy import abs,zeros,ones
 import topo
 
-from topo.base.cf import CFSheet
+from topo.base.cf import CFSheet, CFPOutputFnParameter
 from topo.base.parameterclasses import BooleanParameter, Number, Integer, ListParameter
 from topo.base.projection import OutputFnParameter, Projection
 from topo.base.parameterizedobject import ParameterizedObject
@@ -197,13 +197,26 @@ class LISSOM(JointNormalizingCFSheet):
     output_fn = OutputFnParameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
     precedence = Number(0.6)
     
+    post_initialization_weights_output_fn = CFPOutputFnParameter(default=None,
+       doc="""Weights output_fn which can be set after an initial normalization step""")
     
     def __init__(self,**params):
         super(LISSOM,self).__init__(**params)
         self.__counter_stack=[]
         self.activation_count = 0
         self.new_iteration = True
-        
+
+
+    def start(self):
+        self._normalize_weights()
+        if self.post_initialization_weights_output_fn is not None:
+            for proj in self.in_connections:
+                if not isinstance(proj,Projection):
+                    self.debug("Skipping non-Projection ")
+                else:
+                    proj.weights_output_fn=self.post_initialization_weights_output_fn 
+
+
     def input_event(self,conn,data):
         # On a new afferent input, clear the activity
         if self.new_iteration:
@@ -266,24 +279,7 @@ class LISSOM(JointNormalizingCFSheet):
   
 
 
-class OPTNORM(LISSOM):
-    """
-    LISSOM Sheet which can optionally turn off weight normalization after an initial normalization step.
-    """
-    norm_weights = BooleanParameter(default=True, doc="""
-       Whether or not to nomalize the weights after the initial normalization""")
-
-    def __init__(self,**params):
-        super(OPTNORM,self).__init__(**params)
-        
-    def start(self):
-        self._normalize_weights()
-        for proj in self.in_connections:
-            if not isinstance(proj,Projection):
-                self.debug("Skipping non-Projection ")
-            else:
-                if self.norm_weights == False:
-                    proj.weights_output_fn=topo.base.cf.CFPOF_Plugin(single_cf_fn=topo.outputfns.basic.IdentityOF())
 
                     
 
+ 
