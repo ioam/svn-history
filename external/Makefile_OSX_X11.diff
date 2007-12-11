@@ -5,7 +5,7 @@
  	echo ${PREFIX}
  	tar xzf ${PYTHON}.tgz
 -	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
-+	cd ${PYTHON}; patch -p0 < ../Python_OSX_X11.diff		
++	patch -p0 < Python_OSX_X11.diff		
 +	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-rpath,${PREFIX}/lib
  	cd ${PYTHON}; env PREFIX=${PREFIX} make 
  	cd ${PYTHON}; env PREFIX=${PREFIX} make install
