@@ -839,7 +839,7 @@ class ParameterizedObject(object):
 
     # CB: could we somehow have debug statements avoid *all*
     # processing unless debugging is active? Don't know if that's
-    # possible. Pass a string for eval()?
+    # possible. Pass a string for eval()? Use lambdas?
     # (E.g. how can we avoid evaluating expensive_fn() unless
     # debugging is on for things like self.debug("string
     # %s"%expensive_fn()) )
