@@ -831,7 +831,13 @@ class ParameterizedObject(object):
     def verbose(self,*args):
         """Print the arguments as a verbose message."""
         self.__db_print(VERBOSE,*args)
-        
+
+    # CB: could we somehow have debug statements avoid *all*
+    # processing unless debugging is active? Don't know if that's
+    # possible. Pass a string for eval()?
+    # (E.g. how can we avoid evaluating expensive_fn() unless
+    # debugging is on for things like self.debug("string
+    # %s"%expensive_fn()) )
     def debug(self,*args):
         """Print the arguments as a debugging statement."""
         self.__db_print(DEBUG,*args)
