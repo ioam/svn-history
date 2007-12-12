@@ -205,8 +205,9 @@ matplotlib-uninstall:
 PMW = Pmw
 PMW_UNINSTALL = ${PYTHON_LIB}/site-packages/Pmw
 
-pmw: ${PMW}.tgz python
+pmw: ${PMW}.tgz python Pmw.diff pmw-uninstall
 	tar xzf ${PMW}.tgz
+	cd ${PMW}; patch -p0 < ../Pmw.diff
 	cp -r ${PMW} ${PREFIX}/${PYTHON_LIB}/site-packages/Pmw
 	touch pmw
 

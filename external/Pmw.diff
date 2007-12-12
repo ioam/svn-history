@@ -1,0 +1,12 @@
+diff -Naur -x '*.pyc' -x '*~' -r Pmw/Pmw_1_2/lib/PmwBase.py ../lib/python2.5/site-packages/Pmw/Pmw_1_2/lib/PmwBase.py
+--- Pmw_1_2/lib/PmwBase.py	2003-05-17 10:14:08.000000000 -0400
++++ Pmw_1_2/lib/PmwBase.py	2007-12-11 15:14:15.000000000 -0500
+@@ -1774,7 +1774,7 @@
+     if type(exc_type) == types.ClassType:
+ 	# Handle python 1.5 class exceptions.
+ 	exc_type = exc_type.__name__
+-    msg = exc_type + ' Exception in Tk callback\n'
++    msg = exc_type.__name__ + ' Exception in Tk callback\n'
+     msg = msg + '  Function: %s (type: %s)\n' % (repr(func), type(func))
+     msg = msg + '  Args: %s\n' % str(args)
+ 
