@@ -400,10 +400,6 @@ class Composite(PatternGenerator):
         return generators
 
         
-
-        return generators
-    
-
     # JABALERT: To support large numbers of patterns on a large input region,
     # should be changed to evaluate each pattern in a small box, and then
     # combine them at the full Composite Bounding box size.
