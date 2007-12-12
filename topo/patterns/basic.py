@@ -390,12 +390,16 @@ class Composite(PatternGenerator):
         on these values and/or eliminate generators from this list
         if necessary.
         """
-        vals = (g.force_new_dynamic_value('x'),
-                g.force_new_dynamic_value('y'),
-                g.force_new_dynamic_value('size'),
-                g.force_new_dynamic_value('scale'),
-                g.force_new_dynamic_value('orientation'),
-                g.force_new_dynamic_value('offset'))
+        for g in generators:
+            vals = (g.force_new_dynamic_value('x'),
+                    g.force_new_dynamic_value('y'),
+                    g.force_new_dynamic_value('size'),
+                    g.force_new_dynamic_value('scale'),
+                    g.force_new_dynamic_value('orientation'),
+                    g.force_new_dynamic_value('offset'))
+        return generators
+
+        
 
         return generators
     
