@@ -579,7 +579,11 @@ class TopoConsole(TkguiWindow):
             
         topo.sim.run_and_time(fduration)
         self.auto_refresh()
-        
+
+
+    # CEBERRORALERT: Step button does strange things at time==0.
+    # E.g. for lissom_oo_or, nothing appears to happen. For
+    # hierarchical, runs to time==10.
     def run_step(self):
 
         if not topo.sim.events:
