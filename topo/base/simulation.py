@@ -1144,7 +1144,7 @@ class Simulation(ParameterizedObject):
 
                 if did_event:
                     did_event = False
-                    self.debug("Time to sleep; next event time: %s",self.timestr(self.events[0].time))
+                    #self.debug("Time to sleep; next event time: %s",self.timestr(self.events[0].time))
                     for ep in self._event_processors.values():
                         ep.process_current_time()
                     
