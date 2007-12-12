@@ -25,7 +25,8 @@ print '<table width="100%" cellpadding="5"><tr><td bgcolor="'.$banner_bg_color.'
   normalization across a Sheet's projections<BR> -->
   simulation can now be locked to real time<BR>
   added optional XML snapshot saving and loading (do 'make -C external gnosis')<BR>
-  
+  comprehensive support for dynamic parameter values<BR>  
+  updated to python 2.5<BR>
 </dd>
 <dt>Example scripts:</dt>
 <dd>
@@ -64,6 +65,10 @@ print '<table width="100%" cellpadding="5"><tr><td bgcolor="'.$banner_bg_color.'
   OutputFn class<BR>
   Pipeline OutputFns can now be constructed easily using +<BR>
   &nbsp;&nbsp;('x=HalfRectify() ; y=Square() ; z=x+y' gives 'z==PipelineOF(output_fns=x,y)')<BR>
+  New OutputFn classes for homeostatic plasticity and for tracking values over time<BR>
+  <!-- ScalingOF, AttributeTrackingOF? -->
+  Added post_initialization_weights_output_fn to LISSOM to allow
+  normalization to be turned off or changed after initialization<BR>
 </dd>
 </font>
 </dl>
