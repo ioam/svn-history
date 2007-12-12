@@ -121,7 +121,7 @@ class Dynamic(Parameter):
     """
     time_fn = None  
     
-    __slots__ = ['last_default','last_time']
+    __slots__ = ['last_default','last_time','_dynamically_generated']
     __doc__ = property((lambda self: self.doc))
 
         
@@ -137,8 +137,10 @@ class Dynamic(Parameter):
         if is_dynamic(self.default):
             self.last_default = None
             self._set_instantiate(True)
+            self._dynamically_generated = True
         else:
             self.last_default = self.default
+            self._dynamically_generated = False
 
 
     def _needs_update(self,obj):
@@ -179,14 +181,10 @@ class Dynamic(Parameter):
         # note that this code results in more loops than are
         # necessary, but it's simpler to understand.
 
-        # 2007/12/09 1540 CST: probably accounts for most of the
-        # current 7% difference in performance between lissom_oo_or
-        # now vs. before Number was changed to inherit from Dynamic
-        
-        if self._needs_update(obj):
-            return self._produce_value(obj)
+        if not self._value_is_dynamically_generated(obj) or not self._needs_update(obj):
+            return self._last_value(obj)  
         else:
-            return self._last_value(obj)
+            return self._produce_value(obj)
 
 
     def __set__(self,obj,val):
@@ -200,11 +198,17 @@ class Dynamic(Parameter):
             if not obj:
                 self.last_default = self.default
                 self._set_instantiate(False)
+                self._dynamically_generated = False
             else:
-                obj.__dict__[self.internal_name(obj)+'_last']=val
+                internal_name = self.internal_name(obj)
+                obj.__dict__[internal_name+'_last']=val
+                obj.__dict__[internal_name+'_dynamically_generated']=False
         else:
             if not obj:
                 self._set_instantiate(True)
+                self._dynamically_generated = True
+            else:
+                obj.__dict__[self.internal_name(obj)+'_dynamically_generated']=True
 
 
     def _last_value(self,obj):
@@ -229,7 +233,7 @@ class Dynamic(Parameter):
                 value = self.last_default
 
         return value
-    
+
 
     def _produce_value(self,obj):
         """
@@ -282,14 +286,12 @@ class Dynamic(Parameter):
         has one, otherwise inspects the parameter default value.
         """
         if not obj:
-            dynamic = is_dynamic(self.default)
-        else:
+            return self._dynamically_generated
+        else:            
             try:
-                dynamic = is_dynamic(obj.__dict__[self.internal_name(obj)])
+                return obj.__dict__[self.internal_name(obj)+"_dynamically_generated"]
             except KeyError:
-                dynamic = is_dynamic(self.default)
-                
-        return dynamic
+                return self._dynamically_generated
 
 
 

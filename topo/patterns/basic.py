@@ -390,10 +390,15 @@ class Composite(PatternGenerator):
         on these values and/or eliminate generators from this list
         if necessary.
         """
-        for g in generators:
-            vals = (g.x, g.y, g.size, g.orientation, g.scale, g.offset)
-        return generators
+        vals = (g.force_new_dynamic_value('x'),
+                g.force_new_dynamic_value('y'),
+                g.force_new_dynamic_value('size'),
+                g.force_new_dynamic_value('scale'),
+                g.force_new_dynamic_value('orientation'),
+                g.force_new_dynamic_value('offset'))
 
+        return generators
+    
 
     # JABALERT: To support large numbers of patterns on a large input region,
     # should be changed to evaluate each pattern in a small box, and then
@@ -490,11 +495,14 @@ class SeparatedComposite(Composite):
         valid_generators = []
         for g in generators:
             # Advance values as a side effect
-            vals = (g.size, g.orientation, g.scale, g.offset)
+            vals = (g.force_new_dynamic_value('size'),
+                    g.force_new_dynamic_value('scale'),
+                    g.force_new_dynamic_value('orientation'),
+                    g.force_new_dynamic_value('offset'))
             
             for trial in xrange(self.max_trials):
                 # Generate a new position (as a side effect) and add generator if it's ok
-                vals = (g.x, g.y)
+                vals = (g.force_new_dynamic_value('x'), g.force_new_dynamic_value('y'))
                 if alltrue([self.__distance_valid(g,v) for v in valid_generators]):
                     valid_generators.append(g)
                     break

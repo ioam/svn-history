@@ -75,7 +75,10 @@ def descendents(class_):
     return out[::-1]
 
 
-
+# CB: we could maybe reduce the complexity by doing something to allow
+# a parameter to discover things about itself when created (would also
+# allow things like checking a Parameter is owned by a
+# ParameterizedObject). I have some vague ideas about what to do.
 class Parameter(object):
     """
     An attribute descriptor for declaring parameters.
@@ -210,7 +213,7 @@ class Parameter(object):
     # __slots__, whether or not they define attributes not present in
     # the base Parameter class.  That's because a subclass will have
     # a __dict__ unless it also defines __slots__.
-    __slots__ = ['_attrib_name','default','doc','hidden','precedence','instantiate','constant']
+    __slots__ = ['_attrib_name','_internal_name','default','doc','hidden','precedence','instantiate','constant']
 
     ### JABALERT: hidden could perhaps be replaced with a very low
     ### (e.g. negative) precedence value.  That way by default the
@@ -277,6 +280,7 @@ class Parameter(object):
 
 
         self._attrib_name = None  # used to cache attrib_name
+        self._internal_name = None
         self.hidden=hidden
         self.precedence = precedence
         self.default = default
@@ -362,8 +366,8 @@ class Parameter(object):
         * if the Parameter has not actually been set on ths instance,
         then internal_name will not be in the instance's __dict__
         """
-        return '_%s_param_value'%self.attrib_name(obj,None)
-
+        return self._internal_name or '_%s_param_value'%self.attrib_name(obj,None)
+#        return self._internal_name or '_%s_param_value'%self.attrib_name(obj,None)
 
     def attrib_name(self,obj=None,objtype=None):
         """
@@ -399,6 +403,7 @@ class Parameter(object):
                     desc,desctype = class_.get_param_descriptor(attrib_name)
                     if desc is self:
                         self._attrib_name = attrib_name
+                        self._internal_name = "_%s_param_value"%attrib_name
                         return attrib_name
                     
         return '' # could maybe rewrite this method so it's clearer
@@ -935,6 +940,9 @@ class ParameterizedObject(object):
         return self.__shenma(name,self.inspect_value,"_%s_param_value_last"%name,'last_default')
 
 
+
+    # CB: these two methods are missing class equivalents; might actually be better not to have
+    # them
     def is_dynamically_generated(self,name):
         """
         Return True if the attribute is a parameter being dynamically
@@ -947,6 +955,17 @@ class ParameterizedObject(object):
             return False
         else:
             return param_obj._value_is_dynamically_generated(self)
+
+    def force_new_dynamic_value(self,name):
+        param_obj = self.params().get(name)
+
+        if not param_obj:
+            return getattr(self,name)
+        elif not hasattr(param_obj,'_produce_value') or not param_obj._value_is_dynamically_generated(self):
+            return param_obj.__get__(self,type(self))
+        else:
+            return param_obj._produce_value(self)
+            
         
 
     def __shenma(self,name,mthd,local_attr_name,param_attr_name):
