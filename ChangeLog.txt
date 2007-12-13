@@ -1,3 +1,933 @@
+2007-12-12  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* external/Pmw.diff 1.2: Fixed Pmw patch per Jeff's suggestion
+
+	* external/Makefile 1.96, external/Pmw.diff 1.1: Added Pmw patch
+	to fix bug in error reporting
+
+2007-12-12  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.116: Minor addition to
+	comment.
+
+	* topo/tkgui/topoconsole.py 1.252: Added ERRORALERT (about Step
+	button).
+
+	* topo/patterns/basic.py 1.127: Corrected a mistake in the
+	previous checkin.
+
+	* topo/patterns/basic.py 1.126: Fixed mistake in previous checkin.
+
+	* topo/base/parameterclasses.py 1.119,
+	topo/base/parameterizedobject.py 1.115, topo/patterns/basic.py
+	1.125: Intermediate checkin (anticipates some changes for when
+	Dynamic uses topo.sim.time() but doesn't change any current
+	results). Dynamic caches whether or not its value is being
+	dynamically generated; Parameter caches internal_name; added
+	force_new_dynamic_value() to ParameterizedObject;
+	SeparatedComposite uses force_new_dynamic_value().
+
+	* topo/base/parameterizedobject.py 1.114: Added comment.
+
+	* topo/base/simulation.py 1.121: Commented out expensive debug()
+	statement; improves performance of half-density lissom_oo_or by
+	about 4%.
+
+2007-12-11  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/pylabplots.py 1.53: added an option to
+	plot_tracked_attributes for putting a label on the y axis
+
+	* topo/sheets/lissom.py 1.79: Removed OPTNORM and added
+	post_initialization_weights_output_fn to LISSOM to allow the
+	weights outputfn to be changed after an initial normalization step
+
+	* topo/outputfns/homeostatic.py 1.33: Changed ScalingOF and
+	JointScalingOF to calculate scaling factor with old
+	average. Corrected JointScalingOF to scale individual projection
+	activities rather than totals
+
+2007-12-11  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* external/Makefile_OSX_X11.diff 1.2: Fixed path error in original
+	checkin.
+
+	* Makefile 1.141: Added osx-x11-patch.
+
+	* external/Python_OSX_X11.diff 1.1, external/Makefile_OSX_X11.diff
+	1.1: For building Python with X11 Tkinter on OS X.
+
+2007-12-10  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/projection.py 1.101, topo/base/sheet.py 1.126,
+	topo/outputfns/basic.py 1.74, topo/outputfns/homeostatic.py 1.32:
+	Cleaned up docs and spacing
+
+	* topo/commands/basic.py 1.84: Removed duplicate processing of
+	ProjectionSheets
+
+2007-12-10  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/pylabplots.py 1.52: Fixed bug in
+	plot_tracked_attributes to plot the correct time values
+
+	* topo/sheets/lissom.py 1.78: added new OPTNORM lissom sheet which
+	can optionally turn off normalization after an initial
+	normalization step
+
+	* topo/outputfns/homeostatic.py 1.31: added new ScalingOF and
+	JointScalingOF, added stop_updating and restore_updating functions
+	to allow freezing of state during e.g. pattern_present
+
+	* topo/outputfns/basic.py 1.73: added stop_updating and
+	restore_updating functions to AttributeTrackingOF and
+	ActivityAveragingOF to allow freezing if their state during
+	e.g. pattern_present
+
+	* topo/commands/basic.py 1.83: replaced turning learning flag off
+	in pattern_present with calling stop_updating() and
+	restore_updating()
+
+	* topo/base/sheet.py 1.125: added stop_updating and
+	restore_updating functions to Sheet to allow learning to be turned
+	off during e.g. pattern_present
+
+	* topo/base/projection.py 1.100: added stop_updating and
+	restore_updating functions to Projection and ProjectionSheet to
+	allow freezing of their state during e.g. pattern_present
+
+	* topo/base/functionfamilies.py 1.22: added stop_updating and
+	restore_updating functions to OutputFn and PipelineOF to allow
+	functions with state to freeze their state during
+	e.g. pattern_present
+
+2007-12-09  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.113: Cache the result of
+	params() because we call it often (via __repr__).
+
+	* topo/base/parameterclasses.py 1.118: Added some comments.
+
+	* topo/base/parameterclasses.py 1.117: Removed is_iterator() - we
+	only care if the object has a next() method.
+
+	* topo/base/parameterclasses.py 1.116: Improve speed of
+	is_iterator() by replacing 'x in dir(obj)' with hasattr(obj,x) (no
+	visible change).
+
+	* topo/misc/utils.py 1.52: Added comment.
+
+2007-12-08  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/utils.py 1.51: Fixed typo in code from last commit.
+
+	* topo/misc/utils.py 1.50: profile() uses cProfile (python
+	2.5). (If cProfile can't be imported, the previous profile
+	function - now old_profile() - is used.)
+
+	* external/.cvsignore 1.35: Upgraded several packages.
+
+	* external/Makefile 1.95: Upgraded to Python 2.5.1
+
+	* external/Makefile 1.94: Upgraded pylint.
+
+	* external/pychecker-0.8.16.tar.gz 1.2: Upgraded to current cvs
+	version.
+
+	* external/Makefile 1.93: Uncommented and finished logilab-astng
+	target.
+
+	* topo/base/parameterclasses.py 1.115,
+	topo/base/parameterizedobject.py 1.112: Set instantiate through a
+	method because its value can also depend on constant.
+
+	* topo/tests/__init__.py 1.27: Minor cleanup - should be no
+	changes to behavior.
+
+	* external/Gnosis_Utils-1.2.1.tar.gz 1.2: Upgraded.
+
+2007-12-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.140: Renamed osx-patch-clean to osx-patch-uninstall.
+
+2007-12-07  rczhao  <rczhao@lodestar.inf.ed.ac.uk>
+
+	* external/Makefile 1.92: Rolled back to older version of pytables
+	as the latest version 2.0.2 doesn't work for numpy 1.0.2 currently
+	installed on Topographica
+
+	* external/pytables-20070518.tar.gz 1.3: Rolled back to this old
+	version as the latest 2.0.2 version has to be run with numpy 1.0.3
+	but current numpy in Topographica is 1.0.2.
+
+2007-12-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterclasses.py 1.114: Undid
+	keep-instantiate-updated change (causes surprising behavior);
+	intermediate checkin.
+
+	* topo/tkgui/parametersframe.py 1.147: Minor simplification - no
+	visible change.
+
+2007-12-07  rczhao  <rczhao@lodestar.inf.ed.ac.uk>
+
+	* external/Makefile 1.91: Updated pytables and hdf5 building
+	commands so that they can be built properly now.
+
+	* external/hdf5-1.6.6.tar.gz 1.1: Utility for managing extremely
+	large and complex data collections. Required for pytables
+
+	* external/pytables-2.0.2.tar.gz 1.1: A Python-HDF5 interface,
+	enabling hierarchical dataset for handling large amounts of
+	datasets
+
+	* external/pytables-20070518.tar.gz 1.2: To be replaced by latest
+	version 2.0.2
+
+2007-12-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/tkparameterizedobject.py 1.126: Minor cleanup - no
+	visible change.
+
+2007-12-07  rczhao  <rczhao@lodestar.inf.ed.ac.uk>
+
+	* facespace/aam_fit.pyx 1.2, facespace/face_space_patterns.py 1.3:
+	Fixed a bug in generating faces.
+
+	* facespace/face_space.ty 1.3: Removed OutputFnDebugger
+
+2007-12-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.146,
+	topo/tkgui/tkparameterizedobject.py 1.125: Removed unnecessary
+	parameters() function.
+
+	* topo/tkgui/tkparameterizedobject.py 1.124: Use
+	ParameterizedObject's is_dynamically_generated() method.
+
+	* topo/base/parameterizedobject.py 1.111: Fixed error in
+	is_dynamically_generated().
+
+	* topo/tests/testDynamicParameter.txt 1.10: Test
+	'is_dynamically_generated'.
+
+	* topo/base/parameterizedobject.py 1.110: Added convenience method
+	'is_dynamically_generated()' to ParameterizedObject.
+
+	* topo/base/parameterclasses.py 1.113: Renamed a method.
+
+	* topo/base/parameterclasses.py 1.112: Fixed ERRORALERT in Number.
+
+	* topo/tests/testNumberParameter.txt 1.1: Initial version.
+
+	* topo/base/parameterclasses.py 1.111: Added ERRORALERT for
+	Number.
+
+	* topo/base/parameterizedobject.py 1.109: Removed unused
+	Parameter.count.
+
+	* topo/base/parameterclasses.py 1.110: Added some documentation to
+	Dynamic's methods and made a minor simplification (should be no
+	change to behavior).
+
+2007-12-06  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterclasses.py 1.109: Added comment and made
+	minor simplification.
+
+	* topo/tests/testDynamicParameter.txt 1.9: Added tests of time_fn.
+
+	* topo/tests/testDynamicParameter.txt 1.8: Added more tests to
+	show Dynamic's behavior.
+
+	* topo/base/parameterclasses.py 1.108: Dynamic: now keeps
+	instantiate up to date for the default value.
+
+2007-12-06  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* external/.cvsignore 1.34: Updated Gnosis version
+
+	* external/Gnosis_Utils.diff 1.1, external/Makefile 1.90: Added
+	patch for gnosis xml to avoid spurious 'FATAL ERROR <unknown>:1:0:
+	not well-formed (invalid token)' message when testing whether a
+	snapshot is xml or not
+
+2007-12-06  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* external/Makefile 1.89: Added commented-out (and unfinished)
+	section for logilab-astng, required for new version of pylint.
+
+	* external/logilab-astng-0.17.1.tar.gz 1.1: From www.logilab.org.
+
+	* doc/buildbot/pycheckrc 1.4: Special methods have been added to
+	pychecker now. limit now defaults to a low number - we need it to
+	be higher.
+
+	* external/Makefile 1.88: Upgrade to CVS version of pychecker.
+
+	* external/pychecker-0.8.18-CVS-200712061936.tar.gz 1.1: From
+	pychecker.cvs.sf.net (time is CST by mistake).
+
+	* external/logilab-common-0.25.0.tar.gz 1.1,
+	external/pylint-0.13.2.tar.gz 1.1: From logilab.org.
+
+	* external/Makefile 1.87: Removed copy-and-paste errors (epydoc
+	and docutils don't depend on common).
+
+	* topo/base/parameterizedobject.py 1.108: Minor simplification -
+	no visible change.
+
+	* topo/base/parameterizedobject.py 1.107: Clarified 'gensym'.
+
+2007-12-05  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/utils.py 1.49: Moved misplaced alert
+
+2007-12-05  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/pylabplots.py 1.51: renamed param_names as
+	attrib_names
+
+	* examples/lissom_oo_or_noshrinking.ty 1.15: changed param_names
+	to attrib_names in AttributeTrackingOF
+
+	* topo/outputfns/basic.py 1.72: added learning parameter to
+	AttributeTrackingOF and ActivityAveragingOF so that tracking and
+	averaging can be turned off during map measurement, renamed
+	param_names to attrib_names in AttributeTrackingOF
+
+	* topo/commands/basic.py 1.82: Fixed pattern_present so that sheet
+	and projection output_fns learning parameter can be set to false
+	even when embedded in a PipelineOF
+
+2007-12-04  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.106: Added ERRORALERT.
+
+	* topo/base/parameterizedobject.py 1.105: Removed caching of
+	Parameter's _internal_name (makes code a little simpler).
+
+	* topo/base/parameterizedobject.py 1.104: Removed a comment,
+	modified another.
+
+	* topo/base/parameterclasses.py 1.107: Renamed get_name() to
+	internal_name().
+
+	* topo/base/parameterizedobject.py 1.103: Updated documentation
+	for Parameter. Simplified Parameter 'name' in the code and
+	documentation. (Removed ALERT about instantiating constant
+	parameters.)
+
+2007-12-03  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or_noshrinking.ty 1.14: made compatible with
+	new AttributeTrackingOF which replaces OutputFnDebugger
+
+	* topo/commands/pylabplots.py 1.50: made compatible with changes
+	to AttributeTrackingOF
+
+	* topo/outputfns/homeostatic.py 1.30: moved AttributeTrackingOF
+	and ActivityAveragingOF to outputfns/basic
+
+	* topo/outputfns/basic.py 1.71: added AttributeTrackingOF and
+	ActivityAveragingOF moved from topo/outputfns/homeostatic
+
+2007-12-03  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Developer_Manual/coding_text.php 1.6: Added minor
+	clarification
+
+2007-12-03  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or_noshrinking.ty 1.13: Replaced
+	OutputFnDebugger with ValueTrackingOutputFn for debugging
+
+	* topo/commands/pylabplots.py 1.49: corrected errors in
+	plot_values
+
+	* topo/outputfns/homeostatic.py 1.29: minor change to
+	documentation
+
+	* topo/commands/pylabplots.py 1.48: changed plot_values to be
+	compatible with new ValueTrackingOutputFn
+
+	* topo/outputfns/homeostatic.py 1.28: Made new
+	ValueTrackingOutputFn which keeps track of parameter values for
+	debugging. Added AvgScalingOutputFn which keeps track of average
+	activities and calculates scaling factor for homeostatic scaling
+
+	* topo/commands/pylabplots.py 1.47: Added plot_values function for
+	plotting or saving time series data from output functions
+
+2007-12-03  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/outputfns/homeostatic.py 1.27: Untested cleanup; should
+	work the same as the previous revision
+
+2007-12-03  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/outputfns/homeostatic.py 1.26: Cleaned up OutputFnDebugger,
+	removed plotting imports
+
+2007-12-02  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulation.py 1.120: Added commented-out lines to set
+	Dynamic's time_fn.
+
+	* topo/base/parameterclasses.py 1.106: Demo code to allow us to
+	try Dynamic parameters that only advance once per simulation
+	time. (Actually the time_fn can be any function.) Needs pretty big
+	cleanup if we decide to keep this.
+
+	* topo/base/parameterizedobject.py 1.102: Removed code to look for
+	a parameter object in a ParameterizedObject instance's dict, since
+	Dynamic parameters are not longer stored that way (i.e. no more
+	DynamicNumber inside a Number).
+
+	* topo/base/parameterizedobject.py 1.101: Moved
+	ParameterizedObjectMetaclass.print_param_defaults() to
+	ParameterizedObject (as a classmethod).
+
+	* examples/hierarchical.ty 1.73: classparams() is now just
+	params().
+
+	* topo/tkgui/tkparameterizedobject.py 1.123: No longer need to
+	distinguish classparams() and params().
+
+	* topo/base/parameterizedobject.py 1.100: Removed
+	ParameterizedObjectMetaclass.classparams() and made
+	ParameterizedObject.params() be a classmethod.
+
+	* topo/tkgui/tkparameterizedobject.py 1.122: Updates to match
+	changes to Dynamic.
+
+	* topo/tests/testDynamicParameter.txt 1.7: Tests use Dynamic
+	rather than Number. Changed tests to reflect possible
+	instantiation of Dynamic parameters.
+
+	* topo/base/parameterizedobject.py 1.99: Minor updates to match
+	changes to Dynamic. Added some (unrelated) comments.
+
+	* topo/base/parameterclasses.py 1.105: (Intermediate checkin.)
+	Dynamic parameters have instantiate set to True if created with a
+	dynamic default value. (No-effect 'update_fn' added, too, because
+	some reorganization got mixed up with fixing instantiation.)
+
+2007-12-01  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.139: Added gui-tests target.
+
+	* doc/buildbot/master.cfg 1.8: Use make osx-patch on sake. Update
+	basic-gui-tests to gui-tests.
+
+	* topo/tests/testDynamicParameter.txt 1.6: Added test to show bug
+	in current Dynamic parameter implementation.
+
+	* topo/base/parameterclasses.py 1.104: Added ERRORALERT about
+	Dynamic's _dynamic slot.
+
+	* topo/tkgui/tkparameterizedobject.py 1.121: Use
+	EditableOptionMenu instead of OptionMenu (though not yet taking
+	advantage of the editable list). Added gui_set_param() and
+	gui_get_param() methods.
+
+	* topo/tkgui/testpattern.py 1.104: Changed 'present' parameter to
+	'Present' for consistency. (I have been naming ButtonParameters
+	with a capital letter, but will probably revert them all to
+	lowercase sometime soon.)
+
+	* topo/tkgui/widgets.py 1.25: Added get() and set() to
+	EditableOptionMenu (for consistency with other widgets).
+
+	* topo/tests/testparametersframe.py 1.13: The OptionMenu we use
+	now has get().
+
+	* topo/misc/commandline.py 1.67: Added ALERT about topographica
+	not staying open.
+
+	* Makefile 1.138: Use gui_tests.py for running the GUI
+	tests. Added detailed-gui-tests target.
+
+	* topo/tests/gui_tests.py 1.1: Initial version. run_detailed()
+	fails right now because it shows a test pattern bug.
+
+2007-11-30  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Reference_Manual/index_text.php 1.27, external/Makefile
+	1.86: Added building instructions for Player
+
+2007-11-30  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/outputfns/homeostatic.py 1.25: Removed plotting from
+	OutputFnDebugger, changed so that parameters are now stored in a
+	values dictionary as a list of (time, value) pairs which is
+	extendable to any length
+
+2007-11-30  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/playerrobot.py 1.3: Minor clarification
+
+	* topo/misc/robotics.py 1.2: Cleaned up comments and whitespace.
+	Fixed syntax error in version string.
+
+	* topo/misc/playerrobot.py 1.2: Cleaned up docs and whitespace
+
+	* topo/outputfns/homeostatic.py 1.24: Made OutputFnDebugger have a
+	default function of None, so that non-existing parameters will
+	generate errors.  Merged its debug_dict and avg_dict, in
+	preparation for defining a standard interface and separating
+	plotting out
+
+	* topo/outputfns/homeostatic.py 1.23: Removed stray unused
+	function
+
+	* topo/outputfns/homeostatic.py 1.22: Merged save_debug_graphs
+	into plot_debug_graphs, making plot_debug_graphs save to disk if
+	an optional filename parameter is supplied
+
+	* topo/outputfns/homeostatic.py 1.21: Simplified OutputFnDebugger
+	by eliminating duplicate for loops
+
+	* topo/outputfns/homeostatic.py 1.20: Fixed parameter default
+	handling for OuputFnDebugger, and made output files be saved in
+	the appropriate directory
+
+	* topo/outputfns/homeostatic.py 1.19: Restored penultimate
+	version; had mistakenly removed some imports
+
+2007-11-30  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterclasses.py 1.103: Minor change to comment.
+
+	* topo/tests/testplotgrouppanel.py 1.18: Use startgui() function.
+
+	* topo/tests/__init__.py 1.26: Added some documentation. Cleanup
+	of run() and run_named().
+
+	* topo/tkgui/__init__.py 1.45: Added option to suppress printing
+	'Launching GUI'.
+
+	* topo/tests/testsheet.py 1.51: Reorganized so that tests no
+	longer run identically twice (should reduce 'make tests'
+	time). Renamed 'slice' to 'slice_' where 'slice' was being used as
+	a variable name. Added a little documentation
+
+2007-11-29  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or_scaling.ty 1.4,
+	topo/outputfns/homeostatic.py 1.18:
+	examples/lissom_oo_or_scaling.ty
+
+	* topo/sheets/lissom.py 1.77: removed SLISSOM sheet
+
+	* topo/projections/basic.py 1.64: Removed DebugDFProjection
+
+2007-11-29  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or_scaling.ty 1.3: Cleaned up docstring
+
+	* topo/outputfns/homeostatic.py 1.17: Cleaned up whitespace and
+	comments
+
+	* topo/outputfns/basic.py 1.70: Removed references to 'activity'
+	and cleaned up PoissonSample documentation
+
+	* topo/outputfns/basic.py 1.69: Minor tweak
+
+	* topo/outputfns/basic.py 1.68: Minor update to docstring
+
+2007-11-29  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.98: Tried to simplify and
+	document inspect_value() and repr_value(). Should be no visible
+	change.
+
+	* topo/tests/testCompositeParameter.txt 1.2: Added test that
+	Composite is ok with Dynamic (test should really be elsewhere).
+
+	* topo/base/parameterclasses.py 1.102: Removed ERRORALERT (fixed
+	elsewhere).
+
+	* topo/base/parameterizedobject.py 1.97: Updated repr_value() and
+	inspect_value() to handle CompositeParameter.
+
+	* topo/base/parameterizedobject.py 1.96: Simplified repr_value().
+
+	* topo/base/parameterizedobject.py 1.95: In repr_value(),
+	corrected how to find a Parameter object in the
+	ParameterizedObject class hierarchy.
+
+	* topo/tests/testDynamicParameter.txt 1.5: Added test for
+	repr_value().
+
+	* topo/tests/testDynamicParameter.txt 1.4: Added test for Dynamic
+	parameter shared by instances of a class.
+
+	* topo/base/parameterclasses.py 1.101: Dynamic parameter not
+	forced to instantiate.
+
+	* topo/base/parameterizedobject.py 1.94: Cleaned up repr_value()
+	so that it also works for Parameters set on a class.
+
+	* topo/base/parameterclasses.py 1.100: Added ERRORALERT.
+
+	* topo/base/parameterizedobject.py 1.93: Fixed bug in repr_value()
+	where dynamic values were being advanced (dict.get default value
+	is looked up even if not being used). (Same bug existed in the
+	past, but that was caused by Parameter instances sharing
+	last_value.)
+
+	* topo/tests/__init__.py 1.25: Small cleanup of run_named().
+
+	* topo/tests/testpatterngenerator.py 1.19,
+	topo/tests/testpatternpresent.py 1.19,
+	topo/tests/testtemplateplotgrouppanel.py 1.14,
+	topo/tests/testcfsom.py 1.37: No longer uses DynamicNumber to wrap
+	a number generator.
+
+	* topo/tests/testDynamicParameter.txt 1.3, topo/patterns/basic.py
+	1.124, topo/outputfns/basic.py 1.67: Change from DynamicNumber to
+	Number.
+
+	* topo/commands/basic.py 1.81: Updated documentation regarding
+	Dynamic parameters.
+
+	* topo/base/parameterclasses.py 1.99: Turn of warnings about
+	changed Dynamic parameters for the moment.
+
+	* topo/base/parameterclasses.py 1.98: Fixed minor typo.
+
+	* examples/hierarchical.ty 1.72: Updated to use dynamic Number
+	rather than DynamicNumber (as first example of how syntax
+	changes).
+
+	* topo/patterns/image.py 1.71: Removed unused import.
+
+	* topo/tests/testDynamicParameter.txt 1.2: Suppress Dynamic
+	warnings and show that DynamicNumber declared in a class by adding
+	doc string.
+
+	* topo/tkgui/parametersframe.py 1.145: Some reorganization and
+	support for regridding a parameter. Intermediate checkin.
+
+	* topo/tkgui/tkparameterizedobject.py 1.120: Updates for changes
+	to Dynamic and DynamicNumber. Added repack_param()
+	(untested). Intermediate checkin, but Dynamic parameters are
+	working (not all features can be invoked graphically yet).
+
+	* topo/plotting/palette.py 1.13: Replaced lambda-in-a-parameter
+	with a callable class. (Dynamic parameters are always
+	instantiated.)
+
+	* topo/base/parameterizedobject.py 1.92: Updated inspect_value()
+	with changes to Dynamic parameters. Added repr_value() (name to be
+	changed) to return the value of a parameter in a form that allows
+	the parameter to be recreated. New Dynamic-support code not yet
+	finished, but appears to be working so far.
+
+	* topo/base/parameterclasses.py 1.97: Updated Dynamic: has
+	_dynamic and last_value slots. _dynamic is set to True if the
+	Dynamic's value is callable or is an iterator (i.e. is dynamic). A
+	Dynamic Parameter's last_value is stored inside the Parameter
+	itself when the Parameter is only set on the class, but is stored
+	as _X_param_value_last in the owning *object* if the Parameter's
+	value has been set on the object (might not be final). Number now
+	inherits from Dynamic. If Number is set to a dynamic value, the
+	bounds are checked at __get__ time rather than at __set__ time
+	(which is what happens for non-dynamic values). Replaced
+	DynamicNumber with a dummy that fills the two previous (distinct)
+	uses (i.e. it replaces class Parameter declarations of
+	DynamicNumber with Number, and it replaces using DynamicNumber to
+	wrap number generators as values for Number parameters). New
+	Dynamic code not yet finished, but appears to be working so far.
+
+2007-11-28  jprovost  <jprovost@lodestar.inf.ed.ac.uk>
+
+	* topo/outputfns/basic.py 1.66: Added comment to PoissonSample OF
+	class.
+
+	* topo/misc/traces.py 1.5: Renamed TraceSpecification to Trace
+
+2007-11-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testDynamicParameter.txt 1.1: Initial version. Shows
+	a current flaw (i.e. fails right now) and has some checks for when
+	new Dynamic parameter committed (yet to happen).
+
+2007-11-28  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulation.py 1.119: Added docstring
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.35: Fixed minor problems
+	found by John Davey
+
+2007-11-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/__init__.py 1.24: Added support for running a single
+	named doctest file.
+
+	* topo/tests/testpatterngenerator.py 1.18: Added test to show a
+	bug (currently test fails).
+
+2007-11-27  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/index_text.php 1.57: Update to Mac OS X build
+	instructions.
+
+	* topo/tests/testsheet.py 1.50: Updated Slice.tuple() to
+	Slice.as_tuple().
+
+	* topo/base/sheet.py 1.124: (Slice) Minor cleanup of
+	documentation. Added __getitem__ method. Made some methods
+	private. Renamed tuple() to as_tuple(). Changed
+	'coordinate_transformer' to 'sheet_coordinate_system'.
+
+	* topo/base/sheetcoords.py 1.14: Made some methods private.
+
+	* external/matplotlib-0.90.0.tar.gz 1.3: Upgraded to
+	matplotlib-0.90.1
+
+	* Makefile 1.137: Undid part of previous commit - can't have the
+	osx-patch file in a different directory.
+
+	* Makefile 1.136: Added target osx-patch-clean (in case someone
+	wants to remove the patch). Moved osx-patch file to external/ so
+	it doesn't clutter the topographica directory.
+
+2007-11-26  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/sheets/saccade.py 1.7: Trivial cleanup of whitespace
+
+	* topo/base/parameterizedobject.py 1.91: Clarified __is_abstract
+	docstring
+
+2007-11-26  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.135: Added osx-patch target (for patching
+	external/Makefile's python building command.
+
+	* doc/Future_Work/current_text.php 1.330: Minor additions.
+
+	* doc/buildbot/master.cfg 1.7: 4-hourly tests changed to be
+	8-hourly. xvfb-run gets display automatically.
+
+	* doc/Future_Work/current_text.php 1.329: Added first draft of
+	procedure to convert from CVS to SVN.
+
+	* external/Python-2.5.1.tgz 1.1: From python.org
+
+2007-11-25  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/teststimuli.py 1.4: Fixed version control string
+
+2007-11-25  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulation.py 1.118: Cleaned up exception printing in
+	CommandEvent.
+
+	* topo/base/simulation.py 1.117: Added a comment.
+
+	* topo/base/simulation.py 1.116: Altered some of SimSingleton's
+	wrapper methods to call actual_sim's methods directly.
+
+	* topo/base/simulation.py 1.115: Allow 'x in topo.sim' syntax.
+
+	* doc/Future_Work/current_text.php 1.328: IPython tasks moved to
+	tracker.
+
+	* topo/base/parameterizedobject.py 1.90: Added comment to
+	__is_abstract().
+
+2007-11-25  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testimage.py 1.10, topo/tests/testsheetview.py 1.20,
+	examples/lissom_oo_or_scaling.ty 1.2, examples/lissom_photo_or.ty
+	1.12, examples/saccade_demo.ty 1.11, topo/patterns/basic.py 1.123,
+	topo/patterns/image.py 1.70: Changed users of FileImage to use the
+	current name
+
+	* examples/lissom_oo_or_dy_photo.ty 1.10: Fixed broken import
+
+2007-11-25  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.89: Fixed minor typo
+
+	* topo/commands/analysis.py 1.139, topo/patterns/teststimuli.py
+	1.3, topo/responsefns/projfns.py 1.24,
+	topo/sheets/generatorsheet.py 1.60: Removed unused import.
+
+	* doc/buildbot/.pycheckrc 1.2: Moved to pycheckrc.
+
+2007-11-23  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.88: Simplified abstract
+	property slightly
+
+	* topo/patterns/image.py 1.69: Renamed Image to FileImage, keeping
+	old name for compatibility.  Minor cleanup of whitespace and docs
+
+	* topo/base/arrayutils.py 1.29: Minor fix to whitespace
+
+	* Makefile 1.134: Added lint-base target, and disabled some
+	spurious warnings for lint
+
+2007-11-23  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.267,
+	topo/tkgui/projectionpanel.py 1.160: Simplified denotion of an
+	abstract class.
+
+	* topo/tests/testparameterizedobject.py 1.5: Simplified denotion
+	of an abstract class and added test that non-abstract class has
+	abstract=False.
+
+	* topo/misc/numbergenerators.py 1.21, topo/misc/traces.py 1.4,
+	topo/patterns/image.py 1.68, topo/patterns/random.py 1.34,
+	topo/plotting/plotgroup.py 1.236, topo/base/boundingregion.py
+	1.39, topo/base/cf.py 1.105, topo/base/functionfamilies.py 1.21,
+	topo/base/parameterclasses.py 1.96,
+	topo/base/parameterizedobject.py 1.87,
+	topo/base/patterngenerator.py 1.112, topo/base/projection.py 1.99,
+	topo/base/sheet.py 1.123, topo/base/simulation.py 1.114,
+	topo/coordmapperfns/basic.py 1.16, topo/learningfns/som.py 1.21:
+	Simplified denotion of an abstract class.
+
+	* topo/tests/testparameterizedobject.py 1.4: Added test for
+	abstract class.
+
+	* topo/base/simulation.py 1.113: Removed unused variable.
+
+	* Makefile 1.133: Moved pychecker commandline options (except
+	--config) to pycheckrc.
+
+	* doc/buildbot/pycheckrc 1.3: Moved pychecker commandline options
+	from Makefile to pycheckrc. Globally suppress warning about empty
+	__slots__ and __get__/__set__ not being special.
+
+	* topo/base/cf.py 1.104: (CFPOF_Plugin) Removed unused variable,
+	and out-of-date documentation.
+
+	* doc/buildbot/pycheckrc 1.2: Added a suppression (as a comment,
+	because I'm not yet sure how best to make suppressions work), and
+	made the existing suppression more specific.
+
+	* topo/base/simulation.py 1.111: Renamed a variable that's the
+	same as a builtin.
+
+	* topo/base/parameterclasses.py 1.95: Renamed variable that had
+	the same name as a built-in function.
+
+	* topo/base/arrayutils.py 1.28: Renamed a variable that had the
+	same name as a builtin function.
+
+	* Makefile 1.132, doc/buildbot/pycheckrc 1.1: Moved .pycheckrc to
+	pycheckrc.
+
+2007-11-22  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/outputfns/homeostatic.py 1.16: corrected bug in
+	OutputFnDebugger
+
+	* topo/sheets/lissom.py 1.76: added new SLISSOM sheet which allows
+	scaling of projection activities for use with
+	lissom_oo_or_scaling.ty
+
+	* examples/lissom_oo_or_scaling.ty 1.1: Simulation based on
+	lissom_oo_or_noshrinking with added homeostatic synaptic scaling
+
+2007-11-22  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/cf.py 1.103: Removed unused variable (no visible change).
+
+2007-11-21  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.34: Fixed typo.
+
+2007-11-21  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/projections/basic.py 1.63: added a new projection for debugging
+
+2007-11-21  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/buildbot/master.cfg 1.6: doozy tests now run with xvfb-run
+
+2007-11-20  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or_noshrinking.ty 1.12:
+	removed adapting homeostatic rule
+
+	* topo/outputfns/homeostatic.py 1.15:
+	added option for saving debugging graphs
+
+2007-11-20  James Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Home/news_text.php 1.2: Updated with news since 0.9.4
+
+	* topo/outputfns/basic.py 1.65: Minor cleanup of docs
+
+	* ChangeLog.txt 1.26: Added recent changes
+
+	* doc/Home/oldnews_text.php 1.7: Moved 0.9.4 to old news
+
+	* doc/Makefile 1.21: Fixed bug in previous checkin
+
+	* doc/Home/.cvsignore 1.3, doc/Downloads/.cvsignore 1.5: More to ignore
+
+	* doc/Future_Work/current_text.php 1.327:
+	More notes on how to specify real-world units
+
+	* doc/shared/index.php 1.41, doc/Home/news_text.php 1.1, doc/Makefile 1.20:
+	Made separate file for news
+
+2007-11-20  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.326:
+	Removed all the pychecker output and restored general task description.
+
+	* topo/base/sheet.py 1.122: Added to comment.
+
+	* Makefile 1.131:
+	check-base: added --stdlib to ignore warnings from files in standard library (I think that includes site-packages/)
+
+	* Makefile 1.130:
+	Added check-base section for running pychecker on topo.base.
+
+	* doc/buildbot/.pycheckrc 1.1: Initial version.
+
+	* doc/Future_Work/current_text.php 1.325:
+	Removed bogus pychecker output: the Slice class implements __iter__, which is enough for unpacking.
+
+	* topo/base/sheet.py 1.121: Added note.
+
+	* topo/base/cf.py 1.102:
+	What should have happened in the previous commit.
+
+	* doc/Future_Work/current_text.php 1.324: Fixed pychecker problem.
+
+	* topo/base/arrayutils.py 1.27:
+	Explicity pass 0,0 to complex() (at least currently, complex()==complex(0,0)).
+
+	* topo/tkgui/parametersframe.py 1.144: Altered a comment.
+
+	* doc/Future_Work/current_text.php 1.323: Fixed pychecker problems.
+
+	* topo/base/parameterclasses.py 1.94:
+	Fixed comparisons with True and False.
+
+	* topo/base/cf.py 1.101: Fixed comparison with True.
+
+	* doc/Future_Work/current_text.php 1.322:
+	Fixed a pychecker problem in parameterizedobject.py (v1.85).
+
+	* doc/Future_Work/current_text.php 1.321:
+	Added back revised pychecker task.
+
+	* topo/base/parameterizedobject.py 1.86:
+	Removed unused abtract_class argument from ParameterizedObject.__init__.
+
+	* topo/base/parameterizedobject.py 1.85:
+	Changed parameter-deletion's string error to TypeError.
+
 2007-11-20  ceball  <ceball@lodestar.inf.ed.ac.uk>
 
 	* doc/Future_Work/current_text.php 1.326: Removed all the
