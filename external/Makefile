@@ -545,7 +545,7 @@ BWIDGET = pybwidget-0.1.2_1.8.0
 BWIDGET_UNINSTALL += share/pybwidget 
 BWIDGET_UNINSTALL += ${PYTHON_LIB}/site-packages/bwidget
 
-bwidget: ${BWIDGET}.tar.gz python tcl tk
+bwidget: ${BWIDGET}.tar.gz python
 	tar xzf ${BWIDGET}.tar.gz
 	cd ${BWIDGET}; ${PREFIX}/bin/python setup.py install
 	touch bwidget
