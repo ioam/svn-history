@@ -65,5 +65,24 @@ class TestParameterizedObject(unittest.TestCase):
         self.assertEqual(TestPO.abstract,False)
 
 
+    def test_params(self):
+
+        ## basic test
+        # CB: test not so good because it requires changes if params of PO are changed
+        assert 'name' in ParameterizedObject.params()
+        assert 'print_level' in ParameterizedObject.params()
+        assert len(ParameterizedObject.params())==2
+
+        ## check for bug where subclass Parameters were not showing up if params() already
+        # called on a super class.
+        assert 'inst' in TestPO.params()
+        assert 'notinst' in TestPO.params()
+
+        ## check caching
+        assert ParameterizedObject.params() is ParameterizedObject().params(), "Results of params() should be cached." # just for performance reasons
+
+
+
+
 suite = unittest.TestSuite()
 suite.addTest(unittest.makeSuite(TestParameterizedObject))

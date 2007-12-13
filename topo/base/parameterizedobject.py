@@ -1082,18 +1082,22 @@ class ParameterizedObject(object):
         Includes Parameters from this class and its
         superclasses.
         """
-        # CB: we cache the parameters in cls._params because this
-        # method is called often, and new parameters cannot be added
-        # (or deleted)
+        # CB: we cache the parameters because this method is called
+        # often, and new parameters cannot be added (or deleted)
         try:
-            return cls._params
+            return getattr(cls,'_%s__params'%cls.__name__)
         except AttributeError:
             paramdict = {}
             for class_ in classlist(cls):
                 for name,val in class_.__dict__.items():
                     if isinstance(val,Parameter):
                         paramdict[name] = val
-            type.__setattr__(cls,'_params',paramdict)
+
+            # We only want the cache to be visible to the cls on which
+            # params() is called, so we mangle the name ourselves at
+            # runtime (if we were to mangle it now, it would be
+            # _ParameterizedObject.__params for all classes).
+            type.__setattr__(cls,'_%s__params'%cls.__name__,paramdict)
             return paramdict
         
 
