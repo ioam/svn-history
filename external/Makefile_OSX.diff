@@ -1,9 +1,13 @@
-Index: external/Makefile
+Index: Makefile
 ===================================================================
 RCS file: /cvsroot/topographica/topographica/external/Makefile,v
-retrieving revision 1.74
-diff -r1.74 Makefile
-30c30
+retrieving revision 1.97
+diff -r1.97 Makefile
+29c29
+< python: ${PYTHON}.tgz tk
+---
+> python: ${PYTHON}.tgz 
+32c32
 < 	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
 ---
 > 	cd ${PYTHON}; ./configure --prefix=${PREFIX}
