@@ -8,10 +8,10 @@ __version__='$Revision$'
 import topo
 assert hasattr(topo,'guimain'), "GUI must be running."
 
-import traceback,sys,inspect
 from numpy import array
 from numpy.testing import assert_array_equal
 
+import topo.tests.functionaltest as ft
 
 
 # typing shortcut
@@ -34,7 +34,7 @@ def run_basic():
                    (p,'Preference Maps','Orientation Preference'),
                    (p,'Tuning Curves','Orientation Tuning') ]
     
-    return _run([_menu_item_fn(*x) for x in menu_paths],"Running basic GUI tests...")
+    return ft.run([_menu_item_fn(*x) for x in menu_paths],"Running basic GUI tests...")
 
 
 
@@ -42,7 +42,7 @@ def run_detailed():
     """Test that more complex GUI actions are working."""
     _initialize()
     tests = [test_cf_coords,test_test_pattern] # and so on...
-    return _run(tests,"Running detailed GUI tests...")
+    return ft.run(tests,"Running detailed GUI tests...")
 
 
 
@@ -155,40 +155,3 @@ def _menu_item_fn(*clicks):
     return test_menu_item
 
 
-
-
-######################################################################
-# TEST FRAMEWORK FUNCTIONS
-######################################################################
-
-# could be used to call any set of functions
-
-def _run(tests,title=None):
-    """
-    Call all test functions in tests and print the test outcomes.
-    """
-    if title: print "\n%s\n"%title
-    errs = {}
-    for test in tests:
-        test_info = "%s (%s)"%(test.__name__,inspect.getdoc(test))
-        error = _run_test(test) 
-        if error is None:
-            print "PASS: %s"%test_info
-        else:
-            print "FAIL: %s"%test_info
-            errs[(test.__name__,test.__doc__)]=error
-
-    for t,e in errs.items(): print "\n** Error from %s (%s):\n%s\n"%(t[0],t[1],e) 
-    print "\nNumber of tests: %s"%len(tests)
-    print "Number of errors: %s\n"%len(errs)
-    return len(errs)
-
-
-def _run_test(test):
-    """Call test and return None on success, or the exception string on failure."""
-    try:
-        test()
-        return None
-    except:
-        return traceback.format_exc()
-        
