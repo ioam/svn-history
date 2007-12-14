@@ -745,7 +745,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
 
-
+    
 
 ######################################################################
 # Translation between GUI (strings) and true values
@@ -760,7 +760,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # overwrite any more specific class found above
         # (e.g. a Number with a dynamic value will have a numeric
         # translator from above, so we replace that)
-        if self.get_source_po(name).is_dynamically_generated(name):
+        if param_is_dynamically_generated(param,self.get_source_po(name)):
             translator_type = self.trans[Dynamic]
             
         self.translators[name]=translator_type(param,initial_value=self.get_parameter_value(name))
@@ -1097,7 +1097,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         param_obj,source_po = self.get_parameter_object(name,with_location=True)
 
-        if not source_po.is_dynamically_generated(name):
+        if not param_is_dynamically_generated(param_obj,source_po):
             # ...but overwrite that with a more specific one, if possible
             for c in classlist(type(param_obj))[::-1]:
                 if self.widget_creators.has_key(c):
@@ -1568,3 +1568,17 @@ class CSPTranslator(String_ObjectTranslator):
 ##                 if type(current_value)==type(obj):
 ##                     self.cache[class_name] = current_value
 ##                     break
+
+
+
+def param_is_dynamically_generated(param,po):
+
+    if not hasattr(param,'_value_is_dynamically_generated'):
+        return False
+
+    if isinstance(po,ParameterizedObject):
+        return param._value_is_dynamically_generated(po)
+    elif isinstance(po,ParameterizedObjectMetaclass):
+        return param._value_is_dynamically_generated(None)
+    else:
+        raise ValueError("po must be a ParameterizedObject or ParameterizedObjectMetaclass.")
