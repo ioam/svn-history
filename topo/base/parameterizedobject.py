@@ -942,7 +942,7 @@ class ParameterizedObject(object):
 
 
     # CB: these two methods are missing class equivalents; might actually be better not to have
-    # them
+    # these methods at all
     def is_dynamically_generated(self,name):
         """
         Return True if the attribute is a parameter being dynamically
