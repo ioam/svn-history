@@ -19,7 +19,6 @@ g = topo.guimain
 
 def run_basic():
     """Check that the windows all open ok (i.e. is GUI functioning?)."""
-    print "\nRunning basic GUI tests...\n" 
     _initialize()
 
     s = 'Simulation'
@@ -35,16 +34,15 @@ def run_basic():
                    (p,'Preference Maps','Orientation Preference'),
                    (p,'Tuning Curves','Orientation Tuning') ]
     
-    return _run([_menu_item_fn(*x) for x in menu_paths])
+    return _run([_menu_item_fn(*x) for x in menu_paths],"Running basic GUI tests...")
 
 
 
 def run_detailed():
     """Test that more complex GUI actions are working."""
-    print "\nRunning detailed GUI tests...\n"
     _initialize()
     tests = [test_cf_coords,test_test_pattern] # and so on...
-    return _run(tests)
+    return _run(tests,"Running detailed GUI tests...")
 
 
 
@@ -165,10 +163,11 @@ def _menu_item_fn(*clicks):
 
 # could be used to call any set of functions
 
-def _run(tests):
+def _run(tests,title=None):
     """
     Call all test functions in tests and print the test outcomes.
     """
+    if title: print "\n%s\n"%title
     errs = {}
     for test in tests:
         test_info = "%s (%s)"%(test.__name__,inspect.getdoc(test))
