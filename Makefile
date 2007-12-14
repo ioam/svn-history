@@ -188,10 +188,10 @@ snapshot-tests:
 gui-tests: basic-gui-tests detailed-gui-tests
 
 basic-gui-tests:
-	./topographica -g -c "from topo.tests.gui_tests import run_basic; run_basic(); topo.guimain.quit_topographica(check=False)"
+	./topographica -g -c "from topo.tests.gui_tests import run_basic; nerr=run_basic(); import sys; sys.exit(nerr)"
 
 detailed-gui-tests:
-	./topographica -g -c "from topo.tests.gui_tests import run_detailed; run_detailed(); topo.guimain.quit_topographica(check=False)"
+	./topographica -g -c "from topo.tests.gui_tests import run_detailed; nerr=run_detailed(); import sys; sys.exit(nerr)"
 
 
 clean-pyc:
