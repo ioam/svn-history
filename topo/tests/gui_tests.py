@@ -65,30 +65,26 @@ def test_test_pattern():
     act = g['Plots']['Activity']()
 
     
-    ### Change pattern generator
     tp.gui_set_param('pattern_generator','TwoRectangles')
     from topo.patterns.basic import TwoRectangles
-    assert isinstance(tp.pattern_generator,TwoRectangles)
+    assert isinstance(tp.pattern_generator,TwoRectangles), "Pattern generator did not change."
 
 
-    ### Check pattern in preview window
     preview = tp.plotgroup.plots[0].view_dict['Activity'].view()[0]
     two_rectangles = array([[0.,1],[1.,0.]])
-    assert_array_equal(preview,two_rectangles)
+    assert_array_equal(preview,two_rectangles,"Incorrect pattern in preview plot.")
 
 
-    ### Check pattern in activity window
     tp.Present()
     gs_view = act.plotgroup.plots[0].view_dict['Activity']
     assert gs_view.src_name=='GS'
     gs_plot_array = gs_view.view()[0]
-    assert_array_equal(gs_plot_array,two_rectangles)
+    assert_array_equal(gs_plot_array,two_rectangles,"Incorrect pattern in activity plot after Present.")
 
 
-    ### Change some pattern parameters
     tp.params_frame.gui_set_param('scale',0.5)
     preview = tp.plotgroup.plots[0].view_dict['Activity'].view()[0]
-    assert_array_equal(preview,0.5*two_rectangles)
+    assert_array_equal(preview,0.5*two_rectangles,"Changing pattern parameters did not update preview.")
 
     
     ### Defaults button
@@ -115,7 +111,7 @@ def test_test_pattern():
     # test that preview display is correct
     tp.params_frame.Defaults()
     preview = tp.plotgroup.plots[0].view_dict['Activity'].view()[0]
-    assert_array_equal(preview,initial_preview)
+    assert_array_equal(preview,initial_preview,"Defaults button failed to revert params to default values.")
 
 
     # CB: still need to test duration, learning, etc
