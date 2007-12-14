@@ -174,7 +174,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
 
         for param_name,val in defaults.items():
             if not self.get_parameter_object(param_name).hidden:
-                self._tkvars[param_name].set(val)
+                self.gui_set_param(param_name,val)#_tkvars[param_name].set(val)
 
         if self.on_modify: self.on_modify()
         if self.on_change: self.on_change()
@@ -524,6 +524,21 @@ class ParametersFrameWithApply(ParametersFrame):
 
 
     def __delete_trace(self,var): pass #var.trace_vdelete(*var.trace_vinfo()[0])
+
+
+    def _defaults_button(self):
+        """See Defaults parameter."""
+        assert isinstance(self._extraPO,ParameterizedObject)
+
+        defaults = self._extraPO.defaults()
+
+        for param_name,val in defaults.items():
+            if not self.get_parameter_object(param_name).hidden:
+                self._tkvars[param_name].set(val)
+
+        if self.on_modify: self.on_modify()
+        if self.on_change: self.on_change()
+        self.update_idletasks()
 
 
 
