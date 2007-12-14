@@ -97,7 +97,6 @@ def test_test_pattern():
         tp.params_frame.gui_set_param(name,value)
 
     changed_preview = tp.plotgroup.plots[0].view_dict['Activity'].view()[0]
-    
     # and check the preview did change
     try:
         assert_array_equal(changed_preview,initial_preview)
@@ -109,8 +108,7 @@ def test_test_pattern():
     # test that preview display is correct
     tp.params_frame.Defaults()
     preview = tp.plotgroup.plots[0].view_dict['Activity'].view()[0]
-    assert_array_equal(preview,initial_preview,"Defaults button failed to revert params to default values.")
-
+    assert_array_equal(preview,two_rectangles,"Defaults button failed to revert params to default values.")
 
     # CB: still need to test duration, learning, etc
 
