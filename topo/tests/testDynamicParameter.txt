@@ -16,9 +16,9 @@
 
 >>> t1 = TestPO1()
 
->>> t1.is_dynamically_generated('x')
+>>> t1.params()['x']._value_is_dynamically_generated(t1)
 True
->>> t1.is_dynamically_generated('y')
+>>> t1.params()['y']._value_is_dynamically_generated(t1)
 False
 
 >>> t1.inspect_value('x')  # no value generated yet
