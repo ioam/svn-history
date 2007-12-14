@@ -927,7 +927,7 @@ class ParameterizedObject(object):
         Same as getattr() except for Dynamic parameters, which have their
         value-generating object returned.
         """
-        return self.__shenma(name,self.repr_value,"_%s_param_value"%name,'default')
+        return self._shenma(name,self.repr_value,"_%s_param_value"%name,'default')
 
 
     def inspect_value(self,name):
@@ -937,7 +937,7 @@ class ParameterizedObject(object):
         Same as getattr() except for Dynamic parameters, which have their
         last value returned.
         """
-        return self.__shenma(name,self.inspect_value,"_%s_param_value_last"%name,'last_default')
+        return self._shenma(name,self.inspect_value,"_%s_param_value_last"%name,'last_default')
 
 
 
@@ -956,7 +956,7 @@ class ParameterizedObject(object):
             
         
 
-    def __shenma(self,name,mthd,local_attr_name,param_attr_name):
+    def _shenma(self,name,mthd,local_attr_name,param_attr_name):
         """
         Get the attribute specified by name; for non-parameters, this is the same
         as getattr(), but for Parameters:-
