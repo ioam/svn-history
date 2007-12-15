@@ -105,9 +105,14 @@ and using the command:
 
 The <code>-r LATEST_STABLE</code> option should be omitted if you want
 the bleeding-edge version, which may not always be usable due to work
-in progress.  The checkout process will likely take several minutes
-(probably appearing to hang at certain points), as there are some
-extremely large files involved.
+in progress, although you can check to see the code builds on a specific platform 
+(<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_build">linux</a>,
+<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=ppc_darwin8.10.0_build">Mac</a>) and whether or not our   
+<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests">code tests pass</a>.
+
+<P>The checkout process will likely take several minutes (probably
+appearing to hang at certain points), as there are some extremely
+large files involved.
 
 
 <H4><A NAME="osx">Mac OS X</A></H4>
