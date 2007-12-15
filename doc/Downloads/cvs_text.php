@@ -250,12 +250,13 @@ update to the latest stable version at any time by doing:
 packages have been released.  If you want the very most recent
 version, stable or not, replace <code>-r LATEST_STABLE</code> with
 <code>-A</code> to force a complete update. Before updating to the
-most recent version, you can check its status (i.e. whether or not it
-builds successfully, and whether or not all the tests pass) by
-visiting <a
-href="http://buildbot.topographica.org/">buildbot.topographica.org</a>.
+most recent version, you can check its status; see 
+the results of our 
+<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests">code test suite</a>
+and our 
+<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_slow-tests">results & performance</a> monitor.
 
-
+<!--CB: just trying it out; embedding an image would be best-->
 
 <P>Windows TortoiseCVS users can right click in the topographica
 directory and select <code>CVS Update</code> to get the new files.
