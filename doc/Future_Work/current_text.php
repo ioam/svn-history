@@ -61,10 +61,8 @@ Procedure to convert from CVS to SVN:
 (http://sourceforge.net/docman/display_doc.php?docid=31070&group_id=1))
 
 
-1. Make sure people check in all outstanding work? Or maybe instead
-we'll give some instruction for converting what they have to some
-format they can apply to the new svn repository. (E.g. using diff and
-patch - you probably have a better idea.)
+1. Warn that we'll be switching and in people's best interest to commit
+changes they have soon.
 
 
 
@@ -84,37 +82,62 @@ to see how big, what's there, etc]
 
 4. Clean up topographica-cvsbackup archive
 
-Not sure what (if anything) needs to go. I haven't really looked at
-the full repository directory before. When I see it, I might realize
-things that should go. But do we need to take this opportunity to
-change anything? Whatever is done, make a script to do it again.
+  4.1 Remove any directory that has only Attic in it:
+      face-space
+      topographica/face-space
+
+      (Plus, I guess we should remove all the contents of the Attic
+      directories, as those are files that svn won't really be able to do
+      much about, right?  I.e., their history is already lost, even if they
+      later moved to files that are current, because svn won't know that
+      they connect to the current location of that file.  But I guess
+      we have to keep them if removing them would cause problems.)
+
+  4.2 Remove any .DS_Store files:
+      facespace/.DS_Store
 
 
 
 5. Convert the repository to an SVN dump file with cvs2svn by going to
 the directory at the root of the repository and running the following
-command: "cvs2svn --dumpfile=svndump .".
-(--trunk-only will drop all branches and tags, but will likely make
-the process painless)
+command: "cvs2svn --trunk-only --dumpfile=svndump .".
 
-Do we want all the branches and tages? If the cvs repository is going
-to hang around, maybe we can lose them now?
+We lose all branches AND tags this way. We could exclude specific ones:
 
-
-
-6. If the conversion generates an error message, follow the prompts
-indicating what the problem is, and attempt to resolve them using one
-of the various options for cvs2svn . Do I need to worry about file
-types? (binary etc...I assume not)
+"""
+To exclude a tag or branch, use the option --exclude=SYMBOL. You can
+also exclude a whole group of symbols matching a specified regular
+expression; for example, --exclude='RELEASE_0_.*'. (The regular
+expression has to match the whole symbol name for the rule to apply.)
+"""
+http://cvs2svn.tigris.org/cvs2svn.html
 
 
 
-7. use svndumpfilter to remove CVSROOT from repository
+6. Conversion without --trunk-only generates no error
+messages. Conversion with --trunk-only generates:
+
+ERROR: A CVS repository cannot contain both ./topographica/examples/lissom_oo_or_scaling.ty,v and ./topographica/examples/Attic/lissom_oo_or_scaling.ty,v
+ERROR: A CVS repository cannot contain both ./topographica/external/Gnosis_Utils-1.2.1.tar.gz,v and ./topographica/external/Attic/Gnosis_Utils-1.2.1.tar.gz,v
+ERROR: A CVS repository cannot contain both ./topographica/external/matplotlib-0.90.0.tar.gz,v and ./topographica/external/Attic/matplotlib-0.90.0.tar.gz,v
+ERROR: A CVS repository cannot contain both ./topographica/external/pychecker-0.8.16.tar.gz,v and ./topographica/external/Attic/pychecker-0.8.16.tar.gz,v
+
+So with --trunk-only, delete those Attic files.
 
 
 
-8. Compress the resulting SVN dump file (svndump) if so desired, using
-zip, gzip or bzip2 (but do not tar it).
+7. use svndumpfilter to remove CVSROOT from repository:
+
+cat svndump | svndumpfilter exclude trunk/CVSROOT > svndump1
+
+
+8  Check the result:
+svnadmin create /home/ceball/topographica-SVN
+svnadmin load /home/ceball/topographica-SVN < svndump1
+
+svn checkout file:///home/ceball/topographica-svn/ topographica-co
+
+Then investigate it...
 
 
 
@@ -132,7 +155,8 @@ zip, gzip or bzip2 (but do not tar it).
 
 
 
-11 Name the file using only alphanumeric characters and a period
+11 Compress the file with zip, gzip, or bzip2. 
+Name the file using only alphanumeric characters and a period
 (Example: svndump.gz -- good; projectname-svndump.gz -- bad).
 
 
@@ -163,9 +187,20 @@ created but empty for this to work).
 - Wait for however long it takes (e.g. a day)
 
 
-14. what extra setup? e.g. mail on checkins, etc
-Plus people seem to mention a case-insensitivity script, but we do use
-case (e.g. Doc)
+14. add commit hook script svnnotify
+Sends email notifications of changes made during a SVN
+commit. Choose version that includes the diff.
+
+Login to the SourceForge.net website
+Go to the project summary page (https://www.sf.net/projects/PROJECTNAME)
+Click on the 'Admin' link
+Click on the 'Subversion' admin page link
+Select the hook script from the 'Hooks:' pulldown menu
+Click the 'Add' button
+Fill in any of the requested hook parameter fields, as displayed on the resulting page (if any)
+Click the 'Finish Add' button
+
+
 
 
 
