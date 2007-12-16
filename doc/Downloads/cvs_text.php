@@ -108,7 +108,7 @@ the bleeding-edge version, which may not always be usable due to work
 in progress, although you can check to see the code builds on a specific platform 
 (<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_build">linux</a>,
 <a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=ppc_darwin8.10.0_build">Mac</a>) and whether or not our   
-<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests">code tests pass</a>.
+<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests&builder=x86_ubuntu7.04_slow-tests">code tests pass</a>.
 
 <P>The checkout process will likely take several minutes (probably
 appearing to hang at certain points), as there are some extremely
@@ -255,11 +255,8 @@ update to the latest stable version at any time by doing:
 packages have been released.  If you want the very most recent
 version, stable or not, replace <code>-r LATEST_STABLE</code> with
 <code>-A</code> to force a complete update. Before updating to the
-most recent version, you can check its status; see 
-the results of our 
-<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests">code test suite</a>
-and our 
-<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_slow-tests">results & performance</a> monitor.
+most recent version, you can check its 
+<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests&builder=x86_ubuntu7.04_slow-tests">status</a>.
 
 <!--CB: just trying it out; embedding an image would be best-->
 
