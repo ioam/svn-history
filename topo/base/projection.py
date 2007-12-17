@@ -5,10 +5,11 @@ $Id$
 """
 __version__='$Revision$'
 
-from numpy import array,ones,sometrue
+import operator
+from numpy import array,asarray,ones,sometrue, logical_and, logical_or
 
 from sheet import Sheet
-from parameterclasses import Number, BooleanParameter, Parameter
+from parameterclasses import Number, BooleanParameter, Parameter, ListParameter
 from parameterizedobject import ParameterizedObject
 from simulation import EPConnection
 from functionfamilies import OutputFnParameter,IdentityOF
@@ -27,6 +28,27 @@ class SheetMask(ParameterizedObject):
     class can be used to restrict the computation to only those
     neurons that the Mask lists as active.
     """
+
+    # JPALERT: Is there anything about this class that assumes its sheet is a
+    # ProjectionSheet?
+
+
+    # JPALERT: Need this double indirection because Python property get/set
+    # methods can't be overridden in subclasses(!).
+    def __get_data(self): return self.get_data()
+    def __set_data(self,data): self.set_data(data)
+    data = property(__get_data,__set_data)
+    
+    def __get_sheet(self): return self.get_sheet()
+    def __set_sheet(self,sheet): self.set_sheet(sheet)
+    sheet = property(__get_sheet,__set_sheet)
+    
+    
+    def __init__(self,sheet=None,**params):
+        super(SheetMask,self).__init__(**params)
+        self.sheet = sheet
+
+
     # Ensure that whenever somebody accesses the data they are not None
     def get_data(self): 
         assert(self._sheet != None)
@@ -34,22 +56,19 @@ class SheetMask(ParameterizedObject):
     def set_data(self,data): 
         assert(self._sheet != None)
         self._data = data
-    data = property(get_data,set_data)
-    
-    
+
     def get_sheet(self): 
         assert(self._sheet != None)
         return self._sheet
     def set_sheet(self,sheet): 
         self._sheet = sheet 
         if(self._sheet != None): self.reset()
-    sheet = property(get_sheet,set_sheet)
-    
-    
-    def __init__(self,sheet=None,**params):
-        super(SheetMask,self).__init__(**params)
-        self.sheet = sheet
-        
+
+
+    def __and__(self,mask):
+        return AndMask(self._sheet,submasks=[self,mask])
+    def __or__(self,mask):
+        return OrMask(self._sheet,submasks=[self,mask])
 
     # JABALERT: Shouldn't this just keep one matrix around and zero it out,
     # instead of allocating a new one each time?
@@ -57,11 +76,11 @@ class SheetMask(ParameterizedObject):
       """Initialize mask to default value (with no neurons masked out)."""
       self.data = ones(self.sheet.shape)
 
-
+    
     def calculate(self):
       """
       Calculate a new mask based on the activity of the sheet.
-
+      
       For instance, in an algorithm like LISSOM that is based on a
       process of feedforward activation followed by lateral settling,
       the calculation is done at the beginning of each iteration after
@@ -71,8 +90,8 @@ class SheetMask(ParameterizedObject):
       mask.
       """
       pass
-      
 
+  
     # JABALERT: Not clear what the user should do with this.
     def update(self):
       """
@@ -86,8 +105,66 @@ class SheetMask(ParameterizedObject):
       """
       pass
 
+  
+class CompositeSheetMask(SheetMask):
+    """
+    A SheetMask that computes its value from other SheetMasks.    
+    """
+    __abstract =  True 
 
+    submasks = ListParameter(class_=SheetMask)
 
+    def __init__(self,sheet=None,**params):
+        super(CompositeSheetMask,self).__init__(sheet,**params)
+        assert self.submasks, "A composite mask must have at least one submask."
+
+    def _combine_submasks(self):
+        """
+        A method that combines the submasks.
+
+        Subclasses should override this method to do their respective
+        composite calculations.  The result should be stored in self.data.
+        """
+        raise NotImplementedError
+    
+    def set_sheet(self,sheet):
+        for m in self.submasks:
+            m.sheet = sheet
+        super(CompositeSheetMask,self).set_sheet(sheet)
+
+    def reset(self):
+        for m in self.submasks:
+            m.reset()
+        self._combine_submasks()
+        
+    def calculate(self):
+        for m in self.submasks:
+            m.calculate()
+        self._combine_submasks()
+            
+    def update(self):
+        for m in self.submasks:
+            m.update()
+        self._combine_submasks()
+
+class AndMask(CompositeSheetMask):
+    """
+    A composite SheetMask that takes computes its value as the
+    logical AND (i.e. intersection) of its sub-masks.
+    """
+    def _combine_submasks(self):
+        self._data = asarray(reduce(logical_and,(m.data for m in self.submasks)),dtype=int)
+
+class OrMask(CompositeSheetMask):
+    """
+    A composite SheetMask that takes computes its value as the
+    logical OR (i.e. union) of its sub-masks.
+    """
+    def _combine_submasks(self):
+        self._data = asarray(reduce(logical_or,(m.data for m in self.submasks)),dtype=int)
+
+    
+        
 class Projection(EPConnection):
     """
     A projection from a Sheet into a ProjectionSheet.
