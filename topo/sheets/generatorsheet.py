@@ -6,11 +6,12 @@ $Id$
 __version__='$Revision$'
 
 from topo.base.simulation import FunctionEvent, PeriodicEventSequence
+from topo.base.functionfamilies import OutputFnParameter,IdentityOF
 from topo.base.sheet import Sheet 
 from topo.base.sheet import BoundingBox
 from topo.misc.utils import NxN
 
-from topo.base.parameterclasses import Number, ListParameter
+from topo.base.parameterclasses import Number, ListParameter, BooleanParameter
 
 import topo.base.patterngenerator
 import topo.patterns.basic
@@ -40,6 +41,12 @@ class GeneratorSheet(Sheet):
     
     input_generator = topo.base.patterngenerator.PatternGeneratorParameter(doc=
         "Specifies a particular PatternGenerator type to use when creating patterns.")
+
+    output_fn = OutputFnParameter(doc="""
+        Output function to apply (if apply_output_fn is true) to this Sheet's activity.""")
+    
+    apply_output_fn=BooleanParameter(default=True,doc="""
+        Whether to apply the output_fn after computing an Activity matrix.""")
     
     def __init__(self,**params):
         super(GeneratorSheet,self).__init__(**params)
@@ -105,6 +112,9 @@ class GeneratorSheet(Sheet):
         assert self.shape==self.activity.shape, \
                "Generated pattern shape %s does not match sheet shape %s." % \
                (self.shape,self.activity.shape)
+
+        if self.apply_output_fn:
+            self.output_fn(self.activity)
         self.send_output(src_port='Activity',data=self.activity)
                                                         
               
