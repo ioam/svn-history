@@ -12,7 +12,7 @@ __version__='$Revision$'
 from optparse import OptionParser
 from inlinec import import_weave
 
-import sys, __main__, math, os, re
+import sys, __main__, math, os, re, traceback
 
 import topo
 
@@ -229,7 +229,7 @@ def process_argv(argv):
     while True:
         # Process options up until the first filename
         (option,args) = topo_parser.parse_args(args,option)
-
+        
         # Handle filename
         if args:
             filename=args.pop(0)
@@ -237,8 +237,18 @@ def process_argv(argv):
             filedir = os.path.dirname(os.path.abspath(filename))
             sys.path.insert(0,filedir) # Allow imports relative to this file's path
             sim_name_from_filename(filename) # Default value of topo.sim.name
-            execfile(filename,__main__.__dict__)
-            something_executed=True
+
+            try:
+                execfile(filename,__main__.__dict__)
+                something_executed=True
+            except:
+                # if run with -i, errors should deposit user
+                # at the command line.
+                # JPALERT: Should this also work for '-g' ?
+                if option.interactive:
+                    os.environ['PYTHONINSPECT'] = '1'
+                raise
+
             
         if not args:
             break
@@ -246,6 +256,8 @@ def process_argv(argv):
     # CEBALERT: topographica doesn't stay open if there's an error
     # in commands executed - try:
     #  ./topographica -i -c "raise"
+    # JP: -i should always result in an interactive prompt.
+    # This is fixed above.
         
     # If no scripts and no commands were given, pretend -i was given.
     if not something_executed:
@@ -254,7 +266,7 @@ def process_argv(argv):
     if option.interactive:
         print BANNER
 
-    if option.interactive or option.gui:
+    if option.interactive or option.gui or os.environ.get('PYTHONINSPECT'):
         # Provide Python prompt even after execution completes
 	os.environ["PYTHONINSPECT"] = "1"
 
