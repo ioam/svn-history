@@ -22,7 +22,7 @@ import Image,ImageOps
 from math import pi,cos,sin
 
 from topo.base.simulation import Simulation,EventProcessor
-from topo.base.parameterclasses import Integer,Number,ClassSelectorParameter
+from topo.base.parameterclasses import Integer,Number,ClassSelectorParameter,BooleanParameter
 from topo.patterns.image import GenericImage
 
 from playerrobot import CameraDevice,PTZDevice
@@ -75,6 +75,10 @@ class PTZ(EventProcessor):
     speed = Number(default=200,bounds=(0,None),doc="""
        Desired max pan/tilt speed in deg/sec.""")
 
+    invert_amplitude = BooleanParameter(default=False,doc="""
+       Invert the sense of the amplitude signal, in order to get the
+       appropriate ipsi-/contralateral sense of saccades.""")
+
     dest_ports = ["Saccade"]
     src_ports = ["State"]
 
@@ -89,10 +93,15 @@ class PTZ(EventProcessor):
     def shift(self,amplitude,direction):
 
         self.debug("Executing shift, amplitude=%.2f, direction=%.2f"%(amplitude,direction))
-        pan,tilt,zoom = self.ptz.state_deg       
+        if self.invert_amplitude:
+            amplitude *= -1
+
+        # if the amplitude is negative, invert the direction, so up is still up.
         if amplitude < 0:
             direction *= -1
         angle = direction * pi/180
+
+        pan,tilt,zoom = self.ptz.state_deg       
         pan += amplitude * cos(angle)
         tilt += amplitude * sin(angle)
 
