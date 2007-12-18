@@ -17,6 +17,7 @@ from math import pi, sin, cos, sqrt
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy import alltrue
 
+from topo.base.parameterizedobject import ParamOverrides
 from topo.base.parameterclasses import Integer, Number, Parameter, Enumeration
 from topo.base.parameterclasses import ListParameter
 from topo.base.functionfamilies import OutputFnParameter
@@ -53,20 +54,20 @@ class SineGratingDisk(PatternGenerator):
         super(SineGratingDisk,self).__init__(**params)
        
     def __call__(self,**params):
-      	bounds = params.get('bounds',self.bounds)
-        xdensity=params.get('xdensity',self.xdensity)
-        ydensity=params.get('ydensity',self.ydensity)
-        x=params.get('x',self.x)
-        y=params.get('y',self.y)
-        scale=params.get('scale',self.scale)
-        offset=params.get('offset',self.offset)
-        orientation=params.get('orientation',self.orientation)
-        size=params.get('size',self.size)
-        phase=params.get('phase',self.phase)
-        frequency=params.get('frequency',self.frequency)
-        aspect_ratio=params.get('aspect_ratio',self.aspect_ratio)
-        smoothing=params.get('smoothing',self.smoothing)
-
+        pos = ParamOverrides(self,params)
+      	bounds = pos['bounds']
+        xdensity=pos['xdensity']
+        ydensity=pos['ydensity']
+        x=pos['x']
+        y=pos['y']
+        scale=pos['scale']
+        offset=pos['offset']
+        orientation=pos['orientation']
+        size=pos['size']
+        phase=pos['phase']
+        frequency=pos['frequency']
+        aspect_ratio=pos['aspect_ratio']
+        smoothing=pos['smoothing']
       
         input_1=SineGrating(phase=phase, frequency=frequency, orientation=orientation, scale=scale, offset=offset)
         input_2=Disk(aspect_ratio=aspect_ratio,smoothing=smoothing,x=x, y=y,size=size,scale=scale, offset=offset)
@@ -103,20 +104,23 @@ class SineGratingRing(PatternGenerator):
         super(SineGratingRing,self).__init__(**params)
        
     def __call__(self,**params):
-      	bounds = params.get('bounds',self.bounds)
-        xdensity=params.get('xdensity',self.xdensity)
-        ydensity=params.get('ydensity',self.ydensity)
-        x=params.get('x',self.x)
-        y=params.get('y',self.y)
-        scale=params.get('scale',self.scale)
-        offset=params.get('offset',self.offset)
-        orientation=params.get('orientation',self.orientation)
-        size=params.get('size',self.size)
-        phase=params.get('phase',self.phase)
-        frequency=params.get('frequency',self.frequency)
-        aspect_ratio=params.get('aspect_ratio',self.aspect_ratio)
-        smoothing=params.get('smoothing',self.smoothing)
-        thickness=params.get('thickness', self.thickness)
+        # CEBALERT: missing check_params (should upgrade/remove/decide what to do with check_params anyway)
+        pos = ParamOverrides(self,params)
+
+      	bounds = pos['bounds']
+        xdensity=pos['xdensity']
+        ydensity=pos['ydensity']
+        x=pos['x']
+        y=pos['y']
+        scale=pos['scale']
+        offset=pos['offset']
+        orientation=pos['orientation']
+        size=pos['size']
+        phase=pos['phase']
+        frequency=pos['frequency']
+        aspect_ratio=pos['aspect_ratio']
+        smoothing=pos['smoothing']
+        thickness=pos['thickness']
       
         input_1=SineGrating(phase=phase, frequency=frequency, orientation=orientation, scale=scale, offset=offset)
         input_2=Ring(thickness=thickness,aspect_ratio=aspect_ratio,smoothing=smoothing,x=x, y=y,size=size,scale=scale, offset=offset)
@@ -149,22 +153,25 @@ class OrientationContrastPattern (SineGratingRing):
         super(OrientationContrastPattern,self).__init__(**params)
        
     def __call__(self,**params):
-      	bounds = params.get('bounds',self.bounds)
-        xdensity=params.get('xdensity',self.xdensity)
-        ydensity=params.get('ydensity',self.ydensity)
-        x=params.get('x',self.x)
-        y=params.get('y',self.y)
-        scale=params.get('scale',self.scale)
-        offset=params.get('offset',self.offset)
-        phase=params.get('phase',self.phase)
-        frequency=params.get('frequency',self.frequency)
-        aspect_ratio=params.get('aspect_ratio',self.aspect_ratio)
-        smoothing=params.get('smoothing',self.smoothing)
-        thickness=params.get('thickness', self.thickness)
-        orientationcentre=params.get('orientationcentre',self.orientationcentre)
-        orientationsurround=params.get('orientationsurround',self.orientationsurround)
-        size_centre=params.get('size_centre',self.size_centre)
-        size_surround=params.get('size_surround',self.size_surround)
+
+
+      	bounds = pos['bounds']
+        xdensity=pos['xdensity']
+        ydensity=pos['ydensity']
+        x=pos['x']
+        y=pos['y']
+        scale=pos['scale']
+        offset=pos['offset']
+        size=pos['size']
+        phase=pos['phase']
+        frequency=pos['frequency']
+        aspect_ratio=pos['aspect_ratio']
+        smoothing=pos['smoothing']
+        thickness=pos['thickness']
+        orientationcentre=pos['orientationcentre']
+        orientationsurround=pos['orientationsurround']
+        size_centre=pos['size_centre']
+        size_surround=pos['size_surround']
       
         input_1=SineGratingDisk(phase=phase, frequency=frequency,orientation=orientationcentre, scale=scale, offset=offset,
                                 aspect_ratio=aspect_ratio,smoothing=0.0,x=x, y=y,size=size_centre)

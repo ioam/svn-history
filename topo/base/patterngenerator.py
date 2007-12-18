@@ -13,7 +13,7 @@ from numpy.oldnumeric import add,subtract,cos,sin
 from boundingregion import BoundingBox, BoundingRegionParameter
 from functionfamilies import OutputFnParameter, IdentityOF
 from parameterclasses import Parameter,Number,ClassSelectorParameter,CompositeParameter
-from parameterizedobject import ParameterizedObject
+from parameterizedobject import ParameterizedObject,ParamOverrides
 from sheetcoords import SheetCoordinateSystem
 
 
@@ -109,27 +109,25 @@ class PatternGenerator(ParameterizedObject):
         as currently set on the object. Otherwise, any params
         specified override those currently set on the object.
         """
-        self._check_params(params)
-                
+        self._check_params(params)                
         self.debug("params = ",params)
-        self.__setup_xy(params.get('bounds',self.bounds),
-                        params.get('xdensity',self.xdensity),
-                        params.get('ydensity',self.ydensity),
-                        params.get('x',self.x),
-                        params.get('y',self.y),
+
+        # what name for pos? all_params? should be short...
+        pos = ParamOverrides(self,params)
+
+        self.__setup_xy(pos['bounds'],pos['xdensity'],pos['ydensity'],
+                        pos['x'],pos['y'],
+                        # uh-oh
                         params.get('position',None),
-                        params.get('orientation',self.orientation))
+                        pos['orientation'])
 
-        scale = params.get('scale',self.scale)
-        offset = params.get('offset',self.offset)
-        output_fn = params.get('output_fn',self.output_fn)
-        
-        result = scale*self.function(**params)+offset
+        result = pos['scale']*self.function(pos)+pos['offset']
 
-        mask = params.get('mask',self.mask)
+        mask = pos['mask']
         if mask is not None:
             result*=mask
-        
+
+        output_fn = pos['output_fn']
         if output_fn is not IdentityOF: # Optimization (but may not actually help)
             output_fn(result)           # CEBHACKALERT: particularly since everything but
                                         # the IdentityOF *class* will pass this if-test!
@@ -144,7 +142,7 @@ class PatternGenerator(ParameterizedObject):
         """
         if position is not None:
             x,y = position
-            
+
         self.debug("bounds = ",bounds,"xdensity =",xdensity,"x =",x,"y=",y)
         # Generate vectors representing coordinates at which the pattern
         # will be sampled.
@@ -154,7 +152,9 @@ class PatternGenerator(ParameterizedObject):
         self.pattern_x, self.pattern_y = self.__create_and_rotate_coordinate_arrays(x_points-x,y_points-y,orientation)
 
 
-    def function(self,**params):
+    # need a reasonable name here & I dropped **params but should I have? (pos,**params)
+    # (also could have left alone (pos), but would result in lots of duplicate ParamOverrides being created)
+    def function(self,pos):
         """
         Function to draw a pattern that will then be scaled and rotated.
 
@@ -203,22 +203,17 @@ class Constant(PatternGenerator):
     # coordinate transformations (which would have no effect anyway)
     def __call__(self,**params):
         self._check_params(params)
+        pos = ParamOverrides(self,params)
+        
+        shape = SheetCoordinateSystem(pos['bounds'],pos['xdensity'],pos['ydensity']).shape
 
-        bounds = params.get('bounds',self.bounds)
-        xdensity = params.get('xdensity',self.xdensity)
-        ydensity = params.get('ydensity',self.ydensity)
-        scale = params.get('scale',self.scale)
-        offset = params.get('offset',self.offset)
-        output_fn = params.get('output_fn',self.output_fn)
+        result = pos['scale']*ones(shape, Float)+pos['offset']
 
-        shape = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
-
-        result = scale*ones(shape, Float)+offset
-
-        mask = params.get('mask',self.mask)
+        mask = pos['mask']
         if mask is not None:
             result*=mask
-        
+
+        output_fn = pos['output_fn']
         if output_fn is not IdentityOF: # Optimization (but may not actually help)
             output_fn(result)
 

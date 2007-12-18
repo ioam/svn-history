@@ -7,6 +7,7 @@ __version__='$Revision$'
 
 import numpy.oldnumeric.random_array as RandomArray
 
+from topo.base.parameterizedobject import ParamOverrides
 from topo.base.parameterclasses import Number,Parameter
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
@@ -26,7 +27,7 @@ class RandomGenerator(PatternGenerator):
     size    = Number(hidden = True)
     orientation   = Number(hidden = True)
 
-    def _distrib(self,shape,**params):
+    def _distrib(self,shape,pos):
         """Method for subclasses to override with a particular random distribution."""
         raise NotImplementedError
     
@@ -34,20 +35,17 @@ class RandomGenerator(PatternGenerator):
     # coordinate transformations (which would have no effect anyway)
     def __call__(self,**params):
         self._check_params(params)
-        
-        bounds = params.get('bounds',self.bounds)
-        xdensity = params.get('xdensity',self.xdensity)
-        ydensity = params.get('ydensity',self.ydensity)
-        output_fn = params.get('output_fn',self.output_fn)
+        pos = ParamOverrides(self,params)
 
-        shape = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
+        shape = SheetCoordinateSystem(pos['bounds'],pos['xdensity'],pos['ydensity']).shape
 
-        result = self._distrib(shape)
+        result = self._distrib(shape,pos)
 
-        mask = params.get('mask',self.mask)
+        mask = pos['mask']
         if mask is not None:
             result*=mask
-        
+            
+        output_fn = pos['output_fn']
         if output_fn is not IdentityOF: # Optimization (but may not actually help)
             output_fn(result)
         
@@ -58,10 +56,8 @@ class RandomGenerator(PatternGenerator):
 class UniformRandom(RandomGenerator):
     """2D uniform random noise pattern generator."""
 
-    def _distrib(self,shape,**params):
-        offset_=params.get('offset',self.offset)
-        scale_=params.get('scale',self.scale)
-        return RandomArray.uniform( offset_, offset_+scale_, shape)
+    def _distrib(self,shape,pos):
+        return RandomArray.uniform(pos['offset'], pos['offset']+pos['scale'], shape)
 
 
 class GaussianRandom(RandomGenerator):
@@ -76,8 +72,6 @@ class GaussianRandom(RandomGenerator):
     scale  = Number(default=0.25,softbounds=(0.0,2.0))
     offset = Number(default=0.50,softbounds=(-2.0,2.0))
 
-    def _distrib(self,shape,**params):
-        offset_=params.get('offset',self.offset)
-        scale_ =params.get('scale', self.scale)
-        return offset_+scale_*RandomArray.standard_normal(shape)
+    def _distrib(self,shape,pos):
+        return pos['offset']+pos['scale']*RandomArray.standard_normal(shape)
 

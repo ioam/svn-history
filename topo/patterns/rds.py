@@ -10,6 +10,7 @@ from numpy.oldnumeric.random_array import random,seed
 
 from topo.base.parameterclasses import Number,Integer
 from topo.base.patterngenerator import PatternGenerator
+from topo.base.parameterizedobject import ParamOverrides
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.base.functionfamilies import IdentityOF
 
@@ -66,22 +67,23 @@ class RandomDotStereogram(PatternGenerator):
 
         # Gather parameters
         self._check_params(params)
+        pos = ParamOverrides(self,params)
         
-        bounds      = params.get('bounds',self.bounds)
-        xdensity    = params.get('xdensity',self.xdensity)
-        ydensity    = params.get('ydensity',self.ydensity)
-        scale       = params.get('scale',self.scale)
-        offset      = params.get('offset',self.offset)
-        output_fn   = params.get('output_fn',self.output_fn)
-        dotdensity  = params.get('dotdensity',self.dotdensity)
-        random_seed = params.get('random_seed',self.random_seed)
+        bounds      = pos['bounds']
+        xdensity    = pos['xdensity']
+        ydensity    = pos['ydensity']
+        scale       = pos['scale']
+        offset      = pos['offset']
+        output_fn   = pos['output_fn']
+        dotdensity  = pos['dotdensity']
+        random_seed = pos['random_seed']
 
         xsize,ysize = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
         xsize,ysize = int(round(xsize)),int(round(ysize))
         
-        xdisparity  = int(round(xsize*params.get('xdisparity',self.xdisparity)))
-        ydisparity  = int(round(xsize*params.get('ydisparity',self.ydisparity)))
-        dotsize     = int(round(xsize*params.get('dotsize',self.dotsize)))
+        xdisparity  = int(round(xsize*pos['xdisparity']))  
+        ydisparity  = int(round(xsize*pos['ydisparity']))   
+        dotsize     = int(round(xsize*pos['dotsize']))
         
         bigxsize = 2*xsize
         bigysize = 2*ysize

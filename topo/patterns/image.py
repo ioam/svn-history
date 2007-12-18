@@ -295,25 +295,25 @@ class GenericImage(PatternGenerator):
                                             background_value_fn=edge_average)
 
 
-    def function(self,**params):
-        xdensity = params.get('xdensity', self.xdensity)
-        ydensity = params.get('ydensity', self.ydensity)
-        x        = params.get('pattern_x',self.pattern_x)
-        y        = params.get('pattern_y',self.pattern_y)
-        size_normalization = params.get('scaling',self.size_normalization)
+    def function(self,pos):
+        xdensity = pos['xdensity']
+        ydensity = pos['ydensity']
+        x        = pos['pattern_x']
+        y        = pos['pattern_y']
+        size_normalization = pos.get('scaling') or self.size_normalization  #params.get('scaling',self.size_normalization)
 
-        height = params.get('size',self.size)
-        width = (params.get('aspect_ratio',self.aspect_ratio))*height
+        height = pos['size']
+        width = pos['aspect_ratio']*height
 
-        whole_image_output_fn = params.get('whole_image_output_fn',self.whole_image_output_fn)
+        whole_image_output_fn = pos['whole_image_output_fn']
 
-        if self._get_image(params) or whole_image_output_fn != self.last_wiof:
+        if self._get_image(pos) or whole_image_output_fn != self.last_wiof:
             self.last_wiof = whole_image_output_fn
             self.__setup_pattern_sampler()
         return self.ps(x,y,float(xdensity),float(ydensity),size_normalization,float(width),float(height))
 
 
-    def _get_image(self,params):
+    def _get_image(self,pos):
         """
         Get a new image, if necessary.
 
@@ -387,8 +387,8 @@ class FileImage(GenericImage):
         self.last_wiof = None
 
 
-    def _get_image(self,params):
-        filename = params.get('filename',self.filename)
+    def _get_image(self,pos):
+        filename = pos['filename']
 
         if filename!=self.last_filename:
             self.last_filename=filename
