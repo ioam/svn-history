@@ -1290,19 +1290,4 @@ class ParamOverrides(dict):
         return dict.__repr__(self)+" overriding params from %s"%repr(self.overridden)
  
 
-    # CEB: temporarily match old behavior
-    def _access(self,k):
-        if hasattr(self.overridden,'will_confuse_you'):
-            try:
-                getattr(self.overridden,k)
-            except AttributeError:
-                pass
-        
-    def __getitem__(self,k):
-        self._access(k)
-        return dict.__getitem__(self,k)
-
-    def get(self,k):
-        self._access(k)
-        return dict.get(self,k)
 

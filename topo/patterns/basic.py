@@ -381,7 +381,6 @@ class Composite(PatternGenerator):
         if necessary.
         """
         for g in generators:
-            g.will_confuse_you = True
             vals = (g.force_new_dynamic_value('x'),
                     g.force_new_dynamic_value('y'),
                     g.force_new_dynamic_value('size'),
@@ -475,7 +474,6 @@ class SeparatedComposite(Composite):
         
         valid_generators = []
         for g in generators:
-            g.will_confuse_you=True
             # Advance values as a side effect
             vals = (g.force_new_dynamic_value('size'),
                     g.force_new_dynamic_value('scale'),
