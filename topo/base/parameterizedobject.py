@@ -1260,6 +1260,8 @@ class PicklableClassAttributes(object):
 
 # CB: __missing__ is new to python 2.5; do I still need to
 # provide an alternative for 2.4?
+
+# 
 class ParamOverrides(dict):
     """
     A dictionary that returns the attribute of an object if that attribute is not
@@ -1276,7 +1278,7 @@ class ParamOverrides(dict):
         #      dict.__init__(self,**kw)
         # be faster/easier to use?
         self.overridden = overridden
-        dict.__init__(self,dict_)
+        dict.__init__(self,dict_)        
 
     def __missing__(self,attr):
         """Return the attribute from overridden object."""
@@ -1287,3 +1289,20 @@ class ParamOverrides(dict):
         # something like...
         return dict.__repr__(self)+" overriding params from %s"%repr(self.overridden)
  
+
+    # CEB: temporarily match old behavior
+    def _access(self,k):
+        if hasattr(self.overridden,'will_confuse_you'):
+            try:
+                getattr(self.overridden,k)
+            except AttributeError:
+                pass
+        
+    def __getitem__(self,k):
+        self._access(k)
+        return dict.__getitem__(self,k)
+
+    def get(self,k):
+        self._access(k)
+        return dict.get(self,k)
+
