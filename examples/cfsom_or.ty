@@ -41,7 +41,7 @@ inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12+
                 for i in xrange(num_inputs)]
 
 # Contents of retina
-combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=0.6,generators=inputs)
+combined_inputs = topo.patterns.basic.SeparatedComposite(max_trials=75,min_separation=0.6,generators=inputs)
 
 # Sheets, connections, and their parameters
 topo.sim['Retina'] = GeneratorSheet(input_generator=combined_inputs,
