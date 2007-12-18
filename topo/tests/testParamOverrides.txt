@@ -6,7 +6,7 @@
 >>> po.name
 'A'
 
->>> overrides = ParamOverrides(po,name='B')
+>>> overrides = ParamOverrides(po,{'name':'B'})
 >>> overrides['name']
 'B'
 

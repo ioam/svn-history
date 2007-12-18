@@ -1267,16 +1267,16 @@ class ParamOverrides(dict):
 
     Used to override the parameters of an object.
     """
-    def __init__(self,overridden,**kw):
+    def __init__(self,overridden,dict_): 
         # we'd like __init__ to be fast because it's going to be
         # called a lot. What's the fastest way to move the existing
         # params dictionary into this one? Would
-        #  def __init__(self,overridden,dict_):
+        #  def __init__(self,overridden,**kw):
         #      ...
-        #      dict.__init__(self,dict_)
-        # be faster?
+        #      dict.__init__(self,**kw)
+        # be faster/easier to use?
         self.overridden = overridden
-        dict.__init__(self,**kw)
+        dict.__init__(self,dict_)
 
     def __missing__(self,attr):
         """Return the attribute from overridden object."""
@@ -1286,5 +1286,4 @@ class ParamOverrides(dict):
         """As dict.__repr__, but indicate the overridden object."""
         # something like...
         return dict.__repr__(self)+" overriding params from %s"%repr(self.overridden)
-        
-
+ 
