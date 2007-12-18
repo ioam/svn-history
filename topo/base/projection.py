@@ -147,18 +147,20 @@ class CompositeSheetMask(SheetMask):
             m.update()
         self._combine_submasks()
 
+
+
 class AndMask(CompositeSheetMask):
     """
-    A composite SheetMask that takes computes its value as the
-    logical AND (i.e. intersection) of its sub-masks.
+    A composite SheetMask that computes its value as the logical AND (i.e. intersection) of its sub-masks.
     """
     def _combine_submasks(self):
         self._data = asarray(reduce(logical_and,(m.data for m in self.submasks)),dtype=int)
 
+
+
 class OrMask(CompositeSheetMask):
     """
-    A composite SheetMask that takes computes its value as the
-    logical OR (i.e. union) of its sub-masks.
+    A composite SheetMask that computes its value as the logical OR (i.e. union) of its sub-masks.
     """
     def _combine_submasks(self):
         self._data = asarray(reduce(logical_or,(m.data for m in self.submasks)),dtype=int)
