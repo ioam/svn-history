@@ -1257,3 +1257,34 @@ class PicklableClassAttributes(object):
                         if isinstance(obj,Parameter):
                             class_attributes[full_class_path][name] = obj
 
+
+# CB: __missing__ is new to python 2.5; do I still need to
+# provide an alternative for 2.4?
+class ParamOverrides(dict):
+    """
+    A dictionary that returns the attribute of an object if that attribute is not
+    present in itself.
+
+    Used to override the parameters of an object.
+    """
+    def __init__(self,overridden,**kw):
+        # we'd like __init__ to be fast because it's going to be
+        # called a lot. What's the fastest way to move the existing
+        # params dictionary into this one? Would
+        #  def __init__(self,overridden,dict_):
+        #      ...
+        #      dict.__init__(self,dict_)
+        # be faster?
+        self.overridden = overridden
+        dict.__init__(self,**kw)
+
+    def __missing__(self,attr):
+        """Return the attribute from overridden object."""
+        return getattr(self.overridden,attr)
+        
+    def __repr__(self):
+        """As dict.__repr__, but indicate the overridden object."""
+        # something like...
+        return dict.__repr__(self)+" overriding params from %s"%repr(self.overridden)
+        
+
