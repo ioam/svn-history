@@ -752,6 +752,11 @@ http://www.psych.ndsu.nodak.edu/brady/downloads.html
 
 <!-- NOTES NEEDING TO BE TURNED INTO TASKS 
 
+Could consider interfacing to PsychoPy (http://www.psychopy.org) or
+VisionEgg (http://www.visionegg.org/), free libraries for running
+psychophysics experiments in Python.
+
+
 The DAVIS visualization system might be useful to study, especially when moving
 to 2-photon-imaging-like models: http://vip.cs.utsa.edu/research/Davis
 
