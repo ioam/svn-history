@@ -35,7 +35,6 @@ False
 >>> t2 = TestPO1(x=UniformRandom(lbound=-1,ubound=1,seed=10))
 >>> t3 = TestPO1(x=UniformRandom(lbound=-1,ubound=1,seed=10))
 
-
 >>> isinstance(t2.repr_value('x'),UniformRandom)  # check repr_value()
 True
 
@@ -101,6 +100,10 @@ True
 
 
 
+## Check sharing of 
+
+
+
 
 ## Repeat some earlier tests to check old-style uses (previous syntax
 ## in example scripts) still work ok
@@ -151,4 +154,41 @@ True
 False
 
 
+## Check shared generator
+
+>>> u = UniformRandom(lbound=-1,ubound=1,seed=20)
+>>> t11 = TestPO1(x=u)
+>>> t12 = TestPO2(x=u)
+>>> topo.sim.run(1)
+>>> t11.x==t12.x
+True
+
+
+### Check Dynamic works with some common generator-like things
+
+>>> i = iter([1,2,3])
+>>> t11.x = i
+None
+
+>>> topo.sim.run(1)
+
+>>> t11.x
+1
+
+>>> def gen():
+...     yield 2
+...     yield 4
+...     yield 6
+
+>>> g = gen()
+
+>>> t11.x = g
+
+>>> t11.x
+None
+
+>>> topo.sim.run(1)
+
+>>> t11.x
+2
 
