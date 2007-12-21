@@ -168,7 +168,6 @@ True
 
 >>> i = iter([1,2,3])
 >>> t11.x = i
-None
 
 >>> topo.sim.run(1)
 
@@ -185,10 +184,10 @@ None
 >>> t11.x = g
 
 >>> t11.x
-None
+2
 
 >>> topo.sim.run(1)
 
 >>> t11.x
-2
+4
 
