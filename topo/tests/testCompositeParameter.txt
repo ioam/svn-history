@@ -86,8 +86,6 @@
 >>> iy.next()
 5
 
->>> a2.xy  # asking for Composite advances attribs
-[3, 6]
 
 
 
