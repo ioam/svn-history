@@ -370,23 +370,10 @@ class Composite(PatternGenerator):
 
     def _advance_pattern_generators(self,generators):
         """
-        Advance each of the parameters overriden by this class.
-        
-        Each parameter should be accessed once, as it would be if the
-        pattern generator was used on its own, so that any dynamic
-        values are calculated first.
-
-        Subclasses can override this method to provide constraints
-        on these values and/or eliminate generators from this list
-        if necessary.
+        Subclasses can override this method to provide constraints on
+        the values of genertators' parameters and/or eliminate
+        generators from this list if necessary.
         """
-        for g in generators:
-            vals = (g.force_new_dynamic_value('x'),
-                    g.force_new_dynamic_value('y'),
-                    g.force_new_dynamic_value('size'),
-                    g.force_new_dynamic_value('scale'),
-                    g.force_new_dynamic_value('orientation'),
-                    g.force_new_dynamic_value('offset'))
         return generators
 
         
@@ -403,14 +390,14 @@ class Composite(PatternGenerator):
         orientation=pos['orientation']
         size = pos['size']
         patterns = [pg(xdensity=pos['xdensity'],ydensity=pos['ydensity'],bounds=pos['bounds'],mask=pos['mask'],
-                       x=pos['x']+size*(pg.inspect_value("x")*cos(orientation)-
-                                        pg.inspect_value("y")*sin(orientation)),
-                       y=pos['y']+size*(pg.inspect_value("x")*sin(orientation)+
-                                        pg.inspect_value("y")*cos(orientation)),
-                       orientation=pg.inspect_value("orientation")+orientation,
-                       size=pg.inspect_value("size")*pos['size'],
-                       scale=pg.inspect_value("scale")*pos['scale'],
-                       offset=pg.inspect_value("offset")+pos['offset'])
+                       x=pos['x']+size*(pg.x*cos(orientation)-
+                                        pg.y*sin(orientation)),
+                       y=pos['y']+size*(pg.x*sin(orientation)+
+                                        pg.y*cos(orientation)),
+                       orientation=pg.orientation+orientation,
+                       size=pg.size*pos['size'],
+                       scale=pg.scale*pos['scale'],
+                       offset=pg.offset+pos['offset'])
                     for pg in generators]
         image_array = self.operator.reduce(patterns)
         return image_array
@@ -458,8 +445,8 @@ class SeparatedComposite(Composite):
 
         Can be extended easily to support other criteria.
         """
-        dist = sqrt((g1.inspect_value("x") - g0.inspect_value("x")) ** 2 +
-                    (g1.inspect_value("y") - g0.inspect_value("y")) ** 2)
+        dist = sqrt((g1.x - g0.x) ** 2 +
+                    (g1.y - g0.y) ** 2)
         return dist >= self.min_separation
 
 
@@ -474,18 +461,16 @@ class SeparatedComposite(Composite):
         
         valid_generators = []
         for g in generators:
-            # Advance values as a side effect
-            vals = (g.force_new_dynamic_value('size'),
-                    g.force_new_dynamic_value('scale'),
-                    g.force_new_dynamic_value('orientation'),
-                    g.force_new_dynamic_value('offset'))
             
             for trial in xrange(self.max_trials):
-                # Generate a new position (as a side effect) and add generator if it's ok
-                vals = (g.force_new_dynamic_value('x'), g.force_new_dynamic_value('y'))
+                # Generate a new position and add generator if it's ok
+                
                 if alltrue([self.__distance_valid(g,v) for v in valid_generators]):
                     valid_generators.append(g)
                     break
+                
+                vals = (g.force_new_dynamic_value('x'), g.force_new_dynamic_value('y'))
+                
             else:
                 self.warning("Unable to place pattern %s subject to given constraints" %
                              g.name)

@@ -928,8 +928,8 @@ class Simulation(ParameterizedObject):
         """
         super(Simulation,self).__init__(**params)
 
-        #from topo.base.parameterclasses import Dynamic
-        #Dynamic.time_fn = self.time
+        from topo.base.parameterclasses import Dynamic
+        Dynamic.time_fn = self.time
 
         self._time = FixedPoint("0.0",4)
         self._event_processors = {}
