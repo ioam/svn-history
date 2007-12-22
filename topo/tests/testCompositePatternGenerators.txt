@@ -59,17 +59,14 @@ False
 >>> import topo
 >>> topo.sim.run(1)
 
-# separatedcomposite skips (all tests pass for [1] not [0] below)
 >>> assert g0.inspect_value(o)==g0o[0], "%s %s"%(g0.inspect_value(o),g0o[0])
 >>> assert g0.inspect_value(x)==g0x[0], "%s %s"%(g0.inspect_value(x),g0x[0])
 >>> assert g0.inspect_value(y)==g0y[0], "%s %s"%(g0.inspect_value(y),g0y[0])
 
-# composite skips (all tests pass for [1] not [0] below)
 >>> assert g2.inspect_value(o)==g0o[0], "%s %s"%(g2.inspect_value(o),g0o[0])
 >>> assert g2.inspect_value(x)==g0x[0], "%s %s"%(g2.inspect_value(x),g0x[0])
 >>> assert g2.inspect_value(y)==g0y[0], "%s %s"%(g2.inspect_value(y),g0y[0])
 
-# non-composite pattern is fine
 >>> assert gaussian0.inspect_value(x)==gaussian0x[0], "%s %s"%(gaussian0.inspect_value(x),gaussian0x[0])
 
 
