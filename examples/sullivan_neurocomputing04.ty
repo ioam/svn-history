@@ -52,6 +52,12 @@ from topo.base.arrayutils import wrap
 from topo.misc.numbergenerators import UniformRandom
 
 
+# CEBALERT: keep old behavior until we investigate why changing
+# to time-controlled dynamic parameters alters the results. 
+from topo.base.parameterclasses import Dynamic
+Dynamic.time_fn = None
+
+
 class XYModulo(CoordinateMapperFn):
     """Return the x coordinate of the given coordinate, modulo the specified step distance."""
  
