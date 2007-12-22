@@ -921,7 +921,7 @@ class ParameterizedObject(object):
 
         if not param_obj:
             return getattr(self,name)
-        elif not hasattr(param_obj,'_produce_value') or not param_obj._value_is_dynamically_generated(self):
+        elif not hasattr(param_obj,'_force') or not param_obj._value_is_dynamically_generated(self):
             return param_obj.__get__(self,type(self))
         else:
             return param_obj._force(self)
@@ -956,7 +956,7 @@ class ParameterizedObject(object):
             value = getattr(self,name)
         elif hasattr(param_obj,'attribs'):
             value = [self.inspect_value(a) for a in param_obj.attribs]
-        elif not hasattr(param_obj,'_dynamically_generated'):
+        elif not hasattr(param_obj,'_inspect'):
             value = getattr(self,name)
         else:
             value = param_obj._inspect(self)
@@ -983,7 +983,7 @@ class ParameterizedObject(object):
             value = [mthd(a) for a in param_obj.attribs]
 
         # not a Dynamic Parameter 
-        elif not hasattr(param_obj,'_dynamically_generated'):
+        elif not hasattr(param_obj,'_value_is_dynamically_generated'):
             value = getattr(self,name)
 
         # Dynamic Parameter...

@@ -124,8 +124,7 @@ class Dynamic(Parameter):
     """
     time_fn = None  
     
-    # CEB: other code might use _dynamically_generated to detect a possibly
-    __slots__ = ['_dynamically_generated']
+    __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
         
@@ -135,8 +134,6 @@ class Dynamic(Parameter):
         default is dynamic.
         """
         super(Dynamic,self).__init__(**params)
-
-        self._dynamically_generated = None # REMOVE!
 
         if is_dynamic(self.default):
             self._set_instantiate(True)
@@ -210,7 +207,9 @@ class Dynamic(Parameter):
 
         return value
 
-
+    # CB: presence of this method is is the way others tell if it's a dynamic parameter at all
+    # (i.e. probably need to have a better name and make this more formal + it might make
+    # more sense to check for 'inspect' - need to think about it after doc+clean.)
     def _value_is_dynamically_generated(self,obj):
         """
         Return True if the parameter is actually dynamic (i.e. the
