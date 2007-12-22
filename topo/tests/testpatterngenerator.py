@@ -204,12 +204,14 @@ class TestPatternGenerator(unittest.TestCase):
 
     def test_bug__dynamic_param_advanced_by_repr(self):
         """Check for bug where repr of a PatternGenerator causes a DynamicNumber to change."""
-        # to do with position?
+        # CEB: can probably remove this test now we have time-controlled dynamic parameters
         from topo.misc.numbergenerators import UniformRandom
+        import topo
 
         p=PatternGenerator(x=UniformRandom(lbound=-1,ubound=1,seed=1))
 
         x0 = p.x
+        topo.sim.run(1)
         x1 = p.x
         self.assertNotEqual(x0,x1) # check we have setup something that actually changes
 
