@@ -10,7 +10,6 @@ __version__='$Revision$'
 
 
 from optparse import OptionParser
-from inlinec import import_weave
 
 import sys, __main__, math, os, re, traceback
 
@@ -253,11 +252,6 @@ def process_argv(argv):
         if not args:
             break
 
-    # CEBALERT: topographica doesn't stay open if there's an error
-    # in commands executed - try:
-    #  ./topographica -i -c "raise"
-    # JP: -i should always result in an interactive prompt.
-    # This is fixed above.
         
     # If no scripts and no commands were given, pretend -i was given.
     if not something_executed:
