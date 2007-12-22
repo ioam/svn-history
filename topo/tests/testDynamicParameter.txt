@@ -133,6 +133,9 @@ False
 
 
 ### Check that time_fn works
+>>> from topo.base.simulation import Simulation
+>>> s = Simulation(register=True)
+
 >>> import topo; Dynamic.time_fn = topo.sim.time
 >>> t10 = TestPO1()
 >>> a = t10.x; b = t10.x; c = t10.x
@@ -164,30 +167,32 @@ False
 True
 
 
-### Check Dynamic works with some common generator-like things
+# we currently don't support iterators/generators in Dynamic
+# unless they're wrapped
+## ### Check Dynamic works with some common generator-like things
 
->>> i = iter([1,2,3])
->>> t11.x = i
+## >>> i = iter([1,2,3])
+## >>> t11.x = i
 
->>> topo.sim.run(1)
+## >>> topo.sim.run(1)
 
->>> t11.x
-1
+## >>> t11.x
+## 1
 
->>> def gen():
-...     yield 2
-...     yield 4
-...     yield 6
+## >>> def gen():
+## ...     yield 2
+## ...     yield 4
+## ...     yield 6
 
->>> g = gen()
+## >>> g = gen()
 
->>> t11.x = g
+## >>> t11.x = g
 
->>> t11.x
-2
+## >>> t11.x
+## 2
 
->>> topo.sim.run(1)
+## >>> topo.sim.run(1)
 
->>> t11.x
-4
+## >>> t11.x
+## 4
 
