@@ -914,6 +914,19 @@ class ParameterizedObject(object):
 
     # CEBALERT: the class equivalents of these are missing
     # (i.e. one can't yet do Gaussian.inspect_value('x') )
+
+
+    def force_new_dynamic_value(self,name):
+        param_obj = self.params().get(name)
+
+        if not param_obj:
+            return getattr(self,name)
+        elif not hasattr(param_obj,'_produce_value') or not param_obj._value_is_dynamically_generated(self):
+            return param_obj.__get__(self,type(self))
+        else:
+            return param_obj._force(self)
+            
+
     
     # CEBALERT: can someone make this more elegant? Or at least
     # suggest some better names and help with the documentation?
@@ -937,24 +950,19 @@ class ParameterizedObject(object):
         Same as getattr() except for Dynamic parameters, which have their
         last value returned.
         """
-        return self._shenma(name,self.inspect_value,"_%s_param_value_last"%name,'last_default')
-
-
-
-    # CB: these two methods are missing class equivalents; might actually be better not to have
-    # these methods at all
-
-    def force_new_dynamic_value(self,name):
         param_obj = self.params().get(name)
 
         if not param_obj:
-            return getattr(self,name)
-        elif not hasattr(param_obj,'_produce_value') or not param_obj._value_is_dynamically_generated(self):
-            return param_obj.__get__(self,type(self))
+            value = getattr(self,name)
+        elif hasattr(param_obj,'attribs'):
+            value = [self.inspect_value(a) for a in param_obj.attribs]
+        elif not hasattr(param_obj,'_dynamically_generated'):
+            value = getattr(self,name)
         else:
-            return param_obj._produce_value(self)
+            value = param_obj._inspect(self)
+
+        return value
             
-        
 
     def _shenma(self,name,mthd,local_attr_name,param_attr_name):
         """
@@ -975,7 +983,7 @@ class ParameterizedObject(object):
             value = [mthd(a) for a in param_obj.attribs]
 
         # not a Dynamic Parameter 
-        elif not hasattr(param_obj,'last_default'):
+        elif not hasattr(param_obj,'_dynamically_generated'):
             value = getattr(self,name)
 
         # Dynamic Parameter...

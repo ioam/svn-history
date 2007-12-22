@@ -94,6 +94,9 @@ is_number = operator.isNumberType
 
 # CB: "last" should be "current"
 # CB: doc out of date! (I'm updating it.)
+
+# check that value before first gen makes sense
+# * can't use gen/iter *
 class Dynamic(Parameter):
     """
     Parameter whose value can be generated dynamically by a callable object.
@@ -121,7 +124,8 @@ class Dynamic(Parameter):
     """
     time_fn = None  
     
-    __slots__ = ['last_default','last_time','_dynamically_generated']
+    # CEB: other code might use _dynamically_generated to detect a possibly
+    __slots__ = ['_dynamically_generated']
     __doc__ = property((lambda self: self.doc))
 
         
@@ -132,45 +136,18 @@ class Dynamic(Parameter):
         """
         super(Dynamic,self).__init__(**params)
 
-        self.last_time = -1  # time assumed to have earliest value of 0 (actually -0.99...)
+        self._dynamically_generated = None # REMOVE!
 
         if is_dynamic(self.default):
-            self.last_default = None
             self._set_instantiate(True)
-            self._dynamically_generated = True
-        else:
-            self.last_default = self.default
-            self._dynamically_generated = False
+            self._initialize_generator(self.default)
 
 
-    def _needs_update(self,obj):
-        """
-        Return True if the current time is greater than the last time.
-
-        If called on a class (obj is None), gets the last value from the
-        parameter object.
-
-        If called on an instance (obj is not None), gets the last time
-        from the instance's __dict__. If the last time is not in the
-        instance's __dict__, then the instance is using the class
-        (default) value, so the same is done as when called on a
-        class.
-
-        If Dynamic has no time_fn, always returns True.
-        """
-        if self.time_fn is None: return True
-
-        time = self.time_fn()
-        
-        if not obj:
-            update = time>self.last_time
-        else:
-            try:
-                update = time>obj.__dict__[self.internal_name(obj)+'_time']
-            except KeyError:
-                update = time>self.last_time
-
-        return update
+    def _initialize_generator(self,gen):
+        # CEB: I'd use None for this, except can't compare a fixedpoint
+        # number with None (e.g. 1>None but FixedPoint(1)>None can't be done)
+        gen._Dynamic_last = None
+        gen._Dynamic_time = -1
                 
         
     def __get__(self,obj,objtype):
@@ -181,11 +158,13 @@ class Dynamic(Parameter):
         # note that this code results in more loops than are
         # necessary, but it's simpler to understand.
 
-        if not self._value_is_dynamically_generated(obj) or not self._needs_update(obj):
-            return self._last_value(obj)  
-        else:
-            return self._produce_value(obj)
+        gen = super(Dynamic,self).__get__(obj,objtype)
 
+        if not hasattr(gen,'_Dynamic_last'):
+            return gen
+        else:
+            return self._produce_value(gen)
+            
 
     def __set__(self,obj,val):
         """
@@ -194,48 +173,12 @@ class Dynamic(Parameter):
         """
         super(Dynamic,self).__set__(obj,val)
 
-        if not is_dynamic(val):
-            if not obj:
-                self.last_default = self.default
-                self._set_instantiate(False)
-                self._dynamically_generated = False
-            else:
-                internal_name = self.internal_name(obj)
-                obj.__dict__[internal_name+'_last']=val
-                obj.__dict__[internal_name+'_dynamically_generated']=False
-        else:
-            if not obj:
-                self._set_instantiate(True)
-                self._dynamically_generated = True
-            else:
-                obj.__dict__[self.internal_name(obj)+'_dynamically_generated']=True
+        dynamic = is_dynamic(val)        
+        if dynamic: self._initialize_generator(val)
+        if not obj: self._set_instantiate(dynamic)
 
 
-    def _last_value(self,obj):
-        """
-        Return the last value produced for this parameter.
-        
-        If called on a class (obj is None), return the last class
-        value (this Parameter object's last_default).
-
-        If called on an instance (obj is not None), return the
-        last value produced by the instance (stored in the instance's
-        __dict__). If the instance's __dict__ does not contain a last value,
-        then the instance is using the class value (default), so the
-        same is done as for when called on a class.
-        """
-        if not obj:
-            value = self.last_default
-        else:
-            try:
-                value = obj.__dict__[self.internal_name(obj)+'_last']
-            except KeyError:
-                value = self.last_default
-
-        return value
-
-
-    def _produce_value(self,obj):
+    def _produce_value(self,gen,update=None):
         """
         Return a new value for this parameter.
 
@@ -251,29 +194,23 @@ class Dynamic(Parameter):
         parameter has not been set on the instance, does the same as
         when called on a class.
         """
-        if self.time_fn:
+        if self.time_fn is None or update:
+            value = produce_value(gen)
+            gen._Dynamic_last = value
+        else:
+            
             time = self.time_fn()
-        else:
-            time = -1
 
-        if not obj:
-            value = produce_value(self.default)
-            self.last_default = value
-            self.last_time = time
-        else:
-            try:
-                name = self.internal_name(obj)
-                value = produce_value(obj.__dict__[name])
-                obj.__dict__[name+'_last']=value
-                obj.__dict__[name+'_time']=time
-            except KeyError:
-                value = produce_value(self.default)
-                self.last_default = value
-                self.last_time = time
+            if update is not False and time>gen._Dynamic_time:
+                value = produce_value(gen)
+                gen._Dynamic_last = value
+                gen._Dynamic_time = time
+            else:
+                value = gen._Dynamic_last
 
         return value
 
-    
+
     def _value_is_dynamically_generated(self,obj):
         """
         Return True if the parameter is actually dynamic (i.e. the
@@ -285,14 +222,24 @@ class Dynamic(Parameter):
         If called on an instance, inspects the instance's value if it
         has one, otherwise inspects the parameter default value.
         """
-        if not obj:
-            return self._dynamically_generated
-        else:            
-            try:
-                return obj.__dict__[self.internal_name(obj)+"_dynamically_generated"]
-            except KeyError:
-                return self._dynamically_generated
+        gen=super(Dynamic,self).__get__(obj,None)
+        return hasattr(gen,'_Dynamic_last')
 
+
+    def _inspect(self,obj):
+        gen=super(Dynamic,self).__get__(obj,None)
+        if hasattr(gen,'_Dynamic_last'):
+            return gen._Dynamic_last 
+        else:
+            return gen 
+    
+    def _force(self,obj):
+        gen=super(Dynamic,self).__get__(obj,None)
+        if hasattr(gen,'_Dynamic_last'):
+            return self._produce_value(gen,update=True)
+        else:
+            return gen 
+        
 
 
 # CEBALERT: Now accepts FixedPoint, but not fully tested.
@@ -917,3 +864,4 @@ class DynamicNumber(object):
         self.val = default
     def __call__(self):
         return self.val()
+
