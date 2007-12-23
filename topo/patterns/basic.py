@@ -64,9 +64,9 @@ class Gaussian(PatternGenerator):
         where ysigma=size/2 and xsigma=size/2*aspect_ratio.
         """)
 
-    def function(self,pos):
-        ysigma = pos['size']/2.0
-        xsigma = pos['aspect_ratio']*ysigma
+    def function(self,params):
+        ysigma = params['size']/2.0
+        xsigma = params['aspect_ratio']*ysigma
 
         return gaussian(self.pattern_x,self.pattern_y,xsigma,ysigma)
 
@@ -80,9 +80,9 @@ class SineGrating(PatternGenerator):
     phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),
                        precedence=0.51,doc="Phase of the sine grating.")
 
-    def function(self,pos):
+    def function(self,params):
         """Return a sine grating pattern (two-dimensional sine wave)."""
-        return 0.5 + 0.5*sin(pos['frequency']*2*pi*self.pattern_y + pos['phase'])        
+        return 0.5 + 0.5*sin(params['frequency']*2*pi*self.pattern_y + params['phase'])        
 
 
 
@@ -105,12 +105,12 @@ class Gabor(PatternGenerator):
     size = Number(default=0.25,doc="""
         Determines the height of the Gaussian component (see Gaussian).""")
 
-    def function(self,pos):
-        height = pos['size']/2.0
-        width = pos['aspect_ratio']*height
+    def function(self,params):
+        height = params['size']/2.0
+        width = params['aspect_ratio']*height
         
         return gabor( self.pattern_x,self.pattern_y,width,height,
-                      pos['frequency'],pos['phase'])
+                      params['frequency'],params['phase'])
 
 
 class Line(PatternGenerator):
@@ -123,8 +123,8 @@ class Line(PatternGenerator):
                        precedence=0.61,
                        doc="Width of the Gaussian fall-off.")
 
-    def function(self,pos):
-        return line(self.pattern_y,pos['thickness'],pos['smoothing'])
+    def function(self,params):
+        return line(self.pattern_y,params['thickness'],params['smoothing'])
 
 
 class Disk(PatternGenerator):
@@ -149,13 +149,13 @@ class Disk(PatternGenerator):
     smoothing = Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.61,doc="Width of the Gaussian fall-off")
     
-    def function(self,pos):
-        height = pos['size']
-        aspect_ratio = pos['aspect_ratio']
+    def function(self,params):
+        height = params['size']
+        aspect_ratio = params['aspect_ratio']
 
         # CEBHACKALERT: this division should handle aspect_ratio=0
         return disk(self.pattern_x/aspect_ratio,self.pattern_y,height,
-                         pos['smoothing'])
+                         params['smoothing'])
 
 
 class Ring(PatternGenerator):
@@ -177,12 +177,12 @@ class Ring(PatternGenerator):
     
     size = Number(default=0.5)
 
-    def function(self,pos):
-        height = pos['size']
-        aspect_ratio = pos['aspect_ratio']
+    def function(self,params):
+        height = params['size']
+        aspect_ratio = params['aspect_ratio']
 
         return ring(self.pattern_x/aspect_ratio,self.pattern_y,height,
-                    pos['thickness'],pos['smoothing'])
+                    params['thickness'],params['smoothing'])
     
 
 class Rectangle(PatternGenerator):
@@ -196,9 +196,9 @@ class Rectangle(PatternGenerator):
 
     # We will probably want to add Fuzzy-style anti-aliasing to this.
 
-    def function(self,pos):
-        height = pos['size']
-        width = pos['aspect_ratio']*height
+    def function(self,params):
+        height = params['size']
+        width = params['aspect_ratio']*height
         
         return bitwise_and(abs(self.pattern_x)<=width/2.0,
                            abs(self.pattern_y)<=height/2.0)
@@ -222,9 +222,9 @@ class TwoRectangles(Rectangle):
     # YC: Maybe this can be implemented much more cleanly by calling
     # the parent's function() twice, but it's hard to see how to 
     # set the (x,y) offset for the parent.
-    def function(self,pos):
-        height = pos['size']
-        width = pos['aspect_ratio']*height
+    def function(self,params):
+        height = params['size']
+        width = params['aspect_ratio']*height
 
         return bitwise_or(
 	       bitwise_and(bitwise_and(
@@ -254,11 +254,11 @@ class SquareGrating(PatternGenerator):
     # and there might be an easier way to do it than by
     # cropping a sine grating.
 
-    def function(self,pos):
+    def function(self,params):
         """
         Return a square-wave grating (alternating black and white bars).
         """
-        return around(0.5 + 0.5*sin(pos['frequency']*2*pi*self.pattern_y + pos['phase']))
+        return around(0.5 + 0.5*sin(params['frequency']*2*pi*self.pattern_y + params['phase']))
 
 
 
@@ -277,16 +277,16 @@ class Sweeper(PatternGenerator):
         Number of steps at the given speed to move in the sweep direction.
         The distance moved is speed*step.""")
 
-    def function(self,pos):
+    def function(self,params):
         """Selects and returns one of the patterns in the list."""
-        bounds = pos['bounds']
-        xdensity=pos['xdensity']
-        ydensity=pos['ydensity']
-        x=pos['x']
-        y=pos['y']
-        scale=pos['scale']
-        offset=pos['offset']
-        size=pos['size']
+        bounds = params['bounds']
+        xdensity=params['xdensity']
+        ydensity=params['ydensity']
+        x=params['x']
+        y=params['y']
+        scale=params['scale']
+        offset=params['offset']
+        size=params['size']
         orientation=['orientation']
         
         pg = self.generator
@@ -294,9 +294,9 @@ class Sweeper(PatternGenerator):
         pattern_orientation=orientation
         motion_orientation=pattern_orientation+pi/2.0
         
-        speed=pos['speed']
+        speed=params['speed']
         motion_sign=2*int(motion_orientation/pi)-1
-        step=pos['step']
+        step=params['step']
 
         new_x = x+size*pg.x
         new_y = y+size*pg.y
@@ -380,24 +380,24 @@ class Composite(PatternGenerator):
     # JABALERT: To support large numbers of patterns on a large input region,
     # should be changed to evaluate each pattern in a small box, and then
     # combine them at the full Composite Bounding box size.
-    def function(self,pos):
+    def function(self,params):
         """Constructs combined pattern out of the individual ones."""
-        generators = self._advance_pattern_generators(pos['generators'])
+        generators = self._advance_pattern_generators(params['generators'])
 
         # CEBALERT: mask gets applied by all PGs including the Composite itself
         # (leads to redundant calculations in current lissom_oo_or usage, but
         # will lead to problems/limitations in the future).
-        orientation=pos['orientation']
-        size = pos['size']
-        patterns = [pg(xdensity=pos['xdensity'],ydensity=pos['ydensity'],bounds=pos['bounds'],mask=pos['mask'],
-                       x=pos['x']+size*(pg.x*cos(orientation)-
+        orientation=params['orientation']
+        size = params['size']
+        patterns = [pg(xdensity=params['xdensity'],ydensity=params['ydensity'],bounds=params['bounds'],mask=params['mask'],
+                       x=params['x']+size*(pg.x*cos(orientation)-
                                         pg.y*sin(orientation)),
-                       y=pos['y']+size*(pg.x*sin(orientation)+
+                       y=params['y']+size*(pg.x*sin(orientation)+
                                         pg.y*cos(orientation)),
                        orientation=pg.orientation+orientation,
-                       size=pg.size*pos['size'],
-                       scale=pg.scale*pos['scale'],
-                       offset=pg.offset+pos['offset'])
+                       size=pg.size*params['size'],
+                       scale=pg.scale*params['scale'],
+                       offset=pg.offset+params['offset'])
                     for pg in generators]
         image_array = self.operator.reduce(patterns)
         return image_array
@@ -502,18 +502,18 @@ class Selector(PatternGenerator):
         super(Selector,self).__init__(**params)
         self.generators = generators
 
-    def function(self,pos):
+    def function(self,params):
         """Selects and returns one of the patterns in the list."""
-        bounds = pos['bounds']
-        xdensity=pos['xdensity']
-        ydensity=pos['ydensity']
-        x=pos['x']
-        y=pos['y']
-        scale=pos['scale']
-        offset=pos['offset']
-        size=pos['size']
+        bounds = params['bounds']
+        xdensity=params['xdensity']
+        ydensity=params['ydensity']
+        x=params['x']
+        y=params['y']
+        scale=params['scale']
+        offset=params['offset']
+        size=params['size']
         orientation=['orientation']
-        index=pos['index']
+        index=params['index']
         int_index=int(len(self.generators)*wrap(0,1.0,index))
 
         pg = self.generators[int_index]
@@ -548,26 +548,24 @@ class SineGratingDisk(PatternGenerator):
 
     frequency  = Number(default=2.4,doc="frequency of the sine grating")
 
-
-##     def __init__(self,**params):
-##         super(SineGratingDisk,self).__init__(**params)
        
-    def __call__(self,**params):
+    def __call__(self,**params_to_override):
+        params = ParamOverrides(self,params_to_override)
 
-        bounds = pos['bounds']
-        xdensity=pos['xdensity']
-        ydensity=pos['ydensity']
-        x=pos['x']
-        y=pos['y']
-        scale=pos['scale']
-        offset=pos['offset']
-        size=pos['size']
+        bounds = params['bounds']
+        xdensity=params['xdensity']
+        ydensity=params['ydensity']
+        x=params['x']
+        y=params['y']
+        scale=params['scale']
+        offset=params['offset']
+        size=params['size']
         orientation=['orientation']
-        size=pos['size']
-        phase=pos['phase']
-        frequency=pos['frequency']
-        aspect_ratio=pos['aspect_ratio']
-        smoothing=pos['smoothing']
+        size=params['size']
+        phase=params['phase']
+        frequency=params['frequency']
+        aspect_ratio=params['aspect_ratio']
+        smoothing=params['smoothing']
 
       
         input_1=SineGrating(phase=phase, frequency=frequency, orientation=orientation, scale=scale, offset=offset)
@@ -597,18 +595,19 @@ class GaussiansCorner(PatternGenerator):
     angle = Number(default=pi/2,doc="The angle of the corner")
     
     
-    def __call__(self,**params):
+    def __call__(self,**params_to_override):
+        params = ParamOverrides(self,params_to_override)
 
-        bounds = pos['bounds']
-        xdensity=pos['xdensity']
-        ydensity=pos['ydensity']
-        x=pos['x']
-        y=pos['y']
-        scale=pos['scale']
-        offset=pos['offset']
-        size=pos['size']
+        bounds = params['bounds']
+        xdensity=params['xdensity']
+        ydensity=params['ydensity']
+        x=params['x']
+        y=params['y']
+        scale=params['scale']
+        offset=params['offset']
+        size=params['size']
         orientation=['orientation']
-        size=pos['size']
+        size=params['size']
 	
 	input_1=Gaussian()
         input_2=Gaussian()
