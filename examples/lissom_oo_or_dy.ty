@@ -39,7 +39,7 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import DynamicNumber,Number
+from topo.base.parameterclasses import Number
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
@@ -120,20 +120,20 @@ class NumericOffset(ParameterizedObject):
        return base + offset_scale*offset
 
 left_x=NumericOffset(offset_scale=-1.0,
-   base=DynamicNumber(UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12)),
-   offset=DynamicNumber(UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150)))
+   base=UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12),
+   offset=UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150))
 
 right_x=NumericOffset(offset_scale=1.0,
-   base=DynamicNumber(UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12)),
-   offset=DynamicNumber(UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150)))
+   base=UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12),
+   offset=UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150))
 
 
 if plusminus:
    from topo.misc.numbergenerators import Choice
    scale_value = Choice(choices=[-0.5,0.5])
    scale_value_copy=copy.deepcopy(scale_value)
-   left_scale=DynamicNumber(scale_value)
-   right_scale=DynamicNumber(scale_value_copy)
+   left_scale=scale_value
+   right_scale=scale_value_copy
    input_offset=0.5
 else:
    left_scale=1.0
@@ -143,16 +143,16 @@ else:
 left_input_pattern = topo.patterns.basic.Gaussian(
           size=2*0.0468, aspect_ratio=4.0, offset=input_offset,
           scale=left_scale,
-          x=DynamicNumber(left_x),
-          y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34)),
-          orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+          x=left_x,
+          y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
+          orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
 right_input_pattern = topo.patterns.basic.Gaussian(
           size=2*0.0468, aspect_ratio=4.0,offset=input_offset,
           scale=right_scale,
-          x=DynamicNumber(right_x),
-          y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34)),
-          orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+          x=right_x,
+          y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
+          orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
 
 # Specify weight initialization, response function, and learning function

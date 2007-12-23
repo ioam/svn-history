@@ -25,7 +25,6 @@ import topo.patterns.basic
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFProjection,CFPOF_Plugin,CFSheet
-from topo.base.parameterclasses import DynamicNumber,Number
 from topo.sheets.cfsom import CFSOM
 from topo.responsefns.optimized import CFPRF_EuclideanDistance_opt,CFPRF_DotProduct_opt
 from topo.learningfns.projfns import CFPLF_Trace, CFPLF_Plugin,  CFPLF_OutstarHebbian
@@ -40,7 +39,7 @@ from math import pi, sin, cos
 from numpy import sin,add
 
 from topo.base.parameterclasses import Number, Parameter, Enumeration
-from topo.base.parameterclasses import DynamicNumber, ListParameter
+from topo.base.parameterclasses import ListParameter
 from topo.base.functionfamilies import OutputFnParameter
 from topo.base.patterngenerator import PatternGenerator
 
@@ -141,8 +140,7 @@ GeneratorSheet.phase = 0
 
 input_pattern = OrientedLine(
     offEdge=1,
-    angle=DynamicNumber(UniformRandom(lbound=0,ubound=360,seed=13))
-		    )
+    angle=UniformRandom(lbound=0,ubound=360,seed=13))
 
 # Sheets, connections, and their parameters
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
@@ -157,7 +155,7 @@ topo.sim['V1'] = CFSheet(nominal_density=default_density,
                          output_fn = KernelMax(density=default_density,kernel_radius=3.5))
 
 topo.sim.connect('Retina','V1',delay=0.05,connection_type=CFProjection,
-                 weights_generator = topo.patterns.basic.Line(orientation=DynamicNumber(UniformRandom(lbound=0.0,ubound=2*pi,seed=30))),
+                 weights_generator = topo.patterns.basic.Line(orientation=UniformRandom(lbound=0.0,ubound=2*pi,seed=30)),
                  nominal_bounds_template=BoundingBox(radius=0.1),
                  response_fn = CFPRF_DotProduct_opt(),
                  coord_mapper=XYModulo())

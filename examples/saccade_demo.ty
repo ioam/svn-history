@@ -20,7 +20,6 @@ from itertools import cycle
 import pylab
 
 from topo.base.parameterizedobject import VERBOSE,NORMAL,DEBUG
-from topo.base.parameterclasses import DynamicNumber,Number
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFProjection
 
@@ -57,13 +56,13 @@ saccade_generator = topo.patterns.basic.Gaussian(
     # A cycle through a series of saccades to the
     # periphery, and back to the center.
     # 
-    #                        NE    C     SE   C     NW   C     SW    C
-    # x=DynamicNumber(cycle([0.3,-0.3,  0.3,-0.3, -0.3, 0.3, -0.3, 0.3])),
-    # y=DynamicNumber(cycle([0.3,-0.3, -0.3, 0.3,  0.3,-0.3, -0.3, 0.3])),
+    #          NE    C     SE   C     NW   C     SW    C
+    # x=cycle([0.3,-0.3,  0.3,-0.3, -0.3, 0.3, -0.3, 0.3]),
+    # y=cycle([0.3,-0.3, -0.3, 0.3,  0.3,-0.3, -0.3, 0.3]),
 
     # random saccades
-    x = DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5)),
-    y = DynamicNumber(UniformRandom(lbound=-0.4,ubound=0.4)),
+    x = UniformRandom(lbound=-0.5,ubound=0.5),
+    y = UniformRandom(lbound=-0.4,ubound=0.4),
 
     # constant 'still' saccade: will produce random walk if using
     # SaccadeController.decode_method = 'sample'

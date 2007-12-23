@@ -1,5 +1,5 @@
 >>> from topo.base.parameterizedobject import ParameterizedObject
->>> from topo.base.parameterclasses import Dynamic, DynamicNumber
+>>> from topo.base.parameterclasses import Dynamic
 >>> from topo.misc.numbergenerators import UniformRandom
 
 
@@ -104,10 +104,14 @@ True
 
 
 
-
+##################################################
 ## Repeat some earlier tests to check old-style uses (previous syntax
 ## in example scripts) still work ok
->>> from topo.base.parameterclasses import Number
+>>> from topo.base.parameterclasses import Number,DynamicNumber
+>>> warnedA=DynamicNumber.warnedA  # disable warnings & restore at end
+>>> warnedB=DynamicNumber.warnedB
+>>> DynamicNumber.warnedA=True
+>>> DynamicNumber.warnedB=True
 
 >>> class TestPO2(ParameterizedObject):
 ...    x = Number(default=0.0)
@@ -129,6 +133,11 @@ False
 True
 >>> t5.inspect_value==t4_last_value # catch new bug caused by shared Parameter object (shared last_value)
 False
+
+>>> DynamicNumber.warnedA=warnedA
+>>> DynamicNumber.warnedB=warnedB
+
+##################################################
 
 
 

@@ -34,7 +34,6 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet 
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.base.functionfamilies import OutputFn
-from topo.base.parameterclasses import DynamicNumber, Number
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.learningfns.basic import Hebbian
 from topo.learningfns.projfns import HomeoSynaptic
@@ -61,7 +60,7 @@ CFProjection.weights_generator=topo.patterns.random.UniformRandom()
 # Input pattern
 input_pattern = topo.patterns.basic.Gaussian(
 			scale=1, size=0.1, aspect_ratio=1.0,
-			x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
+			x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
 			y=0,orientation=0)
 		
 	

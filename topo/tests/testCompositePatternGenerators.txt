@@ -1,5 +1,5 @@
 >>> from topo.patterns.basic import Composite, SeparatedComposite, Gaussian
->>> from topo.base.parameterclasses import Dynamic, DynamicNumber
+>>> from topo.base.parameterclasses import Dynamic
 >>> from topo.misc.numbergenerators import UniformRandom
 >>> from topo.base.simulation import Simulation
 >>> from topo.base.cf import CFSheet,CFProjection
@@ -9,8 +9,8 @@
 
 ## SeparatedComposite with 0 separation so no numbers lost through trials.
 # (so should presumably be the same as Composite) 
->>> g0 = Gaussian(x=DynamicNumber(UniformRandom(seed=1)),y=DynamicNumber(UniformRandom(seed=2)),orientation=DynamicNumber(UniformRandom(seed=3)))
->>> g1 = Gaussian(x=DynamicNumber(UniformRandom(seed=4)),y=DynamicNumber(UniformRandom(seed=5)),orientation=DynamicNumber(UniformRandom(seed=6)))
+>>> g0 = Gaussian(x=UniformRandom(seed=1),y=UniformRandom(seed=2),orientation=UniformRandom(seed=3))
+>>> g1 = Gaussian(x=UniformRandom(seed=4),y=UniformRandom(seed=5),orientation=UniformRandom(seed=6))
 >>> separated_composite = SeparatedComposite(min_separation=0,generators=[g0,g1])
 
 >>> import copy
@@ -19,7 +19,7 @@
 False
 
 >>> composite = Composite(generators=[g2,g3])
->>> gaussian0 = Gaussian(x=DynamicNumber(UniformRandom(seed=7)))
+>>> gaussian0 = Gaussian(x=UniformRandom(seed=7))
 
 
 ## Setup simulation 

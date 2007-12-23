@@ -20,7 +20,6 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import DynamicNumber,Number
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
@@ -46,18 +45,18 @@ class Opposite(object):
 
 left_input_pattern = topo.patterns.basic.Gaussian(
           size=2*0.0468, aspect_ratio=4.0,
-          scale=DynamicNumber(left_input), 
-          x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
-          y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
-          orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+          scale=left_input, 
+          x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
+          y=UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
+          orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
 
 right_input_pattern = topo.patterns.basic.Gaussian(
           size=2*0.0468, aspect_ratio=4.0,
-          scale=DynamicNumber(Opposite(left_input)),
-          x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
-          y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
-          orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+          scale=Opposite(left_input),
+          x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
+          y=UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
+          orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
                                  
 # Specify weight initialization, response function, and learning function

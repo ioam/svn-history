@@ -25,7 +25,7 @@ from topo.base.cf import CFPLearningFn,LearningFnParameter
 from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 from topo.base.cf import CFSheet, CFPOF_Plugin
 from topo.base.functionfamilies import LearningFn, OutputFn, OutputFnParameter, IdentityOF
-from topo.base.parameterclasses import DynamicNumber, Number, BooleanParameter, ListParameter
+from topo.base.parameterclasses import Number, BooleanParameter, ListParameter
 from topo.learningfns.basic import Hebbian
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.learningfns.projfns import HomeoSynaptic
@@ -78,9 +78,9 @@ class PiecewiseLinear_debug2(OutputFn):
 
 input_pattern = topo.patterns.basic.Gaussian(
           scale=1.0, size=2*0.0468, aspect_ratio=4.0,
-          x=DynamicNumber(UniformRandom(lbound=-0.6,ubound=0.6,seed=12)),
-          y=DynamicNumber(UniformRandom(lbound=-0.6,ubound=0.6,seed=34)),
-          orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+          x=UniformRandom(lbound=-0.6,ubound=0.6,seed=12),
+          y=UniformRandom(lbound=-0.6,ubound=0.6,seed=34),
+          orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
                                 
 
 class InitFn(CFPLearningFn):

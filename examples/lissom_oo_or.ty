@@ -43,7 +43,6 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
@@ -53,9 +52,9 @@ from topo.misc.numbergenerators import UniformRandom
 
 num_inputs=2
 input_type=Gaussian
-inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),
-                   y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i)),
-                   orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56+i)),
+inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
+                   y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
+                   orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
                    size=0.088388, aspect_ratio=4.66667, scale=1.0,
                    bounds=BoundingBox(radius=0.8)) # JABALERT: What does this bounds do?
         for i in xrange(num_inputs)]

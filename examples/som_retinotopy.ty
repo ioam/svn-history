@@ -27,7 +27,6 @@ import topo.patterns.basic
 
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet,CFProjection
-from topo.base.parameterclasses import DynamicNumber,Number
 from topo.learningfns.projfns import CFPLF_EuclideanHebbian
 from topo.misc.numbergenerators import UniformRandom,BoundedNumber,ExponentialDecay
 from topo.outputfns.basic import KernelMax
@@ -48,8 +47,8 @@ input_pattern = topo.patterns.basic.Gaussian(
     scale=1.0,
     size=2*sqrt(2.0*0.1*24.0)/24.0,
     aspect_ratio=1.0,
-    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=input_seed+12)),
-    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=input_seed+56)),
+    x=UniformRandom(lbound=-0.5,ubound=0.5,seed=input_seed+12),
+    y=UniformRandom(lbound=-0.5,ubound=0.5,seed=input_seed+56),
     orientation=0)
 
 
@@ -71,8 +70,8 @@ topo.sim['V1'] = CFSheet(
 topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,connection_type=CFProjection,
     weights_generator = topo.patterns.random.UniformRandom(),
     nominal_bounds_template=BoundingBox(radius=1.0), # fully connected network.
-    learning_rate=DynamicNumber(ExponentialDecay(starting_value = locals().get('alpha_0',0.42),
-                                                 time_constant=40000/6.0)),
+    learning_rate=ExponentialDecay(starting_value = locals().get('alpha_0',0.42),
+                                   time_constant=40000/6.0),
     response_fn = CFPRF_EuclideanDistance_opt(),
     learning_fn = CFPLF_EuclideanHebbian())
 
