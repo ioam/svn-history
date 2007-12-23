@@ -50,24 +50,22 @@ class SineGratingDisk(PatternGenerator):
 
     hidden = BooleanParameter(default=True)
 
-    def __init__(self,**params):
-        super(SineGratingDisk,self).__init__(**params)
        
-    def __call__(self,**params):
-        pos = ParamOverrides(self,params)
-      	bounds = pos['bounds']
-        xdensity=pos['xdensity']
-        ydensity=pos['ydensity']
-        x=pos['x']
-        y=pos['y']
-        scale=pos['scale']
-        offset=pos['offset']
-        orientation=pos['orientation']
-        size=pos['size']
-        phase=pos['phase']
-        frequency=pos['frequency']
-        aspect_ratio=pos['aspect_ratio']
-        smoothing=pos['smoothing']
+    def __call__(self,**params_to_override):
+        params = ParamOverrides(self,params_to_override)
+      	bounds = params['bounds']
+        xdensity=params['xdensity']
+        ydensity=params['ydensity']
+        x=params['x']
+        y=params['y']
+        scale=params['scale']
+        offset=params['offset']
+        orientation=params['orientation']
+        size=params['size']
+        phase=params['phase']
+        frequency=params['frequency']
+        aspect_ratio=params['aspect_ratio']
+        smoothing=params['smoothing']
       
         input_1=SineGrating(phase=phase, frequency=frequency, orientation=orientation, scale=scale, offset=offset)
         input_2=Disk(aspect_ratio=aspect_ratio,smoothing=smoothing,x=x, y=y,size=size,scale=scale, offset=offset)
@@ -100,27 +98,24 @@ class SineGratingRing(PatternGenerator):
     frequency  = Number(default=2.4,doc="frequency of the sine grating")
 
 
-    def __init__(self,**params):
-        super(SineGratingRing,self).__init__(**params)
-       
-    def __call__(self,**params):
+    def __call__(self,**params_to_override):
         # CEBALERT: missing check_params (should upgrade/remove/decide what to do with check_params anyway)
-        pos = ParamOverrides(self,params)
+        params = ParamOverrides(self,params_to_override)
 
-      	bounds = pos['bounds']
-        xdensity=pos['xdensity']
-        ydensity=pos['ydensity']
-        x=pos['x']
-        y=pos['y']
-        scale=pos['scale']
-        offset=pos['offset']
-        orientation=pos['orientation']
-        size=pos['size']
-        phase=pos['phase']
-        frequency=pos['frequency']
-        aspect_ratio=pos['aspect_ratio']
-        smoothing=pos['smoothing']
-        thickness=pos['thickness']
+      	bounds = params['bounds']
+        xdensity=params['xdensity']
+        ydensity=params['ydensity']
+        x=params['x']
+        y=params['y']
+        scale=params['scale']
+        offset=params['offset']
+        orientation=params['orientation']
+        size=params['size']
+        phase=params['phase']
+        frequency=params['frequency']
+        aspect_ratio=params['aspect_ratio']
+        smoothing=params['smoothing']
+        thickness=params['thickness']
       
         input_1=SineGrating(phase=phase, frequency=frequency, orientation=orientation, scale=scale, offset=offset)
         input_2=Ring(thickness=thickness,aspect_ratio=aspect_ratio,smoothing=smoothing,x=x, y=y,size=size,scale=scale, offset=offset)
@@ -149,29 +144,26 @@ class OrientationContrastPattern (SineGratingRing):
     size_surround= Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                    precedence=0.50, doc="Frequency of the sine grating.")
     
-    def __init__(self,**params):
-        super(OrientationContrastPattern,self).__init__(**params)
        
-    def __call__(self,**params):
-
-
-      	bounds = pos['bounds']
-        xdensity=pos['xdensity']
-        ydensity=pos['ydensity']
-        x=pos['x']
-        y=pos['y']
-        scale=pos['scale']
-        offset=pos['offset']
-        size=pos['size']
-        phase=pos['phase']
-        frequency=pos['frequency']
-        aspect_ratio=pos['aspect_ratio']
-        smoothing=pos['smoothing']
-        thickness=pos['thickness']
-        orientationcentre=pos['orientationcentre']
-        orientationsurround=pos['orientationsurround']
-        size_centre=pos['size_centre']
-        size_surround=pos['size_surround']
+    def __call__(self,**params_to_override):
+        params = ParamOverrides(self,params_to_override)
+      	bounds = params['bounds']
+        xdensity=params['xdensity']
+        ydensity=params['ydensity']
+        x=params['x']
+        y=params['y']
+        scale=params['scale']
+        offset=params['offset']
+        size=params['size']
+        phase=params['phase']
+        frequency=params['frequency']
+        aspect_ratio=params['aspect_ratio']
+        smoothing=params['smoothing']
+        thickness=params['thickness']
+        orientationcentre=params['orientationcentre']
+        orientationsurround=params['orientationsurround']
+        size_centre=params['size_centre']
+        size_surround=params['size_surround']
       
         input_1=SineGratingDisk(phase=phase, frequency=frequency,orientation=orientationcentre, scale=scale, offset=offset,
                                 aspect_ratio=aspect_ratio,smoothing=0.0,x=x, y=y,size=size_centre)

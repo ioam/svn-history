@@ -100,7 +100,7 @@ class PatternGenerator(ParameterizedObject):
         This function can be used for normalization, thresholding, etc.""")
 
       
-    def __call__(self,**params):
+    def __call__(self,**params_to_override):
         """
         Call the subclasses 'function' method on a rotated and scaled coordinate system.
 
@@ -109,25 +109,23 @@ class PatternGenerator(ParameterizedObject):
         as currently set on the object. Otherwise, any params
         specified override those currently set on the object.
         """
-        self._check_params(params)                
-        self.debug("params = ",params)
+        self._check_params(params_to_override)                
+        self.debug("params = ",params_to_override)
+        params = ParamOverrides(self,params_to_override)
 
-        # what name for pos? all_params? should be short...
-        pos = ParamOverrides(self,params)
-
-        self.__setup_xy(pos['bounds'],pos['xdensity'],pos['ydensity'],
-                        pos['x'],pos['y'],
+        self.__setup_xy(params['bounds'],params['xdensity'],params['ydensity'],
+                        params['x'],params['y'],
                         # uh-oh
-                        params.get('position',None),
-                        pos['orientation'])
+                        params_to_override.get('position',None),
+                        params['orientation'])
 
-        result = pos['scale']*self.function(pos)+pos['offset']
+        result = params['scale']*self.function(params)+params['offset']
 
-        mask = pos['mask']
+        mask = params['mask']
         if mask is not None:
             result*=mask
 
-        output_fn = pos['output_fn']
+        output_fn = params['output_fn']
         if output_fn is not IdentityOF: # Optimization (but may not actually help)
             output_fn(result)           # CEBHACKALERT: particularly since everything but
                                         # the IdentityOF *class* will pass this if-test!
@@ -152,9 +150,7 @@ class PatternGenerator(ParameterizedObject):
         self.pattern_x, self.pattern_y = self.__create_and_rotate_coordinate_arrays(x_points-x,y_points-y,orientation)
 
 
-    # need a reasonable name here & I dropped **params but should I have? (pos,**params)
-    # (also could have left alone (pos), but would result in lots of duplicate ParamOverrides being created)
-    def function(self,pos):
+    def function(self,params):
         """
         Function to draw a pattern that will then be scaled and rotated.
 
@@ -201,19 +197,19 @@ class Constant(PatternGenerator):
 
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
-    def __call__(self,**params):
-        self._check_params(params)
-        pos = ParamOverrides(self,params)
+    def __call__(self,**params_to_override):
+        self._check_params(params_to_override)
+        params = ParamOverrides(self,params_to_override)
         
-        shape = SheetCoordinateSystem(pos['bounds'],pos['xdensity'],pos['ydensity']).shape
+        shape = SheetCoordinateSystem(params['bounds'],params['xdensity'],params['ydensity']).shape
 
-        result = pos['scale']*ones(shape, Float)+pos['offset']
+        result = params['scale']*ones(shape, Float)+params['offset']
 
-        mask = pos['mask']
+        mask = params['mask']
         if mask is not None:
             result*=mask
 
-        output_fn = pos['output_fn']
+        output_fn = params['output_fn']
         if output_fn is not IdentityOF: # Optimization (but may not actually help)
             output_fn(result)
 

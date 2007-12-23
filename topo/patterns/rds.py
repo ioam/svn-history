@@ -63,27 +63,27 @@ class RandomDotStereogram(PatternGenerator):
                         precedence=0.54,doc="Seed value for the random position of the dots.")
 
 
-    def __call__(self,**params):
+    def __call__(self,**params_to_override):
 
         # Gather parameters
-        self._check_params(params)
-        pos = ParamOverrides(self,params)
+        self._check_params(params_to_override)
+        params = ParamOverrides(self,params_to_override)
         
-        bounds      = pos['bounds']
-        xdensity    = pos['xdensity']
-        ydensity    = pos['ydensity']
-        scale       = pos['scale']
-        offset      = pos['offset']
-        output_fn   = pos['output_fn']
-        dotdensity  = pos['dotdensity']
-        random_seed = pos['random_seed']
+        bounds      = params['bounds']
+        xdensity    = params['xdensity']
+        ydensity    = params['ydensity']
+        scale       = params['scale']
+        offset      = params['offset']
+        output_fn   = params['output_fn']
+        dotdensity  = params['dotdensity']
+        random_seed = params['random_seed']
 
         xsize,ysize = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
         xsize,ysize = int(round(xsize)),int(round(ysize))
         
-        xdisparity  = int(round(xsize*pos['xdisparity']))  
-        ydisparity  = int(round(xsize*pos['ydisparity']))   
-        dotsize     = int(round(xsize*pos['dotsize']))
+        xdisparity  = int(round(xsize*params['xdisparity']))  
+        ydisparity  = int(round(xsize*params['ydisparity']))   
+        dotsize     = int(round(xsize*params['dotsize']))
         
         bigxsize = 2*xsize
         bigysize = 2*ysize

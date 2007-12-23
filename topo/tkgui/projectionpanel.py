@@ -305,14 +305,20 @@ class ProjectionPanel(PlotMatrixPanel):
         super(ProjectionPanel,self).sheet_change()
 
 
-    def populate_projection_param(self):
+    def populate_projection_param(self,n=1):
         prjns = [x for x in self.plotgroup.sheet.projections().values()]
+        print [x.name for x in prjns]
         self.plotgroup.params()['projection'].objects = prjns
-        self.plotgroup.projection = prjns[0]
+        self.projection = prjns[0]
+        print prjns[0],type(prjns[0])
+
+        print "prjn",self.plotgroup.projection
 
 
     def refresh_projections(self):
-        self.populate_projection_param()
+    
+        ProjectionPanel.populate_projection_param(self,2)
+        #self.populate_projection_param(2)
 
         #################
         # CEBALERT: How do you change list of tkinter.optionmenu options? Use pmw's optionmenu?

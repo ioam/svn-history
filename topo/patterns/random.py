@@ -33,19 +33,19 @@ class RandomGenerator(PatternGenerator):
     
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
-    def __call__(self,**params):
-        self._check_params(params)
-        pos = ParamOverrides(self,params)
+    def __call__(self,**params_to_override):
+        self._check_params(params_to_override)
+        params = ParamOverrides(self,params_to_override)
 
-        shape = SheetCoordinateSystem(pos['bounds'],pos['xdensity'],pos['ydensity']).shape
+        shape = SheetCoordinateSystem(params['bounds'],params['xdensity'],params['ydensity']).shape
 
-        result = self._distrib(shape,pos)
+        result = self._distrib(shape,params)
 
-        mask = pos['mask']
+        mask = params['mask']
         if mask is not None:
             result*=mask
             
-        output_fn = pos['output_fn']
+        output_fn = params['output_fn']
         if output_fn is not IdentityOF: # Optimization (but may not actually help)
             output_fn(result)
         
@@ -56,8 +56,8 @@ class RandomGenerator(PatternGenerator):
 class UniformRandom(RandomGenerator):
     """2D uniform random noise pattern generator."""
 
-    def _distrib(self,shape,pos):
-        return RandomArray.uniform(pos['offset'], pos['offset']+pos['scale'], shape)
+    def _distrib(self,shape,params):
+        return RandomArray.uniform(params['offset'], params['offset']+params['scale'], shape)
 
 
 class GaussianRandom(RandomGenerator):
@@ -72,6 +72,6 @@ class GaussianRandom(RandomGenerator):
     scale  = Number(default=0.25,softbounds=(0.0,2.0))
     offset = Number(default=0.50,softbounds=(-2.0,2.0))
 
-    def _distrib(self,shape,pos):
-        return pos['offset']+pos['scale']*RandomArray.standard_normal(shape)
+    def _distrib(self,shape,params):
+        return params['offset']+params['scale']*RandomArray.standard_normal(shape)
 

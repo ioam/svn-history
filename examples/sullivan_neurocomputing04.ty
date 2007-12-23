@@ -82,9 +82,9 @@ class OrientedLine(PatternGenerator):
                        doc="Width of the Gaussian fall-off.")
     offEdge = Number(default=1,doc="1 if previous line has gone off edge of grid, 0 otherwise")
     angle	   = Number(default=0.0,doc="")
-    def function(self,pos):
+    def function(self,params):
         if (self.offEdge==1):
-            angle=pos['angle']
+            angle=params['angle']
             if (angle>180):
                 angle-=180
                 direction=-1
@@ -131,7 +131,7 @@ class OrientedLine(PatternGenerator):
             self.y+=self.deltaY
             if (self.x<-0.5 or self.x>0.5 or self.y<-0.5 or self.y>0.5):
                self.offEdge=1
-        return line(self.pattern_y,pos['thickness'],pos['smoothing'])
+        return line(self.pattern_y,params['thickness'],params['smoothing'])
 
 
 # Weight seed
