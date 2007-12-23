@@ -201,6 +201,10 @@ Fill in any of the requested hook parameter fields, as displayed on the resultin
 Click the 'Finish Add' button
 
 
+15
+Remove all .cvsignore files from repository (cvs2svn did already take the information into svn:ignore
+properties).
+
 
 
 
