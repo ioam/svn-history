@@ -1254,7 +1254,9 @@ class PicklableClassAttributes(object):
 # CB: __missing__ is new to python 2.5; do I still need to
 # provide an alternative for 2.4?
 
-# 
+# CEBALERT: we should incorporate overridden._check_params() here
+# rather than making __call__ methods do it
+# (that is, if we want to keep _check_params at all).
 class ParamOverrides(dict):
     """
     A dictionary that returns the attribute of an object if that attribute is not
