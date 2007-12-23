@@ -46,6 +46,15 @@ tracker rather than added to this list</B>.
 <H2>Tasks to be addressed after the 0.9.4 release:</H2>
 
 
+<H4>2007/12/23 (CB): who's tracking the results of...</H4>
+<ul>
+<li>examples/joublin_bc96.ty</li>
+<li>examples/lissom_whisker_barrels.ty</li>
+<li>examples/ohzawa_science90.ty</li>
+</ul>
+And others...
+
+
 <H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
 <li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
