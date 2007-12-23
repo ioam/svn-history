@@ -602,7 +602,11 @@ e.g. for debugging.)
                              if p_name not in self.params_in_history]
 
         for widget in widgets_to_update:
-            widget.config(state=state)
+            # CEBALERT: I don't see why this doesn't always work.
+            try:
+                widget.config(state=state)
+            except:
+                pass
 
         self.__update_history_buttons()
 
