@@ -819,8 +819,8 @@ class DynamicNumber(object):
     """
     Provide support for exising code that uses DynamicNumber: see __new__().
     """
-    warnedA = True#False  # suppress warnings for the moment.
-    warnedB = True#False
+    warnedA = False  # suppress warnings for the moment.
+    warnedB = False
     
     def __new__(cls,default=None,**params):
         """
