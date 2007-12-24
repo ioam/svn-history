@@ -817,7 +817,7 @@ class InstanceMethodWrapper(object):
 ## CEB: this whole chunk awaiting removal.
 class DynamicNumber(object):
     """
-    Provide support for exising code that uses DynamicNumber: see __new__().
+    Provide support for existing code that uses DynamicNumber: see __new__().
     """
     warnedA = False  # suppress warnings for the moment.
     warnedB = False
