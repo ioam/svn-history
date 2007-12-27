@@ -41,7 +41,7 @@ def run_basic():
 def run_detailed():
     """Test that more complex GUI actions are working."""
     _initialize()
-    tests = [test_cf_coords,test_test_pattern] # and so on...
+    tests = [test_cf_coords,test_test_pattern,test_projection] # and so on...
     return ft.run(tests,"Running detailed GUI tests...")
 
 
@@ -112,6 +112,13 @@ def test_test_pattern():
     # CB: still need to test duration, learning, etc
 
 
+
+def test_projection():
+    """Check the Projection window."""
+    
+    p = g['Plots']['Projection']()
+    p.gui_set_param('projection','S2')
+    
 
 
 ######################################################################
