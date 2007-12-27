@@ -67,21 +67,20 @@ def test_test_pattern():
     from topo.patterns.basic import TwoRectangles
     assert isinstance(tp.pattern_generator,TwoRectangles), "Pattern generator did not change."
 
-
-    preview = tp.plotgroup.plots[0].view_dict['Activity'].view()[0]
+    preview = _get_named_plot('GS',tp.plotgroup.plots).view_dict['Activity'].view()[0]
     two_rectangles = array([[0.,1],[1.,0.]])
     assert_array_equal(preview,two_rectangles,"Incorrect pattern in preview plot.")
 
 
     tp.Present()
-    gs_view = act.plotgroup.plots[0].view_dict['Activity']
+    gs_view = _get_named_plot('GS',act.plotgroup.plots).view_dict['Activity']
     assert gs_view.src_name=='GS'
     gs_plot_array = gs_view.view()[0]
     assert_array_equal(gs_plot_array,two_rectangles,"Incorrect pattern in activity plot after Present.")
 
 
     tp.params_frame.gui_set_param('scale',0.5)
-    preview = tp.plotgroup.plots[0].view_dict['Activity'].view()[0]
+    preview = _get_named_plot('GS',tp.plotgroup.plots).view_dict['Activity'].view()[0]
     assert_array_equal(preview,0.5*two_rectangles,"Changing pattern parameters did not update preview.")
 
     
@@ -96,7 +95,7 @@ def test_test_pattern():
     for name,value in new_param_values:
         tp.params_frame.gui_set_param(name,value)
 
-    changed_preview = tp.plotgroup.plots[0].view_dict['Activity'].view()[0]
+    changed_preview = _get_named_plot('GS',tp.plotgroup.plots).view_dict['Activity'].view()[0]
     # and check the preview did change
     try:
         assert_array_equal(changed_preview,initial_preview)
@@ -107,7 +106,7 @@ def test_test_pattern():
     
     # test that preview display is correct
     tp.params_frame.Defaults()
-    preview = tp.plotgroup.plots[0].view_dict['Activity'].view()[0]
+    preview = _get_named_plot('GS',tp.plotgroup.plots).view_dict['Activity'].view()[0]
     assert_array_equal(preview,two_rectangles,"Defaults button failed to revert params to default values.")
 
     # CB: still need to test duration, learning, etc
@@ -129,8 +128,12 @@ def _initialize():
 
     sim=Simulation(register=True,name="test pattern tester")
     sim['GS']=GeneratorSheet(nominal_density=2)
+    sim['GS2']=GeneratorSheet(nominal_density=2)
     sim['S'] = CFSheet(nominal_density=2)
+    sim['S2'] = CFSheet(nominal_density=2)
     sim.connect('GS','S',connection_type=CFProjection,delay=0.05)
+    sim.connect('GS','S2',connection_type=CFProjection,delay=0.05)
+    sim.connect('GS2','S2',connection_type=CFProjection,delay=0.05)
     global g
     g=topo.guimain
 
@@ -153,3 +156,12 @@ def _menu_item_fn(*clicks):
     return test_menu_item
 
 
+
+def _get_named_plot(name,plots):
+
+    for plot in plots:
+        if plot.plot_src_name==name:
+            return plot
+
+    assert False
+    
