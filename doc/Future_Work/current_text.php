@@ -95,43 +95,35 @@ to see how big, what's there, etc]
       face-space
       topographica/face-space
 
-      (Plus, I guess we should remove all the contents of the Attic
-      directories, as those are files that svn won't really be able to do
-      much about, right?  I.e., their history is already lost, even if they
-      later moved to files that are current, because svn won't know that
-      they connect to the current location of that file.  But I guess
-      we have to keep them if removing them would cause problems.)
-
   4.2 Remove any .DS_Store files:
       facespace/.DS_Store
 
 
-
-5. Convert the repository to an SVN dump file with cvs2svn by going to
-the directory at the root of the repository and running the following
-command: "cvs2svn --trunk-only --dumpfile=svndump .".
-
-We lose all branches AND tags this way. We could exclude specific ones:
-
-"""
-To exclude a tag or branch, use the option --exclude=SYMBOL. You can
-also exclude a whole group of symbols matching a specified regular
-expression; for example, --exclude='RELEASE_0_.*'. (The regular
-expression has to match the whole symbol name for the rule to apply.)
-"""
-http://cvs2svn.tigris.org/cvs2svn.html
+rm -rf face-space topographica/face-space facespace/.DS_Store
 
 
+5. Remove Attic files that generate errors:
 
-6. Conversion without --trunk-only generates no error
-messages. Conversion with --trunk-only generates:
+rm -rf topographica/examples/Attic/lissom_oo_or_scaling.ty,v topographica/external/Attic/Gnosis_Utils-1.2.1.tar.gz,v topographica/external/Attic/matplotlib-0.90.0.tar.gz,v topographica/external/Attic/pychecker-0.8.16.tar.gz,v 
 
+(
 ERROR: A CVS repository cannot contain both ./topographica/examples/lissom_oo_or_scaling.ty,v and ./topographica/examples/Attic/lissom_oo_or_scaling.ty,v
 ERROR: A CVS repository cannot contain both ./topographica/external/Gnosis_Utils-1.2.1.tar.gz,v and ./topographica/external/Attic/Gnosis_Utils-1.2.1.tar.gz,v
 ERROR: A CVS repository cannot contain both ./topographica/external/matplotlib-0.90.0.tar.gz,v and ./topographica/external/Attic/matplotlib-0.90.0.tar.gz,v
 ERROR: A CVS repository cannot contain both ./topographica/external/pychecker-0.8.16.tar.gz,v and ./topographica/external/Attic/pychecker-0.8.16.tar.gz,v
+)
 
-So with --trunk-only, delete those Attic files.
+
+
+6. Convert the repository to an SVN dump file with cvs2svn by going to
+the directory at the root of the repository and running the following
+command: 
+
+cvs2svn --exclude="parametersframe_replacement_branch_FINAL" --exclude="before_merge_parametersframe_replacement_branch_200708291730BST" --exclude="before_merge_into_parametersframe_replacement_branch_200708271525BST" --exclude="before_merge_HEAD_in_200708271525BST" --exclude="parametersframe_replacement_branch" --exclude="tkgui_parameterization_branch" --exclude="shared_weights_use_views" --exclude="output_fn_has_return" --exclude="shelve_issue" --exclude="after_decref" --exclude="before_decref" --exclude="simulation_time_inclusive" --exclude="simulation_time_exclusive"  --dumpfile=svndump .
+
+
+
+
 
 
 
