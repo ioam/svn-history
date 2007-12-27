@@ -41,9 +41,29 @@ def run(tests,title=None):
 
 def _run_test(test):
     """Call test and return None on success, or the exception string on failure."""
+
+    import StringIO
+    stderr = StringIO.StringIO()
+    sys.stderr = stderr
+
+    # CEBALERT: for some reason, this doesn't always catch errors.
+    # I guess somehow they are buried? So in addition to this,
+    # we check stderr!
     try:
         test()
-        return None
+        X=None
     except:
-        return traceback.format_exc()
+        X=traceback.format_exc()
+        
+    # there's some thing to have bit of code always executed,
+    # but can't remember what it is. with it, could make this
+    # code cleaner.
+
+    sys.stderr = sys.__stderr__
+
+    if stderr.getvalue(): X = stderr.getvalue()
+    stderr.close()
+    
+    return X
+
         
