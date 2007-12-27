@@ -119,7 +119,7 @@ ERROR: A CVS repository cannot contain both ./topographica/external/pychecker-0.
 the directory at the root of the repository and running the following
 command: 
 
-cvs2svn --exclude="parametersframe_replacement_branch_FINAL" --exclude="before_merge_parametersframe_replacement_branch_200708291730BST" --exclude="before_merge_into_parametersframe_replacement_branch_200708271525BST" --exclude="before_merge_HEAD_in_200708271525BST" --exclude="parametersframe_replacement_branch" --exclude="tkgui_parameterization_branch" --exclude="shared_weights_use_views" --exclude="output_fn_has_return" --exclude="shelve_issue" --exclude="after_decref" --exclude="before_decref" --exclude="simulation_time_inclusive" --exclude="simulation_time_exclusive"  --dumpfile=svndump .
+cvs2svn --exclude="parametersframe_replacement_branch_FINAL" --exclude="before_merge_parametersframe_replacement_branch_200708291730BST" --exclude="before_merge_into_parametersframe_replacement_branch_200708271525BST" --exclude="before_merge_HEAD_in_200708271525BST" --exclude="parametersframe_replacement_branch" --exclude="tkgui_parameterization_branch" --exclude="shared_weights_use_views" --exclude="output_fn_has_return" --exclude="shelve_issue" --exclude="after_decref" --exclude="before_decref" --exclude="simulation_time_inclusive" --exclude="simulation_time_exclusive" --exclude="numpy_test_branch" --exclude="numpy_test_branch_merged" --exclude="LATEST_STABLE" --exclude="start"  --dumpfile=svndump .
 
 
 
@@ -133,16 +133,14 @@ cat svndump | svndumpfilter exclude trunk/CVSROOT > svndump1
 
 
 8  Check the result:
-svnadmin create /home/ceball/topographica-SVN
-svnadmin load /home/ceball/topographica-SVN < svndump1
+svnadmin create /home/ceball/topographica-svn
+svnadmin load /home/ceball/topographica-svn < svndump1
 
 svn checkout file:///home/ceball/topographica-svn/ topographica-co
 
 Then investigate it...
 
 
-
--------------------------------------------------------------------------
 
 
 9. Tell people to stop CVS commits
