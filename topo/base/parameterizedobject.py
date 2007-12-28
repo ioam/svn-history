@@ -1275,9 +1275,16 @@ class ParamOverrides(dict):
         self.overridden = overridden
         dict.__init__(self,dict_)        
 
-    def __missing__(self,attr):
-        """Return the attribute from overridden object."""
-        return getattr(self.overridden,attr)
+
+    def __getitem__(self,key):
+        try:
+            return dict.__getitem__(self,key)
+        except KeyError:
+            return getattr(self.overridden,key)
+
+##     def __missing__(self,attr):
+##         """Return the attribute from overridden object."""
+##         return getattr(self.overridden,attr)
         
     def __repr__(self):
         """As dict.__repr__, but indicate the overridden object."""
