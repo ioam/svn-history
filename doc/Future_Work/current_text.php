@@ -82,8 +82,7 @@ changes they have soon.
 
 3. Get a copy of the RCS files for the CVS repository
 
-rsync -av rsync://topographica.cvs.sourceforge.net/cvsroot/topographica/*
-topographica-cvsbackup
+rsync -av rsync://topographica.cvs.sourceforge.net/cvsroot/topographica/* topographica-cvsbackup
 [on doozy, the current CVS is rsync'ing to /home/ceball/topographica-cvsbackup/
 to see how big, what's there, etc]
 
@@ -119,7 +118,7 @@ ERROR: A CVS repository cannot contain both ./topographica/external/pychecker-0.
 the directory at the root of the repository and running the following
 command: 
 
-cvs2svn --exclude="parametersframe_replacement_branch_FINAL" --exclude="before_merge_parametersframe_replacement_branch_200708291730BST" --exclude="before_merge_into_parametersframe_replacement_branch_200708271525BST" --exclude="before_merge_HEAD_in_200708271525BST" --exclude="parametersframe_replacement_branch" --exclude="tkgui_parameterization_branch" --exclude="shared_weights_use_views" --exclude="output_fn_has_return" --exclude="shelve_issue" --exclude="after_decref" --exclude="before_decref" --exclude="simulation_time_inclusive" --exclude="simulation_time_exclusive" --exclude="numpy_test_branch" --exclude="numpy_test_branch_merged" --exclude="LATEST_STABLE" --exclude="InputSheet_per_kernel" --exclude="topographica" --exclude="start" --dumpfile=svndump .
+cvs2svn --exclude="parametersframe_replacement_branch_FINAL" --exclude="before_merge_parametersframe_replacement_branch_200708291730BST" --exclude="before_merge_into_parametersframe_replacement_branch_200708271525BST" --exclude="before_merge_HEAD_in_200708271525BST" --exclude="parametersframe_replacement_branch" --exclude="tkgui_parameterization_branch" --exclude="shared_weights_use_views" --exclude="output_fn_has_return" --exclude="shelve_issue" --exclude="after_decref" --exclude="before_decref" --exclude="simulation_time_inclusive" --exclude="simulation_time_exclusive" --exclude="numpy_test_branch" --exclude="numpy_test_branch_merged" --exclude="LATEST_STABLE" --exclude="InputSheet_per_kernel" --exclude="topographica" --exclude="start" --use-cvs --dumpfile=svndump .
 
 
 
@@ -128,7 +127,7 @@ cvs2svn --exclude="parametersframe_replacement_branch_FINAL" --exclude="before_m
 
 7. use svndumpfilter to remove CVSROOT from repository:
 
-cat svndump | svndumpfilter --drop-empty-revs --renumber-revs exclude trunk/CVSROOT tags/after_basic_optims/CVSROOT tags/CNV_COURSE/CVSROOT tags/first_numpy_version/CVSROOT tags/release_0_8_1/CVSROOT  tags/release_0_9_1/CVSROOT  tags/release_0_9_4/CVSROOT tags/april_2007_performance_testing/CVSROOT tags/cnv_course_2007/CVSROOT tags/last_numeric_version/CVSROOT tags/release_0_8_2/CVSROOT tags/release_0_9_2/CVSROOT tags/before_basic_optims/CVSROOT tags/cnv_course_2007_2/CVSROOT tags/release_0_8_0/CVSROOT tags/release_0_9_0/CVSROOT tags/release_0_9_3/CVSROOT > svndump1
+cat svndump | svndumpfilter --drop-empty-revs --renumber-revs exclude trunk/CVSROOT tags/after_basic_optims/CVSROOT tags/CNV_COURSE/CVSROOT tags/first_numpy_version/CVSROOT tags/release_0_8_1/CVSROOT  tags/release_0_9_1/CVSROOT  tags/release_0_9_4/CVSROOT tags/april_2007_performance_testing/CVSROOT tags/cnv_course_2007/CVSROOT tags/last_numeric_version/CVSROOT tags/release_0_8_2/CVSROOT tags/release_0_9_2/CVSROOT tags/before_basic_optims/CVSROOT tags/cnv_course_2007_2/CVSROOT tags/release_0_8_0/CVSROOT tags/release_0_9_0/CVSROOT tags/release_0_9_3/CVSROOT --use-cvs --username=ceball_cvs2svn > svndump1
 
 
 --drop-empty-revs, --renumber-revs:
@@ -146,6 +145,11 @@ Then investigate it...
 
 Check-out the same branch/tag from both CVS and SVN into fresh directories
 Compare all files between the two (removing .svn/ and CVS/ directories)
+
+diff -q -r topoCVS topoSVN
+
+* but what about keywords * ?
+
 
 
 9. Tell people to stop CVS commits
@@ -210,10 +214,11 @@ Remove all .cvsignore files from repository (cvs2svn did already take the inform
 properties).
 
 svn rm `find -name .cvsignore |xargs`
-svn commit -m ".cvs ignore information already exists in svn:ignore property." 
+svn commit -m "Remove .cvsignore, because the information already exists in svn:ignore." 
 
-** .cvsignore files will exist in tags/branches where they were included before **
-(so they aren't in release branches, which is the most important.
+
+
+
 
 
 
