@@ -314,22 +314,24 @@ class ProjectionPanel(PlotMatrixPanel):
     def refresh_projections(self):
         self.populate_projection_param()
 
-        #################
-        # CEBALERT: How do you change list of tkinter.optionmenu options? Use pmw's optionmenu?
-        # Or search the web for a way to alter the list in the tkinter one.
-        # Currently, replace widget completely: looks bad and is complex.
-        # When fixing, remove try/except marked by the 'for projectionpanel' CEBALERT in
-        # tkparameterizedobject.py.
-        if 'projection' in self.representations:
-            w  = self.representations['projection']['widget']
-            l  = self.representations['projection']['label']
-            l.destroy()
-            w.destroy()
-            self.pack_param('projection',parent=self.representations['projection']['frame'],
-                            on_modify=self.refresh_plots,side='left',expand=1,
-                            widget_options={'sort_fn_args':{'cmp':cmp_projections},
-                                            'new_default':True})
-        #################
+        self.update_selector('projection')
+
+##         #################
+##         # CEBALERT: How do you change list of tkinter.optionmenu options? Use pmw's optionmenu?
+##         # Or search the web for a way to alter the list in the tkinter one.
+##         # Currently, replace widget completely: looks bad and is complex.
+##         # When fixing, remove try/except marked by the 'for projectionpanel' CEBALERT in
+##         # tkparameterizedobject.py.
+##         if 'projection' in self.representations:
+##             w  = self.representations['projection']['widget']
+##             l  = self.representations['projection']['label']
+##             l.destroy()
+##             w.destroy()
+##             self.pack_param('projection',parent=self.representations['projection']['frame'],
+##                             on_modify=self.refresh_plots,side='left',expand=1,
+##                             widget_options={'sort_fn_args':{'cmp':cmp_projections},
+##                                             'new_default':True})
+##         #################
 
 
             
