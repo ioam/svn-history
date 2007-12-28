@@ -384,11 +384,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
         priority.
 
 
-        * param_has_modifyable_choices
-        Some parameters are represented by widgets whose options
-        can't be changed once created (e.g. OptionMenu), and some
-        parameters have a fixed set of options (e.g. Boolean).
-        
         
 
         * obj2str_fn & str2obj_fn
@@ -421,10 +416,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # don't need restrictions from DoubleVar.)
         self.__param_to_tkvar = {BooleanParameter:BooleanVar,
                                  Parameter:StringVar}
-
-        self.param_has_modifyable_choices = {BooleanParameter:False,
-                                             SelectorParameter:False,
-                                             Parameter:True}
 
         # CEBALERT: Parameter is the base parameter class, but ... 
         # at least need a test that will fail when a new param type added
