@@ -445,37 +445,13 @@ class TkParameterizedObjectBase(ParameterizedObject):
             self._init_tkvars(PO)
 
 
-
-    def _source_POs(self):
-        """
-        Return a list of ParameterizedObjects in which to find
-        Parameters.
-        
-        The list is ordered by precedence, as defined by self_first.
-        """
-        if not self._extraPO:
-            sources = [self]
-        elif self.self_first:
-            sources = [self,self._extraPO]
-        else:
-            sources = [self._extraPO,self]
-        return sources
-
-
     def _init_tkvars(self,PO):
         """
         Create Tkinter Variable shadows of all Parameters of PO.        
         """
         for name,param in PO.params().items():
             self._create_tkvar(PO,name,param)
-
-
-    def _handle_gui_set(self,p_name):
-        """
-        * The callback to use for all GUI variable traces/binds *
-        """
-        if self._live_update: self._update_param_from_tkvar(p_name)
-
+            
 
     # rename param to param_obj
     def _create_tkvar(self,PO,name,param):
@@ -515,6 +491,18 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # be surprised by the result from get()?
         tkvar._original_get = tkvar.get
         tkvar.get = lambda x=name: self._tkvar_get(x)
+
+
+
+################################################################################
+# 
+################################################################################
+
+    def _handle_gui_set(self,p_name):
+        """
+        * The callback to use for all GUI variable traces/binds *
+        """
+        if self._live_update: self._update_param_from_tkvar(p_name)
 
 
     def _tkvar_set(self,param_name,val):
@@ -611,18 +599,29 @@ class TkParameterizedObjectBase(ParameterizedObject):
         if hasattr(tkvar,'_on_change'): tkvar._on_change()
 
 
-    def __set_parameter(self,param_name,val):
-        # use set_in_bounds if it exists
-        # i.e. users of widgets get their values cropped
-        # (no warnings/errors, so e.g. a string in a
-        # tagged slider just goes to the default value)
-        # CEBALERT: set_in_bounds not valid for POMetaclass?
-        parameter,sourcePO=self.get_parameter_object(param_name,with_location=True)
-        if hasattr(parameter,'set_in_bounds') and isinstance(sourcePO,ParameterizedObject): 
-            parameter.set_in_bounds(sourcePO,val)
+################################################################################
+# 
+################################################################################
+
+
+
+    def _source_POs(self):
+        """
+        Return a list of ParameterizedObjects in which to find
+        Parameters.
+        
+        The list is ordered by precedence, as defined by self_first.
+        """
+        if not self._extraPO:
+            sources = [self]
+        elif self.self_first:
+            sources = [self,self._extraPO]
         else:
-            setattr(sourcePO,param_name,val)
-                        
+            sources = [self._extraPO,self]
+        return sources
+
+
+
 
     def get_source_po(self,name):
         """
@@ -674,9 +673,17 @@ class TkParameterizedObjectBase(ParameterizedObject):
     def set_parameter_value(self,name,val,parameterized_object=None):
         """
         Set the value of the parameter specified by name to val.
+
+        Updates the corresponding tkvar.
         """
         source = parameterized_object or self.get_source_po(name)
-        setattr(source,name,val)
+        object.__setattr__(source,name,val)
+
+        # update the tkvar
+        if name in self._tkvars:
+            self._tkvars[name]._original_set(self._object2string(name,val))
+
+
 ######################################################
 
 ########## these lookup attributes in order ##########
@@ -690,10 +697,9 @@ class TkParameterizedObjectBase(ParameterizedObject):
     def __getattribute__(self,name):
         """
         If the attribute is found on this object, return it. Otherwise,
-        search the list of shadow POs and return from the first match.
+        return the attribute from the extraPO, if it exists.
         If there is no match, raise an attribute error.
         """
-        # ERROR: make this use the get_parameter_value method when it's getting a parameter!
         try:
             return object.__getattribute__(self,name)
         except AttributeError:
@@ -708,29 +714,30 @@ class TkParameterizedObjectBase(ParameterizedObject):
     def __setattr__(self,name,val):
         """
         If the attribute already exists on this object, set it. If the attribute
-        is found on a shadow PO (searched in order), set it there. Otherwise, set the
+        is found on the extraPO, set it there. Otherwise, set the
         attribute on this object (i.e. add a new attribute).
         """
-        # ERROR: make this use the set_parameter_value method when it's getting a parameter!
-        try:
-            object.__getattribute__(self,name)
-            object.__setattr__(self,name,val)
-            # update tkvar
-            if name in self._tkvars:
-                self._tkvars[name]._original_set(self._object2string(name,val))
-            return # a bit hidden
+        # use dir() not hasattr() because hasattr uses __getattribute__
+        if name in dir(self):
+            
+            if name in self.params():
+                self.set_parameter_value(name,val,self)
+            else:
+                object.__setattr__(self,name,val)
+                
+        elif name in dir(self._extraPO):
 
-        except AttributeError:
-            if hasattr(self._extraPO,name):
-                setattr(self._extraPO,name,val)
-                # update tkvar
-                if name in self._tkvars:
-                    self._tkvars[name]._original_set(self._object2string(name,val))
-                return # also a bit hidden
+            if name in self._extraPO.params():
+                self.set_parameter_value(name,val,self._extraPO)
+            else:
+                object.__setattr__(self._extraPO,name,val)
 
-        # name not found, so set on this object
-        object.__setattr__(self,name,val)   
+        else:
+
+            # name not found, so set on this object
+            object.__setattr__(self,name,val)   
 #######################################################
+
 
 ######################################################################
 
@@ -795,6 +802,24 @@ class TkParameterizedObjectBase(ParameterizedObject):
             error_string+=" or %s"%str(o)
             
         return error_string
+
+
+    def __set_parameter(self,param_name,val):
+        """
+        Helper method:
+        """
+        # use set_in_bounds if it exists
+        # i.e. users of widgets get their values cropped
+        # (no warnings/errors, so e.g. a string in a
+        # tagged slider just goes to the default value)
+        # CEBALERT: set_in_bounds not valid for POMetaclass?
+        parameter,sourcePO=self.get_parameter_object(param_name,with_location=True)
+        if hasattr(parameter,'set_in_bounds') and isinstance(sourcePO,ParameterizedObject): 
+            parameter.set_in_bounds(sourcePO,val)
+        else:
+            setattr(sourcePO,param_name,val)
+                        
+
 
 
 
@@ -925,17 +950,110 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # show up when a frame takes focus). Or there could be timer process.
 
 
-    def __pretty_print(self,s):
+
+
+
+################################################################################
+# 
+################################################################################
+ 
+    def _update_param_from_tkvar(self,param_name,force=False):
         """
-        Convert a Parameter name s to a string suitable for display,
-        if pretty_parameters is True.
+        Prevents the superclass's _update_param_from_tkvar() method from being
+        called unless:
+        
+        * param_name is a Parameter type that has changes immediately
+          applied (see doc for param_immediately_apply_change
+          dictionary);
+
+        * force is True.
+
+        (I.e. to update a parameter for which
+        param_immediately_apply_change[type(parameter)]==False, call
+        this method with force=True. E.g. when <Return> is pressed in
+        a text box, this method is called with force=True.)
         """
-        if not self.pretty_parameters:
-            return s
+        self.debug("TkPO._update_param_from_tkvar(%s)"%param_name)
+        
+        param_obj = self.get_parameter_object(param_name)
+        
+        if not lookup_by_class(self.param_immediately_apply_change,
+                               type(param_obj)) and not force:
+            return
         else:
-            n = s.replace("_"," ")
-            n = n.capitalize()
-            return n
+            super(TkParameterizedObject,self)._update_param_from_tkvar(param_name)
+
+
+            
+    def _tkvar_set(self,param_name,val):
+        """
+        Calls superclass's version, but adds help text for the
+        currently selected item of SelectorParameters.
+        """
+        super(TkParameterizedObject,self)._tkvar_set(param_name,val)
+
+        if isinstance(self.get_parameter_object(param_name),SelectorParameter):
+            try:
+                w = self.representations[param_name]['widget']
+                help_text =  getdoc(self._string2object(
+                    param_name,
+                    self._tkvars[param_name]._original_get()))
+
+
+                ######################################################
+                # CEBALERT: for projectionpanel, which currently has
+                # to destroy a widget (because Tkinter.OptionMenu's
+                # list of choices cannot easily be replaced). See ALERT
+                # 'How do you change list [...]' in projectionpanel.py.
+                try:
+                    self.balloon.bind(w,help_text)
+                except TclError:
+                    pass
+                ######################################################
+
+            except (AttributeError,KeyError):
+                # could be called before self.representations exists,
+                # or before param in _tkvars dict
+                pass
+
+
+
+
+    ### Use in callbacks
+
+    def _handle_gui_set(self,p_name,force=False):
+        """Override the superclass's method to X and allow status indications."""
+        if self._live_update:
+            self._update_param_from_tkvar(p_name,force)
+
+        self._indicate_tkvar_status(p_name)
+
+
+
+    ### Simulate GUI actions
+
+    def gui_set_param(self,param_name,val):
+        """Simulate setting the parameter in the GUI."""
+        self._tkvar_set(param_name,val)  # ERROR: presumably calls trace stuff twice
+        self._handle_gui_set(param_name,force=True)
+
+    def gui_get_param(self,param_name):
+        """Simulate getting the parameter in the GUI."""
+        return self._tkvars[param_name].get()
+
+
+
+################################################################################
+# End 
+################################################################################
+
+
+
+
+
+################################################################################
+#
+################################################################################
 
     # CEBALERT: rename on_change and on_modify
     def pack_param(self,name,parent=None,widget_options={},
@@ -1072,7 +1190,19 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         self._create_tkvar(PO,name,param_obj)
         
         self.pack_param(name,f,on_change=on_change,on_modify=on_modify,**o)
-    
+
+
+################################################################################
+#
+################################################################################
+
+
+
+
+
+################################################################################
+# WIDGET CREATION
+################################################################################
 
     def _create_widget(self,name,master,widget_options={},on_change=None,on_modify=None):
         """
@@ -1119,35 +1249,6 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         return widget,label
 
-
-    # CB: the colors etc for indication are only temporary
-    def _indicate_tkvar_status(self,param_name):
-        """
-        Set the parameter's label to:
-         - blue if the GUI value differs from that set on the object
-         - red if the text doesn't translate to a correct value
-         - black if the GUI and object have the same value
-        """
-        f = 'black'
-        
-        if self._tkvar_changed(param_name):
-            f='blue'
-
-        if self.translators[param_name].last_string2object_failed:
-            f='red'
-
-        if hasattr(self,'representations') and param_name in self.representations:
-            try:
-                label = self.representations[param_name]['label']
-                if label is None:  # see HACK about the label being none
-                    return
-                label['foreground']=f
-            except TclError:
-                pass
-
-
-            
-        
 
         
     def _create_button_widget(self,frame,name,widget_options):
@@ -1304,90 +1405,49 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             widget.bind('<FocusOut>', lambda e=None,x=name: self._handle_gui_set(x,force=True))
         return widget
 
+################################################################################
+# End WIDGET CREATION
+################################################################################
 
-    def _update_param_from_tkvar(self,param_name,force=False):
+
+
+    # CB: the colors etc for indication are only temporary
+    def _indicate_tkvar_status(self,param_name):
         """
-        Prevents the superclass's _update_param_from_tkvar() method from being
-        called unless:
+        Set the parameter's label to:
+         - blue if the GUI value differs from that set on the object
+         - red if the text doesn't translate to a correct value
+         - black if the GUI and object have the same value
+        """
+        f = 'black'
         
-        * param_name is a Parameter type that has changes immediately
-          applied (see doc for param_immediately_apply_change
-          dictionary);
+        if self._tkvar_changed(param_name):
+            f='blue'
 
-        * force is True.
+        if self.translators[param_name].last_string2object_failed:
+            f='red'
 
-        (I.e. to update a parameter for which
-        param_immediately_apply_change[type(parameter)]==False, call
-        this method with force=True. E.g. when <Return> is pressed in
-        a text box, this method is called with force=True.)
-        """
-        self.debug("TkPO._update_param_from_tkvar(%s)"%param_name)
-        
-        param_obj = self.get_parameter_object(param_name)
-        
-        if not lookup_by_class(self.param_immediately_apply_change,
-                               type(param_obj)) and not force:
-            return
-        else:
-            super(TkParameterizedObject,self)._update_param_from_tkvar(param_name)
-
-
-            
-    def _tkvar_set(self,param_name,val):
-        """
-        Calls superclass's version, but adds help text for the
-        currently selected item of SelectorParameters.
-        """
-        super(TkParameterizedObject,self)._tkvar_set(param_name,val)
-
-        if isinstance(self.get_parameter_object(param_name),SelectorParameter):
+        if hasattr(self,'representations') and param_name in self.representations:
             try:
-                w = self.representations[param_name]['widget']
-                help_text =  getdoc(self._string2object(
-                    param_name,
-                    self._tkvars[param_name]._original_get()))
-
-
-                ######################################################
-                # CEBALERT: for projectionpanel, which currently has
-                # to destroy a widget (because Tkinter.OptionMenu's
-                # list of choices cannot easily be replaced). See ALERT
-                # 'How do you change list [...]' in projectionpanel.py.
-                try:
-                    self.balloon.bind(w,help_text)
-                except TclError:
-                    pass
-                ######################################################
-
-            except (AttributeError,KeyError):
-                # could be called before self.representations exists,
-                # or before param in _tkvars dict
+                label = self.representations[param_name]['label']
+                if label is None:  # see HACK about the label being none
+                    return
+                label['foreground']=f
+            except TclError:
                 pass
 
 
-
-    def _handle_gui_set(self,p_name,force=False):
-        if self._live_update:
-            self._update_param_from_tkvar(p_name,force)
-
-        self._indicate_tkvar_status(p_name)
-
-
-
-
-    def gui_set_param(self,param_name,val):
-        """Simulate setting the parameter in the GUI."""
-        self._tkvar_set(param_name,val)  # ERROR: presumably calls trace stuff twice
-        self._handle_gui_set(param_name,force=True)
-
-    def gui_get_param(self,param_name):
-        """Simulate getting the parameter in the GUI."""
-        return self._tkvars[param_name].get()
-
-
-
-
-
+    def __pretty_print(self,s):
+        """
+        Convert a Parameter name s to a string suitable for display,
+        if pretty_parameters is True.
+        """
+        if not self.pretty_parameters:
+            return s
+        else:
+            n = s.replace("_"," ")
+            n = n.capitalize()
+            return n
 
 
 
