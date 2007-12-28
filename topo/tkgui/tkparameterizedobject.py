@@ -1114,7 +1114,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         representation = {"frame":frame,"widget":widget,
                           "label":label,"pack_options":pack_options,
-                          "on_change":on_change,"on_modify":on_modify}                       
+                          "on_change":on_change,"on_modify":on_modify,
+                          "widget_options":widget_options}                       
         self.representations[name] = representation
 
         # If there's a label, balloon's bound to it - otherwise, bound
@@ -1303,35 +1304,18 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         button.config(**widget_options) # widget_options override things from parameter
         return button
 
+    def update_selector(self,name):
 
-    def _create_selector_widget(self,frame,name,widget_options):
-        """
-        Return a Tkinter.OptionMenu to represent Parameter 'name'.
+        if name in self.representations:
+            widget_options = self.representations[name]["widget_options"]
 
-        In addition to Tkinter.OptionMenu's usual options, the
-        following additional ones may be included in widget_options:
+            new_range,widget_options = self._X(name,widget_options)
 
-        * sort_fn_args: if widget_options includes 'sort_fn_args',
-          these are passed to the sort() method of the list of
-          *objects* available for the parameter, and the names are
-          displayed sorted in that order.  If 'sort_fn_args' is not
-          present, the default is to sort the list of names using its
-          sort() method.
+            w = self.representations[name]['widget']
+            w.replace_list(new_range) # what a mess
 
-        * new_default: if widget_options includes 'new_default':True,
-          the currently selected value for the widget will be set
-          to the first item in the (possibly sorted as above) range.
-          Otherwise, the currently selected value will be left as the
-          current value.
-        """
-        param = self.get_parameter_object(name)
-        #self._update_translator(name,param)
 
-        ## sort the range for display
-        # CEBALERT: extend OptionMenu so that it
-        # (a) supports changing its option list (subject of a previous ALERT)
-        # (b) supports sorting of its option list
-        # (c) supports selecting a new default
+    def _X(self,name,widget_options):
 
         self.translators[name].update()
         
@@ -1362,6 +1346,42 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         tkvar.set(current_value)
 
+        return new_range,widget_options
+        
+
+    def _create_selector_widget(self,frame,name,widget_options):
+        """
+        Return a Tkinter.OptionMenu to represent Parameter 'name'.
+
+        In addition to Tkinter.OptionMenu's usual options, the
+        following additional ones may be included in widget_options:
+
+        * sort_fn_args: if widget_options includes 'sort_fn_args',
+          these are passed to the sort() method of the list of
+          *objects* available for the parameter, and the names are
+          displayed sorted in that order.  If 'sort_fn_args' is not
+          present, the default is to sort the list of names using its
+          sort() method.
+
+        * new_default: if widget_options includes 'new_default':True,
+          the currently selected value for the widget will be set
+          to the first item in the (possibly sorted as above) range.
+          Otherwise, the currently selected value will be left as the
+          current value.
+        """
+        #param = self.get_parameter_object(name)
+        #self._update_translator(name,param)
+
+        ## sort the range for display
+        # CEBALERT: extend OptionMenu so that it
+        # (a) supports changing its option list (subject of a previous ALERT)
+        # (b) supports sorting of its option list
+        # (c) supports selecting a new default
+
+        new_range,widget_options = self._X(name,widget_options)
+
+        tkvar = self._tkvars[name]
+        
         w = OptionMenu(frame,tkvar,*new_range,**widget_options)
         help_text = getdoc(self._string2object(name,tkvar._original_get()))
         self.balloon.bind(w,help_text)
@@ -1577,8 +1597,10 @@ class String_ObjectTranslator(Translator):
         return inverse(self.cache).get(object_) or object_
 
     def update(self):
-        for object_name,object_ in self.param.get_range().items():
-            self.cache[object_name] = object_
+        self.cache = self.param.get_range()
+        
+        #for object_name,object_ in self.param.get_range().items():
+        #    self.cache[object_name] = object_
         
 
 
@@ -1609,6 +1631,7 @@ class CSPTranslator(String_ObjectTranslator):
         # store list of OBJECTS (not classes) for ClassSelectorParameter's range
         # (Although CSParam's range uses classes; allows parameters set on the
         # options to persist - matches original parametersframe.)
+        self.cache = {}
         for class_name,class_ in self.param.get_range().items():
             self.cache[class_name] = class_()
 
