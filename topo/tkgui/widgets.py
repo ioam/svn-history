@@ -736,6 +736,10 @@ class EditableOptionMenu(Tkinter.OptionMenu):
         # should check val is in list
         self.variable.set(val)
 
+    def replace_list(self,new_list):
+        self.delete_option(0,Tkinter.END)
+        for v in new_list:
+            self.insert_option(Tkinter.END,v)
 
 
 # CEBALERT: should probably be in __init__.py
