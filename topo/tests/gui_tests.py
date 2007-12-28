@@ -117,7 +117,12 @@ def test_projection():
     """Check the Projection window."""
     
     p = g['Plots']['Projection']()
-    p.gui_set_param('projection','S2')
+    p.gui_set_param('sheet','S')
+    p.gui_set_param('projection','GSToS')
+
+    p.gui_set_param('sheet','S2')
+    p.gui_set_param('projection','GS2ToS2')
+    p.gui_set_param('projection','GSToS2')
     
 
 
