@@ -16,7 +16,6 @@
 >>> topo.sim.time()
 FixedPoint('0.0000', 4)
 
->>> assert_array_equal(R.activity,array([[0.,0.],[0.,0.]]))
 
 # check for bug:
 # pattern_present() before any run() messes up events
