@@ -35,8 +35,8 @@ class TestPlotGroupSaver(unittest.TestCase):
 
     def setUp(self):
         self.sim = Simulation(register=True,name="PGS_test")
-        self.sim['A'] = GeneratorSheet(nominal_density=4)
-        self.sim['B'] = CFSheet(nominal_density=4)
+        self.sim['A'] = GeneratorSheet(nominal_density=2)
+        self.sim['B'] = CFSheet(nominal_density=2)
         self.sim.connect('A','B',connection_type=CFProjection,name='Afferent')        
 
     def save(self,name,**params):
