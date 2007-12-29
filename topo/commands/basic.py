@@ -103,7 +103,7 @@ def pattern_present(inputs={},duration=1.0,learning=False,overwrite_previous=Fal
             ParameterizedObject().warning('%s not a valid Sheet Name.' % each)
 
     topo.sim.event_push()
-    topo.sim.run(duration) 
+    topo.sim.run(duration,fake=True) 
     topo.sim.event_pop()
 
     # turn sheets' updating and output_fn updating back on if we turned it off before
