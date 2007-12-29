@@ -151,7 +151,10 @@ SPEEDTESTS=${subst ^,topo/tests/,${subst .ty,.ty_SPEEDTEST,${SPEEDSCRIPTS}}}
 train-tests: ${TRAINTESTS}
 speed-tests: ${SPEEDTESTS}
 
-slow-tests: train-tests snapshot-tests speed-tests
+snapshot-compatibility-tests: 
+	./topographica -c "from topo.commands.basic import load_snapshot; load_snapshot('topo/tests/lissom_oo_or.ty_pickle_test.typ')" -c "topo.sim.run(1)"
+
+slow-tests: train-tests snapshot-tests speed-tests snapshot-compatibility-tests
 
 # CB: add notes somewhere about...
 # - making sure weave compilation has already occurred before running speed tests
