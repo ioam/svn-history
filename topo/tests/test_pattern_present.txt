@@ -1,62 +1,94 @@
 >>> import copy
 >>> from topo.patterns.basic import Gaussian,Constant
+>>> from numpy import array
 >>> from numpy.testing import assert_array_equal
 >>> from topo.tests.setup_simulation import new_simulation,assert_array_not_equal
 >>> from topo.misc.numbergenerators import UniformRandom
+>>> from topo.commands.basic import pattern_present,save_input_generators,restore_input_generators
 >>> import topo
+
 
 >>> new_simulation()
 >>> R = topo.sim['GS']
->>> R.set_input_generator(Gaussian(x=UniformRandom()))
+>>> ig=Gaussian(x=UniformRandom())
+>>> R.set_input_generator(ig)
 
 >>> topo.sim.time()
 FixedPoint('0.0000', 4)
 
+
 >>> topo.sim.run(1) # 1
->>> x1 = R.input_generator.x
->>> a1 = copy.deepcopy(R.activity)
+>>> x_t1 = R.input_generator.x
+>>> a_t1 = copy.deepcopy(R.activity)
+
 >>> topo.sim.run(1) # 2
->>> x2 = R.input_generator.x
->>> a2 = copy.deepcopy(R.activity)
+>>> x_t2 = R.input_generator.x
+>>> a_t2 = copy.deepcopy(R.activity)
 
->>> x1==x2
+# check that dyn params are advancing
+>>> x_t1==x_t2 
 False
+>>> assert_array_not_equal(a_t1,a_t2)
 
->>> assert_array_not_equal(a1,a2)
 
->>> from topo.commands.basic import pattern_present,save_input_generators,restore_input_generators
+## bug is that pattern_present() before any run() messes up events
+
 
 ### Test save_/restore_generators
 >>> save_input_generators()
 >>> R.set_input_generator(Constant(scale=0.1,x=100))
->>> R.input_generator.x==x2
+>>> R.input_generator.x==x_t2
 False
 >>> restore_input_generators()
->>> R.input_generator.x==x2
+>>> R.input_generator.x==x_t2
 True
 
+### Test pattern_present
+>>> pattern_present(inputs={'GS':Constant(scale=1)})
 
->>> pattern_present()
+# check activity pattern
+>>> assert_array_equal(array([[1.,1.],[1.,1.]]),R.activity)
 
+# check time's back to where it should be
 >>> topo.sim.time()
 FixedPoint('2.0000', 4)
 
-
->>> x3 = R.input_generator.x
->>> x3==x2  # input generator is not restored exactly!
+# check input generator was restored
+>>> R.input_generator is ig
+True
+>>> R.input_generator.x==x_t2  
 True
 
->>> a3 = copy.deepcopy(R.activity)
->>> assert_array_equal(a3,a2,"Activity pattern not restored.")
 
-## >>> topo.sim.run(1)
-## >>> topo.sim.time() 
-## FixedPoint('3.0000', 4)
+>>> topo.sim.run(1)
+>>> topo.sim.time() 
+FixedPoint('3.0000', 4)
 
-## >>> a4 = copy.deepcopy(R.activity)
+>>> x_t3 = R.input_generator.x
+>>> a_t3 = copy.deepcopy(R.activity)
 
-## >>> x4 = R.input_generator.x
-## >>> x4==x3
-## False
 
-## >>> assert_array_not_equal(a4,a3)
+>>> topo.sim.run(1)  # 4
+
+>>> x_t4 = R.input_generator.x
+>>> x_t4==x_t3
+False
+
+>>> a_t4 = copy.deepcopy(R.activity)
+>>> assert_array_not_equal(a_t4,a_t3)
+
+
+>>> topo.sim.run(1)  # 5
+
+>>> x_t5 = R.input_generator.x
+>>> x_t5==x_t4
+False
+
+>>> a_t5 = copy.deepcopy(R.activity)
+>>> assert_array_not_equal(a_t5,a_t4)
+
+
+
+
+
+
