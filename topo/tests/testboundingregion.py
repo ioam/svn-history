@@ -1,4 +1,3 @@
-
 """
 Test cases for the boundingregion module.
 
