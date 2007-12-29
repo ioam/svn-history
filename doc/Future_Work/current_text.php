@@ -136,19 +136,19 @@ cat svndump | svndumpfilter --drop-empty-revs --renumber-revs exclude trunk/CVSR
 
 
 8  Check the result:
-svnadmin create /home/ceball/topographica-svn
-svnadmin load /home/ceball/topographica-svn < svndump1
+$ svnadmin create /home/ceball/topographica-svn
+$ svnadmin load /home/ceball/topographica-svn < svndump1
 
-svn checkout file:///home/ceball/topographica-svn/ topographica-co
+$ svn checkout file:///home/ceball/topographica-svn/ topographica-whole_SVN_checkout
+
 
 Then investigate it...
 
-Check-out the same branch/tag from both CVS and SVN into fresh directories
-Compare all files between the two (removing .svn/ and CVS/ directories)
+$ cd topographica-whole_CVS_checkout
+$ cvs update -A -P -d  # hopefully nobody committed anything...
+$ cd ..
 
-diff -q -r topoCVS topoSVN
-
-* but what about keywords * ?
+$ diff -I '[$]Header:' -I '[$]Id:' -I '[$]Revision:' -r topographica-whole_SVN_checkout topographica-whole_CVS_checkout | grep -v 'Only in .*: CVS' | grep -v 'Only in .*: .svn' | grep -v '.pyc$'
 
 
 
