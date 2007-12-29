@@ -148,7 +148,7 @@ $ cd topographica-whole_CVS_checkout
 $ cvs update -A -P -d  # hopefully nobody committed anything...
 $ cd ..
 
-$ diff -I '[$]Header:' -I '[$]Id:' -I '[$]Revision:' -r topographica-whole_SVN_checkout topographica-whole_CVS_checkout | grep -v 'Only in .*: CVS' | grep -v 'Only in .*: .svn' | grep -v '.pyc$'
+$ diff -I '[$]Header:' -I '[$]Id:' -I '[$]Revision:' -r topographica-whole_SVN_checkout/trunk topographica-whole_CVS_checkout/ | grep -v 'Only in .*: CVS' | grep -v 'Only in .*: .svn'
 
 
 
