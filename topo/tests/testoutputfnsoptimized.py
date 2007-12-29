@@ -4,6 +4,7 @@ $Id$
 """
 __version__='$Revision$'
 
+# CEBHACKALERT: we should delete this file, right?
 
 import unittest
 
