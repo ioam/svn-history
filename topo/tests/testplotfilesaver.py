@@ -31,7 +31,7 @@ import __main__
 exec "from topo.commands.analysis import *" in __main__.__dict__
 
 
-class TestPlotGroupSaver(unittest.TestCase):
+class TestPlotGroupSaverBase(unittest.TestCase):
 
     def setUp(self):
         self.sim = Simulation(register=True,name="PGS_test")
@@ -43,6 +43,10 @@ class TestPlotGroupSaver(unittest.TestCase):
         save_plotgroup(name,
                        saver_params={"filename_prefix":"topo/tests/testplotfilesaver"},
                        **params)        
+
+
+
+class TestPlotGroupSaver(TestPlotGroupSaverBase):
 
     def test_activity_saving(self):
         self.save('Activity')
@@ -61,7 +65,7 @@ class TestPlotGroupSaver(unittest.TestCase):
         resolve_path("topo/tests/testplotfilesaverPGS_test_000000.00_Afferent_(from_A).png")
 
         
-class TestCFProjectionPlotGroupSaver(TestPlotGroupSaver):
+class TestCFProjectionPlotGroupSaver(TestPlotGroupSaverBase):
 
     def test_cfprojection_saving(self):
         self.save('Projection',
