@@ -1113,6 +1113,11 @@ class Simulation(ParameterizedObject):
         # see my HACKALERT below.
         
         # Initialize any EPs that haven't been started yet
+        # CEBALERT: anything that manipulates the event stack in some
+        # way (e.g. calls state_push() *must* ensure that this code
+        # has been executed first (i.e. the code must call
+        # topo.sim.run(0) before doing anything).  (Currently applies
+        # to pattern_present() and Test Pattern's Present button.)
         for e in self.eps_to_start:
 	    e.start()
 
