@@ -75,6 +75,42 @@ def descendents(class_):
     return out[::-1]
 
 
+
+# CEBALERT: update when swich to Python 2.5 - it has partial() in
+# the functional module. (What's called curry below seems to be
+# partial function application, not currying.)
+
+# http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/222061
+curry = lambda func, *args, **kw:\
+            lambda *p, **n:\
+                func(*args + p, **dict(kw.items() + n.items()))
+
+
+class bothmethod(object):
+    """
+    'optional @classmethod'
+    
+    A decorator that allows a method to receive either the class
+    object (if called on the class) or the instance object
+    (if called on the instance) as its first argument.
+
+    Code (but not documentation) copied from:
+    http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/523033.
+    """
+    def __init__(self, func):
+        self.func = func
+
+    # i.e. this is also a non-data descriptor
+    def __get__(self, obj, type=None):
+        if obj is None:
+            return curry(self.func, type)
+        else:
+            return curry(self.func, obj)
+
+
+
+
+
 # CB: we could maybe reduce the complexity by doing something to allow
 # a parameter to discover things about itself when created (would also
 # allow things like checking a Parameter is owned by a
@@ -292,7 +328,11 @@ class Parameter(object):
     def _set_instantiate(self,instantiate):
         # constant => instantiate
         self.instantiate = instantiate or self.constant
-        
+
+    # descriptor doc says we should have obj,objtype but
+    # maybe should have obj,objtype=None - somehow indicate
+    # that we never actually use objtype anyway. We store
+    # class (objtype) info on the parameter itself.
     def __get__(self,obj,objtype):
         """
         Return the value for this Parameter.
@@ -910,24 +950,36 @@ class ParameterizedObject(object):
         vals.sort(key=lambda x:x[0])
         return vals
 
+    # CB: is there a more obvious solution than making these
+    # 'bothmethod's?
+    # An alternative would be to lose these methods completely and
+    # make users do things via the Parameter object directly.
 
-
-    # CEBALERT: the class equivalents of the below three methods are missing
-    # (i.e. one can't yet do Gaussian.inspect_value('x') )
-    # CB: will probably remove
-    def force_new_dynamic_value(self,name):
-        param_obj = self.params().get(name)
+    # CB: is there a performance hit for doing this decoration? It
+    # would show up in lissom_oo_or because separated composite uses
+    # this method.
+    @bothmethod
+    def force_new_dynamic_value(cls_or_slf,name):
+        param_obj = cls_or_slf.params().get(name)
 
         if not param_obj:
-            return getattr(self,name)
-        elif not hasattr(param_obj,'_force') or not param_obj._value_is_dynamically_generated(self):
-            return param_obj.__get__(self,type(self))
+            return getattr(cls_or_slf,name)
+
+
+        cls,slf=None,None
+        if isinstance(cls_or_slf,type):
+            cls = cls_or_slf
         else:
-            return param_obj._force(self)
+            slf = cls_or_slf
+            
+        if not hasattr(param_obj,'_force') or not param_obj._value_is_dynamically_generated(slf,cls):
+            return param_obj.__get__(slf,cls)
+        else:
+            return param_obj._force(slf,cls) 
             
 
-    # CEBALERT: rename
-    def repr_value(self,name):
+    @bothmethod
+    def repr_value(cls_or_slf,name):   # CBALERT: rename!
         """
         Return the value or value-generating object of the named
         attribute.
@@ -936,48 +988,53 @@ class ParameterizedObject(object):
         (i.e. the same as getattr()), but Dynamic parameters have
         their value-generating object returned.
         """
-        param_obj = self.params().get(name)
+        param_obj = cls_or_slf.params().get(name)
 
         if not param_obj:
-            value = getattr(self,name)
+            value = getattr(cls_or_slf,name)
 
         # CompositeParameter detected by being a Parameter and having 'attribs'
         elif hasattr(param_obj,'attribs'):
-            value = [self.repr_value(a) for a in param_obj.attribs]
+            value = [cls_or_slf.repr_value(a) for a in param_obj.attribs]
 
         # not a Dynamic Parameter 
         elif not hasattr(param_obj,'_inspect'):
-            value = getattr(self,name)
+            value = getattr(cls_or_slf,name)
 
         # Dynamic Parameter...
         else:
-            try:
-                # ...which had been set on this object
-                value = self.__dict__["_%s_param_value"%name] 
-            except KeyError:
-                # ...which had not been set on object:
+            internal_name = "_%s_param_value"%name
+            if hasattr(cls_or_slf,internal_name):
+                # dealing with object and it's been set on this object
+                value = getattr(cls_or_slf,internal_name)
+            else:
+                # dealing with class or isn't set on the object
                 value = param_obj.default
 
         return value
 
 
-    def inspect_value(self,name):
+    @bothmethod
+    def inspect_value(cls_or_slf,name):  # CB: rename/consider removing.
         """
         Return the current value of the named attribute without modifying it.
 
         Same as getattr() except for Dynamic parameters, which have their
         last generated value returned.
         """
-        param_obj = self.params().get(name)
+        param_obj = cls_or_slf.params().get(name)
 
         if not param_obj:
-            value = getattr(self,name)
+            value = getattr(cls_or_slf,name)
         elif hasattr(param_obj,'attribs'):
-            value = [self.inspect_value(a) for a in param_obj.attribs]
+            value = [cls_or_slf.inspect_value(a) for a in param_obj.attribs]
         elif not hasattr(param_obj,'_inspect'):
-            value = getattr(self,name)
+            value = getattr(cls_or_slf,name)
         else:
-            value = param_obj._inspect(self)
+            if isinstance(cls_or_slf,type):
+                value = param_obj._inspect(None,cls_or_slf)
+            else:
+                value = param_obj._inspect(cls_or_slf,None)
 
         return value
             
@@ -1132,6 +1189,7 @@ def print_all_param_defaults():
     for c in classes:
         c.print_param_defaults()
     print "_______________________________________________________________________________"
+
 
 
 
