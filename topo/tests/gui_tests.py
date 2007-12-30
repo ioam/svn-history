@@ -8,11 +8,14 @@ __version__='$Revision$'
 import topo
 assert hasattr(topo,'guimain'), "GUI must be running."
 
+import copy
+
 from numpy import array
 from numpy.testing import assert_array_equal
 
 import topo.tests.functionaltest as ft
 
+from topo.tests.setup_simulation import assert_array_not_equal
 
 # typing shortcut
 g = topo.guimain
@@ -62,6 +65,17 @@ def test_test_pattern():
     tp = g['Simulation']['Test Pattern']()
     act = g['Plots']['Activity']()
 
+    ## Test for state_push bug (simulation not run() before Present pressed)
+    assert len(topo.sim.eps_to_start)>0, "test must be run before simulation is run()"
+    from topo.patterns.basic import Gaussian
+    from topo.misc.numbergenerators import UniformRandom
+    topo.sim['GS'].set_input_generator(Gaussian(x=UniformRandom()))
+    tp.Present()
+    topo.sim.run(1)
+    act1 = copy.deepcopy(topo.sim['GS'].activity)
+    topo.sim.run(2)
+    assert_array_not_equal(topo.sim['GS'].activity,act1,"GeneratorSheet no longer generating patterns")
+    ##
     
     tp.gui_set_param('pattern_generator','TwoRectangles')
     from topo.patterns.basic import TwoRectangles
