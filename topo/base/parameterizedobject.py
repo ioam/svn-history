@@ -80,6 +80,10 @@ def descendents(class_):
 # the functional module. (What's called curry below seems to be
 # partial function application, not currying.)
 
+# (I hope partial() will allow doc to be seen for the actual
+#  method rather than the lambdas, but if it doesn't, there's
+#  also a decorator module somewhere - I think.)
+
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/222061
 curry = lambda func, *args, **kw:\
             lambda *p, **n:\
