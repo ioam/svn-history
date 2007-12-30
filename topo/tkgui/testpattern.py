@@ -158,6 +158,8 @@ class TestPattern(SheetPanel):
         the specified length of time, then restore the original
         patterns.
         """
+        topo.sim.run(0.0)  # ensure EPs are start()ed
+        
 	topo.sim.state_push()
 
         input_dict = dict([(sheet.name,sheet.input_generator) for sheet in self.plotgroup._sheets()])
