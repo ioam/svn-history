@@ -5,6 +5,8 @@ $Id$
 """
 __version__='$Revision$'
 
+import copy
+
 from topo.base.simulation import FunctionEvent, PeriodicEventSequence
 from topo.base.functionfamilies import OutputFnParameter,IdentityOF
 from topo.base.sheet import Sheet 
@@ -86,6 +88,7 @@ class GeneratorSheet(Sheet):
     def push_input_generator(self):
         """Push the current input_generator onto a stack for future retrieval."""
         self.input_generator_stack.append(self.input_generator)
+        self.input_generator = copy.copy(self.input_generator)
 
                
     def pop_input_generator(self):
