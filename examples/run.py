@@ -87,14 +87,19 @@ measure_cog()"
 ###
 
 
-def run(script_name,density=4,commands=["topo.sim.run(1)"]):
+# CB: this really needs some cleanup.
+def run(script_name,density=None,commands=["topo.sim.run(1)"]):
     """
     Return a complete command for running the given topographica
     example script (i.e. a script in the examples/ directory) at the
     given density, along with any additional commands.
     """
-    cmds = ' -c "default_density='+`density`+'"'
+    if density:
+        density_cmd = ' -c "default_density='+`density`+'" '
+    else:
+        density_cmd = " "
 
+    cmds = ""
     for c in commands:
         cmds+=' -c "'+c+'"'
 
@@ -102,9 +107,9 @@ def run(script_name,density=4,commands=["topo.sim.run(1)"]):
 
     if platform.system()=="Windows":
         # CB: extra leading " required!
-        c = '""'+topographica+'" "'+script+'"'+cmds
+        c = '""'+topographica+density_cmd+script+'"'+cmds
     else:
-        c = topographica+" "+script+' '+cmds
+        c = topographica+density_cmd+script+' '+cmds
 
     return c
 
@@ -123,11 +128,11 @@ group_targets = dict( all_quick=["hierarchical","cfsom_or","som_retinotopy","lis
 
 
 targets = {
-    "cfsom_or":       run("cfsom_or.ty"),
-    "hierarchical":   run("hierarchical.ty"),
-    "lissom_or":      run("lissom_or.ty"),
-    "lissom_oo_or":   run("lissom_oo_or.ty"),
-    "som_retinotopy": run("som_retinotopy.ty"),
+    "cfsom_or":       run("cfsom_or.ty",density=4),
+    "hierarchical":   run("hierarchical.ty",density=4),
+    "lissom_or":      run("lissom_or.ty",density=4),
+    "lissom_oo_or":   run("lissom_oo_or.ty",density=4),
+    "som_retinotopy": run("som_retinotopy.ty",density=4),
 
     "trickysyntax":run("hierarchical.ty",commands=["topo.sim.run(1)",
                                                    "print 'printing a string'"]),
