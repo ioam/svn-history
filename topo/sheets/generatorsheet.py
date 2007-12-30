@@ -97,7 +97,7 @@ class GeneratorSheet(Sheet):
         if len(self.input_generator_stack) >= 1:
             self.set_input_generator(self.input_generator_stack.pop())
         else:
-            ParameterizedObject().warning('There is no previous input generator to restore.')
+            self.warning('There is no previous input generator to restore.')
 
     def generate(self):
         """
