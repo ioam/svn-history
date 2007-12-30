@@ -41,16 +41,6 @@ False
 >>> assert_array_not_equal(a_t2,a_t3)
 
 
-
-### Test save_/restore_generators
->>> save_input_generators()
->>> R.set_input_generator(Constant(scale=0.1,x=100))
->>> R.input_generator.x==x_t3
-False
->>> restore_input_generators()
->>> R.input_generator.x==x_t3
-True
-
 ### Test pattern_present
 >>> pattern_present(inputs={'GS':Constant(scale=1)})
 
@@ -97,6 +87,14 @@ False
 
 
 
+# check for GeneratorSheet bug:
+# push_input_generator didn't copy
 
+### Test save_/restore_generators
+>>> save_input_generators()
+>>> R.input_generator.x = 376.7
+>>> restore_input_generators()
+>>> R.input_generator.x==376.7
+False
 
 
