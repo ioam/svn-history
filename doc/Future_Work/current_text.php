@@ -894,6 +894,15 @@ http://www.onlamp.com/pub/a/python/2005/01/27/ipython.html?page=1
 _________________________________________________________
 working with matlab: scipy's io.loadmat 
 
+
+
+_________________________________________________________
+lots of places I do isinstance(x,ParameterizedObjectMetaclass) or 
+something to determine class or obj. There are easier ways
+(e.g. isinstance(X,type)), and maybe not all of them are required.
+
+
+
 -->
 
 
