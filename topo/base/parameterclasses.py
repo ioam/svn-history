@@ -210,7 +210,7 @@ class Dynamic(Parameter):
     # CB: presence of this method is is the way others tell if it's a dynamic parameter at all
     # (i.e. probably need to have a better name and make this more formal + it might make
     # more sense to check for 'inspect' - need to think about it after doc+clean.)
-    def _value_is_dynamically_generated(self,obj):
+    def _value_is_dynamically_generated(self,obj,objtype=None):
         """
         Return True if the parameter is actually dynamic (i.e. the
         value is being generated).
@@ -221,19 +221,21 @@ class Dynamic(Parameter):
         If called on an instance, inspects the instance's value if it
         has one, otherwise inspects the parameter default value.
         """
-        gen=super(Dynamic,self).__get__(obj,None)
+        gen=super(Dynamic,self).__get__(obj,objtype)
         return hasattr(gen,'_Dynamic_last')
 
 
-    def _inspect(self,obj):
-        gen=super(Dynamic,self).__get__(obj,None)
+    def _inspect(self,obj,objtype=None):
+        gen=super(Dynamic,self).__get__(obj,objtype)
+        
         if hasattr(gen,'_Dynamic_last'):
             return gen._Dynamic_last 
         else:
             return gen 
     
-    def _force(self,obj):
-        gen=super(Dynamic,self).__get__(obj,None)
+    def _force(self,obj,objtype=None):
+        gen=super(Dynamic,self).__get__(obj,objtype)
+        
         if hasattr(gen,'_Dynamic_last'):
             return self._produce_value(gen,update=True)
         else:
@@ -294,7 +296,7 @@ class Number(Dynamic):
         value, if one has been set, otherwise produce the default value.
         """
         result = super(Number,self).__get__(obj,objtype)
-        if self._value_is_dynamically_generated(obj): self._check_bounds(result)
+        if self._value_is_dynamically_generated(obj,objtype): self._check_bounds(result)
         return result
 
 
