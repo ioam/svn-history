@@ -75,6 +75,9 @@ def pattern_present(inputs={},duration=1.0,learning=False,overwrite_previous=Fal
     If learning is False, overwrites the existing values of Sheet.learning
     to disable learning, then reenables learning.
     """
+    # ensure EPs get started (if pattern_present is called before the simulation is run())
+    topo.sim.run(0.0) 
+    
        
     if not overwrite_previous:
         save_input_generators()
@@ -103,7 +106,7 @@ def pattern_present(inputs={},duration=1.0,learning=False,overwrite_previous=Fal
             ParameterizedObject().warning('%s not a valid Sheet Name.' % each)
 
     topo.sim.event_push()
-    topo.sim.run(duration,fake=True) 
+    topo.sim.run(duration) 
     topo.sim.event_pop()
 
     # turn sheets' updating and output_fn updating back on if we turned it off before

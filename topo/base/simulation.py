@@ -1097,12 +1097,7 @@ class Simulation(ParameterizedObject):
         else:
             self.timer.call_and_time(duration)
 
-    # CEBALERT: added 'fake' to avoid problem with pattern_present causing
-    # the true list of eps_to_start to get wiped out.
-    # Maybe instead, run shouldn't clear out eps_to_start, but should
-    # detect which haven't been started and just start those?
-    # Or call 'fake' something better and document it...
-    def run(self,duration=Forever,until=Forever,fake=False):
+    def run(self,duration=Forever,until=Forever):
         """
         Process simulation events for the specified duration or until the specified time.
 
@@ -1121,8 +1116,7 @@ class Simulation(ParameterizedObject):
         for e in self.eps_to_start:
 	    e.start()
 
-        if not fake:
-            self.eps_to_start=[]
+        self.eps_to_start=[]
 
         
         # Complicated expression for min(time+duration,until)
