@@ -88,7 +88,11 @@ class GeneratorSheet(Sheet):
     def push_input_generator(self):
         """Push the current input_generator onto a stack for future retrieval."""
         self.input_generator_stack.append(self.input_generator)
-        self.input_generator = copy.copy(self.input_generator)
+
+        # CEBALERT: would be better to reorganize code so that
+        # push_input_generator must be supplied with a new generator.
+        from topo.base.patterngenerator import Constant
+        self.set_input_generator(Constant()) 
 
                
     def pop_input_generator(self):
