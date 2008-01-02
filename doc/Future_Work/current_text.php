@@ -118,7 +118,7 @@ ERROR: A CVS repository cannot contain both ./topographica/external/pychecker-0.
 the directory at the root of the repository and running the following
 command: 
 
-cvs2svn --exclude="parametersframe_replacement_branch_FINAL" --exclude="before_merge_parametersframe_replacement_branch_200708291730BST" --exclude="before_merge_into_parametersframe_replacement_branch_200708271525BST" --exclude="before_merge_HEAD_in_200708271525BST" --exclude="parametersframe_replacement_branch" --exclude="tkgui_parameterization_branch" --exclude="shared_weights_use_views" --exclude="output_fn_has_return" --exclude="shelve_issue" --exclude="after_decref" --exclude="before_decref" --exclude="simulation_time_inclusive" --exclude="simulation_time_exclusive" --exclude="numpy_test_branch" --exclude="numpy_test_branch_merged" --exclude="LATEST_STABLE" --exclude="InputSheet_per_kernel" --exclude="topographica" --exclude="start" --use-cvs --username=ceball_cvs2svn --default-eol="native" --dumpfile=svndump .
+cvs2svn --exclude="parametersframe_replacement_branch_FINAL" --exclude="before_merge_parametersframe_replacement_branch_200708291730BST" --exclude="before_merge_into_parametersframe_replacement_branch_200708271525BST" --exclude="before_merge_HEAD_in_200708271525BST" --exclude="parametersframe_replacement_branch" --exclude="tkgui_parameterization_branch" --exclude="shared_weights_use_views" --exclude="output_fn_has_return" --exclude="shelve_issue" --exclude="after_decref" --exclude="before_decref" --exclude="simulation_time_inclusive" --exclude="simulation_time_exclusive" --exclude="numpy_test_branch" --exclude="numpy_test_branch_merged" --exclude="InputSheet_per_kernel" --exclude="topographica" --exclude="start" --use-cvs --username=ceball_cvs2svn --default-eol="native" --dumpfile=svndump .
 
 
 # Any transformations of names?
@@ -970,6 +970,77 @@ _________________________________________________________
 lots of places I do isinstance(x,ParameterizedObjectMetaclass) or 
 something to determine class or obj. There are easier ways
 (e.g. isinstance(X,type)), and maybe not all of them are required.
+
+
+
+
+
+_________________________________________________________
+CB: code I was experimenting with in Parameter's __init__ (everyone else please ignore)
+(detects Parameter not declared inside ParameterizedObject)
+
+        f0 = sys._getframe(0)
+        frames = [f0]
+
+        for i in range(100):
+            new_f = frames[i].f_back
+            if new_f:
+                frames.append(new_f)
+            else:
+                break
+
+        found = False
+        for f in frames:
+            if 'ParameterizedObject' in open(f.f_code.co_filename).readlines()[f.f_code.co_firstlineno-1]:
+                found=True
+
+        print found
+
+        if not found:
+            print self
+        
+                
+##         import __main__; __main__.__dict__['z']=[f0,f1,f2,f3,f4]
+##         print "zed for ",self
+        
+##         method_name = f.f_code.co_name
+##         filename = f.f_code.co_filename
+       
+##         arg_class = None
+##         args = inspect.getargvalues(f)
+##         if (args[3].has_key('func')):
+##             func = args[3]['func'] # extract wrapped function
+##             try:
+##                 arg_class = func.func_class
+##                 method_name = func.func_name
+##                 filename = func.func_code.co_filename
+##             except:
+##                 pass
+
+##         print self,"*",arg_class
+
+## #def called_class():
+        
+##         f = sys._getframe(0)       
+## ##        method_name = f.f_code.co_name
+## ##        filename = f.f_code.co_filename
+
+##         arg = None
+##         args = inspect.getargvalues(f)
+##         if len(args[0]) > 0:
+##             arg_name = args[0][0] # potentially the 'self' arg if its a method
+##             a=args[3][arg_name]
+##             print self," BY ",a,type(a)
+
+       #return arg_class #(method_name, filename, arg_class)
+
+
+ #       called_class()
+
+_________________________________________________________
+
+
+
 
 
 
