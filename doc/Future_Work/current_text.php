@@ -121,6 +121,9 @@ command:
 cvs2svn --exclude="parametersframe_replacement_branch_FINAL" --exclude="before_merge_parametersframe_replacement_branch_200708291730BST" --exclude="before_merge_into_parametersframe_replacement_branch_200708271525BST" --exclude="before_merge_HEAD_in_200708271525BST" --exclude="parametersframe_replacement_branch" --exclude="tkgui_parameterization_branch" --exclude="shared_weights_use_views" --exclude="output_fn_has_return" --exclude="shelve_issue" --exclude="after_decref" --exclude="before_decref" --exclude="simulation_time_inclusive" --exclude="simulation_time_exclusive" --exclude="numpy_test_branch" --exclude="numpy_test_branch_merged" --exclude="LATEST_STABLE" --exclude="InputSheet_per_kernel" --exclude="topographica" --exclude="start" --use-cvs --username=ceball_cvs2svn --default-eol="native" --dumpfile=svndump .
 
 
+# Any transformations of names?
+#        --symbol-transform="RELEASE:Release" \
+#        --symbol-transform="_:." \
 
 
 
@@ -153,6 +156,73 @@ $ diff -I '[$]Header:' -I '[$]Id:' -I '[$]Revision:' -r topographica-whole_SVN_c
 
 
 9. Tell people to stop CVS commits
+
+
+
+------------------------------------------------------------------------------------
+* Make the cvs repository readonly (apart from for ceball&jbednar)?
+
+* put WARNING.txt saying moved to Subversion?
+
+
+Permissions
+
+Read access cannot be restricted: This limitation is imposed to ensure
+all code is available to the public per the spirit of the Open Source
+Definition. No means is provided nor supported to restrict anonymous
+access to a project's CVS repository.
+
+Access for project developers: Developer CVS access is only provided
+to project members who have been granted 'Allow access to CVS
+repository (developer access)' on the developer permissions
+page. Project administrators can enable/disable CVS access entirely to
+a project developer with this setting. Developers without this enabled
+will have to use anonymous CVS access.
+
+Fine-grained write permissions: cvs_acls is centrally installed and
+maintained on the CVS server by SourceForge.net staff. cvs_acls allows
+for per-module or per-directory or per-branch restriction of any CVS
+write operations that require a commit. cvs_acls does not block a user
+from creating a new module; the only way to do that is to block CVS
+access entirely. To configure cvs_acls:
+
+   1. Checkout a copy of the 'CVSROOT' module
+
+   2. Create a file with the name 'avail' in the 'CVSROOT' module with
+   the contents as described below
+
+   3. Edit the 'checkoutlist' file and add an entry for 'avail' on its
+   own line, without quotes
+
+   4. Commit the changes to the repository
+
+   5. Edit the 'commitinfo' file and add the entry as described below
+
+   6. Commit the change to enable cvs_acls
+
+The cvs_acls script contains a list of instructions in how to format
+the avail file. We recommend you read the instructions and do the
+following to ensure you maintain access to the repository:
+
+unavail
+avail|YOUR_USERNAME
+
+YOUR_USERNAME should be your SourceForge.net username, lowercase, as
+normal. Add a blank line at the end of the 'avail' file, cvs_acls
+expects a blank line at the end.
+
+Add the following to the 'commitinfo' file after any existing text, as
+described above:
+
+ALL /cvsroot/sitedocs/CVSROOT/cvstools/cvs_acls
+
+
+
++ http://sitedocs.cvs.sourceforge.net/sitedocs/CVSROOT/cvstools/cvs_acls?view=markup
+
+------------------------------------------------------------------------------------
+
+
 
 
 
