@@ -47,7 +47,7 @@ for your system and install them.
 
 <!--CB: should this be broken up?-->
 <pre>
-svn co https://topographica.svn.sf.net/svnroot/topographica/ \
+svn co https://topographica.svn.sourceforge.net/svnroot/topographica/ \
 tags/LATEST_STABLE/topographica topographica
 </pre>
 
@@ -224,7 +224,7 @@ a different version of the code. For instance, if you currently have the
 trunk version, you can switch to the LATEST_STABLE version
 by typing:
 <pre>
-svn switch https://topographica.svn.sf.net/svnroot/topographica/ \
+svn switch https://topographica.svn.sourceforge.net/svnroot/topographica/ \
 tags/LATEST_STABLE/topographica
 </pre>
 
@@ -242,7 +242,7 @@ branch or tag by typing <code>svn info | grep URL</code>.
 To see what other versions of the code are available, you can view the
 <a href="http://topographica.svn.sourceforge.net/viewvc/topographica/tags/">tags</a>
 directory of the SVN repository in your web browser, or type
-<code>svn ls --verbose https://topographica.svn.sf.net/svnroot/topographica/tags/</code>. 
+<code>svn ls --verbose https://topographica.svn.sourceforge.net/svnroot/topographica/tags/</code>. 
 
 
 
@@ -268,7 +268,7 @@ developer, you may wish to set up CVS so that SourceForge.net does not
 have to keep asking for your password for every transaction.  This can
 be done using SSH, by <A
 HREF="https://sourceforge.net/docs/F02/">setting up SSH and uploading
-your public keys to sf.net</A>, then starting ssh-agent on your local
+your public keys to sourceforge.net</A>, then starting ssh-agent on your local
 machine.  Once the agent is running, you should be able to use CVS
 with no password.
 -->
