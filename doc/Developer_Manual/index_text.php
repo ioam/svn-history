@@ -1,7 +1,7 @@
 <P>This manual gives guidelines for developers working on the source
 code for the Topographica simulator. Users will not usually need to
 refer to this material, unless they plan to submit significant blocks
-of code to the project (which is, of course, strongly encouraged!).
+of code to the project (which is, of course, strongly <a href="#joining">encouraged</a>!).
 
 <P>By default, all the text in this manual refers to program code
 written in the Python language. There are also some bits of C/C++ code
@@ -41,5 +41,13 @@ about how to set up tests</DD>
 
 <P><DT><A href="releases.html"><strong>Releases</strong></A></DT>
 <DD>How to make a new public release of Topographica</DD>
-</DL>
 
+<P><DT><A name="joining"><strong>Joining</strong></A></DT> <DD>Anyone interested in
+Topographica is welcome to join as a Topographica developer to get
+read/write access, so that your changes can become part of the main
+distribution.  Just sign up for a free account at <A
+HREF="http://sourceforge.net/"> SourceForge.net</A>, then email <A
+HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107?subject=Request%20to%20be%20a%20Topographica%20developer">Jim</a>
+your username and what you want to do, and he'll tell you how to
+proceed from there.</DD>
+</DL>

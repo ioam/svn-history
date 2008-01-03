@@ -234,17 +234,17 @@ before deciding whether to update to the bleeding-edge (trunk)
 version, you can check its
 <a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests&builder=x86_ubuntu7.04_slow-tests">status</a>.)
 
+<!--CB: just trying it out; embedding an image would be best-->
 
 <P>You can discover if your copy is from the trunk or a particular
 branch or tag by typing <code>svn info | grep URL</code>.
 <!--CB: will need to clarify this when revisions are in branches/ -->
 To see what other versions of the code are available, you can view the
 <a href="http://topographica.svn.sourceforge.net/viewvc/topographica/tags/">tags</a>
-directory of the SVN repository in your web browser.
+directory of the SVN repository in your web browser, or type
+<code>svn ls --verbose https://topographica.svn.sf.net/svnroot/topographica/tags/</code>. 
 
 
-
-<!--CB: just trying it out; embedding an image would be best-->
 
 <P>Windows TortoiseCVS users can right click in the topographica
 directory and select <code>CVS Update</code> to get the new files.
@@ -255,19 +255,6 @@ that case "make" can also take some time to build.
 
 
 
-
-
-<!--CB: move to a developer manual page? -->
-<!--
-<P>Note that anyone interested in Topographica is welcome to join as a
-Topographica developer to get read/write access, so that your changes
-can become part of the main distribution.  Just sign up for a free
-account at <A HREF="http://sourceforge.net/"> SourceForge.net</A>,
-then email <A
-HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107?subject=Request%20to%20be%20a%20Topographica%20developer">Jim</a>
-your username and what you want to do,
-and he'll tell you how to proceed from there.
--->
 
 
 <!--CB svn caches username and password by default (caches with the
