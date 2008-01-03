@@ -121,12 +121,33 @@ class Dynamic(Parameter):
     Note that at present, the callable object must be an instance of a
     callable class, rather than a named function or a lambda function,
     or else this object will not be picklable.
+
+
+    Works for callable class objects (i.e. support () and allow attributes
+    to be set).
+    
     """
     time_fn = None  
     
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
+    # CBENHANCEMENT: Add an 'epsilon' slot...
+    # See email 'Re: simulation-time-controlled Dynamic parameters'
+    # Dec 22, 2007 CB->JAB
+
+    # CBALERT: can't use python's iterators or generators with this
+    # class:
+    #
+    # (1) we deepcopy parameter values; python currently doesn't
+    # handle deepcopy of iterators and generators
+    #
+    # (2) we want to be able to pickle simulations; python can't
+    # currently pickle iterators and generators (same as above)
+    #
+    # (3) generators and iterators can't have attributes; we need to
+    # store _Dynamic_last and _Dynamic_time on the value generators
+    
         
     def __init__(self,**params):
         """
