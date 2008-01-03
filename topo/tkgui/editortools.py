@@ -136,7 +136,11 @@ class NodeTool(Frame):
         # pass the class name (set by ParametersFrameWithApply) here.
         # Same goes for projections.
         sheet_name=self.sheet_list[self.current_option].name
-        if sheet_name is not None:
+        
+        import tkSimpleDialog
+        sheet_name = tkSimpleDialog.askstring("New Sheet","Please enter a name for the Sheet")
+
+        if sheet_name:
             sheet = self.sheet_list[self.current_option](name=sheet_name)
         else:
             sheet = self.sheet_list[self.current_option]()
