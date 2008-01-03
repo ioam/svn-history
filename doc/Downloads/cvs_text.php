@@ -1,113 +1,66 @@
-<H2>Installing Topographica using CVS</H2>
+<H2>Installing Topographica using Subversion</H2>
 
-<P><A HREF="http://www.nongnu.org/cvs/">CVS</A> (the Concurrent
-Versions System) is the version control system used for managing
-Topographica development.  It keeps track of every change made to any
-file, and can reconstruct the state of the software from any date and
-time in the history of Topographica development.  The Topographica CVS
-repository is hosted by <A
-HREF="http://sourceforge.net/projects/topographica">
-SourceForge.net</A>.  The essentials for using CVS at SourceForge are
+<P><A HREF="http://subversion.tigris.org/">Subversion</A> (SVN) is the
+version control system used for managing Topographica development.  It
+keeps track of every change made to any file, and can reconstruct the
+state of the software from any date and time in the history of
+Topographica development.  The Topographica SVN repository is hosted
+by <A HREF="http://sourceforge.net/projects/topographica">
+SourceForge.net</A>.  The essentials for using SVN at SourceForge are
 described below; see the <A
-HREF="http://sourceforge.net/docman/display_doc.php?docid=29894&group_id=1">
-SourceForge documentation</A> for more details or if you have any
+HREF="http://sourceforge.net/docman/display_doc.php?docid=31070&group_id=1">
+SourceForge SVN documentation</A> for more details or if you have any
 difficulties.
 
-<H3><A NAME="system-setup">Specifying a CVS repository</A></H3>
-
-Many of the commands below require you to tell CVS where the
-Topographica files are located and how to access them.  In these
-commands, you should replace the string <code>$TOPOROOT</code> with
-one of two different ways to access the files, depending on whether or
-not you are an official Topographica developer.  Non-developers should
-use the read-only version of the repository, with a
-<code>$TOPOROOT</code> of:
-
-<pre>
-:pserver:anonymous@topographica.cvs.sf.net:/cvsroot/topographica
-</pre>
-
-Developers need read/write access, so that they can make changes that
-become a permanent part of the project repository, and would use a
-<code>$TOPOROOT</code> of:
-
-<pre>
-:ext:<i>uname</i>@topographica.cvs.sf.net:/cvsroot/topographica
-</pre>
-
-Here <i>uname</i> should be replaced with your SourceForge.net
-username.
-
-<P>Note that anyone interested in Topographica is welcome to join as a
-Topographica developer to get read/write access, so that your changes
-can become part of the main distribution.  Just sign up for a free
-account at <A HREF="http://sourceforge.net/"> SourceForge.net</A>,
-then email <A
-HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107?subject=Request%20to%20be%20a%20Topographica%20developer">Jim</a>
-your username and what you want to do,
-and he'll tell you how to proceed from there.
-
-<P>With either read-only or read-write access, you will need to choose
-whether you want the very most recent version, with changes made
-daily, or only the most recent stable version for which installation
-packages have been created.  The very most recent version will be
-called "bleeding-edge" below, while the stable version will be called
+<P>In the instructions below, you will need to choose whether you want
+the very most recent version, with changes made daily, or only the
+most recent stable version. <!--for which installation packages have
+been created.--> The very most recent version will be called
+"bleeding-edge" (or "trunk") below, while the stable version will be called
 LATEST_STABLE.  Developers will want the very most recent version, as
 will those working closely with developers.  Others will probably want
 to stick to the LATEST_STABLE version except to fix specific problems.
 
 
-<H3>Downloading via CVS</H3>
+<H3>Downloading via Subversion</H3>
 
-The CVS installation instructions differ on the various platforms, as
+The SVN installation instructions differ on the various platforms, as
 outlined below.  Regardless of platform, please note that the
-Topographica repository contains some very large files, and the CVS
+Topographica repository contains some very large files, and the SVN
 download process may appear to hang or freeze at various times while
-these files are downloaded.  Unfortunately, CVS does not provide any
+these files are downloaded.  Unfortunately, SVN does not provide any
 sort of feedback that this is occurring, so please just be patient
-when downloading via CVS.  Such pauses should be rare after the first
-CVS download, unless one of the large files has been updated.
+when downloading.  Such pauses should be rare after the first SVN
+download, unless one of the large files has been updated.
 
 
 <H4><A NAME="linux">Linux/UNIX:</A></H4>
 
 Most Linux and other UNIX platforms already have all of the necessary
 programs and libraries required for Topographica.  But if your
-distribution does not include <code>cvs</code>, <code>ssh</code>, or
-<code>php</code> by default, first obtain versions of those programs
+distribution does not include <code>svn</code>
+<!--CB: with ssl?-->
+or <code>php</code> by default, first obtain versions of those programs
 for your system and install them.
 
-<P>Then for read-only access, log in to the CVS server using the
-command:
+<P>The Topographica files can be checked out by using the command:
 
+<!--CB: should this be broken up?-->
 <pre>
-  cvs -d $TOPOROOT login
+svn co https://topographica.svn.sf.net/svnroot/topographica/ \
+tags/LATEST_STABLE/topographica topographica
 </pre>
 
-When a password is requested, just press return.
+<P>This will create a <code>topographica</code> directory in your present
+working directory; omitting the final <code>topographica</code> will 
+put the files directly into your present directory.
 
-<P>For read/write access, no login step is needed, but you may need to
-tell CVS to use <code>ssh</code> to transfer files.  Just type
-<code>export CVS_RSH=ssh</code> for <code>sh/bash</code> or
-<code>setenv CVS_RSH ssh</code> for csh/tcsh shells; you may wish to
-put this in your shell startup script permanently.  The checkout and
-update commands below should then ask for your SourceForge.net
-password; if instead you get a message about rsh timing out, you have
-probably forgotten to do the CVS_RSH command.
-
-<P>For either read-only or read/write access, the actual files can be
-checked out by changing to wherever you want the files to be stored,
-and using the command:
-
-<pre>
-  cvs -d $TOPOROOT checkout -r LATEST_STABLE topographica
-</pre>
-
-The <code>-r LATEST_STABLE</code> option should be omitted if you want
-the bleeding-edge version, which may not always be usable due to work
-in progress, although you can check to see the code builds on a specific platform 
+<P>To get the bleeding-edge (trunk) version, replace <code>tags/LATEST_STABLE</code> with 
+<code>trunk</code>. Note that the bleeding-edge version
+is not always usable due to work in progress; you can check to see if the
+code currently builds on a specific platform
 (<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_build">linux</a>,
-<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=ppc_darwin8.10.0_build">Mac</a>) and whether or not our   
+<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=ppc_darwin8.10.0_build">Mac</a>) and whether our   
 <a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests&builder=x86_ubuntu7.04_slow-tests">code tests pass</a>.
 
 <P>The checkout process will likely take several minutes (probably
@@ -187,6 +140,10 @@ removing LDFLAGS as described in index_text.php).-->
 <!--  Topographica on Windows, compiling everything from source...
 <!--  see the list of current tasks.-->
 
+<!--CEBALERT Windows instructions are out of date
+http://tortoisesvn.tigris.org/
+--> 
+
 <P>Under Windows, we recommend installing
 <A HREF="http://www.tortoisecvs.org/">TortoiseCVS</A> (tested 11/2006
 using TortoiseCVS 1.8.29). TortoiseCVS includes everything required
@@ -230,33 +187,62 @@ HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&
 Jim</a> for more details.
 
 
-<H3>Problems with CVS?</H3>
+<!-- CB: error messages need to be updated. Maybe see if we get any
+these days?
+<H3>Problems with SVN?</H3>
 
-Sometimes the SourceForge.net cvs service experiences problems. If you
+Sometimes the SourceForge.net svn service experiences problems. If you
 receive messages such as "connection closed by remote host", or the
 cvs connection times out, you may wish to check the SourceForge.net 
 <a href="https://sourceforge.net/docman/display_doc.php?docid=2352&group_id=1">status
 page</a>. Be aware that this page is not always updated as fast as
 problems appear.
+-->
 
+<!-- CB: haven't updated anything past here-->
 
 <H3>Updating using CVS</H3>
 
-Linux/UNIX/Mac users who have Topographica checked out via CVS can
-update to the latest stable version at any time by doing:
+Linux/UNIX/Mac users who have Topographica checked out via SVN can
+update their copy of Topographica by changing to the
+directory containing the Topographica files and then doing:
 
 <pre>
-  cd topographica
-  cvs update -d -P -r LATEST_STABLE
-  make all
+  svn update 
+  make
 </pre>
 
-<P>This will retrieve the latest version for which installation
-packages have been released.  If you want the very most recent
-version, stable or not, replace <code>-r LATEST_STABLE</code> with
-<code>-A</code> to force a complete update. Before updating to the
-most recent version, you can check its 
-<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests&builder=x86_ubuntu7.04_slow-tests">status</a>.
+
+<P>If you previously checked out the LATEST_STABLE version of
+Topographica, this will update to the current LATEST_STABLE
+code. If you previously checked out the 
+bleeding-edge (trunk) version of Topographica, this will update
+to the absolute most recent version of the code.
+
+<P>If you wish, you can switch your copy of Topographica to 
+a different version of the code. For instance, if you currently have the 
+trunk version, you can switch to the LATEST_STABLE version
+by typing:
+<pre>
+svn switch https://topographica.svn.sf.net/svnroot/topographica/ \
+tags/LATEST_STABLE/topographica
+</pre>
+
+To switch from the LATEST_STABLE version to the trunk version, replace
+<code>tags/LATEST_STABLE</code> with <code>trunk</code>.  (Note that
+before deciding whether to update to the bleeding-edge (trunk)
+version, you can check its
+<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests&builder=x86_ubuntu7.04_slow-tests">status</a>.)
+
+
+<P>You can discover if your copy is from the trunk or a particular
+branch or tag by typing <code>svn info | grep URL</code>.
+<!--CB: will need to clarify this when revisions are in branches/ -->
+To see what other versions of the code are available, you can view the
+<a href="http://topographica.svn.sourceforge.net/viewvc/topographica/tags/">tags</a>
+directory of the SVN repository in your web browser.
+
+
 
 <!--CB: just trying it out; embedding an image would be best-->
 
@@ -265,7 +251,28 @@ directory and select <code>CVS Update</code> to get the new files.
 
 <P>Note that updating the external/ subdirectory sometimes takes a
 long time, if some of the external packages have been upgraded, and in
-that case "make all" can also take some time to build.
+that case "make" can also take some time to build.
+
+
+
+
+
+<!--CB: move to a developer manual page? -->
+<!--
+<P>Note that anyone interested in Topographica is welcome to join as a
+Topographica developer to get read/write access, so that your changes
+can become part of the main distribution.  Just sign up for a free
+account at <A HREF="http://sourceforge.net/"> SourceForge.net</A>,
+then email <A
+HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107?subject=Request%20to%20be%20a%20Topographica%20developer">Jim</a>
+your username and what you want to do,
+and he'll tell you how to proceed from there.
+-->
+
+
+<!--CB svn caches username and password by default (caches with the
+working copy forever, it seems?); decide what to do with the text
+below 
 
 <H3>SSH Agent</H3>
 
@@ -277,3 +284,4 @@ HREF="https://sourceforge.net/docs/F02/">setting up SSH and uploading
 your public keys to sf.net</A>, then starting ssh-agent on your local
 machine.  Once the agent is running, you should be able to use CVS
 with no password.
+-->
