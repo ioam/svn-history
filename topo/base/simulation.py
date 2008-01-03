@@ -220,6 +220,11 @@ class EventProcessor(ParameterizedObject):
     
     dest_ports=[None]
 
+    # CEBERRORALERT: this code prevents EventProcessors from getting
+    # a gensym name.
+    #
+    # s = Sheet()
+    # s.name is None
     name = Parameter(constant=True)
 
     def __init__(self,**params):
@@ -1251,6 +1256,9 @@ class Simulation(ParameterizedObject):
         Same as state_push(), but does not ask EventProcessors to save
         their state.
         """
+        # CBALERT: does it make more sense to put the original events onto the
+        # stack, and replace self.events with the copies? Not sure this makes
+        # any practical difference currently.
         self._events_stack.append((self._time,[copy(event) for event in self.events]))
 
 
