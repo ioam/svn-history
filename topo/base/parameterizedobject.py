@@ -1115,7 +1115,7 @@ class ParameterizedObject(object):
             # params() is called, so we mangle the name ourselves at
             # runtime (if we were to mangle it now, it would be
             # _ParameterizedObject.__params for all classes).
-            type.__setattr__(cls,'_%s__params'%cls.__name__,paramdict)
+            setattr(cls,'_%s__params'%cls.__name__,paramdict)
             return paramdict
         
 
