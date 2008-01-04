@@ -165,12 +165,7 @@ def __numpy_ufunc_pickle_support():
     def ufunc_pickler(ufunc):
 	return ufunc.__name__
 
-##     # CEBALERT: I think we don't need this method
-##     def ufunc_unpickler(name):
-##         print "To help with debugging, please email ceball@users.sf.net if you see this message, and include as much information as possible about what you were doing."
-## 	import numpy
-## 	return getattr(numpy,name)
-
+    # CB: could add ufunc_unpickler if we need.
     import numpy
     copy_reg.pickle(numpy.ufunc,ufunc_pickler)#,ufunc_unpickler)
 
