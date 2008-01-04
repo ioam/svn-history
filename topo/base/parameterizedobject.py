@@ -560,7 +560,7 @@ class ParameterizedObjectMetaclass(type):
         the descriptor).  If the new value is a Parameter, once it has
         been set we make sure that the value is inherited from
         ParameterizedObject superclasses as described in __param_inheritance().
-        """        
+        """
         # Find out if there's a Parameter called attribute_name as a
         # class attribute of this class - if not, parameter is None.
         parameter,owning_class = self.get_param_descriptor(attribute_name)
@@ -576,8 +576,18 @@ class ParameterizedObjectMetaclass(type):
             if isinstance(value,Parameter):
                 self.__param_inheritance(attribute_name,value)
             else:
-                print ("Warning: Setting non-Parameter class attribute %s.%s = %s "
-                       % (self.__name__,attribute_name,`value`))
+                # the purpose of the warning below is to catch
+                # mistakes ("thinking you are setting a parameter, but
+                # you're not"). There are legitimate times when
+                # something needs be set on the class, and we don't
+                # want to see a warning then. Such attributes should
+                # presumably be __ or at least _. (For instance,
+                # python's own pickling mechanism caches __slotnames__
+                # on the class:
+                # http://mail.python.org/pipermail/python-checkins/2003-February/033517.html.)
+                if not attribute_name.startswith('_'):
+                    print ("Warning: Setting non-Parameter class attribute %s.%s = %s "
+                           % (self.__name__,attribute_name,`value`))
 
                 
     def __param_inheritance(self,param_name,param):
@@ -931,6 +941,7 @@ class ParameterizedObject(object):
             if desc:
                 self.debug("Setting param %s ="%name, val)
             else:
+                # CEBERRORALERT: the message is wrong: does get set
                 self.warning("CANNOT SET non-parameter %s ="%name, val)
             # i.e. if not desc it's setting an attribute in __dict__, not a Parameter
             setattr(self,name,val)
@@ -1054,57 +1065,20 @@ class ParameterizedObject(object):
         for name,val in self.get_param_values():
             print '%s.%s = %s' % (self.name,name,val)
 
-            
+
+    # CB: this method *only* exists because object has no __getstate__
+    # and we use __getstate__ in some subclasses.
+    # In the future, if we want to control something about
+    # __getstate__ for all classes, it will be easier if subclasses
+    # that already have a __getstate__ go through this
+    # method. Otherwise we might get hard-to-track bugs when sublasses
+    # that an have existing __getstate__ method are not altered.
     def __getstate__(self):
         """
         Save the object's state: return a dictionary that is a shallow
-        copy of the object's __dict__, except that entries in __dict__
-        which are Parameters get deep copied.
-
-        (i.e. we assume mutable objects are in Parameters.)
-
-        ParameterizedObjects always have a __dict__ and do not have __slots__.
+        copy of the object's __dict__.
         """
-        # shallow copy the __dict__ because we change some entries
-        state = self.__dict__.copy()
-
-##  JPHACKALERT: After discussing with JAB and CEB, I'm commenting out
-##  these entire functions, because they seem to only exist for the
-##  purpose of deepcopying the parameters, which is (probably?) not
-##  necessary.  Note that this function and the accompanying
-##  __setstate__ don't seem to do anything useful -- they just copy
-##  self.__dict__ -- but I get weird warnings from 'make tests' if I
-##  remove them.
-
-## CB: __setstate__ exists only to set 'self.initialized'. If that
-## were not necessary, we wouldn't need it; that is, __setstate__ does
-## not exist to support pickling, but to work around problems
-## setting Constant parameters when either copying or recreating (unpickling)
-## parameterized objects (I can't remember which -- maybe it's both).
-
-## The weird warnings caused by removing __gestate__ appear to be from
-## something internal to python's default handling of getstate and
-## setstate; python seems to pass around some seemingly undocumented
-## __slotnames__ thing in the keyword arguments, and of course we
-## assume things in keywords are parameters to be set on parameterized
-## objects, hence the weird warnings. Anyone want to look at the
-## source code for python? Because it seems like otherwise we could
-## delete this __getstate__ method.
-## (Why would there be anything to do with slots for ParameterizedObjects,
-## anyway?)
-
-        # CB (note to myself): note that this code applies *only* when
-        # a __something_param_value contains a Parameter.
-        # e.g. k is a ParameterizedObject with a Parameter p.
-        #   k.p = DynamicNumber(something)
-        # k.p is then a Parameter itself. 
-        
-        # deep copy Parameters; overwrites their original shallow copies 
-##         for (k,v) in self.__dict__.items():
-##             if isinstance(v,Parameter):
-##                 state[k] = copy.deepcopy(v)
-
-        return state
+        return self.__dict__.copy()
 
 
     def __setstate__(self,state):
@@ -1114,10 +1088,7 @@ class ParameterizedObject(object):
         During this process the object is considered uninitialized.
         """
         self.initialized=False
-        
-        for k,v in state.items():
-            setattr(self,k,v)
-            
+        self.__dict__.update(state)
         self.initialized=True
 
 
