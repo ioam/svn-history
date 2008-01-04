@@ -325,3 +325,7 @@ class JointScalingOF(OutputFn):
     def restore_updating(self):
         """Pop the most recently saved updating parameter off the stack."""
         self.updating = self._updating_state.pop() 
+
+
+__all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,OutputFn)]))
+

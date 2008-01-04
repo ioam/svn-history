@@ -112,3 +112,8 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
 
 
 provide_unoptimized_equivalent("CFPOF_DivisiveNormalizeL1_opt","CFPOF_DivisiveNormalizeL1",locals())
+
+
+
+__all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,OutputFn)]))
+
