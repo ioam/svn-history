@@ -131,14 +131,13 @@ class NodeTool(Frame):
             self.parameter_tool.update_parameters()
         # get the current selection and create the new topo object
 
-        # CEBHACKALERT: because ParameterizedObject overwrites the name
+        # CEBALERT: because ParameterizedObject overwrites the name
         # unless it's passed in params when the object is created, I
         # pass the class name (set by ParametersFrameWithApply) here.
-        # Same goes for projections.
+        # Same goes for projections. (i.e. Allow people to set the name
+        # for a new sheet or projection.)
         sheet_name=self.sheet_list[self.current_option].name
-        
-        import tkSimpleDialog
-        sheet_name = tkSimpleDialog.askstring("New Sheet","Please enter a name for the Sheet")
+        # Instead, should have a popup that asks for the name.
 
         if sheet_name:
             sheet = self.sheet_list[self.current_option](name=sheet_name)
