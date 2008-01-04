@@ -588,7 +588,7 @@ class ParameterizedObjectMetaclass(type):
                 if not attribute_name.startswith('_'):
                     print ("Warning: Setting non-Parameter class attribute %s.%s = %s "
                            % (self.__name__,attribute_name,`value`))
-
+                
                 
     def __param_inheritance(self,param_name,param):
         """
@@ -941,8 +941,7 @@ class ParameterizedObject(object):
             if desc:
                 self.debug("Setting param %s ="%name, val)
             else:
-                # CEBERRORALERT: the message is wrong: does get set
-                self.warning("CANNOT SET non-parameter %s ="%name, val)
+                self.warning("Set non-parameter %s ="%name, val)
             # i.e. if not desc it's setting an attribute in __dict__, not a Parameter
             setattr(self,name,val)
 
