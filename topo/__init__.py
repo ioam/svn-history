@@ -49,9 +49,9 @@ __all__ = ['analysis',
            'responsefns',
            'sheets']
 
-# gets set by the topographica script
+# get set by the topographica script
 release = ''
-
+version = ''
 
 
 
