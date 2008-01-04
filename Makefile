@@ -99,7 +99,7 @@ topographica: external Makefile
 	echo "topo.release='${RELEASE}'" >> topographica
 	echo "# do I need to close the file or does that happen automatically?" >> topographica
 	echo "from os import popen" >> topographica
-	echo "try: topo.version = popen("svnversion -n").read()" >> topographica
+	echo "try: topo.version = popen('svnversion -n').read()" >> topographica
 	echo "except: pass" >> topographica
 	echo "" >> topographica
 	echo "# Process the command-line arguments" >> topographica
