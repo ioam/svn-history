@@ -149,7 +149,7 @@ def save_snapshot(snapshot_name=None,xml=False):
                                                 startup_commands=topo.sim.startup_commands)
 
     topo.sim.RELEASE=topo.release
-
+    topo.sim.VERSION=topo.version
 
     # CEBHACKALERT: is a tuple guaranteed to be unpacked in order?
     # If not, then startup commands are not necessarily executed before
