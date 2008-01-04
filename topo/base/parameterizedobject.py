@@ -906,7 +906,13 @@ class ParameterizedObject(object):
         # Deepcopy all 'instantiate=True' parameters
         for class_ in classlist(type(self)):
             for (k,v) in class_.__dict__.items():
-                if isinstance(v,Parameter) and v.instantiate:
+                # CEBALERT: name is constant (at least for EPs), but
+                # it's generated (there's no default). So it would be
+                # replaced with None here without the k!=name test
+                # below. We need to sort out the name parameter. (At
+                # least, should be constant for all
+                # ParameterizedObject.)
+                if isinstance(v,Parameter) and v.instantiate and k!="name":
                     new_object = copy.deepcopy(v.default)
                     self.__dict__[v.internal_name(self)]=new_object
 
