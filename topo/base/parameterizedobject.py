@@ -705,7 +705,16 @@ dbprint_prefix=Parameter(None, hidden=True, doc="""
     as some indicator of the global state).""")
 
 
-    
+
+# CEBERRORALERT: repr of PO not working properly (probably from
+# inspect_value for Dynamic params). E.g.
+# >>> g = Gaussian()
+# >>> g
+# Gaussian(aspect_ratio=0.29999999999999999, bounds=BoundingBox(radius=0.5), mask=None, name='Gaussian00029', offset=0.0, orientation=0.0, output_fn=IdentityOF(name='IdentityOF00030', norm_value=None, print_level=100), position=[0.0, 0.0], print_level=100, scale=1.0, size=0.5, x=0.0, xdensity=10, y=0.0, ydensity=10)
+# >>> g.aspect_ratio=3
+# >>> g  
+# Gaussian(aspect_ratio=0.29999999999999999, bounds=BoundingBox(radius=0.5), mask=None, name='Gaussian00029', offset=0.0, orientation=0.0, output_fn=IdentityOF(name='IdentityOF00030', norm_value=None, print_level=100), position=[0.0, 0.0], print_level=100, scale=1.0, size=0.5, x=0.0, xdensity=10, y=0.0, ydensity=10)
+# (aspect_ratio showing old value)
 
 class ParameterizedObject(object):
     """
@@ -1174,6 +1183,12 @@ def print_all_param_defaults():
 
 
 
+# Support for changing parameter names
+_param_name_changes = {}
+# e.g. you change topo.patterns.basic.Gaussian.aspect_ratio to aspect_ration
+# _param_name_changes['topo.patterns.basic.Gaussian']={'aspect_ratio':'aspect_ration'}
+#
+# (not yet finished - do we need to add information about version numbers?)
 
 import __main__
 import inspect
@@ -1237,6 +1252,13 @@ class PicklableClassAttributes(object):
 
             # now restore class Parameter values
             for p_name,p in state.items():
+
+                if class_name in _param_name_changes:
+                    if p_name in _param_name_changes[class_name]:
+                        new_p_name = _param_name_changes[class_name][p_name]
+                        ParameterizedObject().message("%s's %s parameter has been renamed to %s."%(class_name,p_name,new_p_name))
+                        p_name = new_p_name
+
                 try:
                     setattr(class_,p_name,p)
                 except:
