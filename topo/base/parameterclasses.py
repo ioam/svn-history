@@ -167,28 +167,26 @@ class Dynamic(Parameter):
         if not obj: self._set_instantiate(dynamic)
 
 
-    def _produce_value(self,gen,update=None):
+    def _produce_value(self,gen,force=False):
         """
         Return a value from gen.
 
-        If there is no time_fn, or update=True, then a new value will
-        be returned (i.e. gen will be asked to produce a new value).
+        If there is no time_fn, then a new value will be returned
+        (i.e. gen will be asked to produce a new value).
 
-        If the value of time_fn is less than or equal to what it was
-        last time produce_value was called, the last value gen
-        produced will be returned. Otherwise, a new value will be
-        produced and returned.
+        If force is True, or the value of time_fn() is greater than
+        what it was was last time produce_value was called, a
+        new value will be produced and returned. Otherwise,
+        the last value gen produced will be returned.
         """
-        # CBALERT: update=False will be ignored! This logic is too
-        # confusing.
-        if self.time_fn is None or update:
+        if self.time_fn is None:
             value = produce_value(gen)
             gen._Dynamic_last = value
         else:
             
             time = self.time_fn()
 
-            if update is not False and time>gen._Dynamic_time:
+            if force or time>gen._Dynamic_time:
                 value = produce_value(gen)
                 gen._Dynamic_last = value
                 gen._Dynamic_time = time
@@ -221,7 +219,7 @@ class Dynamic(Parameter):
         gen=super(Dynamic,self).__get__(obj,objtype)
         
         if hasattr(gen,'_Dynamic_last'):
-            return self._produce_value(gen,update=True)
+            return self._produce_value(gen,force=True)
         else:
             return gen 
         
