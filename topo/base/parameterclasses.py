@@ -69,85 +69,54 @@ class Enumeration(Parameter):
 def produce_value(value_obj):
     """
     A helper function that produces an actual parameter from a stored
-    object.  If the object is callable, call it, else if it's an
-    iterator, call its .next(), otherwise return the object.
+    object: if the object is callable, call it, otherwise return the
+    object.
     """
     if callable(value_obj):
         return value_obj()
-    elif hasattr(value_obj,'next'):
-        return value_obj.next()
     else:
         return value_obj
 
 
-def is_dynamic(value):
-    return callable(value) or hasattr(value,'next')
-
-    
-
-import operator
-is_number = operator.isNumberType
-
-
-
-# CB: make sure e.g. 'UniformRandom...' shows up in help(PO)
-
-# CB: "last" should be "current"
-# CB: doc out of date! (I'm updating it.)
-
-# check that value before first gen makes sense
-# * can't use gen/iter *
 class Dynamic(Parameter):
     """
-    Parameter whose value can be generated dynamically by a callable object.
+    Parameter whose value can be generated dynamically by a callable
+    object.
     
-    If a Parameter is declared as Dynamic, it can be set to be a
-    callable object (such as a function), and getting the parameter's
-    value will call that callable.  E.g., to cause all objects of type
-    Foo to draw the value of Parameter gammas from a Gaussian
-    distribution, you'd write something like:
+    If a Parameter is declared as Dynamic, it can be set a callable
+    object (such as a function or callable class), and getting the
+    parameter's value will call that callable.
 
-      from random import gauss
-      Foo.sigma = Dynamic(lambda:gauss(0.5,0.1))
-
-    If a Dynamic Parameter's value is set to a Python generator or iterator,
-    then when the Parameter is accessed, the iterator's .next() method
-    is called.  So to get a parameter that cycles through a sequence,
-    you could write:
-        
-      from itertools import cycle
-      Foo.sigma = Dynamic(cycle([0.1,0.5,0.9]))
-
-    Note that at present, the callable object must be an instance of a
+    Note that at present, the callable object must allow attributes
+    to be set on itself.
+    
+    [Python 2.4 limitation: the callable object must be an instance of a
     callable class, rather than a named function or a lambda function,
-    or else this object will not be picklable.
+    otherwise the object will not be picklable or deepcopyable.]
 
 
-    Works for callable class objects (i.e. support () and allow attributes
-    to be set).
-    
+    Setting Dynamic.time_fn allows the production of dynamic values to
+    be controlled: a new value will be produced only if the current
+    value of time_fn is greater than what it was last time the
+    parameter value was requested.
+
+    If time_fn is set to None, a new value is always produced.
+
+    If Dynamic.time_fn is set to something other than None, it must,
+    when called, produce a number.
     """
-    time_fn = None  
+    # CB: making Dynamic support iterators and generators is sf.net
+    # feature request 1864370
+    
+    time_fn = None # could add a slot for time_fn to allow instances
+                   # to override
     
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
-    # CBENHANCEMENT: Add an 'epsilon' slot...
+    # CBENHANCEMENT: Add an 'epsilon' slot.
     # See email 'Re: simulation-time-controlled Dynamic parameters'
     # Dec 22, 2007 CB->JAB
-
-    # CBALERT: can't use python's iterators or generators with this
-    # class:
-    #
-    # (1) we deepcopy parameter values; python currently doesn't
-    # handle deepcopy of iterators and generators
-    #
-    # (2) we want to be able to pickle simulations; python can't
-    # currently pickle iterators and generators (same as above)
-    #
-    # (3) generators and iterators can't have attributes; we need to
-    # store _Dynamic_last and _Dynamic_time on the value generators
-    
         
     def __init__(self,**params):
         """
@@ -156,26 +125,25 @@ class Dynamic(Parameter):
         """
         super(Dynamic,self).__init__(**params)
 
-        if is_dynamic(self.default):
+        if callable(self.default):
             self._set_instantiate(True)
             self._initialize_generator(self.default)
 
 
     def _initialize_generator(self,gen):
+        """Add 'last time' and 'last value' attributes to the generator."""
+        gen._Dynamic_last = None
         # CEB: I'd use None for this, except can't compare a fixedpoint
         # number with None (e.g. 1>None but FixedPoint(1)>None can't be done)
-        gen._Dynamic_last = None
         gen._Dynamic_time = -1
                 
         
     def __get__(self,obj,objtype):
         """
-        Produce and return a new value if _needs_update(), otherwise
-        return the last value.
+        Call the superclass's __get__; if the result is not dynamic
+        return that result, otherwise ask that result to produce a
+        value and return it.
         """
-        # note that this code results in more loops than are
-        # necessary, but it's simpler to understand.
-
         gen = super(Dynamic,self).__get__(obj,objtype)
 
         if not hasattr(gen,'_Dynamic_last'):
@@ -186,32 +154,33 @@ class Dynamic(Parameter):
 
     def __set__(self,obj,val):
         """
-        Call super's set, keep instantiate up to date for the default
-        value, and keep last value up to date for non-dynamic values.
+        Call the superclass's set and keep this parameter's
+        instantiate value up to date (dynamic parameters
+        must be instantiated).
+
+        If val is dynamic, initialize it as a generator.
         """
         super(Dynamic,self).__set__(obj,val)
 
-        dynamic = is_dynamic(val)        
+        dynamic = callable(val)        
         if dynamic: self._initialize_generator(val)
         if not obj: self._set_instantiate(dynamic)
 
 
     def _produce_value(self,gen,update=None):
         """
-        Return a new value for this parameter.
+        Return a value from gen.
 
-        If called on a class (obj is None), produces a value from the
-        default (and stores it (in last_default) along with the time
-        (in last_time)).
+        If there is no time_fn, or update=True, then a new value will
+        be returned (i.e. gen will be asked to produce a new value).
 
-        If called on an instance (obj is not None), and this parameter
-        has been set on the instance (i.e. the instance has a dynamic
-        value generator set in its __dict__), produces a new value
-        from the instance's dynamic value generator (and stores that
-        value, along with the time) in the instance's dict. If the
-        parameter has not been set on the instance, does the same as
-        when called on a class.
+        If the value of time_fn is less than or equal to what it was
+        last time produce_value was called, the last value gen
+        produced will be returned. Otherwise, a new value will be
+        produced and returned.
         """
+        # CBALERT: update=False will be ignored! This logic is too
+        # confusing.
         if self.time_fn is None or update:
             value = produce_value(gen)
             gen._Dynamic_last = value
@@ -231,30 +200,26 @@ class Dynamic(Parameter):
     # CB: presence of this method is is the way others tell if it's a dynamic parameter at all
     # (i.e. probably need to have a better name and make this more formal + it might make
     # more sense to check for 'inspect' - need to think about it after doc+clean.)
-    def _value_is_dynamically_generated(self,obj,objtype=None):
+    def _value_is_dynamic(self,obj,objtype=None):
         """
         Return True if the parameter is actually dynamic (i.e. the
         value is being generated).
-
-        If called on a class (obj is None), inspects the parameter
-        default value.
-
-        If called on an instance, inspects the instance's value if it
-        has one, otherwise inspects the parameter default value.
         """
-        gen=super(Dynamic,self).__get__(obj,objtype)
-        return hasattr(gen,'_Dynamic_last')
+        return hasattr(super(Dynamic,self).__get__(obj,objtype),'_Dynamic_last')
 
 
     def _inspect(self,obj,objtype=None):
+        """Return the last generated value for this parameter."""
         gen=super(Dynamic,self).__get__(obj,objtype)
         
         if hasattr(gen,'_Dynamic_last'):
             return gen._Dynamic_last 
         else:
             return gen 
+
     
     def _force(self,obj,objtype=None):
+        """Force a new value to be generated, and return it."""
         gen=super(Dynamic,self).__get__(obj,objtype)
         
         if hasattr(gen,'_Dynamic_last'):
@@ -262,6 +227,11 @@ class Dynamic(Parameter):
         else:
             return gen 
         
+
+
+import operator
+is_number = operator.isNumberType
+
 
 
 # CEBALERT: Now accepts FixedPoint, but not fully tested.
@@ -307,7 +277,7 @@ class Number(Dynamic):
         
         self.bounds = bounds
         self._softbounds = softbounds  
-        if not is_dynamic(default): self._check_bounds(default)  
+        if not callable(default): self._check_bounds(default)  
         
 
     def __get__(self,obj,objtype):
@@ -317,7 +287,7 @@ class Number(Dynamic):
         value, if one has been set, otherwise produce the default value.
         """
         result = super(Number,self).__get__(obj,objtype)
-        if self._value_is_dynamically_generated(obj,objtype): self._check_bounds(result)
+        if self._value_is_dynamic(obj,objtype): self._check_bounds(result)
         return result
 
 
@@ -325,7 +295,7 @@ class Number(Dynamic):
         """
         Set to the given value, raising an exception if out of bounds.
         """
-        if not is_dynamic(val): self._check_bounds(val)
+        if not callable(val): self._check_bounds(val)
         super(Number,self).__set__(obj,val)
         
 
@@ -335,7 +305,7 @@ class Number(Dynamic):
         All objects are accepted, and no exceptions will be raised.  See
         crop_to_bounds for details on how cropping is done.
         """
-        if not is_dynamic(val):
+        if not callable(val):
             bounded_val = self.crop_to_bounds(val)
         else:
             bounded_val = val

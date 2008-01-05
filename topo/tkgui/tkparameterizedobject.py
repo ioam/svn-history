@@ -123,8 +123,8 @@ from topo.base.parameterizedobject import ParameterizedObject,Parameter, \
      classlist,ParameterizedObjectMetaclass
 from topo.base.parameterclasses import BooleanParameter,StringParameter, \
      Number,SelectorParameter,ClassSelectorParameter,ObjectSelectorParameter, \
-     CallableParameter,Dynamic,is_dynamic
-
+     CallableParameter,Dynamic
+     
 import topo # for topo.guimain only
 
 from topo.misc.utils import eval_atof, inverse
@@ -1664,12 +1664,12 @@ class CSPTranslator(String_ObjectTranslator):
 
 def param_is_dynamically_generated(param,po):
 
-    if not hasattr(param,'_value_is_dynamically_generated'):
+    if not hasattr(param,'_value_is_dynamic'):
         return False
 
     if isinstance(po,ParameterizedObject):
-        return param._value_is_dynamically_generated(po)
+        return param._value_is_dynamic(po)
     elif isinstance(po,ParameterizedObjectMetaclass):
-        return param._value_is_dynamically_generated(None)
+        return param._value_is_dynamic(None)
     else:
         raise ValueError("po must be a ParameterizedObject or ParameterizedObjectMetaclass.")

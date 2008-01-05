@@ -1001,7 +1001,7 @@ class ParameterizedObject(object):
         else:
             slf = cls_or_slf
             
-        if not hasattr(param_obj,'_force') or not param_obj._value_is_dynamically_generated(slf,cls):
+        if not hasattr(param_obj,'_force') or not param_obj._value_is_dynamic(slf,cls):
             return param_obj.__get__(slf,cls)
         else:
             return param_obj._force(slf,cls) 
