@@ -97,6 +97,8 @@ topographica: external Makefile
 	echo "" >> topographica
 	echo "import topo" >> topographica
 	echo "topo.release='${RELEASE}'" >> topographica
+	echo "#CB: doesn't do what I want yet (or I don't understand tags)." >> topographica
+	echo "#For a copy that's checked out as LATEST_STABLE, this reports same revision no. as HEAD" >> topographica
 	echo "# do I need to close the file or does that happen automatically?" >> topographica
 	echo "from os import popen" >> topographica
 	echo "try: topo.version = popen('svnversion -n').read()" >> topographica
