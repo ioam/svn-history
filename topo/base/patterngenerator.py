@@ -196,6 +196,16 @@ class PatternGenerator(ParameterizedObject):
         return pattern_x, pattern_y
 
 
+    # CEB: hack for pickle
+    def __setstate__(self,state):
+        self.__dict__.update(state)
+
+        if '_last_params' not in state:
+            self._last_params = (None,None,None,None,None)
+        if '_last_points' not in state:
+            self._last_points = (None,None)
+
+
 # Trivial example of a PatternGenerator, provided for when a default is
 # needed.  The other concrete PatternGenerator classes are stored in
 # patterns/, to be imported as needed.
