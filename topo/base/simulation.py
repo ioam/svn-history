@@ -160,6 +160,14 @@ class SimSingleton(Singleton):
         except AttributeError:
             object.__setattr__(self.actual_sim, name, value)
 
+    # CEBALERT: after this method, the previous Simulation still
+    # exists.  (E.g. after loading a snapshot each time, the previous
+    # simulation still exists. At least, that's what I think by
+    # keeping track of what exists using
+    # weakref.WeakValueDictionary). Who's keeping a reference to it?
+    # Why doesn't it disappear? Memory use could get pretty big if you
+    # keep loading big snapshots...
+    # (My guess is that it's something to do with SomeTimer.)
     def change_sim(self,new_sim):
         """Set actual_sim to be new_sim."""
         assert isinstance(new_sim,Simulation), "Can only change to a Simulation instance."
