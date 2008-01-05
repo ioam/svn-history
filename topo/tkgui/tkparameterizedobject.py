@@ -95,6 +95,22 @@ $Id$
 # displaying numbers!)
 
 
+
+
+## import logging
+## import string,time
+## log_name= 'guilog_%s'%string.join([str(i) for i in list(time.gmtime())],"")
+
+## logging.basicConfig(level=logging.DEBUG,
+##                     format='%(asctime)s %(levelname)s %(message)s',
+##                     filename='topo/tkgui/%s'%log_name,
+##                     filemode='w')
+## from os import popen
+## version = popen('svnversion -n').read()
+## logging.info("tkgui logging started for %s"%version)
+
+
+
 import __main__, sys
 import Tkinter
 
@@ -1023,6 +1039,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
     def _handle_gui_set(self,p_name,force=False):
         """Override the superclass's method to X and allow status indications."""
+        #logging.info("%s._handle_gui_set(%s,force=%s)"%(self,p_name,force))
         if self._live_update:
             self._update_param_from_tkvar(p_name,force)
 
