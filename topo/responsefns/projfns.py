@@ -14,7 +14,6 @@ import fixedpoint
 
 from numpy import sum,exp
 from math import pi, sqrt
-from fixedpoint import FixedPoint
 from topo.base.parameterclasses import Number
 from topo.base.cf import CFSheet, CFPResponseFn
 from numpy.oldnumeric import zeros, Float, ravel
