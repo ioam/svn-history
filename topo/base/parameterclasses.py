@@ -233,9 +233,7 @@ is_number = operator.isNumberType
 
 
 
-# CEBALERT: Now accepts FixedPoint, but not fully tested.
-# CB: doc out of date
-# CB: need to evaluate performance impact from Dynamic
+# CEBALERT: Number does not work with FixedPoint
 class Number(Dynamic):
     """
     """

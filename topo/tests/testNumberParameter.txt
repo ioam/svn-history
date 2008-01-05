@@ -1,12 +1,14 @@
 >>> from topo.base.parameterizedobject import ParameterizedObject
 >>> from topo.base.parameterclasses import Number 
 >>> from topo.misc.numbergenerators import UniformRandom
+>>> from fixedpoint import FixedPoint
 
 
 >>> class TestPO1(ParameterizedObject):
 ...    x = Number(default=UniformRandom(lbound=-1,ubound=1,seed=1),bounds=(-1,1))
 ...    y = Number(default=1,bounds=(-1,1))
 
+#...    z = Number(default=FixedPoint('1.00'))
 
 >>> t1 = TestPO1()
 
@@ -29,6 +31,10 @@
 ... else:
 ...     assert False, "Should raise ValueError."
 
+
+### Check FixedPoint works
+#>>> t1.z
+#'FixedPoint(1.00)'
 
 
 
