@@ -722,14 +722,10 @@ class ListParameter(Parameter):
 
     # Could add range() method from ClassSelectorParameter, to allow
     # list to be populated in the GUI
-
+    
     def __set__(self,obj,val):
         """Set to the given value, raising an exception if out of bounds."""
-
-        # CEBERRORALERT: needs updating
-        if not (hasattr(val,'_dynamic') and val._dynamic):
-        #if type(val)!=DynamicNumber:
-            self._check_bounds(val)
+        self._check_bounds(val)
         super(ListParameter,self).__set__(obj,val)
 
     def _check_bounds(self,val):
