@@ -1240,7 +1240,7 @@ class PicklableClassAttributes(object):
                 try:
                     setattr(class_,p_name,p)
                 except:
-                    ParameterizedObject().warning('Problem restoring parameter %s=%s for class %s; name may have changed since the snapshot was created.' % (p_name,repr(p),class_name))
+                    ParameterizedObject().warning('Problem restoring parameter %s=%s for class %s (Parameter object representing %s may have changed since the snapshot was created).' % (p_name,repr(p),class_name,p_name))
                 
 
 
