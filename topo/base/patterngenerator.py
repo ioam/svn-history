@@ -99,6 +99,11 @@ class PatternGenerator(ParameterizedObject):
         Optional function to apply to the pattern array after it has been created.
         This function can be used for normalization, thresholding, etc.""")
 
+    def __init__(self,**params):
+        super(PatternGenerator,self).__init__(**params)
+        self._last_params = (None,None,None,None,None)
+        self._last_points = (None,None)
+    
       
     def __call__(self,**params_to_override):
         """
@@ -113,12 +118,21 @@ class PatternGenerator(ParameterizedObject):
         self.debug("params = ",params_to_override)
         params = ParamOverrides(self,params_to_override)
 
-        self.__setup_xy(params['bounds'],params['xdensity'],params['ydensity'],
-                        params['x'],params['y'],
-                        # uh-oh
-                        params_to_override.get('position',None),
-                        params['orientation'])
+        bounds=params['bounds']
+        xdensity=params['xdensity']
+        ydensity=params['ydensity']
+        x=params['x']
+        y=params['y']
+        orientation=params['orientation']
+        position=params_to_override.get('position',None)
 
+        if position is not None:
+            x,y = position
+
+        if (bounds,xdensity,ydensity,x,y,orientation)!=self._last_params:
+            self.__setup_xy(bounds,xdensity,ydensity,x,y,orientation)
+            self._last_params=(bounds,xdensity,ydensity,x,y,orientation)
+            
         result = params['scale']*self.function(params)+params['offset']
 
         mask = params['mask']
@@ -132,19 +146,22 @@ class PatternGenerator(ParameterizedObject):
         return result                   # Should be: "if not instance(output_fn,IdentityOF):".
                                         # I guess this needs fixing in several places.
 
-    def __setup_xy(self,bounds,xdensity,ydensity,x,y,position,orientation):
+    def __setup_xy(self,bounds,xdensity,ydensity,x,y,orientation):
         """
         Produce pattern coordinate matrices from the bounds and
         density (or rows and cols), and transforms them according to
         x, y, and orientation.
         """
-        if position is not None:
-            x,y = position
-
         self.debug("bounds = ",bounds,"xdensity =",xdensity,"x =",x,"y=",y)
         # Generate vectors representing coordinates at which the pattern
         # will be sampled.
-        x_points,y_points = SheetCoordinateSystem(bounds,xdensity,ydensity).sheetcoordinates_of_matrixidx()
+
+        if (bounds,xdensity,ydensity)!=self._last_params[0:3]:
+            x_points,y_points = SheetCoordinateSystem(bounds,xdensity,ydensity).sheetcoordinates_of_matrixidx()
+            self._last_points = (x_points,y_points)
+        else:
+            x_points,y_points = self._last_points
+            
         # Generate matrices of x and y sheet coordinates at which to
         # sample pattern, at the correct orientation
         self.pattern_x, self.pattern_y = self.__create_and_rotate_coordinate_arrays(x_points-x,y_points-y,orientation)
