@@ -355,7 +355,8 @@ class Parameter(object):
         if not obj:
             result = self.default
         else:
-            result = obj.__dict__.get(self.internal_name(obj),self.default)
+            # look for _internal name first, to avoid another method call if possible
+            result = obj.__dict__.get(self._internal_name or self.internal_name(obj),self.default)
         return result
         
 
