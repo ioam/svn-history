@@ -99,21 +99,31 @@ def boolean_option_action(option,opt_str,value,parser):
     #print "Processing %s" % (opt_str)
     setattr(parser.values,option.dest,True)
 
-topo_parser.add_option("-i","--interactive",action="callback",callback=boolean_option_action,
+
+# CB: note that topographica should stay open if an error occurs
+# anywhere after a -i (i.e. in a -c command or script)
+def i_action(option,opt_str,value,parser):
+    """Callback function for the -i option."""
+    boolean_option_action(option,opt_str,value,parser)
+    os.environ['PYTHONINSPECT'] = '1' # Provide Python prompt even after execution completes
+    print BANNER
+
+topo_parser.add_option("-i","--interactive",action="callback",callback=i_action,
                        dest="interactive",default=False,
                        help="provide an interactive prompt even if stdin does not appear to be a terminal.")
-
-
 
 def gui():
     """Start the GUI as if -g were supplied in the command used to launch Topographica."""
     auto_import_commands()
     import topo.tkgui
     topo.tkgui.start()
-            
+
+# Topographica stays open if an error occurs after -g
+# (see comment by i_action)
 def g_action(option,opt_str,value,parser):
     """Callback function for the -g option."""
     boolean_option_action(option,opt_str,value,parser)
+    os.environ['PYTHONINSPECT'] = '1'
     gui()
     
 topo_parser.add_option("-g","--gui",action="callback",callback=g_action,dest="gui",default=False,help="""\
@@ -228,7 +238,7 @@ def process_argv(argv):
     while True:
         # Process options up until the first filename
         (option,args) = topo_parser.parse_args(args,option)
-        
+
         # Handle filename
         if args:
             filename=args.pop(0)
@@ -237,17 +247,8 @@ def process_argv(argv):
             sys.path.insert(0,filedir) # Allow imports relative to this file's path
             sim_name_from_filename(filename) # Default value of topo.sim.name
 
-            try:
-                execfile(filename,__main__.__dict__)
-                something_executed=True
-            except:
-                # if run with -i, errors should deposit user
-                # at the command line.
-                # JPALERT: Should this also work for '-g' ?
-                if option.interactive:
-                    os.environ['PYTHONINSPECT'] = '1'
-                raise
-
+            execfile(filename,__main__.__dict__)
+            something_executed=True
             
         if not args:
             break
@@ -257,13 +258,7 @@ def process_argv(argv):
     if not something_executed:
         option.interactive=True
         
-    if option.interactive:
-        print BANNER
-
     if option.interactive or option.gui or os.environ.get('PYTHONINSPECT'):
-        # Provide Python prompt even after execution completes
-	os.environ["PYTHONINSPECT"] = "1"
-
         # Use readline if available
         try:
             import readline
