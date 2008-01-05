@@ -1230,20 +1230,18 @@ class PicklableClassAttributes(object):
             exec cmd in __main__.__dict__
             
         for class_name,state in state['class_attributes'].items():
-            
             # from "topo.base.parameter.Parameter", we want "topo.base.parameter"
             module_path = class_name[0:class_name.rindex('.')]
             exec 'import '+module_path in __main__.__dict__
-            
+            class_ = eval(class_name,__main__.__dict__)
+
             # now restore class Parameter values
             for p_name,p in state.items():
-                # CEBHACKALERT: doesn't seem like a great mechanism;
-                # could write over a user's variable?
-                __main__.__dict__['val'] = p
                 try:
-                    exec 'setattr('+class_name+',"'+p_name+'",val)' in __main__.__dict__
+                    setattr(class_,p_name,p)
                 except:
                     ParameterizedObject().warning('Problem restoring parameter %s=%s for class %s; name may have changed since the snapshot was created.' % (p_name,repr(p),class_name))
+                
 
 
     # CEBALERT: might could be simplified
