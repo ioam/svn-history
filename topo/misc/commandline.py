@@ -256,8 +256,9 @@ def process_argv(argv):
         
     # If no scripts and no commands were given, pretend -i was given.
     if not something_executed:
-        option.interactive=True
-        
+        os.environ['PYTHONINSPECT'] = '1'
+
+    # CEBALERT: option.interactive is unused
     if option.interactive or option.gui or os.environ.get('PYTHONINSPECT'):
         # Use readline if available
         try:
