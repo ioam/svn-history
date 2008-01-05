@@ -12,7 +12,6 @@ import copy
 import topo
 from numpy import exp,zeros,ones
 
-from topo.base.arrayutils import clip_in_place
 from topo.base.functionfamilies import OutputFn, OutputFnParameter, IdentityOF
 from topo.base.parameterclasses import Number, BooleanParameter, ListParameter, StringParameter
 from topo.base.parameterizedobject import ParameterizedObject
