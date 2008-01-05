@@ -106,7 +106,10 @@ class Dynamic(Parameter):
     when called, produce a number.
     """
     # CB: making Dynamic support iterators and generators is sf.net
-    # feature request 1864370
+    # feature request 1864370. When working on that task, note that
+    # detection of a dynamic generator by 'callable' needs to be
+    # replaced by something that matches whatever Dynamic becomes
+    # capabale of using.
     
     time_fn = None # could add a slot for time_fn to allow instances
                    # to override
@@ -250,40 +253,44 @@ class Number(Dynamic):
         (e.g. bounds=(None,10) means there is no lower bound, and an
         upper bound of 10).
 
-        Bounds are checked when a Number is created or set. Using a
-        default value outside the hard bounds, or one that is not
-        numeric, results in an exception. It is therefore not possible
-        to create a parameter with a default value that is
-        inconsistent with the bounds.
+        Number is also a type of Dynamic parameter, so its value
+        can be set to a callable to get a dynamically generated
+        number (see Dynamic).
+
+        When not being dynamically generated, bounds are checked when
+        a Number is created or set. Using a default value outside the
+        hard bounds, or one that is not numeric, results in an
+        exception. When being dynamically generated, bounds are
+        checked when a the value of a Number is requested. A generated
+        value that is not numeric, or is outside the hard bounds,
+        results in an exception.
 
         A separate function set_in_bounds() is provided that will
         silently crop the given value into the legal range, for use
         in, for instance, a GUI.
 
-        ``softbounds`` are present to indicate the typical range of the
-        parameter, but are not enforced. Setting the soft bounds
+        ``softbounds`` are present to indicate the typical range of
+        the parameter, but are not enforced. Setting the soft bounds
         allows, for instance, a GUI to know what values to display on
         sliders for the Number.
 
         Example of creating a Number::
-        
           AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
         """
         super(Number,self).__init__(default=default,**params)
         
         self.bounds = bounds
         self._softbounds = softbounds  
-        if not callable(default): self._check_bounds(default)  
+        if not callable(default): self._check_value(default)  
         
 
     def __get__(self,obj,objtype):
         """
-        Get a parameter value.  If called on the class, produce the
-        default value.  If called on an instance, produce the instance's
-        value, if one has been set, otherwise produce the default value.
+        Same as the superclass's __get__, but if the value was
+        dynamically generated, check the bounds.
         """
         result = super(Number,self).__get__(obj,objtype)
-        if self._value_is_dynamic(obj,objtype): self._check_bounds(result)
+        if self._value_is_dynamic(obj,objtype): self._check_value(result)
         return result
 
 
@@ -291,7 +298,7 @@ class Number(Dynamic):
         """
         Set to the given value, raising an exception if out of bounds.
         """
-        if not callable(val): self._check_bounds(val)
+        if not callable(val): self._check_value(val)
         super(Number,self).__set__(obj,val)
         
 
@@ -343,9 +350,7 @@ class Number(Dynamic):
         return val
 
 
-    # CB: rename to _check_value or something because it also checks the type
-    # and gets hijacked to do that more in subclasses (e.g. Integer)
-    def _check_bounds(self,val):
+    def _check_value(self,val):
         """
         Checks that the value is numeric and that it is within the hard
         bounds; if not, an exception is raised.
@@ -367,6 +372,7 @@ class Number(Dynamic):
             elif vmax != None:
                 if not val <=vmax:
                     raise ValueError("Parameter must be at most " + `vmax` + '.')
+
 
     def get_soft_bounds(self):
         """
@@ -393,14 +399,15 @@ class Number(Dynamic):
         return (l,u)
 
 
+
 class Integer(Number):
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
-    def _check_bounds(self,val):
+    def _check_value(self,val):
         if not isinstance(val,int):
             raise ValueError("Parameter must be an integer.")
-        super(Integer,self)._check_bounds(val)
+        super(Integer,self)._check_value(val)
 
 
 class Magnitude(Number):
