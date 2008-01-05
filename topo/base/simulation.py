@@ -165,6 +165,9 @@ class SimSingleton(Singleton):
         assert isinstance(new_sim,Simulation), "Can only change to a Simulation instance."
         self.actual_sim=new_sim
 
+        from topo.base.parameterclasses import Dynamic
+        Dynamic.time_fn = self.actual_sim.time
+
 
     ## Container-like access
     # (__getattribute__ is not used to find these methods, so we have to provide access.)
@@ -932,9 +935,6 @@ class Simulation(ParameterizedObject):
         register==False.        
         """
         super(Simulation,self).__init__(**params)
-
-        from topo.base.parameterclasses import Dynamic
-        Dynamic.time_fn = self.time
 
         self._time = FixedPoint("0.0",4)
         self._event_processors = {}
