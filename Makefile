@@ -186,12 +186,16 @@ slow-tests: train-tests snapshot-tests speed-tests snapshot-compatibility-tests
 .SECONDARY: ${SPEEDDATA} ${TRAINDATA} # Make sure that *_*DATA is kept around
 
 
+# CEBALERT: please make this work for som_retinotopy as well as lissom_oo_or
+
+# Test that simulations give the same results whether run straight
+# through or run part way, saved, reloaded, and run on to the same
+# point.
 snapshot-tests:
-	./topographica -c "default_density=4" examples/lissom_oo_or.ty -c "topo.sim.run(1)" -c "from topo.commands.basic import save_snapshot ; save_snapshot('snapshot-tests.typ')"
-	./topographica -c "from topo.commands.basic import load_snapshot ; load_snapshot('snapshot-tests.typ')"
-	./topographica -c "default_density=4" examples/som_retinotopy.ty -c "topo.sim.run(1)" -c "from topo.commands.basic import save_snapshot ; save_snapshot('snapshot-tests.typ')"
-	./topographica -c "default_density=4" examples/som_retinotopy.ty -c "from topo.commands.basic import load_snapshot ; load_snapshot('snapshot-tests.typ')"
-	rm -f 'snapshot-tests.typ'
+	./topographica -c 'from topo.tests.test_script import compare_with_and_without_snapshot_NoSnapshot as A; A(script="examples/lissom_oo_or.ty")'
+	./topographica -c 'from topo.tests.test_script import compare_with_and_without_snapshot_CreateSnapshot as B; B(script="examples/lissom_oo_or.ty")'
+	./topographica -c 'from topo.tests.test_script import compare_with_and_without_snapshot_LoadSnapshot as C; C(script="examples/lissom_oo_or.ty")'
+	rm -f 'examples/lissom_oo_or.ty_PICKLETEST*'
 
 
 gui-tests: basic-gui-tests detailed-gui-tests

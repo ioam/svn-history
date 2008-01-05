@@ -196,3 +196,97 @@ def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
     # over the place (i.e. vary by more than 10%).
     #assert percent_change<=5, "\nTime increase was greater than 5%"
 
+
+
+
+### Snapshot tests: see the Makefile
+
+# This is clumsy. We could control topographica subprocesses, but I
+# can't remember how to do it
+
+def compare_with_and_without_snapshot_NoSnapshot(script="examples/lissom_oo_or.ty",look_at='V1',density=4,run_for=10,break_at=5):
+    data_filename=script+"_PICKLETEST"
+    
+    # we must execute in main because e.g. scheduled events are run in __main__
+    __main__.__dict__['default_density']=density
+    execfile(script,__main__.__dict__)
+    
+
+    data = {}
+    topo.sim.run(break_at)
+    data[topo.sim.time()]= copy.deepcopy(topo.sim[look_at].activity)
+    topo.sim.run(run_for-break_at)
+    data[topo.sim.time()]= copy.deepcopy(topo.sim[look_at].activity)
+        
+    data['run_for']=run_for
+    data['break_at']=break_at
+    data['density']=density
+    data['look_at']=look_at
+    
+    pickle.dump(data,open(normalize_path(data_filename),'wb'),2)
+
+
+def compare_with_and_without_snapshot_CreateSnapshot(script="examples/lissom_oo_or.ty"):
+    data_filename=script+"_PICKLETEST"
+        
+    try:
+        data = pickle.load(open(resolve_path(data_filename),"rb"))
+    except IOError:
+        print "\nData file '"+data_filename+"' could not be opened; run _A() first."
+        raise
+
+    # retrieve parameters used when script was run
+    run_for=data['run_for']
+    break_at=data['break_at']
+    look_at=data['look_at']
+    density=data['density']
+    
+    __main__.__dict__['default_density']=density
+    execfile(script,__main__.__dict__)        
+
+    # check we have the same before any pickling
+    topo.sim.run(break_at)
+    assert_array_equal(data[topo.sim.time()],topo.sim[look_at].activity,
+                       err_msg="\nAt topo.sim.time()=%d"%topo.sim.time())
+
+    from topo.commands.basic import save_snapshot
+    save_snapshot(normalize_path(data_filename+'.typ_'))
+
+
+def compare_with_and_without_snapshot_LoadSnapshot(script="examples/lissom_oo_or.ty"):
+    data_filename=script+"_PICKLETEST"
+    snapshot_filename=script+"_PICKLETEST.typ_"
+        
+    try:
+        data = pickle.load(open(resolve_path(data_filename),"rb"))
+    except IOError:
+        print "\nData file '"+data_filename+"' could not be opened; run _A() first"
+        raise
+
+    # retrieve parameters used when script was run
+    run_for=data['run_for']
+    break_at=data['break_at']
+    look_at=data['look_at']
+    density=data['density']
+    
+    from topo.commands.basic import load_snapshot
+
+    try:
+        load_snapshot(resolve_path(snapshot_filename))
+    except IOError:
+        print "\nPickle file '"+snapshot_filename+"' could not be opened; run _B() first."
+        raise
+
+    assert topo.sim.time()==break_at
+    assert_array_equal(data[topo.sim.time()],topo.sim[look_at].activity,
+                       err_msg="\nAt topo.sim.time()=%d"%topo.sim.time())
+    print "Match at %s after loading snapshot"%topo.sim.time()
+
+    topo.sim.run(run_for-break_at)
+                
+    assert_array_equal(data[topo.sim.time()],topo.sim[look_at].activity,
+                       err_msg="\nAt topo.sim.time()=%d"%topo.sim.time())
+
+    print "Match at %s after running loaded snapshot"%topo.sim.time()
+
+
