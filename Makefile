@@ -157,10 +157,25 @@ SPEEDTESTS=${subst ^,topo/tests/,${subst .ty,.ty_SPEEDTEST,${SPEEDSCRIPTS}}}
 train-tests: ${TRAINTESTS}
 speed-tests: ${SPEEDTESTS}
 
+
 snapshot-compatibility-tests: 
 	./topographica -c "from topo.commands.basic import load_snapshot; load_snapshot('topo/tests/lissom_oo_or.ty_pickle_test.typ')" -c "topo.sim.run(1)"
 
-slow-tests: train-tests snapshot-tests speed-tests snapshot-compatibility-tests
+
+# Test that simulations give the same results whether run straight
+# through or run part way, saved, reloaded, and run on to the same
+# point.
+# CEBALERT: please make this work for som_retinotopy as well as lissom_oo_or
+simulation-snapshot-tests:
+	./topographica -c 'from topo.tests.test_script import compare_with_and_without_snapshot_NoSnapshot as A; A(script="examples/lissom_oo_or.ty")'
+	./topographica -c 'from topo.tests.test_script import compare_with_and_without_snapshot_CreateSnapshot as B; B(script="examples/lissom_oo_or.ty")'
+	./topographica -c 'from topo.tests.test_script import compare_with_and_without_snapshot_LoadSnapshot as C; C(script="examples/lissom_oo_or.ty")'
+	rm -f examples/lissom_oo_or.ty_PICKLETEST*
+
+
+snapshot-tests: simulation-snapshot-tests snapshot-compatibility-tests
+
+slow-tests: train-tests snapshot-tests speed-tests 
 
 # CB: add notes somewhere about...
 # - making sure weave compilation has already occurred before running speed tests
@@ -186,16 +201,6 @@ slow-tests: train-tests snapshot-tests speed-tests snapshot-compatibility-tests
 .SECONDARY: ${SPEEDDATA} ${TRAINDATA} # Make sure that *_*DATA is kept around
 
 
-# CEBALERT: please make this work for som_retinotopy as well as lissom_oo_or
-
-# Test that simulations give the same results whether run straight
-# through or run part way, saved, reloaded, and run on to the same
-# point.
-snapshot-tests:
-	./topographica -c 'from topo.tests.test_script import compare_with_and_without_snapshot_NoSnapshot as A; A(script="examples/lissom_oo_or.ty")'
-	./topographica -c 'from topo.tests.test_script import compare_with_and_without_snapshot_CreateSnapshot as B; B(script="examples/lissom_oo_or.ty")'
-	./topographica -c 'from topo.tests.test_script import compare_with_and_without_snapshot_LoadSnapshot as C; C(script="examples/lissom_oo_or.ty")'
-	rm -f 'examples/lissom_oo_or.ty_PICKLETEST*'
 
 
 gui-tests: basic-gui-tests detailed-gui-tests
