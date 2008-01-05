@@ -1001,7 +1001,7 @@ class ParameterizedObject(object):
         else:
             slf = cls_or_slf
             
-        if not hasattr(param_obj,'_force') or not param_obj._value_is_dynamic(slf,cls):
+        if not hasattr(param_obj,'_force'): 
             return param_obj.__get__(slf,cls)
         else:
             return param_obj._force(slf,cls) 
@@ -1027,7 +1027,7 @@ class ParameterizedObject(object):
             value = [cls_or_slf.repr_value(a) for a in param_obj.attribs]
 
         # not a Dynamic Parameter 
-        elif not hasattr(param_obj,'_inspect'):
+        elif not hasattr(param_obj,'_value_is_dynamic'):
             value = getattr(cls_or_slf,name)
 
         # Dynamic Parameter...

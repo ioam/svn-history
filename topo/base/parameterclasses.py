@@ -197,9 +197,7 @@ class Dynamic(Parameter):
 
         return value
 
-    # CB: presence of this method is is the way others tell if it's a dynamic parameter at all
-    # (i.e. probably need to have a better name and make this more formal + it might make
-    # more sense to check for 'inspect' - need to think about it after doc+clean.)
+
     def _value_is_dynamic(self,obj,objtype=None):
         """
         Return True if the parameter is actually dynamic (i.e. the
