@@ -33,6 +33,19 @@ sort of feedback that this is occurring, so please just be patient
 when downloading.  Such pauses should be rare after the first SVN
 download, unless one of the large files has been updated.
 
+<P>The location (URL) of the Topographica repository is:
+<pre>
+https://topographica.svn.sourceforge.net/svnroot/topographica
+</pre>
+
+In commands given on this page, <code>$TOPOROOT</code> is used to
+represent that URL, so please replace it in commands you enter. (For
+instance, linux users might first type
+<code>export TOPOROOT=https://topographica.svn.sourceforge.net/svnroot/topographica</code>,
+and then <code>$TOPOROOT</code> will be substituted for them in the
+commands below.)
+
+
 
 <H4><A NAME="linux">Linux/UNIX:</A></H4>
 
@@ -45,10 +58,8 @@ for your system and install them.
 
 <P>The Topographica files can be checked out by using the command:
 
-<!--CB: should this be broken up?-->
 <pre>
-svn co https://topographica.svn.sourceforge.net/svnroot/topographica/ \
-tags/LATEST_STABLE/topographica topographica
+svn co $TOPOROOT/tags/LATEST_STABLE/topographica topographica
 </pre>
 
 <P>This will create a <code>topographica</code> directory in your present
@@ -57,11 +68,11 @@ put the files directly into your present directory.
 
 <P>To get the bleeding-edge (trunk) version, replace <code>tags/LATEST_STABLE</code> with 
 <code>trunk</code>. Note that the bleeding-edge version
-is not always usable due to work in progress; you can check to see if the
+is not always usable due to work in progress (but you can check to see if the
 code currently builds on a specific platform
 (<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_build">linux</a>,
 <a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=ppc_darwin8.10.0_build">Mac</a>) and whether our   
-<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests&builder=x86_ubuntu7.04_slow-tests">code tests pass</a>.
+<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests&builder=x86_ubuntu7.04_slow-tests">code tests pass</a>).
 
 <P>The checkout process will likely take several minutes (probably
 appearing to hang at certain points), as there are some extremely
@@ -136,7 +147,7 @@ removing LDFLAGS as described in index_text.php).-->
 
 
 <H4><A NAME="windows">Windows:</A></H4>
-<!--  CEBALERT: One day we might have instructions for building -->
+<!--  CEB: One day we might have instructions for building -->
 <!--  Topographica on Windows, compiling everything from source...
 <!--  see the list of current tasks.-->
 
@@ -199,9 +210,8 @@ page</a>. Be aware that this page is not always updated as fast as
 problems appear.
 -->
 
-<!-- CB: haven't updated anything past here-->
 
-<H3>Updating using CVS</H3>
+<H3>Updating using Subversion</H3>
 
 Linux/UNIX/Mac users who have Topographica checked out via SVN can
 update their copy of Topographica by changing to the
@@ -224,8 +234,7 @@ a different version of the code. For instance, if you currently have the
 trunk version, you can switch to the LATEST_STABLE version
 by typing:
 <pre>
-svn switch https://topographica.svn.sourceforge.net/svnroot/topographica/ \
-tags/LATEST_STABLE/topographica
+svn switch $TOPOROOT/tags/LATEST_STABLE/topographica
 </pre>
 
 To switch from the LATEST_STABLE version to the trunk version, replace
@@ -242,7 +251,7 @@ branch or tag by typing <code>svn info | grep URL</code>.
 To see what other versions of the code are available, you can view the
 <a href="http://topographica.svn.sourceforge.net/viewvc/topographica/tags/">tags</a>
 directory of the SVN repository in your web browser, or type
-<code>svn ls --verbose https://topographica.svn.sourceforge.net/svnroot/topographica/tags/</code>. 
+<code>svn ls --verbose $TOPOROOT/tags/</code>. 
 
 
 
