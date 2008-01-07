@@ -7,7 +7,6 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.functionfamilies import OutputFn
 from topo.base.cf import CFPOutputFn
 
 # imported here so that all projection-level output functions are in the
@@ -16,5 +15,5 @@ from topo.base.cf import CFPOF_Plugin,CFPOF_Identity
 
 
 
-__all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,OutputFn)]))
+__all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,CFPOutputFn)]))
 

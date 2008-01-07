@@ -115,5 +115,6 @@ provide_unoptimized_equivalent("CFPOF_DivisiveNormalizeL1_opt","CFPOF_DivisiveNo
 
 
 
-__all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,OutputFn)]))
+__all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and
+                    (issubclass(v,OutputFn) or issubclass(v,CFPOutputFn))]))
 
