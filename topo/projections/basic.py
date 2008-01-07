@@ -16,6 +16,7 @@ from math import exp
 from numpy import exp,zeros,ones
 # So all Projections are present in this package
 from topo.base.projection import Projection
+from topo.base.boundingregion import BoundingBox
 from topo.base.sheet import activity_type
 from topo.base.cf import CFProjection,CFPLearningFnParameter,CFPLF_Identity,CFPResponseFnParameter,CFPOutputFnParameter,CFPOF_Identity,CFPOutputFn,CFPResponseFn, DotProduct, ResponseFnParameter
 from topo.base.functionfamilies import OutputFnParameter,LearningFnParameter,IdentityLF
@@ -48,7 +49,8 @@ class SharedWeightCF(ConnectionField):
 	
     # JAHACKALERT: This implementation copies some of the CEBHACKALERTS 
     # of the ConnectionField.__init__ function from which it is dervied
-    def __init__(self,cf,x,y,bounds_template,mask_template,input_sheet):
+    def __init__(self,cf,input_sheet,x=0.0,y=0.0,bounds_template=BoundingBox(radius=0.1),
+                 mask_template=None):
         """
         From an existing copy of ConnectionField (CF) that acts as a
 	template, create a new CF that shares weights with the
@@ -112,10 +114,10 @@ class SharedWeightCFProjection(CFProjection):
         super(SharedWeightCFProjection,self).__init__(initialize_cfs=False,**params)
 
         # We want the sharedcf to be located on the grid, so
-        # pick a central unit and use its center
-        self.__sharedcf=self.cf_type(self.center_unitxcenter,
+        # pick a central unit and use its center        
+        self.__sharedcf=self.cf_type(self.src,
+                                     self.center_unitxcenter,
                                      self.center_unitycenter,
-                                     self.src,
                                      self.bounds_template,
                                      self.weights_generator,
                                      self.mask_template,
@@ -127,7 +129,7 @@ class SharedWeightCFProjection(CFProjection):
         for y in self.dest.sheet_rows()[::-1]:
             row = []
             for x in self.dest.sheet_cols():
-                cf = SharedWeightCF(scf,x,y,bounds_template,self.mask_template,self.src)
+                cf = SharedWeightCF(scf,self.src,x,y,bounds_template,self.mask_template)
                 row.append(cf)
             cflist.append(row)
         self._cfs = cflist

@@ -149,10 +149,11 @@ class ConnectionField(ParameterizedObject):
         
         """)
 
-
-    # CEBALERT: add some default values
-    def __init__(self,x,y,input_sheet,bounds_template,
-                 weights_generator,mask_template,
+    
+    # CB: doc slice_
+    # can do something for mask_template=None
+    def __init__(self,input_sheet,x=0.0,y=0.0,bounds_template=BoundingBox(radius=0.1),
+                 weights_generator=patterngenerator.Constant(),mask_template=None,
                  output_fn=IdentityOF(),slice_=None,**params):
         """
         Create weights at the specified (x,y) location on the specified input_sheet.
@@ -663,8 +664,7 @@ class CFProjection(Projection):
                     x_cf,y_cf = self.coord_mapper(x,y)
                     self.debug("Creating CF(%d,%d) from src (%.3f,%.3f) to  dest (%.3f,%.3f)"%(r,c,x_cf,y_cf,x,y))
                     try:
-                        row.append(self.cf_type(x_cf,y_cf,
-                                                self.src,
+                        row.append(self.cf_type(self.src,x_cf,y_cf,
                                                 copy.copy(self.bounds_template),
                                                 self.weights_generator,
                                                 copy.copy(self.mask_template), 
