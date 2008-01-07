@@ -195,6 +195,8 @@ class ConnectionField(ParameterizedObject):
         # Now we have to get the right submatrix of the mask (in case
         # it is near an edge)
         r1,r2,c1,c2 =  self.get_slice(slice_)
+
+        mask_template=copy.copy(mask_template) # CB: copy necessary? i think it's necer altered
         m = mask_template[r1:r2,c1:c2]
 	
         self.mask = m.astype(weight_type)
@@ -316,6 +318,7 @@ class ConnectionField(ParameterizedObject):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
 
             mr1,mr2,mc1,mc2 = self.get_slice()
+            mask_template=copy.copy(mask_template) # CB: copy necessary?
             m = mask_template[mr1:mr2,mc1:mc2]
             self.mask = m.astype(weight_type)
 
@@ -667,7 +670,7 @@ class CFProjection(Projection):
                         row.append(self.cf_type(self.src,x_cf,y_cf,
                                                 self.bounds_template,
                                                 self.weights_generator,
-                                                copy.copy(self.mask_template), 
+                                                self.mask_template, 
                                                 output_fn=self.weights_output_fn.single_cf_fn,
                                                 slice_=slice_))
                     except NullCFError:
@@ -876,7 +879,7 @@ class CFProjection(Projection):
         for r in xrange(rows):
             for c in xrange(cols):
                 cfs[r][c].change_bounds(bounds_template,
-                                        copy.copy(mask_template),
+                                        mask_template,
                                         output_fn=output_fn)
 
 
