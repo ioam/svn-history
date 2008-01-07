@@ -199,7 +199,56 @@ def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
 
 
 
-### Snapshot tests: see the Makefile
+
+### startup timing: almost copy+paste of the speed functions above
+
+# CB: ought to tell users that they should expect variation in results etc
+# so they might know what is significant. Or use repeat(3 or 4) and return
+# the minimum value to try to make the result more reliable.
+def time_sim_startup(script="examples/lissom_oo_or.ty",density=24):
+    return timeit.Timer("execfile('%s',__main__.__dict__)"%script,'import __main__;gc.enable()').timeit(number=1)
+
+     
+def generate_startup_speed_data(script="examples/lissom_oo_or.ty",density=24,data_filename=None):
+    if data_filename==None:
+        data_filename=script+"_STARTUPSPEEDDATA"
+
+    how_long = time_sim_startup(script,density)
+
+    speed_data_file = open(normalize_path(data_filename),'w')
+    speed_data_file.write("%s=%s"%(density,how_long))
+    speed_data_file.close()
+
+
+def compare_startup_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
+    if data_filename==None:
+        data_filename=script+"_STARTUPSPEEDDATA"
+
+    speed_data_file = open(resolve_path(data_filename),'r')
+        
+    info = speed_data_file.readline()
+    speed_data_file.close()
+
+    density,old_time = info.split('=')
+    density = float(density); old_time=float(old_time)
+    
+    new_time = time_sim_startup(script,density)
+
+    percent_change = 100.0*(new_time-old_time)/old_time
+
+    print "["+script+"]"+ '  Before: %2.1f s  Now: %2.1f s  (change=%2.1f s, %2.1f percent)'\
+          %(old_time,new_time,new_time-old_time,percent_change)
+
+### end startup timing
+
+
+
+
+
+
+
+
+######### Snapshot tests: see the Makefile
 
 # This is clumsy. We could control topographica subprocesses, but I
 # can't remember how to do it
@@ -290,3 +339,4 @@ def compare_with_and_without_snapshot_LoadSnapshot(script="examples/lissom_oo_or
     print "Match at %s after running loaded snapshot"%topo.sim.time()
 
 
+######### end Snapshot tests

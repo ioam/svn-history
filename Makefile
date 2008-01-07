@@ -154,8 +154,13 @@ SPEEDSCRIPTS=${SCRIPTS}
 SPEEDDATA =${subst ^,topo/tests/,${subst .ty,.ty_SPEEDDATA,${SPEEDSCRIPTS}}}
 SPEEDTESTS=${subst ^,topo/tests/,${subst .ty,.ty_SPEEDTEST,${SPEEDSCRIPTS}}}
 
+STARTUPSPEEDSCRIPTS= ^lissom_oo_or.ty ^lissom_or.ty  
+STARTUPSPEEDDATA =${subst ^,topo/tests/,${subst .ty,.ty_STARTUPSPEEDDATA,${STARTUPSPEEDSCRIPTS}}}
+STARTUPSPEEDTESTS=${subst ^,topo/tests/,${subst .ty,.ty_STARTUPSPEEDTEST,${STARTUPSPEEDSCRIPTS}}}
+
 train-tests: ${TRAINTESTS}
 speed-tests: ${SPEEDTESTS}
+startup-speed-tests: ${STARTUPSPEEDTESTS}
 
 
 snapshot-compatibility-tests: 
@@ -175,7 +180,7 @@ simulation-snapshot-tests:
 
 snapshot-tests: simulation-snapshot-tests snapshot-compatibility-tests
 
-slow-tests: train-tests snapshot-tests speed-tests 
+slow-tests: train-tests snapshot-tests speed-tests startup-speed-tests
 
 # CB: add notes somewhere about...
 # - making sure weave compilation has already occurred before running speed tests
@@ -198,7 +203,14 @@ slow-tests: train-tests snapshot-tests speed-tests
 %_SPEEDTEST: %_SPEEDDATA
 	./topographica -c 'from topo.tests.test_script import compare_speed_data; compare_speed_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_SPEEDDATA")'
 
-.SECONDARY: ${SPEEDDATA} ${TRAINDATA} # Make sure that *_*DATA is kept around
+
+%_STARTUPSPEEDDATA:
+	./topographica -c 'from topo.tests.test_script import generate_startup_speed_data; generate_startup_speed_data(script="examples/${notdir $*}",density=48,data_filename="topo/tests/${notdir $*}_STARTUPSPEEDDATA")'
+
+%_STARTUPSPEEDTEST: %_STARTUPSPEEDDATA
+	./topographica -c 'from topo.tests.test_script import compare_startup_speed_data; compare_startup_speed_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_STARTUPSPEEDDATA")'
+
+.SECONDARY: ${SPEEDDATA} ${TRAINDATA} ${STARTUPSPEEDDATA} # Make sure that *_*DATA is kept around
 
 
 
