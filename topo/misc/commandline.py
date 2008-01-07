@@ -100,14 +100,17 @@ def boolean_option_action(option,opt_str,value,parser):
     setattr(parser.values,option.dest,True)
 
 
+def interactive():
+    os.environ['PYTHONINSPECT'] = '1' 
+    print BANNER    
+
 # CB: note that topographica should stay open if an error occurs
 # anywhere after a -i (i.e. in a -c command or script)
 def i_action(option,opt_str,value,parser):
     """Callback function for the -i option."""
     boolean_option_action(option,opt_str,value,parser)
-    os.environ['PYTHONINSPECT'] = '1' # Provide Python prompt even after execution completes
-    print BANNER
-
+    interactive()
+    
 topo_parser.add_option("-i","--interactive",action="callback",callback=i_action,
                        dest="interactive",default=False,
                        help="provide an interactive prompt even if stdin does not appear to be a terminal.")
@@ -123,8 +126,7 @@ def gui():
 def g_action(option,opt_str,value,parser):
     """Callback function for the -g option."""
     boolean_option_action(option,opt_str,value,parser)
-    os.environ['PYTHONINSPECT'] = '1'
-    gui()
+    interactive()
     
 topo_parser.add_option("-g","--gui",action="callback",callback=g_action,dest="gui",default=False,help="""\
 launch an interactive graphical user interface; \
@@ -256,10 +258,9 @@ def process_argv(argv):
         
     # If no scripts and no commands were given, pretend -i was given.
     if not something_executed:
-        os.environ['PYTHONINSPECT'] = '1'
+        interactive()
 
-    # CEBALERT: option.interactive is unused
-    if option.interactive or option.gui or os.environ.get('PYTHONINSPECT'):
+    if os.environ.get('PYTHONINSPECT'):
         # Use readline if available
         try:
             import readline
