@@ -23,7 +23,7 @@
 
 <TR>
 <TD><code>./topographica -c 'targets=["lissom_oo_or_10000.typ"]' examples/run.py</code></TD>
-<TD><code>topographica -c "targets=['lissom_oo_or_10000.typ']" examples/run.py</code></TD>
+<TD><code>topographica -c "targets=['lissom_oo_or_10000.typ']" examples\run.py</code></TD>
 
 </TABLE>
 
