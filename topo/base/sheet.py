@@ -241,6 +241,9 @@ class Slice(object):
         return self.__slice[index]
 
 
+    # CB: needs some cleanup - specifically, should be using
+    # array for slice_
+
     def __init__(self,slice_bounds,sheet_coordinate_system):
         """
         Create a slice of the given sheet_coordinate_system from the
@@ -248,7 +251,7 @@ class Slice(object):
         to the created slice in the 'bounds' attribute.
         """
         self.__scs = sheet_coordinate_system
-        self.__slice = self.__scs.bounds2slice(slice_bounds)
+        self.__slice = self.__scs.bounds2slice(slice_bounds) 
         self.bounds = self.__scs.slice2bounds(self.__slice)
 
     def as_tuple(self):
@@ -264,18 +267,17 @@ class Slice(object):
         r1,r2,c1,c2 = self.__slice
         r1+=r; r2+=r
         c1+=c; c2+=c
-        self._set_slice(array((r1,r2,c1,c2)))
+        self.__slice=(r1,r2,c1,c2)
+        self.bounds = self.__scs.slice2bounds(self.__slice)
 
     # CEBHACKALERT: temporarily available for outside use
     def _set_slice(self,slice_):
         """
         bypass creation of slice from bounds.
         """
-        if not isinstance(slice_,ArrayType):
-            self.__slice = array(slice_)
-        else:
-            self.__slice = slice_
-        self.bounds = self.__scs.slice2bounds(self.__slice)
+        self.__slice = slice_
+        self.bounds = self.__scs.slice2bounds(slice_)
+
 
 
     def submatrix(self,matrix):
