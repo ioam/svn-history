@@ -31,29 +31,30 @@ warnings_as_exceptions = False
 object_count = 0
 
 
-# CEBALERT: isn't this the same as our current classlist()?
-#  def classlist: return inspect.getmro(class_)[::-1]
+import inspect
+def classlist(class_):return inspect.getmro(class_)[::-1]
+
 # Also, classlist() has almost identical code as descendents().
 
-def classlist(class_):
-    """
-    Return a list of the class hierarchy above (and including) the given class.
+## def classlist(class_):
+##     """
+##     Return a list of the class hierarchy above (and including) the given class.
 
-    The list is ordered from least- to most-specific.  Often useful in
-    functions to get and set the full state of an object, e.g. for
-    pickling.
-    """
-    assert isinstance(class_, type)
-    q = [class_]
-    out = []
-    while len(q):
-        x = q.pop(0)
-        out.append(x)
-        for b in x.__bases__:
-            if b not in q and b not in out:
-                q.append(b)
+##     The list is ordered from least- to most-specific.  Often useful in
+##     functions to get and set the full state of an object, e.g. for
+##     pickling.
+##     """
+##     assert isinstance(class_, type)
+##     q = [class_]
+##     out = []
+##     while len(q):
+##         x = q.pop(0)
+##         out.append(x)
+##         for b in x.__bases__:
+##             if b not in q and b not in out:
+##                 q.append(b)
                 
-    return out[::-1]
+##     return out[::-1]
 
 
 def descendents(class_):
