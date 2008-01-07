@@ -236,7 +236,7 @@ def compare_startup_speed_data(script="examples/lissom_oo_or.ty",data_filename=N
 
     percent_change = 100.0*(new_time-old_time)/old_time
 
-    print "["+script+"]"+ '  Before: %2.1f s  Now: %2.1f s  (change=%2.1f s, %2.1f percent)'\
+    print "["+script+ ' startup]  Before: %2.1f s  Now: %2.1f s  (change=%2.1f s, %2.1f percent)'\
           %(old_time,new_time,new_time-old_time,percent_change)
 
 ### end startup timing
