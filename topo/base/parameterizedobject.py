@@ -965,9 +965,10 @@ class ParameterizedObject(object):
         Typically invoked by a __call__() method that accepts keyword
         arguments for parameter setting.
         """
+        self_params = self.params()
         for item in params:
-            if item not in self.params():
-                self.warning("'%s' was ignored (not a Parameter)."%item)
+            if item not in self_params:
+                self.warning("'%s' will be ignored (not a Parameter)."%item)
 
 
     def get_param_values(self,onlychanged=False):
