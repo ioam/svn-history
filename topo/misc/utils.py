@@ -252,13 +252,13 @@ def profile(command,n=50,sorting=('cumulative','time'),strip_dirs=True):
 
     if strip_dirs:prof_stats.strip_dirs()
     
-    prof_stats.sort_stats(*sorting).print_callees(n)
+    #prof_stats.sort_stats(*sorting).print_callees(n)
 
     ### the above lets us see which times are due to which calls
     ### unambiguously, while the version below only reports total time
     ### spent in each object, not the time due to that particular
     ### call.
-    # prof_stats.sort_stats(*sorting).print_stats(n)
+    prof_stats.sort_stats(*sorting).print_stats(n)
 
     
 

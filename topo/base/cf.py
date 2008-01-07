@@ -185,7 +185,7 @@ class ConnectionField(ParameterizedObject):
 
         self.x = x; self.y = y
         self.input_sheet = input_sheet
-	self.bounds_template = copy.copy(bounds_template) # CB: copy necessary? i think it's never altered
+	self.bounds_template = bounds_template 
 	
         # Move bounds to correct (x,y) location, and convert to an array
         # CEBALERT: make this clearer by splitting into two functions.
@@ -196,7 +196,6 @@ class ConnectionField(ParameterizedObject):
         # it is near an edge)
         r1,r2,c1,c2 =  self.get_slice(slice_)
 
-        mask_template=copy.copy(mask_template) # CB: copy necessary? i think it's necer altered
         m = mask_template[r1:r2,c1:c2]
 	
         self.mask = m.astype(weight_type)
@@ -307,7 +306,7 @@ class ConnectionField(ParameterizedObject):
         should be extended to support increasing as well.
         """
         # CEBALERT: re-write to allow arbitrary resizing
-	self.bounds_template = copy.copy(bounds_template) # CB: copy necessary?
+	self.bounds_template = bounds_template 
         or1,or2,oc1,oc2 = self.slice_array
 
         self.offset_bounds()
@@ -318,7 +317,6 @@ class ConnectionField(ParameterizedObject):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
 
             mr1,mr2,mc1,mc2 = self.get_slice()
-            mask_template=copy.copy(mask_template) # CB: copy necessary?
             m = mask_template[mr1:mr2,mc1:mc2]
             self.mask = m.astype(weight_type)
 
