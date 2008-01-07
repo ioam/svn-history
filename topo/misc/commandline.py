@@ -127,6 +127,7 @@ def g_action(option,opt_str,value,parser):
     """Callback function for the -g option."""
     boolean_option_action(option,opt_str,value,parser)
     interactive()
+    gui()
     
 topo_parser.add_option("-g","--gui",action="callback",callback=g_action,dest="gui",default=False,help="""\
 launch an interactive graphical user interface; \
@@ -257,7 +258,7 @@ def process_argv(argv):
 
         
     # If no scripts and no commands were given, pretend -i was given.
-    if not something_executed:
+    if not something_executed and not os.environ.get('PYTHONINSPECT'):
         interactive()
 
     if os.environ.get('PYTHONINSPECT'):
