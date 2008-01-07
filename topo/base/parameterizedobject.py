@@ -950,9 +950,9 @@ class ParameterizedObject(object):
         for name,val in params.items():
             desc,desctype = self.__class__.get_param_descriptor(name)
             if desc:
-                self.debug("Setting param %s ="%name, val)
+                self.debug("Setting param %s=%s"% (name, val))
             else:
-                self.warning("Set non-parameter %s ="%name, val)
+                self.warning("Setting non-parameter attribute %s=%s using a mechanism intended only for parameters" % (name, val))
             # i.e. if not desc it's setting an attribute in __dict__, not a Parameter
             setattr(self,name,val)
 
