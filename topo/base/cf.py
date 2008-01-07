@@ -185,7 +185,7 @@ class ConnectionField(ParameterizedObject):
 
         self.x = x; self.y = y
         self.input_sheet = input_sheet
-	self.bounds_template = bounds_template
+	self.bounds_template = copy.copy(bounds_template) # CB: copy necessary? i think it's never altered
 	
         # Move bounds to correct (x,y) location, and convert to an array
         # CEBALERT: make this clearer by splitting into two functions.
@@ -305,7 +305,7 @@ class ConnectionField(ParameterizedObject):
         should be extended to support increasing as well.
         """
         # CEBALERT: re-write to allow arbitrary resizing
-	self.bounds_template = bounds_template
+	self.bounds_template = copy.copy(bounds_template) # CB: copy necessary?
         or1,or2,oc1,oc2 = self.slice_array
 
         self.offset_bounds()
@@ -665,7 +665,7 @@ class CFProjection(Projection):
                     self.debug("Creating CF(%d,%d) from src (%.3f,%.3f) to  dest (%.3f,%.3f)"%(r,c,x_cf,y_cf,x,y))
                     try:
                         row.append(self.cf_type(self.src,x_cf,y_cf,
-                                                copy.copy(self.bounds_template),
+                                                self.bounds_template,
                                                 self.weights_generator,
                                                 copy.copy(self.mask_template), 
                                                 output_fn=self.weights_output_fn.single_cf_fn,
@@ -875,7 +875,7 @@ class CFProjection(Projection):
         output_fn = self.weights_output_fn.single_cf_fn
         for r in xrange(rows):
             for c in xrange(cols):
-                cfs[r][c].change_bounds(copy.copy(bounds_template),
+                cfs[r][c].change_bounds(bounds_template,
                                         copy.copy(mask_template),
                                         output_fn=output_fn)
 
