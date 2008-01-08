@@ -76,8 +76,7 @@ class ConnectionField(ParameterizedObject):
     # Specifies how to get a submatrix from the source sheet that is aligned
     # properly with this weight matrix.  The information is stored as an
     # array for speed of access from optimized C components.
-    # CEBALERT: can rename this to 'slice_' now.
-    input_sheet_slice = []  # should be called src_slice
+    input_sheet_slice = []   
 
     _has_norm_total = False
 
@@ -108,9 +107,7 @@ class ConnectionField(ParameterizedObject):
         self._has_norm_total = False
 
 
-    # CEBALERT: Accessing norm_total as a property from the C code will probably
-    # slow it down; this should be checked.
-    # We can remove this ALERT now, right?
+    # CB Accessing norm_total as a property from the C code makes very little difference.
     norm_total = property(__get_norm_total,__set_norm_total,__del_norm_total,
         """
         The norm_total property returns a value useful in computing
@@ -141,6 +138,12 @@ class ConnectionField(ParameterizedObject):
         _has_norm_total, _norm_total
         
         """)
+        # CB: no existing C code accesses _norm_total. Isn't there
+        # some redundant code in the C functions?
+        # E.g. CPLF_Hebbian_opt sets norm_total and then sets
+        # _has_norm_total=True; surely just setting norm_total is
+        # enough? Or, it could set _norm_total and then it would need
+        # to set _has_norm_total=True
 
     
     # CB: doc slice_
@@ -369,9 +372,10 @@ class CFPRF_Plugin(CFPResponseFn):
     def __call__(self, iterator, input_activity, activity, strength):
         single_cf_fn = self.single_cf_fn
         for cf,r,c in iterator():
-           r1,r2,c1,c2 = cf.input_sheet_slice
-           X = input_activity[r1:r2,c1:c2]
-           activity[r,c] = single_cf_fn(X,cf.weights)
+            r1,r2,c1,c2 = cf.input_sheet_slice
+            X = input_activity[r1:r2,c1:c2]
+            #X = input_activity[cf.input_sheet_slice.slice2d()]
+            activity[r,c] = single_cf_fn(X,cf.weights)
         activity *= strength
 
 
@@ -526,7 +530,8 @@ class CFPOutputFnParameter(ClassSelectorParameter):
 
 
 
-                    
+# CB: need to make usage of 'src' and 'input_sheet' consistent between
+# ConnectionField and CFProjection (i.e. pick one of them).
 class CFProjection(Projection):
     """
     A projection composed of ConnectionFields from a Sheet into a ProjectionSheet.
@@ -804,6 +809,11 @@ class CFProjection(Projection):
         Return a single connection field UnitView, for the unit
         located nearest to sheet coordinate (sheet_x,sheet_y).
         """
+        # CB: I think this is equivalent, right?
+        # cf = self.cf(self.dest.sheet2matrixidx(sheet_x,sheet_y))
+        # matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)        
+        # cf.input_sheet_slice.submatrix(matrix_data)=cf.weights 
+
 	matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)
         (r,c) = self.dest.sheet2matrixidx(sheet_x,sheet_y)
         r1,r2,c1,c2 = self.cf(r,c).input_sheet_slice
@@ -815,6 +825,10 @@ class CFProjection(Projection):
 	"""
 	Returns the activity in a single projection
 	"""
+        # CB: presumably activity passed through Numeric.array to make a copy?
+        # In that case, wouldn't
+        # matrix_data = self.activity.copy()
+        # be clearer?
 	matrix_data = Numeric.array(self.activity)
 	return ProjectionView((matrix_data,self.dest.bounds),self,timestamp)
 
