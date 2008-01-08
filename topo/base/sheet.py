@@ -21,7 +21,6 @@ $Id$
 
 __version__ = '$Revision$'
 
-
 from simulation import EventProcessor
 from sheetcoords import SheetCoordinateSystem
 from parameterclasses import BooleanParameter, Number, Parameter, NumericTuple
@@ -205,11 +204,26 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         self.learning = self._updating_state.pop()
 
 
-class Slice(object):
+
+
+# Needs cleanup/rename:
+#
+# since it's different from slice.  It's our special slice that's an
+# array specifying row_start,row_stop,col_start,col_stop.
+# 
+# In python, a[slice(0,2)] (where a is a list/array/similar) is
+# equivalent to a[0:2].
+#
+# So, not sure what to call this class. (Will need to rename some
+# methods, too.)
+
+from numpy import int32,ndarray
+
+class Slice(ndarray):
     """
-    Represents a slice of a SheetCoordinateSystem; i.e., an
-    array specifying the row and column start and end points
-    for a submatrix of the SheetCoordinateSystem.
+    Represents a slice of a SheetCoordinateSystem; i.e., an array
+    specifying the row and column start and end points for a submatrix
+    of the SheetCoordinateSystem.
 
     The slice is created from the supplied slice_bounds by calculating
     the slice that corresponds most closely to the specified bounds.
@@ -217,68 +231,32 @@ class Slice(object):
     the specified bounds. Slice stores the bounds that do exactly
     correspond to the slice in the 'bounds' attribute.
 
-    The slice elements can be recovered by unpacking an instance
-    (e.g. k = Slice(); r1,r2,c1,c2 = k) or using bracket access
-    (e.g. r1,r2 = k[0:2])
-
     Note that the slice does not respect the bounds of the
     SheetCoordinateSystem, and that actions such as translate() also
     do not respect the bounds. To ensure that the slice is within the
     SheetCoordinateSystem's bounds, use crop_to_sheet().
     """
-    # Have a shape attribute (like numpy.array)
-    def __get_shape(self):
-        """Return the shape of the slice."""
-        r1,r2,c1,c2 = self.__slice
-        return (r2-r1,c2-c1)
-    shape = property(__get_shape)
-
-    # Allow unpacking and [] access
-    def __iter__(self):
-        return iter(self.__slice)
-
-    def __getitem__(self,index):
-        return self.__slice[index]
-
-
-    # CB: needs some cleanup - specifically, should be using
-    # array for slice_
-
-    def __init__(self,slice_bounds,sheet_coordinate_system):
+    def __new__(cls, slice_bounds, sheet_coordinate_system):
         """
         Create a slice of the given sheet_coordinate_system from the
         specified bounds, and store the bounds that exactly correspond
         to the created slice in the 'bounds' attribute.
         """
-        self.__scs = sheet_coordinate_system
-        self.__slice = self.__scs.bounds2slice(slice_bounds) 
-        self.bounds = self.__scs.slice2bounds(self.__slice)
+        # I couldn't find documentation on subclassing array; I used
+        # the following as reference:
+        # http://scipy.org/scipy/numpy/browser/branches/maskedarray/numpy/ma/tests/test_subclassing.py?rev=4577
+        slice_ = sheet_coordinate_system.bounds2slice(slice_bounds)
+        bounds = sheet_coordinate_system.slice2bounds(slice_)
 
-    def as_tuple(self):
-        """Return the slice as a 4-tuple."""
-        r1,r2,c1,c2 = self.__slice
-        return (r1,r2,c1,c2)
-    
-    def translate(self, r, c):
-        """
-        Translate the slice by the specified number of rows
-        and columns.
-        """
-        r1,r2,c1,c2 = self.__slice
-        r1+=r; r2+=r
-        c1+=c; c2+=c
-        self.__slice=(r1,r2,c1,c2)
-        self.bounds = self.__scs.slice2bounds(self.__slice)
+        a = array(slice_, dtype=int32, copy=False).view(cls)
+        a._scs = sheet_coordinate_system
+        a.bounds = bounds
+        return a
 
-    # CEBHACKALERT: temporarily available for outside use
-    def _set_slice(self,slice_):
-        """
-        bypass creation of slice from bounds.
-        """
-        self.__slice = slice_
-        self.bounds = self.__scs.slice2bounds(slice_)
-
-
+    def __array_finalize__(self,obj):
+        self._scs = getattr(obj,'_scs',None)
+        self.bounds = getattr(obj,'bounds',None)
+        
 
     def submatrix(self,matrix):
         """
@@ -292,29 +270,48 @@ class Slice(object):
         The submatrix is just a view into the sheet_matrix; it is not
         an independent copy.
         """
-        r1,r2,c1,c2 = self.__slice
-        return matrix[r1:r2,c1:c2]
+        return matrix[self[0]:self[1],self[2]:self[3]]
     
-    ## CB: Because crop_to_sheet and translate are both called many,
-    ## many times during CFProjection initialization, it might be
-    ## worth making the bounds be accessed as a property so that it
-    ## wouldn't be updated twice as it is now, and would instead be
-    ## cached and reused.
-    def crop_to_sheet(self): # CEBALERT: crop_to_sheet_coordinate_system_bounds?
+
+##     def slice2d(self):
+##         return slice(self[0],self[1]),slice(self[2],self[3])
+
+        
+    def translate(self, r, c):
+        """
+        Translate the slice by the specified number of rows
+        and columns.
+        """
+        self+=[r,r,c,c]
+        self.bounds = self._scs.slice2bounds(self)
+
+
+    def set_from_slice(self,slice_):
+        self.put([0,1,2,3],slice_)
+        self.bounds = self._scs.slice2bounds(slice_)
+
+
+    # shouldn't the two method names below refer to scs rather than sheet?
+    def shape_on_sheet(self):
+        return self[1]-self[0],self[3]-self[2]
+
+
+    def crop_to_sheet(self): 
         """
         Crop the slice to the SheetCoordinateSystem's bounds.
         """
-        r1,r2,c1,c2 = self.__scs.bounds2slice(self.__scs.bounds)
-        maxrow,maxcol = r2-r1,c2-c1
+        maxrow,maxcol = self._scs.shape
                         
-        t_idx,b_idx,l_idx,r_idx = self.__slice
+        self[0] = max(0,self[0])
+        self[1] = min(maxrow,self[1])
+        self[2] = max(0,self[2])
+        self[3] = min(maxcol,self[3])
 
-        rstart = max(0,t_idx)
-        rbound = min(maxrow,b_idx)
-        cstart = max(0,l_idx)
-        cbound = min(maxcol,r_idx)
-        
-        self._set_slice((rstart,rbound,cstart,cbound))
+        self.bounds = self._scs.slice2bounds(self)
+
+
+
+
 
 
 

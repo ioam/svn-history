@@ -19,13 +19,6 @@ $Id$
 
 __version__ = '$Revision$'
 
-# CEBHACKALERT: some things that need to be cleaned up in this file:
-# CFProjection sometimes passes *copies* of objects to the CFs it's creating,
-# sometimes it doesn't. Some of ConnectionField's methods change their
-# arguments, some don't.  These could lead to confusion and some hard-to-track
-# bugs. (Same applies to SharedWeightCFProjection.)
-
-
 import numpy.oldnumeric as Numeric
 from numpy import abs
 import copy
@@ -84,7 +77,7 @@ class ConnectionField(ParameterizedObject):
     # properly with this weight matrix.  The information is stored as an
     # array for speed of access from optimized C components.
     # CEBALERT: can rename this to 'slice_' now.
-    slice_array = []
+    slice_array = []  # should be called src_slice
 
     _has_norm_total = False
 
@@ -226,13 +219,13 @@ class ConnectionField(ParameterizedObject):
         the correct submatrix of the weights or mask in case the
         unit is near the edge of the sheet).
         """
-        if not slice_:
+        if slice_ is None:
             slice_ = Slice(self.bounds_template,self.input_sheet)
             
         sheet_rows,sheet_cols = self.input_sheet.activity.shape
 
         # get size of weights matrix
-        n_rows,n_cols = slice_.shape
+        n_rows,n_cols = slice_.shape_on_sheet()
 
         # get slice for the submatrix
         center_row,center_col = self.input_sheet.sheet2matrixidx(self.x,self.y)
@@ -254,7 +247,7 @@ class ConnectionField(ParameterizedObject):
 
         Also stores the slice_array for access by C.
 	"""
-        if not slice_:
+        if slice_ is None:
             slice_ = Slice(self.bounds_template,self.input_sheet)
         else:
             slice_ = copy.copy(slice_)
@@ -272,18 +265,21 @@ class ConnectionField(ParameterizedObject):
 
         # weights matrix cannot have a zero-sized dimension (could
         # happen at this stage because of cropping)
-        nrows,ncols = slice_.shape
+        nrows,ncols = slice_.shape_on_sheet()
         if nrows<1 or ncols<1:
             raise NullCFError(self.x,self.y,self.input_sheet,nrows,ncols)
 
         self.bounds = slice_.bounds
 
+
         # Also, store the array for direct access by C.
-        # Numeric.Int32 is specified explicitly here to avoid having it
-        # default to Numeric.Int.  Numeric.Int works on 32-bit platforms,
-        # but does not work properly with the optimized C activation and
-        # learning functions on 64-bit machines.
-        self.slice_array = Numeric.array(tuple(slice_),typecode=Numeric.Int32) 
+        # Numeric.Int32 is specified explicitly in Slice to avoid
+        # having it default to Numeric.Int.  Numeric.Int works on
+        # 32-bit platforms, but does not work properly with the
+        # optimized C activation and learning functions on 64-bit
+        # machines.
+        self.slice_array = slice_
+        
 
 
     def get_input_matrix(self, activity):
@@ -769,13 +765,13 @@ class CFProjection(Projection):
         r1=center_row-yrad
         c1=center_col-xrad
 
-        weights_slice._set_slice((r1,r2,c1,c2))
+        weights_slice.set_from_slice((r1,r2,c1,c2))
         ### end alert
 
         ### Checks:
         # (1) user-supplied bounds must lead to a weights matrix of at
         # least 1x1
-        rows,cols = weights_slice.shape
+        rows,cols = weights_slice.shape_on_sheet()
         if rows==0 or cols==0:
             raise ValueError("nominal_bounds_template results in a zero-sized weights matrix (%s,%s) for %s - you may need to supply a larger nominal_bounds_template or increase the density of the sheet."%(rows,cols,self.name))
         # (2) weights matrix must be odd (otherwise this method has an error)
