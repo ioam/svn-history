@@ -77,7 +77,7 @@ class ConnectionField(ParameterizedObject):
     # properly with this weight matrix.  The information is stored as an
     # array for speed of access from optimized C components.
     # CEBALERT: can rename this to 'slice_' now.
-    slice_array = []  # should be called src_slice
+    input_sheet_slice = []  # should be called src_slice
 
     _has_norm_total = False
 
@@ -245,7 +245,7 @@ class ConnectionField(ParameterizedObject):
         Offset the bounds_template to this cf's location and store the
         result in the 'bounds' attribute.
 
-        Also stores the slice_array for access by C.
+        Also stores the input_sheet_slice for access by C.
 	"""
         if slice_ is None:
             slice_ = Slice(self.bounds_template,self.input_sheet)
@@ -278,12 +278,12 @@ class ConnectionField(ParameterizedObject):
         # 32-bit platforms, but does not work properly with the
         # optimized C activation and learning functions on 64-bit
         # machines.
-        self.slice_array = slice_
+        self.input_sheet_slice = slice_
         
 
 
     def get_input_matrix(self, activity):
-        r1,r2,c1,c2 = self.slice_array
+        r1,r2,c1,c2 = self.input_sheet_slice
         return activity[r1:r2,c1:c2]
 
 
@@ -303,10 +303,10 @@ class ConnectionField(ParameterizedObject):
         """
         # CEBALERT: re-write to allow arbitrary resizing
 	self.bounds_template = bounds_template 
-        or1,or2,oc1,oc2 = self.slice_array
+        or1,or2,oc1,oc2 = self.input_sheet_slice
 
         self.offset_bounds()
-        r1,r2,c1,c2 = self.slice_array
+        r1,r2,c1,c2 = self.input_sheet_slice
 
 
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
@@ -369,7 +369,7 @@ class CFPRF_Plugin(CFPResponseFn):
     def __call__(self, iterator, input_activity, activity, strength):
         single_cf_fn = self.single_cf_fn
         for cf,r,c in iterator():
-           r1,r2,c1,c2 = cf.slice_array
+           r1,r2,c1,c2 = cf.input_sheet_slice
            X = input_activity[r1:r2,c1:c2]
            activity[r,c] = single_cf_fn(X,cf.weights)
         activity *= strength
@@ -806,7 +806,7 @@ class CFProjection(Projection):
         """
 	matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)
         (r,c) = self.dest.sheet2matrixidx(sheet_x,sheet_y)
-        r1,r2,c1,c2 = self.cf(r,c).slice_array
+        r1,r2,c1,c2 = self.cf(r,c).input_sheet_slice
 	matrix_data[r1:r2,c1:c2] = self.cf(r,c).weights
         return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self,timestamp)
 

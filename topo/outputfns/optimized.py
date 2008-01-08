@@ -47,7 +47,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                     {
                         PyObject *cf = PyList_GetItem(cfsr,l);
                         PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
-                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
+                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"input_sheet_slice");
                         PyObject *sum_obj     = PyObject_GetAttrString(cf,"norm_total");
                         
                         float *wi = (float *)(((PyArrayObject*)weights_obj)->data);

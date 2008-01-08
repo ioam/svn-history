@@ -48,7 +48,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                     else {
                         PyObject *cf = PyList_GetItem(cfsr,l);
                         PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
-                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
+                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"input_sheet_slice");
     
                         // This code is optimized for contiguous arrays, which are typical,
                         // but we make it work for noncontiguous arrays (e.g. views) by
@@ -134,7 +134,7 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
                 for (int l=0; l<cols; ++l) {
                     PyObject *cf = PyList_GetItem(cfsr,l);
                     PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
-                    PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
+                    PyObject *slice_obj   = PyObject_GetAttrString(cf,"input_sheet_slice");
                     
 		    float *wj = (float *)(((PyArrayObject*)weights_obj)->data);
                     int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);

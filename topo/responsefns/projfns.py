@@ -39,7 +39,7 @@ class CFPRF_EuclideanDistance(CFPResponseFn):
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
-                r1,r2,c1,c2 = cf.slice_array
+                r1,r2,c1,c2 = cf.input_sheet_slice
                 X = input_activity[r1:r2,c1:c2]
 		diff = ravel(X) - ravel(cf.weights)
 		euclidean_dist_mat[r,c] = L2norm(diff)
@@ -92,7 +92,7 @@ class CFPRF_ActivityBased(CFPResponseFn):
         normalize_factor=max(input_activity.flat)
         
         for cf,r,c in iterator():
-            r1,r2,c1,c2 = cf.slice_array
+            r1,r2,c1,c2 = cf.input_sheet_slice
             X = input_activity[r1:r2,c1:c2]
             avg_activity=sum(X.flat)/len(X.flat)
             x=avg_activity/normalize_factor

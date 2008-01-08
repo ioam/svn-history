@@ -44,7 +44,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
 
                         PyObject *cf = PyList_GetItem(cfsr,l);
                         PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
-                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
+                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"input_sheet_slice");
                         PyObject *mask_obj    = PyObject_GetAttrString(cf,"mask");
 
                         float *wi = (float *)(((PyArrayObject*)weights_obj)->data);

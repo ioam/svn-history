@@ -615,7 +615,7 @@ def measure_cog(proj_name ="Afferent"):
 		for r in xrange(rows):
 		    for c in xrange(cols):
 			cf=proj.cf(r,c)
-			r1,r2,c1,c2 = cf.slice_array
+			r1,r2,c1,c2 = cf.input_sheet_slice
 			row_centroid,col_centroid = centroid(cf.weights)
 			xcentroid, ycentroid = proj.src.matrix2sheet(
 			        r1+row_centroid+0.5,

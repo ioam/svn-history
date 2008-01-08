@@ -68,7 +68,7 @@ class SharedWeightCF(ConnectionField):
 
         # Move bounds to correct (x,y) location, and convert to an array
         # CEBHACKALERT: make this clearer by splitting into two functions.
-        # JANOTE: sets self.bounds and self.slice_array; not sure
+        # JANOTE: sets self.bounds and self.input_sheet_slice; not sure
 	# whether this has to be still called!!!!
 	self.offset_bounds()
 
