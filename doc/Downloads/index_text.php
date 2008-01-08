@@ -49,9 +49,12 @@ on Linux but is not supported on the Mac).  Following this, type
 be used if those are present; we are looking into whether the ones in
 the Topographica distribution can be used instead.
 
-<P>On other systems, just type <code>make</code> (which may be called
-<code>gmake</code> on some systems) from within the
-<code>topographica/</code> directory.  You will currently (10/2007)
+<P>On other Unix-based systems like Linux, just type <code>make</code>
+(which may be called <code>gmake</code> on some systems) from within
+the <code>topographica/</code> directory.  It is best to do this as a
+regular user in the user's own directory, not as a root user with
+special privileges, because Topographica does not need any special
+access to your system.  You will currently (10/2007)
 need to do this on a machine with a functioning DISPLAY, not on a
 remote text-only windowless session, because of build requirements for
 the MatPlotLib library.  (Note that many systems provide xfvb for this
@@ -74,8 +77,8 @@ before <code>make</code> will succeed.  On some systems the
 <code>-dev</code> packages are called <code>-devel</code>, and
 sometimes specific versions must be specified (e.g.
 <code>libpng12-dev</code>,
-<code>libfreetype6-dev</code>).
-
+<code>libfreetype6-dev</code>).  Example for Ubuntu 7.10:
+"sudo apt-get install  libfreetype6 libfreetype6-dev libpng12-0 libpng12-dev libx11-dev zlib1g".
 
 <P>If you have the php, m4, bibtex, convert,
 and fig2dev commands installed, you can also make local copies of the
