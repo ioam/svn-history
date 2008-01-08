@@ -180,7 +180,7 @@ simulation-snapshot-tests:
 
 snapshot-tests: simulation-snapshot-tests snapshot-compatibility-tests
 
-slow-tests: train-tests snapshot-tests speed-tests startup-speed-tests
+slow-tests: train-tests speed-tests startup-speed-tests snapshot-tests 
 
 # CB: add notes somewhere about...
 # - making sure weave compilation has already occurred before running speed tests
