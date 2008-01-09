@@ -99,12 +99,6 @@ class PatternGenerator(ParameterizedObject):
         Optional function to apply to the pattern array after it has been created.
         This function can be used for normalization, thresholding, etc.""")
 
-    def __init__(self,**params):
-        super(PatternGenerator,self).__init__(**params)
-        self._last_params = (None,None,None,None,None)
-        self._last_points = (None,None)
-    
-      
     def __call__(self,**params_to_override):
         """
         Call the subclasses 'function' method on a rotated and scaled coordinate system.
@@ -129,9 +123,7 @@ class PatternGenerator(ParameterizedObject):
         if position is not None:
             x,y = position
 
-        if (bounds,xdensity,ydensity,x,y,orientation)!=self._last_params:
-            self.__setup_xy(bounds,xdensity,ydensity,x,y,orientation)
-            self._last_params=(bounds,xdensity,ydensity,x,y,orientation)
+        self.__setup_xy(bounds,xdensity,ydensity,x,y,orientation)
             
         result = params['scale']*self.function(params)+params['offset']
 
@@ -156,11 +148,7 @@ class PatternGenerator(ParameterizedObject):
         # Generate vectors representing coordinates at which the pattern
         # will be sampled.
 
-        if (bounds,xdensity,ydensity)!=self._last_params[0:3]:
-            x_points,y_points = SheetCoordinateSystem(bounds,xdensity,ydensity).sheetcoordinates_of_matrixidx()
-            self._last_points = (x_points,y_points)
-        else:
-            x_points,y_points = self._last_points
+        x_points,y_points = SheetCoordinateSystem(bounds,xdensity,ydensity).sheetcoordinates_of_matrixidx()
             
         # Generate matrices of x and y sheet coordinates at which to
         # sample pattern, at the correct orientation
@@ -195,15 +183,6 @@ class PatternGenerator(ParameterizedObject):
         pattern_x = add.outer(sin(orientation)*y, cos(orientation)*x)
         return pattern_x, pattern_y
 
-
-    # CEB: hack for pickle
-    def __setstate__(self,state):
-        self.__dict__.update(state)
-
-        if '_last_params' not in state:
-            self._last_params = (None,None,None,None,None)
-        if '_last_points' not in state:
-            self._last_points = (None,None)
 
 
 # Trivial example of a PatternGenerator, provided for when a default is
