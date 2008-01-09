@@ -287,7 +287,7 @@ class Sweeper(PatternGenerator):
         scale=params['scale']
         offset=params['offset']
         size=params['size']
-        orientation=['orientation']
+        orientation=params['orientation']
         
         pg = self.generator
 
@@ -512,7 +512,7 @@ class Selector(PatternGenerator):
         scale=params['scale']
         offset=params['offset']
         size=params['size']
-        orientation=['orientation']
+        orientation=params['orientation']
         index=params['index']
         int_index=int(len(self.generators)*wrap(0,1.0,index))
 
@@ -560,7 +560,7 @@ class SineGratingDisk(PatternGenerator):
         scale=params['scale']
         offset=params['offset']
         size=params['size']
-        orientation=['orientation']
+        orientation=params['orientation']
         size=params['size']
         phase=params['phase']
         frequency=params['frequency']
@@ -606,7 +606,7 @@ class GaussiansCorner(PatternGenerator):
         scale=params['scale']
         offset=params['offset']
         size=params['size']
-        orientation=['orientation']
+        orientation=params['orientation']
         size=params['size']
 	
 	input_1=Gaussian()
