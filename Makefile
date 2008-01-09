@@ -158,10 +158,14 @@ STARTUPSPEEDSCRIPTS= ^lissom_oo_or.ty ^lissom_or.ty
 STARTUPSPEEDDATA =${subst ^,topo/tests/,${subst .ty,.ty_STARTUPSPEEDDATA,${STARTUPSPEEDSCRIPTS}}}
 STARTUPSPEEDTESTS=${subst ^,topo/tests/,${subst .ty,.ty_STARTUPSPEEDTEST,${STARTUPSPEEDSCRIPTS}}}
 
+
+# CB: when changing the various targets, don't forget about buildbot. 
+
 train-tests: ${TRAINTESTS}
 speed-tests: ${SPEEDTESTS}
 startup-speed-tests: ${STARTUPSPEEDTESTS}
 
+all-speed-tests: speed-tests startup-speed-tests
 
 snapshot-compatibility-tests: 
 	./topographica -c "from topo.commands.basic import load_snapshot; load_snapshot('topo/tests/lissom_oo_or.ty_pickle_test.typ')" -c "topo.sim.run(1)"
@@ -180,7 +184,10 @@ simulation-snapshot-tests:
 
 snapshot-tests: simulation-snapshot-tests snapshot-compatibility-tests
 
-slow-tests: train-tests speed-tests startup-speed-tests snapshot-tests 
+# CB: snapshot-tests is not part of slow-tests for the moment
+# (until slow-tests split up on buildbot).
+slow-tests: train-tests all-speed-tests 
+#snapshot-tests 
 
 # CB: add notes somewhere about...
 # - making sure weave compilation has already occurred before running speed tests
