@@ -248,6 +248,11 @@ class Slice(ndarray):
         slice_ = sheet_coordinate_system.bounds2slice(slice_bounds)
         bounds = sheet_coordinate_system.slice2bounds(slice_)
 
+        # Numeric.Int32 is specified explicitly in Slice to avoid
+        # having it default to Numeric.Int.  Numeric.Int works on
+        # 32-bit platforms, but does not work properly with the
+        # optimized C activation and learning functions on 64-bit
+        # machines.
         a = array(slice_, dtype=int32, copy=False).view(cls)
         a._scs = sheet_coordinate_system
         a.bounds = bounds
@@ -271,11 +276,14 @@ class Slice(ndarray):
         an independent copy.
         """
         return matrix[self[0]:self[1],self[2]:self[3]]
-    
 
-##     def slice2d(self):
+    # CB: not sure if this is a good idea or not. In some ways, I
+    # think matrix[slice_()] would be clearer than
+    # slice.submatrix(matrix), but I'm not sure. cf.py is where
+    # to look to see this in action.
+##     def __call__(self):
 ##         return slice(self[0],self[1]),slice(self[2],self[3])
-
+        
         
     def translate(self, r, c):
         """
