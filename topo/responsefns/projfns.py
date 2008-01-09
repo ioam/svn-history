@@ -10,7 +10,6 @@ __version__='$Revision$'
 
 import numpy
 import copy
-import fixedpoint
 
 from numpy import sum,exp
 from math import pi, sqrt
