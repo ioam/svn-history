@@ -15,7 +15,7 @@ extensible for models not yet supported.
 <p>This tutorial assumes that you have already followed the
 instructions for <a href="../Downloads/index.html">obtaining and
 installing</a> Topographica.  Also, you will need to generate a saved
-orientation map network, which can be done by running
+orientation map network (a .typ file), which can be done by running
 <blockquote><code class='to_type'>./topographica -c "targets=['lissom_oo_or_10000.typ']" examples/run.py</code></blockquote>
 
 (on Unix or Mac systems; on Windows, the syntax is slightly different&mdash;see the note about
