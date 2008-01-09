@@ -49,8 +49,7 @@ class SharedWeightCF(ConnectionField):
 	
     # JAHACKALERT: This implementation copies some of the CEBHACKALERTS 
     # of the ConnectionField.__init__ function from which it is dervied
-    def __init__(self,cf,input_sheet,x=0.0,y=0.0,bounds_template=BoundingBox(radius=0.1),
-                 mask_template=None):
+    def __init__(self,cf,input_sheet,x=0.0,y=0.0,bounds_template=BoundingBox(radius=0.1)):
         """
         From an existing copy of ConnectionField (CF) that acts as a
 	template, create a new CF that shares weights with the
@@ -64,19 +63,15 @@ class SharedWeightCF(ConnectionField):
         """
         self.x = x; self.y = y
         self.input_sheet = input_sheet
-	self.bounds_template = bounds_template
 
-        # Move bounds to correct (x,y) location, and convert to an array
-        # CEBHACKALERT: make this clearer by splitting into two functions.
-        # JANOTE: sets self.bounds and self.input_sheet_slice; not sure
-	# whether this has to be still called!!!!
-	self.offset_bounds()
-
-        # Now we have to get the right submatrix of the mask (in case
-        # it is near an edge)
-        r1,r2,c1,c2 =  self.get_slice()
-        self.weights = cf.weights[r1:r2,c1:c2]
+        # must be called to setup the input_sheet_slice
+        self.create_input_sheet_slice(bounds=bounds_template)
 	
+        # must be called to setup the weights slice for this x,y
+        self.create_weights_slice(bounds=bounds_template)
+
+        self.weights = self.weights_slice.submatrix(cf.weights)
+        
 	# JAHACKALERT the OutputFn cannot be applied in SharedWeightCF
 	# - another inconsistency in the class tree design - there
 	# should be nothing in the parent class that is ignored in its
@@ -129,7 +124,7 @@ class SharedWeightCFProjection(CFProjection):
         for y in self.dest.sheet_rows()[::-1]:
             row = []
             for x in self.dest.sheet_cols():
-                cf = SharedWeightCF(scf,self.src,x,y,bounds_template,self.mask_template)
+                cf = SharedWeightCF(scf,self.src,x,y,bounds_template)
                 row.append(cf)
             cflist.append(row)
         self._cfs = cflist
