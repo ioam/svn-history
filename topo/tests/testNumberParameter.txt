@@ -8,6 +8,7 @@
 ...    x = Number(default=UniformRandom(lbound=-1,ubound=1,seed=1),bounds=(-1,1))
 ...    y = Number(default=1,bounds=(-1,1))
 
+# CB: Number doesn't accept FixedPoint in declaration
 #...    z = Number(default=FixedPoint('1.00'))
 
 >>> t1 = TestPO1()
@@ -32,9 +33,34 @@
 ...     assert False, "Should raise ValueError."
 
 
-### Check FixedPoint works
+### Check Number accepts FixedPoint
 #>>> t1.z
 #'FixedPoint(1.00)'
+
+>>> t1.x = FixedPoint('0.999',3)
+>>> t1.x-=0.0004
+>>> t1.x
+FixedPoint('0.999', 3)
+
+>>> t1.x-=0.0004
+>>> t1.x
+FixedPoint('0.999', 3)
+
+>>> t1.x-=0.0004
+>>> t1.x
+FixedPoint('0.999', 3)
+
+
+>>> try:
+...    t1.x+=0.002
+... except ValueError:
+...    pass
+... else:
+...    raise AssertionError("Number's bounds were not respected")
+
+
+
+
 
 
 

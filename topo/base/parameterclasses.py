@@ -233,7 +233,9 @@ is_number = operator.isNumberType
 
 
 
-# CEBALERT: Number does not work with FixedPoint
+# CEBALERT: Number does not fully work with FixedPoint
+# (can't use in parameter declaration but can set existing parameter
+# to fixedpoint; see testNumber.txt)
 class Number(Dynamic):
     """
     """
