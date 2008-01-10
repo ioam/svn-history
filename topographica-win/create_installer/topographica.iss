@@ -38,7 +38,7 @@ Source: "D:\Program Files\topographica\*"; DestDir: "{app}"; Flags: ignoreversio
 [Icons]
 Name: "{group}\Topographica"; Filename: "{app}\topographica.bat"; WorkingDir: "{app}"; Parameters: "-g"; IconFilename: "{app}\topographica.ico"
 Name: "{group}\Uninstall Topographica"; Filename: "{uninstallexe}"
-Name: "{userdesktop}\Topographica"; Filename: "{app}\topographica.bat"; Parameters: "-g"; Tasks: desktopicon; IconFilename: "{app}\topographica.ico"
+Name: "{userdesktop}\Topographica"; Filename: "{app}\topographica.bat"; WorkingDir: "{app}"; Parameters: "-g"; Tasks: desktopicon; IconFilename: "{app}\topographica.ico"
 
 
 [Registry]
