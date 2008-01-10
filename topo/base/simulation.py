@@ -102,9 +102,17 @@ class Singleton(object):
         cls.__it__ = it = object.__new__(cls)
         it.init(*args, **kwds)
         return it
+
     def init(self, *args, **kwds):
         """Method to be overridden if the subclass needs initialization."""
         pass
+
+    def __reduce_ex__(self,p):
+        """
+        Causes __new__ to be called on unpickling; in turn, __new__
+        ensures there is only one instance.
+        """
+        return (type(self),tuple()) 
 
 
 
@@ -197,10 +205,9 @@ class SimSingleton(Singleton):
 
 
     ## pickling & copying
-    def __getstate__(self):
-        """Avoid calling actual_sim's __getstate__ directly.""" 
-        return {'actual_sim':self.actual_sim}
-
+    def __reduce_ex__(self,p):
+        return (type(self),tuple(),{'actual_sim':self.actual_sim})
+    
     def __setstate__(self,state):
         """On unpickling, change to the pickled simulation."""
         self.change_sim(state['actual_sim'])
