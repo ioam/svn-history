@@ -59,7 +59,7 @@ class ConnectionField(ParameterizedObject):
     the output sheet, and is normally used as part of a Projection
     including many other ConnectionFields.
     """
-    
+
     x = Number(default=0.0,softbounds=(-1.0,1.0),doc="""
         The x coordinate of the location of the center of this ConnectionField
         on the input Sheet, e.g. for use when determining where the weight matrix
@@ -79,6 +79,17 @@ class ConnectionField(ParameterizedObject):
     input_sheet_slice = []   
 
     _has_norm_total = False
+
+    def __setstate__(self,state):
+
+        ## slice_array was renamed to input_sheet_slice
+        if 'slice_array' in state:
+            input_sheet_slice = state['slice_array']
+            state['input_sheet_slice'] = input_sheet_slice
+            del state['slice_array'] # probably doesn't work
+            
+        super(ConnectionField,self).__setstate__(state)
+        
 
     def __get_norm_total(self):
         """
