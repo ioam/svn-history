@@ -2,8 +2,11 @@
 
 <H3><A NAME="unix-commands-on-win">Translating UNIX commands to Windows</A></H3>
 
+<P>The Windows equivalent of 'the shell' is its 'Command Prompt'. The
+easiest way to start this is by clicking on 'Start', then 'Run', then
+typing <code>cmd</code>, then clicking 'Ok'.
 
-<P>To convert UNIX shell commands to Windows cmd.exe commands:
+<P>To convert UNIX shell commands to Windows Command Prompt commands:
 <ul>
 <li>Omit any initial '<code>./</code>'</li>
 <li>Replace any forward slash '<code>/</code>' in a path with a backslash '<code>\</code>'</li>
@@ -12,10 +15,10 @@
 
 <P>Examples:
 
-<TABLE>
+<TABLE BORDER="1">
 <TR>
 <TH>UNIX</TH>
-<TH>Windows</TH>
+<TH>Windows equivalent</TH>
 
 <TR>
 <TD><code>./topographica -g examples/lissom_oo_or.ty</code></TD>
