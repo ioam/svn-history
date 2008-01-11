@@ -106,12 +106,13 @@ suggested above).  Initially, the weights are uniformly random.
 </li>
 
 <li>We can visualize the mapping from the input space into the
-cortical space using a <span class='t_item'>Center of Gravity</span>
-plot.  To get one, open the <span class='t_item'>Plots</span> menu
-from the <span class='w_title'>Topographica Console</span>, select
-<span class='t_item'>Preference Maps</span>, and press the Refresh
-button by the Update Command to get several plots.
-These plots show the results of computing the <i>center of gravity</i>
+cortical space using a Center of Gravity plot.  To get one, open the
+<span class='t_item'>Plots</span> menu from the <span
+class='w_title'>Topographica Console</span>, select <span
+class='t_item'>Preference Maps</span> and then <span
+class='t_item'>Center of Gravity</span>, and press the Refresh button
+by the Update Command to get several plots.  These plots show the
+results of computing the <i>center of gravity</i>
 (a.k.a. <i>centroid</i> or <i>center of mass</i>) of the set of input
 weights for each neuron.
 
