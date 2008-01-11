@@ -87,8 +87,9 @@ align="middle" WIDTH="272" HEIGHT="265" border=2>
 <li>To see the initial state of this network, select <span
 class='t_item'>Projection</span> from the <span
 class='t_item'>Plots</span> menu to get the <span
-class='w_title'>Projection</span> window.  This plot shows the initial
-set of weights from a 10x10 subset of the V1 neurons:
+class='w_title'>Projection</span> window, and press the Update
+command's refresh arrow as the window suggests.  This plot shows the
+initial set of weights from a 10x10 subset of the V1 neurons:
 <!-- (i.e., all neurons for this small network): -->
 
 <p class='center'>
