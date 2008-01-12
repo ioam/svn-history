@@ -151,9 +151,6 @@ easier.
 
 <H2>Things we hope to take care of eventually</H2>
 
-<H4>2006/11/09 (RZ): map statistics</H4>
-Add support for automatic generation of reports with statistics about
-maps, e.g. for estimating perceived quantities.
 
 <H4>2006/11/09 (JA): optimizations from c++</H4>
 Need to implement more of the optimizations from the C++ LISSOM code.
@@ -267,9 +264,6 @@ in testimage.py (that uses sheet functions).  Currently commented out;
 may not be a problem.
 
 
-<H4>2006/02/21 (JB): Parameters: remove 'hidden' attribute</H4>
-Instead use (e.g. negative) precendence.
-
 
 <H4>2006/02/21 (JB): PatternGenerator parameters</H4>
 Have size and aspect_ratio Parameters in PatternGenerator so that
@@ -283,17 +277,6 @@ hard.
 <H4>2006/03/07 (JL): change_bounds()</H4>
 make change_bounds() able to enlarge as well as shrink 
 
-
-<H4>2005/01/01: grouping sheets for plotting</H4>
-Add a mechanism to group Sheets into a logical unit for plotting,
-analysis, etc.  For instance, it should be possible to group three
-R,G,B sheets into one eye, two ON and OFF sheets into one LGN area,
-and several V1 layers into one stack.  Such grouping should support
-e.g. presenting a color bitmap to an Eye instead of to R, G, and B
-separately, plotting the resulting activation from the three areas in
-true color, combining ON and OFF plots into one bitmap (by
-subtraction), and measuring a vertically summed orientation map for a
-model using several layers.
 
 <H4>2005/01/01: porting other simulations from c++ lissom</H4>
 Finish porting all categories of simulations from parts II and III of
