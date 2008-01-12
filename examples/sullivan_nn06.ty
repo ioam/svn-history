@@ -18,7 +18,6 @@ $Id$
 __version__='$Revision$'
 
 
-import fixedpoint
 import copy
 
 from math import pi, sqrt
@@ -66,6 +65,10 @@ input_pattern = topo.patterns.basic.Gaussian(
 	
   	  
 # Sheets, connections, and their parameters
+
+
+# Make simulation use fixed-point time.
+topo.sim.set_time(FixedPoint(topo.sim.time(),4))
 
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,

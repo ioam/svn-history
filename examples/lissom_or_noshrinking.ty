@@ -14,7 +14,6 @@ __version__='$Revision$'
 
 
 import numpy
-import fixedpoint
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
@@ -58,6 +57,10 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
 ###########################################
 # build simulation
+
+# Make simulation use fixed-point time.
+topo.sim.set_time(FixedPoint(topo.sim.time(),4))
+
 
 topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
                                   input_generator=combined_inputs,

@@ -31,8 +31,9 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.misc.numbergenerators import UniformRandom
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 
+
 # JABALERT: Shouldn't this script file be renamed lissom_oo_or_sf since it's ON/OFF?
-topo.sim.name = "lissom_oo_or_sf"
+topo.sim.name = "lissom_oo_or_sf" #CB: the name is changed below, too
 
 
 ###########################################
@@ -159,6 +160,11 @@ SharedWeightCFProjection.response_fn = CFPRF_DotProduct_opt()
 
 ###########################################
 # build simulation
+
+# Make simulation use fixed-point time.
+topo.sim.set_time(FixedPoint(topo.sim.time(),4))
+
+
 topo.sim.name='big and small'
 
 topo.sim['Retina'] = GeneratorSheet(nominal_density=24.0,nominal_bounds=BoundingBox(radius=v1size+retinabuffer),input_generator=input_pattern,phase=0.05)

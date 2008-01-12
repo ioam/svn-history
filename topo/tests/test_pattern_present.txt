@@ -13,9 +13,8 @@
 >>> ig=Gaussian(x=UniformRandom())
 >>> R.set_input_generator(ig)
 
->>> topo.sim.time()
-FixedPoint('0.0000', 4)
-
+>>> topo.sim.time()==0
+True
 
 # check for bug:
 # pattern_present() before any run() messes up events
@@ -48,8 +47,8 @@ False
 >>> assert_array_equal(array([[1.,1.],[1.,1.]]),R.activity)
 
 # check time's back to where it should be
->>> topo.sim.time()
-FixedPoint('3.0000', 4)
+>>> topo.sim.time()==3
+True
 
 # check input generator was restored
 >>> R.input_generator is ig
@@ -59,8 +58,8 @@ True
 
 
 >>> topo.sim.run(1)
->>> topo.sim.time() 
-FixedPoint('4.0000', 4)
+>>> topo.sim.time()==4
+True
 
 >>> x_t4 = R.input_generator.x
 >>> a_t4 = copy.deepcopy(R.activity)

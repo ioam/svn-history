@@ -30,7 +30,6 @@ $Id$
 __version__='$Revision$'
 
 
-import fixedpoint
 import numpy
 import copy
 
@@ -102,6 +101,10 @@ for i in xrange(num_lags):
                                       nominal_bounds=BoundingBox(radius=0.5+0.25),
                                       output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                                       measure_maps=False)
+
+# Make simulation use fixed-point time.
+topo.sim.set_time(FixedPoint(topo.sim.time(),4))
+
 
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,
                         nominal_bounds=BoundingBox(radius=0.5))

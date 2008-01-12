@@ -76,6 +76,10 @@ LeakyCFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
 
 ### Build simulation
+
+# Make simulation use fixed-point time.
+topo.sim.set_time(FixedPoint(topo.sim.time(),4))
+
 #
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 topo.sim['V1'] = SLISSOM(tsettle=1,threshold=0.05,noise_rate=0.001,

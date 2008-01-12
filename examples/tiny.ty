@@ -67,6 +67,10 @@ gaussian_generator = topo.patterns.basic.Gaussian(
     aspect_ratio = 7.0/1.5,
     bounds = BoundingBox(radius=0.8))
 
+
+# Make simulation use fixed-point time.
+topo.sim.set_time(FixedPoint(topo.sim.time(),4))
+
 # Sheets, connections, and their parameters
 topo.sim['Retina'] = GeneratorSheet(input_generator=gaussian_generator,
                                     nominal_bounds=BoundingBox(radius=0.6),

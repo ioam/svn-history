@@ -26,7 +26,6 @@ $Id$
 __version__='$Revision$'
 
 
-import fixedpoint
 import numpy
 
 from math import pi, sqrt
@@ -89,6 +88,10 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
 ###########################################
 # build simulation
+
+# Make simulation use fixed-point time.
+topo.sim.set_time(FixedPoint(topo.sim.time(),4))
+
 
 topo.sim['Retina']=GeneratorSheet(nominal_bounds=BoundingBox(radius=1.77),
                                   nominal_density=48.0,

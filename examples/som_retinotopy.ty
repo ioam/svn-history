@@ -56,6 +56,11 @@ input_pattern = topo.patterns.basic.Gaussian(
 weight_seed=locals().get('weight_seed',0)
 numpy.random.seed((weight_seed+67,weight_seed+89))
 
+# Make simulation use fixed-point time.
+from fixedpoint import FixedPoint
+topo.sim.set_time(FixedPoint(topo.sim.time(),4))
+
+
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 
 default_density=locals().get('default_density',10.0)

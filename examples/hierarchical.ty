@@ -68,6 +68,11 @@ CFProjection.response_fn = CFPRF_DotProduct_opt()
 ###########################################
 # build simulation
 
+
+# Make simulation use fixed-point time.
+from fixedpoint import FixedPoint
+topo.sim.set_time(FixedPoint(topo.sim.time(),4))
+
 # Sheets
 topo.sim['LeftRetina'] = GeneratorSheet(input_generator=left_input_pattern,
 	nominal_bounds = BoundingBox(points=((-0.75,-0.5),(0.75,0.5))))

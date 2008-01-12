@@ -79,6 +79,11 @@ scene_seq = [(1,topo.patterns.image.FileImage())]
 # Sheets: A movable eye, a SuperiorColliculus generating eye movements,
 # and a SaccadeController to decode SC activity into eye movement commands.
 
+# Make simulation use fixed-point time.
+from fixedpoint import FixedPoint
+topo.sim.set_time(FixedPoint(topo.sim.time(),4))
+
+
 topo.sim['Eye'] = ShiftingGeneratorSheet(input_sequence=scene_seq)
 
 decoder = topo.sim['SaccadeControl'] = SaccadeController()

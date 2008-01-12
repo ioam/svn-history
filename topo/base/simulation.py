@@ -64,7 +64,6 @@ __version__='$Revision$'
 from parameterizedobject import ParameterizedObject, Parameter
 from parameterclasses import Number, BooleanParameter, StringParameter, wrap_callable
 from copy import copy, deepcopy
-from fixedpoint import FixedPoint
 
 import parameterizedobject
 import bisect
@@ -75,7 +74,8 @@ STOP = "Simulation Stopped"
 # CEBALERT: Is it dangerous to have 'Forever' implemented
 # like this? To start with, min(Forever,1) gives
 # FixedPoint('-1.00,2') i.e. Forever.
-Forever = FixedPoint(-1)
+# Forever = FixedPoint(-1)
+Forever = -1 # float("inf") or does that fail on some platforms?
 
 # Default path to the current simulation, from main
 # Only to be used by script_repr(), to allow it to generate
@@ -107,13 +107,13 @@ class Singleton(object):
         """Method to be overridden if the subclass needs initialization."""
         pass
 
+    # CB: our addition
     def __reduce_ex__(self,p):
         """
         Causes __new__ to be called on unpickling; in turn, __new__
         ensures there is only one instance.
         """
         return (type(self),tuple()) 
-
 
 
 class SimSingleton(Singleton):
@@ -943,15 +943,57 @@ class Simulation(ParameterizedObject):
         """)
     
     eps_to_start = []
+
+    def set_time(self,time):
+        """
+        Set this Simulation's _time to time, and store the type
+        of the time.
+
+        This allows the simulation to use a time type other than
+        the default float.
+
+        For instance, one might wish to use a fixed-point time to
+        avoid the possibility of a floating-point time accumulating
+        rounding errors. Or, one might wish to use a rational time to
+        allow events to happen a certain number of times in a given
+        interval.
+
+
+        An example - change the time type to be a FixedPoint with
+        precision 4 (and do not alter the current time):
+        topo.sim.set_time(FixedPoint(topo.sim.time(),4)
+
+
+        Some potentially useful number classes:
+
+        The Topographica distribution includes one implementation of
+        FixedPoint:
+        from fixedpoint import FixedPoint
+
+        Python includes a Decimal class in the standard library:
+        from decimal import Decimal
+
+        There are several implementations of rational numbers; the
+        following open-source package offers rational numbers (among
+        others):
+        http://www.egenix.com/products/python/mxExperimental/mxNumber/
+        """
+        self._time = time
+        self._time_type = type(time)
+        
     
-    def __init__(self,**params):
+    def __init__(self,initial_time=0.0,**params):
         """
         Create the Simulation and register it with SimSingleton unless
-        register==False.        
+        register==False.
+
+        initial_time allows the starting time and starting time type
+        to be specifed: see set_time().
         """
         super(Simulation,self).__init__(**params)
 
-        self._time = FixedPoint("0.0",4)
+        self.set_time(initial_time)
+
         self._event_processors = {}
 
         if self.register:
@@ -1126,7 +1168,18 @@ class Simulation(ParameterizedObject):
           until    = maximum simulation time to simulate. Default: run indefinitely.
 
         If both duration and until are used, the one that is reached first will apply.
+
+
+        Note that duration and until should be specified in a format suitable for
+        conversion (coercion?) into the Simulation's _time_type.
         """
+        # CEBALERT: need to do something about the global 'Forever';
+        # what it should be probably varies with _time_type.
+        
+        duration = self._time_type(duration)
+        until = self._time_type(until)
+        
+        
         # CEBHACKALERT: If I do topo.sim.run(10), then topo.sim.run(until=3),
         # topo.sim._time returns to 3 (i.e. the simulation time can jump backwards).
         # JP: This because of the weird sim._time = stop_time line at the end of this method.
@@ -1146,11 +1199,11 @@ class Simulation(ParameterizedObject):
         
         # Complicated expression for min(time+duration,until)
         if duration == Forever:
-            stop_time = FixedPoint(until)
+            stop_time = until
         elif until == Forever:
             stop_time = self._time + duration
         else:
-            stop_time = min(self._time+duration,FixedPoint(until))
+            stop_time = min(self._time+duration,until) 
             
         did_event = False
 
