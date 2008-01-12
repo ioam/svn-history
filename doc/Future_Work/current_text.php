@@ -79,15 +79,6 @@ tuning fullfield' tuning curves.  CB: would the tutorial benefit from
 being split up a little more?  Maybe it's getting daunting?
 
 
-<H4>2007/10/08 (CB): test topographica-win</H4>
-Test that results from Windows version match those from the standard
-one. The unit tests and the "make compare_oo_or" test are fine, but I
-can't run the other, smaller tests of all the networks because the
-checked in _DATA files don't seem to work on Windows. I get
-"ImportError: no module named fixedpoint" during unpickling. Importing
-fixedpoint works in Windows, and I can see it there in
-site-packages. So there's some confusion somewhere, and it could be
-difficult to solve. I have no idea whatever about this problem.
 
 
 <H4>2007/10/03 (CB): Less-urgent tkgui cleanup</H4>
@@ -193,16 +184,6 @@ Set c++ lissom params so that topographica doesn't have to set ganglia
 weight mask specially. Generalize oo_or_map_topo.params.
 
 
-<H4>2006/06/19 (CB): things not to pickle</H4>
-e.g. Filename's search_paths attribute shouldn't be pickled.
-Presumably there will be other such items, so should objects have a
-standard attribute/parameter that lists attributes not to pickle? Or
-something like that.  Otherwise, save_snapshot and load_snapshot could
-specifically avoid items. Parameter could have a 'pickle' attribute
-that indicates whether or not to pickle its contents. Could we have some
-global list of objects not to pickle? Need to think about what's best.
-
-
 <H4>2007/03/26 (CB): PatternGeneratorParameter default value</H4>
 Investigate why this:
 "
@@ -264,14 +245,6 @@ in testimage.py (that uses sheet functions).  Currently commented out;
 may not be a problem.
 
 
-
-<H4>2006/02/21 (JB): PatternGenerator parameters</H4>
-Have size and aspect_ratio Parameters in PatternGenerator so that
-subclasses can inherit doc, precedence attributes (etc), but have them
-not used unless a subclass does really use them.  It might be better
-just to create an abstract PatternGenerator class for grouping
-together all patterns using those parameters, which shouldn't be too
-hard.
 
 
 <H4>2006/03/07 (JL): change_bounds()</H4>
