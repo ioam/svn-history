@@ -7,21 +7,23 @@ You will need a writable directory with a large amount of space
 available, about 500 megabytes as of 10/2007.
 
 <P>There are two ways to obtain Topographica: as downloadable
-installation packages, or via
-<A HREF="http://subversion.tigris.org/">Subversion</A> (SVN).  Most users should
-download the installation packages at our Sourceforge
-<A HREF="http://sourceforge.net/project/showfiles.php?group_id=53602">downloads</A>
+installation packages, or via <A
+HREF="http://subversion.tigris.org/">Subversion</A> (SVN).  Most users
+should download the installation packages at our Sourceforge <A
+HREF="http://sourceforge.net/project/showfiles.php?group_id=53602">downloads</A>
 page. Linux, Unix, and Mac OS X users can download either the
 <code>.zip</code> or <code>.tar.gz</code> archive package, unpack it,
 and then follow the <A HREF="#building-topographica">'Building
 Topographica'</A> instructions below.  Depending on your setup, Mac
-users may find that you  need to install some of the programs specified in the
-<A HREF="cvs.html#osx">Mac SVN instructions</A>.  Windows users can download and
-run the self-installing <code>.exe</code> file, and can then skip to
-the <A HREF="#running-topographica">'Running Topographica'</A>
-instructions below.  Users who want more frequent updates, or who need
-to modify the source code, should <A HREF="cvs.html">obtain
-Topographica using SVN</A> instead.
+users may find that you need to install some of the programs specified
+in the <A HREF="cvs.html#osx">Mac SVN instructions</A>.  Windows users
+can download and run the self-installing <a
+href="https://sourceforge.net/project/platformdownload.php?group_id=53602&sel_platform=6233">.exe</a>
+file, and can then skip to the <A
+HREF="#running-topographica">'Running Topographica'</A> instructions
+below.  Users who want more frequent updates, or who need to modify
+the source code, should <A HREF="cvs.html">obtain Topographica using
+SVN</A> instead.
 
 <H3><A NAME="building-topographica">Building Topographica</A></H3>
 
