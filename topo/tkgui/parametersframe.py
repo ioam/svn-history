@@ -105,6 +105,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
 
 
 
+
     def __create_button_panel(self):
         """
         Add the buttons in their own panel (frame).
@@ -243,7 +244,16 @@ class ParametersFrame(TkParameterizedObject,Frame):
     def __grid_param(self,parameter_name,row):
         widget = self.representations[parameter_name]['widget']
         label = self.representations[parameter_name]['label']
-        help_text = getdoc(self.get_parameter_object(parameter_name))
+
+        # CB: (I know about the code duplication here & in tkpo)
+        param_obj = self.get_parameter_object(parameter_name)
+        help_text = getdoc(param_obj)
+
+        if param_obj.default is not None:
+            # some params appear to have no docs!!!
+            if help_text is not None:
+                help_text+="\n\nDefault: %s"%self._object2string(parameter_name,param_obj.default)
+        
 
         label.grid(row=row,column=0,
                    padx=2,pady=2,sticky=E)
@@ -386,33 +396,32 @@ class ParametersFrame(TkParameterizedObject,Frame):
 
         
 
-        
-
     
 
-    def _indicate_tkvar_status(self,param_name):
-        """
-        Calls the superclass's method, then additionally indicates if a parameter
-        differs from the class default (by giving label green background).
-        """
-        TkParameterizedObject._indicate_tkvar_status(self,param_name)
+##     def _indicate_tkvar_status(self,param_name):
+##         """
+##         Calls the superclass's method, then additionally indicates if a parameter
+##         differs from the class default (by giving label green background).
+##         """
+##         TkParameterizedObject._indicate_tkvar_status(self,param_name)
 
-        b = 'white'
+##         b = 'white'
         
-        param,sourcePO = self.get_parameter_object(param_name,with_location=True)
+##         param,sourcePO = self.get_parameter_object(param_name,with_location=True)
 
-        if sourcePO is not self and self.get_parameter_value(param_name) is not self.get_parameter_object(param_name).default:
-            b = "green"
+##         if sourcePO is not self and self.get_parameter_value(param_name) is not self.get_parameter_object(param_name).default:
+##             b = "green"
 
 
-        if hasattr(self,'representations') and param_name in self.representations:
-            try:
-                label = self.representations[param_name]['label']
-                if label is None:  # HACK about the label being none
-                    return
-                label['background']=b
-            except TclError:
-                pass
+##         if hasattr(self,'representations') and param_name in self.representations:
+##             try:
+##                 label = self.representations[param_name]['label']
+##                 if label is None:  # HACK about the label being none
+##                     return
+##                 label['background']=b
+##             except TclError:
+##                 pass
+
 
 
     def _refresh_value(self,param_name):
@@ -480,6 +489,20 @@ class ParametersFrameWithApply(ParametersFrame):
             if self._tkvar_changed(name):
                 return True
         return False
+
+
+    
+    def _handle_gui_set(self,p_name,force=False):
+        TkParameterizedObject._handle_gui_set(self,p_name,force)
+
+        if hasattr(self,'representations') and 'Apply' in self.representations:
+            w=self.representations['Apply']['widget']
+            if self.has_unapplied_change():
+                w['foreground']='blue'
+            else:
+                w['foreground']='black'
+            
+
 
 
     def _close_button(self):

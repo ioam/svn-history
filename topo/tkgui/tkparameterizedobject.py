@@ -163,6 +163,10 @@ def keys_sorted_by_value(d, **sort_kwargs):
 
 
 
+def is_button(widget):
+    return 'command' in widget.config() and not hasattr(widget,'toggle')
+
+
 
 # Buttons are not naturally represented by parameters?
 #
@@ -1141,7 +1145,15 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # label (because maybe more help will be present for what's in
         # the box) but when there's [button], want popup help over the
         # button.)
-        self.balloon.bind(label or frame,getdoc(self.get_parameter_object(name)))
+        param_obj = self.get_parameter_object(name)
+        help_text = getdoc(param_obj)
+
+        if param_obj.default is not None:
+            # some params appear to have no docs!!!
+            if help_text is not None:
+                help_text+="\n\nDefault: %s"%self._object2string(name,param_obj.default)
+        
+        self.balloon.bind(label or frame,help_text)
         
         frame.pack(pack_options)
 
@@ -1252,10 +1264,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         widget=widget_creation_fn(master,name,widget_options)
 
         # Is widget a button (but not a checkbutton)? If so, no label wanted.
-        widget_is_a_button = 'command' in widget.config() and not hasattr(widget,'toggle')
-
         # CEBALERT 'notNonelabel': change to have a label with no text
-        if widget_is_a_button: 
+        if is_button(widget): 
             label = None
         else:
             label = Tkinter.Label(master,text=self.__pretty_print(name))
@@ -1266,7 +1276,6 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             widget.config(state='disabled')
 
         return widget,label
-
 
         
     def _create_button_widget(self,frame,name,widget_options):
@@ -1456,22 +1465,37 @@ class TkParameterizedObject(TkParameterizedObjectBase):
          - red if the text doesn't translate to a correct value
          - black if the GUI and object have the same value
         """
-        f = 'black'
+        status=None
         
         if self._tkvar_changed(param_name):
-            f='blue'
+            status = 'changed'
 
         if self.translators[param_name].last_string2object_failed:
-            f='red'
+            status = 'error'
+
+        self._set_widget_status(param_name,status)
+
+
+    # this scheme is incompatible with tile
+    # (tile having the right idea about how to do this kind of thing!)
+    def _set_widget_status(self,param_name,status):
 
         if hasattr(self,'representations') and param_name in self.representations:
+
+            widget = self.representations[param_name]['widget']
+
+            states = {'error':'red','changed':'blue',None:'black'}
+
             try:
-                label = self.representations[param_name]['label']
-                if label is None:  # see HACK about the label being none
+                if is_button(widget):
                     return
-                label['foreground']=f
-            except TclError:
+                else:
+                    widget.config(foreground=states[status])
+            except TclError:  #CEBALERT uh-oh
                 pass
+
+                            
+
 
 
     def __pretty_print(self,s):
