@@ -492,15 +492,15 @@ class ParametersFrameWithApply(ParametersFrame):
 
 
     
-    def _handle_gui_set(self,p_name,force=False):
-        TkParameterizedObject._handle_gui_set(self,p_name,force)
+##     def _handle_gui_set(self,p_name,force=False):
+##         TkParameterizedObject._handle_gui_set(self,p_name,force)
 
-        if hasattr(self,'representations') and 'Apply' in self.representations:
-            w=self.representations['Apply']['widget']
-            if self.has_unapplied_change():
-                w['foreground']='blue'
-            else:
-                w['foreground']='black'
+##         if hasattr(self,'representations') and 'Apply' in self.representations:
+##             w=self.representations['Apply']['widget']
+##             if self.has_unapplied_change():
+##                 w['foreground']='blue'
+##             else:
+##                 w['foreground']='black'
             
 
 
