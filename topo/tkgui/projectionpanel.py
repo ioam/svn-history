@@ -52,7 +52,7 @@ class ProjectionSheetPanel(TemplatePlotGroupPanel):
 
     sheet_type = ProjectionSheet
 
-    auto_refresh = BooleanParameter(False) # these panels can be slow to refresh
+
 
     # CEBHACKALERT: valid_context() needs to be more specific in
     # subclasses.  How to allow valid_context() to work for more
@@ -75,6 +75,9 @@ class ProjectionSheetPanel(TemplatePlotGroupPanel):
 
     def __init__(self,console,master,plotgroup,**params):
         super(ProjectionSheetPanel,self).__init__(console,master,plotgroup,**params)
+
+        self.plotgroup.auto_refresh=False
+        
         self.pack_param('sheet',parent=self.control_frame_3,
             on_modify=self.sheet_change,side='left',expand=1,
             widget_options={'new_default':True,
