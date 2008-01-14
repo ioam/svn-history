@@ -987,7 +987,7 @@ class CFSheet(ProjectionSheet):
 	(There is one UnitView for each Projection to this CFSheet).
 
 	Each UnitView is then added to the sheet_views of its source sheet.
-	It returns the list of all UnitView for the given unit.
+	It returns the list of all UnitViews for the given unit.
 	"""     
         for p in self.in_connections:
             if not isinstance(p,CFProjection):

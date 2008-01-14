@@ -43,7 +43,7 @@ class SampleHebbian(LearningFn):
     def __init__(self,**params):
         super(SampleHebbian,self).__init__(**params)
         self.value=self.value_0
-    
+        
     def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
 	"""
         Update the value of the given weights matrix based on the

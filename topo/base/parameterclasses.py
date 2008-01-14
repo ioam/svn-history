@@ -109,7 +109,7 @@ class Dynamic(Parameter):
     # feature request 1864370. When working on that task, note that
     # detection of a dynamic generator by 'callable' needs to be
     # replaced by something that matches whatever Dynamic becomes
-    # capabale of using.
+    # capable of using.
     
     time_fn = None # could add a slot for time_fn to allow instances
                    # to override

@@ -590,7 +590,7 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
                                    name=proj.name) for proj in sheet.in_connections]
 
 
-
+# JABALERT: Needs a new name.
 class TwoDThingPlotGroup(ProjectionSheetPlotGroup):
     """
     A ProjectionSheetPlotGroup capable of generating coordinates on a 2D grid.
