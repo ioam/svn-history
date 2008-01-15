@@ -84,7 +84,7 @@ tk-uninstall:
 ##############################################################
 # ipython (improved interactive prompt)
 #
-IPYTHON = ipython-0.7.3
+IPYTHON = ipython-0.8.2
 IPYTHON_UNINSTALL =  ${PYTHON_LIB}/site-packages/IPython
 
 ipython: ${IPYTHON}.tar.gz python 
