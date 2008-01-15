@@ -75,6 +75,47 @@ class CommandPrompt2(CommandPrompt):
 
 
 
+
+class IPCommandPrompt(object):
+    """
+    Control over IPython prompt.
+
+    e.g.
+      IPCommandPrompt.set_format(IPCommandPrompt.simtime_format)
+      IPCommandPrompt.set_format('\# ')  # prompt no.
+      IPCommandPrompt.set_format('\N ')  # prompt no., no colors
+      IPCommandPrompt.set_format('${my_var}>>> ')  # evaluate my_var each time
+      
+
+    Use one of the predefined alternatives, or use your own format - see
+    http://ipython.scipy.org/doc/manual/node12.html#SECTION000125000000000000000
+    """
+
+    # Predefined alternatives
+    basic_format   = 'Topographica>>> '
+    simtime_format = 'Topo_t${topo.sim.time()}>>> '
+    simtime_cmd_format = 'Topo_t${topo.sim.time()}_c\\#>>> '
+    
+    # Select from one of the predefined alternatives (or any other format):
+
+    _format = basic_format
+
+    @classmethod
+    def set_format(cls,format):
+        import __main__
+        IP = __main__.__dict__['__IP']
+        IP.outputcache.prompt1.p_template=format
+        IP.outputcache.prompt1.set_p_str()
+        cls._format = format
+
+    @classmethod
+    def get_format(cls):
+        return cls._format
+
+# could do same for prompt2
+
+
+
 # Use to define global constants
 global_constants = {'pi':math.pi}
 
@@ -265,11 +306,16 @@ def process_argv(argv):
     if option.gui:
         topo.guimain.title(topo.sim.name)
 
+
+    ## INTERACTIVE SESSION BEGINS HERE (i.e. can't have anything but
+    ## some kind of cleanup code afterwards)
     if os.environ.get('PYTHONINSPECT'):
         ### First try to get IPython
         try:
+            # CB: should probably allow a way for users to pass things to IPython? Or at
+            # least setup some kind of topogrpcahi ipython config file
             from IPython.Shell import IPShell
-            IPShell(['-noconfirm_exit','-nobanner','-pi1','Topographica_t${topo.sim.time()}_c\#>>> '],user_ns=__main__.__dict__).mainloop(sys_exit=1)
+            IPShell(['-noconfirm_exit','-nobanner','-pi1',IPCommandPrompt.get_format()],user_ns=__main__.__dict__).mainloop(sys_exit=1)            
         except ImportError:
             ## Then at least try to get readline
             try:
@@ -279,5 +325,6 @@ def process_argv(argv):
             else:
                 import rlcompleter
                 readline.parse_and_bind("tab: complete")
+
         
 
