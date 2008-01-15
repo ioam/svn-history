@@ -491,6 +491,14 @@ class ParametersFrameWithApply(ParametersFrame):
         return False
 
 
+
+    def _indicate_tkvar_status(self,param_name,status=None):
+
+        if self._tkvar_changed(param_name):
+            status = 'changed'
+
+        super(ParametersFrameWithApply,self)._indicate_tkvar_status(param_name,status)
+        
     
 ##     def _handle_gui_set(self,p_name,force=False):
 ##         TkParameterizedObject._handle_gui_set(self,p_name,force)

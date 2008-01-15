@@ -1460,18 +1460,13 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
 
     # CB: the colors etc for indication are only temporary
-    def _indicate_tkvar_status(self,param_name):
+    def _indicate_tkvar_status(self,param_name,status=None):
         """
         Set the parameter's label to:
          - blue if the GUI value differs from that set on the object
          - red if the text doesn't translate to a correct value
          - black if the GUI and object have the same value
         """
-        status=None
-        
-        if self._tkvar_changed(param_name):
-            status = 'changed'
-
         if self.translators[param_name].last_string2object_failed:
             status = 'error'
 
