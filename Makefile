@@ -100,14 +100,6 @@ topographica: external Makefile
 	echo "#CB: a reg.exp. would simplify the line below!" >> topographica
 	echo "# do I need to close the file or does that happen automatically?" >> topographica
 	echo "from os import popen" >> topographica
-# JPALERT: Hey! Please stop writing code that only works when 
-# topographica is run from within $TOPOROOT.  How hard is
-# it to put in a path, anyway?  I think instead of fixing these over 
-# and over I'm just going to put in pissy ALERTs instead.  Maybe  
-# the automated tests should run topographica from outside $TOPOROOT
-# just to catch all these things.  (Though it probably won't catch
-# this one, since it doesn't cause a crash; it just prints a  cryptic message 
-# on startup.)
 	echo "try: topo.version = popen('svn info "${PREFIX}"| grep \'Last Changed Rev:\'').read().split(': ')[1].rstrip()" >> topographica
 	echo "#try: topo.version = popen('svnversion -n').read()" >> topographica
 	echo "except: pass" >> topographica
