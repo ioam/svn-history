@@ -691,6 +691,25 @@ player-clean:
 player-uninstall:
 	rm -rf player ${foreach f,${PLAYER_UNINSTALL}, ${PREFIX}/${f}}
 
+
+
+##############################################################
+# progressbar
+#
+PROGRESSBAR = progressbar-2.2
+
+PROGRESSBAR_UNINSTALL += ${PYTHON_LIB}/site-packages/progressbar.py
+
+progressbar: ${PROGRESSBAR}.tar.gz python
+	tar -xozf ${PROGRESSBAR}.tar.gz
+	cd ${PROGRESSBAR}; ${PREFIX}/bin/python setup.py install
+	touch progressbar
+
+progressbar-clean:
+	rm -rf ${PROGRESSBAR}
+progressbar-uninstall:
+	rm -rf progressbar ${foreach f,${PROGRESSBAR_UNINSTALL}, ${PREFIX}/${f}}
+
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
