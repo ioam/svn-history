@@ -351,7 +351,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
         parameter_window.title(PO_to_edit.name+' parameters')
 
         ### CEBALERT: confusing? ###
-        title=Tkinter.Label(parameter_window, text="("+param_name + " of " + self._extraPO.name + ")")
+        title=Tkinter.Label(parameter_window, text="("+param_name + " of " + (self._extraPO.name or 'class '+self._extraPO.__name__) + ")")
         title.pack(side = "top")
         self.balloon.bind(title,getdoc(self.get_parameter_object(param_name,self._extraPO)))
         ############################
