@@ -94,6 +94,8 @@ $Id$
 # by the user...check that we don't actually introduce a change here by
 # displaying numbers!)
 
+# ENHANCEMENT: right click menu that contains option to make number
+# dynamic or not (i.e. change representation).
 
 
 
@@ -1652,37 +1654,26 @@ class String_ObjectTranslator(Translator):
 class CSPTranslator(String_ObjectTranslator):
         
     def string2object(self,string_):
-        return self.cache.get(string_) or string_
+        obj = self.cache.get(string_) or string_
 
-    # (should be simplified but this whole thing will be replaced anyway)
+        ## instantiate if it's just a class
+        if isinstance(obj,type) and isinstance(string_,str):
+            obj = obj()
+            self.cache[string_]=obj
+
+        return obj
+        
     def object2string(self,object_):
-        string_ = object_ 
+        ## replace class if we already have object
         for name,obj in self.cache.items():
-            if obj==object_:
-                string_ = name
-                break
-            elif type(obj)==type(object_):  # for CSParam, assume that matching class
-                string_ = name              # means we already have a better object from
-                                            # whoever called this!
-                self.cache[name]=object_ # update translator
-                break
-        return string_
+            if type(object_)==obj or type(object_)==type(obj):
+                self.cache[name]=object_
+        ##
 
+        return inverse(self.cache).get(object_) or object_
+    
     def update(self,current_value=None):
-        # store list of OBJECTS (not classes) for ClassSelectorParameter's range
-        # (Although CSParam's range uses classes; allows parameters set on the
-        # options to persist - matches original parametersframe.)
-        self.cache = {}
-        for class_name,class_ in self.param.get_range().items():
-            self.cache[class_name] = class_()
-
-        # we want the current_param_value to be in this dictionary, so we replace
-        # the entry that has the same class
-##         if current_value is not None:
-##             for class_name,obj in self.cache.items():
-##                 if type(current_value)==type(obj):
-##                     self.cache[class_name] = current_value
-##                     break
+        self.cache = self.param.get_range()
 
 
 
