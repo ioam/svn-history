@@ -225,6 +225,7 @@ def process_argv(argv):
     """
 
     # Initial preparation
+    import __main__
     for (k,v) in global_constants.items():
         exec '%s = %s' % (k,v) in __main__.__dict__
 
@@ -261,23 +262,22 @@ def process_argv(argv):
     if not something_executed and not os.environ.get('PYTHONINSPECT'):
         interactive()
 
-    if os.environ.get('PYTHONINSPECT'):
-        # Use readline if available
-        try:
-            import readline
-        except ImportError:
-            print "Module readline not available.\nHistory and completion support disabled."
-        else:
-            #set up command completion
-            import rlcompleter
-            readline.parse_and_bind("tab: complete")
-    else:
-        # IPython (unlike Python) stays open no matter what interactive is set to,
-        # so we need to call exit
-        sys.exit()
-
     if option.gui:
         topo.guimain.title(topo.sim.name)
 
-    
+    if os.environ.get('PYTHONINSPECT'):
+        ### First try to get IPython
+        try:
+            from IPython.Shell import IPShell
+            IPShell(['-noconfirm_exit','-nobanner','-pi1','Topographica_t${topo.sim.time()}_c\#>>> '],user_ns=__main__.__dict__).mainloop(sys_exit=1)
+        except ImportError:
+            ## Then at least try to get readline
+            try:
+                import readline
+            except ImportError:
+                print "Module readline not available.\nHistory and completion support disabled."
+            else:
+                import rlcompleter
+                readline.parse_and_bind("tab: complete")
         
+
