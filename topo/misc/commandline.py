@@ -52,7 +52,7 @@ class CommandPrompt(object):
     # (or other such solutions)
     # Predefined alternatives
     basic_format   = '"Topographica>>> "'
-    simtime_format = '"Topographica_t%g>>> " % topo.sim.time()'
+    simtime_format = '"topo_t%g>>> " % topo.sim.time()'
     ansi_format    = '"\x1b[32;40;1mTopographica\x1b[33;40;1m_t%g>>>\x1b[m " % topo.sim.time()'
 
     # Select from one of the predefined alternatives (or any other format):
@@ -93,12 +93,12 @@ class IPCommandPrompt(object):
 
     # Predefined alternatives
     basic_format   = 'Topographica>>> '
-    simtime_format = 'Topo_t${topo.sim.time()}>>> '
+    simtime_format = 'topo_t${topo.sim.time()}>>> '
     simtime_cmd_format = 'Topo_t${topo.sim.time()}_c\\#>>> '
     
     # Select from one of the predefined alternatives (or any other format):
 
-    _format = basic_format
+    _format = simtime_format
 
     @classmethod
     def set_format(cls,format):
