@@ -167,8 +167,7 @@ def boolean_option_action(option,opt_str,value,parser):
 
 
 def interactive():
-    os.environ['PYTHONINSPECT'] = '1' 
-    print BANNER    
+    os.environ['PYTHONINSPECT']='1'
 
 # CB: note that topographica should stay open if an error occurs
 # anywhere after a -i (i.e. in a -c command or script)
@@ -289,7 +288,6 @@ def process_argv(argv):
     """
     Process command-line arguments (minus argv[0]!), rearrange and execute.
     """
-
     # Initial preparation
     import __main__
     for (k,v) in global_constants.items():
@@ -320,18 +318,16 @@ def process_argv(argv):
         if not args:
             break
 
-        
+
     # If no scripts and no commands were given, pretend -i was given.
-    if not something_executed and not os.environ.get('PYTHONINSPECT'):
-        interactive()
-
-    if option.gui:
-        topo.guimain.title(topo.sim.name)
-
+    if not something_executed: interactive()
+     
+    if option.gui: topo.guimain.title(topo.sim.name)
 
     ## INTERACTIVE SESSION BEGINS HERE (i.e. can't have anything but
     ## some kind of cleanup code afterwards)
     if os.environ.get('PYTHONINSPECT'):
+        print BANNER    
         # CB: should probably allow a way for users to pass things to
         # IPython? Or at least setup some kind of topogrpcahi ipython
         # config file
