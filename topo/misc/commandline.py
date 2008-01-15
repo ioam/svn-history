@@ -28,24 +28,6 @@ licensing information.
 
 
 class CommandPrompt(object):
-    """
-    Provides a dynamically updated command prompt.
-
-    The variable sys.ps1 controls Python's command prompt.  If that
-    variable is set to a non-string object, then the object's
-    __str__() method is called before displaying the prompt.  This
-    class provides a __str__() method that evaluates this class's
-    'format' variable in __main__, and then returns the result.  To
-    use this, just set sys.ps1 to an instance of this class.
-
-    The prompt is then controlled by the class attribute 'format'.
-    Several predefined formats are provided, and any of these (or any
-    arbitrary string) can be used by setting the class attribute
-    'format' to their values.  For example, user code can turn on ANSI
-    colors using:
-    
-      CommandPrompt.format=CommandPrompt.ansi_format
-    """
 
     # For portable ANSI output, could use TerminalController from:
     # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/475116
@@ -62,7 +44,7 @@ class CommandPrompt(object):
     def split(self,*args):
         return str(self).split(*args)
 
-class CommandPrompt2(CommandPrompt):
+
     """
     Provides a dynamically updated command prompt for sys.ps2.
 
@@ -75,44 +57,87 @@ class CommandPrompt2(CommandPrompt):
 
 
 
-
-class IPCommandPrompt(object):
+##### Command-prompt formatting
+#    
+class IPCommandPromptHandler(object):
     """
-    Control over IPython prompt.
-
-    e.g.
-      IPCommandPrompt.set_format(IPCommandPrompt.simtime_format)
-      IPCommandPrompt.set_format('\# ')  # prompt no.
-      IPCommandPrompt.set_format('\N ')  # prompt no., no colors
-      IPCommandPrompt.set_format('${my_var}>>> ')  # evaluate my_var each time
-      
-
-    Use one of the predefined alternatives, or use your own format - see
-    http://ipython.scipy.org/doc/manual/node12.html#SECTION000125000000000000000
+    Allows control over IPython's dynamic command prompts.
     """
-
-    # Predefined alternatives
-    basic_format   = 'Topographica>>> '
-    simtime_format = 'topo_t${topo.sim.time()}>>> '
-    simtime_cmd_format = 'Topo_t${topo.sim.time()}_c\\#>>> '
-    
-    # Select from one of the predefined alternatives (or any other format):
-
-    _format = simtime_format
+    _format = ''
+    _prompt = ''
 
     @classmethod
     def set_format(cls,format):
+        """
+        Set IPython's prompt template to format.
+        """
         import __main__
         IP = __main__.__dict__['__IP']
-        IP.outputcache.prompt1.p_template=format
-        IP.outputcache.prompt1.set_p_str()
+        prompt = getattr(IP.outputcache,self._prompt)
+        prompt.p_template = format
+        prompt.set_p_str()        
         cls._format = format
 
     @classmethod
     def get_format(cls):
+        """
+        Return the current template.
+        """
         return cls._format
 
-# could do same for prompt2
+    
+class CommandPrompt(IPCommandPromptHandler):
+    """
+    Control over input prompt.
+
+    Several predefined formats are provided, and any of these (or any
+    arbitrary string) can be used by calling set_format() with their
+    values.
+
+    See the IPython manual for details:
+    http://ipython.scipy.org/doc/manual/node12.html#SECTION000125000000000000000
+    Examples:
+      # Use one of the predefined formats:
+      CommandPrompt.set_format(CommandPrompt.basic_format)
+      # Just print the command number:
+      CommandPrompt.set_format('\# ')
+      # Print the command number but don't use color:
+      CommandPrompt.set_format('\N ')
+      # Print the value of my_var at each prompt:
+      CommandPrompt.set_format('${my_var}>>> ')        
+    """
+    _prompt = 'prompt1'
+    
+    # Predefined alternatives
+    basic_format   = 'Topographica>>> '
+    simtime_format = 'topo_t${topo.sim.time()}>>> '
+    simtimecmd_format = 'topo_t${topo.sim.time()}_c\\#>>> '
+    
+    _format = simtimecmd_format
+
+
+class CommandPrompt2(IPCommandPromptHandler):
+    """
+    Control over continuation prompt.
+
+    (See CommandPrompt.)
+    """
+    _prompt = 'prompt2'
+    basic_format = '   .\\D.: '
+    _format = basic_format
+
+
+class OutputPrompt(IPCommandPromptHandler):
+    """
+    Control over output prompt.
+
+    (See CommandPrompt.)
+    """
+    _prompt = 'prompt_out'
+    basic_format = 'Out[\#]:'
+    _format = basic_format
+
+#####
 
 
 
@@ -269,9 +294,6 @@ def process_argv(argv):
     import __main__
     for (k,v) in global_constants.items():
         exec '%s = %s' % (k,v) in __main__.__dict__
-
-    sys.ps1 = CommandPrompt()
-    sys.ps2 = CommandPrompt2()
     
     exec_startup_files()
 
@@ -310,21 +332,15 @@ def process_argv(argv):
     ## INTERACTIVE SESSION BEGINS HERE (i.e. can't have anything but
     ## some kind of cleanup code afterwards)
     if os.environ.get('PYTHONINSPECT'):
-        ### First try to get IPython
-        try:
-            # CB: should probably allow a way for users to pass things to IPython? Or at
-            # least setup some kind of topogrpcahi ipython config file
-            from IPython.Shell import IPShell
-            IPShell(['-noconfirm_exit','-nobanner','-pi1',IPCommandPrompt.get_format()],user_ns=__main__.__dict__).mainloop(sys_exit=1)            
-        except ImportError:
-            ## Then at least try to get readline
-            try:
-                import readline
-            except ImportError:
-                print "Module readline not available.\nHistory and completion support disabled."
-            else:
-                import rlcompleter
-                readline.parse_and_bind("tab: complete")
+        # CB: should probably allow a way for users to pass things to
+        # IPython? Or at least setup some kind of topogrpcahi ipython
+        # config file
+        from IPython.Shell import IPShell
+        IPShell(['-noconfirm_exit','-nobanner',
+                 '-pi1',CommandPrompt.get_format(),
+                 '-pi2',CommandPrompt2.get_format(),
+                 '-po',OutputPrompt.get_format()],
+                user_ns=__main__.__dict__).mainloop(sys_exit=1)            
 
         
 
