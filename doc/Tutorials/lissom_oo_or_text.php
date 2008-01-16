@@ -101,7 +101,7 @@ network.
 <p></p>
 </li>
 
-<li>The <a name="Activity-plot"><span class='t_item'>Activity</span></a> 
+<li>The <a name="Activity-plot"><span class='w_title'>Activity</span></a> 
 window should then show the result:
 <p class='center'>
 <img src="images/activity_line_oo.png" alt="Response to a line"
@@ -145,12 +145,11 @@ explained below.
 <li> To help understand the response patterns in V1, we can look at
 the weights to V1 neurons.  These weights were learned previously, by
 presenting 10000 pairs of oriented Gaussian patterns at random angles
-and positions.  To plot a single neuron, select
-<a name="ConnectionFields-plot"><span class='t_item'>Connection Fields</span></a> from the <span
-class='t_item'>Plots</span> menu, then select <span
-class='t_item'>V1</span> from the <span class='t_item'>Sheet</span>
-drop-down list. This will plot the synaptic strengths of connections
-to the neuron in the center of the cortex (by default):
+and positions.  To plot a single neuron, select <a
+name="ConnectionFields-plot"><span class='t_item'>Connection
+Fields</span></a> from the <span class='t_item'>Plots</span>
+menu. This will plot the synaptic strengths of connections to the
+neuron in the center of the cortex (by default):
 
 <p class="center">
 <img src="images/unit_weights_0_0_oo.png" alt="Weights of one neuron"
