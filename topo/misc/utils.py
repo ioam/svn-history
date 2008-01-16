@@ -369,14 +369,14 @@ class ExtraPickler(Singleton):
 
     def add(self,item):
         self.extras.append(item)
-    
-    def __getstate__(self):
+
+    def __reduce_ex__(self,p):
         states = {}
         for extra in self.extras:
             d = {}
             exec "from %s import %s"%(extra[0],extra[1]) in d
             states[extra] = d[extra[1]]
-        return {'extras':self.extras,'states':states}
+        return (type(self),tuple(),{'extras':self.extras,'states':states})
                 
     def __setstate__(self,state):
         import __main__
