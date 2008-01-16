@@ -1621,7 +1621,10 @@ class Eval_ReprTranslator(Translator):
         if object_==self.last_object:
             return self.last_string
         else:
-            return repr(object_)
+            string_ = repr(object_)
+            self.last_object = object_
+            self.last_string = string_
+            return string_
 
 
         
