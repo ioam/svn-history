@@ -14,14 +14,14 @@ uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall pmw-uni
 ##############################################################
 # Python (interpreted language)
 #
-PYTHON = Python-2.4.4
+PYTHON = Python-2.5.1
 
-PYTHON_LIB  = lib/python2.4
-PYTHON_INC  = include/python2.4
-PYTHON_CONF = lib/python2.4/config
+PYTHON_LIB  = lib/python2.5
+PYTHON_INC  = include/python2.5
+PYTHON_CONF = lib/python2.5/config
 
-PYTHON_UNINSTALL += bin/idle bin/python bin/pydoc bin/python2.4 
-PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.4
+PYTHON_UNINSTALL += bin/idle bin/python bin/pydoc bin/python2.5 
+PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.5
 
 
 # LDFLAGS sets ${PREFIX}/lib as the LD_LIBRARY in the binary
@@ -409,30 +409,6 @@ gnosis-clean:
 	rm -rf ${GNOSIS} 
 gnosis-uninstall:
 	rm -rf gnosis $(foreach f, ${GNOSIS_UNINSTALL}, ${PREFIX}/${f})
-
-
-
-##############################################################
-# ctypes (used by pyaudiolab)
-#
-
-# CBALERT: ctypes is present in Python 2.5, so remove it
-# if python is updated!
-CTYPES = ctypes-1.0.1
-CTYPES_UNINSTALL =  ${PYTHON_LIB}/site-packages/ctypes
-CTYPES_UNINSTALL += ${PYTHON_LIB}/_ctypes.so ${PYTHON_LIB}/_ctypes_test.so
-
-ctypes: ${CTYPES}.tar.gz python
-	tar -xozf ${CTYPES}.tar.gz
-	cd ${CTYPES}; ${PREFIX}/bin/python setup.py build
-	cd ${CTYPES}; ${PREFIX}/bin/python setup.py install
-	touch ctypes
-
-ctypes-clean:
-	rm -rf ${CTYPES}
-ctypes-uninstall:
-	rm -rf ctypes ${CTYPES} $(foreach f, ${CTYPES_UNINSTALL}, ${PREFIX}/${f})
-
 
 
 
