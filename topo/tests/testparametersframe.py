@@ -133,7 +133,7 @@ class TestParametersFrameWithApply(unittest.TestCase):
 # for non-instantiated params etc
 
             
-
+# test apply disabling etc
     
         
 

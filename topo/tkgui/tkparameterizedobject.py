@@ -115,6 +115,7 @@ $Id$
 
 import __main__, sys
 import Tkinter
+import copy
 
 from inspect import getdoc
 from Tkinter import BooleanVar, StringVar, Frame, Checkbutton, \
@@ -786,13 +787,19 @@ class TkParameterizedObjectBase(ParameterizedObject):
         self.translators[name]=translator_type(param,initial_value=self.get_parameter_value(name))
 
 
-    def _object2string(self,param_name,obj):
+    # CEB: doc replace & generalize,  or change
+    def _object2string(self,param_name,obj,replace=True):
         """
         If val is one of the objects in param_name's translator,
         translate to the string.
         """
-        self.debug("object2string_ifreq(%s,%s)"%(param_name,obj))
+        self.debug("object2string(%s,%s)"%(param_name,obj))
         translator = self.translators[param_name]
+
+        if replace is False:
+            translator=copy.deepcopy(translator)
+            
+        
         return translator.object2string(obj)              
 
 
@@ -804,7 +811,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         to the object; otherwise, call convert_string2obj on the
         string.
         """
-        self.debug("string2object_ifreq(%s,%s)"%(param_name,string))
+        self.debug("string2object(%s,%s)"%(param_name,string))
         translator = self.translators[param_name]
         o = translator.string2object(string)
         self.debug("...s2o return %s, type %s"%(o,type(o)))
@@ -1153,7 +1160,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         if param_obj.default is not None:
             # some params appear to have no docs!!!
             if help_text is not None:
-                help_text+="\n\nDefault: %s"%self._object2string(name,param_obj.default)
+                help_text+="\n\nDefault: %s"%self._object2string(name,param_obj.default,replace=False)
         
         self.balloon.bind(label or frame,help_text)
         
@@ -1637,15 +1644,8 @@ class String_ObjectTranslator(Translator):
     def update(self):
         self.cache = self.param.get_range()
         
-        #for object_name,object_ in self.param.get_range().items():
-        #    self.cache[object_name] = object_
         
 
-
-# Shouldn't have to distinguish SelectorParameters, but since we
-# instantiate the choices for ClassSelectorParameter, we have to.
-# CEBALERT: let's not instantiate the choices in the list until we
-# have to. (See note below.)
 class CSPTranslator(String_ObjectTranslator):
         
     def string2object(self,string_):
@@ -1667,7 +1667,7 @@ class CSPTranslator(String_ObjectTranslator):
 
         return inverse(self.cache).get(object_) or object_
     
-    def update(self,current_value=None):
+    def update(self):
         self.cache = self.param.get_range()
 
 

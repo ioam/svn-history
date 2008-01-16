@@ -328,10 +328,10 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         csp_param = self.f.get_parameter_object('csp')
         csp_tkvar = self.f._tkvars['csp']
 
-        # For class selector parameters, the tkpo should instantiate
-        # all choices on pack()ing of the parameter and then maintain
-        # the instances (allows persistence of edits to properties of
-        # the classes during the lifetime of a window).
+        # should maintain instances once created (allows persistence
+        # of edits to properties of the classes during the lifetime of
+        # a window).
+
         csp_tkvar.set('Ring')
         self.assertEqual(type(self.f.csp),topo.patterns.basic.Ring)
         ring_id = id(self.f.csp)
@@ -346,7 +346,8 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         self.assertEqual(id(self.f.csp),rectangle_id)
         
         # test sorting
-        # CB: add
+        # CB: add instantiation test, switching test, etc
+
 
 
     def test_string_parameter(self):

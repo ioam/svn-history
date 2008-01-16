@@ -252,7 +252,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
         if param_obj.default is not None:
             # some params appear to have no docs!!!
             if help_text is not None:
-                help_text+="\n\nDefault: %s"%self._object2string(parameter_name,param_obj.default)
+                help_text+="\n\nDefault: %s"%self._object2string(parameter_name,param_obj.default,replace=False)
         
 
         label.grid(row=row,column=0,
@@ -500,15 +500,17 @@ class ParametersFrameWithApply(ParametersFrame):
         super(ParametersFrameWithApply,self)._indicate_tkvar_status(param_name,status)
         
     
-##     def _handle_gui_set(self,p_name,force=False):
-##         TkParameterizedObject._handle_gui_set(self,p_name,force)
+    def _handle_gui_set(self,p_name,force=False):
+        TkParameterizedObject._handle_gui_set(self,p_name,force)
 
-##         if hasattr(self,'representations') and 'Apply' in self.representations:
-##             w=self.representations['Apply']['widget']
-##             if self.has_unapplied_change():
-##                 w['foreground']='blue'
-##             else:
-##                 w['foreground']='black'
+        if hasattr(self,'representations') and 'Apply' in self.representations:
+            w=self.representations['Apply']['widget']
+            if self.has_unapplied_change():
+                state='normal'
+            else:
+                state='disable'
+
+            w.config(state=state)
             
 
 
