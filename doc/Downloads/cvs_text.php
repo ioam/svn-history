@@ -79,7 +79,7 @@ appearing to hang at certain points), as there are some extremely
 large files involved.
 
 
-<H4><A NAME="osx">Mac OS X</A></H4>
+<H4><A NAME="osx">Mac OS X:</A></H4>
 
 Topographica can be built on Mac OS X (or later) using the <A
 HREF="#linux">Linux</A> instructions above, but you will likely first
@@ -151,36 +151,66 @@ removing LDFLAGS as described in index_text.php).-->
 <!--  Topographica on Windows, compiling everything from source...
 <!--  see the list of current tasks.-->
 
-<!--CEBALERT Windows instructions are out of date
-http://tortoisesvn.tigris.org/
---> 
+<P><em>Please note that we have only recently begun using SVN
+(having used a different system in the past), and we have not had much
+opportunity to test the SVN setup on Windows. Therefore, the following
+instructions might change.</em>
 
 <P>Under Windows, we recommend installing
-<A HREF="http://www.tortoisecvs.org/">TortoiseCVS</A> (tested 11/2006
-using TortoiseCVS 1.8.29). TortoiseCVS includes everything required
+<A HREF="http://www.tortoisesvn.net/">TortoiseSVN</A> (tested 01/2008
+using TortoiseSVN 1.4.7), which comes as an easy-to-install
+executable. In general, TortoiseSVN users can easily translate
+commandline SVN instructions (e.g. those we give for linux users) by
+right clicking in an SVN-controlled directory and choosing the
+appropriate command from the TortoiseSVN submenu.
+
+<!--TortoiseCVS includes everything required
 for read/write access, but if you are using another CVS client
 you might also need an SSH client such as
 <A HREF="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</A>.
+-->
 
-<P>Then open the Windows directory where you want the files to be
-located on your machine, right click, select "CVS Checkout", fill in
-CVSROOT with the appropriate <code>$TOPOROOT</code>, and type in
-<code>topographica</code> for the module name.  Before clicking OK,
-select the <code>Revision</code> tab and select <code>Choose branch or
-tag</code>, filling in <code>LATEST_STABLE</code> as the tag name
-(unless you want the bleeding-edge version).  When you click OK, the
-files should be downloaded for you (though it might take a little time). 
+<P>After installing TortoiseSVN if you do not already have it, open
+the Windows directory where you want the Topographica files to be
+located on your machine (you might first wish to create a
+'topographica' folder), then right click, select <code>SVN
+Checkout</code>, and fill in the <code>URL of repository</code> with
+<pre>
+https://topographica.svn.sourceforge.net/svnroot/topographica/tags/LATEST_STABLE/topographica
+</pre>
+
+Ensure that the <code>Checkout directory</code> shows the location
+into which you want the files to be placed (e.g. <code>c:\Documents
+and Settings\username\My Documents\topographica</code>), then
+click <code>OK</code>. As the files download, you will be informed of
+the transfer speed and amount transferred; the total as of 01/2008 is
+about 85 MBytes.
 
 <P>Following this step, it is necessary to obtain the Windows versions
-of Topographica's support tools. Change into the <code>topographica</code>
-directory that you just checked out, and again right click and select
-"CVS Checkout". Re-use the settings from before, but change the module name 
-from <code>topographica</code> to <code>topographica-win</code>.
-<!--CB: should we say to set the revision tag again this time, or does it 
-remain the same? I forgot to check.-->
-The wait to download will be longer this time, since the Windows support
-tools are distributed as binaries.
+of Topographica's support tools. In the folder that contains your
+new <code>topographica</code> folder (i.e. the parent folder
+of <code>topographica</code>), right click again and choose <code>SVN
+Checkout</code> as before. Edit the last part of <code>URL of
+repository</code>, changing
+<code>topographica</code> to <code>topographica-win</code>. The URL
+should then read: 
+<pre>
+https://topographica.svn.sourceforge.net/svnroot/topographica/tags/LATEST_STABLE/topographica-win
+</pre>
+After clicking <code>OK</code>, you will have to wait longer
+than last time, since the Windows support tools are distributed as
+binaries (the total as of 01/2008 is about 125 MBytes).
 
+<P>Once the transfer has completed, move
+the <code>topographica-win</code> folder into
+the <code>topographica</code> folder (e.g. right click and hold down
+on <code>topographica-win</code>, drag over <code>topographica</code>,
+let go, then choose <code>Move</code>).
+
+<P>Now that you have TortoiseSVN installed, and the SVN version of
+Topographica, you can return to instructions
+for <a href="index.html#building-topographica">building
+Topographica</a>.
 
 <H4><A NAME="windows">Cygwin:</A></H4>
 
@@ -255,8 +285,8 @@ directory of the SVN repository in your web browser, or type
 
 
 
-<P>Windows TortoiseCVS users can right click in the topographica
-directory and select <code>CVS Update</code> to get the new files.
+<P>Windows TortoiseSVN users can right click in the topographica
+directory and select <code>SVN Update</code> to get the new files.
 
 <P>Note that updating the external/ subdirectory sometimes takes a
 long time, if some of the external packages have been upgraded, and in

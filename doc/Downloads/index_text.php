@@ -13,8 +13,8 @@ should download the installation packages at our Sourceforge <A
 HREF="http://sourceforge.net/project/showfiles.php?group_id=53602">downloads</A>
 page. Linux, Unix, and Mac OS X users can download either the
 <code>.zip</code> or <code>.tar.gz</code> archive package, unpack it,
-and then follow the <A HREF="#building-topographica">'Building
-Topographica'</A> instructions below.  Depending on your setup, Mac
+and then follow the <A HREF="#building-topographica">Building
+Topographica</A> instructions below.  Depending on your setup, Mac
 users may find that you need to install some of the programs specified
 in the <A HREF="cvs.html#osx">Mac SVN instructions</A>.  Windows users
 can download and run the self-installing <a
