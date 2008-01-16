@@ -59,14 +59,11 @@ class KeyedList(list):
             if name == key:
                 return value
             
-        # Support indexing by integer, where e.g. keydlist[2] returns the
-        # third element.  Is this really required by any calling code?
+        # Though not often useful for this class, the list interface
+        # provides for access by an integer key:
         if isinstance(key,int):
             for (index,(name,value)) in enumerate(self):
                 if index == key:
-                    print """Please email jbednar at inf.ed. ac.uk with
-                             the command you used to generate this message so that
-                             he can see whether this code is used anywhere"""
                     return value
 
         raise KeyError(key)
