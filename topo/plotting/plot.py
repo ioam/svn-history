@@ -103,7 +103,8 @@ class Plot(ParameterizedObject):
 def _sane_plot_data(channels,sheet_views):
      # CEBALERT: was sf.net tracker item 1860837
      # (Avoid plotting only hue+confidence for a weights plot.)
-     if 'Strength' in channels and channels['Strength'][0]=='Weights':
+     s_chan = channels.get('Strength')
+     if s_chan is not None and len(s_chan)>0 and s_chan[0]=='Weights':
           return channels['Strength'] in sheet_views
      else:
           return True
