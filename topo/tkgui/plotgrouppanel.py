@@ -60,8 +60,8 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
     Refresh = ButtonParameter(image_path="topo/tkgui/icons/redo-small.png",
         size=button_image_size,
         doc="""
-        Force the current plot to be regenerated (i.e. execute
-        update_command and plot_command).""")
+        Refresh the current plot (i.e. force the current plot to be regenerated
+        by executing update_command and plot_command).""")
 
     Redraw = ButtonParameter(image_path="topo/tkgui/icons/redo-small.png",
         size=button_image_size,

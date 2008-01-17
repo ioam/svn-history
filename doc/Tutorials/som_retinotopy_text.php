@@ -244,7 +244,7 @@ patterns, though not very cleanly yet:
 align="middle" WIDTH="379" HEIGHT="545">
 </p>
 
-If you update the Projection Activity window, you will see that the
+If you look at the Projection Activity window, you will see that the
 activation patterns are becoming smoother, since the weight vectors
 are now similar between neighboring neurons.
 
@@ -316,12 +316,11 @@ results.
 <P><LI>Now, re-run the basic simulation by quitting and restarting
 Topographica.  This time, change one of the parameter values, either
 by editing the <code>som_retinotopy.ty</code> file before starting, or
-by providing it on the command line (for those parameters that check
-<code>locals()</code> for their defaults), or 
-by typing the command at the Topographica terminal prompt.  For
-instance, to see the starting value of the neighborhood radius (from
-which all future values are calculated according to exponential
-decay), type:
+by providing it on the command line before the script name (for those
+parameters that check <code>locals()</code> for their defaults), or by
+typing the command at the Topographica terminal prompt.  For instance,
+to see the starting value of the neighborhood radius (from which all
+future values are calculated according to exponential decay), type:
 
 <pre>
   topo.sim['V1'].radius_0
@@ -337,7 +336,7 @@ your terminal window. Then change this value as you see fit, e.g. to
 </pre>
 
 and go through learning again.  (You can also make this change in the
-Model Editor, or by passing "-c radius_0=0.1" on the command line.) 
+Model Editor, or by passing <code>-c radius_0=0.1</code> on the command line.) 
 With such a small learning radius, global ordering is unlikely to
 happen, and one can expect the topographic grid not to flatten out
 (despite local order in patches).
@@ -346,7 +345,7 @@ happen, and one can expect the topographic grid not to flatten out
 
 <P>Similarly, consider changing the learning rate from
 <code>V1.alpha_0=0.42</code> to e.g. 1.0
-(e.g. by passing "-c alpha_0=1.0" on the command line).  The retina
+(e.g. by passing <code>-c alpha_0=1.0</code> on the command line).  The retina
 and V1 densities cannot be changed after the simulation has started; to
 change those provide their values on the command line as above (or
 edit the <code>som_retinotopy.ty</code> file)

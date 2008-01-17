@@ -277,7 +277,7 @@ try presenting a vertical line
 (<span_class='t_item'>orientation</span> of <code>pi/2</code>) and
 then, in the <span class='w_title'>Activity</span> window, right click
 on one of the cyan-colored patches of activity (for instance, around unit
-41,24). This will bring up a menu:
+41,24) <!--CB: bit out of date, but fortunately still close.-->. This will bring up a menu:
 
 <p class="center">
 <img src="images/lissom_oo_or_activity_rightclick.png" alt="Right-click menu"
@@ -380,7 +380,7 @@ are less sensitive to the scale or contrast.
 
 <p> 
 To present photographs, select a <span class='t_item'>Pattern generator</span> of type
-<span class='t_item'>Image</span>. (You can type the path to an image file of your
+<span class='t_item'>FileImage</span>. (You can type the path to an image file of your
 own (in e.g. PNG, JPG, TIFF, or PGM format) in the <span
 class='t_item'>filename</span> box.) For most photographs you will 
 need to change the <span class='t_item'>scale</span> to something like
