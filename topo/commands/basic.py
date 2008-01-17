@@ -38,6 +38,9 @@ from topo.misc import filepaths
 
 def save_input_generators():
     """Save a copy of the active_sim's current input_generators for all GeneratorSheets."""
+    # ensure EPs get started (if save_input_generators is called before the simulation is run())
+    topo.sim.run(0.0) 
+
     generator_sheets = topo.sim.objects(GeneratorSheet).values()
     for sheet in generator_sheets:
         sheet.push_input_generator()
