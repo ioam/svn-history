@@ -102,10 +102,14 @@ False
 >>> topo.sim.time()==0
 True
 
-# check for bug:
-# save_input_generators() before any run() messes up events
->>> save_input_generators()
->>> a_t1 = copy.deepcopy(R.activity)
+>>> R = topo.sim['GS']
+>>> ig=Gaussian(x=UniformRandom())
+>>> R.set_input_generator(ig)
 
->>> topo.sim.run(1)
->>> assert_array_not_equal(R.activity,a_t1,"GS activity pattern did not change.")
+# CB: need to add test for bug
+# save_input_generators() before any run() messes up events
+## >>> save_input_generators()
+## >>> a_t1 = copy.deepcopy(R.activity)
+
+## >>> topo.sim.run(1)
+## >>> assert_array_not_equal(R.activity,a_t1,"GS activity pattern did not change.")
