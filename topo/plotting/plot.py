@@ -99,6 +99,16 @@ class Plot(ParameterizedObject):
           return self.plot_src_name + '\n' + self.name
 
 
+
+def _sane_plot_data(channels,sheet_views):
+     # CEBALERT: was sf.net tracker item 1860837
+     # (Avoid plotting only hue+confidence for a weights plot.)
+     if 'Strength' in channels and channels['Strength'][0]=='Weights':
+          return channels['Strength'] in sheet_views
+     else:
+          return True
+
+
 def make_template_plot(channels,sheet_views,density=None,
               plot_bounding_box=None,normalize=False,name='None'):
      """
@@ -109,11 +119,12 @@ def make_template_plot(channels,sheet_views,density=None,
      one of the Plot subclasses automatically.  See Plot.__init__ for
      a description of the arguments.
      """
-     plot_types=[SHCPlot,RGBPlot,PalettePlot]
-     for pt in plot_types:
-         plot = pt(channels,sheet_views,density,plot_bounding_box,normalize,name=name)
-         if plot.bitmap != None:
-	     return plot
+     if _sane_plot_data(channels,sheet_views):
+          plot_types=[SHCPlot,RGBPlot,PalettePlot]
+          for pt in plot_types:
+               plot = pt(channels,sheet_views,density,plot_bounding_box,normalize,name=name)
+               if plot.bitmap is not None:
+                    return plot
      
      ParameterizedObject(name="make_template_plot").verbose('No',name,'plot constructed for this Sheet')
      return None

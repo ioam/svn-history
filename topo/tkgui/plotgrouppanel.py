@@ -358,16 +358,14 @@ e.g. for debugging.)
     # rename (not specific to plot_frame)
     # document, and make display_* methods semi-private methods
     def update_plot_frame(self,plots=True,labels=True):
-
-        skip_plotting_hack = self.__skip_plotting_hack()
         
-        if plots and not skip_plotting_hack:
+        if plots:
             self.plotgroup.scale_images()
             self.display_plots()
-        if labels and not skip_plotting_hack: self.display_labels()
+        if labels: self.display_labels()
         self.refresh_title()
 
-        if len(self.canvases)==0 or skip_plotting_hack:
+        if len(self.canvases)==0:
             self.no_plot_note.grid(row=1,column=0,sticky='nsew')
             self.no_plot_note_enabled=True
             self.representations['Enlarge']['widget']['state']=DISABLED
@@ -391,22 +389,7 @@ e.g. for debugging.)
         self.plotgroup.make_plots(update=True)
         self.update_plot_frame()        
         self.add_to_plotgroups_history()
-        
-
-
-    def __skip_plotting_hack(self):
-        # CEBALERT: see sf.net tracker item 1860837
-        # If the plotgroup is a 'weights' one, and there's no matching strength key
-        # in the sheet's sheet_views, don't want to plot any other data.
-        if hasattr(self.plotgroup,'keyname') and self.plotgroup.keyname=='Weights':
-            if hasattr(self.plotgroup,'plots') and len(self.plotgroup.plots)>0:
-                first_plot = self.plotgroup.plots[0]
-                if first_plot.channels['Strength'] not in topo.sim[first_plot.plot_src_name].sheet_views:
-                    return True
-
-        return False
-            
-            
+                    
             
 
     def redraw_plots(self):
