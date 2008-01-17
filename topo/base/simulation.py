@@ -1181,6 +1181,10 @@ class Simulation(ParameterizedObject):
         """
         # CEBALERT: need to do something about the global 'Forever';
         # what it should be probably varies with _time_type.
+
+        # CEBALERT: calls to topo.sim.run() within topo should use a
+        # string to specify the time rather than a float (since float
+        # is not compatible with all number types).
         
         duration = self._time_type(duration)
         until = self._time_type(until)
@@ -1196,7 +1200,8 @@ class Simulation(ParameterizedObject):
         # way (e.g. calls state_push() *must* ensure that this code
         # has been executed first (i.e. the code must call
         # topo.sim.run(0) before doing anything).  (Currently applies
-        # to pattern_present() and Test Pattern's Present button.)
+        # to pattern_present(), Test Pattern's Present button, and
+        # save_input_generators.)
         for e in self.eps_to_start:
 	    e.start()
 
