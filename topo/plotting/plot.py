@@ -263,8 +263,8 @@ class TemplatePlot(Plot):
         In case of a constant array, ones is returned for value greater than zero,
         and zeros in case of value inferior or equal to zero.
         """
-        a_offset = a-min(a.ravel())
-        max_a_offset = max(a_offset.ravel())
+        a_offset = a-a.min()
+        max_a_offset = a_offset.max()
         if max_a_offset>0:
              a = divide(a_offset,float(max_a_offset))
         else:

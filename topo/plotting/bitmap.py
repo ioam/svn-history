@@ -124,10 +124,10 @@ class Bitmap(ParameterizedObject):
         inArray = (Numeric.floor(inArray * max_pixel_value)).astype(Numeric.Int)
 
         # Clip any values that are still larger than max_pixel_value
-        to_clip = sum(Numeric.greater(inArray.ravel(),max_pixel_value))
+        to_clip = (Numeric.greater(inArray.ravel(),max_pixel_value)).sum()
 	if (to_clip>0):
             self.clipped_pixels = self.clipped_pixels + to_clip
-	    inArray = Numeric.clip(inArray,0,max_pixel_value)
+	    inArray.clip(0,max_pixel_value,out=inArray)
 	    self.verbose("Bitmap: clipped",to_clip,"image pixels that were out of range")
 
         r,c = inArray.shape
@@ -199,9 +199,9 @@ class HSVBitmap(Bitmap):
         # to accept an image of type 'HSV', so that they will do this
         # conversion themselves, without us needing an explicit loop
         # here.  That should speed this up.
-        ch = Numeric.clip(hue,0.0,1.0)
-        cs = Numeric.clip(sat,0.0,1.0)
-        cv = Numeric.clip(val,0.0,1.0)
+        ch = hue.clip(0.0,1.0)
+        cs = sat.clip(0.0,1.0)
+        cv = val.clip(0.0,1.0)
         
         for i in range(shape[0]):
             for j in range(shape[1]):
