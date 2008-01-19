@@ -119,10 +119,10 @@ check-base:
 	${PYCHECKER} topo/base/*.py 
 
 lint:
-	${PYLINT} topo/*.py topo/*/*.py
+	${PYLINT} topo
 
 lint-base:
-	${PYLINT} topo/base/*.py
+	${PYLINT} topo.base
 
 
 # Compare topographica and C++ lissom output
