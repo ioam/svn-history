@@ -10,7 +10,7 @@
 # Previous things from Makefile that don't seem to work any more
 # disable-msg W0131
 # --min-name-length=1
-# --parseable=yes
+
 
 [MASTER]
 
@@ -66,7 +66,7 @@ disable-msg=C0322,C0323,C0324,C0103
 
 # set the output format. Available formats are text, parseable, colorized, msvs
 # (visual studio) and html
-output-format=text
+output-format=parseable
 
 # Include message's id in output
 include-ids=no
