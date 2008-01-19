@@ -1,8 +1,8 @@
 # $Id$
 PREFIX =  ${CURDIR}/
-PYLINT = bin/pylint --parseable=yes --required-attributes=__version__ --min-name-length=1 --notes=FIXME,XXX,TODO,ALERT --max-line-length=200 --disable-msg=C0322,C0323,C0324,C0103,W0131
+PYLINT = bin/pylint --rcfile=doc/buildbot/pylintrc
 
-PYCHECKER = bin/pychecker
+PYCHECKER = bin/pychecker --config doc/buildbot/pycheckrc
 
 RELEASE = 0.9.4
 RELEASE_TAG = release_0_9_4
@@ -116,7 +116,7 @@ check:
 	${PYCHECKER} topo/*.py topo/*/*.py
 
 check-base:
-	${PYCHECKER} --config doc/buildbot/pycheckrc topo/base/*.py 
+	${PYCHECKER} topo/base/*.py 
 
 lint:
 	${PYLINT} topo/*.py topo/*/*.py
