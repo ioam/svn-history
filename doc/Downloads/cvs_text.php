@@ -151,10 +151,11 @@ removing LDFLAGS as described in index_text.php).-->
 <!--  Topographica on Windows, compiling everything from source...
 <!--  see the list of current tasks.-->
 
-<P><em>Please note that we have only recently begun using SVN
-(having used a different system in the past), and we have not had much
-opportunity to test the SVN setup on Windows. Therefore, the following
-instructions might change.</em>
+<P><em>Please note that we have only recently moved from an older
+revision control system (CVS) to SVN, and the SVN setup on Windows is
+not yet complete.  To get the SVN version to build on Windows as of
+1/2008, you will probably need to update some of the included external
+packages.</em>
 
 <P>Under Windows, we recommend installing
 <A HREF="http://www.tortoisesvn.net/">TortoiseSVN</A> (tested 01/2008
