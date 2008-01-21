@@ -466,6 +466,32 @@ class CFPLF_Plugin(CFPLearningFn):
             # CEBHACKALERT: see ConnectionField.__init__() re. mask & output fn
             cf.weights *= cf.mask                
 
+class CFPLF_Plugin_scaled(CFPLearningFn):
+    """CFPLearningFunction applying the specified single_cf_fn to each CF.
+    Scales the single connection learning rate by a scaling factor which is
+    different for each individual unit. Therefore uses a different learning
+    rate for each individual connection field"""
+
+    single_cf_fn = LearningFnParameter(default=Hebbian(),
+        doc="Accepts a LearningFn that will be applied to each CF individually.")
+
+    learning_rate_scaling_factor = None
+    
+    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
+        """Apply the specified single_cf_fn to every CF."""
+        # avoid evaluating these references each time in the loop
+        single_cf_fn = self.single_cf_fn
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+        
+        for cf,r,c in iterator():
+            sc_learning_rate = self.learning_rate_scaling_factor[r,c] * single_connection_learning_rate 
+            single_cf_fn(cf.get_input_matrix(input_activity),
+                         output_activity[r,c], cf.weights, sc_learning_rate)
+            # CEBHACKALERT: see ConnectionField.__init__() re. mask & output fn
+            cf.weights *= cf.mask   
+
+
+
 class CFPOutputFn(ParameterizedObject):
     """
     Type for an object that applies some operation (typically something
