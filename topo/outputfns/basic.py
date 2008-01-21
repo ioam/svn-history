@@ -26,7 +26,7 @@ from topo.base.sheet import activity_type
 from topo.base.arrayutils import clip_in_place,clip_lower
 from topo.base.arrayutils import L2norm, norm, array_argmax
 from topo.base.functionfamilies import OutputFn, OutputFnParameter
-from topo.base.parameterclasses import Parameter,Number,ListParameter,BooleanParameter
+from topo.base.parameterclasses import Parameter,Number,ListParameter,BooleanParameter, StringParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGeneratorParameter,Constant
 from topo.base.boundingregion import BoundingBox
@@ -441,15 +441,14 @@ class AttributeTrackingOF(OutputFn):
 class ActivityAveragingOF(OutputFn):
     """
     Calculates the average of the input activity. The average is calculated as an 
-    exponential moving average. The weighting for each older data point decreases exponentially,
-    giving more importance to recent values while not discarding older observations entirely.
-    The degree of weighing decrease is expressed as a constant smoothing factor (smoothing).
+    exponential moving average. The weighting for each older data point decreases exponentially.
+    The degree of weighing for the previous values is expressed as a constant smoothing factor (smoothing).
     """
     step=Number(default=1, doc="How often to calculate average activity")
     
-    smoothing = Number(default=0.0003, doc="""
-    The degree of weighting decrease for older values when calculating the average""")
-
+    smoothing = Number(default=0.9997, doc="""
+    The degree of weighting for the previous average when calculating the new average""")
+   
     updating = BooleanParameter(default=True, doc="""
     Whether or not to average activity, allows averaging to be turned off during e.g. map measurement""")
 
@@ -470,7 +469,7 @@ class ActivityAveragingOF(OutputFn):
             self.n_step += 1
             if self.n_step == self.step:
                 self.n_step = 0
-                self.x_avg = self.smoothing*x + (1.0-self.smoothing)*self.x_avg
+                self.x_avg = (1.0-self.smoothing)*x + self.smoothing*self.x_avg
 
     def stop_updating(self):
         """
@@ -486,6 +485,75 @@ class ActivityAveragingOF(OutputFn):
         """Pop the most recently saved updating parameter off the stack"""
 
         self.updating = self._updating_state.pop()                        
+
+
+class SheetAttributeTrackingOF(OutputFn):
+    """
+    Output function which keeps track of individual attributes of a sheet (attrib_names),
+    over time, for specified units. Attributes can be tracked if they are the same size as the activity matrix.
+    The values dictionary stores (time, value) pairs indexed by the parameter name and unit,
+    i.e. values['x'][(0,0)]=(time=t,value of x at time=t).
+    """
+    #ALERT This may be similar to using a trace (topo.misc.traces.py)
+    
+    attrib_names = ListParameter(default=[], doc="""
+        List of names of the function object's parameters that should be stored.""")
+    
+    units = ListParameter(default=[(0,0)], doc="""
+        Matrix coordinates of the unit(s) for which parameter values will be stored.""")
+    
+    updating = BooleanParameter(default=True, doc="""
+        Whether or not to track parameters.
+        Allows tracking to be turned off during analysis, and then re-enabled.""")
+
+    sheet = StringParameter(default=None)
+
+    def __init__(self,**params):
+        super(SheetAttributeTrackingOF,self).__init__(**params)
+        self.values={}
+        self._updating_state = []
+        
+        for p in self.attrib_names:
+            self.values[p]={}
+            for u in self.units:
+                self.values[p][u]=[]
+        
+         
+        
+    def __call__(self,x):
+
+        if self.updating:
+            #collect values on each appropriate step
+            for p in self.attrib_names:
+                if p=="x":
+                    value_matrix=x
+                else:
+                    value_matrix= getattr(topo.sim[self.sheet], p)
+                        
+                    for u in self.units:
+                        self.values[p][u].append((topo.sim.time(),value_matrix[u]))
+                        
+
+    def stop_updating(self):
+        """
+        Save the current state of the updating parameter to an internal stack. 
+        Turn updating off for the output_fn.
+        """
+
+        self._updating_state.append(self.updating)
+        self.updating=False
+
+
+    def restore_updating(self):
+        """Pop the most recently saved updating parameter off the stack"""
+
+        self.updating = self._updating_state.pop()  
+
+
+
+
+
+
 
 
 __all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,OutputFn)]))
