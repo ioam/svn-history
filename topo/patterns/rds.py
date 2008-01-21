@@ -14,8 +14,6 @@ from topo.base.parameterizedobject import ParamOverrides
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.base.functionfamilies import IdentityOF
 
-from topo.base.arrayutils import clip_lower
-
 
 ### JABHACKALERT: This code seems to work fine when the input regions
 ### are all the same size and shape, but for
