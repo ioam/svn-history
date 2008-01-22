@@ -494,8 +494,7 @@ class SheetAttributeTrackingOF(OutputFn):
     The values dictionary stores (time, value) pairs indexed by the parameter name and unit,
     i.e. values['x'][(0,0)]=(time=t,value of x at time=t).
     """
-    #ALERT This may be similar to using a trace (topo.misc.traces.py)
-    
+      
     attrib_names = ListParameter(default=[], doc="""
         List of names of the function object's parameters that should be stored.""")
     
