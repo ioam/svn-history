@@ -12,10 +12,10 @@ please try the following:
 
 <P><li> If you are using a version that is more than a few weeks old,
 consider trying the most up to date ("bleeding-edge") version via
-<a href="../Downloads/cvs.html">CVS</a>.  The code is updated nearly
+<a href="../Downloads/cvs.html">SVN</a>.  The code is updated nearly
 every day, so by the end of a few weeks many changes will have
 accumulated.  Often, bugs will have been fixed and new features will
-have been added already in the CVS repository, even though they are
+have been added already in the SVN repository, even though they are
 not yet released officially.
 
 <p><li>If the problem is still present in the current version, you can
@@ -43,14 +43,14 @@ code. </li>
 
 <p><li>Otherwise, please
 <a href="http://sourceforge.net/tracker/?group_id=53602&atid=470929">file
-a bug report</a>. For us to help with your problem, we need to be able to
+a bug report</a>. For us to help with the problem, we need to be able to
 replicate it. Please include:
 
 <p>
 <ul>
 <li>the full error message, if any</li>
-<li>the output of <code>cvs diff</code> and <code>cvs status</code></li>
-(if using a CVS version), or the Topographica release number</li>
+<li>the output of <code>svn diff</code>, <code>svn status</code>, and <code>svn info</code>
+(if using an SVN version), or the Topographica release number</li>
 <li>which operating system you are using (Linux, Mac, or Windows)</li>
 <li>any additional file needed to replicate the problem (e.g. a script you're using)</li>
 <li>a specific recipe (list of steps) that can reproduce the problem</li>
@@ -58,7 +58,7 @@ replicate it. Please include:
 
 <P>To maximize the speed of resolution, please make sure that your
 problem can be replicated using an unmodified copy of Topographica
-(either released or from CVS), and try to have a small, clear,
+(either released or from SVN), and try to have a small, clear,
 quick-to-run example of the problem.  Any bug report is better than
 none, so in any case please do send it in even if you can't satisfy
 the above requests.  Even so, the clearer and simpler it is, the
