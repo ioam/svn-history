@@ -49,7 +49,7 @@ replicate it. Please include:
 <p>
 <ul>
 <li>the full error message, if any</li>
-<li>the output of <code>svn diff</code>, <code>svn status</code>, and <code>svn info</code>
+<li>the output of <code>svn diff</code> and <code>svn info</code>
 (if using an SVN version), or the Topographica release number</li>
 <li>which operating system you are using (Linux, Mac, or Windows)</li>
 <li>any additional file needed to replicate the problem (e.g. a script you're using)</li>
