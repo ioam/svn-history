@@ -326,32 +326,30 @@ class JointScaling(LISSOM):
             self.x_avg = (1.0-self.smoothing)*joint_total + self.smoothing*self.x_avg
             self.scaled_x_avg = (1.0-self.smoothing)*joint_total*self.sf + self.smoothing*self.scaled_x_avg
 
-    def get_sf(self):
-        """
-        Calculate the joint total of the grouped projections and use this to calculate the scaling factor.
-        """
-        joint_total = zeros(self.shape, activity_type)
-        for key,projlist in self._grouped_in_projections():
-            if key is not None:
-                for proj in projlist:
-                    joint_total += proj.activity
-       
-        self.calculate_joint_sf(joint_total)
-
 
     def do_joint_scaling(self):
         """
         Assume that the projections to be jointly scaled are those which are being jointly normalized.
+        Calculate the joint total of the grouped projections and use this to calculate the scaling factor.
         Scale the projection activity and learning rate for these projections.
         """
+        joint_total = zeros(self.shape, activity_type)
+        
         for key,projlist in self._grouped_in_projections():
-            # JABHACKALERT: Need to check that the key is JointNormalize, and to
-            # respect different groups, but will work with Judith's current example.  
             if key is not None:
-                for proj in projlist:
-                    proj.activity *= self.sf
-                    proj.learning_fn.learning_rate_scaling_factor = self.sf 
-                                      
+                if key =='Afferent':
+                    for proj in projlist:
+                        joint_total += proj.activity
+                    self.calculate_joint_sf(joint_total)
+                    for proj in projlist:
+                        if hasattr(proj.learning_fn,'learning_rate_scaling_factor'):
+                            proj.activity *= self.sf
+                            proj.learning_fn.update_scaling_factor(self.sf)
+                        else:
+                            raise ValueError("Projections to be joint scaled must have learning function which supports scaling e.g. CFPLF_PluginScaled")
+                   
+                else:
+                    raise ValueError("Only Afferent scaling currently supported")                  
 
     def activate(self):
         """
@@ -374,7 +372,6 @@ class JointScaling(LISSOM):
         #Afferent projections are only activated once at the beginning of each iteration
         #therefore we only scale the projection activity and learning rate once.
         if self.activation_count == 1: 
-            self.get_sf()
             self.do_joint_scaling()   
 
        
