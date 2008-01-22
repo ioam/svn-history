@@ -466,7 +466,9 @@ class CFPLF_Plugin(CFPLearningFn):
             # CEBHACKALERT: see ConnectionField.__init__() re. mask & output fn
             cf.weights *= cf.mask                
 
-class CFPLF_Plugin_scaled(CFPLearningFn):
+
+
+class CFPLF_PluginScaled(CFPLearningFn):
     """CFPLearningFunction applying the specified single_cf_fn to each CF.
     Scales the single connection learning rate by a scaling factor which is
     different for each individual unit. Therefore uses a different learning
@@ -475,11 +477,15 @@ class CFPLF_Plugin_scaled(CFPLearningFn):
     single_cf_fn = LearningFnParameter(default=Hebbian(),
         doc="Accepts a LearningFn that will be applied to each CF individually.")
 
-    learning_rate_scaling_factor = None
+    learning_rate_scaling_factor = Parameter(default=None,
+        doc="Matrix of scaling factors for scaling the learning rate of each CF individually.")
     
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
-        # avoid evaluating these references each time in the loop
+      
+        if self.learning_rate_scaling_factor is None:
+            self.learning_rate_scaling_factor = ones(input_activity.shape)
+            
         single_cf_fn = self.single_cf_fn
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         
@@ -489,6 +495,10 @@ class CFPLF_Plugin_scaled(CFPLearningFn):
                          output_activity[r,c], cf.weights, sc_learning_rate)
             # CEBHACKALERT: see ConnectionField.__init__() re. mask & output fn
             cf.weights *= cf.mask   
+
+    def update_scaling_factor(self, new_scaling_factor):
+        """Update the single connection learning rate scaling factor"""
+        self.learning_rate_scaling_factor = new_scaling_factor
 
 
 
