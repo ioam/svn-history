@@ -275,6 +275,8 @@ To switch from the LATEST_STABLE version to the trunk version, replace
 before deciding whether to update to the bleeding-edge (trunk)
 version, you can check its
 <a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests&builder=x86_ubuntu7.04_slow-tests">status</a>.)
+Alternatively, to switch to a separate branch named 'some-branch', replace
+<code>tags/LATEST_STABLE</code> with <code>branches/some-branch</code>
 
 <!--CB: just trying it out; embedding an image would be best-->
 
