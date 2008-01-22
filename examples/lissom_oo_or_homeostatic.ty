@@ -30,7 +30,7 @@ from topo.sheets.lissom import JointScaling
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.cf import CFSheet, CFPLF_Plugin_scaled
+from topo.base.cf import CFSheet, CFPLF_PluginScaled
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
@@ -78,7 +78,18 @@ elif type_input=="Natural":
 
     combined_inputs =topo.patterns.basic.Selector(generators=inputs)
 
+elif type_input=="NoisyDisks":
     
+    input_type=topo.patterns.basic.Composite
+    inputs=[input_type(operator=numpy.multiply,
+                       generators=[topo.patterns.basic.Disk(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=rand_seedx),
+                                                            y=UniformRandom(lbound=-0.75,ubound=0.75,seed=rand_seedy),
+                                                            size=2.0, aspect_ratio=1.0, scale=1.0,
+                                                            offset=0.5,
+                                                            bounds=BoundingBox(radius=0.8), smoothing=0.1),
+                                   topo.patterns.random.UniformRandom()])]
+            
+    combined_inputs =topo.patterns.basic.Selector(generators=inputs)
 
 
 #Units to track for debugging
@@ -92,7 +103,6 @@ smoothing=locals().get('smoothing',0.999)
 #LGN
 LGN_on_output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
 LGN_off_output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
-
 
 #V1
 triesch=locals().get('triesch', True)
@@ -108,7 +118,7 @@ else:
     AV=ActivityAveragingOF(smoothing=smoothing,step=1)
     V1_Tracker=AttributeTrackingOF(function=AV, attrib_names=['x_avg'], units=V1_units, step=1)
     V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, AV, V1_Tracker])
-
+    
 #Output Functions: Projections
 
 #Debugging
@@ -193,9 +203,12 @@ topo.sim['V1'] = JointScaling(nominal_density=locals().get('default_density',48.
                               nominal_bounds=BoundingBox(radius=0.5),tsettle=9,
                               learning=True,output_fn=V1_OF,
                               post_initialization_weights_output_fn=pi,
-                              target=afferent_target, smoothing=smoothing)
+                              target=afferent_target, smoothing=smoothing, rate_only=locals().get('rate_only',False))
 
 
+
+
+    
 topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
                  connection_type=SharedWeightCFProjection,strength=2.33,
                  nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
@@ -209,7 +222,7 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,
                  output_fn=LGNOn_OF,
-                 learning_fn=CFPLF_Plugin_scaled(),
+                 learning_fn=CFPLF_PluginScaled(),
                  strength=1.0,name='LGNOnAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
@@ -220,7 +233,7 @@ topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','J
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
 		 connection_type=CFProjection,
                  output_fn=LGNOff_OF,
-                 learning_fn=CFPLF_Plugin_scaled(),
+                 learning_fn=CFPLF_PluginScaled(),
                  strength=1.0,name='LGNOffAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
