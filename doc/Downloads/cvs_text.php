@@ -11,8 +11,8 @@ described below; see the <A
 HREF="http://sourceforge.net/docman/display_doc.php?docid=31070&group_id=1">
 SourceForge SVN documentation</A> for more details or if you have any
 difficulties.  You will need to run at least SVN 1.4 on your machine;
-SVN 1.3 and below will complain that they are too old to communicate
-with our repository.
+SVN clients 1.3 and below will complain that they are too old to
+communicate with our repository.
 
 <P>In the instructions below, you will need to choose whether you want
 the very most recent version, with changes made daily, or only the
