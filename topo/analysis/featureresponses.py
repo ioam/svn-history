@@ -24,7 +24,6 @@ from topo.misc.utils import cross_product, frange
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.commands.basic import restore_input_generators, save_input_generators
 from topo.misc.distribution import Distribution
-from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.cf import CFSheet
 
 class DistributionMatrix(ParameterizedObject):
