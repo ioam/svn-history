@@ -90,8 +90,9 @@ clean-ext-packages:
 	make -C external uninstall
 
 
-# Build the Python startup script
-topographica: external Makefile
+# Build the Python startup script.  Rebuilt whenever a file changes in
+# topo/ or examples, to make sure that topo.version is up to date.
+topographica: external Makefile topo/*/*.py examples/*.ty
 	echo "#!${PREFIX}bin/python" > topographica
 	echo "# Startup script for Topographica" >> topographica
 	echo "" >> topographica
