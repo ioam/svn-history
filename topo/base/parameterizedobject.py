@@ -1251,7 +1251,12 @@ class PicklableClassAttributes(object):
             # from "topo.base.parameter.Parameter", we want "topo.base.parameter"
             module_path = class_name[0:class_name.rindex('.')]
             exec 'import '+module_path in __main__.__dict__
-            class_ = eval(class_name,__main__.__dict__)
+
+            try:
+                class_ = eval(class_name,__main__.__dict__)
+            except:
+                ParameterizedObject().warning("Could not find class %s to restore its parameter values (class might have been removed or renamed)."%class_name)
+                break
 
             # now restore class Parameter values
             for p_name,p in state.items():
