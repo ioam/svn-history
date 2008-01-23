@@ -61,6 +61,11 @@ class Feature(object):
              self.values=(frange(low_bound,up_bound,step,not cyclic))
 
 
+
+
+
+
+
 class PatternPresenter(ParameterizedObject):
     """
     Function object for presenting PatternGenerator-created patterns.
@@ -81,7 +86,7 @@ class PatternPresenter(ParameterizedObject):
         self.contrast_parameter=params.get('contrast_parameter',self.contrast_parameter)
 
     def __call__(self,features_values,param_dict):
-        
+
         for param,value in param_dict.iteritems():
            self.gen.__setattr__(param,value)
                
@@ -108,6 +113,14 @@ class PatternPresenter(ParameterizedObject):
         ### should be able to provide general support for manipulating
         ### both pattern parameters and parameters controlling
         ### interaction between or differences between patterns.
+
+##         if features_values.has_key('direction'):
+##             orientation = features_values['direction']+pi/2            
+##             from topo.patterns.basic import Sweeper            
+##             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
+##                 inputs[name] = Sweeper(generator=inputs[name],step=i,speed=features_values['speed'])
+##                 setattr(inputs[name],'orientation',orientation)
+                            
 
         if features_values.has_key("phasedisparity"):
             if len(input_sheet_names)!=2:
@@ -187,6 +200,10 @@ class PatternPresenter(ParameterizedObject):
             
         pattern_present(inputs, self.duration, learning=False,
                         apply_output_fn=self.apply_output_fn)
+
+
+
+
 
 
 
@@ -1137,6 +1154,65 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relativ
             param_dict.update(curve)
             curve_label='Orientation = %.4f rad' % curve["orientation"] 
 	    x.collect_feature_responses(feature_values,pattern_presenter, param_dict, curve_label,display)
+
+
+
+
+###############################################################################
+## pg= create_plotgroup(name='Direction Preference',category="Preference Maps",
+##              doc='Measure preference for sine grating orientation.',
+##              update_command='measure_dr_pref()')
+## pg.add_plot('Direction Preference',[('Hue','DirectionPreference')])
+## pg.add_plot('Direction Preference&Selectivity',[('Hue','DirectionPreference'),
+## 						   ('Confidence','DirectionSelectivity')])
+## pg.add_plot('Direction Selectivity',[('Strength','DirectionSelectivity')])
+## pg.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
+
+
+
+## def measure_dr_pref(num_phase=12,num_direction=6,num_speeds=4,max_speed=2.0/24,frequencies=[2.4],
+##                     scale=0.2,offset=0.0,display=False,weighted_average=True,
+##                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
+
+##     if num_phase <= 0 or num_direction <= 0:
+##         raise ValueError("num_phase and num_direction must be greater than 0")
+
+##     else:
+##         step_phase=2*pi/num_phase
+##         step_direction=2*pi/num_direction
+##         step_speed=float(max_speed)/num_speeds
+
+##         feature_values = [Feature(name="speed",range=(0.0,max_speed),step=step_speed,cyclic=False),
+##                           Feature(name="frequency",values=frequencies),
+##                           Feature(name="direction",range=(0.0,2*pi),step=step_direction,cyclic=True),
+##                           Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
+
+##         param_dict = {"scale":scale,"offset":offset}
+##         x=FeatureMaps(feature_values)
+##         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+
+##     Subplotting.set_subplots("Direction",force=True)
+
+
+# CB: how did I get this?
+## KeyError Exception in Tk callback
+##   Function: <bound method PlotsMenuEntry.__call__ of PlotsMenuEntry(name='PlotsMenuEntry00195', print_level=100)> (type: <type 'instancemethod'>)
+##   Args: ()
+## Traceback (innermost last):
+##   File "/home/ceball/topographica/lib/python2.5/site-packages/Pmw/Pmw_1_2/lib/PmwBase.py", line 1747, in __call__
+##     return apply(self.func, args)
+##   File "/home/ceball/topographica/topo/tkgui/topoconsole.py", line 130, in __call__
+##     new_plotgroup.plot_templates = topo.plotting.plotgroup.plotgroups[self.plotgroup.name].plot_templates
+##   File "/home/ceball/topographica/topo/misc/keyedlist.py", line 69, in __getitem__
+##     raise KeyError(key)
+## KeyError: 'Direction Preference'
+
+
+
+
+
+
+
 
 
 def decode_feature(sheet, preference_map = "OrientationPreference", axis_bounds=(0.0,1.0), cyclic=True, weighted_average=True):
