@@ -44,7 +44,6 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
@@ -55,8 +54,8 @@ from topo.misc.numbergenerators import UniformRandom
 
 num_inputs=1
 input_type=Gaussian
-inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),
-                   y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i)),
+inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
+                   y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
                    orientation=0,
                    size=0.088388, aspect_ratio=4.66667, scale=1.0,
                    bounds=BoundingBox(radius=0.8))
@@ -88,7 +87,7 @@ num_lags=4
 for i in xrange(num_lags):
     topo.sim['Retina'+str(i)]=GeneratorSheet(nominal_density=24.0,
                                              input_generator=Sweeper(generator=copy.deepcopy(sub_inputs),step=i,speed=1/24.0,
-                                                                     orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=88))),
+                                                                     orientation=UniformRandom(lbound=-pi,ubound=pi,seed=88)),
                                              period=1.0, phase=0.05,
                                              nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
 
