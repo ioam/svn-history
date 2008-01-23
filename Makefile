@@ -90,19 +90,14 @@ clean-ext-packages:
 	make -C external uninstall
 
 
-# Startup Script, in Python
+# Build the Python startup script
 topographica: external Makefile
 	echo "#!${PREFIX}bin/python" > topographica
 	echo "# Startup script for Topographica" >> topographica
 	echo "" >> topographica
 	echo "import topo" >> topographica
 	echo "topo.release='${RELEASE}'" >> topographica
-	echo "#CB: a reg.exp. would simplify the line below!" >> topographica
-	echo "# do I need to close the file or does that happen automatically?" >> topographica
-	echo "from os import popen" >> topographica
-	echo "try: topo.version = popen('svn info "${PREFIX}"| grep \'Last Changed Rev:\'').read().split(': ')[1].rstrip()" >> topographica
-	echo "#try: topo.version = popen('svnversion -n').read()" >> topographica
-	echo "except: pass" >> topographica
+	echo "topo.version='${shell svnversion}'" >> topographica
 	echo "" >> topographica
 	echo "# Process the command-line arguments" >> topographica
 	echo "from sys import argv" >> topographica
