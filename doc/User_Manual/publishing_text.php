@@ -190,7 +190,7 @@ Scaling</code>.  That way each unit will be plotted as either 1x1,
 2x2, 3x3, etc., rather than some being 1x2, some 2x3, etc., as needed
 to reach a certain fixed overall plot size.  Be sure to hit
 <code>Reduce</code> as many times as you can, to get down to 1 pixel
-per unit, and turn off Sheet Coordinates.  It does not matter that the
+per unit.  It does not matter that the
 plot will be too small on screen at that point; it will be fine in
 the final document if it is scaled appropriately.  Be sure to save in
 PNG or another <A HREF="#image-types">appropriate bitmap format</A>,
