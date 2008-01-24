@@ -25,7 +25,7 @@ from topo.base.sheetview import SheetView
 from topo.base.parameterclasses import BooleanParameter,Number,ClassSelectorParameter,ObjectSelectorParameter
 from topo.base.patterngenerator import PatternGenerator
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.commands.basic import pattern_present
+from topo.commands.basic import pattern_present, wipe_out_activity
 from topo.plotting.plot import make_template_plot
 from topo.plotting.plotgroup import SheetPlotGroup
 
@@ -161,6 +161,8 @@ class TestPattern(SheetPanel):
         topo.sim.run(0.0)  # ensure EPs are start()ed
         
 	topo.sim.state_push()
+        wipe_out_activity()
+        topo.sim.event_clear()
 
         input_dict = dict([(sheet.name,sheet.input_generator) for sheet in self.plotgroup._sheets()])
 
