@@ -34,7 +34,7 @@ from topo.base.sheet import Sheet
 from topo.base.arrayutils import wrap
 
 from topo.misc.filepaths import normalize_path
-
+from topo.analysis.vision import complexity
 from pylab import save
 
 
@@ -564,3 +564,20 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
         else:
             pylab.show()
 
+def plot_modulation_ratio(fullmatrix):
+    if (topo.sim.objects().has_key("V1Complex") & topo.sim.objects().has_key("V1Simple")):
+        bins = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0]
+        v1s = complexity(fullmatrix[topo.sim["V1Simple"]])
+        v1c = complexity(fullmatrix[topo.sim["V1Complex"]])
+        pylab.figure()
+        pylab.subplot(311)
+        pylab.hist(v1s,bins)
+        pylab.axis([0,2.0,0,3500])
+        pylab.subplot(312)
+        pylab.hist(v1c,bins)
+        pylab.axis([0,2.0,0,3500])
+        pylab.subplot(313)
+        #pylab.hist(numpy.concatenate(v1s,v1c),bins)
+        pylab.axis([0,2.0,0,3500])
+        pylab.savefig(str(topo.sim.time()) + 'RM.png')
+        #pylab.show()
