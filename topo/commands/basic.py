@@ -406,4 +406,13 @@ def run_batch(script_file,output_directory="Output",
     
     print endnote
 
-    
+def wipe_out_activity():
+    """
+    Resets to zeros the activity in the sheets and projection activities of all sheets in the model
+    """
+    for sheet in topo.sim.objects().keys():
+        topo.sim[sheet].activity*=0.0
+        for con in topo.sim[sheet].in_connections:
+            if hasattr(con, 'activity'):
+                print con.name
+                con.activity*=0.0
