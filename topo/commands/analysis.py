@@ -9,7 +9,6 @@ __version__='$Revision$'
 from numpy.oldnumeric import array, zeros, Float,size, shape
 from math import pi
 import copy
-
 import topo
 from topo.base.arrayutils import octave_output, centroid
 from topo.base.cf import CFSheet, CFProjection, Projection
@@ -18,7 +17,7 @@ from topo.base.parameterclasses import ListParameter, BooleanParameter
 from topo.base.projection import ProjectionSheet
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
-from topo.commands.basic import pattern_present
+from topo.commands.basic import pattern_present, wipe_out_activity
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.utils import frange
 from topo.base.arrayutils import wrap
@@ -28,8 +27,9 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.parameterclasses import Parameter
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
+from topo.commands.pylabplots import plot_modulation_ratio
 from topo.misc.distribution import Distribution
-
+from topo.analysis.vision import complexity
 from topo.patterns.random import GaussianRandom
 
 class Feature(object):
@@ -197,9 +197,11 @@ class PatternPresenter(ParameterizedObject):
                     g.offset=0.0
                     g.scale=g.contrast
             
+        wipe_out_activity()
+        topo.sim.event_clear()
             
         pattern_present(inputs, self.duration, learning=False,
-                        apply_output_fn=self.apply_output_fn)
+                     apply_output_fn=self.apply_output_fn)
 
 
 
@@ -724,7 +726,7 @@ pg.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,weighted_average=True,
-                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
+                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0)):
     """
     Measure orientation maps, using a sine grating by default.
 
@@ -757,8 +759,10 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         param_dict = {"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+        fm = x._fullmatrix
 
     Subplotting.set_subplots("Orientation",force=False)
+    return fm
 
 ###############################################################################
 pg= create_plotgroup(name='Ocular Preference',category="Preference Maps",
@@ -1249,3 +1253,25 @@ def decode_feature(sheet, preference_map = "OrientationPreference", axis_bounds=
         return d.weighted_average()
     else:
         return d.max_value_bin()
+
+###############################################################################
+pg= create_plotgroup(name='Orientation Preference and Complexity',category="Preference Maps",
+             doc='Measure preference for sine grating orientation.',
+             update_command='fm = measure_or_pref(frequencies=[3.0],scale=0.2,num_phase=128);analyse_complexity(fm)')
+pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
+pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
+						   ('Confidence','OrientationSelectivity')])
+pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
+pg.add_plot('Modulatio Ratio',[('Strength','ComplexSelectivity')])
+pg.add_plot('Phase Preference',[('Hue','PhasePreference')])
+pg.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
+
+def analyse_complexity(fm):
+    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
+    measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
+
+    for sheet in measured_sheets:   
+        complx = array(complexity(fm[sheet]))
+        print complx
+        sheet.sheet_views['Complex'+'Selectivity']=SheetView((complx,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time())
+    plot_modulation_ratio(fm)               
