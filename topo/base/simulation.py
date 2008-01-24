@@ -1348,6 +1348,22 @@ class Simulation(ParameterizedObject):
         Same as state_pop(), but does not restore EventProcessors' state.
         """
         self._time, self.events = self._events_stack.pop()        
+    
+    def event_clear(self):
+        """
+        Clears out sheaduled events. This commands is intended to be used with the state_push/ pop combination to 
+        ensure that any remaining events do not affact measurements of the network.
+        
+        It keeps Trigger event on the event list as deleting this one corrupts simulation - it can be a NASTY HACK
+        """
+        events_temp = []
+        print self.events
+        for e in self.events:
+            if not isinstance(e,EPConnectionEvent):
+              events_temp = events_temp + [e]
+            
+        self.events = events_temp
+        print self.events
 
 
     # Could just process src and dest in conn_params.  
