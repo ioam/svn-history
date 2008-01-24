@@ -6,12 +6,12 @@ $Id$
 __version__='$Revision$'
 
 import numpy
-
+import topo
 from math import pi, sin, cos, sqrt
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy import alltrue
 
-from topo.base.parameterclasses import Integer, Number, Parameter, Enumeration
+from topo.base.parameterclasses import Integer, Number, Parameter, Enumeration,ClassSelectorParameter
 from topo.base.parameterclasses import ListParameter
 from topo.base.functionfamilies import OutputFnParameter
 from topo.base.patterngenerator import PatternGenerator
@@ -688,3 +688,59 @@ class OneDPowerSpectrum(PatternGenerator):
 
         return numpy.fft.fft(signal_sample*self.smoothing_window) #,n=n_samples)
     
+class Translator(PatternGenerator):
+    """
+    PatternGenerator that accepts other PatternGenerator.
+    To create a new pattern, asks each of the PatternGenerators in the
+    list to create a pattern, then it translates this pattern based on 
+    the global time, thus simulating the movement of the pattern.
+    """
+
+    generator = ClassSelectorParameter(default=Constant(scale=0.0),
+        class_=PatternGenerator,doc="""Pattern that will be moved around.""")
+        
+    direction = Number(default=0,bounds=(-pi,pi),doc="The direction in which the pattern should move in radians")
+    
+    speed = Number(default=1,bounds=(0.0,None),doc="The speed with which pattern should move in sheet coordinates per simulation time unit")
+    
+    reset_period = Number(default=1,bounds=(0.0,None),doc="Defines when pattern position should by reset (usuallly to new value defined by dynamic parameter). These reset times are defined as [simulation_time modulo reset_time ?= 0].")
+    
+    last_time = 0.0
+
+    def __init__(self,**params):
+        super(Translator,self).__init__(**params)
+        self.orientation = params.get('orientation',self.orientation)
+        
+    def __call__(self,**params):
+        """Constructs combined pattern out of the individual ones."""
+        generator = params.get('generator', self.generator)
+        
+        if((float(topo.sim.time()) >= self.last_time + self.reset_period) or (float(topo.sim.time()) ==0.05)):
+            self.last_time += self.reset_period
+            # time to reset the parameter
+            (self.x, self.y, self.scale) = (generator.x,generator.y,generator.scale)
+            generator.force_new_dynamic_value('x')
+            generator.force_new_dynamic_value('y')
+            generator.force_new_dynamic_value('scale')
+           # print (self.x, self.y, self.scale)
+            discards = (self.direction,self.orientation)
+            self.direction = ((pi +self.inspect_value("orientation") + pi/2.0) % (2*pi)) - pi
+            # DEBUGGING HACK
+        #else:
+            
+        (a,b,c) = (generator.x,generator.y,generator.scale)   
+        
+        xdensity=params.get('xdensity',self.xdensity)
+        ydensity=params.get('ydensity',self.ydensity)
+        bounds = params.get('bounds',self.bounds)
+        
+        # compute how much time elapsed from the last reset
+        t = float(topo.sim.time())-self.last_time
+
+        ## CEBALERT: mask gets applied by all PGs including the Composite itself
+        ## (leads to redundant calculations in current lissom_oo_or usage, but
+        ## will lead to problems/limitations in the future).
+        
+        dirr = self.inspect_value("direction")
+        #JA HACK, I want it to move in prependicular orientation
+        return generator(xdensity=xdensity,ydensity=ydensity,bounds=bounds,x=self.x+t*cos(self.inspect_value("orientation")+pi/2)*self.speed,y=self.y+t*sin(self.inspect_value("orientation")+pi/2)*self.speed,orientation=self.inspect_value("orientation"))#,scale=self.inspect_value("scale"))
