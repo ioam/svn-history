@@ -78,6 +78,25 @@ class Sigmoid(OutputFn):
         x *= 0.0
 	x += 1.0 / (1.0 + exp(-(self.r*x_orig+self.k)))
                   
+class NakaRushton(OutputFn):
+    """
+    Naka-Rushton curve was shown to well approximate the constrast gain control in cortical neurons.
+    The input of the curve is usually contrast however under the assumption that the firing rate of our neurons is
+    directly proportional to the contrast (which seems to be true in our simple models) it can be used as
+    a OutputFn
+    
+    The parameter c50 corresponds to contrast at which the half of the maximal output is reached - here this translates to input of the neuron at which the neuron will respond with 0.5
+    """
+    
+    c50 = Number(default=0.1, doc="The input of the neuron at which it responds at half of it's maximal firing rate (1.0)")
+    e = Number(default=1.0,doc="The exponent of the input x")
+    
+    def __call__(self,x):
+        #print 'A:', x
+        #print 'B:', pow(x,self.e) / (pow(x,self.e) + pow(self.c50,self.e))
+        x_orig = copy.copy(x)
+        x *= 0
+        x += pow(x_orig,self.e) / (pow(x_orig,self.e) + pow(self.c50,self.e))
 
 class GeneralizedLogistic(OutputFn):
     """ 
