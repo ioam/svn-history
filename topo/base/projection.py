@@ -13,6 +13,7 @@ from parameterclasses import Number, BooleanParameter, Parameter, ListParameter
 from parameterizedobject import ParameterizedObject
 from simulation import EPConnection
 from functionfamilies import OutputFnParameter,IdentityOF
+from topo.misc.keyedlist import KeyedList
 
 
 class SheetMask(ParameterizedObject):
@@ -312,6 +313,56 @@ class ProjectionSheet(Sheet):
         self.new_input = True
 
 
+    def _port_match(self,key,portlist):
+        """
+        Returns True if the given key matches any port on the given list.
+
+        A port is considered a match if the port is == to the key,
+        or if the port is a tuple whose first element is == to the key,
+        or if both the key and the port are tuples whose first elements are ==.
+
+        This approach allows connections to be grouped using tuples.
+        """
+        port=portlist[0]
+        return [port for port in portlist
+                if (port == key or
+                    (isinstance(key,tuple)  and key[0] == port) or
+                    (isinstance(port,tuple) and port[0] == key) or
+                    (isinstance(key,tuple)  and isinstance(port,tuple) and port[0] == key[0]))]
+
+
+    def _grouped_in_projections(self,ptype):
+        """
+        Return a dictionary of lists of incoming Projections, grouped for type.
+        Each projection of type <ptype> is grouped according to the name of the port into a single list 
+        within the dictionary.
+
+        The entry None will contain those that are not of type <ptype>, while the other entries will contain a list of
+        Projections, each of which has type ptype.
+        
+        Example: to obtain the lists of projection that should be together joint normalised you call
+        __grouped_in_projection('JointNormalize')
+        """
+        in_proj = KeyedList()
+        in_proj[None]=[] # Independent (ungrouped) connections
+        
+        for c in self.in_connections:
+            d = c.dest_port
+            if not isinstance(c,Projection):
+                self.debug("Skipping non-Projection "+c.name)
+            elif isinstance(d,tuple) and len(d)>2 and d[1]==ptype:
+                if in_proj.get(d[2]):
+                    in_proj[d[2]].append(c)
+                else:
+                    in_proj[d[2]]=[c]
+            #elif isinstance(d,tuple):
+            #    raise ValueError("Unable to determine appropriate action for dest_port: %s (connection %s)." % (d,c.name))
+            else:
+                in_proj[None].append(c)
+                    
+        return in_proj
+
+
     def activate(self):
         """
         Collect activity from each projection, combine it to calculate
@@ -320,9 +371,25 @@ class ProjectionSheet(Sheet):
         in that subclass.
         """
         self.activity *= 0.0
+        div = self.activity *0.0
+        mul = self.activity *0.0
 
         for proj in self.in_connections:
-            self.activity += proj.activity
+            d = proj.dest_port
+            if not isinstance(proj,Projection):
+                self.debug("Skipping non-Projection "+proj.name)
+            elif isinstance(d,tuple) and len(d)>1 and d[1]=='Divisive':
+                div += proj.activity
+            elif isinstance(d,tuple) and len(d)>1 and d[1]=='Multiplicative':
+                mul += proj.activity
+            else:
+                self.activity += proj.activity
+
+        #print div[60,60]
+        #print self.activity[60,60]
+        self.activity /= (1.0 + div)
+        #print self.activity[60,60]
+        self.activity *= (1.0 + mul)
 
         if self.apply_output_fn:
             self.output_fn(self.activity)
