@@ -11,7 +11,7 @@ import copy
 from math import fmod,floor
 
 import numpy
-from numpy import zeros, array
+from numpy import zeros, array, empty, object_, size
 from numpy.oldnumeric import Float
 
 import topo
@@ -116,6 +116,38 @@ class DistributionMatrix(ParameterizedObject):
         return selectivity_matrix
 
 
+class FullMatrix(ParameterizedObject):
+    """
+    Keeps a full matrix - eg. records the output of the sheet for each combination of feature values
+    """
+
+    def __init__(self,matrix_shape,features):
+        self.matrix_shape = matrix_shape
+        self.features = features
+        self.dimensions = ()
+        for f in features:
+            self.dimensions = self.dimensions + (size(f.values),)
+        self.full_matrix = empty(self.dimensions,object_)
+
+    def update(self, new_values, feature_value_permutation):
+        """Add a new matrix of histogram values for a given bin value."""
+        index = ()
+        for f in self.features:
+            for ff,value in feature_value_permutation:
+                if(ff == f.name):
+                    index = index + (f.values.index(value),)
+        self.full_matrix[index] = new_values
+    
+        
+    def _complexity_rec(self,x,y,index,depth):
+        if depth<size(self.features):
+            for i in range(size(self.features[depth].values)):
+                self._complexity_rec(x,y,index + (i,),depth+1)
+        else:
+            if self.max_value < self.full_matrix[index][x][y]:
+                self.index = index
+                self.max_value = self.full_matrix[index][x][y]
+
 
 # CB: FeatureResponses and ReverseCorrelation need cleanup; I began but haven't finished.
 
@@ -148,11 +180,12 @@ class FeatureResponses(ParameterizedObject):
     def initialize_featureresponses(self,features):
         """Create an empty DistributionMatrix for each feature and each sheet."""
 	self._featureresponses = {}
+        self._fullmatrix = {}
         for sheet in self.sheets_to_measure():
             self._featureresponses[sheet] = {}
             for f in features:
                 self._featureresponses[sheet][f.name]=DistributionMatrix(sheet.shape,axis_range=f.range,cyclic=f.cyclic)
-
+            self._fullmatrix[sheet] = FullMatrix(sheet.shape,features)
 
     def sheets_to_measure(self):
         """Return a list of the Sheets in the current simulation for which to collect responses."""
@@ -207,7 +240,7 @@ class FeatureResponses(ParameterizedObject):
         for sheet in self.sheets_to_measure():
             for feature,value in zip(self.feature_names, permutation):
                 self._featureresponses[sheet][feature].update(sheet.activity, value)
-        
+            self._fullmatrix[sheet].update(sheet.activity,zip(self.feature_names, permutation))
 
 
 class ReverseCorrelation(FeatureResponses):
