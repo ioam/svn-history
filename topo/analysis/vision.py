@@ -4,9 +4,7 @@ import numpy
 from numpy import zeros, array
 from numpy.oldnumeric import Float
 from numpy import zeros, array, size, empty, object_
-import scipy
-
-
+#import scipy
 
 import topo
     
@@ -68,7 +66,7 @@ def complexity(full_matrix):
                 res = res + abs(full_matrix.full_matrix[tuple(iindex.tolist())][x][y] - average)
                 complex_matrix[x,y] = complex_matrix[x,y] + [full_matrix.full_matrix[tuple(iindex.tolist())][x][y]]
             complexity[x,y] = res / (2*sum)
-            fft = scipy.fft(complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y],2048)
+            fft = numpy.fft(complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y],2048)
             first_har = 2048/len(complex_matrix[0,0])
             fftmeasure[x,y] = (2 *abs(fft[first_har]) * abs(fft[first_har]) )/(abs(fft[0]) * abs(fft[0]))
 #            print complex_matrix[x,y]
