@@ -109,3 +109,16 @@ properties (e.g. binary vs none, end of line) for adding?-->
 <!--
 Authentication realm: <https://topographica.svn.sf.net:443> SourceForge Subversion area
 -->
+
+
+
+<!--
+[lodestar]v1cball: svn commit ...
+Authentication realm: <https://topographica.svn.sourceforge.net:443> SourceForge Subversion area
+Password for 'v1cball': 
+
+Authentication realm: <https://topographica.svn.sourceforge.net:443> SourceForge Subversion area
+Username: ceball
+Password for 'ceball': X
+
+-->
