@@ -249,6 +249,7 @@ SCIPY_UNINSTALL = ${PYTHON_LIB}/site-packages/scipy external/scipy
 scipy: ${SCIPY}.tar.gz python
 	rm -f ${PYTHON_LIB}/site-packages/scipy external/scipy
 	tar -xozf ${SCIPY}.tar.gz
+	cp scipy-site.cfg ${SCIPY}/site.cfg
 	cd ${SCIPY}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch scipy
 
