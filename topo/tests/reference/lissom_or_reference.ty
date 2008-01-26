@@ -69,7 +69,6 @@ import numpy.oldnumeric as Numeric
 
 from math import pi, sqrt
 
-from topo.base.parameterclasses import DynamicNumber
 from topo.base.boundingregion import BoundingBox
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
@@ -140,11 +139,8 @@ gaussian_height = ysigma/BaseRN/sqrt(2.0)
 
 # get input pattern position parameters from the log file output of
 # the equivalent c++ simulation
-n_inputs,input_x,input_y,input_orientation = get_input_params()
+n_inputs,input_params = get_input_params()
 
-# c++ lissom's first iteration is just a test, so we lose it
-n_inputs-=1;input_x.next();input_y.next();input_orientation.next() 
-print "Number of patterns available for learning iterations:",n_inputs
 
 input_pattern = topo.patterns.basic.Gaussian(
     scale=scale_input,
@@ -152,9 +148,9 @@ input_pattern = topo.patterns.basic.Gaussian(
     size = 2*gaussian_height,
     aspect_ratio= gaussian_width/gaussian_height,
     # c++ positions and angle need to be converted to match Topographica
-    x=DynamicNumber(lambda : input_x.next()/BaseRN - 0.5*RN/BaseRN),
-    y=DynamicNumber(lambda : input_y.next()/BaseRN - 0.5*RN/BaseRN),
-    orientation=DynamicNumber(lambda : round(2*pi*input_orientation.next()/360.0,1)))
+    x=lambda : input_params[0]['cx'].next()/BaseRN - 0.5*RN/BaseRN,
+    y=lambda : input_params[0]['cy'].next()/BaseRN - 0.5*RN/BaseRN,
+    orientation=lambda : round(2*pi*input_params[0]['theta'].next()/360.0,1))
 
 
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)

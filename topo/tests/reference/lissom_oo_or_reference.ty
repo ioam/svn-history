@@ -72,7 +72,6 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection,SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.base.sheet import BoundingBox
-from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
@@ -153,8 +152,8 @@ GeneratorSheet.period = 1.0
 GeneratorSheet.phase=0.05
 
 # take the input pattern position parameters from the log file output of the equivalent c++ simulation
-n_inputs,input_x,input_y,input_orientation = get_input_params()
-n_inputs-=1;input_x.next();input_y.next();input_orientation.next() # c++ lissom's first iteration is just a test
+n_inputs,input_params = get_input_params()
+
 print "Number of patterns available for learning iterations:",n_inputs
 
 
@@ -165,9 +164,9 @@ input_pattern = topo.patterns.basic.Gaussian(
     scale=scale_input,
     size = 2*gaussian_height,
     aspect_ratio= gaussian_width/gaussian_height,
-    x=DynamicNumber(lambda : input_x.next()/BaseLN - 0.5*LN/BaseLN),
-    y=DynamicNumber(lambda : input_y.next()/BaseLN - 0.5*LN/BaseLN),
-    orientation=DynamicNumber(lambda : round(2*pi*input_orientation.next()/360.0,1)))
+    x=lambda : input_params[0]['cx'].next()/BaseLN - 0.5*LN/BaseLN,
+    y=lambda : input_params[0]['cy'].next()/BaseLN - 0.5*LN/BaseLN,
+    orientation=lambda : round(2*pi*input_params[0]['theta'].next()/360.0,1))
 
 
 retina_bounds = BoundingBox(radius= RN/(2.0*BaseRN*area_scale))

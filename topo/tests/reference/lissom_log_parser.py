@@ -19,37 +19,48 @@ from topo.tests.utils import array_almost_equal
 filename_base = ""
 
 
+import re
 def get_input_params():
     """
-    Return iterators over list of float values for C++ LISSOM's cx, cy, and theta.
+
+    Return iterators over list of float values for C++ LISSOM's cx,
+    cy, and theta for multiple eyes.
+
 
     Expects log file with values held in lines like this::
     
-      'Iteration: 000000  [Eye0 [Obj0 cx:02.1 cy:11.6 theta:074.0]]\n'  
+      'Iteration: 000000  [Eye0 [Obj0 cx:02.1 cy:11.6 theta:074.0]]\n'
+
+    or this:
+    
+      'Iteration: 000000  [Eye0 [Obj0 cx:23.4 cy:10.0 theta:059.6]]  [Eye1 [Obj0 cx:22.6 cy:10.5 theta:059.6]]  [Eye2 [Obj0 cx:21.7 cy:11.1 theta:059.6]]  [Eye3 [Obj0 cx:20.8 cy:11.6 theta:059.6]]\n'
+      
     """
     f = open(filename_base+'log','r')
-    
-    x = []
-    y = []
-    orientation = []
 
-    n_inputs = 0
-    for line in f.readlines():    
-        if line.startswith('Iteration'):
-            bits = line.split()
-            assert len(bits)==7, "Messed-up line (is lissom still running?)\n" + line
+    # first iter is test in c++ lissom; use to get num eyes
+    n_eyes = len(f.readline().split('Eye')[1::])
 
-            cx = float(bits[4].split(':')[1])
-            cy = float(bits[5].split(':')[1])
-            theta = float(bits[6].split(':')[1].rstrip(']]'))
+    input_params = dict([(i,dict(cx=list(),cy=list(),theta=list()))
+                         for i in range(n_eyes)])
 
-            x.append(cx)
-            y.append(cy)
-            orientation.append(theta)
-    
-            n_inputs+=1
+    # supposed to match numbers like 02.1, 074.0 etc
+    val_match = re.compile(r'([0-9]([0-9]|\.)+)+')
 
-    return n_inputs,iter(x),iter(y),iter(orientation)
+    lines = f.readlines()                 
+    for line in lines:
+        eyes = line.split('Eye')[1::]
+        for eye,i in zip(eyes,range(n_eyes)):
+            cx,cy,theta = [float(val[0]) for val in val_match.findall(eye)]
+            input_params[i]['cx'].append(cx)
+            input_params[i]['cy'].append(cy)
+            input_params[i]['theta'].append(theta)
+
+    for i in input_params:
+        for val in input_params[i]:
+            input_params[i][val] = iter(input_params[i][val])
+
+    return len(lines),input_params
 
 
 
