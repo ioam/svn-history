@@ -114,12 +114,13 @@ class PatternPresenter(ParameterizedObject):
         ### both pattern parameters and parameters controlling
         ### interaction between or differences between patterns.
 
-##         if features_values.has_key('direction'):
-##             orientation = features_values['direction']+pi/2            
-##             from topo.patterns.basic import Sweeper            
-##             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
-##                 inputs[name] = Sweeper(generator=inputs[name],step=i,speed=features_values['speed'])
-##                 setattr(inputs[name],'orientation',orientation)
+
+        if features_values.has_key('direction'):
+            orientation = features_values['direction']+pi/2            
+            from topo.patterns.basic import Sweeper            
+            for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
+                inputs[name] = Sweeper(generator=inputs[name],step=i,speed=features_values['speed'])
+                setattr(inputs[name],'orientation',orientation)
                             
 
         if features_values.has_key("phasedisparity"):
@@ -1163,39 +1164,42 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relativ
 
 
 ###############################################################################
-## pg= create_plotgroup(name='Direction Preference',category="Preference Maps",
-##              doc='Measure preference for sine grating orientation.',
-##              update_command='measure_dr_pref()')
-## pg.add_plot('Direction Preference',[('Hue','DirectionPreference')])
-## pg.add_plot('Direction Preference&Selectivity',[('Hue','DirectionPreference'),
-## 						   ('Confidence','DirectionSelectivity')])
-## pg.add_plot('Direction Selectivity',[('Strength','DirectionSelectivity')])
-## pg.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
+pg= create_plotgroup(name='Direction Preference',category="Preference Maps",
+             doc='Measure preference for sine grating orientation.',
+             update_command='measure_dr_pref()')
+pg.add_plot('Direction Preference',[('Hue','DirectionPreference')])
+pg.add_plot('Direction Preference&Selectivity',[('Hue','DirectionPreference'),
+                                                ('Confidence','DirectionSelectivity')])
+pg.add_plot('Direction Selectivity',[('Strength','DirectionSelectivity')])
+pg.add_static_image('OR Color Key','topo/commands/or_key_white_vert_small.png')
 
 
 
-## def measure_dr_pref(num_phase=12,num_direction=6,num_speeds=4,max_speed=2.0/24,frequencies=[2.4],
-##                     scale=0.2,offset=0.0,display=False,weighted_average=True,
-##                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
+def measure_dr_pref(num_phase=12,num_direction=6,num_speeds=4,max_speed=2.0/24,
+                    frequencies=[2.4],scale=0.2,offset=0.0,display=False,
+                    weighted_average=True,apply_output_fn=False,duration=0.175,
+                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating())):
 
-##     if num_phase <= 0 or num_direction <= 0:
-##         raise ValueError("num_phase and num_direction must be greater than 0")
+    if num_phase <= 0 or num_direction <= 0:
+        raise ValueError("num_phase and num_direction must be greater than 0")
 
-##     else:
-##         step_phase=2*pi/num_phase
-##         step_direction=2*pi/num_direction
-##         step_speed=float(max_speed)/num_speeds
+    else:
+        step_phase=2*pi/num_phase
+        step_direction=2*pi/num_direction
+        step_speed=float(max_speed)/num_speeds
 
-##         feature_values = [Feature(name="speed",range=(0.0,max_speed),step=step_speed,cyclic=False),
-##                           Feature(name="frequency",values=frequencies),
-##                           Feature(name="direction",range=(0.0,2*pi),step=step_direction,cyclic=True),
-##                           Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
+        feature_values = [Feature(name="speed",range=(0.0,max_speed),step=step_speed,
+                                  cyclic=False),
+                          Feature(name="frequency",values=frequencies),
+                          Feature(name="direction",range=(0.0,2*pi),step=step_direction,
+                                  cyclic=True),
+                          Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
 
-##         param_dict = {"scale":scale,"offset":offset}
-##         x=FeatureMaps(feature_values)
-##         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+        param_dict = {"scale":scale,"offset":offset}
+        x=FeatureMaps(feature_values)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
-##     Subplotting.set_subplots("Direction",force=True)
+    Subplotting.set_subplots("Direction",force=True)
 
 
 # CB: how did I get this?
