@@ -331,6 +331,11 @@ def process_argv(argv):
         # CB: should probably allow a way for users to pass things to
         # IPython? Or at least setup some kind of topogrpcahi ipython
         # config file
+
+        # Stop IPython namespace hack?
+        # http://www.nabble.com/__main__-vs-__main__-td14606612.html
+        __main__.__name__="__mynamespace__"
+
         from IPython.Shell import IPShell
         IPShell(['-noconfirm_exit','-nobanner',
                  '-pi1',CommandPrompt.get_format(),
