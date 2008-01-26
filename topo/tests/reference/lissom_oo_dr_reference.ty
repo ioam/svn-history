@@ -1,0 +1,429 @@
+"""
+LISSOM simulation designed to match C++ LISSOM's oo_dir_map
+simulation.
+
+** still being written **
+
+
+$Id: lissom_oo_or_reference.ty 5436 2007-04-15 08:54:08Z ceball $
+"""
+__version__='$Revision: 5436 $'
+
+
+# CB: the plan is to make this file more and more general while
+# keeping it matching the equivalent c++ lissom simulation (i.e. do to
+# this what was done to lissom_or_reference/or_map_topo.param).
+
+
+
+## from topo.base.parameterizedobject import ParameterizedObject
+## ParameterizedObject.print_level=300
+
+import fixedpoint
+import numpy.oldnumeric as Numeric
+#import pdb # debugger
+
+from math import pi, sqrt
+from fixedpoint import FixedPoint
+
+import topo.patterns.basic
+
+from topo.sheets.lissom import LISSOM
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.projections.basic import CFProjection,SharedWeightCFProjection
+from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.base.sheet import BoundingBox
+from topo.base.parameterclasses import DynamicNumber
+from topo.base.cf import CFSheet
+from topo.base.boundingregion import BoundingBox
+from topo.learningfns.optimized import CFPLF_Hebbian_opt
+from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.outputfns.basic import DivisiveNormalizeL1,PiecewiseLinear
+
+from topo.tests.reference.lissom_log_parser import get_input_params,check_weights,check_activities
+
+# All the C++ data-getting functions will use this as the filename base
+topo.tests.reference.lissom_log_parser.filename_base="topo/tests/reference/oo_dir_map."
+
+
+### Variables to match oo_or_map_topo.param
+#
+BaseN=48.0
+BaseRN=24.0
+BaseLN=24.0
+area_scale=1.0
+num_eyes=4
+
+rf_radius=BaseRN/4.0+0.5
+inh_rad=max(2.5,BaseN/4.0-1.0+0.5)
+exc_rad=max(2.5,BaseN/10.0-0.3)
+
+#min_exc_rad=max(1.0,BaseN/44+0.5)
+#default_afferent_size_scale=BaseN/BaseRN
+gammaexc=0.9
+gammainh=0.9
+delta=0.083
+beta=0.633
+
+
+randomness = 0.0
+#smooth_circular_radius_trim = -0.25
+
+#rf_radius_scale=5.0/rf_radius
+#retina_area_scale = (BaseRN*area_scale/24.0*rf_radius_scale)*(BaseRN*area_scale/24.0*rf_radius_scale)
+#inputs_pereye=max(retina_area_scale,1)
+xsigma=6.0
+ysigma=1.5
+scale_input=1.0
+
+
+# radius of LGN DoG center Gaussian
+sigma_c = 0.5
+
+# radius of LGN DoG surround Gaussian
+sigma_s = 4*sigma_c 
+
+# radius of LGN afferent connections
+r_L = 4.7*sigma_s
+
+# buffers so sheet above has full rfs...
+lgn_edge_buffer = round(rf_radius,0)
+retina_edge_buffer=round(rf_radius+r_L,0)
+
+# ...and actual numbers of neurons with the buffers
+RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
+LN=round(BaseLN*area_scale+2*lgn_edge_buffer,0)
+
+
+acs=6.5*6.5/rf_radius/rf_radius
+ecs=19.5*19.5/exc_rad/exc_rad
+ics=47.5*47.5/inh_rad/inh_rad
+alpha_input=0.007*acs
+alpha_exc=0.002*ecs
+alpha_inh=0.00025*ics
+
+tsettle=8
+
+
+# Number of decimal places for simulator time
+fixedpoint.DEFAULT_PRECISION=3
+
+# input generation params
+GeneratorSheet.nominal_density = BaseRN*area_scale
+GeneratorSheet.period = 1.0
+GeneratorSheet.phase=0.05
+
+# take the input pattern position parameters from the log file output of the equivalent c++ simulation
+n_inputs,input_params = get_input_params()
+print "Number of patterns available for learning iterations:",n_inputs
+
+
+gaussian_width = xsigma/BaseRN/sqrt(2.0)
+gaussian_height = ysigma/BaseRN/sqrt(2.0)
+
+input_pattern = topo.patterns.basic.Gaussian(
+    scale=scale_input,
+    size = 2*gaussian_height,
+    aspect_ratio= gaussian_width/gaussian_height,
+    x=lambda : input_params[0]['cx'].next()/BaseLN - 0.5*LN/BaseLN,
+    y=lambda : input_params[0]['cy'].next()/BaseLN - 0.5*LN/BaseLN,
+    orientation=0)
+
+                         
+
+
+retina_bounds = BoundingBox(radius= RN/(2.0*BaseRN*area_scale))
+lgn_bounds = BoundingBox(radius=LN/(2.0*BaseLN*area_scale))
+                                               
+GeneratorSheet.nominal_bounds = retina_bounds
+
+CFSheet.nominal_bounds = lgn_bounds
+CFSheet.nominal_density= BaseLN
+
+# Connection parameters
+lgn_weight_bounds = BoundingBox(radius=r_L/BaseLN)
+afferent_weight_bounds   = BoundingBox(radius=rf_radius/BaseRN)               
+excitatory_weight_bounds = BoundingBox(radius=exc_rad/BaseN)  
+inhibitory_weight_bounds = BoundingBox(radius=inh_rad/BaseN)                  
+
+
+# Circular ConnectionFields
+CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.weights_generator = topo.patterns.basic.Constant()
+CFProjection.response_fn=CFPRF_DotProduct_opt()
+CFProjection.learning_fn=CFPLF_Hebbian_opt()
+CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
+
+SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
+
+# CB: examples/ files should not copy this, because we prefer the way
+# topographica sizes the mask (c++ lissom and topographica are the
+# same for certain values of r_L, but topographica makes the mask size
+# match the actual connectionfield in general).
+SharedWeightCFProjection.autosize_mask=False
+SharedWeightCFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0,
+                                                                size=2.0*r_L/BaseLN)
+
+import topo
+def doh(i):
+    return input_params[i]['theta'].next()
+
+
+from topo.patterns.basic import Sweeper
+
+for i in range(num_eyes):
+    topo.sim['Eye%s'%i]=GeneratorSheet(
+        input_generator=Sweeper(
+        generator=copy.deepcopy(input_pattern),
+        step=i,speed=1.0/BaseRN,
+        orientation=lambda x=i:round(2*pi*doh(x)/360.0,1)))
+
+    topo.sim['Ganglia%s0'%i]=CFSheet(output_fn=PiecewiseLinear(lower_bound=0.0,
+                                                               upper_bound=1.0))
+    
+    topo.sim['Ganglia%s1'%i]=CFSheet(output_fn=PiecewiseLinear(lower_bound=0.0,
+                                                               upper_bound=1.0))
+
+
+topo.sim['Primary'] = LISSOM(nominal_density=BaseN,
+                             tsettle=tsettle,
+                             output_fn=PiecewiseLinear(lower_bound=delta,upper_bound=beta))
+
+
+# C++ LISSOM divides by pi in RadialFunction::Gaussian but not for
+# Gaussian in retinalobjs (and elsewhere)
+centerg = topo.patterns.basic.Gaussian(
+    size=2*sigma_c*sqrt(pi)/BaseRN,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))
+
+surroundg = topo.patterns.basic.Gaussian(
+    size=2*sigma_s*sqrt(pi)/BaseRN,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))
+
+
+on_weights = topo.patterns.basic.Composite(
+    generators=[centerg,surroundg],operator=Numeric.subtract)
+
+off_weights = topo.patterns.basic.Composite(
+    generators=[surroundg,centerg],operator=Numeric.subtract)
+
+
+### GOT TO HERE *SIGH*
+
+
+for i in range(num_eyes):
+    
+    topo.sim.connect('Eye%s'%i,'Ganglia%s0'%i,delay=FixedPoint("0.05"),
+                     connection_type=SharedWeightCFProjection,strength=1.0,
+                     nominal_bounds_template=lgn_weight_bounds,
+                     weights_generator=on_weights,name="Afferent%s0"%i)
+
+    topo.sim.connect('Eye%s'%i,'Ganglia%s1'%i,delay = FixedPoint("0.05"),
+                     connection_type=SharedWeightCFProjection,strength=1.0,
+                     nominal_bounds_template=lgn_weight_bounds,
+                     weights_generator=off_weights,name="Afferent%s0"%i)
+
+    topo.sim.connect('Ganglia%s0'%i,'Primary',delay=FixedPoint("0.05"),
+                     dest_port=('Activity','JointNormalize', 'Afferent'),
+                     connection_type=CFProjection,strength=1.0,name='Afferent%s0'%i,
+                     nominal_bounds_template=afferent_weight_bounds)
+
+    topo.sim.connect('Ganglia%s1'%i,'Primary',delay=FixedPoint("0.05"),
+                     dest_port=('Activity','JointNormalize', 'Afferent'),
+                     connection_type=CFProjection,strength=1.0,name='Afferent%s1'%i,
+                     nominal_bounds_template=afferent_weight_bounds)
+
+
+topo.sim.connect('Primary','Primary',delay=FixedPoint("0.05"),
+                 connection_type=CFProjection,strength=0.9,name='LateralExcitatory',
+                 nominal_bounds_template=excitatory_weight_bounds)
+            
+topo.sim.connect('Primary','Primary',delay=FixedPoint("0.05"),
+                 connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
+                 nominal_bounds_template=inhibitory_weight_bounds)
+
+
+def n_units(x):
+    """
+    Same technique as in cf.py for counting the number of units.
+    """
+    center_unit=(int(BaseN/2),int(BaseN/2))
+    return len(Numeric.nonzero(Numeric.ravel(x.cf(*center_unit).mask)))
+
+
+
+# shortcuts to save on typing...
+Af00 = topo.sim['Primary'].projections()["Afferent00"]
+Af01 = topo.sim['Primary'].projections()["Afferent01"]
+LE = topo.sim['Primary'].projections()["LateralExcitatory"]
+LI = topo.sim['Primary'].projections()["LateralInhibitory"]
+
+
+# Topographica learning rate is independent of density
+Af00.learning_rate=alpha_input*n_units(Af00)
+Af01.learning_rate=alpha_input*n_units(Af01)
+LE.learning_rate=alpha_exc*n_units(LE)
+LI.learning_rate=alpha_inh*n_units(LI)
+
+
+
+
+### EXCITATORY BOUNDS CHANGES
+#
+# The learning rate is adjusted too because the number of units
+# changes (even if the learning rate is going to be adjusted anyway at
+# this time)
+#
+topo.sim.schedule_command(199, 'exc_rad*=0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=n_units(LE)*alpha_exc')
+
+
+### LEARNING RATE CHANGES
+#
+topo.sim.schedule_command(  499, 'alpha_exc=0.0010*ecs; LE.learning_rate=alpha_exc*n_units(LE)')
+
+topo.sim.schedule_command(  499, 'alpha_input=0.0050*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
+topo.sim.schedule_command( 1999, 'alpha_input=0.0040*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
+topo.sim.schedule_command( 3999, 'alpha_input=0.0030*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
+topo.sim.schedule_command(19999, 'alpha_input=0.0015*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
+
+
+### Primary output function bounds changes
+#
+topo.sim.schedule_command(  199, 'topo.sim["Primary"].output_fn.lower_bound=0.11; topo.sim["Primary"].output_fn.upper_bound=0.66')
+topo.sim.schedule_command(  499, 'topo.sim["Primary"].output_fn.lower_bound=0.12; topo.sim["Primary"].output_fn.upper_bound=0.67')
+topo.sim.schedule_command(  999, 'topo.sim["Primary"].output_fn.lower_bound=0.15; topo.sim["Primary"].output_fn.upper_bound=0.68')
+topo.sim.schedule_command( 1999, 'topo.sim["Primary"].output_fn.lower_bound=0.18; topo.sim["Primary"].output_fn.upper_bound=0.70')
+topo.sim.schedule_command( 2999, 'topo.sim["Primary"].output_fn.lower_bound=0.20; topo.sim["Primary"].output_fn.upper_bound=0.73')
+topo.sim.schedule_command( 3999, 'topo.sim["Primary"].output_fn.lower_bound=0.20; topo.sim["Primary"].output_fn.upper_bound=0.76')
+topo.sim.schedule_command( 4999, 'topo.sim["Primary"].output_fn.lower_bound=0.21; topo.sim["Primary"].output_fn.upper_bound=0.79')
+topo.sim.schedule_command( 6499, 'topo.sim["Primary"].output_fn.lower_bound=0.22; topo.sim["Primary"].output_fn.upper_bound=0.82')
+topo.sim.schedule_command( 7999, 'topo.sim["Primary"].output_fn.lower_bound=0.23; topo.sim["Primary"].output_fn.upper_bound=0.85')
+topo.sim.schedule_command(19999, 'topo.sim["Primary"].output_fn.lower_bound=0.24; topo.sim["Primary"].output_fn.upper_bound=0.88')
+
+
+
+from math import floor
+
+def the_slice(row):
+
+    start_r = row
+    end_r = start_r + int(floor(0.5*4*4.7*2)) + 1
+
+    return slice(start_r,end_r)
+
+
+if locals().get('comparisons',False):
+
+
+
+    ### INITIAL WEIGHTS COMPARISONS
+    #
+    check_weights('Ganglia00','Afferent0',(0,0),the_slice(0),the_slice(0))
+    check_weights('Ganglia00','Afferent0',(12,12),the_slice(12),the_slice(12))
+    
+    check_weights('Ganglia01','Afferent0',(0,0),the_slice(0),the_slice(0))
+    check_weights('Ganglia01','Afferent0',(12,12),the_slice(12),the_slice(12))
+    
+    # CEBALERT: Before the simulation has been run, the
+    # Topographica weights are not jointly normalized.
+    topo.sim.run(0.00001)
+    
+    check_weights('Primary','Afferent00',(0,0),slice(1,14),slice(1,14))
+    check_weights('Primary','Afferent00',(23,23),slice(12,25),slice(12,25))
+    check_weights('Primary','Afferent01',(0,0),slice(1,14),slice(1,14))
+    check_weights('Primary','Afferent01',(23,23),slice(12,25),slice(12,25))
+
+    check_weights('Primary','LateralExcitatory',(0,0),slice(0,5),slice(0,5))
+    check_weights('Primary','LateralExcitatory',(23,23),slice(19,28),slice(19,28))
+
+    check_weights('Primary','LateralInhibitory',(0,0),slice(0,12),slice(0,12))
+    check_weights('Primary','LateralInhibitory',(23,23),slice(12,35),slice(12,35))
+
+    topo.sim.run(0.99999) # i.e. to 1
+
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+    
+    topo.sim.run(198) # to 199
+
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    # add some checks for weights
+    
+    topo.sim.run(1) # to 200
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(300) # to 500
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(500) # to 1000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(1000) # to 2000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(1000) # to 3000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(1000) # to 4000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(1000) # to 5000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(1000) # to 6000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(1000) # to 7000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(1000) # to 8000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+    topo.sim.run(12000) # to 20000
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
+
+
+
+
+### Command used to generate C++ LISSOM data for comparisons.
+#
+#
+
+#./lissom5 commandpath="/home/chris/mae/lissom/command/" display=0 oo_or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c "plot_unit region=Ganglia00 save_matrices=True 12 12" -c "plot_unit region=Ganglia01 save_matrices=True 0 0" -c "plot_unit region=Ganglia01 save_matrices=True 12 12" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+198' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'step' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+300' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+500' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+12000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'
