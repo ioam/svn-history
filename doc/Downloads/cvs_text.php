@@ -72,9 +72,9 @@ put the files directly into your present directory.
 <code>trunk</code>. Note that the bleeding-edge version
 is not always usable due to work in progress (but you can check to see if the
 code currently builds on a specific platform
-(<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_build">linux</a>,
-<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=ppc_darwin8.10.0_build">Mac</a>) and whether our   
-<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests&builder=x86_ubuntu7.04_slow-tests">code tests pass</a>).
+(<a href="http://buildbot.topographica.org/one_box_per_builder?builder=linux_build">linux</a>,
+<a href="http://buildbot.topographica.org/one_box_per_builder?builder=mac_build">Mac</a>) and whether our   
+<a href="http://buildbot.topographica.org/one_box_per_builder?builder=linux_tests&builder=linux_slow-tests">code tests pass</a>).
 
 <P>The checkout process will likely take several minutes (probably
 appearing to hang at certain points), as there are some extremely
@@ -274,7 +274,7 @@ To switch from the LATEST_STABLE version to the trunk version, replace
 <code>tags/LATEST_STABLE</code> with <code>trunk</code>.  (Note that
 before deciding whether to update to the bleeding-edge (trunk)
 version, you can check its
-<a href="http://doozy.inf.ed.ac.uk:8010/one_box_per_builder?builder=x86_ubuntu7.04_tests&builder=x86_ubuntu7.04_slow-tests">status</a>.)
+<a href="http://buildbot.topographica.org/one_box_per_builder?builder=linux_tests&builder=linux_slow-tests">status</a>.)
 Alternatively, to switch to a separate branch named 'some-branch', replace
 <code>tags/LATEST_STABLE</code> with <code>branches/some-branch</code>
 
