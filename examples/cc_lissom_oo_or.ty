@@ -39,7 +39,7 @@ from topo.learningfns.optimized import CFPLF_Hebbian_opt, CFPLF_Trace_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear,DivisiveNormalizeL1, Pipeline
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay, Choice
-from topo.outputfns.homeostatic import HomeostaticMaxEnt,OutputFnDebugger
+from topo.outputfns.homeostatic import HomeostaticMaxEnt
 from topo.patterns.basic import Gaussian
 from topo.learningfns.projfns import CFPLF_Trace
 from topo.base.functionfamilies import CoordinateMapperFn
@@ -98,12 +98,12 @@ core_size=locals().get('CS',0.5)
 ## Homeostatic stuff
 #Simple
 HES=HomeostaticMaxEnt(eta_a=0.0,eta=locals().get('ETA',0.0002),smoothing=0.0003,a_init=locals().get('SAINI',18), b_init=locals().get('SBINI',-10),learning=locals().get('HMON',False), mu=locals().get('SCxMU',0.01))
-ODS=OutputFnDebugger(function=HES, **shared_debug_params)
-output_fn_S=Pipeline(output_fns=[HES, ODS])
+#ODS=OutputFnDebugger(function=HES, **shared_debug_params)
+output_fn_S=HES#Pipeline(output_fns=[HES, ODS])
 #Complex
 HEC=HomeostaticMaxEnt(eta_a=0.0,learning=locals().get('HMON',False),eta=locals().get('ETA',0.0002),smoothing=0.0003,a_init=14.5, b_init=locals().get('CBINI',-4.0), mu=locals().get('CCxMU',0.02))
-ODC=OutputFnDebugger(function=HEC, **shared_debug_params)
-output_fn_C=Pipeline(output_fns=[HEC, ODC])
+#ODC=OutputFnDebugger(function=HEC, **shared_debug_params)
+output_fn_C=HEC#Pipeline(output_fns=[HEC, ODC])
 
 
 ###########################################
@@ -237,7 +237,7 @@ topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.05"),name='LateralE
                  #learning_fn=CFPLF_Trace_opt(trace_strength=locals().get('TraceStr',0.5)))
 
 topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.05"),name='LateralInhibitory',
-                 connection_type=CFProjection,strength=-locals().get('CxLatInhStr',0.4),
+                 connection_type=CFProjection,strength=-locals().get('CxLatInhStr',0.3),
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                      generators=[Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',2*0.22917)),
                                 topo.patterns.random.UniformRandom()]),
