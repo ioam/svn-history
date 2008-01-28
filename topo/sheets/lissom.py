@@ -73,33 +73,6 @@ class JointNormalizingCFSheet(CFSheet):
                     (isinstance(port,tuple) and port[0] == key) or
                     (isinstance(key,tuple)  and isinstance(port,tuple) and port[0] == key[0]))]
 
-    def _grouped_in_projections(self):
-        """
-        Return a dictionary of lists of incoming Projections, grouped for normalization.
-
-        The entry None will contain those to be normalized
-        independently, while the other entries will contain a list of
-        Projections, each of which should be normalized together.
-        """
-        in_proj = KeyedList()
-        in_proj[None]=[] # Independent (ungrouped) connections
-        
-        for c in self.in_connections:
-            d = c.dest_port
-            if not isinstance(c,Projection):
-                self.debug("Skipping non-Projection "+c.name)
-            elif isinstance(d,tuple) and len(d)>2 and d[1]=='JointNormalize':
-                if in_proj.get(d[2]):
-                    in_proj[d[2]].append(c)
-                else:
-                    in_proj[d[2]]=[c]
-            elif isinstance(d,tuple):
-                raise ValueError("Unable to determine appropriate action for dest_port: %s (connection %s)." % (d,c.name))
-            else:
-                in_proj[None].append(c)
-                    
-        return in_proj
-
                         
     def compute_joint_norm_totals(self,projlist,mask):
         """
@@ -130,8 +103,7 @@ class JointNormalizingCFSheet(CFSheet):
         if(mask == None):
             mask = Numeric.ones(self.shape,activity_type)
         
-        for key,projlist in self._grouped_in_projections():
-            
+        for key,projlist in self._grouped_in_projections('JointNormalize'):
             if key == None:
                 normtype='Independent'
             else:
@@ -245,7 +217,10 @@ class LISSOM(JointNormalizingCFSheet):
             if self.activation_count == self.mask_init_time:
                 self.mask.calculate()
             
-    	    if self.activation_count == self.tsettle:
+            if self.tsettle == 0:
+                self.activate()
+                self.learn()
+   	    elif self.activation_count == self.tsettle:
                 # Once we have been activated the required number of times
                 # (determined by tsettle), reset various counters, learn
                 # if appropriate, and avoid further activation until an
@@ -259,6 +234,7 @@ class LISSOM(JointNormalizingCFSheet):
                 self.activation_count += 1
                 if (self.learning and self.continuous_learning):
                    self.learn()
+
                    
 
     # print the weights of a unit
@@ -277,6 +253,18 @@ class LISSOM(JointNormalizingCFSheet):
         super(LISSOM,self).state_pop(**args)
         self.activation_count,self.new_iteration=self.__counter_stack.pop()
   
+class JointNormalizingCFSheet_Continouse(JointNormalizingCFSheet):
+    """
+    This is a version of CFSheet that runs continousely - eg. there are no 'resting' periods between pattern presentations. 
+    However learning occurs only always when the time is an integer number.
+    """
+    def process_current_time(self):
+        if(float(topo.sim.time()) % 1.0 == 0.0):
+            #self.activate()
+            if (self.learning):
+                 self.learn()
+        else:
+             self.activate()
 
 class JointScaling(LISSOM):
     """
