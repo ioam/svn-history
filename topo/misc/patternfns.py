@@ -1,3 +1,4 @@
+from __future__ import with_statement
 """
 Family of two-dimensional functions indexed by x and y.
 
@@ -16,16 +17,27 @@ from math import pi
 from numpy.oldnumeric import where,maximum,cos,sin,sqrt,divide,greater_equal,bitwise_xor,exp
 from numpy import seterr
 
-# Many of these functions use Gaussian smoothing, which is based on a
-# calculation like exp(divide(x*x,sigma)).  When sigma is zero the
-# value of this expression should be zero at all points in the plane,
-# because such a Gaussian is infinitely small.  Obtaining the correct
-# answer using finite-precision floating-point array computations
-# requires allowing infinite values to be returned from divide(), and
-# allowing exp() to underflow silently to zero when given an infinite
-# value.  In numpy this is achieved by using its seterr() function to
-# disable divide-by-zero and underflow warnings temporarily while
-# these values are being computed; see below for examples.
+from contextlib import contextmanager
+
+@contextmanager
+def float_error_ignore():
+    """
+    Many of the functions in this module use Gaussian smoothing, which
+    is based on a calculation like exp(divide(x*x,sigma)).  When sigma
+    is zero the value of this expression should be zero at all points
+    in the plane, because such a Gaussian is infinitely small.
+    Obtaining the correct answer using finite-precision floating-point
+    array computations requires allowing infinite values to be
+    returned from divide(), and allowing exp() to underflow silently
+    to zero when given an infinite value.  In numpy this is achieved
+    by using its seterr() function to disable divide-by-zero and
+    underflow warnings temporarily while these values are being
+    computed.
+    """
+    oldsettings=seterr(divide='ignore',under='ignore')
+    yield
+    seterr(**oldsettings)
+
 
 
 def gaussian(x, y, xsigma, ysigma):
@@ -34,23 +46,20 @@ def gaussian(x, y, xsigma, ysigma):
     bell curve, like a normal distribution but not necessarily summing
     to 1.0).
     """
-    oldsettings=seterr(divide="ignore",under="ignore")
-    x_w = divide(x,xsigma)
-    y_h = divide(y,ysigma)
-    result = exp(-0.5*x_w*x_w + -0.5*y_h*y_h)
-    seterr(**oldsettings)
-    return result
+    with float_error_ignore():
+        x_w = divide(x,xsigma)
+        y_h = divide(y,ysigma)
+        return exp(-0.5*x_w*x_w + -0.5*y_h*y_h)
 
 
 def gabor(x, y, xsigma, ysigma, frequency, phase):
     """
     Gabor pattern (sine grating multiplied by a circular Gaussian).
     """
-    oldsettings=seterr(divide="ignore",under="ignore")
-    x_w = divide(x,xsigma)
-    y_h = divide(y,ysigma)
-    p = exp(-0.5*x_w*x_w + -0.5*y_h*y_h)
-    seterr(**oldsettings)
+    with float_error_ignore():
+        x_w = divide(x,xsigma)
+        y_h = divide(y,ysigma)
+        p = exp(-0.5*x_w*x_w + -0.5*y_h*y_h)
     return p * 0.5*cos(2*pi*frequency*y + phase)
 
 
@@ -67,9 +76,8 @@ def line(y, thickness, gaussian_width):
     gaussian_y_coord = distance_from_line - thickness/2.0
     sigmasq = gaussian_width*gaussian_width
 
-    oldsettings=seterr(divide="ignore",under="ignore")
-    falloff = exp(divide(-gaussian_y_coord*gaussian_y_coord,2*sigmasq))
-    seterr(**oldsettings)
+    with float_error_ignore():
+        falloff = exp(divide(-gaussian_y_coord*gaussian_y_coord,2*sigmasq))
 
     return where(gaussian_y_coord<=0, 1.0, falloff)
 
@@ -89,9 +97,9 @@ def disk(x, y, height, gaussian_width):
     distance_outside_disk = distance_from_origin - disk_radius
     sigmasq = gaussian_width*gaussian_width
 
-    oldsettings=seterr(divide="ignore",under="ignore")
-    falloff = exp(divide(-distance_outside_disk*distance_outside_disk,2*sigmasq))
-    seterr(**oldsettings)
+    with float_error_ignore():
+        falloff = exp(divide(-distance_outside_disk*distance_outside_disk,
+                             2*sigmasq))
 
     return where(distance_outside_disk<=0,1.0,falloff)
 
@@ -111,9 +119,8 @@ def ring(x, y, height, thickness, gaussian_width):
 
     sigmasq = gaussian_width*gaussian_width
 
-    oldsettings=seterr(divide="ignore",under="ignore")
-    inner_falloff = exp(divide(-distance_inside_inner_disk*distance_inside_inner_disk, 2.0*sigmasq))
-    outer_falloff = exp(divide(-distance_outside_outer_disk*distance_outside_outer_disk, 2.0*sigmasq))
-    seterr(**oldsettings)
+    with float_error_ignore():
+        inner_falloff = exp(divide(-distance_inside_inner_disk*distance_inside_inner_disk, 2.0*sigmasq))
+        outer_falloff = exp(divide(-distance_outside_outer_disk*distance_outside_outer_disk, 2.0*sigmasq))
 
     return maximum(inner_falloff,maximum(outer_falloff,ring))
