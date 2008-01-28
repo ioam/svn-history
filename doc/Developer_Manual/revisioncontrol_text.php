@@ -71,17 +71,17 @@ the source of a bug, or whether it was all those other changes that
 <H2>Revision info</H2>
 
 <P>Every readable file (i.e. text, source code, html, etc.) should
-include an <CODE>&#36;Id&#36;</CODE> tag so that the SVN revision
+include an <CODE>&#36;Id:&#36;</CODE> tag so that the SVN revision
 information will be visible immediately, even in files outside of the
 CVS repository.
 
-<P>For text files, the <CODE>Id</CODE> tag should be placed near the
+<P>For text files, the <CODE>Id:</CODE> tag should be placed near the
 top, surrounded by dollar signs, on a line by itself.  Near the bottom
 is also acceptable, but not preferred.  See the top of the README.txt
-file for an example; CVS fills in all but the letters "Id" and the
+file for an example; CVS fills in all but the letters "Id:" and the
 dollar signs.
 
-<P>For Python files, the <CODE>Id</CODE> tag should be placed at the
+<P>For Python files, the <CODE>Id:</CODE> tag should be placed at the
 end of the Python doc string for that module, surrounded by dollar
 signs, on a line by itself.  
 
