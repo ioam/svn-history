@@ -133,8 +133,8 @@ def save_snapshot(snapshot_name=None,xml=False):
 
     The snapshot is saved as a gzip-compressed Python binary pickle.
 
-    (xml snapshots are currently experimental, and will not work for
-    most users.)
+    (xml snapshots are currently experimental, and will not be useful
+    for most users.)
 
     As this function uses Python's 'pickle' module, it is subject to
     the same limitations (see the pickle module's documentation) -
