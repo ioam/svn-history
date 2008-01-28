@@ -50,7 +50,7 @@ publication, please cite this reference:
 <A TARGET="_TOP" HREF="http://www.computationalmaps.org">
       <IMG SRC="../images/cmvc-cover-icon.jpg" ALT="Computational Maps in the Visual Cortex (2005) Miikkulainen, Bednar, Choe, and Sirosh" WIDTH="162" HEIGHT="251" BORDER="0" ALIGN="RIGHT"></a>
 Many of the ideas in Topographica were developed in conjunction with our
-new book:
+book:
 <P><blockquote>
 <A NAME="miikkulainen:book05">Risto</A>
   Miikkulainen, James&nbsp;A. Bednar, Yoonsuck Choe, and Joseph Sirosh.
