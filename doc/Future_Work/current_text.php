@@ -45,6 +45,19 @@ tracker rather than added to this list</B>.
 
 <H2>Tasks to be addressed after the 0.9.4 release:</H2>
 
+<H4>2008/01/25 (JB): Organization of examples/</H4>
+The examples directory is getting quite big and confusing, at least in
+SVN.  We should consider how we want people to keep track of their
+code; should it be in the main SVN repository?  A separate "contrib"
+or "inprogress" branch?  We have to consider at least three types of
+examples, which may need three different locations: trivial
+(tiny.ty, cfsom_or.ty, hierarchical.ty), published
+(at least lissom_oo_or.ty, lissom_oo_dr.ty, lissom_or.ty,
+lissom_photo_or.ty, lissom_whisker_barrels.ty, obermayer_pnas90.ty,
+goodhill_network90.ty, som_retinotopy.ty), and ongoing research (by
+us, but also by people unaffiliated with Topographica but want their
+changes to track with SVN or be tied to a specific SVN version?)
+
 
 <H4>2007/12/23 (CB): who's tracking the results of...</H4>
 <ul>
