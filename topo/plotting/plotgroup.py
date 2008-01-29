@@ -761,6 +761,11 @@ class UnitPlotGroup(ProjectionSheetPlotGroup):
 	topo.commands.analysis.coordinate = (self.x,self.y)
 	super(UnitPlotGroup,self)._exec_update_command()
 
+    def _exec_plot_command(self):
+	topo.commands.analysis.coordinate = (self.x,self.y)
+	super(UnitPlotGroup,self)._exec_plot_command()
+
+
 
 
 class ConnectionFieldsPlotGroup(UnitPlotGroup):
