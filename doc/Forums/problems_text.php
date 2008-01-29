@@ -43,8 +43,8 @@ fixing the problem is urgent, and/or suggest fixes for the offending
 code. </li>
 
 <p><li>Otherwise, please
-<a href="http://sourceforge.net/tracker/?group_id=53602&atid=470929">file
-   a bug report</a>. If possible, please include:
+<a href="http://sourceforge.net/tracker/?func=add&group_id=53602&atid=470929">
+file a bug report</a>. If possible, please include:
 
 <p>
 <ul>
