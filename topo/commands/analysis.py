@@ -1202,25 +1202,6 @@ def measure_dr_pref(num_phase=12,num_direction=6,num_speeds=4,max_speed=2.0/24,
     Subplotting.set_subplots("Direction",force=True)
 
 
-# CB: how did I get this?
-## KeyError Exception in Tk callback
-##   Function: <bound method PlotsMenuEntry.__call__ of PlotsMenuEntry(name='PlotsMenuEntry00195', print_level=100)> (type: <type 'instancemethod'>)
-##   Args: ()
-## Traceback (innermost last):
-##   File "/home/ceball/topographica/lib/python2.5/site-packages/Pmw/Pmw_1_2/lib/PmwBase.py", line 1747, in __call__
-##     return apply(self.func, args)
-##   File "/home/ceball/topographica/topo/tkgui/topoconsole.py", line 130, in __call__
-##     new_plotgroup.plot_templates = topo.plotting.plotgroup.plotgroups[self.plotgroup.name].plot_templates
-##   File "/home/ceball/topographica/topo/misc/keyedlist.py", line 69, in __getitem__
-##     raise KeyError(key)
-## KeyError: 'Direction Preference'
-
-
-
-
-
-
-
 
 
 def decode_feature(sheet, preference_map = "OrientationPreference", axis_bounds=(0.0,1.0), cyclic=True, weighted_average=True):
