@@ -414,5 +414,4 @@ def wipe_out_activity():
         topo.sim[sheet].activity*=0.0
         for con in topo.sim[sheet].in_connections:
             if hasattr(con, 'activity'):
-                print con.name
                 con.activity*=0.0
