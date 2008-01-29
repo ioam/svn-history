@@ -416,7 +416,7 @@ class CFPLearningFn(ParameterizedObject):
         the total rate is to be divided evenly among all the units in
         the connection field.
 	"""
-        return learning_rate/proj.n_units()
+        return float(learning_rate)/proj.n_units()
 
 
     # JABALERT: Should the learning_rate be a parameter of this object instead of an argument?
