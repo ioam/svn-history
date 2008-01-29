@@ -261,6 +261,24 @@ class Slice(ndarray):
     def __array_finalize__(self,obj):
         self._scs = getattr(obj,'_scs',None)
         self.bounds = getattr(obj,'bounds',None)
+
+
+    def __reduce__(self):
+        """
+        Add this object's attributes (_scs and bounds) to the array reduction's state.
+        """
+        ndarray_reduction = list(ndarray.__reduce__(self)) # it's a tuple but we need to modify it
+        ndarray_reduction[2] = {'ndarray_state':ndarray_reduction[2],
+                                'slice_state':(self._scs,self.bounds)} 
+        return tuple(ndarray_reduction)
+
+    
+    def __setstate__(self,state):
+        """
+        Set this object's attributes as well as the array's.
+        """
+        ndarray.__setstate__(self,state['ndarray_state']) #[0])
+        self._scs,self.bounds = state['slice_state']
         
 
     def submatrix(self,matrix):
