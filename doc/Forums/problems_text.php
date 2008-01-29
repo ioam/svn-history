@@ -16,7 +16,8 @@ consider trying the most up to date ("bleeding-edge") version via
 every day, so by the end of a few weeks many changes will have
 accumulated.  Often, bugs will have been fixed and new features will
 have been added already in the SVN repository, even though they are
-not yet released officially.
+not yet released officially. <!--You can see what has changed since
+a certain date by looking at ... -->
 
 <p><li>If the problem is still present in the current version, you can
 search the list of
@@ -43,14 +44,23 @@ code. </li>
 
 <p><li>Otherwise, please
 <a href="http://sourceforge.net/tracker/?group_id=53602&atid=470929">file
-a bug report</a>. For us to help with the problem, we need to be able to
-replicate it. Please include:
+   a bug report</a>. If possible, please include:
 
 <p>
 <ul>
 <li>the full error message, if any</li>
-<li>the output of <code>svn diff</code> and <code>svn info</code>
-(if using an SVN version), or the Topographica release number</li>
+
+<li>if you are not using SVN (i.e. you downloaded a released version),
+please include the Topographica release number (you can obtain this by
+starting Topographica and typing <code>topo.release</code>)</li>
+
+<li>if you are using SVN, please include the output of <code>svn
+diff</code>, <code>svn status</code>, and <code>svn info</code>; you
+can create a single file (<code>report</code>) containing this
+information with the following command:
+<pre>svn info > report; svn status >> report; svn diff >> report</pre></li>
+<!--need to say it will overwrite any existing file called 'report'?-->
+
 <li>which operating system you are using (Linux, Mac, or Windows)</li>
 <li>any additional file needed to replicate the problem (e.g. a script you're using)</li>
 <li>a specific recipe (list of steps) that can reproduce the problem</li>
