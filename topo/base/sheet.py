@@ -277,7 +277,7 @@ class Slice(ndarray):
         """
         Set this object's attributes as well as the array's.
         """
-        ndarray.__setstate__(self,state['ndarray_state']) #[0])
+        ndarray.__setstate__(self,state['ndarray_state']) 
         self._scs,self.bounds = state['slice_state']
         
 
