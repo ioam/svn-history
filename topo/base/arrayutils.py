@@ -106,16 +106,6 @@ def centroid(array_2D):
     return row_centroid, col_centroid
 
 
-def clip_in_place(mat,lower_bound,upper_bound):
-    """Version of Numeric.clip that changes the argument in place, with no intermediate."""
-    lower_cropping = mat<lower_bound
-    upper_cropping = mat>upper_bound
-    to_keep = logical_not(bitwise_or(lower_cropping,upper_cropping))
-
-    mat *= to_keep
-    mat += lower_cropping*lower_bound
-    mat += upper_cropping*upper_bound
-
 
 def clip_lower(mat,lower_bound):
     """One-sided version of clip_in_place."""

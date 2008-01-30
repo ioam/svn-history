@@ -23,7 +23,7 @@ from math import ceil
 
 
 from topo.base.sheet import activity_type
-from topo.base.arrayutils import clip_in_place,clip_lower
+from topo.base.arrayutils import clip_lower
 from topo.base.arrayutils import L2norm, norm, array_argmax
 from topo.base.functionfamilies import OutputFn, OutputFnParameter
 from topo.base.parameterclasses import Parameter,Number,ListParameter,BooleanParameter, StringParameter
@@ -55,7 +55,7 @@ class PiecewiseLinear(OutputFn):
         fact = 1.0/(self.upper_bound-self.lower_bound)        
         x -= self.lower_bound
         x *= fact
-        clip_in_place(x,0.0,1.0)
+        x.clip(0.0,1.0,out=x)
 
 
 class Sigmoid(OutputFn):
