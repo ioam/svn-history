@@ -1003,7 +1003,7 @@ class ParameterizedObject(object):
 
 
     @bothmethod
-    def inspect_value(cls_or_slf,name):  # CB: rename/consider removing.
+    def inspect_value(cls_or_slf,name): 
         """
         Return the current value of the named attribute without modifying it.
 
@@ -1230,9 +1230,7 @@ class PicklableClassAttributes(object):
                 
 
 
-    # CEBALERT: might could be simplified
-    # (in addition to simplifications that could be made now this is a method rather than
-    # a standalone function).
+    # CB: I guess this could be simplified
     def get_PO_class_attributes(self,module,class_attributes,processed_modules,exclude=()):
         """
         Recursively search module and get attributes of ParameterizedObject classes within it.
@@ -1273,8 +1271,6 @@ class PicklableClassAttributes(object):
                             class_attributes[full_class_path][name] = obj
 
 
-# CB: __missing__ is new to python 2.5; do I still need to
-# provide an alternative for 2.4?
 
 # CEBALERT: we should incorporate overridden._check_params() here
 # rather than making __call__ methods do it
@@ -1296,17 +1292,10 @@ class ParamOverrides(dict):
         # be faster/easier to use?
         self.overridden = overridden
         dict.__init__(self,dict_)        
-
-
-    def __getitem__(self,key):
-        try:
-            return dict.__getitem__(self,key)
-        except KeyError:
-            return getattr(self.overridden,key)
-
-##     def __missing__(self,attr):
-##         """Return the attribute from overridden object."""
-##         return getattr(self.overridden,attr)
+ 
+    def __missing__(self,attr):
+        """Return the attribute from overridden object."""
+        return getattr(self.overridden,attr)
         
     def __repr__(self):
         """As dict.__repr__, but indicate the overridden object."""
