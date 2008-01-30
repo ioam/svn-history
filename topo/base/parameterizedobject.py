@@ -310,10 +310,7 @@ class Parameter(object):
         # constant => instantiate
         self.instantiate = instantiate or self.constant
 
-    # descriptor doc says we should have obj,objtype but
-    # maybe should have obj,objtype=None - somehow indicate
-    # that we never actually use objtype anyway. We store
-    # class (objtype) info on the parameter itself.
+
     def __get__(self,obj,objtype):
         """
         Return the value for this Parameter.
@@ -389,7 +386,7 @@ class Parameter(object):
         then internal_name will not be in the instance's __dict__
         """
         return self._internal_name or '_%s_param_value'%self.attrib_name(obj,None)
-#        return self._internal_name or '_%s_param_value'%self.attrib_name(obj,None)
+
 
     def attrib_name(self,obj=None,objtype=None):
         """
@@ -652,10 +649,6 @@ class ParameterizedObjectMetaclass(type):
 
 
 
-
-
-
-
 # JABALERT: Only partially achieved so far -- objects of the same
 # type and parameter values are treated as different, so anything
 # for which instantiate == True is reported as being non-default.
@@ -663,24 +656,15 @@ class ParameterizedObjectMetaclass(type):
 # of the things a Parameter does, but using a Parameter here
 # should be more readable anyway.
 
-# CBERRORALERT: Parameters only work as expected inside ParameterizedObjects:
-# >>> topo.base.parameterizedobject.script_repr_suppress_defaults=(Parameter=False)
-# >>> topo.base.parameterizedobject.script_repr_suppress_defaults is True
-# True
-# In the case below, the behavior probably turns out ok because
-# "if Parameter()" is True, and setting
-# topo.base.parameterizedobject.script_repr_suppress_defaults=False
-# just writes over the Parameter object anyway.
-script_repr_suppress_defaults=Parameter(True, hidden=True, doc="""
-    Whether script_repr should avoid reporting the values of parameters
-    that are just inheriting their values from the class defaults.""")
+# Whether script_repr should avoid reporting the values of parameters
+# that are just inheriting their values from the class defaults.
+script_repr_suppress_defaults=True
 
-
-dbprint_prefix=Parameter(None, hidden=True, doc="""
-    If not None, the value of this Parameter will be called (using '()')
-    before every call to __db_print, and is expected to evaluate to a
-    string that is suitable for prefixing messages and warnings (such
-    as some indicator of the global state).""")
+# If not None, the value of this Parameter will be called (using '()')
+# before every call to __db_print, and is expected to evaluate to a
+# string that is suitable for prefixing messages and warnings (such
+# as some indicator of the global state).""")
+dbprint_prefix=None
 
 
 
