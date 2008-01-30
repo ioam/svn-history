@@ -75,6 +75,14 @@ And others...
 <li>Cleanup + doc of plotgroup.py</li>
 </ul>
 
+Investigate http://www.egenix.com/products/python/mxExperimental/mxNumber/ or some
+other alternative to fixedpoint.FixedPoint.
+
+CB: 
+- cleanup test_pattern_present (or wherever I tried to add test for not-run simulation
+before presenting patterns/saving generators)
+- test that fullfield x and y work
+- test for recent run() problem with float
 
 
 <H4>2007/09/20: copying plotgroup from plotgroups</H4>
