@@ -277,8 +277,17 @@ class Slice(ndarray):
         """
         Set this object's attributes as well as the array's.
         """
-        ndarray.__setstate__(self,state['ndarray_state']) 
-        self._scs,self.bounds = state['slice_state']
+        ## PICKLEHACK: test for state not a dict is to allow snapshots
+        ## saved before pickle support was added to Slice to load
+        ## without error 
+        ## i.e. for snapshots created between 7547 (Slice becomes
+        ## array) and 7762 (inclusive; Slice got pickle support in 7763)
+        if isinstance(state,dict):
+            ndarray.__setstate__(self,state['ndarray_state']) 
+            self._scs,self.bounds = state['slice_state']
+        else:
+            # support snapshots created without
+            ndarray.__setstate__(self,state)
         
 
     def submatrix(self,matrix):
