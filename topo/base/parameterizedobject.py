@@ -668,16 +668,6 @@ dbprint_prefix=None
 
 
 
-# CEBERRORALERT: repr of PO not working properly (probably from
-# inspect_value for Dynamic params). E.g.
-# >>> g = Gaussian()
-# >>> g
-# Gaussian(aspect_ratio=0.29999999999999999, bounds=BoundingBox(radius=0.5), mask=None, name='Gaussian00029', offset=0.0, orientation=0.0, output_fn=IdentityOF(name='IdentityOF00030', norm_value=None, print_level=100), position=[0.0, 0.0], print_level=100, scale=1.0, size=0.5, x=0.0, xdensity=10, y=0.0, ydensity=10)
-# >>> g.aspect_ratio=3
-# >>> g  
-# Gaussian(aspect_ratio=0.29999999999999999, bounds=BoundingBox(radius=0.5), mask=None, name='Gaussian00029', offset=0.0, orientation=0.0, output_fn=IdentityOF(name='IdentityOF00030', norm_value=None, print_level=100), position=[0.0, 0.0], print_level=100, scale=1.0, size=0.5, x=0.0, xdensity=10, y=0.0, ydensity=10)
-# (aspect_ratio showing old value)
-
 class ParameterizedObject(object):
     """
     Base class for named objects that support Parameters and message formatting.
