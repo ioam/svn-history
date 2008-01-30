@@ -107,6 +107,20 @@ def centroid(array_2D):
 
 
 
+# CB: I suggest that we replace clip_lower with one of the two
+# functions below. They both look simpler, and might be slightly
+# faster. I think, however, that we have no test of clip_lower (direct
+# or indirect), so I'm not prepared to switch.
+#
+# (I haven't actually tested these functions.)
+#
+## def clip_lower1(mat,lower_bound,upper_bound):
+##    mat[mat<lower_bound]=lower_bound
+
+## from numpy import putmask
+## def clip_lower2(mat, lower_bound):
+##    putmask(mat, mat<lower_bound, lower_bound)
+
 def clip_lower(mat,lower_bound):
     """One-sided version of clip_in_place."""
     lower_cropping = mat<lower_bound
