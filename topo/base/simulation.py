@@ -600,7 +600,8 @@ class CommandEvent(Event):
         """
         Add the event to the simulation.
 
-        Prints a warning if the syntax is incorrect.
+        Raises an exception if the command_string contains a syntax
+        error.
         """
         self.command_string = command_string
         self.__test()
@@ -614,9 +615,6 @@ class CommandEvent(Event):
         """Generate a runnable command for creating this CommandEvent."""
         return simulation_path+".schedule_command("+`self.time`+",'"+ self.command_string+"')"
 
-    # CEBALERT: should we stop execution after detecting errors
-    # (rather than just printing a warning) in __call__() and
-    # __test()? After deciding, make docstrings match behavior.
 
     def __call__(self,sim):
         """
@@ -628,6 +626,9 @@ class CommandEvent(Event):
         scripts you have run, or imports they make---all currently
         available in __main__.__dict__---will not be saved with the
         network.
+
+        If executing the command causes an error, the error is ignored
+        and a warning is printed.
         """
         # Presumably here to avoid importing __main__ into the rest of the file
         import __main__
@@ -637,39 +638,18 @@ class CommandEvent(Event):
         try:
             exec self.command_string in __main__.__dict__
         except:
-            ParameterizedObject(name="CommandEvent").warning('%s was not executed because it would have caused an error: \n%s'%(self,self.__traceback_string()))
-
-
-    def __traceback_string(self):
-        """
-        Return traceback.format_exc() surrounded by markers to indicate that the
-        exception is different from normal: it did not actually occur.
-        """
-        import traceback
-        return "----------\n" + traceback.format_exc() + "----------\n"
+            print "Error in scheduled command:"
+            raise
             
     def __test(self):
         """
         Check for SyntaxErrors in the command.
-        
-        All other errors are ignored since __main__ could be in any state at the scheduled time.
         """
-        # This method doesn't affect an object the user has, because it executes the command in a new
-        # dictionary. So for instance, an iterator will not be advanced because it won't exist in the
-        # new dictionary. But the syntax of the command will be checked.
-        #
-        # CB: we could check for more errors, e.g. by checking for NameError and ignoring *only*
-        # that error. Then we would catch things like attempting to schedule 5/0.
-        # But I don't think we should actually do that (e.g. someone could be catching
-        # divide-by-zero errors later in their simulation).
-
-        # CEBALERT: isn't this a bad idea? What if the command takes ages to run?
         try:
-            exec self.command_string in {}
+            compile(self.command_string,"CommandString","single") 
         except SyntaxError:
-            ParameterizedObject(name='CommandEvent').warning('The scheduled command "%s" will not be executed because it contains a syntax error:\n%s'%(self.command_string,self.__traceback_string()))
-        except: # errors that aren't syntax errors don't mean anything here
-            pass
+            print "Error in scheduled command:"
+            raise
         
 
 class FunctionEvent(Event):
