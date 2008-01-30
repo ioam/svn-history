@@ -164,8 +164,9 @@ the ON and OFF channels of the LGN), followed by the lateral excitatory
 and lateral inhibitory weights to that neuron from nearby neurons in
 V1. The afferent weights represent the retinal pattern that would most
 excite the neuron.  For the particular neuron shown above, the optimal
-retinal stimulus would be a short, bright line oriented at about 180
-degrees (horizontal) in the center of the retina.  </p><p></p></li>
+retinal stimulus would be a short, bright line oriented at about 160
+degrees (from 10 o'clock to 4 o'clock) in the center of the retina.
+</p><p></p></li>
 
 <li>If all neurons had the same weight pattern, the response
 would not be patchy -- it would just be a blurred version of the
@@ -268,7 +269,8 @@ align="middle" WIDTH="490" HEIGHT="421"><br />
 </p><br>
 
 <P> Look at the <span class='t_item'>LateralExcitatory</span> weights,
-which show that the neurons near this neuron are nearly all red (horizontal).
+which show that the neurons near the above neuron are nearly all
+purple, to match its preferred orientation.
 <!-- somewhere might want to say this one almost falls on a boundary--> 
 
 <P>
@@ -441,7 +443,9 @@ Eventually, the number of V1 activations reaches a fixed limit for LISSOM
 until the next input is generated at time 1.05.  Thus the default
 stepsize of 1.0 lets the user see the results after each input pattern
 has been presented and the cortex has come to a steady state, but
-results can also be examined at a finer timescale.
+results can also be examined at a finer timescale.  Be sure to leave
+the time clock at an even multiple of 1.0 before you do anything else,
+so that the network will be in a well-defined state.
 </li>
 </ol>
 
@@ -490,7 +494,9 @@ level.  To do this, open the <span class='w_title'>Model Editor</span>
 window, right click on the LGNOnAfferent projection (the cone-shaped
 lines from LGNOn to V1), select Properties, and change Learning Rate
 from the default 0.48 to 100, press Apply, and then do the same for
-the LGNOffAfferent projection.  You can also do the same from the
+the LGNOffAfferent projection.
+<!--
+You can also do the same from the
 terminal, or from the <span class='w_title'>Command Prompt</span>
 window available from the <span class='t_item'>Simulation</span> menu:
 
@@ -498,6 +504,7 @@ window available from the <span class='t_item'>Simulation</span> menu:
 topo.sim['V1'].projections('LGNOnAfferent').learning_rate=100
 topo.sim['V1'].projections('LGNOffAfferent').learning_rate=100
 </code></blockquote>
+-->
 
 Now each new pattern generated in a
 training iteration will nearly wipe out any existing weights.
@@ -575,7 +582,7 @@ so, the overall organization and function should be similar.
 <h2>Exploring further</h2>
 
 <p> Topographica comes with additional examples, and more are
-currently being added.  In particular, the above examples work
+always being added.  In particular, the above examples work
 in nearly the same way with the simpler <code>lissom_or.ty</code>
 model.  Any valid Python code can
 be used to control and extend Topographica; documentation for Python and existing Topographica commands

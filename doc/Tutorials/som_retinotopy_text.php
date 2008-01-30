@@ -161,8 +161,8 @@ a way to visualize how smoothly both X and Y are mapped, although at
 this stage of training it is not particularly useful.
 
 <P><li>The behavior of this randomly connected network can be visualized
-by plotting the feedforward activation of each neuron, which
-represents the SOM Euclidean-distance response function.  Select
+by plotting the activation of each neuron, which shows the final
+cortical response to the given input pattern.  Select
 <span class='t_item'>Activity</span> from
 the <span class='t_item'>Plots</span> menu to get the following plot:
 
@@ -197,7 +197,7 @@ blob centered around the maximally responding unit.
 
 <P>To see more detail about what the responses were before SOM's
 neighborhood function forced them into a Gaussian shape, you can look
-a the Projection Activity plot, which shows the feedforward activity
+at the Projection Activity plot, which shows the feedforward activity
 in V1:
 
 <p class='center'>
@@ -212,9 +212,10 @@ intuitively expects for a neural response).  The V1 feedforward
 activity appears random because the Euclidean distance from the input
 vector to the initial random weight vector is random.
 
-<P><li> If you now hit <span class='t_item'>Refresh</span> in the
-<span class='w_title'>Projection</span> window, you'll see that some
-of the neurons have learned new weight patterns based on this input.
+<P><li> If you now hit the <span class='t_item'>Refresh</span> arrow
+on the Update command in the <span class='w_title'>Projection</span>
+window, you'll see that some of the neurons have learned new weight
+patterns based on this input.
 
 <p class='center'>
 <img src="images/som_projection_000001.png" alt="Projection window at 1"
@@ -272,7 +273,8 @@ have. Similarly, the topographic grid plot:
 
 shows that the network is now responding to different regions of the
 input space, but that most regions of the input space are not covered
-properly.  Additional training up to 10000 iterations leads to a flat, square
+properly.  Additional training up to 10000 iterations (which becomes
+faster due to a smaller neighborhood radius) leads to a flat, square
 map:
 
 <p class='center'>
@@ -317,39 +319,22 @@ results.
 Topographica.  This time, change one of the parameter values, either
 by editing the <code>som_retinotopy.ty</code> file before starting, or
 by providing it on the command line before the script name (for those
-parameters that check <code>locals()</code> for their defaults), or by
-typing the command at the Topographica terminal prompt.  For instance,
-to see the starting value of the neighborhood radius (from which all
-future values are calculated according to exponential decay), type:
+parameters that check <code>locals()</code> for their defaults).  For
+instance, the starting value of the neighborhood radius (from which
+all future values are calculated according to exponential decay) is
+1.0.  You can change this value as you see fit, e.g. to 0.1, by
+passing <code>-c radius_0=0.1</code> on the command line
+<emph>before</emph> the .ty file.  With such a small learning radius,
+global ordering is unlikely to happen, and one can expect the
+topographic grid not to flatten out (despite local order in patches).
+<br> <br>
 
-<pre>
-  topo.sim['V1'].radius_0
-</pre>
-
-
-You should see an initial value of something like 0.9975 displayed in
-your terminal window. Then change this value as you see fit, e.g. to
-0.1:
-
-<pre>
-  topo.sim['V1'].radius_0=0.1
-</pre>
-
-and go through learning again.  (You can also make this change in the
-Model Editor, or by passing <code>-c radius_0=0.1</code> on the command line.) 
-With such a small learning radius, global ordering is unlikely to
-happen, and one can expect the topographic grid not to flatten out
-(despite local order in patches).
-<br>
-<br>
-
-<P>Similarly, consider changing the learning rate from
-<code>V1.alpha_0=0.42</code> to e.g. 1.0
-(e.g. by passing <code>-c alpha_0=1.0</code> on the command line).  The retina
-and V1 densities cannot be changed after the simulation has started; to
-change those provide their values on the command line as above (or
-edit the <code>som_retinotopy.ty</code> file)
-and start Topographica again.
+<P>Similarly, consider changing the initial learning rate from
+re<code>0.42</code> to e.g. <code>1.0</code> (e.g. by passing <code>-c
+alpha_0=1.0</code> on the command line).  The retina and V1 densities
+cannot be changed after the simulation has started; to change those
+provide their values on the command line as above (or edit the
+<code>som_retinotopy.ty</code> file) and start Topographica again.
 
 <P>You can also try changing the input_seed ("-c input_seed=XX"), to
 get a different stream of inputs, or weight_seed ("-c
@@ -383,7 +368,7 @@ dimensions.
 <h2>Exploring further</h2>
 
 <p> Topographica comes with
-additional examples, and more are currently being added. Any valid Python code can
+additional examples, and more are always being added. Any valid Python code can
 be used to control and extend Topographica; documentation for Python and existing Topographica commands
 can be accessed from the <span class='t_item'>Help</span> menu of the
 <span class='w_title'>Topographica Console</span> window.
