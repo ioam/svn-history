@@ -174,9 +174,13 @@ simulation-snapshot-tests:
 
 snapshot-tests: simulation-snapshot-tests snapshot-compatibility-tests
 
+print-info:
+	@echo Running at ${shell date +%s}
+	@echo svnversion ${shell svnversion}
+
 # CB: snapshot-tests is not part of slow-tests for the moment
 # (until slow-tests split up on buildbot).
-slow-tests: train-tests all-speed-tests 
+slow-tests: print-info train-tests all-speed-tests 
 #snapshot-tests 
 
 # CB: add notes somewhere about...
