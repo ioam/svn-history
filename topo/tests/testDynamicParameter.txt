@@ -7,7 +7,7 @@
 
 
 ## Basic tests of Dynamic parameters (__get__ & __set__,
-## and that inspect_value() and repr_value() work).
+## and that inspect_value() and get_value_generator() work).
 
 >>> class TestPO1(ParameterizedObject):
 ...    x = Dynamic(default=UniformRandom(lbound=-1,ubound=1,seed=1),doc="nothing")
@@ -35,7 +35,7 @@ False
 >>> t2 = TestPO1(x=UniformRandom(lbound=-1,ubound=1,seed=10))
 >>> t3 = TestPO1(x=UniformRandom(lbound=-1,ubound=1,seed=10))
 
->>> isinstance(t2.repr_value('x'),UniformRandom)  # check repr_value()
+>>> isinstance(t2.get_value_generator('x'),UniformRandom)  # check get_value_generator()
 True
 
 
@@ -90,12 +90,12 @@ True
 
 # but now all existing instances of TestPO3 that don't have their own value for
 # the parameter share one UniformRandom object!
->>> t7.repr_value('y') is TestPO3().params()['y'].default
+>>> t7.get_value_generator('y') is TestPO3().params()['y'].default
 True
 
 >>> import copy
 >>> t9 = copy.deepcopy(t7)  
->>> t9.repr_value('y') is TestPO3().params()['y'].default  # check a copy is the same
+>>> t9.get_value_generator('y') is TestPO3().params()['y'].default  # check a copy is the same
 True
 
 

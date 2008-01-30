@@ -925,7 +925,7 @@ class ParameterizedObject(object):
         """Return a list of name,value pairs for all Parameters of this object"""
         vals = []
         for name,val in self.params().items():
-            value = self.repr_value(name)
+            value = self.get_value_generator(name)
             if (not onlychanged or value != val.default):
                 vals.append((name,value))
 
@@ -942,11 +942,17 @@ class ParameterizedObject(object):
     # this method.
     @bothmethod
     def force_new_dynamic_value(cls_or_slf,name):
+        """
+        Force a new value to be generated for the dynamic attribute
+        name, and return it.
+
+        If name is not dynamic, its current value is returned
+        (i.e. equivalent to getattr(name).
+        """
         param_obj = cls_or_slf.params().get(name)
 
         if not param_obj:
             return getattr(cls_or_slf,name)
-
 
         cls,slf=None,None
         if isinstance(cls_or_slf,type):
@@ -961,7 +967,7 @@ class ParameterizedObject(object):
             
 
     @bothmethod
-    def repr_value(cls_or_slf,name):   # CBALERT: rename!
+    def get_value_generator(cls_or_slf,name): 
         """
         Return the value or value-generating object of the named
         attribute.
@@ -977,7 +983,7 @@ class ParameterizedObject(object):
 
         # CompositeParameter detected by being a Parameter and having 'attribs'
         elif hasattr(param_obj,'attribs'):
-            value = [cls_or_slf.repr_value(a) for a in param_obj.attribs]
+            value = [cls_or_slf.get_value_generator(a) for a in param_obj.attribs]
 
         # not a Dynamic Parameter 
         elif not hasattr(param_obj,'_value_is_dynamic'):

@@ -690,7 +690,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         Otherwise, looks in the source_POs of this object.
         """
         source = parameterized_object or self.get_source_po(name)
-        return source.repr_value(name) 
+        return source.get_value_generator(name) 
 
         
     def set_parameter_value(self,name,val,parameterized_object=None):

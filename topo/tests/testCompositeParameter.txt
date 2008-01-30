@@ -80,8 +80,8 @@
 >>> a2.inspect_value('xy')  # inspect should not advance numbers 
 [1, 4]
 
->>> ix,iy = a2.repr_value('xy')
->>> ix()  # repr_value() should give the objects
+>>> ix,iy = a2.get_value_generator('xy')
+>>> ix()  # get_value_generator() should give the objects
 2
 >>> iy()
 5
