@@ -32,29 +32,13 @@ object_count = 0
 
 
 import inspect
-def classlist(class_):return inspect.getmro(class_)[::-1]
+def classlist(class_):
+    """
+    Return a list of the class hierarchy above (and including) the given class.
 
-# Also, classlist() has almost identical code as descendents().
-
-## def classlist(class_):
-##     """
-##     Return a list of the class hierarchy above (and including) the given class.
-
-##     The list is ordered from least- to most-specific.  Often useful in
-##     functions to get and set the full state of an object, e.g. for
-##     pickling.
-##     """
-##     assert isinstance(class_, type)
-##     q = [class_]
-##     out = []
-##     while len(q):
-##         x = q.pop(0)
-##         out.append(x)
-##         for b in x.__bases__:
-##             if b not in q and b not in out:
-##                 q.append(b)
-                
-##     return out[::-1]
+    Same as inspect.getmro(class_)[::-1]
+    """
+    return inspect.getmro(class_)[::-1]
 
 
 def descendents(class_):
@@ -77,20 +61,12 @@ def descendents(class_):
 
 
 
-# CEBALERT: update when swich to Python 2.5 - it has partial() in
-# the functional module. (What's called curry below seems to be
-# partial function application, not currying.)
 
-# (I hope partial() will allow doc to be seen for the actual
-#  method rather than the lambdas, but if it doesn't, there's
-#  also a decorator module somewhere - I think.)
+# consider decorator module: would allow doc to be seen for the
+# actual method rather than partial. Not part of standard library:
+# http://www.phyast.pitt.edu/~micheles/python/documentation.html
 
-# http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/222061
-curry = lambda func, *args, **kw:\
-            lambda *p, **n:\
-                func(*args + p, **dict(kw.items() + n.items()))
-
-
+from functools import partial
 class bothmethod(object):
     """
     'optional @classmethod'
@@ -108,9 +84,9 @@ class bothmethod(object):
     # i.e. this is also a non-data descriptor
     def __get__(self, obj, type=None):
         if obj is None:
-            return curry(self.func, type)
+            return partial(self.func, type)
         else:
-            return curry(self.func, obj)
+            return partial(self.func, obj)
 
 
 
