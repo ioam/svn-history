@@ -18,7 +18,6 @@ import topo.patterns.random
 
 from topo.base.sheet import activity_type
 from numpy import exp,zeros,ones
-from topo.base.arrayutils import clip_in_place
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFPLearningFn,LearningFnParameter
 from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
@@ -58,7 +57,7 @@ class PiecewiseLinear_debug2(OutputFn):
         fact = 1.0/(self.upper_bound-self.lower_bound)        
         x -= self.lower_bound
         x *= fact
-        clip_in_place(x,0.0,1.0)
+        x.clip(0.0,1.0,x)
 
 	if self.first_call:
 	    self.first_call = False
