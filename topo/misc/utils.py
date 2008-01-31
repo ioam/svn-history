@@ -11,6 +11,9 @@ import re
 import string
 import random
 import numpy
+import cProfile
+import pstats
+
 
 def NxN(tuple):
     """
@@ -243,7 +246,6 @@ def profile(command,n=50,sorting=('cumulative','time'),strip_dirs=True):
     """
     # This function simply wraps some functions from the cProfile
     # module, making profiling easier.
-    import cProfile, pstats
 
     # CB: leaves around "filename": should give this a proper name and maybe
     # put in /tmp/ and maybe allow someone to choose where to save it
@@ -413,52 +415,3 @@ class ExtraPickler(Singleton):
                 
 
 
-
-# CB: will be removed
-def old_profile(command,n=50,sorting=('cumulative','time'),strip_dirs=True):
-    """
-    Profile the given command (supplied as a string), printing
-    statistics about the top n functions when ordered according to
-    sorting.
-
-    sorting defaults to ordering by cumulative time and then internal
-    time; see http://docs.python.org/lib/profile-stats.html for other
-    sorting options.
-
-    By default, the complete paths of files are not shown. If there
-    are multiple files with the same name, you might wish to set
-    strip_dirs=False to make it easier to follow the output.
-
-
-    Examples:
-
-    - profile loading a simulation:
-    profile('execfile("examples/hierarchical.ty")')
-
-    - profile running an already loaded simulation:
-    profile('topo.sim.run(10)')
-
-    - profile running a whole simulation:
-    profile('execfile("examples/lissom_oo_or.ty");topo.sim.run(20000)')
-
-    - profile running a simulation, but from the commandline:
-    ./topographica examples/hierarchical.ty -c "from topo.misc.utils import profile; profile('topo.sim.run(10)')"
-    """
-    # This function simply wraps some functions from the hotshot
-    # module, making profiling easier.
-    import hotshot,hotshot.stats
-    
-    prof = hotshot.Profile('current_profile')
-    prof.run(command)
-    prof.close()
-    
-    prof_stats = hotshot.stats.load('current_profile')
-
-    if strip_dirs:prof_stats.strip_dirs()
-    prof_stats.sort_stats(*sorting).print_stats(n)
-
-
-try:
-    import cProfile
-except ImportError:
-    profile = old_profile
