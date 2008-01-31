@@ -76,7 +76,7 @@ class JointNormalizingCFSheet(CFSheet):
                         
     def compute_joint_norm_totals(self,projlist,mask):
         """
-        Compute norm_total for each CF in each projections from a group to be normalized jointly.
+        Compute norm_total for each CF in each projection from a group to be normalized jointly.
         """
 
         # Assumes that all Projections in the list have the same r,c size
