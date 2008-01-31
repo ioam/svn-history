@@ -242,11 +242,11 @@ doc: FORCE
 #############################################################################
 # For maintainer only; be careful with these commands
 
-## Code releases, currently handled via CVS.
+## Subversion-only code release, without making new binaries
 ## Run these from a relatively clean copy of the topographica directory 
 ## (without stray files, especially in doc/).
 
-cvs-release: LATEST_STABLE sf-web-site
+svn-release: LATEST_STABLE sf-web-site
 
 # Update any topographica-win files that keep track of the version number
 # CEBALERT: maintainer must have checked out topographica-win
@@ -258,13 +258,11 @@ new-version: FORCE
 
 
 # Make a new LATEST_STABLE on the web, using the currently checked-out version
+TOPOROOT=https://topographica.svn.sourceforge.net/svnroot/topographica
 LATEST_STABLE:
-	cvs rtag -d LATEST_STABLE topographica
-	cvs rtag -d LATEST_STABLE topographica-win
-	cvs tag  -F -c LATEST_STABLE
-	cvs tag  -F -c ${RELEASE_TAG}
-	cvs rtag -F LATEST_STABLE  topographica-win
-	cvs rtag -F ${RELEASE_TAG} topographica-win
+	svn delete -m "Updating LATEST_STABLE."  $TOPOROOT/tags/LATEST_STABLE
+	svn copy $TOPOROOT/trunk $TOPOROOT/tags/LATEST_STABLE -m "Updating LATEST_STABLE."
+
 
 # Update Topographica.org web site
 sf-web-site: reference-manual doc
@@ -273,7 +271,7 @@ sf-web-site: reference-manual doc
 
 # Clear out everything not intended for the public distribution
 #
-# This is ordinarily commented out in the CVS version for safety, 
+# This is ordinarily commented out in the SVN version for safety, 
 # but it is enabled when the distribution directory is created.
 #
 #@@distclean: FORCE clean
@@ -311,7 +309,7 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} -r images
 #@@	   ${RM} -r topographica-win
 #@@	   ${RM} -r tmp/
-#@@	   ${RM} -r CVS */CVS */*/CVS */*/*/CVS
+#@@	   ${RM} -r .svn */.svn */*/.svn */*/*/.svn
 #@@	   ${CD} topo/tests/reference ; make clean
 
 # Make public distribution archive
