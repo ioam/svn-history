@@ -28,7 +28,7 @@ import numpy
 import topo.patterns.random
 import topo.patterns.basic
 
-from topo.base.arrayutils import clip_in_place,array_argmax
+from topo.base.arrayutils import array_argmax
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet 
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
