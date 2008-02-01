@@ -31,6 +31,7 @@ from topo.commands.pylabplots import plot_modulation_ratio
 from topo.misc.distribution import Distribution
 from topo.analysis.vision import complexity
 from topo.patterns.random import GaussianRandom
+from topo.base.simulation import EPConnectionEvent
 
 class Feature(object):
     """
@@ -199,7 +200,7 @@ class PatternPresenter(ParameterizedObject):
                     g.scale=g.contrast
             
         wipe_out_activity()
-        topo.sim.event_clear()
+        topo.sim.event_clear(EPConnectionEvent)
             
         pattern_present(inputs, self.duration, learning=False,
                      apply_output_fn=self.apply_output_fn)
@@ -926,29 +927,27 @@ def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4
     michelson_contrast can be replaced by another variable(s) eg. scale, weber_contrast or
     any other contrast definition, provided it is defined in PatternPresenter. 
     """
-
-    sheets_to_measure=topo.sim.objects(CFSheet).values()
-
-    for sheet in sheets_to_measure:
-        if num_phase <= 0 or num_orientation <= 0:
-            raise ValueError("num_phase and num_orientation must be greater than 0")
+    sheet=topo.sim[sheet_name]
+    
+    if num_phase <= 0 or num_orientation <= 0:
+        raise ValueError("num_phase and num_orientation must be greater than 0")
+    
+    else:
+        step_phase=2*pi/num_phase
+        step_orientation=pi/num_orientation
         
-        else:
-            step_phase=2*pi/num_phase
-            step_orientation=pi/num_orientation
-            
-            feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                              Feature(name="orientation",range=(0,pi),step=step_orientation,cyclic=True),
-                              Feature(name="frequency",values=frequencies)]     
-            
-            x_axis='orientation'
-            x=FeatureCurves(feature_values,sheet,x_axis)
-            
-            for curve in curve_parameters:
-                param_dict={}
-                param_dict.update(curve)
-                curve_label='Contrast = '+str(curve["contrast"])+'%'
-                x.collect_feature_responses(feature_values,pattern_presenter,param_dict,curve_label,display)
+        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                        Feature(name="orientation",range=(0,pi),step=step_orientation,cyclic=True),
+                        Feature(name="frequency",values=frequencies)]     
+        
+        x_axis='orientation'
+        x=FeatureCurves(feature_values,sheet,x_axis)
+        
+        for curve in curve_parameters:
+            param_dict={}
+            param_dict.update(curve)
+            curve_label='Contrast = '+str(curve["contrast"])+'%'
+            x.collect_feature_responses(feature_values,pattern_presenter,param_dict,curve_label,display)
 	  
 
 ###############################################################################
@@ -1093,7 +1092,7 @@ def measure_size_response(num_phase=18,
 create_plotgroup(template_plot_type="curve",name='Contrast Response',category="Tuning Curves",
         doc='Measure the contrast response function for a specific unit.',
         update_command='measure_contrast_response()',
-        plot_command='tuning_curve(x_axis="contrast",plot_type=pylab.semilogx,unit="%")',
+        plot_command='tuning_curve(x_axis="contrast",plot_type=pylab.plot,unit="%")',
         prerequisites=['OrientationPreference','XPreference'])
 
 
@@ -1242,21 +1241,26 @@ def decode_feature(sheet, preference_map = "OrientationPreference", axis_bounds=
 ###############################################################################
 pg= create_plotgroup(name='Orientation Preference and Complexity',category="Preference Maps",
              doc='Measure preference for sine grating orientation.',
-             update_command='fm = measure_or_pref(frequencies=[3.0],scale=0.2,num_phase=128);analyse_complexity(fm)')
+             update_command='fm = measure_or_pref(frequencies=[3.0],scale=0.2,num_phase=32);analyze_complexity(fm)')
 pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
 pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
-pg.add_plot('Modulatio Ratio',[('Strength','ComplexSelectivity')])
+pg.add_plot('Modulation Ratio',[('Strength','ComplexSelectivity')])
 pg.add_plot('Phase Preference',[('Hue','PhasePreference')])
 pg.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
 
-def analyse_complexity(fm):
+def analyze_complexity(full_matrix):
+    """
+    This function perform orientation prefference analysis and than in addition also 
+    based on the data obtained from this procedure computes modulation ratio of 
+    each neuron. This ratio distinguishes complex cells from simple cells.    
+    """
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
     measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
 
     for sheet in measured_sheets:   
-        complx = array(complexity(fm[sheet]))
-        print complx
+        print sheet
+        complx = array(complexity(full_matrix[sheet]))
         sheet.sheet_views['Complex'+'Selectivity']=SheetView((complx,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time())
-    plot_modulation_ratio(fm)               
+    plot_modulation_ratio(full_matrix)               
