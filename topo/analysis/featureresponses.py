@@ -137,16 +137,6 @@ class FullMatrix(ParameterizedObject):
                 if(ff == f.name):
                     index = index + (f.values.index(value),)
         self.full_matrix[index] = new_values
-    
-        
-    def _complexity_rec(self,x,y,index,depth):
-        if depth<size(self.features):
-            for i in range(size(self.features[depth].values)):
-                self._complexity_rec(x,y,index + (i,),depth+1)
-        else:
-            if self.max_value < self.full_matrix[index][x][y]:
-                self.index = index
-                self.max_value = self.full_matrix[index][x][y]
 
 
 # CB: FeatureResponses and ReverseCorrelation need cleanup; I began but haven't finished.
