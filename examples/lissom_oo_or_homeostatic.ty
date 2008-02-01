@@ -1,17 +1,24 @@
-"""
-Simulation for development of stable orientation maps based on lissom_oo_or_noshrinking.ty
-(see Chapman et. al, J. Neurosci 16(20):6443, 1996). The development is also robust
-to changes in the input (e.g., number of Gaussians in the retinal input or brightness of each Gaussian).
+""" 
+Simulation for development of stable orientation maps based on
+lissom_oo_or_noshrinking.ty (see Chapman et. al, J. Neurosci
+16(20):6443, 1996).  The development is also robust to changes in the
+input (e.g., number of Gaussians in the retinal input or brightness of
+each Gaussian).
+
 Afferent projection activities for individual units are scaled based
-on maintaining a target average afferent activity. The learning rate (and
-rate of learning rate decrease) for afferent projections are also scaled in
-order to maintain the overall rate of learning despite changes in LGN activity.
-The sigmoidal output function for V1 is regulated using the Triesch rule
-(Jochen Triesch,ICANN 2005, LNCS 3696 pp.65-70) which maintains stable activity
-in V1 given a target average activity. The current script is set up as a debug version
-for plotting sheet and projection attributes throughout development.
-If the statistics of the input (but not the contrast) are changed then the afferent_target
-and the average V1 activity need to be changed in order to maintain similar responses in V1. 
+on maintaining a target average afferent activity. The learning rate
+(and rate of learning rate decrease?) for afferent projections is also
+scaled in order to maintain the overall rate of learning despite
+changes in LGN activity.  The sigmoidal output function for V1 is
+regulated using the Triesch rule (Jochen Triesch, ICANN 2005, LNCS
+3696 pp.65-70), which maintains stable activity in V1 given a target
+average activity. 
+
+The current script is set up as a debug version for plotting sheet and
+projection attributes throughout development.  If the statistics of
+the input (but not the contrast) are changed, then the afferent_target
+and the average V1 activity need to be changed in order to maintain
+similar responses in V1.
 
 $Id:$
 """
