@@ -12,8 +12,10 @@ in V1 given a target average activity. The current script is set up as a debug v
 for plotting sheet and projection attributes throughout development.
 If the statistics of the input (but not the contrast) are changed then the afferent_target
 and the average V1 activity need to be changed in order to maintain similar responses in V1. 
+
+$Id:$
 """
-__version__=''
+__version__='$Revision:$'
 
 
 import fixedpoint
