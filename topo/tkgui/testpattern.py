@@ -32,7 +32,7 @@ from topo.plotting.plotgroup import SheetPlotGroup
 from parametersframe import ParametersFrame
 from plotgrouppanel import SheetPanel
 from tkparameterizedobject import ButtonParameter
-
+from topo.base.simulation import EPConnectionEvent
 
 class TestPatternPlotGroup(SheetPlotGroup):
 
@@ -162,7 +162,7 @@ class TestPattern(SheetPanel):
         
 	topo.sim.state_push()
         wipe_out_activity()
-        topo.sim.event_clear()
+        topo.sim.event_clear(EPConnectionEvent)
 
         input_dict = dict([(sheet.name,sheet.input_generator) for sheet in self.plotgroup._sheets()])
 
