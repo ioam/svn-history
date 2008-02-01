@@ -1328,17 +1328,21 @@ class Simulation(ParameterizedObject):
         Same as state_pop(), but does not restore EventProcessors' state.
         """
         self._time, self.events = self._events_stack.pop()        
-    
-    def event_clear(self):
+
+
+    def event_clear(self,event_type):
         """
-        Clears out sheaduled events. This commands is intended to be used with the state_push/ pop combination to 
-        ensure that any remaining events do not affact measurements of the network.
-        
-        It keeps Trigger event on the event list as deleting this one corrupts simulation - it can be a NASTY HACK
+        Clear out all scheduled events of the specified type.
+
+        For instance, with event_type=EPConnectionEvent, this function can be used to ensure
+        that no pending EPConnectionEvents will remain on the queue during some analysis 
+        or measurement operation.  One will usually want to do a state_push before using this
+        function, then clear out the events that should be deleted, do the measurement or 
+        analysis, and then do state_pop to restore the original state.
         """
         events_temp = []
         for e in self.events:
-            if not isinstance(e,EPConnectionEvent):
+            if not isinstance(e,event_type):
               events_temp = events_temp + [e]
         self.events = events_temp
 
