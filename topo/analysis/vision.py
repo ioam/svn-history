@@ -1,17 +1,28 @@
+"""
+Vision specific analysis procedures
+
+$Id: featureresponses.py 7714 2008-01-24 16:42:21Z antolikjan $
+"""
+__version__='$Revision: 7714 $'
+
 from math import fmod,floor
 
 import numpy
-from numpy import zeros, array
 from numpy.oldnumeric import Float
 from numpy import zeros, array, size, empty, object_
 #import scipy
 
 import topo
+import topo.commands.pylabplots
+    
     
 max_value = 0
 global_index = ()
 
 def _complexity_rec(x,y,index,depth,fm):
+        """
+        Recurrent helper function for complexity()
+        """
         global max_value
         global global_index
         if depth<size(fm.features):
@@ -24,6 +35,7 @@ def _complexity_rec(x,y,index,depth,fm):
     
 def complexity(full_matrix):
     global global_index
+    global max_value
     """This function expects as an input a object of type FullMatrix which contains
     responses of all neurons in a sheet to stimuly with different varying parameter values.
     One of these parameters (features) has to be phase. In such case it computes the classic
@@ -46,7 +58,9 @@ def complexity(full_matrix):
     average = 0.0
     for x in range(rows):
         for y in range(cols):
-            complex_matrix[x,y] = []
+            complex_matrix[x,y] = []#
+            max_value=0
+            global_index = ()
             _complexity_rec(x,y,(),0,full_matrix)
             
             #compute the sum of the responses over phases given the found index of highest response 
@@ -72,5 +86,5 @@ def complexity(full_matrix):
 #            print complex_matrix[x,y]
 #            print fft
 #            print fftmeasure[x,y]
-
+    topo.commands.pylabplots.matrixplot(fftmeasure)
     return fftmeasure
