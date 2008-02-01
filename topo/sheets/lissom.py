@@ -56,24 +56,7 @@ class JointNormalizingCFSheet(CFSheet):
     def start(self):
         self._normalize_weights()        
 
-    def _port_match(self,key,portlist):
-        """
-        Returns True if the given key matches any port on the given list.
-
-        A port is considered a match if the port is == to the key,
-        or if the port is a tuple whose first element is == to the key,
-        or if both the key and the port are tuples whose first elements are ==.
-
-        This approach allows connections to be grouped using tuples.
-        """
-        port=portlist[0]
-        return [port for port in portlist
-                if (port == key or
-                    (isinstance(key,tuple)  and key[0] == port) or
-                    (isinstance(port,tuple) and port[0] == key) or
-                    (isinstance(key,tuple)  and isinstance(port,tuple) and port[0] == key[0]))]
-
-                        
+                       
     def compute_joint_norm_totals(self,projlist,mask):
         """
         Compute norm_total for each CF in each projection from a group to be normalized jointly.
@@ -218,6 +201,7 @@ class LISSOM(JointNormalizingCFSheet):
                 self.mask.calculate()
             
             if self.tsettle == 0:
+                # This is a special case of tsettle value, for which LISSOM should behave in a same way as CFSheet
                 self.activate()
                 self.learn()
    	    elif self.activation_count == self.tsettle:
@@ -253,7 +237,7 @@ class LISSOM(JointNormalizingCFSheet):
         super(LISSOM,self).state_pop(**args)
         self.activation_count,self.new_iteration=self.__counter_stack.pop()
   
-class JointNormalizingCFSheet_Continouse(JointNormalizingCFSheet):
+class JointNormalizingCFSheet_Continuous(JointNormalizingCFSheet):
     """
     This is a version of CFSheet that runs continousely - eg. there are no 'resting' periods between pattern presentations. 
     However learning occurs only always when the time is an integer number.
