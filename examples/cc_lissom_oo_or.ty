@@ -27,7 +27,7 @@ from fixedpoint import FixedPoint
 import topo.patterns.basic
 import topo.patterns.random
 
-from topo.sheets.lissom import LISSOM, JointNormalizingCFSheet_Continouse
+from topo.sheets.lissom import LISSOM, JointNormalizingCFSheet_Continuous
 from topo.sheets.optimized import NeighborhoodMask_Opt, LISSOM_Opt
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
@@ -124,12 +124,12 @@ topo.sim['LGNOff']=CFSheet(nominal_density=48.0,
                            output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                            measure_maps=False)
 
-topo.sim['V1Simple'] = JointNormalizingCFSheet_Continouse(nominal_density=locals().get('default_density',120.0),
+topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',120.0),
                         nominal_bounds=BoundingBox(radius=core_size),
                         output_fn=output_fn_S)
 
                         
-topo.sim['V1Complex'] = JointNormalizingCFSheet_Continouse(nominal_density=locals().get('default_density',120.0),
+topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',120.0),
                         nominal_bounds=BoundingBox(radius=core_size),
                         output_fn=output_fn_C)
 
