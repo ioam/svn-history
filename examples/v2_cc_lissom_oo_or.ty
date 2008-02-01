@@ -27,12 +27,12 @@ from fixedpoint import FixedPoint
 import topo.patterns.basic
 import topo.patterns.random
 
-from topo.sheets.lissom import LISSOM, JointNormalizingCFSheet_Continouse
+from topo.sheets.lissom import LISSOM, JointNormalizingCFSheet_Continuous
 from topo.sheets.optimized import NeighborhoodMask_Opt, LISSOM_Opt
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import DynamicNumber, Number
+from topo.base.parameterclasses import DynamicNumber, Number, Parameter
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt, CFPLF_Trace_opt
@@ -82,7 +82,6 @@ class Jitter(CoordinateMapperFn):
     rand = Parameter(default=None)
     def __call__(self,x,y):
         return x+(self.rand()-0.5)*self.scale,y+(self.rand()-0.5)*self.scale
-
 jitterOn = Jitter(rand =UniformRandom(seed=1023))
 jitterOff = Jitter(rand =UniformRandom(seed=1023))
 
@@ -100,13 +99,11 @@ core_size=locals().get('CS',0.5)
 #Simple
 HES=HomeostaticMaxEnt(eta_a=0.0,eta=locals().get('ETA',0.0002),smoothing=0.0003,a_init=locals().get('SAINI',18), b_init=locals().get('SBINI',-10),learning=locals().get('HMON',False), mu=locals().get('SCxMU',0.01))
 #ODS=OutputFnDebugger(function=HES, **shared_debug_params)
-#output_fn_S=Pipeline(output_fns=[HES, ODS])
-output_fn_S=HES
+output_fn_S=HES#Pipeline(output_fns=[HES, ODS])
 #Complex
 HEC=HomeostaticMaxEnt(eta_a=0.0,learning=locals().get('HMON',False),eta=locals().get('ETA',0.0002),smoothing=0.0003,a_init=14.5, b_init=locals().get('CBINI',-4.0), mu=locals().get('CCxMU',0.02))
 #ODC=OutputFnDebugger(function=HEC, **shared_debug_params)
-#output_fn_C=Pipeline(output_fns=[HEC, ODC])
-output_fn_C=HEC
+output_fn_C=HEC#Pipeline(output_fns=[HEC, ODC])
 
 
 ###########################################
@@ -127,12 +124,12 @@ topo.sim['LGNOff']=CFSheet(nominal_density=48.0,
                            output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                            measure_maps=False)
 
-topo.sim['V1Simple'] = JointNormalizingCFSheet_Continouse(nominal_density=locals().get('default_density',120.0),
+topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',120.0),
                         nominal_bounds=BoundingBox(radius=core_size),
                         output_fn=output_fn_S)
 
                         
-topo.sim['V1Complex'] = JointNormalizingCFSheet_Continouse(nominal_density=locals().get('default_density',120.0),
+topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',120.0),
                         nominal_bounds=BoundingBox(radius=core_size),
                         output_fn=output_fn_C)
 
@@ -240,7 +237,7 @@ topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.05"),name='LateralE
                  #learning_fn=CFPLF_Trace_opt(trace_strength=locals().get('TraceStr',0.5)))
 
 topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.05"),name='LateralInhibitory',
-                 connection_type=CFProjection,strength=-locals().get('CxLatInhStr',0.4),
+                 connection_type=CFProjection,strength=-locals().get('CxLatInhStr',0.3),
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                      generators=[Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',2*0.22917)),
                                 topo.patterns.random.UniformRandom()]),
