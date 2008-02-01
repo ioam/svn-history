@@ -1,4 +1,7 @@
+# ALERT: Please document this file!
 """
+
+$Id:$
 """
 __version__='$Revision$'
 
@@ -28,14 +31,6 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1, IdentityOF, Sigmoid
 from topo.misc.numbergenerators import UniformRandom
 
-<<<<<<< .mine
-<<<<<<< .mine
-topo.sim.name = "lissom_oo_or"
-=======
-topo.sim.name = "lgn_lateral"
-=======
->>>>>>> .r7484
->>>>>>> .r6010
 
 #num_inputs=2
 #input_type=Gaussian
