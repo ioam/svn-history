@@ -1,7 +1,7 @@
 # ALERT: Please document this file!
 """
 
-$Id:$
+$Id$
 """
 __version__='$Revision$'
 
@@ -69,17 +69,11 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 ###########################################
 # build simulation
 
-<<<<<<< .mine
-topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
-                                  input_generator=combined_inputs,
-=======
 # Make simulation use fixed-point time.
 topo.sim.set_time(FixedPoint(topo.sim.time(),4))
 
-
-topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
-                                  input_generator=input_pattern,
->>>>>>> .r7655
+topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
+                                  input_generator=combined_inputs,
                                   period=1.0, phase=0.05,
                                   nominal_bounds=BoundingBox(radius=1.0+0.25+0.375))
 
