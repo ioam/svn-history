@@ -40,7 +40,7 @@ the United Kingdom and the United States.  The principal developers are:
       maintains receptive field plotting support and other analysis code.
 
   <p><dt><a target="_top" href="http://www.cs.utexas.edu/~jp/">Jefferson
-      Provost</a>, 2003-</dt> 
+      Provost</a>, 2002-</dt> 
   <dd>Jeff is a postdoctoral researcher in the Neuroscience Department at
       the University of Pittsburgh.  He wrote the initial GUI
       implementation (first in Scheme, then in Python), and the first
