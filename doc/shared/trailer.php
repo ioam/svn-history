@@ -18,7 +18,7 @@
 <?php
 echo date("D M j G:i:s T Y");
 ?>
-</I><SMALL><img src="http://www.cs.utexas.edu/users/jbednar/cgi-bin/logaccess.cgi?topographica.org" height=1 width=1>
+</I>.
 </TD>
   </TR>
 </TABLE>
