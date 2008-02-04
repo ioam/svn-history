@@ -652,21 +652,44 @@ gnuplotpy-uninstall:
 ##############################################################
 # Player
 #
+# ALERT: Not fully tested yet; may need more attention
 PLAYER = player-2.1.0rc1
 
-# Not a completely clean install yet; needs more files
-PLAYER_UNINSTALL += ${PYTHON_LIB}/site-packages/playerc.py ${PYTHON_LIB}/../libplayer*
+PLAYER_UNINSTALL += ${PYTHON_LIB}/site-packages/playerc* ${PYTHON_LIB}/site-packages/_playerc.so ${PYTHON_LIB}/../libplayer*
 
 player: ${PLAYER}.tar.bz2
 	tar -xojf ${PLAYER}.tar.bz2
 	cd ${PLAYER}; ./configure --prefix=${PREFIX}
 	make -C ${PLAYER} install
+	make -C ${PLAYER}/client_libs/libplayerc/bindings/python
+	cd ${PLAYER}/client_libs/libplayerc/bindings/python ; ${PREFIX}/bin/python ./setup.py install --prefix=${PREFIX}
 	touch player
 
 player-clean:
 	rm -rf ${PLAYER}
 player-uninstall:
 	rm -rf player ${foreach f,${PLAYER_UNINSTALL}, ${PREFIX}/${f}}
+
+
+
+##############################################################
+# Stage
+#
+# ALERT: Not fully tested yet; may need more attention
+STAGE = stage-2.1.0rc1
+
+STAGE_UNINSTALL += ${PYTHON_LIB}/../libstage*
+
+stage: ${STAGE}.tar.bz2
+	tar -xojf ${STAGE}.tar.bz2
+	cd ${STAGE}; ./configure --prefix=${PREFIX}
+	make -C ${STAGE} install
+	touch stage
+
+stage-clean:
+	rm -rf ${STAGE}
+stage-uninstall:
+	rm -rf stage ${foreach f,${STAGE_UNINSTALL}, ${PREFIX}/${f}}
 
 
 
