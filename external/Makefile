@@ -652,7 +652,7 @@ gnuplotpy-uninstall:
 ##############################################################
 # Player
 #
-PLAYER = player-2.0.5
+PLAYER = player-2.1.0rc1
 
 # Not a completely clean install yet; needs more files
 PLAYER_UNINSTALL += ${PYTHON_LIB}/site-packages/playerc.py ${PYTHON_LIB}/../libplayer*
