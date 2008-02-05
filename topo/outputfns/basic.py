@@ -58,6 +58,7 @@ class PiecewiseLinear(OutputFn):
         x.clip(0.0,1.0,out=x)
 
 
+
 class Sigmoid(OutputFn):
     """ 
     Sigmoidal (logistic) output function 1/(1+exp-(r*x+k)).
@@ -390,15 +391,17 @@ class PoissonSample(OutputFn):
 
 class AttributeTrackingOF(OutputFn):
     """
-    Output function which keeps track of individual attributes of an output function (attrib_names),
-    over time, for specified units. Attributes can be tracked if they are the same size as the activity matrix.
+    Output function which keeps track of individual attributes (attrib_names)of a ParameterizedObject,
+    over time, for specified units. For example the object can be a sheet: topo.sim['V1']
+    or a projection: topo.sim['V1'}.projections['LateralInhibitory'] or an output_function.
+    Attributes can be tracked if they are the same size as the activity matrix.
     If no function is specified this function will keep track of activity over time.
     The values dictionary stores (time, value) pairs indexed by the parameter name and unit,
     i.e. values['x'][(0,0)]=(time=t,value of x at time=t)
     """
     
-    function = OutputFnParameter(default=None, doc="""
-        Output function whose parameters will be tracked.""")
+    object = Parameter(default=None, doc="""
+        ParameterizedObject instance whose parameters will be tracked.""")
     
     attrib_names = ListParameter(default=[], doc="""
         List of names of the function object's parameters that should be stored.""")
@@ -436,7 +439,7 @@ class AttributeTrackingOF(OutputFn):
                     if p=="x":
                         value_matrix=x
                     else:
-                        value_matrix= getattr(self.function, p)
+                        value_matrix= getattr(self.object, p)
                         
                     for u in self.units:
                         self.values[p][u].append((topo.sim.time(),value_matrix[u]))
@@ -504,71 +507,6 @@ class ActivityAveragingOF(OutputFn):
         """Pop the most recently saved updating parameter off the stack"""
 
         self.updating = self._updating_state.pop()                        
-
-
-class SheetAttributeTrackingOF(OutputFn):
-    """
-    Output function which keeps track of individual attributes of a sheet (attrib_names),
-    over time, for specified units. Attributes can be tracked if they are the same size as the activity matrix.
-    The values dictionary stores (time, value) pairs indexed by the parameter name and unit,
-    i.e. values['x'][(0,0)]=(time=t,value of x at time=t).
-    """
-      
-    attrib_names = ListParameter(default=[], doc="""
-        List of names of the function object's parameters that should be stored.""")
-    
-    units = ListParameter(default=[(0,0)], doc="""
-        Matrix coordinates of the unit(s) for which parameter values will be stored.""")
-    
-    updating = BooleanParameter(default=True, doc="""
-        Whether or not to track parameters.
-        Allows tracking to be turned off during analysis, and then re-enabled.""")
-
-    sheet = StringParameter(default=None)
-
-    def __init__(self,**params):
-        super(SheetAttributeTrackingOF,self).__init__(**params)
-        self.values={}
-        self._updating_state = []
-        
-        for p in self.attrib_names:
-            self.values[p]={}
-            for u in self.units:
-                self.values[p][u]=[]
-        
-         
-        
-    def __call__(self,x):
-
-        if self.updating:
-            #collect values on each appropriate step
-            for p in self.attrib_names:
-                if p=="x":
-                    value_matrix=x
-                else:
-                    value_matrix= getattr(topo.sim[self.sheet], p)
-                        
-                    for u in self.units:
-                        self.values[p][u].append((topo.sim.time(),value_matrix[u]))
-                        
-
-    def stop_updating(self):
-        """
-        Save the current state of the updating parameter to an internal stack. 
-        Turn updating off for the output_fn.
-        """
-
-        self._updating_state.append(self.updating)
-        self.updating=False
-
-
-    def restore_updating(self):
-        """Pop the most recently saved updating parameter off the stack"""
-
-        self.updating = self._updating_state.pop()  
-
-
-
 
 
 
