@@ -27,7 +27,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
     single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)    
 
     def __call__(self, iterator, input_activity, activity, strength, **params):
-	
+       
         temp_act = activity
         rows,cols = activity.shape
         irows,icols = input_activity.shape

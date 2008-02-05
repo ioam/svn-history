@@ -459,7 +459,7 @@ class CFPLF_Plugin(CFPLearningFn):
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
 
-
+        
 	for cf,r,c in iterator():
             single_cf_fn(cf.get_input_matrix(input_activity),
                          output_activity[r,c], cf.weights, single_connection_learning_rate)
@@ -482,7 +482,7 @@ class CFPLF_PluginScaled(CFPLearningFn):
     
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
-      
+       
         if self.learning_rate_scaling_factor is None:
             self.learning_rate_scaling_factor = ones(input_activity.shape)
             
@@ -495,11 +495,12 @@ class CFPLF_PluginScaled(CFPLearningFn):
                          output_activity[r,c], cf.weights, sc_learning_rate)
             # CEBHACKALERT: see ConnectionField.__init__() re. mask & output fn
             cf.weights *= cf.mask   
+      
 
     def update_scaling_factor(self, new_scaling_factor):
         """Update the single connection learning rate scaling factor"""
         self.learning_rate_scaling_factor = new_scaling_factor
-
+      
 
 
 class CFPOutputFn(ParameterizedObject):
@@ -640,6 +641,10 @@ class CFProjection(Projection):
         default=IdentityOF(),
         doc='Function applied to the Projection activity after it is computed.')
 
+    debug_output_fn  = OutputFnParameter(
+        default=IdentityOF(),
+        doc='Function applied to the Projection activity after it is computed.')
+        
     weights_output_fn = CFPOutputFnParameter(
         default=CFPOF_Plugin(),
         doc='Function applied to each CF after learning.')
@@ -878,6 +883,7 @@ class CFProjection(Projection):
         self.activity *=0.0
         self.response_fn(MaskedCFIter(self), input_activity, self.activity, self.strength)
         self.output_fn(self.activity)
+    
 
 
     def learn(self):
@@ -888,7 +894,7 @@ class CFProjection(Projection):
         # i.e. there is an input to the Projection.
         if self.input_buffer != None:
             self.learning_fn(MaskedCFIter(self),self.input_buffer,self.dest.activity,self.learning_rate)
-
+       
 
     def apply_learn_output_fn(self,mask):
         self.weights_output_fn(MaskedCFIter(self),mask)

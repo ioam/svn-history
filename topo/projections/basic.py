@@ -189,6 +189,95 @@ class LeakyCFProjection(CFProjection):
         super(LeakyCFProjection,self).activate(self.leaky_input_buffer)
 
 
+class ScaledCFProjection(CFProjection):
+    """
+   
+    """
+
+    target = Number(default=0.045, doc="""Target average activity for jointly scaled projections""")
+
+    updating = BooleanParameter(default=True, doc="""
+        Whether or not to update average.
+        Allows averaging to be turned off, e.g. during map measurement.""")
+
+    target_lr = Number(default=0.045, doc="""Target average activity for jointly scaled projections for scaling learning rate""")
+    
+    smoothing = Number(default=0.999, doc="""
+        Determines the degree of weighting of previous activity vs.
+        current activity when calculating the average.""")
+
+    debug_output_fn  = OutputFnParameter(
+        default=IdentityOF(),
+        doc='Function applied to the Projection activity after it is computed.')
+
+    def __init__(self,**params):
+        super(ScaledCFProjection,self).__init__(**params)
+        self.x_avg=None
+        self.sf=None
+        self.lr_sf=None
+        self._updating_state = []
+        self.scaled_x_avg=None
+
+    def calculate_sf(self):
+        """
+        If updating is True, calculate the scaling factor based on the target average activity and the previous
+        average joint activity. Keep track of the scaled average for debugging. Could be overwritten if a different
+        scaling factor is required.
+        """
+      
+        if self.updating:
+            self.sf *=0.0
+            self.lr_sf *=0.0
+            self.sf += self.target/self.x_avg
+            self.lr_sf += self.target_lr/self.x_avg
+            self.x_avg = (1.0-self.smoothing)*self.activity + self.smoothing*self.x_avg
+            self.scaled_x_avg = (1.0-self.smoothing)*self.activity*self.sf + self.smoothing*self.scaled_x_avg
+
+
+    def do_scaling(self):
+        """
+      
+        """
+        self.activity *= self.sf
+        if hasattr(self.learning_fn,'learning_rate_scaling_factor'):
+            self.learning_fn.update_scaling_factor(self.lr_sf)
+        else:
+            raise ValueError("Projections to be caled must have learning function which supports scaling e.g. CFPLF_PluginScaled")
+                   
+    def activate(self,input_activity):
+        """Activate using the specified response_fn and output_fn."""
+        self.input_buffer = input_activity
+        self.activity *=0.0
+
+        if self.x_avg is None:
+            self.x_avg=self.target*ones(self.dest.shape, activity_type)
+        if self.scaled_x_avg is None:
+            self.scaled_x_avg=self.target*ones(self.dest.shape, activity_type) 
+        if self.sf is None:
+            self.sf=ones(self.dest.shape, activity_type)
+        if self.lr_sf is None:
+            self.lr_sf=ones(self.dest.shape, activity_type)
+        
+        self.response_fn(MaskedCFIter(self), input_activity, self.activity, self.strength)
+        self.output_fn(self.activity)
+        print sum(self.activity.flat), self.name, "before"
+        self.calculate_sf()
+        self.do_scaling()
+        print sum(self.activity.flat), self.name, "after"
+        self.debug_output_fn(self.activity)
+        
+    def stop_updating(self):
+        """
+        Save the current state of the updating parameter to an internal stack. 
+        Turns updating off for the output_fn.
+        """
+        self._updating_state.append(self.updating)
+        self.updating=False
+
+
+    def restore_updating(self):
+        """Pop the most recently saved updating parameter off the stack."""
+        self.updating = self._updating_state.pop() 
 
 class OneToOneProjection(Projection):
     """
