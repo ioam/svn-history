@@ -256,45 +256,52 @@ class JointScaling(LISSOM):
     based on a specified target average activity.
     An exponentially weighted average is used to calculate the average joint afferent activity.
     This average is then used to calculate a scaling factor for the current afferent activity
-    in order to bring the average activity closer to the target.
-    Learning rates are also scaled in order to ensure that the afferent projections
-    learn at the same rate regardless of the average input activity from the LGN.
+    and for the afferent learning rate.
     The target average activity for the afferent projections depends on the statistics of the input,
     if units are activated more often (e.g. the number of Gaussian patterns on the retina during each
-    iteration is increased)the target should be larger in order to maintain a constant average
-    response to similar inputs in V1. 
+    iteration is increased)the target average activity should be larger in order to maintain a constant average
+    response to similar inputs in V1. The target activity for learning rate scaling does not need to change
+    since the learning rate should be scaled regardless of what causes the change in average activity.
     """
     #ALERT Could also be extended to jointly scale different groups of projections.Currently only works for
     #the joint scaling of the Afferent projections as grouped together by JointNormalize in dest_port.
     
-    target = Number(default=0.04, doc="""Target average activity for jointly scaled projections""")
+    target = Number(default=0.045, doc="""
+        Target average activity for jointly scaled projections""")
 
     updating = BooleanParameter(default=True, doc="""
         Whether or not to update average.
         Allows averaging to be turned off, e.g. during map measurement.""")
 
-    smoothing = Number(default=0.9997, doc="""
+    target_lr = Number(default=0.045, doc="""
+        Target average activity for jointly scaled projections for scaling learning rate""")
+    
+    smoothing = Number(default=0.999, doc="""
         Determines the degree of weighting of previous activity vs.
         current activity when calculating the average.""")
-    
+
+
     def __init__(self,**params):
         super(JointScaling,self).__init__(**params)
         self.x_avg=None
         self.sf=None
+        self.lr_sf=None
         self._updating_state = []
         self.scaled_x_avg=None
 
 
     def calculate_joint_sf(self, joint_total):
         """
-        If updating is True, calculate the scaling factor based on the target average activity and the previous
-        average joint activity. Keep track of the scaled average for debugging. Could be overwritten if a different
-        scaling factor is required.
+        If updating is True, calculate the scaling factors based on the target average activity and the previous
+        average joint activity. Keep track of the scaled average for debugging. Could be overwritten if different
+        scaling factors are required.
         """
-       
+      
         if self.updating:
             self.sf *=0.0
+            self.lr_sf *=0.0
             self.sf += self.target/self.x_avg
+            self.lr_sf += self.target_lr/self.x_avg
             self.x_avg = (1.0-self.smoothing)*joint_total + self.smoothing*self.x_avg
             self.scaled_x_avg = (1.0-self.smoothing)*joint_total*self.sf + self.smoothing*self.scaled_x_avg
 
@@ -314,9 +321,9 @@ class JointScaling(LISSOM):
                         joint_total += proj.activity
                     self.calculate_joint_sf(joint_total)
                     for proj in projlist:
+                        proj.activity *= self.sf
                         if hasattr(proj.learning_fn,'learning_rate_scaling_factor'):
-                            proj.activity *= self.sf
-                            proj.learning_fn.update_scaling_factor(self.sf)
+                            proj.learning_fn.update_scaling_factor(self.lr_sf)
                         else:
                             raise ValueError("Projections to be joint scaled must have learning function which supports scaling e.g. CFPLF_PluginScaled")
                    
@@ -340,16 +347,20 @@ class JointScaling(LISSOM):
             self.scaled_x_avg=self.target*ones(self.shape, activity_type) 
         if self.sf is None:
             self.sf=ones(self.shape, activity_type)
+        if self.lr_sf is None:
+            self.lr_sf=ones(self.shape, activity_type)
 
+        
         #Afferent projections are only activated once at the beginning of each iteration
         #therefore we only scale the projection activity and learning rate once.
-        if self.activation_count == 1: 
+        if self.activation_count == 0: 
             self.do_joint_scaling()   
+        
 
-       
         for proj in self.in_connections:
             self.activity += proj.activity
 
+        
         if self.apply_output_fn:
             self.output_fn(self.activity)
           
@@ -371,4 +382,4 @@ class JointScaling(LISSOM):
 
                     
 
- 
+
