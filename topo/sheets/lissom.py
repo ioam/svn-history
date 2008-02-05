@@ -314,7 +314,7 @@ class JointScaling(LISSOM):
         """
         joint_total = zeros(self.shape, activity_type)
         
-        for key,projlist in self._grouped_in_projections():
+        for key,projlist in self._grouped_in_projections('JointNormalize'):
             if key is not None:
                 if key =='Afferent':
                     for proj in projlist:
