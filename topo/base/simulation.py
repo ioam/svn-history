@@ -536,9 +536,12 @@ class EPConnection(ParameterizedObject):
                ",\n"+prefix+(",\n"+prefix).join(settings) + ")"
 
 
+# CEBALERT: it's not a ParameterizedObject, so what good is
+# __abstract? Presumably this class should be a ParameterizedObject?
+# Or is there a problem with that?
 class Event(object):
     """Hierarchy of classes for storing simulation events of various types."""
-    __abstract = True 
+    __abstract = True  
 
     def __init__(self,time):
         self.time = time
