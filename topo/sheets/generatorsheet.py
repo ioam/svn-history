@@ -150,11 +150,18 @@ class SequenceGeneratorSheet(GeneratorSheet):
     immediately after completion.
     """
     
-    input_sequence = ListParameter(default=[(1,topo.patterns.basic.Gaussian())],
-          doc="""The sequence of patterns to generate. 
-          Must be a list of (onset,generator) tuples.""")
+    input_sequence = ListParameter(default=[],
+          doc="""The sequence of patterns to generate.  Must be a list of
+          (onset,generator) tuples. An empty list defaults to the
+          single tuple: (0,self.input_generator), resulting in
+          identical behavior to an ordinary GeneratorSheet.""")
 
 
+    def __init__(self,**params):
+        super(SequenceGeneratorSheet,self).__init__(**params)
+        if not self.input_sequence:
+            self.input_sequence = [(0,self.input_generator)]
+            
     def start(self):
         assert self.simulation
 
