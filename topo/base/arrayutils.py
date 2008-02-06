@@ -148,7 +148,7 @@ def wrap(lower, upper, x):
 # There might already be a function for this in Numeric...
 def array_argmax(mat):
     "Returns the coordinates of the maximum element in the given matrix."
-    # pylint: disable-msg=W0622
+    # pylint: disable-msg=W0612
     rows,cols = mat.shape
     pos = argmax(mat.ravel())
     r = pos/cols
