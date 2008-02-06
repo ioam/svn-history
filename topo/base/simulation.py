@@ -536,16 +536,14 @@ class EPConnection(ParameterizedObject):
                ",\n"+prefix+(",\n"+prefix).join(settings) + ")"
 
 
-# CEBALERT: it's not a ParameterizedObject, so what good is
-# __abstract? Presumably this class should be a ParameterizedObject?
-# Or is there a problem with that?
-class Event(object):
+class Event(ParameterizedObject):
     """Hierarchy of classes for storing simulation events of various types."""
     __abstract = True  
 
-    def __init__(self,time):
+    def __init__(self,time,**params):
+        super(Event,self).__init__(**params)
         self.time = time
-        
+
     def __call__(self,sim):
         """
         Cause some computation to be performed, deliver a message, etc.,
@@ -580,8 +578,8 @@ class EPConnectionEvent(Event):
     it has arrived, so that the dest can determine what to do with the
     data.
     """
-    def __init__(self,time,conn,data=None):
-        super(EPConnectionEvent,self).__init__(time)
+    def __init__(self,time,conn,data=None,**params):
+        super(EPConnectionEvent,self).__init__(time,**params)
         assert isinstance(conn,EPConnection)
         ### JABALERT: Do we always want to deepcopy here?
         ### E.g. the same data sent to a dozen ports should probably have
@@ -599,7 +597,7 @@ class EPConnectionEvent(Event):
 class CommandEvent(Event):
     """An Event consisting of a command string to execute."""
 
-    def __init__(self,time,command_string):
+    def __init__(self,time,command_string,**params):
         """
         Add the event to the simulation.
 
@@ -608,7 +606,7 @@ class CommandEvent(Event):
         """
         self.command_string = command_string
         self.__test()
-        super(CommandEvent,self).__init__(time)
+        super(CommandEvent,self).__init__(time,**params)
         
     def __repr__(self):
         return "CommandEvent(time="+`self.time`+", command_string='"+self.command_string+"')"
@@ -659,7 +657,7 @@ class FunctionEvent(Event):
     """
     Event that executes a given function function(*args,**kw).
     """
-    def __init__(self,time,fn,*args,**kw):
+    def __init__(self,time,fn,args=(),kw={},**params):
         super(FunctionEvent,self).__init__(time)
         self.fn = wrap_callable(fn)
         self.args = args
@@ -679,8 +677,8 @@ class EventSequence(Event):
     The .time attributes of the events in the sequence are interpreted
     as offsets relative to the start time of the sequence itself.
     """
-    def __init__(self,time,sequence):
-        super(EventSequence,self).__init__(time)
+    def __init__(self,time,sequence,**params):
+        super(EventSequence,self).__init__(time,**params)
         self.sequence = sequence
 
     def __call__(self,sim):
@@ -716,8 +714,8 @@ class PeriodicEventSequence(EventSequence):
     ## actually be useful the other way.
     
 
-    def __init__(self,time,period,sequence):
-        super(PeriodicEventSequence,self).__init__(time,sequence)
+    def __init__(self,time,period,sequence,**params):
+        super(PeriodicEventSequence,self).__init__(time,sequence,**params)
         self.period = period
         
     def __call__(self,sim):        
