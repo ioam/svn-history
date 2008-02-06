@@ -136,6 +136,10 @@ class DataRecorder(EventProcessor):
             start = 0
         else:
             start = bisect.bisect_left(times,start_time)
+            if start >= len(times):
+                start = len(times)-1
+            elif times[start] > start_time:
+                start -= 1
 
         if end_time is None:
             end = None
@@ -176,19 +180,34 @@ class InMemoryRecorder(DataRecorder):
             var.time.insert(idx,time)
             var.data.insert(idx,data)
 
-
+    def get_datum(self,name,time):
+        idx,dummy = self.get_time_indices(name,time,time)
+        data = self._vars[name].data
+        if idx >= len(data):
+            idx -= 1
+        return data[idx]
+    
     def get_data(self,name,times=(None,None),fill_range=False):
         tstart,tend = times
         start,end = self.get_time_indices(name,tstart,tend)
         var = self._vars[name]
-        time,data = var.time[start:end],var.data[start:end]
-        if fill_range:
-            if time[0] > tstart and start > 0:
-                time.insert(0,tstart)
-                data.insert(0,var.data[start-1])
-            if time[-1] < tend:
-                time.append(tend)
-                data.append(data[-1])
+
+        if start >= len(data):
+            # if the start index is out of bounds
+            if fill_range:
+                time = times
+                data = [var.data[-1]]*2
+            else:
+                time,data = [],[]
+        else:
+            time,data = var.time[start:end],var.data[start:end]
+            if fill_range:
+                if time[0] > tstart and start > 0:
+                    time.insert(0,tstart)
+                    data.insert(0,var.data[start-1])
+                if time[-1] < tend:
+                    time.append(tend)
+                    data.append(data[-1])
         
         return time,data
 
