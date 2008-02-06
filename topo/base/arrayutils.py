@@ -7,7 +7,7 @@ __version__ = "$Revision$"
 
 import re
 
-from numpy.oldnumeric import sqrt, ones, dot, sum, arctan2, array2string, logical_not, bitwise_or, argmax, fmod, floor
+from numpy.oldnumeric import sqrt, ones, dot, sum, arctan2, array2string, logical_not, argmax, fmod, floor
 from numpy import set_printoptions
 
 # Ask numpy to print even relatively large arrays by default

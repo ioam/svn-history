@@ -5,10 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import copy
 import re
-import os.path
-import sys
 import types
 
 from parameterizedobject import Parameter, descendents, ParameterizedObject
