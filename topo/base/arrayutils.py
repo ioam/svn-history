@@ -7,8 +7,11 @@ __version__ = "$Revision$"
 
 import re
 
-from numpy.oldnumeric import sqrt, dot, sum, arctan2, array2string, logical_not, argmax, fmod, floor
-from numpy import set_printoptions
+from numpy.oldnumeric import sqrt, dot,arctan2, array2string, logical_not, argmax, fmod, floor
+
+# CB: I think it's ok to replace Python's abs with numpy's in this file,
+# but pylint complains. Maybe it's right?
+from numpy import set_printoptions, abs
 
 # Ask numpy to print even relatively large arrays by default
 set_printoptions(threshold=200*200)
@@ -25,12 +28,12 @@ def norm(v,p=2):
     """
     Returns the Lp norm of v, where p is arbitrary and defaults to 2.
     """
-    return sum(abs(v)**p)**(1.0/p)
+    return (abs(v)**p).sum()**(1.0/p)
 
 
 def divisive_normalization(weights):
     """Divisively normalize an array to sum to 1.0"""
-    s = sum(weights.ravel())
+    s = weights.sum()
     if s != 0:
         factor = 1.0/s
         weights *= factor
@@ -41,6 +44,7 @@ def add_border(matrix,width=1,value=0.0):
     Returns a new matrix consisting of the given matrix with a border
     or margin of the given width filled with the given value.
     """
+    # CEBALERT: why is this import here? Can I move it?
     from numpy.oldnumeric import concatenate as join,array
     rows,cols = matrix.shape
 
@@ -144,6 +148,7 @@ def wrap(lower, upper, x):
 # There might already be a function for this in Numeric...
 def array_argmax(mat):
     "Returns the coordinates of the maximum element in the given matrix."
+    # pylint: disable-msg=W0622
     rows,cols = mat.shape
     pos = argmax(mat.ravel())
     r = pos/cols
@@ -167,7 +172,8 @@ def __numpy_ufunc_pickle_support():
     import copy_reg
 
     def ufunc_pickler(ufunc):
-	return ufunc.__name__
+        """Return the ufunc's name"""
+        return ufunc.__name__
 
     # CB: could add ufunc_unpickler if we need.
     import numpy
