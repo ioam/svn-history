@@ -1145,13 +1145,20 @@ class Simulation(ParameterizedObject):
         else:
             self.timer.call_and_time(duration)
 
+
     def run(self,duration=Forever,until=Forever):
         """
         Process simulation events for the specified duration or until the specified time.
 
         Arguments:
-          duration = length of simulation time to run. Default: run indefinitely.
-          until    = maximum simulation time to simulate. Default: run indefinitely.
+        
+          duration = length of simulation time to run. Default: run
+          indefinitely while there are still events in the
+          event_queue.
+
+          until = maximum simulation time to simulate. Default: run
+          indefinitely while there are still events in the event
+          queue.
 
         If both duration and until are used, the one that is reached first will apply.
 
