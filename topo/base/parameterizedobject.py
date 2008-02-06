@@ -13,6 +13,7 @@ import re
 
 
 from pprint import pprint
+from types import FunctionType
 
 # JABALERT: Could consider using Python's logging facilities instead.
 SILENT  = 0
@@ -813,13 +814,28 @@ class ParameterizedObject(object):
         return "<%s %s>" % (self.__class__.__name__,self.name)
 
 
+    # CB: I'm not sure why we allow multiple args here rather than just one
+    # message (given that the caller can easily use string substitution with
+    # "%s"%var etc). I think this makes things more complicated, but I might
+    # be missing something.
     def __db_print(self,level=NORMAL,*args):
         """
         Print each of the given args iff print_level or
         self.db_print_level is greater than or equal to the given
         level.
+
+        Any of args may be functions, in which case they will be
+        called. This allows delayed execution, preventing
+        time-consuming code from being called unless the print level
+        requires it.
         """
         if level <= max(min_print_level,self.print_level):
+
+            # call any args that are functions
+            args = list(args)
+            for a in args:
+                if isinstance(a,FunctionType): args[args.index(a)]=a()
+            
             s = ' '.join([str(x) for x in args])
             
             if dbprint_prefix and callable(dbprint_prefix):
@@ -838,11 +854,11 @@ class ParameterizedObject(object):
         warnings_as_exceptions is True, then raise an Exception
         containing the arguments.
         """
-
         if not warnings_as_exceptions:
             self.__db_print(WARNING,"Warning:",*args)
         else:
             raise Exception, ' '.join(["Warning:",]+[str(x) for x in args])
+
 
     def message(self,*args):
         """Print the arguments as a message."""
@@ -852,12 +868,6 @@ class ParameterizedObject(object):
         """Print the arguments as a verbose message."""
         self.__db_print(VERBOSE,*args)
 
-    # CB: could we somehow have debug statements avoid *all*
-    # processing unless debugging is active? Don't know if that's
-    # possible. Pass a string for eval()? Use lambdas?
-    # (E.g. how can we avoid evaluating expensive_fn() unless
-    # debugging is on for things like self.debug("string
-    # %s"%expensive_fn()) )
     def debug(self,*args):
         """Print the arguments as a debugging statement."""
         self.__db_print(DEBUG,*args)
