@@ -10,6 +10,7 @@ import ImageTk
 ### JCALERT! Try not to have to use chain and delete this import.
 from itertools import chain
 from Tkinter import Canvas, Label
+from numpy import sometrue
 
 import topo
 
@@ -94,7 +95,8 @@ class ProjectionSheetPanel(TemplatePlotGroupPanel):
 
 
     def populate_sheet_param(self):
-        sheets = topo.sim.objects(self.sheet_type).values() 
+        sheets = [s for s in topo.sim.objects(self.sheet_type).values()
+                  if sometrue([isinstance(p,CFProjection) for p in s.in_connections])]
         self.plotgroup.params()['sheet'].objects = sheets
         self.plotgroup.sheet = sheets[0] # CB: necessary?
 
