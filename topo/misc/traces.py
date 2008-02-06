@@ -11,15 +11,22 @@ $Id$
 """
 __version__ = '$Revision$'
 
-from numpy import array,asarray
-
+import os
 import bisect
+from itertools import izip
 
+from numpy import array,asarray
+import ImageDraw
+
+import topo.base.parameterclasses as param
 from topo.base.simulation import EventProcessor
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number,StringParameter,DictParameter,BooleanParameter
 from topo.base.parameterclasses import Integer,CompositeParameter,Parameter
 from topo.misc.utils import Struct
+from topo.plotting.bitmap import RGBBitmap, MontageBitmap
+from topo.misc.filepaths import normalize_path
+
 
 class DataRecorder(EventProcessor):
     """
@@ -394,3 +401,142 @@ class TraceGroup(ParameterizedObject):
             ymin,ymax = trace.get_ybounds(y)
             pylab.axis(xmin=time[0],xmax=time[-1],ymin=ymin,ymax=ymax)        
             
+
+
+
+
+def get_images(name,times,recorder,overlays=(0,0,0)):
+    """
+    Get a time-sequence of matrix data from a DataRecorder variable
+    and convert it to a sequence of images stored in Bitmap objects.
+
+    Parameters: name is the name of the variable to be queried. times
+    is a sequence of timepoints at which to query the
+    variable. recorder is the data recorder. overlays is a tuple of
+    matrices or scalars to be added to the red, green, and blue
+    channels of the bitmaps respectively.
+    """
+    result = []
+
+    for t in times:
+        d = recorder.get_datum(name,t)
+        im = RGBBitmap(d+overlays[0],d+overlays[1],d+overlays[2])
+        result.append(im)
+    return result
+
+               
+class ActivityMovie(ParameterizedObject):
+    """
+    An object encapsulating a series of movie frames displaying the
+    value of one or more matrix-valued time-series contained in a
+    DataRecorder object.
+
+    An ActivityMovie takes a DataRecorder object, a list of names of
+    variables in that recorder and a sequence of timepoints at which
+    to sample those variables.  It uses that information to compose a
+    sequence of MontageBitmap objects displaying the stored values of
+    each variable at each timepoint.  These bitmaps can then be saved
+    to sequentially-named files that can be composited into a movie by
+    external software.
+
+    Parameters are available to control the layout of the montage,
+    adding timecodes to the frames, and the names of the frame files.
+    """
+
+    
+    variables = param.ListParameter(class_=str, doc="""
+       A list of variable names in a DataRecorder object containing
+       matrix-valued time series data.""")
+       
+    overlays = param.DictParameter(default={}, doc="""
+       A dictionary indicating overlays for the variable bitmaps.  The
+       for each key in the dict matching the name of a variable, there
+       should be associated a triple of matrices to be overlayed on
+       the red, green, and blue channels of the corresponding bitmap
+       in each frame."""
+       )
+       
+    frame_times = param.ListParameter(default=[0,1], doc="""
+       A list of the times of the frames in the movie.""")
+       
+    montage_params = param.DictParameter(default={},doc="""
+       A dictionary containing parameters to be used when
+       instantiating the MontageBitmap objects representing each frame.""",       
+        instantiate=False)
+
+    recorder = param.ClassSelectorParameter(class_=DataRecorder, doc="""
+       The DataRecorder storing the timeseries.""")
+
+    filename_fmt = param.StringParameter(default='%n_%t.%T',doc="""
+       The format for the filenames used to store the frames.  The following
+       substitutions are possible:
+
+       %n: The name of this ActivityMovie object.
+       %t: The frame time, as formatted by the filename_time_fmt parameter
+       %T: The filetype given by the filetype parameter. """)
+    
+    filename_time_fmt = param.StringParameter(default='%05.0f', doc="""
+       The format of the frame time, using Python string substitution for
+       a floating-point number.""")
+       
+    filetype = param.StringParameter(default='tif',doc="""
+       The filetype to use when writing frames. Can be any filetype understood
+       by the Python Imaging Library.""")
+
+    filename_prefix = param.StringParameter(default='', doc="""
+       A prefix to append to the filename of each frame when saving can include
+       directories.  If the filename contains a path, any non-existent directories
+       in the path will be created when the movie is saved.""")
+
+    add_timecode = param.BooleanParameter(default=False, doc="""
+       Whether to add a visible timecode indicator to each frame.""")
+    
+    timecode_options = param.DictParameter(default={},instantiate=False,doc="""
+       A dictionary of keyword options to be passed to the PIL ImageDraw.text method
+       when drawing the timecode on the frame. Valid options include font,
+       an ImageFont object indicating the text font, and fill a PIL color
+       specification indicating the text color.""")
+    
+    timecode_fmt = param.StringParameter(default='%05.0f',doc="""
+       The format of the timecode displayed in the movie frames, using
+       Python string substitution for a floating-point number.""")
+    
+    timecode_offset = param.Number(default=0,doc="""
+       A value to be added to each timecode before formatting for display.""")
+    
+    def __init__(self,**params):
+
+        super(ActivityMovie,self).__init__(**params)
+
+        bitmaps = [get_images(var,self.frame_times,self.recorder,
+                              overlays=self.overlays.get(var,(0,0,0)))
+                   for var in self.variables]
+        
+        self.frames = [MontageBitmap(bitmaps=list(bms),**self.montage_params)
+                       for bms in izip(*bitmaps)]
+        if self.add_timecode:
+            for t,f in izip(self.frame_times,self.frames):
+                draw = ImageDraw.Draw(f.image)
+                timecode = self.timecode_fmt % (t+self.timecode_offset)
+                tw,th = draw.textsize(timecode,font=self.timecode_options.get('font',None))
+                w,h = f.image.size
+                draw.text((w-tw,h-th),timecode,**self.timecode_options)
+    
+    def save(self):
+        """
+        Save the movie frames
+        """
+        filename_pat = self.name.join(self.filename_fmt.split('%n'))
+        filename_pat = self.filename_time_fmt.join(filename_pat.split('%t'))
+        filename_pat = self.filetype.join(filename_pat.split('%T'))
+
+        filename_pat = normalize_path(filename_pat,prefix=self.filename_prefix)
+        dirname = os.path.dirname(filename_pat)
+        if not os.access(dirname,os.F_OK):
+            os.makedirs(dirname)
+        
+        self.verbose('Writing',len(self.frames),'to files like "%s"'%filename_pat)
+        for t,f in zip(self.frame_times,self.frames):
+            filename = filename_pat% t
+            self.debug("Writing frame",repr(filename))
+            f.image.save(filename)
