@@ -59,7 +59,7 @@ load-plugins=
 #enable-msg=
 
 # Disable the message(s) with the given id(s).
-disable-msg=C0322,C0323,C0324,C0103
+disable-msg=C0322,C0323,C0324,C0103,W0403
 
 
 [REPORTS]
