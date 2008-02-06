@@ -124,7 +124,7 @@ elif type_input=="NoisyDiskstoNatural":
     disks_combined_inputs =topo.patterns.basic.Selector(generators=disks_inputs)
     
     natural_input_type=topo.patterns.image.Image
-    natural_inputs=[input_type(filename="images/shouval/"+f,
+    natural_inputs=[natural_input_type(filename="images/shouval/"+f,
                        size=10.0,  #size_normalization='original',(size=10.0)
                        x=UniformRandom(lbound=-0.75,ubound=0.75,seed=rand_seedx),
                        y=UniformRandom(lbound=-0.75,ubound=0.75,seed=rand_seedy),
@@ -157,13 +157,13 @@ afferent_target = locals().get('afferent_target',0.045)
 #V1
 triesch=locals().get('triesch', True)
 if triesch==True:
-    Attrib_Tracker=AttributeTrackingOF(attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=V1_units)
+    Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=V1_units)
     HE=HomeostaticMaxEnt(smoothing=smoothing, eta=locals().get('eta',0.002), a_init=locals().get('a_init',14.5),
                          b_init=locals().get('b_init',-5.5), mu=afferent_target/5)
     V1_Tracker=AttributeTrackingOF(object=HE, attrib_names=['a', 'b','y_avg'], units=V1_units, step=1)
     V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
 else:
-    Attrib_Tracker=AttributeTrackingOF(attrib_names=['x_avg', 'sf','lr_sf', 'scaled_x_avg'], units=V1_units)
+    Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf','lr_sf', 'scaled_x_avg'], units=V1_units)
     HE=Sigmoid(r=locals().get('a_init',14.5),k=locals().get('b_init',-5.5))
     AV=ActivityAveragingOF(smoothing=smoothing,step=1)
     V1_Tracker=AttributeTrackingOF(object=AV, attrib_names=['x_avg'], units=V1_units, step=1)
@@ -302,9 +302,6 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                  strength=-1.0,
                  weights_generator=gauss_rand(size=2*0.22917),
                  nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=1.80873)
-
-#St object for tracking V1 attributes
-Attrib_Tracker.object=topo.sim["V1"]
 
 # default locations for model editor
 topo.sim.grid_layout([[None,    'V1',     None],
