@@ -401,7 +401,14 @@ class AttributeTrackingOF(OutputFn):
     """
     
     object = Parameter(default=None, doc="""
-        ParameterizedObject instance whose parameters will be tracked.""")
+        ParameterizedObject instance whose parameters will be tracked.
+
+        If this parameter's value is a string, it will be evaluated first
+        (by calling Python's eval() function).  This feature is designed to
+        allow circular references, so that the OF can track the object that
+        owns it, without causing problems for recursive traversal (as for
+        script_repr()).""")
+    # There may be some way to achieve the above without using eval(), which would be better.
     
     attrib_names = ListParameter(default=[], doc="""
         List of names of the function object's parameters that should be stored.""")
@@ -421,6 +428,7 @@ class AttributeTrackingOF(OutputFn):
         self.values={}
         self._updating_state = []
         self.n_step = 0
+        self._object=None
         for p in self.attrib_names:
             self.values[p]={}
             for u in self.units:
@@ -428,8 +436,13 @@ class AttributeTrackingOF(OutputFn):
          
         
     def __call__(self,x):
-
         if self.updating:
+            if self._object==None:
+                if isinstance(self.object,str):
+                    self._object=eval(self.object)
+                else:
+                    self._object=self.object
+            
             #collect values on each appropriate step
             self.n_step += 1
         
@@ -439,7 +452,7 @@ class AttributeTrackingOF(OutputFn):
                     if p=="x":
                         value_matrix=x
                     else:
-                        value_matrix= getattr(self.object, p)
+                        value_matrix= getattr(self._object, p)
                         
                     for u in self.units:
                         self.values[p][u].append((topo.sim.time(),value_matrix[u]))
