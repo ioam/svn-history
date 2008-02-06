@@ -1,0 +1,19 @@
+Common subdirectories: Imaging-1.1.5.old/Docs and Imaging-1.1.5/Docs
+Common subdirectories: Imaging-1.1.5.old/Images and Imaging-1.1.5/Images
+Common subdirectories: Imaging-1.1.5.old/PIL and Imaging-1.1.5/PIL
+Common subdirectories: Imaging-1.1.5.old/Sane and Imaging-1.1.5/Sane
+Common subdirectories: Imaging-1.1.5.old/Scripts and Imaging-1.1.5/Scripts
+Common subdirectories: Imaging-1.1.5.old/Tk and Imaging-1.1.5/Tk
+Common subdirectories: Imaging-1.1.5.old/libImaging and Imaging-1.1.5/libImaging
+diff -u Imaging-1.1.5.old/setup.py Imaging-1.1.5/setup.py
+--- Imaging-1.1.5.old/setup.py	2005-03-23 13:16:40.000000000 -0500
++++ Imaging-1.1.5/setup.py	2008-01-29 14:02:57.000000000 -0500
+@@ -28,7 +28,7 @@
+ #
+ # TIFF_ROOT = libinclude("/opt/tiff")
+ 
+-FREETYPE_ROOT = None
++FREETYPE_ROOT = "/usr/X11R6/lib","/usr/X11R6/include"
+ JPEG_ROOT = None
+ TIFF_ROOT = None
+ ZLIB_ROOT = None

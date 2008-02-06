@@ -1,13 +1,21 @@
 Index: Makefile
 ===================================================================
-RCS file: /cvsroot/topographica/topographica/external/Makefile,v
-retrieving revision 1.97
-diff -r1.97 Makefile
-29c29
-< python: ${PYTHON}.tgz tk
----
-> python: ${PYTHON}.tgz 
-32c32
-< 	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
----
-> 	cd ${PYTHON}; ./configure --prefix=${PREFIX}
+--- Makefile	(revision 7767)
++++ Makefile	(working copy)
+@@ -29,7 +29,7 @@
+ python: ${PYTHON}.tgz tk
+ 	echo ${PREFIX}
+ 	tar -xozf ${PYTHON}.tgz
+-	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
++	cd ${PYTHON}; ./configure --prefix=${PREFIX}
+ 	cd ${PYTHON}; env PREFIX=${PREFIX} make 
+ 	cd ${PYTHON}; env PREFIX=${PREFIX} make install
+ 	touch python
+@@ -141,6 +141,7 @@
+ ifeq ("$(shell uname -m)","x86_64")
+ 	cd ${PIL}; patch < ../Imaging.diff
+ endif
++	patch -p0 < Imaging_OSX.diff
+ 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build_ext -i
+ 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python selftest.py
+ 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install

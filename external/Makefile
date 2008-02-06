@@ -29,7 +29,7 @@ PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.5
 python: ${PYTHON}.tgz tk
 	echo ${PREFIX}
 	tar -xozf ${PYTHON}.tgz
-	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
+	cd ${PYTHON}; ./configure --prefix=${PREFIX}
 	cd ${PYTHON}; env PREFIX=${PREFIX} make 
 	cd ${PYTHON}; env PREFIX=${PREFIX} make install
 	touch python
@@ -141,6 +141,7 @@ pil: ${PIL}.tgz jpeg python
 ifeq ("$(shell uname -m)","x86_64")
 	cd ${PIL}; patch < ../Imaging.diff
 endif
+	patch -p0 < Imaging_OSX.diff
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build_ext -i
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python selftest.py
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install

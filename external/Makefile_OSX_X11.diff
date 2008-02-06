@@ -1,12 +1,20 @@
---- Makefile	2007-12-11 12:49:46.000000000 +0800
-+++ Makefile.new	2007-12-11 12:49:16.000000000 +0800
-@@ -29,7 +29,8 @@
+Index: Makefile
+===================================================================
+--- Makefile	(revision 7767)
++++ Makefile	(working copy)
+@@ -29,6 +29,7 @@
  python: ${PYTHON}.tgz tk
  	echo ${PREFIX}
- 	tar xzf ${PYTHON}.tgz
--	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
-+	patch -p0 < Python_OSX_X11.diff		
-+	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-rpath,${PREFIX}/lib
+ 	tar -xozf ${PYTHON}.tgz
++	patch -p0 < Python_OSX_X11.diff
+ 	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
  	cd ${PYTHON}; env PREFIX=${PREFIX} make 
  	cd ${PYTHON}; env PREFIX=${PREFIX} make install
- 	touch python
+@@ -141,6 +142,7 @@
+ ifeq ("$(shell uname -m)","x86_64")
+ 	cd ${PIL}; patch < ../Imaging.diff
+ endif
++	patch -p0 < Imaging_OSX.diff
+ 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build_ext -i
+ 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python selftest.py
+ 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
