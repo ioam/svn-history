@@ -749,7 +749,7 @@ class PeriodicEventSequence(EventSequence):
 ### implemented using PeriodicEvents?
 
 import time
-from math import fmod,floor
+from math import floor
 class SomeTimer(ParameterizedObject):
     """
     Provides a countdown timer for functions that run repeatedly.
