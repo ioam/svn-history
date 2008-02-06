@@ -24,14 +24,16 @@ __version__='$Revision$'
 
 from colorsys import hsv_to_rgb
 
-import numpy.oldnumeric as Numeric, Image, math
-from topo.base.parameterclasses import Parameter
+import numpy.oldnumeric as Numeric, Image, ImageDraw, math
+from topo.base.parameterclasses import ListParameter,Integer,CompositeParameter,DictParameter
+from topo.base.parameterclasses import NumericTuple
 from topo.base.parameterizedobject import ParameterizedObject
 
 ### JCALERT: To do:
 ###        - Update the test file.
 ###        - Write PaletteBitmap when the Palette class is fixed
 ###        - Get rid of accessing function (copy, show...) (should we really?)
+
 
 class Bitmap(ParameterizedObject):
     """
@@ -235,4 +237,97 @@ class RGBBitmap(Bitmap):
 
 
 
-	
+class MontageBitmap(Bitmap):
+    """
+    A bitmap composed of tiles containing other bitmaps.
+
+    Bitmaps are scaled to fit in the given tile size, and tiled
+    right-to-left, top-to-bottom into the given number of rows and columns.
+    """
+    bitmaps = ListParameter(class_=Bitmap,doc="""
+       The list of bitmaps to compose.""")
+
+    rows = Integer(default=2, doc="""
+       The number of rows in the montage.""")
+    cols = Integer(default=2, doc="""
+       The number of columns in the montage.""")    
+    shape = CompositeParameter(attribs=['rows','cols'], doc="""
+       The shape of the monage. Same as (self.rows,self.cols).""")
+
+    margin = Integer(default=5,doc="""
+       The size in pixels of the margin to put around each
+       tile in the montage.""")
+
+    tile_size = NumericTuple(default=(100,100), doc="""
+       The size in pixels of a tile in the montage.""")
+
+    titles = ListParameter(class_=str, default=[], doc="""
+       A list of titles to overlay on the tiles.""")
+
+    title_pos = NumericTuple(default=(10,10), doc="""
+       The position of the upper left corner of the title in each tile.""")
+
+    title_options = DictParameter(default={}, doc="""
+        Dictionary of options for drawing the titles.  Dict should
+        contain keyword options for the PIL draw.text method.  Possible
+        options include 'fill' (fill color), 'outline' (outline color),
+        and 'font' (an ImageFont font instance).  The PIL defaults will
+        be used for any omitted options.""",
+        instantiate=False)
+
+    hooks = ListParameter(default=[], doc="""
+        A list of functions, one per tile, that take a PIL image as
+        input and return a PIL image as output.  The hooks are applied
+        to the tile images before resizing.  The value None can be
+        inserted as a placeholder where no hook function is needed.""")
+
+    resize_filter = Integer(default=Image.NEAREST,doc="""
+       The filter used for resizing the images.  Defaults
+       to NEAREST.  See PIL Image module documentation for other
+       options and their meanings.""")
+    
+    bg_color = NumericTuple(default=(0,0,0), doc="""
+       The background color for the montage, as (r,g,b).""")
+
+    def __init__(self,**params):
+        ## JPALERT: The Bitmap class is a Parameterized object,but its
+        ## __init__ doesn't take **params and doesn't call super.__init__,
+        ## so we have to skip it
+        ParameterizedObject.__init__(self,**params)
+
+        rows,cols = self.shape
+        tilew,tileh = self.tile_size
+        bgr,bgg,bgb = self.bg_color
+
+        width  = tilew*cols + self.margin*(cols*2)
+        height = tileh*rows + self.margin*(rows*2) 
+        self.image = Image.new('RGB',(width,height),
+                               (bgr*255,bgg*255,bgb*255))
+        
+        for r in xrange(rows):
+            for c in xrange(cols):
+                i = r*self.cols+c
+                if i < len(self.bitmaps):
+                    bm = self.bitmaps[i]
+                    bmw,bmh = bm.image.size
+                    if bmw > bmh:
+                        bmh = int( float(tilew)/bmw * bmh )
+                        bmw = tilew
+                    else:
+                        bmw = int( float(tileh)/bmh * bmw )
+                        bmh = tileh
+
+                    if self.hooks[i]:
+                        f = self.hooks[i]
+                    else:
+                        f = lambda x:x
+                    new_bm = Bitmap(f(bm.image).resize((bmw,bmh)))
+                    if self.titles:
+                        draw = ImageDraw.Draw(new_bm.image)
+                        draw.text(self.title_pos,self.titles[i],**self.title_options)
+                    self.image.paste( new_bm.image,
+                                      (c * width/cols + tilew/2 - bmw/2 + self.margin,
+                                       r * height/rows + tileh/2 - bmh/2 + self.margin) )
+                        
+                else:
+                    break
