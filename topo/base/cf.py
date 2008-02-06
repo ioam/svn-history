@@ -637,10 +637,7 @@ class CFProjection(Projection):
         Amount of learning at each step for this projection, specified
         in units that are independent of the density of each Sheet.""")
 
-    output_fn  = OutputFnParameter(
-        default=IdentityOF(),
-        doc='Function applied to the Projection activity after it is computed.')
-
+    # CEBALERT: is this used?
     debug_output_fn  = OutputFnParameter(
         default=IdentityOF(),
         doc='Function applied to the Projection activity after it is computed.')

@@ -73,37 +73,37 @@ class SheetMask(ParameterizedObject):
     # JABALERT: Shouldn't this just keep one matrix around and zero it out,
     # instead of allocating a new one each time?
     def reset(self):
-      """Initialize mask to default value (with no neurons masked out)."""
-      self.data = ones(self.sheet.shape)
+        """Initialize mask to default value (with no neurons masked out)."""
+        self.data = ones(self.sheet.shape)
 
     
     def calculate(self):
-      """
-      Calculate a new mask based on the activity of the sheet.
-      
-      For instance, in an algorithm like LISSOM that is based on a
-      process of feedforward activation followed by lateral settling,
-      the calculation is done at the beginning of each iteration after
-      the feedforward activity has been calculated.
-
-      Subclasses should override this method to compute some non-default
-      mask.
-      """
-      pass
+        """
+        Calculate a new mask based on the activity of the sheet.
+        
+        For instance, in an algorithm like LISSOM that is based on a
+        process of feedforward activation followed by lateral settling,
+        the calculation is done at the beginning of each iteration after
+        the feedforward activity has been calculated.
+        
+        Subclasses should override this method to compute some non-default
+        mask.
+        """
+        pass
 
   
     # JABALERT: Not clear what the user should do with this.
     def update(self):
-      """
-      Update the current mask based on the current activity and a previous mask.
-
-      Should be called only if calculate() has already been called since the last
-      reset(); potentially faster to compute than redoing the entire calculate().
-      
-      Subclasses should override this method to compute some non-default
-      mask.
-      """
-      pass
+        """
+        Update the current mask based on the current activity and a previous mask.
+        
+        Should be called only if calculate() has already been called since the last
+        reset(); potentially faster to compute than redoing the entire calculate().
+        
+        Subclasses should override this method to compute some non-default
+        mask.
+        """
+        pass
 
   
 class CompositeSheetMask(SheetMask):
@@ -183,6 +183,10 @@ class Projection(EPConnection):
     src_port = Parameter(default='Activity')
     
     dest_port = Parameter(default='Activity')
+
+    output_fn  = OutputFnParameter(
+        default=IdentityOF(),
+        doc='Function applied to the Projection activity after it is computed.')
 
        
     def __init__(self,**params):
