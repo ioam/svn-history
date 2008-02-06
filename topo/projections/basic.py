@@ -191,24 +191,23 @@ class LeakyCFProjection(CFProjection):
 
 class ScaledCFProjection(CFProjection):
     """
-   
+    A CFProjection which allows scaling of activity based on a specified target average activity.
+    An exponentially weighted average is used to calculate the average activity.
+    This average is then used to calculate scaling factors for the current activity
+    and for the learning rate.
     """
 
-    target = Number(default=0.045, doc="""Target average activity for jointly scaled projections""")
+    target = Number(default=0.045, doc="""Target average activity for projection""")
 
     updating = BooleanParameter(default=True, doc="""
         Whether or not to update average.
         Allows averaging to be turned off, e.g. during map measurement.""")
 
-    target_lr = Number(default=0.045, doc="""Target average activity for jointly scaled projections for scaling learning rate""")
+    target_lr = Number(default=0.045, doc="""Target average activity for scaling learning rate""")
     
     smoothing = Number(default=0.999, doc="""
         Determines the degree of weighting of previous activity vs.
         current activity when calculating the average.""")
-
-    debug_output_fn  = OutputFnParameter(
-        default=IdentityOF(),
-        doc='Function applied to the Projection activity after it is computed.')
 
     def __init__(self,**params):
         super(ScaledCFProjection,self).__init__(**params)
@@ -220,9 +219,9 @@ class ScaledCFProjection(CFProjection):
 
     def calculate_sf(self):
         """
-        If updating is True, calculate the scaling factor based on the target average activity and the previous
-        average joint activity. Keep track of the scaled average for debugging. Could be overwritten if a different
-        scaling factor is required.
+        If updating is True, calculate the scaling factors based on the target average activity and the previous
+        average activity. Keep track of the scaled average for debugging. Could be overwritten if different
+        scaling factors are required.
         """
       
         if self.updating:
@@ -236,7 +235,7 @@ class ScaledCFProjection(CFProjection):
 
     def do_scaling(self):
         """
-      
+        Scale the projection activity and learning rate for the projection.
         """
         self.activity *= self.sf
         if hasattr(self.learning_fn,'learning_rate_scaling_factor'):
@@ -260,11 +259,8 @@ class ScaledCFProjection(CFProjection):
         
         self.response_fn(MaskedCFIter(self), input_activity, self.activity, self.strength)
         self.output_fn(self.activity)
-        print sum(self.activity.flat), self.name, "before"
         self.calculate_sf()
         self.do_scaling()
-        print sum(self.activity.flat), self.name, "after"
-        self.debug_output_fn(self.activity)
         
     def stop_updating(self):
         """
