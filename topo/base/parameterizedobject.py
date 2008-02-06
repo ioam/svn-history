@@ -950,7 +950,7 @@ class ParameterizedObject(object):
     # would show up in lissom_oo_or because separated composite uses
     # this method.
     @bothmethod
-    def force_new_dynamic_value(cls_or_slf,name):
+    def force_new_dynamic_value(cls_or_slf,name): # pylint: disable-msg=E0213
         """
         Force a new value to be generated for the dynamic attribute
         name, and return it.
@@ -976,7 +976,7 @@ class ParameterizedObject(object):
             
 
     @bothmethod
-    def get_value_generator(cls_or_slf,name): 
+    def get_value_generator(cls_or_slf,name): # pylint: disable-msg=E0213
         """
         Return the value or value-generating object of the named
         attribute.
@@ -1012,7 +1012,7 @@ class ParameterizedObject(object):
 
 
     @bothmethod
-    def inspect_value(cls_or_slf,name): 
+    def inspect_value(cls_or_slf,name): # pylint: disable-msg=E0213
         """
         Return the current value of the named attribute without modifying it.
 
