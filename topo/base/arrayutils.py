@@ -7,14 +7,11 @@ __version__ = "$Revision$"
 
 import re
 
-from numpy.oldnumeric import sqrt, dot,arctan2, array2string, logical_not, argmax, fmod, floor
-
-# CB: I think it's ok to replace Python's abs with numpy's in this file,
-# but pylint complains. Maybe it's right?
-from numpy import set_printoptions, abs
+from numpy import sqrt,dot,arctan2,array2string,logical_not,fmod,floor,array,concatenate
+import numpy
 
 # Ask numpy to print even relatively large arrays by default
-set_printoptions(threshold=200*200)
+numpy.set_printoptions(threshold=200*200)
 
 
 def L2norm(v):
@@ -28,7 +25,7 @@ def norm(v,p=2):
     """
     Returns the Lp norm of v, where p is arbitrary and defaults to 2.
     """
-    return (abs(v)**p).sum()**(1.0/p)
+    return (numpy.abs(v)**p).sum()**(1.0/p)
 
 
 def divisive_normalization(weights):
@@ -44,15 +41,13 @@ def add_border(matrix,width=1,value=0.0):
     Returns a new matrix consisting of the given matrix with a border
     or margin of the given width filled with the given value.
     """
-    # CEBALERT: why is this import here? Can I move it?
-    from numpy.oldnumeric import concatenate as join,array
     rows,cols = matrix.shape
 
     hborder = array([ [value]*(cols+2*width) ]*width)
     vborder = array([ [value]*width ] * rows)
 
-    temp = join( (vborder,matrix,vborder), axis=1)
-    return join( (hborder,temp,hborder) )     
+    temp = concatenate( (vborder,matrix,vborder), axis=1)
+    return concatenate( (hborder,temp,hborder) )     
 
 
 def arg(z):
@@ -95,12 +90,12 @@ def centroid(array_2D):
     rmass_sum=0
     cmass_sum=0
     for r in xrange(rows):
-        row_sum = sum(array_2D[r,:])
+        row_sum = array_2D[r,:].sum()
         rsum += r*row_sum
         rmass_sum += row_sum
     
     for c in xrange(cols):
-        col_sum = sum(array_2D[:,c])
+        col_sum = array_2D[:,c].sum()
         csum += c*col_sum
         cmass_sum += col_sum
         
@@ -149,7 +144,7 @@ def wrap(lower, upper, x):
 def array_argmax(mat):
     "Returns the coordinates of the maximum element in the given matrix."
     rows,cols = mat.shape # pylint: disable-msg=W0612
-    pos = argmax(mat.ravel())
+    pos = mat.argmax()
     r = pos/cols
     c = pos%cols
     return r,c
@@ -175,7 +170,6 @@ def __numpy_ufunc_pickle_support():
         return ufunc.__name__
 
     # CB: could add ufunc_unpickler if we need.
-    import numpy
     copy_reg.pickle(numpy.ufunc,ufunc_pickler)#,ufunc_unpickler)
 
 
