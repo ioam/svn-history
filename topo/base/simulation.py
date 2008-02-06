@@ -1236,7 +1236,7 @@ class Simulation(ParameterizedObject):
             else:
                 # Pop and call the event at the head of the queue.
                 event = self.events.pop(0)
-                #self.debug("Delivering "+ repr(event))
+                self.debug(lambda:"Delivering %s"%(event))
                 event(self)
                 did_event=True
 
