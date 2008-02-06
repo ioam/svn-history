@@ -1160,7 +1160,6 @@ _param_name_changes = {}
 # (not yet finished - do we need to add information about version numbers?)
 
 import __main__
-import inspect
 class PicklableClassAttributes(object):
     """
     Supports pickling of ParameterizedObject class attributes for a given module.
