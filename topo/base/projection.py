@@ -5,7 +5,6 @@ $Id$
 """
 __version__='$Revision$'
 
-import operator
 from numpy import array,asarray,ones,sometrue, logical_and, logical_or
 
 from sheet import Sheet

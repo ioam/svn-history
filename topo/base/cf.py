@@ -32,7 +32,7 @@ from functionfamilies import ResponseFnParameter,DotProduct
 from functionfamilies import CoordinateMapperFnParameter,IdentityMF
 from projection import Projection,ProjectionSheet, SheetMask
 from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter,Integer,BooleanParameter
-from sheet import Sheet,Slice
+from sheet import Slice
 from sheetview import UnitView, ProjectionView
 from boundingregion import BoundingBox,BoundingRegionParameter
 

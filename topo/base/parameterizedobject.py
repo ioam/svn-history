@@ -12,7 +12,6 @@ import copy
 import re
 
 
-from pprint import pprint
 from types import FunctionType
 
 # JABALERT: Could consider using Python's logging facilities instead.

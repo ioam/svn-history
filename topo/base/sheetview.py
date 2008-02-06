@@ -13,7 +13,6 @@ $Id$
 """
 __version__='$Revision$'
 
-import sys
 import types
 import operator
 

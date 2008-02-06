@@ -11,7 +11,6 @@ __version__='$Revision$'
 
 # CEBALERT: Documentation is just draft.
 
-import numpy.oldnumeric as Numeric
 import numpy
 
 from topo.base.parameterizedobject import ParameterizedObject,Parameter
