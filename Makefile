@@ -132,7 +132,7 @@ compare_oo_or:
 
 # Test that the specified scripts haven't changed in results or speed.
 #SCRIPTS=^cfsom_or.ty ^lissom_oo_or.ty ^som_retinotopy.ty
-SCRIPTS= ^cfsom_or.ty ^hierarchical.ty ^lissom_or.ty ^lissom_oo_or.ty ^lissom_oo_or_dy.ty ^lissom_oo_od.ty ^lissom_or_noshrinking.ty ^lissom_oo_or_homeostatic.ty ^som_retinotopy.ty ^sullivan_neurocomputing04.ty ^sullivan_nn06.ty
+SCRIPTS= ^cfsom_or.ty ^hierarchical.ty ^lissom_or.ty ^lissom_oo_or.ty ^lissom_oo_or_dy.ty ^lissom_oo_od.ty ^lissom_or_noshrinking.ty ^som_retinotopy.ty ^sullivan_neurocomputing04.ty ^sullivan_nn06.ty
 # ^lissom_photo_or.ty # Omitted because photos are not always installed
 
 
