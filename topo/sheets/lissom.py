@@ -236,11 +236,14 @@ class LISSOM(JointNormalizingCFSheet):
     def state_pop(self,**args):
         super(LISSOM,self).state_pop(**args)
         self.activation_count,self.new_iteration=self.__counter_stack.pop()
-  
+
+
+
 class JointNormalizingCFSheet_Continuous(JointNormalizingCFSheet):
     """
-    This is a version of CFSheet that runs continousely - eg. there are no 'resting' periods between pattern presentations. 
-    However learning occurs only always when the time is an integer number.
+    CFSheet variant that runs continuously, with no 'resting' periods between pattern presentations.
+    
+    Even so, learning occurs only always when the time is a whole number.
     """
     def process_current_time(self):
         if(float(topo.sim.time()) % 1.0 == 0.0):
@@ -249,6 +252,8 @@ class JointNormalizingCFSheet_Continuous(JointNormalizingCFSheet):
                  self.learn()
         else:
              self.activate()
+
+
 
 class JointScaling(LISSOM):
     """

@@ -178,6 +178,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         """
         self.__saved_activity.append(array(self.activity))
 
+
     def state_pop(self):
         """
         Pop the most recently saved state off the stack.
@@ -186,20 +187,41 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         """
         self.activity = self.__saved_activity.pop()
 
+
     def activity_len(self):
         """Return the number of items that have been saved by state_push()."""
         return len(self.__saved_activity)
 
+
     def stop_updating(self):
         """
-        Save the current state of the learning parameter to an internal stack. 
-        Turns off the updating parameter for the sheet.
+        Temporarily disable updating of medium and long term internal state.
+
+        This function should be implemented by all subclasses so that
+        it preserves the ability of the Sheet to compute activity,
+        i.e. to operate over a short time scale, while preventing any
+        lasting changes to the state.
+
+        Any operation that does not have any lasting state, such as
+        those affecting only the current activity level, should not
+        be affected by this call.
+
+        By default, simply saves a copy of the learning flag to an
+        internal stack (so that it can be restored by
+        restore_updating()), and then sets learning to False.
         """
         self._updating_state.append(self.learning)
         self.learning=False
 
+
     def restore_updating(self):
-        """Pop the most recently saved learning parameter off the stack."""
+        """
+        Re-enable updating of medium and long term internal state after a stop_updating call.
+
+        This function should be implemented by all subclasses to
+        remove the effect of the most recent stop_updating call,
+        i.e. to reenable plasticity of any type that was disabled.
+        """
         self.learning = self._updating_state.pop()
 
 
