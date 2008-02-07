@@ -442,7 +442,7 @@ libsndfile-uninstall:
 PYAUDIOLAB = pyaudiolab-0.6.6
 PYAUDIOLAB_UNINSTALL =  ${PYTHON_LIB}/site-packages/pyaudiolab
 
-pyaudiolab: ${PYAUDIOLAB}.tar.gz python libsndfile ctypes
+pyaudiolab: ${PYAUDIOLAB}.tar.gz python libsndfile 
 	tar -xozf ${PYAUDIOLAB}.tar.gz
 	cd ${PYAUDIOLAB}; ${PREFIX}/bin/python setup.py install
 	touch pyaudiolab
