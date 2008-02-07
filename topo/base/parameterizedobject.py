@@ -445,6 +445,13 @@ class Parameter(object):
 
     def __setstate__(self,state):
         """See __getstate__()"""
+
+        ## PICKLEHACK: removed 'hidden' attribute in r7861
+        if 'hidden' in state:
+            state['precedence']=-1
+            del state['hidden']
+            
+
         for (k,v) in state.items():
             setattr(self,k,v)    
 
