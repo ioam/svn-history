@@ -200,14 +200,12 @@ class ScaledCFProjection(CFProjection):
     An exponentially weighted average is used to calculate the average
     activity.  This average is then used to calculate scaling factors
     for the current activity and for the learning rate.
+
+    The updating parameter can be used to turn off updating of the average
+    activity, e.g. during map measurement.
     """
 
     target = Number(default=0.045, doc="""Target average activity for the projection.""")
-
-    updating = BooleanParameter(default=True, doc="""
-        Whether or not to update average.
-        
-        Allows averaging to be turned off, e.g. during map measurement.""")
 
     target_lr = Number(default=0.045, doc="""
         Target average activity for scaling the learning rate.""")
@@ -223,7 +221,6 @@ class ScaledCFProjection(CFProjection):
         self.x_avg=None
         self.sf=None
         self.lr_sf=None
-        self._updating_state = []
         self.scaled_x_avg=None
 
 
@@ -273,15 +270,6 @@ class ScaledCFProjection(CFProjection):
         self.output_fn(self.activity)
         self.calculate_sf()
         self.do_scaling()
-
-        
-    def stop_updating(self):
-        self._updating_state.append(self.updating)
-        self.updating=False
-
-
-    def restore_updating(self):
-        self.updating = self._updating_state.pop() 
 
 
 

@@ -147,7 +147,7 @@ class OutputFnWithState(OutputFn):
         
         By default, simply saves a copy of the learning flag to an
         internal stack (so that it can be restored by
-        restore_updating()), and then sets updating to False.
+        restore_updating()), and then sets the updating parameter to False.
         """
         self._updating_state.append(self.updating)
         self.updating=False
@@ -162,8 +162,8 @@ class OutputFnWithState(OutputFn):
         i.e. to reenable changes to the internal state, without any
         lasting effect during the time that updating was disabled.
 
-        By default, simply restores the last save value of the
-        updating flag.
+        By default, simply restores the last saved value of the
+        updating parameter.
         """
         self.updating = self._updating_state.pop()                        
 

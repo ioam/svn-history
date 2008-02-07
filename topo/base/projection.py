@@ -509,32 +509,20 @@ class ProjectionSheet(Sheet):
         The old value of the learning parameter is saved to an
         internal stack to be restored by restore_updating().
         """
-
-        self._updating_state.append(self.learning)
-        self.learning=False
+        
+        super(ProjectionSheet,self).stop_updating()
         self.output_fn.stop_updating()
         for proj in self.in_connections:
-            if not isinstance(proj,Projection):
-                self.debug("Skipping non-Projection "+proj.name)
-            else:
+            # Could instead check for a stop_updating method
+            if isinstance(proj,Projection):
                 proj.stop_updating()
 
 
     def restore_updating(self):
-        """
-        Re-enable updating of medium and long term internal state after a stop_updating call.
-
-        This function should be implemented by all subclasses to
-        remove the effect of the most recent stop_updating call,
-        i.e. to reenable plasticity of any type that was disabled.
-        """
-
-        self.learning = self._updating_state.pop()
+        super(ProjectionSheet,self).restore_updating()
         self.output_fn.restore_updating()
         for proj in self.in_connections:
-            if not isinstance(proj,Projection):
-                self.debug("Skipping non-Projection "+proj.name)
-            else:
+            if isinstance(proj,Projection):
                 proj.restore_updating()
         
     

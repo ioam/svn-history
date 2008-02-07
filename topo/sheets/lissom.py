@@ -1,5 +1,5 @@
 """
-The LISSOM and JointNormalizingCFSheet classes.
+LISSOM and related sheet classes.
 
 $Id$
 """
@@ -150,10 +150,12 @@ class LISSOM(JointNormalizingCFSheet):
        If false, waits until settling is completed before doing learning.""")
 
     output_fn = OutputFnParameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
+    
     precedence = Number(0.6)
     
     post_initialization_weights_output_fn = CFPOutputFnParameter(default=None,
        doc="""Weights output_fn which can be set after an initial normalization step""")
+
     
     def __init__(self,**params):
         super(LISSOM,self).__init__(**params)
@@ -218,7 +220,6 @@ class LISSOM(JointNormalizingCFSheet):
                 self.activation_count += 1
                 if (self.learning and self.continuous_learning):
                    self.learn()
-
                    
 
     # print the weights of a unit
@@ -243,7 +244,7 @@ class JointNormalizingCFSheet_Continuous(JointNormalizingCFSheet):
     """
     CFSheet variant that runs continuously, with no 'resting' periods between pattern presentations.
     
-    Even so, learning occurs only always when the time is a whole number.
+    Note that learning occurs only always when the time is a whole number.
     """
     def process_current_time(self):
         if(float(topo.sim.time()) % 1.0 == 0.0):
@@ -272,18 +273,14 @@ class JointScaling(LISSOM):
     #the joint scaling of the Afferent projections as grouped together by JointNormalize in dest_port.
     
     target = Number(default=0.045, doc="""
-        Target average activity for jointly scaled projections""")
+        Target average activity for jointly scaled projections.""")
 
-    updating = BooleanParameter(default=True, doc="""
-        Whether or not to update average.
-        Allows averaging to be turned off, e.g. during map measurement.""")
-
+    # JABALERT: I cannot parse the docstring; is it an activity or a learning rate?
     target_lr = Number(default=0.045, doc="""
-        Target average activity for jointly scaled projections for scaling learning rate""")
+        Target average activity for jointly scaled projections for scaling learning rate.""")
     
     smoothing = Number(default=0.999, doc="""
-        Determines the degree of weighting of previous activity vs.
-        current activity when calculating the average.""")
+        Influence of previous activity, relative to current, for computing the average.""")
 
 
     def __init__(self,**params):
@@ -291,18 +288,18 @@ class JointScaling(LISSOM):
         self.x_avg=None
         self.sf=None
         self.lr_sf=None
-        self._updating_state = []
         self.scaled_x_avg=None
 
 
     def calculate_joint_sf(self, joint_total):
         """
-        If updating is True, calculate the scaling factors based on the target average activity and the previous
-        average joint activity. Keep track of the scaled average for debugging. Could be overwritten if different
-        scaling factors are required.
+        Calculate current scaling factors based on the target and previous average joint activities.
+
+        Keeps track of the scaled average for debugging. Could be
+        overridden by a subclass to calculate the factors differently.
         """
       
-        if self.updating:
+        if self.learning:
             self.sf *=0.0
             self.lr_sf *=0.0
             self.sf += self.target/self.x_avg
@@ -313,9 +310,12 @@ class JointScaling(LISSOM):
 
     def do_joint_scaling(self):
         """
-        Assume that the projections to be jointly scaled are those which are being jointly normalized.
-        Calculate the joint total of the grouped projections and use this to calculate the scaling factor.
-        Scale the projection activity and learning rate for these projections.
+        Scales jointly normalized projections together.
+
+        Assumes that the projections to be jointly scaled are those
+        that are being jointly normalized.  Calculates the joint total
+        of the grouped projections, and uses this to calculate the
+        scaling factor.
         """
         joint_total = zeros(self.shape, activity_type)
         
@@ -330,22 +330,24 @@ class JointScaling(LISSOM):
                         if hasattr(proj.learning_fn,'learning_rate_scaling_factor'):
                             proj.learning_fn.update_scaling_factor(self.lr_sf)
                         else:
-                            raise ValueError("Projections to be joint scaled must have learning function which supports scaling e.g. CFPLF_PluginScaled")
+                            raise ValueError("Projections to be joint scaled must have a learning_fn that supports scaling e.g. CFPLF_PluginScaled")
                    
                 else:
                     raise ValueError("Only Afferent scaling currently supported")                  
 
+
     def activate(self):
         """
-        Calculate the scaling factor and scale the afferent projection activity.
-        Collect activity from each projection, combine it to calculate
-        the activity for this sheet, and send the result out.  Subclasses
-        may override this method to whatever it means to calculate activity
-        in that subclass.
+        Compute appropriate scaling factors, apply them, and collect resulting activity.
+
+        Scaling factors are first computed for each set of jointly
+        normalized projections, and the resulting activity patterns
+        are then scaled.  Then the activity is collected from each
+        projection, combined to calculate the activity for this sheet,
+        and the result is sent out.
         """
         self.activity *= 0.0
 
-        
         if self.x_avg is None:
             self.x_avg=self.target*ones(self.shape, activity_type)
         if self.scaled_x_avg is None:
@@ -355,36 +357,15 @@ class JointScaling(LISSOM):
         if self.lr_sf is None:
             self.lr_sf=ones(self.shape, activity_type)
 
-        
         #Afferent projections are only activated once at the beginning of each iteration
         #therefore we only scale the projection activity and learning rate once.
         if self.activation_count == 0: 
             self.do_joint_scaling()   
-        
 
         for proj in self.in_connections:
             self.activity += proj.activity
-
         
         if self.apply_output_fn:
             self.output_fn(self.activity)
           
         self.send_output(src_port='Activity',data=self.activity)
-
-
-    def stop_updating(self):
-        """
-        Save the current state of the updating parameter to an internal stack. 
-        Turns updating off for the output_fn.
-        """
-        self._updating_state.append(self.updating)
-        self.updating=False
-
-
-    def restore_updating(self):
-        """Pop the most recently saved updating parameter off the stack."""
-        self.updating = self._updating_state.pop() 
-
-                    
-
-
