@@ -118,7 +118,7 @@ def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
         
 
 
-def check_weights(sheet_name,proj_name,unit,c_row_slice,c_col_slice):
+def check_weights(sheet_name,proj_name,unit,c_row_slice,c_col_slice,required_dp=6):
     """
     Print the smallest number of decimal places to which all
     corresponding elements of the C++ lissom and Topographica weights
@@ -143,8 +143,11 @@ def check_weights(sheet_name,proj_name,unit,c_row_slice,c_col_slice):
     print comparing_what+" matched to "+`match_dp`+" d.p."
     # could return comparing_what & dp if that information is to be used for something else
 
+    if required_dp>0:
+        assert match_dp>=required_dp, "Required match to %s d.p. but got %s d.p."%(required_dp,match_dp)
 
-def check_activities(sheet_name):
+
+def check_activities(sheet_name,required_dp=5):
     """
     Print the smallest number of decimal places to which all
     corresponding elements of the C++ lissom and Topographica
@@ -164,3 +167,6 @@ def check_activities(sheet_name):
     match_dp = compare_elements(topo_act,c_act)
     print comparing_what+" matched to "+`match_dp`+" d.p."
     # could return comparing_what & dp if that information is to be used for something else
+
+    if required_dp>0:
+        assert match_dp>=required_dp, "Required match to %s d.p. but got %s d.p."%(required_dp,match_dp)
