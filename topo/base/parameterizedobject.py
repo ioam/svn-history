@@ -653,9 +653,6 @@ class ParameterizedObjectMetaclass(type):
 # JABALERT: Only partially achieved so far -- objects of the same
 # type and parameter values are treated as different, so anything
 # for which instantiate == True is reported as being non-default.
-# Note that this module-level Parameter won't actually do most 
-# of the things a Parameter does, but using a Parameter here
-# should be more readable anyway.
 
 # Whether script_repr should avoid reporting the values of parameters
 # that are just inheriting their values from the class defaults.

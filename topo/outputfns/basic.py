@@ -389,15 +389,26 @@ class PoissonSample(OutputFn):
         x *= self.out_scale
 
 
+
 class AttributeTrackingOF(OutputFn):
     """
-    Output function which keeps track of individual attributes (attrib_names)of a ParameterizedObject,
-    over time, for specified units. For example the object can be a sheet: topo.sim['V1']
-    or a projection: topo.sim['V1'}.projections['LateralInhibitory'] or an output_function.
-    Attributes can be tracked if they are the same size as the activity matrix.
-    If no function is specified this function will keep track of activity over time.
-    The values dictionary stores (time, value) pairs indexed by the parameter name and unit,
-    i.e. values['x'][(0,0)]=(time=t,value of x at time=t)
+    Keeps track of attributes of a specified ParameterizedObject over time, for analysis or plotting.
+
+    Useful objects to track include sheets (e.g. "topo.sim['V1']"),
+    projections ("topo.sim['V1'].projections['LateralInhibitory']"),
+    or an output_function.  
+
+    Any attribute whose value is a matrix the same size as the
+    activity matrix can be tracked.  Only specified units within this
+    matrix will be tracked.
+    
+    If no object is specified, this function will keep track of the
+    incoming activity over time.
+
+    The results are stored in a dictionary named 'values', as (time,
+    value) pairs indexed by the parameter name and unit.  For
+    instance, if the value of attribute 'x' is v for unit (0,0)
+    at time t, values['x'][(0,0)]=(t,v).
     """
     
     object = Parameter(default=None, doc="""
@@ -416,7 +427,11 @@ class AttributeTrackingOF(OutputFn):
     units = ListParameter(default=[(0,0)], doc="""
         Matrix coordinates of the unit(s) for which parameter values will be stored.""")
     
-    step = Number(default=1, doc="How often to update parameter information")
+    step = Number(default=1, doc="""
+        How often to update the tracked values.
+
+        For instance, step=1 means to update them every time this OF is
+        called; step=2 means to update them every other time.""")
 
     updating = BooleanParameter(default=True, doc="""
         Whether or not to track parameters.
@@ -457,43 +472,48 @@ class AttributeTrackingOF(OutputFn):
                     for u in self.units:
                         self.values[p][u].append((topo.sim.time(),value_matrix[u]))
 
-    def stop_updating(self):
-        """
-        Save the current state of the updating parameter to an internal stack. 
-        Turn updating off for the output_fn.
-        """
 
+    def stop_updating(self):
         self._updating_state.append(self.updating)
         self.updating=False
 
 
     def restore_updating(self):
-        """Pop the most recently saved updating parameter off the stack"""
-
         self.updating = self._updating_state.pop()                        
           
 
+
 class ActivityAveragingOF(OutputFn):
     """
-    Calculates the average of the input activity. The average is calculated as an 
-    exponential moving average. The weighting for each older data point decreases exponentially.
-    The degree of weighing for the previous values is expressed as a constant smoothing factor (smoothing).
+    Calculates the average of the input activity.
+
+    The average is calculated as an exponential moving average, where
+    the weighting for each older data point decreases exponentially.
+    The degree of weighing for the previous values is expressed as a
+    constant smoothing factor.
     """
-    step=Number(default=1, doc="How often to calculate average activity")
+
+    step = Number(default=1, doc="""
+        How often to update the average.
+
+        For instance, step=1 means to update it every time this OF is
+        called; step=2 means to update it every other time.""")
     
     smoothing = Number(default=0.9997, doc="""
-    The degree of weighting for the previous average when calculating the new average""")
+        The degree of weighting for the previous average, when calculating the new average.""")
    
     updating = BooleanParameter(default=True, doc="""
-    Whether or not to average activity, allows averaging to be turned off during e.g. map measurement""")
+        If False, disable updating of the averages, e.g. during map measurement.""")
 
-    initial_average=Number(default=0, doc="Initial value for x_avg")
+    initial_average=Number(default=0, doc="Starting value for the average activity.")
+
     
     def __init__(self,**params):
         super(ActivityAveragingOF,self).__init__(**params)
         self.n_step = 0
         self.x_avg=None
         self._updating_state = []   
+
 
     def __call__(self,x):
         if self.x_avg is None:
@@ -507,18 +527,11 @@ class ActivityAveragingOF(OutputFn):
                 self.x_avg = (1.0-self.smoothing)*x + self.smoothing*self.x_avg
 
     def stop_updating(self):
-        """
-        Save the current state of the updating parameter to an internal stack. 
-        Turn updating off for the output_fn.
-        """
-
         self._updating_state.append(self.updating)
         self.updating=False
 
 
     def restore_updating(self):
-        """Pop the most recently saved updating parameter off the stack"""
-
         self.updating = self._updating_state.pop()                        
 
 

@@ -8,6 +8,8 @@ $Id$
 """
 __version__='$Revision$'
 
+# ALERT: These should probably move into basic.py; they don't have any special dependencies.
+
 import copy
 import topo
 from numpy import exp,zeros,ones

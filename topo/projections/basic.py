@@ -1,8 +1,6 @@
 """
-Repository for the basic Projection types.
-
-Mainly provides a place where additional Projections can be added in
-future, so that all will be in a well-defined, searchable location.
+Repository for the basic Projection types, without any special
+dependencies or requirements.
 
 $Id$
 """
@@ -30,6 +28,7 @@ from topo.misc.utils import rowcol2idx
 from topo.outputfns.basic import IdentityOF
 
 
+
 class CFPOF_SharedWeight(CFPOutputFn):
     """
     CFPOutputFn for use with SharedWeightCFProjections.
@@ -43,6 +42,7 @@ class CFPOF_SharedWeight(CFPOutputFn):
         if type(self.single_cf_fn) is not IdentityOF:
             cf = cfs[0][0]
             self.single_cf_fn(cf.weights)
+
 
 
 class SharedWeightCF(ConnectionField):
@@ -82,6 +82,7 @@ class SharedWeightCF(ConnectionField):
 	# The SharedWeightCFProjection class and its anccestors will
 	# have this property set to false which means that the 
 	# learning will be deactivated
+
 	
 
 class SharedWeightCFProjection(CFProjection):
@@ -93,7 +94,8 @@ class SharedWeightCFProjection(CFProjection):
     """
     
     ### JABHACKALERT: Set to be constant as a clue that learning won't
-    ### actually work yet.
+    ### actually work yet, but we could certainly extend it to support
+    ### learning if desired, e.g. to learn position-independent responses.
     learning_fn = CFPLearningFnParameter(CFPLF_Identity(),constant=True)
     output_fn  = OutputFnParameter(default=IdentityOF())
     weights_output_fn = CFPOutputFnParameter(default=CFPOF_SharedWeight())
@@ -165,6 +167,7 @@ class SharedWeightCFProjection(CFProjection):
 	pass
 
 
+
 class LeakyCFProjection(CFProjection):
     """
     A projection that has a decay_rate parameter so that incoming
@@ -189,27 +192,33 @@ class LeakyCFProjection(CFProjection):
         super(LeakyCFProjection,self).activate(self.leaky_input_buffer)
 
 
+
 class ScaledCFProjection(CFProjection):
     """
-    A CFProjection which allows scaling of activity based on a specified target average activity.
-    An exponentially weighted average is used to calculate the average activity.
-    This average is then used to calculate scaling factors for the current activity
-    and for the learning rate.
+    Allows scaling of activity based on a specified target average activity.
+    
+    An exponentially weighted average is used to calculate the average
+    activity.  This average is then used to calculate scaling factors
+    for the current activity and for the learning rate.
     """
 
-    target = Number(default=0.045, doc="""Target average activity for projection""")
+    target = Number(default=0.045, doc="""Target average activity for the projection.""")
 
     updating = BooleanParameter(default=True, doc="""
         Whether or not to update average.
+        
         Allows averaging to be turned off, e.g. during map measurement.""")
 
-    target_lr = Number(default=0.045, doc="""Target average activity for scaling learning rate""")
+    target_lr = Number(default=0.045, doc="""
+        Target average activity for scaling the learning rate.""")
     
     smoothing = Number(default=0.999, doc="""
-        Determines the degree of weighting of previous activity vs.
-        current activity when calculating the average.""")
+        Influence of previous activity, relative to current, for computing the average.""")
+
 
     def __init__(self,**params):
+        # JABALERT: Private variables should be prefixed __ (truly private) or _ (nominally private)
+        # Are all of these really something you expect people to be using outside this class?
         super(ScaledCFProjection,self).__init__(**params)
         self.x_avg=None
         self.sf=None
@@ -217,11 +226,13 @@ class ScaledCFProjection(CFProjection):
         self._updating_state = []
         self.scaled_x_avg=None
 
+
     def calculate_sf(self):
         """
-        If updating is True, calculate the scaling factors based on the target average activity and the previous
-        average activity. Keep track of the scaled average for debugging. Could be overwritten if different
-        scaling factors are required.
+        Calculate current scaling factors based on the target and previous average activities.
+
+        Keeps track of the scaled average for debugging. Could be
+        overridden by a subclass to calculate the factors differently.
         """
       
         if self.updating:
@@ -241,7 +252,8 @@ class ScaledCFProjection(CFProjection):
         if hasattr(self.learning_fn,'learning_rate_scaling_factor'):
             self.learning_fn.update_scaling_factor(self.lr_sf)
         else:
-            raise ValueError("Projections to be caled must have learning function which supports scaling e.g. CFPLF_PluginScaled")
+            raise ValueError("Projections to be called must have learning function which supports scaling (e.g. CFPLF_PluginScaled).")
+
                    
     def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
@@ -261,19 +273,17 @@ class ScaledCFProjection(CFProjection):
         self.output_fn(self.activity)
         self.calculate_sf()
         self.do_scaling()
+
         
     def stop_updating(self):
-        """
-        Save the current state of the updating parameter to an internal stack. 
-        Turns updating off for the output_fn.
-        """
         self._updating_state.append(self.updating)
         self.updating=False
 
 
     def restore_updating(self):
-        """Pop the most recently saved updating parameter off the stack."""
         self.updating = self._updating_state.pop() 
+
+
 
 class OneToOneProjection(Projection):
     """
@@ -298,6 +308,7 @@ class OneToOneProjection(Projection):
         doc="""Learning function applied to weights.""")
 
     learning_rate = Number(default=0)
+
     
     def __init__(self,**kw):
         super(OneToOneProjection,self).__init__(**kw)

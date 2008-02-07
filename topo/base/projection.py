@@ -193,8 +193,15 @@ class Projection(EPConnection):
         super(Projection,self).__init__(**params)
         self.activity = array(self.dest.activity)
         self._updating_state = []
+
         
     def activate(self,input_activity):
+        """
+        Compute an activity matrix for output, based on the specified input_activity.
+        
+        Subclasses must override this method to whatever it means to
+        calculate activity in that subclass.
+        """
         raise NotImplementedError
 
     
@@ -204,6 +211,7 @@ class Projection(EPConnection):
         to support learning.
         """
         pass
+
 
     def apply_learn_output_fn(self,mask):
         """
@@ -219,22 +227,42 @@ class Projection(EPConnection):
         """
         pass
 
+
+    # JABALERT: Should this be renamed disable_plasticity (and restore_plasticity)?
     def stop_updating(self):
         """
-        Save the current state of the updating parameter to an internal stack.
-        Calls the stop_updating function for the projection output_fn.
-        Will need to be overwritten in subclasses that have a updating parameter,
-        or some other potential state change which should be frozen.  
+        Temporarily disable updating of medium and long term internal state.
+
+        This function should be implemented by all subclasses so that
+        it preserves the ability of the Projection to compute
+        activity, i.e. to operate over a short time scale, while
+        preventing any lasting changes to the state.
+
+        For instance, in a Projection with modifiable connection
+        weights, the values of those weights should be made fixed and
+        unchanging after this call.  For a Projection with automatic
+        normalization, homeostatic plasticity, or other features that
+        depend on a history of events (rather than just the current
+        item being processed), those processes should all be disabled
+        at their current setting.
+
+        Any process that does not have any lasting state, such as
+        those affecting only the current activity level, should not
+        be affected by this call.
+
+        By default, this call simply calls stop_updating() on the
+        Projection's output_fn.
         """
         self.output_fn.stop_updating()
       
 
     def restore_updating(self):
         """
-        Pop the most recently saved updating parameter off the stack.
-        Calls the restore_updating function for the projection output_fn.
-        Will need to be overwritten in subclasses that have a updating parameter
-        or some other potential state change which should be frozen.
+        Re-enable updating of medium and long term internal state after a stop_updating call.
+
+        This function should be implemented by all subclasses to
+        remove the effect of the most recent stop_updating call,
+        i.e. to reenable plasticity of any type that was disabled.
         """
         self.output_fn.restore_updating()
            
@@ -464,9 +492,22 @@ class ProjectionSheet(Sheet):
 
     def stop_updating(self):
         """
-        Save the current state of the learning parameter to an internal stack.
-        Turns off the updating and calls the stop_updating function for each
-        projection and for the sheet output function.
+        Temporarily disable updating of medium and long term internal state.
+
+        This function should be implemented by all subclasses so that
+        it preserves the ability of the ProjectionSheet to compute
+        activity, i.e. to operate over a short time scale, while
+        preventing any lasting changes to the state.
+
+        Any process that does not have any lasting state, such as
+        those affecting only the current activity level, should not
+        be affected by this call.
+
+        By default, calls stop_updating() on the ProjectionSheet's
+        output_fn and all of its incoming Projections, and also
+        enables the learning parameter for this ProjectionSheet.
+        The old value of the learning parameter is saved to an
+        internal stack to be restored by restore_updating().
         """
 
         self._updating_state.append(self.learning)
@@ -481,9 +522,11 @@ class ProjectionSheet(Sheet):
 
     def restore_updating(self):
         """
-        Pop the most recently saved learning parameter off the stack.
-        Calls the restore_updating function for each projection and for
-        the sheet output function.
+        Re-enable updating of medium and long term internal state after a stop_updating call.
+
+        This function should be implemented by all subclasses to
+        remove the effect of the most recent stop_updating call,
+        i.e. to reenable plasticity of any type that was disabled.
         """
 
         self.learning = self._updating_state.pop()
