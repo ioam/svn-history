@@ -12,6 +12,7 @@ $Id$
 """
 __version__='$Revision$'
 
+
 import numpy, numpy.random
 import numpy.oldnumeric as Numeric
 import copy
@@ -25,7 +26,7 @@ from math import ceil
 from topo.base.sheet import activity_type
 from topo.base.arrayutils import clip_lower
 from topo.base.arrayutils import L2norm, norm, array_argmax
-from topo.base.functionfamilies import OutputFn, OutputFnParameter
+from topo.base.functionfamilies import OutputFn, OutputFnWithState, OutputFnParameter
 from topo.base.parameterclasses import Parameter,Number,ListParameter,BooleanParameter, StringParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGeneratorParameter,Constant
@@ -61,37 +62,54 @@ class PiecewiseLinear(OutputFn):
 
 class Sigmoid(OutputFn):
     """ 
-    Sigmoidal (logistic) output function 1/(1+exp-(r*x+k)).
-    Parameters r and k control the growth rate (r) and the x-position (k)
-    of the exponential. As defined in Jochen Triesch,ICANN 2005, LNCS 3696 pp.65-70. 
+    Sigmoidal (logistic) output function: 1/(1+exp-(r*x+k)).
+
+    As defined in Jochen Triesch, ICANN 2005, LNCS 3696 pp. 65-70. 
+    The parameters control the growth rate (r) and the x position (k)
+    of the exponential.
     
-    This function is also a special case of the Generalized Logistic function below with r=r l=0, u=1, m=-k/2r and b=1
-    Richards, F.J. 1959 A flexible growth function for empirical use. J. Experimental Botany 10: 290--300, 1959
+    This function is a special case of the GeneralizedLogistic
+    function, with parameters r=r, l=0, u=1, m=-k/2r, and b=1.  See
+    Richards, F.J. (1959), A flexible growth function for empirical
+    use. J. Experimental Botany 10: 290--300, 1959.
     http://en.wikipedia.org/wiki/Generalised_logistic_curve
-    
     """
+    
     r = Number(default=1,doc="Parameter controlling the growth rate")
     k = Number(default=0,doc="Parameter controlling the x-postion")
     
     def __call__(self,x):
-
         x_orig = copy.copy(x)
         x *= 0.0
 	x += 1.0 / (1.0 + exp(-(self.r*x_orig+self.k)))
+
+
                   
 class NakaRushton(OutputFn):
+    #JABALERT: Please write the equation into words in the docstring, as in Sigmoid.
     """
-    Naka-Rushton curve was shown to well approximate the constrast gain control in cortical neurons.
-    The input of the curve is usually contrast however under the assumption that the firing rate of our neurons is
-    directly proportional to the contrast (which seems to be true in our simple models) it can be used as
-    a OutputFn
+    Naka-Rushton curve.
+
+    From Naka, K. and Rushton, W. (1996), S-potentials from luminosity
+    units in the retina of fish (Cyprinidae). J. Physiology 185:587-599.
+
+    The Naka-Rushton curve has been shown to be a good approximation
+    of constrast gain control in cortical neurons.  The input of the
+    curve is usually contrast, but under the assumption that the
+    firing rate of a model neuron is directly proportional to the
+    contrast, it can be used as an OutputFn for a Sheet.
     
-    The parameter c50 corresponds to contrast at which the half of the maximal output is reached - here this translates to input of the neuron at which the neuron will respond with 0.5
+    The parameter c50 corresponds to the contrast at which the half of
+    the maximal output is reached.  For a Sheet OutputFn this translates
+    to the input for which a neuron will respond with activity 0.5.
     """
     
-    c50 = Number(default=0.1, doc="The input of the neuron at which it responds at half of it's maximal firing rate (1.0)")
-    e = Number(default=1.0,doc="The exponent of the input x")
-    
+    c50 = Number(default=0.1, doc="""
+        The input of the neuron at which it responds at half of its maximal firing rate (1.0).""")
+
+    e = Number(default=1.0,doc="""The exponent of the input x.""")
+
+    #JABALERT: (pow(x_orig,self.e) should presumably be done only once, using a temporary
     def __call__(self,x):
         #print 'A:', x
         #print 'B:', pow(x,self.e) / (pow(x,self.e) + pow(self.c50,self.e))
@@ -99,34 +117,43 @@ class NakaRushton(OutputFn):
         x *= 0
         x += pow(x_orig,self.e) / (pow(x_orig,self.e) + pow(self.c50,self.e))
 
+
+
 class GeneralizedLogistic(OutputFn):
     """ 
-    The generalized logistic curve (Richards' curve), flexible function for specifying a nonlinear growth curve.
-    y = l + ( u /(1 + b exp(-r (x - 2m)) ^ (1 / b)) )
+    The generalized logistic curve (Richards' curve): y = l + (u /(1 + b * exp(-r*(x-2*m))^(1/b))).
 
-    It has five parameters:
+    The logistic curve is a flexible function for specifying a
+    nonlinear growth curve using five parameters:
 
-    * l: the lower asymptote;
-    * u: the upper asymptote minus l;
-    * m: the time of maximum growth;
-    * r: the growth rate;
-    * b: affects near which asymptote maximum growth occurs.
+    * l: the lower asymptote
+    * u: the upper asymptote minus l
+    * m: the time of maximum growth
+    * r: the growth rate
+    * b: affects near which asymptote maximum growth occurs
 
-    Richards, F.J. 1959 A flexible growth function for empirical use. J. Experimental Botany 10: 290--300, 1959
+    From Richards, F.J. (1959), A flexible growth function for empirical
+    use. J. Experimental Botany 10: 290--300.
     http://en.wikipedia.org/wiki/Generalised_logistic_curve
-
     """
-    l = Number(default=1,doc="Parameter controlling the lower asymptote")
-    u = Number(default=1,doc="Parameter controlling the upper asymptote (upper asymptote minus lower asymptote")
+    
+    # JABALERT: Reword these to say what they are, not what they
+    # control, if they are anything that can be expressed naturally.
+    # E.g. is l a parameter controlling the lower asymptote, or is it
+    # simply the lower asymptote?  If it's the lower asymptote, say
+    # doc="Lower asymptote.".  Only if the parameter's relationship to
+    # what it controls is very indirect should it be worded as below.
+    l = Number(default=1,doc="Parameter controlling the lower asymptote.")
+    u = Number(default=1,doc="Parameter controlling the upper asymptote (upper asymptote minus lower asymptote.")
     m = Number(default=1,doc="Parameter controlling the time of maximum growth.")
     r = Number(default=1,doc="Parameter controlling the growth rate.")
-    b = Number(default=1,doc="Parameter which affects near which asymptote maximum growth occurs")
+    b = Number(default=1,doc="Parameter which affects near which asymptote maximum growth occurs.")
     
     def __call__(self,x):
-        
         x_orig = copy.copy(x)
         x *= 0.0
         x += self.l + ( self.u /(1 + self.b*exp(-self.r *(x_orig - 2*self.m))**(1 / self.b)) )    
+
 
 
 class DivisiveNormalizeL1(OutputFn):
@@ -150,6 +177,7 @@ class DivisiveNormalizeL1(OutputFn):
             x *= factor
 
 
+
 class DivisiveNormalizeL2(OutputFn):
     """
     OutputFn to divide an array by its Euclidean length (aka its L2 norm).
@@ -164,6 +192,7 @@ class DivisiveNormalizeL2(OutputFn):
         if tot != 0:
             factor = (self.norm_value/tot)
             x *= factor
+
 
 
 class DivisiveNormalizeLinf(OutputFn):
@@ -186,6 +215,7 @@ class DivisiveNormalizeLinf(OutputFn):
             factor = (self.norm_value/tot)
             x *= factor
 
+
     
 class DivisiveNormalizeLp(OutputFn):
     """
@@ -207,6 +237,7 @@ class DivisiveNormalizeLp(OutputFn):
             x *=factor 
 
 
+
 class HalfRectifyAndSquare(OutputFn):
     """
     Output function that applies a half-wave rectification (clips at zero)
@@ -217,6 +248,8 @@ class HalfRectifyAndSquare(OutputFn):
     def __call__(self,x):
         clip_lower(x,self.lower_bound)
         x *= x
+
+
 
 class HalfRectify(OutputFn):
     """
@@ -229,16 +262,14 @@ class HalfRectify(OutputFn):
         clip_lower(x,self.lower_bound)
 
 
-class Square(OutputFn):
-    """
-    Output function that applies a squaring nonlinearity
 
-    """
+class Square(OutputFn):
+    """Output function that applies a squaring nonlinearity."""
 
     def __call__(self,x):
-    
         x *= x     
         
+
 
 class BinaryThreshold(OutputFn):
     """
@@ -250,6 +281,7 @@ class BinaryThreshold(OutputFn):
         above_threshold = x>=self.threshold
         x *= 0.0
         x += above_threshold
+
 
 
 ### JABALERT: Is this the right location for this class?  It brings in
@@ -284,6 +316,7 @@ class PatternCombine(OutputFn):
         new_pattern = self.operator(x, self.generator(bounds=bb,xdensity=1,ydensity=1))
         x *= 0.0
         x += new_pattern
+
 
 
 ### JABALERT: Is this the right location for this class?  It brings in
@@ -390,7 +423,7 @@ class PoissonSample(OutputFn):
 
 
 
-class AttributeTrackingOF(OutputFn):
+class AttributeTrackingOF(OutputFnWithState):
     """
     Keeps track of attributes of a specified ParameterizedObject over time, for analysis or plotting.
 
@@ -409,6 +442,9 @@ class AttributeTrackingOF(OutputFn):
     value) pairs indexed by the parameter name and unit.  For
     instance, if the value of attribute 'x' is v for unit (0,0)
     at time t, values['x'][(0,0)]=(t,v).
+
+    Updating of the tracked values can be disabled temporarily using
+    the updating parameter.
     """
     
     object = Parameter(default=None, doc="""
@@ -433,15 +469,10 @@ class AttributeTrackingOF(OutputFn):
         For instance, step=1 means to update them every time this OF is
         called; step=2 means to update them every other time.""")
 
-    updating = BooleanParameter(default=True, doc="""
-        Whether or not to track parameters.
-        Allows tracking to be turned off during analysis, and then re-enabled.""")
-    
 
     def __init__(self,**params):
         super(AttributeTrackingOF,self).__init__(**params)
         self.values={}
-        self._updating_state = []
         self.n_step = 0
         self._object=None
         for p in self.attrib_names:
@@ -471,19 +502,10 @@ class AttributeTrackingOF(OutputFn):
                         
                     for u in self.units:
                         self.values[p][u].append((topo.sim.time(),value_matrix[u]))
-
-
-    def stop_updating(self):
-        self._updating_state.append(self.updating)
-        self.updating=False
-
-
-    def restore_updating(self):
-        self.updating = self._updating_state.pop()                        
           
 
 
-class ActivityAveragingOF(OutputFn):
+class ActivityAveragingOF(OutputFnWithState):
     """
     Calculates the average of the input activity.
 
@@ -491,6 +513,9 @@ class ActivityAveragingOF(OutputFn):
     the weighting for each older data point decreases exponentially.
     The degree of weighing for the previous values is expressed as a
     constant smoothing factor.
+
+    The updating parameter allows the updating of the average values
+    to be disabled temporarily, e.g. while presenting test patterns.
     """
 
     step = Number(default=1, doc="""
@@ -502,9 +527,6 @@ class ActivityAveragingOF(OutputFn):
     smoothing = Number(default=0.9997, doc="""
         The degree of weighting for the previous average, when calculating the new average.""")
    
-    updating = BooleanParameter(default=True, doc="""
-        If False, disable updating of the averages, e.g. during map measurement.""")
-
     initial_average=Number(default=0, doc="Starting value for the average activity.")
 
     
@@ -512,7 +534,6 @@ class ActivityAveragingOF(OutputFn):
         super(ActivityAveragingOF,self).__init__(**params)
         self.n_step = 0
         self.x_avg=None
-        self._updating_state = []   
 
 
     def __call__(self,x):
@@ -525,16 +546,6 @@ class ActivityAveragingOF(OutputFn):
             if self.n_step == self.step:
                 self.n_step = 0
                 self.x_avg = (1.0-self.smoothing)*x + self.smoothing*self.x_avg
-
-    def stop_updating(self):
-        self._updating_state.append(self.updating)
-        self.updating=False
-
-
-    def restore_updating(self):
-        self.updating = self._updating_state.pop()                        
-
-
 
 
 

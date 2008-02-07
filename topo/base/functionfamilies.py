@@ -14,7 +14,7 @@ __version__='$Revision$'
 import numpy
 
 from topo.base.parameterizedobject import ParameterizedObject,Parameter
-from topo.base.parameterclasses import ClassSelectorParameter, ListParameter
+from topo.base.parameterclasses import ClassSelectorParameter, ListParameter, BooleanParameter
 
 
 class OutputFn(ParameterizedObject):
@@ -30,7 +30,7 @@ class OutputFn(ParameterizedObject):
     __abstract = True
     
     # CEBALERT: can we have this here - is there a more appropriate
-    # term for it, general to output functions?
+    # term for it, general to output functions?  JAB: Please do rename it!
     norm_value = Parameter(default=None)
 
 
@@ -38,15 +38,36 @@ class OutputFn(ParameterizedObject):
         raise NotImplementedError
 
     def __add__(self,of):
-
         assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
         return PipelineOF(output_fns=[self,of])
 
     def stop_updating(self):
-        pass
+        """
+        Temporarily disable updating of internal state.
+
+        This function should be implemented by all subclasses so that
+        after a call, the output should always be the same for any
+        given input pattern, and no call should have any effect that
+        persists after a restore_updating() call.
         
+        By default, simply saves a copy of the learning flag to an
+        internal stack (so that it can be restored by
+        restore_updating()), and then sets learning to False.
+        """
+        pass
+
     def restore_updating(self):
+        """
+        Re-enable updating of internal state after a stop_updating call.
+
+        This function should be implemented by all subclasses to
+        remove the effect of the most recent stop_updating call,
+        i.e. to reenable changes to the internal state, without any
+        lasting effect during the time that updating was disabled.
+        """
         pass    
+
+
 
 # Trivial example of an OutputFn, provided for when a default
 # is needed.  The other concrete OutputFunction classes are stored
@@ -63,6 +84,8 @@ class IdentityOF(OutputFn):
 
     def __call__(self,x,sum=None):
         pass
+
+
 
 class PipelineOF(OutputFn):
     """
@@ -81,19 +104,71 @@ class PipelineOF(OutputFn):
         self.output_fns.append(of)
 
     def stop_updating(self):
-        """
-        Call the stop_updating function for each output_fn.
-        """
+        """Call the stop_updating function for each output_fn."""
+        
         for of in self.output_fns:
             of.stop_updating()
         
     def restore_updating(self):
-        """Call the restore_updating function for each output_fn.
-        """
+        """Call the restore_updating function for each output_fn."""
 
         for of in self.output_fns:
             of.restore_updating()
-                 
+
+
+
+class OutputFnWithState(OutputFn):
+    """
+    Abstract base class for OutputFns that need to maintain a self.updating parameter.
+
+    These OutputFns typically maintain some form of internal history
+    or other state from previous calls, which can be disabled by
+    stop_updating().
+    """
+
+    updating = BooleanParameter(default=True, doc="""
+        Whether or not to update the internal state on each call.
+        Allows updating to be turned off during analysis, and then re-enabled.""")
+
+
+    def __init__(self,**params):
+        super(OutputFnWithState,self).__init__(**params)
+        self._updating_state = []
+
+
+    def stop_updating(self):
+        """
+        Temporarily disable updating of internal state.
+
+        This function should be implemented by all subclasses so that
+        after a call, the output should always be the same for any
+        given input pattern, and no call should have any effect that
+        persists after a restore_updating() call.
+        
+        By default, simply saves a copy of the learning flag to an
+        internal stack (so that it can be restored by
+        restore_updating()), and then sets updating to False.
+        """
+        self._updating_state.append(self.updating)
+        self.updating=False
+
+
+    def restore_updating(self):
+        """
+        Re-enable updating of internal state after a stop_updating call.
+
+        This function should be implemented by all subclasses to
+        remove the effect of the most recent stop_updating call,
+        i.e. to reenable changes to the internal state, without any
+        lasting effect during the time that updating was disabled.
+
+        By default, simply restores the last save value of the
+        updating flag.
+        """
+        self.updating = self._updating_state.pop()                        
+
+
+
 class OutputFnParameter(ClassSelectorParameter):
     """
     Parameter whose value can be any OutputFn, i.e., a function
