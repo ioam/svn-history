@@ -67,7 +67,7 @@ def descendents(class_):
 # http://www.phyast.pitt.edu/~micheles/python/documentation.html
 
 from functools import partial
-class bothmethod(object):
+class bothmethod(object): # pylint: disable-msg=R0903
     """
     'optional @classmethod'
     
@@ -78,13 +78,15 @@ class bothmethod(object):
     Code (but not documentation) copied from:
     http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/523033.
     """
+    # pylint: disable-msg=R0903
+    
     def __init__(self, func):
         self.func = func
 
     # i.e. this is also a non-data descriptor
-    def __get__(self, obj, type=None):
+    def __get__(self, obj, type_=None):
         if obj is None:
-            return partial(self.func, type)
+            return partial(self.func, type_)
         else:
             return partial(self.func, obj)
 
@@ -261,8 +263,8 @@ class Parameter(object):
 
 
 
-    def __init__(self,default=None,doc=None,
-                 precedence=None,instantiate=False,constant=False):
+    def __init__(self,default=None,doc=None,precedence=None,  # pylint: disable-msg=R0913
+                 instantiate=False,constant=False): 
         """
         Initialize a new Parameter object: store the supplied attributes.
 
@@ -299,11 +301,11 @@ class Parameter(object):
 
 
     def _set_instantiate(self,instantiate):
-        # constant => instantiate
-        self.instantiate = instantiate or self.constant
+        """Constant parameters must be instantiated."""
+        self.instantiate = instantiate or self.constant # pylint: disable-msg=W0201
 
 
-    def __get__(self,obj,objtype):
+    def __get__(self,obj,objtype): # pylint: disable-msg=W0613
         """
         Return the value for this Parameter.
 
@@ -411,7 +413,7 @@ class Parameter(object):
         for class_ in classes:
             for attrib_name in dir(class_):
                 if hasattr(class_,'get_param_descriptor'):
-                    desc,desctype = class_.get_param_descriptor(attrib_name)
+                    desc = class_.get_param_descriptor(attrib_name)[0]
                     if desc is self:
                         self._attrib_name = attrib_name
                         self._internal_name = "_%s_param_value"%attrib_name
@@ -471,26 +473,26 @@ class ParameterizedObjectMetaclass(type):
     attribute __abstract set to True. The 'abstract' attribute can be
     used to find out if a class is abstract or not.
     """    
-    def __init__(self,name,bases,dict):
+    def __init__(mcs,name,bases,dict_):
         """
         Initialize the class object (not an instance of the class, but the class itself).
 
         Initializes all the Parameters by looking up appropriate
         default values; see __param_inheritance().
         """
-        type.__init__(self,name,bases,dict)
+        type.__init__(mcs,name,bases,dict_)
 
         # All objects (with their names) of type Parameter that are
         # defined in this class
         parameters = [(name,obj)
-                      for (name,obj) in dict.items()
+                      for (name,obj) in dict_.items()
                       if isinstance(obj,Parameter)]
         
         for param_name,param in parameters:
-            self.__param_inheritance(param_name,param)
+            mcs.__param_inheritance(param_name,param)
 
 
-    def __is_abstract(self):
+    def __is_abstract(mcs):
         """
         Return True if the class has an attribute __abstract set to True.  
         Subclasses will return False unless they themselves have
@@ -506,7 +508,7 @@ class ParameterizedObjectMetaclass(type):
         # _ClassName__abstract.  So, we have to mangle it ourselves at
         # runtime.
         try:
-            return getattr(self,'_%s__abstract'%self.__name__)
+            return getattr(mcs,'_%s__abstract'%mcs.__name__)
         except AttributeError:
             return False
         
@@ -514,7 +516,7 @@ class ParameterizedObjectMetaclass(type):
 
 
 
-    def __setattr__(self,attribute_name,value):
+    def __setattr__(mcs,attribute_name,value):
         """
         Implements 'self.attribute_name=value' in a way that also supports Parameters.
 
@@ -530,18 +532,18 @@ class ParameterizedObjectMetaclass(type):
         """
         # Find out if there's a Parameter called attribute_name as a
         # class attribute of this class - if not, parameter is None.
-        parameter,owning_class = self.get_param_descriptor(attribute_name)
+        parameter,owning_class = mcs.get_param_descriptor(attribute_name)
 
         if parameter and not isinstance(value,Parameter):
-            if owning_class != self:
-                type.__setattr__(self,attribute_name,copy.copy(parameter))
-            self.__dict__[attribute_name].__set__(None,value)
+            if owning_class != mcs:
+                type.__setattr__(mcs,attribute_name,copy.copy(parameter))
+            mcs.__dict__[attribute_name].__set__(None,value)
 
         else:    
-            type.__setattr__(self,attribute_name,value)
+            type.__setattr__(mcs,attribute_name,value)
             
             if isinstance(value,Parameter):
-                self.__param_inheritance(attribute_name,value)
+                mcs.__param_inheritance(attribute_name,value)
             else:
                 # the purpose of the warning below is to catch
                 # mistakes ("thinking you are setting a parameter, but
@@ -554,10 +556,10 @@ class ParameterizedObjectMetaclass(type):
                 # http://mail.python.org/pipermail/python-checkins/2003-February/033517.html.)
                 if not attribute_name.startswith('_'):
                     print ("Warning: Setting non-Parameter class attribute %s.%s = %s "
-                           % (self.__name__,attribute_name,`value`))
+                           % (mcs.__name__,attribute_name,`value`))
                 
                 
-    def __param_inheritance(self,param_name,param):
+    def __param_inheritance(mcs,param_name,param):
         """
         Look for Parameter values in superclasses of this ParameterizedObject.
 
@@ -592,17 +594,17 @@ class ParameterizedObjectMetaclass(type):
         # for CompositeParameter.__set__ to work, it needs to know
         # what class the Parameter belongs to. This code looks finds
         # any parameter with a slot named 'objtype' and sets the
-        # slot's value to the current type (i.e. self).
+        # slot's value to the current type (i.e. mcs).
         # JPALERT: This feels hackish.  Not sure if there's a better
         # way.  On the other hand, this mechanism might be useful for
         # other parameters too.
         if 'objtype' in slots:
-            setattr(param,'objtype',self)
+            setattr(param,'objtype',mcs)
             del slots['objtype']
             
 
         for slot in slots.keys():
-            superclasses = iter(classlist(self)[::-1])
+            superclasses = iter(classlist(mcs)[::-1])
 
             # Search up the hierarchy until param.slot (which
             # has to be obtained using getattr(param,slot))
@@ -624,14 +626,14 @@ class ParameterizedObjectMetaclass(type):
                     setattr(param,slot,new_value)
 
         
-    def get_param_descriptor(self,param_name):
+    def get_param_descriptor(mcs,param_name):
         """
         Goes up the class hierarchy (starting from the current class)
         looking for a Parameter class attribute param_name. As soon as
         one is found as a class attribute, that Parameter is returned
         along with the class in which it is declared.
         """
-        classes = classlist(self)
+        classes = classlist(mcs)
         for c in classes[::-1]:
             attribute = c.__dict__.get(param_name)
             if isinstance(attribute,Parameter):
@@ -830,7 +832,7 @@ class ParameterizedObject(object):
             s = ' '.join([str(x) for x in args])
             
             if dbprint_prefix and callable(dbprint_prefix):
-                prefix=dbprint_prefix()
+                prefix=dbprint_prefix() # pylint: disable-msg=E1102
             else:
                 prefix=""
                 
@@ -899,7 +901,7 @@ class ParameterizedObject(object):
                         new_object.initialized=True
                     
         for name,val in params.items():
-            desc,desctype = self.__class__.get_param_descriptor(name)
+            desc = self.__class__.get_param_descriptor(name)[0] # pylint: disable-msg=E1101
             if desc:
                 self.debug("Setting param %s=%s"% (name, val))
             else:
@@ -1030,6 +1032,7 @@ class ParameterizedObject(object):
 
 
     def print_param_values(self):
+        """Print the values of all this object's Parameters."""
         for name,val in self.get_param_values():
             print '%s.%s = %s' % (self.name,name,val)
 
@@ -1091,6 +1094,7 @@ class ParameterizedObject(object):
 
     @classmethod
     def print_param_defaults(cls):
+        """Print the default values of all cls's Parameters."""
         for key,val in cls.__dict__.items():
             if isinstance(val,Parameter):
                 print cls.__name__+'.'+key, '=', repr(val.default)
@@ -1129,6 +1133,7 @@ class ParameterizedObject(object):
 
 
 def print_all_param_defaults():
+    """Print the default values for all imported Parameters."""
     print "_______________________________________________________________________________"
     print ""
     print "                           Parameter Default Values"
@@ -1159,6 +1164,8 @@ class PicklableClassAttributes(object):
     and any given startup_commands. On unpickling, executes the startup
     commands and sets the class attributes.
     """
+    # pylint: disable-msg=R0903
+    
     # CB: might have mixed up module and package in the docs.
     def __init__(self,module,exclusions=(),startup_commands=()):
         """
