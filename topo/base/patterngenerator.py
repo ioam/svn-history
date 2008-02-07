@@ -54,13 +54,13 @@ class PatternGenerator(ParameterizedObject):
     __abstract = True
     
     bounds  = BoundingRegionParameter(
-        default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True,
+        default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),precedence=-1,
         doc="BoundingBox of the area in which the pattern is generated.")
     
-    xdensity = Number(default=10,bounds=(0,None),hidden=True,doc="""
+    xdensity = Number(default=10,bounds=(0,None),precedence=-1,doc="""
         Density (number of samples per 1.0 length) in the x direction.""")
 
-    ydensity = Number(default=10,bounds=(0,None),hidden=True,doc="""
+    ydensity = Number(default=10,bounds=(0,None),precedence=-1,doc="""
         Density (number of samples per 1.0 length) in the y direction.
         Typically the same as the xdensity.""")
 
@@ -71,7 +71,7 @@ class PatternGenerator(ParameterizedObject):
         Y-coordinate location of pattern center.""")
 
 
-    position = CompositeParameter(attribs=['x','y'],hidden=True,doc="""
+    position = CompositeParameter(attribs=['x','y'],precedence=-1,doc="""
         Coordinates of location of pattern center.
         Provides a convenient way to set the x and y parameters together
         as a tuple (x,y), but shares the same actual storage as x and y
@@ -195,10 +195,10 @@ class Constant(PatternGenerator):
 
     # The standard position and orientation variables are ignored for this special case,
     # so we hide them from auto-generated lists of parameters (e.g. in the GUI)
-    x = Number(hidden=True)
-    y = Number(hidden=True)
-    orientation   = Number(hidden = True)
-    size = Number(hidden=True)
+    x = Number(precedence=-1)
+    y = Number(precedence=-1)
+    orientation   = Number(precedence=-1)
+    size = Number(precedence=-1)
     
 
     # Optimization: We use a simpler __call__ method here to skip the

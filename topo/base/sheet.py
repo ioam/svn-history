@@ -79,7 +79,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
     precedence = Number(default = 0.1, softbounds=(0.0,1.0),
         doc='Allows a sorting order for Sheets, e.g. in the GUI.')
 
-    layout_location = NumericTuple(default = (-1,-1),hidden=True,doc="""
+    layout_location = NumericTuple(default = (-1,-1),precedence=-1,doc="""
         Location for this Sheet in an arbitrary pixel-based space
         in which Sheets can be laid out for visualization.""")
 

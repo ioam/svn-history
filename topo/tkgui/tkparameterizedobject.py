@@ -897,7 +897,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     # Parameters here (to avoid name clashes with any additional
     # Parameters this might eventually be representing).
 
-    pretty_parameters = BooleanParameter(default=True, hidden=True,
+    pretty_parameters = BooleanParameter(default=True,precedence=-1,
         doc="""Whether to format parameter names, or display the
         variable names instead.
 

@@ -33,6 +33,7 @@ from inspect import getdoc
 
 from topo.base.parameterizedobject import ParameterizedObject, \
                                           ParameterizedObjectMetaclass
+from topo.base.parameterclasses import Number
 
 from topo.misc.utils import keys_sorted_by_value
 
@@ -61,6 +62,8 @@ class ParametersFrame(TkParameterizedObject,Frame):
     # Just be sure not to use this button when you don't want
     # the master window to vanish (e.g. in the model editor).
     Close = ButtonParameter(doc="Close the window. (If applicable, asks if unsaved changes should be saved).")
+
+    display_threshold = Number(default=0,precedence=-10,doc="Parameters with precedence below this value are not displayed.")
 
     def __init__(self,master,parameterized_object=None,on_change=None,
                  on_modify=None,**params):
@@ -104,7 +107,13 @@ class ParametersFrame(TkParameterizedObject,Frame):
         self.pack(expand='yes',fill='both') 
 
 
-
+    def hidden_param(self,name):
+        """Return True if a parameter's precedence is below the display threshold."""
+        # CB: interpret None as 0; remove if we set a default precedence (though that would
+        # break param_inheritance for precedence, I think)
+        precedence = self.get_parameter_object(name).precedence or 0 
+        return precedence<self.display_threshold
+        
 
     def __create_button_panel(self):
         """
@@ -174,7 +183,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
         defaults = self._extraPO.defaults()
 
         for param_name,val in defaults.items():
-            if not self.get_parameter_object(param_name).hidden:
+            if not self.hidden_param(param_name):
                 self.gui_set_param(param_name,val)#_tkvars[param_name].set(val)
 
         if self.on_modify: self.on_modify()
@@ -213,7 +222,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
         ### Pack all of the non-hidden Parameters
         self.displayed_params = {}
         for n,p in parameterized_object.params().items():
-            if not p.hidden:
+            if not self.hidden_param(n):
                 self.displayed_params[n]=p
                     
         self.pack_displayed_params(on_change=on_change,on_modify=on_modify)
@@ -574,7 +583,7 @@ class ParametersFrameWithApply(ParametersFrame):
         defaults = self._extraPO.defaults()
 
         for param_name,val in defaults.items():
-            if not self.get_parameter_object(param_name).hidden:
+            if not self.hidden_param(param_name):
                 self._tkvars[param_name].set(val)
 
         if self.on_modify: self.on_modify()

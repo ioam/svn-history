@@ -230,13 +230,8 @@ class Parameter(object):
     # __slots__, whether or not they define attributes not present in
     # the base Parameter class.  That's because a subclass will have
     # a __dict__ unless it also defines __slots__.
-    __slots__ = ['_attrib_name','_internal_name','default','doc','hidden','precedence','instantiate','constant']
+    __slots__ = ['_attrib_name','_internal_name','default','doc','precedence','instantiate','constant']
 
-    ### JABALERT: hidden could perhaps be replaced with a very low
-    ### (e.g. negative) precedence value.  That way by default the
-    ### GUI could display those with precedence >0, but the user could
-    ### select a level.
-                                                                                                     
 
     __doc__ = property((lambda self: self.doc))
     # When a Parameter is owned by a ParameterizedObject, we want the
@@ -266,7 +261,7 @@ class Parameter(object):
 
 
 
-    def __init__(self,default=None,doc=None,hidden=False,
+    def __init__(self,default=None,doc=None,
                  precedence=None,instantiate=False,constant=False):
         """
         Initialize a new Parameter object: store the supplied attributes.
@@ -275,12 +270,10 @@ class Parameter(object):
         default: the owning class's value for the attribute
         represented by this Parameter.
 
-        hidden is a flag that allows objects using Parameters to know
-        whether or not to display them to the user (e.g. in GUI menus).
-
         precedence is a value, usually in the range 0.0 to 1.0, that
-        allows the order of Parameters in a class to be defined (again
-        for e.g. in GUI menus).
+        allows the order of Parameters in a class to be defined (for
+        e.g. in GUI menus). A negative precedence indicates a
+        parameter that should be hidden in e.g. GUI menus.
 
         default, doc, and precedence default to None. This is to allow
         inheritance of Parameter slots (attributes) from the owning-class'
@@ -298,7 +291,6 @@ class Parameter(object):
 
         self._attrib_name = None  # used to cache attrib_name
         self._internal_name = None
-        self.hidden=hidden
         self.precedence = precedence
         self.default = default
         self.doc = doc
@@ -721,7 +713,7 @@ class ParameterizedObject(object):
     ## CEBALERT: should be StringParameter, right?
     name           = Parameter(default=None,doc="String identifier for this object.")
     ### JABALERT: Should probably make this an Enumeration instead.
-    print_level = Parameter(default=MESSAGE,hidden=True)
+    print_level = Parameter(default=MESSAGE,precedence=-1)
 
     
     def __init__(self,**params):

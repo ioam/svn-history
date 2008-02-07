@@ -32,10 +32,10 @@ class RandomDotStereogram(PatternGenerator):
     """
 
     # Suppress unused parameters
-    x = Number(hidden=True)
-    y = Number(hidden=True)
-    size = Number(hidden=True)
-    orientation = Number(hidden=True)
+    x = Number(precedence=-1)
+    y = Number(precedence=-1)
+    size = Number(precedence=-1)
+    orientation = Number(precedence=-1)
 
     # Override defaults to make them appropriate
     scale  = Number(default=0.5)

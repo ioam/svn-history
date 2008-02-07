@@ -622,7 +622,7 @@ class CFProjection(Projection):
     # cases).  We will allow the user to override the mask size, but
     # by offering a scaling parameter.
     autosize_mask = BooleanParameter(
-        default=True,constant=True,hidden=True,doc="""
+        default=True,constant=True,precedence=-1,doc="""
         Topographica sets the mask size so that it is the same as the connection field's
         size, unless this parameter is False - in which case the user-specified size of
         the weights_shape is used. In normal usage of Topographica, this parameter should

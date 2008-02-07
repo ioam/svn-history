@@ -33,7 +33,7 @@ class Null(Constant):
     """
     A constant pattern of zero activity.
     """
-    scale = Number(default=0,constant=True,hidden=True)
+    scale = Number(default=0,constant=True,precedence=-1)
 
 
 class Gaussian(PatternGenerator):
@@ -430,7 +430,7 @@ class SeparatedComposite(Composite):
         ### such issues can be checked.
 
     max_trials = Integer(default = 50, bounds = (0,None),
-                         softbounds = (0,100), hidden=True, doc="""
+                         softbounds = (0,100), precedence=-1, doc="""
         Number of times to try for a new pattern location that meets the criteria.
         
         This is an essentially arbitrary timeout value that helps

@@ -22,10 +22,10 @@ class RandomGenerator(PatternGenerator):
 
     # The standard x, y, and orientation variables are currently ignored,
     # so they aren't shown in auto-generated lists of parameters (e.g. in the GUI)
-    x       = Number(hidden = True)
-    y       = Number(hidden = True)
-    size    = Number(hidden = True)
-    orientation   = Number(hidden = True)
+    x       = Number(precedence=-1)
+    y       = Number(precedence=-1)
+    size    = Number(precedence=-1)
+    orientation   = Number(precedence=-1)
 
     def _distrib(self,shape,pos):
         """Method for subclasses to override with a particular random distribution."""
