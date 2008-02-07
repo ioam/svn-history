@@ -330,8 +330,19 @@ def the_slice(row):
     return slice(start_r,end_r)
 
 
-if locals().get('comparisons',False):
+if locals().get('profiling',False):
+    import timeit
+    iterations = locals().get('iterations',1)
+    t= timeit.Timer('topo.sim.run('+`iterations`+')','gc.enable(); import topo').timeit(number=1)
+    
+    check_activities('Eye0')
+    check_activities('Ganglia00')
+    check_activities('Ganglia01')
+    check_activities('Primary')
 
+    print "[lissom_oo_or_reference.ty] run(%s) in %s s"%(iterations,t)
+
+elif locals().get('comparisons',False):
 
 
     ### INITIAL WEIGHTS COMPARISONS
