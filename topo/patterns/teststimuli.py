@@ -48,9 +48,6 @@ class SineGratingDisk(PatternGenerator):
 
     frequency  = Number(default=2.4,doc="frequency of the sine grating")
 
-    # CEBALERT: what is this for?
-    hidden = BooleanParameter(default=True)
-
        
     def __call__(self,**params_to_override):
         params = ParamOverrides(self,params_to_override)
