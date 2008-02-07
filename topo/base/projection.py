@@ -188,6 +188,10 @@ class Projection(EPConnection):
         default=IdentityOF(),
         doc='Function applied to the Projection activity after it is computed.')
 
+    updating = BooleanParameter(default=True, doc="""
+        Whether or not to update the internal state on each call.
+        Allows updating to be turned off during analysis, and then re-enabled.""")
+
        
     def __init__(self,**params):
         super(Projection,self).__init__(**params)
@@ -253,6 +257,8 @@ class Projection(EPConnection):
         By default, this call simply calls stop_updating() on the
         Projection's output_fn.
         """
+        self._updating_state.append(self.updating)
+        self.updating=False
         self.output_fn.stop_updating()
       
 
@@ -264,8 +270,10 @@ class Projection(EPConnection):
         remove the effect of the most recent stop_updating call,
         i.e. to reenable plasticity of any type that was disabled.
         """
+        self.updating = self._updating_state.pop()
         self.output_fn.restore_updating()
-           
+
+
 
 class ProjectionSheet(Sheet):
     """
