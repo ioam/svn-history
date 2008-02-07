@@ -439,6 +439,7 @@ e.g. for debugging.)
         This function should be redefined in subclasses for interesting
         things such as 2D grids.
         """
+        ### JABALERT: Can we make it simple to make plots be put onto multiple lines here?
 	plots = self.plotgroup.plots
 	self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image) for p in plots]
 
