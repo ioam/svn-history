@@ -962,6 +962,7 @@ class Simulation(ParameterizedObject):
         others):
         http://www.egenix.com/products/python/mxExperimental/mxNumber/
         """
+        # pylint: disable-msg=W0201
         self._time = time
         self._time_type = type(time)
         
@@ -1036,10 +1037,10 @@ class Simulation(ParameterizedObject):
         and read the simulation time.
         """
         if not isinstance(ep_name,str):
-           raise TypeError("Expected string for item name (EPs in the Simulation are indexed by name).")
+            raise TypeError("Expected string for item name (EPs in the Simulation are indexed by name).")
 
         if not isinstance(ep,EventProcessor):
-           raise TypeError("Expected EventProcessor: objects in the Simulation must be EPs.")
+            raise TypeError("Expected EventProcessor: objects in the Simulation must be EPs.")
 
         if ep in self._event_processors.values():
             self.warning("EventProcessor "+str(ep)+" () already exists in the simulation and will not be added.")
@@ -1064,7 +1065,7 @@ class Simulation(ParameterizedObject):
         connections that go out of it.
         """
         if not isinstance(ep_name,str):
-           raise TypeError("Expected string for item name (EPs in the Simulation are indexed by name).")
+            raise TypeError("Expected string for item name (EPs in the Simulation are indexed by name).")
 
         self.__delete_ep(ep_name)
 
@@ -1194,7 +1195,7 @@ class Simulation(ParameterizedObject):
         # to pattern_present(), Test Pattern's Present button, and
         # save_input_generators.)
         for e in self.eps_to_start:
-	    e.start()
+            e.start()
 
         self.eps_to_start=[]
 
@@ -1315,7 +1316,7 @@ class Simulation(ParameterizedObject):
         See state_push() for more details.
         """
         self.event_pop()
-	for ep in self._event_processors.values():
+        for ep in self._event_processors.values():
             ep.state_pop()
 
 
@@ -1354,7 +1355,7 @@ class Simulation(ParameterizedObject):
         events_temp = []
         for e in self.events:
             if not isinstance(e,event_type):
-              events_temp = events_temp + [e]
+                events_temp = events_temp + [e]
         self.events = events_temp
 
 
