@@ -1,3 +1,4 @@
+from __future__ import division 
 """
 Implementation of 2D ocular dominance model from G.J. Goodhill &
 D.J. Willshaw (1990), "Application of the elastic net algorithm to the
@@ -10,7 +11,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from __future__ import division #DO NOT DELETE!Needs it for correct&precise divisions.
+
 from numpy.oldnumeric import *
 import numpy
 from fixedpoint import FixedPoint
@@ -19,7 +20,7 @@ import topo.patterns.random
 import topo.patterns.basic
 
 from topo.base.boundingregion import BoundingBox
-from topo.base.parameterclasses import DynamicNumber,Number,Integer
+from topo.base.parameterclasses import Number,Integer
 from topo.base.sheet import Sheet
 from topo.sheets.generatorsheet import GeneratorSheet
 
