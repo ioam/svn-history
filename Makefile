@@ -198,6 +198,11 @@ slow-tests: print-info train-tests all-speed-tests
 # processors/platforms).
 
 
+v_lissom:
+	make -C topo/tests/reference/	
+	time ./topographica -c "profiling=True;iterations=20000" topo/tests/reference/lissom_oo_or_reference.ty
+
+
 %_SPEEDDATA:
 	./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/${notdir $*}",iterations=250,data_filename="topo/tests/${notdir $*}_SPEEDDATA")'
 
