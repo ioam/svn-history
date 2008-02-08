@@ -1,9 +1,14 @@
+
+import sys
 import re
 import pickle
 from glob import glob
 
+from sys import argv
+
 #logfile = 'LOG'
 script = "lissom_oo_or.ty"
+
 
 V=re.compile(r'[0-9]*-log')
 def get_build_no(logfilename):
@@ -13,18 +18,18 @@ def get_build_no(logfilename):
 def create_timings(i_am_sure=False):
     if i_am_sure:
         timings = {}
-        f = open('timings.pkl','w')
+        f = open('/home/ceball/buildbot/timings.pkl','w')
         pickle.dump(timings,f,0)
         f.close()
     
 def get_timings():
-    f = open('timings.pkl')
+    f = open('/home/ceball/buildbot/timings.pkl')
     timings = pickle.load(f)
     f.close()
     return timings
 
 def save_timings(timings):
-    f = open('timings.pkl','w')
+    f = open('/home/ceball/buildbot/timings.pkl','w')
     pickle.dump(timings,f,0)
     f.close()
 
@@ -47,8 +52,6 @@ def get_date_version_time(logfile,timings=None):
             versioni=i
         if line.startswith("[examples/%s]"%script):
             timingi=i
-        if line.find('elapsed')>0:
-            cpusei=i
         if line.find('program finished')>0:
             ok=True
 
@@ -71,7 +74,8 @@ def get_date_version_time(logfile,timings=None):
     start,stop = t.search(timel).span()
     timing = float(timel[start+5:stop-1])
 
-    cpusel = all_lines[cpusei]
+    cpusel = all_lines[timingi+1]
+#    if cpusel.find('elapsed')>0:
     start,stop = cpusel.index('elapsed')+8,cpusel.index('%CPU')
     cpu_usage = float(cpusel[start:stop])
 
@@ -83,9 +87,10 @@ def get_date_version_time(logfile,timings=None):
 #    system = float(s.findall(timingl)[0].rstrip('system'))
 #    cpu_time=user+system
 
-    if timings is not None and cpu_usage>95:
-        timings[build] = (date,version,timing,cpu_usage)
+    if timings is not None and cpu_usage>95:            
+        timings[script][build] = (date,version,timing,cpu_usage)
     else:
+        timings[script][build]=None
         print "...build %s had %s percent cpu (not >95)"%(build,cpu_usage)
     return (build,date,version,timing,cpu_usage)
 
@@ -95,18 +100,25 @@ filename_pattern = '*-log-shell_2-stdio'
 def update_timings(location="/home/ceball/buildbot/buildmaster/slow-tests_x86_ubuntu7.04/"):
 
     timings = get_timings()
-    
+
+    if script not in timings:
+        timings[script]={}
+
     filenames = glob(location+filename_pattern)
     for filename in filenames:
 
         build = get_build_no(filename)
 
-        if build>=MIN_BUILD and build not in timings:
+        if build>=MIN_BUILD and build not in timings[script]:
             print "Adding timing info for build",build
             get_date_version_time(filename,timings)
 
     save_timings(timings)
-    print timings
+    #print timings
     
 
     
+if __name__=='__main__':
+    if len(sys.argv)>1:
+        if sys.argv[1]=='update':
+            update_timings()
