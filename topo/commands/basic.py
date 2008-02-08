@@ -53,8 +53,6 @@ def restore_input_generators():
         sheet.pop_input_generator()
 
 
-### JABHACKALERT!  Should leave the state of all learning flags
-### unchanged upon return; currently it's overwriting all of them.
 def pattern_present(inputs={},duration=1.0,learning=False,overwrite_previous=False,apply_output_fn=True):
     """
     Present the specified test patterns for the specified duration.
@@ -85,12 +83,9 @@ def pattern_present(inputs={},duration=1.0,learning=False,overwrite_previous=Fal
     if not overwrite_previous:
         save_input_generators()
 
-    ### JABALERT!  Should clean up how these are set on each
-    ### sheet; it overwrites any old values.
-        
-    # turn off sheets' updating and output function updating
-    #(e.g. in Homeostatic output functions) if learning=False
     if not learning:
+        # turn off learning and plasticity everywhere
+        # Could move this to a command disable_plasticity
         for sheet in topo.sim.objects(Sheet).values():
              sheet.stop_updating()
 
