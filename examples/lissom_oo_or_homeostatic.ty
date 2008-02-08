@@ -71,18 +71,13 @@ if type_input=="Gaussian":
 elif type_input=="Natural":
     
     input_type=topo.patterns.image.Image
-    inputs=[input_type(filename="images/shouval/"+f,
+    image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+    inputs=[input_type(filename=f,
                        size=10.0,  #size_normalization='original',(size=10.0)
                        x=UniformRandom(lbound=-0.75,ubound=0.75,seed=rand_seedx),
                        y=UniformRandom(lbound=-0.75,ubound=0.75,seed=rand_seedy),
-                   
                        orientation=UniformRandom(lbound=-pi,ubound=pi,seed=rand_seedo))
-            for f in ["base06.png", "base11.png", "base13.png", "base14.png", "base15.png",
-                      "base16.png", "base17.png", "base18.png", "base19.png", "base20.png", "base21.png",
-                      "base22.png", "base24.png", "new_images01.png", "new_images02.png", "new_images03.png",
-                      "new_images04.png", "new_images05.png", "new_images06.png", "new_images07.png",
-                      "new_images08.png", "new_images09.png", "new_images10.png", "new_images11.png",
-                      "new_images12.png"]]
+		for f in image_filenames]
 
     combined_inputs =topo.patterns.basic.Selector(generators=inputs)
 
@@ -124,18 +119,13 @@ elif type_input=="NoisyDiskstoNatural":
     disks_combined_inputs =topo.patterns.basic.Selector(generators=disks_inputs)
     
     natural_input_type=topo.patterns.image.Image
-    natural_inputs=[natural_input_type(filename="images/shouval/"+f,
+    image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+    natural_inputs=[natural_input_type(filename=f,
                        size=10.0,  #size_normalization='original',(size=10.0)
                        x=UniformRandom(lbound=-0.75,ubound=0.75,seed=rand_seedx),
                        y=UniformRandom(lbound=-0.75,ubound=0.75,seed=rand_seedy),
-                   
                        orientation=UniformRandom(lbound=-pi,ubound=pi,seed=rand_seedo))
-            for f in ["base06.png", "base11.png", "base13.png", "base14.png", "base15.png",
-                      "base16.png", "base17.png", "base18.png", "base19.png", "base20.png", "base21.png",
-                      "base22.png", "base24.png", "new_images01.png", "new_images02.png", "new_images03.png",
-                      "new_images04.png", "new_images05.png", "new_images06.png", "new_images07.png",
-                      "new_images08.png", "new_images09.png", "new_images10.png", "new_images11.png",
-                      "new_images12.png"]]
+		for f in image_filenames]
 
     natural_combined_inputs =topo.patterns.basic.Selector(generators=natural_inputs)
 
