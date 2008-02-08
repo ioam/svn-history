@@ -42,7 +42,7 @@ def get_date_version_time(logfile,timings=None):
     all_lines = f.readlines()
     f.close()
 
-    ok = False
+    ok = ok2 = False
     datei=versioni=timingi=cpusei=-1
     i = 0;
     for line in all_lines:
@@ -52,13 +52,19 @@ def get_date_version_time(logfile,timings=None):
             versioni=i
         if line.startswith("[examples/%s]"%script):
             timingi=i
-        if line.find('program finished')>0:
+        if line.find("Results from examples/%s have not changed."%script)>=0:
+            ok2=True
+        if line.find('program finished')>=0:
             ok=True
 
         i+=1;
 
     if not ok:
         print "...build %s currently incomplete"%build
+        return None
+
+    if not ok2:
+        print "...speed test invalid because results didn't match"
         return None
 
     datel= all_lines[datei]
