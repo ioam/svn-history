@@ -50,13 +50,6 @@ connections might have src_port = 'Recurrent', and probably also a
 special dest_port.
 
 
-CURRENT SIMULATION
-
-The current Simulation, which can be accessed through the instance of
-the Singleton class SimSingleton(), is the most recent Simulation to
-have been created with register=True (the default).
-
-
 $Id$
 """
 __version__='$Revision$'
@@ -754,6 +747,7 @@ class SomeTimer(ParameterizedObject):
 
 # PICKLEHACK: for snapshots saved before r7901
 class SimSingleton(object):
+    """Support for old snapshots."""
     def __setstate__(self,state):
         sim = state['actual_sim']
         from topo.base.parameterclasses import Dynamic
