@@ -357,7 +357,43 @@ def signabs(x):
 # somewhere of extra things to pickle, and pickle that in
 # save_snapshot()? What about supporting things other than
 # module-level attributes?
-from topo.base.simulation import Singleton
+
+
+class Singleton(object):
+    """
+    The singleton pattern.
+
+    To create a singleton class, you subclass from Singleton; each
+    subclass will have a single instance, no matter how many times its
+    constructor is called. To further initialize the subclass
+    instance, subclasses should override 'init' instead of __init__ -
+    the __init__ method is called each time the constructor is called.
+
+    From http://www.python.org/2.2.3/descrintro.html#__new__
+    """
+    def __new__(cls, *args, **kwds):
+        it = cls.__dict__.get("__it__")
+        if it is not None:
+            return it
+        cls.__it__ = it = object.__new__(cls)
+        it.init(*args, **kwds)
+        return it
+
+    def init(self, *args, **kwds):
+        """Method to be overridden if the subclass needs initialization."""
+        pass
+
+    # CB: our addition
+    def __reduce_ex__(self,p):
+        """
+        Causes __new__ to be called on unpickling; in turn, __new__
+        ensures there is only one instance.
+        """
+        return (type(self),tuple()) 
+
+
+
+
 class ExtraPickler(Singleton):
     """
     Provides a simple means to include arbitrary attributes from

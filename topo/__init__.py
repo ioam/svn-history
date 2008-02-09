@@ -58,8 +58,8 @@ version = ''
                     
 
 
-from topo.base.simulation import SimSingleton
-sim = SimSingleton()
+from topo.base.simulation import Simulation
+sim = Simulation() 
 
 
 

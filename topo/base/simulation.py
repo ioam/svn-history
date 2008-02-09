@@ -83,136 +83,6 @@ Forever = -1 # float("inf") or does that fail on some platforms?
 simulation_path="topo.sim"
 
 
-class Singleton(object):
-    """
-    The singleton pattern.
-
-    To create a singleton class, you subclass from Singleton; each
-    subclass will have a single instance, no matter how many times its
-    constructor is called. To further initialize the subclass
-    instance, subclasses should override 'init' instead of __init__ -
-    the __init__ method is called each time the constructor is called.
-
-    From http://www.python.org/2.2.3/descrintro.html#__new__
-    """
-    def __new__(cls, *args, **kwds):
-        it = cls.__dict__.get("__it__")
-        if it is not None:
-            return it
-        cls.__it__ = it = object.__new__(cls)
-        it.init(*args, **kwds)
-        return it
-
-    def init(self, *args, **kwds):
-        """Method to be overridden if the subclass needs initialization."""
-        pass
-
-    # CB: our addition
-    def __reduce_ex__(self,p):
-        """
-        Causes __new__ to be called on unpickling; in turn, __new__
-        ensures there is only one instance.
-        """
-        return (type(self),tuple()) 
-
-
-class SimSingleton(Singleton):
-    """Provides access to a single shared instance of Simulation."""
-    
-    actual_sim = None
-
-    # should both these completely hide that this is
-    # SimSingleton, as they do at the moment?
-    def __repr__(self):
-        """Return the simulation's __repr__()."""
-        return self.actual_sim.__repr__()
-
-    def __str__(self):
-        """Return the simulation's __str__()."""
-        return self.actual_sim.__str__()
-    
-    def init(self):
-        """Create a new simulation object when needed."""
-        # The Simulation constructor will call SimSingleton's change_sim()
-        Simulation()
-
-    def __getattribute__(self,name):
-        """
-        If the SimSingleton object has the attribute, return it; if the
-        actual_sim has the attribute, return it; otherwise, an AttributeError
-        relating to Simulation will be raised (as usual).
-        """
-        try:
-            return object.__getattribute__(self,name)
-        except AttributeError:
-            actual_sim = object.__getattribute__(self,'actual_sim')
-            return getattr(actual_sim,name)
-
-    def __setattr__(self,name,value):
-        """
-        If this object has the attribute name, set it to value.
-        Otherwise, set self.actual_sim.name=value.
-
-        (Unless an attribute is inserted directly into this object's
-        __dict__, the only attribute it has is 'actual_sim'. So, this
-        method really sets attributes on actual_sim.)
-        """
-        # read like:
-        #  if hasattr(self,name):
-        #      setattr(self,name,value)
-        #  else:
-        #      setattr(self.actual_sim,name,value)
-        try:
-            object.__getattribute__(self, name) 
-            object.__setattr__(self, name, value)
-        except AttributeError:
-            object.__setattr__(self.actual_sim, name, value)
-
-    # CEBALERT: after this method, the previous Simulation still
-    # exists.  (E.g. after loading a snapshot each time, the previous
-    # simulation still exists. At least, that's what I think by
-    # keeping track of what exists using
-    # weakref.WeakValueDictionary). Who's keeping a reference to it?
-    # Why doesn't it disappear? Memory use could get pretty big if you
-    # keep loading big snapshots...
-    # (My guess is that it's something to do with SomeTimer.)
-    def change_sim(self,new_sim):
-        """Set actual_sim to be new_sim."""
-        assert isinstance(new_sim,Simulation), "Can only change to a Simulation instance."
-        self.actual_sim=new_sim
-
-        from topo.base.parameterclasses import Dynamic
-        Dynamic.time_fn = self.actual_sim.time
-
-
-    ## Container-like access
-    # (__getattribute__ is not used to find these methods, so we have to provide access.)
-    def __getitem__(self,item_name):
-        """Allow dictionary-style access to the simulation."""
-        return self.actual_sim.__getitem__(item_name)
-
-    def __setitem__(self,item_name,item_value):
-        """Allow dictionary-style access to the simulation."""
-        self.actual_sim.__setitem__(item_name,item_value)
-
-    def __delitem__(self,item_name):
-        """Allow dictionary-style deletion of objects from the simulation."""
-        self.actual_sim.__delitem__(item_name)
-
-    def __iter__(self):
-        """Return an iterator of the simulation's objects()."""
-        return self.actual_sim.__iter__()
-
-
-    ## pickling & copying
-    def __reduce_ex__(self,p):
-        return (type(self),tuple(),{'actual_sim':self.actual_sim})
-    
-    def __setstate__(self,state):
-        """On unpickling, change to the pickled simulation."""
-        self.change_sim(state['actual_sim'])
-        
-        
 
 
 class EventProcessor(ParameterizedObject):
@@ -882,6 +752,12 @@ class SomeTimer(ParameterizedObject):
         self.__measure(fduration,step)
 
 
+# PICKLEHACK: for snapshots saved before r7901
+class SimSingleton(object):
+    def __setstate__(self,state):
+        sim = state['actual_sim']
+        from topo.base.parameterclasses import Dynamic
+        Dynamic.time_fn = sim.time
 
 
 # Simulation stores its events in a linear-time priority queue (i.e., a
@@ -894,12 +770,12 @@ class Simulation(ParameterizedObject):
     """
     A simulation class that uses a simple sorted event list (instead of
     e.g. a sched.scheduler object) to manage events and dispatching.
-
-    The Parameter 'register' indicates whether or not to register the
-    Simulation with SimSingleton, which can be used to provide a
-    single point of contact for accessing the Simulation.
     """
-    register = BooleanParameter(default=True)
+    register = BooleanParameter(default=True,constant=True,doc="""
+        Whether or not to register this Simulation. If True, this
+        Simulation will replace an existing Simulation, if one
+        exists. 
+        """)
 
     startup_commands = Parameter(instantiate=True,default=[],doc="""
         List of string commands that will be exec'd in
@@ -927,6 +803,7 @@ class Simulation(ParameterizedObject):
         """)
     
     eps_to_start = []
+
 
     def set_time(self,time):
         """
@@ -965,12 +842,39 @@ class Simulation(ParameterizedObject):
         # pylint: disable-msg=W0201
         self._time = time
         self._time_type = type(time)
-        
+
+
+    _state = {}
+
+    def __new__(cls,*p,**k):
+        """
+        Create a new instance of this class.
+
+        If register=True, this instance will share the same state as
+        any other instances of this class (i.e. they all share the same
+        __dict__. The shared state is stored in Simulation._state.
+        """
+        self = ParameterizedObject.__new__(cls,*p,**k)
+
+        # CB: clumsy handling of register parameter
+        register = False
+        if 'register' in k and k['register'] is True:
+            register = True
+        elif Simulation.register is True:
+            register = True
+
+        if register:
+            # This is the monostate pattern; see e.g.
+            # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66531
+            self.__dict__ = cls._state
+
+        return self
+
     
     def __init__(self,initial_time=0.0,**params):
         """
-        Create the Simulation and register it with SimSingleton unless
-        register==False.
+        Create the Simulation; unless register=False, this Simulation
+        will replace an existing one (if one exists).
 
         initial_time allows the starting time and starting time type
         to be specifed: see set_time().
@@ -982,12 +886,15 @@ class Simulation(ParameterizedObject):
         self._event_processors = {}
 
         if self.register:
-            SimSingleton().change_sim(self)
             # Indicate that no specific name has been set
             self.name=params.get('name')
             # Set up debugging messages to include the simulator time
             parameterizedobject.dbprint_prefix= \
                (lambda: "Time: "+self.timestr()+" ")
+
+            from topo.base.parameterclasses import Dynamic
+            Dynamic.time_fn = self.time
+
 
         self.events = []
         self._events_stack = []
