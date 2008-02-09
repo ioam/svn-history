@@ -357,7 +357,7 @@ class Parameter(object):
             elif not obj.initialized:
                 obj.__dict__[self.internal_name(obj)] = val
             else:
-                raise TypeError("Constant parameter %s cannot be modified"%self.attrib_name)
+                raise TypeError("Constant parameter '%s' cannot be modified"%self.attrib_name(obj))
 
         else:
             if not obj:
@@ -367,7 +367,7 @@ class Parameter(object):
                 
 
     def __delete__(self,obj):
-        raise TypeError("Cannot delete %s: Parameters deletion not allowed."%self.attrib_name)
+        raise TypeError("Cannot delete '%s': Parameters deletion not allowed."%self.attrib_name(obj))
 
 
     def internal_name(self,obj):
