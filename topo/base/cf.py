@@ -388,8 +388,6 @@ class CFPResponseFnParameter(ClassSelectorParameter):
     that uses all the CFs of a CFProjection to transform the input activity
     into an output activity.
     """
-    __slots__ = []
-
     def __init__(self,default=CFPRF_Plugin(),**params):
         super(CFPResponseFnParameter,self).__init__(CFPResponseFn,default=default,**params)        
 
@@ -441,8 +439,6 @@ class CFPLearningFnParameter(ClassSelectorParameter):
     that uses all the CFs of a CFProjection to transform the input activity
     into an output activity.
     """
-    __slots__ = []
-
     def __init__(self,default=CFPLF_Identity(),**params):
         super(CFPLearningFnParameter,self).__init__(CFPLearningFn,default=default,**params)        
 
@@ -560,7 +556,6 @@ class CFPOutputFnParameter(ClassSelectorParameter):
     that iterates through all the CFs of a CFProjection and applies
     an output_fn to each.
     """
-    __slots__ = []
     def __init__(self,default=CFPOF_Plugin(),**params):
         super(CFPOutputFnParameter,self).__init__(CFPOutputFn,default=default,**params)        
 

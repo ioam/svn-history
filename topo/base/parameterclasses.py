@@ -107,8 +107,6 @@ class Dynamic(Parameter):
     time_fn = None # could add a slot for time_fn to allow instances
                    # to override
     
-    __slots__ = []
-
     # CBENHANCEMENT: Add an 'epsilon' slot.
     # See email 'Re: simulation-time-controlled Dynamic parameters'
     # Dec 22, 2007 CB->JAB
@@ -392,7 +390,6 @@ class Number(Dynamic):
 
 
 class Integer(Number):
-    __slots__ = []
 
     def _check_value(self,val):
         if not isinstance(val,int):
@@ -401,8 +398,6 @@ class Integer(Number):
 
 
 class Magnitude(Number):
-    __slots__ = []
-
 
     def __init__(self,default=1.0,softbounds=None,**params):
         Number.__init__(self,default=default,bounds=(0.0,1.0),softbounds=softbounds,**params)
@@ -430,7 +425,6 @@ class BooleanParameter(Parameter):
 
 
 class StringParameter(Parameter):
-    __slots__ = []
 
     def __init__(self,default="",**params):
         """Initialize a string parameter."""
@@ -478,8 +472,7 @@ class NumericTuple(Parameter):
 
 
 class XYCoordinates(NumericTuple):
-    __slots__ = []
-  
+
     def __init__(self,default=(0.0,0.0),**params):
         super(XYCoordinates,self).__init__(default=default,length=2,**params)
 
@@ -493,8 +486,6 @@ class CallableParameter(Parameter):
     regular standalone functions cannot be deepcopied as of Python
     2.4, so instantiate must be False for those values.
     """
-    __slots__ = []
-
     def __init__(self,default=None,**params):
         Parameter.__init__(self,default=wrap_callable(default),**params)
 
@@ -582,8 +573,6 @@ class SelectorParameter(Parameter):
     """
     __abstract = True
     
-    __slots__=[]
-
     def get_range(self):
         raise NotImplementedError("get_range() must be implemented in subclasses.")
 
@@ -746,8 +735,6 @@ class DictParameter(ClassSelectorParameter):
     """
     Parameter whose value is a dictionary.
     """
-    __slots__ = []
-
     def __init__(self,**params):
         super(DictParameter,self).__init__(dict,**params)
 

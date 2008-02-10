@@ -93,11 +93,9 @@ class bothmethod(object): # pylint: disable-msg=R0903
 
 
 class ParameterMetaclass(type):
-
-    # CB: can probably create __slots__ here (in init) too, if
-    # __slots__ isn't defined (would save having to put __slots__=[]
-    # in subclasses that add no new slots).
-
+    """
+    Metaclass allowing control over creation of Parameter classes.
+    """
     def __new__(meta,classname,bases,classdict):
         # store the class's docstring in __classdoc
         if '__doc__' in classdict:
@@ -105,6 +103,14 @@ class ParameterMetaclass(type):
         # when asking for help on Parameter *object*, return the doc
         # slot
         classdict['__doc__']=property(lambda x: x.doc)
+
+        # To get the benefit of slots, subclasses must themselves define
+        # __slots__, whether or not they define attributes not present in
+        # the base Parameter class.  That's because a subclass will have
+        # a __dict__ unless it also defines __slots__.
+        if '__slots__' not in classdict:
+            classdict['__slots__']=[]
+        
         return type.__new__(meta,classname,bases,classdict)
 
     def __getattribute__(mcs,name):
@@ -240,8 +246,6 @@ class Parameter(object):
     #   the attrib_name for the Parameter); in the code, this is
     #   called the internal_name.
 
-
-
     # So that the extra features of Parameters do not require a lot of
     # overhead, Parameters are implemented using __slots__ (see
     # http://www.python.org/doc/2.4/ref/slots.html).  Instead of having
@@ -251,13 +255,8 @@ class Parameter(object):
     # attributes.  Using __slots__ requires special support for
     # operations to copy and restore Parameters (e.g. for Python
     # persistent storage pickling); see __getstate__ and __setstate__.
-    # 
-    # To get the benefit of slots, subclasses must themselves define
-    # __slots__, whether or not they define attributes not present in
-    # the base Parameter class.  That's because a subclass will have
-    # a __dict__ unless it also defines __slots__.
-    __slots__ = ['_attrib_name','_internal_name','default','doc','precedence','instantiate','constant']
-
+    __slots__ = ['_attrib_name','_internal_name','default',
+                 'doc','precedence','instantiate','constant']
 
     def __init__(self,default=None,doc=None,precedence=None,  # pylint: disable-msg=R0913
                  instantiate=False,constant=False): 
@@ -277,16 +276,6 @@ class Parameter(object):
         inheritance of Parameter slots (attributes) from the owning-class'
         class hierarchy (see ParameterizedObjectMetaclass).
         """
-        # CEBALERT: make sure that subclass authors have also declared
-        # __slots__, so we get the optimization of no
-        # dictionaries. Ideally, we'd like to check this with
-        # something like pychecker instead.
-        # We also need to check that subclasses have a __doc__ attribute.
-        assert not hasattr(self,'__dict__'), \
-               "Subclasses of Parameter should define __slots__; " \
-               + `type(self)` + " does not."
-
-
         self._attrib_name = None  # used to cache attrib_name
         self._internal_name = None
         self.precedence = precedence
@@ -553,9 +542,9 @@ class ParameterizedObjectMetaclass(type):
                 # you're not"). There are legitimate times when
                 # something needs be set on the class, and we don't
                 # want to see a warning then. Such attributes should
-                # presumably be __ or at least _. (For instance,
-                # python's own pickling mechanism caches __slotnames__
-                # on the class:
+                # presumably be prefixed by at least one underscore.
+                # (For instance, python's own pickling mechanism
+                # caches __slotnames__ on the class:
                 # http://mail.python.org/pipermail/python-checkins/2003-February/033517.html.)
                 if not attribute_name.startswith('_'):
                     print ("Warning: Setting non-Parameter class attribute %s.%s = %s "
@@ -657,7 +646,7 @@ script_repr_suppress_defaults=True
 # If not None, the value of this Parameter will be called (using '()')
 # before every call to __db_print, and is expected to evaluate to a
 # string that is suitable for prefixing messages and warnings (such
-# as some indicator of the global state).""")
+# as some indicator of the global state).
 dbprint_prefix=None
 
 

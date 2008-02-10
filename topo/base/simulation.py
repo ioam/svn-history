@@ -255,9 +255,7 @@ class EventProcessor(ParameterizedObject):
         
 class EventProcessorParameter(Parameter):
     """Parameter whose value can be any EventProcessor instance."""
-    
-    __slots__ = []
-    
+     
     def __init__(self,default=EventProcessor(),**params):
         super(EventProcessorParameter,self).__init__(default=default,**params)
         

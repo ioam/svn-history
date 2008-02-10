@@ -176,8 +176,6 @@ class Cartesian2DPoint(Parameter):
     Parameter whose value represents a point in a 2D Cartesian plane.
     """
     ### JABALERT: Should accept and respect a BoundingBox bounds.
-    __slots__ = []
-
     def __set__(self,obj,val):
         try: ## Test that it is a 2-tuple
             (x,y) = val 
@@ -405,8 +403,6 @@ class BoundingRegionParameter(Parameter):
     """
     Parameter whose value can be any BoundingRegion instance, enclosing a region in a 2D plane.
     """
-    __slots__ = []
-
     def __init__(self,default=BoundingBox(radius=0.5),**params):
         super(BoundingRegionParameter,self).__init__(default=default,instantiate=True,**params)
         
