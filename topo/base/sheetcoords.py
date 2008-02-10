@@ -79,8 +79,7 @@ $Id$
 __version__ = '$Revision$'
 
 
-from numpy.oldnumeric import array,floor,ceil,around
-
+from numpy import array,floor,ceil,around,arange
 from boundingregion import BoundingBox
 
 
@@ -324,9 +323,8 @@ class SheetCoordinateSystem(object):
         representing the x-center of each matrix cell, and y
         represents the corresponding y-center of the cell.
         """
-        n_rows,n_cols = self.shape
-        rows = array(range(n_rows)); cols = array(range(n_cols))
-        return self.matrixidx2sheet_array(rows,cols)
+        rows,cols = self.shape
+        return self.matrixidx2sheet_array(arange(rows),arange(cols))
 
 
     ### CEBALERT: move these two methods to Slice.
