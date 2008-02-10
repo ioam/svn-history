@@ -112,15 +112,7 @@ class GeneratorSheet(Sheet):
         """
         self.verbose("Generating a new pattern")
 
-        ### JABALERT: Would it be more efficient to re-use the same
-        ### bit of memory each time?  This way allocates a new block
-        ### of memory each time a pattern is drawn...
-        # CEB: and it probably doesn't respect the type of the
-        # activity array (haven;t checked this).
-        self.activity = self.input_generator()
-        assert self.shape==self.activity.shape, \
-               "Generated pattern shape %s does not match sheet shape %s." % \
-               (self.shape,self.activity.shape)
+        self.activity[:] = self.input_generator()
 
         if self.apply_output_fn:
             self.output_fn(self.activity)
