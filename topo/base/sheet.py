@@ -21,12 +21,14 @@ $Id$
 
 __version__ = '$Revision$'
 
+from numpy import zeros,array
+from numpy.oldnumeric import Float
+
 from simulation import EventProcessor
 from sheetcoords import SheetCoordinateSystem
 from parameterclasses import BooleanParameter, Number, NumericTuple
-from numpy.oldnumeric import zeros,array,Float
-
 from boundingregion import BoundingBox, BoundingRegionParameter
+
 
 activity_type = Float
 
@@ -126,8 +128,8 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         Delete the dictionary entry with key entry 'view_name' to save
         memory.
         """
-	if self.sheet_views.has_key(view_name):   
-	    del self.sheet_views[view_name]
+        if self.sheet_views.has_key(view_name):   
+            del self.sheet_views[view_name]
 
 
     def sheet_offset(self):
