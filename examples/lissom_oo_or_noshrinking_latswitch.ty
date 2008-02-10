@@ -29,9 +29,8 @@ from topo.base.cf import CFSheet, CFPResponseFn
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfns.basic import PiecewiseLinear,DivisiveNormalizeL1
+from topo.outputfns.basic import PiecewiseLinear,DivisiveNormalizeL1, HomeostaticMaxEnt
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
-from topo.outputfns.homeostatic import AdaptingHomeostaticMaxEnt
 from topo.patterns.basic import Gaussian, Composite, SeparatedComposite
 from topo.responsefns.projfns import CFPRF_ActivityBased
 
@@ -80,7 +79,7 @@ topo.sim['LGNOff']=CFSheet(nominal_density=24.0,
 
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
                         nominal_bounds=BoundingBox(radius=0.5),tsettle=9,
-                        output_fn=AdaptingHomeostaticMaxEnt(a_init=14.5, b_init=-4, eta_init=0.0002, mu=0.01, lstep=8, rate_factor=0.1))
+                        output_fn=HomeostaticMaxEnt())
 
 # DoG weights for the LGN
 centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
