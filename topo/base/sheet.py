@@ -21,7 +21,7 @@ $Id$
 
 __version__ = '$Revision$'
 
-from numpy import zeros,array
+from numpy import zeros,array,arange
 from numpy.oldnumeric import Float
 
 from simulation import EventProcessor
@@ -140,25 +140,23 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         return -self.bounds.aarect().left(),-self.bounds.aarect().bottom()
 
 
-    def sheet_rows(self):
+    def row_col_sheetcoords(self):
         """
-        Return a list of Y-coordinates corresponding to the rows of
-        the activity matrix of the sheet.
+        Return an array of Y-coordinates corresponding to the rows of
+        the activity matrix of the sheet, and an array of
+        X-coordinates corresponding to the columns.
         """
-        rows,cols = self.activity.shape
-        # CEBALERT: Should use matrixidx2sheet_array
-        coords = [self.matrixidx2sheet(r,0) for r in range(rows-1,-1,-1)]
-        return [y for (x,y) in coords]
+        # The row and column centers are returned in matrix (not
+        # sheet) order (hence the reversals below).
+        nrows,ncols = self.activity.shape
+        return self.matrixidx2sheet_array(arange(nrows-1,-1,-1),arange(ncols))[::-1]
+        
 
+    # CBALERT: to be removed once other code has been updated
+    def sheet_rows(self):
+        return self.row_col_sheetcoords()[0]
     def sheet_cols(self):
-        """
-        Return a list of X-coordinates corresponding to the columns
-        of the activity matrix of the sheet.
-        """
-        rows,cols = self.activity.shape
-        # CEBALERT: Should use matrixidx2sheet_array
-        coords = [self.matrixidx2sheet(0,c) for c in range(cols)]
-        return [x for (x,y) in coords]
+        return self.row_col_sheetcoords()[1]
 
 
     def state_push(self):
