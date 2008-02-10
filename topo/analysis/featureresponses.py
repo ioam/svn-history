@@ -11,7 +11,7 @@ import copy
 from math import fmod,floor
 
 import numpy
-from numpy import zeros, array, empty, object_, size, vectorize
+from numpy import zeros, array, empty, object_, size, vectorize, fromfunction
 from numpy.oldnumeric import Float
 
 import topo
@@ -62,21 +62,9 @@ class DistributionMatrix(ParameterizedObject):
         ### actually modifies the distribution_matrix, but that has
         ### not yet been done.  Alternatively, it could use a different
         ### function name altogether (e.g. update(x,y)).
-        self.distribution_matrix + self.__make_pairs(new_values,bin)
-        
-        
-
-    def __make_pairs(self,new_values,bin):
-        """For a given bin, transform a matrix of values into a matrix of dictionaries {bin:element}."""
-
-        # CBALERT: should be updated to dtype=object ?
-        new_matrix=zeros(new_values.shape,'O')
-        for i in range(len(new_values)):
-            for j in range(len(new_values[i])):
-                new_matrix[i,j] = {bin:new_values[i,j]}
-        return new_matrix
-   
-    
+        self.distribution_matrix + fromfunction(vectorize(lambda i,j: {bin:new_values[i,j]}),
+                                                new_values.shape)  
+            
 
     def weighted_average(self):
         """Return the weighted average of each Distribution as a matrix."""
