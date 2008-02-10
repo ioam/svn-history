@@ -718,7 +718,7 @@ def measure_rfcog(sheet_name='V1',input_sheet_name='Retina'):
 ###############################################################################
 pg= create_plotgroup(name='Orientation Preference',category="Preference Maps",
              doc='Measure preference for sine grating orientation.',
-             update_command='measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4], scale=0.3,offset=0.0,display=False,weighted_average=True,pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175))')
+             update_command='measure_or_pref()')
 pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
@@ -728,7 +728,7 @@ pg.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,weighted_average=True,
-                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0)):
+                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
     """
     Measure orientation maps, using a sine grating by default.
 
