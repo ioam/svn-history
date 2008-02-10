@@ -11,7 +11,7 @@ import copy
 from math import fmod,floor
 
 import numpy
-from numpy import zeros, array, empty, object_, size
+from numpy import zeros, array, empty, object_, size, vectorize
 from numpy.oldnumeric import Float
 
 import topo
@@ -26,6 +26,11 @@ from topo.commands.basic import restore_input_generators, save_input_generators
 from topo.misc.distribution import Distribution
 from topo.base.cf import CFSheet
 
+
+# CB: having a class called DistributionMatrix with an attribute
+# distribution_matrix to hold the distribution matrix seems silly.
+# Either rename distribution_matrix or make DistributionMatrix into
+# a matrix.
 class DistributionMatrix(ParameterizedObject):
     """
     Maintains a matrix of Distributions (each of which is a dictionary
@@ -41,17 +46,13 @@ class DistributionMatrix(ParameterizedObject):
     (which can be used as a preference map) and/or a selectivity
     map (which measures the peakedness of each distribution).
     """
-
     def __init__(self,matrix_shape,axis_range=(0.0,1.0), cyclic=False):
+        """Initialize the internal data structure: a matrix of Distribution objects."""
         self.axis_range=axis_range
-        # Initialize the internal data structure: a matrix of Distribution objects.
-        # It would be nice to do this using some sort of map() or apply() function...
-        self.distribution_matrix = zeros(matrix_shape,'O')
-        rows, cols = matrix_shape
-        for i in range(rows): 
-            for j in range(cols):
-                self.distribution_matrix[i,j] = Distribution(axis_range,cyclic,keep_peak=True)
-        
+        new_distribution = vectorize(lambda x: Distribution(axis_range,cyclic,True),
+                                     doc="Return a Distribution instance for each element of x.")
+        self.distribution_matrix = new_distribution(empty(matrix_shape))
+
   
 
     def update(self, new_values, bin):
