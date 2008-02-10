@@ -149,7 +149,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         # The row and column centers are returned in matrix (not
         # sheet) order (hence the reversals below).
         nrows,ncols = self.activity.shape
-        return self.matrixidx2sheet_array(arange(nrows-1,-1,-1),arange(ncols))[::-1]
+        return self.matrixidx2sheet(arange(nrows-1,-1,-1),arange(ncols))[::-1]
         
 
     # CBALERT: to be removed once other code has been updated

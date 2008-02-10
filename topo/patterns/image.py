@@ -120,7 +120,7 @@ class PatternSampler(ParameterizedObject):
         y/=height
 
         # convert the sheet (x,y) coordinates to matrixidx (r,c) ones
-        r,c = self.pattern_sheet.sheet2matrixidx_array(x,y)
+        r,c = self.pattern_sheet.sheet2matrixidx(x,y)
 
         # now sample pattern at the (r,c) corresponding to the supplied (x,y)
         pattern_rows,pattern_cols = self.pattern_sheet.activity.shape

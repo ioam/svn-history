@@ -79,7 +79,7 @@ $Id$
 __version__ = '$Revision$'
 
 
-from numpy import array,floor,ceil,around,arange
+from numpy import array,floor,ceil,round_,arange
 from boundingregion import BoundingBox
 
 
@@ -245,22 +245,17 @@ class SheetCoordinateSystem(object):
         boundary will be just outside the matrix, because the right and
         bottom boundaries are exclusive.
 
-        Valid only for scalar x and y.
+        Valid for scalar or array x and y.
         """
         r,c = self.sheet2matrix(x,y)
         r = floor(r)
         c = floor(c)
-        return int(r), int(c)
 
-
-    def sheet2matrixidx_array(self,x,y):
-        """
-        sheet2matrixidx but for arrays of x and y.
-        """
-        r,c = self.sheet2matrix(x,y)
-        r = floor(r)
-        c = floor(c)
-        return r.astype(int), c.astype(int)
+        # CB: was it better to have two different methods?
+        if hasattr(r,'astype'):
+            return r.astype(int), c.astype(int)
+        else:
+            return int(r),int(c)
 
 
     def matrix2sheet(self,float_row,float_col):
@@ -289,7 +284,7 @@ class SheetCoordinateSystem(object):
         sheet2matrixidx(), because sheet2matrixidx() discards all but the integer
         portion of the continuous matrix coordinate.
 
-        Valid only for scalar row and col.
+        Valid only for scalar or array row and col.
         """
         x,y = self.matrix2sheet((row+0.5), (col+0.5))
 
@@ -298,7 +293,7 @@ class SheetCoordinateSystem(object):
         # Round eliminates any precision errors that have been compounded
         # via floating point operations so that the rounded number will better
         # match the floating number that we type in.
-        return round(x,10),round(y,10)
+        return round_(x,10),round_(y,10)
 
 
     def closest_cell_center(self,x,y):
@@ -309,14 +304,6 @@ class SheetCoordinateSystem(object):
         return self.matrixidx2sheet(*self.sheet2matrixidx(x,y))
 
 
-    def matrixidx2sheet_array(self,row,col):
-        """
-        matrixidx2sheet() but for arrays.
-        """
-        x,y = self.matrix2sheet((row+0.5), (col+0.5))
-        return around(x,10),around(y,10)
-
-
     def sheetcoordinates_of_matrixidx(self):
         """
         Return x,y where x is a vector of sheet coordinates
@@ -324,7 +311,7 @@ class SheetCoordinateSystem(object):
         represents the corresponding y-center of the cell.
         """
         rows,cols = self.shape
-        return self.matrixidx2sheet_array(arange(rows),arange(cols))
+        return self.matrixidx2sheet(arange(rows),arange(cols))
 
 
     ### CEBALERT: move these two methods to Slice.
