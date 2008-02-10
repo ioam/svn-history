@@ -115,6 +115,8 @@ class GeneratorSheet(Sheet):
         ### JABALERT: Would it be more efficient to re-use the same
         ### bit of memory each time?  This way allocates a new block
         ### of memory each time a pattern is drawn...
+        # CEB: and it probably doesn't respect the type of the
+        # activity array (haven;t checked this).
         self.activity = self.input_generator()
         assert self.shape==self.activity.shape, \
                "Generated pattern shape %s does not match sheet shape %s." % \
