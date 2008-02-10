@@ -175,7 +175,6 @@ class OutputFnParameter(ClassSelectorParameter):
     mapping a 2D array to a 2D array.
     """
     __slots__ = []
-    __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=IdentityOF(),**params):
         super(OutputFnParameter,self).__init__(OutputFn,default=default,**params)
@@ -236,7 +235,6 @@ class LearningFnParameter(ClassSelectorParameter):
     Parameter whose value can be any LearningFunction.
     """
     __slots__ = []
-    __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=Hebbian(),**params):
         super(LearningFnParameter,self).__init__(LearningFn,default=default,**params)        
@@ -271,7 +269,6 @@ class ResponseFnParameter(ClassSelectorParameter):
     Parameter whose value can be any ResponseFunction.
     """
     __slots__ = []
-    __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=DotProduct(),**params):
         super(ResponseFnParameter,self).__init__(ResponseFn,default=default,**params)        
@@ -304,7 +301,6 @@ class CoordinateMapperFnParameter(ClassSelectorParameter):
     Parameter whose value can be any CoordinateMapperFn.
     """
     __slots__ = []
-    __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=IdentityMF(),**params):
         super(CoordinateMapperFnParameter,self).__init__(CoordinateMapperFn,default=default,**params)

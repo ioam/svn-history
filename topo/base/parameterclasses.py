@@ -12,10 +12,7 @@ from parameterizedobject import Parameter, descendents, ParameterizedObject
 
 # CEBALERT: much of the documentation for Parameter subclasses
 # that ought to be in the class docstring is in the __init__
-# docstring so that it shows up. In some cases there is
-# some repetition.
-# See JAB hackalert by Parameter's __doc__.
-
+# docstring.
 
 
 # CEBHACKALERT: needs to be finished
@@ -26,7 +23,6 @@ class Enumeration(Parameter):
     An Enumeration's value is always one from its list of available values.
     """
     __slots__ = ['available']
-    __doc__ = property((lambda self: self.doc))
 
     def __init__(self, default=None, available=[], **params):
         """
@@ -112,7 +108,6 @@ class Dynamic(Parameter):
                    # to override
     
     __slots__ = []
-    __doc__ = property((lambda self: self.doc))
 
     # CBENHANCEMENT: Add an 'epsilon' slot.
     # See email 'Re: simulation-time-controlled Dynamic parameters'
@@ -237,7 +232,6 @@ class Number(Dynamic):
     """
     """
     __slots__ = ['bounds','_softbounds']
-    __doc__ = property((lambda self: self.doc))
  
     def __init__(self,default=0.0,bounds=None,softbounds=None,**params):
         """
@@ -399,7 +393,6 @@ class Number(Dynamic):
 
 class Integer(Number):
     __slots__ = []
-    __doc__ = property((lambda self: self.doc))
 
     def _check_value(self,val):
         if not isinstance(val,int):
@@ -409,7 +402,7 @@ class Integer(Number):
 
 class Magnitude(Number):
     __slots__ = []
-    __doc__ = property((lambda self: self.doc))
+
 
     def __init__(self,default=1.0,softbounds=None,**params):
         Number.__init__(self,default=default,bounds=(0.0,1.0),softbounds=softbounds,**params)
@@ -417,7 +410,7 @@ class Magnitude(Number):
 
 class BooleanParameter(Parameter):
     __slots__ = ['bounds']
-    __doc__ = property((lambda self: self.doc))
+
 
 
     # CB: what does bounds=(0,1) mean/do for this Parameter?
@@ -438,7 +431,6 @@ class BooleanParameter(Parameter):
 
 class StringParameter(Parameter):
     __slots__ = []
-    __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default="",**params):
         """Initialize a string parameter."""
@@ -453,7 +445,7 @@ class StringParameter(Parameter):
 
 class NumericTuple(Parameter):
     __slots__ = ['length']
-    __doc__ = property((lambda self: self.doc))
+
 
     def __init__(self,default=(0,0),length=None,**params):
         """
@@ -487,7 +479,6 @@ class NumericTuple(Parameter):
 
 class XYCoordinates(NumericTuple):
     __slots__ = []
-    __doc__ = property((lambda self: self.doc))
   
     def __init__(self,default=(0.0,0.0),**params):
         super(XYCoordinates,self).__init__(default=default,length=2,**params)
@@ -503,7 +494,6 @@ class CallableParameter(Parameter):
     2.4, so instantiate must be False for those values.
     """
     __slots__ = []
-    __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=None,**params):
         Parameter.__init__(self,default=wrap_callable(default),**params)
@@ -593,7 +583,6 @@ class SelectorParameter(Parameter):
     __abstract = True
     
     __slots__=[]
-    __doc__ = property((lambda self: self.doc))
 
     def get_range(self):
         raise NotImplementedError("get_range() must be implemented in subclasses.")
@@ -604,7 +593,6 @@ class ObjectSelectorParameter(SelectorParameter):
     Parameter whose value is set to an object from its list of possible objects.
     """
     __slots__ = ['objects'] 
-    __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=None,objects=[],instantiate=True,**params):
         self.objects = objects
@@ -646,7 +634,6 @@ class ClassSelectorParameter(SelectorParameter):
     Parameter whose value is an instance of the specified class.    
     """
     __slots__ = ['class_','suffix_to_lose']
-    __doc__ = property((lambda self: self.doc))
 
     def __init__(self,class_,default=None,instantiate=True,
                  suffix_to_lose='',**params):
@@ -709,7 +696,6 @@ class ListParameter(Parameter):
     items in the list are checked to be of that type.
     """
     __slots__ = ['class_','bounds']
-    __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=[],class_=None,instantiate=True,
                  bounds=(0,None),**params):
@@ -761,7 +747,6 @@ class DictParameter(ClassSelectorParameter):
     Parameter whose value is a dictionary.
     """
     __slots__ = []
-    __doc__ = property((lambda self: self.doc))
 
     def __init__(self,**params):
         super(DictParameter,self).__init__(dict,**params)
@@ -798,9 +783,6 @@ class InstanceMethodWrapper(object):
 
     def __call__(self,*args,**kw):
         return self.im(*args,**kw)
-
-
-
 
 
 ## CEB: this whole chunk awaiting removal.

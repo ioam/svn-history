@@ -92,7 +92,29 @@ class bothmethod(object): # pylint: disable-msg=R0903
 
 
 
+class ParameterMetaclass(type):
 
+    # CB: can probably create __slots__ here (in init) too, if
+    # __slots__ isn't defined (would save having to put __slots__=[]
+    # in subclasses that add no new slots).
+
+    def __new__(meta,classname,bases,classdict):
+        # store the class's docstring in __classdoc
+        if '__doc__' in classdict:
+            classdict['__classdoc']=classdict['__doc__']
+        # when asking for help on Parameter *object*, return the doc
+        # slot
+        classdict['__doc__']=property(lambda x: x.doc)
+        return type.__new__(meta,classname,bases,classdict)
+
+    def __getattribute__(mcs,name):
+        if name=='__doc__':
+            # when asking for help on Parameter *class*, return the
+            # stored class docstring
+            return type.__getattribute__(mcs,'__classdoc')
+        else:
+            return type.__getattribute__(mcs,name)
+        
 
 # CB: we could maybe reduce the complexity by doing something to allow
 # a parameter to discover things about itself when created (would also
@@ -169,6 +191,8 @@ class Parameter(object):
        graphical user interfaces, to allow ParameterizedObjects to be
        edited by users.       
     """
+    __metaclass__ = ParameterMetaclass
+    
     # Because they implement __get__ and __set__, Parameters are known
     # as 'descriptors' in Python; see "Implementing Descriptors" and
     # "Invoking Descriptors" in the 'Customizing attribute access'
@@ -233,34 +257,6 @@ class Parameter(object):
     # the base Parameter class.  That's because a subclass will have
     # a __dict__ unless it also defines __slots__.
     __slots__ = ['_attrib_name','_internal_name','default','doc','precedence','instantiate','constant']
-
-
-    __doc__ = property((lambda self: self.doc))
-    # When a Parameter is owned by a ParameterizedObject, we want the
-    # documentation for that object to print the doc slot for this
-    # parameter, not the __doc__ value for the Parameter class or
-    # subclass.  For instance, if we have a ParameterizedObject class X with
-    # parameters y(doc="All about y") and z(doc="More about z"),
-    # help(X) should include "All about y" in the section describing
-    # y, and "More about z" in the section about z.
-    #
-    # We currently achieve this by making __doc__ return the value of
-    # self.doc, using the code below.
-    #
-    # NOTE: This code must also be copied to any subclass of
-    # Parameter, or else the documentation for y and z above will
-    # be the documentation for their Parameter class, not those
-    # specific parameters.
-    #
-    # JABHACKALERT: Unfortunately, this trick makes the documentation
-    # for Parameter and its subclasses invisible, so that e.g.
-    # help(Parameter) and help(Number) do not include the usual
-    # docstring defined in those classes.  We could save a copy of
-    # that docstring in a class attribute, and it *may* be possible
-    # somehow to return that for help(Parameter), without breaking the
-    # current support for help(X) (where X is a ParameterizedObject and help(X)
-    # describes X's specific Parameters).  Seems difficult, though.
-
 
 
     def __init__(self,default=None,doc=None,precedence=None,  # pylint: disable-msg=R0913

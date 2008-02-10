@@ -257,7 +257,6 @@ class EventProcessorParameter(Parameter):
     """Parameter whose value can be any EventProcessor instance."""
     
     __slots__ = []
-    __doc__ = property((lambda self: self.doc))
     
     def __init__(self,default=EventProcessor(),**params):
         super(EventProcessorParameter,self).__init__(default=default,**params)

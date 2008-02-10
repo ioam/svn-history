@@ -33,7 +33,6 @@ class Filename(Parameter):
       function).
     """
     __slots__ = ['search_paths'] 
-    __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=None,search_paths=[],**params):
         self.search_paths = search_paths

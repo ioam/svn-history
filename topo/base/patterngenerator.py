@@ -226,7 +226,6 @@ class PatternGeneratorParameter(ClassSelectorParameter):
     """Parameter whose value can be any instance of a PatternGenerator class."""
     
     __slots__ = []
-    __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=Constant(),**params):
         super(PatternGeneratorParameter,self).__init__(PatternGenerator,default=default,suffix_to_lose='Generator',**params)

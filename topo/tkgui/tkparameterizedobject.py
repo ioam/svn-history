@@ -200,7 +200,6 @@ class ButtonParameter(CallableParameter):
     # CEBALERT: we should probably solve the above for users,
     # but what a pain!
     __slots__ = ['image_path','size','_hack']
-    __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=None,image_path=None,size=None,
                  **params):
