@@ -32,14 +32,14 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import DynamicNumber, Number
+from topo.base.parameterclasses import Number
 from topo.base.cf import CFSheet, CFPResponseFn
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
-from topo.outputfns.homeostatic import HomeostaticMaxEnt
+from topo.outputfns.basic import HomeostaticMaxEnt
 from topo.patterns.basic import Gaussian
 
 
@@ -91,9 +91,9 @@ class Activity_based(CFPResponseFn):
 
 input_pattern = topo.patterns.basic.Gaussian(
           scale=1.0, size=2*0.0468, aspect_ratio=4.0,
-          x=DynamicNumber(UniformRandom(lbound=-0.775,ubound=0.775,seed=12)),
-          y=DynamicNumber(UniformRandom(lbound=-0.775,ubound=0.775,seed=34)),
-          orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+          x=UniformRandom(lbound=-0.775,ubound=0.775,seed=12),
+          y=UniformRandom(lbound=-0.775,ubound=0.775,seed=34),
+          orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
                                  
 # Specify weight initialization, response function, and learning function

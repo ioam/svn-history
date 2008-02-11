@@ -39,7 +39,6 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
@@ -61,12 +60,9 @@ mouth   =  Gaussian(aspect_ratio = 1.0, x = -5/24.0, y = 0.0/24.0,
 
 inputs=[Composite(generators = [lefteye, righteye, mouth],
                   operator = numpy.maximum, size = 1.7,
-                  orientation=DynamicNumber(UniformRandom(lbound=17.0/36.0*pi,
-                                                          ubound=19.0/36.0*pi,seed=56+i)),
-                  x=DynamicNumber(UniformRandom(lbound=-85.0/48.0,
-                                                ubound= 85.0/48.0, seed=12+i)),
-                  y=DynamicNumber(UniformRandom(lbound=-85.0/48.0,
-                                                ubound= 85.0/48.0, seed=34+i)))
+                  orientation=UniformRandom(lbound=17.0/36.0*pi,ubound=19.0/36.0*pi,seed=56+i),
+                  x=UniformRandom(lbound=-85.0/48.0,ubound=85.0/48.0, seed=12+i),
+                  y=UniformRandom(lbound=-85.0/48.0,ubound=85.0/48.0, seed=34+i))
         for i in xrange(num_inputs)]
 
 combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=1.722972972972973,generators=inputs)

@@ -24,7 +24,7 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import DynamicNumber, Number
+from topo.base.parameterclasses import Number
 from topo.base.cf import CFSheet, CFPResponseFn
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
@@ -37,9 +37,9 @@ from topo.responsefns.projfns import CFPRF_ActivityBased
 
 num_inputs=2
 input_type=topo.patterns.basic.Gaussian
-inputs=[input_type(x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)),
-                   y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i)),
-                   orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56+i)),
+inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
+                   y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
+                   orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
                    size=0.088388, aspect_ratio=4.66667, scale=1.0,
                    bounds=BoundingBox(radius=0.8))
                 for i in xrange(num_inputs)]
@@ -102,31 +102,36 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 
 topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=1.0,name='LGNOnAfferent',
-                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply,
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
+                 nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=BoundedNumber(bounds=(0.137,None),generator=
                                                                                                                 ExponentialDecay(starting_value =
                                                                                                                                  locals().get('LGNOnafferent_lr',0.9590/2),
-                                                                                                                                 time_constant=3200/num_inputs)))))
+                                                                                                                                 time_constant=3200/num_inputs)))
+
+
 
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=1.0,name='LGNOffAfferent',
-                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply,
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=
+                 nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=BoundedNumber(bounds=(0.137,None),generator=
                                                                                                                 ExponentialDecay(starting_value =
                                                                                                                                  locals().get('LGNOffafferent_lr',0.9590/2),
-                                                                                                                                 time_constant=3200/num_inputs)))))
+                                                                                                                                 time_constant=3200/num_inputs)))
+
+
+
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
                  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
-                 nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0) 
-            
+                 nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0)
+
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='Lateral',
                  connection_type=CFProjection,response_fn=CFPRF_ActivityBased(),
-                 weights_generator=Composite(operator=numpy.multiply, 
+                 weights_generator=Composite(operator=numpy.multiply,
                      generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
                                  topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.8087)

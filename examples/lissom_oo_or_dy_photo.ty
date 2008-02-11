@@ -33,7 +33,7 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import DynamicNumber,Number
+from topo.base.parameterclasses import Number
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
@@ -124,7 +124,7 @@ class ImageSeq(PatternGenerator):
 	    self.number_of_patterns = len(self.patterns)
 
 
-    def function(self,**params):
+    def function(self,params):
        
         xdensity = params.get('xdensity', self.xdensity)
         ydensity = params.get('ydensity', self.ydensity)
@@ -179,15 +179,15 @@ rand3_copy=copy.deepcopy(rand3)
 
 
 left_input_pattern = ImageSeq(imagepath='examples/stereo/left/',size_normalization='original',
-                                                      random_num1=DynamicNumber(rand1),
-                                                      random_num2=DynamicNumber(rand2),
-                                                      random_num3=DynamicNumber(rand3),scale=2.0)
+                                                      random_num1=rand1,
+                                                      random_num2=rand2,
+                                                      random_num3=rand3,scale=2.0)
                                                       
 
 right_input_pattern = ImageSeq(imagepath='examples/stereo/right/',size_normalization='original',
-                                                      random_num1=DynamicNumber(rand1_copy),
-                                                      random_num2=DynamicNumber(rand2_copy),
-                                                      random_num3=DynamicNumber(rand3_copy),scale=2.0)
+                                                      random_num1=rand1_copy,
+                                                      random_num2=rand2_copy,
+                                                      random_num3=rand3_copy,scale=2.0)
                                                       
          
 

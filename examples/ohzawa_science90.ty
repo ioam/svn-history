@@ -26,7 +26,7 @@ import topo.patterns.rds
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
-from topo.base.parameterclasses import DynamicNumber,Number
+from topo.base.parameterclasses import Number
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.outputfns.basic import PiecewiseLinear,HalfRectifyAndSquare
@@ -35,10 +35,10 @@ from topo.misc.numbergenerators import UniformRandom,UniformRandomInt
 from topo.commands.pylabplots import *
 
 
-input_pattern = topo.patterns.rds.RandomDotStereogram(dotsize=DynamicNumber(UniformRandom(lbound=0.05,ubound=0.15,seed=100)),
-                                        xdisparity=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
-                                        dotdensity=DynamicNumber(UniformRandom(lbound=0.2,ubound=0.8,seed=300)),
-                                        random_seed=DynamicNumber(UniformRandomInt(lbound=0,ubound=1000,seed=400)))
+input_pattern = topo.patterns.rds.RandomDotStereogram(dotsize=UniformRandom(lbound=0.05,ubound=0.15,seed=100),
+                                        xdisparity=UniformRandom(lbound=-0.5,ubound=0.5,seed=200),
+                                        dotdensity=UniformRandom(lbound=0.2,ubound=0.8,seed=300),
+                                        random_seed=UniformRandomInt(lbound=0,ubound=1000,seed=400))
 
 input_pattern_copy=copy.deepcopy(input_pattern)
 
@@ -182,7 +182,6 @@ import topo.base.patterngenerator
 from topo.base import sheetview
 from topo.base.arrayutils import octave_output, centroid
 from topo.base.cf import CFSheet, CFProjection, Projection
-from topo.base.parameterclasses import DynamicNumber
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.projection import ProjectionSheet
 from topo.base.sheet import Sheet

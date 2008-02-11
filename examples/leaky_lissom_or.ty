@@ -18,7 +18,6 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection,LeakyCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.base.sheet import BoundingBox
-from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFPLF_Plugin
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
@@ -41,9 +40,9 @@ GeneratorSheet.nominal_bounds = BoundingBox(radius=0.72)
 input_pattern = topo.patterns.basic.Gaussian(
     scale=1.0,size=2*0.0468,aspect_ratio=4.0,
     bounds=BoundingBox(radius=0.72),
-    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
-    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
-    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+    x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
+    y=UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
+    orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
 # YC use test pattern
 input_pattern = topo.patterns.basic.TwoRectangles(scale=1.0)

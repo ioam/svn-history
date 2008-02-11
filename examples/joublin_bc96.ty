@@ -43,7 +43,7 @@ from topo.base.cf import ConnectionField, CFPLearningFn, CFPLF_Identity, CFProje
 from topo.base.cf import MaskedCFIter
 from topo.base.functionfamilies import DotProduct, ResponseFnParameter, LearningFn
 from topo.base.functionfamilies import OutputFn, OutputFnParameter, IdentityOF
-from topo.base.parameterclasses import DynamicNumber, Number
+from topo.base.parameterclasses import Number
 from topo.base.parameterizedobject import ParameterizedObject,ParamOverrides
 from topo.base.patterngenerator import PatternGenerator, PatternGeneratorParameter
 from topo.base.sheetcoords import SheetCoordinateSystem
@@ -627,9 +627,9 @@ class HindpawGaussian(Gaussian):
 
 input_pattern = HindpawGaussian(
     scale=1.0,size=0.24,aspect_ratio=1.0,
-    x=DynamicNumber(UniformRandom(lbound=0.0,ubound=1.0,seed=12)),
-    y=DynamicNumber(UniformRandom(lbound=0.0,ubound=1.0,seed=34)),
-    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+    x=UniformRandom(lbound=0.0,ubound=1.0,seed=12),
+    y=UniformRandom(lbound=0.0,ubound=1.0,seed=34),
+    orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
 #input_pattern = topo.patterns.basic.Gaussian(
 #                x=0.5, y=0.5, orientation=0, size=0.24,aspect_ratio=1)

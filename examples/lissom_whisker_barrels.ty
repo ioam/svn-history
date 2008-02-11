@@ -106,7 +106,7 @@ class WhiskerArray(PatternGenerator):
                                                self.pipe_off_strength,
                                                self.num_whiskers)
         
-    def function(self,**params):
+    def function(self,params):
         deflection = params.get('deflection',self.deflection)
         
         # JABALERT: Should probably make the function "mlab.sweep" be a parameter,
@@ -174,7 +174,7 @@ class TestWhiskerArray(PatternGenerator):
         self.ganglion_cell_positions=mlab.shuffle(self.num_whiskers,self.num_ganglion_cells,WhiskerArray.random_seed)
         
 
-    def function(self,**params):
+    def function(self,params):
         deflection = params.get('deflection',self.deflection)
             
         self.firing_rates = mlab.test_deflections(
@@ -232,7 +232,7 @@ class WhiskerBotData(PatternGenerator):
 	self.wbot_data=mlab.load("wbot_data_new")
 
 	
-    def function(self,**params):
+    def function(self,params):
 	if self.whiskerBot_data==1:
 		self.wbot_x=self.wbot_data.back_new_x
 		self.wbot_y=self.wbot_data.back_new_y
@@ -279,7 +279,7 @@ def specify_whisker_deflections():
                                                     WhiskerArray.num_ganglion_cells,
                                                     WhiskerArray.num_whiskers)
         new_view = SheetView((ganglion_preferences,sheet.bounds), sheet.name,sheet.precedence)
-        sheet.sheet_view_dict['DeflectionPreference']=new_view
+        sheet.sheet_views['DeflectionPreference']=new_view
 
 
 
@@ -341,7 +341,6 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
@@ -379,7 +378,7 @@ else:
 for i in xrange(num_lags):
     topo.sim['Ganglia'+str(i)]=GeneratorSheet(nominal_density=num_whiskers*num_ganglion_cells,
                                              input_generator=WhiskerArray(num_whiskers=num_whiskers,num_ganglion_cells=num_ganglion_cells,step=i+step_offset,
-                                                                          deflection=DynamicNumber(UniformRandom(lbound=0,ubound=2*pi,seed=23))),
+                                                                          deflection=UniformRandom(lbound=0,ubound=2*pi,seed=23)),
                                              period=1.0, phase=0.05,
                                              nominal_bounds=BoundingBox(radius=0.5))
 specify_whisker_deflections()

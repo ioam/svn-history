@@ -66,15 +66,15 @@ from topo.patterns.basic import Composite
 
 #this one for small receptive fields
 #input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size = 1*2*0.0468,aspect_ratio=4.0,
-#                                    x=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=12)),
-#                                    y=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=34)),
-#                                    orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=56)))
+#                                    x=RandomWrapper("uniform",-0.5,0.5,seed=12),
+#                                    y=RandomWrapper("uniform",-0.5,0.5,seed=34),
+#                                    orientation=RandomWrapper("uniform",-pi,pi,seed=56))
   
 #this one for large receptive fields                                  
 #input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size = 2*2*0.0468,aspect_ratio=4.0,
-#                                    x=DynamicNumber(RandomWrapper("uniform",-1.0,1.0,seed=12)),
-#                                    y=DynamicNumber(RandomWrapper("uniform",-1.0,1.0,seed=34)),
-#                                    orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=56)))
+#                                    x=RandomWrapper("uniform",-1.0,1.0,seed=12),
+#                                    y=RandomWrapper("uniform",-1.0,1.0,seed=34),
+#                                    orientation=RandomWrapper("uniform",-pi,pi,seed=56))
 
 #this one is for testing   
 
@@ -85,10 +85,10 @@ from topo.patterns.basic import Composite
 #	else:
 #		return 0.2  #2*2*0.0468
  #          
-#input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size = DynamicNumber(rando),aspect_ratio=4.0,
-#                                    x=DynamicNumber(RandomWrapper("uniform",(-0.5),(0.5),seed=12)),
-#                                    y=DynamicNumber(RandomWrapper("uniform",(-0.5),(0.5),seed=34)),
-#                                    orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=56)))
+#input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size = rando,aspect_ratio=4.0,
+#                                    x=RandomWrapper("uniform",(-0.5),(0.5),seed=12),
+#                                    y=RandomWrapper("uniform",(-0.5),(0.5),seed=34),
+#                                    orientation=RandomWrapper("uniform",-pi,pi,seed=56))
 
 
 
@@ -131,19 +131,19 @@ input_pattern = topo.patterns.basic.Gaussian(
 #   if (random.uniform(0,1)>0.5):
 #       sizee=0.5
 #       return topo.patterns.basic.Gaussian(scale=1.0,size = 1*2*0.0468,aspect_ratio=4.0,
-#                                    x=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=12)),
-#                                    y=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=34)),
-#                                    orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=56)))#
+#                                    x=RandomWrapper("uniform",-0.5,0.5,seed=12),
+#                                    y=RandomWrapper("uniform",-0.5,0.5,seed=34),
+#                                    orientation=RandomWrapper("uniform",-pi,pi,seed=56))#
 
 #   else:
 #   	   sizee=1.0
 #   	   return topo.patterns.basic.Gaussian(scale=1.0,size = 2*2*0.0468,aspect_ratio=4.0,
-#                                    x=DynamicNumber(RandomWrapper("uniform",-1.0,1.0,seed=12)),
-#                                    y=DynamicNumber(RandomWrapper("uniform",-1.0,1.0,seed=34)),
-#                                    orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=56)))
+#                                    x=RandomWrapper("uniform",-1.0,1.0,seed=12),
+#                                    y=RandomWrapper("uniform",-1.0,1.0,seed=34),
+#                                    orientation=RandomWrapper("uniform",-pi,pi,seed=56))
 #
 
-#input_pattern = DynamicNumber(rando)
+#input_pattern = rando
 
 
                                                                       

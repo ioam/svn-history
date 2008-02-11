@@ -32,7 +32,7 @@ from topo.sheets.optimized import NeighborhoodMask_Opt, LISSOM_Opt
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import DynamicNumber, Number, Parameter
+from topo.base.parameterclasses import Number, Parameter
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt, CFPLF_Trace_opt
@@ -232,7 +232,7 @@ topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.05"),name='LateralE
                  connection_type=CFProjection,strength=locals().get('CxLatExcStr',0.7),
                  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatExcSize',0.04)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('CxLatExcBB',0.12)),
-                 learning_rate=0.0)#DynamicNumber((BoundedNumber(bounds=(0.137,None),generator=ExponentialDecay(starting_value = locals().get('CtoC_lr',5.0),time_constant=locals().get('CtoC_tc',9600))))),
+                 learning_rate=0.0)#(BoundedNumber(bounds=(0.137,None),generator=ExponentialDecay(starting_value = locals().get('CtoC_lr',5.0),time_constant=locals().get('CtoC_tc',9600)))),
                  #learning_fn=CFPLF_Trace_opt(trace_strength=locals().get('TraceStr',0.5)))
 
 topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.05"),name='LateralInhibitory',
