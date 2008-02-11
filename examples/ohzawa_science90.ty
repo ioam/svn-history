@@ -59,24 +59,24 @@ topo.sim['RightRetina'] = GeneratorSheet(nominal_density=100.0,
                         
 # Binocular simple cells
 topo.sim['S1'] = CFSheet(nominal_density=1.0,measure_maps=False,
-                         output_fn=HalfRectifyAndSquare(),learning=False,
+                         output_fn=HalfRectifyAndSquare(),plastic=False,
                          nominal_bounds=BoundingBox(radius=0.5))
 
 topo.sim['S2'] = CFSheet(nominal_density=1.0,measure_maps=False,
-                         output_fn=HalfRectifyAndSquare(),learning=False,
+                         output_fn=HalfRectifyAndSquare(),plastic=False,
                          nominal_bounds=BoundingBox(radius=0.5))
 
 topo.sim['S3'] = CFSheet(nominal_density=1.0,measure_maps=False,
-                         output_fn=HalfRectifyAndSquare(),learning=False,
+                         output_fn=HalfRectifyAndSquare(),plastic=False,
                          nominal_bounds=BoundingBox(radius=0.5))
 
 topo.sim['S4'] = CFSheet(nominal_density=1.0,measure_maps=False,
-                         output_fn=HalfRectifyAndSquare(),learning=False,
+                         output_fn=HalfRectifyAndSquare(),plastic=False,
                          nominal_bounds=BoundingBox(radius=0.5))
 
 
 # Complex cell (just one total)
-topo.sim['C'] = CFSheet(nominal_density=1.0,measure_maps=True,learning=False,
+topo.sim['C'] = CFSheet(nominal_density=1.0,measure_maps=True,plastic=False,
                          nominal_bounds=BoundingBox(radius=0.5))
 
 
@@ -403,7 +403,7 @@ class TestPatternPresenter(object):
             inputs[input_pattern[1]]=gen_copy2
  
 
-        pattern_present(inputs, self.duration, learning=False,
+        pattern_present(inputs, self.duration, plastic=False,
                         apply_output_fn=self.apply_output_fn)
 
         '''

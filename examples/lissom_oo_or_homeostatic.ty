@@ -243,7 +243,7 @@ topo.sim['LGNOff']=CFSheet(nominal_density=24.0,
 
 topo.sim['V1'] = JointScaling(nominal_density=locals().get('default_density',48.0),
                               nominal_bounds=BoundingBox(radius=0.5),tsettle=9,
-                              learning=True,output_fn=V1_OF,
+                              plastic=True,output_fn=V1_OF,
                               post_initialization_weights_output_fn=pi,
                               target=afferent_target, smoothing=smoothing,target_lr=0.045)
 

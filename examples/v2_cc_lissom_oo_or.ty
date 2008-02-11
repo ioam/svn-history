@@ -96,11 +96,11 @@ core_size=locals().get('CS',0.5)
 
 ## Homeostatic stuff
 #Simple
-HES=HomeostaticMaxEnt(eta_a=0.0,eta=locals().get('ETA',0.0002),smoothing=0.0003,a_init=locals().get('SAINI',18), b_init=locals().get('SBINI',-10),learning=locals().get('HMON',False), mu=locals().get('SCxMU',0.01))
+HES=HomeostaticMaxEnt(eta_a=0.0,eta=locals().get('ETA',0.0002),smoothing=0.0003,a_init=locals().get('SAINI',18), b_init=locals().get('SBINI',-10),plastic=locals().get('HMON',False), mu=locals().get('SCxMU',0.01))
 #ODS=OutputFnDebugger(function=HES, **shared_debug_params)
 output_fn_S=HES#Pipeline(output_fns=[HES, ODS])
 #Complex
-HEC=HomeostaticMaxEnt(eta_a=0.0,learning=locals().get('HMON',False),eta=locals().get('ETA',0.0002),smoothing=0.0003,a_init=14.5, b_init=locals().get('CBINI',-4.0), mu=locals().get('CCxMU',0.02))
+HEC=HomeostaticMaxEnt(eta_a=0.0,plastic=locals().get('HMON',False),eta=locals().get('ETA',0.0002),smoothing=0.0003,a_init=14.5, b_init=locals().get('CBINI',-4.0), mu=locals().get('CCxMU',0.02))
 #ODC=OutputFnDebugger(function=HEC, **shared_debug_params)
 output_fn_C=HEC#Pipeline(output_fns=[HEC, ODC])
 
