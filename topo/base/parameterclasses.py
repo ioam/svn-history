@@ -42,10 +42,8 @@ class Enumeration(Parameter):
         """
         Raises an error if the given value isn't in the list of available ones.
         """
-        # CEBALERT: it would be good to print the Parameter's name
-        # here (see also Number and elsewhere in this file).
         if not self.available.count(val) >= 1:
-            raise ValueError("EnumeratedParamater can't be set to '" + repr(val) + "' because that's not in the list of available values " + repr(self.available) + ".")
+            raise ValueError("%s not in %s's list of available values."%(val,self._attrib_name))
 
 
 def produce_value(value_obj):
@@ -336,23 +334,19 @@ class Number(Dynamic):
         Checks that the value is numeric and that it is within the hard
         bounds; if not, an exception is raised.
         """
-        # CEB: all the following error messages should probably print out the parameter's name
-        # ('x', 'theta', or whatever)
         if not (is_number(val)):
-            raise ValueError("Parameter " + `self._attrib_name` + " (" + `self.__class__.__name__` +
-                             ") only takes a numeric value; " + `type(val)` + " is not numeric.")
-
+            raise ValueError("Parameter '%s' only takes numeric values"%(self._attrib_name))
         if self.bounds!=None:
             vmin,vmax = self.bounds
             if vmin != None and vmax != None:
                 if not (vmin <= val <= vmax):
-                    raise ValueError("Parameter must be between " + `vmin` + ' and ' + `vmax` + ' (inclusive).')
+                    raise ValueError("Parameter '%s' must be between %s and %s (inclusive)"%(self._attrib_name,vmin,vmax))
             elif vmin != None:
                 if not vmin <= val: 
-                    raise ValueError("Parameter must be at least " + `vmin` + '.')
+                    raise ValueError("Parameter '%s' must be at least %s"%(self._attrib_name,vmin))
             elif vmax != None:
                 if not val <=vmax:
-                    raise ValueError("Parameter must be at most " + `vmax` + '.')
+                    raise ValueError("Parameter '%s' must be at most %s"%(self._attrib_name,vmax))
 
 
     def get_soft_bounds(self):
@@ -385,7 +379,7 @@ class Integer(Number):
 
     def _check_value(self,val):
         if not isinstance(val,int):
-            raise ValueError("Parameter must be an integer.")
+            raise ValueError("Parameter '%s' must be an integer."%self._attrib_name)
         super(Integer,self)._check_value(val)
 
 
@@ -406,10 +400,10 @@ class BooleanParameter(Parameter):
 
     def __set__(self,obj,val):
         if not isinstance(val,bool):
-            raise ValueError("BooleanParameter only takes a Boolean value.")
+            raise ValueError("BooleanParameter '%s' only takes a Boolean value."%self._attrib_name)
 
         if val is not True and val is not False:
-            raise ValueError("BooleanParameter must be True or False.")
+            raise ValueError("BooleanParameter '%s' must be True or False."%self._attrib_name)
 
         super(BooleanParameter,self).__set__(obj,val)
 
@@ -422,7 +416,7 @@ class StringParameter(Parameter):
         
     def __set__(self,obj,val):
         if not isinstance(val,str):
-            raise ValueError("StringParameter only takes a string value.")
+            raise ValueError("StringParameter '%s' only takes a string value."%self._attrib_name)
 
         super(StringParameter,self).__set__(obj,val)
 
@@ -446,14 +440,14 @@ class NumericTuple(Parameter):
         
     def _check(self,val):
         if not isinstance(val,tuple):
-            raise ValueError("NumericTuple only takes a tuple value.")
+            raise ValueError("NumericTuple '%s' only takes a tuple value."%self._attrib_name)
         
         if not len(val)==self.length:
-            raise ValueError("Tuple is not of the correct length (%d instead of %d)." %
-                             (len(val),self.length))
+            raise ValueError("%s: tuple is not of the correct length (%d instead of %d)." %
+                             (self._attrib_name,len(val),self.length))
         for n in val:
             if not is_number(n):
-                raise ValueError("Tuple element is not numeric: %s." % (str(n)))
+                raise ValueError("%s: tuple element is not numeric: %s." % (self._attrib_name,str(n)))
             
     def __set__(self,obj,val):
         self._check(val)
@@ -480,7 +474,7 @@ class CallableParameter(Parameter):
 
     def __set__(self,obj,val):
         if not callable(val):
-            raise ValueError("CallableParameter only takes a callable object.")
+            raise ValueError("CallableParameter '%s' only takes a callable object."%self._attrib_name)
         super(CallableParameter,self).__set__(obj,wrap_callable(val))
 
 
@@ -543,7 +537,7 @@ class CompositeParameter(Parameter):
         """
         Set the values of all the attribs.
         """
-        assert len(val) == len(self.attribs),"Compound parameter %s got the wrong number of values (needed %d, but got %d)." % (self._attrib_name,len(self.attribs),len(val))
+        assert len(val) == len(self.attribs),"Compound parameter '%s' got the wrong number of values (needed %d, but got %d)." % (self._attrib_name,len(self.attribs),len(val))
         
         if not obj:
             for a,v in zip(self.attribs,val):
@@ -631,11 +625,8 @@ class ClassSelectorParameter(SelectorParameter):
         val must be None or an instance of self.class_
         """
         if not (isinstance(val,self.class_) or val is None):
-            raise ValueError("Parameter " + `self._attrib_name` + " (" + \
-                             `self.__class__.__name__` + ") must be an instance of " + \
-                             self.class_.__name__ + "; " + `val` + \
-                             " is " + `type(val)` + ".")
-        
+            raise ValueError("Parameter '%s' must be an instance of %s"%(self._attrib_name,\
+                                                                         self.class_.__name__))
 
     def __set__(self,obj,val):
         self._check_value(val,obj)
@@ -696,24 +687,21 @@ class ListParameter(Parameter):
         Checks that the list is of the right length and has the right contents.
         Otherwise, an exception is raised.
         """
-
-        # CEB: all the following error messages should probably print out the parameter's name
-        # ('x', 'theta', or whatever)
         if not (isinstance(val,list)):
-            raise ValueError("Parameter " + `self._attrib_name` + " (" + `self.__class__.__name__` + ") must be a list.")
+            raise ValueError("ListParameter '%s' must be a list."%(self._attrib_name))
 
         if self.bounds!=None:
             min_length,max_length = self.bounds
             l=len(val)
             if min_length != None and max_length != None:
                 if not (min_length <= l <= max_length):
-                    raise ValueError("List length must be between " + `min_length` + ' and ' + `max_length` + ' (inclusive).')
+                    raise ValueError("%s: list length must be between %s and %s (inclusive)"%(self._attrib_name,min_length,max_length))
             elif min_length != None:
                 if not min_length <= l: 
-                    raise ValueError("List length must be at least " + `min_length` + '.')
+                    raise ValueError("%s: list length must be at least %s."%(self._attrib_name,min_length))
             elif max_length != None:
                 if not l <= max_length:
-                    raise ValueError("List length must be at most " + `max_length` + '.')
+                    raise ValueError("%s: list length must be at most %s."%(self._attrib_name,max_length))
 
         if self.class_!=None:
             for v in val:
