@@ -517,8 +517,7 @@ class CompositeParameter(Parameter):
     sequence of values and sets the value of the constituent
     attributes sets all the constituents
     """
-
-    __slots__=['attribs']
+    __slots__=['attribs','objtype']
 
     def __init__(self,attribs=[],**kw):
         super(CompositeParameter,self).__init__(default=None,**kw)

@@ -256,10 +256,13 @@ class Parameter(object):
     # operations to copy and restore Parameters (e.g. for Python
     # persistent storage pickling); see __getstate__ and __setstate__.
     __slots__ = ['_attrib_name','_internal_name','default','doc',
-                 'precedence','instantiate','constant','objtype']
+                 'precedence','instantiate','constant']
 
-    # 'objtype' should really be 'owning_class' (or similar)
-
+    # When created, a Parameter does not know which
+    # ParameterizedObject class owns it. If a Parameter subclass needs
+    # to know the owning class, it can declare an 'objtype' slot
+    # (which will be filled in by ParameterizedObjectMetaclass)
+                                                   
     def __init__(self,default=None,doc=None,precedence=None,  # pylint: disable-msg=R0913
                  instantiate=False,constant=False): 
         """
@@ -278,8 +281,7 @@ class Parameter(object):
         inheritance of Parameter slots (attributes) from the owning-class'
         class hierarchy (see ParameterizedObjectMetaclass).
         """
-        self.objtype=None
-        self._attrib_name = None  # used to cache attrib_name
+        self._attrib_name = None  
         self._internal_name = None
         self.precedence = precedence
         self.default = default
@@ -289,13 +291,6 @@ class Parameter(object):
 
     # CB: need to make it clear that a parameter *must* be declared
     # in a ParameterizedObject, and nothing else.
-    def _set_objtype(self,objtype):
-        # When created, a Parameter does not know which ParameterizedObject class
-        # owns it. This method allows the ParameterizedObjectMetaclass to set the
-        # Parameter's owner.
-        self.objtype=objtype
-        self._set_names(objtype)
-
 
     def _set_instantiate(self,instantiate):
         """Constant parameters must be instantiated."""
@@ -454,8 +449,9 @@ class ParameterizedObjectMetaclass(type):
                       if isinstance(obj,Parameter)]
         
         for param_name,param in parameters:
-            # parameter doesn't know owning class, so mcs sets it (see set_objtype)
-            param._set_objtype(mcs)
+            # parameter has no way to find out the name a
+            # ParameterizedObject has for it
+            param._set_names(mcs) # CEBALERT: can just pass name
             mcs.__param_inheritance(param_name,param)
 
 
@@ -551,11 +547,15 @@ class ParameterizedObjectMetaclass(type):
         # this parameter)
         slots = {}
         for p_class in classlist(type(param)):
-            if hasattr(p_class,'__slots__'):
+            if hasattr(p_class,'__slots__'): # CEBALERT: should remove this if test
                 slots.update(dict.fromkeys(p_class.__slots__))
 
-        # objtype is already handled
-        del slots['objtype'] 
+        # Some Parameter classes need to know the owning
+        # ParameterizedObjectclass. Such classes can declare an
+        # 'objtype' slot, and the owning class will be stored in it.
+        if 'objtype' in slots:
+            setattr(param,'objtype',mcs)            
+            del slots['objtype'] 
 
         for slot in slots.keys():
             superclasses = iter(classlist(mcs)[::-1])
