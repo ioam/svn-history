@@ -361,19 +361,9 @@ class Parameter(object):
         raise TypeError("Cannot delete '%s': Parameters deletion not allowed."%self._attrib_name)
 
 
-    def _set_names(self,objtype):
-        """
-        Store the name of the attribute this Parameter is
-        representing, and store the Parameter's internal_name.
-        """
-        for attrib_name in dir(objtype):
-            if hasattr(objtype,'get_param_descriptor'):
-                desc = objtype.get_param_descriptor(attrib_name)[0]
-                if desc is self:
-                    self._attrib_name = attrib_name
-                    self._internal_name = "_%s_param_value"%attrib_name
-                    return
-        assert False # CB: how to write this more clearly? 
+    def _set_names(self,attrib_name):        
+        self._attrib_name = attrib_name
+        self._internal_name = "_%s_param_value"%attrib_name
     
 
     def __getstate__(self):
@@ -450,7 +440,7 @@ class ParameterizedObjectMetaclass(type):
         for param_name,param in parameters:
             # parameter has no way to find out the name a
             # ParameterizedObject has for it
-            param._set_names(mcs) # CEBALERT: can just pass name
+            param._set_names(param_name) 
             mcs.__param_inheritance(param_name,param)
 
 
