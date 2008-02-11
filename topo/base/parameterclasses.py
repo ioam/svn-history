@@ -10,11 +10,6 @@ import types
 
 from parameterizedobject import Parameter, descendents, ParameterizedObject
 
-# CEBALERT: much of the documentation for Parameter subclasses
-# that ought to be in the class docstring is in the __init__
-# docstring.
-
-
 # CEBHACKALERT: needs to be finished
 class Enumeration(Parameter):
     """
@@ -51,12 +46,6 @@ class Enumeration(Parameter):
         # here (see also Number and elsewhere in this file).
         if not self.available.count(val) >= 1:
             raise ValueError("EnumeratedParamater can't be set to '" + repr(val) + "' because that's not in the list of available values " + repr(self.available) + ".")
-
-
-
-
-
-
 
 
 def produce_value(value_obj):
@@ -228,43 +217,46 @@ is_number = operator.isNumberType
 # to fixedpoint; see testNumber.txt)
 class Number(Dynamic):
     """
+    Number is a numeric parameter. Numbers have a default value,
+    and bounds.  There are two types of bounds: ``bounds`` and
+    ``softbounds``.  ``bounds`` are hard bounds: the parameter must have
+    a value within the specified range.  The default bounds are
+    (None,None), meaning there are actually no hard bounds.  One
+    or both bounds can be set by specifying a value
+    (e.g. bounds=(None,10) means there is no lower bound, and an
+    upper bound of 10).
+
+    Number is also a type of Dynamic parameter, so its value
+    can be set to a callable to get a dynamically generated
+    number (see Dynamic).
+
+    When not being dynamically generated, bounds are checked when
+    a Number is created or set. Using a default value outside the
+    hard bounds, or one that is not numeric, results in an
+    exception. When being dynamically generated, bounds are
+    checked when a the value of a Number is requested. A generated
+    value that is not numeric, or is outside the hard bounds,
+    results in an exception.
+
+    A separate function set_in_bounds() is provided that will
+    silently crop the given value into the legal range, for use
+    in, for instance, a GUI.
+
+    ``softbounds`` are present to indicate the typical range of
+    the parameter, but are not enforced. Setting the soft bounds
+    allows, for instance, a GUI to know what values to display on
+    sliders for the Number.
+
+    Example of creating a Number::
+      AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
     """
     __slots__ = ['bounds','_softbounds']
  
     def __init__(self,default=0.0,bounds=None,softbounds=None,**params):
         """
-        Number is a numeric parameter. Numbers have a default value,
-        and bounds.  There are two types of bounds: ``bounds`` and
-        ``softbounds``.  ``bounds`` are hard bounds: the parameter must have
-        a value within the specified range.  The default bounds are
-        (None,None), meaning there are actually no hard bounds.  One
-        or both bounds can be set by specifying a value
-        (e.g. bounds=(None,10) means there is no lower bound, and an
-        upper bound of 10).
+        Initialize this parameter object and store the bounds.
 
-        Number is also a type of Dynamic parameter, so its value
-        can be set to a callable to get a dynamically generated
-        number (see Dynamic).
-
-        When not being dynamically generated, bounds are checked when
-        a Number is created or set. Using a default value outside the
-        hard bounds, or one that is not numeric, results in an
-        exception. When being dynamically generated, bounds are
-        checked when a the value of a Number is requested. A generated
-        value that is not numeric, or is outside the hard bounds,
-        results in an exception.
-
-        A separate function set_in_bounds() is provided that will
-        silently crop the given value into the legal range, for use
-        in, for instance, a GUI.
-
-        ``softbounds`` are present to indicate the typical range of
-        the parameter, but are not enforced. Setting the soft bounds
-        allows, for instance, a GUI to know what values to display on
-        sliders for the Number.
-
-        Example of creating a Number::
-          AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
+        Non-dynamic default values are checked against the bounds.
         """
         super(Number,self).__init__(default=default,**params)
         
@@ -406,8 +398,6 @@ class Magnitude(Number):
 class BooleanParameter(Parameter):
     __slots__ = ['bounds']
 
-
-
     # CB: what does bounds=(0,1) mean/do for this Parameter?
     def __init__(self,default=False,bounds=(0,1),**params):
         """Initialize a Boolean parameter, allowing values True or False."""
@@ -439,7 +429,6 @@ class StringParameter(Parameter):
 
 class NumericTuple(Parameter):
     __slots__ = ['length']
-
 
     def __init__(self,default=(0,0),length=None,**params):
         """
