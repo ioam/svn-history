@@ -446,7 +446,11 @@ class AttributeTrackingOF(OutputFnWithState):
     Updating of the tracked values can be disabled temporarily using
     the plastic parameter.
     """
-    
+
+    # ALERT: Need to make this read-only, because it can't be changed
+    # after instantiation unless _object is also changed.  Or else
+    # need to make _object update whenever object is changed and
+    # _object has already been set.
     object = Parameter(default=None, doc="""
         ParameterizedObject instance whose parameters will be tracked.
 
