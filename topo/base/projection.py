@@ -188,15 +188,15 @@ class Projection(EPConnection):
         default=IdentityOF(),
         doc='Function applied to the Projection activity after it is computed.')
 
-    updating = BooleanParameter(default=True, doc="""
+    plastic = BooleanParameter(default=True, doc="""
         Whether or not to update the internal state on each call.
-        Allows updating to be turned off during analysis, and then re-enabled.""")
+        Allows plasticity to be turned off during analysis, and then re-enabled.""")
 
        
     def __init__(self,**params):
         super(Projection,self).__init__(**params)
         self.activity = array(self.dest.activity)
-        self._updating_state = []
+        self._plasticity_setting_stack = []
 
         
     def activate(self,input_activity):
@@ -232,10 +232,10 @@ class Projection(EPConnection):
         pass
 
 
-    # JABALERT: Should this be renamed disable_plasticity (and restore_plasticity)?
-    def stop_updating(self):
+  
+    def disable_plasticity(self):
         """
-        Temporarily disable updating of medium and long term internal state.
+        Temporarily disable plasticity of medium and long term internal state.
 
         This function should be implemented by all subclasses so that
         it preserves the ability of the Projection to compute
@@ -254,24 +254,24 @@ class Projection(EPConnection):
         those affecting only the current activity level, should not
         be affected by this call.
 
-        By default, this call simply calls stop_updating() on the
+        By default, this call simply calls disable_plasticity() on the
         Projection's output_fn.
         """
-        self._updating_state.append(self.updating)
-        self.updating=False
-        self.output_fn.stop_updating()
+        self._plasticity_setting_stack.append(self.plastic)
+        self.plastic=False
+        self.output_fn.disable_plasticity()
       
 
-    def restore_updating(self):
+    def restore_plasticity(self):
         """
-        Re-enable updating of medium and long term internal state after a stop_updating call.
+        Re-enable plasticity of medium and long term internal state after a disable_plasticity call.
 
         This function should be implemented by all subclasses to
-        remove the effect of the most recent stop_updating call,
+        remove the effect of the most recent disable_plasticity call,
         i.e. to reenable plasticity of any type that was disabled.
         """
-        self.updating = self._updating_state.pop()
-        self.output_fn.restore_updating()
+        self.plastic = self._plasticity_setting_stack.pop()
+        self.output_fn.restore_plasticity()
 
 
 
@@ -446,7 +446,7 @@ class ProjectionSheet(Sheet):
         if self.new_input:
             self.activate()
             self.new_input = False
-            if self.learning:
+            if self.plastic:
                 self.learn()
 
 
@@ -498,9 +498,9 @@ class ProjectionSheet(Sheet):
             raise KeyError(name)
 
 
-    def stop_updating(self):
+    def disable_plasticity(self):
         """
-        Temporarily disable updating of medium and long term internal state.
+        Temporarily disable plasticity of medium and long term internal state.
 
         This function should be implemented by all subclasses so that
         it preserves the ability of the ProjectionSheet to compute
@@ -511,27 +511,27 @@ class ProjectionSheet(Sheet):
         those affecting only the current activity level, should not
         be affected by this call.
 
-        By default, calls stop_updating() on the ProjectionSheet's
+        By default, calls disable_plasticity() on the ProjectionSheet's
         output_fn and all of its incoming Projections, and also
-        enables the learning parameter for this ProjectionSheet.
-        The old value of the learning parameter is saved to an
-        internal stack to be restored by restore_updating().
+        enables the plastic parameter for this ProjectionSheet.
+        The old value of the plastic parameter is saved to an
+        internal stack to be restored by restore_plasticity().
         """
         
-        super(ProjectionSheet,self).stop_updating()
-        self.output_fn.stop_updating()
+        super(ProjectionSheet,self).disable_plasticity()
+        self.output_fn.disable_plasticity()
         for proj in self.in_connections:
-            # Could instead check for a stop_updating method
+            # Could instead check for a disable_plasticity method
             if isinstance(proj,Projection):
-                proj.stop_updating()
+                proj.disable_plasticity()
 
 
-    def restore_updating(self):
-        super(ProjectionSheet,self).restore_updating()
-        self.output_fn.restore_updating()
+    def restore_plasticity(self):
+        super(ProjectionSheet,self).restore_plasticity()
+        self.output_fn.restore_plasticity()
         for proj in self.in_connections:
             if isinstance(proj,Projection):
-                proj.restore_updating()
+                proj.restore_plasticity()
         
     
 

@@ -213,12 +213,12 @@ class LISSOM(JointNormalizingCFSheet):
                 # external event arrives.
                 self.activation_count = 0
                 self.new_iteration = True # used by input_event when it is called
-                if (self.learning and not self.continuous_learning):
+                if (self.plastic and not self.continuous_learning):
                     self.learn()
             else:
                 self.activate()
                 self.activation_count += 1
-                if (self.learning and self.continuous_learning):
+                if (self.plastic and self.continuous_learning):
                    self.learn()
                    
 
@@ -249,7 +249,7 @@ class JointNormalizingCFSheet_Continuous(JointNormalizingCFSheet):
     def process_current_time(self):
         if(float(topo.sim.time()) % 1.0 == 0.0):
             #self.activate()
-            if (self.learning):
+            if (self.plastic):
                  self.learn()
         else:
              self.activate()
@@ -277,7 +277,7 @@ class JointScaling(LISSOM):
 
     # JABALERT: I cannot parse the docstring; is it an activity or a learning rate?
     target_lr = Number(default=0.045, doc="""
-        Target average activity for jointly scaled projections for scaling learning rate.""")
+        Target average activity for jointly scaled projections used for calculating a learning rate scaling factor.""")
     
     smoothing = Number(default=0.999, doc="""
         Influence of previous activity, relative to current, for computing the average.""")
@@ -299,7 +299,7 @@ class JointScaling(LISSOM):
         overridden by a subclass to calculate the factors differently.
         """
       
-        if self.learning:
+        if self.plastic:
             self.sf *=0.0
             self.lr_sf *=0.0
             self.sf += self.target/self.x_avg

@@ -41,29 +41,29 @@ class OutputFn(ParameterizedObject):
         assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
         return PipelineOF(output_fns=[self,of])
 
-    def stop_updating(self):
+    def disable_plasticity(self):
         """
-        Temporarily disable updating of internal state.
+        Temporarily disable plasticity of internal state.
 
         This function should be implemented by all subclasses so that
         after a call, the output should always be the same for any
         given input pattern, and no call should have any effect that
-        persists after a restore_updating() call.
+        persists after a restore_plasticity() call.
         
-        By default, simply saves a copy of the learning flag to an
+        By default, simply saves a copy of the plastic flag to an
         internal stack (so that it can be restored by
-        restore_updating()), and then sets learning to False.
+        restore_plasticity()), and then sets plastic to False.
         """
         pass
 
-    def restore_updating(self):
+    def restore_plasticity(self):
         """
-        Re-enable updating of internal state after a stop_updating call.
+        Re-enable plasticity of internal state after a disable_plasticity call.
 
         This function should be implemented by all subclasses to
-        remove the effect of the most recent stop_updating call,
+        remove the effect of the most recent disable_plasticity call,
         i.e. to reenable changes to the internal state, without any
-        lasting effect during the time that updating was disabled.
+        lasting effect during the time that plasticity was disabled.
         """
         pass    
 
@@ -103,69 +103,69 @@ class PipelineOF(OutputFn):
         assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
         self.output_fns.append(of)
 
-    def stop_updating(self):
-        """Call the stop_updating function for each output_fn."""
+    def disable_plasticity(self):
+        """Call the disable_plasticity function for each output_fn."""
         
         for of in self.output_fns:
-            of.stop_updating()
+            of.disable_plasticity()
         
-    def restore_updating(self):
-        """Call the restore_updating function for each output_fn."""
+    def restore_plasticity(self):
+        """Call the restore_plasticity function for each output_fn."""
 
         for of in self.output_fns:
-            of.restore_updating()
+            of.restore_plasticity()
 
 
 
 class OutputFnWithState(OutputFn):
     """
-    Abstract base class for OutputFns that need to maintain a self.updating parameter.
+    Abstract base class for OutputFns that need to maintain a self.plastic parameter.
 
     These OutputFns typically maintain some form of internal history
     or other state from previous calls, which can be disabled by
-    stop_updating().
+    disable_plasticity().
     """
 
-    updating = BooleanParameter(default=True, doc="""
+    plastic = BooleanParameter(default=True, doc="""
         Whether or not to update the internal state on each call.
-        Allows updating to be turned off during analysis, and then re-enabled.""")
+        Allows plasticity to be turned off during analysis, and then re-enabled.""")
 
 
     def __init__(self,**params):
         super(OutputFnWithState,self).__init__(**params)
-        self._updating_state = []
+        self._plasticity_setting_stack = []
 
 
-    def stop_updating(self):
+    def disable_plasticity(self):
         """
-        Temporarily disable updating of internal state.
+        Temporarily disable plasticity of internal state.
 
         This function should be implemented by all subclasses so that
         after a call, the output should always be the same for any
         given input pattern, and no call should have any effect that
-        persists after a restore_updating() call.
+        persists after a restore_plasticity() call.
         
-        By default, simply saves a copy of the learning flag to an
+        By default, simply saves a copy of the plastic flag to an
         internal stack (so that it can be restored by
-        restore_updating()), and then sets the updating parameter to False.
+        restore_plasticity()), and then sets the plastic parameter to False.
         """
-        self._updating_state.append(self.updating)
-        self.updating=False
+        self._plasticity_setting_stack.append(self.plastic)
+        self.plastic=False
 
 
-    def restore_updating(self):
+    def restore_plasticity(self):
         """
-        Re-enable updating of internal state after a stop_updating call.
+        Re-enable plasticity of internal state after a disable_plasticity call.
 
         This function should be implemented by all subclasses to
-        remove the effect of the most recent stop_updating call,
+        remove the effect of the most recent disable_plasticity call,
         i.e. to reenable changes to the internal state, without any
-        lasting effect during the time that updating was disabled.
+        lasting effect during the time that plasticity was disabled.
 
         By default, simply restores the last saved value of the
-        updating parameter.
+        plastic parameter.
         """
-        self.updating = self._updating_state.pop()                        
+        self.plastic = self._plasticity_setting_stack.pop()                        
 
 
 

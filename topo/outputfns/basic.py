@@ -444,7 +444,7 @@ class AttributeTrackingOF(OutputFnWithState):
     at time t, values['x'][(0,0)]=(t,v).
 
     Updating of the tracked values can be disabled temporarily using
-    the updating parameter.
+    the plastic parameter.
     """
     
     object = Parameter(default=None, doc="""
@@ -482,7 +482,7 @@ class AttributeTrackingOF(OutputFnWithState):
          
         
     def __call__(self,x):
-        if self.updating:
+        if self.plastic:
             if self._object==None:
                 if isinstance(self.object,str):
                     self._object=eval(self.object)
@@ -514,7 +514,7 @@ class ActivityAveragingOF(OutputFnWithState):
     The degree of weighing for the previous values is expressed as a
     constant smoothing factor.
 
-    The updating parameter allows the updating of the average values
+    The plastic parameter allows the updating of the average values
     to be disabled temporarily, e.g. while presenting test patterns.
     """
 
@@ -541,7 +541,7 @@ class ActivityAveragingOF(OutputFnWithState):
             self.x_avg=self.initial_average*ones(x.shape, activity_type)         
 
         # Collect values on each appropriate step
-        if self.updating:
+        if self.plastic:
             self.n_step += 1
             if self.n_step == self.step:
                 self.n_step = 0
@@ -559,7 +559,7 @@ class HomeostaticMaxEnt(OutputFnWithState):
     distribution of firing rates (for the maximum possible entropy).
     
     Note that this OutputFn has state, so the history of calls to it
-    will affect future behavior.  The updating parameter can be used
+    will affect future behavior.  The plastic parameter can be used
     to disable changes to the state.
     
     Also calculates average activity as useful debugging information,
@@ -598,7 +598,7 @@ class HomeostaticMaxEnt(OutputFnWithState):
         x *= 0.0
 	x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
 
-        if self.updating:
+        if self.plastic:
 
             self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg #Calculate average for use in debugging only
 
@@ -618,7 +618,7 @@ class ScalingOF(OutputFnWithState):
     x_avg is greater than the target, and multiplies the input
     activity by this scaling factor.
 
-    The updating parameter allows the updating of the average values
+    The plastic parameter allows the updating of the average values
     to be disabled temporarily, e.g. while presenting test patterns.
     """
     
@@ -647,7 +647,7 @@ class ScalingOF(OutputFnWithState):
             self.sf=ones(x.shape, activity_type)
 
         # Collect values on each appropriate step
-        if self.updating:
+        if self.plastic:
             self.n_step += 1
             if self.n_step == self.step:
                 self.n_step = 0

@@ -202,7 +202,7 @@ class PatternPresenter(ParameterizedObject):
         wipe_out_activity()
         topo.sim.event_clear(EPConnectionEvent)
             
-        pattern_present(inputs, self.duration, learning=False,
+        pattern_present(inputs, self.duration, plastic=False,
                      apply_output_fn=self.apply_output_fn)
 
 

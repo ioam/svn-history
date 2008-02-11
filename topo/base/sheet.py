@@ -71,7 +71,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
             """)
     
     # JABALERT: Should be set per-projection, not per-Sheet, right?
-    learning = BooleanParameter(True,
+    plastic = BooleanParameter(True,
         doc="""
             Setting this to False tells the Sheet not to change its
             permanent state (e.g. any connection weights) based on
@@ -110,9 +110,9 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         # setup the activity matrix
         self.activity = zeros(self.shape,activity_type)
 
-        # For non-learning inputs
+        # For non-plastic inputs
         self.__saved_activity = []
-        self._updating_state = []  
+        self._plasticity_setting_stack = []  
 
         ### JABALERT: Should perhaps rename this to view_dict
         self.sheet_views = {}
@@ -173,7 +173,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
 
         Note that Sheets that do learning need not save the
         values of all connection weights, if any, because
-        learning can be turned off explicitly.  Thus this method
+        plasticity can be turned off explicitly.  Thus this method
         is intended only for shorter-term state.
         """
         self.__saved_activity.append(array(self.activity))
@@ -193,9 +193,9 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         return len(self.__saved_activity)
 
 
-    def stop_updating(self):
+    def disable_plasticity(self):
         """
-        Temporarily disable updating of medium and long term internal state.
+        Temporarily disable plasticity of medium and long term internal state.
 
         This function should be implemented by all subclasses so that
         it preserves the ability of the Sheet to compute activity,
@@ -206,23 +206,23 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         those affecting only the current activity level, should not
         be affected by this call.
 
-        By default, simply saves a copy of the learning flag to an
+        By default, simply saves a copy of the plastic flag to an
         internal stack (so that it can be restored by
-        restore_updating()), and then sets learning to False.
+        restore_plasticity()), and then sets plastic to False.
         """
-        self._updating_state.append(self.learning)
-        self.learning=False
+        self._plasticity_setting_stack.append(self.plastic)
+        self.plastic=False
 
 
-    def restore_updating(self):
+    def restore_plasticity(self):
         """
-        Re-enable updating of medium and long term internal state after a stop_updating call.
+        Re-enable plasticity of medium and long term internal state after a disable_plasticity call.
 
         This function should be implemented by all subclasses to
-        remove the effect of the most recent stop_updating call,
+        remove the effect of the most recent disable_plasticity call,
         i.e. to reenable plasticity of any type that was disabled.
         """
-        self.learning = self._updating_state.pop()
+        self.plastic = self._plasticity_setting_stack.pop()
 
 
 

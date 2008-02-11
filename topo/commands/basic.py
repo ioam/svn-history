@@ -53,7 +53,7 @@ def restore_input_generators():
         sheet.pop_input_generator()
 
 
-def pattern_present(inputs={},duration=1.0,learning=False,overwrite_previous=False,apply_output_fn=True):
+def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=False,apply_output_fn=True):
     """
     Present the specified test patterns for the specified duration.
 
@@ -73,8 +73,8 @@ def pattern_present(inputs={},duration=1.0,learning=False,overwrite_previous=Fal
     If overwrite_previous is true, the given inputs overwrite those
     previously defined.
 
-    If learning is False, overwrites the existing values of Sheet.learning
-    to disable learning, then reenables learning.
+    If plastic is False, overwrites the existing values of Sheet.plastic
+    to disable plasticity, then reenables plasticity.
     """
     # ensure EPs get started (if pattern_present is called before the simulation is run())
     topo.sim.run(0.0) 
@@ -83,11 +83,10 @@ def pattern_present(inputs={},duration=1.0,learning=False,overwrite_previous=Fal
     if not overwrite_previous:
         save_input_generators()
 
-    if not learning:
-        # turn off learning and plasticity everywhere
-        # Could move this to a command disable_plasticity
+    if not plastic:
+        # turn off plasticity everywhere
         for sheet in topo.sim.objects(Sheet).values():
-             sheet.stop_updating()
+             sheet.disable_plasticity()
 
     if not apply_output_fn:
         for each in topo.sim.objects(Sheet).values():
@@ -107,11 +106,11 @@ def pattern_present(inputs={},duration=1.0,learning=False,overwrite_previous=Fal
     topo.sim.run(duration) 
     topo.sim.event_pop()
 
-    # turn sheets' updating and output_fn updating back on if we turned it off before
+    # turn sheets' plasticity and output_fn plasticity back on if we turned it off before
 
-    if not learning:
+    if not plastic:
         for sheet in topo.sim.objects(Sheet).values():
-            sheet.restore_updating()
+            sheet.restore_plasticity()
           
     if not apply_output_fn:
         for each in topo.sim.objects(Sheet).values():

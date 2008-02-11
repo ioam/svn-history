@@ -201,7 +201,7 @@ class ScaledCFProjection(CFProjection):
     activity.  This average is then used to calculate scaling factors
     for the current activity and for the learning rate.
 
-    The updating parameter can be used to turn off updating of the average
+    The plastic parameter can be used to turn off updating of the average
     activity, e.g. during map measurement.
     """
 
@@ -232,7 +232,7 @@ class ScaledCFProjection(CFProjection):
         overridden by a subclass to calculate the factors differently.
         """
       
-        if self.updating:
+        if self.plastic:
             self.sf *=0.0
             self.lr_sf *=0.0
             self.sf += self.target/self.x_avg
