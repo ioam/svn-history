@@ -96,7 +96,7 @@ class ParameterMetaclass(type):
     """
     Metaclass allowing control over creation of Parameter classes.
     """
-    def __new__(meta,classname,bases,classdict):
+    def __new__(meta,classname,bases,classdict):        
         # store the class's docstring in __classdoc
         if '__doc__' in classdict:
             classdict['__classdoc']=classdict['__doc__']
@@ -255,8 +255,10 @@ class Parameter(object):
     # attributes.  Using __slots__ requires special support for
     # operations to copy and restore Parameters (e.g. for Python
     # persistent storage pickling); see __getstate__ and __setstate__.
-    __slots__ = ['_attrib_name','_internal_name','default',
-                 'doc','precedence','instantiate','constant']
+    __slots__ = ['_attrib_name','_internal_name','default','doc',
+                 'precedence','instantiate','constant','objtype']
+
+    # 'objtype' should really be 'owning_class' (or similar)
 
     def __init__(self,default=None,doc=None,precedence=None,  # pylint: disable-msg=R0913
                  instantiate=False,constant=False): 
@@ -276,6 +278,7 @@ class Parameter(object):
         inheritance of Parameter slots (attributes) from the owning-class'
         class hierarchy (see ParameterizedObjectMetaclass).
         """
+        self.objtype=None
         self._attrib_name = None  # used to cache attrib_name
         self._internal_name = None
         self.precedence = precedence
@@ -283,6 +286,15 @@ class Parameter(object):
         self.doc = doc
         self.constant = constant
         self._set_instantiate(instantiate)
+
+    # CB: need to make it clear that a parameter *must* be declared
+    # in a ParameterizedObject, and nothing else.
+    def _set_objtype(self,objtype):
+        # When created, a Parameter does not know which ParameterizedObject class
+        # owns it. This method allows the ParameterizedObjectMetaclass to set the
+        # Parameter's owner.
+        self.objtype=objtype
+        self._set_names(objtype)
 
 
     def _set_instantiate(self,instantiate):
@@ -308,8 +320,7 @@ class Parameter(object):
         if not obj:
             result = self.default
         else:
-            # look for _internal name first, to avoid another method call if possible
-            result = obj.__dict__.get(self._internal_name or self.internal_name(obj),self.default)
+            result = obj.__dict__.get(self._internal_name,self.default)
         return result
         
 
@@ -340,71 +351,34 @@ class Parameter(object):
             if not obj:
                 self.default = val
             elif not obj.initialized:
-                obj.__dict__[self.internal_name(obj)] = val
+                obj.__dict__[self._internal_name] = val
             else:
-                raise TypeError("Constant parameter '%s' cannot be modified"%self.attrib_name(obj))
+                raise TypeError("Constant parameter '%s' cannot be modified"%self._attrib_name)
 
         else:
             if not obj:
                 self.default = val
             else:
-                obj.__dict__[self.internal_name(obj)] = val
+                obj.__dict__[self._internal_name] = val
                 
 
     def __delete__(self,obj):
-        raise TypeError("Cannot delete '%s': Parameters deletion not allowed."%self.attrib_name(obj))
+        raise TypeError("Cannot delete '%s': Parameters deletion not allowed."%self._attrib_name)
 
 
-    def internal_name(self,obj):
+    def _set_names(self,objtype):
         """
-        Return the internal name (e.g. _X_param_name for attrib_name
-        X) that the specified ParameterizedObject instance has (or
-        would have*) for this parameter.
-
-        * if the Parameter has not actually been set on ths instance,
-        then internal_name will not be in the instance's __dict__
+        Store the name of the attribute this Parameter is
+        representing, and store the Parameter's internal_name.
         """
-        return self._internal_name or '_%s_param_value'%self.attrib_name(obj,None)
-
-
-    def attrib_name(self,obj=None,objtype=None):
-        """
-        Return the attribute name represented by this Parameter.
-        
-        Guarantees to return the attrib_name if at least one of obj
-        and objtype is supplied; if neither obj nor objtype is
-        supplied, and _discover_attrib_name has not previously been
-        called successfully, an empty string will be returned.
-        """
-        return self._attrib_name or self._discover_attrib_name(obj,objtype)
-
-
-    def _discover_attrib_name(self,obj,objtype):
-        """
-        Discover the name of the attribute this Parameter is
-        representing (and cache a successful result in _attrib_name).
-
-        Guarantees to return the attrib_name if at least one of obj
-        and objtype is supplied; if neither obj nor objtype is
-        supplied, an empty string will be returned.
-        """
-        # The parameter object itself does not initially know the name
-        # of the attribute that it is representing, but it can discover
-        # that name by looking for itself in the owning class hierarchy.
-
-        if obj and not objtype: objtype = type(obj)
-
-        classes = classlist(objtype)[::-1]
-        for class_ in classes:
-            for attrib_name in dir(class_):
-                if hasattr(class_,'get_param_descriptor'):
-                    desc = class_.get_param_descriptor(attrib_name)[0]
-                    if desc is self:
-                        self._attrib_name = attrib_name
-                        self._internal_name = "_%s_param_value"%attrib_name
-                        return attrib_name
-                    
-        return '' # could maybe rewrite this method so it's clearer
+        for attrib_name in dir(objtype):
+            if hasattr(objtype,'get_param_descriptor'):
+                desc = objtype.get_param_descriptor(attrib_name)[0]
+                if desc is self:
+                    self._attrib_name = attrib_name
+                    self._internal_name = "_%s_param_value"%attrib_name
+                    return
+        assert False # CB: how to write this more clearly? 
     
 
     def __getstate__(self):
@@ -435,7 +409,6 @@ class Parameter(object):
         if 'hidden' in state:
             state['precedence']=-1
             del state['hidden']
-            
 
         for (k,v) in state.items():
             setattr(self,k,v)    
@@ -481,6 +454,8 @@ class ParameterizedObjectMetaclass(type):
                       if isinstance(obj,Parameter)]
         
         for param_name,param in parameters:
+            # parameter doesn't know owning class, so mcs sets it (see set_objtype)
+            param._set_objtype(mcs)
             mcs.__param_inheritance(param_name,param)
 
 
@@ -579,21 +554,8 @@ class ParameterizedObjectMetaclass(type):
             if hasattr(p_class,'__slots__'):
                 slots.update(dict.fromkeys(p_class.__slots__))
 
-        # This is to make CompositeParameter.__set__ work
-        # properly. Unlike __get__, the __set__ method of an attribute
-        # descriptor doesn't get passed any indication of what class
-        # it belongs to, when called without an instance.  In order
-        # for CompositeParameter.__set__ to work, it needs to know
-        # what class the Parameter belongs to. This code looks finds
-        # any parameter with a slot named 'objtype' and sets the
-        # slot's value to the current type (i.e. mcs).
-        # JPALERT: This feels hackish.  Not sure if there's a better
-        # way.  On the other hand, this mechanism might be useful for
-        # other parameters too.
-        if 'objtype' in slots:
-            setattr(param,'objtype',mcs)
-            del slots['objtype']
-            
+        # objtype is already handled
+        del slots['objtype'] 
 
         for slot in slots.keys():
             superclasses = iter(classlist(mcs)[::-1])
@@ -877,7 +839,7 @@ class ParameterizedObject(object):
                 # ParameterizedObject.)
                 if isinstance(v,Parameter) and v.instantiate and k!="name":
                     new_object = copy.deepcopy(v.default)
-                    self.__dict__[v.internal_name(self)]=new_object
+                    self.__dict__[v._internal_name]=new_object
 
                     # a new ParameterizedObject needs a new name
                     # CEBHACKALERT: this will write over any name given

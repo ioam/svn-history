@@ -339,7 +339,7 @@ class Number(Dynamic):
         # CEB: all the following error messages should probably print out the parameter's name
         # ('x', 'theta', or whatever)
         if not (is_number(val)):
-            raise ValueError("Parameter " + `self.attrib_name()` + " (" + `self.__class__.__name__` +
+            raise ValueError("Parameter " + `self._attrib_name` + " (" + `self.__class__.__name__` +
                              ") only takes a numeric value; " + `type(val)` + " is not numeric.")
 
         if self.bounds!=None:
@@ -524,7 +524,7 @@ class CompositeParameter(Parameter):
     attributes sets all the constituents
     """
 
-    __slots__=['attribs','objtype']
+    __slots__=['attribs']
 
     def __init__(self,attribs=[],**kw):
         super(CompositeParameter,self).__init__(default=None,**kw)
@@ -543,7 +543,7 @@ class CompositeParameter(Parameter):
         """
         Set the values of all the attribs.
         """
-        assert len(val) == len(self.attribs),"Compound parameter %s got the wrong number of values (needed %d, but got %d)." % (self.attrib_name(obj=obj),len(self.attribs),len(val))
+        assert len(val) == len(self.attribs),"Compound parameter %s got the wrong number of values (needed %d, but got %d)." % (self._attrib_name,len(self.attribs),len(val))
         
         if not obj:
             for a,v in zip(self.attribs,val):
@@ -586,7 +586,7 @@ class ObjectSelectorParameter(SelectorParameter):
         """
         if val is not None and val not in self.objects:
             raise ValueError("%s not in Parameter %s's list of possible objects" \
-                             %(val,self.attrib_name(obj=obj)))
+                             %(val,self._attrib_name))
 
 # CBNOTE: I think it's not helpful to do a type check for the value of
 # an ObjectSelectorParameter. If we did such type checking, any user
@@ -631,7 +631,7 @@ class ClassSelectorParameter(SelectorParameter):
         val must be None or an instance of self.class_
         """
         if not (isinstance(val,self.class_) or val is None):
-            raise ValueError("Parameter " + `self.attrib_name(obj=obj)` + " (" + \
+            raise ValueError("Parameter " + `self._attrib_name` + " (" + \
                              `self.__class__.__name__` + ") must be an instance of " + \
                              self.class_.__name__ + "; " + `val` + \
                              " is " + `type(val)` + ".")
@@ -700,7 +700,7 @@ class ListParameter(Parameter):
         # CEB: all the following error messages should probably print out the parameter's name
         # ('x', 'theta', or whatever)
         if not (isinstance(val,list)):
-            raise ValueError("Parameter " + `self.attrib_name()` + " (" + `self.__class__.__name__` + ") must be a list.")
+            raise ValueError("Parameter " + `self._attrib_name` + " (" + `self.__class__.__name__` + ") must be a list.")
 
         if self.bounds!=None:
             min_length,max_length = self.bounds
