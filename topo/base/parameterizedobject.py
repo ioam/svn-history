@@ -96,7 +96,7 @@ class ParameterMetaclass(type):
     """
     Metaclass allowing control over creation of Parameter classes.
     """
-    def __new__(meta,classname,bases,classdict):        
+    def __new__(mcs,classname,bases,classdict):        
         # store the class's docstring in __classdoc
         if '__doc__' in classdict:
             classdict['__classdoc']=classdict['__doc__']
@@ -111,7 +111,7 @@ class ParameterMetaclass(type):
         if '__slots__' not in classdict:
             classdict['__slots__']=[]
         
-        return type.__new__(meta,classname,bases,classdict)
+        return type.__new__(mcs,classname,bases,classdict)
 
     def __getattribute__(mcs,name):
         if name=='__doc__':
