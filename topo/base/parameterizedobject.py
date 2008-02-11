@@ -384,12 +384,11 @@ class Parameter(object):
         # The only complication is that a subclass' __slots__ do
         # not contain superclass' __slots__ (the superclass' __slots__
         # end up as attributes of the subclass).
-        classes = [klass for klass in classlist(type(self))
-                   if hasattr(klass,'__slots__')]
+        parent_param_classes = [class_ for class_ in classlist(type(self))[1::]]
         
         all_slots = []
-        for klass in classes:
-            all_slots+=klass.__slots__
+        for class_ in parent_param_classes:
+            all_slots+=class_.__slots__
         
         state = {}
         for slot in all_slots:
@@ -546,9 +545,8 @@ class ParameterizedObjectMetaclass(type):
         # get all relevant slots (i.e. slots defined in all superclasses of
         # this parameter)
         slots = {}
-        for p_class in classlist(type(param)):
-            if hasattr(p_class,'__slots__'): # CEBALERT: should remove this if test
-                slots.update(dict.fromkeys(p_class.__slots__))
+        for p_class in classlist(type(param))[1::]:
+            slots.update(dict.fromkeys(p_class.__slots__))
 
         # Some Parameter classes need to know the owning
         # ParameterizedObjectclass. Such classes can declare an
