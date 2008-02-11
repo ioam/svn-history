@@ -175,13 +175,12 @@ def load_snapshot(snapshot_name):
     # unpickling the PicklableClassAttributes() executes startup_commands and
     # sets PO class parameters.
 
-    snapshot = gzip.open(snapshot_name,'r')
-
     # If it's not gzipped, open as a normal file.
     try:
+        snapshot = gzip.open(snapshot_name,'r')
         snapshot.read(1)
         snapshot.seek(0)
-    except IOError:
+    except (IOError,NameError):
         snapshot = open(snapshot_name,'r')
 
     # If it's not xml, open as a normal pickle.
