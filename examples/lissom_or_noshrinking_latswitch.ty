@@ -82,7 +82,7 @@ class Activity_based(CFPResponseFn):
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
-                r1,r2,c1,c2 = cf.slice_array
+                r1,r2,c1,c2 = cf.input_sheet_slice
                 X = input_activity[r1:r2,c1:c2]
                 activity[r,c] =  strength_fn(X,cf.weights,self.l, self.u, self.m, self.r, self.b)
 
