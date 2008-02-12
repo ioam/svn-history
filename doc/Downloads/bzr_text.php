@@ -60,6 +60,15 @@ bzr whoami "Your Name <user@address.ext>"
 can update your own branch with changes committed to Topographica's
 trunk:
 <pre>
+$ bzr merge
+Merging from remembered location http://bazaar.launchpad.net/~vcs-imports/topographica/trunk/
+ M  topographica/examples/lissom_or_noshrinking.ty
+All changes applied successfully.
+
+$ bzr commit -m 'Merged changes from SVN trunk.' .
+</pre>
+Or, if your copy has not diverged from the SVN trunk, you can simply pull the changes:
+<pre>
 $ bzr pull
 Using saved location: http://bazaar.launchpad.net/~vcs-imports/topographica/trunk/
 +N  topographica/doc/Downloads/bzr_text.php
@@ -69,7 +78,7 @@ Using saved location: http://bazaar.launchpad.net/~vcs-imports/topographica/trun
 All changes applied successfully.
 Now on revision 7812.
 </pre>
-<!-- why not bzr merge there?-->
+
 
 <P>Once you have done some work, you probably want to make your
 changes publicly visible (currently they exist only on your local
