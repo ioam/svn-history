@@ -27,3 +27,7 @@ bzr branch http://bazaar.launchpad.net/~vcs-imports/topographica/trunk
 </pre>
 
 
+
+Notes:
+* launchpad branch can be 6-24 hours behind sf.net trunk
+* talk about how launchpad user can publish his/her own branch of topographica
