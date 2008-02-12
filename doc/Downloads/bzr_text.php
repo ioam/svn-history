@@ -42,7 +42,7 @@ Topographica. To do this, simply follow the XXXX svn build instructions
 for your platform.
 
 
-<H3>Working with your Bazaar Topographica repository.</H3>
+<H3>Working with branch</H3>
 
 <P>Now that you have your own branch, you are free to work with it
 however you wish.  You can commit changes whether or not you are a
@@ -53,7 +53,7 @@ requires network access.
 <P>Before committing for the first time, you should inform bzr who you
 are, so that changes are attributed to the correct username:
 <pre>
-bzr whoami "C. Ball <ceball@users.sf.net>"
+bzr whoami "Your Name <user@address.ext>"
 </pre>
 
 <P>To stay up to date with the SVN version of Topographica, you
