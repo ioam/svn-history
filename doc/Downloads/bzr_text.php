@@ -3,6 +3,10 @@
 <P>**These instructions are not finished, and probably contain errors**
 me in URLs works if you're logged into launchpad.
 
+big note: does bzr support limiting how much history to take when branching?
+otherwise branches are going to be unnecessarily big...who wants topo history
+back to the start when working on a new branch?!
+
 <P><A HREF="http://bazaar-vcs.org/">Bazaar</A> (bzr) is a
 distributed version control system. Something something something.
 
@@ -13,9 +17,10 @@ trunk over time. Starting from this branch is an easy way for anyone
 (registered Topographica developer or not) to develop a particular
 feature.
 
+<P>launchpad mirror branch can be 6-24 hours behind sf.net trunk
+
 <!--
-<P>Alternatively, you yourself can make your own branch of Topographica's SVN trunk
-using bzr... probably "bzr branch $TOPOROOT/trunk" or similar.
+<P>Alternatively, you yourself are free to make your own branch of Topographica's SVN trunk using bzr... probably "bzr branch $TOPOROOT/trunk" or similar after installing bzr-svn. Will be difficult unless you can limit amount of history to import.
 -->
 
 <P>Our trunk bzr branch is hosted by <A
@@ -42,7 +47,7 @@ Topographica. To do this, simply follow the XXXX svn build instructions
 for your platform.
 
 
-<H3>Working with branch</H3>
+<H3>Working with your Bazaar branch</H3>
 
 <P>Now that you have your own branch, you are free to work with it
 however you wish.  You can commit changes whether or not you are a
@@ -65,8 +70,14 @@ Merging from remembered location http://bazaar.launchpad.net/~vcs-imports/topogr
  M  topographica/examples/lissom_or_noshrinking.ty
 All changes applied successfully.
 
+$ bzr diff
+# check what changed
+
 $ bzr commit -m 'Merged changes from SVN trunk.' .
 </pre>
+
+
+<!--
 Or, if your copy has not diverged from the SVN trunk, you can simply pull the changes:
 <pre>
 $ bzr pull
@@ -78,13 +89,20 @@ Using saved location: http://bazaar.launchpad.net/~vcs-imports/topographica/trun
 All changes applied successfully.
 Now on revision 7812.
 </pre>
+-->
 
+<P>Note that if you also merge changes from other branches, you should 
+specify the branch from which to pull/merge. In such cases, the merge command
+above would become:
+<pre>
+$ bzr merge http://bazaar.launchpad.net/~vcs-imports/topographica/trunk/
+</pre>
 
 <P>Once you have done some work, you probably want to make your
 changes publicly visible (currently they exist only on your local
 copy).  To do this, you have two options. The first is simply to
-publish your own branch, and the second is to 'push' your changes to
-the Topographica SVN repository (for which you need to be a
+publish your own branch somewhere; the second is to 'push' your
+changes to the Topographica SVN repository (for which you need to be a
 Topographica developer).
 
 
@@ -131,16 +149,49 @@ copy downloaded,unpacked dir to ~/.bazaar/plugins
 bzr push ...
 
 
-<!--
-add team branch section
--->
+<H4>Launchpad.net team branches</H4>
+
+We have a launchpad team: topographica-developers XXXX URL.
+Team branches explained at https://help.launchpad.net/FeatureHighlights/TeamBranches
+allows workflow similar to SVN's. Use this kind of branch to collaborate on a new
+feature or fix.
+
+<H5>Branch creation</H5>
+
+<P>From the bzr branch you wish to publish, type:
+<pre>
+bzr push bzr+ssh://cball@bazaar.launchpad.net/~topographica-developers/topographica/branch-name
+</pre>
+
+Note that this can take a while.
+
+<H5>Getting branch</H5>
+
+<P>As recommended by launchpad, we suggest collaborators each make a checkout (rahter than a branch) of the code:
+
+<pre>
+bzr checkout bzr+ssh://user@bazaar.launchpad.net/~topographica-developers/topographica/branch-name
+</pre>
+
+This means you don't get all the history in your local copy, and therefore you can't commit locally. 
+
+If you prefer, you could instead <code>bzr branch</code> from (rather than <code>checkout</code>) this branch, work on your own, and then <code>bzr push</code> your updates back to the team branch's location. 
+
+
+Alternatively, you could combine the two approaches: <code>bzr checkout branch-name</code>, and then <code>bzr branch</code> that to get a local branch. You would be able to commit to this local branch, and have full revision control. After finishing some task, you could then <code>bzr merge</code> your local branch changes into your checked-out copy of <code>branch-name</code>, and then <code>bzr commit</code> the changes to the launchpad server.
+
+
+
 
 Notes:
-* launchpad branch can be 6-24 hours behind sf.net trunk
+* any way to get emails for team branch commits? (how to get emails at all...)
+* general info about branching with lp https://help.launchpad.net/FeatureHighlights/EasyBranching
+* bzr/git+svn http://info.wsisiz.edu.pl/~blizinsk/git-bzr.html
 
-+How we could replace subverion with a central, team bzr branch:
-https://help.launchpad.net/FeatureHighlights/TeamBranches
-no need for everyone to checkout whole history
+https://help.launchpad.net/CreatingAHostedBranch
+
+http://wiki.list.org/display/DEV/MailmanOnLaunchpad
+
 
 
 
