@@ -208,7 +208,8 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
 
         By default, simply saves a copy of the plastic flag to an
         internal stack (so that it can be restored by
-        restore_plasticity_state()), and then sets plastic to new_plasticity_state.
+        restore_plasticity_state()), and then sets plastic to
+        new_plasticity_state.
         """
         self._plasticity_setting_stack.append(self.plastic)
         self.plastic=new_plasticity_state
@@ -221,7 +222,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
 
         This function should be implemented by all subclasses to
         remove the effect of the most recent override_plasticity_state call,
-        i.e. to restore state plasticity of any type that was overridden.
+        i.e. to restore plasticity of any type that was overridden.
         """
         self.plastic = self._plasticity_setting_stack.pop()
 

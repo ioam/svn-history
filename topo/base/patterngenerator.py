@@ -27,9 +27,11 @@ from sheetcoords import SheetCoordinateSystem
 # them be used like the current ones.
 # (PatternGenerator-->TwoDPatternGenerator?)
 
-#JLALERT PatternGenerator should have override_plasticity_state/restore_plasticty_state
-#functions which can override the plasticity of any output_fn which has state.
-#Will also need to support Composite patterns.
+# JLALERT: PatternGenerator should have
+# override_plasticity_state/restore_plasticity_state functions which
+# can override the plasticity of any output_fn that has state, in case
+# anyone ever uses such an object in a PatternGenerator.  Will also
+# need to support Composite patterns.
 
 class PatternGenerator(ParameterizedObject):
     """

@@ -245,19 +245,23 @@ class Projection(EPConnection):
 
         For instance, if new_plasticity_state is False, in a
         Projection with modifiable connection weights, the values of
-        those weights should be made fixed and unchanging after this call.
-        For a Projection with automatic normalization, homeostatic plasticity,
-        or other features that depend on a history of events
-        (rather than just the current item being processed),
-        the plasticity state of those processes can be changed temporarily,
-        e.g. to turn plasticity off during map measurement.
+        those weights should temporarily be made fixed and unchanging
+        after this call.  For a Projection with automatic
+        normalization, homeostatic plasticity, or other features that
+        depend on a history of events (rather than just the current
+        item being processed), changes in those properties would be
+        disabled temporarily.  Setting the plasticity state to False
+        is useful during analysis operations (e.g. map measurement)
+        that would otherwise change the state of the underlying
+        network.
 
         Any process that does not have any lasting state, such as
         those affecting only the current activity level, should not
         be affected by this call.
 
-        By default, this call simply calls override_plasticity_state() on the
-        Projection's output_fn.
+        By default, this call simply calls override_plasticity_state()
+        on the Projection's output_fn, and sets the 'plastic'
+        parameter to False.
         """
         self._plasticity_setting_stack.append(self.plastic)
         self.plastic=new_plasticity_state
@@ -266,8 +270,8 @@ class Projection(EPConnection):
 
     def restore_plasticity_state(self):
         """
-        Restore previous plasticity of medium and long term internal
-        state after a override_plasticity_state call.
+        Restore previous plasticity state of medium and long term
+        internal state after a override_plasticity_state call.
 
         This function should be implemented by all subclasses to
         remove the effect of the most recent override_plasticity_state call,
@@ -507,20 +511,21 @@ class ProjectionSheet(Sheet):
         internal state.
 
         This function should be implemented by all subclasses so that
-        it preserves the ability of the ProjectionSheet to compute
-        activity, i.e. to operate over a short time scale, while
-        preventing any lasting changes to the state
-        (if new_plasticiy_state=False).
+        when new_plasticity_state=False, it preserves the ability of
+        the ProjectionSheet to compute activity, i.e. to operate over
+        a short time scale, while preventing any lasting changes to
+        the state.
 
         Any process that does not have any lasting state, such as
         those affecting only the current activity level, should not
         be affected by this call.
 
-        By default, calls override_plasticity_state() on the ProjectionSheet's
-        output_fn and all of its incoming Projections, and also
-        enables the plastic parameter for this ProjectionSheet.
-        The old value of the plastic parameter is saved to an
-        internal stack to be restored by restore_plasticity_state().
+        By default, calls override_plasticity_state() on the
+        ProjectionSheet's output_fn and all of its incoming
+        Projections, and also enables the 'plastic' parameter for this
+        ProjectionSheet.  The old value of the plastic parameter is
+        saved to an internal stack to be restored by
+        restore_plasticity_state().
         """
         
         super(ProjectionSheet,self).override_plasticity_state(new_plasticity_state)

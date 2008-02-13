@@ -18,9 +18,9 @@ from topo.base.parameterclasses import Number, ListParameter, BooleanParameter
 import topo.base.patterngenerator
 import topo.patterns.basic
 
-#JLALERT This sheet should have override_plasticity_state/restore_plasticty_state
-#functions which call override_plasticity_state/restore_plasticty_state on the
-#sheet output_fn and input_generator output_fn.
+# JLALERT: This sheet should have override_plasticity_state/restore_plasticity_state
+# functions that call override_plasticity_state/restore_plasticty_state on the
+# sheet output_fn and input_generator output_fn.
 
 class GeneratorSheet(Sheet):
     """

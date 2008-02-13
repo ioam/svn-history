@@ -47,23 +47,21 @@ class OutputFn(ParameterizedObject):
 
         This function should be implemented by all subclasses so that
         after a call, the output should always be the same for any
-        given input pattern, and no call should have any effect that
-        persists after a restore_plasticity() call.
-        
-        By default, simply saves a copy of the plastic flag to an
-        internal stack (so that it can be restored by
-        restore_plasticity()), and then sets plastic to False.
+        given input pattern (apart from true randomness or other
+        differences that do not depend on an internal state), and no
+        call should have any effect that persists after a subsequent
+        restore_plasticity_state() call.
         """
         pass
 
     def restore_plasticity_state(self):
         """
-        Re-enable plasticity of internal state after a disable_plasticity call.
+        Re-enable plasticity of internal state after an override_plasticity_state call.
 
         This function should be implemented by all subclasses to
-        remove the effect of the most recent disable_plasticity call,
+        remove the effect of the most recent override_plasticity_state call,
         i.e. to reenable changes to the internal state, without any
-        lasting effect during the time that plasticity was disabled.
+        lasting effect from the time during which plasticity was disabled.
         """
         pass    
 
@@ -104,13 +102,13 @@ class PipelineOF(OutputFn):
         self.output_fns.append(of)
 
     def override_plasticity_state(self, new_plasticity_state):
-        """Call the disable_plasticity function for each output_fn."""
+        """Call override_plasticity_state for each output_fn."""
         
         for of in self.output_fns:
             of.override_plasticity_state(new_plasticity_state)
         
     def restore_plasticity_state(self):
-        """Call the restore_plasticity function for each output_fn."""
+        """Call restore_plasticity_state for each output_fn."""
 
         for of in self.output_fns:
             of.restore_plasticity_state()
@@ -123,7 +121,7 @@ class OutputFnWithState(OutputFn):
 
     These OutputFns typically maintain some form of internal history
     or other state from previous calls, which can be disabled by
-    disable_plasticity().
+    override_plasticity_state().
     """
 
     plastic = BooleanParameter(default=True, doc="""
@@ -142,12 +140,15 @@ class OutputFnWithState(OutputFn):
 
         This function should be implemented by all subclasses so that
         after a call, the output should always be the same for any
-        given input pattern, and no call should have any effect that
-        persists after a restore_plasticity() call.
+        given input pattern (apart from true randomness or other
+        differences that do not depend on an internal state), and no
+        call should have any effect that persists after a subsequent
+        restore_plasticity_state() call.
         
-        By default, simply saves a copy of the plastic flag to an
-        internal stack (so that it can be restored by
-        restore_plasticity()), and then sets the plastic parameter to False.
+        By default, simply saves a copy of the 'plastic' parameter to
+        an internal stack (so that it can be restored by
+        restore_plasticity_state()), and then sets the plastic
+        parameter to the given value (True or False).
         """
         self._plasticity_setting_stack.append(self.plastic)
         self.plastic=new_plasticity_state
@@ -155,15 +156,15 @@ class OutputFnWithState(OutputFn):
 
     def restore_plasticity_state(self):
         """
-        Re-enable plasticity of internal state after a disable_plasticity call.
+        Re-enable plasticity of internal state after an override_plasticity_state call.
 
         This function should be implemented by all subclasses to
-        remove the effect of the most recent disable_plasticity call,
+        remove the effect of the most recent override_plasticity_state call,
         i.e. to reenable changes to the internal state, without any
-        lasting effect during the time that plasticity was disabled.
+        lasting effect from the time during which plasticity was disabled.
 
         By default, simply restores the last saved value of the
-        plastic parameter.
+        'plastic' parameter.
         """
         self.plastic = self._plasticity_setting_stack.pop()                        
 
