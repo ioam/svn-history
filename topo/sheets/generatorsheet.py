@@ -18,6 +18,9 @@ from topo.base.parameterclasses import Number, ListParameter, BooleanParameter
 import topo.base.patterngenerator
 import topo.patterns.basic
 
+#JLALERT This sheet should have override_plasticity_state/restore_plasticty_state
+#functions which call override_plasticity_state/restore_plasticty_state on the
+#sheet output_fn and input_generator output_fn.
 
 class GeneratorSheet(Sheet):
     """
@@ -26,7 +29,7 @@ class GeneratorSheet(Sheet):
     Typically generates the patterns by choosing parameters from a
     random distribution, but can use any mechanism.
     """
-    
+
     src_ports=['Activity']
     
     period = Number(default=1,bounds=(0,None),doc=

@@ -41,7 +41,7 @@ class OutputFn(ParameterizedObject):
         assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
         return PipelineOF(output_fns=[self,of])
 
-    def disable_plasticity(self):
+    def override_plasticity_state(self, new_plasticity_state):
         """
         Temporarily disable plasticity of internal state.
 
@@ -56,7 +56,7 @@ class OutputFn(ParameterizedObject):
         """
         pass
 
-    def restore_plasticity(self):
+    def restore_plasticity_state(self):
         """
         Re-enable plasticity of internal state after a disable_plasticity call.
 
@@ -103,17 +103,17 @@ class PipelineOF(OutputFn):
         assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
         self.output_fns.append(of)
 
-    def disable_plasticity(self):
+    def override_plasticity_state(self, new_plasticity_state):
         """Call the disable_plasticity function for each output_fn."""
         
         for of in self.output_fns:
-            of.disable_plasticity()
+            of.override_plasticity_state(new_plasticity_state)
         
-    def restore_plasticity(self):
+    def restore_plasticity_state(self):
         """Call the restore_plasticity function for each output_fn."""
 
         for of in self.output_fns:
-            of.restore_plasticity()
+            of.restore_plasticity_state()
 
 
 
@@ -136,7 +136,7 @@ class OutputFnWithState(OutputFn):
         self._plasticity_setting_stack = []
 
 
-    def disable_plasticity(self):
+    def override_plasticity_state(self, new_plasticity_state):
         """
         Temporarily disable plasticity of internal state.
 
@@ -150,10 +150,10 @@ class OutputFnWithState(OutputFn):
         restore_plasticity()), and then sets the plastic parameter to False.
         """
         self._plasticity_setting_stack.append(self.plastic)
-        self.plastic=False
+        self.plastic=new_plasticity_state
 
 
-    def restore_plasticity(self):
+    def restore_plasticity_state(self):
         """
         Re-enable plasticity of internal state after a disable_plasticity call.
 

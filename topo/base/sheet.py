@@ -193,14 +193,14 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         return len(self.__saved_activity)
 
 
-    def disable_plasticity(self):
+    def override_plasticity_state(self, new_plasticity_state):
         """
-        Temporarily disable plasticity of medium and long term internal state.
+        Temporarily override plasticity of medium and long term internal state.
 
         This function should be implemented by all subclasses so that
         it preserves the ability of the Sheet to compute activity,
         i.e. to operate over a short time scale, while preventing any
-        lasting changes to the state.
+        lasting changes to the state (if new_plasticity_state=False).
 
         Any operation that does not have any lasting state, such as
         those affecting only the current activity level, should not
@@ -208,19 +208,20 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
 
         By default, simply saves a copy of the plastic flag to an
         internal stack (so that it can be restored by
-        restore_plasticity()), and then sets plastic to False.
+        restore_plasticity_state()), and then sets plastic to new_plasticity_state.
         """
         self._plasticity_setting_stack.append(self.plastic)
-        self.plastic=False
+        self.plastic=new_plasticity_state
 
 
-    def restore_plasticity(self):
+    def restore_plasticity_state(self):
         """
-        Re-enable plasticity of medium and long term internal state after a disable_plasticity call.
+        Restores plasticity of medium and long term internal state after
+        a override_plasticity_state call.
 
         This function should be implemented by all subclasses to
-        remove the effect of the most recent disable_plasticity call,
-        i.e. to reenable plasticity of any type that was disabled.
+        remove the effect of the most recent override_plasticity_state call,
+        i.e. to restore state plasticity of any type that was overridden.
         """
         self.plastic = self._plasticity_setting_stack.pop()
 

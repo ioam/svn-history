@@ -86,7 +86,7 @@ def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=Fals
     if not plastic:
         # turn off plasticity everywhere
         for sheet in topo.sim.objects(Sheet).values():
-             sheet.disable_plasticity()
+             sheet.override_plasticity_state(new_plasticity_state=False)
 
     if not apply_output_fn:
         for each in topo.sim.objects(Sheet).values():
@@ -110,7 +110,7 @@ def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=Fals
 
     if not plastic:
         for sheet in topo.sim.objects(Sheet).values():
-            sheet.restore_plasticity()
+            sheet.restore_plasticity_state()
           
     if not apply_output_fn:
         for each in topo.sim.objects(Sheet).values():

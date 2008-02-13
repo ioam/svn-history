@@ -233,45 +233,48 @@ class Projection(EPConnection):
 
 
   
-    def disable_plasticity(self):
+    def override_plasticity_state(self, new_plasticity_state):
         """
-        Temporarily disable plasticity of medium and long term internal state.
+        Temporarily override plasticity of medium and long term internal
+        state.
 
         This function should be implemented by all subclasses so that
         it preserves the ability of the Projection to compute
         activity, i.e. to operate over a short time scale, while
         preventing any lasting changes to the state.
 
-        For instance, in a Projection with modifiable connection
-        weights, the values of those weights should be made fixed and
-        unchanging after this call.  For a Projection with automatic
-        normalization, homeostatic plasticity, or other features that
-        depend on a history of events (rather than just the current
-        item being processed), those processes should all be disabled
-        at their current setting.
+        For instance, if new_plasticity_state is False, in a
+        Projection with modifiable connection weights, the values of
+        those weights should be made fixed and unchanging after this call.
+        For a Projection with automatic normalization, homeostatic plasticity,
+        or other features that depend on a history of events
+        (rather than just the current item being processed),
+        the plasticity state of those processes can be changed temporarily,
+        e.g. to turn plasticity off during map measurement.
 
         Any process that does not have any lasting state, such as
         those affecting only the current activity level, should not
         be affected by this call.
 
-        By default, this call simply calls disable_plasticity() on the
+        By default, this call simply calls override_plasticity_state() on the
         Projection's output_fn.
         """
         self._plasticity_setting_stack.append(self.plastic)
-        self.plastic=False
-        self.output_fn.disable_plasticity()
+        self.plastic=new_plasticity_state
+        self.output_fn.override_plasticity_state(new_plasticity_state)
       
 
-    def restore_plasticity(self):
+    def restore_plasticity_state(self):
         """
-        Re-enable plasticity of medium and long term internal state after a disable_plasticity call.
+        Restore previous plasticity of medium and long term internal
+        state after a override_plasticity_state call.
 
         This function should be implemented by all subclasses to
-        remove the effect of the most recent disable_plasticity call,
-        i.e. to reenable plasticity of any type that was disabled.
+        remove the effect of the most recent override_plasticity_state call,
+        e.g. to reenable plasticity of any type that was disabled.
         """
         self.plastic = self._plasticity_setting_stack.pop()
-        self.output_fn.restore_plasticity()
+        self.output_fn.restore_plasticity_state()
 
 
 
@@ -498,40 +501,42 @@ class ProjectionSheet(Sheet):
             raise KeyError(name)
 
 
-    def disable_plasticity(self):
+    def override_plasticity_state(self, new_plasticity_state):
         """
-        Temporarily disable plasticity of medium and long term internal state.
+        Temporarily override plasticity state of medium and long term
+        internal state.
 
         This function should be implemented by all subclasses so that
         it preserves the ability of the ProjectionSheet to compute
         activity, i.e. to operate over a short time scale, while
-        preventing any lasting changes to the state.
+        preventing any lasting changes to the state
+        (if new_plasticiy_state=False).
 
         Any process that does not have any lasting state, such as
         those affecting only the current activity level, should not
         be affected by this call.
 
-        By default, calls disable_plasticity() on the ProjectionSheet's
+        By default, calls override_plasticity_state() on the ProjectionSheet's
         output_fn and all of its incoming Projections, and also
         enables the plastic parameter for this ProjectionSheet.
         The old value of the plastic parameter is saved to an
-        internal stack to be restored by restore_plasticity().
+        internal stack to be restored by restore_plasticity_state().
         """
         
-        super(ProjectionSheet,self).disable_plasticity()
-        self.output_fn.disable_plasticity()
+        super(ProjectionSheet,self).override_plasticity_state(new_plasticity_state)
+        self.output_fn.override_plasticity_state(new_plasticity_state)
         for proj in self.in_connections:
-            # Could instead check for a disable_plasticity method
+            # Could instead check for a override_plasticity_state method
             if isinstance(proj,Projection):
-                proj.disable_plasticity()
+                proj.override_plasticity_state(new_plasticity_state)
 
 
-    def restore_plasticity(self):
-        super(ProjectionSheet,self).restore_plasticity()
-        self.output_fn.restore_plasticity()
+    def restore_plasticity_state(self):
+        super(ProjectionSheet,self).restore_plasticity_state()
+        self.output_fn.restore_plasticity_state()
         for proj in self.in_connections:
             if isinstance(proj,Projection):
-                proj.restore_plasticity()
+                proj.restore_plasticity_state()
         
     
 

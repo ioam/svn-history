@@ -26,6 +26,11 @@ from sheetcoords import SheetCoordinateSystem
 # of a PG that doesn't match the current assumptions), but still lets
 # them be used like the current ones.
 # (PatternGenerator-->TwoDPatternGenerator?)
+
+#JLALERT PatternGenerator should have override_plasticity_state/restore_plasticty_state
+#functions which can override the plasticity of any output_fn which has state.
+#Will also need to support Composite patterns.
+
 class PatternGenerator(ParameterizedObject):
     """
     A class hierarchy for callable objects that can generate 2D patterns.
