@@ -182,7 +182,7 @@ bzr push bzr+ssh://cball@bazaar.launchpad.net/~topographica-developers/topograph
 bzr checkout bzr+ssh://user@bazaar.launchpad.net/~topographica-developers/topographica/branch-name
 </pre>
 
-<P>A checked-out copy will automatically ensure you have changes from others before you commit, and will store all your changes on the central copy. If you do not have network access while working, your commits will remain local until you perform some operation that does connect to the network (XXXX check). You can use <code>bzr commit --local</code> to force your change to be local (but note that the commit will later be made to the central branch automatically when you later perform an action with network access).
+<P>A checked-out copy will automatically ensure you have changes from others before you commit, and will store all your changes on the central copy. If you do not have network access while working, your commits will remain local until you perform some operation that does connect to the network (XXXX check). You can use <code>bzr commit --local</code> to force your change to be local (but note that the commit will later be made to the central branch automatically when you later perform an action with network access). XXX mention what happens with bzr update (local commits -> pending merge)
 
 <P>You might want to work on your own from a team branch, which is of course still possible by performing the usual <code>bzr branch</code> (rather than <code>bzr checkout</code>). You can then use <code>bzr push</code> to send your local commits back to the team branch.
 
@@ -242,19 +242,29 @@ ceball@doozy:~/tile/tk85/topographica$
 <H3>Notes</H3>
 
 <pre>
+
+* shared branch might help me (slower net connection, running out of disk space)
+  http://bazaar-vcs.org/SharedRepositoryTutorial
+
 * any way to get emails for team branch commits? (how to get emails at
-all...)
+  all...)
 
 * general info about branching with lp
-https://help.launchpad.net/FeatureHighlights/EasyBranching
+  https://help.launchpad.net/FeatureHighlights/EasyBranching
 
 * bzr/git+svn workflow
-http://info.wsisiz.edu.pl/~blizinsk/git-bzr.html
+  http://info.wsisiz.edu.pl/~blizinsk/git-bzr.html
 
-*
-http://wiki.list.org/display/DEV/MailmanOnLaunchpad
+* http://wiki.list.org/display/DEV/MailmanOnLaunchpad
 
 * https://help.ubuntu.com/community/EasyBazaar
+
+* http://jam-bazaar.blogspot.com/2007/10/bazaar-vs-subversion.html
+
+* http://sayspy.blogspot.com/2006/11/bazaar-vs-mercurial-unscientific.html
+
+* http://ligarto.org/rdiaz/BzrCentralLocalRepoNotes.html I just found
+  but haven't read seems to be this document but better! doh!
 
 </pre>
 
