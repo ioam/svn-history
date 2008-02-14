@@ -19,7 +19,7 @@ difficult to get working. Guess it takes a long time, too.
 by <A HREF="https://launchpad.net/">Launchpad</A>.  The essentials for
 using bzr at Launchpad are described below; see Launchpad's 
 <A HREF="https://help.launchpad.net/FeatureHighlights/BazaarHosting">Bazaar
-hosting introduction</A> for a longer tutorial.  Note that you will
+hosting introduction</A> for a longer tutorial. Note that you will
 need to run at least bzr 0.92 on your machine, because older bzr
 clients will complain that they do not recognize the Topographica
 branch format.
@@ -34,8 +34,9 @@ bzr branch http://bazaar.launchpad.net/~vcs-imports/topographica/trunk
 This command can take a while to
 exectute<sup><A HREF="#footnote-1">1</A></sup>, but the progress will
 be displayed (unless you are in a dumb terminal, such as Emacs's shell
-mode). Once complete, the new directory will occupy around 1 Gb (as of
-02/2008). After you have the source code, you probably want to 
+mode, progress is displayed for XXXX all lengthy bzr
+operations). Once complete, the new directory will occupy around 1 Gb
+(as of 02/2008). After you have the source code, you probably want to
 <A HREF="index.html#building-topographica">build Topographica</A>.
 
 
@@ -50,7 +51,7 @@ requires network access.
 <P>Before committing for the first time, you should inform bzr who you
 are, so that changes are attributed to the correct username:
 <pre>
-CEBALERT: formatting messed up
+CEBALERT: formatting messed up - see source
 bzr whoami "Your Name <user@address.ext>"
 </pre>
 
@@ -58,6 +59,19 @@ bzr whoami "Your Name <user@address.ext>"
 can update your own branch with changes committed to Topographica's
 trunk:
 <pre>
+$ bzr update
+Tree is up to date at revision 7820.
+</pre>
+
+<P>Note that you could also use <code>bzr pull</code> or <code>bzr merge</code>,
+depending on the status of your branch. See help for those commands, or the
+<A HREF="http://bazaar-vcs.org/FAQ#head-73f0b8ea8515a0087ce8705fbaafc55c80a0a30e">pull/merge</A>
+or <A HREF="http://bazaar-vcs.org/FAQ#head-b08de2689c115dc966f1336ab90f1eddd9d85e0b">update/merge</A>
+explanations in the list
+of <A HREF="http://bazaar-vcs.org/FAQ">frequently asked questions
+about Bazaar</A>.
+<!--
+
 $ bzr merge
 Merging from remembered location http://bazaar.launchpad.net/~vcs-imports/topographica/trunk/
  M  topographica/examples/lissom_or_noshrinking.ty
@@ -67,7 +81,7 @@ $ bzr diff
 # check what changed
 
 $ bzr commit -m 'Merged changes from SVN trunk.' .
-</pre>
+-->
 
 <!--
 Or, if your copy has not diverged from the SVN trunk, you can simply pull the changes:
@@ -113,10 +127,10 @@ publishing a branch is an easy way to do this.
 
 <P>
 Bazaar allows you to publish your branch using any of several
-different transport protocols (e.g. sftp, ssh), so you can publish to
-almost any server you wish. Here, however, we assume you are a
-Launchpad user, and that you want to publish to your Launchpad space
-and have the branch associated with Topographica:
+different transport protocols (e.g. sftp, ssh, http), so you can
+publish to almost any server you wish. Here, however, we assume you
+are a Launchpad user, and that you want to publish to your Launchpad
+space and have the branch associated with Topographica:
 
 <pre>
 bzr push bzr+ssh://user@bazaar.launchpad.net/~user/topographica/branch_name
@@ -143,13 +157,28 @@ with <code>+junk</code>.
 fixing a bug, you will want to commit your finished work to the central
 Topographica repository...
 
-<P> XXXX, not yet written.
-http://bazaar-vcs.org/BzrForeignBranches/Subversion
-Get bzr-svn
-copy downloaded,unpacked dir to ~/.bazaar/plugins
-bzr push ...
+<P>Install bzr-svn:
 
+XXXX
+<pre>
+ceball@doozy:~/b$ wget http://samba.org/~jelmer/bzr/bzr-svn-0.4.7.tar.gz
+ceball@doozy:~/b$ tar zxvf bzr-svn-0.4.7.tar.gz 
+ceball@doozy:~/b$ mv bzr-svn-0.4.7 svn
+ceball@doozy:~/b$ mv svn/ ~/.bazaar/plugins/
+</pre>
 
+then:
+
+<pre>
+# editing
+# bzr commit(s)
+$ bzr push https://topographica.svn.sourceforge.net/svnroot/topographica/trunk
+</pre>
+
+<P>The first time you run this time, there is a long wait.  CEBALERT:
+in fact I killed it because I got suspicious after a while that it
+doing something bad - not sure. I'll just be using patch to move
+changes...
 
 <H3>Launchpad.net team branches</H3>
 
@@ -170,7 +199,7 @@ which you can join by cliking on the 'Join this team' button on the team homepag
 
 <P>From the bzr branch you wish to publish for team collaboration, type:
 <pre>
-bzr push bzr+ssh://cball@bazaar.launchpad.net/~topographica-developers/topographica/branch-name
+bzr push bzr+ssh://user@bazaar.launchpad.net/~topographica-developers/topographica/branch-name
 </pre>
 
 
@@ -243,7 +272,8 @@ ceball@doozy:~/tile/tk85/topographica$
 
 <pre>
 
-* shared branch might help me (slower net connection, running out of disk space)
+* If you're going to have more than one branch of Topographica, you might
+  consider using a shared repository:
   http://bazaar-vcs.org/SharedRepositoryTutorial
 
 * any way to get emails for team branch commits? (how to get emails at
