@@ -85,7 +85,7 @@ class NeighborhoodMask_Opt(NeighborhoodMask):
         rows,cols = self.data.shape
         ignore1,matradius = self.sheet.sheet2matrixidx(self.radius,0)
         ignore2,x = self.sheet.sheet2matrixidx(0,0)
-        matradius = abs(matradius -x)
+        matradius = int(abs(matradius -x))
         thr = self.threshold
         activity = self.sheet.activity
         mask = self.data
