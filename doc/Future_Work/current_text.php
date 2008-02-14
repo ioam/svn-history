@@ -466,6 +466,10 @@ Display issues;
        In [2]: y = 15 s
        In [3]: x*y
        Out[3]: 45 m/s
+
+   Or maybe use ScientificPython's PhysicalQuantity (alone and in object arrays)
+   or "unum"s to represent quantities with units:
+   http://books.google.com/books?id=3nR75KSvsq4C&pg=PA169&lpg=PA169&dq=numpy+physicalquantity&source=web&ots=_cmXEC0qpx&sig=JBEz9BlegnIQJor-1BwnAdRTKLE
  )
 
 Minor
