@@ -299,7 +299,8 @@ class AARectangle(object):
         self._right = max([x for x,y in points])
 
 
-    # Basic support for pickling
+    # support for pickling because this class has __slots__ rather
+    # than __dict__
     def __getstate__(self):
         state={}
         for k in self.__slots__:
