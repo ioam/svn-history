@@ -1,17 +1,5 @@
 """
-Example of a LISSOM-based orientation map that avoids shrinking the
-lateral excitatory radius.
-
-This simulation is intended to be similar to standard LISSOM with ON
-and OFF channels, but without the dramatic reorganizations typical of
-the early iterations where the lateral excitatory radius is large.
-Requires homeostatic plasticity -- otherwise the map still jumps
-around a lot at the start of learning, yet some neurons still fail to
-organize.
-
-The number of input patterns and type of V1 output function can be specified
-at the command line using e.g.
--c 'num_inputs=3' and -c 'Outputfn_type='Homeostatic_debug''
+LISSOM-based orientation map with complex cell layer.
 
 $Id: lissom_oo_or_noshrinking.ty,v 1.11 2007/05/02 15:20:45 judelaw Exp $
 """
@@ -81,6 +69,7 @@ class Jitter(CoordinateMapperFn):
     rand = Parameter(default=None)
     def __call__(self,x,y):
         return x+(self.rand()-0.5)*self.scale,y+(self.rand()-0.5)*self.scale
+
 jitterOn = Jitter(rand =UniformRandom(seed=1023))
 jitterOff = Jitter(rand =UniformRandom(seed=1023))
 

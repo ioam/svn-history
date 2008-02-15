@@ -623,7 +623,8 @@ def measure_cog(proj_name ="Afferent"):
     """
     ### JABHACKALERT: Should be updated to support multiple projections
     ### to each sheet, not requiring the name to be specified.
-    
+
+    # ALERT: Use a list comprehension instead?
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
     measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
     
@@ -1240,10 +1241,11 @@ def decode_feature(sheet, preference_map = "OrientationPreference", axis_bounds=
     else:
         return d.max_value_bin()
 
+
 ###############################################################################
 pg= create_plotgroup(name='Orientation Preference and Complexity',category="Preference Maps",
-             doc='Measure preference for sine grating orientation.',
-             update_command='fm = measure_or_pref(frequencies=[3.0],scale=0.2,num_phase=32);analyze_complexity(fm)')
+             doc='Measure preference for sine grating orientation and phase.',
+             update_command='fm = measure_or_pref(frequencies=[3.0],scale=0.2,num_phase=32); analyze_complexity(fm)')
 pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
@@ -1254,15 +1256,17 @@ pg.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
 
 def analyze_complexity(full_matrix):
     """
-    This function perform orientation prefference analysis and than in addition also 
-    based on the data obtained from this procedure computes modulation ratio of 
-    each neuron. This ratio distinguishes complex cells from simple cells.    
+    Compute modulation ratio for each neuron, to distinguish complex from simple cells.
+
+    Uses data obtained from measure_or_pref().
     """
+    # ALERT: Use a list comprehension instead?
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
     measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
 
     for sheet in measured_sheets:   
-        print sheet
+        #print sheet
         complx = array(complexity(full_matrix[sheet]))
-        sheet.sheet_views['Complex'+'Selectivity']=SheetView((complx,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time())
-    plot_modulation_ratio(full_matrix)               
+        sheet.sheet_views['Complex'+'Selectivity']=SheetView((complx,sheet.bounds), sheet.name, sheet.precedence, topo.sim.time())
+
+    plot_modulation_ratio(full_matrix)

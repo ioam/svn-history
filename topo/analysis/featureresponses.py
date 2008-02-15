@@ -105,9 +105,11 @@ class DistributionMatrix(ParameterizedObject):
         return selectivity_matrix
 
 
+
 class FullMatrix(ParameterizedObject):
     """
-    Keeps a full matrix - eg. records the output of the sheet for each combination of feature values
+    Records the output of every unit in a sheet, for every combination of feature values.
+    Useful for collecting data for later analysis while presenting many input patterns.
     """
 
     def __init__(self,matrix_shape,features):
@@ -118,6 +120,7 @@ class FullMatrix(ParameterizedObject):
             self.dimensions = self.dimensions + (size(f.values),)
         self.full_matrix = empty(self.dimensions,object_)
 
+
     def update(self, new_values, feature_value_permutation):
         """Add a new matrix of histogram values for a given bin value."""
         index = ()
@@ -126,6 +129,7 @@ class FullMatrix(ParameterizedObject):
                 if(ff == f.name):
                     index = index + (f.values.index(value),)
         self.full_matrix[index] = new_values
+
 
 
 # CB: FeatureResponses and ReverseCorrelation need cleanup; I began but haven't finished.
@@ -220,6 +224,7 @@ class FeatureResponses(ParameterizedObject):
             for feature,value in zip(self.feature_names, permutation):
                 self._featureresponses[sheet][feature].update(sheet.activity, value)
             self._fullmatrix[sheet].update(sheet.activity,zip(self.feature_names, permutation))
+
 
 
 class ReverseCorrelation(FeatureResponses):

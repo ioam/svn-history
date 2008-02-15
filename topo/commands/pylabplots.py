@@ -524,6 +524,7 @@ def plotrctg():
         pylab.scatter(xx,yy)
         pylab.show()
 
+
 def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **params):
     """
     Plots parameter values associated with a ValueTrackingOutputFn output function.
@@ -531,7 +532,6 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
     VT=ValueTrackingOutputFn(function=HE, debug_params=['a', 'b',], units=[(0,0),(1,1)], step=1)
     plot_values(VT,0,10000,debug_params=['a'],units=[(0,0)], filename='V1')
     """
-
     
     for p in params.get('attrib_names',output_fn.attrib_names):
         pylab.figure(figsize=(6,4))
@@ -564,7 +564,9 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
         else:
             pylab.show()
 
+
 def plot_modulation_ratio(fullmatrix):
+    # JABALERT: Needs docstring explaining what it's for and what it gives you
     if (topo.sim.objects().has_key("V1Complex") & topo.sim.objects().has_key("V1Simple")):
         bins = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0]
         v1s = complexity(fullmatrix[topo.sim["V1Simple"]])

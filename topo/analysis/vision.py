@@ -1,5 +1,5 @@
 """
-Vision specific analysis procedures
+Vision-specific analysis functions.
 
 $Id: featureresponses.py 7714 2008-01-24 16:42:21Z antolikjan $
 """
@@ -33,6 +33,8 @@ def _complexity_rec(x,y,index,depth,fm):
                 global_index = index
                 max_value = fm.full_matrix[index][x][y]    
     
+
+
 def complexity(full_matrix):
     global global_index
     global max_value

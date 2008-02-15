@@ -1284,13 +1284,13 @@ class Simulation(ParameterizedObject):
 
     def objects(self,baseclass=EventProcessor):
         """
-        Return a list of simulation objects having the specified base
-        class.  All simulation objects have a base class of
+        Return a dictionary of simulation objects having the specified
+        base class.  All simulation objects have a base class of
         EventProcessor, and so the baseclass must be either
         EventProcessor or one of its subclasses.
 
         If there is a simulator called s, you can type e.g.
-        s.objects().keys() to see a list of all objects.
+        s.objects().keys() to see a list of the names of all objects.
         """
         return dict([(ep_name,ep)
                      for (ep_name,ep) in self._event_processors.items()

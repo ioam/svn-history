@@ -463,16 +463,19 @@ class CFPLF_Plugin(CFPLearningFn):
 
 
 class CFPLF_PluginScaled(CFPLearningFn):
-    """CFPLearningFunction applying the specified single_cf_fn to each CF.
-    Scales the single connection learning rate by a scaling factor which is
-    different for each individual unit. Therefore uses a different learning
-    rate for each individual connection field"""
+    """
+    CFPLearningFunction applying the specified single_cf_fn to each CF.
+    Scales the single-connection learning rate by a scaling factor
+    that is different for each individual unit. Thus each individual
+    connection field uses a different learning rate.
+    """
 
     single_cf_fn = LearningFnParameter(default=Hebbian(),
         doc="Accepts a LearningFn that will be applied to each CF individually.")
 
     learning_rate_scaling_factor = Parameter(default=None,
         doc="Matrix of scaling factors for scaling the learning rate of each CF individually.")
+
     
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
@@ -492,7 +495,7 @@ class CFPLF_PluginScaled(CFPLearningFn):
       
 
     def update_scaling_factor(self, new_scaling_factor):
-        """Update the single connection learning rate scaling factor"""
+        """Update the single-connection learning rate scaling factor."""
         self.learning_rate_scaling_factor = new_scaling_factor
       
 

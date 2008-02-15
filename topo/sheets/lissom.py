@@ -187,9 +187,9 @@ class LISSOM(JointNormalizingCFSheet):
 
     ### JABALERT!  There should be some sort of warning when
     ### tsettle times the input delay is larger than the input period.
-    ### Right now it seems to do strange things in that case (settle
-    ### at all after the first iteration?), but of course that is
-    ### arguably an error condition anyway (and should thus be
+    ### Right now it seems to do strange things in that case (does it
+    ### settle at all after the first iteration?), but of course that
+    ### is arguably an error condition anyway (and should thus be
     ### flagged).
     def process_current_time(self):
         """
@@ -203,9 +203,10 @@ class LISSOM(JointNormalizingCFSheet):
                 self.mask.calculate()
             
             if self.tsettle == 0:
-                # This is a special case of tsettle value, for which LISSOM should behave in a same way as CFSheet
+                # Special case: behave just like a CFSheet
                 self.activate()
                 self.learn()
+                
    	    elif self.activation_count == self.tsettle:
                 # Once we have been activated the required number of times
                 # (determined by tsettle), reset various counters, learn
@@ -242,9 +243,9 @@ class LISSOM(JointNormalizingCFSheet):
 
 class JointNormalizingCFSheet_Continuous(JointNormalizingCFSheet):
     """
-    CFSheet variant that runs continuously, with no 'resting' periods between pattern presentations.
+    CFSheet that runs continuously, with no 'resting' periods between pattern presentations.
     
-    Note that learning occurs only always when the time is a whole number.
+    Note that learning occurs only when the time is a whole number.
     """
     def process_current_time(self):
         if(float(topo.sim.time()) % 1.0 == 0.0):

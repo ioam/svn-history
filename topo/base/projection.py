@@ -379,15 +379,18 @@ class ProjectionSheet(Sheet):
 
     def _grouped_in_projections(self,ptype):
         """
-        Return a dictionary of lists of incoming Projections, grouped for type.
-        Each projection of type <ptype> is grouped according to the name of the port into a single list 
-        within the dictionary.
+        Return a dictionary of lists of incoming Projections, grouped by type.
 
-        The entry None will contain those that are not of type <ptype>, while the other entries will contain a list of
+        Each projection of type <ptype> is grouped according to the
+        name of the port, into a single list within the dictionary.
+
+        The entry None will contain those that are not of type
+        <ptype>, while the other entries will contain a list of
         Projections, each of which has type ptype.
         
-        Example: to obtain the lists of projection that should be together joint normalised you call
-        __grouped_in_projection('JointNormalize')
+        Example: to obtain the lists of projections that should be
+        jointly normalised together, call
+        __grouped_in_projection('JointNormalize').
         """
         in_proj = KeyedList()
         in_proj[None]=[] # Independent (ungrouped) connections
@@ -420,6 +423,7 @@ class ProjectionSheet(Sheet):
         div = self.activity *0.0
         mul = self.activity *0.0
 
+        # Add, multiply, or divide incoming activities as appropriate
         for proj in self.in_connections:
             d = proj.dest_port
             if not isinstance(proj,Projection):
@@ -431,10 +435,7 @@ class ProjectionSheet(Sheet):
             else:
                 self.activity += proj.activity
 
-        #print div[60,60]
-        #print self.activity[60,60]
         self.activity /= (1.0 + div)
-        #print self.activity[60,60]
         self.activity *= (1.0 + mul)
 
         if self.apply_output_fn:
