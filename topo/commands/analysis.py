@@ -6,7 +6,7 @@ $Id$
 __version__='$Revision$'
 
 
-from numpy.oldnumeric import array, zeros, Float,size, shape
+from numpy.oldnumeric import array, zeros, Float,size, shape, maximum
 from math import pi
 import copy
 import topo
@@ -29,7 +29,6 @@ from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, Feat
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.commands.pylabplots import plot_modulation_ratio
 from topo.misc.distribution import Distribution
-from topo.analysis.vision import complexity
 from topo.patterns.random import GaussianRandom
 from topo.base.simulation import EPConnectionEvent
 
@@ -1243,30 +1242,45 @@ def decode_feature(sheet, preference_map = "OrientationPreference", axis_bounds=
 
 
 ###############################################################################
-pg= create_plotgroup(name='Orientation Preference and Complexity',category="Preference Maps",
-             doc='Measure preference for sine grating orientation and phase.',
-             update_command='fm = measure_or_pref(frequencies=[3.0],scale=0.2,num_phase=32); analyze_complexity(fm)')
+gaussian_corner = topo.patterns.basic.Composite(operator = maximum,
+                                            generators = [topo.patterns.basic.Gaussian(
+                                                            size = 0.06,orientation=0,aspect_ratio=7,x=0.3),
+                                                            topo.patterns.basic.Gaussian(
+                                                            size = 0.06,orientation=pi/2,aspect_ratio=7,y=0.3)])
+
+
+pg=  create_plotgroup(name='Corner OR Preference',category="Preference Maps",
+             doc='Measure orientation prefference for corner stimuly [or generally any more complex stimuly that cannot be represented as fullfield pattern].',
+             update_command='measure_corner_or_pref(); topographic_grid()',
+             normalize=True)
 pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
 pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
-pg.add_plot('Modulation Ratio',[('Strength','ComplexSelectivity')])
-pg.add_plot('Phase Preference',[('Hue','PhasePreference')])
-pg.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
 
-def analyze_complexity(full_matrix):
+
+def measure_corner_or_pref(divisions=20,num_orientation=8,scale=1.0,offset=0.0,display=False,
+                           pattern_presenter=PatternPresenter(gaussian_corner,apply_output_fn=True,duration=1.0),
+                          x_range=(-1.4,1.4),y_range=(-1.4,1.4),weighted_average=True):
     """
-    Compute modulation ratio for each neuron, to distinguish complex from simple cells.
+    Measure position preference map, using a corner formed by two gaussians by default.
 
-    Uses data obtained from measure_or_pref().
+    Measures maps by collating the responses to a set of input
+    patterns controlled by some parameters.  The parameter ranges and
+    number of input patterns in each range are determined by the
+    divisions parameter.  The particular pattern used is determined by the
+    size, scale, offset, and pattern_presenter arguments.
     """
-    # ALERT: Use a list comprehension instead?
-    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
-
-    for sheet in measured_sheets:   
-        #print sheet
-        complx = array(complexity(full_matrix[sheet]))
-        sheet.sheet_views['Complex'+'Selectivity']=SheetView((complx,sheet.bounds), sheet.name, sheet.precedence, topo.sim.time())
-
-    plot_modulation_ratio(full_matrix)
+    if divisions <= 0 or num_orientation <= 0:
+        raise ValueError("divisions and num_orientation must be greater than 0")
+    else:
+        step_orientation=2*pi/num_orientation
+        # JABALERT: Will probably need some work to support multiple input regions
+        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
+                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
+                          Feature(name="orientation",range=(0.0,2*pi),step=step_orientation,cyclic=True)
+                         ]          
+                          
+        param_dict = {"scale":scale,"offset":offset}
+        x=FeatureMaps(feature_values)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
