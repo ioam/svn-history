@@ -115,7 +115,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         self._plasticity_setting_stack = []  
 
         ### JABALERT: Should perhaps rename this to view_dict
-        self.sheet_views = {}
+        self.sheet_views = {}        
 
 
     ### JABALERT: This should be deleted now that sheet_views is public
@@ -300,18 +300,9 @@ class Slice(ndarray):
         """
         Set this object's attributes as well as the array's.
         """
-        ## PICKLEHACK: test for state not a dict is to allow snapshots
-        ## saved before pickle support was added to Slice to load
-        ## without error 
-        ## i.e. for snapshots created between 7547 (Slice becomes
-        ## array) and 7762 (inclusive; Slice got pickle support in 7763)
-        if isinstance(state,dict):
-            ndarray.__setstate__(self,state['ndarray_state']) 
-            self._scs,self.bounds = state['slice_state']
-        else:
-            # support snapshots created without
-            ndarray.__setstate__(self,state)
-        
+        ndarray.__setstate__(self,state['ndarray_state']) 
+        self._scs,self.bounds = state['slice_state']
+
 
     def submatrix(self,matrix):
         """
@@ -370,7 +361,48 @@ class Slice(ndarray):
 
 
 
+#### snapshot compatibility ####
+from parameterizedobject import SnapshotCompatibility
 
+def _slice_setstate_selector(state):
+    # Allow loading of pickles created before Pickle support was added to Slice.
+    #
+    # In snapshots created between 7547 (Slice becomes array) and 7762
+    # (inclusive; Slice got pickle support in 7763), Slice instances
+    # will be missing some information.
+    #
+    # CB: info could be recovered if required.
+    if isinstance(state,dict):
+        return None
+    else:
+        return ndarray.__setstate__
+                
+SnapshotCompatibility.select_setstate(Slice,_slice_setstate_selector)
 
+# CB: this is to work round change in SCS, but __setstate__ is never
+# called on that (method resolution order means __setstate__ comes
+# from EventProcessor instead)
+def _sheet_set_shape(state):
+    # since 7958, SCS has stored shape on creation
+    def setstate(instance,state):
+        if '_SheetCoordinateSystem__shape' not in state:
+            m = '_SheetCoordinateSystem__'
+            # all these are necessary for the calculation now,
+            # but would not otherwise be restored until later
+            setattr(instance,'bounds',state['bounds'])
+            setattr(instance,'lbrt',state['lbrt'])
+            setattr(instance,m+'xdensity',state[m+'xdensity'])
+            setattr(instance,m+'xstep',state[m+'xstep'])
+            setattr(instance,m+'ydensity',state[m+'ydensity'])
+            setattr(instance,m+'ystep',state[m+'ystep'])
+            
+            r1,r2,c1,c2 = instance.bounds2slice(instance.bounds)
+            shape = (r2-r1,c2-c1)
+            setattr(instance,m+'shape',shape)
+        super(Sheet,instance).__setstate__(state)
 
+    return setstate
+
+SnapshotCompatibility.select_setstate(Sheet,_sheet_set_shape) 
+################################
 
