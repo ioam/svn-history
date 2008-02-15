@@ -94,13 +94,28 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
 
         inline(hebbian_code, ['input_activity', 'output_activity','rows', 'cols', 'icols', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
 
+
+class CFPLF_Hebbian(CFPLF_Plugin):
+    """
+    Wrapper written to allow transparent non-optimized fallback; 
+    equivalent to CFPLF_Plugin(single_cf_fn=Hebbian()).
+    """
+    def __init__(self,**params):
+        super(CFPLF_Hebbian,self).__init__(single_cf_fn=Hebbian(),**params)
+
+
+provide_unoptimized_equivalent("CFPLF_Hebbian_opt","CFPLF_Hebbian",locals())
+
+
+
+
 class CFPLF_Trace_opt(CFPLearningFn):
     """
-    Optimized version of CFPLF_Trace, see projfns.py for more info 
+    Optimized version of CFPLF_Trace; see projfns.py for more info 
     """
 
-    trace_strength=Number(default=0.5,bounds=(0.0,1.0),
-       doc="How much the learning is dominated by the activity trace, relative to the current value.")     
+    trace_strength=Number(default=0.5,bounds=(0.0,1.0),doc="""
+       How much the learning is dominated by the activity trace, relative to the current value.""")
 
     single_cf_fn = LearningFnParameter(default=Hebbian(),
         doc="LearningFn that will be applied to each CF individually.")              
@@ -177,13 +192,5 @@ class CFPLF_Trace_opt(CFPLearningFn):
 
         inline(trace_code, ['input_activity', 'traces','rows', 'cols', 'icols', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
 
-class CFPLF_Hebbian(CFPLF_Plugin):
-    """
-    Wrapper written to allow transparent non-optimized fallback; 
-    equivalent to CFPLF_Plugin(single_cf_fn=Hebbian()).
-    """
-    def __init__(self,**params):
-        super(CFPLF_Hebbian,self).__init__(single_cf_fn=Hebbian(),**params)
 
-
-provide_unoptimized_equivalent("CFPLF_Hebbian_opt","CFPLF_Hebbian",locals())
+provide_unoptimized_equivalent("CFPLF_Trace_opt","CFPLF_Trace",locals())
