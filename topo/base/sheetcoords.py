@@ -125,38 +125,23 @@ class SheetCoordinateSystem(object):
     Provides methods to allow conversion between sheet and matrix
     coordinates.    
     """
-    ### xdensity and ydensity are properties so that xstep is kept in
-    ### sync with xdensity, and similarly for ystep and ydensity. We
-    ### use xstep and ystep so that the repeatedly performed
-    ### calculations in matrix2sheet() use multiplications rather than
-    ### divisions, for speed.
-    def __set_xdensity(self,density):
-        self.__xdensity=density
-        self.__xstep = 1.0/density
-        
-    def __set_ydensity(self,density):
-        self.__ydensity=density
-        self.__ystep = 1.0/density
+    def __get_xdensity(self):
+        return self.__xdensity
+    def __get_ydensity(self):
+        return self.__ydensity
+    def __get_shape(self):
+        return self.__shape
 
-    def __get_xdensity(self): return self.__xdensity
-    def __get_ydensity(self): return self.__ydensity
-    
+    #### These are all properties so that they can't be set ####
+    # CB: unnecessary? if we're going to keep this, what about bounds and lbrt?
     xdensity = property(__get_xdensity,
-                        __set_xdensity,
                         doc="""The spacing between elements in an underlying
                         matrix representation, in the x direction.""")
 
     ydensity = property(__get_ydensity,
-                        __set_ydensity,
                         doc="""The spacing between elements in an underlying
                         matrix representation, in the y direction.""")
 
-    ### CEBHACKALERT: temporary implementation.  JAB: In what way?
-    def __get_shape(self):
-        r1,r2,c1,c2 = self.bounds2slice(self.bounds)
-        return (r2-r1,c2-c1)
-
-    ### shape is a property so that it's like numpy.array.shape
     shape = property(__get_shape)
 
 
@@ -177,8 +162,25 @@ class SheetCoordinateSystem(object):
             bounds,xdensity = self.__equalize_densities(bounds,xdensity)
 
         self.bounds = bounds
-        self.xdensity, self.ydensity = xdensity, ydensity or xdensity
+        self.__set_xdensity(xdensity)
+        self.__set_ydensity(ydensity or xdensity)
+        
         self.lbrt = array(bounds.lbrt())
+
+        r1,r2,c1,c2 = self.bounds2slice(self.bounds)
+        self.__shape = (r2-r1,c2-c1)
+
+
+    ### we use xstep and ystep so that the repeatedly performed
+    ### calculations in matrix2sheet() use multiplications rather than
+    ### divisions, for speed
+    def __set_xdensity(self,density):
+        self.__xdensity=density
+        self.__xstep = 1.0/density
+        
+    def __set_ydensity(self,density):
+        self.__ydensity=density
+        self.__ystep = 1.0/density
 
 
     def __equalize_densities(self,nominal_bounds,nominal_density):
