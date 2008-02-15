@@ -102,6 +102,8 @@ class SnapshotCompatibility(object):
     Class that provides various functions to support loading of old snapshots.
     """
     # only a class to collect the functions together
+
+    # these methods will evolve as I discover what they need to do...
     @staticmethod
     def preprocess_state(class_,state_mod_fn): 
         """
@@ -116,7 +118,7 @@ class SnapshotCompatibility(object):
 
 
     @staticmethod
-    def select_setstate(class_,selector):
+    def select_setstate(class_,selector,pre_super=False,post_super=True):
         """
         Select appropriate function to call as a replacement
         for class.__setstate__ at runtime.
@@ -124,11 +126,28 @@ class SnapshotCompatibility(object):
         selector must return None if the class_'s original method is
         to be used; otherwise, it should return a function that takes
         an instance of the class and the state.
+
+        pre_super and post_super determine if super(class_)'s
+        __setstate__ should be invoked before or after (respectively)
+        calling the function returned by selector. If selector returns
+        None, super(class_)'s __setstate__ is never called.
         """
+        if pre_super is True and post_super is True:
+            raise ValueError("Cannot call super method before and after.")
+        
         old_setstate = class_.__setstate__
         def new_setstate(instance,state):
             setstate = selector(state) or old_setstate
-            setstate(instance,state)        
+            
+            if pre_super and setstate is not old_setstate:
+                super(class_,instance).__setstate__
+
+            setstate(instance,state)
+
+            if post_super and setstate is not old_setstate:
+                super(class_,instance).__setstate__(state)
+            
+            
         class_.__setstate__ = new_setstate
 
 

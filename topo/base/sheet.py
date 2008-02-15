@@ -377,7 +377,7 @@ def _slice_setstate_selector(state):
     else:
         return ndarray.__setstate__
                 
-SnapshotCompatibility.select_setstate(Slice,_slice_setstate_selector)
+SnapshotCompatibility.select_setstate(Slice,_slice_setstate_selector,post_super=False)
 
 # CB: this is to work round change in SCS, but __setstate__ is never
 # called on that (method resolution order means __setstate__ comes
@@ -399,7 +399,6 @@ def _sheet_set_shape(state):
             r1,r2,c1,c2 = instance.bounds2slice(instance.bounds)
             shape = (r2-r1,c2-c1)
             setattr(instance,m+'shape',shape)
-        super(Sheet,instance).__setstate__(state)
 
     return setstate
 
