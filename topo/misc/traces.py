@@ -424,7 +424,9 @@ def get_images(name,times,recorder,overlays=(0,0,0)):
         result.append(im)
     return result
 
-               
+
+# JABALERT: Is there some reason it is called ActivityMovie in
+# particular, if it can plot things other than Activity?
 class ActivityMovie(ParameterizedObject):
     """
     An object encapsulating a series of movie frames displaying the
@@ -445,67 +447,67 @@ class ActivityMovie(ParameterizedObject):
 
     
     variables = param.ListParameter(class_=str, doc="""
-       A list of variable names in a DataRecorder object containing
-       matrix-valued time series data.""")
+        A list of variable names in a DataRecorder object containing
+        matrix-valued time series data.""")
        
     overlays = param.DictParameter(default={}, doc="""
-       A dictionary indicating overlays for the variable bitmaps.  The
-       for each key in the dict matching the name of a variable, there
-       should be associated a triple of matrices to be overlayed on
-       the red, green, and blue channels of the corresponding bitmap
-       in each frame."""
-       )
+        A dictionary indicating overlays for the variable bitmaps.  The
+        for each key in the dict matching the name of a variable, there
+        should be associated a triple of matrices to be overlayed on
+        the red, green, and blue channels of the corresponding bitmap
+        in each frame.""")
        
     frame_times = param.ListParameter(default=[0,1], doc="""
-       A list of the times of the frames in the movie.""")
+        A list of the times of the frames in the movie.""")
        
     montage_params = param.DictParameter(default={},doc="""
-       A dictionary containing parameters to be used when
-       instantiating the MontageBitmap objects representing each frame.""",       
+        A dictionary containing parameters to be used when
+        instantiating the MontageBitmap objects representing each frame.""",       
         instantiate=False)
 
     recorder = param.ClassSelectorParameter(class_=DataRecorder, doc="""
-       The DataRecorder storing the timeseries.""")
+        The DataRecorder storing the timeseries.""")
 
     filename_fmt = param.StringParameter(default='%n_%t.%T',doc="""
-       The format for the filenames used to store the frames.  The following
-       substitutions are possible:
-
-       %n: The name of this ActivityMovie object.
-       %t: The frame time, as formatted by the filename_time_fmt parameter
-       %T: The filetype given by the filetype parameter. """)
+        The format for the filenames used to store the frames.  The following
+        substitutions are possible:
+        
+        %n: The name of this ActivityMovie object.
+        %t: The frame time, as formatted by the filename_time_fmt parameter
+        %T: The filetype given by the filetype parameter. """)
     
     filename_time_fmt = param.StringParameter(default='%05.0f', doc="""
-       The format of the frame time, using Python string substitution for
-       a floating-point number.""")
+        The format of the frame time, using Python string substitution for
+        a floating-point number.""")
        
     filetype = param.StringParameter(default='tif',doc="""
-       The filetype to use when writing frames. Can be any filetype understood
-       by the Python Imaging Library.""")
+        The filetype to use when writing frames. Can be any filetype understood
+        by the Python Imaging Library.""")
 
     filename_prefix = param.StringParameter(default='', doc="""
-       A prefix to append to the filename of each frame when saving can include
-       directories.  If the filename contains a path, any non-existent directories
-       in the path will be created when the movie is saved.""")
+        A prefix to prepend to the filename of each frame when saving; 
+        can include directories.  If the filename contains a path, any
+        non-existent directories in the path will be created when the
+        movie is saved.""")
 
     add_timecode = param.BooleanParameter(default=False, doc="""
-       Whether to add a visible timecode indicator to each frame.""")
+        Whether to add a visible timecode indicator to each frame.""")
     
     timecode_options = param.DictParameter(default={},instantiate=False,doc="""
-       A dictionary of keyword options to be passed to the PIL ImageDraw.text method
-       when drawing the timecode on the frame. Valid options include font,
-       an ImageFont object indicating the text font, and fill a PIL color
-       specification indicating the text color.""")
+        A dictionary of keyword options to be passed to the PIL ImageDraw.text method
+        when drawing the timecode on the frame. Valid options include font,
+        an ImageFont object indicating the text font, and fill a PIL color
+        specification indicating the text color.""")
     
     timecode_fmt = param.StringParameter(default='%05.0f',doc="""
-       The format of the timecode displayed in the movie frames, using
-       Python string substitution for a floating-point number.""")
+        The format of the timecode displayed in the movie frames, using
+        Python string substitution for a floating-point number.""")
     
     timecode_offset = param.Number(default=0,doc="""
-       A value to be added to each timecode before formatting for display.""")
+        A value to be added to each timecode before formatting for display.""")
     
-    def __init__(self,**params):
 
+    def __init__(self,**params):
         super(ActivityMovie,self).__init__(**params)
 
         bitmaps = [get_images(var,self.frame_times,self.recorder,
@@ -521,11 +523,11 @@ class ActivityMovie(ParameterizedObject):
                 tw,th = draw.textsize(timecode,font=self.timecode_options.get('font',None))
                 w,h = f.image.size
                 draw.text((w-tw,h-th),timecode,**self.timecode_options)
+
     
     def save(self):
-        """
-        Save the movie frames
-        """
+        """Save the movie frames."""
+        
         filename_pat = self.name.join(self.filename_fmt.split('%n'))
         filename_pat = self.filename_time_fmt.join(filename_pat.split('%t'))
         filename_pat = self.filetype.join(filename_pat.split('%T'))

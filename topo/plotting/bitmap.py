@@ -245,27 +245,27 @@ class MontageBitmap(Bitmap):
     right-to-left, top-to-bottom into the given number of rows and columns.
     """
     bitmaps = ListParameter(class_=Bitmap,doc="""
-       The list of bitmaps to compose.""")
+        The list of bitmaps to compose.""")
 
     rows = Integer(default=2, doc="""
-       The number of rows in the montage.""")
+        The number of rows in the montage.""")
     cols = Integer(default=2, doc="""
-       The number of columns in the montage.""")    
+        The number of columns in the montage.""")    
     shape = CompositeParameter(attribs=['rows','cols'], doc="""
-       The shape of the monage. Same as (self.rows,self.cols).""")
+        The shape of the montage. Same as (self.rows,self.cols).""")
 
     margin = Integer(default=5,doc="""
-       The size in pixels of the margin to put around each
-       tile in the montage.""")
+        The size in pixels of the margin to put around each
+        tile in the montage.""")
 
     tile_size = NumericTuple(default=(100,100), doc="""
-       The size in pixels of a tile in the montage.""")
+        The size in pixels of a tile in the montage.""")
 
     titles = ListParameter(class_=str, default=[], doc="""
-       A list of titles to overlay on the tiles.""")
+        A list of titles to overlay on the tiles.""")
 
     title_pos = NumericTuple(default=(10,10), doc="""
-       The position of the upper left corner of the title in each tile.""")
+        The position of the upper left corner of the title in each tile.""")
 
     title_options = DictParameter(default={}, doc="""
         Dictionary of options for drawing the titles.  Dict should
@@ -292,7 +292,9 @@ class MontageBitmap(Bitmap):
     def __init__(self,**params):
         ## JPALERT: The Bitmap class is a Parameterized object,but its
         ## __init__ doesn't take **params and doesn't call super.__init__,
-        ## so we have to skip it
+        ## so we have to skip it.
+        ## JAB: Good point; Bitmap should be modified to be more like
+        ## other PO classes.
         ParameterizedObject.__init__(self,**params)
 
         rows,cols = self.shape
