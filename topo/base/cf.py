@@ -78,18 +78,7 @@ class ConnectionField(ParameterizedObject):
     # array for speed of access from optimized C components.
     input_sheet_slice = []   
 
-    _has_norm_total = False
-
-    def __setstate__(self,state):
-
-        ## slice_array was renamed to input_sheet_slice
-        if 'slice_array' in state:
-            input_sheet_slice = state['slice_array']
-            state['input_sheet_slice'] = input_sheet_slice
-            del state['slice_array'] # probably doesn't work
-            
-        super(ConnectionField,self).__setstate__(state)
-        
+    _has_norm_total = False        
 
     def __get_norm_total(self):
         """
@@ -334,6 +323,19 @@ class ConnectionField(ParameterizedObject):
         """Rescale the weight matrix in place, interpolating or decimating as necessary."""
         raise NotImplementedError
 
+
+
+#### snapshot compatibility ####
+def _cf_rename_slice_array(state):
+    ## slice_array was renamed to input_sheet_slice in r7548
+    if 'slice_array' in state:
+        input_sheet_slice = state['slice_array']
+        state['input_sheet_slice'] = input_sheet_slice
+        del state['slice_array'] # probably doesn't work
+        
+from parameterizedobject import SnapshotCompatibility
+SnapshotCompatibility.preprocess_state(ConnectionField,_cf_rename_slice_array)
+################################
 
 
 class CFPResponseFn(ParameterizedObject):
