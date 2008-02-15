@@ -901,12 +901,6 @@ class Simulation(ParameterizedObject):
                                simulation_time_fn=wrap_callable(self.time))
 
 
-    def __setstate__(self,state):
-        if '_time_type' not in state:
-            state['_time_type']=type(state['_time'])
-        super(Simulation,self).__setstate__(state)
-        
-
     def __getitem__(self,item_name):
         """
         Return item_name if it exists as an EventProcessor in
@@ -1369,3 +1363,17 @@ class Simulation(ParameterizedObject):
             y += ystep
 
 
+
+
+#### snapshot compatibility ####
+def _sim_add_time_type(state):
+    # _time_type attribute added to simulation in r7581
+    if '_time_type' not in state:
+        state['_time_type']=type(state['_time'])
+
+from parameterizedobject import SnapshotCompatibility
+SnapshotCompatibility.preprocess_state(Simulation,_sim_add_time_type)
+################################
+
+
+        
