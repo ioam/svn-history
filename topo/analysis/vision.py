@@ -17,6 +17,7 @@ import topo.commands.pylabplots
 from topo.base.parameterclasses import Number
 from topo.misc.numbergenerators import UniformRandom
 from math import fmod,floor,pi, sin, cos, sqrt
+from topo.plotting.plotgroup import create_plotgroup, plotgroups
     
 max_value = 0
 global_index = ()
