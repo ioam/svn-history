@@ -258,26 +258,35 @@ class JointNormalizingCFSheet_Continuous(JointNormalizingCFSheet):
 
 class JointScaling(LISSOM):
     """
-    A LISSOM sheet extended to allow joint scaling of Afferent input projections
-    based on a specified target average activity.
-    An exponentially weighted average is used to calculate the average joint afferent activity.
-    This average is then used to calculate a scaling factor for the current afferent activity
-    and for the afferent learning rate.
-    The target average activity for the afferent projections depends on the statistics of the input,
-    if units are activated more often (e.g. the number of Gaussian patterns on the retina during each
-    iteration is increased)the target average activity should be larger in order to maintain a constant average
-    response to similar inputs in V1. The target activity for learning rate scaling does not need to change
-    since the learning rate should be scaled regardless of what causes the change in average activity.
+    LISSOM sheet extended to allow joint auto-scaling of Afferent input projections.
+    
+    An exponentially weighted average is used to calculate the average
+    joint activity across all jointly-normalized afferent projections.
+    This average is then used to calculate a scaling factor for the
+    current afferent activity and for the afferent learning rate.
+
+    The target average activity for the afferent projections depends
+    on the statistics of the input; if units are activated more often
+    (e.g. the number of Gaussian patterns on the retina during each
+    iteration is increased) the target average activity should be
+    larger in order to maintain a constant average response to similar
+    inputs in V1. The target activity for learning rate scaling does
+    not need to change, because the learning rate should be scaled
+    regardless of what causes the change in average activity.
     """
-    #ALERT Could also be extended to jointly scale different groups of projections.Currently only works for
-    #the joint scaling of the Afferent projections as grouped together by JointNormalize in dest_port.
+    # ALERT: Should probably be extended to jointly scale different
+    # groups of projections. Currently only works for the joint
+    # scaling of projections named "Afferent", grouped together by
+    # JointNormalize in dest_port.
     
     target = Number(default=0.045, doc="""
         Target average activity for jointly scaled projections.""")
 
     # JABALERT: I cannot parse the docstring; is it an activity or a learning rate?
     target_lr = Number(default=0.045, doc="""
-        Target average activity for jointly scaled projections used for calculating a learning rate scaling factor.""")
+        Target average activity for jointly scaled projections.
+
+        Used for calculating a learning rate scaling factor.""")
     
     smoothing = Number(default=0.999, doc="""
         Influence of previous activity, relative to current, for computing the average.""")
@@ -310,7 +319,7 @@ class JointScaling(LISSOM):
 
     def do_joint_scaling(self):
         """
-        Scales jointly normalized projections together.
+        Scale jointly normalized projections together.
 
         Assumes that the projections to be jointly scaled are those
         that are being jointly normalized.  Calculates the joint total
