@@ -27,7 +27,7 @@ from topo.base.parameterizedobject import ParameterizedObject, Parameter, Pickla
 from topo.base.functionfamilies import OutputFn
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
-from topo.base.projection import ProjectionSheet
+from topo.base.projection import Projection, ProjectionSheet
 
 from topo.sheets.generatorsheet import GeneratorSheet
 
@@ -399,12 +399,17 @@ def run_batch(script_file,output_directory="Output",
     
     print endnote
 
+
 def wipe_out_activity():
     """
-    Resets to zeros the activity in the sheets and projection activities of all sheets in the model
+    Resets activity of all Sheets and their connections to zero.
     """
-    for sheet in topo.sim.objects().keys():
-        topo.sim[sheet].activity*=0.0
-        for con in topo.sim[sheet].in_connections:
-            if hasattr(con, 'activity'):
-                con.activity*=0.0
+    # ALERT: this works for now, but it may need to be implemented
+    # recursively using methods implemented separately on each class,
+    # if there are often new types of objects created that store an
+    # activity value.
+    for s in topo.sim.objects(Sheet).values():
+        s.activity*=0.0
+        for c in s.in_connections:
+            if hasattr(c,'activity'):
+                c.activity*=0.0
