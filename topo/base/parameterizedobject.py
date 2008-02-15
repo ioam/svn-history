@@ -92,6 +92,46 @@ class bothmethod(object): # pylint: disable-msg=R0903
 
 
 
+# CB: this must unfortunately appear before the Parameter class.
+# (Should we import this from elsewere? Can't see that it could go
+# anywhere else.) Having two classes for pickle support (this +
+# PicklableClassAttributes) messes up reading this file, but the
+# classes are necessary, and are for different things.
+class SnapshotCompatibility(object):
+    """
+    Class that provides various functions to support loading of old snapshots.
+    """
+    # only a class to collect the functions together
+    @staticmethod
+    def preprocess_state(class_,state_mod_fn): 
+        """
+        Allow processing of state with state_mod_fn before
+        class_.__setstate__(instance,state) is called.
+        """
+        old_setstate = class_.__setstate__
+        def new_setstate(instance,state):
+            state_mod_fn(state) 
+            old_setstate(instance,state)
+        class_.__setstate__ = new_setstate
+
+
+    @staticmethod
+    def select_setstate(class_,selector):
+        """
+        Select appropriate function to call as a replacement
+        for class.__setstate__ at runtime.
+
+        selector must return None if the class_'s original method is
+        to be used; otherwise, it should return a function that takes
+        an instance of the class and the state.
+        """
+        old_setstate = class_.__setstate__
+        def new_setstate(instance,state):
+            setstate = selector(state) or old_setstate
+            setstate(instance,state)        
+        class_.__setstate__ = new_setstate
+
+
 class ParameterMetaclass(type):
     """
     Metaclass allowing control over creation of Parameter classes.
@@ -387,16 +427,20 @@ class Parameter(object):
         return state
 
     def __setstate__(self,state):
-        """See __getstate__()"""
-
-        ## PICKLEHACK: removed 'hidden' attribute in r7861
-        if 'hidden' in state:
-            state['precedence']=-1
-            del state['hidden']
-
+        # set values of __slots__ (instead of in non-existent __dict__)
         for (k,v) in state.items():
             setattr(self,k,v)    
 
+
+#### snapshot compatibility ####
+def _param_remove_hidden(state):
+    # Hidden attribute removed from Parameter in r7861
+    if 'hidden' in state:
+        state['precedence']=-1
+        del state['hidden']
+
+SnapshotCompatibility.preprocess_state(Parameter,_param_remove_hidden)
+################################
 
 
 class ParameterizedObjectMetaclass(type):
@@ -1082,6 +1126,9 @@ def print_all_param_defaults():
     for c in classes:
         c.print_param_defaults()
     print "_______________________________________________________________________________"
+
+
+
 
 
 
