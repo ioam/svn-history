@@ -101,11 +101,6 @@ class EventProcessor(ParameterizedObject):
     
     dest_ports=[None]
 
-    # CEBERRORALERT: this code prevents EventProcessors from getting
-    # a gensym name.
-    #
-    # s = Sheet()
-    # s.name is None
     name = Parameter(constant=True)
 
     def __init__(self,**params):
