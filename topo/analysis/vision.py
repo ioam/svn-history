@@ -6,7 +6,7 @@ $Id: featureresponses.py 7714 2008-01-24 16:42:21Z antolikjan $
 __version__='$Revision: 7714 $'
 
 from math import fmod,floor
-
+import pylab
 import numpy
 from numpy.oldnumeric import Float
 from numpy import zeros, array, size, empty, object_
@@ -14,7 +14,9 @@ from numpy import zeros, array, size, empty, object_
 
 import topo
 import topo.commands.pylabplots
-    
+from topo.base.parameterclasses import Number
+from topo.misc.numbergenerators import UniformRandom
+from math import fmod,floor,pi, sin, cos, sqrt
     
 max_value = 0
 global_index = ()
@@ -85,8 +87,73 @@ def complexity(full_matrix):
             fft = numpy.fft.fft(complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y],2048)
             first_har = 2048/len(complex_matrix[0,0])
             fftmeasure[x,y] = (2 *abs(fft[first_har]) * abs(fft[first_har]) )/(abs(fft[0]) * abs(fft[0]))
-#            print complex_matrix[x,y]
-#            print fft
-#            print fftmeasure[x,y]
-    topo.commands.pylabplots.matrixplot(fftmeasure)
     return fftmeasure
+
+def phase_preference_scatter_plot(sheet_name):
+    r = UniformRandom(seed=1023)
+    preference_map = topo.sim[sheet_name].sheet_views['PhasePreference']
+    offset_magnitude = 0.01
+    datax = []
+    datay = []
+    (v,bb) = preference_map.view()
+    for z in zeros(300):
+        x = r() - 0.5
+        y = r() - 0.5
+        rand = r()
+        xoff = sin(rand*2*pi)*offset_magnitude
+        yoff = cos(rand*2*pi)*offset_magnitude
+        xx = max(min(x+xoff,0.49999),-0.49999)
+        yy = max(min(y+yoff,0.49999),-0.49999)
+        x = max(min(x,0.49999),-0.49999)
+        y = max(min(y,0.49999),-0.49999)
+        [xc1,yc1] = topo.sim[sheet_name].sheet2matrixidx(xx,yy)
+        [xc2,yc2] = topo.sim[sheet_name].sheet2matrixidx(x,y)
+        if((xc1==xc2) &  (yc1==yc2)): continue
+        datax = datax + [v[xc1,yc1]]
+        datay = datay + [v[xc2,yc2]]
+    
+    for i in range(0,len(datax)):
+        datax[i] = datax[i] * 360
+        datay[i] = datay[i] * 360
+        if(datay[i] > datax[i] + 180): datay[i]=  datay[i]- 360
+        if((datax[i] > 180) & (datay[i]> 180)): datax[i] = datax[i] - 360; datay[i] = datay[i] - 360
+        if((datax[i] > 180) & (datay[i] < (datax[i]-180))): datax[i] = datax[i] - 360; #datay[i] = datay[i] - 360
+        
+    f = pylab.figure()
+    pylab.plot(datax,datay,'ro')
+    pylab.plot([0,360],[-180,180])
+    pylab.plot([-180,180],[0,360])
+    pylab.plot([-180,-180],[360,360])
+    pylab.axis([-180,360,-180,360])
+    pylab.grid()
+    pylab.savefig(str(topo.sim.time()) + sheet_name + "_scatter.png")
+
+###############################################################################
+pg= create_plotgroup(name='Orientation Preference and Complexity',category="Preference Maps",
+
+             doc='Measure preference for sine grating orientation.',
+             update_command='fm = measure_or_pref(frequencies=[3.0],scale=0.2,num_phase=32,             pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0));analyze_complexity(fm)')
+pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
+pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
+						   ('Confidence','OrientationSelectivity')])
+pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
+pg.add_plot('Modulation Ratio',[('Strength','ComplexSelectivity')])
+pg.add_plot('Phase Preference',[('Hue','PhasePreference')])
+pg.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
+
+def analyze_complexity(full_matrix):
+    """
+    Compute modulation ratio for each neuron, to distinguish complex from simple cells.
+
+    Uses data obtained from measure_or_pref().
+    """
+    # ALERT: Use a list comprehension instead?
+    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
+    measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
+
+    for sheet in measured_sheets:   
+        #print sheet
+        complx = array(complexity(full_matrix[sheet]))
+        sheet.sheet_views['Complex'+'Selectivity']=SheetView((complx,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time())
+    plot_modulation_ratio(full_matrix)               
+    phase_preference_scatter_plot("V1Simple")
