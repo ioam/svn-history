@@ -116,7 +116,7 @@ class PatternGenerator(ParameterizedObject):
         specified override those currently set on the object.
         """
         self._check_params(params_to_override)                
-        self.debug("params = ",params_to_override)
+        self.debug(lambda:"params = %s"%params_to_override)
         params = ParamOverrides(self,params_to_override)
 
         bounds=params['bounds']
@@ -151,7 +151,7 @@ class PatternGenerator(ParameterizedObject):
         density (or rows and cols), and transforms them according to
         x, y, and orientation.
         """
-        self.debug("bounds = ",bounds,"xdensity =",xdensity,"x =",x,"y=",y)
+        self.debug(lambda:"bounds=%s, xdensity=%s, ydensity=%s, x=%s, y=%s, orientation=%s"%(bounds,xdensity,ydensity,x,y,orientation))
         # Generate vectors representing coordinates at which the pattern
         # will be sampled.
 
