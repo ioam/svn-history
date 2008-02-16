@@ -123,7 +123,7 @@ class TestPattern(SheetPanel):
                                                 nominal_bounds=gs.nominal_bounds,
                                                 nominal_density=gs.nominal_density)
                                  for gs in topo.sim.objects(GeneratorSheet).values()]
-        self.plotgroup.name = "Test Pattern"
+        self.plotgroup._set_name("Test Pattern")
 
 
     def switch_sheet(self):
