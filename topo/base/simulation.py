@@ -101,7 +101,6 @@ class EventProcessor(ParameterizedObject):
     
     dest_ports=[None]
 
-    name = Parameter(constant=True)
 
     def __init__(self,**params):
         """
@@ -789,6 +788,9 @@ class Simulation(ParameterizedObject):
         """)
     
     eps_to_start = []
+
+
+    name = Parameter(constant=False)
 
 
     def set_time(self,time):
