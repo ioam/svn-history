@@ -139,11 +139,13 @@ class PatternGenerator(ParameterizedObject):
             result*=mask
 
         output_fn = params['output_fn']
-        if output_fn is not IdentityOF: # Optimization (but may not actually help)
-            output_fn(result)           # CEBHACKALERT: particularly since everything but
-                                        # the IdentityOF *class* will pass this if-test!
-        return result                   # Should be: "if not instance(output_fn,IdentityOF):".
-                                        # I guess this needs fixing in several places.
+        # Optimization (not clear that is helps; does make small (-0.5s out of 75s)
+        # difference to startup time of lissom_oo_or)
+        if not isinstance(output_fn,IdentityOF): 
+            output_fn(result)  
+                               
+        return result          
+                               
 
     def __setup_xy(self,bounds,xdensity,ydensity,x,y,orientation):
         """
