@@ -215,7 +215,7 @@ def shortclassname(x):
 
 
 
-def profile(command,n=50,sorting=('cumulative','time'),strip_dirs=True):
+def profile(command,n=50,sorting=('cumulative','time'),strip_dirs=False):
     """
     Profile the given command (supplied as a string), printing
     statistics about the top n functions when ordered according to
@@ -254,8 +254,7 @@ def profile(command,n=50,sorting=('cumulative','time'),strip_dirs=True):
 
     if strip_dirs:prof_stats.strip_dirs()
     
-    #prof_stats.sort_stats(*sorting).print_callees(n)
-
+    prof_stats.sort_stats(*sorting).print_callees(n)
     ### the above lets us see which times are due to which calls
     ### unambiguously, while the version below only reports total time
     ### spent in each object, not the time due to that particular
