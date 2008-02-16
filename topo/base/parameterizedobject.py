@@ -315,7 +315,7 @@ class Parameter(object):
     # operations to copy and restore Parameters (e.g. for Python
     # persistent storage pickling); see __getstate__ and __setstate__.
     __slots__ = ['_attrib_name','_internal_name','default','doc',
-                 'precedence','instantiate','constant']
+                 'precedence','instantiate','constant','readonly']
 
     # When created, a Parameter does not know which
     # ParameterizedObject class owns it. If a Parameter subclass needs
@@ -323,7 +323,7 @@ class Parameter(object):
     # (which will be filled in by ParameterizedObjectMetaclass)
                                                    
     def __init__(self,default=None,doc=None,precedence=None,  # pylint: disable-msg=R0913
-                 instantiate=False,constant=False): 
+                 instantiate=False,constant=False,readonly=False): 
         """
         Initialize a new Parameter object: store the supplied attributes.
 
@@ -345,7 +345,8 @@ class Parameter(object):
         self.precedence = precedence
         self.default = default
         self.doc = doc
-        self.constant = constant
+        self.constant = constant 
+        self.readonly = readonly
         self._set_instantiate(instantiate)
 
     # CB: need to make it clear that a parameter *must* be declared
@@ -393,16 +394,28 @@ class Parameter(object):
         If the Parameter's constant attribute is True, only allows
         the value to be set for a ParameterizedObject class or on
         uninitialized ParameterizedObject instances.
+
+        If the Parameter's readonly attribute is True, only allows the
+        value to be specified in the Parameter declaration inside the
+        ParameterizedObject source code. A read-only parameter also
+        cannot be set on a ParameterizedObject class.
         
         Note that until Topographica supports some form of read-only
         object, it is still possible to change the attributes of the
-        object stored in a constant (e.g. the left bound of a
-        BoundingBox).
+        object stored in a constant or read-only Parameter (e.g. the
+        left bound of a BoundingBox).
         """
         # NB: obj can be None (when __set__ called for a
         # ParameterizedObject class)
-        if self.constant:
-            if not obj:
+        if self.constant or self.readonly:
+            if self.readonly:
+                # CB: interpreted 'read only' to include not being
+                # able to set on the class object. If that's wrong,
+                # switch this 'if readonly' block with the below 'elif
+                # not obj' block to allow setting on the
+                # class. Otherwise please remove this comment.
+                raise TypeError("Read-only parameter '%s' cannot be modified"%self._attrib_name)
+            elif not obj:
                 self.default = val
             elif not obj.initialized:
                 obj.__dict__[self._internal_name] = val
@@ -459,6 +472,13 @@ def _param_remove_hidden(state):
         del state['hidden']
 
 SnapshotCompatibility.preprocess_state(Parameter,_param_remove_hidden)
+
+def _param_add_readonly(state):
+    # Hidden attribute added to Parameter in r7974
+    if 'readonly' not in state:
+        state['readonly']=False
+
+SnapshotCompatibility.preprocess_state(Parameter,_param_add_readonly)
 ################################
 
 
