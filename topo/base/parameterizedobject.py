@@ -474,7 +474,7 @@ def _param_remove_hidden(state):
 SnapshotCompatibility.preprocess_state(Parameter,_param_remove_hidden)
 
 def _param_add_readonly(state):
-    # Hidden attribute added to Parameter in r7974
+    # Hidden attribute added to Parameter in r7975
     if 'readonly' not in state:
         state['readonly']=False
 
