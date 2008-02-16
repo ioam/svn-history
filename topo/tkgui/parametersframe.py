@@ -26,6 +26,8 @@ __version__='$Revision$'
 #   new (class default) object into the list).
 #
 
+# (check Defaults btn with dynamic params)
+
 import Tkinter, tkMessageBox
 
 from Tkinter import Frame, E,W, Label, TclError

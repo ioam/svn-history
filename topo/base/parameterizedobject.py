@@ -910,6 +910,22 @@ class ParameterizedObject(object):
         """Print the arguments as a debugging statement."""
         self.__db_print(DEBUG,*args)
 
+    # CEBALERT: this is a bit ugly
+    def _instantiate_param(self,param_obj,dict_=None,key=None):
+        # deepcopy param_obj.default into self.__dict__ (or dict_ if supplied)
+        # under the parameter's _internal_name (or key if supplied)
+        dict_ = dict_ or self.__dict__
+        key = key or param_obj._internal_name
+        new_object = copy.deepcopy(param_obj.default)
+        dict_[key]=new_object
+
+        if isinstance(new_object,ParameterizedObject):
+            global object_count
+            object_count+=1
+            # CB: writes over name given to the original object;
+            # should it instead keep the same name?
+            new_object.__generate_name()
+        
 
     @as_uninitialized
     def _setup_params(self,**params):
@@ -930,16 +946,8 @@ class ParameterizedObject(object):
             for (k,v) in class_.__dict__.items():
                 # (avoid replacing name with the default of None)
                 if isinstance(v,Parameter) and v.instantiate and k!="name":
-                    new_object = copy.deepcopy(v.default)
-                    self.__dict__[v._internal_name]=new_object
-
-                    if isinstance(new_object,ParameterizedObject):
-                        global object_count
-                        object_count+=1
-                        # CB: writes over name given to the original object;
-                        # should it instead keep the same name?
-                        new_object.__generate_name()
-                    
+                    self._instantiate_param(v)
+                                        
         for name,val in params.items():
             desc = self.__class__.get_param_descriptor(name)[0] # pylint: disable-msg=E1101
             if desc:
@@ -1140,13 +1148,6 @@ class ParameterizedObject(object):
                 print cls.__name__+'.'+key, '=', repr(val.default)
 
 
-
-
-    # CEBALERTs:
-    # * name should be a constant Parameter, rather than needing to test
-    #   specially for name here
-    # * what happens to dynamic parameters?
-    # * doing the right thing for instantiate? (see note below)
     def defaults(self):
         """
         Return {parameter_name:parameter.default} for all non-constant
@@ -1157,14 +1158,10 @@ class ParameterizedObject(object):
         """
         d = {}
         for param_name,param in self.params().items():
-            if param.constant or param_name=='name': # fake constant name
+            if param.constant:
                 pass
-            # CEBHACKALERT
             elif param.instantiate:
-                # should use other code to instantiate. missing
-                # object count increase, etc? need some method to
-                # do this for everywhere that needs it?
-                d[param_name]=copy.deepcopy(param.default)
+                self._instantiate_param(param,dict_=d,key=param_name)
             else:
                 d[param_name]=param.default
         return d
