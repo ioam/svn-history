@@ -11,7 +11,7 @@ from topo.base.functionfamilies import LearningFn,LearningFnParameter
 from topo.base.parameterclasses import Number
 
 # Imported here so that all learning functions will be in the same package
-from topo.base.functionfamilies import Hebbian
+from topo.base.functionfamilies import Hebbian,IdentityLF
 
 
 
