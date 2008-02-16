@@ -354,6 +354,8 @@ class Parameter(object):
 
     def _set_instantiate(self,instantiate):
         """Constant parameters must be instantiated."""
+        # CB: I think I'm right that it doesn't matter for read-only
+        # parameters, since they can't be set even on a class.
         self.instantiate = instantiate or self.constant # pylint: disable-msg=W0201
 
 
@@ -413,7 +415,8 @@ class Parameter(object):
                 # able to set on the class object. If that's wrong,
                 # switch this 'if readonly' block with the below 'elif
                 # not obj' block to allow setting on the
-                # class. Otherwise please remove this comment.
+                # class, and make readonly=>instantiate.
+                # Otherwise please remove this comment.
                 raise TypeError("Read-only parameter '%s' cannot be modified"%self._attrib_name)
             elif not obj:
                 self.default = val
@@ -765,7 +768,7 @@ class ParameterizedObject(object):
         self._setup_params(**params)
         object_count += 1
 
-        self.nopickle = []
+        self.nopickle = [] # CEBALERT: remove this - we don't use it
         self.debug('Initialized',self)
 
         self.initialized=True
@@ -925,22 +928,16 @@ class ParameterizedObject(object):
         # Deepcopy all 'instantiate=True' parameters
         for class_ in classlist(type(self)):
             for (k,v) in class_.__dict__.items():
-                # CEBALERT: name is constant (at least for EPs), but
-                # it's generated (there's no default). So it would be
-                # replaced with None here without the k!=name test
-                # below. We need to sort out the name parameter. (At
-                # least, should be constant for all
-                # ParameterizedObject.)
+                # (avoid replacing name with the default of None)
                 if isinstance(v,Parameter) and v.instantiate and k!="name":
                     new_object = copy.deepcopy(v.default)
                     self.__dict__[v._internal_name]=new_object
 
-                    # a new ParameterizedObject needs a new name
-                    # CEBHACKALERT: this will write over any name given
-                    # to the original object.
                     if isinstance(new_object,ParameterizedObject):
                         global object_count
                         object_count+=1
+                        # CB: writes over name given to the original object;
+                        # should it instead keep the same name?
                         new_object.__generate_name()
                     
         for name,val in params.items():
