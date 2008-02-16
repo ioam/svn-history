@@ -20,8 +20,8 @@ from topo.misc.utils import shortclassname
 from parametersframe import ParametersFrameWithApply
 from topowidgets import TkguiWindow
 
-
-class EditorObject(ParameterizedObject):
+# CEBALERT: should be a ParameterizedObject
+class EditorObject(object):
     """
     Anything that can be added and manipulated in an EditorCanvas. Every EditorCanvas
     has a corresponding Topo object associated with it. An instance of this class can 
@@ -30,7 +30,7 @@ class EditorObject(ParameterizedObject):
     FROM = 0
     TO = 1
 
-    def __init__(self, name, canvas):
+    def __init__(self, name, canvas,**params):
         self.canvas = canvas # retains a reference to the canvas
         self.name = name # set the name of the sheet
         self.focus = False # this does not have the focus

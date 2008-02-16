@@ -513,8 +513,8 @@ class EditorCanvas(Canvas):
 
 
 
-# (CB: Ought to be a TkguiWindow itself.)
-class ModelEditor(ParameterizedObject):
+# CEBALERT: Should be a TkParameterizedObject or something
+class ModelEditor(object):
     """
     This class constructs the main editor window. It uses a instance
     of GUICanvas as the main editing canvas and inserts the
