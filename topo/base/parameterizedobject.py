@@ -715,7 +715,9 @@ class ParameterizedObject(object):
     __metaclass__ = ParameterizedObjectMetaclass
 
     ## CEBALERT: should be StringParameter, right?
-    name           = Parameter(default=None,doc="String identifier for this object.")
+    name           = Parameter(default=None,constant=True,doc="""
+    String identifier for this object.""")
+    
     ### JABALERT: Should probably make this an Enumeration instead.
     print_level = Parameter(default=MESSAGE,precedence=-1)
 
@@ -748,13 +750,31 @@ class ParameterizedObject(object):
 
         self.initialized=True
 
+    def as_uninitialized(fn):
+        """
+        Decorator: call fn with the instance's initialization flag set
+        to False, then revert the flag.
+        """
+        def override_initialization(self,*args,**kw):
+            original_initialized=self.initialized
+            self.initialized=False
+            fn(self,*args,**kw)
+            self.initialized=original_initialized
+        return override_initialization
 
+        
+    @as_uninitialized
+    def _set_name(self,name):
+        self.name=name
+
+
+    @as_uninitialized
     def __generate_name(self):
         """
         Set name to a gensym formed from the object's type name and
         the object_count.
         """
-        self.name = '%s%05d' % (self.__class__.__name__ ,object_count)
+        self._set_name('%s%05d' % (self.__class__.__name__ ,object_count))
 
     # CB: __repr__ is called often; methods it uses should not be too slow
     def __repr__(self):
@@ -868,6 +888,7 @@ class ParameterizedObject(object):
         self.__db_print(DEBUG,*args)
 
 
+    @as_uninitialized
     def _setup_params(self,**params):
         """
         Initialize default and keyword parameter values.
@@ -878,6 +899,8 @@ class ParameterizedObject(object):
         (to avoid suprising aliasing errors).  Then sets each of the
         keyword arguments, warning when any of them are not defined as
         parameters.
+
+        Constant Parameters can be set during calls to this method.
         """
         # Deepcopy all 'instantiate=True' parameters
         for class_ in classlist(type(self)):
@@ -898,9 +921,7 @@ class ParameterizedObject(object):
                     if isinstance(new_object,ParameterizedObject):
                         global object_count
                         object_count+=1
-                        new_object.initialized=False
                         new_object.__generate_name()
-                        new_object.initialized=True
                     
         for name,val in params.items():
             desc = self.__class__.get_param_descriptor(name)[0] # pylint: disable-msg=E1101

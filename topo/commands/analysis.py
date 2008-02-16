@@ -235,8 +235,8 @@ def save_plotgroup(name,saver_params={},**params):
     if 'projection' in params:
         params['sheet'] = params['projection'].dest
 
+    plotgroup._set_name(name)
     # save_plotgroup's **params are passed to the plotgroup
-    params['name'] = name
     for param,val in params.items():
         setattr(plotgroup,param,val)
     
