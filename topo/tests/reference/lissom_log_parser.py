@@ -12,19 +12,23 @@ __version__='$Revision$'
 
 # CEBHACKALERT: filename should change
 
-from numpy.oldnumeric import ones,zeros,where,ravel,sum,array
+from math import pi, atan2
+from numpy import array
 import topo
 from topo.tests.utils import array_almost_equal
 
+
 filename_base = ""
 
+
+def sign(x): return 1 if x>=0 else -1
 
 import re
 def get_input_params():
     """
 
     Return iterators over list of float values for C++ LISSOM's cx,
-    cy, and theta for multiple eyes.
+    cy, and theta for multiple eyes, as well as sign.
 
 
     Expects log file with values held in lines like this::
@@ -41,14 +45,14 @@ def get_input_params():
     # first iter is test in c++ lissom; use to get num eyes
     n_eyes = len(f.readline().split('Eye')[1::])
 
-    input_params = dict([(i,dict(cx=list(),cy=list(),theta=list()))
+    input_params = dict([(i,dict(cx=list(),cy=list(),theta=list(),sign=list()))
                          for i in range(n_eyes)])
 
     # supposed to match numbers like 02.1, 074.0 etc
     val_match = re.compile(r'([0-9]([0-9]|\.)+)+')
 
     lines = f.readlines()                 
-    for line in lines:
+    for line,lineno in zip(lines,range(len(lines))):
         eyes = line.split('Eye')[1::]
         for eye,i in zip(eyes,range(n_eyes)):
             cx,cy,theta = [float(val[0]) for val in val_match.findall(eye)]
@@ -56,6 +60,15 @@ def get_input_params():
             input_params[i]['cy'].append(cy)
             input_params[i]['theta'].append(theta)
 
+        ### get sign (is there an easier way?)
+        realDx = input_params[1]['cx'][lineno]-input_params[0]['cx'][lineno]
+        realDy = input_params[1]['cy'][lineno]-input_params[0]['cy'][lineno]
+        realtheta = 180*(atan2(realDy,realDx)/pi)
+        theta = input_params[0]['theta'][lineno]
+        for i in range(n_eyes):
+            input_params[i]['sign'].append(sign(theta)/sign(realtheta))
+        ###
+        
     for i in input_params:
         for val in input_params[i]:
             input_params[i][val] = iter(input_params[i][val])
