@@ -1,20 +1,24 @@
 <H2>Developing Topographica with Git</H2>
 
+<P>** This is draft documentation ** <BR>
+If you know Git well, you can probably already perform the operations
+described here. In that case, please help to improve the documentation
+below! Thanks
 
-<P>As well as git itself, you need to have git-svn.
+<P>To work with the Topographica SVN repository using Git, you need to
+have git-svn as well as git itself.
 
 
-<P>If you know Git well, you can probably already perform the operations
-described here, and be able to avoid limitations described below.
 
-
-<H3>Getting the Topographica code</code>
-
+<H3>Getting the Topographica code</H3>
 
 <P>First, you need to select the revision from which you would like your
 git history to begin. For most work, a recent revision is fine (but make
 sure the path you want to get actually existed in that revision). Then,
 you can execute the following:
+
+<!--CB: will cut output out of examples eventually, and make commands
+more generic-->
 
 <pre>
 ceball@doozy:~/g$ export TOPOROOT=https://topographica.svn.sourceforge.net/svnroot/topographica
@@ -75,6 +79,14 @@ users</A>. Operations such as <code>diff</code>
 and <code>commit</code> that you perform with <code>git</code> are
 local to your repository.
 
+<P>Before committing to your repository, you should probably identify
+yourself to git:
+<pre>
+ceball@doozy:~/g$ git config --global user.email ceball@users.sf.net
+ceball@doozy:~/g$ git config --global user.name "C. E. Ball"
+</pre>
+
+<P>Example...
 <pre>
 ceball@doozy:~/g/topographica$ emacs -nw topo/base/parameterizedobject.py 
 ceball@doozy:~/g/topographica$ git diff
@@ -112,44 +124,35 @@ your Git repository.
 <H4>Tracking Topographica's SVN repository</H4>
 
 <P>To get updates from the Topographica SVN repository, your own copy
-should have no local changes. If you do have local changes,
-the <A HREF="">git-stash</A> command is allows you to store your own
-changes for later retrieval.
+should have no local changes. (If you do have local changes,
+the <A HREF="">git-stash</A> command allows you to store your own
+changes for later retrieval.)
 
 <pre>
 # (git-stash if required)
+ceball@doozy:~/g/topographica$ git-svn rebase
+        M       doc/Downloads/git_text.php
+r7992 = b31884caa7780766a2732cac7418ab5020085757 (git-svn)
+First, rewinding head to replay your work on top of it...
+
+HEAD is now at b31884c... Topographica with Git: added more info (still incoherent).
+
+Applying Updated comment.
+
+Wrote tree eeb4607b62d41100a5e66aade9ba268e0e44ae34
+Committed: 779f4bf3e1a526f53b7ba1e3d6351b717b4aaa65
+# (git-stash apply; git-stash clear if required)
+</pre>
+
+<P>To understand what <code>rebase</code> does, see <A HREF="http://www.kernel.org/pub/software/scm/git/docs/user-manual.html#using-git-rebase">Keeping a patch series up to date using git-rebase</A> from the Git user manual.
 
 
-
-
-http://www.kernel.org/pub/software/scm/git/docs/user-manual.html#using-git-rebase
-
-
-
-
-
-
-
-
-
- Since you are very likely to have local changes, 
-
-<pre>
- git-svn rebase
-(make sure no local changes: use git-stash
-   1. put aside your changes using the command: git-stash
-   2. update your working copy using: git-svn rebase as usual
-   3. take back your changes typing: git-stash apply
-   4. clear the stash typing: git-stash clear
-
-
-
+<!--
 switch to branch master
 git checkout master
+-->
 
-
-
-
+<!--
 # Initialize a repo (like git init):
         git-svn init http://svn.foo.org/project/trunk
 # Fetch remote revisions:
@@ -163,93 +166,102 @@ git checkout master
         git-svn fetch && git rebase remotes/git-svn
 # Append svn:ignore settings to the default git exclude file:
         git-svn show-ignore >> .git/info/exclude
+-->
 
 
-<H3>Committing changes to Topographica's SVN trunk</H3>
+<H4>Sending your changes to Topographica's SVN trunk</H4>
 
-<P>The first time, make sure you have identified yourself to git:
-<pre>
-ceball@doozy:~/temp$ git config --global user.email ceball@users.sf.net
-ceball@doozy:~/temp$ git config --global user.name "C. E. Ball"
-</pre>
 
-Then the following command will send each of your git commits to the SVN repository:
+The following command will send each of your git commits to the SVN repository:
 <pre>
 git-svn dcommit
 </pre>
 
 
-<H3>Committing your changes as a branch on Topographica's SVN</H3>
+<H4>Branching your own Git repository</H4>
 
-
-<H3>Sharing your changes</H3>
-
-<P>You or anyone else can <A HREF="">XXXXclone</A> your repository to
-share code.
+<P>If you are working on a new feature, you will probably find it helpful
+to branch your (Topographica SVN) repository, and work on the branch.
 
 <pre>
-mkdir new_repo
-cd new_repo
-git clone /path/to/repo
+ceball@doozy:~/g/topographica$ git checkout -b some-feature-name remotes/git-svn
+Switched to a new branch "some-feature-name"
 </pre>
 
-<P>If you are collaborating with someone, you might decide to share
-a repository. In that case, the safest approach is to use a
-repository that is not also a working copy.
+To see your branches:
+<pre>
+ceball@doozy:~/g/topographica$ git branch
+  master
+* some-feature-name
+</pre>
+
+<P>Now you can work on <code>some-feature-name</code>; changes there
+will not appear in <code>master</code> (which you can check by making
+a change, then inspecting the code after switching back with <code>git
+checkout master</code>).
+
+<P>You can push and pull changes between your own branches ... XXXX
+
+
+
+<H4>Sharing your repository</H4>
+
+<P>You or anyone else can <A HREF="">XXXXclone</A> your Git repository to
+share code (see the tutorial or other documentation mentioned earlier for
+details of this).
+
+<P>If you are collaborating with someone, or you work on multiple
+machines, you might decide to share a repository. In that case, the
+safest approach is to use a repository that is not also a working
+copy.
 
 <pre>
-mkdir ~/git/some-feature-name
-cd ~/git/some-feature-name
-git clone --bare /path/to/repo
+ceball@doozy:~/g/topographica$ mkdir ~/git/some-feature-name
+ceball@doozy:~/g/topographica$ cd ~/git/some-feature-name
+ceball@doozy:~/git/some-feature-name$ git clone --bare ~/g/topographica
+Initialized empty Git repository in /home/ceball/git/some-feature-name/topographica/
+remote: Generating pack...
+remote: Done counting 635 objects.
+remote: Deltifying 635 objects...
+remote:  100% (635/635) done
+Indexing 635 objects...
+ 100% (635/635) done
+Resolving 63 deltas...
+ 100% (63/63) done
+remote: Total 635 (delta 63), reused 0 (delta 0)
 </pre>
 
-<P>Now you can both push and pull to that repository:
+(<code>--bare</code> instructs git not to clone all the files i.e. not to make a working copy.)
+
+<P>If you both have read/write access to <code>~/git/some-feature-name</code>, you can both <code>git push</code>/<code>git pull</code> to/from that repository. To begin, someone would clone the repository:
 
 <pre>
-git clone ~/git/some-feature-name
+someone@doozy:~/work/some-feature-name$ git clone /home/ceball/git/some-feature-name/topographica/
+Initialized empty Git repository in /home/someone/work/some-feature-name/topographica/.git/
+remote: Generating pack...
+remote: Done counting 635 objects.
+Deltifying 635 objects...
+  Indexing 635 objects...one
+ 100% (635/635) donemote: ne
+remote: Total 635 (delta 63), reused 635 (delta 63)
+ 100% (635/635) done
+Resolving 63 deltas...
+ 100% (63/63) done
+Checking 572 files out...
+ 100% (572/572) done
+</pre>
+
+Now someone will have a working copy in <code>/home/someone/work/some-feature-name/topographica</code>. To get a working copy, you would do a similar thing.
+
+<P>You can both now share code via push/pull to/from that repository. Once you finish the new feature, you can send it to Topographica's SVN by pulling it into your XXXX git-svn repo and dcommitting 
+
+<P>Note that Git supports the <code>ssh</code> protocol, so you and your collaborators can work across machines. For instance, someone not on doozy in the example above could clone the repository using the following:
+<pre>
+git clone ssh://ceball@doozy.inf.ed.ac.uk/home/ceball/git/some-feature-name
 </pre>
 
 
-git clone ssh://ceball@doozy.inf.ed.ac.uk/home/ceball/git/tkgui-tk85
-
-
-
-
-
-
-
-
-git push git@gitorious.org:topographica/tkgui-tk85.git
-
-
-Access denied or bad repository path
-fatal: The remote end hung up unexpectedly
-error: failed to push to 'git@gitorious.org:topographica/tkgui-tk85.git'
-
-git remote add origin git@gitorious.org:/topographica/tkgui-tk85.git
-
-
-
-
-References
-
-Git-svn manual
-http://www.kernel.org/pub/software/scm/git/docs/git-svn.html
-
-Howto use git and svn together
-http://www.flavio.castelli.name/howto_use_git_with_svn
-
-Git for Subversion users:
-
-
-http://utsl.gen.nz/talks/git-svn/intro.html
-
-
-
-
-
-publishing 
-
+<!-- public hosting
 [remote "origin"]
         url = ceball@localhost:git/tkgui-tk85/
         fetch = +refs/heads/*:refs/remotes/origin/*
@@ -257,8 +269,27 @@ publishing
         remote = origin
         merge = refs/heads/tkgui-tk85
 
-git push origin tkgui-tk85
+git push git@gitorious.org:topographica/tkgui-tk85.git
+
+Access denied or bad repository path
+fatal: The remote end hung up unexpectedly
+error: failed to push to 'git@gitorious.org:topographica/tkgui-tk85.git'
+
+git remote add origin git@gitorious.org:/topographica/tkgui-tk85.git
+-->
 
 
 
-git clone /home/ceball/git/tkgui-tk85 tkgui-tk85
+<H2>References</H2>
+
+<P>something something
+
+<pre>
+Git-svn manual
+http://www.kernel.org/pub/software/scm/git/docs/git-svn.html
+
+Howto use git and svn together
+http://www.flavio.castelli.name/howto_use_git_with_svn
+
+
+http://utsl.gen.nz/talks/git-svn/intro.html
