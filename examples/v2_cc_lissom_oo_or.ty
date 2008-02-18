@@ -31,6 +31,7 @@ from topo.patterns.basic import Gaussian
 from topo.learningfns.projfns import CFPLF_Trace
 from topo.base.functionfamilies import CoordinateMapperFn
 
+# JABALERT: Why 3?
 topo.sim.name = "3"
 
 shared_params = {"a_init":14.5, "b_init":-4, "mu":0.01, "smoothing":0.0003}
@@ -69,8 +70,8 @@ class Jitter(CoordinateMapperFn):
     rand = Parameter(default=None)
     def __call__(self,x,y):
         return x+(self.rand()-0.5)*self.scale,y+(self.rand()-0.5)*self.scale
-jitterOn = Jitter(rand =UniformRandom(seed=1023))
-jitterOff = Jitter(rand =UniformRandom(seed=1023))
+jitterOn  = Jitter(rand=UniformRandom(seed=1023))
+jitterOff = Jitter(rand=UniformRandom(seed=1023))
 
 # Specify weight initialization, response function, and learning function
 numpy.random.seed((500,500))
