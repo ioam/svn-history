@@ -79,9 +79,8 @@ users</A>. Operations such as <code>diff</code>
 and <code>commit</code> that you perform with <code>git</code> are
 local to your repository.
 
-<!-- mention git commit -a -->
 
-<!--(echo; git-svn show-ignore) >> .git/info/exclude-->
+<!-- mention git commit -a -->
 
 <P>Before committing to your repository, you should probably identify
 yourself to git:
@@ -89,6 +88,13 @@ yourself to git:
 ceball@doozy:~/g$ git config --global user.email ceball@users.sf.net
 ceball@doozy:~/g$ git config --global user.name "C. E. Ball"
 </pre>
+
+Also, you probably want to instruct git to ignore the same files as SVN ignores:
+
+<pre>
+(echo; git-svn show-ignore) >> .git/info/exclude
+</pre>
+
 
 <P>Example...
 <pre>
@@ -148,7 +154,7 @@ Committed: 779f4bf3e1a526f53b7ba1e3d6351b717b4aaa65
 # (git-stash apply; git-stash clear if required)
 </pre>
 
-<P>To understand what <code>rebase</code> does, see <A HREF="http://www.kernel.org/pub/software/scm/git/docs/user-manual.html#using-git-rebase">Keeping a patch series up to date using git-rebase</A> from the Git user manual.
+<P>rebase moves a whole branch to a newer "base" commit; see <A HREF="http://www.kernel.org/pub/software/scm/git/docs/user-manual.html#using-git-rebase">Keeping a patch series up to date using git-rebase</A> from the Git user manual.
 
 
 <!--
@@ -185,7 +191,7 @@ git-svn dcommit
 <H4>Branching your own Git repository</H4>
 
 <P>If you are working on a new feature, you will probably find it helpful
-to branch your (Topographica SVN) repository, and work on the branch.
+to branch your git repository, and work on the branch.
 
 <pre>
 ceball@doozy:~/g/topographica$ git checkout -b some-feature-name remotes/git-svn
@@ -205,7 +211,12 @@ a change, then inspecting the code after switching back with <code>git
 checkout master</code>).
 
 <P>You can push and pull changes between your own branches ... XXXX
-
+<pre>
+e.g. new-feature-name -> master
+svn checkout master
+?git pull . new-feature-name
+then delete new-feature-name branch.
+</pre>
 
 
 <H4>Sharing your repository</H4>
@@ -237,7 +248,7 @@ remote: Total 635 (delta 63), reused 0 (delta 0)
 
 (<code>--bare</code> instructs git not to clone all the files i.e. not to make a working copy.)
 
-<P>If you both have read/write access to <code>~/git/some-feature-name</code>, you can both <code>git push</code>/<code>git pull</code> to/from that repository. To begin, someone would clone the repository:
+<P>If you both have read/write access to <code>~/git/some-feature-name</code>, you can both <code>git push</code>/<code>git pull</code> to/from that repository after first cloning it:
 
 <pre>
 someone@doozy:~/work/some-feature-name$ git clone /home/ceball/git/some-feature-name/topographica/
@@ -255,7 +266,15 @@ Checking 572 files out...
  100% (572/572) done
 </pre>
 
-Now someone will have a working copy in <code>/home/someone/work/some-feature-name/topographica</code>. To get a working copy, you would do a similar thing.
+Now someone will have a working copy in <code>/home/someone/work/some-feature-name/topographica</code>. To get a working copy, you would do a similar thing. After getting the copy, XXXX you need to switch to the appropriate branch:
+
+<pre>
+?
+git branch -r
+git branch tkgui-tk85 origin/tkgui-tk85
+git checkout tkgui-tk85
+</pre>
+
 
 <P>You can both now share code via push/pull to/from that repository. Once you finish the new feature, you can send it to Topographica's SVN by pulling it into your XXXX git-svn repo and dcommitting 
 
@@ -291,6 +310,10 @@ git remote add origin git@gitorious.org:/topographica/tkgui-tk85.git
 <P>something something
 
 <pre>
+
+http://lwn.net/Articles/210045/
+
+
 Git-svn manual
 http://www.kernel.org/pub/software/scm/git/docs/git-svn.html
 
@@ -312,4 +335,52 @@ http://www.kernel.org/pub/software/scm/git/docs/everyday.html
 
 Multiple branches using git-svn
 http://www.dmo.ca/blog/20070608113513
+
+tips about branches
+http://wiki.laptop.org/go/Kuku/Git_Usage
+
+http://wiki.sourcemage.org/Git_Guide
+
+
+http://www.adeal.eu/
+
+Merging branches
+
+To get the difference between your master branch and the currently checked out branch: git diff master..HEAD
+
+Merging a local branch is as easy as this: git checkout master; git pull . <branch>
+
+Once you merged your branch you can delete it: git branch -d <branchname>
+
+
+http://www.kernel.org/pub/software/scm/git/docs/git-merge.html
+
+
+http://michael-prokop.at/blog/2007/12/03/git-svn-in-30-minutes/
+
+http://blog.nanorails.com/tags/git
+http://blog.nanorails.com/articles/2008/1/31/getting-started-with-git
+</pre>
+
+
+
+<pre>
+My notes...
+
+ceball@san:~/dev/topographica-git$ git checkout -b tkgui-tk85 remotes/git-svn
+
+ceball@doozy:~$ mkdir git
+ceball@doozy:~$ cd git/
+ceball@doozy:~/git$ mkdir topographica
+ceball@doozy:~/git$ cd topographica
+ceball@doozy:~/git/topographica$ git --bare init
+Initialized empty Git repository in /home/ceball/git/topographica/
+
+
+ceball@san:~/dev/topographica-git$ git push ssh://ceball@doozy.inf.ed.ac.uk/home/ceball/git/topographica tkgui-tk85
+
+
+merge:
+bail is git reset 
+fix conflict is git add 
 </pre>
