@@ -8,12 +8,11 @@ Topographica SVN trunk (via the Bazaar mirror) over time. Starting
 from this branch is an easy way for anyone (registered Topographica
 developer or not) to develop a new feature or fix a bug.
 
-<!--
 <P>Alternatively, you yourself are free to make your own branch of
 Topographica's SVN trunk using bzr... probably "bzr branch
 $TOPOROOT/trunk" or similar after installing bzr-svn. Not sure how
 difficult to get working. Guess it takes a long time, too.
--->
+
 
 <P>Our Bazaar mirror of Topographica's SVN repository is hosted
 by <A HREF="https://launchpad.net/">Launchpad</A>.  The essentials for
@@ -79,6 +78,7 @@ All changes applied successfully.
 
 $ bzr diff
 # check what changed
+# if there are conflicts, examine&resolve, then bzr resolved filename
 
 $ bzr commit -m 'Merged changes from SVN trunk.' .
 -->
