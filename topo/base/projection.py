@@ -265,7 +265,8 @@ class Projection(EPConnection):
         """
         self._plasticity_setting_stack.append(self.plastic)
         self.plastic=new_plasticity_state
-        self.output_fn.override_plasticity_state(new_plasticity_state)
+        if hasattr(self.output_fn,'override_plasticity_state'):
+            self.output_fn.override_plasticity_state(new_plasticity_state)
       
 
     def restore_plasticity_state(self):
@@ -278,7 +279,8 @@ class Projection(EPConnection):
         e.g. to reenable plasticity of any type that was disabled.
         """
         self.plastic = self._plasticity_setting_stack.pop()
-        self.output_fn.restore_plasticity_state()
+        if hasattr(self.output_fn,'restore_plasticity_state'):
+            self.output_fn.restore_plasticity_state()
 
 
 
@@ -530,7 +532,8 @@ class ProjectionSheet(Sheet):
         """
         
         super(ProjectionSheet,self).override_plasticity_state(new_plasticity_state)
-        self.output_fn.override_plasticity_state(new_plasticity_state)
+        if hasattr(self.output_fn,'override_plasticity_state'):
+            self.output_fn.override_plasticity_state(new_plasticity_state)
         for proj in self.in_connections:
             # Could instead check for a override_plasticity_state method
             if isinstance(proj,Projection):
@@ -539,7 +542,8 @@ class ProjectionSheet(Sheet):
 
     def restore_plasticity_state(self):
         super(ProjectionSheet,self).restore_plasticity_state()
-        self.output_fn.restore_plasticity_state()
+        if hasattr(self.output_fn,'restore_plasticity_state'):
+            self.output_fn.restore_plasticity_state()
         for proj in self.in_connections:
             if isinstance(proj,Projection):
                 proj.restore_plasticity_state()

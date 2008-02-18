@@ -41,29 +41,6 @@ class OutputFn(ParameterizedObject):
         assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
         return PipelineOF(output_fns=[self,of])
 
-    def override_plasticity_state(self, new_plasticity_state):
-        """
-        Temporarily disable plasticity of internal state.
-
-        This function should be implemented by all subclasses so that
-        after a call, the output should always be the same for any
-        given input pattern (apart from true randomness or other
-        differences that do not depend on an internal state), and no
-        call should have any effect that persists after a subsequent
-        restore_plasticity_state() call.
-        """
-        pass
-
-    def restore_plasticity_state(self):
-        """
-        Re-enable plasticity of internal state after an override_plasticity_state call.
-
-        This function should be implemented by all subclasses to
-        remove the effect of the most recent override_plasticity_state call,
-        i.e. to reenable changes to the internal state, without any
-        lasting effect from the time during which plasticity was disabled.
-        """
-        pass    
 
 
 
@@ -101,17 +78,26 @@ class PipelineOF(OutputFn):
         assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
         self.output_fns.append(of)
 
-    def override_plasticity_state(self, new_plasticity_state):
-        """Call override_plasticity_state for each output_fn."""
-        
-        for of in self.output_fns:
-            of.override_plasticity_state(new_plasticity_state)
-        
-    def restore_plasticity_state(self):
-        """Call restore_plasticity_state for each output_fn."""
-
-        for of in self.output_fns:
-            of.restore_plasticity_state()
+    def __getattribute__(self,name):
+        # Return name from this object, unless it doesn't exist - in
+        # which case, assume name is a function existing on 
+        # the output_fns and try to call it on all of them. Will only
+        # raise an error if name is found but isn't callable.
+        # CEBALERT: should be changed to do different things depending
+        # what the type of of.name is & need to think about what
+        # errors to raise, if any.
+        # (e.g. inspect first OF: if name not present, try the next;
+        # if name present & a method, try to call for each OF; if name
+        # present and an attribute, return a list? What if some don't
+        # have it? etc... would a warning be useful?
+        try:
+            return super(PipelineOF,self).__getattribute__(name)
+        except AttributeError:
+            def call_name_for_all_ofs(*args,**kw):
+                for of in self.output_fns:
+                    if hasattr(of,name):
+                        getattr(of,name)(*args,**kw)
+            return call_name_for_all_ofs
 
 
 
