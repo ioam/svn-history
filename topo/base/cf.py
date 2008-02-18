@@ -26,7 +26,7 @@ import copy
 import patterngenerator
 from patterngenerator import PatternGeneratorParameter
 from parameterizedobject import ParameterizedObject
-from functionfamilies import OutputFnParameter,IdentityOF
+from functionfamilies import OutputFn,IdentityOF
 from functionfamilies import LearningFnParameter,Hebbian,IdentityLF
 from functionfamilies import ResponseFnParameter,DotProduct
 from functionfamilies import CoordinateMapperFnParameter,IdentityMF
@@ -525,7 +525,7 @@ class CFPOF_Plugin(CFPOutputFn):
     Applies the specified single_cf_fn to each CF in the CFProjection
     for which the mask is nonzero.
     """
-    single_cf_fn = OutputFnParameter(default=IdentityOF(),
+    single_cf_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),
         doc="Accepts an OutputFn that will be applied to each CF individually.")
     
     def __call__(self, iterator, mask, **params):
@@ -548,21 +548,11 @@ class CFPOF_Identity(CFPOutputFn):
     Must never be changed or subclassed, because it might never
     be called. (I.e., it could simply be tested for and skipped.)
     """
-    single_cf_fn = OutputFnParameter(default=IdentityOF(),constant=True)
+    single_cf_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),constant=True)
     
     def __call__(self, iterator, mask, **params):
         pass
 
-
-
-class CFPOutputFnParameter(ClassSelectorParameter):
-    """
-    Parameter whose value can be any CFOutputFn; i.e., a function
-    that iterates through all the CFs of a CFProjection and applies
-    an output_fn to each.
-    """
-    def __init__(self,default=CFPOF_Plugin(),**params):
-        super(CFPOutputFnParameter,self).__init__(CFPOutputFn,default=default,**params)        
 
 
 
@@ -634,11 +624,11 @@ class CFProjection(Projection):
         in units that are independent of the density of each Sheet.""")
 
     # CEBALERT: is this used?
-    debug_output_fn  = OutputFnParameter(
+    debug_output_fn  = ClassSelectorParameter(OutputFn,
         default=IdentityOF(),
         doc='Function applied to the Projection activity after it is computed.')
         
-    weights_output_fn = CFPOutputFnParameter(
+    weights_output_fn = ClassSelectorParameter(CFPOutputFn,
         default=CFPOF_Plugin(),
         doc='Function applied to each CF after learning.')
 

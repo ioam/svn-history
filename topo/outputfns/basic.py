@@ -26,7 +26,7 @@ from math import ceil
 from topo.base.sheet import activity_type
 from topo.base.arrayutils import clip_lower
 from topo.base.arrayutils import L2norm, norm, array_argmax
-from topo.base.functionfamilies import OutputFn, OutputFnWithState, OutputFnParameter
+from topo.base.functionfamilies import OutputFn, OutputFnWithState
 from topo.base.parameterclasses import Parameter,Number,ListParameter,BooleanParameter, StringParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGeneratorParameter,Constant

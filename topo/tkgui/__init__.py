@@ -78,8 +78,9 @@ from topo.projections import *
 from topo.responsefns import *
 from topo.sheets import *
 
-from topo.base.cf import CFPLearningFnParameter,CFPOutputFnParameter,CFPResponseFnParameter
-from topo.base.functionfamilies import LearningFnParameter,OutputFnParameter,ResponseFnParameter
+# CB: why are these here? are they really used in the gui?
+from topo.base.cf import CFPLearningFnParameter,CFPResponseFnParameter
+from topo.base.functionfamilies import LearningFnParameter,ResponseFnParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
 
 

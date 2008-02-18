@@ -11,14 +11,14 @@ import ImageOps
 from numpy.oldnumeric import array, Float, sum, ravel, ones
 
 from topo.base.boundingregion import BoundingBox
-from topo.base.parameterclasses import Number, Parameter, Enumeration, Integer
+from topo.base.parameterclasses import Number, Parameter, Enumeration, Integer,\
+     ClassSelectorParameter
 from topo.base.parameterclasses import StringParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGenerator
-from topo.base.projection import OutputFnParameter
 from topo.base.sheetcoords import SheetCoordinateSystem
 
-from topo.outputfns.basic import DivisiveNormalizeLinf,IdentityOF
+from topo.outputfns.basic import DivisiveNormalizeLinf,IdentityOF,OutputFn
 
 from topo.misc.filepaths import Filename
 
@@ -260,7 +260,7 @@ class GenericImage(PatternGenerator):
 
     __abstract = True
     
-    output_fn = OutputFnParameter(default=IdentityOF())
+    output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF())
     
     aspect_ratio  = Number(default=1.0,bounds=(0.0,None),
         softbounds=(0.0,2.0),precedence=0.31,doc="""
@@ -274,7 +274,8 @@ class GenericImage(PatternGenerator):
         precedence=0.95,doc="""
         How to scale the initial image size relative to the default area of 1.0.""")
 
-    whole_image_output_fn = OutputFnParameter(default=DivisiveNormalizeLinf(),
+    whole_image_output_fn = ClassSelectorParameter(
+        OutputFn,default=DivisiveNormalizeLinf(),
         precedence=0.96,doc="""
         Function applied to the whole, original image array (before any cropping).""")
 

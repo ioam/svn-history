@@ -20,7 +20,6 @@ from numpy import alltrue
 from topo.base.parameterizedobject import ParamOverrides
 from topo.base.parameterclasses import Integer, Number, Parameter, Enumeration
 from topo.base.parameterclasses import ListParameter
-from topo.base.functionfamilies import OutputFnParameter
 from topo.base.patterngenerator import PatternGenerator
 
 # Imported here so that all PatternGenerators will be in the same package

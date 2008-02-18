@@ -11,7 +11,7 @@ from math import pi
 from numpy.oldnumeric import add,subtract,cos,sin
 
 from boundingregion import BoundingBox, BoundingRegionParameter
-from functionfamilies import OutputFnParameter, IdentityOF
+from functionfamilies import OutputFn, IdentityOF
 from parameterclasses import Parameter,Number,ClassSelectorParameter,CompositeParameter
 from parameterizedobject import ParameterizedObject,ParamOverrides
 from sheetcoords import SheetCoordinateSystem
@@ -102,7 +102,7 @@ class PatternGenerator(ParameterizedObject):
         pattern array after it has been created, before any output_fn is
         applied. This can be used to shape the pattern.""")
     
-    output_fn = OutputFnParameter(default=IdentityOF(),precedence=0.08,doc="""
+    output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),precedence=0.08,doc="""
         Optional function to apply to the pattern array after it has been created.
         This function can be used for normalization, thresholding, etc.""")
 

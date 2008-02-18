@@ -156,17 +156,6 @@ class OutputFnWithState(OutputFn):
 
 
 
-class OutputFnParameter(ClassSelectorParameter):
-    """
-    Parameter whose value can be any OutputFn, i.e., a function
-    mapping a 2D array to a 2D array.
-    """
-    def __init__(self,default=IdentityOF(),**params):
-        super(OutputFnParameter,self).__init__(OutputFn,default=default,**params)
-
-
-
-
 class LearningFn(ParameterizedObject):
     """
     Abstract base class for learning functions that plug into

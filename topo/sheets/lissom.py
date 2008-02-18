@@ -10,9 +10,11 @@ import numpy
 from numpy import abs,zeros,ones
 import topo
 
-from topo.base.cf import CFSheet, CFPOutputFnParameter
-from topo.base.parameterclasses import BooleanParameter, Number, Integer, ListParameter
-from topo.base.projection import OutputFnParameter, Projection
+from topo.base.functionfamilies import OutputFn
+from topo.base.cf import CFSheet, CFPOutputFn
+from topo.base.parameterclasses import BooleanParameter, Number, Integer,\
+     ListParameter,ClassSelectorParameter
+from topo.base.projection import Projection
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import activity_type
 from topo.misc.inlinec import optimized
@@ -149,12 +151,13 @@ class LISSOM(JointNormalizingCFSheet):
        Whether to modify the weights after every settling step.
        If false, waits until settling is completed before doing learning.""")
 
-    output_fn = OutputFnParameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
+    output_fn = ClassSelectorParameter(OutputFn,default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
     
     precedence = Number(0.6)
     
-    post_initialization_weights_output_fn = CFPOutputFnParameter(default=None,
-       doc="""Weights output_fn which can be set after an initial normalization step""")
+    post_initialization_weights_output_fn = ClassSelectorParameter(
+        CFPOutputFn,default=None,doc="""
+        Weights output_fn which can be set after an initial normalization step""")
 
     
     def __init__(self,**params):

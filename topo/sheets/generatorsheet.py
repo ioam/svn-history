@@ -8,12 +8,13 @@ __version__='$Revision$'
 import copy
 
 from topo.base.simulation import FunctionEvent, PeriodicEventSequence
-from topo.base.functionfamilies import OutputFnParameter,IdentityOF
+from topo.base.functionfamilies import OutputFn,IdentityOF
 from topo.base.sheet import Sheet 
 from topo.base.sheet import BoundingBox
 from topo.misc.utils import NxN
 
-from topo.base.parameterclasses import Number, ListParameter, BooleanParameter
+from topo.base.parameterclasses import Number, ListParameter, BooleanParameter,\
+     ClassSelectorParameter
 
 import topo.base.patterngenerator
 import topo.patterns.basic
@@ -47,7 +48,7 @@ class GeneratorSheet(Sheet):
     input_generator = topo.base.patterngenerator.PatternGeneratorParameter(doc=
         "Specifies a particular PatternGenerator type to use when creating patterns.")
 
-    output_fn = OutputFnParameter(doc="""
+    output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),doc="""
         Output function to apply (if apply_output_fn is true) to this Sheet's activity.""")
     
     apply_output_fn=BooleanParameter(default=True,doc="""

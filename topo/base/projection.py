@@ -8,10 +8,11 @@ __version__='$Revision$'
 from numpy import array,asarray,ones,sometrue, logical_and, logical_or
 
 from sheet import Sheet
-from parameterclasses import Number, BooleanParameter, Parameter, ListParameter
+from parameterclasses import Number, BooleanParameter, Parameter, ListParameter,\
+     ClassSelectorParameter
 from parameterizedobject import ParameterizedObject
 from simulation import EPConnection
-from functionfamilies import OutputFnParameter,IdentityOF
+from functionfamilies import OutputFn,IdentityOF
 from topo.misc.keyedlist import KeyedList
 
 
@@ -184,9 +185,8 @@ class Projection(EPConnection):
     
     dest_port = Parameter(default='Activity')
 
-    output_fn  = OutputFnParameter(
-        default=IdentityOF(),
-        doc='Function applied to the Projection activity after it is computed.')
+    output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),doc="""
+    Function applied to the Projection activity after it is computed.""")
 
     plastic = BooleanParameter(default=True, doc="""
         Whether or not to update the internal state on each call.
@@ -314,8 +314,7 @@ class ProjectionSheet(Sheet):
     
     dest_ports=['Activity']
     
-    output_fn = OutputFnParameter(
-        default=IdentityOF(),
+    output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),
         doc="Output function to apply (if apply_output_fn is true) to this Sheet's activity.")
     
     apply_output_fn=BooleanParameter(default=True,

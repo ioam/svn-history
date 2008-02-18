@@ -16,16 +16,19 @@ from numpy import exp,zeros,ones
 from topo.base.projection import Projection
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheet import activity_type
-from topo.base.cf import CFProjection,CFPLearningFnParameter,CFPLF_Identity,CFPResponseFnParameter,CFPOutputFnParameter,CFPOF_Identity,CFPOutputFn,CFPResponseFn, DotProduct, ResponseFnParameter
-from topo.base.functionfamilies import OutputFnParameter,LearningFnParameter,IdentityLF
-from topo.base.parameterclasses import Number,BooleanParameter,Parameter, ListParameter
+from topo.base.cf import CFProjection,CFPLearningFnParameter,CFPLF_Identity,\
+     CFPResponseFnParameter,CFPOutputFn,CFPOF_Identity,CFPOutputFn,CFPResponseFn,\
+     DotProduct, ResponseFnParameter
+from topo.base.functionfamilies import LearningFnParameter,IdentityLF
+from topo.base.parameterclasses import Number,BooleanParameter,Parameter,\
+     ListParameter,ClassSelectorParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGeneratorParameter,Constant
 from topo.base.sheetview import UnitView
 from topo.base.cf import ConnectionField, CFPRF_Plugin, MaskedCFIter
 from topo.base.functionfamilies import CoordinateMapperFnParameter,IdentityMF
 from topo.misc.utils import rowcol2idx
-from topo.outputfns.basic import IdentityOF
+from topo.outputfns.basic import OutputFn,IdentityOF
 
 
 
@@ -35,7 +38,7 @@ class CFPOF_SharedWeight(CFPOutputFn):
 
     Applies the single_cf_fn to the single shared CF's weights.
     """
-    single_cf_fn = OutputFnParameter(default=IdentityOF())
+    single_cf_fn = ClassSelectorParameter(OutputFn,default=IdentityOF())
     
     def __call__(self, cfs, output_activity, norm_values=None, **params):
         """Apply the specified single_cf_fn to every CF."""
@@ -97,8 +100,9 @@ class SharedWeightCFProjection(CFProjection):
     ### actually work yet, but we could certainly extend it to support
     ### learning if desired, e.g. to learn position-independent responses.
     learning_fn = CFPLearningFnParameter(CFPLF_Identity(),constant=True)
-    output_fn  = OutputFnParameter(default=IdentityOF())
-    weights_output_fn = CFPOutputFnParameter(default=CFPOF_SharedWeight())
+    output_fn  = ClassSelectorParameter(OutputFn,default=IdentityOF())
+    weights_output_fn = ClassSelectorParameter(
+        CFPOutputFn,default=CFPOF_SharedWeight())
 
 
     def __init__(self,**params):
@@ -289,7 +293,7 @@ class OneToOneProjection(Projection):
         default=Constant(),constant=True,
         doc="""Generate initial weight values for each unit of the destination sheet.""")
 
-    output_fn  = OutputFnParameter(default=IdentityOF(),
+    output_fn  = ClassSelectorParameter(OutputFn,default=IdentityOF(),
         doc='Function applied to the Projection activity after it is computed.')
 
     learning_fn = LearningFnParameter(default=IdentityLF(),

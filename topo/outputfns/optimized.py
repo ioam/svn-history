@@ -6,8 +6,8 @@ Requires the weave package; without it unoptimized versions are used.
 """
 
 from topo.base.cf import CFPOutputFn,CFPOF_Plugin
-from topo.base.functionfamilies import OutputFn, OutputFnParameter, IdentityOF
-from topo.base.parameterclasses import Number
+from topo.base.functionfamilies import OutputFn, IdentityOF
+from topo.base.parameterclasses import Number, ClassSelectorParameter
 from topo.base.parameterizedobject import ParameterizedObject
 
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
@@ -25,10 +25,8 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     Intended to be equivalent to, but faster than,
     CFPOF_DivisiveNormalizeL1.
     """
-    single_cf_fn = OutputFnParameter(DivisiveNormalizeL1(norm_value=1.0),
-                                     constant=True)
-
-    
+    single_cf_fn = ClassSelectorParameter(
+        OutputFn,DivisiveNormalizeL1(norm_value=1.0),constant=True)
     
     def __call__(self, iterator, mask, **params):
         rows,cols = mask.shape
@@ -89,8 +87,8 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
     property of ConnectionField.
     """
 
-    single_cf_fn = OutputFnParameter(DivisiveNormalizeL1(norm_value=1.0),
-                                     constant=True)
+    single_cf_fn = ClassSelectorParameter(
+        OutputFn,default=DivisiveNormalizeL1(norm_value=1.0),constant=True)
 
     def __call__(self, iterator, mask, **params):
         """
