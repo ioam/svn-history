@@ -194,9 +194,7 @@ class EventProcessor(ParameterizedObject):
                                  if self._port_match(conn.src_port,[src_port])]
 
         for conn in out_conns_on_src_port:
-            self.verbose("Sending output on src_port %s via connection %s to %s"%(src_port,
-                                                                                 conn.name,
-                                                                                 conn.dest.name))
+            self.verbose("Sending output on src_port %s via connection %s to %s" % (str(src_port), conn.name, conn.dest.name))
             e=EPConnectionEvent(conn.delay+self.simulation.time(),conn,data)
             self.simulation.enqueue_event(e)
             
