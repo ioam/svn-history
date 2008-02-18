@@ -7,11 +7,12 @@ __version__ = "$Revision$"
 
 import re
 
-from numpy import sqrt,dot,arctan2,array2string,logical_not,fmod,floor,array,concatenate
-import numpy
+from numpy import sqrt,dot,arctan2,array2string,logical_not,fmod,floor,\
+     array,concatenate,set_printoptions
+from numpy import abs # pylint: disable-msg=W0622
 
 # Ask numpy to print even relatively large arrays by default
-numpy.set_printoptions(threshold=200*200)
+set_printoptions(threshold=200*200)
 
 
 def L2norm(v):
@@ -25,7 +26,7 @@ def norm(v,p=2):
     """
     Returns the Lp norm of v, where p is arbitrary and defaults to 2.
     """
-    return (numpy.abs(v)**p).sum()**(1.0/p)
+    return (abs(v)**p).sum()**(1.0/p)
 
 
 def divisive_normalization(weights):
@@ -162,7 +163,7 @@ def __numpy_ufunc_pickle_support():
 
     # Note that this only works if the ufunc is from numpy; we might want to add a warning
     # on finding that isinstance(ufunc,numpy.ufunc) is False.
-
+    from numpy import ufunc
     import copy_reg
 
     def ufunc_pickler(ufunc):
@@ -170,7 +171,7 @@ def __numpy_ufunc_pickle_support():
         return ufunc.__name__
 
     # CB: could add ufunc_unpickler if we need.
-    copy_reg.pickle(numpy.ufunc,ufunc_pickler)#,ufunc_unpickler)
+    copy_reg.pickle(ufunc,ufunc_pickler)#,ufunc_unpickler)
 
 
 __numpy_ufunc_pickle_support()
