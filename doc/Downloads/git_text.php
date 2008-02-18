@@ -215,6 +215,7 @@ checkout master</code>).
 e.g. new-feature-name -> master
 svn checkout master
 ?git pull . new-feature-name
+git-svn dcommit   XXXX options about log message, --squash for one commit only
 then delete new-feature-name branch.
 </pre>
 
@@ -275,6 +276,8 @@ git branch tkgui-tk85 origin/tkgui-tk85
 git checkout tkgui-tk85
 </pre>
 
+
+<!-- or should it be fetch? -->
 
 <P>You can both now share code via push/pull to/from that repository. Once you finish the new feature, you can send it to Topographica's SVN by pulling it into your XXXX git-svn repo and dcommitting 
 
