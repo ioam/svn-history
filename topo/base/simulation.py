@@ -510,9 +510,6 @@ class FunctionEvent(Event):
     """
     Event that executes a given function function(*args,**kw).
     """
-    # JPALERT: If Events are ParameterizedObjects now, then their
-    # arguments (e.g. time, fn, args, kw, data, conn, etc...) should
-    # be parameters, no?
     def __init__(self,time,fn,*args,**kw):
         super(FunctionEvent,self).__init__(time)
         self.fn = wrap_callable(fn)
