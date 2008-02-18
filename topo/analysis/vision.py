@@ -18,7 +18,7 @@ from topo.base.parameterclasses import Number
 from topo.misc.numbergenerators import UniformRandom
 from math import fmod,floor,pi, sin, cos, sqrt
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
-    
+
 max_value = 0
 global_index = ()
 
@@ -156,5 +156,5 @@ def analyze_complexity(full_matrix):
         #print sheet
         complx = array(complexity(full_matrix[sheet]))
         sheet.sheet_views['Complex'+'Selectivity']=SheetView((complx,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time())
-    plot_modulation_ratio(full_matrix)               
+    topo.commands.pylabplots.plot_modulation_ratio(full_matrix)               
     phase_preference_scatter_plot("V1Simple")
