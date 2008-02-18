@@ -79,6 +79,10 @@ users</A>. Operations such as <code>diff</code>
 and <code>commit</code> that you perform with <code>git</code> are
 local to your repository.
 
+<!-- mention git commit -a -->
+
+<!--(echo; git-svn show-ignore) >> .git/info/exclude-->
+
 <P>Before committing to your repository, you should probably identify
 yourself to git:
 <pre>
@@ -206,7 +210,7 @@ checkout master</code>).
 
 <H4>Sharing your repository</H4>
 
-<P>You or anyone else can <A HREF="">XXXXclone</A> your Git repository to
+<P>You or anyone else can <A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-clone.html">clone</A> your Git repository to
 share code (see the tutorial or other documentation mentioned earlier for
 details of this).
 
@@ -260,6 +264,7 @@ Now someone will have a working copy in <code>/home/someone/work/some-feature-na
 git clone ssh://ceball@doozy.inf.ed.ac.uk/home/ceball/git/some-feature-name
 </pre>
 
+(share ssh keys to avoid passwords)
 
 <!-- public hosting
 [remote "origin"]
@@ -278,6 +283,7 @@ error: failed to push to 'git@gitorious.org:topographica/tkgui-tk85.git'
 git remote add origin git@gitorious.org:/topographica/tkgui-tk85.git
 -->
 
+<!-- CB: there seem to be various gui tools for git, too -->
 
 
 <H2>References</H2>
@@ -293,3 +299,17 @@ http://www.flavio.castelli.name/howto_use_git_with_svn
 
 
 http://utsl.gen.nz/talks/git-svn/intro.html
+
+
+http://tsunanet.blogspot.com/2007/07/learning-git-svn-in-5min.html
+
+
+http://en.wikibooks.org/wiki/Source_Control_Management_With_Git/Interoperation/Subversion
+
+http://hassox.blogspot.com/2007/12/using-git-with-svn.html
+
+http://www.kernel.org/pub/software/scm/git/docs/everyday.html
+
+Multiple branches using git-svn
+http://www.dmo.ca/blog/20070608113513
+</pre>
