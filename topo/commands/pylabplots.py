@@ -28,6 +28,7 @@ import copy
 from numpy.oldnumeric import arange, sqrt, pi, array, floor, transpose, argmax, argmin
 
 import topo
+import errno
 
 from topo.base.arrayutils import octave_output
 from topo.base.sheet import Sheet
@@ -36,7 +37,7 @@ from topo.base.arrayutils import wrap
 from topo.misc.filepaths import normalize_path
 from topo.analysis.vision import complexity
 from pylab import save
-
+import topo.analysis.vision
 
 
 def windowtitle(title):
@@ -579,7 +580,115 @@ def plot_modulation_ratio(fullmatrix):
         pylab.hist(v1c,bins)
         pylab.axis([0,2.0,0,3500])
         pylab.subplot(313)
-        #pylab.hist(numpy.concatenate(v1s,v1c),bins)
+        pylab.hist(numpy.concatenate(v1s,v1c),bins)
         pylab.axis([0,2.0,0,3500])
         pylab.savefig(str(topo.sim.time()) + 'RM.png')
         #pylab.show()
+
+def tuning_curve_batch(directory,filename,plot_type,unit,sheet_name,coordinate,x_axis):
+    """
+    Saves a plot of the tuning curve for the appropriate feature type, such as orientation, contrast or size into a file.
+
+    The curve datapoints are collected from the curve_dict for each
+    sheet, depending on the value of topo.commands.analysis.sheet_name
+    and topo.commands.analysis.coordinate (which may be set by the GUI or
+    by hand).
+    """
+
+    sheet=topo.sim[sheet_name]
+    i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
+    
+    pylab.figure(figsize=(7,7))
+    isint=pylab.isinteractive()
+    pylab.ioff()
+    manager = pylab.get_current_fig_manager()
+    
+    pylab.ylabel('Response')
+    pylab.xlabel(x_axis.capitalize()+' ('+unit+')')
+    pylab.title('Sheet '+sheet_name+', coordinate(x,y)='+'('+
+	 	str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+topo.sim.timestr())
+    manager.window.title(topo.sim.name+': '+x_axis.capitalize()+' Tuning Curve')
+
+
+    for curve_label in sorted(sheet.curve_dict[x_axis].keys()):
+        x_values, y_values = tuning_curve_data(sheet,x_axis, curve_label, i_value, j_value)
+        plot_type(x_values, y_values, label=curve_label)
+         
+    if isint: pylab.ion()
+    pylab.legend(loc=4)
+    try:
+        os.makedirs(directory)
+    except os.error, e:
+	if e.errno != errno.EEXIST:
+	    raise
+    pylab.savefig(os.path.join(directory,filename) + '.png')
+
+def or_tuning_curve_batch(directory,filename,plot_type,unit,sheet_name,coordinate,x_axis):
+    """
+    Plots a tuning curve for orientation which rotates the curve 
+    values so that minimum y values are at the minimum x value.
+    The y_values and labels are rotated by an amount determined by the minmum 
+    y_value for the first curve plotted (usually the lowest contrast curve). 
+
+    The curve datapoints are collected from the curve_dict for each
+    sheet, depending on the value of topo.commands.analysis.sheet_name
+    and topo.commands.analysis.coordinate (which may be set by the GUI or
+    by hand).
+    """
+    # There may be cases (ie when the lowest contrast curve gives a lot of zero y_values)
+    # in which the maximum is not in the centre.
+    # Ideally this should be changed so that the preferred orientation is in the centre.
+    # This may also be useful for other tuning curve types, not just orientation ie. direction.
+    
+    sheet=topo.sim[sheet_name]
+    i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
+    
+
+    pylab.figure(figsize=(7,7))
+    isint=pylab.isinteractive()
+    pylab.ioff()
+    manager = pylab.get_current_fig_manager()
+    
+    pylab.ylabel('Response')
+    pylab.xlabel(x_axis.capitalize()+' ('+unit+')')
+    pylab.title('Sheet '+sheet_name+', coordinate(x,y)='+'('+
+	 	str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+topo.sim.timestr())
+    #manager.window.title(topo.sim.name+': '+x_axis.capitalize()+' Tuning Curve')
+
+    def rotate(seq, n=1):
+        n = n % len(seq) # n=hop interval
+        return seq[n:] + seq[:n]
+
+    first_curve=True
+    for curve_label in sorted(sheet.curve_dict[x_axis].keys()):
+	if first_curve==True:
+	    x_values, y_values = tuning_curve_data(sheet,x_axis, curve_label, i_value, j_value)
+	    min_arg=argmin(y_values)
+	    x_min=x_values[min_arg] 
+	    y_min=y_values[min_arg]
+	    y_values=rotate(y_values, n=min_arg)
+	    ticks=rotate(x_values, n=min_arg)
+	    label_min=ticks[0]
+	    x_max=min(x_values)+pi
+	    x_values.append(x_max)
+	    y_values.append(y_min)
+	    first_curve=False
+	else:
+	    y_values=[sheet.curve_dict[x_axis][curve_label][key].view()[0][i_value,j_value] for key in ticks]
+	    y_min=sheet.curve_dict[x_axis][curve_label][x_min].view()[0][i_value,j_value] 
+	    y_values.append(y_min)
+	labels = copy.copy(ticks)
+	labels.append(label_min)
+	labels= [x*180/pi for x in labels]
+	labels_new = [str(int(x)) for x in labels]
+	pylab.xticks(x_values, labels_new)
+	plot_type(x_values, y_values, label=curve_label)
+         
+    if isint: pylab.ion()
+    pylab.legend(loc=4)
+    try:
+        os.makedirs(directory)
+    except os.error, e:
+	if e.errno != errno.EEXIST:
+	    raise
+    pylab.savefig(os.path.join(directory,filename) + '.png')
