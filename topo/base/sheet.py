@@ -32,7 +32,8 @@ from boundingregion import BoundingBox, BoundingRegionParameter
 
 activity_type = Float
 
-class Sheet(EventProcessor,SheetCoordinateSystem):
+# (disable W0223 because input_event is deliberately still not implemented)
+class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
     """
     The generic base class for neural sheets.
 
