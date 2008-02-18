@@ -26,7 +26,7 @@ from math import ceil
 from topo.base.sheet import activity_type
 from topo.base.arrayutils import clip_lower
 from topo.base.arrayutils import L2norm, norm, array_argmax
-from topo.base.functionfamilies import OutputFn, OutputFnWithState
+from topo.base.functionfamilies import OutputFn
 from topo.base.parameterclasses import Parameter,Number,ListParameter,BooleanParameter, StringParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGeneratorParameter,Constant
@@ -420,6 +420,61 @@ class PoissonSample(OutputFn):
         x *= 0.0
         x += sample
         x *= self.out_scale
+
+
+
+class OutputFnWithState(OutputFn):
+    """
+    Abstract base class for OutputFns that need to maintain a self.plastic parameter.
+
+    These OutputFns typically maintain some form of internal history
+    or other state from previous calls, which can be disabled by
+    override_plasticity_state().
+    """
+
+    plastic = BooleanParameter(default=True, doc="""
+        Whether or not to update the internal state on each call.
+        Allows plasticity to be turned off during analysis, and then re-enabled.""")
+
+
+    def __init__(self,**params):
+        super(OutputFnWithState,self).__init__(**params)
+        self._plasticity_setting_stack = []
+
+
+    def override_plasticity_state(self, new_plasticity_state):
+        """
+        Temporarily disable plasticity of internal state.
+
+        This function should be implemented by all subclasses so that
+        after a call, the output should always be the same for any
+        given input pattern (apart from true randomness or other
+        differences that do not depend on an internal state), and no
+        call should have any effect that persists after a subsequent
+        restore_plasticity_state() call.
+        
+        By default, simply saves a copy of the 'plastic' parameter to
+        an internal stack (so that it can be restored by
+        restore_plasticity_state()), and then sets the plastic
+        parameter to the given value (True or False).
+        """
+        self._plasticity_setting_stack.append(self.plastic)
+        self.plastic=new_plasticity_state
+
+
+    def restore_plasticity_state(self):
+        """
+        Re-enable plasticity of internal state after an override_plasticity_state call.
+
+        This function should be implemented by all subclasses to
+        remove the effect of the most recent override_plasticity_state call,
+        i.e. to reenable changes to the internal state, without any
+        lasting effect from the time during which plasticity was disabled.
+
+        By default, simply restores the last saved value of the
+        'plastic' parameter.
+        """
+        self.plastic = self._plasticity_setting_stack.pop()                        
 
 
 
