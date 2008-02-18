@@ -109,7 +109,19 @@ def _sane_plot_data(channels,sheet_views):
      else:
           return True
 
-
+# JABALERT: How can we handle joint normalization, where a set of
+# plots (e.g. a CFProjectionPlotGroup, or the jointly normalized
+# subset of a ConnectionFields plot) is all scaled by the same amount,
+# so that relative strengths can be determined?  Maybe we can have
+# make_template_plot and the various TemplatePlot types accept a
+# parameter 'range_only' that makes them simply calculate a pair
+# (min,max) with the values to use for scaling, and then the caller
+# (e.g. CFProjectionPlotGroup._create_plots) would run through
+# everything twice, first to get the ranges, and then the next time it
+# would supply an explicit range for scaling (overriding the default
+# single-plot normalization)?  See the commented-out code for
+# value_range below for a start. I *think* that would work, but maybe
+# there is some simpler way?
 def make_template_plot(channels,sheet_views,density=None,
               plot_bounding_box=None,normalize=False,name='None'):
      """
@@ -259,12 +271,22 @@ class TemplatePlot(Plot):
 
     def _normalize(self,a):
         """ 
-        Normalize an array s.
-        In case of a constant array, ones is returned for value greater than zero,
-        and zeros in case of value inferior or equal to zero.
+        Normalize an array s to be in the range 0 to 1.0.
+        For an array of identical elements, returns an array of ones
+        if the elements are greater than zero, and zeros if the
+        elements are less than or equal to zero.
         """
+
+        # Store range of values, as a start to supporting joint normalization
+        #if not hasattr(self,value_range):
+        #     self.value_range=(a.min(),a.max())
+        #else: # If normalizing multiple matrices, take the largest values
+        #     self.value_range=(min(self.value_range[0],a.min()),
+        #                       max(self.value_range[1],a.max()))
+
         a_offset = a-a.min()
         max_a_offset = a_offset.max()
+
         if max_a_offset>0:
              a = divide(a_offset,float(max_a_offset))
         else:
