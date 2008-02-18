@@ -109,24 +109,6 @@ class NormalRandom(RandomDistribution):
         return self.random_generator.normalvariate(self.mu,self.sigma)
 
 
-# It would be good to eliminate the dependency on topo, but it's not
-# otherwise obvious how to pass in a suitable time object.  Storing
-# topo.sim.time in a CallableParameter won't work as of Python 2.4,
-# because a reference to an instance method cannot be pickled.
-# Calling .time() on a stored object doesn't work either, because
-# storing topo.sim leads to a infinite loop during pickling topo.sim.
-# Surely there is somehow a way to provide topo.sim.time to the
-# constructor rather than hardcoding it like this...
-#
-# JP: CallableParameter now handles pickling instance methods like
-# topo.sim.time.  I have added a parameter below, but it is commented
-# out because of the assertion (above) about circular references to
-# topo.sim causing infinite loops in pickling.  (The
-# InstanceMethodWrapper that CallableParameter uses stores a refernce
-# to the instance that the method belongs to.) Normally, pickling handles
-# circular references with no problem, so I wonder what's going wrong.
-
-
 import topo
 class ExponentialDecay(ParameterizedObject):
     """
@@ -148,6 +130,8 @@ class ExponentialDecay(ParameterizedObject):
         Another popular choice of base is 2, which allows the
         time_constant to be interpreted as a half-life.""")
 
+    # CEBALERT: default should be more like 'lambda:0', but that would
+    # confuse GUI users.
     time_fn = CallableParameter(default=topo.sim.time,doc="""
      Function to generate the time used for the decay.""")
 
