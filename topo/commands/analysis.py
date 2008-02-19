@@ -27,7 +27,6 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.parameterclasses import Parameter
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
-from topo.commands.pylabplots import plot_modulation_ratio
 from topo.misc.distribution import Distribution
 from topo.patterns.random import GaussianRandom
 from topo.base.simulation import EPConnectionEvent
