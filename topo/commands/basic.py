@@ -31,7 +31,7 @@ from topo.base.projection import Projection, ProjectionSheet
 
 from topo.sheets.generatorsheet import GeneratorSheet
 
-from topo.misc.utils import ExtraPickler
+from topo.misc.utils import ExtraPickler, LegacySnapshotSupport
 from topo.misc.filepaths import normalize_path
 from topo.misc import filepaths
 
@@ -183,6 +183,8 @@ def load_snapshot(snapshot_name):
     except (IOError,NameError):
         snapshot = open(snapshot_name,'r')
 
+    LegacySnapshotSupport.install()
+        
     # If it's not xml, open as a normal pickle.
     try:
         gnosis.xml.pickle.load(snapshot,allow_rawpickles=True,class_search=gnosis.xml.pickle.SEARCH_ALL)
