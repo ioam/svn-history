@@ -1008,3 +1008,18 @@ class CFSheet(ProjectionSheet):
     def release_unit_view(self,x,y):
         self.release_sheet_view(('Weights',x,y))
 
+
+
+
+# CB: temporary (working here)
+class CFPOutputFnParameter(object):
+    def __new__(cls,*args,**kw):
+        return ClassSelectorParameter(CFPOutputFn,*args,**kw)
+
+class CFPResponseFnParameter(object):
+    def __new__(cls,*args,**kw):
+        return ClassSelectorParameter(CFPResponseFn,*args,**kw)
+
+class CFPLearningFnParameter(object):
+    def __new__(cls,*args,**kw):
+        return ClassSelectorParameter(CFPLearningFn,*args,**kw)

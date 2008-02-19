@@ -210,3 +210,17 @@ class CoordinateMapperFnParameter(ClassSelectorParameter):
     def __init__(self,default=IdentityMF(),**params):
         super(CoordinateMapperFnParameter,self).__init__(CoordinateMapperFn,default=default,**params)
 
+
+
+# CB: temporary (working here)
+class OutputFnParameter(object):
+    def __new__(cls,*args,**kw):
+        return ClassSelectorParameter(OutputFn,*args,**kw)
+
+class ResponseFnParameter(object):
+    def __new__(cls,*args,**kw):
+        return ClassSelectorParameter(ResponseFn,*args,**kw)
+
+class LearningFnParameter(object):
+    def __new__(cls,*args,**kw):
+        return ClassSelectorParameter(LearningFn,*args,**kw)
