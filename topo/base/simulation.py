@@ -730,15 +730,6 @@ class SomeTimer(ParameterizedObject):
         self.__measure(fduration,step)
 
 
-# PICKLEHACK: for snapshots saved before r7901
-class SimSingleton(object):
-    """Support for old snapshots."""
-    def __setstate__(self,state):
-        sim = state['actual_sim']
-        from topo.base.parameterclasses import Dynamic
-        Dynamic.time_fn = sim.time
-
-
 # Simulation stores its events in a linear-time priority queue (i.e., a
 # sorted list.) For efficiency, e.g. for spiking neuron simulations,
 # we'll probably need to replace the linear priority queue with a more

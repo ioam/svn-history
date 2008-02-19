@@ -212,15 +212,3 @@ class CoordinateMapperFnParameter(ClassSelectorParameter):
 
 
 
-# CB: temporary (working here)
-class OutputFnParameter(object):
-    def __new__(cls,*args,**kw):
-        return ClassSelectorParameter(OutputFn,*args,**kw)
-
-class ResponseFnParameter(object):
-    def __new__(cls,*args,**kw):
-        return ClassSelectorParameter(ResponseFn,*args,**kw)
-
-class LearningFnParameter(object):
-    def __new__(cls,*args,**kw):
-        return ClassSelectorParameter(LearningFn,*args,**kw)

@@ -997,16 +997,3 @@ class CFSheet(ProjectionSheet):
 
 
 
-
-# CB: temporary (working here)
-class CFPOutputFnParameter(object):
-    def __new__(cls,*args,**kw):
-        return ClassSelectorParameter(CFPOutputFn,*args,**kw)
-
-class CFPResponseFnParameter(object):
-    def __new__(cls,*args,**kw):
-        return ClassSelectorParameter(CFPResponseFn,*args,**kw)
-
-class CFPLearningFnParameter(object):
-    def __new__(cls,*args,**kw):
-        return ClassSelectorParameter(CFPLearningFn,*args,**kw)

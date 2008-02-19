@@ -512,6 +512,15 @@ class SnapshotCompatibility(object):
             
         class_.__setstate__ = new_setstate
 
+##     @staticmethod
+##     def fake_a_class(module,old_class_name,new_class):
+
+##         class FakeA(object):
+##             def __new__(cls,*args,**kw):
+##                 return constructor
+
+
+
 
 class LegacySnapshotSupport(object):
 
@@ -602,5 +611,61 @@ class LegacySnapshotSupport(object):
 
         from topo.base.sheet import Sheet
         SnapshotCompatibility.select_setstate(Sheet,_sheet_set_shape) 
+
+
+        
+        from topo.base.parameterclasses import ClassSelectorParameter
+        from topo.base.functionfamilies import OutputFn,ResponseFn,LearningFn
+        
+        class OutputFnParameter(object):
+            def __new__(cls,*args,**kw):
+                return ClassSelectorParameter(OutputFn,*args,**kw)
+
+        class ResponseFnParameter(object):
+            def __new__(cls,*args,**kw):
+                return ClassSelectorParameter(ResponseFn,*args,**kw)
+
+        class LearningFnParameter(object):
+            def __new__(cls,*args,**kw):
+                return ClassSelectorParameter(LearningFn,*args,**kw)
+
+
+        import topo.base.functionfamilies
+        topo.base.functionfamilies.OutputFnParameter = OutputFnParameter
+        topo.base.functionfamilies.ResponseFnParameter = ResponseFnParameter
+        topo.base.functionfamilies.LearningFnParameter = LearningFnParameter
+
+
+
+        from topo.base.cf import CFPOutputFn,CFPResponseFn,CFPLearningFn
+        # CB: temporary (working here)
+        class CFPOutputFnParameter(object):
+            def __new__(cls,*args,**kw):
+                return ClassSelectorParameter(CFPOutputFn,*args,**kw)
+
+        class CFPResponseFnParameter(object):
+            def __new__(cls,*args,**kw):
+                return ClassSelectorParameter(CFPResponseFn,*args,**kw)
+
+        class CFPLearningFnParameter(object):
+            def __new__(cls,*args,**kw):
+                return ClassSelectorParameter(CFPLearningFn,*args,**kw)
+
+        import topo.base.cf
+        topo.base.cf.CFPOutputFnParameter = CFPOutputFnParameter
+        topo.base.cf.CFPResponseFnParameter = CFPResponseFnParameter
+        topo.base.cf.CFPLearningFnParameter = CFPLearningFnParameter
+            
+
+        # for snapshots saved before r7901
+        class SimSingleton(object):
+            """Support for old snapshots."""
+            def __setstate__(self,state):
+                sim = state['actual_sim']
+                from topo.base.parameterclasses import Dynamic
+                Dynamic.time_fn = sim.time
+
+        import topo.base.simulation
+        topo.base.simulation.SimSingleton=SimSingleton
 
 
