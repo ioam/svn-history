@@ -1,5 +1,5 @@
 """
-Line-based plotting commands using MatPlotLib.
+Line-based and matrix-based plotting commands using MatPlotLib.
 
 Before importing this file, you will probably want to do something
 like:
