@@ -65,6 +65,14 @@ class IdentityOF(OutputFn):
 class PipelineOF(OutputFn):
     """
     Applies a list of other OutputFns in order, to combine their effects.
+
+
+    Also, passes through method call requests to the list of
+    OutputFns. For instance, if an OutputFn o1 has a method m(arg1),
+    then the following results in m being called on o1:
+    
+     p = PipelineOF(output_fns=[IdentityOF(),o1])
+     p.m(7)  # calls m(7) on o1 but not on the IdentityOF
     """
     output_fns = ListParameter(default=[],class_=OutputFn,doc="""
         List of OutputFns to apply, in order.  The default is an empty list, 
@@ -79,24 +87,26 @@ class PipelineOF(OutputFn):
         self.output_fns.append(of)
 
     def __getattribute__(self,name):
-        # Return name from this object, unless it doesn't exist - in
-        # which case, assume name is a function existing on 
-        # the output_fns and try to call it on all of them. Will only
-        # raise an error if name is found but isn't callable.
-        # CEBALERT: should be changed to do different things depending
-        # what the type of of.name is & need to think about what
-        # errors to raise, if any.
-        # (e.g. inspect first OF: if name not present, try the next;
-        # if name present & a method, try to call for each OF; if name
-        # present and an attribute, return a list? What if some don't
-        # have it? etc... would a warning be useful?
+        # Return attribute 'name' from this object, if one exists.
+        # Otherwise, calls 'name' on each nested OF that has the
+        # attribute 'name'.  If any OF has a non-callable attribute
+        # 'name', an error is raised.
         try:
             return super(PipelineOF,self).__getattribute__(name)
         except AttributeError:
             def call_name_for_all_ofs(*args,**kw):
                 for of in self.output_fns:
+                    # to instead ignore OFs that have the attribute but
+                    # it's not callable:
+                    #  if hasattr(of,name) and callable(of.name):
+                    #      getattr(of,name)(*args,**kw)
                     if hasattr(of,name):
-                        getattr(of,name)(*args,**kw)
+                        mthd=getattr(of,name)
+                        try:
+                            mthd(*args,**kw)
+                        except TypeError:
+                            raise TypeError("%s's attribute '%s' is not callable."%(of,name))
+                            
             return call_name_for_all_ofs
 
 
