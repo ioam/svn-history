@@ -436,7 +436,8 @@ class OutputFnWithState(OutputFn):
         Whether or not to update the internal state on each call.
         Allows plasticity to be turned off during analysis, and then re-enabled.""")
 
-
+    __abstract = True
+    
     def __init__(self,**params):
         super(OutputFnWithState,self).__init__(**params)
         self._plasticity_setting_stack = []
