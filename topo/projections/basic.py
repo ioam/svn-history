@@ -18,7 +18,7 @@ from topo.base.cf import CFProjection,ConnectionField,MaskedCFIter,\
      CFPLearningFn,CFPLF_Identity,CFPOutputFn
 from topo.base.parameterclasses import Number,ClassSelectorParameter
 from topo.base.patterngenerator import PatternGeneratorParameter,Constant
-from topo.base.functionfamilies import CoordinateMapperFnParameter,IdentityMF
+from topo.base.functionfamilies import CoordinateMapperFn,IdentityMF
 
 from topo.misc.utils import rowcol2idx
 
@@ -280,7 +280,8 @@ class OneToOneProjection(Projection):
     coordinate mapper.  Inputs that map outside the bounds of the
     input sheet are treated as having zero weight.
     """
-    coord_mapper = CoordinateMapperFnParameter(default=IdentityMF(),
+    coord_mapper = ClassSelectorParameter(CoordinateMapperFn,
+        default=IdentityMF(),
         doc='Function to map a destination unit coordinate into the src sheet.')
 
     weights_generator = PatternGeneratorParameter(

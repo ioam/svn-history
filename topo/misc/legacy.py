@@ -171,10 +171,12 @@ class SnapshotSupport(object):
         # r8014 Removed LearningFnParameter and ResponseFnParameter (+CFP equivalents)
         from topo.base.parameterclasses import ClassSelectorParameter
 
-        from topo.base.functionfamilies import OutputFn,ResponseFn,LearningFn
+        from topo.base.functionfamilies import OutputFn,ResponseFn,LearningFn,\
+             CoordinateMapperFn
         d = {"OutputFnParameter":OutputFn,
              "ResponseFnParameter":ResponseFn,
-             "LearningFnParameter":LearningFn}        
+             "LearningFnParameter":LearningFn,
+             "CoordinateMapperFnParameter":CoordinateMapperFn}        
 
         import topo.base.functionfamilies
         for name,arg in d.items():

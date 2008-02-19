@@ -29,9 +29,10 @@ from parameterizedobject import ParameterizedObject
 from functionfamilies import OutputFn,IdentityOF
 from functionfamilies import LearningFn,Hebbian,IdentityLF
 from functionfamilies import ResponseFn,DotProduct
-from functionfamilies import CoordinateMapperFnParameter,IdentityMF
+from functionfamilies import CoordinateMapperFn,IdentityMF
 from projection import Projection,ProjectionSheet, SheetMask
-from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter,Integer,BooleanParameter
+from parameterclasses import Parameter,Number,BooleanParameter,\
+     ClassSelectorParameter,Integer,BooleanParameter
 from sheet import Slice
 from sheetview import UnitView, ProjectionView
 from boundingregion import BoundingBox,BoundingRegionParameter
@@ -602,7 +603,7 @@ class CFProjection(Projection):
         The default of 1 gives a minimum matrix of 3x3. 0 would
         allow a 1x1 matrix.""")
 
-    coord_mapper = CoordinateMapperFnParameter(
+    coord_mapper = ClassSelectorParameter(CoordinateMapperFn,
         default=IdentityMF(),
         doc='Function to map a projected coordinate into the target sheet.')
 

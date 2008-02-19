@@ -206,14 +206,3 @@ class IdentityMF(CoordinateMapperFn):
         return x,y
 
 
-
-
-class CoordinateMapperFnParameter(ClassSelectorParameter):
-    """
-    Parameter whose value can be any CoordinateMapperFn.
-    """
-    def __init__(self,default=IdentityMF(),**params):
-        super(CoordinateMapperFnParameter,self).__init__(CoordinateMapperFn,default=default,**params)
-
-
-

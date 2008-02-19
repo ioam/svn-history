@@ -102,6 +102,8 @@ Makefile = svn:eol-style=native;svn:keywords="Author Date Id Revision"
 </pre>
 
 
+<!-- .cvsignore -> svn property on directory; document -->
+
 <!--
 CB: going to remove Revision tags?
 In addition, just after the doc string,
