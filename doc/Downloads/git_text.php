@@ -1,13 +1,46 @@
 <H2>Developing Topographica with Git</H2>
 
-<P>** This is draft documentation ** <BR>
+<P>The master repository for Topographica code is stored by
+<a href="cvs.html">Subversion</a> (SVN) at SourceForge.net.  It is
+often useful to work on separate copies of the code, either to develop
+a new, complicated feature, to make far-reaching changes that need
+extensive testing, or to keep track of changes useful only at your
+local site (such as private research code).  In such cases it can be
+useful to use the <a href="http://git.or.cz/">Git</a> version control
+tool to establish a local branch of Topographica, so that you can have
+the benefits of version control (keeping track of different revisions)
+without necessarily affecting the global repository.  If it does turn
+out that the local changes would be useful to other Topographica
+users, they can then be "pushed" onto the global repository for
+everyone to use once they are completed.
+
+<P>SVN's own branching and merging facilities can be used in some
+cases, but (a) they are only available to Topographica developers, (b)
+they are far more difficult to use and error-prone than those from git
+and other
+<a href="http://www.inf.ed.ac.uk/teaching/courses/sapm/2007-2008/readings/uvc/version-control.html">
+distributed version control systems</a>, (c) they require constant
+access to a centralized server, and thus cannot provide version
+control when no network connection is available, and (d) most
+operations are slow, in part because of the dependence on the remote
+server.  Branches maintained using git have none of these problems,
+and because git can work seamlessly with the centralized SVN server
+when necessary, git can be very useful for any of the uses mentioned
+above.
+
+<H3>Installing git on your machine</H3>
+
+<P>Although git is not typically installed in most Linux
+distributions, it is usually easy to add it.  E.g. for Debian or
+Ubuntu Linux, just do 'apt-get install git git-svn git-doc'; for
+others you can get installation packages from
+<a href="http://git.or.cz/">git.or.cz</a>.  The git-svn package allows
+git to connect to Topographica's SVN repository.
+
+<P>** The remainder of this file is draft documentation ** <BR>
 If you know Git well, you can probably already perform the operations
 described here. In that case, please help to improve the documentation
-below! Thanks
-
-<P>To work with the Topographica SVN repository using Git, you need to
-have git-svn as well as git itself.
-
+below! Thanks.
 
 
 <H3>Getting the Topographica code</H3>
