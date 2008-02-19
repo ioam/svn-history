@@ -14,7 +14,7 @@ __version__='$Revision$'
 import numpy
 
 from topo.base.parameterizedobject import ParameterizedObject,Parameter
-from topo.base.parameterclasses import ClassSelectorParameter, ListParameter, BooleanParameter
+from topo.base.parameterclasses import ListParameter
 
 
 class OutputFn(ParameterizedObject):
