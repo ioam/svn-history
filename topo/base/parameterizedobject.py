@@ -471,7 +471,8 @@ class Parameter(object):
 def _param_remove_hidden(state):
     # Hidden attribute removed from Parameter in r7861
     if 'hidden' in state:
-        state['precedence']=-1
+        if state['hidden'] is True:
+            state['precedence']=-1
         del state['hidden']
 
 SnapshotCompatibility.preprocess_state(Parameter,_param_remove_hidden)
