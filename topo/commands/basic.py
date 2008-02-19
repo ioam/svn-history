@@ -31,9 +31,12 @@ from topo.base.projection import Projection, ProjectionSheet
 
 from topo.sheets.generatorsheet import GeneratorSheet
 
-from topo.misc.utils import ExtraPickler, LegacySnapshotSupport
+from topo.misc.utils import ExtraPickler
 from topo.misc.filepaths import normalize_path
+from topo.misc import legacy 
 from topo.misc import filepaths
+
+
 
 
 def save_input_generators():
@@ -184,7 +187,7 @@ def load_snapshot(snapshot_name):
         snapshot = open(snapshot_name,'r')
 
     # install any code necessary to support unpickling this snapshot
-    LegacySnapshotSupport.install() # version
+    legacy.SnapshotSupport.install() # version
         
     # If it's not xml, open as a normal pickle.
     try:
