@@ -73,17 +73,33 @@ the source of a bug, or whether it was all those other changes that
 <P>Every readable file (i.e. text, source code, html, etc.) should
 include an <CODE>&#36;Id:&#36;</CODE> tag so that the SVN revision
 information will be visible immediately, even in files outside of the
-CVS repository.
+SVN repository.
 
 <P>For text files, the <CODE>Id:</CODE> tag should be placed near the
 top, surrounded by dollar signs, on a line by itself.  Near the bottom
 is also acceptable, but not preferred.  See the top of the README.txt
-file for an example; CVS fills in all but the letters "Id:" and the
+file for an example; SVN fills in all but the letters "Id:" and the
 dollar signs.
 
 <P>For Python files, the <CODE>Id:</CODE> tag should be placed at the
 end of the Python doc string for that module, surrounded by dollar
 signs, on a line by itself.  
+
+<P>If you include the following in
+your <code>~/.subversion/config</code> file, these things will be done
+automatically for you:
+
+<pre>
+# ... (other content you have already)
+[auto-props]
+# ... (other content you have already)
+Makefile = svn:eol-style=native;svn:keywords="Author Date Id Revision"
+*.ty = svn:eol-style=native;svn:keywords="Author Date Id Revision"
+*.py = svn:eol-style=native;svn:keywords="Author Date Id Revision"
+*.txt = svn:eol-style=native;svn:keywords="Author Date Id Revision"
+*.png = svn:mime-type=image/png
+*.jpg = svn:mime-type=image/jpeg
+</pre>
 
 
 <!--
@@ -100,10 +116,6 @@ the version number of the file should be declared.  For example:
   __version__ = "&#36;Revision&#36;"
 </PRE>
 -->
-
-
-<!-- CB missing: 
-properties (e.g. binary vs none, end of line) for adding?-->
 
 
 <!--
