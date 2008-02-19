@@ -129,13 +129,16 @@ class Parameter(object):
     """
     An attribute descriptor for declaring parameters.
 
-    Parameters are a special kind of class attribute.  Setting a class
-    attribute to be an instance of this class causes that attribute of
-    the class and its instances to be treated as a Parameter.  This
-    allows special behavior, including dynamically generated parameter
-    values (using lambdas or generators), documentation strings,
-    read-only (constant) parameters, and type or range checking at
-    assignment time.
+    Parameters are a special kind of class attribute.  Setting a
+    ParameterizedObject class attribute to be a Parameter instance
+    causes that attribute of the class (and the class's instances) to
+    be treated as a Parameter.  This allows special behavior,
+    including dynamically generated parameter values, documentation
+    strings, constant and read-only parameters, and type or range
+    checking at assignment time.
+
+    ** Note that Parameters can only be used when set as class **
+    ** attributes of ParameterizedObjects.                     **
 
     For example, suppose someone wants to define two new kinds of
     objects Foo and Bar, such that Bar has a parameter delta, Foo is a
@@ -204,9 +207,6 @@ class Parameter(object):
     # section of the Python reference manual:
     # http://docs.python.org/ref/attribute-access.html
     #
-    #
-    #
-    #
     # Overview of Parameters for programmers
     # ======================================
     #
@@ -245,6 +245,7 @@ class Parameter(object):
     #   the attrib_name for the Parameter); in the code, this is
     #   called the internal_name.
 
+                                                   
     # So that the extra features of Parameters do not require a lot of
     # overhead, Parameters are implemented using __slots__ (see
     # http://www.python.org/doc/2.4/ref/slots.html).  Instead of having
@@ -267,7 +268,6 @@ class Parameter(object):
         """
         Initialize a new Parameter object: store the supplied attributes.
 
-
         default: the owning class's value for the attribute
         represented by this Parameter.
 
@@ -285,18 +285,20 @@ class Parameter(object):
         self.precedence = precedence
         self.default = default
         self.doc = doc
-        self.constant = constant 
+        self.constant = constant or readonly # readonly => constant
         self.readonly = readonly
         self._set_instantiate(instantiate)
 
-    # CB: need to make it clear that a parameter *must* be declared
-    # in a ParameterizedObject, and nothing else.
 
     def _set_instantiate(self,instantiate):
         """Constant parameters must be instantiated."""
-        # CB: I think I'm right that it doesn't matter for read-only
-        # parameters, since they can't be set even on a class.
-        self.instantiate = instantiate or self.constant # pylint: disable-msg=W0201
+        # CB: instantiate doesn't actually matter for read-only
+        # parameters, since they can't be set even on a class.  But
+        # this avoids needless instantiation.
+        if self.readonly:
+            self.instantiate = False
+        else:
+            self.instantiate = instantiate or self.constant # pylint: disable-msg=W0201
 
 
     def __get__(self,obj,objtype): # pylint: disable-msg=W0613
