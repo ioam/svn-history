@@ -590,11 +590,6 @@ class CFProjection(Projection):
         Amount of learning at each step for this projection, specified
         in units that are independent of the density of each Sheet.""")
 
-    # CEBALERT: is this used?
-    debug_output_fn  = ClassSelectorParameter(OutputFn,
-        default=IdentityOF(),
-        doc='Function applied to the Projection activity after it is computed.')
-        
     weights_output_fn = ClassSelectorParameter(CFPOutputFn,
         default=CFPOF_Plugin(),
         doc='Function applied to each CF after learning.')
