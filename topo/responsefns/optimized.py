@@ -25,7 +25,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
     is equivalent to this one, but it also works for 1D arrays.
     """
 
-    single_cf_fn = ClassSelectorParameter(ResponseFn,DotProduct(),constant=True)    
+    single_cf_fn = ClassSelectorParameter(ResponseFn,DotProduct(),readonly=True)    
 
     def __call__(self, iterator, input_activity, activity, strength, **params):
        
@@ -103,6 +103,7 @@ class CFPRF_DotProduct(CFPRF_Plugin):
     Wrapper written to allow transparent non-optimized fallback; 
     equivalent to CFPRF_Plugin(single_cf_fn=DotProduct()).
     """
+    # CB: should probably have single_cf_fn here & readonly
     def __init__(self,**params):
         super(CFPRF_DotProduct,self).__init__(single_cf_fn=DotProduct(),**params)
 

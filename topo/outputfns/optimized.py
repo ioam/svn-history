@@ -26,7 +26,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     CFPOF_DivisiveNormalizeL1.
     """
     single_cf_fn = ClassSelectorParameter(
-        OutputFn,DivisiveNormalizeL1(norm_value=1.0),constant=True)
+        OutputFn,DivisiveNormalizeL1(norm_value=1.0),readonly=True)
     
     def __call__(self, iterator, mask, **params):
         rows,cols = mask.shape
