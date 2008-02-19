@@ -97,6 +97,7 @@ Makefile = svn:eol-style=native;svn:keywords="Author Date Id Revision"
 *.ty = svn:eol-style=native;svn:keywords="Author Date Id Revision"
 *.py = svn:eol-style=native;svn:keywords="Author Date Id Revision"
 *.txt = svn:eol-style=native;svn:keywords="Author Date Id Revision"
+*.diff = svn:eol-style=native
 *.png = svn:mime-type=image/png
 *.jpg = svn:mime-type=image/jpeg
 </pre>
