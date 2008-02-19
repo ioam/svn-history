@@ -8,7 +8,7 @@ __version__='$Revision$'
 import re
 import types
 
-from parameterizedobject import Parameter, descendents, ParameterizedObject
+from parameterizedobject import Parameter, descendents
 
 # CEBHACKALERT: needs to be finished
 class Enumeration(Parameter):
@@ -604,28 +604,20 @@ class ClassSelectorParameter(SelectorParameter):
     """
     Parameter whose value is an instance of the specified class.    
     """
-    __slots__ = ['class_','suffix_to_lose']
+    __slots__ = ['class_']
 
-    def __init__(self,class_,default=None,instantiate=True,
-                 suffix_to_lose='',**params):
+    def __init__(self,class_,default=None,instantiate=True,**params):
         self.class_ = class_
-
-        # CBENHANCEMENT: currently offers the possibility to cut off
-        # the end of a class name (suffix_to_lose), but this could be
-        # extended to any processing of the class name.
-        self.suffix_to_lose = suffix_to_lose
-
         self._check_value(default)
         Parameter.__init__(self,default=default,instantiate=instantiate,**params)
 
 
     def _check_value(self,val,obj=None):
-        """
-        val must be None or an instance of self.class_
-        """
+        """val must be None or an instance of self.class_"""
         if not (isinstance(val,self.class_) or val is None):
-            raise ValueError("Parameter '%s' must be an instance of %s"%(self._attrib_name,\
-                                                                         self.class_.__name__))
+            raise ValueError(
+                "Parameter '%s' must be an instance of %s"%(self._attrib_name,
+                                                            self.class_.__name__))
 
     def __set__(self,obj,val):
         self._check_value(val,obj)
@@ -636,22 +628,14 @@ class ClassSelectorParameter(SelectorParameter):
         """
         Return the possible types for this parameter's value.
 
-        (I.e. return {visible_name: <class>} for all classes that are
+        (I.e. return {name: <class>} for all classes that are
         concrete_descendents() of self.class_.)
 
         Only classes from modules that have been imported are added
         (see concrete_descendents()).
         """
         classes = concrete_descendents(self.class_)
-        return dict([(self.__classname_repr(name),class_) for name,class_ in classes.items()])
-
-
-    def __classname_repr(self, class_name):
-        """
-        Return class_name stripped of self.suffix_to_lose.
-        """
-        return re.sub(self.suffix_to_lose+'$','',class_name)
-
+        return dict([(name,class_) for name,class_ in classes.items()])
 
 
 
