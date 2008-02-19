@@ -27,9 +27,10 @@ from topo.base.sheet import activity_type
 from topo.base.arrayutils import clip_lower
 from topo.base.arrayutils import L2norm, norm, array_argmax
 from topo.base.functionfamilies import OutputFn
-from topo.base.parameterclasses import Parameter,Number,ListParameter,BooleanParameter, StringParameter
+from topo.base.parameterclasses import Parameter,Number,ListParameter,\
+     BooleanParameter, StringParameter, ClassSelectorParameter
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.patterngenerator import PatternGeneratorParameter,Constant
+from topo.base.patterngenerator import PatternGenerator,Constant
 from topo.base.boundingregion import BoundingBox
 from topo.patterns.basic import Gaussian
 
@@ -295,7 +296,8 @@ class PatternCombine(OutputFn):
     Useful for operations like adding noise or masking out lesioned
     items or around the edges of non-rectangular shapes.
     """
-    generator = PatternGeneratorParameter(default=Constant(), doc="""
+    generator = ClassSelectorParameter(PatternGenerator,
+        default=Constant(), doc="""
         Pattern to combine with the supplied matrix.""")
 
     operator = Parameter(numpy.multiply,precedence=0.98,doc="""
@@ -340,7 +342,7 @@ class KernelMax(OutputFn):
     kernel_radius = Number(default=0.0,bounds=(0,None),doc="""
         Kernel radius in Sheet coordinates.""")
     
-    neighborhood_kernel_generator = PatternGeneratorParameter(
+    neighborhood_kernel_generator = ClassSelectorParameter(PatternGenerator,
         default=Gaussian(x=0.0,y=0.0,aspect_ratio=1.0),
         doc="Neighborhood function")
 

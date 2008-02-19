@@ -169,6 +169,8 @@ class SnapshotSupport(object):
         ##########
         # r8001 Removed OutputFnParameter and CFPOutputFnParameter
         # r8014 Removed LearningFnParameter and ResponseFnParameter (+CFP equivalents)
+        # r8028 Removed CoordinateMapperFnParameter
+        # r8029 Removed PatternGeneratorParameter
         from topo.base.parameterclasses import ClassSelectorParameter
 
         from topo.base.functionfamilies import OutputFn,ResponseFn,LearningFn,\
@@ -192,6 +194,11 @@ class SnapshotSupport(object):
         for name,arg in d.items():
             fake_a_class(topo.base.cf,name,
                          ClassSelectorParameter,(arg,))
+
+        import topo.base.patterngenerator
+        from topo.base.patterngenerator import PatternGenerator
+        fake_a_class(topo.base.patterngenerator,"PatternGeneratorParameter",
+                     ClassSelectorParameter,(PatternGenerator,))
         ##########
             
 

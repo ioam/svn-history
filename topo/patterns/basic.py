@@ -16,7 +16,7 @@ from topo.base.parameterclasses import ListParameter
 from topo.base.patterngenerator import PatternGenerator
 
 # Imported here so that all PatternGenerators will be in the same package
-from topo.base.patterngenerator import Constant, PatternGeneratorParameter
+from topo.base.patterngenerator import Constant
 
 from topo.misc.patternfns import gaussian,gabor,line,disk,ring
 from topo.base.arrayutils import wrap

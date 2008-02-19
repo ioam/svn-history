@@ -13,9 +13,8 @@ from numpy.oldnumeric import exp, argmax
 from topo.base.arrayutils import L2norm, array_argmax
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFPLearningFn
-from topo.base.parameterclasses import Number
-from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.patterngenerator import PatternGeneratorParameter
+from topo.base.parameterclasses import Number, ClassSelectorParameter
+from topo.base.patterngenerator import PatternGenerator
     
 from topo.patterns.basic import Gaussian
 from topo.outputfns.basic import IdentityOF
@@ -66,7 +65,7 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
         when deciding how far from the winner to keep updating the weights.
         """)
     
-    neighborhood_kernel_generator = PatternGeneratorParameter(
+    neighborhood_kernel_generator = ClassSelectorParameter(PatternGenerator,
         default=Gaussian(x=0.0,y=0.0,aspect_ratio=1.0),
         doc="Neighborhood function")
     

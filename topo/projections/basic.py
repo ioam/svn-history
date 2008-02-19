@@ -17,7 +17,7 @@ from topo.base.sheet import activity_type
 from topo.base.cf import CFProjection,ConnectionField,MaskedCFIter,\
      CFPLearningFn,CFPLF_Identity,CFPOutputFn
 from topo.base.parameterclasses import Number,ClassSelectorParameter
-from topo.base.patterngenerator import PatternGeneratorParameter,Constant
+from topo.base.patterngenerator import PatternGenerator,Constant
 from topo.base.functionfamilies import CoordinateMapperFn,IdentityMF
 
 from topo.misc.utils import rowcol2idx
@@ -284,7 +284,7 @@ class OneToOneProjection(Projection):
         default=IdentityMF(),
         doc='Function to map a destination unit coordinate into the src sheet.')
 
-    weights_generator = PatternGeneratorParameter(
+    weights_generator = ClassSelectorParameter(PatternGenerator,
         default=Constant(),constant=True,
         doc="""Generate initial weight values for each unit of the destination sheet.""")
 

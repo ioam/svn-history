@@ -11,13 +11,12 @@ from topo.base.simulation import FunctionEvent, PeriodicEventSequence
 from topo.base.functionfamilies import OutputFn,IdentityOF
 from topo.base.sheet import Sheet 
 from topo.base.sheet import BoundingBox
-from topo.misc.utils import NxN
-
 from topo.base.parameterclasses import Number, ListParameter, BooleanParameter,\
      ClassSelectorParameter
+from topo.base.patterngenerator import PatternGenerator, Constant
 
-import topo.base.patterngenerator
-import topo.patterns.basic
+from topo.misc.utils import NxN
+
 
 # JLALERT: This sheet should have override_plasticity_state/restore_plasticity_state
 # functions that call override_plasticity_state/restore_plasticty_state on the
@@ -45,8 +44,8 @@ class GeneratorSheet(Sheet):
         generated and processed before this step is complete.
         """)
     
-    input_generator = topo.base.patterngenerator.PatternGeneratorParameter(doc=
-        "Specifies a particular PatternGenerator type to use when creating patterns.")
+    input_generator = ClassSelectorParameter(PatternGenerator,default=Constant(),
+        doc="""Specifies a particular PatternGenerator type to use when creating patterns.""")
 
     output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),doc="""
         Output function to apply (if apply_output_fn is true) to this Sheet's activity.""")

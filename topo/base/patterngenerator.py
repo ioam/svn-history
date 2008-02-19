@@ -230,8 +230,3 @@ class Constant(PatternGenerator):
 
         return result
 
-
-class PatternGeneratorParameter(ClassSelectorParameter):
-    """Parameter whose value can be any instance of a PatternGenerator class."""
-    def __init__(self,default=Constant(),**params):
-        super(PatternGeneratorParameter,self).__init__(PatternGenerator,default=default,suffix_to_lose='Generator',**params)

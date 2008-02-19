@@ -24,7 +24,7 @@ from numpy import abs
 import copy
 
 import patterngenerator
-from patterngenerator import PatternGeneratorParameter
+from patterngenerator import PatternGenerator
 from parameterizedobject import ParameterizedObject
 from functionfamilies import OutputFn,IdentityOF
 from functionfamilies import LearningFn,Hebbian,IdentityLF
@@ -563,12 +563,12 @@ class CFProjection(Projection):
         Bounds defining the Sheet area covered by a prototypical ConnectionField.
         The true bounds will differ depending on the density (see initialize_bounds()).""")
     
-    weights_generator = PatternGeneratorParameter(
+    weights_generator = ClassSelectorParameter(PatternGenerator,
         default=patterngenerator.Constant(),constant=True,
         doc="Generate initial weights values.")
 
     # JABALERT: Confusing name; change to cf_shape or cf_boundary_shape
-    weights_shape = PatternGeneratorParameter(
+    weights_shape = ClassSelectorParameter(PatternGenerator,
         default=patterngenerator.Constant(),constant=True,
         doc="Define the shape of the connection fields.")
 
