@@ -27,7 +27,7 @@ import topo.patterns.basic
 import topo.patterns.random
 
 
-from topo.base.functionfamilies import ResponseFn, ResponseFnParameter
+from topo.base.functionfamilies import ResponseFn 
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection

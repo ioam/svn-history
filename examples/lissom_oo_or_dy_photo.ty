@@ -48,8 +48,8 @@ import ImageOps
 
 from topo.patterns.image import edge_average
 from topo.base.patterngenerator import PatternGenerator
-from topo.base.parameterclasses import Number, Parameter, Enumeration
-from topo.base.projection import OutputFnParameter
+from topo.base.parameterclasses import Number, Parameter, Enumeration,\
+     ClassSelectorParameter
 from topo.outputfns.basic import DivisiveNormalizeLinf,IdentityOF
 from topo.patterns.image import PatternSampler
 from topo.misc.numbergenerators import UniformRandom
@@ -65,7 +65,7 @@ class ImageSeq(PatternGenerator):
 
     """
 
-    output_fn = OutputFnParameter(default=IdentityOF())
+    output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF())
     
     aspect_ratio  = Number(default=1.0,bounds=(0.0,None),
         softbounds=(0.0,2.0),precedence=0.31,doc=
@@ -79,7 +79,7 @@ class ImageSeq(PatternGenerator):
         precedence=0.95,doc=
         "How to scale the initial image size relative to the default area of 1.0.")
 
-    whole_image_output_fn = OutputFnParameter(default=DivisiveNormalizeLinf(),
+    whole_image_output_fn = ClassSelectorParameter(OutputFn,default=DivisiveNormalizeLinf(),
         precedence=0.96,doc=
         "Function applied to the whole, original image array (before any cropping).")
 
