@@ -342,7 +342,7 @@ class Parameter(object):
         ParameterizedObject source code. A read-only parameter also
         cannot be set on a ParameterizedObject class.
         
-        Note that until Topographica supports some form of read-only
+        Note that until we support some form of read-only
         object, it is still possible to change the attributes of the
         object stored in a constant or read-only Parameter (e.g. the
         left bound of a BoundingBox).
@@ -351,12 +351,6 @@ class Parameter(object):
         # ParameterizedObject class)
         if self.constant or self.readonly:
             if self.readonly:
-                # CB: interpreted 'read only' to include not being
-                # able to set on the class object. If that's wrong,
-                # switch this 'if readonly' block with the below 'elif
-                # not obj' block to allow setting on the
-                # class, and make readonly=>instantiate.
-                # Otherwise please remove this comment.
                 raise TypeError("Read-only parameter '%s' cannot be modified"%self._attrib_name)
             elif not obj:
                 self.default = val
@@ -1174,7 +1168,7 @@ class PicklableClassAttributes(object):
             exec cmd in __main__.__dict__
             
         for class_name,state in state['class_attributes'].items():
-            # from "topo.base.parameter.Parameter", we want "topo.base.parameter"
+            # from e.g. "topo.base.parameter.Parameter", we want "topo.base.parameter"
             module_path = class_name[0:class_name.rindex('.')]
             exec 'import '+module_path in __main__.__dict__
 
@@ -1227,12 +1221,13 @@ class PicklableClassAttributes(object):
             else:
                 if isinstance(v,type) and issubclass(v,ParameterizedObject):
 
-                    # Note: we take the class name as v.__name__, not k, because
-                    # k might be just a label for the true class. For example,
-                    # if Topographica falls back to the unoptimized components,
-                    # k could be "CFPRF_DotProduct_opt", but v.__name__
-                    # - and the actual class - is "CFPRF_DotProduct". It
-                    # is correct to set the attributes on the true class.
+                    # Note: we take the class name as v.__name__, not
+                    # k, because k might be just a label for the true
+                    # class. For example, if someone imports a class
+                    # using 'as', the name in the local namespace
+                    # could be different from the name when the class
+                    # was defined.  It is correct to set the
+                    # attributes on the true class.
                     full_class_path = v.__module__+'.'+v.__name__
                     class_attributes[full_class_path] = {}
                     # POs always have __dict__, never slots

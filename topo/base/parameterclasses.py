@@ -718,8 +718,9 @@ class InstanceMethodWrapper(object):
     """
     Wrapper for pickling instance methods.
 
-    Constructor takes an instance method (e.g. topo.sim.time) as
-    its only argument.  Wrapper instance is callable, picklable, etc.
+    The constructor takes an instance method (e.g. for an object
+    'sim', method sim.time) as its only argument.  The wrapper
+    instance is callable, picklable, etc.
     """
     # CEBALERT: Both repr and name disguise that this is an
     # InstanceMethodWrapper (note that we probably won't need this
