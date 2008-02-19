@@ -183,7 +183,8 @@ def load_snapshot(snapshot_name):
     except (IOError,NameError):
         snapshot = open(snapshot_name,'r')
 
-    LegacySnapshotSupport.install()
+    # install any code necessary to support unpickling this snapshot
+    LegacySnapshotSupport.install() # version
         
     # If it's not xml, open as a normal pickle.
     try:

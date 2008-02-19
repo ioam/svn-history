@@ -512,13 +512,25 @@ class SnapshotCompatibility(object):
             
         class_.__setstate__ = new_setstate
 
-##     @staticmethod
-##     def fake_a_class(module,old_class_name,new_class):
 
-##         class FakeA(object):
-##             def __new__(cls,*args,**kw):
-##                 return constructor
+    @staticmethod
+    def fake_a_class(module,old_name,new_class,new_class_args=()):
+        """
+        Install a class named 'old_name' in 'module'; when created,
+        the class actually returns an instance of 'new_class'.
 
+        new_class_args allow any arguments to be supplied to new_class
+        before other arguments are passed at creation time.
+        """
+        class_code = """
+class %s(object):
+    def __new__(cls,*args,**kw):
+        all_args = new_class_args+args
+        return new_class(*all_args,**kw)"""        
+        exec class_code%old_name in locals()
+        fake_old_class = eval(old_name,locals())
+
+        setattr(module,old_name,fake_old_class)
 
 
 
@@ -613,48 +625,31 @@ class LegacySnapshotSupport(object):
         SnapshotCompatibility.select_setstate(Sheet,_sheet_set_shape) 
 
 
-        
+        ##########
+        # r8001 Removed OutputFnParameter and CFPOutputFnParameter
+        # r8014 Removed LearningFnParameter and ResponseFnParameter (+CFP equivalents)
         from topo.base.parameterclasses import ClassSelectorParameter
+
         from topo.base.functionfamilies import OutputFn,ResponseFn,LearningFn
-        
-        class OutputFnParameter(object):
-            def __new__(cls,*args,**kw):
-                return ClassSelectorParameter(OutputFn,*args,**kw)
-
-        class ResponseFnParameter(object):
-            def __new__(cls,*args,**kw):
-                return ClassSelectorParameter(ResponseFn,*args,**kw)
-
-        class LearningFnParameter(object):
-            def __new__(cls,*args,**kw):
-                return ClassSelectorParameter(LearningFn,*args,**kw)
-
+        d = {"OutputFnParameter":OutputFn,
+             "ResponseFnParameter":ResponseFn,
+             "LearningFnParameter":LearningFn}        
 
         import topo.base.functionfamilies
-        topo.base.functionfamilies.OutputFnParameter = OutputFnParameter
-        topo.base.functionfamilies.ResponseFnParameter = ResponseFnParameter
-        topo.base.functionfamilies.LearningFnParameter = LearningFnParameter
-
-
+        for name,arg in d.items():
+            SnapshotCompatibility.fake_a_class(topo.base.functionfamilies,name,
+                                               ClassSelectorParameter,(arg,))
 
         from topo.base.cf import CFPOutputFn,CFPResponseFn,CFPLearningFn
-        # CB: temporary (working here)
-        class CFPOutputFnParameter(object):
-            def __new__(cls,*args,**kw):
-                return ClassSelectorParameter(CFPOutputFn,*args,**kw)
-
-        class CFPResponseFnParameter(object):
-            def __new__(cls,*args,**kw):
-                return ClassSelectorParameter(CFPResponseFn,*args,**kw)
-
-        class CFPLearningFnParameter(object):
-            def __new__(cls,*args,**kw):
-                return ClassSelectorParameter(CFPLearningFn,*args,**kw)
+        d = {"CFPOutputFnParameter":CFPOutputFn,
+             "CFPResponseFnParameter":CFPResponseFn,
+             "CFPLearningFnParameter":CFPLearningFn}         
 
         import topo.base.cf
-        topo.base.cf.CFPOutputFnParameter = CFPOutputFnParameter
-        topo.base.cf.CFPResponseFnParameter = CFPResponseFnParameter
-        topo.base.cf.CFPLearningFnParameter = CFPLearningFnParameter
+        for name,arg in d.items():
+            SnapshotCompatibility.fake_a_class(topo.base.cf,name,
+                                               ClassSelectorParameter,(arg,))
+        ##########
             
 
         # for snapshots saved before r7901
