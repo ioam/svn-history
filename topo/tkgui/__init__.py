@@ -78,13 +78,7 @@ from topo.projections import *
 from topo.responsefns import *
 from topo.sheets import *
 
-# CB: why are these here? are they really used in the gui?
-from topo.base.cf import CFPLearningFnParameter,CFPResponseFnParameter
-from topo.base.functionfamilies import LearningFnParameter,ResponseFnParameter
-from topo.base.patterngenerator import PatternGeneratorParameter
-
-
-
+# CEBALERT: check if I need to import ClassSelectorParameter. I guess not.
 
 #
 # Define up the right click (context menu) events. These variables can

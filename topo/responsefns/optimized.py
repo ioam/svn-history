@@ -8,9 +8,10 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.functionfamilies import ResponseFnParameter,DotProduct,ResponseFn
+from topo.base.functionfamilies import ResponseFn,DotProduct
 from topo.base.cf import CFPResponseFn, CFPRF_Plugin
-from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.parameterclasses import ClassSelectorParameter
+
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 
 from topo.responsefns.projfns import CFPRF_EuclideanDistance
@@ -24,7 +25,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
     is equivalent to this one, but it also works for 1D arrays.
     """
 
-    single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)    
+    single_cf_fn = ClassSelectorParameter(ResponseFn,DotProduct(),constant=True)    
 
     def __call__(self, iterator, input_activity, activity, strength, **params):
        

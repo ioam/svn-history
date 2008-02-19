@@ -159,14 +159,6 @@ class IdentityLF(LearningFn):
         pass
 
 
-class LearningFnParameter(ClassSelectorParameter):
-    """
-    Parameter whose value can be any LearningFunction.
-    """
-    def __init__(self,default=Hebbian(),**params):
-        super(LearningFnParameter,self).__init__(LearningFn,default=default,**params)        
-
-
 
 class ResponseFn(ParameterizedObject):
     """Abstract base class for response functions that plug into CFPRF_Plugin."""
@@ -188,16 +180,6 @@ class DotProduct(ResponseFn):
     """
     def __call__(self,m1,m2):
         return numpy.dot(m1.ravel(),m2.ravel())
-
-
-
-class ResponseFnParameter(ClassSelectorParameter):
-    """
-    Parameter whose value can be any ResponseFunction.
-    """
-    def __init__(self,default=DotProduct(),**params):
-        super(ResponseFnParameter,self).__init__(ResponseFn,default=default,**params)        
-
 
 
 

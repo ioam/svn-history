@@ -8,12 +8,13 @@ $Id$
 """
 __version__ = "$Revision$"
 
+from numpy import zeros
+
 from topo.base.sheet import activity_type
-from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Parameter, Number
+from topo.base.parameterclasses import Parameter, Number, ClassSelectorParameter
 from topo.base.cf import CFPLearningFn,CFPLF_Plugin
-from topo.base.functionfamilies import Hebbian,LearningFnParameter
-from numpy.oldnumeric import zeros
+from topo.base.functionfamilies import Hebbian,LearningFn
+
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 
 
@@ -117,7 +118,7 @@ class CFPLF_Trace_opt(CFPLearningFn):
     trace_strength=Number(default=0.5,bounds=(0.0,1.0),doc="""
        How much the learning is dominated by the activity trace, relative to the current value.""")
 
-    single_cf_fn = LearningFnParameter(default=Hebbian(),
+    single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),
         doc="LearningFn that will be applied to each CF individually.")              
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):

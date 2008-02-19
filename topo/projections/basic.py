@@ -7,29 +7,23 @@ $Id$
 
 __version__ = "$Revision$"
 
-import topo
-import copy
-import numpy
-from math import exp
-from numpy import exp,zeros,ones
+
+from numpy import exp,ones,zeros,array,nonzero
+
 # So all Projections are present in this package
 from topo.base.projection import Projection
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheet import activity_type
-from topo.base.cf import CFProjection,CFPLearningFnParameter,CFPLF_Identity,\
-     CFPResponseFnParameter,CFPOutputFn,CFPOF_Identity,CFPOutputFn,CFPResponseFn,\
-     DotProduct, ResponseFnParameter
-from topo.base.functionfamilies import LearningFnParameter,IdentityLF
-from topo.base.parameterclasses import Number,BooleanParameter,Parameter,\
-     ListParameter,ClassSelectorParameter
-from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.cf import CFProjection,ConnectionField,MaskedCFIter,\
+     CFPLearningFn,CFPLF_Identity,CFPOutputFn
+from topo.base.parameterclasses import Number,ClassSelectorParameter
 from topo.base.patterngenerator import PatternGeneratorParameter,Constant
-from topo.base.sheetview import UnitView
-from topo.base.cf import ConnectionField, CFPRF_Plugin, MaskedCFIter
 from topo.base.functionfamilies import CoordinateMapperFnParameter,IdentityMF
-from topo.misc.utils import rowcol2idx
-from topo.outputfns.basic import OutputFn,IdentityOF
 
+from topo.misc.utils import rowcol2idx
+
+from topo.outputfns.basic import OutputFn,IdentityOF
+from topo.learningfns.basic import LearningFn,IdentityLF
 
 
 class CFPOF_SharedWeight(CFPOutputFn):
@@ -99,7 +93,7 @@ class SharedWeightCFProjection(CFProjection):
     ### JABHACKALERT: Set to be constant as a clue that learning won't
     ### actually work yet, but we could certainly extend it to support
     ### learning if desired, e.g. to learn position-independent responses.
-    learning_fn = CFPLearningFnParameter(CFPLF_Identity(),constant=True)
+    learning_fn = ClassSelectorParameter(CFPLearningFn,CFPLF_Identity(),constant=True)
     output_fn  = ClassSelectorParameter(OutputFn,default=IdentityOF())
     weights_output_fn = ClassSelectorParameter(
         CFPOutputFn,default=CFPOF_SharedWeight())
@@ -184,7 +178,7 @@ class LeakyCFProjection(CFProjection):
 
     def __init__(self,**params):
         super(LeakyCFProjection,self).__init__(**params)
-	self.leaky_input_buffer = numpy.zeros(self.src.activity.shape)
+	self.leaky_input_buffer = zeros(self.src.activity.shape)
 
     def activate(self,input_activity):
 	"""
@@ -296,7 +290,7 @@ class OneToOneProjection(Projection):
     output_fn  = ClassSelectorParameter(OutputFn,default=IdentityOF(),
         doc='Function applied to the Projection activity after it is computed.')
 
-    learning_fn = LearningFnParameter(default=IdentityLF(),
+    learning_fn = ClassSelectorParameter(LearningFn,default=IdentityLF(),
         doc="""Learning function applied to weights.""")
 
     learning_rate = Number(default=0)
@@ -326,9 +320,9 @@ class OneToOneProjection(Projection):
                      for y in reversed(self.dest.sheet_rows())
                      for x in self.dest.sheet_cols()]
         
-        self.src_idxs = numpy.array([rowcol2idx(r,c,self.src.activity.shape)
-                                     for r,c in (self.src.sheet2matrixidx(u,v)
-                                                 for u,v in srccoords)])
+        self.src_idxs = array([rowcol2idx(r,c,self.src.activity.shape)
+                               for r,c in (self.src.sheet2matrixidx(u,v)
+                                           for u,v in srccoords)])
 
         # dest_idxs contains the indices of the dest units whose weights project
         # in bounds on the src sheet.
@@ -340,11 +334,11 @@ class OneToOneProjection(Projection):
 
         # The [0] is required because numpy.nonzero returns the
         # nonzero indices wrapped in a one-tuple.
-        self.dest_idxs = numpy.nonzero(destmask)[0]
+        self.dest_idxs = nonzero(destmask)[0]
         self.src_idxs = self.src_idxs.take(self.dest_idxs)
         assert len(self.dest_idxs) == len(self.src_idxs)
 
-        self.activity = numpy.zeros(self.dest.shape,dtype=float)
+        self.activity = zeros(self.dest.shape,dtype=float)
 
     def activate(self,input):
         self.input_buffer = input

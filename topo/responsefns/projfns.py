@@ -8,20 +8,13 @@ $Id$
 """
 __version__='$Revision$'
 
-import numpy
-import copy
+from numpy import sum,exp,zeros,ravel
+from numpy.oldnumeric import Float
 
-from numpy import sum,exp
-from math import pi, sqrt
-from topo.base.parameterclasses import Number
-from topo.base.cf import CFSheet, CFPResponseFn
-from numpy.oldnumeric import zeros, Float, ravel
-
-from topo.base.functionfamilies import ResponseFnParameter,DotProduct
-from topo.base.arrayutils import L2norm
+from topo.base.parameterclasses import Number,ClassSelectorParameter
 from topo.base.cf import CFPResponseFn
-
-from topo.misc.inlinec import inline, optimized
+from topo.base.functionfamilies import ResponseFn,DotProduct
+from topo.base.arrayutils import L2norm
 
 # Imported here so that all ResponseFns will be in the same package
 from topo.base.cf import CFPRF_Plugin
@@ -83,7 +76,7 @@ class CFPRF_ActivityBased(CFPResponseFn):
     m = Number(default=0.25,doc="Time of maximum growth.")
     r = Number(default=-200,doc="Growth rate, controls the gradient")
     b = Number(default=2,doc="Controls position of maximum growth")
-    single_cf_fn = ResponseFnParameter(default=DotProduct(),doc="""
+    single_cf_fn = ClassSelectorParameter(ResponseFn,default=DotProduct(),doc="""
         ResponseFn to apply to each CF individually.""")
   
     def __call__(self, iterator, input_activity, activity, strength):

@@ -10,17 +10,18 @@ $Id$
 """
 __version__ = "$Revision$"
 
+from numpy import ones,zeros
 import numpy.oldnumeric as Numeric
-from numpy.oldnumeric import ones,Float,Float32,zeros
+from numpy.oldnumeric import Float,Float32
 
-from topo.base.cf import CFPLearningFn,LearningFnParameter
+from topo.base.cf import CFPLearningFn
 from topo.base.sheet import activity_type
-from topo.base.parameterclasses import Number,BooleanParameter
-from basic import BCMFixed
-from topo.base.functionfamilies import Hebbian,LearningFn,LearningFnParameter
-
+from topo.base.parameterclasses import Number,ClassSelectorParameter
+from topo.base.functionfamilies import Hebbian,LearningFn
 # Imported here so that all ProjectionLearningFns will be in the same package
 from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
+
+from basic import BCMFixed
 
 
 class CFPLF_EuclideanHebbian(CFPLearningFn):
@@ -63,7 +64,7 @@ class CFPLF_EuclideanHebbian(CFPLearningFn):
 ##    Activities change only when there is both pre- and post-synaptic activity.
 ##    Threshold is adjusted based on recent firing rates.
 ##    """
-##    single_cf_fn = LearningFnParameter(default=BCMFixed())
+##    single_cf_fn = ClassSelectorParameter(LearningFn,default=BCMFixed())
 ##    
 ##    unit_threshold_0=Number(default=0.5,bounds=(0,None),
 ##        doc="Initial value of threshold between LTD and LTP; actual value computed based on recent history.")
@@ -119,7 +120,7 @@ class CFPLF_Trace(CFPLearningFn):
     trace_strength=Number(default=0.5,bounds=(0.0,1.0),
        doc="How much the learning is dominated by the activity trace, relative to the current value.")     
 
-    single_cf_fn = LearningFnParameter(default=Hebbian(),
+    single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),
         doc="LearningFn that will be applied to each CF individually.")              
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
@@ -153,7 +154,7 @@ class CFPLF_OutstarHebbian(CFPLearningFn):
     
     NOT YET TESTED.
     """
-    single_cf_fn = LearningFnParameter(default=Hebbian(),
+    single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),
         doc="LearningFn that will be applied to each CF individually.")
 
     outstar_wsum = None
@@ -187,7 +188,7 @@ class HomeoSynaptic(CFPLearningFn):
 
     Does not necessarily require output_fn normalization for stability.
     """
-    single_cf_fn = LearningFnParameter(default=Hebbian(),
+    single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),
        doc="LearningFn that will be applied to each CF individually")
 
     beta_n = Number(default=0.01,bounds=(0,None),

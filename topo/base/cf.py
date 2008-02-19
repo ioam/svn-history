@@ -27,8 +27,8 @@ import patterngenerator
 from patterngenerator import PatternGeneratorParameter
 from parameterizedobject import ParameterizedObject
 from functionfamilies import OutputFn,IdentityOF
-from functionfamilies import LearningFnParameter,Hebbian,IdentityLF
-from functionfamilies import ResponseFnParameter,DotProduct
+from functionfamilies import LearningFn,Hebbian,IdentityLF
+from functionfamilies import ResponseFn,DotProduct
 from functionfamilies import CoordinateMapperFnParameter,IdentityMF
 from projection import Projection,ProjectionSheet, SheetMask
 from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter,Integer,BooleanParameter
@@ -373,7 +373,7 @@ class CFPRF_Plugin(CFPResponseFn):
     ConnectionField weights) and computes a scalar activation value
     based on those weights.
     """
-    single_cf_fn = ResponseFnParameter(default=DotProduct(),
+    single_cf_fn = ClassSelectorParameter(ResponseFn,default=DotProduct(),
         doc="Accepts a ResponseFn that will be applied to each CF individually.")
     
     def __call__(self, iterator, input_activity, activity, strength):
@@ -382,16 +382,6 @@ class CFPRF_Plugin(CFPResponseFn):
             X = cf.input_sheet_slice.submatrix(input_activity)
             activity[r,c] = single_cf_fn(X,cf.weights)
         activity *= strength
-
-
-class CFPResponseFnParameter(ClassSelectorParameter):
-    """
-    Parameter whose value can be any CFProjectionResponseFunction; i.e., a function
-    that uses all the CFs of a CFProjection to transform the input activity
-    into an output activity.
-    """
-    def __init__(self,default=CFPRF_Plugin(),**params):
-        super(CFPResponseFnParameter,self).__init__(CFPResponseFn,default=default,**params)        
 
 
 class CFPLearningFn(ParameterizedObject):
@@ -429,25 +419,15 @@ class CFPLearningFn(ParameterizedObject):
 
 class CFPLF_Identity(CFPLearningFn):
     """CFLearningFunction performing no learning."""
-    single_cf_fn = LearningFnParameter(default=IdentityLF(),constant=True)
+    single_cf_fn = ClassSelectorParameter(LearningFn,default=IdentityLF(),constant=True)
   
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         pass
 
 
-class CFPLearningFnParameter(ClassSelectorParameter):
-    """
-    Parameter whose value can be any CFPLearningFn; i.e., a function
-    that uses all the CFs of a CFProjection to transform the input activity
-    into an output activity.
-    """
-    def __init__(self,default=CFPLF_Identity(),**params):
-        super(CFPLearningFnParameter,self).__init__(CFPLearningFn,default=default,**params)        
-
-
 class CFPLF_Plugin(CFPLearningFn):
     """CFPLearningFunction applying the specified single_cf_fn to each CF."""
-    single_cf_fn = LearningFnParameter(default=Hebbian(),
+    single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),
         doc="Accepts a LearningFn that will be applied to each CF individually.")
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
@@ -472,7 +452,7 @@ class CFPLF_PluginScaled(CFPLearningFn):
     connection field uses a different learning rate.
     """
 
-    single_cf_fn = LearningFnParameter(default=Hebbian(),
+    single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),
         doc="Accepts a LearningFn that will be applied to each CF individually.")
 
     learning_rate_scaling_factor = Parameter(default=None,
@@ -577,7 +557,7 @@ class CFProjection(Projection):
 
     
     
-    response_fn = CFPResponseFnParameter(
+    response_fn = ClassSelectorParameter(CFPResponseFn,
         default=CFPRF_Plugin(),
         doc='Function for computing the Projection response to an input pattern.')
     
@@ -614,7 +594,7 @@ class CFProjection(Projection):
         the weights_shape is used. In normal usage of Topographica, this parameter should
         remain True.""")
 
-    learning_fn = CFPLearningFnParameter(
+    learning_fn = ClassSelectorParameter(CFPLearningFn,
         default=CFPLF_Plugin(),
         doc='Function for computing changes to the weights based on one activation step.')
 
