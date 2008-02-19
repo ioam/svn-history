@@ -86,6 +86,11 @@ class PipelineOF(OutputFn):
         assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
         self.output_fns.append(of)
 
+    def __add__(self,of):
+        # Returns a single new Pipeline rather than a nested Pipeline
+        assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
+        return PipelineOF(output_fns=self.output_fns+[of])
+
     def __getattribute__(self,name):
         # Return attribute 'name' from this object, if one exists.
         # Otherwise, calls 'name' on each nested OF that has the
