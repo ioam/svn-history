@@ -35,7 +35,11 @@ distributions, it is usually easy to add it.  E.g. for Debian or
 Ubuntu Linux, just do 'apt-get install git git-svn git-doc'; for
 others you can get installation packages from
 <a href="http://git.or.cz/">git.or.cz</a>.  The git-svn package allows
-git to connect to Topographica's SVN repository.
+git to connect to Topographica's SVN repository. Note that you should
+try to get Git version 1.5.3 (used while writing this document) or
+later. If you are building from source, you can skip git-doc, which
+can be difficult to compile (XXXX link) since, and the documentation
+is all available online (XXXX link).
 
 <P>** The remainder of this file is draft documentation ** <BR>
 If you know Git well, you can probably already perform the operations
@@ -83,50 +87,69 @@ ceball@doozy:~/g/topographica$ git-svn rebase
 Current branch master is up to date.
 </pre>
 
-(substituting values appropriate for what you wish to do). If you're getting just a recent revision of the <code>topographica</code> code (and not <code>topographica-win</code> or <code>facespace</code>), the new directory will occupy about 124 megabytes (as of February 2008).
+(substituting values appropriate for what you wish to do; e.g. you can
+get more history by changing <code>-r</code>). If you're getting 
+a recent revision of the <code>topographica</code> code (and
+not <code>topographica-win</code> or <code>facespace</code>), the new
+directory will occupy about 124 megabytes (as of February 2008).
+
+
+<P>Want the whole history instead? Probably
+<pre>
+ git svn clone $TOPOROOT/trunk/topographica topographica
+</pre>
+will put it in <code>topographica/</code> directory. Might take a
+while. I have never tried it. You only need to get it all once,
+because after that you can use branches to create different version.
 
 <!--
-ceball@doozy:~/topographica2$ git-svn init https://topographica.svn.sourceforge.net/svnroot/topographica -T/trunk/topographica
-Initialized empty Git repository in .git/
-ceball@doozy:~/topographica2$ git-svn fetch -r 7988:HEAD
+Want all tags and branches too? Seems unlikely. See the git manual, -T -B options.
 -->
 
-<!--
-You could get the entire history? You'd only need to do it once, because after that you'd be using git branches.
--->
-
-<P>Note that if you get a message such as <code>unknown revision or path not in the working tree</code>, then you have probably specifed a path that does not exist at the specified revision. You can use <code>svn log</code> on an SVN copy of Topographica to get information about revisions, or you can <a href="http://topographica.svn.sourceforge.net/viewvc/topographica/">view the SVN repository on the web</a>.
+<P>Note that if you get a message such as <code>unknown revision or
+path not in the working tree</code>, then you have probably specifed a
+path that does not exist at the specified revision. You can
+use <code>svn log</code> on an SVN copy of Topographica to get
+information about revisions, or you
+can <a href="http://topographica.svn.sourceforge.net/viewvc/topographica/">view
+the SVN repository on the web</a>.
 
 <P>After you have the source code, you probably want to
-<A HREF="index.html#building-topographica">build Topographica</A>.
+<A HREF="index.html#building-topographica">build Topographica</A>. You
+probably also want to instruct git to ignore the same files as SVN
+ignores:
+<pre>
+(echo; git-svn show-ignore) >> .git/info/exclude
+</pre>
+
 
 
 <H3>Working with your Git repository</H3>
 
-<P>Now that you have the Topographica source code in your own
-Git repository, you are free to work on it as you wish. You can
-commit files, add files, delete files, and so on. If you are new
-to Git, you might find the <A HREF="http://www.kernel.org/pub/software/scm/git/docs/tutorial.html">Git tutorial</A> useful; there is also a 
-<A HREF="http://git.or.cz/course/svn.html">crash course for SVN
-users</A>. Operations such as <code>diff</code>
-and <code>commit</code> that you perform with <code>git</code> are
-local to your repository.
+<P>Now that you have the Topographica source code in your own Git
+repository, you are free to work on it as you wish. You can commit
+files, add files, delete files, and so on. Note that operations such
+as <code>diff</code> and <code>commit</code> that you perform with
+<code>git</code> are local to your repository.
 
+<P>If you are new to Git, you might find the <A
+HREF="http://www.kernel.org/pub/software/scm/git/docs/tutorial.html">Git
+tutorial</A> useful; there is also a <A
+HREF="http://git.or.cz/course/svn.html">crash course for SVN
+users</A>, which will help you to avoid being surprised by small
+differences between similarly named git and svn commands.  When
+puzzled by an operation in Git, the <A
+HREF="http://git.or.cz/gitwiki/GitFaq">Git FAQ</A> is often helpful.
 
-<!-- mention git commit -a -->
-
-<P>Before committing to your repository, you should probably identify
-yourself to git:
+<P>Before committing to your repository for the first time, you should
+probably identify yourself to git:
 <pre>
 ceball@doozy:~/g$ git config --global user.email ceball@users.sf.net
 ceball@doozy:~/g$ git config --global user.name "C. E. Ball"
 </pre>
 
-Also, you probably want to instruct git to ignore the same files as SVN ignores:
-
-<pre>
-(echo; git-svn show-ignore) >> .git/info/exclude
-</pre>
+Other configuration options are available by reading <code>man
+git-config</code>.
 
 
 <P>Example...
@@ -156,9 +179,21 @@ Created commit 5f209a3: Updated comment.
  1 files changed, 1 insertions(+), 6 deletions(-)
 </pre>
 
+<P>Note that for subversion users, the behavior of <code>git
+commit</code> in particular might be surprising when adding new files,
+so be sure to take a look at
+the <A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-commit.html">git-commit
+man page</A> or see the FAQ
+entry <A HREF="http://git.or.cz/gitwiki/GitFaq#head-3aa45c7d75d40068e07231a5bf8a1a0db9a8b717">Why
+is "git commit -a" not the default?</A>.
 
-<P>After working on your own copy of Topographica, there are a couple
-of operations that you will probably want to perform at some stage:
+<P>Also note that while you are still working locally, before you have
+shared any changes, you can ammend commits (and even rewrite parts of
+your history). XXXX link <!--When your changes are finally sent to
+SVN, this can make your changes clearer to see for other users.-->
+
+<P>After working on your own repository, there are a couple of
+operations that you will probably want to perform at some stage:
 tracking other peoples' changes to the Topographica SVN repository,
 adding your changes to the Topographica SVN repository, and sharing
 your Git repository.
@@ -168,8 +203,8 @@ your Git repository.
 
 <P>To get updates from the Topographica SVN repository, your own copy
 should have no local changes. (If you do have local changes,
-the git-stash command allows you to store your own
-changes for later retrieval.)
+the <A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-stash.html">git-stash</A>
+command allows you to store your own changes for later retrieval.)
 
 <pre>
 # (git-stash if required)
@@ -187,30 +222,10 @@ Committed: 779f4bf3e1a526f53b7ba1e3d6351b717b4aaa65
 # (git-stash apply; git-stash clear if required)
 </pre>
 
-<P>rebase moves a whole branch to a newer "base" commit; see <A HREF="http://www.kernel.org/pub/software/scm/git/docs/user-manual.html#using-git-rebase">Keeping a patch series up to date using git-rebase</A> from the Git user manual.
-
-
-<!--
-switch to branch master
-git checkout master
--->
-
-<!--
-# Initialize a repo (like git init):
-        git-svn init http://svn.foo.org/project/trunk
-# Fetch remote revisions:
-        git-svn fetch
-# Create your own branch to hack on:
-        git checkout -b tkgui-tk85 remotes/git-svn
-# Do some work, and then commit your new changes to SVN, as well as
-# automatically updating your working HEAD:
-        git-svn dcommit
-# Something is committed to SVN, rebase the latest into your branch:
-        git-svn fetch && git rebase remotes/git-svn
-# Append svn:ignore settings to the default git exclude file:
-        git-svn show-ignore >> .git/info/exclude
--->
-
+<P><code>rebase</code> moves a whole branch to a newer "base" commit;
+see <A HREF="http://www.kernel.org/pub/software/scm/git/docs/user-manual.html#using-git-rebase">Keeping
+a patch series up to date using git-rebase</A> from the Git user
+manual.
 
 <H4>Sending your changes to Topographica's SVN trunk</H4>
 
@@ -229,14 +244,36 @@ repository, preserving their log messages, so that to an SVN user it
 appears you made each of those changes one after the other in a
 batch.  
 
+<!--You should first run <code>git-svn fetch</code> and <code>git-svn
+rebase</code> so you commit against the latest changes in the SVN
+repository.-->
+
+
 <H4>Branching your own Git repository</H4>
 
-<P>If you are working on a complicated new feature, you will probably
-find it helpful to branch your git repository, and work on the branch.
+<P>If you are working on more than a few lines of code - a new
+feature, for instance - you will probably find it more helpful to
+branch your git repository, and work on the branch. Afterwards, you
+can merge your branch into your master repository and send the changes
+to Topographica's SVN repository.
+
+<P>The <A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-svn.html">git-svn</A>
+man page gives an overview of a possible workflow:
 
 <pre>
-ceball@doozy:~/g/topographica$ git checkout -b some-feature-name remotes/git-svn
-Switched to a new branch "some-feature-name"
+# Initialize a repo (like git init):
+        git-svn init http://svn.foo.org/project/trunk
+# Fetch remote revisions:
+        git-svn fetch
+# Create your own branch to hack on:
+        git checkout -b new-branch-name remotes/git-svn
+# Do some work, and then commit your new changes to SVN, as well as
+# automatically updating your working HEAD:
+        git-svn dcommit
+# Something is committed to SVN, rebase the latest into your branch:
+        git-svn fetch && git rebase remotes/git-svn
+# Append svn:ignore settings to the default git exclude file:
+        git-svn show-ignore >> .git/info/exclude
 </pre>
 
 To see your branches:
@@ -246,25 +283,70 @@ ceball@doozy:~/g/topographica$ git branch
 * some-feature-name
 </pre>
 
+<P>You can of course now push, pull, and merge changes between your
+own branches as you wish. 
+
+<P>Example of what I've been doing...working on a branch that will
+replace tkgui. I wanted to keep the new feature branch updated with
+changes from Topographica's SVN as I went along.
+
+<pre>
+ceball@doozy:~/g/topographica$ git checkout -b some-feature-name remotes/git-svn
+Switched to a new branch "some-feature-name"
+</pre>
+
 <P>Now you can work on <code>some-feature-name</code>; changes there
 will not appear in <code>master</code> (which you can check by making
 a change, then inspecting the code after switching back with <code>git
 checkout master</code>).
 
-<P>You can push and pull changes between your own branches ... XXXX
+<P>To keep my branch up to date with SVN:
+
 <pre>
-e.g. new-feature-name -> master
-svn checkout master
-?git pull . new-feature-name
-git-svn dcommit   XXXX options about log message, --squash for one commit only
-then delete new-feature-name branch.
+git checkout master         # switch to master branch
+git svn rebase              # retrieve the latest commits from subversion repo
+git checkout some-feature-name
+git rebase master   # makes sure that your branch is rebased against latest version of svn tree
 </pre>
+
+<P>On completion of the work, I will:
+
+<pre>
+# update master to match svn
+git checkout master
+git svn rebase
+
+# bring my branch into master      
+git rebase some-feature-name master  # fast-forwards master to include some-feature-name changes
+git svn dcommit             
+</pre>
+
+Of course you are free instead to use <code>git merge</code>; the
+approach here always moves your branch changes onto the end of the
+updated SVN history. That makes most sense to me.
+
+<P>
+Conflicts...not documented yet
+
+<pre>
+XXXX
+ git rebase master
+ # ... reports merge conflicts
+ git mergetool # launches merge tool
+ # after you merge all conflicting changes
+ git rebase --continue
+</pre>
+
+<P>Delete branch when done. XXXX
 
 
 <H4>Sharing your repository</H4>
 
-<P>You or anyone else can
-<A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-clone.html">clone</A>
+<P>XXXX If you follow this section, you will probably get really
+confused. Needs to be written when I know what I'm doing.
+
+<P>You or anyone else
+can <A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-clone.html">clone</A>
 your Git repository to share code (see the tutorial or other
 documentation mentioned earlier for details of this).
 
@@ -289,10 +371,11 @@ Resolving 63 deltas...
 remote: Total 635 (delta 63), reused 0 (delta 0)
 </pre>
 
-(<code>--bare</code> instructs git not to clone all the files i.e. not to make a working copy.)
+(<code>--bare</code> instructs git not to clone all the files i.e. not
+to make a working copy.)
 
-<P>If you both have read/write access to
-<code>~/git/some-feature-name</code>, you can both <code>git
+<P>If you both have read/write access
+to <code>~/git/some-feature-name</code>, you can both <code>git
 push</code>/<code>git pull</code> to/from that repository after first
 cloning it:
 
@@ -312,10 +395,10 @@ Checking 572 files out...
  100% (572/572) done
 </pre>
 
-Now someone will have a working copy in
-<code>/home/someone/work/some-feature-name/topographica</code>. To get
-a working copy, you would do a similar thing. After getting the copy,
-XXXX you need to switch to the appropriate branch:
+Now someone will have a working copy
+in <code>/home/someone/work/some-feature-name/topographica</code>. To
+get a working copy, you would do a similar thing. After getting the
+copy, XXXX you need to switch to the appropriate branch:
 
 <pre>
 ?
@@ -336,9 +419,8 @@ dcommitting
 your collaborators can work across machines. For instance, someone not
 on doozy in the example above could clone the repository using the
 following:
-
-<pre> git clone
-ssh://ceball@doozy.inf.ed.ac.uk/home/ceball/git/some-feature-name
+<pre>
+git clone ssh://ceball@doozy.inf.ed.ac.uk/home/ceball/git/some-feature-name
 </pre>
 
 (share ssh keys to avoid passwords)
@@ -363,7 +445,7 @@ git remote add origin git@gitorious.org:/topographica/tkgui-tk85.git
 <!-- CB: there seem to be various gui tools for git, too -->
 
 
-<H2>References</H2>
+<H2>References + Notes</H2>
 
 <P>something something
 
@@ -404,7 +486,8 @@ http://www.adeal.eu/
 
 Merging branches
 
-To get the difference between your master branch and the currently checked out branch: git diff master..HEAD
+To get the difference between your master branch and the currently checked out branch: 
+git diff master..HEAD
 
 Merging a local branch is as easy as this: git checkout master; git pull . <branch>
 
@@ -418,11 +501,9 @@ http://michael-prokop.at/blog/2007/12/03/git-svn-in-30-minutes/
 
 http://blog.nanorails.com/tags/git
 http://blog.nanorails.com/articles/2008/1/31/getting-started-with-git
-</pre>
 
 
 
-<pre>
 My notes...
 
 ceball@san:~/dev/topographica-git$ git checkout -b tkgui-tk85 remotes/git-svn
@@ -441,4 +522,53 @@ ceball@san:~/dev/topographica-git$ git push ssh://ceball@doozy.inf.ed.ac.uk/home
 merge:
 bail is git reset 
 fix conflict is git add 
+
+Q. How do I revert a commit?
+
+A. The git-reset command allows you to reset the HEAD of the branch to
+any given point in history. To go back one commit, run "git-reset
+HEAD^". This will keep your local changes and you can make any
+additional changes before re-commiting the new work. Also see the
+"git-commit --amend" command and the "git-reset" man page for other
+examples.
+
+http://sipx-wiki.calivia.com/index.php/Mirroring_sipXecs_subversion_repository_with_git
+
+man git-rev-parse
+
+
+http://utsl.gen.nz/talks/git-svn/intro.html#wtf-why
+
+
+
+list all recent actions
+git reflog
+
+
+
+pack to min disk usage
+
+git pack-refs --prune
+git reflog expire --all
+git repack -a -d -f -l
+git prune
+git rerere gc
+
+
+
+interactive rebasing
+
+git rebase -interactive
+
+
+
+
+gitk readable fonts
+
+[ -r ~/.gitk ] || cat > ~/.gitk << EOF
+set mainfont {Arial 10}
+set textfont { Courier 10}
+set uifont {Arial 10 bold}
+EOF
+
 </pre>
