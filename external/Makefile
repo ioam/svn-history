@@ -28,7 +28,7 @@ PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.5
 # CB: rpath is ignored on OS X (so where are the library files taken from?). 
 python: ${PYTHON}.tgz tk 
 	echo ${PREFIX}
-	tar -xozf ${PYTHON}.tgz
+	tar -xzf ${PYTHON}.tgz
 	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
 	cd ${PYTHON}; env PREFIX=${PREFIX} make 
 	cd ${PYTHON}; env PREFIX=${PREFIX} make install
@@ -48,7 +48,7 @@ TCL_UNINSTALL += lib/tcl8.4 lib.tclConfig.sh lib/libtcl8.4.so lib/libtclstub8.4.
 TCL_UNINSTALL += include/tcl*.h man/man*
 
 tcl: ${TCL}-src.tar.gz
-	tar -xozf ${TCL}-src.tar.gz
+	tar -xzf ${TCL}-src.tar.gz
 	cd ${TCL}/unix; ./configure --prefix=${PREFIX}
 	make -C ${TCL}/unix install
 	touch tcl
@@ -69,7 +69,7 @@ TK_UNINSTALL += lib/tk8.4 lib/libtk8.4.so lib/libtkstub8.4.a
 TK_UNINSTALL += include/tk*.h lib/tkConfig.sh
 
 tk: ${TK}-src.tar.gz tcl
-	tar -xozf ${TK}-src.tar.gz
+	tar -xzf ${TK}-src.tar.gz
 	cd ${TK}/unix; ./configure --prefix=${PREFIX}
 	make -C ${TK}/unix install
 	touch tk
@@ -88,7 +88,7 @@ IPYTHON = ipython-0.8.2
 IPYTHON_UNINSTALL =  ${PYTHON_LIB}/site-packages/IPython
 
 ipython: ${IPYTHON}.tar.gz python 
-	tar -xozf ${IPYTHON}.tar.gz
+	tar -xzf ${IPYTHON}.tar.gz
 	cd ${IPYTHON}; ${PREFIX}/bin/python setup.py install
 	touch ipython
 
@@ -113,7 +113,7 @@ JPEG_UNINSTALL += include/jconfig.h include/jerror.h include/jmorecfg.h include/
 
 
 jpeg: ${JPEG}.tgz
-	tar -xozf ${JPEG}.tgz
+	tar -xzf ${JPEG}.tgz
 	cd ${JPEG}; ./configure --prefix=${PREFIX} --enable-shared --enable-static
 	make -C ${JPEG}
 	make -C ${JPEG} test
@@ -133,7 +133,7 @@ PIL = Imaging-1.1.5
 PIL_UNINSTALL = ${PYTHON_LIB}/site-packages/PIL
 
 pil: ${PIL}.tgz jpeg python
-	tar -xozf ${PIL}.tgz
+	tar -xzf ${PIL}.tgz
 #	cd ${PIL}/libImaging; ./configure --prefix=${PREFIX} --with-jpeg=${PREFIX}/lib
 #	make -C ${PIL}/libImaging
 #
@@ -160,7 +160,7 @@ NUMPY = numpy-1.0.2
 NUMPY_UNINSTALL =  ${PYTHON_LIB}/site-packages/numpy
 
 numpy: ${NUMPY}.tar.gz python numpy.diff
-	tar -xozf ${NUMPY}.tar.gz
+	tar -xzf ${NUMPY}.tar.gz
 	cd ${NUMPY}; patch -p0 < ../numpy.diff
 	cd ${NUMPY}; ${PREFIX}/bin/python setup.py install
 	touch numpy
@@ -189,7 +189,7 @@ else
 endif
 
 matplotlib: ${MATPLOTLIB}.tar.gz python
-	tar -xozf ${MATPLOTLIB}.tar.gz
+	tar -xzf ${MATPLOTLIB}.tar.gz
 	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py build
 	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py install
 	touch matplotlib
@@ -208,7 +208,7 @@ PMW_UNINSTALL = ${PYTHON_LIB}/site-packages/Pmw
 
 pmw: ${PMW}.tgz python Pmw.diff 
 	make pmw-uninstall
-	tar -xozf ${PMW}.tgz
+	tar -xzf ${PMW}.tgz
 	cd ${PMW}; patch -p0 < ../Pmw.diff
 	cp -r ${PMW} ${PREFIX}/${PYTHON_LIB}/site-packages/Pmw
 	touch pmw
@@ -229,7 +229,7 @@ WEAVE_UNINSTALL = ${PYTHON_LIB}/site-packages/weave external/weave
 weave: ${WEAVE}.tar.gz python
 	rm -rf Scipy_core-0.3.0_108.1820
 	rm -f ${PYTHON_LIB}/site-packages/weave external/weave
-	tar -xozf ${WEAVE}.tar.gz
+	tar -xzf ${WEAVE}.tar.gz
 	cd ${WEAVE}/Lib/weave/; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch weave
 
@@ -249,7 +249,7 @@ SCIPY_UNINSTALL = ${PYTHON_LIB}/site-packages/scipy external/scipy
 # Forces removal of scipy version used with Numeric
 scipy: ${SCIPY}.tar.gz python
 	rm -f ${PYTHON_LIB}/site-packages/scipy external/scipy
-	tar -xozf ${SCIPY}.tar.gz
+	tar -xzf ${SCIPY}.tar.gz
 	cp scipy-site.cfg ${SCIPY}/site.cfg
 	cd ${SCIPY}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch scipy
@@ -269,7 +269,7 @@ FIXEDPT_UNINSTALL = ${PYTHON_LIB}/site-packages
 
 fixedpoint: ${FIXEDPT}.tgz python fixedpoint.diff fixedpoint_setup.py
 	rm -rf ${FIXEDPT}
-	tar -xozf ${FIXEDPT}.tgz
+	tar -xzf ${FIXEDPT}.tgz
 	mv fixedpoint ${FIXEDPT}
 	cp fixedpoint.diff ${FIXEDPT}
 	cp fixedpoint_setup.py ${FIXEDPT}/setup.py
@@ -290,7 +290,7 @@ PYCHECKER = pychecker-0.8.18-CVS-200712061936
 PYCHECKER_UNINSTALL = ${PYTHON_LIB}/site-packages/pychecker
 
 pychecker: ${PYCHECKER}.tar.gz python
-	tar -xozf ${PYCHECKER}.tar.gz
+	tar -xzf ${PYCHECKER}.tar.gz
 	cd ${PYCHECKER}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch pychecker
 
@@ -309,7 +309,7 @@ COMMON = logilab-common-0.25.0
 COMMON_UNINSTALL = ${PYTHON_LIB}/site-packages/logilab/common
 
 common: ${COMMON}.tar.gz python
-	tar -xozf ${COMMON}.tar.gz
+	tar -xzf ${COMMON}.tar.gz
 	cd ${COMMON}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch common
 
@@ -328,7 +328,7 @@ ASTNG = logilab-astng-0.17.1
 ASTNG_UNINSTALL = ${PYTHON_LIB}/site-packages/logilab/astng
 
 astng: ${ASTNG}.tar.gz python
-	tar -xozf ${ASTNG}.tar.gz
+	tar -xzf ${ASTNG}.tar.gz
 	cd ${ASTNG}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch astng
 
@@ -346,7 +346,7 @@ PYLINT = pylint-0.13.2
 PYLINT_UNINSTALL = ${PYTHON_LIB}/site-packages/pylint
 
 pylint: ${PYLINT}.tar.gz python common astng
-	tar -xozf ${PYLINT}.tar.gz
+	tar -xzf ${PYLINT}.tar.gz
 	cd ${PYLINT}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch pylint
 
@@ -364,7 +364,7 @@ EPYDOC = epydoc-3.0beta1
 EPYDOC_UNINSTALL = ${PYTHON_LIB}/site-packages/epydoc
 
 epydoc: ${EPYDOC}.tar.gz python
-	tar -xozf ${EPYDOC}.tar.gz
+	tar -xzf ${EPYDOC}.tar.gz
 	cd ${EPYDOC}; cd epydoc ; patch -p0 < ../../epydoc.diff; cd .. ; ${PREFIX}/bin/python setup.py install
 	touch epydoc
 
@@ -382,7 +382,7 @@ DOCUTILS = docutils-0.4
 DOCUTILS_UNINSTALL = ${PYTHON_LIB}/site-packages/docutils
 
 docutils: ${DOCUTILS}.tar.gz python
-	tar -xozf ${DOCUTILS}.tar.gz
+	tar -xzf ${DOCUTILS}.tar.gz
 	cd ${DOCUTILS}; ${PREFIX}/bin/python setup.py install
 	touch docutils
 
@@ -402,7 +402,7 @@ GNOSIS_UNINSTALL =  ${PYTHON_LIB}/site-packages/gnosis
 # uninstalls previous version first (could i just call 'gnosis-uninstall'?)
 gnosis: ${GNOSIS}.tar.gz python
 	rm -rf $(foreach f, ${GNOSIS_UNINSTALL}, ${PREFIX}/${f})
-	tar -xozf ${GNOSIS}.tar.gz
+	tar -xzf ${GNOSIS}.tar.gz
 	cd ${GNOSIS}; patch -p0 < ../Gnosis_Utils.diff
 	cd ${GNOSIS}; ${PREFIX}/bin/python setup.py install
 	touch gnosis
@@ -423,7 +423,7 @@ LIBSNDFILE_UNINSTALL += bin/sndfile-*
 LIBSNDFILE_UNINSTALL += lib/libsndfile.*
 
 libsndfile: ${LIBSNDFILE}.tar.gz
-	tar -xozf ${LIBSNDFILE}.tar.gz
+	tar -xzf ${LIBSNDFILE}.tar.gz
 	cd ${LIBSNDFILE}; ./configure --prefix=${PREFIX}
 	cd ${LIBSNDFILE}; make 
 	cd ${LIBSNDFILE}; make install
@@ -443,7 +443,7 @@ PYAUDIOLAB = pyaudiolab-0.6.6
 PYAUDIOLAB_UNINSTALL =  ${PYTHON_LIB}/site-packages/pyaudiolab
 
 pyaudiolab: ${PYAUDIOLAB}.tar.gz python libsndfile 
-	tar -xozf ${PYAUDIOLAB}.tar.gz
+	tar -xzf ${PYAUDIOLAB}.tar.gz
 	cd ${PYAUDIOLAB}; ${PREFIX}/bin/python setup.py install
 	touch pyaudiolab
 
@@ -463,7 +463,7 @@ MLABWRAP_UNINSTALL =  ${PYTHON_LIB}/site-packages/mlabwrap.py*
 MLABWRAP_UNINSTALL += ${PYTHON_LIB}/site-packages/mlabrawmodule.so
 
 mlabwrap: ${MLABWRAP}.tar.gz python 
-	tar -xozf ${MLABWRAP}.tar.gz
+	tar -xzf ${MLABWRAP}.tar.gz
 	cd ${MLABWRAP}; ${PREFIX}/bin/python setup.py install
 	touch mlabwrap
 
@@ -484,7 +484,7 @@ TILE_UNINSTALL += lib/tile0.7.8 lib/libttkstub.a
 TILE_UNINSTALL += include/ttk*.h
 
 tile: ${TILE}.tar.gz tk
-	tar -xozf ${TILE}.tar.gz
+	tar -xzf ${TILE}.tar.gz
 	cd ${TILE}/generic; ./configure --prefix=${PREFIX}
 	make -C ${TILE}/generic install
 	touch tile
@@ -525,7 +525,7 @@ BWIDGET_UNINSTALL += share/pybwidget
 BWIDGET_UNINSTALL += ${PYTHON_LIB}/site-packages/bwidget
 
 bwidget: ${BWIDGET}.tar.gz python
-	tar -xozf ${BWIDGET}.tar.gz
+	tar -xzf ${BWIDGET}.tar.gz
 	cd ${BWIDGET}; ${PREFIX}/bin/python setup.py install
 	touch bwidget
 
@@ -544,7 +544,7 @@ PSYCO = psyco-dist
 PSYCO_UNINSTALL += ${PYTHON_LIB}/site-packages/psyco
 
 psyco: ${PSYCO}-svn42201.tar.gz python
-	tar -xozf ${PSYCO}-svn42201.tar.gz
+	tar -xzf ${PSYCO}-svn42201.tar.gz
 	cd ${PSYCO}; ${PREFIX}/bin/python setup.py install
 	touch psyco
 
@@ -563,7 +563,7 @@ PYREX = Pyrex-0.9.5.1a
 PYREX_UNINSTALL += ${PYTHON_LIB}/site-packages/Pyrex
 
 pyrex: ${PYREX}.tar.gz python
-	tar -xozf ${PYREX}.tar.gz
+	tar -xzf ${PYREX}.tar.gz
 	cd ${PYREX}; ${PREFIX}/bin/python setup.py install
 	touch pyrex
 
@@ -582,7 +582,7 @@ HDF5 = hdf5-1.6.6
 HDF5_UNINSTALL += 
 
 hdf5: ${HDF5}.tar.gz
-	tar -xozf ${HDF5}.tar.gz
+	tar -xzf ${HDF5}.tar.gz
 	cd ${HDF5}; ./configure --enable-cxx --prefix=${PREFIX}
 	make -C ${HDF5} install
 	touch hdf5
@@ -601,7 +601,7 @@ PYTABLES = pytables
 PYTABLES_UNINSTALL += ${PYTHON_LIB}/site-packages/tables
 
 pytables: ${PYTABLES}-20070518.tar.gz pyrex hdf5
-	tar -xozf ${PYTABLES}-20070518.tar.gz
+	tar -xzf ${PYTABLES}-20070518.tar.gz
 	cd ${PYTABLES}; ${PREFIX}/bin/python setup.py install --hdf5=${PREFIX}
 	touch pytables
 
@@ -622,7 +622,7 @@ BLUESPHERE_UNINSTALL += topo/tkgui/icons/*.png
 bluesphere: ${BLUESPHERE}.tar.gz
 	rm -rf ${BLUESPHERE}
 	mkdir ${BLUESPHERE}
-	cd ${BLUESPHERE}; tar -xozf ../${BLUESPHERE}.tar.gz
+	cd ${BLUESPHERE}; tar -xzf ../${BLUESPHERE}.tar.gz
 	cp ${BLUESPHERE}_Makefile ${BLUESPHERE}/Makefile
 	cd ${BLUESPHERE}; make
 	cp ${BLUESPHERE}/*.png ../topo/tkgui/icons/
@@ -641,7 +641,7 @@ GNUPLOTPY = gnuplot-py-1.7
 GNUPLOTPY_UNINSTALL += ${PYTHON_LIB}/site-packages/Gnuplot
 
 gnuplotpy: ${GNUPLOTPY}.tar.gz
-	tar -xozf ${GNUPLOTPY}.tar.gz
+	tar -xzf ${GNUPLOTPY}.tar.gz
 	cd ${GNUPLOTPY}; ${PREFIX}/bin/python setup.py install
 	touch gnuplotpy
 
@@ -659,7 +659,7 @@ PLAYER = player-2.1.0rc1
 PLAYER_UNINSTALL += ${PYTHON_LIB}/site-packages/playerc* ${PYTHON_LIB}/site-packages/_playerc.so ${PYTHON_LIB}/../libplayer*
 
 player: ${PLAYER}.tar.bz2
-	tar -xojf ${PLAYER}.tar.bz2
+	tar -xjf ${PLAYER}.tar.bz2
 	cd ${PLAYER}; ./configure --prefix=${PREFIX}
 	make -C ${PLAYER} install
 	make -C ${PLAYER}/client_libs/libplayerc/bindings/python
@@ -682,7 +682,7 @@ STAGE = stage-2.1.0rc1
 STAGE_UNINSTALL += ${PYTHON_LIB}/../libstage*
 
 stage: ${STAGE}.tar.bz2
-	tar -xojf ${STAGE}.tar.bz2
+	tar -xjf ${STAGE}.tar.bz2
 	cd ${STAGE}; ./configure --prefix=${PREFIX}
 	make -C ${STAGE} install
 	touch stage
@@ -702,7 +702,7 @@ PROGRESSBAR = progressbar-2.2
 PROGRESSBAR_UNINSTALL += ${PYTHON_LIB}/site-packages/progressbar.py
 
 progressbar: ${PROGRESSBAR}.tar.gz python
-	tar -xozf ${PROGRESSBAR}.tar.gz
+	tar -xzf ${PROGRESSBAR}.tar.gz
 	cd ${PROGRESSBAR}; ${PREFIX}/bin/python setup.py install
 	touch progressbar
 
