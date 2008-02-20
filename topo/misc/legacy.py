@@ -103,6 +103,16 @@ class SnapshotSupport(object):
         preprocess_state(Parameter,param_add_readonly)
 
 
+        def class_selector_remove_suffixtolose(state):
+            # suffix_to_lose removed from ClassSelectorParameter in r8031
+            if 'suffix_to_lose' in state:
+                del state['suffix_to_lose']
+
+        from topo.base.parameterclasses import ClassSelectorParameter
+        preprocess_state(ClassSelectorParameter,class_selector_remove_suffixtolose)
+
+
+
         def cf_rename_slice_array(state):
             ## slice_array was renamed to input_sheet_slice in r7548
             if 'slice_array' in state:
