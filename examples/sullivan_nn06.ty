@@ -33,7 +33,6 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet 
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.base.functionfamilies import OutputFn
-from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.learningfns.basic import Hebbian
 from topo.learningfns.projfns import HomeoSynaptic
 from topo.learningfns.som import CFPLF_HebbianSOM
