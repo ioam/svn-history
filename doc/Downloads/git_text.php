@@ -168,7 +168,7 @@ your Git repository.
 
 <P>To get updates from the Topographica SVN repository, your own copy
 should have no local changes. (If you do have local changes,
-the <A HREF="">git-stash</A> command allows you to store your own
+the git-stash command allows you to store your own
 changes for later retrieval.)
 
 <pre>
@@ -214,17 +214,25 @@ git checkout master
 
 <H4>Sending your changes to Topographica's SVN trunk</H4>
 
+Changes that you have committed in your local git repository are not
+automatically exported to the main SVN repository for Topographica,
+which lets you use version control even for things that are not meant
+to be part of the main Topographica distribution.  If you do want your
+changes to be made public, then run:
 
-The following command will send each of your git commits to the SVN repository:
 <pre>
 git-svn dcommit
 </pre>
 
+This will will send each of your git commits, in order, to the SVN
+repository, preserving their log messages, so that to an SVN user it
+appears you made each of those changes one after the other in a
+batch.  
 
 <H4>Branching your own Git repository</H4>
 
-<P>If you are working on a new feature, you will probably find it helpful
-to branch your git repository, and work on the branch.
+<P>If you are working on a complicated new feature, you will probably
+find it helpful to branch your git repository, and work on the branch.
 
 <pre>
 ceball@doozy:~/g/topographica$ git checkout -b some-feature-name remotes/git-svn
@@ -255,9 +263,10 @@ then delete new-feature-name branch.
 
 <H4>Sharing your repository</H4>
 
-<P>You or anyone else can <A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-clone.html">clone</A> your Git repository to
-share code (see the tutorial or other documentation mentioned earlier for
-details of this).
+<P>You or anyone else can
+<A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-clone.html">clone</A>
+your Git repository to share code (see the tutorial or other
+documentation mentioned earlier for details of this).
 
 <P>If you are collaborating with someone, or you work on multiple
 machines, you might decide to share a repository. In that case, the
@@ -282,7 +291,10 @@ remote: Total 635 (delta 63), reused 0 (delta 0)
 
 (<code>--bare</code> instructs git not to clone all the files i.e. not to make a working copy.)
 
-<P>If you both have read/write access to <code>~/git/some-feature-name</code>, you can both <code>git push</code>/<code>git pull</code> to/from that repository after first cloning it:
+<P>If you both have read/write access to
+<code>~/git/some-feature-name</code>, you can both <code>git
+push</code>/<code>git pull</code> to/from that repository after first
+cloning it:
 
 <pre>
 someone@doozy:~/work/some-feature-name$ git clone /home/ceball/git/some-feature-name/topographica/
@@ -300,7 +312,10 @@ Checking 572 files out...
  100% (572/572) done
 </pre>
 
-Now someone will have a working copy in <code>/home/someone/work/some-feature-name/topographica</code>. To get a working copy, you would do a similar thing. After getting the copy, XXXX you need to switch to the appropriate branch:
+Now someone will have a working copy in
+<code>/home/someone/work/some-feature-name/topographica</code>. To get
+a working copy, you would do a similar thing. After getting the copy,
+XXXX you need to switch to the appropriate branch:
 
 <pre>
 ?
@@ -312,11 +327,18 @@ git checkout tkgui-tk85
 
 <!-- or should it be fetch? -->
 
-<P>You can both now share code via push/pull to/from that repository. Once you finish the new feature, you can send it to Topographica's SVN by pulling it into your XXXX git-svn repo and dcommitting 
+<P>You can both now share code via push/pull to/from that
+repository. Once you finish the new feature, you can send it to
+Topographica's SVN by pulling it into your XXXX git-svn repo and
+dcommitting
 
-<P>Note that Git supports the <code>ssh</code> protocol, so you and your collaborators can work across machines. For instance, someone not on doozy in the example above could clone the repository using the following:
-<pre>
-git clone ssh://ceball@doozy.inf.ed.ac.uk/home/ceball/git/some-feature-name
+<P>Note that Git supports the <code>ssh</code> protocol, so you and
+your collaborators can work across machines. For instance, someone not
+on doozy in the example above could clone the repository using the
+following:
+
+<pre> git clone
+ssh://ceball@doozy.inf.ed.ac.uk/home/ceball/git/some-feature-name
 </pre>
 
 (share ssh keys to avoid passwords)
