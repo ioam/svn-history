@@ -29,7 +29,16 @@ PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.5
 python: ${PYTHON}.tgz tk 
 	echo ${PREFIX}
 	tar -xzf ${PYTHON}.tgz
+# Configure for specific operating system versions
+ifeq ("$(shell uname -s)","Darwin")
+ifeq ("$(shell uname -r | cut -d . -f 1)","9") # Darwin 9.x == Mac OS X 10.5 (Leopard)
+	cd ${PYTHON}; ./configure --prefix=${PREFIX} MACOSX_DEPLOYMENT_TARGET=10.5
+else
+	cd ${PYTHON}; ./configure --prefix=${PREFIX}
+endif
+else
 	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
+endif
 	cd ${PYTHON}; env PREFIX=${PREFIX} make 
 	cd ${PYTHON}; env PREFIX=${PREFIX} make install
 	touch python
@@ -137,11 +146,14 @@ pil: ${PIL}.tgz jpeg python
 #	cd ${PIL}/libImaging; ./configure --prefix=${PREFIX} --with-jpeg=${PREFIX}/lib
 #	make -C ${PIL}/libImaging
 #
-#       Apply patch for 64-bit machines; helps prevent "encoder zip not available" problems
+# Apply OS-specific patches:
 ifeq ("$(shell uname -m)","x86_64")
+#       # Tell 64-bit Linux machines where to find zlib, to prevent "encoder zip not available" problems
 	cd ${PIL}; patch < ../Imaging.diff
-endif
+else ifeq ("$(shell uname -s)","Darwin")
+#       # Tell OS X machines where to find freetype
 	patch -p0 < Imaging_OSX.diff
+endif
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build_ext -i
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python selftest.py
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
