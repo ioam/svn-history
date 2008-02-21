@@ -55,7 +55,7 @@ try:
 
     # Default parameters to add to the inline_weave() call.
     inline_named_params = {
-        'extra_compile_args':['-O2','-fomit-frame-pointer','-funroll-loops'],
+        'extra_compile_args':['-O2','-Wno-unused-variable -fomit-frame-pointer','-funroll-loops'],
         'extra_link_args':['-lstdc++'],
         'compiler':'gcc',
         'verbose':0}
