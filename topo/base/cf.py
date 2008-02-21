@@ -242,7 +242,7 @@ class ConnectionField(ParameterizedObject):
         c2 = -max(-n_cols, center_col-sheet_cols-n_cols/2)
         r2 = -max(-n_rows, center_row-sheet_rows-n_rows/2)
 
-        slice_.set_from_slice((r1,r2,c1,c2))
+        slice_.set_from_slice((r1,r2,c1,c2),False)
         self.weights_slice = slice_
 
 

@@ -82,7 +82,7 @@ __version__ = '$Revision$'
 from numpy import array,floor,ceil,round_,arange
 from boundingregion import BoundingBox
 
-
+from topo.base.boundingregion import AARectangle
 
 # Note about the 'bounds-master' approach we have adopted
 # =======================================================
@@ -343,8 +343,7 @@ class SheetCoordinateSystem(object):
 
         return t_idx,b_idx,l_idx,r_idx
 
-
-    def slice2bounds(self,slice_):
+    def slice2bounds(self,slice_,bb=None):
         """
         Construct the bounds that corresponds to the given slice.
         This way, this function is an exact transform of bounds2slice. 
@@ -355,5 +354,11 @@ class SheetCoordinateSystem(object):
         left,bottom = self.matrix2sheet(r2,c1)
         right, top  = self.matrix2sheet(r1,c2)
 
-        return BoundingBox(points=((left,bottom),
-                                   (right,top)))
+        points = ((left,bottom),(right,top))
+
+        if bb is None:
+            return BoundingBox(points=points)
+        else:
+            bb._aarect = AARectangle(*points)
+            return bb
+

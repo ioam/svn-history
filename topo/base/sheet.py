@@ -333,12 +333,15 @@ class Slice(ndarray):
         and columns.
         """
         self+=[r,r,c,c]
-        self.bounds = self._scs.slice2bounds(self)
+        self.bounds = self._scs.slice2bounds(self,self.bounds)
 
 
-    def set_from_slice(self,slice_):
+    def set_from_slice(self,slice_,x=True):
         self.put([0,1,2,3],slice_)
-        self.bounds = self._scs.slice2bounds(slice_)
+        if x is True:
+            self.bounds = self._scs.slice2bounds(slice_,self.bounds)
+        else:
+            self.bounds = self._scs.slice2bounds(slice_)
 
 
     # shouldn't the two method names below refer to scs rather than sheet?
@@ -357,7 +360,7 @@ class Slice(ndarray):
         self[2] = max(0,self[2])
         self[3] = min(maxcol,self[3])
 
-        self.bounds = self._scs.slice2bounds(self)
+        self.bounds = self._scs.slice2bounds(self,self.bounds)
 
 
 
