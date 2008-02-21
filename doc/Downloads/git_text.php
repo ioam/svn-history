@@ -78,19 +78,21 @@ a recent revision of the <code>topographica</code> code (and
 not <code>topographica-win</code> or <code>facespace</code>), the new
 directory will occupy about 124 megabytes (as of February 2008).
 
-<!--
-<P>Note that you could get the complete history if you wish, but we
-have never tried this. The command would be something like:
+<P>If you wished, you <i>could</i> get the complete history of the
+Topographica project, using:
 <pre>
  git svn clone $TOPOROOT/trunk/topographica topographica
 </pre>
-(to put the whole repository in <code>topographica/</code>). This
-would likely take a long time to execute, although you would only need
-to do it once (because after that you could use branches to create
-different versions). 
-
-Want all tags and branches too? Seems unlikely. See the git manual, -T -B options.
--->
+instead of all of the above commands after <code>export</code>, to
+make a new directory <code>topographica/</code> with a copy of the
+entire repository (620MB as of 2/2008) plus a working copy.  This will
+usually take 2-3 hours to run, although you would only need to do it
+once (because after that you could use branches to create different
+versions).  Note that this only gets the trunk; if you want all tags
+and branches as well (which seems unlikely), you can use the -T and -B
+options described in the git manual.  In any case, this method is not
+usually necessary, unless you want to do some comparison across a wide
+range of historical versions of Topographica.
 
 <P>Note that if you get a message such as <code>unknown revision or
 path not in the working tree</code>, then you have probably specifed a
