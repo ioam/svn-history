@@ -197,7 +197,7 @@ changes to be made public, then run:
 git-svn dcommit
 </pre>
 
-This will will send each of your git commits, in order, to the SVN
+This will send each of your git commits, in order, to the SVN
 repository, preserving their log messages, so that to an SVN user it
 appears you made each of those changes one after the other in a
 batch. 
@@ -216,11 +216,11 @@ the <code>dcommit</code> process, and the SVN error will be reported.
 
 <H4>Branching your own Git repository</H4>
 
-<P>If you are working on more than a few lines of code - a new
-feature, for instance - you will probably find it more helpful to
-branch your git repository, and work on the branch. Afterwards, you
-can merge your branch into your master repository and send the changes
-to Topographica's SVN repository.
+<P>If you are working on more than a few lines of code - a potentially
+complicated new feature, for instance - you will probably find it more
+helpful to branch your git repository, and work on the
+branch. Afterwards, you can merge your branch into your master
+repository and send the changes to Topographica's SVN repository.
 
 <P>The <A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-svn.html">git-svn</A>
 man page gives an overview of a possible workflow:
