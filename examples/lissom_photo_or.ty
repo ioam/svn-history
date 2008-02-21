@@ -52,7 +52,7 @@ from topo.misc.numbergenerators import UniformRandom
 
 input_type=topo.patterns.image.FileImage
 image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
-inputs=[input_type(filename=f,size_normalization='original',orientation=0
+inputs=[input_type(filename=f,size_normalization='original',orientation=0,
                    x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
                    y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34))
 	for f in image_filenames]
