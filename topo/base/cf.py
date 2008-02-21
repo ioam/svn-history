@@ -108,7 +108,8 @@ class ConnectionField(ParameterizedObject):
         self._has_norm_total = False
 
 
-    # CB Accessing norm_total as a property from the C code makes very little difference.
+    # CB: Accessing norm_total as a property from the C code has
+    # little impact on the performance. (Shown by JAB?)
     norm_total = property(__get_norm_total,__set_norm_total,__del_norm_total,
         """
         The norm_total property returns a value useful in computing
@@ -135,11 +136,11 @@ class ConnectionField(ParameterizedObject):
         that the value is only set just before it will be used, and
         deleted as soon as it has been accessed.
         
-        WARNING: Any c-optimized code can bypass this property and access directly
-        _has_norm_total, _norm_total
+        WARNING: Any c-optimized code can bypass this property and
+        access directly _has_norm_total, _norm_total
         
         """)
-        # CB: no existing C code accesses _norm_total. Isn't there
+        # CEBALERT: no existing C code accesses _norm_total. Isn't there
         # some redundant code in the C functions?
         # E.g. CPLF_Hebbian_opt sets norm_total and then sets
         # _has_norm_total=True; surely just setting norm_total is
@@ -151,50 +152,58 @@ class ConnectionField(ParameterizedObject):
         return self.input_sheet_slice.bounds
     bounds = property(get_bounds)
 
-    
-    # CB: doc slice_ (just an optimization; otherwise gets calc'd from bounds_template
-    # and input_sheet). Check the optimization helps.
-    # can do something for mask_template=None
+
+    # CEBALERT: stop this passing of both bounds & slice:
+    #   if template is BB then assume uninitialized
+    #   if template is slice then assume initialized
+    # CEBALERT: do something for mask_template=None
     def __init__(self,input_sheet,x=0.0,y=0.0,bounds_template=BoundingBox(radius=0.1),
                  weights_generator=patterngenerator.Constant(),mask_template=None,
                  output_fn=IdentityOF(),slice_template=None,**params):
         """
-        Create weights at the specified (x,y) location on the specified input_sheet.
+        Create weights at the specified (x,y) location on the
+        specified input_sheet.
         
-        The supplied bounds_template is moved to the specified location,
-        then converted to an array, and finally the weights pattern is
+        The supplied bounds_template is converted to a slice, moved to  
+        the specified (x,y) location, and then the weights pattern is
         drawn inside by the weights_generator.
-        
-        The mask_template allows the weights to be limited to being non-zero in a subset 
-        of the rectangular weights area.  The actual mask is created by cropping the 
-        mask_template by the boundaries of the input_sheet, so that the weights all
-        correspond to actual locations in the input sheet.  For instance, if a circular 
-        pattern of weights is desired, the mask_template should have a disk-shaped 
-        pattern of elements with value 1, surrounded by elements with the value 0.  
-        If the CF extends over the edge of the input sheet then the weights will 
-        actually be half-moon (or similar) rather than circular. 
-        
-        Note that bounds_template is assumed to have been initialized correctly
-        already (i.e. represents the exact bounds) - see
-        CFProjection.initialize_bounds().
+
+        Note that if the slice corresponding to bounds_template is
+        already known, then it can be passed in as
+        slice_template. This slice will then be used directly, instead
+        of converting bounds_template into a slice.
+
+        If bounds_template is specified, it is assumed to have been
+        initialized correctly already (i.e. represents the exact
+        bounds) - see CFProjection.initialize_bounds().
+                
+        The mask_template allows the weights to be limited to being
+        non-zero in a subset of the rectangular weights area.  The
+        actual mask is created by cropping the mask_template by the
+        boundaries of the input_sheet, so that the weights all
+        correspond to actual locations in the input sheet.  For
+        instance, if a circular pattern of weights is desired, the
+        mask_template should have a disk-shaped pattern of elements
+        with value 1, surrounded by elements with the value 0.  If the
+        CF extends over the edge of the input sheet then the weights
+        will actually be half-moon (or similar) rather than circular.
         """
         # CEBALERT: maybe an external function is required for
-        # initializing the bounds? We need to have correctly setup bounds
-        # here, in change_bounds(), and in other places such as CFProjection
-        # (where the mask is made). At the moment, the function is in
-        # CFProjection.
-        super(ConnectionField,self).__init__(**params)
-        self.x = x; self.y = y
-        self.input_sheet = input_sheet
+        # initializing the bounds? We need to have correctly setup
+        # bounds here, in change_bounds(), and in other places such as
+        # CFProjection (where the mask is made). At the moment, the
+        # function is in CFProjection.
         
-        # Move bounds to correct (x,y) location
-        # Also, store the array for direct access by C.
-        self.create_input_sheet_slice(bounds=bounds_template,slice_=slice_template)
-	
-        # Now we have to get the right submatrix of the mask (in case
-        # it is near an edge)
+        super(ConnectionField,self).__init__(**params)
+        self.input_sheet = input_sheet
+        self.x = x
+        self.y = y
+        
+        self.create_input_sheet_slice(bounds=bounds_template,slice_=slice_template)	
         self.create_weights_slice(bounds=bounds_template,slice_=slice_template)
 
+        # CB: this would be clearer (but not perfect)
+        # m = mask_template[self.weights_slice()]
         m = self.weights_slice.submatrix(mask_template)
         self.mask = m.astype(weight_type)
 
@@ -207,12 +216,12 @@ class ConnectionField(ParameterizedObject):
         
         self.weights = w.astype(weight_type)
 
-        # CEBHACKALERT: the system of masking through multiplication
+        # CEBALERT: the system of masking through multiplication
         # by 0 works for now, while the output_fns are all
         # multiplicative.  But in the long run we need a better way to
         # apply the mask.  The same applies anywhere the mask is used,
-        # including in learningfns/.
-        # We should investigate the numpy.ma module.
+        # including in learningfns/. We should investigate masked
+        # arrays (from numpy).
         output_fn(self.weights)        
 
 
@@ -242,13 +251,14 @@ class ConnectionField(ParameterizedObject):
         c2 = -max(-n_cols, center_col-sheet_cols-n_cols/2)
         r2 = -max(-n_rows, center_row-sheet_rows-n_rows/2)
 
+        # CEBALERT: False forces slice_ to get a copy of the bounds;
+        # that should happen elsewhere.
         slice_.set_from_slice((r1,r2,c1,c2),False)
         self.weights_slice = slice_
 
 
-    # CEBHACKALERT: assumes the user wants the bounds to be centered
-    # about the unit, which might not be true. Same HACKALERT as for
-    # CFProjection.initialize_bounds()
+    # CBALERT: assumes the user wants the bounds to be centered about
+    # the unit, which might not be true. 
     def create_input_sheet_slice(self,bounds,slice_=None):
         """
         Offset the bounds_template to this cf's location and store the
@@ -282,16 +292,18 @@ class ConnectionField(ParameterizedObject):
 
 
     def get_input_matrix(self, activity):
+        # CB: again, this is clearer:
+        # activity[self.input_sheet_slice()]
         return self.input_sheet_slice.submatrix(activity)
 
 
+    # CBALERT: same as for init(); clear up bounds_template & slice_template
     def change_bounds(self, bounds_template, mask_template, output_fn=IdentityOF(), slice_template=None):
         """
         Change the bounding box for this ConnectionField.
 
         bounds_template is assumed to have been initialized
-        already (its equivalent slice made odd, and
-        snapped to grid - as in __init__() ).
+        already  
         
         Discards weights or adds new (zero) weights as necessary,
         preserving existing values where possible.
@@ -703,11 +715,12 @@ class CFProjection(Projection):
         return mask_template
         
 
+    # CB: returns a copy of the bounds
     def initialize_bounds(self,original_bounds):
         """
-        Return sheet-coordinate bounds that correspond exactly to the slice
-        of the sheet which best approximates the specified sheet-coordinate
-        bounds.
+        Return sheet-coordinate bounds that correspond exactly to the
+        slice of the sheet which best approximates the specified
+        sheet-coordinate bounds.
 
         The supplied bounds are translated to have a center at the
         center of one of the sheet's units (we arbitrarily use the
@@ -731,21 +744,22 @@ class CFProjection(Projection):
         
         bounds_xcenter,bounds_ycenter=bounds.centroid()
         sheet_rows,sheet_cols=self.src.shape
+
         # arbitrary (e.g. could use 0,0) 
         center_row,center_col = sheet_rows/2,sheet_cols/2
         unit_xcenter,unit_ycenter=self.src.matrixidx2sheet(center_row,
                                                            center_col)
 
-        #CEBALERT: to be cleaned up...
+        ### CEBALERT: for SharedWeightCFProjection
         self.center_unitxcenter,self.center_unitycenter = unit_xcenter,unit_ycenter
-
+        ###
+        
         bounds.translate(unit_xcenter-bounds_xcenter,
                          unit_ycenter-bounds_ycenter)
 
-        ### CEBALERT: for now, assumes weights are to be centered
-        # about each unit, whatever the user specified. This will be
-        # changed. See also CF.offset_bounds().
-        #
+
+
+        ########## CEBALERT: assumes weights are to be centered about each unit.
         # Slice will (optionally) perform a more general version
         # of this, so it will not need to appear here.
         weights_slice =  Slice(bounds,self.src)
@@ -761,16 +775,16 @@ class CFProjection(Projection):
         c1=center_col-xrad
 
         weights_slice.set_from_slice((r1,r2,c1,c2))
-        ### end alert
+        ########## 
 
-        ### Checks:
-        # (1) user-supplied bounds must lead to a weights matrix of at
-        # least 1x1
+
+        # user-supplied bounds must lead to a weights matrix of at least 1x1
         rows,cols = weights_slice.shape_on_sheet()
         if rows==0 or cols==0:
             raise ValueError("nominal_bounds_template results in a zero-sized weights matrix (%s,%s) for %s - you may need to supply a larger nominal_bounds_template or increase the density of the sheet."%(rows,cols,self.name))
-        # (2) weights matrix must be odd (otherwise this method has an error)
-        # (The second check should move to a test file.)
+
+        # weights matrix must be odd (otherwise this method has an error)
+        # CEBALERT: this test should move to a test file.
         if rows%2!=1 or cols%2!=1:
             raise AssertionError("nominal_bounds_template yielded even-height or even-width weights matrix (%s rows, %s columns) for %s - weights matrix must have odd dimensions."%(rows,cols,self.name))
 
