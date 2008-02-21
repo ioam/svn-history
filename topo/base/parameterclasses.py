@@ -5,7 +5,6 @@ $Id$
 """
 __version__='$Revision$'
 
-import re
 import types
 
 from parameterizedobject import Parameter, descendents
@@ -568,7 +567,7 @@ class ObjectSelectorParameter(SelectorParameter):
     def __init__(self,default=None,objects=[],instantiate=True,**params):
         self.objects = objects
         self._check_value(default)
-        Parameter.__init__(self,default=default,instantiate=instantiate,**params)
+        super(ObjectSelectorParameter,self).__init__(default=default,instantiate=instantiate,**params)
         
     # CBNOTE: if the list of objects is changed, the current value for
     # this parameter in existing POs could be out of the new range.
@@ -609,7 +608,7 @@ class ClassSelectorParameter(SelectorParameter):
     def __init__(self,class_,default=None,instantiate=True,**params):
         self.class_ = class_
         self._check_value(default)
-        Parameter.__init__(self,default=default,instantiate=instantiate,**params)
+        super(ClassSelectorParameter,self).__init__(default=default,instantiate=instantiate,**params)
 
 
     def _check_value(self,val,obj=None):
