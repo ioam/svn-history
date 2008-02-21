@@ -29,7 +29,7 @@ SVN</A> instead.
 
 Once you have obtained the <code>topographica</code> directory, you
 are ready to build Topographica.  This directory contains the files
-making up Topographica itself, plus source code versions of the
+making up Topographica itself, plus source code versions of most of the
 various external libraries needed by Topographica.  At present, the
 libraries are included in source code form to minimize
 platform-specific modifications needed for different systems, although
@@ -42,28 +42,9 @@ on setup.bat in the
 <code>topographica\topographica-win\setup_cvs_copy\</code>
 directory after checking out the code.
 
-<P>On Mac OS X, you first need to type <code>make osx-patch</code>
-(which removes <code>LDFLAGS=-Wl,-rpath,${PREFIX}/lib</code> from the
-python build step; the <code>-rpath</code> option is required
-on Linux but is not supported on the Mac).  Following this, type
-<code>make</code> as usual (see below).  Note that the lack of
-<code>-rpath</code> appears to mean that system Tcl/Tk libraries will
-be used if those are present; we are looking into whether the ones in
-the Topographica distribution can be used instead.
-
-<P>On other Unix-based systems like Linux, just type <code>make</code>
-(which may be called <code>gmake</code> on some systems) from within
-the <code>topographica/</code> directory.  It is best to do this as a
-regular user in the user's own directory, not as a root user with
-special privileges, because Topographica does not need any special
-access to your system.  You will currently (10/2007)
-need to do this on a machine with a functioning DISPLAY, not on a
-remote text-only windowless session, because of build requirements for
-the MatPlotLib library.  (Note that many systems provide xfvb for this
-very purpose, and in such cases you can simply do "xvfb-run make" to
-build using a virtual display instead.)  The build process will take a
-while to complete (e.g. about 5-10 minutes on a 1.5GHz Pentium IV
-machine with a local disk).
+<P>On Mac OS X, you should first make sure that tcl/tk version 8.4 is
+installed on your system, as it is by default with OS X 10.4 and 10.5;
+other tcl/tk versions will not currently work.
 
 <P>On some Linux distributions that start with a minimal set of
 packages included, such as Ubuntu or the various "live CD" systems,
@@ -81,6 +62,22 @@ sometimes specific versions must be specified (e.g.
 <code>libpng12-dev</code>,
 <code>libfreetype6-dev</code>).  Example for Ubuntu 7.10:
 "sudo apt-get install  libfreetype6 libfreetype6-dev libpng12-0 libpng12-dev libx11-dev zlib1g".
+
+<P>Then once these libraries are installed on Linux, Mac OS X, and
+other Unix-based systems, (as they usually are by default), just type
+<code>make</code>
+(which may be called <code>gmake</code> on some systems) from within
+the <code>topographica/</code> directory.  It is best to do this as a
+regular user in the user's own directory, not as a root user with
+special privileges, because Topographica does not need any special
+access to your system.  You will currently (10/2007)
+need to do this on a machine with a functioning DISPLAY, not on a
+remote text-only windowless session, because of build requirements for
+the MatPlotLib library.  (Note that many systems provide xfvb for this
+very purpose, and in such cases you can simply do "xvfb-run make" to
+build using a virtual display instead.)  The build process will take a
+while to complete (e.g. about 5-10 minutes on a 1.5GHz Pentium IV
+machine with a local disk).
 
 <P>If you have the php, m4, bibtex, convert,
 and fig2dev commands installed, you can also make local copies of the
