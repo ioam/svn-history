@@ -61,7 +61,7 @@ def windowtitle(title):
 # Default DPI when rendering to a bitmap.  The nominal size * the dpi
 # gives the final image size in pixels.  
 # E.g.: 4"x4" image * 80 dpi ==> 320x320 pixel image
-# The output can be .png, .ps, .pdf, etc, as supported by MatPlotLib
+# The output can be .png, .ps, .pdf, .svg, etc, as supported by MatPlotLib
 default_output_dpi=100
 default_output_format=".png"
 
