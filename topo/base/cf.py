@@ -388,11 +388,11 @@ class CFPLearningFn(ParameterizedObject):
         
 
     def constant_sum_connection_rate(self,proj,learning_rate):
-	""" 
-	Return the learning rate for a single connection assuming that
+        """ 
+        Return the learning rate for a single connection assuming that
         the total rate is to be divided evenly among all the units in
         the connection field.
-	"""
+        """
         return float(learning_rate)/proj.n_units()
 
 
@@ -419,12 +419,12 @@ class CFPLF_Plugin(CFPLearningFn):
         doc="Accepts a LearningFn that will be applied to each CF individually.")
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
-	single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
 
         
-	for cf,r,c in iterator():
+        for cf,r,c in iterator():
             single_cf_fn(cf.get_input_matrix(input_activity),
                          output_activity[r,c], cf.weights, single_connection_learning_rate)
             # CEBHACKALERT: see ConnectionField.__init__() re. mask & output fn
@@ -504,9 +504,9 @@ class CFPOF_Plugin(CFPOutputFn):
             single_cf_fn = self.single_cf_fn
 
             for cf,r,c in iterator():
-              if (mask[r][c] != 0):
-                 single_cf_fn(cf.weights)
-                 del cf.norm_total
+                if (mask[r][c] != 0):
+                    single_cf_fn(cf.weights)
+                    del cf.norm_total
 
 
 class CFPOF_Identity(CFPOutputFn):
@@ -778,7 +778,7 @@ class CFProjection(Projection):
 
 
     def n_units(self):
-	"""Return the number of unmasked units in a typical ConnectionField."""      
+        """Return the number of unmasked units in a typical ConnectionField."""      
         ### JCALERT! Right now, we take the number of units at the
         ### center of the cfs matrix.  It would be more reliable to
         ### calculate it directly from the target sheet density and
@@ -786,7 +786,7 @@ class CFProjection(Projection):
         #center_r,center_c = sheet2matrixidx(0,0,bounds,xdensity,ydensity)
         rows,cols=self.cfs_shape
         cf = self._cfs[rows/2][cols/2]
-	return len(Numeric.nonzero(Numeric.ravel(cf.mask)))
+        return len(Numeric.nonzero(Numeric.ravel(cf.mask)))
 
 
     def cf(self,r,c):
@@ -804,24 +804,21 @@ class CFProjection(Projection):
         # matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)        
         # cf.input_sheet_slice.submatrix(matrix_data)=cf.weights 
 
-	matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)
+        matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)
         (r,c) = self.dest.sheet2matrixidx(sheet_x,sheet_y)
         r1,r2,c1,c2 = self.cf(r,c).input_sheet_slice
-	matrix_data[r1:r2,c1:c2] = self.cf(r,c).weights
+        matrix_data[r1:r2,c1:c2] = self.cf(r,c).weights
         return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self,timestamp)
 
 
     def get_projection_view(self, timestamp):
-	"""
-	Returns the activity in a single projection
-	"""
+        """Returns the activity in a single projection"""
         # CB: presumably activity passed through Numeric.array to make a copy?
         # In that case, wouldn't
         # matrix_data = self.activity.copy()
         # be clearer?
-	matrix_data = Numeric.array(self.activity)
-	return ProjectionView((matrix_data,self.dest.bounds),self,timestamp)
-
+        matrix_data = Numeric.array(self.activity)
+        return ProjectionView((matrix_data,self.dest.bounds),self,timestamp)
 
     def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
