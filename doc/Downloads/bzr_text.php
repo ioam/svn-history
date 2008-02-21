@@ -1,5 +1,7 @@
 <H2>Topographica using Bazaar</H2>
 
+<P>** Draft documentation **
+
 <P>The trunk of Topographica's SVN repository is continuously
 mirrored<sup><a href="#footnote-1">1</a></sup> to a public Bazaar
 (bzr) branch. This allows anyone to make his or her own Bazaar branch
@@ -8,11 +10,11 @@ Topographica SVN trunk (via the Bazaar mirror) over time. Starting
 from this branch is an easy way for anyone (registered Topographica
 developer or not) to develop a new feature or fix a bug.
 
-<P>Alternatively, you yourself are free to make your own branch of
-Topographica's SVN trunk using bzr... probably "bzr branch
-$TOPOROOT/trunk" or similar after installing bzr-svn. Not sure how
-difficult to get working. Guess it takes a long time, too.
-
+<P>Note that at least with Bazaar 1.1.0, we have found
+that <A HREF="git.html">Git</A> (another distributed version control
+system) interoperates better with the Topographica SVN repository, so
+unless you are familiar with Bazaar already, we recommend you use Git
+instead.
 
 <P>Our Bazaar mirror of Topographica's SVN repository is hosted
 by <A HREF="https://launchpad.net/">Launchpad</A>.  The essentials for
@@ -38,6 +40,15 @@ operations). Once complete, the new directory will occupy around 1 Gb
 (as of 02/2008). After you have the source code, you probably want to
 <A HREF="index.html#building-topographica">build Topographica</A>.
 
+<P>XXXX mention lightweight checkout
+
+<P>Alternatively, instead of using our Bazaar mirror, you yourself are
+free to make a branch of Topographica's SVN trunk using
+bzr... probably "bzr branch $TOPOROOT/trunk" or similar after
+installing bzr-svn. Not sure how difficult to get working. Guess it
+takes a long time, too.
+
+
 
 <H3>Working with your Bazaar branch</H3>
 
@@ -50,7 +61,7 @@ requires network access.
 <P>Before committing for the first time, you should inform bzr who you
 are, so that changes are attributed to the correct username:
 <pre>
-CEBALERT: formatting messed up - see source
+XXXX formatting messed up - see source
 bzr whoami "Your Name <user@address.ext>"
 </pre>
 
