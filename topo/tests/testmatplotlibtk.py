@@ -11,7 +11,7 @@ class TestMatPlotLibTk(unittest.TestCase):
 
     def test_TkAgg(self):
         import matplotlib
-        matplotlib.use('TkAgg')
+        #matplotlib.use('TkAgg')
         try: import pylab
         except ImportError: havetkagg = False
         else: havetkagg = True

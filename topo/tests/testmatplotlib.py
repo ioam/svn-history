@@ -16,7 +16,7 @@ class TestMatPlotLib(unittest.TestCase):
 
     def test_agg(self):
         import matplotlib
-        matplotlib.use('Agg')
+        #matplotlib.use('Agg')
         try: import pylab
         except ImportError: haveagg = False
         else: haveagg = True
