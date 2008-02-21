@@ -58,33 +58,18 @@ you can execute the following:
 more generic-->
 
 <pre>
-ceball@doozy:~/g$ export TOPOROOT=https://topographica.svn.sourceforge.net/svnroot/topographica
-ceball@doozy:~/g$ mkdir topographica
-ceball@doozy:~/g$ cd topographica/
-ceball@doozy:~/g/topographica$ git-svn init $TOPOROOT/trunk/topographica
-Initialized empty Git repository in .git/
-ceball@doozy:~/g/topographica$ git-svn fetch -r7986
-        A       topo/coordmapperfns/__init__.py
-        A       topo/coordmapperfns/basic.py
-        ...
-        A       examples/goodhill_network90.ty
-        A       examples/laminar_or.ty
-r7986 = 03b4d77b03a4ad27f1c9fb7e8c8bd23f25200ca8 (git-svn)
-Checking 571 files out...
- 100% (571/571) done
-Checked out HEAD:
-  https://topographica.svn.sourceforge.net/svnroot/topographica/trunk/topographica r7986
-ceball@doozy:~/g/topographica$ git-svn rebase
-        A       doc/Downloads/git_text.php
-r7987 = 6c15be77a2b82610484a79a25eb84e6f867e6307 (git-svn)
-        M       doc/Downloads/git_text.php
-r7988 = f0d17b08e6c4c560dac048e84f27d9b372c63713 (git-svn)
-First, rewinding head to replay your work on top of it...
+# location of SVN repository
+$ export TOPOROOT=https://topographica.svn.sourceforge.net/svnroot/topographica
 
-HEAD is now at f0d17b0... Continued writing.
-Fast-forwarded master to refs/remotes/git-svn.
-ceball@doozy:~/g/topographica$ git-svn rebase
-Current branch master is up to date.
+# create directory to hold new files
+$ mkdir topographica; cd topographica
+
+# create a new Git repository
+$ git-svn init $TOPOROOT/trunk/topographica
+
+# retrieve the SVN files and history
+# (you can choose a value for r)
+$ git-svn fetch -r7986; git-svn rebase
 </pre>
 
 (substituting values appropriate for what you wish to do; e.g. you can
@@ -93,16 +78,17 @@ a recent revision of the <code>topographica</code> code (and
 not <code>topographica-win</code> or <code>facespace</code>), the new
 directory will occupy about 124 megabytes (as of February 2008).
 
-
-<P>Want the whole history instead? Probably
+<!--
+<P>Note that you could get the complete history if you wish, but we
+have never tried this. The command would be something like:
 <pre>
  git svn clone $TOPOROOT/trunk/topographica topographica
 </pre>
-will put it in <code>topographica/</code> directory. Might take a
-while. I have never tried it. You only need to get it all once,
-because after that you can use branches to create different version.
+(to put the whole repository in <code>topographica/</code>). This
+would likely take a long time to execute, although you would only need
+to do it once (because after that you could use branches to create
+different versions). 
 
-<!--
 Want all tags and branches too? Seems unlikely. See the git manual, -T -B options.
 -->
 
@@ -121,73 +107,54 @@ ignores:
 <pre>
 (echo; git-svn show-ignore) >> .git/info/exclude
 </pre>
-
+If <code>svn:ignore</code> properties are subsequently changed in the
+SVN repository, you will have to update your <code>exclude</code>
+information.
 
 
 <H3>Working with your Git repository</H3>
 
 <P>Now that you have the Topographica source code in your own Git
 repository, you are free to work on it as you wish. You can commit
-files, add files, delete files, and so on. Note that operations such
-as <code>diff</code> and <code>commit</code> that you perform with
-<code>git</code> are local to your repository.
+files, add files, delete files, and so on. All operations that you
+perform with <code>git</code> (such as <code>diff</code>
+and <code>commit</code>) are local; only operations
+with <code>git-svn</code> have the potential to modify the SVN
+repository.
 
-<P>If you are new to Git, you might find the <A
-HREF="http://www.kernel.org/pub/software/scm/git/docs/tutorial.html">Git
-tutorial</A> useful; there is also a <A
-HREF="http://git.or.cz/course/svn.html">crash course for SVN
-users</A>, which will help you to avoid being surprised by small
-differences between similarly named git and svn commands.  When
-puzzled by an operation in Git, the <A
-HREF="http://git.or.cz/gitwiki/GitFaq">Git FAQ</A> is often helpful.
+<P>If you are new to Git, you might find
+the <A HREF="http://www.kernel.org/pub/software/scm/git/docs/tutorial.html">Git
+tutorial</A> useful. We recommend that you read through the 
+<A HREF="http://git.or.cz/course/svn.html">crash course for SVN
+users</A>, which will help you to avoid being surprised by differences
+between similarly named git and svn commands. If you are still puzzled
+by a particular operation in Git,
+the <A HREF="http://git.or.cz/gitwiki/GitFaq">Git FAQ</A> is often
+helpful.
 
-<P>Before committing to your repository for the first time, you should
-probably identify yourself to git:
-<pre>
-ceball@doozy:~/g$ git config --global user.email ceball@users.sf.net
-ceball@doozy:~/g$ git config --global user.name "C. E. Ball"
-</pre>
-
-Other configuration options are available by reading <code>man
-git-config</code>.
-
-
-<P>Example...
-<pre>
-ceball@doozy:~/g/topographica$ emacs -nw topo/base/parameterizedobject.py 
-ceball@doozy:~/g/topographica$ git diff
-diff --git a/topo/base/parameterizedobject.py b/topo/base/parameterizedobject.py
-index f0a4f2c..906766f 100644
---- a/topo/base/parameterizedobject.py
-+++ b/topo/base/parameterizedobject.py
-@@ -411,12 +411,7 @@ class Parameter(object):
-         # ParameterizedObject class)
-         if self.constant or self.readonly:
-             if self.readonly:
--                # CB: interpreted 'read only' to include not being
--                # able to set on the class object. If that's wrong,
--                # switch this 'if readonly' block with the below 'elif
--                # not obj' block to allow setting on the
--                # class, and make readonly=>instantiate.
--                # Otherwise please remove this comment.
-+                # CB: 'read only' includes not being able to set on class
-                 raise TypeError("Read-only parameter '%s' cannot be modified"%self._attrib_name)
-             elif not obj:
-                 self.default = val
-ceball@doozy:~/g/topographica$ git commit -m "Updated comment." topo/base/parameterizedobject.py
-Created commit 5f209a3: Updated comment.
- 1 files changed, 1 insertions(+), 6 deletions(-)
-</pre>
-
-<P>Note that for subversion users, the behavior of <code>git
+<!--
+<P>Note that for subversion users, <code>git revert</code> the behavior of <code>git
 commit</code> in particular might be surprising when adding new files,
 so be sure to take a look at
 the <A HREF="http://www.kernel.org/pub/software/scm/git/docs/git-commit.html">git-commit
 man page</A> or see the FAQ
 entry <A HREF="http://git.or.cz/gitwiki/GitFaq#head-3aa45c7d75d40068e07231a5bf8a1a0db9a8b717">Why
 is "git commit -a" not the default?</A>.
+-->
 
-<P>Also note that while you are still working locally, before you have
+<P>Before committing to your repository for the first time, you should
+identify yourself to git:
+<pre>
+ceball@doozy:~/g$ git config --global user.email ceball@users.sf.net
+ceball@doozy:~/g$ git config --global user.name "C. E. Ball"
+</pre>
+
+You should also check that your machine has the correct time and date,
+otherwise your history can become confusing. Other configuration
+options are available by reading <code>man git-config</code>.
+
+
+<P>While you are still working locally, before you have
 shared any changes, you can ammend commits (and even rewrite parts of
 your history). XXXX link <!--When your changes are finally sent to
 SVN, this can make your changes clearer to see for other users.-->
@@ -196,7 +163,7 @@ SVN, this can make your changes clearer to see for other users.-->
 operations that you will probably want to perform at some stage:
 tracking other peoples' changes to the Topographica SVN repository,
 adding your changes to the Topographica SVN repository, and sharing
-your Git repository.
+your Git repository. These are discussed in the following sections.
 
 
 <H4>Tracking Topographica's SVN repository</H4>
@@ -208,31 +175,22 @@ command allows you to store your own changes for later retrieval.)
 
 <pre>
 # (git-stash if required)
-ceball@doozy:~/g/topographica$ git-svn rebase
-        M       doc/Downloads/git_text.php
-r7992 = b31884caa7780766a2732cac7418ab5020085757 (git-svn)
-First, rewinding head to replay your work on top of it...
-
-HEAD is now at b31884c... Topographica with Git: added more info (still incoherent).
-
-Applying Updated comment.
-
-Wrote tree eeb4607b62d41100a5e66aade9ba268e0e44ae34
-Committed: 779f4bf3e1a526f53b7ba1e3d6351b717b4aaa65
+$ git-svn rebase
 # (git-stash apply; git-stash clear if required)
 </pre>
 
-<P><code>rebase</code> moves a whole branch to a newer "base" commit;
+<code>rebase</code> moves a whole branch to a newer "base" commit;
 see <A HREF="http://www.kernel.org/pub/software/scm/git/docs/user-manual.html#using-git-rebase">Keeping
 a patch series up to date using git-rebase</A> from the Git user
-manual.
+manual for further explanation.
+
 
 <H4>Sending your changes to Topographica's SVN trunk</H4>
 
-Changes that you have committed in your local git repository are not
+<P>Changes that you have committed in your local git repository are not
 automatically exported to the main SVN repository for Topographica,
-which lets you use version control even for things that are not meant
-to be part of the main Topographica distribution.  If you do want your
+letting you use version control even for things that are not meant to
+be part of the main Topographica distribution.  If you do want your
 changes to be made public, then run:
 
 <pre>
@@ -242,7 +200,11 @@ git-svn dcommit
 This will will send each of your git commits, in order, to the SVN
 repository, preserving their log messages, so that to an SVN user it
 appears you made each of those changes one after the other in a
-batch.  
+batch. As with SVN, you should first check that you have updated and
+tested your code with changes from others (<code>git-svn
+rebase</code>) to ensure that your changes are compatible (and not
+just that they apply cleanly).
+
 
 <!--You should first run <code>git-svn fetch</code> and <code>git-svn
 rebase</code> so you commit against the latest changes in the SVN
