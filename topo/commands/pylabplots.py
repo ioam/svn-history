@@ -1,8 +1,8 @@
 """
 Line-based and matrix-based plotting commands using MatPlotLib.
 
-Before importing this file, you can override the default backend
-of Agg by doing:
+Before importing this file, you will probably want to do something
+like:
 
   import matplotlib
   matplotlib.use('TkAgg')
@@ -47,14 +47,50 @@ def windowtitle(title):
     will get nice titles in Tk windows.  If other toolkits are in use,
     the title can be set here using a similar try/except mechanism, or
     else there can be a switch based on the backend type.
-    """
-    try: 
-        manager = pylab.get_current_fig_manager()
-        manager.window.title(title)
-    except:
-        pass
 
-def vectorplot(vec,xvalues=None,title=None,style='-',label=None):
+    Nothing is done if the title is None.
+    """
+    if title is not None:
+        try: 
+            manager = pylab.get_current_fig_manager()
+            manager.window.title(title)
+        except:
+            pass
+
+
+# Default DPI when rendering to a bitmap.  The nominal size * the dpi
+# gives the final image size in pixels.  
+# E.g.: 4"x4" image * 80 dpi ==> 320x320 pixel image
+# The output can be .png, .ps, .pdf, etc, as supported by MatPlotLib
+default_output_dpi=100
+default_output_format=".png"
+
+def generate_figure(title=None,filename=None,suffix="",format=None):
+    """
+    Helper function to display a figure on screen or save to a file.
+    
+    The title is used for the window when displaying onscreen. 
+
+    The name of the file is constructed from the provided filename
+    plus the provided suffix plus the current simulator time plus
+    the specified format (defaulting to default_output_format). 
+
+    For bitmap formats, the DPI is determined by default_output_dpi.
+    """
+    if (format==None):
+        format=default_output_format
+
+    pylab.show._needmain=False
+    if filename is not None:
+        fullname=filename+suffix+str(topo.sim.time())+suffix+format
+        pylab.savefig(normalize_path(fullname), dpi=default_output_dpi)
+    else:
+        windowtitle(title)
+        pylab.show()
+
+
+
+def vectorplot(vec,xvalues=None,title=None,style='-',label=None,filename=None):
     """
     Simple line plotting for any vector or list of numbers.
 
@@ -86,12 +122,10 @@ def vectorplot(vec,xvalues=None,title=None,style='-',label=None):
     else:
         pylab.plot(vec, style, label=label)
     pylab.grid(True)
-    if title: windowtitle(title)
-    pylab.show._needmain = False
-    pylab.show()
+    generate_figure(title=title,filename=filename)
 
 
-def matrixplot(mat,title=None,aspect=None,colorbar=True):
+def matrixplot(mat,title=None,aspect=None,colorbar=True,filename=None):
     """
     Simple plotting for any matrix as a bitmap with axes.
 
@@ -105,11 +139,10 @@ def matrixplot(mat,title=None,aspect=None,colorbar=True):
     pylab.imshow(mat,interpolation='nearest',aspect=aspect)
     if title: windowtitle(title)
     if colorbar and (mat.min()!= mat.max()): pylab.colorbar()
-    pylab.show._needmain = False     
-    pylab.show()
+    generate_figure(title=title,filename=filename)
 
 
-def matrixplot3d(mat,title=None,type="wireframe"):
+def matrixplot3d(mat,title=None,type="wireframe",filename=None):
     """
     Simple plotting for any matrix as a 3D wireframe with axes.
 
@@ -153,10 +186,7 @@ def matrixplot3d(mat,title=None,type="wireframe"):
     ax.set_ylabel('C')
     ax.set_zlabel('Value')
 
-    if title: windowtitle(title)
-    pylab.show._needmain=False
-    pylab.show()
-
+    generate_figure(title=title,filename=filename)
 
 
 def matrixplot3d_gnuplot(mat,title=None,outputfilename="tmp.ps"):
@@ -229,7 +259,7 @@ def histogramplot(data,title=None,colors=None,*args,**kw):
     pylab.show()
 
 
-def gradientplot(data,cyclic=True,cyclic_range=1.0,title=None):
+def gradientplot(data,cyclic=True,cyclic_range=1.0,title=None, filename=None):
     """
     Compute and show the gradient plot of the supplied data.
     Translated from Octave code originally written by Yoonsuck Choe.
@@ -251,7 +281,7 @@ def gradientplot(data,cyclic=True,cyclic_range=1.0,title=None):
         dx = 0.5*cyclic_range-abs(dx-0.5*cyclic_range)
         dy = 0.5*cyclic_range-abs(dy-0.5*cyclic_range)
 
-    matrixplot(sqrt(dx*dx+dy*dy),title=title)
+    matrixplot(sqrt(dx*dx+dy*dy),title=title,filename=filename)
     
 
 def activityplot(sheet,activity=None,title=None,cmap=pylab.cm.Greys):    
@@ -268,7 +298,7 @@ def activityplot(sheet,activity=None,title=None,cmap=pylab.cm.Greys):
     pylab.imshow(activity, extent=(l,r,b,t),cmap=cmap)
 
 
-def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreference',axis=[-0.5,0.5,-0.5,0.5]):
+def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreference',axis=[-0.5,0.5,-0.5,0.5],filename=None):
     """
     By default, plot the XPreference and YPreference preferences for all
     Sheets for which they are defined, using MatPlotLib.
@@ -304,18 +334,11 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
             # what the actual possible range is for this simulation (which would presumably
             # be the maximum size of any GeneratorSheet?).
             pylab.axis(axis)
-            windowtitle('Topographic mapping to '+sheet.name+' at time '+topo.sim.timestr())
-
-            # Will need to provide a way to save this output
-            # when there is no GUI
-            #pylab.savefig('simple_plot')
+            title='Topographic mapping to '+sheet.name+' at time '+topo.sim.timestr()
 
             if isint: pylab.ion()
-            
-            # Allow multiple concurrent plots; there may be a
-            # cleaner way to do this...
-            pylab.show._needmain = False 
-            pylab.show()
+
+            generate_figure(title=title,filename=filename,suffix="_"+sheet.name)
 
 
 def tuning_curve_data(sheet, x_axis, curve_label, i_value, j_value):
@@ -491,6 +514,7 @@ def plot_coord_mapping(mapper,sheet,style='b-'):
 ### Fields*' pgts in topo/commands/analysis.py & should share the
 ### implementation of topographic_grid (because that's what is
 ### intended to be visualized here).
+### Should be using generate_figure() as in matrixplot().
 def plotrctg():
     
     import matplotlib
@@ -521,12 +545,13 @@ def plotrctg():
         pylab.show()
 
 
+# JABALERT: Should be using generate_figure() as in matrixplot().
 def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **params):
     """
-    Plots parameter values associated with a ValueTrackingOutputFn output function.
+    Plots parameter values associated with an AttributeTrackingOF.
     Example call:
-    VT=ValueTrackingOutputFn(function=HE, debug_params=['a', 'b',], units=[(0,0),(1,1)], step=1)
-    plot_values(VT,0,10000,debug_params=['a'],units=[(0,0)], filename='V1')
+    VT=AttributeTrackingOF(function=HE, debug_params=['a', 'b',], units=[(0,0),(1,1)], step=1)
+    plot_tracked_attributes(VT,0,10000,debug_params=['a'],units=[(0,0)], filename='V1')
     """
     
     for p in params.get('attrib_names',output_fn.attrib_names):
@@ -537,8 +562,6 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
         ylabel=params.get('ylabel', "")
         pylab.ylabel(p+" "+ylabel)
         pylab.xlabel('Iteration Number')
-        manager = pylab.get_current_fig_manager()
-        manager.window.title(topo.sim.name+': '+p)
         
         for unit in params.get('units',output_fn.units):
             y_data=[y for (x,y) in output_fn.values[p][unit]]
@@ -552,17 +575,13 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
                 
         if isint: pylab.ion()
         pylab.legend(loc=0)
-        pylab.show._needmain = False
-        # The size * the dpi gives the final image size
-        #   a 4"x4" image * 80 dpi ==> 320x320 pixel image
-        if filename is not None:
-            pylab.savefig(normalize_path(filename+p+str(topo.sim.time())+".png"), dpi=100)
-        else:
-            pylab.show()
+
+        generate_figure(title=topo.sim.name+': '+p,filename=filename,suffix=p)
 
 
 def plot_modulation_ratio(fullmatrix):
     # JABALERT: Needs docstring explaining what it's for and what it gives you
+    # Should be using generate_figure() as in matrixplot().
     if (topo.sim.objects().has_key("V1Complex") & topo.sim.objects().has_key("V1Simple")):
         bins = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0]
         v1s = complexity(fullmatrix[topo.sim["V1Simple"]])
@@ -580,6 +599,9 @@ def plot_modulation_ratio(fullmatrix):
         pylab.savefig(str(topo.sim.time()) + 'RM.png')
         #pylab.show()
 
+
+# JABALERT: Remove duplication with tuning_curve, above.  
+# Should be using generate_figure() as in matrixplot().
 def tuning_curve_batch(directory,filename,plot_type,unit,sheet_name,coordinate,x_axis):
     """
     Saves a plot of the tuning curve for the appropriate feature type, such as orientation, contrast or size into a file.
@@ -618,6 +640,10 @@ def tuning_curve_batch(directory,filename,plot_type,unit,sheet_name,coordinate,x
 	    raise
     pylab.savefig(os.path.join(directory,filename) + '.png')
 
+
+
+# JABALERT: Remove duplication with or_tuning_curve, above.  
+# Should be using generate_figure() as in matrixplot().
 def or_tuning_curve_batch(directory,filename,plot_type,unit,sheet_name,coordinate,x_axis):
     """
     Plots a tuning curve for orientation which rotates the curve 
