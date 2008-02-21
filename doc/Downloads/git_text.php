@@ -200,15 +200,18 @@ git-svn dcommit
 This will will send each of your git commits, in order, to the SVN
 repository, preserving their log messages, so that to an SVN user it
 appears you made each of those changes one after the other in a
-batch. As with SVN, you should first check that you have updated and
-tested your code with changes from others (<code>git-svn
-rebase</code>) to ensure that your changes are compatible (and not
-just that they apply cleanly).
+batch. 
 
+<P>As with SVN, before committing you should first check that you have
+updated and tested your code with changes from others (<code>git-svn
+rebase; make tests</code>) to ensure that your changes are compatible
+(and not just that they apply cleanly). Any actual conflict
+encountered by git-svn (e.g.  you try to commit a file which has been
+updated by someone else while you were working on it) will stop
+the <code>dcommit</code> process, and the SVN error will be reported.
 
-<!--You should first run <code>git-svn fetch</code> and <code>git-svn
-rebase</code> so you commit against the latest changes in the SVN
-repository.-->
+<!-- does git-svn dcommit also then run git-svn rebase after? -->
+
 
 
 <H4>Branching your own Git repository</H4>
@@ -246,9 +249,14 @@ ceball@doozy:~/g/topographica$ git branch
 </pre>
 
 <P>You can of course now push, pull, and merge changes between your
-own branches as you wish. 
+own branches as you wish. You also can switch between branches to work
+on different features using the same repository, although note that
+the branch under which you issued the <code>make</code> command is the
+one that determines which version of external packages were compiled
+(this should not be a problem unless your branch is deliberately
+dealing with different external pacakges).
 
-<P>Example of what I've been doing...working on a branch that will
+<P>XXXX superdraft...Example of what I've been doing...working on a branch that will
 replace tkgui. I wanted to keep the new feature branch updated with
 changes from Topographica's SVN as I went along.
 
