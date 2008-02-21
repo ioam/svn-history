@@ -18,6 +18,7 @@ class TestPO(ParameterizedObject):
     notinst = Parameter(default=[1,2,3],instantiate=False)
     const = Parameter(default=1,constant=True)
     ro = Parameter(default="Hello",readonly=True)
+    ro2 = Parameter(default=object(),readonly=True,instantiate=True)
 
 class AnotherTestPO(ParameterizedObject):
     instPO = Parameter(default=TestPO(),instantiate=True)
@@ -59,6 +60,11 @@ class TestParameterizedObject(unittest.TestCase):
 
         # check you cannot set on class
         self.assertRaises(TypeError,setattr,TestPO,'ro',5)
+
+        self.assertEqual(testpo.params()['ro'].constant,True)
+
+        # check that instantiate was ignored for readonly
+        self.assertEqual(testpo.params()['ro2'].instantiate,False)
         
 
 
