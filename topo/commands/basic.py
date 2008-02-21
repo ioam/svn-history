@@ -324,8 +324,8 @@ def run_batch(script_file,output_directory="Output",
     parameterizedobject.script_repr_suppress_defaults=False
 
     # Make sure pylab plots are saved to disk
-    import matplotlib 
-    matplotlib.use('Agg') # Is 'GD' required on some platforms?
+    #import matplotlib 
+    #matplotlib.use('Agg')
 
     # Construct simulation name
     scriptbase= re.sub('.ty$','',os.path.basename(script_file))

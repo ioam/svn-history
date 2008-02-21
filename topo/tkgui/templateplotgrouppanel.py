@@ -29,11 +29,6 @@ from topo.plotting.plotgroup import TemplatePlotGroup
 
 from widgets import Menu
 
-### We want to support any featuremap type defined in that file, and
-### so import all of them here.
-import matplotlib
-matplotlib.use('TkAgg')
-
 
 ### CEBALERT: additional dynamic info/right-click problems:
 #

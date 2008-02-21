@@ -1,8 +1,8 @@
 """
 Line-based and matrix-based plotting commands using MatPlotLib.
 
-Before importing this file, you will probably want to do something
-like:
+Before importing this file, you can override the default backend
+of Agg by doing:
 
   import matplotlib
   matplotlib.use('TkAgg')
@@ -17,10 +17,6 @@ __version__='$Revision$'
 
 import numpy
 import matplotlib
-### JABHACKALERT: Need to figure out how to use Agg by default, but
-### override it with TkAgg, so that the documentation file for this
-### file can be generated.  It's apparently not as simple as just
-### doing "matplotlib.use('Agg')" here.
 import pylab
 import re, os
 import copy
@@ -498,7 +494,6 @@ def plot_coord_mapping(mapper,sheet,style='b-'):
 def plotrctg():
     
     import matplotlib
-    matplotlib.use('TkAgg')
     import pylab
     from numpy import fabs
     from topo.base.arrayutils import centroid
