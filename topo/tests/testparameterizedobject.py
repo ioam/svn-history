@@ -32,7 +32,7 @@ class TestAbstractPO(ParameterizedObject):
 class TestParameterizedObject(unittest.TestCase):
 
     def test_constant_parameter(self):
-        """Test taht you can't set a constant parameter after construction."""
+        """Test that you can't set a constant parameter after construction."""
         testpo = TestPO(const=17)
         self.assertEqual(testpo.const,17)
         self.assertRaises(TypeError,setattr,testpo,'const',10)
@@ -69,6 +69,7 @@ class TestParameterizedObject(unittest.TestCase):
 
 
     def test_basic_instantiation(self):
+        """Check that instantiated parameters are copied into objects."""
 
         testpo = TestPO()
 
@@ -83,7 +84,7 @@ class TestParameterizedObject(unittest.TestCase):
 
 
     def test_more_instantiation(self):
-
+        """Show that objects in instantiated Parameters can still share data."""
         anothertestpo = AnotherTestPO()
 
         ### CB: AnotherTestPO.instPO is instantiated, but
@@ -104,15 +105,17 @@ class TestParameterizedObject(unittest.TestCase):
 
 
     def test_params(self):
+        """Basic tests of params() method."""
 
-        ## basic test
-        # CB: test not so good because it requires changes if params of PO are changed
+
+        # CB: test not so good because it requires changes if params
+        # of PO are changed
         assert 'name' in ParameterizedObject.params()
         assert 'print_level' in ParameterizedObject.params()
         assert len(ParameterizedObject.params())==2
 
-        ## check for bug where subclass Parameters were not showing up if params() already
-        # called on a super class.
+        ## check for bug where subclass Parameters were not showing up
+        ## if params() already called on a super class.
         assert 'inst' in TestPO.params()
         assert 'notinst' in TestPO.params()
 
