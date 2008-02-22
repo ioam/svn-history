@@ -21,6 +21,14 @@ def create_timings(i_am_sure=False):
         f = open('/home/ceball/buildbot/timings.pkl','w')
         pickle.dump(timings,f,0)
         f.close()
+
+def create_startups(i_am_sure=False):
+    if i_am_sure:
+        startups = {}
+        f = open('/home/ceball/buildbot/startups.pkl','w')
+        pickle.dump(startups,f,0)
+        f.close()
+
     
 def get_timings():
     f = open('/home/ceball/buildbot/timings.pkl')
@@ -34,7 +42,19 @@ def save_timings(timings):
     f.close()
 
 
-def get_date_version_time(logfile,timings=None):
+def get_startups():
+    f = open('/home/ceball/buildbot/startups.pkl')
+    startups = pickle.load(f)
+    f.close()
+    return startups
+
+def save_startups(startups):
+    f = open('/home/ceball/buildbot/startups.pkl','w')
+    pickle.dump(startups,f,0)
+    f.close()
+
+
+def get_date_version_time(logfile,timings=None,startups=None):
 
     build = get_build_no(logfile)
     
@@ -52,6 +72,8 @@ def get_date_version_time(logfile,timings=None):
             versioni=i
         if line.startswith("[examples/%s]"%script):
             timingi=i
+        if line.startswith("[examples/%s startup]"%script):
+            startupi=i
         if line.find("Results from examples/%s have not changed."%script)>=0:
             ok2=True
         if line.find('program finished')>=0:
@@ -85,6 +107,16 @@ def get_date_version_time(logfile,timings=None):
     start,stop = cpusel.index('elapsed')+8,cpusel.index('%CPU')
     cpu_usage = float(cpusel[start:stop])
 
+    startupl = all_lines[startupi]
+    t=re.compile(r'Now: [0-9.]* ')
+    start,stop = t.search(startupl).span()
+    startup = float(startupl[start+5:stop-1])
+
+    startcpusel = all_lines[startupi+1]
+#    if cpusel.find('elapsed')>0:
+    start,stop = startcpusel.index('elapsed')+8,startcpusel.index('%CPU')
+    startcpusage = float(startcpusel[start:stop])
+
     
 #    timingl = all_lines[timingi]
 #    u=re.compile(r'[0-9\.]*user')
@@ -93,12 +125,23 @@ def get_date_version_time(logfile,timings=None):
 #    system = float(s.findall(timingl)[0].rstrip('system'))
 #    cpu_time=user+system
 
-    if timings is not None and cpu_usage>95:            
-        timings[script][build] = (date,version,timing,cpu_usage)
-    else:
-        timings[script][build]=None
-        print "...build %s had %s percent cpu (not >95)"%(build,cpu_usage)
-    return (build,date,version,timing,cpu_usage)
+    if timings:
+
+        if cpu_usage>95:            
+            timings[script][build] = (date,version,timing,cpu_usage)
+        else:
+            timings[script][build]=None
+            print "...build %s had %s percent cpu during timing (not >95)"%(build,cpu_usage)
+
+    if startups:
+
+        if startcpusage>95:
+            startups[script][build] = (date,version,startup,startcpusage)
+        else:
+            startups[script][build] = None
+            print "...build %s had %s percent cpu during startup (not >95)"%(build,startcpusage)
+
+    return (build,date,version,timing,startup,cpu_usage)
 
 
 MIN_BUILD=153
@@ -110,18 +153,38 @@ def update_timings(location="/home/ceball/buildbot/buildmaster/slow-tests_x86_ub
     if script not in timings:
         timings[script]={}
 
+
+    startups = get_startups()
+
+    if script not in startups:
+        startups[script]={}
+
+
     filenames = glob(location+filename_pattern)
     for filename in filenames:
 
         build = get_build_no(filename)
 
-        if build>=MIN_BUILD and build not in timings[script]:
-            print "Adding timing info for build",build
-            get_date_version_time(filename,timings)
+        if build>=MIN_BUILD:
+            
+            if build not in timings[script]: 
+                print "Adding timing for build...",build
+            else:
+                timings = None
+
+            if build not in startups[script]:
+                print "Adding startup time for build...",build
+            else:
+                startups = None
+
+            get_date_version_time(filename,timings,startups)
 
     save_timings(timings)
     #print timings
     
+
+
+
 
     
 if __name__=='__main__':
