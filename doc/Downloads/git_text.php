@@ -543,4 +543,12 @@ set textfont { Courier 10}
 set uifont {Arial 10 bold}
 EOF
 
+
+-----
+get corrupted git-svn?
+mv .git/svn .git/svn.bad
+git-svn fetch
+
+then also rebase branches; seemed to work
+
 </pre>
