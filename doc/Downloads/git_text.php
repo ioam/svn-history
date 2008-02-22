@@ -147,8 +147,8 @@ is "git commit -a" not the default?</A>.
 <P>Before committing to your repository for the first time, you should
 identify yourself to git:
 <pre>
-ceball@doozy:~/g$ git config --global user.email ceball@users.sf.net
-ceball@doozy:~/g$ git config --global user.name "C. E. Ball"
+ceball@doozy:~/g$ git config --global user.email user@address.ext
+ceball@doozy:~/g$ git config --global user.name "User Name"
 </pre>
 
 You should also check that your machine has the correct time and date,
@@ -304,8 +304,8 @@ Conflicts...not documented yet
 XXXX
  git rebase master
  # ... reports merge conflicts
- git mergetool # launches merge tool
- # after you merge all conflicting changes
+ # edit conflicting files file1 file2
+ # git add file1 file2
  git rebase --continue
 </pre>
 
@@ -543,12 +543,5 @@ set textfont { Courier 10}
 set uifont {Arial 10 bold}
 EOF
 
-
------
-get corrupted git-svn?
-mv .git/svn .git/svn.bad
-git-svn fetch
-
-then also rebase branches; seemed to work
 
 </pre>
