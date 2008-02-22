@@ -114,8 +114,13 @@ def get_date_version_time(logfile,timings=None,startups=None):
 
     startcpusel = all_lines[startupi+1]
 #    if cpusel.find('elapsed')>0:
-    start,stop = startcpusel.index('elapsed')+8,startcpusel.index('%CPU')
-    startcpusage = float(startcpusel[start:stop])
+
+    try:
+        start,stop = startcpusel.index('elapsed')+8,startcpusel.index('%CPU')
+        startcpusage = float(startcpusel[start:stop])
+    except ValueError:
+        startcpusage = 99  # HACK to get some data
+    
 
     
 #    timingl = all_lines[timingi]
