@@ -63,20 +63,24 @@ def get_date_version_time(logfile,timings=None,startups=None):
     f.close()
 
     ok = ok2 = False
-    datei=versioni=timingi=cpusei=-1
+    #datei=versioni=timingi=cpusei=startupi=-1
     i = 0;
     for line in all_lines:
         if line.find("Running at")>=0:
+            
             datei=i
-        if line.find("svnversion")>=0:
+        elif line.find("svnversion")>=0:
+            
             versioni=i
-        if line.startswith("[examples/%s]"%script):
+        elif line.startswith("[examples/%s]"%script):
             timingi=i
-        if line.startswith("[examples/%s startup]"%script):
+            
+        elif line.find("[examples/%s startup]"%script)>=0:
             startupi=i
-        if line.find("Results from examples/%s have not changed."%script)>=0:
+            
+        elif line.find("Results from examples/%s have not changed."%script)>=0:
             ok2=True
-        if line.find('program finished')>=0:
+        elif line.find('program finished')>=0:
             ok=True
 
         i+=1;
@@ -88,6 +92,20 @@ def get_date_version_time(logfile,timings=None,startups=None):
     if not ok2:
         print "...speed test invalid because results didn't match"
         return None
+
+
+#
+#    try:
+#        startupi
+#    except:
+#        print build
+#        for l in all_lines:
+#            if l.startswith("[examples/%s startup]"%script):
+#                print "*****",l,script
+#     
+#        raise
+#
+
 
     datel= all_lines[datei]
     d=re.compile(r'at [0-9]*')
@@ -164,7 +182,6 @@ def update_timings(location="/home/ceball/buildbot/buildmaster/slow-tests_x86_ub
     if script not in startups:
         startups[script]={}
 
-
     filenames = glob(location+filename_pattern)
     for filename in filenames:
 
@@ -172,19 +189,25 @@ def update_timings(location="/home/ceball/buildbot/buildmaster/slow-tests_x86_ub
 
         if build>=MIN_BUILD:
             
+	    do_timings=do_startups=False
+
             if build not in timings[script]: 
                 print "Adding timing for build...",build
-            else:
-                timings = None
-
+		do_timings=True
+            
             if build not in startups[script]:
                 print "Adding startup time for build...",build
-            else:
-                startups = None
-
-            get_date_version_time(filename,timings,startups)
+            	do_startups=True
+		
+	    if do_timings and do_startups:
+                get_date_version_time(filename,timings,startups)
+            if do_timings and not do_startups:
+                get_date_version_time(filename,timings,None)
+            if not do_timings and do_startups:
+                get_date_version_time(filename,None,startups)
 
     save_timings(timings)
+    save_startups(startups)
     #print timings
     
 
