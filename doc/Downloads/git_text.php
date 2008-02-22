@@ -158,8 +158,18 @@ options are available by reading <code>man git-config</code>.
 
 <P>While you are still working locally, before you have
 shared any changes, you can ammend commits (and even rewrite parts of
-your history). XXXX link <!--When your changes are finally sent to
+your history). <!--When your changes are finally sent to
 SVN, this can make your changes clearer to see for other users.-->
+For instance, you can go back one commit with the following command:
+<pre>
+git-reset HEAD^
+</pre>
+
+Your local changes will be kept, so you can make additional changes
+before re-committing. See the <A HREF="">XXXXgit-reset</A>
+documentation for further details. <!--Note that it is safe to edit
+your history while your changes remain local, but if you have shared
+them, you should not edit your history.-->
 
 <P>After working on your own repository, there are a couple of
 operations that you will probably want to perform at some stage:
@@ -495,14 +505,6 @@ merge:
 bail is git reset 
 fix conflict is git add 
 
-Q. How do I revert a commit?
-
-A. The git-reset command allows you to reset the HEAD of the branch to
-any given point in history. To go back one commit, run "git-reset
-HEAD^". This will keep your local changes and you can make any
-additional changes before re-commiting the new work. Also see the
-"git-commit --amend" command and the "git-reset" man page for other
-examples.
 
 http://sipx-wiki.calivia.com/index.php/Mirroring_sipXecs_subversion_repository_with_git
 
