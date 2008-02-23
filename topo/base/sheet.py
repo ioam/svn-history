@@ -21,6 +21,8 @@ $Id$
 
 __version__ = '$Revision$'
 
+from copy import deepcopy
+
 from numpy import zeros,array,arange
 from numpy.oldnumeric import Float
 
@@ -269,9 +271,12 @@ class Slice(ndarray):
         # I couldn't find documentation on subclassing array; I used
         # the following as reference:
         # http://scipy.org/scipy/numpy/browser/branches/maskedarray/numpy/ma/tests/test_subclassing.py?rev=4577
+
+
+        # CB: shouldn't create new BoundingBox; cleanup when moving methods
         slice_ = sheet_coordinate_system.bounds2slice(slice_bounds)
         bounds = sheet_coordinate_system.slice2bounds(slice_)
-
+            
         # Numeric.Int32 is specified explicitly in Slice to avoid
         # having it default to Numeric.Int.  Numeric.Int works on
         # 32-bit platforms, but does not work properly with the
@@ -295,6 +300,21 @@ class Slice(ndarray):
         ndarray_reduction[2] = {'ndarray_state':ndarray_reduction[2],
                                 'slice_state':(self._scs,self.bounds)} 
         return tuple(ndarray_reduction)
+
+
+    def __deepcopy__(self,m):
+        # Return a new Slice object; the ndarray is deepcopied as usual,
+        # but the *scs is kept the same*, and the *bounds are deepcopied*
+        # (otherwise bounds and scs would be shallow copied because of
+        # how ndarray.__deepcopy__ works)
+        # CB: temporary. maybe __new__ will be altered to take already initialized slice
+        # as an option. After moving b2s & s2b here.
+        new_slice = ndarray.__deepcopy__(self,m)
+        new_slice._scs = self._scs
+        new_slice.bounds = deepcopy(self.bounds,m)
+        return new_slice
+
+#./topographica -i -c default_density=2 examples/cfsom_or.ty -c "s1 = topo.sim['V1'].in_connections[0].cf(1,1).input_sheet_slice;from copy import deepcopy; s2=deepcopy(s1); assert s2.bounds is not s1.bounds"
 
     
     def __setstate__(self,state):
