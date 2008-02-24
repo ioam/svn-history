@@ -157,6 +157,7 @@ class PatternGenerator(ParameterizedObject):
         # Generate vectors representing coordinates at which the pattern
         # will be sampled.
 
+        # CB: note to myself - use slice_._scs if supplied?
         x_points,y_points = SheetCoordinateSystem(bounds,xdensity,ydensity).sheetcoordinates_of_matrixidx()
             
         # Generate matrices of x and y sheet coordinates at which to

@@ -146,7 +146,7 @@ class SnapshotSupport(object):
             else:
                 return ndarray.__setstate__
 
-        from topo.base.sheet import Slice                
+        from topo.base.sheetcoords import Slice                
         select_setstate(Slice,slice_setstate_selector,post_super=False)
 
         # CB: this is to work round change in SCS, but __setstate__ is never
@@ -166,8 +166,7 @@ class SnapshotSupport(object):
                     setattr(instance,m+'ydensity',state[m+'ydensity'])
                     setattr(instance,m+'ystep',state[m+'ystep'])
 
-                    r1,r2,c1,c2 = instance.bounds2slice(instance.bounds)
-                    shape = (r2-r1,c2-c1)
+                    shape = Slice(instance.bounds,instance).shape_on_sheet()
                     setattr(instance,m+'shape',shape)
 
             return setstate

@@ -21,7 +21,7 @@ __version__ = '$Revision$'
 
 import numpy.oldnumeric as Numeric
 from numpy import abs
-import copy
+from copy import copy
 
 import patterngenerator
 from patterngenerator import PatternGenerator
@@ -33,7 +33,7 @@ from functionfamilies import CoordinateMapperFn,IdentityMF
 from projection import Projection,ProjectionSheet, SheetMask
 from parameterclasses import Parameter,Number,BooleanParameter,\
      ClassSelectorParameter,Integer,BooleanParameter
-from sheet import Slice
+from sheetcoords import Slice
 from sheetview import UnitView, ProjectionView
 from boundingregion import BoundingBox,BoundingRegionParameter
 
@@ -157,12 +157,16 @@ class ConnectionField(ParameterizedObject):
     #   if template is BB then assume uninitialized
     #   if template is slice then assume initialized
     # CEBALERT: do something for mask_template=None
-    def __init__(self,input_sheet,x=0.0,y=0.0,bounds_template=BoundingBox(radius=0.1),
-                 weights_generator=patterngenerator.Constant(),mask_template=None,
-                 output_fn=IdentityOF(),slice_template=None,**params):
+    def __init__(self,input_sheet,x=0.0,y=0.0,template=BoundingBox(radius=0.1),
+                 weights_generator=patterngenerator.Constant(),mask=None,
+                 output_fn=IdentityOF(),**params):
         """
         Create weights at the specified (x,y) location on the
         specified input_sheet.
+
+
+
+        Note that supplied template will be modified
         
         The supplied bounds_template is converted to a slice, moved to  
         the specified (x,y) location, and then the weights pattern is
@@ -188,32 +192,31 @@ class ConnectionField(ParameterizedObject):
         CF extends over the edge of the input sheet then the weights
         will actually be half-moon (or similar) rather than circular.
         """
-        # CEBALERT: maybe an external function is required for
-        # initializing the bounds? We need to have correctly setup
-        # bounds here, in change_bounds(), and in other places such as
-        # CFProjection (where the mask is made). At the moment, the
-        # function is in CFProjection.
-        
         super(ConnectionField,self).__init__(**params)
         self.input_sheet = input_sheet
         self.x = x
         self.y = y
-        
-        self.create_input_sheet_slice(bounds=bounds_template,slice_=slice_template)	
-        self.create_weights_slice(bounds=bounds_template,slice_=slice_template)
+
+        self.create_input_sheet_slice(template)
+
+        # CB: need to deal with mask is None
+##         if mask is None:
+##             # Note that if passed in, mask shared between CFs (but not if created here)
+##             mask = self.create_mask(patterngenerator.Constant(),self.template.bounds,input_sheet,True) 
 
         # CB: this would be clearer (but not perfect)
         # m = mask_template[self.weights_slice()]
-        m = self.weights_slice.submatrix(mask_template)
+        m = self.weights_slice.submatrix(mask)  # view of original mask
         self.mask = m.astype(weight_type)
-
+        
         # CEBALERT: might want to do something about a size that's specified
         # (right now the size is assumed to be that of the bounds)
         w = weights_generator(x=x,y=y,bounds=self.bounds,
                               xdensity=input_sheet.xdensity,
                               ydensity=input_sheet.ydensity,
                               mask=self.mask)
-        
+
+        # CEBALERT: unnecessary copy: pass type to pg & have it draw in that
         self.weights = w.astype(weight_type)
 
         # CEBALERT: the system of masking through multiplication
@@ -225,70 +228,62 @@ class ConnectionField(ParameterizedObject):
         output_fn(self.weights)        
 
 
-    def create_weights_slice(self,bounds,slice_=None):
-        """
-        Return the correct slice for a weights/mask matrix at this
-        ConnectionField's location on the sheet (i.e. for getting
-        the correct submatrix of the weights or mask in case the
-        unit is near the edge of the sheet).
-        """
-        if slice_ is None:
-            slice_ = Slice(bounds,self.input_sheet)
-        else:
-            slice_ = copy.copy(slice_)
-            
-        sheet_rows,sheet_cols = self.input_sheet.activity.shape
-
-        # get size of weights matrix
-        n_rows,n_cols = slice_.shape_on_sheet()
-
-        # get slice for the submatrix
-        center_row,center_col = self.input_sheet.sheet2matrixidx(self.x,self.y)
-
-        ### CEBALERT: there is presumably a better way than this.
-        c1 = -min(0, center_col-n_cols/2)  # assume odd weight matrix so can use n_cols/2 
-        r1 = -min(0, center_row-n_rows/2)  # for top and bottom
-        c2 = -max(-n_cols, center_col-sheet_cols-n_cols/2)
-        r2 = -max(-n_rows, center_row-sheet_rows-n_rows/2)
-
-        # CEBALERT: False forces slice_ to get a copy of the bounds;
-        # that should happen elsewhere.
-        slice_.set_from_slice((r1,r2,c1,c2),False)
-        self.weights_slice = slice_
-
-
-    # CBALERT: assumes the user wants the bounds to be centered about
-    # the unit, which might not be true. 
-    def create_input_sheet_slice(self,bounds,slice_=None):
+    # CEBALERT: rename 
+    def create_input_sheet_slice(self,template):
         """
         Offset the bounds_template to this cf's location and store the
         result in the 'bounds' attribute.
 
         Also stores the input_sheet_slice for access by C.
-	"""
-        if slice_ is None:
-            slice_ = Slice(bounds,self.input_sheet)
+
+        stores weights_slice (weights/mask slice for this xy)
+        """
+        # (copy template because it gets modified)
+        if not isinstance(template,Slice):
+            # CEBALERT: remember to deal with min_matrix_radius
+            template = Slice(copy(template),self.input_sheet,force_odd=True)
         else:
-            slice_ = copy.copy(slice_)
-               
-        # translate to this cf's location
-        cf_row,cf_col = self.input_sheet.sheet2matrixidx(self.x,self.y)
-        bounds_x,bounds_y=bounds.centroid()
-        b_row,b_col=self.input_sheet.sheet2matrixidx(bounds_x,bounds_y)
+            template = copy(template)
 
-        row_offset = cf_row-b_row
-        col_offset = cf_col-b_col
-        slice_.translate(row_offset,col_offset)
-
-        slice_.crop_to_sheet()
-
+        # copy required because the template gets modified
+        input_sheet_slice = copy(template)
+        input_sheet_slice.positionedcrop(self.x,self.y)
         # weights matrix cannot have a zero-sized dimension (could
         # happen at this stage because of cropping)
-        nrows,ncols = slice_.shape_on_sheet()
+        nrows,ncols = input_sheet_slice.shape_on_sheet()
         if nrows<1 or ncols<1:
             raise NullCFError(self.x,self.y,self.input_sheet,nrows,ncols)
+        self.input_sheet_slice = input_sheet_slice
 
-        self.input_sheet_slice = slice_
+        # not copied because we don't use again
+        template.positionlesscrop(self.x,self.y)
+        self.weights_slice = template
+
+
+
+    @staticmethod
+    def create_mask(shape,bounds_template,sheet,autosize=True):
+        """
+        """
+        # Calculate the size & aspect_ratio of the mask if appropriate;
+        # mask size set to be that of the weights matrix
+        if hasattr(shape, 'size') and autosize:
+            l,b,r,t = bounds_template.lbrt()
+            shape.size = t-b
+            shape.aspect_ratio = (r-l)/shape.size
+
+        # Center mask to matrixidx center
+        center_r,center_c = sheet.sheet2matrixidx(0,0)
+        center_x,center_y = sheet.matrixidx2sheet(center_r,center_c)
+
+        mask = shape(x=center_x,y=center_y,
+                     bounds=bounds_template,
+                     xdensity=sheet.xdensity,
+                     ydensity=sheet.ydensity)
+        # CEBALERT: threshold should be settable by user
+        mask = Numeric.where(mask>=0.5,mask,0.0)
+
+        return mask
 
 
     def get_input_matrix(self, activity):
@@ -297,34 +292,35 @@ class ConnectionField(ParameterizedObject):
         return self.input_sheet_slice.submatrix(activity)
 
 
-    # CBALERT: same as for init(); clear up bounds_template & slice_template
-    def change_bounds(self, bounds_template, mask_template, output_fn=IdentityOF(), slice_template=None):
+    def change_bounds(self,template,mask,output_fn=IdentityOF()):
         """
         Change the bounding box for this ConnectionField.
 
-        bounds_template is assumed to have been initialized
-        already  
-        
         Discards weights or adds new (zero) weights as necessary,
         preserving existing values where possible.
 
         Currently only supports reducing the size, not increasing, but
         should be extended to support increasing as well.
+
+        Note that the supplied bounds_template and slice_template will
+        be modified, so if you're also using them elsewhere you should
+        pass copies.
         """
         # CEBALERT: re-write to allow arbitrary resizing
         or1,or2,oc1,oc2 = self.input_sheet_slice
 
-        self.create_input_sheet_slice(bounds_template,slice_=slice_template)
-        self.create_weights_slice(bounds_template,slice_=slice_template)
-        
+        self.something(template,mask)
+                    
         r1,r2,c1,c2 = self.input_sheet_slice
+
 
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
             # CB: why are we copying here? Why can't we do
             # self.weights = self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1]
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
-            m = self.weights_slice.submatrix(mask_template)
+            m = self.weights_slice.submatrix(mask)
             self.mask = m.astype(weight_type)
+
 
             # CEBHACKALERT: see __init__() regarding mask & output fn.
             self.weights *= self.mask
@@ -534,8 +530,6 @@ class CFPOF_Identity(CFPOutputFn):
         pass
 
 
-
-
 # CB: need to make usage of 'src' and 'input_sheet' consistent between
 # ConnectionField and CFProjection (i.e. pick one of them).
 class CFProjection(Projection):
@@ -554,9 +548,6 @@ class CFProjection(Projection):
     activate(self,input_activity) that computes the response from the
     input and stores it in the activity array.
     """
-
-    
-    
     response_fn = ClassSelectorParameter(CFPResponseFn,
         default=CFPRF_Plugin(),
         doc='Function for computing the Projection response to an input pattern.')
@@ -573,7 +564,7 @@ class CFProjection(Projection):
     nominal_bounds_template = BoundingRegionParameter(
         default=BoundingBox(radius=0.1),doc="""
         Bounds defining the Sheet area covered by a prototypical ConnectionField.
-        The true bounds will differ depending on the density (see initialize_bounds()).""")
+        The true bounds will differ depending on the density (see create_slice_template()).""")
     
     weights_generator = ClassSelectorParameter(PatternGenerator,
         default=patterngenerator.Constant(),constant=True,
@@ -647,12 +638,14 @@ class CFProjection(Projection):
         # get the actual bounds_template by adjusting a copy of the
         # nominal_bounds_template to ensure an odd slice, and to be
         # cropped to sheet if necessary
-        self.bounds_template = self.initialize_bounds(self.nominal_bounds_template)
+        slice_template = Slice(copy(self.nominal_bounds_template),self.src,force_odd=True,
+                               min_matrix_radius=self.min_matrix_radius)
+        
+        self.bounds_template = slice_template.bounds
+        mask_template = self.cf_type.create_mask(self.weights_shape,self.bounds_template,
+                                                 self.src,self.autosize_mask)
 
-        slice_template = Slice(self.bounds_template,self.src)
-
-        self.mask_template = self.create_mask_template()
-
+        self.mask_template = mask_template # (for subclasses)
         if initialize_cfs:            
             # set up array of ConnectionFields translated to each x,y in the src sheet
             cflist = []
@@ -669,11 +662,10 @@ class CFProjection(Projection):
                     self.debug("Creating CF(%d,%d) from src (%.3f,%.3f) to  dest (%.3f,%.3f)"%(r,c,x_cf,y_cf,x,y))
                     try:
                         row.append(self.cf_type(self.src,x_cf,y_cf,
-                                                self.bounds_template,
-                                                self.weights_generator,
-                                                self.mask_template, 
-                                                output_fn=self.weights_output_fn.single_cf_fn,
-                                                slice_template=slice_template))
+                                                template=slice_template,
+                                                weights_generator=self.weights_generator,
+                                                mask=mask_template, # all cfs share mask array
+                                                output_fn=self.weights_output_fn.single_cf_fn))
                     except NullCFError:
                         if self.allow_null_cfs:
                             row.append(None)
@@ -690,105 +682,6 @@ class CFProjection(Projection):
         self.input_buffer = None
         self.activity = Numeric.array(self.dest.activity)
 
-
-    def create_mask_template(self):
-        """
-        """
-        # Calculate the size & aspect_ratio of the mask if appropriate;
-        # mask size set to be that of the weights matrix
-        if hasattr(self.weights_shape, 'size') and self.autosize_mask:
-            l,b,r,t = self.bounds_template.lbrt()
-            self.weights_shape.size = t-b
-            self.weights_shape.aspect_ratio = (r-l)/self.weights_shape.size
-
-        # Center mask to matrixidx center
-        center_r,center_c = self.src.sheet2matrixidx(0,0)
-        center_x,center_y = self.src.matrixidx2sheet(center_r,center_c)
-        
-        mask_template = self.weights_shape(x=center_x,y=center_y,
-                                           bounds=self.bounds_template,
-                                           xdensity=self.src.xdensity,
-                                           ydensity=self.src.ydensity)
-        # CEBALERT: threshold should be settable by user
-        mask_template = Numeric.where(mask_template>=0.5,mask_template,0.0)
-
-        return mask_template
-        
-
-    # CB: returns a copy of the bounds
-    def initialize_bounds(self,original_bounds):
-        """
-        Return sheet-coordinate bounds that correspond exactly to the
-        slice of the sheet which best approximates the specified
-        sheet-coordinate bounds.
-
-        The supplied bounds are translated to have a center at the
-        center of one of the sheet's units (we arbitrarily use the
-        center unit), and then these bounds are converted to a slice
-        in such a way that the slice exactly includes all units whose
-        centers are within the bounds (see
-        SheetCoordinateSystem.bounds2slice()). However, to ensure that
-        the bounds are treated symmetrically, we take the right and
-        bottom bounds and reflect these about the center of the slice
-        (i.e. we take the 'xradius' to be right_col-center_col and the
-        'yradius' to be bottom_col-center_row). Hence, if the bounds
-        happen to go through units, if the units are included on the
-        right and bottom bounds, they will be included on the left and
-        top bounds. This ensures that the slice has odd dimensions.
-
-        This slice is converted back to the exactly corresponding
-        bounds, and these are returned.
-        """
-        # don't alter the original_bounds
-        bounds = copy.deepcopy(original_bounds)
-        
-        bounds_xcenter,bounds_ycenter=bounds.centroid()
-        sheet_rows,sheet_cols=self.src.shape
-
-        # arbitrary (e.g. could use 0,0) 
-        center_row,center_col = sheet_rows/2,sheet_cols/2
-        unit_xcenter,unit_ycenter=self.src.matrixidx2sheet(center_row,
-                                                           center_col)
-
-        ### CEBALERT: for SharedWeightCFProjection
-        self.center_unitxcenter,self.center_unitycenter = unit_xcenter,unit_ycenter
-        ###
-        
-        bounds.translate(unit_xcenter-bounds_xcenter,
-                         unit_ycenter-bounds_ycenter)
-
-
-
-        ########## CEBALERT: assumes weights are to be centered about each unit.
-        # Slice will (optionally) perform a more general version
-        # of this, so it will not need to appear here.
-        weights_slice =  Slice(bounds,self.src)
-        r1,r2,c1,c2 = weights_slice
-
-        # use the calculated radius unless it's smaller than the min
-        xrad=max(c2-center_col-1,self.min_matrix_radius)
-        yrad=max(r2-center_row-1,self.min_matrix_radius)
-
-        r2=center_row+yrad+1
-        c2=center_col+xrad+1
-        r1=center_row-yrad
-        c1=center_col-xrad
-
-        weights_slice.set_from_slice((r1,r2,c1,c2))
-        ########## 
-
-
-        # user-supplied bounds must lead to a weights matrix of at least 1x1
-        rows,cols = weights_slice.shape_on_sheet()
-        if rows==0 or cols==0:
-            raise ValueError("nominal_bounds_template results in a zero-sized weights matrix (%s,%s) for %s - you may need to supply a larger nominal_bounds_template or increase the density of the sheet."%(rows,cols,self.name))
-
-        # weights matrix must be odd (otherwise this method has an error)
-        # CEBALERT: this test should move to a test file.
-        if rows%2!=1 or cols%2!=1:
-            raise AssertionError("nominal_bounds_template yielded even-height or even-width weights matrix (%s rows, %s columns) for %s - weights matrix must have odd dimensions."%(rows,cols,self.name))
-
-        return weights_slice.bounds
 
 
     def n_units(self):
@@ -868,7 +761,10 @@ class CFProjection(Projection):
 	Currently only allows reducing the size, but should be
         extended to allow increasing as well.
         """
-        bounds_template = self.initialize_bounds(nominal_bounds_template)
+        bounds_template = copy(nominal_bounds_template)
+
+        slice_template = Slice(bounds_template,self.src,force_odd=True,
+                               min_matrix_radius=self.min_matrix_radius)
 
         if not self.bounds_template.containsbb_exclusive(bounds_template):
             if self.bounds_template.containsbb_inclusive(bounds_template):
@@ -877,23 +773,23 @@ class CFProjection(Projection):
                 self.warning('Unable to change_bounds; currently allows reducing only.')
             return
 
+        mask_template = self.cf_type.create_mask(self.weights_shape,self.bounds_template,
+                                                 self.src,self.autosize_mask)
+
         # it's ok so we can store the bounds and resize the weights
         self.nominal_bounds_template = nominal_bounds_template
         self.bounds_template = bounds_template
 
-        mask_template = self.create_mask_template()
         
         rows,cols = self.get_shape()
         cfs = self._cfs
         output_fn = self.weights_output_fn.single_cf_fn
-        slice_template = Slice(bounds_template,self.src)
+
         for r in xrange(rows):
             for c in xrange(cols):
-                cfs[r][c].change_bounds(bounds_template,
-                                        mask_template,                                      
-                                        output_fn=output_fn,
-                                        slice_template=slice_template)                                        
-
+                cfs[r][c].change_bounds(template=slice_template,
+                                        mask=mask_template,
+                                        output_fn=output_fn)
 
     def change_density(self, new_wt_density):
         """
@@ -1001,6 +897,3 @@ class CFSheet(ProjectionSheet):
     ### JCALERT! This should probably be deleted...
     def release_unit_view(self,x,y):
         self.release_sheet_view(('Weights',x,y))
-
-
-

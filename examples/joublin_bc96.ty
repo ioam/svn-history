@@ -171,7 +171,7 @@ class RCells_CFProjection(CFProjection):
         r1=center_row-yrad
         c1=center_col-xrad
 
-        weights_slice.set_from_slice((r1,r2,c1,c2))
+        weights_slice.set((r1,r2,c1,c2))
         
         rows,cols = weights_slice.shape
         if rows==0 or cols==0:

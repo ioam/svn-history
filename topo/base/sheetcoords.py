@@ -79,10 +79,14 @@ $Id$
 __version__ = '$Revision$'
 
 
+from copy import copy
+
 from numpy import array,floor,ceil,round_,arange
 from boundingregion import BoundingBox
 
-from topo.base.boundingregion import AARectangle
+
+
+
 
 # Note about the 'bounds-master' approach we have adopted
 # =======================================================
@@ -167,7 +171,7 @@ class SheetCoordinateSystem(object):
         
         self.lbrt = array(bounds.lbrt())
 
-        r1,r2,c1,c2 = self.bounds2slice(self.bounds)
+        r1,r2,c1,c2 = Slice._boundsspec2slicespec(self.lbrt,self)
         self.__shape = (r2-r1,c2-c1)
 
 
@@ -316,25 +320,291 @@ class SheetCoordinateSystem(object):
         return self.matrixidx2sheet(arange(rows),arange(cols))
 
 
-    ### CEBALERT: move these two methods to Slice.
-    def bounds2slice(self,slice_bounds):
+
+
+
+
+
+# Needs cleanup/rename:
+#
+# since it's different from slice.  It's our special slice that's an
+# array specifying row_start,row_stop,col_start,col_stop for a
+# Sheet (2d array).
+# 
+# In python, a[slice(0,2)] (where a is a list/array/similar) is
+# equivalent to a[0:2].
+#
+# So, not sure what to call this class. (Will need to rename some
+# methods, too.) SCSSlice? SheetSlice?
+
+from numpy import int32,ndarray
+
+class Slice(ndarray):
+    """
+    Represents a slice of a SheetCoordinateSystem; i.e., an array
+    specifying the row and column start and end points for a submatrix
+    of the SheetCoordinateSystem.
+
+    The slice is created from the supplied bounds by calculating the
+    slice that corresponds most closely to the specified bounds.
+    Therefore, the slice does not necessarily correspond exactly to
+    the specified bounds. Slice stores the bounds that do exactly
+    correspond to the slice in its 'bounds' attribute.
+
+    Note that the slice does not respect the bounds of the
+    SheetCoordinateSystem, and that actions such as translate() also
+    do not respect the bounds. To ensure that the slice is within the
+    SheetCoordinateSystem's bounds, use crop_to_sheet().
+    """
+    
+    def __new__(cls, bounds, sheet_coordinate_system, force_odd=False,
+                min_matrix_radius=1): # CEBALERT: min_matrix_radius only used for odd slice
         """
-        Convert a bounding box into an array slice suitable for computing
-        a submatrix.
-
-        Includes all units whose centers are within the specified sheet
-        coordinate bounding box slice_bounds.
-
-        The returned slice does not respect the sheet_bounds: use
-        crop_slice_to_sheet_bounds() to have the slice cropped to the
-        sheet.
-
-        Returns (a,b,c,d) such that a matrix M can be sliced using M[a:b,c:d].
+        Create a slice of the given sheet_coordinate_system from the
+        specified bounds, and store the bounds that exactly correspond
+        to the created slice in the 'bounds' attribute.
         """
-        l,b,r,t = slice_bounds.lbrt()
+        # I couldn't find documentation on subclassing array; I used
+        # the following as reference:
+        # http://scipy.org/scipy/numpy/browser/branches/maskedarray/
+        #  numpy/ma/tests/test_subclassing.py?rev=4577
 
-        t_m,l_m = self.sheet2matrix(l,t)
-        b_m,r_m = self.sheet2matrix(r,b)
+        if force_odd:
+            slicespec=Slice._createoddslicespec(bounds,sheet_coordinate_system,
+                                                min_matrix_radius)
+        else:
+            slicespec=Slice._boundsspec2slicespec(bounds.lbrt(),sheet_coordinate_system)
+
+        bounds.set(Slice._slicespec2boundsspec(slicespec,sheet_coordinate_system))
+
+        # Numeric.Int32 is specified explicitly in Slice to avoid
+        # having it default to Numeric.Int.  Numeric.Int works on
+        # 32-bit platforms, but does not work properly with the
+        # optimized C activation and learning functions on 64-bit
+        # machines.
+        a = array(slicespec, dtype=int32, copy=False).view(cls)
+        a._scs = sheet_coordinate_system
+        a.bounds = bounds
+        return a
+
+    def __array_finalize__(self,obj):
+        # see info about subclassing ndarray
+        self._scs = getattr(obj,'_scs',None)
+        self.bounds = getattr(obj,'bounds',None)
+
+
+    def __reduce__(self):
+        # Add this object's attributes (_scs and bounds) to the array reduction's state.
+        ndarray_reduction = list(ndarray.__reduce__(self)) # it's a tuple but we need to modify it
+        ndarray_reduction[2] = {'ndarray_state':ndarray_reduction[2],
+                                'slice_state':(self._scs,self.bounds)} 
+        return tuple(ndarray_reduction)
+
+
+    def __copy__(self):
+        # Return a new Slice object; the ndarray is copied as usual,
+        # but we have to handle copying our attributes separately.
+        # We keep _scs the same, but copy the bounds.
+        new_slice = ndarray.__copy__(self)
+        new_slice.bounds = copy(self.bounds)
+        return new_slice
+    
+
+    def __setstate__(self,state):
+        """
+        Set this object's attributes as well as the array's.
+        """
+        ndarray.__setstate__(self,state['ndarray_state']) 
+        self._scs,self.bounds = state['slice_state']
+
+
+    def submatrix(self,matrix):
+        """
+        Return the submatrix of the given matrix specified by this
+        slice.
+
+        Equivalent to computing the intersection between the
+        SheetCoordinateSystem's bounds and the bounds, and
+        returning the corresponding submatrix of the given matrix.
+
+        The submatrix is just a view into the sheet_matrix; it is not
+        an independent copy.
+        """
+        return matrix[self[0]:self[1],self[2]:self[3]]
+
+    # CB: not sure if this is a good idea or not. In some ways, I
+    # think matrix[slice_()] would be clearer than
+    # slice.submatrix(matrix), but I'm not sure. cf.py is where
+    # to look to see this in action.
+##     def __call__(self):
+##         return slice(self[0],self[1]),slice(self[2],self[3])
+        
+
+
+    ### CLEANUP ###
+
+    # CEBALERT: unnecessary? use translate and crop and back. or is
+    # that more steps? rename
+    def positionlesscrop(self,x,y):
+        """
+        Return the correct slice for a weights/mask matrix at this
+        ConnectionField's location on the sheet (i.e. for getting
+        the correct submatrix of the weights or mask in case the
+        unit is near the edge of the sheet).
+        """
+        sheet_rows,sheet_cols = self._scs.shape
+
+        # get size of weights matrix
+        n_rows,n_cols = self.shape_on_sheet()
+
+        # get slice for the submatrix
+        center_row,center_col = self._scs.sheet2matrixidx(x,y)
+
+        c1 = -min(0, center_col-n_cols/2)  # assume odd weight matrix so can use n_cols/2 
+        r1 = -min(0, center_row-n_rows/2)  # for top and bottom
+        c2 = -max(-n_cols, center_col-sheet_cols-n_cols/2)
+        r2 = -max(-n_rows, center_row-sheet_rows-n_rows/2)
+
+        self.set((r1,r2,c1,c2))
+
+    # CBALERT: assumes the user wants the bounds to be centered about
+    # the unit, which might not be true. 
+    def positionedcrop(self,x,y):
+        """
+        Offset the bounds_template to this cf's location and store the
+        result in the 'bounds' attribute.
+
+        Also stores the input_sheet_slice for access by C.
+	"""
+        # translate to this cf's location
+        cf_row,cf_col = self._scs.sheet2matrixidx(x,y)
+        bounds_x,bounds_y=self.bounds.centroid()
+        b_row,b_col=self._scs.sheet2matrixidx(bounds_x,bounds_y)
+
+        row_offset = cf_row-b_row
+        col_offset = cf_col-b_col
+        self.translate(row_offset,col_offset)
+        self.crop_to_sheet()
+
+    ###############
+
+
+
+        
+    def translate(self, r, c):
+        """
+        Translate the slice by the specified number of rows
+        and columns.
+        """
+        self+=[r,r,c,c]
+        self.bounds.set(self._slicespec2boundsspec(self,self._scs))
+
+
+    def set(self,slice_specification):
+        """Set this slice from some iterable that specifies (r1,r2,c1,c2)."""
+        self.put([0,1,2,3],slice_specification)
+        self.bounds.set(self._slicespec2boundsspec(slice_specification,self._scs))
+
+
+    def shape_on_sheet(self):
+        """Return the shape of the array that this Slice would give on its sheet."""
+        return self[1]-self[0],self[3]-self[2]
+
+
+    def crop_to_sheet(self): 
+        """Crop the slice to the SheetCoordinateSystem's bounds."""
+        maxrow,maxcol = self._scs.shape
+                        
+        self[0] = max(0,self[0])
+        self[1] = min(maxrow,self[1])
+        self[2] = max(0,self[2])
+        self[3] = min(maxcol,self[3])
+
+        self.bounds.set(self._slicespec2boundsspec(self,self._scs))
+
+
+
+
+    ### CB: working on methods below here
+    # (+ not keeping these names)
+
+
+    @staticmethod
+    def _createoddslicespec(bounds,scs,min_matrix_radius):
+        """
+        Create the 'odd' Slice that best approximates the specifed
+        sheet-coordinate bounds.
+        
+        The supplied bounds are translated to have a center at the
+        center of one of the sheet's units (we arbitrarily use the
+        center unit), and then these bounds are converted to a slice
+        in such a way that the slice exactly includes all units whose
+        centers are within the bounds (see boundsspec2slicespec()).
+        However, to ensure that the bounds are treated symmetrically,
+        we take the right and bottom bounds and reflect these about
+        the center of the slice (i.e. we take the 'xradius' to be
+        right_col-center_col and the 'yradius' to be
+        bottom_col-center_row). Hence, if the bounds happen to go
+        through units, if the units are included on the right and
+        bottom bounds, they will be included on the left and top
+        bounds. This ensures that the slice has odd dimensions.
+        """
+        bounds_xcenter,bounds_ycenter=bounds.centroid()
+        sheet_rows,sheet_cols = scs.shape
+
+        # arbitrary (e.g. could use 0,0) 
+        center_row,center_col = sheet_rows/2,sheet_cols/2
+        unit_xcenter,unit_ycenter=scs.matrixidx2sheet(center_row,
+                                                      center_col)
+
+        bounds.translate(unit_xcenter-bounds_xcenter,
+                         unit_ycenter-bounds_ycenter)
+
+        ########## CEBALERT: assumes weights are to be centered about each unit.
+        r1,r2,c1,c2 = Slice._boundsspec2slicespec(bounds.lbrt(),scs)
+
+        # use the calculated radius unless it's smaller than the min
+        xrad=max(c2-center_col-1,min_matrix_radius)
+        yrad=max(r2-center_row-1,min_matrix_radius)
+
+        r2=center_row+yrad+1
+        c2=center_col+xrad+1
+        r1=center_row-yrad
+        c1=center_col-xrad
+        ########## 
+
+        # weights matrix must be odd (otherwise this method has an error)
+        # CEBALERT: this test should move to a test file.
+##         if rows%2!=1 or cols%2!=1:
+##             raise AssertionError("nominal_bounds_template yielded even-height or even-width weights matrix (%s rows, %s columns) - weights matrix must have odd dimensions."%(rows,cols))
+
+        return (r1,r2,c1,c2)
+
+
+##         # CEBALERT: with min_matrix_radius, this test is unnecessary? (check) 
+##         # user-supplied bounds must lead to a weights matrix of at least 1x1
+##         rows,cols = weights_slice.shape_on_sheet()
+##         if rows==0 or cols==0:
+##             raise ValueError("nominal_bounds_template results in a zero-sized weights matrix (%s,%s) - you may need to supply a larger nominal_bounds_template or increase the density of the sheet."%(rows,cols))
+
+
+    
+    
+    @staticmethod
+    def _boundsspec2slicespec(boundsspec,scs):
+        """
+        Convert an iterable boundsspec (supplying l,b,r,t of a
+        BoundingRegion) into a Slice specification.
+
+        Includes all units whose centers are within the specified
+        sheet-coordinate bounds specified by boundsspec.
+
+        Exact inverse of _slicespec2boundsspec().
+        """
+        l,b,r,t = boundsspec
+
+        t_m,l_m = scs.sheet2matrix(l,t)
+        b_m,r_m = scs.sheet2matrix(r,b)
 
         l_idx = int(ceil(l_m-0.5))
         t_idx = int(ceil(t_m-0.5))
@@ -343,22 +613,19 @@ class SheetCoordinateSystem(object):
 
         return t_idx,b_idx,l_idx,r_idx
 
-    def slice2bounds(self,slice_,bb=None):
+
+    @staticmethod
+    def _slicespec2boundsspec(slicespec,scs):
         """
-        Construct the bounds that corresponds to the given slice.
-        This way, this function is an exact transform of bounds2slice. 
-        That enables to retrieve the slice information from the bounding box.
+        Convert an iterable slicespec (supplying r1,r2,c1,c2 of a
+        Slice) into a BoundingRegion specification.
+        
+        Exact inverse of _boundsspec2slicespec().        
         """
-        r1,r2,c1,c2 = slice_
+        r1,r2,c1,c2 = slicespec
 
-        left,bottom = self.matrix2sheet(r2,c1)
-        right, top  = self.matrix2sheet(r1,c2)
+        left,bottom = scs.matrix2sheet(r2,c1)
+        right, top  = scs.matrix2sheet(r1,c2)
 
-        points = ((left,bottom),(right,top))
-
-        if bb is None:
-            return BoundingBox(points=points)
-        else:
-            bb._aarect = AARectangle(*points)
-            return bb
+        return ((left,bottom),(right,top))
 

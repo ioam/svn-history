@@ -8,7 +8,7 @@ __version__='$Revision$'
 import unittest
 from numpy import array
 
-from topo.base.sheetcoords import SheetCoordinateSystem
+from topo.base.sheetcoords import SheetCoordinateSystem,Slice
 from topo.base.sheet import *
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheetview import SheetView
@@ -435,29 +435,29 @@ class ExtraSheetTests(unittest.TestCase):
         ct = SheetCoordinateSystem(bb,10)
 
 	slice_ =(0,3,7,8)
-	bounds = ct.slice2bounds(slice_)
-        test_slice = ct.bounds2slice(bounds)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
+        test_slice = Slice(bounds,ct)
 
 	for a,b in zip(slice_,test_slice):
 	    self.assertEqual(a,b)
 
 	slice_ =(4,7,8,10)
-	bounds = ct.slice2bounds(slice_)
-        test_slice = ct.bounds2slice(bounds)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
+        test_slice = Slice(bounds,ct)
 
 	for a,b in zip(slice_,test_slice):
 	    self.assertEqual(a,b)
 
 	slice_ =(2,3,4,8)
-	bounds = ct.slice2bounds(slice_)
-        test_slice = ct.bounds2slice(bounds)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
+        test_slice = Slice(bounds,ct)
 
 	for a,b in zip(slice_,test_slice):
 	    self.assertEqual(a,b)
 
 	slice_ =(0,3,9,10)
-	bounds = ct.slice2bounds(slice_)
-        test_slice = ct.bounds2slice(bounds)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
+        test_slice = Slice(bounds,ct)
 
 	for a,b in zip(slice_,test_slice):
 	    self.assertEqual(a,b)
@@ -466,22 +466,22 @@ class ExtraSheetTests(unittest.TestCase):
         ct = SheetCoordinateSystem(bb,20,20)
 
 	slice_ =(9,14,27,29)
-	bounds = ct.slice2bounds(slice_)
-        test_slice = ct.bounds2slice(bounds)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
+        test_slice = Slice(bounds,ct)
 
 	for a,b in zip(slice_,test_slice):
 	    self.assertEqual(a,b)
 
 	slice_ =(0,6,0,7)
-	bounds = ct.slice2bounds(slice_)
-        test_slice = ct.bounds2slice(bounds)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
+        test_slice = Slice(bounds,ct)
 
 	for a,b in zip(slice_,test_slice):
 	    self.assertEqual(a,b)
 
 	slice_ =(6,10,11,29)
-	bounds = ct.slice2bounds(slice_)
-        test_slice = ct.bounds2slice(bounds)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
+        test_slice = Slice(bounds,ct)
 
 	for a,b in zip(slice_,test_slice):
 	    self.assertEqual(a,b)
@@ -490,15 +490,15 @@ class ExtraSheetTests(unittest.TestCase):
         ct = SheetCoordinateSystem(bb,7)
 
 	slice_ =(4,7,2,3)
-	bounds = ct.slice2bounds(slice_)
-        test_slice = ct.bounds2slice(bounds)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
+        test_slice = Slice(bounds,ct)
 
 	for a,b in zip(slice_,test_slice):
 	    self.assertEqual(a,b)
 
 	slice_ =(0,7,0,7)
-	bounds = ct.slice2bounds(slice_)
-        test_slice = ct.bounds2slice(bounds)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
+        test_slice = Slice(bounds,ct)
 
 	for a,b in zip(slice_,test_slice):
 	    self.assertEqual(a,b)
@@ -606,9 +606,9 @@ class ExtraSheetTests(unittest.TestCase):
         sheet_bb = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
         ct = SheetCoordinateSystem(sheet_bb,10)
         
-        slice_ = ct.bounds2slice(sheet_bb)
+        slice_ = Slice(sheet_bb,ct)
         true_slice = (0,10,0,10) # inclusive left boundary, exclusive right boundary
-        self.assertEqual(slice_,true_slice) 
+        self.assertEqual(tuple(slice_.tolist()),true_slice) 
 
 	# for the following tests, the values have been all computed by hand and then
         # tested (by JC). The boundingbox and density tested have been chosen randomly,
@@ -617,39 +617,40 @@ class ExtraSheetTests(unittest.TestCase):
 	# Test with 20 density. 
         ct = SheetCoordinateSystem(sheet_bb,20,20)
         bb = BoundingBox(points=((-0.05,-0.20),(0.20,0.05)))
-        slice_ = ct.bounds2slice(bb)
+        slice_ = Slice(bb,ct)
 
         true_slice = (9,14,9,14) 
-        self.assertEqual(slice_,true_slice)
+        self.assertEqual(tuple(slice_.tolist()),true_slice)
 
 	bb = BoundingBox(points=((-0.40,0),(-0.30,0.30)))
-        slice_ = ct.bounds2slice(bb)
+        slice_ = Slice(bb,ct)
         true_slice = (4,10,2,4) 
-        self.assertEqual(slice_,true_slice)
+        self.assertEqual(tuple(slice_.tolist()),true_slice)
 
 	bb = BoundingBox(points=((0.15,0.10),(0.30,0.30)))
-        slice_ = ct.bounds2slice(bb)
+        slice_ = Slice(bb,ct)
         true_slice = (4,8,13,16) 
-        self.assertEqual(slice_,true_slice)
+        self.assertEqual(tuple(slice_.tolist()),true_slice)
 
 	bb = BoundingBox(points=((-0.05,-0.45),(0.10,-0.25)))
-        slice_ = ct.bounds2slice(bb)
+        slice_ = Slice(bb,ct)
         true_slice = (15,19,9,12) 
-        self.assertEqual(slice_,true_slice)
+        self.assertEqual(tuple(slice_.tolist()),true_slice)
 	
 	# test with 7 density sheet.
 	
 	bb = BoundingBox(points=((-0.5+2.0/7.0,0.5-2.0/7.0),(-0.5+4.0/7.0,0.5)))
         ct = SheetCoordinateSystem(sheet_bb,7)
         
-        slice_ = ct.bounds2slice(bb)
+        slice_ = Slice(bb,ct)
         true_slice = (0,2,2,4) 
-        self.assertEqual(slice_,true_slice)
+        self.assertEqual(tuple(slice_.tolist()),true_slice)
 
         #(4x4 matrix)
         ct = SheetCoordinateSystem(BoundingBox(radius=0.2),xdensity=10,ydensity=10)
         test_bounds = BoundingBox(radius=0.1)
-        r1,r2,c1,c2 = ct.bounds2slice(test_bounds)
+        slice_=Slice(test_bounds,ct)
+        r1,r2,c1,c2 = slice_
         self.assertEqual((r1,r2,c1,c2),(1,3,1,3))
 
         # Note: this test fails because units that fall on the
@@ -670,7 +671,7 @@ class ExtraSheetTests(unittest.TestCase):
 	sheet_bb = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
         ct = SheetCoordinateSystem(sheet_bb,7)
 	slice_ = (0,7,0,7)
-	bounds = ct.slice2bounds(slice_)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
 	true_bounds_lbrt = (-0.5,-0.5,0.5,0.5)
 	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)
@@ -683,13 +684,13 @@ class ExtraSheetTests(unittest.TestCase):
 	# Test for 10 density
         ct = SheetCoordinateSystem(sheet_bb,10)
 	slice_ = (0,9,1,5)
-	bounds = ct.slice2bounds(slice_)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
 	true_bounds_lbrt = (-0.4,-0.4,0,0.5)
 	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)
 
 	slice_ = (2,3,7,10)
-	bounds = ct.slice2bounds(slice_)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
 	true_bounds_lbrt = (0.2,0.2,0.5,0.3)
 	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)
@@ -697,13 +698,13 @@ class ExtraSheetTests(unittest.TestCase):
        	# Test for 7 density
         ct = SheetCoordinateSystem(sheet_bb,7)
 	slice_ = (3,7,2,5)
-	bounds = ct.slice2bounds(slice_)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
 	true_bounds_lbrt = (-0.5+2.0/7.0,-0.5,-0.5+5.0/7.0,0.5-3.0/7.0)
 	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)
 
 	slice_ = (2,6,0,1)
-	bounds = ct.slice2bounds(slice_)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
 	true_bounds_lbrt = (-0.5,0.5-6.0/7.0,-0.5+1.0/7.0,0.5-2.0/7.0)
 	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)
@@ -711,14 +712,14 @@ class ExtraSheetTests(unittest.TestCase):
 	# Test for 25 density
         ct = SheetCoordinateSystem(sheet_bb,25)
 	slice_ = (0,25,4,10)
-	bounds = ct.slice2bounds(slice_)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
 	true_bounds_lbrt = (-0.5+4.0/25.0,-0.5,-0.5+10.0/25.0,0.5)
 	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)
 	
 
 	slice_ = (7,18,3,11)
-	bounds = ct.slice2bounds(slice_)
+	bounds = BoundingBox(points=Slice._slicespec2boundsspec(slice_,ct))
 	true_bounds_lbrt = (-0.5+3.0/25.0,0.5-18.0/25.0,-0.5+11.0/25.0,0.5-7.0/25.0)
 	for a,b in zip(bounds.lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)

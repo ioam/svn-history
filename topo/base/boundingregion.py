@@ -42,6 +42,10 @@ class BoundingRegion(ParameterizedObject):
         """        
         return self.aarect().centroid()
 
+    def set(self,points):
+        self._aarect=AARectangle(*points)
+
+
 class BoundingBox(BoundingRegion):
     """
     A rectangular bounding box defined either by two points forming
@@ -339,6 +343,7 @@ class AARectangle(object):
                 self._bottom,
                 self._right,
                 self._top)
+
 
     def centroid(self):
         """
