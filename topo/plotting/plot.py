@@ -16,8 +16,7 @@ from numpy.oldnumeric import zeros, ones, Float, divide,ravel,clip,array
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
 from topo.base.sheetview import SheetView
-from topo.base.sheet import Slice
-from topo.base.sheetcoords import SheetCoordinateSystem
+from topo.base.sheetcoords import SheetCoordinateSystem,Slice
 
 
 

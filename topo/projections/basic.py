@@ -46,7 +46,7 @@ class SharedWeightCF(ConnectionField):
 	
     # JAHACKALERT: This implementation copies some of the CEBHACKALERTS 
     # of the ConnectionField.__init__ function from which it is dervied
-    def __init__(self,cf,input_sheet,x=0.0,y=0.0,bounds_template=BoundingBox(radius=0.1)):
+    def __init__(self,cf,input_sheet,x=0.0,y=0.0,template=BoundingBox(radius=0.1),mask=None):
         """
         From an existing copy of ConnectionField (CF) that acts as a
 	template, create a new CF that shares weights with the
@@ -58,14 +58,11 @@ class SharedWeightCF(ConnectionField):
 	the CF are implemented as a numpy view into the single master
 	copy of the weights stored in the CF template.
         """
+        # where'd the super call go? can id it
         self.x = x; self.y = y
         self.input_sheet = input_sheet
 
-        # must be called to setup the input_sheet_slice
-        self.create_input_sheet_slice(bounds=bounds_template)
-	
-        # must be called to setup the weights slice for this x,y
-        self.create_weights_slice(bounds=bounds_template)
+        self.create_input_sheet_slice(template)
 
         self.weights = self.weights_slice.submatrix(cf.weights)
         
@@ -108,15 +105,24 @@ class SharedWeightCFProjection(CFProjection):
         # do want anything that CFProjection defines.
         super(SharedWeightCFProjection,self).__init__(initialize_cfs=False,**params)
 
+
+        #CEBALERT: clean up
+        sheet_rows,sheet_cols=self.src.shape
+        # arbitrary (e.g. could use 0,0) 
+        center_row,center_col = sheet_rows/2,sheet_cols/2
+        self.center_unitxcenter,self.center_unitycenter=self.src.matrixidx2sheet(center_row,
+                                                                                 center_col)
+
+
         # We want the sharedcf to be located on the grid, so
         # pick a central unit and use its center        
         self.__sharedcf=self.cf_type(self.src,
                                      self.center_unitxcenter,
                                      self.center_unitycenter,
-                                     self.bounds_template,
-                                     self.weights_generator,
-                                     self.mask_template,
-                                     self.weights_output_fn.single_cf_fn)
+                                     template=self.bounds_template,
+                                     weights_generator=self.weights_generator,
+                                     mask=self.mask_template,
+                                     output_fn=self.weights_output_fn.single_cf_fn)
 
         cflist = []
         scf = self.__sharedcf
