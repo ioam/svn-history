@@ -11,6 +11,31 @@ clean: python-clean jpeg-clean pil-clean numpy-clean pmw-clean tk-clean tcl-clea
 
 uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall
 
+
+
+##############################################################
+# libblt: already available on nearly all systems, but some systems
+# have a version incompatible with tkinter (and Tcl/Tk?), so we build
+# our own version. If there are any problems building this, just do
+# 'make blt-uninstall' followed by 'touch blt' (or remove python's blt
+# dependency below), and it should still nearly always be fine.
+#
+BLT = blt2.4z
+BLT_UNINSTALL += lib/libBLT24.so
+
+blt: ${BLT}.tar.gz
+	tar xzf ${BLT}.tar.gz
+	cd ${BLT}; ./configure --prefix=${PREFIX}
+	make -i -C ${BLT} install
+	touch blt
+
+blt-clean:
+	rm -rf  ${BLT}
+blt-uninstall:
+	rm -rf blt ${foreach f,${BLT_UNINSTALL}, ${PREFIX}/${f}}
+
+
+
 ##############################################################
 # Python (interpreted language)
 #
@@ -26,7 +51,7 @@ PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.5
 
 # LDFLAGS sets ${PREFIX}/lib as the LD_LIBRARY in the binary
 # CB: rpath is ignored on OS X (so where are the library files taken from?). 
-python: ${PYTHON}.tgz tk 
+python: ${PYTHON}.tgz tk blt
 	echo ${PREFIX}
 	tar -xzf ${PYTHON}.tgz
 # Configure for specific operating system versions
