@@ -61,12 +61,13 @@ def get_input_params():
             input_params[i]['theta'].append(theta)
 
         ### get sign (is there an easier way?)
-        realDx = input_params[1]['cx'][lineno]-input_params[0]['cx'][lineno]
-        realDy = input_params[1]['cy'][lineno]-input_params[0]['cy'][lineno]
-        realtheta = 180*(atan2(realDy,realDx)/pi)
-        theta = input_params[0]['theta'][lineno]
-        for i in range(n_eyes):
-            input_params[i]['sign'].append(sign(theta)/sign(realtheta))
+        if len(eyes)>1: # CeBALERLT: not general (assuming motion just because more than 1 eye)
+            realDx = input_params[1]['cx'][lineno]-input_params[0]['cx'][lineno]
+            realDy = input_params[1]['cy'][lineno]-input_params[0]['cy'][lineno]
+            realtheta = 180*(atan2(realDy,realDx)/pi)
+            theta = input_params[0]['theta'][lineno]
+            for i in range(n_eyes):
+                input_params[i]['sign'].append(sign(theta)/sign(realtheta))
         ###
         
     for i in input_params:
