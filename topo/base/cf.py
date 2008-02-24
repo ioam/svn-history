@@ -309,7 +309,7 @@ class ConnectionField(ParameterizedObject):
         # CEBALERT: re-write to allow arbitrary resizing
         or1,or2,oc1,oc2 = self.input_sheet_slice
 
-        self.create_input_sheet_slice(template,mask)
+        self.create_input_sheet_slice(template)
                     
         r1,r2,c1,c2 = self.input_sheet_slice
 
