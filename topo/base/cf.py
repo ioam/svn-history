@@ -720,7 +720,7 @@ class CFProjection(Projection):
 
     def get_projection_view(self, timestamp):
         """Returns the activity in a single projection"""
-        return ProjectionView((matrix_data.copy(),self.dest.bounds),self,timestamp)
+        return ProjectionView((self.activity.copy(),self.dest.bounds),self,timestamp)
 
 
     def activate(self,input_activity):
