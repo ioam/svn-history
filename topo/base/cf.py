@@ -317,9 +317,7 @@ class ConnectionField(ParameterizedObject):
             # CB: why are we copying here? Why can't we do
             # self.weights = self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1]
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
-            m = self.weights_slice.submatrix(mask)
-            self.mask = m.astype(weight_type)
-
+            self.mask = self.weights_slice.submatrix(mask)
 
             # CEBHACKALERT: see __init__() regarding mask & output fn.
             self.weights *= self.mask
