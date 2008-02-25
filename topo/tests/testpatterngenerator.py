@@ -10,13 +10,13 @@ import unittest
 
 from numpy.oldnumeric import array, pi
 from numpy.oldnumeric.mlab import rot90
+from numpy.testing import assert_array_equal
 
 from topo.base.patterngenerator import Constant,PatternGenerator
 from topo.base.boundingregion import BoundingBox
 
 from topo.patterns.basic import Rectangle,Gaussian,Composite
 
-from utils import assert_array_equal
 
 
 class TestPatternGenerator(unittest.TestCase):

@@ -15,7 +15,7 @@ from numpy.testing import assert_array_equal
 
 import topo.tests.functionaltest as ft
 
-from topo.tests.setup_simulation import assert_array_not_equal
+from topo.tests.utils import assert_array_not_equal
 
 # typing shortcut
 g = topo.guimain

@@ -5,6 +5,7 @@ $Id$
 __version__='$Revision$'
 
 import unittest, copy
+from numpy.testing import assert_array_equal
 
 import topo
 import __main__
@@ -14,8 +15,6 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.commands.basic import save_snapshot,load_snapshot
 from topo.patterns.basic import Gaussian, Line
 from topo.base.simulation import Simulation,SomeTimer
-
-from utils import assert_array_equal
 
 
 # CEBHACKALERT: this test must depend on something that happens in

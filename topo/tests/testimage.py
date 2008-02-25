@@ -18,7 +18,7 @@ __version__='$Revision$'
 ### visualize matrices during debugging.
 
 import unittest
-from utils import assert_array_almost_equal
+from numpy.testing import assert_array_almost_equal
 
 from numpy.oldnumeric import array,Float,pi
 ## from numpy.oldnumeric.mlab import rot90
