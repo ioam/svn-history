@@ -71,6 +71,21 @@ class ConnectionField(ParameterizedObject):
         on the input Sheet, e.g. for use when determining where the weight matrix
         lines up with the input Sheet matrix.""")
 
+    min_matrix_radius = Integer(default=1,bounds=(0,None),doc="""
+        Enforced minimum for radius of weights matrix.
+        The default of 1 gives a minimum matrix of 3x3. 0 would
+        allow a 1x1 matrix.""")
+
+    # CEBALERT: this is temporary (allows c++ matching in certain
+    # cases).  We will allow the user to override the mask size, but
+    # by offering a scaling parameter.
+    autosize_mask = BooleanParameter(
+        default=True,constant=True,precedence=-1,doc="""
+        Topographica sets the mask size so that it is the same as the connection field's
+        size, unless this parameter is False - in which case the user-specified size of
+        the weights_shape is used. In normal usage of Topographica, this parameter should
+        remain True.""")
+
     # Weights matrix; not yet initialized.
     weights = []
 
@@ -79,7 +94,8 @@ class ConnectionField(ParameterizedObject):
     # array for speed of access from optimized C components.
     input_sheet_slice = []   
 
-    _has_norm_total = False        
+    _has_norm_total = False
+    
 
     def __get_norm_total(self):
         """
@@ -153,9 +169,6 @@ class ConnectionField(ParameterizedObject):
     bounds = property(get_bounds)
 
 
-    # CEBALERT: stop this passing of both bounds & slice:
-    #   if template is BB then assume uninitialized
-    #   if template is slice then assume initialized
     # CEBALERT: do something for mask_template=None
     def __init__(self,input_sheet,x=0.0,y=0.0,template=BoundingBox(radius=0.1),
                  weights_generator=patterngenerator.Constant(),mask=None,
@@ -163,34 +176,29 @@ class ConnectionField(ParameterizedObject):
         """
         Create weights at the specified (x,y) location on the
         specified input_sheet.
-
-
-
-        Note that supplied template will be modified
         
-        The supplied bounds_template is converted to a slice, moved to  
-        the specified (x,y) location, and then the weights pattern is
-        drawn inside by the weights_generator.
+        The supplied template (if a BoundingRegion) is converted to a
+        Slice, moved to the specified (x,y) location, and then the
+        weights pattern is drawn inside by the weights_generator.
 
-        Note that if the slice corresponding to bounds_template is
-        already known, then it can be passed in as
-        slice_template. This slice will then be used directly, instead
-        of converting bounds_template into a slice.
+        Note that if the appropriate template Slice is already known,
+        then it can be passed in instead of a BoundingRegion template.
+        This slice will then be used directly, instead of converting
+        the template into a Slice.
 
-        If bounds_template is specified, it is assumed to have been
-        initialized correctly already (i.e. represents the exact
-        bounds) - see CFProjection.initialize_bounds().
+        The supplied template object itself will not be modified (it
+        is copied before use).
                 
-        The mask_template allows the weights to be limited to being
-        non-zero in a subset of the rectangular weights area.  The
-        actual mask is created by cropping the mask_template by the
+        The mask allows the weights to be limited to being non-zero in
+        a subset of the rectangular weights area.  The actual mask
+        used is a view of the given mask created by cropping to the
         boundaries of the input_sheet, so that the weights all
         correspond to actual locations in the input sheet.  For
         instance, if a circular pattern of weights is desired, the
-        mask_template should have a disk-shaped pattern of elements
-        with value 1, surrounded by elements with the value 0.  If the
-        CF extends over the edge of the input sheet then the weights
-        will actually be half-moon (or similar) rather than circular.
+        mask should have a disk-shaped pattern of elements with value
+        1, surrounded by elements with the value 0.  If the CF extends
+        over the edge of the input sheet then the weights will
+        actually be half-moon (or similar) rather than circular.
         """
         super(ConnectionField,self).__init__(**params)
         self.input_sheet = input_sheet
@@ -199,23 +207,28 @@ class ConnectionField(ParameterizedObject):
 
         self.create_input_sheet_slice(template)
 
-        # CB: need to deal with mask is None
+        # CBALERT: need to deal with mask is None
 ##         if mask is None:
 ##             # Note that if passed in, mask shared between CFs (but not if created here)
 ##             mask = self.create_mask(patterngenerator.Constant(),self.template.bounds,input_sheet,True) 
 
-        # CB: this would be clearer (but not perfect, and probably slower)
+        # CBNOTE: this would be clearer (but not perfect, and probably slower)
         # m = mask_template[self.weights_slice()]
         self.mask = self.weights_slice.submatrix(mask)  # view of original mask
         
-        # CEBALERT: might want to do something about a size that's specified
-        # (right now the size is assumed to be that of the bounds)
+        # CBENHANCEMENT: might want to do something about a size
+        # that's specified (right now the size is assumed to be that
+        # of the bounds)
         w = weights_generator(x=x,y=y,bounds=self.bounds,
                               xdensity=input_sheet.xdensity,
                               ydensity=input_sheet.ydensity,
                               mask=self.mask)
 
-        # CEBALERT: unnecessary copy: pass type to pg & have it draw in that
+        # CEBALERT: unnecessary copy! Pass type to PG & have it draw
+        # in that.  (Should be simple, except making it work for all
+        # the PG subclasses that override array creation in various
+        # ways (producing or using inconsistent types) turned out to
+        # be too painful.)
         self.weights = w.astype(weight_type)
 
         # CEBALERT: the system of masking through multiplication
@@ -227,26 +240,27 @@ class ConnectionField(ParameterizedObject):
         output_fn(self.weights)        
 
 
-    # CEBALERT: rename 
+    # CB: can this be renamed to something better?
     def create_input_sheet_slice(self,template):
         """
-        Offset the bounds_template to this cf's location and store the
-        result in the 'bounds' attribute.
+        Create the input_sheet_slice, which provides the appropriate
+        Slice for this CF on the input_sheet (as well as providing
+        this CF's exact bounds).
 
-        Also stores the input_sheet_slice for access by C.
-
-        stores weights_slice (weights/mask slice for this xy)
+        Also creates the weights_slice, which provides the Slice for
+        this weights matrix (in case it must be cropped at an edge).
         """
         # (copy template because it gets modified)
         if not isinstance(template,Slice):
-            # CEBALERT: remember to deal with min_matrix_radius
-            template = Slice(copy(template),self.input_sheet,force_odd=True)
+            template = Slice(copy(template),self.input_sheet,force_odd=True,
+                             min_matrix_radius=self.min_matrix_radius)
         else:
             template = copy(template)
 
         # copy required because the template gets modified
         input_sheet_slice = copy(template)
         input_sheet_slice.positionedcrop(self.x,self.y)
+
         # weights matrix cannot have a zero-sized dimension (could
         # happen at this stage because of cropping)
         nrows,ncols = input_sheet_slice.shape_on_sheet()
@@ -261,12 +275,13 @@ class ConnectionField(ParameterizedObject):
 
 
     @staticmethod
-    def create_mask(shape,bounds_template,sheet,autosize=True):
+    def create_mask(shape,bounds_template,sheet):
         """
+        Create the mask (see __init__()).
         """
         # Calculate the size & aspect_ratio of the mask if appropriate;
         # mask size set to be that of the weights matrix
-        if hasattr(shape, 'size') and autosize:
+        if hasattr(shape, 'size') and ConnectionField.autosize_mask:
             l,b,r,t = bounds_template.lbrt()
             shape.size = t-b
             shape.aspect_ratio = (r-l)/shape.size
@@ -279,14 +294,16 @@ class ConnectionField(ParameterizedObject):
                      bounds=bounds_template,
                      xdensity=sheet.xdensity,
                      ydensity=sheet.ydensity)
-        # CEBALERT: threshold should be settable by user
+        # CBENHANCEMENT: threshold should be settable by user
         mask = Numeric.where(mask>=0.5,mask,0.0)
 
         return mask.astype(weight_type)
 
 
+    # CEBALERT: unnecessary method; can use something like
+    # activity[cf.input_sheet_slice()]
     def get_input_matrix(self, activity):
-        # CB: again, this is clearer:
+        # CBNOTE: again, this might be clearer (but probably slower):
         # activity[self.input_sheet_slice()]
         return self.input_sheet_slice.submatrix(activity)
 
@@ -301,9 +318,8 @@ class ConnectionField(ParameterizedObject):
         Currently only supports reducing the size, not increasing, but
         should be extended to support increasing as well.
 
-        Note that the supplied bounds_template and slice_template will
-        be modified, so if you're also using them elsewhere you should
-        pass copies.
+        Note that the supplied template will be modified, so if you're
+        also using them elsewhere you should pass copies.
         """
         # CEBALERT: re-write to allow arbitrary resizing
         or1,or2,oc1,oc2 = self.input_sheet_slice
@@ -319,7 +335,6 @@ class ConnectionField(ParameterizedObject):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
             self.mask = self.weights_slice.submatrix(mask)
 
-            # CEBHACKALERT: see __init__() regarding mask & output fn.
             self.weights *= self.mask
             output_fn(self.weights)
             del self.norm_total
@@ -572,16 +587,6 @@ class CFProjection(Projection):
         default=patterngenerator.Constant(),constant=True,
         doc="Define the shape of the connection fields.")
 
-    # CEBALERT: this is temporary (allows c++ matching in certain
-    # cases).  We will allow the user to override the mask size, but
-    # by offering a scaling parameter.
-    autosize_mask = BooleanParameter(
-        default=True,constant=True,precedence=-1,doc="""
-        Topographica sets the mask size so that it is the same as the connection field's
-        size, unless this parameter is False - in which case the user-specified size of
-        the weights_shape is used. In normal usage of Topographica, this parameter should
-        remain True.""")
-
     learning_fn = ClassSelectorParameter(CFPLearningFn,
         default=CFPLF_Plugin(),
         doc='Function for computing changes to the weights based on one activation step.')
@@ -597,11 +602,6 @@ class CFProjection(Projection):
 
     strength = Number(default=1.0,doc="""
         Global multiplicative scaling applied to the Activity of this Sheet.""")
-
-    min_matrix_radius = Integer(default=1,bounds=(0,None),doc="""
-        Enforced minimum for radius of weights matrix.
-        The default of 1 gives a minimum matrix of 3x3. 0 would
-        allow a 1x1 matrix.""")
 
     coord_mapper = ClassSelectorParameter(CoordinateMapperFn,
         default=IdentityMF(),
@@ -636,11 +636,10 @@ class CFProjection(Projection):
         # nominal_bounds_template to ensure an odd slice, and to be
         # cropped to sheet if necessary
         slice_template = Slice(copy(self.nominal_bounds_template),self.src,force_odd=True,
-                               min_matrix_radius=self.min_matrix_radius)
+                               min_matrix_radius=self.cf_type.min_matrix_radius)
         
         self.bounds_template = slice_template.bounds
-        mask_template = self.cf_type.create_mask(self.weights_shape,self.bounds_template,
-                                                 self.src,self.autosize_mask)
+        mask_template = self.cf_type.create_mask(self.weights_shape,self.bounds_template,self.src)
 
         self.mask_template = mask_template # (for subclasses)
         if initialize_cfs:            
@@ -761,7 +760,7 @@ class CFProjection(Projection):
         bounds_template = copy(nominal_bounds_template)
 
         slice_template = Slice(bounds_template,self.src,force_odd=True,
-                               min_matrix_radius=self.min_matrix_radius)
+                               min_matrix_radius=self.cf_type.min_matrix_radius)
 
         if not self.bounds_template.containsbb_exclusive(bounds_template):
             if self.bounds_template.containsbb_inclusive(bounds_template):
@@ -771,7 +770,7 @@ class CFProjection(Projection):
             return
 
         mask_template = self.cf_type.create_mask(self.weights_shape,self.bounds_template,
-                                                 self.src,self.autosize_mask)
+                                                 self.src)
 
         # it's ok so we can store the bounds and resize the weights
         self.nominal_bounds_template = nominal_bounds_template
