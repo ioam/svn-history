@@ -44,8 +44,6 @@ class CFPOF_SharedWeight(CFPOutputFn):
 
 class SharedWeightCF(ConnectionField):
 	
-    # JAHACKALERT: This implementation copies some of the CEBHACKALERTS 
-    # of the ConnectionField.__init__ function from which it is dervied
     def __init__(self,cf,input_sheet,x=0.0,y=0.0,template=BoundingBox(radius=0.1),mask=None):
         """
         From an existing copy of ConnectionField (CF) that acts as a
@@ -58,11 +56,10 @@ class SharedWeightCF(ConnectionField):
 	the CF are implemented as a numpy view into the single master
 	copy of the weights stored in the CF template.
         """
-        # where'd the super call go? can id it
         self.x = x; self.y = y
         self.input_sheet = input_sheet
 
-        self.create_input_sheet_slice(template)
+        self._create_input_sheet_slice(template)
 
         self.weights = self.weights_slice.submatrix(cf.weights)
         
@@ -86,7 +83,6 @@ class SharedWeightCFProjection(CFProjection):
     Otherwise similar to CFProjection, except that learning is
     currently disabled.
     """
-    
     ### JABHACKALERT: Set to be constant as a clue that learning won't
     ### actually work yet, but we could certainly extend it to support
     ### learning if desired, e.g. to learn position-independent responses.
@@ -106,16 +102,14 @@ class SharedWeightCFProjection(CFProjection):
         super(SharedWeightCFProjection,self).__init__(initialize_cfs=False,**params)
 
 
-        #CEBALERT: clean up
+        # We want the sharedcf to be located on the grid, so use the
+        # center of a unit
         sheet_rows,sheet_cols=self.src.shape
         # arbitrary (e.g. could use 0,0) 
         center_row,center_col = sheet_rows/2,sheet_cols/2
         self.center_unitxcenter,self.center_unitycenter=self.src.matrixidx2sheet(center_row,
                                                                                  center_col)
 
-
-        # We want the sharedcf to be located on the grid, so
-        # pick a central unit and use its center        
         self.__sharedcf=self.cf_type(self.src,
                                      self.center_unitxcenter,
                                      self.center_unitycenter,
@@ -134,6 +128,7 @@ class SharedWeightCFProjection(CFProjection):
                 row.append(cf)
             cflist.append(row)
         self._cfs = cflist
+
 
     def change_bounds(self, nominal_bounds_template):
         """
@@ -154,21 +149,21 @@ class SharedWeightCFProjection(CFProjection):
     
     
     def learn(self):
-	"""
+        """
         Because of how output functions are applied, it is not currently
         possible to use learning functions and output functions for
         SharedWeightCFProjections, so we disable them here.
-	"""
+        """
         pass
     
     
     def apply_learn_output_fn(self,mask):
-	"""
+        """
         Because of how output functions are applied, it is not currently
         possible to use learning functions and output functions for
         SharedWeightCFProjections, so we disable them here.
-	"""
-	pass
+        """
+        pass
 
 
 
@@ -184,15 +179,15 @@ class LeakyCFProjection(CFProjection):
 
     def __init__(self,**params):
         super(LeakyCFProjection,self).__init__(**params)
-	self.leaky_input_buffer = zeros(self.src.activity.shape)
+        self.leaky_input_buffer = zeros(self.src.activity.shape)
 
     def activate(self,input_activity):
-	"""
-	Retain input_activity from the previous step in leaky_input_buffer
-	and add a leaked version of it to the current input_activity. This 
-	function needs to deal with a finer time-scale.
-	"""
-	self.leaky_input_buffer = input_activity + self.leaky_input_buffer*exp(-self.decay_rate) 
+        """
+        Retain input_activity from the previous step in leaky_input_buffer
+        and add a leaked version of it to the current input_activity. This 
+        function needs to deal with a finer time-scale.
+        """
+        self.leaky_input_buffer = input_activity + self.leaky_input_buffer*exp(-self.decay_rate) 
         super(LeakyCFProjection,self).activate(self.leaky_input_buffer)
 
 

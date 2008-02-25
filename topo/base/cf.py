@@ -207,7 +207,7 @@ class ConnectionField(ParameterizedObject):
         self.x = x
         self.y = y
 
-        self.create_input_sheet_slice(template)
+        self._create_input_sheet_slice(template)
 
         # CBALERT: need to deal with mask is None
 ##         if mask is None:
@@ -243,7 +243,7 @@ class ConnectionField(ParameterizedObject):
 
 
     # CB: can this be renamed to something better?
-    def create_input_sheet_slice(self,template):
+    def _create_input_sheet_slice(self,template):
         """
         Create the input_sheet_slice, which provides the appropriate
         Slice for this CF on the input_sheet (as well as providing
@@ -326,7 +326,7 @@ class ConnectionField(ParameterizedObject):
         # CEBALERT: re-write to allow arbitrary resizing
         or1,or2,oc1,oc2 = self.input_sheet_slice
 
-        self.create_input_sheet_slice(template)
+        self._create_input_sheet_slice(template)
                     
         r1,r2,c1,c2 = self.input_sheet_slice
 
