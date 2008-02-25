@@ -204,10 +204,9 @@ class ConnectionField(ParameterizedObject):
 ##             # Note that if passed in, mask shared between CFs (but not if created here)
 ##             mask = self.create_mask(patterngenerator.Constant(),self.template.bounds,input_sheet,True) 
 
-        # CB: this would be clearer (but not perfect)
+        # CB: this would be clearer (but not perfect, and probably slower)
         # m = mask_template[self.weights_slice()]
-        m = self.weights_slice.submatrix(mask)  # view of original mask
-        self.mask = m.astype(weight_type)
+        self.mask = self.weights_slice.submatrix(mask)  # view of original mask
         
         # CEBALERT: might want to do something about a size that's specified
         # (right now the size is assumed to be that of the bounds)
@@ -283,7 +282,7 @@ class ConnectionField(ParameterizedObject):
         # CEBALERT: threshold should be settable by user
         mask = Numeric.where(mask>=0.5,mask,0.0)
 
-        return mask
+        return mask.astype(weight_type)
 
 
     def get_input_matrix(self, activity):
