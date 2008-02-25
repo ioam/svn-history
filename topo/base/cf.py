@@ -6,13 +6,15 @@ simulations of cortical sheets that take input through connection
 fields that project from other cortical sheets (or laterally from
 themselves).
 
-ConnectionField: Holds a single connection field within a CFProjection.
+ConnectionField: Holds a single connection field within a
+CFProjection.
 
 CFProjection: A set of ConnectionFields mapping from a Sheet into a
 ProjectionSheet.
 
 CFSheet: A subclass of ProjectionSheet that provides an interface to
-the underlying ConnectionFields in any projection of type CFProjection.
+the underlying ConnectionFields in any projection of type
+CFProjection.
 
 $Id$
 """
@@ -330,8 +332,6 @@ class ConnectionField(ParameterizedObject):
 
 
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
-            # CB: why are we copying here? Why can't we do
-            # self.weights = self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1]
             self.weights = self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1]
             self.mask = self.weights_slice.submatrix(mask)
 
@@ -447,7 +447,6 @@ class CFPLF_Plugin(CFPLearningFn):
         for cf,r,c in iterator():
             single_cf_fn(cf.get_input_matrix(input_activity),
                          output_activity[r,c], cf.weights, single_connection_learning_rate)
-            # CEBHACKALERT: see ConnectionField.__init__() re. mask & output fn
             cf.weights *= cf.mask                
 
 
@@ -621,10 +620,10 @@ class CFProjection(Projection):
         in the source sheet corresponding to the unit in the target
         sheet.
 
-        The nominal_bounds_template specified may be altered. The bounds must
-        be fit to the Sheet's matrix, and the weights matrix must
-        have odd dimensions. These altered bounds are passed to the
-        individual connection fields.
+        The nominal_bounds_template specified may be altered: the
+        bounds must be fitted to the Sheet's matrix, and the weights
+        matrix must have odd dimensions. These altered bounds are
+        passed to the individual connection fields.
 
         A mask for the weights matrix is constructed. The shape is
         specified by weights_shape; the size defaults to the size
@@ -646,11 +645,14 @@ class CFProjection(Projection):
             # set up array of ConnectionFields translated to each x,y in the src sheet
             cflist = []
 
-            # JPALERT: Should we be using a 2D object array here instead of a list of lists?
-            # (i.e. self._cfs = numpy.array((rows,cols,dtype=object)
-            # This would allow single-call addressing (self._cfs[r,c]), and might
-            # be more efficient in other ways, but it might require modification
-            # of the optimized CFPOFs and CFPLFs.
+            # ENHANCEMENT: we'd like to use an array instead of a list
+            # of lists, but weave does not support arrays of
+            # dtype=object (so the optimized functions cannot be made
+            # to work).  An array of cfs would allow more efficient
+            # cf[r,c] addressing, and might allow faster access by C
+            # (although tests using an array of CFs with Instant
+            # appeared to show no such improvement).  See emails
+            # between CEB & JAB.
             for r,y in enumerate(self.dest.sheet_rows()[::-1]):
                 row = []
                 for c,x in enumerate(self.dest.sheet_cols()):
@@ -660,7 +662,7 @@ class CFProjection(Projection):
                         row.append(self.cf_type(self.src,x_cf,y_cf,
                                                 template=slice_template,
                                                 weights_generator=self.weights_generator,
-                                                mask=mask_template, # all cfs share mask array
+                                                mask=mask_template, 
                                                 output_fn=self.weights_output_fn.single_cf_fn))
                     except NullCFError:
                         if self.allow_null_cfs:
@@ -702,26 +704,24 @@ class CFProjection(Projection):
         Return a single connection field UnitView, for the unit
         located nearest to sheet coordinate (sheet_x,sheet_y).
         """
-        # CB: I think this is equivalent, right?
-        # cf = self.cf(self.dest.sheet2matrixidx(sheet_x,sheet_y))
-        # matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)        
-        # cf.input_sheet_slice.submatrix(matrix_data)=cf.weights 
-
-        matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)
+        matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float) 
         (r,c) = self.dest.sheet2matrixidx(sheet_x,sheet_y)
         r1,r2,c1,c2 = self.cf(r,c).input_sheet_slice
         matrix_data[r1:r2,c1:c2] = self.cf(r,c).weights
+
+        # CB: the following would be equivalent with Slice __call__
+        
+        # cf = self.cf(self.dest.sheet2matrixidx(sheet_x,sheet_y))
+        # matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)
+        # matrix_data[cf.input_sheet_slice()]=cf.weights
+
         return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self,timestamp)
 
 
     def get_projection_view(self, timestamp):
         """Returns the activity in a single projection"""
-        # CB: presumably activity passed through Numeric.array to make a copy?
-        # In that case, wouldn't
-        # matrix_data = self.activity.copy()
-        # be clearer?
-        matrix_data = Numeric.array(self.activity)
-        return ProjectionView((matrix_data,self.dest.bounds),self,timestamp)
+        return ProjectionView((matrix_data.copy(),self.dest.bounds),self,timestamp)
+
 
     def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
@@ -729,9 +729,8 @@ class CFProjection(Projection):
         self.activity *=0.0
         self.response_fn(MaskedCFIter(self), input_activity, self.activity, self.strength)
         self.output_fn(self.activity)
+
     
-
-
     def learn(self):
         """
         For a CFProjection, learn consists of calling the learning_fn.
@@ -852,7 +851,6 @@ class MaskedCFIter(CFIter):
 ### JABALERT: Should consider eliminating this class, moving its
 ### methods up to ProjectionSheet, because they may in fact be valid
 ### for all ProjectionSheets.
-###    
 class CFSheet(ProjectionSheet):
     """
     A ProjectionSheet providing access to the ConnectionFields in its CFProjections.
