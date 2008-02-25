@@ -43,10 +43,11 @@ __version__='$Revision$'
 
 import pickle, copy, __main__, timeit
 
+from numpy.testing import assert_array_equal, assert_array_almost_equal
+
 from topo.misc.filepaths import resolve_path, normalize_path
 
 import topo
-from topo.tests.utils import assert_array_equal, assert_array_almost_equal
 
 
 # CEBALERT: will these 'script="examples..."' paths work on Windows?
