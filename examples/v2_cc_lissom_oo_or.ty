@@ -1,9 +1,9 @@
 """
 LISSOM-based orientation map with complex cell layer and simple V2 model.
 
-$Id: lissom_oo_or_noshrinking.ty,v 1.11 2007/05/02 15:20:45 judelaw Exp $
+$Id$
 """
-__version__='$Revision: 1.11 $'
+__version__='$Revision$'
 
 
 import numpy
