@@ -792,7 +792,10 @@ _________________________________________________________
 
 
 
-
+Something like
+assert topo.guimain.tk.call("info","library").endswith("lib/tcl8.5")
+could eventually form the basis of a buildbot test on os x that checks
+we use Topographica's tcl/tk rather than the system one.
 
 
 -->
