@@ -78,16 +78,6 @@ class ConnectionField(ParameterizedObject):
         The default of 1 gives a minimum matrix of 3x3. 0 would
         allow a 1x1 matrix.""")
 
-    # CEBALERT: this is temporary (allows c++ matching in certain
-    # cases).  We will allow the user to override the mask size, but
-    # by offering a scaling parameter.
-    autosize_mask = BooleanParameter(
-        default=True,constant=True,precedence=-1,doc="""
-        Topographica sets the mask size so that it is the same as the connection field's
-        size, unless this parameter is False - in which case the user-specified size of
-        the weights_shape is used. In normal usage of Topographica, this parameter should
-        remain True.""")
-
     # Weights matrix; not yet initialized.
     weights = []
 
@@ -273,33 +263,6 @@ class ConnectionField(ParameterizedObject):
         # not copied because we don't use again
         template.positionlesscrop(self.x,self.y)
         self.weights_slice = template
-
-
-
-    @staticmethod
-    def create_mask(shape,bounds_template,sheet):
-        """
-        Create the mask (see __init__()).
-        """
-        # Calculate the size & aspect_ratio of the mask if appropriate;
-        # mask size set to be that of the weights matrix
-        if hasattr(shape, 'size') and ConnectionField.autosize_mask:
-            l,b,r,t = bounds_template.lbrt()
-            shape.size = t-b
-            shape.aspect_ratio = (r-l)/shape.size
-
-        # Center mask to matrixidx center
-        center_r,center_c = sheet.sheet2matrixidx(0,0)
-        center_x,center_y = sheet.matrixidx2sheet(center_r,center_c)
-
-        mask = shape(x=center_x,y=center_y,
-                     bounds=bounds_template,
-                     xdensity=sheet.xdensity,
-                     ydensity=sheet.ydensity)
-        # CBENHANCEMENT: threshold should be settable by user
-        mask = Numeric.where(mask>=0.5,mask,0.0)
-
-        return mask.astype(weight_type)
 
 
     # CEBALERT: unnecessary method; can use something like
@@ -606,6 +569,16 @@ class CFProjection(Projection):
         default=IdentityMF(),
         doc='Function to map a projected coordinate into the target sheet.')
 
+    # CEBALERT: this is temporary (allows c++ matching in certain
+    # cases).  We will allow the user to override the mask size, but
+    # by offering a scaling parameter.
+    autosize_mask = BooleanParameter(
+        default=True,constant=True,precedence=-1,doc="""
+        Topographica sets the mask size so that it is the same as the connection field's
+        size, unless this parameter is False - in which case the user-specified size of
+        the weights_shape is used. In normal usage of Topographica, this parameter should
+        remain True.""")
+
 
     # shape property defining the dimension of the _cfs field
     def get_shape(self): return len(self._cfs),len(self._cfs[0])
@@ -638,9 +611,9 @@ class CFProjection(Projection):
                                min_matrix_radius=self.cf_type.min_matrix_radius)
         
         self.bounds_template = slice_template.bounds
-        mask_template = self.cf_type.create_mask(self.weights_shape,self.bounds_template,self.src)
+        mask_template = self.create_mask(self.weights_shape,self.bounds_template,self.src)
 
-        self.mask_template = mask_template # (for subclasses)
+        self.mask_template = mask_template # (stored for subclasses)
         if initialize_cfs:            
             # set up array of ConnectionFields translated to each x,y in the src sheet
             cflist = []
@@ -679,6 +652,32 @@ class CFProjection(Projection):
         ### happening
         self.input_buffer = None
         self.activity = Numeric.array(self.dest.activity)
+
+    # CEB: have not yet decided proper location for this method
+    def create_mask(self,shape,bounds_template,sheet):
+        """
+        Create the mask (see ConnectionField.__init__()).
+        """
+        # Calculate the size & aspect_ratio of the mask if appropriate;
+        # mask size set to be that of the weights matrix
+        if hasattr(shape, 'size') and self.autosize_mask:
+            l,b,r,t = bounds_template.lbrt()
+            shape.size = t-b
+            shape.aspect_ratio = (r-l)/shape.size
+
+        # Center mask to matrixidx center
+        center_r,center_c = sheet.sheet2matrixidx(0,0)
+        center_x,center_y = sheet.matrixidx2sheet(center_r,center_c)
+
+        mask = shape(x=center_x,y=center_y,
+                     bounds=bounds_template,
+                     xdensity=sheet.xdensity,
+                     ydensity=sheet.ydensity)
+        # CBENHANCEMENT: threshold should be settable by user
+        mask = Numeric.where(mask>=0.5,mask,0.0)
+
+        # CB: unnecessary copy (same as for weights)
+        return mask.astype(weight_type)
 
 
 
@@ -768,8 +767,7 @@ class CFProjection(Projection):
                 self.warning('Unable to change_bounds; currently allows reducing only.')
             return
 
-        mask_template = self.cf_type.create_mask(self.weights_shape,self.bounds_template,
-                                                 self.src)
+        mask_template = self.create_mask(self.weights_shape,self.bounds_template,self.src)
 
         # it's ok so we can store the bounds and resize the weights
         self.nominal_bounds_template = nominal_bounds_template
