@@ -295,7 +295,8 @@ class ConnectionField(ParameterizedObject):
 
 
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
-            self.weights = self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1]
+            # CEBALERT: it's faster to copy! Need to understand why.
+            self.weights = (self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1]).copy()
             self.mask = self.weights_slice.submatrix(mask)
 
             self.weights *= self.mask
