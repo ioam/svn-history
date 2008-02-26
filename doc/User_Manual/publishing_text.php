@@ -155,6 +155,19 @@ filename is generated automatically.  You can also save these images
 from a script, e.g. in batch mode, using
 <a href="commandline.html#saving-bitmaps">save_plotgroup</a>.
 
+<H4>Color keys</H4>
+
+PlotGroups that include color-based plots, such as preference maps,
+typically include a color key when displayed in a Topographica window.
+A low-resolution bitmap version of the key is saved with the plots by
+save_plotgroup, but for publication it is usually better to use the
+original vector-format PDF files from which the bitmaps were
+generated.  The PDF files will usually be located near the bitmap used
+in the PlotGroup.  For instance, the 'Orientation Preference'
+PlotGroup defined in topo/commands/analysis.py specifies that the key
+is 'topo/commands/or_key_white_vert_small.png', and the corresponding
+PDF file is 'topo/commands/or_key_white_vert.pdf'.
+
 <H4>Activity and ConnectionField plots</H4>
 
 <P>Plots in these windows can be saved just as for Preference Map
