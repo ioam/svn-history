@@ -4,7 +4,8 @@ Utility functions used by the test files.
 $Id$
 """
 
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal,assert_array_almost_equal
+
 def assert_array_not_equal(a1,a2,msg=""):
     try:
         assert_array_equal(a1,a2)
@@ -14,6 +15,12 @@ def assert_array_not_equal(a1,a2,msg=""):
         raise AssertionError(msg)
 
 
+def array_almost_equal(*args,**kw):
+    try:
+        assert_array_almost_equal(*args,**kw)
+        return True
+    except AssertionError:
+        return False
 
 # temp
 
