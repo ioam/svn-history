@@ -869,7 +869,7 @@ class Simulation(ParameterizedObject):
             Dynamic.time_fn = self.time
 
 
-        self.events = []
+        self.events = [] # CB: consider collections.deque? (PEP 290)
         self._events_stack = []
         self.eps_to_start = []
             
