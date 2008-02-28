@@ -502,7 +502,7 @@ class Slice(ndarray):
 
     def set(self,slice_specification):
         """Set this slice from some iterable that specifies (r1,r2,c1,c2)."""
-        self.put([0,1,2,3],slice_specification)
+        self.put([0,1,2,3],slice_specification) # pylint: disable-msg=E1101
         self.bounds.set(self._slicespec2boundsspec(slice_specification,self._scs))
 
 
