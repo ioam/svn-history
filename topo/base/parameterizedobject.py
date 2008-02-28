@@ -11,7 +11,7 @@ import sys
 import copy
 import re
 
-
+from operator import itemgetter,attrgetter
 from types import FunctionType
 
 # JABALERT: Could consider using Python's logging facilities instead.
@@ -101,7 +101,7 @@ class ParameterMetaclass(type):
             classdict['__classdoc']=classdict['__doc__']
         # when asking for help on Parameter *object*, return the doc
         # slot
-        classdict['__doc__']=property(lambda x: x.doc)
+        classdict['__doc__']=property(attrgetter('doc'))
 
         # To get the benefit of slots, subclasses must themselves define
         # __slots__, whether or not they define attributes not present in
@@ -899,7 +899,7 @@ class ParameterizedObject(object):
             if (not onlychanged or value != val.default):
                 vals.append((name,value))
 
-        vals.sort(key=lambda x:x[0])
+        vals.sort(key=itemgetter(0))
         return vals
 
     # CB: is there a more obvious solution than making these
