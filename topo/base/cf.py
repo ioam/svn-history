@@ -21,8 +21,8 @@ $Id$
 
 __version__ = '$Revision$'
 
-import numpy.oldnumeric as Numeric
-from numpy import abs
+from numpy import abs,array,zeros,where
+from numpy.oldnumeric import Float,Float32
 from copy import copy
 
 import patterngenerator
@@ -40,10 +40,9 @@ from sheetview import UnitView, ProjectionView
 from boundingregion import BoundingBox,BoundingRegionParameter
 
 
-
 # Specified explicitly when creating weights matrix - required
 # for optimized C functions.
-weight_type = Numeric.Float32
+weight_type = Float32
 
 
 class NullCFError(ValueError):
@@ -654,7 +653,7 @@ class CFProjection(Projection):
         ### type error. It probably has to be clarified why this is
         ### happening
         self.input_buffer = None
-        self.activity = Numeric.array(self.dest.activity)
+        self.activity = array(self.dest.activity)
 
     # CEB: have not yet decided proper location for this method
     def create_mask(self,shape,bounds_template,sheet):
@@ -677,7 +676,7 @@ class CFProjection(Projection):
                      xdensity=sheet.xdensity,
                      ydensity=sheet.ydensity)
         # CBENHANCEMENT: threshold should be settable by user
-        mask = Numeric.where(mask>=0.5,mask,0.0)
+        mask = where(mask>=0.5,mask,0.0)
 
         # CB: unnecessary copy (same as for weights)
         return mask.astype(weight_type)
@@ -693,7 +692,7 @@ class CFProjection(Projection):
         #center_r,center_c = sheet2matrixidx(0,0,bounds,xdensity,ydensity)
         rows,cols=self.cfs_shape
         cf = self._cfs[rows/2][cols/2]
-        return len(Numeric.nonzero(Numeric.ravel(cf.mask)))
+        return len(cf.mask.ravel().nonzero()[0]) # CB: newer numpy array has .flatnonzero()
 
 
     def cf(self,r,c):
@@ -706,7 +705,7 @@ class CFProjection(Projection):
         Return a single connection field UnitView, for the unit
         located nearest to sheet coordinate (sheet_x,sheet_y).
         """
-        matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float) 
+        matrix_data = zeros(self.src.activity.shape,Float) 
         (r,c) = self.dest.sheet2matrixidx(sheet_x,sheet_y)
         r1,r2,c1,c2 = self.cf(r,c).input_sheet_slice
         matrix_data[r1:r2,c1:c2] = self.cf(r,c).weights
