@@ -379,7 +379,7 @@ astng-uninstall:
 ##############################################################
 # pylint (optional source-code checker)
 #
-PYLINT = pylint-0.13.2
+PYLINT = pylint-0.14.0
 PYLINT_UNINSTALL = ${PYTHON_LIB}/site-packages/pylint
 
 pylint: ${PYLINT}.tar.gz python common astng
