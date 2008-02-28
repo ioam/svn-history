@@ -8,7 +8,7 @@ __version__='$Revision$'
 
 from math import pi
 
-from numpy.oldnumeric import add,subtract,cos,sin
+from numpy import add,subtract,cos,sin
 
 from boundingregion import BoundingBox, BoundingRegionParameter
 from functionfamilies import OutputFn, IdentityOF
