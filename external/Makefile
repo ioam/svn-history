@@ -361,7 +361,7 @@ common-uninstall:
 # logilab astng, required for pylint (but should be 
 # removed if pylint is removed)
 # #CB need to make pylint depend on this after update to python 2.5
-ASTNG = logilab-astng-0.17.1
+ASTNG = logilab-astng-0.17.2
 ASTNG_UNINSTALL = ${PYTHON_LIB}/site-packages/logilab/astng
 
 astng: ${ASTNG}.tar.gz python
