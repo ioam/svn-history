@@ -294,11 +294,13 @@ class ConnectionField(ParameterizedObject):
 
 
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
-            # CEBALERT: it's faster to copy! Need to understand why.
-            self.weights = (self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1]).copy()
-            # CB: presumably it's not the copying - try this, too:
-            # self.weights = array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=0)
-
+            # CB: note that it's faster to copy (i.e. replacing copy=1 with copy=0
+            # below slows down change_bounds().
+            self.weights = array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
+            # (so the obvious choice,
+            # self.weights=self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],
+            # is also slower).
+            
             self.mask = self.weights_slice.submatrix(mask)
             self.weights *= self.mask
             output_fn(self.weights)
