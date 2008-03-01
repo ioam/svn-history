@@ -21,6 +21,7 @@ $Id$
 """
 __version__='$Revision$'
 
+from copy import copy
 
 from colorsys import hsv_to_rgb
 
@@ -54,18 +55,15 @@ class Bitmap(ParameterizedObject):
     def __init__(self,image):
         self.image = image
 
-    # CEBALERT: is this used anywhere?
-    def copy(self):
-        """
-        Return a copy of the encapsulated image so the original is
-        preserved.
-        """
-        return self.image.copy()
 
+    def __copy__(self):
+        # avoid calling __getstate__ for copy (not required)
+        image = self.image.copy()
+        return Bitmap(image)
 
-    # CEB: by converting to string and back, we probably incur some speed
-    # penalty on copy()ing Bitmaps (since __getstate__ and __setstate__ are
-    # used for copying, unless __copy__ and __deepcopy__ are defined instead).
+    # CB: could define a __deepcopy__ too, but we don't need
+    # deepcopy to be fast.
+
     def __getstate__(self):
         """
         Return the object's state (as in the superclass), but replace
