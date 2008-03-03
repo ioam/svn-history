@@ -12,7 +12,7 @@ import topo
 
 from topo.base.functionfamilies import OutputFn
 from topo.base.cf import CFSheet, CFPOutputFn
-from topo.base.parameterclasses import BooleanParameter, Number, Integer,\
+from topo.base.parameterclasses import Parameter,BooleanParameter, Number, Integer,\
      ListParameter,ClassSelectorParameter
 from topo.base.projection import Projection
 from topo.base.parameterizedobject import ParameterizedObject
@@ -20,7 +20,7 @@ from topo.base.sheet import activity_type
 from topo.misc.inlinec import optimized
 from topo.misc.keyedlist import KeyedList
 from topo.outputfns.basic import PiecewiseLinear
-
+from topo.base.simulation import EPConnectionEvent
 
 class JointNormalizingCFSheet(CFSheet):
     """
@@ -130,6 +130,9 @@ class LISSOM(JointNormalizingCFSheet):
     been reached, an external input is required before the sheet will
     activate again.
     """
+    
+    strict_tsettle = Parameter(default = None,
+        doc='This parameter when defined tells the LISSOM sheet not to send afferent output until the strict_tsettle time')    
     
     mask_init_time=Integer(default=5,bounds=(0,None),doc=""" 
        Determines when a new mask is initialized in each new iteration.
@@ -242,6 +245,19 @@ class LISSOM(JointNormalizingCFSheet):
         super(LISSOM,self).state_pop(**args)
         self.activation_count,self.new_iteration=self.__counter_stack.pop()
 
+    def send_output(self,src_port=None,data=None):
+        """Send some data out to all connections on the given src_port."""
+        out_conns_on_src_port = [conn for conn in self.out_connections
+                                 if self._port_match(conn.src_port,[src_port])]
+
+        for conn in out_conns_on_src_port:
+            if self.strict_tsettle != None:
+               if self.activation_count < self.strict_tsettle:
+                   if len(conn.dest_port)>2 and conn.dest_port[2] == 'Afferent':
+                    continue
+            self.verbose("Sending output on src_port %s via connection %s to %s" % (str(src_port), conn.name, conn.dest.name))
+            e=EPConnectionEvent(conn.delay+self.simulation.time(),conn,data)
+            self.simulation.enqueue_event(e)
 
 
 class JointNormalizingCFSheet_Continuous(JointNormalizingCFSheet):
