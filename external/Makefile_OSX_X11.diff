@@ -1,20 +1,12 @@
-Index: Makefile
-===================================================================
---- Makefile	(revision 7767)
-+++ Makefile	(working copy)
-@@ -29,6 +29,7 @@
- python: ${PYTHON}.tgz tk
- 	echo ${PREFIX}
- 	tar -xozf ${PYTHON}.tgz
+diff --git a/external/Makefile b/external/Makefile
+index b36dc64..39207a5 100644
+--- a/external/Makefile
++++ b/external/Makefile
+@@ -57,6 +57,7 @@ python: ${PYTHON}.tgz tk
+ 	tar -xzf ${PYTHON}.tgz
+ # Configure for specific operating system versions
+ ifeq ("$(shell uname -s)","Darwin")
 +	patch -p0 < Python_OSX_X11.diff
- 	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
- 	cd ${PYTHON}; env PREFIX=${PREFIX} make 
- 	cd ${PYTHON}; env PREFIX=${PREFIX} make install
-@@ -141,6 +142,7 @@
- ifeq ("$(shell uname -m)","x86_64")
- 	cd ${PIL}; patch < ../Imaging.diff
- endif
-+	patch -p0 < Imaging_OSX.diff
- 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build_ext -i
- 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python selftest.py
- 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
+ ifeq ("$(shell uname -r | cut -d . -f 1)","9") # Darwin 9.x == Mac OS X 10.5 (Leopard)
+ 	cd ${PYTHON}; ./configure --prefix=${PREFIX} MACOSX_DEPLOYMENT_TARGET=10.5
+ else
