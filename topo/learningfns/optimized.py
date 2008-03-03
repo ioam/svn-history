@@ -16,6 +16,7 @@ from topo.base.cf import CFPLearningFn,CFPLF_Plugin
 from topo.base.functionfamilies import Hebbian,LearningFn
 
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
+from projfns import CFPLF_Trace
 
 
 
