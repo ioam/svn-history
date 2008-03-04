@@ -207,7 +207,7 @@ class Constant(PatternGenerator):
     # so we hide them from auto-generated lists of parameters (e.g. in the GUI)
     x = Number(precedence=-1)
     y = Number(precedence=-1)
-    orientation   = Number(precedence=-1)
+    orientation = Number(precedence=-1)
     size = Number(precedence=-1)
     
 

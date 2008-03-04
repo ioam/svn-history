@@ -45,23 +45,20 @@ class Gaussian(PatternGenerator):
       ysigma=size/2
       xsigma=ysigma*aspect_ratio
 
-    The Gaussian is then computed for the given (x,y) values as:
+    The Gaussian is then computed for the given (x,y) values as::
     
       exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)
     """
     
-    aspect_ratio   = Number(default=0.3,bounds=(0.0,None),softbounds=(0.0,2.0),
-        precedence=0.31,doc=
-        """
+    aspect_ratio = Number(default=0.3,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.31,doc="""
         Ratio of the width to the height.
-        Specifically, xsigma=ysigma*aspect_ratio (see size).
-        """)
+        Specifically, xsigma=ysigma*aspect_ratio (see size).""")
     
-    size  = Number(default=0.5,doc="""
+    size = Number(default=0.5,doc="""
         Overall size of the Gaussian, defined by:
         exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)
-        where ysigma=size/2 and xsigma=size/2*aspect_ratio.
-        """)
+        where ysigma=size/2 and xsigma=size/2*aspect_ratio.""")
 
     def function(self,params):
         ysigma = params['size']/2.0
