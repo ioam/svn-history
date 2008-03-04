@@ -57,7 +57,14 @@ class Filename(Parameter):
         raw_path = super(Filename,self).__get__(obj,objtype)
         return resolve_path(raw_path,self.search_paths)
 
-
+    def __getstate__(self):
+        # don't want to pickle the search_paths        
+        state = super(Filename,self).__getstate__()
+        # CBALERT: uncommenting gives an error on make tests (testsnapshots.py).
+        # Testsnapshots.py runs fine on its own, and the snapshot-tests pass.
+        # Must be a test interaction? Needs investigating.
+        #del state['search_paths']
+        return state
 
 
 # Is there a more obvious way of getting this path?
