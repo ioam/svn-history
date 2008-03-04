@@ -398,6 +398,7 @@ class FileImage(GenericImage):
         else:
             return False
 
+# PICKLEHACK (move to legacy)
 # Temporary as of 12/2007, for backwards compatibility
 Image=FileImage
 
