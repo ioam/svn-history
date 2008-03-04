@@ -55,17 +55,12 @@ tracker rather than added to this list</B>.
 
 
 * cf.py
-() something more than masking by multiplication 
-() array of CFs rather than list of lists 
-() null cf support not there for plotting or C code
-() reorganize CF (create abstract base class) for e.g. sharedweightcf 
 () change_bounds() -> special __set__ method on bounds_template
 () eliminate CFSheet?
 () minor cleanup of _norm_total in c code? 
 () rename weights_shape
 () learning rate -> learning function (rather than cfprojection) 
 () where mask created (by cfprojection/cf)
-() arbitrary bounds resizing
 () learning rate a parameter of CFPLearningFn
 () CFPOutputFn could be dropped now a masked iterator can be passed in
 () calculation of no. of units (internal)
@@ -83,8 +78,6 @@ tracker rather than added to this list</B>.
 
 
 * Projection
-
-() need abstract Mask class for SheetMask and CFMask (+ close #1834370?)
 () other SheetMask + subclasses cleanup (I'm not yet familiar with problems)
 
 
@@ -98,12 +91,6 @@ tracker rather than added to this list</B>.
 
 
 * PatternGenerator
-
-() draw pattern into supplied array? at least be able to specify
-array type. (Can then modify ConnectionField not to do an extra copy
-of weights.) Once patterngenerator can do this, can cleanup all array
-types to be float32 (need to modify C code).
-() a base class for PatternGenerators that doesn't assume 2d image (see also #1869778)
 () needs to support plasticity of output functions
 
 
@@ -115,10 +102,9 @@ types to be float32 (need to modify C code).
 
 
 * Simulation
-() time type: replace FixedPoint, how Forever etc is implemented
 () EPConnectionEvent always deepcopying data: does it need to?
 () SomeTimer (also #1432101)
-() the mess inside run() 
+() the mess inside run(); how Forever etc is implemented 
 () calling topo.sim.run(0) in appropriate places
 () PeriodicEventSequence
     ## JPHACKALERT: This should really be refactored into a
@@ -128,8 +114,6 @@ types to be float32 (need to modify C code).
     ## change the behavior if the sequence length is longer than the
     ## period, but I'm not sure how important that is, and it might
     ## actually be useful the other way.
-
-
 
 
 * Parameters
@@ -146,8 +130,20 @@ types to be float32 (need to modify C code).
 () ParamOverrides should check_params()
 
 
+<H4>promoting basic.py</H4>
+etc wherever we haven't done it
+
+<H4>some kind of global time_fn manager?</H4>
+defaults to something like lambda:0; the gui could set
+to topo.sim.time. Rather than having a default of topo.sim.time
+in places that don't know about simulations. In parameterclasses?
+
 <H4>parameters out</H4>
 to different dir,package eventually
+
+<H4>memory leak?</H4>  
+Does topographica's memory usage go up over
+time? what was Jan's pickle problem? can he reproduce it?
 
 
 <H4>Mac</H4>
@@ -167,9 +163,6 @@ lissom_photo_or.ty, lissom_whisker_barrels.ty, obermayer_pnas90.ty,
 goodhill_network90.ty, som_retinotopy.ty), and ongoing research (by
 us, but also by people unaffiliated with Topographica but want their
 changes to track with SVN or be tied to a specific SVN version?)
-
-
-<H4>Expressions in dynamic parameters (CB)</H4>
 
 
 <H4>psyco (CB)</H4>
@@ -238,11 +231,6 @@ canvas methods (eg postscript()). But right-click code will need
 updating. Should be easy to lay out plots on a canvas, just like
 the grid() code that we have at the moment.
 
-
-<H4>2007/05/09: topoconsole workspace</H4>
-Can we have a matlab-like workspace?
-
------------
 
 
 
@@ -624,37 +612,8 @@ users could install the optimized versions if they wished.
 Investigate garnumpy.
 
 
-<H4>2007/09/06 (CB): Investigate using Tile</H4> 
-Tile widgets looks good on linux, windows, and mac.  Tile uses themes
-& styles, so we get a GUI that looks 'right' on Windows and Mac.
-
-<P> To use Tile: <code>make -C external tile</code> and remove
-<code>Pmw.initialize(root)</code> from __init__.py (means you lose the
-GUI popup errors - you won't be sad about that), then uncomment marked
-code in __init__.py.
-
-<P> Status (tile-0.7.8,bwidget-1.7.0): On linux, console starts with all its
-widgets themed by Tile (except MessageBar), but various parts of
-Tkinter (e.g. tkFileDialog) are obviously not compatible with Tile
-(try an 'Open' dialog). Tile is incompatible with options like
--background.  Plot group panels won't open as someone somewhere passes
-some -background options. Is it possible some bwidgets are not
-possible with Tile, too? In the Tk world, I think bwidget and Tile are
-very popular, so there should be some information.
-
-<P> Pmw is definitely not compatible with Tile. Pmw.Balloon and
-Pmw.MessageBar are fine since they happen not to interact, but we
-can't use Pmw.OptionMenu and Pmw.Group (among others).
-
-<P> Tile is already in Tk8.5a6, so it'll come into Tkinter eventually
-anyway.
-
-<P>
-Tile: http://wiki.tcl.tk/11075 <BR>
-Migrate to Tile: http://wiki.tcl.tk/15443 <BR>
-Apps using Tile: http://wiki.tcl.tk/13636 <BR>
-Tile into tk core: http://www.nabble.com/Tile-merged-into-the-core-t2549979.html<BR>
-bwidget: http://tkinter.unpy.net/bwidget/
+<H4>2007/05/09: topoconsole workspace</H4>
+Can we have a matlab-like workspace?
 
 
 <H4>2007/07/24 (JB): Matlab Toolbox for Dimensionality Reduction</H4>
