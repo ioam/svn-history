@@ -45,6 +45,116 @@ tracker rather than added to this list</B>.
 
 <H2>Tasks to be addressed after the 0.9.4 release:</H2>
 
+
+<H4>topo.base ALERTs</H4>
+
+* boundingregion.py cleanup
+
+
+* sheetviews
+
+
+* cf.py
+() something more than masking by multiplication 
+() array of CFs rather than list of lists 
+() null cf support not there for plotting or C code
+() reorganize CF (create abstract base class) for e.g. sharedweightcf 
+() change_bounds() -> special __set__ method on bounds_template
+() eliminate CFSheet?
+() minor cleanup of _norm_total in c code? 
+() rename weights_shape
+() learning rate -> learning function (rather than cfprojection) 
+() where mask created (by cfprojection/cf)
+() arbitrary bounds resizing
+() learning rate a parameter of CFPLearningFn
+() CFPOutputFn could be dropped now a masked iterator can be passed in
+() calculation of no. of units (internal)
+
+### JCALERT! We might want to change the default value of the
+### input value to self.src.activity; but it fails, raising a
+### type error. It probably has to be clarified why this is
+### happening
+
+
+* functionfamilies.py
+() OutputFn: plasticity fns
+() OutputFn: norm_value
+() LearningFn should have learning_rate param
+
+
+* Projection
+
+() need abstract Mask class for SheetMask and CFMask (+ close #1834370?)
+() other SheetMask + subclasses cleanup (I'm not yet familiar with problems)
+
+
+*Sheet
+() has plastic param, but set per projection
+
+
+* Slice
+(1) M[slice]-style syntax
+(2) cleanup
+
+
+* PatternGenerator
+
+() draw pattern into supplied array? at least be able to specify
+array type. (Can then modify ConnectionField not to do an extra copy
+of weights.) Once patterngenerator can do this, can cleanup all array
+types to be float32 (need to modify C code).
+() a base class for PatternGenerators that doesn't assume 2d image (see also #1869778)
+() needs to support plasticity of output functions
+
+
+
+* C code
+() re-write change_bounds() in C?
+() impact of attribute access etc in C (e.g. with slice)
+
+
+
+* Simulation
+() time type: replace FixedPoint, how Forever etc is implemented
+() EPConnectionEvent always deepcopying data: does it need to?
+() SomeTimer (also #1432101)
+() the mess inside run() 
+() calling topo.sim.run(0) in appropriate places
+() PeriodicEventSequence
+    ## JPHACKALERT: This should really be refactored into a
+    ## PeriodicEvent class that periodically executes a single event,
+    ## then the user can construct a periodic sequence using a
+    ## combination of PeriodicEvent and EventSequence.  This would
+    ## change the behavior if the sequence length is longer than the
+    ## period, but I'm not sure how important that is, and it might
+    ## actually be useful the other way.
+
+
+
+
+* Parameters
+() Enumeration not finished
+() Replace any remaining subclasses of ClassSelectorParameter
+() FixedPoint doesn't work properly with Number (removing fixedpoint anyway?)
+() Removing InstanceMethodWrapper if possible & anything else not required with python 2.5
+() logging: make sure debug statements etc not hurting performance
+() logging: use python's instead of our own?
+() script_repr: 
+# JABALERT: Only partially achieved so far -- objects of the same
+# type and parameter values are treated as different, so anything
+# for which instantiate == True is reported as being non-default.
+() ParamOverrides should check_params()
+
+
+<H4>parameters out</H4>
+to different dir,package eventually
+
+
+<H4>Mac</H4>
+OS X 10.5 problems
+Use x11 tk 8.5 (one of the mac users can then deal with using an aqua tk)
+
+
 <H4>2008/01/25 (JB): Organization of examples/</H4>
 The examples directory is getting quite big and confusing, at least in
 SVN.  We should consider how we want people to keep track of their
@@ -59,6 +169,18 @@ us, but also by people unaffiliated with Topographica but want their
 changes to track with SVN or be tied to a specific SVN version?)
 
 
+<H4>Expressions in dynamic parameters (CB)</H4>
+
+
+<H4>psyco (CB)</H4>
+Is it working currently? Wouldn't work for me on lodestar.
+(Also see #1760374)
+
+
+<H4>alternatives to allow users to include optimized code</H4>
+pyrex/cython, ...
+
+
 <H4>2007/12/23 (CB): who's tracking the results of...</H4>
 <ul>
 <li>examples/joublin_bc96.ty</li>
@@ -68,17 +190,10 @@ changes to track with SVN or be tied to a specific SVN version?)
 And others...
 
 
-<H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
-<ul>
-<li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
-<li>Cleanup + doc of *panel.py files</li>
-<li>Cleanup + doc of plotgroup.py</li>
-</ul>
+<H4>data archive format</H4>
 
-Investigate http://www.egenix.com/products/python/mxExperimental/mxNumber/ or some
-other alternative to fixedpoint.FixedPoint.
 
-CB: 
+<H4>CB: some tests to add</H4>
 - cleanup test_pattern_present (or wherever I tried to add test for not-run simulation
 before presenting patterns/saving generators)
 - test that fullfield x and y work
@@ -88,10 +203,6 @@ before presenting patterns/saving generators)
 <H4>2007/09/20: copying plotgroup from plotgroups</H4>
 See ALERT next to plotgroups in plotgroup.py.
 
-<H4>2007/09/01: timing code </H4>
-The timing object is nearly done, allowing progress bars, time
-remaining estimates, etc., but Jim needs to look at it to finish it up
-(and then close tracker 1432101).
 
 <H4>2007/10/26: Update tutorial</H4>
 Update the lissom_oo_or tutorial page to include fresh figures; some
@@ -101,33 +212,39 @@ being split up a little more?  Maybe it's getting daunting?
 
 
 
-
-<H4>2007/10/03 (CB): Less-urgent tkgui cleanup</H4>
+<H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
-<li>Control which options are available on right-click menu.
-The menus need to be dynamic, adapting to whatever channels are
-present, rather than always assuming that plots are SHC plots.</li>
-<li>Replace Pmw balloon and message bar with those from bwidget; remove
-Pmw</li>
-<li>Use parametersframe/tkparameterizedobject in more places (topoconsole, 
-right click menus...) </li>
-<li>Restriction on operations in parallel? (E.g. run and map measurement.)</li>
-<li>Which widgets should expand (expand=YES ?), which should fill the
-space (fill=X?) (e.g. in parameters frames sliders etc should
-expand), and so on. Switch to grid layout where it's more
-appropriate.</li>
-<li>Document some Tkinter tips. More tasks/notes in
-topo/tkgui/__init__.py</li>
+<li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
+<li>Cleanup + doc of *panel.py files</li>
+<li>Cleanup + doc of plotgroup.py</li>
 </ul>
 
 
-<H4>2007/03/29 (CB): connectionfield/slice/sheetcoords</H4>
-HACKALERTs relating to connection fields; test file for
-connectionfield; cleaning up cf.py and projections/basic.py along with
-the Slice class and SheetCoordinateSystem (there are several
-simplifications that can be made).  Maybe we can use masked arrays,
-now that Numpy has support for several varieties that might meet our
-needs better than Numeric's did.
+
+<H4>2007/10/03 (CB): Less-urgent tkgui cleanup</H4>
+<ul>
+<li>Control which options are available on right-click menu (#1829836).
+The menus need to be dynamic, adapting to whatever channels are
+present, rather than always assuming that plots are SHC plots.</li>
+<li>Use parametersframe/tkparameterizedobject in more places (topoconsole, 
+right click menus...) </li>
+<li>Restriction on operations in parallel? (E.g. run and map measurement.)</li>
+</ul>
+
+
+<H4>2007/06/07: plotgrouppanel's plots </H4>
+Maybe should be one canvas with bitmaps drawn on. Then we'd get
+canvas methods (eg postscript()). But right-click code will need
+updating. Should be easy to lay out plots on a canvas, just like
+the grid() code that we have at the moment.
+
+
+<H4>2007/05/09: topoconsole workspace</H4>
+Can we have a matlab-like workspace?
+
+-----------
+
+
 
 <H4>2007/07/07: more tests </H4>
 We need a test with non-square input sheets, non-square LISSOM sheets, etc., 
@@ -138,6 +255,7 @@ map measurement that we can (e.g. or maps).
 http://www.digitalpeers.com/pythondebugger/.
 
 
+<!--
 <H4>2007/11/20: output from pychecker in topo.base</H4>
 Look at output from "make check-base" and either fix the problems or
 add them to the suppressions dictionary in .pycheckrc. Once finished,
@@ -152,7 +270,7 @@ don't quite understand (like "Function (__init__) uses named
 arguments" or "__set__ is not a special method"); those would be worth
 understanding.  Once that's done for base/, the rest should be much
 easier.
-
+-->
 
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
@@ -188,17 +306,6 @@ Measurement of numpy.sum(X)/X.sum()/sum(X) performance. Difference
 between simulation results on different platforms (for slow-tests in
 Makefile).
 
-<H4>2007/05/29 (JP) Mac GUI cleanup</H4>
-The Mac GUI needs a variety of things to make it more Mac-like.
-<ul>
-<li> Menus are only visible when Console is frontmost. Probably need a menubar
-for every window.
-<li> Pmw radio buttons are broken on mac.  Their selected state is invisible. E.g. in Test pattern window.
-<li> Various window styles need to be tweaked: e.g.  EntryFields should be sunken, backgrounds, light grey (not white), etc.
-<li> Tooltip timing is screwed up.
-</ul>
-(Note that some of these would be fixed by switching to Tile (see 'investigate using Tile' task). Do any Mac apps use a series of separate windows as topographica does? Anyway, we are already considering (or will consider sometime!) if it's possible to have a workspace for topographica (like matlab has) with tkinter.)
-
 
 <H4>2007/03/29 (CB): tidy up c++ lissom matching</H4>
 Set c++ lissom params so that topographica doesn't have to set ganglia
@@ -218,15 +325,6 @@ the commandline, from a script, and saving/loading snapshots.)
 <H4>2007/02/28 (CB): OneDPowerSpectrum & Audio PatternGenerators</H4>
 Finish the two classes. Make a demo with Audio. Both currently don't work
 with test pattern window because plotting expects 2d arrays.
-
-
-<H4>2007/03/30: PatternGenerator, PatternGenerator2D</H4>
-Have a second abstract class so that the base PatternGenerator is
-simpler.
-
-
-<H4>2007/05/09: topoconsole workspace</H4>
-Can we have a matlab-like workspace?
 
 
 <H4>2005/01/01: components from external packages </H4>
@@ -249,28 +347,10 @@ ScientificPython, Chaco, Pyro (the robotics package), g, logger
 </pre>
 
 
-
-<H4>2006/05/15: array type</H4>
-All arrays should be numpy.float32
-
-
-<H4>2006/04/20: unit tests</H4>
-Need to be cleaned up so they run correctly. For example, many of the
-tests in testsheet.py run twice - correct that.  See CEBALERT in
-topo/tests/testsheet.py.
-
-
 <H4>2006/04/20 (JB): Composite & Image test files.</H4>
 Complete test file for Composite and Image.  investigate failing test
 in testimage.py (that uses sheet functions).  Currently commented out;
 may not be a problem.
-
-
-
-
-<H4>2006/03/07 (JL): change_bounds()</H4>
-make change_bounds() able to enlarge as well as shrink 
-
 
 <H4>2005/01/01: porting other simulations from c++ lissom</H4>
 Finish porting all categories of simulations from parts II and III of
@@ -278,11 +358,15 @@ the LISSOM book (i.e. orientation maps, ocular dominance maps,
 direction maps, combined maps, face maps, and two-level maps) to
 Topographica.
 
-<H4>2007/06/07: plotgrouppanel's plots </H4>
-Maybe should be one canvas with bitmaps drawn on. Then we'd get
-canvas methods (eg postscript()). But right-click code will need
-updating. Should be easy to lay out plots on a canvas, just like
-the grid() code that we have at the moment.
+
+<H4>2007/05/29 (JP) Mac (aqua) GUI cleanup</H4>
+The Mac GUI needs a variety of things to make it more Mac-like.
+<ul>
+<li> Pmw radio buttons are broken on mac.  Their selected state is invisible. E.g. in Test pattern window.
+<li> Various window styles need to be tweaked: e.g.  EntryFields should be sunken, backgrounds, light grey (not white), etc.
+<li> Tooltip timing is screwed up.
+</ul>
+(Note that some of these would be fixed by switching to Tile (see 'investigate using Tile' task). Do any Mac apps use a series of separate windows as topographica does? Anyway, we are already considering (or will consider sometime!) if it's possible to have a workspace for topographica (like matlab has) with tkinter.)
 
 
 
@@ -799,6 +883,7 @@ we use Topographica's tcl/tk rather than the system one.
 
 
 -->
+
 
 
 
