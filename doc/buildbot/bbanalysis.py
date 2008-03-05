@@ -226,7 +226,7 @@ def plot_startups():
     filename="/home/ceball/buildbot/buildmaster/public_html/p/lissom_oo_or_startup"
     plott(t,tytle,filename)
 
-    
+import matplotlib;matplotlib.use('Agg')    
 
 def plott(t,tytle,filename):
 
