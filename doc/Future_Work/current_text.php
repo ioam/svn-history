@@ -841,6 +841,9 @@ could eventually form the basis of a buildbot test on os x that checks
 we use Topographica's tcl/tk rather than the system one.
 
 
+Consider nose unittest extension
+http://somethingaboutorange.com/mrl/projects/nose/
+
 -->
 
 
