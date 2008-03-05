@@ -232,6 +232,8 @@ import matplotlib;matplotlib.use('Agg')
 
 def plott(t,tytle,filename):
 
+    from pylab import title,xlabel,ylabel,savefig,figure
+    
     builds=[]
     versions=[]
     times=[]
@@ -246,7 +248,7 @@ def plott(t,tytle,filename):
     figure()
     vectorplot(times,versions,style='bx')
 
-    from pylab import title,xlabel,ylabel,savefig,figure
+    
     title(tytle)
     xlabel("svnversion")
     ylabel("time /s")
