@@ -212,6 +212,52 @@ def update_timings(location="/home/ceball/buildbot/buildmaster/slow-tests_x86_ub
     
 
 
+def plot_timings():
+    timings=get_timings()
+    t=timings['lissom_oo_or.ty']
+    tytle="lissom_oo_or.ty, 250 iterations"
+    filename="/home/ceball/buildbot/buildmaster/public_html/p/lissom_oo_or_250")
+    plott(t,tytle,filename)
+
+def plot_startups():
+    timings=get_startups()
+    t=timings['lissom_oo_or.ty']
+    tytle="lissom_oo_or.ty, startup"
+    filename="/home/ceball/buildbot/buildmaster/public_html/p/lissom_oo_or_startup")
+    plott(t,tytle,filename)
+
+    
+
+def plott(t,tytle,filename):
+
+    builds=[]
+    versions=[]
+    times=[]
+    for build,data in t.items():
+        if data is not None:
+            builds.append(build)
+            versions.append(data[1])
+            times.append(data[2]*data[3]/99.0)
+
+
+    from topo.commands.pylabplots import vectorplot
+    vectorplot(times,versions,style='bx')
+
+    from pylab import *
+    title(tytle)
+    xlabel("svnversion")
+    ylabel("time /s")
+    savefig(filename+"_svn.png")
+
+    figure()
+    vectorplot(times,builds,style='bx')
+
+    title("lissom_oo_or.ty, 250 iterations")
+    xlabel("build")
+    ylabel("time /s")
+    savefig(filename+"_build.png")
+
+
 
 
     
