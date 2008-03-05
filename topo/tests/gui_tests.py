@@ -44,7 +44,8 @@ def run_basic():
 def run_detailed():
     """Test that more complex GUI actions are working."""
     _initialize()
-    tests = [test_cf_coords,test_test_pattern,test_projection] # and so on...
+    tests = [test_cf_coords,test_test_pattern,
+             test_projection,test_orientation_tuning] # and so on...
     return ft.run(tests,"Running detailed GUI tests...")
 
 
@@ -138,6 +139,15 @@ def test_projection():
     p.gui_set_param('projection','GS2ToS2')
     p.gui_set_param('projection','GSToS2')
     
+
+def test_orientation_tuning():
+    """Check that orientation tuning plot works."""
+
+    p = g['Plots']['Tuning Curves']['Orientation Tuning']()
+
+    p.update_command = "measure_or_tuning(num_phase=1,num_orientation=1,curve_parameters=[{'contrast':30}])"
+
+    p.Refresh()
 
 
 ######################################################################
