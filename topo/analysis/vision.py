@@ -18,6 +18,8 @@ from topo.base.parameterclasses import Number
 from topo.misc.numbergenerators import UniformRandom
 from math import fmod,floor,pi, sin, cos, sqrt
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
+from topo.base.cf import CFSheet
+from topo.base.sheetview import SheetView
 
 max_value = 0
 global_index = ()
@@ -103,10 +105,10 @@ def phase_preference_scatter_plot(sheet_name):
         rand = r()
         xoff = sin(rand*2*pi)*offset_magnitude
         yoff = cos(rand*2*pi)*offset_magnitude
-        xx = max(min(x+xoff,0.49999),-0.49999)
-        yy = max(min(y+yoff,0.49999),-0.49999)
-        x = max(min(x,0.49999),-0.49999)
-        y = max(min(y,0.49999),-0.49999)
+        xx = max(min(x+xoff,0.39999),-0.39999)
+        yy = max(min(y+yoff,0.39999),-0.39999)
+        x = max(min(x,0.39999),-0.39999)
+        y = max(min(y,0.39999),-0.39999)
         [xc1,yc1] = topo.sim[sheet_name].sheet2matrixidx(xx,yy)
         [xc2,yc2] = topo.sim[sheet_name].sheet2matrixidx(x,y)
         if((xc1==xc2) &  (yc1==yc2)): continue
