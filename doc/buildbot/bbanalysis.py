@@ -216,14 +216,14 @@ def plot_timings():
     timings=get_timings()
     t=timings['lissom_oo_or.ty']
     tytle="lissom_oo_or.ty, 250 iterations"
-    filename="/home/ceball/buildbot/buildmaster/public_html/p/lissom_oo_or_250")
+    filename="/home/ceball/buildbot/buildmaster/public_html/p/lissom_oo_or_250"
     plott(t,tytle,filename)
 
 def plot_startups():
     timings=get_startups()
     t=timings['lissom_oo_or.ty']
     tytle="lissom_oo_or.ty, startup"
-    filename="/home/ceball/buildbot/buildmaster/public_html/p/lissom_oo_or_startup")
+    filename="/home/ceball/buildbot/buildmaster/public_html/p/lissom_oo_or_startup"
     plott(t,tytle,filename)
 
     
@@ -243,7 +243,7 @@ def plott(t,tytle,filename):
     from topo.commands.pylabplots import vectorplot
     vectorplot(times,versions,style='bx')
 
-    from pylab import *
+    from pylab import title,xlabel,ylabel,savefig,figure
     title(tytle)
     xlabel("svnversion")
     ylabel("time /s")
@@ -261,7 +261,8 @@ def plott(t,tytle,filename):
 
 
     
-if __name__=='__main__':
-    if len(sys.argv)>1:
-        if sys.argv[1]=='update':
-            update_timings()
+## if __name__=='__main__':
+    
+##     if len(sys.argv)>1:
+##         if sys.argv[1]=='update':
+##             update_timings()
