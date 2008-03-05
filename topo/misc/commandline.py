@@ -14,8 +14,8 @@ from optparse import OptionParser
 import sys, __main__, math, os, re, traceback
 
 import topo
-import matplotlib
-matplotlib.use("Agg")
+#import matplotlib
+#matplotlib.use("Agg")
 
 # Startup banner
 BANNER = """
