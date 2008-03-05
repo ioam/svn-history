@@ -53,6 +53,8 @@ def save_startups(startups):
     pickle.dump(startups,f,0)
     f.close()
 
+# excluded for some other reason
+exclusions = [153]
 
 def get_date_version_time(logfile,timings=None,startups=None):
 
@@ -150,19 +152,19 @@ def get_date_version_time(logfile,timings=None,startups=None):
 
     if timings:
 
-        if cpu_usage>95:            
+        if cpu_usage>95 and build not in exclusions:            
             timings[script][build] = (date,version,timing,cpu_usage)
         else:
             timings[script][build]=None
-            print "...build %s had %s percent cpu during timing (not >95)"%(build,cpu_usage)
+            #print "...build %s had %s percent cpu during timing (not >95)"%(build,cpu_usage)
 
     if startups:
 
-        if startcpusage>95:
+        if startcpusage>95 and build not in exclusions:
             startups[script][build] = (date,version,startup,startcpusage)
         else:
             startups[script][build] = None
-            print "...build %s had %s percent cpu during startup (not >95)"%(build,startcpusage)
+            #print "...build %s had %s percent cpu during startup (not >95)"%(build,startcpusage)
 
     return (build,date,version,timing,startup,cpu_usage)
 
@@ -241,13 +243,14 @@ def plott(t,tytle,filename):
 
 
     from topo.commands.pylabplots import vectorplot
+    figure()
     vectorplot(times,versions,style='bx')
 
     from pylab import title,xlabel,ylabel,savefig,figure
     title(tytle)
     xlabel("svnversion")
     ylabel("time /s")
-    savefig(filename+"_svn.png")
+    savefig(filename+"_svnversion.png")
 
     figure()
     vectorplot(times,builds,style='bx')
@@ -255,7 +258,7 @@ def plott(t,tytle,filename):
     title("lissom_oo_or.ty, 250 iterations")
     xlabel("build")
     ylabel("time /s")
-    savefig(filename+"_build.png")
+    savefig(filename+"_buildno.png")
 
 
 
