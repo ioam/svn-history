@@ -48,65 +48,64 @@ tracker rather than added to this list</B>.
 
 <H4>topo.base ALERTs</H4>
 
-* boundingregion.py cleanup
+Prorities:
+9: release 0.9.5
+8: release 1.0
+3: release someday
+0: remove alert
+
+(9): Merge tile branch
+(9): Merge or abandon (or move to 1.0?) idle branch?
 
 
-* sheetviews
+* boundingregion.py cleanup: release 1.0
+
+
+* sheetviews: release 1.0
 
 
 * cf.py
-() change_bounds() -> special __set__ method on bounds_template
-() eliminate CFSheet?
-() minor cleanup of _norm_total in c code? 
-() rename weights_shape
-() learning rate -> learning function (rather than cfprojection) 
-() where mask created (by cfprojection/cf)
-() learning rate a parameter of CFPLearningFn
-() CFPOutputFn could be dropped now a masked iterator can be passed in
-() calculation of no. of units (internal)
+(0) change_bounds() -> special __set__ method on bounds_template
+(0) eliminate CFSheet?
+(9) minor cleanup of _norm_total in c code?
+(9) rename weights_shape
+(8) learning rate moves to learning function (rather than cfprojection)
+(9) where mask created (by cfprojection/cf)
+(8) learning rate a parameter of CFPLearningFn
+(8) CFPOutputFn mask parameter could be dropped now a masked iterator can be passed in
+(3) calculation of no. of units (internal)
 
-### JCALERT! We might want to change the default value of the
+(9) JCALERT! We might want to change the default value of the
 ### input value to self.src.activity; but it fails, raising a
 ### type error. It probably has to be clarified why this is
 ### happening
 
 
 * functionfamilies.py
-() OutputFn: plasticity fns
-() OutputFn: norm_value
-() LearningFn should have learning_rate param
+(9) OutputFn: plasticity fns
+(9) OutputFn: norm_value
+(8) LearningFn should have learning_rate param (see same alert in cf.py)
 
 
 * Projection
-() other SheetMask + subclasses cleanup (I'm not yet familiar with problems)
-
-
-*Sheet
-() has plastic param, but set per projection
+(8) other SheetMask + subclasses cleanup (I'm not yet familiar with problems)
 
 
 * Slice
-(1) M[slice]-style syntax
-(2) cleanup
+(9) M[slice]-style syntax (first figuring out performance implications of attribute access)
+(9) cleanup
 
 
 * PatternGenerator
-() needs to support plasticity of output functions
-
-
-
-* C code
-() re-write change_bounds() in C?
-() impact of attribute access etc in C (e.g. with slice)
-
+(8) needs to support plasticity of output functions (after fixing Pipeline's plasticity support)
 
 
 * Simulation
-() EPConnectionEvent always deepcopying data: does it need to?
-() SomeTimer (also #1432101)
-() the mess inside run(); how Forever etc is implemented 
-() calling topo.sim.run(0) in appropriate places
-() PeriodicEventSequence
+(3) EPConnectionEvent always deepcopying data: does it need to?
+(8) SomeTimer (also #1432101)
+(8) the mess inside run(); how Forever etc is implemented 
+(9) calling topo.sim.run(0) in appropriate places
+(3) PeriodicEventSequence
     ## JPHACKALERT: This should really be refactored into a
     ## PeriodicEvent class that periodically executes a single event,
     ## then the user can construct a periodic sequence using a
@@ -117,36 +116,37 @@ tracker rather than added to this list</B>.
 
 
 * Parameters
-() Enumeration not finished
-() Replace any remaining subclasses of ClassSelectorParameter
-() FixedPoint doesn't work properly with Number (removing fixedpoint anyway?)
-() Removing InstanceMethodWrapper if possible & anything else not required with python 2.5
-() logging: make sure debug statements etc not hurting performance
-() logging: use python's instead of our own?
-() script_repr: 
+(9) Enumeration marked as not finished (but seems fine!)
+(9) Replace any remaining subclasses of ClassSelectorParameter
+(8) FixedPoint doesn't work properly with Number (removing fixedpoint anyway?)
+(9) Removing InstanceMethodWrapper if possible & anything else not required with python 2.5
+(9) logging: make sure debug statements etc not hurting performance
+(3) logging: use python's instead of our own?
+(3) script_repr: 
 # JABALERT: Only partially achieved so far -- objects of the same
 # type and parameter values are treated as different, so anything
 # for which instantiate == True is reported as being non-default.
-() ParamOverrides should check_params()
+(8) ParamOverrides should check_params()
 
 
 <H4>promoting basic.py</H4>
-etc wherever we haven't done it
+(9) etc wherever we haven't done it
 
 <H4>parameters out</H4>
-to different dir,package eventually
+(9) to different dir,package eventually
 
 <H4>memory leak?</H4>  
-Does topographica's memory usage go up over
-time? what was Jan's pickle problem? can he reproduce it?
+(9) Does topographica's memory usage go up over time? what was Jan's
+pickle problem? can he reproduce it? -- yes, and so can Jude, but
+she's working on it.
 
 <H4>Mac</H4>
-OS X 10.5 problems
-Use x11 tk 8.5 (one of the mac users can then deal with using an aqua tk)
+(9) OS X 10.5 problems: either get X11 or aqua working
+(3) Have someone else get the other one working
 
 
 <H4>2008/01/25 (JB): Organization of examples/</H4>
-The examples directory is getting quite big and confusing, at least in
+(8) The examples directory is getting quite big and confusing, at least in
 SVN.  We should consider how we want people to keep track of their
 code; should it be in the main SVN repository?  A separate "contrib"
 or "inprogress" branch?  We have to consider at least three types of
@@ -160,47 +160,48 @@ changes to track with SVN or be tied to a specific SVN version?)
 
 
 <H4>CB: some tests to add</H4>
-- cleanup test_pattern_present (or wherever I tried to add test for not-run simulation
-before presenting patterns/saving generators)
-- test that fullfield x and y work
-- test for recent run() problem with float
+(3) cleanup test_pattern_present (or wherever I tried to add test for
+not-run simulation before presenting patterns/saving generators)
+(3) test that fullfield x and y work
+(3) test for recent run() problem with float
 
 
 <H4>2007/09/20: copying plotgroup from plotgroups</H4>
-See ALERT next to plotgroups in plotgroup.py.
+(9) See ALERT next to plotgroups in plotgroup.py.
 
 
 <H4>2007/10/26: Update tutorial</H4>
-Update the lissom_oo_or tutorial page to include fresh figures; some
+(8) Update the lissom_oo_or tutorial page to include fresh figures; some
 are a bit out of date.  Add a section about plotting 'Orientation
 tuning fullfield' tuning curves.  CB: would the tutorial benefit from
 being split up a little more?  Maybe it's getting daunting?
 
 
 <H4>psyco (CB)</H4>
-Is it working currently? Wouldn't work for me on lodestar.
+(9) Is it working currently? Wouldn't work for me on lodestar.
 (Also see #1760374)
 
 
 <H4>data archive format</H4>
-
+(8)
 
 <H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
-<li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
-<li>Cleanup + doc of *panel.py files</li>
-<li>Cleanup + doc of plotgroup.py</li>
+<li>(9) Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
+<li>(3) Cleanup + doc of *panel.py files</li>
+<li>(9) Cleanup + doc of plotgroup.py</li>
 </ul>
+
 
 
 <H4>2007/10/03 (CB): Less-urgent tkgui cleanup</H4>
 <ul>
-<li>Use parametersframe/tkparameterizedobject in more places (topoconsole, 
+<li>(3) Use parametersframe/tkparameterizedobject in more places (topoconsole, 
 right click menus...) </li>
-<li>Restriction on operations in parallel? (E.g. run and map measurement.)</li>
+<li>(3) Restriction on operations in parallel? (E.g. run and map measurement.)</li>
 </ul>
 
-<H4>pylint: deal with or ignore all warnings</H4>
+<H4>(9) pylint: deal with or ignore all warnings</H4>
 For make lint-base
 
 
