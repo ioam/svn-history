@@ -844,6 +844,10 @@ we use Topographica's tcl/tk rather than the system one.
 Consider nose unittest extension
 http://somethingaboutorange.com/mrl/projects/nose/
 
+
+Idiomatic python
+http://python.net/~goodger/projects/pycon/2007/idiomatic/handout.html
+
 -->
 
 
