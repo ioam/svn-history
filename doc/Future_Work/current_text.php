@@ -133,18 +133,12 @@ tracker rather than added to this list</B>.
 <H4>promoting basic.py</H4>
 etc wherever we haven't done it
 
-<H4>some kind of global time_fn manager?</H4>
-defaults to something like lambda:0; the gui could set
-to topo.sim.time. Rather than having a default of topo.sim.time
-in places that don't know about simulations. In parameterclasses?
-
 <H4>parameters out</H4>
 to different dir,package eventually
 
 <H4>memory leak?</H4>  
 Does topographica's memory usage go up over
 time? what was Jan's pickle problem? can he reproduce it?
-
 
 <H4>Mac</H4>
 OS X 10.5 problems
@@ -165,27 +159,6 @@ us, but also by people unaffiliated with Topographica but want their
 changes to track with SVN or be tied to a specific SVN version?)
 
 
-<H4>psyco (CB)</H4>
-Is it working currently? Wouldn't work for me on lodestar.
-(Also see #1760374)
-
-
-<H4>alternatives to allow users to include optimized code</H4>
-pyrex/cython, ...
-
-
-<H4>2007/12/23 (CB): who's tracking the results of...</H4>
-<ul>
-<li>examples/joublin_bc96.ty</li>
-<li>examples/lissom_whisker_barrels.ty</li>
-<li>examples/ohzawa_science90.ty</li>
-</ul>
-And others...
-
-
-<H4>data archive format</H4>
-
-
 <H4>CB: some tests to add</H4>
 - cleanup test_pattern_present (or wherever I tried to add test for not-run simulation
 before presenting patterns/saving generators)
@@ -204,6 +177,13 @@ tuning fullfield' tuning curves.  CB: would the tutorial benefit from
 being split up a little more?  Maybe it's getting daunting?
 
 
+<H4>psyco (CB)</H4>
+Is it working currently? Wouldn't work for me on lodestar.
+(Also see #1760374)
+
+
+<H4>data archive format</H4>
+
 
 <H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
 <ul>
@@ -213,34 +193,15 @@ being split up a little more?  Maybe it's getting daunting?
 </ul>
 
 
-
 <H4>2007/10/03 (CB): Less-urgent tkgui cleanup</H4>
 <ul>
-<li>Control which options are available on right-click menu (#1829836).
-The menus need to be dynamic, adapting to whatever channels are
-present, rather than always assuming that plots are SHC plots.</li>
 <li>Use parametersframe/tkparameterizedobject in more places (topoconsole, 
 right click menus...) </li>
 <li>Restriction on operations in parallel? (E.g. run and map measurement.)</li>
 </ul>
 
-
-<H4>2007/06/07: plotgrouppanel's plots </H4>
-Maybe should be one canvas with bitmaps drawn on. Then we'd get
-canvas methods (eg postscript()). But right-click code will need
-updating. Should be easy to lay out plots on a canvas, just like
-the grid() code that we have at the moment.
-
-
-
-
-<H4>2007/07/07: more tests </H4>
-We need a test with non-square input sheets, non-square LISSOM sheets, etc., 
-with both types of non-squareness...and we also need to test whatever
-map measurement that we can (e.g. or maps).
-
-<H4>2007/02/26: consider an alternative debugger</H4>
-http://www.digitalpeers.com/pythondebugger/.
+<H4>pylint: deal with or ignore all warnings</H4>
+For make lint-base
 
 
 <!--
@@ -293,6 +254,35 @@ bottlenecks. Add general advice for optimization to the manual pages.
 Measurement of numpy.sum(X)/X.sum()/sum(X) performance. Difference
 between simulation results on different platforms (for slow-tests in
 Makefile).
+
+
+<H4>alternatives to allow users to include optimized code</H4>
+pyrex/cython, ...
+
+<H4>some kind of global time_fn manager?</H4>
+defaults to something like lambda:0; the gui could set
+to topo.sim.time. Rather than having a default of topo.sim.time
+in places that don't know about simulations. In parameterclasses?
+
+
+<H4>2007/12/23 (CB): who's tracking the results of...</H4>
+<ul>
+<li>examples/joublin_bc96.ty</li>
+<li>examples/lissom_whisker_barrels.ty</li>
+<li>examples/ohzawa_science90.ty</li>
+</ul>
+And others...
+
+
+<H4>2007/07/07: more tests </H4>
+We need a test with non-square input sheets, non-square LISSOM sheets, etc., 
+with both types of non-squareness...and we also need to test whatever
+map measurement that we can (e.g. or maps).
+
+<H4>2007/02/26: consider an alternative debugger</H4>
+http://www.digitalpeers.com/pythondebugger/.
+
+
 
 
 <H4>2007/03/29 (CB): tidy up c++ lissom matching</H4>
@@ -355,6 +345,17 @@ The Mac GUI needs a variety of things to make it more Mac-like.
 <li> Tooltip timing is screwed up.
 </ul>
 (Note that some of these would be fixed by switching to Tile (see 'investigate using Tile' task). Do any Mac apps use a series of separate windows as topographica does? Anyway, we are already considering (or will consider sometime!) if it's possible to have a workspace for topographica (like matlab has) with tkinter.)
+
+<H4>2007/06/07: plotgrouppanel's plots </H4>
+Maybe should be one canvas with bitmaps drawn on. Then we'd get
+canvas methods (eg postscript()). But right-click code will need
+updating. Should be easy to lay out plots on a canvas, just like
+the grid() code that we have at the moment.
+
+
+<H4>Run tkgui in its own thread?</H4>
+
+
 
 
 
@@ -841,9 +842,14 @@ could eventually form the basis of a buildbot test on os x that checks
 we use Topographica's tcl/tk rather than the system one.
 
 
+
 Consider nose unittest extension
 http://somethingaboutorange.com/mrl/projects/nose/
 
+
+Need to link to numpy documentation somewhere
+http://www.scipy.org/Numpy_Functions_by_Category
+http://www.scipy.org/Numpy_Example_List_With_Doc
 
 Idiomatic python
 http://python.net/~goodger/projects/pycon/2007/idiomatic/handout.html
