@@ -748,6 +748,53 @@ progressbar-clean:
 progressbar-uninstall:
 	rm -rf progressbar ${foreach f,${PROGRESSBAR_UNINSTALL}, ${PREFIX}/${f}}
 
+
+
+#############################################################
+# GNU MP
+
+GMP = gmp-4.2.2
+
+GMP_UNINSTALL += lib/libgmp.* 
+GMP_UNINSTALL += include/gmp.h
+
+
+gmp: ${GMP}.tar.gz
+	tar -xzf ${GMP}.tar.gz
+	cd ${GMP}; ./configure --prefix=${PREFIX} 
+	make -C ${GMP}
+	make -C ${GMP} check
+	make -C ${GMP} install
+	touch gmp
+
+gmp-clean: 
+	rm -rf ${GMP} 
+gmp-uninstall:
+	rm -rf gmp $(foreach f, ${GMP_UNINSTALL}, ${PREFIX}/${f})
+
+
+# CBALERT: there are probably other packages for which we should remove .egg-info?
+
+##############################################################
+# eGenix mx Experimental (for mxNumber)
+#
+MXNUMBER = egenix-mx-experimental-3.0.0
+
+MXNUMBER_UNINSTALL += ${PYTHON_LIB}/site-packages/mx/
+MXNUMBER_UNINSTALL += ${PYTHON_LIB}/site-packages/egenix_mx_experimental-3.0.0-py2.5.egg-info
+
+mxnumber: ${MXNUMBER}.tar.gz python gmp
+	tar -xzf ${MXNUMBER}.tar.gz
+	cd ${MXNUMBER}; ${PREFIX}/bin/python setup.py install
+	touch mxnumber
+
+mxnumber-clean:
+	rm -rf ${MXNUMBER}
+mxnumber-uninstall:
+	rm -rf mxnumber ${foreach f,${MXNUMBER_UNINSTALL}, ${PREFIX}/${f}}
+
+
+
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
