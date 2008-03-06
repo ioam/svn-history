@@ -115,9 +115,6 @@ including allowing a threshold so that a colormap plot can be
 shown on top of a monochrome background plot, e.g. an activity blob on
 top of an ocular dominance or other grayscale map. -->
 							 
-<P><DT>Map statistics</DT><DD>  
-We will implement general routines for measuring the statistical
-properties of Sheets, such as for computing a perceived orientation.
 </DL>
 
 
