@@ -748,8 +748,13 @@ class CFProjection(Projection):
         self.weights_output_fn(MaskedCFIter(self),mask)
 
 
-    ### JABALERT: This should be changed into a special __set__ method for
-    ### bounds_template, instead of being a separate function.
+    ### This could be changed into a special __set__ method for
+    ### bounds_template, instead of being a separate function, but
+    ### having it be explicit like this might be clearer.
+    ###
+    ### This implementation is fairly slow, and for some algorithms
+    ### that rely on changing the bounds frequently, it may be worth
+    ### re-implementing it in C.
     def change_bounds(self, nominal_bounds_template):
         """
         Change the bounding box for all of the ConnectionFields in this Projection.

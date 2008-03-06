@@ -72,7 +72,6 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
             (since these are identical for a Sheet).
             """)
     
-    # JABALERT: Should be set per-projection, not per-Sheet, right?
     plastic = BooleanParameter(True,
         doc="""
             Setting this to False tells the Sheet not to change its
@@ -115,8 +114,6 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
         # For non-plastic inputs
         self.__saved_activity = []
         self._plasticity_setting_stack = []  
-
-        ### JABALERT: Should perhaps rename this to view_dict
         self.sheet_views = {}        
 
 
