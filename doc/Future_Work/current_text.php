@@ -290,15 +290,6 @@ Set c++ lissom params so that topographica doesn't have to set ganglia
 weight mask specially. Generalize oo_or_map_topo.params.
 
 
-<H4>2007/03/26 (CB): PatternGeneratorParameter default value</H4>
-Investigate why this:
-"
-from topo.base.patterngenerator import PatternGeneratorParameter
-PatternGeneratorParameter.default=topo.patterns.basic.Line()
-"
-gives errors about being read only sometimes. (Try at 
-the commandline, from a script, and saving/loading snapshots.)
-
 
 <H4>2007/02/28 (CB): OneDPowerSpectrum & Audio PatternGenerators</H4>
 Finish the two classes. Make a demo with Audio. Both currently don't work
