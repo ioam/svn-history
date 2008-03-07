@@ -251,13 +251,6 @@ def default_analysis_function():
     for pg in default_analysis_plotgroups:
         save_plotgroup(pg)
 
-    # Plot all projections for all measured_sheets
-    for s in measured_sheets:
-        for p in s.projections().values():
-            save_plotgroup("Projection",projection=p)
-
-
-
 # JAB: Should also have some sort of time scaling, so that sims with
 # different lengths don't need an entirely new set of analysis times.
 # Should encode the cvs state somehow in the output directory, in a
@@ -311,6 +304,12 @@ def run_batch(script_file,output_directory="Output",
     each simulation differs from the others.
     """
     import sys # CEBALERT: why I have to import this again? (Also done elsewhere below.)
+    
+    import matplotlib
+    from topo.misc.commandline import auto_import_commands
+    matplotlib.use("Agg")
+    auto_import_commands()
+    
     command_used_to_start = string.join(sys.argv)
     
     starttime=time.time()
@@ -324,8 +323,6 @@ def run_batch(script_file,output_directory="Output",
     parameterizedobject.script_repr_suppress_defaults=False
 
     # Make sure pylab plots are saved to disk
-    #import matplotlib 
-    #matplotlib.use('Agg')
 
     # Construct simulation name
     scriptbase= re.sub('.ty$','',os.path.basename(script_file))
