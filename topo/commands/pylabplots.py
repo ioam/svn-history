@@ -24,8 +24,8 @@ import copy
 from numpy.oldnumeric import arange, sqrt, pi, array, floor, transpose, argmax, argmin
 
 import topo
+from topo.misc.filepaths import normalize_path
 import errno
-
 from topo.base.arrayutils import octave_output
 from topo.base.sheet import Sheet
 from topo.base.arrayutils import wrap
@@ -580,7 +580,10 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
 
 
 def plot_modulation_ratio(fullmatrix):
-    # JABALERT: Needs docstring explaining what it's for and what it gives you
+    """
+    This function computes the modulation ratios of neurons in the V1Simple and V1Complex area and
+    plots the histogram of them. See analysis.vision.complexity for more info.
+    """
     # Should be using generate_figure() as in matrixplot().
     if (topo.sim.objects().has_key("V1Complex") & topo.sim.objects().has_key("V1Simple")):
         bins = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0]
@@ -594,9 +597,9 @@ def plot_modulation_ratio(fullmatrix):
         pylab.hist(v1c,bins)
         pylab.axis([0,2.0,0,3500])
         pylab.subplot(313)
-        pylab.hist(numpy.concatenate(v1s,v1c),bins)
+        #pylab.hist(numpy.concatenate(array(v1s),array(v1c)),bins)
         pylab.axis([0,2.0,0,3500])
-        pylab.savefig(str(topo.sim.time()) + 'RM.png')
+        pylab.savefig(normalize_path(str(topo.sim.time()) + 'RM.png'))
         #pylab.show()
 
 
@@ -712,4 +715,4 @@ def or_tuning_curve_batch(directory,filename,plot_type,unit,sheet_name,coordinat
     except os.error, e:
 	if e.errno != errno.EEXIST:
 	    raise
-    pylab.savefig(os.path.join(directory,filename) + '.png')
+    pylab.savefig(normalize_path(directory+filename) + '.png')
