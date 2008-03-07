@@ -4,6 +4,7 @@ import pylab
 import os.path
 import topo.patterns.basic
 import topo.commands.analysis
+import copy
 #from scipy.integrate import dblquad
 #from scipy.optimize.tnc import fmin_tnc
 #from scipy.optimize.optimize import fmin, fmin_powell
