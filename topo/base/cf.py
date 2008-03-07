@@ -855,9 +855,10 @@ class MaskedCFIter(CFIter):
             
 
 
-### JABALERT: Should consider eliminating this class, moving its
-### methods up to ProjectionSheet, because they may in fact be valid
-### for all ProjectionSheets.
+### We don't really need this class; its methods could probably be
+### moved up to ProjectionSheet, because they may in fact be valid for
+### all ProjectionSheets. But we're leaving it here, because it is
+### likely to be useful in the future.
 class CFSheet(ProjectionSheet):
     """
     A ProjectionSheet providing access to the ConnectionFields in its CFProjections.

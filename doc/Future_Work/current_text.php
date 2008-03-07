@@ -54,19 +54,17 @@ Prorities:
 3: release someday
 0: remove alert
 
-(9): Merge tile branch
-(9): Merge or abandon (or move to 1.0?) idle branch?
+(9): Merge tile branch (CEB)
+(9): Merge or abandon (or move to 1.0?) idle branch? (CEB)
 
 
-* boundingregion.py cleanup: release 1.0
+* boundingregion.py cleanup: release 1.0 (CEB)
 
 
-* sheetviews: release 1.0
+* sheetviews: release 1.0 (JAB)
 
 
 * cf.py
-(0) change_bounds() -> special __set__ method on bounds_template
-(0) eliminate CFSheet?
 (9) minor cleanup of _norm_total in c code?
 (9) rename weights_shape
 (8) learning rate moves to learning function (rather than cfprojection)
@@ -839,12 +837,6 @@ Consider nose unittest extension
 http://somethingaboutorange.com/mrl/projects/nose/
 
 
-Need to link to numpy documentation somewhere
-http://www.scipy.org/Numpy_Functions_by_Category
-http://www.scipy.org/Numpy_Example_List_With_Doc
-
-Idiomatic python
-http://python.net/~goodger/projects/pycon/2007/idiomatic/handout.html
 
 -->
 
