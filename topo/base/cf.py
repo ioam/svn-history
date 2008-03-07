@@ -115,8 +115,9 @@ class ConnectionField(ParameterizedObject):
         self._has_norm_total = False
 
 
-    # CB: Accessing norm_total as a property from the C code has
-    # little impact on the performance. (Shown by JAB?)
+    # CB: Accessing norm_total as a property from the C code takes
+    # about 2% of run time for 90 iterations of lissom_oo_or. (As of
+    # r8139, using floating-point simulation time.)
     norm_total = property(__get_norm_total,__set_norm_total,__del_norm_total,
         """
         The norm_total property returns a value useful in computing
@@ -145,14 +146,8 @@ class ConnectionField(ParameterizedObject):
         
         WARNING: Any c-optimized code can bypass this property and
         access directly _has_norm_total, _norm_total
-        
+       
         """)
-        # CEBALERT: no existing C code accesses _norm_total. Isn't there
-        # some redundant code in the C functions?
-        # E.g. CPLF_Hebbian_opt sets norm_total and then sets
-        # _has_norm_total=True; surely just setting norm_total is
-        # enough? Or, it could set _norm_total and then it would need
-        # to set _has_norm_total=True
 
 
     def get_bounds(self):

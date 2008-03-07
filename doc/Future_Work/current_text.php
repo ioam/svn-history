@@ -65,7 +65,6 @@ Prorities:
 
 
 * cf.py
-(9) minor cleanup of _norm_total in c code?
 (8) learning rate moves to learning function (rather than cfprojection)
 (9) where mask created (by cfprojection/cf)
 (8) learning rate a parameter of CFPLearningFn
