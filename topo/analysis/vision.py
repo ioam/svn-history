@@ -20,7 +20,7 @@ from math import fmod,floor,pi, sin, cos, sqrt
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.base.cf import CFSheet
 from topo.base.sheetview import SheetView
-from topo.misc.filepath import normalize_path
+from topo.misc.filepaths import normalize_path
 
 max_value = 0
 global_index = ()
