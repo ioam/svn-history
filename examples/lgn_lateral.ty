@@ -57,7 +57,7 @@ topo.patterns.basic.Gaussian.aspect_ratio=4.0
 # Specify weight initialization, response function, and learning function
 numpy.random.seed((500,500))
 
-CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()

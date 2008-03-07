@@ -518,7 +518,7 @@ class CFProjection(Projection):
     CFPResponseFn (typically a CF-aware version of mdot) and output_fn 
     (which is typically IdentityOF).  The initial contents of the 
     ConnectionFields mapping from the input Sheet into the target
-    ProjectionSheet are controlled by the weights_generator, weights_shape,
+    ProjectionSheet are controlled by the weights_generator, cf_shape,
     and weights_output_fn parameters, while the location of the
     ConnectionField is controlled by the coord_mapper parameter.
 
@@ -548,8 +548,7 @@ class CFProjection(Projection):
         default=patterngenerator.Constant(),constant=True,
         doc="Generate initial weights values.")
 
-    # JABALERT: Confusing name; change to cf_shape or cf_boundary_shape
-    weights_shape = ClassSelectorParameter(PatternGenerator,
+    cf_shape = ClassSelectorParameter(PatternGenerator,
         default=patterngenerator.Constant(),constant=True,
         doc="Define the shape of the connection fields.")
 
@@ -580,7 +579,7 @@ class CFProjection(Projection):
         default=True,constant=True,precedence=-1,doc="""
         Topographica sets the mask size so that it is the same as the connection field's
         size, unless this parameter is False - in which case the user-specified size of
-        the weights_shape is used. In normal usage of Topographica, this parameter should
+        the cf_shape is used. In normal usage of Topographica, this parameter should
         remain True.""")
 
 
@@ -603,7 +602,7 @@ class CFProjection(Projection):
         passed to the individual connection fields.
 
         A mask for the weights matrix is constructed. The shape is
-        specified by weights_shape; the size defaults to the size
+        specified by cf_shape; the size defaults to the size
         of the nominal_bounds_template.
         """
         super(CFProjection,self).__init__(**params)
@@ -615,7 +614,7 @@ class CFProjection(Projection):
                                min_matrix_radius=self.cf_type.min_matrix_radius)
         
         self.bounds_template = slice_template.bounds
-        mask_template = self.create_mask(self.weights_shape,self.bounds_template,self.src)
+        mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
 
         self.mask_template = mask_template # (stored for subclasses)
         if initialize_cfs:            
@@ -776,7 +775,7 @@ class CFProjection(Projection):
                 self.warning('Unable to change_bounds; currently allows reducing only.')
             return
 
-        mask_template = self.create_mask(self.weights_shape,self.bounds_template,self.src)
+        mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
 
         # it's ok so we can store the bounds and resize the weights
         self.nominal_bounds_template = nominal_bounds_template
