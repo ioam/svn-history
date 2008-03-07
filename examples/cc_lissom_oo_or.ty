@@ -85,7 +85,8 @@ core_size=locals().get('CS',0.5)
 
 ## Homeostatic stuff
 #Simple
-HES=HomeostaticMaxEnt(eta_a=0.0,eta=locals().get('ETA',0.0002),smoothing=0.0003,a_init=locals().get('SAINI',18), b_init=locals().get('SBINI',-10),plastic=locals().get('HMON',False), mu=locals().get('SCxMU',0.01))
+
+HES=HomeostaticMaxEnt(eta_a=0.0,eta=locals().get('ETA',0.0002),smoothing=0.0003,a_init=locals().get('SAINI',26), b_init=locals().get('SBINI',-11),plastic=locals().get('HMON',False), mu=locals().get('SCxMU',0.01))
 #ODS=OutputFnDebugger(function=HES, **shared_debug_params)
 output_fn_S=HES#Pipeline(output_fns=[HES, ODS])
 #Complex
@@ -187,14 +188,14 @@ topo.sim.connect('V1Simple','V1Complex',delay=FixedPoint("0.05"),
                      #topo.patterns.basic.Composite(operator=numpy.multiply, 
                      #generators=[Gaussian(aspect_ratio=1.0, size=locals().get('StoCSize',0.2)),
                      #           topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=locals().get('StoCSize',0.15)/2),
-                 learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                               ExponentialDecay(starting_value = locals().get('StoC_lr',5.0),
-                                                time_constant=locals().get('StoC_tc',9600)))),
-                 learning_fn=CFPLF_Trace_opt(trace_strength=locals().get('TraceStr',0.5)))
+                 nominal_bounds_template=BoundingBox(radius=locals().get('StoCSize',0.2)/2),learning_rate=0)
+#                 learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
+#                               ExponentialDecay(starting_value = locals().get('StoC_lr',5.0),
+#                                                time_constant=locals().get('StoC_tc',9600)))),
+#                 learning_fn=CFPLF_Trace_opt(trace_strength=locals().get('TraceStr',0.5)))
                 
-topo.sim.connect('V1Complex','V1Simple',delay=FixedPoint("0.2"),
-                 connection_type=CFProjection,strength=locals().get('FStrExc',0.24),name='V1SimpleFeedbackExc1',
+topo.sim.connect('V1Complex','V1Simple',delay=FixedPoint("0.05"),
+                 connection_type=CFProjection,strength=locals().get('FStrExc',0.28),name='V1SimpleFeedbackExc1',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=18),
               #   connection_type=CFProjection,strength=locals().get('FStrExc',0.13),name='V1SimpleFeedbackExc',
               #   weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
@@ -207,8 +208,8 @@ topo.sim.connect('V1Complex','V1Simple',delay=FixedPoint("0.2"),
                                                 time_constant=locals().get('StoC_tc',9600)))),
                  learning_fn=CFPLF_Trace_opt(trace_strength=locals().get('TraceStr',0.5)))
 
-topo.sim.connect('V1Complex','V1Simple',delay=FixedPoint("0.2"),
-                  connection_type=CFProjection,strength=locals().get('FStrInh',-1.65),name='V1SimpleFeedbackInh',
+topo.sim.connect('V1Complex','V1Simple',delay=FixedPoint("0.05"),
+                  connection_type=CFProjection,strength=locals().get('FStrInh',-2.2),name='V1SimpleFeedbackInh',
               #   connection_type=CFProjection,strength=locals().get('FStrInh',-2.0),name='V1SimpleFeedbackInh',
               #   weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
               #       generators=[Gaussian(aspect_ratio=1.0, size=3),
