@@ -14,7 +14,7 @@ from topo.projections.basic import CFProjection
 from topo.base.boundingregion import BoundingBox
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.patterns.basic import Gaussian
-from topo.outputfns.basic import HomeostaticMaxEnt
+from topo.outputfns.basic import HomeostaticMaxEnt,OutputFnWithState
 from topo.sheets.lissom import LISSOM
 from topo.sheets.optimized import NeighborhoodMask_Opt, LISSOM_Opt
 from topo.plotting.plotfilesaver import * 
@@ -22,6 +22,7 @@ from topo.commands.pylabplots import or_tuning_curve_batch, matrixplot
 from topo.commands.analysis import save_plotgroup, measure_or_tuning_fullfield
 from topo.misc.filepaths import normalize_path
 from topo.commands.pylabplots import plot_tracked_attributes
+from topo.base.parameterclasses import Number
 
 import matplotlib 
 matplotlib.use('Agg')
@@ -310,7 +311,7 @@ def homeostatic_analysis_function():
     """
     
   
-    if __main__.__dict__['triesch'] == True: 
+    if __main__.__dict__['triesch'] == True or  __main__.__dict__['simple'] == True: 
         plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
         plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], 0, topo.sim.time(), filename="V1", ylabel="V1")
     else:
@@ -324,3 +325,33 @@ def homeostatic_analysis_function():
     #plot_tracked_attributes(topo.sim["V1"].projections()["LGNOffAfferent"].debug_output_fn.output_fns[1], 0,topo.sim.time(), filename="LGNOffAfter", ylabel="LGNOffAfter")
     plot_tracked_attributes(topo.sim["V1"].projections()["LateralExcitatory"].output_fn.output_fns[1], 0,topo.sim.time(), filename="LatExBefore", ylabel="LatExBefore")
     plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], 0,topo.sim.time(), filename="LatInBefore", ylabel="LatInBefore")
+    
+
+class SimpleHomeo(OutputFnWithState):
+    mu = Number(default=0.01,doc="Target average activity.")
+    a_init = Number(default=13,doc="Multiplicative parameter controlling the exponential.")
+    b_init = Number(default=-4,doc="Additive parameter controlling the exponential.")
+    eta = Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
+    smoothing = Number(default=0.9997, doc="Weighting of previous activity vs. current activity when calculating the average.")
+
+    def __init__(self,**params):
+        super(SimpleHomeo,self).__init__(**params)
+	self.first_call = True
+
+    def __call__(self,x):
+        
+	if self.first_call:
+	    self.first_call = False
+	    self.a = ones(x.shape, x.dtype.char) * self.a_init
+	    self.b = ones(x.shape, x.dtype.char) * self.b_init
+	    self.y_avg = zeros(x.shape, x.dtype.char) 
+
+        x_orig = copy.copy(x)
+        x *= 0.0
+	x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
+
+        if self.plastic & (float(topo.sim.time()) % 1.0 >= 0.54):
+	    print "IN1"
+            self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
+            # Update a and b
+	    self.a += self.eta * (self.y_avg - self.mu)
