@@ -110,47 +110,69 @@ documentation:
 <P><DL COMPACT>
 
 <P><DT><A href="http://python.org/doc/">Python</A></DT>
-<DD>Topographica command and scripting language (essential!).  For a
-good basic introduction, check out the <A
-HREF="http://docs.python.org/tut/tut.html">Python tutorial</A>.  There
-are also books and many websites available with more information.
-Topographica is built on an unmodified copy of Python, so anything that
-Python can do is also valid for Topographica.
+<DD>Topographica command and scripting language (essential!).
+Topographica is built on an unmodified copy of Python, so anything
+that Python can do is also valid for Topographica. For a good basic
+introduction, check out
+the <A HREF="http://docs.python.org/tut/tut.html">Python
+tutorial</A>. Those already familiar with programming might find
+<A href="http://wiki.python.org/moin/BeginnersGuide/Programmers">Python
+for Programmers</A>
+or <A href="http://python.net/~goodger/projects/pycon/2007/idiomatic/handout.html">Idiomatic
+Python</A> useful.
+<BR>
+
 </DD>
 
 <P><DT><A href="http://numpy.scipy.org/">NumPy</A></DT>
-<DD>Topographica makes heavy use of NumPy arrays and math functions; these
-provide high-level operations for dealing with matrix data.  The
-interface and options are similar to Matlab and other high-level array
-languages.  These operations are generally much higher performance
-than explicitly manipulating each matrix element, as well as being
-simpler, and so they should be used whenever possible.
+<DD>Topographica makes heavy use of NumPy arrays and math functions;
+these provide high-level operations for dealing with matrix data.  The
+interface and options
+are <A href="http://www.scipy.org/NumPy_for_Matlab_Users">similar to
+Matlab</A> and other high-level array languages.  These operations are
+generally much higher performance than explicitly manipulating each
+matrix element, as well as being simpler, and so they should be used
+whenever possible. See
+the <A href="http://www.scipy.org/Documentation">NumPy documentation
+list</A> to learn about the full range of available functions.
 </DD>
 
 <P><DT><A href="http://matplotlib.sourceforge.net/">MatPlotLib</A></DT>
-<DD>Matplotlib is used for generating 1D (line)
-and 2D (plane) plots, such as topographic grid plots.  It provides
-a very general Matlab-like interface to creating plots of any quantities
-one might wish to visualize, including any array or vector in the program.
+<DD>Matplotlib is used for generating 1D (line) and 2D (plane) plots,
+such as topographic grid plots.  It
+provides <A href="http://matplotlib.sourceforge.net/matplotlib.pylab.html">PyLab</A>,
+a very general Matlab-like interface for creating plots of any
+quantities one might wish to visualize, including any array or vector
+in the program.
 </DD>
 
 <P><DT><A href="http://www.pythonware.com/products/pil/">PIL</A></DT>
 <DD>Topographica uses the Python Imaging Library for reading and
 writing bitmap images of various types.  PIL also provides a variety
-of image processing and graphics routines, which are available for use
-in Topographica components and scripts.</DD>
+of <A HREF="http://www.pythonware.com/library/pil/handbook/index.htm">image
+processing and graphics routines</A>, which are available for use in
+Topographica components and scripts.</DD>
 
-<P><DT><A href="http://pmw.sourceforge.net/">Pmw</A></DT>
-<DD>Topographica uses Pmw for its graphical user interface (GUI)
-classes, and those who want to add their own GUI windows can use any
-widgets from Pmw.</DD>
+<P><DT><A href="http://ipython.scipy.org/">IPython</A></DT>
+<DD>IPython provides Topographica with an enhanced Python shell,
+allowing efficient interactive work. The IPython
+manual's <A href="http://ipython.scipy.org/doc/manual/node4.html">Quick
+tips</A> section explains the most immediately useful features; see
+<A href="http://ipython.scipy.org/moin/Documentation">IPython's
+documentation</A> for more detailed information.
+</DD>
 
 <P><DT><A href="http://www.scipy.org/Weave">Weave</A></DT>
 <DD>Topographica uses weave to allow snippets of C or C++ code to be
 included within Python functions, usually for a specific speed optimization.
 This functionality is available for any user-defined library function, 
 for cases when speed is crucial.</DD>
+
+
+<!--CEBALERT: remember to add GMP, mxNumber, (gnosis) -->
+
 </DL>
+
 
 <H3>Optional External Packages</H3>
 
