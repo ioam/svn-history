@@ -79,7 +79,7 @@ def rf_analysis():
     from topo.commands.analysis import measure_or_tuning_fullfield, measure_or_pref
     from topo.commands.pylabplots import or_tuning_curve_batch
     from topo.analysis.vision import analyze_complexity    
-
+    from topo.misc.filepaths import normalize_path
     
     if(float(topo.sim.time()) <=10010): 
         # Build a list of all sheets worth measuring

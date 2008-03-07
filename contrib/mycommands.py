@@ -2,9 +2,9 @@ import __main__
 import numpy
 import pylab
 import os.path
+import copy
 import topo.patterns.basic
 import topo.commands.analysis
-import copy
 #from scipy.integrate import dblquad
 #from scipy.optimize.tnc import fmin_tnc
 #from scipy.optimize.optimize import fmin, fmin_powell
@@ -347,7 +347,7 @@ class SimpleHomeo(OutputFnWithState):
 	    self.b = ones(x.shape, x.dtype.char) * self.b_init
 	    self.y_avg = zeros(x.shape, x.dtype.char) 
 
-        x_orig = copy.copy(x)
+        x_orig = copy(x)
         x *= 0.0
 	x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
 
