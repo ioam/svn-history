@@ -217,7 +217,6 @@ def save_plotgroup(name,saver_params={},**params):
       save_plotgroup("Orientation Preference")
       save_plotgroup("Projection",projection=topo.sim['V1'].projections('Afferent'))
                                   
-
     Some plotgroups accept optional parameters, which can be passed
     like projection above.
 
@@ -1252,10 +1251,10 @@ pg=  create_plotgroup(name='Corner OR Preference',category="Preference Maps",
              doc='Measure orientation prefference for corner stimuly [or generally any more complex stimuly that cannot be represented as fullfield pattern].',
              update_command='measure_corner_or_pref(); topographic_grid()',
              normalize=True)
-pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
-pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
+pg.add_plot('Corner Orientation Preference',[('Hue','OrientationPreference')])
+pg.add_plot('Corner Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
-pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
+pg.add_plot('Corner Orientation Selectivity',[('Strength','OrientationSelectivity')])
 
 
 def measure_corner_or_pref(divisions=20,num_orientation=8,scale=1.0,offset=0.0,display=False,
@@ -1283,3 +1282,5 @@ def measure_corner_or_pref(divisions=20,num_orientation=8,scale=1.0,offset=0.0,d
         param_dict = {"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+
+	
