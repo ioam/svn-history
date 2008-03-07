@@ -2,7 +2,7 @@ This reference manual contains detailed documentation of each
 component making up Topographica, assuming that the user is already
 familiar with basic Topographica usage.  See the <A
 HREF="../User_Manual/index.html">User Manual</A> and <A
-HREF="../Tutorials/index.html">Tutorials</A> for such a introduction.
+HREF="../Tutorials/index.html">Tutorials</A> for such an introduction.
 Note that the documentation of these components is gradually being
 improved, and not every component is properly documented yet.
 Moreover, the documentation is often much more verbose than necessary,
