@@ -20,6 +20,7 @@ from math import fmod,floor,pi, sin, cos, sqrt
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.base.cf import CFSheet
 from topo.base.sheetview import SheetView
+from topo.misc.filepath import normalize_path
 
 max_value = 0
 global_index = ()
@@ -129,7 +130,7 @@ def phase_preference_scatter_plot(sheet_name):
     pylab.plot([-180,-180],[360,360])
     pylab.axis([-180,360,-180,360])
     pylab.grid()
-    pylab.savefig(str(topo.sim.time()) + sheet_name + "_scatter.png")
+    pylab.savefig(normalize_path(str(topo.sim.time()) + sheet_name + "_scatter.png"))
 
 ###############################################################################
 pg= create_plotgroup(name='Orientation Preference and Complexity',category="Preference Maps",
