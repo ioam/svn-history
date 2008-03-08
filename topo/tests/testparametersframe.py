@@ -127,6 +127,21 @@ class TestParametersFrameWithApply(unittest.TestCase):
         w.insert(0,"TestPO(name='fred')")
         self.f.Apply()
         self.assertNotEqual(id(self.f.pa),testpo_id)
+
+
+    # (CB: this isn't the place for this test)
+    def test_link_to_topo_sim(self):
+        """Indicate there's a bug. Have yet to investigate where it actually comes from."""
+        import topo
+        from utils import new_simulation
+        from topo.tkgui.parametersframe import edit_parameters
+        new_simulation()
+        e = edit_parameters(topo.sim['S'])
+        e.gui_set_param('precedence',7)
+        e.Apply()
+        self.assertEqual(topo.sim['S'].precedence,7)
+        # problem with Simulation no longer being singleton?
+        
         
 
 # CEBALERT: need test for defaults button. Check that works ok
