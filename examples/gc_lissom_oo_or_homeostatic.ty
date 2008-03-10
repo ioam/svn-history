@@ -241,12 +241,12 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=locals().get('default_retina_d
                                   nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
 
 topo.sim['LGNOn']=LISSOM(nominal_density=24.0,
-                          nominal_bounds=BoundingBox(radius=0.5+0.25),
+                          nominal_bounds=BoundingBox(radius=1.0+0.25),
                           output_fn=LGN_on_output_fn,tsettle=0,
                           measure_maps=False,divisive_constant=locals().get('dc',1.0))
 
 topo.sim['LGNOff']=LISSOM(nominal_density=24.0,
-                           nominal_bounds=BoundingBox(radius=0.5+0.25),
+                           nominal_bounds=BoundingBox(radius=1.0+0.25),
                            output_fn=LGN_off_output_fn,tsettle=0,
                            measure_maps=False,divisive_constant=locals().get('dc',1.0))
 
@@ -254,7 +254,7 @@ topo.sim['V1'] = JointScaling(nominal_density=locals().get('default_density',48.
                               nominal_bounds=BoundingBox(radius=0.5),tsettle=9,
                               plastic=True,output_fn=V1_OF,
                               post_initialization_weights_output_fn=pi,
-                              target=afferent_target, smoothing=smoothing,target_lr=0.045)
+                              target=afferent_target, smoothing=smoothing,target_lr=locals().get('target_lr',0.045))
 
 
 topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
