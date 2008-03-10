@@ -117,3 +117,5 @@ def rf_analysis():
         pylab.figure()
         pylab.hist(topo.commands.basic.activity_history,(numpy.arange(20.0)/20.0))
         pylab.savefig(normalize_path(str(topo.sim.time()) + 'activity_histogram.png'))	
+	from topo.commands.basic import save_snapshot
+	save_snapshot(normalize_path('snapshot.typ'))
