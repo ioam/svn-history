@@ -279,8 +279,8 @@ def AddGC():
                     nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOff',
                     weights_generator=lgn_surroundg)
     
-    topo.sim["V1"].in_connections[0].strength=5.0
-    topo.sim["V1"].in_connections[1].strength=5.0
+    topo.sim["V1"].in_connections[0].strength=__main__.__dict__.get('LGNStr',5.0)
+    topo.sim["V1"].in_connections[1].strength=__main__.__dict__.get('LGNStr',5.0)
     #topo.sim["V1"].output_fn = Sigmoid(k=-4.3,r=8.5)
     
     topo.sim["LGNOn"].tsettle = 2
@@ -347,12 +347,13 @@ class SimpleHomeo(OutputFnWithState):
 	    self.b = ones(x.shape, x.dtype.char) * self.b_init
 	    self.y_avg = zeros(x.shape, x.dtype.char) 
 
-        x_orig = copy(x)
-        x *= 0.0
-	x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
 
         if self.plastic & (float(topo.sim.time()) % 1.0 >= 0.54):
+	    x_orig = copy(x)
+            x *= 0.0
+	    x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
+
 	    print "IN1"
             self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
             # Update a and b
-	    self.a += self.eta * (self.y_avg - self.mu)
+	    self.b -= self.eta * (self.y_avg - self.mu)
