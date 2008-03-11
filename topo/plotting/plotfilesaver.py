@@ -33,8 +33,12 @@ class PlotGroupSaver(ParameterizedObject):
         Optional prefix that can be used in the filename_format command
         to disambiguate different simulations or conditions.""")
 
+    filename_suffix = StringParameter(default="",doc="""
+        Optional suffix that can be used in the filename_format command
+        to disambiguate different simulations or conditions.""")
+
     filename_format = StringParameter(default=
-        "%(filename_prefix)s%(basename)s_%(plot_label)s.%(file_format)s",doc="""
+        "%(filename_prefix)s%(basename)s_%(plot_label)s%(filename_suffix)s.%(file_format)s",doc="""
         Format string to use for generating filenames for plots.  This
         string will be evaluated in the context of a dictionary that
         defines various items commonly used when generating filenames,
