@@ -544,25 +544,26 @@ class AttributeTrackingOF(OutputFnWithState):
          
         
     def __call__(self,x):
-        if self.plastic:
-            if self._object==None:
-                if isinstance(self.object,str):
-                    self._object=eval(self.object)
-                else:
-                    self._object=self.object
+    
+	if self._object==None:
+	    if isinstance(self.object,str):
+		self._object=eval(self.object)
+	    else:
+		self._object=self.object
             
-            #collect values on each appropriate step
-            self.n_step += 1
+	    #collect values on each appropriate step
+	self.n_step += 1
         
-            if self.n_step == self.step:
-                self.n_step = 0
+	if self.n_step == self.step:
+	    self.n_step = 0
+	    if self.plastic:
                 for p in self.attrib_names:
                     if p=="x":
                         value_matrix=x
                     else:
                         value_matrix= getattr(self._object, p)
                         
-                    for u in self.units:
+		    for u in self.units:
                         self.values[p][u].append((topo.sim.time(),value_matrix[u]))
           
 
@@ -603,11 +604,59 @@ class ActivityAveragingOF(OutputFnWithState):
             self.x_avg=self.initial_average*ones(x.shape, activity_type)         
 
         # Collect values on each appropriate step
+        
+	self.n_step += 1
+	if self.n_step == self.step:
+	    self.n_step = 0
+	    if self.plastic:
+		self.x_avg = (1.0-self.smoothing)*x + self.smoothing*self.x_avg
+
+class ResponseAveragingOF(OutputFnWithState):
+    """
+    Calculates the average of the responses to an input.
+    Keeps a running average of the activity value of non zero activites for each unit.
+    """
+
+    step = Number(default=9, doc="""
+        How often to update the average.
+
+        For instance, step=1 means to update it every time this OF is
+        called; step=2 means to update it every other time.""")
+    
+    def __init__(self,**params):
+        super(ResponseAveragingOF,self).__init__(**params)
+        self.n_step = 0
+        self.r_count=None
+	self.r_sum=None
+	self.r_avg=None
+        
+    def __call__(self,x):
+       
+	if self.r_sum is None:
+	    self.r_sum=zeros(x.shape, activity_type)
+	if self.r_count is None:         
+	    self.r_count=zeros(x.shape, activity_type)
+	if self.r_avg is None:  
+	    self.r_avg=zeros(x.shape, activity_type)
+        
+        
+	rows,cols = x.shape
+        
+       	# Collect values on each appropriate step
         if self.plastic:
             self.n_step += 1
             if self.n_step == self.step:
                 self.n_step = 0
-                self.x_avg = (1.0-self.smoothing)*x + self.smoothing*self.x_avg
+		for r in range(rows):
+		    for c in range(cols):
+			if(x[r,c] > 0.01):
+                            self.r_sum[r,c] += x[r,c]
+			    self.r_count[r,c] +=1
+                            self.r_avg[r,c] *=0.0
+			    self.r_avg[r,c] += self.r_sum[r,c]/self.r_count[r,c]
+                   
+
+                       
 
 
 
@@ -643,9 +692,16 @@ class HomeostaticMaxEnt(OutputFnWithState):
     smoothing = Number(default=0.9997, doc="""
         Weighting of previous activity vs. current activity when calculating the average.""")
 
+    step = Number(default=9, doc="""
+        How often to update the a and b parameters.
+	For instance, step=1 means to update it every time this OF is
+        called; step=2 means to update it every other time.""")
+    
     def __init__(self,**params):
         super(HomeostaticMaxEnt,self).__init__(**params)
 	self.first_call = True
+	self.n_step=0
+        self.cutoff=0.0
 
     def __call__(self,x):
         
@@ -657,16 +713,21 @@ class HomeostaticMaxEnt(OutputFnWithState):
 
 	# Apply sigmoid function to x, resulting in what Triesch calls y
         x_orig = copy.copy(x)
+       
         x *= 0.0
 	x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
+	self.cutoff = 1.0 / (1.0 + exp(-self.b))
+	
 
-        if self.plastic:
-
-            self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg #Calculate average for use in debugging only
-
-            # Update a and b
-            self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
-            self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
+	self.n_step += 1
+	if self.n_step == self.step:
+	    self.n_step = 0
+	    if self.plastic:                
+		self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg #Calculate average for use in debugging only
+		
+		# Update a and b
+		self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
+		self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
           
 
 
@@ -709,11 +770,12 @@ class ScalingOF(OutputFnWithState):
             self.sf=ones(x.shape, activity_type)
 
         # Collect values on each appropriate step
-        if self.plastic:
-            self.n_step += 1
-            if self.n_step == self.step:
-                self.n_step = 0
-                self.sf *= 0.0
+       
+	self.n_step += 1
+	if self.n_step == self.step:
+	    self.n_step = 0
+	    if self.plastic:
+		self.sf *= 0.0
                 self.sf += self.target/self.x_avg
                 self.x_avg = (1.0-self.smoothing)*x + self.smoothing*self.x_avg
         
