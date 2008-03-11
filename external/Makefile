@@ -30,7 +30,7 @@ blt: ${BLT}.tar.gz
 	touch blt
 
 blt-clean:
-	rm -rf  ${BLT}
+	rm -rf ${BLT}
 blt-uninstall:
 	rm -rf blt ${foreach f,${BLT_UNINSTALL}, ${PREFIX}/${f}}
 
@@ -69,7 +69,7 @@ endif
 	touch python
 
 python-clean: blt-clean
-	rm -rf  ${PYTHON} Python-2.4*/
+	rm -rf ${PYTHON} Python-2.4*/
 
 python-uninstall: blt-uninstall
 	rm -rf python ${foreach f,${PYTHON_UNINSTALL}, ${PREFIX}/${f}} Python-2.4*/
@@ -89,7 +89,7 @@ tcl: ${TCL}-src.tar.gz
 	touch tcl
 
 tcl-clean:
-	rm -rf  ${TCL} tcl8*/
+	rm -rf ${TCL} tcl8*/
 tcl-uninstall:
 	rm -rf tcl ${foreach f,${TCL_UNINSTALL}, ${PREFIX}/${f}} tcl8*/
 
@@ -110,7 +110,7 @@ tk: ${TK}-src.tar.gz tcl
 	touch tk
 
 tk-clean:
-	rm -rf  ${TK} tk8*/
+	rm -rf ${TK} tk8*/
 tk-uninstall:
 	rm -rf tk ${foreach f,${TK_UNINSTALL}, ${PREFIX}/${f}} tk8*/
 
@@ -468,7 +468,7 @@ libsndfile: ${LIBSNDFILE}.tar.gz
 	touch libsndfile
 
 libsndfile-clean:
-	rm -rf  ${LIBSNDFILE} 
+	rm -rf ${LIBSNDFILE} 
 libsndfile-uninstall:
 	rm -rf libsndfile ${foreach f,${LIBSNDFILE_UNINSTALL}, ${PREFIX}/${f}}
 
@@ -528,7 +528,7 @@ tile: ${TILE}.tar.gz tk
 	touch tile
 
 tile-clean:
-	rm -rf  ${TILE} tile-*/
+	rm -rf ${TILE} tile-*/
 tile-uninstall:
 	rm -rf tile ${foreach f,${TILE_UNINSTALL}, ${PREFIX}/${f}} tile-*/
 
@@ -548,7 +548,7 @@ tilewrapper: ${TILEWRAPPER}.py.gz tile
 	touch tilewrapper
 
 tilewrapper-clean:
-	rm -rf  ${TILEWRAPPER}.py 
+	rm -rf ${TILEWRAPPER}.py 
 tilewrapper-uninstall:
 	rm -rf tilewrapper ${foreach f,${TILEWRAPPER_UNINSTALL}, ${PREFIX}/${f}}
 
@@ -568,7 +568,7 @@ bwidget: ${BWIDGET}.tar.gz python
 	touch bwidget
 
 bwidget-clean:
-	rm -rf  ${BWIDGET} 
+	rm -rf ${BWIDGET} 
 bwidget-uninstall:
 	rm -rf bwidget ${foreach f,${BWIDGET_UNINSTALL}, ${PREFIX}/${f}}
 
@@ -587,7 +587,7 @@ psyco: ${PSYCO}-svn42201.tar.gz python
 	touch psyco
 
 psyco-clean:
-	rm -rf  ${PSYCO} 
+	rm -rf ${PSYCO} 
 psyco-uninstall:
 	rm -rf psyco ${foreach f,${PSYCO_UNINSTALL}, ${PREFIX}/${f}}
 
