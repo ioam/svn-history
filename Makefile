@@ -215,7 +215,7 @@ detailed-gui-tests:
 
 
 clean-pyc:
-	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc examples/*.pyc
+	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc examples/*.pyc ~/.python2*_compiled/
 
 clean-doc:
 	make -C doc clean
