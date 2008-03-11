@@ -151,7 +151,7 @@ class SharedWeightCFProjection(CFProjection):
     def learn(self):
         """
         Because of how output functions are applied, it is not currently
-        possible to use learning functions and output functions for
+        possible to use learning functions and learning output functions for
         SharedWeightCFProjections, so we disable them here.
         """
         pass
@@ -160,7 +160,7 @@ class SharedWeightCFProjection(CFProjection):
     def apply_learn_output_fn(self,mask):
         """
         Because of how output functions are applied, it is not currently
-        possible to use learning functions and output functions for
+        possible to use learning functions and learning output functions for
         SharedWeightCFProjections, so we disable them here.
         """
         pass
