@@ -7,9 +7,9 @@ all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
 
 dist: bluesphere
 
-clean: python-clean jpeg-clean pil-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean tile-clean tilewrapper-clean bwidget-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean
+clean: python-clean jpeg-clean pil-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean tile-clean tilewrapper-clean bwidget-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean tile-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall tile-uninstall
 
 
 
@@ -68,10 +68,11 @@ endif
 	cd ${PYTHON}; env PREFIX=${PREFIX} make install
 	touch python
 
-python-clean:
-	rm -rf  ${PYTHON} 
-python-uninstall:
-	rm -rf python ${foreach f,${PYTHON_UNINSTALL}, ${PREFIX}/${f}}
+python-clean: blt-clean
+	rm -rf  ${PYTHON} Python-2.4*/
+
+python-uninstall: blt-uninstall
+	rm -rf python ${foreach f,${PYTHON_UNINSTALL}, ${PREFIX}/${f}} Python-2.4*/
 
 ##############################################################
 # Tcl (required by Tk GUI toolkit)
@@ -88,9 +89,9 @@ tcl: ${TCL}-src.tar.gz
 	touch tcl
 
 tcl-clean:
-	rm -rf  ${TCL} 
+	rm -rf  ${TCL} tcl8*/
 tcl-uninstall:
-	rm -rf tcl ${foreach f,${TCL_UNINSTALL}, ${PREFIX}/${f}}
+	rm -rf tcl ${foreach f,${TCL_UNINSTALL}, ${PREFIX}/${f}} tcl8*/
 
 
 
@@ -109,9 +110,9 @@ tk: ${TK}-src.tar.gz tcl
 	touch tk
 
 tk-clean:
-	rm -rf  ${TK} 
+	rm -rf  ${TK} tk8*/
 tk-uninstall:
-	rm -rf tk ${foreach f,${TK_UNINSTALL}, ${PREFIX}/${f}}
+	rm -rf tk ${foreach f,${TK_UNINSTALL}, ${PREFIX}/${f}} tk8*/
 
 
 
@@ -232,9 +233,9 @@ matplotlib: ${MATPLOTLIB}.tar.gz python
 	touch matplotlib
 
 matplotlib-clean:
-	rm -rf ${MATPLOTLIB} 
+	rm -rf ${MATPLOTLIB} matplotlib-0.90*/
 matplotlib-uninstall:
-	rm -rf matplotlib ${MATPLOTLIB} $(foreach f, ${MATPLOTLIB_UNINSTALL}, ${PREFIX}/${f})
+	rm -rf matplotlib ${MATPLOTLIB} $(foreach f, ${MATPLOTLIB_UNINSTALL}, ${PREFIX}/${f}) matplotlib-0.90*/
 
 
 ##############################################################
@@ -271,9 +272,9 @@ weave: ${WEAVE}.tar.gz python
 	touch weave
 
 weave-clean:
-	rm -rf ${WEAVE} 
+	rm -rf ${WEAVE} weave-3852
 weave-uninstall:
-	rm -rf weave ${WEAVE} $(foreach f, ${WEAVE_UNINSTALL}, ${PREFIX}/${f})
+	rm -rf weave ${WEAVE} $(foreach f, ${WEAVE_UNINSTALL}, ${PREFIX}/${f}) weave-3852
 
 
 
@@ -370,9 +371,9 @@ astng: ${ASTNG}.tar.gz python
 	touch astng
 
 astng-clean:
-	rm -rf ${ASTNG} 
+	rm -rf ${ASTNG} logilab-astng-0.*/
 astng-uninstall:
-	rm -rf astng ${ASTNG} $(foreach f, ${ASTNG_UNINSTALL}, ${PREFIX}/${f})
+	rm -rf astng ${ASTNG} $(foreach f, ${ASTNG_UNINSTALL}, ${PREFIX}/${f}) logilab-astng-0.*/
 
 
 
@@ -387,10 +388,10 @@ pylint: ${PYLINT}.tar.gz python common astng
 	cd ${PYLINT}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch pylint
 
-pylint-clean:
-	rm -rf ${PYLINT} 
-pylint-uninstall:
-	rm -rf pylint ${PYLINT} $(foreach f, ${PYLINT_UNINSTALL}, ${PREFIX}/${f})
+pylint-clean: astng-clean common-clean
+	rm -rf ${PYLINT} pylint-0.*/
+pylint-uninstall: astng-uninstall common-uninstall
+	rm -rf pylint ${PYLINT} $(foreach f, ${PYLINT_UNINSTALL}, ${PREFIX}/${f}) pylint-0.*/
 
 
 
@@ -527,9 +528,9 @@ tile: ${TILE}.tar.gz tk
 	touch tile
 
 tile-clean:
-	rm -rf  ${TILE} 
+	rm -rf  ${TILE} tile-*/
 tile-uninstall:
-	rm -rf tile ${foreach f,${TILE_UNINSTALL}, ${PREFIX}/${f}}
+	rm -rf tile ${foreach f,${TILE_UNINSTALL}, ${PREFIX}/${f}} tile-*/
 
 
 ##############################################################
