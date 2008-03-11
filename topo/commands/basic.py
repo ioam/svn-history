@@ -251,6 +251,17 @@ def default_analysis_function():
     for pg in default_analysis_plotgroups:
         save_plotgroup(pg)
 
+    # Save at least one projection plot
+    if measured_sheets: 
+        save_plotgroup("Projection",projection=measured_sheets[0].in_connections[0])
+
+    # Test response to a standardized pattern
+    from topo.patterns.basic import Gaussian
+    from math import pi
+    pattern_present(inputs={"Retina":Gaussian(orientation=pi/4,aspect_ratio=4.7)})
+    save_plotgroup("Activity",saver_params={"filename_suffix":"_45d"})
+
+
 # JAB: Should also have some sort of time scaling, so that sims with
 # different lengths don't need an entirely new set of analysis times.
 # Should encode the cvs state somehow in the output directory, in a
