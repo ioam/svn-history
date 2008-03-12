@@ -110,6 +110,29 @@ class PipelineOF(OutputFn):
                 of.restore_plasticity_state()
 
 
+    # We don't use norm_value ourselves, so if someone asks for it,
+    # return an underlying value from self.output_fns.  Only in the
+    # case where a single underlying OF defines norm_value is that
+    # meaningful to do, so we ensure that we only return something in
+    # that specific case.
+    def __get_norm_value(self):
+        found=False
+        for of in self.output_fns:
+            if of.norm_value is not None:
+                if found==True:
+                    raise ValueError("At most one OF in a PipelineOF may define norm_value")
+                val=of.norm_value
+                found=True
+        if found: return val
+        raise ValueError("None of the OFs in the PipelineOF have defined norm_value")
+
+    def __set_norm_value(self,norm_value):
+        raise ValueError("Set the norm_value on one of the individual output_fns instead.")
+
+    norm_value = property(__get_norm_value,__set_norm_value)
+
+
+
 class LearningFn(ParameterizedObject):
     """
     Abstract base class for learning functions that plug into
