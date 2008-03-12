@@ -553,7 +553,8 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
     VT=AttributeTrackingOF(function=HE, debug_params=['a', 'b',], units=[(0,0),(1,1)], step=1)
     plot_tracked_attributes(VT,0,10000,debug_params=['a'],units=[(0,0)], filename='V1')
     """
-    
+    raw = params.get('raw', False)
+
     for p in params.get('attrib_names',output_fn.attrib_names):
         pylab.figure(figsize=(6,4))
         isint=pylab.isinteractive()
@@ -566,8 +567,10 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
         for unit in params.get('units',output_fn.units):
             y_data=[y for (x,y) in output_fn.values[p][unit]]
             x_data=[x for (x,y) in output_fn.values[p][unit]]
-            #save(normalize_path("Filename+p+str(unit[0])+"_"+str(unit[1]),plot_data,fmt='%.6f', delimiter=','))
-            # uncomment if you also want to save the raw data
+            if raw==True:
+                plot_data=zip(x_data,y_data)
+                save(normalize_path(filename+p+str(unit[0])+"_"+str(unit[1])),plot_data,fmt='%.6f', delimiter=',')
+            
             
             pylab.plot(x_data,y_data, label='Unit'+str(unit))
             (ymin,ymax)=params.get('ybounds',(None,None))
@@ -575,7 +578,6 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
                 
         if isint: pylab.ion()
         pylab.legend(loc=0)
-
         generate_figure(title=topo.sim.name+': '+p,filename=filename,suffix=p)
 
 
