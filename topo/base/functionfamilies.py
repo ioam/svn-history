@@ -91,29 +91,23 @@ class PipelineOF(OutputFn):
         assert isinstance(of,OutputFn), "OutputFns can only be added to other OutputFns"
         return PipelineOF(output_fns=self.output_fns+[of])
 
-    def __getattribute__(self,name):
-        # Return attribute 'name' from this object, if one exists.
-        # Otherwise, calls 'name' on each nested OF that has the
-        # attribute 'name'.  If any OF has a non-callable attribute
-        # 'name', an error is raised.
-        try:
-            return super(PipelineOF,self).__getattribute__(name)
-        except AttributeError:
-            def call_name_for_all_ofs(*args,**kw):
-                for of in self.output_fns:
-                    # to instead ignore OFs that have the attribute but
-                    # it's not callable:
-                    #  if hasattr(of,name) and callable(of.name):
-                    #      getattr(of,name)(*args,**kw)
-                    if hasattr(of,name):
-                        mthd=getattr(of,name)
-                        try:
-                            mthd(*args,**kw)
-                        except TypeError:
-                            raise TypeError("%s's attribute '%s' is not callable."%(of,name))
-                            
-            return call_name_for_all_ofs
+    def override_plasticity_state(self, new_plasticity_state):
+        """
+        Calls override_plasticity_state on every output_fn
+        in the list that defines that method.
+        """
+        for of in self.output_fns:
+            if hasattr(of,"override_plasticity_state"):
+                of.override_plasticity_state(new_plasticity_state)
 
+    def restore_plasticity_state(self):
+        """
+        Calls restore_plasticity_state on every output_fn
+        in the list that defines that method.
+        """
+        for of in self.output_fns:
+            if hasattr(of,"restore_plasticity_state"):
+                of.restore_plasticity_state()
 
 
 class LearningFn(ParameterizedObject):
