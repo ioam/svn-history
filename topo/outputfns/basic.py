@@ -33,6 +33,7 @@ from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGenerator,Constant
 from topo.base.boundingregion import BoundingBox
 from topo.patterns.basic import Gaussian
+from topo.base.sheetcoords import SheetCoordinateSystem
 
 # Imported here so that all OutputFns will be in the same package
 from topo.base.functionfamilies import IdentityOF,PipelineOF
@@ -498,8 +499,8 @@ class AttributeTrackingOF(OutputFnWithState):
 
     The results are stored in a dictionary named 'values', as (time,
     value) pairs indexed by the parameter name and unit.  For
-    instance, if the value of attribute 'x' is v for unit (0,0)
-    at time t, values['x'][(0,0)]=(t,v).
+    instance, if the value of attribute 'x' is v for unit (0.0,0.0)
+    at time t, values['x'][(0.0,0.0)]=(t,v).
 
     Updating of the tracked values can be disabled temporarily using
     the plastic parameter.
@@ -518,12 +519,13 @@ class AttributeTrackingOF(OutputFnWithState):
         owns it, without causing problems for recursive traversal (as for
         script_repr()).""")
     # There may be some way to achieve the above without using eval(), which would be better.
+    #JLALERT When using this function snapshots cannot be saved because of problem with eval()
     
     attrib_names = ListParameter(default=[], doc="""
         List of names of the function object's parameters that should be stored.""")
     
-    units = ListParameter(default=[(0,0)], doc="""
-        Matrix coordinates of the unit(s) for which parameter values will be stored.""")
+    units = ListParameter(default=[(0.0,0.0)], doc="""
+        Sheet coordinates of the unit(s) for which parameter values will be stored.""")
     
     step = Number(default=1, doc="""
         How often to update the tracked values.
@@ -531,16 +533,26 @@ class AttributeTrackingOF(OutputFnWithState):
         For instance, step=1 means to update them every time this OF is
         called; step=2 means to update them every other time.""")
 
+    coordframe = Parameter(default=None,doc="""
+        The SheetCoordinateSystem to use to convert the position
+        into matrix coordinates. If this parameter's value is a string,
+        it will be evaluated first(by calling Python's eval() function).
+        This feature is designed to allow circular references,
+        so that the OF can track the object that
+        owns it, without causing problems for recursive traversal (as for
+        script_repr()).""")
 
     def __init__(self,**params):
         super(AttributeTrackingOF,self).__init__(**params)
         self.values={}
         self.n_step = 0
         self._object=None
+        self._coordframe=None
         for p in self.attrib_names:
             self.values[p]={}
             for u in self.units:
                 self.values[p][u]=[]
+                
          
         
     def __call__(self,x):
@@ -551,7 +563,16 @@ class AttributeTrackingOF(OutputFnWithState):
 	    else:
 		self._object=self.object
             
-	    #collect values on each appropriate step
+        if self._coordframe == None:
+            if isinstance(self._object,SheetCoordinateSystem):
+                self._coordframe=self._object
+            elif isinstance(self.coordframe,str):
+                self._coordframe=eval(self.coordframe)
+            else:
+                raise ValueError("A coordinate frame (e.g. coordframe=topo.sim['V1']) must be specified in order to track"+str(self._object))
+                
+
+        #collect values on each appropriate step
 	self.n_step += 1
         
 	if self.n_step == self.step:
@@ -564,7 +585,8 @@ class AttributeTrackingOF(OutputFnWithState):
                         value_matrix= getattr(self._object, p)
                         
 		    for u in self.units:
-                        self.values[p][u].append((topo.sim.time(),value_matrix[u]))
+                        mat_u=self._coordframe.sheet2matrixidx(u[0],u[1])
+                        self.values[p][u].append((topo.sim.time(),value_matrix[mat_u]))
           
 
 
@@ -611,54 +633,6 @@ class ActivityAveragingOF(OutputFnWithState):
 	    if self.plastic:
 		self.x_avg = (1.0-self.smoothing)*x + self.smoothing*self.x_avg
 
-class ResponseAveragingOF(OutputFnWithState):
-    """
-    Calculates the average of the responses to an input.
-    Keeps a running average of the activity value of non zero activites for each unit.
-    """
-
-    step = Number(default=9, doc="""
-        How often to update the average.
-
-        For instance, step=1 means to update it every time this OF is
-        called; step=2 means to update it every other time.""")
-    
-    def __init__(self,**params):
-        super(ResponseAveragingOF,self).__init__(**params)
-        self.n_step = 0
-        self.r_count=None
-	self.r_sum=None
-	self.r_avg=None
-        
-    def __call__(self,x):
-       
-	if self.r_sum is None:
-	    self.r_sum=zeros(x.shape, activity_type)
-	if self.r_count is None:         
-	    self.r_count=zeros(x.shape, activity_type)
-	if self.r_avg is None:  
-	    self.r_avg=zeros(x.shape, activity_type)
-        
-        
-	rows,cols = x.shape
-        
-       	# Collect values on each appropriate step
-        if self.plastic:
-            self.n_step += 1
-            if self.n_step == self.step:
-                self.n_step = 0
-		for r in range(rows):
-		    for c in range(cols):
-			if(x[r,c] > 0.01):
-                            self.r_sum[r,c] += x[r,c]
-			    self.r_count[r,c] +=1
-                            self.r_avg[r,c] *=0.0
-			    self.r_avg[r,c] += self.r_sum[r,c]/self.r_count[r,c]
-                   
-
-                       
-
-
 
 class HomeostaticMaxEnt(OutputFnWithState):
     """
@@ -692,16 +666,17 @@ class HomeostaticMaxEnt(OutputFnWithState):
     smoothing = Number(default=0.9997, doc="""
         Weighting of previous activity vs. current activity when calculating the average.""")
 
-    step = Number(default=9, doc="""
+    step = Number(default=1, doc="""
         How often to update the a and b parameters.
 	For instance, step=1 means to update it every time this OF is
         called; step=2 means to update it every other time.""")
     
+
     def __init__(self,**params):
         super(HomeostaticMaxEnt,self).__init__(**params)
 	self.first_call = True
 	self.n_step=0
-        self.cutoff=0.0
+      
 
     def __call__(self,x):
         
@@ -716,8 +691,7 @@ class HomeostaticMaxEnt(OutputFnWithState):
        
         x *= 0.0
 	x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
-	self.cutoff = 1.0 / (1.0 + exp(-self.b))
-	
+		
 
 	self.n_step += 1
 	if self.n_step == self.step:
