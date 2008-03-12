@@ -62,17 +62,20 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
 #V1 Output function
 output_fn_type=locals().get('output_fn_type','Homeostatic')
-shared_params = {"a_init":14.5, "b_init":-4, "mu":0.01, "smoothing":0.0003}
+shared_params = {"a_init":14.5, "b_init":-4, "mu":0.01, "smoothing":0.9997}
 
 if output_fn_type  == 'Homeostatic':
     topo.sim.name = "lissom_oo_or_noshrinking"
     output_fn = HomeostaticMaxEnt(eta=0.0002, **shared_params) 
 
 elif output_fn_type == "Homeostatic_debug":
-
+    #Sheet coordinates of units to track for debugging
+    units=[(0.0, 0.0),(0.25,0.25),(0.49,0.49),(-0.25,0.25),(-0.49,0.49),
+           (0.25,-0.25),(0.49,-0.49),(-0.25,-0.25),(-0.49,-0.49),
+           (0.0,0.25), (0.25,0.0), (0.0,-0.25), (-0.25,0.0)]
     topo.sim.name = "lissom_oo_or_noshrinking_debug"
     HE=HomeostaticMaxEnt(eta=0.0002, **shared_params )
-    TF=AttributeTrackingOF(function=HE, attrib_names=['a','b', 'y_avg'], units=[(0, 47), (12, 36),(24, 24), (36, 12),(47, 0)], step=1)
+    TF=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']", attrib_names=['a','b', 'y_avg'], units=units, step=1)
     output_fn=HE+TF
 
 
