@@ -316,7 +316,8 @@ class PatternCombine(OutputFn):
         #reasonably
         rows,cols = x.shape
         bb = BoundingBox(points=((0,0), (rows,cols)))
-        new_pattern = self.operator(x, self.generator(bounds=bb,xdensity=1,ydensity=1))
+        generated_pattern = self.generator(bounds=bb,xdensity=1,ydensity=1).transpose()
+        new_pattern = self.operator(x, generated_pattern)
         x *= 0.0
         x += new_pattern
 
