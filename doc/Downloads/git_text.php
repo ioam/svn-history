@@ -303,6 +303,8 @@ git rebase some-feature-name master  # fast-forwards master to include some-feat
 git svn dcommit             
 </pre>
 
+(I could instead just git svn dcommit from the branch instead.)
+
 Of course you are free instead to use <code>git merge</code>; the
 approach here always moves your branch changes onto the end of the
 updated SVN history. That makes most sense to me.
