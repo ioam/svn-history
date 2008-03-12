@@ -564,7 +564,9 @@ class AttributeTrackingOF(OutputFnWithState):
 		self._object=self.object
             
         if self._coordframe == None:
-            if isinstance(self._object,SheetCoordinateSystem):
+            if isinstance(self.coordframe,str) and isinstance(self._object,SheetCoordinateSystem):
+                raise ValueError(str(self._object)+"is already a coordframe, no need to specify coordframe")
+            elif isinstance(self._object,SheetCoordinateSystem):
                 self._coordframe=self._object
             elif isinstance(self.coordframe,str):
                 self._coordframe=eval(self.coordframe)
@@ -679,7 +681,8 @@ class HomeostaticMaxEnt(OutputFnWithState):
       
 
     def __call__(self,x):
-        
+
+      
 	if self.first_call:
 	    self.first_call = False
 	    self.a = ones(x.shape, x.dtype.char) * self.a_init
