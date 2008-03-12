@@ -21,9 +21,10 @@ $Id$
 
 __version__ = '$Revision$'
 
-from numpy import abs,array,zeros,where
+from numpy import abs,array,zeros,where, ones
 from numpy.oldnumeric import Float,Float32
 from copy import copy
+
 
 import patterngenerator
 from patterngenerator import PatternGenerator
@@ -432,7 +433,7 @@ class CFPLF_PluginScaled(CFPLearningFn):
         """Apply the specified single_cf_fn to every CF."""
        
         if self.learning_rate_scaling_factor is None:
-            self.learning_rate_scaling_factor = ones(input_activity.shape)
+            self.learning_rate_scaling_factor = ones(output_activity.shape)
             
         single_cf_fn = self.single_cf_fn
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
@@ -521,6 +522,7 @@ class CFProjection(Projection):
     activate(self,input_activity) that computes the response from the
     input and stores it in the activity array.
     """
+
     response_fn = ClassSelectorParameter(CFPResponseFn,
         default=CFPRF_Plugin(),
         doc='Function for computing the Projection response to an input pattern.')
