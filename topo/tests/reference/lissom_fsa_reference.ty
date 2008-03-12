@@ -283,7 +283,7 @@ topo.sim.connect('LGNOff','FSA',delay=FixedPoint("0.05"),
           nominal_bounds_template=afferent_weight_bounds, learning_rate = alpha_input * n_aff_units)
 
 # Temporarily moved here to avoid masking the LGN weights until we can do it in a way that doesn't change the sum of the weights
-CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
 
 topo.sim.connect('FSA','FSA',delay=FixedPoint("0.05"),
           connection_type=CFProjection,strength=gammaexc,name='LateralExcitatory',
