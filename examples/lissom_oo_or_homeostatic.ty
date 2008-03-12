@@ -242,7 +242,7 @@ if tracking==True:
 # Specify weight initialization, response function, and learning function
 numpy.random.seed((rand_weights,rand_weights))
 
-CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
@@ -320,7 +320,6 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 
 topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,
-                 output_fn=LGNOn_OF,
                  learning_fn=CFPLF_PluginScaled(),
                  strength=lgn_strength,name='LGNOnAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
@@ -329,7 +328,6 @@ topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','J
                		 
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
 		 connection_type=CFProjection,
-                 output_fn=LGNOff_OF,
                  learning_fn=CFPLF_PluginScaled(),
                  strength=lgn_strength,name='LGNOffAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
@@ -346,7 +344,6 @@ if lat_scaling==True:
                      target=1.0*locals().get('exc_tar',0.01),
                      target_lr=1.0*locals().get('exc_tar',0.01),
                      learning_fn=CFPLF_PluginScaled(),
-                     output_fn=LatEx_OF,
                      strength=1.0,
                      weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
                      nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0.0) 
@@ -357,7 +354,6 @@ if lat_scaling==True:
                      target=-1.0*locals().get('inh_tar',0.01),
                      target_lr=-1.0*locals().get('inh_tar',0.01),
                      learning_fn=CFPLF_PluginScaled(),
-                     output_fn=LatIn_OF,
                      strength=-1.0*locals().get('inh_strength',1.0),
                      weights_generator=gauss_rand(size=2*0.22917),
                      nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=locals().get('lat_lr',1.80873))
@@ -365,20 +361,23 @@ if lat_scaling==True:
 else:
     topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                      connection_type=CFProjection,
-                     output_fn=LatEx_OF,
                      strength=1.0*locals().get('exc_strength',1.0),
                      weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
                      nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0.0) 
 
     topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                      connection_type=CFProjection,
-                     output_fn=LatIn_OF,
                      strength=-1.0*locals().get('inh_strength',1.0),
                      weights_generator=gauss_rand(size=2*0.22917),
                      nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=locals().get('lat_lr',1.80873))
 
 
-
+#Output functions for tracking
+if tracking==True:
+    topo.sim["V1"].projections()["LGNOnAfferent"].output_fn=LGNOn_OF
+    topo.sim["V1"].projections()["LGNOffAfferent"].output_fn=LGNOff_OF
+    topo.sim["V1"].projections()["LateralExcitatory"].output_fn=LatEx_OF
+    topo.sim["V1"].projections()["LateralInhibitory"].output_fn=LatIn_OF
 
 
 # default locations for model editor
