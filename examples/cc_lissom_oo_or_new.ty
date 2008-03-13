@@ -118,7 +118,11 @@ topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals
 
 topo.sim['V1SimpleInh'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',120.0),
                         nominal_bounds=BoundingBox(radius=core_size),
-                        output_fn=Sigmoid(r=locals().get('r_init',20.5),k=locals().get('k_init',-3.5)))
+                        output_fn=Sigmoid(r=locals().get('r_init',30.5),k=locals().get('k_init',-4.5)))
+
+#topo.sim['V1SimpleInh2'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',120.0),
+#                       nominal_bounds=BoundingBox(radius=core_size),
+#                        output_fn=Sigmoid(r=locals().get('r_init',30.5),k=locals().get('k_init',-3.5)))
 
                         
 topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',120.0),
@@ -178,42 +182,54 @@ topo.sim.connect('LGNOff','V1Simple',delay=FixedPoint("0.05"),dest_port=('Activi
                                ExponentialDecay(starting_value = locals().get('S_lr',5.0),
                                                 time_constant=locals().get('S_tc',9600)))))
 
-#topo.sim.connect('V1Simple','V1Simple',delay=FixedPoint("0.05"),name='SLateralInh',
-#                 connection_type=CFProjection,strength=-locals().get('SLatStr',0.0),
-#                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=locals().get('SLatSize',10.1)),
-#                 nominal_bounds_template=BoundingBox(radius=locals().get('SLatSize',0.1)),learning_rate=0) 
-
 #V1 Complex
 
 
 topo.sim.connect('V1SimpleInh','V1Simple',delay=FixedPoint("0.01"),
                  connection_type=CFProjection,strength=-1.0,name='V1SimpleInhAfferent',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=18),
-                 nominal_bounds_template=BoundingBox(radius=locals().get('FExcSize',0.001)/2),
+                 nominal_bounds_template=BoundingBox(radius=locals().get('FExcSize',0.0001)/2),
                  learning_rate=0)
+
+topo.sim.connect('V1Complex','V1SimpleInh',delay=FixedPoint("0.01"),
+                 connection_type=CFProjection,strength=locals().get('FStrInh',1.0),name='V1SimpleFeedbackInh',
+                 weights_generator=Gaussian(aspect_ratio=1.0, size=18),
+                 nominal_bounds_template=BoundingBox(radius=locals().get('FInhSize',0.2)/2),learning_rate=0)
+
+topo.sim.connect('V1Complex','V1SimpleInh',delay=FixedPoint("0.01"),
+                 connection_type=CFProjection,strength=-locals().get('FStrInh',1.0),name='V1SimpleFeedbackInh1',
+                 weights_generator=Gaussian(aspect_ratio=1.0, size=18),
+                 nominal_bounds_template=BoundingBox(radius=locals().get('FInhSize',0.00001)/2),learning_rate=0)
+
+
+#topo.sim.connect('V1SimpleInh1','V1SimpleInh',delay=FixedPoint("0.01"),
+#                 connection_type=CFProjection,strength=-1.0,name='V1SimpleInhAfferent',
+#                 weights_generator=Gaussian(aspect_ratio=1.0, size=18),
+#                 nominal_bounds_template=BoundingBox(radius=locals().get('FExcSize',0.0001)/2),
+#                 learning_rate=0)
+
+#topo.sim.connect('V1Complex','V1SimpleInh1',delay=FixedPoint("0.01"),
+#                 connection_type=CFProjection,strength=-locals().get('FStrInh',1.0),name='V1SimpleFeedbackInh',
+#                 weights_generator=Gaussian(aspect_ratio=1.0, size=18),
+#                 nominal_bounds_template=BoundingBox(radius=locals().get('FInhSize',0.0001)/2),learning_rate=0)
+
+
+#topo.sim.connect('V1Complex','V1Simple',delay=FixedPoint("0.02"),
+#                 connection_type=CFProjection,strength=locals().get('FStrExc',0.28),name='V1SimpleFeedbackExc1',
+#                 weights_generator=Gaussian(aspect_ratio=1.0, size=18),
+#                 nominal_bounds_template=BoundingBox(radius=locals().get('FExcSize',0.005)/2),
+#                 learning_rate=0)
 
 topo.sim.connect('V1Simple','V1Complex',delay=FixedPoint("0.04"),
                  connection_type=CFProjection,strength=locals().get('StoCStr',1.0),name='V1SimpleAfferent',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=locals().get('StoCSize',0.2)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('StoCSize',0.2)/2),
                  learning_rate=0)
-                
-topo.sim.connect('V1Complex','V1Simple',delay=FixedPoint("0.02"),
-                 connection_type=CFProjection,strength=locals().get('FStrExc',0.28),name='V1SimpleFeedbackExc1',
-                 weights_generator=Gaussian(aspect_ratio=1.0, size=18),
-                 nominal_bounds_template=BoundingBox(radius=locals().get('FExcSize',0.005)/2),
-                 learning_rate=0)
-
-topo.sim.connect('V1Complex','V1SimpleInh',delay=FixedPoint("0.01"),
-                 connection_type=CFProjection,strength=locals().get('FStrInh',1.0),name='V1SimpleFeedbackInh',
-                 weights_generator=Gaussian(aspect_ratio=1.0, size=2.5),
-                 nominal_bounds_template=BoundingBox(radius=locals().get('FInhSize',0.5)/2),learning_rate=0)
-
 
 topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.04"),name='LateralExcitatory',
                  connection_type=CFProjection,strength=locals().get('CxLatExcStr',0.7),
                  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatExcSize',0.04)),
-                 nominal_bounds_template=BoundingBox(radius=locals().get('CxLatExcBB',0.12)),
+                 nominal_bounds_template=BoundingBox(radius=locals().get('CxLatExcBB',0.03)),
                  learning_rate=0.0)
 
 topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.04"),name='LateralInhibitory',
