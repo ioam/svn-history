@@ -47,7 +47,7 @@ from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
-from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt, CFPOF_DivisiveNormalizeL1
+from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
@@ -74,8 +74,7 @@ CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
-#CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
-CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1(single_cf_fn = DivisiveNormalizeL1(norm_value=1.0))
+CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
 
