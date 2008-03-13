@@ -545,7 +545,6 @@ def plotrctg():
         pylab.show()
 
 
-# JABALERT: Should be using generate_figure() as in matrixplot().
 def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **params):
     """
     Plots parameter values associated with an AttributeTrackingOF.
