@@ -22,6 +22,8 @@ from topo.base.parameterizedobject import Parameter
 from topo.base.parameterclasses import Number,Enumeration,ListParameter,BooleanParameter
 from topo.base.functionfamilies import CoordinateMapperFn, IdentityMF
 from topo.misc.utils import signabs
+from topo.misc.numbergenerators import UniformRandom
+
 
 ##########################################################################
 # coordinate mapper functions
