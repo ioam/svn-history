@@ -5,6 +5,8 @@ $Id$
 """
 __version__='$Revision$'
 
+import numpy
+
 import numpy.oldnumeric.random_array as RandomArray
 
 from topo.base.parameterizedobject import ParamOverrides
@@ -74,4 +76,19 @@ class GaussianRandom(RandomGenerator):
 
     def _distrib(self,shape,params):
         return params['offset']+params['scale']*RandomArray.standard_normal(shape)
+
+
+class PoissonRandom(RandomGenerator):
+    """
+    2D Poisson random noise pattern generator.
+
+    Each pixel is chosen independently from a Poisson distribution
+    with the given lambda.
+    """
+    # JABALERT: Is this useful?
+
+    lam = Number(default=0.5,softbounds=(0.0,2.0),doc="""Poisson lambda parameter""")
+
+    def _distrib(self,shape,params):
+        return params['offset']+params['scale']*numpy.random.poisson(lam=self.lam,size=shape)
 

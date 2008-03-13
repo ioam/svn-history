@@ -57,7 +57,21 @@ class Pipeline(CoordinateMapperFn):
     def __call__(self,x,y):
         return reduce( lambda args,f: apply(f,args),
                        [(x,y)] + self.mappers )
-    
+
+
+class Jitter(CoordinateMapperFn):
+    """
+    Additively modifies calculated x,y coordinates, e.g. with random noise.
+    """
+
+    scale = Parameter(default=0.0,doc="Amount of jitter.")
+
+    gen = Parameter(default=UniformRandom(),doc=
+        "Number generator to use, typically a random distribution.")
+
+    def __call__(self,x,y):
+        return x+(self.gen()-0.5)*self.scale,y+(self.gen()-0.5)*self.scale
+
 
 class Grid(CoordinateMapperFn):
     """
