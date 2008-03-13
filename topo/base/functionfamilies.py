@@ -124,7 +124,7 @@ class PipelineOF(OutputFn):
                 val=of.norm_value
                 found=True
         if found: return val
-        raise ValueError("None of the OFs in the PipelineOF have defined norm_value")
+        return None
 
     def __set_norm_value(self,norm_value):
         raise ValueError("Set the norm_value on one of the individual output_fns instead.")
