@@ -1248,7 +1248,7 @@ gaussian_corner = topo.patterns.basic.Composite(operator = maximum,
 
 
 pg=  create_plotgroup(name='Corner OR Preference',category="Preference Maps",
-             doc='Measure orientation prefference for corner stimuly [or generally any more complex stimuly that cannot be represented as fullfield pattern].',
+             doc='Measure orientation preference for corner shape (or other complex stimuli that cannot be represented as fullfield patterns).',
              update_command='measure_corner_or_pref(); topographic_grid()',
              normalize=True)
 pg.add_plot('Corner Orientation Preference',[('Hue','OrientationPreference')])
@@ -1261,7 +1261,7 @@ def measure_corner_or_pref(divisions=20,num_orientation=8,scale=1.0,offset=0.0,d
                            pattern_presenter=PatternPresenter(gaussian_corner,apply_output_fn=True,duration=1.0),
                           x_range=(-1.4,1.4),y_range=(-1.4,1.4),weighted_average=True):
     """
-    Measure position preference map, using a corner formed by two gaussians by default.
+    Measure orientation preference map, using a corner formed by two gaussians by default.
 
     Measures maps by collating the responses to a set of input
     patterns controlled by some parameters.  The parameter ranges and
@@ -1283,4 +1283,3 @@ def measure_corner_or_pref(divisions=20,num_orientation=8,scale=1.0,offset=0.0,d
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
-	
