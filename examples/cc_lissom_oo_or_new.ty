@@ -70,7 +70,7 @@ class Jitter(CoordinateMapperFn):
         return x+(self.rand()-0.5)*self.scale,y+(self.rand()-0.5)*self.scale
 
 jitterOn = Jitter(rand =UniformRandom(seed=1023))
-jitterOff = Jitter(rand =UniformRandom(seed=1023))
+jitterOff = Jitter(rand =UniformRandom(seed=513))
 
 # Specify weight initialization, response function, and learning function
 numpy.random.seed((500,500))
@@ -129,10 +129,6 @@ topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=local
                         nominal_bounds=BoundingBox(radius=core_size),
                         output_fn=output_fn_C)
 
-print topo.sim['V1Simple'].mask
-#topo.sim['V1Simple'].mask = NeighborhoodMask_Opt(threshold = 0.00001,radius = 0.15,sheet = topo.sim['V1Simple'])
-#topo.sim['V1Complex'].mask = NeighborhoodMask_Opt(threshold = 0.00001,radius = 0.15,sheet = topo.sim['V1Complex'])
-
 
 # DoG weights for the LGN
 #centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
@@ -162,7 +158,7 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 topo.sim.connect('LGNOn','V1Simple',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=locals().get('LGNStr',5.5),name='LGNOnAfferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                     generators=[Gaussian(aspect_ratio=1.0, size=UniformRandom(lbound=1.4,ubound=1.4,seed=56))
+                     generators=[Gaussian(aspect_ratio=1.0, size=UniformRandom(lbound=0.1,ubound=0.1,seed=56))
                  ,topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
                  coord_mapper=jitterOn,
@@ -174,7 +170,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=FixedPoint("0.05"),dest_port=('Activit
 topo.sim.connect('LGNOff','V1Simple',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=locals().get('LGNStr',5.5),name='LGNOffAfferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                     generators=[Gaussian(aspect_ratio=1.0,size=UniformRandom(lbound=1.4,ubound=1.4,seed=13))
+                     generators=[Gaussian(aspect_ratio=1.0,size=UniformRandom(lbound=0.1,ubound=0.1,seed=13))
                  ,topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
                  coord_mapper=jitterOff,
@@ -192,12 +188,12 @@ topo.sim.connect('V1SimpleInh','V1Simple',delay=FixedPoint("0.05"),
                  learning_rate=0)
 
 topo.sim.connect('V1Complex','V1SimpleInh',delay=FixedPoint("0.05"),
-                 connection_type=CFProjection,strength=locals().get('FStrInh',1.0),name='V1SimpleFeedbackInh',
+                 connection_type=CFProjection,strength=locals().get('FStrInh',4.0),name='V1SimpleFeedbackInh',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=18),
-                 nominal_bounds_template=BoundingBox(radius=locals().get('FInhSize',0.2)/2),learning_rate=0)
+                 nominal_bounds_template=BoundingBox(radius=locals().get('FInhSize',0.3)/2),learning_rate=0)
 
 topo.sim.connect('V1Complex','V1SimpleInh',delay=FixedPoint("0.05"),
-                 connection_type=CFProjection,strength=-locals().get('FStrInh',1.0),name='V1SimpleFeedbackInh1',
+                 connection_type=CFProjection,strength=-4.0,name='V1SimpleFeedbackInh1',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=18),
                  nominal_bounds_template=BoundingBox(radius=locals().get('FInhSize',0.00001)/2),learning_rate=0)
 
@@ -235,9 +231,9 @@ topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.05"),name='LateralE
 topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.05"),name='LateralInhibitory',
                  connection_type=CFProjection,strength=-locals().get('CxLatInhStr',0.3),
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                     generators=[Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',2*0.22917)),
+                     generators=[Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',3*0.22917)),
                                 topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.22917),
+                 nominal_bounds_template=BoundingBox(radius=0.32917),
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
                                ExponentialDecay(starting_value = locals().get('CtoC_lr',5.0),time_constant=locals().get('CtoC_tc',9600)))))
 
