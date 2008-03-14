@@ -18,13 +18,12 @@ The current script is set up as a debug version for plotting sheet and
 projection attributes throughout development.  If the statistics of
 the input (but not the contrast) are changed, then the afferent_target
 and the average V1 activity need to be changed in order to maintain
-similar responses in V1.
+similar responses in V1. To turn tracking off set tracking=False
 
 $Id$
 """
 __version__='$Revision$'
 
-#Currently cannot save snapshots when using tracking functions because of eval() - to turn tracking off set tracking=False
 import fixedpoint
 import numpy
 
@@ -390,12 +389,12 @@ topo.sim.grid_layout([[None,    'V1',     None],
 if type_input=="NoisyDiskstoNatural":
     new_afferent_target = locals().get('new_afferent_target',0.076)
     new_mu=locals().get('new_mu',new_afferent_target/5)
-    topo.sim.schedule_command(2500,'topo.sim["Retina"].set_input_generator(natural_combined_inputs,push_existing=False)')
-    topo.sim.schedule_command(2500,'topo.sim["V1"].target=new_afferent_target')
+    topo.sim.schedule_command(3500,'topo.sim["Retina"].set_input_generator(natural_combined_inputs,push_existing=False)')
+    topo.sim.schedule_command(3500,'topo.sim["V1"].target=new_afferent_target')
     if tracking==True:
-        topo.sim.schedule_command(2500,'topo.sim["V1"].output_fn.output_fns[1].mu=new_mu')
+        topo.sim.schedule_command(3500,'topo.sim["V1"].output_fn.output_fns[1].mu=new_mu')
     else:
-        topo.sim.schedule_command(2500,'topo.sim["V1"].output_fn.mu=new_mu')
+        topo.sim.schedule_command(3500,'topo.sim["V1"].output_fn.mu=new_mu')
 
 if type_input=="ChangeScale":
     topo.sim.schedule_command(5000,'topo.sim["Retina"].set_input_generator(new_combined_inputs,push_existing=False)')
