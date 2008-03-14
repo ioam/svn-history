@@ -285,6 +285,10 @@ LI.learning_rate=alpha_inh*n_units(LI)
 
 
 
+### NOTE: the weights comparisons will need to be improved when this
+### file supports variable densities, because C++ lissom doesn't
+### situate the weights.
+
 
 ### EXCITATORY BOUNDS CHANGES
 #
@@ -340,6 +344,11 @@ if locals().get('profiling',False):
     check_activities('Ganglia01')
     check_activities('Primary')
 
+    check_weights('Primary','Afferent00',(0,0),slice(1,14),slice(1,14))
+    check_weights('Primary','Afferent00',(23,23),slice(12,25),slice(12,25))
+    check_weights('Primary','Afferent01',(0,0),slice(1,14),slice(1,14))
+    check_weights('Primary','Afferent01',(23,23),slice(12,25),slice(12,25))
+
     print "[lissom_oo_or_reference.ty] run(%s) in %s s"%(iterations,t)
 
 elif locals().get('comparisons',False):
@@ -382,8 +391,6 @@ elif locals().get('comparisons',False):
     check_activities('Ganglia01')
     check_activities('Primary')
 
-    # add some checks for weights
-    
     topo.sim.run(1) # to 200
     check_activities('Eye0')
     check_activities('Ganglia00')
@@ -395,6 +402,14 @@ elif locals().get('comparisons',False):
     check_activities('Ganglia00')
     check_activities('Ganglia01')
     check_activities('Primary')
+
+
+    check_weights('Primary','Afferent00',(0,0),slice(1,14),slice(1,14))
+    check_weights('Primary','Afferent00',(23,23),slice(12,25),slice(12,25))
+    check_weights('Primary','Afferent01',(0,0),slice(1,14),slice(1,14))
+    check_weights('Primary','Afferent01',(23,23),slice(12,25),slice(12,25))
+
+
 
     topo.sim.run(500) # to 1000
     check_activities('Eye0')
@@ -451,10 +466,19 @@ elif locals().get('comparisons',False):
     check_activities('Primary')
 
 
+    check_weights('Primary','Afferent00',(0,0),slice(1,14),slice(1,14))
+    check_weights('Primary','Afferent00',(23,23),slice(12,25),slice(12,25))
+    check_weights('Primary','Afferent01',(0,0),slice(1,14),slice(1,14))
+    check_weights('Primary','Afferent01',(23,23),slice(12,25),slice(12,25))
+
+
+
 
 
 ### Command used to generate C++ LISSOM data for comparisons.
 #
 #
 
-#./lissom5 commandpath="/home/chris/mae/lissom/command/" display=0 oo_or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c "plot_unit region=Ganglia00 save_matrices=True 12 12" -c "plot_unit region=Ganglia01 save_matrices=True 0 0" -c "plot_unit region=Ganglia01 save_matrices=True 12 12" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+198' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'step' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+300' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+500' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+12000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'
+# is the commandpath necessary any more?
+# nice ./lissom5 commandpath="/home/chris/mae/lissom/command/" display=0 oo_or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c "plot_unit region=Ganglia00 save_matrices=True 12 12" -c "plot_unit region=Ganglia01 save_matrices=True 0 0" -c "plot_unit region=Ganglia01 save_matrices=True 12 12" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+198' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'step' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+300' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c "plot_unit region=Ganglia00 save_matrices=True 12 12" -c "plot_unit region=Ganglia01 save_matrices=True 0 0" -c "plot_unit region=Ganglia01 save_matrices=True 12 12" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c 'training t+500' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+12000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c "plot_unit region=Ganglia00 save_matrices=True 12 12" -c "plot_unit region=Ganglia01 save_matrices=True 0 0" -c "plot_unit region=Ganglia01 save_matrices=True 12 12" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' --interactive
+
