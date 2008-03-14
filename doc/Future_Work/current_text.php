@@ -156,9 +156,13 @@ changes to track with SVN or be tied to a specific SVN version?)
 
 <H4>CB: some tests to add</H4>
 (3) cleanup test_pattern_present (or wherever I tried to add test for
-not-run simulation before presenting patterns/saving generators)
+    not-run simulation before presenting patterns/saving generators)
 (3) test that fullfield x and y work
 (3) test for recent run() problem with float
+(8) gaps in c++ comparisons (lissom_oo_or_reference checked only at
+    density 48)
+(8) gaps in tests (no guarantee that code in/related to
+    connectionfield is valid at all densities (etc) ).
 
 
 <H4>2007/09/20: copying plotgroup from plotgroups</H4>
