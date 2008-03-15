@@ -69,9 +69,8 @@ def about(display=True):
     """Print release and licensing information."""
 
     ABOUT_TEXT = """
-Pre-release version """+release+ \
-""" of Topographica; an updated version may be
-available from topographica.org.
+Pre-release version %s (%s) of Topographica; an updated
+version may be available from topographica.org.
 
 Copyright 2005-2007 James A. Bednar, Jan Antolik, Christopher Ball,
 Yoonsuck Choe, Julien Ciroux, Judah B. De Paula, Foivos Demertzis,
@@ -86,7 +85,7 @@ in the hope that it will be useful, but without any warranty; without
 even the implied warranty of merchantability or fitness for a
 particular purpose.  See the GNU General Public License for more
 details.
-"""
+"""%(release,version)
     if display:
         print ABOUT_TEXT
     else:        
