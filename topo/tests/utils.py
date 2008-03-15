@@ -29,14 +29,14 @@ def array_almost_equal(*args,**kw):
 # actually needs a new simulation).
 #
 
-def new_simulation(name=None):
+def new_simulation(name=None,register=True):
 
     from topo.base.simulation import Simulation
     from topo.base.cf import CFSheet,CFProjection
     from topo.sheets.generatorsheet import GeneratorSheet
     from topo.base.boundingregion import BoundingBox
 
-    sim=Simulation(register=True,name=name)
+    sim=Simulation(register=register,name=name)
     b= BoundingBox(radius=0.5)
     sim['GS']=GeneratorSheet(nominal_density=2,nominal_bounds=b)
     sim['GS2']=GeneratorSheet(nominal_density=2,nominal_bounds=b)
@@ -45,4 +45,5 @@ def new_simulation(name=None):
     sim.connect('GS','S',connection_type=CFProjection,delay=0.05)
     sim.connect('GS','S2',connection_type=CFProjection,delay=0.05)
     sim.connect('GS2','S2',connection_type=CFProjection,delay=0.05)
+    return sim
 

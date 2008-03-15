@@ -8,7 +8,7 @@
 >>> import topo
 
 
->>> new_simulation()
+>>> ignore=new_simulation()
 >>> R = topo.sim['GS']
 >>> ig=Gaussian(x=UniformRandom())
 >>> R.set_input_generator(ig)
@@ -97,7 +97,7 @@ False
 False
 
 
->>> new_simulation()
+>>> ignore=new_simulation()
 
 >>> topo.sim.time()==0
 True
