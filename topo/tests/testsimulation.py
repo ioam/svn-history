@@ -6,15 +6,45 @@ __version__='$Revision$'
 
 import unittest
 import copy
+import pickle
 
 from numpy.oldnumeric import array
-from topo.base.simulation import *
+from topo.base.simulation import Simulation,EPConnection,EPConnectionEvent,Event
 from topo.eps.basic import *
 
+from utils import new_simulation
+
+import topo
 
 # CEBALERT: not a complete test of Simulation
 
 class TestSimulation(unittest.TestCase):
+
+
+    def test_singleton(self):
+        sim1 = new_simulation(name="test_singleton")
+        assert sim1 is topo.sim
+        
+        sid = id(topo.sim['S'])
+
+        sim2 = copy.copy(topo.sim)
+        assert sim2 is sim1
+
+        sim3 = copy.deepcopy(topo.sim)        
+        assert sim3 is sim1
+
+        self.assertEqual(id(sim3['S']),sid)
+
+        topo.sim['S'].precedence=111
+        p = pickle.dumps(topo.sim)        
+        topo.sim['S'].precedence=5
+        sim4 = pickle.loads(p)
+
+        assert sim4 is sim1
+        assert topo.sim['S'].precedence==111,"%s"%topo.sim['S'].precedence 
+
+        
+    
     def test_event_copy(self):
         """
         Test to make sure that EPConnectionEvent copies the underlying data
@@ -26,7 +56,7 @@ class TestSimulation(unittest.TestCase):
         se = EPConnectionEvent(1,epc,data)
         se.data[0] = 5
         assert data[0] != se.data[0], 'Matrices should be different'
-        se2 = copy(se)
+        se2 = copy.copy(se)
         assert se is not se2, 'Objects are the same'
 
     def test_state_stack(self):

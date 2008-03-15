@@ -740,6 +740,9 @@ class Simulation(ParameterizedObject):
     """
     A simulation class that uses a simple sorted event list (instead of
     e.g. a sched.scheduler object) to manage events and dispatching.
+
+    Simulation is a singleton: there is only one instance of
+    Simulation, no matter how many times it is instantiated.
     """
     register = BooleanParameter(default=True,constant=True,doc="""
         Whether or not to register this Simulation. If True, this
@@ -816,38 +819,29 @@ class Simulation(ParameterizedObject):
         self._time = time
         self._time_type = type(time)
 
-
-    _state = {}
-
+    ### Simulation is a singleton ###
     def __new__(cls,*p,**k):
-        """
-        Create a new instance of this class.
-
-        If register=True, this instance will share the same state as
-        any other instances of this class (i.e. they all share the same
-        __dict__. The shared state is stored in Simulation._state.
-        """
-        self = ParameterizedObject.__new__(cls,*p,**k)
-
-        # CB: clumsy handling of register parameter
-        register = False
-        if 'register' in k and k['register'] is True:
-            register = True
-        elif Simulation.register is True:
-            register = True
-
-        if register:
-            # This is the monostate pattern; see e.g.
-            # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66531
-            self.__dict__ = cls._state
-
+        if not hasattr(cls,'_inst'):
+            cls._inst = super(Simulation,cls).__new__(cls,*p,**k)
+        return cls._inst
+    def __reduce__(self):
+        # Causes __new__ to be called on unpickling (required to
+        # ensure single instance). (Is there another way to get
+        # __new__ to be called on unpickling?)
+        return Simulation,(),self.__getstate__()
+    def __copy__(self):
         return self
+    def __deepcopy__(self,m):
+        return self
+    #################################
 
-    
+    # __init__ can still be called after the Simulation instance has
+    # been created
+    # e.g. Simulation(name='A'); Simulation(name='B')
+    # leaves the Simulation instance with name=='B'.
     def __init__(self,initial_time=0.0,**params):
         """
-        Create the Simulation; unless register=False, this Simulation
-        will replace an existing one (if one exists).
+        Initialize the Simulation instance.
 
         initial_time allows the starting time and starting time type
         to be specifed: see set_time().
