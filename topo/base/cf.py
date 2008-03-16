@@ -202,6 +202,9 @@ class ConnectionField(ParameterizedObject):
         # CBNOTE: this would be clearer (but not perfect, and probably slower)
         # m = mask_template[self.weights_slice()]
         self.mask = self.weights_slice.submatrix(mask)  # view of original mask
+        self.mask = array(self.mask,copy=1) # CEBALERT: why is this necessary?
+        # (without it, optimized learning function creates artifacts in CFs at
+        # left and right edges of sheet, at some densities)
         
         # CBENHANCEMENT: might want to do something about a size
         # that's specified (right now the size is assumed to be that
