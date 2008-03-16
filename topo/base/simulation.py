@@ -746,8 +746,8 @@ class Simulation(ParameterizedObject):
     """
     register = BooleanParameter(default=True,constant=True,doc="""
         Whether or not to register this Simulation. If True, this
-        Simulation will replace an existing Simulation, if one
-        exists. 
+        Simulation (when created explicitly or when unpickled)
+        will replace an existing Simulation (if one exists).
         """)
 
     startup_commands = Parameter(instantiate=True,default=[],doc="""
@@ -819,26 +819,73 @@ class Simulation(ParameterizedObject):
         self._time = time
         self._time_type = type(time)
 
-    ### Simulation is a singleton ###
+
+    ### Simulation(register=True) is a singleton ###        
     def __new__(cls,*p,**k):
-        if not hasattr(cls,'_inst'):
-            cls._inst = super(Simulation,cls).__new__(cls,*p,**k)
-        return cls._inst
-    def __reduce__(self):
-        # Causes __new__ to be called on unpickling (required to
-        # ensure single instance). (Is there another way to get
-        # __new__ to be called on unpickling?)
-        return Simulation,(),self.__getstate__()
+
+        if 'register' in k:
+            register = k['register']
+        else:
+            register = Simulation.register
+
+        if register:
+            if not hasattr(cls,'_inst'):
+                cls._inst = super(Simulation,cls).__new__(cls,*p,**k)
+            return cls._inst
+        else:
+            return super(Simulation,cls).__new__(cls,*p,**k)
+
     def __copy__(self):
-        return self
+        # A Simulation(register=False) instance is copied by python as
+        # usual, while the Simulation(register=True) instance is not
+        # copied at all.
+        if self.register:
+            return self
+        else:
+            new_sim = Simulation()
+            new_sim.__dict__ = copy(self.__dict__)
+            return new_sim 
+
     def __deepcopy__(self,m):
-        return self
+        if self.register:
+            return self
+        else:
+            new_sim = Simulation()
+            new_sim.__dict__ = deepcopy(self.__dict__,m)
+            return new_sim
+
+    # I might have bound __copy__ (& __deepcopy__) just to the
+    # Simulation(register=True) instance to avoid the Simulation class
+    # having a __copy__ method at all, but copy() only checks the
+    # *class* for the existence of __copy__.
+    #
+    # I might have bound the __reduce__ method just to the
+    # Simulation(register=True) instance to avoid the Simulation class
+    # having a __reduce__ method at all, but unless the class had a
+    # __reduce__ method, it seems that __new__ is not called on
+    # unpickling (and that is required to ensure a single instance
+    # of Simulation(register=True)).
+
+    def __reduce__(self):
+        # __reduce__ causes __new__ to be called on unpickling
+        # (required to ensure single instance for
+        # Simulation(register=True)).  Is there another way to get
+        # __new__ to be called on unpickling? 
+        if self.register:
+            return Simulation,(),self.__getstate__()
+        else:
+            # do nothing special for register is False
+            return super(Simulation,self).__reduce__()
+
+    # Note that __init__ can still be called after the
+    # Simulation(register=True) instance has been created
+    # e.g. Simulation(name='A'); Simulation(name='B')
+    # leaves the Simulation instance with name=='B'.  This would
+    # actually allow a Simulation's 'register' value to be changed
+    # after creation (but register is supposed to be constant).
     #################################
 
-    # __init__ can still be called after the Simulation instance has
-    # been created
-    # e.g. Simulation(name='A'); Simulation(name='B')
-    # leaves the Simulation instance with name=='B'.
+
     def __init__(self,initial_time=0.0,**params):
         """
         Initialize the Simulation instance.

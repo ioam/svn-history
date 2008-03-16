@@ -21,7 +21,7 @@ import topo
 class TestSimulation(unittest.TestCase):
 
 
-    def test_singleton(self):
+    def test_register_is_true(self):
         sim1 = new_simulation(name="test_singleton")
         assert sim1 is topo.sim
         
@@ -42,6 +42,30 @@ class TestSimulation(unittest.TestCase):
 
         assert sim4 is sim1
         assert topo.sim['S'].precedence==111,"%s"%topo.sim['S'].precedence 
+
+
+    def test_register_is_false(self):
+        sim1 = new_simulation(register=False)
+        assert sim1 is not topo.sim
+        
+        sid = id(sim1['S'])
+
+        sim2 = copy.copy(sim1)
+        assert sim2 is not sim1
+
+        sim3 = copy.deepcopy(sim1)        
+        assert sim3 is not sim1
+
+        self.assertNotEqual(id(sim3['S']),sid)
+
+        topo.sim['S'].precedence=111
+        p = pickle.dumps(topo.sim)        
+        topo.sim['S'].precedence=5
+        sim4 = pickle.loads(p)
+
+        assert sim4 is not sim1
+        assert topo.sim['S'].precedence==5,"%s"%topo.sim['S'].precedence 
+
 
         
     
