@@ -836,12 +836,15 @@ class Simulation(ParameterizedObject):
             return super(Simulation,cls).__new__(cls,*p,**k)
 
     def __copy__(self):
-        # A Simulation(register=False) instance is copied by python as
-        # usual, while the Simulation(register=True) instance is not
-        # copied at all.
+        # A Simulation(register=False) instance is copied, while the
+        # Simulation(register=True) instance is not copied.
         if self.register:
             return self
         else:
+            # CB: I *think* this is how to do a copy. Any better
+            # ideas?  The copy.copy() function calls an object's
+            # __reduce__ method and then reconstructs the object from
+            # that using copy._reconstruct().
             new_sim = Simulation()
             new_sim.__dict__ = copy(self.__dict__)
             return new_sim 
@@ -854,17 +857,10 @@ class Simulation(ParameterizedObject):
             new_sim.__dict__ = deepcopy(self.__dict__,m)
             return new_sim
 
-    # I might have bound __copy__ (& __deepcopy__) just to the
+    # CB: I might have bound __copy__ (& __deepcopy__) just to the
     # Simulation(register=True) instance to avoid the Simulation class
     # having a __copy__ method at all, but copy() only checks the
     # *class* for the existence of __copy__.
-    #
-    # I might have bound the __reduce__ method just to the
-    # Simulation(register=True) instance to avoid the Simulation class
-    # having a __reduce__ method at all, but unless the class had a
-    # __reduce__ method, it seems that __new__ is not called on
-    # unpickling (and that is required to ensure a single instance
-    # of Simulation(register=True)).
 
     def __reduce__(self):
         # __reduce__ causes __new__ to be called on unpickling
