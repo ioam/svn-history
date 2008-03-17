@@ -301,6 +301,8 @@ class ConnectionField(ParameterizedObject):
             # is also slower).
             
             self.mask = self.weights_slice.submatrix(mask)
+            self.mask = array(self.mask,copy=1) # CB: why's this necessary?
+                                                # (see ALERT in __init__)
             self.weights *= self.mask
             output_fn(self.weights)
             del self.norm_total
