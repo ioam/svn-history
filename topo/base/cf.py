@@ -777,9 +777,8 @@ class CFProjection(Projection):
                 self.warning('Unable to change_bounds; currently allows reducing only.')
             return
 
-        mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
-
         # it's ok so we can store the bounds and resize the weights
+        mask_template = self.create_mask(self.cf_shape,bounds_template,self.src)
         self.nominal_bounds_template = nominal_bounds_template
         self.bounds_template = bounds_template
 
