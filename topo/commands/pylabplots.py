@@ -568,10 +568,10 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
             x_data=[x for (x,y) in output_fn.values[p][unit]]
             if raw==True:
                 plot_data=zip(x_data,y_data)
-                save(normalize_path(filename+p+str(unit[0])+"_"+str(unit[1])),plot_data,fmt='%.6f', delimiter=',')
+                save(normalize_path(filename+p+'(%.2f, %.2f)' %(unit[0], unit[1])),plot_data,fmt='%.6f', delimiter=',')
             
             
-            pylab.plot(x_data,y_data, label='Unit'+str(unit))
+            pylab.plot(x_data,y_data, label='Unit '+'(%.2f, %.2f)' %(unit[0], unit[1]))
             (ymin,ymax)=params.get('ybounds',(None,None))
             pylab.axis(xmin=init_time,xmax=final_time, ymin=ymin, ymax=ymax) 
                 
