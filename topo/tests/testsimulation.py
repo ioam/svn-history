@@ -38,12 +38,15 @@ class TestSimulation(unittest.TestCase):
         topo.sim['S'].precedence=111
         p = pickle.dumps(topo.sim,2)        
         topo.sim['S'].precedence=5
-        sim4 = pickle.loads(p)
 
+        Simulation.register=False # to ensure the object's own register is being used
+        sim4 = pickle.loads(p)
+        Simulation.register=True
+        
         assert sim4 is sim1
         assert topo.sim['S'].precedence==111,"%s"%topo.sim['S'].precedence
 
-        Simulation.register=False
+        
         
 
 
@@ -55,7 +58,7 @@ class TestSimulation(unittest.TestCase):
 
         sim2 = copy.copy(sim1)
         assert sim2 is not sim1
-        assert sim2 is not topo.sim # fails because no register argument passed to new
+        assert sim2 is not topo.sim 
         
         sim3 = copy.deepcopy(sim1)        
         assert sim3 is not sim1
