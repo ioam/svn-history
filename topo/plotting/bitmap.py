@@ -317,7 +317,7 @@ class MontageBitmap(Bitmap):
                         bmw = int( float(tileh)/bmh * bmw )
                         bmh = tileh
 
-                    if self.hooks[i]:
+                    if self.hooks and self.hooks[i]:
                         f = self.hooks[i]
                     else:
                         f = lambda x:x
