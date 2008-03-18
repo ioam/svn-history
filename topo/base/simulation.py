@@ -68,7 +68,7 @@ STOP = "Simulation Stopped"
 # like this? To start with, min(Forever,1) gives
 # FixedPoint('-1.00,2') i.e. Forever.
 # Forever = FixedPoint(-1)
-Forever = -1 # float("inf") or does that fail on some platforms?
+Forever = -1 
 
 # Default path to the current simulation, from main
 # Only to be used by script_repr(), to allow it to generate
@@ -744,6 +744,38 @@ class Simulation(ParameterizedObject):
     Simulation is a singleton: there is only one instance of
     Simulation, no matter how many times it is instantiated.
     """
+    time_type = Parameter(default=float,constant=True,doc="""
+    The number type to use for Simulation's time.
+
+    Simulation's time type can be set to any numeric type that
+    XXX.
+
+    Extra arguments can be passed to time_type when it is being used
+    to create the Simulation's time: see time_type_args.
+
+    For instance, one might wish to use arbitrary precision
+    floating-point time to avoid accumulating rounding errors.  Or,
+    one might wish to use a rational time to allow events to happen a
+    certain number of times in a given interval.
+
+ 
+    Some potentially useful number classes:
+
+    - mx.Number.Rational, mx.Number.Float (both included with
+    Topographica). mx.Number provides Python with access to the GNU
+    Multi-Precision library, but requires GMP to be built.
+    
+    - fixedpoint.FixedPoint (a pure Python fixed-point number).
+
+    - Python's Decimal class (in the standard library).
+    """)
+
+    time_type_args = Parameter(default=(),constant=True,doc="""
+    tuple of arguments to give to time_type whenever a new
+    instance of the time_type is being created (e.g. when a Simulation
+    is created).
+    """)
+
     register = BooleanParameter(default=True,constant=True,doc="""
         Whether or not to register this Simulation. If True, this
         Simulation (when created explicitly or when unpickled)
@@ -780,44 +812,17 @@ class Simulation(ParameterizedObject):
 
     name = Parameter(constant=False)
 
-
-    def set_time(self,time):
+    def set_time(self,time=0):
         """
-        Set this Simulation's _time to time, and store the type
-        of the time.
-
-        This allows the simulation to use a time type other than
-        the default float.
-
-        For instance, one might wish to use a fixed-point time to
-        avoid the possibility of a floating-point time accumulating
-        rounding errors. Or, one might wish to use a rational time to
-        allow events to happen a certain number of times in a given
-        interval.
-
-
-        An example - change the time type to be a FixedPoint with
-        precision 4 (and do not alter the current time):
-        topo.sim.set_time(FixedPoint(topo.sim.time(),4)
-
-
-        Some potentially useful number classes:
-
-        The Topographica distribution includes one implementation of
-        FixedPoint:
-        from fixedpoint import FixedPoint
-
-        Python includes a Decimal class in the standard library:
-        from decimal import Decimal
-
-        There are several implementations of rational numbers; the
-        following open-source package offers rational numbers (among
-        others):
-        http://www.egenix.com/products/python/mxExperimental/mxNumber/
+        Set this Simulation's _time to time, using the type specified
+        by the time_type parameter.
         """
         # pylint: disable-msg=W0201
-        self._time = time
-        self._time_type = type(time)
+        if self.time_type_args:
+            self._time = self.time_type(time,*self.time_type_args)
+        else:
+            self._time = self.time_type(time)
+
 
 
     ### Simulation(register=True) is a singleton
@@ -915,7 +920,7 @@ class Simulation(ParameterizedObject):
     # creates an instance of a class, while __init__ is subsequently
     # given that instance.
     
-    def __init__(self,initial_time=0.0,**params):
+    def __init__(self,**params):
         """
         Initialize a Simulation instance.
 
@@ -929,7 +934,7 @@ class Simulation(ParameterizedObject):
         """
         super(Simulation,self).__init__(**params)
 
-        self.set_time(initial_time)
+        self.set_time()
 
         self._event_processors = {}
 
@@ -1127,8 +1132,8 @@ class Simulation(ParameterizedObject):
         # string to specify the time rather than a float (since float
         # is not compatible with all number types).
         
-        duration = self._time_type(duration)
-        until = self._time_type(until)
+        duration = self.time_type(duration,*self.time_type_args)
+        until = self.time_type(until,*self.time_type_args)
         
         
         # CEBHACKALERT: If I do topo.sim.run(10), then topo.sim.run(until=3),
