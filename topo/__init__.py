@@ -54,11 +54,22 @@ release = ''
 version = ''
 
 
-
-                    
-
+# Set the default value of Simulation.time_type to mx.Number.Float
+# (or the slower fixedpoint.FixedPoint if mx.Number.Float is unavailable)
+try:
+    import mx.Number
+    time_type = mx.Number.Float
+    time_type_args = ()
+    # CEB: the default no. of bits is higher than we need - should set precision
+except ImportError:
+    import fixedpoint
+    time_type = fixedpoint.FixedPoint
+    time_type_args = (4,)  # gives precision=4
 
 from topo.base.simulation import Simulation
+Simulation.time_type = time_type
+Simulation.time_type_args = time_type_args
+
 sim = Simulation() 
 
 
