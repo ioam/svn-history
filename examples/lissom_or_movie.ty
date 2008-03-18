@@ -3,22 +3,28 @@ This example shows how to create an activity movie.
 
 It does the following:
 
-1) load in  the lissom_or.ty script using execfile
-2) instrument the simulation with a DataRecorder,
-3) run the simulation for a while to collect some data
+1) run the lissom_or.ty script.
+2) instrument the simulation with a DataRecorder.
+3) run the simulation for a while to collect some data.
 4) construct an ActivityMovie object from a period of collected data.
 5) save the frames of the movie to files.
 
-$Id:$
+$Id$
 """
-from topo.plotting.bitmap import MontageBitmap
-from topo.misc.traces import ActivityMovie,InMemoryRecorder
+__version__='$Revision: 8217 $'
 
 import pdb
 import ImageFont
+import os
 
-# Replace font path with the path to a suitable TrueType font on your system.
-title_font = ImageFont.truetype('/Library/Fonts/ChalkboardBold.ttf',20)
+from numpy import arange
+
+from topo.plotting.bitmap import MontageBitmap
+from topo.misc.traces import ActivityMovie,InMemoryRecorder
+from topo.misc.filepaths import application_path
+
+# Can use any TrueType font on your system
+title_font = ImageFont.truetype(os.path.join(application_path,'lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
 
 # Add a timecode to each movie
 ActivityMovie.add_timecode = True
@@ -47,7 +53,7 @@ MontageBitmap.title_options = dict(font=title_font,fill='#C1FFC1')
 
 
 print "Loading the simulation..."
-execfile('lissom_or.ty')
+execfile(os.path.join(application_path,'examples/lissom_or.ty'))
 
 # Add a data recorder and record the activity from the Retina and V1
 
@@ -73,7 +79,7 @@ movie = ActivityMovie(name = 'Lissom Orientation Movie',
                       frame_times = list(arange(0,10.0,0.1)))
 
 # Save the frames to files:
-print 'Saving movie...'
+print 'Saving movie to %s...' % ActivityMovie.filename_prefix
 movie.save()
 
                       
