@@ -839,6 +839,8 @@ http://somethingaboutorange.com/mrl/projects/nose/
 
 
 
+have buildbot run make -C examples?
+
 -->
 
 
