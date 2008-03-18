@@ -36,12 +36,15 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(id(sim3['S']),sid)
 
         topo.sim['S'].precedence=111
-        p = pickle.dumps(topo.sim)        
+        p = pickle.dumps(topo.sim,2)        
         topo.sim['S'].precedence=5
         sim4 = pickle.loads(p)
 
         assert sim4 is sim1
-        assert topo.sim['S'].precedence==111,"%s"%topo.sim['S'].precedence 
+        assert topo.sim['S'].precedence==111,"%s"%topo.sim['S'].precedence
+
+        Simulation.register=False
+        
 
 
     def test_register_is_false(self):
@@ -52,18 +55,21 @@ class TestSimulation(unittest.TestCase):
 
         sim2 = copy.copy(sim1)
         assert sim2 is not sim1
-
+        assert sim2 is not topo.sim # fails because no register argument passed to new
+        
         sim3 = copy.deepcopy(sim1)        
         assert sim3 is not sim1
+        assert sim3 is not topo.sim
 
         self.assertNotEqual(id(sim3['S']),sid)
 
         topo.sim['S'].precedence=111
-        p = pickle.dumps(topo.sim)        
+        p = pickle.dumps(topo.sim,2)        
         topo.sim['S'].precedence=5
         sim4 = pickle.loads(p)
 
         assert sim4 is not sim1
+        assert sim4 is not topo.sim
         assert topo.sim['S'].precedence==5,"%s"%topo.sim['S'].precedence 
 
 
