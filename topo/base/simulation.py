@@ -820,9 +820,40 @@ class Simulation(ParameterizedObject):
         self._time_type = type(time)
 
 
-    ### Simulation(register=True) is a singleton ###        
-    def __new__(cls,*p,**k):
+    ### Simulation(register=True) is a singleton
+    #
+    # There is only ever one instance of Simulation(register=True).
+    # This instance is stored in Simulation._inst; when __new__ is
+    # called and register is True, this instance is created if it
+    # doesn't already exist, and returned otherwise. copying or
+    # deepcopying this instance returns the instance.
+    #
+    # For a Simulation with register False, calling __new__ results in
+    # a new object as usual for Python objects. copying and
+    # deepcopying returns a new Simulation with a copy or deepcopy
+    # (respectively) of the original Simulation's __dict__.
+    #
+    # We want __new__ to be called on unpickling so that we can ensure
+    # a single Simulation(register=True) instance; therefore,
+    # Simulation must have a __reduce__ method (I think). Unpickling a
+    # Simulation(register=True) instance replaces the state of the
+    # existing instance; unpickling a Simulation(register=False)
+    # instance proceeds as for any Python object that defines
+    # __reduce__.
+    #
+    #
+    # Subclass authors need to consider how register will be handled
+    # in any subclass of Simulation.  Having Simulation(register=True)
+    # be a monostate class, rather than a singleton, might be simpler
+    # when it comes to subclassing.  There is no fundamental reason
+    # why Simulation(register=True) could not be a monostate rather
+    # than a singleton.
 
+    def __new__(cls,*p,**k):
+        """
+        Return the single Simulation instance if register is True;
+        otherwise, return a new instance of Simulation.
+        """
         if 'register' in k:
             register = k['register']
         else:
@@ -874,20 +905,27 @@ class Simulation(ParameterizedObject):
             return super(Simulation,self).__reduce__()
 
     # Note that __init__ can still be called after the
-    # Simulation(register=True) instance has been created
-    # e.g. Simulation(name='A'); Simulation(name='B')
-    # leaves the Simulation instance with name=='B'.  This would
-    # actually allow a Simulation's 'register' value to be changed
-    # after creation (but register is supposed to be constant).
-    #################################
-
-
+    # Simulation(register=True) instance has been created. E.g. with
+    # Simulation.register is True,
+    #
+    # Simulation(name='A'); Simulation(name='B')
+    #
+    # would leave the single Simulation(register=True) instance with
+    # name=='B'. This is because, as is usual in Python, __new__
+    # creates an instance of a class, while __init__ is subsequently
+    # given that instance.
+    
     def __init__(self,initial_time=0.0,**params):
         """
-        Initialize the Simulation instance.
+        Initialize a Simulation instance.
 
         initial_time allows the starting time and starting time type
         to be specifed: see set_time().
+
+        Note that if register is True, the single
+        Simulation(register=True) instance is initialized. If register
+        is False, this method will operate on a new Simulation
+        instance, as usual.
         """
         super(Simulation,self).__init__(**params)
 
