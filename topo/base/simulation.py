@@ -876,7 +876,7 @@ class Simulation(ParameterizedObject):
             # ideas?  The copy.copy() function calls an object's
             # __reduce__ method and then reconstructs the object from
             # that using copy._reconstruct().
-            new_sim = Simulation()
+            new_sim = Simulation(register=self.register)
             new_sim.__dict__ = copy(self.__dict__)
             return new_sim 
 
@@ -884,7 +884,7 @@ class Simulation(ParameterizedObject):
         if self.register:
             return self
         else:
-            new_sim = Simulation()
+            new_sim = Simulation(register=self.register)
             new_sim.__dict__ = deepcopy(self.__dict__,m)
             return new_sim
 
