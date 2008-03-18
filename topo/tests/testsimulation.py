@@ -63,14 +63,15 @@ class TestSimulation(unittest.TestCase):
 
         self.assertNotEqual(id(sim3['S']),sid)
 
-        topo.sim['S'].precedence=111
-        p = pickle.dumps(topo.sim,2)        
+        new_simulation(register=True)
+        sim1['S'].precedence=111
+        p = pickle.dumps(sim1,2)        
         topo.sim['S'].precedence=5
         sim4 = pickle.loads(p)
 
         assert sim4 is not sim1
         assert sim4 is not topo.sim
-        assert topo.sim['S'].precedence==5,"%s"%topo.sim['S'].precedence 
+        assert topo.sim['S'].precedence==5
 
 
         
