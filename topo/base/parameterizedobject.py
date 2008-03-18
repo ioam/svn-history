@@ -605,6 +605,22 @@ script_repr_suppress_defaults=True
 dbprint_prefix=None
 
 
+def as_uninitialized(fn):
+    """
+    Decorator: call fn with the parameterized_object instance's
+    initialization flag set to False, then revert the flag.
+
+    (Used to decorate ParameterizedObject methods that must alter
+    a constant Parameter.)
+    """
+    def override_initialization(parameterized_object,*args,**kw):
+        original_initialized=parameterized_object.initialized
+        parameterized_object.initialized=False
+        fn(parameterized_object,*args,**kw)
+        parameterized_object.initialized=original_initialized
+    return override_initialization
+
+
 
 class ParameterizedObject(object):
     """
@@ -691,18 +707,6 @@ class ParameterizedObject(object):
         self.debug('Initialized',self)
 
         self.initialized=True
-
-    def as_uninitialized(fn):
-        """
-        Decorator: call fn with the instance's initialization flag set
-        to False, then revert the flag.
-        """
-        def override_initialization(self,*args,**kw):
-            original_initialized=self.initialized
-            self.initialized=False
-            fn(self,*args,**kw)
-            self.initialized=original_initialized
-        return override_initialization
 
         
     @as_uninitialized
