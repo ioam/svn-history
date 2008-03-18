@@ -214,7 +214,7 @@ stsd = 2
 
 
 # Make simulation use fixed-point time.
-topo.sim.set_time(FixedPoint(topo.sim.time(),4))
+topo.sim.set_time_type(FixedPoint,4)
 
 
 topo.sim['LeftRetina']=GeneratorSheet(nominal_density=24.0,

@@ -69,7 +69,7 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 # build simulation
 
 # Make simulation use fixed-point time.
-topo.sim.set_time(FixedPoint(topo.sim.time(),4))
+topo.sim.set_time_type(FixedPoint,4)
 
 topo.sim['Retina']=GeneratorSheet(nominal_density=48.0,
                                   input_generator=combined_inputs,

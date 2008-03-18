@@ -384,7 +384,7 @@ for i in xrange(num_lags):
 specify_whisker_deflections()
 
 # Make simulation use fixed-point time.
-topo.sim.set_time(FixedPoint(topo.sim.time(),4))
+topo.sim.set_time_type(FixedPoint,4)
 
 
 topo.sim['S1'] = LISSOM(nominal_density=locals().get('default_density',16*WhiskerArray.num_whiskers),tsettle=9,

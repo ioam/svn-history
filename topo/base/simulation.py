@@ -54,7 +54,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from parameterizedobject import ParameterizedObject, Parameter
+from parameterizedobject import ParameterizedObject, Parameter, as_uninitialized
 from parameterclasses import Number, BooleanParameter, StringParameter, wrap_callable
 from copy import copy, deepcopy
 
@@ -812,7 +812,7 @@ class Simulation(ParameterizedObject):
 
     name = Parameter(constant=False)
 
-    def set_time(self,time=0):
+    def _set_time(self,time=0):
         """
         Set this Simulation's _time to time, using the type specified
         by the time_type parameter.
@@ -823,8 +823,16 @@ class Simulation(ParameterizedObject):
         else:
             self._time = self.time_type(time)
 
+    @as_uninitialized
+    def set_time_type(self,time_type,*time_type_args):
+        """
+        Convenience method to allow time_type to be changed easily.
+        """
+        self.time_type = time_type
+        self.time_type_args = time_type_args
+        self._set_time(time=self._time)
 
-
+        
     ### Simulation(register=True) is a singleton
     #
     # There is only ever one instance of Simulation(register=True).
@@ -924,9 +932,6 @@ class Simulation(ParameterizedObject):
         """
         Initialize a Simulation instance.
 
-        initial_time allows the starting time and starting time type
-        to be specifed: see set_time().
-
         Note that if register is True, the single
         Simulation(register=True) instance is initialized. If register
         is False, this method will operate on a new Simulation
@@ -934,7 +939,7 @@ class Simulation(ParameterizedObject):
         """
         super(Simulation,self).__init__(**params)
 
-        self.set_time()
+        self._set_time()
 
         self._event_processors = {}
 

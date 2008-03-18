@@ -72,7 +72,7 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 # build simulation
 
 # Make simulation use fixed-point time.
-topo.sim.set_time(FixedPoint(topo.sim.time(),4))
+topo.sim.set_time_type(FixedPoint,4)
 
 
 topo.sim['Retina']=GeneratorSheet(nominal_density=locals().get('default_retina_density',24.0),

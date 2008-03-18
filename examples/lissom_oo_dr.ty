@@ -102,7 +102,7 @@ for i in xrange(num_lags):
                                       measure_maps=False)
 
 # Make simulation use fixed-point time.
-topo.sim.set_time(FixedPoint(topo.sim.time(),4))
+topo.sim.set_time_type(FixedPoint,4)
 
 
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,
