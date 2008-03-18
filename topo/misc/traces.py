@@ -24,8 +24,10 @@ from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number,StringParameter,DictParameter,BooleanParameter
 from topo.base.parameterclasses import Integer,CompositeParameter,Parameter
 from topo.misc.utils import Struct
-from topo.plotting.bitmap import RGBBitmap, MontageBitmap
-from topo.misc.filepaths import normalize_path
+from topo.plotting.bitmap import RGBBitmap, MontageBitmap, TITLE_FONT
+from topo.misc.filepaths import normalize_path, application_path
+
+
 
 
 class DataRecorder(EventProcessor):
@@ -492,12 +494,13 @@ class ActivityMovie(ParameterizedObject):
 
     add_timecode = param.BooleanParameter(default=False, doc="""
         Whether to add a visible timecode indicator to each frame.""")
-    
+
     timecode_options = param.DictParameter(default={},instantiate=False,doc="""
         A dictionary of keyword options to be passed to the PIL ImageDraw.text method
         when drawing the timecode on the frame. Valid options include font,
         an ImageFont object indicating the text font, and fill a PIL color
-        specification indicating the text color.""")
+        specification indicating the text color.  If unspecified, color defaults to
+        the PIL default of black.  Font defaults to topo.plotting.bitmap.TITLE_FONT.""")
     
     timecode_fmt = param.StringParameter(default='%05.0f',doc="""
         The format of the timecode displayed in the movie frames, using
@@ -520,9 +523,10 @@ class ActivityMovie(ParameterizedObject):
             for t,f in izip(self.frame_times,self.frames):
                 draw = ImageDraw.Draw(f.image)
                 timecode = self.timecode_fmt % (t+self.timecode_offset)
-                tw,th = draw.textsize(timecode,font=self.timecode_options.get('font',None))
+                tw,th = draw.textsize(timecode,font=self.timecode_options.setdefault('font',TITLE_FONT))
                 w,h = f.image.size
-                draw.text((w-tw,h-th),timecode,**self.timecode_options)
+                
+                draw.text((w-tw-f.margin-1,h-th-1),timecode,**self.timecode_options)
 
     
     def save(self):

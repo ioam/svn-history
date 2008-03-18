@@ -14,7 +14,7 @@ $Id$
 __version__='$Revision: 8217 $'
 
 import pdb
-import ImageFont
+#import ImageFont
 import os
 
 from numpy import arange
@@ -24,11 +24,10 @@ from topo.misc.traces import ActivityMovie,InMemoryRecorder
 from topo.misc.filepaths import application_path
 
 # Can use any TrueType font on your system
-title_font = ImageFont.truetype(os.path.join(application_path,'lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
+#title_font = ImageFont.truetype(os.path.join(application_path,'lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
 
 # Add a timecode to each movie
 ActivityMovie.add_timecode = True
-ActivityMovie.timecode_options = dict(fill='lightgreen',font=title_font)
 ActivityMovie.timecode_fmt = '%.2f'
 
 # The format for times in filenames
@@ -49,7 +48,7 @@ MontageBitmap.tile_size = (200,200)
 MontageBitmap.shape = (1,2)
 # Frame title parameters
 MontageBitmap.title_pos = (5,5)
-MontageBitmap.title_options = dict(font=title_font,fill='#C1FFC1')
+#MontageBitmap.title_options = dict(fill='white')
 
 
 print "Loading the simulation..."

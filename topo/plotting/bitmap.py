@@ -25,10 +25,14 @@ from copy import copy
 
 from colorsys import hsv_to_rgb
 
-import numpy.oldnumeric as Numeric, Image, ImageDraw, math
+import numpy.oldnumeric as Numeric, Image, ImageDraw, math, ImageFont, os
 from topo.base.parameterclasses import ListParameter,Integer,CompositeParameter,DictParameter
 from topo.base.parameterclasses import NumericTuple
 from topo.base.parameterizedobject import ParameterizedObject
+from topo.misc.filepaths import application_path
+
+TITLE_FONT = ImageFont.truetype(os.path.join(application_path,'lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
+
 
 ### JCALERT: To do:
 ###        - Update the test file.
@@ -303,6 +307,8 @@ class MontageBitmap(Bitmap):
         height = tileh*rows + self.margin*(rows*2) 
         self.image = Image.new('RGB',(width,height),
                                (bgr*255,bgg*255,bgb*255))
+
+        self.title_options.setdefault('font',TITLE_FONT)
         
         for r in xrange(rows):
             for c in xrange(cols):
