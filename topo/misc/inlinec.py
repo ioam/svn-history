@@ -40,6 +40,11 @@ from copy import copy
 # to avoid weave altogether, e.g. if your installation is broken.
 import_weave = True
 
+import __main__
+if '__import_weave' in __main__.__dict__:
+    import_weave = __main__.__dict__["__import_weave"]
+
+
 # Variable that will be used to report whether weave was successfully
 # imported (below).
 weave_imported = False

@@ -10,6 +10,10 @@ RELEASE_TAG = release_0_9_4
 TEST_VERBOSITY = 1
 
 
+TESTWEAVE = 1
+TESTDP = 14
+
+
 # Commands needed to build a public distribution
 
 COMPRESS_ARCHIVE           = gzip
@@ -176,7 +180,7 @@ slow-tests: print-info train-tests all-speed-tests
 	./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",density=8,run_for=[1,99,150])'
 
 %_TEST: %_DATA
-	time ./topographica -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",decimal=14)'
+	time ./topographica -c '__import_weave=${TESTWEAVE}' -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",decimal=${TESTDP})'
 # CB: Beyond 14 dp, the results of the current tests do not match on ppc64 and i686 (using linux).
 # In the future, decimal=14 might have to be reduced (if the tests change, or to accommodate other
 # processors/platforms).
