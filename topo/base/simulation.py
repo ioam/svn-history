@@ -730,13 +730,69 @@ class SomeTimer(ParameterizedObject):
         self.__measure(fduration,step)
 
 
+
+
+
+# CEBALERT: working here (the implementation might change
+# completely). This version passes all tests, so at least the behavior
+# is correct now.
+class OptionalSingleton(object):
+
+    _inst = None
+
+    def __new__(cls,singleton):
+        """
+        Return the single Simulation instance if register is True;
+        otherwise, return a new instance of Simulation.
+        """
+        if singleton:
+            if cls is not type(cls._inst):
+                cls._inst = object.__new__(cls) 
+                cls._inst._singleton = True
+            return cls._inst
+        else:
+            new_inst = object.__new__(cls) 
+            new_inst._singleton = False
+            return new_inst
+
+    def __getnewargs__(self):
+        return (self._singleton,)
+
+    def __copy__(self):
+        # A Simulation(singleton=False) instance is copied, while the
+        # Simulation(singleton=True) instance is not copied.
+        if self._singleton:
+            return self
+        else:
+            # CB: I *think* this is how to do a copy. Any better
+            # ideas?  The copy.copy() function calls an object's
+            # __reduce__ method and then reconstructs the object from
+            # that using copy._reconstruct().
+            new_obj = self.__class__(self._singleton)
+            new_obj.__dict__ = copy(self.__dict__)
+            return new_obj 
+
+    def __deepcopy__(self,m):
+        if self._singleton:
+            return self
+        else:
+            new_obj = self.__class__(self._singleton)
+            new_obj.__dict__ = deepcopy(self.__dict__,m)
+            return new_obj
+
+    # CB: I might have bound __copy__ (& __deepcopy__) just to the
+    # Simulation(singleton=True) instance to avoid the Simulation class
+    # having a __copy__ method at all, but copy() only checks the
+    # *class* for the existence of __copy__.
+
+
 # Simulation stores its events in a linear-time priority queue (i.e., a
 # sorted list.) For efficiency, e.g. for spiking neuron simulations,
 # we'll probably need to replace the linear priority queue with a more
 # efficient one.  Jeff has an O(log N) minheap implementation, but
 # there are likely to be many others to select from.
 #
-class Simulation(ParameterizedObject):
+class Simulation(ParameterizedObject,OptionalSingleton):
     """
     A simulation class that uses a simple sorted event list (instead of
     e.g. a sched.scheduler object) to manage events and dispatching.
@@ -812,6 +868,30 @@ class Simulation(ParameterizedObject):
 
     name = Parameter(constant=False)
 
+
+
+    ### Simulation(register=True) is a singleton
+    #
+    # There is only ever one instance of Simulation(register=True).
+    # This instance is stored in Simulation._inst; when __new__ is
+    # called and register is True, this instance is created if it
+    # doesn't already exist, and returned otherwise. copying or
+    # deepcopying this instance returns the instance.
+    #
+    # For a Simulation with register False, calling __new__ results in
+    # a new object as usual for Python objects. copying and
+    # deepcopying returns a new Simulation with a copy or deepcopy
+    # (respectively) of the original Simulation's __dict__.
+    def __new__(cls,*args,**kw):
+        if 'register' in kw:
+            register = kw['register']
+        elif len(args)==1:
+            register = args[0]
+        else:
+            register = cls.register
+        return OptionalSingleton.__new__(cls,register)
+
+
     def _set_time(self,time=0):
         """
         Set this Simulation's _time to time, using the type specified
@@ -832,91 +912,6 @@ class Simulation(ParameterizedObject):
         self.time_type_args = time_type_args
         self._set_time(time=self._time)
 
-        
-    ### Simulation(register=True) is a singleton
-    #
-    # There is only ever one instance of Simulation(register=True).
-    # This instance is stored in Simulation._inst; when __new__ is
-    # called and register is True, this instance is created if it
-    # doesn't already exist, and returned otherwise. copying or
-    # deepcopying this instance returns the instance.
-    #
-    # For a Simulation with register False, calling __new__ results in
-    # a new object as usual for Python objects. copying and
-    # deepcopying returns a new Simulation with a copy or deepcopy
-    # (respectively) of the original Simulation's __dict__.
-    #
-    # We want __new__ to be called on unpickling so that we can ensure
-    # a single Simulation(register=True) instance; therefore,
-    # Simulation must have a __reduce__ method (I think). Unpickling a
-    # Simulation(register=True) instance replaces the state of the
-    # existing instance; unpickling a Simulation(register=False)
-    # instance proceeds as for any Python object that defines
-    # __reduce__.
-    #
-    #
-    # Subclass authors need to consider how register will be handled
-    # in any subclass of Simulation.  Having Simulation(register=True)
-    # be a monostate class, rather than a singleton, might be simpler
-    # when it comes to subclassing.  There is no fundamental reason
-    # why Simulation(register=True) could not be a monostate rather
-    # than a singleton.
-
-    def __new__(cls,*p,**k):
-        """
-        Return the single Simulation instance if register is True;
-        otherwise, return a new instance of Simulation.
-        """
-        if 'register' in k:
-            register = k['register']
-        else:
-            register = Simulation.register
-
-        if register:
-            if not hasattr(cls,'_inst'):
-                cls._inst = super(Simulation,cls).__new__(cls,*p,**k)
-            return cls._inst
-        else:
-            return super(Simulation,cls).__new__(cls,*p,**k)
-
-    def __copy__(self):
-        # A Simulation(register=False) instance is copied, while the
-        # Simulation(register=True) instance is not copied.
-        if self.register:
-            return self
-        else:
-            # CB: I *think* this is how to do a copy. Any better
-            # ideas?  The copy.copy() function calls an object's
-            # __reduce__ method and then reconstructs the object from
-            # that using copy._reconstruct().
-            new_sim = Simulation(register=self.register)
-            new_sim.__dict__ = copy(self.__dict__)
-            return new_sim 
-
-    def __deepcopy__(self,m):
-        if self.register:
-            return self
-        else:
-            new_sim = Simulation(register=self.register)
-            new_sim.__dict__ = deepcopy(self.__dict__,m)
-            return new_sim
-
-    # CB: I might have bound __copy__ (& __deepcopy__) just to the
-    # Simulation(register=True) instance to avoid the Simulation class
-    # having a __copy__ method at all, but copy() only checks the
-    # *class* for the existence of __copy__.
-
-    def __reduce__(self):
-        # __reduce__ causes __new__ to be called on unpickling
-        # (required to ensure single instance for
-        # Simulation(register=True)).  Is there another way to get
-        # __new__ to be called on unpickling? 
-        if self.register:
-            return Simulation,(),self.__getstate__()
-        else:
-            # do nothing special for register is False
-            return super(Simulation,self).__reduce__()
-
     # Note that __init__ can still be called after the
     # Simulation(register=True) instance has been created. E.g. with
     # Simulation.register is True,
@@ -927,17 +922,12 @@ class Simulation(ParameterizedObject):
     # name=='B'. This is because, as is usual in Python, __new__
     # creates an instance of a class, while __init__ is subsequently
     # given that instance.
-    
-    def __init__(self,**params):
+
+    def __init__(self,*args,**params):
         """
         Initialize a Simulation instance.
-
-        Note that if register is True, the single
-        Simulation(register=True) instance is initialized. If register
-        is False, this method will operate on a new Simulation
-        instance, as usual.
         """
-        super(Simulation,self).__init__(**params)
+        ParameterizedObject.__init__(self,**params)
 
         self._set_time()
 
