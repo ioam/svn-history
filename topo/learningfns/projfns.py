@@ -38,14 +38,14 @@ class CFPLF_EuclideanHebbian(CFPLearningFn):
         # This learning function does not need to scale the learning
         # rate like some do, so it does not use constant_sum_connection_rate()
 
-        cfs = iterator.proj._cfs
+        cfs = iterator.proj.cfs
         rows,cols = output_activity.shape
         for r in xrange(rows):
             for c in xrange(cols):
-                out = output_activity[r][c]
+                out = output_activity[r,c]
                 if out !=0:
                     rate = learning_rate * out                    
-                    cf = cfs[r][c]
+                    cf = cfs[r,c]
 		    X = cf.get_input_matrix(input_activity)
                     cf.weights += rate * (X - cf.weights)
 
@@ -124,7 +124,7 @@ class CFPLF_Trace(CFPLearningFn):
         doc="LearningFn that will be applied to each CF individually.")              
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
-        cfs = iterator.proj._cfs
+        cfs = iterator.proj.cfs
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         single_cf_fn = self.single_cf_fn
         ##Initialise traces to zero if they don't already exist
@@ -160,7 +160,7 @@ class CFPLF_OutstarHebbian(CFPLearningFn):
     outstar_wsum = None
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
-        cfs = iterator.proj._cfs
+        cfs = iterator.proj.cfs
 	single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
@@ -217,7 +217,7 @@ class HomeoSynaptic(CFPLearningFn):
         a per-connection learning rate.
 	"""
         
-        cfs = iterator.proj._cfs
+        cfs = iterator.proj.cfs
         if not hasattr(self,'averages'):
             self.averages = ones(output_activity.shape,Float) * 0.1
 	    
@@ -250,4 +250,4 @@ class HomeoSynaptic(CFPLearningFn):
          
 	# For analysis only; can be removed (in which case also remove the initializations above)
         self.ave_hist.append(self.averages[0][7])
-        self.temp_hist.append (Numeric.sum(abs(cfs[0][7].weights.ravel())))
+        self.temp_hist.append (Numeric.sum(abs(cfs[0,7].weights.ravel())))

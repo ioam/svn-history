@@ -40,7 +40,7 @@ class TestIter(unittest.TestCase):
         dest = self.sim['Dest']
         proj = dest.projections()['SrcToDest']
         total = 0
-        proj._cfs[5][5] = None
+        proj.cfs[5,5] = None
         for cf,r,c in self.iter_type(proj)():
             total += 1
             self.failIfEqual((r,c),(5,5))
@@ -66,7 +66,7 @@ class TestMaskedCFIter(TestIter):
         for cf,r,c in self.iter_type(proj)():
             total += 1
             self.failUnlessEqual((r,c),(5,5))
-            self.failUnless(cf is proj._cfs[5][5])
+            self.failUnless(cf is proj.cfs[5,5])
         self.failUnlessEqual(total,1)
         
 

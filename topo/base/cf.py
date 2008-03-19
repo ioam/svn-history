@@ -584,19 +584,12 @@ class CFProjection(Projection):
         the cf_shape is used. In normal usage of Topographica, this parameter should
         remain True.""")
 
-
-    # shape property defining the dimension of the _cfs field
-    def get_shape(self): return len(self._cfs),len(self._cfs[0])
-    cfs_shape = property(get_shape)
-
-
-
     def __init__(self,initialize_cfs=True,**params):
         """
         Initialize the Projection with a set of cf_type objects
         (typically ConnectionFields), each located at the location
         in the source sheet corresponding to the unit in the target
-        sheet.
+        sheet. The cf_type objects are stored in the 'cfs' array.
 
         The nominal_bounds_template specified may be altered: the
         bounds must be fitted to the Sheet's matrix, and the weights
@@ -619,18 +612,18 @@ class CFProjection(Projection):
         mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
 
         self.mask_template = mask_template # (stored for subclasses)
+
+        # CB: instead of building as a list of list, should build as
+        # an array.  Note that the list of lists must still be
+        # available in _cfs as it is used by the optimized C
+        # functions.  (Weave does not support arrays of dtype=object,
+        # so the optimized functions cannot be made to work with the
+        # array).
+
         if initialize_cfs:            
             # set up array of ConnectionFields translated to each x,y in the src sheet
             cflist = []
 
-            # ENHANCEMENT: we'd like to use an array instead of a list
-            # of lists, but weave does not support arrays of
-            # dtype=object (so the optimized functions cannot be made
-            # to work).  An array of cfs would allow more efficient
-            # cf[r,c] addressing, and might allow faster access by C
-            # (although tests using an array of CFs with Instant
-            # appeared to show no such improvement).  See emails
-            # between CEB & JAB.
             for r,y in enumerate(self.dest.sheet_rows()[::-1]):
                 row = []
                 for c,x in enumerate(self.dest.sheet_cols()):
@@ -649,6 +642,9 @@ class CFProjection(Projection):
                             raise
                 cflist.append(row)
 
+            self.cfs = array(cflist,dtype=object)
+            # CB: this is supposed to be accessed by weave functions
+            # only, and should disappear one day
             self._cfs = cflist
 
         ### JCALERT! We might want to change the default value of the
@@ -693,14 +689,16 @@ class CFProjection(Projection):
         ### calculate it directly from the target sheet density and
         ### the weight_bounds.  Example:
         #center_r,center_c = sheet2matrixidx(0,0,bounds,xdensity,ydensity)
-        rows,cols=self.cfs_shape
-        cf = self._cfs[rows/2][cols/2]
+        rows,cols=self.cfs.shape
+        cf = self.cfs[rows/2,cols/2]
         return len(cf.mask.ravel().nonzero()[0]) # CB: newer numpy array has .flatnonzero()
 
 
     def cf(self,r,c):
         """Return the specified ConnectionField"""
-        return self._cfs[r][c]
+        # CB: should we offer convenience cf(x,y) (i.e. sheetcoords) method instead?
+        self.warning("CFProjection.cf(r,c) is deprecated: use cfs[r,c] instead")
+        return self.cfs[r,c]
 
 
     def get_view(self, sheet_x, sheet_y, timestamp):
@@ -710,8 +708,8 @@ class CFProjection(Projection):
         """
         matrix_data = zeros(self.src.activity.shape,Float) 
         (r,c) = self.dest.sheet2matrixidx(sheet_x,sheet_y)
-        r1,r2,c1,c2 = self.cf(r,c).input_sheet_slice
-        matrix_data[r1:r2,c1:c2] = self.cf(r,c).weights
+        r1,r2,c1,c2 = self.cfs[r,c].input_sheet_slice
+        matrix_data[r1:r2,c1:c2] = self.cfs[r,c].weights
 
         # CB: the following would be equivalent with Slice __call__
         
@@ -782,14 +780,14 @@ class CFProjection(Projection):
         self.nominal_bounds_template = nominal_bounds_template
         self.bounds_template = bounds_template
 
-        
-        rows,cols = self.get_shape()
-        cfs = self._cfs
+        cfs = self.cfs
+        rows,cols = cfs.shape
         output_fn = self.weights_output_fn.single_cf_fn
 
         for r in xrange(rows):
             for c in xrange(cols):
-                cfs[r][c].change_bounds(template=slice_template,
+                # CB: listhack - loop is candidate for replacement by numpy fn
+                cfs[r,c].change_bounds(template=slice_template,
                                         mask=mask_template,
                                         output_fn=output_fn)
 
@@ -812,10 +810,10 @@ class CFIter(object):
         self.proj = cfprojection    
 
     def __call__(self):
-        rows,cols = self.proj.cfs_shape
+        rows,cols = self.proj.cfs.shape
         for r in xrange(rows):
             for c in xrange(cols):
-                cf = self.proj._cfs[r][c]
+                cf = self.proj.cfs[r,c]
                 if cf is not None:
                     yield cf,r,c
 
@@ -831,7 +829,7 @@ class MaskedCFIter(CFIter):
         super(MaskedCFIter,self).__init__(cfprojection)
     
     def __call__(self):
-        rows,cols = self.proj.cfs_shape
+        rows,cols = self.proj.cfs.shape
 
         # JPHACKALERT: Should really check for the existence of the
         # mask, rather than checking its type. This is a hack to
@@ -843,13 +841,13 @@ class MaskedCFIter(CFIter):
             mask = self.proj.dest.mask.data
             for r in xrange(rows):
                 for c in xrange(cols):
-                    cf = self.proj._cfs[r][c]
+                    cf = self.proj.cfs[r,c]
                     if (cf is not None) and mask[r,c]:
                         yield cf,r,c
         else:
             for r in xrange(rows):
                 for c in xrange(cols):
-                    cf = self.proj._cfs[r][c]
+                    cf = self.proj.cfs[r,c]
                     if cf is not None:
                         yield cf,r,c
             

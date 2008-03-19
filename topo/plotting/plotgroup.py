@@ -727,7 +727,7 @@ class CFProjectionPlotGroup(ProjectionPlotGroup):
                 bounds = src_sheet.bounds
             else:
                 (r,c) = projection.dest.sheet2matrixidx(x,y)
-                bounds = projection.cf(r,c).bounds
+                bounds = projection.cfs[r,c].bounds
                                                     
             plot_list.append(make_template_plot(plot_channels,
                                                 src_sheet.sheet_views,
@@ -796,7 +796,7 @@ class ConnectionFieldsPlotGroup(UnitPlotGroup):
                 bounds = None
             else:
                 (r,c) = p.dest.sheet2matrixidx(self.x,self.y)
-                bounds = p.cf(r,c).bounds
+                bounds = p.cfs[r,c].bounds
             plot_list.append(make_template_plot(plot_channels,
                                                 p.src.sheet_views,
                                                 p.src.xdensity,

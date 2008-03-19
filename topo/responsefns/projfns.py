@@ -25,12 +25,12 @@ class CFPRF_EuclideanDistance(CFPResponseFn):
     Euclidean-distance--based response function.
     """
     def __call__(self, iterator, input_activity, activity, strength, **params):
-        cfs = iterator.proj._cfs
+        cfs = iterator.proj.cfs
         rows,cols = activity.shape
 	euclidean_dist_mat = zeros((rows,cols),Float)
         for r in xrange(rows):
             for c in xrange(cols):
-                cf = cfs[r][c]
+                cf = cfs[r,c]
                 r1,r2,c1,c2 = cf.input_sheet_slice
                 X = input_activity[r1:r2,c1:c2]
 		diff = ravel(X) - ravel(cf.weights)

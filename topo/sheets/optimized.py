@@ -38,7 +38,7 @@ class LISSOM_Opt(LISSOM):
         
         # Assumes that all Projections in the list have the same r,c size
         assert len(projlist)>=1
-        rows,cols = projlist[0].cfs_shape
+        rows,cols = projlist[0].cfs.shape
         length = len(projlist)
 
         code = """

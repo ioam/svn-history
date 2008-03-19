@@ -67,15 +67,15 @@ class JointNormalizingCFSheet(CFSheet):
         # Assumes that all Projections in the list have the same r,c size
         assert len(projlist)>=1
         proj  = projlist[0]
-        rows,cols = proj.cfs_shape
+        rows,cols = proj.cfs.shape
 
         for r in range(rows):
             for c in range(cols):
                 if(mask[r,c] != 0):
-                    sums = [p.cf(r,c).norm_total for p in projlist]
+                    sums = [p.cfs[r,c].norm_total for p in projlist]
                     joint_sum = Numeric.add.reduce(sums)
                     for p in projlist:
-                        p.cf(r,c).norm_total=joint_sum
+                        p.cfs[r,c].norm_total=joint_sum
 
 
     def _normalize_weights(self,mask = None):
@@ -233,7 +233,7 @@ class LISSOM(JointNormalizingCFSheet):
     def printwts(self,x,y):
         for proj in self.in_connections:
             print proj.name, x, y
-            print proj.cf(x,y).weights
+            print proj.cfs[x,y].weights
 
 
     def state_push(self,**args):
