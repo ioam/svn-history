@@ -29,7 +29,6 @@ __version__='$Revision$'
 import numpy
 
 from math import pi, sqrt
-from fixedpoint import FixedPoint
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -71,9 +70,6 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 ###########################################
 # build simulation
 
-# Make simulation use fixed-point time.
-topo.sim.set_time_type(FixedPoint,4)
-
 
 topo.sim['Retina']=GeneratorSheet(nominal_density=locals().get('default_retina_density',24.0),
                                   input_generator=combined_inputs,
@@ -87,21 +83,21 @@ topo.sim['V1'].output_fn.lower_bound=0.1
 topo.sim['V1'].output_fn.upper_bound=0.65
 
 
-topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
+topo.sim.connect('Retina','V1',delay=0.10,
                  connection_type=CFProjection,strength=1.0,name='Afferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590)
 
-topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
+topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.10417),
                                                                              topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.10417),learning_rate=2.55528) 
             
-topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
+topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
                  connection_type=CFProjection,strength=-0.9,
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),

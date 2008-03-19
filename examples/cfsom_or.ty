@@ -43,10 +43,6 @@ inputs=[input_type(x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12+i),
 combined_inputs = topo.patterns.basic.SeparatedComposite(max_trials=75,min_separation=0.6,generators=inputs)
 
 
-# Make simulation use fixed-point time.
-from fixedpoint import FixedPoint
-topo.sim.set_time_type(FixedPoint,4)
-
 # Sheets, connections, and their parameters
 topo.sim['Retina'] = GeneratorSheet(input_generator=combined_inputs,
                                     period=1.0,phase=0.05,nominal_density=30)
