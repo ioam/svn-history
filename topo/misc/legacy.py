@@ -236,3 +236,15 @@ class SnapshotSupport(object):
 
         import topo.base.parameterclasses
         topo.base.parameterclasses.DynamicNumber = DynamicNumber
+
+
+        from topo.base.cf import CFProjection
+        from numpy import array
+        def cfproj_add_cfs(state):
+            # cfs attribute added in r8227
+            if 'cfs' not in state:
+                cflist = state['_cfs']
+                state['cfs'] = array(cflist)
+        preprocess_state(CFProjection,cfproj_add_cfs)
+
+        
