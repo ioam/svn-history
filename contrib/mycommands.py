@@ -345,15 +345,13 @@ class SimpleHomeo(OutputFnWithState):
 	    self.first_call = False
 	    self.a = ones(x.shape, x.dtype.char) * self.a_init
 	    self.b = ones(x.shape, x.dtype.char) * self.b_init
-	    self.y_avg = zeros(x.shape, x.dtype.char) 
+	    self.y_avg = zeros(x.shape, x.dtype.char) * self.mu
 
+        x_orig = copy(x)
+        x *= 0.0
+        x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
 
         if self.plastic & (float(topo.sim.time()) % 1.0 >= 0.54):
-	    x_orig = copy(x)
-            x *= 0.0
-	    x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
-
-	    print "IN1"
             self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
             # Update a and b
 	    self.b -= self.eta * (self.y_avg - self.mu)
