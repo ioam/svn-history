@@ -41,8 +41,7 @@ def v2_analysis_function():
     from topo.base.projection import ProjectionSheet
     from topo.sheets.generatorsheet import GeneratorSheet
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
-    
-    
+    from topo.misc.filepaths import normalize_path
 
     # Build a list of all sheets worth measuring
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
@@ -78,10 +77,9 @@ def rf_analysis():
     from topo.sheets.generatorsheet import GeneratorSheet
     from topo.commands.analysis import measure_or_tuning_fullfield, measure_or_pref
     from topo.commands.pylabplots import or_tuning_curve_batch
-    from topo.analysis.vision import analyze_complexity    
-    from topo.misc.filepaths import normalize_path
+    from topo.misc.filepaths import normalize_path    
     
-    if(float(topo.sim.time()) <=10010): 
+    if(float(topo.sim.time()) <=20010): 
         # Build a list of all sheets worth measuring
         f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
         measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
@@ -106,16 +104,23 @@ def rf_analysis():
         or_tuning_curve_batch(prefix,"OrientationTC:V1:[-0.1,-0.1]",pylab.plot,"degrees","V1",[-0.1,-0.1],"orientation")      
         or_tuning_curve_batch(prefix,"OrientationTC:V1:[0.1,-0.1]",pylab.plot,"degrees","V1",[0.1,-0.1],"orientation")     
         or_tuning_curve_batch(prefix,"OrientationTC:V1:[-0.1,0.1]",pylab.plot,"degrees","V1",[-0.1,0.1],"orientation") 
-	
-	contrib.mycommands.homeostatic_analysis_function()
-	
-	topo.sim["V1"].plastic=False
     else:
         topo.commands.basic.activity_history = numpy.concatenate((contrib.mycommands.activity_history,topo.sim["V1"].activity.flatten()),axis=1)    
-    
-    if(topo.sim.time() == 11009): 
+
+    if(float(topo.sim.time()) == 20000): 
+    	topo.sim["V1"].plastic=False
+	contrib.mycommands.homeostatic_analysis_function()
+
+    if(float(topo.sim.time()) == 21009): 
         pylab.figure()
         pylab.hist(topo.commands.basic.activity_history,(numpy.arange(20.0)/20.0))
+
         pylab.savefig(normalize_path(str(topo.sim.time()) + 'activity_histogram.png'))	
 	from topo.commands.basic import save_snapshot
 	save_snapshot(normalize_path('snapshot.typ'))
+
+def saver_function():
+        from topo.misc.filepaths import normalize_path
+	from topo.commands.basic import save_snapshot
+	save_snapshot(normalize_path('snapshot.typ'))
+ 
