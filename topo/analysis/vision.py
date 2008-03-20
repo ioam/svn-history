@@ -136,7 +136,7 @@ def phase_preference_scatter_plot(sheet_name):
 pg= create_plotgroup(name='Orientation Preference and Complexity',category="Preference Maps",
 
              doc='Measure preference for sine grating orientation.',
-             update_command='fm = measure_or_pref(frequencies=[3.0],scale=0.2,num_phase=32,             pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0));analyze_complexity(fm)')
+             update_command='fm = measure_or_pref(frequencies=[3.0],num_orientation=8,scale=0.3,num_phase=32,             pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0));analyze_complexity(fm)')
 pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
