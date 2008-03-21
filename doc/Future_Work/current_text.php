@@ -176,11 +176,6 @@ tuning fullfield' tuning curves.  CB: would the tutorial benefit from
 being split up a little more?  Maybe it's getting daunting?
 
 
-<H4>psyco</H4>
-(9) Is it working currently? Wouldn't work for me on lodestar.
-(Also see #1760374)
-
-
 <H4>data archive format</H4>
 (8)
 
