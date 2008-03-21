@@ -266,7 +266,7 @@ def n_units(x):
     Same technique as in cf.py for counting the number of units.
     """
     center_unit=(int(BaseN/2),int(BaseN/2))
-    return len(Numeric.nonzero(Numeric.ravel(x.cf(*center_unit).mask)))
+    return len(Numeric.nonzero(Numeric.ravel(x.cfs[center_unit].mask)))
 
 
 
@@ -285,9 +285,9 @@ LI.learning_rate=alpha_inh*n_units(LI)
 
 
 
-### NOTE: the weights comparisons will need to be improved when this
-### file supports variable densities, because C++ lissom doesn't
-### situate the weights.
+### NOTE: c++ lissom does not output unsituated weights, so a function
+### in lissom_log_parser guesses how to unsituate the weights. If your
+### weights contains rows or columns of zeros, this guessing will fail.
 
 
 ### EXCITATORY BOUNDS CHANGES
@@ -324,15 +324,6 @@ topo.sim.schedule_command(19999, 'topo.sim["Primary"].output_fn.lower_bound=0.24
 
 
 
-from math import floor
-
-def the_slice(row):
-
-    start_r = row
-    end_r = start_r + int(floor(0.5*4*4.7*2)) + 1
-
-    return slice(start_r,end_r)
-
 
 if locals().get('profiling',False):
     import timeit
@@ -344,10 +335,10 @@ if locals().get('profiling',False):
     check_activities('Ganglia01')
     check_activities('Primary')
 
-    check_weights('Primary','Afferent00',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent00',(23,23),slice(12,25),slice(12,25))
-    check_weights('Primary','Afferent01',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent01',(23,23),slice(12,25),slice(12,25))
+    check_weights('Primary','Afferent00',(0,0))
+    check_weights('Primary','Afferent00',(23,23))
+    check_weights('Primary','Afferent01',(0,0))
+    check_weights('Primary','Afferent01',(23,23))
 
     print "[lissom_oo_or_reference.ty] run(%s) in %s s"%(iterations,t)
 
@@ -356,26 +347,26 @@ elif locals().get('comparisons',False):
 
     ### INITIAL WEIGHTS COMPARISONS
     #
-    check_weights('Ganglia00','Afferent0',(0,0),the_slice(0),the_slice(0))
-    check_weights('Ganglia00','Afferent0',(12,12),the_slice(12),the_slice(12))
+    check_weights('Ganglia00','Afferent0',(0,0))
+    check_weights('Ganglia00','Afferent0',(12,12))
     
-    check_weights('Ganglia01','Afferent0',(0,0),the_slice(0),the_slice(0))
-    check_weights('Ganglia01','Afferent0',(12,12),the_slice(12),the_slice(12))
+    check_weights('Ganglia01','Afferent0',(0,0))
+    check_weights('Ganglia01','Afferent0',(12,12))
     
     # CEBALERT: Before the simulation has been run, the
     # Topographica weights are not jointly normalized.
     topo.sim.run(0.00001)
     
-    check_weights('Primary','Afferent00',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent00',(23,23),slice(12,25),slice(12,25))
-    check_weights('Primary','Afferent01',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent01',(23,23),slice(12,25),slice(12,25))
+    check_weights('Primary','Afferent00',(0,0))
+    check_weights('Primary','Afferent00',(23,23))
+    check_weights('Primary','Afferent01',(0,0))
+    check_weights('Primary','Afferent01',(23,23))
 
-    check_weights('Primary','LateralExcitatory',(0,0),slice(0,5),slice(0,5))
-    check_weights('Primary','LateralExcitatory',(23,23),slice(19,28),slice(19,28))
+    check_weights('Primary','LateralExcitatory',(0,0))
+    check_weights('Primary','LateralExcitatory',(23,23))
 
-    check_weights('Primary','LateralInhibitory',(0,0),slice(0,12),slice(0,12))
-    check_weights('Primary','LateralInhibitory',(23,23),slice(12,35),slice(12,35))
+    check_weights('Primary','LateralInhibitory',(0,0))
+    check_weights('Primary','LateralInhibitory',(23,23))
 
     topo.sim.run(0.99999) # i.e. to 1
 
@@ -404,10 +395,10 @@ elif locals().get('comparisons',False):
     check_activities('Primary')
 
 
-    check_weights('Primary','Afferent00',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent00',(23,23),slice(12,25),slice(12,25))
-    check_weights('Primary','Afferent01',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent01',(23,23),slice(12,25),slice(12,25))
+    check_weights('Primary','Afferent00',(0,0))
+    check_weights('Primary','Afferent00',(23,23))
+    check_weights('Primary','Afferent01',(0,0))
+    check_weights('Primary','Afferent01',(23,23))
 
 
 
@@ -466,10 +457,10 @@ elif locals().get('comparisons',False):
     check_activities('Primary')
 
 
-    check_weights('Primary','Afferent00',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent00',(23,23),slice(12,25),slice(12,25))
-    check_weights('Primary','Afferent01',(0,0),slice(1,14),slice(1,14))
-    check_weights('Primary','Afferent01',(23,23),slice(12,25),slice(12,25))
+    check_weights('Primary','Afferent00',(0,0))
+    check_weights('Primary','Afferent00',(23,23))
+    check_weights('Primary','Afferent01',(0,0))
+    check_weights('Primary','Afferent01',(23,23))
 
 
 
