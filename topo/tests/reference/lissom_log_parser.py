@@ -106,6 +106,43 @@ def get_matrix(matrix_file):
 
 
 
+def unsituate(matrix,expected_diameter=None):
+    """
+    Return the view of matrix that contains all non-zero rows and
+    columns (a guess at how to unsituate a weights matrix).
+
+    expected_diameter can be specifed as an optional check.
+
+    ** This function will fail if the weights matrix itself has a 
+    ** border row or column of zeros (or, less likely, a row or
+    ** column of zeros somewhere inside the weights matrix).
+    ** Never report that this function is broken: fix it, or
+    ** update c++ lissom.
+
+    e.g. for matrix
+    0 0 0 0 0.0 0.0 0.0 0.0
+    0 0 0 0 0.0 0.1 0.0 0.0
+    0.0 0.0 0.1 0.2 0.3 0.0
+    0 0 0 0 0.0 0.1 0.0 0.0
+    0 0 0 0 0.0 0.0 0.0 0.0
+    
+    will return matrix[1:4,2:5] i.e.
+    0.0 0.1 0.0
+    0.1 0.2 0.3
+    0.0 0.1 0.0
+    """
+    nonzeror,nonzeroc = matrix.nonzero()
+    rstart = nonzeror.min()
+    rstop = nonzeror.max()+1
+    cstart = nonzeroc.min()
+    cstop = nonzeroc.max()+1
+
+    if expected_diameter is not None:
+        assert ctop-cstart==rstop-rstart==expected_diamater,"situate_c_matrix() couldn't guess how to situate %s"
+        
+    return matrix[rstart:rstop,cstart:cstop]
+    
+    
 def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
     """
     Return the smallest number of decimal places to which all
@@ -132,29 +169,39 @@ def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
         
 
 
-def check_weights(sheet_name,proj_name,unit,c_row_slice,c_col_slice,required_dp=6):
+def check_weights(sheet_name,proj_name,unit,slices=None,required_dp=6):
     """
-    Print the smallest number of decimal places to which all
-    corresponding elements of the C++ lissom and Topographica weights
-    of unit in proj_name (which projects into sheet_name) match.
+    Assert that corresponding elements of the C++ lissom and
+    Topographica weights of unit in proj_name (which projects into
+    sheet_name) match to at least required_dp.
 
-    c_row_slice and c_col_slice specifiy where the weights are (C++ lissom
-    does not situate weights in its .matrix files).
+    If required_dp is 0, simply prints the smallest number of decimal
+    places to which the two corresponding elements match.
+
+    If specified, slices must be a tuple of slice objects specifying
+    where the weights are (C++ lissom does not situate weights in its
+    .matrix files; check_weights uses unsituate() to guess, but if
+    it's wrong you can override with slices).
     """
     cTIME = "%06d"%long(topo.sim.time())
     cREGION = sheet_name
     cCONN = proj_name
     cUNIT = "%03d_%03d"%unit
-    
+
     c_matrix_filename=filename_base+cTIME+'.wts.'+cREGION+'.'+cCONN+'.'+cUNIT+'.matrix'
+    comparing_what = proj_name + " " + str(unit) + " t=" + str(topo.sim.time())
+    print "Comparing %s"%comparing_what
 
-    comparing_what = proj_name + " " + str(unit) + " t=" + str(topo.sim.time()) 
+    topo_weights = topo.sim[sheet_name].projections()[proj_name].cfs[unit].weights
+    situated_c_weights = get_matrix(c_matrix_filename)
 
-    topo_weights = topo.sim[sheet_name].projections()[proj_name].cf(*unit).weights
-    c_weights = get_matrix(c_matrix_filename)[c_row_slice,c_col_slice]
+    if slices is None:
+        c_weights = unsituate(situated_c_weights)
+    else:
+        c_weights = situated_c_weights[slices[0],slices[1]]
 
     match_dp = compare_elements(topo_weights,c_weights)
-    print comparing_what+" matched to "+`match_dp`+" d.p."
+    print "...matched to "+`match_dp`+" d.p."
     # could return comparing_what & dp if that information is to be used for something else
 
     if required_dp>0:
@@ -171,15 +218,14 @@ def check_activities(sheet_name,required_dp=5):
     cREGION = sheet_name
 
     c_matrix_filename=filename_base+cTIME+'p000.'+cREGION+'_Activity.matrix'
-
-    
-    comparing_what = sheet_name + " activity t=" + str(topo.sim.time()) 
+    comparing_what = sheet_name + " activity t=" + str(topo.sim.time())
+    print "Comparing %s"%comparing_what
 
     topo_act = topo.sim[sheet_name].activity
     c_act = get_matrix(c_matrix_filename)
 
     match_dp = compare_elements(topo_act,c_act)
-    print comparing_what+" matched to "+`match_dp`+" d.p."
+    print "...matched to "+`match_dp`+" d.p."
     # could return comparing_what & dp if that information is to be used for something else
 
     if required_dp>0:
