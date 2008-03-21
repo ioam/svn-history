@@ -127,7 +127,7 @@ topo.sim['V1SimpleInh'] = JointNormalizingCFSheet_Continuous(nominal_density=loc
                         
 topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',120.0),
                         nominal_bounds=BoundingBox(radius=core_size),
-                        output_fn=output_fn_C)
+                        output_fn=Sigmoid(r=locals().get('CAINI',14.5),k=locals().get('CBINI',-4.0)))
 
 
 # DoG weights for the LGN
@@ -223,17 +223,21 @@ topo.sim.connect('V1Simple','V1Complex',delay=FixedPoint("0.05"),
                  learning_rate=0)
 
 topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.05"),name='LateralExcitatory',
-                 connection_type=CFProjection,strength=locals().get('CxLatExcStr',0.7),
+                 connection_type=CFProjection,strength=locals().get('CxLatExcStr',0.9),
                  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatExcSize',0.04)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('CxLatExcBB',0.03)),
                  learning_rate=0.0)
 
 topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.05"),name='LateralInhibitory',
-                 connection_type=CFProjection,strength=-locals().get('CxLatInhStr',0.3),
+                 connection_type=CFProjection,strength=-locals().get('CxLatInhStr',0.9),
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                      generators=[Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',3*0.22917)),
                                 topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.32917),
-                 learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                               ExponentialDecay(starting_value = locals().get('CtoC_lr',5.0),time_constant=locals().get('CtoC_tc',9600)))))
+                 learning_rate=0)#(BoundedNumber(bounds=(0.137,None),generator=
+                               #ExponentialDecay(starting_value = locals().get('CtoC_lr',5.0),time_constant=locals().get('CtoC_tc',9600)))))
+
+#### Activation function threshold changes
+#OF='topo.sim["V1Complex"].output_fn'
+#topo.sim.schedule_command(200*st,OF+'.lower_bound=0.093;'+OF+'.upper_bound=0.643')
 
