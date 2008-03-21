@@ -57,7 +57,7 @@ Prorities:
 (9): Merge or abandon (or move to 1.0?) idle branch? (CEB)
 
 
-* boundingregion.py cleanup: release 1.0 (CEB)
+* boundingregion.py cleanup: release 1.0 
 
 
 * sheetviews: release 1.0 (JAB)
@@ -65,7 +65,7 @@ Prorities:
 
 * cf.py
 (8) learning rate moves to learning function (rather than cfprojection)
-(9) where mask created (by cfprojection/cf)
+(9) where mask created (by cfprojection/cf)  (CEB)
 (8) learning rate a parameter of CFPLearningFn
 (8) CFPOutputFn mask parameter could be dropped now a masked iterator can be passed in
 (3) calculation of no. of units (internal)
@@ -87,8 +87,8 @@ Prorities:
 
 
 * Slice
-(9) M[slice]-style syntax (first figuring out performance implications of attribute access)
-(9) cleanup
+(9) M[slice]-style syntax (first figuring out performance implications of attribute access) (CEB)
+(9) cleanup (CEB)
 
 
 * PatternGenerator
@@ -111,7 +111,7 @@ Prorities:
 
 
 * Parameters
-(9) Enumeration marked as not finished (but seems fine!)
+(9) Enumeration marked as not finished (but seems fine!) (CEB)
 (9) Replace any remaining subclasses of ClassSelectorParameter
 (8) FixedPoint doesn't work properly with Number (removing fixedpoint anyway?)
 (9) Removing InstanceMethodWrapper if possible & anything else not required with python 2.5
@@ -165,7 +165,7 @@ changes to track with SVN or be tied to a specific SVN version?)
     connectionfield is valid at all densities (etc) ).
 
 
-<H4>2007/09/20: copying plotgroup from plotgroups</H4>
+<H4>2007/09/20 (CB): copying plotgroup from plotgroups</H4>
 (9) See ALERT next to plotgroups in plotgroup.py.
 
 
@@ -176,7 +176,7 @@ tuning fullfield' tuning curves.  CB: would the tutorial benefit from
 being split up a little more?  Maybe it's getting daunting?
 
 
-<H4>psyco (CB)</H4>
+<H4>psyco</H4>
 (9) Is it working currently? Wouldn't work for me on lodestar.
 (Also see #1760374)
 
@@ -200,7 +200,7 @@ right click menus...) </li>
 <li>(3) Restriction on operations in parallel? (E.g. run and map measurement.)</li>
 </ul>
 
-<H4>(9) pylint: deal with or ignore all warnings</H4>
+<H4>(9) pylint (CB): deal with or ignore all warnings</H4>
 For make lint-base
 
 
@@ -234,13 +234,13 @@ easier.
 <H4>2006/11/09 (JA): optimizations from c++</H4>
 Need to implement more of the optimizations from the C++ LISSOM code.
 
-<H4>2007/03/29 (CB): Makefiles to python scripts</H4>
+<H4>2007/03/29: Makefiles to python scripts</H4>
 Control tests from a python file rather than the Makefile.  Can then include
 more tests of examples, by specifying sheet to look at etc.  And importantly,
 can easily run tests on Windows version.
 
 
-<H4>2007/03/26 (CB): Support for optimization</H4>
+<H4>2007/03/26: Support for optimization</H4>
 Do we need our own simple timing functions to make it easier for users
 to optimize their components (as opposed to the overall Topographica
 framework, for which the current profile() commands are appropriate)?
@@ -250,7 +250,7 @@ doing optimization, focusing on the components we expect to be the
 bottlenecks. Add general advice for optimization to the manual pages.
 
 
-<H4>2007/03/26 (CB): developer page about efficient array computations.</H4>
+<H4>2007/03/26: developer page about efficient array computations.</H4>
 Measurement of numpy.sum(X)/X.sum()/sum(X) performance. Difference
 between simulation results on different platforms (for slow-tests in
 Makefile).
@@ -265,7 +265,7 @@ to topo.sim.time. Rather than having a default of topo.sim.time
 in places that don't know about simulations. In parameterclasses?
 
 
-<H4>2007/12/23 (CB): who's tracking the results of...</H4>
+<H4>2007/12/23: who's tracking the results of...</H4>
 <ul>
 <li>examples/joublin_bc96.ty</li>
 <li>examples/lissom_whisker_barrels.ty</li>
@@ -285,7 +285,7 @@ http://www.digitalpeers.com/pythondebugger/.
 
 
 
-<H4>2007/03/29 (CB): tidy up c++ lissom matching</H4>
+<H4>2007/03/29: tidy up c++ lissom matching</H4>
 Set c++ lissom params so that topographica doesn't have to set ganglia
 weight mask specially. Generalize oo_or_map_topo.params.
 
