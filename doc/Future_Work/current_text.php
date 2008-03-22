@@ -162,7 +162,8 @@ changes to track with SVN or be tied to a specific SVN version?)
 (8) gaps in c++ comparisons (lissom_oo_or_reference checked only at
     density 48)
 (8) gaps in tests (no guarantee that code in/related to
-    connectionfield is valid at all densities (etc) ).
+    connectionfield is valid at all densities
+(8) make speed-tests check results, too
 
 
 <H4>2007/09/20 (CB): copying plotgroup from plotgroups</H4>
