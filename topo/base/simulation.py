@@ -800,43 +800,57 @@ class Simulation(ParameterizedObject,OptionalSingleton):
     Simulation is a singleton: there is only one instance of
     Simulation, no matter how many times it is instantiated.
     """
-    time_type = Parameter(default=float,constant=True,doc="""
-    The number type to use for Simulation's time.
-
-    Simulation's time type can be set to any numeric type that
-    XXX.
-
-    Extra arguments can be passed to time_type when it is being used
-    to create the Simulation's time: see time_type_args.
-
-    For instance, one might wish to use arbitrary precision
-    floating-point time to avoid accumulating rounding errors.  Or,
-    one might wish to use a rational time to allow events to happen a
-    certain number of times in a given interval.
-
- 
-    Some potentially useful number classes:
-
-    - mx.Number.Rational, mx.Number.Float (both included with
-    Topographica). mx.Number provides Python with access to the GNU
-    Multi-Precision library, but requires GMP to be built.
     
-    - fixedpoint.FixedPoint (a pure Python fixed-point number).
-
-    - Python's Decimal class (in the standard library).
-    """)
+    time_type = Parameter(default=float,constant=True,doc="""
+        The numeric type to use for Simulation's time values.
+        
+        Simulation's time type can be set to any numeric type that
+        supports the usual Python numeric operations, including at
+        least multiplication, addition, and subtraction.  Most of the
+        code assumes that fractional values are supported, as they are
+        for floats, but it may be possible to use an integer type
+        instead if various default fractional values are overridden.
+        
+        For instance, one might wish to use arbitrary precision
+        floating-point time to avoid accumulating rounding errors.
+        For instance, if stepping through a simulation every 0.05 time
+        units, after 20 such steps using floats the simulation will
+        not reach 1.0 exactly, but will instead be slightly higher or
+        lower.  With an arbitrary precision float type such a series
+        of steps can be guaranteed to reach 1.0 exactly.
+        Alternatively, one might wish to use a rational type so that
+        events can be guaranteed to happen a certain number of times
+        in a given interval, even if the ratio cannot be expressed as
+        an even decimal or binary fraction.
+        
+        Extra arguments can be passed to time_type when it is being used
+        to create the Simulation's time: see time_type_args.
+        
+        Some potentially useful number classes::
+        
+        - mx.Number.Rational, mx.Number.Float: provide Python with access
+          to the fast GNU Multi-Precision library, but require GMP to be
+          built.
+        
+        - fixedpoint.FixedPoint: pure Python fixed-point number, but
+          quite slow.
+        
+        - Python's Decimal class: in the standard library, but also quite
+          slow.""")
 
     time_type_args = Parameter(default=(),constant=True,doc="""
-    tuple of arguments to give to time_type whenever a new
-    instance of the time_type is being created (e.g. when a Simulation
-    is created).
-    """)
+        Tuple of arguments to give to time_type whenever a new
+        instance of the time_type is being created (e.g. when a
+        Simulation is created).""")
 
     register = BooleanParameter(default=True,constant=True,doc="""
         Whether or not to register this Simulation. If True, this
         Simulation (when created explicitly or when unpickled)
-        will replace an existing Simulation (if one exists).
-        """)
+        will replace any existing registered Simulation (if one exists).
+        Thus only one Simulation with register=True can exist at
+        any one time, which makes it simpler to handle defining
+        and reloading a series of simulations without polluting the
+        memory space with unused simulations.""")
 
     startup_commands = Parameter(instantiate=True,default=[],doc="""
         List of string commands that will be exec'd in
