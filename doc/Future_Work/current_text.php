@@ -837,6 +837,13 @@ http://somethingaboutorange.com/mrl/projects/nose/
 
 have buildbot run make -C examples?
 
+
+
+I'm not certain, but maybe we could make pickles smaller by taking advantage
+of something new in protocol 2, documented at http://www.python.org/dev/peps/pep-0307/ (search for 'bloat' and '__newobj__') (implement __reduce__ and
+__newobj__ for ParameterizedObject)
+
+
 -->
 
 
