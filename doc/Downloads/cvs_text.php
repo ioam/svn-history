@@ -96,6 +96,9 @@ the system, you would do:
 
 <ol>
 
+<!--CEBALERT: these instructions are out of date, right? 
+E.g. there's no binary fink for 10.5 -->
+
 <li> If an X11 Xwindows server is not already installed, install
 Apple's <a
 href="http://www.apple.com/support/downloads/x11formacosx.html">X11
@@ -118,7 +121,7 @@ necessarily been tested.
 HREF="http://www.finkproject.org/download/">Fink 0.8.1 Binary Installer</A>
 package. Again, other versions should work, but have not necessarily
 been tested. 
-<!--CB: maybe macports is easier now?-->
+<!--CB: evaluate macports?-->
 
 <li> Start an X11 terminal and enter the following command: <code>fink
 install cvs libpng3 freetype219</code>. (These packages provide,
@@ -130,7 +133,8 @@ matplotlib library used by Topographica.)
 (e.g. for online help), use Fink to get imagemagick, transfig, php,
 and m4 (if these are not already installed): <code>fink install
 php4 m4 tetex imagemagick transfig</code>.
-
+<!-- with fink for os x 10.5 (i.e. not binary fink), this command 
+takes at least 6 hours to run on sake... -->
 </ol>
 
 <P>If you have trouble running <code>fink</code>, make sure the Fink
