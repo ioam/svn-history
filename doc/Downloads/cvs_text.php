@@ -134,7 +134,8 @@ matplotlib library used by Topographica.)
 and m4 (if these are not already installed): <code>fink install
 php4 m4 tetex imagemagick transfig</code>.
 <!-- with fink for os x 10.5 (i.e. not binary fink), this command 
-takes at least 6 hours to run on sake... -->
+takes at least 6 hours to run on sake...and then it finishes with:
+Failed: Fink::SysState: Could not resolve inconsistent dependencies-->
 </ol>
 
 <P>If you have trouble running <code>fink</code>, make sure the Fink
