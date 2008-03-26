@@ -1,7 +1,7 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-default: python jpeg pil numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis bwidget ipython
+default: python jpeg pil numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis bwidget ipython mxnumber
 
 all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
 
