@@ -279,9 +279,6 @@ def AddGC():
                     nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOff',
                     weights_generator=lgn_surroundg)
     
-    topo.sim["V1"].in_connections[0].strength=__main__.__dict__.get('LGNStr',5.0)
-    topo.sim["V1"].in_connections[1].strength=__main__.__dict__.get('LGNStr',5.0)
-    #topo.sim["V1"].output_fn = Sigmoid(k=-4.3,r=8.5)
     
     topo.sim["LGNOn"].tsettle = 2
     topo.sim["LGNOff"].tsettle = 2
@@ -355,3 +352,16 @@ class SimpleHomeo(OutputFnWithState):
             self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
             # Update a and b
 	    self.b -= self.eta * (self.y_avg - self.mu)
+
+current_histogram = []
+activity_queue = []
+call_time=0
+def update_histogram(sheet_name="V1"):
+    activity_queue.insert(0,topo.sim[sheet_name])
+    if(call_time>=1000):
+        activity_queue.pop()
+    call_time=call_time+1
+    current_histogram = numpy.empty(0)
+    for a in activity_queue:
+        numpy.concatenate((current_histogram,a.flatten()),axis=1)
+
