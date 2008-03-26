@@ -197,7 +197,7 @@ if tracking==True:
             V1_OF=PipelineOF(output_fns=[HE, V1_Tracker])
     elif simple==True:
             Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
-            HE=CascadeHomeostatic(smoothing=locals().get('V1_smoothing',smoothing), 
+            HE=CascadeHomeostatic(smoothing=locals().get('V1_smoothing',smoothing), a_smoothing=locals().get('a_smoothing',0.9997),         b_smoothing=locals().get('b_smoothing',0.9997), 
                                  b_eta=locals().get('b_eta',0.002*9), a_init=locals().get('a_init',14.5),
                                  b_init=locals().get('b_init',-5.5), mu=mu, step=9)
             V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['a', 'b','y_avg','y_count'], units=units, step=9)
