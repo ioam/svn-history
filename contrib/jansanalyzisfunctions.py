@@ -30,6 +30,11 @@ def complex_analysis_function():
     for s in measured_sheets:
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p)
+    
+    from topo.misc.filepaths import normalize_path
+    from topo.commands.basic import save_snapshot
+    save_snapshot(normalize_path('snapshot.typ'))
+
 
 def v2_analysis_function():
     """
@@ -52,7 +57,9 @@ def v2_analysis_function():
     topo.commands.analysis.coordinate=(0.0,0.0)
     if input_sheets:    topo.commands.analysis.input_sheet_name=input_sheets[0].name
     if measured_sheets: topo.commands.analysis.sheet_name=measured_sheets[0].name
-    
+
+    topo.sim["V1Simple"].measure_maps = True
+    topo.sim["V1Complex"].measure_maps = True
     save_plotgroup("Orientation Preference and Complexity")    
     # Plot all projections for all measured_sheets
     for s in measured_sheets:
@@ -60,10 +67,12 @@ def v2_analysis_function():
             save_plotgroup("Projection",projection=p)
 
     save_plotgroup("Activity")
-    topo.sim["V1Simple"].measure_maps = False
-    topo.sim["V1Complex"].measure_maps = False
+#    topo.sim["V1Simple"].measure_maps = False
+#    topo.sim["V1Complex"].measure_maps = False
         
     save_plotgroup("Corner OR Preference")
+    from topo.commands.basic import save_snapshot
+    save_snapshot(normalize_path('snapshot.typ'))
 
 
 activity_history=numpy.array([])
@@ -120,7 +129,6 @@ def rf_analysis():
 	save_snapshot(normalize_path('snapshot.typ'))
 
 def saver_function():
-        from topo.misc.filepaths import normalize_path
-	from topo.commands.basic import save_snapshot
-	save_snapshot(normalize_path('snapshot.typ'))
+    from topo.commands.basic import save_snapshot
+    save_snapshot(normalize_path('snapshot.typ'))
  
