@@ -158,7 +158,7 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 topo.sim.connect('LGNOn','V1Simple',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=locals().get('LGNStr',5.5),name='LGNOnAfferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                     generators=[Gaussian(aspect_ratio=1.0, size=UniformRandom(lbound=0.1,ubound=0.1,seed=56))
+                     generators=[Gaussian(aspect_ratio=1.0, size=UniformRandom(lbound=0.2,ubound=0.2,seed=56))
                  ,topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
                  coord_mapper=jitterOn,
@@ -170,7 +170,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=FixedPoint("0.05"),dest_port=('Activit
 topo.sim.connect('LGNOff','V1Simple',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=locals().get('LGNStr',5.5),name='LGNOffAfferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                     generators=[Gaussian(aspect_ratio=1.0,size=UniformRandom(lbound=0.1,ubound=0.1,seed=13))
+                     generators=[Gaussian(aspect_ratio=1.0,size=UniformRandom(lbound=0.2,ubound=0.2,seed=13))
                  ,topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
                  coord_mapper=jitterOff,
