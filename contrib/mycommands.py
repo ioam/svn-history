@@ -23,7 +23,8 @@ from topo.commands.pylabplots import or_tuning_curve_batch, matrixplot
 from topo.commands.analysis import save_plotgroup, measure_or_tuning_fullfield
 from topo.misc.filepaths import normalize_path
 from topo.commands.pylabplots import plot_tracked_attributes
-from topo.base.parameterclasses import Number
+from topo.base.parameterclasses import Number, Parameter
+from topo.base.functionfamilies import CoordinateMapperFn
 
 import matplotlib 
 matplotlib.use('Agg')
@@ -223,8 +224,8 @@ def AddV2():
                                        topo.patterns.basic.Gaussian(scale=1,size = 0.06,orientation=0,aspect_ratio=7,x=0.3),
                                        topo.patterns.basic.Gaussian(scale=1,size = 0.06,orientation=pi/2,aspect_ratio=7,y=0.3)],
                     scale=1.0, bounds=BoundingBox(radius=0.8),
-                    x=UniformRandom(lbound=-(globals().get('BS',0.5)+0.25),ubound=(globals().get('BS',0.5)+0.25),seed=12),
-                    y=UniformRandom(lbound=-(globals().get('BS',0.5)+0.25),ubound=(globals().get('BS',0.5)+0.25),seed=34),
+                    x=UniformRandom(lbound=-(__main__.__dict__.get('BS',0.5)+0.25),ubound=(__main__.__dict__.get('BS',0.5)+0.25),seed=12),
+                    y=UniformRandom(lbound=-(__main__.__dict__.get('BS',0.5)+0.25),ubound=(__main__.__dict__.get('BS',0.5)+0.25),seed=34),
                     orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
                 for i in xrange(1)]
     #combined_corners = topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=corners)
@@ -232,30 +233,30 @@ def AddV2():
 
     topo.sim['Retina'].set_input_generator(combined_corners)
     
-    topo.sim['V2'] = LISSOM(nominal_density=globals().get('default_density',48.0),
-                        nominal_bounds=BoundingBox(radius=globals().get('CS',0.5)),tsettle=9,
-                        output_fn=HomeostaticMaxEnt(a_init=14.5, b_init=globals().get('BINI',-4), mu=globals().get('V2MU',0.01)))
+    topo.sim['V2'] = LISSOM(nominal_density=__main__.__dict__.get('default_density',48.0),
+                        nominal_bounds=BoundingBox(radius=__main__.__dict__.get('CS',0.5)),tsettle=9,
+                        output_fn=HomeostaticMaxEnt(a_init=14.5, b_init=__main__.__dict__.get('BINI',-4), mu=__main__.__dict__.get('V2MU',0.01)))
 
     topo.sim.connect('V1Complex','V2',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
-                    connection_type=CFProjection,strength=globals().get('V1aff_str',1),name='V1Afferent',
+                    connection_type=CFProjection,strength=__main__.__dict__.get('V1aff_str',1),name='V1Afferent',
                     weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                    generators=[Gaussian(aspect_ratio=1.0, size=3),#globals().get('V1aff_size',30)),
+                                                                    generators=[Gaussian(aspect_ratio=1.0, size=3),#__main__.__dict__.get('V1aff_size',30)),
                                                                                 topo.patterns.random.UniformRandom()]),
-                    nominal_bounds_template=BoundingBox(radius=globals().get('V1aff_size',2*0.27083)/2),learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                                                                                                    ExponentialDecay(starting_value = globals().get('V1aff_lr',0.9590/2),
-                                                                                                                    time_constant=globals().get('V1aff_lrtc',1600),
+                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V1aff_size',2*0.27083)/2),learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
+                                                                                                    ExponentialDecay(starting_value = __main__.__dict__.get('V1aff_lr',0.9590/2),
+                                                                                                                    time_constant=__main__.__dict__.get('V1aff_lrtc',1600),
                                                                                                                     time_offset=2000))))
     topo.sim.connect('V2','V2',delay=FixedPoint("0.05"),name='V2LateralExcitatory',
                     connection_type=CFProjection,strength=0.9,
-                    weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=globals().get('V2lat_exc_size',0.04)),
-                    nominal_bounds_template=BoundingBox(radius=globals().get('V2lat_exc_size',0.04)/2),learning_rate=0) 
+                    weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=__main__.__dict__.get('V2lat_exc_size',0.04)),
+                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2lat_exc_size',0.04)/2),learning_rate=0) 
                 
     topo.sim.connect('V2','V2',delay=FixedPoint("0.05"),name='V2LateralInhibitory',
                     connection_type=CFProjection,strength=-0.9,
                     weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                    generators=[Gaussian(aspect_ratio=1.0,      size=globals().get('V2lat_inh_size',2*0.22917)),
+                                                                    generators=[Gaussian(aspect_ratio=1.0,      size=__main__.__dict__.get('V2lat_inh_size',2*0.22917)),
                                                                                 topo.patterns.random.UniformRandom()]),
-                    nominal_bounds_template=BoundingBox(radius=globals().get('V2lat_inh_size',2*0.22917)/2),learning_rate=1.8087)
+                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2lat_inh_size',2*0.22917)/2),learning_rate=1.8087)
 
     topo.sim["V1Simple"].in_connections[0].strength=1.8
     topo.sim["V1Simple"].in_connections[1].strength=1.8
@@ -270,12 +271,12 @@ def AddGC():
 
 
     topo.sim.connect('LGNOn','LGNOn',delay=FixedPoint("0.05"),dest_port=('Activity','Divisive'),
-                    connection_type=SharedWeightCFProjection,strength=locals().get('LGNLatStr',35),
+                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',35),
                     nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOn',
                     weights_generator=lgn_surroundg)
     
     topo.sim.connect('LGNOff','LGNOff',delay=FixedPoint("0.05"),dest_port=('Activity','Divisive'),
-                    connection_type=SharedWeightCFProjection,strength=locals().get('LGNLatStr',35),
+                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',35),
                     nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOff',
                     weights_generator=lgn_surroundg)
     
@@ -353,6 +354,14 @@ class SimpleHomeo(OutputFnWithState):
             # Update a and b
 	    self.b -= self.eta * (self.y_avg - self.mu)
 
+
+class Jitter(CoordinateMapperFn):
+    scale =  0.4    
+    rand = Parameter(default=None)    
+    def __call__(self,x,y):
+            return x+(self.rand()-0.5)*self.scale,y+(self.rand()-0.5)*self.scale
+
+
 current_histogram = []
 activity_queue = []
 call_time=0
@@ -364,4 +373,5 @@ def update_histogram(sheet_name="V1"):
     current_histogram = numpy.empty(0)
     for a in activity_queue:
         numpy.concatenate((current_histogram,a.flatten()),axis=1)
+
 
