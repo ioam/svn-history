@@ -36,7 +36,7 @@ shared_params = {"a_init":14.5, "b_init":-4, "mu":0.01, "smoothing":0.0003}
 shared_debug_params = {"debug_params":["a", "b"] , "avg_params":["x"], "units":[(0,0),(11,11),(23,23)]}
 
 stim = locals().get('Stimulus','BarThin')
-
+core_size=locals().get('CS',0.5)
 num_inputs=1
 
 if stim == 'Gaussian':
@@ -51,8 +51,8 @@ elif stim == 'Bar':
     size=1.0, bounds =  BoundingBox(radius=0.8),thickness=0.5),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.07))
 elif stim == 'BarThin':
     input= topo.patterns.basic.Translator(generator=topo.patterns.basic.Line(
-        x=UniformRandom(lbound=-0.65,ubound=0.65,seed=1023),
-        y=UniformRandom(lbound=-0.65,ubound=0.65,seed=53),
+        x=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=1023),
+        y=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=53),
     size=1.0, offset=0.5,scale=Choice(choices=[-0.5,0.5],seed=56),bounds =  BoundingBox(radius=0.8),thickness=0.04,smoothing=0.0),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
 elif stim == 'Gabor':
     input= topo.patterns.basic.Translator(generator=topo.patterns.basic.Gabor(
@@ -80,7 +80,7 @@ CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
-core_size=locals().get('CS',0.5)
+
 
 ## Homeostatic stuff
 #Simple
