@@ -42,7 +42,7 @@ from topo.base.cf import CFSheet, CFPLF_PluginScaled
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF, IdentityOF, ActivityAveragingOF, AttributeTrackingOF, Sigmoid, HalfRectify, HomeostaticMaxEnt
+from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF, IdentityOF, ActivityAveragingOF, AttributeTrackingOF, Sigmoid, HalfRectify, HomeostaticMaxEnt,CascadeHomeostatic
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.patterns.image import Image
 
@@ -179,6 +179,7 @@ lgn_strength = locals().get('lgn_strength', 1.0)
 #V1
 tracking=locals().get('tracking', True)
 triesch=locals().get('triesch', True)
+simple=locals().get('simple', False)
 scaling=locals().get('scaling',True)
 if tracking==True:
     if triesch==True:
@@ -194,6 +195,13 @@ if tracking==True:
                                  b_init=locals().get('b_init',-5.5), mu=mu, step=9)
             V1_Tracker=AttributeTrackingOF(object=HE,coordframe="topo.sim['V1']", attrib_names=['a', 'b','y_avg'], units=units, step=9)
             V1_OF=PipelineOF(output_fns=[HE, V1_Tracker])
+    elif simple==True:
+            Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
+            HE=CascadeHomeostatic(smoothing=locals().get('V1_smoothing',smoothing), 
+                                 b_eta=locals().get('b_eta',0.002*9), a_init=locals().get('a_init',14.5),
+                                 b_init=locals().get('b_init',-5.5), mu=mu, step=9)
+            V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['a', 'b','y_avg','y_count'], units=units, step=9)
+            V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
     else:
         if scaling==True:
             Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf','lr_sf', 'scaled_x_avg'], units=units)
@@ -286,12 +294,12 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=default_retina_density,
 topo.sim['LGNOn']=LISSOM(nominal_density=default_retina_density,
                           nominal_bounds=BoundingBox(radius=0.5+0.25),
                           output_fn=LGN_on_output_fn,
-                          measure_maps=False,divisive_constant=locals().get('dc',1.0),scale=locals().get("LGNStr",50))
+                          measure_maps=False,divisive_constant=locals().get('dc',1.0),scale=locals().get("LGNStr",4.2))
 
 topo.sim['LGNOff']=LISSOM(nominal_density=default_retina_density,
                            nominal_bounds=BoundingBox(radius=0.5+0.25),
                            output_fn=LGN_off_output_fn,
-                           measure_maps=False,divisive_constant=locals().get('dc',1.0),scale=locals().get("LGNStr",50))
+                           measure_maps=False,divisive_constant=locals().get('dc',1.0),scale=locals().get("LGNStr",4.2))
 
 
 if scaling==False:
