@@ -353,7 +353,6 @@ def process_argv(argv):
 
         from IPython.Shell import IPShell
         IPShell(['-noconfirm_exit','-nobanner',
-                 '-colors','NoColor',
                  '-pi1',CommandPrompt.get_format(),
                  '-pi2',CommandPrompt2.get_format(),
                  '-po',OutputPrompt.get_format()],
