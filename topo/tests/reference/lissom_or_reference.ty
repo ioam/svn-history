@@ -93,7 +93,7 @@ area_scale=1.0
 #num_eyes=1
 rf_radius=BaseRN/4.0+0.5
 inh_rad=BaseN/4.0-1.0+0.5 # this factor of 0.5 is added to make shapes similar in C++ and topographica version
-exc_rad=2.5
+exc_rad=max(2.5,BaseN/10.0)
 
 gammaexc=0.9
 gammainh=0.9
