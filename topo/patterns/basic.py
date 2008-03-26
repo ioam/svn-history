@@ -728,7 +728,16 @@ class Translator(PatternGenerator):
         # docstring above; plus, the special case of 0.05 should be
         # documented.  Maybe use a special case for last_time=0.0
         # instead, to avoid depending on 0.05?
+        
+        xdensity=params.get('xdensity',self.xdensity)
+        ydensity=params.get('ydensity',self.ydensity)
+        bounds = params.get('bounds',self.bounds)
+
+        
         if((float(topo.sim.time()) >= self.last_time + self.reset_period) or (float(topo.sim.time()) ==0.05)):
+            if ((float(topo.sim.time()) <= (self.last_time+self.reset_period+1.0)) and (float(topo.sim.time()) !=0.05))    :
+                return Null()(xdensity=xdensity,ydensity=ydensity,bounds=bounds)
+        
             self.last_time += self.reset_period
             # time to reset the parameter
             (self.x, self.y, self.scale) = (generator.x,generator.y,generator.scale)
@@ -740,10 +749,7 @@ class Translator(PatternGenerator):
             
         (a,b,c) = (generator.x,generator.y,generator.scale)   
         
-        xdensity=params.get('xdensity',self.xdensity)
-        ydensity=params.get('ydensity',self.ydensity)
-        bounds = params.get('bounds',self.bounds)
-        
+       
         # compute how much time elapsed from the last reset
         t = float(topo.sim.time())-self.last_time
 
