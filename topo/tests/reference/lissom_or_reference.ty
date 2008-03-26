@@ -262,13 +262,13 @@ topo.sim.schedule_command( 7999, 'topo.sim["Primary"].tsettle=13')
 
 
 def check_all_weights():
-    # well it's not all weights...
-    check_weights('Primary','Afferent0',(0,0))
-    check_weights('Primary','Afferent0',(12,12))
-    check_weights('Primary','LateralExcitatory',(0,0))
-    check_weights('Primary','LateralExcitatory',(12,12))
-    check_weights('Primary','LateralInhibitory',(0,0))
-    check_weights('Primary','LateralInhibitory',(12,12))    
+    print "Checking all weights..."
+    # we might consider skipping every other one, or something like that!
+    for i in range(BaseN):
+        for j in range(BaseN):
+            check_weights('Primary','Afferent0',(i,j))
+            check_weights('Primary','LateralExcitatory',(i,j))
+            check_weights('Primary','LateralInhibitory',(i,j))
 
 def check_all_activities():
     check_activities('Eye0')
@@ -295,27 +295,27 @@ if locals().get('comparisons',False):
     check_all_activities();check_all_weights()
 
     topo.sim.run(100)
-    check_all_activities();check_all_weights()
+    check_all_activities() #200
     
     topo.sim.run(400)
-    check_all_activities();check_all_weights()
+    check_all_activities() #600
     
     topo.sim.run(300)
-    check_all_activities();check_all_weights()
+    check_all_activities() #900
     
     topo.sim.run(100) # to 1000
     check_all_activities();check_all_weights()
 
     for i in range(8): # to 9000
         topo.sim.run(1000)
-        check_all_activities();check_all_weights()
+        check_all_activities()
 
 
     topo.sim.run(3000) # 12000
     check_all_activities();check_all_weights()
 
     topo.sim.run(3000)
-    check_all_activities();check_all_weights()
+    check_all_activities()
     
     topo.sim.run(5000)
     check_all_activities();check_all_weights()
@@ -323,5 +323,5 @@ if locals().get('comparisons',False):
 
 # Command to generate lissom data for comparisons
 #
-#./lissom5 display=0 010910_or_map_512MB.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'   -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+5" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+10" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+80" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+400" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12'  -c "training t+300" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+5000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12'
+#./lissom5 display=0 010910_or_map_512MB.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c 'call save_all_units.command' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'   -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+5" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+10" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+80" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+400" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+300" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'  -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+5000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command'
 
