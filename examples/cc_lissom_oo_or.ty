@@ -90,7 +90,7 @@ HES=HomeostaticMaxEnt(eta_a=0.0,eta=locals().get('ETA',0.0002),smoothing=0.0003,
 #ODS=OutputFnDebugger(function=HES, **shared_debug_params)
 output_fn_S=HES#Pipeline(output_fns=[HES, ODS])
 #Complex
-HEC=HomeostaticMaxEnt(eta_a=0.0,plastic=locals().get('HMON',False),eta=locals().get('ETA',0.0002),smoothing=0.0003,a_init=14.5, b_init=locals().get('CBINI',-4.0), mu=locals().get('CCxMU',0.02))
+HEC=HomeostaticMaxEnt(eta_a=0.0,plastic=locals().get('HMON',False),eta=locals().get('ETA',0.0002),smoothing=0.0003,a_init=locals().get('CAINI',14.5), b_init=locals().get('CBINI',-4.0), mu=locals().get('CCxMU',0.02))
 #ODC=OutputFnDebugger(function=HEC, **shared_debug_params)
 output_fn_C=HEC#Pipeline(output_fns=[HEC, ODC])
 
@@ -209,12 +209,8 @@ topo.sim.connect('V1Complex','V1Simple',delay=FixedPoint("0.05"),
                  learning_fn=CFPLF_Trace_opt(trace_strength=locals().get('TraceStr',0.5)))
 
 topo.sim.connect('V1Complex','V1Simple',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=locals().get('FStrInh',-2.2),name='V1SimpleFeedbackInh',
-              #   connection_type=CFProjection,strength=locals().get('FStrInh',-2.0),name='V1SimpleFeedbackInh',
-              #   weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-              #       generators=[Gaussian(aspect_ratio=1.0, size=3),
-              #                  topo.patterns.random.UniformRandom()]),
-                 weights_generator=Gaussian(aspect_ratio=1.0, size=0.5),
+                 connection_type=CFProjection,strength=locals().get('FStrInh',-2.2),name='V1SimpleFeedbackInh',
+                 weights_generator=Gaussian(aspect_ratio=1.0, size=2.5),
                  nominal_bounds_template=BoundingBox(radius=locals().get('FInhSize',0.5)/2),learning_rate=0)#,
 
 
