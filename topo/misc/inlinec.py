@@ -36,13 +36,11 @@ $Id$
 import os
 from copy import copy
 
-# If true, will attempt to import weave.  Set this to False if you want
-# to avoid weave altogether, e.g. if your installation is broken.
-import_weave = True
-
+# If import_weave is not defined, or is set to True, will attempt to
+# import weave.  Set import_weave to False if you want to avoid weave
+# altogether, e.g. if your installation is broken.
 import __main__
-if '__import_weave' in __main__.__dict__:
-    import_weave = __main__.__dict__["__import_weave"]
+import_weave = __main__.__dict__.get('import_weave',True)
 
 
 # Variable that will be used to report whether weave was successfully
