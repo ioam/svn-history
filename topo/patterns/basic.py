@@ -733,7 +733,9 @@ class Translator(PatternGenerator):
         ydensity=params.get('ydensity',self.ydensity)
         bounds = params.get('bounds',self.bounds)
 
-        
+        # CB: are the float() calls required because the comparisons
+        # involving FixedPoint fail otherwise? Or for some other
+        # reason?
         if((float(topo.sim.time()) >= self.last_time + self.reset_period) or (float(topo.sim.time()) ==0.05)):
             if ((float(topo.sim.time()) <= (self.last_time+self.reset_period+1.0)) and (float(topo.sim.time()) !=0.05))    :
                 return Null()(xdensity=xdensity,ydensity=ydensity,bounds=bounds)
