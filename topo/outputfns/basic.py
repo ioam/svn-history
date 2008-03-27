@@ -729,8 +729,8 @@ class CascadeHomeostatic(OutputFnWithState):
     a_smoothing = Number(default=0.9997, doc="""
         Weighting of previous activity vs. current activity when calculating the average.""")
         
-    num_cascades = Number(default=5,doc="Target average firing rate.")
-    thresholds = [0.01,0.05,0.1,0.2,0.4] 
+    num_cascades = Number(default=9,doc="Target average firing rate.")
+    thresholds = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
 
     step = Number(default=1, doc="""
         How often to update the a and b parameters.
@@ -776,11 +776,6 @@ class CascadeHomeostatic(OutputFnWithState):
                 for i in xrange(self.num_cascades):
                     self.y_counts[i] = (1.0-self.a_smoothing)*((x >= self.thresholds[i])*1.0) + self.a_smoothing*self.y_counts[i]
                     self.a -= self.a_eta *   ((self.y_counts[i] >= self.targets[i])*2.0-1.0)
-#                 print self.a[10,10]
-#                 print self.y_counts[0][10,10]
-#                 print self.y_counts[1][10,10]
-#                 print self.y_counts[2][10,10]
-#                 print self.y_counts[3][10,10]
                     
                 self.y_count=self.y_counts[2]
                 
