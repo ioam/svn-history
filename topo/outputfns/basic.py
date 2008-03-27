@@ -776,11 +776,11 @@ class CascadeHomeostatic(OutputFnWithState):
                 for i in xrange(self.num_cascades):
                     self.y_counts[i] = (1.0-self.a_smoothing)*((x >= self.thresholds[i])*1.0) + self.a_smoothing*self.y_counts[i]
                     self.a -= self.a_eta *   ((self.y_counts[i] >= self.targets[i])*2.0-1.0)
-                 print self.a[10,10]
-                 print self.y_counts[0][10,10]
-                 print self.y_counts[1][10,10]
-                 print self.y_counts[2][10,10]
-                 print self.y_counts[3][10,10]
+#                 print self.a[10,10]
+#                 print self.y_counts[0][10,10]
+#                 print self.y_counts[1][10,10]
+#                 print self.y_counts[2][10,10]
+#                 print self.y_counts[3][10,10]
                     
                 self.y_count=self.y_counts[2]
                 
