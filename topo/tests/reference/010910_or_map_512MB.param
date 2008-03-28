@@ -5,8 +5,12 @@
 #
 # $Header: /u/nn/cvsroot/lissom/samples/or_map.param,v 1.60 2001/05/22 20:10:04 jbednar Exp $
 
+# CB: each 'set' must be on a line of its own for clunky auto-filling to work.
+
 #reduce density of book version
-set BaseN=24 BaseRN=24 area_scale=1.0
+set BaseN=24 
+set BaseRN=24 
+set area_scale=1.0
 set num_eyes=1 layers_pereye=0
 set inputs_pereye=1
 
