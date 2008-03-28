@@ -332,3 +332,39 @@ def compare_with_and_without_snapshot_LoadSnapshot(script="examples/lissom_oo_or
 
 
 ######### end Snapshot tests
+
+
+
+
+
+
+
+def run_multiple_density_comparisons():
+    from topo.misc.utils import cross_product
+    import subprocess
+    
+    k = [4,6,8,10,12,14,16,24,32]
+    x = cross_product([k,k])
+
+    cmds = []
+    for spec in x:
+        c="""./topographica -c "BaseRN=%s;BaseN=%s;comparisons=True;stop_at_1000=True" topo/tests/reference/lissom_or_reference.ty"""%(spec[0],spec[1])
+        cmds.append(c)
+
+    results = []
+    for cmd in cmds:
+        print "Executing '%s'"%cmd
+        r = subprocess.call(cmd,shell=True)
+        if r==0:
+            result = "PASS"
+        else:
+            result = "FAIL"
+        results.append(result)
+
+    print "================================================================================"
+    for cmd,result in zip(cmds,results):
+        print "%s ... %s"%(result,cmd)
+    print "================================================================================"
+    
+    if "FAIL" in results:
+        raise AssertionError("Not all simulations matched (see results above)")
