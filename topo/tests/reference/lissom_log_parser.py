@@ -40,7 +40,9 @@ def get_input_params():
       'Iteration: 000000  [Eye0 [Obj0 cx:23.4 cy:10.0 theta:059.6]]  [Eye1 [Obj0 cx:22.6 cy:10.5 theta:059.6]]  [Eye2 [Obj0 cx:21.7 cy:11.1 theta:059.6]]  [Eye3 [Obj0 cx:20.8 cy:11.6 theta:059.6]]\n'
       
     """
-    f = open(filename_base+'log','r')
+    logfile = filename_base+'log' 
+    print "Reading input params from %s"%logfile
+    f = open(logfile,'r')
 
     # first iter is test in c++ lissom; use to get num eyes
     n_eyes = len(f.readline().split('Eye')[1::])
@@ -191,6 +193,7 @@ def check_weights(sheet_name,proj_name,unit,slices=None,required_dp=6):
     c_matrix_filename=filename_base+cTIME+'.wts.'+cREGION+'.'+cCONN+'.'+cUNIT+'.matrix'
     comparing_what = proj_name + " " + str(unit) + " t=" + str(topo.sim.time())
     print "Comparing %s"%comparing_what
+    print "Reading C++ data from %s"%c_matrix_filename
 
     topo_weights = topo.sim[sheet_name].projections()[proj_name].cfs[unit].weights
     situated_c_weights = get_matrix(c_matrix_filename)
@@ -220,6 +223,7 @@ def check_activities(sheet_name,required_dp=5):
     c_matrix_filename=filename_base+cTIME+'p000.'+cREGION+'_Activity.matrix'
     comparing_what = sheet_name + " activity t=" + str(topo.sim.time())
     print "Comparing %s"%comparing_what
+    print "Reading c++ data from %s"%c_matrix_filename
 
     topo_act = topo.sim[sheet_name].activity
     c_act = get_matrix(c_matrix_filename)
