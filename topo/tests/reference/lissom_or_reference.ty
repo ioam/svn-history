@@ -80,15 +80,13 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 import topo.patterns.basic
 
 from topo.tests.reference.lissom_log_parser import get_input_params,check_weights,check_activities
-
-# All the C++ data-getting functions will use this as the filename base
-topo.tests.reference.lissom_log_parser.filename_base="topo/tests/reference/010910_or_map_512MB."
-
+from topo.misc.filepaths import normalize_path
 
 ### Variables to match 010910_or_map_512MB.param and or_defs
 #
-BaseN=24.0
-BaseRN=24.0
+BaseN=locals().get("BaseN",24.0)
+BaseRN=locals().get("BaseRN",24.0)
+
 area_scale=1.0
 #num_eyes=1
 rf_radius=BaseRN/4.0+0.5
@@ -125,6 +123,52 @@ alpha_inh=0.00025*ics
 
 tsettle=9
 
+
+
+####
+
+clissomcmd = """./lissom5 display=0 010910_or_map_512MB.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::ppm_plots=False" -c "cmd::plot_unit::weight_situate=False" -c 'call save_all_units.command' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command"   -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "training t+5" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+10" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+80" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+400" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+300" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'  -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+5000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command'"""
+
+
+out_dir=normalize_path("topo/tests/reference/010910_or_map_512MB_BaseN%s_BaseRN%s/"%(BaseN,BaseRN))
+
+
+def set_clissom_params():
+    lines = []
+    f = open(out_dir+"/010910_or_map_512MB.param",'r')
+    for line in f:
+        if 'set BaseRN' in line:
+            line="set BaseRN=%s\n"%BaseRN
+        if 'set BaseN' in line:
+            line="set BaseN=%s\n"%BaseN
+        lines.append(line)
+    f.close()
+    f = open(out_dir+"/010910_or_map_512MB.param",'w')
+    f.writelines(lines)
+    f.close()
+    
+# All the C++ data-getting functions will use this as the filename base
+topo.tests.reference.lissom_log_parser.filename_base=out_dir+"/010910_or_map_512MB."
+
+import os.path
+if not os.path.exists(out_dir):
+    os.mkdir(out_dir)
+    for thing in ["010910_or_map_512MB.param","lissom5","set_thresholds.command","save_all_units.command","or_defs"]:
+        os.system("cp topo/tests/reference/%s %s"%(thing,out_dir))
+
+    cwd = os.getcwd()
+    os.chdir(out_dir)
+
+    set_clissom_params()
+
+    print "------------------------------------------------------------"
+    print "Generating c++ lissom results in %s"%out_dir
+    os.system(clissomcmd)
+    print "------------------------------------------------------------"
+    os.chdir(cwd)
+
+
+print "Running topographica simulation..."
 
 # Number of decimal places for simulator time
 fixedpoint.DEFAULT_PRECISION=3

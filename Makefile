@@ -114,9 +114,11 @@ lint-base:
 
 
 # Compare topographica and C++ lissom output
+COMPARE_BASERN=24.0
+COMPARE_BASEN=24.0
 compare_or: 
 	make -C topo/tests/reference/
-	./topographica -c "comparisons=True" topo/tests/reference/lissom_or_reference.ty 
+	./topographica -c "BaseRN=${COMPARE_BASERN}; BaseN=${COMPARE_BASEN}; comparisons=True" topo/tests/reference/lissom_or_reference.ty 
 
 compare_oo_or: 
 	make -C topo/tests/reference/
