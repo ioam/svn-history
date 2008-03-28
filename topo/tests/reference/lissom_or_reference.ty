@@ -320,7 +320,8 @@ def check_all_weights():
 def check_all_activities():
     check_activities('Eye0')
     check_activities('Primary')
-    
+
+stop_at_1000=locals().get("stop_at_1000",False)
 
 if locals().get('comparisons',False):
 
@@ -354,19 +355,21 @@ if locals().get('comparisons',False):
     topo.sim.run(100) # to 1000
     check_all_activities();check_all_weights()
 
-    for i in range(8): # to 9000
-        topo.sim.run(1000)
+    if not stop_at_1000:
+
+        for i in range(8): # to 9000
+            topo.sim.run(1000)
+            check_all_activities()
+
+
+        topo.sim.run(3000) # 12000
+        check_all_activities();check_all_weights()
+
+        topo.sim.run(3000)
         check_all_activities()
 
-
-    topo.sim.run(3000) # 12000
-    check_all_activities();check_all_weights()
-
-    topo.sim.run(3000)
-    check_all_activities()
-    
-    topo.sim.run(5000)
-    check_all_activities();check_all_weights()
+        topo.sim.run(5000)
+        check_all_activities();check_all_weights()
 
 
 # Command to generate lissom data for comparisons
