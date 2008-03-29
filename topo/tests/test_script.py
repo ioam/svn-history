@@ -342,8 +342,11 @@ def compare_with_and_without_snapshot_LoadSnapshot(script="examples/lissom_oo_or
 def run_multiple_density_comparisons():
     from topo.misc.utils import cross_product
     import subprocess
+    import traceback
+    import os
     
-    k = [4,6,8,10,12,14,16,24,32]
+    #k = [4,6,8,10,12,14,16,24,32]
+    k = [4,6]
     x = cross_product([k,k])
 
     cmds = []
@@ -352,19 +355,47 @@ def run_multiple_density_comparisons():
         cmds.append(c)
 
     results = []
+    errs=[]
     for cmd in cmds:
+        print 
+        print "************************************************************"
         print "Executing '%s'"%cmd
-        r = subprocess.call(cmd,shell=True)
+        
+#        errout = os.tmpfile()#StringIO.StringIO()
+
+        p = subprocess.Popen(cmd, shell=True,stderr=subprocess.PIPE)
+        r = os.waitpid(p.pid, 0)
+        errout = p.stderr
+        #r = subprocess.call(cmd,shell=True)#,stderr=subprocess.PIPE)#errout)
+        #print "TB",traceback.print_exc()
         if r==0:
             result = "PASS"
         else:
             result = "FAIL"
         results.append(result)
 
+        l = errout.readlines()
+        i = 0
+        L=0
+        for line in l:
+            if line.startswith("AssertionError"):
+                L=i
+                break
+            i+=1
+        
+        errs.append(l[L::])
+        errout.close()
+
     print "================================================================================"
-    for cmd,result in zip(cmds,results):
-        print "%s ... %s"%(result,cmd)
+    nerr = 0
+    for xi,result,err in zip(x,results,errs):
+        print
+        print "* %s ... BaseRN=%s,BaseN=%s"%(result,xi[0],xi[1])
+        if result=="FAIL":
+            e = ""
+            print e.join(err)
+            
+            nerr+=1
     print "================================================================================"
     
-    if "FAIL" in results:
-        raise AssertionError("Not all simulations matched (see results above)")
+    return nerr

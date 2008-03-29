@@ -123,7 +123,7 @@ compare_or:
 
 or_comparisons:
 	make -C topo/tests/reference/
-	./topographica -c "from topo.tests.test_script import run_multiple_density_comparisons;run_multiple_density_comparisons()"
+	./topographica -c "from topo.tests.test_script import run_multiple_density_comparisons;nerr=run_multiple_density_comparisons(); import sys;sys.exit(nerr)"
 
 compare_oo_or: 
 	make -C topo/tests/reference/

@@ -308,15 +308,30 @@ topo.sim.schedule_command( 7999, 'topo.sim["Primary"].tsettle=13')
 ### in lissom_log_parser guesses how to unsituate the weights. If your
 ### weights contains rows or columns of zeros, this guessing will fail.
 
+import traceback
+def _check(s,p):
+    # we might consider skipping every other one, or something like that!
+    try:
+        for i in range(BaseN):
+            for j in range(BaseN):
+                check_weights(s,p,(i,j))
+        return 0
+    except AssertionError, st:
+        #traceback.print_exc()
+#        e = traceback.format_exc(1)
+        return "%s: %s\n"%(s,st)
+        
 
 def check_all_weights():
     print "Checking all weights..."
-    # we might consider skipping every other one, or something like that!
-    for i in range(BaseN):
-        for j in range(BaseN):
-            check_weights('Primary','Afferent0',(i,j))
-            check_weights('Primary','LateralExcitatory',(i,j))
-            check_weights('Primary','LateralInhibitory',(i,j))
+    p = ["Afferent0","LateralExcitatory","LateralInhibitory"]
+    e = ""
+    for proj in p:
+        o =_check('Primary',proj)
+        if o!=0:e+=o
+    if len(e)>0:
+        raise AssertionError("The following weights did not match:\n%s"%e)
+
 
 def check_all_activities():
     check_activities('Eye0')
