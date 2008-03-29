@@ -145,7 +145,7 @@ def unsituate(matrix,expected_diameter=None):
     return matrix[rstart:rstop,cstart:cstop]
     
     
-def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
+def compare_elements(topo_matrix,lissom_matrix,max_dp=8,name=None):
     """
     Return the smallest number of decimal places to which all
     corresponding elements of a C++ lissom and topographica matrix match.
@@ -154,9 +154,13 @@ def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
 
     Returns -1 if they don't match to at least 1 decimal place.
     """
+    if name is None:
+        name = ""
+    else:
+        name = name+": "
     # CB: this could be a general function, but I doubt anybody would use it.
     # Plus the hackalert below would have to be fixed.
-    assert topo_matrix.shape == lissom_matrix.shape, "topographica array shape %s, but c++ matrix shape %s"%(topo_matrix.shape,lissom_matrix.shape)
+    assert topo_matrix.shape == lissom_matrix.shape, "%stopographica array shape %s, but c++ matrix shape %s"%(name,topo_matrix.shape,lissom_matrix.shape)
     match_at=-1
     
     for dp in range(1,max_dp+1)[::-1]:
@@ -203,7 +207,7 @@ def check_weights(sheet_name,proj_name,unit,slices=None,required_dp=6):
     else:
         c_weights = situated_c_weights[slices[0],slices[1]]
 
-    match_dp = compare_elements(topo_weights,c_weights)
+    match_dp = compare_elements(topo_weights,c_weights,name=comparing_what)
     print "...matched to "+`match_dp`+" d.p."
     # could return comparing_what & dp if that information is to be used for something else
 
@@ -228,7 +232,7 @@ def check_activities(sheet_name,required_dp=5):
     topo_act = topo.sim[sheet_name].activity
     c_act = get_matrix(c_matrix_filename)
 
-    match_dp = compare_elements(topo_act,c_act)
+    match_dp = compare_elements(topo_act,c_act,name=comparing_what)
     print "...matched to "+`match_dp`+" d.p."
     # could return comparing_what & dp if that information is to be used for something else
 
