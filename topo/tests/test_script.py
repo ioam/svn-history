@@ -345,8 +345,7 @@ def run_multiple_density_comparisons():
     import traceback
     import os
     
-    #k = [4,6,8,10,12,14,16,24,32]
-    k = [4,6]
+    k = [4,6,8,10,12,14,16,24,32]
     x = cross_product([k,k])
 
     cmds = []
