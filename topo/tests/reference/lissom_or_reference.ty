@@ -202,6 +202,7 @@ input_pattern = topo.patterns.basic.Gaussian(
 
 
 CFProjection.cf_type.min_matrix_radius = 0
+CFProjection.autosize_mask=False
 CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
