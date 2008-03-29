@@ -21,6 +21,11 @@ from topo.tests.utils import array_almost_equal
 filename_base = ""
 
 
+def dprint(txt,d=True):
+    if d:
+        print txt
+
+
 def sign(x): return 1 if x>=0 else -1
 
 import re
@@ -175,7 +180,7 @@ def compare_elements(topo_matrix,lissom_matrix,max_dp=8,name=None):
         
 
 
-def check_weights(sheet_name,proj_name,unit,slices=None,required_dp=6):
+def check_weights(sheet_name,proj_name,unit,slices=None,required_dp=6,display=True):
     """
     Assert that corresponding elements of the C++ lissom and
     Topographica weights of unit in proj_name (which projects into
@@ -196,8 +201,8 @@ def check_weights(sheet_name,proj_name,unit,slices=None,required_dp=6):
 
     c_matrix_filename=filename_base+cTIME+'.wts.'+cREGION+'.'+cCONN+'.'+cUNIT+'.matrix'
     comparing_what = proj_name + " " + str(unit) + " t=" + str(topo.sim.time())
-    print "Comparing %s"%comparing_what
-    print "Reading C++ data from %s"%c_matrix_filename
+    dprint("Comparing %s"%comparing_what,display)
+    dprint("Reading C++ data from %s"%c_matrix_filename,display)
 
     topo_weights = topo.sim[sheet_name].projections()[proj_name].cfs[unit].weights
     situated_c_weights = get_matrix(c_matrix_filename)
@@ -208,14 +213,14 @@ def check_weights(sheet_name,proj_name,unit,slices=None,required_dp=6):
         c_weights = situated_c_weights[slices[0],slices[1]]
 
     match_dp = compare_elements(topo_weights,c_weights,name=comparing_what)
-    print "...matched to "+`match_dp`+" d.p."
+    dprint("...matched to "+`match_dp`+" d.p.",display)
     # could return comparing_what & dp if that information is to be used for something else
 
     if required_dp>0:
         assert match_dp>=required_dp, "%s: required match to %s d.p. but got %s d.p."%(comparing_what,required_dp,match_dp)
 
 
-def check_activities(sheet_name,required_dp=5):
+def check_activities(sheet_name,required_dp=5,display=True):
     """
     Print the smallest number of decimal places to which all
     corresponding elements of the C++ lissom and Topographica
@@ -226,14 +231,14 @@ def check_activities(sheet_name,required_dp=5):
 
     c_matrix_filename=filename_base+cTIME+'p000.'+cREGION+'_Activity.matrix'
     comparing_what = sheet_name + " activity t=" + str(topo.sim.time())
-    print "Comparing %s"%comparing_what
-    print "Reading c++ data from %s"%c_matrix_filename
+    dprint("Comparing %s"%comparing_what,display)
+    dprint("Reading c++ data from %s"%c_matrix_filename,display)
 
     topo_act = topo.sim[sheet_name].activity
     c_act = get_matrix(c_matrix_filename)
 
     match_dp = compare_elements(topo_act,c_act,name=comparing_what)
-    print "...matched to "+`match_dp`+" d.p."
+    dprint("...matched to "+`match_dp`+" d.p.",display)
     # could return comparing_what & dp if that information is to be used for something else
 
     if required_dp>0:

@@ -347,10 +347,10 @@ def run_multiple_density_comparisons():
     
     k = [4,6,8,10,12,14,16,24,32]
     x = cross_product([k,k])
-
+    
     cmds = []
     for spec in x:
-        c="""./topographica -c "BaseRN=%s;BaseN=%s;comparisons=True;stop_at_1000=True" topo/tests/reference/lissom_or_reference.ty"""%(spec[0],spec[1])
+        c="""./topographica -c "verbose=False;BaseRN=%s;BaseN=%s;comparisons=True;stop_at_1000=True" topo/tests/reference/lissom_or_reference.ty"""%(spec[0],spec[1])
         cmds.append(c)
 
     results = []
@@ -363,10 +363,13 @@ def run_multiple_density_comparisons():
 #        errout = os.tmpfile()#StringIO.StringIO()
 
         p = subprocess.Popen(cmd, shell=True,stderr=subprocess.PIPE)
-        r = os.waitpid(p.pid, 0)
+        p.wait()
+        r = p.returncode
+        
         errout = p.stderr
         #r = subprocess.call(cmd,shell=True)#,stderr=subprocess.PIPE)#errout)
         #print "TB",traceback.print_exc()
+        
         if r==0:
             result = "PASS"
         else:
@@ -386,6 +389,9 @@ def run_multiple_density_comparisons():
         errout.close()
 
     print "================================================================================"
+    print
+    print "SUMMARY"
+    print
     nerr = 0
     for xi,result,err in zip(x,results,errs):
         print

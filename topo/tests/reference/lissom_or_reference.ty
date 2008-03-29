@@ -304,6 +304,8 @@ topo.sim.schedule_command( 6499, 'topo.sim["Primary"].tsettle=12')
 topo.sim.schedule_command( 7999, 'topo.sim["Primary"].tsettle=13')
 
 
+verbose = locals().get("verbose",True)
+
 ### NOTE: c++ lissom does not output unsituated weights, so a function
 ### in lissom_log_parser guesses how to unsituate the weights. If your
 ### weights contains rows or columns of zeros, this guessing will fail.
@@ -314,7 +316,7 @@ def _check(s,p):
     try:
         for i in range(BaseN):
             for j in range(BaseN):
-                check_weights(s,p,(i,j))
+                check_weights(s,p,(i,j),display=verbose)
         return 0
     except AssertionError, st:
         #traceback.print_exc()
@@ -323,7 +325,7 @@ def _check(s,p):
         
 
 def check_all_weights():
-    print "Checking all weights..."
+    print "t=%s: Checking all weights..."%topo.sim.time()
     p = ["Afferent0","LateralExcitatory","LateralInhibitory"]
     e = ""
     for proj in p:
@@ -334,8 +336,9 @@ def check_all_weights():
 
 
 def check_all_activities():
-    check_activities('Eye0')
-    check_activities('Primary')
+    print "t=%s: Checking all activities..."%topo.sim.time()
+    check_activities('Eye0',display=verbose)
+    check_activities('Primary',display=verbose)
 
 stop_at_1000=locals().get("stop_at_1000",False)
 
