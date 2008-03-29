@@ -208,7 +208,7 @@ def check_weights(sheet_name,proj_name,unit,slices=None,required_dp=6):
     # could return comparing_what & dp if that information is to be used for something else
 
     if required_dp>0:
-        assert match_dp>=required_dp, "Required match to %s d.p. but got %s d.p."%(required_dp,match_dp)
+        assert match_dp>=required_dp, "%s: required match to %s d.p. but got %s d.p."%(comparing_what,required_dp,match_dp)
 
 
 def check_activities(sheet_name,required_dp=5):
@@ -233,4 +233,4 @@ def check_activities(sheet_name,required_dp=5):
     # could return comparing_what & dp if that information is to be used for something else
 
     if required_dp>0:
-        assert match_dp>=required_dp, "Required match to %s d.p. but got %s d.p."%(required_dp,match_dp)
+        assert match_dp>=required_dp, "%s: required match to %s d.p. but got %s d.p."%(comparing_what,required_dp,match_dp)
