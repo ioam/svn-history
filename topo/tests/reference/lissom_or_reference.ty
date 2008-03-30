@@ -89,8 +89,17 @@ BaseRN=locals().get("BaseRN",24.0)
 
 area_scale=1.0
 #num_eyes=1
+
 rf_radius=BaseRN/4.0+0.5
-inh_rad=BaseN/4.0-1.0+0.5 # this factor of 0.5 is added to make shapes similar in C++ and topographica version
+# force odd aff weights matrix
+if (2*rf_radius)%2==0:
+    rf_radius+=0.5
+
+inh_rad=BaseN/4.0-1.0
+# force odd inh weights matrix
+if (2*inh_rad)%2==0:
+    inh_rad+=0.5
+
 exc_rad=max(2.5,BaseN/10.0)
 
 gammaexc=0.9
@@ -137,10 +146,16 @@ def set_clissom_params():
     lines = []
     f = open(out_dir+"/010910_or_map_512MB.param",'r')
     for line in f:
+        # could we go all the way and try to write
+        # the entire params file...?
+        if 'set inh_rad' in line:
+            line="set inh_rad=%s\n"%inh_rad
         if 'set BaseRN' in line:
             line="set BaseRN=%s\n"%BaseRN
         if 'set BaseN' in line:
             line="set BaseN=%s\n"%BaseN
+        if 'rf_radius' in line:
+            line="set rf_radius=%s\n"%rf_radius
         lines.append(line)
     f.close()
     f = open(out_dir+"/010910_or_map_512MB.param",'w')
@@ -202,7 +217,6 @@ input_pattern = topo.patterns.basic.Gaussian(
 
 
 CFProjection.cf_type.min_matrix_radius = 0
-CFProjection.autosize_mask=False
 CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
