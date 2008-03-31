@@ -2,7 +2,9 @@ import __main__
 import numpy
 import pylab
 import os.path
+import os
 import copy
+import pdb
 import topo.patterns.basic
 import topo.commands.analysis
 #from scipy.integrate import dblquad
@@ -21,10 +23,14 @@ from topo.sheets.optimized import NeighborhoodMask_Opt, LISSOM_Opt
 from topo.plotting.plotfilesaver import * 
 from topo.commands.pylabplots import or_tuning_curve_batch, matrixplot
 from topo.commands.analysis import save_plotgroup, measure_or_tuning_fullfield
-from topo.misc.filepaths import normalize_path
+from topo.misc.filepaths import normalize_path,application_path
 from topo.commands.pylabplots import plot_tracked_attributes
 from topo.base.parameterclasses import Number, Parameter
 from topo.base.functionfamilies import CoordinateMapperFn
+from topo.plotting.bitmap import MontageBitmap
+from topo.misc.traces import ActivityMovie,InMemoryRecorder
+
+
 
 import matplotlib 
 matplotlib.use('Agg')
@@ -375,3 +381,56 @@ def update_histogram(sheet_name="V1"):
         numpy.concatenate((current_histogram,a.flatten()),axis=1)
 
 
+def measure_histogram():
+    for i in xrange(0,1000):
+        topo.sim.run(1)
+        update_histogram()
+    pylab.hist(current_histogram,(numpy.arange(100.0)/100.0))
+    
+    
+def enable_movie():
+    # Add a timecode to each movie
+    ActivityMovie.add_timecode = True
+    ActivityMovie.timecode_fmt = '%.2f'
+
+    # The format for times in filenames
+    ActivityMovie.filename_time_fmt = '%06.2f'
+
+    # Frame filenames should be like: "frame002.30.tif"
+    ActivityMovie.filename_fmt = 'frame%t.%T'
+
+    # The directory for movie frames:
+    ActivityMovie.filename_prefix = 'lissom_or_movie/'
+
+    # Frames should be on a white background
+    MontageBitmap.bg_color = (1,1,1)
+    # Maps within each frame will fit to 200x200 pixel tiles
+    MontageBitmap.tile_size = (200,200)
+
+    # The montages will contain 1x2 images
+    MontageBitmap.shape = (1,2)
+    # Frame title parameters
+    MontageBitmap.title_pos = (5,5)
+    #MontageBitmap.title_options = dict(fill='white')
+
+    topo.sim['Data'] = InMemoryRecorder()
+    
+    topo.sim.connect('Retina','Data',
+                    src_port = 'Activity',
+                    name = 'Retina Activity')
+    topo.sim.connect('V1','Data',
+                    src_port = 'Activity',
+                    name = 'V1 Activity')
+
+def save_movie():
+    # Create a movie
+    print 'Composing movie...'
+    movie = ActivityMovie(name = 'Lissom Orientation Movie',
+                        recorder = topo.sim['Data'],
+                        montage_params = dict(titles=['Retina','V1']),
+                        variables = ['Retina Activity','V1 Activity'],
+                        frame_times = list(numpy.arange(0,10.0,0.1)))
+    
+    # Save the frames to files:
+    print 'Saving movie to %s...' % ActivityMovie.filename_prefix
+    movie.save()
