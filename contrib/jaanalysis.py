@@ -80,7 +80,7 @@ def rf_analysis():
     import topo
     import pylab
     import topo.analysis.vision
-    import contrib.mycommands
+    import contrib.jacommands
     from topo.commands.analysis import save_plotgroup
     from topo.base.projection import ProjectionSheet
     from topo.sheets.generatorsheet import GeneratorSheet
@@ -114,11 +114,11 @@ def rf_analysis():
         or_tuning_curve_batch(prefix,"OrientationTC:V1:[0.1,-0.1]",pylab.plot,"degrees","V1",[0.1,-0.1],"orientation")     
         or_tuning_curve_batch(prefix,"OrientationTC:V1:[-0.1,0.1]",pylab.plot,"degrees","V1",[-0.1,0.1],"orientation") 
     else:
-        topo.commands.basic.activity_history = numpy.concatenate((contrib.mycommands.activity_history,topo.sim["V1"].activity.flatten()),axis=1)    
+        topo.commands.basic.activity_history = numpy.concatenate((contrib.jacommands.activity_history,topo.sim["V1"].activity.flatten()),axis=1)    
 
     if(float(topo.sim.time()) == 20000): 
     	topo.sim["V1"].plastic=False
-	contrib.mycommands.homeostatic_analysis_function()
+	contrib.jacommands.homeostatic_analysis_function()
 
     if(float(topo.sim.time()) == 21009): 
         pylab.figure()
