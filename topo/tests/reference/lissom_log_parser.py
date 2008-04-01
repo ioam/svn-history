@@ -247,3 +247,65 @@ def check_activities(sheet_name,required_dp=5,display=True):
 
     if required_dp>0:
         assert match_dp>=required_dp, "%s: required match to %s d.p. but got %s d.p."%(comparing_what,required_dp,match_dp)
+
+
+
+
+def _set_clissom_params(name,out_dir,**kw):
+    lines = []
+    fname = out_dir+"/%s.param"%name
+    f = open(fname,'r')
+    for line in f:
+        # could we go all the way and try to write
+        # the entire params file...?
+        if 'set inh_rad' in line:
+            line="set inh_rad=%s\n"%kw['inh_rad']
+        if 'set BaseRN' in line:
+            line="set BaseRN=%s\n"%kw['BaseRN']
+        if 'set BaseN' in line:
+            line="set BaseN=%s\n"%kw['BaseN']
+        if 'rf_radius' in line:
+            line="set rf_radius=%s\n"%kw['rf_radius']
+        lines.append(line)
+    f.close()
+    f = open(fname,'w')
+    f.writelines(lines)
+    f.close()
+
+
+# Command to generate lissom data for comparisons
+def _clissomcmd(name):
+    return """./lissom5 display=0 %s.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::ppm_plots=False" -c "cmd::plot_unit::weight_situate=False" -c 'call save_all_units.command' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command"   -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "training t+5" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+10" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+80" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+400" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+300" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'  -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+5000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command'"""%name
+
+
+
+
+import os.path
+from topo.misc.filepaths import normalize_path
+
+def initialize_clissom_data(name,**kw):
+    out_dir=normalize_path("topo/tests/reference/%s_BaseN%s_BaseRN%s/"%(name,kw['BaseN'],
+                                                                        kw['BaseRN']))
+    global filename_base
+    filename_base = out_dir+"/%s."%name
+
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
+        for thing in ["%s.param"%name,"lissom5","set_thresholds.command",
+                      "save_all_units.command","or_defs"]:
+            os.system("cp topo/tests/reference/%s %s"%(thing,out_dir))
+
+        cwd = os.getcwd()
+        os.chdir(out_dir)
+        os.system("chmod +x %s"%"lissom5")
+
+        _set_clissom_params(name,out_dir,**kw)
+
+        print "------------------------------------------------------------"
+        print "Generating c++ lissom results in %s"%out_dir
+        os.system(_clissomcmd(name))
+        print "------------------------------------------------------------"
+        os.chdir(cwd)
+    else:
+        print "Skipping c++ lissom data generation: results already exist in %s"%out_dir
+
