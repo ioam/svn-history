@@ -26,7 +26,6 @@ def dprint(txt,d=True):
         print txt
 
 
-def sign(x): return 1 if x>=0 else -1
 
 import re
 def get_input_params():
@@ -69,12 +68,17 @@ def get_input_params():
 
         ### get sign (is there an easier way?)
         if len(eyes)>1: # CeBALERLT: not general (assuming motion just because more than 1 eye)
-            realDx = input_params[1]['cx'][lineno]-input_params[0]['cx'][lineno]
-            realDy = input_params[1]['cy'][lineno]-input_params[0]['cy'][lineno]
-            realtheta = 180*(atan2(realDy,realDx)/pi)
-            theta = input_params[0]['theta'][lineno]
+            realDx = input_params[len(eyes)-1]['cx'][lineno]-input_params[0]['cx'][lineno]
+            realDy = input_params[len(eyes)-1]['cy'][lineno]-input_params[0]['cy'][lineno]
+            realdir = 180*(atan2(realDy,realDx)/pi)
+            # just need to flip sign for q1 and q4
+            if -90<=realdir<=90:
+                s = -1
+            else:
+                s = 1
+
             for i in range(n_eyes):
-                input_params[i]['sign'].append(sign(theta)/sign(realtheta))
+                input_params[i]['sign'].append(s) 
         ###
         
     for i in input_params:
