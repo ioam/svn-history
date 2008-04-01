@@ -106,6 +106,8 @@ tsettle=8
 
 # Number of decimal places for simulator time
 fixedpoint.DEFAULT_PRECISION=3
+from fixedpoint import FixedPoint
+topo.sim.set_time_type(FixedPoint,3)
 
 # input generation params
 GeneratorSheet.nominal_density = BaseRN*area_scale
@@ -251,17 +253,21 @@ def n_units(x):
     return len(Numeric.nonzero(Numeric.ravel(x.cf(*center_unit).mask)))
 
 
+nu = n_units(topo.sim['Primary'].projections("Afferent00"))
+for i in range(num_eyes):
+    topo.sim['Primary'].projections("Afferent%i0"%i).learning_rate = alpha_input*nu
+    topo.sim['Primary'].projections("Afferent%i1"%i).learning_rate = alpha_input*nu
+
+
 
 # shortcuts to save on typing...
-Af00 = topo.sim['Primary'].projections()["Afferent00"]
-Af01 = topo.sim['Primary'].projections()["Afferent01"]
 LE = topo.sim['Primary'].projections()["LateralExcitatory"]
 LI = topo.sim['Primary'].projections()["LateralInhibitory"]
 
 
 # Topographica learning rate is independent of density
-Af00.learning_rate=alpha_input*n_units(Af00)
-Af01.learning_rate=alpha_input*n_units(Af01)
+
+
 LE.learning_rate=alpha_exc*n_units(LE)
 LI.learning_rate=alpha_inh*n_units(LI)
 
