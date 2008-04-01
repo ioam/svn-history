@@ -63,7 +63,7 @@ $Id$
 __version__='$Revision$'
 
 
-#import pdb 
+
 import fixedpoint
 import numpy.oldnumeric as Numeric
 
@@ -136,6 +136,7 @@ tsettle=9
 
 ####
 
+# Command to generate lissom data for comparisons
 clissomcmd = """./lissom5 display=0 010910_or_map_512MB.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::ppm_plots=False" -c "cmd::plot_unit::weight_situate=False" -c 'call save_all_units.command' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command"   -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "training t+5" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+10" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+80" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+400" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+300" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'  -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+5000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command'"""
 
 
@@ -184,26 +185,26 @@ if not os.path.exists(out_dir):
     os.chdir(cwd)
 
 
+
+
+
+
+################ TOPO SIMULATION
+
+
 print "Running topographica simulation..."
 
 # Number of decimal places for simulator time
-fixedpoint.DEFAULT_PRECISION=3
-
 from fixedpoint import FixedPoint
-topo.sim.set_time_type(FixedPoint,4)
-
-### Setup the Topographica simulation
-#
+topo.sim.set_time_type(FixedPoint,3)
 
 input_bounds = BoundingBox(radius=RN/(BaseRN*area_scale)/2.0)
 gaussian_width = xsigma/BaseRN/sqrt(2.0)
 gaussian_height = ysigma/BaseRN/sqrt(2.0)
 
-
 # get input pattern position parameters from the log file output of
 # the equivalent c++ simulation
 n_inputs,input_params = get_input_params()
-
 
 input_pattern = topo.patterns.basic.Gaussian(
     scale=scale_input,
@@ -216,39 +217,39 @@ input_pattern = topo.patterns.basic.Gaussian(
     orientation=lambda : round(2*pi*input_params[0]['theta'].next()/360.0,1))
 
 
-CFProjection.cf_type.min_matrix_radius = 0
+CFProjection.cf_type.min_matrix_radius = 0 # allow 1x1 weights matrix
 CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
-
 topo.sim['Eye0'] = GeneratorSheet(input_generator=input_pattern,
-                                    nominal_bounds=input_bounds,
-                                    nominal_density=BaseRN*area_scale,
-                                    period=1,
-                                    phase=0.05)
+                                  nominal_bounds=input_bounds,
+                                  nominal_density=BaseRN*area_scale,
+                                  period=1,
+                                  phase=0.05)
 
-topo.sim['Primary'] = LISSOM(output_fn = PiecewiseLinear(lower_bound=delta_i,upper_bound=beta_i),
-                        nominal_density = BaseN,
-                        tsettle=tsettle)
+topo.sim['Primary'] = LISSOM(output_fn=PiecewiseLinear(lower_bound=delta_i,
+                                                       upper_bound=beta_i),
+                             nominal_density = BaseN,
+                             tsettle=tsettle)
 
 topo.sim.connect('Eye0','Primary', delay = fixedpoint.FixedPoint("0.05"),
-          connection_type=CFProjection,strength = 1.0, name='Afferent0',
-          nominal_bounds_template=BoundingBox(radius=rf_radius/BaseRN))
+                 connection_type=CFProjection,strength = 1.0, name='Afferent0',
+                 nominal_bounds_template=BoundingBox(radius=rf_radius/BaseRN))
 
 
 topo.sim.connect('Primary','Primary', delay = fixedpoint.FixedPoint("0.05"),
-          connection_type=CFProjection,strength=gammaexc,
-          name='LateralExcitatory',
-          nominal_bounds_template=BoundingBox(radius=exc_rad/BaseN, min_radius=1.5/BaseN))
-
+                 connection_type=CFProjection,strength=gammaexc,
+                 name='LateralExcitatory',
+                 nominal_bounds_template=BoundingBox(radius=exc_rad/BaseN,
+                                                     min_radius=1.5/BaseN))
 
 topo.sim.connect('Primary','Primary', delay = fixedpoint.FixedPoint("0.05"),
-          connection_type=CFProjection,strength=-gammainh,
-          name='LateralInhibitory',
-          nominal_bounds_template=BoundingBox(radius=inh_rad/BaseN) )
+                 connection_type=CFProjection,strength=-gammainh,
+                 name='LateralInhibitory',
+                 nominal_bounds_template=BoundingBox(radius=inh_rad/BaseN) )
 
 
 # Cb: should just be x.n_units()
@@ -326,7 +327,7 @@ verbose = locals().get("verbose",True)
 ### in lissom_log_parser guesses how to unsituate the weights. If your
 ### weights contains rows or columns of zeros, this guessing will fail.
 
-import traceback
+
 def _check(s,p):
     # we might consider skipping every other one, or something like that!
     try:
@@ -335,8 +336,6 @@ def _check(s,p):
                 check_weights(s,p,(i,j),display=verbose)
         return 0
     except AssertionError, st:
-        #traceback.print_exc()
-#        e = traceback.format_exc(1)
         return "%s: %s\n"%(s,st)
         
 
@@ -407,7 +406,4 @@ if locals().get('comparisons',False):
         check_all_activities();check_all_weights()
 
 
-# Command to generate lissom data for comparisons
-#
-#./lissom5 display=0 010910_or_map_512MB.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::ppm_plots=False" -c "cmd::plot_unit::weight_situate=False" -c 'call save_all_units.command' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command"   -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "call save_all_units.command" -c "training t+5" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+10" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+80" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+400" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+300" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+1000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'  -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command' -c "training t+3000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+5000" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'call save_all_units.command'
 
