@@ -169,6 +169,9 @@ changes to track with SVN or be tied to a specific SVN version?)
 <H4>2007/09/20 (CB): copying plotgroup from plotgroups</H4>
 (9) See ALERT next to plotgroups in plotgroup.py.
 
+<H4>2008/03/31: private/protected attributes</H4>
+(8) Check that we have _ and __ as we want them, at least for base
+
 
 <H4>2007/10/26: Update tutorial</H4>
 (8) Update the lissom_oo_or tutorial page to include fresh figures; some
