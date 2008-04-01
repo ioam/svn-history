@@ -279,11 +279,11 @@ verbose = locals().get("verbose",True)
 ### weights contains rows or columns of zeros, this guessing will fail.
 
 
-def _check(s,p):
+def _check_proj(s,p,N):
     # we might consider skipping every other one, or something like that!
     try:
-        for i in range(BaseN):
-            for j in range(BaseN):
+        for i in range(N):
+            for j in range(N):
                 check_weights(s,p,(i,j),display=verbose)
         return 0
     except AssertionError, st:
@@ -295,7 +295,7 @@ def check_all_weights():
     p = ["Afferent0","LateralExcitatory","LateralInhibitory"]
     e = ""
     for proj in p:
-        o =_check('Primary',proj)
+        o =_check_proj('Primary',proj,BaseN)
         if o!=0:e+=o
     if len(e)>0:
         raise AssertionError("The following weights did not match:\n%s"%e)
@@ -309,6 +309,8 @@ def check_all_activities():
 stop_at_1000=locals().get("stop_at_1000",False)
 
 if locals().get('comparisons',False):
+
+    
 
     ### Check initial weights
     check_all_weights()
