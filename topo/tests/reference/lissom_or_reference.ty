@@ -271,10 +271,8 @@ topo.sim.schedule_command( 6499, 'topo.sim["Primary"].tsettle=12')
 topo.sim.schedule_command( 7999, 'topo.sim["Primary"].tsettle=13')
 
 
+
 if locals().get('comparisons',False):
-
-    prjns_to_check = ["Afferent0","LateralExcitatory","LateralInhibitory"]
-
     verbose = locals().get("verbose",True)
     stop_at_1000=locals().get("stop_at_1000",False)
     run_comparisons(locals())

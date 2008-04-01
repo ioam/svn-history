@@ -21,7 +21,8 @@ def check_all_weights():
     print "t=%s: Checking all weights..."%topo.sim.time()
 
     e = ""
-    for proj in prjns_to_check:
+    # assumes 'Primary'
+    for proj in topo.sim['Primary'].projections():
         o =_check_proj('Primary',proj,BaseN)
         if o!=0:e+=o
     if len(e)>0:
