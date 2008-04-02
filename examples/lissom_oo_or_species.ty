@@ -41,6 +41,7 @@ if species=='mouse':
     jitter_scale=0.5 # Large jitter in CF centers
     li_strength=-2.0 # Stronger inhibition to still produce some retinotopy
     num_inputs=1     # Input patterns are huge; can only fit one at a time
+    v1_density=locals().get('default_density',10.0)
 else:
     # Default parameters to match lissom_oo_or.ty:
     ms=1.0
@@ -48,6 +49,7 @@ else:
     jitter_scale=0.0
     li_strength=-0.9
     num_inputs=2
+    v1_density=locals().get('default_density',48.0)
 
 
 
@@ -98,7 +100,7 @@ topo.sim['LGNOff']=CFSheet(nominal_density=24.0/ms,
                            output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                            measure_maps=False)
 
-topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,
+topo.sim['V1'] = LISSOM(nominal_density=v1_density,tsettle=9,
                         nominal_bounds=BoundingBox(radius=0.5))
 
 topo.sim['V1'].output_fn.lower_bound=0.083
