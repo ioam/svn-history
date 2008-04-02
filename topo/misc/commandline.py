@@ -14,8 +14,16 @@ from optparse import OptionParser
 import sys, __main__, math, os, re, traceback
 
 import topo
-#import matplotlib
-#matplotlib.use("Agg")
+
+matplotlib_imported=False
+try:
+    # Import matplotlib, if available, and use a non-GUI backend by default
+    import matplotlib
+    matplotlib_imported=True
+    from matplotlib import rcParams
+    rcParams['backend']='Agg'
+except:
+    ImportError("Could not import matplotlib; pylab plots will not work.")
 
 # Startup banner
 BANNER = """
@@ -183,9 +191,14 @@ topo_parser.add_option("-i","--interactive",action="callback",callback=i_action,
 
 def gui():
     """Start the GUI as if -g were supplied in the command used to launch Topographica."""
+    if matplotlib_imported: 
+        from matplotlib import rcParams
+        rcParams['backend']='TkAgg'
+        print "Setting TkAgg"
     auto_import_commands()
     import topo.tkgui
     topo.tkgui.start()
+
 
 # Topographica stays open if an error occurs after -g
 # (see comment by i_action)
@@ -194,6 +207,7 @@ def g_action(option,opt_str,value,parser):
     boolean_option_action(option,opt_str,value,parser)
     interactive()
     gui()
+    
     
 topo_parser.add_option("-g","--gui",action="callback",callback=g_action,dest="gui",default=False,help="""\
 launch an interactive graphical user interface; \
