@@ -194,7 +194,6 @@ def gui():
     if matplotlib_imported: 
         from matplotlib import rcParams
         rcParams['backend']='TkAgg'
-        print "Setting TkAgg"
     auto_import_commands()
     import topo.tkgui
     topo.tkgui.start()
