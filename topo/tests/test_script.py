@@ -345,9 +345,9 @@ def run_multiple_density_comparisons():
     import traceback
     import os
     
-    k = [4,6,8,10,12,14,16,24,32]
+    k = [8,10,12,14,34]
     x = cross_product([k,k])
-    
+
     cmds = []
     for spec in x:
         c="""./topographica -c "verbose=False;BaseRN=%s;BaseN=%s;comparisons=True;stop_at_1000=True" topo/tests/reference/lissom_or_reference.ty"""%(spec[0],spec[1])

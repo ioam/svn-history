@@ -128,7 +128,6 @@ input_pattern = topo.patterns.basic.Gaussian(
     orientation=lambda : round(2*pi*input_params[0]['theta'].next()/360.0,1))
 
 
-CFProjection.cf_type.min_matrix_radius = 0 # allow 1x1 weights matrix
 CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()

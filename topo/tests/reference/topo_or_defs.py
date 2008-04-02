@@ -14,6 +14,9 @@ def initialize_variables(BaseRN,BaseN):
     if (2*inh_rad)%2==0:
         inh_rad+=0.5
 
+    for n,r in zip(['rf_radius','inh_rad'],[rf_radius,inh_rad]):
+        assert r>=1.5, "%s = %s; smaller than 1.5 - can't compare simulations"%(n,r)
+
     exc_rad=max(2.5,BaseN/10.0)
     ############################################################
 
