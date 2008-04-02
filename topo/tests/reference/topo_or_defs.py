@@ -57,3 +57,64 @@ def initialize_variables(BaseRN,BaseN):
     return locals()
 
 
+
+def add_scheduled_outputfn_changes(sim):
+    ### delta/beta changes
+    #
+    sim.schedule_command(  199, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.01; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.01')
+    sim.schedule_command(  499, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.02; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.02')
+    sim.schedule_command(  999, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.05; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.03')
+    sim.schedule_command( 1999, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.08; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.05')
+    sim.schedule_command( 2999, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.10; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.08')
+    sim.schedule_command( 3999,                                                    'topo.sim["Primary"].output_fn.upper_bound=beta_i+0.11')
+    sim.schedule_command( 4999, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.11; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.14')
+    sim.schedule_command( 6499, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.12; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.17')
+    sim.schedule_command( 7999, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.13; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.20')
+    sim.schedule_command(19999, 'topo.sim["Primary"].output_fn.lower_bound=delta_i+0.14; topo.sim["Primary"].output_fn.upper_bound=beta_i+0.23')
+
+def add_scheduled_tsettle_changes(sim):
+    #tsettle changes
+    sim.schedule_command( 1999, 'topo.sim["Primary"].tsettle=10')
+    sim.schedule_command( 4999, 'topo.sim["Primary"].tsettle=11')
+    sim.schedule_command( 6499, 'topo.sim["Primary"].tsettle=12')
+    sim.schedule_command( 7999, 'topo.sim["Primary"].tsettle=13')
+    
+
+def add_scheduled_exc_bounds_changes(sim):
+    ### Excitatory bounds changes
+    #
+    # The learning rate is adjusted too because the number of units
+    # changes and ecs changes (even if the learning rate is going to
+    # be adjusted anyway at this time)
+    sim.schedule_command(199,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); LE.learning_rate=alpha_exc*LE.n_units()')
+    sim.schedule_command(499,'exc_rad=exc_rad*0.7; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
+    sim.schedule_command(999,'exc_rad=exc_rad*0.8; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
+    sim.schedule_command(1999,'exc_rad=exc_rad*0.8; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
+    sim.schedule_command(2999,'exc_rad=exc_rad*0.8; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
+    sim.schedule_command(3999,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
+    sim.schedule_command(4999,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
+    sim.schedule_command(6499,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
+    sim.schedule_command(7999,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
+    sim.schedule_command(19999,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
+
+
+def add_scheduled_exc_Lrate_changes(sim):
+    ### Excitatory learning rate changes
+    #
+    sim.schedule_command(499,'alpha_exc=0.001*ecs; LE.learning_rate=alpha_exc*LE.n_units()')
+
+
+def add_scheduled_aff_Lrate_changes(sim,pname="Af"):
+    ### Afferent learning rate changes
+    #
+    sim.schedule_command(499,  'alpha_input=0.0050*acs; %s.learning_rate=alpha_input*%s.n_units()'%(pname,pname))
+    sim.schedule_command(1999, 'alpha_input=0.0040*acs; %s.learning_rate=alpha_input*%s.n_units()'%(pname,pname))
+    sim.schedule_command(3999, 'alpha_input=0.0030*acs; %s.learning_rate=alpha_input*%s.n_units()'%(pname,pname))
+    sim.schedule_command(19999,'alpha_input=0.0015*acs; %s.learning_rate=alpha_input*%s.n_units()'%(pname,pname))
+
+
+
+
+
+
+    
