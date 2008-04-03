@@ -804,7 +804,9 @@ class CFProjection(Projection):
 class CFIter(object):
     """
     Iterator to walk through all ConnectionFields of all neurons in
-    the destination Sheet of the given CFProjection.
+    the destination Sheet of the given CFProjection.  Each iteration
+    yields the tuple (cf,row,col) where cf is the ConnectionField at
+    position (row,col).
     """
     def __init__(self,cfprojection):
         self.proj = cfprojection    
