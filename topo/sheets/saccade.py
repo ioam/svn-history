@@ -28,7 +28,10 @@ from topo.base.cf import CFSheet
 from topo.base.simulation import PeriodicEventSequence,FunctionEvent
 from topo.sheets.generatorsheet import SequenceGeneratorSheet
 from topo.base.parameterclasses import Number,Magnitude,CallableParameter,BooleanParameter
+from topo.base.parameterclasses import ClassSelectorParameter
 from topo.base.boundingregion import BoundingBox,BoundingRegionParameter
+from topo.coordmapperfns.basic import  CoordinateMapperFn, IdentityMF
+
 from topo.misc import utils
 
 
@@ -124,11 +127,13 @@ class SaccadeController(CFSheet):
     26(6): 857-73.
     """
 
+    # JPALERT: amplitude_scale and direction scale can be implemented as
+    # part of self.command_mapper, so these should probably be removed.
+
     amplitude_scale = Number(default=120,doc="""
         Scale factor for saccade command amplitude, expressed in
-        degrees per unit of sheet.  Indicates how large a
-        saccade is represented by the x-component of the command
-        input.""")
+        degrees per unit of sheet.  Indicates how large a saccade is
+        represented by the x-component of the command input.""")
     
     direction_scale = Number(default=180,doc="""
         Scale factor for saccade command direction, expressed in
@@ -141,7 +146,10 @@ class SaccadeController(CFSheet):
         The function for extracting a single point from sheet activity.
         Should take a sheet as the first argument, and return (x,y).""")
 
-
+    command_mapper = ClassSelectorParameter(CoordinateMapperFn,default=IdentityMF(),
+                                   doc="""
+        A CoordinateMapperFn that will be applied to the command vector extracted
+        from the sheet activity.""")
 
     src_ports = ['Activity','Saccade']
 
@@ -153,6 +161,8 @@ class SaccadeController(CFSheet):
         # decode the input projection activity as a command
         xa,ya = self.decode_fn(self)
         self.verbose("Saccade command centroid = (%.2f,%.2f)"%(xa,ya))
+
+        xa,ya = self.command_mapper(xa,ya)
         
         amplitude = xa * self.amplitude_scale
         direction = ya * self.direction_scale
