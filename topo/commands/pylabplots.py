@@ -1,6 +1,16 @@
 """
 Line-based and matrix-based plotting commands using MatPlotLib.
 
+Before importing this file, you will probably want to do something
+like:
+
+  from matplotlib import rcParams
+  rcParams['backend']='TkAgg'
+
+to select a backend, or else select an appropriate one in your
+matplotlib.rc file (if any).  There are many backends available for
+different GUI or non-GUI uses.
+
 $Id$
 """
 __version__='$Revision$'
