@@ -316,9 +316,8 @@ def run_batch(script_file,output_directory="Output",
     """
     import sys # CEBALERT: why I have to import this again? (Also done elsewhere below.)
     
-    import matplotlib
+   
     from topo.misc.commandline import auto_import_commands
-    matplotlib.use("Agg")
     auto_import_commands()
     
     command_used_to_start = string.join(sys.argv)
