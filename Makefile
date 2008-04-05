@@ -115,19 +115,24 @@ lint-base:
 
 # Compare topographica and C++ lissom output
 # (needs cleanup+doc)
-COMPARE_BASERN=24.0
-COMPARE_BASEN=24.0
+COMPARE_BASERN=24
+COMPARE_BASEN=24
 compare_or: 
 	make -C topo/tests/reference/
 	./topographica -c "BaseRN=${COMPARE_BASERN}; BaseN=${COMPARE_BASEN}; comparisons=True" topo/tests/reference/lissom_or_reference.ty 
 
 or_comparisons:
 	make -C topo/tests/reference/
-	./topographica -c "from topo.tests.test_script import run_multiple_density_comparisons;nerr=run_multiple_density_comparisons(); import sys;sys.exit(nerr)"
+	./topographica -c "from topo.tests.test_script import run_multiple_density_comparisons;nerr=run_multiple_density_comparisons('lissom_or_reference.ty'); import sys;sys.exit(nerr)"
 
 compare_oo_or: 
 	make -C topo/tests/reference/
-	./topographica -c "comparisons=True" topo/tests/reference/lissom_oo_or_reference.ty 
+	./topographica -c "BaseRN=${COMPARE_BASERN}; BaseN=${COMPARE_BASEN}; comparisons=True" topo/tests/reference/lissom_oo_or_reference.ty 
+
+oo_or_comparisons:
+	make -C topo/tests/reference/
+	./topographica -c "from topo.tests.test_script import run_multiple_density_comparisons;nerr=run_multiple_density_comparisons('lissom_oo_or_reference.ty'); import sys;sys.exit(nerr)"
+
 
 # Test that the specified scripts haven't changed in results or speed.
 #SCRIPTS=^cfsom_or.ty ^lissom_oo_or.ty ^som_retinotopy.ty

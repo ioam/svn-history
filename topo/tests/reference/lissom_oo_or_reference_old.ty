@@ -49,10 +49,8 @@ $Id: lissom_oo_or_reference.ty 8319 2008-04-05 05:38:39Z ceball $
 __version__='$Revision: 8319 $'
 
 
-# CB: the plan is to make this file more and more general while
-# keeping it matching the equivalent c++ lissom simulation (i.e. do to
-# this what was done to lissom_or_reference/or_map_topo.param).
-
+### This file will be deleted and data will be checked in for the
+### new version
 
 
 ## from topo.base.parameterizedobject import ParameterizedObject

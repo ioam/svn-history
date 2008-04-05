@@ -3,9 +3,9 @@
 # RF-LISSOM parameter file for an ON/OFF orientation-map simulation
 # designed to match what lissom_oo_or_reference does at the present time.
 #
-# The plan is that when Topographica matches, this simulation can
-# become more like the one from the book (by removing more and more
-# of the specific values set here, and using or_defs).
+# This simulation should become more like the one from the book (by
+# removing more and more of the specific values set here, and using
+# or_defs instead - as was done for lissom_or_reference.ty).
 #
 # $Header: /cvsroot/topographica/topographica/topo/tests/reference/oo_or_map_topo.param,v 1.3 2007/02/07 09:36:42 ceball Exp $
 
@@ -22,13 +22,15 @@ set rf_radius=BaseRN/4+0.5
 # end in 0.5, allowing me at least to match the behavior where I know
 # how c++ lissom behaves.
 set inh_rad=2.5>?(BaseN/4-1)+0.5
-set exc_rad=2.5>?(BaseN/10)-0.3
+set exc_rad=2.5>?(BaseN/10)
 
 #set default_afferent_size_scale=BaseN/BaseRN
 set gammaexc=0.9 
 set gammainh=0.9
-set delta=0.083 
-set beta=0.083+0.55
+set delta=0.1
+set beta=delta+0.55
+
+
 set noise=0
 define_param min_exc_rad Param_Float   0  exc_rad "Minimum exc_rad value allowed" 1>?BaseN/44+0.5
 
@@ -51,7 +53,7 @@ set input_default_type=Input_Gaussian
 set input_default_position="Uncorrelate &uncorrelation 0 RN  Random RN/2 RN/2 Precision 1"
 set input_default_angle="Random PI/2 PI/2 Precision 1"
 #set inputs_pereye=retina_area_scale>?1 uncorrelation=0.0 
-set xsigma=6.0 
+set xsigma=7.0 
 set ysigma=1.5
 set scale_input=1.0 normalize_aff=False
 

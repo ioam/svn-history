@@ -2,47 +2,7 @@
 LISSOM simulation designed to match C++ LISSOM's oo_or_map_topo
 simulation.
 
-This file is much more complex than necessary, because it is set up to
-match the C++ version of the LISSOM simulator as closely as possible.
-Most of the variables below are just temporary ones designed to match
-those in the other simulator. In addition, some of the techniques for
-setting up the network are out of date. Please do not use this file as
-an example of how to use Topographica.
-
-
-If you want to run automatic comparisons, run the script like this:
-./topographica -g -c "comparisons=True" topo/tests/reference/lissom_oo_or_reference.ty
-
-
-For the comparisons, you can either use the existing data or generate
-data yourself.
-
-- Existing data
-gunzip oo_or_map_topo.log.gz and the oo_or_map_topo.*.matrix.gz files
-in this directory.
-
-- Generate data
-gunzip lissom5.gz and run lissom using the command at the end
-of this file.
-
-(When using gunzip, if you leave the original gz files in place cvs
-will not download those original gz files again.)
-
-
-
-Notes
-=====
-
-- This simulation will not pickle, but that is only because it defines
-functions in __main__ (and uses lambda functions). Many variables are
-also defined in __main__; some these would have to be made available
-again for the simulation to work.
-
-- If you get a StopIteration error related to dynamic number, be sure
-that the log file or_map_topo.log contains at least as many iterations
-as you are trying to perform in this simulation.
-
-
+Please see the comments for lissom_or_reference.
 
 $Id$
 """
@@ -53,10 +13,6 @@ __version__='$Revision$'
 # keeping it matching the equivalent c++ lissom simulation (i.e. do to
 # this what was done to lissom_or_reference/or_map_topo.param).
 
-
-
-## from topo.base.parameterizedobject import ParameterizedObject
-## ParameterizedObject.print_level=300
 
 import numpy.oldnumeric as Numeric
 from math import pi, sqrt
@@ -84,27 +40,17 @@ from topo.tests.reference.lissom_log_parser import get_input_params,\
 from common_control import run_comparisons
 from topo_or_defs import *
 
-BaseN=locals().get("BaseN",48.0)
-BaseRN=locals().get("BaseRN",24.0)
+BaseN=locals().get("BaseN",24)
+# CB: something's not matching for 48, but this simulation can
+# definitely match at that density (so just a parameter mismatch -
+# will be fixed as generalization progresses...)
+BaseRN=locals().get("BaseRN",24)
 
-# import variables designed to match 010910_or_map_512MB.param and or_defs
 locals().update(initialize_variables(BaseRN,BaseN))
 
 # ********************************************************************
-BaseN=48.0
-BaseRN=24.0
-BaseLN=24.0
 
-rf_radius=BaseRN/4.0+0.5
-inh_rad=max(2.5,BaseN/4.0-1.0+0.5)
-exc_rad=max(2.5,BaseN/10.0-0.3)
-
-delta=0.083
-beta=0.633
-
-xsigma=6.0
-ysigma=1.5
-scale_input=1.0
+BaseLN = 24.0
 
 # radius of LGN DoG center Gaussian
 sigma_c = 0.5
@@ -123,21 +69,13 @@ retina_edge_buffer=round(rf_radius+r_L,0)
 RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
 LN=round(BaseLN*area_scale+2*lgn_edge_buffer,0)
 
-
-acs=6.5*6.5/rf_radius/rf_radius
-ecs=19.5*19.5/exc_rad/exc_rad
-ics=47.5*47.5/inh_rad/inh_rad
-alpha_input=0.007*acs
-alpha_exc=0.002*ecs
-alpha_inh=0.00025*ics
-
 tsettle=8
 
 # ********************************************************************
 
-#initialize_clissom_data(name,inh_rad=inh_rad,rf_radius=rf_radius,
-#                        BaseRN=BaseRN,BaseN=BaseN)
-topo.tests.reference.lissom_log_parser.filename_base="topo/tests/reference/oo_or_map_topo."
+initialize_clissom_data(name,inh_rad=inh_rad,rf_radius=rf_radius,
+                        BaseRN=BaseRN,BaseN=BaseN)
+
 #######################
 
 
@@ -155,11 +93,11 @@ GeneratorSheet.nominal_density = BaseRN*area_scale
 GeneratorSheet.period = 1.0
 GeneratorSheet.phase=0.05
 
-# take the input pattern position parameters from the log file output of the equivalent c++ simulation
+# take the input pattern position parameters from the log file output
+# of the equivalent c++ simulation
 n_inputs,input_params = get_input_params()
 
 print "Number of patterns available for learning iterations:",n_inputs
-
 
 gaussian_width = xsigma/BaseRN/sqrt(2.0)
 gaussian_height = ysigma/BaseRN/sqrt(2.0)
@@ -200,31 +138,36 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 # match the actual connectionfield in general).
 SharedWeightCFProjection.autosize_mask=False
 SharedWeightCFProjection.cf_shape=topo.patterns.basic.Disk(smoothing=0.0,
-                                                                size=2.0*r_L/BaseLN)
+                                                           size=2.0*r_L/BaseLN)
 
 
 
 topo.sim['Eye0'] = GeneratorSheet(nominal_bounds=retina_bounds,
-                                    input_generator=input_pattern)
+                                  input_generator=input_pattern)
 
 topo.sim['Ganglia00'] = CFSheet(nominal_bounds=lgn_bounds,nominal_density=BaseLN,
-                      output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+                                output_fn=PiecewiseLinear(lower_bound=0.0,
+                                                          upper_bound=1.0))
 
 topo.sim['Ganglia01'] = CFSheet(nominal_bounds=lgn_bounds,nominal_density=BaseLN,
-                      output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+                                output_fn=PiecewiseLinear(lower_bound=0.0,
+                                                          upper_bound=1.0))
 
 topo.sim['Primary'] = LISSOM(nominal_density=BaseN,
-                        tsettle=tsettle,
-                        output_fn=PiecewiseLinear(lower_bound=delta,upper_bound=beta))
+                             tsettle=tsettle,
+                             output_fn=PiecewiseLinear(lower_bound=delta_i,
+                                                       upper_bound=beta_i))
 
 
 # C++ LISSOM divides by pi in RadialFunction::Gaussian but not for
 # Gaussian in retinalobjs (and elsewhere)
 centerg = topo.patterns.basic.Gaussian(
-    size=2*sigma_c*sqrt(pi)/BaseRN,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))
+    size=2*sigma_c*sqrt(pi)/BaseRN,aspect_ratio=1.0,
+    output_fn=DivisiveNormalizeL1(norm_value=2.33))
 
 surroundg = topo.patterns.basic.Gaussian(
-    size=2*sigma_s*sqrt(pi)/BaseRN,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))
+    size=2*sigma_s*sqrt(pi)/BaseRN,aspect_ratio=1.0,
+    output_fn=DivisiveNormalizeL1(norm_value=2.33))
 
 
 on_weights = topo.patterns.basic.Composite(
@@ -257,15 +200,18 @@ topo.sim.connect('Ganglia01','Primary',delay=FixedPoint("0.05"),
 
 
 topo.sim.connect('Primary','Primary',delay=FixedPoint("0.05"),
-                 connection_type=CFProjection,strength=0.9,name='LateralExcitatory',
+                 connection_type=CFProjection,strength=0.9,
+                 name='LateralExcitatory',
                  nominal_bounds_template=excitatory_weight_bounds)
             
 topo.sim.connect('Primary','Primary',delay=FixedPoint("0.05"),
-                 connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
+                 connection_type=CFProjection,strength=-0.9,
+                 name='LateralInhibitory',
                  nominal_bounds_template=inhibitory_weight_bounds)
 
 
 
+topo.sim.run(0) # topog doesn't jointly normalize weights on creation
 
 
 # shortcuts to save on typing...
@@ -294,159 +240,10 @@ topo.sim.schedule_command(199, 'exc_rad*=0.6; LE.change_bounds(BoundingBox(radiu
 # CB: missing one at 499
 
 
-
-
-
-
-
-
-
-
-#######################################################################
-
-from topo.tests.reference.lissom_log_parser import *
-if locals().get('profiling',False):
-    import timeit
-    iterations = locals().get('iterations',1)
-    t= timeit.Timer('topo.sim.run('+`iterations`+')','gc.enable(); import topo').timeit(number=1)
-    
-    check_activities('Eye0')
-    check_activities('Ganglia00')
-    check_activities('Ganglia01')
-    check_activities('Primary')
-
-    check_weights('Primary','Afferent00',(0,0))
-    check_weights('Primary','Afferent00',(23,23))
-    check_weights('Primary','Afferent01',(0,0))
-    check_weights('Primary','Afferent01',(23,23))
-
-    print "[lissom_oo_or_reference.ty] run(%s) in %s s"%(iterations,t)
-
-elif locals().get('comparisons',False):
-
-
-    ### INITIAL WEIGHTS COMPARISONS
-    #
-    check_weights('Ganglia00','Afferent0',(0,0))
-    check_weights('Ganglia00','Afferent0',(12,12))
-    
-    check_weights('Ganglia01','Afferent0',(0,0))
-    check_weights('Ganglia01','Afferent0',(12,12))
-    
-    # CEBALERT: Before the simulation has been run, the
-    # Topographica weights are not jointly normalized.
-    topo.sim.run(0.00001)
-    
-    check_weights('Primary','Afferent00',(0,0))
-    check_weights('Primary','Afferent00',(23,23))
-    check_weights('Primary','Afferent01',(0,0))
-    check_weights('Primary','Afferent01',(23,23))
-
-    check_weights('Primary','LateralExcitatory',(0,0))
-    check_weights('Primary','LateralExcitatory',(23,23))
-
-    check_weights('Primary','LateralInhibitory',(0,0))
-    check_weights('Primary','LateralInhibitory',(23,23))
-
-    topo.sim.run(0.99999) # i.e. to 1
-
-    check_activities('Eye0')
-    check_activities('Ganglia00')
-    check_activities('Ganglia01')
-    check_activities('Primary')
-    
-    topo.sim.run(198) # to 199
-
-    check_activities('Eye0')
-    check_activities('Ganglia00')
-    check_activities('Ganglia01')
-    check_activities('Primary')
-
-    topo.sim.run(1) # to 200
-    check_activities('Eye0')
-    check_activities('Ganglia00')
-    check_activities('Ganglia01')
-    check_activities('Primary')
-
-    topo.sim.run(300) # to 500
-    check_activities('Eye0')
-    check_activities('Ganglia00')
-    check_activities('Ganglia01')
-    check_activities('Primary')
-
-
-    check_weights('Primary','Afferent00',(0,0))
-    check_weights('Primary','Afferent00',(23,23))
-    check_weights('Primary','Afferent01',(0,0))
-    check_weights('Primary','Afferent01',(23,23))
-
-
-
-    topo.sim.run(500) # to 1000
-    check_activities('Eye0')
-    check_activities('Ganglia00')
-    check_activities('Ganglia01')
-    check_activities('Primary')
-
-    topo.sim.run(1000) # to 2000
-    check_activities('Eye0')
-    check_activities('Ganglia00')
-    check_activities('Ganglia01')
-    check_activities('Primary')
-
-    topo.sim.run(1000) # to 3000
-    check_activities('Eye0')
-    check_activities('Ganglia00')
-    check_activities('Ganglia01')
-    check_activities('Primary')
-
-    topo.sim.run(1000) # to 4000
-    check_activities('Eye0')
-    check_activities('Ganglia00')
-    check_activities('Ganglia01')
-    check_activities('Primary')
-
-    topo.sim.run(1000) # to 5000
-    check_activities('Eye0')
-    check_activities('Ganglia00')
-    check_activities('Ganglia01')
-    check_activities('Primary')
-
-    topo.sim.run(1000) # to 6000
-    check_activities('Eye0')
-    check_activities('Ganglia00')
-    check_activities('Ganglia01')
-    check_activities('Primary')
-
-    topo.sim.run(1000) # to 7000
-    check_activities('Eye0')
-    check_activities('Ganglia00')
-    check_activities('Ganglia01')
-    check_activities('Primary')
-
-    topo.sim.run(1000) # to 8000
-    check_activities('Eye0')
-    check_activities('Ganglia00')
-    check_activities('Ganglia01')
-    check_activities('Primary')
-
-    topo.sim.run(12000) # to 20000
-    check_activities('Eye0')
-    check_activities('Ganglia00')
-    check_activities('Ganglia01')
-    check_activities('Primary')
-
-
-    check_weights('Primary','Afferent00',(0,0))
-    check_weights('Primary','Afferent00',(23,23))
-    check_weights('Primary','Afferent01',(0,0))
-    check_weights('Primary','Afferent01',(23,23))
-
-
-### Command used to generate C++ LISSOM data for comparisons.
-#
-#
-
-# is the commandpath necessary any more?
-# nice ./lissom5 commandpath="/home/chris/mae/lissom/command/" display=0 oo_or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c "plot_unit region=Ganglia00 save_matrices=True 12 12" -c "plot_unit region=Ganglia01 save_matrices=True 0 0" -c "plot_unit region=Ganglia01 save_matrices=True 12 12" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+198' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'step' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+300' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c "plot_unit region=Ganglia00 save_matrices=True 12 12" -c "plot_unit region=Ganglia01 save_matrices=True 0 0" -c "plot_unit region=Ganglia01 save_matrices=True 12 12" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c 'training t+500' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+1000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'training t+12000' -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c "plot_unit region=Ganglia00 save_matrices=True 12 12" -c "plot_unit region=Ganglia01 save_matrices=True 0 0" -c "plot_unit region=Ganglia01 save_matrices=True 12 12" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' --interactive
+##### comparisons #####
+if locals().get('comparisons',False):
+    verbose = locals().get("verbose",False)
+    stop_at_1000=locals().get("stop_at_1000",False)
+    run_comparisons(locals())
+#######################
 
