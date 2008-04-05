@@ -5,12 +5,18 @@
 ### weights contains rows or columns of zeros, this guessing will fail.
 
 from topo.tests.reference.lissom_log_parser import check_weights,check_activities
+from math import ceil
 
 def _check_proj(s,p,N):
-    # we might consider skipping every other one, or something like that!
+
+    # to match save_all_units.command
+    step = int(ceil(N/20.0))
+    if step>2 and step%2==1:
+        step+=1
+    
     try:
-        for i in range(N):
-            for j in range(N):
+        for i in range(0,N,step):
+            for j in range(0,N,step):
                 check_weights(s,p,(i,j),display=verbose)
         return 0
     except AssertionError, st:
@@ -18,7 +24,7 @@ def _check_proj(s,p,N):
         
 
 def check_all_weights():
-    print "t=%s: Checking all weights..."%topo.sim.time()
+    print "t=%s: Checking weights..."%topo.sim.time()
 
     e = ""
     # assumes 'Primary'
@@ -30,7 +36,7 @@ def check_all_weights():
 
 
 def check_all_activities():
-    print "t=%s: Checking all activities..."%topo.sim.time()
+    print "t=%s: Checking activities..."%topo.sim.time()
     check_activities('Eye0',display=verbose)
     check_activities('Primary',display=verbose)
 
