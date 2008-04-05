@@ -94,25 +94,14 @@ locals().update(initialize_variables(BaseRN,BaseN))
 BaseN=48.0
 BaseRN=24.0
 BaseLN=24.0
+
 rf_radius=BaseRN/4.0+0.5
 inh_rad=max(2.5,BaseN/4.0-1.0+0.5)
 exc_rad=max(2.5,BaseN/10.0-0.3)
 
-#num_eyes=1
-area_scale=1.0
-#min_exc_rad=max(1.0,BaseN/44+0.5)
-#default_afferent_size_scale=BaseN/BaseRN
-gammaexc=0.9
-gammainh=0.9
 delta=0.083
 beta=0.633
 
-randomness = 0.0
-#smooth_circular_radius_trim = -0.25
-
-#rf_radius_scale=5.0/rf_radius
-#retina_area_scale = (BaseRN*area_scale/24.0*rf_radius_scale)*(BaseRN*area_scale/24.0*rf_radius_scale)
-#inputs_pereye=max(retina_area_scale,1)
 xsigma=6.0
 ysigma=1.5
 scale_input=1.0
@@ -313,40 +302,7 @@ topo.sim.schedule_command(199, 'exc_rad*=0.6; LE.change_bounds(BoundingBox(radiu
 
 
 
-
-
-
-
-## ### LEARNING RATE CHANGES
-## #
-
-## topo.sim.schedule_command(  499, 'alpha_exc=0.0010*ecs; LE.learning_rate=alpha_exc*n_units(LE)')
-## topo.sim.schedule_command(  499, 'alpha_input=0.0050*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
-
-
-## topo.sim.schedule_command( 1999, 'alpha_input=0.0040*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
-## topo.sim.schedule_command( 3999, 'alpha_input=0.0030*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
-## topo.sim.schedule_command(19999, 'alpha_input=0.0015*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
-
-
-## ### Primary output function bounds changes
-## #
-#topo.sim.schedule_command(  199, 'topo.sim["Primary"].output_fn.lower_bound=0.11; topo.sim["Primary"].output_fn.upper_bound=0.66')
-
-
-
-## topo.sim.schedule_command(  499, 'topo.sim["Primary"].output_fn.lower_bound=0.12; topo.sim["Primary"].output_fn.upper_bound=0.67')
-
-## topo.sim.schedule_command(  999, 'topo.sim["Primary"].output_fn.lower_bound=0.15; topo.sim["Primary"].output_fn.upper_bound=0.68')
-## topo.sim.schedule_command( 1999, 'topo.sim["Primary"].output_fn.lower_bound=0.18; topo.sim["Primary"].output_fn.upper_bound=0.70')
-## topo.sim.schedule_command( 2999, 'topo.sim["Primary"].output_fn.lower_bound=0.20; topo.sim["Primary"].output_fn.upper_bound=0.73')
-## topo.sim.schedule_command( 3999, 'topo.sim["Primary"].output_fn.lower_bound=0.20; topo.sim["Primary"].output_fn.upper_bound=0.76')
-## topo.sim.schedule_command( 4999, 'topo.sim["Primary"].output_fn.lower_bound=0.21; topo.sim["Primary"].output_fn.upper_bound=0.79')
-## topo.sim.schedule_command( 6499, 'topo.sim["Primary"].output_fn.lower_bound=0.22; topo.sim["Primary"].output_fn.upper_bound=0.82')
-## topo.sim.schedule_command( 7999, 'topo.sim["Primary"].output_fn.lower_bound=0.23; topo.sim["Primary"].output_fn.upper_bound=0.85')
-## topo.sim.schedule_command(19999, 'topo.sim["Primary"].output_fn.lower_bound=0.24; topo.sim["Primary"].output_fn.upper_bound=0.88')
-
-
+#######################################################################
 
 from topo.tests.reference.lissom_log_parser import *
 if locals().get('profiling',False):
@@ -485,9 +441,6 @@ elif locals().get('comparisons',False):
     check_weights('Primary','Afferent00',(23,23))
     check_weights('Primary','Afferent01',(0,0))
     check_weights('Primary','Afferent01',(23,23))
-
-
-
 
 
 ### Command used to generate C++ LISSOM data for comparisons.
