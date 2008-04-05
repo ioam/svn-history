@@ -92,8 +92,8 @@ from topo.tests.reference.lissom_log_parser import get_input_params,\
 from common_control import run_comparisons
 from topo_or_defs import *
 
-BaseN=locals().get("BaseN",24.0)
-BaseRN=locals().get("BaseRN",24.0)
+BaseN=locals().get("BaseN",24)
+BaseRN=locals().get("BaseRN",24)
 
 # import variables designed to match 010910_or_map_512MB.param and or_defs
 locals().update(initialize_variables(BaseRN,BaseN))
@@ -122,7 +122,7 @@ n_inputs,input_params = get_input_params()
 
 input_pattern = topo.patterns.basic.Gaussian(
     scale=scale_input,
-    bounds=input_bounds,
+    #bounds=input_bounds,
     size = 2*gaussian_height,
     aspect_ratio= gaussian_width/gaussian_height,
     # c++ positions and angle need to be converted to match Topographica
@@ -187,7 +187,7 @@ add_scheduled_aff_Lrate_changes(topo.sim)
 
 ##### comparisons #####
 if locals().get('comparisons',False):
-    verbose = locals().get("verbose",True)
+    verbose = locals().get("verbose",False)
     stop_at_1000=locals().get("stop_at_1000",False)
     run_comparisons(locals())
 #######################
