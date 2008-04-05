@@ -339,7 +339,7 @@ def compare_with_and_without_snapshot_LoadSnapshot(script="examples/lissom_oo_or
 
 
 
-def run_multiple_density_comparisons():
+def run_multiple_density_comparisons(ref_script):
     from topo.misc.utils import cross_product
     import subprocess
     import traceback
@@ -350,7 +350,7 @@ def run_multiple_density_comparisons():
 
     cmds = []
     for spec in x:
-        c="""./topographica -c "verbose=False;BaseRN=%s;BaseN=%s;comparisons=True;stop_at_1000=True" topo/tests/reference/lissom_or_reference.ty"""%(spec[0],spec[1])
+        c="""./topographica -c "verbose=False;BaseRN=%s;BaseN=%s;comparisons=True;stop_at_1000=True" topo/tests/reference/%s"""%(spec[0],spec[1],ref_script)
         cmds.append(c)
 
     results = []
