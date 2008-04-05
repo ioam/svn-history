@@ -264,8 +264,9 @@ def _set_clissom_params(name,out_dir,**kw):
             line="set BaseRN=%s\n"%kw['BaseRN']
         if 'set BaseN' in line:
             line="set BaseN=%s\n"%kw['BaseN']
-        if 'rf_radius' in line:
+        if 'set rf_radius' in line:
             line="set rf_radius=%s\n"%kw['rf_radius']
+        # exc_rad
         lines.append(line)
     f.close()
     f = open(fname,'w')
