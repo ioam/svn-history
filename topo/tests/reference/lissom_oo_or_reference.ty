@@ -143,20 +143,24 @@ SharedWeightCFProjection.cf_shape=topo.patterns.basic.Disk(smoothing=0.0,
 
 
 topo.sim['Eye0'] = GeneratorSheet(nominal_bounds=retina_bounds,
-                                  input_generator=input_pattern)
+                                  input_generator=input_pattern,
+                                  precedence=0)
 
 topo.sim['Ganglia00'] = CFSheet(nominal_bounds=lgn_bounds,nominal_density=BaseLN,
                                 output_fn=PiecewiseLinear(lower_bound=0.0,
-                                                          upper_bound=1.0))
+                                                          upper_bound=1.0),
+                                precedence=1)
 
 topo.sim['Ganglia01'] = CFSheet(nominal_bounds=lgn_bounds,nominal_density=BaseLN,
                                 output_fn=PiecewiseLinear(lower_bound=0.0,
-                                                          upper_bound=1.0))
+                                                          upper_bound=1.0),
+                                precedence=1)
 
 topo.sim['Primary'] = LISSOM(nominal_density=BaseN,
                              tsettle=tsettle,
                              output_fn=PiecewiseLinear(lower_bound=delta_i,
-                                                       upper_bound=beta_i))
+                                                       upper_bound=beta_i),
+                             precedence=2)
 
 
 # C++ LISSOM divides by pi in RadialFunction::Gaussian but not for

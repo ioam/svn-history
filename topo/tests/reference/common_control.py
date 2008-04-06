@@ -24,11 +24,12 @@ def _check_proj(s,p,N):
         
 
 def check_all_weights():
-    print "t=%s: Checking weights."%topo.sim.time()
+    print "t=%s: Checking weights..."%topo.sim.time()
 
     e = ""
     # assumes 'Primary'
     for proj in topo.sim['Primary'].projections():
+        print "...%s"%proj
         o =_check_proj('Primary',proj,BaseN)
         if o!=0:e+=o
     if len(e)>0:
@@ -36,11 +37,16 @@ def check_all_weights():
 
 
 def check_all_activities():
-    print "t=%s: Checking activities."%topo.sim.time()
-    check_activities('Eye0',display=verbose)
-    check_activities('Primary',display=verbose)
+    print "t=%s: Checking activities..."%topo.sim.time()
 
+    sheets = sorted(topo.sim.objects().values(), cmp=lambda x, y:
+                    cmp(x.precedence,
+                        y.precedence))
+    for s in sheets:
+        print "...%s"%s.name
+        check_activities(s.name,display=verbose)
 
+        
 # hack
 L = locals()
 

@@ -141,12 +141,14 @@ topo.sim['Eye0'] = GeneratorSheet(input_generator=input_pattern,
                                   nominal_bounds=input_bounds,
                                   nominal_density=BaseRN*area_scale,
                                   period=1,
-                                  phase=0.05)
+                                  phase=0.05,
+                                  precedence=0)
 
 topo.sim['Primary'] = LISSOM(output_fn=PiecewiseLinear(lower_bound=delta_i,
                                                        upper_bound=beta_i),
                              nominal_density = BaseN,
-                             tsettle=tsettle)
+                             tsettle=tsettle,
+                             precedence=1)
 
 topo.sim.connect('Eye0','Primary', delay = fixedpoint.FixedPoint("0.05"),
                  connection_type=CFProjection,strength = 1.0, name='Afferent0',
