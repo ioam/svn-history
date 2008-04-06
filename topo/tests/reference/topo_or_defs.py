@@ -20,7 +20,7 @@ def initialize_variables(BaseRN,BaseN):
     exc_rad=max(2.5,BaseN/10.0)
     ############################################################
 
-
+    rf_radius_scale=6.5/rf_radius
 
     ############################################################
     # Variables to match 010910_or_map_512MB.param and or_defs
@@ -35,9 +35,8 @@ def initialize_variables(BaseRN,BaseN):
 
     randomness = 0.0
 
-    rf_radius_scale=1.0
-    xsigma=7.0
-    ysigma=1.5
+    xsigma=7.0/rf_radius_scale
+    ysigma=1.5/rf_radius_scale
     scale_input=1.0
 
     retina_edge_buffer=rf_radius-0.5+(randomness*BaseRN*area_scale/2)
