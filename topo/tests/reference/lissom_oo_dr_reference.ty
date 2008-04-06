@@ -10,18 +10,9 @@ $Id: lissom_oo_or_reference.ty 5436 2007-04-15 08:54:08Z ceball $
 __version__='$Revision: 5436 $'
 
 
-# CB: the plan is to make this file more and more general while
-# keeping it matching the equivalent c++ lissom simulation (i.e. do to
-# this what was done to lissom_or_reference/or_map_topo.param).
-
-
-
-## from topo.base.parameterizedobject import ParameterizedObject
-## ParameterizedObject.print_level=300
-
+import copy
 import fixedpoint
 import numpy.oldnumeric as Numeric
-#import pdb # debugger
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
@@ -39,42 +30,35 @@ from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import DivisiveNormalizeL1,PiecewiseLinear
 
-from topo.tests.reference.lissom_log_parser import get_input_params,check_weights,check_activities
 
-# All the C++ data-getting functions will use this as the filename base
-topo.tests.reference.lissom_log_parser.filename_base="topo/tests/reference/oo_dir_map."
+name = "oo_dir_map"
 
+##### comparisons #####
+from topo.tests.reference.lissom_log_parser import get_input_params,\
+     initialize_clissom_data
+from common_control import run_comparisons
+from topo_or_defs import *
 
-### Variables to match oo_or_map_topo.param
-#
-BaseN=48.0
-BaseRN=24.0
-BaseLN=24.0
-area_scale=1.0
+BaseN=locals().get("BaseN",24)
+# CB: something's not matching for 48, but this simulation can
+# definitely match at that density (so just a parameter mismatch -
+# will be fixed as generalization progresses...)
+BaseRN=locals().get("BaseRN",24)
+
+locals().update(initialize_variables(BaseRN,BaseN))
+
+# ********************************************************************
 num_eyes=4
-
-rf_radius=BaseRN/4.0+0.5
-inh_rad=max(2.5,BaseN/4.0-1.0+0.5)
-exc_rad=max(2.5,BaseN/10.0-0.3)
-
-#min_exc_rad=max(1.0,BaseN/44+0.5)
-#default_afferent_size_scale=BaseN/BaseRN
-gammaexc=0.9
-gammainh=0.9
 delta=0.083
 beta=0.633
-
-
-randomness = 0.0
-#smooth_circular_radius_trim = -0.25
-
-#rf_radius_scale=5.0/rf_radius
-#retina_area_scale = (BaseRN*area_scale/24.0*rf_radius_scale)*(BaseRN*area_scale/24.0*rf_radius_scale)
-#inputs_pereye=max(retina_area_scale,1)
 xsigma=6.0
 ysigma=1.5
-scale_input=1.0
+# ********************************************************************
 
+
+# ********************************************************************
+
+BaseLN = 24.0
 
 # radius of LGN DoG center Gaussian
 sigma_c = 0.5
@@ -93,15 +77,17 @@ retina_edge_buffer=round(rf_radius+r_L,0)
 RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
 LN=round(BaseLN*area_scale+2*lgn_edge_buffer,0)
 
-
-acs=6.5*6.5/rf_radius/rf_radius
-ecs=19.5*19.5/exc_rad/exc_rad
-ics=47.5*47.5/inh_rad/inh_rad
-alpha_input=0.007*acs
-alpha_exc=0.002*ecs
-alpha_inh=0.00025*ics
-
 tsettle=8
+
+# ********************************************************************
+
+
+initialize_clissom_data(name,inh_rad=inh_rad,rf_radius=rf_radius,
+                        BaseRN=BaseRN,BaseN=BaseN)
+
+#######################
+
+
 
 
 # Number of decimal places for simulator time
@@ -163,7 +149,7 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 # match the actual connectionfield in general).
 SharedWeightCFProjection.autosize_mask=False
 SharedWeightCFProjection.cf_shape=topo.patterns.basic.Disk(smoothing=0.0,
-                                                                size=2.0*r_L/BaseLN)
+                                                           size=2.0*r_L/BaseLN)
 
 import topo
 
@@ -191,6 +177,7 @@ for i in range(num_eyes):
 
 
 topo.sim['Primary'] = LISSOM(nominal_density=BaseN,
+                             nominal_bounds=BoundingBox(radius=0.5),
                              tsettle=tsettle,
                              output_fn=PiecewiseLinear(lower_bound=delta,upper_bound=beta))
 
@@ -245,65 +232,42 @@ topo.sim.connect('Primary','Primary',delay=FixedPoint("0.05"),
                  nominal_bounds_template=inhibitory_weight_bounds)
 
 
-def n_units(x):
-    """
-    Same technique as in cf.py for counting the number of units.
-    """
-    center_unit=(int(BaseN/2),int(BaseN/2))
-    return len(Numeric.nonzero(Numeric.ravel(x.cf(*center_unit).mask)))
-
-
-nu = n_units(topo.sim['Primary'].projections("Afferent00"))
-for i in range(num_eyes):
-    topo.sim['Primary'].projections("Afferent%i0"%i).learning_rate = alpha_input*nu
-    topo.sim['Primary'].projections("Afferent%i1"%i).learning_rate = alpha_input*nu
-
-
 
 # shortcuts to save on typing...
+for i in range(num_eyes):
+    locals()['Af%i0'%i]=topo.sim['Primary'].projections('Afferent%i0'%i)
+    locals()['Af%i1'%i]=topo.sim['Primary'].projections('Afferent%i1'%i)
 LE = topo.sim['Primary'].projections()["LateralExcitatory"]
 LI = topo.sim['Primary'].projections()["LateralInhibitory"]
 
 
 # Topographica learning rate is independent of density
+for i in range(num_eyes):
+    a=locals()['Af%i0'%i]
+    b=locals()['Af%i1'%i]
+    a.learning_rate=alpha_input*a.n_units()
+    b.learning_rate=alpha_input*b.n_units()
+LE.learning_rate=alpha_exc*LE.n_units()
+LI.learning_rate=alpha_inh*LI.n_units()
 
 
-LE.learning_rate=alpha_exc*n_units(LE)
-LI.learning_rate=alpha_inh*n_units(LI)
+# Scheduled actions
+add_scheduled_outputfn_changes(topo.sim)
+add_scheduled_tsettle_changes(topo.sim)
+add_scheduled_exc_bounds_changes(topo.sim)
+add_scheduled_exc_Lrate_changes(topo.sim)
+for i in range(num_eyes):
+    add_scheduled_aff_Lrate_changes(topo.sim,"Af%i0"%i)
+    add_scheduled_aff_Lrate_changes(topo.sim,"Af%i1"%i)
 
 
+topo.sim.run(0) # normalize weights
 
+##### comparisons #####
+if locals().get('comparisons',False):
+    verbose = locals().get("verbose",False)
+    stop_at_1000=locals().get("stop_at_1000",False)
+    run_comparisons(locals())
+#######################
 
-### EXCITATORY BOUNDS CHANGES
-#
-# The learning rate is adjusted too because the number of units
-# changes (even if the learning rate is going to be adjusted anyway at
-# this time)
-#
-topo.sim.schedule_command(199, 'exc_rad*=0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=n_units(LE)*alpha_exc')
-
-
-### LEARNING RATE CHANGES
-#
-topo.sim.schedule_command(  499, 'alpha_exc=0.0010*ecs; LE.learning_rate=alpha_exc*n_units(LE)')
-
-topo.sim.schedule_command(  499, 'alpha_input=0.0050*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
-topo.sim.schedule_command( 1999, 'alpha_input=0.0040*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
-topo.sim.schedule_command( 3999, 'alpha_input=0.0030*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
-topo.sim.schedule_command(19999, 'alpha_input=0.0015*acs; Af00.learning_rate=alpha_input*n_units(Af00); Af01.learning_rate=alpha_input*n_units(Af01)')
-
-
-### Primary output function bounds changes
-#
-topo.sim.schedule_command(  199, 'topo.sim["Primary"].output_fn.lower_bound=0.11; topo.sim["Primary"].output_fn.upper_bound=0.66')
-topo.sim.schedule_command(  499, 'topo.sim["Primary"].output_fn.lower_bound=0.12; topo.sim["Primary"].output_fn.upper_bound=0.67')
-topo.sim.schedule_command(  999, 'topo.sim["Primary"].output_fn.lower_bound=0.15; topo.sim["Primary"].output_fn.upper_bound=0.68')
-topo.sim.schedule_command( 1999, 'topo.sim["Primary"].output_fn.lower_bound=0.18; topo.sim["Primary"].output_fn.upper_bound=0.70')
-topo.sim.schedule_command( 2999, 'topo.sim["Primary"].output_fn.lower_bound=0.20; topo.sim["Primary"].output_fn.upper_bound=0.73')
-topo.sim.schedule_command( 3999, 'topo.sim["Primary"].output_fn.lower_bound=0.20; topo.sim["Primary"].output_fn.upper_bound=0.76')
-topo.sim.schedule_command( 4999, 'topo.sim["Primary"].output_fn.lower_bound=0.21; topo.sim["Primary"].output_fn.upper_bound=0.79')
-topo.sim.schedule_command( 6499, 'topo.sim["Primary"].output_fn.lower_bound=0.22; topo.sim["Primary"].output_fn.upper_bound=0.82')
-topo.sim.schedule_command( 7999, 'topo.sim["Primary"].output_fn.lower_bound=0.23; topo.sim["Primary"].output_fn.upper_bound=0.85')
-topo.sim.schedule_command(19999, 'topo.sim["Primary"].output_fn.lower_bound=0.24; topo.sim["Primary"].output_fn.upper_bound=0.88')
-
-
+ 
