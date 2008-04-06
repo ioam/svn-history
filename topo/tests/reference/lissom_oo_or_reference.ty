@@ -62,14 +62,13 @@ sigma_s = 4*sigma_c
 r_L = 4.7*sigma_s
 
 # buffers so sheet above has full rfs...
-lgn_edge_buffer = round(rf_radius,0)
-retina_edge_buffer=round(rf_radius+r_L,0)
-
 # ...and actual numbers of neurons with the buffers
-RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
+lgn_edge_buffer = retina_edge_buffer # from topo_or_defs
 LN=round(BaseLN*area_scale+2*lgn_edge_buffer,0)
 
-tsettle=8
+retina_edge_buffer=round(rf_radius+r_L,0)
+RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
+
 
 # ********************************************************************
 
@@ -111,14 +110,15 @@ input_pattern = topo.patterns.basic.Gaussian(
     orientation=lambda : round(2*pi*input_params[0]['theta'].next()/360.0,1))
 
 
+# CB: you are here
 retina_bounds = BoundingBox(radius= RN/(2.0*BaseRN*area_scale))
 lgn_bounds = BoundingBox(radius=LN/(2.0*BaseLN*area_scale))
                                                
 
 
 # Connection parameters
-lgn_weight_bounds = BoundingBox(radius=r_L/BaseLN)
-afferent_weight_bounds   = BoundingBox(radius=rf_radius/BaseRN)               
+lgn_weight_bounds = BoundingBox(radius=r_L/BaseRN)
+afferent_weight_bounds   = BoundingBox(radius=rf_radius/BaseLN)               
 excitatory_weight_bounds = BoundingBox(radius=exc_rad/BaseN)  
 inhibitory_weight_bounds = BoundingBox(radius=inh_rad/BaseN)                  
 
@@ -234,8 +234,8 @@ LI.learning_rate=alpha_inh*LI.n_units()
 
 # Scheduled actions
 add_scheduled_outputfn_changes(topo.sim)
-#add_scheduled_tsettle_changes(topo.sim)
-#add_scheduled_exc_bounds_changes(topo.sim)
+add_scheduled_tsettle_changes(topo.sim)
+add_scheduled_exc_bounds_changes(topo.sim)
 add_scheduled_exc_Lrate_changes(topo.sim)
 add_scheduled_aff_Lrate_changes(topo.sim,"Af01")
 add_scheduled_aff_Lrate_changes(topo.sim,"Af00")
