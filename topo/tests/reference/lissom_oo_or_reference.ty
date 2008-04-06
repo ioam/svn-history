@@ -32,7 +32,7 @@ from topo.outputfns.basic import DivisiveNormalizeL1,PiecewiseLinear
 
 
 ### Name of the basis simulation (set this)
-name = "oo_or_map_topo" 
+name = "010910_oo_or_map_512MB" 
 
 ##### comparisons #####
 from topo.tests.reference.lissom_log_parser import get_input_params,\

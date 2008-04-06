@@ -24,7 +24,7 @@ def _check_proj(s,p,N):
         
 
 def check_all_weights():
-    print "t=%s: Checking weights..."%topo.sim.time()
+    print "t=%s: Checking weights."%topo.sim.time()
 
     e = ""
     # assumes 'Primary'
@@ -36,7 +36,7 @@ def check_all_weights():
 
 
 def check_all_activities():
-    print "t=%s: Checking activities..."%topo.sim.time()
+    print "t=%s: Checking activities."%topo.sim.time()
     check_activities('Eye0',display=verbose)
     check_activities('Primary',display=verbose)
 
