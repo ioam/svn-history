@@ -51,8 +51,6 @@ locals().update(initialize_variables(BaseRN,BaseN))
 num_eyes=4
 delta=0.083
 beta=0.633
-xsigma=6.0
-ysigma=1.5
 # ********************************************************************
 
 
@@ -161,25 +159,32 @@ def doubledoh(i):
 
 from topo.patterns.basic import Sweeper
 
+# precedence is used to determine order for checking
+
 for i in range(num_eyes):
     topo.sim['Eye%s'%i]=GeneratorSheet(
         input_generator=Sweeper(
         generator=copy.deepcopy(input_pattern),
         step=i,speed=1.0/BaseRN,
         sign=lambda x=i:doubledoh(x),
-        orientation=lambda x=i:round(2*pi*doh(x)/360.0,1)))
+        orientation=lambda x=i:round(2*pi*doh(x)/360.0,1)),
+        precedence=i)
 
     topo.sim['Ganglia%s0'%i]=CFSheet(output_fn=PiecewiseLinear(lower_bound=0.0,
-                                                               upper_bound=1.0))
+                                                               upper_bound=1.0),
+                                     precedence=num_eyes+1)
     
     topo.sim['Ganglia%s1'%i]=CFSheet(output_fn=PiecewiseLinear(lower_bound=0.0,
-                                                               upper_bound=1.0))
+                                                               upper_bound=1.0),
+                                     precedence=num_eyes+1)
 
 
 topo.sim['Primary'] = LISSOM(nominal_density=BaseN,
                              nominal_bounds=BoundingBox(radius=0.5),
                              tsettle=tsettle,
-                             output_fn=PiecewiseLinear(lower_bound=delta,upper_bound=beta))
+                             output_fn=PiecewiseLinear(lower_bound=delta,
+                                                       upper_bound=beta),
+                             precedence=num_eyes+2)
 
 
 # C++ LISSOM divides by pi in RadialFunction::Gaussian but not for
