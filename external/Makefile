@@ -698,7 +698,7 @@ PLAYER_UNINSTALL += ${PYTHON_LIB}/site-packages/playerc* ${PYTHON_LIB}/site-pack
 
 player: ${PLAYER}.tar.bz2
 	tar -xjf ${PLAYER}.tar.bz2
-	cd ${PLAYER}; ./configure --prefix=${PREFIX}
+	cd ${PLAYER}; ./configure --prefix=${PREFIX} ${PLAYER_FLAGS}
 	make -C ${PLAYER} install
 	make -C ${PLAYER}/client_libs/libplayerc/bindings/python
 	cd ${PLAYER}/client_libs/libplayerc/bindings/python ; ${PREFIX}/bin/python ./setup.py install --prefix=${PREFIX}
@@ -795,6 +795,23 @@ mxnumber-uninstall:
 	rm -rf mxnumber ${foreach f,${MXNUMBER_UNINSTALL}, ${PREFIX}/${f}}
 
 
+
+##############################################################
+# processing (improved interactive prompt)
+#
+PROCESSING = processing-0.51
+PROCESSING_UNINSTALL =  ${PYTHON_LIB}/site-packages/processing
+PROCESSING_UNINSTALL += ${PYTHON_LIB}/site-packages/processing-0.51-py2.5.egg-info
+
+processing: ${PROCESSING}.tar.gz python 
+	tar -xzf ${PROCESSING}.tar.gz
+	cd ${PROCESSING}; ${PREFIX}/bin/python setup.py install
+	touch processing
+
+processing-clean:
+	rm -rf ${PROCESSING} 
+processing-uninstall:
+	rm -rf processing ${PROCESSING} $(foreach f, ${PROCESSING_UNINSTALL}, ${PREFIX}/${f})
 
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
