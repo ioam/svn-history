@@ -167,5 +167,5 @@ class SequenceGeneratorSheet(GeneratorSheet):
             event_seq.append(FunctionEvent(delay,self.set_input_generator,gen))
             event_seq.append(FunctionEvent(0,self.generate))
         now = self.simulation.time()
-        seq = PeriodicEventSequence(now+self.phase,self.period,event_seq)
-        self.simulation.enqueue_event(seq)
+        self.event = PeriodicEventSequence(now+self.phase,self.period,event_seq)
+        self.simulation.enqueue_event(self.event)
