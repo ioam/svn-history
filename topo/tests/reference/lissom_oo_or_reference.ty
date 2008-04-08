@@ -1,3 +1,5 @@
+from __future__ import division
+
 """
 LISSOM simulation designed to match C++ LISSOM's oo_or_map_topo
 simulation.
@@ -50,10 +52,10 @@ locals().update(initialize_variables(BaseRN,BaseN))
 
 # ********************************************************************
 
-BaseLN = 24.0
+BaseLN = BaseRN
 
 # radius of LGN DoG center Gaussian
-sigma_c = 0.5
+sigma_c = 0.5/rf_radius_scale
 
 # radius of LGN DoG surround Gaussian
 sigma_s = 4*sigma_c 
@@ -61,14 +63,15 @@ sigma_s = 4*sigma_c
 # radius of LGN afferent connections
 r_L = 4.7*sigma_s
 
-# buffers so sheet above has full rfs...
-# ...and actual numbers of neurons with the buffers
-lgn_edge_buffer = retina_edge_buffer # from topo_or_defs
-LN=round(BaseLN*area_scale+2*lgn_edge_buffer,0)
+blur_scale=2*2.33
 
-retina_edge_buffer=round(rf_radius+r_L,0)
-RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
-
+## CEBALERT
+from math import ceil
+LN=ceil(BaseLN*area_scale+2*(rf_radius-0.5))
+if LN%2==1: LN+=1
+RN = ceil(area_scale*BaseLN+2*(BaseRN/BaseLN)*(rf_radius-0.5)+2*(r_L-0.5))
+if RN%2==1:RN+=1
+##
 
 # ********************************************************************
 
@@ -105,16 +108,12 @@ input_pattern = topo.patterns.basic.Gaussian(
     scale=scale_input,
     size = 2*gaussian_height,
     aspect_ratio= gaussian_width/gaussian_height,
-    x=lambda : input_params[0]['cx'].next()/BaseLN - 0.5*LN/BaseLN,
-    y=lambda : input_params[0]['cy'].next()/BaseLN - 0.5*LN/BaseLN,
+    x=lambda : input_params[0]['cx'].next()/BaseRN - 0.5*LN/BaseRN,
+    y=lambda : input_params[0]['cy'].next()/BaseRN - 0.5*LN/BaseRN,
     orientation=lambda : round(2*pi*input_params[0]['theta'].next()/360.0,1))
 
-
-# CB: you are here
-retina_bounds = BoundingBox(radius= RN/(2.0*BaseRN*area_scale))
-lgn_bounds = BoundingBox(radius=LN/(2.0*BaseLN*area_scale))
-                                               
-
+retina_bounds = BoundingBox(radius=0.5*RN/(BaseRN*area_scale))
+lgn_bounds = BoundingBox(radius=0.5*LN/(BaseLN*area_scale))
 
 # Connection parameters
 lgn_weight_bounds = BoundingBox(radius=r_L/BaseRN)
@@ -167,11 +166,11 @@ topo.sim['Primary'] = LISSOM(nominal_density=BaseN,
 # Gaussian in retinalobjs (and elsewhere)
 centerg = topo.patterns.basic.Gaussian(
     size=2*sigma_c*sqrt(pi)/BaseRN,aspect_ratio=1.0,
-    output_fn=DivisiveNormalizeL1(norm_value=2.33))
+    output_fn=DivisiveNormalizeL1(norm_value=blur_scale))
 
 surroundg = topo.patterns.basic.Gaussian(
     size=2*sigma_s*sqrt(pi)/BaseRN,aspect_ratio=1.0,
-    output_fn=DivisiveNormalizeL1(norm_value=2.33))
+    output_fn=DivisiveNormalizeL1(norm_value=blur_scale))
 
 
 on_weights = topo.patterns.basic.Composite(
