@@ -73,6 +73,9 @@ RN = ceil(area_scale*BaseLN+2*(BaseRN/BaseLN)*(rf_radius-0.5)+2*(r_L-0.5))
 if RN%2==1:RN+=1
 ##
 
+# CB: need to deal with this more cleanly
+acs/=2.0 # divided by n_aff_inputs
+alpha_input=0.007*acs
 # ********************************************************************
 
 initialize_clissom_data(name,inh_rad=inh_rad,rf_radius=rf_radius,

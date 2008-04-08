@@ -42,7 +42,9 @@ def initialize_variables(BaseRN,BaseN):
     retina_edge_buffer=rf_radius-0.5+(randomness*BaseRN*area_scale/2)
     RN=BaseRN*area_scale+2*retina_edge_buffer
 
+    # should be divided by n_aff_inputs
     acs=6.5*6.5/rf_radius/rf_radius
+
     ecs=19.5*19.5/exc_rad/exc_rad
     ics=47.5*47.5/inh_rad/inh_rad
     alpha_input=0.007*acs
@@ -54,7 +56,6 @@ def initialize_variables(BaseRN,BaseN):
 
 
     return locals()
-
 
 
 def add_scheduled_outputfn_changes(sim):
