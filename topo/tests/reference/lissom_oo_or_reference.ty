@@ -121,7 +121,8 @@ lgn_bounds = BoundingBox(radius=0.5*LN/(BaseLN*area_scale))
 # Connection parameters
 lgn_weight_bounds = BoundingBox(radius=r_L/BaseRN)
 afferent_weight_bounds   = BoundingBox(radius=rf_radius/BaseLN)               
-excitatory_weight_bounds = BoundingBox(radius=exc_rad/BaseN)  
+excitatory_weight_bounds = BoundingBox(radius=exc_rad/BaseN,
+                                       min_radius=min_exc_rad)  
 inhibitory_weight_bounds = BoundingBox(radius=inh_rad/BaseN)                  
 
 
