@@ -22,6 +22,8 @@ def initialize_variables(BaseRN,BaseN):
 
     rf_radius_scale=6.5/rf_radius
 
+    min_exc_rad=max(1.5,BaseN/44)
+
     ############################################################
     # Variables to match 010910_or_map_512MB.param and or_defs
     area_scale=1.0
@@ -86,16 +88,19 @@ def add_scheduled_exc_bounds_changes(sim):
     # The learning rate is adjusted too because the number of units
     # changes and ecs changes (even if the learning rate is going to
     # be adjusted anyway at this time)
-    sim.schedule_command(199,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); LE.learning_rate=alpha_exc*LE.n_units()')
-    sim.schedule_command(499,'exc_rad=exc_rad*0.7; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
-    sim.schedule_command(999,'exc_rad=exc_rad*0.8; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
-    sim.schedule_command(1999,'exc_rad=exc_rad*0.8; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
-    sim.schedule_command(2999,'exc_rad=exc_rad*0.8; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
-    sim.schedule_command(3999,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
-    sim.schedule_command(4999,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
-    sim.schedule_command(6499,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
-    sim.schedule_command(7999,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
-    sim.schedule_command(19999,'exc_rad=exc_rad*0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()')
+
+    change_bounds = "LE.change_bounds(BoundingBox(radius=exc_rad/BaseN,min_radius=min_exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()"
+    
+    sim.schedule_command(199,'exc_rad=exc_rad*0.6; %s'%change_bounds)
+    sim.schedule_command(499,'exc_rad=exc_rad*0.7; %s'%change_bounds)
+    sim.schedule_command(999,'exc_rad=exc_rad*0.8; %s'%change_bounds)
+    sim.schedule_command(1999,'exc_rad=exc_rad*0.8; %s'%change_bounds)
+    sim.schedule_command(2999,'exc_rad=exc_rad*0.8; %s'%change_bounds)
+    sim.schedule_command(3999,'exc_rad=exc_rad*0.6; %s'%change_bounds)
+    sim.schedule_command(4999,'exc_rad=exc_rad*0.6; %s'%change_bounds)
+    sim.schedule_command(6499,'exc_rad=exc_rad*0.6; %s'%change_bounds)
+    sim.schedule_command(7999,'exc_rad=exc_rad*0.6; %s'%change_bounds)
+    sim.schedule_command(19999,'exc_rad=exc_rad*0.6; %s'%change_bounds)
 
 
 def add_scheduled_exc_Lrate_changes(sim):
