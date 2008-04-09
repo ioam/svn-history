@@ -80,7 +80,7 @@ def add_scheduled_tsettle_changes(sim):
     sim.schedule_command( 4999, 'topo.sim["Primary"].tsettle=11')
     sim.schedule_command( 6499, 'topo.sim["Primary"].tsettle=12')
     sim.schedule_command( 7999, 'topo.sim["Primary"].tsettle=13')
-    
+
 
 def add_scheduled_exc_bounds_changes(sim):
     ### Excitatory bounds changes
@@ -89,6 +89,14 @@ def add_scheduled_exc_bounds_changes(sim):
     # changes and ecs changes (even if the learning rate is going to
     # be adjusted anyway at this time)
 
+    # Turn off mask autosizing; not sure how it manages to work
+    # for creation (i.e. only doesn't match after resizing) - is
+    # that a fluke of the initial radii, or does c++ lissom do
+    # something different when resizing vs creating, or what?
+##     LE = sim['Primary'].projections('LateralExcitatory')
+##     LE.initialized=False;LE.autosize_mask=False;LE.initialized=True
+##     change_bounds = "LE.cf_shape.size=2.0*round(max(exc_rad,min_exc_rad))/BaseN;LE.change_bounds(BoundingBox(radius=exc_rad/BaseN,min_radius=min_exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()"
+    
     change_bounds = "LE.change_bounds(BoundingBox(radius=exc_rad/BaseN,min_radius=min_exc_rad/BaseN));LE.learning_rate=alpha_exc*LE.n_units()"
     
     sim.schedule_command(199,'exc_rad=exc_rad*0.6; %s'%change_bounds)
