@@ -70,10 +70,10 @@ def run_comparisons(l):
     check_all_activities()
 
     topo.sim.run(80)
-    check_all_activities();check_all_weights()
+    check_all_weights();check_all_activities()
 
     topo.sim.run(100)
-    check_all_activities() #200
+    check_all_weights();check_all_activities() #200
     
     topo.sim.run(400)
     check_all_activities() #600
@@ -82,7 +82,7 @@ def run_comparisons(l):
     check_all_activities() #900
     
     topo.sim.run(100) # to 1000
-    check_all_activities();check_all_weights()
+    check_all_weights();check_all_activities()
 
     if not stop_at_1000:
 
@@ -92,13 +92,13 @@ def run_comparisons(l):
 
 
         topo.sim.run(3000) # 12000
-        check_all_activities();check_all_weights()
+        check_all_weights();check_all_activities()
 
         topo.sim.run(3000)
         check_all_activities()
 
         topo.sim.run(5000)
-        check_all_activities();check_all_weights()
+        check_all_weights();check_all_activities()
 
 
 
