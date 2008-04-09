@@ -52,6 +52,10 @@ L = locals()
 
 def run_comparisons(l):
 
+
+    # there are weigts checks at the beginning and then
+    # after every bounds change
+    
     L.update(l)
 
     ### Check initial weights
@@ -69,36 +73,39 @@ def run_comparisons(l):
     topo.sim.run(10)
     check_all_activities()
 
-    topo.sim.run(80)
-    check_all_weights();check_all_activities()
+    topo.sim.run(80) # 100
+    check_all_activities()
 
     topo.sim.run(100)
     check_all_weights();check_all_activities() #200
-    
-    topo.sim.run(400)
-    check_all_activities() #600
+
+    topo.sim.run(300)
+    check_all_weights();check_all_activities() #500
     
     topo.sim.run(300)
-    check_all_activities() #900
-    
-    topo.sim.run(100) # to 1000
+    check_all_activities() #800
+        
+    topo.sim.run(200) # 1000
     check_all_weights();check_all_activities()
 
     if not stop_at_1000:
 
-        for i in range(8): # to 9000
+        for i in range(4): # to 5000
             topo.sim.run(1000)
-            check_all_activities()
+            check_all_weights();check_all_activities()
 
 
-        topo.sim.run(3000) # 12000
+        topo.sim.run(1500) # 6500
         check_all_weights();check_all_activities()
 
-        topo.sim.run(3000)
+        topo.sim.run(1500) # 8000
+        check_all_weights();check_all_activities()
+
+        topo.sim.run(5000) # 13000
         check_all_activities()
 
-        topo.sim.run(5000)
-        check_all_weights();check_all_activities()
-
-
-
+        topo.sim.run(3000) # 16000
+        check_all_activities()
+        
+        topo.sim.run(4000) # 20000
+        check_all_weights; check_all_activities()
