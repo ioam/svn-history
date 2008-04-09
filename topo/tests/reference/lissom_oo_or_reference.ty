@@ -194,23 +194,23 @@ topo.sim.connect('Eye0','Ganglia01',delay = FixedPoint("0.05"),
                  weights_generator=off_weights,name="Afferent0")
 
 
-topo.sim.connect('Ganglia00','Primary',delay=FixedPoint("0.05"),
-                 dest_port=('Activity','JointNormalize', 'Afferent'),
-                 connection_type=CFProjection,strength=1.0,name='Afferent00',
-                 nominal_bounds_template=afferent_weight_bounds)
+Af00 = topo.sim.connect('Ganglia00','Primary',delay=FixedPoint("0.05"),
+                dest_port=('Activity','JointNormalize', 'Afferent'),
+                connection_type=CFProjection,strength=1.0,name='Afferent00',
+                nominal_bounds_template=afferent_weight_bounds)
 
-topo.sim.connect('Ganglia01','Primary',delay=FixedPoint("0.05"),
+Af01 = topo.sim.connect('Ganglia01','Primary',delay=FixedPoint("0.05"),
                  dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=1.0,name='Afferent01',
                  nominal_bounds_template=afferent_weight_bounds)
 
 
-topo.sim.connect('Primary','Primary',delay=FixedPoint("0.05"),
+LE = topo.sim.connect('Primary','Primary',delay=FixedPoint("0.05"),
                  connection_type=CFProjection,strength=0.9,
                  name='LateralExcitatory',
                  nominal_bounds_template=excitatory_weight_bounds)
             
-topo.sim.connect('Primary','Primary',delay=FixedPoint("0.05"),
+LI = topo.sim.connect('Primary','Primary',delay=FixedPoint("0.05"),
                  connection_type=CFProjection,strength=-0.9,
                  name='LateralInhibitory',
                  nominal_bounds_template=inhibitory_weight_bounds)
@@ -218,13 +218,6 @@ topo.sim.connect('Primary','Primary',delay=FixedPoint("0.05"),
 
 
 topo.sim.run(0) # topog doesn't jointly normalize weights on creation
-
-
-# shortcuts to save on typing...
-Af00 = topo.sim['Primary'].projections()["Afferent00"]
-Af01 = topo.sim['Primary'].projections()["Afferent01"]
-LE = topo.sim['Primary'].projections()["LateralExcitatory"]
-LI = topo.sim['Primary'].projections()["LateralInhibitory"]
 
 
 # Topographica learning rate is independent of density
