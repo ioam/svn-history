@@ -163,17 +163,74 @@ def doh(i):
 def doubledoh(i):
     return input_params[i]['sign'].next()
 
-from topo.patterns.basic import Sweeper
+
+#################################################################
+from topo.base.patterngenerator import PatternGenerator
+from topo.base.parameterclasses import Number,Parameter
+from math import cos,sin
+class Sweeper(PatternGenerator):
+    """
+    PatternGenerator that sweeps a supplied PatternGenerator in a direction
+    perpendicular to its orientation.
+    """
+
+    generator = Parameter(default=Gaussian(),precedence=0.97, doc="Pattern to sweep.")
+
+    speed = Number(default=0.25,bounds=(0.0,None),doc="""
+        Sweep speed: number of sheet coordinate units per unit time.""")
+
+    step = Number(default=1,doc="""
+        Number of steps at the given speed to move in the sweep direction.
+        The distance moved is speed*step.""")
+
+    def function(self,params):
+        """Selects and returns one of the patterns in the list."""
+        bounds = params['bounds']
+        xdensity=params['xdensity']
+        ydensity=params['ydensity']
+        x=params['x']
+        y=params['y']
+        scale=params['scale']
+        offset=params['offset']
+        size=params['size']
+        orientation=params['orientation']
+        
+        pg = self.generator
+
+        pattern_orientation=orientation
+        motion_orientation=pattern_orientation+pi/2.0
+        
+        speed=params['speed']
+        motion_sign=2*int(motion_orientation/pi)-1
+        step=params['step']
+
+        new_x = x+size*pg.x
+        new_y = y+size*pg.y
+        
+        image_array = pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
+                         x=new_x + motion_sign*speed*step*cos(motion_orientation),
+                         y=new_y + motion_sign*speed*step*sin(motion_orientation),
+                         orientation=pattern_orientation,
+                         scale=pg.scale*scale,offset=pg.offset+offset)
+        
+        return image_array
+
+#################################################################
+
+
+
+
+
 
 # precedence is used to determine order for checking
 
 for i in range(num_eyes):
     topo.sim['Eye%s'%i]=GeneratorSheet(
         input_generator=Sweeper(
-        generator=copy.deepcopy(input_pattern),
-        step=i,speed=1.0/BaseRN,
-        sign=lambda x=i:doubledoh(x),
-        orientation=lambda x=i:round(2*pi*doh(x)/360.0,1)),
+                generator=copy.deepcopy(input_pattern),
+                step=i,speed=1.0/BaseRN,
+                sign=lambda x=i:doubledoh(x),
+                orientation=lambda x=i:round(2*pi*doh(x)/360.0,1)),
         precedence=i)
 
     topo.sim['Ganglia%s0'%i]=CFSheet(output_fn=PiecewiseLinear(lower_bound=0.0,
