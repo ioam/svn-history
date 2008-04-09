@@ -257,7 +257,22 @@ subdirectory, and do <code>make -C external player</code>.
 The Gazebo and Stage simulators that support the Player interface
 can also be used, as described on the Player site.
 </DD>
+
+<P><DT><A HREF="http://pypi.python.org/pypi/processing">Processing</A></DT>
+<DD>
+Because of the "global interpreter lock" it is not possible to do true
+multiprocessing in Python using the language's built-in threads.
+The <i>processing</i> module provides support for multiprocessing
+using an API similar to that of Python's <i>threading</i> module.
+(Although, unlike threads, processes don't share memory.)  The module
+also provides a number of other useful features including process-safe
+queues, worker pools, and factories ("managers") that allow the
+creation of python objects in other processes that communicate through
+proxies. 
+</DD>
+
 </DL>
+
 
 
 
