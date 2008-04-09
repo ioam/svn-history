@@ -54,12 +54,13 @@ beta=0.633
 # ********************************************************************
 
 
+
 # ********************************************************************
 
-BaseLN = 24.0
+BaseLN = BaseRN
 
 # radius of LGN DoG center Gaussian
-sigma_c = 0.5
+sigma_c = 0.5/rf_radius_scale
 
 # radius of LGN DoG surround Gaussian
 sigma_s = 4*sigma_c 
@@ -67,17 +68,21 @@ sigma_s = 4*sigma_c
 # radius of LGN afferent connections
 r_L = 4.7*sigma_s
 
-# buffers so sheet above has full rfs...
-lgn_edge_buffer = round(rf_radius,0)
-retina_edge_buffer=round(rf_radius+r_L,0)
+blur_scale=2*2.33
 
-# ...and actual numbers of neurons with the buffers
-RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
-LN=round(BaseLN*area_scale+2*lgn_edge_buffer,0)
+## CEBALERT
+from math import ceil
+LN=ceil(BaseLN*area_scale+2*(rf_radius-0.5))
+if LN%2==1: LN+=1
+RN = ceil(area_scale*BaseLN+2*(BaseRN/BaseLN)*(rf_radius-0.5)+2*(r_L-0.5))
+if RN%2==1:RN+=1
+##
 
-tsettle=8
-
+# CB: need to deal with this more cleanly
+acs/=2.0 # divided by n_aff_inputs
+alpha_input=0.007*acs
 # ********************************************************************
+
 
 
 initialize_clissom_data(name,inh_rad=inh_rad,rf_radius=rf_radius,
@@ -128,7 +133,8 @@ CFSheet.nominal_density= BaseLN
 # Connection parameters
 lgn_weight_bounds = BoundingBox(radius=r_L/BaseLN)
 afferent_weight_bounds   = BoundingBox(radius=rf_radius/BaseRN)               
-excitatory_weight_bounds = BoundingBox(radius=exc_rad/BaseN)  
+excitatory_weight_bounds = BoundingBox(radius=exc_rad/BaseN,
+                                       min_radius=min_exc_rad/BaseN)  
 inhibitory_weight_bounds = BoundingBox(radius=inh_rad/BaseN)                  
 
 

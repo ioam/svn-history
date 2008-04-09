@@ -6,19 +6,22 @@
 # $Header: /disk/cvs/jbcvsglobal/lissom/samples/oo_dir_map.param,v 1.6 2003/04/23 20:37:41 jbednar Exp $
 
 
-###
+### Will be overwritten
+# CB: each 'set' must be on a line of its own for clunky auto-filling to work.
 set BaseN=8  
-set BaseRN=24  
-set area_scale=1
+set BaseRN=8  
 set rf_radius=BaseRN/4+0.5 
 set inh_rad=2.5>?(BaseN/4-1)+0.5
 set exc_rad=2.5>?(BaseN/10)
 ###
 
+set area_scale=1
+
+set num_eyes=4 layers_pereye=2 inputs_pereye=1
 
 
-set num_eyes=4 layers_pereye=2
 
+######################################################################
 
 # Definitions were copied here so that RN will be defined
 set retina_edge_buffer=rf_radius+randomness*BaseRN/2
@@ -72,21 +75,23 @@ input_define Obj$$$$i Eye$$$$f Input_Gaussian theta=&::it$$$${i} ${scale_str} \
 cx='Expression ::ix$$$${i}+((sgn*$$$${speed}*$$$${f})@:(::it$$$${i}-PI/2))' \
 cy='Expression ::iy$$$${i}+((sgn*$$$${speed}*$$$${f})@;(::it$$$${i}-PI/2))' "
 
-#call or_defs onoff=True s_delta=0.083 s_beta=0.083+0.55 ids=1.0
-
-set blur_type=Blur_DoGGoD blur_radius=0.5
-set blur_radius_surround_multiplier=4.0 blur_scale=2.33
-set ::Region::.defaults::Retina::activity_threshold=Uninitialized 
-set input_offset=0.0 input_accum_type=Accum_Add 
-set ::Region::.defaults::Convolution::activity_lbound=0.0 ::Region::.defaults::Convolution::activity_ubound=1.0
+######################################################################
 
 
-set randomness=0 lat_exc_randomness=0 lat_inh_randomness=0
-set preset_aff_wts=True preset_sigma_aff=0
-set preset_lat_wts=True preset_sigma_exc=0 preset_sigma_inh=0
-set circular_aff_wts=True  circular_lat_wts=True
-set smooth_circular_outlines=False smooth_circular_radius_trim=-0.25
+call or_defs onoff=True s_delta=0.083 s_beta=0.083+0.55 ids=1.0
 
+
+############
+set input_separation_min_enforce=True
+set input_offset=0.0
+set scale_input=1.0
+############
+
+call common.param
+
+
+
+######################################################################
 
 define_param speed Param_String  0 Uninitialized \
  "Retinal distance to travel between centers of objects in each 'eye', i.e. time \
