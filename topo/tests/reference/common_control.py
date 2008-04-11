@@ -4,7 +4,7 @@
 ### in lissom_log_parser guesses how to unsituate the weights. If your
 ### weights contains rows or columns of zeros, this guessing will fail.
 
-from topo.tests.reference.lissom_log_parser import check_weights,check_activities
+from topo.tests.reference.lissom_log_parser import check_weights,check_activities,check_size
 from math import ceil
 
 def _check_proj(s,p,N):
@@ -13,6 +13,15 @@ def _check_proj(s,p,N):
     step = int(ceil(N/20.0))
     if step>2 and step%2==1:
         step+=1
+
+    # check all sizes
+    try:
+        for i in range(0,N,step):
+            for j in range(0,N,step):
+                check_size(s,p,(i,j),display=verbose)
+    except AssertionError, st:
+        return "%s: %s\n"%(s,st)
+
     
     try:
         for i in range(0,N,step):
@@ -74,7 +83,7 @@ def run_comparisons(l):
     check_all_activities()
 
     topo.sim.run(80) # 100
-    check_all_activities()
+    check_all_weights(); check_all_activities()
 
     topo.sim.run(100)
     check_all_weights();check_all_activities() #200

@@ -250,6 +250,29 @@ def check_activities(sheet_name,required_dp=5,display=True):
 
 
 
+def check_size(sheet_name,proj_name,unit,slices=None,display=True):
+    cTIME = "%06d"%long(topo.sim.time())
+    cREGION = sheet_name
+    cCONN = proj_name
+    cUNIT = "%03d_%03d"%unit
+
+    c_matrix_filename=filename_base+cTIME+'.wts.'+cREGION+'.'+cCONN+'.'+cUNIT+'.matrix'
+    comparing_what = proj_name + " " + str(unit) + " t=" + str(topo.sim.time())
+    dprint("Comparing sizes of %s"%comparing_what,display)
+    dprint("Reading C++ data from %s"%c_matrix_filename,display)
+
+    topo_weights = topo.sim[sheet_name].projections()[proj_name].cfs[unit].weights
+    situated_c_weights = get_matrix(c_matrix_filename)
+
+    if slices is None:
+        c_weights = unsituate(situated_c_weights)
+    else:
+        c_weights = situated_c_weights[slices[0],slices[1]]
+
+    assert topo_weights.shape == c_weights.shape, "%s: topographica array shape %s, but c++ matrix shape %s"%(comparing_what,topo_weights.shape,c_weights.shape)
+
+
+
 
 def _set_clissom_params(name,out_dir,**kw):
     lines = []
@@ -266,6 +289,8 @@ def _set_clissom_params(name,out_dir,**kw):
             line="set BaseN=%s\n"%kw['BaseN']
         if 'set rf_radius' in line:
             line="set rf_radius=%s\n"%kw['rf_radius']
+        if 'set exc_rad' in line:
+            line="set exc_rad=%s\n"%kw['exc_rad']
         # exc_rad
         lines.append(line)
     f.close()
@@ -308,4 +333,5 @@ def initialize_clissom_data(name,**kw):
         os.chdir(cwd)
     else:
         print "Skipping c++ lissom data generation: results already exist in %s"%out_dir
+
 
