@@ -1,3 +1,4 @@
+from __future__ import division
 """
 A LISSOM-based orientation map, designed to match the equivalent
 C++ simulation.
@@ -99,7 +100,7 @@ BaseRN=locals().get("BaseRN",24)
 locals().update(initialize_variables(BaseRN,BaseN))
 
 initialize_clissom_data(name,inh_rad=inh_rad,rf_radius=rf_radius,
-                        BaseRN=BaseRN,BaseN=BaseN)
+                        exc_rad=exc_rad,BaseRN=BaseRN,BaseN=BaseN)
 #######################
 
 
@@ -137,6 +138,7 @@ CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
+
 topo.sim['Eye0'] = GeneratorSheet(input_generator=input_pattern,
                                   nominal_bounds=input_bounds,
                                   nominal_density=BaseRN*area_scale,
@@ -150,27 +152,23 @@ topo.sim['Primary'] = LISSOM(output_fn=PiecewiseLinear(lower_bound=delta_i,
                              tsettle=tsettle,
                              precedence=1)
 
-topo.sim.connect('Eye0','Primary', delay = fixedpoint.FixedPoint("0.05"),
+Af = topo.sim.connect('Eye0','Primary', delay = fixedpoint.FixedPoint("0.05"),
                  connection_type=CFProjection,strength = 1.0, name='Afferent0',
                  nominal_bounds_template=BoundingBox(radius=rf_radius/BaseRN))
 
-
-topo.sim.connect('Primary','Primary', delay = fixedpoint.FixedPoint("0.05"),
+LE = topo.sim.connect('Primary','Primary', delay = fixedpoint.FixedPoint("0.05"),
                  connection_type=CFProjection,strength=gammaexc,
                  name='LateralExcitatory',
                  nominal_bounds_template=BoundingBox(radius=exc_rad/BaseN,
                                                      min_radius=min_exc_rad/BaseN))
 
-topo.sim.connect('Primary','Primary', delay = fixedpoint.FixedPoint("0.05"),
+LI = topo.sim.connect('Primary','Primary', delay = fixedpoint.FixedPoint("0.05"),
                  connection_type=CFProjection,strength=-gammainh,
                  name='LateralInhibitory',
                  nominal_bounds_template=BoundingBox(radius=inh_rad/BaseN) )
 
 
-# shortcuts to save on typing...
-Af = topo.sim['Primary'].projections()["Afferent0"]
-LE = topo.sim['Primary'].projections()["LateralExcitatory"]
-LI = topo.sim['Primary'].projections()["LateralInhibitory"]
+
 
 # Topographica learning rate is independent of density
 Af.learning_rate=alpha_input*Af.n_units()
