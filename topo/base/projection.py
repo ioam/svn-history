@@ -317,15 +317,15 @@ class ProjectionSheet(Sheet):
     output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),
         doc="Output function to apply (if apply_output_fn is true) to this Sheet's activity.")
     
+    multiplicative_constant = Number(default = 0.0,doc="""
+        Constant value added to projection activity before combining multiplicatively.""")   
+       
+    divisive_constant = Number(default = 1.0,doc="""
+        Constant value added to projection activity before combining divisively.""")    
+    
     apply_output_fn=BooleanParameter(default=True,
         doc="Whether to apply the output_fn after computing an Activity matrix.")
         
-    multiplicative_constant = Parameter(default = None,
-        doc='Allows to change the constant in the equation governing the multiplicative projections')    
-        
-    divisive_constant = Parameter(default = None,
-        doc='Allows to change the constant in the equation governing the divisive projections')    
-
     # Should be a MaskParameter for safety
     #mask = ClassSelectorParameter(SheetMask,default=SheetMask(),instantiate=True,doc="""
     mask = Parameter(default=SheetMask(),instantiate=True,doc="""
@@ -420,35 +420,40 @@ class ProjectionSheet(Sheet):
     def activate(self):
         """
         Collect activity from each projection, combine it to calculate
-        the activity for this sheet, and send the result out.  Subclasses
-        may override this method to whatever it means to calculate activity
-        in that subclass.
+        the activity for this sheet, and send the result out. 
+
+        Subclasses may override this method to whatever it means to
+        calculate activity in that subclass.
         """
+
         self.activity *= 0.0
-        if(self.divisive_constant != None):
-            div = self.activity *0.0
-        if(self.multiplicative_constant != None):
-            mul = self.activity *0.0
 
         # Add, multiply, or divide incoming activities as appropriate
         for proj in self.in_connections:
             d = proj.dest_port
+            # JABALERT: Should be skipping anything not connected to an "Activity" port, too!
             if not isinstance(proj,Projection):
                 self.debug("Skipping non-Projection "+proj.name)
+
             elif isinstance(d,tuple) and len(d)>1 and d[1]=='Divisive':
-                if(self.divisive_constant == None):
-                    raise Error('Divisive constant not defined but model includes Divisive projections')
-                div += proj.activity
+                if not hasattr(self,"div"):
+                    div  = proj.activity.copy()
+                else:
+                    div += proj.activity
+
             elif isinstance(d,tuple) and len(d)>1 and d[1]=='Multiplicative':
-                if(self.multiplicative_constant == None):
-                    raise Error('Multiplicative constant not defined but model includes Multiplicative projections')
-                mul += proj.activity
+                if not hasattr(self,"mul"):
+                    mul  = proj.activity.copy()
+                else:
+                    mul += proj.activity
+
             else:
                 self.activity += proj.activity
-        
-        if(self.divisive_constant != None):
+
+        if hasattr(self,"div"):
             self.activity /= (div + float(self.divisive_constant))
-        if(self.multiplicative_constant != None):
+
+        if hasattr(self,"mul"):
             self.activity *= (mul + float(self.multiplicative_constant))
 
         if self.apply_output_fn:
