@@ -459,7 +459,6 @@ class ProjectionSheet(Sheet):
         if self.apply_output_fn:
             self.output_fn(self.activity)
 
-        self.send_output(src_port='Activity',data=self.activity)
     
 
     def process_current_time(self):
@@ -471,6 +470,7 @@ class ProjectionSheet(Sheet):
         """
         if self.new_input:
             self.activate()
+            self.send_output(src_port='Activity',data=self.activity)
             self.new_input = False
             if self.plastic:
                 self.learn()
