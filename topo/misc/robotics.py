@@ -22,7 +22,8 @@ import Image,ImageOps
 from math import pi,cos,sin
 
 from topo.base.simulation import Simulation,EventProcessor
-from topo.base.parameterclasses import Integer,Number,ClassSelectorParameter,BooleanParameter
+from topo.base.parameterclasses import Integer,Number,ClassSelectorParameter
+from topo.base.parameterclasses import BooleanParameter, ListParameter
 from topo.patterns.image import GenericImage
 
 from playerrobot import CameraDevice,PTZDevice
@@ -38,9 +39,15 @@ class CameraImage(GenericImage):
        An instance of playerrobot.CameraDevice to be used
        to generate images.""")
 
+    def __init__(self,**params):
+        super(CameraImage,self).__init__(**params)
+        self._image = None
+
     def _get_image(self,params):
-        
-        fmt,w,h,bpp,fdiv,data = self.camera.image
+        self._decode_image(*self.camera.image)
+        return True
+
+    def _decode_image(self,fmt,w,h,bpp,fdiv,data):
         if fmt==1:
             self._image = Image.new('L',(w,h))
             self._image.fromstring(data,'raw')
@@ -50,8 +57,40 @@ class CameraImage(GenericImage):
             rgb_im = Image.new('RGB',(w,h))
             rgb_im.fromstring(data,'raw')
             self._image = ImageOps.grayscale(rgb_im)
-        return True
+        
 
+
+class CameraImageQueued(CameraImage):
+    """
+    A version of CameraImage that gets the image from the camera's image queue,
+    rather than directly from the camera object.  Using queues is
+    necessary when running the playerrobot in a separate process
+    without shared memory.  When getting an image, this pattern
+    generator will fetch every image in the image queue and use the
+    most recent as the current pattern.
+    """
+
+    def _get_image(self,params):
+
+        im_spec = None
+        
+        if self._image is None:
+            # if we don't have an image then block until we get one
+            im_spec = self.camera.image_queue.get()
+            self.camera.image_queue.task_done()
+
+        # Make sure we clear the image queue and get the most recent image.
+        while not self.camera.image_queue.empty():
+            im_spec = self.camera.image_queue.get_nowait()
+            self.camera.image_queue.task_done()
+
+        if im_spec:
+            # If we got a new image from the queue, then
+            # construct a PIL image from it.
+            self._decode_image(*im_spec)
+            return True
+        else:
+            return False
 
 
 class PTZ(EventProcessor):
@@ -106,7 +145,8 @@ class PTZ(EventProcessor):
         tilt += amplitude * sin(angle)
 
         self.ptz.set_ws_deg(pan,tilt,self.zoom,self.speed,self.speed)
-
+        ## self.ptz.cmd_queue.put_nowait(('set_ws_deg',
+        ##                                (pan,tilt,self.zoom,self.speed,self.speed)))
 
 
 
@@ -127,19 +167,39 @@ class RealTimeSimulation(Simulation):
     sleep for the remainder of the epoch.  If the computation time for
     the epoch exceeded the real time, a warning is issued and
     processing proceeds immediately to the next simulation time epoch.
+
+
+    RUN HOOKS
+
+    The simulation includes as parameters two lists of functions/callables,
+    run_start_hooks and run_stop_hooks, that will be called
+    immediately before and after event processing during a call to
+    .run().  This allows, for example, starting and stopping of
+    real-time devices that might use resources while the simulation is
+    not running.
     """
     
     timescale = Number(default=1.0,bounds=(0,None),doc="""
        The desired real length of one simulation time unit, in milliseconds.""")
 
+    run_start_hooks = ListParameter(default=[],doc="""
+       A list of callable objects to be called on entry to .run(), before any events
+       are processed.""")
+    run_stop_hooks = ListParameter(default=[],doc="""
+       A list of callable objects to be called on exit from .run()
+       after all events are processed.""") 
 
     def __init__(self,**params):
         super(RealTimeSimulation,self).__init__(**params)
         self._real_timestamp = 0.0
         
     def run(self,*args,**kw):
+        for h in self.run_start_hooks:
+            h()
         self._real_timestamp = self.real_time()
         super(RealTimeSimulation,self).run(*args,**kw)
+        for h in self.run_stop_hooks:
+            h()
 
     def real_time(self):
         return time.time() * 1000

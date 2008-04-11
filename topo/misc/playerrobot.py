@@ -12,12 +12,50 @@ $Id$
 __version__='$Revision$'
 
 
-import time,threading,array
+import time,array
 import playerc
+
+from threading import RLock, Thread
+from Queue import Queue
 
 from operator import eq,ne
 from copy import copy
 from math import pi
+
+
+# JPALERT: Because of the global interpreter lock in Python, using
+# Python threads (via the 'thread' or 'threading' modules does not
+# necessarily provide low-latency polling of the player process.  In
+# particular, long-running native functions (e.g. C/C++ foreign
+# functions) will not be pre-empted, so the polling loop won't
+# get a timeslice until they complete.  A better solution, especially
+# on multicore machines, is true preemptive multiprocessing.  The
+# 'processing' module should provide that, but it doesn't yet work
+# properly on MacOS, and I haven't tested it yet on linux.  God knows
+# what will happen on Windows.
+
+def use_processing():
+    """
+    Configure the module to use the processing library for asynchronous
+    process support. Use of the processing library requires the use of
+    queues for communication with robot devices.
+    """
+    import processing
+    global RLock, Thread, Queue
+    RLock = processing.RLock
+    Thread = processing.Process
+    Queue = processing.Queue
+
+def use_threading():
+    """
+    Configure the module to use the threading library for asynchronous
+    process support. (the default)
+    """
+    import threading, Queue
+    global RLock, Thread, Queue
+    RLock = threading.RLock
+    Thread = threading.Thread
+    Queue = Queue.Queue
 
 # JPALERT This is a HACK for the CVS version of Player, this value
 # should be defined in the playerc module:
@@ -116,6 +154,16 @@ class PlayerObject(object):
             if name not in dir(self) and name[:2] != '__' and callable(attr):
                 setattr(self,name,synchronized(lock)(player_fn()(attr)))
 
+        self.cmd_queue = Queue()
+
+    def process_queues(self):
+        while not self.cmd_queue.empty():
+            name,args = self.cmd_queue.get()
+            try:
+                print "Doing command:",name,args
+                getattr(self,name)(*args)
+            finally:
+                self.cmd_queue.task_done()
 
 
 class PlayerClient(PlayerObject):
@@ -130,6 +178,8 @@ class PlayerClient(PlayerObject):
         self.read = synchronized(lock)(player_fn(eq,None)(proxy.read))
         super(PlayerClient,self).__init__(proxy,lock)
 
+    def process_queues(self):
+        pass
 
 
 class PlayerDevice(PlayerObject):
@@ -192,7 +242,16 @@ class CameraDevice(PlayerDevice):
     def __init__(self,proxy,lock):
         self.decompress = synchronized(lock)(player_fn(ne,None)(proxy.decompress))
         super(CameraDevice,self).__init__(proxy,lock)
+        self.image_queue = Queue()
 
+    def process_queues(self):
+        im = self.image
+        # check to make sure it's really an image
+        if im[1] > 0:
+            self.image_queue.put(im)
+        super(CameraDevice,self).process_queues()
+
+        
 #    @synched_method
     def get_image(self):
         """
@@ -272,19 +331,19 @@ class PlayerRobot(object):
 
         self._thread = None
         self._running = False
-        self._lock = threading.RLock()
+        self._lock = RLock()
         self.speed = speed
 
         self._client = PlayerClient(playerc.playerc_client(None,host,port),self._lock)
 
+        self._queues_running = False
         self._devices = []
         for devname,devnum in devices:
             self.add_device(devname,devnum=devnum)
 
     def start(self):
         assert self._thread is None
-        self._thread = threading.Thread(target=self.run_loop,
-                                        name="PlayerRobot Run Loop")
+        self._thread = Thread(target=self.run_loop,name="PlayerRobot Run Loop")
         self._thread.setDaemon(True)
         self._thread.start()
         
@@ -300,10 +359,25 @@ class PlayerRobot(object):
         try:
             while self._running:
                 self._client.read()
+                if self._queues_running:
+                    self.process_queues()
                 time.sleep(1.0/self.speed)
         finally:
             self.unsubscribe_all()
             self._client.disconnect()
+
+    def run_queues(self,run_state):
+        """
+        When using queues for communication with devices, this method
+        toggles queue processing.  It is often useful to turn off
+        queue processing, e.g. when a client does not plan on using queued
+        data for a while.
+        """
+        self._queues_running = run_state
+        
+    def process_queues(self):
+        for d in self._devices:
+            d.process_queues()
 
     def subscribe_all(self):
         for dev in self._devices:
