@@ -73,8 +73,8 @@ def run_comparisons(l):
     ### Check initial patterns are ok on Eye0 and Primary
     for i in range(5):
         topo.sim.run(1)
-        check_all_activities()
         check_all_weights()
+        check_all_activities()
     
     topo.sim.run(5)
     check_all_activities()
