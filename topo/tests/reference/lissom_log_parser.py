@@ -17,6 +17,7 @@ from numpy import array
 import topo
 from topo.tests.utils import array_almost_equal
 
+from topo.base.arrayutils import arg
 
 filename_base = ""
 
@@ -27,7 +28,6 @@ def dprint(txt,d=True):
 
 
 
-import re
 def get_input_params():
     """
 
@@ -54,32 +54,49 @@ def get_input_params():
     input_params = dict([(i,dict(cx=list(),cy=list(),theta=list(),sign=list()))
                          for i in range(n_eyes)])
 
-    # supposed to match numbers like 02.1, 074.0 etc
-    val_match = re.compile(r'([0-9]([0-9]|\.)+)+')
-
     lines = f.readlines()                 
     for line,lineno in zip(lines,range(len(lines))):
         eyes = line.split('Eye')[1::]
         for eye,i in zip(eyes,range(n_eyes)):
-            cx,cy,theta = [float(val[0]) for val in val_match.findall(eye)]
+
+            # e.g. eye='1 [Obj0 cx:-0.2 cy:13.8 theta:011.7]]  ['
+            cx,cy,theta =[float(W.split(":")[1].split("]")[0])
+                          for W in eye.split(" ")[2:5]]
+            
             input_params[i]['cx'].append(cx)
             input_params[i]['cy'].append(cy)
             input_params[i]['theta'].append(theta)
 
-        ### get sign (is there an easier way?)
+            
         if len(eyes)>1: # CeBALERLT: not general (assuming motion just because more than 1 eye)
-            realDx = input_params[len(eyes)-1]['cx'][lineno]-input_params[0]['cx'][lineno]
-            realDy = input_params[len(eyes)-1]['cy'][lineno]-input_params[0]['cy'][lineno]
-            realdir = 180*(atan2(realDy,realDx)/pi)
-            # just need to flip sign for q1 and q4
-            if -90<=realdir<=90:
-                s = -1
+
+            ##### get sign
+            X1=complex(input_params[0]['cx'][lineno],
+                       input_params[0]['cy'][lineno])
+            X2=complex(input_params[len(eyes)-1]['cx'][lineno],
+                       input_params[len(eyes)-1]['cy'][lineno])
+
+            realdir=180*arg(X2-X1)/pi
+
+            # for 0<=realdir<360 (instead of -180<=realdir<180)
+            if realdir<0:realdir+=360
+
+            topo_dir = theta+90 # dir that will be given to topographica
+
+            # if realdir & topo_dir aren't the same, it's because
+            # c lissom used sign=-1 (& the dirs will be 180 apart)
+            
+            E=3 # (imprecision from getting dir from 1-dp positions)
+            if abs(realdir-topo_dir)<E:
+                s=1
+            elif 180-E<=abs(realdir-topo_dir)<180+E:
+                s=-1
             else:
-                s = 1
+                assert False
+            #####
 
             for i in range(n_eyes):
                 input_params[i]['sign'].append(s) 
-        ###
         
     for i in input_params:
         for val in input_params[i]:
