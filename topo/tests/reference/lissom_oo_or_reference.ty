@@ -79,7 +79,7 @@ alpha_input=0.007*acs
 # ********************************************************************
 
 initialize_clissom_data(name,inh_rad=inh_rad,rf_radius=rf_radius,
-                        BaseRN=BaseRN,BaseN=BaseN)
+                        BaseRN=BaseRN,BaseN=BaseN,exc_rad=exc_rad)
 
 #######################
 
