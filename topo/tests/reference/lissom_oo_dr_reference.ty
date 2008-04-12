@@ -1,3 +1,4 @@
+from __future__ import division
 """
 LISSOM simulation designed to match C++ LISSOM's oo_dir_map
 simulation.
@@ -51,6 +52,7 @@ locals().update(initialize_variables(BaseRN,BaseN))
 num_eyes=4
 delta=0.083
 beta=0.633
+speed=1.0; blur_scale=2*2.38
 # ********************************************************************
 
 
@@ -68,7 +70,7 @@ sigma_s = 4*sigma_c
 # radius of LGN afferent connections
 r_L = 4.7*sigma_s
 
-blur_scale=2*2.33
+#blur_scale=2*2.33
 
 ## CEBALERT
 from math import ceil
@@ -84,9 +86,8 @@ alpha_input=0.007*acs
 # ********************************************************************
 
 
-
 initialize_clissom_data(name,inh_rad=inh_rad,rf_radius=rf_radius,
-                        BaseRN=BaseRN,BaseN=BaseN)
+                        BaseRN=BaseRN,BaseN=BaseN,exc_rad=exc_rad)
 
 #######################
 
@@ -116,8 +117,9 @@ input_pattern = topo.patterns.basic.Gaussian(
     size = 2*gaussian_height,
     aspect_ratio= gaussian_width/gaussian_height,
     x=lambda : input_params[0]['cx'].next()/BaseLN - 0.5*LN/BaseLN,
-    y=lambda : input_params[0]['cy'].next()/BaseLN - 0.5*LN/BaseLN,
-    orientation=0)
+    y=lambda : input_params[0]['cy'].next()/BaseLN - 0.5*LN/BaseLN)
+
+    #orientation = lambda : round(2*pi*input_params[0]['theta'].next()/360.0,1))
 
                          
 
@@ -183,6 +185,8 @@ class Sweeper(PatternGenerator):
         Number of steps at the given speed to move in the sweep direction.
         The distance moved is speed*step.""")
 
+    sign = Number(default=1)
+
     def function(self,params):
         """Selects and returns one of the patterns in the list."""
         bounds = params['bounds']
@@ -201,7 +205,7 @@ class Sweeper(PatternGenerator):
         motion_orientation=pattern_orientation+pi/2.0
         
         speed=params['speed']
-        motion_sign=2*int(motion_orientation/pi)-1
+        motion_sign=params['sign']#*2*int(motion_orientation/pi)-1
         step=params['step']
 
         new_x = x+size*pg.x
@@ -225,10 +229,15 @@ class Sweeper(PatternGenerator):
 # precedence is used to determine order for checking
 
 for i in range(num_eyes):
+
+##     topo.sim['Eye%s'%i]=GeneratorSheet(
+##         input_generator=input_pattern,
+##         precedence=i)
+
     topo.sim['Eye%s'%i]=GeneratorSheet(
         input_generator=Sweeper(
                 generator=copy.deepcopy(input_pattern),
-                step=i,speed=1.0/BaseRN,
+                step=i,speed=speed/BaseRN,
                 sign=lambda x=i:doubledoh(x),
                 orientation=lambda x=i:round(2*pi*doh(x)/360.0,1)),
         precedence=i)
@@ -253,10 +262,10 @@ topo.sim['Primary'] = LISSOM(nominal_density=BaseN,
 # C++ LISSOM divides by pi in RadialFunction::Gaussian but not for
 # Gaussian in retinalobjs (and elsewhere)
 centerg = topo.patterns.basic.Gaussian(
-    size=2*sigma_c*sqrt(pi)/BaseRN,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))
+    size=2*sigma_c*sqrt(pi)/BaseRN,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=blur_scale))
 
 surroundg = topo.patterns.basic.Gaussian(
-    size=2*sigma_s*sqrt(pi)/BaseRN,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))
+    size=2*sigma_s*sqrt(pi)/BaseRN,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=blur_scale))
 
 
 on_weights = topo.patterns.basic.Composite(
