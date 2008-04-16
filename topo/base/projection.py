@@ -5,6 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
+import numpy
 from numpy import array,asarray,ones,sometrue, logical_and, logical_or
 
 from sheet import Sheet
@@ -191,6 +192,19 @@ class Projection(EPConnection):
     plastic = BooleanParameter(default=True, doc="""
         Whether or not to update the internal state on each call.
         Allows plasticity to be turned off during analysis, and then re-enabled.""")
+    
+    activity_group = Parameter(default=(0.5,numpy.add), doc="""
+       Grouping and precedence specifier for computing activity from
+       Projections.  In a ProjectionSheet, all Projections in the
+       same activity_group will be summed, and then the results from
+       each group will be combined in the order of the activity_group
+       using the operator specified by the activity_operator.  For
+       instance, if there are two Projections with
+       activity_operator=="Add" and activity_group=="0.2" and two with
+       activity_operator=="Divide" and activity_group=="0.6", activity
+       from the first two will be added together, and the result
+       divided by the sum of the second two.""")
+  
 
        
     def __init__(self,**params):
@@ -425,37 +439,26 @@ class ProjectionSheet(Sheet):
         Subclasses may override this method to whatever it means to
         calculate activity in that subclass.
         """
-
+        
         self.activity *= 0.0
-
-        # Add, multiply, or divide incoming activities as appropriate
+        tmp_dict={}
+        
         for proj in self.in_connections:
-            d = proj.dest_port
-            # JABALERT: Should be skipping anything not connected to an "Activity" port, too!
-            if not isinstance(proj,Projection):
-                self.debug("Skipping non-Projection "+proj.name)
-
-            elif isinstance(d,tuple) and len(d)>1 and d[1]=='Divisive':
-                if not hasattr(self,"div"):
-                    div  = proj.activity.copy()
-                else:
-                    div += proj.activity
-
-            elif isinstance(d,tuple) and len(d)>1 and d[1]=='Multiplicative':
-                if not hasattr(self,"mul"):
-                    mul  = proj.activity.copy()
-                else:
-                    mul += proj.activity
-
-            else:
-                self.activity += proj.activity
-
-        if hasattr(self,"div"):
-            self.activity /= (div + float(self.divisive_constant))
-
-        if hasattr(self,"mul"):
-            self.activity *= (mul + float(self.multiplicative_constant))
-
+            if (proj.activity_group != None) | (proj.dest_port[0] != 'Activity'):
+                if not tmp_dict.has_key(proj.activity_group[0]): 
+                    tmp_dict[proj.activity_group[0]]=[]
+                tmp_dict[proj.activity_group[0]].append(proj)
+        
+        keys = tmp_dict.keys()
+        keys.sort()
+        for priority in keys:
+            tmp_activity = self.activity.copy() * 0.0
+            
+            for proj in tmp_dict[priority]:
+                tmp_activity += proj.activity
+            self.activity=tmp_dict[priority][0].activity_group[1](self.activity,tmp_activity)
+            
+            
         if self.apply_output_fn:
             self.output_fn(self.activity)
 
