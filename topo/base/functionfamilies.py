@@ -65,15 +65,8 @@ class IdentityOF(OutputFn):
 class PipelineOF(OutputFn):
     """
     Applies a list of other OutputFns in order, to combine their effects.
-
-
-    Also, passes through method call requests to the list of
-    OutputFns. For instance, if an OutputFn o1 has a method m(arg1),
-    then the following results in m being called on o1:
-    
-     p = PipelineOF(output_fns=[IdentityOF(),o1])
-     p.m(7)  # calls m(7) on o1 but not on the IdentityOF
     """
+    
     output_fns = ListParameter(default=[],class_=OutputFn,doc="""
         List of OutputFns to apply, in order.  The default is an empty list, 
         which should be overridden for any useful work.""")
