@@ -225,7 +225,9 @@ def save_script_repr(script_name=None):
 
 
 # Used only by default_analysis_function
-default_analysis_plotgroups=["Activity","Orientation Preference"]
+# Should be in order they are needed; e.g. Activity after map measurement,
+# in case Activity plot includes map subplots
+default_analysis_plotgroups=["Orientation Preference","Activity"]
 
 def default_analysis_function():
     """
@@ -252,8 +254,9 @@ def default_analysis_function():
         save_plotgroup(pg)
 
     # Save at least one projection plot
-    if measured_sheets: 
-        save_plotgroup("Projection",projection=measured_sheets[0].in_connections[0])
+    if measured_sheets:
+        for p in measured_sheets[0].in_connections:
+            save_plotgroup("Projection",projection=p)
 
     # Test response to a standardized pattern
     from topo.patterns.basic import Gaussian
@@ -409,6 +412,9 @@ def run_batch(script_file,output_directory="Output",
     stdout.close()
     sys.stdout = sys.__stdout__
     ##################################
+
+    # ALERT: Need to count number of errors and warnings and put that on stdout
+    # and at the end of the .out file, so that they will be sure to be noticed.
     
     print endnote
 
