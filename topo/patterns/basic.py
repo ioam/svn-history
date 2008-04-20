@@ -291,7 +291,15 @@ class Sweeper(PatternGenerator):
         motion_orientation=pattern_orientation+pi/2.0
         
         speed=params['speed']
+
+        # CEBALERT: I think this is only useful for
+        # 0<=motion_orienation<2*pi
+        # i.e. shouldn't the incoming angle be adjusted
+        # so that this is always true? 
         motion_sign=2*int(motion_orientation/pi)-1
+        # (and it would be simpler to use just 'orientation' rather
+        # than 'motion_orientation')
+        
         step=params['step']
 
         new_x = x+size*pg.x
