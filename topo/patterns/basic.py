@@ -299,12 +299,9 @@ class Sweeper(PatternGenerator):
         
         pg = self.generator
 
-        
-        pattern_orientation=orientation
-        motion_orientation=pattern_orientation+pi/2.0
+        motion_orientation=orientation+pi/2.0
 
         speed=params['speed']
-       
         step=params['step']
 
         new_x = x+size*pg.x
@@ -313,7 +310,7 @@ class Sweeper(PatternGenerator):
         image_array = pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
                          x=new_x + speed*step*cos(motion_orientation),
                          y=new_y + speed*step*sin(motion_orientation),
-                         orientation=pattern_orientation,
+                         orientation=orientation,
                          scale=pg.scale*scale,offset=pg.offset+offset)
         
         return image_array
