@@ -257,6 +257,18 @@ class SquareGrating(PatternGenerator):
         return around(0.5 + 0.5*sin(params['frequency']*2*pi*self.pattern_y + params['phase']))
 
 
+# CB: I removed motion_sign from this class because I think it is
+# unnecessary. But maybe I misunderstood the original author's
+# intention?
+#
+# In any case, the original implementation was incorrect - it was not
+# possible to get some motion directions (directions in one whole
+# quadrant were missed out).
+#
+# Note that to get a 2pi range of directions, one must use a 2pi range
+# of orientations (there are two directions for any given
+# orientation).  Alternatively, we could generate a random sign, and
+# use an orientation restricted to a pi range.
 
 class Sweeper(PatternGenerator):
     """
@@ -287,27 +299,20 @@ class Sweeper(PatternGenerator):
         
         pg = self.generator
 
+        
         pattern_orientation=orientation
         motion_orientation=pattern_orientation+pi/2.0
-        
-        speed=params['speed']
 
-        # CEBALERT: I think this is only useful for
-        # 0<=motion_orienation<2*pi
-        # i.e. shouldn't the incoming angle be adjusted
-        # so that this is always true? 
-        motion_sign=2*int(motion_orientation/pi)-1
-        # (and it would be simpler to use just 'orientation' rather
-        # than 'motion_orientation')
-        
+        speed=params['speed']
+       
         step=params['step']
 
         new_x = x+size*pg.x
         new_y = y+size*pg.y
         
         image_array = pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
-                         x=new_x + motion_sign*speed*step*cos(motion_orientation),
-                         y=new_y + motion_sign*speed*step*sin(motion_orientation),
+                         x=new_x + speed*step*cos(motion_orientation),
+                         y=new_y + speed*step*sin(motion_orientation),
                          orientation=pattern_orientation,
                          scale=pg.scale*scale,offset=pg.offset+offset)
         
