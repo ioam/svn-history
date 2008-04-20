@@ -32,6 +32,27 @@ def _check_proj(s,p,N):
         return "%s: %s\n"%(s,st)
         
 
+def check(weights=True,activities=True):
+
+    errs = ""
+
+    if weights:
+        try:
+            check_all_weights()
+        except AssertionError,we:
+            errs+=we.args[0]+"\n"
+
+    if activities:
+        try:
+            check_all_activities()
+        except AssertionError,ae:
+            errs+=ae.args[0]+"\n"
+
+    if len(errs)>0:
+        raise AssertionError("\n"+errs)
+            
+        
+
 def check_all_weights():
     print "t=%s: Checking weights..."%topo.sim.time()
 
@@ -51,70 +72,87 @@ def check_all_activities():
     sheets = sorted(topo.sim.objects().values(), cmp=lambda x, y:
                     cmp(x.precedence,
                         y.precedence))
+    errs = ""
     for s in sheets:
         print "...%s"%s.name
-        check_activities(s.name,display=verbose)
+        try:
+            check_activities(s.name,display=verbose)
+        except AssertionError, st:
+            errs+=st.args[0]+"\n"
+
+    if len(errs)>0:
+        raise AssertionError("The following activities did not match:\n%s"%errs)
+
+##         try:
+##             check_activities(s.name,display=verbose)
+##         except AssertionError, st:
+##             prjns = sorted(topo.sim[s.name].in_connections)[::-1]
+
+##             e = ""
+##             for pr in prjns:
+##                 print "Checking %s."%pr.name
+##                 o =_check_proj(s.name,pr.name,BaseN)
+##                 if o!=0:e+=o
+                
+##             raise AssertionError("%s  (If any incoming projection did not match, it will be listed below.)\n%s\n"%(st,e))
 
         
 # hack
 L = locals()
 
+
+
+
+
 def run_comparisons(l):
 
 
-    # there are weigts checks at the beginning and then
-    # after every bounds change
+    # * times mark scheduled actions
     
     L.update(l)
 
-    ### Check initial weights
-    check_all_weights()
+    check(activities=False) #0 *
 
-    ### Check initial patterns are ok on Eye0 and Primary
     for i in range(5):
         topo.sim.run(1)
-        check_all_weights()
-        check_all_activities()
+        check()    
+
+    topo.sim.run(95) #100
+    check()
+
+    topo.sim.run(100) #200 *
+    check() 
+
+    topo.sim.run(150) #350
+    check() 
+
+    topo.sim.run(150) #500 *
+    check() 
     
-    topo.sim.run(5)
-    check_all_activities()
-
-    topo.sim.run(10)
-    check_all_activities()
-
-    topo.sim.run(80) # 100
-    check_all_weights(); check_all_activities()
-
-    topo.sim.run(100)
-    check_all_weights();check_all_activities() #200
-
-    topo.sim.run(300)
-    check_all_weights();check_all_activities() #500
-    
-    topo.sim.run(300)
-    check_all_activities() #800
+    topo.sim.run(300) #800
+    check()
         
-    topo.sim.run(200) # 1000
-    check_all_weights();check_all_activities()
+    topo.sim.run(200) # 1000 *
+    check()
 
     if not stop_at_1000:
 
-        for i in range(4): # to 5000
+        for i in range(4): # to 5000 *
             topo.sim.run(1000)
-            check_all_weights();check_all_activities()
+            check()
 
 
-        topo.sim.run(1500) # 6500
-        check_all_weights();check_all_activities()
+        topo.sim.run(1500) # 6500 *
+        check()
 
-        topo.sim.run(1500) # 8000
-        check_all_weights();check_all_activities()
+        topo.sim.run(1500) # 8000 *
+        check()
 
-        topo.sim.run(5000) # 13000
-        check_all_activities()
+        topo.sim.run(5000) # 13000 
+        check()
 
         topo.sim.run(3000) # 16000
-        check_all_activities()
+        check()
         
-        topo.sim.run(4000) # 20000
-        check_all_weights; check_all_activities()
+        topo.sim.run(4000) # 20000 *
+        check()
