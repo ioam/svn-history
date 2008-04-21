@@ -753,7 +753,6 @@ progressbar-uninstall:
 
 #############################################################
 # GNU MP
-
 GMP = gmp-4.2.2
 
 GMP_UNINSTALL += lib/libgmp.* 
@@ -793,6 +792,25 @@ mxnumber-clean:
 	rm -rf ${MXNUMBER}
 mxnumber-uninstall:
 	rm -rf mxnumber ${foreach f,${MXNUMBER_UNINSTALL}, ${PREFIX}/${f}}
+
+
+##############################################################
+# wraps GMP
+#
+GMPY = gmpy-sources-101
+
+GMPY_UNINSTALL += ${PYTHON_LIB}/site-packages/gmpy-1.01-py2.5.egg-info
+GMPY_UNINSTALL += ${PYTHON_LIB}/site-packages/gmpy.so
+
+gmpy: ${GMPY}.tar.gz python gmp
+	tar -xzf ${GMPY}.tar.gz
+	cd ${GMPY}; ${PREFIX}/bin/python setup.py install
+	touch gmpy
+
+gmpy-clean:
+	rm -rf ${GMPY}
+gmpy-uninstall:
+	rm -rf gmpy ${foreach f,${GMPY_UNINSTALL}, ${PREFIX}/${f}}
 
 
 
