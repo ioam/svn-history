@@ -54,12 +54,21 @@ release = ''
 version = ''
 
 
+def _mpq_pickle_support():
+    """Allow instances of gmpy.mpq to pickle."""
+    from gmpy import mpq
+    mpq_type = type(mpq(1,10)) # CEBALERT: any idea how to get this properly?
+    import copy_reg
+    copy_reg.pickle(mpq_type,lambda q: (mpq,(q.digits(),)))
+
+
 # Set the default value of Simulation.time_type to gmpy.mpq
 # (or the slower fixedpoint.FixedPoint if gmpy is unavailable)
 try:
     import gmpy
     time_type = gmpy.mpq
     time_type_args = ()
+    _mpq_pickle_support()
 except ImportError:
     import fixedpoint
     time_type = fixedpoint.FixedPoint
