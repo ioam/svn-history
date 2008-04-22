@@ -806,7 +806,7 @@ GMPY_UNINSTALL += ${PYTHON_LIB}/site-packages/gmpy.so
 
 gmpy: ${GMPY}.tar.gz python gmp
 	tar -xzf ${GMPY}.tar.gz
-	cd ${GMPY}; ${PREFIX}/bin/python setup.py install
+	cd ${GMPY}; ${PREFIX}/bin/python setup.py build_ext --include-dirs='${PREFIX}/include' --library-dirs='${PREFIX}/lib'; ${PREFIX}/bin/python setup.py install
 	touch gmpy
 
 gmpy-clean:
