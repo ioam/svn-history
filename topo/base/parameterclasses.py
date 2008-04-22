@@ -9,7 +9,7 @@ import types
 
 from parameterizedobject import Parameter, descendents
 
-# CEBHACKALERT: needs to be finished
+
 class Enumeration(Parameter):
     """
     Enumeration is a Parameter with a list of available values.
@@ -22,10 +22,12 @@ class Enumeration(Parameter):
         """
         Create an Enumeration, checking that 'default' is in 'available'.
         """
-        Parameter.__init__(self,default=default,**params)
-        # CB: just needs to be list-like. has __iter__ method?
-        if not type(available)==list:
-            raise ValueError("Enumeration must be created with a list of available values.")
+        try:
+            default in available
+        except TypeError, te:
+            raise TypeError("Enumeration's 'available' argument must be iterable ('%s' is not iterable)."%available)
+
+        Parameter.__init__(self,default=default,**params)        
         self.available = available
         self.__check_value(default) 
         
@@ -41,7 +43,7 @@ class Enumeration(Parameter):
         """
         Raises an error if the given value isn't in the list of available ones.
         """
-        if not self.available.count(val) >= 1:
+        if val not in self.available:
             raise ValueError("%s not in %s's list of available values."%(val,self._attrib_name))
 
 

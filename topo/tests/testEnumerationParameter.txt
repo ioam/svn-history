@@ -1,0 +1,31 @@
+>>> from topo.base.parameterizedobject import ParameterizedObject
+>>> from topo.base.parameterclasses import Enumeration
+
+>>> class P(ParameterizedObject):
+...     e = Enumeration(default=5,available=[5,6,7])
+
+>>> p = P(e=6)
+>>> p.e
+6
+
+>>> try:
+...     p.e = 9
+... except ValueError:
+...     pass
+... else:
+...     raise AssertionError("Enumeration set outside range.")
+
+>>> try:
+...     q = Enumeration(5,[4])
+... except ValueError:
+...     pass
+... else:
+...     raise AssertionError("Enumeration created outside range.")
+
+>>> try:
+...     q = Enumeration(5,10)
+... except TypeError:
+...     pass
+... else:
+...     raise AssertionError("Enumeration created without range.")
+
