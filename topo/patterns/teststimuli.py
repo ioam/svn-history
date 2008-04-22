@@ -18,7 +18,7 @@ from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy import alltrue
 
 from topo.base.parameterizedobject import ParamOverrides
-from topo.base.parameterclasses import Integer, Number, Parameter, Enumeration
+from topo.base.parameterclasses import Integer, Number, Parameter
 from topo.base.parameterclasses import ListParameter
 from topo.base.patterngenerator import PatternGenerator
 
