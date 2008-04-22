@@ -119,8 +119,8 @@ class CommandPrompt(IPCommandPromptHandler):
     
     # Predefined alternatives
     basic_format   = 'Topographica>>> '
-    simtime_format = 'topo_t${topo.sim.time()}>>> '
-    simtimecmd_format = 'topo_t${topo.sim.time()}_c\\#>>> '
+    simtime_format = 'topo_t${topo.sim.timestr()}>>> '
+    simtimecmd_format = 'topo_t${topo.sim.timestr()}_c\\#>>> '
     
     _format = simtimecmd_format
 
