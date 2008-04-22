@@ -54,13 +54,12 @@ release = ''
 version = ''
 
 
-# Set the default value of Simulation.time_type to mx.Number.Float
-# (or the slower fixedpoint.FixedPoint if mx.Number.Float is unavailable)
+# Set the default value of Simulation.time_type to gmpy.mpq
+# (or the slower fixedpoint.FixedPoint if gmpy is unavailable)
 try:
-    import mx.Number
-    time_type = mx.Number.Float
+    import gmpy
+    time_type = gmpy.mpq
     time_type_args = ()
-    # CEB: the default no. of bits is higher than we need - should set precision
 except ImportError:
     import fixedpoint
     time_type = fixedpoint.FixedPoint
