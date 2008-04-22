@@ -7,9 +7,9 @@ all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
 
 dist: bluesphere
 
-clean: python-clean jpeg-clean pil-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean tile-clean tilewrapper-clean bwidget-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean tile-clean gmp-clean mxnumber-clean
+clean: python-clean jpeg-clean pil-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean tile-clean tilewrapper-clean bwidget-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean tile-clean gmp-clean mxnumber-clean gmpy-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall tile-uninstall gmp-uninstall mxnumber-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall tile-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall
 
 
 
@@ -774,6 +774,8 @@ gmp-uninstall:
 
 
 # CBALERT: there are probably other packages for which we should remove .egg-info?
+
+# CB: mxnumber will be removed
 
 ##############################################################
 # eGenix mx Experimental (for mxNumber)
