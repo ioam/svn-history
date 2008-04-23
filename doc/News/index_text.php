@@ -24,6 +24,7 @@
   simpler and more complete support for dynamic parameters<BR>  
   updated to Python 2.5<BR>
   source code repository moved from CVS to Subversion (<A HREF="../Downloads/cvs.html">SVN</A>)<BR>
+  simulation time is now a rational number<BR>
 <!-- Simplified package importing API (promoting basic.py, etc.; not yet done) -->
 </dd>
 <dt>Command-line and batch:</dt>

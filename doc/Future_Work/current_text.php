@@ -111,8 +111,6 @@ Prorities:
 
 
 * Parameters
-(9) Enumeration marked as not finished (but seems fine!) (CEB)
-(9) Replace any remaining subclasses of ClassSelectorParameter
 (8) FixedPoint doesn't work properly with Number (removing fixedpoint anyway?)
 (9) Removing InstanceMethodWrapper if possible & anything else not required with python 2.5
 (9) logging: make sure debug statements etc not hurting performance
