@@ -14,7 +14,7 @@ __version__='$Revision$'
 
 from numpy.oldnumeric import *
 import numpy
-from fixedpoint import FixedPoint
+from gmpy import mpq
 
 import topo.patterns.random
 import topo.patterns.basic
@@ -326,9 +326,6 @@ plotgroups['Center of Gravity'].command='update_elastic_net_maps() ; topographic
 
 ### Sheets,connections,parameters
 
-
-# Make simulation use fixed-point time.
-topo.sim.set_time_type(FixedPoint,4)
 
 ## Right and left retinas used for visualization
 topo.sim['LeftRetina']=GeneratorSheet(nominal_density=1,period=1.0, phase=0.05,

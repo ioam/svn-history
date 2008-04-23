@@ -21,7 +21,7 @@ import copy
 from numpy import exp
 
 from math import pi, sqrt
-from fixedpoint import FixedPoint
+from gmpy import mpq
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -107,9 +107,6 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 ###########################################
 # build simulation
 
-# Make simulation use fixed-point time.
-topo.sim.set_time_type(FixedPoint,4)
-
 
 topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
                                   input_generator=input_pattern,
@@ -122,19 +119,19 @@ topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
                         nominal_bounds=BoundingBox(radius=0.5),tsettle=9, 
                         output_fn=HomeostaticMaxEnt(a_init=13, b_init=-4, eta=0.002, mu=0.01))
 
-topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
+topo.sim.connect('Retina','V1',delay=mpq(0.10),
                   connection_type=CFProjection,strength=1.0,name='Afferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply,
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.271),
                                                                              topo.patterns.random.UniformRandom()]),
                   nominal_bounds_template=BoundingBox(radius=0.271),learning_rate=0.9590)
 
-topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
+topo.sim.connect('V1','V1',delay=mpq(0.05),name='LateralExcitatory',
                   connection_type=CFProjection,strength=0.9,
                  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=2*0.03),
                   nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0) 
             
-topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
+topo.sim.connect('V1','V1',delay=mpq(0.05),name='LateralInhibitory',
                   connection_type=CFProjection,response_fn=Activity_based(),
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply,
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.229),

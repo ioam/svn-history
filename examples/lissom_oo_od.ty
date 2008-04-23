@@ -10,7 +10,7 @@ __version__='$Revision$'
 import numpy
 
 from math import pi, sqrt
-from fixedpoint import FixedPoint
+from gmpy import mpq
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -74,9 +74,6 @@ SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveNormalizeL1()
 # build simulation
 
 
-# Make simulation use fixed-point time.
-topo.sim.set_time_type(FixedPoint,4)
-
 
 topo.sim['LeftRetina']=GeneratorSheet(nominal_density=24.0,
                                   input_generator=left_input_pattern,
@@ -116,25 +113,25 @@ topo.sim['V1'].output_fn.upper_bound=0.633
 
 
 # LGN ON channel
-topo.sim.connect('LeftRetina','LGNOnLeft',delay=FixedPoint("0.05"),
+topo.sim.connect('LeftRetina','LGNOnLeft',delay=mpq(0.05),
                   connection_type=SharedWeightCFProjection,strength=2.33,
                   nominal_bounds_template=BoundingBox(radius=0.375),name='LCenterOn',
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
-topo.sim.connect('LeftRetina','LGNOnLeft',delay = FixedPoint("0.05"),
+topo.sim.connect('LeftRetina','LGNOnLeft',delay = mpq(0.05),
                   connection_type=SharedWeightCFProjection,strength=-2.33,
                   name='LSurroundOn',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 
-topo.sim.connect('RightRetina','LGNOnRight',delay=FixedPoint("0.05"),
+topo.sim.connect('RightRetina','LGNOnRight',delay=mpq(0.05),
                   connection_type=SharedWeightCFProjection,strength=2.33,
                   nominal_bounds_template=BoundingBox(radius=0.375),name='RCenterOn',
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
-topo.sim.connect('RightRetina','LGNOnRight',delay = FixedPoint("0.05"),
+topo.sim.connect('RightRetina','LGNOnRight',delay = mpq(0.05),
                   connection_type=SharedWeightCFProjection,strength=-2.33,
                   name='RSurroundOn',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
@@ -142,25 +139,25 @@ topo.sim.connect('RightRetina','LGNOnRight',delay = FixedPoint("0.05"),
 
 
 # LGN OFF channel
-topo.sim.connect('LeftRetina','LGNOffLeft',delay = FixedPoint("0.05"),
+topo.sim.connect('LeftRetina','LGNOffLeft',delay = mpq(0.05),
                   connection_type=SharedWeightCFProjection,strength=-2.33,
                   name='LCenterOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
-topo.sim.connect('LeftRetina','LGNOffLeft',delay = FixedPoint("0.05"),
+topo.sim.connect('LeftRetina','LGNOffLeft',delay = mpq(0.05),
                   connection_type=SharedWeightCFProjection,strength=2.33,
                   name='LSurroundOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 
-topo.sim.connect('RightRetina','LGNOffRight',delay = FixedPoint("0.05"),
+topo.sim.connect('RightRetina','LGNOffRight',delay = mpq(0.05),
                   connection_type=SharedWeightCFProjection,strength=-2.33,
                   name='RCenterOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
-topo.sim.connect('RightRetina','LGNOffRight',delay = FixedPoint("0.05"),
+topo.sim.connect('RightRetina','LGNOffRight',delay = mpq(0.05),
                   connection_type=SharedWeightCFProjection,strength=2.33,
                   name='RSurroundOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
@@ -171,30 +168,30 @@ topo.sim.connect('RightRetina','LGNOffRight',delay = FixedPoint("0.05"),
 # TRALERT: Not yet investigated if Joint Normalization is working properly
 
 
-topo.sim.connect('LGNOnLeft','V1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOnLeft','V1',delay=mpq(0.05),dest_port=('Activity','JointNormalize', 'Afferent'),
                   connection_type=CFProjection,strength=0.75,name='LGNOnLeftAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590*2.0)
 
-topo.sim.connect('LGNOffLeft','V1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOffLeft','V1',delay=mpq(0.05),dest_port=('Activity','JointNormalize', 'Afferent'),
                   connection_type=CFProjection,strength=0.5,name='LGNOffLeftAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590*2.0)
 
-topo.sim.connect('LGNOnRight','V1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOnRight','V1',delay=mpq(0.05),dest_port=('Activity','JointNormalize', 'Afferent'),
                   connection_type=CFProjection,strength=0.75,name='LGNOnRightAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590*2.0)
 
-topo.sim.connect('LGNOffRight','V1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOffRight','V1',delay=mpq(0.05),dest_port=('Activity','JointNormalize', 'Afferent'),
                   connection_type=CFProjection,strength=0.5,name='LGNOffRightAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590*2.0)
 
 
 # Lateral Connections
 
-topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
+topo.sim.connect('V1','V1',delay=mpq(0.05),name='LateralExcitatory',
                   connection_type=CFProjection,strength=0.9,
                   nominal_bounds_template=BoundingBox(radius=0.10),learning_rate=3.2018) 
             
-topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
+topo.sim.connect('V1','V1',delay=mpq(0.05),name='LateralInhibitory',
                   connection_type=CFProjection,strength=-0.9,
                   nominal_bounds_template=BoundingBox(radius=0.23),learning_rate=1.9626)  
 

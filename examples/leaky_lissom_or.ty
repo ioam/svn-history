@@ -8,7 +8,7 @@ __version__='$Revision$'
 import numpy
 
 from math import pi, sqrt
-from fixedpoint import FixedPoint
+from gmpy import mpq
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -76,9 +76,6 @@ LeakyCFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
 ### Build simulation
 
-# Make simulation use fixed-point time.
-topo.sim.set_time_type(FixedPoint,4)
-
 #
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 topo.sim['V1'] = SLISSOM(tsettle=1,threshold=0.05,noise_rate=0.001,
@@ -87,18 +84,18 @@ topo.sim['V1'] = SLISSOM(tsettle=1,threshold=0.05,noise_rate=0.001,
 
 V1 = topo.sim['V1']
 
-topo.sim.connect('Retina','V1', delay = FixedPoint("0.1"),
+topo.sim.connect('Retina','V1', delay = mpq(0.1),
           connection_type=LeakyCFProjection,strength=1.0,name='Afferent0',
           nominal_bounds_template=BoundingBox(radius=0.05),learning_rate=0.0,
 	  decay_rate=0.2)
 
-topo.sim.connect('V1','V1', delay = FixedPoint("0.1"), 
+topo.sim.connect('V1','V1', delay = mpq(0.1), 
           connection_type=LeakyCFProjection,strength = 0.9, 
 	  name='LateralExcitatory',
           nominal_bounds_template=BoundingBox(radius=0.2),learning_rate=0.1,
 	  decay_rate=0.05)
             
-topo.sim.connect('V1','V1', delay = FixedPoint("0.1"), 
+topo.sim.connect('V1','V1', delay = mpq(0.1), 
           connection_type=LeakyCFProjection,strength = -1.1, 
 	  name='LateralInhibitory',
           nominal_bounds_template=BoundingBox(radius=1.0),learning_rate=0.1,

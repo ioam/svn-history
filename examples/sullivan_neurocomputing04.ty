@@ -142,10 +142,6 @@ input_pattern = OrientedLine(
     angle=UniformRandom(lbound=0,ubound=360,seed=13))
 
 
-# Make simulation use fixed-point time.
-from fixedpoint import FixedPoint
-topo.sim.set_time_type(FixedPoint,4)
-
 # Sheets, connections, and their parameters
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
                                     period=1.0,phase=0.05,nominal_density=40)

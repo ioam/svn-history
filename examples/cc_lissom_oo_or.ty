@@ -10,7 +10,7 @@ import numpy
 import fixedpoint
 
 from math import pi, sqrt
-from fixedpoint import FixedPoint
+from gmpy import mpq
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -140,19 +140,19 @@ off_weights = topo.patterns.basic.Composite(
 
 
 
-topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
+topo.sim.connect('Retina','LGNOn',delay=mpq(0.05),
                  connection_type=SharedWeightCFProjection,strength=2.33,
                  nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                  weights_generator=on_weights)
 
-topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
+topo.sim.connect('Retina','LGNOff',delay = mpq(0.05),
                  connection_type=SharedWeightCFProjection,strength=2.33,
                  nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                  weights_generator=off_weights)
 
 #V1 Simple
 
-topo.sim.connect('LGNOn','V1Simple',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOn','V1Simple',delay=mpq(0.05),dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=locals().get('LGNStr',5.5),name='LGNOnAfferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                      generators=[Gaussian(aspect_ratio=1.0, size=UniformRandom(lbound=1.4,ubound=1.4,seed=56))
@@ -164,7 +164,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=FixedPoint("0.05"),dest_port=('Activit
                                                 time_constant=locals().get('S_tc',9600)))))
 
 
-topo.sim.connect('LGNOff','V1Simple',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOff','V1Simple',delay=mpq(0.05),dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=locals().get('LGNStr',5.5),name='LGNOffAfferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                      generators=[Gaussian(aspect_ratio=1.0,size=UniformRandom(lbound=1.4,ubound=1.4,seed=13))
@@ -175,14 +175,14 @@ topo.sim.connect('LGNOff','V1Simple',delay=FixedPoint("0.05"),dest_port=('Activi
                                ExponentialDecay(starting_value = locals().get('S_lr',5.0),
                                                 time_constant=locals().get('S_tc',9600)))))
 
-#topo.sim.connect('V1Simple','V1Simple',delay=FixedPoint("0.05"),name='SLateralInh',
+#topo.sim.connect('V1Simple','V1Simple',delay=mpq(0.05),name='SLateralInh',
 #                 connection_type=CFProjection,strength=-locals().get('SLatStr',0.0),
 #                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=locals().get('SLatSize',10.1)),
 #                 nominal_bounds_template=BoundingBox(radius=locals().get('SLatSize',0.1)),learning_rate=0) 
 
 #V1 Complex
 
-topo.sim.connect('V1Simple','V1Complex',delay=FixedPoint("0.05"),
+topo.sim.connect('V1Simple','V1Complex',delay=mpq(0.05),
                  connection_type=CFProjection,strength=locals().get('StoCStr',2.0),name='V1SimpleAfferent',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=locals().get('StoCSize',0.2)),
                      #topo.patterns.basic.Composite(operator=numpy.multiply, 
@@ -194,7 +194,7 @@ topo.sim.connect('V1Simple','V1Complex',delay=FixedPoint("0.05"),
 #                                                time_constant=locals().get('StoC_tc',9600)))),
 #                 learning_fn=CFPLF_Trace_opt(trace_strength=locals().get('TraceStr',0.5)))
                 
-topo.sim.connect('V1Complex','V1Simple',delay=FixedPoint("0.05"),
+topo.sim.connect('V1Complex','V1Simple',delay=mpq(0.05),
                  connection_type=CFProjection,strength=locals().get('FStrExc',0.28),name='V1SimpleFeedbackExc1',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=18),
               #   connection_type=CFProjection,strength=locals().get('FStrExc',0.13),name='V1SimpleFeedbackExc',
@@ -208,20 +208,20 @@ topo.sim.connect('V1Complex','V1Simple',delay=FixedPoint("0.05"),
                                                 time_constant=locals().get('StoC_tc',9600)))),
                  learning_fn=CFPLF_Trace_opt(trace_strength=locals().get('TraceStr',0.5)))
 
-topo.sim.connect('V1Complex','V1Simple',delay=FixedPoint("0.05"),
+topo.sim.connect('V1Complex','V1Simple',delay=mpq(0.05),
                  connection_type=CFProjection,strength=locals().get('FStrInh',-2.2),name='V1SimpleFeedbackInh',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=2.5),
                  nominal_bounds_template=BoundingBox(radius=locals().get('FInhSize',0.5)/2),learning_rate=0)#,
 
 
-topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.05"),name='LateralExcitatory',
+topo.sim.connect('V1Complex','V1Complex',delay=mpq(0.05),name='LateralExcitatory',
                  connection_type=CFProjection,strength=locals().get('CxLatExcStr',0.7),
                  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatExcSize',0.04)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('CxLatExcBB',0.12)),
                  learning_rate=0.0)#(BoundedNumber(bounds=(0.137,None),generator=ExponentialDecay(starting_value = locals().get('CtoC_lr',5.0),time_constant=locals().get('CtoC_tc',9600)))),
                  #learning_fn=CFPLF_Trace_opt(trace_strength=locals().get('TraceStr',0.5)))
 
-topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.05"),name='LateralInhibitory',
+topo.sim.connect('V1Complex','V1Complex',delay=mpq(0.05),name='LateralInhibitory',
                  connection_type=CFProjection,strength=-locals().get('CxLatInhStr',0.3),
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                      generators=[Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',2*0.22917)),

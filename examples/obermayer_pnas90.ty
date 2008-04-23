@@ -89,10 +89,6 @@ input_pattern = topo.patterns.basic.Gaussian(
 # cortical sheet (original network had a density of 256, but that is too large for normal use)
 numpy.random.seed((500,500))
 
-# Make simulation use fixed-point time.
-from fixedpoint import FixedPoint
-topo.sim.set_time_type(FixedPoint,4)
-
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 

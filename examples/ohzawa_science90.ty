@@ -18,7 +18,7 @@ import numpy
 import copy
 
 from math import pi, sqrt
-from fixedpoint import FixedPoint
+from gmpy import mpq
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -43,9 +43,6 @@ input_pattern = topo.patterns.rds.RandomDotStereogram(dotsize=UniformRandom(lbou
 input_pattern_copy=copy.deepcopy(input_pattern)
 
 
-
-# Make simulation use fixed-point time.
-topo.sim.set_time_type(FixedPoint,4)
 
 # Input regions
 topo.sim['LeftRetina']  = GeneratorSheet(nominal_density=100.0,
@@ -95,58 +92,58 @@ topo.patterns.basic.Gabor.aspect_ratio=1
 
 ###TRALERT: Tuned Excitatory complex cell model
 
-topo.sim.connect('LeftRetina','S1',delay = FixedPoint("0.05"),name='LS1',
+topo.sim.connect('LeftRetina','S1',delay = mpq(0.05),name='LS1',
                  connection_type=CFProjection,
                  weights_generator=topo.patterns.basic.Gabor(phase=0))
 
-topo.sim.connect('RightRetina','S1',delay = FixedPoint("0.05"),name='RS1',
+topo.sim.connect('RightRetina','S1',delay = mpq(0.05),name='RS1',
                  connection_type=CFProjection,
                  weights_generator=topo.patterns.basic.Gabor(phase=0))
 
 
-topo.sim.connect('LeftRetina','S2',delay = FixedPoint("0.05"),name='LS2',
+topo.sim.connect('LeftRetina','S2',delay = mpq(0.05),name='LS2',
                  connection_type=CFProjection,
                  weights_generator=topo.patterns.basic.Gabor(phase=pi))
 
-topo.sim.connect('RightRetina','S2',delay = FixedPoint("0.05"),name='RS2',
+topo.sim.connect('RightRetina','S2',delay = mpq(0.05),name='RS2',
                  connection_type=CFProjection,
                  weights_generator=topo.patterns.basic.Gabor(phase=pi))
 
 
 
-topo.sim.connect('LeftRetina','S3',delay = FixedPoint("0.05"),name='LS3',
+topo.sim.connect('LeftRetina','S3',delay = mpq(0.05),name='LS3',
                  connection_type=CFProjection,
                  weights_generator=topo.patterns.basic.Gabor(phase=pi/2))
 
-topo.sim.connect('RightRetina','S3',delay = FixedPoint("0.05"),name='RS3',
+topo.sim.connect('RightRetina','S3',delay = mpq(0.05),name='RS3',
                  connection_type=CFProjection,
                  weights_generator=topo.patterns.basic.Gabor(phase=pi/2))
 
 
-topo.sim.connect('LeftRetina','S4',delay = FixedPoint("0.05"),name='LS4',
+topo.sim.connect('LeftRetina','S4',delay = mpq(0.05),name='LS4',
                  connection_type=CFProjection,
                  weights_generator=topo.patterns.basic.Gabor(phase=3*pi/2))
 
-topo.sim.connect('RightRetina','S4',delay = FixedPoint("0.05"),name='RS4',
+topo.sim.connect('RightRetina','S4',delay = mpq(0.05),name='RS4',
                  connection_type=CFProjection,
                  weights_generator=topo.patterns.basic.Gabor(phase=3*pi/2))
 
-topo.sim.connect('S1','C',delay = FixedPoint("0.05"),name='S1ToC',
+topo.sim.connect('S1','C',delay = mpq(0.05),name='S1ToC',
                  connection_type=CFProjection,
                  min_matrix_radius=0,nominal_bounds_template=BoundingBox(radius=0.01))
                  
 
-topo.sim.connect('S2','C',delay = FixedPoint("0.05"),name='S2ToC',
+topo.sim.connect('S2','C',delay = mpq(0.05),name='S2ToC',
                  connection_type=CFProjection,
                  min_matrix_radius=0,nominal_bounds_template=BoundingBox(radius=0.01))
                  
 
-topo.sim.connect('S3','C',delay = FixedPoint("0.05"),name='S3ToC',
+topo.sim.connect('S3','C',delay = mpq(0.05),name='S3ToC',
                  connection_type=CFProjection,
                  min_matrix_radius=0,nominal_bounds_template=BoundingBox(radius=0.01))
                 
 
-topo.sim.connect('S4','C',delay = FixedPoint("0.05"),name='S4ToC',
+topo.sim.connect('S4','C',delay = mpq(0.05),name='S4ToC',
                  connection_type=CFProjection,
                  min_matrix_radius=0,nominal_bounds_template=BoundingBox(radius=0.01))
                  

@@ -331,7 +331,7 @@ import numpy
 import copy
 
 from math import pi, sqrt, fmod
-from fixedpoint import FixedPoint
+from gmpy import mpq
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -383,9 +383,6 @@ for i in xrange(num_lags):
                                              nominal_bounds=BoundingBox(radius=0.5))
 specify_whisker_deflections()
 
-# Make simulation use fixed-point time.
-topo.sim.set_time_type(FixedPoint,4)
-
 
 topo.sim['S1'] = LISSOM(nominal_density=locals().get('default_density',16*WhiskerArray.num_whiskers),tsettle=9,
                         nominal_bounds=BoundingBox(radius=0.5))
@@ -397,14 +394,14 @@ topo.sim['S1'].output_fn.upper_bound=0.633
 
 # The Grid coord_mapper divides the cortical sheet into barrel fields, 1 for each whisker. 
 for i in xrange(num_lags):
-    topo.sim.connect('Ganglia'+str(i),'S1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
+    topo.sim.connect('Ganglia'+str(i),'S1',delay=mpq(0.05),dest_port=('Activity','JointNormalize', 'Afferent'),
                      connection_type=CFProjection,strength=1.0,name='Afferent'+str(i),
                      weights_generator=topo.patterns.basic.Composite(generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                                  topo.patterns.random.UniformRandom()]), nominal_bounds_template=BoundingBox(radius=0.53/WhiskerArray.num_whiskers),learning_rate=0.85, coord_mapper=Grid(xdensity=WhiskerArray.num_whiskers,ydensity=WhiskerArray.num_whiskers))
                    
 
 
-topo.sim.connect('S1','S1',delay=FixedPoint("0.05"),name='LateralExcitatory',
+topo.sim.connect('S1','S1',delay=mpq(0.05),name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.10417),
@@ -412,7 +409,7 @@ topo.sim.connect('S1','S1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                  nominal_bounds_template=BoundingBox(radius=0.10417),learning_rate=2.55528) 
                  
             
-topo.sim.connect('S1','S1',delay=FixedPoint("0.05"),name='LateralInhibitory',
+topo.sim.connect('S1','S1',delay=mpq(0.05),name='LateralInhibitory',
                  connection_type=CFProjection,strength=-0.9,
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
