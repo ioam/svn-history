@@ -133,6 +133,13 @@ Prorities:
 pickle problem? can he reproduce it? -- yes, and so can Jude, but
 she's working on it.
 
+<H4>memory & loading snapshots</H4>
+(9) CB: If I keep calling load_snapshot(X), I find that Topographica's
+memory usage goes up - apparently by less than the space taken by X
+each time, but it still seems to go up significantly. Needs
+investigation (what actually happens, is it a problem in topographica,
+etc).
+
 <H4>Mac</H4>
 (9) OS X 10.5 problems: either get X11 or aqua working
 (3) Have someone else get the other one working
