@@ -386,8 +386,8 @@ if tracking==True:
     topo.sim["V1"].projections()["LateralExcitatory"].output_fn=LatEx_OF
     topo.sim["V1"].projections()["LateralInhibitory"].output_fn=LatIn_OF
 
-import contrib.mycommands
-contrib.mycommands.AddGC()
+import contrib.jacommands
+contrib.jacommands.AddGC()
 
 
 # default locations for model editor
