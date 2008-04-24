@@ -12,7 +12,6 @@ import topo.commands.analysis
 #from scipy.optimize.optimize import fmin, fmin_powell
 from math import pi, sqrt, exp, pow
 from numpy.oldnumeric import zeros, Float, sum
-from fixedpoint import FixedPoint
 from topo.projections.basic import CFProjection
 from topo.base.boundingregion import BoundingBox
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
@@ -243,7 +242,7 @@ def AddV2():
                         nominal_bounds=BoundingBox(radius=__main__.__dict__.get('CS',0.5)),tsettle=9,
                         output_fn=HomeostaticMaxEnt(a_init=14.5, b_init=__main__.__dict__.get('BINI',-4), mu=__main__.__dict__.get('V2MU',0.01)))
 
-    topo.sim.connect('V1Complex','V2',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
+    topo.sim.connect('V1Complex','V2',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
                     connection_type=CFProjection,strength=__main__.__dict__.get('V1aff_str',1),name='V1Afferent',
                     weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                     generators=[Gaussian(aspect_ratio=1.0, size=3),#__main__.__dict__.get('V1aff_size',30)),
@@ -252,12 +251,12 @@ def AddV2():
                                                                                                     ExponentialDecay(starting_value = __main__.__dict__.get('V1aff_lr',0.9590/2),
                                                                                                                     time_constant=__main__.__dict__.get('V1aff_lrtc',1600),
                                                                                                                     time_offset=2000))))
-    topo.sim.connect('V2','V2',delay=FixedPoint("0.05"),name='V2LateralExcitatory',
+    topo.sim.connect('V2','V2',delay=0.05,name='V2LateralExcitatory',
                     connection_type=CFProjection,strength=0.9,
                     weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=__main__.__dict__.get('V2lat_exc_size',0.04)),
                     nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2lat_exc_size',0.04)/2),learning_rate=0) 
                 
-    topo.sim.connect('V2','V2',delay=FixedPoint("0.05"),name='V2LateralInhibitory',
+    topo.sim.connect('V2','V2',delay=0.05,name='V2LateralInhibitory',
                     connection_type=CFProjection,strength=-0.9,
                     weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                     generators=[Gaussian(aspect_ratio=1.0,      size=__main__.__dict__.get('V2lat_inh_size',2*0.22917)),
@@ -274,18 +273,17 @@ def divide_with_constant(x,y):
 
 def AddGC():
     from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1,Sigmoid 
-    from fixedpoint import FixedPoint
     from topo.projections.basic import CFProjection, SharedWeightCFProjection
     from topo.base.boundingregion import BoundingBox
     lgn_surroundg = Gaussian(size=locals().get('LGNLatSurroundSize',0.5),aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 
 
-    topo.sim.connect('LGNOn','LGNOn',delay=FixedPoint("0.05"),dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
+    topo.sim.connect('LGNOn','LGNOn',delay=0.05,dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
                     connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',35),
                     nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOn',
                     weights_generator=lgn_surroundg)
     
-    topo.sim.connect('LGNOff','LGNOff',delay=FixedPoint("0.05"),dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
+    topo.sim.connect('LGNOff','LGNOff',delay=0.05,dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
                     connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',35),
                     nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOff',
                     weights_generator=lgn_surroundg)
