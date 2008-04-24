@@ -16,7 +16,7 @@ __version__='$Revision$'
 import numpy
 
 from math import pi, sqrt
-from gmpy import mpq
+
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -69,7 +69,7 @@ topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
                         output_fn=HomeostaticMaxEnt(a_init=13, b_init=-4, eta=0.0002, mu=0.01))
 
 
-topo.sim.connect('Retina','V1',delay=mpq(0.05),
+topo.sim.connect('Retina','V1',delay=0.05,
                  connection_type=CFProjection,strength=1.0,name='Afferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
@@ -79,12 +79,12 @@ topo.sim.connect('Retina','V1',delay=mpq(0.05),
                                              generator=ExponentialDecay(starting_value=locals().get('afferent_lr',0.9590),
                                                                         time_constant=3200/num_inputs)))
 
-topo.sim.connect('V1','V1',delay=mpq(0.05),name='LateralExcitatory',
+topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
                  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
                  nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0) 
             
-topo.sim.connect('V1','V1',delay=mpq(0.05),name='LateralInhibitory',
+topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
                  connection_type=CFProjection,strength=-0.9,
                  weights_generator=Composite(operator=numpy.multiply, 
                      generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),

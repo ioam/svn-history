@@ -10,7 +10,7 @@ import numpy
 import fixedpoint
 
 from math import pi, sqrt
-from gmpy import mpq
+
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -143,19 +143,19 @@ off_weights = topo.patterns.basic.Composite(
 
 
 
-topo.sim.connect('Retina','LGNOn',delay=mpq(0.05),
+topo.sim.connect('Retina','LGNOn',delay=0.05,
                  connection_type=SharedWeightCFProjection,strength=2.33,
                  nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                  weights_generator=on_weights)
 
-topo.sim.connect('Retina','LGNOff',delay = mpq(0.05),
+topo.sim.connect('Retina','LGNOff',delay=0.05,
                  connection_type=SharedWeightCFProjection,strength=2.33,
                  nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                  weights_generator=off_weights)
 
 #V1 Simple
 
-topo.sim.connect('LGNOn','V1Simple',delay=mpq(0.05),dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOn','V1Simple',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=locals().get('LGNStr',5.5),name='LGNOnAfferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                      generators=[Gaussian(aspect_ratio=1.0, size=UniformRandom(lbound=0.2,ubound=0.2,seed=56))
@@ -167,7 +167,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=mpq(0.05),dest_port=('Activity','Joint
                                                 time_constant=locals().get('S_tc',9600)))))
 
 
-topo.sim.connect('LGNOff','V1Simple',delay=mpq(0.05),dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=locals().get('LGNStr',5.5),name='LGNOffAfferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                      generators=[Gaussian(aspect_ratio=1.0,size=UniformRandom(lbound=0.2,ubound=0.2,seed=13))
@@ -181,54 +181,54 @@ topo.sim.connect('LGNOff','V1Simple',delay=mpq(0.05),dest_port=('Activity','Join
 #V1 Complex
 
 
-topo.sim.connect('V1SimpleInh','V1Simple',delay=mpq(0.05),
+topo.sim.connect('V1SimpleInh','V1Simple',delay=0.05,
                  connection_type=CFProjection,strength=-1.0,name='V1SimpleInhAfferent',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=18),
                  nominal_bounds_template=BoundingBox(radius=locals().get('FExcSize',0.0001)/2),
                  learning_rate=0)
 
-topo.sim.connect('V1Complex','V1SimpleInh',delay=mpq(0.05),
+topo.sim.connect('V1Complex','V1SimpleInh',delay=0.05,
                  connection_type=CFProjection,strength=locals().get('FStrInh',4.0),name='V1SimpleFeedbackInh',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=18),
                  nominal_bounds_template=BoundingBox(radius=locals().get('FInhSize',0.3)/2),learning_rate=0)
 
-topo.sim.connect('V1Complex','V1SimpleInh',delay=mpq(0.05),
+topo.sim.connect('V1Complex','V1SimpleInh',delay=0.05,
                  connection_type=CFProjection,strength=-4.0,name='V1SimpleFeedbackInh1',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=18),
                  nominal_bounds_template=BoundingBox(radius=locals().get('FInhSize',0.00001)/2),learning_rate=0)
 
 
-#topo.sim.connect('V1SimpleInh1','V1SimpleInh',delay=mpq(0.01),
+#topo.sim.connect('V1SimpleInh1','V1SimpleInh',delay=0.01,
 #                 connection_type=CFProjection,strength=-1.0,name='V1SimpleInhAfferent',
 #                 weights_generator=Gaussian(aspect_ratio=1.0, size=18),
 #                 nominal_bounds_template=BoundingBox(radius=locals().get('FExcSize',0.0001)/2),
 #                 learning_rate=0)
 
-#topo.sim.connect('V1Complex','V1SimpleInh1',delay=mpq(0.01),
+#topo.sim.connect('V1Complex','V1SimpleInh1',delay=0.01,
 #                 connection_type=CFProjection,strength=-locals().get('FStrInh',1.0),name='V1SimpleFeedbackInh',
 #                 weights_generator=Gaussian(aspect_ratio=1.0, size=18),
 #                 nominal_bounds_template=BoundingBox(radius=locals().get('FInhSize',0.0001)/2),learning_rate=0)
 
 
-#topo.sim.connect('V1Complex','V1Simple',delay=mpq(0.02),
+#topo.sim.connect('V1Complex','V1Simple',delay=0.02,
 #                 connection_type=CFProjection,strength=locals().get('FStrExc',0.28),name='V1SimpleFeedbackExc1',
 #                 weights_generator=Gaussian(aspect_ratio=1.0, size=18),
 #                 nominal_bounds_template=BoundingBox(radius=locals().get('FExcSize',0.005)/2),
 #                 learning_rate=0)
 
-topo.sim.connect('V1Simple','V1Complex',delay=mpq(0.05),
+topo.sim.connect('V1Simple','V1Complex',delay=0.05,
                  connection_type=CFProjection,strength=locals().get('StoCStr',1.0),name='V1SimpleAfferent',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=locals().get('StoCSize',0.2)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('StoCSize',0.2)/2),
                  learning_rate=0)
 
-topo.sim.connect('V1Complex','V1Complex',delay=mpq(0.05),name='LateralExcitatory',
+topo.sim.connect('V1Complex','V1Complex',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,strength=locals().get('CxLatExcStr',0.9),
                  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatExcSize',0.04)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('CxLatExcBB',0.03)),
                  learning_rate=0.0)
 
-topo.sim.connect('V1Complex','V1Complex',delay=mpq(0.05),name='LateralInhibitory',
+topo.sim.connect('V1Complex','V1Complex',delay=0.05,name='LateralInhibitory',
                  connection_type=CFProjection,strength=-locals().get('CxLatInhStr',0.9),
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                      generators=[Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',3*0.22917)),

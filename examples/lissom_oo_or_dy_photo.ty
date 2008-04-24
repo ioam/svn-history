@@ -27,7 +27,7 @@ import numpy
 import copy
 
 from math import pi, sqrt
-from gmpy import mpq
+
 
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
@@ -255,25 +255,25 @@ topo.sim['V1'].output_fn.upper_bound=0.626
 lgn_strength=4.7
 
 # LGN ON channel
-topo.sim.connect('LeftRetina','LGNOnLeft',delay=mpq(0.05),
+topo.sim.connect('LeftRetina','LGNOnLeft',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   nominal_bounds_template=BoundingBox(radius=0.375),name='LCenterOn',
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
-topo.sim.connect('LeftRetina','LGNOnLeft',delay = mpq(0.05),
+topo.sim.connect('LeftRetina','LGNOnLeft',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='LSurroundOn',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 
-topo.sim.connect('RightRetina','LGNOnRight',delay=mpq(0.05),
+topo.sim.connect('RightRetina','LGNOnRight',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   nominal_bounds_template=BoundingBox(radius=0.375),name='RCenterOn',
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
-topo.sim.connect('RightRetina','LGNOnRight',delay = mpq(0.05),
+topo.sim.connect('RightRetina','LGNOnRight',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='RSurroundOn',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
@@ -281,25 +281,25 @@ topo.sim.connect('RightRetina','LGNOnRight',delay = mpq(0.05),
 
 
 # LGN OFF channel
-topo.sim.connect('LeftRetina','LGNOffLeft',delay = mpq(0.05),
+topo.sim.connect('LeftRetina','LGNOffLeft',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='LCenterOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
-topo.sim.connect('LeftRetina','LGNOffLeft',delay = mpq(0.05),
+topo.sim.connect('LeftRetina','LGNOffLeft',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   name='LSurroundOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 
-topo.sim.connect('RightRetina','LGNOffRight',delay = mpq(0.05),
+topo.sim.connect('RightRetina','LGNOffRight',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='RCenterOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
-topo.sim.connect('RightRetina','LGNOffRight',delay = mpq(0.05),
+topo.sim.connect('RightRetina','LGNOffRight',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   name='RSurroundOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
@@ -307,30 +307,30 @@ topo.sim.connect('RightRetina','LGNOffRight',delay = mpq(0.05),
 
 # Connections from LGNs to V1
 
-topo.sim.connect('LGNOnLeft','V1',delay=mpq(0.05),#dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOnLeft','V1',delay=0.05,#dest_port=('Activity','JointNormalize', 'Afferent'),
                   connection_type=CFProjection,strength=0.25,name='LGNOnLeftAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590/stsd)
 
-topo.sim.connect('LGNOffLeft','V1',delay=mpq(0.05),#dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOffLeft','V1',delay=0.05,#dest_port=('Activity','JointNormalize', 'Afferent'),
                   connection_type=CFProjection,strength=0.25,name='LGNOffLeftAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590/stsd)
 
-topo.sim.connect('LGNOnRight','V1',delay=mpq(0.05),#dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOnRight','V1',delay=0.05,#dest_port=('Activity','JointNormalize', 'Afferent'),
                   connection_type=CFProjection,strength=0.25,name='LGNOnRightAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590/stsd)
 
-topo.sim.connect('LGNOffRight','V1',delay=mpq(0.05),#dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOffRight','V1',delay=0.05,#dest_port=('Activity','JointNormalize', 'Afferent'),
                   connection_type=CFProjection,strength=0.25,name='LGNOffRightAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590/stsd)
 
 
 # Lateral Connections
 
-topo.sim.connect('V1','V1',delay=mpq(0.05),name='LateralExcitatory',
+topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                   connection_type=CFProjection,strength=0.9,
                   nominal_bounds_template=BoundingBox(radius=0.10),learning_rate=3.2018/stsd) 
             
-topo.sim.connect('V1','V1',delay=mpq(0.05),name='LateralInhibitory',
+topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
                   connection_type=CFProjection,strength=-1.25,
                   nominal_bounds_template=BoundingBox(radius=0.23),learning_rate=0.1963)  
 

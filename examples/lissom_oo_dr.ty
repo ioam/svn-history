@@ -34,7 +34,7 @@ import numpy
 import copy
 
 from math import pi, sqrt
-from gmpy import mpq
+
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -134,19 +134,19 @@ UniformRandomPG = topo.patterns.random.UniformRandom
     
 for i in xrange(num_lags):
 
-    topo.sim.connect('Retina'+str(i),'LGNOn'+str(i),delay=mpq(0.05),
+    topo.sim.connect('Retina'+str(i),'LGNOn'+str(i),delay=0.05,
                      connection_type=SharedWeightCFProjection,strength=2.38,
                      nominal_bounds_template=BoundingBox(radius=0.375),
                      name='Afferent',weights_generator=on_weights)
     
-    topo.sim.connect('Retina'+str(i),'LGNOff'+str(i),delay = mpq(0.05),
+    topo.sim.connect('Retina'+str(i),'LGNOff'+str(i),delay=0.05,
                      connection_type=SharedWeightCFProjection,strength=2.38,
                      nominal_bounds_template=BoundingBox(radius=0.375),
                      name='Afferent',weights_generator=off_weights)
 
     
     topo.sim.connect(
-        'LGNOn'+str(i),'V1',delay=mpq(0.05),
+        'LGNOn'+str(i),'V1',delay=0.05,
         dest_port=('Activity','JointNormalize', 'Afferent'),
         connection_type=CFProjection,strength=1.0,
         name='LGNOnAfferent'+str(i),
@@ -159,7 +159,7 @@ for i in xrange(num_lags):
         
 
     topo.sim.connect(
-        'LGNOff'+str(i),'V1',delay=mpq(0.05),
+        'LGNOff'+str(i),'V1',delay=0.05,
         dest_port=('Activity','JointNormalize', 'Afferent'),
         connection_type=CFProjection,strength=1.0,
         name='LGNOffAfferent'+str(i),
@@ -172,7 +172,7 @@ for i in xrange(num_lags):
                      
 
 topo.sim.connect(
-    'V1','V1',delay=mpq(0.05),name='LateralExcitatory',
+    'V1','V1',delay=0.05,name='LateralExcitatory',
     connection_type=CFProjection,strength=0.9,
     weights_generator=CompositePG(operator=numpy.multiply, 
                                   generators=[Gaussian(aspect_ratio=1.0,
@@ -182,7 +182,7 @@ topo.sim.connect(
     learning_rate=2.55528) 
             
 topo.sim.connect(
-    'V1','V1',delay=mpq(0.05),name='LateralInhibitory',
+    'V1','V1',delay=0.05,name='LateralInhibitory',
     connection_type=CFProjection,strength=-0.9,
     weights_generator=CompositePG(operator=numpy.multiply, 
                                   generators=[Gaussian(aspect_ratio=1.0,

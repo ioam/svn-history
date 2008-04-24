@@ -15,7 +15,7 @@ import numpy
 import copy
 
 from math import pi, sqrt
-from gmpy import mpq
+
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -86,18 +86,18 @@ on_weights  = Composite(generators=[centerg,surroundg],operator=numpy.subtract)
 off_weights = Composite(generators=[surroundg,centerg],operator=numpy.subtract)
 
 
-topo.sim.connect('Retina','LGNOn',delay=mpq(0.05),
+topo.sim.connect('Retina','LGNOn',delay=0.05,
                  connection_type=SharedWeightCFProjection,strength=2.33,
                  nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                  weights_generator=on_weights)
 
-topo.sim.connect('Retina','LGNOff',delay = mpq(0.05),
+topo.sim.connect('Retina','LGNOff',delay=0.05,
                  connection_type=SharedWeightCFProjection,strength=2.33,
                  nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                  weights_generator=off_weights)
 
 
-topo.sim.connect('LGNOn','V1',delay=mpq(0.05),dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOn','V1',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=1.0,name='LGNOnAfferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply,
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
@@ -109,7 +109,7 @@ topo.sim.connect('LGNOn','V1',delay=mpq(0.05),dest_port=('Activity','JointNormal
 
 
 
-topo.sim.connect('LGNOff','V1',delay=mpq(0.05),dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOff','V1',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=1.0,name='LGNOffAfferent',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply,
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
@@ -121,12 +121,12 @@ topo.sim.connect('LGNOff','V1',delay=mpq(0.05),dest_port=('Activity','JointNorma
 
 
 
-topo.sim.connect('V1','V1',delay=mpq(0.05),name='LateralExcitatory',
+topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
                  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
                  nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0)
 
-topo.sim.connect('V1','V1',delay=mpq(0.05),name='Lateral',
+topo.sim.connect('V1','V1',delay=0.05,name='Lateral',
                  connection_type=CFProjection,response_fn=CFPRF_ActivityBased(),
                  weights_generator=Composite(operator=numpy.multiply,
                      generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),

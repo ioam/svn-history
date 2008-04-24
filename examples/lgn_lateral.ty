@@ -9,7 +9,7 @@ __version__='$Revision$'
 import numpy
 import __main__
 from math import pi, sqrt
-from gmpy import mpq
+
 
 import matplotlib
 matplotlib.use('TkAgg')
@@ -99,23 +99,23 @@ off_weights = topo.patterns.basic.Composite(
 
 
 
-topo.sim.connect('Retina','LGNOnSep',delay=mpq(0.1),
+topo.sim.connect('Retina','LGNOnSep',delay=0.1,
                 connection_type=SharedWeightCFProjection,strength=2.33,
                  nominal_bounds_template=BoundingBox(radius=0.375),name='AfferentOn',
                  weights_generator=on_weights)
 
-#topo.sim.connect('Retina','LGNOffSep',delay=mpq(0.1),
+#topo.sim.connect('Retina','LGNOffSep',delay=0.1,
 #                 connection_type=SharedWeightCFProjection,strength=2.33,
 #                 nominal_bounds_template=BoundingBox(radius=0.375),name='AfferentOff',
 #                 weights_generator=off_weights)
 
 
-topo.sim.connect('LGNOnSep','LGNOnSep',delay=mpq(0.05),dest_port=('Activity','Divisive'),
+topo.sim.connect('LGNOnSep','LGNOnSep',delay=0.05,dest_port=('Activity','Divisive'),
                  connection_type=SharedWeightCFProjection,strength=locals().get('LGNLatStr',18),
                  nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOn',
                  weights_generator=lgn_surroundg)
 
-#topo.sim.connect('LGNOffSep','LGNOnSep',delay=mpq(0.05),
+#topo.sim.connect('LGNOffSep','LGNOnSep',delay=0.05,
 #                 connection_type=SharedWeightCFProjection,strength=locals().get('LGNLatStr',0),
 #                 nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOff',
 #                 weights_generator=lgn_surroundg)
