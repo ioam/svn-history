@@ -14,7 +14,6 @@ __version__='$Revision$'
 
 from numpy.oldnumeric import *
 import numpy
-from gmpy import mpq
 
 import topo.patterns.random
 import topo.patterns.basic
