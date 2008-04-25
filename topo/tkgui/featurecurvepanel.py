@@ -48,8 +48,8 @@ class FeatureCurvePanel(PlotGroupPanel):
             return False
 
 
-    def __init__(self,console,master,plotgroup,**params):
-	PlotGroupPanel.__init__(self,console,master,plotgroup,**params)
+    def __init__(self,master,plotgroup,**params):
+	PlotGroupPanel.__init__(self,master,plotgroup,**params)
 
         self.pack_param("sheet",parent=self.control_frame_3,
             on_change=self.sheet_change,side='left',expand=1,
