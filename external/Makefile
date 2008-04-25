@@ -8,9 +8,9 @@ all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
 
 dist: bluesphere
 
-clean: python-clean jpeg-clean pil-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean tile-clean tilewrapper-uninstall psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean gmp-clean mxnumber-clean gmpy-clean scrodget-clean tklib-clean
+clean: python-clean jpeg-clean pil-clean numpy-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean tilewrapper-uninstall psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean gmp-clean mxnumber-clean gmpy-clean scrodget-clean tklib-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall tile-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall scrodget-uninstall tklib-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall tilewrapper-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall scrodget-uninstall tklib-uninstall
 
 
 
@@ -52,7 +52,7 @@ PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.5
 
 # LDFLAGS sets ${PREFIX}/lib as the LD_LIBRARY in the binary
 # CB: rpath is ignored on OS X (so where are the library files taken from?). 
-python: ${PYTHON}.tgz tk
+python: ${PYTHON}.tgz tk blt
 	echo ${PREFIX}
 	tar -xzf ${PYTHON}.tgz
 # Configure for specific operating system versions
