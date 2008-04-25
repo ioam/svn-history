@@ -6,7 +6,8 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Frame, Button, Label, Canvas, TOP, X, GROOVE, RAISED, BOTTOM,StringVar,OptionMenu
+from Tkinter import Frame, Button, Label, Canvas, TOP, X, GROOVE, RAISED,\
+     BOTTOM,StringVar
 from Tile import Combobox
 
 import topo.sheets
