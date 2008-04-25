@@ -447,7 +447,7 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
             
     def quit_topographica(self,check=True):
         """Quit topographica."""
-        if not check or (check and tkMessageBox.askyesno("Quit Topographica","Really quit?")):
+        if not check or (check and askyesno("Quit Topographica","Really quit?")):
             self.destroy() 
             print "Quit selected; exiting"
 
@@ -677,6 +677,20 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
         """
         return ProgressWindow(self,timer=timer,title=title)
 
+
+
+
+# CEB: workaround for tkinter lagging behind tk (tk must have changed
+# the type of a returned value).  This is copied almost exactly from
+# tkMessageBox If there are other things like this, we could have the
+# gui load some 'dynamic patches' to tkinter on startup, which could
+# then be removed when tkinter is updated (they'd all be in one place,
+# and no tkgui code would have to change).
+from tkMessageBox import _show,QUESTION,YESNO
+def askyesno(title=None, message=None, **options):
+    "Ask a question; return true if the answer is yes"
+    s = _show(title, message, QUESTION, YESNO, **options)
+    return str(s) == "yes"
 
 
 
