@@ -492,7 +492,6 @@ class ScrolledFrame(T.Frame):
         
         self.content = T.Frame(self.canvas)
         self.content.title = lambda x: self.title(x)
-        self.content._gah = self # ALERT
         
         self.canvas.create_window(0,0,window=self.content,anchor='nw')
 
