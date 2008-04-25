@@ -395,6 +395,8 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
             self.representations['Reduce' ]['widget']['state']=NORMAL
 
         self.__update_widgets_for_history() # have a general update_widgets method instead (that calls update_widgets_for_history; can it also include enlarge/reduce alterations?)
+        # CBALERT: problem when docked: this event isn't being caught, ie it doesn't end up
+        # going to the right place...
         self.event_generate("<<SizeRight>>")
         
 
