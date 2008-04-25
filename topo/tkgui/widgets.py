@@ -530,10 +530,16 @@ def with_busy_cursor(fn):
     Decorator to show busy cursor for duration of fn call.
     """
     def busy_fn(widget,*args,**kw):
-        widget['cursor']='watch'
-        widget.update_idletasks()
+        if 'cursor' in widget.configure():
+            old_cursor=widget['cursor']
+            widget['cursor']='watch'
+            widget.update_idletasks()
+
         fn(widget,*args,**kw)
-        widget['cursor']=''
+
+        if 'cursor' in widget.configure():
+            widget['cursor']=old_cursor
+            
     return busy_fn
 
 
