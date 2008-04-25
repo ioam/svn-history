@@ -88,6 +88,9 @@ def open_plotgroup_panel(class_,plotgroup=None,**kw):
         frame = topo.guimain.some_area.new_frame()
         panel = class_(frame.content,plotgroup=plotgroup,**kw)
 
+        # hack
+        panel._container = frame
+
         if not panel.dock:
             topo.guimain.some_area.eject(frame)
             panel.refresh_title()
@@ -296,7 +299,7 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
         self.some_area = FrameManager(self)
         # CB: make FrameManager pack itself if it has at least one
         # tab.
-        #self.some_area.pack(fill="both", expand=1)
+        self.some_area.pack(fill="both", expand=1)
         
         
 

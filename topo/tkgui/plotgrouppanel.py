@@ -203,8 +203,8 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
                         on_change=self.reduce_plots,side=LEFT)
         self.params_in_history.append('Reduce')
 
-##         self.pack_param("dock",parent=self.control_frame_1,
-##                         on_change=self.set_dock,side=LEFT)
+        self.pack_param("dock",parent=self.control_frame_1,
+                        on_change=self.set_dock,side=LEFT)
 
 
         # Don't need to add these two to params_in_history because their
@@ -258,10 +258,10 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
 
     def set_dock(self):
         if self.dock:
-            topo.guimain.some_area.consume(self.master._gah)
+            topo.guimain.some_area.consume(self._container)
             self.refresh_title()
         else:
-            topo.guimain.some_area.eject(self.master._gah)
+            topo.guimain.some_area.eject(self._container)
             self.refresh_title()
             
 
