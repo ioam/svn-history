@@ -777,7 +777,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # overwrite any more specific class found above
         # (e.g. a Number with a dynamic value will have a numeric
         # translator from above, so we replace that)
-        if param_is_dynamically_generated(param,self.get_source_po(name)):
+        if param_is_dynamically_generated(param,self.get_source_po(name)) or name in self.allow_dynamic:
             translator_type = self.trans[Dynamic]
             
         self.translators[name]=translator_type(param,initial_value=self.get_parameter_value(name))
@@ -948,7 +948,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         dictionary, under the Parameter's name.
         """
         self.master = master
-        
+
+        self.allow_dynamic = []
         self.param_immediately_apply_change = {BooleanParameter:True,
                                                SelectorParameter:True,
                                                Number:False,
@@ -1227,6 +1228,20 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         self.pack_param(name,f,on_change=on_change,on_modify=on_modify,**o)
 
 
+    def switch_dynamic(self,name):
+        # here: need to switch widget etc
+
+        if name in self.allow_dynamic:
+            self.allow_dynamic.remove(name)
+        else:
+            self.allow_dynamic.append(name)
+
+        self.repack_param(name)
+
+
+
+
+
 ################################################################################
 #
 ################################################################################
@@ -1253,7 +1268,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
         param_obj,source_po = self.get_parameter_object(name,with_location=True)
 
-        if not param_is_dynamically_generated(param_obj,source_po):
+        if not (param_is_dynamically_generated(param_obj,source_po) or name in self.allow_dynamic):
             # ...but overwrite that with a more specific one, if possible
             for c in classlist(type(param_obj))[::-1]:
                 if self.widget_creators.has_key(c):

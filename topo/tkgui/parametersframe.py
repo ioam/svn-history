@@ -286,9 +286,6 @@ class ParametersFrame(TkParameterizedObject,Frame):
         self.representations[parameter_name]['row']=row
 
 
-    def switch_dynamic(self,name):
-        # here: need to switch widget etc
-        self.repack_param(x)
 
 
     def __make_representation(self,name,on_change=None,on_modify=None):
