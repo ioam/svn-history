@@ -169,10 +169,12 @@ class FrameManager(Tile.Notebook):
         return w_path
 
     def _set_toplevel_title(self,frame,title):
+        # (started putting a bunch of stuff in here unrelated to title)
         w_path = self._get_window_of_frame(frame)
         self.tk.call("wm","title",w_path,title)
         p = '@'+resolve_path('topo/tkgui/icons/topo.xbm')
         self.tk.call("wm","iconbitmap",w_path,p)
+        self.tk.call("wm","geometry",w_path,"") # geom back to auto
 
     def _set_tab_title(self,frame,title):
         self.tab(self._tab_ids[frame],text=title)

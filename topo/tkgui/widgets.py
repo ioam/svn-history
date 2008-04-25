@@ -499,9 +499,6 @@ class ScrolledFrame(T.Frame):
         self.bind("<<SizeRight>>",self.sizeright)
 
 
-    def title(self,*args):
-        print "title HACK"
-
 
     def sizeright(self,event=None):
         self.content.update_idletasks()
@@ -509,6 +506,7 @@ class ScrolledFrame(T.Frame):
                                            self.content.winfo_height()))
         self.canvas.configure(width=self.content.winfo_width(),
                              height=self.content.winfo_height())
+
 
 
 
@@ -521,12 +519,10 @@ class ScrolledWindow(T.Toplevel):
         self._scrolledframe = ScrolledFrame(self)
         self._scrolledframe.pack(expand=1,fill='both')
         self.content = self._scrolledframe.content
-      
+
+    # required? presumably should be deleted
     def sizeright(self,event=None):
         self._scrolledframe.sizeright()
-        self.geometry('')
-
-
 
 
 def with_busy_cursor(fn):
