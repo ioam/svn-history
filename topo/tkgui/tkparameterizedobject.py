@@ -120,6 +120,7 @@ import copy
 from inspect import getdoc
 from Tkinter import BooleanVar, StringVar, Frame, Checkbutton, \
      Entry, TclError
+from Tile import Combobox
 
 from topo.base.parameterizedobject import ParameterizedObject,Parameter, \
      classlist,ParameterizedObjectMetaclass
@@ -132,8 +133,7 @@ import topo # for topo.guimain only
 from topo.misc.utils import eval_atof, inverse
 from topo.misc.filepaths import Filename, resolve_path
 
-from widgets import FocusTakingButton as Button2, TaggedSlider, \
-     EditableOptionMenu as OptionMenu, Balloon
+from widgets import FocusTakingButton as Button2, TaggedSlider, Balloon
 from topowidgets import entry_background
 
 def lookup_by_class(dict_,class_):
@@ -512,7 +512,6 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # be surprised by the result from get()?
         tkvar._original_get = tkvar.get
         tkvar.get = lambda x=name: self._tkvar_get(x)
-
 
 
 ################################################################################
@@ -1345,7 +1344,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             new_range,widget_options = self._X(name,widget_options)
 
             w = self.representations[name]['widget']
-            w.replace_list(new_range) # what a mess
+            # hACK: tuple to work around strange list parsing tkinter/tcl
+            w.configure('values',tuple(new_range)) # what a mess
 
 
     def _X(self,name,widget_options):
@@ -1414,8 +1414,25 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         new_range,widget_options = self._X(name,widget_options)
 
         tkvar = self._tkvars[name]
+
+        # Combobox looks bad with standard theme on my ubuntu
+        # (and 'changed' marker - blue text - not visible).
+        w = Combobox(frame,textvariable=tkvar,
+                     values=new_range,state='readonly',
+                     **widget_options)
+
+        # CEBALERT: somehow Combobox sets textvariable without calling
+        # its set() method! So how can I possibly track that the
+        # variable's been set? So (hack) track the ComboBox event
+        # itself. Shouldn't be necessary, should be checked as tk
+        # versions are upgraded...
+        def f(event,name=name):
+            v = self._tkvars[name].get()
+            self._tkvar_set(name,v)
+        w.bind("<<ComboboxSelected>>",f)
         
-        w = OptionMenu(frame,tkvar,*new_range,**widget_options)
+        
+
         help_text = getdoc(self._string2object(name,tkvar._original_get()))
         self.balloon.bind(w,help_text)
         return w
