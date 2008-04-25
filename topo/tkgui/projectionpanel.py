@@ -223,7 +223,7 @@ class PlotMatrixPanel(ProjectionSheetPanel):
                               for p in plots]
         old_canvases = self.canvases
 
-        self.canvases = [Canvas(self.plot_frame,
+        self.canvases = [Canvas(self.plot_container,
                            width=image.width()+BORDERWIDTH*2+CANVASBUFFER,
                            height=image.height()+BORDERWIDTH*2+CANVASBUFFER,
                            bd=0)

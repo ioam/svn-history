@@ -47,8 +47,6 @@ BORDERWIDTH = 1
 # not displayed.  
 CANVASBUFFER = 1
 
-
-
 class PlotGroupPanel(TkParameterizedObject,Frame):
 
     __abstract = True
@@ -143,22 +141,23 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 	self.plot_frame = Tkinter.LabelFrame(self,text=self.plotgroup.name)
         self.plot_frame.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)        
 
-##         self.plot_frame = Frame(self) #self.plot_group_title.interior() 
-##         self.plot_frame.pack(side=TOP,expand=YES,fill=BOTH)
+        # CB: why did I need a new frame after switching to 8.5?
+        # I've forgotten what i changed.
+        self.plot_container = Tkinter.Frame(self.plot_frame)
+        self.plot_container.pack(anchor="center")
+
 
         # Label does have a wraplength option...but it's in screen
         # units. Surely tk has a function to convert between
         # text and screen units?
-        no_plot_note_text = """
-(Press Refresh on the update command to generate
-the plot, after modifying the commands below if
-necessary.  Refreshing may take some time.
+        no_plot_note_text = """      
+Press Refresh on the update command to generate the plot, after modifying the commands below if necessary. Note that Refreshing may take some time.
 
-Many commands accept 'display=True' so that the
-progress can be viewed in an open Activity window,
-e.g. for debugging.)
-"""        
-        self.no_plot_note=Label(self.plot_frame,text=no_plot_note_text,justify='center')
+Many commands accept 'display=True' so that the progress can be viewed in an open Activity window, e.g. for debugging.
+"""
+
+        self.no_plot_note=Label(self.plot_container,text=no_plot_note_text,
+                                justify="center",wraplength=350)
         self.no_plot_note_enabled=False
 
 
@@ -238,6 +237,9 @@ e.g. for debugging.)
         # just a mechanism to disable/enable cfs/rfs plots as
         # necessary. Hack includes the attribute below as well as
         # other items marked 'disable items hack'.
+        # (Note that tk 8.5 has better handling of state switching
+        # (using flags for each state, I think), so presumably this
+        # can be cleaned up easily.)
         self._unit_menu_updaters = {}
         
         self._sheet_menu = Menu(self._canvas_menu, tearoff=0)
@@ -380,6 +382,7 @@ e.g. for debugging.)
         self.refresh_title()
 
         if len(self.canvases)==0:
+            # CEB: check that pack's ok here
             self.no_plot_note.grid(row=1,column=0,sticky='nsew')
             self.no_plot_note_enabled=True
             self.representations['Enlarge']['widget']['state']=DISABLED
@@ -454,6 +457,7 @@ e.g. for debugging.)
         """
         ### JABALERT: Can we make it simple to make plots be put onto multiple lines here?
 	plots = self.plotgroup.plots
+        
 	self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image) for p in plots]
 
 
@@ -471,7 +475,7 @@ e.g. for debugging.)
                new_sizes != old_sizes:
             # Need new canvases...
             old_canvases = self.canvases
-            self.canvases = [Canvas(self.plot_frame,
+            self.canvases = [Canvas(self.plot_container,
                                width=image.width()+BORDERWIDTH*2+CANVASBUFFER,
                                height=image.height()+BORDERWIDTH*2+CANVASBUFFER,
                                bd=0)
@@ -550,7 +554,7 @@ e.g. for debugging.)
             pass
         elif self._num_labels != len(self.canvases):
             old_labels = self.plot_labels
-            self.plot_labels = [Label(self.plot_frame,text=each)
+            self.plot_labels = [Label(self.plot_container,text=each)
 				 for each in self.plotgroup.labels]
             for i in range(len(self.plot_labels)):
                 self.plot_labels[i].grid(row=1,column=i,sticky=NSEW)
