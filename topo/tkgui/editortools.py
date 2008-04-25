@@ -93,6 +93,11 @@ class NodeTool(Frame):
         self.bind('<Button-1>', self.change_mode)
         self.pack(side = TOP, fill = X)
         # label sets canvas mode
+
+        # CebAlerT: make these 'move' 'add sheet of type' things etc
+        # look like buttons again, or -better - clean up the whole
+        # interface!
+        
         self.title_label = Label(self, text="Add sheet of type:")
         #bg ='light grey')
         self.title_label.bind('<Button-1>', self.change_mode)
