@@ -57,6 +57,8 @@ class TestPatternPlotGroup(SheetPlotGroup):
 
 class TestPattern(SheetPanel):
 
+    dock = BooleanParameter(False)
+
     edit_sheet = ObjectSelectorParameter(doc="""Sheet for which to edit pattern properties.""")
 
     plastic = BooleanParameter(default=False,doc="""Whether to enable plasticity during presentation.""")
@@ -77,10 +79,10 @@ class TestPattern(SheetPanel):
             return False
 
 
-    def __init__(self,console,master,**params):
-        plotgroup = TestPatternPlotGroup()
+    def __init__(self,master,plotgroup=None,**params):
+        plotgroup = plotgroup or TestPatternPlotGroup()
         
-	super(TestPattern,self).__init__(console,master,plotgroup,**params)
+	super(TestPattern,self).__init__(master,plotgroup,**params)
         
         self.auto_refresh = True
 
@@ -91,7 +93,7 @@ class TestPattern(SheetPanel):
         edit_sheet_param = self.get_parameter_object('edit_sheet')
         edit_sheet_param.objects = self.plotgroup._sheets()
 
-        self.pg_control_pane = Frame(self,bd=1,relief="sunken")
+        self.pg_control_pane = Frame(self) #,bd=1,relief="sunken")
         self.pg_control_pane.pack(side="top",expand='yes',fill='x')
         
         self.params_frame = ParametersFrame(
@@ -169,6 +171,6 @@ class TestPattern(SheetPanel):
         pattern_present(input_dict,self.duration,
                         plastic=self.plastic,overwrite_previous=False)
 
-        self.console.auto_refresh()
+        topo.guimain.auto_refresh()
 	topo.sim.state_pop()
         

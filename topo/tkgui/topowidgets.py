@@ -15,46 +15,29 @@ __version__='$Revision$'
 import Tkinter
 import operator
 
-import Pmw
-import bwidget
+
 
 from topo.misc.filepaths import resolve_path
 import topo.tkgui
 
+from widgets import Balloon, Progressbar
 
-
-    
-
-
-
-######################################################################            
 ######################################################################
-# CB: Working here; *TkguiWindows need significant cleanup.
-# Merge TkguiWindow and ScrolledTkguiWindow because scrollbars are automatic now.
-# Clearly separate ResizableScrollableFrame.
+######################################################################            
 
-# Actually...
-# Before trying to simplify, see if bwidget has been updated
-# (most of the complications come from bwidget bugs).
-# Otherwise, *consider wrapping scrodget* to get a better scrolledframe.
-# (The problem there is we'll probably have to add a package to tcl/tk
-# and that might not work on os x because we're not using our own
-# tcl/tk...I'm not sure).
+from widgets import ScrolledWindow
 
-# Might wonder why we need <<SizeRight>> event, and don't just use the
-# <Configure> event for calling sizeright: Can't distinguish manual
-# resize from autoresizing.
-
-
-class TkguiWindow(Tkinter.Toplevel):
+class TkguiWindow(ScrolledWindow):
     """
     The standard tkgui window; defines attributes common to tkgui windows.
 
     Currently these attributes are:
      - a window icon
     """
-    def __init__(self,**config):
-        Tkinter.Toplevel.__init__(self,**config)
+    def __init__(self,parent,**config):
+
+        ScrolledWindow.__init__(self,parent)
+        self.content.title = self.title
 
         # CEBALERT: doesn't work on OS X, and is a strange color on
         # Windows.  To get a proper icon on OS X, we probably have to
@@ -69,166 +52,9 @@ class TkguiWindow(Tkinter.Toplevel):
         # self.bind("<<right-click>>",self.display_context_menu)
 
 
-class ScrolledTkguiWindow(TkguiWindow):
-    """
-    A TkguiWindow with automatic scrollbars.
-    """
-    def __init__(self,**config):
-        TkguiWindow.__init__(self,**config)
-                
-        self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
-        self._scroll_frame = ResizableScrollableFrame(self,borderwidth=2,
-                                                       relief="flat")
-        self._scroll_frame.pack(expand="yes",fill="both")
-        self.bind("<<SizeRight>>",self._scroll_frame.sizeright)
-        self.bind("<Configure>",self._scroll_frame.barz)
-        
-        self.content = self._scroll_frame.contents
 
-        # provide route to title() method for convenience
-        self.content.title = self.title
+ScrolledTkguiWindow = TkguiWindow 
 
-
-class ResizableScrollableFrame(Tkinter.Frame):
-    """
-    A scrollable frame that can also be manually resized.
-
-    Any normal scrollable frame will not resize automatically to
-    accommodate its contents, because that would defeat the
-    purpose of scrolling in the first place.  However, having a
-    scrollable frame that can be resized manually is useful; this
-    class adds easy resizing to a bwidget
-    ScrollableFrame/ScrolledWindow combination.
-
-    ** BEING CONSTRUCTED: not currently suitable for standalone use **
-    """
-    def __init__(self,master,**config):
-        """
-        The 'contents' attribute is the frame into which contents
-        should be placed (for the contents to be inside the
-        scrollable area), i.e. almost all use of
-        f=ResizableScrollableFrame(master) will be via f.contents.
-        """
-        self.__hack=False
-        Tkinter.Frame.__init__(self,master,**config)
-        self.master = master
-
-        # non-empty Frames ignore any specified width/height, so create two empty
-        # frames used purely for setting height & width
-        self.__height_sizer = Tkinter.Frame(self,height=0,width=0)#2,borderwidth=2,relief='sunken',background="blue")
-        self.__height_sizer.pack(side="left")
-        self.__width_sizer = Tkinter.Frame(self,width=0,height=0)#2,background="red",borderwidth=2,relief="sunken")
-        self.__width_sizer.pack()
-
-        # the scrollable frame, with scrollbars
-        self._scrolled_window = bwidget.ScrolledWindow(self,auto="both",scrollbar="both") #auto="both") #*shscrollbar="none")#,,
-                                                       #scrollbar="both")
-        # set small start height/width, will grow if necessary
-        scrolled_frame = bwidget.ScrollableFrame(self._scrolled_window,
-                                                 height=50,width=50)
-        self.scrolled_frame = scrolled_frame
-        self._scrolled_window.setwidget(scrolled_frame)
-        self._scrolled_window.pack(fill="both",expand='yes')
-
-        # CB: tk docs say getframe() not necessary? Where did I see that?
-        self.contents = scrolled_frame.getframe()
-
-        self.oldsize=(-1,-1)
-
-
-    def barz(self,e=None):
-        self.after_idle(self.barz2)
-
-    def barz2(self,e=None):
-        import topo.tkgui
-        if topo.tkgui.system_platform!="mac":
-            self.__hack=True # can't call update_idletasks() in after_idle().
-            # fortunately we only need to call update_idletasks() for
-            # autoresize not to put extra space round the side; this method only needs to get things exactly correct for manual resize.
-            scrollbar = self._which_scrollbars()
-            self.__hack=False
-            self._scrolled_window.config(scrollbar=scrollbar)
-        
-        
-    def set_size(self,width=None,height=None):
-        """
-        Manually specify the size of the scrollable frame area.
-        """
-        if width:self.__width_sizer['width']=width
-        if height:self.__height_sizer['height']=height
-
-    # CB: rename, rename event
-    def sizeright(self,e=None):
-        self.master.geometry('')
-
-        # Extra for width of scrollbars; should be found programmatically. But how?
-        extraw = 19; extrah = 19
-
-        self.update_idletasks()
-        
-        w = min(self.contents.winfo_reqwidth()+extraw,
-                self.winfo_screenwidth()-extraw)
-        # -60 for task bars etc on screen...how to find true viewable height?
-        h = min(self.contents.winfo_reqheight()+extrah,
-                self.winfo_screenheight()-60-extrah)
-
-        if self.oldsize!=(w,h):
-            self.set_size(w,h)
-            self.oldsize = (w,h)
-
-        scrollbar = self._which_scrollbars()
-
-        dw = extraw-3; dh = extrah-3
-
-        # can't seem to do this anywhere but right here
-        # (get attributeerror otherwise)
-        import topo.tkgui
-        if topo.tkgui.system_platform!="mac":
-            self._scrolled_window.config(scrollbar=scrollbar)
-
-        if scrollbar=="none":
-            w-=dw
-            h-=dh
-        elif scrollbar=="vertical":
-            h-=dh
-        elif scrollbar=="horizontal":
-            w-=dw
-
-        self.set_size(w,h)
-        # don't set self.oldsize=(w,h)
-
-
-    def _need_bars(self):
-        sw = self._scrolled_window
-        c = self.contents
-        need_x,need_y = False,False
-
-        if not self.__hack: self.update_idletasks()
-
-        if sw.winfo_width()<c.winfo_reqwidth() and \
-               abs(sw.winfo_width()-c.winfo_reqwidth())>1: 
-            need_x=True
-        if sw.winfo_height()<c.winfo_reqheight() and \
-               abs(sw.winfo_height()-c.winfo_reqheight())>1:
-            need_y=True
-        return need_x,need_y
-
-    def _which_scrollbars(self):
-        need_x,need_y = self._need_bars()
-        if need_x and need_y:
-            scrollbar = 'both'
-        elif need_x and not need_y:
-            scrollbar = 'horizontal'
-        elif not need_x and need_y:
-            scrollbar = 'vertical'
-        elif not need_x and not need_y:
-            scrollbar = 'none'
-        return scrollbar
-    
-##     def _fractions_visible(self):
-##         X = [float(x) for x in self.scrolled_frame.xview().split(' ')]
-##         Y = [float(x) for x in self.scrolled_frame.xview().split(' ')]
-##         return X[1]-X[0],Y[1]-Y[0]
 
 ######################################################################
 ######################################################################            
@@ -290,17 +116,17 @@ class ProgressWindow(ProgressController,TkguiWindow):
     ** Currently expects a 0-100 (percent) value ***        
     """
 
-    def __init__(self,timer=None,progress_var=None,title=None):
+    def __init__(self,parent,timer=None,progress_var=None,title=None):
         ProgressController.__init__(self,timer,progress_var)
-        TkguiWindow.__init__(self)
+        TkguiWindow.__init__(self,parent)
 
         self.protocol("WM_DELETE_WINDOW",self.set_stop)
         self.title(title or self.timer.func.__name__.capitalize())
-        self.balloon = Pmw.Balloon(self)
+        self.balloon = Balloon(self)
 
-        progress_bar = bwidget.ProgressBar(self,type="normal",
-                                           maximum=100,height=20,width=200,
-                                           variable=self.progress_var)
+        progress_bar = Progressbar(self,#type="normal",
+                                   #maximum=100,height=20,width=200,
+                                   variable=self.progress_var)
         progress_bar.pack(padx=15,pady=15)
 
         progress_box = Tkinter.Frame(self,border=2,relief="sunken")

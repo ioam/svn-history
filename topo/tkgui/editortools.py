@@ -6,8 +6,8 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Frame, Button, Label, Canvas, TOP, X, GROOVE, RAISED, BOTTOM
-import Pmw
+from Tkinter import Frame, Button, Label, Canvas, TOP, X, GROOVE, RAISED, BOTTOM,StringVar,OptionMenu
+from Tile import Combobox
 
 import topo.sheets
 from topo.sheets import *
@@ -21,6 +21,8 @@ from topo.base.projection import Projection
 from editorobjects import EditorSheet, EditorProjection
 from parametersframe import ParametersFrameWithApply
 
+
+
 class ArrowTool(Frame):
     """
     ArrowTool is a selectable frame containing an arrow icon and a label. It is a
@@ -29,16 +31,18 @@ class ArrowTool(Frame):
     """
 
     def __init__(self, canvas,  parent = None, parambar = None):
-        Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
+        Frame.__init__(self, parent)
+        #, bg = 'light grey', bd = 4, relief = RAISED)
         self.canvas = canvas # hold canvas reference
         self.parameter_tool = parambar # To display class properties and name
         # label sets canvas mode
-        self.title_label = Label(self, text="Move:", bg ='light grey')
+        self.title_label = Label(self, text="Move:")
+#, bg ='light grey')
         self.title_label.bind('<Button-1>', self.change_mode)
         self.title_label.pack()
         self.doc = 'Use the arrow tool to select and\nmove objects in the canvas around'
         # arrow icon
-        self.icon = Canvas(self, bg = 'light grey', width = 35, height = 30)
+        self.icon = Canvas(self, width = 35, height = 30) #bg = 'light grey', 
         self.icon.create_polygon(10,0, 10,22, 16,17, 22,29, 33,22, 25,13, 33,8, 
             fill = 'black', outline = 'white')
         self.icon.pack()
@@ -61,9 +65,10 @@ class ArrowTool(Frame):
         else:
             col = 'light grey'; relief = RAISED
 
-        self.config(bg = col, relief = relief)
-        self.title_label.config(bg = col)
-        self.icon.config(bg = col)
+        # ALERT
+        #self.config(bg = col, relief = relief)
+        #self.title_label.config(bg = col)
+        #self.icon.config(bg = col)
 
 
 
@@ -79,28 +84,38 @@ class NodeTool(Frame):
 
     def __init__(self, canvas,  parent = None, parambar = None):
         
-        Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
+        Frame.__init__(self, parent)
+#, bg = 'light grey', bd = 4, relief = RAISED)
         self.canvas = canvas # hold canvas reference.
         self.parameter_tool = parambar # To display class properties and name
         # bind clicks, pack in toolbar at top and fill out in X direction
         self.bind('<Button-1>', self.change_mode)
         self.pack(side = TOP, fill = X)
         # label sets canvas mode
-        self.title_label = Label(self, text="Add sheet of type:", bg ='light grey')
+        self.title_label = Label(self, text="Add sheet of type:")
+        #bg ='light grey')
         self.title_label.bind('<Button-1>', self.change_mode)
         self.title_label.pack()
         self.doc = 'Use the sheet tool to click a\nsheet object into the canvas.'
         # gets list of all the available sheets.
         self.sheet_list = concrete_descendents(Sheet)
         sheet_list = self.sheet_list.keys()
-        # populate the menu with the available sheet list.
-        self.option_menu = Pmw.ComboBox(self, selectioncommand = 
-            self.set_option, scrolledlist_items = sheet_list)
+
+        
+        ## menu with list of available sheets
+        self.option_var = StringVar()
+        self.option_var.set(sheet_list[0])
+        self.current_option = self.option_var.get()
+
+        self.option_menu = Combobox(self,textvariable=self.option_var,
+                                    values=sheet_list,state='readonly')
         self.option_menu.pack()
         self.option_menu.bind('<Button-1>', self.change_mode)
-        # select the initial selection
-        self.option_menu.selectitem(sheet_list[0])
-        self.current_option = sheet_list[0]
+        
+        self.option_var.trace_variable('w',self.set_option)
+        
+        
+
 
 
     #   Focus Methods
@@ -119,9 +134,11 @@ class NodeTool(Frame):
                 self.parameter_tool.set_focus(name, current_option, self.doc)
         else:
             col = 'light grey'; relief = RAISED
-        self.config(bg = col, relief = relief)
-        self.title_label.config(bg = col)
-        self.option_menu.config(bg = col)
+
+        # ALERT
+        #self.config(bg = col, relief = relief)
+        #self.title_label.config(bg = col)
+        #self.option_menu.config(bg = col)
 
 
     #   Node Methods
@@ -152,8 +169,9 @@ class NodeTool(Frame):
 
     #   Util Methods
     
-    def set_option(self, option):
-        self.current_option = option
+    def set_option(self,*args):
+        """ """ 
+        self.current_option = self.option_var.get()
         self.change_mode(None)
 
 
@@ -172,28 +190,37 @@ class ConnectionTool(Frame):
 
     def __init__(self, canvas, parent = None, parambar = None):
         # super constructor call.
-        Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
+        Frame.__init__(self, parent)
+        #, bg = 'light grey', bd = 4, relief = RAISED)
         self.canvas = canvas # hold canvas reference.
         self.parameter_tool = parambar # To display class properties and name
         # bind clicks, pack in toolbar at top and fill out in X direction
         self.bind('<Button-1>', self.change_mode)
         self.pack(side = TOP, fill = X)
         # label sets canvas mode
-        self.title_label = Label(self, text="Add projection of type:", bg ='light grey')
+        self.title_label = Label(self, text="Add projection of type:")
+        #, bg ='light grey')
         self.title_label.bind('<Button-1>', self.change_mode)
         self.title_label.pack()
         self.doc = 'Use the connection tool to\ndrag connections between objects'
         # gets list of all the available projections.
         self.proj_list = concrete_descendents(Projection)
         proj_list = self.proj_list.keys() # gets the class names.
-        # populate the menu with the available projection list.
-        self.option_menu = Pmw.ComboBox(self, selectioncommand = 
-            self.set_option, scrolledlist_items = proj_list)
-        self.option_menu.bind('<Button-1>', self.change_mode)
+
+
+        ## menu with list of available projections
+        self.option_var = StringVar()
+        self.option_var.set(proj_list[0])
+        self.current_option = self.option_var.get()
+    
+        self.option_menu = Combobox(self,textvariable=self.option_var,
+                                    values=proj_list,state='readonly')
+
         self.option_menu.pack()
-        # select the initial selection
-        self.option_menu.selectitem(proj_list[0])
-        self.current_option = proj_list[0]
+        self.option_menu.bind("<Button-1>",self.change_mode)
+        
+        self.option_var.trace_variable('w',self.set_option)
+
 
 
     #   Canvas Topo Linking Methods
@@ -234,8 +261,10 @@ class ConnectionTool(Frame):
         editor_connection.connect(node, con)
         return True
 
-    def set_option(self, option):
-        self.current_option = option
+
+    def set_option(self,*args):
+        """ """ 
+        self.current_option = self.option_var.get()
         self.change_mode(None)
 
 
@@ -255,9 +284,11 @@ class ConnectionTool(Frame):
                 self.parameter_tool.set_focus(name, current_option, self.doc)
         else:
             col = 'light grey'; relief = RAISED
-        self.config(bg = col, relief = relief)
-        self.title_label.config(bg = col)
-        self.option_menu.config(bg = col)
+
+        # ALERT
+        #self.config(bg = col, relief = relief)
+        #self.title_label.config(bg = col)
+        #self.option_menu.config(bg = col)
 
 
 class ParametersTool(Frame):

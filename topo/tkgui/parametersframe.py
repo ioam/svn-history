@@ -358,7 +358,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
         # CEBALERT: should have used get_parameter_value(param_name)?
         PO_to_edit = self._string2object(param_name,self._tkvars[param_name].get()) 
 
-        parameter_window = TkguiWindow()
+        parameter_window = TkguiWindow(self)
         parameter_window.title(PO_to_edit.name+' parameters')
 
         ### CEBALERT: confusing? ###

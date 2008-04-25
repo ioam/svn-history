@@ -10,7 +10,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import Pmw, sys, Tkinter, _tkinter,os
+import sys, Tkinter, _tkinter,os
 import topo.base.parameterizedobject
 
 from topoconsole import TopoConsole
@@ -21,12 +21,6 @@ from topoconsole import TopoConsole
 # In several places we use pack() when grid() would probably be
 # simpler. Check you know which fits a task better rather than copying
 # existing code.
-#
-## Pmw
-# Not being maintained, and incompatible with some improvements to
-# tk (like Tile). Everything we use from Pmw is available from
-# other packages (like bwidget, Tix, etc). So maybe try to avoid
-# adding more Pmw.
 #
 ## Dialogs
 # Don't know how to theme them (can't make them inherit from
@@ -50,15 +44,6 @@ from topoconsole import TopoConsole
 # are a bit of a mix. This needs to be cleaned up when we have a
 # final window organization method in mind.
 
-# the most bwidget screenshots i could find:
-# http://tcltk.free.fr/Bwidget/
-# some bwidget ref's/notes I'm using/going to use:
-# http://wiki.tcl.tk/1091 and 3909
-# http://tkinter.unpythonic.net/bwidget/BWman/
-# http://sourceforge.net/docman/display_doc.php?docid=17481&group_id=12883
-# https://stat.ethz.ch/pipermail/r-sig-gui/2004-April/000258.html
-# http://wiki.tcl.tk/8646
-# http://wiki.tcl.tk/2251
 
 # When not using the GUI, Topographica does not ordinarily import any of
 # the classes in the separate Topographica packages. For example, none
@@ -97,18 +82,12 @@ else:
     right_click_release_events = ['ButtonRelease-2']
     
 
-def __ttkify(root,widget):
-    """Take widget from ttk instead of Tkinter"""
-    la = "ttk::"+widget
-    root.tk.call('namespace', 'import', '-force', la) # overwrites the current Tkinter one
-
 
 
 # CEBALERT: this function needs some cleaning up
 
 # gets set to the TopoConsole instance created by start.
 console = None
-
 def start(mainloop=False,banner=True):
     """
     Start Tk and read in an options_database file (if present), then
@@ -138,6 +117,9 @@ def start(mainloop=False,banner=True):
     root = Tkinter.Tk()
     root.withdraw()
 
+    # default,clam,alt,classic
+    root.tk.call("ttk::style","theme","use","classic")  
+
     # Try to read in options from an options_database file
     # (see http://www.itworld.com/AppDev/1243/UIR000616regex/
     # or p. 49 Grayson)
@@ -147,21 +129,13 @@ def start(mainloop=False,banner=True):
         print "Read options database from",options_database
     except _tkinter.TclError:
         pass
-
-    # CB: uncomment for Tile
-##     root.tk.call('package', 'require', 'tile')
-##     widgets_to_ttkify = [] # add widgets one by one until error,
-##                            # then find cause, fix, continue...
-##     #'text','scrollbar','button','frame','labelframe','label','combobox', etc
-##     for w in widgets_to_ttkify:
-##         __ttkify(root,w)
-##     root.tk.call('tile::setTheme', 'default') # or classic or xpnative or winnative or aqua
-
-    # CB: comment out for Tile
-    Pmw.initialise(root)
     
-    topoconsole = TopoConsole()
+    topoconsole = TopoConsole(root)
     console = topoconsole
+
+    # Provide a way for other code to access the GUI when necessary
+    topo.guimain=console
+
     
     # This alows context menus to work on the Mac.  Widget code should bind
     # contextual menus to the virtual event <<right-click>>, not
@@ -180,6 +154,8 @@ def start(mainloop=False,banner=True):
     if mainloop: root.mainloop()
 
     return topoconsole
+
+
 
 
 

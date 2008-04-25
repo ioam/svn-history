@@ -14,7 +14,6 @@ from numpy.fft.helper import fftshift
 from numpy import abs
 
 import copy
-import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas, Checkbutton, BooleanVar, DISABLED, NORMAL,NO
 from tkFileDialog import asksaveasfilename
@@ -91,9 +90,9 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
 
 
     ## CB: update init args now we have no pgts.
-    def __init__(self,console,master,plotgroup,**params):
+    def __init__(self,master,plotgroup,**params):
 
-        super(TemplatePlotGroupPanel,self).__init__(console,master,plotgroup,**params)
+        super(TemplatePlotGroupPanel,self).__init__(master,plotgroup,**params)
 
         self.pack_param('strength_only',parent=self.control_frame_1,
                         on_change=self.strength_only_fn,side='right')

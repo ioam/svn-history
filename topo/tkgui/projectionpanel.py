@@ -74,8 +74,8 @@ class ProjectionSheetPanel(TemplatePlotGroupPanel):
         return (not projections == [])
 
 
-    def __init__(self,console,master,plotgroup,**params):
-        super(ProjectionSheetPanel,self).__init__(console,master,plotgroup,**params)
+    def __init__(self,master,plotgroup,**params):
+        super(ProjectionSheetPanel,self).__init__(master,plotgroup,**params)
 
         self.plotgroup.auto_refresh=False
         
@@ -110,8 +110,8 @@ class ProjectionSheetPanel(TemplatePlotGroupPanel):
 
 class ProjectionActivityPanel(ProjectionSheetPanel):
 
-    def __init__(self,console,master,plotgroup,**params):       
-        super(ProjectionActivityPanel,self).__init__(console,master,plotgroup,**params)
+    def __init__(self,master,plotgroup,**params):       
+        super(ProjectionActivityPanel,self).__init__(master,plotgroup,**params)
         self.auto_refresh = True
 
     def _plot_title(self):
@@ -122,11 +122,11 @@ class ProjectionActivityPanel(ProjectionSheetPanel):
 class UnitsPanel(ProjectionSheetPanel):
 
 
-    def __init__(self,console,master,plotgroup,**params):
+    def __init__(self,master,plotgroup,**params):
         self.initial_args=params # CEBALERT: store the initial arguments so we can get sheet,x,y in
                                  # sheet_change if any of them were specified. Isn't there a cleaner
                                  # way?
-        super(UnitsPanel,self).__init__(console,master,plotgroup,**params)
+        super(UnitsPanel,self).__init__(master,plotgroup,**params)
         self.pack_param('x',parent=self.control_frame_4,on_change=self.refresh_plots)
         self.pack_param('y',parent=self.control_frame_4,on_change=self.refresh_plots)
         self.sheet_change()
@@ -178,8 +178,8 @@ class UnitsPanel(ProjectionSheetPanel):
           
 class ConnectionFieldsPanel(UnitsPanel):
 
-    def __init__(self,console,master,plotgroup,**params):
-        super(ConnectionFieldsPanel,self).__init__(console,master,plotgroup,**params)
+    def __init__(self,master,plotgroup,**params):
+        super(ConnectionFieldsPanel,self).__init__(master,plotgroup,**params)
         self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change,side='left',expand=1)
         
     def situate_change(self):
@@ -261,8 +261,8 @@ class PlotMatrixPanel(ProjectionSheetPanel):
     
 class RFProjectionPanel(PlotMatrixPanel):
 
-    def __init__(self,console,master,plotgroup,**params):
-        super(RFProjectionPanel,self).__init__(console,master,plotgroup,**params)
+    def __init__(self,master,plotgroup,**params):
+        super(RFProjectionPanel,self).__init__(master,plotgroup,**params)
         self.pack_param('input_sheet',parent=self.control_frame_3,
                         on_modify=self.redraw_plots,side='left',expand=1,
                         widget_options={'new_default':True})
@@ -286,8 +286,8 @@ class RFProjectionPanel(PlotMatrixPanel):
     
 
 class ProjectionPanel(PlotMatrixPanel):
-    def __init__(self,console,master,plotgroup,**params):
-        super(ProjectionPanel,self).__init__(console,master,plotgroup,**params)
+    def __init__(self,master,plotgroup,**params):
+        super(ProjectionPanel,self).__init__(master,plotgroup,**params)
         self.pack_param('projection',parent=self.control_frame_3,
                         on_modify=self.redraw_plots,side='left',expand=1,
                         widget_options={'sort_fn_args':{'cmp':cmp_projections},
@@ -344,8 +344,8 @@ class CFProjectionPanel(ProjectionPanel):
     """
     Panel for displaying CFProjections.
     """
-    def __init__(self,console,master,plotgroup,**params):
-        super(CFProjectionPanel,self).__init__(console,master,plotgroup,**params)
+    def __init__(self,master,plotgroup,**params):
+        super(CFProjectionPanel,self).__init__(master,plotgroup,**params)
         self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change,side='left',expand=1)
 
     def situate_change(self):

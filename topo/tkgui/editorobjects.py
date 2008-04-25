@@ -7,8 +7,7 @@ $Id$
 __version__='$Revision$'
 
 from inspect import getdoc
-from Tkinter import Button, Label, Frame, TOP, LEFT, RIGHT, BOTTOM, E, LAST, FIRST
-import Pmw
+from Tkinter import Button, Label, Frame, TOP, LEFT, RIGHT, BOTTOM, E, LAST, FIRST, OptionMenu, StringVar,Toplevel
 import math
 
 import topo
@@ -19,6 +18,9 @@ from topo.misc.utils import shortclassname
 
 from parametersframe import ParametersFrameWithApply
 from topowidgets import TkguiWindow
+
+
+from widgets import Balloon
 
 # CEBALERT: should be a ParameterizedObject
 class EditorObject(object):
@@ -51,9 +53,9 @@ class EditorObject(object):
     def show_properties(self):
         "Show parameters frame for object."
         
-        parameter_window = TkguiWindow()
+        parameter_window = Toplevel() #CEBALERT #TkguiWindow(self)
         parameter_window.title(self.name)
-        balloon = Pmw.Balloon(parameter_window)
+        balloon = Balloon(parameter_window)
 
         title = Label(parameter_window, text = self.name)
         title.pack(side = TOP)
@@ -142,14 +144,20 @@ class EditorNode(EditorObject):
         Label(self.parameter_window, text = '\n\nConnections').pack(side = TOP)
         connections = list(set(self.to_connections).union(set(self.from_connections)))
         connection_list = [con.name for con in connections]
-        connection_menu = Pmw.ComboBox(self.parameter_window, selectioncommand = 
-            self.view_connection_parameters, scrolledlist_items = 
-            connection_list)
+
+        self.connection_var = StringVar()
+        self.connection_var.set(connection_list[0])
+        
+        connection_menu = OptionMenu(self.parameter_window,self.connection_var,*connection_list)
+
+        self.connection_var.trace_variable('w',self.view_connection_parameters)
+
         connection_menu.pack(side = TOP)
         
-    def view_connection_parameters(self, selection):
+    def view_connection_parameters(self, *args):
+        con_sel = self.connection_var.get()
         for con in self.to_connections + self.from_connections:
-            if con.name == selection:
+            if con.name == con_sel:
                 break
         else : 
             return
@@ -524,7 +532,7 @@ class EditorProjection(EditorConnection):
         self.gradient = (1,1)
         self.id = (None,None)
         self.label = None
-        self.balloon = Pmw.Balloon(canvas)
+        self.balloon = Balloon(canvas)
         self.factor = self.get_factor()
         self.receptive_field = receptive_field
         self.set_colours()
@@ -623,7 +631,9 @@ class EditorProjection(EditorConnection):
             y2 = to_position[1] - b
             self.id = (self.canvas.create_oval(x1, y1, x2, y2, fill = lateral_colour, 
                 dash = (2,2), outline = self.colour[2], width = 2), None)
+
             self.balloon.tagbind(self.canvas, self.id[0], self.name)       
+
         else :  # connection between distinct nodes
             x1, y1 = to_position
             x2, y2 = from_position
@@ -658,6 +668,7 @@ class EditorProjection(EditorConnection):
             y2 = to_position[1] - b
             self.id = (self.canvas.create_oval(x1, y1, x2, y2, fill = lateral_colour, 
                 dash = (2,2), outline = self.colour[2], width = 2), None)
+
             self.balloon.tagbind(self.canvas, self.id[0], self.name)
 
         else :  # connection between distinct nodes

@@ -26,8 +26,57 @@ import code
 import StringIO
 import __main__
 
-import Pmw
-import bwidget
+
+
+########## Barely wrapped widgets from Tile
+
+class Progressbar(Tkinter.Widget):
+    def __init__(self, master=None, cnf={}, **kw):
+        Widget.__init__(self, master, "ttk::progressbar", cnf, kw)
+        
+    def step(self, amount=1.0):
+        """Increments the -value by amount. amount defaults to 1.0 
+        if omitted. """
+        return self.tk.call(self._w, "step", amount)
+        
+    def start(self):
+        self.tk.call("ttk::progressbar::start", self._w)
+        
+    def stop(self):
+        self.tk.call("ttk::progressbar::stop", self._w)
+
+
+
+# Barely wrapped tooltip from tklib.
+# CB: this isn't the right way to do it, and it breaks menubar
+# tips for some reason, but user code didn't have to change.
+from Tkinter import Widget
+class Balloon(Widget):
+    
+    _tkname = '::tooltip::tooltip'
+
+    def __init__(self,master,cnf={},**kw):
+        master.tk.call("package","require","tooltip")
+        Tkinter.Widget.__init__(self, master,self._tkname, cnf, kw)
+
+    def bind(self,*args):
+        """
+        e.g. for a Button b and a Menu m with item 'Quit' in a Toplevel t
+        
+        balloon = Balloon(t)
+        balloon.bind(b,'some guidance')
+        balloon.bind(m,'Quit','more guidance')
+        """
+        if len(args)>2:            
+            self.tk.call(self._tkname,args[0]._w,'-index',args[1],args[2])
+        else:
+            self.tk.call(self._tkname,*args)
+
+    def tagbind(self,*args,**kw):
+        print "### Balloon.tagbind(): not yet implemented error ###"
+
+
+########## 
 
 
 
@@ -206,8 +255,8 @@ class TaggedSlider(Tkinter.Frame):
         # no variable: we control the slider ourselves
         self.slider = Tkinter.Scale(self,variable=None,
                     from_=self.bounds[0],to=self.bounds[1],
-                    showvalue=0,orient='horizontal',length=slider_length,
-                    **slider_extra_config)
+                    orient='horizontal',length=slider_length,
+                    showvalue=0,**slider_extra_config)
         
         self.slider.pack(side='right',expand="yes",fill='x')
         self.slider.bind('<ButtonRelease-1>', self._slider_used)
@@ -358,146 +407,6 @@ class TaggedSlider(Tkinter.Frame):
 
 
 
-class InterpreterComboBox(Pmw.ComboBox):
-    """
-    Subclass of Pmw.ComboBox to allow null strings to be passed to
-    the interpreter.
-    """
-    def _addHistory(self):
-        input = self._entryWidget.get()
-        if input == '':
-            self['selectioncommand'](input)
-        else:
-            Pmw.ComboBox._addHistory(self)
-
-
-class OutputText(Tkinter.Text):
-    """
-    A Tkinter Text widget but with some convenience methods.
-
-    (Notably the Text stays DISABLED (i.e. not editable)
-    except when we need to display new text).
-    """
-
-    def append_cmd(self,cmd,output):
-        """
-        Print out:
-        >>> cmd
-        output
-
-        And scroll to the end.
-        """
-        self.config(state="normal")
-        self.insert("end",">>> "+cmd+"\n"+output)
-        self.insert("end","\n")
-        self.config(state="disabled")        
-        self.see("end")
-
-    def append_text(self,text):
-        """
-        Print out:
-        text
-
-        And scroll to the end.
-        """
-        self.config(state="normal")
-        self.insert("end",text)
-        self.insert("end","\n")
-        self.config(state="disabled")
-        self.see("end")
-
-
-
-# CB: can we embed some shell or even ipython instead? Maybe not
-# ipython for a while:
-# http://lists.ipython.scipy.org/pipermail/ipython-user/2006-March/003352.html
-# If we were to use ipython as the default interpreter for
-# topographica, then we wouldn't need any of this, since all platforms
-# could have a decent command line (could users override what they
-# wanted to use as their interpreter in a config file?).  Otherwise
-# maybe we can turn this into something capable of passing input to
-# and from some program that the user can specify?
-class CommandPrompt(Tkinter.Frame):
-    """
-    A Tkinter Frame that provides simple access to python interpreter.
-
-    Useful when there is no decent system terminal (e.g. on Windows).
-
-    Provides status messages to any supplied msg_bar (which should be a Pmw.MessageBar).
-    """
-    def __init__(self,master,msg_bar=None,**config):
-        Tkinter.Frame.__init__(self,master,**config)
-
-
-        self.msg_bar=msg_bar
-        self.balloon = Pmw.Balloon(self)
-
-        # command interpreter for executing commands (used by exec_cmd).
-        self.interpreter = code.InteractiveConsole(__main__.__dict__)
-        
-        ### Make a ComboBox (command_entry) for entering commands.
-        self.command_entry=InterpreterComboBox(self,autoclear=1,history=1,dropdown=1,
-                                               label_text='>>> ',labelpos='w',
-                                               # CB: if it's a long command, the gui obviously stops responding.
-                                               # On OS X, a spinning wheel appears. What about linux and win?
-                                               selectioncommand=self.exec_cmd)
-        
-        self.balloon.bind(self.command_entry,
-             """Accepts any valid Python command and executes it in main as if typed at a terminal window.""")
-
-        scrollbar = Tkinter.Scrollbar(self)
-        scrollbar.pack(side='right', fill='y')
-        # CEBALERT: what length history is this going to keep?
-        self.command_output = OutputText(self,
-                                         state='disabled',
-                                         height=10,
-                                         yscrollcommand=scrollbar.set)
-        self.command_output.pack(side='top',expand='yes',fill='both')
-        scrollbar.config(command=self.command_output.yview)
-
-        self.command_entry.pack(side='bottom',expand='no',fill='x')
-
-
-    def exec_cmd(self,cmd):
-        """
-        Pass cmd to the command interpreter.
-
-        Redirects sys.stdout and sys.stderr to the output text window
-        for the duration of the command.
-        """   
-        capture_stdout = StringIO.StringIO()
-        capture_stderr = StringIO.StringIO()
-
-        # capture output and errors
-        sys.stdout = capture_stdout
-        sys.stderr = capture_stderr
-
-        if self.interpreter.push(cmd):
-            self.command_entry.configure(label_text='... ')
-            result = 'Continue: ' + cmd
-        else:
-            self.command_entry.configure(label_text='>>> ')
-            result = 'OK: ' + cmd
-
-        output = capture_stdout.getvalue()
-        error = capture_stderr.getvalue()
-
-        self.command_output.append_cmd(cmd,output)
-        
-        if error:
-            self.command_output.append_text("*** Error:\n"+error)
-            
-        # stop capturing
-        sys.stdout = sys.__stdout__
-        sys.stderr = sys.__stderr__
-                
-        capture_stdout.close()
-        capture_stderr.close()
-
-        if self.msg_bar: self.msg_bar.message('state', result)
-
-        self.command_entry.component('entryfield').clear()
-
 
 
 class FocusTakingButton(Tkinter.Button):
@@ -510,7 +419,7 @@ class FocusTakingButton(Tkinter.Button):
     def __init__(self, master=None, cnf={}, **kw):
         Tkinter.Button.__init__(self,master=master,cnf=cnf,**kw)
         self.bind("<Enter>", lambda e=None,x=self: x.focus_set())
-        self['highlightthickness']=0
+        #self['highlightthickness']=0
 
 
 
@@ -532,9 +441,12 @@ class EditableOptionMenu(Tkinter.OptionMenu):
     """
     def __init__(self, master, variable, value, *values, **kwargs):
         """copy-paste-modified from Tkinter.OptionMenu, works the same way"""
-        kw = {"borderwidth": 2, "textvariable": variable,
-              "indicatoron": 1, "relief": Tkinter.RAISED, "anchor": "c",
-              "highlightthickness": 2}
+##         kw = {"borderwidth": 2, "textvariable": variable,
+##               "indicatoron": 1, "relief": Tkinter.RAISED, "anchor": "c",
+##               "highlightthickness": 2}
+
+        kw = {"textvariable": variable}
+
         Tkinter.Widget.__init__(self, master, "menubutton", kw)
         self.widgetName = 'tk_optionMenu'
         menu = self.__menu = Tkinter.Menu(self, name="menu", tearoff=0)
@@ -619,3 +531,113 @@ elif platform.system()=='Darwin' or platform.mac_ver()[0]:
 elif platform.system()=='Windows':
     system_platform = 'win'
 ##########
+
+
+
+
+
+
+######################################################################            
+######################################################################
+
+# Might wonder why we need <<SizeRight>> event, and don't just use the
+# <Configure> event for calling sizeright: Can't distinguish manual
+# resize from autoresizing.
+
+
+import Tkinter as T
+from scrodget import Scrodget
+
+
+class ScrolledFrame(T.Frame):
+    """
+    XXXX
+    
+    Content to be scrolled should go in the 'content' frame.
+    """
+    def __init__(self,parent,**config):
+        T.Frame.__init__(self,parent,**config)
+
+        self.canvas = T.Canvas(self)
+        self.canvas.pack()
+        self.canvas.configure(width=0,height=0)
+        
+        self.sc = Scrodget(self,autohide=1)
+        self.sc.associate(self.canvas)
+        self.sc.pack(expand=1,fill="both")
+        
+        self.content = T.Frame(self.canvas)
+        self.content.title = lambda x: self.title(x)
+        self.content._gah = self # ALERT
+        
+        self.canvas.create_window(0,0,window=self.content,anchor='nw')
+
+        self.bind("<<SizeRight>>",self.sizeright)
+
+
+    def title(self,*args):
+        print "title HACK"
+
+
+    def sizeright(self,event=None):
+        self.content.update_idletasks()
+        self.canvas.configure(scrollregion=(0, 0, self.content.winfo_width(),
+                                           self.content.winfo_height()))
+        self.canvas.configure(width=self.content.winfo_width(),
+                             height=self.content.winfo_height())
+
+
+
+
+class ScrolledWindow(T.Toplevel):
+
+    def __init__(self,parent,**config):
+        T.Toplevel.__init__(self,parent,**config)
+        self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
+        self._scrolledframe = ScrolledFrame(self)
+        self._scrolledframe.pack(expand=1,fill='both')
+        self.content = self._scrolledframe.content
+      
+    def sizeright(self,event=None):
+        self._scrolledframe.sizeright()
+        self.geometry('')
+
+
+
+
+def with_busy_cursor(fn):
+    """
+    Decorator to show busy cursor for duration of fn call.
+    """
+    def busy_fn(widget,*args,**kw):
+        widget['cursor']='watch'
+        widget.update_idletasks()
+        fn(widget,*args,**kw)
+        widget['cursor']=''
+    return busy_fn
+
+
+
+
+class StatusBar(T.Frame):
+
+    def __init__(self, master):
+        T.Frame.__init__(self, master)
+        self.label = T.Label(self, borderwidth=1, relief='sunken', anchor='w')
+        self.label.pack(fill='x')
+
+    def message(self,chuck=None,message=None):
+        self.set(message)
+
+    def set(self, format, *args):
+        self.label.config(text=format % args)
+        self.label.update_idletasks()
+
+    def clear(self):
+        self.label.config(text="")
+        self.label.update_idletasks()
+
+
+
+
+

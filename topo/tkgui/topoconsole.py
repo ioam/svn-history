@@ -20,12 +20,12 @@ import webbrowser
 from math import fmod,floor
 from inspect import getdoc
 
+from Tile import Notebook
 import Tkinter
 from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
      LEFT, RIGHT, YES, NO, BOTH, Label, Text, END, DISABLED, NORMAL, Scrollbar, Y
 import tkMessageBox
 from tkFileDialog import asksaveasfilename,askopenfilename
-import Pmw
 
 import topo
 from topo.base.parameterizedobject import ParameterizedObject
@@ -36,13 +36,14 @@ from topo.misc.commandline import sim_name_from_filename
 import topo.commands.basic
 
 import topo.tkgui 
-from widgets import TaggedSlider,ControllableMenu, CommandPrompt, system_platform
+from widgets import TaggedSlider,ControllableMenu, system_platform,StatusBar,Balloon,ScrolledFrame
 from topowidgets import ScrolledTkguiWindow,TkguiWindow,ProgressWindow,ProgressController
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from featurecurvepanel import FeatureCurvePanel
 from projectionpanel import CFProjectionPanel,ProjectionActivityPanel,ConnectionFieldsPanel,RFProjectionPanel
 from testpattern import TestPattern
 from editorwindow import ModelEditor
+
 
 
 
@@ -81,6 +82,29 @@ plotpanel_classes = {}
 
 
 
+def open_plotgroup_panel(class_,plotgroup=None,**kw):
+
+    if class_.valid_context():
+        frame = topo.guimain.some_area.new_frame()
+        panel = class_(frame.content,plotgroup=plotgroup,**kw)
+
+        if not panel.dock:
+            topo.guimain.some_area.eject(frame)
+            panel.refresh_title()
+        else:
+            topo.guimain.some_area.unhide(frame)
+
+        panel.pack(expand='yes',fill='both')
+        frame.sizeright()
+        
+        topo.guimain.messageBar.message('state', 'OK')
+        return panel
+    else:
+        topo.guimain.messageBar.message(
+            'state',
+            'No suitable objects in this simulation for this operation.')
+
+
 
         
 
@@ -89,7 +113,7 @@ class PlotsMenuEntry(ParameterizedObject):
     Stores information about a Plots menu command
     (including the command itself, and the plotgroup template).
     """
-    def __init__(self,console,plotgroup,class_=TemplatePlotGroupPanel,**params):
+    def __init__(self,plotgroup,class_=TemplatePlotGroupPanel,**params):
         """
         Store the template, and set the class that will be created by this menu entry
 
@@ -101,7 +125,6 @@ class PlotsMenuEntry(ParameterizedObject):
         """
         super(PlotsMenuEntry,self).__init__(**params)
 
-        self.console = console
         self.plotgroup = plotgroup
 
         # Special cases.  These classes are specific to the topo/tkgui
@@ -113,37 +136,94 @@ class PlotsMenuEntry(ParameterizedObject):
         self.class_ = plotpanel_classes.get(self.plotgroup.name,class_)
         
 
-    def __call__(self,event=None,**args):
+    def __call__(self,event=None,**kw):
         """
         Instantiate the class_ (used as menu commands' 'command' attribute).
 
         Keyword args are passed to the class_.
-
-        (event is a dummy argument to allow use in callbacks.)
         """
-        if self.class_.valid_context():
-            # window hidden while being constructed to improve appearance
-            window = ScrolledTkguiWindow(); window.withdraw()
-            new_plotgroup = copy.deepcopy(self.plotgroup)
+        new_plotgroup = copy.deepcopy(self.plotgroup)
 
-            # CB: hack to share plot_templates with the current plotgroup in plotgroups
-            new_plotgroup.plot_templates = topo.plotting.plotgroup.plotgroups[self.plotgroup.name].plot_templates
-            panel = self.class_(self.console,window.content,new_plotgroup,**args)
-            panel.pack(expand='yes',fill='both')
-            window.deiconify()
-            window._scroll_frame.sizeright()
+        # CB: hack to share plot_templates with the current
+        # plotgroup in plotgroups
+        new_plotgroup.plot_templates = topo.plotting.plotgroup.plotgroups[self.plotgroup.name].plot_templates
 
-            self.console.messageBar.message('state', 'OK')
-            return panel
+        return open_plotgroup_panel(self.class_,new_plotgroup,**kw)
+
+
+
+
+import Tile
+
+class FrameManager(Tile.Notebook):
+    """Manages windows that can be tabs in a notebook, or toplevels."""
+    def __init__(self, master=None, cnf={}, **kw):
+        Notebook.__init__(self, master, cnf=cnf, **kw)
+        self._tab_ids = {}
+
+    def _get_window_of_frame(self,f):
+        paths = self.tk.call("wm","stackorder",topo.guimain._w)
+        L = f._w.split('.')
+        L.pop(0)
+        w_path = "."+".".join(L)
+        return w_path
+
+    def _set_toplevel_title(self,frame,title):
+        w_path = self._get_window_of_frame(frame)
+        self.tk.call("wm","title",w_path,title)
+        p = '@'+resolve_path('topo/tkgui/icons/topo.xbm')
+        self.tk.call("wm","iconbitmap",w_path,p)
+
+    def _set_tab_title(self,frame,title):
+        self.tab(self._tab_ids[frame],text=title)
+
+    def add(self, child, cnf={}, **kw):
+        # CBERRORALERT: haven't yet implemented proper tracking of IDs
+        i = len(self.tabs()) # oh dear
+        self._tab_ids[child]=i
+
+        if hasattr(child,'title') and not hasattr(child,'_old_title'):
+            child._old_title = child.title
+
+        child.title = lambda x: self._set_tab_title(child,x)
+
+        #kw['state']='hidden'            
+        Tile.Notebook.add(self,child,cnf=cnf,**kw)
+
+
+    def unhide(self,frame):
+        if frame in self._tab_ids:
+            self.tab(self._tab_ids[frame],state='normal')
+
+            
+
+    def new_frame(self):
+        f=ScrolledFrame(self)
+        self.add(f,state='hidden')
+        return f
+
+    def consume(self,f):
+        if f not in self._tab_ids:
+            self.tk.call('wm','forget',f._w)
+            self.add(f)
         else:
-            self.console.messageBar.message('state',
-                                            'No suitable objects in this simulation for this operation.')
+            print f,"already in"
+
         
-    command = __call__        
+    def eject(self,f):
+        if f in self._tab_ids:
+            self.forget(self._tab_ids[f])
+            del self._tab_ids[f]
+            self.tk.call('wm','manage',f._w)
+            f.title=lambda x: self._set_toplevel_title(f,x)
+            return f
+        else:
+            print f,"not in"
 
 
-# when this becomes a TkPO, we can have parameters for various things (e.g. title base)
-class TopoConsole(TkguiWindow):
+
+from tkparameterizedobject import TkParameterizedObject
+class TopoConsole(TkguiWindow,TkParameterizedObject):
     """
     Main window for the Tk-based GUI.
     """
@@ -152,10 +232,16 @@ class TopoConsole(TkguiWindow):
         """Allow dictionary-style access to the menu bar."""
         return self.menubar[menu_name]
 
-    
-    def __init__(self,**config):
 
-        TkguiWindow.__init__(self,**config)
+        
+
+
+
+    
+    def __init__(self,root,**params):
+
+        TkguiWindow.__init__(self,root)
+        TkParameterizedObject.__init__(self,root,**params)
 
         self.auto_refresh_panels = []
         self._init_widgets()
@@ -163,8 +249,6 @@ class TopoConsole(TkguiWindow):
                                   # So topo.misc.commandline sets the title as its last action (if -g)
 
 
-        # Provide a way for other code to access the GUI when necessary
-        topo.guimain=self
 
         # catch click on the 'x': offers choice to quit or not
         self.protocol("WM_DELETE_WINDOW",self.quit_topographica)
@@ -185,10 +269,8 @@ class TopoConsole(TkguiWindow):
         ##########
 
     def title(self,t=None):
-        if t is None:
-            newtitle = "Topographica"
-        else:
-            newtitle = "Topographica: %s" % t
+        newtitle = "Topographica"
+        if t: newtitle+=": %s" % t
         TkguiWindow.title(self,newtitle)
         
 
@@ -198,31 +280,38 @@ class TopoConsole(TkguiWindow):
         ## status bar could be improved to show all tasks?
 
         ### Status bar
-	self.messageBar = Pmw.MessageBar(self,
-                                         entry_width = 45,
-                                         entry_relief='groove')
+	self.messageBar = StatusBar(self.content)                                   
+                                   
 	self.messageBar.pack(side = BOTTOM,fill=X,padx=4,pady=8)
 	self.messageBar.message('state', 'OK')
 
+
+        self.some_area = FrameManager(self)
+        self.some_area.pack(fill="both", expand=1)
+        
+        
+
 	### Balloon, for pop-up help
-	self.balloon = Pmw.Balloon(self)
+	self.balloon = Balloon(self.content)
 
 	### Top-level (native) menu bar
-        # (There is no context-sensitive help for the menu because mechanisms
-        #  for implementing it are not available on all platforms. We used to
-        #  have a Pmw Balloon bound to the menu, with its output directed to
-        #  the status bar.)
-	self.menubar = ControllableMenu(self)       
+	self.menubar = ControllableMenu(self.content)       
         self.configure(menu=self.menubar)
+
+        #self.menu_balloon = Balloon(topo.tkgui.root)
+
+        # no menubar in tile yet
+        # http://news.hping.org/comp.lang.tcl.archive/4679.html
 
         self.__simulation_menu()
         self.__plots_menu()
         self.__help_menu()
 
         ### Running the simulation
-        # CB: could replace with bwidget LabelFrame, if necessary
-        run_frame = Tkinter.Frame(self,bd=2,relief=Tkinter.GROOVE)
+        run_frame = Tkinter.Frame(self.content)
         run_frame.pack(side='top',fill='x',padx=4,pady=8)
+
+        self.run_frame = run_frame
         
         Label(run_frame,text='Run for: ').pack(side=LEFT)
         
@@ -251,6 +340,7 @@ class TopoConsole(TkguiWindow):
         self.step_button = Button(run_frame,text="Step",command=self.run_step)
         self.balloon.bind(self.step_button,"Run the simulation through the time at which the next events are processed.")
         self.step_button.pack(side=LEFT)
+        self.sizeright()
 
 
     def __simulation_menu(self):
@@ -264,13 +354,15 @@ class TopoConsole(TkguiWindow):
         simulation_menu.add_command(label='Load snapshot',command=self.load_snapshot)
         simulation_menu.add_command(label='Save snapshot',command=self.save_snapshot)
         #simulation_menu.add_command(label='Reset',command=self.reset_network)
-        simulation_menu.add_command(label='Test Pattern',command=self.open_test_pattern_window)
+        simulation_menu.add_command(label='Test Pattern',command=self.open_test_pattern)
+
         simulation_menu.add_command(label='Model Editor',command=self.open_model_editor)
-        simulation_menu.add_command(label='Command prompt',command=self.open_command_prompt)
         simulation_menu.add_command(label='Quit',command=self.quit_topographica)
 
         
 
+    def open_test_pattern(self):
+        return open_plotgroup_panel(TestPattern)
 
     def __plots_menu(self):
         """
@@ -281,7 +373,7 @@ class TopoConsole(TkguiWindow):
         entries=KeyedList() # keep the order of plotgroup_templates (which is also KL)
         categories = []
         for label,plotgroup in plotgroups.items():
-            entries[label] = PlotsMenuEntry(self,plotgroup)
+            entries[label] = PlotsMenuEntry(plotgroup)
             categories.append(plotgroup.category)
         categories = sorted(set(categories))
 
@@ -293,7 +385,8 @@ class TopoConsole(TkguiWindow):
         assert 'Basic' in categories, "'Basic' is the category for the standard Plots menu entries."
         for label,entry in entries:
             if entry.plotgroup.category=='Basic':
-                    plots_menu.add_command(label=label,command=entry.command)
+                    plots_menu.add_command(label=label,command=entry.__call__)
+                    
         categories.remove('Basic')
 
         plots_menu.add_separator()
@@ -307,7 +400,7 @@ class TopoConsole(TkguiWindow):
             # could probably search more efficiently than this
             for label,entry in entries:
                 if entry.plotgroup.category==category:
-                    category_menu.add_command(label=label,command=entry.command)
+                    category_menu.add_command(label=label,command=entry.__call__)
 
             
         plots_menu.add_separator()
@@ -467,43 +560,17 @@ class TopoConsole(TkguiWindow):
                 self.update_idletasks()
 
 
-    def open_command_prompt(self):
-        prompt_win = TkguiWindow()
-        prompt_win.title("Topographica Command Prompt")
-        CommandPrompt(prompt_win,self.messageBar).pack(expand='yes',fill='both')
-        
-
         
 
     def open_model_editor(self):
         """Start the Model editor."""
-	return ModelEditor()
+        return ModelEditor(self)
 
 
-
-
-    def open_test_pattern_window(self):
-        """
-        Test Pattern Window.  
-        """
-        if TestPattern.valid_context():
-            window = ScrolledTkguiWindow() ; window.withdraw()
-            panel = TestPattern(self,window.content)
-            panel.pack(expand='yes',fill='both')
-            window.deiconify()
-            window._scroll_frame.sizeright()
-
-
-            self.messageBar.message('state', 'OK')
-            return panel
-        else:
-            self.messageBar.message('state',
-                                    'No suitable objects in this simulation for this operation.')
-            
 
 
     def new_about_window(self):
-        win = TkguiWindow()
+        win = TkguiWindow(self)
         win.withdraw()
         win.title("About Topographica")
         text = Label(win,text=topo.about(display=False),justify=LEFT)
@@ -562,9 +629,9 @@ class TopoConsole(TkguiWindow):
 
         # CB: clean up (+ docstring)
         if fduration>9:
-            ProgressWindow()
+            ProgressWindow(self)
         else:
-            ProgressController()
+            ProgressController(self)
             
         topo.sim.run_and_time(fduration)
         self.auto_refresh()
@@ -596,7 +663,7 @@ class TopoConsole(TkguiWindow):
         """
         Provide a convenient link to progress bars.
         """
-        return ProgressWindow(timer=timer,title=title)
+        return ProgressWindow(self,timer=timer,title=title)
 
 
 

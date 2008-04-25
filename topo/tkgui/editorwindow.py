@@ -40,7 +40,8 @@ class EditorCanvas(Canvas):
     """
 
     def __init__(self, root = None, width = 600, height = 600):
-        Canvas.__init__(self, root, width = width, height = height, bg = "white", bd = 2, relief = SUNKEN)
+        Canvas.__init__(self, root, width = width, height = height)
+        # bg = "white", bd = 2, relief = SUNKEN)
         self.panel = Frame(root)
         self.panel.pack(side = TOP, fill = X)
         # Top bar of the canvas, allowing changes in size, display and to force refresh.
@@ -521,31 +522,41 @@ class ModelEditor(object):
     three-option toolbar in a Frame along the left side of the window.
     """
 
-    def __init__(self):
+    def __init__(self,master):
         
         # create editor window and set title
-        root = TkguiWindow()
+        root = TkguiWindow(master)
         root.title("Model Editor")
-        # create a GUICanvas and place it in a frame
-        canvas_frame = Frame(root, bg = 'white')
-        canvas = EditorCanvas(canvas_frame)
-    
-        # create the three toolbar items and place them into a frame
-        frame = Frame(root, bg = 'light grey', bd = 2)
-        parameters_tool = ParametersTool(frame)
-        arrow_tool = ArrowTool(canvas, frame, parameters_tool) # movement arrow toolbar item
-        object_tool = NodeTool(canvas, frame, parameters_tool) # object creation toolbar item
-        connection_tool = ConnectionTool(canvas, frame, parameters_tool) # connection toolbar item
-        parameters_tool.pack(side = TOP)
-        frame.pack(side = LEFT, fill = Y) # pack the toolbar on the left
-        canvas.pack(fill = BOTH, expand = YES) # pack the canvas and allow it to be expanded
-        canvas_frame.pack(fill = BOTH, expand = YES) # pack the canvas frame into the window; expandable
+
+        canvas_frame = Frame(root) #, bg = 'white')
+        canvas_frame.pack(side='right',fill = BOTH, expand = YES)
+
+        toolbar_frame = Frame(root)#, bg = 'light grey', bd = 2)
+        toolbar_frame.pack(side=LEFT,fill=Y) 
+
+        self.canvas = EditorCanvas(canvas_frame)
+        self.canvas.pack(fill = BOTH, expand = YES)     
+
+
+        # object/node = sheet
+        
+        parameters_tool = ParametersTool(toolbar_frame)
+        arrow_tool=ArrowTool(self.canvas,toolbar_frame,parameters_tool)
+        object_tool=NodeTool(self.canvas,toolbar_frame,parameters_tool)
+        connection_tool=ConnectionTool(self.canvas,toolbar_frame,parameters_tool)
+
+        arrow_tool.pack(side='top')
+        object_tool.pack(side='top')
+        connection_tool.pack(side='top')
+        parameters_tool.pack(side='top')
+
+
         # give the canvas a reference to the toolbars
-        canvas.set_tool_bars(arrow_tool, connection_tool, object_tool) 
+        self.canvas.set_tool_bars(arrow_tool, connection_tool, object_tool) 
 
         # give the canvas focus and import any objects and connections already in the simulation
-        canvas.focus_set()
-        self.canvas = canvas
+        self.canvas.focus_set()
+
 
         # Grid layout defaults
         self.xstart = 100

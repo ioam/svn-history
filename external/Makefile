@@ -1,15 +1,16 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-default: python jpeg pil numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis bwidget ipython gmpy
+default: python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy snit tilewrapper scrodget tklib
+
 
 all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
 
 dist: bluesphere
 
-clean: python-clean jpeg-clean pil-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean tile-clean tilewrapper-clean bwidget-clean psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean tile-clean gmp-clean mxnumber-clean gmpy-clean
+clean: python-clean jpeg-clean pil-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean scipy-clean mlabwrap-clean ipython-clean libsndfile-clean pyaudiolab-clean tile-clean tilewrapper-uninstall psyco-clean pyrex-clean hdf5-clean pytables-clean gnuplotpy-clean bluesphere-clean player-clean progressbar-clean stage-clean gmp-clean mxnumber-clean gmpy-clean scrodget-clean tklib-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-clean bwidget-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall tile-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall tile-uninstall tilewrapper-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall tile-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall scrodget-uninstall tklib-uninstall
 
 
 
@@ -77,9 +78,9 @@ python-uninstall: blt-uninstall
 ##############################################################
 # Tcl (required by Tk GUI toolkit)
 #
-TCL = tcl8.4.13
-TCL_UNINSTALL += bin/tclsh8.4 bin/wish8.4 lib/tclConfig.sh
-TCL_UNINSTALL += lib/tcl8.4 lib.tclConfig.sh lib/libtcl8.4.so lib/libtclstub8.4.a
+TCL = tcl8.5.1
+TCL_UNINSTALL += bin/tclsh8.5 bin/wish8.5 lib/tclConfig.sh
+TCL_UNINSTALL += lib/tcl8.5 lib.tclConfig.sh lib/libtcl8.5.so lib/libtclstub8.5.a
 TCL_UNINSTALL += include/tcl*.h man/man*
 
 tcl: ${TCL}-src.tar.gz
@@ -98,14 +99,16 @@ tcl-uninstall:
 ##############################################################
 # Tk (GUI toolkit)
 #
-TK = tk8.4.13
+TK = tk8.5.1
 
-TK_UNINSTALL += lib/tk8.4 lib/libtk8.4.so lib/libtkstub8.4.a
+TK_UNINSTALL += lib/tk8.5 lib/libtk8.5.so lib/libtkstub8.5.a
 TK_UNINSTALL += include/tk*.h lib/tkConfig.sh
+
+# sudo apt-get install libxft-dev
 
 tk: ${TK}-src.tar.gz tcl
 	tar -xzf ${TK}-src.tar.gz
-	cd ${TK}/unix; ./configure --prefix=${PREFIX}
+	cd ${TK}/unix; ./configure --prefix=${PREFIX} --enable-xft
 	make -C ${TK}/unix install
 	touch tk
 
@@ -113,6 +116,27 @@ tk-clean:
 	rm -rf ${TK} tk8*/
 tk-uninstall:
 	rm -rf tk ${foreach f,${TK_UNINSTALL}, ${PREFIX}/${f}} tk8*/
+
+
+
+##############################################################
+# Tklib (GUI toolkit)
+#
+TKLIB = tklib-CVS20080114
+
+TKLIB_UNINSTALL += lib/tklib0.4.1.0/ 
+
+# sudo apt-get install libxft-dev
+
+tklib: ${TKLIB}.tar.gz tcl tk
+	tar -xzf ${TKLIB}.tar.gz
+	cd ${TKLIB}; ${PREFIX}/bin/tclsh8.5 installer.tcl -no-gui -no-wait -no-html -no-nroff -no-examples -pkgs
+	touch tklib
+
+tklib-clean:
+	rm -rf  ${TKLIB} 
+tklib-uninstall:
+	rm -rf tklib ${foreach f,${TKLIB_UNINSTALL}, ${PREFIX}/${f}}
 
 
 
@@ -237,24 +261,6 @@ matplotlib-clean:
 matplotlib-uninstall:
 	rm -rf matplotlib ${MATPLOTLIB} $(foreach f, ${MATPLOTLIB_UNINSTALL}, ${PREFIX}/${f}) matplotlib-0.90*/
 
-
-##############################################################
-# PMW (graphical toolkit)
-#
-PMW = Pmw
-PMW_UNINSTALL = ${PYTHON_LIB}/site-packages/Pmw
-
-pmw: ${PMW}.tgz python Pmw.diff 
-	make pmw-uninstall
-	tar -xzf ${PMW}.tgz
-	cd ${PMW}; patch -p0 < ../Pmw.diff
-	cp -r ${PMW} ${PREFIX}/${PYTHON_LIB}/site-packages/Pmw
-	touch pmw
-
-pmw-clean:
-	rm -rf ${PMW} 
-pmw-uninstall:
-	rm -rf pmw ${PREFIX}/${PMW_UNINSTALL}
 
 
 ##############################################################
@@ -514,63 +520,55 @@ mlabwrap-uninstall:
 
 
 ##############################################################
-# TILE (extension to tk; actually a part of tk 8.5)
-#
-TILE = tile-0.7.8
-
-TILE_UNINSTALL += lib/tile0.7.8 lib/libttkstub.a
-TILE_UNINSTALL += include/ttk*.h
-
-tile: ${TILE}.tar.gz tk
-	tar -xzf ${TILE}.tar.gz
-	cd ${TILE}/generic; ./configure --prefix=${PREFIX}
-	make -C ${TILE}/generic install
-	touch tile
-
-tile-clean:
-	rm -rf ${TILE} tile-*/
-tile-uninstall:
-	rm -rf tile ${foreach f,${TILE_UNINSTALL}, ${PREFIX}/${f}} tile-*/
-
-
-##############################################################
-# TILEWRAPPER (makes tile easy to use from tkinter)
+# TILEWRAPPER (easier access to ttk widgets from within python)
 #
 TILEWRAPPER = Tile
 
-TILEWRAPPER_UNINSTALL += ${PYTHON_LIB}/site-packages/Tile.py*
-
-# CB: I've made a bit of a meal out of simply copying
-# Tile.py to the site-packages directory!
-tilewrapper: ${TILEWRAPPER}.py.gz tile
-	gzip -dc ${TILEWRAPPER}.py.gz > ${TILEWRAPPER}.py
-	cp ${TILEWRAPPER}.py ${PREFIX}/${PYTHON_LIB}/site-packages/
+tilewrapper: python
+	cp Tile.py ${PREFIX}/lib/python2.5/site-packages/
 	touch tilewrapper
 
-tilewrapper-clean:
-	rm -rf ${TILEWRAPPER}.py 
 tilewrapper-uninstall:
 	rm -rf tilewrapper ${foreach f,${TILEWRAPPER_UNINSTALL}, ${PREFIX}/${f}}
 
 
+##############################################################
+# SCRODGET  (provides decent scrollbars)
+#
+SCRODGET = pyscrodget-0.0.1_2.1
+
+SCRODGET_UNINSTALL += share/pyscrodget
+SCRODGET_UNINSTALL += ${PYTHON_LIB}/site-packages/pyscrodget
+
+scrodget: ${SCRODGET}.tar.gz python snit
+	tar -xzf ${SCRODGET}.tar.gz
+	cd ${SCRODGET}; ${PREFIX}/bin/python setup.py install
+	touch scrodget
+
+scrodget-clean:
+	rm -rf  ${SCRODGET} 
+scrodget-uninstall:
+	rm -rf scrodget ${foreach f,${SCRODGET_UNINSTALL}, ${PREFIX}/${f}}
+
+
 
 ##############################################################
-# BWIDGET
+# SNIT (toolkit that scrodget uses)
 #
-BWIDGET = pybwidget-0.1.2_1.8.0
+SNIT = snit1.0
 
-BWIDGET_UNINSTALL += share/pybwidget 
-BWIDGET_UNINSTALL += ${PYTHON_LIB}/site-packages/bwidget
+SNIT_UNINSTALL += lib/tcl8.5/${SNIT}
+#SNIT_UNINSTALL += ${PYTHON_LIB}/site-packages/pysnit
 
-bwidget: ${BWIDGET}.tar.gz python
-	tar -xzf ${BWIDGET}.tar.gz
-	cd ${BWIDGET}; ${PREFIX}/bin/python setup.py install
-	touch bwidget
+snit: ${SNIT}.tar.gz tcl
+	tar -xzf ${SNIT}.tar.gz
+	cp -R ${SNIT} ${PREFIX}/lib/tcl8.5/${SNIT}
+	touch snit
 
-bwidget-clean:
-	rm -rf ${BWIDGET} 
-bwidget-uninstall:
-	rm -rf bwidget ${foreach f,${BWIDGET_UNINSTALL}, ${PREFIX}/${f}}
+snit-clean:
+	rm -rf  ${SNIT} 
+snit-uninstall:
+	rm -rf snit ${foreach f,${SNIT_UNINSTALL}, ${PREFIX}/${f}}
 
 
 

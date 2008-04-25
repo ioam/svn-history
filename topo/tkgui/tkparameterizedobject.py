@@ -120,7 +120,6 @@ import copy
 from inspect import getdoc
 from Tkinter import BooleanVar, StringVar, Frame, Checkbutton, \
      Entry, TclError
-from Pmw import Balloon
 
 from topo.base.parameterizedobject import ParameterizedObject,Parameter, \
      classlist,ParameterizedObjectMetaclass
@@ -134,7 +133,7 @@ from topo.misc.utils import eval_atof, inverse
 from topo.misc.filepaths import Filename, resolve_path
 
 from widgets import FocusTakingButton as Button2, TaggedSlider, \
-     EditableOptionMenu as OptionMenu
+     EditableOptionMenu as OptionMenu, Balloon
 from topowidgets import entry_background
 
 def lookup_by_class(dict_,class_):
@@ -1324,16 +1323,16 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         image = button_param.get_image()
         if image:
             button['image']=image
-            button['relief']='flat'
+            #button['relief']='flat'
         else:
             button['text']=self.__pretty_print(name)
             
 
         # and set size from ButtonParameter
         size = button_param.size
-        if size:
-            button['width']=size[0]
-            button['height']=size[1]
+        #if size:
+        #    button['width']=size[0]
+        #    button['height']=size[1]
 
         button.config(**widget_options) # widget_options override things from parameter
         return button

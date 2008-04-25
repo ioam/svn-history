@@ -13,8 +13,6 @@ from inspect import getdoc
 from math import floor
 
 import ImageTk
-import Pmw
-import bwidget
 
 import Tkinter, _tkinter
 from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
@@ -35,7 +33,7 @@ from topo.commands.pylabplots import matrixplot
 
 from topo.sheets.generatorsheet import GeneratorSheet
 
-from widgets import Menu
+from widgets import Menu,StatusBar,with_busy_cursor
 from tkparameterizedobject import ButtonParameter, TkParameterizedObject
 
 
@@ -53,6 +51,9 @@ CANVASBUFFER = 1
 class PlotGroupPanel(TkParameterizedObject,Frame):
 
     __abstract = True
+
+
+    dock = BooleanParameter(default=False,doc="on console or not")
 
     # Default size for images used on buttons
     button_image_size=(20,20)
@@ -102,7 +103,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
     plotgroup = property(get_plotgroup,set_plotgroup)
 
 
-    def __init__(self,console,master,plotgroup,**params):
+    def __init__(self,master,plotgroup,**params):
         """
         If your parameter should be available in history, add its name
         to the params_in_history list, otherwise it will be disabled
@@ -111,7 +112,6 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         
         TkParameterizedObject.__init__(self,master,extraPO=plotgroup,**params)
         Frame.__init__(self,master)
-        self.console=console
         
         self.setup_plotgroup()
 
@@ -139,10 +139,11 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
 	self.control_frame_2 = Frame(self)
         self.control_frame_2.pack(side=TOP,expand=NO,fill=X)
 
-	self.plot_group_title = Pmw.Group(self,tag_text=self.plotgroup.name)
-        self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)        
-        self.plot_frame = self.plot_group_title.interior() 
+	self.plot_frame = Tkinter.LabelFrame(self,text=self.plotgroup.name)
+        self.plot_frame.pack(side=TOP,expand=YES,fill=BOTH)#,padx=5,pady=5)        
 
+##         self.plot_frame = Frame(self) #self.plot_group_title.interior() 
+##         self.plot_frame.pack(side=TOP,expand=YES,fill=BOTH)
 
         # Label does have a wraplength option...but it's in screen
         # units. Surely tk has a function to convert between
@@ -174,8 +175,8 @@ e.g. for debugging.)
 
 
         #################### DYNAMIC INFO BAR ####################
-	self.messageBar = Pmw.MessageBar(self,entry_relief='groove')
-	self.messageBar.pack(side=BOTTOM,fill=X,expand=NO,padx=4,pady=8)
+	self.messageBar = StatusBar(self)
+	self.messageBar.pack(side=BOTTOM,fill=X,expand=NO)
         ##########################################################
 
 
@@ -201,6 +202,9 @@ e.g. for debugging.)
         self.pack_param('Reduce',parent=self.control_frame_1,
                         on_change=self.reduce_plots,side=LEFT)
         self.params_in_history.append('Reduce')
+
+        self.pack_param("dock",parent=self.control_frame_1,
+                        on_change=self.set_dock,side=LEFT)
 
 
         # Don't need to add these two to params_in_history because their
@@ -248,6 +252,15 @@ e.g. for debugging.)
         # CB: don't forget to include ctrl-q
         # import __main__; __main__.__dict__['qqq']=self
 
+
+    def set_dock(self):
+        if self.dock:
+            topo.guimain.some_area.consume(self.master._gah)
+            self.refresh_title()
+        else:
+            topo.guimain.some_area.eject(self.master._gah)
+            self.refresh_title()
+            
 
 
     def setup_plotgroup(self):
@@ -380,7 +393,8 @@ e.g. for debugging.)
         self.__update_widgets_for_history() # have a general update_widgets method instead (that calls update_widgets_for_history; can it also include enlarge/reduce alterations?)
         self.event_generate("<<SizeRight>>")
         
-        
+
+    @with_busy_cursor
     def refresh_plots(self):
         """
         Call plotgroup's make_plots with update=True (i.e. run
@@ -389,9 +403,9 @@ e.g. for debugging.)
         self.plotgroup.make_plots(update=True)
         self.update_plot_frame()        
         self.add_to_plotgroups_history()
-                    
-            
 
+
+    @with_busy_cursor
     def redraw_plots(self):
         """
         Call plotgroup's make_plots with update=False (i.e. run only
@@ -399,7 +413,7 @@ e.g. for debugging.)
         """
         self.plotgroup.make_plots(update=False)
         self.update_plot_frame(labels=False)
-        
+
 
     def rescale_plots(self):
         """
@@ -408,16 +422,15 @@ e.g. for debugging.)
         """
         self.plotgroup.scale_images()
         self.update_plot_frame(labels=False)
-        
 
+    
     def refresh(self,update=True):
         """
         Main steps for generating plots in the Frame. 
 
         # if update is True, the SheetViews are re-generated
         """
-        Pmw.showbusycursor()
-
+        
         # if we've been looking in the history, now need to return to the "current time"
         # plotgroup (but copy it: don't update the old one, which is a record of the previous state)
         if self.history_index!=0:
@@ -429,7 +442,6 @@ e.g. for debugging.)
         else:
             self.redraw_plots()
 
-        Pmw.hidebusycursor()
 
 
     # CEBALERT: this method needs cleaning, along with its versions in subclasses.
@@ -681,14 +693,14 @@ e.g. for debugging.)
         """
         title = self._plot_title()
         
-        self.plot_group_title.configure(tag_text=title)
-        self.master.title("%s: %s"%(topo.sim.name,title))
+        self.plot_frame.configure(text=title)
+        self.master.title(title.replace(" at time ","/"))
 
           
     def destroy(self):
         """overrides toplevel destroy, adding removal from autorefresh panels"""
-        if self.console and self in self.console.auto_refresh_panels:
-            self.console.auto_refresh_panels.remove(self)
+        if topo.guimain.auto_refresh_panels:
+            topo.guimain.auto_refresh_panels.remove(self)
         Frame.destroy(self)
             
 
@@ -715,15 +727,16 @@ class SheetPanel(PlotGroupPanel):
             return False
         
 
-    def __init__(self,console,master,plotgroup,**params):
-        super(SheetPanel,self).__init__(console,master,plotgroup,**params)
+    def __init__(self,master,plotgroup,**params):
+        super(SheetPanel,self).__init__(master,plotgroup,**params)
 
         self.pack_param('auto_refresh',parent=self.control_frame_1,
                         on_change=self.set_auto_refresh,
                         side=RIGHT)
         self.params_in_history.append('auto_refresh')
 
-        if self.auto_refresh: self.console.auto_refresh_panels.append(self)
+        if self.auto_refresh:
+            topo.guimain.auto_refresh_panels.append(self)
 
 
         self.pack_param('normalize',parent=self.control_frame_1,
@@ -785,11 +798,11 @@ class SheetPanel(PlotGroupPanel):
         auto_refresh_panels list.
         """
         if self.auto_refresh: 
-            if not (self in self.console.auto_refresh_panels):
-                self.console.auto_refresh_panels.append(self)
+            if not (self in topo.guimain.auto_refresh_panels):
+                topo.guimain.auto_refresh_panels.append(self)
         else:
-            if self in self.console.auto_refresh_panels:
-                self.console.auto_refresh_panels.remove(self)
+            if self in topo.guimain.auto_refresh_panels:
+                topo.guimain.auto_refresh_panels.remove(self)
 
 
     def _connection_fields_window(self):
@@ -801,7 +814,7 @@ class SheetPanel(PlotGroupPanel):
             sheet = topo.sim[self._right_click_info['plot'].plot_src_name]
             x,y =  self._right_click_info['coords'][1]
             # CEBERRORALERT: should avoid requesting cf out of range.
-            self.console['Plots']["Connection Fields"](x=x,y=y,sheet=sheet)
+            topo.guimain['Plots']["Connection Fields"](x=x,y=y,sheet=sheet)
             
     def _receptive_field_window(self):
         """
