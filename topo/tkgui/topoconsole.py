@@ -66,8 +66,8 @@ tutorials_locations        = ('doc/Tutorials/index.html',
                               'http://topographica.org/Tutorials/')
 reference_manual_locations = ('doc/Reference_Manual/index.html',
                               'http://topographica.org/Reference_Manual/')
-python_doc_locations = ('http://www.python.org/doc/')
-topo_www_locations = ('http://www.topographica.org/')
+python_doc_locations = ('http://www.python.org/doc/',)
+topo_www_locations = ('http://www.topographica.org/',)
 plotting_help_locations = ('doc/User_Manual/plotting.html',
                            'http://topographica.org/User_Manual/plotting.html')
 
