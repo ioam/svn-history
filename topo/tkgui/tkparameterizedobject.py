@@ -445,7 +445,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                     ObjectSelectorParameter:String_ObjectTranslator,
                     ClassSelectorParameter:CSPTranslator,
                     Number:EvalToFloatTranslator,
-                    BooleanParameter:DoNothingTranslator,
+                    BooleanParameter:BoolTranslator,
                     StringParameter:DoNothingTranslator}
         
         self.change_PO(extraPO)
@@ -1582,6 +1582,12 @@ class DoNothingTranslator(Translator):
 
     def object2string(self,object_):
         return object_
+
+# seems to be necessary after switching to tk 8.5
+# need to check it's really necessary
+class BoolTranslator(DoNothingTranslator):
+    def string2object(self,string_):
+        return bool(string_)
 
 
 # Error messages: need to change how they're reported
