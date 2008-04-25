@@ -251,6 +251,7 @@ class TaggedSlider(Tkinter.Frame):
         self.tag.pack(side='left')
         self.tag.bind('<Return>', self._tag_press_return)  
         self.tag.bind('<FocusOut>', self._tag_focus_out)
+        self.tag.bind('<Leave>', self._tag_focus_out)
 
         # no variable: we control the slider ourselves
         self.slider = Tkinter.Scale(self,variable=None,
