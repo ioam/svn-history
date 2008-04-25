@@ -63,7 +63,7 @@ from topo.projections import *
 from topo.responsefns import *
 from topo.sheets import *
 
-# CEBALERT: check if I need to import ClassSelectorParameter. I guess not.
+
 
 #
 # Define up the right click (context menu) events. These variables can
