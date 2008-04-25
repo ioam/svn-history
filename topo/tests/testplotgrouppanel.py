@@ -32,7 +32,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         self.plotgroup = PlotGroup()
         self.plotgroup.plot_list.append(self.plot)
         
-        self.pgpanel = PlotGroupPanel(topo.guimain,window,self.plotgroup)
+        self.pgpanel = PlotGroupPanel(window,self.plotgroup)
         self.pgpanel.pack()
 
         #import __main__; __main__.__dict__['p']=self.pgpanel
