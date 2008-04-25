@@ -28,7 +28,6 @@ def run_basic():
     p = 'Plots'
     
     menu_paths = [ (s,'Test Pattern'),
-                   (s,'Command prompt'),
                    (s,'Model Editor'),
                    (p,'Activity'),
                    (p,'Connection Fields'),
