@@ -36,7 +36,7 @@ from topo.misc.commandline import sim_name_from_filename
 import topo.commands.basic
 
 import topo.tkgui 
-from widgets import TaggedSlider,ControllableMenu, system_platform,StatusBar,Balloon,ScrolledFrame
+from widgets import TaggedSlider,ControllableMenu,system_platform,StatusBar,Balloon,ScrolledFrame
 from topowidgets import ScrolledTkguiWindow,TkguiWindow,ProgressWindow,ProgressController
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from featurecurvepanel import FeatureCurvePanel
@@ -230,6 +230,11 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
     Main window for the Tk-based GUI.
     """
 
+    def _getmenubar(self):
+        return self.master.menubar
+
+    menubar = property(_getmenubar)
+
     def __getitem__(self,menu_name):
         """Allow dictionary-style access to the menu bar."""
         return self.menubar[menu_name]
@@ -297,7 +302,7 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
 	self.balloon = Balloon(self.content)
 
 	### Top-level (native) menu bar
-	self.menubar = ControllableMenu(self.content)       
+	#self.menubar = ControllableMenu(self.content)       
         self.configure(menu=self.menubar)
 
         #self.menu_balloon = Balloon(topo.tkgui.root)

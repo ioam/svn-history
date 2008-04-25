@@ -70,7 +70,7 @@ from topo.sheets import *
 # be appended or overridden in .topographicarc, if the user has some
 # crazy input device.
 #
-from widgets import system_platform
+from widgets import system_platform,ControllableMenu
 
 if system_platform=='mac':
     # if it's on the mac, these are the context-menu events
@@ -117,6 +117,9 @@ def start(mainloop=False,banner=True):
     root = Tkinter.Tk()
     root.withdraw()
 
+    root.menubar = ControllableMenu(root)
+    root.configure(menu=root.menubar)
+    
     # default,clam,alt,classic
     root.tk.call("ttk::style","theme","use","classic")  
 
