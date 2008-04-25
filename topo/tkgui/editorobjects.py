@@ -632,7 +632,8 @@ class EditorProjection(EditorConnection):
             self.id = (self.canvas.create_oval(x1, y1, x2, y2, fill = lateral_colour, 
                 dash = (2,2), outline = self.colour[2], width = 2), None)
 
-            self.balloon.tagbind(self.canvas, self.id[0], self.name)       
+# CEBALERT: as far as I know, this balloon binding never worked.
+#            self.balloon.tagbind(self.canvas, self.id[0], self.name)       
 
         else :  # connection between distinct nodes
             x1, y1 = to_position
@@ -669,7 +670,7 @@ class EditorProjection(EditorConnection):
             self.id = (self.canvas.create_oval(x1, y1, x2, y2, fill = lateral_colour, 
                 dash = (2,2), outline = self.colour[2], width = 2), None)
 
-            self.balloon.tagbind(self.canvas, self.id[0], self.name)
+#            self.balloon.tagbind(self.canvas, self.id[0], self.name)
 
         else :  # connection between distinct nodes
             x1, y1 = to_position

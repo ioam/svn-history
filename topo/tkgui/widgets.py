@@ -72,8 +72,8 @@ class Balloon(Widget):
         else:
             self.tk.call(self._tkname,*args)
 
-    def tagbind(self,*args,**kw):
-        print "### Balloon.tagbind(): not yet implemented error ###"
+##     def tagbind(self,*args,**kw):
+##         print "### Balloon.tagbind(): not yet implemented error ###"
 
 
 ########## 
