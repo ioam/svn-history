@@ -493,10 +493,9 @@ class ParametersFrameWithApply(ParametersFrame):
         super(ParametersFrameWithApply,self).set_PO(parameterized_object,
                                                     on_change=on_change,
                                                     on_modify=on_modify)
-        ### Delete all variable traces
+
         # (don't want to update parameters immediately)
         for v in self._tkvars.values():
-            self.__delete_trace(v)
             v._checking_get = v.get
             v.get = v._original_get
 
@@ -574,8 +573,6 @@ class ParametersFrameWithApply(ParametersFrame):
                 w = self.representations[name]['widget']
                 if hasattr(w,'tag_set'):w.tag_set()
 
-
-    def __delete_trace(self,var): pass #var.trace_vdelete(*var.trace_vinfo()[0])
 
 
     def _defaults_button(self):
