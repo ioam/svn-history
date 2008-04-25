@@ -633,7 +633,7 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
         if fduration>9:
             ProgressWindow(self)
         else:
-            ProgressController(self)
+            ProgressController()
             
         topo.sim.run_and_time(fduration)
         self.auto_refresh()
