@@ -733,7 +733,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
           
     def destroy(self):
         """overrides toplevel destroy, adding removal from autorefresh panels"""
-        if topo.guimain.auto_refresh_panels:
+        if self in topo.guimain.auto_refresh_panels:
             topo.guimain.auto_refresh_panels.remove(self)
         Frame.destroy(self)
             
