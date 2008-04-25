@@ -32,18 +32,16 @@ class ArrowTool(Frame):
     """
 
     def __init__(self, canvas,  parent = None, parambar = None):
-        Frame.__init__(self, parent)
-        #, bg = 'light grey', bd = 4, relief = RAISED)
+        Frame.__init__(self, parent,bg = 'light grey', bd = 4, relief = RAISED)
         self.canvas = canvas # hold canvas reference
         self.parameter_tool = parambar # To display class properties and name
         # label sets canvas mode
-        self.title_label = Label(self, text="Move:")
-#, bg ='light grey')
+        self.title_label = Label(self, text="Move:", bg ='light grey')
         self.title_label.bind('<Button-1>', self.change_mode)
         self.title_label.pack()
         self.doc = 'Use the arrow tool to select and\nmove objects in the canvas around'
         # arrow icon
-        self.icon = Canvas(self, width = 35, height = 30) #bg = 'light grey', 
+        self.icon = Canvas(self, width = 35, height = 30,bg = 'light grey')
         self.icon.create_polygon(10,0, 10,22, 16,17, 22,29, 33,22, 25,13, 33,8, 
             fill = 'black', outline = 'white')
         self.icon.pack()
@@ -67,9 +65,9 @@ class ArrowTool(Frame):
             col = 'light grey'; relief = RAISED
 
         # ALERT
-        #self.config(bg = col, relief = relief)
-        #self.title_label.config(bg = col)
-        #self.icon.config(bg = col)
+        self.config(bg = col, relief = relief)
+        self.title_label.config(bg = col)
+        self.icon.config(bg = col)
 
 
 
@@ -85,8 +83,7 @@ class NodeTool(Frame):
 
     def __init__(self, canvas,  parent = None, parambar = None):
         
-        Frame.__init__(self, parent)
-#, bg = 'light grey', bd = 4, relief = RAISED)
+        Frame.__init__(self, parent,bg = 'light grey', bd = 4, relief = RAISED)
         self.canvas = canvas # hold canvas reference.
         self.parameter_tool = parambar # To display class properties and name
         # bind clicks, pack in toolbar at top and fill out in X direction
@@ -98,8 +95,7 @@ class NodeTool(Frame):
         # look like buttons again, or -better - clean up the whole
         # interface!
         
-        self.title_label = Label(self, text="Add sheet of type:")
-        #bg ='light grey')
+        self.title_label = Label(self, text="Add sheet of type:",bg ='light grey')
         self.title_label.bind('<Button-1>', self.change_mode)
         self.title_label.pack()
         self.doc = 'Use the sheet tool to click a\nsheet object into the canvas.'
@@ -142,8 +138,8 @@ class NodeTool(Frame):
             col = 'light grey'; relief = RAISED
 
         # ALERT
-        #self.config(bg = col, relief = relief)
-        #self.title_label.config(bg = col)
+        self.config(bg = col, relief = relief)
+        self.title_label.config(bg = col)
         #self.option_menu.config(bg = col)
 
 
@@ -196,16 +192,14 @@ class ConnectionTool(Frame):
 
     def __init__(self, canvas, parent = None, parambar = None):
         # super constructor call.
-        Frame.__init__(self, parent)
-        #, bg = 'light grey', bd = 4, relief = RAISED)
+        Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
         self.canvas = canvas # hold canvas reference.
         self.parameter_tool = parambar # To display class properties and name
         # bind clicks, pack in toolbar at top and fill out in X direction
         self.bind('<Button-1>', self.change_mode)
         self.pack(side = TOP, fill = X)
         # label sets canvas mode
-        self.title_label = Label(self, text="Add projection of type:")
-        #, bg ='light grey')
+        self.title_label = Label(self, text="Add projection of type:",bg ='light grey')
         self.title_label.bind('<Button-1>', self.change_mode)
         self.title_label.pack()
         self.doc = 'Use the connection tool to\ndrag connections between objects'
@@ -292,8 +286,8 @@ class ConnectionTool(Frame):
             col = 'light grey'; relief = RAISED
 
         # ALERT
-        #self.config(bg = col, relief = relief)
-        #self.title_label.config(bg = col)
+        self.config(bg = col, relief = relief)
+        self.title_label.config(bg = col)
         #self.option_menu.config(bg = col)
 
 

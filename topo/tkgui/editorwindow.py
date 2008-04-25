@@ -40,7 +40,7 @@ class EditorCanvas(Canvas):
     """
 
     def __init__(self, root = None, width = 600, height = 600):
-        Canvas.__init__(self, root, width = width, height = height)
+        Canvas.__init__(self, root, width = width, height = height,bg='white')
         # bg = "white", bd = 2, relief = SUNKEN)
         self.panel = Frame(root)
         self.panel.pack(side = TOP, fill = X)
@@ -528,10 +528,10 @@ class ModelEditor(object):
         root = TkguiWindow(master)
         root.title("Model Editor")
 
-        canvas_frame = Frame(root) #, bg = 'white')
+        canvas_frame = Frame(root,bg = 'white')
         canvas_frame.pack(side='right',fill = BOTH, expand = YES)
 
-        toolbar_frame = Frame(root)#, bg = 'light grey', bd = 2)
+        toolbar_frame = Frame(root, bg = 'light grey', bd = 2)
         toolbar_frame.pack(side=LEFT,fill=Y) 
 
         self.canvas = EditorCanvas(canvas_frame)
