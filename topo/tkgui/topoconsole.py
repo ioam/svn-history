@@ -299,7 +299,7 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
         self.some_area = FrameManager(self)
         # CB: make FrameManager pack itself if it has at least one
         # tab.
-        self.some_area.pack(fill="both", expand=1)
+##         self.some_area.pack(fill="both", expand=1)
         
         
 
