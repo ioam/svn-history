@@ -285,6 +285,8 @@ class ParametersFrame(TkParameterizedObject,Frame):
 
         self.representations[parameter_name]['row']=row
 
+        self._post_add_param(parameter_name)
+
 
 
 

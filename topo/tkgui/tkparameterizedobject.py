@@ -94,9 +94,6 @@ $Id$
 # by the user...check that we don't actually introduce a change here by
 # displaying numbers!)
 
-# ENHANCEMENT: right click menu that contains option to make number
-# dynamic or not (i.e. change representation).
-
 
 
 ## import logging
@@ -133,7 +130,7 @@ import topo # for topo.guimain only
 from topo.misc.utils import eval_atof, inverse
 from topo.misc.filepaths import Filename, resolve_path
 
-from widgets import FocusTakingButton as Button2, TaggedSlider, Balloon
+from widgets import FocusTakingButton as Button2, TaggedSlider, Balloon, Menu
 
 def lookup_by_class(dict_,class_):
     """
@@ -976,6 +973,30 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         # show up when a frame takes focus). Or there could be timer process.
 
 
+        self.popup_menu = Menu(master, tearoff=0)
+        self.test_var = BooleanVar()
+        self.popup_menu.add("checkbutton",indexname="dynamic",label="Enter dynamic value?",
+                            state="disabled",command=self._switch_dynamic,
+                            variable=self.test_var)
+
+
+    def _param_right_click(self,event,param_name):
+        
+        param,po = self.get_parameter_object(param_name,with_location=True)
+        currently_dynamic = param_is_dynamically_generated(param,po)
+        
+        if hasattr(param,'_value_is_dynamic') and not currently_dynamic:
+            self._right_click_param = param_name
+            state = "normal"
+        else:
+            self._right_click_param = None
+            state = "disabled"
+
+        self.popup_menu.entryconfig("dynamic",state=state)
+
+        self.test_var.set(currently_dynamic or param_name in self.allow_dynamic) 
+        self.popup_menu.tk_popup(event.x_root,
+                                 event.y_root)
 
 
 
@@ -1082,6 +1103,16 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 #
 ################################################################################
 
+    # some refactoring required: should be a base method that's to do
+    # with adding a representation for a parameter. then this stuff
+    # would go in it.
+    def _post_add_param(self,param_name):
+        l = self.representations[param_name]['label']
+        if l is not None:
+            l.bind('<<right-click>>',lambda event: \
+                   self._param_right_click(event,param_name))
+
+
     # CEBALERT: rename on_change and on_modify
     def pack_param(self,name,parent=None,widget_options={},
                    on_change=None,on_modify=None,**pack_options):
@@ -1164,6 +1195,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         frame.pack(pack_options)
 
         self._indicate_tkvar_status(name)
+
+        self._post_add_param(name)
         return representation
 
 
@@ -1228,15 +1261,19 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         self.pack_param(name,f,on_change=on_change,on_modify=on_modify,**o)
 
 
-    def switch_dynamic(self,name):
-        # here: need to switch widget etc
+    def _switch_dynamic(self,name=None,dynamic=False):
 
-        if name in self.allow_dynamic:
-            self.allow_dynamic.remove(name)
+        param_name = name or self._right_click_param
+        param,po = self.get_parameter_object(param_name,with_location=True)
+        if not hasattr(param,'_value_is_dynamic'):
+            return
+        
+        if param_name in self.allow_dynamic:
+            self.allow_dynamic.remove(param_name)
         else:
-            self.allow_dynamic.append(name)
+            self.allow_dynamic.append(param_name)
 
-        self.repack_param(name)
+        self.repack_param(param_name)
 
 
 
@@ -1274,6 +1311,9 @@ class TkParameterizedObject(TkParameterizedObjectBase):
                 if self.widget_creators.has_key(c):
                     widget_creation_fn = self.widget_creators[c]
                     break
+        elif name not in self.allow_dynamic:
+            self.allow_dynamic.append(name)
+                    
             
         if on_change is not None:
             self._tkvars[name]._on_change=on_change
