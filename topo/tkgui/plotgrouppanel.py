@@ -203,8 +203,8 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
                         on_change=self.reduce_plots,side=LEFT)
         self.params_in_history.append('Reduce')
 
-        self.pack_param("dock",parent=self.control_frame_1,
-                        on_change=self.set_dock,side=LEFT)
+##         self.pack_param("dock",parent=self.control_frame_1,
+##                         on_change=self.set_dock,side=LEFT)
 
 
         # Don't need to add these two to params_in_history because their
