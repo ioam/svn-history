@@ -52,7 +52,7 @@ PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.5
 
 # LDFLAGS sets ${PREFIX}/lib as the LD_LIBRARY in the binary
 # CB: rpath is ignored on OS X (so where are the library files taken from?). 
-python: ${PYTHON}.tgz tk blt
+python: ${PYTHON}.tgz tk
 	echo ${PREFIX}
 	tar -xzf ${PYTHON}.tgz
 # Configure for specific operating system versions
