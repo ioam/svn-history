@@ -1345,7 +1345,11 @@ class TkParameterizedObject(TkParameterizedObjectBase):
 
             w = self.representations[name]['widget']
             # hACK: tuple to work around strange list parsing tkinter/tcl
-            w.configure('values',tuple(new_range)) # what a mess
+            w.configure(values=tuple(new_range)) # what a mess
+            #w.configure(state='readonly') # CEBALERT: why necessary?
+            # does it get changed somewhere else by mistake? e.g. does
+            # plotgrouppanel switch disabled to normal and normal to
+            # disabled without checking that normal isn't readonly?
 
 
     def _X(self,name,widget_options):
@@ -1430,7 +1434,9 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             v = self._tkvars[name].get()
             self._tkvar_set(name,v)
         w.bind("<<ComboboxSelected>>",f)
-        
+
+        # CEBALERT: hack to 
+        w._readonly_=True
         
 
         help_text = getdoc(self._string2object(name,tkvar._original_get()))

@@ -18,7 +18,8 @@ import Tkinter, _tkinter
 from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
      BooleanVar, StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
-     Scrollbar, Y, VERTICAL, HORIZONTAL, END, NO, NONE,Scrollbar,Canvas
+     Scrollbar, Y, VERTICAL, HORIZONTAL, END, NO, NONE,Scrollbar,Canvas, \
+     TclError
 
 import topo
 
@@ -601,6 +602,32 @@ e.g. for debugging.)
             self.plotgroups_history.append(copy.copy(self.plotgroup))
         self.__update_widgets_for_history() 
 
+    def __set_widget_state(self,widget,state):
+        # sets the widget's state to state, unless state=='normal'
+        # and the widget's current state is 'readonly', in which
+        # case readonly is preserved.
+        # If a widget state was set to 'disabled' deliberately, this
+        # will have the unwanted effect of enabling that widget.
+        # Surely there's a better way than this!
+        # (Probably the history stuff should store the old state
+        # on the widget somewhere. That would also eliminate the
+        # combobox-specific hack.)
+
+        # CEBALERT: I guess some widgets don't have state?
+        try:
+            current_state = widget.configure('state')[3]
+        except TclError:
+            return
+
+        ### hack to deal with combobox: see tkparameterizedobject's
+        ###  create_selector_widget().
+        if state=='normal':
+            if hasattr(widget,'_readonly_'):
+                state='readonly'
+        ###########################################################
+                            
+        widget.configure(state=state)
+            
         
     def __update_widgets_for_history(self):
         """
@@ -617,12 +644,8 @@ e.g. for debugging.)
                              if p_name not in self.params_in_history]
 
         for widget in widgets_to_update:
-            # CEBALERT: I don't see why this doesn't always work.
-            try:
-                widget.config(state=state)
-            except:
-                pass
-
+            self.__set_widget_state(widget,state)
+            
         self.__update_history_buttons()
 
 
