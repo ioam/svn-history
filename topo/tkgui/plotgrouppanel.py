@@ -203,8 +203,8 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
                         on_change=self.reduce_plots,side=LEFT)
         self.params_in_history.append('Reduce')
 
-        self.pack_param("dock",parent=self.control_frame_1,
-                        on_change=self.set_dock,side=LEFT)
+##         self.pack_param("dock",parent=self.control_frame_1,
+##                         on_change=self.set_dock,side=LEFT)
 
 
         # Don't need to add these two to params_in_history because their
@@ -394,9 +394,14 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
             self.representations['Enlarge']['widget']['state']=NORMAL
             self.representations['Reduce' ]['widget']['state']=NORMAL
 
-        self.__update_widgets_for_history() # have a general update_widgets method instead (that calls update_widgets_for_history; can it also include enlarge/reduce alterations?)
-        # CBALERT: problem when docked: this event isn't being caught, ie it doesn't end up
-        # going to the right place...
+        self.__update_widgets_for_history()
+        # have a general update_widgets method instead (that calls
+        # update_widgets_for_history; can it also include
+        # enlarge/reduce alterations?)
+
+        # CBALERT: problem when docked: this event isn't being caught,
+        # ie it doesn't end up going to the right place... (i.e. no
+        # scrollbars when docked).
         self.event_generate("<<SizeRight>>")
         
 
