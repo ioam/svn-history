@@ -441,7 +441,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                     Dynamic:Eval_ReprTranslator,
                     ObjectSelectorParameter:String_ObjectTranslator,
                     ClassSelectorParameter:CSPTranslator,
-                    Number:EvalToFloatTranslator,
+                    Number:Eval_ReprTranslator,
                     BooleanParameter:BoolTranslator,
                     StringParameter:DoNothingTranslator}
         
@@ -1646,22 +1646,6 @@ class BoolTranslator(DoNothingTranslator):
 
 
 # Error messages: need to change how they're reported
-class EvalToFloatTranslator(Translator):
-    def string2object(self,string_):
-        try:
-            r=eval_atof(string_)
-            self._pass_out_msg("OK")
-        except Exception,inst:
-            m = str(sys.exc_info()[0])[11::]+" ("+str(inst)+")"
-            self._pass_out_msg(m)
-            self.last_string2object_failed=True
-            return string_ # HIDDEN
-
-        self.last_string2object_failed=False
-        return r
-            
-    def object2string(self,object_):
-        return object_
 
 
 
