@@ -233,8 +233,8 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         nu_widget._slider_used()
         self.assertEqual(self.f.nu,0.8)        
         self.assertEqual(nu_widget.slider.get(),0.8)
-        self.assertEqual(nu_widget.tag.get(),'0.8')
-        self.assertEqual(nu_tkvar.get(),'0.8')
+        self.assertEqual(eval(nu_widget.tag.get()),eval('0.8'))
+        self.assertEqual(eval(nu_tkvar.get()),eval('0.8'))
 
         # now make immediate and test that
         self.f.param_immediately_apply_change[Number]=True        
@@ -246,7 +246,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
 
         # check gui getting
         self.f.nu = 0.2
-        self.assertEqual(nu_tkvar.get(),'0.2')
+        self.assertEqual(eval(nu_tkvar.get()),eval('0.2'))
 
         # try to set tag beyond the 1 upper bound
         nu_tkvar.set(40.0)
@@ -259,7 +259,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         nu_widget.tag.insert(0,"testA")
         nu_widget._tag_press_return()
         self.assertEqual(self.f.nu,0.075)
-        self.assertEqual(nu_widget.tag.get(),'0.075') # we overwrite display
+        self.assertEqual(nu_widget.tag.get(),'testA') # variable name not overwritten
 
         # check we can do some basic maths
         exec "from math import sin,pi" in __main__.__dict__
