@@ -92,20 +92,6 @@ def flatten(l):
                     sequence, j = sequence[j], 0
         return result
 
-
-# CEBNOTE: use this for tkparameterizedobject or delete it
-def eval_atof(str):
-    """
-    Evaluates the given string in __main__, and converts it to a float.
-
-    The string can contain any expression that will evaluate to a
-    number.  The expression can use any variables or functions that
-    are defined in the main namespace.
-
-    See string.atof() for more details about the conversion from the
-    evaluated string into a float.
-    """
-    return string.atof(eval(str,__main__.__dict__))
     
 
 """

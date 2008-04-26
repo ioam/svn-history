@@ -127,7 +127,7 @@ from topo.base.parameterclasses import BooleanParameter,StringParameter, \
      
 import topo # for topo.guimain only
 
-from topo.misc.utils import eval_atof, inverse
+from topo.misc.utils import inverse
 from topo.misc.filepaths import Filename, resolve_path
 
 from widgets import FocusTakingButton as Button2, TaggedSlider, Balloon, Menu
