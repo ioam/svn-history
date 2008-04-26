@@ -75,9 +75,10 @@ put the files directly into your present directory.
 <code>trunk</code>. Note that the bleeding-edge version
 is not always usable due to work in progress (but you can check to see if the
 code currently builds on a specific platform
-(<a href="http://buildbot.topographica.org/one_box_per_builder?builder=linux_build">linux</a>,
-<a href="http://buildbot.topographica.org/one_box_per_builder?builder=mac_build">Mac</a>) and whether our   
-<a href="http://buildbot.topographica.org/one_box_per_builder?builder=linux_tests&builder=linux_slow-tests">code tests pass</a>).
+(<a href="http://buildbot.topographica.org/one_box_per_builder?builder=lodestar_build">Fedora</a>,
+<a href="http://buildbot.topographica.org/one_box_per_builder?builder=doozy_build">Ubuntu 7</a>,
+<a href="http://buildbot.topographica.org/one_box_per_builder?builder=sake_build">OS X 10.5</a>) and whether our   
+<a href="http://buildbot.topographica.org/one_box_per_builder?builder=lodestar_tests&builder=lodestar_slow-tests">code tests pass</a>).
 
 <P>The checkout process will likely take several minutes (probably
 appearing to hang at certain points), as there are some extremely
