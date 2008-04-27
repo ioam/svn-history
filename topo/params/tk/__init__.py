@@ -2,7 +2,13 @@
 Classes linking ParameterizedObjects and Parameters to Tkinter.
 
 TkParameterizedObject allows flexible graphical representation and
-manipulation of any ParameterizedObject's Parameters.
+manipulation of a ParameterizedObject's individual Parameters;
+ParametersFrame extends TkParameterizedObject, displaying all the
+Parameters as a list.
+
+
+
+TO BE UPDATED...
 
 Note that TkParameterizedObject extends TkParameterizedObjectBase by
 adding widget-drawing abilities; documentation for using these classes
