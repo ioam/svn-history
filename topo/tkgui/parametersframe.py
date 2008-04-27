@@ -43,9 +43,19 @@ from tkparameterizedobject import TkParameterizedObject, ButtonParameter
 
 
 ### topo dependencies
-from topo.misc.utils import keys_sorted_by_value
 from topowidgets import TkguiWindow
 
+
+def keys_sorted_by_value(d):
+    """
+    Return the keys of dictionary d sorted by value.
+    """
+    # By Daniel Schult, 2004/01/23
+    # http://aspn.activestate.com/ASPN/Python/Cookbook/Recipe/52306
+    items=d.items()
+    backitems=[ [v[1],v[0]] for v in items]
+    backitems.sort()
+    return [ backitems[i][1] for i in range(0,len(backitems))]
 
 
 
