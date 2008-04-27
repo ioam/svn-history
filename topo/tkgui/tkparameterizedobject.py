@@ -124,13 +124,36 @@ from topo.base.parameterizedobject import ParameterizedObject,Parameter, \
 from topo.base.parameterclasses import BooleanParameter,StringParameter, \
      Number,SelectorParameter,ClassSelectorParameter,ObjectSelectorParameter, \
      CallableParameter,Dynamic
-     
-import topo # for topo.guimain only
-
-from topo.misc.utils import inverse
-from topo.misc.filepaths import Filename, resolve_path
 
 from widgets import FocusTakingButton as Button2, TaggedSlider, Balloon, Menu
+
+
+### topo dependencies
+import topo # for topo.guimain only
+from topo.misc.filepaths import Filename, resolve_path
+###
+
+
+
+
+
+
+
+def inverse(dict_):
+    """
+    Return the inverse of dictionary dict_.
+    
+    (I.e. return a dictionary with keys that are the values of dict_,
+    and values that are the corresponding keys from dict_.)
+
+    The values of dict_ must be unique.
+    """
+    idict = dict([(value,key) for key,value in dict_.iteritems()])
+    if len(idict)!=len(dict_):
+        raise ValueError("Dictionary has no inverse (values not unique).")
+    return idict
+
+
 
 def lookup_by_class(dict_,class_):
     """

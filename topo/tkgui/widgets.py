@@ -25,14 +25,17 @@ import traceback
 import code
 import StringIO
 import __main__
+import platform
 
+from tkMessageBox import _show,QUESTION,YESNO
+from scrodget import Scrodget
 
 
 ########## Barely wrapped widgets from Tile
 
 class Progressbar(Tkinter.Widget):
     def __init__(self, master=None, cnf={}, **kw):
-        Widget.__init__(self, master, "ttk::progressbar", cnf, kw)
+        Tkinter.Widget.__init__(self, master, "ttk::progressbar", cnf, kw)
         
     def step(self, amount=1.0):
         """Increments the -value by amount. amount defaults to 1.0 
@@ -50,8 +53,8 @@ class Progressbar(Tkinter.Widget):
 # Barely wrapped tooltip from tklib.
 # CB: this isn't the right way to do it, and it breaks menubar
 # tips for some reason, but user code didn't have to change.
-from Tkinter import Widget
-class Balloon(Widget):
+
+class Balloon(Tkinter.Widget):
     
     _tkname = '::tooltip::tooltip'
 
@@ -447,7 +450,7 @@ class FocusTakingButton(Tkinter.Button):
 # * actually it's the window manager that's important, right?
 # Does tkinter/tk itself give any useful information?
 # What about root.tk.call("tk","windowingsystem")?
-import platform
+
 system_platform = 'unknown'
 if platform.system()=='Linux':
     system_platform = 'linux'
@@ -470,20 +473,18 @@ elif platform.system()=='Windows':
 # resize from autoresizing.
 
 
-import Tkinter as T
-from scrodget import Scrodget
 
 
-class ScrolledFrame(T.Frame):
+class ScrolledFrame(Tkinter.Frame):
     """
     XXXX
     
     Content to be scrolled should go in the 'content' frame.
     """
     def __init__(self,parent,**config):
-        T.Frame.__init__(self,parent,**config)
+        Tkinter.Frame.__init__(self,parent,**config)
 
-        self.canvas = T.Canvas(self)
+        self.canvas = Tkinter.Canvas(self)
         self.canvas.pack()
         self.canvas.configure(width=0,height=0)
         
@@ -491,7 +492,7 @@ class ScrolledFrame(T.Frame):
         self.sc.associate(self.canvas)
         self.sc.pack(expand=1,fill="both")
         
-        self.content = T.Frame(self.canvas)
+        self.content = Tkinter.Frame(self.canvas)
         self.content.title = lambda x: self.title(x)
         
         self.canvas.create_window(0,0,window=self.content,anchor='nw')
@@ -511,10 +512,10 @@ class ScrolledFrame(T.Frame):
 
 
 
-class ScrolledWindow(T.Toplevel):
+class ScrolledWindow(Tkinter.Toplevel):
 
     def __init__(self,parent,**config):
-        T.Toplevel.__init__(self,parent,**config)
+        Tkinter.Toplevel.__init__(self,parent,**config)
         self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
         self._scrolledframe = ScrolledFrame(self)
         self._scrolledframe.pack(expand=1,fill='both')
@@ -545,11 +546,11 @@ def with_busy_cursor(fn):
 
 
 
-class StatusBar(T.Frame):
+class StatusBar(Tkinter.Frame):
 
     def __init__(self, master):
-        T.Frame.__init__(self, master)
-        self.label = T.Label(self, borderwidth=1, relief='sunken', anchor='w')
+        Tkinter.Frame.__init__(self, master)
+        self.label = Tkinter.Label(self, borderwidth=1, relief='sunken', anchor='w')
         self.label.pack(fill='x')
 
     def message(self,chuck=None,message=None):
@@ -567,3 +568,13 @@ class StatusBar(T.Frame):
 
 
 
+# CEB: workaround for tkinter lagging behind tk (tk must have changed
+# the type of a returned value).  This is copied almost exactly from
+# tkMessageBox If there are other things like this, we could have the
+# gui load some 'dynamic patches' to tkinter on startup, which could
+# then be removed when tkinter is updated (they'd all be in one place,
+# and no tkgui code would have to change).
+def askyesno(title=None, message=None, **options):
+    "Ask a question; return true if the answer is yes"
+    s = _show(title, message, QUESTION, YESNO, **options)
+    return str(s) == "yes"

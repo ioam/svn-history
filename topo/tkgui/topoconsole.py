@@ -36,7 +36,7 @@ from topo.misc.commandline import sim_name_from_filename
 import topo.commands.basic
 
 import topo.tkgui 
-from widgets import TaggedSlider,ControllableMenu,system_platform,StatusBar,Balloon,ScrolledFrame
+from widgets import TaggedSlider,ControllableMenu,system_platform,StatusBar,Balloon,ScrolledFrame,askyesno
 from topowidgets import ScrolledTkguiWindow,TkguiWindow,ProgressWindow,ProgressController
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from featurecurvepanel import FeatureCurvePanel
@@ -680,17 +680,6 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
 
 
 
-# CEB: workaround for tkinter lagging behind tk (tk must have changed
-# the type of a returned value).  This is copied almost exactly from
-# tkMessageBox If there are other things like this, we could have the
-# gui load some 'dynamic patches' to tkinter on startup, which could
-# then be removed when tkinter is updated (they'd all be in one place,
-# and no tkgui code would have to change).
-from tkMessageBox import _show,QUESTION,YESNO
-def askyesno(title=None, message=None, **options):
-    "Ask a question; return true if the answer is yes"
-    s = _show(title, message, QUESTION, YESNO, **options)
-    return str(s) == "yes"
 
 
 

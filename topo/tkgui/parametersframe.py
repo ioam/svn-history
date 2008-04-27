@@ -28,20 +28,24 @@ __version__='$Revision$'
 
 # (check Defaults btn with dynamic params)
 
-import Tkinter, tkMessageBox
-
+import Tkinter
 from Tkinter import Frame, E,W, Label, TclError
 from inspect import getdoc
+
+
 
 from topo.base.parameterizedobject import ParameterizedObject, \
                                           ParameterizedObjectMetaclass
 from topo.base.parameterclasses import Number
 
-from topo.misc.utils import keys_sorted_by_value
-
-from widgets import Menu
-from topowidgets import TkguiWindow
+from widgets import Menu,askyesno
 from tkparameterizedobject import TkParameterizedObject, ButtonParameter
+
+
+### topo dependencies
+from topo.misc.utils import keys_sorted_by_value
+from topowidgets import TkguiWindow
+
 
 
 
@@ -535,7 +539,7 @@ class ParametersFrameWithApply(ParametersFrame):
     def _close_button(self):
         # CEBALERT: dialog box should include a cancel button
         if self.has_unapplied_change() \
-               and tkMessageBox.askyesno("Close","Apply changes before closing?"):
+               and askyesno("Close","Apply changes before closing?"):
             self.update_parameters()
         super(ParametersFrameWithApply,self)._close_button()
 
