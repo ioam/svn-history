@@ -125,11 +125,11 @@ from Tkinter import BooleanVar, StringVar, Frame, Checkbutton, \
      Entry, TclError, E, W, Label
 from Tile import Combobox
 
-from topo.base.parameterizedobject import ParameterizedObject,Parameter, \
-     classlist,ParameterizedObjectMetaclass
-from topo.base.parameterclasses import BooleanParameter,StringParameter, \
-     Number,SelectorParameter,ClassSelectorParameter,ObjectSelectorParameter, \
-     CallableParameter,Dynamic
+from ..parameterized import ParameterizedObject,ParameterizedObjectMetaclass,\
+     classlist
+
+from .. import Boolean,String,Number,Selector,ClassSelector,ObjectSelector,\
+     Callable,Dynamic,Parameter
 
 from widgets import FocusTakingButton as Button2, TaggedSlider, Balloon, Menu, \
      askyesno,TkguiWindow
@@ -196,11 +196,11 @@ def is_button(widget):
 #
 # Maybe we should have a parent class that implements the
 # non-Parameter specific stuff, then one that bolts on the
-# Parameter-specific stuff, and then instead of ButtonParameter we'd
+# Parameter-specific stuff, and then instead of Button we'd
 # have TopoButton, or something like that...
 import ImageTk, Image, ImageOps
 
-class ButtonParameter(CallableParameter):
+class Button(Callable):
     """
     Parameter representing all Parameter classes that are GUI-specific.
 
@@ -224,7 +224,7 @@ class ButtonParameter(CallableParameter):
 
     def __init__(self,default=None,image_path=None,size=None,
                  **params):
-        CallableParameter.__init__(self,default=default,**params)
+        Callable.__init__(self,default=default,**params)
         self.image_path = image_path
         self.size = size
         self._hack = []
@@ -457,7 +457,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # (Note that, for instance, we don't include Number:DoubleVar.
         # This is because we use Number to control the type, so we
         # don't need restrictions from DoubleVar.)
-        self.__param_to_tkvar = {BooleanParameter:BooleanVar,
+        self.__param_to_tkvar = {Boolean:BooleanVar,
                                  Parameter:StringVar}
 
         # CEBALERT: Parameter is the base parameter class, but ... 
@@ -465,11 +465,11 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # Rename
         self.trans={Parameter:Eval_ReprTranslator,
                     Dynamic:Eval_ReprTranslator,
-                    ObjectSelectorParameter:String_ObjectTranslator,
-                    ClassSelectorParameter:CSPTranslator,
+                    ObjectSelector:String_ObjectTranslator,
+                    ClassSelector:CSPTranslator,
                     Number:Eval_ReprTranslator,
-                    BooleanParameter:BoolTranslator,
-                    StringParameter:DoNothingTranslator}
+                    Boolean:BoolTranslator,
+                    String:DoNothingTranslator}
         
         self.change_PO(extraPO)
         super(TkParameterizedObjectBase,self).__init__(**params)
@@ -916,7 +916,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     # Parameters here (to avoid name clashes with any additional
     # Parameters this might eventually be representing).
 
-    pretty_parameters = BooleanParameter(default=True,precedence=-1,
+    pretty_parameters = Boolean(default=True,precedence=-1,
         doc="""Whether to format parameter names, or display the
         variable names instead.
 
@@ -973,8 +973,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         self.master = master
 
         self.allow_dynamic = []
-        self.param_immediately_apply_change = {BooleanParameter:True,
-                                               SelectorParameter:True,
+        self.param_immediately_apply_change = {Boolean:True,
+                                               Selector:True,
                                                Number:False,
                                                Parameter:False}
 
@@ -985,12 +985,12 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         self.balloon = Balloon(master)
 
         self.widget_creators = {
-            BooleanParameter:self._create_boolean_widget,
+            Boolean:self._create_boolean_widget,
             Dynamic:self._create_string_widget,
             Number:self._create_number_widget,
-            ButtonParameter:self._create_button_widget,
-            StringParameter:self._create_string_widget,
-            SelectorParameter:self._create_selector_widget}
+            Button:self._create_button_widget,
+            String:self._create_string_widget,
+            Selector:self._create_selector_widget}
         
         self.representations = {}  
         
@@ -1065,7 +1065,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         """
         super(TkParameterizedObject,self)._tkvar_set(param_name,val)
 
-        if isinstance(self.get_parameter_object(param_name),SelectorParameter):
+        if isinstance(self.get_parameter_object(param_name),Selector):
             try:
                 w = self.representations[param_name]['widget']
                 help_text =  getdoc(self._string2object(
@@ -1172,7 +1172,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         
 
         widget_options specified here override anything that might have been
-        set elsewhere (e.g. ButtonParameter's size can be overridden here
+        set elsewhere (e.g. Button's size can be overridden here
         if required).
 
 
@@ -1374,7 +1374,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         After creating a button for a Parameter param, self.param() also
         executes the button's command.
 
-        If the ButtonParameter was declared with an image, the button will
+        If the Button was declared with an image, the button will
         have that image (and no text); otherwise, the button will display
         the (possibly pretty_print()ed) name of the Parameter.        
         """
@@ -1407,7 +1407,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             button['text']=self.__pretty_print(name)
             
 
-        # and set size from ButtonParameter
+        # and set size from Button
         size = button_param.size
         #if size:
         #    button['width']=size[0]
@@ -1655,7 +1655,7 @@ class Translator(object):
 class DoNothingTranslator(Translator):
     """
     Performs no translation. For use with Parameter types such as
-    BooleanParameter and StringParameter, where the representation
+    Boolean and String, where the representation
     of the object in the GUI is the object itself.
     """
     def string2object(self,string_):
@@ -1820,7 +1820,7 @@ def param_is_dynamically_generated(param,po):
 
 # KNOWN ISSUES
 #
-# - Defaults button doesn't work for SelectorParameters (need to insert
+# - Defaults button doesn't work for Selectors (need to insert
 #   new (class default) object into the list).
 #
 
@@ -1852,15 +1852,15 @@ class ParametersFrame(TkParameterizedObject,Frame):
     Changes made to Parameter representations on the GUI are
     immediately applied to the underlying object.
     """
-    Defaults = ButtonParameter(doc="""Return values to class defaults.""")
+    Defaults = Button(doc="""Return values to class defaults.""")
 
-    Refresh = ButtonParameter(doc="Return values to those currently set on the object (or, if editing a class, to those currently set on the class).")  
+    Refresh = Button(doc="Return values to those currently set on the object (or, if editing a class, to those currently set on the class).")  
 
     # CEBALERT: this is a Frame, so close isn't likely to make
     # sense. But fortunately the close button acts on master.
     # Just be sure not to use this button when you don't want
     # the master window to vanish (e.g. in the model editor).
-    Close = ButtonParameter(doc="Close the window. (If applicable, asks if unsaved changes should be saved).")
+    Close = Button(doc="Close the window. (If applicable, asks if unsaved changes should be saved).")
 
     display_threshold = Number(default=0,precedence=-10,doc="Parameters with precedence below this value are not displayed.")
 
@@ -2250,7 +2250,7 @@ class ParametersFrameWithApply(ParametersFrame):
 
     # CB: might be nice to make Apply button blue like the unapplied changes,
     # but can't currently set button color
-    Apply = ButtonParameter(doc="""Set object's Parameters to displayed values.\n
+    Apply = Button(doc="""Set object's Parameters to displayed values.\n
                                    When editing a class, sets the class defaults
                                    (i.e. acts on the class object).""")
     

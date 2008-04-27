@@ -17,7 +17,6 @@ from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import FeatureCurvePlotGroup
 
 from plotgrouppanel import PlotGroupPanel
-from tkparameterizedobject import ButtonParameter
 
 
 ## CEBALERT: same as for featurecurveplotgroup: shares code with templateplotgrouppanel
