@@ -151,30 +151,6 @@ def frange(start, end=None, inc=1.0, inclusive=False):
     return L
 
 
-# CB: this function isn't used, as of 2006/06/22
-def values_sorted_by_key(d):
-    """
-    Return the values of dictionary d sorted by key.
-    """
-    # By Alex Martelli, 2001/04/08
-    # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52306
-    keys = d.keys()
-    keys.sort()
-    return map(d.get, keys)
-
-
-def keys_sorted_by_value(d):
-    """
-    Return the keys of dictionary d sorted by value.
-    """
-    # By Daniel Schult, 2004/01/23
-    # http://aspn.activestate.com/ASPN/Python/Cookbook/Recipe/52306
-    items=d.items()
-    backitems=[ [v[1],v[0]] for v in items]
-    backitems.sort()
-    return [ backitems[i][1] for i in range(0,len(backitems))]
-
-
 
 def shortclassname(x):
     """
