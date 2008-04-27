@@ -38,12 +38,9 @@ from topo.base.parameterizedobject import ParameterizedObject, \
                                           ParameterizedObjectMetaclass
 from topo.base.parameterclasses import Number
 
-from widgets import Menu,askyesno
+from widgets import Menu,askyesno,TkguiWindow
 from tkparameterizedobject import TkParameterizedObject, ButtonParameter
 
-
-### topo dependencies
-from widgets import TkguiWindow
 
 
 def keys_sorted_by_value(d):

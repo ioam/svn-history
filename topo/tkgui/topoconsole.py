@@ -46,8 +46,8 @@ from editorwindow import ModelEditor
 
 
 
-
-
+# CEBALERT: check this is working everywhere (all tkguiwindows)
+TkguiWindow.window_icon_path = resolve_path('topo/tkgui/icons/topo.xbm')
 
 SCRIPT_FILETYPES = [('Topographica scripts','*.ty'),
                     ('Python scripts','*.py'),

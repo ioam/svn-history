@@ -9,12 +9,6 @@ $Id$
 """
 __version__='$Revision$'
 
-### CEBALERT: there is at least one import problem in tkgui (probably
-### caused by files importing each other). (Putting even a do-nothing,
-### import-nothing version of the TkguiWindow class in any of the
-### existing tkgui files and then trying to use it in
-### plotgrouppanel.py generates an import error.)
-# CB: after reorganization, see if this problem persists.
 
 import sys
 import copy
@@ -545,10 +539,7 @@ def with_busy_cursor(fn):
 
 
 
-
-
-from topo.misc.filepaths import resolve_path
-
+# CEBALERT: rename
 class TkguiWindow(ScrolledWindow):
     """
     The standard tkgui window; defines attributes common to tkgui windows.
@@ -556,6 +547,9 @@ class TkguiWindow(ScrolledWindow):
     Currently these attributes are:
      - a window icon
     """
+
+    window_icon_path = None
+
     def __init__(self,parent,**config):
 
         ScrolledWindow.__init__(self,parent)
@@ -566,7 +560,7 @@ class TkguiWindow(ScrolledWindow):
         # bundle into an application package or something like that.
         # On OS X, could possibly alter the small titlebar icon with something like:
         # self.attributes("-titlepath","/Users/x/topographica/AppIcon.icns")
-        self.iconbitmap('@'+(resolve_path('topo/tkgui/icons/topo.xbm')))
+        self.iconbitmap('@'+self.window_icon_path)
 
         ### Universal right-click menu
         # CB: not currently used by anything but the plotgrouppanels
