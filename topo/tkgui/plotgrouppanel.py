@@ -34,7 +34,8 @@ from topo.commands.pylabplots import matrixplot
 
 from topo.sheets.generatorsheet import GeneratorSheet
 
-from widgets import Menu,StatusBar
+from widgets import Menu
+from topowidgets import StatusBar
 from tkparameterizedobject import ButtonParameter, TkParameterizedObject
 
 

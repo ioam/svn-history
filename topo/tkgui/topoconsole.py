@@ -36,8 +36,8 @@ from topo.misc.commandline import sim_name_from_filename
 import topo.commands.basic
 
 import topo.tkgui 
-from widgets import TaggedSlider,ControllableMenu,StatusBar,Balloon,ScrolledFrame,askyesno,TkguiWindow,ScrolledTkguiWindow
-from topowidgets import ProgressWindow,ProgressController
+from widgets import TaggedSlider,ControllableMenu,Balloon,ScrolledFrame,askyesno,TkguiWindow,ScrolledTkguiWindow
+from topowidgets import ProgressWindow,ProgressController,StatusBar
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from featurecurvepanel import FeatureCurvePanel
 from projectionpanel import CFProjectionPanel,ProjectionActivityPanel,ConnectionFieldsPanel,RFProjectionPanel
