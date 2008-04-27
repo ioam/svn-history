@@ -14,17 +14,17 @@ from math import floor
 
 import ImageTk
 
-import Tkinter, _tkinter
+import Tkinter
 from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
      BooleanVar, StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
      Scrollbar, Y, VERTICAL, HORIZONTAL, END, NO, NONE,Scrollbar,Canvas, \
      TclError
 
-import topo
+from .. import params
+# CEB: maybe bad, since people reading code will probably assume tk is Tkinter
+from ..params import tk
 
-from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import BooleanParameter, Integer
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 
@@ -34,10 +34,9 @@ from topo.commands.pylabplots import matrixplot
 
 from topo.sheets.generatorsheet import GeneratorSheet
 
-from widgets import Menu
 from topowidgets import StatusBar
-from tkparameterizedobject import ButtonParameter, TkParameterizedObject
 
+import topo
 
 BORDERWIDTH = 1
 
@@ -68,48 +67,48 @@ def with_busy_cursor(fn):
     return busy_fn
 
 
-class PlotGroupPanel(TkParameterizedObject,Frame):
+class PlotGroupPanel(tk.TkParameterizedObject,Frame):
 
     __abstract = True
 
 
-    dock = BooleanParameter(default=False,doc="on console or not")
+    dock = params.Boolean(default=False,doc="on console or not")
 
     # Default size for images used on buttons
     button_image_size=(20,20)
 
-    Refresh = ButtonParameter(image_path="topo/tkgui/icons/redo-small.png",
+    Refresh = tk.Button(image_path="topo/tkgui/icons/redo-small.png",
         size=button_image_size,
         doc="""
         Refresh the current plot (i.e. force the current plot to be regenerated
         by executing update_command and plot_command).""")
 
-    Redraw = ButtonParameter(image_path="topo/tkgui/icons/redo-small.png",
+    Redraw = tk.Button(image_path="topo/tkgui/icons/redo-small.png",
         size=button_image_size,
         doc="""Redraw the plot from existing data (i.e. execute plot_command only).""")
     
-    Enlarge = ButtonParameter(image_path="topo/tkgui/icons/viewmag+_2.2.png",
+    Enlarge = tk.Button(image_path="topo/tkgui/icons/viewmag+_2.2.png",
         size=button_image_size,
         doc="""Increase the displayed size of the current plots by about 20%.""")
                           
-    Reduce = ButtonParameter(image_path="topo/tkgui/icons/viewmag-_2.1.png",
+    Reduce = tk.Button(image_path="topo/tkgui/icons/viewmag-_2.1.png",
         size=button_image_size,doc="""
         Reduce the displayed size of the current plots by about 20%.
         A minimum size that preserves at least one pixel per unit is
         enforced, to ensure that no data is lost when displaying.""")
 
-    Fwd = ButtonParameter(image_path="topo/tkgui/icons/forward-2.0.png",
+    Fwd = tk.Button(image_path="topo/tkgui/icons/forward-2.0.png",
         size=button_image_size,doc="""
         Move forward through the history of all the plots shown in this window.""")
 
-    Back = ButtonParameter(image_path="topo/tkgui/icons/back-2.0.png",
+    Back = tk.Button(image_path="topo/tkgui/icons/back-2.0.png",
         size=button_image_size,doc="""
         Move backward through the history of all the plots shown in
         this window.  When showing a historical plot, some functions
         will be disabled, because the original data is no longer
         available.""")
     
-    gui_desired_maximum_plot_height = Integer(default=150,bounds=(0,None),doc="""
+    gui_desired_maximum_plot_height = params.Integer(default=150,bounds=(0,None),doc="""
         Value to provide for PlotGroup.desired_maximum_plot_height for
         PlotGroups opened by the GUI.  Determines the initial, default
         scaling for the PlotGroup.""")
@@ -130,7 +129,7 @@ class PlotGroupPanel(TkParameterizedObject,Frame):
         in historical views.
         """
         
-        TkParameterizedObject.__init__(self,master,extraPO=plotgroup,**params)
+        tk.TkParameterizedObject.__init__(self,master,extraPO=plotgroup,**params)
         Frame.__init__(self,master)
         
         self.setup_plotgroup()
@@ -245,9 +244,9 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         #################### RIGHT-CLICK MENU STUFF ####################
         ### Right-click menu for canvases; subclasses can add cascades
         ### or insert commands on the existing cascades.
-        self._canvas_menu = Menu(self, tearoff=0) #self.context_menu 
+        self._canvas_menu = tk.widgets.Menu(self, tearoff=0) #self.context_menu 
 
-        self._unit_menu = Menu(self._canvas_menu, tearoff=0)
+        self._unit_menu = tk.widgets.Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.add_cascade(menu=self._unit_menu,state=DISABLED,
                                       indexname='unit_menu')
 
@@ -263,7 +262,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         # can be cleaned up easily.)
         self._unit_menu_updaters = {}
         
-        self._sheet_menu = Menu(self._canvas_menu, tearoff=0)
+        self._sheet_menu = tk.widgets.Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.add_cascade(menu=self._sheet_menu,state=DISABLED,
                                       indexname='sheet_menu')
         self._canvas_menu.add_separator()
