@@ -11,9 +11,11 @@ $Id$
 __version__='$Revision$'
 
 import sys, Tkinter, _tkinter,os
+import platform 
 import topo.base.parameterizedobject
 
 from topoconsole import TopoConsole
+from widgets import ControllableMenu
 
 #### notes about tkgui ####
 #
@@ -65,12 +67,45 @@ from topo.sheets import *
 
 
 
+# CEBALERT: should probably be in __init__.py
+##########
+### Which os is being used (for gui purposes)?
+#
+# system_plaform can be:
+# "linux"
+# "mac"
+# "win"
+# "unknown"
+#
+# If you are programming tkgui and need to do something special
+# for some other platform (or to further distinguish the above
+# platforms), please modify this code.
+#
+# Right now tkgui only needs to detect if the platform is linux (do I
+# mean any kind of non-OS X unix*?) or mac, because there is some
+# special-purpose code for both those two: the mac code below, and the
+# menu-activating code in topoconsole.  We might have some Windows-
+# specific code for the window icons later on, too.
+# * actually it's the window manager that's important, right?
+# Does tkinter/tk itself give any useful information?
+# What about root.tk.call("tk","windowingsystem")?
+
+system_platform = 'unknown'
+if platform.system()=='Linux':
+    system_platform = 'linux'
+elif platform.system()=='Darwin' or platform.mac_ver()[0]:
+    system_platform = 'mac'
+elif platform.system()=='Windows':
+    system_platform = 'win'
+##########
+
+
+
 #
 # Define up the right click (context menu) events. These variables can
 # be appended or overridden in .topographicarc, if the user has some
 # crazy input device.
 #
-from widgets import system_platform,ControllableMenu
 
 if system_platform=='mac':
     # if it's on the mac, these are the context-menu events

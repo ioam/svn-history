@@ -10,16 +10,8 @@ $Id: widgets.py 8443 2008-04-27 05:08:51Z ceball $
 __version__='$Revision: 8443 $'
 
 
-import sys
-import copy
-import operator
 import decimal
 import Tkinter
-import traceback
-import code
-import StringIO
-import __main__
-import platform
 
 from tkMessageBox import _show,QUESTION,YESNO
 from scrodget import Scrodget
@@ -27,23 +19,6 @@ from scrodget import Scrodget
 
 # CEBALERT: not all these classes will stay here (they are not
 # relevant for parameters).
-
-########## Barely wrapped widgets from Tile
-
-class Progressbar(Tkinter.Widget):
-    def __init__(self, master=None, cnf={}, **kw):
-        Tkinter.Widget.__init__(self, master, "ttk::progressbar", cnf, kw)
-        
-    def step(self, amount=1.0):
-        """Increments the -value by amount. amount defaults to 1.0 
-        if omitted. """
-        return self.tk.call(self._w, "step", amount)
-        
-    def start(self):
-        self.tk.call("ttk::progressbar::start", self._w)
-        
-    def stop(self):
-        self.tk.call("ttk::progressbar::stop", self._w)
 
 
 
@@ -74,9 +49,6 @@ class Balloon(Tkinter.Widget):
 
 ##     def tagbind(self,*args,**kw):
 ##         print "### Balloon.tagbind(): not yet implemented error ###"
-
-
-########## 
 
 
 
@@ -425,37 +397,6 @@ class FocusTakingButton(Tkinter.Button):
 
 
 
-# CEBALERT: should probably be in __init__.py
-##########
-### Which os is being used (for gui purposes)?
-#
-# system_plaform can be:
-# "linux"
-# "mac"
-# "win"
-# "unknown"
-#
-# If you are programming tkgui and need to do something special
-# for some other platform (or to further distinguish the above
-# platforms), please modify this code.
-#
-# Right now tkgui only needs to detect if the platform is linux (do I
-# mean any kind of non-OS X unix*?) or mac, because there is some
-# special-purpose code for both those two: the mac code below, and the
-# menu-activating code in topoconsole.  We might have some Windows-
-# specific code for the window icons later on, too.
-# * actually it's the window manager that's important, right?
-# Does tkinter/tk itself give any useful information?
-# What about root.tk.call("tk","windowingsystem")?
-
-system_platform = 'unknown'
-if platform.system()=='Linux':
-    system_platform = 'linux'
-elif platform.system()=='Darwin' or platform.mac_ver()[0]:
-    system_platform = 'mac'
-elif platform.system()=='Windows':
-    system_platform = 'win'
-##########
 
 
 
@@ -523,22 +464,6 @@ class ScrolledWindow(Tkinter.Toplevel):
         self._scrolledframe.sizeright()
 
 
-def with_busy_cursor(fn):
-    """
-    Decorator to show busy cursor for duration of fn call.
-    """
-    def busy_fn(widget,*args,**kw):
-        if 'cursor' in widget.configure():
-            old_cursor=widget['cursor']
-            widget['cursor']='watch'
-            widget.update_idletasks()
-
-        fn(widget,*args,**kw)
-
-        if 'cursor' in widget.configure():
-            widget['cursor']=old_cursor
-            
-    return busy_fn
 
 
 

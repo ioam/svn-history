@@ -11,8 +11,30 @@ __version__='$Revision$'
 
 import Tkinter
 
-from widgets import Balloon, Progressbar,TkguiWindow
+from widgets import Balloon, TkguiWindow
 import topo
+
+
+
+
+
+class Progressbar(Tkinter.Widget):
+    def __init__(self, master=None, cnf={}, **kw):
+        Tkinter.Widget.__init__(self, master, "ttk::progressbar", cnf, kw)
+        
+    def step(self, amount=1.0):
+        """Increments the -value by amount. amount defaults to 1.0 
+        if omitted. """
+        return self.tk.call(self._w, "step", amount)
+        
+    def start(self):
+        self.tk.call("ttk::progressbar::start", self._w)
+        
+    def stop(self):
+        self.tk.call("ttk::progressbar::stop", self._w)
+
+
+
 
 ######################################################################
 ######################################################################

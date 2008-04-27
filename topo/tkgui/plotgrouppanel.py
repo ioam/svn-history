@@ -34,7 +34,7 @@ from topo.commands.pylabplots import matrixplot
 
 from topo.sheets.generatorsheet import GeneratorSheet
 
-from widgets import Menu,StatusBar,with_busy_cursor
+from widgets import Menu,StatusBar
 from tkparameterizedobject import ButtonParameter, TkParameterizedObject
 
 
@@ -46,6 +46,26 @@ BORDERWIDTH = 1
 # the border will not be close, too small, and some of the image is
 # not displayed.  
 CANVASBUFFER = 1
+
+
+
+def with_busy_cursor(fn):
+    """
+    Decorator to show busy cursor for duration of fn call.
+    """
+    def busy_fn(widget,*args,**kw):
+        if 'cursor' in widget.configure():
+            old_cursor=widget['cursor']
+            widget['cursor']='watch'
+            widget.update_idletasks()
+
+        fn(widget,*args,**kw)
+
+        if 'cursor' in widget.configure():
+            widget['cursor']=old_cursor
+            
+    return busy_fn
+
 
 class PlotGroupPanel(TkParameterizedObject,Frame):
 
