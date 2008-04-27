@@ -43,7 +43,7 @@ from tkparameterizedobject import TkParameterizedObject, ButtonParameter
 
 
 ### topo dependencies
-from topowidgets import TkguiWindow
+from widgets import TkguiWindow
 
 
 def keys_sorted_by_value(d):

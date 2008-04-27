@@ -17,7 +17,7 @@ from topo.commands.analysis import update_activity
 from topo.misc.utils import shortclassname
 
 from parametersframe import ParametersFrameWithApply
-from topowidgets import TkguiWindow
+from widgets import TkguiWindow
 
 
 from widgets import Balloon

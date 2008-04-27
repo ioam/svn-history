@@ -7,60 +7,12 @@ $Id$
 __version__='$Revision$'
 
 
-# CEBALERT: we can clean up some of these and then move them to
-# widgets.py (i.e. some are not really tied to topographica). We can
-# probably move the remaining classes elsewhere, and then remove this
-# file.
+# We should now be able to move these classes elsewhere 
 
 import Tkinter
-import operator
 
-
-
-from topo.misc.filepaths import resolve_path
-import topo.tkgui
-
-from widgets import Balloon, Progressbar
-
-######################################################################
-######################################################################            
-
-from widgets import ScrolledWindow
-
-class TkguiWindow(ScrolledWindow):
-    """
-    The standard tkgui window; defines attributes common to tkgui windows.
-
-    Currently these attributes are:
-     - a window icon
-    """
-    def __init__(self,parent,**config):
-
-        ScrolledWindow.__init__(self,parent)
-        self.content.title = self.title
-
-        # CEBALERT: doesn't work on OS X, and is a strange color on
-        # Windows.  To get a proper icon on OS X, we probably have to
-        # bundle into an application package or something like that.
-        # On OS X, could possibly alter the small titlebar icon with something like:
-        # self.attributes("-titlepath","/Users/x/topographica/AppIcon.icns")
-        self.iconbitmap('@'+(resolve_path('topo/tkgui/icons/topo.xbm')))
-
-        ### Universal right-click menu
-        # CB: not currently used by anything but the plotgrouppanels
-        # self.context_menu = Tkinter.Menu(self, tearoff=0)
-        # self.bind("<<right-click>>",self.display_context_menu)
-
-
-
-ScrolledTkguiWindow = TkguiWindow 
-
-
-######################################################################
-######################################################################            
-
-
-
+from widgets import Balloon, Progressbar,TkguiWindow
+import topo
 
 ######################################################################
 ######################################################################

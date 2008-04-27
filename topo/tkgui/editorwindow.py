@@ -18,7 +18,7 @@ from topo.base.projection import Projection
 
 from editorobjects import EditorNode, EditorSheet, EditorProjection
 from editortools import ArrowTool, NodeTool, ConnectionTool, ParametersTool
-from topowidgets import TkguiWindow
+from widgets import TkguiWindow
 
 canvas_region = (0, 0, 1200, 1200)
 """Size of the canvas, as a bounding box (xl yl xh yh)."""
