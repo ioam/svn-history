@@ -79,8 +79,8 @@ name = "oo_or_map_topo"
 ##### comparisons #####
 from topo.tests.reference.lissom_log_parser import get_input_params,\
      initialize_clissom_data
-from common_control import run_comparisons
-from topo_or_defs import *
+from topo.tests.reference.common_control import run_comparisons
+from topo.tests.reference.topo_or_defs import *
 
 BaseN=locals().get("BaseN",48.0)
 BaseRN=locals().get("BaseRN",24.0)
@@ -135,7 +135,7 @@ tsettle=8
 
 #initialize_clissom_data(name,inh_rad=inh_rad,rf_radius=rf_radius,
 #                        BaseRN=BaseRN,BaseN=BaseN)
-topo.tests.reference.lissom_log_parser.filename_base="topo/tests/reference/oo_or_map_topo."
+topo.tests.reference.lissom_log_parser.filename_base="topo/tests/reference/fixed_params/oo_or_map_topo."
 #######################
 
 

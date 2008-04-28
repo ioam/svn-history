@@ -127,8 +127,8 @@ or_comparisons:
 
 # will change to use new script (+BaseRN,BaseN ignored right now)
 compare_oo_or: 
-	make -C topo/tests/reference/
-	./topographica -c "BaseRN=${COMPARE_BASERN}; BaseN=${COMPARE_BASEN}; comparisons=True" topo/tests/reference/lissom_oo_or_reference_old.ty 
+	make -C topo/tests/reference/fixed_params/
+	./topographica -c "BaseRN=${COMPARE_BASERN}; BaseN=${COMPARE_BASEN}; comparisons=True" topo/tests/reference/fixed_params/lissom_oo_or_reference_fixed.ty 
 
 oo_or_comparisons:
 	make -C topo/tests/reference/
