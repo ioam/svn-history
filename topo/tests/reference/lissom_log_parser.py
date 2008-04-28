@@ -374,10 +374,11 @@ def initialize_clissom_data(name,**kw):
 
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
-        for thing in ["%s.param"%name,"lissom5","set_thresholds.command",
+        for thing in ["%s.param"%name,"set_thresholds.command",
                       "save_all_units.command","or_defs","measure_or_pref",
                       "measure_dir_pref","common.param"]:
             os.system("cp topo/tests/reference/%s %s"%(thing,out_dir))
+            os.system("gzip -dc topo/tests/reference/lissom5.gz > %s/lissom5"%out_dir)
 
         cwd = os.getcwd()
         os.chdir(out_dir)
