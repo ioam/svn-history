@@ -376,7 +376,7 @@ def initialize_clissom_data(name,**kw):
         os.mkdir(out_dir)
         for thing in ["%s.param"%name,"lissom5","set_thresholds.command",
                       "save_all_units.command","or_defs","measure_or_pref",
-                      "measure_dir_pref"]:
+                      "measure_dir_pref","common.param"]:
             os.system("cp topo/tests/reference/%s %s"%(thing,out_dir))
 
         cwd = os.getcwd()
