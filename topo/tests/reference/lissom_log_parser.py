@@ -365,6 +365,7 @@ def _clissomcmd(name):
 
 import os.path
 from topo.misc.filepaths import normalize_path
+import glob
 
 def initialize_clissom_data(name,**kw):
     out_dir=normalize_path("topo/tests/reference/%s_BaseN%s_BaseRN%s/"%(name,kw['BaseN'],
@@ -374,14 +375,15 @@ def initialize_clissom_data(name,**kw):
 
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
-        for thing in ["%s.param"%name,"set_thresholds.command",
-                      "save_all_units.command","or_defs","measure_or_pref",
-                      "measure_dir_pref","common.param"]:
-            os.system("cp topo/tests/reference/%s %s"%(thing,out_dir))
-            os.system("gzip -dc topo/tests/reference/lissom5.gz > %s/lissom5"%out_dir)
+        clissom_support_files = glob.glob("topo/tests/reference/support_clissom/*")
+        
+        for f in clissom_support_files:
+            os.system("cp %s %s"%(f,out_dir))
 
+        os.system("cp topo/tests/reference/%s.param %s"%(name,out_dir))
         cwd = os.getcwd()
         os.chdir(out_dir)
+        os.system("gzip -dc lissom5.gz > lissom5")
         os.system("chmod +x %s"%"lissom5")
 
         _set_clissom_params(name,out_dir,**kw)
