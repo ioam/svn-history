@@ -49,6 +49,8 @@ clean: clean-doc clean-ext-packages clean-pyc
 	${RM} .#??*.* */.#??*.* */*/.#??*.* */*/*/.#??*.* current_profile ./topo/tests/testsnapshot.typ ./topo/tests/testplotfilesaver*.png
 	${RM} -r bin include share lib man topographica ImageSaver*.jpeg python_topo
 
+uninstall:
+	make -C external uninstall
 
 # Mac OS X: to build python with X11 Tkinter
 osx-x11-patch: 
