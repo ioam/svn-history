@@ -1,7 +1,6 @@
 """
 Generic support for objects with full-featured Parameters and
-messaging.  Potentially useful for any large Python program that needs
-user-modifiable object attributes.
+messaging.  
 
 $Id: parameterizedobject.py 8214 2008-03-18 12:16:32Z ceball $
 """
@@ -124,21 +123,18 @@ class ParameterMetaclass(type):
 # CB: we could maybe reduce the complexity by doing something to allow
 # a parameter to discover things about itself when created (would also
 # allow things like checking a Parameter is owned by a
-# ParameterizedObject). I have some vague ideas about what to do.
+# Parameterized). I have some vague ideas about what to do.
 class Parameter(object):
     """
     An attribute descriptor for declaring parameters.
 
     Parameters are a special kind of class attribute.  Setting a
-    ParameterizedObject class attribute to be a Parameter instance
-    causes that attribute of the class (and the class's instances) to
-    be treated as a Parameter.  This allows special behavior,
-    including dynamically generated parameter values, documentation
-    strings, constant and read-only parameters, and type or range
-    checking at assignment time.
-
-    ** Note that Parameters can only be used when set as class **
-    ** attributes of ParameterizedObjects.                     **
+    Parameterized class attribute to be a Parameter instance causes
+    that attribute of the class (and the class's instances) to be
+    treated as a Parameter.  This allows special behavior, including
+    dynamically generated parameter values, documentation strings,
+    constant and read-only parameters, and type or range checking at
+    assignment time.
 
     For example, suppose someone wants to define two new kinds of
     objects Foo and Bar, such that Bar has a parameter delta, Foo is a
@@ -146,17 +142,19 @@ class Parameter(object):
     (and delta inherited from Bar).  She would begin her class
     definitions with something like this:
 
-    class Bar(ParameterizedObject):
+    class Bar(Parameterized):
         delta = Parameter(default=0.6, doc='The difference between steps.')
         ...
         
     class Foo(Bar):
         alpha = Parameter(default=0.1, doc='The starting value.')
-        sigma = Parameter(default=0.5, doc='The standard deviation.', constant=True)
+        sigma = Parameter(default=0.5, doc='The standard deviation.',
+                          constant=True)
         gamma = Parameter(default=1.0, doc='The ending value.')
         ...
 
-    Class Foo would then have four parameters, with delta defaulting to 0.6.
+    Class Foo would then have four parameters, with delta defaulting
+    to 0.6.
 
     Parameters have several advantages over plain attributes:
 
@@ -176,28 +174,34 @@ class Parameter(object):
        keyword arguments (as in ``def __init__(self,**params):``), and
        then each class calls its superclass (as in
        ``super(Foo,self).__init__(**params)``) so that the
-       ParameterizedObject constructor will process the keywords.
+       Parameterized constructor will process the keywords.
 
-    2. A ParameterizedObject need specify only the attributes of a
+    2. A Parameterized class need specify only the attributes of a
        Parameter whose values differ from those declared in
-       superclasses of the ParameterizedObject; the other values will
-       be inherited.  E.g. if Foo declares
+       superclasses; the other values will be inherited.  E.g. if Foo
+       declares
 
         delta = Parameter(default=0.2) 
 
        the default value of 0.2 will override the 0.6 inherited from
        Bar, but the doc will be inherited from Bar.
 
-    3. The Parameter descriptor class can be subclassed to provide more
-       complex behavior, allowing special types of parameters that, for
-       example, require their values to be numbers in certain ranges,
-       generate their values dynamically from a random distribution, or 
-       read their values from a file or other external source.
+    3. The Parameter descriptor class can be subclassed to provide
+       more complex behavior, allowing special types of parameters
+       that, for example, require their values to be numbers in
+       certain ranges, generate their values dynamically from a random
+       distribution, or read their values from a file or other
+       external source.
 
     4. The attributes associated with Parameters provide enough
        information for automatically generating property sheets in
-       graphical user interfaces, to allow ParameterizedObjects to be
-       edited by users.       
+       graphical user interfaces, allowing Parameterized instances to
+       be edited by users.
+
+    Note that Parameters can only be used when set as class attributes
+    of Parameterized classes. Parameters used as standalone objects,
+    or as class attributes of non-Parameterized classes, will not have
+    the behavior described here.
     """
     __metaclass__ = ParameterMetaclass
     
@@ -213,7 +217,7 @@ class Parameter(object):
     # Consider the following code:
     #
     #
-    # class A(ParameterizedObject):
+    # class A(Parameterized):
     #     p = Parameter(default=1)
     #
     # a1 = A()
@@ -236,14 +240,14 @@ class Parameter(object):
     #
     # Be careful when referring to the 'name' of a Parameter:
     #                                                   
-    # * A ParameterizedObject class has a name for the attribute which
-    #   is being represented by the Parameter ('p' in the example above);
+    # * A Parameterized class has a name for the attribute which is
+    #   being represented by the Parameter ('p' in the example above);
     #   in the code, this is called the 'attrib_name'.
     #
-    # * When a ParameterizedObject instance has its own local value
-    #   for a parameter, it is stored as '_X_param_value' (where X is
-    #   the attrib_name for the Parameter); in the code, this is
-    #   called the internal_name.
+    # * When a Parameterized instance has its own local value for a
+    #   parameter, it is stored as '_X_param_value' (where X is the
+    #   attrib_name for the Parameter); in the code, this is called
+    #   the internal_name.
 
                                                    
     # So that the extra features of Parameters do not require a lot of
@@ -259,9 +263,9 @@ class Parameter(object):
                  'precedence','instantiate','constant','readonly']
 
     # When created, a Parameter does not know which
-    # ParameterizedObject class owns it. If a Parameter subclass needs
+    # Parameterized class owns it. If a Parameter subclass needs
     # to know the owning class, it can declare an 'objtype' slot
-    # (which will be filled in by ParameterizedObjectMetaclass)
+    # (which will be filled in by ParameterizedMetaclass)
                                                    
     def __init__(self,default=None,doc=None,precedence=None,  # pylint: disable-msg=R0913
                  instantiate=False,constant=False,readonly=False): 
@@ -278,7 +282,7 @@ class Parameter(object):
 
         default, doc, and precedence default to None. This is to allow
         inheritance of Parameter slots (attributes) from the owning-class'
-        class hierarchy (see ParameterizedObjectMetaclass).
+        class hierarchy (see ParameterizedMetaclass).
         """
         self._attrib_name = None  
         self._internal_name = None
@@ -305,16 +309,16 @@ class Parameter(object):
         """
         Return the value for this Parameter.
 
-        If called for a ParameterizedObject class, produce that
+        If called for a Parameterized class, produce that
         class's value (i.e. this Parameter object's 'default'
         attribute).
 
-        If called for a ParameterizedObject instance, produce that
+        If called for a Parameterized instance, produce that
         instance's value, if one has been set - otherwise produce the
         class's value (default).
         """
         # NB: obj can be None (when __get__ called for a
-        # ParameterizedObject class); objtype is never None
+        # Parameterized class); objtype is never None
         
         if not obj:
             result = self.default
@@ -327,22 +331,22 @@ class Parameter(object):
         """
         Set the value for this Parameter.
 
-        If called for a ParameterizedObject class, set that class's
+        If called for a Parameterized class, set that class's
         value (i.e. set this Parameter object's 'default' attribute).
 
-        If called for a ParameterizedObject instance, set the value of
+        If called for a Parameterized instance, set the value of
         this Parameter on that instance (i.e. in the instance's
         __dict__, under the parameter's internal_name). 
 
         
         If the Parameter's constant attribute is True, only allows
-        the value to be set for a ParameterizedObject class or on
-        uninitialized ParameterizedObject instances.
+        the value to be set for a Parameterized class or on
+        uninitialized Parameterized instances.
 
         If the Parameter's readonly attribute is True, only allows the
         value to be specified in the Parameter declaration inside the
-        ParameterizedObject source code. A read-only parameter also
-        cannot be set on a ParameterizedObject class.
+        Parameterized source code. A read-only parameter also
+        cannot be set on a Parameterized class.
         
         Note that until we support some form of read-only
         object, it is still possible to change the attributes of the
@@ -350,7 +354,7 @@ class Parameter(object):
         left bound of a BoundingBox).
         """
         # NB: obj can be None (when __set__ called for a
-        # ParameterizedObject class)
+        # Parameterized class)
         if self.constant or self.readonly:
             if self.readonly:
                 raise TypeError("Read-only parameter '%s' cannot be modified"%self._attrib_name)
@@ -404,24 +408,24 @@ class Parameter(object):
 
 
 
-class ParameterizedObjectMetaclass(type):
+class ParameterizedMetaclass(type):
     """
-    The metaclass of ParameterizedObject (and all its descendents).
+    The metaclass of Parameterized (and all its descendents).
 
     The metaclass overrides type.__setattr__ to allow us to set
     Parameter values on classes without overwriting the attribute
-    descriptor.  That is, for a ParameterizedObject of type X with a
+    descriptor.  That is, for a Parameterized class of type X with a
     Parameter y, the user can type X.y=3, which sets the default value
     of Parameter y to be 3, rather than overwriting y with the
     constant value 3 (and thereby losing all other info about that
     Parameter, such as the doc string, bounds, etc.).
 
-    The __init__ method is used when defining a ParameterizedObject
-    class, usually when the module where that class is located is
-    imported for the first time.  That is, the __init__ in this
-    metaclass initializes the *class* object, while the __init__
-    method defined in each ParameterizedObject class is called for
-    each new instance of that class.
+    The __init__ method is used when defining a Parameterized class,
+    usually when the module where that class is located is imported
+    for the first time.  That is, the __init__ in this metaclass
+    initializes the *class* object, while the __init__ method defined
+    in each Parameterized class is called for each new instance of
+    that class.
 
     Additionally, a class can declare itself abstract by having an
     attribute __abstract set to True. The 'abstract' attribute can be
@@ -429,7 +433,8 @@ class ParameterizedObjectMetaclass(type):
     """    
     def __init__(mcs,name,bases,dict_):
         """
-        Initialize the class object (not an instance of the class, but the class itself).
+        Initialize the class object (not an instance of the class, but
+        the class itself).
 
         Initializes all the Parameters by looking up appropriate
         default values; see __param_inheritance().
@@ -444,7 +449,7 @@ class ParameterizedObjectMetaclass(type):
         
         for param_name,param in parameters:
             # parameter has no way to find out the name a
-            # ParameterizedObject has for it
+            # Parameterized class has for it
             param._set_names(param_name) 
             mcs.__param_inheritance(param_name,param)
 
@@ -460,7 +465,7 @@ class ParameterizedObjectMetaclass(type):
         presumably not abstract).
         """
         # Can't just do ".__abstract", because that is mangled to
-        # _ParameterizedObjectMetaclass__abstract before running, but
+        # _ParameterizedMetaclass__abstract before running, but
         # the actual class object will have an attribute
         # _ClassName__abstract.  So, we have to mangle it ourselves at
         # runtime.
@@ -485,7 +490,7 @@ class ParameterizedObjectMetaclass(type):
         In all other cases set the attribute normally (i.e. overwrite
         the descriptor).  If the new value is a Parameter, once it has
         been set we make sure that the value is inherited from
-        ParameterizedObject superclasses as described in __param_inheritance().
+        Parameterized superclasses as described in __param_inheritance().
         """
         # Find out if there's a Parameter called attribute_name as a
         # class attribute of this class - if not, parameter is None.
@@ -518,34 +523,37 @@ class ParameterizedObjectMetaclass(type):
                 
     def __param_inheritance(mcs,param_name,param):
         """
-        Look for Parameter values in superclasses of this ParameterizedObject.
+        Look for Parameter values in superclasses of this
+        Parameterized class.
 
         Ordinarily, when a Python object is instantiated, attributes
         not given values in the constructor will inherit the value
         given in the object's class, or in its superclasses.  For
-        Parameters owned by ParameterizedObjects, we have implemented an
-        additional level of default lookup, should this ordinary
+        Parameters owned by Parameterized classes, we have implemented
+        an additional level of default lookup, should this ordinary
         lookup return only None.
 
         In such a case, i.e. when no non-None value was found for a
         Parameter by the usual inheritance mechanisms, we explicitly
         look for Parameters with the same name in superclasses of this
-        ParameterizedObject, and use the first such value that we find.
+        Parameterized class, and use the first such value that we
+        find.
 
         The goal is to be able to set the default value (or other
-        slots) of a Parameter within a ParameterizedObject, just as we can set
-        values for non-Parameter objects in ParameterizedObjects, and have the
-        values inherited through the ParameterizedObject hierarchy as usual.
+        slots) of a Parameter within a Parameterized class, just as we
+        can set values for non-Parameter objects in Parameterized
+        classes, and have the values inherited through the
+        Parameterized hierarchy as usual.
         """
-        # get all relevant slots (i.e. slots defined in all superclasses of
-        # this parameter)
+        # get all relevant slots (i.e. slots defined in all
+        # superclasses of this parameter)
         slots = {}
         for p_class in classlist(type(param))[1::]:
             slots.update(dict.fromkeys(p_class.__slots__))
 
-        # Some Parameter classes need to know the owning
-        # ParameterizedObjectclass. Such classes can declare an
-        # 'objtype' slot, and the owning class will be stored in it.
+        # Some Parameter classes need to know the owning Parameterized
+        # class. Such classes can declare an 'objtype' slot, and the
+        # owning class will be stored in it.
         if 'objtype' in slots:
             setattr(param,'objtype',mcs)            
             del slots['objtype'] 
@@ -553,12 +561,12 @@ class ParameterizedObjectMetaclass(type):
         for slot in slots.keys():
             superclasses = iter(classlist(mcs)[::-1])
 
-            # Search up the hierarchy until param.slot (which
-            # has to be obtained using getattr(param,slot))
-            # is not None, or we run out of classes to search.
+            # Search up the hierarchy until param.slot (which has to
+            # be obtained using getattr(param,slot)) is not None, or
+            # we run out of classes to search.
             #
-            # CEBALERT: there's probably a better way than while
-            # and an iterator, but it works.
+            # CEBALERT: there's probably a better way than while and
+            # an iterator, but it works.
             while getattr(param,slot)==None:
                 try:
                     param_super_class = superclasses.next()
@@ -610,7 +618,7 @@ def as_uninitialized(fn):
     Decorator: call fn with the parameterized_object instance's
     initialization flag set to False, then revert the flag.
 
-    (Used to decorate ParameterizedObject methods that must alter
+    (Used to decorate Parameterized methods that must alter
     a constant Parameter.)
     """
     def override_initialization(parameterized_object,*args,**kw):
@@ -622,30 +630,31 @@ def as_uninitialized(fn):
 
 
 
-class ParameterizedObject(object):
+class Parameterized(object):
     """
-    Base class for named objects that support Parameters and message formatting.
+    Base class for named objects that support Parameters and message
+    formatting.
     
-    Automatic object naming: Every ParameterizedObject has a name
+    Automatic object naming: Every Parameterized instance has a name
     parameter.  If the user doesn't designate a name=<str> argument
     when constructing the object, the object will be given a name
     consisting of its class name followed by a unique 5-digit number.
     
-    Automatic parameter setting: The ParameterizedObject __init__
-    method will automatically read the list of keyword parameters.  If
-    any keyword matches the name of a Parameter (see Parameter class)
+    Automatic parameter setting: The Parameterized __init__ method
+    will automatically read the list of keyword parameters.  If any
+    keyword matches the name of a Parameter (see Parameter class)
     defined in the object's class or any of its superclasses, that
     parameter in the instance will get the value given as a keyword
     argument.  For example:
     
-      class Foo(ParameterizedObject):
+      class Foo(Parameterized):
          xx = Parameter(default=1)
     
       foo = Foo(xx=20)
     
     in this case foo.xx gets the value 20.
     
-    Message formatting: Each ParameterizedObject has several methods
+    Message formatting: Each Parameterized instance has several methods
     for optionally printing output according to the current 'print
     level', such as SILENT, WARNING, MESSAGE, VERBOSE, or DEBUG.  Each
     successive level allows more messages to be printed.  For example,
@@ -654,23 +663,23 @@ class ParameterizedObject(object):
     printed.  When it is SILENT, no output will be printed.
     
     For each level (except SILENT) there's an associated print method:
-    ParameterizedObject.warning(), .message(), .verbose(), and .debug().
+    Parameterized.warning(), .message(), .verbose(), and .debug().
     
     Each line printed this way is prepended with the name of the
-    object that printed it.  The ParameterizedObject parameter
-    print_level, and the module global variable min_print_level
-    combine to determine what gets printed.  For example, if foo is a
-    ParameterizedObject:
+    object that printed it.  The Parameterized.print_level parameter
+    and the module global variable min_print_level combine to
+    determine what gets printed.  For example, if foo is a
+    Parameterized:
     
        foo.message('The answer is',42)
     
     is equivalent to:
     
-       if max(foo.print_level,base.min_print_level) >= MESSAGE:
+       if max(foo.print_level,pararameterized.min_print_level) >= MESSAGE:
            print foo.name+':', 'The answer is', 42
     """
 
-    __metaclass__ = ParameterizedObjectMetaclass
+    __metaclass__ = ParameterizedMetaclass
 
     ## CEBALERT: should be StringParameter, right?
     name           = Parameter(default=None,constant=True,doc="""
@@ -682,7 +691,7 @@ class ParameterizedObject(object):
     
     def __init__(self,**params):
         """
-        Initialize this ParameterizedObject.
+        Initialize this Parameterized instance.
 
         The values of parameters can be supplied as keyword arguments
         to the constructor (using parametername=parametervalue); these
@@ -747,7 +756,7 @@ class ParameterizedObject(object):
                 rep=None
             elif name == 'print_level':
                 rep=None
-            elif isinstance(val,ParameterizedObject):
+            elif isinstance(val,Parameterized):
                 rep=val.script_repr(imports=imports,prefix=prefix+"    ")
             elif isinstance(val,list):
                 result=[]
@@ -842,7 +851,7 @@ class ParameterizedObject(object):
         new_object = copy.deepcopy(param_obj.default)
         dict_[key]=new_object
 
-        if isinstance(new_object,ParameterizedObject):
+        if isinstance(new_object,Parameterized):
             global object_count
             object_count+=1
             # CB: writes over name given to the original object;
@@ -1057,7 +1066,7 @@ class ParameterizedObject(object):
             # We only want the cache to be visible to the cls on which
             # params() is called, so we mangle the name ourselves at
             # runtime (if we were to mangle it now, it would be
-            # _ParameterizedObject.__params for all classes).
+            # _Parameterized.__params for all classes).
             setattr(cls,'_%s__params'%cls.__name__,paramdict)
             return paramdict
         
@@ -1098,7 +1107,7 @@ def print_all_param_defaults():
     print ""
     print "                           Parameter Default Values"
     print ""
-    classes = descendents(ParameterizedObject)
+    classes = descendents(Parameterized)
     classes.sort(key=lambda x:x.__name__)
     for c in classes:
         c.print_param_defaults()
@@ -1121,7 +1130,7 @@ _param_name_changes = {}
 import __main__
 class PicklableClassAttributes(object):
     """
-    Supports pickling of ParameterizedObject class attributes for a given module.
+    Supports pickling of Parameterized class attributes for a given module.
 
     When requested to be pickled, stores a module's PO classes' attributes,
     and any given startup_commands. On unpickling, executes the startup
@@ -1152,7 +1161,7 @@ class PicklableClassAttributes(object):
             # there's classes and functions...what else?
             if isinstance(v,type) or isinstance(v,types.FunctionType):
                 if v.__module__ == "__main__":
-                    ParameterizedObject().warning("%s (type %s) has source in __main__; it will only be found on unpickling if the class is explicitly defined (e.g. by running the same script first) before unpickling."%(k,type(v)))
+                    Parameterized().warning("%s (type %s) has source in __main__; it will only be found on unpickling if the class is explicitly defined (e.g. by running the same script first) before unpickling."%(k,type(v)))
 
         
         class_attributes = {}
@@ -1181,7 +1190,7 @@ class PicklableClassAttributes(object):
             try:
                 class_ = eval(class_name,__main__.__dict__)
             except:
-                ParameterizedObject().warning("Could not find class %s to restore its parameter values (class might have been removed or renamed)."%class_name)
+                Parameterized().warning("Could not find class %s to restore its parameter values (class might have been removed or renamed)."%class_name)
                 break
 
             # now restore class Parameter values
@@ -1190,20 +1199,20 @@ class PicklableClassAttributes(object):
                 if class_name in _param_name_changes:
                     if p_name in _param_name_changes[class_name]:
                         new_p_name = _param_name_changes[class_name][p_name]
-                        ParameterizedObject().message("%s's %s parameter has been renamed to %s."%(class_name,p_name,new_p_name))
+                        Parameterized().message("%s's %s parameter has been renamed to %s."%(class_name,p_name,new_p_name))
                         p_name = new_p_name
 
                 try:
                     setattr(class_,p_name,p)
                 except:
-                    ParameterizedObject().warning('Problem restoring parameter %s=%s for class %s (Parameter object representing %s may have changed since the snapshot was created).' % (p_name,repr(p),class_name,p_name))
+                    Parameterized().warning('Problem restoring parameter %s=%s for class %s (Parameter object representing %s may have changed since the snapshot was created).' % (p_name,repr(p),class_name,p_name))
                 
 
 
     # CB: I guess this could be simplified
     def get_PO_class_attributes(self,module,class_attributes,processed_modules,exclude=()):
         """
-        Recursively search module and get attributes of ParameterizedObject classes within it.
+        Recursively search module and get attributes of Parameterized classes within it.
 
         class_attributes is a dictionary {module.path.and.Classname: state}, where state
         is the dictionary {attribute: value}.
@@ -1225,7 +1234,7 @@ class PicklableClassAttributes(object):
                 processed_modules.append(v)
 
             else:
-                if isinstance(v,type) and issubclass(v,ParameterizedObject):
+                if isinstance(v,type) and issubclass(v,Parameterized):
 
                     # Note: we take the class name as v.__name__, not
                     # k, because k might be just a label for the true

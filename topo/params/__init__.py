@@ -1,14 +1,23 @@
 """
-Generic support for objects with full-featured Parameters and
-messaging.  Potentially useful for any large Python program that needs
-user-modifiable object attributes.
+Parameters are a kind of class attribute allowing special behavior,
+including dynamically generated parameter values, documentation
+strings, constant and read-only parameters, and type or range checking
+at assignment time.
+
+Potentially useful for any large Python program that needs
+user-modifiable object attributes; see the parameterized.Parameter and
+parameterized.Parameterized classes for more information.
 
 
-Subclasses of Parameter, implementing specific parameter types.
+This file contains subclasses of Parameter, implementing specific
+parameter types (e.g. Number).
 
 $Id: parameterclasses.py 8381 2008-04-22 06:56:47Z ceball $
 """
 __version__='$Revision: 8381 $'
+
+# CEBALERT: we'll need more documentation above (eventually, when
+# params becomes a separate directory and then package).
 
 import types
 

@@ -1,8 +1,5 @@
-"""
-Subclasses of Parameter, implementing specific parameter types.
+# Moved to topo/params/__init__.py
 
-$Id$
-"""
 __version__='$Revision$'
 
 import types

@@ -67,7 +67,7 @@ def with_busy_cursor(fn):
     return busy_fn
 
 
-class PlotGroupPanel(tk.TkParameterizedObject,Frame):
+class PlotGroupPanel(tk.TkParameterized,Frame):
 
     __abstract = True
 
@@ -129,7 +129,7 @@ class PlotGroupPanel(tk.TkParameterizedObject,Frame):
         in historical views.
         """
         
-        tk.TkParameterizedObject.__init__(self,master,extraPO=plotgroup,**params)
+        tk.TkParameterized.__init__(self,master,extraPO=plotgroup,**params)
         Frame.__init__(self,master)
         
         self.setup_plotgroup()

@@ -1,41 +1,41 @@
 """
-Classes linking ParameterizedObjects and Parameters to Tkinter.
+Classes linking Parameters to Tkinter.
 
-TkParameterizedObject allows flexible graphical representation and
-manipulation of a ParameterizedObject's individual Parameters;
-ParametersFrame extends TkParameterizedObject, displaying all the
+TkParameterized allows flexible graphical representation and
+manipulation of a Parameterized's individual Parameters;
+ParametersFrame extends TkParameterized, displaying all the
 Parameters as a list.
 
 
 
 TO BE UPDATED...
 
-Note that TkParameterizedObject extends TkParameterizedObjectBase by
+Note that TkParameterized extends TkParameterizedBase by
 adding widget-drawing abilities; documentation for using these classes
-begins at a more useful and simple level in TkParameterizedObject, and
-continues in more detail in TkParameterizedObjectBase (an abstract
+begins at a more useful and simple level in TkParameterized, and
+continues in more detail in TkParameterizedBase (an abstract
 class).
 
 
 
-A typical use of TkParameterizedObject might be in some subclass that
+A typical use of TkParameterized might be in some subclass that
 is also a Tkinter.Frame (e.g. PlotGroupPanel). The Frame serves as the
 container into which the representations of the Parameters are placed
 - although any suitable Tkinter widget can be used, and there is in
-fact no need to sublass TkParameterizedObject. The following example
+fact no need to sublass TkParameterized. The following example
 shows this, displaying the Parameters from two different
-ParameterizedObjects in a window:
+Parameterizeds in a window:
 
 
  ## Existing, non-GUI code
- from topo.base.parameterizedobject import ParameterizedObject
+ from topo.base.parameterizedobject import Parameterized
  from topo.base.parameterclasses import Number,StringParameter,BooleanParameter
 
- class Object1(ParameterizedObject):
+ class Object1(Parameterized):
      duration = Number(2.0,bounds=(0,None),doc='Duration of measurement')
      displacement = Number(0.0,bounds=(-1,1),doc='Displacement from point A')
 
- class Object2(ParameterizedObject):
+ class Object2(Parameterized):
      active_today = BooleanParameter(True,doc='Whether or not to count today')
      operator_name = StringParameter('Zhong Wen',doc='Operator today')
 
@@ -45,12 +45,12 @@ ParameterizedObjects in a window:
 
  ## Flexible GUI representation 
  import Tkinter
- from topo.tkgui.tkparameterizedobject import TkParameterizedObject
+ from topo.tkgui.tkparameterizedobject import TkParameterized
 
  app_window = Tkinter.Tk()
 
- t1 = TkParameterizedObject(app_window,extraPO=o1)
- t2 = TkParameterizedObject(app_window,extraPO=o2)
+ t1 = TkParameterized(app_window,extraPO=o1)
+ t2 = TkParameterized(app_window,extraPO=o2)
 
  t1.pack_param('duration')
  t1.pack_param('displacement')
@@ -59,7 +59,7 @@ ParameterizedObjects in a window:
 
 
 The resulting window exhibits some of the more important features of
-TkParameterizedObject: each Parameter is represented by an appropriate
+TkParameterized: each Parameter is represented by an appropriate
 widget (e.g. slider for a Number); type and range checking is handled
 already by using Parameters; doc strings are displayed automatically
 as pop-up help for each Parameter; changes to the Parameters in the
@@ -70,7 +70,7 @@ Additionally, it is possible to associate changes to variables with
 function calls, display true Parameter variable names, and more (umm
 like what) - see the detailed documentation.
 
-Existing examples of TkParameterizedObject usage can be found in
+Existing examples of TkParameterized usage can be found in
 parametersframe.ParametersFrameWithApply (as mentioned above) and
 in plotgrouppanel.PlotGroupPanel (where it is used to
 allow editing of PlotGroups).
@@ -91,10 +91,10 @@ $Id: tkparameterizedobject.py 8444 2008-04-27 05:29:14Z ceball $
 # independently of as much of topographica as possible.
 
 # CEB: currently working on this file (still have to attend to
-# simple ALERTs; documentation finished for TkParameterizedObject
-# but not for TkParameterizedObjectBase)
+# simple ALERTs; documentation finished for TkParameterized
+# but not for TkParameterizedBase)
 
-# CB: it's quite likely that the way TkParameterizedObjectBase is
+# CB: it's quite likely that the way TkParameterizedBase is
 # implemented could be simplified. Right now, it still contains
 # leftovers of various attempts to get everything working. But
 # it does seem to work!
@@ -131,7 +131,7 @@ from Tkinter import BooleanVar, StringVar, Frame, Checkbutton, \
      Entry, TclError, E, W, Label
 from Tile import Combobox
 
-from ..parameterized import ParameterizedObject,ParameterizedObjectMetaclass,\
+from ..parameterized import Parameterized,ParameterizedMetaclass,\
      classlist
 
 from .. import Boolean,String,Number,Selector,ClassSelector,ObjectSelector,\
@@ -211,7 +211,7 @@ class Button(Callable):
     Parameter representing all Parameter classes that are GUI-specific.
 
     Can be associated with an image when used in a
-    TkParameterizedObject by specifying an image_path (i.e. location
+    TkParameterized by specifying an image_path (i.e. location
     of an image suitable for PIL, e.g. a PNG, TIFF, or JPEG image) and
     optionally a size (width,height) tuple.
 
@@ -257,26 +257,26 @@ class Button(Callable):
 
 
 
-class TkParameterizedObjectBase(ParameterizedObject):
+class TkParameterizedBase(Parameterized):
     """
-    A ParameterizedObject that maintains Tkinter.Variable shadows
+    A Parameterized that maintains Tkinter.Variable shadows
     (proxies) of its Parameters. The Tkinter Variable shadows are kept
     in sync with the Parameter values, and vice versa.
 
     Optionally performs the same for an *additional* shadowed
-    ParameterizedObject (extraPO). The Parameters of the extra
+    Parameterized (extraPO). The Parameters of the extra
     shadowed PO are available via this object (via both the usual
     'dot' attribute access and dedicated parameter accessors
     declared in this class). 
 
-    The Tkinter.Variable shadows for this ParameterizedObject and any
+    The Tkinter.Variable shadows for this Parameterized and any
     extra shadowed one are available under their corresponding
     parameter names in the _tkvars dictionary.
 
     (See note 1 for complications arising from name clashes.)
     
 
-    Parameters being represented by TkParameterizedObjectBase also
+    Parameters being represented by TkParameterizedBase also
     have a 'translators' dictionary, allowing mapping between string
     representations of the objects and the objects themselves (for use
     with e.g. a Tkinter.OptionMenu). More information about the
@@ -295,7 +295,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         the Parameter on this PO will be shadowed.
 
         Example: 'name' is a common attribute. As a
-        ParameterizedObject, this object has a 'name' Parameter. Any
+        Parameterized, this object has a 'name' Parameter. Any
         shadowed PO will also have a 'name' Parameter. By default,
         this object's name will be shadowed at the expense of the name
         of the extra shadowed PO.
@@ -306,11 +306,11 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
         (b) Along the same lines, an additional complication can arise
         relating specifically to 'dot' attribute lookup.  For
-        instance, a sublass of TkParameterizedObject might also
+        instance, a sublass of TkParameterized might also
         inherit from Tkinter.Frame. Frame has many of its own
         attributes, including - for example - 'size'. If we shadow a
-        ParameterizedObject that has a 'size' Parameter, the
-        ParameterizedObject's size Parameter will not be available as
+        Parameterized that has a 'size' Parameter, the
+        Parameterized's size Parameter will not be available as
         .size because ('dot') attribute lookup begins on the local
         object and is not overridden by 'self_first'. Using the
         parameter accessors .get_parameter_object('size') or
@@ -346,7 +346,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
     # CEBNOTE: Regarding note 2 above...if the above becomes a
     # problem, we could have some autorefresh of the vars or a
     # callback of some kind in the parameterized object itself.
-    # (See note in TkParameterizedObject.__init__.)
+    # (See note in TkParameterized.__init__.)
 
     # CEB: because of note 1, attributes of this class should have
     # names that are unlikely to clash (or they should be private);
@@ -363,9 +363,9 @@ class TkParameterizedObjectBase(ParameterizedObject):
 ##     def __repr__(self):
 ##         # Method adds the name of the _extraPO, plus avoids recursion problem (see note).
         
-##         if isinstance(self._extraPO,ParameterizedObject):
+##         if isinstance(self._extraPO,Parameterized):
 ##             extraPOstring = self._extraPO.__class__.__name__+"(name=%s)"%self._extraPO.name
-##         elif isinstance(self._extraPO,ParameterizedObjectMetaclass):
+##         elif isinstance(self._extraPO,ParameterizedMetaclass):
 ##             extraPOstring = self._extraPO.__name__
 ##         elif self._extraPO is None:
 ##             extraPOstring = "None"
@@ -392,7 +392,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
     def _setup_params(self,**params):
         """
         Parameters that are not in this object itself but are in the
-        extraPO get set on extraPO. Then calls ParameterizedObject's
+        extraPO get set on extraPO. Then calls Parameterized's
         _setup_params().
         """
         ### a parameter might be passed in for one of the extra_pos;
@@ -403,7 +403,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                 self.set_parameter_value(n,p)
                 del params[n]
 
-        ParameterizedObject._setup_params(self,**params)
+        Parameterized._setup_params(self,**params)
 
     # CEBALERT: rename extraPO...but to what?
     # Rename change_PO() and anything else related.
@@ -451,8 +451,8 @@ class TkParameterizedObjectBase(ParameterizedObject):
         
         """
         assert extraPO is None \
-               or isinstance(extraPO,ParameterizedObjectMetaclass) \
-               or isinstance(extraPO,ParameterizedObject)
+               or isinstance(extraPO,ParameterizedMetaclass) \
+               or isinstance(extraPO,Parameterized)
 
         # make self.first etc private
 
@@ -478,7 +478,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
                     String:DoNothingTranslator}
         
         self.change_PO(extraPO)
-        super(TkParameterizedObjectBase,self).__init__(**params)
+        super(TkParameterizedBase,self).__init__(**params)
 
 
     def change_PO(self,extraPO):
@@ -618,7 +618,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         parameter,sourcePO=self.get_parameter_object(param_name,with_location=True)
 
         ### can only edit constant parameters for class objects
-        if parameter.constant==True and not isinstance(sourcePO,ParameterizedObjectMetaclass):
+        if parameter.constant==True and not isinstance(sourcePO,ParameterizedMetaclass):
             return  ### HIDDEN
 
         tkvar = self._tkvars[param_name]
@@ -655,7 +655,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
     def _source_POs(self):
         """
-        Return a list of ParameterizedObjects in which to find
+        Return a list of Parameterizeds in which to find
         Parameters.
         
         The list is ordered by precedence, as defined by self_first.
@@ -673,7 +673,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
     def get_source_po(self,name):
         """
-        Return the ParameterizedObject which contains the parameter 'name'.
+        Return the Parameterized which contains the parameter 'name'.
         """
         sources = self._source_POs()
         
@@ -868,7 +868,7 @@ class TkParameterizedObjectBase(ParameterizedObject):
         # tagged slider just goes to the default value)
         # CEBALERT: set_in_bounds not valid for POMetaclass?
         parameter,sourcePO=self.get_parameter_object(param_name,with_location=True)
-        if hasattr(parameter,'set_in_bounds') and isinstance(sourcePO,ParameterizedObject): 
+        if hasattr(parameter,'set_in_bounds') and isinstance(sourcePO,Parameterized): 
             parameter.set_in_bounds(sourcePO,val)
         else:
             setattr(sourcePO,param_name,val)
@@ -879,16 +879,16 @@ class TkParameterizedObjectBase(ParameterizedObject):
 
 
 
-class TkParameterizedObject(TkParameterizedObjectBase):
+class TkParameterized(TkParameterizedBase):
     """
     Provide widgets for Parameters of itself and up to one additional
-    ParameterizedObject.
+    Parameterized.
 
     A subclass that defines a Parameter p can display it appropriately
     for manipulation by the user simply by calling
     pack_param('p'). The GUI display and the actual Parameter value
     are automatically synchronized (though see technical notes in
-    TkParameterizedObjectBase's documentation for more details).
+    TkParameterizedBase's documentation for more details).
 
     In general, pack_param() adds a Tkinter.Frame containing a label
     and a widget: 
@@ -900,8 +900,8 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     ---------------------
 
     In the same way, an instance of this class can be used to display
-    the Parameters of an existing ParameterizedObject. By passing in
-    extraPO=x, where x is an existing ParameterizedObject, a Parameter
+    the Parameters of an existing Parameterized. By passing in
+    extraPO=x, where x is an existing Parameterized, a Parameter
     q of x can be displayed in the GUI by calling pack_param('q').
 
     For representation in the GUI, Parameter values might need to be
@@ -909,16 +909,16 @@ class TkParameterizedObject(TkParameterizedObjectBase):
     (e.g. for a ClassSelectorParameter, the options are really class
     objects, but the user must be presented with a list of strings to
     choose from). Such translation is handled and documented in the
-    TkParameterizedObjectBase; the default behaviors can be overridden
+    TkParameterizedBase; the default behaviors can be overridden
     if required.
 
     (Note that this class simply adds widget drawing to
-    TkParameterizedObjectBase. More detail about the shadowing of
+    TkParameterizedBase. More detail about the shadowing of
     Parameters is available in the documentation for
-    TkParameterizedObjectBase.)
+    TkParameterizedBase.)
     """
 
-    # CEBNOTE: as for TkParameterizedObjectBase, avoid declaring
+    # CEBNOTE: as for TkParameterizedBase, avoid declaring
     # Parameters here (to avoid name clashes with any additional
     # Parameters this might eventually be representing).
 
@@ -927,7 +927,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         variable names instead.
 
         Example use:
-          TkParameterizedObject.pretty_parameters=False
+          TkParameterized.pretty_parameters=False
     
         (This causes all Parameters throughout the GUI to be displayed
         with variable names.)
@@ -939,7 +939,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         Initialize this object with the arguments and attributes
         described below:
         
-        extraPO: optional ParameterizedObject for which to shadow
+        extraPO: optional Parameterized for which to shadow
         Parameters (in addition to Parameters of this object; see
         superclass)
 
@@ -984,7 +984,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
                                                Number:False,
                                                Parameter:False}
 
-        TkParameterizedObjectBase.__init__(self,extraPO=extraPO,
+        TkParameterizedBase.__init__(self,extraPO=extraPO,
                                            self_first=self_first,
                                            **params)
 
@@ -1060,7 +1060,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
                                type(param_obj)) and not force:
             return
         else:
-            super(TkParameterizedObject,self)._update_param_from_tkvar(param_name)
+            super(TkParameterized,self)._update_param_from_tkvar(param_name)
 
 
             
@@ -1069,7 +1069,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
         Calls superclass's version, but adds help text for the
         currently selected item of SelectorParameters.
         """
-        super(TkParameterizedObject,self)._tkvar_set(param_name,val)
+        super(TkParameterized,self)._tkvar_set(param_name,val)
 
         if isinstance(self.get_parameter_object(param_name),Selector):
             try:
@@ -1363,7 +1363,7 @@ class TkParameterizedObject(TkParameterizedObjectBase):
             label = Tkinter.Label(master,text=self.__pretty_print(name))
 
         # disable widgets for constant params
-        if param_obj.constant and isinstance(source_po,ParameterizedObject):
+        if param_obj.constant and isinstance(source_po,Parameterized):
             # (need to be able to set on class, hence check it's PO not POMetaclass
             widget.config(state='disabled')
 
@@ -1639,7 +1639,7 @@ class Translator(object):
 
         last_string2object_failed is a flag that can be set to indicate that
         the last string-to-object translation failed.
-        (TkParameterizedObject checks this attribute for indicating errors to
+        (TkParameterized checks this attribute for indicating errors to
         the user.)
 
     """
@@ -1777,12 +1777,12 @@ def param_is_dynamically_generated(param,po):
     if not hasattr(param,'_value_is_dynamic'):
         return False
 
-    if isinstance(po,ParameterizedObject):
+    if isinstance(po,Parameterized):
         return param._value_is_dynamic(po)
-    elif isinstance(po,ParameterizedObjectMetaclass):
+    elif isinstance(po,ParameterizedMetaclass):
         return param._value_is_dynamic(None)
     else:
-        raise ValueError("po must be a ParameterizedObject or ParameterizedObjectMetaclass.")
+        raise ValueError("po must be a Parameterized or ParameterizedMetaclass.")
 
 
 
@@ -1803,16 +1803,16 @@ def param_is_dynamically_generated(param,po):
 
 
 ## """
-## Classes for graphically manipulating all the Parameters of a ParameterizedObject.
+## Classes for graphically manipulating all the Parameters of a Parameterized.
 
 ## ParametersFrame and ParametersFrameWithApply display the Parameters of
-## a supplied ParameterizedObject. Both allow these Parameters to be
+## a supplied Parameterized. Both allow these Parameters to be
 ## edited; ParametersFrame applies changes immediately as they are made,
 ## whereas ParametersFrameWithApply makes no changes until a confirmation
 ## is given (by pressing the 'Apply' button).
 
 
-## ParametersFrame extends TkParameterizedObject; see TkParameterizedObject
+## ParametersFrame extends TkParameterized; see TkParameterized
 ## for the underlying details of representing Parmeters in the GUI.
 
 
@@ -1850,10 +1850,10 @@ def keys_sorted_by_value(d):
 
 # CB: color buttons to match? deactivate irrelevant buttons?
 
-class ParametersFrame(TkParameterizedObject,Frame):
+class ParametersFrame(TkParameterized,Frame):
     """
     Displays and allows instantaneous editing of the Parameters
-    of a supplied ParameterizedObject.
+    of a supplied Parameterized.
 
     Changes made to Parameter representations on the GUI are
     immediately applied to the underlying object.
@@ -1881,10 +1881,10 @@ class ParametersFrame(TkParameterizedObject,Frame):
         GUI (i.e. by the user). Since a variable's value is not
         necessarily changed by such a set(), on_modify is another
         optional function to call only when a GUI variable's value
-        actually changes. (See TkParameterizedObject for more detail.)
+        actually changes. (See TkParameterized for more detail.)
         """
         Frame.__init__(self,master,borderwidth=1,relief='raised')
-        TkParameterizedObject.__init__(self,master,
+        TkParameterized.__init__(self,master,
                                        extraPO=parameterized_object,
                                        self_first=False,**params)
 
@@ -1983,7 +1983,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
 
     def _defaults_button(self):
         """See Defaults parameter."""
-        assert isinstance(self._extraPO,ParameterizedObject)
+        assert isinstance(self._extraPO,Parameterized)
 
         defaults = self._extraPO.defaults()
 
@@ -2033,7 +2033,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
         self.pack_displayed_params(on_change=on_change,on_modify=on_modify)
 
         # hide Defaults button for classes
-        if isinstance(parameterized_object,ParameterizedObjectMetaclass):
+        if isinstance(parameterized_object,ParameterizedMetaclass):
             self.hide_param('Defaults')
         else:
             self.unhide_param('Defaults')    
@@ -2131,7 +2131,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
         
     def _create_selector_widget(self,frame,name,widget_options):
         """As for the superclass, but binds <<right-click>> event for opening menu."""
-        w = TkParameterizedObject._create_selector_widget(self,frame,name,widget_options)
+        w = TkParameterized._create_selector_widget(self,frame,name,widget_options)
         w.bind('<<right-click>>',lambda event: self.__right_click(event, w))
         return w
 
@@ -2216,7 +2216,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
 ##         Calls the superclass's method, then additionally indicates if a parameter
 ##         differs from the class default (by giving label green background).
 ##         """
-##         TkParameterizedObject._indicate_tkvar_status(self,param_name)
+##         TkParameterized._indicate_tkvar_status(self,param_name)
 
 ##         b = 'white'
         
@@ -2248,7 +2248,7 @@ class ParametersFrame(TkParameterizedObject,Frame):
 class ParametersFrameWithApply(ParametersFrame):
     """
     Displays and allows editing of the Parameters of a supplied
-    ParameterizedObject.
+    Parameterized.
 
     Changes made to Parameter representations in the GUI are not
     applied to the underlying object until Apply is pressed.
@@ -2321,7 +2321,7 @@ class ParametersFrameWithApply(ParametersFrame):
         
     
     def _handle_gui_set(self,p_name,force=False):
-        TkParameterizedObject._handle_gui_set(self,p_name,force)
+        TkParameterized._handle_gui_set(self,p_name,force)
 
         if hasattr(self,'representations') and 'Apply' in self.representations:
             w=self.representations['Apply']['widget']
@@ -2344,7 +2344,7 @@ class ParametersFrameWithApply(ParametersFrame):
 
 
     def update_parameters(self):
-        if isinstance(self._extraPO,ParameterizedObjectMetaclass):
+        if isinstance(self._extraPO,ParameterizedMetaclass):
             for name in self.displayed_params.keys():
                 #if self._tkvar_changed(name):
                 self._update_param_from_tkvar(name)
@@ -2379,7 +2379,7 @@ class ParametersFrameWithApply(ParametersFrame):
 
     def _defaults_button(self):
         """See Defaults parameter."""
-        assert isinstance(self._extraPO,ParameterizedObject)
+        assert isinstance(self._extraPO,Parameterized)
 
         defaults = self._extraPO.defaults()
 
@@ -2407,9 +2407,9 @@ def edit_parameters(parameterized_object,with_apply=True,**params):
 
     Extra params are passed to the ParametersFrame constructor.
     """
-    if not (isinstance(parameterized_object,ParameterizedObject) or \
-           isinstance(parameterized_object,ParameterizedObjectMetaclass)):
-        raise ValueError("Can only edit parameters of a ParameterizedObject.")
+    if not (isinstance(parameterized_object,Parameterized) or \
+           isinstance(parameterized_object,ParameterizedMetaclass)):
+        raise ValueError("Can only edit parameters of a Parameterized.")
 
     if not with_apply:
         pf_class = ParametersFrame

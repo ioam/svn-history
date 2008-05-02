@@ -339,7 +339,7 @@ class TaggedSlider(Tkinter.Frame):
         If that's not possible (e.g. there's text in the box), use the
         value contained in the variable (because whatever owns the
         variable could have performed a conversion of the text -
-        TkParameterizedObject does this, for instance).
+        TkParameterized does this, for instance).
 
         Leaves the resolution as it was if no number is available.
         """
