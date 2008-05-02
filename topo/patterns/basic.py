@@ -775,3 +775,6 @@ class Translator(PatternGenerator):
         # JAHACKALERT: I want it to move in perpendicular orientation
         # JAB: Does it do that now, or not?  Please clarify.
         return generator(xdensity=xdensity,ydensity=ydensity,bounds=bounds,x=self.x+t*cos(self.inspect_value("orientation")+pi/2)*self.speed,y=self.y+t*sin(self.inspect_value("orientation")+pi/2)*self.speed,orientation=self.inspect_value("orientation"))#,scale=self.inspect_value("scale"))
+
+
+__all__ = list(set([k for k,v in locals().items() if isinstance(v,type) and issubclass(v,PatternGenerator)]))
