@@ -142,7 +142,6 @@ from widgets import FocusTakingButton as Button2, TaggedSlider, Balloon, Menu, \
 
 
 ### topo dependencies
-import topo # for topo.guimain only
 from topo.misc.filepaths import Filename, resolve_path
 ###
 
@@ -407,7 +406,7 @@ class TkParameterizedBase(Parameterized):
 
     # CEBALERT: rename extraPO...but to what?
     # Rename change_PO() and anything else related.
-    def __init__(self,extraPO=None,self_first=True,live_update=True,**params):
+    def __init__(self,extraPO=None,self_first=True,live_update=True,guimain=None,**params):
         """
 
 
@@ -454,6 +453,7 @@ class TkParameterizedBase(Parameterized):
                or isinstance(extraPO,ParameterizedMetaclass) \
                or isinstance(extraPO,Parameterized)
 
+        self.guimain = guimain
         # make self.first etc private
 
         self._live_update = live_update
@@ -811,6 +811,8 @@ class TkParameterizedBase(Parameterized):
             
         self.translators[name]=translator_type(param,initial_value=self.get_parameter_value(name))
 
+        self.translators[name].guimain = self.guimain
+
 
     # CEB: doc replace & generalize,  or change
     def _object2string(self,param_name,obj,replace=True):
@@ -934,7 +936,7 @@ class TkParameterized(TkParameterizedBase):
         """)
 
 
-    def __init__(self,master,extraPO=None,self_first=True,**params):
+    def __init__(self,master,extraPO=None,self_first=True,guimain=None,**params):
         """
         Initialize this object with the arguments and attributes
         described below:
@@ -1655,7 +1657,8 @@ class Translator(object):
         raise NotImplementedError
 
     def _pass_out_msg(self,msg):
-        if hasattr(topo,'guimain'): topo.guimain.status_message(msg)
+        if self.guimain:
+            self.guimain.status_message(msg)
 
 
 class DoNothingTranslator(Translator):

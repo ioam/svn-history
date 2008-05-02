@@ -129,7 +129,8 @@ class PlotGroupPanel(tk.TkParameterized,Frame):
         in historical views.
         """
         
-        tk.TkParameterized.__init__(self,master,extraPO=plotgroup,**params)
+        tk.TkParameterized.__init__(self,master,extraPO=plotgroup,
+                                    guimain=topo.guimain,**params)
         Frame.__init__(self,master)
         
         self.setup_plotgroup()
