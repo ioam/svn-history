@@ -141,9 +141,46 @@ from widgets import FocusTakingButton as Button2, TaggedSlider, Balloon, Menu, \
      askyesno,TkguiWindow
 
 
-### topo dependencies
-from topo.misc.filepaths import Filename, resolve_path
-###
+
+# CEBALERT: copied from topo.misc.filepaths, to make it clear what we
+# need. I guess we should consider how much of topo.misc.filepaths
+# we might want in topo/params...
+########################################
+import os.path, sys
+application_path = os.path.split(os.path.split(sys.executable)[0])[0]
+output_path = application_path
+
+def resolve_path(path,search_paths=[]):
+    """
+    Find the path to an existing file, searching in the specified
+    search paths if the filename is not absolute, and converting a
+    UNIX-style path to the current OS's format if necessary.
+
+    To turn a supplied relative path into an absolute one, the path is
+    appended to each path in (search_paths+the current working
+    directory+the application's base path), in that order, until the
+    file is found.
+
+    (Similar to Python's os.path.abspath(), except more search paths
+    than just os.getcwd() can be used, and the file must exist.)
+    
+    An IOError is raised if the file is not found anywhere.
+    """
+    path = os.path.normpath(path)
+
+    if os.path.isabs(path): return path
+
+    all_search_paths = search_paths + [os.getcwd()] + [application_path]
+
+    paths_tried = []
+    for prefix in set(all_search_paths): # does set() keep order?            
+        try_path = os.path.join(os.path.normpath(prefix),path)
+        if os.path.isfile(try_path): return try_path
+        paths_tried.append(try_path)
+
+    raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following place(s): '+str(paths_tried)+'.')
+
+########################################
 
 
 
