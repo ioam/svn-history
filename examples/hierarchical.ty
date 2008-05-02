@@ -19,8 +19,8 @@ from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.numbergenerators import UniformRandom
 #from topo.projections.basic import OneToOneProjection
-import topo.outputfns
-import topo.patterns 
+from topo import outputfns
+from topo import patterns 
 import topo.patterns.random
 
 
@@ -34,14 +34,14 @@ GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0.25
 GeneratorSheet.nominal_density = 20
 
-left_input_pattern = topo.patterns.Line(
+left_input_pattern = patterns.Line(
     thickness=0.02,
     bounds=BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
     x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
     y=UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
     orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
-right_input_pattern = topo.patterns.Line(
+right_input_pattern = patterns.Line(
     thickness=0.02,
     bounds=BoundingBox(points=((-0.8,-1.05),(0.8,1.05))),
     x=UniformRandom(lbound=-0.5,ubound=0.5,seed=100),
@@ -53,10 +53,10 @@ right_input_pattern = topo.patterns.Line(
 CFSheet.nominal_density = locals().get('default_density',10.0)
 
 # sheet activation saturates at 1
-CFSheet.output_fn = topo.outputfns.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
+CFSheet.output_fn = outputfns.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
 
 numpy.random.seed((500,500))
-CFProjection.weights_generator = topo.patterns.random.UniformRandom()
+CFProjection.weights_generator = patterns.random.UniformRandom()
 CFProjection.nominal_bounds_template=BoundingBox(radius=0.1)
 CFProjection.learning_fn = CFPLF_Hebbian_opt()
 CFProjection.response_fn = CFPRF_DotProduct_opt()
@@ -121,4 +121,4 @@ topo.sim['RightRetina'].layout_location=(369,520)
 
 
 # set default input generator (e.g. for the GUI)
-GeneratorSheet.params()['input_generator'].default=topo.patterns.Line()
+GeneratorSheet.params()['input_generator'].default=patterns.Line()
