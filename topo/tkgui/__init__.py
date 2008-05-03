@@ -10,9 +10,12 @@ $Id$
 """
 __version__='$Revision$'
 
-import sys, Tkinter, _tkinter,os
-import platform 
-import topo.base.parameterizedobject
+import sys
+import os
+import platform
+import Tkinter
+
+import topo
 
 from topoconsole import TopoConsole
 from widgets import ControllableMenu
@@ -67,7 +70,6 @@ from topo.sheets import *
 
 
 
-# CEBALERT: should probably be in __init__.py
 ##########
 ### Which os is being used (for gui purposes)?
 #
@@ -165,7 +167,7 @@ def start(mainloop=False,banner=True):
         options_database = os.path.join(sys.path[0],"topo","tkgui","options_database")
         root.option_readfile(options_database)
         print "Read options database from",options_database
-    except _tkinter.TclError:
+    except Tkinter.TclError:
         pass
     
     topoconsole = TopoConsole(root)
