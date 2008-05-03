@@ -17,6 +17,7 @@ from topo.plotting.plot import Plot
 from topo.plotting.plotgroup import PlotGroup
 from topo.tkgui.plotgrouppanel import PlotGroupPanel
 
+from  topo.params.tk.widgets import StatusBar
 
 class TestPlotGroupPanel(unittest.TestCase):
 
@@ -25,6 +26,8 @@ class TestPlotGroupPanel(unittest.TestCase):
         start_tkgui() # this test needs the console
 
         window = Tkinter.Toplevel()
+        # see HACK A in topoconsole
+        window.status = StatusBar(window)
         
         image = Image.open('examples/ellen_arthur.pgm')
         self.plot = Plot(image,name='Ellen Arthur')
