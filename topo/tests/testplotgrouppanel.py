@@ -17,7 +17,7 @@ from topo.plotting.plot import Plot
 from topo.plotting.plotgroup import PlotGroup
 from topo.tkgui.plotgrouppanel import PlotGroupPanel
 
-from  topo.params.tk.widgets import StatusBar
+from  topo.params.tk import StatusBar
 
 class TestPlotGroupPanel(unittest.TestCase):
 
