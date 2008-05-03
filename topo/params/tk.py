@@ -178,10 +178,11 @@ from tkMessageBox import _show,QUESTION,YESNO
 from Tile import Combobox
 from scrodget import Scrodget
 
-from ..parameterized import Parameterized,ParameterizedMetaclass,\
+from parameterized import Parameterized,ParameterizedMetaclass,\
      classlist
 
-from .. import Boolean,String,Number,Selector,ClassSelector,ObjectSelector,\
+# Hmm
+from ..params import Boolean,String,Number,Selector,ClassSelector,ObjectSelector,\
      Callable,Dynamic,Parameter
 
 
