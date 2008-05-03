@@ -43,10 +43,10 @@ class Balloon(Tkinter.Widget):
 
 
 
-
-######################################################################
-######################################################################
-# CEBALERT: rename!
+# CEBALERT: should be renamed to something like IndexMenu, but then
+# I am not sure if some of our tk hacks would work (e.g. in topoconsole,
+# we set something for Menu on linux so that the popup behavior is
+# reasonable).
 class Menu(Tkinter.Menu):
     """
     Tkinter Menu, but with a way to access entries by name.
@@ -143,18 +143,7 @@ class Menu(Tkinter.Menu):
     # other methods can be overriden if they're needed
 
 
-######################################################################
-######################################################################
-    
 
-
-
-        
-
-
-
-######################################################################
-######################################################################
 class TaggedSlider(Tkinter.Frame):
     """
     Widget for manipulating a numeric value using either a slider or a
@@ -349,15 +338,6 @@ class TaggedSlider(Tkinter.Frame):
             pass
 
 
-######################################################################
-######################################################################        
-
-
-
-
-
-
-
 class FocusTakingButton(Tkinter.Button):
     """
     A Tkinter Button that takes the focus when the mouse <Enter>s.
@@ -372,22 +352,9 @@ class FocusTakingButton(Tkinter.Button):
 
 
 
-
-
-
-
-
-
-
-######################################################################            
-######################################################################
-
 # Might wonder why we need <<SizeRight>> event, and don't just use the
 # <Configure> event for calling sizeright: Can't distinguish manual
 # resize from autoresizing.
-
-
-
 
 class ScrolledFrame(Tkinter.Frame):
     """
