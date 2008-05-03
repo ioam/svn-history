@@ -34,8 +34,6 @@ from topo.commands.pylabplots import matrixplot
 
 from topo.sheets.generatorsheet import GeneratorSheet
 
-from topowidgets import StatusBar
-
 import topo
 
 BORDERWIDTH = 1
@@ -195,12 +193,8 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         self.plotcommand_frame.pack(side=TOP,expand=YES,fill=X)
 
 
-        #################### DYNAMIC INFO BAR ####################
-	self.messageBar = StatusBar(self)
-	self.messageBar.pack(side=BOTTOM,fill=X,expand=NO)
-        ##########################################################
-
-
+        # CEBALERT: replace 
+	self.messageBar = self.master.status 
 
         self.pack_param('update_command',parent=self.updatecommand_frame,
                         expand='yes',fill='x',side='left')

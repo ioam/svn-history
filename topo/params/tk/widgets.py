@@ -440,6 +440,25 @@ class ScrolledWindow(Tkinter.Toplevel):
         self._scrolledframe.sizeright()
 
 
+class StatusBar(Tkinter.Frame):
+
+    def __init__(self, master):
+        Tkinter.Frame.__init__(self, master)
+        self.label = Tkinter.Label(self, borderwidth=1, relief='sunken', anchor='w')
+        self.label.pack(fill='x')
+
+    def message(self,chuck=None,message=None):
+        self.set(message)
+
+    def set(self, format, *args):
+        self.label.config(text=format % args)
+        self.label.update_idletasks()
+
+    def clear(self):
+        self.label.config(text="")
+        self.label.update_idletasks()
+
+
 
 class AppWindow(ScrolledWindow):
     """
@@ -451,7 +470,7 @@ class AppWindow(ScrolledWindow):
     """
     window_icon_path = None
 
-    def __init__(self,parent,**config):
+    def __init__(self,parent,status=False,**config):
 
         ScrolledWindow.__init__(self,parent)
         self.content.title = self.title
@@ -468,6 +487,13 @@ class AppWindow(ScrolledWindow):
         # self.context_menu = Tkinter.Menu(self, tearoff=0)
         # self.bind("<<right-click>>",self.display_context_menu)
 
+        # status bar is currenlty inside scrolled area (a feature
+        # request is to move it outside ie replace self.content with
+        # just self)
+        self.status = StatusBar(self.content) 
+        if status:
+            self.status.pack(side="bottom",fill="x",expand="no")
+        
 
 
 # CEB: workaround for tkinter lagging behind tk (tk must have changed

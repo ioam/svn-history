@@ -22,7 +22,7 @@ from inspect import getdoc
 from Tile import Notebook
 from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
      LEFT, RIGHT, YES, NO, BOTH, Label, Text, END, DISABLED, \
-     NORMAL, Scrollbar, Y, DoubleVar
+     NORMAL, Scrollbar, Y, DoubleVar, Widget
 from tkFileDialog import asksaveasfilename,askopenfilename
 
 from topo.params.tk import TkParameterized
@@ -38,7 +38,6 @@ import topo.commands.basic
 
 import topo.tkgui 
 
-from topowidgets import ProgressWindow,ProgressController,StatusBar
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from featurecurvepanel import FeatureCurvePanel
 from projectionpanel import CFProjectionPanel,ProjectionActivityPanel,ConnectionFieldsPanel,RFProjectionPanel
@@ -78,23 +77,6 @@ plotting_help_locations = ('doc/User_Manual/plotting.html',
 plotpanel_classes = {}
 # CEBALERT: why are the other plotpanel_classes updates at the end of this file?
 
-
-
-# CEBALERT: of course dictionary access is used as an alternative to
-# the config method or whatever it's called! So this could cause
-# serious confusion to someone trying to set config options using the
-# dictionary style access rather than .config()! Either document
-# clearly or abandon, and get() and set() to access menu entries by
-# name.
-class ControllableMenu(tk_widgets.Menu):
-    """
-    A Menu, but where entries are accessible by name (using
-    dictionary-style access).
-
-    ** Not truly compatible with Tkinter; work in progress **
-    """
-    def __getitem__(self,name):
-        return self.entries[name]
 
 
 
@@ -175,6 +157,8 @@ class PlotsMenuEntry(ParameterizedObject):
 
 import Tile
 
+from topo.params.tk.widgets import StatusBar
+
 class FrameManager(Tile.Notebook):
     """Manages windows that can be tabs in a notebook, or toplevels."""
     def __init__(self, master=None, cnf={}, **kw):
@@ -190,11 +174,16 @@ class FrameManager(Tile.Notebook):
 
     def _set_toplevel_title(self,frame,title):
         # (started putting a bunch of stuff in here unrelated to title)
+
+        # CEBALERT HACK A: don't know how to get an AppWindow instead
+        # of a plain Toplevel - seems to be no choice. So everything
+        # here is a hack to copy AppWindow.
         w_path = self._get_window_of_frame(frame)
         self.tk.call("wm","title",w_path,title)
         p = '@'+resolve_path('topo/tkgui/icons/topo.xbm')
         self.tk.call("wm","iconbitmap",w_path,p)
         self.tk.call("wm","geometry",w_path,"") # geom back to auto
+
 
     def _set_tab_title(self,frame,title):
         self.tab(self._tab_ids[frame],text=title)
@@ -222,6 +211,12 @@ class FrameManager(Tile.Notebook):
     def new_frame(self):
         f=tk_widgets.ScrolledFrame(self)
         self.add(f,state='hidden')
+
+        ### HACK A
+        f.content.status = StatusBar(f.content)
+        f.content.status.pack(side="bottom",fill="x",expand="no")
+        ###
+
         return f
 
     def consume(self,f):
@@ -267,7 +262,7 @@ class TopoConsole(tk_widgets.AppWindow,TkParameterized):
     
     def __init__(self,root,**params):
 
-        tk_widgets.AppWindow.__init__(self,root)
+        tk_widgets.AppWindow.__init__(self,root,status=True)
         TkParameterized.__init__(self,root,**params)
 
         self.auto_refresh_panels = []
@@ -306,12 +301,8 @@ class TopoConsole(tk_widgets.AppWindow,TkParameterized):
         ## CEBALERT: now we can have multiple operations at the same time,
         ## status bar could be improved to show all tasks?
 
-        ### Status bar
-	self.messageBar = StatusBar(self.content)                                   
-                                   
-	self.messageBar.pack(side = BOTTOM,fill=X,padx=4,pady=8)
-	self.messageBar.message('state', 'OK')
-
+        # CEBALERT
+        self.messageBar = self.status
 
         self.some_area = FrameManager(self)
         # CB: make FrameManager pack itself if it has at least one
@@ -694,6 +685,160 @@ class TopoConsole(tk_widgets.AppWindow,TkParameterized):
         """
         return ProgressWindow(self,timer=timer,title=title)
 
+
+
+
+
+
+
+# CEBALERT: of course dictionary access is used as an alternative to
+# the config method or whatever it's called! So this could cause
+# serious confusion to someone trying to set config options using the
+# dictionary style access rather than .config()! Either document
+# clearly or abandon, and get() and set() to access menu entries by
+# name.
+class ControllableMenu(tk_widgets.Menu):
+    """
+    A Menu, but where entries are accessible by name (using
+    dictionary-style access).
+
+    ** Not truly compatible with Tkinter; work in progress **
+    """
+    def __getitem__(self,name):
+        return self.entries[name]
+
+
+# CB: temporary - will later be able to import from Tile
+class Progressbar(Widget):
+    def __init__(self, master=None, cnf={}, **kw):
+        Widget.__init__(self, master, "ttk::progressbar", cnf, kw)
+        
+    def step(self, amount=1.0):
+        """Increments the -value by amount. amount defaults to 1.0 
+        if omitted. """
+        return self.tk.call(self._w, "step", amount)
+        
+    def start(self):
+        self.tk.call("ttk::progressbar::start", self._w)
+        
+    def stop(self):
+        self.tk.call("ttk::progressbar::stop", self._w)
+
+
+
+
+######################################################################
+######################################################################
+# CEB: working here - not finished
+# (needs to become tkparameterizedobject, so we can have some parameters
+#  to control formatting etc)
+# Split up to solve a problem on windows for release 0.9.4.
+# Wait until we've decided what to do with SomeTimer before recoding.
+class ProgressController(object):
+    def __init__(self,timer=None,progress_var=None):
+
+        self.timer = timer or topo.sim.timer
+        self.timer.receive_info.append(self.timing_info)
+
+        self.progress_var = progress_var or DoubleVar()
+        # trace the variable so that at 100 we can destroy the window
+        self.progress_trace_name = self.progress_var.trace_variable(
+            'w',lambda name,index,mode: self._close_if_complete())
+
+
+    def _close_if_complete(self):
+        """
+        Close the specified progress window if the value of progress_var has reached 100.
+        """
+        if self.progress_var.get()>=100:
+            # delete the variable trace (necessary?)
+            self.progress_var.trace_vdelete('w',self.progress_trace_name)
+
+            self._close(last_message="Time %s: Finished %s"%(topo.sim.timestr(),
+                                                             self.timer.func.__name__))
+            
+    # CB: should allow interruption of whatever process it's timing
+    def _close(self,last_message=None):
+        self.timer.receive_info.remove(self.timing_info)
+        if last_message: topo.guimain.status_message(last_message)
+
+    def timing_info(self,time,percent,name,duration,remaining):
+        self.progress_var.set(percent)
+
+    # CB: should allow interruption of whatever process it's timing
+    def set_stop(self):
+        """Declare that running should be interrupted."""
+        self.timer.stop=True
+        last_message = "Time %s: Interrupted %s"%(topo.sim.timestr(),
+                                                  self.timer.func.__name__)
+        self._close(last_message)
+
+
+class ProgressWindow(ProgressController,tk_widgets.AppWindow):
+    """
+    Graphically displays progress information for a SomeTimer object.
+    
+    ** Currently expects a 0-100 (percent) value ***        
+    """
+
+    def __init__(self,parent,timer=None,progress_var=None,title=None):
+        ProgressController.__init__(self,timer,progress_var)
+        tk_widgets.AppWindow.__init__(self,parent)
+
+        self.protocol("WM_DELETE_WINDOW",self.set_stop)
+        self.title(title or self.timer.func.__name__.capitalize())
+        self.balloon = tk_widgets.Balloon(self)
+
+        progress_bar = Progressbar(self,#type="normal",
+                                   #maximum=100,height=20,width=200,
+                                   variable=self.progress_var)
+        progress_bar.pack(padx=15,pady=15)
+
+        progress_box = Frame(self,border=2,relief="sunken")
+        progress_box.pack()
+
+        Label(progress_box,text="Duration:").grid(row=0,column=0,sticky='w')
+        self.duration = Label(progress_box)
+        self.duration.grid(row=0,column=1,sticky='w')
+
+        Label(progress_box,text="Simulation time:").grid(row=1,column=0,sticky='w')
+        self.sim_time = Label(progress_box)
+        self.sim_time.grid(row=1,column=1,sticky='w')
+
+        # Should say 'at current rate', since the calculation assumes linearity
+        Label(progress_box,text="Remaining time:").grid(row=2,column=0,sticky='w')
+        self.remaining = Label(progress_box)
+        self.remaining.grid(row=2,column=1,sticky='w')
+        
+        
+        stop_button = Button(self,text="Stop",command=self.set_stop)
+        stop_button.pack(side="bottom")
+        self.balloon.bind(stop_button,"""
+        Stop a running simulation.
+            
+        The simulation can be interrupted only on round integer
+        simulation times, e.g. at 3.0 or 4.0 but not 3.15.  This
+        ensures that stopping and restarting are safe for any
+        model set up to be in a consistent state at integer
+        boundaries, as the example Topographica models are.""")
+            
+        
+    def _close(self,last_message=None):
+        ProgressController._close(self,last_message)
+        tk_widgets.AppWindow.destroy(self)
+        self.destroyed=True
+
+    def timing_info(self,time,percent,name,duration,remaining):
+        ProgressController.timing_info(self,time,percent,name,duration,remaining)
+        
+        # hack because i'm doing something in the wrong order
+        if not hasattr(self,'destroyed'):
+            self.duration['text'] = str(duration)
+            self.sim_time['text'] = str(time)
+            self.remaining['text'] = "%02d:%02d"%(int(remaining/60),int(remaining%60))
+            self.update()
+######################################################################
+######################################################################
 
 
 
