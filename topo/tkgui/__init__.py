@@ -17,8 +17,7 @@ import Tkinter
 
 import topo
 
-from topoconsole import TopoConsole
-from widgets import ControllableMenu
+from topoconsole import TopoConsole,ControllableMenu
 
 #### notes about tkgui ####
 #

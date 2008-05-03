@@ -80,6 +80,24 @@ plotpanel_classes = {}
 
 
 
+# CEBALERT: of course dictionary access is used as an alternative to
+# the config method or whatever it's called! So this could cause
+# serious confusion to someone trying to set config options using the
+# dictionary style access rather than .config()! Either document
+# clearly or abandon, and get() and set() to access menu entries by
+# name.
+class ControllableMenu(tk_widgets.Menu):
+    """
+    A Menu, but where entries are accessible by name (using
+    dictionary-style access).
+
+    ** Not truly compatible with Tkinter; work in progress **
+    """
+    def __getitem__(self,name):
+        return self.entries[name]
+
+
+
 
 def open_plotgroup_panel(class_,plotgroup=None,**kw):
 
@@ -356,7 +374,7 @@ class TopoConsole(tk_widgets.AppWindow,TkParameterized):
 
     def __simulation_menu(self):
         """Add the simulation menu options to the menubar."""
-        simulation_menu = tk_widgets.ControllableMenu(self.menubar,tearoff=0)
+        simulation_menu = ControllableMenu(self.menubar,tearoff=0)
 
         self.menubar.add_cascade(label='Simulation',menu=simulation_menu)
 
@@ -389,7 +407,7 @@ class TopoConsole(tk_widgets.AppWindow,TkParameterized):
         categories = sorted(set(categories))
 
         # 'Plots' menu
-        plots_menu = tk_widgets.ControllableMenu(self.menubar,tearoff=0)
+        plots_menu = ControllableMenu(self.menubar,tearoff=0)
         self.menubar.add_cascade(label='Plots',menu=plots_menu)
         
         # The Basic category items appear on the menu itself.
@@ -405,7 +423,7 @@ class TopoConsole(tk_widgets.AppWindow,TkParameterized):
         # Add the other categories to the menu as cascades, and the plots of each category to
         # their cascades.
         for category in categories:
-            category_menu = tk_widgets.ControllableMenu(plots_menu,tearoff=0)
+            category_menu = ControllableMenu(plots_menu,tearoff=0)
             plots_menu.add_cascade(label=category,menu=category_menu)
 
             # could probably search more efficiently than this
@@ -422,7 +440,7 @@ class TopoConsole(tk_widgets.AppWindow,TkParameterized):
     def __help_menu(self):
         """Add the help menu options."""
 
-        help_menu = tk_widgets.ControllableMenu(self.menubar,tearoff=0,name='help')
+        help_menu = ControllableMenu(self.menubar,tearoff=0,name='help')
         self.menubar.add_cascade(label='Help',menu=help_menu)
 
         help_menu.add_command(label='About',command=self.new_about_window)
