@@ -61,8 +61,10 @@ def descendents(class_):
 
 
 
-# consider decorator module: would allow doc to be seen for the
-# actual method rather than partial. Not part of standard library:
+# CEBALERT: decorators hide the docstring when using help().  Consider
+# the decorator module: would allow doc to be seen for the actual
+# method rather than seeing 'partial object at ...'.
+# Not part of standard library:
 # http://www.phyast.pitt.edu/~micheles/python/documentation.html
 
 from functools import partial
@@ -615,17 +617,17 @@ dbprint_prefix=None
 
 def as_uninitialized(fn):
     """
-    Decorator: call fn with the parameterized_object instance's
+    Decorator: call fn with the parameterized_instance's
     initialization flag set to False, then revert the flag.
 
     (Used to decorate Parameterized methods that must alter
     a constant Parameter.)
     """
-    def override_initialization(parameterized_object,*args,**kw):
-        original_initialized=parameterized_object.initialized
-        parameterized_object.initialized=False
-        fn(parameterized_object,*args,**kw)
-        parameterized_object.initialized=original_initialized
+    def override_initialization(parameterized_instance,*args,**kw):
+        original_initialized=parameterized_instance.initialized
+        parameterized_instance.initialized=False
+        fn(parameterized_instance,*args,**kw)
+        parameterized_instance.initialized=original_initialized
     return override_initialization
 
 
