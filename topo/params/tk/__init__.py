@@ -166,13 +166,13 @@ $Id: tkparameterizedobject.py 8444 2008-04-27 05:29:14Z ceball $
 
 
 
-import __main__, sys
-import Tkinter
+import __main__
+import sys
 import copy
 
 from inspect import getdoc
 from Tkinter import BooleanVar, StringVar, Frame, Checkbutton, \
-     Entry, TclError, E, W, Label
+     Entry, TclError, E, W, Label, Toplevel
 from Tile import Combobox
 
 from ..parameterized import Parameterized,ParameterizedMetaclass,\
@@ -243,7 +243,6 @@ def inverse(dict_):
     return idict
 
 
-
 def lookup_by_class(dict_,class_):
     """
     Look for class_ or its superclasses in the keys of dict_; on
@@ -260,6 +259,18 @@ def lookup_by_class(dict_,class_):
     return v
 
 
+def keys_sorted_by_value(d):
+    """
+    Return the keys of dictionary d sorted by value.
+    """
+    # By Daniel Schult, 2004/01/23
+    # http://aspn.activestate.com/ASPN/Python/Cookbook/Recipe/52306
+    items=d.items()
+    backitems=[ [v[1],v[0]] for v in items]
+    backitems.sort()
+    return [ backitems[i][1] for i in range(0,len(backitems))]
+
+
 def keys_sorted_by_value_unique(d, **sort_kwargs):
     """
     Return the keys of d, sorted by value.
@@ -272,8 +283,11 @@ def keys_sorted_by_value_unique(d, **sort_kwargs):
     return [i[val] for val in values]
 
 
-
 def is_button(widget):
+    """
+    Simple detection of Button-like widgets that are not Checkbuttons
+    (i.e. widgets that do not require a separate label).
+    """
     return 'command' in widget.config() and not hasattr(widget,'toggle')
 
 
@@ -288,17 +302,15 @@ import ImageTk, Image, ImageOps
 
 class Button(Callable):
     """
-    Parameter representing all Parameter classes that are GUI-specific.
+    A GUI-specific parameter to display a button.
 
-    Can be associated with an image when used in a
-    TkParameterized by specifying an image_path (i.e. location
-    of an image suitable for PIL, e.g. a PNG, TIFF, or JPEG image) and
-    optionally a size (width,height) tuple.
-
+    Can be associated with an image by specifying an image_path
+    (i.e. location of an image suitable for PIL, e.g. a PNG, TIFF, or
+    JPEG image) and optionally a size (width,height) tuple.
 
     Note that the button size can also be set when there is no image,
-    but instead of being presumed to be in pixels, it is instead
-    presumed to be in text units (a Tkinter feature: see
+    but instead of being presumed to be in pixels, it is presumed to
+    be in text units (a Tkinter feature: see
     e.g. http://effbot.org/tkinterbook/button.htm). Therefore, to
     place two identically sized buttons next to each other, with one
     displaying text and the other an image, you first have to convert
@@ -308,8 +320,7 @@ class Button(Callable):
     # but what a pain!
     __slots__ = ['image_path','size','_hack']
 
-    def __init__(self,default=None,image_path=None,size=None,
-                 **params):
+    def __init__(self,default=None,image_path=None,size=None,**params):
         Callable.__init__(self,default=default,**params)
         self.image_path = image_path
         self.size = size
@@ -320,7 +331,7 @@ class Button(Callable):
 # image". Must be happening before tk starts, or something. So
 # instead, return image on demand. Also, because of PIL bug (see
 # topoconsole.py "got to keep references to the images") we store
-# a reference to the image each time.
+# a reference to the image each time in _hack.
     def get_image(self):
         """
         Return an ImageTk.PhotoImage of the image at image_path
@@ -1286,7 +1297,7 @@ class TkParameterized(TkParameterizedBase):
         widget,label = self._create_widget(name,frame,widget_options,on_change,on_modify)
 
         # checkbuttons are 'widget label' rather than 'label widget'
-        if widget.__class__ is Tkinter.Checkbutton:  # type(widget) doesn't seem to work
+        if widget.__class__ is Checkbutton:  # type(widget) doesn't seem to work
             widget_side='left'; label_side='right'
         else:
             label_side='left'; widget_side='right'
@@ -1452,7 +1463,7 @@ class TkParameterized(TkParameterizedBase):
         if is_button(widget): 
             label = None
         else:
-            label = Tkinter.Label(master,text=self.__pretty_print(name))
+            label = Label(master,text=self.__pretty_print(name))
 
         # disable widgets for constant params
         if param_obj.constant and isinstance(source_po,Parameterized):
@@ -1878,37 +1889,6 @@ def param_is_dynamically_generated(param,po):
         raise ValueError("po must be a Parameterized or ParameterizedMetaclass.")
 
 
-
-
-# CEB: still working on this file
-
-
-# KNOWN ISSUES
-#
-# - Defaults button doesn't work for Selectors (need to insert
-#   new (class default) object into the list).
-#
-
-# (check Defaults btn with dynamic params)
-
-
-
-
-def keys_sorted_by_value(d):
-    """
-    Return the keys of dictionary d sorted by value.
-    """
-    # By Daniel Schult, 2004/01/23
-    # http://aspn.activestate.com/ASPN/Python/Cookbook/Recipe/52306
-    items=d.items()
-    backitems=[ [v[1],v[0]] for v in items]
-    backitems.sort()
-    return [ backitems[i][1] for i in range(0,len(backitems))]
-
-
-
-# CB: color buttons to match? deactivate irrelevant buttons?
-
 class ParametersFrame(TkParameterized,Frame):
     """
     Displays and allows instantaneous editing of the Parameters
@@ -1973,8 +1953,7 @@ class ParametersFrame(TkParameterized,Frame):
 
     def hidden_param(self,name):
         """Return True if a parameter's precedence is below the display threshold."""
-        # CB: interpret None as 0; remove if we set a default precedence (though that would
-        # break param_inheritance for precedence, I think)
+        # interpret a precedence of None as 0
         precedence = self.get_parameter_object(name).precedence or 0 
         return precedence<self.display_threshold
         
@@ -2136,7 +2115,7 @@ class ParametersFrame(TkParameterized,Frame):
         # We want widgets to stretch to both sides...
         posn=E+W
         # ...except Checkbuttons, which should be left-aligned.
-        if widget.__class__==Tkinter.Checkbutton:
+        if widget.__class__==Checkbutton:
             posn=W
 
         widget.grid(row=row,
@@ -2223,7 +2202,7 @@ class ParametersFrame(TkParameterized,Frame):
         parameter_window.title(PO_to_edit.name+' parameters')
 
         ### CEBALERT: confusing? ###
-        title=Tkinter.Label(parameter_window, text="("+param_name + " of " + (self._extraPO.name or 'class '+self._extraPO.__name__) + ")")
+        title=Label(parameter_window, text="("+param_name + " of " + (self._extraPO.name or 'class '+self._extraPO.__name__) + ")")
         title.pack(side = "top")
         self.balloon.bind(title,getdoc(self.get_parameter_object(param_name,self._extraPO)))
         ############################
@@ -2266,9 +2245,7 @@ class ParametersFrame(TkParameterized,Frame):
         self.__make_representation(param_name)
         self.__grid_param(param_name,row)
 
-        
-
-    
+            
 
 ##     def _indicate_tkvar_status(self,param_name):
 ##         """
@@ -2301,9 +2278,6 @@ class ParametersFrame(TkParameterized,Frame):
 
 
 
-
-
-
 class ParametersFrameWithApply(ParametersFrame):
     """
     Displays and allows editing of the Parameters of a supplied
@@ -2313,15 +2287,18 @@ class ParametersFrameWithApply(ParametersFrame):
     applied to the underlying object until Apply is pressed.
     """
 
-    # CB: might be nice to make Apply button blue like the unapplied changes,
-    # but can't currently set button color
+    # CEBENHANCEMENT: might be nice to make Apply button blue like the
+    # unapplied changes, but can't currently set button color.
     Apply = Button(doc="""Set object's Parameters to displayed values.\n
-                                   When editing a class, sets the class defaults
-                                   (i.e. acts on the class object).""")
+                          When editing a class, sets the class defaults
+                          (i.e. acts on the class object).""")
     
-    def __init__(self,master,parameterized_object=None,on_change=None,on_modify=None,**params):        
-        super(ParametersFrameWithApply,self).__init__(master,parameterized_object,
-                                                      on_change,on_modify,**params)
+    def __init__(self,master,parameterized_object=None,
+                 on_change=None,on_modify=None,**params):        
+        super(ParametersFrameWithApply,self).__init__(master,
+                                                      parameterized_object,
+                                                      on_change,on_modify,
+                                                      **params)
         self._live_update = False
 
         ### CEBALERT: describe why this apply is different from Apply
@@ -2451,23 +2428,19 @@ class ParametersFrameWithApply(ParametersFrame):
         self.update_idletasks()
 
 
-
 # CB: can override tracefn so that Apply/Refresh buttons are enabled/disabled as appropriate
 
-
-
-
-def edit_parameters(parameterized_object,with_apply=True,**params):
+def edit_parameters(parameterized,with_apply=True,**params):
     """
-    Edit the Parameters of parameterized_object.
+    Edit the Parameters of a supplied parameterized instance or class.
 
     Specify with_apply=False for a ParametersFrame (which immediately
     updates the object - no need to press the Apply button).
 
     Extra params are passed to the ParametersFrame constructor.
     """
-    if not (isinstance(parameterized_object,Parameterized) or \
-           isinstance(parameterized_object,ParameterizedMetaclass)):
+    if not (isinstance(parameterized,Parameterized) or \
+           isinstance(parameterized,ParameterizedMetaclass)):
         raise ValueError("Can only edit parameters of a Parameterized.")
 
     if not with_apply:
@@ -2475,8 +2448,4 @@ def edit_parameters(parameterized_object,with_apply=True,**params):
     else:
         pf_class = ParametersFrameWithApply
 
-    return pf_class(Tkinter.Toplevel(),parameterized_object,**params)
-
-    
-
-
+    return pf_class(Toplevel(),parameterized,**params)
