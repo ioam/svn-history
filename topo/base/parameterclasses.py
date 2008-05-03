@@ -1,8 +1,10 @@
-# Moved to topo/params/__init__.py
+"""
+Moved to topo/params/__init__.py
+"""
 
 __version__='$Revision$'
 
-import types
+# pylint: disable-msg=W0611
 
 from parameterizedobject import Parameter, descendents
 
