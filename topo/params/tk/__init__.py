@@ -2,34 +2,75 @@
 Classes linking Parameters to Tkinter.
 
 TkParameterized allows flexible graphical representation and
-manipulation of a Parameterized's individual Parameters;
-ParametersFrame extends TkParameterized, displaying all the
-Parameters as a list.
+manipulation of the parameters of a Parameterized instance or class.
+
+ParametersFrame and ParametersFrameWithApply extend TkParameterized,
+displaying all the Parameters together in a list. Both allow these
+Parameters to be edited; ParametersFrame applies changes immediately
+as they are made, whereas ParametersFrameWithApply makes no changes
+until a confirmation is given (by pressing the 'Apply' button).
+
+Using these classes to display parameters has several benefits,
+including that, automatically:
+
+- changes to the Parameters in the GUI are reflected in the objects
+  themselves without any additional code;
+
+- each Parameter is represented by an appropriate widget (e.g. slider
+  for a Number);
+
+- type and range checking is handled (by virtue of using parameters);
+
+- doc strings are displayed as pop-up help for each parameter;
+
+- parameter names are formatted nicely for display;
+
+- changes to parameter values in the GUI can be associated with
+  function calls.
 
 
+Examples
+========
 
-TO BE UPDATED...
+(1) Display the parameters of an object inside an existing window
 
-Note that TkParameterized extends TkParameterizedBase by
-adding widget-drawing abilities; documentation for using these classes
-begins at a more useful and simple level in TkParameterized, and
-continues in more detail in TkParameterizedBase (an abstract
-class).
+You want to display all parameters of a parameterized instance
+inside an existing containter (e.g. a window or a frame):
 
+  # existing Parameterized instance g
+  from topo import patterns
+  g = patterns.Gaussian()
+  
+  # existing window t
+  import Tkinter
+  t = Tkinter.Toplevel()
+  
+  # display all the parameters of g in t
+  from topo.params.tk import ParametersFrame
+  ParametersFrame(t,g)
+  #should be ParametersFrame(t,g).pack(); see ALERT in ParametersFrame
+  
 
+(2) Display the parameters of an object in a standalone window
 
-A typical use of TkParameterized might be in some subclass that
-is also a Tkinter.Frame (e.g. PlotGroupPanel). The Frame serves as the
-container into which the representations of the Parameters are placed
-- although any suitable Tkinter widget can be used, and there is in
-fact no need to sublass TkParameterized. The following example
-shows this, displaying the Parameters from two different
-Parameterizeds in a window:
+You want a new window displaying only the parameters of your object:
 
+  # existing Parameterized instance g
+  from topo import patterns
+  g = patterns.Gaussian()
+  
+  # display all the parameters of g in a new window
+  from topo.params.tk import edit_parameters
+  edit_parameters(g)
+  
+
+(3) Flexible GUI layout using TkParameterized
+
+You want to display only some of the parameters of one or more
+Parameterized instances:
 
  ## Existing, non-GUI code
- from topo.base.parameterizedobject import Parameterized
- from topo.base.parameterclasses import Number,StringParameter,BooleanParameter
+ from topo.params import Parameterized,Number,String,Boolean
 
  class Object1(Parameterized):
      duration = Number(2.0,bounds=(0,None),doc='Duration of measurement')
@@ -42,70 +83,73 @@ Parameterizeds in a window:
  o1 = Object1()
  o2 = Object2()
 
-
- ## Flexible GUI representation 
+ ## Existing window
  import Tkinter
- from topo.tkgui.tkparameterizedobject import TkParameterized
+ t = Tkinter.Toplevel()
 
- app_window = Tkinter.Tk()
+ ## Flexible GUI representation: display o1.duration, o1.displacement,
+ ## and o2.active_today inside t, ignoring o2.operator_name
+ from topo.params.tk import TkParameterized
 
- t1 = TkParameterized(app_window,extraPO=o1)
- t2 = TkParameterized(app_window,extraPO=o2)
+ t1 = TkParameterized(t,o1)
+ t2 = TkParameterized(t,o2)
 
- t1.pack_param('duration')
- t1.pack_param('displacement')
- t2.pack_param('active_today')
- # (choose not to display o2's 'operator_name')
+ t1.pack_param('duration',side='left')
+ t1.pack_param('displacement',side='bottom')
+ t2.pack_param('active_today',side='right')
 
 
-The resulting window exhibits some of the more important features of
-TkParameterized: each Parameter is represented by an appropriate
-widget (e.g. slider for a Number); type and range checking is handled
-already by using Parameters; doc strings are displayed automatically
-as pop-up help for each Parameter; changes to the Parameters in the
-GUI are instantly reflected in the objects themselves; Parameter
-names are formatted nicely for display.
+(4) ?
 
-Additionally, it is possible to associate changes to variables with
-function calls, display true Parameter variable names, and more (umm
-like what) - see the detailed documentation.
+TkParameterized is itself a subclass of Parameterized, so a
+TkParameterized class can have its own parameters (in addition to
+representing those of an external parameterized instance or class).
 
-Existing examples of TkParameterized usage can be found in
-parametersframe.ParametersFrameWithApply (as mentioned above) and
-in plotgrouppanel.PlotGroupPanel (where it is used to
-allow editing of PlotGroups).
+  ## Existing class
+  from topo import params
+  
+  class X(params.Parameterized):
+      one = params.Boolean(True)
+      two = params.Boolean(True)
+  
+                                                      
+  ## Panel to represent an instance of X 
+  from Tkinter import Frame
+  from topo.params.tk import TkParameterized
+
+  class XPanel(TkParameterized,Frame):
+  
+      dock = params.Boolean(False,doc='Whether to attach this Panel')
+      
+      def __init__(self,master,x):
+          self.pack_param('dock',side='top',on_change=self.handle_dock)
+          self.pack_param('one',side='left')
+          self.pack_param('two',side='right')
+
+      def handle_dock(self):
+          if self.dock:
+              # dock the window
+          else:
+              # undock the window        
+  
+
+  ## Running the code
+  t = Tkinter.Toplevel()
+  x = X()
+  XPanel(t,x)
 
 
 $Id: tkparameterizedobject.py 8444 2008-04-27 05:29:14Z ceball $
 """
 
-### CB: file currently being reorganized.
-# This file is too long because the param/gui interface code has
-# become too long, and needs cleaning up.
+# CB: This file is too long because the param/gui interface code has
+# become too long, and needs cleaning up.  I'm still working on it
+# (still have to attend to simple ALERTs and do a one-pass cleanup)
 
-
-
-# CEBALERT: in the same way that parameterizedobject.py does not
-# import much, this file should import as little as possible from
-# outside basic gui files and topo/base so that it can be used
-# independently of as much of topographica as possible.
-
-# CEB: currently working on this file (still have to attend to
-# simple ALERTs; documentation finished for TkParameterized
-# but not for TkParameterizedBase)
-
-# CB: it's quite likely that the way TkParameterizedBase is
-# implemented could be simplified. Right now, it still contains
-# leftovers of various attempts to get everything working. But
-# it does seem to work!
-
-
-
-# ERROR: (checking for number equality not correct because of precision,
-# so they're listed as 'changed' when in fact they haven't been...at least
-# by the user...check that we don't actually introduce a change here by
-# displaying numbers!)
-
+# It's quite likely that the way TkParameterizedBase is implemented
+# could be simplified. Right now, it still contains leftovers of
+# various attempts to get everything working. But it does seem to
+# work!
 
 
 ## import logging
@@ -137,8 +181,8 @@ from ..parameterized import Parameterized,ParameterizedMetaclass,\
 from .. import Boolean,String,Number,Selector,ClassSelector,ObjectSelector,\
      Callable,Dynamic,Parameter
 
-from widgets import FocusTakingButton as Button2, TaggedSlider, Balloon, Menu, \
-     askyesno,TkguiWindow
+from widgets import FocusTakingButton as Button2, TaggedSlider, Balloon, \
+     Menu, askyesno,TkguiWindow
 
 
 
@@ -293,9 +337,15 @@ class Button(Callable):
 
 
 
+
+# Note that TkParameterized extends TkParameterizedBase by adding
+# widget-drawing abilities; documentation for using these classes
+# begins at a more useful and simple level in TkParameterized (the
+# documentation for TkParameterizedBase is more complex).
+
 class TkParameterizedBase(Parameterized):
     """
-    A Parameterized that maintains Tkinter.Variable shadows
+    A Parameterized subclass that maintains Tkinter.Variable shadows
     (proxies) of its Parameters. The Tkinter Variable shadows are kept
     in sync with the Parameter values, and vice versa.
 
@@ -310,7 +360,7 @@ class TkParameterizedBase(Parameterized):
     parameter names in the _tkvars dictionary.
 
     (See note 1 for complications arising from name clashes.)
-    
+
 
     Parameters being represented by TkParameterizedBase also
     have a 'translators' dictionary, allowing mapping between string
@@ -912,6 +962,9 @@ class TkParameterizedBase(Parameterized):
         else:
             setattr(sourcePO,param_name,val)
                         
+
+
+
 
 
 
@@ -1825,40 +1878,6 @@ def param_is_dynamically_generated(param,po):
         raise ValueError("po must be a Parameterized or ParameterizedMetaclass.")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## """
-## Classes for graphically manipulating all the Parameters of a Parameterized.
-
-## ParametersFrame and ParametersFrameWithApply display the Parameters of
-## a supplied Parameterized. Both allow these Parameters to be
-## edited; ParametersFrame applies changes immediately as they are made,
-## whereas ParametersFrameWithApply makes no changes until a confirmation
-## is given (by pressing the 'Apply' button).
-
-
-## ParametersFrame extends TkParameterized; see TkParameterized
-## for the underlying details of representing Parmeters in the GUI.
-
-
-## $Id: tkparameterizedobject.py 8444 2008-04-27 05:29:14Z ceball $
-## """
-## __version__='$Revision: 8444 $'
 
 
 # CEB: still working on this file
