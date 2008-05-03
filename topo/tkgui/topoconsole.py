@@ -17,15 +17,16 @@ import sys
 import __main__
 import webbrowser
 
-from math import fmod,floor
 from inspect import getdoc
 
 from Tile import Notebook
-import Tkinter
 from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
-     LEFT, RIGHT, YES, NO, BOTH, Label, Text, END, DISABLED, NORMAL, Scrollbar, Y
-import tkMessageBox
+     LEFT, RIGHT, YES, NO, BOTH, Label, Text, END, DISABLED, \
+     NORMAL, Scrollbar, Y, DoubleVar
 from tkFileDialog import asksaveasfilename,askopenfilename
+
+from topo.params.tk import TkParameterized
+import topo.params.tk.widgets as tk_widgets
 
 import topo
 from topo.base.parameterizedobject import ParameterizedObject
@@ -36,7 +37,7 @@ from topo.misc.commandline import sim_name_from_filename
 import topo.commands.basic
 
 import topo.tkgui 
-from widgets import TaggedSlider,ControllableMenu,Balloon,ScrolledFrame,askyesno,TkguiWindow,ScrolledTkguiWindow
+
 from topowidgets import ProgressWindow,ProgressController,StatusBar
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from featurecurvepanel import FeatureCurvePanel
@@ -45,9 +46,7 @@ from testpattern import TestPattern
 from editorwindow import ModelEditor
 
 
-
-# CEBALERT: check this is working everywhere (all tkguiwindows)
-TkguiWindow.window_icon_path = resolve_path('topo/tkgui/icons/topo.xbm')
+tk_widgets.AppWindow.window_icon_path = resolve_path('topo/tkgui/icons/topo.xbm')
 
 SCRIPT_FILETYPES = [('Topographica scripts','*.ty'),
                     ('Python scripts','*.py'),
@@ -203,7 +202,7 @@ class FrameManager(Tile.Notebook):
             
 
     def new_frame(self):
-        f=ScrolledFrame(self)
+        f=tk_widgets.ScrolledFrame(self)
         self.add(f,state='hidden')
         return f
 
@@ -227,8 +226,8 @@ class FrameManager(Tile.Notebook):
 
 
 
-from tkparameterizedobject import TkParameterizedObject
-class TopoConsole(TkguiWindow,TkParameterizedObject):
+
+class TopoConsole(tk_widgets.AppWindow,TkParameterized):
     """
     Main window for the Tk-based GUI.
     """
@@ -250,8 +249,8 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
     
     def __init__(self,root,**params):
 
-        TkguiWindow.__init__(self,root)
-        TkParameterizedObject.__init__(self,root,**params)
+        tk_widgets.AppWindow.__init__(self,root)
+        TkParameterized.__init__(self,root,**params)
 
         self.auto_refresh_panels = []
         self._init_widgets()
@@ -281,7 +280,7 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
     def title(self,t=None):
         newtitle = "Topographica"
         if t: newtitle+=": %s" % t
-        TkguiWindow.title(self,newtitle)
+        tk_widgets.AppWindow.title(self,newtitle)
         
 
     def _init_widgets(self):
@@ -304,10 +303,10 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
         
 
 	### Balloon, for pop-up help
-	self.balloon = Balloon(self.content)
+	self.balloon = tk_widgets.Balloon(self.content)
 
 	### Top-level (native) menu bar
-	#self.menubar = ControllableMenu(self.content)       
+	#self.menubar = tk_widgets.ControllableMenu(self.content)       
         self.configure(menu=self.menubar)
 
         #self.menu_balloon = Balloon(topo.tkgui.root)
@@ -320,17 +319,17 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
         self.__help_menu()
 
         ### Running the simulation
-        run_frame = Tkinter.Frame(self.content)
+        run_frame = Frame(self.content)
         run_frame.pack(side='top',fill='x',padx=4,pady=8)
 
         self.run_frame = run_frame
         
         Label(run_frame,text='Run for: ').pack(side=LEFT)
         
-        self.run_for_var=Tkinter.DoubleVar()
+        self.run_for_var=DoubleVar()
         self.run_for_var.set(1.0)
 
-        run_for = TaggedSlider(run_frame,
+        run_for = tk_widgets.TaggedSlider(run_frame,
                                variable=self.run_for_var,
                                tag_width=11,
                                slider_length=150,
@@ -357,7 +356,7 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
 
     def __simulation_menu(self):
         """Add the simulation menu options to the menubar."""
-        simulation_menu = ControllableMenu(self.menubar,tearoff=0)
+        simulation_menu = tk_widgets.ControllableMenu(self.menubar,tearoff=0)
 
         self.menubar.add_cascade(label='Simulation',menu=simulation_menu)
 
@@ -390,7 +389,7 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
         categories = sorted(set(categories))
 
         # 'Plots' menu
-        plots_menu = ControllableMenu(self.menubar,tearoff=0)
+        plots_menu = tk_widgets.ControllableMenu(self.menubar,tearoff=0)
         self.menubar.add_cascade(label='Plots',menu=plots_menu)
         
         # The Basic category items appear on the menu itself.
@@ -406,7 +405,7 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
         # Add the other categories to the menu as cascades, and the plots of each category to
         # their cascades.
         for category in categories:
-            category_menu = ControllableMenu(plots_menu,tearoff=0)
+            category_menu = tk_widgets.ControllableMenu(plots_menu,tearoff=0)
             plots_menu.add_cascade(label=category,menu=category_menu)
 
             # could probably search more efficiently than this
@@ -423,7 +422,7 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
     def __help_menu(self):
         """Add the help menu options."""
 
-        help_menu = ControllableMenu(self.menubar,tearoff=0,name='help')
+        help_menu = tk_widgets.ControllableMenu(self.menubar,tearoff=0,name='help')
         self.menubar.add_cascade(label='Help',menu=help_menu)
 
         help_menu.add_command(label='About',command=self.new_about_window)
@@ -447,7 +446,7 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
             
     def quit_topographica(self,check=True):
         """Quit topographica."""
-        if not check or (check and askyesno("Quit Topographica","Really quit?")):
+        if not check or (check and tk_widgets.askyesno("Quit Topographica","Really quit?")):
             self.destroy() 
             print "Quit selected; exiting"
 
@@ -582,7 +581,7 @@ class TopoConsole(TkguiWindow,TkParameterizedObject):
 
 
     def new_about_window(self):
-        win = TkguiWindow(self)
+        win = tk_widgets.AppWindow(self)
         win.withdraw()
         win.title("About Topographica")
         text = Label(win,text=topo.about(display=False),justify=LEFT)

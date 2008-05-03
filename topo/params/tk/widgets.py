@@ -1,10 +1,6 @@
 """
 Collection of compound widgets for Tkinter.
 
-Widgets in this file only depend on Tkinter (or other general packages
-of widgets, such as bwidget) - they are not specific to Topographica.
-
-
 $Id: widgets.py 8443 2008-04-27 05:08:51Z ceball $
 """
 __version__='$Revision: 8443 $'
@@ -15,11 +11,6 @@ import Tkinter
 
 from tkMessageBox import _show,QUESTION,YESNO
 from scrodget import Scrodget
-
-
-# CEBALERT: not all these classes will stay here (they are not
-# relevant for parameters).
-
 
 
 # Barely wrapped tooltip from tklib.
@@ -465,17 +456,14 @@ class ScrolledWindow(Tkinter.Toplevel):
 
 
 
-
-
-# CEBALERT: rename
-class TkguiWindow(ScrolledWindow):
+class AppWindow(ScrolledWindow):
     """
-    The standard tkgui window; defines attributes common to tkgui windows.
-
-    Currently these attributes are:
-     - a window icon
+    A ScrolledWindow with extra features intended to be common to all
+    windows of an application.
+    
+    Currently this only includes a window icon, but we intend to
+    add a right-click menu and possibly more.
     """
-
     window_icon_path = None
 
     def __init__(self,parent,**config):
@@ -494,10 +482,6 @@ class TkguiWindow(ScrolledWindow):
         # CB: not currently used by anything but the plotgrouppanels
         # self.context_menu = Tkinter.Menu(self, tearoff=0)
         # self.bind("<<right-click>>",self.display_context_menu)
-
-
-
-ScrolledTkguiWindow = TkguiWindow 
 
 
 
