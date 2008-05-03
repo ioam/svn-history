@@ -25,8 +25,7 @@ from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
      NORMAL, Scrollbar, Y, DoubleVar, Widget
 from tkFileDialog import asksaveasfilename,askopenfilename
 
-from topo.params.tk import TkParameterized
-import topo.params.tk.widgets as tk_widgets
+import topo.params.tk as tk
 
 import topo
 from topo.base.parameterizedobject import ParameterizedObject
@@ -45,7 +44,7 @@ from testpattern import TestPattern
 from editorwindow import ModelEditor
 
 
-tk_widgets.AppWindow.window_icon_path = resolve_path('topo/tkgui/icons/topo.xbm')
+tk.AppWindow.window_icon_path = resolve_path('topo/tkgui/icons/topo.xbm')
 
 SCRIPT_FILETYPES = [('Topographica scripts','*.ty'),
                     ('Python scripts','*.py'),
@@ -157,7 +156,7 @@ class PlotsMenuEntry(ParameterizedObject):
 
 import Tile
 
-from topo.params.tk.widgets import StatusBar
+
 
 class FrameManager(Tile.Notebook):
     """Manages windows that can be tabs in a notebook, or toplevels."""
@@ -209,11 +208,11 @@ class FrameManager(Tile.Notebook):
             
 
     def new_frame(self):
-        f=tk_widgets.ScrolledFrame(self)
+        f=tk.ScrolledFrame(self)
         self.add(f,state='hidden')
 
         ### HACK A
-        f.content.status = StatusBar(f.content)
+        f.content.status = tk.StatusBar(f.content)
         f.content.status.pack(side="bottom",fill="x",expand="no")
         ###
 
@@ -240,7 +239,7 @@ class FrameManager(Tile.Notebook):
 
 
 
-class TopoConsole(tk_widgets.AppWindow,TkParameterized):
+class TopoConsole(tk.AppWindow,tk.TkParameterized):
     """
     Main window for the Tk-based GUI.
     """
@@ -262,8 +261,8 @@ class TopoConsole(tk_widgets.AppWindow,TkParameterized):
     
     def __init__(self,root,**params):
 
-        tk_widgets.AppWindow.__init__(self,root,status=True)
-        TkParameterized.__init__(self,root,**params)
+        tk.AppWindow.__init__(self,root,status=True)
+        tk.TkParameterized.__init__(self,root,**params)
 
         self.auto_refresh_panels = []
         self._init_widgets()
@@ -293,7 +292,7 @@ class TopoConsole(tk_widgets.AppWindow,TkParameterized):
     def title(self,t=None):
         newtitle = "Topographica"
         if t: newtitle+=": %s" % t
-        tk_widgets.AppWindow.title(self,newtitle)
+        tk.AppWindow.title(self,newtitle)
         
 
     def _init_widgets(self):
@@ -312,10 +311,10 @@ class TopoConsole(tk_widgets.AppWindow,TkParameterized):
         
 
 	### Balloon, for pop-up help
-	self.balloon = tk_widgets.Balloon(self.content)
+	self.balloon = tk.Balloon(self.content)
 
 	### Top-level (native) menu bar
-	#self.menubar = tk_widgets.ControllableMenu(self.content)       
+	#self.menubar = tk.ControllableMenu(self.content)       
         self.configure(menu=self.menubar)
 
         #self.menu_balloon = Balloon(topo.tkgui.root)
@@ -338,7 +337,7 @@ class TopoConsole(tk_widgets.AppWindow,TkParameterized):
         self.run_for_var=DoubleVar()
         self.run_for_var.set(1.0)
 
-        run_for = tk_widgets.TaggedSlider(run_frame,
+        run_for = tk.TaggedSlider(run_frame,
                                variable=self.run_for_var,
                                tag_width=11,
                                slider_length=150,
@@ -455,7 +454,7 @@ class TopoConsole(tk_widgets.AppWindow,TkParameterized):
             
     def quit_topographica(self,check=True):
         """Quit topographica."""
-        if not check or (check and tk_widgets.askyesno("Quit Topographica","Really quit?")):
+        if not check or (check and tk.askyesno("Quit Topographica","Really quit?")):
             self.destroy() 
             print "Quit selected; exiting"
 
@@ -590,7 +589,7 @@ class TopoConsole(tk_widgets.AppWindow,TkParameterized):
 
 
     def new_about_window(self):
-        win = tk_widgets.AppWindow(self)
+        win = tk.AppWindow(self)
         win.withdraw()
         win.title("About Topographica")
         text = Label(win,text=topo.about(display=False),justify=LEFT)
@@ -697,7 +696,7 @@ class TopoConsole(tk_widgets.AppWindow,TkParameterized):
 # dictionary style access rather than .config()! Either document
 # clearly or abandon, and get() and set() to access menu entries by
 # name.
-class ControllableMenu(tk_widgets.Menu):
+class ControllableMenu(tk.Menu):
     """
     A Menu, but where entries are accessible by name (using
     dictionary-style access).
@@ -774,7 +773,7 @@ class ProgressController(object):
         self._close(last_message)
 
 
-class ProgressWindow(ProgressController,tk_widgets.AppWindow):
+class ProgressWindow(ProgressController,tk.AppWindow):
     """
     Graphically displays progress information for a SomeTimer object.
     
@@ -783,11 +782,11 @@ class ProgressWindow(ProgressController,tk_widgets.AppWindow):
 
     def __init__(self,parent,timer=None,progress_var=None,title=None):
         ProgressController.__init__(self,timer,progress_var)
-        tk_widgets.AppWindow.__init__(self,parent)
+        tk.AppWindow.__init__(self,parent)
 
         self.protocol("WM_DELETE_WINDOW",self.set_stop)
         self.title(title or self.timer.func.__name__.capitalize())
-        self.balloon = tk_widgets.Balloon(self)
+        self.balloon = tk.Balloon(self)
 
         progress_bar = Progressbar(self,#type="normal",
                                    #maximum=100,height=20,width=200,
@@ -825,7 +824,7 @@ class ProgressWindow(ProgressController,tk_widgets.AppWindow):
         
     def _close(self,last_message=None):
         ProgressController._close(self,last_message)
-        tk_widgets.AppWindow.destroy(self)
+        tk.AppWindow.destroy(self)
         self.destroyed=True
 
     def timing_info(self,time,percent,name,duration,remaining):

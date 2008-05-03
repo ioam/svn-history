@@ -239,9 +239,9 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         #################### RIGHT-CLICK MENU STUFF ####################
         ### Right-click menu for canvases; subclasses can add cascades
         ### or insert commands on the existing cascades.
-        self._canvas_menu = tk.widgets.Menu(self, tearoff=0) #self.context_menu 
+        self._canvas_menu = tk.Menu(self, tearoff=0) #self.context_menu 
 
-        self._unit_menu = tk.widgets.Menu(self._canvas_menu, tearoff=0)
+        self._unit_menu = tk.Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.add_cascade(menu=self._unit_menu,state=DISABLED,
                                       indexname='unit_menu')
 
@@ -257,7 +257,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         # can be cleaned up easily.)
         self._unit_menu_updaters = {}
         
-        self._sheet_menu = tk.widgets.Menu(self._canvas_menu, tearoff=0)
+        self._sheet_menu = tk.Menu(self._canvas_menu, tearoff=0)
         self._canvas_menu.add_cascade(menu=self._sheet_menu,state=DISABLED,
                                       indexname='sheet_menu')
         self._canvas_menu.add_separator()
