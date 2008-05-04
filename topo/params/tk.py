@@ -459,35 +459,8 @@ class TkParameterizedBase(Parameterized):
     _extraPO = None
 
 
-    # CEBALERT: fix the more useful repr method
+    # CEBALERT: Parameterized repr method leads to recursion error.
     def __repr__(self): return object.__repr__(self)    
-##     def __repr__(self):
-##         # Method adds the name of the _extraPO, plus avoids recursion problem (see note).
-        
-##         if isinstance(self._extraPO,Parameterized):
-##             extraPOstring = self._extraPO.__class__.__name__+"(name=%s)"%self._extraPO.name
-##         elif isinstance(self._extraPO,ParameterizedMetaclass):
-##             extraPOstring = self._extraPO.__name__
-##         elif self._extraPO is None:
-##             extraPOstring = "None"
-##         else:
-##             raise TypeError
-
-##         # this is just like in the superclass, except that for a button parameter
-##         # calling repr(val) won't work if val is a method of this object (leads
-##         # to a recursion error).
-##         settings = []
-##         for name,val in self.get_param_values():
-##             if isinstance(self.get_parameter_object,ButtonParameter):
-##                 r = object.__repr__(val)
-##             else:
-##                 r = repr(val)
-##             settings.append("%s=%s"%(name,r))
-            
-##         return self.__class__.__name__ + "(_extraPO=%s, "%extraPOstring + ", ".join(settings) + ")"
-
-
-
 
 
     def _setup_params(self,**params):
