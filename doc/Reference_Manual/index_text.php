@@ -22,8 +22,10 @@ href="topo.html"><strong>topo</strong></A> package.  The most
 essential of these are:
 
 <P><DL COMPACT>
-<DT><A href="topo.base-module.html"><strong>base</strong></A></DT>
-<DD>Core Topographica functions and classes</DD>
+<P><DT><A href="topo.base-module.html"><strong>base</strong></A></DT>
+<DD>Core Topographica-specific functions and classes</DD>
+<P><DT><A href="topo.params-module.html"><strong>params</strong></A></DT>
+<DD>Support for objects with user-controllable attributes</DD>
 <P><DT><A href="topo.plotting-module.html"><strong>plotting</strong></A></DT>
 <DD>Visualization functions and classes</DD>
 <P><DT><A href="topo.analysis-module.html"><strong>analysis</strong></A></DT>
@@ -35,14 +37,16 @@ essential of these are:
 </dl>
 
 The <strong>base</strong> directory contains the most fundamental
-Topographica classes, implementing basic functionality such as
-Parameters (user-controllable attributes), Sheets (arrays of units),
-Projections (large groups of connections between Sheets),
-ConnectionFields (spatially localized groups of connections to one
-unit), and the event-driven Simulation.  All of these files are
+Topographica classes, implementing basic functionality such as Sheets
+(arrays of units), Projections (large groups of connections between
+Sheets), ConnectionFields (spatially localized groups of connections
+to one unit), and the event-driven Simulation.  It relies heavily on
+the generic support for Parameters (user-controllable attributes) from
+the <strong>params</strong> directory.  Together these files are
 independent of the rest of the files in topo/, and act as the primary
 programming interface on which Topographica is built.  The rest of the
-directories add components used in specific models.
+directories add components used in specific models, or add graphical
+interfaces.
 
 <H2><A NAME="library">Library</A></H2>
 
@@ -65,6 +69,8 @@ classes:
 <DD>Calculate the response of a unit or a Projection</DD>
 <P><DT><A href="topo.learningfns-module.html"><strong>learningfns</strong></A></DT>
 <DD>Adjust weights for a unit or a Projection</DD>
+<P><DT><A href="topo.coordmapperfns-module.html"><strong>coordmapperfns</strong></A></DT>
+<DD>Determine mapping from one Projection to another</DD>
 <P><DT><A href="topo.commands-module.html"><strong>commands</strong></A></DT>
 <DD>High-level user commands</DD>
 </DL>
@@ -94,7 +100,7 @@ each unit.  For instance, a LearningFn can be used with a
 CFPLearningFn of type CFPLF_Plugin, and will be applied the same to
 each unit individually.
 
-<P>Many components also come with an optimized version, usually
+<P>Some components also come with an optimized version, usually
 written in C for speed.  The fastest, but least flexible, components
 will be high-level components written in C, such as CFPLF_Hebbian_opt.
 
