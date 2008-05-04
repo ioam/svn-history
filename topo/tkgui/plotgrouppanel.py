@@ -128,6 +128,7 @@ class PlotGroupPanel(tk.TkParameterized,Frame):
         """
         
         tk.TkParameterized.__init__(self,master,extraPO=plotgroup,
+                                    msg_handler=master.status,
                                     **params)
         Frame.__init__(self,master)
         

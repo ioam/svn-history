@@ -10,6 +10,7 @@ from inspect import getdoc
 from Tkinter import Button, Label, Frame, TOP, LEFT, RIGHT, BOTTOM, E, LAST, FIRST, OptionMenu, StringVar,Toplevel
 import math
 
+import topo.params.tk as tk
 import topo
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Enumeration,BooleanParameter
@@ -54,12 +55,16 @@ class EditorObject(object):
         "Show parameters frame for object."
         
         parameter_window = Toplevel() #CEBALERT #TkguiWindow(self)
+        status=tk.StatusBar(parameter_window)
+        status.pack(side="bottom",fill='x',expand='yes')
+        
         parameter_window.title(self.name)
         balloon = Balloon(parameter_window)
 
         title = Label(parameter_window, text = self.name)
         title.pack(side = TOP)
-        self.parameter_frame = ParametersFrameWithApply(parameter_window)
+        self.parameter_frame = ParametersFrameWithApply(parameter_window,
+                                                        msg_handler=status)
         balloon.bind(title,self.objdoc())
         self.parameter_window = parameter_window
 

@@ -888,6 +888,8 @@ class TkParameterizedBase(Parameterized):
             
         self.translators[name]=translator_type(param,initial_value=self.get_parameter_value(name))
 
+        self.translators[name].msg_handler = self.msg_handler
+
 
 
 
@@ -1016,7 +1018,8 @@ class TkParameterized(TkParameterizedBase):
         """)
 
 
-    def __init__(self,master,extraPO=None,self_first=True,**params):
+    def __init__(self,master,extraPO=None,self_first=True,
+                 msg_handler=None,**params):
         """
         Initialize this object with the arguments and attributes
         described below:
@@ -1059,6 +1062,7 @@ class TkParameterized(TkParameterizedBase):
         dictionary, under the Parameter's name.
         """
         self.master = master
+        self.msg_handler = msg_handler
 
         # CEBALER: doc
         self.allow_dynamic = []
@@ -1914,7 +1918,7 @@ class ParametersFrame(TkParameterized,T.Frame):
     display_threshold = Number(default=0,precedence=-10,doc="Parameters with precedence below this value are not displayed.")
 
     def __init__(self,master,parameterized_object=None,on_change=None,
-                 on_modify=None,**params):
+                 on_modify=None,msg_handler=None,**params):
         """
         Create a ParametersFrame with the specifed master, and
         representing the Parameters of parameterized_object.
@@ -1927,11 +1931,12 @@ class ParametersFrame(TkParameterized,T.Frame):
         actually changes. (See TkParameterized for more detail.)
         """
         T.Frame.__init__(self,master,borderwidth=1,relief='raised')
-        self.status = StatusBar(self)
-        
+
         TkParameterized.__init__(self,master,
-                                       extraPO=parameterized_object,
-                                       self_first=False,**params)
+                                 extraPO=parameterized_object,
+                                 self_first=False,
+                                 msg_handler=msg_handler,
+                                 **params)
 
         self.on_change = on_change
         self.on_modify = on_modify
@@ -1943,8 +1948,6 @@ class ParametersFrame(TkParameterized,T.Frame):
         if parameterized_object:
             self.set_PO(parameterized_object,on_change=on_change,
                         on_modify=on_modify)
-
-        self.status.pack(side="bottom",expand="yes",fill='x')
 
         self.__create_button_panel()
 
@@ -2215,7 +2218,7 @@ class ParametersFrame(TkParameterized,T.Frame):
         self.balloon.bind(title,getdoc(self.get_parameter_object(param_name,self._extraPO)))
         ############################
         
-        parameter_frame = type(self)(parameter_window,parameterized_object=PO_to_edit)
+        parameter_frame = type(self)(parameter_window,parameterized_object=PO_to_edit,msg_handler=self.msg_handler)
         parameter_frame.pack()
 
 
@@ -2279,9 +2282,6 @@ class ParametersFrame(TkParameterized,T.Frame):
 ##             except T.TclError:
 ##                 pass
 
-    def _create_translator(self,name,param):
-        TkParameterized._create_translator(self,name,param)
-        self.translators[name].msg_handler = self.status
 
 
     def _refresh_value(self,param_name):

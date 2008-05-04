@@ -99,7 +99,8 @@ class TestPattern(SheetPanel):
         self.params_frame = ParametersFrame(
             self.pg_control_pane,
             parameterized_object=self.pattern_generator,
-            on_modify=self.conditional_refresh)
+            on_modify=self.conditional_refresh,
+            msg_handler=master.status)
 
         self.params_frame.hide_param('Close')
         self.params_frame.hide_param('Refresh')
