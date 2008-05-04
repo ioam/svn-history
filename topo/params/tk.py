@@ -139,7 +139,7 @@ representing those of an external parameterized instance or class).
   XPanel(t,x)
 
 
-$Id: tkparameterizedobject.py 8444 2008-04-27 05:29:14Z ceball $
+$Id$
 """
 
 # CB: This file is too long because the param/gui interface code has

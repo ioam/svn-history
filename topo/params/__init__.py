@@ -12,9 +12,9 @@ parameterized.Parameterized classes for more information.
 This file contains subclasses of Parameter, implementing specific
 parameter types (e.g. Number).
 
-$Id: parameterclasses.py 8381 2008-04-22 06:56:47Z ceball $
+$Id$
 """
-__version__='$Revision: 8381 $'
+__version__='$Revision$'
 
 # CEBALERT: we'll need more documentation above (eventually, when
 # params becomes a separate directory and then package).

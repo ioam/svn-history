@@ -2,9 +2,9 @@
 Generic support for objects with full-featured Parameters and
 messaging.  
 
-$Id: parameterizedobject.py 8214 2008-03-18 12:16:32Z ceball $
+$Id$
 """
-__version__='$Revision: 8214 $'
+__version__='$Revision$'
 
 import sys
 import copy
