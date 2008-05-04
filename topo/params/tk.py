@@ -169,10 +169,10 @@ import sys
 import copy
 import decimal
 import os.path
+import ImageTk, Image, ImageOps
+import Tkinter as T
 
 from inspect import getdoc
-
-import Tkinter as T
 
 from tkMessageBox import _show,QUESTION,YESNO
 from Tile import Combobox
@@ -180,10 +180,9 @@ from scrodget import Scrodget
 
 from parameterized import Parameterized,ParameterizedMetaclass,\
      classlist
-
-# Hmm
-from ..params import Boolean,String,Number,Selector,ClassSelector,ObjectSelector,\
-     Callable,Dynamic,Parameter
+     
+from .params import Boolean,String,Number,Selector,ClassSelector,\
+     ObjectSelector,Callable,Dynamic,Parameter
 
 
 # CEBALERT: copied from topo.misc.filepaths, to make it clear what we
@@ -309,8 +308,6 @@ def askyesno(title=None, message=None, **options):
 # non-Parameter specific stuff, then one that bolts on the
 # Parameter-specific stuff, and then instead of Button we'd
 # have TopoButton, or something like that...
-import ImageTk, Image, ImageOps
-
 class Button(Callable):
     """
     A GUI-specific parameter to display a button.
@@ -355,16 +352,12 @@ class Button(Callable):
             self._hack.append(image)
 
         return image
+
             
-
-
-
-
 # Note that TkParameterized extends TkParameterizedBase by adding
 # widget-drawing abilities; documentation for using these classes
 # begins at a more useful and simple level in TkParameterized (the
 # documentation for TkParameterizedBase is more complex).
-
 class TkParameterizedBase(Parameterized):
     """
     A Parameterized subclass that maintains Tkinter.Variable shadows
