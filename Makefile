@@ -44,7 +44,7 @@ default: ext-packages topographica
 
 all: default reference-manual doc tests examples 
 
-clean: clean-doc clean-ext-packages clean-pyc 
+clean: clean-doc clean-ext-packages clean-compiled 
 	${RM} .??*~ *~ */*~ */.??*~ */*/*~ */*/.??*~ */*/*/*~ */*/*/.??*~ *.bak
 	${RM} .#??*.* */.#??*.* */*/.#??*.* */*/*/.#??*.* current_profile ./topo/tests/testsnapshot.typ ./topo/tests/testplotfilesaver*.png
 	${RM} -r bin include share lib man topographica ImageSaver*.jpeg python_topo
@@ -236,9 +236,13 @@ detailed-gui-tests:
 	./topographica -g -c "from topo.tests.gui_tests import run_detailed; nerr=run_detailed(); import sys; sys.exit(nerr)"
 
 
+clean-compiled: clean-weave clean-pyc
+
+clean-weave:
+	rm -rf ~/.python2*_compiled/ | cat
+
 clean-pyc:
 	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc examples/*.pyc
-	rm -rf ~/.python2*_compiled/ | cat
 
 clean-doc:
 	make -C doc clean
