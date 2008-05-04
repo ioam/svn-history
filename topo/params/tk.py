@@ -291,7 +291,7 @@ def is_button(widget):
 
 # CEB: workaround for tkinter lagging behind tk (tk must have changed
 # the type of a returned value).  This is copied almost exactly from
-# tkMessageBox If there are other things like this, we could have the
+# tkMessageBox. If there are other things like this, we could have the
 # gui load some 'dynamic patches' to tkinter on startup, which could
 # then be removed when tkinter is updated (they'd all be in one place,
 # and no tkgui code would have to change).
@@ -444,10 +444,13 @@ class TkParameterizedBase(Parameterized):
     # use only the parameter access methods instead). But having them
     # available as attributes is really convenient.
 
-    # CEBNOTE: Regarding note 2 above...if the above becomes a
-    # problem, we could have some autorefresh of the vars or a
-    # callback of some kind in the parameterized object itself.
-    # (See note in TkParameterized.__init__.)
+    # CEBNOTE: Regarding note 2 above...if it becomes a problem, we
+    # could have some autorefresh of the vars or a callback of some
+    # kind in the parameterized object itself. E.g a
+    # refresh-the-widgets-on-focus-in method could make the gui in
+    # sync with the actual object (so changes outside the gui could
+    # show up when a frame takes focus). Or there could be timer
+    # process.
 
     # CEB: because of note 1, attributes of this class should have
     # names that are unlikely to clash (or they should be private);
@@ -481,7 +484,7 @@ class TkParameterizedBase(Parameterized):
 
     # CEBALERT: rename extraPO...but to what?
     # Rename change_PO() and anything else related.
-    def __init__(self,extraPO=None,self_first=True,live_update=True,guimain=None,**params):
+    def __init__(self,extraPO=None,self_first=True,live_update=True,**params):
         """
 
 
@@ -528,7 +531,6 @@ class TkParameterizedBase(Parameterized):
                 or isinstance(extraPO,Parameterized)):
             raise TypeError("%s is not a Parameterized instance or class."%extraPO)
 
-        self.guimain = guimain
         # make self.first etc private
 
         self._live_update = live_update
@@ -886,10 +888,10 @@ class TkParameterizedBase(Parameterized):
             
         self.translators[name]=translator_type(param,initial_value=self.get_parameter_value(name))
 
-        self.translators[name].guimain = self.guimain
 
 
-    # CEB: doc replace & generalize,  or change
+
+    # CEBALERT: doc replace & rename to plastic or something
     def _object2string(self,param_name,obj,replace=True):
         """
         If val is one of the objects in param_name's translator,
@@ -898,11 +900,10 @@ class TkParameterizedBase(Parameterized):
         self.debug("object2string(%s,%s)"%(param_name,obj))
         translator = self.translators[param_name]
 
-        if replace is False:
-            translator=copy.deepcopy(translator)
+        if not replace:
+            translator=copy.copy(translator)
             
-        
-        return translator.object2string(obj)              
+        return translator.object2string(obj)
 
 
     def _string2object(self,param_name,string):
@@ -962,7 +963,7 @@ class TkParameterizedBase(Parameterized):
 class TkParameterized(TkParameterizedBase):
     """
     Provide widgets for Parameters of itself and up to one additional
-    Parameterized.
+    Parameterized instance or class.
 
     A subclass that defines a Parameter p can display it appropriately
     for manipulation by the user simply by calling
@@ -980,17 +981,18 @@ class TkParameterized(TkParameterizedBase):
     ---------------------
 
     In the same way, an instance of this class can be used to display
-    the Parameters of an existing Parameterized. By passing in
-    extraPO=x, where x is an existing Parameterized, a Parameter
-    q of x can be displayed in the GUI by calling pack_param('q').
+    the Parameters of an existing object. By passing in extraPO=x,
+    where x is an existing Parameterized instance or class, a
+    Parameter q of x can also be displayed in the GUI by calling
+    pack_param('q').
 
     For representation in the GUI, Parameter values might need to be
     converted between their real values and strings used for display
-    (e.g. for a ClassSelectorParameter, the options are really class
-    objects, but the user must be presented with a list of strings to
-    choose from). Such translation is handled and documented in the
-    TkParameterizedBase; the default behaviors can be overridden
-    if required.
+    (e.g. for a ClassSelector, the options are really class objects,
+    but the user is presented with a list of strings to choose
+    from). Such translation is handled and documented in the
+    TkParameterizedBase; the default behaviors can be overridden if
+    required.
 
     (Note that this class simply adds widget drawing to
     TkParameterizedBase. More detail about the shadowing of
@@ -1014,12 +1016,12 @@ class TkParameterized(TkParameterizedBase):
         """)
 
 
-    def __init__(self,master,extraPO=None,self_first=True,guimain=None,**params):
+    def __init__(self,master,extraPO=None,self_first=True,**params):
         """
         Initialize this object with the arguments and attributes
         described below:
         
-        extraPO: optional Parameterized for which to shadow
+        extraPO: optional Parameterized object for which to shadow
         Parameters (in addition to Parameters of this object; see
         superclass)
 
@@ -1058,15 +1060,17 @@ class TkParameterized(TkParameterizedBase):
         """
         self.master = master
 
+        # CEBALER: doc
         self.allow_dynamic = []
+        
         self.param_immediately_apply_change = {Boolean:True,
                                                Selector:True,
                                                Number:False,
                                                Parameter:False}
 
         TkParameterizedBase.__init__(self,extraPO=extraPO,
-                                           self_first=self_first,
-                                           **params)
+                                     self_first=self_first,
+                                     **params)
 
         self.balloon = Balloon(master)
 
@@ -1080,35 +1084,36 @@ class TkParameterized(TkParameterizedBase):
         
         self.representations = {}  
         
-        # CEBNOTE: a refresh-the-widgets-on-focus-in method could make the gui
-        # in sync with the actual object (so changes outside the gui could
-        # show up when a frame takes focus). Or there could be timer process.
 
-
+        # CEBNOTE: it would be nice to sort out menus properly
+        # (i.e. parameterize them)
         self.popup_menu = Menu(master, tearoff=0)
-        self.test_var = T.BooleanVar()
-        self.popup_menu.add("checkbutton",indexname="dynamic",label="Enter dynamic value?",
+        self.dynamic_var = T.BooleanVar()
+        self.popup_menu.add("checkbutton",indexname="dynamic",
+                            label="Enter dynamic value?",
                             state="disabled",command=self._switch_dynamic,
-                            variable=self.test_var)
+                            variable=self.dynamic_var)
 
 
-    def _param_right_click(self,event,param_name):
-        
+    def __update_dynamic_menu_entry(param_name):
+        """Keep track of status of dynamic entry."""
         param,po = self.get_parameter_object(param_name,with_location=True)
         currently_dynamic = param_is_dynamically_generated(param,po)
-        
         if hasattr(param,'_value_is_dynamic') and not currently_dynamic:
             self._right_click_param = param_name
             state = "normal"
         else:
             self._right_click_param = None
             state = "disabled"
-
         self.popup_menu.entryconfig("dynamic",state=state)
+        self.dynamic_var.set(currently_dynamic or \
+                             param_name in self.allow_dynamic) 
+        
 
-        self.test_var.set(currently_dynamic or param_name in self.allow_dynamic) 
-        self.popup_menu.tk_popup(event.x_root,
-                                 event.y_root)
+    def _param_right_click(self,event,param_name):
+        """Display a popup menu when user right clicks on a parameter."""
+        self.__update_dynamic_menu_entry(param_name)
+        self.popup_menu.tk_popup(event.x_root,event.y_root)
 
 
 
@@ -1704,9 +1709,6 @@ class TkParameterized(TkParameterizedBase):
 
 
 
-
-
-
 ######################################################################
 ######################################################################
 
@@ -1723,10 +1725,11 @@ class Translator(object):
         the user.)
 
     """
-    last_string2object_failed = False
+    last_string2object_failed = False # CEBALERT: why class attr?
 
     def __init__(self,param,initial_value=None):
         self.param = param
+        self.msg_handler = None
     
     def string2object(self,string_):
         raise NotImplementedError
@@ -1735,8 +1738,15 @@ class Translator(object):
         raise NotImplementedError
 
     def _pass_out_msg(self,msg):
-        if self.guimain:
-            self.guimain.status_message(msg)
+        if self.msg_handler:
+            self.msg_handler.message(None,msg)
+
+    def __copy__(self):
+        """Copy only translator-specific state."""
+        new = self.__class__(self.param)
+        new.last_string2object_failed = self.last_string2object_failed
+        new.msg_handler = self.msg_handler
+        return new
 
 
 class DoNothingTranslator(Translator):
@@ -1784,9 +1794,11 @@ class Eval_ReprTranslator(Translator):
             try:
                 self.last_object = eval(string_,__main__.__dict__)
                 self.last_string = string_
-                self._pass_out_msg("OK")
+                self._pass_out_msg(" ")
+                #print "OUT:"
             except Exception,inst:
-                m = str(sys.exc_info()[0])[11::]+" ("+str(inst)+")"
+                #print "OUT:", str(sys.exc_info()[0])[11::]+" ("+str(inst)+")"
+                m = str(inst) # CEBALERT: clean up
                 self._pass_out_msg(m)
                 self.last_string2object_failed=True
                 return string_ # HIDDEN
@@ -1804,7 +1816,11 @@ class Eval_ReprTranslator(Translator):
             self.last_string = string_
             return string_
 
-
+    def __copy__(self):
+        n = super(Eval_ReprTranslator,self).__copy__()
+        n.last_string = self.last_string
+        n.last_object = self.last_object
+        return n
         
 
 class String_ObjectTranslator(Translator):
@@ -1824,7 +1840,12 @@ class String_ObjectTranslator(Translator):
 
     def update(self):
         self.cache = self.param.get_range()
-        
+
+    def __copy__(self):
+        n = super(String_ObjectTranslator,self).__copy__()
+        n.cache = self.cache 
+        return n
+    
         
 
 class CSPTranslator(String_ObjectTranslator):
@@ -1900,6 +1921,8 @@ class ParametersFrame(TkParameterized,T.Frame):
         actually changes. (See TkParameterized for more detail.)
         """
         T.Frame.__init__(self,master,borderwidth=1,relief='raised')
+        self.status = StatusBar(self)
+        
         TkParameterized.__init__(self,master,
                                        extraPO=parameterized_object,
                                        self_first=False,**params)
@@ -1914,6 +1937,8 @@ class ParametersFrame(TkParameterized,T.Frame):
         if parameterized_object:
             self.set_PO(parameterized_object,on_change=on_change,
                         on_modify=on_modify)
+
+        self.status.pack(side="bottom",expand="yes",fill='x')
 
         self.__create_button_panel()
 
@@ -2248,6 +2273,9 @@ class ParametersFrame(TkParameterized,T.Frame):
 ##             except T.TclError:
 ##                 pass
 
+    def _create_translator(self,name,param):
+        TkParameterized._create_translator(self,name,param)
+        self.translators[name].msg_handler = self.status
 
 
     def _refresh_value(self,param_name):
@@ -2350,6 +2378,7 @@ class ParametersFrameWithApply(ParametersFrame):
 
     def _close_button(self):
         # CEBALERT: dialog box should include a cancel button
+        # Also, changes are *not* applied if one of the boxes is in error.
         if self.has_unapplied_change() \
                and askyesno("Close","Apply changes before closing?"):
             self.update_parameters()

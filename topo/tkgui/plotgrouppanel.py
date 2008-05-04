@@ -128,7 +128,7 @@ class PlotGroupPanel(tk.TkParameterized,Frame):
         """
         
         tk.TkParameterized.__init__(self,master,extraPO=plotgroup,
-                                    guimain=topo.guimain,**params)
+                                    **params)
         Frame.__init__(self,master)
         
         self.setup_plotgroup()
