@@ -124,7 +124,6 @@ compare_or:
 	./topographica -c "BaseRN=${COMPARE_BASERN}; BaseN=${COMPARE_BASEN}; comparisons=True" topo/tests/reference/lissom_or_reference.ty 
 
 or_comparisons:
-	make -C topo/tests/reference/
 	./topographica -c "from topo.tests.test_script import run_multiple_density_comparisons;nerr=run_multiple_density_comparisons('lissom_or_reference.ty'); import sys;sys.exit(nerr)"
 
 # will change to use new script (+BaseRN,BaseN ignored right now)
@@ -133,7 +132,6 @@ compare_oo_or:
 	./topographica -c "BaseRN=${COMPARE_BASERN}; BaseN=${COMPARE_BASEN}; comparisons=True" topo/tests/reference/fixed_params/lissom_oo_or_reference_fixed.ty 
 
 oo_or_comparisons:
-	make -C topo/tests/reference/
 	./topographica -c "from topo.tests.test_script import run_multiple_density_comparisons;nerr=run_multiple_density_comparisons('lissom_oo_or_reference.ty'); import sys;sys.exit(nerr)"
 
 
