@@ -551,9 +551,9 @@ class TkParameterizedBase(Parameterized):
 
         
         """
-        assert extraPO is None \
-               or isinstance(extraPO,ParameterizedMetaclass) \
-               or isinstance(extraPO,Parameterized)
+        if not (extraPO is None or isinstance(extraPO,ParameterizedMetaclass) \
+                or isinstance(extraPO,Parameterized)):
+            raise TypeError("%s is not a Parameterized instance or class."%extraPO)
 
         self.guimain = guimain
         # make self.first etc private
@@ -2443,10 +2443,6 @@ def edit_parameters(parameterized,with_apply=True,**params):
 
     Extra params are passed to the ParametersFrame constructor.
     """
-    if not (isinstance(parameterized,Parameterized) or \
-           isinstance(parameterized,ParameterizedMetaclass)):
-        raise ValueError("Can only edit parameters of a Parameterized.")
-
     if not with_apply:
         pf_class = ParametersFrame
     else:
