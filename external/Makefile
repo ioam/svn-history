@@ -404,7 +404,7 @@ pylint-uninstall: astng-uninstall common-uninstall
 ##############################################################
 # epydoc (Automatic Reference_Manual generator)
 #
-EPYDOC = epydoc-3.0beta1
+EPYDOC = epydoc-3.0.1
 EPYDOC_UNINSTALL = ${PYTHON_LIB}/site-packages/epydoc
 
 epydoc: ${EPYDOC}.tar.gz python
