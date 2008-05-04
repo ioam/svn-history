@@ -181,7 +181,7 @@ from scrodget import Scrodget
 from parameterized import Parameterized,ParameterizedMetaclass,\
      classlist
      
-from .params import Boolean,String,Number,Selector,ClassSelector,\
+from . import Boolean,String,Number,Selector,ClassSelector,\
      ObjectSelector,Callable,Dynamic,Parameter
 
 
