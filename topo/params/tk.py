@@ -1872,6 +1872,12 @@ class CSPTranslator(String_ObjectTranslator):
     def update(self):
         self.cache = self.param.get_range()
 
+    def __copy__(self):
+        # because this one's object2string can modify cache
+        n = Translator.__copy__(self)
+        n.cache = copy.copy(self.cache)
+        return n
+
 
 
 def param_is_dynamically_generated(param,po):
@@ -2314,11 +2320,13 @@ class ParametersFrameWithApply(ParametersFrame):
         self.pack_param('Apply',parent=self._buttons_frame_right,
                         on_change=self._apply_button,side='left')
 
-        # this check for displayed_params, like elsewhere it exists, is to get round the
-        # fact that parametersframes can be opened without any associated object. Need
-        # to clean this up. (displayed_params should probably start as an empty dict.)
+        # this check for displayed_params, like elsewhere it exists,
+        # is to get round the fact that parametersframes can be opened
+        # without any associated object. Need to clean this
+        # up. (displayed_params should probably start as an empty
+        # dict.)
         if hasattr(self,'displayed_params'):
-            assert self.has_unapplied_change() is False, "ParametersFrame altered a value. If possible, please email ceball at users.sf.net describing what you were doing when you received this error."
+            assert self.has_unapplied_change() is False, "ParametersFrame altered a value on opening. If possible, please email ceball at users.sf.net describing what you were doing when you received this error."
             # should use existing code
             self.representations['Apply']['widget']['state']='disabled'
 
