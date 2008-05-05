@@ -54,17 +54,21 @@ class EditorObject(object):
     def show_properties(self):
         "Show parameters frame for object."
         
-        parameter_window = Toplevel() #CEBALERT #TkguiWindow(self)
-        status=tk.StatusBar(parameter_window)
-        status.pack(side="bottom",fill='x',expand='yes')
+        parameter_window = tk.AppWindow(topo.guimain,status=True)
+        #status=tk.StatusBar(parameter_window)
+        #status.pack(side="bottom",fill='x',expand='yes')
         
         parameter_window.title(self.name)
         balloon = Balloon(parameter_window)
 
+#        import __main__;__main__.__dict__['AAA'] = parameter_window
         title = Label(parameter_window, text = self.name)
         title.pack(side = TOP)
-        self.parameter_frame = ParametersFrameWithApply(parameter_window,
-                                                        msg_handler=status)
+        self.parameter_frame = ParametersFrameWithApply(
+            parameter_window,
+            msg_handler=parameter_window.status)
+        parameter_window.sizeright()
+        
         balloon.bind(title,self.objdoc())
         self.parameter_window = parameter_window
 

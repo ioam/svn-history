@@ -128,7 +128,7 @@ class PlotGroupPanel(tk.TkParameterized,Frame):
         """
         
         tk.TkParameterized.__init__(self,master,extraPO=plotgroup,
-                                    msg_handler=master.status,
+                                    msg_handler=master.container.status,
                                     **params)
         Frame.__init__(self,master)
         
@@ -195,7 +195,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
 
 
         # CEBALERT: replace 
-	self.messageBar = self.master.status 
+	self.messageBar = self.master.container.status 
 
         self.pack_param('update_command',parent=self.updatecommand_frame,
                         expand='yes',fill='x',side='left')
@@ -274,10 +274,10 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
 
     def set_dock(self):
         if self.dock:
-            topo.guimain.some_area.consume(self._container)
+            topo.guimain.some_area.consume(self.master.container)
             self.refresh_title()
         else:
-            topo.guimain.some_area.eject(self._container)
+            topo.guimain.some_area.eject(self.master.container)
             self.refresh_title()
             
 

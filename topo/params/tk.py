@@ -2176,6 +2176,7 @@ class ParametersFrame(TkParameterized,T.Frame):
 
         self.currently_displaying = dict([(param_name,self.representations[param_name])
                                           for param_name in self.displayed_params])
+        #self.event_generate("<<SizeRight>>")
             
         
     def _create_selector_widget(self,frame,name,widget_options):
@@ -2807,34 +2808,57 @@ class FocusTakingButton(T.Button):
         #self['highlightthickness']=0
 
 
+# CB: tklib has status bar and scrolled window (among other widgets);
+# should try them out (although they're tk only...) because we might
+# not need the scrodget pacakge.
+
 # Might wonder why we need <<SizeRight>> event, and don't just use the
 # <Configure> event for calling sizeright: Can't distinguish manual
 # resize from autoresizing.
-
 class ScrolledFrame(T.Frame):
     """
     XXXX
     
     Content to be scrolled should go in the 'content' frame.
     """
-    def __init__(self,parent,**config):
+
+    def _getstatus(self):
+        return self._status
+    def _setstatus(self,s):
+        self._status = s
+    status = property(_getstatus,_setstatus)
+    
+    def __init__(self,parent,status=False,**config):
         T.Frame.__init__(self,parent,**config)
 
-        self.canvas = T.Canvas(self)
+        topframe = T.Frame(self)#,bd=2,relief='groove')
+        botframe = T.Frame(self)#,bd=2,relief='groove')
+
+        botframe.pack(side="bottom",expand="yes",fill="x")
+        topframe.pack(side="top",expand="yes",fill="both")
+        
+
+
+        self.canvas = T.Canvas(topframe)
         self.canvas.pack()
         self.canvas.configure(width=0,height=0)
         
-        self.sc = Scrodget(self,autohide=1)
+        self.sc = Scrodget(topframe,autohide=1)
         self.sc.associate(self.canvas)
         self.sc.pack(expand=1,fill="both")
         
         self.content = T.Frame(self.canvas)
         self.content.title = lambda x: self.title(x)
+        self.content.container = self
         
         self.canvas.create_window(0,0,window=self.content,anchor='nw')
 
         self.bind("<<SizeRight>>",self.sizeright)
 
+        self.status = StatusBar(botframe) 
+        if status:
+            self.status.pack(side="bottom",fill="both",expand="yes")
+            
 
 
     def sizeright(self,event=None):
@@ -2853,7 +2877,13 @@ class ScrolledWindow(T.Toplevel):
     def __init__(self,parent,**config):
         T.Toplevel.__init__(self,parent,**config)
         self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
-        self._scrolledframe = ScrolledFrame(self)
+
+        self.topframe = T.Frame(self)
+        self.topframe.pack(side='top',expand='yes',fill='both')
+        self.botframe = T.Frame(self)
+        self.botframe.pack(side='bottom',expand='no',fill='x')
+        
+        self._scrolledframe = ScrolledFrame(self.topframe)
         self._scrolledframe.pack(expand=1,fill='both')
         self.content = self._scrolledframe.content
 
@@ -2912,7 +2942,7 @@ class AppWindow(ScrolledWindow):
         # status bar is currenlty inside scrolled area (a feature
         # request is to move it outside ie replace self.content with
         # just self)
-        self.status = StatusBar(self.content) 
+        self.status = StatusBar(self.botframe) 
         if status:
             self.status.pack(side="bottom",fill="x",expand="no")
         

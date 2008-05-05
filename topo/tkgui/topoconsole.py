@@ -19,7 +19,7 @@ import webbrowser
 
 from inspect import getdoc
 
-from Tile import Notebook
+import Tile
 from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
      LEFT, RIGHT, YES, NO, BOTH, Label, Text, END, DISABLED, \
      NORMAL, Scrollbar, Y, DoubleVar, Widget
@@ -86,9 +86,6 @@ def open_plotgroup_panel(class_,plotgroup=None,**kw):
         frame = topo.guimain.some_area.new_frame()
         panel = class_(frame.content,plotgroup=plotgroup,**kw)
 
-        # hack
-        panel._container = frame
-
         if not panel.dock:
             topo.guimain.some_area.eject(frame)
             panel.refresh_title()
@@ -152,16 +149,10 @@ class PlotsMenuEntry(ParameterizedObject):
         return open_plotgroup_panel(self.class_,new_plotgroup,**kw)
 
 
-
-
-import Tile
-
-
-
 class FrameManager(Tile.Notebook):
     """Manages windows that can be tabs in a notebook, or toplevels."""
     def __init__(self, master=None, cnf={}, **kw):
-        Notebook.__init__(self, master, cnf=cnf, **kw)
+        Tile.Notebook.__init__(self, master, cnf=cnf, **kw)
         self._tab_ids = {}
 
     def _get_window_of_frame(self,f):
@@ -208,12 +199,12 @@ class FrameManager(Tile.Notebook):
             
 
     def new_frame(self):
-        f=tk.ScrolledFrame(self)
+        f=tk.ScrolledFrame(self,status=True)
         self.add(f,state='hidden')
 
         ### HACK A
-        f.content.status = tk.StatusBar(f.content)
-        f.content.status.pack(side="bottom",fill="x",expand="no")
+        #f.content.status = tk.StatusBar(f.content)
+        #f.content.status.pack(side="bottom",fill="x",expand="no")
         ###
 
         return f
@@ -221,6 +212,9 @@ class FrameManager(Tile.Notebook):
     def consume(self,f):
         if f not in self._tab_ids:
             self.tk.call('wm','forget',f._w)
+            f.status.pack_forget()
+            f.old_status = f.status
+            f.status = topo.guimain.messageBar
             self.add(f)
         else:
             print f,"already in"
@@ -232,6 +226,11 @@ class FrameManager(Tile.Notebook):
             del self._tab_ids[f]
             self.tk.call('wm','manage',f._w)
             f.title=lambda x: self._set_toplevel_title(f,x)
+
+            ###
+            if hasattr(f,'old_status'):
+                f.status = f.old_status
+                f.status.pack(side="bottom",fill="x",expand="no")
             return f
         else:
             print f,"not in"
