@@ -667,10 +667,24 @@ class TkParameterizedBase(Parameterized):
         displayed_value = self._string2object(name,self._tkvars[name]._original_get())
         object_value = self.get_parameter_value(name) #getattr(self._extraPO,name)
 
-        if displayed_value!=object_value:
-            changed = True
-        else:
-            changed = False
+        # use equality check then identity check because e.g.  val
+        # starts at 0.5, type 0.8, then type 0.5, need that to be
+        # changed is False, but some types cannot be equality compared
+        # (can be identity compared).
+        # CEBALERT: need to add a unit test to ensure this keeps working.
+        # Plus, I need to think about this, because while the above is
+        # true for floats, identity tests make more sense for many types
+        # (i.e. you want to know the object is the same).
+        try:
+            if displayed_value != object_value:
+                changed = True
+            else:
+                changed = False
+        except:
+            if displayed_value is not object_value:
+                changed = True
+            else:
+                changed = False
 
         self.debug("..._v_c return %s"%changed)
         return changed
@@ -1078,6 +1092,9 @@ class TkParameterized(TkParameterizedBase):
 
         self.balloon = Balloon(master)
 
+        # CEBALERT: what about subclasses of Number (e.g. Integer,
+        # which should get a slider that jumps between integers...
+        # maybe that already happens)?
         self.widget_creators = {
             Boolean:self._create_boolean_widget,
             Dynamic:self._create_string_widget,
