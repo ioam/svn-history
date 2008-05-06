@@ -57,10 +57,13 @@ def with_busy_cursor(fn):
             widget['cursor']='watch'
             widget.update_idletasks()
 
-        fn(widget,*args,**kw)
-
-        if 'cursor' in widget.configure():
-            widget['cursor']=old_cursor
+        try:
+            fn(widget,*args,**kw)
+        finally:
+            # ensure old cursor is replaced even if fn() raises an
+            # error
+            if 'cursor' in widget.configure():
+                widget['cursor']=old_cursor
             
     return busy_fn
 
