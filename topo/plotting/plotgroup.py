@@ -625,9 +625,10 @@ class TwoDThingPlotGroup(ProjectionSheetPlotGroup):
         l = l + x_step
         b = b + y_step
         coords = []
-        self.proj_plotting_shape = (int(x * self.density), int(y * self.density))
-        for j in rev(range(self.proj_plotting_shape[1])):
-            for i in range(self.proj_plotting_shape[0]):
+        self.proj_plotting_shape = (int(y * self.density),int(x * self.density))
+
+        for j in rev(range(self.proj_plotting_shape[0])):
+            for i in range(self.proj_plotting_shape[1]):
                 coords.append((x_step*i + l, y_step*j + b))
 
         return coords
