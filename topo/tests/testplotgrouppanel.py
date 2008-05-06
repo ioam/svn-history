@@ -27,7 +27,8 @@ class TestPlotGroupPanel(unittest.TestCase):
 
         window = Tkinter.Toplevel()
         # see HACK A in topoconsole
-        window.status = StatusBar(window)
+        window.container = Tkinter.Frame(window)
+        window.container.status = StatusBar(window)
         
         image = Image.open('examples/ellen_arthur.pgm')
         self.plot = Plot(image,name='Ellen Arthur')
