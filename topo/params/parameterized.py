@@ -569,7 +569,7 @@ class ParameterizedMetaclass(type):
             #
             # CEBALERT: there's probably a better way than while and
             # an iterator, but it works.
-            while getattr(param,slot)==None:
+            while getattr(param,slot) is None:
                 try:
                     param_super_class = superclasses.next()
                 except StopIteration:
