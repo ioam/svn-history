@@ -232,8 +232,8 @@ class PlotMatrixPanel(ProjectionSheetPanel):
         # Lay out images
         for i,image,canvas in zip(range(len(self.zoomed_images)),
                                   self.zoomed_images,self.canvases):
-            canvas.grid(row=i//self.plotgroup.proj_plotting_shape[0],
-                        column=i%self.plotgroup.proj_plotting_shape[1],
+            canvas.grid(row=i//self.plotgroup.proj_plotting_shape[1],
+                        column=i%(self.plotgroup.proj_plotting_shape[1]),
                         padx=UNIT_PADDING,pady=UNIT_PADDING)
             # BORDERWIDTH is added because the border is drawn on the
             # canvas, overwriting anything underneath it.
