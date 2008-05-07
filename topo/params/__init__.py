@@ -123,10 +123,20 @@ class Dynamic(Parameter):
         if callable(self.default):
             self._set_instantiate(True)
             self._initialize_generator(self.default)
+        
 
+    def _get_gen(self,obj):
+        gen = super(Dynamic,self).__get__(obj,type(obj))
+        return gen
+        
 
-    def _initialize_generator(self,gen):
-        """Add 'last time' and 'last value' attributes to the generator."""
+    def _initialize_generator(self,gen,obj=None):
+        """
+        Add 'last time' and 'last value' attributes to the generator.
+        """
+        if hasattr(obj,"_Dynamic_time_fn"):
+            gen._Dynamic_time_fn = obj._Dynamic_time_fn
+
         gen._Dynamic_last = None
         # CEB: I'd use None for this, except can't compare a fixedpoint
         # number with None (e.g. 1>None but FixedPoint(1)>None can't be done)
@@ -158,7 +168,7 @@ class Dynamic(Parameter):
         super(Dynamic,self).__set__(obj,val)
 
         dynamic = callable(val)        
-        if dynamic: self._initialize_generator(val)
+        if dynamic: self._initialize_generator(val,obj)
         if not obj: self._set_instantiate(dynamic)
 
 
@@ -174,12 +184,17 @@ class Dynamic(Parameter):
         new value will be produced and returned. Otherwise,
         the last value gen produced will be returned.
         """
-        if self.time_fn is None:
+        if hasattr(gen,"_Dynamic_time_fn"):            
+            time_fn = gen._Dynamic_time_fn
+        else:
+            time_fn = self.time_fn
+        
+        if time_fn is None:
             value = produce_value(gen)
             gen._Dynamic_last = value
         else:
             
-            time = self.time_fn()
+            time = time_fn()
 
             if force or time>gen._Dynamic_time:
                 value = produce_value(gen)

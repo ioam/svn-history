@@ -719,6 +719,14 @@ class Parameterized(object):
 
         self.initialized=True
 
+
+    def set_dynamic_time_fn(self,time_fn):
+        self._Dynamic_time_fn = time_fn
+            
+        for p in self.params().values():
+            if hasattr(p,'_value_is_dynamic') and p._value_is_dynamic(self):
+                gen = p._get_gen(self)
+                gen._Dynamic_time_fn = time_fn
         
     @as_uninitialized
     def _set_name(self,name):
