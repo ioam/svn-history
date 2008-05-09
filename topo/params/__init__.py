@@ -123,12 +123,7 @@ class Dynamic(Parameter):
         if callable(self.default):
             self._set_instantiate(True)
             self._initialize_generator(self.default)
-        
 
-    def _get_gen(self,obj):
-        gen = super(Dynamic,self).__get__(obj,type(obj))
-        return gen
-        
 
     def _initialize_generator(self,gen,obj=None):
         """

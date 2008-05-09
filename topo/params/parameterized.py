@@ -720,14 +720,33 @@ class Parameterized(object):
         self.initialized=True
 
 
-    def set_dynamic_time_fn(self,time_fn):
-        self._Dynamic_time_fn = time_fn
+    @bothmethod
+    def set_dynamic_time_fn(self_or_cls,time_fn):
+        """
+        Set time_fn for all Dynamic Parameters of this class or
+        instance object that are currently being dynamically
+        generated.
+
+        Additionally, sets _Dynamic_time_fn=time_fn on this class or
+        instance object, so that any future changes to Dynamic
+        Parmeters can inherit time_fn (e.g. if a Number is changed
+        from a float to a number generator, the number generator will
+        inherit time_fn).
+        """
+        self_or_cls._Dynamic_time_fn = time_fn
+
+        if isinstance(self_or_cls,type):
+            a = (None,self_or_cls)
+        else:
+            a = (self_or_cls,)
+
+        for n,p in self_or_cls.params().items():
+            if hasattr(p,'_value_is_dynamic'):
+                if p._value_is_dynamic(*a):
+                    g = self_or_cls.get_value_generator(n)
+                    g._Dynamic_time_fn = time_fn
+                
             
-        for p in self.params().values():
-            if hasattr(p,'_value_is_dynamic') and p._value_is_dynamic(self):
-                gen = p._get_gen(self)
-                gen._Dynamic_time_fn = time_fn
-        
     @as_uninitialized
     def _set_name(self,name):
         self.name=name
