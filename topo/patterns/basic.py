@@ -11,6 +11,8 @@ from math import pi, sin, cos, sqrt
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy import alltrue
 
+from topo.params.parameterized import bothmethod,Parameterized
+
 from topo.base.parameterclasses import Integer, Number, Parameter,\
      ClassSelectorParameter
 from topo.base.parameterclasses import ListParameter
@@ -497,6 +499,7 @@ class Selector(PatternGenerator):
 
     size  = Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
 
+    # CB: needs to have time_fn=None
     index = Number(default=UniformRandom(lbound=0,ubound=1.0,seed=76),
         bounds=(-1.0,1.0),precedence=0.20,doc="""
         Index into the list of pattern generators, on a scale from 0
@@ -532,6 +535,22 @@ class Selector(PatternGenerator):
                          scale=pg.scale*scale,offset=pg.offset+offset)
                        
         return image_array
+
+
+    @bothmethod
+    def set_dynamic_time_fn(self_or_cls,time_fn):
+        """
+        Calls Parameter's version, but additionally calls the method
+        on all generators.
+        """
+        if isinstance(self_or_cls,type):
+            Parameterized.set_dynamic_time_fn(time_fn)
+        else:
+            super(Selector,self_or_cls).set_dynamic_time_fn(time_fn)
+
+        for g in self_or_cls.generators:
+            g.set_dynamic_time_fn(time_fn)
+
 
 
 class SineGratingDisk(PatternGenerator):
