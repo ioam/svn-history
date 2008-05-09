@@ -15,9 +15,9 @@ from numpy.testing import assert_array_equal
 from topo.base.patterngenerator import Constant,PatternGenerator
 from topo.base.boundingregion import BoundingBox
 
-from topo.patterns.basic import Rectangle,Gaussian,Composite
+from topo.patterns.basic import Rectangle,Gaussian,Composite,Selector
 
-
+from topo.misc.numbergenerators import UniformRandom
 
 class TestPatternGenerator(unittest.TestCase):
 
@@ -222,6 +222,28 @@ class TestPatternGenerator(unittest.TestCase):
 
 
 
+# CB: does not test most featurs of Selector!
+class TestSelector(unittest.TestCase):
+
+    def setUp(self):
+        self.g1 = Gaussian(x=UniformRandom())
+        self.g2 = Gaussian(x=UniformRandom())
+        self.s = Selector(generators=[self.g1,self.g2])
+        
+    def test_dynamic_index(self):
+        """index should always vary (i.e. have time_fn=None)"""
+        # CEBALERT: line below should not be required
+        self.s.set_dynamic_time_fn(None)
+        self.assertNotEqual(self.s.index,self.s.index)
+
+    def test_dynamic_inheritance(self):
+        """Selector should apply time_fn to subpatterns"""
+        self.s.set_dynamic_time_fn(None)
+        self.assertNotEqual(self.g1.x,self.g1.x)
+
+
+
 
 suite = unittest.TestSuite()
-suite.addTest(unittest.makeSuite(TestPatternGenerator))
+cases = [TestPatternGenerator,TestSelector]
+suite.addTests([unittest.makeSuite(case) for case in cases])
