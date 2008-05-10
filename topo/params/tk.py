@@ -2152,6 +2152,9 @@ class ParametersFrame(TkParameterized,T.Frame):
                     pady=2,
                     sticky=posn)
 
+        # widgets expand to fill frame
+        widget.master.grid_columnconfigure(1,weight=2)
+
         self.representations[parameter_name]['row']=row
 
         self._post_add_param(parameter_name)
