@@ -47,13 +47,12 @@ location:
 <pre>
 $ ./topographica -g
 Topographica&gt; from topo.patterns.basic import Gaussian
-Topographica&gt; from topo.base.parameterclasses import DynamicNumber
 Topographica&gt; from topo.misc.numbergenerators import UniformRandom
 Topographica&gt; input_pattern = Gaussian(size=0.08, aspect_ratio=4,
                  xdensity=60,ydensity=60,
-                 x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
-                 y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
-                 orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+                 x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
+                 y=UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
+                 orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
 Topographica&gt; matrixplot(input_pattern())
 Topographica&gt; matrixplot(input_pattern())
 </pre>
@@ -157,13 +156,13 @@ random from a set of four different pattern generators:
 
 <pre>
 CFProjection.weights_generator=topo.patterns.basic.Selector(generators=[
-    topo.patterns.basic.Gaussian(orientation=DynamicNumber(
-        UniformRandom(lbound=-pi,ubound=pi,seed=99))),
+    topo.patterns.basic.Gaussian(
+        orientation=UniformRandom(lbound=-pi,ubound=pi,seed=99)),
     topo.patterns.basic.Gaussian(aspect_ratio=1.0,
-        x=DynamicNumber(UniformRandom(lbound=-0.2,ubound=0.2,seed=12)),
-        y=DynamicNumber(UniformRandom(lbound=-0.2,ubound=0.2,seed=34))),
-    topo.patterns.basic.Rectangle(size=0.3,orientation=DynamicNumber(
-        UniformRandom(lbound=-pi,ubound=pi,seed=99))),
+        x=UniformRandom(lbound=-0.2,ubound=0.2,seed=12),
+        y=UniformRandom(lbound=-0.2,ubound=0.2,seed=34)),
+    topo.patterns.basic.Rectangle(
+        size=0.3,orientation=UniformRandom(lbound=-pi,ubound=pi,seed=99)),
     topo.patterns.basic.Disk(size=0.2)])
 </pre>
 

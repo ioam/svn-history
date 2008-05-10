@@ -58,7 +58,7 @@ and
 Each of these types can be declared to be constant, in which case the
 value cannot be changed after the ParameterizedObject that owns the
 Parameter has been created.  Some classes like
-<?php classref('topo.base.parameterclasses','DynamicNumber')?> 
+<?php classref('topo.base.parameterclasses','Number')?> 
 allow the parameter values to be generated from a sequence or random
 distribution, such as for generating random input patterns.
 

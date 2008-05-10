@@ -602,6 +602,8 @@ class CFProjection(Projection):
         """
         super(CFProjection,self).__init__(**params)
 
+        self.weights_generator.set_dynamic_time_fn(None,sublistattr='generators')
+
         # get the actual bounds_template by adjusting a copy of the
         # nominal_bounds_template to ensure an odd slice, and to be
         # cropped to sheet if necessary
