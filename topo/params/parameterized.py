@@ -721,7 +721,7 @@ class Parameterized(object):
 
 
     @bothmethod
-    def set_dynamic_time_fn(self_or_cls,time_fn):
+    def set_dynamic_time_fn(self_or_cls,time_fn,sublistattr=None):
         """
         Set time_fn for all Dynamic Parameters of this class or
         instance object that are currently being dynamically
@@ -732,6 +732,12 @@ class Parameterized(object):
         Parmeters can inherit time_fn (e.g. if a Number is changed
         from a float to a number generator, the number generator will
         inherit time_fn).
+
+        If specified, sublistattr is the name of an attribute of this
+        class or instance that contains an iterable collection of
+        subobjects on which set_dynamic_time_fn should be called.  If
+        the attribute sublistattr is present on any of the subobjects,
+        set_dynamic_time_fn() will be called for those, too.
         """
         self_or_cls._Dynamic_time_fn = time_fn
 
@@ -745,6 +751,15 @@ class Parameterized(object):
                 if p._value_is_dynamic(*a):
                     g = self_or_cls.get_value_generator(n)
                     g._Dynamic_time_fn = time_fn
+
+        if sublistattr:
+            try:
+                sublist = getattr(self_or_cls,sublistattr)
+            except AttributeError:
+                sublist = []
+        
+            for obj in sublist:
+                obj.set_dynamic_time_fn(time_fn,sublistattr)
                 
             
     @as_uninitialized

@@ -11,8 +11,6 @@ from math import pi, sin, cos, sqrt
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy import alltrue
 
-from topo.params.parameterized import bothmethod,Parameterized
-
 from topo.base.parameterclasses import Integer, Number, Parameter,\
      ClassSelectorParameter
 from topo.base.parameterclasses import ListParameter
@@ -525,7 +523,6 @@ class Selector(PatternGenerator):
         orientation=params['orientation']
         index=params['index']
         int_index=int(len(self.generators)*wrap(0,1.0,index))
-
         pg = self.generators[int_index]
         
         image_array = pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
@@ -536,20 +533,6 @@ class Selector(PatternGenerator):
                        
         return image_array
 
-
-    @bothmethod
-    def set_dynamic_time_fn(self_or_cls,time_fn):
-        """
-        Calls Parameter's version, but additionally calls the method
-        on all generators.
-        """
-        if isinstance(self_or_cls,type):
-            Parameterized.set_dynamic_time_fn(time_fn)
-        else:
-            super(Selector,self_or_cls).set_dynamic_time_fn(time_fn)
-
-        for g in self_or_cls.generators:
-            g.set_dynamic_time_fn(time_fn)
 
 
 

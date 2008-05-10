@@ -229,16 +229,14 @@ class TestSelector(unittest.TestCase):
         self.g1 = Gaussian(x=UniformRandom())
         self.g2 = Gaussian(x=UniformRandom())
         self.s = Selector(generators=[self.g1,self.g2])
+        self.s.set_dynamic_time_fn(None,'generators')
         
     def test_dynamic_index(self):
-        """index should always vary (i.e. have time_fn=None)"""
-        # CEBALERT: line below should not be required
-        self.s.set_dynamic_time_fn(None)
+        """index should always vary"""
         self.assertNotEqual(self.s.index,self.s.index)
 
     def test_dynamic_inheritance(self):
-        """Selector should apply time_fn to subpatterns"""
-        self.s.set_dynamic_time_fn(None)
+        """time_fn should have been applied to subpatterns"""
         self.assertNotEqual(self.g1.x,self.g1.x)
 
 
