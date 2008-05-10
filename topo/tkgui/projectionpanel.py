@@ -15,9 +15,11 @@ from numpy import sometrue
 import topo
 
 from topo.base.cf import CFProjection
-from topo.base.projection import ProjectionSheet
+from topo.base.projection import ProjectionSheet, Projection
 from topo.base.parameterclasses import BooleanParameter, Integer
 
+from topo.sheets.generatorsheet import GeneratorSheet
+        
 from templateplotgrouppanel import TemplatePlotGroupPanel
 
 
@@ -52,26 +54,20 @@ class ProjectionSheetPanel(TemplatePlotGroupPanel):
     __abstract = True
 
     sheet_type = ProjectionSheet
+    projection_type = Projection
 
-
-
-    # CEBHACKALERT: valid_context() needs to be more specific in
-    # subclasses.  How to allow valid_context() to work for more
-    # specific subclasses (e.g. to replace ProjectionSheet with
-    # CFSheet)?
-    @staticmethod
-    def valid_context():
+    @classmethod
+    def valid_context(cls):
         """
-        Return True if there are Projections in the simulation.
-
-        Used by TopoConsole to determine whether or not to open a ProjectionPanel.
+        Return True if there is at least one instance of
+        projection_type among all projections in the simulation.
         """
-        sheets = topo.sim.objects(ProjectionSheet).values()
-        if not sheets:
-            return False
-        projectionlists=[sheet.in_connections for sheet in sheets]
-        projections=[i for i in chain(*projectionlists)]
-        return (not projections == [])
+        for p in chain(*[sheet.projections().values()
+                         for sheet in topo.sim.objects(cls.sheet_type).values()]):
+            if isinstance(p,cls.projection_type):
+                return True
+
+        return False
 
 
     def __init__(self,master,plotgroup,**params):
@@ -96,7 +92,8 @@ class ProjectionSheetPanel(TemplatePlotGroupPanel):
 
     def populate_sheet_param(self):
         sheets = [s for s in topo.sim.objects(self.sheet_type).values()
-                  if sometrue([isinstance(p,CFProjection) for p in s.in_connections])]
+                  if sometrue([isinstance(p,self.projection_type)
+                               for p in s.in_connections])]
         self.plotgroup.params()['sheet'].objects = sheets
         self.plotgroup.sheet = sheets[0] # CB: necessary?
 
@@ -177,6 +174,8 @@ class UnitsPanel(ProjectionSheetPanel):
 
           
 class ConnectionFieldsPanel(UnitsPanel):
+
+    projection_type = CFProjection
 
     def __init__(self,master,plotgroup,**params):
         super(ConnectionFieldsPanel,self).__init__(master,plotgroup,**params)
@@ -261,6 +260,8 @@ class PlotMatrixPanel(ProjectionSheetPanel):
     
 class RFProjectionPanel(PlotMatrixPanel):
 
+    sheet_type = GeneratorSheet
+
     def __init__(self,master,plotgroup,**params):
         super(RFProjectionPanel,self).__init__(master,plotgroup,**params)
         self.pack_param('input_sheet',parent=self.control_frame_3,
@@ -274,8 +275,7 @@ class RFProjectionPanel(PlotMatrixPanel):
         self.populate_input_sheet_param()
 
     def populate_input_sheet_param(self):
-        from topo.sheets.generatorsheet import GeneratorSheet
-        sheets = topo.sim.objects(GeneratorSheet).values()
+        sheets = topo.sim.objects(self.sheet_type).values()
         self.plotgroup.params()['input_sheet'].objects = sheets
         self.plotgroup.input_sheet=sheets[0]
 
@@ -311,9 +311,10 @@ class ProjectionPanel(PlotMatrixPanel):
 
 
     def populate_projection_param(self):
-        prjns = [x for x in self.plotgroup.sheet.projections().values()]
+        prjns = [proj for proj in self.plotgroup.sheet.projections().values()
+                 if isinstance(proj,self.projection_type)]
         self.plotgroup.params()['projection'].objects = prjns
-        self.plotgroup.projection = prjns[0]
+        self.plotgroup.projection = prjns[0] # CB: necessary?
 
 
     def refresh_projections(self):
@@ -344,6 +345,9 @@ class CFProjectionPanel(ProjectionPanel):
     """
     Panel for displaying CFProjections.
     """
+
+    projection_type = CFProjection
+
     def __init__(self,master,plotgroup,**params):
         super(CFProjectionPanel,self).__init__(master,plotgroup,**params)
         self.pack_param('situate',parent=self.control_frame_3,on_change=self.situate_change,side='left',expand=1)
@@ -351,12 +355,6 @@ class CFProjectionPanel(ProjectionPanel):
     def situate_change(self):
         self.redraw_plots()
     
-    def populate_projection_param(self):
-        prjns = [x for x in self.plotgroup.sheet.projections().values()
-                 if isinstance(x,CFProjection)]
-        self.plotgroup.params()['projection'].objects = prjns
-        self.plotgroup.projection = prjns[0] # CB: necessary?
-
 
 
 

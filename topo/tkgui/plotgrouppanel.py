@@ -758,10 +758,12 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
             
 
 
-class SheetPanel(PlotGroupPanel):    
+class SheetPanel(PlotGroupPanel):
 
-    @staticmethod
-    def valid_context():
+    sheet_type = Sheet
+
+    @classmethod
+    def valid_context(cls):
         """
         Return true if there appears to be data available for this type of plot.
 
@@ -774,7 +776,7 @@ class SheetPanel(PlotGroupPanel):
         more specific requirements should override this method with
         something more appropriate.
         """
-        if topo.sim.objects(Sheet).items():
+        if topo.sim.objects(cls.sheet_type).items():
             return True
         else:
             return False

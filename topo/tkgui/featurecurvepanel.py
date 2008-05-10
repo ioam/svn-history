@@ -24,24 +24,12 @@ from plotgrouppanel import PlotGroupPanel
 # hierarchy.
 class FeatureCurvePanel(PlotGroupPanel):
 
-
     # CEBHACKALERT: to which types of sheet is this plotgroup supposed to be applicable?
-    # Also applies to populate_sheet_param() below.
-    @staticmethod
-    def valid_context():
-        """
-        Return true if there appears to be data available for this type of plot.
+    sheet_type = ProjectionSheet
 
-        To avoid confusing error messages, this method should be
-        defined to return False in the case where there is no
-        appropriate data to plot.  This information can be used to,
-        e.g., gray out the appropriate menu item.
-        By default, PlotPanels are assumed to be valid only for
-        simulations that contain at least one Sheet.  Subclasses with
-        more specific requirements should override this method with
-        something more appropriate.
-        """
-        if topo.sim.objects(ProjectionSheet).items():
+    @classmethod
+    def valid_context(cls):
+        if topo.sim.objects(cls.sheet_type).items():
             return True
         else:
             return False
@@ -98,7 +86,7 @@ class FeatureCurvePanel(PlotGroupPanel):
 
 
     def populate_sheet_param(self):
-        sheets = topo.sim.objects(ProjectionSheet).values() 
+        sheets = topo.sim.objects(self.sheet_type).values() 
         self.plotgroup.params()['sheet'].objects = sheets
         self.plotgroup.sheet = sheets[0] # CB: necessary?
 

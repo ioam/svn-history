@@ -57,6 +57,8 @@ class TestPatternPlotGroup(SheetPlotGroup):
 
 class TestPattern(SheetPanel):
 
+    sheet_type = GeneratorSheet
+    
     dock = BooleanParameter(False)
 
     edit_sheet = ObjectSelectorParameter(doc="""Sheet for which to edit pattern properties.""")
@@ -69,14 +71,6 @@ class TestPattern(SheetPanel):
 
     pattern_generator = ClassSelectorParameter(class_=PatternGenerator, doc="""Type of pattern to present. Each type has various parameters that can be changed.""")
 
-
-    @staticmethod
-    def valid_context():
-        """Only open if GeneratorSheets are in the Simulation."""
-        if topo.sim.objects(GeneratorSheet).items():
-            return True
-        else:
-            return False
 
 
     def __init__(self,master,plotgroup=None,**params):
