@@ -78,7 +78,7 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
 ###########################################
 # build simulation
-eyes=['']
+eyes=['Left', 'Right']
 response_types=['On','Off']
 
 for e in eyes:
@@ -207,6 +207,16 @@ topo.sim.schedule_command( 6500*st,'topo.sim["V1"].tsettle=12')
 topo.sim.schedule_command( 8000*st,'topo.sim["V1"].tsettle=13')
 
 # default locations for model editor
-topo.sim.grid_layout([[None,    'V1',     None],
-                      ['LGNOn', None,     'LGNOff'],
-                      [None,    'Retina', None]], xstart=150)
+vs = [None]*(len(response_types)*len(eyes)-1) + ['V1'] + [None]*len(response_types)*len(eyes)
+
+ls=[]
+for e in eyes:
+    for l in response_types:
+        ls += [e+'LGN'+l,None]
+
+es=[]
+for e in eyes:
+     es += [None]*(len(response_types)/2) + [e+'Retina',None] + [None]*(len(response_types)/2)
+
+
+topo.sim.grid_layout([vs,ls,es], xstart=150)
