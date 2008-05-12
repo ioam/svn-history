@@ -78,21 +78,19 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
 ###########################################
 # build simulation
+eyes=['']
+response_types=['On','Off']
 
-topo.sim['Retina']=GeneratorSheet(nominal_density=locals().get('default_retina_density',24.0),
-                                  input_generator=combined_inputs,
-                                  period=1.0, phase=0.05,
-                                  nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
-
-topo.sim['LGNOn']=CFSheet(nominal_density=24.0,
-                          nominal_bounds=BoundingBox(radius=0.5+0.25),
-                          output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
-                          measure_maps=False)
-
-topo.sim['LGNOff']=CFSheet(nominal_density=24.0,
-                           nominal_bounds=BoundingBox(radius=0.5+0.25),
-                           output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
-                           measure_maps=False)
+for e in eyes:
+      topo.sim[e+'Retina']=GeneratorSheet(nominal_density=locals().get('default_retina_density',24.0),
+                                          input_generator=combined_inputs,
+                                          period=1.0, phase=0.05,
+                                          nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
+      for l in response_types:
+          topo.sim[e+'LGN'+l]=CFSheet(nominal_density=24.0,
+                                      nominal_bounds=BoundingBox(radius=0.5+0.25),
+                                      output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                                      measure_maps=False)
 
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,
                         nominal_bounds=BoundingBox(radius=0.5))
@@ -104,38 +102,28 @@ topo.sim['V1'].output_fn.upper_bound=0.633
 centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 
-on_weights = topo.patterns.basic.Composite(
+lgn_weights={}
+lgn_weights['On'] = topo.patterns.basic.Composite(
     generators=[centerg,surroundg],operator=numpy.subtract)
 
-off_weights = topo.patterns.basic.Composite(
+lgn_weights['Off'] = topo.patterns.basic.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
+for e in eyes:
+	for l in response_types:
+		topo.sim.connect(e+'Retina',e+'LGN'+l,delay=0.05,
+                 		connection_type=SharedWeightCFProjection,strength=2.33,
+                 		nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
+                 		weights_generator=lgn_weights[l])
 
-
-topo.sim.connect('Retina','LGNOn',delay=0.05,
-                 connection_type=SharedWeightCFProjection,strength=2.33,
-                 nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
-                 weights_generator=on_weights)
-
-topo.sim.connect('Retina','LGNOff',delay = 0.05,
-                 connection_type=SharedWeightCFProjection,strength=2.33,
-                 nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
-                 weights_generator=off_weights)
-
-topo.sim.connect('LGNOn','V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
-                 connection_type=CFProjection,strength=1.0,name='LGNOnAfferent',
-                 # JABALERT: Should probably simplify this by making a function for it.
-                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+		topo.sim.connect(e+'LGN'+l,'V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
+               	  		connection_type=CFProjection,strength=1.0,name=e+'LGN'+l+'Afferent',
+               	  		# JABALERT: Should probably simplify this by making a function for it.
+                		weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590/2)
+                       		nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590/len(response_types)/len(eyes))
 
-topo.sim.connect('LGNOff','V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
-                 connection_type=CFProjection,strength=1.0,name='LGNOffAfferent',
-                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
-                                                                             topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590/2)
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
@@ -186,13 +174,13 @@ topo.sim.schedule_command( 8000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 topo.sim.schedule_command(20000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 
 ### Afferent learning rate changes
-ON ='topo.sim["V1"].projections()["LGNOnAfferent"]'
-OFF='topo.sim["V1"].projections()["LGNOffAfferent"]'
-
-topo.sim.schedule_command(  500*st,ON+'.learning_rate=0.6850/2;'+OFF+'.learning_rate=0.6850/2')
-topo.sim.schedule_command( 2000*st,ON+'.learning_rate=0.5480/2;'+OFF+'.learning_rate=0.5480/2')
-topo.sim.schedule_command( 4000*st,ON+'.learning_rate=0.4110/2;'+OFF+'.learning_rate=0.4110/2')
-topo.sim.schedule_command(20000*st,ON+'.learning_rate=0.2055/2;'+OFF+'.learning_rate=0.2055/2')
+for e in eyes:
+	for l in response_types:
+		S ='topo.sim["V1"].projections()["'+e+'LGN'+l+'Afferent"]'
+		topo.sim.schedule_command(  500*st,S+'.learning_rate=0.6850/len(response_types)/len(eyes)')
+		topo.sim.schedule_command( 2000*st,S+'.learning_rate=0.5480/len(response_types)/len(eyes)')
+		topo.sim.schedule_command( 4000*st,S+'.learning_rate=0.4110/len(response_types)/len(eyes)')
+		topo.sim.schedule_command(20000*st,S+'.learning_rate=0.2055/len(response_types)/len(eyes)')
 
 ### Activation function threshold changes
 OF='topo.sim["V1"].output_fn'
