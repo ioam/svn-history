@@ -25,9 +25,9 @@ differences include:
 There may be other small differences, as this file has not yet been
 compared exhaustively to the original simulations.
 
-$Id: lissom_oo_or.ty 8223 2008-03-19 01:47:13Z ceball $
+$Id$
 """
-__version__='$Revision: 8223 $'
+__version__='$Revision$'
 
 
 import numpy
