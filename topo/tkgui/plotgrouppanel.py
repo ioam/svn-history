@@ -747,8 +747,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         title = self._plot_title()
         
         self.plot_frame.configure(text=title)
-        self.master.title(title.replace(" at time ","/"))
-
+        self.master.title(topo.sim.name+': '+title.replace(" at time ","/"))
           
     def destroy(self):
         """overrides toplevel destroy, adding removal from autorefresh panels"""
