@@ -570,12 +570,6 @@ To figure out:
 
 <H2>Ongoing work</H2>
 
-<H4>2006/12/14 (JB): Documentation for the new Numeric </H4>
-It's not free. But we could document differences from the current
-Numeric documentation for our users, as we find these differences.
-This doesn't seem very urgent any more, as the online Numpy
-documentation has gotten much better.
-
 <H4>2006/04/10: optional external packages on platforms other than linux</H4>
 Optional packages (e.g. mlabwrap, pyaudio) on Windows and OS X.
 
@@ -600,6 +594,7 @@ Python.
 <H4>2006/02/21 (all): documentation, unit tests</H4>
 Improving both, plus eliminating ALERTs.
 
+Could use Sphinx instead of epydoc for Reference Manual; apparently searchable.
 			     
 <H4>2007/03/14 (CB): gnosis.xml.pickle </H4>
 Needs to be updated for numpy. I'm working with module's author at the
@@ -679,13 +674,6 @@ _________________________________________________________
 |  > A[i,j]?  I think in most of our code we do A[i][j]...
 
 +(OPTIMIZATION PAGE)
-
-
-_________________________________________________________
-
-
-Has anyone looked at the (new to python 2.4) decimal module? 
-http://docs.python.org/lib/module-decimal.html
 
 
 _________________________________________________________
