@@ -107,3 +107,8 @@ it for the largest class whose solution <i>is</i> clear.  Once an
 appropriate level has been chosen, make sure all documentation,
 comments, and names match that level, pretending that no lower levels
 exist except as possible examples.
+
+<P>For further info from a scholarly perspective, you may want to read
+<A href="http://doi.acm.org/10.1145/379377.375236">Producing reusable
+object-oriented components</A>.
+

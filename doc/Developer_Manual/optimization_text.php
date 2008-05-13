@@ -30,10 +30,18 @@ base Sheet class level, we can add a method there that then gets
 overridden in the subclass with the special purpose code.  That way
 all optimization will be local (and thus maintainable).  If it's not
 clear how to optimize something cleanly, first do it uncleanly to see
-if it will have any effect, but don't check it in to CVS.  If it looks
+if it will have any effect, but don't check it in to SVN.  If it looks
 like the optimization is worthwhile, brainstorm with other team
 members to figure out a way to do it cleanly and check in the clean
 version instead.
+
+<P>For a good overview of how to optimize memory usage, which is often
+the bottleneck for our simulations, see
+<A href="http://lwn.net/Articles/250967/">Ulrich Drepper's article</A>.
+If you are ambitious, even the most optimized components in
+Topographica could be further improved using these technqiues,
+possibly substantially.
+
 
 <H2>Optimizing Python code</H2>
 
@@ -281,7 +289,7 @@ profile('topo.sim.run(200)',n=20)"
  7600/400    0.528    0.000    3.211    0.008 parameterizedobject.py:642(__repr__)
 </pre>
 
-<P>We can see from the above output that the time spent in <code>functionfamilies.py149(__call__)</code>
+<P>We can see from the above output that the time spent in <code>functionfamilies.py:149(__call__)</code>
 has been more than halved, and only about 60% as much time is now spent
 in <code>CFPRF_Plugin()</code>. Overall, we have cut the simulation run time to
 about 75% of its original value with just a few minutes' work.
@@ -362,7 +370,7 @@ profile('topo.sim.run(200)',n=20)"
  7600/400    0.561    0.000    3.239    0.008 parameterizedobject.py:642(__repr__)
 </pre>
 
-<P>We have reduced the total run time to 93% of its previous value.
+<P>This does reduce the total run time, but only slightly, to 93% of its previous value.
 But <code>CFPRF_Plugin</code> is no longer the same as it was before:
 arrays it receives are flattened, which restricts what functions could
 be plugged in as the <code>single_cf_fn</code>.  If the performance
