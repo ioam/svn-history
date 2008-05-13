@@ -140,7 +140,8 @@ generally much higher performance than explicitly manipulating each
 matrix element, as well as being simpler, and so they should be used
 whenever possible. See
 the <A href="http://www.scipy.org/Documentation">NumPy documentation
-list</A> to learn about the full range of available functions.
+list</A> (especially the NumPy Example List and NumPy Functions by
+Category) to learn about the full range of available functions. 
 </DD>
 
 <P><DT><A href="http://matplotlib.sourceforge.net/">MatPlotLib</A></DT>
