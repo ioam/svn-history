@@ -185,10 +185,9 @@ class ConnectionFieldsPanel(UnitsPanel):
         self.redraw_plots()
 
     def _plot_title(self):
-        return 'Connection Fields of ' + self.sheet.name + \
-               ' unit (' + str(self.plotgroup.x) + ',' + str(self.plotgroup.y) + ') at time '\
-               + topo.sim.timestr(self.plotgroup.time)
-
+        return 'Connection Fields of %s unit (%g,%g) at time %s' % \
+               (self.sheet.name, self.plotgroup.x,self.plotgroup.y,
+                topo.sim.timestr(self.plotgroup.time))
 
 
 class PlotMatrixPanel(ProjectionSheetPanel):
