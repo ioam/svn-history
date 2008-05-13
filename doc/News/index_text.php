@@ -35,7 +35,7 @@
   &nbsp;&nbsp;&nbsp;<A HREF="../Reference_Manual/topo.misc.commandline-module.html#gui">topo.misc.commandline.gui()</A> or<BR>
   &nbsp;&nbsp;&nbsp;<A HREF="../Reference_Manual/topo.misc.commandline-module.html#auto_import_commands">topo.misc.commandline.auto_import_commands()</A><BR>
   simulation name set automatically from .ty script name by default<BR>
-  
+<!--  added -p option to call Psyco JIT optimizer<BR> -->
 </dd>
 </font>
 </dl>
@@ -141,6 +141,7 @@
   <A target="_top" href="../User_Manual/plotting.html#measuring-preference-maps">simplified
   bitmap plotting</A> (removed template classes)<br>
   GUI plots can be saved as PNG or EPS (right-click menu)<br>
+  automatic collection of plots for animations (see ./topographica examples/lissom_or_movie.ty)<br>
 </dd>
 <dt>Component library:</dt>
 <dd>
