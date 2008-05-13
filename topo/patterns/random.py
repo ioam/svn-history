@@ -60,6 +60,26 @@ class UniformRandom(RandomGenerator):
         return RandomArray.uniform(params['offset'], params['offset']+params['scale'], shape)
 
 
+
+class BinaryUniformRandom(RandomGenerator):
+    """
+    2D binary uniform random noise pattern generator.
+
+    Generates an array of random numbers that are 1.0 with the given
+    on_probability, or else 0.0, then scales it and adds the offset as
+    for other patterns.  For the default scale and offset, the result
+    is a binary mask where some elements are on at random.
+    """
+
+    on_probability = Number(default=0.5,bounds=[0.0,1.0],doc="""
+        Probability (in the range 0.0 to 1.0) that the binary value
+        (before scaling) is on rather than off (1.0 rather than 0.0).""")
+
+    def _distrib(self,shape,params):
+        rmin = params['on_probability']-0.5
+        return params['offset']+params['scale']*(RandomArray.uniform(rmin,rmin+1.0,shape).round())
+
+
 class GaussianRandom(RandomGenerator):
     """
     2D Gaussian random noise pattern generator.
