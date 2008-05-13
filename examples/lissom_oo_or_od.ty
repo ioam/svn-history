@@ -1,8 +1,8 @@
 """
-Example of a LISSOM-based orientation map (with ON/OFF channels).
+Example of a LISSOM-based orientation and ocular dominance map (with ON/OFF channels).
 
 Intended to be a close (but approximate) match to the orientation map
-simulation from figure 5.9 of Miikkulainen, Bednar, Choe, and Sirosh
+simulation from figure 5.27 of Miikkulainen, Bednar, Choe, and Sirosh
 (2005), Computational Maps in the Visual Cortex, Springer.  Known
 differences include:
 
@@ -36,6 +36,7 @@ from math import pi, sqrt
 
 import topo.patterns.basic
 import topo.patterns.random
+import copy
 
 from topo.patterns.basic import Gaussian
 from topo.sheets.lissom import LISSOM
@@ -49,17 +50,24 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
+class Opposite(object):
+    """
+    Given a number generator x, returns an 'opposite' value, i.e. 2-x.
+    """
+
+    def __init__(self, gen):
+        self.gen = copy.deepcopy(gen)
+    
+    def __call__(self):
+        return 2.0-self.gen()
+
+eyes=['Left', 'Right']
+response_types=['On','Off']
+
 num_inputs=2
 input_type=Gaussian
-inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
-                   y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
-                   orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
-                   size=0.088388, aspect_ratio=4.66667, scale=1.0,
-                   bounds=BoundingBox(radius=0.8)) # JABALERT: What does this bounds do?
-        for i in xrange(num_inputs)]
 
-combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
-                                 
+
 # Default for tutorial
 topo.patterns.basic.Line.scale=0.9
 topo.patterns.basic.Gaussian.size=0.08333
@@ -78,12 +86,17 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
 ###########################################
 # build simulation
-eyes=['Left', 'Right']
-response_types=['On','Off']
-
 for e in eyes:
       topo.sim[e+'Retina']=GeneratorSheet(nominal_density=locals().get('default_retina_density',24.0),
-                                          input_generator=combined_inputs,
+                                          input_generator= topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators= \
+                                          [input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
+                                                      y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
+                                                      orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
+                                                      size=0.088388, aspect_ratio=4.66667,
+                                                      scale=   Opposite(UniformRandom(lbound=1,ubound=1,seed=78+i)) \
+                                                      if e=='Right' else UniformRandom(lbound=1,ubound=1,seed=78+i),
+                                                      bounds=BoundingBox(radius=0.8))
+                                                      for i in xrange(num_inputs)]),
                                           period=1.0, phase=0.05,
                                           nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
       for l in response_types:
