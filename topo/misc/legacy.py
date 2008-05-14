@@ -124,13 +124,17 @@ class SnapshotSupport(object):
         preprocess_state(ConnectionField,cf_rename_slice_array)
 
 
-        def sim_add_time_type(state):
+        def sim_remove_time_type_attr(state):
             # _time_type attribute added to simulation in r7581
-            if '_time_type' not in state:
-                state['_time_type']=type(state['_time'])
-
+            # and replaced by time_type param in r8215
+            if '_time_type' in state:
+                # CB: untested code (unless someone has such a snapshot;
+                # if nobody has such a snapshot, can remove this code).
+                state['_time_type_param_value']=state['_time_type']
+                del state['_time_type']
+            
         from topo.base.simulation import Simulation
-        preprocess_state(Simulation,sim_add_time_type)
+        preprocess_state(Simulation,sim_remove_time_type_attr)
 
 
         def slice_setstate_selector(state):
