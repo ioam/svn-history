@@ -54,6 +54,25 @@ release = ''
 version = ''
 
 
+def _numpy_ufunc_pickle_support():
+    """
+    Allow instances of numpy.ufunc to pickle.
+    """
+    # Remove this when numpy.ufuncs themselves support pickling.
+    # Code from Robert Kern; see:
+    #http://news.gmane.org/find-root.php?group=gmane.comp.python.numeric.general&article=13400
+    from numpy import ufunc
+    import copy_reg
+
+    def ufunc_pickler(ufunc):
+        """Return the ufunc's name"""
+        return ufunc.__name__
+
+    copy_reg.pickle(ufunc,ufunc_pickler)
+
+_numpy_ufunc_pickle_support()
+
+
 def _mpq_pickle_support():
     """Allow instances of gmpy.mpq to pickle."""
     from gmpy import mpq
