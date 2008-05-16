@@ -93,8 +93,8 @@ for e in eyes:
                                                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
                                                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
                                                       size=0.088388, aspect_ratio=4.66667,
-                                                      scale=   Opposite(UniformRandom(lbound=1,ubound=1,seed=78+i)) \
-                                                      if e=='Right' else UniformRandom(lbound=1,ubound=1,seed=78+i),
+                                                      scale=    Opposite(UniformRandom(lbound=0,ubound=2,seed=78+i)) \
+                                                      if e=='Right' else UniformRandom(lbound=0,ubound=2,seed=78+i),
                                                       bounds=BoundingBox(radius=0.8))
                                                       for i in xrange(num_inputs)]),
                                           period=1.0, phase=0.05,
