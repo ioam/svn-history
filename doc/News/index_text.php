@@ -1,4 +1,4 @@
-<p><b>28 January 2008:</b> Updates since version 0.9.4
+<p><b>16 May 2008:</b> Updates since version 0.9.4
   (currently available only via <A
   HREF="../Downloads/cvs.html">SVN</A>, but to be included in the next
   release):
@@ -57,6 +57,7 @@
   new example files for robotics interfacing<BR>
   &nbsp;&nbsp;&nbsp;(<A HREF="../Reference_Manual/topo.misc.playerrobot-module.html">misc/playerrobot.py</A>,
   <A HREF="../Reference_Manual/topo.misc.robotics-module.html">misc/robotics.py</A>)<br>
+  new joint simulations for OR/OD, OR/DR<BR>
 </dd>
 <dt>Component library:</dt>
 <dd>
@@ -74,6 +75,8 @@
   normalization to be <A
   HREF="../Reference_Manual/topo.sheets.lissom.LISSOM-class.html#post_initialization_weights_output_fn">changed</A> after initialization<BR>
   new CompositeSheetMask, AndMask, and OrMask classes<BR>
+  NumberGenerators can now be combined and modified using arithmetic expressions
+<!-- (e.g. abs(2*UniformRandom()-5) is now a NumberGenerator too).--><BR>
 </dd>
 </font>
 </dl>
