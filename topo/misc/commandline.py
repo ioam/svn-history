@@ -357,7 +357,7 @@ def process_argv(argv):
     if os.environ.get('PYTHONINSPECT'):
         print BANNER    
         # CB: should probably allow a way for users to pass things to
-        # IPython? Or at least setup some kind of topogrpcahi ipython
+        # IPython? Or at least set up some kind of topographica ipython
         # config file
 
         # Stop IPython namespace hack?
@@ -365,6 +365,7 @@ def process_argv(argv):
         __main__.__name__="__mynamespace__"
 
         from IPython.Shell import IPShell
+        print "topo_t000000.00_c0>>>  " # Hack for Emacs shell mode
         IPShell(['-noconfirm_exit','-nobanner',
                  '-pi1',CommandPrompt.get_format(),
                  '-pi2',CommandPrompt2.get_format(),
