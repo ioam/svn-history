@@ -8,12 +8,80 @@ __version__='$Revision$'
 
 import random
 from math import e
+import operator
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number, ListParameter, CallableParameter, Parameter
 
 
-class RandomDistribution(ParameterizedObject):
+class NumberGenerator(ParameterizedObject):
+    """
+    Abstract base class for any object that when called produces a number.
+
+    Primarily provides support for using NumberGenerators in simple
+    arithmetic expressions, such as abs((x+y)/z), where x,y,z are
+    NumberGenerators.
+    """
+    
+    def __call__(self):
+        raise NotImplementedError
+
+    # Could define any of Python's operators here, esp. if they have operator or ufunc equivalents
+    def __add__      (self,operand): return BinaryOperator(self,operand,operator.add)
+    def __sub__      (self,operand): return BinaryOperator(self,operand,operator.sub)
+    def __mul__      (self,operand): return BinaryOperator(self,operand,operator.mul)
+    def __mod__      (self,operand): return BinaryOperator(self,operand,operator.mod)
+    def __pow__      (self,operand): return BinaryOperator(self,operand,operator.pow)
+    def __div__      (self,operand): return BinaryOperator(self,operand,operator.div)
+    def __truediv__  (self,operand): return BinaryOperator(self,operand,operator.truediv)
+    def __floordiv__ (self,operand): return BinaryOperator(self,operand,operator.floordiv)
+
+    def __radd__     (self,operand): return BinaryOperator(self,operand,operator.add,True)
+    def __rsub__     (self,operand): return BinaryOperator(self,operand,operator.sub,True)
+    def __rmul__     (self,operand): return BinaryOperator(self,operand,operator.mul,True)
+    def __rmod__     (self,operand): return BinaryOperator(self,operand,operator.mod,True)
+    def __rpow__     (self,operand): return BinaryOperator(self,operand,operator.pow,True)
+    def __rdiv__     (self,operand): return BinaryOperator(self,operand,operator.div,True)
+    def __rtruediv__ (self,operand): return BinaryOperator(self,operand,operator.truediv,True)
+    def __rfloordiv__(self,operand): return BinaryOperator(self,operand,operator.floordiv,True)
+
+    def __neg__ (self): return UnaryOperator(self,operator.neg)
+    def __pos__ (self): return UnaryOperator(self,operator.pos)
+    def __abs__ (self): return UnaryOperator(self,operator.abs)
+
+
+
+class BinaryOperator(NumberGenerator):
+    """Applies any binary operator to NumberGenerators or constants to yield a NumberGenerator."""
+    
+    def __init__(self,lhs,rhs,operator,reverse=False):
+        if reverse:
+            self.lhs=rhs
+            self.rhs=lhs
+        else:
+            self.lhs=lhs
+            self.rhs=rhs
+        self.operator=operator
+    
+    def __call__(self):
+        return self.operator(self.lhs() if callable(self.lhs) else self.lhs,
+                             self.rhs() if callable(self.rhs) else self.rhs)
+
+
+
+class UnaryOperator(NumberGenerator):
+    """Applies any unary operator to a NumberGenerator to yield another NumberGenerator."""
+    
+    def __init__(self,operand,operator):
+        self.operand=operand
+        self.operator=operator
+    
+    def __call__(self):
+        return self.operator(self.operand())
+
+
+
+class RandomDistribution(NumberGenerator):
     """
     Python's random module provides the Random class, which can be
     instantiated to give an object that can be asked to generate
@@ -110,7 +178,7 @@ class NormalRandom(RandomDistribution):
 
 
 import topo
-class ExponentialDecay(ParameterizedObject):
+class ExponentialDecay(NumberGenerator):
     """
     Function object that provides a value that decays according to an
     exponential function, based on topo.sim.time().
@@ -142,7 +210,7 @@ class ExponentialDecay(ParameterizedObject):
                                                  float(self.time_constant))
 
 
-class BoundedNumber(ParameterizedObject):
+class BoundedNumber(NumberGenerator):
     """
     Function object that silently enforces numeric bounds on values
     returned by a callable object.
