@@ -62,7 +62,7 @@ def arg(z):
 
 def octave_str(mat,name="mat",owner=""):
     """
-    Print the given Numeric matrix in Octave format, listing the given
+    Print the given Numpy matrix in Octave format, listing the given
     matrix name and the object that owns it (if any).
     """
     # This just prints the string version of the matrix and does search/replace
@@ -141,7 +141,7 @@ def wrap(lower, upper, x):
     return lower + fmod(x-lower + 2*range_*(1-floor(x/(2*range_))), range_)
 
 
-# There might already be a function for this in Numeric...
+# There might already be a function for this in Numpy...
 def array_argmax(mat):
     "Returns the coordinates of the maximum element in the given matrix."
     rows,cols = mat.shape # pylint: disable-msg=W0612

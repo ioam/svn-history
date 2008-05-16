@@ -37,7 +37,7 @@ class PatternSampler(ParameterizedObject):
     def __init__(self, pattern_array=None, image=None, whole_pattern_output_fn=IdentityOF(), background_value_fn=None):
         """
         Create a SheetCoordinateSystem whose activity is pattern_array
-        (where pattern_array is a Numeric array), modified in place by
+        (where pattern_array is a NumPy array), modified in place by
         whole_pattern_output_fn.
 
         If supplied, background_value_fn must accept an array and return a scalar.
@@ -127,7 +127,7 @@ class PatternSampler(ParameterizedObject):
         if pattern_rows==0 or pattern_cols==0:
             return pattern_sample
         else:
-            # CEBALERT: is there a more Numeric way to do this?
+            # CEBALERT: is there a more NumPy way to do this that would be faster?
             rows,cols = pattern_sample.shape
             for i in xrange(rows):
                 for j in xrange(cols):

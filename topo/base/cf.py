@@ -716,7 +716,7 @@ class CFProjection(Projection):
         # CB: the following would be equivalent with Slice __call__
         
         # cf = self.cf(self.dest.sheet2matrixidx(sheet_x,sheet_y))
-        # matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)
+        # matrix_data = numpy.zeros(self.src.activity.shape,Numeric.Float)
         # matrix_data[cf.input_sheet_slice()]=cf.weights
 
         return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self,timestamp)

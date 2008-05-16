@@ -362,7 +362,7 @@ class Distribution(object):
         """
         Convert a bin number to a direction in radians.
 
-        Works for Numeric arrays of bin numbers, returning
+        Works for NumPy arrays of bin numbers, returning
         an array of directions.
         """
         return (2*pi)*bin/self.axis_range 
@@ -372,7 +372,7 @@ class Distribution(object):
         """
         Convert a direction in radians into a bin number.
 
-        Works for Numeric arrays of direction, returning
+        Works for NumPy arrays of direction, returning
         an array of bin numbers.
         """
         return direction*self.axis_range/(2*pi)

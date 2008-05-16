@@ -377,11 +377,10 @@ class Slice(ndarray):
 
         bounds.set(Slice._slicespec2boundsspec(slicespec,sheet_coordinate_system))
 
-        # Numeric.Int32 is specified explicitly in Slice to avoid
-        # having it default to Numeric.Int.  Numeric.Int works on
-        # 32-bit platforms, but does not work properly with the
-        # optimized C activation and learning functions on 64-bit
-        # machines.
+        # numpy.int32 is specified explicitly in Slice to avoid having
+        # it default to numpy.int.  numpy.int works on 32-bit
+        # platforms, but does not work properly with the optimized C
+        # activation and learning functions on 64-bit machines.
         a = array(slicespec, dtype=int32, copy=False).view(cls)
         a._scs = sheet_coordinate_system
         a.bounds = bounds
