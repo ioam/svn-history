@@ -50,16 +50,6 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
-class Opposite(object):
-    """
-    Given a number generator x, returns an 'opposite' value, i.e. 2-x.
-    """
-
-    def __init__(self, gen):
-        self.gen = copy.deepcopy(gen)
-    
-    def __call__(self):
-        return 2.0-self.gen()
 
 # Default for tutorial
 topo.patterns.basic.Line.scale=0.9
@@ -94,7 +84,7 @@ for e in eyes:
                                                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
                                                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
                                                       size=0.088388, aspect_ratio=4.66667,
-                                                      scale=Opposite(UniformRandom(lbound=1,ubound=1,seed=78+i)) \
+                                                      scale=         2.0-UniformRandom(lbound=1,ubound=1,seed=78+i) \
                                                       if e=='Right' else UniformRandom(lbound=1,ubound=1,seed=78+i),
                                                       bounds=BoundingBox(radius=0.8))
                                                       for i in xrange(num_inputs)]),
