@@ -36,7 +36,6 @@ from math import pi, sqrt
 
 import topo.patterns.basic
 import topo.patterns.random
-import copy
 
 from topo.patterns.basic import Gaussian
 from topo.sheets.lissom import LISSOM
