@@ -186,10 +186,11 @@ class DockManager(Tile.Notebook):
         if win in self._tab_ids:
             self.forget(self._tab_ids[win])
 
-            # manage my tab ids
+            # manage my tab ids (HACK)
             del self._tab_ids[win]
             for w in self._tab_ids:
                 self._tab_ids[w]-=1
+                self._tab_ids[w]=max(self._tab_ids[w],0)
                 
             self.tk.call('wm','manage',win._w)
             win.renew()

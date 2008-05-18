@@ -430,7 +430,10 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         #self.event_generate("<<SizeRight>>")
         self.parent.sizeright()
         if geom:
-            self.parent.geometry('')
+            try:
+                self.parent.geometry('')
+            except TclError:
+                pass
         
 
     @with_busy_cursor
