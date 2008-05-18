@@ -88,9 +88,10 @@ def open_plotgroup_panel(class_,plotgroup=None,**kw):
 
         if not panel.dock:
             topo.guimain.some_area.eject(win)
-            panel.refresh_title()
         else:
-            topo.guimain.some_area.unhide(win)
+            topo.guimain.some_area.consume(win)
+
+        panel.refresh_title()
 
         panel.pack(expand='yes',fill='both')
         win.sizeright()
@@ -167,13 +168,13 @@ class DockManager(Tile.Notebook):
         self._tab_ids[child]=len(self.tabs())
         Tile.Notebook.add(self,child,cnf=cnf,**kw)
 
-    def unhide(self,win):
-        if win in self._tab_ids:
-            self.tab(self._tab_ids[win],state='normal')
+##     def unhide(self,win):
+##         if win in self._tab_ids:
+##             self.tab(self._tab_ids[win],state='normal')
 
     def new_window(self):
         win = tk.AppWindow(self,status=True)
-        self.consume(win)
+        #self.consume(win)
         return win
 
     def consume(self,win):
@@ -265,11 +266,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         self.messageBar = self.status
 
         self.some_area = DockManager(self)
-        # CB: make DockManager pack itself if it has at least one
-        # tab.
 ##         self.some_area.pack(fill="both", expand=1)
-        
-        
 
 	### Balloon, for pop-up help
 	self.balloon = tk.Balloon(self.content)
