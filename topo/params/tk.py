@@ -2899,9 +2899,10 @@ class ScrolledWindow(T.Toplevel):
         self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
 
         self.topframe = T.Frame(self)
-        self.topframe.pack(side='top',expand='yes',fill='both')
         self.botframe = T.Frame(self)
+
         self.botframe.pack(side='bottom',expand='no',fill='x')
+        self.topframe.pack(side='top',expand='yes',fill='both')
         
         self._scrolledframe = ScrolledFrame(self.topframe)
         self._scrolledframe.pack(expand=1,fill='both')
@@ -2947,13 +2948,7 @@ class AppWindow(ScrolledWindow):
         ScrolledWindow.__init__(self,parent)
         self.content.title = self.title
 
-        # CEBALERT: doesn't work on OS X, and is a strange color on
-        # Windows.  To get a proper icon on OS X, we probably have to
-        # bundle into an application package or something like that.
-        # On OS X, could possibly alter the small titlebar icon with something like:
-        # self.attributes("-titlepath","/Users/x/topographica/AppIcon.icns")
-        self.iconbitmap('@'+self.window_icon_path)
-
+        self.renew()
         ### Universal right-click menu
         # CB: not currently used by anything but the plotgrouppanels
         # self.context_menu = Tkinter.Menu(self, tearoff=0)
@@ -2964,7 +2959,20 @@ class AppWindow(ScrolledWindow):
         # just self)
         self.status = StatusBar(self.botframe) 
         if status:
-            self.status.pack(side="bottom",fill="x",expand="no")
+            self.status.pack(side="bottom",fill="both",expand="yes")
+
+    def renew(self):
+        # CEBALERT: doesn't work on OS X, and is a strange color on
+        # Windows.  To get a proper icon on OS X, we probably have to
+        # bundle into an application package or something like that.
+        # On OS X, could possibly alter the small titlebar icon with something like:
+        # self.attributes("-titlepath","/Users/x/topographica/AppIcon.icns")
+        self.iconbitmap('@'+self.window_icon_path)
+
+        self.protocol("WM_DELETE_WINDOW",self.mydestroy)
+
+    def mydestroy(self):
+        ScrolledWindow.destroy(self)
         
 
 

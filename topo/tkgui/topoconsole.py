@@ -22,7 +22,7 @@ from inspect import getdoc
 import Tile
 from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
      LEFT, RIGHT, YES, NO, BOTH, Label, Text, END, DISABLED, \
-     NORMAL, Scrollbar, Y, DoubleVar, Widget
+     NORMAL, Scrollbar, Y, DoubleVar, Widget,Toplevel
 from tkFileDialog import asksaveasfilename,askopenfilename
 
 import topo.params.tk as tk
@@ -83,17 +83,19 @@ plotpanel_classes = {}
 def open_plotgroup_panel(class_,plotgroup=None,**kw):
 
     if class_.valid_context():
-        frame = topo.guimain.some_area.new_frame()
-        panel = class_(frame.content,plotgroup=plotgroup,**kw)
+        win = topo.guimain.some_area.new_window()
+        panel = class_(win,plotgroup=plotgroup,**kw)
 
         if not panel.dock:
-            topo.guimain.some_area.eject(frame)
+            topo.guimain.some_area.eject(win)
             panel.refresh_title()
         else:
-            topo.guimain.some_area.unhide(frame)
+            topo.guimain.some_area.unhide(win)
 
         panel.pack(expand='yes',fill='both')
-        frame.sizeright()
+        win.sizeright()
+        
+        #frame.sizeright()
         
         topo.guimain.messageBar.message('state', 'OK')
         return panel
@@ -149,91 +151,50 @@ class PlotsMenuEntry(ParameterizedObject):
         return open_plotgroup_panel(self.class_,new_plotgroup,**kw)
 
 
-class FrameManager(Tile.Notebook):
+class DockManager(Tile.Notebook):
     """Manages windows that can be tabs in a notebook, or toplevels."""
     def __init__(self, master=None, cnf={}, **kw):
         Tile.Notebook.__init__(self, master, cnf=cnf, **kw)
         self._tab_ids = {}
 
-    def _get_window_of_frame(self,f):
-        paths = self.tk.call("wm","stackorder",topo.guimain._w)
-        L = f._w.split('.')
-        L.pop(0)
-        w_path = "."+".".join(L)
-        return w_path
+    def _set_tab_title(self,win,title):
+        self.tab(self._tab_ids[win],text=title)
 
-    def _set_toplevel_title(self,frame,title):
-        # (started putting a bunch of stuff in here unrelated to title)
-
-        # CEBALERT HACK A: don't know how to get an AppWindow instead
-        # of a plain Toplevel - seems to be no choice. So everything
-        # here is a hack to copy AppWindow.
-        w_path = self._get_window_of_frame(frame)
-        self.tk.call("wm","title",w_path,title)
-        p = '@'+resolve_path('topo/tkgui/icons/topo.xbm')
-        self.tk.call("wm","iconbitmap",w_path,p)
-        self.tk.call("wm","geometry",w_path,"") # geom back to auto
-
-
-    def _set_tab_title(self,frame,title):
-        self.tab(self._tab_ids[frame],text=title)
+    def _set_toplevel_title(self,win,title):
+        self.tk.call("wm","title",win._w,topo.sim.name+": "+title)
 
     def add(self, child, cnf={}, **kw):
-        # CBERRORALERT: haven't yet implemented proper tracking of IDs
-        i = len(self.tabs()) # oh dear
-        self._tab_ids[child]=i
-
-        if hasattr(child,'title') and not hasattr(child,'_old_title'):
-            child._old_title = child.title
-
-        child.title = lambda x: self._set_tab_title(child,x)
-
-        #kw['state']='hidden'            
+        self._tab_ids[child]=len(self.tabs())
         Tile.Notebook.add(self,child,cnf=cnf,**kw)
 
+    def unhide(self,win):
+        if win in self._tab_ids:
+            self.tab(self._tab_ids[win],state='normal')
 
-    def unhide(self,frame):
-        if frame in self._tab_ids:
-            self.tab(self._tab_ids[frame],state='normal')
+    def new_window(self):
+        win = tk.AppWindow(self,status=True)
+        self.consume(win)
+        return win
 
-            
-
-    def new_frame(self):
-        f=tk.ScrolledFrame(self,status=True)
-        self.add(f,state='hidden')
-
-        ### HACK A
-        #f.content.status = tk.StatusBar(f.content)
-        #f.content.status.pack(side="bottom",fill="x",expand="no")
-        ###
-
-        return f
-
-    def consume(self,f):
-        if f not in self._tab_ids:
-            self.tk.call('wm','forget',f._w)
-            f.status.pack_forget()
-            f.old_status = f.status
-            f.status = topo.guimain.messageBar
-            self.add(f)
-        else:
-            print f,"already in"
-
+    def consume(self,win):
+        if win not in self._tab_ids:
+            self.tk.call('wm','forget',win._w)
+            win.title = lambda x: self._set_tab_title(win,x)
+            self.add(win)
         
-    def eject(self,f):
-        if f in self._tab_ids:
-            self.forget(self._tab_ids[f])
-            del self._tab_ids[f]
-            self.tk.call('wm','manage',f._w)
-            f.title=lambda x: self._set_toplevel_title(f,x)
+    def eject(self,win):
+        if win in self._tab_ids:
+            self.forget(self._tab_ids[win])
 
-            ###
-            if hasattr(f,'old_status'):
-                f.status = f.old_status
-                f.status.pack(side="bottom",fill="x",expand="no")
-            return f
-        else:
-            print f,"not in"
+            # manage my tab ids
+            del self._tab_ids[win]
+            for w in self._tab_ids:
+                self._tab_ids[w]-=1
+                
+            self.tk.call('wm','manage',win._w)
+            win.renew()
+            win.title = lambda x: self._set_toplevel_title(win,x)
+            return win
 
 
 
@@ -302,8 +263,8 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         # CEBALERT
         self.messageBar = self.status
 
-        self.some_area = FrameManager(self)
-        # CB: make FrameManager pack itself if it has at least one
+        self.some_area = DockManager(self)
+        # CB: make DockManager pack itself if it has at least one
         # tab.
 ##         self.some_area.pack(fill="both", expand=1)
         

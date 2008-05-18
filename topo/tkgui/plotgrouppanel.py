@@ -131,10 +131,11 @@ class PlotGroupPanel(tk.TkParameterized,Frame):
         """
         
         tk.TkParameterized.__init__(self,master,extraPO=plotgroup,
-                                    msg_handler=master.container.status,
+                                    msg_handler=master.status,
                                     **params)
-        Frame.__init__(self,master)
-        
+        Frame.__init__(self,master.content)
+
+        self.parent = master #CEBALERT
         self.setup_plotgroup()
 
 
@@ -198,7 +199,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
 
 
         # CEBALERT: replace 
-	self.messageBar = self.master.container.status 
+	self.messageBar = self.parent.status 
 
         self.pack_param('update_command',parent=self.updatecommand_frame,
                         expand='yes',fill='x',side='left')
@@ -277,10 +278,10 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
 
     def set_dock(self):
         if self.dock:
-            topo.guimain.some_area.consume(self.master.container)
+            topo.guimain.some_area.consume(self.parent)
             self.refresh_title()
         else:
-            topo.guimain.some_area.eject(self.master.container)
+            topo.guimain.some_area.eject(self.parent)
             self.refresh_title()
             
 
@@ -392,7 +393,12 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
 
     # rename (not specific to plot_frame)
     # document, and make display_* methods semi-private methods
-    def update_plot_frame(self,plots=True,labels=True):
+    def update_plot_frame(self,plots=True,labels=True,geom=False):
+        """
+
+        set geom True for any action that user would expect to lose
+        his/her manual window size (e.g. pressing enlarge button)
+        """
         
         if plots:
             self.plotgroup.scale_images()
@@ -421,7 +427,10 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         # CBALERT: problem when docked: this event isn't being caught,
         # ie it doesn't end up going to the right place... (i.e. no
         # scrollbars when docked).
-        self.event_generate("<<SizeRight>>")
+        #self.event_generate("<<SizeRight>>")
+        self.parent.sizeright()
+        if geom:
+            self.parent.geometry('')
         
 
     @with_busy_cursor
@@ -451,7 +460,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         plot_command or the update_command, then display the result.
         """
         self.plotgroup.scale_images()
-        self.update_plot_frame(labels=False)
+        self.update_plot_frame(labels=False,geom=True)
 
     
     def refresh(self,update=True):
@@ -603,14 +612,14 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         if (not self.plotgroup.scale_images(1.0/self.zoom_factor)):
             self.representations['Reduce']['widget']['state']=DISABLED
         self.representations['Enlarge']['widget']['state']=NORMAL
-        self.update_plot_frame(labels=False)
+        self.update_plot_frame(labels=False,geom=True)
 
     def enlarge_plots(self):
         """Function called by widget to increase the plot size, when possible."""
         if (not self.plotgroup.scale_images(self.zoom_factor)):
             self.representations['Enlarge']['widget']['state']=DISABLED
         self.representations['Reduce']['widget']['state']=NORMAL
-        self.update_plot_frame(labels=False)
+        self.update_plot_frame(labels=False,geom=True)
         
 
 ######################################################################
@@ -747,7 +756,8 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         title = self._plot_title()
         
         self.plot_frame.configure(text=title)
-        self.master.title(topo.sim.name+': '+title.replace(" at time ","/"))
+        #print "title"
+        self.parent.title(title.replace(" at time ","/"))
           
     def destroy(self):
         """overrides toplevel destroy, adding removal from autorefresh panels"""
