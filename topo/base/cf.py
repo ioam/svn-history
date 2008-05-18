@@ -37,7 +37,7 @@ from projection import Projection,ProjectionSheet, SheetMask
 from parameterclasses import Parameter,Number,BooleanParameter,\
      ClassSelectorParameter,Integer,BooleanParameter
 from sheetcoords import Slice
-from sheetview import UnitView, ProjectionView
+from sheetview import UnitView
 from boundingregion import BoundingBox,BoundingRegionParameter
 
 
@@ -721,10 +721,6 @@ class CFProjection(Projection):
 
         return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self,timestamp)
 
-
-    def get_projection_view(self, timestamp):
-        """Returns the activity in a single projection"""
-        return ProjectionView((self.activity.copy(),self.dest.bounds),self,timestamp)
 
 
     def activate(self,input_activity):

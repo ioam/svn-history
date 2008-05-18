@@ -14,6 +14,8 @@ from parameterclasses import Number, BooleanParameter, Parameter, ListParameter,
 from parameterizedobject import ParameterizedObject
 from simulation import EPConnection
 from functionfamilies import OutputFn,IdentityOF
+from sheetview import ProjectionView
+
 from topo.misc.keyedlist import KeyedList
 
 
@@ -295,6 +297,12 @@ class Projection(EPConnection):
         self.plastic = self._plasticity_setting_stack.pop()
         if hasattr(self.output_fn,'restore_plasticity_state'):
             self.output_fn.restore_plasticity_state()
+
+
+    def get_projection_view(self, timestamp):
+        """Returns the activity in a single projection"""
+        return ProjectionView((self.activity.copy(),self.dest.bounds),self,timestamp)
+
 
 
 
