@@ -7,20 +7,21 @@ $Id$
 __version__='$Revision$'
 
 import random
-from math import e
 import operator
 
-from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Number, ListParameter, CallableParameter, Parameter
+from math import e
+
+from .. import params
 
 
-class NumberGenerator(ParameterizedObject):
+
+class NumberGenerator(params.Parameterized):
     """
     Abstract base class for any object that when called produces a number.
 
     Primarily provides support for using NumberGenerators in simple
     arithmetic expressions, such as abs((x+y)/z), where x,y,z are
-    NumberGenerators.
+    NumberGenerators or numbers.
     """
     
     def __call__(self):
@@ -52,7 +53,7 @@ class NumberGenerator(ParameterizedObject):
 
 
 class BinaryOperator(NumberGenerator):
-    """Applies any binary operator to NumberGenerators or constants to yield a NumberGenerator."""
+    """Applies any binary operator to NumberGenerators or numbers to yield a NumberGenerator."""
     
     def __init__(self,lhs,rhs,operator,reverse=False):
         if reverse:
@@ -128,8 +129,8 @@ class UniformRandom(RandomDistribution):
 
     See the random module for further details.    
     """
-    lbound = Number(default=0.0,doc="inclusive lower bound")
-    ubound = Number(default=1.0,doc="exclusive upper bound")
+    lbound = params.Number(default=0.0,doc="inclusive lower bound")
+    ubound = params.Number(default=1.0,doc="exclusive upper bound")
     
     def __call__(self):
         return self.random_generator.uniform(self.lbound,self.ubound)
@@ -142,8 +143,8 @@ class UniformRandomInt(RandomDistribution):
 
     See the randint function in the random module for further details.    
     """
-    lbound = Number(default=0,doc="inclusive lower bound")
-    ubound = Number(default=1000,doc="inclusive upper bound")
+    lbound = params.Number(default=0,doc="inclusive lower bound")
+    ubound = params.Number(default=1000,doc="inclusive upper bound")
     
     def __call__(self):
         x = self.random_generator.randint(self.lbound,self.ubound)
@@ -157,7 +158,7 @@ class Choice(RandomDistribution):
     Accepts items of any type, though they are typically numbers.
     See the choice() function in the random module for further details.
     """
-    choices = ListParameter(default=[0,1],
+    choices = params.List(default=[0,1],
         doc="List of items from which to select.")
     
     def __call__(self):
@@ -170,8 +171,8 @@ class NormalRandom(RandomDistribution):
 
     See the random module for further details.    
     """
-    mu = Number(default=0.0,doc="mean of the distribution")
-    sigma = Number(default=1.0,doc="standard deviation of the distribution")
+    mu = params.Number(default=0.0,doc="mean of the distribution")
+    sigma = params.Number(default=1.0,doc="standard deviation of the distribution")
     
     def __call__(self):
         return self.random_generator.normalvariate(self.mu,self.sigma)
@@ -187,20 +188,20 @@ class ExponentialDecay(NumberGenerator):
     
     See http://en.wikipedia.org/wiki/Exponential_decay.
     """
-    starting_value = Number(1.0, doc="Value used for time zero.")
-    ending_value = Number(0.0, doc="Value used for time infinity.")
+    starting_value = params.Number(1.0, doc="Value used for time zero.")
+    ending_value = params.Number(0.0, doc="Value used for time infinity.")
 
-    time_constant = Number(10000,doc="""
+    time_constant = params.Number(10000,doc="""
         Time scale for the exponential; large values give slow decay.""")
 
-    base = Number(e, doc="""
+    base = params.Number(e, doc="""
         Base of the exponent; the default yields starting_value*exp(-t/time_constant).
         Another popular choice of base is 2, which allows the
         time_constant to be interpreted as a half-life.""")
 
     # CEBALERT: default should be more like 'lambda:0', but that would
     # confuse GUI users.
-    time_fn = CallableParameter(default=topo.sim.time,doc="""
+    time_fn = params.Callable(default=topo.sim.time,doc="""
      Function to generate the time used for the decay.""")
 
     def __call__(self):
@@ -215,9 +216,9 @@ class BoundedNumber(NumberGenerator):
     Function object that silently enforces numeric bounds on values
     returned by a callable object.
     """
-    generator = CallableParameter(None, doc="Object to call to generate values.")
+    generator = params.Callable(None, doc="Object to call to generate values.")
 
-    bounds = Parameter((None,None), doc="""
+    bounds = params.Parameter((None,None), doc="""
         Legal range for the value returned, as a pair.
         
         The default bounds are (None,None), meaning there are actually
