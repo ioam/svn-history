@@ -1,7 +1,7 @@
 """
 Example of a LISSOM-based direction map (with ON/OFF channels).
 
-Intended to be a close (but approximate) match to the orientation map
+Intended to be a close (but approximate) match to the direction map
 simulation from figure 5.23 of Miikkulainen, Bednar, Choe, and Sirosh
 (2005), Computational Maps in the Visual Cortex, Springer.  Known
 differences include:
