@@ -345,9 +345,15 @@ def run_batch(script_file,output_directory="Output",
 
     simname = prefix
 
-    if params.keys():
-        for a in params.keys():
-           prefix += "," + a + "=" + str(params[a])
+    # Construct parameter-value portion of filename; should do more filtering
+    for a in params.keys():
+        val=params[a]
+        
+        # Special case to give reasonable filenames for lists
+        valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
+                 else str(params[a]))
+        prefix += "," + a + "=" + valstr
+
 
     # Set provided parameter values in main namespace
     for a in params.keys():
