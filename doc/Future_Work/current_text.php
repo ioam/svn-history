@@ -983,7 +983,7 @@ Why go to all this trouble? Having Parameterized attributes that are
 themselves instances of Parameter classes means that we can have
 various special behaviors for attributes. Parameter has several 
 fields, such as 'doc', 'default', and so on. Because of inheritance, 
-we the doc and default value for a Parmeter 'size' of a Parameterized subclass can be
+the doc and default value for a Parameter 'size' of a Parameterized subclass can be
 inherited by further Parameterized subclasses. Another example - we have the
 Number(Parameter) subclass; its __set__ method can perform bounds
 checking to ensure that such attributes can only be set to a
