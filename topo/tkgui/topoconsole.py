@@ -266,7 +266,7 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
         self.messageBar = self.status
 
         self.some_area = DockManager(self)
-##         self.some_area.pack(fill="both", expand=1)
+        self.some_area.pack(fill="both", expand=1)
 
 	### Balloon, for pop-up help
 	self.balloon = tk.Balloon(self.content)
