@@ -71,6 +71,7 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 eyes=['']
 response_types=['On','Off']
 num_lags=4
+speed=1.0 # speed can be 0, 1, 2 or 3  
 
 num_inputs=1
 input_type=Gaussian
@@ -90,7 +91,7 @@ for e in eyes:
 
         default_retina_density=locals().get('default_retina_density',24.0)
 
-        input=Sweeper(generator=copy.deepcopy(input),step=n,speed=5.0/default_retina_density,
+        input=Sweeper(generator=copy.deepcopy(input),step=n,speed=speed/default_retina_density,
                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
         topo.sim[e+'Retina'+str(n)]=GeneratorSheet(nominal_density=default_retina_density,
@@ -120,11 +121,13 @@ lgn_weights['On'] = topo.patterns.basic.Composite(
 lgn_weights['Off'] = topo.patterns.basic.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
+strength=[2.33, 2.38, 2.53, 2.8] #2.33 for speed=0, 2.38 for speed=1, 2.53 for speed=2, 2.8 for speed=3 from CMVC
+
 for e in eyes:
     for n in xrange(num_lags):
 	for l in response_types:
 		topo.sim.connect(e+'Retina'+str(n),e+'LGN'+l+str(n),delay=0.05,
-                 		connection_type=SharedWeightCFProjection,strength=2.33,
+                 		connection_type=SharedWeightCFProjection,strength=strength[int(speed)],
                  		nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                  		weights_generator=lgn_weights[l])
 
