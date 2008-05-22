@@ -602,6 +602,7 @@ pg.add_plot('Y CoG',[('Strength','YCoG')])
 pg.add_plot('CoG',[('Red','XCoG'),('Green','YCoG')])
 
 
+####################################################################################
 
 def measure_cog(proj_name ="Afferent"):    
     """
@@ -1164,7 +1165,7 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relativ
 
 ###############################################################################
 pg= create_plotgroup(name='Direction Preference',category="Preference Maps",
-             doc='Measure preference for sine grating orientation.',
+             doc='Measure preference for sine grating movement direction.',
              update_command='measure_dr_pref()')
 pg.add_plot('Direction Preference',[('Hue','DirectionPreference')])
 pg.add_plot('Direction Preference&Selectivity',[('Hue','DirectionPreference'),
@@ -1174,8 +1175,8 @@ pg.add_static_image('OR Color Key','topo/commands/or_key_white_vert_small.png')
 
 
 
-def measure_dr_pref(num_phase=12,num_direction=6,num_speeds=4,max_speed=2.0/24,
-                    frequencies=[2.4],scale=0.2,offset=0.0,display=False,
+def measure_dr_pref(num_phase=12,num_direction=4,num_speeds=4,max_speed=3.0/locals().get('default_retina_density',24.0),
+                    frequencies=[2.4],scale=0.4,offset=0.0,display=False,
                     weighted_average=True,apply_output_fn=False,duration=0.175,
                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating())):
 
@@ -1199,9 +1200,6 @@ def measure_dr_pref(num_phase=12,num_direction=6,num_speeds=4,max_speed=2.0/24,
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
     Subplotting.set_subplots("Direction",force=True)
-
-
-
 
 def decode_feature(sheet, preference_map = "OrientationPreference", axis_bounds=(0.0,1.0), cyclic=True, weighted_average=True):
     """
