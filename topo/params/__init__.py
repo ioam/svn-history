@@ -237,14 +237,14 @@ is_number = operator.isNumberType
 
 class Number(Dynamic):
     """
-    Number is a numeric parameter. Numbers have a default value,
-    and bounds.  There are two types of bounds: ``bounds`` and
-    ``softbounds``.  ``bounds`` are hard bounds: the parameter must have
-    a value within the specified range.  The default bounds are
-    (None,None), meaning there are actually no hard bounds.  One
-    or both bounds can be set by specifying a value
-    (e.g. bounds=(None,10) means there is no lower bound, and an
-    upper bound of 10).
+    Number is a numeric parameter. Numbers have a default value and
+    optional bounds.  There are two types of bounds: ``bounds`` and
+    ``softbounds``.  ``bounds`` are hard bounds: the parameter must
+    have a value within the specified range.  The default bounds are
+    (None,None), meaning there are actually no hard bounds.  One or
+    both bounds can be set by specifying a value
+    (e.g. bounds=(None,10) means there is no lower bound, and an upper
+    bound of 10).
 
     Number is also a type of Dynamic parameter, so its value
     can be set to a callable to get a dynamically generated
