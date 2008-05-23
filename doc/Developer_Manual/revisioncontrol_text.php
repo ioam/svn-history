@@ -102,6 +102,8 @@ Makefile = svn:eol-style=native;svn:keywords="Author Date Id Revision"
 *.jpg = svn:mime-type=image/jpeg
 </pre>
 
+<p>You may also need to set "enable-auto-props yes", if your config file
+has auto-props disabled by default.
 
 <!-- .cvsignore -> svn property on directory; document -->
 
