@@ -1,7 +1,7 @@
 """
-Example of a LISSOM-based direction and ocular dominance map (with ON/OFF channels).
+Example of a LISSOM-based orientation,direction and ocular dominance map.
 
-Intended to be a close (but approximate) match to the direction map
+Intended to be a close (but approximate) match to the joint map
 simulation from figure 5.29 of Miikkulainen, Bednar, Choe, and Sirosh
 (2005), Computational Maps in the Visual Cortex, Springer.  Known
 differences include:
@@ -22,8 +22,7 @@ differences include:
  - Inhibitory weight pruning is disabled (not pruning all weights below
    1e-5 as in the book)
 
-There may be other small differences, as this file has not yet been
-compared exhaustively to the original simulations.
+This file is not yet complete, and may not do anything useful yet.
 
 $Id$
 """
