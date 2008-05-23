@@ -25,7 +25,7 @@ canvas_region = (0, 0, 1200, 1200)
 
 # These can be customized, e.g. in .topographicarc; they should probably be parameters
 # somewhere.
-scaling_factor = 1.0
+scaling_factor = topo.sim.item_scale
 enlarging_factor = 1.25
 
 
@@ -62,7 +62,7 @@ class EditorCanvas(Canvas):
             self.normalize_checkbutton.select()
 
         # retain the current focus in the canvas
-        self.scaling_factor = scaling_factor
+        self.scaling_factor = topo.sim.item_scale#scaling_factor
         self.current_object = None
         self.current_connection = None
         self.focus = None

@@ -883,7 +883,6 @@ class Simulation(ParameterizedObject,OptionalSingleton):
     name = Parameter(constant=False)
 
 
-
     ### Simulation(register=True) is a singleton
     #
     # There is only ever one instance of Simulation(register=True).
@@ -961,6 +960,7 @@ class Simulation(ParameterizedObject,OptionalSingleton):
         self.events = [] # CB: consider collections.deque? (PEP 290)
         self._events_stack = []
         self.eps_to_start = []
+        self.item_scale=1.0 # this variable determines the size of each item in a diagram
             
         # CB: make this a parameter for documentation? Otherwise nobody will know
         # about being able to adjust step.
@@ -1410,7 +1410,7 @@ class Simulation(ParameterizedObject,OptionalSingleton):
     
 
     # Convenience function for use in graphical editors of the simulation
-    def grid_layout(self,objgrid,xstart=100,xstep=150,ystart=100,ystep=150):
+    def grid_layout(self,objgrid,xstart=100,xstep=150,ystart=100,ystep=150,item_scale=1.0):
         """
         Set the layout_location of simulation objects in a grid pattern.
     
@@ -1421,6 +1421,9 @@ class Simulation(ParameterizedObject,OptionalSingleton):
     
         The object None can be placed in the grid to skip a grid space.
         """
+        
+        self.item_scale=item_scale
+        
         y = ystart
         for row in objgrid:
             x = xstart
