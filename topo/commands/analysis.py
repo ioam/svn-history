@@ -1176,7 +1176,7 @@ pg.add_static_image('OR Color Key','topo/commands/or_key_white_vert_small.png')
 
 
 def measure_dr_pref(num_phase=12,num_direction=6,num_speeds=4,max_speed=2.0/24,
-                    frequencies=[2.4],scale=0.5,offset=0.0,display=False,
+                    frequencies=[2.4],scale=0.6,offset=0.0,display=False,
                     weighted_average=True,apply_output_fn=False,duration=0.175,
                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating())):
 
