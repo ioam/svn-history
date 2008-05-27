@@ -34,7 +34,7 @@ from topo.misc.filepaths import normalize_path
 from topo.analysis.vision import complexity
 from pylab import save
 import topo.analysis.vision
-
+from topo.plotting.plot import make_template_plot, Plot
 
 def windowtitle(title):
     """
@@ -339,8 +339,41 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
             if isint: pylab.ion()
 
             generate_figure(title=title,filename=filename,suffix="_"+sheet.name)
+            
+#########################################################################################
+def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],contours=[(0.5,'OcularPreference','black')],filename=None):   
+    """
+    Use matplotlib to make a plot from a bitmap constructed using the
+    specified strength, color, and confidence SheetViews, plus additional
+    overlaid line contour plot(s) specified with (contour-value,
+    map-name,line-color) triples.
+    """
+   
+    for template in plot_template:
+    
+        for sheet in topo.sim.objects(Sheet).values():
+            name=template.keys().pop()
+            plot=make_template_plot(template,sheet.sheet_views,sheet.xdensity,sheet.bounds,False,name=template[name])        
+            if plot:
+                bitmap=plot.bitmap
+            	
+                pylab.figure(figsize=(5,5))
+                isint=pylab.isinteractive() # Temporarily make non-interactive for plotting
+                pylab.ioff()					 # Turn interactive mode off 
+            
+                pylab.imshow(bitmap.image,interpolation='nearest')				
+                pylab.axis('off')
 
+                for (v,n,c) in contours:
+                    mat = pylab.flipud(sheet.sheet_views[n].view()[0])                            		
+                    pylab.contour(mat,[v, v],colors=c)# draw line with the specified color c 
+                                                  # using the specified matrix mat and value v
 
+                title='Joint plot of %s and %s at time %s' %(plot.name,n,topo.sim.timestr())
+                if isint: pylab.ion()
+                generate_figure(title=title,filename=filename,suffix="_"+sheet.name)
+ 
+######################################################################################
 def tuning_curve_data(sheet, x_axis, curve_label, i_value, j_value):
     """
     Collect data for one tuning curve from the curve_dict of each sheet.
