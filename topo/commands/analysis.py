@@ -604,6 +604,14 @@ pg.add_plot('CoG',[('Red','XCoG'),('Green','YCoG')])
 
 ####################################################################################
 
+pg= create_plotgroup(name='Orientation and Ocular Preference',category="Combined Preference Maps",
+             doc='Measure the orientation preference overlaid with the ocular dominace gradient.',
+             update_command='',
+             plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],contours=[(0.5,"OcularPreference","black")])',            
+             normalize=False)
+
+####################################################################################
+
 def measure_cog(proj_name ="Afferent"):    
     """
     Calculate center of gravity (CoG) for each CF of each unit in each CFSheet.
