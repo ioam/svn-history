@@ -352,7 +352,7 @@ def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],contours=[(0.
     for template in plot_template:
     
         for sheet in topo.sim.objects(Sheet).values():
-            name=template.keys().pop()
+            name=template.keys().pop(0)
             plot=make_template_plot(template,sheet.sheet_views,sheet.xdensity,sheet.bounds,False,name=template[name])        
             if plot:
                 bitmap=plot.bitmap
@@ -366,10 +366,10 @@ def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],contours=[(0.
 
                 for (v,n,c) in contours:
                     mat = pylab.flipud(sheet.sheet_views[n].view()[0])                            		
-                    pylab.contour(mat,[v, v],colors=c)# draw line with the specified color c 
+                    pylab.contour(mat,[v, v],colors=c,linewidths=2)# draw line with the specified color c 
                                                   # using the specified matrix mat and value v
 
-                title='Joint plot of %s and %s at time %s' %(plot.name,n,topo.sim.timestr())
+                title='%s and %s boundaries at time %s' %(plot.name,n,topo.sim.timestr())
                 if isint: pylab.ion()
                 generate_figure(title=title,filename=filename,suffix="_"+sheet.name)
  
