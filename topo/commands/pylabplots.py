@@ -349,9 +349,9 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
 def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],contours=[(0.5,'OcularPreference','black')],filename=None):   
     """
     Use matplotlib to make a plot from a bitmap constructed using the
-    specified strength, color, and confidence SheetViews, plus additional
-    overlaid line contour plot(s) specified with (contour-value,
-    map-name,line-color) triples.
+    specified plot_template, plus additional overlaid line contour
+    plot(s) specified with (contour-value, map-name,line-color)
+    triples.
     """
    
     for template in plot_template:
