@@ -5,8 +5,12 @@ $Id: featureresponses.py 7714 2008-01-24 16:42:21Z antolikjan $
 """
 __version__='$Revision: 7714 $'
 
+try:
+    import pylab
+except:
+    print "Warning: Could not import matplotlib; pylab plots will not work."
+
 from math import fmod,floor
-import pylab
 import numpy
 from numpy.oldnumeric import Float
 from numpy import zeros, array, size, empty, object_

@@ -15,9 +15,13 @@ $Id$
 """
 __version__='$Revision$'
 
+try:
+    import matplotlib
+    import pylab
+except:
+    print "Warning: Could not import matplotlib; pylab plots will not work."
+
 import numpy
-import matplotlib
-import pylab
 import re, os
 import copy
 
@@ -32,7 +36,6 @@ from topo.base.arrayutils import wrap
 
 from topo.misc.filepaths import normalize_path
 from topo.analysis.vision import complexity
-from pylab import save
 import topo.analysis.vision
 from topo.plotting.plot import make_template_plot, Plot
 
@@ -284,7 +287,7 @@ def gradientplot(data,cyclic=True,cyclic_range=1.0,title=None, filename=None):
     matrixplot(sqrt(dx*dx+dy*dy),title=title,filename=filename)
     
 
-def activityplot(sheet,activity=None,title=None,cmap=pylab.cm.Greys):    
+def activityplot(sheet,activity=None,title=None,cmap=None):
     """
     Plots the activity in a sheet.
 
@@ -295,6 +298,8 @@ def activityplot(sheet,activity=None,title=None,cmap=pylab.cm.Greys):
     l,b,r,t = sheet.bounds.aarect().lbrt()
     if activity is None:
         activity = sheet.activity
+    if cmap is None:
+        cmap=pylab.cm.Greys
     pylab.imshow(activity, extent=(l,r,b,t),cmap=cmap)
 
 
@@ -601,7 +606,7 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
             x_data=[x for (x,y) in output_fn.values[p][unit]]
             if raw==True:
                 plot_data=zip(x_data,y_data)
-                save(normalize_path(filename+p+'(%.2f, %.2f)' %(unit[0], unit[1])),plot_data,fmt='%.6f', delimiter=',')
+                pylab.save(normalize_path(filename+p+'(%.2f, %.2f)' %(unit[0], unit[1])),plot_data,fmt='%.6f', delimiter=',')
             
             
             pylab.plot(x_data,y_data, label='Unit (%.2f, %.2f)' %(unit[0], unit[1]))

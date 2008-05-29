@@ -23,7 +23,7 @@ try:
     from matplotlib import rcParams
     rcParams['backend']='Agg'
 except:
-    ImportError("Could not import matplotlib; pylab plots will not work.")
+    print "Warning: Could not import matplotlib; pylab plots will not work."
 
 # Startup banner
 BANNER = """
