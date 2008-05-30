@@ -383,8 +383,8 @@ def overlaid_plots_arrow(plot_template=[{'Hue':'OrientationPreference'}],arrows=
     """
     Use matplotlib to make a plot from a bitmap constructed using the
     specified strength, color, and confidence SheetViews, plus additional
-    overlaid arrows plot(s) specified with (contour-value,
-    map-name,line-color) tupels.
+    overlaid arrows plot(s) specified with (contour-value, map-name,line-color)
+    tuples.
     """
    
     for template in plot_template:
