@@ -25,7 +25,7 @@ import numpy
 import re, os
 import copy
 
-from numpy.oldnumeric import arange, sqrt, pi, array, floor, transpose, argmax, argmin
+from numpy.oldnumeric import arange, sqrt, pi, array, floor, transpose, argmax, argmin, cos, sin
 
 import topo
 from topo.misc.filepaths import normalize_path
@@ -371,14 +371,47 @@ def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],contours=[(0.
 
                 for (v,n,c) in contours:
                     mat = pylab.flipud(sheet.sheet_views[n].view()[0])                            		
-                    pylab.contour(mat,[v, v],colors=c,linewidths=2)# draw line with the specified color c 
-                                                  # using the specified matrix mat and value v
-
+                    pylab.contour(mat,[v, v],colors=c,linewidths=2)
+                    							
                 title='%s and %s boundaries at time %s' %(plot.name,n,topo.sim.timestr())
                 if isint: pylab.ion()
                 generate_figure(title=title,filename=filename,suffix="_"+sheet.name)
  
 ######################################################################################
+
+def overlaid_plots_arrow(plot_template=[{'Hue':'OrientationPreference'}],arrows=[('DirectionPreference','white')], filename=None):   
+    """
+    Use matplotlib to make a plot from a bitmap constructed using the
+    specified strength, color, and confidence SheetViews, plus additional
+    overlaid arrows plot(s) specified with (contour-value,
+    map-name,line-color) tupels.
+    """
+   
+    for template in plot_template:
+    
+        for sheet in topo.sim.objects(Sheet).values():
+            name=template.keys().pop(0)
+            plot=make_template_plot(template,sheet.sheet_views,sheet.xdensity,sheet.bounds,False,name=template[name])        
+            if plot:
+                bitmap=plot.bitmap
+            	
+                pylab.figure(figsize=(5,5))
+                isint=pylab.isinteractive() # Temporarily make non-interactive for plotting
+                pylab.ioff()					 # Turn interactive mode off 
+            
+                pylab.imshow(bitmap.image,origin='lower',interpolation='nearest')				
+                pylab.axis('off')
+
+                for (n,c) in arrows:
+                    mat = pylab.flipud(sheet.sheet_views[n].view()[0])
+                    pylab.quiver(cos(2*pi*mat),sin(2*pi*mat),color=c,edgecolors=c,minshaft=3,linewidths=1)						
+							
+                title='%s and %s boundaries at time %s' %(plot.name,n,topo.sim.timestr())
+                if isint: pylab.ion()
+                generate_figure(title=title,filename=filename,suffix="_"+sheet.name)
+
+######################################################################################
+
 def tuning_curve_data(sheet, x_axis, curve_label, i_value, j_value):
     """
     Collect data for one tuning curve from the curve_dict of each sheet.
