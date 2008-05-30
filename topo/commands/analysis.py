@@ -605,12 +605,21 @@ pg.add_plot('CoG',[('Red','XCoG'),('Green','YCoG')])
 ####################################################################################
 
 pg= create_plotgroup(name='Orientation and Ocular Preference',category="Combined Preference Maps",
-             doc='Measure the orientation preference overlaid with the ocular dominace gradient.',
+             doc='Measure the orientation preference overlaid with the ocular dominace boundaries.',
              update_command='',
              plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],contours=[(0.5,"OcularPreference","black")])',            
              normalize=False)
 
 ####################################################################################
+
+pg= create_plotgroup(name='Orientation and Direction Preference',category="Combined Preference Maps",
+             doc='Measure the orientation preference overlaid with the direction preference arrows.',
+             update_command='',
+             plot_command='overlaid_plots_arrow()',            
+             normalize=False)
+
+####################################################################################
+
 
 def measure_cog(proj_name ="Afferent"):    
     """
@@ -1179,36 +1188,38 @@ pg.add_plot('Direction Preference',[('Hue','DirectionPreference')])
 pg.add_plot('Direction Preference&Selectivity',[('Hue','DirectionPreference'),
                                                 ('Confidence','DirectionSelectivity')])
 pg.add_plot('Direction Selectivity',[('Strength','DirectionSelectivity')])
-pg.add_static_image('OR Color Key','topo/commands/or_key_white_vert_small.png')
+pg.add_static_image('Color Key','topo/commands/dr_key_white_vert_small.png')
 
 
 
 def measure_dr_pref(num_phase=12,num_direction=6,num_speeds=4,max_speed=2.0/24,
-                    frequencies=[2.4],scale=0.6,offset=0.0,display=False,
-                    weighted_average=True,apply_output_fn=False,duration=0.175,
-                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating())):
+                    frequencies=[2.4],scale=0.3,offset=0.0, 
+                    display=False, weighted_average=True,
+                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
 
     if num_phase <= 0 or num_direction <= 0:
         raise ValueError("num_phase and num_direction must be greater than 0")
 
     else:
         step_phase=2*pi/num_phase
-        step_direction=2*pi/num_direction
+        step_direction=2*pi/num_direction 
         step_speed=float(max_speed)/num_speeds
 
         feature_values = [Feature(name="speed",range=(0.0,max_speed),step=step_speed,
                                   cyclic=False),
                           Feature(name="frequency",values=frequencies),
-                          Feature(name="direction",range=(0.0,2*pi),step=step_direction,
+                          Feature(name="direction",range=(0.0,2*pi),step=step_direction, 
                                   cyclic=True),
                           Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
 
         param_dict = {"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
-
-    Subplotting.set_subplots("Direction",force=True)
-
+        fm = x._fullmatrix
+        
+    Subplotting.set_subplots("Direction",force=True)	 
+    return fm
+	
 def decode_feature(sheet, preference_map = "OrientationPreference", axis_bounds=(0.0,1.0), cyclic=True, weighted_average=True):
     """
     Estimate the value of a feature from the current activity pattern on a sheet.
