@@ -346,12 +346,13 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
             generate_figure(title=title,filename=filename,suffix="_"+sheet.name)
             
 #########################################################################################
-def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],contours=[(0.5,'OcularPreference','black')],filename=None):   
+def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],overlay=[('contours','OcularPreference',0.5,'black'),('arrows','DirectionPreference','DirectionSelectivity','white')],filename=None):   
     """
     Use matplotlib to make a plot from a bitmap constructed using the
     specified plot_template, plus additional overlaid line contour
-    plot(s) specified with (contour-value, map-name,line-color)
-    triples.
+    plot(s) specified with ('contours',map-name,contour-value,line-color)
+    quadruples and/or overlaid arrows plot(s) specified with ('arrows',map-name for arrows location,
+    map-name for arrows scaling,arrow-color) quadruples.
     """
    
     for template in plot_template:
@@ -365,61 +366,32 @@ def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],contours=[(0.
                 pylab.figure(figsize=(5,5))
                 isint=pylab.isinteractive() # Temporarily make non-interactive for plotting
                 pylab.ioff()					 # Turn interactive mode off 
-            
-                pylab.imshow(bitmap.image,interpolation='nearest')				
-                pylab.axis('off')
-
-                for (v,n,c) in contours:
-                    mat = pylab.flipud(sheet.sheet_views[n].view()[0])                            		
-                    pylab.contour(mat,[v, v],colors=c,linewidths=2)
-                    							
-                title='%s and %s boundaries at time %s' %(plot.name,n,topo.sim.timestr())
-                if isint: pylab.ion()
-                generate_figure(title=title,filename=filename,suffix="_"+sheet.name)
- 
-######################################################################################
-
-def overlaid_plots_arrow(plot_template=[{'Hue':'OrientationPreference'}],arrows=[('DirectionPreference','DirectionSelectivity','white')], filename=None):   
-    """
-    Use matplotlib to make a plot from a bitmap constructed using the
-    specified strength, color, and confidence SheetViews, plus additional
-    overlaid arrows plot(s) specified with (map-name for arrows location,
-    map-name for arrows scaling,arrow-color) tupels.
-    """
-   
-    for template in plot_template:
-    
-        for sheet in topo.sim.objects(Sheet).values():
-            name=template.keys().pop(0)
-            plot=make_template_plot(template,sheet.sheet_views,sheet.xdensity,sheet.bounds,False,name=template[name])        
-            if plot:
-                bitmap=plot.bitmap
-            	
-                pylab.figure(figsize=(5,5))
-                isint=pylab.isinteractive() # Temporarily make non-interactive for plotting
-                pylab.ioff()					 # Turn interactive mode off 
-            
+                                    
                 pylab.imshow(bitmap.image,origin='lower',interpolation='nearest')				
                 pylab.axis('off')
 
-                for (pref,sel,c) in arrows:
+                for (t,pref,sel,c) in overlay:
                     p = pylab.flipud(sheet.sheet_views[pref].view()[0])
-                    s = pylab.flipud(sheet.sheet_views[sel].view()[0])
-                    scale=pylab.ceil(log10(len(p)))
-                    X=pylab.array([x for x in xrange(len(p)/scale)])                  
-                    p_sc=pylab.zeros((len(p)/scale,len(p)/scale))
-                    s_sc=pylab.zeros((len(p)/scale,len(p)/scale))
-                    for i in X:
-                        for j in X:
-                            p_sc[i][j]=p[scale*i][scale*j]
-                            s_sc[i][j]=s[scale*i][scale*j]                    
-                    pylab.quiver(scale*X,scale*X,cos(2*pi*p_sc)*s_sc,sin(2*pi*p_sc)*s_sc,color=c,edgecolors=c,minshaft=3,linewidths=1)						
+                    
+                    if (t=='contours'):
+                        pylab.contour(p,[sel,sel],colors=c,linewidths=2)
+                        
+                    if (t=='arrows'):							
+                    		s = pylab.flipud(sheet.sheet_views[sel].view()[0])
+                    		scale=int(pylab.ceil(log10(len(p))))
+                    		X=pylab.array([x for x in xrange(len(p)/scale)])                  
+                    		p_sc=pylab.zeros((len(p)/scale,len(p)/scale))
+                    		s_sc=pylab.zeros((len(p)/scale,len(p)/scale))
+                    		for i in X:
+                    		    for j in X:
+                    		        p_sc[i][j]=p[scale*i][scale*j]
+                    		        s_sc[i][j]=s[scale*i][scale*j]
+                    		pylab.quiver(scale*X,scale*X,cos(2*pi*p_sc)*s_sc,sin(2*pi*p_sc)*s_sc,color=c,edgecolors=c,minshaft=3,linewidths=1)						
 							
-                title='%s and %s boundaries at time %s' %(plot.name,p,topo.sim.timestr())
+                title='%s overlaid with %s at time %s' %(plot.name,pref,topo.sim.timestr())
                 if isint: pylab.ion()
                 generate_figure(title=title,filename=filename,suffix="_"+sheet.name)
-
-
+                
 ######################################################################################
 
 def tuning_curve_data(sheet, x_axis, curve_label, i_value, j_value):
