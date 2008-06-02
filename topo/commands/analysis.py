@@ -607,7 +607,7 @@ pg.add_plot('CoG',[('Red','XCoG'),('Green','YCoG')])
 pg= create_plotgroup(name='Orientation and Ocular Preference',category="Combined Preference Maps",
              doc='Plot the orientation preference overlaid with ocular dominance boundaries.',
              update_command='',
-             plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],contours=[(0.5,"OcularPreference","black")])',            
+             plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","OcularPreference",0.5,"black")])',            
              normalize=False)
 
 ####################################################################################
@@ -615,7 +615,7 @@ pg= create_plotgroup(name='Orientation and Ocular Preference',category="Combined
 pg= create_plotgroup(name='Orientation and Direction Preference',category="Combined Preference Maps",
              doc='Plot the orientation preference overlaid with direction preference arrows.',
              update_command='',
-             plot_command='overlaid_plots_arrow()',            
+             plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"}],overlay=[("arrows","DirectionPreference","DirectionSelectivity","white")])',            
              normalize=False)
 
 ####################################################################################
