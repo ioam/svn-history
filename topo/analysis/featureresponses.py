@@ -162,7 +162,7 @@ class FeatureResponses(ParameterizedObject):
         
     def initialize_featureresponses(self,features):
         """Create an empty DistributionMatrix for each feature and each sheet."""
-	self._featureresponses = {}
+        self._featureresponses = {}
         self._fullmatrix = {}
         for sheet in self.sheets_to_measure():
             self._featureresponses[sheet] = {}
@@ -310,7 +310,7 @@ class FeatureMaps(FeatureResponses):
         subplots.""")
     
     def __init__(self,features):
-	super(FeatureMaps,self).__init__(features)
+        super(FeatureMaps,self).__init__(features)
         self.features=features
         
     def collect_feature_responses(self,pattern_presenter,param_dict,display,weighted_average=True):
