@@ -25,7 +25,7 @@ import numpy
 import re, os
 import copy
 
-from numpy.oldnumeric import arange, sqrt, pi, array, floor, transpose, argmax, argmin, cos, sin
+from numpy.oldnumeric import arange, sqrt, pi, array, floor, transpose, argmax, argmin, cos, sin, log10
 
 import topo
 from topo.misc.filepaths import normalize_path
@@ -379,12 +379,12 @@ def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],contours=[(0.
  
 ######################################################################################
 
-def overlaid_plots_arrow(plot_template=[{'Hue':'OrientationPreference'}],arrows=[('DirectionPreference','white')], filename=None):   
+def overlaid_plots_arrow(plot_template=[{'Hue':'OrientationPreference'}],arrows=[('DirectionPreference','DirectionSelectivity','white')], filename=None):   
     """
     Use matplotlib to make a plot from a bitmap constructed using the
     specified strength, color, and confidence SheetViews, plus additional
-    overlaid arrows plot(s) specified with (contour-value, map-name,line-color)
-    tuples.
+    overlaid arrows plot(s) specified with (map-name for arrows location,
+    map-name for arrows scaling,arrow-color) tupels.
     """
    
     for template in plot_template:
@@ -402,13 +402,23 @@ def overlaid_plots_arrow(plot_template=[{'Hue':'OrientationPreference'}],arrows=
                 pylab.imshow(bitmap.image,origin='lower',interpolation='nearest')				
                 pylab.axis('off')
 
-                for (n,c) in arrows:
-                    mat = pylab.flipud(sheet.sheet_views[n].view()[0])
-                    pylab.quiver(cos(2*pi*mat),sin(2*pi*mat),color=c,edgecolors=c,minshaft=3,linewidths=1)						
+                for (pref,sel,c) in arrows:
+                    p = pylab.flipud(sheet.sheet_views[pref].view()[0])
+                    s = pylab.flipud(sheet.sheet_views[sel].view()[0])
+                    scale=pylab.ceil(log10(len(p)))
+                    X=pylab.array([x for x in xrange(len(p)/scale)])                  
+                    p_sc=pylab.zeros((len(p)/scale,len(p)/scale))
+                    s_sc=pylab.zeros((len(p)/scale,len(p)/scale))
+                    for i in X:
+                        for j in X:
+                            p_sc[i][j]=p[scale*i][scale*j]
+                            s_sc[i][j]=s[scale*i][scale*j]                    
+                    pylab.quiver(scale*X,scale*X,cos(2*pi*p_sc)*s_sc,sin(2*pi*p_sc)*s_sc,color=c,edgecolors=c,minshaft=3,linewidths=1)						
 							
-                title='%s and %s boundaries at time %s' %(plot.name,n,topo.sim.timestr())
+                title='%s and %s boundaries at time %s' %(plot.name,p,topo.sim.timestr())
                 if isint: pylab.ion()
                 generate_figure(title=title,filename=filename,suffix="_"+sheet.name)
+
 
 ######################################################################################
 
