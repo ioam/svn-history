@@ -61,6 +61,7 @@ def complexity(full_matrix):
     
     for f in full_matrix.features:
         if f.name == "phase":
+            
             phase_index = i
             break
         i=i+1
@@ -76,6 +77,7 @@ def complexity(full_matrix):
             _complexity_rec(x,y,(),0,full_matrix)
             
             #compute the sum of the responses over phases given the found index of highest response 
+
             iindex = array(global_index)
             sum = 0.0
             for i in range(size(full_matrix.features[phase_index].values)):
