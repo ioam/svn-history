@@ -54,6 +54,9 @@ class JointNormalizingCFSheet(CFSheet):
 
     # JABALERT: Should check that whenever a connection is added to a
     # group, it has the same no of cfs as the existing connections.
+    apply_output_fn_init=BooleanParameter(default=True,
+        doc="""This flag determines whether connection fields will get normalised 
+            during initialization of the Projection sheet.""")
 
     def start(self):
         self._normalize_weights()        
