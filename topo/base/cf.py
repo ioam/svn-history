@@ -39,6 +39,7 @@ from parameterclasses import Parameter,Number,BooleanParameter,\
 from sheetcoords import Slice
 from sheetview import UnitView
 from boundingregion import BoundingBox,BoundingRegionParameter
+from topo.outputfns.basic import IdentityOF 
 
 
 # Specified explicitly when creating weights matrix - required
@@ -583,6 +584,11 @@ class CFProjection(Projection):
         size, unless this parameter is False - in which case the user-specified size of
         the cf_shape is used. In normal usage of Topographica, this parameter should
         remain True.""")
+    
+    apply_output_fn_init=BooleanParameter(default=True,
+        doc="""This flag determines whether connection fields will get normalised 
+            during initialization of the Projection sheet.""")
+
 
     def __init__(self,initialize_cfs=True,**params):
         """
@@ -603,7 +609,6 @@ class CFProjection(Projection):
         super(CFProjection,self).__init__(**params)
 
         self.weights_generator.set_dynamic_time_fn(None,sublistattr='generators')
-
         # get the actual bounds_template by adjusting a copy of the
         # nominal_bounds_template to ensure an odd slice, and to be
         # cropped to sheet if necessary
@@ -632,11 +637,15 @@ class CFProjection(Projection):
                     x_cf,y_cf = self.coord_mapper(x,y)
                     self.debug("Creating CF(%d,%d) from src (%.3f,%.3f) to  dest (%.3f,%.3f)"%(r,c,x_cf,y_cf,x,y))
                     try:
+                        if self.apply_output_fn_init:
+                            of = self.weights_output_fn.single_cf_fn
+                        else:
+                            of = IdentityOF()
                         row.append(self.cf_type(self.src,x_cf,y_cf,
                                                 template=slice_template,
                                                 weights_generator=self.weights_generator,
                                                 mask=mask_template, 
-                                                output_fn=self.weights_output_fn.single_cf_fn))
+                                                output_fn=of))
                     except NullCFError:
                         if self.allow_null_cfs:
                             row.append(None)
