@@ -172,7 +172,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=FixedPoint("0.05"),dest_port=('Activit
                  nominal_bounds_template=BoundingBox(radius=0.27083),
                  coord_mapper=jitterOn,
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                               ExponentialDecay(starting_value = locals().get('S_lr',0.1),
+                               ExponentialDecay(starting_value = locals().get('S_lr',0.3),
                                                 time_constant=locals().get('S_tc',3200)))))
 
 
@@ -184,7 +184,7 @@ topo.sim.connect('LGNOff','V1Simple',delay=FixedPoint("0.05"),dest_port=('Activi
                  nominal_bounds_template=BoundingBox(radius=0.27083),
                  coord_mapper=jitterOff,
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                               ExponentialDecay(starting_value = locals().get('S_lr',0.1),
+                               ExponentialDecay(starting_value = locals().get('S_lr',0.3),
                                                 time_constant=locals().get('S_tc',3200)))))
 
 
@@ -235,7 +235,6 @@ topo.sim.schedule_command(6000,OF+".r=9;"+ OF + ".k=-3.6")
 topo.sim.schedule_command(7000,OF+".r=7;"+ OF + ".k=-3.4")
 topo.sim.schedule_command(8000,OF+".r=5;"+ OF + ".k=-3.2")
 topo.sim.schedule_command(9000,OF+".r=4;"+ OF + ".k=-3.0")
-topo.sim.schedule_command(10000,OF+".r=3;"+ OF + ".k=-2.8")
 topo.sim.schedule_command(10000,OF+".r=3;"+ OF + ".k=-2.5")
 #topo.sim.schedule_command(11000,OF+".r=9.9;"+ OF + ".k=-3.0")
 #topo.sim.schedule_command(12000,OF+".r=9.4;"+ OF + ".k=-2.9")
