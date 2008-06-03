@@ -230,7 +230,8 @@ OF = "topo.sim['V1Complex'].output_fn"
 #topo.sim.schedule_command(2000,OF+".r=14.0;"+ OF + ".k=-3.9")
 #topo.sim.schedule_command(3000,OF+".r=13.7;"+ OF + ".k=-3.8")
 #topo.sim.schedule_command(4000,OF+".r=13.4;"+ OF + ".k=-3.7")
-topo.sim.schedule_command(5000,OF+".r=12;"+ OF + ".k=-3.8")
+topo.sim.schedule_command(5000,"secondStage()")
+topo.sim.schedule_command(5001,OF+".r=12;"+ OF + ".k=-3.8")
 topo.sim.schedule_command(6000,OF+".r=9;"+ OF + ".k=-3.6")
 topo.sim.schedule_command(7000,OF+".r=7;"+ OF + ".k=-3.4")
 topo.sim.schedule_command(8000,OF+".r=5;"+ OF + ".k=-3.2")
@@ -240,6 +241,10 @@ topo.sim.schedule_command(10000,OF+".r=3;"+ OF + ".k=-2.5")
 #topo.sim.schedule_command(12000,OF+".r=9.4;"+ OF + ".k=-2.9")
 #topo.sim.schedule_command(13000,OF+".r=8.9;"+ OF + ".k=-2.8")
 #topo.sim.schedule_command(14000,OF+".r=8.5;"+ OF + ".k=-2.7")
+
+
+def offset_tf():
+	return topo.sim.time()-5000
 
 def secondStage():
     topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
@@ -256,6 +261,8 @@ def secondStage():
     topo.sim['FakeRetina2'].set_input_generator(zeroInput)
     topo.sim['LGNOn'].in_connections[0].strength=0
     topo.sim['LGNOff'].in_connections[0].strength=0
+    topo.sim['V1Simple'].in_connections[0].learning_rate.time_fn=topo.sim.time()
+    topo.sim['V1Simple'].in_connections[1].learning_rate.time_fn=topo.sim.time()
     
 
 
