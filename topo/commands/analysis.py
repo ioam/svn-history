@@ -632,6 +632,13 @@ pg= create_plotgroup(name='Orientation and Direction Preference',category="Combi
 
 ####################################################################################
 
+pg= create_plotgroup(name='Orientation, Ocular and Direction Preference',category="Combined Preference Maps",
+             doc='Plot the orientation preference overlaid with ocular dominance boundaries and direction preference arrows.',
+             update_command='',
+             plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","OcularPreference",0.5,"black"),("arrows","DirectionPreference","DirectionSelectivity","white")])',            
+             normalize=False)
+
+####################################################################################
 
 def measure_cog(proj_name ="Afferent"):    
     """
