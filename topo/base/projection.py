@@ -358,11 +358,15 @@ class ProjectionSheet(Sheet):
         disables all masking, but subclasses can use this mask to
         implement optimizations, non-rectangular Sheet shapes,
         lesions, etc.""")
-                             
+    
+    contFlag=BooleanParameter(default=False,
+        doc="Whether to calculate the activity in the sheet continuously.")
+    
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)
         self.new_input = False
         self.mask.sheet = self
+        self.old_a = self.activity.copy()*0.0
 
     def _dest_connect(self, conn):
         """
@@ -466,10 +470,16 @@ class ProjectionSheet(Sheet):
                 tmp_activity += proj.activity
             self.activity=tmp_dict[priority][0].activity_group[1](self.activity,tmp_activity)
             
-            
+        # experimental time constant
+        
+        if self.contFlag:
+            new_a = self.activity.copy()
+            self.activity = self.old_a + (new_a - self.old_a)*0.3
+            self.old_a = self.activity.copy()
+        
         if self.apply_output_fn:
             self.output_fn(self.activity)
-
+    
         self.send_output(src_port='Activity',data=self.activity)
     
 
