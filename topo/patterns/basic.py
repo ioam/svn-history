@@ -64,7 +64,7 @@ class Gaussian(PatternGenerator):
     def function(self,params):
         ysigma = params['size']/2.0
         xsigma = params['aspect_ratio']*ysigma
-
+        
         return gaussian(self.pattern_x,self.pattern_y,xsigma,ysigma)
 
 
@@ -749,8 +749,8 @@ class Translator(PatternGenerator):
         # CB: are the float() calls required because the comparisons
         # involving FixedPoint fail otherwise? Or for some other
         # reason?
-        if((float(topo.sim.time()) >= self.last_time + self.reset_period) or (float(topo.sim.time()) ==0.05)):
-            if ((float(topo.sim.time()) <= (self.last_time+self.reset_period+1.0)) and (float(topo.sim.time()) !=0.05))    :
+        if((float(topo.sim.time()) >= self.last_time + self.reset_period) or (float(topo.sim.time()) <=0.05)):
+            if ((float(topo.sim.time()) <= (self.last_time+self.reset_period+1.0)) and (float(topo.sim.time()) >=0.05))    :
                 return Null()(xdensity=xdensity,ydensity=ydensity,bounds=bounds)
         
             self.last_time += self.reset_period
