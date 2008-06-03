@@ -198,11 +198,19 @@ class PatternPresenter(ParameterizedObject):
                     g.scale=g.contrast
             
         wipe_out_activity()
+        
+        for sheet in topo.sim.objects(Sheet).values():
+            if hasattr(sheet,'contFlag'):
+               sheet.old_a *= 0
+        
         topo.sim.event_clear(EPConnectionEvent)
             
         pattern_present(inputs, self.duration, plastic=False,
                      apply_output_fn=self.apply_output_fn)
 
+        for sheet in topo.sim.objects(Sheet).values():
+            if hasattr(sheet,'contFlag'):
+               sheet.old_a *= 0 
 
 
 
