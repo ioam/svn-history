@@ -118,7 +118,7 @@ class PatternPresenter(ParameterizedObject):
             orientation = features_values['direction']+pi/2            
             from topo.patterns.basic import Sweeper            
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
-                inputs[name] = Sweeper(generator=inputs[name],step=i,speed=features_values['speed'])
+                inputs[name] = Sweeper(generator=inputs[name],step=int(name[-1]),speed=features_values['speed'])
                 setattr(inputs[name],'orientation',orientation)
                             
 
@@ -1186,8 +1186,6 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relativ
 	    x.collect_feature_responses(feature_values,pattern_presenter, param_dict, curve_label,display)
 
 
-
-
 ###############################################################################
 pg= create_plotgroup(name='Direction Preference',category="Preference Maps",
              doc='Measure preference for sine grating movement direction.',
@@ -1227,7 +1225,9 @@ def measure_dr_pref(num_phase=12,num_direction=6,num_speeds=4,max_speed=2.0/24,
         
     Subplotting.set_subplots("Direction",force=True)	 
     return fm
-	
+  
+    
+###############################################################################	
 def decode_feature(sheet, preference_map = "OrientationPreference", axis_bounds=(0.0,1.0), cyclic=True, weighted_average=True):
     """
     Estimate the value of a feature from the current activity pattern on a sheet.
