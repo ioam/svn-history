@@ -194,7 +194,7 @@ class EventProcessor(ParameterizedObject):
                                  if self._port_match(conn.src_port,[src_port])]
 
         for conn in out_conns_on_src_port:
-            self.verbose("Sending output on src_port %s via connection %s to %s" % (str(src_port), conn.name, conn.dest.name))
+            #self.verbose("Sending output on src_port %s via connection %s to %s" % (str(src_port), conn.name, conn.dest.name))
             e=EPConnectionEvent(conn.delay+self.simulation.time(),conn,data)
             self.simulation.enqueue_event(e)
             
@@ -1341,7 +1341,10 @@ class Simulation(ParameterizedObject,OptionalSingleton):
             conn_params['name'] = src+'To'+dest
 
         # Looks up src and dest in our dictionary of objects
-        conn = connection_type(src=self[src],dest=self[dest],**conn_params)
+        if hasattr(self[dest],'apply_output_fn_init'):
+            conn = connection_type(src=self[src],dest=self[dest],apply_output_fn_init=self[dest].apply_output_fn_init,**conn_params)
+        else:
+            conn = connection_type(src=self[src],dest=self[dest],**conn_params)
         self[src]._src_connect(conn)
         self[dest]._dest_connect(conn)
         return conn
