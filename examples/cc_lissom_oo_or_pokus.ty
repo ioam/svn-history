@@ -154,7 +154,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=0.05,dest_port=('Activity','JointNorma
                  nominal_bounds_template=BoundingBox(radius=0.27083),
                  coord_mapper=jitterOn,
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                               ExponentialDecay(starting_value = locals().get('S_lr',4),
+                               ExponentialDecay(starting_value = locals().get('S_lr',1),
                                                 time_constant=locals().get('S_tc',9600)))))
 
 
@@ -166,7 +166,7 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNorm
                  nominal_bounds_template=BoundingBox(radius=0.27083),
                  coord_mapper=jitterOff,
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                               ExponentialDecay(starting_value = locals().get('S_lr',4),
+                               ExponentialDecay(starting_value = locals().get('S_lr',1),
                                                 time_constant=locals().get('S_tc',9600)))))
 
 topo.sim.connect('V1Simple','V1Simple',delay=0.02,name='V1SimpleLateral',
