@@ -154,12 +154,16 @@ class PatternPresenter(ParameterizedObject):
         #        inputs[input_sheet_names[0]]=inputs[input_sheet_names[0]]
         #        inputs[input_sheet_names[1]]=inputs[input_sheet_names[1]]
 
+
         if features_values.has_key("ocular"):
-            if len(input_sheet_names)!=2:
-                self.warning('Ocularity is defined only when there are exactly two patterns')
-            else:
-                inputs[input_sheet_names[0]].scale=2*inputs[input_sheet_names[0]].ocular
-                inputs[input_sheet_names[1]].scale=2.0-2*inputs[input_sheet_names[1]].ocular
+            for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
+                if (name[0:5]=='Right'):
+                    inputs[name].scale=2*inputs[name].ocular
+                else:
+                    if (name[0:4]=='Left'):
+                        inputs[name].scale=2.0-2*inputs[name].ocular
+                    else:
+                        self.warning('Ocularity is defined only when there are inputs for right and left retinas.')
 
 
         # For WhiskerArray only; used to set the delay/lag in each input sheet
