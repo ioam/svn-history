@@ -92,12 +92,12 @@ surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1
 for e in eyes:
     for n in xrange(num_lags):
 	for l in response_types:
-		topo.sim.connect(e+'Retina'+retinas[response_types.index(l)]+str(n),e+'LGN'+l+str(n),delay=0.05,
+		topo.sim.connect(e+'RetinaOne'+str(n),e+'LGN'+l+str(n),delay=0.05,
                  		connection_type=SharedWeightCFProjection,strength=2.33*(-1)**response_types.index(l),
                  		nominal_bounds_template=BoundingBox(radius=0.375),name='AfferentCenter',
                  		weights_generator=centerg)
 
-		topo.sim.connect(e+'Retina'+retinas[response_types.index(l)-1]+str(n),e+'LGN'+l+str(n),delay=0.05,
+		topo.sim.connect(e+'RetinaTwo'+str(n),e+'LGN'+l+str(n),delay=0.05,
                  		connection_type=SharedWeightCFProjection,strength=2.33*(-1)**(1+response_types.index(l)),
                  		nominal_bounds_template=BoundingBox(radius=0.375),name='AfferentSurround',
                  		weights_generator=surroundg)
@@ -107,21 +107,21 @@ for e in eyes:
                	  		# JABALERT: Should probably simplify this by making a function for it.
                 		weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
-                                                                             topo.patterns.random.UniformRandom()]),
+                                                                 topo.patterns.random.UniformRandom()]),
                  		nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590/len(response_types)/len(eyes)/num_lags)
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.10417),
-                                                                             topo.patterns.random.UniformRandom()]),
+                                                                 topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.10417),learning_rate=2.55528) 
             
 topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
                  connection_type=CFProjection,strength=-0.9,
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
-                                                                             topo.patterns.random.UniformRandom()]),
+                                                                 topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=1.80873)  
 
 
