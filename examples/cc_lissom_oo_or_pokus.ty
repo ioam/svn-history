@@ -61,7 +61,7 @@ elif stim == 'Gabor':
         y=UniformRandom(lbound=-0.65,ubound=0.65,seed=53),
     size=0.15, frequency=3.3, scale=1.0,offset=0.5,aspect_ratio=3, bounds =  BoundingBox(radius=0.8)),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.0))
 
-jitter  =  locals().get('Jitter',0.4)
+jitter  =  locals().get('Jitter',0.2)
 
 class Jitter(CoordinateMapperFn):
     """Return the jittered x,y coordinate of the given coordinate."""
@@ -105,7 +105,7 @@ topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals
 
 topo.sim['V1SimpleInh'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',120.0),
                         nominal_bounds=BoundingBox(radius=core_size),contFlag=True,
-                        output_fn=Sigmoid(r=locals().get('r_init',15),k=locals().get('k_init',-7.5)))
+                        output_fn=Sigmoid(r=locals().get('i_r_init',15),k=locals().get('i_k_init',-7.5)))
 
 topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',120.0),
                         nominal_bounds=BoundingBox(radius=core_size),contFlag=True,
@@ -183,14 +183,14 @@ topo.sim.connect('LGNOn','V1SimpleInh',delay=0.05,name='V1SimpleInhAfferentOn',
                  connection_type=CFProjection,strength=2.0,coord_mapper=jitterOn,
                  weights_generator=Gaussian(aspect_ratio=1.0, size=2*0.27),
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                               ExponentialDecay(starting_value = locals().get('S_lr',4),
+                               ExponentialDecay(starting_value = locals().get('S_lr',1),
                                                 time_constant=locals().get('S_tc',9600)))))
 
 topo.sim.connect('LGNOff','V1SimpleInh',delay=0.05,name='V1SimpleInhAfferentOff',
                  connection_type=CFProjection,strength=2.0,coord_mapper=jitterOff,
                  weights_generator=Gaussian(aspect_ratio=1.0, size=2*0.27),
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                               ExponentialDecay(starting_value = locals().get('S_lr',4),
+                               ExponentialDecay(starting_value = locals().get('S_lr',1),
                                                 time_constant=locals().get('S_tc',9600)))))
 
 
@@ -211,11 +211,11 @@ topo.sim.connect('V1SimpleInh','V1Simple',delay=0.02,name='V1SimpleInhFeedback',
 #V1Complex
 
 topo.sim.connect('V1Complex','V1Simple',delay=0.02,
-                 connection_type=OneToOneProjection,strength=locals().get('FExcStr',0.15),name='V1ComplexFeedback',
+                 connection_type=OneToOneProjection,strength=locals().get('FExcStr',0.25),name='V1ComplexFeedback',
                  learning_rate=0)
 
 topo.sim.connect('V1Complex','V1SimpleInh',delay=0.02,
-                 connection_type=OneToOneProjection,strength=locals().get('FExcStr',0.2),name='V1ComplexFeedback1',
+                 connection_type=OneToOneProjection,strength=locals().get('FInhStr',0.2),name='V1ComplexFeedback1',
                  learning_rate=0)
 
 
@@ -223,7 +223,7 @@ topo.sim.connect('V1Simple','V1Complex',delay=0.02,
                  connection_type=CFProjection,strength=locals().get('StoCStr',5),name='V1SimpleAfferent',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=locals().get('StoCSize',0.15)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('StoCSize',0.15)/2),
-                 learning_rate=0)
+                 learning_rate=locals().get('StoC_lr',0))
 
 topo.sim.connect('V1Complex','V1Complex',delay=0.02,name='LateralExcitatory',
                  connection_type=CFProjection,strength=locals().get('CxLatExcStr',0.8),
