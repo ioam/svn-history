@@ -95,52 +95,34 @@ surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1
 for e in eyes:
     for n in xrange(num_lags):
         for l in response_types:
-	        for retina in retinas:
-		        topo.sim.connect(e+retina+'Retina'+str(n),
-		                         e+retina+'/'+retinas[retinas.index(retina)-1]+' LGN'+l+str(n),
-		                         delay=0.05,
-		                         connection_type=SharedWeightCFProjection,
-		                         strength=2.33*(-1)**response_types.index(l),
-		                         nominal_bounds_template=BoundingBox(radius=0.375),
-		                         name='AfferentCenter',
-		                         weights_generator=centerg)
+            for retina in retinas:
+                topo.sim.connect(e+retina+'Retina'+str(n),
+                                 e+retina+'/'+retinas[retinas.index(retina)-1]+' LGN'+l+str(n), delay=0.05,
+		                 connection_type=SharedWeightCFProjection, strength=2.33*(-1)**response_types.index(l),
+		                 nominal_bounds_template=BoundingBox(radius=0.375), 
+                                 name='AfferentCenter', weights_generator=centerg)
 
-		        topo.sim.connect(e+retina+'Retina'+str(n),
-                                 e+retinas[retinas.index(retina)-1]+'/'+retina+' LGN'+l+str(n),
-                                 delay=0.05,
-                                 connection_type=SharedWeightCFProjection,
-                                 strength=2.33*(-1)**(1+response_types.index(l)),
+                topo.sim.connect(e+retina+'Retina'+str(n),
+                                 e+retinas[retinas.index(retina)-1]+'/'+retina+' LGN'+l+str(n), delay=0.05,
+                                 connection_type=SharedWeightCFProjection, strength=2.33*(-1)**(1+response_types.index(l)),
                                  nominal_bounds_template=BoundingBox(radius=0.375),
-                                 name='AfferentSurround',
-                                 weights_generator=surroundg)
+                                 name='AfferentSurround', weights_generator=surroundg)
 
-		        topo.sim.connect(e+retina+'Retina'+str(n),
-		                         e+'Luminosity LGN'+l+str(n),
-		                         delay=0.05,
-		                         connection_type=SharedWeightCFProjection,
-		                         strength=2.33*(-1)**response_types.index(l)/2,
-		                         nominal_bounds_template=BoundingBox(radius=0.375),
-		                         name='AfferentCenter'+retina,
-		                         weights_generator=centerg)
+                topo.sim.connect(e+retina+'Retina'+str(n),
+		                 e+'Luminosity LGN'+l+str(n), delay=0.05,
+		                 connection_type=SharedWeightCFProjection, strength=2.33*(-1)**response_types.index(l)/2,
+		                 nominal_bounds_template=BoundingBox(radius=0.375),
+		                 name='AfferentCenter'+retina, weights_generator=centerg)
 
-		        topo.sim.connect(e+retina+'Retina'+str(n),
-		                         e+'Luminosity LGN'+l+str(n),
-		                         delay=0.05,
-		                         connection_type=SharedWeightCFProjection,
-		                         strength=2.33*(-1)**(1+response_types.index(l))/2,
-		                         nominal_bounds_template=BoundingBox(radius=0.375),
-		                         name='AfferentSurround'+retina,
-		                         weights_generator=surroundg)
+                topo.sim.connect(e+retina+'Retina'+str(n),
+		                 e+'Luminosity LGN'+l+str(n), delay=0.05,
+		                 connection_type=SharedWeightCFProjection, strength=2.33*(-1)**(1+response_types.index(l))/2,
+		                 nominal_bounds_template=BoundingBox(radius=0.375),
+		                 name='AfferentSurround'+retina, weights_generator=surroundg)
 		                         
-        for l in response_types:		    
-	        for layer in LGNlayers:
-	            topo.sim.connect(e+layer+' LGN'+l+str(n),
-                                 'V1',
-                                 delay=0.05,
-                                 dest_port=('Activity', 'JointNormalize', 'AfferentCenter', 'AfferentSurround', 'AfferentCenterRed', 'AfferentSurroundRed','AfferentCenterGreen', 'AfferentSurroundGreen'),
-                                 connection_type=CFProjection,
-                                 strength=1.0,
-                                 name=e+layer+' LGN'+l+'Afferent'+str(n),
+            for layer in LGNlayers:
+                topo.sim.connect(e+layer+' LGN'+l+str(n), 'V1', delay=0.05, dest_port=('Activity', 'JointNormalize', 'AfferentCenter', 'AfferentSurround', 'AfferentCenterRed', 'AfferentSurroundRed','AfferentCenterGreen', 'AfferentSurroundGreen'),
+                                 connection_type=CFProjection, strength=1.0, name=e+layer+' LGN'+l+'Afferent'+str(n),
                                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                    generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                    topo.patterns.random.UniformRandom()]),
