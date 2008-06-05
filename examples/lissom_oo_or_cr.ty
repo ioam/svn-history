@@ -47,6 +47,7 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 eyes=['']
 response_types=['On','Off']
 retinas=['Red','Green']
+LGNlayers=['Red/Green','Green/Red','Luminosity']
 num_lags=1
 
 num_inputs=1
@@ -74,8 +75,8 @@ for e in eyes:
                                                               nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
 
         for l in response_types:
-            for retina in retinas:
-                topo.sim[e+retina+'/'+retinas[retinas.index(retina)-1]+' LGN'+l+str(n)]=CFSheet(nominal_density=24.0,
+            for layer in LGNlayers:
+                topo.sim[e+layer+' LGN'+l+str(n)]=CFSheet(nominal_density=24.0,
                                         nominal_bounds=BoundingBox(radius=0.5+0.25),
                                         output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                                         measure_maps=False)
@@ -93,33 +94,60 @@ surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1
 
 for e in eyes:
     for n in xrange(num_lags):
-	    for l in response_types:
+        for l in response_types:
 	        for retina in retinas:
 		        topo.sim.connect(e+retina+'Retina'+str(n),
-                        e+retina+'/'+retinas[retinas.index(retina)-1]+' LGN'+l+str(n),delay=0.05,
-                 		connection_type=SharedWeightCFProjection,strength=2.33*(-1)**response_types.index(l),
-                 		nominal_bounds_template=BoundingBox(radius=0.375),name='AfferentCenter',
-                 		weights_generator=centerg)
+		                         e+retina+'/'+retinas[retinas.index(retina)-1]+' LGN'+l+str(n),
+		                         delay=0.05,
+		                         connection_type=SharedWeightCFProjection,
+		                         strength=2.33*(-1)**response_types.index(l),
+		                         nominal_bounds_template=BoundingBox(radius=0.375),
+		                         name='AfferentCenter',
+		                         weights_generator=centerg)
 
 		        topo.sim.connect(e+retina+'Retina'+str(n),
-                        e+retinas[retinas.index(retina)-1]+'/'+retina+' LGN'+l+str(n),delay=0.05,
-                 		connection_type=SharedWeightCFProjection,strength=2.33*(-1)**(1+response_types.index(l)),
-                 		nominal_bounds_template=BoundingBox(radius=0.375),name='AfferentSurround',
-                 		weights_generator=surroundg)
-                 		
-                 		
-		        topo.sim.connect(e+retina+'/'+retinas[retinas.index(retina)-1]+' LGN'+l+str(n),
-                        'V1',delay=0.05,dest_port=('Activity', 'JointNormalize', 'AfferentCenter', 'AfferentSurround'),
-               	  		connection_type=CFProjection,strength=1.0,
-               	  		name=e+retina+'/'+retinas[retinas.index(retina)-1]+' LGN'+l+'Afferent'+str(n),
-               	  		# JABALERT: Should probably simplify this by making a function for it.
-                		weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
-                                                                 topo.patterns.random.UniformRandom()]),
-                 		nominal_bounds_template=BoundingBox(radius=0.27083),
-                        learning_rate=0.9590/len(response_types)/len(eyes)/num_lags/len(retinas))
+                                 e+retinas[retinas.index(retina)-1]+'/'+retina+' LGN'+l+str(n),
+                                 delay=0.05,
+                                 connection_type=SharedWeightCFProjection,
+                                 strength=2.33*(-1)**(1+response_types.index(l)),
+                                 nominal_bounds_template=BoundingBox(radius=0.375),
+                                 name='AfferentSurround',
+                                 weights_generator=surroundg)
 
+		        topo.sim.connect(e+retina+'Retina'+str(n),
+		                         e+'Luminosity LGN'+l+str(n),
+		                         delay=0.05,
+		                         connection_type=SharedWeightCFProjection,
+		                         strength=2.33*(-1)**response_types.index(l)/2,
+		                         nominal_bounds_template=BoundingBox(radius=0.375),
+		                         name='AfferentCenter'+retina,
+		                         weights_generator=centerg)
 
+		        topo.sim.connect(e+retina+'Retina'+str(n),
+		                         e+'Luminosity LGN'+l+str(n),
+		                         delay=0.05,
+		                         connection_type=SharedWeightCFProjection,
+		                         strength=2.33*(-1)**(1+response_types.index(l))/2,
+		                         nominal_bounds_template=BoundingBox(radius=0.375),
+		                         name='AfferentSurround'+retina,
+		                         weights_generator=surroundg)
+		                         
+        for l in response_types:		    
+	        for layer in LGNlayers:
+	            topo.sim.connect(e+layer+' LGN'+l+str(n),
+                                 'V1',
+                                 delay=0.05,
+                                 dest_port=('Activity', 'JointNormalize', 'AfferentCenter', 'AfferentSurround', 'AfferentCenterRed', 'AfferentSurroundRed','AfferentCenterGreen', 'AfferentSurroundGreen'),
+                                 connection_type=CFProjection,
+                                 strength=1.0,
+                                 name=e+layer+' LGN'+l+'Afferent'+str(n),
+                                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                                                   generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
+                                                   topo.patterns.random.UniformRandom()]),
+                                 nominal_bounds_template=BoundingBox(radius=0.27083),
+                                 learning_rate=0.9590/len(response_types)/len(eyes)/num_lags/len(LGNlayers))
+
+                        
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
@@ -169,15 +197,15 @@ topo.sim.schedule_command( 8000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 topo.sim.schedule_command(20000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 
 ### Afferent learning rate changes
-for retina in retinas:
+for layer in LGNlayers:
     for n in xrange(num_lags):
         for e in eyes:
             for l in response_types:
-                S ='topo.sim["V1"].projections()["'+e+retina+'/'+retinas[retinas.index(retina)-1]+' LGN'+l+'Afferent'+str(n)+'"]'
-                topo.sim.schedule_command(  500*st,S+'.learning_rate=0.6850/len(response_types)/len(eyes)/num_lags/len(retinas)')
-                topo.sim.schedule_command( 2000*st,S+'.learning_rate=0.5480/len(response_types)/len(eyes)/num_lags/len(retinas)')
-                topo.sim.schedule_command( 4000*st,S+'.learning_rate=0.4110/len(response_types)/len(eyes)/num_lags/len(retinas)')
-                topo.sim.schedule_command(20000*st,S+'.learning_rate=0.2055/len(response_types)/len(eyes)/num_lags/len(retinas)')
+                S ='topo.sim["V1"].projections()["'+e+layer+' LGN'+l+'Afferent'+str(n)+'"]'
+                topo.sim.schedule_command(  500*st,S+'.learning_rate=0.6850/len(response_types)/len(eyes)/num_lags/len(LGNlayers)')
+                topo.sim.schedule_command( 2000*st,S+'.learning_rate=0.5480/len(response_types)/len(eyes)/num_lags/len(LGNlayers)')
+                topo.sim.schedule_command( 4000*st,S+'.learning_rate=0.4110/len(response_types)/len(eyes)/num_lags/len(LGNlayers)')
+                topo.sim.schedule_command(20000*st,S+'.learning_rate=0.2055/len(response_types)/len(eyes)/num_lags/len(LGNlayers)')
 
 ### Activation function threshold changes
 OF='topo.sim["V1"].output_fn'
@@ -204,14 +232,15 @@ topo.sim.schedule_command( 6500*st,'topo.sim["V1"].tsettle=12')
 topo.sim.schedule_command( 8000*st,'topo.sim["V1"].tsettle=13')
 
 # default locations for model editor
-vs = [None]*(len(retinas)*len(response_types)*len(eyes)*num_lags-1) + ['V1'] + [None]*len(retinas)*len(response_types)*len(eyes)*num_lags
+vs = [None]*(len(LGNlayers)*len(response_types)*len(eyes)*num_lags-1) + ['V1'] + [None]*len(LGNlayers)*len(response_types)*len(eyes)*num_lags
 
 ls=[]
 for n in xrange(num_lags):
     for e in eyes:
-        for retina in retinas:
+        for layer in LGNlayers:
             for l in response_types:            
-                ls += [e+retina+'/'+retinas[retinas.index(retina)-1]+' LGN'+l+str(n)]+[None]
+                ls += [e+layer+' LGN'+l+str(n)]+[None]
+                
 
 es=[]
 for n in xrange(num_lags):
