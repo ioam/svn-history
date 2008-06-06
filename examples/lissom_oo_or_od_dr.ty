@@ -22,7 +22,8 @@ differences include:
  - Inhibitory weight pruning is disabled (not pruning all weights below
    1e-5 as in the book)
 
-This file is not yet complete, and may not do anything useful yet.
+There may be other small differences, as this file has not yet been
+compared exhaustively to the original simulations.
 
 $Id$
 """
@@ -70,7 +71,7 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 eyes=['Left', 'Right']
 response_types=['On','Off']
 num_lags=4
-speed=1.0 # speed can be 0, 1, 2 or 3  
+speed=1.0 # Useful speeds range from 0.0 - 3.0.
 
 num_inputs=1
 input_type=Gaussian
@@ -220,7 +221,8 @@ topo.sim.schedule_command( 6500*st,'topo.sim["V1"].tsettle=12')
 topo.sim.schedule_command( 8000*st,'topo.sim["V1"].tsettle=13')
 
 # default locations for model editor
-vs = [None]*(len(response_types)*len(eyes)*num_lags-1) + ['V1'] + [None]*len(response_types)*len(eyes)*num_lags
+vs=[None]*(len(response_types)*len(eyes)*num_lags-1) + ['V1'] + \
+   [None]*(len(response_types)*len(eyes)*num_lags)
 
 ls=[]
 for e in eyes:
@@ -231,7 +233,8 @@ for e in eyes:
 es=[]
 for e in eyes:
     for n in xrange(num_lags):
-        es += [None]*(len(response_types)/2) + [e+'Retina'+str(n),None] + [None]*(len(response_types)/2)
+        es += [None]*(len(response_types)/2) + [e+'Retina'+str(n),None] + \
+              [None]*(len(response_types)/2)
 
 topo.sim.grid_layout([vs,ls,es], xstep=70/len(eyes), ystep=200, item_scale=0.75/len(eyes))
 
