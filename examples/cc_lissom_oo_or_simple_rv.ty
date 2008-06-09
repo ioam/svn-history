@@ -192,7 +192,7 @@ topo.sim.connect('LGNOff','V1Simple',delay=FixedPoint("0.05"),dest_port=('Activi
 
 topo.sim.connect('V1Simple','V1Complex',delay=FixedPoint("0.05"),
                  connection_type=CFProjection,strength=locals().get('StoCStr',3),name='V1SimpleAfferent',
-                 weights_generator=Gaussian(aspect_ratio=1.0, size=locals().get('StoCSize',0.1)),
+                 weights_generator=Gaussian(aspect_ratio=1.0, size=locals().get('StoCSize',0.15)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('StoCSize',0.1)/2),learning_rate=0)
                 
 topo.sim.connect('V1Complex','V1Simple',delay=FixedPoint("0.05"),
