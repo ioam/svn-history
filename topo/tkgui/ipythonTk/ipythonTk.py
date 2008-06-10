@@ -265,5 +265,8 @@ class IPythonTopLevel(Tkinter.Toplevel):
 
 if __name__ == "__main__":
     root = Tkinter.Tk()
+    import __main__
+    __main__.__dict__['rooot']=root
     v=IPythonTopLevel(root)
     root.mainloop()
+

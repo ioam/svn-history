@@ -199,6 +199,24 @@ def gui():
     topo.tkgui.start()
 
 
+
+###### CB: TESTING (Jun 2008)
+def start_gui_from_ide_newthread():
+    # e.g. from IDLE
+    auto_import_commands()
+    from threading import Thread
+    from topo.tkgui import start
+    t = Thread(target=start,kwargs={'mainloop':True})
+    t.start()
+
+def start_gui_from_ide(root=None):
+    # e.g. from IPython in Tkinter
+    auto_import_commands()
+    from topo.tkgui import start
+    start(mainloop=True,root=root)
+######    
+    
+
 # Topographica stays open if an error occurs after -g
 # (see comment by i_action)
 def g_action(option,opt_str,value,parser):
