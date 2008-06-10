@@ -14,7 +14,6 @@ is available at U{http://www.opensource.org/licenses/bsd-license.php}
 """
 
 import Tkinter
-import Pmw
 
 import re
 import sys
@@ -249,38 +248,22 @@ class IPythonView(TkConsoleView, IterableIPShell):
     self.showReturned(rv)
     self.cout.truncate(0)
 
-	
-class IPythonTopLevel(Pmw.MegaToplevel):
-    def __init__(self, root, banner=None,**kw):
-	    
-        # Initialise base class 
-        Pmw.MegaToplevel.__init__(self, root)
- 
-        self.title('CCP1GUI IPython Shell')
-    
-        scrollR = self.createcomponent('console-scroll-right',
-				       (),
-				       None,
-				       Tkinter.Scrollbar,
-				       self.interior()
-				       )
-	scrollR.pack(side='right',fill='y')
 
-        console = self.createcomponent('console',
-				       (),
-				       None,
-				       IPythonView,
-				       self.interior(),
-                                       banner=banner
-				       )
+class IPythonTopLevel(Tkinter.Toplevel):
+    def __init__(self, root, banner=None,**kw):
+        Tkinter.Toplevel.__init__(self,root)
+ 
+        yscroll = Tkinter.Scrollbar(self)
+        yscroll.pack(side='right',fill='y')
+
+        console = IPythonView(self)
         console.pack(fill='both')
-	
-        console.config(yscrollcommand=scrollR.set )
-	scrollR.config(command=console.yview)
-  
+
+        console.config(yscrollcommand=yscroll.set)
+        yscroll.config(command=console.yview)
+    
 
 if __name__ == "__main__":
     root = Tkinter.Tk()
     v=IPythonTopLevel(root)
-    v.show()    
     root.mainloop()
