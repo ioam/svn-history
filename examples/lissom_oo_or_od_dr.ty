@@ -69,15 +69,15 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 ###########################################
 # build simulation
 eyes=['Left', 'Right']
-response_types=['On','Off']
-num_lags=4
+center_polarities=['On','Off']
+lags=['0','1','2','3']
 speed=1.0 # Useful speeds range from 0.0 - 3.0.
 
 num_inputs=1
 input_type=Gaussian
 
 for e in eyes:
-    for n in xrange(num_lags):
+    for n in lags:
         inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
                            y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
                            orientation=0,
@@ -91,15 +91,15 @@ for e in eyes:
 
         default_retina_density=locals().get('default_retina_density',24.0)
 
-        input_moved=Sweeper(generator=copy.deepcopy(input_composite),step=n,speed=speed/24.0,
+        input_moved=Sweeper(generator=copy.deepcopy(input_composite),step=int(n),speed=speed/24.0,
                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
-        topo.sim[e+'Retina'+str(n)]=GeneratorSheet(nominal_density=default_retina_density,
+        topo.sim[e+'Retina'+n]=GeneratorSheet(nominal_density=default_retina_density,
                                                    input_generator=input_moved,
                                                    period=1.0, phase=0.05,
                                                    nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
-        for l in response_types:
-            topo.sim[e+'LGN'+l+str(n)]=CFSheet(nominal_density=24.0,
+        for l in center_polarities:
+            topo.sim[e+'LGN'+l+n]=CFSheet(nominal_density=24.0,
                                       nominal_bounds=BoundingBox(radius=0.5+0.25),
                                       output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                                       measure_maps=False)
@@ -124,20 +124,20 @@ lgn_weights['Off'] = topo.patterns.basic.Composite(
 strength=[2.33, 2.38, 2.53, 2.8] #2.33 for speed=0, 2.38 for speed=1, 2.53 for speed=2, 2.8 for speed=3 from CMVC
 
 for e in eyes:
-    for n in xrange(num_lags):
-	for l in response_types:
-		topo.sim.connect(e+'Retina'+str(n),e+'LGN'+l+str(n),delay=0.05,
+    for n in lags:
+	for l in center_polarities:
+		topo.sim.connect(e+'Retina'+n,e+'LGN'+l+n,delay=0.05,
                  		connection_type=SharedWeightCFProjection,strength=strength[int(speed)],
                  		nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                  		weights_generator=lgn_weights[l])
 
-		topo.sim.connect(e+'LGN'+l+str(n),'V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
-               	  		connection_type=CFProjection,strength=1.0,name=e+'LGN'+l+'Afferent'+str(n),
+		topo.sim.connect(e+'LGN'+l+n,'V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
+               	  		connection_type=CFProjection,strength=1.0,name=e+'LGN'+l+'Afferent'+n,
                	  		# JABALERT: Should probably simplify this by making a function for it.
                 		weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.patterns.random.UniformRandom()]),
-                 		nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590/len(response_types)/len(eyes)/num_lags)
+                 		nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags))
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
@@ -187,14 +187,14 @@ topo.sim.schedule_command( 8000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 topo.sim.schedule_command(20000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 
 ### Afferent learning rate changes
-for n in xrange(num_lags):
+for n in lags:
     for e in eyes:
-        for l in response_types:
-            S ='topo.sim["V1"].projections()["'+e+'LGN'+l+'Afferent'+str(n)+'"]'
-            topo.sim.schedule_command(  500*st,S+'.learning_rate=0.6850/len(response_types)/len(eyes)/num_lags')
-            topo.sim.schedule_command( 2000*st,S+'.learning_rate=0.5480/len(response_types)/len(eyes)/num_lags')
-            topo.sim.schedule_command( 4000*st,S+'.learning_rate=0.4110/len(response_types)/len(eyes)/num_lags')
-            topo.sim.schedule_command(20000*st,S+'.learning_rate=0.2055/len(response_types)/len(eyes)/num_lags')
+        for l in center_polarities:
+            S ='topo.sim["V1"].projections()["'+e+'LGN'+l+'Afferent'+n+'"]'
+            topo.sim.schedule_command(  500*st,S+'.learning_rate=0.6850/len(center_polarities)/len(eyes)/len(lags)')
+            topo.sim.schedule_command( 2000*st,S+'.learning_rate=0.5480/len(center_polarities)/len(eyes)/len(lags)')
+            topo.sim.schedule_command( 4000*st,S+'.learning_rate=0.4110/len(center_polarities)/len(eyes)/len(lags)')
+            topo.sim.schedule_command(20000*st,S+'.learning_rate=0.2055/len(center_polarities)/len(eyes)/len(lags)')
 
 ### Activation function threshold changes
 OF='topo.sim["V1"].output_fn'
@@ -221,20 +221,20 @@ topo.sim.schedule_command( 6500*st,'topo.sim["V1"].tsettle=12')
 topo.sim.schedule_command( 8000*st,'topo.sim["V1"].tsettle=13')
 
 # default locations for model editor
-vs=[None]*(len(response_types)*len(eyes)*num_lags-1) + ['V1'] + \
-   [None]*(len(response_types)*len(eyes)*num_lags)
+vs=[None]*(len(center_polarities)*len(eyes)*len(lags)-1) + ['V1'] + \
+   [None]*(len(center_polarities)*len(eyes)*len(lags))
 
 ls=[]
 for e in eyes:
-    for n in xrange(num_lags):
-        for l in response_types:
-            ls += [e+'LGN'+l+str(n),None]
+    for n in lags:
+        for l in center_polarities:
+            ls += [e+'LGN'+l+n,None]
 
 es=[]
 for e in eyes:
-    for n in xrange(num_lags):
-        es += [None]*(len(response_types)/2) + [e+'Retina'+str(n),None] + \
-              [None]*(len(response_types)/2)
+    for n in lags:
+        es += [None]*(len(center_polarities)/2) + [e+'Retina'+n,None] + \
+              [None]*(len(center_polarities)/2)
 
 topo.sim.grid_layout([vs,ls,es], xstep=70/len(eyes), ystep=200, item_scale=0.75/len(eyes))
 
