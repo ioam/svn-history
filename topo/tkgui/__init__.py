@@ -124,7 +124,7 @@ else:
 
 # gets set to the TopoConsole instance created by start.
 console = None
-def start(mainloop=False,banner=True):
+def start(mainloop=False,banner=True,root=None):
     """
     Start Tk and read in an options_database file (if present), then
     open a TopoConsole.
@@ -150,7 +150,8 @@ def start(mainloop=False,banner=True):
     # TopoConsole itself be a subclass of Tk would make sense - since
     # it is the main application window - but then we could not have a
     # hierarchy in which all windows are given some common properties.
-    root = Tkinter.Tk()
+    if root is None:
+        root = Tkinter.Tk()
     root.withdraw()
 
     root.menubar = ControllableMenu(root)
