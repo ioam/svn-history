@@ -11,7 +11,7 @@ __version__='$Revision$'
 
 from optparse import OptionParser
 
-import sys, __main__, math, os, re, traceback
+import sys, __main__, math, os, re
 
 import topo
 
