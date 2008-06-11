@@ -204,7 +204,7 @@ class PatternPresenter(ParameterizedObject):
         wipe_out_activity()
         
         for sheet in topo.sim.objects(Sheet).values():
-            if hasattr(sheet,'contFlag'):
+            if hasattr(sheet,'old_a'):
                sheet.old_a *= 0
         
         topo.sim.event_clear(EPConnectionEvent)
@@ -213,7 +213,7 @@ class PatternPresenter(ParameterizedObject):
                      apply_output_fn=self.apply_output_fn)
 
         for sheet in topo.sim.objects(Sheet).values():
-            if hasattr(sheet,'contFlag'):
+            if hasattr(sheet,'old_a'):
                sheet.old_a *= 0 
 
 
