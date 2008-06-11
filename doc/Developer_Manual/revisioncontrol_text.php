@@ -10,8 +10,15 @@ working with the latest code.
 summarizing the items changed in easily understandable terms, and
 avoiding pejorative language (i.e. comments like "Lord only knows what
 idiot coded it that way!"). If possible (e.g. when adding a feature or
-fixing a bug), try to link the commit log message to one of the
-sf.net tracker IDs (and vice versa).
+fixing a bug), try to link the commit log message to one of the sf.net
+tracker IDs (and mention the revision number that fixed the bug when
+closing it on sf.net).  When describing the changes, it is crucial to
+examine every line produced by <CODE>svn diff</CODE> to verify that
+only intentional changes (and not stray characters or temporary
+changes) are checked in, and that the log message covers all the
+important changes.  You should also do <CODE>svn status</CODE> to make
+sure that you don't have any important files not yet checked into SVN,
+as <CODE>svn diff</CODE> will not report these.
 
 <P>If so many items were changed that any single log message would
 have to be very general (e.g. "Misc changes to many files"), then
@@ -19,7 +26,7 @@ please check in smaller groups of files, each with a meaningful log
 message. Using smaller,
 meaningful chunks also makes debugging much easier later, allowing the
 source of a new bug to be tracked down to a small, understandable set
-of changes.  Conversely, if the same trivial changes were made to a
+of related changes.  Conversely, if the same trivial changes were made to a
 large group of files, please check in all of those at once, with the
 same log message, so that it will be clear that they go together.
 
@@ -102,8 +109,8 @@ Makefile = svn:eol-style=native;svn:keywords="Author Date Id Revision"
 *.jpg = svn:mime-type=image/jpeg
 </pre>
 
-<p>You may also need to set "enable-auto-props yes", if your config file
-has auto-props disabled by default.
+<p>You will usually also need to set "enable-auto-props yes", as the 
+config file usually has auto-props disabled by default.
 
 <!-- .cvsignore -> svn property on directory; document -->
 
