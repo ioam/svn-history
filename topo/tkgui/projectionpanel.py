@@ -259,7 +259,7 @@ class PlotMatrixPanel(ProjectionSheetPanel):
     
 class RFProjectionPanel(PlotMatrixPanel):
 
-    sheet_type = GeneratorSheet
+    sheet_type = ProjectionSheet
 
     def __init__(self,master,plotgroup,**params):
         super(RFProjectionPanel,self).__init__(master,plotgroup,**params)
@@ -274,7 +274,7 @@ class RFProjectionPanel(PlotMatrixPanel):
         self.populate_input_sheet_param()
 
     def populate_input_sheet_param(self):
-        sheets = topo.sim.objects(self.sheet_type).values()
+        sheets = topo.sim.objects(GeneratorSheet).values()
         self.plotgroup.params()['input_sheet'].objects = sheets
         self.plotgroup.input_sheet=sheets[0]
 
