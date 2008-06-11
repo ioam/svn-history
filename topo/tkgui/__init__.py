@@ -124,7 +124,7 @@ else:
 
 # gets set to the TopoConsole instance created by start.
 console = None
-def start(mainloop=False,banner=True,root=None):
+def start(mainloop=False,banner=True,root=None,console_has_console=False):
     """
     Start Tk and read in an options_database file (if present), then
     open a TopoConsole.
@@ -169,8 +169,9 @@ def start(mainloop=False,banner=True,root=None):
         print "Read options database from",options_database
     except Tkinter.TclError:
         pass
-    
-    topoconsole = TopoConsole(root)
+
+    # CEBALERT: console_has_console is a temporary hack
+    topoconsole = TopoConsole(root,console=console_has_console)
     console = topoconsole
 
     # Provide a way for other code to access the GUI when necessary
@@ -193,7 +194,7 @@ def start(mainloop=False,banner=True,root=None):
     # Without this line the command-line remains responsive.
     if mainloop: root.mainloop()
 
-    return topoconsole
+    return root
 
 
 

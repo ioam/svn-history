@@ -189,14 +189,15 @@ topo_parser.add_option("-i","--interactive",action="callback",callback=i_action,
                        dest="interactive",default=False,
                        help="provide an interactive prompt even if stdin does not appear to be a terminal.")
 
-def gui():
+def gui(start=True):
     """Start the GUI as if -g were supplied in the command used to launch Topographica."""
     if matplotlib_imported: 
         from matplotlib import rcParams
         rcParams['backend']='TkAgg'
     auto_import_commands()
-    import topo.tkgui
-    topo.tkgui.start()
+    if start:
+        import topo.tkgui
+        topo.tkgui.start()
 
 
 
@@ -224,12 +225,25 @@ def g_action(option,opt_str,value,parser):
     boolean_option_action(option,opt_str,value,parser)
     interactive()
     gui()
-    
-    
+
+
 topo_parser.add_option("-g","--gui",action="callback",callback=g_action,dest="gui",default=False,help="""\
 launch an interactive graphical user interface; \
 equivalent to -c 'from topo.misc.commandline import gui ; gui()'. \
 Implies -a.""")
+
+
+def G_action(option,opt_str,value,parser):
+    """Callback function for the -mg option."""
+    boolean_option_action(option,opt_str,value,parser)
+    interactive()
+    gui(start=False)
+
+
+topo_parser.add_option("-G","--more_gui",action="callback",callback=G_action,dest="more_gui",default=False,help="""\
+EXPERIMENTAL: launch a more interactive graphical user interface...; \
+Implies -a.""")
+
 
 
 # Keeps track of whether something has been performed, when deciding whether to assume -i
@@ -372,7 +386,23 @@ def process_argv(argv):
 
     ## INTERACTIVE SESSION BEGINS HERE (i.e. can't have anything but
     ## some kind of cleanup code afterwards)
-    if os.environ.get('PYTHONINSPECT'):
+    if option.more_gui:
+        from topo.tkgui.ipythonTk.ipythonTk import IPythonTopLevel
+        from topo.tkgui import start
+
+        # CB: also need to redirect messages from the standard console
+        # to the graphical console
+        
+        # Stop IPython namespace hack?
+        # http://www.nabble.com/__main__-vs-__main__-td14606612.html
+        __main__.__name__="__mynamespace__"
+
+        root = start(console_has_console=True)
+        topo.guimain.title(topo.sim.name)
+        root.mainloop()
+
+
+    elif os.environ.get('PYTHONINSPECT'):
         print BANNER    
         # CB: should probably allow a way for users to pass things to
         # IPython? Or at least set up some kind of topographica ipython
