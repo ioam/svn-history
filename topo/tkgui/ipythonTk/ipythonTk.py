@@ -219,11 +219,12 @@ class TkConsoleView(Tkinter.Text):
     return "break"
 
 class IPythonView(TkConsoleView, IterableIPShell):
-  def __init__(self,root,banner=None):
+    # CB: use **kw?
+  def __init__(self,root,banner=None,user_ns=None):
     TkConsoleView.__init__(self,root)
     self.cout = StringIO()
     IterableIPShell.__init__(self, cout=self.cout,cerr=self.cout,
-                             input_func=self.raw_input)
+                             input_func=self.raw_input,user_ns=user_ns)
     
     if banner:
       self.showBanner(banner)
