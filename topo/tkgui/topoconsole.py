@@ -770,12 +770,8 @@ class ProgressWindow(ProgressController,tk.AppWindow):
 
         self.protocol("WM_DELETE_WINDOW",self.set_stop)
         name = title or topo.sim.name
-        if name:
-            name+=": "
-        else:
-            name=""
+        self.title((name+": " if name else "") + self.timer.func.__name__)
         
-        self.title(name+self.timer.func.__name__)
         self.balloon = tk.Balloon(self)
 
         progress_bar = Progressbar(self,#type="normal",
