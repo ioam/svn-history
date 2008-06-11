@@ -200,7 +200,7 @@ class DockManager(Tile.Notebook):
 
 
 
-from topo.tkgui.ipythonTk.ipythonTk import IPythonView
+from topo.ipythonTk.ipythonTk import IPythonView
 class IPythonInAFrame(Frame):
     def __init__(self, root, banner=None, user_ns=None,**kw):
         Frame.__init__(self,root)

@@ -387,7 +387,6 @@ def process_argv(argv):
     ## INTERACTIVE SESSION BEGINS HERE (i.e. can't have anything but
     ## some kind of cleanup code afterwards)
     if option.more_gui:
-        from topo.tkgui.ipythonTk.ipythonTk import IPythonTopLevel
         from topo.tkgui import start
 
         # CB: also need to redirect messages from the standard console
