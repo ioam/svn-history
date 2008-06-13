@@ -30,6 +30,8 @@ from topo.misc.numbergenerators import UniformRandom, BoundedNumber, Exponential
 from topo.patterns.basic import Gaussian
 from topo.learningfns.projfns import CFPLF_Trace
 from topo.base.functionfamilies import CoordinateMapperFn
+from contrib.jacommands import randomize_V1Simple_relative_LGN_strength
+
 
 topo.sim.name = "CCSimple"
 
@@ -251,13 +253,11 @@ def secondStage():
     topo.sim['FakeRetina2'].set_input_generator(zeroInput)
     topo.sim['LGNOn'].in_connections[0].strength=0
     topo.sim['LGNOff'].in_connections[0].strength=0
+    
     topo.sim['V1Simple'].in_connections[0].learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
                                							  ExponentialDecay(starting_value = locals().get('SSS_lr',0.3),
                                                           time_fn=offset_tf,time_constant=locals().get('S_tc',3200))))
-    topo.sim['V1Simple'].in_connections[1].learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                               							  ExponentialDecay(starting_value = locals().get('SSS_lr',0.3),
-                                                          time_fn=offset_tf,time_constant=locals().get('S_tc',3200))))
-
-	from contrib.jacommands import randomize_V1Simple_relative_LGN_strength
-	randomize_V1Simple_relative_LGN_strength()
+    
+    topo.sim['V1Simple'].in_connections[1].learning_rate=(BoundedNumber(bounds=(0.137,None),generator=ExponentialDecay(starting_value = locals().get('SSS_lr',0.3),time_fn=offset_tf,time_constant=locals().get('S_tc',3200))))
+    randomize_V1Simple_relative_LGN_strength()
 
