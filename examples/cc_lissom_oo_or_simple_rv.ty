@@ -227,16 +227,14 @@ topo.sim.connect('V1Complex','V1Complex',delay=FixedPoint("0.05"),name='LateralI
 OF = "topo.sim['V1Complex'].output_fn"
 
 topo.sim.schedule_command(5000,"secondStage()")
-topo.sim.schedule_command(8001,OF+".r=12;"+ OF + ".k=-3.8")
-topo.sim.schedule_command(9000,OF+".r=9;"+ OF + ".k=-3.6")
-topo.sim.schedule_command(10000,OF+".r=7;"+ OF + ".k=-3.4")
-topo.sim.schedule_command(11000,OF+".r=5;"+ OF + ".k=-3.2")
-topo.sim.schedule_command(12000,OF+".r=4;"+ OF + ".k=-3.0")
-topo.sim.schedule_command(13000,OF+".r=3;"+ OF + ".k=-2.5")
+
+
+topo.sim.schedule_command(8100,OF+".r=8;"+ OF + ".k=-5")
 
 
 def offset_tf():
 	return topo.sim.time()-5000
+
 
 def secondStage():
     topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
@@ -260,5 +258,6 @@ def secondStage():
                                							  ExponentialDecay(starting_value = locals().get('SSS_lr',0.3),
                                                           time_fn=offset_tf,time_constant=locals().get('S_tc',3200))))
 
-
+	from contrib.jacommands import randomize_V1Simple_relative_LGN_strength
+	randomize_V1Simple_relative_LGN_strength()
 
