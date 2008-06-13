@@ -437,3 +437,28 @@ def save_movie():
     # Save the frames to files:
     print 'Saving movie to %s...' % ActivityMovie.filename_prefix
     movie.save()
+    
+def randomize_V1Simple_relative_LGN_strength():
+    lgn_on_proj =  topo.sim["V1Simple"].in_connections[0]
+    lgn_off_proj = topo.sim["V1Simple"].in_connections[1]
+    
+    rand = UniformRandom()
+    
+    rows,cols = lgn_on_proj.cfs.shape
+    for r in xrange(rows):
+        for c in xrange(cols):
+            print r,c
+            cf_on = lgn_on_proj.cfs[r,c]
+            cf_off = lgn_off_proj.cfs[r,c]
+            
+            cf_on._has_norm_total=False
+            cf_off._has_norm_total=False
+
+            ra = rand()
+            a = 0.1
+            if ra>=0.5: a = 0.9
+            
+            cf_on.weights*=a 
+            cf_off.weights*=(1-a)
+  
+    
