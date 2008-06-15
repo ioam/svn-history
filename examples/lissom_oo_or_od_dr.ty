@@ -1,5 +1,5 @@
 """
-Example of a LISSOM-based orientation,direction and ocular dominance map.
+Example of a LISSOM-based orientation, direction and ocular dominance map.
 
 Intended to be a close (but approximate) match to the joint map
 simulation from figure 5.29 of Miikkulainen, Bednar, Choe, and Sirosh
@@ -68,10 +68,18 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
 ###########################################
 # build simulation
-eyes=['Left', 'Right']
 center_polarities=['On','Off']
-lags=['0','1','2','3']
-speed=1.0 # Useful speeds range from 0.0 - 3.0.
+eyes=['']
+lags=['']
+speed=0.0
+
+dims=locals().get('dims',['or','od','dr'])
+
+if 'od' in dims: eyes=['Left', 'Right']
+
+if 'dr' in dims: 
+    lags=['0','1','2','3']
+    speed=1.0 # Useful speeds range from 0.0 - 3.0.
 
 num_inputs=1
 input_type=Gaussian
@@ -80,7 +88,7 @@ for e in eyes:
     for n in lags:
         inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
                            y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
-                           orientation=0,
+                           orientation=0 if n != '' else UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
                            size=0.088388, aspect_ratio=4.66667,
                            scale=         2.0-UniformRandom(lbound=0,ubound=2,seed=78+i) \
                            if e=='Right' else UniformRandom(lbound=0,ubound=2,seed=78+i),
@@ -91,8 +99,10 @@ for e in eyes:
 
         default_retina_density=locals().get('default_retina_density',24.0)
 
-        input_moved=Sweeper(generator=copy.deepcopy(input_composite),step=int(n),speed=speed/24.0,
-                      orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
+        if n != '':
+            input_moved=Sweeper(generator=copy.deepcopy(input_composite),step=int(n),speed=speed/24.0,
+                                orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
+        else: input_moved=input_composite
 
         topo.sim[e+'Retina'+n]=GeneratorSheet(nominal_density=default_retina_density,
                                                    input_generator=input_moved,
