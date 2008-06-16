@@ -9,6 +9,16 @@ from sys import argv
 #logfile = 'LOG'
 script = "lissom_oo_or.ty"
 
+#CB: approx for now
+annotations = {
+    (8100,66.5):((0,0),"A"),
+    (8600,58):((0,4),"B"),
+    (8250,53.5):((0,0),"C"),
+    (8395,54.3):((20,-2),"D"),
+    (8100,56.5):((-20,-2),"E"),
+    (8425,55):((0,2),"F")
+    }
+
 
 V=re.compile(r'[0-9]*-log')
 def get_build_no(logfilename):
@@ -230,9 +240,12 @@ def plot_startups():
 
 import matplotlib;matplotlib.use('Agg')    
 
+def sgn(x):
+    return +1 if x>=0.0 else -1
+
 def plott(t,tytle,filename):
 
-    from pylab import title,xlabel,ylabel,savefig,figure
+    from pylab import title,xlabel,ylabel,savefig,figure,annotate
     
     builds=[]
     versions=[]
@@ -252,6 +265,19 @@ def plott(t,tytle,filename):
     title(tytle)
     xlabel("svnversion")
     ylabel("time /s")
+
+    for k,v in annotations.items():
+        if v[0]==(0,0):
+            arrowprops=None
+        else:
+            arrowprops={'width':0.25,'frac':0.05,'headwidth':5}
+        
+        #CEBALERT:necessary cos of bug in matplotlib where arrow can\t be vertical or horizontal?
+        xshift=sgn(v[0][0])*max(abs(v[0][0]),0.01)
+        yshift=sgn(v[0][1])*max(abs(v[0][1]),0.01)
+
+        annotate(v[1],k,xytext=(k[0]+xshift,k[1]+yshift),arrowprops=arrowprops)
+
     savefig(filename+"_svnversion.png")
 
     figure()
@@ -260,6 +286,7 @@ def plott(t,tytle,filename):
     title("lissom_oo_or.ty, 250 iterations")
     xlabel("build")
     ylabel("time /s")
+
     savefig(filename+"_buildno.png")
 
 
