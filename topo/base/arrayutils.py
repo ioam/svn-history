@@ -142,6 +142,11 @@ def wrap(lower, upper, x):
 
 
 # There might already be a function for this in Numpy...
+# CB: there isn't, but this method is listed at
+# http://www.scipy.org/PerformanceTips:
+## def min_ij(x):
+##     i, j = divmod(x.argmin(), x.shape[1])
+##     return i, j
 def array_argmax(mat):
     "Returns the coordinates of the maximum element in the given matrix."
     rows,cols = mat.shape # pylint: disable-msg=W0612
