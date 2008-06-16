@@ -33,7 +33,8 @@ development and for reproducing published figures is also available.
 Not yet fully tested.
 $Id$
 
-""" __version__='$Revision$'
+"""
+__version__='$Revision$'
 
 import fixedpoint
 import numpy
