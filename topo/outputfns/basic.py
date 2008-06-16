@@ -658,10 +658,6 @@ class HomeostaticMaxEnt(OutputFnWithState):
     http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc431.htm
     """
 
-    a_init = Number(default=13,doc="Multiplicative parameter controlling the exponential.")
-    
-    b_init = Number(default=-4,doc="Additive parameter controlling the exponential.")
-    
     eta = Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
     
     mu = Number(default=0.01,doc="Target average firing rate.")
@@ -679,15 +675,22 @@ class HomeostaticMaxEnt(OutputFnWithState):
         super(HomeostaticMaxEnt,self).__init__(**params)
 	self.first_call = True
 	self.n_step=0
-      
+        self.a_init = params.get('a_init', None)
+        self.b_init = params.get('a_init', None)
 
     def __call__(self,x):
 
       
 	if self.first_call:
 	    self.first_call = False
-	    self.a = ones(x.shape, x.dtype.char) * self.a_init
-	    self.b = ones(x.shape, x.dtype.char) * self.b_init
+            if self.a_init==None:
+                self.a = numpy.random.uniform(low=10, high=20,size=x.shape)
+            else:
+                self.a = ones(x.shape, x.dtype.char) * self.a_init
+            if self.b_init==None:
+                self.b = numpy.random.uniform(low=-8.0, high=-4.0,size=x.shape)
+            else:
+                self.b = ones(x.shape, x.dtype.char) * self.b_init
 	    self.y_avg = zeros(x.shape, x.dtype.char) 
 
 	# Apply sigmoid function to x, resulting in what Triesch calls y
