@@ -1,10 +1,21 @@
 """
 Example of a LISSOM-based orientation, direction and ocular dominance map.
+Direction and ocular dominance dimensions can be turned on and off. E.g.:
+ - To get OR map: ./topographica -c "dims=['or']" examples/lissom_oo_or_od_dr.ty
+ - To get OR/DR map: ./topographica -c "dims=['or','dr']" examples/lissom_oo_or_od_dr.ty
+ - To get OR/OD map: ./topographica -c "dims=['or','od']" examples/lissom_oo_or_od_dr.ty
+ - To get OR/OD/DR map (dafault option): ./topographica -c "dims=['or','od','dr']" examples/lissom_oo_or_od_dr.ty
 
-Intended to be a close (but approximate) match to the joint map
-simulation from figure 5.29 of Miikkulainen, Bednar, Choe, and Sirosh
-(2005), Computational Maps in the Visual Cortex, Springer.  Known
-differences include:
+Intended to be a close (but approximate) match to the various map 
+simulations in chapter 5 of Miikkulainen, Bednar, Choe, and Sirosh 
+(2005), Computational Maps in the Visual Cortex, Springer
+Specifically:
+    dims=["or"]:           Figure 5.9
+    dims=["or","dr"]:      Figure 5.23
+    dims=["or","od"]:      Figure 5.27
+    dims=["or","od","dr"]: Figure 5.29
+
+Known differences include:
 
  - The default_density is smaller for practicality (142 in the book).
  - The matching is not yet perfect at different densities
