@@ -55,7 +55,7 @@ class JointScaling_lronly(LISSOM):
         super(JointScaling_lronly,self).__init__(**params)
         self.lr_x_avg=None
         self.lr_sf=None
-                
+        self.__current_state_stack=[]        
 
     def calculate_joint_sf(self, joint_total):
         """
@@ -130,6 +130,15 @@ class JointScaling_lronly(LISSOM):
           
         self.send_output(src_port='Activity',data=self.activity)
 
+    def state_push(self,**args):
+        super(JointScaling_lronly,self).state_push(**args)
+        self.__current_state_stack.append((copy.copy(self.lr_x_avg),copy.copy(self.lr_sf)))
+        
+        
+
+    def state_pop(self,**args):
+        super(JointScaling_lronly,self).state_pop(**args)
+        self.lr_x_avg, self.lr_sf=self.__current_state_stack.pop()
        
 class JointScaling_affonly(LISSOM):
     """
@@ -159,7 +168,7 @@ class JointScaling_affonly(LISSOM):
         self.x_avg=None
         self.sf=None
         self.scaled_x_avg=None
-
+        self.__current_state_stack=[] 
 
     def calculate_joint_sf(self, joint_total):
         """
@@ -232,6 +241,29 @@ class JointScaling_affonly(LISSOM):
            
           
         self.send_output(src_port='Activity',data=self.activity)
+
+
+
+    def state_push(self,**args):
+        super(JointScaling_affonly,self).state_push(**args)
+        self.__current_state_stack.append((copy.copy(self.x_avg),copy.copy(self.scaled_x_avg),
+                                           copy.copy(self.sf)))
+        
+        
+
+    def state_pop(self,**args):
+        super(JointScaling_affonly,self).state_pop(**args)
+        self.x_avg,self.scaled_x_avg, self.sf =self.__current_state_stack.pop()
+
+
+
+
+
+
+
+
+
+
 
 #############################################################################
 #Functions for analysis#####################################################
@@ -323,7 +355,7 @@ class StoreStability(ParameterizedObject):
 
 
 # Used by homeostatic analysis function
-default_analysis_plotgroups=["Activity", "Orientation Preference"]
+default_analysis_plotgroups=["Activity"]
 Selectivity=StoreMedSelectivity()
 Stability=StoreStability()
 
@@ -344,7 +376,7 @@ def homeostatic_analysis_function():
     from topo.commands.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
     from topo.sheets.generatorsheet import GeneratorSheet
-    from topo.patterns.basic import Gaussian
+    from topo.patterns.basic import Gaussian, SineGrating
     from topo.commands.basic import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent
 
@@ -368,6 +400,56 @@ def homeostatic_analysis_function():
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p)
 
+    #present a pattern without plasticity to ensure that values are initialized at t=0
+    pattern_present(inputs={"Retina":SineGrating()},duration=1.0,
+                    plastic=False,apply_output_fn=True,overwrite_previous=False)        
+
+   
+
+    topo.sim["V1"].state_push()
+    topo.sim["V1"].output_fn.state_push()
+     
+
+    if __main__.__dict__['scaling'] == True:
+        if topo.sim["V1"].sf==None:
+            pass
+        else:
+            topo.sim["V1"].sf *=0.0
+            topo.sim["V1"].sf +=1.0
+            
+    if __main__.__dict__['tracking'] == True:
+        topo.sim["V1"].output_fn.output_fns[1].a *=0.0
+        topo.sim["V1"].output_fn.output_fns[1].b *=0.0
+        topo.sim["V1"].output_fn.output_fns[1].a +=12.0
+        topo.sim["V1"].output_fn.output_fns[1].b +=-5.0
+
+    else:
+        topo.sim["V1"].output_fn.a *=0.0
+        topo.sim["V1"].output_fn.b *=0.0
+        topo.sim["V1"].output_fn.a +=12.0
+        topo.sim["V1"].output_fn.b +=-5.0
+        
+
+    if __main__.__dict__['changestrength']==True:
+        topo.sim["LGNOn"].projections()["Afferent"].strength=2.33
+        topo.sim["LGNOff"].projections()["Afferent"].strength=2.33
+            
+
+    save_plotgroup("Orientation Preference")
+
+    
+
+    #Restore original values
+    topo.sim["V1"].state_pop()
+    topo.sim["V1"].output_fn.state_pop()
+
+    if __main__.__dict__['changestrength']==True:
+        topo.sim["LGNOn"].projections()["Afferent"].strength=__main__.__dict__['new_strength']
+        topo.sim["LGNOff"].projections()["Afferent"].strength=__main__.__dict__['new_strength']
+
+    
+    
+     
     Selectivity("V1", "Selectivity", 0, topo.sim.time())
     Stability("V1", "Stability", 0, topo.sim.time())
     #Uncomment to present and record the response to a single gaussian
