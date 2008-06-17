@@ -259,6 +259,6 @@ def secondStage():
                                                           time_fn=offset_tf,time_constant=locals().get('S_tc',3200))))
     
     topo.sim['V1Simple'].in_connections[1].learning_rate=(BoundedNumber(bounds=(0.137,None),generator=ExponentialDecay(starting_value = locals().get('SSS_lr',0.3),time_fn=offset_tf,time_constant=locals().get('S_tc',3200))))
-    topo.sim['V1Complex'].in_connections[0].learning_rate=1.0
+    topo.sim['V1Complex'].in_connections[0].learning_rate=locals().get('SSC_lr',0.0)
     randomize_V1Simple_relative_LGN_strength()
 
