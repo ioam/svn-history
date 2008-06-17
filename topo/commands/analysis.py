@@ -118,8 +118,13 @@ class PatternPresenter(ParameterizedObject):
             orientation = features_values['direction']+pi/2            
             from topo.patterns.basic import Sweeper            
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
-                inputs[name] = Sweeper(generator=inputs[name],step=int(name[-1]),speed=features_values['speed'])
-                setattr(inputs[name],'orientation',orientation)
+                try: 
+                    int(name[-1])
+                    inputs[name] = Sweeper(generator=inputs[name],step=int(name[-1]),speed=features_values['speed'])
+                    setattr(inputs[name],'orientation',orientation)
+                except:
+                    self.warning('Direction is defined only when there are different input lags (numbered at the end of their name).')
+
                             
 
         if features_values.has_key("phasedisparity"):
