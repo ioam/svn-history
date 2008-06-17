@@ -9,6 +9,7 @@ import numpy.oldnumeric as Numeric
 import numpy
 from numpy import abs,zeros,ones
 import topo
+import copy
 
 from topo.base.functionfamilies import OutputFn
 from topo.base.cf import CFSheet, CFPOutputFn
@@ -321,7 +322,7 @@ class JointScaling(LISSOM):
         self.sf=None
         self.lr_sf=None
         self.scaled_x_avg=None
-
+        self.__current_state_stack=[]
 
     def calculate_joint_sf(self, joint_total):
         """
@@ -401,3 +402,15 @@ class JointScaling(LISSOM):
             self.output_fn(self.activity)
           
         self.send_output(src_port='Activity',data=self.activity)
+
+
+    def state_push(self,**args):
+        super(JointScaling,self).state_push(**args)
+        self.__current_state_stack.append((copy.copy(self.x_avg),copy.copy(self.scaled_x_avg),
+                                           copy.copy(self.sf), copy.copy(self.lr_sf)))
+        
+        
+
+    def state_pop(self,**args):
+        super(JointScaling,self).state_pop(**args)
+        self.x_avg,self.scaled_x_avg, self.sf, self.lr_sf=self.__current_state_stack.pop()
