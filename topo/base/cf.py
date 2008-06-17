@@ -585,9 +585,9 @@ class CFProjection(Projection):
         the cf_shape is used. In normal usage of Topographica, this parameter should
         remain True.""")
     
-    apply_output_fn_init=BooleanParameter(default=True,
-        doc="""This flag determines whether connection fields will get normalised 
-            during initialization of the Projection sheet.""")
+    apply_output_fn_init=BooleanParameter(default=True,doc="""
+        Whether to apply the output function to connection fields (e.g. for 
+        normalization) when the CFs are first created.""")
 
 
     def __init__(self,initialize_cfs=True,**params):
