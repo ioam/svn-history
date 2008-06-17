@@ -24,7 +24,6 @@ $Id: lissom_oo_or_homeostatic.ty 8197 2008-03-14 11:03:24Z judelaw $
 """
 __version__='$Revision: 8197 $'
 
-import fixedpoint
 import numpy
 
 from math import pi, sqrt

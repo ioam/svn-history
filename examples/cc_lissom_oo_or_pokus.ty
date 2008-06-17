@@ -7,7 +7,6 @@ __version__='$Revision: 8147 $'
 
 
 import numpy
-import fixedpoint
 
 from math import pi, sqrt
 
