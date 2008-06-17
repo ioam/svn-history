@@ -224,12 +224,14 @@ topo.sim.connect('V1Complex','V1Complex',delay=0.05,name='LateralInhibitory',
                  nominal_bounds_template=BoundingBox(radius=0.22917),
                  learning_rate=0)
 
-OF = "topo.sim['V1Complex'].output_fn"
+OFComplex = "topo.sim['V1Complex'].output_fn"
+OFSimple = "topo.sim['V1Simple'].output_fn"
 
 topo.sim.schedule_command(5000,"secondStage()")
 
 
-topo.sim.schedule_command(8100,OF+".r=8;"+ OF + ".k=-5")
+topo.sim.schedule_command(8100,OFComplex+".r=8;"+ OF + ".k=-5.5")
+topo.sim.schedule_command(8100,OFSimple+".k=-10.5;")
 
 
 def offset_tf():
@@ -257,5 +259,6 @@ def secondStage():
                                                           time_fn=offset_tf,time_constant=locals().get('S_tc',3200))))
     
     topo.sim['V1Simple'].in_connections[1].learning_rate=(BoundedNumber(bounds=(0.137,None),generator=ExponentialDecay(starting_value = locals().get('SSS_lr',0.3),time_fn=offset_tf,time_constant=locals().get('S_tc',3200))))
+    topo.sim['V1Complex'].in_connections[0].learning_rate=1.0
     randomize_V1Simple_relative_LGN_strength()
 
