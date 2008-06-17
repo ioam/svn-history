@@ -119,7 +119,6 @@ class PatternPresenter(ParameterizedObject):
             from topo.patterns.basic import Sweeper            
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
                 try: 
-                    int(name[-1])
                     inputs[name] = Sweeper(generator=inputs[name],step=int(name[-1]),speed=features_values['speed'])
                     setattr(inputs[name],'orientation',orientation)
                 except:
