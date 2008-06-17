@@ -481,7 +481,7 @@ class OutputFnWithState(OutputFn):
         """
         self.plastic = self._plasticity_setting_stack.pop()                        
 
-
+        
 
 class AttributeTrackingOF(OutputFnWithState):
     """
@@ -676,7 +676,9 @@ class HomeostaticMaxEnt(OutputFnWithState):
 	self.first_call = True
 	self.n_step=0
         self.a_init = params.get('a_init', None)
-        self.b_init = params.get('a_init', None)
+        self.b_init = params.get('b_init', None)
+        self.__current_state_stack=[]
+       
 
     def __call__(self,x):
 
@@ -709,9 +711,22 @@ class HomeostaticMaxEnt(OutputFnWithState):
 		# Update a and b
 		self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
 		self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
+
+    def state_push(self):
+        """
+        Save the current state of the output function to an internal stack.
+        """
+        self.__current_state_stack.append((copy.copy(self.a), copy.copy(self.b), copy.copy(self.y_avg)))
+
+    def state_pop(self):
+        """
+        Pop the most recently saved state off the stack.
+        
+        See state_push() for more details.
+        """
+        self.a, self.b, self.y_avg =  self.__current_state_stack.pop()
+
                 
-
-
 class CascadeHomeostatic(OutputFnWithState):
     """
     """
