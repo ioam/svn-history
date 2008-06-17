@@ -102,6 +102,25 @@ class PipelineOF(OutputFn):
             if hasattr(of,"restore_plasticity_state"):
                 of.restore_plasticity_state()
 
+    def state_push(self):
+        """
+        Calls state_push on every output_fn
+        in the list that defines that method.
+        """
+        for of in self.output_fns:
+            if hasattr(of,"state_push"):
+                of.state_push()
+
+    def state_pop(self):
+        """
+        Calls state_pop every output_fn
+        in the list that defines that method.
+        """
+        for of in self.output_fns:
+            if hasattr(of,"state_pop"):
+                of.state_pop()
+
+
 
     # We don't use norm_value ourselves, so if someone asks for it,
     # return an underlying value from self.output_fns.  Only in the
