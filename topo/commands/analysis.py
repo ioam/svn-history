@@ -64,7 +64,12 @@ class Feature(object):
 
 
 
-
+# CEBALERT: apart from any significant changes, this class needs minor
+# cleanups. For instance: __init__ doesn't call the superclass's
+# __init__ (is that why the line
+# 'self.contrast_parameter=params.get...'  has been put in?);
+# "x.haskey('y')" is going to disappear from python, I think, and
+# anyway "'y' in x" is clearer. There might also be other things.
 class PatternPresenter(ParameterizedObject):
     """
     Function object for presenting PatternGenerator-created patterns.
