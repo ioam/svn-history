@@ -230,7 +230,7 @@ OFSimple = "topo.sim['V1Simple'].output_fn"
 topo.sim.schedule_command(5000,"secondStage()")
 
 
-topo.sim.schedule_command(8100,OFComplex+".r=8;"+ OFComplex + ".k=-5.5")
+topo.sim.schedule_command(8100,OFComplex+".r=6;"+ OFComplex + ".k=-4")
 topo.sim.schedule_command(8100,OFSimple+".k=-10.5;")
 
 
