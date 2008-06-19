@@ -99,11 +99,12 @@ input_type=topo.patterns.image.FileImage
 for e in eyes:
     for n in lags:
         image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
-        inputs=[input_type(filename=f,
-                       size_normalization='original',#(size=10.0)
+        inputs=[input_type(filename=f, size_normalization='original',#(size=10.0)
                        x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
                        y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
-                       orientation=0 if n != '' else UniformRandom(lbound=-pi,ubound=pi,seed=56))
+                       orientation=0 if n != '' else UniformRandom(lbound=-pi,ubound=pi,seed=56),
+                       scale=         2.0-UniformRandom(lbound=0,ubound=2,seed=78) \
+                       if e=='Right' else UniformRandom(lbound=0,ubound=2,seed=78))
 		for f in image_filenames]
         input_composite=topo.patterns.basic.Selector(generators=inputs)
 
