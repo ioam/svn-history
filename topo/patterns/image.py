@@ -12,7 +12,7 @@ from numpy.oldnumeric import array, Float, sum, ravel, ones
 
 from topo.base.boundingregion import BoundingBox
 from topo.base.parameterclasses import Number, Parameter, Enumeration, Integer,\
-     ClassSelectorParameter
+     ClassSelectorParameter, BooleanParameter
 from topo.base.parameterclasses import StringParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGenerator
@@ -275,13 +275,17 @@ class GenericImage(PatternGenerator):
         How to scale the initial image size relative to the default area of 1.0.""")
 
     whole_image_output_fn = ClassSelectorParameter(
-        OutputFn,default=DivisiveNormalizeLinf(),
-        precedence=0.96,doc="""
+        OutputFn,default=DivisiveNormalizeLinf(),precedence=0.96,doc="""
         Function applied to the whole, original image array (before any cropping).""")
 
     pattern_sampler_type = Parameter(default=PatternSampler, doc="""
         The type of PatternSampler to use to resample/resize the image.""")
 
+    cache_image = BooleanParameter(default=True,doc="""
+        If False, discards the image after drawing the pattern each time,
+        to make it possible to use very large databases of images without
+        running out of memory.""")
+        
 
     def __setup_pattern_sampler(self):
         """
@@ -311,7 +315,13 @@ class GenericImage(PatternGenerator):
         if self._get_image(params) or whole_image_output_fn != self.last_wiof:
             self.last_wiof = whole_image_output_fn
             self.__setup_pattern_sampler()
-        return self.ps(x,y,float(xdensity),float(ydensity),size_normalization,float(width),float(height))
+        result = self.ps(x,y,float(xdensity),float(ydensity),size_normalization,float(width),float(height))
+
+        if not self.cache_image:
+            del self.ps     ; self.ps=None
+            del self._image ; self._image=None
+
+        return result
 
 
     def _get_image(self,params):
@@ -391,7 +401,7 @@ class FileImage(GenericImage):
     def _get_image(self,params):
         filename = params['filename']
 
-        if filename!=self.last_filename:
+        if filename!=self.last_filename or self._image is None:
             self.last_filename=filename
             self._image = ImageOps.grayscale(PIL.open(self.filename))
             return True
