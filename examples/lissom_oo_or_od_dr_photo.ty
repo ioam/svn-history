@@ -103,7 +103,7 @@ for e in eyes:
                        size_normalization='original',#(size=10.0)
                        x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
                        y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
-                       orientation=0)#UniformRandom(lbound=-pi,ubound=pi,seed=65))
+                       orientation=0 if n != '' else UniformRandom(lbound=-pi,ubound=pi,seed=56))
 		for f in image_filenames]
         input_composite=topo.patterns.basic.Selector(generators=inputs)
 
@@ -119,7 +119,7 @@ for e in eyes:
 
         #input_composite=topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
 
-        default_retina_density=locals().get('default_retina_density',24.0)
+        default_retina_density=locals().get('default_retina_density',48.0)
 
         if n != '':
             input_moved=Sweeper(generator=copy.deepcopy(input_composite),step=int(n),speed=speed/24.0,
@@ -139,8 +139,8 @@ for e in eyes:
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,
                         nominal_bounds=BoundingBox(radius=0.5))
 
-topo.sim['V1'].output_fn.lower_bound=0.083 # =0.076 different in lissom_photo_or.ty
-topo.sim['V1'].output_fn.upper_bound=0.633
+topo.sim['V1'].output_fn.lower_bound=0.076
+topo.sim['V1'].output_fn.upper_bound=0.626
 
 # DoG weights for the LGN
 centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
@@ -155,16 +155,15 @@ lgn_weights['Off'] = topo.patterns.basic.Composite(
 
 # Convenience variable: input density scale
 # Set to the average number of activity bubbles per iteration, where
-# each activity bubble is judged to be about the same size as in
-# lissom_oo_or.ty
-ids=4.0
-strength=[2.33, 2.38, 2.53, 2.8] #2.33 for speed=0, 2.38 for speed=1, 2.53 for speed=2, 2.8 for speed=3 from CMVC
+# each activity bubble is judged to be about the same size as in lissom_oo_or.ty
+ids=8.0
+#strength=[2.33, 2.38, 2.53, 2.8] #2.33 for speed=0, 2.38 for speed=1, 2.53 for speed=2, 2.8 for speed=3 from CMVC
 
 for e in eyes:
     for n in lags:
 	for l in center_polarities:
 		topo.sim.connect(e+'Retina'+n,e+'LGN'+l+n,delay=0.05,
-                 		connection_type=SharedWeightCFProjection,strength=strength[int(speed)], # strength= 4.7 in lissom_photo_or.ty
+                 		connection_type=SharedWeightCFProjection,strength=4.7, 
                  		nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                  		weights_generator=lgn_weights[l])
 
@@ -174,28 +173,28 @@ for e in eyes:
                 		weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.patterns.random.UniformRandom()]),
-                 		nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)) #/ids
+                 		nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/ids) 
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
-                 connection_type=CFProjection,strength=0.9,
+                 connection_type=CFProjection,strength=1.2,
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.10417),
                                                                              topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.10417),learning_rate=2.55528) #/ids
+                 nominal_bounds_template=BoundingBox(radius=0.10417),learning_rate=2.55528/ids) 
             
 topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
-                 connection_type=CFProjection,strength=-0.9, #-1.75 
+                 connection_type=CFProjection,strength=-2.0, 
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
                                                                              topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=1.80873)  #/ids/5.0
+                 nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=1.80873/ids)  
 
 
 ### Actions scheduled to occur as the simulation proceeds.#
 topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
 
 # Convenience variable: timescale
-st=1.0/num_inputs #st=1.0/2.0
+st=1.0/num_inputs
 
 ### Lateral excitatory bounds changes
 LE='topo.sim["V1"].projections()["LateralExcitatory"]'
@@ -238,24 +237,24 @@ for n in lags:
     for e in eyes:
         for l in center_polarities:
             S ='topo.sim["V1"].projections()["'+e+'LGN'+l+'Afferent'+n+'"]'
-            topo.sim.schedule_command(  500*st,S+'.learning_rate=0.6850/len(center_polarities)/len(eyes)/len(lags)')
-            topo.sim.schedule_command( 2000*st,S+'.learning_rate=0.5480/len(center_polarities)/len(eyes)/len(lags)')
-            topo.sim.schedule_command( 4000*st,S+'.learning_rate=0.4110/len(center_polarities)/len(eyes)/len(lags)')
-            topo.sim.schedule_command(20000*st,S+'.learning_rate=0.2055/len(center_polarities)/len(eyes)/len(lags)')
+            topo.sim.schedule_command(  500*st,S+'.learning_rate=0.6850/len(center_polarities)/len(eyes)/len(lags)/ids')
+            topo.sim.schedule_command( 2000*st,S+'.learning_rate=0.5480/len(center_polarities)/len(eyes)/len(lags)/ids')
+            topo.sim.schedule_command( 4000*st,S+'.learning_rate=0.4110/len(center_polarities)/len(eyes)/len(lags)/ids')
+            topo.sim.schedule_command(20000*st,S+'.learning_rate=0.2055/len(center_polarities)/len(eyes)/len(lags)/ids')
 
 ### Activation function threshold changes
 OF='topo.sim["V1"].output_fn'
 
-topo.sim.schedule_command(  200*st,OF+'.lower_bound=0.093;'+OF+'.upper_bound=0.643') #lower_bound different everywhere
-topo.sim.schedule_command(  500*st,OF+'.lower_bound=0.103;'+OF+'.upper_bound=0.643')
-topo.sim.schedule_command( 1000*st,OF+'.lower_bound=0.133;'+OF+'.upper_bound=0.663')
-topo.sim.schedule_command( 2000*st,OF+'.lower_bound=0.163;'+OF+'.upper_bound=0.683')
-topo.sim.schedule_command( 3000*st,OF+'.lower_bound=0.183;'+OF+'.upper_bound=0.713')
-topo.sim.schedule_command( 4000*st,OF+'.lower_bound=0.183;'+OF+'.upper_bound=0.743')
-topo.sim.schedule_command( 5000*st,OF+'.lower_bound=0.193;'+OF+'.upper_bound=0.773')
-topo.sim.schedule_command( 6500*st,OF+'.lower_bound=0.203;'+OF+'.upper_bound=0.803')
-topo.sim.schedule_command( 8000*st,OF+'.lower_bound=0.213;'+OF+'.upper_bound=0.833')
-topo.sim.schedule_command(20000*st,OF+'.lower_bound=0.223;'+OF+'.upper_bound=0.863')
+topo.sim.schedule_command(  200*st,OF+'.lower_bound=0.086;'+OF+'.upper_bound=0.636') #550
+topo.sim.schedule_command(  500*st,OF+'.lower_bound=0.096;'+OF+'.upper_bound=0.636') #540
+topo.sim.schedule_command( 1000*st,OF+'.lower_bound=0.126;'+OF+'.upper_bound=0.656') #530
+topo.sim.schedule_command( 2000*st,OF+'.lower_bound=0.156;'+OF+'.upper_bound=0.676') #520
+topo.sim.schedule_command( 3000*st,OF+'.lower_bound=0.176;'+OF+'.upper_bound=0.706') #530
+topo.sim.schedule_command( 4000*st,OF+'.lower_bound=0.176;'+OF+'.upper_bound=0.736') #560
+topo.sim.schedule_command( 5000*st,OF+'.lower_bound=0.186;'+OF+'.upper_bound=0.766') #580
+topo.sim.schedule_command( 6500*st,OF+'.lower_bound=0.196;'+OF+'.upper_bound=0.796') #600
+topo.sim.schedule_command( 8000*st,OF+'.lower_bound=0.206;'+OF+'.upper_bound=0.826') #620
+topo.sim.schedule_command(20000*st,OF+'.lower_bound=0.216;'+OF+'.upper_bound=0.856') #640
 
 ### Just to get more progress reports
 topo.sim.schedule_command(12000*st,'pass')
