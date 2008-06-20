@@ -184,7 +184,7 @@ print-info:
 
 # CB: snapshot-tests is not part of slow-tests for the moment
 # (until slow-tests split up on buildbot).
-slow-tests: print-info train-tests all-speed-tests 
+slow-tests: print-info train-tests all-speed-tests map-tests
 #snapshot-tests 
 
 # CB: add notes somewhere about...
@@ -222,6 +222,10 @@ v_lissom:
 
 .SECONDARY: ${SPEEDDATA} ${TRAINDATA} ${STARTUPSPEEDDATA} # Make sure that *_*DATA is kept around
 
+
+# pass a list of plotgroup names to test() instead of plotgroups_to_test to restrict the tests
+map-tests:
+	./topographica -c "default_density=8" examples/lissom_oo_or.ty -c "topo.sim.run(100);from topo.tests.test_map_measurement import *; test(plotgroups_to_test)" 
 
 
 gui-tests: basic-gui-tests detailed-gui-tests
