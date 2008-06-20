@@ -665,6 +665,10 @@ class HomeostaticMaxEnt(OutputFnWithState):
     smoothing = Number(default=0.9997, doc="""
         Weighting of previous activity vs. current activity when calculating the average.""")
 
+    a_init = Number(default=None,doc="Multiplicative parameter controlling the exponential.")
+   
+    b_init = Number(default=None,doc="Additive parameter controlling the exponential.")
+
     step = Number(default=1, doc="""
         How often to update the a and b parameters.
 	For instance, step=1 means to update it every time this OF is
@@ -675,10 +679,8 @@ class HomeostaticMaxEnt(OutputFnWithState):
         super(HomeostaticMaxEnt,self).__init__(**params)
 	self.first_call = True
 	self.n_step=0
-        self.a_init = params.get('a_init', None)
-        self.b_init = params.get('b_init', None)
         self.__current_state_stack=[]
-       
+        
 
     def __call__(self,x):
 
