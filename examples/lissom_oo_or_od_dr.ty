@@ -1,25 +1,32 @@
 """
 Example of a LISSOM-based orientation, direction and ocular dominance map.
-Direction and ocular dominance dimensions can be turned on and off. E.g.:
- - To get OR map: ./topographica -c "dims=['or']" examples/lissom_oo_or_od_dr.ty
- - To get OR/DR map: ./topographica -c "dims=['or','dr']" examples/lissom_oo_or_od_dr.ty
- - To get OR/OD map: ./topographica -c "dims=['or','od']" examples/lissom_oo_or_od_dr.ty
- - To get OR/OD/DR map (default option): ./topographica -c "dims=['or','od','dr']" examples/lissom_oo_or_od_dr.ty
 
-Different datasets can be specified by:
- - To train on Gaussians (default option): ./topographica -c "dataset='Gaussian'" examples/lissom_oo_or_od_dr.ty
- - To train on natural images: ./topographica -c "dataset='Nature'" examples/lissom_oo_or_od_dr.ty  
+Direction and ocular dominance dimensions can be turned on and off.
+Here are examples of the commands that you could use to get the
+specified combinations of maps:
+  OR:       ./topographica -c "dims=['or']"           examples/lissom_oo_or_od_dr.ty
+  OR/DR:    ./topographica -c "dims=['or','dr']"      examples/lissom_oo_or_od_dr.ty
+  OR/OD:    ./topographica -c "dims=['or','od']"      examples/lissom_oo_or_od_dr.ty
+  OR/OD/DR: ./topographica -c "dims=['or','od','dr']" examples/lissom_oo_or_od_dr.ty
 
-Intended to be a close (but approximate) match to the various map 
-simulations in chapter 5 of Miikkulainen, Bednar, Choe, and Sirosh 
-(2005), Computational Maps in the Visual Cortex, Springer
-Specifically:
+OR/OD/DR is the default.
+
+You can also select different training datasets:
+ Gaussians:      ./topographica -c "dataset='Gaussian'" examples/lissom_oo_or_od_dr.ty
+ Natural images: ./topographica -c "dataset='Nature'"   examples/lissom_oo_or_od_dr.ty  
+
+Gaussian is the default.
+
+These simulations are intended to be close (but approximate) matches
+to the various map simulations in chapter 5 of Miikkulainen, Bednar,
+Choe, and Sirosh (2005), Computational Maps in the Visual Cortex,
+Springer.  Specifically:
     dataset="Gaussian", dimensions=["or"]:           Figure 5.9
-    dataset="Nature",    dimensions=["or"]:           Figure 5.13 Nature
+    dataset="Nature",   dimensions=["or"]:           Figure 5.13 Nature
     dataset="Gaussian", dimensions=["od","dr"]:      Figure 5.23
     dataset="Gaussian", dimensions=["or","od"]:      Figure 5.27
     dataset="Gaussian", dimensions=["or","od","dr"]: Figure 5.29
-    dataset="Nature",    dimensions=["or","od","dr"]: Figure 5.31
+    dataset="Nature",   dimensions=["or","od","dr"]: Figure 5.31
 
 Known differences include:
 
