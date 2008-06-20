@@ -1294,8 +1294,8 @@ gaussian_corner = topo.patterns.basic.Composite(operator = maximum,
 
 pg=  create_plotgroup(name='Corner OR Preference',category="Preference Maps",
              doc='Measure orientation preference for corner shape (or other complex stimuli that cannot be represented as fullfield patterns).',
-# CEBALERT: shouldn't topographic_grid() be in plot_command rather than update_command?
-             update_command='measure_corner_or_pref(); topographic_grid()',
+             update_command='measure_corner_or_pref()',
+             plot_command='topographic_grid()',
              normalize=True)
 pg.add_plot('Corner Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Corner Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
