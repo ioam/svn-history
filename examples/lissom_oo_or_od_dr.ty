@@ -4,16 +4,22 @@ Direction and ocular dominance dimensions can be turned on and off. E.g.:
  - To get OR map: ./topographica -c "dims=['or']" examples/lissom_oo_or_od_dr.ty
  - To get OR/DR map: ./topographica -c "dims=['or','dr']" examples/lissom_oo_or_od_dr.ty
  - To get OR/OD map: ./topographica -c "dims=['or','od']" examples/lissom_oo_or_od_dr.ty
- - To get OR/OD/DR map (dafault option): ./topographica -c "dims=['or','od','dr']" examples/lissom_oo_or_od_dr.ty
+ - To get OR/OD/DR map (default option): ./topographica -c "dims=['or','od','dr']" examples/lissom_oo_or_od_dr.ty
+
+Different datasets can be specified by:
+ - To train on Gaussians (default option): ./topographica -c "dataset='Gaussian'" examples/lissom_oo_or_od_dr.ty
+ - To train on natural images: ./topographica -c "dataset='Nature'" examples/lissom_oo_or_od_dr.ty  
 
 Intended to be a close (but approximate) match to the various map 
 simulations in chapter 5 of Miikkulainen, Bednar, Choe, and Sirosh 
 (2005), Computational Maps in the Visual Cortex, Springer
 Specifically:
-    dims=["or"]:           Figure 5.9
-    dims=["or","dr"]:      Figure 5.23
-    dims=["or","od"]:      Figure 5.27
-    dims=["or","od","dr"]: Figure 5.29
+    dataset="Gaussian", dimensions=["or"]:           Figure 5.9
+    dataset="Nature",    dimensions=["or"]:           Figure 5.13 Nature
+    dataset="Gaussian", dimensions=["od","dr"]:      Figure 5.23
+    dataset="Gaussian", dimensions=["or","od"]:      Figure 5.27
+    dataset="Gaussian", dimensions=["or","od","dr"]: Figure 5.29
+    dataset="Nature",    dimensions=["or","od","dr"]: Figure 5.31
 
 Known differences include:
 
@@ -60,6 +66,7 @@ from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
+from topo.patterns.image import Image
 
 # Default for tutorial
 topo.patterns.basic.Line.scale=0.9
@@ -85,30 +92,46 @@ lags=['']
 speed=0.0
 
 dims=locals().get('dims',['or','od','dr'])
-
 if 'od' in dims: eyes=['Left', 'Right']
-
 if 'dr' in dims: 
     lags=['0','1','2','3']
     speed=1.0 # Useful speeds range from 0.0 - 3.0.
 
 num_inputs=1
-input_type=Gaussian
+dataset=locals().get('dataset',"Gaussian")
+if dataset=="Gaussian":
+    input_type=Gaussian
+    ids=1.0
+elif dataset=="Nature":
+    input_type=topo.patterns.image.FileImage
+    ids=4.0
 
 for e in eyes:
     for n in lags:
-        inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
-                           y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
-                           orientation=0 if n != '' else UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
-                           size=0.088388, aspect_ratio=4.66667,
-                           scale=         2.0-UniformRandom(lbound=0,ubound=2,seed=78+i) \
-                           if e=='Right' else UniformRandom(lbound=0,ubound=2,seed=78+i),
-                           bounds=BoundingBox(radius=0.8))
-                for i in xrange(num_inputs)]
 
-        input_composite=topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
+        if dataset=="Gaussian":
+            inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
+                               y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
+                               orientation=0 if n != '' else UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
+                               size=0.088388, aspect_ratio=4.66667,
+                               scale=         2.0-UniformRandom(lbound=0,ubound=2,seed=78+i) \
+                               if e=='Right' else UniformRandom(lbound=0,ubound=2,seed=78+i),
+                               bounds=BoundingBox(radius=0.8))
+                    for i in xrange(num_inputs)]
+            input_composite=topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
 
-        default_retina_density=locals().get('default_retina_density',24.0)
+        elif dataset=="Nature":
+            image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+            inputs=[input_type(filename=f, size_normalization='original',
+                               x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+                               y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
+                               orientation=0 if n != '' else UniformRandom(lbound=-pi,ubound=pi,seed=56),
+                               scale=         2.0-UniformRandom(lbound=0,ubound=2,seed=78) \
+                               if e=='Right' else UniformRandom(lbound=0,ubound=2,seed=78))
+		    for f in image_filenames]
+            input_composite=topo.patterns.basic.Selector(generators=inputs)
+
+        default_retina_density=locals().get('default_retina_density',48.0 if dataset=="Nature" else 24.0)
 
         if n != '':
             input_moved=Sweeper(generator=copy.deepcopy(input_composite),step=int(n),speed=speed/24.0,
@@ -128,8 +151,8 @@ for e in eyes:
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,
                         nominal_bounds=BoundingBox(radius=0.5))
 
-topo.sim['V1'].output_fn.lower_bound=0.083
-topo.sim['V1'].output_fn.upper_bound=0.633
+topo.sim['V1'].output_fn.lower_bound=0.076 if dataset=="Nature" else 0.083
+topo.sim['V1'].output_fn.upper_bound=0.626 if dataset=="Nature" else 0.633
 
 # DoG weights for the LGN
 centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
@@ -143,12 +166,14 @@ lgn_weights['Off'] = topo.patterns.basic.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
 strength=[2.33, 2.38, 2.53, 2.8] #2.33 for speed=0, 2.38 for speed=1, 2.53 for speed=2, 2.8 for speed=3 from CMVC
+if dataset=="Nature":
+    strength=[4.7,4.7,4.7,4.7] #
 
 for e in eyes:
     for n in lags:
 	for l in center_polarities:
 		topo.sim.connect(e+'Retina'+n,e+'LGN'+l+n,delay=0.05,
-                 		connection_type=SharedWeightCFProjection,strength=strength[int(speed)],
+                 		connection_type=SharedWeightCFProjection,strength=strength[int(speed)], 
                  		nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                  		weights_generator=lgn_weights[l])
 
@@ -158,21 +183,21 @@ for e in eyes:
                 		weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
                                                                              topo.patterns.random.UniformRandom()]),
-                 		nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags))
+                 		nominal_bounds_template=BoundingBox(radius=0.27083),learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/ids) 
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
-                 connection_type=CFProjection,strength=0.9,
+                 connection_type=CFProjection,strength=1.2 if dataset=="Nature" else 0.9,
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.10417),
                                                                              topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.10417),learning_rate=2.55528) 
+                 nominal_bounds_template=BoundingBox(radius=0.10417),learning_rate=2.55528/ids) 
             
 topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
-                 connection_type=CFProjection,strength=-0.9,
+                 connection_type=CFProjection,strength=-1.75 if dataset=="Nature" else -0.9, 
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
                                                                              topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=1.80873)  
+                 nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=1.80873/ids/5)  
 
 
 ### Actions scheduled to occur as the simulation proceeds.#
@@ -180,6 +205,7 @@ topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingB
 
 # Convenience variable: timescale
 st=1.0/num_inputs
+if dataset=="Nature": st=1.0/2.0
 
 ### Lateral excitatory bounds changes
 LE='topo.sim["V1"].projections()["LateralExcitatory"]'
@@ -207,29 +233,51 @@ topo.sim.schedule_command( 6500*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 topo.sim.schedule_command( 8000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 topo.sim.schedule_command(20000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 
+### Lateral inhibitory learning rate and strength changes
+if dataset=="Nature":
+    LI='topo.sim["V1"].projections()["LateralInhibitory"]'
+
+    topo.sim.schedule_command( 1000*st,LI+'.learning_rate=1.80873/ids/5.0*2.0')
+    topo.sim.schedule_command( 2000*st,LI+'.learning_rate=1.80873/ids/5.0*3.0')
+    topo.sim.schedule_command( 5000*st,LI+'.learning_rate=1.80873/ids/5.0*5.0')
+
+    topo.sim.schedule_command( 1000*st,LI+'.strength=-2.2')
+    topo.sim.schedule_command( 2000*st,LI+'.strength=-2.6')
+
 ### Afferent learning rate changes
 for n in lags:
     for e in eyes:
         for l in center_polarities:
             S ='topo.sim["V1"].projections()["'+e+'LGN'+l+'Afferent'+n+'"]'
-            topo.sim.schedule_command(  500*st,S+'.learning_rate=0.6850/len(center_polarities)/len(eyes)/len(lags)')
-            topo.sim.schedule_command( 2000*st,S+'.learning_rate=0.5480/len(center_polarities)/len(eyes)/len(lags)')
-            topo.sim.schedule_command( 4000*st,S+'.learning_rate=0.4110/len(center_polarities)/len(eyes)/len(lags)')
-            topo.sim.schedule_command(20000*st,S+'.learning_rate=0.2055/len(center_polarities)/len(eyes)/len(lags)')
+            topo.sim.schedule_command(  500*st,S+'.learning_rate=0.6850/len(center_polarities)/len(eyes)/len(lags)/ids')
+            topo.sim.schedule_command( 2000*st,S+'.learning_rate=0.5480/len(center_polarities)/len(eyes)/len(lags)/ids')
+            topo.sim.schedule_command( 4000*st,S+'.learning_rate=0.4110/len(center_polarities)/len(eyes)/len(lags)/ids')
+            topo.sim.schedule_command(20000*st,S+'.learning_rate=0.2055/len(center_polarities)/len(eyes)/len(lags)/ids')
 
 ### Activation function threshold changes
 OF='topo.sim["V1"].output_fn'
-
-topo.sim.schedule_command(  200*st,OF+'.lower_bound=0.093;'+OF+'.upper_bound=0.643')
-topo.sim.schedule_command(  500*st,OF+'.lower_bound=0.103;'+OF+'.upper_bound=0.643')
-topo.sim.schedule_command( 1000*st,OF+'.lower_bound=0.133;'+OF+'.upper_bound=0.663')
-topo.sim.schedule_command( 2000*st,OF+'.lower_bound=0.163;'+OF+'.upper_bound=0.683')
-topo.sim.schedule_command( 3000*st,OF+'.lower_bound=0.183;'+OF+'.upper_bound=0.713')
-topo.sim.schedule_command( 4000*st,OF+'.lower_bound=0.183;'+OF+'.upper_bound=0.743')
-topo.sim.schedule_command( 5000*st,OF+'.lower_bound=0.193;'+OF+'.upper_bound=0.773')
-topo.sim.schedule_command( 6500*st,OF+'.lower_bound=0.203;'+OF+'.upper_bound=0.803')
-topo.sim.schedule_command( 8000*st,OF+'.lower_bound=0.213;'+OF+'.upper_bound=0.833')
-topo.sim.schedule_command(20000*st,OF+'.lower_bound=0.223;'+OF+'.upper_bound=0.863')
+if dataset=="Nature":
+    topo.sim.schedule_command(  200*st,OF+'.lower_bound=0.086;'+OF+'.upper_bound=0.636') 
+    topo.sim.schedule_command(  500*st,OF+'.lower_bound=0.096;'+OF+'.upper_bound=0.636') 
+    topo.sim.schedule_command( 1000*st,OF+'.lower_bound=0.126;'+OF+'.upper_bound=0.656') 
+    topo.sim.schedule_command( 2000*st,OF+'.lower_bound=0.156;'+OF+'.upper_bound=0.676') 
+    topo.sim.schedule_command( 3000*st,OF+'.lower_bound=0.176;'+OF+'.upper_bound=0.706') 
+    topo.sim.schedule_command( 4000*st,OF+'.lower_bound=0.176;'+OF+'.upper_bound=0.736') 
+    topo.sim.schedule_command( 5000*st,OF+'.lower_bound=0.186;'+OF+'.upper_bound=0.766') 
+    topo.sim.schedule_command( 6500*st,OF+'.lower_bound=0.196;'+OF+'.upper_bound=0.796') 
+    topo.sim.schedule_command( 8000*st,OF+'.lower_bound=0.206;'+OF+'.upper_bound=0.826') 
+    topo.sim.schedule_command(20000*st,OF+'.lower_bound=0.216;'+OF+'.upper_bound=0.856') 
+else:
+    topo.sim.schedule_command(  200*st,OF+'.lower_bound=0.093;'+OF+'.upper_bound=0.643')
+    topo.sim.schedule_command(  500*st,OF+'.lower_bound=0.103;'+OF+'.upper_bound=0.643')
+    topo.sim.schedule_command( 1000*st,OF+'.lower_bound=0.133;'+OF+'.upper_bound=0.663')
+    topo.sim.schedule_command( 2000*st,OF+'.lower_bound=0.163;'+OF+'.upper_bound=0.683')
+    topo.sim.schedule_command( 3000*st,OF+'.lower_bound=0.183;'+OF+'.upper_bound=0.713')
+    topo.sim.schedule_command( 4000*st,OF+'.lower_bound=0.183;'+OF+'.upper_bound=0.743')
+    topo.sim.schedule_command( 5000*st,OF+'.lower_bound=0.193;'+OF+'.upper_bound=0.773')
+    topo.sim.schedule_command( 6500*st,OF+'.lower_bound=0.203;'+OF+'.upper_bound=0.803')
+    topo.sim.schedule_command( 8000*st,OF+'.lower_bound=0.213;'+OF+'.upper_bound=0.833')
+    topo.sim.schedule_command(20000*st,OF+'.lower_bound=0.223;'+OF+'.upper_bound=0.863')
 
 ### Just to get more progress reports
 topo.sim.schedule_command(12000*st,'pass')
