@@ -25,6 +25,7 @@ from topo.commands.pylabplots import plot_tracked_attributes
 from topo.sheets.lissom import LISSOM
 from topo.base.parameterclasses import Number
 from topo.base.sheet import activity_type
+import copy
 
 class JointScaling_lronly(LISSOM):
     """
@@ -367,10 +368,6 @@ def homeostatic_analysis_function():
     development.
 
     """
-    #JLALERT Have not yet included saving and restoring state and changing
-    #output function and scaling parameters during map measurement, therefore
-    #selectivity plots will not reflect true selectivity.
-
     import topo
     import copy
     from topo.commands.analysis import save_plotgroup, PatternPresenter, update_activity
@@ -493,3 +490,7 @@ def homeostatic_analysis_function():
                                 topo.sim.time(), filename="LatExBefore", ylabel="LatExBefore")
         plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], 0,
                                 topo.sim.time(), filename="LatInBefore", ylabel="LatInBefore")
+
+
+
+
