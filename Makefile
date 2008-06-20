@@ -184,7 +184,7 @@ print-info:
 
 # CB: snapshot-tests is not part of slow-tests for the moment
 # (until slow-tests split up on buildbot).
-slow-tests: print-info map-tests train-tests all-speed-tests 
+slow-tests: print-info train-tests all-speed-tests 
 #snapshot-tests 
 
 # CB: add notes somewhere about...
@@ -223,13 +223,6 @@ v_lissom:
 .SECONDARY: ${SPEEDDATA} ${TRAINDATA} ${STARTUPSPEEDDATA} # Make sure that *_*DATA is kept around
 
 
-
-# CEBALERT: this test isn't in the right place, and isn't flexible -
-# but we need at least some test of map measurement now. This test
-# simply checks that a lissom or_map hasn't changed since r8671
-# (when the data file was added).
-map-tests: 
-	./topographica -c "default_density=8" examples/lissom_oo_or.ty -c "from topo.tests.test_script import test_lissom_orpref; test_lissom_orpref()"
 
 gui-tests: basic-gui-tests detailed-gui-tests
 
