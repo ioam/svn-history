@@ -19,7 +19,7 @@ test functions are expected to be useful.
 """
 
 import pickle
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_almost_equal
 from topo.misc.filepaths import resolve_path, normalize_path
 
 from topo.commands.analysis import *
@@ -100,8 +100,9 @@ def test(plotgroup_names):
         f.close()
 
         for view_name in previous_sheet_views:
-            assert_array_equal(topo.sim['V1'].sheet_views[view_name].view()[0],
-                               previous_sheet_views[view_name].view()[0])
+            assert_array_almost_equal(topo.sim['V1'].sheet_views[view_name].view()[0],
+                                      previous_sheet_views[view_name].view()[0],
+                                      12)
             print '...'+view_name+' array is unchanged since data was generated (%s)'%topo_version
     
 
