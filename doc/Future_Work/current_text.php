@@ -1149,14 +1149,15 @@ d = Dynamic()
 n = Number()
 
 
+_________________________________________________________
 
+Pickling main (for 'saving session') 
+http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/572213
+http://dev.pocoo.org/hg/sandbox/file/tip/pshell.py
 
-
-
-
-
-
-
+CB: note that I'm not actually planning to pickle main/implement
+session saving, but I do plan to read the above references anyway for
+pickle tips.
 
 
 -->
