@@ -404,3 +404,26 @@ def run_multiple_density_comparisons(ref_script):
     print "================================================================================"
     
     return nerr
+
+
+
+# see Makefile
+def test_lissom_orpref():
+    assert topo.sim.name=='lissom_oo_or'
+    assert topo.sim['V1'].nominal_density==8
+    
+    topo.sim.run(100)
+    from topo.commands.analysis import PatternPresenter,measure_or_pref
+    from topo.patterns import SineGrating
+    measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],scale=0.3,offset=0.0,display=False,weighted_average=True,pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175))
+    import pickle
+    previous_sheet_views = pickle.load((open(resolve_path("topo/tests/lissom_oo_or_t100_orpref"),"r")))
+    current_sheet_views = topo.sim['V1'].sheet_views
+
+    from numpy.testing import assert_array_equal
+
+    for view_name in ['OrientationPreference','OrientationSelectivity']:
+        assert_array_equal(current_sheet_views[view_name].view()[0],previous_sheet_views[view_name].view()[0])
+        print view_name+' arrays are equal'
+    
+    
