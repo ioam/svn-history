@@ -199,10 +199,7 @@ topo.sim.connect('V1Complex','V1Simple',delay=0.05,
                  connection_type=CFProjection,strength=locals().get('FStrExc',0.5),name='V1SimpleFeedbackExc1',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=18),
                  nominal_bounds_template=BoundingBox(radius=locals().get('FExcSize',0.005)/2),
-                 learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                               ExponentialDecay(starting_value = locals().get('StoC_lr',5.0),
-                                                time_constant=locals().get('StoC_tc',9600)))),
-                 learning_fn=CFPLF_Trace_opt(trace_strength=locals().get('TraceStr',1.0)))
+                 learning_rate=0)
 
 topo.sim.connect('V1Complex','V1Simple',delay=0.05,
                  connection_type=CFProjection,strength=locals().get('FStrInh',-2.2),name='V1SimpleFeedbackInh',
@@ -255,10 +252,12 @@ def secondStage():
     topo.sim['LGNOff'].in_connections[0].strength=0
     
     topo.sim['V1Simple'].in_connections[0].learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                               							  ExponentialDecay(starting_value = locals().get('SSS_lr',0.3),
-                                                          time_fn=offset_tf,time_constant=locals().get('S_tc',3200))))
+                               							  ExponentialDecay(starting_value = __main__.__dict__.get('SSS_lr',0.3),
+                                                          time_fn=offset_tf,time_constant=__main__.__dict__.get('S_tc',3200))))
     
-    topo.sim['V1Simple'].in_connections[1].learning_rate=(BoundedNumber(bounds=(0.137,None),generator=ExponentialDecay(starting_value = locals().get('SSS_lr',0.3),time_fn=offset_tf,time_constant=locals().get('S_tc',3200))))
-    topo.sim['V1Complex'].in_connections[0].learning_rate=locals().get('SSC_lr',0.0)
+    topo.sim['V1Simple'].in_connections[1].learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
+    													  ExponentialDecay(starting_value = __main__.__dict__.get('SSS_lr',0.3)
+    													  ,time_fn=offset_tf,time_constant=__main__.__dict__.get('S_tc',3200))))
+    topo.sim['V1Complex'].in_connections[0].learning_rate=__main__.__dict__.get('SSC_lr',0.1)
     randomize_V1Simple_relative_LGN_strength()
 
