@@ -25,6 +25,7 @@ from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
+from topo.patterns.image import Image
 
 # Default for tutorial
 topo.patterns.basic.Line.scale=0.9
@@ -51,24 +52,24 @@ opponent_types=['Red-Green','Green-Red','Luminosity']
 lags=['']
 
 num_inputs=1
-input_type=Gaussian
+input_type=topo.patterns.image.FileImage
 
 for e in eyes:
     for n in lags:
-        inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
-                           y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
-                           orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
-                           size=0.088388, aspect_ratio=4.66667,
-                           scale=         2.0-UniformRandom(lbound=1,ubound=1,seed=78+i) \
-                           if e=='Right' else UniformRandom(lbound=1,ubound=1,seed=78+i),
-                           bounds=BoundingBox(radius=0.8))
-                for i in xrange(num_inputs)]
-
-        input_composite=topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
-
         default_retina_density=locals().get('default_retina_density',24.0)
 
         for cone in cone_types:
+            image_filenames=["images/colormap/%02d_%d.png"%(i,(cone=='Green')) for i in xrange(5)]
+            inputs=[input_type(filename=f, size_normalization='original',
+                               x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+                               y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
+                               orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),
+                               scale=         2.0-UniformRandom(lbound=1,ubound=1,seed=78) \
+                               if e=='Right' else UniformRandom(lbound=1,ubound=1,seed=78))
+                    for f in image_filenames]
+
+            input_composite=topo.patterns.basic.Selector(generators=inputs)
+
             topo.sim[e+cone+'Retina'+n]=GeneratorSheet(nominal_density=default_retina_density,
                                                               input_generator=input_composite,
                                                               period=1.0, phase=0.05,
