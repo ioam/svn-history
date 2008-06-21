@@ -665,9 +665,9 @@ class HomeostaticMaxEnt(OutputFnWithState):
     smoothing = Number(default=0.9997, doc="""
         Weighting of previous activity vs. current activity when calculating the average.""")
 
-    a_init = Number(default=None,doc="Multiplicative parameter controlling the exponential.")
+    a_init = Parameter(default=None,doc="Multiplicative parameter controlling the exponential.")
    
-    b_init = Number(default=None,doc="Additive parameter controlling the exponential.")
+    b_init = Parameter(default=None,doc="Additive parameter controlling the exponential.")
 
     step = Number(default=1, doc="""
         How often to update the a and b parameters.
