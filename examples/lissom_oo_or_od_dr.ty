@@ -102,7 +102,7 @@ dims=locals().get('dims',['or','od','dr'])
 if 'od' in dims: eyes=['Left', 'Right']
 if 'dr' in dims: 
     lags=['0','1','2','3']
-    speed=1.0 # Useful speeds range from 0.0 - 3.0.
+    speed=2.0 # Useful speeds range from 0.0 - 3.0.
 
 num_inputs=1
 dataset=locals().get('dataset',"Gaussian")
@@ -174,7 +174,7 @@ lgn_weights['Off'] = topo.patterns.basic.Composite(
 
 strength=[2.33, 2.38, 2.53, 2.8] #2.33 for speed=0, 2.38 for speed=1, 2.53 for speed=2, 2.8 for speed=3 from CMVC
 if dataset=="Nature":
-    strength=[4.7,4.7,4.7,4.7] #
+    strength=[4.7,4.8,5.1,5.8] 
 
 for e in eyes:
     for n in lags:
