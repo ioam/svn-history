@@ -138,8 +138,9 @@ __all__ = [re.sub('\.py$','',f)
 all_doctest = sorted(fnmatch.filter(os.listdir(__path__[0]),'test*.txt'))
 
 
-# CEBALERT: we need to rename test_script.py
-__all__.remove('test_script')   
+# CEBALERT: we need to rename these/reorganize the tests
+__all__.remove('test_script')
+__all__.remove('test_map_measurement')   
                                 
 
 __all__.sort()
