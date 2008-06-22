@@ -36,7 +36,7 @@ plotgroups_to_test = [
     # Several plotgroups are commented out because I was only thinking
     # about map measurement that results in sheet_views stored for V1.
     # (All could be included if the functions below were to be
-    # extended to handle curve_dicts, sheets other than V1, etc.)
+    # extended to handle sheets other than V1, etc.)
     #'Activity',
     #'Connection Fields',
     #'Projection',
@@ -53,17 +53,21 @@ plotgroups_to_test = [
     #'Ocular Preference',
     'Spatial Frequency Preference',
     #'PhaseDisparity Preference',
-    #'Orientation Tuning Fullfield',
-    #'Orientation Tuning',
-    #'Size Tuning',
-    #'Contrast Response',
+    'Orientation Tuning Fullfield',
+    'Orientation Tuning',
+    'Size Tuning',
+    'Contrast Response',
     #'Direction Preference',
-
-    # commented out because it currently relies on pylabplots (see
-    # ALERT in topo.commands.analysis)
-    #'Corner OR Preference'
+    'Corner OR Preference'
     ]
 
+
+def _reset_views(sheet):
+    if hasattr(sheet,'sheet_views'):
+        sheet.sheet_views = {}
+    if hasattr(sheet,'curve_dict'):
+        sheet.curve_dict = {}
+    
 
 def generate(plotgroup_names):
     assert topo.sim.name==sim_name
@@ -72,16 +76,25 @@ def generate(plotgroup_names):
 
     for name in plotgroup_names:
         print "* Generating data for plotgroups['%s']"%name
-        topo.sim['V1'].sheet_views = {}
+
+        views = {}
+        sheet = topo.sim['V1']
+
+        _reset_views(sheet)
+
         exec plotgroups[name].update_command
 
-        if topo.sim['V1'].sheet_views=={}:
-            print "## WARNING: no sheet view in V1" # i.e. this test needs to support a different sheet, curve_views, or something else...or the command didn't store a sheet_view (an error in the command).
-        else:
-            f = open(normalize_path('topo/tests/%s_t%s_%s.data'%(sim_name,topo.sim.timestr(),
+        sheets_views = views[sheet.name] = {}
+
+        if hasattr(sheet,'sheet_views'):
+            sheets_views['sheet_views'] = sheet.sheet_views
+        if hasattr(sheet,'curve_dict'):
+            sheets_views['curve_dict'] = sheet.curve_dict
+
+        f = open(normalize_path('topo/tests/%s_t%s_%s.data'%(sim_name,topo.sim.timestr(),
                                                              name.replace(' ','_'))),'wb')
-            pickle.dump((topo.version,topo.sim['V1'].sheet_views),f)
-            f.close()
+        pickle.dump((topo.version,views),f)
+        f.close()
     
 
 def test(plotgroup_names):
@@ -91,18 +104,35 @@ def test(plotgroup_names):
     
     for name in plotgroup_names:
         print "\n* Testing plotgroups['%s']:"%name
-        topo.sim['V1'].sheet_views = {}
+
+        sheet = topo.sim['V1']
+        _reset_views(sheet)
         exec plotgroups[name].update_command
 
         f = open(resolve_path('topo/tests/%s_t%s_%s.data'%(sim_name,topo.sim.timestr(),
                                                             name.replace(' ','_'))),'r')
-        topo_version,previous_sheet_views = pickle.load(f)
+        topo_version,previous_views = pickle.load(f)
         f.close()
 
-        for view_name in previous_sheet_views:
-            assert_array_almost_equal(topo.sim['V1'].sheet_views[view_name].view()[0],
-                                      previous_sheet_views[view_name].view()[0],
-                                      12)
-            print '...'+view_name+' array is unchanged since data was generated (%s)'%topo_version
-    
+        if 'sheet_views' in previous_views[sheet.name]:
+            previous_sheet_views = previous_views[sheet.name]['sheet_views']
+            for view_name in previous_sheet_views:
+                assert_array_almost_equal(sheet.sheet_views[view_name].view()[0],
+                                          previous_sheet_views[view_name].view()[0],
+                                          12)
+                print '...'+view_name+' array is unchanged since data was generated (%s)'%topo_version
+
+        if 'curve_dict' in previous_views[sheet.name]:
+            previous_curve_dicts = previous_views[sheet.name]['curve_dict']
+            # CB: need to cleanup var names e.g. val
+            for curve_name in previous_curve_dicts:
+                for other_param in previous_curve_dicts[curve_name]:
+                    for val in previous_curve_dicts[curve_name][other_param]:
+
+                        assert_array_almost_equal(sheet.curve_dict[curve_name][other_param][val].view()[0],
+                                                  previous_curve_dicts[curve_name][other_param][val].view()[0],
+                                                  12)
+                        print "...%s %s %s array is unchanged since data was generated (%s)"%(curve_name,other_param,val,topo_version)
+                                          
+
 
