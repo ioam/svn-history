@@ -21,7 +21,7 @@ from topo.commands.basic import pattern_present, wipe_out_activity
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.utils import frange
 from topo.base.arrayutils import wrap
-from topo.patterns.basic import SineGrating, Gaussian
+from topo.patterns.basic import SineGrating, Gaussian, Constant
 from topo.patterns.teststimuli import SineGratingDisk
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.parameterclasses import Parameter
@@ -129,7 +129,18 @@ class PatternPresenter(ParameterizedObject):
                 except:
                     self.warning('Direction is defined only when there are different input lags (numbered at the end of their name).')
 
-                            
+
+        if features_values.has_key('hue'):
+            if features_values['hue']==0:
+                inputs[input_sheet_names[0]]=inputs[input_sheet_names[0]]
+                inputs[input_sheet_names[1]]=Constant(scale=0)
+            if features_values['hue']==1:
+                inputs[input_sheet_names[1]]=inputs[input_sheet_names[1]]
+                inputs[input_sheet_names[0]]=Constant(scale=0)
+            if features_values['hue']==2:
+                inputs[input_sheet_names[0]]=inputs[input_sheet_names[0]]
+                inputs[input_sheet_names[1]]=inputs[input_sheet_names[1]]
+                         
 
         if features_values.has_key("phasedisparity"):
             if len(input_sheet_names)!=2:
@@ -1246,6 +1257,43 @@ def measure_dr_pref(num_phase=12,num_direction=6,num_speeds=4,max_speed=2.0/24,
     Subplotting.set_subplots("Direction",force=True)	 
     return fm
   
+###############################################################################
+pg= create_plotgroup(name='Hue Preference',category="Preference Maps",
+             doc='Measure preference for red, green and lumonosity.',
+             update_command='measure_hue_pref()')
+pg.add_plot('Hue Preference',[('Hue','HuePreference')])
+pg.add_plot('Hue Preference&Selectivity',[('Hue','HuePreference'),
+                                                ('Confidence','HueSelectivity')])
+pg.add_plot('Hue Selectivity',[('Strength','HueSelectivity')])
+#pg.add_static_image('Color Key','topo/commands/dr_key_white_vert_small.png')
+
+
+
+def measure_hue_pref(num_phase=12,num_orientation=4,hues=[0,1,2],
+                    frequencies=[2.4],scale=0.3,offset=0.0, 
+                    display=True, weighted_average=True,
+                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
+
+    if num_phase <= 0 or len(hues) <= 0:
+        raise ValueError("num_phase and number of hues must be greater than 0")
+
+    else:
+        step_phase=2*pi/num_phase
+        step_orientation=pi/num_orientation
+
+
+        feature_values = [Feature(name="frequency",values=frequencies),
+                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
+                          Feature(name="hue", values=hues),
+                          Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
+
+        param_dict = {"scale":scale,"offset":offset}
+        x=FeatureMaps(feature_values)
+        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+        fm = x._fullmatrix
+        
+    Subplotting.set_subplots("Hue",force=True)	 
+    return fm
     
 ###############################################################################	
 def decode_feature(sheet, preference_map = "OrientationPreference", axis_bounds=(0.0,1.0), cyclic=True, weighted_average=True):
