@@ -181,15 +181,14 @@ topo.sim.schedule_command( 8000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 topo.sim.schedule_command(20000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
 
 ### Lateral inhibitory learning rate and strength changes
-if dataset=="Nature":
-    LI='topo.sim["V1"].projections()["LateralInhibitory"]'
+LI='topo.sim["V1"].projections()["LateralInhibitory"]'
 
-    topo.sim.schedule_command( 1000*st,LI+'.learning_rate=1.80873/ids/5.0*2.0')
-    topo.sim.schedule_command( 2000*st,LI+'.learning_rate=1.80873/ids/5.0*3.0')
-    topo.sim.schedule_command( 5000*st,LI+'.learning_rate=1.80873/ids/5.0*5.0')
+topo.sim.schedule_command( 1000*st,LI+'.learning_rate=1.80873/ids/5.0*2.0')
+topo.sim.schedule_command( 2000*st,LI+'.learning_rate=1.80873/ids/5.0*3.0')
+topo.sim.schedule_command( 5000*st,LI+'.learning_rate=1.80873/ids/5.0*5.0')
 
-    topo.sim.schedule_command( 1000*st,LI+'.strength=-2.2')
-    topo.sim.schedule_command( 2000*st,LI+'.strength=-2.6')
+topo.sim.schedule_command( 1000*st,LI+'.strength=-2.2')
+topo.sim.schedule_command( 2000*st,LI+'.strength=-2.6')
 
 ### Afferent learning rate changes
 for opponent in opponent_types:
