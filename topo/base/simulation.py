@@ -1341,10 +1341,7 @@ class Simulation(ParameterizedObject,OptionalSingleton):
             conn_params['name'] = src+'To'+dest
 
         # Looks up src and dest in our dictionary of objects
-        if hasattr(self[dest],'apply_output_fn_init'):
-            conn = connection_type(src=self[src],dest=self[dest],apply_output_fn_init=self[dest].apply_output_fn_init,**conn_params)
-        else:
-            conn = connection_type(src=self[src],dest=self[dest],**conn_params)
+        conn = connection_type(src=self[src],dest=self[dest],**conn_params)
         self[src]._src_connect(conn)
         self[dest]._dest_connect(conn)
         return conn
