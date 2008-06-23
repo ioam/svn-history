@@ -15,15 +15,15 @@ rule (Jochen Triesch, ICANN 2005, LNCS 3696 pp.65-70), which maintains
 stable activity in V1 given a target average activity. 
 
 The afferent target and the target V1 activity are adapted based on
-the frequency of occurance of activation in V1 by setting the
-frequency parameter. A simulation using 2 gaussian patterns per
+the frequency of occurence of activation in V1 by setting the
+frequency parameter. A simulation using 2 Gaussian patterns per
 iteration as the retinal input has a frequency parameter of 2
 therefore frequency values should be chosen relative to this, i.e. a
-simulation using 4 gaussian patterns per iteration has an optimum
+simulation using 4 Gaussian patterns per iteration has an optimum
 frequency parameter of ~ 3.56, natural images have a frequency ~ 5.0
 and noisy disks a frequency ~ 7.5. 
 
-The balance parameter which adjusts the balance between afferent input
+The balance parameter that changes the balance between afferent input
 and V1 activity can also be adjusted to improve map organization.
 
 This script is set up as a tracking version for plotting sheet and
