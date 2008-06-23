@@ -1259,11 +1259,10 @@ def measure_dr_pref(num_phase=12,num_direction=6,num_speeds=4,max_speed=2.0/24,
   
 ###############################################################################
 pg= create_plotgroup(name='Hue Preference',category="Preference Maps",
-             doc='Measure preference for red, green and lumonosity.',
+             doc='Measure preference for red, green, and luminosity.',
              update_command='measure_hue_pref()')
 pg.add_plot('Hue Preference',[('Hue','HuePreference')])
-pg.add_plot('Hue Preference&Selectivity',[('Hue','HuePreference'),
-                                                ('Confidence','HueSelectivity')])
+pg.add_plot('Hue Preference&Selectivity',[('Hue','HuePreference'), ('Confidence','HueSelectivity')])
 pg.add_plot('Hue Selectivity',[('Strength','HueSelectivity')])
 #pg.add_static_image('Color Key','topo/commands/dr_key_white_vert_small.png')
 
@@ -1280,7 +1279,6 @@ def measure_hue_pref(num_phase=12,num_orientation=4,hues=[0,1,2],
     else:
         step_phase=2*pi/num_phase
         step_orientation=pi/num_orientation
-
 
         feature_values = [Feature(name="frequency",values=frequencies),
                           Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
