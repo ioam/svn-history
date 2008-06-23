@@ -12,6 +12,7 @@ from math import pi, sqrt
 
 import topo.patterns.basic
 import topo.patterns.random
+import __main__
 
 from topo.sheets.lissom import LISSOM, JointNormalizingCFSheet_Continuous
 from topo.sheets.optimized import NeighborhoodMask_Opt, LISSOM_Opt
@@ -117,7 +118,7 @@ topo.sim['LGNOff']=CFSheet(nominal_density=48.0,
                            measure_maps=False)
 
 topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',48.0),
-                        nominal_bounds=BoundingBox(radius=core_size),apply_output_fn_init=False,
+                        nominal_bounds=BoundingBox(radius=core_size),
                         output_fn=V1Simple_OF)
 
                         
@@ -170,7 +171,7 @@ topo.sim.connect('LGNOn','V1Simple',delay=0.05,dest_port=('Activity','JointNorma
                      generators=[g1
                  ,topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
-                 coord_mapper=jitterOn,
+                 coord_mapper=jitterOn,apply_output_fn_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
                                ExponentialDecay(starting_value = locals().get('S_lr',0.3),
                                                 time_constant=locals().get('S_tc',3200)))))
@@ -182,7 +183,7 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNorm
                      generators=[g2
                  ,topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
-                 coord_mapper=jitterOff,
+                 coord_mapper=jitterOff,apply_output_fn_init=False,
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
                                ExponentialDecay(starting_value = locals().get('S_lr',0.3),
                                                 time_constant=locals().get('S_tc',3200)))))
@@ -227,7 +228,7 @@ OFSimple = "topo.sim['V1Simple'].output_fn"
 topo.sim.schedule_command(5000,"secondStage()")
 
 
-topo.sim.schedule_command(8100,OFComplex+".r=6;"+ OFComplex + ".k=-4")
+topo.sim.schedule_command(8100,OFComplex+".r=4.5;"+ OFComplex + ".k=-5")
 topo.sim.schedule_command(8100,OFSimple+".k=-10.5;")
 
 
