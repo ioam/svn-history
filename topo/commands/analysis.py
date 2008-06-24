@@ -650,7 +650,7 @@ pg= create_plotgroup(name='Orientation and Direction Preference',category="Combi
 pg= create_plotgroup(name='Orientation and Hue Preference',category="Combined Preference Maps",
              doc='Plot the orientation preference overlaid with hue preference boundaries.',
              update_command='',
-             plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","HuePreference",0.9,"red")])',            
+             plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","HuePreference",0.9,"red"),("contours","HuePreference",0.4,"green")])',            
              normalize=False)
 
 ####################################################################################
