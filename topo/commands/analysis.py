@@ -498,22 +498,19 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
     size, scale, offset, and pattern_presenter arguments.
     """
 
-    # JABALERT: Here and everywhere that follows there's really no
-    # need for the else: clause; should simplify it by removing that.
     if divisions <= 0:
         raise ValueError("Divisions must be greater than 0")
 
-    else:
-        # JABALERT: Will probably need some work to support multiple input regions
-        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
-                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]   
+    # JABALERT: Will probably need some work to support multiple input regions
+    feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
+                      Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]   
+                      
+                                  
                           
-                                      
-                              
-                          
-        param_dict = {"size":size,"scale":scale,"offset":offset}
-        x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+                      
+    param_dict = {"size":size,"scale":scale,"offset":offset}
+    x=FeatureMaps(feature_values)
+    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
 
 ###############################################################################
@@ -572,15 +569,15 @@ def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
     
     if divisions <= 0:
         raise ValueError("Divisions must be greater than 0")
-    else:
-        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
-                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
-                          Feature(name="scale",range=(-scale,scale),step=scale*2)]   
-                          
-        param_dict = {"size":size,"scale":scale,"offset":offset}
 
-        x=ReverseCorrelation(feature_values,input_sheet=input_sheet) #+change argument
-        x.collect_feature_responses(pattern_presenter,param_dict,display,feature_values)
+    feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
+                      Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
+                      Feature(name="scale",range=(-scale,scale),step=scale*2)]   
+                      
+    param_dict = {"size":size,"scale":scale,"offset":offset}
+
+    x=ReverseCorrelation(feature_values,input_sheet=input_sheet) #+change argument
+    x.collect_feature_responses(pattern_presenter,param_dict,display,feature_values)
 
 
 
@@ -601,19 +598,18 @@ def measure_rfs_noise(divisions=99,scale=0.5,offset=0.5,display=False,
     # default value for this parameter
     if not input_sheet_name:
         raise ValueError("Must set topo.commands.analysis.input_sheet_name before calling measure_rfs")
-
     input_sheet = topo.sim[input_sheet_name]
     
     if divisions <= 0:
         raise ValueError("Divisions must be greater than 0")
-    else:
-        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
-                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]   
-                          
-        param_dict = {"scale":scale,"offset":offset}
 
-        x=ReverseCorrelation(feature_values,input_sheet=input_sheet)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,feature_values)
+    feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
+                      Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]   
+                      
+    param_dict = {"scale":scale,"offset":offset}
+
+    x=ReverseCorrelation(feature_values,input_sheet=input_sheet)
+    x.collect_feature_responses(pattern_presenter,param_dict,display,feature_values)
 
 
 
@@ -808,20 +804,19 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
     if num_phase <= 0 or num_orientation <= 0:
         raise ValueError("num_phase and num_orientation must be greater than 0")
 
-    else:
-        step_phase=2*pi/num_phase
-        step_orientation=pi/num_orientation
-       
+    step_phase=2*pi/num_phase
+    step_orientation=pi/num_orientation
+    
 
-       
-        feature_values = [Feature(name="frequency",values=frequencies),
-                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
-                          Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
+    
+    feature_values = [Feature(name="frequency",values=frequencies),
+                      Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
+                      Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
 
-        param_dict = {"scale":scale,"offset":offset}
-        x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
-        fm = x._fullmatrix
+    param_dict = {"scale":scale,"offset":offset}
+    x=FeatureMaps(feature_values)
+    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+    fm = x._fullmatrix
 
    # Subplotting.set_subplots("Orientation",force=False)
     return fm
@@ -859,18 +854,17 @@ def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
     if num_phase <= 0 or num_orientation <= 0:
         raise ValueError("num_phase and num_orientation must be greater than 0")
 
-    else:
-        step_phase=2*pi/num_phase
-        step_orientation=pi/num_orientation
+    step_phase=2*pi/num_phase
+    step_orientation=pi/num_orientation
 
-        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
-                          Feature(name="frequency",values=frequencies),
-                          Feature(name="ocular",range=(0.0,1.0),values=[0.0,1.0])]  
+    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                      Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
+                      Feature(name="frequency",values=frequencies),
+                      Feature(name="ocular",range=(0.0,1.0),values=[0.0,1.0])]  
 
-        param_dict = {"scale":scale,"offset":offset}
-        x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+    param_dict = {"scale":scale,"offset":offset}
+    x=FeatureMaps(feature_values)
+    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
   
 
 ###############################################################################
@@ -906,17 +900,16 @@ def measure_sf_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
     if num_phase <= 0 or num_orientation <= 0:
         raise ValueError("num_phase and num_orientation must be greater than 0")
 
-    else:
-        step_phase=2*pi/num_phase
-        step_orientation=pi/num_orientation
+    step_phase=2*pi/num_phase
+    step_orientation=pi/num_orientation
 
-        feature_values = [Feature(name="frequency",values=frequencies),
-                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
-                          Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
+    feature_values = [Feature(name="frequency",values=frequencies),
+                      Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
+                      Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
 
-        param_dict = {"scale":scale,"offset":offset}
-        x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+    param_dict = {"scale":scale,"offset":offset}
+    x=FeatureMaps(feature_values)
+    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
     Subplotting.set_subplots("Orientation",force=False)
     
@@ -952,19 +945,18 @@ def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequ
     if num_phase <= 0 or num_orientation <= 0 or num_disparity <= 0:
         raise ValueError("num_phase, num_disparity and num_orientation must be greater than 0")
 
-    else:
-        step_phase=2*pi/num_phase
-        step_orientation=pi/num_orientation
-        step_disparity=2*pi/num_disparity
+    step_phase=2*pi/num_phase
+    step_orientation=pi/num_orientation
+    step_disparity=2*pi/num_disparity
 
-        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
-                          Feature(name="frequency",values=frequencies),
-                          Feature(name="phasedisparity",range=(0.0,2*pi),step=step_disparity,cyclic=True)]    
+    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                      Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
+                      Feature(name="frequency",values=frequencies),
+                      Feature(name="phasedisparity",range=(0.0,2*pi),step=step_disparity,cyclic=True)]    
 
-        param_dict = {"scale":scale,"offset":offset}
-        x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+    param_dict = {"scale":scale,"offset":offset}
+    x=FeatureMaps(feature_values)
+    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
 
 ###############################################################################
@@ -992,22 +984,21 @@ def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4
     if num_phase <= 0 or num_orientation <= 0:
         raise ValueError("num_phase and num_orientation must be greater than 0")
     
-    else:
-        step_phase=2*pi/num_phase
-        step_orientation=pi/num_orientation
-        
-        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                        Feature(name="orientation",range=(0,pi),step=step_orientation,cyclic=True),
-                        Feature(name="frequency",values=frequencies)]     
-        
-        x_axis='orientation'
-        x=FeatureCurves(feature_values,sheet,x_axis)
-        
-        for curve in curve_parameters:
-            param_dict={}
-            param_dict.update(curve)
-            curve_label='Contrast = '+str(curve["contrast"])+'%'
-            x.collect_feature_responses(feature_values,pattern_presenter,param_dict,curve_label,display)
+    step_phase=2*pi/num_phase
+    step_orientation=pi/num_orientation
+    
+    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                    Feature(name="orientation",range=(0,pi),step=step_orientation,cyclic=True),
+                    Feature(name="frequency",values=frequencies)]     
+    
+    x_axis='orientation'
+    x=FeatureCurves(feature_values,sheet,x_axis)
+    
+    for curve in curve_parameters:
+        param_dict={}
+        param_dict.update(curve)
+        curve_label='Contrast = '+str(curve["contrast"])+'%'
+        x.collect_feature_responses(feature_values,pattern_presenter,param_dict,curve_label,display)
 	  
 
 ###############################################################################
@@ -1052,23 +1043,22 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
     if num_phase <= 0 or num_orientation <= 0:
         raise ValueError("num_phase and num_orientation must be greater than 0")
     
-    else:
-        step_orientation=pi/num_orientation
-        step_phase=2*pi/num_phase
-        
-        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                          Feature(name="orientation",range=(0,pi),step=step_orientation,cyclic=True),
-                          Feature(name="frequency",values=frequencies)]     
-
-        x_axis='orientation'
-        x=FeatureCurves(feature_values,sheet,x_axis)
-           
+    step_orientation=pi/num_orientation
+    step_phase=2*pi/num_phase
     
-	for curve in curve_parameters:
-            param_dict = {"x":x_value,"y":y_value}
-            param_dict.update(curve)
-	    curve_label='Contrast = '+str(curve["contrast"])+'%'
-            x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
+    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                      Feature(name="orientation",range=(0,pi),step=step_orientation,cyclic=True),
+                      Feature(name="frequency",values=frequencies)]     
+
+    x_axis='orientation'
+    x=FeatureCurves(feature_values,sheet,x_axis)
+       
+    
+    for curve in curve_parameters:
+        param_dict = {"x":x_value,"y":y_value}
+        param_dict.update(curve)
+        curve_label='Contrast = '+str(curve["contrast"])+'%'
+        x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
                
 
 ###############################################################################
@@ -1131,21 +1121,20 @@ def measure_size_response(num_phase=18,
     if num_phase <= 0:
         raise ValueError("num_phase must be greater than 0")
 
-    else:
-        step_phase=2*pi/num_phase
-        step_size=1.0/num_sizes
-        
-        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                          Feature(name="size",range=(0.1,1.0),step=step_size,cyclic=False)]
+    step_phase=2*pi/num_phase
+    step_size=1.0/num_sizes
+    
+    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                      Feature(name="size",range=(0.1,1.0),step=step_size,cyclic=False)]
 
-        x_axis='size'
-        x=FeatureCurves(feature_values,sheet,x_axis)
-          
-        for curve in curve_parameters:
-            param_dict = {"x":x_value,"y":y_value,"orientation":or_value}
-            param_dict.update(curve)
-	    curve_label='Contrast = '+str(curve["contrast"])+'%'
-            x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
+    x_axis='size'
+    x=FeatureCurves(feature_values,sheet,x_axis)
+      
+    for curve in curve_parameters:
+        param_dict = {"x":x_value,"y":y_value,"orientation":or_value}
+        param_dict.update(curve)
+        curve_label='Contrast = '+str(curve["contrast"])+'%'
+        x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
 
 
 ###############################################################################
@@ -1205,19 +1194,18 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relativ
     if num_phase <= 0 :
         raise ValueError("num_phase must be greater than 0")
 
-    else:
-        step_phase=2*pi/num_phase
-        
-        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                          Feature(name="contrast",values=contrasts,cyclic=False)]  
-        x_axis='contrast'
-        x=FeatureCurves(feature_values,sheet,x_axis)
+    step_phase=2*pi/num_phase
+    
+    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                      Feature(name="contrast",values=contrasts,cyclic=False)]  
+    x_axis='contrast'
+    x=FeatureCurves(feature_values,sheet,x_axis)
    
-	for curve in curve_parameters:
-            param_dict = {"x":x_value,"y":y_value,"frequency":frequency, "size":size}
-            param_dict.update(curve)
-            curve_label='Orientation = %.4f rad' % curve["orientation"] 
-	    x.collect_feature_responses(feature_values,pattern_presenter, param_dict, curve_label,display)
+    for curve in curve_parameters:
+        param_dict = {"x":x_value,"y":y_value,"frequency":frequency, "size":size}
+        param_dict.update(curve)
+        curve_label='Orientation = %.4f rad' % curve["orientation"] 
+        x.collect_feature_responses(feature_values,pattern_presenter, param_dict, curve_label,display)
 
 
 ###############################################################################
@@ -1240,22 +1228,21 @@ def measure_dr_pref(num_phase=12,num_direction=6,num_speeds=4,max_speed=2.0/24,
     if num_phase <= 0 or num_direction <= 0:
         raise ValueError("num_phase and num_direction must be greater than 0")
 
-    else:
-        step_phase=2*pi/num_phase
-        step_direction=2*pi/num_direction 
-        step_speed=float(max_speed)/num_speeds
+    step_phase=2*pi/num_phase
+    step_direction=2*pi/num_direction 
+    step_speed=float(max_speed)/num_speeds
 
-        feature_values = [Feature(name="speed",range=(0.0,max_speed),step=step_speed,
-                                  cyclic=False),
-                          Feature(name="frequency",values=frequencies),
-                          Feature(name="direction",range=(0.0,2*pi),step=step_direction, 
-                                  cyclic=True),
-                          Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
+    feature_values = [Feature(name="speed",range=(0.0,max_speed),step=step_speed,
+                              cyclic=False),
+                      Feature(name="frequency",values=frequencies),
+                      Feature(name="direction",range=(0.0,2*pi),step=step_direction, 
+                              cyclic=True),
+                      Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
 
-        param_dict = {"scale":scale,"offset":offset}
-        x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
-        fm = x._fullmatrix
+    param_dict = {"scale":scale,"offset":offset}
+    x=FeatureMaps(feature_values)
+    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+    fm = x._fullmatrix
         
     Subplotting.set_subplots("Direction",force=True)	 
     return fm
@@ -1277,21 +1264,20 @@ def measure_hue_pref(num_phase=12,num_orientation=4,hues=[0.0,0.4,1.0],
     if num_phase <= 0 or len(hues) <= 0:
         raise ValueError("num_phase and number of hues must be greater than 0")
 
-    else:
-        step_phase=2*pi/num_phase
-        step_orientation=pi/num_orientation
+    step_phase=2*pi/num_phase
+    step_orientation=pi/num_orientation
 
-        feature_values = [Feature(name="frequency",values=frequencies),
-                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
-                          Feature(name="hue", values=hues),
-                          Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
+    feature_values = [Feature(name="frequency",values=frequencies),
+                      Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
+                      Feature(name="hue", values=hues),
+                      Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
 
-        param_dict = {"scale":scale,"offset":offset}
-        x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
-        fm = x._fullmatrix
+    param_dict = {"scale":scale,"offset":offset}
+    x=FeatureMaps(feature_values)
+    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+    fm = x._fullmatrix
         
-  #  Subplotting.set_subplots("Hue",force=True)	 
+    # Subplotting.set_subplots("Hue",force=True)	 
     return fm
     
 ###############################################################################	
@@ -1364,15 +1350,15 @@ def measure_corner_or_pref(divisions=20,num_orientation=8,scale=1.0,offset=0.0,d
     """
     if divisions <= 0 or num_orientation <= 0:
         raise ValueError("divisions and num_orientation must be greater than 0")
-    else:
-        step_orientation=2*pi/num_orientation
-        # JABALERT: Will probably need some work to support multiple input regions
-        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
-                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
-                          Feature(name="orientation",range=(0.0,2*pi),step=step_orientation,cyclic=True)
-                         ]          
-                          
-        param_dict = {"scale":scale,"offset":offset}
-        x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+
+    step_orientation=2*pi/num_orientation
+    # JABALERT: Will probably need some work to support multiple input regions
+    feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
+                      Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
+                      Feature(name="orientation",range=(0.0,2*pi),step=step_orientation,cyclic=True)
+                     ]          
+                      
+    param_dict = {"scale":scale,"offset":offset}
+    x=FeatureMaps(feature_values)
+    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
