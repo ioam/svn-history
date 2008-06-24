@@ -128,18 +128,13 @@ class PatternPresenter(ParameterizedObject):
                     setattr(inputs[name],'orientation',orientation)
                 except:
                     self.warning('Direction is defined only when there are different input lags (numbered at the end of their name).')
-
+           
 
         if features_values.has_key('hue'):
-            if features_values['hue']==0:
-                inputs[input_sheet_names[0]]=inputs[input_sheet_names[0]]
-                inputs[input_sheet_names[1]]=Constant(scale=0)
-            if features_values['hue']==1:
-                inputs[input_sheet_names[1]]=inputs[input_sheet_names[1]]
+            if features_values['hue']==0.4:
                 inputs[input_sheet_names[0]]=Constant(scale=0)
-            if features_values['hue']==2:
-                inputs[input_sheet_names[0]]=inputs[input_sheet_names[0]]
-                inputs[input_sheet_names[1]]=inputs[input_sheet_names[1]]
+            if features_values['hue']==1.0:
+                inputs[input_sheet_names[1]]=Constant(scale=0)
                          
 
         if features_values.has_key("phasedisparity"):
@@ -652,6 +647,14 @@ pg= create_plotgroup(name='Orientation and Direction Preference',category="Combi
 
 ####################################################################################
 
+pg= create_plotgroup(name='Orientation and Hue Preference',category="Combined Preference Maps",
+             doc='Plot the orientation preference overlaid with hue preference boundaries.',
+             update_command='',
+             plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","HuePreference",0.9,"red")])',            
+             normalize=False)
+
+####################################################################################
+
 pg= create_plotgroup(name='Orientation, Ocular and Direction Preference',category="Combined Preference Maps",
              doc='Plot the orientation preference overlaid with ocular dominance boundaries and direction preference arrows.',
              update_command='',
@@ -820,7 +823,7 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
         fm = x._fullmatrix
 
-    Subplotting.set_subplots("Orientation",force=False)
+   # Subplotting.set_subplots("Orientation",force=False)
     return fm
 
 ###############################################################################
@@ -1264,13 +1267,11 @@ pg= create_plotgroup(name='Hue Preference',category="Preference Maps",
 pg.add_plot('Hue Preference',[('Hue','HuePreference')])
 pg.add_plot('Hue Preference&Selectivity',[('Hue','HuePreference'), ('Confidence','HueSelectivity')])
 pg.add_plot('Hue Selectivity',[('Strength','HueSelectivity')])
-#pg.add_static_image('Color Key','topo/commands/dr_key_white_vert_small.png')
 
 
-
-def measure_hue_pref(num_phase=12,num_orientation=4,hues=[0,1,2],
+def measure_hue_pref(num_phase=12,num_orientation=4,hues=[0.0,0.4,1.0],
                     frequencies=[2.4],scale=0.3,offset=0.0, 
-                    display=True, weighted_average=True,
+                    display=False, weighted_average=True,
                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
 
     if num_phase <= 0 or len(hues) <= 0:
@@ -1290,7 +1291,7 @@ def measure_hue_pref(num_phase=12,num_orientation=4,hues=[0,1,2],
         x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
         fm = x._fullmatrix
         
-    Subplotting.set_subplots("Hue",force=True)	 
+  #  Subplotting.set_subplots("Hue",force=True)	 
     return fm
     
 ###############################################################################	
