@@ -61,12 +61,12 @@ for e in eyes:
 
         for cone in cone_types:
             image_filenames=["images/colormap/%02d_%d.png"%(i,(cone=='Green')) for i in xrange(5)]
-            inputs=[input_type(filename=f, size_normalization='original',
+            inputs=[input_type(filename=f, size=10.0,#size_normalization='original',
                                x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
                                y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
                                orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),
-                               scale=         2.0-UniformRandom(lbound=1,ubound=1,seed=78) \
-                               if e=='Right' else UniformRandom(lbound=1,ubound=1,seed=78))
+                               scale=         2.0-UniformRandom(lbound=0,ubound=2,seed=78) \
+                               if e=='Right' else UniformRandom(lbound=0,ubound=2,seed=78))
                     for f in image_filenames]
 
             input_composite=topo.patterns.basic.Selector(generators=inputs)
