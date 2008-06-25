@@ -386,7 +386,7 @@ def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],overlay=[('co
                     		    for j in X:
                     		        p_sc[i][j]=p[scale*i][scale*j]
                     		        s_sc[i][j]=s[scale*i][scale*j]
-                    		pylab.quiver(scale*X,scale*X,cos(2*pi*p_sc)*s_sc,sin(2*pi*p_sc)*s_sc,color=c,edgecolors=c,minshaft=3,linewidths=1)						
+                    		pylab.quiver(scale*X,scale*X,cos(2*pi*p_sc)*s_sc,sin(2*pi*p_sc)*s_sc,color=c,edgecolors=('black',),minshaft=3,linewidths=1)						
 							
                 title='%s overlaid with %s at time %s' %(plot.name,pref,topo.sim.timestr())
                 if isint: pylab.ion()
