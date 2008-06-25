@@ -24,10 +24,11 @@ $Id: lissom_oo_or_homeostatic.ty 8197 2008-03-14 11:03:24Z judelaw $
 """
 __version__='$Revision: 8197 $'
 
+import fixedpoint
 import numpy
 
 from math import pi, sqrt
-
+from fixedpoint import FixedPoint
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -41,9 +42,10 @@ from topo.base.cf import CFSheet, CFPLF_PluginScaled
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF, IdentityOF, ActivityAveragingOF, AttributeTrackingOF, Sigmoid, HalfRectify, HomeostaticMaxEnt,CascadeHomeostatic
+from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF, IdentityOF, ActivityAveragingOF, AttributeTrackingOF, Sigmoid, HalfRectify, HomeostaticMaxEnt
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.patterns.image import Image
+from contrib.jacommands import CascadeHomeostatic
 
 ####Input type###
 type_input=locals().get('ti',"Gaussian")
@@ -74,7 +76,7 @@ elif type_input=="Natural":
                        x=UniformRandom(lbound=-0.75,ubound=0.75,seed=rand_seedx),
                        y=UniformRandom(lbound=-0.75,ubound=0.75,seed=rand_seedy),
                        orientation=UniformRandom(lbound=-pi,ubound=pi,seed=rand_seedo))
-		for f in image_filenames]
+                for f in image_filenames]
 
     combined_inputs =topo.patterns.basic.Selector(generators=inputs)
 
@@ -123,7 +125,7 @@ elif type_input=="NoisyDiskstoNatural":
                        x=UniformRandom(lbound=-0.75,ubound=0.75,seed=rand_seedx),
                        y=UniformRandom(lbound=-0.75,ubound=0.75,seed=rand_seedy),
                        orientation=UniformRandom(lbound=-pi,ubound=pi,seed=rand_seedo))
-		for f in image_filenames]
+                for f in image_filenames]
 
     natural_combined_inputs =topo.patterns.basic.Selector(generators=natural_inputs)
 
@@ -148,9 +150,8 @@ elif type_input=="ChangeScale":
     new_combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=0,generators=inputs2)
 
 #Sheet coordinates of units to track for debugging
-units=[(0.0, 0.0),(0.25,0.25),(0.49,0.49),(-0.25,0.25),(-0.49,0.49),
-       (0.25,-0.25),(0.49,-0.49),(-0.25,-0.25),(-0.49,-0.49),
-       (0.0,0.25), (0.25,0.0), (0.0,-0.25), (-0.25,0.0)]
+units=[(0.25,0.25),(-0.25,0.25),
+       (0.25,-0.25),(-0.25,-0.25)]
 
 
 
@@ -196,8 +197,8 @@ if tracking==True:
             V1_OF=PipelineOF(output_fns=[HE, V1_Tracker])
     elif simple==True:
             Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
-            HE=CascadeHomeostatic(smoothing=locals().get('V1_smoothing',smoothing), a_smoothing=locals().get('a_smoothing',0.9997),         b_smoothing=locals().get('b_smoothing',0.9997), 
-                                 b_eta=locals().get('b_eta',0.002*9), a_init=locals().get('a_init',14.5),
+            HE=CascadeHomeostatic(smoothing=smoothing,g_smoothing=locals().get('V1_smoothing',smoothing), a_smoothing=locals().get('a_smoothing',0.9997),b_smoothing=locals().get('b_smoothing',0.9997), 
+                                 b_eta=locals().get('b_eta',0.002*9),a_eta=locals().get('a_eta',0.002*9), a_init=locals().get('a_init',14.5),
                                  b_init=locals().get('b_init',-5.5), mu=mu, step=9)
             V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['a', 'b','y_avg','y_count'], units=units, step=9)
             V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
@@ -314,37 +315,37 @@ else:
                                   target=afferent_target, smoothing=smoothing,lr_smoothing=0.999,target_lr=locals().get('target_lr',0.045))
 
 
-topo.sim.connect('Retina','LGNOn',delay=0.05,
+topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
                  connection_type=SharedWeightCFProjection,strength=locals().get('ret_strength',2.33),
                  nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                  weights_generator=on_weights)
 
-topo.sim.connect('Retina','LGNOff',delay=0.05,
+topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
                  connection_type=SharedWeightCFProjection,strength=locals().get('ret_strength',2.33),
                  nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
                  weights_generator=off_weights)
 
-topo.sim.connect('LGNOn','V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
+topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,
                  learning_fn=CFPLF_PluginScaled(),
                  strength=lgn_strength,name='LGNOnAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
-		 learning_rate=locals().get('aff_lr',0.137))
-               		 
-topo.sim.connect('LGNOff','V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
-		 connection_type=CFProjection,
+                 learning_rate=locals().get('aff_lr',0.137))
+                         
+topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
+                 connection_type=CFProjection,
                  learning_fn=CFPLF_PluginScaled(),
                  strength=lgn_strength,name='LGNOffAfferent',
                  weights_generator=gauss_rand(size=2*0.27083),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
-		 learning_rate=locals().get('aff_lr',0.137))
+                 learning_rate=locals().get('aff_lr',0.137))
 
 lat_scaling = locals().get('lat_scaling',False)
 
 if lat_scaling==True:
     
-    topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
+    topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                      connection_type=ScaledCFProjection,
                      smoothing=smoothing,
                      target=1.0*locals().get('exc_tar',0.01),
@@ -354,7 +355,7 @@ if lat_scaling==True:
                      weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
                      nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0.0) 
 
-    topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
+    topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                      connection_type=ScaledCFProjection,
                      smoothing=smoothing,
                      target=-1.0*locals().get('inh_tar',0.01),
@@ -365,13 +366,13 @@ if lat_scaling==True:
                      nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=locals().get('lat_lr',1.80873))
 
 else:
-    topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
+    topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                      connection_type=CFProjection,
                      strength=1.0*locals().get('exc_strength',1.0),
                      weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
                      nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0.0) 
 
-    topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
+    topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                      connection_type=CFProjection,
                      strength=-1.0*locals().get('inh_strength',1.0),
                      weights_generator=gauss_rand(size=2*0.22917),
