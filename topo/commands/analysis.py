@@ -135,11 +135,11 @@ class PatternPresenter(ParameterizedObject):
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
                 imageHSV=HSVBitmap(array([[features_values['hue']]]),array([[1.0]]),array([[1.0]]))
                 if (name[0:3]=='Red'):
-                    inputs[name].offset=imageHSV.rmat[0,0]
+                    inputs[name].scale=imageHSV.rmat[0,0]
                 elif (name[0:5]=='Green'):
-                    inputs[name].offset=imageHSV.gmat[0,0]
+                    inputs[name].scale=imageHSV.gmat[0,0]
                 elif (name[0:4]=='Blue'):
-                    inputs[name].offset=imageHSV.bmat[0,0]
+                    inputs[name].scale=imageHSV.bmat[0,0]
                 else: 
                     self.warning('Hue is defined only when there are different input sheets with names starting with Red-, Green-, Blue-.')
 
@@ -1263,16 +1263,23 @@ pg.add_plot('Hue Preference&Selectivity',[('Hue','HuePreference'), ('Confidence'
 pg.add_plot('Hue Selectivity',[('Strength','HueSelectivity')])
 
 
-def measure_hue_pref(num_hue=10,scale=0.0,offset=0.0, 
-                    display=False, weighted_average=True,
-                    pattern_presenter=PatternPresenter(pattern_generator=Constant(),apply_output_fn=False,duration=0.175)):
+def measure_hue_pref(num_orientation=4,num_phase=12,num_hue=6,
+                     frequencies=[2.4],scale=0.0,offset=0.0, 
+                     display=False, weighted_average=True,
+                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
 
     if num_hue <= 0:
         raise ValueError("number of hues must be greater than 0")
+
     else:
         step_hue=1.0/num_hue
+        step_phase=2*pi/num_phase
+        step_orientation=pi/num_orientation
 
-        feature_values = [Feature(name="hue", range=(0.0,1.0),step=step_hue,cyclic=True)]
+    feature_values = [Feature(name="frequency",values=frequencies),
+                      Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
+                      Feature(name="hue", range=(0.0,1.0),step=step_hue,cyclic=True),
+                      Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
 
     param_dict = {"scale":scale,"offset":offset}
     x=FeatureMaps(feature_values)
