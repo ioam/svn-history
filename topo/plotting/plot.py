@@ -394,6 +394,7 @@ class SHCPlot(TemplatePlot):
         # value is 0.0 and then scale to make the maximum 1.0
         if normalize:
              s=self._normalize(s)
+             c=self._normalize(c)
             
 
         # This translation from SHC to HSV is valid only for black backgrounds;
