@@ -42,7 +42,7 @@ CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
-
+topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=4.0
 ###########################################
 # build simulation
 eyes=['']
