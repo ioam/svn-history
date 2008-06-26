@@ -129,8 +129,8 @@ elif type_input=="NoisyDiskstoNatural":
     natural_combined_inputs =topo.patterns.basic.Selector(generators=natural_inputs)
 
 #Units to track for debugging
-V1_units=[(-0.49, -0.49), (0.3, 0.3),(0, 0), (-0.3, -0.3),(0.49, 0.49)]
-LGN_units=[(0.2,0.2), (0.1,0.1), (0,0), (-0.1,-0.1), (-0.2,-0.2)]
+V1_units=[(0.25, 0.25),(-0.25, -0.25),(0.25, -0.25),(-0.25, 0.25)]
+LGN_units=[(0,0)]
 
 #Smoothing value for exponential averaging
 smoothing=locals().get('smoothing',0.999)
