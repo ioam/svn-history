@@ -1257,7 +1257,7 @@ def measure_dr_pref(num_phase=12,num_direction=6,num_speeds=4,max_speed=2.0/24,
 ###############################################################################
 pg= create_plotgroup(name='Hue Preference',category="Preference Maps",
              doc='Measure preference for colors.',
-             update_command='measure_hue_pref()')
+             update_command='measure_hue_pref()',normalize=True)
 pg.add_plot('Hue Preference',[('Hue','HuePreference')])
 pg.add_plot('Hue Preference&Selectivity',[('Hue','HuePreference'), ('Confidence','HueSelectivity')])
 pg.add_plot('Hue Selectivity',[('Strength','HueSelectivity')])
