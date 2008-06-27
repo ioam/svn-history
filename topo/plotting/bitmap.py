@@ -195,9 +195,9 @@ class HSVBitmap(Bitmap):
     def __init__(self,hue,sat,val):
         """Each matrix must be the same size, with values in the range 0.0 to 1.0."""
         shape = hue.shape # Assumed same as sat.shape and val.shape
-        self.rmat = Numeric.zeros(shape,Numeric.Float)
-        self.gmat = Numeric.zeros(shape,Numeric.Float)
-        self.bmat = Numeric.zeros(shape,Numeric.Float)
+        rmat = Numeric.zeros(shape,Numeric.Float)
+        gmat = Numeric.zeros(shape,Numeric.Float)
+        bmat = Numeric.zeros(shape,Numeric.Float)
 
         # Note: should someday file a feature request for PIL for them
         # to accept an image of type 'HSV', so that they will do this
@@ -210,13 +210,13 @@ class HSVBitmap(Bitmap):
         for i in range(shape[0]):
             for j in range(shape[1]):
                 r,g,b = hsv_to_rgb(ch[i,j],cs[i,j],cv[i,j])
-                self.rmat[i,j] = r
-                self.gmat[i,j] = g
-                self.bmat[i,j] = b
+                rmat[i,j] = r
+                gmat[i,j] = g
+                bmat[i,j] = b
         
-        rImage = self._arrayToImage(self.rmat)
-        gImage = self._arrayToImage(self.gmat)
-        bImage = self._arrayToImage(self.bmat)
+        rImage = self._arrayToImage(rmat)
+        gImage = self._arrayToImage(gmat)
+        bImage = self._arrayToImage(bmat)
 
         super(HSVBitmap,self).__init__(Image.merge('RGB',(rImage,gImage,bImage)))
 
