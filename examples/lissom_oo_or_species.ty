@@ -38,7 +38,7 @@ species = locals().get('species','mouse')
 if species=='mouse':
     ms=3.0           # Larger afferent connection fields
     msa=2.0          # Larger subcortical areas 
-    jitter_scale=0.5 # Large jitter in CF centers
+    jitter_scale=locals().get('jitter_scale',0.5) # Large jitter in CF centers
     li_strength=-2.0 # Stronger inhibition to still produce some retinotopy
     num_inputs=1     # Input patterns are huge; can only fit one at a time
     v1_density=locals().get('default_density',10.0)
