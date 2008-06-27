@@ -210,15 +210,11 @@ class TemplatePlot(Plot):
 
     def _get_matrix(self,key):
         """
-	Private Plot routine that just retrieves the matrix view (if any)
-        associated with a given key in the Plot.channels.
+        Retrieve the matrix view associated with a given key, if any.
 
-	If the key is in channels, the corresponding sheetviews is looked 
-        for in the view_dict, and its associated matrix is returned if found.
-        None is returned otherwise.
-        
-	(It just deals with the fact that channels can be None, or that the keys
-	specified by channels can potentially refer to no SheetViews in the dict).
+	If the key is found in self.channels and the corresponding
+        sheetview is found in self.view_dict, the view's matrix is
+        returned; otherwise None is returned (with no error).
         """
         sheet_view_key = self.channels.get(key,None)
 	sv = self.view_dict.get(sheet_view_key, None)
@@ -234,10 +230,11 @@ class TemplatePlot(Plot):
                 if self.timestamp < 0:
                     self.timestamp = timestamp
                 elif abs(timestamp - self.timestamp) > self.staleness_warning:
-                    # Warns only once for each old matrix used
+                    # JABALERT: This is supposed to warn only once for each old matrix used, 
+                    # but it's currently warning every time...
                     if self.warn_time != min(timestamp, self.timestamp):
-                        self.warning("Combining SheetViews from different times (%s,%s); see staleness_warning" %
-                                     (timestamp, self.timestamp))
+                        self.warning("Combining SheetViews from different times (%s,%s) for plot %s; see staleness_warning" %
+                                     (timestamp, self.timestamp,self.name))
                         self.warn_time = min(timestamp, self.timestamp)
             
         return matrix
