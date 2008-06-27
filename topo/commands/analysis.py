@@ -10,6 +10,7 @@ from numpy.oldnumeric import array, zeros, Float,size, shape, maximum
 from math import pi
 import copy
 import topo
+from colorsys import hsv_to_rgb
 from topo.base.arrayutils import octave_output, centroid
 from topo.base.cf import CFSheet, CFProjection, Projection
 from topo.base.parameterizedobject import ParameterizedObject
@@ -21,13 +22,12 @@ from topo.commands.basic import pattern_present, wipe_out_activity
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.utils import frange
 from topo.base.arrayutils import wrap
-from topo.patterns.basic import SineGrating, Gaussian, Constant
+from topo.patterns.basic import SineGrating, Gaussian
 from topo.patterns.teststimuli import SineGratingDisk
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.parameterclasses import Parameter
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
-from topo.plotting.bitmap import HSVBitmap
 from topo.misc.distribution import Distribution
 from topo.patterns.random import GaussianRandom
 from topo.base.simulation import EPConnectionEvent
@@ -133,13 +133,13 @@ class PatternPresenter(ParameterizedObject):
 
         if features_values.has_key('hue'):
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
-                imageHSV=HSVBitmap(array([[features_values['hue']]]),array([[1.0]]),array([[1.0]]))
+                r,g,b=hsv_to_rgb(features_values['hue'],1.0,1.0)
                 if (name[0:3]=='Red'):
-                    inputs[name].scale=imageHSV.rmat[0,0]
+                    inputs[name].scale=r
                 elif (name[0:5]=='Green'):
-                    inputs[name].scale=imageHSV.gmat[0,0]
+                    inputs[name].scale=g
                 elif (name[0:4]=='Blue'):
-                    inputs[name].scale=imageHSV.bmat[0,0]
+                    inputs[name].scale=b
                 else: 
                     self.warning('Hue is defined only when there are different input sheets with names starting with Red-, Green-, Blue-.')
 
@@ -1263,8 +1263,8 @@ pg.add_plot('Hue Preference&Selectivity',[('Hue','HuePreference'), ('Confidence'
 pg.add_plot('Hue Selectivity',[('Strength','HueSelectivity')])
 
 
-def measure_hue_pref(num_orientation=6,num_phase=12,num_hue=12,
-                     frequencies=[2.4],scale=0.0,offset=0.0, 
+def measure_hue_pref(num_orientation=4,num_phase=8,
+                     num_hue=12,frequencies=[2.4], 
                      display=False, weighted_average=True,
                      pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
 
@@ -1281,9 +1281,8 @@ def measure_hue_pref(num_orientation=6,num_phase=12,num_hue=12,
                       Feature(name="hue", range=(0.0,1.0),step=step_hue,cyclic=True),
                       Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
 
-    param_dict = {"scale":scale,"offset":offset}
     x=FeatureMaps(feature_values)
-    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+    x.collect_feature_responses(pattern_presenter,{},display,weighted_average)
     fm = x._fullmatrix
         
     Subplotting.set_subplots("Hue",force=True)	 
