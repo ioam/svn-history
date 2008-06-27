@@ -38,6 +38,8 @@ from topo.base.parameterizedobject import ParameterizedObject
 import topo.patterns.basic
 import topo.patterns.random
 
+# ALERT: Consider moving these to the main topo/ directory, perhaps
+# after generalizing them.
 
 class LinearDecay(ParameterizedObject):
     """Linear function decreasing from the starting_value to the ending_value."""
