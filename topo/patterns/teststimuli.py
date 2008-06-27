@@ -27,7 +27,6 @@ from topo.base.patterngenerator import Constant
 
 from topo.misc.patternfns import gaussian,gabor,line,disk,ring
 from topo.misc.numbergenerators import UniformRandom
-from topo.base.parameterclasses import BooleanParameter
 
 
 
