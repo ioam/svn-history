@@ -1263,8 +1263,8 @@ pg.add_plot('Hue Preference&Selectivity',[('Hue','HuePreference'), ('Confidence'
 pg.add_plot('Hue Selectivity',[('Strength','HueSelectivity')])
 
 
-def measure_hue_pref(num_orientation=4,num_phase=8,
-                     num_hue=12,frequencies=[2.4], 
+def measure_hue_pref(num_orientation=4,num_phase=12,
+                     num_hue=8,frequencies=[2.4], 
                      display=False, weighted_average=True,
                      pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
 
