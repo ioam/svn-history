@@ -825,7 +825,7 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
     x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
     fm = x._fullmatrix
 
-   # Subplotting.set_subplots("Orientation",force=False)
+    Subplotting.set_subplots("Orientation",force=True)
     return fm
 
 ###############################################################################
