@@ -93,6 +93,8 @@ def complexity(full_matrix):
                 iindex[phase_index] = i
                 res = res + abs(full_matrix.full_matrix[tuple(iindex.tolist())][x][y] - average)
                 complex_matrix[x,y] = complex_matrix[x,y] + [full_matrix.full_matrix[tuple(iindex.tolist())][x][y]]
+            #this is taking away the DC component
+            complex_matrix[x,y] -= numpy.min(complex_matrix[x,y]) 
             complexity[x,y] = res / (2*sum)
             fft = numpy.fft.fft(complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y]+complex_matrix[x,y],2048)
             first_har = 2048/len(complex_matrix[0,0])
