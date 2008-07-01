@@ -384,10 +384,16 @@ def update_histogram(sheet_name="V1"):
 
 
 def measure_histogram():
+    topo.sim.state_push()
+    topo.sim["V1"].plastic=False
     for i in xrange(0,1000):
         topo.sim.run(1)
         update_histogram()
-    pylab.hist(current_histogram,(numpy.arange(100.0)/100.0))
+    
+    pylab.subplot(111, yscale='log') 
+    pylab.hist(topo.commands.basic.activity_history,(numpy.arange(20.0)/20.0),histtype='step')
+    pylab.savefig(normalize_path(str(topo.sim.time()) + 'activity_histogram.png'))
+    topo.sim.state_pop()
     
     
 def enable_movie():
@@ -539,4 +545,26 @@ class CascadeHomeostatic(OutputFnWithState):
                 self.y_count=self.a_grad
 
   
-    
+class ActivityHysteresis(OutputFnWithState):
+    """ 
+    This output function allows the activity to be smoothly interpolated between 
+    individual time step of the simulation. The time_constant paremater controls the 
+    time scale of this interpolation. 
+    """
+
+    time_constant  = Number(default = 0.3,doc="""Time constant of the continouse projection input calculation.""")
+
+    def __init__(self,**params):
+        super(ActivityHysteresis,self).__init__(**params)
+        self.old_a = self.activity.copy()*0.0
+        self.first_call = True
+        
+    def __call__(self,x):
+        if (first_call == True):
+           self.old_a = self.activity.copy() * 0.0
+           first_call = False
+            
+        if (float(topo.sim.time()) %1.0) <= 0.15: self.old_a = 0 
+        new_a = x.copy()
+        self.old_a = self.old_a + (new_a - self.old_a)*self.time_constant
+        return self.old_a    
