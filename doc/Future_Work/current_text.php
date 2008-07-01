@@ -53,7 +53,22 @@ Prorities:
 3: release someday
 0: remove alert
 
-(9): Merge tile branch (CEB)
+
+(9) matplotlib: upgrade to at least 0.91.3, and maybe 0.98.0.  I'm not
+sure about 0.98.0; it might break our 3D right-click plots (as someone
+hinted a few months back), but it's probably easy to try and see.
+
+(9) numpy: upgrade to
+
+(8) add an option to clean up external/ once topographica has been
+built, to free up some space for users while still leaving it
+updatable
+
+(8) Base class of Number that allows a value of None
+
+(8) Move test data files into subdirectories of topo/tests 
+
+
 (9): Merge or abandon (or move to 1.0?) idle branch? (CEB)
 
 
