@@ -374,26 +374,45 @@ current_histogram = []
 activity_queue = []
 call_time=0
 def update_histogram(sheet_name="V1"):
-    activity_queue.insert(0,topo.sim[sheet_name])
-    if(call_time>=1000):
-        activity_queue.pop()
-    call_time=call_time+1
-    current_histogram = numpy.empty(0)
-    for a in activity_queue:
-        numpy.concatenate((current_histogram,a.flatten()),axis=1)
+    import contrib.jacommands
+    contrib.jacommands.activity_queue.insert(0,topo.sim[sheet_name].activity)
+    if(contrib.jacommands.call_time>=1000):
+        contrib.jacommands.activity_queue.pop()
+    contrib.jacommands.call_time=contrib.jacommands.call_time+1
+    contrib.jacommands.current_histogram = numpy.empty(0)
+    for a in contrib.jacommands.activity_queue:
+        numpy.concatenate((contrib.jacommands.current_histogram,a.flatten()),axis=1)
+    print contrib.jacommands.current_histogram     
 
 
-def measure_histogram():
-    topo.sim.state_push()
-    topo.sim["V1"].plastic=False
-    for i in xrange(0,1000):
-        topo.sim.run(1)
-        update_histogram()
+activities = []
+def collect_activity(sheet_name):
+    import contrib.jacommands
+    contrib.jacommands.activities.insert(0,topo.sim[sheet_name].activity.copy())
+
+def measure_histogram(iterations=1000,sheet_name="V1"):
+    import contrib.jacommands    
     
+    topo.sim["V1"].plastic=False
+    for i in xrange(0,iterations):
+        topo.sim.run(1)
+        topo.sim.state_push()
+        contrib.jacommands.collect_activity(sheet_name)
+        topo.sim.state_pop()
+    concat_activities=[]
+        
+    for a in contrib.jacommands.activities:
+            concat_activities = numpy.concatenate((concat_activities,a.flatten()),axis=1)
+    
+    topo.sim["V1"].plastic=True
+    activities = []
+    
+    pylab.figure()
     pylab.subplot(111, yscale='log') 
-    pylab.hist(topo.commands.basic.activity_history,(numpy.arange(20.0)/20.0),histtype='step')
+    pylab.hist(concat_activities,(numpy.arange(20.0)/20.0))
+    
     pylab.savefig(normalize_path(str(topo.sim.time()) + 'activity_histogram.png'))
-    topo.sim.state_pop()
+
     
     
 def enable_movie():
@@ -568,3 +587,4 @@ class ActivityHysteresis(OutputFnWithState):
         new_a = x.copy()
         self.old_a = self.old_a + (new_a - self.old_a)*self.time_constant
         return self.old_a    
+    
