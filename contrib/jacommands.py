@@ -395,8 +395,8 @@ def measure_histogram(iterations=1000,sheet_name="V1"):
     
     topo.sim["V1"].plastic=False
     for i in xrange(0,iterations):
-        topo.sim.run(1)
         topo.sim.state_push()
+        topo.sim.run(1)
         contrib.jacommands.collect_activity(sheet_name)
         topo.sim.state_pop()
     concat_activities=[]
