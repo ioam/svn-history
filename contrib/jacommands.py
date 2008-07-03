@@ -405,7 +405,7 @@ def measure_histogram(iterations=1000,sheet_name="V1"):
             concat_activities = numpy.concatenate((concat_activities,a.flatten()),axis=1)
     
     topo.sim["V1"].plastic=True
-    activities = []
+    contrib.jacommands.activities = []
     
     pylab.figure()
     pylab.subplot(111, yscale='log') 
