@@ -408,8 +408,11 @@ def measure_histogram(iterations=1000,sheet_name="V1"):
     contrib.jacommands.activities = []
     
     pylab.figure()
-    pylab.subplot(111, yscale='log') 
+    pylab.subplot(111, yscale='log')
+    
     pylab.hist(concat_activities,(numpy.arange(20.0)/20.0))
+    pylab.axis(ymin=10,ymax=100000000)
+      
     
     pylab.savefig(normalize_path(str(topo.sim.time()) + 'activity_histogram.png'))
 
