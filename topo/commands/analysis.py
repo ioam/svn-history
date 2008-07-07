@@ -923,7 +923,7 @@ def measure_sf_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 ###############################################################################
 pg= create_plotgroup(name='PhaseDisparity Preference',category="Preference Maps",
              doc='Measure preference for sine gratings differing in phase between two sheets.',
-             update_command='measure_phasedisparity()')
+             update_command='measure_phasedisparity()',normalize=True)
 pg.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
 pg.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
 pg.add_static_image('Color Key','topo/commands/disp_key_white_vert_small.png')
