@@ -22,12 +22,12 @@ These simulations are intended to be close (but approximate) matches
 to the various map simulations in chapter 5 of Miikkulainen, Bednar,
 Choe, and Sirosh (2005), Computational Maps in the Visual Cortex,
 Springer.  Specifically:
-    dataset="Gaussian", dimensions=["or"]:           Figure 5.9
-    dataset="Nature",   dimensions=["or"]:           Figure 5.13 Nature
-    dataset="Gaussian", dimensions=["od","dr"]:      Figure 5.23
-    dataset="Gaussian", dimensions=["or","od"]:      Figure 5.27
-    dataset="Gaussian", dimensions=["or","od","dr"]: Figure 5.29
-    dataset="Nature",   dimensions=["or","od","dr"]: Figure 5.31
+    dataset='Gaussian', dims=['or']:           Figure 5.9
+    dataset='Nature',   dims=['or']:           Figure 5.13 Nature
+    dataset='Gaussian', dims=['od','dr']:      Figure 5.23
+    dataset='Gaussian', dims=['or','od']:      Figure 5.27
+    dataset='Gaussian', dims=['or','od','dr']: Figure 5.29
+    dataset='Nature',   dims=['or','od','dr']: Figure 5.31
 
 Known differences include:
 
@@ -109,7 +109,7 @@ if 'dr' in dims:
 if 'dy' in dims: 
     max_disparity = locals().get('max_disparity',2.0)
     disparity_bound = max_disparity*0.041665/2.0
-    if max_disparity > 0: position_bound = 0.70833
+    if max_disparity > 0.0: position_bound = 0.70833
 
 num_inputs=1
 dataset=locals().get('dataset',"Gaussian")
@@ -125,7 +125,7 @@ for e in eyes:
 
         if dataset=="Gaussian":
             inputs=[input_type(x=UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12+i) + \
-                                 UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150+i)*('dy' in dims)*(-1)**(e=='Left'),
+                                 UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150+i)*(-1)**(e=='Left'),
                                y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
                                orientation=0 if n != '' else UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
                                size=0.088388, aspect_ratio=4.66667,
@@ -146,7 +146,7 @@ for e in eyes:
 		    for f in image_filenames]
             input_composite=topo.patterns.basic.Selector(generators=inputs)
 
-        default_retina_density=locals().get('default_retina_density',48.0 if dataset=="Nature" else 24.0)
+        default_retina_density=locals().get('default_retina_density',48.0 if dataset=="Nature" or 'dy' in dims else 24.0)
 
         if n != '':
             input_moved=Sweeper(generator=copy.deepcopy(input_composite),step=int(n),speed=speed/24.0,
@@ -180,9 +180,9 @@ lgn_weights['On'] = topo.patterns.basic.Composite(
 lgn_weights['Off'] = topo.patterns.basic.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
-strength=[2.33, 2.38, 2.53, 2.8] #2.33 for speed=0, 2.38 for speed=1, 2.53 for speed=2, 2.8 for speed=3 from CMVC
+strength=[2.33, 2.38, 2.53, 2.8] # 2.33 for speed=0, 2.38 for speed=1, 2.53 for speed=2, 2.8 for speed=3 from CMVC
 if dataset=="Nature":
-    strength=[4.7,4.8,5.1,5.8] 
+    strength=[4.7, 4.8, 5.1, 5.8] 
 
 for e in eyes:
     for n in lags:
