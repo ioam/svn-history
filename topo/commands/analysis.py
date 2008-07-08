@@ -650,6 +650,14 @@ pg= create_plotgroup(name='Orientation and Direction Preference',category="Combi
 
 ####################################################################################
 
+pg= create_plotgroup(name='Orientation and PhaseDisparity Preference',category="Combined Preference Maps",
+             doc='Plot the orientation preference overlaid with phase disparity preference boundaries.',
+             update_command='',
+             plot_command='overlaid_plots(plot_template=[{"Hue":"OrientationPreference","Confidence":"OrientationSelectivity"},{"Strength":"OrientationSelectivity"}],overlay=[("contours","PhasedisparityPreference",0.83,"magenta"),("contours","PhasedisparityPreference",0.08,"yellow")])',            
+             normalize=False)
+
+####################################################################################
+
 pg= create_plotgroup(name='Orientation and Hue Preference',category="Combined Preference Maps",
              doc='Plot the orientation preference overlaid with hue preference boundaries.',
              update_command='',
