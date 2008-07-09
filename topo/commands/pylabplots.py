@@ -18,7 +18,7 @@ __version__='$Revision$'
 try:
     import matplotlib
     import pylab
-except:
+except ImportError:
     print "Warning: Could not import matplotlib; pylab plots will not work."
 
 import numpy

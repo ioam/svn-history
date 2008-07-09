@@ -22,7 +22,7 @@ try:
     matplotlib_imported=True
     from matplotlib import rcParams
     rcParams['backend']='Agg'
-except:
+except ImportError:
     print "Warning: Could not import matplotlib; pylab plots will not work."
 
 # Startup banner
