@@ -138,11 +138,12 @@ for e in eyes:
         elif dataset=="Nature":
             image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
             inputs=[input_type(filename=f,size=10.0, # size_normalization='original',
-                               x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+                               x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12) + \
+                                 UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150)*(-1)**(e=='Left'),
                                y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
                                orientation=0 if n != '' else UniformRandom(lbound=-pi,ubound=pi,seed=56),
                                scale=         2.0-UniformRandom(lbound=0,ubound=2,seed=78) \
-                               if e=='Right' else UniformRandom(lbound=0,ubound=2,seed=78))
+                               if e=='Right' and 'od' in dims else UniformRandom(lbound=0,ubound=2,seed=78))
 		    for f in image_filenames]
             input_composite=topo.patterns.basic.Selector(generators=inputs)
 
