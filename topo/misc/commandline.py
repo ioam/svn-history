@@ -412,7 +412,15 @@ def process_argv(argv):
         __main__.__name__="__mynamespace__"
 
         from IPython.Shell import IPShell
-        print "topo_t000000.00_c0>>>  " # Hack for Emacs shell mode
+
+        # CEBALERT: is this hack really necessary? Even without it, I
+        # still get a prompt when topographica starts (DICE, emacs
+        # 21.4.1).
+        # Hack for Emacs shell mode
+        if os.getenv('EMACS')=='t':
+            print "topo_t000000.00_c0>>>  "
+
+            
         IPShell(['-noconfirm_exit','-nobanner',
                  '-pi1',CommandPrompt.get_format(),
                  '-pi2',CommandPrompt2.get_format(),
