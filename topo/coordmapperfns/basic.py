@@ -488,3 +488,7 @@ def test_ottes_inverse():
                 print '%10.2f %10.2f | %10.2f %10.2f | %10.2f %10.2f | %.2f' \
                       % (r,phi,r2,phi2,r2-r,phi2-phi,phi/phi2)
 
+
+__all__ = list(set([k for k,v in locals().items()
+                    if isinstance(v,type) \
+                    and issubclass(v,CoordinateMapperFn)]))
