@@ -103,4 +103,6 @@ class BCMFixed(LearningFn):
 
 
 
+__all__ = list(set([k for k,v in locals().items()
+                    if isinstance(v,type) and issubclass(v,LearningFn)]))
 
