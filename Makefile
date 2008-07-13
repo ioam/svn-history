@@ -55,7 +55,7 @@ uninstall:
 
 # Mac OS X: to build python with tcl/tk from /Library/Frameworks
 osx-tk-patch:
-	patch --force exernal/Makefile external/Makefile_OSX_tk.diff
+	patch --force external/Makefile external/Makefile_OSX_tk.diff
 	touch osx-tk-patch
 
 osx-tk-patch-uninstall:
