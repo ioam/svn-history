@@ -154,6 +154,13 @@ def start(mainloop=False,banner=True,root=None,console_has_console=False):
         root = Tkinter.Tk()
     root.withdraw()
 
+    if system_platform=='mac': 
+        import topo.misc.filepaths
+        pack_path = os.path.join(topo.misc.filepaths.application_path,
+                                 "lib")
+        root.tk.call("lappend","auto_path",pack_path)
+
+
     root.menubar = ControllableMenu(root)
     root.configure(menu=root.menubar)
     

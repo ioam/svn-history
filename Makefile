@@ -52,6 +52,16 @@ clean: clean-doc clean-ext-packages clean-compiled
 uninstall:
 	make -C external uninstall
 
+
+# Mac OS X: to build python with tcl/tk from /Library/Frameworks
+osx-tk-patch:
+	patch --force exernal/Makefile external/Makefile_OSX_tk.diff
+	touch osx-tk-patch
+
+osx-tk-patch-uninstall:
+	patch --force --reverse external/Makefile external/Makefile_OSX_tk.diff
+	${RM} osx-tk-patch
+
 # Mac OS X: to build python with X11 Tkinter
 osx-x11-patch: 
 	patch --force external/Makefile external/Makefile_OSX_X11.diff

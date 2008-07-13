@@ -1,0 +1,30 @@
+55c55
+< python: ${PYTHON}.tgz tk blt
+---
+> python: ${PYTHON}.tgz 
+59a60
+> 	patch -p0 < Python_OSX_tk.diff
+127c128
+< TKLIB_UNINSTALL += lib/tklib0.4.1.0/ 
+---
+> TKLIB_UNINSTALL += lib/tooltip
+131c132
+< tklib: ${TKLIB}.tar.gz tcl tk
+---
+> tklib: ${TKLIB}.tar.gz 
+133c134
+< 	cd ${TKLIB}; ${PREFIX}/bin/tclsh8.5 installer.tcl -no-gui -no-wait -no-html -no-nroff -no-examples -pkgs
+---
+> 	cp -R ${TKLIB}/modules/tooltip ${PREFIX}/lib/
+560c561
+< SNIT_UNINSTALL += lib/tcl8.5/${SNIT}
+---
+> SNIT_UNINSTALL += ${PREFIX}/lib/${SNIT}
+563c564
+< snit: ${SNIT}.tar.gz tcl
+---
+> snit: ${SNIT}.tar.gz
+565c566
+< 	cp -R ${SNIT} ${PREFIX}/lib/tcl8.5/${SNIT}
+---
+> 	cp -R ${SNIT} ${PREFIX}/lib
