@@ -538,7 +538,7 @@ SNIT = snit-2.2.1
 
 SNIT_UNINSTALL += lib/${SNIT}
 
-snit: ${SNIT}.tar.gz tcl
+snit: ${SNIT}.tar.gz
 	tar -xzf ${SNIT}.tar.gz
 	cp -R ${SNIT} ${PREFIX}/lib/${SNIT}
 	touch snit
@@ -557,7 +557,7 @@ TOOLTIP = tooltip-1.4
 
 TOOLTIP_UNINSTALL += lib/${TOOLTIP}
 
-tooltip: ${TOOLTIP}.tar.gz tcl
+tooltip: ${TOOLTIP}.tar.gz 
 	tar -xzf ${TOOLTIP}.tar.gz
 	cp -R ${TOOLTIP} ${PREFIX}/lib/${TOOLTIP}
 	touch tooltip
