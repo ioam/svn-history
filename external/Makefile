@@ -555,10 +555,9 @@ scrodget-uninstall:
 ##############################################################
 # SNIT (toolkit that scrodget uses)
 #
-SNIT = snit1.0
+SNIT = snit-2.2.1
 
 SNIT_UNINSTALL += lib/tcl8.5/${SNIT}
-#SNIT_UNINSTALL += ${PYTHON_LIB}/site-packages/pysnit
 
 snit: ${SNIT}.tar.gz tcl
 	tar -xzf ${SNIT}.tar.gz
