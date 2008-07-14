@@ -6,7 +6,7 @@ __version__='$Revision$'
 
 # pylint: disable-msg=W0611
 
-from parameterizedobject import Parameter, descendents
+from ..params import Parameter, descendents
 
 from topo.params import Enumeration
 from topo.params import Dynamic

@@ -9,8 +9,8 @@ __version__='$Revision$'
 
 # This simulation is still being worked on
 
-## from topo.base.parameterizedobject import ParameterizedObject
-## ParameterizedObject.print_level=300
+## from ..params import Parameterized
+## Parameterized.print_level=300
 
 import numpy.oldnumeric.random_array as RandomArray
 import numpy

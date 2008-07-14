@@ -1,5 +1,5 @@
 """
-Unit test for ParameterizedObject.
+Unit test for Parameterized.
 
 
 $Id$
@@ -8,28 +8,28 @@ __version__='$Revision$'
 
 import unittest
 
-from topo.base.parameterizedobject import ParameterizedObject, Parameter
+from ..params import Parameterized, Parameter
 
 
-# CEBALERT: not anything like a complete test of ParameterizedObject!
+# CEBALERT: not anything like a complete test of Parameterized!
 
-class TestPO(ParameterizedObject):
+class TestPO(Parameterized):
     inst = Parameter(default=[1,2,3],instantiate=True)
     notinst = Parameter(default=[1,2,3],instantiate=False)
     const = Parameter(default=1,constant=True)
     ro = Parameter(default="Hello",readonly=True)
     ro2 = Parameter(default=object(),readonly=True,instantiate=True)
 
-class AnotherTestPO(ParameterizedObject):
+class AnotherTestPO(Parameterized):
     instPO = Parameter(default=TestPO(),instantiate=True)
     notinstPO = Parameter(default=TestPO(),instantiate=False)
 
 
-class TestAbstractPO(ParameterizedObject):
+class TestAbstractPO(Parameterized):
     __abstract = True
 
 
-class TestParameterizedObject(unittest.TestCase):
+class TestParameterized(unittest.TestCase):
 
     def test_constant_parameter(self):
         """Test that you can't set a constant parameter after construction."""
@@ -90,7 +90,7 @@ class TestParameterizedObject(unittest.TestCase):
         ### CB: AnotherTestPO.instPO is instantiated, but
         ### TestPO.notinst is not instantiated - so notinst is still
         ### shared, even by instantiated parameters of AnotherTestPO.
-        ### Seems like this behavior of ParameterizedObject could be
+        ### Seems like this behavior of Parameterized could be
         ### confusing, so maybe mention it in documentation somewhere.
         TestPO.notinst[1]=7
         # (if you thought your instPO was completely an independent object, you
@@ -110,9 +110,9 @@ class TestParameterizedObject(unittest.TestCase):
 
         # CB: test not so good because it requires changes if params
         # of PO are changed
-        assert 'name' in ParameterizedObject.params()
-        assert 'print_level' in ParameterizedObject.params()
-        assert len(ParameterizedObject.params())==2
+        assert 'name' in Parameterized.params()
+        assert 'print_level' in Parameterized.params()
+        assert len(Parameterized.params())==2
 
         ## check for bug where subclass Parameters were not showing up
         ## if params() already called on a super class.
@@ -120,10 +120,10 @@ class TestParameterizedObject(unittest.TestCase):
         assert 'notinst' in TestPO.params()
 
         ## check caching
-        assert ParameterizedObject.params() is ParameterizedObject().params(), "Results of params() should be cached." # just for performance reasons
+        assert Parameterized.params() is Parameterized().params(), "Results of params() should be cached." # just for performance reasons
 
 
 
 
 suite = unittest.TestSuite()
-suite.addTest(unittest.makeSuite(TestParameterizedObject))
+suite.addTest(unittest.makeSuite(TestParameterized))

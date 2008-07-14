@@ -34,8 +34,8 @@ snapshots should be considered temporary.
   this scary warning:</i> 
 
 <pre>
-ParameterizedObject53371: Warning: ManagedRandomComposite (type <class 
-'topo.base.parameterizedobject.ParameterizedObjectMetaclass'>) has 
+Parameterized53371: Warning: ManagedRandomComposite (type <class 
+'topo.base.parameterizedobject.ParameterizedMetaclass'>) has 
 source in __main__; it will only be found on unpickling if the class is 
 explicitly defined (e.g. by running the same script first) before 
 unpickling.

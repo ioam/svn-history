@@ -179,7 +179,7 @@ import topo.base.patterngenerator
 from topo.base import sheetview
 from topo.base.arrayutils import octave_output, centroid
 from topo.base.cf import CFSheet, CFProjection, Projection
-from topo.base.parameterizedobject import ParameterizedObject
+from topo.params import Parameterized
 from topo.base.projection import ProjectionSheet
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView, ProjectionView
@@ -194,7 +194,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.sheets.lissom import LISSOM
 
 
-class TestFeatureMap(ParameterizedObject):
+class TestFeatureMap(Parameterized):
     """
     A feature map for one stimulus dimension (e.g. Orientation) for one Sheet.
 
@@ -237,7 +237,7 @@ class TestFeatureMap(ParameterizedObject):
 
 
 
-class MeasureTestFeatureMap(ParameterizedObject):
+class MeasureTestFeatureMap(Parameterized):
     """
     """
     def __init__(self, feature_param):

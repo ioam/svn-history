@@ -1,5 +1,5 @@
 """
-Tests for the tkParameterizedObject classes.
+Tests for the tkParameterized classes.
 
 $Id$
 """
@@ -14,7 +14,7 @@ import unittest
 from Tkinter import Frame,Toplevel
 
 from topo.base.simulation import Simulation
-from topo.base.parameterizedobject import ParameterizedObject
+from ..params import Parameterized
 from topo.base.parameterclasses import BooleanParameter,Number,Parameter, \
                                        ObjectSelectorParameter,ClassSelectorParameter, \
                                        StringParameter
@@ -26,10 +26,10 @@ import topo.patterns.basic
 from topo.patterns.basic import Gaussian        
 from topo.outputfns.basic import PiecewiseLinear
 
-from topo.tkgui.tkparameterizedobject import TkParameterizedObject
+from topo.tkgui.tkparameterizedobject import TkParameterized
 
 
-class SomeFrame(TkParameterizedObject,Frame):
+class SomeFrame(TkParameterized,Frame):
     boo = BooleanParameter(default=True)
     osp = ObjectSelectorParameter()
     csp = ClassSelectorParameter(class_=PatternGenerator)
@@ -39,19 +39,19 @@ class SomeFrame(TkParameterizedObject,Frame):
     st = StringParameter("string1")
 
     def __init__(self,master,extraPO=None,**params):
-        TkParameterizedObject.__init__(self,master,extraPO=extraPO,**params)
+        TkParameterized.__init__(self,master,extraPO=extraPO,**params)
         Frame.__init__(self,master)
         self.boocount=0
 
     def upboocount(self):
         self.boocount+=1
 
-class TestPO(ParameterizedObject):
+class TestPO(Parameterized):
     bool_param = BooleanParameter(default=False)
 
 
 
-class TestTkParameterizedObject(unittest.TestCase):
+class TestTkParameterized(unittest.TestCase):
 
 
     def setUp(self):
@@ -275,9 +275,9 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         """
         Test that ObjectSelectorParameter representation works.        
         """
-        some_pos = [ParameterizedObject(name='cat'),
-                    ParameterizedObject(name='rat'),
-                    ParameterizedObject(name='bat')]
+        some_pos = [Parameterized(name='cat'),
+                    Parameterized(name='rat'),
+                    Parameterized(name='bat')]
         osp_param = self.f.get_parameter_object('osp')
 
         osp_param.objects = some_pos
@@ -295,18 +295,18 @@ class TestParameterTypeRepresentations(unittest.TestCase):
 ##         f = SomeFrame(Toplevel())
 ##         f.pack_param('r')
 ##         f.initialize_ranged_parameter('r',
-##                                       [ParameterizedObject(name='cat'),ParameterizedObject(name='rat'),ParameterizedObject(name='bat')])
+##                                       [Parameterized(name='cat'),Parameterized(name='rat'),Parameterized(name='bat')])
 
         self.assertEqual(self.f.translators['osp'].string2object('cat'),some_pos[0])
         self.assertEqual(self.f.translators['osp'].string2object('rat'),some_pos[1])
         self.assertEqual(self.f.translators['osp'].string2object('bat'),some_pos[2])
 
-        gnat = ParameterizedObject(name='gnat')
+        gnat = Parameterized(name='gnat')
         osp_param.objects.append(gnat)
 
         self.f.unpack_param('osp')
         self.f.pack_param('osp') # again, note the need to pack after updating range.
-##         self.f.initialize_ranged_parameter('r',ParameterizedObject)
+##         self.f.initialize_ranged_parameter('r',Parameterized)
         self.assertEqual(self.f.translators['osp'].string2object('gnat'),gnat)
 
         self.assertEqual(self.f._object2string('osp',some_pos[0]),'cat')
@@ -408,7 +408,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
 
 ###########################################################
 
-cases = [TestTkParameterizedObject,TestParameterTypeRepresentations]
+cases = [TestTkParameterized,TestParameterTypeRepresentations]
 
 suite = unittest.TestSuite()
 suite.addTests([unittest.makeSuite(case) for case in cases])

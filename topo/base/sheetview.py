@@ -17,7 +17,7 @@ import types
 import operator
 
 import sheet
-from parameterizedobject import ParameterizedObject
+from parameterizedobject import Parameterized
 from parameterclasses import Parameter,BooleanParameter
 
 ### JABHACKALERT!
@@ -41,7 +41,7 @@ operations = {ADD : operator.add,
               DIVIDE : operator.truediv}
 
 
-class SheetView(ParameterizedObject):
+class SheetView(Parameterized):
     """
     A SheetView is constructed from a matrix of values, a bounding box
     for that matrix, and a name.  There are two major ways to create a

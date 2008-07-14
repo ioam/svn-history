@@ -13,7 +13,7 @@ from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, Bitmap
 
 from numpy.oldnumeric import zeros, ones, Float, divide,ravel,clip,array
 
-from topo.base.parameterizedobject import ParameterizedObject
+from ..params import Parameterized
 from topo.base.parameterclasses import Number
 from topo.base.sheetview import SheetView
 from topo.base.sheetcoords import SheetCoordinateSystem,Slice
@@ -30,7 +30,7 @@ from topo.base.sheetcoords import SheetCoordinateSystem,Slice
 ### - Get rid of release_sheetviews.
 
 
-class Plot(ParameterizedObject):
+class Plot(Parameterized):
      """
      Simple Plot object constructed from a specified PIL image.
      """
@@ -138,7 +138,7 @@ def make_template_plot(channels,sheet_views,density=None,
                if plot.bitmap is not None:
                     return plot
      
-     ParameterizedObject(name="make_template_plot").verbose('No',name,'plot constructed for this Sheet')
+     Parameterized(name="make_template_plot").verbose('No',name,'plot constructed for this Sheet')
      return None
 
 
@@ -176,7 +176,7 @@ class TemplatePlot(Plot):
         normalized, values are clipped at 1.0.
     
         
-        name (which is inherited from ParameterizedObject) specifies the name
+        name (which is inherited from Parameterized) specifies the name
         to use for this plot.
         """
 

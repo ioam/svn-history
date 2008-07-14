@@ -13,7 +13,7 @@ from numpy import add,subtract,cos,sin
 from boundingregion import BoundingBox, BoundingRegionParameter
 from functionfamilies import OutputFn, IdentityOF
 from parameterclasses import Parameter,Number,ClassSelectorParameter,CompositeParameter
-from parameterizedobject import ParameterizedObject,ParamOverrides
+from parameterizedobject import Parameterized,ParamOverrides
 from sheetcoords import SheetCoordinateSystem
 
 
@@ -33,7 +33,7 @@ from sheetcoords import SheetCoordinateSystem
 # anyone ever uses such an object in a PatternGenerator.  Will also
 # need to support Composite patterns.
 
-class PatternGenerator(ParameterizedObject):
+class PatternGenerator(Parameterized):
     """
     A class hierarchy for callable objects that can generate 2D patterns.
 

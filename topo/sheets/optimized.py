@@ -7,7 +7,7 @@ __version__='$Revision$'
 
 from topo.base.functionfamilies import OutputFn, IdentityOF
 from topo.base.parameterclasses import Number
-from topo.base.parameterizedobject import ParameterizedObject
+from ..params import Parameterized
 
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 from topo.base.projection import Projection, NeighborhoodMask

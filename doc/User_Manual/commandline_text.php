@@ -388,14 +388,14 @@ parameter name to use from the command line or in a script, you can
 turn off the parameter name reformatting:
 
 <pre>
-  from topo.tkgui.tkparameterizedobject import TkParameterizedObject
-  TkParameterizedObject.pretty_parameters=False
+  from topo.tkgui.tkparameterizedobject import TkParameterized
+  TkParameterized.pretty_parameters=False
 </pre>
 
 <!--CB: this document sounds like we keep adding things
 to the end of it...-->
 
-<P>One can also open a GUI window to inspect or edit any ParameterizedObject: 
+<P>One can also open a GUI window to inspect or edit any Parameterized: 
 
 <pre>
  from topo.tkgui.parametersframe import edit_parameters

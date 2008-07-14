@@ -11,9 +11,9 @@ values, documentation strings, default values, etc., each of which
 is inherited from parent classes if not specified in a subclass.
 
 <P>Objects that can contain Parameters are called
-<?php classref('topo.base.parameterizedobject','ParameterizedObject')?>.
+<?php classref('topo.base.parameterizedobject','Parameterized')?>.
 For instance, Sheets, Projections, and
-PatternGenerators are all ParameterizedObjects.  The Parameters of a
+PatternGenerators are all Parameterizeds.  The Parameters of a
 Sheet include its <code>nominal_density</code> and <code>nominal_bounds</code>, and
 the Parameters of a PatternGenerator include its <code>scale</code> and
 <code>offset</code>.
@@ -56,7 +56,7 @@ such as
 and
 <?php classref('topo.base.parameterclasses','BooleanParameter')?>.
 Each of these types can be declared to be constant, in which case the
-value cannot be changed after the ParameterizedObject that owns the
+value cannot be changed after the Parameterized that owns the
 Parameter has been created.  Some classes like
 <?php classref('topo.base.parameterclasses','Number')?> 
 allow the parameter values to be generated from a sequence or random
@@ -72,8 +72,8 @@ Parameter does.
 
 <H2>Inheritance and class Parameters</H2>
 
-<P>ParameterizedObjects are designed to inherit Parameter values from
-their parent classes, so that ParameterizedObjects can use default
+<P>Parameterizeds are designed to inherit Parameter values from
+their parent classes, so that Parameterizeds can use default
 values for most Parameters.  This is designed to work just as Python
 attribute inheritance normally works, but also inheriting any
 documentation, bounds, etc. associated with the Parameter, even when
@@ -105,12 +105,12 @@ are expected to keep the same value even if the class Parameter is
 later changed.  Also, mutable Parameter objects, i.e. values that have
 internal state (such as lists, arrays, or class instances) can have
 very confusing behavior if they are shared between
-ParameterizedObjects, because changes to one ParameterizedObject's
+Parameterizeds, because changes to one Parameterized's
 value can affect all the others.  In both of these cases (constants
 and Parameters whose values may be mutable objects) the Parameter
 is typically set to <code>instantiate=True</code>, which forces every
-ParameterizedObject owning that Parameter to instantiate its own
-private, independent copy when the ParameterizedObject is created.
+Parameterized owning that Parameter to instantiate its own
+private, independent copy when the Parameterized is created.
 This avoids much confusion, but does prevent existing objects from
 being controlled as a group by changing the class Parameters.
 
@@ -180,14 +180,14 @@ The same general rules apply to Parameters declared at the class
 level:
 
 <pre>
-from topo.base.parameterizedobject import ParameterizedObject,Parameter
+from topo.params import Parameterized,Parameter
 
-class ExampleP(ParameterizedObject):
+class ExampleP(Parameterized):
 
     a = Parameter(default=10)
 
     def __init__(self,b,**params):
-        # invoke ParameterizedObject's parameter handling
+        # invoke Parameterized's parameter handling
         super(ExampleP,self).__init__(**params)
         self.b = b
 </pre>

@@ -33,7 +33,7 @@ from topo.outputfns.basic import DivisiveNormalizeL1
 from topo.outputfns.basic import KernelMax
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.parameterizedobject import ParameterizedObject
+from topo.params import Parameterized
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -41,7 +41,7 @@ import topo.patterns.random
 # ALERT: Consider moving these to the main topo/ directory, perhaps
 # after generalizing them.
 
-class LinearDecay(ParameterizedObject):
+class LinearDecay(Parameterized):
     """Linear function decreasing from the starting_value to the ending_value."""
     starting_value = Number(0.09,doc="""Value at the beginning of learning.""")
     ending_value = Number(0.02,doc="""Value at the end of learning.""")
@@ -52,7 +52,7 @@ class LinearDecay(ParameterizedObject):
         return self.starting_value + (self.ending_value-self.starting_value)/self.duration*float(self.time_fn())
 
 
-class PiecewiseLinearDecay(ParameterizedObject):
+class PiecewiseLinearDecay(Parameterized):
     """Two-part piecewise-linear decay function."""
 
     starting_value = Number(240.0/256.0,doc="""Value at the beginning of learning.""")

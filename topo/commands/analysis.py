@@ -13,7 +13,7 @@ import topo
 from colorsys import hsv_to_rgb
 from topo.base.arrayutils import octave_output, centroid
 from topo.base.cf import CFSheet, CFProjection, Projection
-from topo.base.parameterizedobject import ParameterizedObject
+from ..params import Parameterized
 from topo.base.parameterclasses import ListParameter, BooleanParameter
 from topo.base.projection import ProjectionSheet
 from topo.base.sheet import Sheet
@@ -71,7 +71,7 @@ class Feature(object):
 # 'self.contrast_parameter=params.get...'  has been put in?);
 # "x.haskey('y')" is going to disappear from python, I think, and
 # anyway "'y' in x" is clearer. There might also be other things.
-class PatternPresenter(ParameterizedObject):
+class PatternPresenter(Parameterized):
     """
     Function object for presenting PatternGenerator-created patterns.
 
@@ -276,7 +276,7 @@ def save_plotgroup(name,saver_params={},**params):
     plotgroup.filesaver.save_to_disk(**saver_params)
 
 
-class Subplotting(ParameterizedObject):
+class Subplotting(Parameterized):
     """
     Convenience functions for handling subplots (such as colorized Activity plots).
     Only needed for avoiding typing, as plots can be declared with their own

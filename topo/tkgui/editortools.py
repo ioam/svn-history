@@ -12,7 +12,7 @@ from Tile import Combobox
 
 import topo.sheets
 from topo.sheets import *
-from topo.base.parameterizedobject import ParameterizedObject
+from ..params import Parameterized
 from topo.base.parameterclasses import concrete_descendents
 from topo.base.sheet import Sheet
 import topo.projections
@@ -150,7 +150,7 @@ class NodeTool(Frame):
             self.parameter_tool.update_parameters()
         # get the current selection and create the new topo object
 
-        # CEBALERT: because ParameterizedObject overwrites the name
+        # CEBALERT: because Parameterized overwrites the name
         # unless it's passed in params when the object is created, I
         # pass the class name (set by ParametersFrameWithApply) here.
         # Same goes for projections. (i.e. Allow people to set the name
@@ -254,7 +254,7 @@ class ConnectionTool(Frame):
             else:
                 con = sim.connect(from_node.name,to_node.name,connection_type=con_type)
         except Exception, e:
-            ParameterizedObject().warning("Unable to connect these sheets with the given "+ self.current_option + " (" + str(e) +").")
+            Parameterized().warning("Unable to connect these sheets with the given "+ self.current_option + " (" + str(e) +").")
             editor_connection.remove()
             return False
         

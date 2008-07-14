@@ -54,7 +54,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from parameterizedobject import ParameterizedObject, Parameter, as_uninitialized
+from parameterizedobject import Parameterized, Parameter, as_uninitialized
 from parameterclasses import Number, BooleanParameter, StringParameter, wrap_callable
 from copy import copy, deepcopy
 
@@ -78,7 +78,7 @@ simulation_path="topo.sim"
 
 
 
-class EventProcessor(ParameterizedObject):
+class EventProcessor(Parameterized):
     """
     Base class for EventProcessors, i.e. objects that can accept and
     handle events.  This base class handles the basic mechanics of
@@ -258,7 +258,7 @@ class EventProcessorParameter(Parameter):
             super(EventProcessorParameter,self).__set__(obj,val)
 
 
-class EPConnection(ParameterizedObject):
+class EPConnection(Parameterized):
     """
     EPConnection stores basic information for a connection between
     two EventProcessors.
@@ -370,7 +370,7 @@ class EPConnection(ParameterizedObject):
             except TypeError:
                 if name=="src" or name=="dest":
                     rep=None
-                elif isinstance(val,ParameterizedObject):
+                elif isinstance(val,Parameterized):
                     rep=val.script_repr(imports=imports,prefix=prefix+"    ")
                 else:
                     rep=repr(val)
@@ -388,7 +388,7 @@ class EPConnection(ParameterizedObject):
                ",\n"+prefix+(",\n"+prefix).join(settings) + ")"
 
 
-# CB: event is not a ParameterizedObject because of a (small) performance hit.
+# CB: event is not a Parameterized because of a (small) performance hit.
 class Event(object):
     """Hierarchy of classes for storing simulation events of various types."""
 
@@ -485,7 +485,7 @@ class CommandEvent(Event):
         # Presumably here to avoid importing __main__ into the rest of the file
         import __main__
 
-        ParameterizedObject(name='CommandEvent').message("Running command %s" \
+        Parameterized(name='CommandEvent').message("Running command %s" \
                                                          % (self.command_string))        
         try:
             exec self.command_string in __main__.__dict__
@@ -599,7 +599,7 @@ class PeriodicEventSequence(EventSequence):
 
 import time
 from math import floor
-class SomeTimer(ParameterizedObject):
+class SomeTimer(Parameterized):
     """
     Provides a countdown timer for functions that run repeatedly.
     
@@ -792,7 +792,7 @@ class OptionalSingleton(object):
 # efficient one.  Jeff has an O(log N) minheap implementation, but
 # there are likely to be many others to select from.
 #
-class Simulation(ParameterizedObject,OptionalSingleton):
+class Simulation(Parameterized,OptionalSingleton):
     """
     A simulation class that uses a simple sorted event list (instead of
     e.g. a sched.scheduler object) to manage events and dispatching.
@@ -940,7 +940,7 @@ class Simulation(ParameterizedObject,OptionalSingleton):
         """
         Initialize a Simulation instance.
         """
-        ParameterizedObject.__init__(self,**params)
+        Parameterized.__init__(self,**params)
 
         self._set_time()
 

@@ -70,7 +70,7 @@ You want to display only some of the parameters of one or more
 Parameterized instances:
 
  ## Existing, non-GUI code
- from topo.params import Parameterized,Number,String,Boolean
+ from ..params import Parameterized,Number,String,Boolean
 
  class Object1(Parameterized):
      duration = Number(2.0,bounds=(0,None),doc='Duration of measurement')

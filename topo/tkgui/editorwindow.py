@@ -11,7 +11,7 @@ from tkFileDialog import asksaveasfilename
 from random import Random, random
 
 import topo
-from topo.base.parameterizedobject import ParameterizedObject
+from ..params import Parameterized
 from topo.misc.filepaths import normalize_path
 from topo.base.sheet import Sheet
 from topo.base.projection import Projection
@@ -514,7 +514,7 @@ class EditorCanvas(Canvas):
 
 
 
-# CEBALERT: Should be a TkParameterizedObject or something
+# CEBALERT: Should be a TkParameterized or something
 class ModelEditor(object):
     """
     This class constructs the main editor window. It uses a instance

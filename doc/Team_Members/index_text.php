@@ -45,7 +45,7 @@ the United Kingdom and the United States.  The principal developers are:
       the University of Pittsburgh.  He wrote the initial GUI
       implementation (first in Scheme, then in Python), and the first
       Python version of most of the base classes (Sheet, CFSheet,
-      CFSOM, ParameterizedObject, LISSOM, etc.), but is now primarily
+      CFSOM, Parameterized, LISSOM, etc.), but is now primarily
       a Topographica user rather than a developer.
 
   <p><dt>Roger Zhao, September 2006-</dt>

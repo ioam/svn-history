@@ -18,7 +18,7 @@ import topo
 import topo.base.sheetcoords
 from topo.base.sheet import Sheet, activity_type
 from topo.base.sheetview import SheetView
-from topo.base.parameterizedobject import ParameterizedObject,Parameter
+from ..params import Parameterized,Parameter
 from topo.base.parameterclasses import Number
 from topo.misc.utils import cross_product, frange
 from topo.base.sheetcoords import SheetCoordinateSystem
@@ -31,7 +31,7 @@ from topo.base.cf import CFSheet
 # distribution_matrix to hold the distribution matrix seems silly.
 # Either rename distribution_matrix or make DistributionMatrix into
 # a matrix.
-class DistributionMatrix(ParameterizedObject):
+class DistributionMatrix(Parameterized):
     """
     Maintains a matrix of Distributions (each of which is a dictionary
     of (feature value: activity) pairs).
@@ -106,7 +106,7 @@ class DistributionMatrix(ParameterizedObject):
 
 
 
-class FullMatrix(ParameterizedObject):
+class FullMatrix(Parameterized):
     """
     Records the output of every unit in a sheet, for every combination of feature values.
     Useful for collecting data for later analysis while presenting many input patterns.
@@ -134,7 +134,7 @@ class FullMatrix(ParameterizedObject):
 
 # CB: FeatureResponses and ReverseCorrelation need cleanup; I began but haven't finished.
 
-class FeatureResponses(ParameterizedObject):
+class FeatureResponses(Parameterized):
     """
     Systematically vary input pattern feature values and collate the responses.
 

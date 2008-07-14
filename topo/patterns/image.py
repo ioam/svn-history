@@ -14,7 +14,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.parameterclasses import Number, Parameter, Enumeration, Integer,\
      ClassSelectorParameter, BooleanParameter
 from topo.base.parameterclasses import StringParameter
-from topo.base.parameterizedobject import ParameterizedObject
+from ..params import Parameterized
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
 
@@ -23,7 +23,7 @@ from topo.outputfns.basic import DivisiveNormalizeLinf,IdentityOF,OutputFn
 from topo.misc.filepaths import Filename
 
 
-class PatternSampler(ParameterizedObject):
+class PatternSampler(Parameterized):
     """
     Stores a SheetCoordinateSystem whose activity represents the
     supplied pattern_array, and when called will resample that array
@@ -196,7 +196,7 @@ def edge_average(a):
         return float(edge_sum)/num_values
 
 
-class FastPatternSampler(ParameterizedObject):
+class FastPatternSampler(Parameterized):
     """
     A fast-n-dirty pattern sampler using Python Imaging Library
     routines.  Currently this sampler doesn't support user-specified

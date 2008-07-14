@@ -14,7 +14,7 @@ import __main__
 
 import topo
 
-from topo.base.parameterizedobject import ParameterizedObject
+from ..params import Parameterized
 from topo.base.parameterclasses import Parameter,BooleanParameter, \
      StringParameter,Number,ObjectSelectorParameter, ListParameter, Integer
 from topo.base.sheet import Sheet
@@ -54,7 +54,7 @@ def cmp_plot(plot1,plot2):
 # * There are no unit tests
 
 
-class PlotGroup(ParameterizedObject):
+class PlotGroup(Parameterized):
     """
     Container that has one or more Plots and also knows how to arrange
     the plots and other special parameters.

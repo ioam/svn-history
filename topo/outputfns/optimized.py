@@ -8,7 +8,7 @@ Requires the weave package; without it unoptimized versions are used.
 from topo.base.cf import CFPOutputFn,CFPOF_Plugin
 from topo.base.functionfamilies import OutputFn, IdentityOF
 from topo.base.parameterclasses import Number, ClassSelectorParameter
-from topo.base.parameterizedobject import ParameterizedObject
+from ..params import Parameterized
 
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 

@@ -12,7 +12,7 @@ import math
 
 import topo.params.tk as tk
 import topo
-from topo.base.parameterizedobject import ParameterizedObject
+from ..params import Parameterized
 from topo.base.parameterclasses import Enumeration,BooleanParameter
 from topo.commands.analysis import update_activity
 from topo.misc.utils import shortclassname
@@ -23,7 +23,7 @@ from widgets import TkguiWindow
 
 from widgets import Balloon
 
-# CEBALERT: should be a ParameterizedObject
+# CEBALERT: should be a Parameterized
 class EditorObject(object):
     """
     Anything that can be added and manipulated in an EditorCanvas. Every EditorCanvas

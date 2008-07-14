@@ -11,7 +11,7 @@ from numpy import array,asarray,ones,sometrue, logical_and, logical_or
 from sheet import Sheet
 from parameterclasses import Number, BooleanParameter, Parameter, ListParameter,\
      ClassSelectorParameter
-from parameterizedobject import ParameterizedObject
+from parameterizedobject import Parameterized
 from simulation import EPConnection
 from functionfamilies import OutputFn,IdentityOF
 from sheetview import ProjectionView
@@ -19,7 +19,7 @@ from sheetview import ProjectionView
 from topo.misc.keyedlist import KeyedList
 
 
-class SheetMask(ParameterizedObject):
+class SheetMask(Parameterized):
     """
     An abstract class that defines a mask over a ProjectionSheet object.
     

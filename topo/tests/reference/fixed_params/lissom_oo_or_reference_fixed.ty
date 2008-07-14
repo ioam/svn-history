@@ -53,8 +53,8 @@ __version__='$Revision: 8319 $'
 ### new version
 
 
-## from topo.base.parameterizedobject import ParameterizedObject
-## ParameterizedObject.print_level=300
+## from ..params import Parameterized
+## Parameterized.print_level=300
 
 import numpy.oldnumeric as Numeric
 from math import pi, sqrt

@@ -20,7 +20,7 @@ import ImageDraw
 
 import topo.base.parameterclasses as param
 from topo.base.simulation import EventProcessor
-from topo.base.parameterizedobject import ParameterizedObject
+from ..params import Parameterized
 from topo.base.parameterclasses import Number,StringParameter,DictParameter,BooleanParameter
 from topo.base.parameterclasses import Integer,CompositeParameter,Parameter
 from topo.misc.utils import Struct
@@ -227,7 +227,7 @@ class InMemoryRecorder(DataRecorder):
 
 
 
-class Trace(ParameterizedObject):
+class Trace(Parameterized):
     """
     A specification for generating 1D traces of data from recorded
     timeseries.
@@ -343,7 +343,7 @@ class SheetPositionTrace(Trace):
 
 
 
-class TraceGroup(ParameterizedObject):
+class TraceGroup(Parameterized):
     """
     A group of data traces to be plotted together.
 
@@ -429,7 +429,7 @@ def get_images(name,times,recorder,overlays=(0,0,0)):
 
 # JABALERT: Is there some reason it is called ActivityMovie in
 # particular, if it can plot things other than Activity?
-class ActivityMovie(ParameterizedObject):
+class ActivityMovie(Parameterized):
     """
     An object encapsulating a series of movie frames displaying the
     value of one or more matrix-valued time-series contained in a

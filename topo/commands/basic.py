@@ -23,7 +23,7 @@ except ImportError:
 
 import topo
 
-from topo.base.parameterizedobject import ParameterizedObject, Parameter, PicklableClassAttributes
+from ..params import Parameterized, Parameter,PicklableClassAttributes
 from topo.base.functionfamilies import OutputFn
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
@@ -103,7 +103,7 @@ def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=Fals
         if gen_eps_list.has_key(each):
             gen_eps_list[each].set_input_generator(inputs[each])
         else:
-            ParameterizedObject().warning('%s not a valid Sheet Name.' % each)
+            Parameterized().warning('%s not a valid Sheet Name.' % each)
 
     topo.sim.event_push()
     topo.sim.run(duration) 
@@ -137,7 +137,7 @@ def save_snapshot(snapshot_name=None,xml=False):
     the same limitations (see the pickle module's documentation) -
     with the notable exception of class attributes. Python does not
     pickle class attributes, but this function stores class attributes
-    of any ParameterizedObject class that is declared within the topo
+    of any Parameterized class that is declared within the topo
     package. See the topo.base.PicklableClassAttributes class for more
     information.
     """
@@ -397,7 +397,7 @@ def run_batch(script_file,output_directory="Output",
             analysis_fn()
             save_script_repr()
             elapsedtime=time.time()-starttime
-            parameterizedobject.ParameterizedObject(name="run_batch").message(
+            parameterizedobject.Parameterized(name="run_batch").message(
                 "Elapsed real time %02d:%02d." % (int(elapsedtime/60),int(elapsedtime%60)))
     except:
         import traceback

@@ -58,7 +58,7 @@ Prorities:
 sure about 0.98.0; it might break our 3D right-click plots (as someone
 hinted a few months back), but it's probably easy to try and see.
 
-(9) numpy: upgrade to
+(9) numpy: upgrade to at least 1.1.0
 
 (8) add an option to clean up external/ once topographica has been
 built, to free up some space for users while still leaving it
@@ -716,7 +716,7 @@ _________________________________________________________
 
 > Second, is there any way to prevent obscure errors like this by
 > checking to make sure that a Parameter is owned by a
-> ParameterizedObject? I can't quite imagine how to do this, because
+> Parameterized? I can't quite imagine how to do this, because
 > when the Parameter is constructed it's not owned by anything at all.
 
 Unfortunately you can't patch __setattr__ on <type> or
@@ -765,7 +765,7 @@ working with matlab: scipy's io.loadmat
 
 
 _________________________________________________________
-lots of places I do isinstance(x,ParameterizedObjectMetaclass) or 
+lots of places I do isinstance(x,ParameterizedMetaclass) or 
 something to determine class or obj. There are easier ways
 (e.g. isinstance(X,type)), and maybe not all of them are required.
 
@@ -775,7 +775,7 @@ something to determine class or obj. There are easier ways
 
 _________________________________________________________
 CB: code I was experimenting with in Parameter's __init__ (everyone else please ignore)
-(detects Parameter not declared inside ParameterizedObject)
+(detects Parameter not declared inside Parameterized)
 
         f0 = sys._getframe(0)
         frames = [f0]
@@ -789,7 +789,7 @@ CB: code I was experimenting with in Parameter's __init__ (everyone else please 
 
         found = False
         for f in frames:
-            if 'ParameterizedObject' in open(f.f_code.co_filename).readlines()[f.f_code.co_firstlineno-1]:
+            if 'Parameterized' in open(f.f_code.co_filename).readlines()[f.f_code.co_firstlineno-1]:
                 found=True
 
         print found
@@ -857,7 +857,7 @@ have buildbot run make -C examples?
 
 I'm not certain, but maybe we could make pickles smaller by taking advantage
 of something new in protocol 2, documented at http://www.python.org/dev/peps/pep-0307/ (search for 'bloat' and '__newobj__') (implement __reduce__ and
-__newobj__ for ParameterizedObject)
+__newobj__ for Parameterized)
 
 
 

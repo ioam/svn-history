@@ -10,7 +10,7 @@ import __main__
 import unittest
 import Tkinter
 
-from topo.base.parameterizedobject import ParameterizedObject
+from ..params import Parameterized
 from topo.base.parameterclasses import BooleanParameter,Number,Parameter, \
                                        ObjectSelectorParameter,ClassSelectorParameter, \
                                        StringParameter
@@ -20,7 +20,7 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.tkgui.parametersframe import ParametersFrameWithApply
 
 
-class TestPO(ParameterizedObject):
+class TestPO(Parameterized):
     boo = BooleanParameter(default=True)
     osp = ObjectSelectorParameter()
     csp = ClassSelectorParameter(class_=PatternGenerator)
@@ -36,8 +36,8 @@ class TestParametersFrameWithApply(unittest.TestCase):
 
     def setUp(self):
 
-        self.some_pos = [ParameterizedObject(),ParameterizedObject(),
-                         ParameterizedObject()]
+        self.some_pos = [Parameterized(),Parameterized(),
+                         Parameterized()]
         
         self.testpo1 = TestPO()
         self.testpo1.params()['osp'].objects = self.some_pos

@@ -12,7 +12,7 @@ import Image
 import ImageOps
 import numpy
 
-from topo.base.parameterizedobject import ParameterizedObject
+from ..params import Parameterized
 from topo.base.parameterclasses import StringParameter
 
 from topo.misc.filepaths import normalize_path
@@ -22,7 +22,7 @@ import topo
 
 # Consider using PIL's ImageFont module
 
-class PlotGroupSaver(ParameterizedObject):
+class PlotGroupSaver(Parameterized):
     """
     Allows a PlotGroup to be saved as a set of bitmap files on disk.
     """

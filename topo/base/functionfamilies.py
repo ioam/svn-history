@@ -13,11 +13,11 @@ __version__='$Revision$'
 
 import numpy
 
-from topo.base.parameterizedobject import ParameterizedObject,Parameter
+from ..params import Parameterized,Parameter
 from topo.base.parameterclasses import ListParameter
 
 
-class OutputFn(ParameterizedObject):
+class OutputFn(Parameterized):
     """
     Function object to modify a matrix in place, e.g. for normalization.
 
@@ -145,7 +145,7 @@ class PipelineOF(OutputFn):
 
 
 
-class LearningFn(ParameterizedObject):
+class LearningFn(Parameterized):
     """
     Abstract base class for learning functions that plug into
     CFPLF_Plugin.
@@ -194,7 +194,7 @@ class IdentityLF(LearningFn):
 
 
 
-class ResponseFn(ParameterizedObject):
+class ResponseFn(Parameterized):
     """Abstract base class for response functions that plug into CFPRF_Plugin."""
 
     __abstract = True
@@ -217,7 +217,7 @@ class DotProduct(ResponseFn):
 
 
 
-class CoordinateMapperFn(ParameterizedObject):
+class CoordinateMapperFn(Parameterized):
     """Abstract base class for functions mapping from a 2D coordinate into another one."""
 
     __abstract = True

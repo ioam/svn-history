@@ -12,10 +12,10 @@ from numpy import inf
 ### matrix notation, not list notation, so that it can be scaled,
 ### translated, etc. easily.
 ###
-from parameterizedobject import ParameterizedObject, Parameter
+from parameterizedobject import Parameterized, Parameter
 from parameterclasses import Number
 
-class BoundingRegion(ParameterizedObject):
+class BoundingRegion(Parameterized):
     """
     Abstract bounding region class, for any portion of a 2D plane.
 

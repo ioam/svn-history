@@ -17,7 +17,7 @@ __version__='$Revision$'
 import os.path
 import sys
 
-from topo.base.parameterizedobject import Parameter, ParameterizedObject
+from topo.base.parameterizedobject import Parameter, Parameterized
 
 
 class Filename(Parameter):
@@ -46,7 +46,7 @@ class Filename(Parameter):
         try:
             resolve_path(val,self.search_paths)
         except IOError, e:
-            ParameterizedObject(name="%s.%s"%(str(obj),self.attrib_name(obj))).warning('%s'%(e.args[0]))
+            Parameterized(name="%s.%s"%(str(obj),self.attrib_name(obj))).warning('%s'%(e.args[0]))
 
         super(Filename,self).__set__(obj,val)
         

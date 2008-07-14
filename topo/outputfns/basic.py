@@ -29,7 +29,7 @@ from topo.base.arrayutils import L2norm, norm, array_argmax
 from topo.base.functionfamilies import OutputFn
 from topo.base.parameterclasses import Parameter,Number,ListParameter,\
      BooleanParameter, StringParameter, ClassSelectorParameter
-from topo.base.parameterizedobject import ParameterizedObject
+from ..params import Parameterized
 from topo.base.patterngenerator import PatternGenerator,Constant
 from topo.base.boundingregion import BoundingBox
 from topo.patterns.basic import Gaussian
@@ -485,7 +485,7 @@ class OutputFnWithState(OutputFn):
 
 class AttributeTrackingOF(OutputFnWithState):
     """
-    Keeps track of attributes of a specified ParameterizedObject over time, for analysis or plotting.
+    Keeps track of attributes of a specified Parameterized over time, for analysis or plotting.
 
     Useful objects to track include sheets (e.g. "topo.sim['V1']"),
     projections ("topo.sim['V1'].projections['LateralInhibitory']"),
@@ -512,7 +512,7 @@ class AttributeTrackingOF(OutputFnWithState):
     # need to make _object update whenever object is changed and
     # _object has already been set.
     object = Parameter(default=None, doc="""
-        ParameterizedObject instance whose parameters will be tracked.
+        Parameterized instance whose parameters will be tracked.
 
         If this parameter's value is a string, it will be evaluated first
         (by calling Python's eval() function).  This feature is designed to

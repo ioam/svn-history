@@ -28,7 +28,7 @@ from copy import copy
 
 import patterngenerator
 from patterngenerator import PatternGenerator
-from parameterizedobject import ParameterizedObject
+from parameterizedobject import Parameterized
 from functionfamilies import OutputFn,IdentityOF
 from functionfamilies import LearningFn,Hebbian,IdentityLF
 from functionfamilies import ResponseFn,DotProduct
@@ -55,7 +55,7 @@ class NullCFError(ValueError):
         ValueError.__init__(self,"ConnectionField at (%s,%s) (input_sheet=%s) has a zero-sized weights matrix (%s,%s); you may need to supply a larger bounds_template or increase the density of the sheet."%(x,y,input,rows,cols))
     
                  
-class ConnectionField(ParameterizedObject):
+class ConnectionField(Parameterized):
     """
     A set of weights on one input Sheet.
 
@@ -315,7 +315,7 @@ class ConnectionField(ParameterizedObject):
 
 
 
-class CFPResponseFn(ParameterizedObject):
+class CFPResponseFn(Parameterized):
     """
     Map an input activity matrix into an output matrix using the CFs
     in a CFProjection.
@@ -361,7 +361,7 @@ class CFPRF_Plugin(CFPResponseFn):
         activity *= strength
 
 
-class CFPLearningFn(ParameterizedObject):
+class CFPLearningFn(Parameterized):
     """
     Compute new CFs for a CFProjection based on input and output activity values.
 
@@ -458,7 +458,7 @@ class CFPLF_PluginScaled(CFPLearningFn):
       
 
 
-class CFPOutputFn(ParameterizedObject):
+class CFPOutputFn(Parameterized):
     """
     Type for an object that applies some operation (typically something
     like normalization) to all CFs in a CFProjection for which the specified

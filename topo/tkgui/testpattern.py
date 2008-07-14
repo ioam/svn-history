@@ -31,7 +31,7 @@ from topo.plotting.plotgroup import SheetPlotGroup
 
 from parametersframe import ParametersFrame
 from plotgrouppanel import SheetPanel
-from tkparameterizedobject import ButtonParameter
+from ..params.tk import Button
 from topo.base.simulation import EPConnectionEvent
 from topo.base.sheet import Sheet
 
@@ -68,7 +68,7 @@ class TestPattern(SheetPanel):
     duration = Number(default=1.0,doc="""How long to run the simulator when presenting.""",
                       softbounds=(0.0,10.0))
 
-    Present = ButtonParameter(doc="""Present this pattern to the simulation.""")
+    Present = Button(doc="""Present this pattern to the simulation.""")
 
     pattern_generator = ClassSelectorParameter(class_=PatternGenerator, doc="""Type of pattern to present. Each type has various parameters that can be changed.""")
 

@@ -65,22 +65,22 @@ Parameters with their representations in the GUI.
 is required to keep track of variables and display components
 ('widgets') ).-->
 
-<P>The classes <a href="">TkParameterizedObject</a> and <a
+<P>The classes <a href="">TkParameterized</a> and <a
 href="">ParametersFrame</a> are the ones most often used for
 creating a new GUI representation of some Topographica
 component. Which to use depends on how much you wish to customize the
-display: a ParametersFrame displays all of a ParameterizedObject's
-Parameters as a list in one Frame, whereas a TkParameterizedObject can
+display: a ParametersFrame displays all of a Parameterized's
+Parameters as a list in one Frame, whereas a TkParameterized can
 display any number of the Parameters in any number of Frames (which
 you specify). Hence the PlotGroupPanels, which display Parameters from
-multiple ParameterizedObjects in a custom layout, are based on
-TkParameterizedObject, whereas editing properties of an object in the
+multiple Parameterizeds in a custom layout, are based on
+TkParameterized, whereas editing properties of an object in the
 model editor simply brings up a ParametersFrame for that object.
 
 <H3>ParametersFrame</H3>
 
 <P>If you wish to display and/or edit the Parameters of a
-ParameterizedObject in the GUI, you can simply insert a
+Parameterized in the GUI, you can simply insert a
 ParametersFrame for that object into an existing container (a window
 such as a tkgui.topowidgets.TkguiWindow or a Tkinter.Toplevel, or a frame such as a
 Tkinter.Frame):
@@ -109,10 +109,10 @@ waiting for confirmation via an Apply button.
 <!--CB: mention buttons, two types of PF-->
 
 
-<H3>TkParameterizedObject</H3>
+<H3>TkParameterized</H3>
 
-<P>ParametersFrame extends TkParameterizedObject, the basic class for
-representing Parameters in the GUI. TkParameterizedObject is more
+<P>ParametersFrame extends TkParameterized, the basic class for
+representing Parameters in the GUI. TkParameterized is more
 flexible, but also slightly more complex to use. In the ParametersFrame
 example above, we display all the Parameters of the Gaussian pattern;
 if instead we wanted to display only its size, x, and y Parameters, we
@@ -127,8 +127,8 @@ g = Gaussian()
 w = TkguiWindow()
 
 # display selected parameters of g in w
-from topo.tkgui.tkparameterizedobject import TkParameterizedObject
-t = TkParameterizedObject(w,g)
+from topo.tkgui.tkparameterizedobject import TkParameterized
+t = TkParameterized(w,g)
 t.pack_param('size')
 t.pack_param('x')
 t.pack_param('y')
@@ -136,7 +136,7 @@ t.pack_param('y')
 
 <P>As for ParametersFrame, changes to values in the GUI are
 immediately reflected in the actual
-Parameters. TkParameterizedObject's flexibility for custom
+Parameters. TkParameterized's flexibility for custom
 arrangements comes from the pack_param() method, which takes several
 optional arguments to control the positioning of the Parameter.
 

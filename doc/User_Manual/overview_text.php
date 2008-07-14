@@ -45,10 +45,10 @@ Topographica that requires an object of type Animal will accept a
 Collie or a Terrier as well, plus any user-defined object of type Dog.
 
 
-<H3>ParameterizedObjects and Parameters</H3>
+<H3>Parameterizeds and Parameters</H3>
 
 <ul>
-<li><?php classref('topo.base.parameterizedobject','ParameterizedObject')?>
+<li><?php classref('topo.base.parameterizedobject','Parameterized')?>
 <li><?php classref('topo.base.parameterizedobject','Parameter')?>
     <ul>
     <li><?php classref('topo.base.parameterclasses','Number')?>
@@ -67,12 +67,12 @@ version of attributes called
 <?php classref('topo.base.parameterizedobject','Parameter')?>s, which have
 their own documentation, range and type error checking, and mechanisms for
 inheritance of default values.  These features are provided for any
-<?php classref('topo.base.parameterizedobject','ParameterizedObject')?>,
+<?php classref('topo.base.parameterizedobject','Parameterized')?>,
 which is a Python object extended to support <?php
 classref('topo.base.parameterizedobject','Parameter')?>s, such as
 allowing any parameter to be set by keyword arguments when creating
 the object.  Most Topographica objects are 
-<?php classref('topo.base.parameterizedobject','ParameterizedObject')?>s.
+<?php classref('topo.base.parameterizedobject','Parameterized')?>s.
 <A HREF="parameters.html">Parameters</A> are discussed in more detail on 
 <A HREF="parameters.html">a separate page</A>.
 
