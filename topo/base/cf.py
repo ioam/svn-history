@@ -39,7 +39,7 @@ from parameterclasses import Parameter,Number,BooleanParameter,\
 from sheetcoords import Slice
 from sheetview import UnitView
 from boundingregion import BoundingBox,BoundingRegionParameter
-from topo.outputfns.basic import IdentityOF 
+
 
 
 # Specified explicitly when creating weights matrix - required
