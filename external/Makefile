@@ -120,27 +120,6 @@ tk-uninstall:
 
 
 ##############################################################
-# Tklib (GUI toolkit)
-#
-TKLIB = tklib-CVS20080114
-
-TKLIB_UNINSTALL += lib/tklib0.4.1.0/ 
-
-# sudo apt-get install libxft-dev
-
-tklib: ${TKLIB}.tar.gz tcl tk
-	tar -xzf ${TKLIB}.tar.gz
-	cd ${TKLIB}; ${PREFIX}/bin/tclsh8.5 installer.tcl -no-gui -no-wait -no-html -no-nroff -no-examples -pkgs
-	touch tklib
-
-tklib-clean:
-	rm -rf  ${TKLIB} 
-tklib-uninstall:
-	rm -rf tklib ${foreach f,${TKLIB_UNINSTALL}, ${PREFIX}/${f}}
-
-
-
-##############################################################
 # ipython (improved interactive prompt)
 #
 IPYTHON = ipython-0.8.4
@@ -553,21 +532,42 @@ scrodget-uninstall:
 
 
 ##############################################################
-# SNIT (toolkit that scrodget uses)
+# SNIT (module from tklib; used by scrodget)
 #
 SNIT = snit-2.2.1
 
-SNIT_UNINSTALL += lib/tcl8.5/${SNIT}
+SNIT_UNINSTALL += lib/${SNIT}
 
 snit: ${SNIT}.tar.gz tcl
 	tar -xzf ${SNIT}.tar.gz
-	cp -R ${SNIT} ${PREFIX}/lib/tcl8.5/${SNIT}
+	cp -R ${SNIT} ${PREFIX}/lib/${SNIT}
 	touch snit
 
 snit-clean:
 	rm -rf  ${SNIT} 
 snit-uninstall:
 	rm -rf snit ${foreach f,${SNIT_UNINSTALL}, ${PREFIX}/${f}}
+
+
+
+##############################################################
+# TOOLTIP (module from tcllib; used for help balloons)
+#
+TOOLTIP = tooltip-1.4
+
+TOOLTIP_UNINSTALL += lib/${TOOLTIP}
+
+tooltip: ${TOOLTIP}.tar.gz tcl
+	tar -xzf ${TOOLTIP}.tar.gz
+	cp -R ${TOOLTIP} ${PREFIX}/lib/${TOOLTIP}
+	touch tooltip
+
+tooltip-clean:
+	rm -rf  ${TOOLTIP} 
+tooltip-uninstall:
+	rm -rf tooltip ${foreach f,${TOOLTIP_UNINSTALL}, ${PREFIX}/${f}}
+
+
 
 
 
