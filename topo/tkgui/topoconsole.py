@@ -452,9 +452,9 @@ class TopoConsole(tk.AppWindow,tk.TkParameterized):
             # but it is not clear why this is necessary.
             # For more info:
             # http://groups.google.com/group/comp.lang.python/browse_thread/thread/68d0f33c8eb2e02d
-            if topo.tkgui.system_platform!="win":  
-                try: os.system("stty sane")   # Gives an error msg on Windows 
-                except: pass                  # and is not required.
+            if topo.tkgui.system_platform=="linux" and os.getenv('EMACS')!='t':
+                try: os.system("stty sane")
+                except: pass
                 
             sys.exit()
 
