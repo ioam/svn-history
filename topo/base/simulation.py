@@ -54,11 +54,12 @@ $Id$
 """
 __version__='$Revision$'
 
-from parameterizedobject import Parameterized, Parameter, as_uninitialized
+from ..params import Parameterized, Parameter
+from ..params.parameterized import as_uninitialized
 from parameterclasses import Number, BooleanParameter, StringParameter, wrap_callable
 from copy import copy, deepcopy
 
-import parameterizedobject
+from ..params import parameterized
 import bisect
 
 SLEEP_EXCEPTION = "Sleep Exception"
@@ -950,7 +951,7 @@ class Simulation(Parameterized,OptionalSingleton):
             # Indicate that no specific name has been set
             self.name=params.get('name')
             # Set up debugging messages to include the simulator time
-            parameterizedobject.dbprint_prefix= \
+            parameterized.dbprint_prefix= \
                (lambda: "Time: "+self.timestr()+" ")
 
             from topo.base.parameterclasses import Dynamic

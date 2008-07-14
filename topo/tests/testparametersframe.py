@@ -10,7 +10,7 @@ import __main__
 import unittest
 import Tkinter
 
-from ..params import Parameterized
+from topo.params import Parameterized
 from topo.base.parameterclasses import BooleanParameter,Number,Parameter, \
                                        ObjectSelectorParameter,ClassSelectorParameter, \
                                        StringParameter

@@ -23,7 +23,9 @@ except ImportError:
 
 import topo
 
-from ..params import Parameterized, Parameter,PicklableClassAttributes
+from ..params import Parameterized, Parameter
+from ..params.parameterized import PicklableClassAttributes
+
 from topo.base.functionfamilies import OutputFn
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
@@ -332,7 +334,7 @@ def run_batch(script_file,output_directory="Output",
 
     # Ensure that saved state includes all parameter values
     from topo.commands.basic import save_script_repr
-    from topo.base import parameterizedobject
+    from topo.params import parameterized as parameterizedobject
     parameterizedobject.script_repr_suppress_defaults=False
 
     # Make sure pylab plots are saved to disk

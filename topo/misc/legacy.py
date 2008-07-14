@@ -98,7 +98,7 @@ class SnapshotSupport(object):
             if 'readonly' not in state:
                 state['readonly']=False
 
-        from topo.base.parameterizedobject import Parameter
+        from ..params import Parameter
         preprocess_state(Parameter,param_remove_hidden)
         preprocess_state(Parameter,param_add_readonly)
 

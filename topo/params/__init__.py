@@ -22,7 +22,6 @@ __version__='$Revision$'
 import types
 
 from parameterized import Parameterized, Parameter, descendents
-from parameterized import PicklableClassAttributes
 
 class Enumeration(Parameter):
     """

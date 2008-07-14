@@ -17,7 +17,7 @@ __version__='$Revision$'
 import os.path
 import sys
 
-from topo.base.parameterizedobject import Parameter, Parameterized
+from ..params import Parameter, Parameterized
 
 
 class Filename(Parameter):

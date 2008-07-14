@@ -17,7 +17,7 @@ from math import pi, sin, cos, sqrt
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy import alltrue
 
-from topo.base.parameterizedobject import ParamOverrides
+from ..params.parameterized import ParamOverrides
 from topo.base.parameterclasses import Integer, Number, Parameter
 from topo.base.parameterclasses import ListParameter
 from topo.base.patterngenerator import PatternGenerator

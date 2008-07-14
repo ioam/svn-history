@@ -1,8 +1,8 @@
 # probably shouldn't be in a file on its own!
 
->>> from topo.base.parameterizedobject import ParamOverrides,ParameterizedObject
+>>> from topo.params.parameterized import ParamOverrides,Parameterized
 
->>> po = ParameterizedObject(name='A',print_level=0)
+>>> po = Parameterized(name='A',print_level=0)
 >>> po.name
 'A'
 

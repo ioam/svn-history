@@ -28,7 +28,7 @@ from copy import copy
 
 import patterngenerator
 from patterngenerator import PatternGenerator
-from parameterizedobject import Parameterized
+from ..params import Parameterized
 from functionfamilies import OutputFn,IdentityOF
 from functionfamilies import LearningFn,Hebbian,IdentityLF
 from functionfamilies import ResponseFn,DotProduct

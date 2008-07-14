@@ -17,7 +17,7 @@ import types
 import operator
 
 import sheet
-from parameterizedobject import Parameterized
+from ..params import Parameterized
 from parameterclasses import Parameter,BooleanParameter
 
 ### JABHACKALERT!

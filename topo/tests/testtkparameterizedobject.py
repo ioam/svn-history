@@ -14,7 +14,7 @@ import unittest
 from Tkinter import Frame,Toplevel
 
 from topo.base.simulation import Simulation
-from ..params import Parameterized
+from topo.params import Parameterized
 from topo.base.parameterclasses import BooleanParameter,Number,Parameter, \
                                        ObjectSelectorParameter,ClassSelectorParameter, \
                                        StringParameter
@@ -26,7 +26,7 @@ import topo.patterns.basic
 from topo.patterns.basic import Gaussian        
 from topo.outputfns.basic import PiecewiseLinear
 
-from topo.tkgui.tkparameterizedobject import TkParameterized
+from topo.params.tk import TkParameterized
 
 
 class SomeFrame(TkParameterized,Frame):

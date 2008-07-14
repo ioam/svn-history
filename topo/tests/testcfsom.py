@@ -9,7 +9,7 @@ __version__='$Revision$'
 import unittest
 from pprint import pprint
 from topo.plotting import plot
-from topo.base import parameterizedobject
+from topo.params import parameterized 
 from topo.plotting.bitmap import *
 from topo.base.sheet import Sheet
 from topo.sheets.generatorsheet import *
@@ -20,7 +20,6 @@ from math import pi
 from topo.base.parameterclasses import Number, Parameter
 from topo.misc.numbergenerators import UniformRandom
 import random
-import topo.base.parameterizedobject
 from topo.base.cf import CFProjection, CFSheet
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 import pdb #debugger
@@ -151,7 +150,7 @@ class TestCFSom(unittest.TestCase):
         # input generation params
         GeneratorSheet.period = 1.0
         GeneratorSheet.nominal_density = 5
-        GeneratorSheet.print_level = topo.base.parameterizedobject.WARNING
+        GeneratorSheet.print_level = parameterized.WARNING
         
 
         # cf som parameters
@@ -160,18 +159,18 @@ class TestCFSom(unittest.TestCase):
         ###########################################
         # build simulation
         
-        topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
+        parameterized.min_print_level = parameterized.WARNING
       
         s = Simulation()
         s.verbose("Creating simulation objects...")
         s['retina']=GeneratorSheet(input_generator=input_pattern)
         
         s['V1'] = CFSheet()
-        s['V1'].print_level = topo.base.parameterizedobject.WARNING
+        s['V1'].print_level = parameterized.WARNING
 
         s.connect('retina','V1',delay=1,connection_type=CFProjection,
                   learning_fn=CFPLF_Hebbian_opt())
-        s.print_level = topo.base.parameterizedobject.WARNING
+        s.print_level = parameterized.WARNING
 
         self.assertTrue(topo.sim['V1'].projections().get('retinaToV1',None) != None)
         self.assertTrue(topo.sim['V1'].projections().get('retinaToV1',None) != None)

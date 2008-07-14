@@ -13,7 +13,8 @@ from numpy import add,subtract,cos,sin
 from boundingregion import BoundingBox, BoundingRegionParameter
 from functionfamilies import OutputFn, IdentityOF
 from parameterclasses import Parameter,Number,ClassSelectorParameter,CompositeParameter
-from parameterizedobject import Parameterized,ParamOverrides
+from ..params import Parameterized
+from ..params.parameterized import ParamOverrides
 from sheetcoords import SheetCoordinateSystem
 
 

@@ -10,7 +10,7 @@ from numpy.oldnumeric.random_array import random,seed
 
 from topo.base.parameterclasses import Number,Integer
 from topo.base.patterngenerator import PatternGenerator
-from topo.base.parameterizedobject import ParamOverrides
+from ..params.parameterized import ParamOverrides
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.base.functionfamilies import IdentityOF
 

@@ -11,7 +11,7 @@ from numpy import array,asarray,ones,sometrue, logical_and, logical_or
 from sheet import Sheet
 from parameterclasses import Number, BooleanParameter, Parameter, ListParameter,\
      ClassSelectorParameter
-from parameterizedobject import Parameterized
+from ..params import Parameterized
 from simulation import EPConnection
 from functionfamilies import OutputFn,IdentityOF
 from sheetview import ProjectionView

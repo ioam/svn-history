@@ -18,7 +18,7 @@ from numpy import exp,log,sqrt,sin,cos,zeros,ones,dot,array
 from numpy.matlib import matrix, zeros as mzeros
 from math import atan,pi,atan2
 
-from topo.base.parameterizedobject import Parameter
+from ..params import Parameter
 from topo.base.parameterclasses import Number,Enumeration,ListParameter,BooleanParameter
 from topo.base.functionfamilies import CoordinateMapperFn, IdentityMF
 from topo.misc.utils import signabs

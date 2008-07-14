@@ -1,8 +1,8 @@
->>> from topo.base.parameterizedobject import ParameterizedObject
+>>> from topo.params import Parameterized
 >>> from topo.base.parameterclasses import Number,CompositeParameter
 
 # initialize a class with a compound parameter
->>> class A(ParameterizedObject):
+>>> class A(Parameterized):
 ...    x = Number(default=0)
 ...    y = Number(default=0)
 ...    xy = CompositeParameter(attribs=['x','y'])
@@ -60,7 +60,7 @@
 
 
 
-## CB: this test is really of ParameterizedObject.
+## CB: this test is really of Parameterized.
 ## Check CompositeParameter is ok with Dynamic
 
 # can't use iter with Dynamic (doesn't pickle, doesn't copy)

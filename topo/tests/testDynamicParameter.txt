@@ -1,4 +1,4 @@
->>> from topo.base.parameterizedobject import ParameterizedObject, Parameter
+>>> from topo.params import Parameterized, Parameter
 >>> from topo.base.parameterclasses import Dynamic
 >>> from topo.misc.numbergenerators import UniformRandom
 
@@ -6,7 +6,7 @@
 ## Basic tests of Dynamic parameters (__get__ & __set__,
 ## and that inspect_value() and get_value_generator() work).
 
->>> class TestPO1(ParameterizedObject):
+>>> class TestPO1(Parameterized):
 ...    x = Dynamic(default=UniformRandom(lbound=-1,ubound=1,seed=1),doc="nothing")
 ...    y = Dynamic(default=1)
 
@@ -56,7 +56,7 @@ False
 
 ## Check instantiation of Dynamic parameter
 
->>> class TestPO3(ParameterizedObject):
+>>> class TestPO3(Parameterized):
 ...    x = Dynamic(default=UniformRandom(lbound=-1,ubound=1,seed=30))
 ...    y = Dynamic(default=1.0)
 
@@ -142,7 +142,7 @@ False
 
 
 # Not yet possible to set time_fn for a Parameter instance
-## >>> class TestPO5(ParameterizedObject):
+## >>> class TestPO5(Parameterized):
 ## ...    x = Dynamic(default=UniformRandom(),dynamic_time_fn=None)
 
 
