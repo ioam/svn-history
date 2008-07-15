@@ -219,25 +219,6 @@ class EventProcessor(Parameterized):
         """
         pass
     
-    def state_push(self):
-        """
-        Save the current state of this EventProcessor to an internal stack.
-
-        This method is used by operations that need to test the
-        response of the EventProcessor without permanently altering
-        its state.  All EventProcessors that maintain short-term state
-        should save and restore it using these commands.
-        """
-        pass
-
-    def state_pop(self):
-        """
-        Pop the most recently saved state off the stack.
-
-        See state_push() for more details.
-        """
-        pass
-
     def script_repr(self,imports=[],prefix="    "):
         """Generate a runnable command for creating this EventProcessor."""
         return simulation_path+"['"+self.name+"']="+\
@@ -1272,6 +1253,8 @@ class Simulation(Parameterized,OptionalSingleton):
         for ep in self._event_processors.values():
             ep.state_push()
 
+        Parameterized.state_push(self)
+
 
     def state_pop(self):
         """
@@ -1282,6 +1265,8 @@ class Simulation(Parameterized,OptionalSingleton):
         self.event_pop()
         for ep in self._event_processors.values():
             ep.state_pop()
+
+        Parameterized.state_pop(self)
 
 
     def event_push(self):

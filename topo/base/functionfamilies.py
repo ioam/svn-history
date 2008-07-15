@@ -110,6 +110,7 @@ class PipelineOF(OutputFn):
         for of in self.output_fns:
             if hasattr(of,"state_push"):
                 of.state_push()
+        super(PipelineOF,self).state_push()
 
     def state_pop(self):
         """
@@ -119,6 +120,7 @@ class PipelineOF(OutputFn):
         for of in self.output_fns:
             if hasattr(of,"state_pop"):
                 of.state_pop()
+        super(PipelineOF,self).state_pop()
 
 
 

@@ -8,7 +8,7 @@ __version__='$Revision$'
 
 import unittest
 
-from topo.params import Parameterized, Parameter
+from topo.params import Parameterized, Parameter, Dynamic
 
 
 # CEBALERT: not anything like a complete test of Parameterized!
@@ -19,6 +19,8 @@ class TestPO(Parameterized):
     const = Parameter(default=1,constant=True)
     ro = Parameter(default="Hello",readonly=True)
     ro2 = Parameter(default=object(),readonly=True,instantiate=True)
+
+    dyn = Dynamic(default=1)
 
 class AnotherTestPO(Parameterized):
     instPO = Parameter(default=TestPO(),instantiate=True)
@@ -123,6 +125,20 @@ class TestParameterized(unittest.TestCase):
         assert Parameterized.params() is Parameterized().params(), "Results of params() should be cached." # just for performance reasons
 
 
+    def test_state_saving(self):
+        from topo.misc.numbergenerators import UniformRandom
+        t = TestPO(dyn=UniformRandom())
+        g = t.get_value_generator('dyn')
+        g._Dynamic_time_fn=None
+        assert t.dyn!=t.dyn
+        orig = t.dyn
+        t.state_push()
+        t.dyn
+        assert t.inspect_value('dyn')!=orig
+        t.state_pop()
+        assert t.inspect_value('dyn')==orig
+        
+        
 
 
 suite = unittest.TestSuite()

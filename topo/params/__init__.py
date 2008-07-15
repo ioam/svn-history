@@ -128,6 +128,7 @@ class Dynamic(Parameter):
         """
         Add 'last time' and 'last value' attributes to the generator.
         """
+        # CEBALERT: use a dictionary to hold these things.
         if hasattr(obj,"_Dynamic_time_fn"):
             gen._Dynamic_time_fn = obj._Dynamic_time_fn
 
@@ -135,6 +136,9 @@ class Dynamic(Parameter):
         # CEB: I'd use None for this, except can't compare a fixedpoint
         # number with None (e.g. 1>None but FixedPoint(1)>None can't be done)
         gen._Dynamic_time = -1
+
+        gen._saved_Dynamic_last = []
+        gen._saved_Dynamic_time = []
                 
         
     def __get__(self,obj,objtype):

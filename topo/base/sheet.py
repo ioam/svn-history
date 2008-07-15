@@ -171,6 +171,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
         is intended only for shorter-term state.
         """
         self.__saved_activity.append(array(self.activity))
+        EventProcessor.state_push(self)
 
 
     def state_pop(self):
@@ -180,6 +181,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
         See state_push() for more details.
         """
         self.activity = self.__saved_activity.pop()
+        EventProcessor.state_pop(self)
 
 
     def activity_len(self):

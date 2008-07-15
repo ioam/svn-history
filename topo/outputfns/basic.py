@@ -719,6 +719,7 @@ class HomeostaticMaxEnt(OutputFnWithState):
         Save the current state of the output function to an internal stack.
         """
         self.__current_state_stack.append((copy.copy(self.a), copy.copy(self.b), copy.copy(self.y_avg)))
+        super(HomeostaticMaxEnt,self).state_push()
 
     def state_pop(self):
         """
@@ -727,7 +728,8 @@ class HomeostaticMaxEnt(OutputFnWithState):
         See state_push() for more details.
         """
         self.a, self.b, self.y_avg =  self.__current_state_stack.pop()
-
+        super(HomeostaticMaxEnt,self).state_pop()
+        
                 
 class CascadeHomeostatic(OutputFnWithState):
     """
