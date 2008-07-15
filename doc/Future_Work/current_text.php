@@ -249,6 +249,10 @@ easier.
 
 <H2>Things we hope to take care of eventually</H2>
 
+<H4>2008/07/14 (CB): replace internal name mangling for parameters</H4>
+with a dict, so e.g. _x_param_value is instead _params['x']. (And decide
+whether or not to do this elsewhere e.g. the attributes added to 
+dynamic generators.)
 
 <H4>2006/11/09 (JA): optimizations from c++</H4>
 Need to implement more of the optimizations from the C++ LISSOM code.
