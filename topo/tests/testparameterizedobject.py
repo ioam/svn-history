@@ -12,7 +12,7 @@ from .. import param
 
 # CEBALERT: not anything like a complete test of Parameterized!
 
-class TestPO(Parameterized):
+class TestPO(param.Parameterized):
     inst = param.Parameter(default=[1,2,3],instantiate=True)
     notinst = param.Parameter(default=[1,2,3],instantiate=False)
     const = param.Parameter(default=1,constant=True)
@@ -21,12 +21,12 @@ class TestPO(Parameterized):
 
     dyn = param.Dynamic(default=1)
 
-class AnotherTestPO(Parameterized):
+class AnotherTestPO(param.Parameterized):
     instPO = param.Parameter(default=TestPO(),instantiate=True)
     notinstPO = param.Parameter(default=TestPO(),instantiate=False)
 
 
-class TestAbstractPO(Parameterized):
+class TestAbstractPO(param.Parameterized):
     __abstract = True
 
 
@@ -113,7 +113,7 @@ class TestParameterized(unittest.TestCase):
         # of PO are changed
         assert 'name' in Parameterized.params()
         assert 'print_level' in Parameterized.params()
-        assert len(Parameterized.params())==2
+        assert len(param.Parameterized.params())==2
 
         ## check for bug where subclass Parameters were not showing up
         ## if params() already called on a super class.

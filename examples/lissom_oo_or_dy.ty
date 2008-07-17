@@ -34,17 +34,18 @@ __version__='$Revision$'
 import numpy
 
 from math import pi, sqrt
+import copy
 
+from topo import param
 
 import topo.patterns.basic
 import topo.patterns.random
-import copy
+
 
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import Number
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
@@ -97,11 +98,9 @@ else:
       position_bound = 0.70833
 
 ### Present input patterns that are at non-corresponding locations on each retina
-from topo.param import Parameterized
-from topo.base.parameterclasses import Number
 
 # Note that this script must be run before unpickling will work.
-class NumericOffset(Parameterized):
+class NumericOffset(param.Parameterized):
    """
    Returns a numeric value plus a specified offset, to facilitate
    setting a group of parameters to values that are linked except

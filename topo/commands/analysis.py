@@ -72,7 +72,7 @@ class Feature(object):
 # 'self.contrast_parameter=params.get...'  has been put in?);
 # "x.haskey('y')" is going to disappear from python, I think, and
 # anyway "'y' in x" is clearer. There might also be other things.
-class PatternPresenter(Parameterized):
+class PatternPresenter(param.Parameterized):
     """
     Function object for presenting PatternGenerator-created patterns.
 
@@ -277,7 +277,7 @@ def save_plotgroup(name,saver_params={},**params):
     plotgroup.filesaver.save_to_disk(**saver_params)
 
 
-class Subplotting(Parameterized):
+class Subplotting(param.Parameterized):
     """
     Convenience functions for handling subplots (such as colorized Activity plots).
     Only needed for avoiding typing, as plots can be declared with their own

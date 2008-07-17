@@ -15,11 +15,12 @@ __version__='$Revision$'
 from numpy.oldnumeric import *
 import numpy
 
+from topo import param
+
 import topo.patterns.random
 import topo.patterns.basic
 
 from topo.base.boundingregion import BoundingBox
-from topo.base.parameterclasses import Number,Integer
 from topo.base.sheet import Sheet
 from topo.sheets.generatorsheet import GeneratorSheet
 

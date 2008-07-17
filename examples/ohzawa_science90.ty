@@ -19,6 +19,8 @@ import copy
 
 from math import pi, sqrt
 
+from topo import param
+
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -26,7 +28,6 @@ import topo.patterns.rds
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
-from topo.base.parameterclasses import Number
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.outputfns.basic import PiecewiseLinear,HalfRectifyAndSquare
@@ -194,7 +195,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.sheets.lissom import LISSOM
 
 
-class TestFeatureMap(Parameterized):
+class TestFeatureMap(param.Parameterized):
     """
     A feature map for one stimulus dimension (e.g. Orientation) for one Sheet.
 
@@ -237,7 +238,7 @@ class TestFeatureMap(Parameterized):
 
 
 
-class MeasureTestFeatureMap(Parameterized):
+class MeasureTestFeatureMap(param.Parameterized):
     """
     """
     def __init__(self, feature_param):

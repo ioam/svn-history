@@ -51,7 +51,7 @@ def cmp_plot(plot1,plot2):
 # * There are no unit tests
 
 
-class PlotGroup(Parameterized):
+class PlotGroup(param.Parameterized):
     """
     Container that has one or more Plots and also knows how to arrange
     the plots and other special parameters.

@@ -10,25 +10,28 @@ import numpy
 
 from math import pi, sqrt
 
-
-import topo.patterns.basic
-import topo.patterns.random
+from topo import param
 
 from topo.sheets.lissom import LISSOM, JointNormalizingCFSheet_Continuous
 from topo.sheets.optimized import NeighborhoodMask_Opt, LISSOM_Opt
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import Number, Parameter
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
+from topo.base.functionfamilies import CoordinateMapperFn
 from topo.learningfns.optimized import CFPLF_Hebbian_opt, CFPLF_Trace_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfns.basic import PiecewiseLinear,DivisiveNormalizeL1, Pipeline, HomeostaticMaxEnt
-from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay, Choice
+from topo.outputfns.basic import PiecewiseLinear,DivisiveNormalizeL1,\
+     Pipeline, HomeostaticMaxEnt
+from topo.misc.numbergenerators import UniformRandom, BoundedNumber,\
+     ExponentialDecay, Choice
 from topo.patterns.basic import Gaussian
 from topo.learningfns.projfns import CFPLF_Trace
-from topo.base.functionfamilies import CoordinateMapperFn
+import topo.patterns.basic
+import topo.patterns.random
+
+
 
 topo.sim.name = "3"
 

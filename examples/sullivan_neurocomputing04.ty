@@ -19,6 +19,8 @@ import numpy
 
 from math import exp, sqrt, fmod, pi, radians,sin,cos
 
+from topo import param
+
 import topo.patterns.random
 import topo.patterns.basic
 
@@ -38,8 +40,6 @@ from topo.misc.patternfns import line
 from math import pi, sin, cos
 from numpy import sin,add
 
-from topo.base.parameterclasses import Number, Parameter, Enumeration
-from topo.base.parameterclasses import ListParameter
 from topo.base.patterngenerator import PatternGenerator
 
 # Imported here so that all PatternGenerators will be in the same package

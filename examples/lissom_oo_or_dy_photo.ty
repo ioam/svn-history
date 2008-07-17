@@ -28,12 +28,12 @@ import copy
 
 from math import pi, sqrt
 
+from topo import param
 
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import Number
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
@@ -48,8 +48,6 @@ import ImageOps
 
 from topo.patterns.image import edge_average
 from topo.base.patterngenerator import PatternGenerator
-from topo.base.parameterclasses import Number, Parameter, Enumeration,\
-     ClassSelectorParameter
 from topo.outputfns.basic import DivisiveNormalizeLinf,IdentityOF
 from topo.patterns.image import PatternSampler
 from topo.misc.numbergenerators import UniformRandom

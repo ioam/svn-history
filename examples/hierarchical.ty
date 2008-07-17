@@ -11,8 +11,9 @@ __version__='$Revision$'
 
 import numpy
 
+from topo import param
+
 from topo.base.cf import CFProjection, CFSheet
-from topo.base.parameterclasses import Number
 from topo.base.patterngenerator import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.responsefns.optimized import CFPRF_DotProduct_opt

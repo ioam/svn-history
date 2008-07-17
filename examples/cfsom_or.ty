@@ -15,6 +15,8 @@ __version__='$Revision$'
 
 import numpy
 
+from topo import param
+
 import topo.patterns.random
 import topo.patterns.basic
  

@@ -22,11 +22,12 @@ import numpy
 
 from math import sqrt, pi
 
+from topo import param
+
 import topo
 
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet,CFProjection
-from topo.base.parameterclasses import Number
 from topo.learningfns.projfns import CFPLF_EuclideanHebbian
 from topo.misc.numbergenerators import UniformRandom,BoundedNumber
 from topo.outputfns.basic import DivisiveNormalizeL1
@@ -41,7 +42,7 @@ import topo.patterns.random
 # ALERT: Consider moving these to the main topo/ directory, perhaps
 # after generalizing them.
 
-class LinearDecay(Parameterized):
+class LinearDecay(param.Parameterized):
     """Linear function decreasing from the starting_value to the ending_value."""
     starting_value = param.Number(0.09,doc="""Value at the beginning of learning.""")
     ending_value = param.Number(0.02,doc="""Value at the end of learning.""")
@@ -52,7 +53,7 @@ class LinearDecay(Parameterized):
         return self.starting_value + (self.ending_value-self.starting_value)/self.duration*float(self.time_fn())
 
 
-class PiecewiseLinearDecay(Parameterized):
+class PiecewiseLinearDecay(param.Parameterized):
     """Two-part piecewise-linear decay function."""
 
     starting_value = param.Number(240.0/256.0,doc="""Value at the beginning of learning.""")
