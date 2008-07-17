@@ -133,7 +133,7 @@ False
 >>> assert q.y!=q.y # time_fn set on the UniformRandom() when q.y was set
 
 >>> class TestPO4(TestPO1):
-...    z = Parameter(default=TestPO1())
+...    z = param.Parameter(default=TestPO1())
 
 
 >>> t50 = TestPO4()

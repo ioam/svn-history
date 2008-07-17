@@ -274,7 +274,7 @@ class GenericImage(PatternGenerator):
         OutputFn,default=DivisiveNormalizeLinf(),precedence=0.96,doc="""
         Function applied to the whole, original image array (before any cropping).""")
 
-    pattern_sampler_type = Parameter(default=PatternSampler, doc="""
+    pattern_sampler_type = param.Parameter(default=PatternSampler, doc="""
         The type of PatternSampler to use to resample/resize the image.""")
 
     cache_image = param.Boolean(default=True,doc="""

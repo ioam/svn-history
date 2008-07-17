@@ -176,7 +176,7 @@ class Sweeper(PatternGenerator):
     perpendicular to its orientation.
     """
 
-    generator = Parameter(default=topo.patterns.basic.Gaussian(),precedence=0.97, doc="Pattern to sweep.")
+    generator = param.Parameter(default=topo.patterns.basic.Gaussian(),precedence=0.97, doc="Pattern to sweep.")
 
     speed = param.Number(default=0.25,bounds=(0.0,None),doc="""
         Sweep speed: number of sheet coordinate units per unit time.""")

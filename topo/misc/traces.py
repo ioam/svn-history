@@ -258,7 +258,7 @@ class Trace(param.Parameterized):
     # should probably support in any case, because it not only needs
     # to support None, it needs to specify whether the bounds are
     # inclusive or exclusive.
-    ybounds = Parameter(default=(None,None),doc="""
+    ybounds = param.Parameter(default=(None,None),doc="""
         The (min,max) boundaries for y axis.  If either is None, then
         the bound min or max of the data given, respectively.""")
 
@@ -330,7 +330,7 @@ class SheetPositionTrace(Trace):
     # JPALERT:  Would be nice to some way to set up the coordinate system
     # automatically.  The DataRecorder object already knows what Sheet
     # the data came from.
-    coordframe = Parameter(default=None,doc="""
+    coordframe = param.Parameter(default=None,doc="""
         The SheetCoordinateSystem to use to convert the position
         into matrix coordinates.""")
 

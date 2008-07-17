@@ -13,17 +13,17 @@ from .. import param
 # CEBALERT: not anything like a complete test of Parameterized!
 
 class TestPO(Parameterized):
-    inst = Parameter(default=[1,2,3],instantiate=True)
-    notinst = Parameter(default=[1,2,3],instantiate=False)
-    const = Parameter(default=1,constant=True)
-    ro = Parameter(default="Hello",readonly=True)
-    ro2 = Parameter(default=object(),readonly=True,instantiate=True)
+    inst = param.Parameter(default=[1,2,3],instantiate=True)
+    notinst = param.Parameter(default=[1,2,3],instantiate=False)
+    const = param.Parameter(default=1,constant=True)
+    ro = param.Parameter(default="Hello",readonly=True)
+    ro2 = param.Parameter(default=object(),readonly=True,instantiate=True)
 
     dyn = param.Dynamic(default=1)
 
 class AnotherTestPO(Parameterized):
-    instPO = Parameter(default=TestPO(),instantiate=True)
-    notinstPO = Parameter(default=TestPO(),instantiate=False)
+    instPO = param.Parameter(default=TestPO(),instantiate=True)
+    notinstPO = param.Parameter(default=TestPO(),instantiate=False)
 
 
 class TestAbstractPO(Parameterized):

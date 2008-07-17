@@ -21,8 +21,8 @@ class TestPO(param.Parameterized):
     boo = param.Boolean(default=True)
     osp = param.ObjectSelector()
     csp = param.ClassSelector(class_=PatternGenerator)
-    const = Parameter(1.0,constant=True)
-    pa = Parameter(default="test")
+    const = param.Parameter(1.0,constant=True)
+    pa = param.Parameter(default="test")
     nu = param.Number(default=1.0,bounds=(-1,1))
     st = param.String("string1")
 

@@ -275,7 +275,7 @@ class Sweeper(PatternGenerator):
     perpendicular to its orientation.
     """
 
-    generator = Parameter(default=Gaussian(),precedence=0.97, doc="Pattern to sweep.")
+    generator = param.Parameter(default=Gaussian(),precedence=0.97, doc="Pattern to sweep.")
 
     speed = param.Number(default=0.25,bounds=(0.0,None),doc="""
         Sweep speed: number of sheet coordinate units per unit time.""")
@@ -326,7 +326,7 @@ class Composite(PatternGenerator):
     # The Accum_Replace operator from LISSOM is not yet supported,
     # but it should be added once PatternGenerator bounding boxes
     # are respected and/or GenericImage patterns support transparency.
-    operator = Parameter(numpy.maximum,precedence=0.98,doc="""
+    operator = param.Parameter(numpy.maximum,precedence=0.98,doc="""
         Binary Numpy function used to combine the individual patterns.
 
         Any binary Numpy array "ufunc" returning the same
@@ -639,7 +639,7 @@ class OneDPowerSpectrum(PatternGenerator):
 
     
     # CEBALERT: this should be constant, but setting it so gives an error
-    windowing_function = Parameter(default=numpy.hanning,doc="""
+    windowing_function = param.Parameter(default=numpy.hanning,doc="""
     This function is multiplied with the interval of signal before performing the
     Fourier transform (i.e. it is used to shape the interval). 
 

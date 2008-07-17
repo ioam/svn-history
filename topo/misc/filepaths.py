@@ -19,7 +19,7 @@ import sys
 
 from .. import param
 
-class Filename(Parameter):
+class Filename(param.Parameter):
     """
     Filename is a Parameter that can be set to a string specifying the
     path of a file (in unix style), and returns it in the format of

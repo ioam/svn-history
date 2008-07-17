@@ -65,7 +65,7 @@ jitter  =  locals().get('Jitter',0.2)
 class Jitter(CoordinateMapperFn):
     """Return the jittered x,y coordinate of the given coordinate."""
     scale =  jitter
-    rand = Parameter(default=None)
+    rand = param.Parameter(default=None)
     def __call__(self,x,y):
         return x+(self.rand()-0.5)*self.scale,y+(self.rand()-0.5)*self.scale
 

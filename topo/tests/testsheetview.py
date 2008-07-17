@@ -118,7 +118,7 @@ class TestSheetView(unittest.TestCase):
 ##     topo/sheets/generatorsheet.py).
 
 ##     """
-##     filename = Parameter(None)
+##     filename = param.Parameter(None)
     
 ##     def __init__(self,**params):
 

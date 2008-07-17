@@ -60,11 +60,11 @@ class ImageSaver(EventProcessor):
                      
     """
 
-    file_prefix = Parameter('')
-    file_format = Parameter('ppm')
-    time_format = Parameter('%f')
-    pixel_scale = Parameter(255)
-    pixel_offset = Parameter(0)
+    file_prefix = param.Parameter('')
+    file_format = param.Parameter('ppm')
+    time_format = param.Parameter('%f')
+    pixel_scale = param.Parameter(255)
+    pixel_offset = param.Parameter(0)
 
 
 

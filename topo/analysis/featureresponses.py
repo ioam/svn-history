@@ -234,7 +234,7 @@ class ReverseCorrelation(FeatureResponses):
     """
     # CB: Can't we have a better class hierarchy?
 
-    input_sheet = Parameter(default=None)
+    input_sheet = param.Parameter(default=None)
 
     def initialize_featureresponses(self,features): # CB: doesn't need features!
 

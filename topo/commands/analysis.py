@@ -83,7 +83,7 @@ class PatternPresenter(Parameterized):
     Subclasses can provide additional mechanisms for doing this in
     different ways.
     """
-    contrast_parameter = Parameter('michelson_contrast')
+    contrast_parameter = param.Parameter('michelson_contrast')
 
     def __init__(self,pattern_generator,apply_output_fn=True,duration=1.0,**params):
         self.apply_output_fn=apply_output_fn

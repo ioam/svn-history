@@ -131,7 +131,7 @@ class LISSOM(JointNormalizingCFSheet):
     activate again.
     """
     
-    strict_tsettle = Parameter(default = None,
+    strict_tsettle = param.Parameter(default = None,
         doc='This parameter when defined tells the LISSOM sheet not to send afferent output until the strict_tsettle time')    
     
     mask_init_time=param.Integer(default=5,bounds=(0,None),doc=""" 

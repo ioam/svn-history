@@ -297,7 +297,7 @@ class PatternCombine(OutputFn):
         default=Constant(), doc="""
         Pattern to combine with the supplied matrix.""")
 
-    operator = Parameter(numpy.multiply,precedence=0.98,doc="""
+    operator = param.Parameter(numpy.multiply,precedence=0.98,doc="""
         Binary Numeric function used to combine the two patterns.
 
         Any binary Numeric array "ufunc" returning the same type of
@@ -507,7 +507,7 @@ class AttributeTrackingOF(OutputFnWithState):
     # after instantiation unless _object is also changed.  Or else
     # need to make _object update whenever object is changed and
     # _object has already been set.
-    object = Parameter(default=None, doc="""
+    object = param.Parameter(default=None, doc="""
         Parameterized instance whose parameters will be tracked.
 
         If this parameter's value is a string, it will be evaluated first
@@ -530,7 +530,7 @@ class AttributeTrackingOF(OutputFnWithState):
         For instance, step=1 means to update them every time this OF is
         called; step=2 means to update them every other time.""")
 
-    coordframe = Parameter(default=None,doc="""
+    coordframe = param.Parameter(default=None,doc="""
         The SheetCoordinateSystem to use to convert the position
         into matrix coordinates. If this parameter's value is a string,
         it will be evaluated first(by calling Python's eval() function).
@@ -661,9 +661,9 @@ class HomeostaticMaxEnt(OutputFnWithState):
     smoothing = param.Number(default=0.9997, doc="""
         Weighting of previous activity vs. current activity when calculating the average.""")
 
-    a_init = Parameter(default=None,doc="Multiplicative parameter controlling the exponential.")
+    a_init = param.Parameter(default=None,doc="Multiplicative parameter controlling the exponential.")
    
-    b_init = Parameter(default=None,doc="Additive parameter controlling the exponential.")
+    b_init = param.Parameter(default=None,doc="Additive parameter controlling the exponential.")
 
     step = param.Number(default=1, doc="""
         How often to update the a and b parameters.

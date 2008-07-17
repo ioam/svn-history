@@ -67,9 +67,9 @@ class Jitter(CoordinateMapperFn):
     Additively modifies calculated x,y coordinates, e.g. with random noise.
     """
 
-    scale = Parameter(default=0.0,doc="Amount of jitter.")
+    scale = param.Parameter(default=0.0,doc="Amount of jitter.")
 
-    gen = Parameter(default=UniformRandom(),doc=
+    gen = param.Parameter(default=UniformRandom(),doc=
         "Number generator to use, typically a random distribution.")
 
     def __call__(self,x,y):
@@ -155,7 +155,7 @@ class AffineTransform(CoordinateMapperFn):
     with the subclasses Translate2d, Rotate2d, and Scale2d.
     """
     
-    matrix = Parameter(default=ones((3,3)),doc="""
+    matrix = param.Parameter(default=ones((3,3)),doc="""
        The affine transformation matrix.  The functions
        Translate2dMat, Rotate2dMat, and Scale2dMat generate affine
        transform matrices that can be multiplied together to create
