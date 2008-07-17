@@ -13,11 +13,10 @@ __version__='$Revision$'
 
 import numpy
 
-from ..params import Parameterized,Parameter
-from topo.base.parameterclasses import ListParameter
+from .. import params as param
 
 
-class OutputFn(Parameterized):
+class OutputFn(param.Parameterized):
     """
     Function object to modify a matrix in place, e.g. for normalization.
 
@@ -31,7 +30,7 @@ class OutputFn(Parameterized):
     
     # CEBALERT: can we have this here - is there a more appropriate
     # term for it, general to output functions?  JAB: Please do rename it!
-    norm_value = Parameter(default=None)
+    norm_value = param.Parameter(default=None)
 
 
     def __call__(self,x):
@@ -67,7 +66,7 @@ class PipelineOF(OutputFn):
     Applies a list of other OutputFns in order, to combine their effects.
     """
     
-    output_fns = ListParameter(default=[],class_=OutputFn,doc="""
+    output_fns = param.List(default=[],class_=OutputFn,doc="""
         List of OutputFns to apply, in order.  The default is an empty list, 
         which should be overridden for any useful work.""")
 
@@ -147,7 +146,7 @@ class PipelineOF(OutputFn):
 
 
 
-class LearningFn(Parameterized):
+class LearningFn(param.Parameterized):
     """
     Abstract base class for learning functions that plug into
     CFPLF_Plugin.
@@ -196,7 +195,7 @@ class IdentityLF(LearningFn):
 
 
 
-class ResponseFn(Parameterized):
+class ResponseFn(param.Parameterized):
     """Abstract base class for response functions that plug into CFPRF_Plugin."""
 
     __abstract = True
@@ -219,7 +218,7 @@ class DotProduct(ResponseFn):
 
 
 
-class CoordinateMapperFn(Parameterized):
+class CoordinateMapperFn(param.Parameterized):
     """Abstract base class for functions mapping from a 2D coordinate into another one."""
 
     __abstract = True

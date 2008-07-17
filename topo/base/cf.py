@@ -25,17 +25,15 @@ from numpy import abs,array,zeros,where, ones
 from numpy.oldnumeric import Float,Float32
 from copy import copy
 
+from .. import params as param
 
 import patterngenerator
 from patterngenerator import PatternGenerator
-from ..params import Parameterized
 from functionfamilies import OutputFn,IdentityOF
 from functionfamilies import LearningFn,Hebbian,IdentityLF
 from functionfamilies import ResponseFn,DotProduct
 from functionfamilies import CoordinateMapperFn,IdentityMF
 from projection import Projection,ProjectionSheet, SheetMask
-from parameterclasses import Parameter,Number,BooleanParameter,\
-     ClassSelectorParameter,Integer,BooleanParameter
 from sheetcoords import Slice
 from sheetview import UnitView
 from boundingregion import BoundingBox,BoundingRegionParameter
@@ -55,7 +53,7 @@ class NullCFError(ValueError):
         ValueError.__init__(self,"ConnectionField at (%s,%s) (input_sheet=%s) has a zero-sized weights matrix (%s,%s); you may need to supply a larger bounds_template or increase the density of the sheet."%(x,y,input,rows,cols))
     
                  
-class ConnectionField(Parameterized):
+class ConnectionField(param.Parameterized):
     """
     A set of weights on one input Sheet.
 
@@ -64,17 +62,17 @@ class ConnectionField(Parameterized):
     including many other ConnectionFields.
     """
 
-    x = Number(default=0.0,softbounds=(-1.0,1.0),doc="""
+    x = param.Number(default=0.0,softbounds=(-1.0,1.0),doc="""
         The x coordinate of the location of the center of this ConnectionField
         on the input Sheet, e.g. for use when determining where the weight matrix
         lines up with the input Sheet matrix.""")
     
-    y = Number(default=0.0,softbounds=(-1.0,1.0),doc="""
+    y = param.Number(default=0.0,softbounds=(-1.0,1.0),doc="""
         The y coordinate of the location of the center of this ConnectionField
         on the input Sheet, e.g. for use when determining where the weight matrix
         lines up with the input Sheet matrix.""")
 
-    min_matrix_radius = Integer(default=1,bounds=(0,None),doc="""
+    min_matrix_radius = param.Integer(default=1,bounds=(0,None),doc="""
         Enforced minimum for radius of weights matrix.
         The default of 1 gives a minimum matrix of 3x3. 0 would
         allow a 1x1 matrix.""")
@@ -315,7 +313,7 @@ class ConnectionField(Parameterized):
 
 
 
-class CFPResponseFn(Parameterized):
+class CFPResponseFn(param.Parameterized):
     """
     Map an input activity matrix into an output matrix using the CFs
     in a CFProjection.
@@ -350,7 +348,7 @@ class CFPRF_Plugin(CFPResponseFn):
     ConnectionField weights) and computes a scalar activation value
     based on those weights.
     """
-    single_cf_fn = ClassSelectorParameter(ResponseFn,default=DotProduct(),
+    single_cf_fn = param.ClassSelector(ResponseFn,default=DotProduct(),
         doc="Accepts a ResponseFn that will be applied to each CF individually.")
     
     def __call__(self, iterator, input_activity, activity, strength):
@@ -361,7 +359,7 @@ class CFPRF_Plugin(CFPResponseFn):
         activity *= strength
 
 
-class CFPLearningFn(Parameterized):
+class CFPLearningFn(param.Parameterized):
     """
     Compute new CFs for a CFProjection based on input and output activity values.
 
@@ -396,7 +394,7 @@ class CFPLearningFn(Parameterized):
 
 class CFPLF_Identity(CFPLearningFn):
     """CFLearningFunction performing no learning."""
-    single_cf_fn = ClassSelectorParameter(LearningFn,default=IdentityLF(),constant=True)
+    single_cf_fn = param.ClassSelector(LearningFn,default=IdentityLF(),constant=True)
   
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         pass
@@ -404,7 +402,7 @@ class CFPLF_Identity(CFPLearningFn):
 
 class CFPLF_Plugin(CFPLearningFn):
     """CFPLearningFunction applying the specified single_cf_fn to each CF."""
-    single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),
+    single_cf_fn = param.ClassSelector(LearningFn,default=Hebbian(),
         doc="Accepts a LearningFn that will be applied to each CF individually.")
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
@@ -428,10 +426,10 @@ class CFPLF_PluginScaled(CFPLearningFn):
     connection field uses a different learning rate.
     """
 
-    single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),
+    single_cf_fn = param.ClassSelector(LearningFn,default=Hebbian(),
         doc="Accepts a LearningFn that will be applied to each CF individually.")
 
-    learning_rate_scaling_factor = Parameter(default=None,
+    learning_rate_scaling_factor = param.Parameter(default=None,
         doc="Matrix of scaling factors for scaling the learning rate of each CF individually.")
 
     
@@ -458,7 +456,7 @@ class CFPLF_PluginScaled(CFPLearningFn):
       
 
 
-class CFPOutputFn(Parameterized):
+class CFPOutputFn(param.Parameterized):
     """
     Type for an object that applies some operation (typically something
     like normalization) to all CFs in a CFProjection for which the specified
@@ -481,7 +479,7 @@ class CFPOF_Plugin(CFPOutputFn):
     Applies the specified single_cf_fn to each CF in the CFProjection
     for which the mask is nonzero.
     """
-    single_cf_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),
+    single_cf_fn = param.ClassSelector(OutputFn,default=IdentityOF(),
         doc="Accepts an OutputFn that will be applied to each CF individually.")
     
     def __call__(self, iterator, mask, **params):
@@ -504,7 +502,7 @@ class CFPOF_Identity(CFPOutputFn):
     Must never be changed or subclassed, because it might never
     be called. (I.e., it could simply be tested for and skipped.)
     """
-    single_cf_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),constant=True)
+    single_cf_fn = param.ClassSelector(OutputFn,default=IdentityOF(),constant=True)
     
     def __call__(self, iterator, mask, **params):
         pass
@@ -529,17 +527,17 @@ class CFProjection(Projection):
     input and stores it in the activity array.
     """
 
-    response_fn = ClassSelectorParameter(CFPResponseFn,
+    response_fn = param.ClassSelector(CFPResponseFn,
         default=CFPRF_Plugin(),
         doc='Function for computing the Projection response to an input pattern.')
     
-    cf_type = Parameter(default=ConnectionField,constant=True,
+    cf_type = param.Parameter(default=ConnectionField,constant=True,
         doc="Type of ConnectionField to use when creating individual CFs.")
 
     # JPHACKALERT: Not all support for null CFs has been implemented.
     # CF plotting and C-optimized CFPxF_ functions need
     # to be fixed to support null CFs without crashing.    
-    allow_null_cfs = BooleanParameter(default=False,
+    allow_null_cfs = param.Boolean(default=False,
         doc="Whether or not the projection can have entirely empty CFs")
     
     nominal_bounds_template = BoundingRegionParameter(
@@ -547,45 +545,45 @@ class CFProjection(Projection):
         Bounds defining the Sheet area covered by a prototypical ConnectionField.
         The true bounds will differ depending on the density (see create_slice_template()).""")
     
-    weights_generator = ClassSelectorParameter(PatternGenerator,
+    weights_generator = param.ClassSelector(PatternGenerator,
         default=patterngenerator.Constant(),constant=True,
         doc="Generate initial weights values.")
 
-    cf_shape = ClassSelectorParameter(PatternGenerator,
+    cf_shape = param.ClassSelector(PatternGenerator,
         default=patterngenerator.Constant(),constant=True,
         doc="Define the shape of the connection fields.")
 
-    learning_fn = ClassSelectorParameter(CFPLearningFn,
+    learning_fn = param.ClassSelector(CFPLearningFn,
         default=CFPLF_Plugin(),
         doc='Function for computing changes to the weights based on one activation step.')
 
     # JABALERT: Shouldn't learning_rate be owned by the learning_fn?
-    learning_rate = Number(default=0.0,softbounds=(0,100),doc="""
+    learning_rate = param.Number(default=0.0,softbounds=(0,100),doc="""
         Amount of learning at each step for this projection, specified
         in units that are independent of the density of each Sheet.""")
 
-    weights_output_fn = ClassSelectorParameter(CFPOutputFn,
+    weights_output_fn = param.ClassSelector(CFPOutputFn,
         default=CFPOF_Plugin(),
         doc='Function applied to each CF after learning.')
 
-    strength = Number(default=1.0,doc="""
+    strength = param.Number(default=1.0,doc="""
         Global multiplicative scaling applied to the Activity of this Sheet.""")
 
-    coord_mapper = ClassSelectorParameter(CoordinateMapperFn,
+    coord_mapper = param.ClassSelector(CoordinateMapperFn,
         default=IdentityMF(),
         doc='Function to map a projected coordinate into the target sheet.')
 
     # CEBALERT: this is temporary (allows c++ matching in certain
     # cases).  We will allow the user to override the mask size, but
     # by offering a scaling parameter.
-    autosize_mask = BooleanParameter(
+    autosize_mask = param.Boolean(
         default=True,constant=True,precedence=-1,doc="""
         Topographica sets the mask size so that it is the same as the connection field's
         size, unless this parameter is False - in which case the user-specified size of
         the cf_shape is used. In normal usage of Topographica, this parameter should
         remain True.""")
     
-    apply_output_fn_init=BooleanParameter(default=True,doc="""
+    apply_output_fn_init=param.Boolean(default=True,doc="""
         Whether to apply the output function to connection fields (e.g. for 
         normalization) when the CFs are first created.""")
 
@@ -879,10 +877,10 @@ class CFSheet(ProjectionSheet):
     or analysis, CFSheet and ProjectionSheet are interchangeable.
     """
 
-    measure_maps = BooleanParameter(True,doc="""
+    measure_maps = param.Boolean(True,doc="""
         Whether to include this Sheet when measuring various maps to create SheetViews.""")
 
-    precedence = Number(0.5)
+    precedence = param.Number(0.5)
 
 
     def update_unit_view(self,x,y,proj_name=''):

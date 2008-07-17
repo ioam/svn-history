@@ -12,10 +12,9 @@ from numpy import inf
 ### matrix notation, not list notation, so that it can be scaled,
 ### translated, etc. easily.
 ###
-from ..params import Parameterized, Parameter
-from parameterclasses import Number
+from .. import params as param
 
-class BoundingRegion(Parameterized):
+class BoundingRegion(param.Parameterized):
     """
     Abstract bounding region class, for any portion of a 2D plane.
 
@@ -175,7 +174,7 @@ class BoundingBox(BoundingRegion):
 
 
 
-class Cartesian2DPoint(Parameter):
+class Cartesian2DPoint(param.Parameter):
     """
     Parameter whose value represents a point in a 2D Cartesian plane.
     """
@@ -215,7 +214,7 @@ class BoundingCircle(BoundingRegion):
     Takes parameters center (a single 2D point (x,y)) and radius (a
     scalar radius).
     """
-    radius = Number(0.5,bounds=(0.0,None))
+    radius = param.Number(0.5,bounds=(0.0,None))
     center = Cartesian2DPoint((0.0,0.0))
 
     def __init__(self,**args):
@@ -380,7 +379,7 @@ class AARectangle(object):
 ### the value is in that class?
 ###
 ### Do we also need a BoundingBoxParameter?
-class BoundingRegionParameter(Parameter):
+class BoundingRegionParameter(param.Parameter):
     """
     Parameter whose value can be any BoundingRegion instance, enclosing a region in a 2D plane.
     """

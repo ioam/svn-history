@@ -25,9 +25,10 @@ __version__ = '$Revision$'
 from numpy import zeros,array,arange
 from numpy.oldnumeric import Float
 
+from .. import params as param
+
 from simulation import EventProcessor
 from sheetcoords import SheetCoordinateSystem
-from parameterclasses import BooleanParameter, Number, NumericTuple
 from boundingregion import BoundingBox, BoundingRegionParameter
 
 
@@ -57,7 +58,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
             of this object.
             """)
     
-    nominal_density = Number(default=10,constant=True,doc="""
+    nominal_density = param.Number(default=10,constant=True,doc="""
             User-specified number of processing units per 1.0 distance
             horizontally or vertically in Sheet coordinates. The actual
             number may be different because of discretization; the matrix
@@ -68,16 +69,16 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
             (since these are identical for a Sheet).
             """)
     
-    plastic = BooleanParameter(True,doc="""
+    plastic = param.Boolean(True,doc="""
             Setting this to False tells the Sheet not to change its
             permanent state (e.g. any connection weights) based on
             incoming events.
             """)
 
-    precedence = Number(default = 0.1, softbounds=(0.0,1.0),doc="""
+    precedence = param.Number(default = 0.1, softbounds=(0.0,1.0),doc="""
             Allows a sorting order for Sheets, e.g. in the GUI.""")
 
-    layout_location = NumericTuple(default = (-1,-1),precedence=-1,doc="""
+    layout_location = param.NumericTuple(default = (-1,-1),precedence=-1,doc="""
             Location for this Sheet in an arbitrary pixel-based space
             in which Sheets can be laid out for visualization.""")
 

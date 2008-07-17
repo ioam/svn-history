@@ -10,11 +10,12 @@ from math import pi
 
 from numpy import add,subtract,cos,sin
 
+from .. import params as param
+from ..params.parameterized import ParamOverrides
+
 from boundingregion import BoundingBox, BoundingRegionParameter
 from functionfamilies import OutputFn, IdentityOF
-from parameterclasses import Parameter,Number,ClassSelectorParameter,CompositeParameter
-from ..params import Parameterized
-from ..params.parameterized import ParamOverrides
+
 from sheetcoords import SheetCoordinateSystem
 
 
@@ -34,7 +35,7 @@ from sheetcoords import SheetCoordinateSystem
 # anyone ever uses such an object in a PatternGenerator.  Will also
 # need to support Composite patterns.
 
-class PatternGenerator(Parameterized):
+class PatternGenerator(param.Parameterized):
     """
     A class hierarchy for callable objects that can generate 2D patterns.
 
@@ -65,45 +66,45 @@ class PatternGenerator(Parameterized):
         default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),precedence=-1,
         doc="BoundingBox of the area in which the pattern is generated.")
     
-    xdensity = Number(default=10,bounds=(0,None),precedence=-1,doc="""
+    xdensity = param.Number(default=10,bounds=(0,None),precedence=-1,doc="""
         Density (number of samples per 1.0 length) in the x direction.""")
 
-    ydensity = Number(default=10,bounds=(0,None),precedence=-1,doc="""
+    ydensity = param.Number(default=10,bounds=(0,None),precedence=-1,doc="""
         Density (number of samples per 1.0 length) in the y direction.
         Typically the same as the xdensity.""")
 
-    x = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.20,doc="""
+    x = param.Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.20,doc="""
         X-coordinate location of pattern center.""")
 
-    y = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.21,doc="""
+    y = param.Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.21,doc="""
         Y-coordinate location of pattern center.""")
 
 
-    position = CompositeParameter(attribs=['x','y'],precedence=-1,doc="""
+    position = param.Composite(attribs=['x','y'],precedence=-1,doc="""
         Coordinates of location of pattern center.
         Provides a convenient way to set the x and y parameters together
         as a tuple (x,y), but shares the same actual storage as x and y
         (and thus only position OR x and y need to be specified).""")
     
-    orientation = Number(default=0.0,softbounds=(0.0,2*pi),precedence=0.40,doc="""
+    orientation = param.Number(default=0.0,softbounds=(0.0,2*pi),precedence=0.40,doc="""
         Polar angle of pattern, i.e., the orientation in the Cartesian coordinate
         system, with zero at 3 o'clock and increasing counterclockwise.""")
     
-    size = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+    size = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.30,doc="""Determines the overall size of the pattern.""")
 
-    scale = Number(default=1.0,softbounds=(0.0,2.0),precedence=0.10,doc="""
+    scale = param.Number(default=1.0,softbounds=(0.0,2.0),precedence=0.10,doc="""
         Multiplicative strength of input pattern, defaulting to 1.0""")
     
-    offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.11,doc="""
+    offset = param.Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.11,doc="""
         Additive offset to input pattern, defaulting to 0.0""")
 
-    mask = Parameter(default=None,precedence=0.06,doc="""
+    mask = param.Parameter(default=None,precedence=0.06,doc="""
         Optional object (expected to be an array) with which to multiply the
         pattern array after it has been created, before any output_fn is
         applied. This can be used to shape the pattern.""")
     
-    output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),precedence=0.08,doc="""
+    output_fn = param.ClassSelector(OutputFn,default=IdentityOF(),precedence=0.08,doc="""
         Optional function to apply to the pattern array after it has been created.
         This function can be used for normalization, thresholding, etc.""")
 
@@ -206,10 +207,10 @@ class Constant(PatternGenerator):
 
     # The standard position and orientation variables are ignored for this special case,
     # so we hide them from auto-generated lists of parameters (e.g. in the GUI)
-    x = Number(precedence=-1)
-    y = Number(precedence=-1)
-    orientation = Number(precedence=-1)
-    size = Number(precedence=-1)
+    x = param.Number(precedence=-1)
+    y = param.Number(precedence=-1)
+    orientation = param.Number(precedence=-1)
+    size = param.Number(precedence=-1)
     
 
     # Optimization: We use a simpler __call__ method here to skip the

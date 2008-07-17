@@ -8,10 +8,9 @@ __version__='$Revision$'
 import numpy
 from numpy import array,asarray,ones,sometrue, logical_and, logical_or
 
+from .. import params as param
+
 from sheet import Sheet
-from parameterclasses import Number, BooleanParameter, Parameter, ListParameter,\
-     ClassSelectorParameter
-from ..params import Parameterized
 from simulation import EPConnection
 from functionfamilies import OutputFn,IdentityOF
 from sheetview import ProjectionView
@@ -19,7 +18,7 @@ from sheetview import ProjectionView
 from topo.misc.keyedlist import KeyedList
 
 
-class SheetMask(Parameterized):
+class SheetMask(param.Parameterized):
     """
     An abstract class that defines a mask over a ProjectionSheet object.
     
@@ -116,7 +115,7 @@ class CompositeSheetMask(SheetMask):
     """
     __abstract =  True 
 
-    submasks = ListParameter(class_=SheetMask)
+    submasks = param.List(class_=SheetMask)
 
     def __init__(self,sheet=None,**params):
         super(CompositeSheetMask,self).__init__(sheet,**params)
@@ -182,20 +181,20 @@ class Projection(EPConnection):
     """
     __abstract=True
     
-    strength = Number(default=1.0)
+    strength = param.Number(default=1.0)
 
-    src_port = Parameter(default='Activity')
+    src_port = param.Parameter(default='Activity')
     
-    dest_port = Parameter(default='Activity')
+    dest_port = param.Parameter(default='Activity')
 
-    output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),doc="""
+    output_fn = param.ClassSelector(OutputFn,default=IdentityOF(),doc="""
     Function applied to the Projection activity after it is computed.""")
 
-    plastic = BooleanParameter(default=True, doc="""
+    plastic = param.Boolean(default=True, doc="""
         Whether or not to update the internal state on each call.
         Allows plasticity to be turned off during analysis, and then re-enabled.""")
     
-    activity_group = Parameter(default=(0.5,numpy.add), doc="""
+    activity_group = param.Parameter(default=(0.5,numpy.add), doc="""
        Grouping and precedence specifier for computing activity from
        Projections.  In a ProjectionSheet, all Projections in the
        same activity_group will be summed, and then the results from
@@ -336,21 +335,21 @@ class ProjectionSheet(Sheet):
     
     dest_ports=['Activity']
     
-    output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),
+    output_fn = param.ClassSelector(OutputFn,default=IdentityOF(),
         doc="Output function to apply (if apply_output_fn is true) to this Sheet's activity.")
     
-    multiplicative_constant = Number(default = 0.0,doc="""
+    multiplicative_constant = param.Number(default = 0.0,doc="""
         Constant value added to projection activity before combining multiplicatively.""")   
        
-    divisive_constant = Number(default = 1.0,doc="""
+    divisive_constant = param.Number(default = 1.0,doc="""
         Constant value added to projection activity before combining divisively.""")    
     
-    apply_output_fn=BooleanParameter(default=True,
+    apply_output_fn=param.Boolean(default=True,
         doc="Whether to apply the output_fn after computing an Activity matrix.")
         
     # Should be a MaskParameter for safety
     #mask = ClassSelectorParameter(SheetMask,default=SheetMask(),instantiate=True,doc="""
-    mask = Parameter(default=SheetMask(),instantiate=True,doc="""
+    mask = param.Parameter(default=SheetMask(),instantiate=True,doc="""
         SheetMask object for computing which units need to be computed further.
         The object should be an instance of SheetMask, and will
         compute which neurons will be considered active for the
@@ -359,7 +358,7 @@ class ProjectionSheet(Sheet):
         implement optimizations, non-rectangular Sheet shapes,
         lesions, etc.""")
     
-    contFlag=BooleanParameter(default=False,
+    contFlag=param.Boolean(default=False,
         doc="Whether to calculate the activity in the sheet continuously.")
     
     def __init__(self,**params):
@@ -595,12 +594,12 @@ class NeighborhoodMask(SheetMask):
     least one neuron in the radius is over the threshold.
     """
 
-    threshold = Number(default=0.00001,bounds=(0,None),doc="""
+    threshold = param.Number(default=0.00001,bounds=(0,None),doc="""
        Threshold for considering a neuron active.
        This value should be small to avoid discarding significantly active
        neurons.""")
 
-    radius = Number(default=0.05,bounds=(0,None),doc="""
+    radius = param.Number(default=0.05,bounds=(0,None),doc="""
        Radius in Sheet coordinates around active neurons to consider
        neighbors active as well.  Using a larger radius ensures that
        the calculation will be unaffected by the mask, but it will

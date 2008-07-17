@@ -16,9 +16,9 @@ __version__='$Revision$'
 import types
 import operator
 
+from .. import params as param
+
 import sheet
-from ..params import Parameterized
-from parameterclasses import Parameter,BooleanParameter
 
 ### JABHACKALERT!
 ###
@@ -41,7 +41,7 @@ operations = {ADD : operator.add,
               DIVIDE : operator.truediv}
 
 
-class SheetView(Parameterized):
+class SheetView(param.Parameterized):
     """
     A SheetView is constructed from a matrix of values, a bounding box
     for that matrix, and a name.  There are two major ways to create a
@@ -50,14 +50,14 @@ class SheetView(Parameterized):
     matrices or SheetViews.
     """
 
-    cyclic = BooleanParameter(default=False,doc=
+    cyclic = param.Boolean(default=False,doc=
         """Whether or not the values in this View's matrix represent a cyclic dimension.""")
 
     # CB: Should call this cyclic_range, I think. Unless norm_factor
     # is ever going to be anything but 1.0 for non-cyclic
     # quantities...but I'm not sure it makes sense to store anything
     # but the cyclic range here. See ALERT in featureresponses.py.
-    norm_factor = Parameter(None,doc="""If cyclic is True, this value is the cyclic range.""")
+    norm_factor = param.Parameter(None,doc="""If cyclic is True, this value is the cyclic range.""")
     
     ### JCALERT! term_1 and term_2 should be more explicit...
     ### the 3 cases described in the doc, are they really useful?
