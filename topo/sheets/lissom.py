@@ -134,14 +134,14 @@ class LISSOM(JointNormalizingCFSheet):
     strict_tsettle = Parameter(default = None,
         doc='This parameter when defined tells the LISSOM sheet not to send afferent output until the strict_tsettle time')    
     
-    mask_init_time=Integer(default=5,bounds=(0,None),doc=""" 
+    mask_init_time=param.Integer(default=5,bounds=(0,None),doc=""" 
        Determines when a new mask is initialized in each new iteration.
 
        The mask is reset whenever new input comes in.  Once the
        activation_count (see tsettle) reaches mask_init_time, the mask
        is initialized to reflect the current activity profile.""")
 
-    tsettle=Integer(default=8,bounds=(0,None),doc="""
+    tsettle=param.Integer(default=8,bounds=(0,None),doc="""
        Number of times to activate the LISSOM sheet for each external input event.
        
        A counter is incremented each time an input is received from any

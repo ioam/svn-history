@@ -57,7 +57,7 @@ class RandomDotStereogram(PatternGenerator):
     dotsize    = param.Number(default=0.1,bounds=(0.0,None),softbounds=(0.05,0.15),
                         precedence=0.53,doc="Edge length of each square dot.")
 
-    random_seed=Integer(default=500,bounds=(0,1000),
+    random_seed=param.Integer(default=500,bounds=(0,1000),
                         precedence=0.54,doc="Seed value for the random position of the dots.")
 
 

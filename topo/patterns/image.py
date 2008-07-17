@@ -205,7 +205,7 @@ class FastPatternSampler(Parameterized):
     of the original picture.
     """
     
-    sampling_method = Integer(default=PIL.NEAREST,doc="""
+    sampling_method = param.Integer(default=PIL.NEAREST,doc="""
        Python Imaging Library sampling method for resampling an image.
        Defaults to Image.NEAREST.""")
 

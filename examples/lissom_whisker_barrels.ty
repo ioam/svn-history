@@ -48,13 +48,13 @@ class WhiskerArray(PatternGenerator):
     """
 
     # Because of quantisation issues, num_whiskers should be an odd number 
-    num_whiskers = Integer(default=3,bounds=(1,None),softbounds=(0.0,10.0),
+    num_whiskers = param.Integer(default=3,bounds=(1,None),softbounds=(0.0,10.0),
         precedence=0.31,doc="""
         Square root of the number of whiskers to use.  E.g. 3 gives a 3x3 array.""")
 
     randomise_ganglion = bool(True)
   
-    num_ganglion_cells = Integer(default=8,doc="""
+    num_ganglion_cells = param.Integer(default=8,doc="""
         Square root of the number of ganglion cells per whisker.""")
 
     deflection = param.Number(default=pi/4,softbounds=(0.0,2*pi),doc="""
@@ -71,18 +71,18 @@ class WhiskerArray(PatternGenerator):
     rectify = param.Boolean(default=True,doc="""
         Whether or not to suppress firing in depressed ganglion. 1 means to rectify, 0 to not.""")
 
-    whisker = Integer(default=(0), doc="""
+    whisker = param.Integer(default=(0), doc="""
         Which whiskers are to receive inputs; use (0) for all.""")
 
     ## SWALERT: This needs to be figured out.
     step_size = param.Number(default = 0.75,doc="""
         Scaling of the distance; must be fine tuned to give good results.""")
 
-    pipe_size = Integer(default=100,doc="""
+    pipe_size = param.Integer(default=100,doc="""
         Square root of the number of elements to define the pipe.
         A larger size means a more smoothly defined Gaussian drop off.""")
 
-    pipe_sigma=Integer(default=20, doc="""
+    pipe_sigma=param.Integer(default=20, doc="""
         Sigma of the pipe falloff.""")
 
     pipe_sigma_on=param.Number(default=0.1, doc="""
@@ -165,7 +165,7 @@ class TestWhiskerArray(PatternGenerator):
     rectify = param.Boolean(default=True,doc="""
         Whether or not to suppress firing in depressed ganglion. 1 means to rectify, 0 to not.""")
     
-    whisker = Integer(default=0, doc="""
+    whisker = param.Integer(default=0, doc="""
         Which whiskers are to receive inputs; use 0 for all.""")
 	
 
@@ -213,10 +213,10 @@ class WhiskerBotData(PatternGenerator):
     rectify = param.Boolean(default=True,doc="""
         Whether or not to supress firing in depressed ganglion cell. 1 is to rectify, 0 is to not""")
 
-    time_step = Integer(default = 1,bounds=(1,50),doc="""
+    time_step = param.Integer(default = 1,bounds=(1,50),doc="""
         Numbered frame from the WhiskerBot simulation.""")
 
-    whiskerBot_data = Integer(default = 1,doc="""
+    whiskerBot_data = param.Integer(default = 1,doc="""
         Choose WhiskerBot data to present. Data are stored in examples/whiskers/wbot_object_data:
         1:Concave surface, 2:Ball, 3:Chequerboard, 4:vertical ridges.""") 
 	

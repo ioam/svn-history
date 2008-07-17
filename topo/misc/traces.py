@@ -307,7 +307,7 @@ class IndexTrace(Trace):
     indexed with a single integer, and traces the value of one indexed element.
     """
     
-    index = Integer(default=0,doc="""
+    index = param.Integer(default=0,doc="""
         The index into the data to be traced.""")
     
     def __call__(self,data):

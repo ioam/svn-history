@@ -436,7 +436,7 @@ class SeparatedComposite(Composite):
         ### plotting the training pattern center distribution, so that
         ### such issues can be checked.
 
-    max_trials = Integer(default = 50, bounds = (0,None),
+    max_trials = param.Integer(default = 50, bounds = (0,None),
                          softbounds = (0,100), precedence=-1, doc="""
         Number of times to try for a new pattern location that meets the criteria.
         
@@ -633,7 +633,7 @@ class OneDPowerSpectrum(PatternGenerator):
     Returns the spectral density of a rolling window of the input signal
     each time it is called. Over time, outputs a spectrogram.
     """
-    window_length = Integer(constant=True,default=2,doc="""
+    window_length = param.Integer(constant=True,default=2,doc="""
     The interval of the signal on which to perform the Fourier transform.
     
     The Fourier transform algorithm is most efficient if this is a power of 2
@@ -652,7 +652,7 @@ class OneDPowerSpectrum(PatternGenerator):
     See  http://en.wikipedia.org/wiki/Window_function
     """)
 
-    window_overlap = Integer(default=0,doc="""Amount of overlap between each window of
+    window_overlap = param.Integer(default=0,doc="""Amount of overlap between each window of
     the signal.""")
     
     sample_spacing = param.Number(constant=True,default=1.0,doc="""

@@ -196,7 +196,7 @@ class PlotMatrixPanel(ProjectionSheetPanel):
     a projection involving a matrix of units.
     """
     
-    gui_desired_maximum_plot_height = Integer(default=5,bounds=(0,None),doc="""
+    gui_desired_maximum_plot_height = param.Integer(default=5,bounds=(0,None),doc="""
         Value to provide for PlotGroup.desired_maximum_plot_height for
         PlotGroups opened by the GUI.  Determines the initial, default
         scaling for the PlotGroup.""")

@@ -52,10 +52,10 @@ class ElasticNet(Sheet):
     two_d = param.Number(default=0.05,bounds=(0,None),
                    doc="Separation between the cells within a layer")
 
-    retinasize=Integer(default=20,bounds=(0,None),
+    retinasize=param.Integer(default=20,bounds=(0,None),
                    doc="Retina size") # Ideally, would get this info from the retina objects
 
-    cortexsize=Integer(default=40,bounds=(0,None),
+    cortexsize=param.Integer(default=40,bounds=(0,None),
                    doc="Cortex size") # Ideally, would calculate this info from our bounding box and density
 
 

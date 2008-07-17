@@ -249,14 +249,14 @@ class MontageBitmap(Bitmap):
     bitmaps = param.List(class_=Bitmap,doc="""
         The list of bitmaps to compose.""")
 
-    rows = Integer(default=2, doc="""
+    rows = param.Integer(default=2, doc="""
         The number of rows in the montage.""")
-    cols = Integer(default=2, doc="""
+    cols = param.Integer(default=2, doc="""
         The number of columns in the montage.""")    
     shape = param.Composite(attribs=['rows','cols'], doc="""
         The shape of the montage. Same as (self.rows,self.cols).""")
 
-    margin = Integer(default=5,doc="""
+    margin = param.Integer(default=5,doc="""
         The size in pixels of the margin to put around each
         tile in the montage.""")
 
@@ -283,7 +283,7 @@ class MontageBitmap(Bitmap):
         to the tile images before resizing.  The value None can be
         inserted as a placeholder where no hook function is needed.""")
 
-    resize_filter = Integer(default=Image.NEAREST,doc="""
+    resize_filter = param.Integer(default=Image.NEAREST,doc="""
        The filter used for resizing the images.  Defaults
        to NEAREST.  See PIL Image module documentation for other
        options and their meanings.""")
