@@ -156,7 +156,7 @@ class LISSOM(JointNormalizingCFSheet):
 
     output_fn = ClassSelectorParameter(OutputFn,default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
     
-    precedence = Number(0.6)
+    precedence = param.Number(0.6)
     
     post_initialization_weights_output_fn = ClassSelectorParameter(
         CFPOutputFn,default=None,doc="""
@@ -299,16 +299,16 @@ class JointScaling(LISSOM):
     # scaling of projections named "Afferent", grouped together by
     # JointNormalize in dest_port.
     
-    target = Number(default=0.045, doc="""
+    target = param.Number(default=0.045, doc="""
         Target average activity for jointly scaled projections.""")
 
     # JABALERT: I cannot parse the docstring; is it an activity or a learning rate?
-    target_lr = Number(default=0.045, doc="""
+    target_lr = param.Number(default=0.045, doc="""
         Target average activity for jointly scaled projections.
 
         Used for calculating a learning rate scaling factor.""")
     
-    smoothing = Number(default=0.999, doc="""
+    smoothing = param.Number(default=0.999, doc="""
         Influence of previous activity, relative to current, for computing the average.""")
 
 

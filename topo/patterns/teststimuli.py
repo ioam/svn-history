@@ -33,18 +33,18 @@ from topo.misc.numbergenerators import UniformRandom
 class SineGratingDisk(PatternGenerator):
     """A sine grating masked by a circular disk so that only a round patch is visible."""
  
-    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+    aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.31,doc=
         "Ratio of width to height; size*aspect_ratio gives the width of the disk.")
 
-    size  = Number(default=0.5,doc="Top to bottom height of the disk")
+    size  = param.Number(default=0.5,doc="Top to bottom height of the disk")
     
-    smoothing = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,0.5),
+    smoothing = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.61,doc="Width of the Gaussian fall-off")
 
-    phase  = Number(default=1.0, doc="phase of the sine grating")
+    phase  = param.Number(default=1.0, doc="phase of the sine grating")
 
-    frequency  = Number(default=2.4,doc="frequency of the sine grating")
+    frequency  = param.Number(default=2.4,doc="frequency of the sine grating")
 
        
     def __call__(self,**params_to_override):
@@ -77,21 +77,21 @@ class SineGratingDisk(PatternGenerator):
 class SineGratingRing(PatternGenerator):
     """A sine grating masked by a ring so that only the ring is visible."""
 
-    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+    aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.31,doc=
                            "Ratio of width to height; size*aspect_ratio gives the overall width.")
 
-    thickness = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),
+    thickness = param.Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.60,doc="Thickness (line width) of the ring.")
 
-    size  = Number(default=0.5,doc="Top to bottom height of the disk")
+    size  = param.Number(default=0.5,doc="Top to bottom height of the disk")
     
-    smoothing = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,0.5),
+    smoothing = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.61,doc="Width of the Gaussian fall-off")
 
-    phase  = Number(default=1.0, doc="phase of the sine grating")
+    phase  = param.Number(default=1.0, doc="phase of the sine grating")
 
-    frequency  = Number(default=2.4,doc="frequency of the sine grating")
+    frequency  = param.Number(default=2.4,doc="frequency of the sine grating")
 
 
     def __call__(self,**params_to_override):
@@ -128,16 +128,16 @@ class SineGratingRing(PatternGenerator):
 class OrientationContrastPattern (SineGratingRing):
     """A sine grating ring and a disk with parameters (orientation and size) which can be changed independantly"""
  
-    orientationcentre= Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+    orientationcentre= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                precedence=0.50, doc="Frequency of the sine grating.")
 
-    orientationsurround= Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+    orientationsurround= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                    precedence=0.50, doc="Frequency of the sine grating.")
 
-    size_centre= Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+    size_centre= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                precedence=0.50, doc="Frequency of the sine grating.")
 
-    size_surround= Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+    size_surround= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                    precedence=0.50, doc="Frequency of the sine grating.")
     
        

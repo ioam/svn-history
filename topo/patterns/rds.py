@@ -32,29 +32,29 @@ class RandomDotStereogram(PatternGenerator):
     """
 
     # Suppress unused parameters
-    x = Number(precedence=-1)
-    y = Number(precedence=-1)
-    size = Number(precedence=-1)
-    orientation = Number(precedence=-1)
+    x = param.Number(precedence=-1)
+    y = param.Number(precedence=-1)
+    size = param.Number(precedence=-1)
+    orientation = param.Number(precedence=-1)
 
     # Override defaults to make them appropriate
-    scale  = Number(default=0.5)
-    offset = Number(default=0.5)
+    scale  = param.Number(default=0.5)
+    offset = param.Number(default=0.5)
 
     # New parameters for this pattern
 
     #JABALERT: Should rename xdisparity and ydisparity to x and y, and simply
     #set them to different values for each pattern to get disparity
-    xdisparity = Number(default=0.0,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
+    xdisparity = param.Number(default=0.0,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                         precedence=0.50,doc="Disparity in the horizontal direction.")
     
-    ydisparity = Number(default=0.0,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
+    ydisparity = param.Number(default=0.0,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                         precedence=0.51,doc="Disparity in the vertical direction.")
     
-    dotdensity = Number(default=0.5,bounds=(0.0,None),softbounds=(0.1,0.9),
+    dotdensity = param.Number(default=0.5,bounds=(0.0,None),softbounds=(0.1,0.9),
                         precedence=0.52,doc="Number of dots per unit area; 0.5=50% coverage.")
 
-    dotsize    = Number(default=0.1,bounds=(0.0,None),softbounds=(0.05,0.15),
+    dotsize    = param.Number(default=0.1,bounds=(0.0,None),softbounds=(0.05,0.15),
                         precedence=0.53,doc="Edge length of each square dot.")
 
     random_seed=Integer(default=500,bounds=(0,1000),

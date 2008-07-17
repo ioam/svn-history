@@ -262,11 +262,11 @@ class GenericImage(PatternGenerator):
     
     output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF())
     
-    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),
+    aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),
         softbounds=(0.0,2.0),precedence=0.31,doc="""
         Ratio of width to height; size*aspect_ratio gives the width.""")
 
-    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+    size  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
                    precedence=0.30,doc="Height of the image.")
         
     size_normalization = Enumeration(default='fit_shortest',

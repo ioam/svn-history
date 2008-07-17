@@ -26,12 +26,12 @@ class PulseGenerator(EventProcessor):
     
     dest_ports=None # Allows connections to come in on any port
 
-    amplitude = Number(1.0,doc="The size of the pulse to generate.")
+    amplitude = param.Number(1.0,doc="The size of the pulse to generate.")
     
-    period    = Number(1.0,bounds=(0.0,None),doc=
+    period    = param.Number(1.0,bounds=(0.0,None),doc=
         "The period with which to repeat the pulse. Must be greater than zero.")
     
-    phase     = Number(0.0,doc=
+    phase     = param.Number(0.0,doc=
         "The time after starting the simulation to wait before sending the first pulse.")
 
     def input_event(self,conn,data):
@@ -56,9 +56,9 @@ class ThresholdUnit(EventProcessor):
     
     dest_ports=None # Allows connections to come in on any port
 
-    threshold     = Number(default=1.0,doc="The threshold at which to fire.")
-    initial_accum = Number(default=0.0,doc="The initial accumulator value.")
-    amplitude     = Number(default=1.0,doc="The size of the pulse to generate.")
+    threshold     = param.Number(default=1.0,doc="The threshold at which to fire.")
+    initial_accum = param.Number(default=0.0,doc="The initial accumulator value.")
+    amplitude     = param.Number(default=1.0,doc="The size of the pulse to generate.")
 
     def __init__(self,**params):
         EventProcessor.__init__(self,**params)

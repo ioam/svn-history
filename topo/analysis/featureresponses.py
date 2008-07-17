@@ -302,7 +302,7 @@ class FeatureMaps(FeatureResponses):
     or selectivity maps.
     """
     
-    selectivity_multiplier = Number(default=17,bounds=(0.0,None),doc="""
+    selectivity_multiplier = param.Number(default=17,bounds=(0.0,None),doc="""
         Factor by which to multiply the calculated selectivity values
         before plotting them.  Usually set much greater than 1.0 to
         highlight particularly unselective areas, especially when

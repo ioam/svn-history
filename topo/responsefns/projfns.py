@@ -71,11 +71,11 @@ class CFPRF_ActivityBased(CFPResponseFn):
     http://en.wikipedia.org/wiki/Generalised_logistic_curve
     """
 
-    l = Number(default=-1.3,doc="Value at infinity")
-    u = Number(default=1.2,doc="(u + l) is the value at minus infinity")
-    m = Number(default=0.25,doc="Time of maximum growth.")
-    r = Number(default=-200,doc="Growth rate, controls the gradient")
-    b = Number(default=2,doc="Controls position of maximum growth")
+    l = param.Number(default=-1.3,doc="Value at infinity")
+    u = param.Number(default=1.2,doc="(u + l) is the value at minus infinity")
+    m = param.Number(default=0.25,doc="Time of maximum growth.")
+    r = param.Number(default=-200,doc="Growth rate, controls the gradient")
+    b = param.Number(default=2,doc="Controls position of maximum growth")
     single_cf_fn = ClassSelectorParameter(ResponseFn,default=DotProduct(),doc="""
         ResponseFn to apply to each CF individually.""")
   

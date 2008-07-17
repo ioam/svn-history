@@ -1154,7 +1154,7 @@ class Dynamic(Parameter):
         self.time_fn = time_fn
         ...
 
-class Number(Dynamic):
+class param.Number(Dynamic):
     __slots__ = ['bounds',...]
     def __init__(self,bounds=None,...,**args):
         super(Number,self).__init__(**args)
@@ -1165,7 +1165,7 @@ class Number(Dynamic):
 d = Dynamic()
 
 # gives error: Dynamic slot 'time_fn' is read only
-n = Number()
+n = param.Number()
 
 
 _________________________________________________________

@@ -27,31 +27,31 @@ class SLISSOM(LISSOM):
     """
 
     # configurable parameters
-    threshold = Number(default=0.3,bounds=(0,None), doc="Baseline threshold")
+    threshold = param.Number(default=0.3,bounds=(0,None), doc="Baseline threshold")
 
-    threshold_decay_rate = Number(default=0.01,bounds=(0,None), 
+    threshold_decay_rate = param.Number(default=0.01,bounds=(0,None), 
         doc="Dynamic threshold decay rate")
     
-    absolute_refractory = Number(default=1.0,bounds=(0,None),
+    absolute_refractory = param.Number(default=1.0,bounds=(0,None),
         doc="Absolute refractory period")
     
-    dynamic_threshold_init = Number(default=2.0,bounds=(0,None),
+    dynamic_threshold_init = param.Number(default=2.0,bounds=(0,None),
 	doc="Initial value for dynamic threshold when spike occurs")
     
-    spike_amplitude = Number(default=1.0,bounds=(0,None),
+    spike_amplitude = param.Number(default=1.0,bounds=(0,None),
 	doc="Amplitude of spike at the moment of spiking")
 
     reset_on_new_iteration = BooleanParameter(default=False,
 	doc="Reset activity and projection activity when new iteration starts")
 
-    noise_rate = Number(default=0.0,bounds=(0,1.0),
+    noise_rate = param.Number(default=0.0,bounds=(0,1.0),
         doc="Noise added to the on-going activity")
 
     # logging facility for debugging
     trace_coords = ListParameter(default=[],
         doc="List of coord(s) of membrane potential(s) to track over time")
 
-    trace_n = Number(default=400,bounds=(1,None),
+    trace_n = param.Number(default=400,bounds=(1,None),
         doc="Number of steps to track neuron's membrane potential")
 
     # matrices and vectors for internal use

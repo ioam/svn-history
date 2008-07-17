@@ -22,10 +22,10 @@ class RandomGenerator(PatternGenerator):
 
     # The standard x, y, and orientation variables are currently ignored,
     # so they aren't shown in auto-generated lists of parameters (e.g. in the GUI)
-    x       = Number(precedence=-1)
-    y       = Number(precedence=-1)
-    size    = Number(precedence=-1)
-    orientation   = Number(precedence=-1)
+    x       = param.Number(precedence=-1)
+    y       = param.Number(precedence=-1)
+    size    = param.Number(precedence=-1)
+    orientation   = param.Number(precedence=-1)
 
     def _distrib(self,shape,pos):
         """Method for subclasses to override with a particular random distribution."""
@@ -71,7 +71,7 @@ class BinaryUniformRandom(RandomGenerator):
     is a binary mask where some elements are on at random.
     """
 
-    on_probability = Number(default=0.5,bounds=[0.0,1.0],doc="""
+    on_probability = param.Number(default=0.5,bounds=[0.0,1.0],doc="""
         Probability (in the range 0.0 to 1.0) that the binary value
         (before scaling) is on rather than off (1.0 rather than 0.0).""")
 
@@ -89,8 +89,8 @@ class GaussianRandom(RandomGenerator):
     scale and adjusted by the given offset.
     """
 
-    scale  = Number(default=0.25,softbounds=(0.0,2.0))
-    offset = Number(default=0.50,softbounds=(-2.0,2.0))
+    scale  = param.Number(default=0.25,softbounds=(0.0,2.0))
+    offset = param.Number(default=0.50,softbounds=(-2.0,2.0))
 
     def _distrib(self,shape,params):
         return params['offset']+params['scale']*RandomArray.standard_normal(shape)

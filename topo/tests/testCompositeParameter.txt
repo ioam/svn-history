@@ -3,8 +3,8 @@
 
 # initialize a class with a compound parameter
 >>> class A(Parameterized):
-...    x = Number(default=0)
-...    y = Number(default=0)
+...    x = param.Number(default=0)
+...    y = param.Number(default=0)
 ...    xy = CompositeParameter(attribs=['x','y'])
 ... 
 

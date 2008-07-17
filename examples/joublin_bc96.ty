@@ -77,17 +77,17 @@ class RCells_CFProjection(CFProjection):
         default=topo.base.patterngenerator.Constant(),constant=True,
         doc="Define the shape of the neighborhood connection fields.")
  
-    neighborhood_sigma = Number(default=4.0,doc="space constant of the weights of neighborhood ConnectionFields.")
-    neighborhood_sigma0 = Number(default=4.0)   
+    neighborhood_sigma = param.Number(default=4.0,doc="space constant of the weights of neighborhood ConnectionFields.")
+    neighborhood_sigma0 = param.Number(default=4.0)   
 
-    neighborhood_time_constant = Number(default=500.0, doc="time constant for neighborhood_sigma.")
+    neighborhood_time_constant = param.Number(default=500.0, doc="time constant for neighborhood_sigma.")
 
-    learning_rate0 = Number(default=0.0)
-    learning_time_constant = Number(default=1000.0, doc="time constant for learning_rate.")
+    learning_rate0 = param.Number(default=0.0)
+    learning_time_constant = param.Number(default=1000.0, doc="time constant for learning_rate.")
 
-    time_step = Number(default=0.01, doc="time step (ms) of the simulation.")
+    time_step = param.Number(default=0.01, doc="time step (ms) of the simulation.")
 
-    rcells_learn = Number(default=1)
+    rcells_learn = param.Number(default=1)
  
     def __init__(self,initialize_cfs=True,**params):
         """
@@ -360,10 +360,10 @@ class Cortical_CFSheet(CFSheet):
 
     """
 	
-    Cortical_RF_eta = Number(default=0.5,doc="The slope of the sigmoid in the activation rule")
-    Cortical_RF_gamma = Number(default=10.0,doc="The refractory period of the cells in the activation rule")
-    Cortical_RF_tau = Number(default=1.0,doc="The membrane time constant of the cells in the activation rule")
-    Cortical_RF_theta = Number(default=0.09,doc="The threshold of the cells (points of inflection of the sigmoid) in the activation rule")
+    Cortical_RF_eta = param.Number(default=0.5,doc="The slope of the sigmoid in the activation rule")
+    Cortical_RF_gamma = param.Number(default=10.0,doc="The refractory period of the cells in the activation rule")
+    Cortical_RF_tau = param.Number(default=1.0,doc="The membrane time constant of the cells in the activation rule")
+    Cortical_RF_theta = param.Number(default=0.09,doc="The threshold of the cells (points of inflection of the sigmoid) in the activation rule")
 	
 	
     def activate(self):
@@ -412,15 +412,15 @@ class ECells_ConnectionField(ConnectionField):
     """
     weights_max = []   # Upper boundaries of the weights
     weights_min = []   # Lower boundaries of the weights
-    weights_max_amplitude = Number(default=1.5)
-    weights_max_sigma = Number(default=4.0/25.0)
-    weights_min_amplitude = Number(default=1.5)
-    weights_min_sigma = Number(default=1.0/25.0)
+    weights_max_amplitude = param.Number(default=1.5)
+    weights_max_sigma = param.Number(default=4.0/25.0)
+    weights_min_amplitude = param.Number(default=1.5)
+    weights_min_sigma = param.Number(default=1.0/25.0)
     
-    weight_pos_row = Number(default=0)
-    weight_pos_col = Number(default=0)
+    weight_pos_row = param.Number(default=0)
+    weight_pos_col = param.Number(default=0)
 
-    cf_set_weight_max = Number(default=0)
+    cf_set_weight_max = param.Number(default=0)
 
     def __init__(self,x,y,input_sheet,bounds_template,weights_generator,mask_template,
                  output_fn=IdentityOF(),slice_=None,**params):
@@ -496,10 +496,10 @@ class ECells_Learning(CFPLearningFn):
     
     """
     
-    gamma = Number(default=10.0,doc="Refractory period of the cell.")
-    epislon = Number(default=0.5,doc="Activity threshold.")
-    alpha_p = Number(default=1.0,doc="Learning rate.")
-    alpha_n = Number(default=0.01,doc="Unlearning rate.") 
+    gamma = param.Number(default=10.0,doc="Refractory period of the cell.")
+    epislon = param.Number(default=0.5,doc="Activity threshold.")
+    alpha_p = param.Number(default=1.0,doc="Learning rate.")
+    alpha_n = param.Number(default=0.01,doc="Unlearning rate.") 
     
     def __call__(self, proj, input_activity, output_activity, learning_rate, **params):
         cfs = proj._cfs
@@ -534,12 +534,12 @@ class Cortical_WeightGenerator(PatternGenerator):
     Weights generator for E-cells and I-cells
     """
     
-    amplitude = Number(default=1.5)
-    sigma = Number(default=1.0)	
-    cf_centre_row = Number(default=0)
-    cf_centre_col = Number(default=0)
-    x = Number(default=0.0)
-    y = Number(default=0.0)
+    amplitude = param.Number(default=1.5)
+    sigma = param.Number(default=1.0)	
+    cf_centre_row = param.Number(default=0)
+    cf_centre_col = param.Number(default=0)
+    x = param.Number(default=0.0)
+    y = param.Number(default=0.0)
     
 
     def __call__(self,**params_to_override):

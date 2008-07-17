@@ -51,8 +51,8 @@ class PiecewiseLinear(OutputFn):
     the upper threshold are set to 1.0, and those in between are
     scaled linearly.
     """
-    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
-    upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
+    lower_bound = param.Number(default=0.0,softbounds=(0.0,1.0))
+    upper_bound = param.Number(default=1.0,softbounds=(0.0,1.0))
     
     def __call__(self,x):
         fact = 1.0/(self.upper_bound-self.lower_bound)        
@@ -77,8 +77,8 @@ class Sigmoid(OutputFn):
     http://en.wikipedia.org/wiki/Generalised_logistic_curve
     """
     
-    r = Number(default=1,doc="Parameter controlling the growth rate")
-    k = Number(default=0,doc="Parameter controlling the x-postion")
+    r = param.Number(default=1,doc="Parameter controlling the growth rate")
+    k = param.Number(default=0,doc="Parameter controlling the x-postion")
     
     def __call__(self,x):
         x_orig = copy.copy(x)
@@ -106,10 +106,10 @@ class NakaRushton(OutputFn):
     to the input for which a neuron will respond with activity 0.5.
     """
     
-    c50 = Number(default=0.1, doc="""
+    c50 = param.Number(default=0.1, doc="""
         The input of the neuron at which it responds at half of its maximal firing rate (1.0).""")
 
-    e = Number(default=1.0,doc="""The exponent of the input x.""")
+    e = param.Number(default=1.0,doc="""The exponent of the input x.""")
 
     #JABALERT: (pow(x_orig,self.e) should presumably be done only once, using a temporary
     def __call__(self,x):
@@ -145,11 +145,11 @@ class GeneralizedLogistic(OutputFn):
     # simply the lower asymptote?  If it's the lower asymptote, say
     # doc="Lower asymptote.".  Only if the parameter's relationship to
     # what it controls is very indirect should it be worded as below.
-    l = Number(default=1,doc="Parameter controlling the lower asymptote.")
-    u = Number(default=1,doc="Parameter controlling the upper asymptote (upper asymptote minus lower asymptote.")
-    m = Number(default=1,doc="Parameter controlling the time of maximum growth.")
-    r = Number(default=1,doc="Parameter controlling the growth rate.")
-    b = Number(default=1,doc="Parameter which affects near which asymptote maximum growth occurs.")
+    l = param.Number(default=1,doc="Parameter controlling the lower asymptote.")
+    u = param.Number(default=1,doc="Parameter controlling the upper asymptote (upper asymptote minus lower asymptote.")
+    m = param.Number(default=1,doc="Parameter controlling the time of maximum growth.")
+    r = param.Number(default=1,doc="Parameter controlling the growth rate.")
+    b = param.Number(default=1,doc="Parameter which affects near which asymptote maximum growth occurs.")
     
     def __call__(self,x):
         x_orig = copy.copy(x)
@@ -169,7 +169,7 @@ class DivisiveNormalizeL1(OutputFn):
     one is non-zero, this operation is equivalent to a divisive sum
     normalization.
     """
-    norm_value = Number(default=1.0)
+    norm_value = param.Number(default=1.0)
 
     def __call__(self,x):
         """L1-normalize the input array, if it has a nonzero sum."""
@@ -187,7 +187,7 @@ class DivisiveNormalizeL2(OutputFn):
     For a given array interpreted as a flattened vector, keeps the
     Euclidean length of the vector at a specified norm_value.
     """
-    norm_value = Number(default=1.0)
+    norm_value = param.Number(default=1.0)
     
     def __call__(self,x):
         tot = 1.0*L2norm(x.ravel())
@@ -209,7 +209,7 @@ class DivisiveNormalizeLinf(OutputFn):
     The L-infinity norm is also known as the divisive infinity norm
     and Chebyshev norm.
     """
-    norm_value = Number(default=1.0)
+    norm_value = param.Number(default=1.0)
     
     def __call__(self,x):
         tot = 1.0*max(abs(x.ravel()))
@@ -229,8 +229,8 @@ class DivisiveNormalizeLp(OutputFn):
     and L2-norm cases.  Defaults to be the same as an L2-norm, i.e.,
     DivisiveNormalizeL2.
     """
-    p = Number(default=2)
-    norm_value = Number(default=1.0)
+    p = param.Number(default=2)
+    norm_value = param.Number(default=1.0)
     
     def __call__(self,x):
         tot = 1.0*norm(x.ravel(),self.p)
@@ -245,7 +245,7 @@ class HalfRectifyAndSquare(OutputFn):
     Output function that applies a half-wave rectification (clips at zero)
     and then squares the values.
     """
-    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
+    lower_bound = param.Number(default=0.0,softbounds=(0.0,1.0))
     
     def __call__(self,x):
         clip_lower(x,self.lower_bound)
@@ -258,7 +258,7 @@ class HalfRectify(OutputFn):
     Output function that applies a half-wave rectification (clips at zero)
     
     """
-    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
+    lower_bound = param.Number(default=0.0,softbounds=(0.0,1.0))
     
     def __call__(self,x):
         clip_lower(x,self.lower_bound)
@@ -277,7 +277,7 @@ class BinaryThreshold(OutputFn):
     """
     Forces all values below a threshold to zero, and above it to 1.0.
     """
-    threshold = Number(default=0.25, doc="Decision point for determining binary value.")
+    threshold = param.Number(default=0.25, doc="Decision point for determining binary value.")
 
     def __call__(self,x):
         above_threshold = x>=self.threshold
@@ -341,18 +341,18 @@ class KernelMax(OutputFn):
     instance, or any function accepting bounds, density, radius, and
     height to return a kernel matrix.
     """
-    kernel_radius = Number(default=0.0,bounds=(0,None),doc="""
+    kernel_radius = param.Number(default=0.0,bounds=(0,None),doc="""
         Kernel radius in Sheet coordinates.""")
     
     neighborhood_kernel_generator = ClassSelectorParameter(PatternGenerator,
         default=Gaussian(x=0.0,y=0.0,aspect_ratio=1.0),
         doc="Neighborhood function")
 
-    crop_radius_multiplier = Number(default=3.0,doc="""        
+    crop_radius_multiplier = param.Number(default=3.0,doc="""        
         Factor by which the radius should be multiplied, when deciding
         how far from the winner to keep evaluating the kernel.""")
     
-    density=Number(1.0,bounds=(0,None),doc="""
+    density=param.Number(1.0,bounds=(0,None),doc="""
         Density of the Sheet whose matrix we act on, for use
         in converting from matrix to Sheet coordinates.""")
     
@@ -406,14 +406,14 @@ class PoissonSample(OutputFn):
     distribution with rate r.
     """
     
-    in_scale = Number(default=1.0,doc="""
+    in_scale = param.Number(default=1.0,doc="""
        Amount by which to scale the input.""")
     
-    baseline_rate = Number(default=0.0,doc="""
+    baseline_rate = param.Number(default=0.0,doc="""
        Constant to add to the input after scaling, resulting in a baseline
        Poisson process rate.""")
     
-    out_scale = Number(default=1.0,doc="""
+    out_scale = param.Number(default=1.0,doc="""
        Amount by which to scale the output (e.g. 1.0/in_scale).""")
 
     def __call__(self,x):
@@ -528,7 +528,7 @@ class AttributeTrackingOF(OutputFnWithState):
     units = ListParameter(default=[(0.0,0.0)], doc="""
         Sheet coordinates of the unit(s) for which parameter values will be stored.""")
     
-    step = Number(default=1, doc="""
+    step = param.Number(default=1, doc="""
         How often to update the tracked values.
 
         For instance, step=1 means to update them every time this OF is
@@ -606,16 +606,16 @@ class ActivityAveragingOF(OutputFnWithState):
     to be disabled temporarily, e.g. while presenting test patterns.
     """
 
-    step = Number(default=1, doc="""
+    step = param.Number(default=1, doc="""
         How often to update the average.
 
         For instance, step=1 means to update it every time this OF is
         called; step=2 means to update it every other time.""")
     
-    smoothing = Number(default=0.9997, doc="""
+    smoothing = param.Number(default=0.9997, doc="""
         The degree of weighting for the previous average, when calculating the new average.""")
    
-    initial_average=Number(default=0, doc="Starting value for the average activity.")
+    initial_average=param.Number(default=0, doc="Starting value for the average activity.")
 
     
     def __init__(self,**params):
@@ -658,18 +658,18 @@ class HomeostaticMaxEnt(OutputFnWithState):
     http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc431.htm
     """
 
-    eta = Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
+    eta = param.Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
     
-    mu = Number(default=0.01,doc="Target average firing rate.")
+    mu = param.Number(default=0.01,doc="Target average firing rate.")
     
-    smoothing = Number(default=0.9997, doc="""
+    smoothing = param.Number(default=0.9997, doc="""
         Weighting of previous activity vs. current activity when calculating the average.""")
 
     a_init = Parameter(default=None,doc="Multiplicative parameter controlling the exponential.")
    
     b_init = Parameter(default=None,doc="Additive parameter controlling the exponential.")
 
-    step = Number(default=1, doc="""
+    step = param.Number(default=1, doc="""
         How often to update the a and b parameters.
 	For instance, step=1 means to update it every time this OF is
         called; step=2 means to update it every other time.""")
@@ -735,26 +735,26 @@ class CascadeHomeostatic(OutputFnWithState):
     """
     """
 
-    a_init = Number(default=13,doc="Multiplicative parameter controlling the exponential.")
+    a_init = param.Number(default=13,doc="Multiplicative parameter controlling the exponential.")
     
-    b_init = Number(default=-4,doc="Additive parameter controlling the exponential.")
+    b_init = param.Number(default=-4,doc="Additive parameter controlling the exponential.")
     
-    b_eta = Number(default=0.02,doc="Learning rate for homeostatic plasticity.")
+    b_eta = param.Number(default=0.02,doc="Learning rate for homeostatic plasticity.")
     
-    a_eta = Number(default=0.002,doc="Learning rate for homeostatic plasticity.")
+    a_eta = param.Number(default=0.002,doc="Learning rate for homeostatic plasticity.")
     
-    mu = Number(default=0.01,doc="Target average firing rate.")
+    mu = param.Number(default=0.01,doc="Target average firing rate.")
     
-    b_smoothing = Number(default=0.997, doc="""
+    b_smoothing = param.Number(default=0.997, doc="""
         Weighting of previous activity vs. current activity when calculating the average.""")
     
-    a_smoothing = Number(default=0.9997, doc="""
+    a_smoothing = param.Number(default=0.9997, doc="""
         Weighting of previous activity vs. current activity when calculating the average.""")
         
-    num_cascades = Number(default=9,doc="Target average firing rate.")
+    num_cascades = param.Number(default=9,doc="Target average firing rate.")
     thresholds = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
 
-    step = Number(default=1, doc="""
+    step = param.Number(default=1, doc="""
         How often to update the a and b parameters.
 	For instance, step=1 means to update it every time this OF is
         called; step=2 means to update it every other time.""")
@@ -816,13 +816,13 @@ class ScalingOF(OutputFnWithState):
     to be disabled temporarily, e.g. while presenting test patterns.
     """
     
-    target = Number(default=0.01, doc="""
+    target = param.Number(default=0.01, doc="""
         Target average activity for each unit.""")
 
-    step=Number(default=1, doc="""
+    step=param.Number(default=1, doc="""
         How often to calculate the average activity and scaling factor.""")
 
-    smoothing = Number(default=0.9997, doc="""
+    smoothing = param.Number(default=0.9997, doc="""
         Determines the degree of weighting of previous activity vs.
         current activity when calculating the average.""")
 

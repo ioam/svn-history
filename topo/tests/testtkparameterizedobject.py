@@ -35,7 +35,7 @@ class SomeFrame(TkParameterized,Frame):
     csp = ClassSelectorParameter(class_=PatternGenerator)
     const = Parameter(1.0,constant=True)
     pa = Parameter(default="test")
-    nu = Number(default=1.0,bounds=(-1,1))
+    nu = param.Number(default=1.0,bounds=(-1,1))
     st = StringParameter("string1")
 
     def __init__(self,master,extraPO=None,**params):

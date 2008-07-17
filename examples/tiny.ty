@@ -37,8 +37,8 @@ class SampleHebbian(LearningFn):
     
     Requires some form of output_fn normalization for stability.
     """
-    sample_param=Number(default=0.1,bounds=(0,None),doc="Example positive-valued numeric parameter")
-    value_0=Number(default=0.8,bounds=(0,None),doc="Example initial value parameter.")
+    sample_param=param.Number(default=0.1,bounds=(0,None),doc="Example positive-valued numeric parameter")
+    value_0=param.Number(default=0.8,bounds=(0,None),doc="Example initial value parameter.")
 
     def __init__(self,**params):
         super(SampleHebbian,self).__init__(**params)

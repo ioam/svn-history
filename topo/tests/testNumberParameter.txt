@@ -9,11 +9,11 @@
 
 
 >>> class TestPO1(Parameterized):
-...    x = Number(default=UniformRandom(lbound=-1,ubound=1,seed=1),bounds=(-1,1))
-...    y = Number(default=1,bounds=(-1,1))
-...    z = Number(default=FixedPoint('1.00'))
+...    x = param.Number(default=UniformRandom(lbound=-1,ubound=1,seed=1),bounds=(-1,1))
+...    y = param.Number(default=1,bounds=(-1,1))
+...    z = param.Number(default=FixedPoint('1.00'))
 
-#...    z = Number(default=mpq(1))
+#...    z = param.Number(default=mpq(1))
 
 
 

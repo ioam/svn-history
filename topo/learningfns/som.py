@@ -31,7 +31,7 @@ class CFPLF_SOM(CFPLearningFn):
     """
     __abstract = True
 
-    learning_radius = Number(default=0.0,doc=
+    learning_radius = param.Number(default=0.0,doc=
         """
         The radius of the neighborhood function to be used for
         learning.  Typically, this value will be set by the Sheet or
@@ -57,9 +57,9 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
     Please see examples/cfsom_or.ty for current SOM support.
     """
 
-    learning_radius = Number(default=0.0)
+    learning_radius = param.Number(default=0.0)
     
-    crop_radius_multiplier = Number(default=3.0,doc=
+    crop_radius_multiplier = param.Number(default=3.0,doc=
         """
         Factor by which the radius should be multiplied,
         when deciding how far from the winner to keep updating the weights.

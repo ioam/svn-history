@@ -265,7 +265,7 @@ class Trace(Parameterized):
         The (min,max) boundaries for y axis.  If either is None, then
         the bound min or max of the data given, respectively.""")
 
-    ymargin = Number(default=0.1,doc="""
+    ymargin = param.Number(default=0.1,doc="""
         The fraction of the difference ymax-ymin to add to the
         top of the plot as padding.""")
     
@@ -321,10 +321,10 @@ class SheetPositionTrace(Trace):
     and traces the value of a given (x,y) position on the sheet.
     """
     
-    x = Number(default=0.0,doc="""
+    x = param.Number(default=0.0,doc="""
         The x sheet-coordinate of the position to be traced.""")
     
-    y = Number(default=0.0,doc="""
+    y = param.Number(default=0.0,doc="""
         The y sheet-coordinate of the position to be traced.""")
 
     position = CompositeParameter(attribs=['x','y'],doc="""
@@ -356,7 +356,7 @@ class TraceGroup(Parameterized):
     """
 
 
-    hspace = Number(default=0.6,doc="""
+    hspace = param.Number(default=0.6,doc="""
        Height spacing adjustment between plots.  Larger values
        produce more space.""")
 

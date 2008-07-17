@@ -24,7 +24,7 @@ class Oja(LearningFn):
     function does not normally need a separate output_fn for normalization.
     """
     
-    alpha=Number(default=0.1,bounds=(0,None))
+    alpha=param.Number(default=0.1,bounds=(0,None))
     def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
         weights += single_connection_learning_rate * (unit_activity * input_activity -
                                                       self.alpha * (unit_activity**2) * weights)
@@ -49,9 +49,9 @@ class Covariance(LearningFn):
     Requires some form of output_fn normalization for stability.
     """
     
-    unit_threshold =Number(default=0.5,bounds=(0,None),
+    unit_threshold =param.Number(default=0.5,bounds=(0,None),
         doc="Threshold between LTD and LTP, applied to the activity of this unit.")
-    input_threshold=Number(default=0.0,bounds=(0,None),
+    input_threshold=param.Number(default=0.0,bounds=(0,None),
         doc="Threshold between LTD and LTP, applied to the input activity.")
     def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
         weights += single_connection_learning_rate * (unit_activity - self.unit_threshold) * (input_activity - self.input_threshold)
@@ -97,7 +97,7 @@ class BCMFixed(LearningFn):
     Requires some form of output_fn normalization for stability.
     """
 
-    unit_threshold=Number(default=0.5,bounds=(0,None),doc="Threshold between LTD and LTP.")
+    unit_threshold=param.Number(default=0.5,bounds=(0,None),doc="Threshold between LTD and LTP.")
     def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
         weights += single_connection_learning_rate * unit_activity * input_activity * (unit_activity-self.unit_threshold)
 

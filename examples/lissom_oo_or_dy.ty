@@ -114,9 +114,9 @@ class NumericOffset(Parameterized):
    pickled; otherwise it would be in a lambda function and not
    picklable.
    """
-   base         = Number(default=0.0,doc="Value to which to add an offset.")
-   offset       = Number(default=0.0,doc="Amount of offset, before scaling.")
-   offset_scale = Number(default=1.0,doc="Scaling value for the offset.")
+   base         = param.Number(default=0.0,doc="Value to which to add an offset.")
+   offset       = param.Number(default=0.0,doc="Amount of offset, before scaling.")
+   offset_scale = param.Number(default=1.0,doc="Scaling value for the offset.")
    
    def __call__(self,**params):
        base=params.get('base',self.base)

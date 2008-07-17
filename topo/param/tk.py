@@ -73,8 +73,8 @@ Parameterized instances:
  from ..param import Parameterized,Number,String,Boolean
 
  class Object1(Parameterized):
-     duration = Number(2.0,bounds=(0,None),doc='Duration of measurement')
-     displacement = Number(0.0,bounds=(-1,1),doc='Displacement from point A')
+     duration = param.Number(2.0,bounds=(0,None),doc='Duration of measurement')
+     displacement = param.Number(0.0,bounds=(-1,1),doc='Displacement from point A')
 
  class Object2(Parameterized):
      active_today = BooleanParameter(True,doc='Whether or not to count today')

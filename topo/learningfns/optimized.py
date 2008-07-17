@@ -119,7 +119,7 @@ class CFPLF_Trace_opt(CFPLearningFn):
     Optimized version of CFPLF_Trace; see projfns.py for more info 
     """
 
-    trace_strength=Number(default=0.5,bounds=(0.0,1.0),doc="""
+    trace_strength=param.Number(default=0.5,bounds=(0.0,1.0),doc="""
        How much the learning is dominated by the activity trace, relative to the current value.""")
 
     single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),readonly=True,

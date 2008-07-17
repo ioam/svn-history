@@ -35,7 +35,7 @@ class Plot(Parameterized):
      Simple Plot object constructed from a specified PIL image.
      """
 
-     staleness_warning=Number(default=10,bounds=(0,None),doc="""
+     staleness_warning=param.Number(default=10,bounds=(0,None),doc="""
        Time length allowed between bitmaps making up a single plot before warning.
 
        If the difference between the SheetView with the earliest

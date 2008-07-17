@@ -34,22 +34,22 @@ class ElasticNet(Sheet):
     """
     Basic elastic net sheet (work in progress..)
     """
-    alpha = Number(default=0.2,bounds=(0,None),
+    alpha = param.Number(default=0.2,bounds=(0,None),
                    doc="Scaling constant, contribution from neighbouring units")
 
-    beta  = Number(default=2.0,bounds=(0,None),
+    beta  = param.Number(default=2.0,bounds=(0,None),
                    doc="Scaling constant, contribution from neighbouring points on the net")
                    
-    initial_k = Number(default=0.2,bounds=(0,None),
+    initial_k = param.Number(default=0.2,bounds=(0,None),
                    doc="Initial k, scale parameter for the force of the retinal cells")
 
-    rate_of_k = Number(default=0.997,bounds=(0,None),
+    rate_of_k = param.Number(default=0.997,bounds=(0,None),
                    doc="Rate of reduction of k must be a lot less than 10% depending on the parameters")
 
-    two_l = Number(default=0.2,bounds=(0,None),
+    two_l = param.Number(default=0.2,bounds=(0,None),
                    doc="Separation between the two layers of cells")
 
-    two_d = Number(default=0.05,bounds=(0,None),
+    two_d = param.Number(default=0.05,bounds=(0,None),
                    doc="Separation between the cells within a layer")
 
     retinasize=Integer(default=20,bounds=(0,None),

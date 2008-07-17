@@ -33,7 +33,7 @@ class Null(Constant):
     """
     A constant pattern of zero activity.
     """
-    scale = Number(default=0,constant=True,precedence=-1)
+    scale = param.Number(default=0,constant=True,precedence=-1)
 
 
 class Gaussian(PatternGenerator):
@@ -51,12 +51,12 @@ class Gaussian(PatternGenerator):
       exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)
     """
     
-    aspect_ratio = Number(default=0.3,bounds=(0.0,None),softbounds=(0.0,2.0),
+    aspect_ratio = param.Number(default=0.3,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.31,doc="""
         Ratio of the width to the height.
         Specifically, xsigma=ysigma*aspect_ratio (see size).""")
     
-    size = Number(default=0.5,doc="""
+    size = param.Number(default=0.5,doc="""
         Overall size of the Gaussian, defined by:
         exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)
         where ysigma=size/2 and xsigma=size/2*aspect_ratio.""")
@@ -71,10 +71,10 @@ class Gaussian(PatternGenerator):
 class SineGrating(PatternGenerator):
     """2D sine grating pattern generator."""
     
-    frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),
+    frequency = param.Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),
                        precedence=0.50, doc="Frequency of the sine grating.")
     
-    phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),
+    phase     = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),
                        precedence=0.51,doc="Phase of the sine grating.")
 
     def function(self,params):
@@ -86,20 +86,20 @@ class SineGrating(PatternGenerator):
 class Gabor(PatternGenerator):
     """2D Gabor pattern generator."""
     
-    frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),
+    frequency = param.Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),
         precedence=0.50,doc="Frequency of the sine grating component.")
     
-    phase = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),
+    phase = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),
         precedence=0.51,doc="Phase of the sine grating component.")
     
-    aspect_ratio = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+    aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.31,doc=
         """
         Ratio of pattern width to height.
         The width of the Gaussian component is size*aspect_ratio (see Gaussian).
         """)
     
-    size = Number(default=0.25,doc="""
+    size = param.Number(default=0.25,doc="""
         Determines the height of the Gaussian component (see Gaussian).""")
 
     def function(self,params):
@@ -113,10 +113,10 @@ class Gabor(PatternGenerator):
 class Line(PatternGenerator):
     """2D line pattern generator."""
 
-    thickness   = Number(default=0.006,bounds=(0.0,None),softbounds=(0.0,1.0),
+    thickness   = param.Number(default=0.006,bounds=(0.0,None),softbounds=(0.0,1.0),
                          precedence=0.60,
                          doc="Thickness (width) of the solid central part of the line.")
-    smoothing = Number(default=0.05,bounds=(0.0,None),softbounds=(0.0,0.5),
+    smoothing = param.Number(default=0.05,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.61,
                        doc="Width of the Gaussian fall-off.")
 
@@ -137,13 +137,13 @@ class Disk(PatternGenerator):
     the point on the circle before stretching that was closest to P.
     """
 
-    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+    aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.31,doc=
         "Ratio of width to height; size*aspect_ratio gives the width of the disk.")
 
-    size  = Number(default=0.5,doc="Top to bottom height of the disk")
+    size  = param.Number(default=0.5,doc="Top to bottom height of the disk")
     
-    smoothing = Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
+    smoothing = param.Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.61,doc="Width of the Gaussian fall-off")
     
     def function(self,params):
@@ -162,17 +162,17 @@ class Ring(PatternGenerator):
     See the Disk class for a note about the Gaussian fall-off.
     """
 
-    thickness = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),
+    thickness = param.Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),
         precedence=0.60,doc="Thickness (line width) of the ring.")
     
-    smoothing = Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
+    smoothing = param.Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
         precedence=0.61,doc="Width of the Gaussian fall-off inside and outside the ring.")
     
-    aspect_ratio = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+    aspect_ratio = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.31,doc=
         "Ratio of width to height; size*aspect_ratio gives the overall width.")
     
-    size = Number(default=0.5)
+    size = param.Number(default=0.5)
 
     def function(self,params):
         height = params['size']
@@ -185,11 +185,11 @@ class Ring(PatternGenerator):
 class Rectangle(PatternGenerator):
     """2D rectangle pattern generator."""
     
-    aspect_ratio   = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+    aspect_ratio   = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.31,doc=
         "Ratio of width to height; size*aspect_ratio gives the width of the rectangle.")
     
-    size  = Number(default=0.5,doc="Height of the rectangle.")
+    size  = param.Number(default=0.5,doc="Height of the rectangle.")
 
     # We will probably want to add Fuzzy-style anti-aliasing to this.
 
@@ -204,16 +204,16 @@ class Rectangle(PatternGenerator):
 class TwoRectangles(Rectangle):
     """Two 2D rectangle pattern generator."""
 
-    x1 = Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
+    x1 = param.Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                 doc="X center of rectangle 1.")
     
-    y1 = Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
+    y1 = param.Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                 doc="Y center of rectangle 1.")
     
-    x2 = Number(default=0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
+    x2 = param.Number(default=0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                 doc="X center of rectangle 2.")
     
-    y2 = Number(default=0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
+    y2 = param.Number(default=0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                 doc="Y center of rectangle 2.")
 
     # YC: Maybe this can be implemented much more cleanly by calling
@@ -241,10 +241,10 @@ class TwoRectangles(Rectangle):
 class SquareGrating(PatternGenerator):
     """2D squarewave grating pattern generator."""
     
-    frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),
+    frequency = param.Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),
         precedence=0.50,doc="Frequency of the square grating.")
     
-    phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),
+    phase     = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),
         precedence=0.51,doc="Phase of the square grating.")
 
     # We will probably want to add anti-aliasing to this,
@@ -279,10 +279,10 @@ class Sweeper(PatternGenerator):
 
     generator = Parameter(default=Gaussian(),precedence=0.97, doc="Pattern to sweep.")
 
-    speed = Number(default=0.25,bounds=(0.0,None),doc="""
+    speed = param.Number(default=0.25,bounds=(0.0,None),doc="""
         Sweep speed: number of sheet coordinate units per unit time.""")
 
-    step = Number(default=1,doc="""
+    step = param.Number(default=1,doc="""
         Number of steps at the given speed to move in the sweep direction.
         The distance moved is speed*step.""")
 
@@ -367,7 +367,7 @@ class Composite(PatternGenerator):
         List of patterns to use in the composite pattern.  The default is
         a blank pattern, and should thus be overridden for any useful work.""")
 
-    size  = Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
+    size  = param.Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
 
     
     def __init__(self,**params):
@@ -420,7 +420,7 @@ class SeparatedComposite(Composite):
     support maximum spacing also (and both at once).
     """
 
-    min_separation = Number(default=0.0, bounds = (0,None),
+    min_separation = param.Number(default=0.0, bounds = (0,None),
                             softbounds = (0.0,1.0), doc="""
         Minimum distance to enforce between all pairs of pattern centers.
 
@@ -495,10 +495,10 @@ class Selector(PatternGenerator):
                                class_=PatternGenerator,bounds=(1,None),
         doc="List of patterns from which to select.")
 
-    size  = Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
+    size  = param.Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
 
     # CB: needs to have time_fn=None
-    index = Number(default=UniformRandom(lbound=0,ubound=1.0,seed=76),
+    index = param.Number(default=UniformRandom(lbound=0,ubound=1.0,seed=76),
         bounds=(-1.0,1.0),precedence=0.20,doc="""
         Index into the list of pattern generators, on a scale from 0
         (start of the list) to 1.0 (end of the list).  Typically a
@@ -544,18 +544,18 @@ class SineGratingDisk(PatternGenerator):
     ### measuring tuning curves).
 
 
-    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+    aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.31,doc=
         "Ratio of width to height; size*aspect_ratio gives the width of the disk.")
 
-    size  = Number(default=0.5,doc="Top to bottom height of the disk")
+    size  = param.Number(default=0.5,doc="Top to bottom height of the disk")
     
-    smoothing = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,0.5),
+    smoothing = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.61,doc="Width of the Gaussian fall-off")
 
-    phase  = Number(default=1.0, doc="phase of the sine grating")
+    phase  = param.Number(default=1.0, doc="phase of the sine grating")
 
-    frequency  = Number(default=2.4,doc="frequency of the sine grating")
+    frequency  = param.Number(default=2.4,doc="frequency of the sine grating")
 
        
     def __call__(self,**params_to_override):
@@ -593,15 +593,15 @@ class SineGratingDisk(PatternGenerator):
 class GaussiansCorner(PatternGenerator):
     """Two Gaussian pattern generators arranged into a corner shape."""
     
-    x = Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
+    x = param.Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                 doc="X center of the corner")
     
-    y = Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
+    y = param.Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                 doc="Y center of the corner")
 		
-    size = Number(default=0.5,doc="The size of the corner")
+    size = param.Number(default=0.5,doc="The size of the corner")
     
-    angle = Number(default=pi/2,doc="The angle of the corner")
+    angle = param.Number(default=pi/2,doc="The angle of the corner")
     
     
     def __call__(self,**params_to_override):
@@ -655,7 +655,7 @@ class OneDPowerSpectrum(PatternGenerator):
     window_overlap = Integer(default=0,doc="""Amount of overlap between each window of
     the signal.""")
     
-    sample_spacing = Number(constant=True,default=1.0,doc="""
+    sample_spacing = param.Number(constant=True,default=1.0,doc="""
     ...1/samplerate,relate to time, etc...""")
     
     
@@ -714,14 +714,14 @@ class Translator(PatternGenerator):
     generator = ClassSelectorParameter(default=Constant(scale=0.0),
         class_=PatternGenerator,doc="""Pattern to be translated.""")
         
-    direction = Number(default=0,bounds=(-pi,pi),doc="""
+    direction = param.Number(default=0,bounds=(-pi,pi),doc="""
         The direction in which the pattern should move, in radians.""")
     
-    speed = Number(default=1,bounds=(0.0,None),doc="""
+    speed = param.Number(default=1,bounds=(0.0,None),doc="""
         The speed with which the pattern should move,
         in sheet coordinates per simulation time unit.""")
     
-    reset_period = Number(default=1,bounds=(0.0,None),doc="""
+    reset_period = param.Number(default=1,bounds=(0.0,None),doc="""
         When pattern position should be reset, usually to the value of a dynamic parameter.
 
         The pattern is reset whenever fmod(simulation_time,reset_time)==0.""")

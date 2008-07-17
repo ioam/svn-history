@@ -57,15 +57,15 @@ class WhiskerArray(PatternGenerator):
     num_ganglion_cells = Integer(default=8,doc="""
         Square root of the number of ganglion cells per whisker.""")
 
-    deflection = Number(default=pi/4,softbounds=(0.0,2*pi),doc="""
+    deflection = param.Number(default=pi/4,softbounds=(0.0,2*pi),doc="""
         Whisker deflection angle, in radians""")
 
     # This is useful for the lagged model; in the simple case step = 1
-    step = Number(default=0,doc="""
+    step = param.Number(default=0,doc="""
         Number of steps at the given speed to move in the sweep direction.
         The distance moved is speed*step.""")
 
-    speed = Number(default=0.09,bounds=(0.0,None),doc="""
+    speed = param.Number(default=0.09,bounds=(0.0,None),doc="""
         Sweep speed, i.e. distance moved in one time step.  Also scales the deflection.""")
 
     rectify = BooleanParameter(default=True,doc="""
@@ -75,7 +75,7 @@ class WhiskerArray(PatternGenerator):
         Which whiskers are to receive inputs; use (0) for all.""")
 
     ## SWALERT: This needs to be figured out.
-    step_size = Number(default = 0.75,doc="""
+    step_size = param.Number(default = 0.75,doc="""
         Scaling of the distance; must be fine tuned to give good results.""")
 
     pipe_size = Integer(default=100,doc="""
@@ -85,16 +85,16 @@ class WhiskerArray(PatternGenerator):
     pipe_sigma=Integer(default=20, doc="""
         Sigma of the pipe falloff.""")
 
-    pipe_sigma_on=Number(default=0.1, doc="""
+    pipe_sigma_on=param.Number(default=0.1, doc="""
         Falloff for the RA ON response.""")
 
-    pipe_sigma_off=Number(default=0.9, doc="""
+    pipe_sigma_off=param.Number(default=0.9, doc="""
         Falloff for the RA OFF response.""")
 
-    pipe_off_strength= Number(default=0, doc="""
+    pipe_off_strength= param.Number(default=0, doc="""
         Height of the RA OFF response.""") 
     
-    random_seed = Number(default = 310) # was 5489 for all sims in thesis
+    random_seed = param.Number(default = 310) # was 5489 for all sims in thesis
     
 
     def __init__(self,**params):
@@ -157,10 +157,10 @@ class TestWhiskerArray(PatternGenerator):
   
     num_ganglion_cells = WhiskerArray.num_ganglion_cells
 
-    deflection = Number(default=pi/4,softbounds=(0.0,2*pi),doc="""
+    deflection = param.Number(default=pi/4,softbounds=(0.0,2*pi),doc="""
         Deflection of whisker array motion, in radians from 0 to 2*pi, assuming a stationary surface.""")
    
-    speed = Number(1)
+    speed = param.Number(1)
     
     rectify = BooleanParameter(default=True,doc="""
         Whether or not to suppress firing in depressed ganglion. 1 means to rectify, 0 to not.""")
@@ -207,7 +207,7 @@ class WhiskerBotData(PatternGenerator):
 
     randomise_ganglion = WhiskerArray.randomise_ganglion 
 	
-    whiskerBot_gain = Number(default=3.14,bounds=(0.0,20.0),doc="""
+    whiskerBot_gain = param.Number(default=3.14,bounds=(0.0,20.0),doc="""
         Scale the WhiskerBot strain data""")
     
     rectify = BooleanParameter(default=True,doc="""

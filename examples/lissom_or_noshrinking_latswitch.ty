@@ -64,11 +64,11 @@ class Activity_based(CFPResponseFn):
     
     """
 
-    l = Number(default=-0.9,doc="Parameter controlling the lower asymptote")
-    u = Number(default=1.2,doc="Parameter controlling the upper asymptote (upper asymptote minus lower asymptote")
-    m = Number(default=0.1,doc="Parameter controlling the time of maximum growth.")
-    r = Number(default=-100,doc="Parameter controlling the growth rate.")
-    b = Number(default=1,doc="Parameter which affects near which asymptote maximum growth occurs")
+    l = param.Number(default=-0.9,doc="Parameter controlling the lower asymptote")
+    u = param.Number(default=1.2,doc="Parameter controlling the upper asymptote (upper asymptote minus lower asymptote")
+    m = param.Number(default=0.1,doc="Parameter controlling the time of maximum growth.")
+    r = param.Number(default=-100,doc="Parameter controlling the growth rate.")
+    b = param.Number(default=1,doc="Parameter which affects near which asymptote maximum growth occurs")
 
     def strength_fn(self,a,w,l,u,m,r,b):
         s = a*w*(l + ( u /(1 + b*exp(-r *(a - 2*m))**(1 / b))))  

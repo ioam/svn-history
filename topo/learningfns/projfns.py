@@ -66,9 +66,9 @@ class CFPLF_EuclideanHebbian(CFPLearningFn):
 ##    """
 ##    single_cf_fn = ClassSelectorParameter(LearningFn,default=BCMFixed())
 ##    
-##    unit_threshold_0=Number(default=0.5,bounds=(0,None),
+##    unit_threshold_0=param.Number(default=0.5,bounds=(0,None),
 ##        doc="Initial value of threshold between LTD and LTP; actual value computed based on recent history.")
-##    unit_threshold_learning_rate=Number(default=0.1,bounds=(0,None),
+##    unit_threshold_learning_rate=param.Number(default=0.1,bounds=(0,None),
 ##        doc="Amount by which the unit_threshold is adjusted for each activity calculation.")
 ##
 ##    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
@@ -117,7 +117,7 @@ class CFPLF_Trace(CFPLearningFn):
     NOT YET TESTED.
     """
 
-    trace_strength=Number(default=0.5,bounds=(0.0,1.0),
+    trace_strength=param.Number(default=0.5,bounds=(0.0,1.0),
        doc="How much the learning is dominated by the activity trace, relative to the current value.")     
 
     single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),
@@ -191,18 +191,18 @@ class HomeoSynaptic(CFPLearningFn):
     single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),
        doc="LearningFn that will be applied to each CF individually")
 
-    beta_n = Number(default=0.01,bounds=(0,None),
+    beta_n = param.Number(default=0.01,bounds=(0,None),
        doc="homeostatic learning rate")
 
-    beta_c = Number(default=0.005,bounds=(0,None),
+    beta_c = param.Number(default=0.005,bounds=(0,None),
        doc="time window over which the neuron's firing rate is averaged")
 
-    activity_target = Number(default=0.1,bounds=(0,None),
+    activity_target = param.Number(default=0.1,bounds=(0,None),
          doc="Target average activity")
 
     #debug = BooleanParameter(default=False,doc="Print average activity values")
-    #beta_n = Number(default=0.00033,bounds=(0,None),doc="Homeostatic learning rate") #Too small?
-    #beta_c = Number(default=0.000033,bounds=(0,None),doc="Time window over which the neuron's firing rate is averaged")
+    #beta_n = param.Number(default=0.00033,bounds=(0,None),doc="Homeostatic learning rate") #Too small?
+    #beta_c = param.Number(default=0.000033,bounds=(0,None),doc="Time window over which the neuron's firing rate is averaged")
     
     def __init__(self,**params):
         super(HomeoSynaptic,self).__init__(**params)

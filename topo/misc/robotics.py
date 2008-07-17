@@ -108,10 +108,10 @@ class PTZ(EventProcessor):
     ptz = ClassSelectorParameter(PTZDevice,default=None,doc="""
        An instance of playerrobot.PTZDevice to be controlled.""")
     
-    zoom = Number(default=120,bounds=(0,None),doc="""
+    zoom = param.Number(default=120,bounds=(0,None),doc="""
        Desired FOV width in degrees.""")
 
-    speed = Number(default=200,bounds=(0,None),doc="""
+    speed = param.Number(default=200,bounds=(0,None),doc="""
        Desired max pan/tilt speed in deg/sec.""")
 
     invert_amplitude = BooleanParameter(default=False,doc="""
@@ -179,7 +179,7 @@ class RealTimeSimulation(Simulation):
     not running.
     """
     
-    timescale = Number(default=1.0,bounds=(0,None),doc="""
+    timescale = param.Number(default=1.0,bounds=(0,None),doc="""
        The desired real length of one simulation time unit, in milliseconds.""")
 
     run_start_hooks = ListParameter(default=[],doc="""

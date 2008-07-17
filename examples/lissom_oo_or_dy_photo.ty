@@ -67,11 +67,11 @@ class ImageSeq(PatternGenerator):
 
     output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF())
     
-    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),
+    aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),
         softbounds=(0.0,2.0),precedence=0.31,doc=
         "Ratio of width to height; size*aspect_ratio gives the width.")
 
-    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+    size  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
                    precedence=0.30,doc="Height of the image.")
        
     size_normalization = Enumeration(default='fit_shortest',
@@ -86,13 +86,13 @@ class ImageSeq(PatternGenerator):
     # Path to directory where sequence of training images are stored
     imagepath = 'examples/stereo/left/'
 
-    random_num1 = Number(default=50.0,bounds=(0.0,100.0),softbounds=(0.0,100.0),
+    random_num1 = param.Number(default=50.0,bounds=(0.0,100.0),softbounds=(0.0,100.0),
                 precedence=0.97,doc="ensures same part of image in both eyes")
 
-    random_num2 = Number(default=50.0,bounds=(0.0,100.0),softbounds=(0.0,100.0),
+    random_num2 = param.Number(default=50.0,bounds=(0.0,100.0),softbounds=(0.0,100.0),
                 precedence=0.97,doc="ensures same part of image in both eyes")
 
-    random_num3 = Number(default=50.0,bounds=(0.0,100.0),softbounds=(0.0,100.0),
+    random_num3 = param.Number(default=50.0,bounds=(0.0,100.0),softbounds=(0.0,100.0),
                 precedence=0.97,doc="ensures same part of image in both eyes")
     
     def __init__(self, **params):

@@ -35,9 +35,9 @@ class ConstantMapper(CoordinateMapperFn):
 
     Outputs constant coordinate (x_cons, y_cons).
     """
-    x_cons = Number(default=0.0,bounds=(0,None),doc="""
+    x_cons = param.Number(default=0.0,bounds=(0,None),doc="""
        The maximum range of the mapping input.""")
-    y_cons = Number(default=0.0,bounds=(0,None), doc="""
+    y_cons = param.Number(default=0.0,bounds=(0,None), doc="""
        The y coordinate of the mapping output.""")
 
     def __call__(self, x, y):
@@ -81,10 +81,10 @@ class Grid(CoordinateMapperFn):
     element map to the same location.
     """
 
-    xdensity = Number(default=1, bounds=(0,None), doc="""
+    xdensity = param.Number(default=1, bounds=(0,None), doc="""
         Number of columns per 1.0 input sheet distance horizontally.""")
 
-    ydensity = Number(default=1, bounds=(0,None), doc="""
+    ydensity = param.Number(default=1, bounds=(0,None), doc="""
         Number of rows per 1.0 input sheet distance vertically.""")
 
     def __call__(self,x,y):
@@ -229,8 +229,8 @@ class Translate2d(AffineTransform):
     """
     Translate the input by xoff,yoff.
     """
-    xoff = Number(default=0.0)
-    yoff = Number(default=0.0)
+    xoff = param.Number(default=0.0)
+    yoff = param.Number(default=0.0)
 
     def __init__(self,**kw):
         super(Translate2d,self).__init__(**kw)
@@ -241,7 +241,7 @@ class Rotate2d(AffineTransform):
     """
     Rotate the input around the origin by an angle in radians.
     """
-    angle = Number(default=0.0)
+    angle = param.Number(default=0.0)
 
     def __init__(self,**kw):
         super(Rotate2d,self).__init__(**kw)
@@ -252,8 +252,8 @@ class Scale2d(AffineTransform):
     """
     Scale the input along the x and y axes by sx and sy, respectively.
     """
-    sx = Number(default=1.0)
-    sy = Number(default=1.0)
+    sx = param.Number(default=1.0)
+    sy = param.Number(default=1.0)
 
     def __init__(self,**kw):
         super(Scale2d,self).__init__(**kw)
@@ -270,9 +270,9 @@ class SingleDimensionMapper(CoordinateMapperFn):
     """
     __abstract = True
 
-    in_range = Number(default=0.5*sqrt(2),bounds=(0,None),doc="""
+    in_range = param.Number(default=0.5*sqrt(2),bounds=(0,None),doc="""
        The maximum range of the mapping input.""")
-    out_range = Number(default=0.5*sqrt(2),bounds=(0,None), doc="""
+    out_range = param.Number(default=0.5*sqrt(2),bounds=(0,None), doc="""
        The maximum range of the output.""")
     remap_dimension = Enumeration(default='radius',
         available=['radius','x','y','xy'],doc="""
@@ -313,7 +313,7 @@ class MagnifyingMapper(SingleDimensionMapper):
     magnification.
     """
     
-    k = Number(default=1.0,bounds=(0,None))
+    k = param.Number(default=1.0,bounds=(0,None))
 
     def _map_fn(self,z):
         k = self.k
@@ -330,7 +330,7 @@ class ReducingMapper(SingleDimensionMapper):
 
     Roughly the inverse of MagnifyingMapper.  k indicates amount of reduction.    
     """
-    k = Number(default=1.0,bounds=(0,None))
+    k = param.Number(default=1.0,bounds=(0,None))
     
     def _map_fn(self,z):
         k = self.k
@@ -350,24 +350,24 @@ class OttesSCMapper(CoordinateMapperFn):
     __abstract = True 
 
     
-    A = Number(default=5.3, doc="""
+    A = param.Number(default=5.3, doc="""
        Shape parameter A, in degrees""")
-    Bu = Number(default=1.8, doc="""
+    Bu = param.Number(default=1.8, doc="""
        Rostral-caudal scale parameter, in mm""")
-    Bv = Number(default=1.8, doc="""
+    Bv = param.Number(default=1.8, doc="""
        Orthogonal (medial-lateral?) scale paraemter in mm/deg""")
 
-    mm_scale = Number(default=8.0,doc="""
+    mm_scale = param.Number(default=8.0,doc="""
        Scale factor to convert constants Bu and Bv from mm to sheet
        units.  Expressed in mm/unit. """)
 
-    amplitude_scale = Number(default=1,doc="""
+    amplitude_scale = param.Number(default=1,doc="""
         Scale factor for saccade command amplitude, expressed in
         degrees per unit of sheet.  Indicates how large a
         saccade is represented by the x-component of the command
         input.""")
     
-    direction_scale = Number(default=1,doc="""
+    direction_scale = param.Number(default=1,doc="""
         Scale factor for saccade command direction, expressed in
         degrees per unit of sheet.  Indicates what direction of saccade
         is represented by the y-component of the command input.""")

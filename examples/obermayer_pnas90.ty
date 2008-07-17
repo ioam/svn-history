@@ -43,9 +43,9 @@ import topo.patterns.random
 
 class LinearDecay(Parameterized):
     """Linear function decreasing from the starting_value to the ending_value."""
-    starting_value = Number(0.09,doc="""Value at the beginning of learning.""")
-    ending_value = Number(0.02,doc="""Value at the end of learning.""")
-    duration = Number(30000,doc="""Time for the ending_value.""")
+    starting_value = param.Number(0.09,doc="""Value at the beginning of learning.""")
+    ending_value = param.Number(0.02,doc="""Value at the end of learning.""")
+    duration = param.Number(30000,doc="""Time for the ending_value.""")
     time_fn = topo.sim.time
     
     def __call__(self):
@@ -55,11 +55,11 @@ class LinearDecay(Parameterized):
 class PiecewiseLinearDecay(Parameterized):
     """Two-part piecewise-linear decay function."""
 
-    starting_value = Number(240.0/256.0,doc="""Value at the beginning of learning.""")
-    middle_value = Number(60.0/256.0,doc="""Value at the midpoint of learning.""")
-    ending_value = Number(2.0/256.0,doc="""Value at the end of learning.""")
-    midpoint = Number(15000,doc="""Time for the middle_value.""")
-    duration = Number(30000,doc="""Time for the ending_value.""")
+    starting_value = param.Number(240.0/256.0,doc="""Value at the beginning of learning.""")
+    middle_value = param.Number(60.0/256.0,doc="""Value at the midpoint of learning.""")
+    ending_value = param.Number(2.0/256.0,doc="""Value at the end of learning.""")
+    midpoint = param.Number(15000,doc="""Time for the middle_value.""")
+    duration = param.Number(30000,doc="""Time for the ending_value.""")
     time_fn = topo.sim.time
 
     def __call__(self):

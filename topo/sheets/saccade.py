@@ -130,12 +130,12 @@ class SaccadeController(CFSheet):
     # JPALERT: amplitude_scale and direction scale can be implemented as
     # part of self.command_mapper, so these should probably be removed.
 
-    amplitude_scale = Number(default=120,doc="""
+    amplitude_scale = param.Number(default=120,doc="""
         Scale factor for saccade command amplitude, expressed in
         degrees per unit of sheet.  Indicates how large a saccade is
         represented by the x-component of the command input.""")
     
-    direction_scale = Number(default=180,doc="""
+    direction_scale = param.Number(default=180,doc="""
         Scale factor for saccade command direction, expressed in
         degrees per unit of sheet.  Indicates what direction of saccade
         is represented by the y-component of the command input.""")
@@ -186,7 +186,7 @@ class ShiftingGeneratorSheet(SequenceGeneratorSheet):
     saccade bounds limits the region within which the saccades may occur.
     """
 
-    visual_angle_scale = Number(default=90,doc="""
+    visual_angle_scale = param.Number(default=90,doc="""
         The scale factor determining the visual angle subtended by this sheet, in
         degrees per unit of sheet.""")
 
@@ -197,9 +197,9 @@ class ShiftingGeneratorSheet(SequenceGeneratorSheet):
     generate_on_shift = BooleanParameter(default=True,doc="""
        Whether to generate a new pattern when a shift occurs.""")
                                          
-    fixation_jitter = Number(default=0,doc="""
+    fixation_jitter = param.Number(default=0,doc="""
        Standard deviation of Gaussian fixation jitter.""")
-    fixation_jitter_period = Number(default=10,doc="""
+    fixation_jitter_period = param.Number(default=10,doc="""
        Period, in time units, indicating how often the eye jitters.
        """)
 

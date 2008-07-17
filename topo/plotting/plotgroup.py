@@ -224,7 +224,7 @@ class SheetPlotGroup(PlotGroup):
         time advances.  The default is False, because many plots are
         slow to generate (including most preference map plots).""")
 
-    desired_maximum_plot_height = Number(default=0,bounds=(0,None),doc="""
+    desired_maximum_plot_height = param.Number(default=0,bounds=(0,None),doc="""
         User-specified height of the tallest plot in this PlotGroup.
         Other plots will generally be scaled as appropriate, either
         to match this size (when sheet_coords is False), or to
@@ -606,7 +606,7 @@ class TwoDThingPlotGroup(ProjectionSheetPlotGroup):
     ### the soft min of 5.0/unit will still give a 600x600 array of CFs!
     ### Density should probably be specified WRT to sheet bounds,
     ### instead of per-unit-of-sheet.    
-    density = Number(default=10.0,
+    density = param.Number(default=10.0,
                      softbounds=(5.0,50.0),doc="""
                      Number of units to plot per 1.0 distance in sheet coordinates""")
 
@@ -752,8 +752,8 @@ class UnitPlotGroup(ProjectionSheetPlotGroup):
     """
 
     # JABALERT: need to show actual coordinates of unit returned
-    x = Number(default=0.0,doc="""x-coordinate of the unit to plot""")
-    y = Number(default=0.0,doc="""y-coordinate of the unit to plot""")
+    x = param.Number(default=0.0,doc="""x-coordinate of the unit to plot""")
+    y = param.Number(default=0.0,doc="""y-coordinate of the unit to plot""")
 ## """Sheet coordinate location desired.  The unit nearest this location will be returned.
 ## It is an error to request a unit outside the area of the Sheet.""")
 

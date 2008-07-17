@@ -32,10 +32,10 @@ class GeneratorSheet(Sheet):
 
     src_ports=['Activity']
     
-    period = Number(default=1,bounds=(0,None),doc=
+    period = param.Number(default=1,bounds=(0,None),doc=
         "Delay (in Simulation time) between generating new input patterns.")
     
-    phase  = Number(default=0.05,doc=
+    phase  = param.Number(default=0.05,doc=
         """
         Delay after the start of the Simulation (at time zero) before
         generating an input pattern.  For a clocked, feedforward simulation, 

@@ -176,7 +176,7 @@ class LeakyCFProjection(CFProjection):
     and then the weighted sum of x(t) is calculated.
     """
 
-    decay_rate = Number(default=1.0,bounds=(0,None),
+    decay_rate = param.Number(default=1.0,bounds=(0,None),
                         doc="Input decay rate for each leaky synapse")
 
     def __init__(self,**params):
@@ -206,12 +206,12 @@ class ScaledCFProjection(CFProjection):
     activity, e.g. during map measurement.
     """
 
-    target = Number(default=0.045, doc="""Target average activity for the projection.""")
+    target = param.Number(default=0.045, doc="""Target average activity for the projection.""")
 
-    target_lr = Number(default=0.045, doc="""
+    target_lr = param.Number(default=0.045, doc="""
         Target average activity for scaling the learning rate.""")
     
-    smoothing = Number(default=0.999, doc="""
+    smoothing = param.Number(default=0.999, doc="""
         Influence of previous activity, relative to current, for computing the average.""")
 
 
@@ -297,7 +297,7 @@ class OneToOneProjection(Projection):
     learning_fn = ClassSelectorParameter(LearningFn,default=IdentityLF(),
         doc="""Learning function applied to weights.""")
 
-    learning_rate = Number(default=0)
+    learning_rate = param.Number(default=0)
 
     
     def __init__(self,**kw):

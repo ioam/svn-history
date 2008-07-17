@@ -178,14 +178,14 @@ class Sweeper(PatternGenerator):
 
     generator = Parameter(default=topo.patterns.basic.Gaussian(),precedence=0.97, doc="Pattern to sweep.")
 
-    speed = Number(default=0.25,bounds=(0.0,None),doc="""
+    speed = param.Number(default=0.25,bounds=(0.0,None),doc="""
         Sweep speed: number of sheet coordinate units per unit time.""")
 
-    step = Number(default=1,doc="""
+    step = param.Number(default=1,doc="""
         Number of steps at the given speed to move in the sweep direction.
         The distance moved is speed*step.""")
 
-    sign = Number(default=1)
+    sign = param.Number(default=1)
 
     def function(self,params):
         """Selects and returns one of the patterns in the list."""

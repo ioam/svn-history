@@ -65,7 +65,7 @@ class TestPattern(SheetPanel):
     edit_sheet = ObjectSelectorParameter(doc="""Sheet for which to edit pattern properties.""")
 
     plastic = BooleanParameter(default=False,doc="""Whether to enable plasticity during presentation.""")
-    duration = Number(default=1.0,doc="""How long to run the simulator when presenting.""",
+    duration = param.Number(default=1.0,doc="""How long to run the simulator when presenting.""",
                       softbounds=(0.0,10.0))
 
     Present = Button(doc="""Present this pattern to the simulation.""")

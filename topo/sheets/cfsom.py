@@ -28,10 +28,10 @@ class CFSOM(CFSheet):
     This implementation is obsolete and will be removed soon.
     Please see examples/cfsom_or.ty for current SOM support.
     """
-    alpha_0 = Number(0.5, doc="Initial value of the learning rate.")
-    radius_0 = Number(1.0, doc="Initial value of the neighborhood radius.")
-    precedence = Number(0.6)
-    learning_length = Number(1000, doc="Number of input presentations to use, by default.")
+    alpha_0 = param.Number(0.5, doc="Initial value of the learning rate.")
+    radius_0 = param.Number(1.0, doc="Initial value of the neighborhood radius.")
+    precedence = param.Number(0.6)
+    learning_length = param.Number(1000, doc="Number of input presentations to use, by default.")
     
     def __init__(self,**params):
         super(CFSOM,self).__init__(**params)
