@@ -260,13 +260,13 @@ class MontageBitmap(Bitmap):
         The size in pixels of the margin to put around each
         tile in the montage.""")
 
-    tile_size = NumericTuple(default=(100,100), doc="""
+    tile_size = param.NumericTuple(default=(100,100), doc="""
         The size in pixels of a tile in the montage.""")
 
     titles = param.List(class_=str, default=[], doc="""
         A list of titles to overlay on the tiles.""")
 
-    title_pos = NumericTuple(default=(10,10), doc="""
+    title_pos = param.NumericTuple(default=(10,10), doc="""
         The position of the upper left corner of the title in each tile.""")
 
     title_options = param.Dict(default={}, doc="""
@@ -288,7 +288,7 @@ class MontageBitmap(Bitmap):
        to NEAREST.  See PIL Image module documentation for other
        options and their meanings.""")
     
-    bg_color = NumericTuple(default=(0,0,0), doc="""
+    bg_color = param.NumericTuple(default=(0,0,0), doc="""
        The background color for the montage, as (r,g,b).""")
 
     def __init__(self,**params):

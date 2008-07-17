@@ -11,10 +11,10 @@ from ..param import Parameter, descendents
 # from topo.param import Enumeration
 # from topo.param import Dynamic
 # from topo.param import Number
-from topo.param import Integer
-from topo.param import Magnitude
-from topo.param import NumericTuple
-from topo.param import XYCoordinates
+#from topo.param import Integer
+#from topo.param import Magnitude
+#from topo.param import NumericTuple
+#from topo.param import XYCoordinates
 
 # from topo.param import Boolean as BooleanParameter
 # from topo.param import String as StringParameter
