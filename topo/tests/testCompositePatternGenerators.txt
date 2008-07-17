@@ -1,5 +1,4 @@
 >>> from topo.patterns.basic import Composite, SeparatedComposite, Gaussian
->>> from topo.base.parameterclasses import Dynamic
 >>> from topo.misc.numbergenerators import UniformRandom
 >>> from topo.base.simulation import Simulation
 >>> from topo.base.cf import CFSheet,CFProjection

@@ -26,8 +26,6 @@ from numpy import dot,sin,cos,pi,array,asarray,argmax,zeros,\
 
 from topo.base.cf import CFSheet
 from topo.base.simulation import PeriodicEventSequence,FunctionEvent
-from topo.base.parameterclasses import Number,Magnitude,CallableParameter,BooleanParameter
-from topo.base.parameterclasses import ClassSelectorParameter
 from topo.base.boundingregion import BoundingBox,BoundingRegionParameter
 from topo.coordmapperfns.basic import  CoordinateMapperFn, IdentityMF
 from topo.sheets.generatorsheet import SequenceGeneratorSheet

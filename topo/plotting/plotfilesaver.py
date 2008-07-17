@@ -14,7 +14,6 @@ import numpy
 
 from .. import param
 
-from topo.base.parameterclasses import StringParameter
 from topo.misc.filepaths import normalize_path
 import topo
 

@@ -18,8 +18,6 @@ from numpy import alltrue
 from .. import param
 from ..param.parameterized import ParamOverrides
 
-from topo.base.parameterclasses import Integer, Number, Parameter
-from topo.base.parameterclasses import ListParameter
 from topo.base.patterngenerator import PatternGenerator
 # Imported here so that all PatternGenerators will be in the same package
 from topo.base.patterngenerator import Constant

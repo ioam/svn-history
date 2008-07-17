@@ -14,7 +14,6 @@ from .. import param
 from .. import param.tk as tk
 
 import topo
-from topo.base.parameterclasses import Enumeration,BooleanParameter
 from topo.commands.analysis import update_activity
 from topo.misc.utils import shortclassname
 

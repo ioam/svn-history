@@ -98,9 +98,9 @@ class SnapshotSupport(object):
             if 'readonly' not in state:
                 state['readonly']=False
 
-        from ..param import Parameter
-        preprocess_state(Parameter,param_remove_hidden)
-        preprocess_state(Parameter,param_add_readonly)
+        from .. import param
+        preprocess_state(param.Parameter,param_remove_hidden)
+        preprocess_state(param.Parameter,param_add_readonly)
 
 
         def class_selector_remove_suffixtolose(state):
@@ -108,8 +108,7 @@ class SnapshotSupport(object):
             if 'suffix_to_lose' in state:
                 del state['suffix_to_lose']
 
-        from topo.base.parameterclasses import ClassSelectorParameter
-        preprocess_state(ClassSelectorParameter,class_selector_remove_suffixtolose)
+        preprocess_state(param.ClassSelector,class_selector_remove_suffixtolose)
 
 
 
@@ -184,7 +183,6 @@ class SnapshotSupport(object):
         # r8014 Removed LearningFnParameter and ResponseFnParameter (+CFP equivalents)
         # r8028 Removed CoordinateMapperFnParameter
         # r8029 Removed PatternGeneratorParameter
-        from topo.base.parameterclasses import ClassSelectorParameter
 
         from topo.base.functionfamilies import OutputFn,ResponseFn,LearningFn,\
              CoordinateMapperFn
@@ -196,7 +194,7 @@ class SnapshotSupport(object):
         import topo.base.functionfamilies
         for name,arg in d.items():
             fake_a_class(topo.base.functionfamilies,name,
-                         ClassSelectorParameter,(arg,))
+                         param.ClassSelector,(arg,))
 
         from topo.base.cf import CFPOutputFn,CFPResponseFn,CFPLearningFn
         d = {"CFPOutputFnParameter":CFPOutputFn,
@@ -206,12 +204,12 @@ class SnapshotSupport(object):
         import topo.base.cf
         for name,arg in d.items():
             fake_a_class(topo.base.cf,name,
-                         ClassSelectorParameter,(arg,))
+                         param.ClassSelector,(arg,))
 
         import topo.base.patterngenerator
         from topo.base.patterngenerator import PatternGenerator
         fake_a_class(topo.base.patterngenerator,"PatternGeneratorParameter",
-                     ClassSelectorParameter,(PatternGenerator,))
+                     param.ClassSelector,(PatternGenerator,))
         ##########
             
 
@@ -220,26 +218,25 @@ class SnapshotSupport(object):
             """Support for old snapshots."""
             def __setstate__(self,state):
                 sim = state['actual_sim']
-                from topo.base.parameterclasses import Dynamic
-                Dynamic.time_fn = sim.time
+                param.Dynamic.time_fn = sim.time
 
         import topo.base.simulation
         topo.base.simulation.SimSingleton=SimSingleton
 
 
-        # DynamicNumber was removed in rXXXX
-        # CEBALERT: missing support 
-        class DynamicNumber(object):
-            # placeholder: use code from topo.base.parameterclasses.DynamicNumber
-            # (e.g. revision 7604)
-            def __new__(cls,*args,**kw):
-                raise NotImplementedError("""
-                Please email ceball at users.sf.net, requesting an
-                update to the legacy snapshot support. If possible,
-                please make your snapshot available for testing.""")
+##         # DynamicNumber was removed in rXXXX
+##         # CEBALERT: missing support 
+##         class DynamicNumber(object):
+##             # placeholder: use code from topo.base.parameterclasses.DynamicNumber
+##             # (e.g. revision 7604)
+##             def __new__(cls,*args,**kw):
+##                 raise NotImplementedError("""
+##                 Please email ceball at users.sf.net, requesting an
+##                 update to the legacy snapshot support. If possible,
+##                 please make your snapshot available for testing.""")
 
-        import topo.base.parameterclasses
-        topo.base.parameterclasses.DynamicNumber = DynamicNumber
+##         import topo.base.parameterclasses
+##         topo.base.parameterclasses.DynamicNumber = DynamicNumber
 
 
         from topo.base.cf import CFProjection

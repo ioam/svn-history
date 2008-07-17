@@ -1,8 +1,7 @@
->>> from topo.param import Parameterized
->>> from topo.base.parameterclasses import Number,CompositeParameter
+>>> from .. import param
 
 # initialize a class with a compound parameter
->>> class A(Parameterized):
+>>> class A(param.Parameterized):
 ...    x = param.Number(default=0)
 ...    y = param.Number(default=0)
 ...    xy = param.Composite(attribs=['x','y'])

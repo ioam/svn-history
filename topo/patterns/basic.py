@@ -13,7 +13,6 @@ from numpy import alltrue
 from .. import param
 
 import topo
-from topo.base.parameterclasses import ListParameter
 # Imported here so that all PatternGenerators will be in the same package
 from topo.base.patterngenerator import Constant
 from topo.base.patterngenerator import PatternGenerator

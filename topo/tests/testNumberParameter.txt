@@ -1,5 +1,4 @@
->>> from topo.param import Parameterized
->>> from topo.base.parameterclasses import Number 
+>>> from .. import param
 >>> from topo.misc.numbergenerators import UniformRandom
 >>> from fixedpoint import FixedPoint
 
@@ -8,7 +7,7 @@
 
 
 
->>> class TestPO1(Parameterized):
+>>> class TestPO1(param.Parameterized):
 ...    x = param.Number(default=UniformRandom(lbound=-1,ubound=1,seed=1),bounds=(-1,1))
 ...    y = param.Number(default=1,bounds=(-1,1))
 ...    z = param.Number(default=FixedPoint('1.00'))

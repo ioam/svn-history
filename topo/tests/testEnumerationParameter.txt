@@ -1,7 +1,6 @@
->>> from topo.param import Parameterized
->>> from topo.base.parameterclasses import Enumeration
+>>> from .. import param
 
->>> class P(Parameterized):
+>>> class P(param.Parameterized):
 ...     e = param.Enumeration(default=5,available=[5,6,7])
 
 >>> p = P(e=6)

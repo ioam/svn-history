@@ -6,6 +6,7 @@ $Id$
 """
 __version__='$Revision$'
 
+# CEBERRORALERT: need to remove DynamicNumber
 
 # This simulation is still being worked on
 

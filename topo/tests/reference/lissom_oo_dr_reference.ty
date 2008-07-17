@@ -18,6 +18,8 @@ import numpy.oldnumeric as Numeric
 from math import pi, sqrt
 from fixedpoint import FixedPoint
 
+from .. import param
+
 import topo.patterns.basic
 
 from topo.sheets.optimized import LISSOM_Opt as LISSOM
@@ -168,7 +170,6 @@ def doubledoh(i):
 
 #################################################################
 from topo.base.patterngenerator import PatternGenerator
-from topo.base.parameterclasses import Number,Parameter
 from math import cos,sin
 class Sweeper(PatternGenerator):
     """
