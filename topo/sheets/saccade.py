@@ -24,6 +24,8 @@ __version__ = '$Revision$'
 from numpy import dot,sin,cos,pi,array,asarray,argmax,zeros,\
      nonzero,take,random,alltrue,sometrue
 
+from .. import param
+
 from topo.base.cf import CFSheet
 from topo.base.simulation import PeriodicEventSequence,FunctionEvent
 from topo.base.boundingregion import BoundingBox,BoundingRegionParameter

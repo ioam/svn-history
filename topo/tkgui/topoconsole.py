@@ -26,7 +26,7 @@ from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
 from tkFileDialog import asksaveasfilename,askopenfilename
 
 from .. import param
-import ..param.tk as tk
+from ..param import tk
 
 import topo
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup

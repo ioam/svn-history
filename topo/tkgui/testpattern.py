@@ -20,7 +20,7 @@ __version__='$Revision$'
 from Tkinter import Frame
 
 from .. import param
-import ..param.tk as tk 
+from ..param import tk
 
 import topo
 

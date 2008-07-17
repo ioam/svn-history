@@ -11,7 +11,7 @@ import math
 from Tkinter import Button, Label, Frame, TOP, LEFT, RIGHT, BOTTOM, E, LAST, FIRST, OptionMenu, StringVar,Toplevel
 
 from .. import param
-from .. import param.tk as tk
+from ..param import tk
 
 import topo
 from topo.commands.analysis import update_activity
