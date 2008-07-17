@@ -269,7 +269,7 @@ class Trace(Parameterized):
         The fraction of the difference ymax-ymin to add to the
         top of the plot as padding.""")
     
-    plotkw = DictParameter(default=dict(linestyle='steps'),doc="""
+    plotkw = param.Dict(default=dict(linestyle='steps'),doc="""
         Contains the keyword arguments to pass to the plot command
         when plotting the trace.""")
 

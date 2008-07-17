@@ -283,7 +283,7 @@ class Subplotting(Parameterized):
     specific subplots without using these functions.
     """
     
-    plotgroups_to_subplot=ListParameter(default=
+    plotgroups_to_subplot=param.List(default=
         ["Activity", "Connection Fields", "Projection", "Projection Activity"],
         doc="List of plotgroups for which to set subplots.")
 

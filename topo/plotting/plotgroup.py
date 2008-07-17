@@ -453,7 +453,7 @@ class TemplatePlotGroup(SheetPlotGroup):
       Should be set to true for quick plots, but false for those that take a long time
       to calculate, so that the user can change the update command if necessary.""")
     
-    prerequisites=ListParameter([],
+    prerequisites=param.List([],
       doc="List of preference maps which must exist before this plot can be calculated.")
 
     category = param.String(default="User",

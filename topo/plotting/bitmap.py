@@ -246,7 +246,7 @@ class MontageBitmap(Bitmap):
     Bitmaps are scaled to fit in the given tile size, and tiled
     right-to-left, top-to-bottom into the given number of rows and columns.
     """
-    bitmaps = ListParameter(class_=Bitmap,doc="""
+    bitmaps = param.List(class_=Bitmap,doc="""
         The list of bitmaps to compose.""")
 
     rows = Integer(default=2, doc="""
@@ -263,13 +263,13 @@ class MontageBitmap(Bitmap):
     tile_size = NumericTuple(default=(100,100), doc="""
         The size in pixels of a tile in the montage.""")
 
-    titles = ListParameter(class_=str, default=[], doc="""
+    titles = param.List(class_=str, default=[], doc="""
         A list of titles to overlay on the tiles.""")
 
     title_pos = NumericTuple(default=(10,10), doc="""
         The position of the upper left corner of the title in each tile.""")
 
-    title_options = DictParameter(default={}, doc="""
+    title_options = param.Dict(default={}, doc="""
         Dictionary of options for drawing the titles.  Dict should
         contain keyword options for the PIL draw.text method.  Possible
         options include 'fill' (fill color), 'outline' (outline color),
@@ -277,7 +277,7 @@ class MontageBitmap(Bitmap):
         be used for any omitted options.""",
         instantiate=False)
 
-    hooks = ListParameter(default=[], doc="""
+    hooks = param.List(default=[], doc="""
         A list of functions, one per tile, that take a PIL image as
         input and return a PIL image as output.  The hooks are applied
         to the tile images before resizing.  The value None can be

@@ -362,7 +362,7 @@ class Composite(PatternGenerator):
               
         """)
     
-    generators = ListParameter(default=[Constant(scale=0.0)],precedence=0.97,
+    generators = param.List(default=[Constant(scale=0.0)],precedence=0.97,
         class_=PatternGenerator,doc="""
         List of patterns to use in the composite pattern.  The default is
         a blank pattern, and should thus be overridden for any useful work.""")
@@ -491,7 +491,7 @@ class Selector(PatternGenerator):
     PatternGenerator that selects from a list of other PatternGenerators.
     """
 
-    generators = ListParameter(default=[Constant()],precedence=0.97,
+    generators = param.List(default=[Constant()],precedence=0.97,
                                class_=PatternGenerator,bounds=(1,None),
         doc="List of patterns from which to select.")
 

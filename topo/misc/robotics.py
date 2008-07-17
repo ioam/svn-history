@@ -182,10 +182,10 @@ class RealTimeSimulation(Simulation):
     timescale = param.Number(default=1.0,bounds=(0,None),doc="""
        The desired real length of one simulation time unit, in milliseconds.""")
 
-    run_start_hooks = ListParameter(default=[],doc="""
+    run_start_hooks = param.List(default=[],doc="""
        A list of callable objects to be called on entry to .run(), before any events
        are processed.""")
-    run_stop_hooks = ListParameter(default=[],doc="""
+    run_stop_hooks = param.List(default=[],doc="""
        A list of callable objects to be called on exit from .run()
        after all events are processed.""") 
 

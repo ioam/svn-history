@@ -522,10 +522,10 @@ class AttributeTrackingOF(OutputFnWithState):
     # There may be some way to achieve the above without using eval(), which would be better.
     #JLALERT When using this function snapshots cannot be saved because of problem with eval()
     
-    attrib_names = ListParameter(default=[], doc="""
+    attrib_names = param.List(default=[], doc="""
         List of names of the function object's parameters that should be stored.""")
     
-    units = ListParameter(default=[(0.0,0.0)], doc="""
+    units = param.List(default=[(0.0,0.0)], doc="""
         Sheet coordinates of the unit(s) for which parameter values will be stored.""")
     
     step = param.Number(default=1, doc="""

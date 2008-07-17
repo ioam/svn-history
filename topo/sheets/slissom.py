@@ -48,7 +48,7 @@ class SLISSOM(LISSOM):
         doc="Noise added to the on-going activity")
 
     # logging facility for debugging
-    trace_coords = ListParameter(default=[],
+    trace_coords = param.List(default=[],
         doc="List of coord(s) of membrane potential(s) to track over time")
 
     trace_n = param.Number(default=400,bounds=(1,None),

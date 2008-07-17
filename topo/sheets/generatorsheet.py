@@ -147,7 +147,7 @@ class SequenceGeneratorSheet(GeneratorSheet):
     immediately after completion.
     """
     
-    input_sequence = ListParameter(default=[],
+    input_sequence = param.List(default=[],
           doc="""The sequence of patterns to generate.  Must be a list of
           (onset,generator) tuples. An empty list defaults to the
           single tuple: (0,self.input_generator), resulting in

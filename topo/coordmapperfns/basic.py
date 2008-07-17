@@ -53,7 +53,7 @@ class Pipeline(CoordinateMapperFn):
     Applies a sequence of coordmappers, left to right.
     """
     
-    mappers=ListParameter(default=[],
+    mappers=param.List(default=[],
         doc="The sequence of mappers to apply.")
 
     def __call__(self,x,y):
