@@ -5,6 +5,9 @@ import os.path
 import os
 import copy
 import pdb
+
+from topo import param
+
 import topo.patterns.basic
 import topo.commands.analysis
 #from scipy.integrate import dblquad
@@ -24,7 +27,6 @@ from topo.commands.pylabplots import or_tuning_curve_batch, matrixplot
 from topo.commands.analysis import save_plotgroup, measure_or_tuning_fullfield
 from topo.misc.filepaths import normalize_path,application_path
 from topo.commands.pylabplots import plot_tracked_attributes
-from topo.base.parameterclasses import Number, Parameter
 from topo.base.functionfamilies import CoordinateMapperFn
 from topo.plotting.bitmap import MontageBitmap
 from topo.misc.traces import ActivityMovie,InMemoryRecorder
@@ -335,11 +337,11 @@ def homeostatic_analysis_function():
     
 
 class SimpleHomeo(OutputFnWithState):
-    mu = Number(default=0.01,doc="Target average activity.")
-    a_init = Number(default=13,doc="Multiplicative parameter controlling the exponential.")
-    b_init = Number(default=-4,doc="Additive parameter controlling the exponential.")
-    eta = Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
-    smoothing = Number(default=0.9997, doc="Weighting of previous activity vs. current activity when calculating the average.")
+    mu = param.Number(default=0.01,doc="Target average activity.")
+    a_init = param.Number(default=13,doc="Multiplicative parameter controlling the exponential.")
+    b_init = param.Number(default=-4,doc="Additive parameter controlling the exponential.")
+    eta = param.Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
+    smoothing = param.Number(default=0.9997, doc="Weighting of previous activity vs. current activity when calculating the average.")
 
     def __init__(self,**params):
         super(SimpleHomeo,self).__init__(**params)
@@ -365,7 +367,7 @@ class SimpleHomeo(OutputFnWithState):
 
 class Jitter(CoordinateMapperFn):
     scale =  0.4    
-    rand = Parameter(default=None)    
+    rand = param.Parameter(default=None)    
     def __call__(self,x,y):
             return x+(self.rand()-0.5)*self.scale,y+(self.rand()-0.5)*self.scale
 
@@ -495,28 +497,28 @@ class CascadeHomeostatic(OutputFnWithState):
     """
     """
 
-    a_init = Number(default=13,doc="Multiplicative parameter controlling the exponential.")
+    a_init = param.Number(default=13,doc="Multiplicative parameter controlling the exponential.")
     
-    b_init = Number(default=-4,doc="Additive parameter controlling the exponential.")
+    b_init = param.Number(default=-4,doc="Additive parameter controlling the exponential.")
     
-    b_eta = Number(default=0.02,doc="Learning rate for homeostatic plasticity.")
+    b_eta = param.Number(default=0.02,doc="Learning rate for homeostatic plasticity.")
     
-    a_eta = Number(default=0.002,doc="Learning rate for homeostatic plasticity.")
+    a_eta = param.Number(default=0.002,doc="Learning rate for homeostatic plasticity.")
     
-    mu = Number(default=0.01,doc="Target average firing rate.")
+    mu = param.Number(default=0.01,doc="Target average firing rate.")
     
-    b_smoothing = Number(default=0.997, doc="""
+    b_smoothing = param.Number(default=0.997, doc="""
         Weighting of previous activity vs. current activity when calculating the average.""")
     
-    a_smoothing = Number(default=0.9997, doc="""
+    a_smoothing = param.Number(default=0.9997, doc="""
         Weighting of previous activity vs. current activity when calculating the average.""")
 
-    g_smoothing = Number(default=0.99, doc="")
+    g_smoothing = param.Number(default=0.99, doc="")
 
-    num_cascades = Number(default=9,doc="Target average firing rate.")
+    num_cascades = param.Number(default=9,doc="Target average firing rate.")
     thresholds = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
     a_grad  = []
-    step = Number(default=1, doc="""
+    step = param.Number(default=1, doc="""
         How often to update the a and b parameters.
         For instance, step=1 means to update it every time this OF is
         called; step=2 means to update it every other time.""")
@@ -574,7 +576,7 @@ class ActivityHysteresis(OutputFnWithState):
     time scale of this interpolation. 
     """
 
-    time_constant  = Number(default = 0.3,doc="""Time constant of the continouse projection input calculation.""")
+    time_constant  = param.Number(default = 0.3,doc="""Time constant of the continouse projection input calculation.""")
 
     def __init__(self,**params):
         super(ActivityHysteresis,self).__init__(**params)

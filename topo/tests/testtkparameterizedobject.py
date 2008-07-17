@@ -235,12 +235,12 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         self.assertEqual(eval(nu_tkvar.get()),eval('0.8'))
 
         # now make immediate and test that
-        self.f.param_immediately_apply_change[Number]=True        
+        self.f.param_immediately_apply_change[param.Number]=True        
         self.f.nu = 0.1
         nu_tkvar.set(0.4)
         self.assertEqual(self.f.nu,0.4)
 
-        self.f.param_immediately_apply_change[Number]=False
+        self.f.param_immediately_apply_change[param.Number]=False
 
         # check gui getting
         self.f.nu = 0.2
@@ -363,7 +363,7 @@ class TestParameterTypeRepresentations(unittest.TestCase):
             self.assertEqual(w.get(),test_string)
 
         # unlike when typed by a user, everything's immediate when simulating set()
-        self.f.param_immediately_apply_change[StringParameter] = True
+        self.f.param_immediately_apply_change[param.String] = True
         test_fn('st')
 
         # and now check the test actually works by making sure

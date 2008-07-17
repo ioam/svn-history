@@ -52,8 +52,7 @@ from topo.misc.numbergenerators import UniformRandom
 
 # CEBALERT: keep old behavior until we investigate why changing
 # to time-controlled dynamic parameters alters the results. 
-from topo.base.parameterclasses import Dynamic
-Dynamic.time_fn = None
+param.Dynamic.time_fn = None
 
 
 class XYModulo(CoordinateMapperFn):

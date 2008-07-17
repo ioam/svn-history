@@ -8,7 +8,9 @@ import pylab
 import numpy
 from numpy import exp,zeros,ones,concatenate,median
 from pylab import save
-from topo.base.parameterizedobject import ParameterizedObject
+
+from topo import param
+
 from math import pi
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg
@@ -23,7 +25,6 @@ from topo.commands.pylabplots import plot_tracked_attributes
 #########################################################################
 ##Sheet types only used lissom_oo_or_homeostatic_tracked.ty for reproducing published figures##
 from topo.sheets.lissom import LISSOM
-from topo.base.parameterclasses import Number
 from topo.base.sheet import activity_type
 import copy
 
@@ -42,12 +43,12 @@ class JointScaling_lronly(LISSOM):
     original values from the lissom_oo_or.ty simulation using two
     Gaussians per iteration as the input dataset.  """
 
-    target_lr = Number(default=0.045, doc="""
+    target_lr = param.Number(default=0.045, doc="""
         Target average activity for jointly scaled projections.
 
         Used for calculating a learning rate scaling factor.""")
     
-    smoothing = Number(default=0.999, doc="""
+    smoothing = param.Number(default=0.999, doc="""
         Influence of previous activity, relative to current, for computing the average.""")
 
     
@@ -157,10 +158,10 @@ class JointScaling_affonly(LISSOM):
     larger in order to maintain a constant average response to similar
     inputs in V1. 
     """
-    target = Number(default=0.045, doc="""
+    target = param.Number(default=0.045, doc="""
         Target average activity for jointly scaled projections.""")
 
-    smoothing = Number(default=0.999, doc="""
+    smoothing = param.Number(default=0.999, doc="""
         Influence of previous activity, relative to current, for computing the average.""")
 
          
@@ -269,7 +270,7 @@ class JointScaling_affonly(LISSOM):
 #############################################################################
 #Functions for analysis#####################################################
 
-class StoreMedSelectivity(ParameterizedObject):
+class StoreMedSelectivity(param.Parameterized):
     """
     Plots and/or stores the average (median) selectivity across the map.
     """
@@ -302,7 +303,7 @@ class StoreMedSelectivity(ParameterizedObject):
         #save(normalize_path("MedianSelectivity"+sheet),plot_data,fmt='%.6f', delimiter=',') #uncomment if you also want to save the raw data
 
 
-class StoreStability(ParameterizedObject):
+class StoreStability(param.Parameterized):
     """
 
     Plots and/or stores the orientation similarity index across the map

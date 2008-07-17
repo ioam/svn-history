@@ -111,8 +111,8 @@ class TestParameterized(unittest.TestCase):
 
         # CB: test not so good because it requires changes if params
         # of PO are changed
-        assert 'name' in Parameterized.params()
-        assert 'print_level' in Parameterized.params()
+        assert 'name' in param.Parameterized.params()
+        assert 'print_level' in param.Parameterized.params()
         assert len(param.Parameterized.params())==2
 
         ## check for bug where subclass Parameters were not showing up
@@ -121,7 +121,7 @@ class TestParameterized(unittest.TestCase):
         assert 'notinst' in TestPO.params()
 
         ## check caching
-        assert Parameterized.params() is Parameterized().params(), "Results of params() should be cached." # just for performance reasons
+        assert param.Parameterized.params() is param.Parameterized().params(), "Results of params() should be cached." # just for performance reasons
 
 
     def test_state_saving(self):

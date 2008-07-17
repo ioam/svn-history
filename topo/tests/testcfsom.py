@@ -150,7 +150,7 @@ class TestCFSom(unittest.TestCase):
         # input generation params
         GeneratorSheet.period = 1.0
         GeneratorSheet.nominal_density = 5
-        GeneratorSheet.print_level = parameterized.WARNING
+        GeneratorSheet.print_level = param.parameterized.WARNING
         
 
         # cf som parameters
@@ -159,18 +159,18 @@ class TestCFSom(unittest.TestCase):
         ###########################################
         # build simulation
         
-        parameterized.min_print_level = parameterized.WARNING
+        param.parameterized.min_print_level = param.parameterized.WARNING
       
         s = Simulation()
         s.verbose("Creating simulation objects...")
         s['retina']=GeneratorSheet(input_generator=input_pattern)
         
         s['V1'] = CFSheet()
-        s['V1'].print_level = parameterized.WARNING
+        s['V1'].print_level = param.parameterized.WARNING
 
         s.connect('retina','V1',delay=1,connection_type=CFProjection,
                   learning_fn=CFPLF_Hebbian_opt())
-        s.print_level = parameterized.WARNING
+        s.print_level = param.parameterized.WARNING
 
         self.assertTrue(topo.sim['V1'].projections().get('retinaToV1',None) != None)
         self.assertTrue(topo.sim['V1'].projections().get('retinaToV1',None) != None)
