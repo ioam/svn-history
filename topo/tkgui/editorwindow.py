@@ -6,12 +6,13 @@ $Id$
 """
 __version__='$Revision$'
 
+from random import Random, random
 from Tkinter import Canvas, Frame, Checkbutton, Button,Menu, Scrollbar, SUNKEN, YES, BOTH, LEFT, END, RIGHT, TOP, BOTTOM, X, Y
 from tkFileDialog import asksaveasfilename
-from random import Random, random
+
+from .. import param
 
 import topo
-from ..param import Parameterized
 from topo.misc.filepaths import normalize_path
 from topo.base.sheet import Sheet
 from topo.base.projection import Projection

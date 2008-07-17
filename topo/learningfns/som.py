@@ -10,10 +10,11 @@ from math import ceil
 
 from numpy.oldnumeric import exp, argmax
 
+from .. import param
+
 from topo.base.arrayutils import L2norm, array_argmax
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFPLearningFn
-from topo.base.parameterclasses import Number, ClassSelectorParameter
 from topo.base.patterngenerator import PatternGenerator
     
 from topo.patterns.basic import Gaussian

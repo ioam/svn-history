@@ -8,11 +8,13 @@ __version__='$Revision$'
 
 from Tkinter import Frame, Button, Label, Canvas, TOP, X, GROOVE, RAISED,\
      BOTTOM,StringVar
+
 from Tile import Combobox
+
+from .. import param
 
 import topo.sheets
 from topo.sheets import *
-from ..param import Parameterized
 from topo.base.parameterclasses import concrete_descendents
 from topo.base.sheet import Sheet
 import topo.projections
@@ -254,7 +256,7 @@ class ConnectionTool(Frame):
             else:
                 con = sim.connect(from_node.name,to_node.name,connection_type=con_type)
         except Exception, e:
-            Parameterized().warning("Unable to connect these sheets with the given "+ self.current_option + " (" + str(e) +").")
+            param.Parameterized().warning("Unable to connect these sheets with the given "+ self.current_option + " (" + str(e) +").")
             editor_connection.remove()
             return False
         

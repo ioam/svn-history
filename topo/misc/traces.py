@@ -18,15 +18,12 @@ from itertools import izip
 from numpy import array,asarray
 import ImageDraw
 
-import topo.base.parameterclasses as param
+from .. import param
+
 from topo.base.simulation import EventProcessor
-from ..param import Parameterized
-from topo.base.parameterclasses import Number,StringParameter,DictParameter,BooleanParameter
-from topo.base.parameterclasses import Integer,CompositeParameter,Parameter
-from topo.misc.utils import Struct
 from topo.plotting.bitmap import RGBBitmap, MontageBitmap, TITLE_FONT
 from topo.misc.filepaths import normalize_path, application_path
-
+from topo.misc.utils import Struct
 
 
 
@@ -227,7 +224,7 @@ class InMemoryRecorder(DataRecorder):
 
 
 
-class Trace(Parameterized):
+class Trace(param.Parameterized):
     """
     A specification for generating 1D traces of data from recorded
     timeseries.
@@ -343,7 +340,7 @@ class SheetPositionTrace(Trace):
 
 
 
-class TraceGroup(Parameterized):
+class TraceGroup(param.Parameterized):
     """
     A group of data traces to be plotted together.
 
@@ -429,7 +426,7 @@ def get_images(name,times,recorder,overlays=(0,0,0)):
 
 # JABALERT: Is there some reason it is called ActivityMovie in
 # particular, if it can plot things other than Activity?
-class ActivityMovie(Parameterized):
+class ActivityMovie(param.Parameterized):
     """
     An object encapsulating a series of movie frames displaying the
     value of one or more matrix-valued time-series contained in a

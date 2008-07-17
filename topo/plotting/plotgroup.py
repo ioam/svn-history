@@ -12,15 +12,12 @@ import copy
 import Image
 import __main__
 
-import topo
+from .. import param
 
-from ..param import Parameterized
-from topo.base.parameterclasses import Parameter,BooleanParameter, \
-     StringParameter,Number,ObjectSelectorParameter, ListParameter, Integer
+import topo
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet,CFProjection,Projection
 from topo.base.projection import ProjectionSheet
-
 from topo.misc.keyedlist import KeyedList
 from topo.misc.filepaths import resolve_path
 

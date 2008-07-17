@@ -21,18 +21,15 @@ try:
 except ImportError:
     pass
 
-import topo
-
-from ..param import Parameterized, Parameter
+from .. import param
 from ..param.parameterized import PicklableClassAttributes
 
+import topo
 from topo.base.functionfamilies import OutputFn
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 from topo.base.projection import Projection, ProjectionSheet
-
 from topo.sheets.generatorsheet import GeneratorSheet
-
 from topo.misc.utils import ExtraPickler
 from topo.misc.filepaths import normalize_path
 from topo.misc import legacy 
@@ -105,7 +102,7 @@ def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=Fals
         if gen_eps_list.has_key(each):
             gen_eps_list[each].set_input_generator(inputs[each])
         else:
-            Parameterized().warning('%s not a valid Sheet Name.' % each)
+            param.Parameterized().warning('%s not a valid Sheet Name.' % each)
 
     topo.sim.event_push()
     topo.sim.run(duration) 
@@ -399,7 +396,7 @@ def run_batch(script_file,output_directory="Output",
             analysis_fn()
             save_script_repr()
             elapsedtime=time.time()-starttime
-            parameterizedobject.Parameterized(name="run_batch").message(
+            param.Parameterized(name="run_batch").message(
                 "Elapsed real time %02d:%02d." % (int(elapsedtime/60),int(elapsedtime%60)))
     except:
         import traceback

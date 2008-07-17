@@ -14,24 +14,25 @@ import numpy
 from numpy import zeros, array, empty, object_, size, vectorize, fromfunction
 from numpy.oldnumeric import Float
 
+from .. import param
+
 import topo
 import topo.base.sheetcoords
+from topo.base.cf import CFSheet
 from topo.base.sheet import Sheet, activity_type
 from topo.base.sheetview import SheetView
-from ..param import Parameterized,Parameter
 from topo.base.parameterclasses import Number
-from topo.misc.utils import cross_product, frange
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.commands.basic import restore_input_generators, save_input_generators
 from topo.misc.distribution import Distribution
-from topo.base.cf import CFSheet
+from topo.misc.utils import cross_product, frange
 
 
 # CB: having a class called DistributionMatrix with an attribute
 # distribution_matrix to hold the distribution matrix seems silly.
 # Either rename distribution_matrix or make DistributionMatrix into
 # a matrix.
-class DistributionMatrix(Parameterized):
+class DistributionMatrix(param.Parameterized):
     """
     Maintains a matrix of Distributions (each of which is a dictionary
     of (feature value: activity) pairs).
@@ -106,7 +107,7 @@ class DistributionMatrix(Parameterized):
 
 
 
-class FullMatrix(Parameterized):
+class FullMatrix(param.Parameterized):
     """
     Records the output of every unit in a sheet, for every combination of feature values.
     Useful for collecting data for later analysis while presenting many input patterns.
@@ -134,7 +135,7 @@ class FullMatrix(Parameterized):
 
 # CB: FeatureResponses and ReverseCorrelation need cleanup; I began but haven't finished.
 
-class FeatureResponses(Parameterized):
+class FeatureResponses(param.Parameterized):
     """
     Systematically vary input pattern feature values and collate the responses.
 

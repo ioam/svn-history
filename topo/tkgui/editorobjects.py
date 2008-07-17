@@ -7,21 +7,20 @@ $Id$
 __version__='$Revision$'
 
 from inspect import getdoc
-from Tkinter import Button, Label, Frame, TOP, LEFT, RIGHT, BOTTOM, E, LAST, FIRST, OptionMenu, StringVar,Toplevel
 import math
+from Tkinter import Button, Label, Frame, TOP, LEFT, RIGHT, BOTTOM, E, LAST, FIRST, OptionMenu, StringVar,Toplevel
 
-import topo.param.tk as tk
+from .. import param
+from .. import param.tk as tk
+
 import topo
-from ..param import Parameterized
 from topo.base.parameterclasses import Enumeration,BooleanParameter
 from topo.commands.analysis import update_activity
 from topo.misc.utils import shortclassname
 
 from parametersframe import ParametersFrameWithApply
-from widgets import TkguiWindow
+from widgets import TkguiWindow, Balloon
 
-
-from widgets import Balloon
 
 # CEBALERT: should be a Parameterized
 class EditorObject(object):

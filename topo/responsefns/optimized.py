@@ -8,12 +8,11 @@ $Id$
 """
 __version__='$Revision$'
 
+from .. import param
+
 from topo.base.functionfamilies import ResponseFn,DotProduct
 from topo.base.cf import CFPResponseFn, CFPRF_Plugin
-from topo.base.parameterclasses import ClassSelectorParameter
-
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
-
 from topo.responsefns.projfns import CFPRF_EuclideanDistance
 
 class CFPRF_DotProduct_opt(CFPResponseFn):

@@ -14,12 +14,13 @@ $Id$
 """
 __version__='$Revision$'
 
-from numpy import exp,log,sqrt,sin,cos,zeros,ones,dot,array
-from numpy.matlib import matrix, zeros as mzeros
 from math import atan,pi,atan2
 
-from ..param import Parameter
-from topo.base.parameterclasses import Number,Enumeration,ListParameter,BooleanParameter
+from numpy import exp,log,sqrt,sin,cos,zeros,ones,dot,array
+from numpy.matlib import matrix, zeros as mzeros
+
+from .. import param
+
 from topo.base.functionfamilies import CoordinateMapperFn, IdentityMF
 from topo.misc.utils import signabs
 from topo.misc.numbergenerators import UniformRandom

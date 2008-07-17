@@ -5,15 +5,19 @@ $Id$
 """
 __version__='$Revision$'
 
-import numpy.oldnumeric as Numeric
-
 from math import exp
-from topo.base.parameterclasses import BooleanParameter, ListParameter
-from topo.base.parameterclasses import Number, Integer
-from lissom import LISSOM
+
+import numpy.oldnumeric as Numeric
+import numpy.oldnumeric.random_array as RandomArray
+
+from .. import param
+
 from topo.commands.pylabplots import vectorplot, matrixplot
 
-import numpy.oldnumeric.random_array as RandomArray
+from lissom import LISSOM
+
+
+
 
 activity_type = Numeric.Float32
 

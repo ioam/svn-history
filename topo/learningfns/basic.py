@@ -7,9 +7,9 @@ __version__ = "$Revision$"
 
 from numpy.oldnumeric import ones,Float32
 
-from topo.base.functionfamilies import LearningFn
-from topo.base.parameterclasses import Number
+from .. import param
 
+from topo.base.functionfamilies import LearningFn
 # Imported here so that all learning functions will be in the same package
 from topo.base.functionfamilies import Hebbian,IdentityLF
 

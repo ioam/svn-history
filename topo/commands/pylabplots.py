@@ -15,6 +15,11 @@ $Id$
 """
 __version__='$Revision$'
 
+import re
+import os
+import copy
+import errno
+
 try:
     import matplotlib
     import pylab
@@ -22,18 +27,12 @@ except ImportError:
     print "Warning: Could not import matplotlib; pylab plots will not work."
 
 import numpy
-import re, os
-import copy
-
 from numpy.oldnumeric import arange, sqrt, pi, array, floor, transpose, argmax, argmin, cos, sin, log10
 
 import topo
-from topo.misc.filepaths import normalize_path
-import errno
 from topo.base.arrayutils import octave_output
 from topo.base.sheet import Sheet
 from topo.base.arrayutils import wrap
-
 from topo.misc.filepaths import normalize_path
 from topo.analysis.vision import complexity
 import topo.analysis.vision
@@ -206,7 +205,7 @@ def matrixplot3d_gnuplot(mat,title=None,outputfilename="tmp.ps"):
     prompt is not available until this command finishes.
     """
     import Gnuplot
-    import Numeric
+    import Numeric # ERRORALERT
     from os import system
     
     psviewer="gv" # Should be a parameter, or handled better somehow

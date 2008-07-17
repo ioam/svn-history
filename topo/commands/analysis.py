@@ -5,32 +5,33 @@ $Id$
 """
 __version__='$Revision$'
 
-
-from numpy.oldnumeric import array, zeros, Float,size, shape, maximum
 from math import pi
 import copy
-import topo
+
 from colorsys import hsv_to_rgb
-from topo.base.arrayutils import octave_output, centroid
+from numpy.oldnumeric import array, zeros, Float,size, shape, maximum
+
+from .. import param
+
+import topo
+from topo.base.arrayutils import octave_output, centroid, wrap
 from topo.base.cf import CFSheet, CFProjection, Projection
-from ..param import Parameterized
-from topo.base.parameterclasses import ListParameter, BooleanParameter
 from topo.base.projection import ProjectionSheet
+from topo.base.simulation import EPConnectionEvent
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 from topo.commands.basic import pattern_present, wipe_out_activity
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.utils import frange
-from topo.base.arrayutils import wrap
+from topo.misc.distribution import Distribution
 from topo.patterns.basic import SineGrating, Gaussian
 from topo.patterns.teststimuli import SineGratingDisk
+from topo.patterns.random import GaussianRandom
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.parameterclasses import Parameter
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
-from topo.misc.distribution import Distribution
-from topo.patterns.random import GaussianRandom
-from topo.base.simulation import EPConnectionEvent
+
+
 
 class Feature(object):
     """

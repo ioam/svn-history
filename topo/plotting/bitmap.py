@@ -21,14 +21,16 @@ $Id$
 """
 __version__='$Revision$'
 
+import os
 from copy import copy
-
+import Image
+import ImageDraw
+import ImageFont
 from colorsys import hsv_to_rgb
+import numpy.oldnumeric as Numeric
 
-import numpy.oldnumeric as Numeric, Image, ImageDraw, math, ImageFont, os
-from topo.base.parameterclasses import ListParameter,Integer,CompositeParameter,DictParameter
-from topo.base.parameterclasses import NumericTuple
-from ..param import Parameterized
+from .. import param
+
 from topo.misc.filepaths import application_path
 
 TITLE_FONT = ImageFont.truetype(os.path.join(application_path,'lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
@@ -40,7 +42,7 @@ TITLE_FONT = ImageFont.truetype(os.path.join(application_path,'lib/python2.5/sit
 ###        - Get rid of accessing function (copy, show...) (should we really?)
 
 
-class Bitmap(Parameterized):
+class Bitmap(param.Parameterized):
     """
     Wrapper class for the PIL Image class.
 
@@ -297,7 +299,7 @@ class MontageBitmap(Bitmap):
         ## so we have to skip it.
         ## JAB: Good point; Bitmap should be modified to be more like
         ## other PO classes.
-        Parameterized.__init__(self,**params)
+        param.Parameterized.__init__(self,**params)
 
         rows,cols = self.shape
         tilew,tileh = self.tile_size

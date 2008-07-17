@@ -10,18 +10,17 @@ __version__ = "$Revision$"
 
 from numpy import exp,ones,zeros,array,nonzero
 
+from .. import param
+
 # So all Projections are present in this package
 from topo.base.projection import Projection
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheet import activity_type
 from topo.base.cf import CFProjection,ConnectionField,MaskedCFIter,\
      CFPLearningFn,CFPLF_Identity,CFPOutputFn
-from topo.base.parameterclasses import Number,ClassSelectorParameter
 from topo.base.patterngenerator import PatternGenerator,Constant
 from topo.base.functionfamilies import CoordinateMapperFn,IdentityMF
-
 from topo.misc.utils import rowcol2idx
-
 from topo.outputfns.basic import OutputFn,IdentityOF
 from topo.learningfns.basic import LearningFn,IdentityLF
 

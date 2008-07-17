@@ -21,17 +21,16 @@ $Id$
 """
 __version__ = '$Revision$'
 
-from numpy import dot,sin,cos,pi,array,asarray,argmax,zeros
-from numpy import nonzero,take,random,alltrue,sometrue
+from numpy import dot,sin,cos,pi,array,asarray,argmax,zeros,\
+     nonzero,take,random,alltrue,sometrue
 
 from topo.base.cf import CFSheet
 from topo.base.simulation import PeriodicEventSequence,FunctionEvent
-from topo.sheets.generatorsheet import SequenceGeneratorSheet
 from topo.base.parameterclasses import Number,Magnitude,CallableParameter,BooleanParameter
 from topo.base.parameterclasses import ClassSelectorParameter
 from topo.base.boundingregion import BoundingBox,BoundingRegionParameter
 from topo.coordmapperfns.basic import  CoordinateMapperFn, IdentityMF
-
+from topo.sheets.generatorsheet import SequenceGeneratorSheet
 from topo.misc import utils
 
 

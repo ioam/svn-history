@@ -5,16 +5,17 @@ Output functions (see basic.py) and projection-level output functions
 Requires the weave package; without it unoptimized versions are used.
 """
 
+from numpy.oldnumeric import sum
+
+from .. import param
+
 from topo.base.cf import CFPOutputFn,CFPOF_Plugin
 from topo.base.functionfamilies import OutputFn, IdentityOF
-from topo.base.parameterclasses import Number, ClassSelectorParameter
-from ..param import Parameterized
-
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 
 from basic import DivisiveNormalizeL1
 
-from numpy.oldnumeric import sum
+
 
 # For backwards compatibility when loading pickled files; can be deleted
 DivisiveNormalizeL1_opt=DivisiveNormalizeL1

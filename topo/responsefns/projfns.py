@@ -11,7 +11,8 @@ __version__='$Revision$'
 from numpy import sum,exp,zeros,ravel
 from numpy.oldnumeric import Float
 
-from topo.base.parameterclasses import Number,ClassSelectorParameter
+from .. import param
+
 from topo.base.cf import CFPResponseFn
 from topo.base.functionfamilies import ResponseFn,DotProduct
 from topo.base.arrayutils import L2norm

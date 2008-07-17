@@ -8,20 +8,20 @@ __version__='$Revision$'
 import numpy.oldnumeric as Numeric
 import numpy
 from numpy import abs,zeros,ones
-import topo
 import copy
 
+from .. import param
+
+import topo
 from topo.base.functionfamilies import OutputFn
 from topo.base.cf import CFSheet, CFPOutputFn
-from topo.base.parameterclasses import Parameter,BooleanParameter, Number, Integer,\
-     ListParameter,ClassSelectorParameter
 from topo.base.projection import Projection
-from ..param import Parameterized
 from topo.base.sheet import activity_type
+from topo.base.simulation import EPConnectionEvent
 from topo.misc.inlinec import optimized
 from topo.misc.keyedlist import KeyedList
 from topo.outputfns.basic import PiecewiseLinear
-from topo.base.simulation import EPConnectionEvent
+
 
 class JointNormalizingCFSheet(CFSheet):
     """

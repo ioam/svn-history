@@ -10,8 +10,8 @@ $Id$
 """
 __version__='$Revision$'
 
+from .. import param
 
-from topo.base.parameterclasses import Number
 from topo.base.simulation import EventProcessor,EPConnectionEvent
 
 

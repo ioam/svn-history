@@ -5,16 +5,16 @@ $Id$
 """
 __version__='$Revision$'
 
-import topo
-assert hasattr(topo,'guimain'), "GUI must be running."
-
 import copy
 
 from numpy import array
 from numpy.testing import assert_array_equal
 
-import topo.tests.functionaltest as ft
 
+import topo
+assert hasattr(topo,'guimain'), "GUI must be running."
+
+import topo.tests.functionaltest as ft
 from topo.tests.utils import assert_array_not_equal
 
 # typing shortcut

@@ -12,31 +12,27 @@ $Id$
 """
 __version__='$Revision$'
 
+from math import ceil
+import copy
+
+from .. import param
 
 import numpy, numpy.random
 import numpy.oldnumeric as Numeric
-import copy
-import topo
-
 from numpy import exp,zeros,ones
-from numpy.oldnumeric import dot, exp
-from math import ceil
+from numpy.oldnumeric import dot
 
-
+import topo
 from topo.base.sheet import activity_type
 from topo.base.arrayutils import clip_lower
 from topo.base.arrayutils import L2norm, norm, array_argmax
 from topo.base.functionfamilies import OutputFn
-from topo.base.parameterclasses import Parameter,Number,ListParameter,\
-     BooleanParameter, StringParameter, ClassSelectorParameter
-from ..param import Parameterized
 from topo.base.patterngenerator import PatternGenerator,Constant
 from topo.base.boundingregion import BoundingBox
-from topo.patterns.basic import Gaussian
 from topo.base.sheetcoords import SheetCoordinateSystem
-
 # Imported here so that all OutputFns will be in the same package
 from topo.base.functionfamilies import IdentityOF,PipelineOF
+from topo.patterns.basic import Gaussian
 
 Pipeline = PipelineOF
 

@@ -8,8 +8,9 @@ __version__='$Revision$'
 
 from numpy.oldnumeric import argmax,exp,floor
 
+from .. import param
+
 from topo.base.arrayutils import L2norm
-from topo.base.parameterclasses import Number
 from topo.base.cf import CFSheet
 from topo.learningfns.som import CFPLF_SOM
 

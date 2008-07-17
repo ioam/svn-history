@@ -7,12 +7,12 @@ __version__='$Revision$'
 
 import copy
 
+from .. import param
+
 from topo.base.simulation import FunctionEvent, PeriodicEventSequence
 from topo.base.functionfamilies import OutputFn,IdentityOF
 from topo.base.sheet import Sheet 
 from topo.base.sheet import BoundingBox
-from topo.base.parameterclasses import Number, ListParameter, BooleanParameter,\
-     ClassSelectorParameter
 from topo.base.patterngenerator import PatternGenerator, Constant
 
 from topo.misc.utils import NxN

@@ -9,23 +9,22 @@ __version__='$Revision$'
 
 from inspect import getdoc
 from math import pi
-from numpy.fft.fftpack import fft2
-from numpy.fft.helper import fftshift
-from numpy import abs
-
 import copy
+
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas, Checkbutton, BooleanVar, DISABLED, NORMAL,NO
 from tkFileDialog import asksaveasfilename
 
-import topo
+from numpy.fft.fftpack import fft2
+from numpy.fft.helper import fftshift
+from numpy import abs
 
-from topo.base.parameterclasses import BooleanParameter
+from .. import param
+
 from topo.misc.filepaths import normalize_path
-
-from plotgrouppanel import SheetPanel
 from topo.plotting.plotgroup import TemplatePlotGroup
 
+from plotgrouppanel import SheetPanel
 from widgets import Menu
 
 

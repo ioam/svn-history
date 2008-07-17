@@ -14,9 +14,10 @@ from numpy import ones,zeros
 import numpy.oldnumeric as Numeric
 from numpy.oldnumeric import Float,Float32
 
+from .. import param
+
 from topo.base.cf import CFPLearningFn
 from topo.base.sheet import activity_type
-from topo.base.parameterclasses import Number,ClassSelectorParameter
 from topo.base.functionfamilies import Hebbian,LearningFn
 # Imported here so that all ProjectionLearningFns will be in the same package
 from topo.base.cf import CFPLF_Identity,CFPLF_Plugin

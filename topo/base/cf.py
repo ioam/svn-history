@@ -21,9 +21,10 @@ $Id$
 
 __version__ = '$Revision$'
 
+from copy import copy
+
 from numpy import abs,array,zeros,where, ones
 from numpy.oldnumeric import Float,Float32
-from copy import copy
 
 from .. import param
 

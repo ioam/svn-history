@@ -7,11 +7,11 @@ __version__='$Revision$'
 
 import numpy.oldnumeric.random_array as RandomArray
 
+from .. import param
 from ..param.parameterized import ParamOverrides
-from topo.base.parameterclasses import Number,Parameter
+
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
-
 from topo.outputfns.basic import IdentityOF
 
 

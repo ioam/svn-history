@@ -8,9 +8,10 @@ __version__='$Revision$'
 from numpy.oldnumeric import zeros,ones,floor,where,choose,less,greater,Int
 from numpy.oldnumeric.random_array import random,seed
 
-from topo.base.parameterclasses import Number,Integer
-from topo.base.patterngenerator import PatternGenerator
+from .. import param
 from ..param.parameterized import ParamOverrides
+
+from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.base.functionfamilies import IdentityOF
 

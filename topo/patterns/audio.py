@@ -6,16 +6,16 @@ $Id$
 """
 __version__='$Revision$'
 
+import numpy
+
 # CEBALERT: you need to build pyaudiolab to use this file.
 # (Not tested it on Windows or OS X.)
 try:
     import pyaudiolab
 except ImportError:
     print "Warning: pyaudiolab must be built to use audio.py"
-    
-import numpy
 
-from topo.base.parameterclasses import Integer,Parameter
+from .. import param
 
 from topo.misc.filepaths import Filename
 

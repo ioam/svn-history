@@ -5,8 +5,8 @@ $Id$
 """
 __version__='$Revision$'
 
-from ..param import Parameterized
-from topo.base.parameterclasses import Dynamic
+from .. import param
+
 import plot
 
 ### JABALERT: Should be able to construct a Palette automatically by
@@ -163,7 +163,7 @@ WHITE_BACKGROUND = 1
 ########################  JC: starting new implementation #############
 from numpy.oldnumeric import zeros
 
-class StringBasedPalette(Parameterized):
+class StringBasedPalette(param.Parameterized):
     
     ### JCALERT: What is the default scale?
     def __init__(spec="KRYW",num_colors=0,scale=1.0):
@@ -202,7 +202,7 @@ class F(object):
 ### straightforward, taking some specification and immediately
 ### constructing a usable object (without e.g. requiring set() to be
 ### called).
-class Palette(Parameterized):
+class Palette(param.Parameterized):
     """
     Each palette has 3*256 values that are keyed by an index.
     This base class takes in a list of 256 triples.

@@ -5,26 +5,28 @@ $Id: featureresponses.py 7714 2008-01-24 16:42:21Z antolikjan $
 """
 __version__='$Revision: 7714 $'
 
-try:
-    import pylab
-except ImportError:
-    print "Warning: Could not import matplotlib; pylab plots will not work."
+from math import fmod,floor,pi,sin,cos,sqrt
 
-from math import fmod,floor
 import numpy
 from numpy.oldnumeric import Float
 from numpy import zeros, array, size, empty, object_
 #import scipy
 
+try:
+    import pylab
+except ImportError:
+    print "Warning: Could not import matplotlib; pylab plots will not work."
+
+from .. import param
+
 import topo
 import topo.commands.pylabplots
-from topo.base.parameterclasses import Number
-from topo.misc.numbergenerators import UniformRandom
-from math import fmod,floor,pi, sin, cos, sqrt
-from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.base.cf import CFSheet
 from topo.base.sheetview import SheetView
 from topo.misc.filepaths import normalize_path
+from topo.misc.numbergenerators import UniformRandom
+from topo.plotting.plotgroup import create_plotgroup, plotgroups
+
 
 max_value = 0
 global_index = ()

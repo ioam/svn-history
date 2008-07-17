@@ -19,21 +19,23 @@ __version__='$Revision$'
 
 from Tkinter import Frame
 
+from .. import param
+import ..param.tk as tk 
+
 import topo
 
 from topo.base.sheetview import SheetView
-from topo.base.parameterclasses import BooleanParameter,Number,ClassSelectorParameter,ObjectSelectorParameter
 from topo.base.patterngenerator import PatternGenerator
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.commands.basic import pattern_present, wipe_out_activity
 from topo.plotting.plot import make_template_plot
 from topo.plotting.plotgroup import SheetPlotGroup
+from topo.base.simulation import EPConnectionEvent
+from topo.base.sheet import Sheet
 
 from parametersframe import ParametersFrame
 from plotgrouppanel import SheetPanel
-from ..param.tk import Button
-from topo.base.simulation import EPConnectionEvent
-from topo.base.sheet import Sheet
+
 
 class TestPatternPlotGroup(SheetPlotGroup):
 
@@ -68,7 +70,7 @@ class TestPattern(SheetPanel):
     duration = param.Number(default=1.0,doc="""How long to run the simulator when presenting.""",
                       softbounds=(0.0,10.0))
 
-    Present = Button(doc="""Present this pattern to the simulation.""")
+    Present = tk.Button(doc="""Present this pattern to the simulation.""")
 
     pattern_generator = param.ClassSelector(class_=PatternGenerator, doc="""Type of pattern to present. Each type has various parameters that can be changed.""")
 

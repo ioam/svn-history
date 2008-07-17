@@ -15,7 +15,6 @@ from ..param.parameterized import ParamOverrides
 
 from boundingregion import BoundingBox, BoundingRegionParameter
 from functionfamilies import OutputFn, IdentityOF
-
 from sheetcoords import SheetCoordinateSystem
 
 

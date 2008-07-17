@@ -7,9 +7,10 @@ $Id$
 """
 __version__='$Revision$'
 
+from numpy.oldnumeric import zeros
+
 from topo.base.sheet import Sheet
 from topo.misc.utils import Struct, NxN
-from numpy.oldnumeric import zeros
 
 class Composer(Sheet):
     """

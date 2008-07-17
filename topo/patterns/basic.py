@@ -6,21 +6,19 @@ $Id$
 __version__='$Revision$'
 
 import numpy
-import topo
 from math import pi, sin, cos, sqrt
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy import alltrue
 
-from topo.base.parameterclasses import Integer, Number, Parameter,\
-     ClassSelectorParameter
-from topo.base.parameterclasses import ListParameter
-from topo.base.patterngenerator import PatternGenerator
+from .. import param
 
+import topo
+from topo.base.parameterclasses import ListParameter
 # Imported here so that all PatternGenerators will be in the same package
 from topo.base.patterngenerator import Constant
-
-from topo.misc.patternfns import gaussian,gabor,line,disk,ring
+from topo.base.patterngenerator import PatternGenerator
 from topo.base.arrayutils import wrap
+from topo.misc.patternfns import gaussian,gabor,line,disk,ring
 from topo.misc.numbergenerators import UniformRandom
 
 # Could add a Gradient class, where the brightness varies as a

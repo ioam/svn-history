@@ -10,12 +10,12 @@ from numpy import array,asarray,ones,sometrue, logical_and, logical_or
 
 from .. import param
 
+from topo.misc.keyedlist import KeyedList # CEBALERT: not in base
+
 from sheet import Sheet
 from simulation import EPConnection
 from functionfamilies import OutputFn,IdentityOF
 from sheetview import ProjectionView
-
-from topo.misc.keyedlist import KeyedList
 
 
 class SheetMask(param.Parameterized):

@@ -18,12 +18,11 @@ __version__ = '$Revision$'
 
 import time
 import Image,ImageOps
-
 from math import pi,cos,sin
 
+from .. import param
+
 from topo.base.simulation import Simulation,EventProcessor
-from topo.base.parameterclasses import Integer,Number,ClassSelectorParameter
-from topo.base.parameterclasses import BooleanParameter, ListParameter
 from topo.patterns.image import GenericImage
 
 from playerrobot import CameraDevice,PTZDevice

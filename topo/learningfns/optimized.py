@@ -10,12 +10,13 @@ __version__ = "$Revision$"
 
 from numpy import zeros
 
+from .. import param
+
 from topo.base.sheet import activity_type
-from topo.base.parameterclasses import Parameter, Number, ClassSelectorParameter
 from topo.base.cf import CFPLearningFn,CFPLF_Plugin
 from topo.base.functionfamilies import Hebbian,LearningFn
-
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
+
 from projfns import CFPLF_Trace
 
 

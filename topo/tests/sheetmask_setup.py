@@ -1,5 +1,6 @@
-from topo.base.projection import SheetMask,ProjectionSheet
 from numpy import zeros
+
+from topo.base.projection import SheetMask,ProjectionSheet
 
 class LeftColMask(SheetMask):
 

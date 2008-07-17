@@ -25,10 +25,10 @@ from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
      NORMAL, Scrollbar, Y, DoubleVar, Widget,Toplevel
 from tkFileDialog import asksaveasfilename,askopenfilename
 
-import topo.param.tk as tk
+from .. import param
+import ..param.tk as tk
 
 import topo
-from ..param import Parameterized
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
 from topo.misc.keyedlist import KeyedList
 from topo.misc.filepaths import resolve_path,normalize_path
@@ -109,7 +109,7 @@ def open_plotgroup_panel(class_,plotgroup=None,**kw):
 
         
 
-class PlotsMenuEntry(Parameterized):
+class PlotsMenuEntry(param.Parameterized):
     """
     Stores information about a Plots menu command
     (including the command itself, and the plotgroup template).

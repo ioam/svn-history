@@ -12,12 +12,11 @@ from itertools import chain
 from Tkinter import Canvas, Label
 from numpy import sometrue
 
-import topo
+from .. import param
 
+import topo
 from topo.base.cf import CFProjection
 from topo.base.projection import ProjectionSheet, Projection
-from topo.base.parameterclasses import BooleanParameter, Integer
-
 from topo.sheets.generatorsheet import GeneratorSheet
         
 from templateplotgrouppanel import TemplatePlotGroupPanel

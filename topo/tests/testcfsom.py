@@ -7,22 +7,22 @@ $Id$
 __version__='$Revision$'
 
 import unittest
+import random
 from pprint import pprint
+from math import pi
+
+from .. import param
+
+import topo.patterns.basic
 from topo.plotting import plot
-from topo.param import parameterized 
 from topo.plotting.bitmap import *
 from topo.base.sheet import Sheet
-from topo.sheets.generatorsheet import *
 from topo.base.simulation import *
 from topo.base import patterngenerator
-import topo.patterns.basic
-from math import pi
-from topo.base.parameterclasses import Number, Parameter
-from topo.misc.numbergenerators import UniformRandom
-import random
 from topo.base.cf import CFProjection, CFSheet
+from topo.misc.numbergenerators import UniformRandom
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
-import pdb #debugger
+from topo.sheets.generatorsheet import *
 
 
 ### Only for ImageSaver

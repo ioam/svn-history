@@ -10,21 +10,20 @@ __version__='$Revision$'
 ### more easily (e.g. in the Test Pattern window, or when
 ### measuring tuning curves).
 
-import numpy
-
-from topo.patterns.basic import SineGrating, Disk, Ring
 from math import pi, sin, cos, sqrt
+import numpy
 from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy import alltrue
 
+from .. import param
 from ..param.parameterized import ParamOverrides
+
 from topo.base.parameterclasses import Integer, Number, Parameter
 from topo.base.parameterclasses import ListParameter
 from topo.base.patterngenerator import PatternGenerator
-
 # Imported here so that all PatternGenerators will be in the same package
 from topo.base.patterngenerator import Constant
-
+from topo.patterns.basic import SineGrating, Disk, Ring
 from topo.misc.patternfns import gaussian,gabor,line,disk,ring
 from topo.misc.numbergenerators import UniformRandom
 

@@ -9,15 +9,14 @@ __version__='$Revision$'
 import palette
 import copy
 
-from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, Bitmap
-
 from numpy.oldnumeric import zeros, ones, Float, divide,ravel,clip,array
 
-from ..param import Parameterized
-from topo.base.parameterclasses import Number
+from .. import param
+
 from topo.base.sheetview import SheetView
 from topo.base.sheetcoords import SheetCoordinateSystem,Slice
 
+from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, Bitmap
 
 
 ### JCALERT!
@@ -30,7 +29,7 @@ from topo.base.sheetcoords import SheetCoordinateSystem,Slice
 ### - Get rid of release_sheetviews.
 
 
-class Plot(Parameterized):
+class Plot(param.Parameterized):
      """
      Simple Plot object constructed from a specified PIL image.
      """
@@ -138,7 +137,7 @@ def make_template_plot(channels,sheet_views,density=None,
                if plot.bitmap is not None:
                     return plot
      
-     Parameterized(name="make_template_plot").verbose('No',name,'plot constructed for this Sheet')
+     param.Parameterized(name="make_template_plot").verbose('No',name,'plot constructed for this Sheet')
      return None
 
 
