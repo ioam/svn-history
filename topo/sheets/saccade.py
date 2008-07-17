@@ -141,7 +141,7 @@ class SaccadeController(CFSheet):
         is represented by the y-component of the command input.""")
 
 
-    decode_fn = CallableParameter(default=activity_centroid,
+    decode_fn = param.Callable(default=activity_centroid,
                                   instantiate=False,doc="""
         The function for extracting a single point from sheet activity.
         Should take a sheet as the first argument, and return (x,y).""")
