@@ -26,18 +26,18 @@ class PlotGroupSaver(Parameterized):
     """
     Allows a PlotGroup to be saved as a set of bitmap files on disk.
     """
-    file_format = StringParameter(default="png",doc="""
+    file_format = param.String(default="png",doc="""
         Bitmap image file format to use.""")
 
-    filename_prefix = StringParameter(default="",doc="""
+    filename_prefix = param.String(default="",doc="""
         Optional prefix that can be used in the filename_format command
         to disambiguate different simulations or conditions.""")
 
-    filename_suffix = StringParameter(default="",doc="""
+    filename_suffix = param.String(default="",doc="""
         Optional suffix that can be used in the filename_format command
         to disambiguate different simulations or conditions.""")
 
-    filename_format = StringParameter(default=
+    filename_format = param.String(default=
         "%(filename_prefix)s%(basename)s_%(plot_label)s%(filename_suffix)s.%(file_format)s",doc="""
         Format string to use for generating filenames for plots.  This
         string will be evaluated in the context of a dictionary that

@@ -59,7 +59,7 @@ class PlotGroup(Parameterized):
     Container that has one or more Plots and also knows how to arrange
     the plots and other special parameters.
     """
-    update_command = StringParameter(default="",doc="""
+    update_command = param.String(default="",doc="""
     Command to execute before updating this plot, e.g. to calculate sheet views.
     
     The command can be any Python code, and will be evaluated in the main namespace
@@ -67,7 +67,7 @@ class PlotGroup(Parameterized):
     the template for this plot, but various arguments can be passed, a modified
     version substituted, etc.""")
 
-    plot_command = StringParameter(default="",doc="""
+    plot_command = param.String(default="",doc="""
     Command to execute when updating sheet or coordinate of unit to be plotted
     when the simulator time has not changed (i.e. no further measurement of
     responses is required).
@@ -444,7 +444,7 @@ class TemplatePlotGroup(SheetPlotGroup):
     examples. 
     """
 
-    doc = StringParameter(default="",
+    doc = param.String(default="",
       doc="Documentation string describing this type of plot.")
 
     plot_immediately=BooleanParameter(False,doc="""
@@ -456,7 +456,7 @@ class TemplatePlotGroup(SheetPlotGroup):
     prerequisites=ListParameter([],
       doc="List of preference maps which must exist before this plot can be calculated.")
 
-    category = StringParameter(default="User",
+    category = param.String(default="User",
       doc="Category to which this plot belongs, which will be created if necessary.")
 
     # JCALERT! We might eventually write these two functions

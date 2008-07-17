@@ -244,7 +244,7 @@ class Trace(Parameterized):
     
     __abstract = True
 
-    data_name = StringParameter(default=None,doc="""
+    data_name = param.String(default=None,doc="""
         Name of the timeseries from which the trace is generated.
         E.g. the connection name into a DataRecorder object.""")
 

@@ -27,7 +27,7 @@ class TestPO(Parameterized):
     const = Parameter(1.0,constant=True)
     pa = Parameter(default="test")
     nu = param.Number(default=1.0,bounds=(-1,1))
-    st = StringParameter("string1")
+    st = param.String("string1")
 
 
 

@@ -36,7 +36,7 @@ class SomeFrame(TkParameterized,Frame):
     const = Parameter(1.0,constant=True)
     pa = Parameter(default="test")
     nu = param.Number(default=1.0,bounds=(-1,1))
-    st = StringParameter("string1")
+    st = param.String("string1")
 
     def __init__(self,master,extraPO=None,**params):
         TkParameterized.__init__(self,master,extraPO=extraPO,**params)
