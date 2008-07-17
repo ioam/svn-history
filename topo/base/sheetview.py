@@ -16,7 +16,7 @@ __version__='$Revision$'
 import types
 import operator
 
-from .. import params as param
+from .. import param
 
 import sheet
 

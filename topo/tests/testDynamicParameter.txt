@@ -1,4 +1,4 @@
->>> from topo.params import Parameterized, Parameter
+>>> from topo.param import Parameterized, Parameter
 >>> from topo.base.parameterclasses import Dynamic
 >>> from topo.misc.numbergenerators import UniformRandom
 

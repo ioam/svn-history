@@ -97,7 +97,7 @@ else:
       position_bound = 0.70833
 
 ### Present input patterns that are at non-corresponding locations on each retina
-from topo.params import Parameterized
+from topo.param import Parameterized
 from topo.base.parameterclasses import Number
 
 # Note that this script must be run before unpickling will work.

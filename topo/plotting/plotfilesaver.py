@@ -12,7 +12,7 @@ import Image
 import ImageOps
 import numpy
 
-from ..params import Parameterized
+from ..param import Parameterized
 from topo.base.parameterclasses import StringParameter
 
 from topo.misc.filepaths import normalize_path

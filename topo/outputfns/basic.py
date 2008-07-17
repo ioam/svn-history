@@ -29,7 +29,7 @@ from topo.base.arrayutils import L2norm, norm, array_argmax
 from topo.base.functionfamilies import OutputFn
 from topo.base.parameterclasses import Parameter,Number,ListParameter,\
      BooleanParameter, StringParameter, ClassSelectorParameter
-from ..params import Parameterized
+from ..param import Parameterized
 from topo.base.patterngenerator import PatternGenerator,Constant
 from topo.base.boundingregion import BoundingBox
 from topo.patterns.basic import Gaussian

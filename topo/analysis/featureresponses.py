@@ -18,7 +18,7 @@ import topo
 import topo.base.sheetcoords
 from topo.base.sheet import Sheet, activity_type
 from topo.base.sheetview import SheetView
-from ..params import Parameterized,Parameter
+from ..param import Parameterized,Parameter
 from topo.base.parameterclasses import Number
 from topo.misc.utils import cross_product, frange
 from topo.base.sheetcoords import SheetCoordinateSystem

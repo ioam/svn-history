@@ -1,4 +1,4 @@
-from topo.params.tk import ParametersFrame,ParametersFrameWithApply,\
+from topo.param.tk import ParametersFrame,ParametersFrameWithApply,\
      edit_parameters
 
 

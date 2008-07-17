@@ -16,7 +16,7 @@ from topo.base.cf import CFSheet, CFPOutputFn
 from topo.base.parameterclasses import Parameter,BooleanParameter, Number, Integer,\
      ListParameter,ClassSelectorParameter
 from topo.base.projection import Projection
-from ..params import Parameterized
+from ..param import Parameterized
 from topo.base.sheet import activity_type
 from topo.misc.inlinec import optimized
 from topo.misc.keyedlist import KeyedList

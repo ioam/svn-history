@@ -10,9 +10,9 @@ from inspect import getdoc
 from Tkinter import Button, Label, Frame, TOP, LEFT, RIGHT, BOTTOM, E, LAST, FIRST, OptionMenu, StringVar,Toplevel
 import math
 
-import topo.params.tk as tk
+import topo.param.tk as tk
 import topo
-from ..params import Parameterized
+from ..param import Parameterized
 from topo.base.parameterclasses import Enumeration,BooleanParameter
 from topo.commands.analysis import update_activity
 from topo.misc.utils import shortclassname

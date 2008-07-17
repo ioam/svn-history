@@ -8,7 +8,7 @@ __version__='$Revision$'
 
 import unittest
 
-from topo.params import Parameterized, Parameter, Dynamic
+from topo.param import Parameterized, Parameter, Dynamic
 
 
 # CEBALERT: not anything like a complete test of Parameterized!

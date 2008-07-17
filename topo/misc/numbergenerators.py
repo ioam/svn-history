@@ -11,11 +11,11 @@ import operator
 
 from math import e
 
-from .. import params
+from .. import param
 
 
 
-class NumberGenerator(params.Parameterized):
+class NumberGenerator(param.Parameterized):
     """
     Abstract base class for any object that when called produces a number.
 
@@ -129,8 +129,8 @@ class UniformRandom(RandomDistribution):
 
     See the random module for further details.    
     """
-    lbound = params.Number(default=0.0,doc="inclusive lower bound")
-    ubound = params.Number(default=1.0,doc="exclusive upper bound")
+    lbound = param.Number(default=0.0,doc="inclusive lower bound")
+    ubound = param.Number(default=1.0,doc="exclusive upper bound")
     
     def __call__(self):
         return self.random_generator.uniform(self.lbound,self.ubound)
@@ -143,8 +143,8 @@ class UniformRandomInt(RandomDistribution):
 
     See the randint function in the random module for further details.    
     """
-    lbound = params.Number(default=0,doc="inclusive lower bound")
-    ubound = params.Number(default=1000,doc="inclusive upper bound")
+    lbound = param.Number(default=0,doc="inclusive lower bound")
+    ubound = param.Number(default=1000,doc="inclusive upper bound")
     
     def __call__(self):
         x = self.random_generator.randint(self.lbound,self.ubound)
@@ -158,7 +158,7 @@ class Choice(RandomDistribution):
     Accepts items of any type, though they are typically numbers.
     See the choice() function in the random module for further details.
     """
-    choices = params.List(default=[0,1],
+    choices = param.List(default=[0,1],
         doc="List of items from which to select.")
     
     def __call__(self):
@@ -171,8 +171,8 @@ class NormalRandom(RandomDistribution):
 
     See the random module for further details.    
     """
-    mu = params.Number(default=0.0,doc="mean of the distribution")
-    sigma = params.Number(default=1.0,doc="standard deviation of the distribution")
+    mu = param.Number(default=0.0,doc="mean of the distribution")
+    sigma = param.Number(default=1.0,doc="standard deviation of the distribution")
     
     def __call__(self):
         return self.random_generator.normalvariate(self.mu,self.sigma)
@@ -188,20 +188,20 @@ class ExponentialDecay(NumberGenerator):
     
     See http://en.wikipedia.org/wiki/Exponential_decay.
     """
-    starting_value = params.Number(1.0, doc="Value used for time zero.")
-    ending_value = params.Number(0.0, doc="Value used for time infinity.")
+    starting_value = param.Number(1.0, doc="Value used for time zero.")
+    ending_value = param.Number(0.0, doc="Value used for time infinity.")
 
-    time_constant = params.Number(10000,doc="""
+    time_constant = param.Number(10000,doc="""
         Time scale for the exponential; large values give slow decay.""")
 
-    base = params.Number(e, doc="""
+    base = param.Number(e, doc="""
         Base of the exponent; the default yields starting_value*exp(-t/time_constant).
         Another popular choice of base is 2, which allows the
         time_constant to be interpreted as a half-life.""")
 
     # CEBALERT: default should be more like 'lambda:0', but that would
     # confuse GUI users.
-    time_fn = params.Callable(default=topo.sim.time,doc="""
+    time_fn = param.Callable(default=topo.sim.time,doc="""
      Function to generate the time used for the decay.""")
 
     def __call__(self):
@@ -216,9 +216,9 @@ class BoundedNumber(NumberGenerator):
     Function object that silently enforces numeric bounds on values
     returned by a callable object.
     """
-    generator = params.Callable(None, doc="Object to call to generate values.")
+    generator = param.Callable(None, doc="Object to call to generate values.")
 
-    bounds = params.Parameter((None,None), doc="""
+    bounds = param.Parameter((None,None), doc="""
         Legal range for the value returned, as a pair.
         
         The default bounds are (None,None), meaning there are actually

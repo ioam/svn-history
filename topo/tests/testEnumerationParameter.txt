@@ -1,4 +1,4 @@
->>> from topo.params import Parameterized
+>>> from topo.param import Parameterized
 >>> from topo.base.parameterclasses import Enumeration
 
 >>> class P(Parameterized):

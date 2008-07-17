@@ -20,7 +20,7 @@ import ImageDraw
 
 import topo.base.parameterclasses as param
 from topo.base.simulation import EventProcessor
-from ..params import Parameterized
+from ..param import Parameterized
 from topo.base.parameterclasses import Number,StringParameter,DictParameter,BooleanParameter
 from topo.base.parameterclasses import Integer,CompositeParameter,Parameter
 from topo.misc.utils import Struct

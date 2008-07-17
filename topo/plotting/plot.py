@@ -13,7 +13,7 @@ from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, Bitmap
 
 from numpy.oldnumeric import zeros, ones, Float, divide,ravel,clip,array
 
-from ..params import Parameterized
+from ..param import Parameterized
 from topo.base.parameterclasses import Number
 from topo.base.sheetview import SheetView
 from topo.base.sheetcoords import SheetCoordinateSystem,Slice

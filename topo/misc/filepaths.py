@@ -17,7 +17,7 @@ __version__='$Revision$'
 import os.path
 import sys
 
-from ..params import Parameter, Parameterized
+from ..param import Parameter, Parameterized
 
 
 class Filename(Parameter):

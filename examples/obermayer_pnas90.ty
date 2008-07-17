@@ -33,7 +33,7 @@ from topo.outputfns.basic import DivisiveNormalizeL1
 from topo.outputfns.basic import KernelMax
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.params import Parameterized
+from topo.param import Parameterized
 
 import topo.patterns.basic
 import topo.patterns.random

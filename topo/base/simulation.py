@@ -54,8 +54,8 @@ $Id$
 """
 __version__='$Revision$'
 
-from .. import params as param
-from ..params.parameterized import as_uninitialized
+from .. import param
+from ..param.parameterized import as_uninitialized
 
 from copy import copy, deepcopy
 
@@ -1252,7 +1252,7 @@ class Simulation(param.Parameterized,OptionalSingleton):
         for ep in self._event_processors.values():
             ep.state_push()
 
-        Parameterized.state_push(self)
+        param.Parameterized.state_push(self)
 
 
     def state_pop(self):
@@ -1265,7 +1265,7 @@ class Simulation(param.Parameterized,OptionalSingleton):
         for ep in self._event_processors.values():
             ep.state_pop()
 
-        Parameterized.state_pop(self)
+        param.Parameterized.state_pop(self)
 
 
     def event_push(self):

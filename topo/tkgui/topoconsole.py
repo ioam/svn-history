@@ -25,10 +25,10 @@ from Tkinter import Frame, StringVar, X, BOTTOM, TOP, Button, \
      NORMAL, Scrollbar, Y, DoubleVar, Widget,Toplevel
 from tkFileDialog import asksaveasfilename,askopenfilename
 
-import topo.params.tk as tk
+import topo.param.tk as tk
 
 import topo
-from ..params import Parameterized
+from ..param import Parameterized
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
 from topo.misc.keyedlist import KeyedList
 from topo.misc.filepaths import resolve_path,normalize_path

@@ -12,7 +12,7 @@ from Tile import Combobox
 
 import topo.sheets
 from topo.sheets import *
-from ..params import Parameterized
+from ..param import Parameterized
 from topo.base.parameterclasses import concrete_descendents
 from topo.base.sheet import Sheet
 import topo.projections

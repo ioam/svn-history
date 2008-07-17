@@ -14,7 +14,7 @@ import __main__
 
 import topo
 
-from ..params import Parameterized
+from ..param import Parameterized
 from topo.base.parameterclasses import Parameter,BooleanParameter, \
      StringParameter,Number,ObjectSelectorParameter, ListParameter, Integer
 from topo.base.sheet import Sheet

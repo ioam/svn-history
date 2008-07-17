@@ -5,7 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from ..params import Parameterized
+from ..param import Parameterized
 from topo.base.parameterclasses import Dynamic
 import plot
 

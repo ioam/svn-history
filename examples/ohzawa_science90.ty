@@ -179,7 +179,7 @@ import topo.base.patterngenerator
 from topo.base import sheetview
 from topo.base.arrayutils import octave_output, centroid
 from topo.base.cf import CFSheet, CFProjection, Projection
-from topo.params import Parameterized
+from topo.param import Parameterized
 from topo.base.projection import ProjectionSheet
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView, ProjectionView

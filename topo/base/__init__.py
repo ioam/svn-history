@@ -2,10 +2,10 @@
 Basic files needed by all Topographica programs.
 
 This package should be self-contained, i.e., should not refer to any
-other part of Topographica other than ..params.  For instance, no file
+other part of Topographica other than ..param.  For instance, no file
 may include an import statement like 'from topo.package.module import'
 or 'import topo.package.module'; the only external reference allowed
-is to ..params.  This policy ensures that all of the packages outside
+is to ..param.  This policy ensures that all of the packages outside
 of this one and params are optional.
 
 $Id$

@@ -46,7 +46,7 @@ inside an existing containter (e.g. a window or a frame):
   t = Tkinter.Toplevel()
   
   # display all the parameters of g in t
-  from topo.params.tk import ParametersFrame
+  from topo.param.tk import ParametersFrame
   ParametersFrame(t,g)
   #should be ParametersFrame(t,g).pack(); see ALERT in ParametersFrame
   
@@ -60,7 +60,7 @@ You want a new window displaying only the parameters of your object:
   g = patterns.Gaussian()
   
   # display all the parameters of g in a new window
-  from topo.params.tk import edit_parameters
+  from topo.param.tk import edit_parameters
   edit_parameters(g)
   
 
@@ -70,7 +70,7 @@ You want to display only some of the parameters of one or more
 Parameterized instances:
 
  ## Existing, non-GUI code
- from ..params import Parameterized,Number,String,Boolean
+ from ..param import Parameterized,Number,String,Boolean
 
  class Object1(Parameterized):
      duration = Number(2.0,bounds=(0,None),doc='Duration of measurement')
@@ -89,7 +89,7 @@ Parameterized instances:
 
  ## Flexible GUI representation: display o1.duration, o1.displacement,
  ## and o2.active_today inside t, ignoring o2.operator_name
- from topo.params.tk import TkParameterized
+ from topo.param.tk import TkParameterized
 
  t1 = TkParameterized(t,o1)
  t2 = TkParameterized(t,o2)
@@ -108,18 +108,18 @@ representing those of an external parameterized instance or class).
   ## Existing class
   from topo import params
   
-  class X(params.Parameterized):
-      one = params.Boolean(True)
-      two = params.Boolean(True)
+  class X(param.Parameterized):
+      one = param.Boolean(True)
+      two = param.Boolean(True)
   
                                                       
   ## Panel to represent an instance of X 
   from Tkinter import Frame
-  from topo.params.tk import TkParameterized
+  from topo.param.tk import TkParameterized
 
   class XPanel(TkParameterized,Frame):
   
-      dock = params.Boolean(False,doc='Whether to attach this Panel')
+      dock = param.Boolean(False,doc='Whether to attach this Panel')
       
       def __init__(self,master,x):
           self.pack_param('dock',side='top',on_change=self.handle_dock)
@@ -187,7 +187,7 @@ from . import Boolean,String,Number,Selector,ClassSelector,\
 
 # CEBALERT: copied from topo.misc.filepaths, to make it clear what we
 # need. I guess we should consider how much of topo.misc.filepaths
-# we might want in topo/params...
+# we might want in topo/param...
 ########################################
 application_path = os.path.split(os.path.split(sys.executable)[0])[0]
 output_path = application_path

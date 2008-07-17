@@ -6,26 +6,26 @@ __version__='$Revision$'
 
 # pylint: disable-msg=W0611
 
-from ..params import Parameter, descendents
+from ..param import Parameter, descendents
 
-from topo.params import Enumeration
-from topo.params import Dynamic
-from topo.params import Number
-from topo.params import Integer
-from topo.params import Magnitude
-from topo.params import NumericTuple
-from topo.params import XYCoordinates
+from topo.param import Enumeration
+from topo.param import Dynamic
+from topo.param import Number
+from topo.param import Integer
+from topo.param import Magnitude
+from topo.param import NumericTuple
+from topo.param import XYCoordinates
 
-from topo.params import Boolean as BooleanParameter
-from topo.params import String as StringParameter
-from topo.params import Callable as CallableParameter
-from topo.params import Composite as CompositeParameter
-from topo.params import Selector as SelectorParameter
-from topo.params import ObjectSelector as ObjectSelectorParameter
-from topo.params import ClassSelector as ClassSelectorParameter
-from topo.params import List as ListParameter
-from topo.params import Dict as DictParameter
+from topo.param import Boolean as BooleanParameter
+from topo.param import String as StringParameter
+from topo.param import Callable as CallableParameter
+from topo.param import Composite as CompositeParameter
+from topo.param import Selector as SelectorParameter
+from topo.param import ObjectSelector as ObjectSelectorParameter
+from topo.param import ClassSelector as ClassSelectorParameter
+from topo.param import List as ListParameter
+from topo.param import Dict as DictParameter
 
-from topo.params import InstanceMethodWrapper
-from topo.params import wrap_callable
-from topo.params import concrete_descendents
+from topo.param import InstanceMethodWrapper
+from topo.param import wrap_callable
+from topo.param import concrete_descendents

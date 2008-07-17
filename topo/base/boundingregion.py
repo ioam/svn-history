@@ -12,7 +12,7 @@ from numpy import inf
 ### matrix notation, not list notation, so that it can be scaled,
 ### translated, etc. easily.
 ###
-from .. import params as param
+from .. import param
 
 class BoundingRegion(param.Parameterized):
     """

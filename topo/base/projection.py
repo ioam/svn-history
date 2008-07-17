@@ -8,7 +8,7 @@ __version__='$Revision$'
 import numpy
 from numpy import array,asarray,ones,sometrue, logical_and, logical_or
 
-from .. import params as param
+from .. import param
 
 from sheet import Sheet
 from simulation import EPConnection

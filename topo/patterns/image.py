@@ -14,7 +14,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.parameterclasses import Number, Parameter, Enumeration, Integer,\
      ClassSelectorParameter, BooleanParameter
 from topo.base.parameterclasses import StringParameter
-from ..params import Parameterized
+from ..param import Parameterized
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
 

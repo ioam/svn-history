@@ -13,7 +13,7 @@ __version__='$Revision$'
 
 import numpy
 
-from .. import params as param
+from .. import param
 
 
 class OutputFn(param.Parameterized):

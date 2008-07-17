@@ -53,7 +53,7 @@ __version__='$Revision: 8319 $'
 ### new version
 
 
-## from topo.params import Parameterized
+## from topo.param import Parameterized
 ## Parameterized.print_level=300
 
 import numpy.oldnumeric as Numeric

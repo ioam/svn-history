@@ -13,7 +13,7 @@ import topo
 from colorsys import hsv_to_rgb
 from topo.base.arrayutils import octave_output, centroid
 from topo.base.cf import CFSheet, CFProjection, Projection
-from ..params import Parameterized
+from ..param import Parameterized
 from topo.base.parameterclasses import ListParameter, BooleanParameter
 from topo.base.projection import ProjectionSheet
 from topo.base.sheet import Sheet

@@ -31,7 +31,7 @@ from topo.plotting.plotgroup import SheetPlotGroup
 
 from parametersframe import ParametersFrame
 from plotgrouppanel import SheetPanel
-from ..params.tk import Button
+from ..param.tk import Button
 from topo.base.simulation import EPConnectionEvent
 from topo.base.sheet import Sheet
 

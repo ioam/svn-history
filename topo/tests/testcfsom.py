@@ -9,7 +9,7 @@ __version__='$Revision$'
 import unittest
 from pprint import pprint
 from topo.plotting import plot
-from topo.params import parameterized 
+from topo.param import parameterized 
 from topo.plotting.bitmap import *
 from topo.base.sheet import Sheet
 from topo.sheets.generatorsheet import *

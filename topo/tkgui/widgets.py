@@ -1,5 +1,5 @@
 
-from topo.params.tk import Menu, AppWindow, Balloon
+from topo.param.tk import Menu, AppWindow, Balloon
 
 TkguiWindow = AppWindow
 ScrolledTkguiWindow = AppWindow

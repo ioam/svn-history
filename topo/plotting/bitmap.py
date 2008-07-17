@@ -28,7 +28,7 @@ from colorsys import hsv_to_rgb
 import numpy.oldnumeric as Numeric, Image, ImageDraw, math, ImageFont, os
 from topo.base.parameterclasses import ListParameter,Integer,CompositeParameter,DictParameter
 from topo.base.parameterclasses import NumericTuple
-from ..params import Parameterized
+from ..param import Parameterized
 from topo.misc.filepaths import application_path
 
 TITLE_FONT = ImageFont.truetype(os.path.join(application_path,'lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)

@@ -10,8 +10,8 @@ from math import pi
 
 from numpy import add,subtract,cos,sin
 
-from .. import params as param
-from ..params.parameterized import ParamOverrides
+from .. import param
+from ..param.parameterized import ParamOverrides
 
 from boundingregion import BoundingBox, BoundingRegionParameter
 from functionfamilies import OutputFn, IdentityOF

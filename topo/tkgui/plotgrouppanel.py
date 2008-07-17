@@ -21,9 +21,9 @@ from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      Scrollbar, Y, VERTICAL, HORIZONTAL, END, NO, NONE,Scrollbar,Canvas, \
      TclError
 
-from .. import params
+from .. import param
 # CEB: maybe bad, since people reading code will probably assume tk is Tkinter
-from ..params import tk
+from ..param import tk
 
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
@@ -73,7 +73,7 @@ class PlotGroupPanel(tk.TkParameterized,Frame):
     __abstract = True
 
 
-    dock = params.Boolean(default=False,doc="on console or not")
+    dock = param.Boolean(default=False,doc="on console or not")
 
     # Default size for images used on buttons
     button_image_size=(20,20)
@@ -109,7 +109,7 @@ class PlotGroupPanel(tk.TkParameterized,Frame):
         will be disabled, because the original data is no longer
         available.""")
     
-    gui_desired_maximum_plot_height = params.Integer(default=150,bounds=(0,None),doc="""
+    gui_desired_maximum_plot_height = param.Integer(default=150,bounds=(0,None),doc="""
         Value to provide for PlotGroup.desired_maximum_plot_height for
         PlotGroups opened by the GUI.  Determines the initial, default
         scaling for the PlotGroup.""")

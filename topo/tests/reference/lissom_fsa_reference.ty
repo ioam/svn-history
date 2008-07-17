@@ -9,7 +9,7 @@ __version__='$Revision$'
 
 # This simulation is still being worked on
 
-## from topo.params import Parameterized
+## from topo.param import Parameterized
 ## Parameterized.print_level=300
 
 import numpy.oldnumeric.random_array as RandomArray
@@ -35,7 +35,7 @@ from topo.outputfns.basic import DivisiveNormalizeL1, PiecewiseLinear
 from topo.base.patterngenerator import PatternGenerator
 from topo.misc.numbergenerators import UniformRandom, NormalRandom, Choice
 from topo.base.parameterclasses import DynamicNumber, Number, ListParameter
-from topo.params import Parameter
+from topo.param import Parameter
 from topo.patterns.basic import Composite, SeparatedComposite, Gaussian, Disk, Constant
 from topo.patterns.image import Image
 
