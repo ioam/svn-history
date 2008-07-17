@@ -32,7 +32,7 @@ class CFPOF_SharedWeight(CFPOutputFn):
 
     Applies the single_cf_fn to the single shared CF's weights.
     """
-    single_cf_fn = ClassSelectorParameter(OutputFn,default=IdentityOF())
+    single_cf_fn = param.ClassSelector(OutputFn,default=IdentityOF())
     
     def __call__(self, cfs, output_activity, norm_values=None, **params):
         """Apply the specified single_cf_fn to every CF."""
@@ -86,9 +86,9 @@ class SharedWeightCFProjection(CFProjection):
     ### JABHACKALERT: Set to be constant as a clue that learning won't
     ### actually work yet, but we could certainly extend it to support
     ### learning if desired, e.g. to learn position-independent responses.
-    learning_fn = ClassSelectorParameter(CFPLearningFn,CFPLF_Identity(),constant=True)
-    output_fn  = ClassSelectorParameter(OutputFn,default=IdentityOF())
-    weights_output_fn = ClassSelectorParameter(
+    learning_fn = param.ClassSelector(CFPLearningFn,CFPLF_Identity(),constant=True)
+    output_fn  = param.ClassSelector(OutputFn,default=IdentityOF())
+    weights_output_fn = param.ClassSelector(
         CFPOutputFn,default=CFPOF_SharedWeight())
 
 
@@ -283,18 +283,18 @@ class OneToOneProjection(Projection):
     coordinate mapper.  Inputs that map outside the bounds of the
     input sheet are treated as having zero weight.
     """
-    coord_mapper = ClassSelectorParameter(CoordinateMapperFn,
+    coord_mapper = param.ClassSelector(CoordinateMapperFn,
         default=IdentityMF(),
         doc='Function to map a destination unit coordinate into the src sheet.')
 
-    weights_generator = ClassSelectorParameter(PatternGenerator,
+    weights_generator = param.ClassSelector(PatternGenerator,
         default=Constant(),constant=True,
         doc="""Generate initial weight values for each unit of the destination sheet.""")
 
-    output_fn  = ClassSelectorParameter(OutputFn,default=IdentityOF(),
+    output_fn  = param.ClassSelector(OutputFn,default=IdentityOF(),
         doc='Function applied to the Projection activity after it is computed.')
 
-    learning_fn = ClassSelectorParameter(LearningFn,default=IdentityLF(),
+    learning_fn = param.ClassSelector(LearningFn,default=IdentityLF(),
         doc="""Learning function applied to weights.""")
 
     learning_rate = param.Number(default=0)

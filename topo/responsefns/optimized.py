@@ -25,7 +25,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
     is equivalent to this one, but it also works for 1D arrays.
     """
 
-    single_cf_fn = ClassSelectorParameter(ResponseFn,DotProduct(),readonly=True)    
+    single_cf_fn = param.ClassSelector(ResponseFn,DotProduct(),readonly=True)    
 
     def __call__(self, iterator, input_activity, activity, strength, **params):
        

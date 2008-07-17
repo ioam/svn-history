@@ -62,7 +62,7 @@ class TestPattern(SheetPanel):
     
     dock = param.Boolean(False)
 
-    edit_sheet = ObjectSelectorParameter(doc="""Sheet for which to edit pattern properties.""")
+    edit_sheet = param.ObjectSelector(doc="""Sheet for which to edit pattern properties.""")
 
     plastic = param.Boolean(default=False,doc="""Whether to enable plasticity during presentation.""")
     duration = param.Number(default=1.0,doc="""How long to run the simulator when presenting.""",
@@ -70,7 +70,7 @@ class TestPattern(SheetPanel):
 
     Present = Button(doc="""Present this pattern to the simulation.""")
 
-    pattern_generator = ClassSelectorParameter(class_=PatternGenerator, doc="""Type of pattern to present. Each type has various parameters that can be changed.""")
+    pattern_generator = param.ClassSelector(class_=PatternGenerator, doc="""Type of pattern to present. Each type has various parameters that can be changed.""")
 
 
 

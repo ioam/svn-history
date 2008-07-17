@@ -521,7 +521,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
     keyname = "ProjectionSheet" # CB: what is this keyname?
 
-    sheet = ObjectSelectorParameter(default=None,doc="""
+    sheet = param.ObjectSelector(default=None,doc="""
     The Sheet from which to produce plots.""")
 
     sheet_type = ProjectionSheet
@@ -669,7 +669,7 @@ class TwoDThingPlotGroup(ProjectionSheetPlotGroup):
 class RFProjectionPlotGroup(TwoDThingPlotGroup):
 
     keyname='RFs'
-    input_sheet = ObjectSelectorParameter(default=None,doc="The sheet on which to measure the RFs.")
+    input_sheet = param.ObjectSelector(default=None,doc="The sheet on which to measure the RFs.")
 
     def _exec_update_command(self): # RFHACK
 	topo.commands.analysis.input_sheet_name = self.input_sheet.name
@@ -679,7 +679,7 @@ class RFProjectionPlotGroup(TwoDThingPlotGroup):
 
 class ProjectionPlotGroup(TwoDThingPlotGroup):
 
-    projection = ObjectSelectorParameter(default=None,doc="The projection to visualize.")
+    projection = param.ObjectSelector(default=None,doc="The projection to visualize.")
     keyname='Weights'                     
 
     def _change_key(self,plotgroup_template,sheet,proj,x,y):

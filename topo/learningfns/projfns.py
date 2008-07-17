@@ -64,7 +64,7 @@ class CFPLF_EuclideanHebbian(CFPLearningFn):
 ##    Activities change only when there is both pre- and post-synaptic activity.
 ##    Threshold is adjusted based on recent firing rates.
 ##    """
-##    single_cf_fn = ClassSelectorParameter(LearningFn,default=BCMFixed())
+##    single_cf_fn = param.ClassSelector(LearningFn,default=BCMFixed())
 ##    
 ##    unit_threshold_0=param.Number(default=0.5,bounds=(0,None),
 ##        doc="Initial value of threshold between LTD and LTP; actual value computed based on recent history.")
@@ -120,7 +120,7 @@ class CFPLF_Trace(CFPLearningFn):
     trace_strength=param.Number(default=0.5,bounds=(0.0,1.0),
        doc="How much the learning is dominated by the activity trace, relative to the current value.")     
 
-    single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),
+    single_cf_fn = param.ClassSelector(LearningFn,default=Hebbian(),
         doc="LearningFn that will be applied to each CF individually.")              
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
@@ -154,7 +154,7 @@ class CFPLF_OutstarHebbian(CFPLearningFn):
     
     NOT YET TESTED.
     """
-    single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),
+    single_cf_fn = param.ClassSelector(LearningFn,default=Hebbian(),
         doc="LearningFn that will be applied to each CF individually.")
 
     outstar_wsum = None
@@ -188,7 +188,7 @@ class HomeoSynaptic(CFPLearningFn):
 
     Does not necessarily require output_fn normalization for stability.
     """
-    single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),
+    single_cf_fn = param.ClassSelector(LearningFn,default=Hebbian(),
        doc="LearningFn that will be applied to each CF individually")
 
     beta_n = param.Number(default=0.01,bounds=(0,None),

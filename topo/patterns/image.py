@@ -260,7 +260,7 @@ class GenericImage(PatternGenerator):
 
     __abstract = True
     
-    output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF())
+    output_fn = param.ClassSelector(OutputFn,default=IdentityOF())
     
     aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),
         softbounds=(0.0,2.0),precedence=0.31,doc="""
@@ -274,7 +274,7 @@ class GenericImage(PatternGenerator):
         precedence=0.95,doc="""
         How to scale the initial image size relative to the default area of 1.0.""")
 
-    whole_image_output_fn = ClassSelectorParameter(
+    whole_image_output_fn = param.ClassSelector(
         OutputFn,default=DivisiveNormalizeLinf(),precedence=0.96,doc="""
         Function applied to the whole, original image array (before any cropping).""")
 

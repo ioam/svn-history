@@ -65,7 +65,7 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
         when deciding how far from the winner to keep updating the weights.
         """)
     
-    neighborhood_kernel_generator = ClassSelectorParameter(PatternGenerator,
+    neighborhood_kernel_generator = param.ClassSelector(PatternGenerator,
         default=Gaussian(x=0.0,y=0.0,aspect_ratio=1.0),
         doc="Neighborhood function")
     

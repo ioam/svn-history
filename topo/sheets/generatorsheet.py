@@ -44,10 +44,10 @@ class GeneratorSheet(Sheet):
         generated and processed before this step is complete.
         """)
     
-    input_generator = ClassSelectorParameter(PatternGenerator,default=Constant(),
+    input_generator = param.ClassSelector(PatternGenerator,default=Constant(),
         doc="""Specifies a particular PatternGenerator type to use when creating patterns.""")
 
-    output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),doc="""
+    output_fn = param.ClassSelector(OutputFn,default=IdentityOF(),doc="""
         Output function to apply (if apply_output_fn is true) to this Sheet's activity.""")
     
     apply_output_fn=param.Boolean(default=True,doc="""

@@ -25,7 +25,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     Intended to be equivalent to, but faster than,
     CFPOF_DivisiveNormalizeL1.
     """
-    single_cf_fn = ClassSelectorParameter(
+    single_cf_fn = param.ClassSelector(
         OutputFn,DivisiveNormalizeL1(norm_value=1.0),readonly=True)
     
     def __call__(self, iterator, mask, **params):
@@ -87,7 +87,7 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
     property of ConnectionField.
     """
 
-    single_cf_fn = ClassSelectorParameter(
+    single_cf_fn = param.ClassSelector(
         OutputFn,default=DivisiveNormalizeL1(norm_value=1.0),constant=True)
 
     def __call__(self, iterator, mask, **params):

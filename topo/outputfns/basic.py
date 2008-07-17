@@ -297,7 +297,7 @@ class PatternCombine(OutputFn):
     Useful for operations like adding noise or masking out lesioned
     items or around the edges of non-rectangular shapes.
     """
-    generator = ClassSelectorParameter(PatternGenerator,
+    generator = param.ClassSelector(PatternGenerator,
         default=Constant(), doc="""
         Pattern to combine with the supplied matrix.""")
 
@@ -344,7 +344,7 @@ class KernelMax(OutputFn):
     kernel_radius = param.Number(default=0.0,bounds=(0,None),doc="""
         Kernel radius in Sheet coordinates.""")
     
-    neighborhood_kernel_generator = ClassSelectorParameter(PatternGenerator,
+    neighborhood_kernel_generator = param.ClassSelector(PatternGenerator,
         default=Gaussian(x=0.0,y=0.0,aspect_ratio=1.0),
         doc="Neighborhood function")
 

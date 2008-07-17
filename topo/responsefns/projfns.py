@@ -76,7 +76,7 @@ class CFPRF_ActivityBased(CFPResponseFn):
     m = param.Number(default=0.25,doc="Time of maximum growth.")
     r = param.Number(default=-200,doc="Growth rate, controls the gradient")
     b = param.Number(default=2,doc="Controls position of maximum growth")
-    single_cf_fn = ClassSelectorParameter(ResponseFn,default=DotProduct(),doc="""
+    single_cf_fn = param.ClassSelector(ResponseFn,default=DotProduct(),doc="""
         ResponseFn to apply to each CF individually.""")
   
     def __call__(self, iterator, input_activity, activity, strength):

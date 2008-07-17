@@ -154,11 +154,11 @@ class LISSOM(JointNormalizingCFSheet):
        Whether to modify the weights after every settling step.
        If false, waits until settling is completed before doing learning.""")
 
-    output_fn = ClassSelectorParameter(OutputFn,default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
+    output_fn = param.ClassSelector(OutputFn,default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
     
     precedence = param.Number(0.6)
     
-    post_initialization_weights_output_fn = ClassSelectorParameter(
+    post_initialization_weights_output_fn = param.ClassSelector(
         CFPOutputFn,default=None,doc="""
         Weights output_fn which can be set after an initial normalization step""")
 

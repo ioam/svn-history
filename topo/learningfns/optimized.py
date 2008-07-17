@@ -31,7 +31,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
     weights are updated during learning, to speed up later operations
     that might depend on it.
     """
-    single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),readonly=True)
+    single_cf_fn = param.ClassSelector(LearningFn,default=Hebbian(),readonly=True)
     
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
@@ -122,7 +122,7 @@ class CFPLF_Trace_opt(CFPLearningFn):
     trace_strength=param.Number(default=0.5,bounds=(0.0,1.0),doc="""
        How much the learning is dominated by the activity trace, relative to the current value.""")
 
-    single_cf_fn = ClassSelectorParameter(LearningFn,default=Hebbian(),readonly=True,
+    single_cf_fn = param.ClassSelector(LearningFn,default=Hebbian(),readonly=True,
         doc="LearningFn that will be applied to each CF individually.")              
 
     def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):

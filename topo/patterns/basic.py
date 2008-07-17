@@ -711,7 +711,7 @@ class Translator(PatternGenerator):
     by an amount based on the global time.
     """
 
-    generator = ClassSelectorParameter(default=Constant(scale=0.0),
+    generator = param.ClassSelector(default=Constant(scale=0.0),
         class_=PatternGenerator,doc="""Pattern to be translated.""")
         
     direction = param.Number(default=0,bounds=(-pi,pi),doc="""

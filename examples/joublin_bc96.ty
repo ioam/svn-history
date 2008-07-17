@@ -73,7 +73,7 @@ class RCells_CFProjection(CFProjection):
         default=BoundingBox(radius=0.1),
         doc="""Bounds defining the neighborhood RF.""")
 
-    neighborhood_weights_shape = ClassSelectorParameter(PatternGenerator,
+    neighborhood_weights_shape = param.ClassSelector(PatternGenerator,
         default=topo.base.patterngenerator.Constant(),constant=True,
         doc="Define the shape of the neighborhood connection fields.")
  
@@ -248,7 +248,7 @@ class RCells_CFPRF_DotProduct_Norm(CFPResponseFn):
     Dot-product response function for projection from Hindpaw to R-cells, with normalization
     """
     
-    single_cf_fn = ClassSelectorParameter(ResponseFn,DotProduct(),constant=True)
+    single_cf_fn = param.ClassSelector(ResponseFn,DotProduct(),constant=True)
     
     def __call__(self, cfs, input_activity, activity, strength, **params):
         rows,cols = activity.shape
@@ -271,7 +271,7 @@ class RCells_CFPRF_DotProduct_Norm_opt(CFPResponseFn):
     Dot-product response function for projection from Hindpaw to R-cells, with normalization
     """
     
-    single_cf_fn = ClassSelectorParameter(ResponseFn,DotProduct(),constant=True)    
+    single_cf_fn = param.ClassSelector(ResponseFn,DotProduct(),constant=True)    
 
     def __call__(self, iterator, input_activity, activity, strength, **params):
         temp_act = activity

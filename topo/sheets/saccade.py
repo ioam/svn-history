@@ -146,7 +146,7 @@ class SaccadeController(CFSheet):
         The function for extracting a single point from sheet activity.
         Should take a sheet as the first argument, and return (x,y).""")
 
-    command_mapper = ClassSelectorParameter(CoordinateMapperFn,default=IdentityMF(),
+    command_mapper = param.ClassSelector(CoordinateMapperFn,default=IdentityMF(),
                                    doc="""
         A CoordinateMapperFn that will be applied to the command vector extracted
         from the sheet activity.""")

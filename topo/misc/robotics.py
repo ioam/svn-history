@@ -35,7 +35,7 @@ class CameraImage(GenericImage):
     camera device.
     """
     
-    camera = ClassSelectorParameter(CameraDevice,default=None,doc="""
+    camera = param.ClassSelector(CameraDevice,default=None,doc="""
        An instance of playerrobot.CameraDevice to be used
        to generate images.""")
 
@@ -105,7 +105,7 @@ class PTZ(EventProcessor):
     can be set as a parameter.
     """
 
-    ptz = ClassSelectorParameter(PTZDevice,default=None,doc="""
+    ptz = param.ClassSelector(PTZDevice,default=None,doc="""
        An instance of playerrobot.PTZDevice to be controlled.""")
     
     zoom = param.Number(default=120,bounds=(0,None),doc="""
