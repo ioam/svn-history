@@ -269,7 +269,7 @@ class GenericImage(PatternGenerator):
     size  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
                    precedence=0.30,doc="Height of the image.")
         
-    size_normalization = Enumeration(default='fit_shortest',
+    size_normalization = param.Enumeration(default='fit_shortest',
         available=['fit_shortest','fit_longest','stretch_to_fit','original'],
         precedence=0.95,doc="""
         How to scale the initial image size relative to the default area of 1.0.""")

@@ -20,7 +20,7 @@ class TestPO(Parameterized):
     ro = Parameter(default="Hello",readonly=True)
     ro2 = Parameter(default=object(),readonly=True,instantiate=True)
 
-    dyn = Dynamic(default=1)
+    dyn = param.Dynamic(default=1)
 
 class AnotherTestPO(Parameterized):
     instPO = Parameter(default=TestPO(),instantiate=True)

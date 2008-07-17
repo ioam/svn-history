@@ -2,7 +2,7 @@
 >>> from topo.base.parameterclasses import Enumeration
 
 >>> class P(Parameterized):
-...     e = Enumeration(default=5,available=[5,6,7])
+...     e = param.Enumeration(default=5,available=[5,6,7])
 
 >>> p = P(e=6)
 >>> p.e
@@ -16,14 +16,14 @@
 ...     raise AssertionError("Enumeration set outside range.")
 
 >>> try:
-...     q = Enumeration(5,[4])
+...     q = param.Enumeration(5,[4])
 ... except ValueError:
 ...     pass
 ... else:
 ...     raise AssertionError("Enumeration created outside range.")
 
 >>> try:
-...     q = Enumeration(5,10)
+...     q = param.Enumeration(5,10)
 ... except TypeError:
 ...     pass
 ... else:

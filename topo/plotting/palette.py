@@ -224,8 +224,8 @@ class Palette(Parameterized):
     of palettes setting the lambda.  More power to you if you do that.
 
     """
-    background = Dynamic(default=BLACK_BACKGROUND)
-    colors_ = Dynamic(default=F())    #(lambda:[(i,i,i) for i in range(256)])
+    background = param.Dynamic(default=BLACK_BACKGROUND)
+    colors_ = param.Dynamic(default=F())    #(lambda:[(i,i,i) for i in range(256)])
 
     def __init__(self,**params):
         """

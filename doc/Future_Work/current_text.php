@@ -1047,7 +1047,7 @@ Actually, there is a third example, but I'll discuss that later.
 We had (2) by default originally (before we changed Dynamic parameters
 to be able to use a time_fn):
 
-class Dynamic(Parameter):
+class param.Dynamic(Parameter):
     ...
     def __get__(self,owner_instance,owner_class):
         val = super(Dynamic,self).__get__(owner_instance,owner_class)
@@ -1068,7 +1068,7 @@ There was no way to have (1).
 
 Now, we have (1) by default, and a more complex system:
 
-class Dynamic(Parameter):
+class param.Dynamic(Parameter):
     time_fn = None                    
     def __init__(self,**params):
         super(Dynamic,self).__init__(**params)
@@ -1147,7 +1147,7 @@ class Parameter(object):
         self.default=default
         ...
 
-class Dynamic(Parameter):
+class param.Dynamic(Parameter):
     __slots__ = ['time_fn']
     def __init__(self,time_fn=None,**args):
         super(Number,self).__init__(**args)
@@ -1162,7 +1162,7 @@ class param.Number(Dynamic):
         ...
 
 # no problem
-d = Dynamic()
+d = param.Dynamic()
 
 # gives error: Dynamic slot 'time_fn' is read only
 n = param.Number()
