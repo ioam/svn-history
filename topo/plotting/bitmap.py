@@ -253,7 +253,7 @@ class MontageBitmap(Bitmap):
         The number of rows in the montage.""")
     cols = Integer(default=2, doc="""
         The number of columns in the montage.""")    
-    shape = CompositeParameter(attribs=['rows','cols'], doc="""
+    shape = param.Composite(attribs=['rows','cols'], doc="""
         The shape of the montage. Same as (self.rows,self.cols).""")
 
     margin = Integer(default=5,doc="""

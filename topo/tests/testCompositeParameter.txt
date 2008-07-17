@@ -5,7 +5,7 @@
 >>> class A(Parameterized):
 ...    x = param.Number(default=0)
 ...    y = param.Number(default=0)
-...    xy = CompositeParameter(attribs=['x','y'])
+...    xy = param.Composite(attribs=['x','y'])
 ... 
 
 # Make an instance and do default checks

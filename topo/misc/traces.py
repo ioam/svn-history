@@ -327,7 +327,7 @@ class SheetPositionTrace(Trace):
     y = param.Number(default=0.0,doc="""
         The y sheet-coordinate of the position to be traced.""")
 
-    position = CompositeParameter(attribs=['x','y'],doc="""
+    position = param.Composite(attribs=['x','y'],doc="""
         The sheet coordinates of the position to be traced.""")
 
     # JPALERT:  Would be nice to some way to set up the coordinate system
