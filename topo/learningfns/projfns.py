@@ -200,7 +200,7 @@ class HomeoSynaptic(CFPLearningFn):
     activity_target = param.Number(default=0.1,bounds=(0,None),
          doc="Target average activity")
 
-    #debug = BooleanParameter(default=False,doc="Print average activity values")
+    #debug = param.Boolean(default=False,doc="Print average activity values")
     #beta_n = param.Number(default=0.00033,bounds=(0,None),doc="Homeostatic learning rate") #Too small?
     #beta_c = param.Number(default=0.000033,bounds=(0,None),doc="Time window over which the neuron's firing rate is averaged")
     

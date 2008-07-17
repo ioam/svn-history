@@ -68,7 +68,7 @@ class WhiskerArray(PatternGenerator):
     speed = param.Number(default=0.09,bounds=(0.0,None),doc="""
         Sweep speed, i.e. distance moved in one time step.  Also scales the deflection.""")
 
-    rectify = BooleanParameter(default=True,doc="""
+    rectify = param.Boolean(default=True,doc="""
         Whether or not to suppress firing in depressed ganglion. 1 means to rectify, 0 to not.""")
 
     whisker = Integer(default=(0), doc="""
@@ -162,7 +162,7 @@ class TestWhiskerArray(PatternGenerator):
    
     speed = param.Number(1)
     
-    rectify = BooleanParameter(default=True,doc="""
+    rectify = param.Boolean(default=True,doc="""
         Whether or not to suppress firing in depressed ganglion. 1 means to rectify, 0 to not.""")
     
     whisker = Integer(default=0, doc="""
@@ -210,7 +210,7 @@ class WhiskerBotData(PatternGenerator):
     whiskerBot_gain = param.Number(default=3.14,bounds=(0.0,20.0),doc="""
         Scale the WhiskerBot strain data""")
     
-    rectify = BooleanParameter(default=True,doc="""
+    rectify = param.Boolean(default=True,doc="""
         Whether or not to supress firing in depressed ganglion cell. 1 is to rectify, 0 is to not""")
 
     time_step = Integer(default = 1,bounds=(1,50),doc="""
@@ -220,7 +220,7 @@ class WhiskerBotData(PatternGenerator):
         Choose WhiskerBot data to present. Data are stored in examples/whiskers/wbot_object_data:
         1:Concave surface, 2:Ball, 3:Chequerboard, 4:vertical ridges.""") 
 	
-    plot_vectors = BooleanParameter(default = True,doc="""
+    plot_vectors = param.Boolean(default = True,doc="""
         Display vector plots from Matlab.""")
     
 

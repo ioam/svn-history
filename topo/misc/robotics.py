@@ -114,7 +114,7 @@ class PTZ(EventProcessor):
     speed = param.Number(default=200,bounds=(0,None),doc="""
        Desired max pan/tilt speed in deg/sec.""")
 
-    invert_amplitude = BooleanParameter(default=False,doc="""
+    invert_amplitude = param.Boolean(default=False,doc="""
        Invert the sense of the amplitude signal, in order to get the
        appropriate ipsi-/contralateral sense of saccades.""")
 

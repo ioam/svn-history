@@ -60,7 +60,7 @@ class TemplatePlotGroupPanel(SheetPanel):
 
     plotgroup_type = TemplatePlotGroup
 
-    strength_only = BooleanParameter(default=False,doc="""If true, disables all but the Strength channel of each plot,
+    strength_only = param.Boolean(default=False,doc="""If true, disables all but the Strength channel of each plot,
 disabling all color coding for Strength/Hue/Confidence plots.""")
 
     ####################################################################

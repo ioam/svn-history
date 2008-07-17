@@ -150,7 +150,7 @@ class LISSOM(JointNormalizingCFSheet):
        activation.  The next external (i.e., afferent or feedback)
        event will then start the counter over again.""")
 
-    continuous_learning = BooleanParameter(default=False, doc="""
+    continuous_learning = param.Boolean(default=False, doc="""
        Whether to modify the weights after every settling step.
        If false, waits until settling is completed before doing learning.""")
 

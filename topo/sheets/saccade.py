@@ -194,7 +194,7 @@ class ShiftingGeneratorSheet(SequenceGeneratorSheet):
         The bounds for saccades.  Saccades are constrained such that the centroid of the
         sheet bounds remains within this region.""")
 
-    generate_on_shift = BooleanParameter(default=True,doc="""
+    generate_on_shift = param.Boolean(default=True,doc="""
        Whether to generate a new pattern when a shift occurs.""")
                                          
     fixation_jitter = param.Number(default=0,doc="""

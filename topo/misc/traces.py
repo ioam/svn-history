@@ -360,7 +360,7 @@ class TraceGroup(Parameterized):
        Height spacing adjustment between plots.  Larger values
        produce more space.""")
 
-    time_axis_relative = BooleanParameter(default=False,doc="""
+    time_axis_relative = param.Boolean(default=False,doc="""
        Whether to plot the time-axis tic values relative to the start
        of the plotted time range, or in absolute values.""")
 

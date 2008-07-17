@@ -21,7 +21,7 @@ from topo.tkgui.parametersframe import ParametersFrameWithApply
 
 
 class TestPO(Parameterized):
-    boo = BooleanParameter(default=True)
+    boo = param.Boolean(default=True)
     osp = ObjectSelectorParameter()
     csp = ClassSelectorParameter(class_=PatternGenerator)
     const = Parameter(1.0,constant=True)

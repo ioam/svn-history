@@ -41,7 +41,7 @@ class SLISSOM(LISSOM):
     spike_amplitude = param.Number(default=1.0,bounds=(0,None),
 	doc="Amplitude of spike at the moment of spiking")
 
-    reset_on_new_iteration = BooleanParameter(default=False,
+    reset_on_new_iteration = param.Boolean(default=False,
 	doc="Reset activity and projection activity when new iteration starts")
 
     noise_rate = param.Number(default=0.0,bounds=(0,1.0),

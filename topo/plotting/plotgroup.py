@@ -193,7 +193,7 @@ class PlotGroup(Parameterized):
 
 class SheetPlotGroup(PlotGroup):
 
-    sheet_coords = BooleanParameter(default=False,doc="""
+    sheet_coords = param.Boolean(default=False,doc="""
         Whether to scale plots based on their relative sizes in sheet
         coordinates.  If true, plots are scaled so that their sizes are
         proportional to their area in sheet coordinates, so that one can
@@ -201,7 +201,7 @@ class SheetPlotGroup(PlotGroup):
         similar sizes on screen, regardless of their corresponding
         sheet areas, which maximizes the size of each plot.""")
 
-    normalize = BooleanParameter(default=False,doc="""
+    normalize = param.Boolean(default=False,doc="""
         Whether to scale plots so that the peak value will be white
         and the minimum value black.  Otherwise, 0.0 will be black
         and 1.0 will be white.  Normalization has the advantage of
@@ -211,14 +211,14 @@ class SheetPlotGroup(PlotGroup):
         but only values between 0.0 and 1.0 will be visibly
         distinguishable.""")
 
-    integer_scaling = BooleanParameter(default=False,doc="""
+    integer_scaling = param.Boolean(default=False,doc="""
         When scaling bitmaps, whether to ensure that the scaled bitmap is an even
         multiple of the original.  If true, every unit will be represented by a
         square of the same size.  Typically false so that the overall area will
         be correct, e.g. when using Sheet coordinates, which is often more
         important.""")
 
-    auto_refresh = BooleanParameter(default=False,doc="""
+    auto_refresh = param.Boolean(default=False,doc="""
         If this plot is being displayed persistently (e.g. in a GUI),
         whether to regenerate it automatically whenever the simulation
         time advances.  The default is False, because many plots are
@@ -238,7 +238,7 @@ class SheetPlotGroup(PlotGroup):
         directly to disk.  Larger values (e.g. 150) are suitable when
         displaying plots on screen.""")
         
-    enforce_minimum_plot_height = BooleanParameter(default=True,doc="""
+    enforce_minimum_plot_height = param.Boolean(default=True,doc="""
         If true, ensure that plots are never shown smaller than their
         native size, i.e. with fewer than one pixel per matrix unit.
         This option is normally left on for safety, so that no
@@ -447,7 +447,7 @@ class TemplatePlotGroup(SheetPlotGroup):
     doc = param.String(default="",
       doc="Documentation string describing this type of plot.")
 
-    plot_immediately=BooleanParameter(False,doc="""
+    plot_immediately=param.Boolean(False,doc="""
       Whether to call the plot command at once or only when the user asks for a refresh.
 
       Should be set to true for quick plots, but false for those that take a long time
@@ -698,7 +698,7 @@ class ProjectionPlotGroup(TwoDThingPlotGroup):
 class CFProjectionPlotGroup(ProjectionPlotGroup):
     """Visualize one CFProjection."""
 
-    situate = BooleanParameter(default=False,doc="""
+    situate = param.Boolean(default=False,doc="""
     If True, plots the weights on the entire source sheet, using zeros
     for all weights outside the ConnectionField.  If False, plots only
     the actual weights that are stored.""")
@@ -783,7 +783,7 @@ class ConnectionFieldsPlotGroup(UnitPlotGroup):
 
     sheet_type = CFSheet
 
-    situate = BooleanParameter(default=False,doc="""
+    situate = param.Boolean(default=False,doc="""
     If True, plots the weights on the entire source sheet, using zeros
     for all weights outside the ConnectionField.  If False, plots only
     the actual weights that are stored.""")

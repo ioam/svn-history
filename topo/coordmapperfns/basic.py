@@ -102,7 +102,7 @@ class Polar2Cartesian(CoordinateMapperFn):
     Map from polar (radius,angle) to Cartesian (x,y) coordinates.
     """
 
-    degrees=BooleanParameter(default=True,
+    degrees=param.Boolean(default=True,
         doc="Indicates whether the input angle is in degrees or radians.")
 
     def __call__(self, r, theta):
@@ -118,10 +118,10 @@ class Cartesian2Polar(CoordinateMapperFn):
     Maps from Cartesian (x,y) to polar (radius,angle).
     """
 
-    degrees = BooleanParameter(default=True,
+    degrees = param.Boolean(default=True,
         doc="Indicates whether the output angle is in degrees or radians.")
 
-    negative_radii = BooleanParameter(default = False,
+    negative_radii = param.Boolean(default = False,
         doc="""If true, coordinates with negative x values will be
         given negative radii, and angles between -90 and 90
         degrees. (useful for mapping to saccade amplitude/direction space)""")

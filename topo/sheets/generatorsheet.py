@@ -50,7 +50,7 @@ class GeneratorSheet(Sheet):
     output_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),doc="""
         Output function to apply (if apply_output_fn is true) to this Sheet's activity.""")
     
-    apply_output_fn=BooleanParameter(default=True,doc="""
+    apply_output_fn=param.Boolean(default=True,doc="""
         Whether to apply the output_fn after computing an Activity matrix.""")
     
     def __init__(self,**params):

@@ -287,7 +287,7 @@ class Subplotting(Parameterized):
         ["Activity", "Connection Fields", "Projection", "Projection Activity"],
         doc="List of plotgroups for which to set subplots.")
 
-    subplotting_declared = BooleanParameter(default=False,
+    subplotting_declared = param.Boolean(default=False,
         doc="Whether set_subplots has previously been called")
     
     @staticmethod    

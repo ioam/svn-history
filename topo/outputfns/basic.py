@@ -436,7 +436,7 @@ class OutputFnWithState(OutputFn):
     override_plasticity_state().
     """
 
-    plastic = BooleanParameter(default=True, doc="""
+    plastic = param.Boolean(default=True, doc="""
         Whether or not to update the internal state on each call.
         Allows plasticity to be turned off during analysis, and then re-enabled.""")
 

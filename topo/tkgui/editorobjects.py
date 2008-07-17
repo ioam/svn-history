@@ -180,8 +180,8 @@ class EditorSheet(EditorNode):
     Canvas. The colours used for drawing can be set. Uses bounding box to
     determine if x, y coord is within its boundary.
     """
-    normalize = BooleanParameter(default=False)
-    show_density = BooleanParameter(default=False)
+    normalize = param.Boolean(default=False)
+    show_density = param.Boolean(default=False)
     view = Enumeration(default='activity',
                        available=['normal','activity'])
     

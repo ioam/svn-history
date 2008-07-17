@@ -281,7 +281,7 @@ class GenericImage(PatternGenerator):
     pattern_sampler_type = Parameter(default=PatternSampler, doc="""
         The type of PatternSampler to use to resample/resize the image.""")
 
-    cache_image = BooleanParameter(default=True,doc="""
+    cache_image = param.Boolean(default=True,doc="""
         If False, discards the image after drawing the pattern each time,
         to make it possible to use very large databases of images without
         running out of memory.""")

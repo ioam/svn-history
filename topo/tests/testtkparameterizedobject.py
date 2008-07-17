@@ -30,7 +30,7 @@ from topo.param.tk import TkParameterized
 
 
 class SomeFrame(TkParameterized,Frame):
-    boo = BooleanParameter(default=True)
+    boo = param.Boolean(default=True)
     osp = ObjectSelectorParameter()
     csp = ClassSelectorParameter(class_=PatternGenerator)
     const = Parameter(1.0,constant=True)
@@ -47,7 +47,7 @@ class SomeFrame(TkParameterized,Frame):
         self.boocount+=1
 
 class TestPO(Parameterized):
-    bool_param = BooleanParameter(default=False)
+    bool_param = param.Boolean(default=False)
 
 
 
