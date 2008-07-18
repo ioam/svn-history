@@ -22,7 +22,6 @@ from topo.sheets.lissom import LISSOM, JointScaling
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import Number
 from topo.base.cf import CFSheet, CFPLF_PluginScaled
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
