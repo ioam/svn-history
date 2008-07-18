@@ -1,0 +1,442 @@
+""" 
+
+$Id$
+"""
+__version__='$Revision: 8197 $'
+
+import fixedpoint
+import numpy
+
+from math import pi, sqrt
+from fixedpoint import FixedPoint
+
+import topo.patterns.basic
+import topo.patterns.random
+
+from topo.patterns.basic import Gaussian, Rectangle
+from topo.sheets.lissom import JointScaling, LISSOM
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.projections.basic import CFProjection, SharedWeightCFProjection
+from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.base.cf import CFSheet, CFPLF_PluginScaled, CFPOF_Plugin
+from topo.base.boundingregion import BoundingBox
+from topo.learningfns.optimized import CFPLF_Hebbian_opt
+from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF, IdentityOF, ActivityAveragingOF, AttributeTrackingOF 
+from topo.outputfns.basic import Sigmoid, HalfRectify, HomeostaticMaxEnt
+from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
+from topo.patterns.image import Image
+from topo.coordmapperfns.basic import Jitter
+#import contrib.jsldefs
+#from contrib.jsldefs import species_analysis_function
+
+species=locals().get('species',"mouse")
+#########Parameters specific to species#############################
+
+#Representing 1 slice 2-photon imaging of a patch of V1###
+#One sheet coordinate = 1 mm
+if species=="cat":
+    topo.sim.name="cat"
+    jitter_scale=locals().get('jitter_scale',0.0) 
+    
+    #Cortical magnification - changes degrees of visual angle into sheet coordinates 1mm cortex = 2 degrees of retinal space
+    mag_factor=locals().get('mag_factor',2)
+
+    # divide all by a scaling factor for visualization
+    #LGN RF sizes
+    centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+    surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+
+    #Receptive field sizes
+    Afferent_size=0.375
+    #2.5/2/mag_factor = 
+    LGNAfferent_size=0.625
+    Lat_inh_size=0.22917
+    Lat_exc_size=0.03
+
+    #Sheet sizes # divide all by a scaling factor for visualization
+    V1_size = 0.3/2
+    LGN_size = 0.3/2+LGNAfferent_size+jitter_scale #=0.775
+    Retina_size= 65/mag_factor #LGN_size + Afferent_size #should be 65 (assuming 130x130 degree retina)/2 (mag factor)
+
+#65/mag_factor is the actual retina size - made retina smaller because too big to simulate - only simulate area of retina which V1 2 photon connects directly to
+
+    default_density = locals().get('default_density',10/(V1_size*2))
+    default_lgn_density = locals().get('default_lgn_density',48/((LGN_size-jitter_scale)*2)) #set density so that lgn has density 48
+    default_retinal_density = locals().get('default_retinal_density',48/(Retina_size*2))
+
+
+    input_bounds=locals().get('input_bounds',Retina_size)
+    gauss_size=locals().get('gauss_size',0.088388) # scale approximately to retina - need to scale based on afferent rf size
+
+    dataset=locals().get('dataset',"Gaussian")
+    nat_size=locals().get('nat_size',10)
+    num_inputs=locals().get('num_inputs',2) #6 inputs frequency 1 seems to work for nojitter
+    frequency=locals().get('frequency',0.5) #V1 is 11 times less likely to be activard (11 times smaller area)?
+    scale= locals().get('scale', 1.0)
+
+if species=="mouse":
+    topo.sim.name="mouse"
+    jitter_scale=locals().get('jitter_scale',0.0) # Large jitter in CF centers
+    
+    #Cortical magnification 1mm of cortex coresponds to 65 degrees of retinal space
+    mag_factor=locals().get('mag_factor',65)
+
+    #LGN RF sizes
+    #6/mag_factor = 0.046 *2
+    #17/mag_factor = 0.131 *2
+    centerg   = Gaussian(size=0.092,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()) #not sure how RF size corresponds to gaussian size - is it radius or diameter?
+    surroundg = Gaussian(size=0.262,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()) #Diameter works much better
+    
+
+    #Receptive field sizes
+    Afferent_size=0.375#3*17/2/mag_factor
+    #35/2/mag_factor = 
+    LGNAfferent_size=0.269#actual arbor size not very different from lissom, retina and V1 just so small.....
+    Lat_inh_size=0.8/2
+    Lat_exc_size=0.05
+
+    #Sheet sizes
+    # 1mm corresponds to 1.0 sheet coordinates, sizes are radii
+    # Simulate sizes corresponding to V1 which directly responds to 60x60 deg. retina (approx half size)
+    V1_size=30.0/mag_factor
+    LGN_size=V1_size+LGNAfferent_size+jitter_scale
+    Retina_size=LGN_size+Afferent_size #Retina size in degrees - 143 x 143?
+   
+
+    #0.3 in V1 corresponds to 10 units
+    default_density = locals().get('default_density',V1_size*2.0*10/0.3)
+    default_lgn_density = locals().get('default_lgn_density',48/((LGN_size)*2))
+    default_retinal_density = locals().get('default_retinal_density',48/(Retina_size*2))
+
+    input_bounds=locals().get('input_bounds',Retina_size)
+    gauss_size=locals().get('gauss_size',0.088388*Retina_size/1.125) #increase size of gaussians relative to original lissom retina size
+
+    dataset=locals().get('dataset',"Gaussian")
+    nat_size=locals().get('nat_size',10)
+    num_inputs=locals().get('num_inputs',2) #maybe increase the number to get quicker development
+    frequency=locals().get('frequency',1.4)
+    scale= locals().get('scale', 1.0)
+    
+if species=="lissom":
+    topo.sim.name="lissom"
+    jitter_scale=locals().get('jitter_scale',0.0) 
+    
+    #Cortical magnification - changes degrees of visual angle into sheet coordinates 1mm cortex = 2 degrees of retinal space
+    mag_factor=locals().get('mag_factor',1)
+
+    # divide all by a scaling factor for visualization
+    #LGN RF sizes
+    centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+    surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+
+    #Receptive field sizes
+    Afferent_size=0.375
+    LGNAfferent_size=0.27083
+    Lat_inh_size=0.22917
+    Lat_exc_size=0.03
+
+    #Sheet sizes # divide all by a scaling factor for visualization
+    V1_size = 0.3/2 # just decresed the size of V1
+    LGN_size = 0.5+LGNAfferent_size+jitter_scale #made size of normal lissom sheet
+    Retina_size= LGN_size + Afferent_size #made size of normal lissom retina
+
+    default_density = locals().get('default_density',10/(V1_size*2))
+    default_lgn_density = locals().get('default_lgn_density',24) #used normal densities
+    default_retinal_density = locals().get('default_retinal_density',24)
+
+
+    input_bounds=locals().get('input_bounds',Retina_size)
+    gauss_size=locals().get('gauss_size',0.088388) # scale approximately to retina - need to scale based on afferent rf size
+
+    dataset=locals().get('dataset',"Gaussian")
+    nat_size=locals().get('nat_size',10) 
+    num_inputs=locals().get('num_inputs',2) 
+    frequency=locals().get('frequency',2) #Units still just as likely to be activated...
+    scale= locals().get('scale', 1.0)
+ 
+###############################################################
+####Different input types which can be used for development###
+#dataset=locals().get('dataset',"Gaussian") #set the input type by choosing the dataset parameter 
+
+#Set targets based on frequency of occurance of V1 activation
+#frequency=locals().get('frequency',1)
+
+if dataset=="Gaussian":
+    input_type=Gaussian
+    #in the case where dataset=Gaussian, must also set the number of Gaussians per iteration, default is 2
+    inputs=[input_type(x=UniformRandom(lbound=-input_bounds,ubound=input_bounds,seed=12+i),
+                       y=UniformRandom(lbound=-input_bounds,ubound=input_bounds,seed=35+i),
+                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
+                       size=gauss_size, aspect_ratio=4.66667, scale=scale, bounds=BoundingBox(radius=input_bounds))
+            #Set the contrast of the gaussian patterns by setting the scale parameter.
+            for i in xrange(num_inputs)]
+    
+    combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=0,generators=inputs)
+    
+elif dataset=="Natural":
+    
+    input_type=topo.patterns.image.Image
+    image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+    inputs=[input_type(filename=f,
+                       size=nat_size,  #size_normalization='original',(size=10.0)
+                       x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
+                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=65))
+		for f in image_filenames]
+
+    combined_inputs =topo.patterns.basic.Selector(generators=inputs)
+
+elif dataset=="NoisyDisks":
+    disk_scale=locals().get('diskscale',0.35)
+    #Set the contrast of the disk pattern by setting the disk_scale parameter, map development also depends on the contrast of the disk edges.
+    input_type=topo.patterns.basic.Composite
+    inputs=[input_type(operator=numpy.add,
+                       generators=[topo.patterns.basic.Disk(x=UniformRandom(lbound=-2.125,ubound=2.125,seed=12),
+                                                            y=UniformRandom(lbound=-2.125,ubound=2.125,seed=36),
+                                                            size=2.0, aspect_ratio=1.0, scale=disk_scale,
+                                                            offset=0.5,
+                                                            bounds=BoundingBox(radius=input_bounds), smoothing=0.1),
+                                   topo.patterns.random.UniformRandom(offset=locals().get('rand_offset',-0.5), scale=locals().get('rand_scale',1.0))])]
+    #Set the scale of the noise by setting the rand_offset and rand_scale parameters, note that the disk/noise signal ratio also depends on the retinal density      
+    combined_inputs =topo.patterns.basic.Selector(generators=inputs)
+
+elif dataset=="Disks":
+    disk_scale=locals().get('diskscale',0.5)
+    input_type=topo.patterns.basic.Disk
+    inputs=[input_type(x=UniformRandom(lbound=-2.125,ubound=2.125,seed=12),
+                       y=UniformRandom(lbound=-2.125,ubound=2.125,seed=36),
+                       size=2.0, aspect_ratio=1.0, scale=disk_scale,
+                       offset=0.5,
+                       bounds=BoundingBox(radius=input_bounds), smoothing=0.1)]
+            
+    combined_inputs =topo.patterns.basic.Selector(generators=inputs)
+
+elif dataset=="NoisyDiskstoNatural":
+    #This dataset mimics pre and post eye-opening development - scheduled changes must also be set to ensure the input pattern changes at simulated eye opening
+    disk_scale=locals().get('diskscale',0.35)
+    disks_input_type=topo.patterns.basic.Composite
+    disks_inputs=[disks_input_type(operator=numpy.add,
+                       generators=[topo.patterns.basic.Disk(x=UniformRandom(lbound=-2.125,ubound=2.125,seed=12),
+                                                            y=UniformRandom(lbound=-2.125,ubound=2.125,seed=36),
+                                                            size=2.0, aspect_ratio=1.0, scale=disk_scale,
+                                                            offset=0.5,
+                                                            bounds=BoundingBox(radius=input_bounds), smoothing=0.1),
+                                   topo.patterns.random.UniformRandom(offset=locals().get('rand_offset',-0.5), scale=locals().get('rand_scale',1.0))])]
+
+    combined_inputs =topo.patterns.basic.Selector(generators=disks_inputs)      
+   
+    
+    natural_input_type=topo.patterns.image.Image
+    image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+    natural_inputs=[natural_input_type(filename=f,
+                       size=10.0,  #size_normalization='original',(size=10.0)
+                       x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
+                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=65))
+		for f in image_filenames]
+
+    natural_combined_inputs =topo.patterns.basic.Selector(generators=natural_inputs)
+
+###############################################################################
+
+#Sheet coordinates of units to track for debugging
+units=locals().get('units',[(0.0, 0.0)])
+
+#Smoothing value for exponential averaging
+smoothing=locals().get('smoothing',0.999)
+V1_smoothing=locals().get('V1_smoothing',0.999) # Allows different smoothing for averaging  V1 activity and averaging afferent activity.
+
+#Output functions: Sheets
+#LGN
+LGN_on_output_fn=HalfRectify()
+LGN_off_output_fn=HalfRectify()
+
+#Set targets based on frequency of occurance of V1 activation
+frequency=locals().get('frequency',2)
+
+#Target average afferent activity and target average V1 activity set based on
+#frequency and balance between afferent and lateral activity
+mu=locals().get('mu',0.0045*frequency)
+balance = locals().get('balance',4.0)
+afferent_target = locals().get('afferent_target',mu*balance)
+
+#V1
+Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
+HE=HomeostaticMaxEnt(smoothing=V1_smoothing,
+                     eta=locals().get('eta',0.016), mu=mu, step=9)
+V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['a', 'b','y_avg'], units=units, step=9)
+V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
+       
+#Output Functions: Projections
+#Debugging
+#LGNOnAfferent
+LGNOn_Avg=ActivityAveragingOF(smoothing=smoothing,step=1)
+LGNOn_Tracker=AttributeTrackingOF(object=LGNOn_Avg,coordframe="topo.sim['V1']", attrib_names=['x_avg'], units=units, step=1)
+LGNOn_OF = PipelineOF(output_fns=[LGNOn_Avg, LGNOn_Tracker])
+
+#LGNOffAfferent
+LGNOff_Avg=ActivityAveragingOF(smoothing=smoothing,step=1)
+LGNOff_Tracker=AttributeTrackingOF(object=LGNOff_Avg,coordframe="topo.sim['V1']", attrib_names=['x_avg'], units=units, step=1)
+LGNOff_OF = PipelineOF(output_fns=[LGNOff_Avg, LGNOff_Tracker])
+
+#LateralExcitatory
+LatEx_Avg=ActivityAveragingOF(initial_average=0.0,smoothing=smoothing,step=1)
+LatEx_Tracker=AttributeTrackingOF(object=LatEx_Avg,coordframe="topo.sim['V1']", attrib_names=['x_avg'], units=units, step=1)
+LatEx_OF = PipelineOF(output_fns=[LatEx_Avg, LatEx_Tracker])
+
+#LateralInhibitory
+LatIn_Avg=ActivityAveragingOF(initial_average=0.0,smoothing=smoothing,step=1)
+LatIn_Tracker = AttributeTrackingOF(object=LatIn_Avg,coordframe="topo.sim['V1']", attrib_names=['x_avg'], units=units, step=1)
+LatIn_OF = PipelineOF(output_fns=[LatIn_Avg, LatIn_Tracker])
+
+# Specify weight initialization, response function, and learning function
+numpy.random.seed((500,500))
+
+CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.weights_generator = topo.patterns.basic.Constant()
+CFProjection.response_fn=CFPRF_DotProduct_opt()
+CFProjection.learning_fn=CFPLF_Hebbian_opt()
+CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
+SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
+
+
+# DoG weights for the LGN
+    
+on_weights = topo.patterns.basic.Composite(
+    generators=[centerg,surroundg],operator=numpy.subtract)
+
+off_weights = topo.patterns.basic.Composite(
+    generators=[surroundg,centerg],operator=numpy.subtract)
+
+jitterOn = Jitter(gen =UniformRandom(seed=1023), scale=jitter_scale)
+jitterOff = Jitter(gen =UniformRandom(seed=513), scale=jitter_scale)
+
+
+#Function for generating Gaussian random initial weights
+def gauss_rand(size):
+    return topo.patterns.basic.Composite(operator=numpy.multiply, 
+                                         generators=[Gaussian(aspect_ratio=1.0, size=size),
+                                                     topo.patterns.random.UniformRandom()])
+
+#Whether or not to use divisive weights normalization
+norm=locals().get('norm',True)
+
+if norm==False:
+    pi=topo.base.cf.CFPOF_Plugin(single_cf_fn=topo.outputfns.basic.IdentityOF())
+else:
+    pi = None
+
+
+###########################################
+# build simulation
+
+topo.sim['Retina']=GeneratorSheet(nominal_density=default_retinal_density,
+                                  input_generator=combined_inputs,
+                                  period=1.0, phase=0.05,
+                                  nominal_bounds=BoundingBox(radius=Retina_size))
+
+topo.sim['LGNOn']=CFSheet(nominal_density=default_lgn_density,
+                          nominal_bounds=BoundingBox(radius=LGN_size),
+                          output_fn=LGN_on_output_fn,
+                          measure_maps=False)
+
+topo.sim['LGNOff']=CFSheet(nominal_density=default_lgn_density,
+                           nominal_bounds=BoundingBox(radius=LGN_size),
+                           output_fn=LGN_off_output_fn,
+                           measure_maps=False)
+
+
+
+topo.sim['V1'] = JointScaling(nominal_density=default_density,
+                              nominal_bounds=BoundingBox(radius=V1_size),tsettle=9,
+                              plastic=True,output_fn=V1_OF,
+                              post_initialization_weights_output_fn=pi,
+                              target=afferent_target, smoothing=smoothing,
+                              target_lr=locals().get('target_lr',0.045))
+
+topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
+                 connection_type=SharedWeightCFProjection,strength=locals().get('ret_strength',2.33),
+                 nominal_bounds_template=BoundingBox(radius=Afferent_size),name='Afferent',
+                 weights_generator=on_weights)
+
+topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
+                 connection_type=SharedWeightCFProjection,strength=locals().get('ret_strength',2.33),
+                 nominal_bounds_template=BoundingBox(radius=Afferent_size),name='Afferent',
+                 weights_generator=off_weights)
+
+topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
+                 connection_type=CFProjection,coord_mapper=jitterOn,
+                 learning_fn=CFPLF_PluginScaled(),
+                 strength=1.0,name='LGNOnAfferent',
+                 weights_generator=gauss_rand(size=2*LGNAfferent_size),
+                 nominal_bounds_template=BoundingBox(radius=LGNAfferent_size),
+		 learning_rate=locals().get('aff_lr',0.137))
+               		 
+topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
+		 connection_type=CFProjection,coord_mapper=jitterOff,
+                 learning_fn=CFPLF_PluginScaled(),
+                 strength=1.0,name='LGNOffAfferent',
+                 weights_generator=gauss_rand(size=2*LGNAfferent_size),
+                 nominal_bounds_template=BoundingBox(radius=LGNAfferent_size),
+		 learning_rate=locals().get('aff_lr',0.137))
+
+topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
+                 connection_type=CFProjection,
+                 strength=1.0*locals().get('exc_strength',1.0),
+                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=Lat_exc_size),
+                 nominal_bounds_template=BoundingBox(radius=Lat_exc_size),learning_rate=0.0) 
+        
+topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
+                 connection_type=CFProjection,
+                 strength=-1.0*locals().get('inh_strength',1.0),
+                 #inh_strength should be increased for more distributed datasets i.e. when the frequency parameter is higher
+                 weights_generator=gauss_rand(size=2*Lat_inh_size),
+                 nominal_bounds_template=BoundingBox(radius=Lat_inh_size),learning_rate=locals().get('lat_lr',1.80873))
+
+
+#Output functions for tracking
+topo.sim["V1"].projections()["LGNOnAfferent"].output_fn=LGNOn_OF
+topo.sim["V1"].projections()["LGNOffAfferent"].output_fn=LGNOff_OF
+topo.sim["V1"].projections()["LateralExcitatory"].output_fn=LatEx_OF
+topo.sim["V1"].projections()["LateralInhibitory"].output_fn=LatIn_OF
+
+
+# default locations for model editor
+topo.sim.grid_layout([[None,    'V1',     None],
+                      ['LGNOn', None,     'LGNOff'],
+                      [None,    'Retina', None]], xstart=150)
+
+### Input pattern changes
+changetime = locals().get('changetime',6000)# Time at which patterns or strengths are set to change
+
+changetargets = locals().get('changetargets',True) #If false, targets for afferent scaling and output function adjustment are not changed.
+if dataset=="NoisyDiskstoNatural":
+    if changetargets==True:
+        new_frequency = locals().get('new_frequency',5)
+        new_balance = locals().get('new_balance',4)
+        new_mu=0.0045*new_frequency
+        new_afferent_target = new_mu*new_balance
+        topo.sim.schedule_command(changetime,'topo.sim["Retina"].set_input_generator(natural_combined_inputs,push_existing=False)')
+        topo.sim.schedule_command(changetime,'topo.sim["V1"].target=new_afferent_target')
+        if tracking==True:
+            topo.sim.schedule_command(changetime,'topo.sim["V1"].output_fn.output_fns[1].mu=new_mu')
+        else:
+            topo.sim.schedule_command(changetime,'topo.sim["V1"].output_fn.mu=new_mu')
+    else:
+        topo.sim.schedule_command(changetime,'topo.sim["Retina"].set_input_generator(natural_combined_inputs,push_existing=False)')
+
+
+#can set strength of retina to lgn projections to change during development  
+changestrength = locals().get('changestrength',False)
+if changestrength==True:
+    new_strength = locals().get('new_strength',2.0)
+    topo.sim.schedule_command(changetime,'topo.sim["LGNOn"].projections()["Afferent"].strength=new_strength')
+    topo.sim.schedule_command(changetime,'topo.sim["LGNOff"].projections()["Afferent"].strength=new_strength')
+
+
+topo.commands.analysis.plotgroups["Orientation Preference"].update_command="measure_or_pref(pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0))"
+
+topo.commands.analysis.plotgroups["Position Preference"].update_command="measure_position_pref(divisions=48,size=0.3,scale=1.0,offset=0.0,display=True,pattern_presenter=PatternPresenter(Rectangle(aspect_ratio=1.0),False,0.175),x_range=(-6.5,6.5),y_range=(-6.5,6.5),weighted_average=True)"    
+
+#Need to know exact experimental procedure for measuring retinotopy and orientation preference
