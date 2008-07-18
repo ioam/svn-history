@@ -632,6 +632,19 @@ def plot_tracked_attributes(output_fn, init_time, final_time, filename=None, **p
         generate_figure(title=topo.sim.name+': '+p,filename=filename,suffix=p)
 
 
+def matrixplot_hsv(mat,title=None,aspect=None,colorbar=True,filename=None):
+    """
+    Simple plotting for any matrix as a bitmap with axes.
+    As for matrixplot above except values are coloured in
+    hsv colorspace rather than greyscale.
+    """
+    pylab.hsv()
+    pylab.figure(figsize=(5,5))
+    pylab.imshow(mat,interpolation='nearest',aspect=aspect)
+    if title: windowtitle(title)
+    if colorbar and (mat.min()!= mat.max()): pylab.colorbar()
+    generate_figure(title=title,filename=filename)
+
 def plot_modulation_ratio(fullmatrix):
     """
     This function computes the modulation ratios of neurons in the V1Simple and V1Complex area and
