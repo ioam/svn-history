@@ -15,7 +15,6 @@ from .. import param
 
 import topo.sheets
 from topo.sheets import *
-from topo.base.parameterclasses import concrete_descendents
 from topo.base.sheet import Sheet
 import topo.projections
 from topo.projections import *
@@ -102,7 +101,7 @@ class NodeTool(Frame):
         self.title_label.pack()
         self.doc = 'Use the sheet tool to click a\nsheet object into the canvas.'
         # gets list of all the available sheets.
-        self.sheet_list = concrete_descendents(Sheet)
+        self.sheet_list = param.concrete_descendents(Sheet)
         sheet_list = self.sheet_list.keys()
 
         
@@ -206,7 +205,7 @@ class ConnectionTool(Frame):
         self.title_label.pack()
         self.doc = 'Use the connection tool to\ndrag connections between objects'
         # gets list of all the available projections.
-        self.proj_list = concrete_descendents(Projection)
+        self.proj_list = param.concrete_descendents(Projection)
         proj_list = self.proj_list.keys() # gets the class names.
 
 
