@@ -279,19 +279,19 @@ from topo.param import Dict as DictParameter
         fake_a_module('parameterclasses',topo.base,code)
 
 
-##         # DynamicNumber was removed in rXXXX
-##         # CEBALERT: missing support 
-##         class DynamicNumber(object):
-##             # placeholder: use code from topo.base.parameterclasses.DynamicNumber
-##             # (e.g. revision 7604)
-##             def __new__(cls,*args,**kw):
-##                 raise NotImplementedError("""
-##                 Please email ceball at users.sf.net, requesting an
-##                 update to the legacy snapshot support. If possible,
-##                 please make your snapshot available for testing.""")
+        # DynamicNumber was removed in rXXXX
+        # CEBALERT: missing support 
+        class DynamicNumber(object):
+            # placeholder: use code from topo.base.parameterclasses.DynamicNumber
+            # (e.g. revision 7604)
+            def __new__(cls,*args,**kw):
+                raise NotImplementedError("""
+                Please email ceball at users.sf.net, requesting an
+                update to the legacy snapshot support. If possible,
+                please make your snapshot available for testing.""")
 
-##         import topo.base.parameterclasses
-##         topo.base.parameterclasses.DynamicNumber = DynamicNumber
+        import topo.base.parameterclasses
+        topo.base.parameterclasses.DynamicNumber = DynamicNumber
 
 
         from topo.base.cf import CFProjection
