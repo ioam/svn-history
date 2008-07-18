@@ -359,6 +359,11 @@ class FeatureMaps(FeatureResponses):
                     norm_factor = self._featureresponses[sheet][feature].distribution_matrix[0,0].axis_range
                 else:
                     norm_factor = 1.0
+
+                #JLHACKALERT - normfactor changes depending on the number of squares the retina
+                #is divided into during retinotopy measurement.
+                if feature=="retinotopy":
+                    norm_factor = (pattern_presenter.divisions)*(pattern_presenter.divisions)
                     
                 if weighted_average:
                     preference_map = SheetView(
@@ -379,7 +384,7 @@ class FeatureMaps(FeatureResponses):
                                              bounding_box), sheet.name , sheet.precedence, topo.sim.time())
                 sheet.sheet_views[feature.capitalize()+'Selectivity']=selectivity_map
 
-
+                
 class FeatureCurves(FeatureResponses):
     """
     Measures and collects the responses to a set of features, for calculating tuning and similar curves.    
