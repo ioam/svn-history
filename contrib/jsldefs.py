@@ -1,12 +1,12 @@
 """
 File containing definitions used by jude law.
 """
-
+import topo
 import matplotlib
 import os, topo, __main__
 import pylab
 import numpy
-from numpy import exp,zeros,ones,concatenate,median
+from numpy import exp,zeros,ones,concatenate,median, abs,array,where
 from pylab import save
 
 from topo import param
@@ -21,6 +21,10 @@ from numpy import abs
 import numpy.oldnumeric as Numeric
 from topo.misc.filepaths import normalize_path
 from topo.commands.pylabplots import plot_tracked_attributes
+from topo.base.cf import CFPOutputFn
+from topo.base.parameterclasses import Parameter,Number,ClassSelectorParameter,Integer,BooleanParameter
+from topo.base.functionfamilies import OutputFn, IdentityOF
+from topo.outputfns.basic import IdentityOF 
 
 #########################################################################
 ##Sheet types only used lissom_oo_or_homeostatic_tracked.ty for reproducing published figures##
@@ -493,5 +497,207 @@ def homeostatic_analysis_function():
                                 topo.sim.time(), filename="LatInBefore", ylabel="LatInBefore")
 
 
+def lesi_analysis_function():
+    """
+
+    Analysis function specific to this simulation which can be used in
+    batch mode to plots and/or store tracked attributes during
+    development.
+
+    """
+    import topo
+    import copy
+    from topo.commands.analysis import save_plotgroup, PatternPresenter, update_activity
+    from topo.base.projection import ProjectionSheet
+    from topo.sheets.generatorsheet import GeneratorSheet
+    from topo.patterns.basic import Gaussian, SineGrating
+    from topo.commands.basic import pattern_present, wipe_out_activity
+    from topo.base.simulation import EPConnectionEvent
 
 
+    # Build a list of all sheets worth measuring
+    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
+    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
+    input_sheets = topo.sim.objects(GeneratorSheet).values()
+    
+    # Set potentially reasonable defaults; not necessarily useful
+    topo.commands.analysis.coordinate=(0.0,0.0)
+    if input_sheets:    topo.commands.analysis.input_sheet_name=input_sheets[0].name
+    if measured_sheets: topo.commands.analysis.sheet_name=measured_sheets[0].name
+
+    # Save all plotgroups listed in default_analysis_plotgroups
+    for pg in default_analysis_plotgroups:
+        save_plotgroup(pg)
+
+    # Plot all projections for all measured_sheets
+    for s in measured_sheets:
+        for p in s.projections().values():
+            save_plotgroup("Projection",projection=p)
+
+    #present a pattern without plasticity to ensure that values are initialized at t=0
+    pattern_present(inputs={"Retina":SineGrating()},duration=1.0,
+                    plastic=False,apply_output_fn=True,overwrite_previous=False)        
+
+   
+
+    save_plotgroup("Orientation Preference")
+
+    Stability("V1Exc", "Stability", 0, topo.sim.time())
+    
+    plot_tracked_attributes(topo.sim["V1Exc"].output_fn.output_fns[0], 0, 
+                            topo.sim.time(),filename="V1Exc", ylabel="V1Exc")
+    plot_tracked_attributes(topo.sim["V1Exc"].output_fn.output_fns[2], 0, 
+                            topo.sim.time(),filename="V1Exc_of", ylabel="V1Exc_of")
+    plot_tracked_attributes(topo.sim["V1Inh"].output_fn.output_fns[1], 0, 
+                            topo.sim.time(), filename="V1Inh", ylabel="V1Inh")
+
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LGNOnAfferent"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="LGNOnAfferent", ylabel="LGNOnAfferent")
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LGNOffAfferent"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="LGNOffAfferent", ylabel="LGNOffAfferent")
+
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LateralExcitatory_local"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="LateralExcitatory_local", ylabel="LateralExcitatory_local")
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["LateralExcitatory"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="LateralExcitatory", ylabel="LateralExcitatory")
+    plot_tracked_attributes(topo.sim["V1Exc"].projections()["V1Inh_to_V1Exc"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="V1Inh_to_V1Exc", ylabel="V1Inh_to_V1Exc")
+
+    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Exc_to_V1Inh_local"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="V1Exc_to_V1Inh_local", ylabel="V1Exc_to_V1Inh_local")
+    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Exc_to_V1Inh"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="V1Exc_to_V1Inh", ylabel="V1Exc_to_V1Inh")
+    plot_tracked_attributes(topo.sim["V1Inh"].projections()["V1Inh_to_V1Inh"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="V1Inh_to_V1Inh", ylabel="V1Inh_to_V1Inh")
+    
+
+
+def species_analysis_function():
+    """
+
+    Analysis function specific to this simulation which can be used in
+    batch mode to plots and/or store tracked attributes during
+    development.
+
+    """
+    import topo
+    import copy
+    from topo.commands.analysis import save_plotgroup, PatternPresenter, update_activity
+    from topo.base.projection import ProjectionSheet
+    from topo.sheets.generatorsheet import GeneratorSheet
+    from topo.patterns.basic import Gaussian, SineGrating
+    from topo.commands.basic import pattern_present, wipe_out_activity
+    from topo.base.simulation import EPConnectionEvent
+
+
+    # Build a list of all sheets worth measuring
+    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
+    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
+    input_sheets = topo.sim.objects(GeneratorSheet).values()
+    
+    # Set potentially reasonable defaults; not necessarily useful
+    topo.commands.analysis.coordinate=(0.0,0.0)
+    if input_sheets:    topo.commands.analysis.input_sheet_name=input_sheets[0].name
+    if measured_sheets: topo.commands.analysis.sheet_name=measured_sheets[0].name
+
+    # Save all plotgroups listed in default_analysis_plotgroups
+    for pg in default_analysis_plotgroups:
+        save_plotgroup(pg)
+
+    # Plot all projections for all measured_sheets
+    for s in measured_sheets:
+        for p in s.projections().values():
+            save_plotgroup("Projection",projection=p)
+
+    #present a pattern without plasticity to ensure that values are initialized at t=0
+    pattern_present(inputs={"Retina":SineGrating()},duration=1.0,
+                    plastic=False,apply_output_fn=True,overwrite_previous=False)        
+
+   
+
+    topo.sim["V1"].state_push()
+    topo.sim["V1"].output_fn.state_push()
+     
+
+    if topo.sim["V1"].sf==None:
+        pass
+    else:
+        topo.sim["V1"].sf *=0.0
+        topo.sim["V1"].sf +=1.0
+            
+    topo.sim["V1"].output_fn.output_fns[1].a *=0.0
+    topo.sim["V1"].output_fn.output_fns[1].b *=0.0
+    topo.sim["V1"].output_fn.output_fns[1].a +=12.0
+    topo.sim["V1"].output_fn.output_fns[1].b +=-5.0
+    
+    save_plotgroup("Orientation Preference")
+
+    #Restore original values
+    topo.sim["V1"].state_pop()
+    topo.sim["V1"].output_fn.state_pop()
+
+    Selectivity("V1", "Selectivity", 0, topo.sim.time())
+    Stability("V1", "Stability", 0, topo.sim.time())
+    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], 0, 
+                            topo.sim.time(), filename="Afferent", ylabel="Afferent", raw=True)
+    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], 0, 
+                            topo.sim.time(), filename="V1", ylabel="V1", raw=True)
+    
+
+    plot_tracked_attributes(topo.sim["V1"].projections()["LGNOnAfferent"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="On_before", ylabel="On_before")
+    plot_tracked_attributes(topo.sim["V1"].projections()["LGNOffAfferent"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="Off_before", ylabel="Off_before")
+
+
+    plot_tracked_attributes(topo.sim["V1"].projections()["LateralExcitatory"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="LatExBefore", ylabel="LatExBefore")
+    plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="LatInBefore", ylabel="LatInBefore")
+
+
+
+#Function for plotting LGN out connections to V1
+
+class CFPOF_Jitter(CFPOutputFn):
+    """
+    Applies the specified single_cf_fn to each CF in the CFProjection
+    for which the mask is nonzero.
+    """
+    single_cf_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),
+                                          doc="Accepts an OutputFn that will be applied to each CF individually.")
+    
+    def __call__(self, iterator, mask, **params):
+        """
+        Apply the single_cf_fn to each CF for which the mask is nonzero.
+        """
+        row, col = iterator.proj.src.shape
+        
+        
+        lgn_cf={}
+        for x in range(row):
+            lgn_cf[x]={}
+            for y in range(col):
+                lgn_cf[x][y]={}
+                lgn_cf[x][y]=zeros(iterator.proj.dest.shape)
+                
+        for x in range(row):
+            for y in range(col):
+                for cf,v1x,v1y in iterator():
+                    if (mask[v1x][v1y] != 0):
+                        r1,r2,c1,c2= cf.input_sheet_slice
+                        rx=range(r1, r2)
+                        ry=range(c1, c2)
+                        if x in rx:
+                            if y in ry:
+                                indx = rx.index(x)
+                                indy = ry.index(y)
+                                
+                                lgn_cf[x][y][v1x][v1y] += cf.weights[indx][indy]
+                                
+
+        topo.commands.pylabplots.matrixplot(lgn_cf[24][24])
+        topo.commands.pylabplots.matrixplot(lgn_cf[11][11])
+        topo.commands.pylabplots.matrixplot(lgn_cf[36][36])
+        topo.commands.pylabplots.matrixplot(lgn_cf[11][36])
+       
