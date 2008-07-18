@@ -85,7 +85,7 @@ class PatternPresenter(param.Parameterized):
     different ways.
     """
     contrast_parameter = param.Parameter('michelson_contrast')
-    divisions = Parameter()
+    divisions = param.Parameter()
    
     def __init__(self,pattern_generator,apply_output_fn=True,duration=1.0,**params):
         self.apply_output_fn=apply_output_fn
