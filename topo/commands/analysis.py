@@ -9,7 +9,7 @@ from math import pi
 import copy
 
 from colorsys import hsv_to_rgb
-from numpy.oldnumeric import array, zeros, Float,size, shape, maximum
+from numpy.oldnumeric import array, zeros, Float,size, shape, maximum, add, ones
 
 from .. import param
 
@@ -25,11 +25,12 @@ from topo.misc.numbergenerators import UniformRandom
 from topo.misc.utils import frange
 from topo.misc.distribution import Distribution
 from topo.patterns.basic import SineGrating, Gaussian
-from topo.patterns.teststimuli import SineGratingDisk
+from topo.patterns.teststimuli import SineGratingDisk, OrientationContrastPattern, SineGratingRectangle
 from topo.patterns.random import GaussianRandom
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
+from topo.commands.pylabplots import matrixplot_hsv
 
 
 
@@ -84,12 +85,14 @@ class PatternPresenter(param.Parameterized):
     different ways.
     """
     contrast_parameter = param.Parameter('michelson_contrast')
-
+    divisions = Parameter()
+   
     def __init__(self,pattern_generator,apply_output_fn=True,duration=1.0,**params):
         self.apply_output_fn=apply_output_fn
         self.duration=duration
         self.gen = pattern_generator
         self.contrast_parameter=params.get('contrast_parameter',self.contrast_parameter)
+        self.divisions=params.get('divisions',self.divisions)
 
     def __call__(self,features_values,param_dict):
 
@@ -144,7 +147,39 @@ class PatternPresenter(param.Parameterized):
                 else: 
                     self.warning('Hue is defined only when there are different input sheets with names starting with Red-, Green-, Blue-.')
 
-
+        if features_values.has_key('retinotopy'):
+            #Calculates coordinates of the centre of each SineGratingRectangle to be presented 
+            coordinate_x=[]
+            coordinate_y=[]
+            coordinates=[]
+            for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
+                l,b,r,t = topo.sim[name].nominal_bounds.lbrt()
+                x_div=float(r-l)/(self.divisions*2)
+                y_div=float(t-b)/(self.divisions*2)
+                for i in range(self.divisions):
+                    if not bool(self.divisions%2):
+                        if bool(i%2):
+                            coordinate_x.append(i*x_div)
+                            coordinate_y.append(i*y_div)
+                            coordinate_x.append(i*-x_div)
+                            coordinate_y.append(i*-y_div)
+                    else:
+                        if not bool(i%2):
+                            coordinate_x.append(i*x_div)
+                            coordinate_y.append(i*y_div)
+                            coordinate_x.append(i*-x_div)
+                            coordinate_y.append(i*-y_div)
+                for x in coordinate_x:
+                    for y in coordinate_y:
+                        coordinates.append((x,y))
+               
+                x_coord=coordinates[features_values['retinotopy']][0]
+                y_coord=coordinates[features_values['retinotopy']][1]
+                inputs[name].x = x_coord
+                inputs[name].y = y_coord
+          
+                
+          
         if features_values.has_key("phasedisparity"):
             if len(input_sheet_names)!=2:
                 self.warning('Disparity is defined only when there are exactly two patterns')
@@ -199,6 +234,56 @@ class PatternPresenter(param.Parameterized):
 
             for i in xrange(num_lags):
                 inputs[input_sheet_names[i]].step=i+step_offset
+
+
+        if features_values.has_key("contrastcentre")or param_dict.has_key("contrastcentre"):
+            if self.contrast_parameter=='michelson_contrast':
+                for g in inputs.itervalues():
+                    g.offsetcentre=0.5
+                    g.scalecentre=2*g.offsetcentre*g.contrastcentre/100.0
+
+            
+	
+            elif self.contrast_parameter=='weber_contrast':
+                # Weber_contrast is currently only well defined for
+                # the special case where the background offset is equal
+                # to the target offset in the pattern type
+                # SineGratingDisk
+                for g in inputs.itervalues():
+                    g.offsetcentre=0.5   #In this case this is the offset of both the background and the sine grating
+                    g.scalecentre=2*g.offsetcentre*g.contrastcentre/100.0
+            
+                
+            elif self.contrast_parameter=='scale':
+                for g in inputs.itervalues():
+                    g.offsetcentre=0.0
+                    g.scalecentre=g.contrastcentre
+
+
+
+        if features_values.has_key("contrastsurround")or param_dict.has_key("contrastsurround"):
+            if self.contrast_parameter=='michelson_contrast':
+                for g in inputs.itervalues():
+                    g.offsetsurround=0.5
+                    g.scalesurround=2*g.offsetsurround*g.contrastsurround/100.0
+
+            
+	
+            elif self.contrast_parameter=='weber_contrast':
+                # Weber_contrast is currently only well defined for
+                # the special case where the background offset is equal
+                # to the target offset in the pattern type
+                # SineGratingDisk
+                for g in inputs.itervalues():
+                    g.offsetsurround=0.5   #In this case this is the offset of both the background and the sine grating
+                    g.scalesurround=2*g.offsetsurround*g.contrastsurround/100.0
+            
+                
+            elif self.contrast_parameter=='scale':
+                for g in inputs.itervalues():
+                    g.offsetsurround=0.0
+                    g.scalesurround=g.contrastsurround
+
 
 
         if features_values.has_key("contrast") or param_dict.has_key("contrast"):
@@ -1379,3 +1464,160 @@ def measure_corner_or_pref(divisions=20,num_orientation=8,scale=1.0,offset=0.0,d
     x=FeatureMaps(feature_values)
     x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
 
+###############################################################################
+pg=create_plotgroup(name='Retinotopy',category="Other",
+                    doc='Measure retinotopy',
+                    update_command='measure_retinotopy()',
+                    normalize=True)
+pg.add_plot('Retinotopy',[('Hue','RetinotopyPreference')])
+pg.add_plot('Retinotopy Selectivity',[('Hue','RetinotopyPreference'),('Confidence','RetinotopySelectivity')])
+
+def measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[2.4],divisions=4,scale=1.0,
+                       offset=0.0,display=False, weighted_average=False, apply_output_fn=True,duration=1.0):
+    """
+    Measures peak retinotopy preference (as in Schuett et. al Journal
+    of Neuroscience 22(15):6549-6559, 2002). The retina is divided
+    into squares (each assigned a color in the color key) which are
+    activated by sine gratings of various phases and orientations.
+    For each unit, the retinotopic position with the highest response
+    at the preferred orientation and phase is recorded and assigned a
+    color according to the retinotopy color key.
+
+    """
+
+    from topo.commands.pylabplots import matrixplot_hsv
+
+    
+    input_sheet_name="Retina"
+    if divisions <= 0 or num_orientation <= 0 or num_phase <= 0 :
+        raise ValueError("divisions and num_orientation and num_phase must be greater than 0")
+    
+    input_sheet = topo.sim[input_sheet_name]
+    
+    l,b,r,t = input_sheet.nominal_bounds.lbrt()
+    x_range=(r,l)
+    y_range=(t,b)
+
+    step_phase=2*pi/num_phase
+    step_orientation=2*pi/num_orientation
+   
+    size=float((x_range[0]-x_range[1]))/divisions
+    retinotopy=range(divisions*divisions)
+    pattern_presenter=PatternPresenter(SineGratingRectangle(),apply_output_fn=apply_output_fn,duration=duration, divisions=divisions)
+    
+    feature_values = [Feature(name="retinotopy",values=retinotopy),
+                      Feature(name="orientation",range=(0.0,2*pi),step=step_orientation,cyclic=True),
+                      Feature(name="frequency",values=frequencies),
+                      Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]          
+                      
+    param_dict = {"size":size,"scale":scale,"offset":offset}
+    x=FeatureMaps(feature_values)
+    x.collect_feature_responses(pattern_presenter,param_dict,display,weighted_average)
+
+    #Generate automatic plot of color key
+    #JLALERT Coordinates also calculated above - could maybe combine this
+    coordinate_x=[]
+    coordinate_y=[]
+    coordinates=[]
+    mat_coords=[]
+
+    x_div=float(r-l)/(divisions*2)
+    y_div=float(t-b)/(divisions*2)
+    ret_matrix = ones(input_sheet.shape, float)
+ 
+    for i in range(divisions):
+        if not bool(divisions%2):
+            if bool(i%2):
+                coordinate_x.append(i*x_div)
+                coordinate_y.append(i*y_div)
+                coordinate_x.append(i*-x_div)
+                coordinate_y.append(i*-y_div)
+        else:
+            if not bool(i%2):
+                coordinate_x.append(i*x_div)
+                coordinate_y.append(i*y_div)
+                coordinate_x.append(i*-x_div)
+                coordinate_y.append(i*-y_div)
+  
+    for x in coordinate_x:
+        for y in coordinate_y:
+            coordinates.append((x,y))
+            
+      
+    for r in retinotopy:
+        x_coord=coordinates[r][0]
+        y_coord=coordinates[r][1]
+        x_top, y_top = input_sheet.sheet2matrixidx(x_coord+x_div,y_coord+y_div)
+        x_bot, y_bot = input_sheet.sheet2matrixidx(x_coord-x_div,y_coord-y_div)
+        norm_ret=float((r+1.0)/(divisions*divisions))
+        
+        for x in range(min(x_bot,x_top),max(x_bot,x_top)):
+            for y in range(min(y_bot,y_top),max(y_bot,y_top)):
+                ret_matrix[x][y] += norm_ret
+               
+    #Plot the color key
+    matrixplot_hsv(ret_matrix, title="Color Key")
+
+###############################################################################
+create_plotgroup(template_plot_type="curve",name='Orientation Contrast',category="Tuning Curves",
+                 doc='Measure the response of one unit to a centre and surround sine grating disk.',
+                 update_command='measure_orientation_contrast()',
+                 plot_command='tuning_curve(x_axis="contrastcentre",plot_type=pylab.plot,unit="%")',
+                 prerequisites=['OrientationPreference','XPreference'])        
+
+    
+def measure_orientation_contrast(contrasts=[0,10,20,30,40,50,60,70,80,90,100],relative_orientations=[0.0, pi/2],
+                                 size_centre=0.5, size_surround=1.0, thickness=0.5, contrastsurround=80, display=False,frequency=2.4,
+                                 num_phase=18,pattern_presenter=PatternPresenter(pattern_generator=OrientationContrastPattern(),
+                                                                                 apply_output_fn=True,duration=1.0,
+                                                                                 contrast_parameter="weber_contrast")):
+    """
+    Measures the response to a centre and surround sine grating disk
+    at different contrasts of the central disk. The central disk is at
+    the preferred orientation of the unit to be measured. The surround
+    disk orientation (with respect to the central grating) and
+    contrast can be varied together with the size of both disks.
+    """
+
+    sheet=topo.sim[sheet_name]
+    matrix_coords = sheet.sheet2matrixidx(coordinate[0],coordinate[1])
+
+    if('OrientationPreference' in sheet.sheet_views):
+        or_pref = sheet.sheet_views['OrientationPreference'].view()[0]
+        or_value = or_pref[matrix_coords]*pi # Orientations are stored as a normalized value beween 0 and 1.
+                                             # The factor of pi is the norm_factor and is the range of orientation in measure_or_pref.
+    else:
+        topo.sim.warning("Orientation Preference should be measured before plotting Orientation Contrast Response -- using default values for "+sheet_name)
+        or_value = 0.0
+   
+
+    if(('XPreference' in sheet.sheet_views) and
+       ('YPreference' in sheet.sheet_views)):
+        x_pref = sheet.sheet_views['XPreference'].view()[0]
+        y_pref = sheet.sheet_views['YPreference'].view()[0]
+        x_value=x_pref[matrix_coords]
+        y_value=y_pref[matrix_coords]
+    else:
+        topo.sim.warning("Position Preference should be measured before plotting Orientation Contrast Response -- using default values for "+sheet_name)
+        x_value=coordinate[0]
+        y_value=coordinate[1]
+ 
+    curve_parameters=[{"orientationsurround":or_value+ro} for ro in relative_orientations]
+    
+     
+    if num_phase <= 0 :
+        raise ValueError("num_phase must be greater than 0")
+
+    step_phase=2*pi/num_phase
+    
+    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                      Feature(name="contrastcentre",values=contrasts,cyclic=False)]  
+    x_axis='contrastcentre'
+    x=FeatureCurves(feature_values,sheet,x_axis)
+   
+    for curve in curve_parameters:
+        param_dict = {"x":x_value,"y":y_value,"frequency":frequency, "size_centre":size_centre, "size_surround":size_surround,
+                      "orientationcentre":or_value, "thickness":thickness, "contrastsurround":contrastsurround}
+        param_dict.update(curve)
+        curve_label='Orientation = %.4f rad' % curve["orientationsurround"] 
+        x.collect_feature_responses(feature_values,pattern_presenter, param_dict, curve_label,display)
