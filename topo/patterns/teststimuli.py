@@ -73,15 +73,15 @@ class SineGratingDisk(PatternGenerator):
 class SineGratingRectangle(PatternGenerator):
     """A sine grating masked by a rectangle so that only a rectangluar patch is visible"""
  
-    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+    aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.31,doc=
         "Ratio of width to height; size*aspect_ratio gives the width of the disk.")
 
-    size  = Number(default=0.5,doc="Top to bottom height of the disk")
+    size  = param.Number(default=0.5,doc="Top to bottom height of the disk")
     
-    phase  = Number(default=1.0, doc="phase of the sine grating")
+    phase  = param.Number(default=1.0, doc="phase of the sine grating")
 
-    frequency  = Number(default=2.4,doc="frequency of the sine grating")
+    frequency  = param.Number(default=2.4,doc="frequency of the sine grating")
 
        
     def __call__(self,**params_to_override):
@@ -176,17 +176,17 @@ class OrientationContrastPattern(SineGratingRing):
     size_surround= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                    precedence=0.50, doc="Frequency of the sine grating.")
 
-    scalecentre= Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+    scalecentre= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                precedence=0.50, doc="Frequency of the sine grating.")
 
-    scalesurround= Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+    scalesurround= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                    precedence=0.50, doc="Frequency of the sine grating.")
 
 
-    offsetcentre= Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+    offsetcentre= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                precedence=0.50, doc="Frequency of the sine grating.")
 
-    offsetsurround= Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+    offsetsurround= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                    precedence=0.50, doc="Frequency of the sine grating.")
        
     def __call__(self,**params_to_override):
