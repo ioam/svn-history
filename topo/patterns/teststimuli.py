@@ -21,7 +21,7 @@ from ..param.parameterized import ParamOverrides
 from topo.base.patterngenerator import PatternGenerator
 # Imported here so that all PatternGenerators will be in the same package
 from topo.base.patterngenerator import Constant
-from topo.patterns.basic import SineGrating, Disk, Ring
+from topo.patterns.basic import SineGrating, Disk, Ring, Rectangle
 from topo.misc.patternfns import gaussian,gabor,line,disk,ring
 from topo.misc.numbergenerators import UniformRandom
 
@@ -62,6 +62,45 @@ class SineGratingDisk(PatternGenerator):
       
         input_1=SineGrating(phase=phase, frequency=frequency, orientation=orientation, scale=scale, offset=offset)
         input_2=Disk(aspect_ratio=aspect_ratio,smoothing=smoothing,x=x, y=y,size=size,scale=scale, offset=offset)
+        
+        patterns = [input_1(xdensity=xdensity,ydensity=ydensity,bounds=bounds),
+                            input_2(xdensity=xdensity,ydensity=ydensity,bounds=bounds)]
+                      
+        image_array = numpy.minimum.reduce(patterns)
+        return image_array
+
+
+class SineGratingRectangle(PatternGenerator):
+    """A sine grating masked by a rectangle so that only a rectangluar patch is visible"""
+ 
+    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.31,doc=
+        "Ratio of width to height; size*aspect_ratio gives the width of the disk.")
+
+    size  = Number(default=0.5,doc="Top to bottom height of the disk")
+    
+    phase  = Number(default=1.0, doc="phase of the sine grating")
+
+    frequency  = Number(default=2.4,doc="frequency of the sine grating")
+
+       
+    def __call__(self,**params_to_override):
+        params = ParamOverrides(self,params_to_override)
+      	bounds = params['bounds']
+        xdensity=params['xdensity']
+        ydensity=params['ydensity']
+        x=params['x']
+        y=params['y']
+        scale=params['scale']
+        offset=params['offset']
+        orientation=params['orientation']
+        size=params['size']
+        phase=params['phase']
+        frequency=params['frequency']
+        aspect_ratio=params['aspect_ratio']
+              
+        input_1=SineGrating(phase=phase, frequency=frequency, orientation=orientation, scale=scale, offset=offset)
+        input_2=Rectangle(aspect_ratio=aspect_ratio,x=x, y=y,size=size,scale=scale, offset=offset)
         
         patterns = [input_1(xdensity=xdensity,ydensity=ydensity,bounds=bounds),
                             input_2(xdensity=xdensity,ydensity=ydensity,bounds=bounds)]
@@ -122,8 +161,8 @@ class SineGratingRing(PatternGenerator):
 
 
 
-class OrientationContrastPattern (SineGratingRing):
-    """A sine grating ring and a disk with parameters (orientation and size) which can be changed independantly"""
+class OrientationContrastPattern(SineGratingRing):
+    """A sine grating ring and a disk with parameters (orientation, size, scale and offset) which can be changed independantly"""
  
     orientationcentre= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                precedence=0.50, doc="Frequency of the sine grating.")
@@ -136,7 +175,19 @@ class OrientationContrastPattern (SineGratingRing):
 
     size_surround= param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
                                    precedence=0.50, doc="Frequency of the sine grating.")
-    
+
+    scalecentre= Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+                               precedence=0.50, doc="Frequency of the sine grating.")
+
+    scalesurround= Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+                                   precedence=0.50, doc="Frequency of the sine grating.")
+
+
+    offsetcentre= Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+                               precedence=0.50, doc="Frequency of the sine grating.")
+
+    offsetsurround= Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,10.0),
+                                   precedence=0.50, doc="Frequency of the sine grating.")
        
     def __call__(self,**params_to_override):
         params = ParamOverrides(self,params_to_override)
@@ -145,8 +196,10 @@ class OrientationContrastPattern (SineGratingRing):
         ydensity=params['ydensity']
         x=params['x']
         y=params['y']
-        scale=params['scale']
-        offset=params['offset']
+        scalesurround=params['scalesurround']
+        offsetsurround=params['offsetsurround']
+        scalecentre=params['scalecentre']
+        offsetcentre=params['offsetcentre']
         size=params['size']
         phase=params['phase']
         frequency=params['frequency']
@@ -158,9 +211,9 @@ class OrientationContrastPattern (SineGratingRing):
         size_centre=params['size_centre']
         size_surround=params['size_surround']
       
-        input_1=SineGratingDisk(phase=phase, frequency=frequency,orientation=orientationcentre, scale=scale, offset=offset,
+        input_1=SineGratingDisk(phase=phase, frequency=frequency,orientation=orientationcentre, scale=scalecentre, offset=offsetcentre,
                                 aspect_ratio=aspect_ratio,smoothing=0.0,x=x, y=y,size=size_centre)
-        input_2=SineGratingRing(phase=phase, frequency=frequency, orientation=orientationsurround, scale=scale, offset=offset,
+        input_2=SineGratingRing(phase=phase, frequency=frequency, orientation=orientationsurround, scale=scalesurround, offset=offsetsurround,
                                 thickness=thickness,aspect_ratio=aspect_ratio,smoothing=0.0,x=x, y=y, size=size_surround)
         
         patterns = [input_1(xdensity=xdensity,ydensity=ydensity,bounds=bounds),
