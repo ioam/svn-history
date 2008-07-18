@@ -5,8 +5,8 @@ $Id$
 """
 __version__='$Revision: 8021 $'
 
-
-
+import imp
+import sys
 
 ### various functions to support loading of old snapshots
 
@@ -73,6 +73,18 @@ class %s(object):
 
     setattr(module,old_name,fake_old_class)
 
+
+# CB: not fully tested (don't know if it's enough
+# to support user code).
+def fake_a_module(name,parent,source_code):
+    """Create the module parent.name using source_code."""
+    # create the module
+    module = imp.new_module(name)
+    exec source_code in module.__dict__
+
+    # install the module
+    sys.modules[parent.__name__+'.'+name]=module
+    setattr(parent,name,module)
 
 
 class SnapshotSupport(object):
@@ -222,6 +234,49 @@ class SnapshotSupport(object):
 
         import topo.base.simulation
         topo.base.simulation.SimSingleton=SimSingleton
+
+
+        # CEBALERT: we really need to start detecting the version so
+        # hacks aren't unnecessary installed. Or at least provide an
+        # option to request legacy support otherwise it's turned
+        # off. Or something like that.
+
+        # rXXXX
+        # support topo.base.parameterized
+        import topo.base
+        code = \
+"""
+from topo.param.parameterized import *
+"""
+        fake_a_module('parameterized',topo.base,code)
+        
+        # rXXXX
+        # support topo.base.parameterizedobject
+        code = \
+"""
+from topo.param.parameterized import *
+ParameterizedObject=Parameterized
+"""
+        fake_a_module('parameterizedobject',topo.base,code)
+
+
+        # rXXXX
+        # support topo.base.parameterclasses
+        code = \
+"""
+from topo.param import *
+
+from topo.param import Boolean as BooleanParameter
+from topo.param import String as StringParameter
+from topo.param import Callable as CallableParameter
+from topo.param import Composite as CompositeParameter
+from topo.param import Selector as SelectorParameter
+from topo.param import ObjectSelector as ObjectSelectorParameter
+from topo.param import ClassSelector as ClassSelectorParameter
+from topo.param import List as ListParameter
+from topo.param import Dict as DictParameter
+"""
+        fake_a_module('parameterclasses',topo.base,code)
 
 
 ##         # DynamicNumber was removed in rXXXX
