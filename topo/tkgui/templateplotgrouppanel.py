@@ -21,6 +21,7 @@ from numpy import abs
 
 from .. import param
 
+import topo.commands.pylabplots
 from topo.misc.filepaths import normalize_path
 from topo.plotting.plotgroup import TemplatePlotGroup
 
