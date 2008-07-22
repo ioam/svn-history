@@ -33,6 +33,9 @@ from .. import param
 
 from topo.misc.filepaths import application_path
 
+# CBERRORALERT: currently fails on Windows
+# (But do we have to look up a font this way? Isn't there a simpler
+# way to do it?)
 TITLE_FONT = ImageFont.truetype(os.path.join(application_path,'lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
 
 
