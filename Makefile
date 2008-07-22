@@ -55,13 +55,24 @@ uninstall:
 
 # Windows: to build topographica using msys, having already installed
 # binary python, pil, jpeg
+# CB: hard-coded paths will disappear.
+# Need to use something more local than distutils.cfg so we don't 
+# destroy any existing setup (e.g. use site.cfg files?) 
 win-msys-patch:
+	mkdir -p bin
+	ln -f -s /c/Python25/python.exe bin/python
+	touch external/tcl external/tk external/blt external/python external/pil external/jpeg
+	echo "[build]" > /c/Python25/Lib/distutils/distutils.cfg
+	echo "compiler = mingw32" >> /c/Python25/Lib/distutils/distutils.cfg
+	echo "import site; site.addsitedir('c:\\\topographica\\\Lib\\\site-packages'); site.addsitedir('c:\\\topographica\\\Lib')" >> /c/Python25/Lib/site-packages/topographica.pth
 	patch --force external/Makefile external/Makefile_win_msys.diff
 	touch win-msys-patch
 
 win-msys-patch-uninstall:
-	patch --force external/Makefile external/Makefile_win_msys.diff
+	patch --force --reverse external/Makefile external/Makefile_win_msys.diff
 	${RM} win-msys-patch
+	${RM} /c/Python25/Lib/distutils.cfg
+	${RM} /c/Python25/Lib/site-packages/topographica.pth
 
 # Mac OS X: to build python with tcl/tk from /Library/Frameworks
 osx-tk-patch:
