@@ -1,12 +1,24 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
+# PIL
+# http://mail.python.org/pipermail/image-sig/2004-December/003067.html
+
+# can't seem to specify this in one way that works for all packages
+# /c/topographica
+# c:\topographica
+# c:/topographica
+PREFIX = "c:\topographica"
+
 # Options to pass to all setup.py install commands.
 # (Allows us to control installation location even when not using our
 # own Python, e.g. on Windows.)
-PYSETUP_OPT = --prefix=${PREFIX}
+PYSETUP_OPT = --prefix=${PREFIX} --install-scripts="c:\topographica\bin"
 
-default: python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
+
+default: numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
+# i.e. python, jpeg, pil installed as binaries beforehand
+#default: python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
 
 
 all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
@@ -176,19 +188,19 @@ PIL = Imaging-1.1.5
 PIL_UNINSTALL = ${PYTHON_LIB}/site-packages/PIL
 
 pil: ${PIL}.tgz jpeg python
-	tar -xzf ${PIL}.tgz
+#	tar -xzf ${PIL}.tgz
 #	cd ${PIL}/libImaging; ./configure --prefix=${PREFIX} --with-jpeg=${PREFIX}/lib
 #	make -C ${PIL}/libImaging
 #
 # Apply OS-specific patches:
-ifeq ("$(shell uname -m)","x86_64")
-#       # Tell 64-bit Linux machines where to find zlib, to prevent "encoder zip not available" problems
-	cd ${PIL}; patch < ../Imaging.diff
-else ifeq ("$(shell uname -s)","Darwin")
-#       # Tell OS X machines where to find freetype
-	patch -p0 < Imaging_OSX.diff
-endif
-	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build_ext -i
+#ifeq ("$(shell uname -m)","x86_64")
+##       # Tell 64-bit Linux machines where to find zlib, to prevent "encoder zip not available" problems
+#	cd ${PIL}; patch < ../Imaging.diff
+#else ifeq ("$(shell uname -s)","Darwin")
+##       # Tell OS X machines where to find freetype
+#	patch -p0 < Imaging_OSX.diff
+#endif
+	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build_ext --compiler=mingw32 -i
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python selftest.py
 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
 	touch pil
@@ -236,7 +248,9 @@ endif
 
 matplotlib: ${MATPLOTLIB}.tar.gz python
 	tar -xzf ${MATPLOTLIB}.tar.gz
-	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py build
+	cp win32_static.tar.gz ${MATPLOTLIB}
+	cd ${MATPLOTLIB}; tar -xzf win32_static.tar.gz
+	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py build --compiler=mingw32 bdist_wininst
 	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
 	touch matplotlib
 
@@ -509,7 +523,7 @@ mlabwrap-uninstall:
 TILEWRAPPER = Tile
 
 tilewrapper: python
-	cp Tile.py ${PREFIX}/lib/python2.5/site-packages/
+	cp Tile.py ${PREFIX}/Lib/site-packages
 	touch tilewrapper
 
 tilewrapper-uninstall:
@@ -760,14 +774,14 @@ GMP = gmp-4.2.2
 GMP_UNINSTALL += lib/libgmp.* 
 GMP_UNINSTALL += include/gmp.h
 
-
 gmp: ${GMP}.tar.gz
 	tar -xzf ${GMP}.tar.gz
-	cd ${GMP}; ./configure --prefix=${PREFIX} 
+	cd ${GMP}; ./configure --prefix="c:/topographica"
 	make -C ${GMP}
 	make -C ${GMP} check
 	make -C ${GMP} install
 	touch gmp
+# need to reset PREFIX!
 
 gmp-clean: 
 	rm -rf ${GMP} 
@@ -808,7 +822,7 @@ GMPY_UNINSTALL += ${PYTHON_LIB}/site-packages/gmpy.so
 
 gmpy: ${GMPY}.tar.gz python gmp
 	tar -xzf ${GMPY}.tar.gz
-	cd ${GMPY}; ${PREFIX}/bin/python setup.py build_ext --include-dirs='${PREFIX}/include' --library-dirs='${PREFIX}/lib'; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	cd ${GMPY}; ${PREFIX}/bin/python setup.py build_ext --compiler=mingw32 --include-dirs='${PREFIX}/include' --library-dirs='${PREFIX}/lib'; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
 	touch gmpy
 
 gmpy-clean:

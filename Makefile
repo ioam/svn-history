@@ -53,6 +53,16 @@ uninstall:
 	make -C external uninstall
 
 
+# Windows: to build topographica using msys, having already installed
+# binary python, pil, jpeg
+win-msys-patch:
+	patch --force external/Makefile external/Makefile_win_msys.diff
+	touch win-msys-patch
+
+win-msys-patch-uninstall:
+	patch --force external/Makefile external/Makefile_win_msys.diff
+	${RM} win-msys-patch
+
 # Mac OS X: to build python with tcl/tk from /Library/Frameworks
 osx-tk-patch:
 	patch --force external/Makefile external/Makefile_OSX_tk.diff
@@ -206,7 +216,7 @@ slow-tests: print-info train-tests all-speed-tests map-tests
 	./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",density=8,run_for=[1,99,150])'
 
 %_TEST: %_DATA
-	time ./topographica -c 'import_weave=${IMPORT_WEAVE}' -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",decimal=${TESTDP})'
+	./topographica -c 'import_weave=${IMPORT_WEAVE}' -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",decimal=${TESTDP})'
 # CB: Beyond 14 dp, the results of the current tests do not match on ppc64 and i686 (using linux).
 # In the future, decimal=14 might have to be reduced (if the tests change, or to accommodate other
 # processors/platforms).
@@ -214,21 +224,21 @@ slow-tests: print-info train-tests all-speed-tests map-tests
 
 v_lissom:
 	make -C topo/tests/reference/	
-	time ./topographica -c "profiling=True;iterations=20000" topo/tests/reference/lissom_oo_or_reference.ty
+	./topographica -c "profiling=True;iterations=20000" topo/tests/reference/lissom_oo_or_reference.ty
 
 
 %_SPEEDDATA:
-	time ./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/${notdir $*}",iterations=250,data_filename="topo/tests/${notdir $*}_SPEEDDATA")'
+	./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/${notdir $*}",iterations=250,data_filename="topo/tests/${notdir $*}_SPEEDDATA")'
 
 %_SPEEDTEST: %_SPEEDDATA
-	time ./topographica -c 'from topo.tests.test_script import compare_speed_data; compare_speed_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_SPEEDDATA")'
+	./topographica -c 'from topo.tests.test_script import compare_speed_data; compare_speed_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_SPEEDDATA")'
 
 
 %_STARTUPSPEEDDATA:
-	time ./topographica -c 'from topo.tests.test_script import generate_startup_speed_data; generate_startup_speed_data(script="examples/${notdir $*}",density=48,data_filename="topo/tests/${notdir $*}_STARTUPSPEEDDATA")'
+	./topographica -c 'from topo.tests.test_script import generate_startup_speed_data; generate_startup_speed_data(script="examples/${notdir $*}",density=48,data_filename="topo/tests/${notdir $*}_STARTUPSPEEDDATA")'
 
 %_STARTUPSPEEDTEST: %_STARTUPSPEEDDATA
-	time ./topographica -c 'from topo.tests.test_script import compare_startup_speed_data; compare_startup_speed_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_STARTUPSPEEDDATA")'
+	./topographica -c 'from topo.tests.test_script import compare_startup_speed_data; compare_startup_speed_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_STARTUPSPEEDDATA")'
 
 .SECONDARY: ${SPEEDDATA} ${TRAINDATA} ${STARTUPSPEEDDATA} # Make sure that *_*DATA is kept around
 
