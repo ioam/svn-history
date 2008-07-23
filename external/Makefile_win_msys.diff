@@ -1,5 +1,5 @@
-*** Makefile	Wed Jul 23 14:43:51 2008
---- Makefile.w	Wed Jul 23 14:43:44 2008
+*** Makefile	Wed Jul 23 15:22:31 2008
+--- Makefile.win	Wed Jul 23 15:22:26 2008
 ***************
 *** 1,13 ****
 ! PREFIX = ${dir ${CURDIR}}
@@ -15,24 +15,17 @@
   
   all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
   
---- 1,23 ----
-! BACK_PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\//\\/g' | sed 's/\(.*\)./\1/')
-! PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\(.*\)./\1/')
-! # awful conversion of e.g. /c/path/to/here/ into c:\path\to\here
-! # and c:/path/to/here
-! # can't seem to specify path in one way that works for all packages
-! # /c/topographica
-! # c:\topographica
-! # c:/topographica
+--- 1,16 ----
+! PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\//\\\\/' | sed 's/\(.*\)./\1/')
+! PREFIX_FWD = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\(.*\)./\1/')
   CC = gcc
-  
 + # PIL
 + # http://mail.python.org/pipermail/image-sig/2004-December/003067.html
-+ 
+  
   # Options to pass to all setup.py install commands.
   # (Allows us to control installation location even when not using our
   # own Python, e.g. on Windows.)
-! PYSETUP_OPT = --prefix=${BACK_PREFIX} --install-scripts=${BACK_PREFIX}\bin
+! PYSETUP_OPT = --prefix=${PREFIX} --install-scripts=${PREFIX}\\bin
   
 + default: numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
 + # i.e. python, jpeg, pil installed as binaries beforehand
@@ -48,7 +41,7 @@
   ##############################################################
   # libblt: already available on nearly all systems, but some systems
   # have a version incompatible with tkinter (and Tcl/Tk?), so we build
---- 28,33 ----
+--- 21,26 ----
 ***************
 *** 188,194 ****
   #       # Tell OS X machines where to find freetype
@@ -58,7 +51,7 @@
   	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python selftest.py
   	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
   	touch pil
---- 197,203 ----
+--- 190,196 ----
   #       # Tell OS X machines where to find freetype
   	patch -p0 < Imaging_OSX.diff
   endif
@@ -75,7 +68,7 @@
   	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
   	touch matplotlib
   
---- 245,253 ----
+--- 238,246 ----
   
   matplotlib: ${MATPLOTLIB}.tar.gz python
   	tar -xzf ${MATPLOTLIB}.tar.gz
@@ -94,7 +87,7 @@
   	touch tilewrapper
   
   tilewrapper-uninstall:
---- 520,526 ----
+--- 513,519 ----
   TILEWRAPPER = Tile
   
   tilewrapper: python
@@ -103,18 +96,29 @@
   
   tilewrapper-uninstall:
 ***************
-*** 760,766 ****
+*** 760,773 ****
   GMP_UNINSTALL += lib/libgmp.* 
   GMP_UNINSTALL += include/gmp.h
   
 - 
   gmp: ${GMP}.tar.gz
   	tar -xzf ${GMP}.tar.gz
-  	cd ${GMP}; ./configure --prefix=${PREFIX} 
---- 771,776 ----
-***************
-*** 768,773 ****
---- 778,784 ----
+! 	cd ${GMP}; ./configure --prefix=${PREFIX} 
+  	make -C ${GMP}
+  	make -C ${GMP} check
+  	make -C ${GMP} install
+  	touch gmp
+  
+  gmp-clean: 
+  	rm -rf ${GMP} 
+--- 764,777 ----
+  GMP_UNINSTALL += lib/libgmp.* 
+  GMP_UNINSTALL += include/gmp.h
+  
+  gmp: ${GMP}.tar.gz
+  	tar -xzf ${GMP}.tar.gz
+! 	cd ${GMP}; ./configure --prefix=${PREFIX_FWD} 
+  	make -C ${GMP}
   	make -C ${GMP} check
   	make -C ${GMP} install
   	touch gmp
@@ -131,7 +135,7 @@
   	touch gmpy
   
   gmpy-clean:
---- 819,825 ----
+--- 812,818 ----
   
   gmpy: ${GMPY}.tar.gz python gmp
   	tar -xzf ${GMPY}.tar.gz
