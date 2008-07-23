@@ -1,5 +1,5 @@
-*** Makefile	Wed Jul 23 11:28:53 2008
---- Makefile.wpath	Wed Jul 23 12:56:42 2008
+*** Makefile	Wed Jul 23 14:43:51 2008
+--- Makefile.w	Wed Jul 23 14:43:44 2008
 ***************
 *** 1,13 ****
 ! PREFIX = ${dir ${CURDIR}}
@@ -16,8 +16,8 @@
   all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
   
 --- 1,23 ----
-! PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\//\\/g' | sed 's/\(.*\)./\1/')
-! GMP_PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\(.*\)./\1/') 
+! BACK_PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\//\\/g' | sed 's/\(.*\)./\1/')
+! PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\(.*\)./\1/') 
 ! # awful conversion of e.g. /c/path/to/here/ into c:\path\to\here
 ! # and c:/path/to/here
 ! # can't seem to specify path in one way that works for all packages
@@ -32,7 +32,7 @@
   # Options to pass to all setup.py install commands.
   # (Allows us to control installation location even when not using our
   # own Python, e.g. on Windows.)
-! PYSETUP_OPT = --prefix=${PREFIX} --install-scripts=${PREFIX}\bin
+! PYSETUP_OPT = --prefix=${BACK_PREFIX} --install-scripts=${BACK_PREFIX}\bin
   
 + default: numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
 + # i.e. python, jpeg, pil installed as binaries beforehand
@@ -103,29 +103,18 @@
   
   tilewrapper-uninstall:
 ***************
-*** 760,773 ****
+*** 760,766 ****
   GMP_UNINSTALL += lib/libgmp.* 
   GMP_UNINSTALL += include/gmp.h
   
 - 
   gmp: ${GMP}.tar.gz
   	tar -xzf ${GMP}.tar.gz
-! 	cd ${GMP}; ./configure --prefix=${PREFIX} 
-  	make -C ${GMP}
-  	make -C ${GMP} check
-  	make -C ${GMP} install
-  	touch gmp
-  
-  gmp-clean: 
-  	rm -rf ${GMP} 
---- 771,784 ----
-  GMP_UNINSTALL += lib/libgmp.* 
-  GMP_UNINSTALL += include/gmp.h
-  
-  gmp: ${GMP}.tar.gz
-  	tar -xzf ${GMP}.tar.gz
-! 	cd ${GMP}; ./configure --prefix=${GMP_PREFIX}
-  	make -C ${GMP}
+  	cd ${GMP}; ./configure --prefix=${PREFIX} 
+--- 771,776 ----
+***************
+*** 768,773 ****
+--- 778,784 ----
   	make -C ${GMP} check
   	make -C ${GMP} install
   	touch gmp
