@@ -17,7 +17,7 @@
   
 --- 1,23 ----
 ! BACK_PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\//\\/g' | sed 's/\(.*\)./\1/')
-! PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\(.*\)./\1/') 
+! PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\(.*\)./\1/')
 ! # awful conversion of e.g. /c/path/to/here/ into c:\path\to\here
 ! # and c:/path/to/here
 ! # can't seem to specify path in one way that works for all packages
