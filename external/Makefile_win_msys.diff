@@ -1,81 +1,67 @@
-*** Makefile	Tue Jul 22 23:32:23 2008
---- Makefile.w	Tue Jul 22 23:32:08 2008
+*** Makefile	Wed Jul 23 11:28:53 2008
+--- Makefile.wpath	Wed Jul 23 12:56:42 2008
 ***************
-*** 1,12 ****
-  PREFIX = ${dir ${CURDIR}}
+*** 1,13 ****
+! PREFIX = ${dir ${CURDIR}}
   CC = gcc
   
   # Options to pass to all setup.py install commands.
   # (Allows us to control installation location even when not using our
   # own Python, e.g. on Windows.)
 ! PYSETUP_OPT = --prefix=${PREFIX}
-  
+! 
 ! default: python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
   
   
   all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
---- 1,24 ----
-  PREFIX = ${dir ${CURDIR}}
+  
+--- 1,23 ----
+! PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\//\\/g' | sed 's/\(.*\)./\1/')
+! GMP_PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\(.*\)./\1/') 
+! # awful conversion of e.g. /c/path/to/here/ into c:\path\to\here
+! # and c:/path/to/here
+! # can't seem to specify path in one way that works for all packages
+! # /c/topographica
+! # c:\topographica
+! # c:/topographica
   CC = gcc
   
 + # PIL
 + # http://mail.python.org/pipermail/image-sig/2004-December/003067.html
 + 
-+ # can't seem to specify this in one way that works for all packages
-+ # /c/topographica
-+ # c:\topographica
-+ # c:/topographica
-+ PREFIX = "c:\topographica"
-+ 
   # Options to pass to all setup.py install commands.
   # (Allows us to control installation location even when not using our
   # own Python, e.g. on Windows.)
-! PYSETUP_OPT = --prefix=${PREFIX} --install-scripts="c:\topographica\bin"
-! 
+! PYSETUP_OPT = --prefix=${PREFIX} --install-scripts=${PREFIX}\bin
   
-! default: numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
-! # i.e. python, jpeg, pil installed as binaries beforehand
-! #default: python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
-  
++ default: numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
++ # i.e. python, jpeg, pil installed as binaries beforehand
   
   all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
-***************
-*** 176,194 ****
-  PIL_UNINSTALL = ${PYTHON_LIB}/site-packages/PIL
   
-  pil: ${PIL}.tgz jpeg python
-! 	tar -xzf ${PIL}.tgz
-  #	cd ${PIL}/libImaging; ./configure --prefix=${PREFIX} --with-jpeg=${PREFIX}/lib
-  #	make -C ${PIL}/libImaging
-  #
-  # Apply OS-specific patches:
-! ifeq ("$(shell uname -m)","x86_64")
-! #       # Tell 64-bit Linux machines where to find zlib, to prevent "encoder zip not available" problems
-! 	cd ${PIL}; patch < ../Imaging.diff
-! else ifeq ("$(shell uname -s)","Darwin")
-! #       # Tell OS X machines where to find freetype
-! 	patch -p0 < Imaging_OSX.diff
-! endif
+***************
+*** 18,24 ****
+  uninstall: python-uninstall jpeg-uninstall pil-uninstall numpy-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall scipy-uninstall mlabwrap-uninstall ipython-uninstall libsndfile-uninstall pyaudiolab-uninstall tilewrapper-uninstall psyco-uninstall pyrex-uninstall hdf5-uninstall pytables-uninstall gnuplotpy-uninstall player-uninstall progressbar-uninstall stage-uninstall gmp-uninstall mxnumber-uninstall gmpy-uninstall scrodget-uninstall tooltip-uninstall snit-uninstall
+  
+  
+- 
+  ##############################################################
+  # libblt: already available on nearly all systems, but some systems
+  # have a version incompatible with tkinter (and Tcl/Tk?), so we build
+--- 28,33 ----
+***************
+*** 188,194 ****
+  #       # Tell OS X machines where to find freetype
+  	patch -p0 < Imaging_OSX.diff
+  endif
 ! 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build_ext -i
   	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python selftest.py
   	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
   	touch pil
---- 188,206 ----
-  PIL_UNINSTALL = ${PYTHON_LIB}/site-packages/PIL
-  
-  pil: ${PIL}.tgz jpeg python
-! #	tar -xzf ${PIL}.tgz
-  #	cd ${PIL}/libImaging; ./configure --prefix=${PREFIX} --with-jpeg=${PREFIX}/lib
-  #	make -C ${PIL}/libImaging
-  #
-  # Apply OS-specific patches:
-! #ifeq ("$(shell uname -m)","x86_64")
-! ##       # Tell 64-bit Linux machines where to find zlib, to prevent "encoder zip not available" problems
-! #	cd ${PIL}; patch < ../Imaging.diff
-! #else ifeq ("$(shell uname -s)","Darwin")
-! ##       # Tell OS X machines where to find freetype
-! #	patch -p0 < Imaging_OSX.diff
-! #endif
+--- 197,203 ----
+  #       # Tell OS X machines where to find freetype
+  	patch -p0 < Imaging_OSX.diff
+  endif
 ! 	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build_ext --compiler=mingw32 -i
   	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python selftest.py
   	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
@@ -89,7 +75,7 @@
   	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
   	touch matplotlib
   
---- 248,256 ----
+--- 245,253 ----
   
   matplotlib: ${MATPLOTLIB}.tar.gz python
   	tar -xzf ${MATPLOTLIB}.tar.gz
@@ -108,7 +94,7 @@
   	touch tilewrapper
   
   tilewrapper-uninstall:
---- 523,529 ----
+--- 520,526 ----
   TILEWRAPPER = Tile
   
   tilewrapper: python
@@ -132,13 +118,13 @@
   
   gmp-clean: 
   	rm -rf ${GMP} 
---- 774,787 ----
+--- 771,784 ----
   GMP_UNINSTALL += lib/libgmp.* 
   GMP_UNINSTALL += include/gmp.h
   
   gmp: ${GMP}.tar.gz
   	tar -xzf ${GMP}.tar.gz
-! 	cd ${GMP}; ./configure --prefix="c:/topographica"
+! 	cd ${GMP}; ./configure --prefix=${GMP_PREFIX}
   	make -C ${GMP}
   	make -C ${GMP} check
   	make -C ${GMP} install
@@ -156,7 +142,7 @@
   	touch gmpy
   
   gmpy-clean:
---- 822,828 ----
+--- 819,825 ----
   
   gmpy: ${GMPY}.tar.gz python gmp
   	tar -xzf ${GMPY}.tar.gz
