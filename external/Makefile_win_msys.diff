@@ -1,5 +1,5 @@
-*** Makefile	Wed Jul 23 15:22:31 2008
---- Makefile.win	Wed Jul 23 15:22:26 2008
+*** Makefile	Wed Jul 23 16:02:47 2008
+--- Makefile.wpath	Wed Jul 23 16:02:43 2008
 ***************
 *** 1,13 ****
 ! PREFIX = ${dir ${CURDIR}}
@@ -16,7 +16,7 @@
   all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
   
 --- 1,16 ----
-! PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\//\\\\/g' | sed 's/\(.*\)./\1/')
+! PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\(.*\)./\1/' | sed 's/\//\\\\/g')
 ! PREFIX_FWD = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\(.*\)./\1/')
   CC = gcc
 + # PIL
@@ -25,7 +25,7 @@
   # Options to pass to all setup.py install commands.
   # (Allows us to control installation location even when not using our
   # own Python, e.g. on Windows.)
-! PYSETUP_OPT = --prefix=${PREFIX} --install-scripts=${PREFIX}\\bin
+! PYSETUP_OPT = --prefix=${PREFIX} --install-scripts=${PREFIX}\bin
   
 + default: numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
 + # i.e. python, jpeg, pil installed as binaries beforehand
