@@ -70,7 +70,8 @@ win-msys-patch:
 	touch external/tcl external/tk external/blt external/python external/pil external/jpeg
 	echo "[build]" > /c/Python25/Lib/distutils/distutils.cfg
 	echo "compiler = mingw32" >> /c/Python25/Lib/distutils/distutils.cfg
-	echo "import site; site.addsitedir('c:\\\topographica\\\Lib\\\site-packages'); site.addsitedir('c:\\\topographica\\\Lib')" >> /c/Python25/Lib/site-packages/topographica.pth
+	bin/python external/msys_path.py /c/Python25/Lib/site-packages/topographica.pth ${PREFIX}/lib ${PREFIX}/lib/site-packages
+#	echo "import site; site.addsitedir('c:\\\topographica\\\Lib\\\site-packages'); site.addsitedir('c:\\\topographica\\\Lib')" >> /c/Python25/Lib/site-packages/topographica.pth
 	patch --force external/Makefile external/Makefile_win_msys.diff
 	touch win-msys-patch
 
