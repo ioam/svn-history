@@ -16,7 +16,7 @@
   all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
   
 --- 1,16 ----
-! PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\//\\\\/' | sed 's/\(.*\)./\1/')
+! PREFIX = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\//\\\\/g' | sed 's/\(.*\)./\1/')
 ! PREFIX_FWD = $(shell echo ${dir ${CURDIR}} | sed 's/\///'  | sed 's/\//:\//' | sed 's/\(.*\)./\1/')
   CC = gcc
 + # PIL
