@@ -18,7 +18,7 @@ from numpy.oldnumeric import zeros, Float, sum
 from topo.projections.basic import CFProjection
 from topo.base.boundingregion import BoundingBox
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
-from topo.patterns.basic import Gaussian
+from topo.patterns.basic import Gaussian,Selector,Null
 from topo.outputfns.basic import HomeostaticMaxEnt,OutputFnWithState
 from topo.sheets.lissom import LISSOM
 from topo.sheets.optimized import NeighborhoodMask_Opt, LISSOM_Opt
@@ -27,10 +27,11 @@ from topo.commands.pylabplots import or_tuning_curve_batch, matrixplot
 from topo.commands.analysis import save_plotgroup, measure_or_tuning_fullfield
 from topo.misc.filepaths import normalize_path,application_path
 from topo.commands.pylabplots import plot_tracked_attributes
+from topo.base.parameterclasses import Number, Parameter,Parameter,ClassSelectorParameter,ListParameter
 from topo.base.functionfamilies import CoordinateMapperFn
 from topo.plotting.bitmap import MontageBitmap
-from topo.misc.traces import ActivityMovie,InMemoryRecorder
-
+#from topo.misc.traces import ActivityMovie,InMemoryRecorder
+from topo.base.patterngenerator import PatternGenerator,Constant 
 
 
 import matplotlib 
@@ -245,7 +246,7 @@ def AddV2():
                         output_fn=HomeostaticMaxEnt(a_init=14.5, b_init=__main__.__dict__.get('BINI',-4), mu=__main__.__dict__.get('V2MU',0.01)))
 
     topo.sim.connect('V1Complex','V2',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
-                    connection_type=CFProjection,strength=__main__.__dict__.get('V1aff_str',1),name='V1Afferent',
+                    connection_type=CFProjection,strength=__main__.__dict__.get('V1aff_str',5),name='V1Afferent',
                     weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                     generators=[Gaussian(aspect_ratio=1.0, size=3),#__main__.__dict__.get('V1aff_size',30)),
                                                                                 topo.patterns.random.UniformRandom()]),
@@ -413,7 +414,7 @@ def measure_histogram(iterations=1000,sheet_name="V1"):
     pylab.subplot(111, yscale='log')
     
     pylab.hist(concat_activities,(numpy.arange(20.0)/20.0))
-    pylab.axis(ymin=10,ymax=100000000)
+    pylab.axis(ymin=1,ymax=100000000)
       
     
     pylab.savefig(normalize_path(str(topo.sim.time()) + 'activity_histogram.png'))
@@ -580,16 +581,141 @@ class ActivityHysteresis(OutputFnWithState):
 
     def __init__(self,**params):
         super(ActivityHysteresis,self).__init__(**params)
-        self.old_a = self.activity.copy()*0.0
         self.first_call = True
         
     def __call__(self,x):
-        if (first_call == True):
-           self.old_a = self.activity.copy() * 0.0
-           first_call = False
-            
-        if (float(topo.sim.time()) %1.0) <= 0.15: self.old_a = 0 
+        if (self.first_call == True):
+           self.old_a = x.copy() * 0.0
+           self.first_call = False
+           
+        #if (float(topo.sim.time()) %1.0) <= 0.15: self.old_a =  self.old_a* 0 
         new_a = x.copy()
         self.old_a = self.old_a + (new_a - self.old_a)*self.time_constant
-        return self.old_a    
+        x*=0
+        x += self.old_a
+        
+class Translator(PatternGenerator):
+    """
+    PatternGenerator that moves another PatternGenerator over time.
+    
+    To create a pattern at a new location, asks the underlying
+    PatternGenerator to create a new pattern at a location translated
+    by an amount based on the global time.
+    """
+
+    generator = ClassSelectorParameter(default=Constant(scale=0.0),
+        class_=PatternGenerator,doc="""Pattern to be translated.""")
+        
+    direction = Number(default=0,bounds=(-pi,pi),doc="""
+        The direction in which the pattern should move, in radians.""")
+    
+    speed = Number(default=1,bounds=(0.0,None),doc="""
+        The speed with which the pattern should move,
+        in sheet coordinates per simulation time unit.""")
+    
+    reset_period = Number(default=1,bounds=(0.0,None),doc="""
+        When pattern position should be reset, usually to the value of a dynamic parameter.
+
+        The pattern is reset whenever fmod(simulation_time,reset_time)==0.""")
+    
+    last_time = 0.0
+
+
+    def __init__(self,**params):
+        super(Translator,self).__init__(**params)
+        self.orientation = params.get('orientation',self.orientation)
+        self.index = 0
+        
+    def __call__(self,**params):
+        """Construct new pattern out of the underlying one."""
+        generator = params.get('generator', self.generator)
+
+        # JABALERT: This condition seems to conflict with the
+        # docstring above; plus, the special case of 0.05 should be
+        # documented.  Maybe use a special case for last_time=0.0
+        # instead, to avoid depending on 0.05?
+        
+        xdensity=params.get('xdensity',self.xdensity)
+        ydensity=params.get('ydensity',self.ydensity)
+        bounds = params.get('bounds',self.bounds)
+
+        # CB: are the float() calls required because the comparisons
+        # involving FixedPoint fail otherwise? Or for some other
+        # reason?
+        if((float(topo.sim.time()) >= self.last_time + self.reset_period) or (float(topo.sim.time()) <=0.05)):
+            if ((float(topo.sim.time()) <= (self.last_time+self.reset_period+1.0)) and (float(topo.sim.time()) >=0.05))    :
+                return Null()(xdensity=xdensity,ydensity=ydensity,bounds=bounds)
+        
+            self.last_time += self.reset_period
+            # time to reset the parameter
+            (self.x, self.y, self.scale) = (generator.x,generator.y,generator.scale)
+            if isinstance(generator,Selector):
+                self.index = generator.index
+            generator.force_new_dynamic_value('x')
+            generator.force_new_dynamic_value('y')
+            generator.force_new_dynamic_value('scale')
+            discards = (self.direction,self.orientation)
+            self.direction = ((pi +self.inspect_value("orientation") + pi/2.0) % (2*pi)) - pi
+            
+        (a,b,c) = (generator.x,generator.y,generator.scale)   
+        
+       
+        # compute how much time elapsed from the last reset
+        t = float(topo.sim.time())-self.last_time
+
+        ## CEBALERT: mask gets applied twice, both for the underlying
+        ## generator and for this one.  (leads to redundant
+        ## calculations in current lissom_oo_or usage, but will lead
+        ## to problems/limitations in the future).
+        
+        dirr = self.inspect_value("direction")
+        # JAHACKALERT: I want it to move in perpendicular orientation
+        # JAB: Does it do that now, or not?  Please clarify.
+        return generator(xdensity=xdensity,ydensity=ydensity,bounds=bounds,x=self.x+t*cos(self.inspect_value("orientation")+pi/2)*self.speed,y=self.y+t*sin(self.inspect_value("orientation")+pi/2)*self.speed,orientation=self.inspect_value("orientation"),index=self.inspect_value("index"))#,scale=self.inspect_value("scale"))
+
+class SequenceSelector(PatternGenerator):
+    """
+    PatternGenerator that selects from a list of other PatternGenerators in a sequential order.
+    """
+
+    generators = ListParameter(default=[Constant()],precedence=0.97,
+                               class_=PatternGenerator,bounds=(1,None),
+        doc="List of patterns from which to select.")
+
+    size  = Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
+
+
+    def __init__(self,generators,**params):
+        super(SequenceSelector,self).__init__(**params)
+        self.generators = generators
+        self.index = 0 
+
+    def function(self,params):
+        """Selects and returns one of the patterns in the list."""
+        bounds = params['bounds']
+        xdensity=params['xdensity']
+        ydensity=params['ydensity']
+        x=params['x']
+        y=params['y']
+        scale=params['scale']
+        offset=params['offset']
+        size=params['size']
+        orientation=params['orientation']
+        index=params['index']
+        
+        if self.index == len(self.generators):
+           self.index = 0 
+        
+        pg = self.generators[self.index]
+        self.index = self.index + 1
+        
+        
+        
+        image_array = pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
+                         x=x+size*(pg.x*cos(orientation)-pg.y*sin(orientation)),
+                         y=y+size*(pg.x*sin(orientation)+pg.y*cos(orientation)),
+                         orientation=pg.orientation+orientation,size=pg.size*size,
+                         scale=pg.scale*scale,offset=pg.offset+offset)
+                       
+        return image_array
     
