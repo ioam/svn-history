@@ -17,7 +17,6 @@ from simulation import EPConnection
 from functionfamilies import OutputFn,IdentityOF
 from sheetview import ProjectionView
 
-
 class SheetMask(param.Parameterized):
     """
     An abstract class that defines a mask over a ProjectionSheet object.
@@ -342,7 +341,7 @@ class ProjectionSheet(Sheet):
         Constant value added to projection activity before combining multiplicatively.""")   
        
     divisive_constant = param.Number(default = 1.0,doc="""
-        Constant value added to projection activity before combining divisively.""")    
+        Constant value added to projection activity before combining divisively.""")  
     
     apply_output_fn=param.Boolean(default=True,
         doc="Whether to apply the output_fn after computing an Activity matrix.")
@@ -357,9 +356,7 @@ class ProjectionSheet(Sheet):
         disables all masking, but subclasses can use this mask to
         implement optimizations, non-rectangular Sheet shapes,
         lesions, etc.""")
-    
-    contFlag=param.Boolean(default=False,
-        doc="Whether to calculate the activity in the sheet continuously.")
+
     
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)
@@ -468,13 +465,6 @@ class ProjectionSheet(Sheet):
             for proj in tmp_dict[priority]:
                 tmp_activity += proj.activity
             self.activity=tmp_dict[priority][0].activity_group[1](self.activity,tmp_activity)
-            
-        # experimental time constant
-        
-        if self.contFlag:
-            new_a = self.activity.copy()
-            self.activity = self.old_a + (new_a - self.old_a)*0.3
-            self.old_a = self.activity.copy()
         
         if self.apply_output_fn:
             self.output_fn(self.activity)
