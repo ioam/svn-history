@@ -166,17 +166,8 @@ class TestPattern(SheetPanel):
 
         input_dict = dict([(sheet.name,sheet.input_generator) for sheet in self.plotgroup._sheets()])
 
-        for sheet in topo.sim.objects(Sheet).values():
-            if hasattr(sheet,'contFlag'):
-               sheet.old_a *= 0
-
         pattern_present(input_dict,self.duration,
                         plastic=self.plastic,overwrite_previous=False)
-
-
-        for sheet in topo.sim.objects(Sheet).values():
-            if hasattr(sheet,'contFlag'):
-               sheet.old_a *= 0
 
         topo.guimain.auto_refresh()
 	topo.sim.state_pop()
