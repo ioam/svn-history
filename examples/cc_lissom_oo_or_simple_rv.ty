@@ -30,7 +30,7 @@ from topo.misc.numbergenerators import UniformRandom, BoundedNumber, Exponential
 from topo.patterns.basic import Gaussian
 from topo.learningfns.projfns import CFPLF_Trace
 from topo.base.functionfamilies import CoordinateMapperFn
-from contrib.jacommands import randomize_V1Simple_relative_LGN_strength
+from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Translator
 
 
 topo.sim.name = "CCSimple"
@@ -41,16 +41,31 @@ core_size=locals().get('CS',0.5)
 
 num_inputs=1
 
-input= topo.patterns.basic.Translator(generator=topo.patterns.basic.Line(   x=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=1023),   y=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=53),size=1.0, offset=0.5,scale=Choice(choices=[-0.5,0.5],seed=56),bounds = BoundingBox(radius=0.8),thickness=0.04,smoothing=0.0),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
+dataset=locals().get('dataset',"Line") #set the input type by choosing the dataset parameter 
+
+
+if dataset=="Line":
+	input= Translator(generator=topo.patterns.basic.Line(   x=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=1023),   y=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=53),size=1.0, offset=0.5,scale=Choice(choices=[-0.5,0.5],seed=56),bounds = BoundingBox(radius=0.8),thickness=0.04,smoothing=0.0),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
+elif dataset=="Natural":
+    input_type=topo.patterns.image.Image
+    image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+    inputs=[input_type(filename=f,
+                       size=10.0,  #size_normalization='original',(size=10.0)
+                       x=0,
+                       y=0,
+                       orientation=0)
+		for f in image_filenames]
+    input =Translator(generator=topo.patterns.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
 
 
 ring=topo.patterns.basic.Ring(x=UniformRandom(lbound=-1.1,ubound=1.1,seed=1023),
                                                             y=UniformRandom(lbound=-1.1,ubound=1.1,seed=511),
-                                                            size=2, aspect_ratio=1.0, scale=0.7,thickness=0.03,
+                                                            size=2, aspect_ratio=1.0, scale=0.8,thickness=0.03,
                                                             offset=0.0,
                                                             bounds=BoundingBox(radius=1.125), smoothing=0.02)
 
-retinal_waves=topo.patterns.basic.Translator(generator=ring,orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
+
+retinal_waves=Translator(generator=ring,orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
 
 
 zeroInput = topo.patterns.basic.Null();
@@ -83,8 +98,8 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 units=[(0.25,0.25),(-0.25,0.25),
        (0.25,-0.25),(-0.25,-0.25)]
 
-V1Simple_OF=Sigmoid(r=locals().get('r_init',22),k=locals().get('k_init',-10))
-V1Complex_OF=Sigmoid(r=locals().get('r_init',14.5),k=locals().get('k_init',-4))
+V1Simple_OF=Sigmoid(r=locals().get('r_init',22),k=locals().get('k_init',-12))
+V1Complex_OF=Sigmoid(r=locals().get('r_init',14.5),k=locals().get('k_init',-3))
 
 
 
@@ -120,12 +135,12 @@ topo.sim['LGNOff']=CFSheet(nominal_density=48.0,
 
 topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',48.0),
                         nominal_bounds=BoundingBox(radius=core_size),
-                        output_fn=V1Simple_OF)
+                        output_fn=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),V1Simple_OF]))
 
                         
 topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',48.0),
                         nominal_bounds=BoundingBox(radius=core_size),
-                        output_fn=V1Complex_OF)
+                        output_fn=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),V1Complex_OF]))
 
 print topo.sim['V1Simple'].mask
 #topo.sim['V1Simple'].mask = NeighborhoodMask_Opt(threshold = 0.00001,radius = 0.15,sheet = topo.sim['V1Simple'])
@@ -193,7 +208,7 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNorm
 #V1 Complex
 
 topo.sim.connect('V1Simple','V1Complex',delay=0.05,
-                 connection_type=CFProjection,strength=locals().get('StoCStr',3),name='V1SimpleAfferent',
+                 connection_type=CFProjection,strength=locals().get('StoCStr',5),name='V1SimpleAfferent',
                  weights_generator=Gaussian(aspect_ratio=1.0, size=locals().get('StoCSize',0.15)),
                  nominal_bounds_template=BoundingBox(radius=locals().get('StoCBB',0.15)/2),learning_rate=0)
                 
@@ -228,15 +243,15 @@ topo.sim.connect('V1Complex','V1Complex',delay=0.05,name='LateralInhibitory',
 OFComplex = "topo.sim['V1Complex'].output_fn"
 OFSimple = "topo.sim['V1Simple'].output_fn"
 
-topo.sim.schedule_command(10000,"secondStage()")
+topo.sim.schedule_command(5000,"secondStage()")
 
 
-topo.sim.schedule_command(15000,OFComplex+".r=4.5;"+ OFComplex + ".k=-5")
-topo.sim.schedule_command(15000,OFSimple+".k=-10.5;")
+topo.sim.schedule_command(10001,OFComplex+".r=5;"+ OFComplex + ".k=-3.5")
+topo.sim.schedule_command(10001,OFSimple+".k=-10.5;")
 
 
 def offset_tf():
-	return topo.sim.time()-10000
+	return topo.sim.time()-5000
 
 
 def secondStage():
@@ -263,5 +278,7 @@ def secondStage():
     													  ExponentialDecay(starting_value = __main__.__dict__.get('SSS_lr',0.3)
     													  ,time_fn=offset_tf,time_constant=__main__.__dict__.get('S_tc',3200))))
     topo.sim['V1Complex'].in_connections[0].learning_rate=__main__.__dict__.get('SSC_lr',0.0)
+    topo.sim['V1Simple'].in_connections[0].strength=3
+    topo.sim['V1Simple'].in_connections[1].strength=3
     randomize_V1Simple_relative_LGN_strength()
 
