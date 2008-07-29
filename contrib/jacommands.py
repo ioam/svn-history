@@ -322,11 +322,11 @@ def homeostatic_analysis_function():
     
   
     if __main__.__dict__['triesch'] == True or  __main__.__dict__['simple'] == True: 
-        plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
-        plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], 0, topo.sim.time(), filename="V1", ylabel="V1")
-    else:
-        plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
+        plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
         plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[3], 0, topo.sim.time(), filename="V1", ylabel="V1")
+    else:
+        plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
+        plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[4], 0, topo.sim.time(), filename="V1", ylabel="V1")
 
    
     plot_tracked_attributes(topo.sim["V1"].projections()["LGNOnAfferent"].output_fn.output_fns[1], 0,topo.sim.time(), filename="LGNOnBefore", ylabel="LGNOnBefore")
@@ -397,11 +397,13 @@ def measure_histogram(iterations=1000,sheet_name="V1"):
     import contrib.jacommands    
     
     topo.sim["V1"].plastic=False
+    topo.sim.state_push()
+    
     for i in xrange(0,iterations):
-        topo.sim.state_push()
         topo.sim.run(1)
         contrib.jacommands.collect_activity(sheet_name)
-        topo.sim.state_pop()
+        
+    topo.sim.state_pop()
     concat_activities=[]
         
     for a in contrib.jacommands.activities:
@@ -548,7 +550,7 @@ class CascadeHomeostatic(OutputFnWithState):
             print self.targets
 
         # Apply sigmoid function to x, resulting in what Triesch calls y
-        x_orig = copy.copy(x)
+        x_orig = copy(x)
        
         x *= 0.0
         x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
