@@ -45,7 +45,7 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF, IdentityOF, ActivityAveragingOF, AttributeTrackingOF, Sigmoid, HalfRectify, HomeostaticMaxEnt
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.patterns.image import Image
-from contrib.jacommands import CascadeHomeostatic
+from contrib.jacommands import CascadeHomeostatic,ActivityHysteresis
 
 ####Input type###
 type_input=locals().get('ti',"Gaussian")
@@ -189,40 +189,20 @@ if tracking==True:
                                  eta=locals().get('eta',0.002*9), a_init=locals().get('a_init',14.5),
                                  b_init=locals().get('b_init',-5.5), mu=mu, step=9)
             V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['a', 'b','y_avg'], units=units, step=9)
-            V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
+            V1_OF=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),Attrib_Tracker, HE, V1_Tracker])
         else:
             HE=HomeostaticMaxEnt(smoothing=smoothing, eta=locals().get('eta',0.002*9), a_init=locals().get('a_init',14.5),
                                  b_init=locals().get('b_init',-5.5), mu=mu, step=9)
             V1_Tracker=AttributeTrackingOF(object=HE,coordframe="topo.sim['V1']", attrib_names=['a', 'b','y_avg'], units=units, step=9)
-            V1_OF=PipelineOF(output_fns=[HE, V1_Tracker])
+            V1_OF=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),HE, V1_Tracker])
     elif simple==True:
             Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
             HE=CascadeHomeostatic(smoothing=smoothing,g_smoothing=locals().get('V1_smoothing',smoothing), a_smoothing=locals().get('a_smoothing',0.9997),b_smoothing=locals().get('b_smoothing',0.9997), 
                                  b_eta=locals().get('b_eta',0.002*9),a_eta=locals().get('a_eta',0.002*9), a_init=locals().get('a_init',14.5),
                                  b_init=locals().get('b_init',-5.5), mu=mu, step=9)
             V1_Tracker=AttributeTrackingOF(object=HE, coordframe="topo.sim['V1']",attrib_names=['a', 'b','y_avg','y_count'], units=units, step=9)
-            V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
-    else:
-        if scaling==True:
-            Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1']", attrib_names=['x_avg', 'sf','lr_sf', 'scaled_x_avg'], units=units)
-            HE=Sigmoid(r=locals().get('a_init',12),k=locals().get('b_init',-5.5))
-            AV=ActivityAveragingOF(smoothing=smoothing,step=1)
-            V1_Tracker=AttributeTrackingOF(object=AV,coordframe="topo.sim['V1']", attrib_names=['x_avg'], units=units, step=1)
-            V1_OF=PipelineOF(output_fns=[Attrib_Tracker, HE, AV, V1_Tracker])
-        else:
-            HE=Sigmoid(r=locals().get('a_init',12),k=locals().get('b_init',-5.5))
-            AV=ActivityAveragingOF(smoothing=smoothing,step=1)
-            V1_Tracker=AttributeTrackingOF(object=AV,coordframe="topo.sim['V1']", attrib_names=['x_avg'], units=units, step=1)
-            V1_OF=PipelineOF(output_fns=[HE, AV, V1_Tracker])
-else:
-    if triesch==True:
-        V1_OF=HomeostaticMaxEnt(smoothing=locals().get('V1_smoothing',smoothing), 
-                             eta=locals().get('eta',0.002*9), a_init=locals().get('a_init',14.5),
-                                b_init=locals().get('b_init',-5.5), mu=mu, step=9)
-   
-    else:
-        V1_OF=Sigmoid(r=locals().get('a_init',12),k=locals().get('b_init',-5.5))
-       
+            V1_OF=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),Attrib_Tracker, HE, V1_Tracker])
+
 #Output Functions: Projections
 #Debugging
 #LGNOnAfferent
@@ -294,12 +274,12 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=default_retina_density,
 topo.sim['LGNOn']=LISSOM(nominal_density=default_retina_density,
                           nominal_bounds=BoundingBox(radius=0.5+0.25),
                           output_fn=LGN_on_output_fn,
-                          measure_maps=False,divisive_constant=locals().get('dc',1.0),scale=locals().get("LGNStr",4.2))
+                          measure_maps=False)
 
 topo.sim['LGNOff']=LISSOM(nominal_density=default_retina_density,
                            nominal_bounds=BoundingBox(radius=0.5+0.25),
                            output_fn=LGN_off_output_fn,
-                           measure_maps=False,divisive_constant=locals().get('dc',1.0),scale=locals().get("LGNStr",4.2))
+                           measure_maps=False)
 
 
 if scaling==False:
