@@ -168,13 +168,13 @@ topo.sim.connect('FakeRetina2','LGNOff',delay = 0.05,
                  nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent')
 
 
-c1 = Choice(choices=[0.1,0.9],seed=56)
-c1._Dynamic_time_fn = None
-c2 = Choice(choices=[0.9,0.1],seed=56)
-c2._Dynamic_time_fn = None
-g1 = Gaussian(aspect_ratio=1.0,scale=c1,size=UniformRandom(lbound=0.4,ubound=0.4,seed=56))
+#c1 = Choice(choices=[0.1,0.9],seed=56)
+#c1._Dynamic_time_fn = None
+#c2 = Choice(choices=[0.9,0.1],seed=56)
+#c2._Dynamic_time_fn = None
+g1 = Gaussian(aspect_ratio=1.0,scale=1.0,size=UniformRandom(lbound=0.4,ubound=0.4,seed=56))
 g1._Dynamic_time_fn = None
-g2 = Gaussian(aspect_ratio=1.0,scale=c2,size=UniformRandom(lbound=0.4,ubound=0.4,seed=56))
+g2 = Gaussian(aspect_ratio=1.0,scale=1.0,size=UniformRandom(lbound=0.4,ubound=0.4,seed=56))
 g2._Dynamic_time_fn = None
 
 
@@ -246,7 +246,7 @@ OFSimple = "topo.sim['V1Simple'].output_fn"
 topo.sim.schedule_command(5000,"secondStage()")
 
 
-topo.sim.schedule_command(10001,OFComplex+".r=5;"+ OFComplex + ".k=-2.5")
+topo.sim.schedule_command(10001,OFComplex+".r=4;"+ OFComplex + ".k=-3")
 topo.sim.schedule_command(10001,OFSimple+".k=-10.5;")
 
 
