@@ -42,11 +42,13 @@ CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
+
 ###########################################
 # build simulation
 eyes=['']
 center_polarities=['On','Off']
-cone_types=['Red','Green']
+rg_cone_types=['Red','Green']
+rgb_cone_types=['Red','Green','Blue']
 opponent_types=['Red-Green','Green-Red','Luminosity']
 lags=['']
 
@@ -58,8 +60,8 @@ for e in eyes:
     for n in lags:
         default_retina_density=locals().get('default_retina_density',48.0)
 
-        for cone in cone_types:
-            image_filenames=["images/colormap/%02d_%d.png"%(i,(cone=='Green')) for i in xrange(5)]
+        for cone in rgb_cone_types:
+            image_filenames=["images/colormap/%02d_%d.png"%(i,rgb_cone_types.index(cone)) for i in xrange(5)]
             inputs=[input_type(filename=f, size=10.0,#size_normalization='original',
                                x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
                                y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
@@ -96,19 +98,20 @@ surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1
 for e in eyes:
     for n in lags:
         for l in center_polarities:
-            for cone in cone_types:
+            for cone in rg_cone_types:
                 topo.sim.connect(e+cone+'Retina'+n,
-                                 e+cone+'-'+cone_types[cone_types.index(cone)-1]+' LGN'+l+n, delay=0.05,
+                                 e+cone+'-'+rg_cone_types[rg_cone_types.index(cone)-1]+' LGN'+l+n, delay=0.05,
 		                 connection_type=SharedWeightCFProjection, strength=4.7*(-1)**center_polarities.index(l),
 		                 nominal_bounds_template=BoundingBox(radius=0.375), 
                                  name='AfferentCenter', weights_generator=centerg)
 
                 topo.sim.connect(e+cone+'Retina'+n,
-                                 e+cone_types[cone_types.index(cone)-1]+'-'+cone+' LGN'+l+n, delay=0.05,
+                                 e+rg_cone_types[rg_cone_types.index(cone)-1]+'-'+cone+' LGN'+l+n, delay=0.05,
                                  connection_type=SharedWeightCFProjection, strength=4.7*(-1)**(1+center_polarities.index(l)),
                                  nominal_bounds_template=BoundingBox(radius=0.375),
                                  name='AfferentSurround', weights_generator=surroundg)
 
+            for cone in rg_cone_types: #rgb_cone
                 topo.sim.connect(e+cone+'Retina'+n,
 		                 e+'Luminosity LGN'+l+n, delay=0.05,
 		                 connection_type=SharedWeightCFProjection, strength=4.7*(-1)**center_polarities.index(l)/2,
@@ -239,7 +242,7 @@ for n in lags:
 es=[]
 for n in lags:
    for e in eyes:
-        for cone in cone_types:
+        for cone in rg_cone_types:
             es += [None]*(len(center_polarities)/2) + [e+cone+'Retina'+n,None] + \
                   [None]*(len(center_polarities)/2)
 
