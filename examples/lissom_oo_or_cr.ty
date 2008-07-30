@@ -49,7 +49,7 @@ eyes=['']
 center_polarities=['On','Off']
 rg_cone_types=['Red','Green']
 rgb_cone_types=['Red','Green','Blue']
-opponent_types=['Red-Green','Green-Red','Luminosity']
+opponent_types=['Red-Green','Green-Red','Blue-RedGreen','Luminosity']
 lags=['']
 
 ids=4.0
@@ -111,16 +111,28 @@ for e in eyes:
                                  nominal_bounds_template=BoundingBox(radius=0.375),
                                  name='AfferentSurround', weights_generator=surroundg)
 
-            for cone in rg_cone_types: #rgb_cone
+                topo.sim.connect(e+cone+'Retina'+n,
+                                 e+'Blue-RedGreen'+' LGN'+l+n, delay=0.05,
+                                 connection_type=SharedWeightCFProjection, strength=4.7*(-1)**(1+center_polarities.index(l))/2,
+                                 nominal_bounds_template=BoundingBox(radius=0.375),
+                                 name='AfferentCenter'+cone, weights_generator=centerg)
+
+            topo.sim.connect(e+'Blue'+'Retina'+n,
+                             e+'Blue-RedGreen'+' LGN'+l+n, delay=0.05,
+                             connection_type=SharedWeightCFProjection, strength=4.7*(-1)**center_polarities.index(l),
+                             nominal_bounds_template=BoundingBox(radius=0.375),
+                             name='AfferentCenter'+'Blue', weights_generator=centerg)
+            
+            for cone in rgb_cone_types: 
                 topo.sim.connect(e+cone+'Retina'+n,
 		                 e+'Luminosity LGN'+l+n, delay=0.05,
-		                 connection_type=SharedWeightCFProjection, strength=4.7*(-1)**center_polarities.index(l)/2,
+		                 connection_type=SharedWeightCFProjection, strength=4.7*(-1)**center_polarities.index(l)/3,
 		                 nominal_bounds_template=BoundingBox(radius=0.375),
 		                 name='AfferentCenter'+cone, weights_generator=centerg)
 
                 topo.sim.connect(e+cone+'Retina'+n,
 		                 e+'Luminosity LGN'+l+n, delay=0.05,
-		                 connection_type=SharedWeightCFProjection, strength=4.7*(-1)**(1+center_polarities.index(l))/2,
+		                 connection_type=SharedWeightCFProjection, strength=4.7*(-1)**(1+center_polarities.index(l))/3,
 		                 nominal_bounds_template=BoundingBox(radius=0.375),
 		                 name='AfferentSurround'+cone, weights_generator=surroundg)
 		                         
@@ -242,7 +254,7 @@ for n in lags:
 es=[]
 for n in lags:
    for e in eyes:
-        for cone in rg_cone_types:
+        for cone in rgb_cone_types:
             es += [None]*(len(center_polarities)/2) + [e+cone+'Retina'+n,None] + \
                   [None]*(len(center_polarities)/2)
 
