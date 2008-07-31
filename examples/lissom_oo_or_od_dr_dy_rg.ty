@@ -1,5 +1,5 @@
 """
-Example of a LISSOM-based orientation, direction, ocular dominance and disparity preference map.
+Example of a LISSOM-based orientation, direction, ocular dominance, disparity and color preference map.
 
 Direction, ocular dominance and disparity dimensions can be turned on and off.
 Here are examples of the commands that you could use to get the
@@ -96,6 +96,7 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 # build simulation
 center_polarities=['On','Off']
 cone_types=['']
+basic_opponent_types=['']
 opponent_types=['']
 eyes=['']
 lags=['']
@@ -103,7 +104,8 @@ speed=0.0
 disparity_bound = 0.0
 position_bound = 0.75
 
-dims=locals().get('dims',['or','od','dr','dy'])
+
+dims=locals().get('dims',['or','od','dr','dy','rg'])
 if 'od' in dims or 'dy' in dims: eyes=['Left', 'Right']
 if 'dr' in dims: 
     lags=['0','1','2','3']
@@ -112,6 +114,11 @@ if 'dy' in dims:
     max_disparity = locals().get('max_disparity',2.0)
     disparity_bound = max_disparity*0.041665/2.0
     if max_disparity > 0.0: position_bound = 0.70833
+if 'rg' in dims:
+    cone_types=['Red','Green']
+    basic_opponent_types=['Red-Green ','Green-Red ']  
+    opponent_types=['Red-Green ','Green-Red ','Luminosity ']    
+
 
 num_inputs=1
 dataset=locals().get('dataset',"Gaussian")
@@ -123,6 +130,7 @@ elif dataset=="Nature":
     ids=4.0
         
 default_retina_density=locals().get('default_retina_density',48.0 if dataset=="Nature" or 'dy' in dims else 24.0)
+
 
 for e in eyes:
     for n in lags:
@@ -154,19 +162,19 @@ for e in eyes:
 
             if n != '':
                 input_moved=Sweeper(generator=copy.deepcopy(input_composite),step=int(n),speed=speed/24.0,
-                                orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
+                                    orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
             else: input_moved=input_composite
 
-            topo.sim[e+'Retina'+n]=GeneratorSheet(nominal_density=default_retina_density,
-                                                   input_generator=input_moved,
-                                                   period=1.0, phase=0.05,
-                                                   nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
+            topo.sim[e+cone+'Retina'+n]=GeneratorSheet(nominal_density=default_retina_density,
+                                                       input_generator=input_moved,
+                                                       period=1.0, phase=0.05,
+                                                       nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
         for l in center_polarities:
             for opponent in opponent_types:
                 topo.sim[e+opponent+'LGN'+l+n]=CFSheet(nominal_density=24.0,
-                                              nominal_bounds=BoundingBox(radius=0.5+0.25),
-                                              output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
-                                              measure_maps=False)
+                                                        nominal_bounds=BoundingBox(radius=0.5+0.25),
+                                                        output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                                                        measure_maps=False)
 
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,
                         nominal_bounds=BoundingBox(radius=0.5))
@@ -185,40 +193,53 @@ if dataset=="Nature":
 for e in eyes:
     for n in lags:
 	for l in center_polarities:
-            for cone in cone_types:
-                topo.sim.connect(e+cone+'Retina'+n,
-                                 e+cone+'LGN'+l+n, delay=0.05,
+            basic_opponent_types_tmp=basic_opponent_types
+            basic_opponent_types_tmp.reverse()
+            for (cone,opponentcenter,opponentsurround) in zip(cone_types,basic_opponent_types,basic_opponent_types_tmp):
+                topo.sim.connect(e+cone+'Retina'+n, e+opponentcenter+'LGN'+l+n, delay=0.05,
                  		 connection_type=SharedWeightCFProjection,strength=strength[int(speed)]*(-1)**center_polarities.index(l), 
                  		 nominal_bounds_template=BoundingBox(radius=0.375),name='AfferentCenter',
                  		 weights_generator=centerg)
 
-                topo.sim.connect(e+'Retina'+n,
-                                 e+cone+'LGN'+l+n, delay=0.05,
+                topo.sim.connect(e+cone+'Retina'+n, e+opponentsurround+'LGN'+l+n, delay=0.05,
                                  connection_type=SharedWeightCFProjection,strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l)), 
                                  nominal_bounds_template=BoundingBox(radius=0.375),name='AfferentSurround',
                                  weights_generator=surroundg)
+
+                if 'Luminosity ' in opponent_types:
+                    topo.sim.connect(e+cone+'Retina'+n, e+'Luminosity LGN'+l+n, delay=0.05,
+                                     connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**center_polarities.index(l)/2,
+                                     nominal_bounds_template=BoundingBox(radius=0.375),
+                                     name='AfferentCenter'+cone, weights_generator=centerg)
+
+                    topo.sim.connect(e+cone+'Retina'+n, e+'Luminosity LGN'+l+n, delay=0.05,
+                                     connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l))/2,
+                                     nominal_bounds_template=BoundingBox(radius=0.375),
+                                     name='AfferentSurround'+cone, weights_generator=surroundg)
+
 
             for opponent in opponent_types:
 		topo.sim.connect(e+opponent+'LGN'+l+n,'V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
                                  connection_type=CFProjection,strength=1.0,name=e+opponent+'LGN'+l+'Afferent'+n,
                                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
-                                                                             topo.patterns.random.UniformRandom(scale=0, offset=1)]),
+                                                                             topo.patterns.random.UniformRandom()]),
                                  nominal_bounds_template=BoundingBox(radius=0.27083),
                                  learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids) 
+
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,strength=1.2 if dataset=="Nature" else 0.9,
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.10417),
-                                                                             topo.patterns.random.UniformRandom(scale=0, offset=1)]),
+                                                                             topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.10417),learning_rate=2.55528/ids) 
             
 topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
                  connection_type=CFProjection,strength=-1.75 if dataset=="Nature" else -0.9, 
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
-                                                                             topo.patterns.random.UniformRandom(scale=0, offset=1)]),
+                                                                             topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=1.80873/ids/5 if dataset=="Nature" else 1.80873/ids)  
 
 
@@ -267,14 +288,15 @@ if dataset=="Nature":
     topo.sim.schedule_command( 2000*st,LI+'.strength=-2.6')
 
 ### Afferent learning rate changes
-for n in lags:
-    for e in eyes:
-        for l in center_polarities:
-            S ='topo.sim["V1"].projections()["'+e+'LGN'+l+'Afferent'+n+'"]'
-            topo.sim.schedule_command(  500*st,S+'.learning_rate=0.6850/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids')
-            topo.sim.schedule_command( 2000*st,S+'.learning_rate=0.5480/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids')
-            topo.sim.schedule_command( 4000*st,S+'.learning_rate=0.4110/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids')
-            topo.sim.schedule_command(20000*st,S+'.learning_rate=0.2055/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids')
+for opponent in opponent_types:
+    for n in lags:
+        for e in eyes:
+            for l in center_polarities:
+                S ='topo.sim["V1"].projections()["'+e+opponent+'LGN'+l+'Afferent'+n+'"]'
+                topo.sim.schedule_command(  500*st,S+'.learning_rate=0.6850/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids')
+                topo.sim.schedule_command( 2000*st,S+'.learning_rate=0.5480/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids')
+                topo.sim.schedule_command( 4000*st,S+'.learning_rate=0.4110/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids')
+                topo.sim.schedule_command(20000*st,S+'.learning_rate=0.2055/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids')
 
 ### Activation function threshold changes
 OF='topo.sim["V1"].output_fn'
