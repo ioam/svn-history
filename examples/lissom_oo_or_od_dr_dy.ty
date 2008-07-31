@@ -213,7 +213,7 @@ topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
                                                                              topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=1.80873/ids/5)  
+                 nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=1.80873/ids/5 if dataset=="Nature" else 1.80873/ids)  
 
 
 ### Actions scheduled to occur as the simulation proceeds.#
