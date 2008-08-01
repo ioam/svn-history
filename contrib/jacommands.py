@@ -229,11 +229,11 @@ def AddV2():
                     generators = [
                                        #topo.patterns.basic.Gaussian(scale=1,size = 0.08838,orientation=0,aspect_ratio=5.6666,x=0.45),
                                        #topo.patterns.basic.Gaussian(scale=1,size = 0.08838,orientation=pi/2,aspect_ratio=5.6666,y=0.45)],
-                                       topo.patterns.basic.Gaussian(scale=1,size = 0.06,orientation=0,aspect_ratio=7,x=0.3),
-                                       topo.patterns.basic.Gaussian(scale=1,size = 0.06,orientation=pi/2,aspect_ratio=7,y=0.3)],
-                    scale=1.0, bounds=BoundingBox(radius=0.8),
-                    x=UniformRandom(lbound=-(__main__.__dict__.get('BS',0.5)+0.25),ubound=(__main__.__dict__.get('BS',0.5)+0.25),seed=12),
-                    y=UniformRandom(lbound=-(__main__.__dict__.get('BS',0.5)+0.25),ubound=(__main__.__dict__.get('BS',0.5)+0.25),seed=34),
+                                       topo.patterns.basic.Gaussian(scale=1,size = 0.04,orientation=0,aspect_ratio=9,x=0.2),
+                                       topo.patterns.basic.Gaussian(scale=1,size = 0.04,orientation=pi/2,aspect_ratio=9,y=0.2)],
+                    scale=1.0, bounds=BoundingBox(radius=0.5),
+                    x=UniformRandom(lbound=-(__main__.__dict__.get('BS',0.5)),ubound=(__main__.__dict__.get('BS',0.5)),seed=12),
+                    y=UniformRandom(lbound=-(__main__.__dict__.get('BS',0.5)),ubound=(__main__.__dict__.get('BS',0.5)),seed=34),
                     orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
                 for i in xrange(1)]
     #combined_corners = topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=corners)
@@ -246,14 +246,12 @@ def AddV2():
                         output_fn=HomeostaticMaxEnt(a_init=14.5, b_init=__main__.__dict__.get('BINI',-4), mu=__main__.__dict__.get('V2MU',0.01)))
 
     topo.sim.connect('V1Complex','V2',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
-                    connection_type=CFProjection,strength=__main__.__dict__.get('V1aff_str',5),name='V1Afferent',
+                    connection_type=CFProjection,strength=__main__.__dict__.get('V1aff_str',1.3),name='V1Afferent',
                     weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                     generators=[Gaussian(aspect_ratio=1.0, size=3),#__main__.__dict__.get('V1aff_size',30)),
                                                                                 topo.patterns.random.UniformRandom()]),
-                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V1aff_size',2*0.27083)/2),learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                                                                                                    ExponentialDecay(starting_value = __main__.__dict__.get('V1aff_lr',0.9590/2),
-                                                                                                                    time_constant=__main__.__dict__.get('V1aff_lrtc',1600),
-                                                                                                                    time_offset=2000))))
+                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V1aff_size',2*0.27083)/2),learning_rate=1.0);
+
     topo.sim.connect('V2','V2',delay=0.05,name='V2LateralExcitatory',
                     connection_type=CFProjection,strength=0.9,
                     weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=__main__.__dict__.get('V2lat_exc_size',0.04)),
@@ -266,8 +264,12 @@ def AddV2():
                                                                                 topo.patterns.random.UniformRandom()]),
                     nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2lat_inh_size',2*0.22917)/2),learning_rate=1.8087)
 
-    topo.sim["V1Simple"].in_connections[0].strength=1.8
-    topo.sim["V1Simple"].in_connections[1].strength=1.8
+    topo.sim["V1Simple"].in_connections[0].strength=2.5
+    topo.sim["V1Simple"].in_connections[1].strength=2.5
+    topo.sim["V1Complex"].output_fn.output_fns[1].r=7
+    topo.sim["V1Simple"].plastic=False
+    topo.sim["V1Complex"].plastic=False
+    
     
 
 def divide_with_constant(x,y):
