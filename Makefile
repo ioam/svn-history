@@ -293,6 +293,9 @@ doc: FORCE
 	make -C doc/
 
 
+# CB: work in progress (to be run on windows, for creating exe)
+build-win-exe: topographica
+	bin/python win_build_exe.py py2exe
 
 #############################################################################
 # For maintainer only; be careful with these commands
