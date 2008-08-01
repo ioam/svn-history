@@ -138,14 +138,14 @@ class PatternPresenter(param.Parameterized):
         if features_values.has_key('hue'):
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
                 r,g,b=hsv_to_rgb(features_values['hue'],1.0,1.0)
-                if (name[0:3]=='Red'):
+                if (name.count('Red')):
                     inputs[name].scale=r
-                elif (name[0:5]=='Green'):
+                elif (name.count('Green')):
                     inputs[name].scale=g
-                elif (name[0:4]=='Blue'):
+                elif (name.count('Blue')):
                     inputs[name].scale=b
                 else: 
-                    self.warning('Hue is defined only when there are different input sheets with names starting with Red-, Green-, Blue-.')
+                    self.warning('Hue is defined only when there are different input sheets with names with Red, Green or Blue substrings.')
 
         if features_values.has_key('retinotopy'):
             #Calculates coordinates of the centre of each SineGratingRectangle to be presented 
@@ -215,13 +215,13 @@ class PatternPresenter(param.Parameterized):
 
         if features_values.has_key("ocular"):
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
-                if (name[0:5]=='Right'):
+                if (name.count('Right')):
                     inputs[name].scale=2*inputs[name].ocular
                 else:
-                    if (name[0:4]=='Left'):
+                    if (name.count('Left')):
                         inputs[name].scale=2.0-2*inputs[name].ocular
                     else:
-                        self.warning('Ocularity is defined only when there are inputs for right and left retinas.')
+                        self.warning('Ocularity is defined only when there are inputs for Right and Left retinas.')
 
 
         # For WhiskerArray only; used to set the delay/lag in each input sheet
