@@ -1,20 +1,22 @@
 """
 Example of a LISSOM-based orientation, direction, ocular dominance, disparity and color preference map.
 
-Direction, ocular dominance and disparity dimensions can be turned on and off.
+Direction, ocular dominance, disparity and color dimensions can be turned on and off.
 Here are examples of the commands that you could use to get the
 specified combinations of maps:
-  OR:               ./topographica -c "dims=['or']"                examples/lissom_oo_or_od_dr_dy.ty
-  OR/DR:            ./topographica -c "dims=['or','dr']"           examples/lissom_oo_or_od_dr_dy.ty
-  OR/OD:            ./topographica -c "dims=['or','od']"           examples/lissom_oo_or_od_dr_dy.ty
-  OR/OD/DR:         ./topographica -c "dims=['or','od','dr']"      examples/lissom_oo_or_od_dr_dy.ty
-  OR/OD/DR/DY:      ./topographica -c "dims=['or','od','dr','dy']" examples/lissom_oo_or_od_dr_dy.ty
+  OR:               ./topographica -c "dims=['or']"                     examples/lissom_oo_or_od_dr_dy_rg.ty
+  OR/DR:            ./topographica -c "dims=['or','dr']"                examples/lissom_oo_or_od_dr_dy_rg.ty
+  OR/OD:            ./topographica -c "dims=['or','od']"                examples/lissom_oo_or_od_dr_dy_rg.ty
+  OR/RG:            ./topographica -c "dims=['or','rg']"                examples/lissom_oo_or_od_dr_dy_rg.ty
+  OR/OD/DR:         ./topographica -c "dims=['or','od','dr']"           examples/lissom_oo_or_od_dr_dy_rg.ty
+  OR/OD/DR/DY:      ./topographica -c "dims=['or','od','dr','dy']"      examples/lissom_oo_or_od_dr_dy_rg.ty
+  OR/OD/DR/DY/RG:   ./topographica -c "dims=['or','od','dr','dy','rg']" examples/lissom_oo_or_od_dr_dy_rg.ty
 
-OR/OD/DR/DY is the default.
+OR/OD/DR/DY/RG is the default.
 
 You can also select different training datasets:
- Gaussians:      ./topographica -c "dataset='Gaussian'" examples/lissom_oo_or_od_dr_dy.ty
- Natural images: ./topographica -c "dataset='Nature'"   examples/lissom_oo_or_od_dr_dy.ty  
+ Gaussians:      ./topographica -c "dataset='Gaussian'" examples/lissom_oo_or_od_dr_dy_rg.ty
+ Natural images: ./topographica -c "dataset='Nature'"   examples/lissom_oo_or_od_dr_dy_rg.ty  
 
 Gaussian is the default.
 
@@ -93,16 +95,16 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 
 
 ###########################################
-# build simulation
-center_polarities=['On','Off']
-cone_types=['']
-basic_opponent_types=['']
-opponent_types=['']
-eyes=['']
-lags=['']
-speed=0.0
-disparity_bound = 0.0
-position_bound = 0.75
+# build simulation                  # parameters for:
+center_polarities=['On','Off']      # oo
+cone_types=['']                     # rg
+opponent_types=['']                 # rg
+basic_opponent_types=['']           # rg 
+eyes=['']                           # od,dy
+lags=['']                           # dr
+speed=0.0                           # dr
+disparity_bound = 0.0               # dy
+position_bound = 0.75               # dy
 
 
 dims=locals().get('dims',['or','od','dr','dy','rg'])
@@ -116,8 +118,8 @@ if 'dy' in dims:
     if max_disparity > 0.0: position_bound = 0.70833
 if 'rg' in dims:
     cone_types=['Red','Green']
-    basic_opponent_types=['Red-Green ','Green-Red ']  
     opponent_types=['Red-Green ','Green-Red ','Luminosity ']    
+    basic_opponent_types=['Red-Green ','Green-Red ']  
 
 
 num_inputs=1
@@ -149,8 +151,9 @@ for e in eyes:
                 input_composite=topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
 
             elif dataset=="Nature":
-                image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
-                inputs=[input_type(filename=f,size=10.0, # size_normalization='original',
+                if 'rg' in dims: image_filenames=["images/colormap/%02d_%d.png"%(i,(cone=='Green')) for i in xrange(5)]
+                else:            image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+                inputs=[input_type(filename=f, size=10.0,
                                    x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12) + \
                                      UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150)*(-1)**(e=='Left'),
                                    y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
@@ -193,7 +196,7 @@ if dataset=="Nature":
 for e in eyes:
     for n in lags:
 	for l in center_polarities:
-            basic_opponent_types_tmp=basic_opponent_types
+            basic_opponent_types_tmp=list(basic_opponent_types)
             basic_opponent_types_tmp.reverse()
             for (cone,opponentcenter,opponentsurround) in zip(cone_types,basic_opponent_types,basic_opponent_types_tmp):
                 topo.sim.connect(e+cone+'Retina'+n, e+opponentcenter+'LGN'+l+n, delay=0.05,
