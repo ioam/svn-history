@@ -583,8 +583,8 @@ PSYCO = psyco-dist
 
 PSYCO_UNINSTALL += ${PYTHON_LIB}/site-packages/psyco
 
-psyco: ${PSYCO}-svn42201.tar.gz python
-	tar -xzf ${PSYCO}-svn42201.tar.gz
+psyco: ${PSYCO}-svn56930.tar.gz python
+	tar -xzf ${PSYCO}-svn56930.tar.gz
 	cd ${PSYCO}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
 	touch psyco
 
