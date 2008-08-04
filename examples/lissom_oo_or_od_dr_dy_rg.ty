@@ -12,7 +12,7 @@ specified combinations of maps:
   OR/OD/DR/DY:      ./topographica -c "dims=['or','od','dr','dy']"      examples/lissom_oo_or_od_dr_dy_rg.ty
   OR/OD/DR/DY/RG:   ./topographica -c "dims=['or','od','dr','dy','rg']" examples/lissom_oo_or_od_dr_dy_rg.ty
 
-OR/OD/DR/DY/RG is the default.
+OR/OD/DR/DY is the default.
 
 You can also select different training datasets:
  Gaussians:      ./topographica -c "dataset='Gaussian'" examples/lissom_oo_or_od_dr_dy_rg.ty
@@ -107,7 +107,7 @@ disparity_bound = 0.0               # dy
 position_bound = 0.75               # dy
 
 
-dims=locals().get('dims',['or','od','dr','dy','rg'])
+dims=locals().get('dims',['or','od','dr','dy'])
 if 'od' in dims or 'dy' in dims: eyes=['Left', 'Right']
 if 'dr' in dims: 
     lags=['0','1','2','3']
