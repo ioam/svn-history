@@ -121,8 +121,7 @@ class PatternPresenter(param.Parameterized):
         ### pattern, e.g. in the Test Pattern window.  In this way we
         ### should be able to provide general support for manipulating
         ### both pattern parameters and parameters controlling
-        ### interaction between or differences between patterns.
-
+        ### interaction between or differences between patterns.           
 
         if features_values.has_key('direction'):
             orientation = features_values['direction']+pi/2            
@@ -146,6 +145,7 @@ class PatternPresenter(param.Parameterized):
                     inputs[name].scale=b
                 else: 
                     self.warning('Hue is defined only when there are different input sheets with names with Red, Green or Blue substrings.')
+
 
         if features_values.has_key('retinotopy'):
             #Calculates coordinates of the centre of each SineGratingRectangle to be presented 
@@ -181,14 +181,17 @@ class PatternPresenter(param.Parameterized):
                 
           
         if features_values.has_key("phasedisparity"):
-            if len(input_sheet_names)!=2:
-                self.warning('Disparity is defined only when there are exactly two patterns')
-            else:
-                temp_phase1=inputs[input_sheet_names[0]].phase - inputs[input_sheet_names[0]].phasedisparity/2.0
-                temp_phase2=inputs[input_sheet_names[1]].phase + inputs[input_sheet_names[1]].phasedisparity/2.0
-                inputs[input_sheet_names[0]].phase=wrap(0,2*pi,temp_phase1)
-                inputs[input_sheet_names[1]].phase=wrap(0,2*pi,temp_phase2)
-
+            temp_phase1=inputs[input_sheet_names[0]].phase - inputs[input_sheet_names[0]].phasedisparity/2.0
+            temp_phase2=inputs[input_sheet_names[len(input_sheet_names)-1]].phase + inputs[input_sheet_names[len(input_sheet_names)-1]].phasedisparity/2.0
+            for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
+                if (name.count('Right')):
+                    inputs[name].phase=wrap(0,2*pi,temp_phase1)
+                elif (name.count('Left')):
+                    inputs[name].phase=wrap(0,2*pi,temp_phase2)
+                else:
+                    self.warning('Disparity is defined only when there are inputs for Right and Left retinas.')
+                
+          
         ## Not yet used; example only
         #if features_values.has_key("xdisparity"):
         #    if len(input_sheet_names)!=2:
@@ -217,12 +220,10 @@ class PatternPresenter(param.Parameterized):
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
                 if (name.count('Right')):
                     inputs[name].scale=2*inputs[name].ocular
+                elif (name.count('Left')):
+                    inputs[name].scale=2.0-2*inputs[name].ocular
                 else:
-                    if (name.count('Left')):
-                        inputs[name].scale=2.0-2*inputs[name].ocular
-                    else:
-                        self.warning('Ocularity is defined only when there are inputs for Right and Left retinas.')
-
+                    self.warning('Ocularity is defined only when there are inputs for Right and Left retinas.')
 
         # For WhiskerArray only; used to set the delay/lag in each input sheet
         if features_values.has_key("deflection"):
