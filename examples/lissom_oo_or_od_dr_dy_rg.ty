@@ -108,6 +108,7 @@ position_bound = 0.75               # dy
 
 
 dims=locals().get('dims',['or','od','dr','dy'])
+topo.sim.name = "lissom_oo_" + string.join(dims, '_')
 if 'od' in dims or 'dy' in dims: eyes=['Left', 'Right']
 if 'dr' in dims: 
     lags=['0','1','2','3']
