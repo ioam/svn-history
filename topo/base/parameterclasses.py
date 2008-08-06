@@ -4,7 +4,24 @@ Moved to topo/params/__init__.py
 
 __version__='$Revision: 8792 $'
 
-# pylint: disable-msg=W0611
+
+msg = """
+'topo.base.parameterclasses' is deprecated; use 'topo.param'.
+
+For instance, instead of:
+ from topo.base.parameterclasses import BooleanParameter,StringParameter
+ p1 = BooleanParameter(False)
+ p2 = StringParameter('test')
+Use:
+ from topo import param
+ p = param.Boolean(False)
+ p = param.String('test')
+"""
+
+import warnings
+warnings.warn(msg,DeprecationWarning,stacklevel=2)
+
+
 from topo.param import *
 
 from topo.param import Boolean as BooleanParameter
