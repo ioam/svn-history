@@ -713,18 +713,24 @@ class SomeTimer(param.Parameterized):
 
 
 
+# This singleton-producing mechanism is pretty complicated, and it
+# would be great if someone could simplify it. Getting all of the
+# behavior we want is tricky, but there are tests for it.
+# Note that:
+# (1) There should only ever be one single Simulation instance for
+#     which register is True. Creating, copying, and unpickling
+#     need to take this into account.
+# (2) A Simulation instance for which register is False should
+#     behave the same as any normal Python object.
 
-# CEBALERT: working here (the implementation might change
-# completely). This version passes all tests, so at least the behavior
-# is correct now.
 class OptionalSingleton(object):
 
     _inst = None
 
     def __new__(cls,singleton):
         """
-        Return the single Simulation instance if register is True;
-        otherwise, return a new instance of Simulation.
+        Return the single instance stored in _inst if singleton is
+        True; otherwise, return a new instance.
         """
         if singleton:
             if cls is not type(cls._inst):
@@ -740,13 +746,16 @@ class OptionalSingleton(object):
         return (self._singleton,)
 
     def __copy__(self):
-        # A Simulation(singleton=False) instance is copied, while the
-        # Simulation(singleton=True) instance is not copied.
+        # An OptionalSingleton(singleton=False) instance is copied, while the
+        # OptionalSingleton(singleton=True) instance is not copied.
         if self._singleton:
             return self
         else:
+            # Ideally we'd just call "object.__copy__", but apparently
+            # there's no such method.
+            
             # CB: I *think* this is how to do a copy. Any better
-            # ideas?  The copy.copy() function calls an object's
+            # ideas?  Python's copy.copy() function calls an object's
             # __reduce__ method and then reconstructs the object from
             # that using copy._reconstruct().
             new_obj = self.__class__(self._singleton)
@@ -762,9 +771,9 @@ class OptionalSingleton(object):
             return new_obj
 
     # CB: I might have bound __copy__ (& __deepcopy__) just to the
-    # Simulation(singleton=True) instance to avoid the Simulation class
-    # having a __copy__ method at all, but copy() only checks the
-    # *class* for the existence of __copy__.
+    # Simulation(singleton=True) instance to avoid the Simulation
+    # class having a __copy__ method at all, but copy() only checks
+    # the *class* for the existence of __copy__.
 
 
 # Simulation stores its events in a linear-time priority queue (i.e., a
@@ -866,23 +875,30 @@ class Simulation(param.Parameterized,OptionalSingleton):
 
     ### Simulation(register=True) is a singleton
     #
+    #
     # There is only ever one instance of Simulation(register=True).
-    # This instance is stored in Simulation._inst; when __new__ is
-    # called and register is True, this instance is created if it
+    # This instance is stored in the '_inst' attribute; when __new__
+    # is called and register is True, this instance is created if it
     # doesn't already exist, and returned otherwise. copying or
-    # deepcopying this instance returns the instance.
+    # deepcopying this instance returns the instance.  
     #
     # For a Simulation with register False, calling __new__ results in
     # a new object as usual for Python objects. copying and
     # deepcopying returns a new Simulation with a copy or deepcopy
     # (respectively) of the original Simulation's __dict__.
+    #
+    # See OptionalSingleton for more information.
     def __new__(cls,*args,**kw):
+
+        # simulate behavior of a parameter for register
         if 'register' in kw:
             register = kw['register']
+        # CB: why do we need this?
         elif len(args)==1:
             register = args[0]
         else:
             register = cls.register
+            
         return OptionalSingleton.__new__(cls,register)
 
 
@@ -909,13 +925,12 @@ class Simulation(param.Parameterized,OptionalSingleton):
     # Note that __init__ can still be called after the
     # Simulation(register=True) instance has been created. E.g. with
     # Simulation.register is True,
-    #
-    # Simulation(name='A'); Simulation(name='B')
+    #   Simulation(name='A'); Simulation(name='B')
     #
     # would leave the single Simulation(register=True) instance with
     # name=='B'. This is because, as is usual in Python, __new__
     # creates an instance of a class, while __init__ is subsequently
-    # given that instance.
+    # given that instance (to initialize).
 
     def __init__(self,*args,**params):
         """
