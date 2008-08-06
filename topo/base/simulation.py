@@ -893,7 +893,10 @@ class Simulation(param.Parameterized,OptionalSingleton):
         # simulate behavior of a parameter for register
         if 'register' in kw:
             register = kw['register']
-        # CB: why do we need this?
+        # this elif shouldn't be required, but is needed for
+        # unpickling: OptionalSingleton's __getnewargs__ is called
+        # with register as the first argument (I don't know how else
+        # to set register on unpickling).
         elif len(args)==1:
             register = args[0]
         else:
