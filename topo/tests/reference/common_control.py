@@ -135,6 +135,8 @@ def run_comparisons(l):
     topo.sim.run(200) # 1000 *
     check()
 
+    # CB: this stop_at_1000 stuff is a temporary hack; when topographica's
+    # faster, I'm not going to need it.
     if not stop_at_1000:
 
         for i in range(4): # to 5000 *
