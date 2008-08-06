@@ -638,6 +638,7 @@ implementations of twenty techniques for dimensionality reduction. A
 number of these implementations were developed from scratch, whereas
 other implementations are based on software that is already available
 on the Web.  http://www.cs.unimaas.nl/l.vandermaaten/dr
+CB: or consider a python/numpy alternative? E.g. http://mdp-toolkit.sourceforge.net/
 
 
 <H4>2007/07/24 (JB): Digital Embryo Workshop</H4>
@@ -694,13 +695,6 @@ _________________________________________________________
 
 +(OPTIMIZATION PAGE)
 
-
-_________________________________________________________
-
-
-(CB) add note for developers: always specify GMT in cvs date commands
-when doing any kind of search through cvs history. your timezone might
-be different (e.g. BST or china time...) 
 
 _________________________________________________________
 
