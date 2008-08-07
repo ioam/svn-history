@@ -72,7 +72,12 @@ class ArrowTool(Frame):
 
 
 
-
+# hack to sort by precedence
+# (won't need when modeleditor is plotgroup)
+def names_sorted_by_precedence(classes):
+    classes.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
+    return [class_.__name__ for class_ in classes]
+    
 
 class NodeTool(Frame):
     """
@@ -102,8 +107,8 @@ class NodeTool(Frame):
         self.doc = 'Use the sheet tool to click a\nsheet object into the canvas.'
         # gets list of all the available sheets.
         self.sheet_list = param.concrete_descendents(Sheet)
-        sheet_list = self.sheet_list.keys()
 
+        sheet_list = names_sorted_by_precedence(self.sheet_list.values())
         
         ## menu with list of available sheets
         self.option_var = StringVar()
@@ -206,7 +211,7 @@ class ConnectionTool(Frame):
         self.doc = 'Use the connection tool to\ndrag connections between objects'
         # gets list of all the available projections.
         self.proj_list = param.concrete_descendents(Projection)
-        proj_list = self.proj_list.keys() # gets the class names.
+        proj_list = names_sorted_by_precedence(self.proj_list.values())
 
 
         ## menu with list of available projections
