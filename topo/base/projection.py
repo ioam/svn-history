@@ -204,8 +204,11 @@ class Projection(EPConnection):
        activity_operator=="Divide" and activity_group=="0.6", activity
        from the first two will be added together, and the result
        divided by the sum of the second two.""")
-  
 
+    # CEBALERT: precedence should probably be defined at some higher level
+    # (and see other classes where it's defined, e.g. Sheet)
+    precedence = param.Number(default=0.5)
+    
        
     def __init__(self,**params):
         super(Projection,self).__init__(**params)

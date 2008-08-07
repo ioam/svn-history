@@ -90,6 +90,7 @@ class SharedWeightCFProjection(CFProjection):
     weights_output_fn = param.ClassSelector(
         CFPOutputFn,default=CFPOF_SharedWeight())
 
+    precedence = param.Number(default=0.5)
 
     def __init__(self,**params):
         """
@@ -178,6 +179,8 @@ class LeakyCFProjection(CFProjection):
     decay_rate = param.Number(default=1.0,bounds=(0,None),
                         doc="Input decay rate for each leaky synapse")
 
+    precedence = param.Number(default=0.4)
+    
     def __init__(self,**params):
         super(LeakyCFProjection,self).__init__(**params)
         self.leaky_input_buffer = zeros(self.src.activity.shape)
@@ -212,7 +215,7 @@ class ScaledCFProjection(CFProjection):
     
     smoothing = param.Number(default=0.999, doc="""
         Influence of previous activity, relative to current, for computing the average.""")
-
+    precedence = param.Number(default=0.4)
 
     def __init__(self,**params):
         # JABALERT: Private variables should be prefixed __ (truly private) or _ (nominally private)

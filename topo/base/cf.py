@@ -588,6 +588,8 @@ class CFProjection(Projection):
         Whether to apply the output function to connection fields (e.g. for 
         normalization) when the CFs are first created.""")
 
+    precedence = param.Number(default=0.8)
+
 
     def __init__(self,initialize_cfs=True,**params):
         """
