@@ -835,6 +835,20 @@ processing-clean:
 processing-uninstall:
 	rm -rf processing ${PROCESSING} $(foreach f, ${PROCESSING_UNINSTALL}, ${PREFIX}/${f})
 
+
+
+
+##############################################################
+# ODICT (ordered dictionary - remove with Python 2.6?)
+#
+ODICT = odict
+
+odict: python
+	cp odict.py ${PREFIX}/lib/python2.5/site-packages/
+	touch odict
+
+odict-uninstall:
+	rm -rf odict ${foreach f,${ODICT_UNINSTALL}, ${PREFIX}/${f}}
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
