@@ -1173,6 +1173,11 @@ session saving, but I do plan to read the above references anyway for
 pickle tips.
 
 
+_________________________________________________________
+
+Parameterized.name returns __name__ rather than None?
+(this is not Parameterized().name)
+
 -->
 
 
