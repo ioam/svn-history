@@ -168,16 +168,16 @@ topo.sim.schedule_command( 8000*st,LE+'.change_bounds(BoundingBox(radius=0.00290
 topo.sim.schedule_command(20000*st,LE+'.change_bounds(BoundingBox(radius=0.00174))')
 
 ### Lateral excitatory learning rate changes
-topo.sim.schedule_command(  200*st,LE+'.learning_rate=0.12168*'+LE+'.n_units()')
-topo.sim.schedule_command(  500*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command( 1000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command( 2000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command( 3000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command( 4000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command( 5000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command( 6500*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command( 8000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command(20000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
+topo.sim.schedule_command(  200*st,LE+'.learning_rate=0.12168/ids*'+LE+'.n_units()')
+topo.sim.schedule_command(  500*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command( 1000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command( 2000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command( 3000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command( 4000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command( 5000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command( 6500*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command( 8000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command(20000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
 
 ### Lateral inhibitory learning rate and strength changes
 LI='topo.sim["V1"].projections()["LateralInhibitory"]'
