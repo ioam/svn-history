@@ -883,7 +883,7 @@ class CFSheet(ProjectionSheet):
     measure_maps = param.Boolean(True,doc="""
         Whether to include this Sheet when measuring various maps to create SheetViews.""")
 
-    precedence = param.Number(0.5)
+    precedence = param.Number(0.8)
 
 
     def update_unit_view(self,x,y,proj_name=''):
