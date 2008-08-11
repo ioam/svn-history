@@ -73,12 +73,13 @@ class BinaryOperator(NumberGenerator):
 class UnaryOperator(NumberGenerator):
     """Applies any unary operator to a NumberGenerator to yield another NumberGenerator."""
     
-    def __init__(self,operand,operator):
+    def __init__(self,operand,operator,**args):
         self.operand=operand
         self.operator=operator
+        self.args=args
     
     def __call__(self):
-        return self.operator(self.operand())
+        return self.operator(self.operand(),**self.args)
 
 
 
