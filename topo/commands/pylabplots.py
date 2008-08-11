@@ -345,7 +345,7 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
             generate_figure(title=title,filename=filename,suffix="_"+sheet.name)
             
 #########################################################################################
-def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],overlay=[('contours','OcularPreference',0.5,'black'),('arrows','DirectionPreference','DirectionSelectivity','white')],filename=None):   
+def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],overlay=[('contours','OcularPreference',0.5,'black'),('arrows','DirectionPreference','DirectionSelectivity','white')],filename=None,normalize=False):   
     """
     Use matplotlib to make a plot from a bitmap constructed using the
     specified plot_template, plus additional overlaid line contour
@@ -358,7 +358,7 @@ def overlaid_plots(plot_template=[{'Hue':'OrientationPreference'}],overlay=[('co
     
         for sheet in topo.sim.objects(Sheet).values():
             name=template.keys().pop(0)
-            plot=make_template_plot(template,sheet.sheet_views,sheet.xdensity,sheet.bounds,False,name=template[name])        
+            plot=make_template_plot(template,sheet.sheet_views,sheet.xdensity,sheet.bounds,normalize,name=template[name])        
             if plot:
                 bitmap=plot.bitmap
             	
