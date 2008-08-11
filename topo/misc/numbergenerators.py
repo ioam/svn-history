@@ -74,6 +74,11 @@ class UnaryOperator(NumberGenerator):
     """Applies any unary operator to a NumberGenerator to yield another NumberGenerator."""
     
     def __init__(self,operand,operator,**args):
+        """
+        Accepts a NumberGenerator operand, a unary operator, and
+        optional arguments to be provided to the operator when calling
+        it on the operand.
+        """
         self.operand=operand
         self.operator=operator
         self.args=args
