@@ -55,7 +55,12 @@ class NumberGenerator(param.Parameterized):
 class BinaryOperator(NumberGenerator):
     """Applies any binary operator to NumberGenerators or numbers to yield a NumberGenerator."""
     
-    def __init__(self,lhs,rhs,operator,reverse=False):
+    def __init__(self,lhs,rhs,operator,reverse=False,**args):
+        """
+        Accepts two NumberGenerator operands, an operator, and
+        optional arguments to be provided to the operator when calling
+        it on the two operands.
+        """
         if reverse:
             self.lhs=rhs
             self.rhs=lhs
@@ -63,10 +68,11 @@ class BinaryOperator(NumberGenerator):
             self.lhs=lhs
             self.rhs=rhs
         self.operator=operator
-    
+        self.args=args
+        
     def __call__(self):
         return self.operator(self.lhs() if callable(self.lhs) else self.lhs,
-                             self.rhs() if callable(self.rhs) else self.rhs)
+                             self.rhs() if callable(self.rhs) else self.rhs, **args)
 
 
 
@@ -75,7 +81,7 @@ class UnaryOperator(NumberGenerator):
     
     def __init__(self,operand,operator,**args):
         """
-        Accepts a NumberGenerator operand, a unary operator, and
+        Accepts a NumberGenerator operand, an operator, and
         optional arguments to be provided to the operator when calling
         it on the operand.
         """
