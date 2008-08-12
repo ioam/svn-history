@@ -72,7 +72,7 @@ class BinaryOperator(NumberGenerator):
         
     def __call__(self):
         return self.operator(self.lhs() if callable(self.lhs) else self.lhs,
-                             self.rhs() if callable(self.rhs) else self.rhs, **args)
+                             self.rhs() if callable(self.rhs) else self.rhs, **self.args)
 
 
 
