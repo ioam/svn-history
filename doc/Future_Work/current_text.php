@@ -47,6 +47,7 @@ tracker rather than added to this list</B>.
 
 <H4>topo.base ALERTs</H4>
 
+<pre>
 Prorities:
 9: release 0.9.5
 8: release 1.0
@@ -85,15 +86,14 @@ updatable
 (8) CFPOutputFn mask parameter could be dropped now a masked iterator can be passed in
 (3) calculation of no. of units (internal)
 
-(9) JCALERT! We might want to change the default value of the
+(8) JCALERT! We might want to change the default value of the
 ### input value to self.src.activity; but it fails, raising a
 ### type error. It probably has to be clarified why this is
 ### happening
 
 
 * functionfamilies.py
-(9) OutputFn: plasticity fns
-(9) OutputFn: norm_value
+(8) OutputFn: norm_value
 (8) LearningFn should have learning_rate param (see same alert in cf.py)
 
 
@@ -102,8 +102,8 @@ updatable
 
 
 * Slice
-(9) M[slice]-style syntax (first figuring out performance implications of attribute access) (CEB)
-(9) cleanup (CEB)
+(8) M[slice]-style syntax (first figuring out performance implications of attribute access) (CEB)
+(8) cleanup (CEB)
 
 
 * PatternGenerator
@@ -128,20 +128,19 @@ updatable
 * Parameters
 (8) FixedPoint doesn't work properly with Number (removing fixedpoint anyway?)
 (9) Removing InstanceMethodWrapper if possible & anything else not required with python 2.5
-(9) logging: make sure debug statements etc not hurting performance
 (3) logging: use python's instead of our own?
 (3) script_repr: 
 # JABALERT: Only partially achieved so far -- objects of the same
 # type and parameter values are treated as different, so anything
 # for which instantiate == True is reported as being non-default.
 (8) ParamOverrides should check_params()
-
+</pre>
 
 <H4>promoting basic.py</H4>
 (9) etc wherever we haven't done it
 
 <H4>parameters out</H4>
-(9) to different dir,package eventually
+(3) to different package eventually
 
 <H4>memory leak?</H4>  
 (9) Does topographica's memory usage go up over time? what was Jan's
@@ -156,8 +155,7 @@ investigation (what actually happens, is it a problem in topographica,
 etc).
 
 <H4>Mac</H4>
-(9) OS X 10.5 problems: either get X11 or aqua working
-(3) Have someone else get the other one working
+(3) Have someone else get OS X 10.5 aqua working
 
 
 <H4>2008/01/25 (JB): Organization of examples/</H4>
@@ -219,7 +217,7 @@ right click menus...) </li>
 <li>(3) Restriction on operations in parallel? (E.g. run and map measurement.)</li>
 </ul>
 
-<H4>(9) pylint (CB): deal with or ignore all warnings</H4>
+<H4>(8) pylint (CB): deal with or ignore all warnings</H4>
 For make lint-base
 
 
