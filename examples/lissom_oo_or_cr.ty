@@ -59,34 +59,33 @@ input_type=topo.patterns.image.FileImage
 for e in eyes:
     for n in lags:
         default_retina_density=locals().get('default_retina_density',48.0)
-
+        scalingfactor=[1.4*0.9,1.4,1.4*0.97] # from Judah's PhD
         for cone in rgb_cone_types:
-            image_filenames=["images/colormap/%02d_%d.png"%(i,rgb_cone_types.index(cone)) for i in xrange(5)]
-            inputs=[input_type(filename=f, size=10.0,#size_normalization='original',
+            image_filenames=["images/colormap/rgb/%02d_%d.pgm"%(i,rgb_cone_types.index(cone)) for i in xrange(1,26)]
+            inputs=[input_type(filename=f, size=10.0,
                                x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
                                y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
                                orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),
-                               scale=         2.0-UniformRandom(lbound=0,ubound=2,seed=78) \
-                               if e=='Right' else UniformRandom(lbound=0,ubound=2,seed=78))
+                               scale=         2.0-UniformRandom(lbound=0,ubound=2,seed=78)*scalingfactor[rgb_cone_types.index(cone)] \
+                               if e=='Right' else UniformRandom(lbound=0,ubound=2,seed=78)*scalingfactor[rgb_cone_types.index(cone)]) 
                     for f in image_filenames]
 
             input_composite=topo.patterns.basic.Selector(generators=inputs)
 
             topo.sim[e+cone+'Retina'+n]=GeneratorSheet(nominal_density=default_retina_density,
-                                                              input_generator=input_composite,
-                                                              period=1.0, phase=0.05,
-                                                              nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
+                                                       input_generator=input_composite,
+                                                       period=1.0, phase=0.05,
+                                                       nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
 
         for l in center_polarities:
             for opponent in opponent_types:
                 topo.sim[e+opponent+' LGN'+l+n]=CFSheet(nominal_density=24.0,
-                                        nominal_bounds=BoundingBox(radius=0.5+0.25),
-                                        output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
-                                        measure_maps=False)
+                                                        nominal_bounds=BoundingBox(radius=0.5+0.25),
+                                                        output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                                                        measure_maps=False)
 
 
-topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,
-                        nominal_bounds=BoundingBox(radius=0.5))
+topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,nominal_bounds=BoundingBox(radius=0.5))
 
 topo.sim['V1'].output_fn.lower_bound=0.076
 topo.sim['V1'].output_fn.upper_bound=0.626
@@ -148,21 +147,21 @@ for e in eyes:
                         
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
-                 connection_type=CFProjection,strength=1.2,
+                 connection_type=CFProjection,strength=1.2, 
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.10417),
                                                                  topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.10417),learning_rate=2.55528/ids) 
             
 topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
-                 connection_type=CFProjection,strength=-1.75,
+                 connection_type=CFProjection,strength=-1.75, 
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
                                                                  topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=1.80873/ids/5)  
 
 
-### Actions scheduled to occur as the simulation proceeds.#
+### Actions scheduled to occur as the simulation proceeds.
 topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
 
 # Convenience variable: timescale
@@ -183,16 +182,16 @@ topo.sim.schedule_command( 8000*st,LE+'.change_bounds(BoundingBox(radius=0.00290
 topo.sim.schedule_command(20000*st,LE+'.change_bounds(BoundingBox(radius=0.00174))')
 
 ### Lateral excitatory learning rate changes
-topo.sim.schedule_command(  200*st,LE+'.learning_rate=0.12168*'+LE+'.n_units()')
-topo.sim.schedule_command(  500*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command( 1000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command( 2000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command( 3000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command( 4000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command( 5000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command( 6500*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command( 8000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-topo.sim.schedule_command(20000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
+topo.sim.schedule_command(  200*st,LE+'.learning_rate=0.12168/ids*'+LE+'.n_units()')
+topo.sim.schedule_command(  500*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command( 1000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command( 2000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command( 3000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command( 4000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command( 5000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command( 6500*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command( 8000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
+topo.sim.schedule_command(20000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
 
 ### Lateral inhibitory learning rate and strength changes
 LI='topo.sim["V1"].projections()["LateralInhibitory"]'
