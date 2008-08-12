@@ -593,8 +593,7 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
                                    name=proj.name) for proj in sheet.in_connections]
 
 
-# JABALERT: Needs a new name.
-class TwoDThingPlotGroup(ProjectionSheetPlotGroup):
+class GridPlotGroup(ProjectionSheetPlotGroup):
     """
     A ProjectionSheetPlotGroup capable of generating coordinates on a 2D grid.
     """
@@ -609,7 +608,7 @@ class TwoDThingPlotGroup(ProjectionSheetPlotGroup):
 
 
     def __init__(self,**params):
-        super(TwoDThingPlotGroup,self).__init__(**params)
+        super(GridPlotGroup,self).__init__(**params)
 
     def generate_coords(self):
         """
@@ -663,7 +662,7 @@ class TwoDThingPlotGroup(ProjectionSheetPlotGroup):
 
 
 
-class RFProjectionPlotGroup(TwoDThingPlotGroup):
+class RFProjectionPlotGroup(GridPlotGroup):
 
     keyname='RFs'
     input_sheet = param.ObjectSelector(default=None,doc="The sheet on which to measure the RFs.")
@@ -674,7 +673,7 @@ class RFProjectionPlotGroup(TwoDThingPlotGroup):
 
 
 
-class ProjectionPlotGroup(TwoDThingPlotGroup):
+class ProjectionPlotGroup(GridPlotGroup):
 
     projection = param.ObjectSelector(default=None,doc="The projection to visualize.")
     keyname='Weights'                     
