@@ -683,12 +683,17 @@ class HomeostaticMaxEnt(OutputFnWithState):
       
 	if self.first_call:
 	    self.first_call = False
+            # CEBALERT: using the generator from patterns.random is only temporary.
+            import topo.patterns.random
             if self.a_init==None:
-                self.a = numpy.random.uniform(low=10, high=20,size=x.shape)
+                self.a = topo.patterns.random.RandomGenerator.random_generator.uniform(low=10, high=20,size=x.shape)
+                #self.a = numpy.random.uniform(low=10, high=20,size=x.shape)
             else:
                 self.a = ones(x.shape, x.dtype.char) * self.a_init
             if self.b_init==None:
-                self.b = numpy.random.uniform(low=-8.0, high=-4.0,size=x.shape)
+                self.b = topo.patterns.random.RandomGenerator.random_generator.uniform(low=-8.0, high=-4.0,size=x.shape)
+                #self.b = numpy.random.uniform(low=-8.0, high=-4.0,size=x.shape)
+                
             else:
                 self.b = ones(x.shape, x.dtype.char) * self.b_init
 	    self.y_avg = zeros(x.shape, x.dtype.char) 

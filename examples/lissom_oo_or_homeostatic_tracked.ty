@@ -252,8 +252,6 @@ if tracking==True:
     LatIn_OF = PipelineOF(output_fns=[LatIn_Avg, LatIn_Tracker])
 
 # Specify weight initialization, response function, and learning function
-numpy.random.seed((500,500))
-
 CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
