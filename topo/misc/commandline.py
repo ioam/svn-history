@@ -261,21 +261,6 @@ topo_parser.add_option("-c","--command",action = "callback",callback=c_action,ty
 		       help="string of arbitrary Python code to be executed in the main namespace.")
 
 
-def enable_psyco():
-    """Turn on the psyco (specializing) compiler for Python."""
-    import psyco
-    import weave
-    psyco.cannotcompile(weave.test)
-    psyco.full()
-    
-def p_action(option,opt_str,value,parser):
-    """Callback for the -p option."""
-    enable_psyco()
-#CB: not sure 'p' is best choice...
-topo_parser.add_option("-p","--psyco",action="callback",callback=p_action,dest="pysco",default=False,
-                       help="enable the psyco compiler (a specializing compiler for Python)")
-
-
 def auto_import_commands():
     """Import the contents of all files in the topo/commands/ directory."""
     import re,os
