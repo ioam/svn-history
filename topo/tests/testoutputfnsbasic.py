@@ -14,14 +14,17 @@ __version__='$Revision$'
 
 
 import unittest
-
+import copy
 
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.outputfns.basic import DivisiveNormalizeL2, DivisiveNormalizeLinf
-from topo.outputfns.basic import DivisiveNormalizeLp
+from topo.outputfns.basic import DivisiveNormalizeLp, HomeostaticMaxEnt
 
 from numpy.oldnumeric import array
+from numpy.testing import assert_array_equal
 from math import sqrt
+
+from utils import assert_array_not_equal
 
 class TestPiecewiseLinear(unittest.TestCase):
 
@@ -336,11 +339,58 @@ class TestDivisiveLpNormalize(unittest.TestCase):
             self.assertAlmostEqual(item1, item2)      
 
 
+
+class TestOutputFnWithRandomState(unittest.TestCase):
+    """Currently just tests whether random generator state is handled
+    by state_push() and state_pop()."""
+
+    def setUp(self):
+
+        self.a = array([[0.3,0.6,0.7],
+                        [0.8,0.4,0.2]])
+
+        self.hme = HomeostaticMaxEnt()
+
+    def test_random_state(self):
+
+        a1 = copy.copy(self.a)
+
+        ###
+        # CEBALERT: hack because homeostaticmaxent doesn't get some
+        # of its state until it's been called once!
+        self.hme(a1)
+
+        start_array = copy.copy(a1)
+
+        ## save the state then generate some results...
+        self.hme.state_push()
+
+        self.hme(a1)
+        res1 = copy.copy(a1)
+        self.hme(a1)
+        res2 = copy.copy(a1)
+
+        # (check results do actually change so the test is valid)
+        assert_array_not_equal(res1,res2)
+
+        a2 = copy.copy(start_array) 
+
+        ### ...then restore the state & check results are the same
+        self.hme.state_pop()
+        self.hme(a2)
+        assert_array_equal(a2,res1)
+
+        self.hme(a2)
+        assert_array_equal(a2,res2)
+
+
+
 cases = [TestPiecewiseLinear,
          TestDivisiveNormalizeL1,
          TestDivisiveLengthNormalize,
          TestDivisiveMaxNormalize,
-         TestDivisiveLpNormalize]
+         TestDivisiveLpNormalize,
+         TestOutputFnWithRandomState]
 
 suite = unittest.TestSuite()
 suite.addTests(unittest.makeSuite(case) for case in cases)

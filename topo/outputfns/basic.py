@@ -382,46 +382,6 @@ class KernelMax(OutputFn):
 
 
 
-class PoissonSample(OutputFn):
-    """
-    Simulate Poisson-distributed activity with specified mean values.
-    
-    This output function interprets each matrix value as the
-    (potentially scaled) rate of a Poisson process and replaces it
-    with a sample from the appropriate Poisson distribution.
-
-    To allow the matrix to contain values in a suitable range (such as
-    [0.0,1.0]), the input matrix is scaled by the parameter in_scale,
-    and the baseline_rate is added before sampling.  After sampling,
-    the output value is then scaled by out_scale.  The function thus
-    performs this transformation::
-
-      x <- P(in_scale * x + baseline_rate) * out_scale
-
-    where x is a matrix value and P(r) samples from a Poisson
-    distribution with rate r.
-    """
-    
-    in_scale = param.Number(default=1.0,doc="""
-       Amount by which to scale the input.""")
-    
-    baseline_rate = param.Number(default=0.0,doc="""
-       Constant to add to the input after scaling, resulting in a baseline
-       Poisson process rate.""")
-    
-    out_scale = param.Number(default=1.0,doc="""
-       Amount by which to scale the output (e.g. 1.0/in_scale).""")
-
-    def __call__(self,x):
-        
-        x *= self.in_scale
-        x += self.baseline_rate
-        sample = numpy.random.poisson(x,x.shape)
-        x *= 0.0
-        x += sample
-        x *= self.out_scale
-
-
 
 class OutputFnWithState(OutputFn):
     """
@@ -477,7 +437,98 @@ class OutputFnWithState(OutputFn):
         """
         self.plastic = self._plasticity_setting_stack.pop()                        
 
+
+# CB: it's not ideal that all OutputFnWithRandomState fns have
+# the plastic stuff (from OutputFnWithState).
+class OutputFnWithRandomState(OutputFnWithState):
+    """
+    Abstract base class for OutputFns that use a random number generator.
+    """
+
+    random_generator = param.Parameter(
+        default=numpy.random.RandomState(seed=(10,10)),doc=
+        """
+        numpy's RandomState provides methods for generating random
+        numbers (see RandomState's help for more information).
+
+        Note that all instances of subclasses of
+        OutputFnWithRandomState will share this RandomState object,
+        and hence its state. To create an instance of an
+        OutputFnWithRandomState subclass that has its own state, set
+        this parameter on the instance to a new RandomState instance.
+        """)
         
+    __abstract = True
+    
+    def __init__(self,**params):
+        super(OutputFnWithRandomState,self).__init__(**params)
+        self.__random_generators_stack = []
+
+    def state_push(self):
+        """
+        Save the current random number generator (onto the stack),
+        replacing it with a copy.
+        """
+        self.__random_generators_stack.append(self.random_generator)
+        self.random_generator=copy.copy(self.random_generator)
+        super(OutputFnWithRandomState,self).state_push()
+
+    def state_pop(self):
+        """
+        Retrieve the previous random number generator from the stack.
+        """
+        self.random_generator = self.__random_generators_stack.pop()
+        super(OutputFnWithRandomState,self).state_push()
+        
+
+
+class PoissonSample(OutputFnWithRandomState):
+    """
+    Simulate Poisson-distributed activity with specified mean values.
+    
+    This output function interprets each matrix value as the
+    (potentially scaled) rate of a Poisson process and replaces it
+    with a sample from the appropriate Poisson distribution.
+
+    To allow the matrix to contain values in a suitable range (such as
+    [0.0,1.0]), the input matrix is scaled by the parameter in_scale,
+    and the baseline_rate is added before sampling.  After sampling,
+    the output value is then scaled by out_scale.  The function thus
+    performs this transformation::
+
+      x <- P(in_scale * x + baseline_rate) * out_scale
+
+    where x is a matrix value and P(r) samples from a Poisson
+    distribution with rate r.
+    """
+
+    ### CEBALERT: using the generator from patterns.random is only temporary.
+    def __init__(self,**params):
+        super(PoissonSample,self).__init__(**params)
+        import topo.patterns.random
+        self.random_generator = topo.patterns.random.RandomGenerator.random_generator
+    ###
+    
+    in_scale = param.Number(default=1.0,doc="""
+       Amount by which to scale the input.""")
+    
+    baseline_rate = param.Number(default=0.0,doc="""
+       Constant to add to the input after scaling, resulting in a baseline
+       Poisson process rate.""")
+    
+    out_scale = param.Number(default=1.0,doc="""
+       Amount by which to scale the output (e.g. 1.0/in_scale).""")
+
+    def __call__(self,x):
+        
+        x *= self.in_scale
+        x += self.baseline_rate
+        sample = self.random_generator.poisson(x,x.shape)
+        x *= 0.0
+        x += sample
+        x *= self.out_scale
+
+
 
 class AttributeTrackingOF(OutputFnWithState):
     """
@@ -633,7 +684,7 @@ class ActivityAveragingOF(OutputFnWithState):
 		self.x_avg = (1.0-self.smoothing)*x + self.smoothing*self.x_avg
 
 
-class HomeostaticMaxEnt(OutputFnWithState):
+class HomeostaticMaxEnt(OutputFnWithRandomState):
     """
     Implementation of homeostatic intrinsic plasticity from Jochen Triesch,
     ICANN 2005, LNCS 3696 pp.65-70.
@@ -676,24 +727,21 @@ class HomeostaticMaxEnt(OutputFnWithState):
 	self.first_call = True
 	self.n_step=0
         self.__current_state_stack=[]
-        
+        # CEBALERT: using the generator from patterns.random is only temporary.
+        import topo.patterns.random
+        self.random_generator = topo.patterns.random.RandomGenerator.random_generator
 
     def __call__(self,x):
 
       
 	if self.first_call:
 	    self.first_call = False
-            # CEBALERT: using the generator from patterns.random is only temporary.
-            import topo.patterns.random
             if self.a_init==None:
-                self.a = topo.patterns.random.RandomGenerator.random_generator.uniform(low=10, high=20,size=x.shape)
-                #self.a = numpy.random.uniform(low=10, high=20,size=x.shape)
+                self.a = self.random_generator.uniform(low=10, high=20,size=x.shape)
             else:
                 self.a = ones(x.shape, x.dtype.char) * self.a_init
             if self.b_init==None:
-                self.b = topo.patterns.random.RandomGenerator.random_generator.uniform(low=-8.0, high=-4.0,size=x.shape)
-                #self.b = numpy.random.uniform(low=-8.0, high=-4.0,size=x.shape)
-                
+                self.b = self.random_generator.uniform(low=-8.0, high=-4.0,size=x.shape)
             else:
                 self.b = ones(x.shape, x.dtype.char) * self.b_init
 	    self.y_avg = zeros(x.shape, x.dtype.char) 
@@ -714,6 +762,7 @@ class HomeostaticMaxEnt(OutputFnWithState):
 		# Update a and b
 		self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
 		self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
+
 
     def state_push(self):
         """
