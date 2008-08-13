@@ -636,7 +636,6 @@ input_pattern = HindpawGaussian(
 #input_pattern = topo.patterns.basic.Gaussian(
 #                x=0.5, y=0.5, orientation=0, size=0.24,aspect_ratio=1)
 
-numpy.random.seed((500,500))
 #CFSOM.learning_length = 10000
 #CFSOM.radius_0 = 15.0/25.0/2.0
 #CFProjection.learning_fn = CFPLF_HebbianSOM()

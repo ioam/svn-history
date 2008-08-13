@@ -54,8 +54,7 @@ input_pattern = topo.patterns.basic.Gaussian(
 
 # Local variable to allow weights to be controlled easily
 weight_seed=locals().get('weight_seed',0)
-numpy.random.seed((weight_seed+67,weight_seed+89))
-
+topo.patterns.random.seed((weight_seed+67,weight_seed+89))
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 

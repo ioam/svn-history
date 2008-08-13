@@ -131,8 +131,6 @@ class OrientedLine(PatternGenerator):
         return line(self.pattern_y,params['thickness'],params['smoothing'])
 
 
-# Weight seed
-numpy.random.seed((500,500))
 GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0
 

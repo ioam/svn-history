@@ -56,7 +56,6 @@ SLISSOM.nominal_density = locals().get('default_density',24.0)
 
 ### Specify weight initialization, response function, and learning function
 #
-numpy.random.seed((500,500))
 CFProjection.weights_generator=topo.patterns.random.UniformRandom()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()

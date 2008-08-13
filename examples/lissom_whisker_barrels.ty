@@ -353,8 +353,6 @@ from topo.misc.numbergenerators import UniformRandom
 num_inputs=WhiskerArray.num_whiskers 
                                  
 # Specify weight initialization, response function, and learning function
-numpy.random.seed((500,500))
-
 #CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.cf_shape = topo.patterns.basic.Constant()
 CFProjection.weights_generator = topo.patterns.basic.Constant()

@@ -72,7 +72,6 @@ jitterOn = Jitter(rand =UniformRandom(seed=1023))
 jitterOff = Jitter(rand =UniformRandom(seed=513))
 
 # Specify weight initialization, response function, and learning function
-numpy.random.seed((500,500))
 CFProjection.weights_generator=topo.patterns.random.UniformRandom()
 CFProjection.cf_shape=topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()

@@ -51,7 +51,6 @@ from topo.responsefns.optimized import CFPRF_DotProduct_opt
 
 
 #weight initialization, response 
-numpy.random.seed((500,500))
 CFProjection.weights_generator=topo.patterns.random.UniformRandom()
 
 

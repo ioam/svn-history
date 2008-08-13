@@ -160,7 +160,6 @@ right_input_pattern = topo.patterns.basic.Gaussian(
 
 
 # Specify weight initialization, response function, and learning function
-numpy.random.seed((500,500))
 CFProjection.weights_generator=topo.patterns.basic.Constant()
 CFProjection.cf_shape=topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()

@@ -5,7 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import numpy.oldnumeric.random_array as RandomArray
+import numpy
 
 from .. import param
 from ..param.parameterized import ParamOverrides
@@ -14,6 +14,15 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.outputfns.basic import IdentityOF
 
+
+def seed(seed=None):
+    """
+    Set the seed on the shared RandomState instance.
+
+    Convenience function: shortcut to RandomGenerator.random_generator.seed().
+    """
+    RandomGenerator.random_generator.seed(seed)
+    
 
 class RandomGenerator(PatternGenerator):
     """2D random noise pattern generator abstract class."""
@@ -27,6 +36,18 @@ class RandomGenerator(PatternGenerator):
     size    = param.Number(precedence=-1)
     orientation   = param.Number(precedence=-1)
 
+    random_generator = param.Parameter(
+        default=numpy.random.RandomState(seed=(500,500)),precedence=-1,doc=
+        """
+        numpy's RandomState provides methods for generating random
+        numbers (see RandomState's help for more information).
+
+        Note that all instances will share this RandomState object,
+        and hence its state. To create a RandomGenerator that has its
+        own state, set this parameter to a new RandomState instance.
+        """)
+
+        
     def _distrib(self,shape,pos):
         """Method for subclasses to override with a particular random distribution."""
         raise NotImplementedError
@@ -57,7 +78,7 @@ class UniformRandom(RandomGenerator):
     """2D uniform random noise pattern generator."""
 
     def _distrib(self,shape,params):
-        return RandomArray.uniform(params['offset'], params['offset']+params['scale'], shape)
+        return self.random_generator.uniform(params['offset'], params['offset']+params['scale'], shape)
 
 
 
@@ -77,7 +98,7 @@ class BinaryUniformRandom(RandomGenerator):
 
     def _distrib(self,shape,params):
         rmin = params['on_probability']-0.5
-        return params['offset']+params['scale']*(RandomArray.uniform(rmin,rmin+1.0,shape).round())
+        return params['offset']+params['scale']*(self.random_generator.uniform(rmin,rmin+1.0,shape).round())
 
 
 class GaussianRandom(RandomGenerator):
@@ -93,5 +114,5 @@ class GaussianRandom(RandomGenerator):
     offset = param.Number(default=0.50,softbounds=(-2.0,2.0))
 
     def _distrib(self,shape,params):
-        return params['offset']+params['scale']*RandomArray.standard_normal(shape)
+        return params['offset']+params['scale']*self.random_generator.standard_normal(shape)
 

@@ -89,12 +89,10 @@ input_pattern = topo.patterns.basic.Gaussian(
     size=2*gaussian_height,aspect_ratio=gaussian_width/gaussian_height,
     bounds=BoundingBox(radius=0.5))
 
-# cortical sheet (original network had a density of 256, but that is too large for normal use)
-numpy.random.seed((500,500))
-
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 
+# cortical sheet (original network had a density of 256, but that is too large for normal use)
 default_density=locals().get('default_density',25) #256
 
 KernelMax.kernel_radius=PiecewiseLinearDecay()

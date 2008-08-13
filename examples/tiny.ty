@@ -54,9 +54,6 @@ class SampleHebbian(LearningFn):
         dummy_value = self.sample_param*self.value*unit_activity
         self.value = self.value*0.9
 
-# Weight seed
-numpy.random.seed((500,500))
-
 # Input pattern
 gaussian_generator = topo.patterns.basic.Gaussian(
     x=UniformRandom(lbound=-0.8,ubound=0.8,seed=12),
