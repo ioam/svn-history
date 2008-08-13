@@ -501,13 +501,6 @@ class PoissonSample(OutputFnWithRandomState):
     where x is a matrix value and P(r) samples from a Poisson
     distribution with rate r.
     """
-
-    ### CEBALERT: using the generator from patterns.random is only temporary.
-    def __init__(self,**params):
-        super(PoissonSample,self).__init__(**params)
-        import topo.patterns.random
-        self.random_generator = topo.patterns.random.RandomGenerator.random_generator
-    ###
     
     in_scale = param.Number(default=1.0,doc="""
        Amount by which to scale the input.""")
@@ -727,13 +720,9 @@ class HomeostaticMaxEnt(OutputFnWithRandomState):
 	self.first_call = True
 	self.n_step=0
         self.__current_state_stack=[]
-        # CEBALERT: using the generator from patterns.random is only temporary.
-        import topo.patterns.random
-        self.random_generator = topo.patterns.random.RandomGenerator.random_generator
 
-    def __call__(self,x):
 
-      
+    def __call__(self,x):      
 	if self.first_call:
 	    self.first_call = False
             if self.a_init==None:
