@@ -4,19 +4,20 @@ Example of a LISSOM-based orientation, direction, ocular dominance, disparity an
 Direction, ocular dominance, disparity and color dimensions can be turned on and off.
 Here are examples of the commands that you could use to get the
 specified combinations of maps:
-  OR:               ./topographica -c "dims=['or']"                     examples/lissom_oo_or_od_dr_dy_rg.ty
-  OR/DR:            ./topographica -c "dims=['or','dr']"                examples/lissom_oo_or_od_dr_dy_rg.ty
-  OR/OD:            ./topographica -c "dims=['or','od']"                examples/lissom_oo_or_od_dr_dy_rg.ty
-  OR/RG:            ./topographica -c "dims=['or','rg']"                examples/lissom_oo_or_od_dr_dy_rg.ty
-  OR/OD/DR:         ./topographica -c "dims=['or','od','dr']"           examples/lissom_oo_or_od_dr_dy_rg.ty
-  OR/OD/DR/DY:      ./topographica -c "dims=['or','od','dr','dy']"      examples/lissom_oo_or_od_dr_dy_rg.ty
-  OR/OD/DR/DY/RG:   ./topographica -c "dims=['or','od','dr','dy','rg']" examples/lissom_oo_or_od_dr_dy_rg.ty
+  OR:               ./topographica -c "dims=['or']"                     examples/lissom_oo_or_od_dr_dy_rg_cr.ty
+  OR/DR:            ./topographica -c "dims=['or','dr']"                examples/lissom_oo_or_od_dr_dy_rg_cr.ty
+  OR/OD:            ./topographica -c "dims=['or','od']"                examples/lissom_oo_or_od_dr_dy_rg_cr.ty
+  OR/RG:            ./topographica -c "dims=['or','rg']"                examples/lissom_oo_or_od_dr_dy_rg_cr.ty
+  OR/OD/DR:         ./topographica -c "dims=['or','od','dr']"           examples/lissom_oo_or_od_dr_dy_rg_cr.ty
+  OR/OD/DR/DY:      ./topographica -c "dims=['or','od','dr','dy']"      examples/lissom_oo_or_od_dr_dy_rg_cr.ty
+  OR/OD/DR/DY/RG:   ./topographica -c "dims=['or','od','dr','dy','rg']" examples/lissom_oo_or_od_dr_dy_rg_cr.ty
+  OR/OD/DR/DY/CR:   ./topographica -c "dims=['or','od','dr','dy','cr']" examples/lissom_oo_or_od_dr_dy_rg_cr.ty
 
 OR/OD/DR/DY is the default.
 
 You can also select different training datasets:
- Gaussians:      ./topographica -c "dataset='Gaussian'" examples/lissom_oo_or_od_dr_dy_rg.ty
- Natural images: ./topographica -c "dataset='Nature'"   examples/lissom_oo_or_od_dr_dy_rg.ty  
+ Gaussians:      ./topographica -c "dataset='Gaussian'" examples/lissom_oo_or_od_dr_dy_rg_cr.ty
+ Natural images: ./topographica -c "dataset='Nature'"   examples/lissom_oo_or_od_dr_dy_rg_cr.ty  
 
 Gaussian is the default.
 
@@ -97,7 +98,8 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 ###########################################
 # build simulation                  # parameters for:
 center_polarities=['On','Off']      # oo
-cone_types=['']                     # rg
+rg_cone_types=['']                  # rg
+cone_types=['']                     # rg,cr
 opponent_types=['']                 # rg
 basic_opponent_types=['']           # rg 
 eyes=['']                           # od,dy
@@ -118,9 +120,16 @@ if 'dy' in dims:
     disparity_bound = max_disparity*0.041665/2.0
     if max_disparity > 0.0: position_bound = 0.70833
 if 'rg' in dims:
+    rg_cone_types=['Red','Green']
     cone_types=['Red','Green']
     opponent_types=['Red-Green ','Green-Red ','Luminosity ']    
     basic_opponent_types=['Red-Green ','Green-Red ']  
+if 'cr' in dims:
+    rg_cone_types=['Red','Green']
+    cone_types=['Red','Green','Blue']
+    opponent_types=['Red-Green ','Green-Red ','Blue-RedGreen ','Luminosity ']
+    basic_opponent_types=['Red-Green ','Green-Red '] 
+    dims.append('rg')
 
 
 num_inputs=1
@@ -143,31 +152,35 @@ for e in eyes:
         for cone in cone_types:
 
             if dataset=="Gaussian":
-                r=0 if 'rg' not in dims else UnaryOperator(UniformRandom(lbound=0,ubound=0.8,seed=78),hsv_to_r,s=1.0,v=1.0)
-                g=0 if 'rg' not in dims else UnaryOperator(UniformRandom(lbound=0,ubound=0.8,seed=78),hsv_to_g,s=1.0,v=1.0)
+                r=0 if 'rg' not in dims else UnaryOperator(UniformRandom(lbound=0,ubound=1,seed=78),hsv_to_r,s=1.0,v=1.0)
+                g=0 if 'rg' not in dims else UnaryOperator(UniformRandom(lbound=0,ubound=1,seed=78),hsv_to_g,s=1.0,v=1.0)
+                b=0 if 'cr' not in dims else UnaryOperator(UniformRandom(lbound=0,ubound=1,seed=78),hsv_to_b,s=1.0,v=1.0)
 
                 inputs=[input_type(x=UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12+i) + \
                                      UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150+i)*(-1)**(e=='Left'),
                                    y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
                                    orientation=0 if n != '' else UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
                                    size=0.088388, aspect_ratio=4.66667,
-                                   scale=2.0-2*(r*(cone=='Red')+g*(cone=='Green'))-UniformRandom(lbound=0,ubound=2,seed=78+i)*('rg' not in dims) \
-                                                                                                                 if e=='Right' and 'od' in dims  \
-                                        else 2*(r*(cone=='Red')+g*(cone=='Green'))+UniformRandom(lbound=0,ubound=2,seed=78+i)*('rg' not in dims),
+                                   scale=2.0-2*(r*(cone=='Red')+g*(cone=='Green')+b*(cone=='Blue')) -  \
+                                         UniformRandom(lbound=0,ubound=2,seed=78+i)*('rg' not in dims) \
+                                                                       if e=='Right' and 'od' in dims  \
+                                         else 2*(r*(cone=='Red')+g*(cone=='Green')+b*(cone=='Blue')) + \
+                                         UniformRandom(lbound=0,ubound=2,seed=78+i)*('rg' not in dims),
                                    bounds=BoundingBox(radius=0.8))
                         for i in xrange(num_inputs)]
                 input_composite=topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
 
             elif dataset=="Nature":
-                if 'rg' in dims: image_filenames=["images/colormap/%02d_%d.png"%(i,(cone=='Green')) for i in xrange(5)]
+                scalingfactor=[1.4*0.9,1.4,1.4*0.97] if 'cr' in dims else [1.0,1.0,1.0]
+                if 'rg' in dims: image_filenames=["images/colormap/rgb/%02d_%d.pgm"%(i,cone_types.index(cone)) for i in xrange(1,26)]
                 else:            image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
                 inputs=[input_type(filename=f, size=10.0,
                                    x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12) + \
                                      UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150)*(-1)**(e=='Left'),
                                    y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
                                    orientation=0 if n != '' else UniformRandom(lbound=-pi,ubound=pi,seed=56),
-                                   scale=         2.0-UniformRandom(lbound=0,ubound=2,seed=78) \
-                                   if e=='Right' and 'od' in dims else UniformRandom(lbound=0,ubound=2,seed=78))
+                                   scale=                          2.0-UniformRandom(lbound=0,ubound=2,seed=78)*scalingfactor[cone_types.index(cone)] \
+                                   if e=='Right' and 'od' in dims else UniformRandom(lbound=0,ubound=2,seed=78)*scalingfactor[cone_types.index(cone)])
                         for f in image_filenames]
                 input_composite=topo.patterns.basic.Selector(generators=inputs)
 
@@ -187,8 +200,7 @@ for e in eyes:
                                                         output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                                                         measure_maps=False)
 
-topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,
-                        nominal_bounds=BoundingBox(radius=0.5))
+topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,nominal_bounds=BoundingBox(radius=0.5))
 
 topo.sim['V1'].output_fn.lower_bound=0.076 if dataset=="Nature" else 0.083
 topo.sim['V1'].output_fn.upper_bound=0.626 if dataset=="Nature" else 0.633
@@ -206,7 +218,7 @@ for e in eyes:
 	for l in center_polarities:
             basic_opponent_types_tmp=list(basic_opponent_types)
             basic_opponent_types_tmp.reverse()
-            for (cone,opponentcenter,opponentsurround) in zip(cone_types,basic_opponent_types,basic_opponent_types_tmp):
+            for (cone,opponentcenter,opponentsurround) in zip(rg_cone_types,basic_opponent_types,basic_opponent_types_tmp):
                 topo.sim.connect(e+cone+'Retina'+n, e+opponentcenter+'LGN'+l+n, delay=0.05,
                  		 connection_type=SharedWeightCFProjection,strength=strength[int(speed)]*(-1)**center_polarities.index(l), 
                  		 nominal_bounds_template=BoundingBox(radius=0.375),name='AfferentCenter',
@@ -217,14 +229,29 @@ for e in eyes:
                                  nominal_bounds_template=BoundingBox(radius=0.375),name='AfferentSurround',
                                  weights_generator=surroundg)
 
+                if 'cr' in dims:
+                    topo.sim.connect(e+cone+'Retina'+n,
+                                     e+'Blue-RedGreen'+' LGN'+l+n, delay=0.05,
+                                     connection_type=SharedWeightCFProjection, strength=4.7*(-1)**(1+center_polarities.index(l))/2,
+                                     nominal_bounds_template=BoundingBox(radius=0.375),
+                                     name='AfferentCenter'+cone, weights_generator=centerg)
+
+            if 'cr' in dims:
+                topo.sim.connect(e+'Blue'+'Retina'+n,
+                                 e+'Blue-RedGreen'+' LGN'+l+n, delay=0.05,
+                                 connection_type=SharedWeightCFProjection, strength=4.7*(-1)**center_polarities.index(l),
+                                 nominal_bounds_template=BoundingBox(radius=0.375),
+                                 name='AfferentCenter'+'Blue', weights_generator=centerg)
+
+            for cone in cone_types: 
                 if 'Luminosity ' in opponent_types:
                     topo.sim.connect(e+cone+'Retina'+n, e+'Luminosity LGN'+l+n, delay=0.05,
-                                     connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**center_polarities.index(l)/2,
+                                     connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**center_polarities.index(l)/len(cone_types),
                                      nominal_bounds_template=BoundingBox(radius=0.375),
                                      name='AfferentCenter'+cone, weights_generator=centerg)
 
                     topo.sim.connect(e+cone+'Retina'+n, e+'Luminosity LGN'+l+n, delay=0.05,
-                                     connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l))/2,
+                                     connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l))/len(cone_types),
                                      nominal_bounds_template=BoundingBox(radius=0.375),
                                      name='AfferentSurround'+cone, weights_generator=surroundg)
 
@@ -234,7 +261,7 @@ for e in eyes:
                                  connection_type=CFProjection,strength=1.0,name=e+opponent+'LGN'+l+'Afferent'+n,
                                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
-                                                                             topo.patterns.random.UniformRandom()]),
+                                                                             topo.patterns.random.UniformRandom(scale=0,offset=1)]),
                                  nominal_bounds_template=BoundingBox(radius=0.27083),
                                  learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids) 
 
@@ -243,14 +270,14 @@ topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,strength=1.2 if dataset=="Nature" else 0.9,
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.10417),
-                                                                             topo.patterns.random.UniformRandom()]),
+                                                                             topo.patterns.random.UniformRandom(scale=0,offset=1)]),
                  nominal_bounds_template=BoundingBox(radius=0.10417),learning_rate=2.55528/ids) 
             
 topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
                  connection_type=CFProjection,strength=-1.75 if dataset=="Nature" else -0.9, 
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
-                                                                             topo.patterns.random.UniformRandom()]),
+                                                                             topo.patterns.random.UniformRandom(scale=0,offset=1)]),
                  nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=1.80873/ids/5 if dataset=="Nature" else 1.80873/ids)  
 
 
