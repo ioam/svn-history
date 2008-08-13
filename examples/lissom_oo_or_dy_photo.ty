@@ -22,6 +22,10 @@ __version__='$Revision$'
 ### with the Test Pattern window, but the specific problem has not
 ### been documented.
 
+# CB: note that the results of this simulation will have changed
+# insignificantly on 2008/08/13 because the random number stream used
+# by ImageSec will differ. To get the old numbers, ImageSec would need
+# to use the RandomState in topo.patterns.random.RandomArray.
 
 import numpy
 import copy
@@ -192,7 +196,6 @@ right_input_pattern = ImageSeq(imagepath='examples/stereo/right/',size_normaliza
 
                           
 # Specify weight initialization, response function, and learning function
-numpy.random.seed((500,500))
 CFProjection.weights_generator=topo.patterns.basic.Constant()
 CFProjection.cf_shape=topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
