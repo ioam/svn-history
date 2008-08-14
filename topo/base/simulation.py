@@ -446,7 +446,8 @@ class CommandEvent(Event):
 
     def script_repr(self,imports=[],prefix="    "):
         """Generate a runnable command for creating this CommandEvent."""
-        return simulation_path+".schedule_command("+`self.time`+",'"+ self.command_string+"')"
+        return simulation_path+'.schedule_command('\
+               +`self.time`+',"'+self.command_string+'")'
 
 
     def __call__(self,sim):
