@@ -136,8 +136,7 @@ class PatternSampler(param.Parameterized):
 
     # Added by Tikesh for presenting stereo images; may not be needed anymore
     def get_image_size(self):
-        r,c=self.pattern_array.shape
-        return r,c
+        return self.pattern_sheet.activity.shape
 
 
     def __apply_size_normalization(self,x,y,sheet_xdensity,sheet_ydensity,scaling):

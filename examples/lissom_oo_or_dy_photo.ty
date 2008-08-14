@@ -42,7 +42,7 @@ from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
+from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1, OutputFn
 from topo.misc.numbergenerators import UniformRandom
 
 from os import listdir
@@ -57,8 +57,7 @@ from topo.patterns.image import PatternSampler
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.filepaths import Filename
 from pylab import fix,ceil
-from numpy.oldnumeric.random_array import randint,seed,uniform
-
+from numpy.random import seed, uniform, randint
 
 class ImageSeq(PatternGenerator):
     """
@@ -86,7 +85,7 @@ class ImageSeq(PatternGenerator):
         "Function applied to the whole, original image array (before any cropping).")
 
     # Path to directory where sequence of training images are stored
-    imagepath = 'examples/stereo/left/'
+    imagepath = param.Parameter(default='examples/stereo/left/')
 
     random_num1 = param.Number(default=50.0,bounds=(0.0,100.0),softbounds=(0.0,100.0),
                 precedence=0.97,doc="ensures same part of image in both eyes")
@@ -117,11 +116,13 @@ class ImageSeq(PatternGenerator):
 	    	
                 if (fname != 'Thumbs.db'): ##generated in Windows
                     print self.imagepath + fname, ' - ', count
+                    # CB: duplicates some code in image.py? This exists because of going to grayscale?
                     image = ImageOps.grayscale(pImage.open(self.imagepath + fname))
                     image_array = array(image.getdata(),Float)
                     image_array.shape = (image.size[::-1]) 
                     
-                    self.patterns.append (PatternSampler(image_array,whole_image_output_fn,edge_average))
+                    self.patterns.append (PatternSampler(pattern_array=image_array,whole_pattern_output_fn=whole_image_output_fn,
+                                                         background_value_fn=edge_average))
                     count=count+1
 	    self.number_of_patterns = len(self.patterns)
 
@@ -148,7 +149,7 @@ class ImageSeq(PatternGenerator):
         
         self.__setup_pattern_sampler(self.imagepath,whole_image_output_fn)
 
-        seed(137*int(random_num1),541*int(random_num1))
+        seed((137*int(random_num1),541*int(random_num1)))
         index = randint(0,len(self.patterns))
 
         ### Requires new get_image_size() method added to PatternSampler
@@ -156,10 +157,10 @@ class ImageSeq(PatternGenerator):
         x_bound=fix(x_value/54.0)-2.0
         y_bound=fix(y_value/54.0)-2.0
 
-        seed(1335*int(random_num2),56781*int(random_num2))
+        seed((1335*int(random_num2),56781*int(random_num2)))
 	self.x = uniform (-x_bound,x_bound)
 
-	seed(3642*int(random_num3),73257*int(random_num3))
+	seed((3642*int(random_num3),73257*int(random_num3)))
 	self.y = uniform (-y_bound,y_bound)
 
 	print index, ' - ', x_bound, ' - ', y_bound, ' - ', self.x, ' - ', self.y
