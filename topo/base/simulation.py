@@ -459,15 +459,12 @@ class CommandEvent(Event):
         scripts you have run, or imports they make---all currently
         available in __main__.__dict__---will not be saved with the
         network.
-
-        If executing the command causes an error, the error is ignored
-        and a warning is printed.
         """
         # Presumably here to avoid importing __main__ into the rest of the file
         import __main__
 
         param.Parameterized(name='CommandEvent').message("Running command %s" \
-                                                         % (self.command_string))        
+                                                         % (self.command_string))
         try:
             exec self.command_string in __main__.__dict__
         except:
