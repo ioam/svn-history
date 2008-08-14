@@ -200,8 +200,8 @@ class Projection(EPConnection):
        each group will be combined in the order of the activity_group
        using the operator specified by the activity_operator.  For
        instance, if there are two Projections with
-       activity_operator=="Add" and activity_group=="0.2" and two with
-       activity_operator=="Divide" and activity_group=="0.6", activity
+       activity_group==(0.2,numpy.add) and two with
+       activity_group==(0.6,numpy.divide), activity
        from the first two will be added together, and the result
        divided by the sum of the second two.""")
 
