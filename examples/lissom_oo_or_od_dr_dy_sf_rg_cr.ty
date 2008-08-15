@@ -131,7 +131,7 @@ if 'cr' in dims:
     basic_opponent_types=['Red-Green ','Green-Red '] 
     dims.append('rg')
 if 'sf' in dims:
-    sf_channels=3 # Useful values are 2,3,4.
+    sf_channels=2 # Useful values are 2,3,4.
 
 
 num_inputs=1
@@ -174,8 +174,9 @@ for e in eyes:
 
             elif dataset=="Nature":
                 scalingfactor=[1.4*0.9,1.4,1.4*0.97] if 'cr' in dims else [1.0,1.0,1.0]
-                if 'rg' in dims: image_filenames=["images/colormap/rgb/%02d_%d.pgm"%(i,cone_types.index(cone)) for i in xrange(1,26)]
-                else:            image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+                if 'cr' in dims:   image_filenames=["images/colormap/rgb/%02d_%d.pgm"%(i,cone_types.index(cone)) for i in xrange(1,26)]
+                elif 'rg' in dims: image_filenames=["images/colormap/%02d_%d.png"%(i,cone_types.index(cone)) for i in xrange(5)]
+                else:              image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
                 inputs=[input_type(filename=f, size=10.0,
                                    x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12) + \
                                      UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150)*(-1)**(e=='Left'),
@@ -263,7 +264,7 @@ for e in eyes:
                                  nominal_bounds_template=BoundingBox(radius=0.375),
                                  name='AfferentCenter'+'Blue', weights_generator=centerg)
 
-            for cone in cone_types: #sf condition
+            for cone in cone_types:
                 if 'Luminosity ' in opponent_types:
                     topo.sim.connect(e+cone+'Retina'+n, e+'Luminosity LGN'+l+n, delay=0.05,
                                      connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**center_polarities.index(l)/len(cone_types),
@@ -274,6 +275,19 @@ for e in eyes:
                                      connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l))/len(cone_types),
                                      nominal_bounds_template=BoundingBox(radius=0.375),
                                      name='AfferentSurround'+cone, weights_generator=surroundg)
+
+                    for channel in xrange(2,sf_channels+1):
+                        topo.sim.connect(e+cone+'Retina'+n, e+'LGN'+l+n+'SF'+str(channel), delay=0.05,
+                                         connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**center_polarities.index(l)/len(cone_types),
+                                         nominal_bounds_template=BoundingBox(radius=0.375*channel),
+                                         name='AfferentCenter'+cone+str(channel), 
+                                         weights_generator=Gaussian(size=0.07385*channel,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()))
+
+                        topo.sim.connect(e+cone+'Retina'+n, e+'LGN'+l+n+'SF'+str(channel), delay=0.05,
+                                         connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l))/len(cone_types),
+                                         nominal_bounds_template=BoundingBox(radius=0.375*channel),
+                                         name='AfferentSurround'+cone+str(channel), 
+                                         weights_generator=Gaussian(size=0.29540*channel,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()))
 
 
             for opponent in opponent_types:
@@ -410,7 +424,7 @@ for e in eyes:
         for l in center_polarities:
             for opponent in opponent_types: 
                 ls += [e+opponent+'LGN'+l+n]+[None]
-            for channel in xrange(2,sf_channels):
+            for channel in xrange(2,sf_channels+1):
                 ls += [e+'LGN'+l+n+'SF'+str(channel)]+[None]
 
 es=[]
