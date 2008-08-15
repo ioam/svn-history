@@ -131,7 +131,7 @@ if 'cr' in dims:
     basic_opponent_types=['Red-Green ','Green-Red '] 
     dims.append('rg')
 if 'sf' in dims:
-    sf_channels=2 # Useful values are 2,3,4.
+    sf_channels=3 # Useful values are 2,3,4.
 
 
 num_inputs=1
@@ -285,14 +285,14 @@ for e in eyes:
                                  nominal_bounds_template=BoundingBox(radius=0.27083),
                                  learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids) 
 
-                for channel in xrange(2,sf_channels+1):
-                    topo.sim.connect(e+'LGN'+l+n+'SF'+str(channel),'V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
-                                     connection_type=CFProjection,strength=1.0,name=e+'LGN'+l+'Afferent'+n+'SF'+str(channel),
-                                     weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                                     generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083*channel),
-                                                                                                 topo.patterns.random.UniformRandom(scale=0,offset=1)]),
-                                     nominal_bounds_template=BoundingBox(radius=0.27083*channel),
-                                     learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids) 
+            for channel in xrange(2,sf_channels+1):
+                topo.sim.connect(e+'LGN'+l+n+'SF'+str(channel),'V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
+                                 connection_type=CFProjection,strength=1.0,name=e+'LGN'+l+'Afferent'+n+'SF'+str(channel),
+                                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083*channel),
+                                                                                             topo.patterns.random.UniformRandom(scale=0,offset=1)]),
+                                 nominal_bounds_template=BoundingBox(radius=0.27083*channel),
+                                 learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids) 
 
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
