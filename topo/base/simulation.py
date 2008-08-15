@@ -960,8 +960,7 @@ class Simulation(param.Parameterized,OptionalSingleton):
             
         # CB: make this a parameter for documentation? Otherwise nobody will know
         # about being able to adjust step.
-
-        # CEBALERT: remove with python 2.5
+        #
         # we set step to 2 so that by default timing doesn't slow simulation too much. but
         # e.g. leaving it as None would result in info at 2% increments of requested run duration,
         # no matter what duration (0.005 or 5, etc).

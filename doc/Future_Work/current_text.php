@@ -101,7 +101,6 @@ Priorities:
 
 * Parameters
 (8) FixedPoint doesn't work properly with Number (removing fixedpoint anyway?)
-(9) Removing InstanceMethodWrapper if possible & anything else not required with python 2.5
 (3) logging: use python's instead of our own?
 (3) script_repr: 
 # JABALERT: Only partially achieved so far -- objects of the same

@@ -732,8 +732,7 @@ class InstanceMethodWrapper(object):
     instance is callable, picklable, etc.
     """
     # CEBALERT: Both repr and name disguise that this is an
-    # InstanceMethodWrapper (note that we probably won't need this
-    # class in python 2.5).
+    # InstanceMethodWrapper.
 
     def __repr__(self):
         return repr(self.im.im_func)
