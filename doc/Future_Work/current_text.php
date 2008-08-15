@@ -36,42 +36,16 @@ tracker rather than added to this list</B>.
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
 
-<H2>Tasks to be addressed in upcoming releases:</H2>
 
-<!-- ------------------------------------------------------------------------ -->
-<!-- ------------------------------------------------------------------------ -->
-<!-- ------------------------------------------------------------------------ -->
-<!-- ------------------------------------------------------------------------ -->
-
-
-
-<H4>topo.base ALERTs</H4>
+<H2>ALERTs in topo.base</H2>
 
 <pre>
-Prorities:
+
+Priorities:
 9: release 0.9.5
 8: release 1.0
 3: release someday
 0: remove alert
-
-
-(9) matplotlib: upgrade to at least 0.91.3, and maybe 0.98.0.  I'm not
-sure about 0.98.0; it might break our 3D right-click plots (as someone
-hinted a few months back), but it's probably easy to try and see.
-
-(9) numpy: upgrade to at least 1.1.0
-
-(8) add an option to clean up external/ once topographica has been
-built, to free up some space for users while still leaving it
-updatable
-
-(8) Base class of Number that allows a value of None
-
-(8) Move test data files into subdirectories of topo/tests 
-
-
-(9): Merge or abandon (or move to 1.0?) idle branch? (CEB)
-
 
 * boundingregion.py cleanup: release 1.0 
 
@@ -134,32 +108,108 @@ updatable
 # type and parameter values are treated as different, so anything
 # for which instantiate == True is reported as being non-default.
 (8) ParamOverrides should check_params()
+
 </pre>
 
-<H4>promoting basic.py</H4>
-(9) etc wherever we haven't done it
 
-<H4>parameters out</H4>
-(3) to different package eventually
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+
+
+<H2>Tasks to be addressed in upcoming release:</H2>
+
+
+<H4>Idle branch</H4>
+Merge or abandon (or move to 1.0?) idle branch? (CEB)
+
+
+<H4>promoting basic.py</H4>
+etc wherever we haven't done it
 
 <H4>memory leak?</H4>  
-(9) Does topographica's memory usage go up over time? what was Jan's
+Does topographica's memory usage go up over time? what was Jan's
 pickle problem? can he reproduce it? -- yes, and so can Jude, but
 she's working on it.
 
 <H4>memory & loading snapshots</H4>
-(9) CB: If I keep calling load_snapshot(X), I find that Topographica's
+CB: If I keep calling load_snapshot(X), I find that Topographica's
 memory usage goes up - apparently by less than the space taken by X
 each time, but it still seems to go up significantly. Needs
 investigation (what actually happens, is it a problem in topographica,
 etc).
 
-<H4>Mac</H4>
-(3) Have someone else get OS X 10.5 aqua working
+<H4>2007/09/20 (CB): copying plotgroup from plotgroups</H4>
+See ALERT next to plotgroups in plotgroup.py.
+
+
+<H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
+<ul>
+<li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
+<li>Cleanup + doc of plotgroup.py</li>
+</ul>
+
+
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+
+
+
+<H2>Tasks to be addressed by release 1.0</H2>
+
+
+<H4>pylint: deal with or ignore all warnings</H4>
+For make lint-base
+
+<!--
+<H4>2007/11/20: output from pychecker in topo.base</H4>
+Look at output from "make check-base" and either fix the problems or
+add them to the suppressions dictionary in .pycheckrc. Once finished,
+can add make check-base to buildbot.
+
+Running it right now gives about 130 warnings, which isn't too hard to imagine looking
+at.  Some of them look like things that could be genuinely confusing,
+and would be easy to fix (like having local variables named min or
+max), and at least one detected an existing hackalert.  Some others
+are clearly not problems, but then there is a huge category that I
+don't quite understand (like "Function (__init__) uses named
+arguments" or "__set__ is not a special method"); those would be worth
+understanding.  Once that's done for base/, the rest should be much
+easier.
+-->
+
+
+<H4>2008/03/31: private/protected attributes</H4>
+Check that we have _ and __ as we want them, at least for base
+
+
+<H4>2007/10/26: Update tutorial</H4>
+Update the lissom_oo_or tutorial page to include fresh figures; some
+are a bit out of date.  Add a section about plotting 'Orientation
+tuning fullfield' tuning curves.  CB: would the tutorial benefit from
+being split up a little more?  Maybe it's getting daunting?
+
+
+<H4>data archive format</H4>
+
+
+<H4>CB: c++ comparisons</H4>
+or/oo_or: Some BaseRN/BaseN combinations don't match. oo_dr: input
+parameters don't match - need to adjust c++ lissom.
+
+<H4>ConnectionField tests</H4>
+no guarantee that code in/related to connectionfield is valid at all densities
+
+<H4>speed-tests should check results</H4>
 
 
 <H4>2008/01/25 (JB): Organization of examples/</H4>
-(8) The examples directory is getting quite big and confusing, at least in
+The examples directory is getting quite big and confusing, at least in
 SVN.  We should consider how we want people to keep track of their
 code; should it be in the main SVN repository?  A separate "contrib"
 or "inprogress" branch?  We have to consider at least three types of
@@ -185,80 +235,56 @@ difference in the resulting matrix sizes at the default densities, but
 for high enough LGN densities we would expect that a few CFs around
 the edge would be cut off slightly using the current values.
 
-<H4>CB: some tests to add</H4>
-(3) cleanup test_pattern_present (or wherever I tried to add test for
-    not-run simulation before presenting patterns/saving generators)
-(3) test that fullfield x and y work
-(3) test for recent run() problem with float
-(8) gaps in c++ comparisons (lissom_oo_or_reference checked only at
-    density 48)
-(8) gaps in tests (no guarantee that code in/related to
-    connectionfield is valid at all densities
-(8) make speed-tests check results, too
 
 
-<H4>2007/09/20 (CB): copying plotgroup from plotgroups</H4>
-(9) See ALERT next to plotgroups in plotgroup.py.
+<H4>option to clean up external/</H4>
+add an option to clean up external/ once topographica has been
+built, to free up some space for users while still leaving it
+updatable
 
-<H4>2008/03/31: private/protected attributes</H4>
-(8) Check that we have _ and __ as we want them, at least for base
+<H4>Base class of Number that allows a value of None</H4>
 
-
-<H4>2007/10/26: Update tutorial</H4>
-(8) Update the lissom_oo_or tutorial page to include fresh figures; some
-are a bit out of date.  Add a section about plotting 'Orientation
-tuning fullfield' tuning curves.  CB: would the tutorial benefit from
-being split up a little more?  Maybe it's getting daunting?
+<H4>Move test data files into subdirectories of topo/tests</H4>
 
 
-<H4>data archive format</H4>
-(8)
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------ -->
 
-<H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
-<ul>
-<li>(9) Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
-<li>(3) Cleanup + doc of *panel.py files</li>
-<li>(9) Cleanup + doc of plotgroup.py</li>
-</ul>
 
+<H2>Things we hope to take care of eventually</H2>
+
+
+<H4>Cleanup + doc of *panel.py files</H4>
 
 
 <H4>2007/10/03 (CB): Less-urgent tkgui cleanup</H4>
 <ul>
-<li>(3) Use parametersframe/tkparameterizedobject in more places (topoconsole, 
+<li>Use parametersframe/tkparameterizedobject in more places (topoconsole, 
 right click menus...) </li>
-<li>(3) Restriction on operations in parallel? (E.g. run and map measurement.)</li>
+<li>Restriction on operations in parallel? (E.g. run and map measurement.)</li>
 </ul>
 
-<H4>(8) pylint (CB): deal with or ignore all warnings</H4>
-For make lint-base
+
+<H4>cleanup test_pattern_present</H4> 
+(or wherever I tried to add test for not-run simulation before
+presenting patterns/saving generators)
+
+<H4>gui: test fullfield x and y work</H4>
+
+<H4>test that shows sim.time() can't be float</H4> 
+test for recent run() problems - to catch problems with other future
+number types
 
 
-<!--
-<H4>2007/11/20: output from pychecker in topo.base</H4>
-Look at output from "make check-base" and either fix the problems or
-add them to the suppressions dictionary in .pycheckrc. Once finished,
-can add make check-base to buildbot.
+<H4>Mac</H4>
+Have someone else get OS X 10.5 X11 working
 
-Running it right now gives about 130 warnings, which isn't too hard to imagine looking
-at.  Some of them look like things that could be genuinely confusing,
-and would be easy to fix (like having local variables named min or
-max), and at least one detected an existing hackalert.  Some others
-are clearly not problems, but then there is a huge category that I
-don't quite understand (like "Function (__init__) uses named
-arguments" or "__set__ is not a special method"); those would be worth
-understanding.  Once that's done for base/, the rest should be much
-easier.
--->
-
-<!-- ------------------------------------------------------------------------ -->
-<!-- ------------------------------------------------------------------------ -->
-<!-- ------------------------------------------------------------------------ -->
-<!-- ------------------------------------------------------------------------ -->
-<!-- ------------------------------------------------------------------------ -->
-<!-- ------------------------------------------------------------------------ -->
-
-<H2>Things we hope to take care of eventually</H2>
+<H4>parameters out</H4>
+to different package
 
 <H4>2008/07/14 (CB): replace internal name mangling for parameters</H4>
 with a dict, so e.g. _x_param_value is instead _params['x']. (And decide
@@ -592,6 +618,11 @@ To figure out:
    Normalize toggle again it does not revert to the old response.
 -->
 
+<H4>2006/02/21: read-only objects</H4>
+Might someday be interesting to have read-only objects, aiming at
+copy-on-write semantics, but this seems quite difficult to achieve in
+Python.
+
 
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
@@ -615,16 +646,10 @@ Plus making sure base and simple classes are imported into packages
 Constant into topo/patterns/, and so on).
 
 
-<H4>2006/02/21: read-only objects</H4>
-Might someday be interesting to have read-only objects, aiming at
-copy-on-write semantics, but this seems quite difficult to achieve in
-Python.
-
-
 <H4>2006/02/21 (all): documentation, unit tests</H4>
 Improving both, plus eliminating ALERTs.
-
 Could use Sphinx instead of epydoc for Reference Manual; apparently searchable.
+
 			     
 <H4>2007/03/14 (CB): gnosis.xml.pickle </H4>
 Needs to be updated for numpy. I'm working with module's author at the
