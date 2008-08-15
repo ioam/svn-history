@@ -42,9 +42,15 @@ on setup.bat in the
 <code>topographica\topographica-win\setup_cvs_copy\</code>
 directory after checking out the code.
 
-<P>On Mac OS X, you should first make sure that tcl/tk version 8.4 is
-installed on your system, as it is by default with OS X 10.4 and 10.5;
-other tcl/tk versions will not currently work.
+<P>On Mac OS X, you should first install tcl/tk version 8.5 on your
+system.  The easiest way to do this is to install <A
+HREF="http://www.activestate.com/Products/activetcl/">ActiveTcl</A>,
+although any Framework build of tcl/tk 8.5 should work. Then, using
+the Terminal application, go to the Topographica directory and type
+<code>make osx-tk-patch</code>. 
+<!-- CEBALERT: the instructions are a little scattered. Some of the
+mac svn stuff should appear here, like the instructions to install
+freetype etc.-->
 
 <P>On some Linux distributions that start with a minimal set of
 packages included, such as Ubuntu or the various "live CD" systems,
