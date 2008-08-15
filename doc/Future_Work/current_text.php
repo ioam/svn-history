@@ -171,6 +171,19 @@ goodhill_network90.ty, som_retinotopy.ty), and ongoing research (by
 us, but also by people unaffiliated with Topographica but want their
 changes to track with SVN or be tied to a specific SVN version?)
 
+<H4>2008/08/15 (JB): Cleanup of examples, especially for afferent radii</H4>
+
+Once Kateryna's project completes, should systematically examine the
+example files (see above task) and eliminate as many as possible;
+several should now be able to be replicated using her master file.  At
+the same time, should update most of the examples to use explicit
+parameters for v1aff_radius and lgnaff_radius, so that the sizes of
+the LGN and retina sheets can be calculated appropriately.  Currently
+many of them have a size that includes a term 0.25 as a buffer, yet
+the relevant radius to be buffered against is 0.27083.  There is no
+difference in the resulting matrix sizes at the default densities, but
+for high enough LGN densities we would expect that a few CFs around
+the edge would be cut off slightly using the current values.
 
 <H4>CB: some tests to add</H4>
 (3) cleanup test_pattern_present (or wherever I tried to add test for
