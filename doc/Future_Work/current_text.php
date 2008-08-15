@@ -119,11 +119,6 @@ Priorities:
 
 <H2>Tasks to be addressed in upcoming release:</H2>
 
-
-<H4>Idle branch</H4>
-Merge or abandon (or move to 1.0?) idle branch? (CEB)
-
-
 <H4>promoting basic.py</H4>
 etc wherever we haven't done it
 
@@ -161,6 +156,8 @@ See ALERT next to plotgroups in plotgroup.py.
 
 <H2>Tasks to be addressed by release 1.0</H2>
 
+<H4>CB: Idle branch</H4>
+Merge or abandon idle branch. 
 
 <H4>pylint: deal with or ignore all warnings</H4>
 For make lint-base
