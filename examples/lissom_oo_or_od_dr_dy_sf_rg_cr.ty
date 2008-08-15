@@ -107,7 +107,7 @@ lags=['']                           # dr
 speed=0.0                           # dr
 disparity_bound = 0.0               # dy
 position_bound = 0.75               # dy
-
+sf_channels = 1                     # sf
 
 dims=locals().get('dims',['or','od','dr','dy'])
 topo.sim.name = "lissom_oo_" + string.join(dims, '_')
@@ -130,6 +130,8 @@ if 'cr' in dims:
     opponent_types=['Red-Green ','Green-Red ','Blue-RedGreen ','Luminosity ']
     basic_opponent_types=['Red-Green ','Green-Red '] 
     dims.append('rg')
+if 'sf' in dims:
+    sf_channels=2 # Useful values are 2,3,4.
 
 
 num_inputs=1
@@ -192,13 +194,19 @@ for e in eyes:
             topo.sim[e+cone+'Retina'+n]=GeneratorSheet(nominal_density=default_retina_density,
                                                        input_generator=input_moved,
                                                        period=1.0, phase=0.05,
-                                                       nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
+                                                       nominal_bounds=BoundingBox(radius=0.5+0.27083*sf_channels+0.375*sf_channels))
         for l in center_polarities:
             for opponent in opponent_types:
                 topo.sim[e+opponent+'LGN'+l+n]=CFSheet(nominal_density=24.0,
-                                                        nominal_bounds=BoundingBox(radius=0.5+0.25),
-                                                        output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
-                                                        measure_maps=False)
+                                                       nominal_bounds=BoundingBox(radius=0.5+0.27083),
+                                                       output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                                                       measure_maps=False)
+            for channel in xrange(2,sf_channels+1):
+                topo.sim[e+'LGN'+l+n+'SF'+str(channel)]=CFSheet(nominal_density=24.0,
+                                                                nominal_bounds=BoundingBox(radius=0.5+0.27083*channel),
+                                                                output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                                                                measure_maps=False)
+                
 
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9,nominal_bounds=BoundingBox(radius=0.5))
 
@@ -229,6 +237,18 @@ for e in eyes:
                                  nominal_bounds_template=BoundingBox(radius=0.375),name='AfferentSurround',
                                  weights_generator=surroundg)
 
+                if 'sf' in dims and 'rg' not in dims: 
+                    for channel in xrange(2,sf_channels+1):
+                        topo.sim.connect(e+cone+'Retina'+n, e+opponentcenter+'LGN'+l+n+'SF'+str(channel), delay=0.05,
+                                         connection_type=SharedWeightCFProjection,strength=strength[int(speed)]*(-1)**center_polarities.index(l), 
+                                         nominal_bounds_template=BoundingBox(radius=0.375*channel),name='AfferentCenter'+str(channel),
+                                         weights_generator=Gaussian(size=0.07385*channel,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()))
+
+                        topo.sim.connect(e+cone+'Retina'+n, e+opponentsurround+'LGN'+l+n+'SF'+str(channel), delay=0.05,
+                                         connection_type=SharedWeightCFProjection,strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l)), 
+                                         nominal_bounds_template=BoundingBox(radius=0.375*channel),name='AfferentSurround'+str(channel),
+                                         weights_generator=Gaussian(size=0.29540*channel,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()))
+
                 if 'cr' in dims:
                     topo.sim.connect(e+cone+'Retina'+n,
                                      e+'Blue-RedGreen'+' LGN'+l+n, delay=0.05,
@@ -243,7 +263,7 @@ for e in eyes:
                                  nominal_bounds_template=BoundingBox(radius=0.375),
                                  name='AfferentCenter'+'Blue', weights_generator=centerg)
 
-            for cone in cone_types: 
+            for cone in cone_types: #sf condition
                 if 'Luminosity ' in opponent_types:
                     topo.sim.connect(e+cone+'Retina'+n, e+'Luminosity LGN'+l+n, delay=0.05,
                                      connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**center_polarities.index(l)/len(cone_types),
@@ -264,6 +284,15 @@ for e in eyes:
                                                                              topo.patterns.random.UniformRandom(scale=0,offset=1)]),
                                  nominal_bounds_template=BoundingBox(radius=0.27083),
                                  learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids) 
+
+                for channel in xrange(2,sf_channels+1):
+                    topo.sim.connect(e+'LGN'+l+n+'SF'+str(channel),'V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
+                                     connection_type=CFProjection,strength=1.0,name=e+'LGN'+l+'Afferent'+n+'SF'+str(channel),
+                                     weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                                                                                     generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083*channel),
+                                                                                                 topo.patterns.random.UniformRandom(scale=0,offset=1)]),
+                                     nominal_bounds_template=BoundingBox(radius=0.27083*channel),
+                                     learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids) 
 
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
@@ -378,9 +407,11 @@ vs=[None]*(len(opponent_types)*len(center_polarities)*len(eyes)*len(lags)-1) + [
 ls=[]
 for e in eyes:
     for n in lags:
-        for opponent in opponent_types:
-            for l in center_polarities:
+        for l in center_polarities:
+            for opponent in opponent_types: 
                 ls += [e+opponent+'LGN'+l+n]+[None]
+            for channel in xrange(2,sf_channels):
+                ls += [e+'LGN'+l+n+'SF'+str(channel)]+[None]
 
 es=[]
 for e in eyes:
