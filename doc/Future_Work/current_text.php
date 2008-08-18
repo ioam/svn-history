@@ -122,11 +122,6 @@ Priorities:
 <H4>promoting basic.py</H4>
 etc wherever we haven't done it
 
-<H4>memory leak?</H4>  
-Does topographica's memory usage go up over time? what was Jan's
-pickle problem? can he reproduce it? -- yes, and so can Jude, but
-she's working on it.
-
 <H4>memory & loading snapshots</H4>
 CB: If I keep calling load_snapshot(X), I find that Topographica's
 memory usage goes up - apparently by less than the space taken by X
