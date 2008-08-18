@@ -108,6 +108,9 @@ speed=0.0                           # dr
 disparity_bound = 0.0               # dy
 position_bound = 0.75               # dy
 sf_channels = 1                     # sf
+sf_spacing = 2.0                    # sf
+v1aff_radius=0.27083                # sf
+lgnaff_radius=0.375                 # sf
 
 dims=locals().get('dims',['or','od','dr','dy'])
 topo.sim.name = "lissom_oo_" + string.join(dims, '_')
@@ -170,7 +173,7 @@ for e in eyes:
                                          UniformRandom(lbound=0,ubound=2,seed=78+i)*('rg' not in dims),
                                    bounds=BoundingBox(radius=0.8))
                         for i in xrange(num_inputs)]
-                input_composite=topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
+                input_composite=topo.patterns.basic.SeparatedComposite(min_separation=2.2*v1aff_radius,generators=inputs)
 
             elif dataset=="Nature":
                 scalingfactor=[1.4*0.9,1.4,1.4*0.97] if 'cr' in dims else [1.0,1.0,1.0]
@@ -195,16 +198,17 @@ for e in eyes:
             topo.sim[e+cone+'Retina'+n]=GeneratorSheet(nominal_density=default_retina_density,
                                                        input_generator=input_moved,
                                                        period=1.0, phase=0.05,
-                                                       nominal_bounds=BoundingBox(radius=0.5+0.27083*sf_channels+0.375*sf_channels))
+                                                       nominal_bounds=BoundingBox(radius=0.5+v1aff_radius*sf_spacing**(sf_channels-1) + \
+                                                                                            lgnaff_radius*sf_spacing**(sf_channels-1)))
         for l in center_polarities:
             for opponent in opponent_types:
                 topo.sim[e+opponent+'LGN'+l+n]=CFSheet(nominal_density=24.0,
-                                                       nominal_bounds=BoundingBox(radius=0.5+0.27083),
+                                                       nominal_bounds=BoundingBox(radius=0.5+v1aff_radius),
                                                        output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                                                        measure_maps=False)
             for channel in xrange(2,sf_channels+1):
                 topo.sim[e+'LGN'+l+n+'SF'+str(channel)]=CFSheet(nominal_density=24.0,
-                                                                nominal_bounds=BoundingBox(radius=0.5+0.27083*channel),
+                                                                nominal_bounds=BoundingBox(radius=0.5+v1aff_radius*sf_spacing**(channel-1)),
                                                                 output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                                                                 measure_maps=False)
                 
@@ -230,82 +234,82 @@ for e in eyes:
             for (cone,opponentcenter,opponentsurround) in zip(rg_cone_types,basic_opponent_types,basic_opponent_types_tmp):
                 topo.sim.connect(e+cone+'Retina'+n, e+opponentcenter+'LGN'+l+n, delay=0.05,
                  		 connection_type=SharedWeightCFProjection,strength=strength[int(speed)]*(-1)**center_polarities.index(l), 
-                 		 nominal_bounds_template=BoundingBox(radius=0.375),name='AfferentCenter',
+                 		 nominal_bounds_template=BoundingBox(radius=lgnaff_radius),name='AfferentCenter',
                  		 weights_generator=centerg)
 
                 topo.sim.connect(e+cone+'Retina'+n, e+opponentsurround+'LGN'+l+n, delay=0.05,
                                  connection_type=SharedWeightCFProjection,strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l)), 
-                                 nominal_bounds_template=BoundingBox(radius=0.375),name='AfferentSurround',
+                                 nominal_bounds_template=BoundingBox(radius=lgnaff_radius),name='AfferentSurround',
                                  weights_generator=surroundg)
 
                 if 'sf' in dims and 'rg' not in dims: 
                     for channel in xrange(2,sf_channels+1):
                         topo.sim.connect(e+cone+'Retina'+n, e+opponentcenter+'LGN'+l+n+'SF'+str(channel), delay=0.05,
                                          connection_type=SharedWeightCFProjection,strength=strength[int(speed)]*(-1)**center_polarities.index(l), 
-                                         nominal_bounds_template=BoundingBox(radius=0.375*channel),name='AfferentCenter'+str(channel),
-                                         weights_generator=Gaussian(size=0.07385*channel,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()))
+                                         nominal_bounds_template=BoundingBox(radius=lgnaff_radius*sf_spacing**(channel-1)),name='AfferentCenter'+str(channel),
+                                         weights_generator=Gaussian(size=0.07385*sf_spacing**(channel-1),aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()))
 
                         topo.sim.connect(e+cone+'Retina'+n, e+opponentsurround+'LGN'+l+n+'SF'+str(channel), delay=0.05,
                                          connection_type=SharedWeightCFProjection,strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l)), 
-                                         nominal_bounds_template=BoundingBox(radius=0.375*channel),name='AfferentSurround'+str(channel),
-                                         weights_generator=Gaussian(size=0.29540*channel,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()))
+                                         nominal_bounds_template=BoundingBox(radius=lgnaff_radius*sf_spacing**(channel-1)),name='AfferentSurround'+str(channel),
+                                         weights_generator=Gaussian(size=0.29540*sf_spacing**(channel-1),aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()))
 
                 if 'cr' in dims:
                     topo.sim.connect(e+cone+'Retina'+n,
                                      e+'Blue-RedGreen'+' LGN'+l+n, delay=0.05,
                                      connection_type=SharedWeightCFProjection, strength=4.7*(-1)**(1+center_polarities.index(l))/2,
-                                     nominal_bounds_template=BoundingBox(radius=0.375),
+                                     nominal_bounds_template=BoundingBox(radius=lgnaff_radius),
                                      name='AfferentCenter'+cone, weights_generator=centerg)
 
             if 'cr' in dims:
                 topo.sim.connect(e+'Blue'+'Retina'+n,
                                  e+'Blue-RedGreen'+' LGN'+l+n, delay=0.05,
                                  connection_type=SharedWeightCFProjection, strength=4.7*(-1)**center_polarities.index(l),
-                                 nominal_bounds_template=BoundingBox(radius=0.375),
+                                 nominal_bounds_template=BoundingBox(radius=lgnaff_radius),
                                  name='AfferentCenter'+'Blue', weights_generator=centerg)
 
             for cone in cone_types:
                 if 'Luminosity ' in opponent_types:
                     topo.sim.connect(e+cone+'Retina'+n, e+'Luminosity LGN'+l+n, delay=0.05,
                                      connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**center_polarities.index(l)/len(cone_types),
-                                     nominal_bounds_template=BoundingBox(radius=0.375),
+                                     nominal_bounds_template=BoundingBox(radius=lgnaff_radius),
                                      name='AfferentCenter'+cone, weights_generator=centerg)
 
                     topo.sim.connect(e+cone+'Retina'+n, e+'Luminosity LGN'+l+n, delay=0.05,
                                      connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l))/len(cone_types),
-                                     nominal_bounds_template=BoundingBox(radius=0.375),
+                                     nominal_bounds_template=BoundingBox(radius=lgnaff_radius),
                                      name='AfferentSurround'+cone, weights_generator=surroundg)
 
                     for channel in xrange(2,sf_channels+1):
                         topo.sim.connect(e+cone+'Retina'+n, e+'LGN'+l+n+'SF'+str(channel), delay=0.05,
                                          connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**center_polarities.index(l)/len(cone_types),
-                                         nominal_bounds_template=BoundingBox(radius=0.375*channel),
+                                         nominal_bounds_template=BoundingBox(radius=lgnaff_radius*sf_spacing**(channel-1)),
                                          name='AfferentCenter'+cone+str(channel), 
-                                         weights_generator=Gaussian(size=0.07385*channel,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()))
+                                         weights_generator=Gaussian(size=0.07385*sf_spacing**(channel-1),aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()))
 
                         topo.sim.connect(e+cone+'Retina'+n, e+'LGN'+l+n+'SF'+str(channel), delay=0.05,
                                          connection_type=SharedWeightCFProjection, strength=strength[int(speed)]*(-1)**(1+center_polarities.index(l))/len(cone_types),
-                                         nominal_bounds_template=BoundingBox(radius=0.375*channel),
+                                         nominal_bounds_template=BoundingBox(radius=lgnaff_radius*sf_spacing**(channel-1)),
                                          name='AfferentSurround'+cone+str(channel), 
-                                         weights_generator=Gaussian(size=0.29540*channel,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()))
+                                         weights_generator=Gaussian(size=0.29540*sf_spacing**(channel-1),aspect_ratio=1.0,output_fn=DivisiveNormalizeL1()))
 
 
             for opponent in opponent_types:
 		topo.sim.connect(e+opponent+'LGN'+l+n,'V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
                                  connection_type=CFProjection,strength=1.0,name=e+opponent+'LGN'+l+'Afferent'+n,
                                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*v1aff_radius),
                                                                              topo.patterns.random.UniformRandom(scale=0,offset=1)]),
-                                 nominal_bounds_template=BoundingBox(radius=0.27083),
+                                 nominal_bounds_template=BoundingBox(radius=v1aff_radius),
                                  learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids) 
 
             for channel in xrange(2,sf_channels+1):
                 topo.sim.connect(e+'LGN'+l+n+'SF'+str(channel),'V1',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
                                  connection_type=CFProjection,strength=1.0,name=e+'LGN'+l+'Afferent'+n+'SF'+str(channel),
                                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
-                                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083*channel),
+                                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*v1aff_radius*sf_spacing**(channel-1)),
                                                                                              topo.patterns.random.UniformRandom(scale=0,offset=1)]),
-                                 nominal_bounds_template=BoundingBox(radius=0.27083*channel),
+                                 nominal_bounds_template=BoundingBox(radius=v1aff_radius*sf_spacing**(channel-1)),
                                  learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids) 
 
 
