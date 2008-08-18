@@ -75,7 +75,9 @@ def get_date_version_time(logfile,timings=None,startups=None):
     f.close()
 
     ok = ok2 = False
-    #datei=versioni=timingi=cpusei=startupi=-1
+    
+    datei=versioni=timingi=startupi=None
+    
     i = 0;
     for line in all_lines:
         if line.find("Running at")>=0:
@@ -105,6 +107,9 @@ def get_date_version_time(logfile,timings=None,startups=None):
         print "...speed test invalid because results didn't match"
         return None
 
+    if datei is None or versioni is None or timingi is None or startupi is None:
+        print "...not all data available - build didn't complete?"
+        return None
 
 #
 #    try:
