@@ -180,7 +180,7 @@ def get_date_version_time(logfile,timings=None,startups=None):
 
 
 MIN_BUILD=153
-filename_pattern = '*-log-shell_2-stdio'
+filename_pattern = '*-log-shell_3-stdio'
 def update_timings(location="/home/ceball/buildbot/buildmaster/slow-tests_x86_ubuntu7.04/"):
 
     timings = get_timings()
