@@ -61,17 +61,23 @@ uninstall:
 
 # Windows: to build topographica using msys, having already installed
 # binary python, pil, jpeg
-# CB: hard-coded paths will disappear.
-# Need to use something more local than distutils.cfg so we don't 
-# destroy any existing setup (e.g. use site.cfg files?) 
 win-msys-patch:
 	mkdir -p bin
 	ln -f -s /c/Python25/python.exe bin/python
+## prerequisites
 	touch external/tcl external/tk external/blt external/python external/pil external/jpeg
+## needed during the build process
+# CEBALERT: shouldn't be required; why can't I get this to work as an
+# option to setup.py? Use site.cfg?
 	echo "[build]" > /c/Python25/Lib/distutils/distutils.cfg
 	echo "compiler = mingw32" >> /c/Python25/Lib/distutils/distutils.cfg
+## topographica.pth for Python to locate Topographica 
+# CEBALERT: means there can only be one copy of Topographica on
+# Windows.  Can't the topographica script modify sys.path at startup?
+# Still, we'd need a way to have this work during the build process,
+# too.
+
 	bin/python external/msys_path.py /c/Python25/Lib/site-packages/topographica.pth ${PREFIX}/lib ${PREFIX}/lib/site-packages
-#	echo "import site; site.addsitedir('c:\\\topographica\\\Lib\\\site-packages'); site.addsitedir('c:\\\topographica\\\Lib')" >> /c/Python25/Lib/site-packages/topographica.pth
 	patch --force external/Makefile external/Makefile_win_msys.diff
 	touch win-msys-patch
 
