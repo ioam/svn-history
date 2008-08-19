@@ -73,12 +73,12 @@ for e in eyes:
             topo.sim[e+cone+'Retina'+n]=GeneratorSheet(nominal_density=default_retina_density,
                                                        input_generator=input_composite,
                                                        period=1.0, phase=0.05,
-                                                       nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
+                                                       nominal_bounds=BoundingBox(radius=0.5+0.27083+0.375))
 
         for l in center_polarities:
             for opponent in opponent_types:
                 topo.sim[e+opponent+' LGN'+l+n]=CFSheet(nominal_density=24.0,
-                                                        nominal_bounds=BoundingBox(radius=0.5+0.25),
+                                                        nominal_bounds=BoundingBox(radius=0.5+0.27083),
                                                         output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                                                         measure_maps=False)
 
