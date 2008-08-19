@@ -55,7 +55,7 @@ Priorities:
 
 * cf.py
 (8) learning rate moves to learning function (rather than cfprojection)
-(9) where mask created (by cfprojection/cf)  (CEB)
+(8) where mask created (by cfprojection/cf)  (CEB)
 (8) learning rate a parameter of CFPLearningFn
 (8) CFPOutputFn mask parameter could be dropped now a masked iterator can be passed in
 (3) calculation of no. of units (internal)
