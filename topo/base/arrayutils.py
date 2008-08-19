@@ -10,9 +10,23 @@ import re
 from numpy import sqrt,dot,arctan2,array2string,logical_not,fmod,floor,\
      array,concatenate,set_printoptions
 from numpy import abs # pylint: disable-msg=W0622
+from numpy import ufunc
 
 # Ask numpy to print even relatively large arrays by default
 set_printoptions(threshold=200*200)
+
+
+def ufunc_script_repr(f):
+    """
+    Return a runnable representation of the numpy ufunc f, and an
+    import statement for its module.
+    """
+    # (could probably be generalized if required, because module is
+    # f.__class__.__module__)
+    return 'numpy.'+f.__name__, "import numpy"
+
+from ..param import parameterized
+parameterized.script_repr_reg[ufunc]=ufunc_script_repr
 
 
 def L2norm(v):
