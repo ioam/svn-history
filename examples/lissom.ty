@@ -301,7 +301,7 @@ for e in eyes:
                                  connection_type=CFProjection,strength=1.0,name=e+opponent+'LGN'+l+'Afferent'+n,
                                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*v1aff_radius),
-                                                                             topo.patterns.random.UniformRandom(scale=0,offset=1)]),
+                                                                             topo.patterns.random.UniformRandom()]),
                                  nominal_bounds_template=BoundingBox(radius=v1aff_radius),
                                  learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids) 
 
@@ -310,7 +310,7 @@ for e in eyes:
                                  connection_type=CFProjection,strength=1.0,name=e+'LGN'+l+'Afferent'+n+'SF'+str(channel),
                                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*v1aff_radius*sf_spacing**(channel-1)),
-                                                                                             topo.patterns.random.UniformRandom(scale=0,offset=1)]),
+                                                                                             topo.patterns.random.UniformRandom()]),
                                  nominal_bounds_template=BoundingBox(radius=v1aff_radius*sf_spacing**(channel-1)),
                                  learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids) 
 
@@ -319,14 +319,14 @@ topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,strength=1.2 if dataset=="Nature" else 0.9,
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.10417),
-                                                                             topo.patterns.random.UniformRandom(scale=0,offset=1)]),
+                                                                             topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.10417),learning_rate=2.55528/ids) 
             
 topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
                  connection_type=CFProjection,strength=-1.75 if dataset=="Nature" else -0.9, 
                  weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
-                                                                             topo.patterns.random.UniformRandom(scale=0,offset=1)]),
+                                                                             topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.22917),learning_rate=1.80873/ids/5 if dataset=="Nature" else 1.80873/ids)  
 
 
