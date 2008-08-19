@@ -105,7 +105,7 @@ if 'dr' in dims:
     lags=['0','1','2','3']
     speed=2.0 # Useful speeds range from 0.0 - 3.0.
 if 'dy' in dims: 
-    max_disparity = locals().get('max_disparity',2.0)
+    max_disparity = locals().get('max_disparity',4.0)
     disparity_bound = max_disparity*0.041665/2.0
     if max_disparity > 0.0: position_bound = 0.70833
 
@@ -155,10 +155,10 @@ for e in eyes:
         topo.sim[e+'Retina'+n]=GeneratorSheet(nominal_density=default_retina_density,
                                                    input_generator=input_moved,
                                                    period=1.0, phase=0.05,
-                                                   nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
+                                                   nominal_bounds=BoundingBox(radius=0.5+0.27083+0.375))
         for l in center_polarities:
             topo.sim[e+'LGN'+l+n]=CFSheet(nominal_density=24.0,
-                                      nominal_bounds=BoundingBox(radius=0.5+0.25),
+                                      nominal_bounds=BoundingBox(radius=0.5+0.27083),
                                       output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                                       measure_maps=False)
 
