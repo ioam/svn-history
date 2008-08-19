@@ -57,7 +57,7 @@ for e in eyes:
         default_retina_density=locals().get('default_retina_density',48.0)
 
         for cone in cone_types:
-            image_filenames=["images/colormap/%02d_%d.png"%(i,(cone=='Green')) for i in xrange(5)]
+            image_filenames=["images/colormap/rgb/%02d_%d.pgm"%(i,(cone=='Green')) for i in xrange(1,26)]
             inputs=[input_type(filename=f, size=10.0,#size_normalization='original',
                                x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
                                y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
@@ -71,12 +71,12 @@ for e in eyes:
             topo.sim[e+cone+'Retina'+n]=GeneratorSheet(nominal_density=default_retina_density,
                                                               input_generator=input_composite,
                                                               period=1.0, phase=0.05,
-                                                              nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
+                                                              nominal_bounds=BoundingBox(radius=0.5+0.27083+0.375))
 
         for l in center_polarities:
             for opponent in opponent_types:
                 topo.sim[e+opponent+' LGN'+l+n]=CFSheet(nominal_density=24.0,
-                                        nominal_bounds=BoundingBox(radius=0.5+0.25),
+                                        nominal_bounds=BoundingBox(radius=0.5+0.27083),
                                         output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                                         measure_maps=False)
 
