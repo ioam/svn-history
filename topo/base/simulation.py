@@ -239,6 +239,8 @@ class EventProcessorParameter(param.Parameter):
             super(EventProcessorParameter,self).__set__(obj,val)
 
 
+from ..param import parameterized
+
 class EPConnection(param.Parameterized):
     """
     EPConnection stores basic information for a connection between
@@ -351,10 +353,8 @@ class EPConnection(param.Parameterized):
             except TypeError:
                 if name=="src" or name=="dest":
                     rep=None
-                elif isinstance(val,param.Parameterized):
-                    rep=val.script_repr(imports=imports,prefix=prefix+"    ")
                 else:
-                    rep=repr(val)
+                    rep = parameterized.script_repr(self,name,val,imports,prefix,settings)
 
             if rep is not None:
                 settings.append('%s=%s' % (name,rep))

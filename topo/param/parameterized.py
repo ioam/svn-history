@@ -608,6 +608,50 @@ class ParameterizedMetaclass(type):
 # that are just inheriting their values from the class defaults.
 script_repr_suppress_defaults=True
 
+
+
+def script_repr(self,name,val,imports,prefix,settings):
+    """
+    Variant of repr() designed for generating a runnable script.
+
+    Types that require special handling can use the script_repr_reg
+    dictionary. Using the type as a key, add a function that returns a
+    suitable representation of instances of that type, and the
+    required import statement.
+    """        
+    if type(val) in script_repr_reg:
+        rep,import_statement = script_repr_reg[type(val)](val)
+        imports.append(import_statement)
+
+    elif hasattr(val,'script_repr'):
+        rep=val.script_repr(imports=imports,prefix=prefix+"    ")
+
+    ## hack to detect container (note that only lists and tuples are
+    ## supported)
+    elif isinstance(val,list) or isinstance(val,tuple): 
+
+        result=[]
+        for i in val:
+            result.append(script_repr(self,name,i,imports,prefix,settings))
+
+        ## (hack to get container brackets)
+        if isinstance(val,list):
+            d1,d2='[',']'
+        elif isinstance(val,tuple):
+            d1,d2='(',')'
+        else:
+            raise NotImplementedError
+        rep=d1+','.join(result)+d2
+        
+    else:
+        rep=repr(val)
+        
+    return rep
+
+
+# see script_repr()
+script_repr_reg = {}
+
 # If not None, the value of this Parameter will be called (using '()')
 # before every call to __db_print, and is expected to evaluate to a
 # string that is suitable for prefixing messages and warnings (such
@@ -846,32 +890,27 @@ class Parameterized(object):
         return self.__class__.__name__ + "(" + ", ".join(settings) + ")"
 
 
+
+
     def script_repr(self,imports=[],prefix="    "):
         """
         Variant of __repr__ designed for generating a runnable script.
-        """
+        """        
         # Suppresses automatically generated names and print_levels.
         settings=[]
         for name,val in self.get_param_values(onlychanged=script_repr_suppress_defaults):
+
             if name == 'name' and re.match('^'+self.__class__.__name__+'[0-9]+$',val):
                 rep=None
             elif name == 'print_level':
                 rep=None
-            elif isinstance(val,Parameterized):
-                rep=val.script_repr(imports=imports,prefix=prefix+"    ")
-            elif isinstance(val,list):
-                result=[]
-                for i in val:
-                    if hasattr(i,'script_repr'):
-                        result.append(i.script_repr(imports=imports,prefix=prefix+"    "))
-                    else:
-                        result.append(repr(i))
-                rep='['+','.join(result)+']'
             else:
-                rep=repr(val)
+                rep=script_repr(self,name,val,imports,prefix,settings)
+
             if rep is not None:
                 settings.append('%s=%s' % (name,rep))
 
+            
         # Generate import statement
         cls = self.__class__.__name__
         mod = self.__module__
