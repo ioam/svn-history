@@ -165,8 +165,9 @@ for e in eyes:
                                      UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150+i)*(-1)**(e=='Left'),
                                    y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
                                    orientation=0 if n != '' else UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
-                                   size=0.088388*UniformRandom(lbound=1,ubound=sf_spacing**(sf_channels-1),seed=23+i)**('sf' in dims), 
-                                   aspect_ratio=4.66667,
+                                   size=0.088388*(3**('or' not in dims)) * \
+                                        UniformRandom(lbound=1,ubound=sf_spacing**(sf_channels-1),seed=23+i)**('sf' in dims), 
+                                   aspect_ratio=4.66667 if 'or' in dims else 1.0,
                                    scale=2.0-2*(r*(cone=='Red')+g*(cone=='Green')+b*(cone=='Blue')) -  \
                                          UniformRandom(lbound=0,ubound=2,seed=78+i)*('rg' not in dims) \
                                                                        if e=='Right' and 'od' in dims  \
@@ -181,7 +182,7 @@ for e in eyes:
                 if 'cr' in dims:   image_filenames=["images/colormap/rgb/%02d_%d.pgm"%(i,cone_types.index(cone)) for i in xrange(1,26)]
                 elif 'rg' in dims: image_filenames=["images/colormap/%02d_%d.png"%(i,cone_types.index(cone)) for i in xrange(5)]
                 else:              image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
-                inputs=[input_type(filename=f, size=10.0,
+                inputs=[input_type(filename=f, size=10.0, cache_image=False,
                                    x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12) + \
                                      UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150)*(-1)**(e=='Left'),
                                    y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34),
