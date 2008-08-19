@@ -119,7 +119,7 @@ if 'dr' in dims:
     lags=['0','1','2','3']
     speed=2.0 # Useful speeds range from 0.0 - 3.0.
 if 'dy' in dims: 
-    max_disparity = locals().get('max_disparity',2.0)
+    max_disparity = locals().get('max_disparity',4.0)
     disparity_bound = max_disparity*0.041665/2.0
     if max_disparity > 0.0: position_bound = 0.70833
 if 'rg' in dims:
@@ -165,7 +165,8 @@ for e in eyes:
                                      UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150+i)*(-1)**(e=='Left'),
                                    y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
                                    orientation=0 if n != '' else UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
-                                   size=0.088388, aspect_ratio=4.66667,
+                                   size=0.088388*UniformRandom(lbound=1,ubound=sf_spacing**(sf_channels-1),seed=23+i)**('sf' in dims), 
+                                   aspect_ratio=4.66667,
                                    scale=2.0-2*(r*(cone=='Red')+g*(cone=='Green')+b*(cone=='Blue')) -  \
                                          UniformRandom(lbound=0,ubound=2,seed=78+i)*('rg' not in dims) \
                                                                        if e=='Right' and 'od' in dims  \
