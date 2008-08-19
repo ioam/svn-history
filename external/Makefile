@@ -220,7 +220,7 @@ numpy-uninstall:
 ##############################################################
 # MatPlotLib (plotting library)
 #
-MATPLOTLIB = matplotlib-0.91.2
+MATPLOTLIB = matplotlib-0.91.4
 MATPLOTLIB_UNINSTALL =  ${PYTHON_LIB}/site-packages/matplotlib
 
 # Workaround to allow MATPLOTLIB to compile on a remote session.
