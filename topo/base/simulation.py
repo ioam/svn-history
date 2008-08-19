@@ -354,7 +354,7 @@ class EPConnection(param.Parameterized):
                 if name=="src" or name=="dest":
                     rep=None
                 else:
-                    rep = parameterized.script_repr(self,name,val,imports,prefix,settings)
+                    rep = parameterized.script_repr(val,imports,prefix,settings)
 
             if rep is not None:
                 settings.append('%s=%s' % (name,rep))

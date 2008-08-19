@@ -610,38 +610,22 @@ script_repr_suppress_defaults=True
 
 
 
-def script_repr(self,name,val,imports,prefix,settings):
+def script_repr(val,imports,prefix,settings):
     """
     Variant of repr() designed for generating a runnable script.
 
     Types that require special handling can use the script_repr_reg
     dictionary. Using the type as a key, add a function that returns a
-    suitable representation of instances of that type, and the
+    suitable representation of instances of that type, and adds the
     required import statement.
-    """        
+    """
+    # CB: doc prefix & settings or realize they don't need to be
+    # passed around, etc.
     if type(val) in script_repr_reg:
-        rep,import_statement = script_repr_reg[type(val)](val)
-        imports.append(import_statement)
+        rep = script_repr_reg[type(val)](val,imports,prefix,settings)
 
     elif hasattr(val,'script_repr'):
         rep=val.script_repr(imports=imports,prefix=prefix+"    ")
-
-    ## hack to detect container (note that only lists and tuples are
-    ## supported)
-    elif isinstance(val,list) or isinstance(val,tuple): 
-
-        result=[]
-        for i in val:
-            result.append(script_repr(self,name,i,imports,prefix,settings))
-
-        ## (hack to get container brackets)
-        if isinstance(val,list):
-            d1,d2='[',']'
-        elif isinstance(val,tuple):
-            d1,d2='(',')'
-        else:
-            raise NotImplementedError
-        rep=d1+','.join(result)+d2
         
     else:
         rep=repr(val)
@@ -651,6 +635,31 @@ def script_repr(self,name,val,imports,prefix,settings):
 
 # see script_repr()
 script_repr_reg = {}
+
+
+# currently only handles list and tuple
+def container_script_repr(container,imports,prefix,settings):
+    result=[]
+    for i in container:
+        result.append(script_repr(i,imports,prefix,settings))
+
+    ## (hack to get container brackets)
+    if isinstance(container,list):
+        d1,d2='[',']'
+    elif isinstance(container,tuple):
+        d1,d2='(',')'
+    else:
+        raise NotImplementedError
+    rep=d1+','.join(result)+d2
+
+    # no imports to add for built-in types
+    
+    return rep
+
+script_repr_reg[list]=container_script_repr
+script_repr_reg[tuple]=container_script_repr
+
+
 
 # If not None, the value of this Parameter will be called (using '()')
 # before every call to __db_print, and is expected to evaluate to a
@@ -905,7 +914,7 @@ class Parameterized(object):
             elif name == 'print_level':
                 rep=None
             else:
-                rep=script_repr(self,name,val,imports,prefix,settings)
+                rep=script_repr(val,imports,prefix,settings)
 
             if rep is not None:
                 settings.append('%s=%s' % (name,rep))

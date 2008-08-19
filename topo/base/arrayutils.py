@@ -16,14 +16,15 @@ from numpy import ufunc
 set_printoptions(threshold=200*200)
 
 
-def ufunc_script_repr(f):
+def ufunc_script_repr(f,imports,prefix=None,settings=None):
     """
     Return a runnable representation of the numpy ufunc f, and an
     import statement for its module.
     """
     # (could probably be generalized if required, because module is
     # f.__class__.__module__)
-    return 'numpy.'+f.__name__, "import numpy"
+    imports.append('import numpy')
+    return 'numpy.'+f.__name__
 
 from ..param import parameterized
 parameterized.script_repr_reg[ufunc]=ufunc_script_repr
