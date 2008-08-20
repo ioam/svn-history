@@ -86,7 +86,9 @@ class NodeTool(Frame):
     The available Sheet types are supplied to be selected from. This Tool supplies
     a suitable Editor cover for a node and creates the corresponding topo object.
     """
-
+    # hack: we can do this properly when converting to a plotgrouppanel
+    default_sheet = 'CFSheet'
+    
     def __init__(self, canvas,  parent = None, parambar = None):
         
         Frame.__init__(self, parent,bg = 'light grey', bd = 4, relief = RAISED)
@@ -112,7 +114,7 @@ class NodeTool(Frame):
         
         ## menu with list of available sheets
         self.option_var = StringVar()
-        self.option_var.set(sheet_list[0])
+        self.option_var.set(self.default_sheet)
         self.current_option = self.option_var.get()
 
         self.option_menu = Combobox(self,textvariable=self.option_var,
