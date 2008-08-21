@@ -136,7 +136,8 @@ class SnapshotSupport(object):
 
 
         def cf_rename_slice_array(state):
-            ## slice_array was renamed to input_sheet_slice in r7548            if 'slice_array' in state:
+            ## slice_array was renamed to input_sheet_slice in r7548
+            if 'slice_array' in state:
                 input_sheet_slice = state['slice_array']
                 state['input_sheet_slice'] = input_sheet_slice
                 del state['slice_array'] # probably doesn't work
