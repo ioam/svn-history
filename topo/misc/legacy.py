@@ -83,7 +83,7 @@ def fake_a_module(name,parent,source_code,parent_path=None):
     exec source_code in module.__dict__
 
     # install the module
-    print "***",name,parent,parent_path
+    #print "***",name,parent,parent_path
     if parent_path is None:
         parent_path = parent.__name__
         
@@ -315,6 +315,10 @@ from topo.param import Dict as DictParameter
         preprocess_state(CFProjection,cfproj_add_cfs)
 
 
+        # i don't understand why I can't get the following idea to work:
+        # e.g. simply have sys.modules['topo.outputfns']=topo.outputfn (and for basic etc)
+        # it doesn't work: importing topo.outputfns just gives topo
+
         # should get the list from elsewhere!
         joke('outputfns','outputfn',['basic','optimized','projfns'])
         joke('responsefns','responsefn',['basic','optimized','projfns'])
@@ -324,7 +328,18 @@ from topo.param import Dict as DictParameter
         joke('eps','ep',['basic'])
         joke('projections','projection',['basic','optimized'])
         joke('patterns','pattern',['basic','image','random','rds','teststimuli']) # missed audio
+
+        # the isn't-in-__all__ shimmy
+        import sys
+        sys.modules['topo.projections.basic'].CFPOF_SharedWeight = topo.projection.basic.CFPOF_SharedWeight
+        sys.modules['topo.projections.basic'].SharedWeightCF = topo.projection.basic.SharedWeightCF
+
+        code = \
+"""
+from topo.sheet.generator import *
+"""
         
+        fake_a_module('generatorsheet',topo.sheets,code,'topo.sheets')
 
 # if we were using pickle rather than cpickle, could subclass the unpickler
 # to look for module Xs as module X if Xs can't be found...
@@ -348,5 +363,7 @@ from topo.%s import *
 """
 from topo.%s.%s import *
 """%(new,x)
+
+        # gotta supply the path because mod is fake...
         fake_a_module(x,mod,code,'topo.%s'%old)
 
