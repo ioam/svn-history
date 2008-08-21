@@ -24,11 +24,11 @@ from topo.commands.pylabplots import plot_tracked_attributes
 from topo.base.cf import CFPOutputFn
 from topo.base.parameterclasses import Parameter,Number,ClassSelectorParameter,Integer,BooleanParameter
 from topo.base.functionfamilies import OutputFn, IdentityOF
-from topo.outputfns.basic import IdentityOF 
+from topo.outputfn.basic import IdentityOF 
 
 #########################################################################
 ##Sheet types only used lissom_oo_or_homeostatic_tracked.ty for reproducing published figures##
-from topo.sheets.lissom import LISSOM
+from topo.sheet.lissom import LISSOM
 from topo.base.sheet import activity_type
 import copy
 
@@ -377,7 +377,7 @@ def homeostatic_analysis_function():
     import copy
     from topo.commands.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
-    from topo.sheets.generatorsheet import GeneratorSheet
+    from topo.sheet.generatorsheet import GeneratorSheet
     from topo.patterns.basic import Gaussian, SineGrating
     from topo.commands.basic import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent
@@ -509,7 +509,7 @@ def lesi_analysis_function():
     import copy
     from topo.commands.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
-    from topo.sheets.generatorsheet import GeneratorSheet
+    from topo.sheet.generatorsheet import GeneratorSheet
     from topo.patterns.basic import Gaussian, SineGrating
     from topo.commands.basic import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent
@@ -584,7 +584,7 @@ def species_analysis_function():
     import copy
     from topo.commands.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
-    from topo.sheets.generatorsheet import GeneratorSheet
+    from topo.sheet.generatorsheet import GeneratorSheet
     from topo.patterns.basic import Gaussian, SineGrating
     from topo.commands.basic import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent

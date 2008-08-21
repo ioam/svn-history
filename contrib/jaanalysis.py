@@ -9,7 +9,7 @@ def complex_analysis_function():
     import topo
     from topo.commands.analysis import save_plotgroup
     from topo.base.projection import ProjectionSheet
-    from topo.sheets.generatorsheet import GeneratorSheet
+    from topo.sheet.generatorsheet import GeneratorSheet
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
 
 
@@ -44,7 +44,7 @@ def v2_analysis_function():
     import topo
     from topo.commands.analysis import save_plotgroup
     from topo.base.projection import ProjectionSheet
-    from topo.sheets.generatorsheet import GeneratorSheet
+    from topo.sheet.generatorsheet import GeneratorSheet
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
     from topo.misc.filepaths import normalize_path
 
@@ -83,7 +83,7 @@ def rf_analysis():
     import contrib.jacommands
     from topo.commands.analysis import save_plotgroup
     from topo.base.projection import ProjectionSheet
-    from topo.sheets.generatorsheet import GeneratorSheet
+    from topo.sheet.generatorsheet import GeneratorSheet
     from topo.commands.analysis import measure_or_tuning_fullfield, measure_or_pref
     from topo.commands.pylabplots import or_tuning_curve_batch
     from topo.misc.filepaths import normalize_path    

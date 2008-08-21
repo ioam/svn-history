@@ -15,13 +15,13 @@ import topo.commands.analysis
 #from scipy.optimize.optimize import fmin, fmin_powell
 from math import pi, sqrt, exp, pow
 from numpy.oldnumeric import zeros, Float, sum
-from topo.projections.basic import CFProjection
+from topo.projection.basic import CFProjection
 from topo.base.boundingregion import BoundingBox
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.patterns.basic import Gaussian,Selector,Null
-from topo.outputfns.basic import HomeostaticMaxEnt,OutputFnWithState
-from topo.sheets.lissom import LISSOM
-from topo.sheets.optimized import NeighborhoodMask_Opt, LISSOM_Opt
+from topo.outputfn.basic import HomeostaticMaxEnt,OutputFnWithState
+from topo.sheet.lissom import LISSOM
+from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
 from topo.plotting.plotfilesaver import * 
 from topo.commands.pylabplots import or_tuning_curve_batch, matrixplot
 from topo.commands.analysis import save_plotgroup, measure_or_tuning_fullfield
@@ -277,8 +277,8 @@ def divide_with_constant(x,y):
     
 
 def AddGC():
-    from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1,Sigmoid 
-    from topo.projections.basic import CFProjection, SharedWeightCFProjection
+    from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1,Sigmoid 
+    from topo.projection.basic import CFProjection, SharedWeightCFProjection
     from topo.base.boundingregion import BoundingBox
     lgn_surroundg = Gaussian(size=locals().get('LGNLatSurroundSize',0.5),aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 
