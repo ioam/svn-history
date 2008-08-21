@@ -4,8 +4,8 @@ Under construction: functions to measure aftereffects.
 """
 from numpy import array
 
-from topo.commands.analysis import decode_feature
-from topo.commands.basic import pattern_present
+from topo.command.analysis import decode_feature
+from topo.command.basic import pattern_present
 
 from topo.base.arrayutils import wrap
 from topo.misc.utils import frange
@@ -18,7 +18,7 @@ from topo import pattern
 
 import pylab
 
-from topo.commands.pylabplots import vectorplot
+from topo.command.pylabplots import vectorplot
 
 def measure_tae():
    print "Measuring initial perception of all orientations..."

@@ -1,5 +1,5 @@
 from topo.pattern.basic import Gabor
-from topo.commands.pylabplots import matrixplot
+from topo.command.pylabplots import matrixplot
 import numpy
 import pylab
 from numpy import array, size, mat, shape

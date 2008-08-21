@@ -537,7 +537,7 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 
     def _exec_update_command(self):
         self._check_sheet_type()
-	topo.commands.analysis.sheet_name = self.sheet.name
+	topo.command.analysis.sheet_name = self.sheet.name
         super(ProjectionSheetPlotGroup,self)._exec_update_command()
         
 
@@ -668,7 +668,7 @@ class RFProjectionPlotGroup(GridPlotGroup):
     input_sheet = param.ObjectSelector(default=None,doc="The sheet on which to measure the RFs.")
 
     def _exec_update_command(self): # RFHACK
-	topo.commands.analysis.input_sheet_name = self.input_sheet.name
+	topo.command.analysis.input_sheet_name = self.input_sheet.name
         super(RFProjectionPlotGroup,self)._exec_update_command()
 
 
@@ -685,8 +685,8 @@ class ProjectionPlotGroup(GridPlotGroup):
         return plot_channels
 
     def _exec_update_command(self):
-        topo.commands.analysis.proj_coords = self.generate_coords()
-        topo.commands.analysis.proj_name = self.projection.name
+        topo.command.analysis.proj_coords = self.generate_coords()
+        topo.command.analysis.proj_name = self.projection.name
         super(ProjectionPlotGroup,self)._exec_update_command()
 
 
@@ -761,11 +761,11 @@ class UnitPlotGroup(ProjectionSheetPlotGroup):
 
         
     def _exec_update_command(self):
-	topo.commands.analysis.coordinate = (self.x,self.y)
+	topo.command.analysis.coordinate = (self.x,self.y)
 	super(UnitPlotGroup,self)._exec_update_command()
 
     def _exec_plot_command(self):
-	topo.commands.analysis.coordinate = (self.x,self.y)
+	topo.command.analysis.coordinate = (self.x,self.y)
 	super(UnitPlotGroup,self)._exec_plot_command()
 
 

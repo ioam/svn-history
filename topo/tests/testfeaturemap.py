@@ -27,7 +27,7 @@ from topo.learningfn.optimized import CFPLF_Hebbian
 
 from topo.pattern import basic
 from topo.analysis.featureresponses import DistributionMatrix, FeatureMaps
-from topo.commands.analysis import Feature
+from topo.command.analysis import Feature
 
 class TestDistributionMatrix(unittest.TestCase):
 

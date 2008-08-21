@@ -290,7 +290,7 @@ def compare_with_and_without_snapshot_CreateSnapshot(script="examples/lissom_oo_
     assert_array_equal(data[topo.sim.time()],topo.sim[look_at].activity,
                        err_msg="\nAt topo.sim.time()=%d"%topo.sim.time())
 
-    from topo.commands.basic import save_snapshot
+    from topo.command.basic import save_snapshot
     save_snapshot(normalize_path(data_filename+'.typ_'))
 
 
@@ -310,7 +310,7 @@ def compare_with_and_without_snapshot_LoadSnapshot(script="examples/lissom_oo_or
     look_at=data['look_at']
     density=data['density']
     
-    from topo.commands.basic import load_snapshot
+    from topo.command.basic import load_snapshot
 
     try:
         load_snapshot(resolve_path(snapshot_filename))

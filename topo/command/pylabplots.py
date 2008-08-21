@@ -418,8 +418,8 @@ def or_tuning_curve(x_axis,plot_type,unit):
     y_value for the first curve plotted (usually the lowest contrast curve). 
 
     The curve datapoints are collected from the curve_dict for each
-    sheet, depending on the value of topo.commands.analysis.sheet_name
-    and topo.commands.analysis.coordinate (which may be set by the GUI or
+    sheet, depending on the value of topo.command.analysis.sheet_name
+    and topo.command.analysis.coordinate (which may be set by the GUI or
     by hand).
     """
     # There may be cases (ie when the lowest contrast curve gives a lot of zero y_values)
@@ -427,8 +427,8 @@ def or_tuning_curve(x_axis,plot_type,unit):
     # Ideally this should be changed so that the preferred orientation is in the centre.
     # This may also be useful for other tuning curve types, not just orientation ie. direction.
     
-    sheet=topo.sim[topo.commands.analysis.sheet_name]
-    coordinate=topo.commands.analysis.coordinate
+    sheet=topo.sim[topo.command.analysis.sheet_name]
+    coordinate=topo.command.analysis.coordinate
     i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
     
 
@@ -439,7 +439,7 @@ def or_tuning_curve(x_axis,plot_type,unit):
     
     pylab.ylabel('Response')
     pylab.xlabel(x_axis.capitalize()+' ('+unit+')')
-    pylab.title('Sheet '+topo.commands.analysis.sheet_name+', coordinate(x,y)='+'('+
+    pylab.title('Sheet '+topo.command.analysis.sheet_name+', coordinate(x,y)='+'('+
 	 	str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+topo.sim.timestr())
     manager.window.title(topo.sim.name+': '+x_axis.capitalize()+' Tuning Curve')
 
@@ -483,13 +483,13 @@ def tuning_curve(x_axis,plot_type,unit):
     Plots a tuning curve for the appropriate feature type, such as orientation, contrast or size.
 
     The curve datapoints are collected from the curve_dict for each
-    sheet, depending on the value of topo.commands.analysis.sheet_name
-    and topo.commands.analysis.coordinate (which may be set by the GUI or
+    sheet, depending on the value of topo.command.analysis.sheet_name
+    and topo.command.analysis.coordinate (which may be set by the GUI or
     by hand).
     """
 
-    sheet=topo.sim[topo.commands.analysis.sheet_name]
-    coordinate=topo.commands.analysis.coordinate
+    sheet=topo.sim[topo.command.analysis.sheet_name]
+    coordinate=topo.command.analysis.coordinate
     i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
     
 
@@ -500,7 +500,7 @@ def tuning_curve(x_axis,plot_type,unit):
     
     pylab.ylabel('Response')
     pylab.xlabel(x_axis.capitalize()+' ('+unit+')')
-    pylab.title('Sheet '+topo.commands.analysis.sheet_name+', coordinate(x,y)='+'('+
+    pylab.title('Sheet '+topo.command.analysis.sheet_name+', coordinate(x,y)='+'('+
 	 	str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+topo.sim.timestr())
     manager.window.title(topo.sim.name+': '+x_axis.capitalize()+' Tuning Curve')
 
@@ -563,7 +563,7 @@ def plot_coord_mapping(mapper,sheet,style='b-'):
 
 # RFHACK
 ### JABHACKALERT: rename & should be called from the 'Receptive
-### Fields*' pgts in topo/commands/analysis.py & should share the
+### Fields*' pgts in topo/command/analysis.py & should share the
 ### implementation of topographic_grid (because that's what is
 ### intended to be visualized here).
 ### Should be using generate_figure() as in matrixplot().
@@ -676,8 +676,8 @@ def tuning_curve_batch(directory,filename,plot_type,unit,sheet_name,coordinate,x
     Saves a plot of the tuning curve for the appropriate feature type, such as orientation, contrast or size into a file.
 
     The curve datapoints are collected from the curve_dict for each
-    sheet, depending on the value of topo.commands.analysis.sheet_name
-    and topo.commands.analysis.coordinate (which may be set by the GUI or
+    sheet, depending on the value of topo.command.analysis.sheet_name
+    and topo.command.analysis.coordinate (which may be set by the GUI or
     by hand).
     """
 
@@ -721,8 +721,8 @@ def or_tuning_curve_batch(directory,filename,plot_type,unit,sheet_name,coordinat
     y_value for the first curve plotted (usually the lowest contrast curve). 
 
     The curve datapoints are collected from the curve_dict for each
-    sheet, depending on the value of topo.commands.analysis.sheet_name
-    and topo.commands.analysis.coordinate (which may be set by the GUI or
+    sheet, depending on the value of topo.command.analysis.sheet_name
+    and topo.command.analysis.coordinate (which may be set by the GUI or
     by hand).
     """
     # There may be cases (ie when the lowest contrast curve gives a lot of zero y_values)

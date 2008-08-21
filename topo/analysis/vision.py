@@ -20,7 +20,7 @@ except ImportError:
 from .. import param
 
 import topo
-import topo.commands.pylabplots
+import topo.command.pylabplots
 from topo.base.cf import CFSheet
 from topo.base.sheetview import SheetView
 from topo.misc.filepaths import normalize_path
@@ -153,7 +153,7 @@ pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'
 pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 pg.add_plot('Modulation Ratio',[('Strength','ComplexSelectivity')])
 pg.add_plot('Phase Preference',[('Hue','PhasePreference')])
-pg.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
+pg.add_static_image('Color Key','topo/command/or_key_white_vert_small.png')
 
 def analyze_complexity(full_matrix):
     """
@@ -169,5 +169,5 @@ def analyze_complexity(full_matrix):
         #print sheet
         complx = array(complexity(full_matrix[sheet]))
         sheet.sheet_views['Complex'+'Selectivity']=SheetView((complx,sheet.bounds), sheet.name , sheet.precedence, topo.sim.time())
-    topo.commands.pylabplots.plot_modulation_ratio(full_matrix)               
+    topo.command.pylabplots.plot_modulation_ratio(full_matrix)               
     phase_preference_scatter_plot("V1Simple")

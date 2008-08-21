@@ -12,7 +12,7 @@ import numpy.oldnumeric.random_array as RandomArray
 
 from .. import param
 
-from topo.commands.pylabplots import vectorplot, matrixplot
+from topo.command.pylabplots import vectorplot, matrixplot
 
 from lissom import LISSOM
 

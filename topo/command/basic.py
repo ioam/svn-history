@@ -253,7 +253,7 @@ def default_analysis_function():
     likely to need something similar but highly customized.
     """
     import topo
-    from topo.commands.analysis import save_plotgroup
+    from topo.command.analysis import save_plotgroup
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
 
@@ -263,9 +263,9 @@ def default_analysis_function():
     input_sheets = topo.sim.objects(GeneratorSheet).values()
     
     # Set potentially reasonable defaults; not necessarily useful
-    topo.commands.analysis.coordinate=(0.0,0.0)
-    if input_sheets:    topo.commands.analysis.input_sheet_name=input_sheets[0].name
-    if measured_sheets: topo.commands.analysis.sheet_name=measured_sheets[0].name
+    topo.command.analysis.coordinate=(0.0,0.0)
+    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
+    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
 
     # Save all plotgroups listed in default_analysis_plotgroups
     for pg in default_analysis_plotgroups:
@@ -349,7 +349,7 @@ def run_batch(script_file,output_directory="Output",
     print startnote
 
     # Ensure that saved state includes all parameter values
-    from topo.commands.basic import save_script_repr
+    from topo.command.basic import save_script_repr
     from topo.param import parameterized as parameterizedobject
     parameterizedobject.script_repr_suppress_defaults=False
 

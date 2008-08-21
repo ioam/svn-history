@@ -20,7 +20,7 @@ from topo.base.projection import ProjectionSheet
 from topo.base.simulation import EPConnectionEvent
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
-from topo.commands.basic import pattern_present, wipe_out_activity
+from topo.command.basic import pattern_present, wipe_out_activity
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.utils import frange
 from topo.misc.distribution import Distribution
@@ -30,7 +30,7 @@ from topo.pattern.random import GaussianRandom
 from topo.sheet.generator import GeneratorSheet
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
-from topo.commands.pylabplots import matrixplot_hsv
+from topo.command.pylabplots import matrixplot_hsv
 
 
 
@@ -634,7 +634,7 @@ def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
     # RFHACK: Should improve how parameters are passed, and add a
     # default value for this parameter
     if not input_sheet_name:
-        raise ValueError("Must set topo.commands.analysis.input_sheet_name before calling measure_rfs")
+        raise ValueError("Must set topo.command.analysis.input_sheet_name before calling measure_rfs")
 
     input_sheet = topo.sim[input_sheet_name]
     
@@ -683,7 +683,7 @@ def measure_rfs_noise(divisions=99,scale=0.5,offset=0.5,display=False,
     # RFHACK: Should improve how parameters are passed, and add a
     # default value for this parameter
     if not input_sheet_name:
-        raise ValueError("Must set topo.commands.analysis.input_sheet_name before calling measure_rfs")
+        raise ValueError("Must set topo.command.analysis.input_sheet_name before calling measure_rfs")
     input_sheet = topo.sim[input_sheet_name]
     
     if divisions <= 0:
@@ -871,7 +871,7 @@ pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
 pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
-pg.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
+pg.add_static_image('Color Key','topo/command/or_key_white_vert_small.png')
 
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
@@ -1013,7 +1013,7 @@ pg= create_plotgroup(name='PhaseDisparity Preference',category="Preference Maps"
              update_command='measure_phasedisparity()',normalize=True)
 pg.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
 pg.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
-pg.add_static_image('Color Key','topo/commands/disp_key_white_vert_small.png')
+pg.add_static_image('Color Key','topo/command/disp_key_white_vert_small.png')
 
 
 def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
@@ -1310,7 +1310,7 @@ pg.add_plot('Direction Preference',[('Hue','DirectionPreference')])
 pg.add_plot('Direction Preference&Selectivity',[('Hue','DirectionPreference'),
                                                 ('Confidence','DirectionSelectivity')])
 pg.add_plot('Direction Selectivity',[('Strength','DirectionSelectivity')])
-pg.add_static_image('Color Key','topo/commands/dr_key_white_vert_small.png')
+pg.add_static_image('Color Key','topo/command/dr_key_white_vert_small.png')
 
 
 
@@ -1478,7 +1478,7 @@ def measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[2.4],division
 
     """
 
-    from topo.commands.pylabplots import matrixplot_hsv
+    from topo.command.pylabplots import matrixplot_hsv
 
     
     input_sheet_name="Retina"

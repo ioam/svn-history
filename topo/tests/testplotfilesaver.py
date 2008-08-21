@@ -18,7 +18,7 @@ from topo.plotting.plotfilesaver import PlotGroupSaver
 
 from topo.plotting.plotgroup import PlotGroup
 
-from topo.commands.analysis import save_plotgroup
+from topo.command.analysis import save_plotgroup
 
 
 # remove old test output
@@ -28,7 +28,7 @@ for f in os.listdir(tests_dir):
         os.remove(os.path.join(tests_dir,f))
 
 import __main__
-exec "from topo.commands.analysis import *" in __main__.__dict__
+exec "from topo.command.analysis import *" in __main__.__dict__
 
 
 class TestPlotGroupSaverBase(unittest.TestCase):

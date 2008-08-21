@@ -319,7 +319,7 @@ def update_elastic_net_maps():
                      sheet.name,sheet.precedence,topo.sim.time())
 
 from topo.plotting.plotgroup import plotgroups
-import topo.commands.analysis
+import topo.command.analysis
 plotgroups['Ocular Preference'].command='update_elastic_net_maps()'
 plotgroups['Center of Gravity'].command='update_elastic_net_maps() ; topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG",axis=[-0.1,1.1,-0.1,1.1])'
 

@@ -42,7 +42,7 @@ from topo.outputfn.basic import DivisiveNormalizeL1
 from topo.pattern.basic import Rectangle
 from topo.sheet.cfsom import CFSOM
 from topo.sheet.generator import GeneratorSheet
-from topo.commands.basic import pattern_present
+from topo.command.basic import pattern_present
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 
 

@@ -22,7 +22,7 @@ from topo.base.cf import CFSheet
 from topo.base.sheet import Sheet, activity_type
 from topo.base.sheetview import SheetView
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.commands.basic import restore_input_generators, save_input_generators
+from topo.command.basic import restore_input_generators, save_input_generators
 from topo.misc.distribution import Distribution
 from topo.misc.utils import cross_product, frange
 

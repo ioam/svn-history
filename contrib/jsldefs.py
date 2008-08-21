@@ -20,7 +20,7 @@ from numpy.fft.helper import fftshift
 from numpy import abs
 import numpy.oldnumeric as Numeric
 from topo.misc.filepaths import normalize_path
-from topo.commands.pylabplots import plot_tracked_attributes
+from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.cf import CFPOutputFn
 from topo.base.parameterclasses import Parameter,Number,ClassSelectorParameter,Integer,BooleanParameter
 from topo.base.functionfamilies import OutputFn, IdentityOF
@@ -375,11 +375,11 @@ def homeostatic_analysis_function():
     """
     import topo
     import copy
-    from topo.commands.analysis import save_plotgroup, PatternPresenter, update_activity
+    from topo.command.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
     from topo.pattern.basic import Gaussian, SineGrating
-    from topo.commands.basic import pattern_present, wipe_out_activity
+    from topo.command.basic import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent
 
 
@@ -389,9 +389,9 @@ def homeostatic_analysis_function():
     input_sheets = topo.sim.objects(GeneratorSheet).values()
     
     # Set potentially reasonable defaults; not necessarily useful
-    topo.commands.analysis.coordinate=(0.0,0.0)
-    if input_sheets:    topo.commands.analysis.input_sheet_name=input_sheets[0].name
-    if measured_sheets: topo.commands.analysis.sheet_name=measured_sheets[0].name
+    topo.command.analysis.coordinate=(0.0,0.0)
+    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
+    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
 
     # Save all plotgroups listed in default_analysis_plotgroups
     for pg in default_analysis_plotgroups:
@@ -507,11 +507,11 @@ def lesi_analysis_function():
     """
     import topo
     import copy
-    from topo.commands.analysis import save_plotgroup, PatternPresenter, update_activity
+    from topo.command.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
     from topo.pattern.basic import Gaussian, SineGrating
-    from topo.commands.basic import pattern_present, wipe_out_activity
+    from topo.command.basic import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent
 
 
@@ -521,9 +521,9 @@ def lesi_analysis_function():
     input_sheets = topo.sim.objects(GeneratorSheet).values()
     
     # Set potentially reasonable defaults; not necessarily useful
-    topo.commands.analysis.coordinate=(0.0,0.0)
-    if input_sheets:    topo.commands.analysis.input_sheet_name=input_sheets[0].name
-    if measured_sheets: topo.commands.analysis.sheet_name=measured_sheets[0].name
+    topo.command.analysis.coordinate=(0.0,0.0)
+    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
+    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
 
     # Save all plotgroups listed in default_analysis_plotgroups
     for pg in default_analysis_plotgroups:
@@ -582,11 +582,11 @@ def species_analysis_function():
     """
     import topo
     import copy
-    from topo.commands.analysis import save_plotgroup, PatternPresenter, update_activity
+    from topo.command.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
     from topo.pattern.basic import Gaussian, SineGrating
-    from topo.commands.basic import pattern_present, wipe_out_activity
+    from topo.command.basic import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent
 
 
@@ -596,9 +596,9 @@ def species_analysis_function():
     input_sheets = topo.sim.objects(GeneratorSheet).values()
     
     # Set potentially reasonable defaults; not necessarily useful
-    topo.commands.analysis.coordinate=(0.0,0.0)
-    if input_sheets:    topo.commands.analysis.input_sheet_name=input_sheets[0].name
-    if measured_sheets: topo.commands.analysis.sheet_name=measured_sheets[0].name
+    topo.command.analysis.coordinate=(0.0,0.0)
+    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
+    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
 
     # Save all plotgroups listed in default_analysis_plotgroups
     for pg in default_analysis_plotgroups:
@@ -696,8 +696,8 @@ class CFPOF_Jitter(CFPOutputFn):
                                 lgn_cf[x][y][v1x][v1y] += cf.weights[indx][indy]
                                 
 
-        topo.commands.pylabplots.matrixplot(lgn_cf[24][24])
-        topo.commands.pylabplots.matrixplot(lgn_cf[11][11])
-        topo.commands.pylabplots.matrixplot(lgn_cf[36][36])
-        topo.commands.pylabplots.matrixplot(lgn_cf[11][36])
+        topo.command.pylabplots.matrixplot(lgn_cf[24][24])
+        topo.command.pylabplots.matrixplot(lgn_cf[11][11])
+        topo.command.pylabplots.matrixplot(lgn_cf[36][36])
+        topo.command.pylabplots.matrixplot(lgn_cf[11][36])
        

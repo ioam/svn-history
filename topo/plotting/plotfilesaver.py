@@ -50,7 +50,7 @@ class PlotGroupSaver(param.Parameterized):
           plotgroup_name: the name of this PlotGroup
       """)
     # Should move this out of plotfilesaver to get the same filenames in the GUI.
-    # Should also allow each template in topo/commands/analysis.py to have a nice
+    # Should also allow each template in topo/command/analysis.py to have a nice
     # short filename format, perhaps as an option.
 
     def __init__(self,plotgroup,**params):

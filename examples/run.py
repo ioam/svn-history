@@ -69,11 +69,11 @@ assert isinstance(specified_targets,list) or isinstance(specified_targets,tuple)
 ### Convenience functions
 def snapshot(filename):
     """Return a command for saving a snapshot named filename."""
-    return "from topo.commands.basic import save_snapshot ; save_snapshot('"+join(examples,filename)+"')"
+    return "from topo.command.basic import save_snapshot ; save_snapshot('"+join(examples,filename)+"')"
     
 def or_analysis():
     """Return a command for orientation analysis."""
-    return "from topo.commands.analysis import measure_or_pref,measure_position_pref,measure_cog,measure_or_tuning_fullfield; \
+    return "from topo.command.analysis import measure_or_pref,measure_position_pref,measure_cog,measure_or_tuning_fullfield; \
 measure_or_pref(); \
 #measure_position_pref(); \
 measure_cog(); \
@@ -81,7 +81,7 @@ measure_cog(); \
 
 def retinotopy_analysis():
     """Return a command for retinotopy analysis."""
-    return "from topo.commands.analysis import measure_position_pref,measure_cog ;\
+    return "from topo.command.analysis import measure_position_pref,measure_cog ;\
 measure_position_pref(); \
 measure_cog()"
 ###

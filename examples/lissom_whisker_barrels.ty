@@ -23,7 +23,7 @@ mlab.addpath('examples/whiskers')
 from topo import param
 
 from topo.base.patterngenerator import PatternGenerator
-from topo.commands.analysis import PatternPresenter, Subplotting
+from topo.command.analysis import PatternPresenter, Subplotting
 from topo.base.functionfamilies import CoordinateMapperFn
 from topo.coordmapper.basic import Grid
 

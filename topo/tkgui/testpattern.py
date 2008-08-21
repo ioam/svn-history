@@ -13,7 +13,7 @@ __version__='$Revision$'
 
 ## Needs to be upgraded to behave how we want:
 ### JABHACKALERT: Should use PatternPresenter (from
-### topo.commands.analysis), which will allow flexible support for
+### topo.command.analysis), which will allow flexible support for
 ### making objects with different parameters in the different eyes,
 ### e.g. to test ocular dominance or disparity.
 
@@ -27,7 +27,7 @@ import topo
 from topo.base.sheetview import SheetView
 from topo.base.patterngenerator import PatternGenerator
 from topo.sheet.generator import GeneratorSheet
-from topo.commands.basic import pattern_present, wipe_out_activity
+from topo.command.basic import pattern_present, wipe_out_activity
 from topo.plotting.plot import make_template_plot
 from topo.plotting.plotgroup import SheetPlotGroup
 from topo.base.simulation import EPConnectionEvent

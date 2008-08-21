@@ -23,7 +23,7 @@ import pickle
 from numpy.testing import assert_array_almost_equal
 
 from topo.misc.filepaths import resolve_path, normalize_path
-from topo.commands.analysis import *
+from topo.command.analysis import *
 from topo.plotting.plotgroup import plotgroups
 
 # CEBALERT: change to be the all-in-one model eventually, and
@@ -31,7 +31,7 @@ from topo.plotting.plotgroup import plotgroups
 sim_name = 'lissom_oo_or'
 
 # For or tuning (and possibly others)
-topo.commands.analysis.sheet_name = 'V1'
+topo.command.analysis.sheet_name = 'V1'
 
 plotgroups_to_test = [
     # Several plotgroups are commented out because I was only thinking

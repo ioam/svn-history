@@ -21,7 +21,7 @@ from numpy import abs
 
 from .. import param
 
-import topo.commands.pylabplots
+import topo.command.pylabplots
 from topo.misc.filepaths import normalize_path
 from topo.plotting.plotgroup import TemplatePlotGroup
 
@@ -210,20 +210,20 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         description = "%s %s at time %s" % (plot.plot_src_name, plot.name, topo.sim.timestr())
         m=plot._get_matrix(channel)
         fft_plot=1-abs(fftshift(fft2(m-0.5, s=None, axes=(-2,-1))))
-        topo.commands.pylabplots.matrixplot(fft_plot, title="FFT Plot: " + description)        
+        topo.command.pylabplots.matrixplot(fft_plot, title="FFT Plot: " + description)        
 
     def __histogram(self,channel):
         plot = self._right_click_info['plot']
         description = "%s %s at time %s" % (plot.plot_src_name, plot.name, topo.sim.timestr())
         m=plot._get_matrix(channel)
-        topo.commands.pylabplots.histogramplot(m,title="Histogram: "+ description)
+        topo.command.pylabplots.histogramplot(m,title="Histogram: "+ description)
 
     def __gradient(self,channel):
         plot = self._right_click_info['plot']
         description = "%s %s at time %s" % (plot.plot_src_name, plot.name, topo.sim.timestr())
         m=plot._get_matrix(channel)
         view = plot.view_dict[plot.channels[channel]]
-        topo.commands.pylabplots.gradientplot(m,title="Gradient: " + description,
+        topo.command.pylabplots.gradientplot(m,title="Gradient: " + description,
                                               cyclic=view.cyclic,cyclic_range=view.norm_factor)
 
     def __print_matrix(self,channel):
@@ -237,13 +237,13 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         plot = self._right_click_info['plot']
         description = "%s %s at time %s" % (plot.plot_src_name, plot.name, topo.sim.timestr())
         m=plot._get_matrix(channel)
-        topo.commands.pylabplots.matrixplot(m, title=description)
+        topo.command.pylabplots.matrixplot(m, title=description)
 
     def __plot_matrix3d(self,channel):
         plot = self._right_click_info['plot']
         description = "%s %s at time %s" % (plot.plot_src_name, plot.name, topo.sim.timestr())
         m=plot._get_matrix(channel)
-        topo.commands.pylabplots.matrixplot3d(m, title=description)
+        topo.command.pylabplots.matrixplot3d(m, title=description)
 
     # CEBALERT: decide if and how to allow any of these functions to be used for getting as many
     # channels' info as possible.

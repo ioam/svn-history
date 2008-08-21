@@ -207,7 +207,7 @@ startup-speed-tests: ${STARTUPSPEEDTESTS}
 all-speed-tests: speed-tests startup-speed-tests
 
 snapshot-compatibility-tests: 
-	./topographica -c "from topo.commands.basic import load_snapshot; load_snapshot('topo/tests/lissom_oo_or.ty_pickle_test.typ')" -c "topo.sim.run(1)"
+	./topographica -c "from topo.command.basic import load_snapshot; load_snapshot('topo/tests/lissom_oo_or.ty_pickle_test.typ')" -c "topo.sim.run(1)"
 
 
 # Test that simulations give the same results whether run straight

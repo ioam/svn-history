@@ -355,13 +355,15 @@ from topo.param import Dict as DictParameter
         fake_a_package('sheets','sheet',['cfsom','composer','generator',
                                          'lissom','optimized','saccade','slissom'])
         fake_a_package('eps','ep',['basic'])
-        fake_a_package('projections','projection',['basic','optimized'])
         fake_a_package('patterns','pattern',['basic','image','random','rds','teststimuli']) # missed audio
+        fake_a_package('commands','command',['basic','analysis','pylabplots'])
 
+        fake_a_package('projections','projection',['basic','optimized'])
         # the isn't-in-__all__ shimmy
         import sys
         sys.modules['topo.projections.basic'].CFPOF_SharedWeight = topo.projection.basic.CFPOF_SharedWeight
         sys.modules['topo.projections.basic'].SharedWeightCF = topo.projection.basic.SharedWeightCF
+
 
         # rXXXX renamed generatorsheet
         code = \

@@ -372,8 +372,8 @@ topo.sim.connect('V1Inh','V1Inh', delay=0.05,
                  nominal_bounds_template = BoundingBox(radius=0.03),learning_rate=0)
 
 
-import topo.commands.analysis
-topo.commands.analysis.plotgroups["Orientation Preference"].update_command="measure_or_pref(pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0))"
+import topo.command.analysis
+topo.command.analysis.plotgroups["Orientation Preference"].update_command="measure_or_pref(pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0))"
 
 import topo.analysis.featureresponses
 topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=1.0

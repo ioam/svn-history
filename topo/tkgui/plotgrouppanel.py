@@ -30,7 +30,7 @@ from topo.base.cf import CFSheet
 
 from topo.plotting.plotgroup import PlotGroup,SheetPlotGroup
 
-from topo.commands.pylabplots import matrixplot
+from topo.command.pylabplots import matrixplot
 
 from topo.sheet.generator import GeneratorSheet
 

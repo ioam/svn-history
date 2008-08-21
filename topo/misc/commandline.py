@@ -262,7 +262,7 @@ topo_parser.add_option("-c","--command",action = "callback",callback=c_action,ty
 
 
 def auto_import_commands():
-    """Import the contents of all files in the topo/commands/ directory."""
+    """Import the contents of all files in the topo/command/ directory."""
     import re,os
     from filepaths import application_path
     import __main__
@@ -270,7 +270,7 @@ def auto_import_commands():
     for f in os.listdir(os.path.join(application_path,"topo/commands")):
         if re.match('^[^_].*\.py$',f):
             modulename = re.sub('\.py$','',f)
-            exec "from topo.commands."+modulename+" import *" in __main__.__dict__
+            exec "from topo.command."+modulename+" import *" in __main__.__dict__
     
 def a_action(option,opt_str,value,parser):
     """Callback function for the -a option."""

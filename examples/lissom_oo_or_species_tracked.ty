@@ -433,8 +433,8 @@ if changestrength==True:
     topo.sim.schedule_command(changetime,'topo.sim["LGNOff"].projections()["Afferent"].strength=new_strength')
 
 
-topo.commands.analysis.plotgroups["Orientation Preference"].update_command="measure_or_pref(pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0))"
+topo.command.analysis.plotgroups["Orientation Preference"].update_command="measure_or_pref(pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0))"
 
-topo.commands.analysis.plotgroups["Position Preference"].update_command="measure_position_pref(divisions=48,size=0.3,scale=1.0,offset=0.0,display=True,pattern_presenter=PatternPresenter(Rectangle(aspect_ratio=1.0),False,0.175),x_range=(-6.5,6.5),y_range=(-6.5,6.5),weighted_average=True)"    
+topo.command.analysis.plotgroups["Position Preference"].update_command="measure_position_pref(divisions=48,size=0.3,scale=1.0,offset=0.0,display=True,pattern_presenter=PatternPresenter(Rectangle(aspect_ratio=1.0),False,0.175),x_range=(-6.5,6.5),y_range=(-6.5,6.5),weighted_average=True)"    
 
 #Need to know exact experimental procedure for measuring retinotopy and orientation preference

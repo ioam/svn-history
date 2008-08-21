@@ -9,7 +9,7 @@ import pdb
 from topo import param
 
 import topo.pattern.basic
-import topo.commands.analysis
+import topo.command.analysis
 #from scipy.integrate import dblquad
 #from scipy.optimize.tnc import fmin_tnc
 #from scipy.optimize.optimize import fmin, fmin_powell
@@ -23,10 +23,10 @@ from topo.outputfn.basic import HomeostaticMaxEnt,OutputFnWithState
 from topo.sheet.lissom import LISSOM
 from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
 from topo.plotting.plotfilesaver import * 
-from topo.commands.pylabplots import or_tuning_curve_batch, matrixplot
-from topo.commands.analysis import save_plotgroup, measure_or_tuning_fullfield
+from topo.command.pylabplots import or_tuning_curve_batch, matrixplot
+from topo.command.analysis import save_plotgroup, measure_or_tuning_fullfield
 from topo.misc.filepaths import normalize_path,application_path
-from topo.commands.pylabplots import plot_tracked_attributes
+from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.parameterclasses import Number, Parameter,Parameter,ClassSelectorParameter,ListParameter
 from topo.base.functionfamilies import CoordinateMapperFn
 from topo.plotting.bitmap import MontageBitmap
@@ -303,8 +303,8 @@ def AddGC():
 #global parameter holding the activities
 activity_history=numpy.array([])
 def collect_activity_statistics():
-    topo.commands.analysis.coordinate = [0.0,0.0]
-    topo.commands.analysis.sheet_name = "V1"
+    topo.command.analysis.coordinate = [0.0,0.0]
+    topo.command.analysis.sheet_name = "V1"
     
     topo.mycommands.activity_history = numpy.concatenate((topo.mycommands.activity_history,topo.sim["V1"].activity.flatten()),axis=1)
 
