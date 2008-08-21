@@ -76,15 +76,26 @@ class %s(object):
 
 # CB: not fully tested (don't know if it's enough
 # to support user code).
-def fake_a_module(name,parent,source_code):
+def fake_a_module(name,parent,source_code,parent_path=None):
     """Create the module parent.name using source_code."""
     # create the module
     module = imp.new_module(name)
     exec source_code in module.__dict__
 
     # install the module
-    sys.modules[parent.__name__+'.'+name]=module
+    print "***",name,parent,parent_path
+    if parent_path is None:
+        parent_path = parent.__name__
+        
+    sys.modules[parent_path+'.'+name]=module
     setattr(parent,name,module)
+
+    # and, sadly, import it in __main__
+    # CEBALERT: we definitely *don't* want this to run every time we load a snapshot;
+    # need some optional arg or automatic detection of when to run!
+    #import __main__
+    #exec "import %s"%parent.__name__ in __main__.__dict__
+    #exec "import %s.%s"%(parent.__name__,name) in __main__.__dict__
 
 
 class SnapshotSupport(object):
@@ -125,8 +136,7 @@ class SnapshotSupport(object):
 
 
         def cf_rename_slice_array(state):
-            ## slice_array was renamed to input_sheet_slice in r7548
-            if 'slice_array' in state:
+            ## slice_array was renamed to input_sheet_slice in r7548            if 'slice_array' in state:
                 input_sheet_slice = state['slice_array']
                 state['input_sheet_slice'] = input_sheet_slice
                 del state['slice_array'] # probably doesn't work
@@ -303,4 +313,39 @@ from topo.param import Dict as DictParameter
                 state['cfs'] = array(cflist)
         preprocess_state(CFProjection,cfproj_add_cfs)
 
+
+        # should get the list from elsewhere!
+        joke('outputfns','outputfn',['basic','optimized','projfns'])
+        joke('responsefns','responsefn',['basic','optimized','projfns'])
+        joke('learningfns','learningfn',['basic','optimized','projfns'])
+        joke('coordmapperfns','coordmapper',['basic'])
+        joke('sheets','sheet',['cfsom','composer','generator','lissom','optimized','saccade','slissom'])
+        joke('eps','ep',['basic'])
+        joke('projections','projection',['basic','optimized'])
+        joke('patterns','pattern',['basic','image','random','rds','teststimuli']) # missed audio
         
+
+# if we were using pickle rather than cpickle, could subclass the unpickler
+# to look for module Xs as module X if Xs can't be found...
+
+def joke(old,new,add_what):
+
+    import topo
+    
+    code = \
+"""
+from topo.%s import *
+"""%new
+    fake_a_module('%s'%old,topo,code,'topo')
+
+    mod = __import__("topo.%s"%old)
+    #mod = eval('topo.%s'%old)
+
+    for x in add_what:
+    
+        code = \
+"""
+from topo.%s.%s import *
+"""%(new,x)
+        fake_a_module(x,mod,code,'topo.%s'%old)
+
