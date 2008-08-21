@@ -32,7 +32,7 @@ from topo.plotting.plotgroup import PlotGroup,SheetPlotGroup
 
 from topo.commands.pylabplots import matrixplot
 
-from topo.sheet.generatorsheet import GeneratorSheet
+from topo.sheet.generator import GeneratorSheet
 
 import topo
 
@@ -841,7 +841,7 @@ class SheetPanel(PlotGroupPanel):
         if plot.plot_src_name in topo.sim.objects():
             sheet = topo.sim[plot.plot_src_name]
 
-            # RFHACK: if any one generatorsheet has RF views for this sheet, then enable the menu option
+            # RFHACK: if any one generator has RF views for this sheet, then enable the menu option
             # At the moemnt, njust a hack to prevent menu option for generator sheets.
             if not isinstance(sheet,GeneratorSheet):
                 show_rfs = True
@@ -895,7 +895,7 @@ class SheetPanel(PlotGroupPanel):
             center_x,center_y = sheet.closest_cell_center(x,y)
 
             # RFHACK:
-            # just matrixplot for whatever generatorsheets have the views
+            # just matrixplot for whatever generators have the views
             for g in topo.sim.objects(GeneratorSheet).values():
                 try:
                     view=g.sheet_views[('RFs',sheet.name,center_x,center_y)]

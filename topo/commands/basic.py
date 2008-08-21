@@ -29,7 +29,7 @@ from topo.base.functionfamilies import OutputFn
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 from topo.base.projection import Projection, ProjectionSheet
-from topo.sheet.generatorsheet import GeneratorSheet
+from topo.sheet.generator import GeneratorSheet
 from topo.misc.utils import ExtraPickler
 from topo.misc.filepaths import normalize_path
 from topo.misc import legacy 
@@ -236,7 +236,7 @@ def default_analysis_function():
     import topo
     from topo.commands.analysis import save_plotgroup
     from topo.base.projection import ProjectionSheet
-    from topo.sheet.generatorsheet import GeneratorSheet
+    from topo.sheet.generator import GeneratorSheet
 
     # Build a list of all sheets worth measuring
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps

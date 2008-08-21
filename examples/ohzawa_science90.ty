@@ -26,7 +26,7 @@ import topo.pattern.basic
 import topo.pattern.random
 import topo.pattern.rds
 
-from topo.sheet.generatorsheet import GeneratorSheet
+from topo.sheet.generator import GeneratorSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
@@ -189,7 +189,7 @@ from topo.misc.numbergenerators import UniformRandom
 from topo.misc.utils import cross_product, frange
 from topo.pattern.basic import SineGrating, Gaussian
 from topo.pattern.rds import RandomDotStereogram
-from topo.sheet.generatorsheet import GeneratorSheet
+from topo.sheet.generator import GeneratorSheet
 from topo.sheet.lissom import LISSOM
 
 

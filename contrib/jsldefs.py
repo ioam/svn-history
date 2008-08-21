@@ -377,7 +377,7 @@ def homeostatic_analysis_function():
     import copy
     from topo.commands.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
-    from topo.sheet.generatorsheet import GeneratorSheet
+    from topo.sheet.generator import GeneratorSheet
     from topo.pattern.basic import Gaussian, SineGrating
     from topo.commands.basic import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent
@@ -509,7 +509,7 @@ def lesi_analysis_function():
     import copy
     from topo.commands.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
-    from topo.sheet.generatorsheet import GeneratorSheet
+    from topo.sheet.generator import GeneratorSheet
     from topo.pattern.basic import Gaussian, SineGrating
     from topo.commands.basic import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent
@@ -584,7 +584,7 @@ def species_analysis_function():
     import copy
     from topo.commands.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
-    from topo.sheet.generatorsheet import GeneratorSheet
+    from topo.sheet.generator import GeneratorSheet
     from topo.pattern.basic import Gaussian, SineGrating
     from topo.commands.basic import pattern_present, wipe_out_activity
     from topo.base.simulation import EPConnectionEvent

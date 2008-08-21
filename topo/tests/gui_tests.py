@@ -159,7 +159,7 @@ def _initialize():
     """Make a simple simulation."""
     from topo.base.simulation import Simulation
     from topo.base.cf import CFSheet,CFProjection
-    from topo.sheet.generatorsheet import GeneratorSheet
+    from topo.sheet.generator import GeneratorSheet
 
     sim=Simulation(register=True,name="test pattern tester")
     sim['GS']=GeneratorSheet(nominal_density=2)

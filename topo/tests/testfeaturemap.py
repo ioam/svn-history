@@ -20,7 +20,7 @@ from topo.base.sheet import Sheet
 from topo.base.boundingregion import BoundingBox
 
 # for making a simulation:
-from topo.sheet.generatorsheet import GeneratorSheet
+from topo.sheet.generator import GeneratorSheet
 from topo.base.cf import CFProjection, CFSheet
 from topo.base.simulation import Simulation
 from topo.learningfn.optimized import CFPLF_Hebbian

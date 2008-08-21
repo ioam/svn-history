@@ -24,7 +24,7 @@ from topo import param
 import topo.pattern.random
 import topo.pattern.basic
 
-from topo.sheet.generatorsheet import GeneratorSheet
+from topo.sheet.generator import GeneratorSheet
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFProjection,CFPOF_Plugin,CFSheet
 from topo.sheet.cfsom import CFSOM

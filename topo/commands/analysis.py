@@ -27,7 +27,7 @@ from topo.misc.distribution import Distribution
 from topo.pattern.basic import SineGrating, Gaussian
 from topo.pattern.teststimuli import SineGratingDisk, OrientationContrastPattern, SineGratingRectangle
 from topo.pattern.random import GaussianRandom
-from topo.sheet.generatorsheet import GeneratorSheet
+from topo.sheet.generator import GeneratorSheet
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 from topo.commands.pylabplots import matrixplot_hsv
