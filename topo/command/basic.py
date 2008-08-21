@@ -204,7 +204,7 @@ def load_snapshot(snapshot_name):
         try:
             _load_pickle(snapshot)
             p.message("snapshot loaded successfully with legacy support")
-        except Exception, inst: # what?
+        except: # what?
             m = "snapshot could not be loaded. If you make a copy " + \
                 "of the snapshot available to Topographica's developers, support " + \
                 "can probably be added to Topographica; please email " + \
