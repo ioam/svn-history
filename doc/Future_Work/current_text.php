@@ -88,7 +88,6 @@ Priorities:
 (3) EPConnectionEvent always deepcopying data: does it need to?
 (8) SomeTimer (also #1432101)
 (8) the mess inside run(); how Forever etc is implemented 
-(9) calling topo.sim.run(0) in appropriate places
 (3) PeriodicEventSequence
     ## JPHACKALERT: This should really be refactored into a
     ## PeriodicEvent class that periodically executes a single event,
@@ -119,26 +118,6 @@ Priorities:
 
 <H2>Tasks to be addressed in upcoming release:</H2>
 
-<H4>promoting basic.py</H4>
-etc wherever we haven't done it
-
-<H4>memory & loading snapshots</H4>
-CB: If I keep calling load_snapshot(X), I find that Topographica's
-memory usage goes up - apparently by less than the space taken by X
-each time, but it still seems to go up significantly. Needs
-investigation (what actually happens, is it a problem in topographica,
-etc).
-
-<H4>2007/09/20 (CB): copying plotgroup from plotgroups</H4>
-See ALERT next to plotgroups in plotgroup.py.
-
-
-<H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
-<ul>
-<li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
-<li>Cleanup + doc of plotgroup.py</li>
-</ul>
-
 
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
@@ -150,6 +129,13 @@ See ALERT next to plotgroups in plotgroup.py.
 
 
 <H2>Tasks to be addressed by release 1.0</H2>
+
+
+<H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
+<ul>
+<li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
+<li>Cleanup + doc of plotgroup.py</li>
+</ul>
 
 <H4>CB: Idle branch</H4>
 Merge or abandon idle branch. 
