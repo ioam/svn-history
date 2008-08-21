@@ -12,6 +12,8 @@ from numpy.oldnumeric import array
 from topo.base.simulation import Simulation,EPConnection,EPConnectionEvent,Event
 from topo.ep.basic import *
 
+from topo.base.cf import CFSheet, CFProjection
+
 from utils import new_simulation
 
 import topo
@@ -162,7 +164,37 @@ class TestSimulation(unittest.TestCase):
         e2 = [ep for ep in t2.values() if isinstance(ep,PulseGenerator) and ep.name == n2]
         assert e1.pop().name == n1, 'Object names do not match'
         assert e2.pop().name == n2, 'Object names do not match'
-        
+
+
+##     def test_garbage_collection(self):
+##         """something"""
+##         s = Simulation(register=False)
+##         s['v1']=CFSheet(nominal_density=24)
+##         s['v2']=CFSheet(nominal_density=24)
+##         s.connect('v1','v2',name='Afferent',delay=0.05,connection_type=CFProjection)
+##         from weakref import WeakValueDictionary as W
+##         w=W()
+##         w['v1'] = s['v1']
+##         w['v2'] = s['v2']
+
+##         # need to cause s to be deleted: s in this namespace should
+##         # be only reference to s (apart from circular ones...)
+##         del s
+
+##         try:
+##             w['v1']
+##         except KeyError:
+##             pass
+##         else:
+##             raise ValueError("v1 was not deleted")
+
+##         try:
+##             w['v2']
+##         except KeyError:
+##             pass
+##         else:
+##             raise ValueError("v2 was not deleted")
+
 
 suite = unittest.TestSuite()
 suite.addTest(unittest.makeSuite(TestSimulation))
