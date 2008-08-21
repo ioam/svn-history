@@ -36,8 +36,8 @@ from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
-from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1, OutputFn
+from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1, OutputFn
 from topo.misc.numbergenerators import UniformRandom
 
 from os import listdir
@@ -47,7 +47,7 @@ import ImageOps
 
 from topo.patterns.image import edge_average
 from topo.base.patterngenerator import PatternGenerator
-from topo.outputfns.basic import DivisiveNormalizeLinf,IdentityOF
+from topo.outputfn.basic import DivisiveNormalizeLinf,IdentityOF
 from topo.patterns.image import PatternSampler
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.filepaths import Filename

@@ -18,7 +18,7 @@ from topo.base.cf import CFPLearningFn
 from topo.base.patterngenerator import PatternGenerator
     
 from topo.patterns.basic import Gaussian
-from topo.outputfns.basic import IdentityOF
+from topo.outputfn.basic import IdentityOF
 
 
 ### JABHACKALERT: This class will be removed once the examples no

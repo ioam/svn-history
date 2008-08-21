@@ -25,7 +25,7 @@ from numpy.oldnumeric import array,Float,pi
 
 from topo.base.boundingregion import BoundingBox
 from topo.patterns.image import FileImage
-from topo.outputfns.basic import IdentityOF
+from topo.outputfn.basic import IdentityOF
 
 
 

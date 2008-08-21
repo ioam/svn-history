@@ -20,7 +20,7 @@ from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.numbergenerators import UniformRandom
 #from topo.projections.basic import OneToOneProjection
-from topo import outputfns
+from topo import outputfn
 from topo import patterns 
 import topo.patterns.random
 
@@ -54,7 +54,7 @@ right_input_pattern = patterns.Line(
 CFSheet.nominal_density = locals().get('default_density',10.0)
 
 # sheet activation saturates at 1
-CFSheet.output_fn = outputfns.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
+CFSheet.output_fn = outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
 
 CFProjection.weights_generator = patterns.random.UniformRandom()
 CFProjection.nominal_bounds_template=BoundingBox(radius=0.1)

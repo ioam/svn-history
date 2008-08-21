@@ -30,7 +30,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
-from topo.outputfns.basic import PiecewiseLinear,HalfRectifyAndSquare
+from topo.outputfn.basic import PiecewiseLinear,HalfRectifyAndSquare
 from topo.base.functionfamilies import OutputFn
 from topo.misc.numbergenerators import UniformRandom,UniformRandomInt
 from topo.commands.pylabplots import *

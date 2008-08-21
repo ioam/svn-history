@@ -45,7 +45,7 @@ class OutputFn(param.Parameterized):
 
 # Trivial example of an OutputFn, provided for when a default
 # is needed.  The other concrete OutputFunction classes are stored
-# in outputfns/, to be imported as needed.
+# in outputfn/, to be imported as needed.
 class IdentityOF(OutputFn):
     """
     Identity function, returning its argument as-is.

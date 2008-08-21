@@ -12,7 +12,7 @@ from ..param.parameterized import ParamOverrides
 
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.outputfns.basic import IdentityOF
+from topo.outputfn.basic import IdentityOF
 
 
 def seed(seed=None):

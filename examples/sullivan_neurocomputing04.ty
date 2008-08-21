@@ -32,7 +32,7 @@ from topo.responsefns.optimized import CFPRF_EuclideanDistance_opt,CFPRF_DotProd
 from topo.learningfns.projfns import CFPLF_Trace, CFPLF_Plugin,  CFPLF_OutstarHebbian
 from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.misc.numbergenerators import UniformRandom
-from topo.outputfns.basic import DivisiveNormalizeL2, KernelMax
+from topo.outputfn.basic import DivisiveNormalizeL2, KernelMax
 from topo.base.functionfamilies import CoordinateMapperFn
 from topo.misc.patternfns import line
 

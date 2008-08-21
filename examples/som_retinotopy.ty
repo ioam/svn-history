@@ -29,7 +29,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet,CFProjection
 from topo.learningfns.projfns import CFPLF_EuclideanHebbian
 from topo.misc.numbergenerators import UniformRandom,BoundedNumber,ExponentialDecay
-from topo.outputfns.basic import KernelMax
+from topo.outputfn.basic import KernelMax
 from topo.responsefns.optimized import CFPRF_EuclideanDistance_opt
 from topo.sheets.generatorsheet import GeneratorSheet
 

@@ -20,7 +20,7 @@ from topo.base.sheet import activity_type
 from topo.base.simulation import EPConnectionEvent
 from topo.misc.inlinec import optimized
 from topo.misc.keyedlist import KeyedList
-from topo.outputfns.basic import PiecewiseLinear
+from topo.outputfn.basic import PiecewiseLinear
 
 
 class JointNormalizingCFSheet(CFSheet):

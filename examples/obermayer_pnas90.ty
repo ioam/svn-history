@@ -30,8 +30,8 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet,CFProjection
 from topo.learningfns.projfns import CFPLF_EuclideanHebbian
 from topo.misc.numbergenerators import UniformRandom,BoundedNumber
-from topo.outputfns.basic import DivisiveNormalizeL1
-from topo.outputfns.basic import KernelMax
+from topo.outputfn.basic import DivisiveNormalizeL1
+from topo.outputfn.basic import KernelMax
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.param import Parameterized
@@ -110,5 +110,5 @@ topo.sim.connect('Retina','V1',delay=0.10,connection_type=CFProjection,
                  weights_generator = topo.patterns.random.UniformRandom())
 
 # Initialize weight values once; should verify that it does this ok
-from topo.outputfns.basic import IdentityOF
+from topo.outputfn.basic import IdentityOF
 topo.sim.schedule_command(0,'topo.sim["V1"].weights_output_fn=IdentityOF()')

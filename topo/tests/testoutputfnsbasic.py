@@ -16,9 +16,9 @@ __version__='$Revision$'
 import unittest
 import copy
 
-from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
-from topo.outputfns.basic import DivisiveNormalizeL2, DivisiveNormalizeLinf
-from topo.outputfns.basic import DivisiveNormalizeLp, HomeostaticMaxEnt
+from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1
+from topo.outputfn.basic import DivisiveNormalizeL2, DivisiveNormalizeLinf
+from topo.outputfn.basic import DivisiveNormalizeLp, HomeostaticMaxEnt
 
 from numpy.oldnumeric import array
 from numpy.testing import assert_array_equal
@@ -235,7 +235,7 @@ class TestDivisiveLpNormalize(unittest.TestCase):
 
         ### JCALERT! As already said above; this method does not work as a procedure
         ### because of a problem when using x *= factor instead of x = x * factor
-        ### it is not understood why because it does work fine in all others outputfns?
+        ### it is not understood why because it does work fine in all others outputfn?
         ### Therefore it is only tested as a function
 
         # Test as a function

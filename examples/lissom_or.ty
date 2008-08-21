@@ -41,8 +41,8 @@ from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
-from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfns.basic import PiecewiseLinear
+from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.outputfn.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
 
 num_inputs=2

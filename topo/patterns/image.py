@@ -15,7 +15,7 @@ from .. import param
 from topo.base.boundingregion import BoundingBox
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.outputfns.basic import DivisiveNormalizeLinf,IdentityOF,OutputFn
+from topo.outputfn.basic import DivisiveNormalizeLinf,IdentityOF,OutputFn
 from topo.misc.filepaths import Filename
 
 
