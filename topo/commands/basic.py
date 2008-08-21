@@ -32,7 +32,6 @@ from topo.base.projection import Projection, ProjectionSheet
 from topo.sheet.generator import GeneratorSheet
 from topo.misc.utils import ExtraPickler
 from topo.misc.filepaths import normalize_path
-from topo.misc import legacy 
 from topo.misc import filepaths
 
 
@@ -170,6 +169,15 @@ def save_snapshot(snapshot_name=None,xml=False):
 
 
 
+def _load_pickle(snapshot):
+    # If it's not xml, open as a normal pickle.
+    try:
+        gnosis.xml.pickle.load(snapshot,allow_rawpickles=True,class_search=gnosis.xml.pickle.SEARCH_ALL)
+    except ExpatError:
+        snapshot.seek(0) 
+        pickle.load(snapshot)
+    
+
 def load_snapshot(snapshot_name):
     """
     Load the simulation stored in snapshot_name.
@@ -185,15 +193,26 @@ def load_snapshot(snapshot_name):
     except (IOError,NameError):
         snapshot = open(snapshot_name,'r')
 
-    # install any code necessary to support unpickling this snapshot
-    legacy.SnapshotSupport.install() # version
         
-    # If it's not xml, open as a normal pickle.
     try:
-        gnosis.xml.pickle.load(snapshot,allow_rawpickles=True,class_search=gnosis.xml.pickle.SEARCH_ALL)
-    except ExpatError:
-        snapshot.seek(0) 
-        pickle.load(snapshot)
+        _load_pickle(snapshot)
+    except: # what?
+        p = param.Parameterized(name="load_snapshot")
+        p.message("snapshot '%s' couldn't be loaded; installing legacy support"%snapshot_name)
+        # should print/log error
+        import topo.misc.legacy as L 
+        L.SnapshotSupport.install()
+        try:
+            _load_pickle(snapshot)
+            p.message("snapshot loaded successfully with legacy support")
+        except: # what?
+            m = "snapshot could not be loaded. If you make a copy " + \
+                "of the snapshot available to Topographica's developers, support " + \
+                "can probably be added to Topographica; please email " + \
+                "developers at topographica.org or file a bug report at sf.net."
+            p.message(m)
+            # should print/log error
+        
 
 
 def save_script_repr(script_name=None):
