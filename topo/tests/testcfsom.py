@@ -21,7 +21,7 @@ from topo.base.simulation import *
 from topo.base import patterngenerator
 from topo.base.cf import CFProjection, CFSheet
 from topo.misc.numbergenerators import UniformRandom
-from topo.learningfns.optimized import CFPLF_Hebbian_opt
+from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.sheets.generatorsheet import *
 
 

@@ -155,7 +155,7 @@ from topo.base.simulation import Simulation
 from topo.plotting.plotgroup import TemplatePlotGroup, ConnectionFieldsPlotGroup
 
 import topo.patterns.random
-from topo.learningfns.som import CFPLF_HebbianSOM
+from topo.learningfn.som import CFPLF_HebbianSOM
 from topo.base.cf import CFProjection, CFSheet
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.base.patterngenerator import BoundingBox

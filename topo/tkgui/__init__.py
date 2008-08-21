@@ -60,7 +60,7 @@ from topoconsole import TopoConsole,ControllableMenu
 # the relevant GUI window starts.
 from topo.coordmapperfns import *
 from topo.eps import *
-from topo.learningfns import *
+from topo.learningfn import *
 from topo.outputfn import *
 from topo.patterns import *
 from topo.projections import *

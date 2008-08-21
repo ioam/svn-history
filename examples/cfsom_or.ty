@@ -22,7 +22,7 @@ import topo.patterns.basic
  
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFProjection, CFSheet
-from topo.learningfns.projfns import CFPLF_EuclideanHebbian
+from topo.learningfn.projfns import CFPLF_EuclideanHebbian
 from topo.outputfn.basic import KernelMax
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.generatorsheet import GeneratorSheet

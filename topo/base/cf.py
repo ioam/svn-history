@@ -225,7 +225,7 @@ class ConnectionField(param.Parameterized):
         # by 0 works for now, while the output_fns are all
         # multiplicative.  But in the long run we need a better way to
         # apply the mask.  The same applies anywhere the mask is used,
-        # including in learningfns/. We should investigate masked
+        # including in learningfn/. We should investigate masked
         # arrays (from numpy).
         output_fn(self.weights)        
 

@@ -33,9 +33,9 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet 
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.base.functionfamilies import OutputFn
-from topo.learningfns.basic import Hebbian
-from topo.learningfns.projfns import HomeoSynaptic
-from topo.learningfns.som import CFPLF_HebbianSOM
+from topo.learningfn.basic import Hebbian
+from topo.learningfn.projfns import HomeoSynaptic
+from topo.learningfn.som import CFPLF_HebbianSOM
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfn.basic import PiecewiseLinear
 from topo.outputfn.basic import DivisiveNormalizeL1

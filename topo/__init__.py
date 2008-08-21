@@ -21,7 +21,7 @@ that can be used with the above functions and classes::
   eps            - EventProcessor classes: other simulation objects
   outputfn      - Output functions, for e.g. normalization or squashing
   responsefns    - Calculate the response of a Projection
-  learningfns    - Adjust weights for a Projection
+  learningfn    - Adjust weights for a Projection
   coordmapperfns - CoordinateMapperFn classes: map coords between Sheets
 
 Each of the library directories can be extended with new classes of
@@ -40,7 +40,7 @@ __all__ = ['analysis',
            'commands',
            'coordmapperfns',
            'eps',
-           'learningfns',
+           'learningfn',
            'misc',
            'outputfn',
            'param',

@@ -23,7 +23,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.cf import CFProjection, CFSheet
 from topo.base.simulation import Simulation
-from topo.learningfns.optimized import CFPLF_Hebbian
+from topo.learningfn.optimized import CFPLF_Hebbian
 
 from topo.patterns import basic
 from topo.analysis.featureresponses import DistributionMatrix, FeatureMaps

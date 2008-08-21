@@ -12,7 +12,7 @@ from .. import param
 
 from topo.base.arrayutils import L2norm
 from topo.base.cf import CFSheet
-from topo.learningfns.som import CFPLF_SOM
+from topo.learningfn.som import CFPLF_SOM
 
 
 ### JABHACKALERT: This class (and this file) will be removed once the

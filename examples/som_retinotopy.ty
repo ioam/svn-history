@@ -27,7 +27,7 @@ import topo.patterns.basic
 
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet,CFProjection
-from topo.learningfns.projfns import CFPLF_EuclideanHebbian
+from topo.learningfn.projfns import CFPLF_EuclideanHebbian
 from topo.misc.numbergenerators import UniformRandom,BoundedNumber,ExponentialDecay
 from topo.outputfn.basic import KernelMax
 from topo.responsefns.optimized import CFPRF_EuclideanDistance_opt
