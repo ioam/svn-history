@@ -31,7 +31,7 @@ from topo.learningfn.projfns import CFPLF_EuclideanHebbian
 from topo.misc.numbergenerators import UniformRandom,BoundedNumber,ExponentialDecay
 from topo.outputfn.basic import KernelMax
 from topo.responsefn.optimized import CFPRF_EuclideanDistance_opt
-from topo.sheets.generatorsheet import GeneratorSheet
+from topo.sheet.generatorsheet import GeneratorSheet
 
 
 # input pattern

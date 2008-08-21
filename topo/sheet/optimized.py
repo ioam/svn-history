@@ -10,7 +10,7 @@ from .. import param
 from topo.base.functionfamilies import OutputFn, IdentityOF
 from topo.base.projection import Projection, NeighborhoodMask
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
-from topo.sheets.lissom import LISSOM
+from topo.sheet.lissom import LISSOM
 
 
 class LISSOM_Opt(LISSOM):

@@ -24,10 +24,10 @@ from topo import param
 import topo.patterns.random
 import topo.patterns.basic
 
-from topo.sheets.generatorsheet import GeneratorSheet
+from topo.sheet.generatorsheet import GeneratorSheet
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFProjection,CFPOF_Plugin,CFSheet
-from topo.sheets.cfsom import CFSOM
+from topo.sheet.cfsom import CFSOM
 from topo.responsefn.optimized import CFPRF_EuclideanDistance_opt,CFPRF_DotProduct_opt
 from topo.learningfn.projfns import CFPLF_Trace, CFPLF_Plugin,  CFPLF_OutstarHebbian
 from topo.learningfn.som import CFPLF_HebbianSOM

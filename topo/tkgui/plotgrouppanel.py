@@ -32,7 +32,7 @@ from topo.plotting.plotgroup import PlotGroup,SheetPlotGroup
 
 from topo.commands.pylabplots import matrixplot
 
-from topo.sheets.generatorsheet import GeneratorSheet
+from topo.sheet.generatorsheet import GeneratorSheet
 
 import topo
 

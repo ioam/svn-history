@@ -22,8 +22,8 @@ from fixedpoint import FixedPoint
 from numpy.oldnumeric import  sum,ones,exp, tan, sin, cos
 import numpy.oldnumeric as Numeric
 
-from topo.sheets.lissom import LISSOM
-from topo.sheets.generatorsheet import GeneratorSheet
+from topo.sheet.lissom import LISSOM
+from topo.sheet.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.parameterclasses import DynamicNumber

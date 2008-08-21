@@ -15,9 +15,9 @@ from topo import param
 import topo.patterns.basic
 import topo.patterns.random
 
-from topo.sheets.lissom import LISSOM, JointNormalizingCFSheet_Continuous
-from topo.sheets.optimized import NeighborhoodMask_Opt, LISSOM_Opt
-from topo.sheets.generatorsheet import GeneratorSheet
+from topo.sheet.lissom import LISSOM, JointNormalizingCFSheet_Continuous
+from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
+from topo.sheet.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet

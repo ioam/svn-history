@@ -73,8 +73,8 @@ import numpy.oldnumeric as Numeric
 from math import pi, sqrt
 
 from topo.base.boundingregion import BoundingBox
-from topo.sheets.lissom import LISSOM
-from topo.sheets.generatorsheet import GeneratorSheet
+from topo.sheet.lissom import LISSOM
+from topo.sheet.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection
 from topo.outputfn.basic import PiecewiseLinear
 from topo.responsefn.optimized import CFPRF_DotProduct_opt

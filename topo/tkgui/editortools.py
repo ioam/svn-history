@@ -13,8 +13,8 @@ from Tile import Combobox
 
 from .. import param
 
-import topo.sheets
-from topo.sheets import *
+import topo.sheet
+from topo.sheet import *
 from topo.base.sheet import Sheet
 import topo.projections
 from topo.projections import *

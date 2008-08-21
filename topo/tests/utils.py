@@ -33,7 +33,7 @@ def new_simulation(name=None,register=True):
 
     from topo.base.simulation import Simulation
     from topo.base.cf import CFSheet,CFProjection
-    from topo.sheets.generatorsheet import GeneratorSheet
+    from topo.sheet.generatorsheet import GeneratorSheet
     from topo.base.boundingregion import BoundingBox
 
     sim=Simulation(register=register,name=name)

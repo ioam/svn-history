@@ -23,8 +23,8 @@ from topo.param.parameterized import VERBOSE,NORMAL,DEBUG
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFProjection
 
-from topo.sheets.generatorsheet import GeneratorSheet
-from topo.sheets.saccade import ShiftingGeneratorSheet, SaccadeController    
+from topo.sheet.generatorsheet import GeneratorSheet
+from topo.sheet.saccade import ShiftingGeneratorSheet, SaccadeController    
 from topo.projections.basic import SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.coordmapper.basic import OttesSCMotorMapper

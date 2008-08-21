@@ -2,7 +2,7 @@
 >>> from topo.misc.numbergenerators import UniformRandom
 >>> from topo.base.simulation import Simulation
 >>> from topo.base.cf import CFSheet,CFProjection
->>> from topo.sheets.generatorsheet import GeneratorSheet
+>>> from topo.sheet.generatorsheet import GeneratorSheet
 
 
 

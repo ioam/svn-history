@@ -22,7 +22,7 @@ from topo.base import patterngenerator
 from topo.base.cf import CFProjection, CFSheet
 from topo.misc.numbergenerators import UniformRandom
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
-from topo.sheets.generatorsheet import *
+from topo.sheet.generatorsheet import *
 
 
 ### Only for ImageSaver

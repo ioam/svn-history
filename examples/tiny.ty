@@ -20,7 +20,7 @@ from topo.learningfn.projfns import CFPLF_Plugin
 from topo.learningfn.basic import Hebbian
 from topo.outputfn.basic import PiecewiseLinear
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
-from topo.sheets.generatorsheet import GeneratorSheet
+from topo.sheet.generatorsheet import GeneratorSheet
 from topo.outputfn.basic import DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 

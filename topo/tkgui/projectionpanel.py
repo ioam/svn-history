@@ -17,7 +17,7 @@ from .. import param
 import topo
 from topo.base.cf import CFProjection
 from topo.base.projection import ProjectionSheet, Projection
-from topo.sheets.generatorsheet import GeneratorSheet
+from topo.sheet.generatorsheet import GeneratorSheet
         
 from templateplotgrouppanel import TemplatePlotGroupPanel
 

@@ -26,7 +26,7 @@ import topo
 
 from topo.base.sheetview import SheetView
 from topo.base.patterngenerator import PatternGenerator
-from topo.sheets.generatorsheet import GeneratorSheet
+from topo.sheet.generatorsheet import GeneratorSheet
 from topo.commands.basic import pattern_present, wipe_out_activity
 from topo.plotting.plot import make_template_plot
 from topo.plotting.plotgroup import SheetPlotGroup

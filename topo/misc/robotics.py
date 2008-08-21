@@ -98,7 +98,7 @@ class PTZ(EventProcessor):
 
     This event processor takes input events on its 'Saccade' input
     port in the form of (amplitude,direction) saccade commands (as
-    produced by the topo.sheets.saccade.SaccadeController class) and
+    produced by the topo.sheet.saccade.SaccadeController class) and
     appropriately servoes the attached PTZ object.  There is not
     currently any dynamic zoom control, though the static zoom level
     can be set as a parameter.

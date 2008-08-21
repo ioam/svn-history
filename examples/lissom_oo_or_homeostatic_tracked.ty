@@ -47,8 +47,8 @@ import topo.patterns.basic
 import topo.patterns.random
 
 from topo.patterns.basic import Gaussian
-from topo.sheets.lissom import JointScaling, LISSOM
-from topo.sheets.generatorsheet import GeneratorSheet
+from topo.sheet.lissom import JointScaling, LISSOM
+from topo.sheet.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet, CFPLF_PluginScaled, CFPOF_Plugin
