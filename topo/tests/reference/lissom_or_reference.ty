@@ -77,7 +77,7 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection
 from topo.outputfn.basic import PiecewiseLinear
-from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 import topo.patterns.basic

@@ -16,7 +16,7 @@ from topo import param
 from topo.base.cf import CFProjection, CFSheet
 from topo.base.patterngenerator import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
-from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.numbergenerators import UniformRandom
 #from topo.projections.basic import OneToOneProjection

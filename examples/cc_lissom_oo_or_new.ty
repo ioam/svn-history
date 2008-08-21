@@ -19,7 +19,7 @@ from topo.sheets.lissom import LISSOM, JointNormalizingCFSheet_Continuous
 from topo.sheets.optimized import NeighborhoodMask_Opt, LISSOM_Opt
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
-from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Trace_opt

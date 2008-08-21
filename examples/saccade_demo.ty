@@ -26,7 +26,7 @@ from topo.base.cf import CFProjection
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.sheets.saccade import ShiftingGeneratorSheet, SaccadeController    
 from topo.projections.basic import SharedWeightCFProjection
-from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.coordmapperfns.basic import OttesSCMotorMapper
 from topo.misc.numbergenerators import UniformRandom
 

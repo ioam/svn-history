@@ -20,7 +20,7 @@ that can be used with the above functions and classes::
   patterns       - PatternGenerator classes: 2D input or weight patterns 
   eps            - EventProcessor classes: other simulation objects
   outputfn      - Output functions, for e.g. normalization or squashing
-  responsefns    - Calculate the response of a Projection
+  responsefn    - Calculate the response of a Projection
   learningfn    - Adjust weights for a Projection
   coordmapperfns - CoordinateMapperFn classes: map coords between Sheets
 
@@ -47,7 +47,7 @@ __all__ = ['analysis',
            'patterns',
            'plotting',
            'projections',
-           'responsefns',
+           'responsefn',
            'sheets']
 
 # get set by the topographica script

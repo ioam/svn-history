@@ -22,14 +22,14 @@ import topo.patterns.random
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
-from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.outputfn.basic import DivisiveNormalizeL1,PiecewiseLinear
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.misc.numbergenerators import UniformRandom
-from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.responsefn.optimized import CFPRF_DotProduct_opt
 
 
 # JABALERT: Shouldn't this script file be renamed lissom_oo_or_sf since it's ON/OFF?

@@ -25,14 +25,14 @@ import numpy.oldnumeric as Numeric
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
-from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfn.basic import DivisiveNormalizeL1, PiecewiseLinear
-#from topo.responsefns.optimized import CFPRF_SharedWeightDotProduct_opt
+#from topo.responsefn.optimized import CFPRF_SharedWeightDotProduct_opt
 from topo.base.patterngenerator import PatternGenerator
 from topo.misc.numbergenerators import UniformRandom, NormalRandom, Choice
 from topo.base.parameterclasses import DynamicNumber, Number, ListParameter

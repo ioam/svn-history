@@ -53,7 +53,7 @@ from topo.base.sheet import Slice
 from topo.base.boundingregion import BoundingBox, BoundingRegionParameter
 from topo.learningfn.som import CFPLF_HebbianSOM
 from topo.outputfn.basic import PiecewiseLinear
-from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.inlinec import inline, optimized
 from topo.misc.numbergenerators import UniformRandom

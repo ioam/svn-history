@@ -157,7 +157,7 @@ from topo.plotting.plotgroup import TemplatePlotGroup, ConnectionFieldsPlotGroup
 import topo.patterns.random
 from topo.learningfn.som import CFPLF_HebbianSOM
 from topo.base.cf import CFProjection, CFSheet
-from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.patterngenerator import BoundingBox
 
 ### JCALERT! This file has to be re-written when the fundamental changes in plot.py

@@ -43,7 +43,7 @@ from topo.patterns.basic import Rectangle
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.commands.basic import pattern_present
-from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.responsefn.optimized import CFPRF_DotProduct_opt
 
 
 ### JABHACKALERT: Missing the lateral projection; should be
