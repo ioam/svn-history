@@ -10,8 +10,8 @@ import numpy
 from math import pi, sqrt
 
 
-import topo.patterns.basic
-import topo.patterns.random
+import topo.pattern.basic
+import topo.pattern.random
 
 from topo.sheet.slissom import SLISSOM
 from topo.sheet.generatorsheet import GeneratorSheet
@@ -37,7 +37,7 @@ GeneratorSheet.period = 1
 GeneratorSheet.phase = 0.05
 GeneratorSheet.nominal_bounds = BoundingBox(radius=0.72)
 
-input_pattern = topo.patterns.basic.Gaussian(
+input_pattern = topo.pattern.basic.Gaussian(
     scale=1.0,size=2*0.0468,aspect_ratio=4.0,
     bounds=BoundingBox(radius=0.72),
     x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
@@ -45,7 +45,7 @@ input_pattern = topo.patterns.basic.Gaussian(
     orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
 
 # YC use test pattern
-input_pattern = topo.patterns.basic.TwoRectangles(scale=1.0)
+input_pattern = topo.pattern.basic.TwoRectangles(scale=1.0)
 
 
 
@@ -56,12 +56,12 @@ SLISSOM.nominal_density = locals().get('default_density',24.0)
 
 ### Specify weight initialization, response function, and learning function
 #
-CFProjection.weights_generator=topo.patterns.random.UniformRandom()
+CFProjection.weights_generator=topo.pattern.random.UniformRandom()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
-LeakyCFProjection.weights_generator=topo.patterns.basic.Rectangle(size=1.0)
+LeakyCFProjection.weights_generator=topo.pattern.basic.Rectangle(size=1.0)
 LeakyCFProjection.response_fn=CFPRF_DotProduct_opt()
 ##- LeakyCFProjection.learning_fn=CFPLF_Hebbian_opt()
 ##- LeakyCFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()

@@ -17,8 +17,8 @@ import numpy
 
 from topo import param
 
-import topo.patterns.random
-import topo.patterns.basic
+import topo.pattern.random
+import topo.pattern.basic
 
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheet import Sheet

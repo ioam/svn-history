@@ -31,10 +31,10 @@ import numpy
 from math import pi, sqrt
 
 
-import topo.patterns.basic
-import topo.patterns.random
+import topo.pattern.basic
+import topo.pattern.random
 
-from topo.patterns.basic import Gaussian,Composite
+from topo.pattern.basic import Gaussian,Composite
 from topo.sheet.lissom import LISSOM
 from topo.sheet.generatorsheet import GeneratorSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
@@ -65,16 +65,16 @@ inputs=[Composite(generators = [lefteye, righteye, mouth],
                   y=UniformRandom(lbound=-85.0/48.0,ubound=85.0/48.0, seed=34+i))
         for i in xrange(num_inputs)]
 
-combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=1.722972972972973,generators=inputs)
+combined_inputs = topo.pattern.basic.SeparatedComposite(min_separation=1.722972972972973,generators=inputs)
 
 # Default for tutorial
-topo.patterns.basic.Line.scale=0.9
-topo.patterns.basic.Gaussian.size=0.08333
-topo.patterns.basic.Gaussian.aspect_ratio=4.0
+topo.pattern.basic.Line.scale=0.9
+topo.pattern.basic.Gaussian.size=0.08333
+topo.pattern.basic.Gaussian.aspect_ratio=4.0
 
 # Specify weight initialization, response function, and learning function
-CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
-CFProjection.weights_generator = topo.patterns.basic.Constant()
+CFProjection.cf_shape = topo.pattern.basic.Disk(smoothing=0.0)
+CFProjection.weights_generator = topo.pattern.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
@@ -108,10 +108,10 @@ topo.sim['FSA'].output_fn.upper_bound=0.65
 centerg   = Gaussian(size=0.11079,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))
 surroundg = Gaussian(size=0.17725,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1(norm_value=2.33))
 
-on_weights = topo.patterns.basic.Composite(
+on_weights = topo.pattern.basic.Composite(
     generators=[centerg,surroundg],operator=numpy.subtract)
 
-off_weights = topo.patterns.basic.Composite(
+off_weights = topo.pattern.basic.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
 
@@ -129,22 +129,22 @@ topo.sim.connect('Retina','LGNOff',delay=0.05,
 topo.sim.connect('LGNOn','FSA',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=1.0700000000000001,name='LGNOnAfferent',
                  # JABALERT: Should probably simplify this by making a function for it.
-                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.4167),
+                 weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.4167),
                  nominal_bounds_template=BoundingBox(radius=1.0625),learning_rate=9.533)
 
 topo.sim.connect('LGNOff','FSA',delay=0.05, dest_port=('Activity','JointNormalize', 'Afferent'),
                  connection_type=CFProjection,strength=1.07,name='LGNOffAfferent',
-                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.4167),
+                 weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.4167),
                  nominal_bounds_template=BoundingBox(radius=1.0625),learning_rate=9.533,)
 
 topo.sim.connect('FSA','FSA',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
-                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.4167),
+                 weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.4167),
                  nominal_bounds_template=BoundingBox(radius=0.166666666667),learning_rate=3.1856)
 
 topo.sim.connect('FSA','FSA',delay=0.05,name='LateralInhibitory',
                  connection_type=CFProjection,strength=-0.9,
-                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.4167),
+                 weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.4167),
                  nominal_bounds_template=BoundingBox(radius=0.416666666667),learning_rate=2.3627)
 
 

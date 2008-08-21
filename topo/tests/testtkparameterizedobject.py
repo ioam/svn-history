@@ -20,8 +20,8 @@ from topo.base.simulation import Simulation
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheet import Sheet
 
-import topo.patterns.basic
-from topo.patterns.basic import Gaussian        
+import topo.pattern.basic
+from topo.pattern.basic import Gaussian        
 from topo.outputfn.basic import PiecewiseLinear
 
 
@@ -332,11 +332,11 @@ class TestParameterTypeRepresentations(unittest.TestCase):
         # a window).
 
         csp_tkvar.set('Ring')
-        self.assertEqual(type(self.f.csp),topo.patterns.basic.Ring)
+        self.assertEqual(type(self.f.csp),topo.pattern.basic.Ring)
         ring_id = id(self.f.csp)
         
         csp_tkvar.set('Rectangle')
-        self.assertEqual(type(self.f.csp),topo.patterns.basic.Rectangle)
+        self.assertEqual(type(self.f.csp),topo.pattern.basic.Rectangle)
         rectangle_id = id(self.f.csp)
         
         csp_tkvar.set('Ring')

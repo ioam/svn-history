@@ -17,7 +17,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFPLearningFn
 from topo.base.patterngenerator import PatternGenerator
     
-from topo.patterns.basic import Gaussian
+from topo.pattern.basic import Gaussian
 from topo.outputfn.basic import IdentityOF
 
 

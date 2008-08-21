@@ -19,7 +19,7 @@ from .. import param
 
 from topo.misc.filepaths import Filename
 
-from topo.patterns.basic import OneDPowerSpectrum
+from topo.pattern.basic import OneDPowerSpectrum
 
 
 

@@ -24,9 +24,9 @@ from topo.commands.basic import pattern_present, wipe_out_activity
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.utils import frange
 from topo.misc.distribution import Distribution
-from topo.patterns.basic import SineGrating, Gaussian
-from topo.patterns.teststimuli import SineGratingDisk, OrientationContrastPattern, SineGratingRectangle
-from topo.patterns.random import GaussianRandom
+from topo.pattern.basic import SineGrating, Gaussian
+from topo.pattern.teststimuli import SineGratingDisk, OrientationContrastPattern, SineGratingRectangle
+from topo.pattern.random import GaussianRandom
 from topo.sheet.generatorsheet import GeneratorSheet
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
@@ -125,7 +125,7 @@ class PatternPresenter(param.Parameterized):
 
         if features_values.has_key('direction'):
             orientation = features_values['direction']+pi/2            
-            from topo.patterns.basic import Sweeper            
+            from topo.pattern.basic import Sweeper            
             for name,i in zip(inputs.keys(),range(len(input_sheet_names))):
                 try: 
                     inputs[name] = Sweeper(generator=inputs[name],step=int(name[-1]),speed=features_values['speed'])
@@ -1413,10 +1413,10 @@ def decode_feature(sheet, preference_map = "OrientationPreference", axis_bounds=
 
 
 ###############################################################################
-gaussian_corner = topo.patterns.basic.Composite(operator = maximum,
-                                            generators = [topo.patterns.basic.Gaussian(
+gaussian_corner = topo.pattern.basic.Composite(operator = maximum,
+                                            generators = [topo.pattern.basic.Gaussian(
                                                             size = 0.06,orientation=0,aspect_ratio=7,x=0.3),
-                                                            topo.patterns.basic.Gaussian(
+                                                            topo.pattern.basic.Gaussian(
                                                             size = 0.06,orientation=pi/2,aspect_ratio=7,y=0.3)])
 
 

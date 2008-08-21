@@ -8,7 +8,7 @@ import pdb
 
 from topo import param
 
-import topo.patterns.basic
+import topo.pattern.basic
 import topo.commands.analysis
 #from scipy.integrate import dblquad
 #from scipy.optimize.tnc import fmin_tnc
@@ -18,7 +18,7 @@ from numpy.oldnumeric import zeros, Float, sum
 from topo.projection.basic import CFProjection
 from topo.base.boundingregion import BoundingBox
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
-from topo.patterns.basic import Gaussian,Selector,Null
+from topo.pattern.basic import Gaussian,Selector,Null
 from topo.outputfn.basic import HomeostaticMaxEnt,OutputFnWithState
 from topo.sheet.lissom import LISSOM
 from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
@@ -225,18 +225,18 @@ def run_combinations(func, params):
 
 
 def AddV2():
-    corners = [topo.patterns.basic.Composite(operator = numpy.maximum,
+    corners = [topo.pattern.basic.Composite(operator = numpy.maximum,
                     generators = [
-                                       #topo.patterns.basic.Gaussian(scale=1,size = 0.08838,orientation=0,aspect_ratio=5.6666,x=0.45),
-                                       #topo.patterns.basic.Gaussian(scale=1,size = 0.08838,orientation=pi/2,aspect_ratio=5.6666,y=0.45)],
-                                       topo.patterns.basic.Gaussian(scale=1,size = 0.04,orientation=0,aspect_ratio=9,x=0.2),
-                                       topo.patterns.basic.Gaussian(scale=1,size = 0.04,orientation=pi/2,aspect_ratio=9,y=0.2)],
+                                       #topo.pattern.basic.Gaussian(scale=1,size = 0.08838,orientation=0,aspect_ratio=5.6666,x=0.45),
+                                       #topo.pattern.basic.Gaussian(scale=1,size = 0.08838,orientation=pi/2,aspect_ratio=5.6666,y=0.45)],
+                                       topo.pattern.basic.Gaussian(scale=1,size = 0.04,orientation=0,aspect_ratio=9,x=0.2),
+                                       topo.pattern.basic.Gaussian(scale=1,size = 0.04,orientation=pi/2,aspect_ratio=9,y=0.2)],
                     scale=1.0, bounds=BoundingBox(radius=0.5),
                     x=UniformRandom(lbound=-(__main__.__dict__.get('BS',0.5)),ubound=(__main__.__dict__.get('BS',0.5)),seed=12),
                     y=UniformRandom(lbound=-(__main__.__dict__.get('BS',0.5)),ubound=(__main__.__dict__.get('BS',0.5)),seed=34),
                     orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
                 for i in xrange(1)]
-    #combined_corners = topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=corners)
+    #combined_corners = topo.pattern.basic.SeparatedComposite(min_separation=2.2*0.27083,generators=corners)
     combined_corners = corners[0]
 
     topo.sim['Retina'].set_input_generator(combined_corners)
@@ -247,21 +247,21 @@ def AddV2():
 
     topo.sim.connect('V1Complex','V2',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
                     connection_type=CFProjection,strength=__main__.__dict__.get('V1aff_str',1.3),name='V1Afferent',
-                    weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                    weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply, 
                                                                     generators=[Gaussian(aspect_ratio=1.0, size=3),#__main__.__dict__.get('V1aff_size',30)),
-                                                                                topo.patterns.random.UniformRandom()]),
+                                                                                topo.pattern.random.UniformRandom()]),
                     nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V1aff_size',2*0.27083)/2),learning_rate=1.0);
 
     topo.sim.connect('V2','V2',delay=0.05,name='V2LateralExcitatory',
                     connection_type=CFProjection,strength=0.9,
-                    weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=__main__.__dict__.get('V2lat_exc_size',0.04)),
+                    weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=__main__.__dict__.get('V2lat_exc_size',0.04)),
                     nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2lat_exc_size',0.04)/2),learning_rate=0) 
                 
     topo.sim.connect('V2','V2',delay=0.05,name='V2LateralInhibitory',
                     connection_type=CFProjection,strength=-0.9,
-                    weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                    weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply, 
                                                                     generators=[Gaussian(aspect_ratio=1.0,      size=__main__.__dict__.get('V2lat_inh_size',2*0.22917)),
-                                                                                topo.patterns.random.UniformRandom()]),
+                                                                                topo.pattern.random.UniformRandom()]),
                     nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2lat_inh_size',2*0.22917)/2),learning_rate=1.8087)
 
     topo.sim["V1Simple"].in_connections[0].strength=2.5

@@ -80,7 +80,7 @@ from topo.outputfn.basic import PiecewiseLinear
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-import topo.patterns.basic
+import topo.pattern.basic
 
 
 ### Name of the basis simulation (set this)
@@ -121,7 +121,7 @@ gaussian_height = ysigma/BaseRN/sqrt(2.0)
 # the equivalent c++ simulation
 n_inputs,input_params = get_input_params()
 
-input_pattern = topo.patterns.basic.Gaussian(
+input_pattern = topo.pattern.basic.Gaussian(
     scale=scale_input,
     #bounds=input_bounds,
     size = 2*gaussian_height,
@@ -132,8 +132,8 @@ input_pattern = topo.patterns.basic.Gaussian(
     orientation=lambda : round(2*pi*input_params[0]['theta'].next()/360.0,1))
 
 
-CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
-CFProjection.weights_generator = topo.patterns.basic.Constant()
+CFProjection.cf_shape = topo.pattern.basic.Disk(smoothing=0.0)
+CFProjection.weights_generator = topo.pattern.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()

@@ -45,10 +45,10 @@ from numpy.oldnumeric import array, Float
 import Image as pImage
 import ImageOps
 
-from topo.patterns.image import edge_average
+from topo.pattern.image import edge_average
 from topo.base.patterngenerator import PatternGenerator
 from topo.outputfn.basic import DivisiveNormalizeLinf,IdentityOF
-from topo.patterns.image import PatternSampler
+from topo.pattern.image import PatternSampler
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.filepaths import Filename
 from pylab import fix,ceil
@@ -116,7 +116,7 @@ class ImageSeq(PatternGenerator):
                     image_array = array(image.getdata(),Float)
                     image_array.shape = (image.size[::-1]) 
                     
-                    self.patterns.append (PatternSampler(pattern_array=image_array,whole_pattern_output_fn=whole_image_output_fn,
+                    self.pattern.append (PatternSampler(pattern_array=image_array,whole_pattern_output_fn=whole_image_output_fn,
                                                          background_value_fn=edge_average))
                     count=count+1
 	    self.number_of_patterns = len(self.patterns)
@@ -192,8 +192,8 @@ right_input_pattern = ImageSeq(imagepath='examples/stereo/right/',size_normaliza
 
                           
 # Specify weight initialization, response function, and learning function
-CFProjection.weights_generator=topo.patterns.basic.Constant()
-CFProjection.cf_shape=topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.weights_generator=topo.pattern.basic.Constant()
+CFProjection.cf_shape=topo.pattern.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
@@ -255,25 +255,25 @@ lgn_strength=4.7
 topo.sim.connect('LeftRetina','LGNOnLeft',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   nominal_bounds_template=BoundingBox(radius=0.375),name='LCenterOn',
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
+                  weights_generator=topo.pattern.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('LeftRetina','LGNOnLeft',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='LSurroundOn',nominal_bounds_template=BoundingBox(radius=0.375),
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
+                  weights_generator=topo.pattern.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('RightRetina','LGNOnRight',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   nominal_bounds_template=BoundingBox(radius=0.375),name='RCenterOn',
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
+                  weights_generator=topo.pattern.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('RightRetina','LGNOnRight',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='RSurroundOn',nominal_bounds_template=BoundingBox(radius=0.375),
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
+                  weights_generator=topo.pattern.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 
 
@@ -281,25 +281,25 @@ topo.sim.connect('RightRetina','LGNOnRight',delay=0.05,
 topo.sim.connect('LeftRetina','LGNOffLeft',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='LCenterOff',nominal_bounds_template=BoundingBox(radius=0.375),
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
+                  weights_generator=topo.pattern.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('LeftRetina','LGNOffLeft',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   name='LSurroundOff',nominal_bounds_template=BoundingBox(radius=0.375),
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
+                  weights_generator=topo.pattern.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('RightRetina','LGNOffRight',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='RCenterOff',nominal_bounds_template=BoundingBox(radius=0.375),
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
+                  weights_generator=topo.pattern.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('RightRetina','LGNOffRight',delay=0.05,
                   connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   name='RSurroundOff',nominal_bounds_template=BoundingBox(radius=0.375),
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
+                  weights_generator=topo.pattern.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 
 # Connections from LGNs to V1

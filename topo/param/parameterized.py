@@ -1271,8 +1271,8 @@ def print_all_param_defaults():
 
 # Support for changing parameter names
 _param_name_changes = {}
-# e.g. you change topo.patterns.basic.Gaussian.aspect_ratio to aspect_ration
-# _param_name_changes['topo.patterns.basic.Gaussian']={'aspect_ratio':'aspect_ration'}
+# e.g. you change topo.pattern.basic.Gaussian.aspect_ratio to aspect_ration
+# _param_name_changes['topo.pattern.basic.Gaussian']={'aspect_ratio':'aspect_ration'}
 #
 # (not yet finished - do we need to add information about version numbers?)
 

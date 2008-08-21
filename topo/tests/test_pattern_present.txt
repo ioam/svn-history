@@ -1,5 +1,5 @@
 >>> import copy
->>> from topo.patterns.basic import Gaussian,Constant
+>>> from topo.pattern.basic import Gaussian,Constant
 >>> from numpy import array
 >>> from numpy.testing import assert_array_equal
 >>> from topo.tests.utils import assert_array_not_equal, new_simulation

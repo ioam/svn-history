@@ -37,8 +37,8 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.misc.numbergenerators import UniformRandom, NormalRandom, Choice
 from topo.base.parameterclasses import DynamicNumber, Number, ListParameter
 from topo.param import Parameter
-from topo.patterns.basic import Composite, SeparatedComposite, Gaussian, Disk, Constant
-from topo.patterns.image import Image
+from topo.pattern.basic import Composite, SeparatedComposite, Gaussian, Disk, Constant
+from topo.pattern.image import Image
 
 #from topo.tests.reference.lissom_log_parser import get_input_params
 
@@ -225,7 +225,7 @@ inhibitory_weight_bounds = BoundingBox(radius = inh_rad / (BaseN * area_scale))
 
 # Circular ConnectionFields
 RandomArray.seed(500,500)
-CFProjection.weights_generator = topo.patterns.basic.Gaussian(
+CFProjection.weights_generator = topo.pattern.basic.Gaussian(
     size = 2.0 * sigma_aff / (BaseLN), aspect_ratio = 1.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
@@ -250,16 +250,16 @@ topo.sim['FSA'] = LISSOM(nominal_bounds=fsa_bounds,nominal_density=BaseN,
 # Gaussian in retinalobjs (and elsewhere)
 # So here each original sigma values are multiplied by sqrt(pi). Because sigma_c and sigma_s were adjusted, the produced Gaussians match the C++ LISSOM simulation.
 
-centerg = topo.patterns.basic.Gaussian(
+centerg = topo.pattern.basic.Gaussian(
     size = 2.0 * sigma_c * sqrt(pi) / BaseLN, aspect_ratio = 1.0, output_fn = DivisiveNormalizeL1(norm_value = 2.33))
 
-surroundg = topo.patterns.basic.Gaussian(
+surroundg = topo.pattern.basic.Gaussian(
     size = 2.0 * sigma_s * sqrt(pi) / BaseLN, aspect_ratio = 1.0, output_fn = DivisiveNormalizeL1(norm_value = 2.33))
 
-on_weights = topo.patterns.basic.Composite(
+on_weights = topo.pattern.basic.Composite(
     generators = [centerg,surroundg], operator = numpy.subtract)
 
-off_weights = topo.patterns.basic.Composite(
+off_weights = topo.pattern.basic.Composite(
     generators = [surroundg,centerg], operator = numpy.subtract)
 
 topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
@@ -284,7 +284,7 @@ topo.sim.connect('LGNOff','FSA',delay=FixedPoint("0.05"),
           nominal_bounds_template=afferent_weight_bounds, learning_rate = alpha_input * n_aff_units)
 
 # Temporarily moved here to avoid masking the LGN weights until we can do it in a way that doesn't change the sum of the weights
-CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.cf_shape = topo.pattern.basic.Disk(smoothing=0.0)
 
 topo.sim.connect('FSA','FSA',delay=FixedPoint("0.05"),
           connection_type=CFProjection,strength=gammaexc,name='LateralExcitatory',

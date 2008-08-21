@@ -36,8 +36,8 @@ from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.sheet.generatorsheet import GeneratorSheet
 from topo.param import Parameterized
 
-import topo.patterns.basic
-import topo.patterns.random
+import topo.pattern.basic
+import topo.pattern.random
 
 # ALERT: Consider moving these to the main topo/ directory, perhaps
 # after generalizing them.
@@ -82,7 +82,7 @@ GeneratorSheet.nominal_density = 30
 gaussian_width = 0.23/sqrt(2)
 gaussian_height = 0.09/sqrt(2)
 
-input_pattern = topo.patterns.basic.Gaussian(
+input_pattern = topo.pattern.basic.Gaussian(
     x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
     y=UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
     orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),
@@ -107,7 +107,7 @@ topo.sim.connect('Retina','V1',delay=0.10,connection_type=CFProjection,
                  response_fn = CFPRF_DotProduct_opt(),
                  learning_fn = CFPLF_EuclideanHebbian(),
                  nominal_bounds_template = BoundingBox(radius=1.0),
-                 weights_generator = topo.patterns.random.UniformRandom())
+                 weights_generator = topo.pattern.random.UniformRandom())
 
 # Initialize weight values once; should verify that it does this ok
 from topo.outputfn.basic import IdentityOF

@@ -24,7 +24,7 @@ from numpy.oldnumeric import array,Float,pi
 ## from numpy.oldnumeric.mlab import rot90
 
 from topo.base.boundingregion import BoundingBox
-from topo.patterns.image import FileImage
+from topo.pattern.image import FileImage
 from topo.outputfn.basic import IdentityOF
 
 

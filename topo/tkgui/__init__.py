@@ -62,7 +62,7 @@ from topo.coordmapper import *
 from topo.ep import *
 from topo.learningfn import *
 from topo.outputfn import *
-from topo.patterns import *
+from topo.pattern import *
 from topo.projection import *
 from topo.responsefn import *
 from topo.sheet import *

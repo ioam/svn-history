@@ -25,8 +25,8 @@ from math import pi, sqrt
 from numpy import array
 import numpy
 
-import topo.patterns.random
-import topo.patterns.basic
+import topo.pattern.random
+import topo.pattern.basic
 
 from topo.base.arrayutils import array_argmax
 from topo.base.boundingregion import BoundingBox
@@ -39,7 +39,7 @@ from topo.learningfn.som import CFPLF_HebbianSOM
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfn.basic import PiecewiseLinear
 from topo.outputfn.basic import DivisiveNormalizeL1
-from topo.patterns.basic import Rectangle
+from topo.pattern.basic import Rectangle
 from topo.sheet.cfsom import CFSOM
 from topo.sheet.generatorsheet import GeneratorSheet
 from topo.commands.basic import pattern_present
@@ -51,11 +51,11 @@ from topo.responsefn.optimized import CFPRF_DotProduct_opt
 
 
 #weight initialization, response 
-CFProjection.weights_generator=topo.patterns.random.UniformRandom()
+CFProjection.weights_generator=topo.pattern.random.UniformRandom()
 
 
 # Input pattern
-input_pattern = topo.patterns.basic.Gaussian(
+input_pattern = topo.pattern.basic.Gaussian(
 			scale=1, size=0.1, aspect_ratio=1.0,
 			x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
 			y=0,orientation=0)

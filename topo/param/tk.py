@@ -38,8 +38,8 @@ You want to display all parameters of a parameterized instance
 inside an existing containter (e.g. a window or a frame):
 
   # existing Parameterized instance g
-  from topo import patterns
-  g = patterns.Gaussian()
+  from topo import pattern
+  g = pattern.Gaussian()
   
   # existing window t
   import Tkinter
@@ -56,8 +56,8 @@ inside an existing containter (e.g. a window or a frame):
 You want a new window displaying only the parameters of your object:
 
   # existing Parameterized instance g
-  from topo import patterns
-  g = patterns.Gaussian()
+  from topo import pattern
+  g = pattern.Gaussian()
   
   # display all the parameters of g in a new window
   from topo.param.tk import edit_parameters

@@ -1,4 +1,4 @@
-from topo.patterns.basic import Gabor
+from topo.pattern.basic import Gabor
 from topo.commands.pylabplots import matrixplot
 import numpy
 import pylab
@@ -7,7 +7,7 @@ from topo.misc.numbergenerators import UniformRandom, BoundedNumber, Exponential
 from topo.base.functionfamilies import IdentityOF
 import topo
 from topo.base.boundingregion import BoundingBox
-from topo.patterns.image import Image
+from topo.pattern.image import Image
 
 
 class ModelFit():
@@ -181,7 +181,7 @@ def runModelFit():
                        orientation=UniformRandom(lbound=-3.14,ubound=3.14,seed=511))
     for f in image_filenames]
 
-    combined_inputs =topo.patterns.basic.Selector(generators=inputs)
+    combined_inputs =topo.pattern.basic.Selector(generators=inputs)
     topo.sim['Retina'].set_input_generator(combined_corners)
 
     

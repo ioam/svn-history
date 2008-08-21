@@ -10,8 +10,8 @@ import numpy
 
 from topo import param
 
-import topo.patterns.random
-import topo.patterns.basic
+import topo.pattern.random
+import topo.pattern.basic
  
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet,CFProjection,CFPOF_Plugin
@@ -55,7 +55,7 @@ class SampleHebbian(LearningFn):
         self.value = self.value*0.9
 
 # Input pattern
-gaussian_generator = topo.patterns.basic.Gaussian(
+gaussian_generator = topo.pattern.basic.Gaussian(
     x=UniformRandom(lbound=-0.8,ubound=0.8,seed=12),
     y=UniformRandom(lbound=-0.8,ubound=0.8,seed=34),
     orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),
@@ -74,7 +74,7 @@ topo.sim['V1'] = CFSheet(nominal_density=locals().get('default_density',5),nomin
 topo.sim.connect(
     'Retina','V1',name='Afferent',delay=0.05,
     connection_type=CFProjection, 
-    weights_generator=topo.patterns.random.UniformRandom(),
+    weights_generator=topo.pattern.random.UniformRandom(),
     nominal_bounds_template=BoundingBox(radius=0.2),
     response_fn=CFPRF_DotProduct_opt(),
     learning_fn=CFPLF_Plugin(single_cf_fn=SampleHebbian(sample_param=0.5)),

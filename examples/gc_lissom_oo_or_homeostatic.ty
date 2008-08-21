@@ -29,10 +29,10 @@ import numpy
 from math import pi, sqrt
 
 
-import topo.patterns.basic
-import topo.patterns.random
+import topo.pattern.basic
+import topo.pattern.random
 
-from topo.patterns.basic import Gaussian
+from topo.pattern.basic import Gaussian
 from topo.sheet.lissom import JointScaling, LISSOM
 from topo.sheet.generatorsheet import GeneratorSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
@@ -45,7 +45,7 @@ from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF
 from contrib.jacommands import SimpleHomeo
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
-from topo.patterns.image import Image
+from topo.pattern.image import Image
 
 ####Input type###
 type_input=locals().get('ti',"Gaussian")
@@ -65,11 +65,11 @@ if type_input=="Gaussian":
                        size=0.088388, aspect_ratio=4.66667, scale=scale, bounds=BoundingBox(radius=1.125))
             for i in xrange(num_inputs)]
     
-    combined_inputs = topo.patterns.basic.SeparatedComposite(min_separation=0,generators=inputs)
+    combined_inputs = topo.pattern.basic.SeparatedComposite(min_separation=0,generators=inputs)
     
 elif type_input=="Natural":
     
-    input_type=topo.patterns.image.Image
+    input_type=topo.pattern.image.Image
     image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
     inputs=[input_type(filename=f,
                        size=10.0,  #size_normalization='original',(size=10.0)
@@ -78,46 +78,46 @@ elif type_input=="Natural":
                        orientation=UniformRandom(lbound=-pi,ubound=pi,seed=rand_seedo))
 		for f in image_filenames]
 
-    combined_inputs =topo.patterns.basic.Selector(generators=inputs)
+    combined_inputs =topo.pattern.basic.Selector(generators=inputs)
 
 elif type_input=="NoisyDisks":
     
-    input_type=topo.patterns.basic.Composite
+    input_type=topo.pattern.basic.Composite
     inputs=[input_type(operator=numpy.multiply,
-                       generators=[topo.patterns.basic.Disk(x=UniformRandom(lbound=-2.125,ubound=2.125,seed=rand_seedx),
+                       generators=[topo.pattern.basic.Disk(x=UniformRandom(lbound=-2.125,ubound=2.125,seed=rand_seedx),
                                                             y=UniformRandom(lbound=-2.125,ubound=2.125,seed=rand_seedy),
                                                             size=2.0, aspect_ratio=1.0, scale=1.0,
                                                             offset=0.5,
                                                             bounds=BoundingBox(radius=1.125), smoothing=0.1),
-                                   topo.patterns.random.UniformRandom(offset=locals().get('rand_offset',0.5), scale=locals().get('rand_scale',0.5))])]
+                                   topo.pattern.random.UniformRandom(offset=locals().get('rand_offset',0.5), scale=locals().get('rand_scale',0.5))])]
             
-    combined_inputs =topo.patterns.basic.Selector(generators=inputs)
+    combined_inputs =topo.pattern.basic.Selector(generators=inputs)
 
 elif type_input=="Disks":
     
-    input_type=topo.patterns.basic.Disk
+    input_type=topo.pattern.basic.Disk
     inputs=[input_type(x=UniformRandom(lbound=-2.125,ubound=2.125,seed=rand_seedx),
                        y=UniformRandom(lbound=-2.125,ubound=2.125,seed=rand_seedy),
                        size=2.0, aspect_ratio=1.0, scale=1.0,
                        offset=0.5,
                        bounds=BoundingBox(radius=1.125), smoothing=0.1)]
             
-    combined_inputs =topo.patterns.basic.Selector(generators=inputs)
+    combined_inputs =topo.pattern.basic.Selector(generators=inputs)
 
 elif type_input=="NoisyDiskstoNatural":
 
-    disks_input_type=topo.patterns.basic.Composite
+    disks_input_type=topo.pattern.basic.Composite
     disks_inputs=[disks_input_type(operator=numpy.multiply,
-                       generators=[topo.patterns.basic.Disk(x=UniformRandom(lbound=-2.125,ubound=2.125,seed=rand_seedx),
+                       generators=[topo.pattern.basic.Disk(x=UniformRandom(lbound=-2.125,ubound=2.125,seed=rand_seedx),
                                                             y=UniformRandom(lbound=-2.125,ubound=2.125,seed=rand_seedy),
                                                             size=2.0, aspect_ratio=1.0, scale=1.0,
                                                             offset=0.5,
                                                             bounds=BoundingBox(radius=1.125), smoothing=0.1),
-                                   topo.patterns.random.UniformRandom(offset=locals().get('rand_offset',0.0), scale=locals().get('rand_scale',0.5))])]
+                                   topo.pattern.random.UniformRandom(offset=locals().get('rand_offset',0.0), scale=locals().get('rand_scale',0.5))])]
             
-    disks_combined_inputs =topo.patterns.basic.Selector(generators=disks_inputs)
+    disks_combined_inputs =topo.pattern.basic.Selector(generators=disks_inputs)
     
-    natural_input_type=topo.patterns.image.Image
+    natural_input_type=topo.pattern.image.Image
     image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
     natural_inputs=[natural_input_type(filename=f,
                        size=10.0,  #size_normalization='original',(size=10.0)
@@ -126,7 +126,7 @@ elif type_input=="NoisyDiskstoNatural":
                        orientation=UniformRandom(lbound=-pi,ubound=pi,seed=rand_seedo))
 		for f in image_filenames]
 
-    natural_combined_inputs =topo.patterns.basic.Selector(generators=natural_inputs)
+    natural_combined_inputs =topo.pattern.basic.Selector(generators=natural_inputs)
 
 #Units to track for debugging
 V1_units=[(0.25, 0.25),(-0.25, -0.25),(0.25, -0.25),(-0.25, 0.25)]
@@ -197,8 +197,8 @@ LatIn_OF = PipelineOF(output_fns=[LatIn_Avg, LatIn_Tracker])
 
 
 # Specify weight initialization, response function, and learning function
-CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
-CFProjection.weights_generator = topo.patterns.basic.Constant()
+CFProjection.cf_shape = topo.pattern.basic.Disk(smoothing=0.0)
+CFProjection.weights_generator = topo.pattern.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
@@ -208,17 +208,17 @@ SharedWeightCFProjection.response_fn=CFPRF_DotProduct_opt()
 centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 
-on_weights = topo.patterns.basic.Composite(
+on_weights = topo.pattern.basic.Composite(
     generators=[centerg,surroundg],operator=numpy.subtract)
 
-off_weights = topo.patterns.basic.Composite(
+off_weights = topo.pattern.basic.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
 #Function for generating Gaussian random initial weights
 def gauss_rand(size):
-    return topo.patterns.basic.Composite(operator=numpy.multiply, 
+    return topo.pattern.basic.Composite(operator=numpy.multiply, 
                                          generators=[Gaussian(aspect_ratio=1.0, size=size),
-                                                     topo.patterns.random.UniformRandom()])
+                                                     topo.pattern.random.UniformRandom()])
 
 #Whether or not to use divisive weights normalization
 norm=locals().get('norm',True)
@@ -288,7 +288,7 @@ topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,
                  output_fn=LatEx_OF,
                  strength=locals().get('LatExcStr',1.0),
-                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
+                 weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.04),
                  nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0.0) 
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',

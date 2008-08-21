@@ -23,7 +23,7 @@ from math import pi,cos,sin
 from .. import param
 
 from topo.base.simulation import Simulation,EventProcessor
-from topo.patterns.image import GenericImage
+from topo.pattern.image import GenericImage
 
 from playerrobot import CameraDevice,PTZDevice
 

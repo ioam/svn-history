@@ -14,7 +14,7 @@ from topo.misc.keyedlist import KeyedList
 import topo
 from math import pi
 import copy
-from topo import patterns
+from topo import pattern
 
 import pylab
 
@@ -33,7 +33,7 @@ def measure_tae():
       # Value is just an approximate match to bednar:nc00; not calculated directly
       topo.sim["V1"].projections(p).learning_rate = 0.005
 
-   inputs = [patterns.Gaussian(x = 0.0, y = 0.0, orientation = pi/2.0,
+   inputs = [pattern.Gaussian(x = 0.0, y = 0.0, orientation = pi/2.0,
                      size=0.088388, aspect_ratio=4.66667, scale=1.0)]
    topo.sim['Retina'].input_generator.generators = inputs
    topo.sim.run(90)
@@ -57,7 +57,7 @@ def measure_tae():
 def test_all_orientations(x=0,y=0):
    results=KeyedList()
    for i in frange(0.0, 1.0, 1.0/36.0, inclusive=True):
-       input = patterns.Gaussian(x=x, y=y, orientation=i*pi,
+       input = pattern.Gaussian(x=x, y=y, orientation=i*pi,
                         size=0.088388, aspect_ratio=4.66667, scale=1.0)
        pattern_present(inputs={'Retina' : input}, duration=1.0,
                        plastic=False,
@@ -95,12 +95,12 @@ def measure_dae(scale=0.6):
       topo.sim["V1"].projections(p).learning_rate = 0.005
 
 
-##    g = patterns.Gaussian(x=0.0,y=0.0,orientation=pi/2.0,size=0.088388,
+##    g = pattern.Gaussian(x=0.0,y=0.0,orientation=pi/2.0,size=0.088388,
 ##                          aspect_ratio=4.66667,scale=1.0)
 
-   g = patterns.SineGrating(frequency=2.4,phase=0.0,orientation=pi/2,scale=scale)
+   g = pattern.SineGrating(frequency=2.4,phase=0.0,orientation=pi/2,scale=scale)
    for j in range(4):
-      topo.sim['Retina%s'%j].set_input_generator(patterns.Sweeper(
+      topo.sim['Retina%s'%j].set_input_generator(pattern.Sweeper(
          generator=copy.deepcopy(g),
          speed=2.0/24.0,
          step=j))
@@ -126,12 +126,12 @@ def measure_dae(scale=0.6):
 
 def test_all_directions(x=0,y=0,scale=0.6):
    results=KeyedList()
-##    g=patterns.Gaussian(x=x,y=y,aspect_ratio=4.66667,
+##    g=pattern.Gaussian(x=x,y=y,aspect_ratio=4.66667,
 ##                        size=0.088388,scale=1.0)
-   g = patterns.SineGrating(frequency=2.4,phase=0.0,orientation=0,scale=scale)
+   g = pattern.SineGrating(frequency=2.4,phase=0.0,orientation=0,scale=scale)
    inputs = {}
    for j in range(4):
-      inputs['Retina%s'%j] = patterns.Sweeper(generator=copy.deepcopy(g),
+      inputs['Retina%s'%j] = pattern.Sweeper(generator=copy.deepcopy(g),
                                               speed=2.0/24.0)
 
    for i in frange(0.0, 2.0, 2.0/18.0, inclusive=True): 

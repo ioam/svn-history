@@ -258,7 +258,7 @@ def default_analysis_function():
             save_plotgroup("Projection",projection=p)
 
     # Test response to a standardized pattern
-    from topo.patterns.basic import Gaussian
+    from topo.pattern.basic import Gaussian
     from math import pi
     pattern_present(inputs={"Retina":Gaussian(orientation=pi/4,aspect_ratio=4.7)})
     save_plotgroup("Activity",saver_params={"filename_suffix":"_45d"})

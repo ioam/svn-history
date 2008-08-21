@@ -36,10 +36,10 @@ import copy
 from math import pi, sqrt
 
 
-import topo.patterns.basic
-import topo.patterns.random
+import topo.pattern.basic
+import topo.pattern.random
 
-from topo.patterns.basic import Gaussian,Sweeper
+from topo.pattern.basic import Gaussian,Sweeper
 from topo.sheet.lissom import LISSOM
 from topo.sheet.generatorsheet import GeneratorSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
@@ -60,18 +60,18 @@ inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
                    size=0.088388, aspect_ratio=4.66667, scale=1.0,
                    bounds=BoundingBox(radius=0.8))
         for i in xrange(num_inputs)]
-sub_inputs = topo.patterns.basic.SeparatedComposite(min_separation=2.2*0.27083,
+sub_inputs = topo.pattern.basic.SeparatedComposite(min_separation=2.2*0.27083,
                                                     generators=inputs)
 
                                  
 # Defaults for tutorial
-topo.patterns.basic.Line.scale=0.9
-topo.patterns.basic.Gaussian.size=0.08333
-topo.patterns.basic.Gaussian.aspect_ratio=4.0
+topo.pattern.basic.Line.scale=0.9
+topo.pattern.basic.Gaussian.size=0.08333
+topo.pattern.basic.Gaussian.aspect_ratio=4.0
 
 # Specify weight initialization, response function, and learning function
-CFProjection.cf_shape = topo.patterns.basic.Disk(smoothing=0.0)
-CFProjection.weights_generator = topo.patterns.basic.Constant()
+CFProjection.cf_shape = topo.pattern.basic.Disk(smoothing=0.0)
+CFProjection.weights_generator = topo.pattern.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
@@ -119,16 +119,16 @@ topo.sim['V1'].output_fn.upper_bound=0.633
 centerg   = Gaussian(size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 surroundg = Gaussian(size=0.29540,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 
-on_weights = topo.patterns.basic.Composite(
+on_weights = topo.pattern.basic.Composite(
     generators=[centerg,surroundg],operator=numpy.subtract)
 
-off_weights = topo.patterns.basic.Composite(
+off_weights = topo.pattern.basic.Composite(
     generators=[surroundg,centerg],operator=numpy.subtract)
 
 
 
-CompositePG = topo.patterns.basic.Composite
-UniformRandomPG = topo.patterns.random.UniformRandom
+CompositePG = topo.pattern.basic.Composite
+UniformRandomPG = topo.pattern.random.UniformRandom
     
 for i in xrange(num_lags):
 

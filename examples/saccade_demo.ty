@@ -30,7 +30,7 @@ from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.coordmapper.basic import OttesSCMotorMapper
 from topo.misc.numbergenerators import UniformRandom
 
-import topo.patterns.image
+import topo.pattern.image
 
 
 
@@ -39,7 +39,7 @@ import topo.patterns.image
 
 topo.base.sheet.Sheet.nominal_density = 48
 topo.base.sheet.Sheet.nominal_bounds = BoundingBox(radius=0.5)
-topo.patterns.image.FileImage.size = 2.0
+topo.pattern.image.FileImage.size = 2.0
 
 SaccadeController.print_level = NORMAL
 
@@ -50,7 +50,7 @@ ShiftingGeneratorSheet.print_level = NORMAL
 ##########################################################################
 # Generators
 
-saccade_generator = topo.patterns.basic.Gaussian(
+saccade_generator = topo.pattern.basic.Gaussian(
 
     #
     # A cycle through a series of saccades to the
@@ -73,7 +73,7 @@ saccade_generator = topo.patterns.basic.Gaussian(
     aspect_ratio=1.0,
     bounds = BoundingBox(radius = 0.5))
 
-scene_seq = [(1,topo.patterns.image.FileImage())]
+scene_seq = [(1,topo.pattern.image.FileImage())]
 
 ##########################################################################
 # Sheets: A movable eye, a SuperiorColliculus generating eye movements,
@@ -97,7 +97,7 @@ topo.sim.connect('SC','SaccadeControl',name="Efferent",
                  dest_port = 'Activity',
                  delay = 0.5,
                  connection_type=CFProjection,
-                 weights_generator = topo.patterns.basic.Gaussian(),
+                 weights_generator = topo.pattern.basic.Gaussian(),
                  nominal_bounds_template = BoundingBox(radius=0),
                  response_fn = CFPRF_DotProduct_opt(),
                  # CEBERRORALERT: I moved this attribute's location in

@@ -18,8 +18,8 @@ import numpy
 from math import pi, sqrt
 
 
-import topo.patterns.basic
-import topo.patterns.random
+import topo.pattern.basic
+import topo.pattern.random
 
 from topo.sheet.lissom import LISSOM
 from topo.sheet.generatorsheet import GeneratorSheet
@@ -32,11 +32,11 @@ from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfn.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.outputfn.basic import HomeostaticMaxEnt
-from topo.patterns.basic import Gaussian,Composite,SeparatedComposite
+from topo.pattern.basic import Gaussian,Composite,SeparatedComposite
 
 
 num_inputs=2
-input_type=topo.patterns.basic.Gaussian
+input_type=topo.pattern.basic.Gaussian
 inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
                    y=UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
                    orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
@@ -47,8 +47,8 @@ inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
 combined_inputs = SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
 
 # Specify weight initialization, response function, and learning function
-CFProjection.weights_generator=topo.patterns.random.UniformRandom()
-CFProjection.cf_shape=topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.weights_generator=topo.pattern.random.UniformRandom()
+CFProjection.cf_shape=topo.pattern.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
@@ -70,9 +70,9 @@ topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
 
 topo.sim.connect('Retina','V1',delay=0.05,
                  connection_type=CFProjection,strength=1.0,name='Afferent',
-                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+                 weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply, 
                                                                  generators=[Gaussian(aspect_ratio=1.0, size=2*0.27083),
-                                                                             topo.patterns.random.UniformRandom()]),
+                                                                             topo.pattern.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.27083),
                  learning_rate=BoundedNumber(bounds=(0.137,None),
                                              generator=ExponentialDecay(starting_value=locals().get('afferent_lr',0.9590),
@@ -80,12 +80,12 @@ topo.sim.connect('Retina','V1',delay=0.05,
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,strength=0.9,
-                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
+                 weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.04),
                  nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0) 
             
 topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
                  connection_type=CFProjection,strength=-0.9,
                  weights_generator=Composite(operator=numpy.multiply, 
                      generators=[Gaussian(aspect_ratio=1.0, size=2*0.22917),
-                                 topo.patterns.random.UniformRandom()]),
+                                 topo.pattern.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.8087)

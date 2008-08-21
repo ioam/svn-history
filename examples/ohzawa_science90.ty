@@ -22,9 +22,9 @@ from math import pi, sqrt
 from topo import param
 
 
-import topo.patterns.basic
-import topo.patterns.random
-import topo.patterns.rds
+import topo.pattern.basic
+import topo.pattern.random
+import topo.pattern.rds
 
 from topo.sheet.generatorsheet import GeneratorSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
@@ -36,7 +36,7 @@ from topo.misc.numbergenerators import UniformRandom,UniformRandomInt
 from topo.commands.pylabplots import *
 
 
-input_pattern = topo.patterns.rds.RandomDotStereogram(dotsize=UniformRandom(lbound=0.05,ubound=0.15,seed=100),
+input_pattern = topo.pattern.rds.RandomDotStereogram(dotsize=UniformRandom(lbound=0.05,ubound=0.15,seed=100),
                                         xdisparity=UniformRandom(lbound=-0.5,ubound=0.5,seed=200),
                                         dotdensity=UniformRandom(lbound=0.2,ubound=0.8,seed=300),
                                         random_seed=UniformRandomInt(lbound=0,ubound=1000,seed=400))
@@ -84,48 +84,48 @@ topo.sim['C'] = CFSheet(nominal_density=1.0,measure_maps=True,plastic=False,
 CFProjection.strength=1.0
 CFProjection.nominal_bounds_template=BoundingBox(radius=0.5)
 
-topo.patterns.basic.Gabor.orientation=pi/2
-topo.patterns.basic.Gabor.size=0.70
-topo.patterns.basic.Gabor.frequency=2.4
-topo.patterns.basic.Gabor.aspect_ratio=1
+topo.pattern.basic.Gabor.orientation=pi/2
+topo.pattern.basic.Gabor.size=0.70
+topo.pattern.basic.Gabor.frequency=2.4
+topo.pattern.basic.Gabor.aspect_ratio=1
 
 ###TRALERT: Tuned Excitatory complex cell model
 
 topo.sim.connect('LeftRetina','S1',delay=0.05,name='LS1',
                  connection_type=CFProjection,
-                 weights_generator=topo.patterns.basic.Gabor(phase=0))
+                 weights_generator=topo.pattern.basic.Gabor(phase=0))
 
 topo.sim.connect('RightRetina','S1',delay=0.05,name='RS1',
                  connection_type=CFProjection,
-                 weights_generator=topo.patterns.basic.Gabor(phase=0))
+                 weights_generator=topo.pattern.basic.Gabor(phase=0))
 
 
 topo.sim.connect('LeftRetina','S2',delay=0.05,name='LS2',
                  connection_type=CFProjection,
-                 weights_generator=topo.patterns.basic.Gabor(phase=pi))
+                 weights_generator=topo.pattern.basic.Gabor(phase=pi))
 
 topo.sim.connect('RightRetina','S2',delay=0.05,name='RS2',
                  connection_type=CFProjection,
-                 weights_generator=topo.patterns.basic.Gabor(phase=pi))
+                 weights_generator=topo.pattern.basic.Gabor(phase=pi))
 
 
 
 topo.sim.connect('LeftRetina','S3',delay=0.05,name='LS3',
                  connection_type=CFProjection,
-                 weights_generator=topo.patterns.basic.Gabor(phase=pi/2))
+                 weights_generator=topo.pattern.basic.Gabor(phase=pi/2))
 
 topo.sim.connect('RightRetina','S3',delay=0.05,name='RS3',
                  connection_type=CFProjection,
-                 weights_generator=topo.patterns.basic.Gabor(phase=pi/2))
+                 weights_generator=topo.pattern.basic.Gabor(phase=pi/2))
 
 
 topo.sim.connect('LeftRetina','S4',delay=0.05,name='LS4',
                  connection_type=CFProjection,
-                 weights_generator=topo.patterns.basic.Gabor(phase=3*pi/2))
+                 weights_generator=topo.pattern.basic.Gabor(phase=3*pi/2))
 
 topo.sim.connect('RightRetina','S4',delay=0.05,name='RS4',
                  connection_type=CFProjection,
-                 weights_generator=topo.patterns.basic.Gabor(phase=3*pi/2))
+                 weights_generator=topo.pattern.basic.Gabor(phase=3*pi/2))
 
 topo.sim.connect('S1','C',delay=0.05,name='S1ToC',
                  connection_type=CFProjection,
@@ -187,8 +187,8 @@ from topo.commands.pylabplots import *
 from topo.misc.distribution import Distribution
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.utils import cross_product, frange
-from topo.patterns.basic import SineGrating, Gaussian
-from topo.patterns.rds import RandomDotStereogram
+from topo.pattern.basic import SineGrating, Gaussian
+from topo.pattern.rds import RandomDotStereogram
 from topo.sheet.generatorsheet import GeneratorSheet
 from topo.sheet.lissom import LISSOM
 

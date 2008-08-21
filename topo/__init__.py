@@ -44,11 +44,11 @@ __all__ = ['analysis',
            'misc',
            'outputfn',
            'param',
-           'patterns',
+           'pattern',
            'plotting',
-           'projections',
+           'projection',
            'responsefn',
-           'sheets']
+           'sheet']
 
 # get set by the topographica script
 release = ''

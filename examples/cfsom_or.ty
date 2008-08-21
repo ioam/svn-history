@@ -17,8 +17,8 @@ import numpy
 
 from topo import param
 
-import topo.patterns.random
-import topo.patterns.basic
+import topo.pattern.random
+import topo.pattern.basic
  
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFProjection, CFSheet
@@ -30,7 +30,7 @@ from topo.misc.numbergenerators import UniformRandom,ExponentialDecay
 
 # Input patterns
 num_inputs=2
-input_type=topo.patterns.basic.Gaussian
+input_type=topo.pattern.basic.Gaussian
 inputs=[input_type(x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12+i),
                    y=UniformRandom(lbound=-0.5,ubound=0.5,seed=34+i),
                    orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
@@ -39,7 +39,7 @@ inputs=[input_type(x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12+i),
                 for i in xrange(num_inputs)]
 
 # Contents of retina
-combined_inputs = topo.patterns.basic.SeparatedComposite(max_trials=75,min_separation=0.6,generators=inputs)
+combined_inputs = topo.pattern.basic.SeparatedComposite(max_trials=75,min_separation=0.6,generators=inputs)
 
 
 # Sheets, connections, and their parameters
@@ -60,7 +60,7 @@ topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,
                  learning_rate=ExponentialDecay(starting_value = 0.5,
                                                 time_constant=-10000/8.0,
                                                 base=0.5),
-                 weights_generator = topo.patterns.basic.Gaussian(),
+                 weights_generator = topo.pattern.basic.Gaussian(),
                  nominal_bounds_template=BoundingBox(radius=0.1),
                  response_fn = CFPRF_DotProduct_opt(),
                  learning_fn=CFPLF_EuclideanHebbian())

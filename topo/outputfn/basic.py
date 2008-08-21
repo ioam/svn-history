@@ -32,7 +32,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.sheetcoords import SheetCoordinateSystem
 # Imported here so that all OutputFns will be in the same package
 from topo.base.functionfamilies import IdentityOF,PipelineOF
-from topo.patterns.basic import Gaussian
+from topo.pattern.basic import Gaussian
 
 Pipeline = PipelineOF
 
@@ -302,7 +302,7 @@ class PatternCombine(OutputFn):
 
         Any binary Numeric array "ufunc" returning the same type of
         array as the operands and supporting the reduce operator is
-        allowed here.  See topo.patterns.basic.Composite.operator for
+        allowed here.  See topo.pattern.basic.Composite.operator for
         more details.              
         """)
     
