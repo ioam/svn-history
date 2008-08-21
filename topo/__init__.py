@@ -22,7 +22,7 @@ that can be used with the above functions and classes::
   outputfn      - Output functions, for e.g. normalization or squashing
   responsefn    - Calculate the response of a Projection
   learningfn    - Adjust weights for a Projection
-  coordmapperfns - CoordinateMapperFn classes: map coords between Sheets
+  coordmapper - CoordinateMapperFn classes: map coords between Sheets
 
 Each of the library directories can be extended with new classes of
 the appropriate type, just by adding a new .py file to that directory.
@@ -38,7 +38,7 @@ __version__ = "$Revision$"
 __all__ = ['analysis',
            'base',
            'commands',
-           'coordmapperfns',
+           'coordmapper',
            'eps',
            'learningfn',
            'misc',

@@ -28,7 +28,7 @@ from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
-from topo.coordmapperfns.basic import Jitter
+from topo.coordmapper.basic import Jitter
 
 # Set up scaling for specific species
 # Very rough and incomplete -- e.g. msa should probably apply
