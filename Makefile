@@ -221,7 +221,7 @@ simulation-snapshot-tests:
 	rm -f examples/lissom_oo_or.ty_PICKLETEST*
 
 
-snapshot-tests: simulation-snapshot-tests snapshot-compatibility-tests
+snapshot-tests: simulation-snapshot-tests snapshot-compatibility-tests script-repr-tests
 
 print-info:
 	@echo Running at ${shell date +%s}
@@ -272,6 +272,10 @@ v_lissom:
 map-tests:
 	./topographica -c "default_density=8" examples/lissom_oo_or.ty -c "topo.sim.run(100);from topo.tests.test_map_measurement import *; test(plotgroups_to_test)" 
 
+script-repr-tests:
+	./topographica examples/hierarchical.ty -a -c "save_script_repr('topo/tests/script_repr_test.ty')"
+	./topographica topo/tests/script_repr_test.ty
+	rm topo/tests/script_repr_test.ty
 
 gui-tests: basic-gui-tests detailed-gui-tests
 

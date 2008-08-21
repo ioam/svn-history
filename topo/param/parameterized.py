@@ -923,9 +923,16 @@ class Parameterized(object):
         # Generate import statement
         cls = self.__class__.__name__
         mod = self.__module__
-        imports.append("from %s import %s" % (mod,cls))
 
-        return self.__class__.__name__ + "(" + (",\n"+prefix).join(settings) + ")"
+        bits = mod.split('.')
+
+        imports.append("import %s"%mod)
+        imports.append("import %s"%bits[0])
+
+        # CB: Doesn't give a nice repr, but I don't see what to do
+        # otherwise that will work in all cases. Also I haven't
+        # updated this code in other places (e.g. simulation).
+        return mod+'.'+self.__class__.__name__ + "(" + (",\n"+prefix).join(settings) + ")"
 
         
     def __str__(self):
