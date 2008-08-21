@@ -75,7 +75,7 @@ from math import pi, sqrt
 from topo.base.boundingregion import BoundingBox
 from topo.sheet.lissom import LISSOM
 from topo.sheet.generatorsheet import GeneratorSheet
-from topo.projections.basic import CFProjection
+from topo.projection.basic import CFProjection
 from topo.outputfn.basic import PiecewiseLinear
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.learningfn.optimized import CFPLF_Hebbian_opt

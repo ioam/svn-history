@@ -27,7 +27,7 @@ import topo.patterns.random
 import topo.patterns.rds
 
 from topo.sheet.generatorsheet import GeneratorSheet
-from topo.projections.basic import CFProjection, SharedWeightCFProjection
+from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.outputfn.basic import PiecewiseLinear,HalfRectifyAndSquare

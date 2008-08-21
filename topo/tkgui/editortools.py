@@ -16,8 +16,8 @@ from .. import param
 import topo.sheet
 from topo.sheet import *
 from topo.base.sheet import Sheet
-import topo.projections
-from topo.projections import *
+import topo.projection
+from topo.projection import *
 from topo.base.projection import Projection
 
 from editorobjects import EditorSheet, EditorProjection
@@ -187,7 +187,7 @@ class NodeTool(Frame):
 
 
 
-# JABHACKALERT: Currently only searches for topo.projections (connections have not been implemented yet).
+# JABHACKALERT: Currently only searches for topo.projection (connections have not been implemented yet).
 class ConnectionTool(Frame):
     """ 
     ConnectionTool extends Frame. It is expected to be included in a topographica

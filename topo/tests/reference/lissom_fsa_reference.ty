@@ -24,7 +24,7 @@ import numpy.oldnumeric as Numeric
 
 from topo.sheet.lissom import LISSOM
 from topo.sheet.generatorsheet import GeneratorSheet
-from topo.projections.basic import CFProjection, SharedWeightCFProjection
+from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet

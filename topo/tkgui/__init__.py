@@ -63,7 +63,7 @@ from topo.ep import *
 from topo.learningfn import *
 from topo.outputfn import *
 from topo.patterns import *
-from topo.projections import *
+from topo.projection import *
 from topo.responsefn import *
 from topo.sheet import *
 

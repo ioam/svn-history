@@ -49,7 +49,7 @@ import topo.patterns.random
 from topo.patterns.basic import Gaussian
 from topo.sheet.lissom import JointScaling, LISSOM
 from topo.sheet.generatorsheet import GeneratorSheet
-from topo.projections.basic import CFProjection, SharedWeightCFProjection
+from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet, CFPLF_PluginScaled, CFPOF_Plugin
 from topo.base.boundingregion import BoundingBox

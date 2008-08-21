@@ -31,7 +31,7 @@ import topo.patterns.basic
 from topo.base.arrayutils import array_argmax
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet 
-from topo.projections.basic import CFProjection, SharedWeightCFProjection
+from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.base.functionfamilies import OutputFn
 from topo.learningfn.basic import Hebbian
 from topo.learningfn.projfns import HomeoSynaptic
