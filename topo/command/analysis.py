@@ -336,7 +336,7 @@ def save_plotgroup(name,saver_params={},**params):
     (To pass an optional parameter to the PlotFileSaver itself, the
     saver_params dictionary can be used.)
     """
-    plotgroup = plotgroups[name]
+    plotgroup = copy.deepcopy(plotgroups[name])
 
     # JABALERT: Why does a Projection plot need a Sheet parameter?
     # CB: It shouldn't, of course, since we know the sheet when we have
