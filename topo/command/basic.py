@@ -456,3 +456,10 @@ def wipe_out_activity():
         for c in s.in_connections:
             if hasattr(c,'activity'):
                 c.activity*=0.0
+
+
+# maybe an explicit list would be better?
+import types
+__all__ = list(set([k for k,v in locals().items()
+                    if isinstance(v,types.FunctionType)
+                    and not v.__name__.startswith('_')]))
