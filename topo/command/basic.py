@@ -199,19 +199,20 @@ def load_snapshot(snapshot_name):
     except: # what?
         p = param.Parameterized(name="load_snapshot")
         p.message("snapshot '%s' couldn't be loaded; installing legacy support"%snapshot_name)
-        # should print/log error
         import topo.misc.legacy as L 
         L.SnapshotSupport.install()
         try:
             _load_pickle(snapshot)
             p.message("snapshot loaded successfully with legacy support")
-        except: # what?
+        except Exception, inst: # what?
             m = "snapshot could not be loaded. If you make a copy " + \
                 "of the snapshot available to Topographica's developers, support " + \
                 "can probably be added to Topographica; please email " + \
-                "developers at topographica.org or file a bug report at sf.net."
-            p.message(m)
-            # should print/log error
+                "developers[at]topographica.org, or file a bug report at " + \
+                "www.sf.net/projects/topographica.\n" + \
+                "Error:"
+            p.warning(m)
+            raise 
         
 
 
