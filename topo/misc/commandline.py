@@ -267,7 +267,7 @@ def auto_import_commands():
     from filepaths import application_path
     import __main__
 
-    for f in os.listdir(os.path.join(application_path,"topo/commands")):
+    for f in os.listdir(os.path.join(application_path,"topo/command")):
         if re.match('^[^_].*\.py$',f):
             modulename = re.sub('\.py$','',f)
             exec "from topo.command."+modulename+" import *" in __main__.__dict__
