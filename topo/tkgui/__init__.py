@@ -59,7 +59,7 @@ from topoconsole import TopoConsole,ControllableMenu
 # derived from the one specified in each widget, and imported before
 # the relevant GUI window starts.
 from topo.coordmapper import *
-from topo.eps import *
+from topo.ep import *
 from topo.learningfn import *
 from topo.outputfn import *
 from topo.patterns import *
