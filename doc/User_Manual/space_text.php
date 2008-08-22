@@ -163,7 +163,7 @@ realized exactly.  For this reason, the quantities set by the user are
 called <code>nominal_density</code> and <code>nominal_bounds</code>,
 and the true bounds and density are calculated from these.
 
-<P>For instance, consider requesting that a Sheet has bounds of
+<P>For instance, consider requesting that a Sheet have bounds of
 <code>BoundingBox(radius=0.3)</code>, and density of <code>7</code>.
 Such an area (a 0.6 x 0.6 square) cannot be tiled exactly by 7 units
 per 1.0 length. When a sheet is created, the density will be adjusted
