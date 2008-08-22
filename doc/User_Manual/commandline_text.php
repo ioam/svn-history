@@ -16,19 +16,37 @@ a Sheet named V1, you can display and change V1's parameters using
 Python commands:
 
 <pre>
-$ ./topographica -i examples/cfsom_or.ty 
-Topographica&gt; V1.density
-50
-Topographica&gt; V1.output_fn
-&lt;Identity00003&gt;
-Topographica&gt; from topo.outputfn.basic import *
-Topographica&gt; V1.output_fn=PiecewiseLinear(lower_bound=0.1,upper_bound=0.8)
-Topographica&gt; V1.output_fn
-&lt;PiecewiseLinear05032&gt;
-Topographica&gt; V1.activity
-array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-              0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-              0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+[cloud]v1cball: ./topographica -i examples/cfsom_or.ty 
+
+Welcome to Topographica!
+
+Type help() for interactive help with python, help(topo) for general
+information about Topographica, help(commandname) for info on a
+specific command, or topo.about() for info on this release, including
+licensing information.
+
+
+
+topo_t000000.00_c1&gt;&gt;&gt; topo.sim['V1'].density
+               Out[1]:50.0
+
+topo_t000000.00_c2&gt;&gt;&gt; topo.sim['V1'].output_fn
+               Out[2]:KernelMax(crop_radius_mugtiplier=...)
+
+topo_t000000.00_c3&gt;&gt;&gt; from topo.outputfn import *
+
+topo_t000000.00_c4&gt;&gt;&gt; topo.sim['V1'].output_fn=PiecewiseLinear(lower_bound=0.1,
+                 ...:                                          upper_bound=0.8)
+
+topo_t000000.00_c5&gt;&gt;&gt; topo.sim['V1'].output_fn
+               Out[5]:PiecewiseLinear(lower_bound=...)
+
+topo_t000000.00_c6&gt;&gt;&gt; topo.sim['V1'].activity
+               Out[6]:
+array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
 ...
 </pre>
 
@@ -37,51 +55,99 @@ to avoid filling your terminal with numbers.  If you do want to see
 the data, you can tell numpy to print even the largest arrays:
 
 <pre>
-Topographica&gt; numpy.set_printoptions(threshold=2**30)
+topo_t000000.00_c7&gt;&gt;&gt; numpy.set_printoptions(threshold=2**30)
 </pre>
 
 <P>To see what is available for inspection or manipulation for any
 object, you can use <code>dir()</code>:
 
 <pre>
-$ ./topographica -i examples/cfsom_or.ty 
-Topographica&gt; dir(V1)
-['_Sheet__saved_activity', ..., 'apply_output_fn', 'bounds', 'density', ...]
-Topographica&gt; 
+topo_t000000.00_c10&gt;&gt;&gt; dir(topo.sim['V1'])
+               Out[10]:
+['_EventProcessor__abstract',
+...
+ 'activity',
+ 'activity_len',
+ 'apply_output_fn',
+ 'bounds',
+...]
 </pre>
 
 Note the directory will typically include many items that are not
 useful to inspect, including those starting with an underscore
 (<code>_</code>), but it gives a good idea what an object contains.
-You can also get help for most objects:
+You can also get information about most objects by typing
+<code>?</code> after the name, or by using the <code>help()</code>
+function for more detailed information:
 
 <pre>
-$ ./topographica -i examples/cfsom_or.ty 
-Topographica&gt; help(V1)
-Help on CFSOM in module topo.sheet.cfsom object:
+topo_t000000.00_c11>>>  PiecewiseLinear?
+...
+Docstring:
+    Piecewise-linear OutputFn with lower and upper thresholds.
+    
+    Values below the lower_threshold are set to zero, those above
+    the upper threshold are set to 1.0, and those in between are
+    scaled linearly.
 
-class CFSOM(topo.base.connectionfield.CFSheet)
- |  Kohonen Self-Organizing Map algorithm extended to support ConnectionFields.
+Constructor information:
+Definition:     PiecewiseLinear(self, **params)
+Docstring:
+    Initialize this Parameterized instance.
+    
+    The values of parameters can be supplied as keyword arguments
+    to the constructor (using parametername=parametervalue); these
+    values will override the class default values for this one
+    instance.
+    
+    If no 'name' parameter is supplied, self.name defaults to the
+    object's class name with a unique number appended to it.
+
+
+topo_t000000.00_c12&gt;&gt;&gt; help(topo.sim['Retina'])
+
+Help on GeneratorSheet in module topo.sheet.generator object:
+
+class GeneratorSheet(topo.base.sheet.Sheet)
+ |  Sheet for generating a series of 2D patterns.
  |  
- |  This is an implementation of the Kohonen SOM algorithm extended to
- |  support ConnectionFields, i.e., different spatially restricted
- |  input regions for different units.  With fully connected input
- |  regions, it should be usable as a regular SOM as well.
+ |  Typically generates the patterns by choosing parameters from a
+ |  random distribution, but can use any mechanism.
+ |  
 ...
  |  Methods defined here:
  |  
  |  __init__(self, **params)
  |  
- |  alpha(self)
- |      Return the learning rate at a specified simulator time, using exponential falloff.
+ |  generate(self)
+ |      Generate the output and send it out the Activity port.
+ |  
 ...
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |  
+ |  apply_output_fn
+ |      Whether to apply the output_fn after computing an Activity matrix.
+ |  
+ |  input_generator
+ |      Specifies a particular PatternGenerator type to use when creating patterns.
+ |  
+... 
  |  ----------------------------------------------------------------------
  |  Data and other attributes defined here:
  |  
- |  alpha_0 = 0.5
-...
-Topographica&gt;
+ |  src_ports = ['Activity']
+ |  
+... 
 </pre>
+
+<P>Topographica uses <A href="http://ipython.scipy.org/">IPython</A>
+for its interactive prompt, providing many convenient facilities for
+interactive work. The 
+<A href="http://ipython.scipy.org/doc/manual/html/interactive/tutorial.html">
+IPython Quick Tutorial</A> is a good place to learn about some of these.
+
+
 
 <H2>Plotting from the command line</H2>
 
@@ -147,10 +213,10 @@ Resulting plot:
 </center>
 
 <P>See the <A
-href="http://numeric.scipy.org/numpydoc/numdoc.htm">Numeric</A>
-documentation for more details on the mathematical expressions and
+href="http://scipy.org/Documentation">numpy documentation</A>
+for more details on the mathematical expressions and
 functions supported, and the <A
-href="http://matplotlib.sourceforge.net/">MatPlotLib</A> documentation
+href="http://matplotlib.sourceforge.net/">MatPlotLib documentation</A> 
 for how to make new plots and change their axes, labels, titles, line
 styles, etc.
 
@@ -207,6 +273,7 @@ only for interactive debugging.
 
 <H2>Customizing the command prompt</H2>
 
+<!--CEBALERT: out of date...-->
 <P>The contents of the command prompt itself are controlled by
 the class variable <code>CommandPrompt.format</code>, which can be set
 to any Python code that evaluates to a string.  As of 12/2006, the
@@ -267,14 +334,14 @@ CommandPrompt.format = CommandPrompt.ansi_format
 
 If you want to study exactly how Topographica is operating, e.g. to
 extend it or control it from the command line, you can consider
-changing the <code>topo.param.parameterized..min_print_level</code>
+changing the <code>topo.param.parameterized.min_print_level</code>
 parameter so that messages will be printed whenever Topographica
 performs an action.  For instance, you can enable verbose messaging
 by starting Topographica as:
 
 <pre>
-  ./topographica -c "from topo.base import parameterizedobject" \
-  -c "parameterizedobject.min_print_level=parameterizedobject.VERBOSE" ...
+  ./topographica -c "from topo import param" \
+  -c "param.parameterized.min_print_level=parameterizedobject.VERBOSE" ...
 </pre>
 
 Instead of VERBOSE, you can use any of the other message levels
@@ -388,19 +455,21 @@ parameter name to use from the command line or in a script, you can
 turn off the parameter name reformatting:
 
 <pre>
-  from topo.tkgui.tkparameterizedobject import TkParameterized
+  from topo.param.tk import TkParameterized
   TkParameterized.pretty_parameters=False
 </pre>
 
 <!--CB: this document sounds like we keep adding things
 to the end of it...-->
 
-<P>One can also open a GUI window to inspect or edit any Parameterized: 
+<P>One can also open a GUI window to inspect or edit any Parameterized object: 
 
 <pre>
- from topo.tkgui.parametersframe import edit_parameters
+ from topo.param.tk import edit_parameters
  edit_parameters(topo.sim['V1']) 
 </pre>
 
-This gives a ParametersFrame representing the Parameters of <code>topo.sim['V1']</code>,
-allowing values to be inspected and changed. (This is the same editing window as is available through the <a href="modeleditor.html#parameters">model editor</a>.) 
+This gives a ParametersFrame representing the Parameters
+of <code>topo.sim['V1']</code>, allowing values to be inspected and
+changed. (This is the same editing window as is available through
+the <a href="modeleditor.html#parameters">model editor</a>.)
