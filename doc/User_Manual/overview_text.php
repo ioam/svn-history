@@ -45,11 +45,11 @@ Topographica that requires an object of type Animal will accept a
 Collie or a Terrier as well, plus any user-defined object of type Dog.
 
 
-<H3>Parameterizeds and Parameters</H3>
+<H3>Parameterized objects and Parameters</H3>
 
 <ul>
-<li><?php classref('topo.base.parameterizedobject','Parameterized')?>
-<li><?php classref('topo.base.parameterizedobject','Parameter')?>
+<li><?php classref('topo.param.parameterized','Parameterized')?>
+<li><?php classref('topo.param.parameterized','Parameter')?>
     <ul>
     <li><?php classref('topo.base.parameterclasses','Number')?>
         <ul>
@@ -63,17 +63,16 @@ Collie or a Terrier as well, plus any user-defined object of type Dog.
 
 <P>In Python, any object can have <i>attributes</i>, which consist of
 a name and a value (of any type).  Topographica provides an extended
-version of attributes called
-<?php classref('topo.base.parameterizedobject','Parameter')?>s, which have
-their own documentation, range and type error checking, and mechanisms for
+version of attributes called <?php
+classref('topo.param.parameterized','Parameter')?>s, which have their
+own documentation, range and type error checking, and mechanisms for
 inheritance of default values.  These features are provided for any
-<?php classref('topo.base.parameterizedobject','Parameterized')?>,
+<?php classref('topo.param.parameterized','Parameterized')?> object,
 which is a Python object extended to support <?php
-classref('topo.base.parameterizedobject','Parameter')?>s, such as
-allowing any parameter to be set by keyword arguments when creating
-the object.  Most Topographica objects are 
-<?php classref('topo.base.parameterizedobject','Parameterized')?>s.
-<A HREF="parameters.html">Parameters</A> are discussed in more detail on 
+classref('topo.param.parameterized','Parameter')?>s.  Most
+Topographica objects are <?php
+classref('topo.param.parameterized','Parameterized')?>.  <A
+HREF="parameters.html">Parameters</A> are discussed in more detail on
 <A HREF="parameters.html">a separate page</A>.
 
 
@@ -90,8 +89,8 @@ the object.  Most Topographica objects are
 
 <P>The set of objects to be simulated is kept by the 
 <?php classref('topo.base.simulation','Simulation')?> class,
-which keeps track of the current simulator time, 
-<?php classref('topo.base.simulation','Event')?>s,
+which keeps track of the current simulator time along with 
+<?php classref('topo.base.simulation','Event')?>s
 that are currently occurring or are scheduled to occur in the future.
 The objects in the simulation are of type
 <?php classref('topo.base.simulation','EventProcessor')?>,
@@ -120,9 +119,10 @@ that could be relevant for a model.
 	  topographic map models as-is, but others need specific
 	  extensions.
             <ul>
-            <li><?php classref('topo.sheets.cfsom','CFSOM')?>: 
+<!--CEBALERT: CFSOM is deprecated... -->
+            <li><?php classref('topo.sheet.cfsom','CFSOM')?>: 
 	      CFSheet with extensions to support the Kohonen SOM algorithm.
-            <li><?php classref('topo.sheets.lissom','LISSOM')?>: 
+            <li><?php classref('topo.sheet.lissom','LISSOM')?>: 
 	      CFSheet with extensions to support the LISSOM algorithm.
             </ul>
         </ul>
@@ -173,6 +173,7 @@ is considered the actual response of each unit.  (The Projection
 activity is just a handy way of computing and reasoning about the
 contribution of each Projection to this overall Sheet activity.)
 
+<!-- CEBALERT: 'The' to 'One'?-->
 <P>The specific type of Projection currently implemented is 
 <?php classref('topo.base.cf','CFProjection')?>, i.e. a Projection that
 consists of a set of <?php
@@ -189,9 +190,9 @@ to having one ConnectionField shared by every destination neuron.
 <ul>
 <li><?php classref('topo.base.patterngenerator','PatternGenerator')?>
     <ul>
-    <li><?php classref('topo.patterns.basic','Gaussian')?>
+    <li><?php classref('topo.pattern.basic','Gaussian')?>
     <li><?php classref('topo.base.patterngenerator','Constant')?>
-    <li><?php classref('topo.patterns.random','UniformRandom')?>
+    <li><?php classref('topo.pattern.random','UniformRandom')?>
     </ul>
 </ul>
 
@@ -205,11 +206,11 @@ producing 2D patterns is provided, as described on
 <ul>
 <li><?php classref('topo.base.functionfamilies','OutputFn')?>
     <ul>
-    <li><?php classref('topo.outputfns.basic','DivisiveNormalizeL1')?>
-    <li><?php classref('topo.outputfns.basic','DivisiveNormalizeL2')?>
-    <li><?php classref('topo.outputfns.basic','PiecewiseLinear')?>
-    <li><?php classref('topo.outputfns.basic','Pipeline')?>
-    <li><?php classref('topo.outputfns.basic','PatternCombine')?>
+    <li><?php classref('topo.outputfn.basic','DivisiveNormalizeL1')?>
+    <li><?php classref('topo.outputfn.basic','DivisiveNormalizeL2')?>
+    <li><?php classref('topo.outputfn.basic','PiecewiseLinear')?>
+    <li><?php classref('topo.outputfn.basic','Pipeline')?>
+    <li><?php classref('topo.outputfn.basic','PatternCombine')?>
     <li><?php classref('topo.base.functionfamilies','IdentityOF')?>
     </ul>
 </ul>
@@ -218,7 +219,7 @@ producing 2D patterns is provided, as described on
 <li><?php classref('topo.base.cf','CFPOutputFn')?>
     <ul>
     <li><?php classref('topo.base.cf','CFPOF_Plugin')?>
-    <li><?php classref('topo.outputfns.optimized','CFPOF_DivisiveNormalizeL1')?>
+    <li><?php classref('topo.outputfn.optimized','CFPOF_DivisiveNormalizeL1')?>
     </ul>
 </ul>
 
@@ -235,7 +236,7 @@ particular processing step of a Sheet or a Projection.  For instance,
 CFProjections have an output_fn applied after they calculate their
 activity, and a weights_output_fn applied after a set of weights is
 modified.  Sheets have an output_fn applied after they calculate their
-activity, and and PatternGenerators have an output_fn applied after
+activity, and PatternGenerators have an output_fn applied after
 the pattern is calculated.
 
 <P>The output_fn parameters allow the user to control calculations in
@@ -272,8 +273,8 @@ normalizing across an entire Projection.
 <li><?php classref('topo.base.cf','CFPResponseFn')?>
     <ul>
     <li><?php classref('topo.base.cf','CFPRF_Plugin')?>
-    <li><?php classref('topo.responsefns.optimized','CFPRF_DotProduct')?>
-    <li><?php classref('topo.responsefns.projfns','CFPRF_EuclideanDistance')?>
+    <li><?php classref('topo.responsefn.optimized','CFPRF_DotProduct')?>
+    <li><?php classref('topo.responsefn.projfns','CFPRF_EuclideanDistance')?>
     </ul>
 </ul>
 
@@ -294,8 +295,8 @@ entire Sheet.
 <li><?php classref('topo.base.functionfamilies','LearningFn')?>
     <ul>
     <li><?php classref('topo.base.functionfamilies','Hebbian')?>
-    <li><?php classref('topo.learningfns.basic','Oja')?>
-    <li><?php classref('topo.learningfns.basic','Covariance')?>
+    <li><?php classref('topo.learningfn.basic','Oja')?>
+    <li><?php classref('topo.learningfn.basic','Covariance')?>
     </ul>
 </ul>
 
@@ -303,8 +304,8 @@ entire Sheet.
 <li><?php classref('topo.base.cf','CFPLearningFn')?>
     <ul>
     <li><?php classref('topo.base.cf','CFPLF_Plugin')?>
-    <li><?php classref('topo.learningfns.optimized','CFPLF_Hebbian')?>
-    <li><?php classref('topo.learningfns.som','CFPLF_HebbianSOM')?>
+    <li><?php classref('topo.learningfn.optimized','CFPLF_Hebbian')?>
+    <li><?php classref('topo.learningfn.som','CFPLF_HebbianSOM')?>
     </ul>
 </ul>
 
@@ -355,15 +356,16 @@ developer.
 <p><li>Python with C interface (ignoring <i>everything</i> in topo/): 
 <dl><dt>Supports:</dt><dd>Anything is possible, with no performance or 
 	programming limitations (since anything can be written
-	efficiently in C, and the rest can be written in Python)
+	efficiently in C, and the rest can be written in Python).
     <dt>Limitations:</dt><dd>Need to do all programming yourself.  Can't
 	mix and match code with other researchers very easily, because
 	they are unlikely to choose similar interfaces or make similar 
 	assumptions.
 </dl>    
 <p><li>Everything in 1., plus event-driven simulator with parameterizable objects, debugging 
-        output, etc. (using just simulation.py, parameterclasses.py,
-        and parameterizedobject.py from topo/base/):
+       output, etc. (using just simulation.py from topo/base/ in addition to Parameter 
+       support from topo/param/):
+
 <dl><dt>Supports:</dt><dd>Running simulations of any physical system, with 
 	good semantics for object parameter specification with inheritance.
     <dt>Limitations:</dt><dd>Basic event structure is in Python, which is
@@ -430,6 +432,7 @@ libraries.
 at different levels from this list.  For instance, even for a model that
 is fully supported by the Topographica primitives in level 5, you may
 want to add an interface to an external sensor such as a camera, which
+<!--CEBALERT: still true about camera?-->
 would have to be implemented at level 1 because no such interface
 currently exists.  Data from the camera would then presumably appear
 in a form compatible with one of the lower layers 3-5, and could then
