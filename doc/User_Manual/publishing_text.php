@@ -164,9 +164,9 @@ save_plotgroup, but for publication it is usually better to use the
 original vector-format PDF files from which the bitmaps were
 generated.  The PDF files will usually be located near the bitmap used
 in the PlotGroup.  For instance, the 'Orientation Preference'
-PlotGroup defined in topo/commands/analysis.py specifies that the key
-is 'topo/commands/or_key_white_vert_small.png', and the corresponding
-PDF file is 'topo/commands/or_key_white_vert.pdf'.
+PlotGroup defined in topo/command/analysis.py specifies that the key
+is 'topo/command/or_key_white_vert_small.png', and the corresponding
+PDF file is 'topo/command/or_key_white_vert.pdf'.
 
 <H4>Activity and ConnectionField plots</H4>
 

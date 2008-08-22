@@ -79,14 +79,14 @@ and to plot or analyze any of the channels independently.
 function Subplotting.set_subplots:
 
 <pre>
-  from topo.commands.analysis import Subplotting
+  from topo.command.analysis import Subplotting
   Subplotting.set_subplots("Direction")
 </pre>
 
 or disabled entirely:
 
 <pre>
-  from topo.commands.analysis import Subplotting
+  from topo.command.analysis import Subplotting
   Subplotting.set_subplots()
 </pre>
 
@@ -102,8 +102,8 @@ measurement based on actively providing a stimulus and measuring the
 response.  These maps are calculated using a
 <a HREF="#measuring-preference-maps">general-purpose preference map
 analysis package</a>, described below, and are primarily specified in
-<A HREF="../Reference_Manual/topo.commands.analysis-module.html">
-topo/commands/analysis.py</A>. The available plots include:
+<A HREF="../Reference_Manual/topo.command.analysis-module.html">
+topo/command/analysis.py</A>. The available plots include:
 
 <dl>
 <dt>Position Preference</dt>
@@ -205,8 +205,8 @@ change the string in the Orientation Preference window from
 <code>measure_or_pref(num_phase=8)</code>.  The next time the plot is
 refreshed, the new value will be used instead.  To see what options
 are available for each command, see
-<A HREF="../Reference_Manual/topo.commands.analysis-module.html">
-topo/commands/analysis.py</A>.
+<A HREF="../Reference_Manual/topo.command.analysis-module.html">
+topo/command/analysis.py</A>.
 
 <P>Some plots also use a "plot command", called after the "update
 command" to actually visualize the results.  For instance,
@@ -275,7 +275,7 @@ Preference plots:
 4. pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
                                                      ('Confidence','OrientationSelectivity')])
 5. pg.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
-6. pg.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
+6. pg.add_static_image('Color Key','topo/command/or_key_white_vert_small.png')
    
    
 7. def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
@@ -350,7 +350,7 @@ you can adjust the FeatureMaps.selectivity_multiplier parameter:
 (ignoring FeatureMaps and PatternPresenter altogether), as long as it
 results in a SheetView added to the appropriate sheet_view_dict and
 specified in the template.  For instance, the
-<A HREF="../Reference_Manual/topo.commands.analysis-module.html#measure_cog">
+<A HREF="../Reference_Manual/topo.command.analysis-module.html#measure_cog">
 measure_cog</A> command used in Center of Gravity plots simply looks
 at each ConnectionField individually, computes its center of gravity,
 and builds a SheetView out of that (rather than presenting any input

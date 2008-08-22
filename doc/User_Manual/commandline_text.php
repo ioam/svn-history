@@ -21,7 +21,7 @@ Topographica&gt; V1.density
 50
 Topographica&gt; V1.output_fn
 &lt;Identity00003&gt;
-Topographica&gt; from topo.outputfns.basic import *
+Topographica&gt; from topo.outputfn.basic import *
 Topographica&gt; V1.output_fn=PiecewiseLinear(lower_bound=0.1,upper_bound=0.8)
 Topographica&gt; V1.output_fn
 &lt;PiecewiseLinear05032&gt;
@@ -58,7 +58,7 @@ You can also get help for most objects:
 <pre>
 $ ./topographica -i examples/cfsom_or.ty 
 Topographica&gt; help(V1)
-Help on CFSOM in module topo.sheets.cfsom object:
+Help on CFSOM in module topo.sheet.cfsom object:
 
 class CFSOM(topo.base.connectionfield.CFSheet)
  |  Kohonen Self-Organizing Map algorithm extended to support ConnectionFields.
@@ -91,7 +91,7 @@ program:</A>
 <pre>
 $ ./topographica -g examples/cfsom_or.ty
 Topographica&gt; topo.sim.run(1)
-Topographica&gt; from topo.commands.pylabplots import *
+Topographica&gt; from topo.command.pylabplots import *
 Topographica&gt; V1 = topo.sim['V1']
 Topographica&gt; matrixplot(V1.activity)
 Topographica&gt; vectorplot(V1.activity[0])
@@ -162,7 +162,7 @@ the Topographica GUI.  For instance, to measure an orientation map and
 save the resulting bitmaps to disk, just do:
 
 <pre>
-Topographica&gt; from topo.commands.analysis import save_plotgroup, measure_or_pref
+Topographica&gt; from topo.command.analysis import save_plotgroup, measure_or_pref
 Topographica&gt; measure_or_pref()
 Topographica&gt; save_plotgroup("Orientation Preference")
 </pre>
@@ -170,7 +170,7 @@ Topographica&gt; save_plotgroup("Orientation Preference")
 <P>The name "Orientation Preference" here is just the name used in the
 Plots menu, and the command "measure_or_pref()" is listed at the
 bottom of the Orientation Preference window.  These names and
-functions are typically defined in topo/commands/analysis.py, and are
+functions are typically defined in topo/command/analysis.py, and are
 used to present testing images and store the resulting responses.  The
 command save_plotgroup then uses this data to generate the bitmap
 images, and saves them to disk.
@@ -195,11 +195,11 @@ requires such importing to avoid confusion between similar commands
 defined in different files.  Still, typing these lines when working
 interactively at the command line can be tedious, so Topographica
 provides the "-a" command-line option, which automatically imports
-every command in topo/commands/*.py.  The "-g" option also
+every command in topo/command/*.py.  The "-g" option also
 automatically enables "-a", so that the commands will be available in
 the GUI as well.  Thus if you start Topographica as "./topographica
 -a" or "./topographica -g", then you can omit the <code>from
-topo.commands... import ...</code> lines above.  Still, it is best
+topo.command... import ...</code> lines above.  Still, it is best
 never to rely on this behavior when writing .ty script files or .py
 code, because of the great potential for confusion, so please use "-a"
 only for interactive debugging.
@@ -267,7 +267,7 @@ CommandPrompt.format = CommandPrompt.ansi_format
 
 If you want to study exactly how Topographica is operating, e.g. to
 extend it or control it from the command line, you can consider
-changing the <code>topo.base.parameterizedobject.min_print_level</code>
+changing the <code>topo.param.parameterized..min_print_level</code>
 parameter so that messages will be printed whenever Topographica
 performs an action.  For instance, you can enable verbose messaging
 by starting Topographica as:

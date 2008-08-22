@@ -21,10 +21,10 @@ PatternGenerator will return Gaussian-shaped patterns:
 
 <pre>
 $ ./topographica -g
-Topographica&gt; from topo.patterns.basic import Gaussian
+Topographica&gt; from topo.pattern.basic import Gaussian
 Topographica&gt; pg=Gaussian(xdensity=60,ydensity=60,size=0.3,aspect_ratio=1.0)
 Topographica&gt; 
-Topographica&gt; from topo.commands.pylabplots import *
+Topographica&gt; from topo.command.pylabplots import *
 Topographica&gt; matrixplot(pg())
 Topographica&gt; matrixplot(pg(size=0.5))
 </pre>
@@ -46,7 +46,7 @@ location:
 
 <pre>
 $ ./topographica -g
-Topographica&gt; from topo.patterns.basic import Gaussian
+Topographica&gt; from topo.pattern.basic import Gaussian
 Topographica&gt; from topo.misc.numbergenerators import UniformRandom
 Topographica&gt; input_pattern = Gaussian(size=0.08, aspect_ratio=4,
                  xdensity=60,ydensity=60,
@@ -62,8 +62,8 @@ Topographica&gt; matrixplot(input_pattern())
 </center>
 
 <P>There are many other types of patterns available already defined in
-the <A HREF="../Reference_Manual/topo.patterns-module.html">
-topo/patterns</A> directory, and adding new patterns is
+the <A HREF="../Reference_Manual/topo.pattern-module.html">
+topo/pattern</A> directory, and adding new patterns is
 straightforward.  Just find one from that directory to use as a
 starting point, then copy it to a new file, modify it, and put the new
 file in the patterns directory.  The new pattern should then show up
@@ -80,9 +80,9 @@ combining them.  For instance, you can make connection weights be
 random but with a Gaussian falloff in strength by setting:
 
 <pre>
-CFProjection.weights_generator=topo.patterns.basic.Composite(
-    generators=[topo.patterns.random.UniformRandom(),
-                topo.patterns.basic.Gaussian(aspect_ratio=1.0,size=0.2)],
+CFProjection.weights_generator=topo.pattern.basic.Composite(
+    generators=[topo.pattern.random.UniformRandom(),
+                topo.pattern.basic.Gaussian(aspect_ratio=1.0,size=0.2)],
     operator=numpy.multiply)
 </pre>
 
@@ -95,7 +95,7 @@ CFProjection.weights_generator=topo.patterns.basic.Composite(
 
 <pre>
 $ ./topographica -g
-Topographica&gt; from topo.patterns.basic import SineGrating, Disk, Composite
+Topographica&gt; from topo.pattern.basic import SineGrating, Disk, Composite
 Topographica&gt; import numpy
 Topographica&gt; surroundsine   = SineGrating(frequency=8.0,orientation=0.25*pi, phase=3*pi/2)
 Topographica&gt; centersine     = SineGrating(frequency=8.0,orientation=0.60*pi)
@@ -122,7 +122,7 @@ rotated, and placed together as a unit:
 
 <pre>
 $ ./topographica -g
-Topographica&gt; from topo.patterns.basic import Gaussian, Disk, Composite
+Topographica&gt; from topo.pattern.basic import Gaussian, Disk, Composite
 Topographica&gt; import numpy
 Topographica&gt; Disk.smoothing=0.005
 Topographica&gt; lefteye    = Disk(    aspect_ratio=0.7, x=0.04, y=0.10, size=0.08, scale=1.00)
@@ -142,7 +142,7 @@ Topographica&gt; matrixplot(pg(orientation=pi/1.8, x=0.2, y=0.1, offset=0.5, siz
 </center>
 
 <P>A wide variety of operators are provided for combining the patterns; see the
-<A HREF="../Reference_Manual/topo.patterns.basic.Composite-class.html#operator">
+<A HREF="../Reference_Manual/topo.pattern.basic.Composite-class.html#operator">
 Composite parameter <code>operator</code></A>) for more details.
 
 
@@ -155,15 +155,15 @@ PatternGenerator.  As a contrived example, weights can be choosen at
 random from a set of four different pattern generators:
 
 <pre>
-CFProjection.weights_generator=topo.patterns.basic.Selector(generators=[
-    topo.patterns.basic.Gaussian(
+CFProjection.weights_generator=topo.pattern.basic.Selector(generators=[
+    topo.pattern.basic.Gaussian(
         orientation=UniformRandom(lbound=-pi,ubound=pi,seed=99)),
-    topo.patterns.basic.Gaussian(aspect_ratio=1.0,
+    topo.pattern.basic.Gaussian(aspect_ratio=1.0,
         x=UniformRandom(lbound=-0.2,ubound=0.2,seed=12),
         y=UniformRandom(lbound=-0.2,ubound=0.2,seed=34)),
-    topo.patterns.basic.Rectangle(
+    topo.pattern.basic.Rectangle(
         size=0.3,orientation=UniformRandom(lbound=-pi,ubound=pi,seed=99)),
-    topo.patterns.basic.Disk(size=0.2)])
+    topo.pattern.basic.Disk(size=0.2)])
 </pre>
 
 <center>

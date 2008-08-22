@@ -4,14 +4,14 @@
 
 <P>The behavior of most of the objects making up a Topographica
 simulation can be controlled by variables called Parameters. A 
-<?php classref('topo.base.parameterizedobject','Parameter')?> 
+<?php classref('topo.param.parameterized.','Parameter')?> 
 is a special type of Python attribute extended to have
 features such as type and range checking, dynamically generated
 values, documentation strings, default values, etc., each of which
 is inherited from parent classes if not specified in a subclass.
 
 <P>Objects that can contain Parameters are called
-<?php classref('topo.base.parameterizedobject','Parameterized')?>.
+<?php classref('topo.param.parameterized.','Parameterized')?>.
 For instance, Sheets, Projections, and
 PatternGenerators are all Parameterizeds.  The Parameters of a
 Sheet include its <code>nominal_density</code> and <code>nominal_bounds</code>, and
@@ -22,7 +22,7 @@ the Parameters of a PatternGenerator include its <code>scale</code> and
 
 <P>For the most part, Parameters can be used just like Python
 attributes.  For instance, consider
-<code>G=topo.patterns.basic.Gaussian()</code>.  This is a
+<code>G=topo.pattern.basic.Gaussian()</code>.  This is a
 two-dimensional Gaussian pattern generator, which has the Parameters
 <code>scale</code>, <code>offset</code>, <code>x</code>,
 <code>y</code>, <code>size</code>, <code>aspect_ratio</code>, and
