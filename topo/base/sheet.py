@@ -83,6 +83,11 @@ class Sheet(EventProcessor,SheetCoordinateSystem):  # pylint: disable-msg=W0223
             in which Sheets can be laid out for visualization.""")
 
 
+    def _get_density(self):
+        return self.xdensity
+
+    density = property(_get_density,doc="""The sheet's true density (i.e. the xdensity, which is equal to the ydensity for a Sheet.)""")
+
     def __init__(self,**params):
         """
         Initialize this object as an EventProcessor, then also as
