@@ -7,7 +7,7 @@ then explains the structure of Topographica simulations of both types.
 <H2>Clocked simulations</H2>
 
 <P>Computer simulations of causal physical processes happening over a
-time periodare typically either <i>clocked</i> or <i>event-driven</i>.
+time period are typically either <i>clocked</i> or <i>event-driven</i>.
 A clocked simulation quantizes time into discrete steps, typically
 equally spaced.  Such an approach is a good way to approximate a
 continuous process, as long as the timestep is small enough.  For
