@@ -4,16 +4,16 @@
 
 <P>The behavior of most of the objects making up a Topographica
 simulation can be controlled by variables called Parameters. A 
-<?php classref('topo.param.parameterized.','Parameter')?> 
+<?php classref('topo.param.parameterized','Parameter')?> 
 is a special type of Python attribute extended to have
 features such as type and range checking, dynamically generated
 values, documentation strings, default values, etc., each of which
 is inherited from parent classes if not specified in a subclass.
 
 <P>Objects that can contain Parameters are called
-<?php classref('topo.param.parameterized.','Parameterized')?>.
+<?php classref('topo.param.parameterized','Parameterized')?> objects.
 For instance, Sheets, Projections, and
-PatternGenerators are all Parameterizeds.  The Parameters of a
+PatternGenerators are all Parameterized.  The Parameters of a
 Sheet include its <code>nominal_density</code> and <code>nominal_bounds</code>, and
 the Parameters of a PatternGenerator include its <code>scale</code> and
 <code>offset</code>.
@@ -22,7 +22,7 @@ the Parameters of a PatternGenerator include its <code>scale</code> and
 
 <P>For the most part, Parameters can be used just like Python
 attributes.  For instance, consider
-<code>G=topo.pattern.basic.Gaussian()</code>.  This is a
+<code>G=topo.pattern.Gaussian()</code>.  This is a
 two-dimensional Gaussian pattern generator, which has the Parameters
 <code>scale</code>, <code>offset</code>, <code>x</code>,
 <code>y</code>, <code>size</code>, <code>aspect_ratio</code>, and
@@ -46,19 +46,19 @@ been declared as a <code>Number</code> Parameter with bounds
 '(0,None)' (i.e. a minimum value of 0.0, and no maximum value). 
 
 <P>To provide reasonable checking for parameters of different types, a large number of
-<A HREF="../Reference_Manual/topo.base.parameterclasses-module.html">other
+<A HREF="../Reference_Manual/topo.param-module.html">other
 Parameter types</A> are provided besides
-<?php classref('topo.base.parameterclasses','Number')?>,
+<?php classref('topo.param','Number')?>,
 such as
-<?php classref('topo.base.parameterclasses','Integer')?>,
-<?php classref('topo.base.parameterclasses','Filename')?>,
-<?php classref('topo.base.parameterclasses','Enumeration')?>,
+<?php classref('topo.param','Integer')?>,
+<?php classref('topo.param','Filename')?>,
+<?php classref('topo.param','Enumeration')?>,
 and
-<?php classref('topo.base.parameterclasses','BooleanParameter')?>.
+<?php classref('topo.param','BooleanParameter')?>.
 Each of these types can be declared to be constant, in which case the
-value cannot be changed after the Parameterized that owns the
-Parameter has been created.  Some classes like
-<?php classref('topo.base.parameterclasses','Number')?> 
+value cannot be changed after the Parameterized object that owns the
+Parameter has been created.  Some classes, such as
+<?php classref('topo.param','Number')?>,
 allow the parameter values to be generated from a sequence or random
 distribution, such as for generating random input patterns.
 
@@ -72,8 +72,8 @@ Parameter does.
 
 <H2>Inheritance and class Parameters</H2>
 
-<P>Parameterizeds are designed to inherit Parameter values from
-their parent classes, so that Parameterizeds can use default
+<P>Parameterized objects inherit Parameter values from
+their parent classes, allowing Parameterized objects to use default
 values for most Parameters.  This is designed to work just as Python
 attribute inheritance normally works, but also inheriting any
 documentation, bounds, etc. associated with the Parameter, even when
@@ -95,7 +95,7 @@ have a default x value of 0.5.  Moreover, all <i>existing</i> objects
 of type Gaussian will also get the new x value of 0.5, unless the user
 has previously set the value of x on that object explicitly.  That is,
 setting a Parameter at the class level typically affects all existing
-and future objects from that Class, unless the object has overriden
+and future objects from that class, unless the object has overriden
 the value for that Parameter.  To affect only one object, set the
 value on that object by itself.
 
@@ -104,13 +104,13 @@ a single shared class Parameter.  For instance, constant parameters
 are expected to keep the same value even if the class Parameter is
 later changed.  Also, mutable Parameter objects, i.e. values that have
 internal state (such as lists, arrays, or class instances) can have
-very confusing behavior if they are shared between
-Parameterizeds, because changes to one Parameterized's
-value can affect all the others.  In both of these cases (constants
-and Parameters whose values may be mutable objects) the Parameter
-is typically set to <code>instantiate=True</code>, which forces every
-Parameterized owning that Parameter to instantiate its own
-private, independent copy when the Parameterized is created.
+very confusing behavior if they are shared between Parameterized
+objects, because changes to one Parameterized object's value can
+affect all the others.  In both of these cases (constants and
+Parameters whose values may be mutable objects) the Parameter is
+typically set to <code>instantiate=True</code>, which forces every
+Parameterized object owning that Parameter to instantiate its own
+private, independent copy when the Parameterized object is created.
 This avoids much confusion, but does prevent existing objects from
 being controlled as a group by changing the class Parameters.
 
@@ -126,9 +126,6 @@ with its own copy of the variable. For example:
 <pre>
 class Example(object):
     a = 10
-
-    def __init__(self,b):
-        self.b = b
 </pre>
 
 Here <code>a</code> is a class attribute, because it is declared at
@@ -137,17 +134,11 @@ Creating two instances of Example demonstrates that the value
 <code>a</code> is shared between the instances:
 
 <pre>
-Topographica> example1 = Example(b=12)
-Topographica> example2 = Example(b=5)
+Topographica> example1 = Example()
+Topographica> example2 = Example()
 Topographica> example1.a
 10
-Topographica> example1.b
-12
 Topographica> example2.a
-10
-Topographica> example2.b
-5
-Topographica> Example.a
 10
 Topographica> Example.a=7
 Topographica> example1.a
@@ -156,22 +147,18 @@ Topographica> example2.a
 7
 </pre>
 
-Note that setting the class attribute on the Example class changed the value
-held in both instances. For an Example instance to have its own, independent
-copy of the variable, it is necessary to set the variable directly on the 
-instance:
+Note that setting the class attribute on the Example class changed the
+value held in both instances. For an Example instance to have its own,
+independent copy of the variable, it is necessary to set the variable
+directly on the instance:
 
 <pre>
 Topographica> example2.a=19
-Topographica> Example.a
-7
-Topographica> example1.a
-7
 Topographica> Example.a=40
-Topographica> example2.a
-19
 Topographica> example1.a
 40
+Topographica> example2.a
+19
 </pre>
 
 Because instances share the object held in the class attribute, any
@@ -180,20 +167,14 @@ The same general rules apply to Parameters declared at the class
 level:
 
 <pre>
-from topo.params import Parameterized,Parameter
+from topo import param
 
-class ExampleP(Parameterized):
-
-    a = Parameter(default=10)
-
-    def __init__(self,b,**params):
-        # invoke Parameterized's parameter handling
-        super(ExampleP,self).__init__(**params)
-        self.b = b
+class ExampleP(param.Parameterized):
+    a = param.Parameter(default=10)
 </pre>
 
 <pre>
-Topographica> example1 = ExampleP(b=12)
+Topographica> example1 = ExampleP()
 Topographica> example1.a
 10
 Topographica> ExampleP.a = 40
@@ -201,12 +182,12 @@ Topographica> example1.a
 40
 </pre>
 
-However, if a specific Parameter value is passed in when creating
-the object, there will be a separate and independent copy containing
-that value:
+However, if a specific Parameter value is passed in when creating the
+object, there will be a separate and independent copy containing that
+value:
 
 <pre>
-Topographica> e1 = ExampleP(5,a=8)
+Topographica> e1 = ExampleP(a=8)
 Topographica> e1.a
 8
 Topographica> ExampleP.a = 12
@@ -220,30 +201,19 @@ Parameter(default=10,instantiate=True)</code>.  As mentioned above,
 this is useful when the Parameter will hold a mutable object, when
 sharing between instances would lead to confusion.
 
-<P>For instance, consider a Parameter whose value is the response
+<P>For instance, consider a Parameter whose value is the output 
 function <code>PiecewiseLinear</code>, which itself has the Parameters
 <code>upper_bound</code> and <code>lower_bound</code>. A user might
-want to declare that all his <code>CFSheet</code>s will have response
-functions that are <code>PiecewiseLinear</code>.  Without
+want to declare that all <code>CFSheet</code>s should have output
+functions that are <code>PiecewiseLinear</code>, by
+setting <code>CFSheet.output_fn=PiecewiseLinear()</code>.  Without
 <code>instantiate=True</code>, instances of the class
-<code>CFSheet</code>, with its attribute <code>output_fn</code>, would
-share a single <code>PiecewiseLinear</code> object. A user with a
-number of <code>CFSheet</code>s might be surprised to find that
-setting the <code>lower_bound</code> on one particular
-<code>CFSheet</code> would change it on them all:
+<code>CFSheet</code> would share a single <code>PiecewiseLinear</code>
+object. A user with a number of <code>CFSheet</code>s might be
+surprised to find that setting the <code>lower_bound</code> on one
+particular <code>CFSheet</code> would change it on them all.
 
-<pre>
-Topographica> CFSheet.output_fn = PiecewiseLinear()
-Topographica> LGNOn = CFSheet()
-Topographica> LGNOff = CFSheet()
-Topographica> LGNOff.output_fn.lower_bound
-0.1
-Topographica> LGNOn.output_fn.lower_bound = 0.05
-Topographica> LGNOff.output_fn.lower_bound
-0.05
-</pre>
-
-To avoid this confusion, the author of <code>CFSheet</code> can
+<P>To avoid this confusion, the author of <code>CFSheet</code> can
 declare that the output_fn Parameter always be instantiated:
 
 <pre>
@@ -254,8 +224,8 @@ In this case, each instance of CFSheet will have its own instance of
 PiecewiseLinear, independent of other <code>CFSheet</code>s'
 <code>PiecewiseLinear()</code> instances.  In fact, output_fn
 parameters (like others taking mutable objects) are typically declared
-not as Parameter but as OutputFunctionParameter, which sets
-<code>instantiate=True</code> automatically.  Thus in most cases
-users can use Parameters without worrying about the details of
-inheritance and instantiation, but the details have been included here
-because the behavior in unusual cases may be surprising.
+not as Parameter but as <?php classref('topo.param','ClassSelector')?>, which sets
+<code>instantiate=True</code> automatically.  Thus in most cases users
+can use Parameters without worrying about the details of inheritance
+and instantiation, but the details have been included here because the
+behavior in unusual cases may be surprising.
