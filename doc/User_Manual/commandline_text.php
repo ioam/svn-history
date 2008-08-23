@@ -143,9 +143,9 @@ class GeneratorSheet(topo.base.sheet.Sheet)
 
 <P>Topographica uses <A href="http://ipython.scipy.org/">IPython</A>
 for its interactive prompt, providing many convenient facilities for
-interactive work. The 
+interactive work (such as tab completion). The 
 <A href="http://ipython.scipy.org/doc/manual/html/interactive/tutorial.html">
-IPython Quick Tutorial</A> is a good place to learn about some of these.
+IPython Quick Tutorial</A> is a good place to learn about these.
 
 
 
