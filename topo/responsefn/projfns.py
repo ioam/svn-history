@@ -15,7 +15,7 @@ from .. import param
 
 from topo.base.cf import CFPResponseFn
 from topo.base.functionfamilies import ResponseFn,DotProduct
-from topo.base.arrayutils import L2norm
+from topo.base.arrayutil import L2norm
 
 # Imported here so that all ResponseFns will be in the same package
 from topo.base.cf import CFPRF_Plugin

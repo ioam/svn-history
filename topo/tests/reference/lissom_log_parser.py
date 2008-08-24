@@ -17,7 +17,7 @@ from numpy import array
 import topo
 from topo.tests.utils import array_almost_equal
 
-from topo.base.arrayutils import arg
+from topo.base.arrayutil import arg
 
 filename_base = ""
 

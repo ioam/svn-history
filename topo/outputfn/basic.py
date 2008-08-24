@@ -24,8 +24,8 @@ from numpy.oldnumeric import dot
 
 import topo
 from topo.base.sheet import activity_type
-from topo.base.arrayutils import clip_lower
-from topo.base.arrayutils import L2norm, norm, array_argmax
+from topo.base.arrayutil import clip_lower
+from topo.base.arrayutil import L2norm, norm, array_argmax
 from topo.base.functionfamilies import OutputFn
 from topo.base.patterngenerator import PatternGenerator,Constant
 from topo.base.boundingregion import BoundingBox

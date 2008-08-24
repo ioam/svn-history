@@ -14,7 +14,7 @@ from numpy.oldnumeric import array, zeros, Float,size, shape, maximum, add, ones
 from .. import param
 
 import topo
-from topo.base.arrayutils import octave_output, centroid, wrap
+from topo.base.arrayutil import octave_output, centroid, wrap
 from topo.base.cf import CFSheet, CFProjection, Projection
 from topo.base.projection import ProjectionSheet
 from topo.base.simulation import EPConnectionEvent

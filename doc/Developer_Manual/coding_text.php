@@ -278,7 +278,7 @@ not just one class but a superclass and several subclasses; such files
 are named after the superclass.  Other files contain a number of
 thematically linked functions or classes, not necessarily a class
 hierarchy; these should be named for the principle or theme that
-relates them (as in arrayutils.py).
+relates them (as in arrayutil.py).
 
 
 <H2><A NAME="paths">Accessing files and handling paths</A></H2>

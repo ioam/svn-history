@@ -30,9 +30,9 @@ import numpy
 from numpy.oldnumeric import arange, sqrt, pi, array, floor, transpose, argmax, argmin, cos, sin, log10
 
 import topo
-from topo.base.arrayutils import octave_output
+from topo.base.arrayutil import octave_output
 from topo.base.sheet import Sheet
-from topo.base.arrayutils import wrap
+from topo.base.arrayutil import wrap
 from topo.misc.filepaths import normalize_path
 from topo.analysis.vision import complexity
 import topo.analysis.vision
@@ -572,7 +572,7 @@ def plotrctg():
     import matplotlib
     import pylab
     from numpy import fabs
-    from topo.base.arrayutils import centroid
+    from topo.base.arrayutil import centroid
 
     # CEBALERT: make clearer (by doing in a more numpy way)
     # CEBHACKALERT: only last plot hangs around because plots are overwritten

@@ -7,7 +7,7 @@ from numpy import array
 from topo.command.analysis import decode_feature
 from topo.command.basic import pattern_present
 
-from topo.base.arrayutils import wrap
+from topo.base.arrayutil import wrap
 from topo.misc.utils import frange
 from topo.misc.keyedlist import KeyedList
 

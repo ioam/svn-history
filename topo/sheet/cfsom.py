@@ -10,7 +10,7 @@ from numpy.oldnumeric import argmax,exp,floor
 
 from .. import param
 
-from topo.base.arrayutils import L2norm
+from topo.base.arrayutil import L2norm
 from topo.base.cf import CFSheet
 from topo.learningfn.som import CFPLF_SOM
 

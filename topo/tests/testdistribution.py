@@ -15,7 +15,7 @@ import copy
 
 # for testing the statistics
 from math import pi, atan2, cos
-from topo.base.arrayutils import arg
+from topo.base.arrayutil import arg
 
 
 class TestDistribution(unittest.TestCase):
