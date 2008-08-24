@@ -112,7 +112,7 @@ def normalize_path(path="",prefix=None):
 
     If the path is not already absolute, it will be made
     absolute (using the specified prefix, which defaults
-    to filepaths.output_path) in the process.
+    to filepath.output_path) in the process.
 
     (Should do the same as Python's os.path.abspath(), except
     using the specified prefix rather than os.getcwd().)

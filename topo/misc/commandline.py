@@ -264,7 +264,7 @@ topo_parser.add_option("-c","--command",action = "callback",callback=c_action,ty
 def auto_import_commands():
     """Import the contents of all files in the topo/command/ directory."""
     import re,os
-    from filepaths import application_path
+    from filepath import application_path
     import __main__
 
     for f in os.listdir(os.path.join(application_path,"topo/command")):

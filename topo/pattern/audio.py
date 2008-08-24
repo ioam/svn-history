@@ -17,7 +17,7 @@ except ImportError:
 
 from .. import param
 
-from topo.misc.filepaths import Filename
+from topo.misc.filepath import Filename
 
 from topo.pattern.basic import OneDPowerSpectrum
 

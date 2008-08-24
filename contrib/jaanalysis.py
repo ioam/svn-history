@@ -31,7 +31,7 @@ def complex_analysis_function():
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p)
     
-    from topo.misc.filepaths import normalize_path
+    from topo.misc.filepath import normalize_path
     from topo.command.basic import save_snapshot
     save_snapshot(normalize_path('snapshot.typ'))
 
@@ -46,7 +46,7 @@ def v2_analysis_function():
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
     exec "from topo.analysis.vision import analyze_complexity" in __main__.__dict__
-    from topo.misc.filepaths import normalize_path
+    from topo.misc.filepath import normalize_path
 
     # Build a list of all sheets worth measuring
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
@@ -86,7 +86,7 @@ def rf_analysis():
     from topo.sheet.generator import GeneratorSheet
     from topo.command.analysis import measure_or_tuning_fullfield, measure_or_pref
     from topo.command.pylabplots import or_tuning_curve_batch
-    from topo.misc.filepaths import normalize_path    
+    from topo.misc.filepath import normalize_path    
     
     if(float(topo.sim.time()) <=20010): 
         # Build a list of all sheets worth measuring

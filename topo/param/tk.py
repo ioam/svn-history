@@ -185,8 +185,8 @@ from . import Boolean,String,Number,Selector,ClassSelector,\
      ObjectSelector,Callable,Dynamic,Parameter
 
 
-# CEBALERT: copied from topo.misc.filepaths, to make it clear what we
-# need. I guess we should consider how much of topo.misc.filepaths
+# CEBALERT: copied from topo.misc.filepath, to make it clear what we
+# need. I guess we should consider how much of topo.misc.filepath
 # we might want in topo/param...
 ########################################
 application_path = os.path.split(os.path.split(sys.executable)[0])[0]

@@ -22,7 +22,7 @@ import pickle
 
 from numpy.testing import assert_array_almost_equal
 
-from topo.misc.filepaths import resolve_path, normalize_path
+from topo.misc.filepath import resolve_path, normalize_path
 from topo.command.analysis import *
 from topo.plotting.plotgroup import plotgroups
 

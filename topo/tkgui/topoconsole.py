@@ -31,7 +31,7 @@ from ..param import tk
 import topo
 from topo.plotting.plotgroup import plotgroups, FeatureCurvePlotGroup
 from topo.misc.keyedlist import KeyedList
-from topo.misc.filepaths import resolve_path,normalize_path
+from topo.misc.filepath import resolve_path,normalize_path
 from topo.misc.commandline import sim_name_from_filename
 import topo.command.basic
 

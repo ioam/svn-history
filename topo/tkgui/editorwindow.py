@@ -13,7 +13,7 @@ from tkFileDialog import asksaveasfilename
 from .. import param
 
 import topo
-from topo.misc.filepaths import normalize_path
+from topo.misc.filepath import normalize_path
 from topo.base.sheet import Sheet
 from topo.base.projection import Projection
 

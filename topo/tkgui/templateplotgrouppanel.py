@@ -22,7 +22,7 @@ from numpy import abs
 from .. import param
 
 import topo.command.pylabplots
-from topo.misc.filepaths import normalize_path
+from topo.misc.filepath import normalize_path
 from topo.plotting.plotgroup import TemplatePlotGroup
 
 from plotgrouppanel import SheetPanel

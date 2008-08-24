@@ -50,7 +50,7 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.outputfn.basic import DivisiveNormalizeLinf,IdentityOF
 from topo.pattern.image import PatternSampler
 from topo.misc.numbergenerators import UniformRandom
-from topo.misc.filepaths import Filename
+from topo.misc.filepath import Filename
 from pylab import fix,ceil
 from numpy.random import seed, uniform, randint
 

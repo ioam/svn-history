@@ -19,7 +19,7 @@ from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet,CFProjection,Projection
 from topo.base.projection import ProjectionSheet
 from topo.misc.keyedlist import KeyedList
-from topo.misc.filepaths import resolve_path
+from topo.misc.filepath import resolve_path
 
 from plot import make_template_plot, Plot
 from plotfilesaver import PlotGroupSaver,CFProjectionPlotGroupSaver

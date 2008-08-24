@@ -19,7 +19,7 @@ from numpy.fft.fftpack import fft2
 from numpy.fft.helper import fftshift
 from numpy import abs
 import numpy.oldnumeric as Numeric
-from topo.misc.filepaths import normalize_path
+from topo.misc.filepath import normalize_path
 from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.cf import CFPOutputFn
 from topo.base.parameterclasses import Parameter,Number,ClassSelectorParameter,Integer,BooleanParameter

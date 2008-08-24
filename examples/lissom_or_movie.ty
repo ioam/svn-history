@@ -21,7 +21,7 @@ from numpy import arange
 
 from topo.plotting.bitmap import MontageBitmap
 from topo.misc.traces import ActivityMovie,InMemoryRecorder
-from topo.misc.filepaths import application_path
+from topo.misc.filepath import application_path
 
 # Can use any TrueType font on your system
 #title_font = ImageFont.truetype(os.path.join(application_path,'lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)

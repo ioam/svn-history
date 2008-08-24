@@ -31,7 +31,7 @@ import numpy.oldnumeric as Numeric
 
 from .. import param
 
-from topo.misc.filepaths import application_path
+from topo.misc.filepath import application_path
 
 # CBERRORALERT: currently fails on Windows
 # (But do we have to look up a font this way? Isn't there a simpler

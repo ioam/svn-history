@@ -31,8 +31,8 @@ from topo.base.cf import CFSheet
 from topo.base.projection import Projection, ProjectionSheet
 from topo.sheet.generator import GeneratorSheet
 from topo.misc.utils import ExtraPickler
-from topo.misc.filepaths import normalize_path
-from topo.misc import filepaths
+from topo.misc.filepath import normalize_path
+from topo.misc import filepath
 
 
 
@@ -383,17 +383,17 @@ def run_batch(script_file,output_directory="Output",
     if not os.path.isdir(normalize_path(output_directory)):
         os.mkdir(normalize_path(output_directory))
 
-    filepaths.output_path = normalize_path(os.path.join(output_directory,prefix))
+    filepath.output_path = normalize_path(os.path.join(output_directory,prefix))
     
-    if os.path.isdir(filepaths.output_path):
+    if os.path.isdir(filepath.output_path):
 	print "Batch run: Warning -- directory: " +  \
-              filepaths.output_path + \
+              filepath.output_path + \
               " already exists! Run aborted; rename directory or wait one minute before trying again."
         import sys
         sys.exit(-1)
     else:
-	os.mkdir(filepaths.output_path)
-        print "Batch run output will be in " + filepaths.output_path
+	os.mkdir(filepath.output_path)
+        print "Batch run output will be in " + filepath.output_path
 
     ##################################
     # capture stdout

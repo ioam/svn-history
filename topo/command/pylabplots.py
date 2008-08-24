@@ -33,7 +33,7 @@ import topo
 from topo.base.arrayutil import octave_output
 from topo.base.sheet import Sheet
 from topo.base.arrayutil import wrap
-from topo.misc.filepaths import normalize_path
+from topo.misc.filepath import normalize_path
 from topo.analysis.vision import complexity
 import topo.analysis.vision
 from topo.plotting.plot import make_template_plot, Plot

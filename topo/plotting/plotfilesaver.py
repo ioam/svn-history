@@ -14,7 +14,7 @@ import numpy
 
 from .. import param
 
-from topo.misc.filepaths import normalize_path
+from topo.misc.filepath import normalize_path
 import topo
 
 

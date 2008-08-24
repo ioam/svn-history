@@ -25,7 +25,7 @@ from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
 from topo.plotting.plotfilesaver import * 
 from topo.command.pylabplots import or_tuning_curve_batch, matrixplot
 from topo.command.analysis import save_plotgroup, measure_or_tuning_fullfield
-from topo.misc.filepaths import normalize_path,application_path
+from topo.misc.filepath import normalize_path,application_path
 from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.parameterclasses import Number, Parameter,Parameter,ClassSelectorParameter,ListParameter
 from topo.base.functionfamily import CoordinateMapperFn

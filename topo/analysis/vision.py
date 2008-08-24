@@ -23,7 +23,7 @@ import topo
 import topo.command.pylabplots
 from topo.base.cf import CFSheet
 from topo.base.sheetview import SheetView
-from topo.misc.filepaths import normalize_path
+from topo.misc.filepath import normalize_path
 from topo.misc.numbergenerators import UniformRandom
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
 

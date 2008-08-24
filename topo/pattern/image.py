@@ -16,7 +16,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.outputfn.basic import DivisiveNormalizeLinf,IdentityOF,OutputFn
-from topo.misc.filepaths import Filename
+from topo.misc.filepath import Filename
 
 
 class PatternSampler(param.Parameterized):
