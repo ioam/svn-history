@@ -18,10 +18,12 @@ the United Kingdom and the United States.  The principal developers are:
       University of Edinburgh, but also contributes optimizations and
       other code to Topographica.
 
-  <p><dt>Chris Ball, September 2005-</dt>
-  <dd>Chris works on nearly every part of Topographica, and is also working on
-      <a target="_top" href="http://homepages.inf.ed.ac.uk/v1cball/mae/">modeling
-      motion aftereffects in LISSOM</a>.
+  <p><dt><a target="_top"
+      href="http://homepages.inf.ed.ac.uk/v1cball/">Chris Ball</a>,
+      September 2005-</dt>
+  <dd>Chris has worked on nearly every part of Topographica.  From
+      September 2008 he will be a PhD student in Edinburgh, working on
+      modeling the development of auditory cortex.
 
   <p><dt><a target="_top" href="http://faculty.cs.tamu.edu/choe/">Yoonsuck Choe</a>, 2002-</dt>
   <dd>Yoonsuck is an Assistant Professor at Texas A&amp;M University.
