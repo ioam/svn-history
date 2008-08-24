@@ -1,3 +1,4 @@
+<!--CEBALERT: is this an up-to-date list?-->
 <P>
 The Topographica software code and documentation are
 copyright 2005-2007 James A. Bednar, Jan Antolik, Christopher Ball,
