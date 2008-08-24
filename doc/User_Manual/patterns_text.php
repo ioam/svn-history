@@ -21,10 +21,9 @@ PatternGenerator will return Gaussian-shaped patterns:
 
 <pre>
 $ ./topographica -g
-Topographica&gt; from topo.pattern.basic import Gaussian
-Topographica&gt; pg=Gaussian(xdensity=60,ydensity=60,size=0.3,aspect_ratio=1.0)
+Topographica&gt; from topo import pattern
+Topographica&gt; pg=pattern.Gaussian(xdensity=60,ydensity=60,size=0.3,aspect_ratio=1.0)
 Topographica&gt; 
-Topographica&gt; from topo.command.pylabplots import *
 Topographica&gt; matrixplot(pg())
 Topographica&gt; matrixplot(pg(size=0.5))
 </pre>
@@ -46,9 +45,9 @@ location:
 
 <pre>
 $ ./topographica -g
-Topographica&gt; from topo.pattern.basic import Gaussian
+Topographica&gt; from topo import pattern
 Topographica&gt; from topo.misc.numbergenerators import UniformRandom
-Topographica&gt; input_pattern = Gaussian(size=0.08, aspect_ratio=4,
+Topographica&gt; input_pattern = pattern.Gaussian(size=0.08, aspect_ratio=4,
                  xdensity=60,ydensity=60,
                  x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
                  y=UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
@@ -66,7 +65,7 @@ the <A HREF="../Reference_Manual/topo.pattern-module.html">
 topo/pattern</A> directory, and adding new patterns is
 straightforward.  Just find one from that directory to use as a
 starting point, then copy it to a new file, modify it, and put the new
-file in the patterns directory.  The new pattern should then show up
+file in the pattern/ directory.  The new pattern should then show up
 in the Test Pattern window of the GUI automatically, and can be used
 in scripts the same way.
 
@@ -80,9 +79,9 @@ combining them.  For instance, you can make connection weights be
 random but with a Gaussian falloff in strength by setting:
 
 <pre>
-CFProjection.weights_generator=topo.pattern.basic.Composite(
-    generators=[topo.pattern.random.UniformRandom(),
-                topo.pattern.basic.Gaussian(aspect_ratio=1.0,size=0.2)],
+CFProjection.weights_generator=pattern.Composite(
+    generators=[pattern.random.UniformRandom(),
+                pattern.Gaussian(aspect_ratio=1.0,size=0.2)],
     operator=numpy.multiply)
 </pre>
 
@@ -95,21 +94,22 @@ CFProjection.weights_generator=topo.pattern.basic.Composite(
 
 <pre>
 $ ./topographica -g
-Topographica&gt; from topo.pattern.basic import SineGrating, Disk, Composite
+Topographica&gt; from topo import pattern
 Topographica&gt; import numpy
-Topographica&gt; surroundsine   = SineGrating(frequency=8.0,orientation=0.25*pi, phase=3*pi/2)
-Topographica&gt; centersine     = SineGrating(frequency=8.0,orientation=0.60*pi)
-Topographica&gt; centerdisk     = Disk(aspect_ratio=1.0, size=0.35, smoothing=0.005)
-Topographica&gt; surrounddisk   = Disk(aspect_ratio=1.0, size=0.90, smoothing=0.005)
-Topographica&gt; surroundring   = Composite(generators=[surrounddisk,centerdisk],
-Topographica&gt;                            operator=numpy.subtract)
-Topographica&gt; center         = Composite(generators=[centersine,centerdisk],
-Topographica&gt;                            operator=numpy.multiply)
-Topographica&gt; surround       = Composite(generators=[surroundsine,surroundring],
-Topographica&gt;                            operator=numpy.multiply)
-Topographica&gt; centersurround = Composite(generators=[center,surround],
-Topographica&gt;                            operator=numpy.add,
-Topographica&gt;                            xdensity=160,ydensity=160)
+Topographica&gt; surroundsine   = pattern.SineGrating(frequency=8.0,orientation=0.25*pi,
+Topographica&gt;                                      phase=3*pi/2)
+Topographica&gt; centersine     = pattern.SineGrating(frequency=8.0,orientation=0.60*pi)
+Topographica&gt; centerdisk     = pattern.Disk(aspect_ratio=1.0, size=0.35, smoothing=0.005)
+Topographica&gt; surrounddisk   = pattern.Disk(aspect_ratio=1.0, size=0.90, smoothing=0.005)
+Topographica&gt; surroundring   = pattern.Composite(generators=[surrounddisk,centerdisk],
+Topographica&gt;                                    operator=numpy.subtract)
+Topographica&gt; center         = pattern.Composite(generators=[centersine,centerdisk],
+Topographica&gt;                                    operator=numpy.multiply)
+Topographica&gt; surround       = pattern.Composite(generators=[surroundsine,surroundring],
+Topographica&gt;                                    operator=numpy.multiply)
+Topographica&gt; centersurround = pattern.Composite(generators=[center,surround],
+Topographica&gt;                                    operator=numpy.add,
+Topographica&gt;                                    xdensity=160,ydensity=160)
 Topographica&gt; matrixplot(centersurround())
 </pre>
 
@@ -122,18 +122,18 @@ rotated, and placed together as a unit:
 
 <pre>
 $ ./topographica -g
-Topographica&gt; from topo.pattern.basic import Gaussian, Disk, Composite
+Topographica&gt; from topo import pattern
 Topographica&gt; import numpy
-Topographica&gt; Disk.smoothing=0.005
-Topographica&gt; lefteye    = Disk(    aspect_ratio=0.7, x=0.04, y=0.10, size=0.08, scale=1.00)
-Topographica&gt; leftpupil  = Disk(    aspect_ratio=1.0, x=0.03, y=0.08, size=0.04, scale=-1.6)
-Topographica&gt; righteye   = Disk(    aspect_ratio=0.7, x=0.04, y=-0.1, size=0.08, scale=1.00)
-Topographica&gt; rightpupil = Disk(    aspect_ratio=1.0, x=0.03, y=-0.08,size=0.04, scale=-1.6)
-Topographica&gt; nose       = Gaussian(aspect_ratio=0.8, x=-0.1, y=0.00, size=0.04, scale=-0.5)
-Topographica&gt; mouth      = Gaussian(aspect_ratio=0.8, x=-0.2, y=0.00, size=0.06, scale=-0.8)
-Topographica&gt; head       = Disk(    aspect_ratio=1.5, x=-0.02,y=0.00, size=0.40, scale=0.70)
-Topographica&gt; pg=Composite(generators=[lefteye,leftpupil,righteye,rightpupil,nose,mouth,head],
-Topographica&gt;              operator=numpy.add,xdensity=160,ydensity=160)
+Topographica&gt; pattern.Disk.smoothing=0.005
+Topographica&gt; lefteye    = pattern.Disk(    aspect_ratio=0.7, x=0.04, y=0.10, size=0.08, scale=1.00)
+Topographica&gt; leftpupil  = pattern.Disk(    aspect_ratio=1.0, x=0.03, y=0.08, size=0.04, scale=-1.6)
+Topographica&gt; righteye   = pattern.Disk(    aspect_ratio=0.7, x=0.04, y=-0.1, size=0.08, scale=1.00)
+Topographica&gt; rightpupil = pattern.Disk(    aspect_ratio=1.0, x=0.03, y=-0.08,size=0.04, scale=-1.6)
+Topographica&gt; nose       = pattern.Gaussian(aspect_ratio=0.8, x=-0.1, y=0.00, size=0.04, scale=-0.5)
+Topographica&gt; mouth      = pattern.Gaussian(aspect_ratio=0.8, x=-0.2, y=0.00, size=0.06, scale=-0.8)
+Topographica&gt; head       = pattern.Disk(    aspect_ratio=1.5, x=-0.02,y=0.00, size=0.40, scale=0.70)
+Topographica&gt; pg=pattern.Composite(generators=[lefteye,leftpupil,righteye,rightpupil,nose,mouth,head],
+Topographica&gt;                      operator=numpy.add,xdensity=160,ydensity=160)
 Topographica&gt; matrixplot(pg(orientation=pi/1.8, x=0.2, y=0.1, offset=0.5, size=0.75))
 </pre>
 
@@ -143,7 +143,7 @@ Topographica&gt; matrixplot(pg(orientation=pi/1.8, x=0.2, y=0.1, offset=0.5, siz
 
 <P>A wide variety of operators are provided for combining the patterns; see the
 <A HREF="../Reference_Manual/topo.pattern.basic.Composite-class.html#operator">
-Composite parameter <code>operator</code></A>) for more details.
+Composite parameter <code>operator</code></A> for more details.
 
 
 <H2>Selector patterns</H2>
@@ -155,15 +155,14 @@ PatternGenerator.  As a contrived example, weights can be choosen at
 random from a set of four different pattern generators:
 
 <pre>
-CFProjection.weights_generator=topo.pattern.basic.Selector(generators=[
-    topo.pattern.basic.Gaussian(
-        orientation=UniformRandom(lbound=-pi,ubound=pi,seed=99)),
-    topo.pattern.basic.Gaussian(aspect_ratio=1.0,
-        x=UniformRandom(lbound=-0.2,ubound=0.2,seed=12),
-        y=UniformRandom(lbound=-0.2,ubound=0.2,seed=34)),
-    topo.pattern.basic.Rectangle(
-        size=0.3,orientation=UniformRandom(lbound=-pi,ubound=pi,seed=99)),
-    topo.pattern.basic.Disk(size=0.2)])
+CFProjection.weights_generator=pattern.Selector(generators=[
+    pattern.Gaussian(orientation=UniformRandom(lbound=-pi,ubound=pi,seed=99)),
+    pattern.Gaussian(aspect_ratio=1.0,
+                     x=UniformRandom(lbound=-0.2,ubound=0.2,seed=12),
+                     y=UniformRandom(lbound=-0.2,ubound=0.2,seed=34)),
+    pattern.Rectangle(orientation=UniformRandom(lbound=-pi,ubound=pi,seed=99),
+                      size0.3=),
+    pattern.Disk(size=0.2)])
 </pre>
 
 <center>
