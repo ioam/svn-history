@@ -217,6 +217,7 @@ academic publication, please cite the following paper so that readers
 will know how to replicate your results and build upon them.  (Plus,
 it is only polite to cite work done by others that you rely on!)
 
+<!--CEBALERT: and there's a newer paper, right?-->
 <BLOCKQUOTE>
 James&nbsp;A. Bednar, Yoonsuck Choe, Judah De Paula, Risto
   Miikkulainen, Jefferson Provost, and Tal Tversky.
