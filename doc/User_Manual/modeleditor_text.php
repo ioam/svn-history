@@ -135,6 +135,7 @@ connected to. Release the mouse button:
 <center>
 <IMG WIDTH="649" HEIGHT="378" SRC="images/editorconnectiondrag.png">
 </center>
+<!--CEBALERT: should probably update screenshots.-->
 
 <p>If the target location is near to an existing sheet, this will form
 a connection between the two sheets and you will see the clear
@@ -241,8 +242,8 @@ script'.
 of the current simulation, which allows that simulation to be restored
 with exactly the same state later.  However, because this option
 requires saving a large portion of the internal state of Topographica,
-the snapshot files will not usually be loadable in a different version
-of Topographica after an upgrade.  Thus .typ snapshots should be
+the snapshot file might not be loadable in a different version of
+Topographica after an upgrade.  Thus .typ snapshots should be
 considered only temporary storage for a model.
 
 <P>'Save script' instead generates a Python script that, when run,
@@ -252,10 +253,9 @@ the Model Editor, because the resulting text file has very little of
 the internal state of Topographica, and it can easily be edited when
 necessary to work with other Topographica versions.  Moreover, the
 resulting .ty script can be edited to add features not yet supported
-by the Model Editor, such as generating dynamic numbers (e.g. to
-generate input patterns). Thus it is generally best to save a new
-model as a .ty script rather than a .typ snapshot.  Note that some
-editing of the .ty script may be necessary to make the script truly
-runnable, for features that have not yet been updated to provide good
-script representations, but such changes are typically quite minor.
+by the Model Editor. Thus it is generally best to save a new model as
+a .ty script rather than a .typ snapshot.  Note that some editing of
+the .ty script may be necessary to make the script truly runnable, for
+features that have not yet been updated to provide good script
+representations, but such changes are typically quite minor.
 
