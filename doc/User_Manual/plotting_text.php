@@ -348,7 +348,7 @@ you can adjust the FeatureMaps.selectivity_multiplier parameter:
 
 <P>Also note that the data for plotting can also be calculated in any other way
 (ignoring FeatureMaps and PatternPresenter altogether), as long as it
-results in a SheetView added to the appropriate sheet_view_dict and
+results in a SheetView added to the appropriate sheet_views dictionary and
 specified in the template.  For instance, the
 <A HREF="../Reference_Manual/topo.command.analysis-module.html#measure_cog">
 measure_cog</A> command used in Center of Gravity plots simply looks
