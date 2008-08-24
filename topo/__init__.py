@@ -9,24 +9,24 @@ information, see the individual subpackages::
   plotting       - Visualization functions and classes
   analysis       - Analysis functions and classes (besides plotting)
   tkgui          - Tk-based graphical user interface (GUI)
-  commands       - High-level user commands
+  command        - High-level user commands
   misc           - Various useful independent modules
 
 The Topographica primitives library consists of a family of classes
 that can be used with the above functions and classes::
 
-  sheets         - Sheet classes: 2D arrays of processing units
-  projections    - Projection classes: connections between Sheets
-  patterns       - PatternGenerator classes: 2D input or weight patterns 
-  eps            - EventProcessor classes: other simulation objects
-  outputfn      - Output functions, for e.g. normalization or squashing
-  responsefn    - Calculate the response of a Projection
-  learningfn    - Adjust weights for a Projection
-  coordmapper - CoordinateMapperFn classes: map coords between Sheets
+  sheet          - Sheet classes: 2D arrays of processing units
+  projection     - Projection classes: connections between Sheets
+  pattern        - PatternGenerator classes: 2D input or weight patterns 
+  ep             - EventProcessor classes: other simulation objects
+  outputfn       - Output functions, for e.g. normalization or squashing
+  responsefn     - Calculate the response of a Projection
+  learningfn     - Adjust weights for a Projection
+  coordmapper    - CoordinateMapperFn classes: map coords between Sheets
 
 Each of the library directories can be extended with new classes of
 the appropriate type, just by adding a new .py file to that directory.
-E.g. new PatternGenerator classes can be added to patterns/, and will
+E.g. new PatternGenerator classes can be added to pattern/, and will
 then show up in the GUI menus as potential input patterns.
 
 $Id$
@@ -37,9 +37,9 @@ __version__ = "$Revision$"
 # imported explicitly if desired.
 __all__ = ['analysis',
            'base',
-           'commands',
+           'command',
            'coordmapper',
-           'eps',
+           'ep',
            'learningfn',
            'misc',
            'outputfn',
