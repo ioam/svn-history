@@ -9,9 +9,9 @@ from numpy.oldnumeric import ones,Float32
 
 from .. import param
 
-from topo.base.functionfamilies import LearningFn
+from topo.base.functionfamily import LearningFn
 # Imported here so that all learning functions will be in the same package
-from topo.base.functionfamilies import Hebbian,IdentityLF
+from topo.base.functionfamily import Hebbian,IdentityLF
 
 
 

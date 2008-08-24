@@ -14,7 +14,7 @@ from topo.misc.keyedlist import KeyedList # CEBALERT: not in base
 
 from sheet import Sheet
 from simulation import EPConnection
-from functionfamilies import OutputFn,IdentityOF
+from functionfamily import OutputFn,IdentityOF
 from sheetview import ProjectionView
 
 class SheetMask(param.Parameterized):

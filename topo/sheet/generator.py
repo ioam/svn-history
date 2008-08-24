@@ -10,7 +10,7 @@ import copy
 from .. import param
 
 from topo.base.simulation import FunctionEvent, PeriodicEventSequence
-from topo.base.functionfamilies import OutputFn,IdentityOF
+from topo.base.functionfamily import OutputFn,IdentityOF
 from topo.base.sheet import Sheet 
 from topo.base.sheet import BoundingBox
 from topo.base.patterngenerator import PatternGenerator, Constant

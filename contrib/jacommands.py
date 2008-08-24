@@ -28,7 +28,7 @@ from topo.command.analysis import save_plotgroup, measure_or_tuning_fullfield
 from topo.misc.filepaths import normalize_path,application_path
 from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.parameterclasses import Number, Parameter,Parameter,ClassSelectorParameter,ListParameter
-from topo.base.functionfamilies import CoordinateMapperFn
+from topo.base.functionfamily import CoordinateMapperFn
 from topo.plotting.bitmap import MontageBitmap
 #from topo.misc.traces import ActivityMovie,InMemoryRecorder
 from topo.base.patterngenerator import PatternGenerator,Constant 

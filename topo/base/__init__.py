@@ -12,7 +12,7 @@ $Id$
 """
 __version__='$Revision$'
 
-__all__ = ['arrayutil','boundingregion','cf','functionfamilies','patterngenerator','projection','sheet','sheetcoords','sheetview','simulation']
+__all__ = ['arrayutil','boundingregion','cf','functionfamily','patterngenerator','projection','sheet','sheetcoords','sheetview','simulation']
 
 
 

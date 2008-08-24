@@ -66,7 +66,7 @@ Priorities:
 ### happening
 
 
-* functionfamilies.py
+* functionfamily.py
 (8) OutputFn: norm_value
 (8) LearningFn should have learning_rate param (see same alert in cf.py)
 

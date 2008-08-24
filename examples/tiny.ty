@@ -15,7 +15,7 @@ import topo.pattern.basic
  
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet,CFProjection,CFPOF_Plugin
-from topo.base.functionfamilies import LearningFn
+from topo.base.functionfamily import LearningFn
 from topo.learningfn.projfns import CFPLF_Plugin
 from topo.learningfn.basic import Hebbian
 from topo.outputfn.basic import PiecewiseLinear

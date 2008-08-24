@@ -26,12 +26,12 @@ import topo
 from topo.base.sheet import activity_type
 from topo.base.arrayutil import clip_lower
 from topo.base.arrayutil import L2norm, norm, array_argmax
-from topo.base.functionfamilies import OutputFn
+from topo.base.functionfamily import OutputFn
 from topo.base.patterngenerator import PatternGenerator,Constant
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheetcoords import SheetCoordinateSystem
 # Imported here so that all OutputFns will be in the same package
-from topo.base.functionfamilies import IdentityOF,PipelineOF
+from topo.base.functionfamily import IdentityOF,PipelineOF
 from topo.pattern.basic import Gaussian
 
 Pipeline = PipelineOF

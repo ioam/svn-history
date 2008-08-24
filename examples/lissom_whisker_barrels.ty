@@ -24,7 +24,7 @@ from topo import param
 
 from topo.base.patterngenerator import PatternGenerator
 from topo.command.analysis import PatternPresenter, Subplotting
-from topo.base.functionfamilies import CoordinateMapperFn
+from topo.base.functionfamily import CoordinateMapperFn
 from topo.coordmapper.basic import Grid
 
 import topo

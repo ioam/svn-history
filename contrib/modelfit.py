@@ -4,7 +4,7 @@ import numpy
 import pylab
 from numpy import array, size, mat, shape
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
-from topo.base.functionfamilies import IdentityOF
+from topo.base.functionfamily import IdentityOF
 import topo
 from topo.base.boundingregion import BoundingBox
 from topo.pattern.image import Image

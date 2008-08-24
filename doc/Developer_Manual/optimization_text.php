@@ -145,7 +145,7 @@ profile('topo.sim.run(200)',n=20)"
       200    0.002    0.000   29.415    0.147 projection.py:182(present_input)
       200    0.009    0.000   29.413    0.147 cf.py:786(activate)
       200    8.124    0.041   29.396    0.147 cf.py:352(__call__)
-   320000   12.163    0.000   21.270    0.000 functionfamilies.py:157(__call__)
+   320000   12.163    0.000   21.270    0.000 functionfamily.py:157(__call__)
       400    0.004    0.000   13.012    0.033 projection.py:151(process_current_time)
       200    0.007    0.000   12.851    0.064 cfsom.py:58(learn)
       200    0.008    0.000   12.804    0.064 cf.py:793(learn)
@@ -174,7 +174,7 @@ function is <code>cf.py:352(__call__)</code> (<code>cf.py</code>, line 352),
 <code>CFPRF_Plugin</code>'s <code>__call__()</code> method:
 
 <pre>
-from topo.base.functionfamilies import DotProduct
+from topo.base.functionfamily import DotProduct
 
 class CFPRF_Plugin(CFPResponseFn):
     """
@@ -222,7 +222,7 @@ function would it be worthwhile to begin with that.
 fine-grained information about the occupation of the CPU while
 executing the response function; the subsequent line in the output
 shows that about 70% of the time spent running the response function
-is spent in <code>functionfamilies.py:151(__call__)</code>,
+is spent in <code>functionfamily.py:151(__call__)</code>,
 <code>CFPRF_Plugin</code>'s default <code>single_cf_fn</code>:
 
 <pre>
@@ -279,7 +279,7 @@ profile('topo.sim.run(200)',n=20)"
       200    0.009    0.000   13.370    0.067 cfsom.py:58(learn)
       200    0.007    0.000   13.316    0.067 cf.py:793(learn)
       200    5.858    0.029   13.303    0.067 som.py:66(__call__)
-   320000    9.440    0.000    9.440    0.000 functionfamilies.py:149(__call__)
+   320000    9.440    0.000    9.440    0.000 functionfamily.py:149(__call__)
     52303    6.320    0.000    6.320    0.000 arrayutil.py:18(L2norm)
       400    0.054    0.000    4.589    0.011 patterngenerator.py:92(__call__)
       200    0.019    0.000    4.389    0.022 generatorsheet.py:106(input_event)
@@ -290,7 +290,7 @@ profile('topo.sim.run(200)',n=20)"
  7600/400    0.528    0.000    3.211    0.008 parameterizedobject.py:642(__repr__)
 </pre>
 
-<P>We can see from the above output that the time spent in <code>functionfamilies.py:149(__call__)</code>
+<P>We can see from the above output that the time spent in <code>functionfamily.py:149(__call__)</code>
 has been more than halved, and only about 60% as much time is now spent
 in <code>CFPRF_Plugin()</code>. Overall, we have cut the simulation run time to
 about 75% of its original value with just a few minutes' work.

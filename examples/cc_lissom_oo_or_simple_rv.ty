@@ -29,7 +29,7 @@ from topo.outputfn.basic import PiecewiseLinear,DivisiveNormalizeL1, PipelineOF,
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay, Choice
 from topo.pattern.basic import Gaussian
 from topo.learningfn.projfns import CFPLF_Trace
-from topo.base.functionfamilies import CoordinateMapperFn
+from topo.base.functionfamily import CoordinateMapperFn
 from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Translator
 
 

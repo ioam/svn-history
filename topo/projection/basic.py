@@ -19,7 +19,7 @@ from topo.base.sheet import activity_type
 from topo.base.cf import CFProjection,ConnectionField,MaskedCFIter,\
      CFPLearningFn,CFPLF_Identity,CFPOutputFn
 from topo.base.patterngenerator import PatternGenerator,Constant
-from topo.base.functionfamilies import CoordinateMapperFn,IdentityMF
+from topo.base.functionfamily import CoordinateMapperFn,IdentityMF
 from topo.misc.utils import rowcol2idx
 from topo.outputfn.basic import OutputFn,IdentityOF
 from topo.learningfn.basic import LearningFn,IdentityLF

@@ -18,7 +18,7 @@ from .. import param
 
 from topo.base.cf import CFPLearningFn
 from topo.base.sheet import activity_type
-from topo.base.functionfamilies import Hebbian,LearningFn
+from topo.base.functionfamily import Hebbian,LearningFn
 # Imported here so that all ProjectionLearningFns will be in the same package
 from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 

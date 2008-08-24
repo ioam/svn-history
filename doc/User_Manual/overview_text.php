@@ -204,14 +204,14 @@ producing 2D patterns is provided, as described on
 <H3>Output functions</H3>
 
 <ul>
-<li><?php classref('topo.base.functionfamilies','OutputFn')?>
+<li><?php classref('topo.base.functionfamily','OutputFn')?>
     <ul>
     <li><?php classref('topo.outputfn.basic','DivisiveNormalizeL1')?>
     <li><?php classref('topo.outputfn.basic','DivisiveNormalizeL2')?>
     <li><?php classref('topo.outputfn.basic','PiecewiseLinear')?>
     <li><?php classref('topo.outputfn.basic','Pipeline')?>
     <li><?php classref('topo.outputfn.basic','PatternCombine')?>
-    <li><?php classref('topo.base.functionfamilies','IdentityOF')?>
+    <li><?php classref('topo.base.functionfamily','IdentityOF')?>
     </ul>
 </ul>
 
@@ -262,9 +262,9 @@ normalizing across an entire Projection.
 <H3>Response functions</H3>
 
 <ul>
-<li><?php classref('topo.base.functionfamilies','ResponseFn')?>
+<li><?php classref('topo.base.functionfamily','ResponseFn')?>
     <ul>
-    <li><?php classref('topo.base.functionfamilies','DotProduct')?>
+    <li><?php classref('topo.base.functionfamily','DotProduct')?>
     </ul>
 </ul>
 
@@ -292,9 +292,9 @@ entire Sheet.
 <H3>Learning functions</H3>
 
 <ul>
-<li><?php classref('topo.base.functionfamilies','LearningFn')?>
+<li><?php classref('topo.base.functionfamily','LearningFn')?>
     <ul>
-    <li><?php classref('topo.base.functionfamilies','Hebbian')?>
+    <li><?php classref('topo.base.functionfamily','Hebbian')?>
     <li><?php classref('topo.learningfn.basic','Oja')?>
     <li><?php classref('topo.learningfn.basic','Covariance')?>
     </ul>

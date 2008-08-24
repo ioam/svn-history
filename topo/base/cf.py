@@ -30,10 +30,10 @@ from .. import param
 
 import patterngenerator
 from patterngenerator import PatternGenerator
-from functionfamilies import OutputFn,IdentityOF
-from functionfamilies import LearningFn,Hebbian,IdentityLF
-from functionfamilies import ResponseFn,DotProduct
-from functionfamilies import CoordinateMapperFn,IdentityMF
+from functionfamily import OutputFn,IdentityOF
+from functionfamily import LearningFn,Hebbian,IdentityLF
+from functionfamily import ResponseFn,DotProduct
+from functionfamily import CoordinateMapperFn,IdentityMF
 from projection import Projection,ProjectionSheet, SheetMask
 from sheetcoords import Slice
 from sheetview import UnitView

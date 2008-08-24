@@ -33,7 +33,7 @@ from topo.learningfn.projfns import CFPLF_Trace, CFPLF_Plugin,  CFPLF_OutstarHeb
 from topo.learningfn.som import CFPLF_HebbianSOM
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfn.basic import DivisiveNormalizeL2, KernelMax
-from topo.base.functionfamilies import CoordinateMapperFn
+from topo.base.functionfamily import CoordinateMapperFn
 from topo.misc.patternfns import line
 
 

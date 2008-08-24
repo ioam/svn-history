@@ -28,7 +28,7 @@ from topo.outputfn.projfns import CFPOF_Identity
 from topo.outputfn.basic import PiecewiseLinear,DivisiveNormalizeL1, Pipeline, HomeostaticMaxEnt, Sigmoid
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay, Choice
 from topo.pattern.basic import Gaussian
-from topo.base.functionfamilies import CoordinateMapperFn
+from topo.base.functionfamily import CoordinateMapperFn
 
 topo.sim.name = "3"
 

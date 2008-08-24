@@ -13,7 +13,7 @@ import copy
 from .. import param
 
 import topo
-from topo.base.functionfamilies import OutputFn
+from topo.base.functionfamily import OutputFn
 from topo.base.cf import CFSheet, CFPOutputFn
 from topo.base.projection import Projection
 from topo.base.sheet import activity_type

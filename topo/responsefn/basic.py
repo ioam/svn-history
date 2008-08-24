@@ -5,7 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.functionfamilies import ResponseFn
+from topo.base.functionfamily import ResponseFn
 
 # Imported here so that all ResponseFns will be in the same package
 from topo.base.cf import DotProduct

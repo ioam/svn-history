@@ -10,7 +10,7 @@ from numpy.oldnumeric import sum
 from .. import param
 
 from topo.base.cf import CFPOutputFn,CFPOF_Plugin
-from topo.base.functionfamilies import OutputFn, IdentityOF
+from topo.base.functionfamily import OutputFn, IdentityOF
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 
 from basic import DivisiveNormalizeL1

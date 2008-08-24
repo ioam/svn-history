@@ -14,7 +14,7 @@ from .. import param
 
 from topo.base.sheet import activity_type
 from topo.base.cf import CFPLearningFn,CFPLF_Plugin
-from topo.base.functionfamilies import Hebbian,LearningFn
+from topo.base.functionfamily import Hebbian,LearningFn
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 
 from projfns import CFPLF_Trace

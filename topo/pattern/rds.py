@@ -13,7 +13,7 @@ from ..param.parameterized import ParamOverrides
 
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.base.functionfamilies import IdentityOF
+from topo.base.functionfamily import IdentityOF
 
 
 ### JABHACKALERT: This code seems to work fine when the input regions

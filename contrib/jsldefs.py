@@ -23,7 +23,7 @@ from topo.misc.filepaths import normalize_path
 from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.cf import CFPOutputFn
 from topo.base.parameterclasses import Parameter,Number,ClassSelectorParameter,Integer,BooleanParameter
-from topo.base.functionfamilies import OutputFn, IdentityOF
+from topo.base.functionfamily import OutputFn, IdentityOF
 from topo.outputfn.basic import IdentityOF 
 
 #########################################################################

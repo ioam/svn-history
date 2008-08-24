@@ -232,16 +232,16 @@ class SnapshotSupport(object):
         # r8028 Removed CoordinateMapperFnParameter
         # r8029 Removed PatternGeneratorParameter
 
-        from topo.base.functionfamilies import OutputFn,ResponseFn,LearningFn,\
+        from topo.base.functionfamily import OutputFn,ResponseFn,LearningFn,\
              CoordinateMapperFn
         d = {"OutputFnParameter":OutputFn,
              "ResponseFnParameter":ResponseFn,
              "LearningFnParameter":LearningFn,
              "CoordinateMapperFnParameter":CoordinateMapperFn}        
 
-        import topo.base.functionfamilies
+        import topo.base.functionfamily
         for name,arg in d.items():
-            fake_a_class(topo.base.functionfamilies,name,
+            fake_a_class(topo.base.functionfamily,name,
                          param.ClassSelector,(arg,))
 
         from topo.base.cf import CFPOutputFn,CFPResponseFn,CFPLearningFn
@@ -373,5 +373,12 @@ from topo.sheet.generator import *
         
         fake_a_module('generatorsheet',topo.sheets,code,'topo.sheets')
 
+
+        # rXXXX renamed functionfamilies
+        code = \
+"""
+from topo.base.functionfamily import *
+"""
+        fake_a_module('functionfamilies',topo.base,code)
 
 
