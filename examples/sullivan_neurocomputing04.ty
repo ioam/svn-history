@@ -29,7 +29,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFProjection,CFPOF_Plugin,CFSheet
 from topo.sheet.cfsom import CFSOM
 from topo.responsefn.optimized import CFPRF_EuclideanDistance_opt,CFPRF_DotProduct_opt
-from topo.learningfn.projfns import CFPLF_Trace, CFPLF_Plugin,  CFPLF_OutstarHebbian
+from topo.learningfn.projfn import CFPLF_Trace, CFPLF_Plugin,  CFPLF_OutstarHebbian
 from topo.learningfn.som import CFPLF_HebbianSOM
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfn.basic import DivisiveNormalizeL2, KernelMax

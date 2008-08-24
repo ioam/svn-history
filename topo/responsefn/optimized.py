@@ -1,6 +1,6 @@
 """
 Response functions (see basic.py) and CFProjection response functions
-(see projfns.py) written in C to optimize performance.
+(see projfn.py) written in C to optimize performance.
 
 Requires the weave package; without it unoptimized versions are used.
 
@@ -13,7 +13,7 @@ from .. import param
 from topo.base.functionfamily import ResponseFn,DotProduct
 from topo.base.cf import CFPResponseFn, CFPRF_Plugin
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
-from topo.responsefn.projfns import CFPRF_EuclideanDistance
+from topo.responsefn.projfn import CFPRF_EuclideanDistance
 
 class CFPRF_DotProduct_opt(CFPResponseFn):
     """

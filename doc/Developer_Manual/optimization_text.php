@@ -82,7 +82,7 @@ versions. This is helpful both for understanding and for ensuring
 correctness.
 
 <P>For example, consider <code>CFPRF_DotProduct</code>, from
-<code>topo.responsefn.projfns</code>. If users wish to use a version
+<code>topo.responsefn.projfn</code>. If users wish to use a version
 optimized by having been written in C, they can instead import
 <code>CFPRF_DotProduct_opt</code> from
 <code>topo.responsefn.optimized</code>. We use

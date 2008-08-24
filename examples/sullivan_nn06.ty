@@ -34,7 +34,7 @@ from topo.base.cf import CFSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.base.functionfamily import OutputFn
 from topo.learningfn.basic import Hebbian
-from topo.learningfn.projfns import HomeoSynaptic
+from topo.learningfn.projfn import HomeoSynaptic
 from topo.learningfn.som import CFPLF_HebbianSOM
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfn.basic import PiecewiseLinear

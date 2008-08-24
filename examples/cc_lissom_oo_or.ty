@@ -27,7 +27,7 @@ from topo.outputfn.basic import PiecewiseLinear,DivisiveNormalizeL1,\
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber,\
      ExponentialDecay, Choice
 from topo.pattern.basic import Gaussian
-from topo.learningfn.projfns import CFPLF_Trace
+from topo.learningfn.projfn import CFPLF_Trace
 import topo.pattern.basic
 import topo.pattern.random
 

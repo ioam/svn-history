@@ -274,7 +274,7 @@ normalizing across an entire Projection.
     <ul>
     <li><?php classref('topo.base.cf','CFPRF_Plugin')?>
     <li><?php classref('topo.responsefn.optimized','CFPRF_DotProduct')?>
-    <li><?php classref('topo.responsefn.projfns','CFPRF_EuclideanDistance')?>
+    <li><?php classref('topo.responsefn.projfn','CFPRF_EuclideanDistance')?>
     </ul>
 </ul>
 

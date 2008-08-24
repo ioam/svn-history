@@ -22,7 +22,7 @@ from topo.base.cf import CFPLF_Plugin
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1
-from topo.learningfn.projfns import CFPLF_OutstarHebbian
+from topo.learningfn.projfn import CFPLF_OutstarHebbian
 from topo.misc.numbergenerators import UniformRandom
 
 

@@ -31,7 +31,7 @@ from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfn.basic import PiecewiseLinear,DivisiveNormalizeL1, HomeostaticMaxEnt
 from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.pattern.basic import Gaussian, Composite, SeparatedComposite
-from topo.responsefn.projfns import CFPRF_ActivityBased
+from topo.responsefn.projfn import CFPRF_ActivityBased
 
 
 num_inputs=2

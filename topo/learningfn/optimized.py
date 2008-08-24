@@ -1,6 +1,6 @@
 """
 Learning functions (see basic.py) and projection-level learning
-functions (see projfns.py) written in C to optimize performance.
+functions (see projfn.py) written in C to optimize performance.
 
 Requires the weave package; without it unoptimized versions are used.
 
@@ -17,7 +17,7 @@ from topo.base.cf import CFPLearningFn,CFPLF_Plugin
 from topo.base.functionfamily import Hebbian,LearningFn
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 
-from projfns import CFPLF_Trace
+from projfn import CFPLF_Trace
 
 
 
@@ -117,7 +117,7 @@ provide_unoptimized_equivalent("CFPLF_Hebbian_opt","CFPLF_Hebbian",locals())
 
 class CFPLF_Trace_opt(CFPLearningFn):
     """
-    Optimized version of CFPLF_Trace; see projfns.py for more info 
+    Optimized version of CFPLF_Trace; see projfn.py for more info 
     """
 
     trace_strength=param.Number(default=0.5,bounds=(0.0,1.0),doc="""

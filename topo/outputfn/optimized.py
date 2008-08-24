@@ -1,6 +1,6 @@
 """
 Output functions (see basic.py) and projection-level output functions
-(see projfns.py) written in C to optimize performance.
+(see projfn.py) written in C to optimize performance.
 
 Requires the weave package; without it unoptimized versions are used.
 """

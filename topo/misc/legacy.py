@@ -109,7 +109,7 @@ def fake_a_module(name,parent,source_code,parent_path=None):
     """Create the module parent.name using source_code."""
     # CB: parent path is necessary (even though it should be available
     # from parent) when faking a package
-    
+
     # create the module
     module = imp.new_module(name)
     exec source_code in module.__dict__
@@ -348,9 +348,9 @@ from topo.param import Dict as DictParameter
         # it doesn't work: importing topo.outputfns just gives topo
 
         # should read the list basic/optimized/etc from somewhere
-        fake_a_package('outputfns','outputfn',['basic','optimized','projfns'])
-        fake_a_package('responsefns','responsefn',['basic','optimized','projfns'])
-        fake_a_package('learningfns','learningfn',['basic','optimized','projfns'])
+        fake_a_package('outputfns','outputfn',['basic','optimized','projfn'])
+        fake_a_package('responsefns','responsefn',['basic','optimized','projfn'])
+        fake_a_package('learningfns','learningfn',['basic','optimized','projfn'])
         fake_a_package('coordmapperfns','coordmapper',['basic'])
         fake_a_package('sheets','sheet',['cfsom','composer','generator',
                                          'lissom','optimized','saccade','slissom'])
@@ -381,4 +381,16 @@ from topo.base.functionfamily import *
 """
         fake_a_module('functionfamilies',topo.base,code)
 
+
+
+        # rXXXX renamed topo.x.projfns
+        from topo import outputfn,responsefn,learningfn
+        for x in ['outputfn','responsefn','learningfn']:
+            code = \
+"""
+from topo.%s.projfn import *
+"""%x
+            # fake topo.x.projfns and topo.xs.projfns since both have existed...
+            fake_a_module('projfns',eval('topo.%ss'%x),code,'topo.%ss'%x)
+            fake_a_module('projfns',eval('topo.%s'%x),code,'topo.%s'%x)
 
