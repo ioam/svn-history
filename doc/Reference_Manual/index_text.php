@@ -24,7 +24,7 @@ essential of these are:
 <P><DL COMPACT>
 <P><DT><A href="topo.base-module.html"><strong>base</strong></A></DT>
 <DD>Core Topographica-specific functions and classes</DD>
-<P><DT><A href="topo.params-module.html"><strong>params</strong></A></DT>
+<P><DT><A href="topo.param-module.html"><strong>param</strong></A></DT>
 <DD>Support for objects with user-controllable attributes</DD>
 <P><DT><A href="topo.plotting-module.html"><strong>plotting</strong></A></DT>
 <DD>Visualization functions and classes</DD>
@@ -42,7 +42,7 @@ Topographica classes, implementing basic functionality such as Sheets
 Sheets), ConnectionFields (spatially localized groups of connections
 to one unit), and the event-driven Simulation.  It relies heavily on
 the generic support for Parameters (user-controllable attributes) from
-the <strong>params</strong> directory.  Together these files are
+the <strong>param</strong> directory.  Together these files are
 independent of the rest of the files in topo/, and act as the primary
 programming interface on which Topographica is built.  The rest of the
 directories add components used in specific models, or add graphical
@@ -55,23 +55,23 @@ family of classes that can be used with the above functions and
 classes:
 
 <P><DL COMPACT>
-<P><DT><A href="topo.patterns-module.html"><strong>patterns</strong></A></DT>
+<P><DT><A href="topo.pattern-module.html"><strong>pattern</strong></A></DT>
 <DD>PatternGenerator classes: 2D input or weight patterns</DD>
-<P><DT><A href="topo.sheets-module.html"><strong>sheets</strong></A></DT>
+<P><DT><A href="topo.sheet-module.html"><strong>sheet</strong></A></DT>
 <DD>Sheet classes: 2D arrays of processing units</DD>
-<P><DT><A href="topo.projections-module.html"><strong>projections</strong></A></DT>
+<P><DT><A href="topo.projection-module.html"><strong>projection</strong></A></DT>
 <DD>Projection classes: connections between Sheets</DD>
-<P><DT><A href="topo.eps-module.html"><strong>eps</strong></A></DT>
+<P><DT><A href="topo.ep-module.html"><strong>ep</strong></A></DT>
 <DD>EventProcessor classes: other simulation objects</DD>
-<P><DT><A href="topo.outputfns-module.html"><strong>outputfns</strong></A></DT>
+<P><DT><A href="topo.outputfn-module.html"><strong>outputfn</strong></A></DT>
 <DD>Output functions: apply to matrices to do e.g. normalization or squashing</DD>
-<P><DT><A href="topo.responsefns-module.html"><strong>responsefns</strong></A></DT>
+<P><DT><A href="topo.responsefn-module.html"><strong>responsefn</strong></A></DT>
 <DD>Calculate the response of a unit or a Projection</DD>
-<P><DT><A href="topo.learningfns-module.html"><strong>learningfns</strong></A></DT>
+<P><DT><A href="topo.learningfn-module.html"><strong>learningfn</strong></A></DT>
 <DD>Adjust weights for a unit or a Projection</DD>
-<P><DT><A href="topo.coordmapperfns-module.html"><strong>coordmapperfns</strong></A></DT>
+<P><DT><A href="topo.coordmapper-module.html"><strong>coordmapper</strong></A></DT>
 <DD>Determine mapping from one Projection to another</DD>
-<P><DT><A href="topo.commands-module.html"><strong>commands</strong></A></DT>
+<P><DT><A href="topo.command-module.html"><strong>command</strong></A></DT>
 <DD>High-level user commands</DD>
 </DL>
 
@@ -84,21 +84,21 @@ function without it.)
 <P>Each of the library directories can be extended with new classes
 of the appropriate type, just by adding a new .py file to that
 directory.  E.g. a file of new PatternGenerator classes can be copied
-into patterns/, and will then show up in the GUI menus as potential
+into pattern/, and will then show up in the GUI menus as potential
 input patterns.  The GUI will also show any class derived from those
 in the library directories, even if it is defined in your own files,
 as long as that file has been run or imported before the GUI window 
 is opened.
 
 <P>Many of the components come in multiple varieties, to be used at
-different levels in a model.  For instance, there are learningfns that
-operate on a single unit (type LearningFn), and ones that operate on
-an entire CFProjection (type CFPLearningFn).  The lower level
-components can be used by providing them to a "Plugin" version of the
-higher level component, which will apply the lower level version to
-each unit.  For instance, a LearningFn can be used with a
-CFPLearningFn of type CFPLF_Plugin, and will be applied the same to
-each unit individually.
+different levels in a model.  For instance, there are learning
+functions that operate on a single unit (type LearningFn), and ones
+that operate on an entire CFProjection (type CFPLearningFn).  The
+lower level components can be used by providing them to a "Plugin"
+version of the higher level component, which will apply the lower
+level version to each unit.  For instance, a LearningFn can be used
+with a CFPLearningFn of type CFPLF_Plugin, and will be applied the
+same to each unit individually.
 
 <P>Some components also come with an optimized version, usually
 written in C for speed.  The fastest, but least flexible, components
@@ -108,9 +108,9 @@ will be high-level components written in C, such as CFPLF_Hebbian_opt.
 <!-- JABALERT! This should probably move to its own page. -->
 <H2>External Packages</H2>
 
-<P>Topographica makes extensive use of external packages included with the 
-distribution.  For full use of the features of these packages, see their
-documentation:
+<P>Topographica makes extensive use of external packages included with
+the distribution.  For full use of the features of these packages, see
+their documentation:
 
 <!-- Should we make these point to the local copy instead? -->
 <P><DL COMPACT>
@@ -140,8 +140,9 @@ generally much higher performance than explicitly manipulating each
 matrix element, as well as being simpler, and so they should be used
 whenever possible. See
 the <A href="http://www.scipy.org/Documentation">NumPy documentation
-list</A> (especially the NumPy Example List and NumPy Functions by
-Category) to learn about the full range of available functions. 
+list</A> (especially the Guide to Numpy, NumPy Example List, and NumPy
+Functions by Category) to learn about the full range of available
+functions.
 </DD>
 
 <P><DT><A href="http://matplotlib.sourceforge.net/">MatPlotLib</A></DT>
@@ -162,9 +163,10 @@ Topographica components and scripts.</DD>
 
 <P><DT><A href="http://ipython.scipy.org/">IPython</A></DT>
 <DD>IPython provides Topographica with an enhanced Python shell,
-allowing efficient interactive work. The IPython
-manual's <A href="http://ipython.scipy.org/doc/manual/node4.html">Quick
-tips</A> section explains the most immediately useful features; see
+allowing efficient interactive work. The 
+<A href="http://ipython.scipy.org/doc/manual/html/interactive/tutorial.html">
+IPython tutorial</A> explains the most immediately useful features;
+see
 <A href="http://ipython.scipy.org/moin/Documentation">IPython's
 documentation</A> for more detailed information.
 </DD>
