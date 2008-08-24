@@ -1,5 +1,7 @@
 <H1>Importing external files and functions</H1>
 
+<!--CEBALERT: add section about using namespaces effectively?-->
+
 <P>When at all possible, use a Python standard library function
 instead of writing your own code or downloading a separate package.
 The standard library functions are available to all Python platforms

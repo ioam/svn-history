@@ -42,12 +42,16 @@ about how to set up tests</DD>
 <P><DT><A href="releases.html"><strong>Releases</strong></A></DT>
 <DD>How to make a new public release of Topographica</DD>
 
-<P><DT><A name="joining"><strong>Joining</strong></A></DT> <DD>Anyone interested in
-Topographica is welcome to join as a Topographica developer to get
-read/write access, so that your changes can become part of the main
-distribution.  Just sign up for a free account at <A
-HREF="http://sourceforge.net/"> SourceForge.net</A>, then email <A
-HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107?subject=Request%20to%20be%20a%20Topographica%20developer">Jim</a>
+<P><DT><A name="joining"><strong>Joining</strong></A></DT> <DD>Anyone
+interested in Topographica is welcome to join as a Topographica
+developer to get read/write access, so that your changes can become
+part of the main distribution.  Just sign up for a free account
+at <A HREF="http://sourceforge.net/"> SourceForge.net</A>, then
+email <A HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107?subject=Request%20to%20be%20a%20Topographica%20developer">Jim</a>
 your username and what you want to do, and he'll tell you how to
-proceed from there.</DD>
+proceed from there. Alternatively, if you want to use Git or Bazaar,
+you can immediately <A href="../Downloads/bzr.html">get your own Bazaar branch</A> or
+<A href="../Downloads/git.html">create a git repository</A> from
+Topographica's SVN repository (although we don't necessarily provide
+support for these).</DD>
 </DL>

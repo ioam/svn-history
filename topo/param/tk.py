@@ -2932,7 +2932,7 @@ class StatusBar(T.Frame):
         self.label.update_idletasks()
 
 
-
+# CEBALERT: rename
 class AppWindow(ScrolledWindow):
     """
     A ScrolledWindow with extra features intended to be common to all

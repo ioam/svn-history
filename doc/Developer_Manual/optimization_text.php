@@ -82,10 +82,10 @@ versions. This is helpful both for understanding and for ensuring
 correctness.
 
 <P>For example, consider <code>CFPRF_DotProduct</code>, from
-<code>topo.responsefns.projfns</code>. If users wish to use a version
+<code>topo.responsefn.projfns</code>. If users wish to use a version
 optimized by having been written in C, they can instead import
 <code>CFPRF_DotProduct_opt</code> from
-<code>topo.responsefns.optimized</code>. We use
+<code>topo.responsefn.optimized</code>. We use
 <code>CFPRF_DotProduct_opt</code> as standard in our code because it's
 much faster than --- but otherwise identical to --- the unoptimized
 version. However, because <code>CFPRF_DotProduct_opt</code> relies on a
@@ -93,7 +93,7 @@ more complex setup (having the weave module installed, as well as a
 correctly configured C++ compiler), we cannot assume all users will
 have access to it. It is also extremely difficult to read and
 understand. Therefore, we provide an automatic fall-back to the
-unoptimized version (see <code>topo/responsefns/optimized.py</code>
+unoptimized version (see <code>topo/responsefn/optimized.py</code>
 for an example of how to do this).
 
 <P>The non-optimized version also acts as a simple specification of
@@ -108,7 +108,8 @@ over time, while preserving the same user-visible behavior.
 <H2>Finding bottlenecks</H2>
 
 <P>As discussed above, we wish to spend our time optimizing parts of
-the code that account for most of the run time. <code>topo.misc.utils</code> contains the
+the code that account for most of the run
+time. <code>topo.misc.utils</code> contains the
 <code>profile()</code> function, providing a simple way to do
 this.
 
@@ -453,8 +454,9 @@ equivalent. You could make a simple check by adding a print statement after
 profiling to show the sum of V1 activity, or some similar indicator.
 
 <P>A final consideration is to ensure that the profile run times are
-long enough to obtain reliable results. For shorter runs, it would
-be necessary to repeat them and average the results.
+long enough to obtain reliable results. For shorter runs, it would be
+necessary to repeat them to find a reasonable estimate of the minimum
+time.
 
 
 <!--CB:

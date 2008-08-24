@@ -1,5 +1,7 @@
 <H1>Making Releases</H1>
 
+<!--CEBALERT: seems we've never done a relese from svn...-->
+
 <P>The latest version of Topographica is always available by CVS, but
 we also make more stable versions available periodically.  To make
 such a release, the steps we generally follow are:

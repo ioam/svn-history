@@ -61,15 +61,9 @@ As with unittest testsuites, all doctest files with names matching <code>topo/te
 
 <H2>Automatic testing</H2>
 
-<P>Currently, topographica is automatically checked out, built, and
-tested (via <code>make tests; make slow-tests</code>) every 12 hours on
-one Linux and one OS X machine (using <a href="http://buildbot.net/">buildbot</a>). 
-The results of these builds and tests can be seen at
-<a
+<P>Currently, topographica is periodically checked out, built, and
+tested on Linux, OS X, and Windows (automatically, using <a
+href="http://buildbot.net/">buildbot</a>).  The results of these
+builds and tests can be seen at <a
 href="http://buildbot.topographica.org/">buildbot.topographica.org</a>.
 
-<P>In the future, we shall add a function so that builds and tests are
-run immediately after commits to the CVS repository. This will allow
-the developer responsible for an error to be alerted to it straight
-away. Additionally, we plan to add a Windows buildslave to catch any
-Windows-specific problems.

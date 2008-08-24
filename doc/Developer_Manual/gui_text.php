@@ -5,8 +5,8 @@ No part of Topographica should import GUI files, rely on the presence
 of a particular GUI or any GUI at all, or assume that the data it
 generates will be used only by a GUI unless it is absolutely
 necessary, e.g. for the actual GUI implementation.  This is a special
-case of the <A HREF="ood.html">general principles of object-oriented design</A>
-discussed elsewhere.
+case of the <A HREF="ood.html">general principles of object-oriented
+design</A> discussed elsewhere.
 
 <P>Many components that would at first glance seem to be GUI-related
 are, in, fact much more general.  Such code should be written for the general
@@ -57,51 +57,54 @@ what they are actually simulating.
 
 <H2><A NAME='programming-tkgui'>Programming with tkgui</H2>
 
-<P>tkgui uses <a href="">Tkinter</a> to draw the GUI components, but
-simplifies GUI implementation by handling linkage of
-Parameters with their representations in the GUI.
+<P>tkgui
+uses <a href="http://wiki.python.org/moin/TkInter">Tkinter</a> to draw
+the GUI components, but simplifies GUI implementation by handling
+linkage of Parameters with their representations in the GUI.
 
 <!--(Tkinter is very flexible, but often quite a large amount of code
 is required to keep track of variables and display components
 ('widgets') ).-->
 
-<P>The classes <a href="">TkParameterized</a> and <a
-href="">ParametersFrame</a> are the ones most often used for
-creating a new GUI representation of some Topographica
-component. Which to use depends on how much you wish to customize the
-display: a ParametersFrame displays all of a Parameterized's
-Parameters as a list in one Frame, whereas a TkParameterized can
-display any number of the Parameters in any number of Frames (which
-you specify). Hence the PlotGroupPanels, which display Parameters from
-multiple Parameterizeds in a custom layout, are based on
-TkParameterized, whereas editing properties of an object in the
-model editor simply brings up a ParametersFrame for that object.
+<P>The
+classes <a href="../Reference_Manual/topo.param.tk.TkParameterized-class.html">TkParameterized</a>
+and <a href="../Reference_Manual/topo.param.tk.ParametersFrame-class.html">ParametersFrame</a>
+are the ones most often used for creating a new GUI representation of
+some Topographica component. Which to use depends on how much you wish
+to customize the display: a ParametersFrame displays all of a
+Parameterized's Parameters as a list in one Frame, whereas a
+TkParameterized can display any number of the Parameters in any number
+of Frames (which you specify). Hence the PlotGroupPanels, which
+display Parameters from multiple Parameterizeds in a custom layout,
+are based on TkParameterized, whereas editing properties of an object
+in the model editor simply brings up a ParametersFrame for that
+object.
 
 <H3>ParametersFrame</H3>
 
 <P>If you wish to display and/or edit the Parameters of a
-Parameterized in the GUI, you can simply insert a
-ParametersFrame for that object into an existing container (a window
-such as a tkgui.topowidgets.TkguiWindow or a Tkinter.Toplevel, or a frame such as a
+Parameterized in the GUI, you can simply insert a ParametersFrame for
+that object into an existing container (a window such as a
+param.tk.AppWindow or a Tkinter.Toplevel, or a frame such as a
 Tkinter.Frame):
 
 <pre>
-from topo.patterns.basic import Gaussian
-from topo.tkgui.topowidgets import TkguiWindow
+from topo import pattern
+from topo.param import tk
 
 # existing component and existing window
-g = Gaussian()
-w = TkguiWindow()
+g = pattern.Gaussian()
+w = tk.AppWindow()
 
 # display all parameters of g in w
-from topo.tkgui.parametersframe import ParametersFrame
-f = ParametersFrame(w,g)
+f = tk.ParametersFrame(w,g)
 </pre>
  
-<P>All the non-hidden Parameters of <code>p</code> will be displayed in a
-new Frame in <code>w</code>. Changing the Parameter's value in the GUI
-immediately changes the actual Parameter value; the class
-topo.tkgui.parametersframe.ParametersFrameWithApply is a version of
+<P>All the non-hidden Parameters of <code>p</code> will be displayed
+in a new Frame in <code>w</code>. Changing the Parameter's value in
+the GUI immediately changes the actual Parameter value; the class
+<A href="../Reference_Manual/topo.param.tk.ParametersFrameWithApply-class.html">
+topo.param.tk.ParametersFrameWithApply</A> is a version of
 ParametersFrame that does not immediately apply changes, instead
 waiting for confirmation via an Apply button.
 
@@ -119,34 +122,34 @@ if instead we wanted to display only its size, x, and y Parameters, we
 could do the following:
 
 <pre>
-from topo.patterns.basic import Gaussian
-from topo.tkgui.topowidgets import TkguiWindow
+from topo import pattern
+from topo.param import tk
 
 # existing component and existing window
-g = Gaussian()
-w = TkguiWindow()
+g = pattern.Gaussian()
+w = tk.AppWindow()
 
 # display selected parameters of g in w
-from topo.tkgui.tkparameterizedobject import TkParameterized
-t = TkParameterized(w,g)
+t = tk.TkParameterized(w,g)
 t.pack_param('size')
 t.pack_param('x')
 t.pack_param('y')
 </pre>
 
 <P>As for ParametersFrame, changes to values in the GUI are
-immediately reflected in the actual
-Parameters. TkParameterized's flexibility for custom
-arrangements comes from the pack_param() method, which takes several
-optional arguments to control the positioning of the Parameter.
+immediately reflected in the actual Parameters. TkParameterized's
+flexibility for custom arrangements comes from the pack_param()
+method, which takes several optional arguments to control the
+positioning of the Parameter.
 
 
 <H2>Tkinter references</H2>
 
-<P>The following links provide useful reference material for programming with 
-Tkinter and Tk:
+<P>The following links provide useful reference material for
+programming with Tkinter and Tcl/Tk:
 
 <ul>
+<li><A HREF="http://www.tkdocs.com/">TkDocs</A></li>
 <li><A HREF="http://effbot.org/tkinterbook/">An Introduction to Tkinter</A></li>
 <li><A HREF="http://www.nmt.edu/tcc/help/lang/python/tkinter.html">Tkinter: GUI programming with Python</A></li>
 <li><A HREF="http://www.ferg.org/thinking_in_tkinter/index.html">Thinking in Tkinter</A></li>

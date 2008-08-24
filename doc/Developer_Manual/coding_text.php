@@ -210,8 +210,8 @@ visible in the various user interfaces.
 
 <P>Parameters should have the narrowest type and tightest bounds that
 would be meaningful.  For instance, a parameter that can be either
-true or false should be of type BooleanParameter, while one that can
-only have a value from 0 to 0.5 should be of type Number with a hard
+true or false should be of type param.Boolean, while one that can only
+have a value from 0 to 0.5 should be of type param.Number with a hard
 bound of 0 to 0.5.  Using the right types and bounds greatly
 simplifies life for the programmer, who can reason about the code
 knowing the full allowable range of the parameter, and for the user,
@@ -302,9 +302,9 @@ from within its own directory, and the current working directory has
 not subsequently been changed).
 
 <P>To avoid this problem, simply use the functions
-<code>topo.base.parameterclasses.resolve_path()</code> (to locate an
+<code>topo.misc.filepaths.resolve_path()</code> (to locate an
 existing file) or
-<code>topo.base.parameterclasses.normalize_path()</code> (to prepare a
+<code>topo.misc.filepaths.normalize_path()</code> (to prepare a
 path for writing). The example above would become
 <code>open(resolve_path('topo/tkgui/icons/topo.xbm'))</code>; to
 create a file for writing, one could write
@@ -322,8 +322,8 @@ on all platforms:
 <ol>
 <li>Do not attempt to perform operations such as <code>open</code> on
 'raw' linux-style paths. Instead, use one of the functions
-<code>topo.base.parameterclasses.normalize_path()</code> or
-<code>topo.base.parameterclasses.resolve_path()</code> (as described
+<code>topo.misc.filepaths.normalize_path()</code> or
+<code>topo.misc.filepaths.resolve_path()</code> (as described
 above).</li>
 <li>(For Windows developers) Never use Windows-style paths within the
 code: always specify paths in linux format. The above-mentioned
@@ -333,7 +333,7 @@ path-handling functions).</li>
 </ol>
 
 <P>Python itself provides a number of functions for dealing with paths
-in its <A HREF="docs.python.org/lib/module-os.path.html">os.path</A> 
-module. The functions above are based on those, but facilitate
-the use of 'search paths', allowing users to specify prefixes to search
-for relative paths.
+in its <A HREF="docs.python.org/lib/module-os.path.html">os.path</A>
+module. The functions above are based on those, but facilitate the use
+of 'search paths', allowing users to specify prefixes to search for
+relative paths.
