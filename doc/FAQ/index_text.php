@@ -27,7 +27,9 @@ The disadvantage of this approach is that most changes in the
 definition of any of the classes used (apart from changing parameter
 values or strictly adding code) will cause the reloading to fail.
 Until we have set up an archival storage format, probably based on XML,
-snapshots should be considered temporary.  
+snapshots should be considered temporary. You can, however, email
+the Topographica developers or file a bug report to get help loading
+your snapshot.  
   
 <!----------------------------------------------------------------------------->
 <LI><B>Q:</B> <i>When I try to save a snapshot of my network, I get
