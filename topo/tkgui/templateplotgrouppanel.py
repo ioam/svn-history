@@ -190,7 +190,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         if snapshot_name:
             plot.bitmap.image.save(snapshot_name)
 
-    # based on routine in editorwindow.py
+    # based on routine in editor.py
     def __save_to_postscript(self):
         plot   = self._right_click_info['plot']
         canvas = self._right_click_info['event'].widget

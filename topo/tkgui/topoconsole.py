@@ -41,7 +41,7 @@ from templateplotgrouppanel import TemplatePlotGroupPanel
 from featurecurvepanel import FeatureCurvePanel
 from projectionpanel import CFProjectionPanel,ProjectionActivityPanel,ConnectionFieldsPanel,RFProjectionPanel
 from testpattern import TestPattern
-from editorwindow import ModelEditor
+from editor import ModelEditor
 
 
 tk.AppWindow.window_icon_path = resolve_path('topo/tkgui/icons/topo.xbm')
