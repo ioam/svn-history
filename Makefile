@@ -401,10 +401,5 @@ dist: doc distdir reference-manual FORCE
 	${CD} ${DIST_DIR}; ${MAKE} distarc
 
 ChangeLog.txt: FORCE
-	mv ChangeLog.txt ChangeLog
-	`locate rcs2log | grep /emacs` -v > ChangeLog.new
-	cat ChangeLog.new ChangeLog > ChangeLog.txt
-	rm -f ChangeLog ChangeLog.new
-
-
-
+	make -C external svn2cl
+	external/svn2cl --include-rev --group-by-day --separate-daylogs -o ChangeLog.txt
