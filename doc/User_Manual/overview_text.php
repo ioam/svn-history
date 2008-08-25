@@ -51,13 +51,13 @@ Collie or a Terrier as well, plus any user-defined object of type Dog.
 <li><?php classref('topo.param.parameterized','Parameterized')?>
 <li><?php classref('topo.param.parameterized','Parameter')?>
     <ul>
-    <li><?php classref('topo.base.parameterclasses','Number')?>
+    <li><?php classref('topo.param','Number')?>
         <ul>
-	<li><?php classref('topo.base.parameterclasses','Integer')?>
+	<li><?php classref('topo.param','Integer')?>
         </ul>
-    <li><?php classref('topo.base.parameterclasses','BooleanParameter')?>
-    <li><?php classref('topo.base.parameterclasses','CallableParameter')?>
-    <li><?php classref('topo.base.parameterclasses','ClassSelectorParameter')?>
+    <li><?php classref('topo.param','Boolean')?>
+    <li><?php classref('topo.param','Callable')?>
+    <li><?php classref('topo.param','ClassSelector')?>
     </ul>
 </ul>
 

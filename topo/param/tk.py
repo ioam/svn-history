@@ -70,15 +70,15 @@ You want to display only some of the parameters of one or more
 Parameterized instances:
 
  ## Existing, non-GUI code
- from ..param import Parameterized,Number,String,Boolean
+ from topo import param
 
- class Object1(Parameterized):
+ class Object1(param.Parameterized):
      duration = param.Number(2.0,bounds=(0,None),doc='Duration of measurement')
      displacement = param.Number(0.0,bounds=(-1,1),doc='Displacement from point A')
 
- class Object2(Parameterized):
-     active_today = BooleanParameter(True,doc='Whether or not to count today')
-     operator_name = StringParameter('Zhong Wen',doc='Operator today')
+ class Object2(param.Parameterized):
+     active_today = param.Boolean(True,doc='Whether or not to count today')
+     operator_name = param.String('A. Person',doc='Operator today')
 
  o1 = Object1()
  o2 = Object2()

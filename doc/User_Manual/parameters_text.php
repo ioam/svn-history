@@ -54,7 +54,7 @@ such as
 <?php classref('topo.param','Filename')?>,
 <?php classref('topo.param','Enumeration')?>,
 and
-<?php classref('topo.param','BooleanParameter')?>.
+<?php classref('topo.param','Boolean')?>.
 Each of these types can be declared to be constant, in which case the
 value cannot be changed after the Parameterized object that owns the
 Parameter has been created.  Some classes, such as
