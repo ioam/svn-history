@@ -409,6 +409,16 @@ from topo.misc.numbergenerator import *
 """
 from topo.misc.patternfn import *
 """
-        print 'fake patternfns'
         fake_a_module('patternfns',topo.misc,code)
+        
+
+        # rXXXX renamed topo.misc.utils
+        import topo.misc.util
+        code = \
+"""
+from topo.misc.util import *
+"""
+        fake_a_module('utils',topo.misc,code)
+        
+
         

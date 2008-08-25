@@ -109,7 +109,7 @@ over time, while preserving the same user-visible behavior.
 
 <P>As discussed above, we wish to spend our time optimizing parts of
 the code that account for most of the run
-time. <code>topo.misc.utils</code> contains the
+time. <code>topo.misc.util</code> contains the
 <code>profile()</code> function, providing a simple way to do
 this.
 
@@ -129,7 +129,7 @@ the simulation.
 performance:
 
 <pre>
-$ ./topographica speed_test.ty -c "from topo.misc.utils import profile; \
+$ ./topographica speed_test.ty -c "from topo.misc.util import profile; \
 profile('topo.sim.run(200)',n=20)" 
 
          1477056 function calls (1468656 primitive calls) in 50.198 CPU seconds
@@ -259,7 +259,7 @@ class DotProduct(ResponseFn):
 <P>With this new DotProduct, we can profile the code again:
 
 <pre>
-$ ./topographica examples/speed_test.ty -c "from topo.misc.utils import profile; \
+$ ./topographica examples/speed_test.ty -c "from topo.misc.util import profile; \
 profile('topo.sim.run(200)',n=20)"
 
          837056 function calls (828656 primitive calls) in 38.153 CPU seconds
@@ -340,7 +340,7 @@ class CFPRF_Plugin(CFPResponseFn):
 <P>This leads to the following performance profile:
 
 <pre>
-$ ./topographica speed_test.ty -c "from topo.misc.utils import profile; \
+$ ./topographica speed_test.ty -c "from topo.misc.util import profile; \
 profile('topo.sim.run(200)',n=20)"
 
          516656 function calls (508256 primitive calls) in 35.410 CPU seconds
@@ -401,7 +401,7 @@ should add this explanation somewhere -->
 <P>Replacing the CFP function with one written entirely in C++, we
 get the following profile:
 <pre>
-$ ./topographica speed_test.ty -c "from topo.misc.utils import profile; \
+$ ./topographica speed_test.ty -c "from topo.misc.util import profile; \
 profile('topo.sim.run(200)',n=20)"
 
          515119 function calls (506917 primitive calls) in 22.492 CPU seconds

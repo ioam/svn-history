@@ -186,7 +186,7 @@ from topo.command.basic import pattern_present, restore_input_generators, save_i
 from topo.command.pylabplots import *
 from topo.misc.distribution import Distribution
 from topo.misc.numbergenerator import UniformRandom
-from topo.misc.utils import cross_product, frange
+from topo.misc.util import cross_product, frange
 from topo.pattern.basic import SineGrating, Gaussian
 from topo.pattern.rds import RandomDotStereogram
 from topo.sheet.generator import GeneratorSheet

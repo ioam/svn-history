@@ -340,7 +340,7 @@ def compare_with_and_without_snapshot_LoadSnapshot(script="examples/lissom_oo_or
 
 
 def run_multiple_density_comparisons(ref_script):
-    from topo.misc.utils import cross_product
+    from topo.misc.util import cross_product
     import subprocess
     import traceback
     import os

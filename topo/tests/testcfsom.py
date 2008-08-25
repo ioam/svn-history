@@ -28,7 +28,7 @@ from topo.sheet.generator import *
 ### Only for ImageSaver
 from numpy.oldnumeric import resize,array,zeros
 from topo.base.simulation import EventProcessor
-from topo.misc.utils import NxN
+from topo.misc.util import NxN
 from pprint import *
 import Image, ImageOps
 

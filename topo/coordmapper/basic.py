@@ -22,7 +22,7 @@ from numpy.matlib import matrix, zeros as mzeros
 from .. import param
 
 from topo.base.functionfamily import CoordinateMapperFn, IdentityMF
-from topo.misc.utils import signabs
+from topo.misc.util import signabs
 from topo.misc.numbergenerator import UniformRandom
 
 

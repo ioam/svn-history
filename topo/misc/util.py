@@ -190,7 +190,7 @@ def profile(command,n=50,sorting=('cumulative','time'),strip_dirs=False):
     profile('execfile("examples/lissom_oo_or.ty");topo.sim.run(20000)')
 
     - profile running a simulation, but from the commandline:
-    ./topographica examples/hierarchical.ty -c "from topo.misc.utils import profile; profile('topo.sim.run(10)')"
+    ./topographica examples/hierarchical.ty -c "from topo.misc.util import profile; profile('topo.sim.run(10)')"
     """
     # This function simply wraps some functions from the cProfile
     # module, making profiling easier.

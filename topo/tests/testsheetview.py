@@ -94,7 +94,7 @@ class TestSheetView(unittest.TestCase):
 ## from numpy.oldnumeric import resize,array
 ## from topo.base.sheet import Sheet
 ## from topo.base.simulation import EventProcessor
-## from topo.misc.utils import NxN
+## from topo.misc.util import NxN
 ## from topo.base.parameterclasses import Parameter
 ## from pprint import *
 ## import Image, ImageOps

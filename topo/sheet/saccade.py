@@ -31,7 +31,7 @@ from topo.base.simulation import PeriodicEventSequence,FunctionEvent
 from topo.base.boundingregion import BoundingBox,BoundingRegionParameter
 from topo.coordmapper.basic import  CoordinateMapperFn, IdentityMF
 from topo.sheet.generator import SequenceGeneratorSheet
-from topo.misc import utils
+from topo.misc import util
 
 
 # JPALERT: The next three functions (activity_centroid,
@@ -61,7 +61,7 @@ def activity_centroid(sheet,activity=None,threshold=0.0):
     idxs = nonzero(a > threshold)[0]
     if not len(idxs):
         return sheet.bounds.centroid()
-    return utils.centroid(take(xy,idxs,axis=0),take(a,idxs))
+    return util.centroid(take(xy,idxs,axis=0),take(a,idxs))
 
 
 def activity_sample(sheet,activity=None):
@@ -74,8 +74,8 @@ def activity_sample(sheet,activity=None):
 
     if activity is None:
         activity = sheet.activity
-    idx = utils.weighted_sample_idx(activity.ravel())
-    r,c = utils.idx2rowcol(idx,activity.shape)
+    idx = util.weighted_sample_idx(activity.ravel())
+    r,c = util.idx2rowcol(idx,activity.shape)
 
     return sheet.matrix2sheet(r,c)
 
@@ -95,7 +95,7 @@ def activity_mode(sheet,activity=None):
     if activity is None:
         activity = sheet.activity
     idx = argmax(activity.flat)
-    r,c = utils.idx2rowcol(idx,activity.shape)
+    r,c = util.idx2rowcol(idx,activity.shape)
     return sheet.matrix2sheet(r,c)
       
 

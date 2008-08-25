@@ -15,7 +15,7 @@ from topo.base.sheet import Sheet
 from topo.base.sheet import BoundingBox
 from topo.base.patterngenerator import PatternGenerator, Constant
 
-from topo.misc.utils import NxN
+from topo.misc.util import NxN
 
 
 # JLALERT: This sheet should have override_plasticity_state/restore_plasticity_state

@@ -15,7 +15,7 @@ from ..param import tk
 
 import topo
 from topo.command.analysis import update_activity
-from topo.misc.utils import shortclassname
+from topo.misc.util import shortclassname
 
 from parametersframe import ParametersFrameWithApply
 
