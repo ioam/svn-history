@@ -11,6 +11,7 @@ from Tkinter import Canvas, Frame, Checkbutton, Button,Menu, Scrollbar, SUNKEN, 
 from tkFileDialog import asksaveasfilename
 
 from .. import param
+from ..param import tk
 
 import topo
 from topo.misc.filepath import normalize_path
@@ -19,7 +20,6 @@ from topo.base.projection import Projection
 
 from editorobjects import EditorNode, EditorSheet, EditorProjection
 from editortools import ArrowTool, NodeTool, ConnectionTool, ParametersTool
-from widgets import TkguiWindow
 
 canvas_region = (0, 0, 1200, 1200)
 """Size of the canvas, as a bounding box (xl yl xh yh)."""
@@ -526,7 +526,7 @@ class ModelEditor(object):
     def __init__(self,master):
         
         # create editor window and set title
-        root = TkguiWindow(master)
+        root = tk.AppWindow(master)
         root.title("Model Editor")
 
         canvas_frame = Frame(root,bg = 'white')

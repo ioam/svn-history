@@ -18,7 +18,7 @@ from topo.command.analysis import update_activity
 from topo.misc.utils import shortclassname
 
 from parametersframe import ParametersFrameWithApply
-from widgets import TkguiWindow, Balloon
+
 
 
 # CEBALERT: should be a Parameterized
@@ -57,7 +57,7 @@ class EditorObject(object):
         #status.pack(side="bottom",fill='x',expand='yes')
         
         parameter_window.title(self.name)
-        balloon = Balloon(parameter_window)
+        balloon = tk.Balloon(parameter_window)
 
 #        import __main__;__main__.__dict__['AAA'] = parameter_window
         title = Label(parameter_window, text = self.name)
@@ -539,7 +539,7 @@ class EditorProjection(EditorConnection):
         self.gradient = (1,1)
         self.id = (None,None)
         self.label = None
-        self.balloon = Balloon(canvas)
+        self.balloon = tk.Balloon(canvas)
         self.factor = self.get_factor()
         self.receptive_field = receptive_field
         self.set_colours()

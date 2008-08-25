@@ -20,13 +20,13 @@ from numpy.fft.helper import fftshift
 from numpy import abs
 
 from .. import param
+from ..param import tk
 
 import topo.command.pylabplots
 from topo.misc.filepath import normalize_path
 from topo.plotting.plotgroup import TemplatePlotGroup
 
 from plotgrouppanel import SheetPanel
-from widgets import Menu
 
 
 ### CEBALERT: additional dynamic info/right-click problems:
@@ -124,7 +124,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
         # for RGB (or any other channels).
         channel_menus={}
         for chan in ['Strength','Hue','Confidence']:
-            newmenu = Menu(self._canvas_menu, tearoff=0)
+            newmenu = tk.Menu(self._canvas_menu, tearoff=0)
             self._canvas_menu.add_cascade(menu=newmenu,label=chan+' channel', indexname=chan)
 
             # The c=chan construction is required so that each lambda has its own copy of the string
