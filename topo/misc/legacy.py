@@ -421,4 +421,11 @@ from topo.misc.util import *
         fake_a_module('utils',topo.misc,code)
         
 
-        
+        # rXXXX renamed topo.misc.traces
+        import topo.misc.trace
+        code = \
+"""
+from topo.misc.trace import *
+"""
+        fake_a_module('traces',topo.misc,code)
+

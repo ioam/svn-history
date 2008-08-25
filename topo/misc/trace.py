@@ -445,29 +445,29 @@ class ActivityMovie(param.Parameterized):
     """
 
     
-    variables = param.ListParameter(class_=str, doc="""
+    variables = param.List(class_=str, doc="""
         A list of variable names in a DataRecorder object containing
         matrix-valued time series data.""")
        
-    overlays = param.DictParameter(default={}, doc="""
+    overlays = param.Dict(default={}, doc="""
         A dictionary indicating overlays for the variable bitmaps.  The
         for each key in the dict matching the name of a variable, there
         should be associated a triple of matrices to be overlayed on
         the red, green, and blue channels of the corresponding bitmap
         in each frame.""")
        
-    frame_times = param.ListParameter(default=[0,1], doc="""
+    frame_times = param.List(default=[0,1], doc="""
         A list of the times of the frames in the movie.""")
        
-    montage_params = param.DictParameter(default={},doc="""
+    montage_params = param.Dict(default={},doc="""
         A dictionary containing parameters to be used when
         instantiating the MontageBitmap objects representing each frame.""",       
         instantiate=False)
 
-    recorder = param.ClassSelectorParameter(class_=DataRecorder, doc="""
+    recorder = param.ClassSelector(class_=DataRecorder, doc="""
         The DataRecorder storing the timeseries.""")
 
-    filename_fmt = param.StringParameter(default='%n_%t.%T',doc="""
+    filename_fmt = param.String(default='%n_%t.%T',doc="""
         The format for the filenames used to store the frames.  The following
         substitutions are possible:
         
@@ -475,31 +475,31 @@ class ActivityMovie(param.Parameterized):
         %t: The frame time, as formatted by the filename_time_fmt parameter
         %T: The filetype given by the filetype parameter. """)
     
-    filename_time_fmt = param.StringParameter(default='%05.0f', doc="""
+    filename_time_fmt = param.String(default='%05.0f', doc="""
         The format of the frame time, using Python string substitution for
         a floating-point number.""")
        
-    filetype = param.StringParameter(default='tif',doc="""
+    filetype = param.String(default='tif',doc="""
         The filetype to use when writing frames. Can be any filetype understood
         by the Python Imaging Library.""")
 
-    filename_prefix = param.StringParameter(default='', doc="""
+    filename_prefix = param.String(default='', doc="""
         A prefix to prepend to the filename of each frame when saving; 
         can include directories.  If the filename contains a path, any
         non-existent directories in the path will be created when the
         movie is saved.""")
 
-    add_timecode = param.BooleanParameter(default=False, doc="""
+    add_timecode = param.Boolean(default=False, doc="""
         Whether to add a visible timecode indicator to each frame.""")
 
-    timecode_options = param.DictParameter(default={},instantiate=False,doc="""
+    timecode_options = param.Dict(default={},instantiate=False,doc="""
         A dictionary of keyword options to be passed to the PIL ImageDraw.text method
         when drawing the timecode on the frame. Valid options include font,
         an ImageFont object indicating the text font, and fill a PIL color
         specification indicating the text color.  If unspecified, color defaults to
         the PIL default of black.  Font defaults to topo.plotting.bitmap.TITLE_FONT.""")
     
-    timecode_fmt = param.StringParameter(default='%05.0f',doc="""
+    timecode_fmt = param.String(default='%05.0f',doc="""
         The format of the timecode displayed in the movie frames, using
         Python string substitution for a floating-point number.""")
     

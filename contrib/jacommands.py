@@ -30,7 +30,7 @@ from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.parameterclasses import Number, Parameter,Parameter,ClassSelectorParameter,ListParameter
 from topo.base.functionfamily import CoordinateMapperFn
 from topo.plotting.bitmap import MontageBitmap
-#from topo.misc.traces import ActivityMovie,InMemoryRecorder
+#from topo.misc.trace import ActivityMovie,InMemoryRecorder
 from topo.base.patterngenerator import PatternGenerator,Constant 
 
 
