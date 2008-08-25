@@ -113,7 +113,7 @@ v1aff_radius=0.27083                # sf
 lgnaff_radius=0.375                 # sf
 
 dims=locals().get('dims',['or','od','dr','dy'])
-topo.sim.name = "lissom_oo_" + string.join(dims, '_')
+topo.sim.name = "lissom_oo_" + '_'.join(dims)
 if 'od' in dims or 'dy' in dims: eyes=['Left', 'Right']
 if 'dr' in dims: 
     lags=['0','1','2','3']
@@ -204,12 +204,12 @@ for e in eyes:
                                                                                             lgnaff_radius*sf_spacing**(sf_channels-1)))
         for l in center_polarities:
             for opponent in opponent_types:
-                topo.sim[e+opponent+'LGN'+l+n]=CFSheet(nominal_density=24.0,
+                topo.sim[e+opponent+'LGN'+l+n]=CFSheet(nominal_density=locals().get('default_retina_density',24.0),
                                                        nominal_bounds=BoundingBox(radius=0.5+v1aff_radius),
                                                        output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                                                        measure_maps=False)
             for channel in xrange(2,sf_channels+1):
-                topo.sim[e+'LGN'+l+n+'SF'+str(channel)]=CFSheet(nominal_density=24.0,
+                topo.sim[e+'LGN'+l+n+'SF'+str(channel)]=CFSheet(nominal_density=locals().get('default_retina_density',24.0),
                                                                 nominal_bounds=BoundingBox(radius=0.5+v1aff_radius*sf_spacing**(channel-1)),
                                                                 output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                                                                 measure_maps=False)
