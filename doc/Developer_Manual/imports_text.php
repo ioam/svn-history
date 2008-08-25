@@ -89,8 +89,8 @@ long list).  For example:
   from numpy import transpose, array
   
   from topo.base.connectionfield import CFSheet
-  from topo.base.topoobject import TopoObject
-  from topo.base.utils import flatten, dict_sort
+  from topo.base.functionfamily import OutputFn
+  from topo.misc.util import flatten, cross_product
   
   from plot import Plot
   import bitmap
