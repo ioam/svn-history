@@ -217,26 +217,23 @@ academic publication, please cite the following paper so that readers
 will know how to replicate your results and build upon them.  (Plus,
 it is only polite to cite work done by others that you rely on!)
 
-<!--CEBALERT: and there's a newer paper, right?-->
 <BLOCKQUOTE>
-James&nbsp;A. Bednar, Yoonsuck Choe, Judah De Paula, Risto
-  Miikkulainen, Jefferson Provost, and Tal Tversky.
-<A HREF="http://nn.cs.utexas.edu/keyword?bednar:neurocomputing04-sw">Modeling
-  cortical maps with Topographica</A>.
-<CITE>Neurocomputing</CITE>, pages 1129-1135, 2004.
+James&nbsp;A. Bednar.
+<A HREF="http://www.brains-minds-media.org/archive/1402">Understanding
+Neural Maps with Topographica</A>.
+<CITE>Brains, Minds, and Media</CITE>, 3:bmm1402, 2008.
 </BLOCKQUOTE>
 
 or in BibTeX format:
 
 <pre>
-@Article{bednar:neurocomputing04-sw,
-  author       = "James A. Bednar and Yoonsuck Choe and Judah {De Paula}
-                  and Risto Miikkulainen and Jefferson Provost and Tal
-                  Tversky",
-  title	       = "Modeling Cortical Maps with {Topographica}",
-  journal      = "Neurocomputing",
-  year	       = 2004,
-  pages        = "1129--1135",
-  url	       = "http://nn.cs.utexas.edu/keyword?bednar:neurocomputing04-sw",
+@Article{bednar:bmm08,
+  author       = "James A. Bednar",
+  title	       = "Understanding Neural Maps with {Topographica}",
+  journal      = "Brains, Minds, and Media",
+  year	       = 2008,
+  volume       = 3,
+  pages	       = "bmm1402",
+  url          = "http://www.brains-minds-media.org/archive/1402",
 }
 </pre>
