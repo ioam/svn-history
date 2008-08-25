@@ -33,7 +33,6 @@ from topo.plotting.plotgroup import SheetPlotGroup
 from topo.base.simulation import EPConnectionEvent
 from topo.base.sheet import Sheet
 
-from parametersframe import ParametersFrame
 from plotgrouppanel import SheetPanel
 
 
@@ -93,7 +92,7 @@ class TestPattern(SheetPanel):
         self.pg_control_pane = Frame(self) #,bd=1,relief="sunken")
         self.pg_control_pane.pack(side="top",expand='yes',fill='x')
         
-        self.params_frame = ParametersFrame(
+        self.params_frame = tk.ParametersFrame(
             self.pg_control_pane,
             parameterized_object=self.pattern_generator,
             on_modify=self.conditional_refresh,

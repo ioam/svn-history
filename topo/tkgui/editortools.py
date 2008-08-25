@@ -12,6 +12,7 @@ from Tkinter import Frame, Button, Label, Canvas, TOP, X, GROOVE, RAISED,\
 from Tile import Combobox
 
 from .. import param
+from ..param import tk
 
 import topo.sheet
 from topo.sheet import *
@@ -21,9 +22,6 @@ from topo.projection import *
 from topo.base.projection import Projection
 
 from editorobjects import EditorSheet, EditorProjection
-from parametersframe import ParametersFrameWithApply
-
-
 
 class ArrowTool(Frame):
     """
@@ -314,7 +312,7 @@ class ParametersTool(Frame):
 
         # CEBALERT: will the users think they have to press 'apply' rather than just clicking
         # on the canvas to get the new object?
-        self.parameter_frame = ParametersFrameWithApply(self)#,buttons_to_remove=['Close','Defaults'])
+        self.parameter_frame = tk.ParametersFrameWithApply(self)#,buttons_to_remove=['Close','Defaults'])
         self.parameter_frame.hide_param('Close')
         self.parameter_frame.hide_param('Defaults')         
         self.parameter_frame.pack(side=BOTTOM)

@@ -11,10 +11,11 @@ import unittest
 import Tkinter
 
 from .. import param
+from ..param import tk
 
 from topo.base.patterngenerator import PatternGenerator
 
-from topo.tkgui.parametersframe import ParametersFrameWithApply
+
 
 
 class TestPO(param.Parameterized):
@@ -43,7 +44,7 @@ class TestParametersFrameWithApply(unittest.TestCase):
         self.testpo1.params()['osp'].objects = self.some_pos
         
         self.toplevel = Tkinter.Toplevel()
-        self.f = ParametersFrameWithApply(self.toplevel,self.testpo1)
+        self.f = tk.ParametersFrameWithApply(self.toplevel,self.testpo1)
 
 
 
@@ -131,9 +132,8 @@ class TestParametersFrameWithApply(unittest.TestCase):
         """Indicate there's a bug. Have yet to investigate where it actually comes from."""
         import topo
         from utils import new_simulation
-        from topo.tkgui.parametersframe import edit_parameters
         new_simulation()
-        e = edit_parameters(topo.sim['S'])
+        e = tk.edit_parameters(topo.sim['S'])
         e.gui_set_param('precedence',7)
         e.Apply()
         self.assertEqual(topo.sim['S'].precedence,7)

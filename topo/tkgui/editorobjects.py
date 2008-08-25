@@ -17,9 +17,6 @@ import topo
 from topo.command.analysis import update_activity
 from topo.misc.util import shortclassname
 
-from parametersframe import ParametersFrameWithApply
-
-
 
 # CEBALERT: should be a Parameterized
 class EditorObject(object):
@@ -62,7 +59,7 @@ class EditorObject(object):
 #        import __main__;__main__.__dict__['AAA'] = parameter_window
         title = Label(parameter_window, text = self.name)
         title.pack(side = TOP)
-        self.parameter_frame = ParametersFrameWithApply(
+        self.parameter_frame = tk.ParametersFrameWithApply(
             parameter_window,
             msg_handler=parameter_window.status)
         parameter_window.sizeright()
