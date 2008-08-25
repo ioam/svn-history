@@ -55,7 +55,7 @@ from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF, IdentityOF, ActivityAveragingOF
 from topo.outputfn.basic import AttributeTrackingOF, Sigmoid, HalfRectify, HomeostaticMaxEnt
-from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
+from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.pattern.image import Image
 
 ###############################################################

@@ -51,7 +51,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1
-from topo.misc.numbergenerators import UniformRandom
+from topo.misc.numbergenerator import UniformRandom
 
 plusminus = locals().get('plusminus',False)
 
@@ -133,7 +133,7 @@ right_x=NumericOffset(offset_scale=1.0,
 
 
 if plusminus:
-   from topo.misc.numbergenerators import Choice
+   from topo.misc.numbergenerator import Choice
    scale_value = Choice(choices=[-0.5,0.5])
    scale_value_copy=copy.deepcopy(scale_value)
    left_scale=scale_value

@@ -29,7 +29,7 @@ import topo
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet,CFProjection
 from topo.learningfn.projfn import CFPLF_EuclideanHebbian
-from topo.misc.numbergenerators import UniformRandom,BoundedNumber
+from topo.misc.numbergenerator import UniformRandom,BoundedNumber
 from topo.outputfn.basic import DivisiveNormalizeL1
 from topo.outputfn.basic import KernelMax
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
@@ -101,7 +101,7 @@ topo.sim['V1'] = CFSheet(
     nominal_density = default_density,
     output_fn = KernelMax(density=default_density))
 
-from topo.misc.numbergenerators import ExponentialDecay
+from topo.misc.numbergenerator import ExponentialDecay
 CFProjection.learning_rate=LinearDecay()
 topo.sim.connect('Retina','V1',delay=0.10,connection_type=CFProjection,
                  response_fn = CFPRF_DotProduct_opt(),

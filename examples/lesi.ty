@@ -29,7 +29,7 @@ from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1, HomeostaticMaxEnt, ActivityAveragingOF, AttributeTrackingOF, PipelineOF
 from topo.outputfn.basic import GeneralizedLogistic, Sigmoid, HalfRectify
 from topo.pattern.basic import Gaussian, Composite, SeparatedComposite
-from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
+from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 
 import contrib.jsldefs
 from contrib.jsldefs import lesi_analysis_function

@@ -1,5 +1,5 @@
 >>> from topo import param
->>> from topo.misc.numbergenerators import UniformRandom
+>>> from topo.misc.numbergenerator import UniformRandom
 
 
 ## Basic tests of Dynamic parameters (__get__ & __set__,

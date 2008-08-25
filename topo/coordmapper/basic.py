@@ -23,7 +23,7 @@ from .. import param
 
 from topo.base.functionfamily import CoordinateMapperFn, IdentityMF
 from topo.misc.utils import signabs
-from topo.misc.numbergenerators import UniformRandom
+from topo.misc.numbergenerator import UniformRandom
 
 
 ##########################################################################

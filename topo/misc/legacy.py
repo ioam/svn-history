@@ -394,3 +394,9 @@ from topo.%s.projfn import *
             fake_a_module('projfns',eval('topo.%ss'%x),code,'topo.%ss'%x)
             fake_a_module('projfns',eval('topo.%s'%x),code,'topo.%s'%x)
 
+        import topo.misc.numbergenerator
+        code = \
+"""
+from topo.misc.numbergenerator import *
+"""
+        fake_a_module('numbergenerators',topo.misc,code)

@@ -68,7 +68,7 @@ def test_test_pattern():
     ## Test for state_push bug (simulation not run() before Present pressed)
     assert len(topo.sim.eps_to_start)>0, "test must be run before simulation is run()"
     from topo.pattern.basic import Gaussian
-    from topo.misc.numbergenerators import UniformRandom
+    from topo.misc.numbergenerator import UniformRandom
     topo.sim['GS'].set_input_generator(Gaussian(x=UniformRandom()))
     tp.Present()
     topo.sim.run(1)

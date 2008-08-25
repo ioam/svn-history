@@ -23,7 +23,7 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.base.patterngenerator import Constant
 from topo.pattern.basic import SineGrating, Disk, Ring, Rectangle
 from topo.misc.patternfns import gaussian,gabor,line,disk,ring
-from topo.misc.numbergenerators import UniformRandom
+from topo.misc.numbergenerator import UniformRandom
 
 
 

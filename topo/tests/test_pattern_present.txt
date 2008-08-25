@@ -3,7 +3,7 @@
 >>> from numpy import array
 >>> from numpy.testing import assert_array_equal
 >>> from topo.tests.utils import assert_array_not_equal, new_simulation
->>> from topo.misc.numbergenerators import UniformRandom
+>>> from topo.misc.numbergenerator import UniformRandom
 >>> from topo.command.basic import pattern_present,save_input_generators,restore_input_generators
 >>> import topo
 

@@ -23,7 +23,7 @@ from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1
 from topo.learningfn.projfn import CFPLF_OutstarHebbian
-from topo.misc.numbergenerators import UniformRandom
+from topo.misc.numbergenerator import UniformRandom
 
 
 # CEBHACKALERT: should be changed over to use circular connection fields.

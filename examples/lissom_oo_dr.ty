@@ -49,7 +49,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1
-from topo.misc.numbergenerators import UniformRandom
+from topo.misc.numbergenerator import UniformRandom
 
 
 num_inputs=1

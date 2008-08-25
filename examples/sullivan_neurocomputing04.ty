@@ -31,7 +31,7 @@ from topo.sheet.cfsom import CFSOM
 from topo.responsefn.optimized import CFPRF_EuclideanDistance_opt,CFPRF_DotProduct_opt
 from topo.learningfn.projfn import CFPLF_Trace, CFPLF_Plugin,  CFPLF_OutstarHebbian
 from topo.learningfn.som import CFPLF_HebbianSOM
-from topo.misc.numbergenerators import UniformRandom
+from topo.misc.numbergenerator import UniformRandom
 from topo.outputfn.basic import DivisiveNormalizeL2, KernelMax
 from topo.base.functionfamily import CoordinateMapperFn
 from topo.misc.patternfns import line
@@ -47,7 +47,7 @@ from topo.base.patterngenerator import Constant
 
 from topo.misc.patternfns import gaussian,gabor,line,disk,ring
 from topo.base.arrayutil import wrap
-from topo.misc.numbergenerators import UniformRandom
+from topo.misc.numbergenerator import UniformRandom
 
 
 # CEBALERT: keep old behavior until we investigate why changing

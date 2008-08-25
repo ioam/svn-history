@@ -25,7 +25,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Trace_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfn.basic import PiecewiseLinear,DivisiveNormalizeL1, Pipeline, HomeostaticMaxEnt, Sigmoid
-from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay, Choice
+from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay, Choice
 from topo.pattern.basic import Gaussian
 from topo.base.functionfamily import CoordinateMapperFn
 

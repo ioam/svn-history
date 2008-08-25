@@ -17,7 +17,7 @@ from math import pi, sqrt, exp, pow
 from numpy.oldnumeric import zeros, Float, sum
 from topo.projection.basic import CFProjection
 from topo.base.boundingregion import BoundingBox
-from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
+from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.pattern.basic import Gaussian,Selector,Null
 from topo.outputfn.basic import HomeostaticMaxEnt,OutputFnWithState
 from topo.sheet.lissom import LISSOM

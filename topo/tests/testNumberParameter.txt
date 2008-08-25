@@ -1,5 +1,5 @@
 >>> from topo import param
->>> from topo.misc.numbergenerators import UniformRandom
+>>> from topo.misc.numbergenerator import UniformRandom
 >>> from fixedpoint import FixedPoint
 
 # CEBALERT: tests needs to use mpq if it's available

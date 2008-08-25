@@ -46,7 +46,7 @@ location:
 <pre>
 $ ./topographica -g
 Topographica&gt; from topo import pattern
-Topographica&gt; from topo.misc.numbergenerators import UniformRandom
+Topographica&gt; from topo.misc.numbergenerator import UniformRandom
 Topographica&gt; input_pattern = pattern.Gaussian(size=0.08, aspect_ratio=4,
                  xdensity=60,ydensity=60,
                  x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),

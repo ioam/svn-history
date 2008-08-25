@@ -12,4 +12,4 @@ $Id$
 """
 __version__='$Revision$'
 
-__all__=['commandline','distribution','filepath','gendocs','inlinec','keyedlist','numbergenerators','patternfns','traces','utils']
+__all__=['commandline','distribution','filepath','gendocs','inlinec','keyedlist','numbergenerator','patternfns','traces','utils']

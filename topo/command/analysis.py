@@ -21,7 +21,7 @@ from topo.base.simulation import EPConnectionEvent
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 from topo.command.basic import pattern_present, wipe_out_activity
-from topo.misc.numbergenerators import UniformRandom
+from topo.misc.numbergenerator import UniformRandom
 from topo.misc.utils import frange
 from topo.misc.distribution import Distribution
 from topo.pattern.basic import SineGrating, Gaussian

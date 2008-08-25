@@ -3,7 +3,7 @@ from topo.command.pylabplots import matrixplot
 import numpy
 import pylab
 from numpy import array, size, mat, shape
-from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
+from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
 from topo.base.functionfamily import IdentityOF
 import topo
 from topo.base.boundingregion import BoundingBox
