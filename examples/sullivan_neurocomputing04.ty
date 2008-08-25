@@ -34,7 +34,7 @@ from topo.learningfn.som import CFPLF_HebbianSOM
 from topo.misc.numbergenerator import UniformRandom
 from topo.outputfn.basic import DivisiveNormalizeL2, KernelMax
 from topo.base.functionfamily import CoordinateMapperFn
-from topo.misc.patternfns import line
+from topo.misc.patternfn import line
 
 
 from math import pi, sin, cos
@@ -45,7 +45,7 @@ from topo.base.patterngenerator import PatternGenerator
 # Imported here so that all PatternGenerators will be in the same package
 from topo.base.patterngenerator import Constant
 
-from topo.misc.patternfns import gaussian,gabor,line,disk,ring
+from topo.misc.patternfn import gaussian,gabor,line,disk,ring
 from topo.base.arrayutil import wrap
 from topo.misc.numbergenerator import UniformRandom
 

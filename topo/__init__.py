@@ -132,7 +132,7 @@ details.
 
 
 # Set most floating-point errors to be fatal for safety; see
-# topo/misc/patternfns.py for examples of how to disable
+# topo/misc/patternfn.py for examples of how to disable
 # the exceptions when doing so is safe.  Underflow is always
 # considered safe; e.g. input patterns can be very small
 # at large distances, and when they are scaled by small

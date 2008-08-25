@@ -17,7 +17,7 @@ import topo
 from topo.base.patterngenerator import Constant
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.arrayutil import wrap
-from topo.misc.patternfns import gaussian,gabor,line,disk,ring
+from topo.misc.patternfn import gaussian,gabor,line,disk,ring
 from topo.misc.numbergenerator import UniformRandom
 
 # Could add a Gradient class, where the brightness varies as a

@@ -381,7 +381,8 @@ from topo.base.functionfamily import *
 """
         fake_a_module('functionfamilies',topo.base,code)
 
-
+        # CB: maybe a simple link from sys.modules would work for these?
+        # (didn't try - see earlier ALERT)
 
         # rXXXX renamed topo.x.projfns
         from topo import outputfn,responsefn,learningfn
@@ -394,9 +395,20 @@ from topo.%s.projfn import *
             fake_a_module('projfns',eval('topo.%ss'%x),code,'topo.%ss'%x)
             fake_a_module('projfns',eval('topo.%s'%x),code,'topo.%s'%x)
 
+        # rXXXX renamed topo.misc.numbergenerators
         import topo.misc.numbergenerator
         code = \
 """
 from topo.misc.numbergenerator import *
 """
         fake_a_module('numbergenerators',topo.misc,code)
+
+        # rXXXX renamed topo.misc.patternfns
+        import topo.misc.patternfn
+        code = \
+"""
+from topo.misc.patternfn import *
+"""
+        print 'fake patternfns'
+        fake_a_module('patternfns',topo.misc,code)
+        
