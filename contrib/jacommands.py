@@ -32,7 +32,7 @@ from topo.base.functionfamily import CoordinateMapperFn
 from topo.plotting.bitmap import MontageBitmap
 #from topo.misc.trace import ActivityMovie,InMemoryRecorder
 from topo.base.patterngenerator import PatternGenerator,Constant 
-
+from topo.outputfns.basic import  Sigmoid
 
 import matplotlib 
 matplotlib.use('Agg')
@@ -243,32 +243,47 @@ def AddV2():
     
     topo.sim['V2'] = LISSOM(nominal_density=__main__.__dict__.get('default_density',48.0),
                         nominal_bounds=BoundingBox(radius=__main__.__dict__.get('CS',0.5)),tsettle=9,
-                        output_fn=HomeostaticMaxEnt(a_init=14.5, b_init=__main__.__dict__.get('BINI',-4), mu=__main__.__dict__.get('V2MU',0.01)))
+                        #output_fn=HomeostaticMaxEnt(a_init=14.5, b_init=__main__.__dict__.get('BINI',-4), mu=__main__.__dict__.get('V2MU',0.01)))
+                        output_fn=Sigmoid(r=locals().get('r_init',8),k=locals().get('k_init',-3)))
 
     topo.sim.connect('V1Complex','V2',delay=0.05,dest_port=('Activity','JointNormalize', 'Afferent'),
-                    connection_type=CFProjection,strength=__main__.__dict__.get('V1aff_str',1.3),name='V1Afferent',
+                    connection_type=CFProjection,strength=__main__.__dict__.get('V2aff_str',0.8),name='V1Afferent',
                     weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply, 
                                                                     generators=[Gaussian(aspect_ratio=1.0, size=3),#__main__.__dict__.get('V1aff_size',30)),
                                                                                 topo.pattern.random.UniformRandom()]),
-                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V1aff_size',2*0.27083)/2),learning_rate=1.0);
+                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2aff_size',2*0.27083)/2),learning_rate=1.0);
 
-    topo.sim.connect('V2','V2',delay=0.05,name='V2LateralExcitatory',
+    topo.sim.connect('V2','V2',delay=0.025,name='V2LateralExcitatory',
                     connection_type=CFProjection,strength=0.9,
                     weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=__main__.__dict__.get('V2lat_exc_size',0.04)),
-                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2lat_exc_size',0.04)/2),learning_rate=0) 
+                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2lat_exc_size',0.08)/2),learning_rate=0) 
                 
-    topo.sim.connect('V2','V2',delay=0.05,name='V2LateralInhibitory',
+    topo.sim.connect('V2','V2',delay=0.025,name='V2LateralInhibitory',
                     connection_type=CFProjection,strength=-0.9,
                     weights_generator=topo.pattern.basic.Composite(operator=numpy.multiply, 
                                                                     generators=[Gaussian(aspect_ratio=1.0,      size=__main__.__dict__.get('V2lat_inh_size',2*0.22917)),
                                                                                 topo.pattern.random.UniformRandom()]),
-                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2lat_inh_size',2*0.22917)/2),learning_rate=1.8087)
+                    nominal_bounds_template=BoundingBox(radius=__main__.__dict__.get('V2lat_inh_size',2*0.22917)/2),learning_rate=0)
 
     topo.sim["V1Simple"].in_connections[0].strength=2.5
     topo.sim["V1Simple"].in_connections[1].strength=2.5
     topo.sim["V1Complex"].output_fn.output_fns[1].r=7
     topo.sim["V1Simple"].plastic=False
     topo.sim["V1Complex"].plastic=False
+    
+    ### Lateral excitatory bounds changes
+    LE='topo.sim["V2"].projections()["V2LateralExcitatory"]'
+
+    topo.sim.schedule_command( 20200,LE+'.change_bounds(BoundingBox(radius=0.06250))')
+    topo.sim.schedule_command( 20500,LE+'.change_bounds(BoundingBox(radius=0.04375))')
+    topo.sim.schedule_command( 21000,LE+'.change_bounds(BoundingBox(radius=0.03500))')
+    topo.sim.schedule_command( 22000,LE+'.change_bounds(BoundingBox(radius=0.02800))')
+    topo.sim.schedule_command( 23000,LE+'.change_bounds(BoundingBox(radius=0.02240))')
+    topo.sim.schedule_command( 24000,LE+'.change_bounds(BoundingBox(radius=0.01344))')
+    topo.sim.schedule_command( 25000,LE+'.change_bounds(BoundingBox(radius=0.00806))')
+    topo.sim.schedule_command( 26500,LE+'.change_bounds(BoundingBox(radius=0.00484))')
+    topo.sim.schedule_command( 28000,LE+'.change_bounds(BoundingBox(radius=0.00290))')
+    topo.sim.schedule_command(40000,LE+'.change_bounds(BoundingBox(radius=0.00174))')
     
     
 
@@ -323,20 +338,14 @@ def homeostatic_analysis_function():
     """
     
   
-    if __main__.__dict__['triesch'] == True or  __main__.__dict__['simple'] == True: 
-        plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
-        plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[3], 0, topo.sim.time(), filename="V1", ylabel="V1")
+    if __main__.__dict__['cascade'] == True or  __main__.__dict__['simple'] == True: 
+        plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1].output_fns[0], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
+        plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1].output_fns[2], 0, topo.sim.time(), filename="V1", ylabel="V1")
     else:
-        plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
-        plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[4], 0, topo.sim.time(), filename="V1", ylabel="V1")
+        plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1].output_fns[0], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
+        plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1].output_fns[3], 0, topo.sim.time(), filename="V1", ylabel="V1")
 
-   
-    plot_tracked_attributes(topo.sim["V1"].projections()["LGNOnAfferent"].output_fn.output_fns[1], 0,topo.sim.time(), filename="LGNOnBefore", ylabel="LGNOnBefore")
-    plot_tracked_attributes(topo.sim["V1"].projections()["LGNOffAfferent"].output_fn.output_fns[1], 0,topo.sim.time(), filename="LGNOffBefore", ylabel="LGNOffBefore")
-    #plot_tracked_attributes(topo.sim["V1"].projections()["LGNOnAfferent"].debug_output_fn.output_fns[1], 0,topo.sim.time(), filename="LGNOnAfter", ylabel="LGNOnAfter")
-    #plot_tracked_attributes(topo.sim["V1"].projections()["LGNOffAfferent"].debug_output_fn.output_fns[1], 0,topo.sim.time(), filename="LGNOffAfter", ylabel="LGNOffAfter")
-    plot_tracked_attributes(topo.sim["V1"].projections()["LateralExcitatory"].output_fn.output_fns[1], 0,topo.sim.time(), filename="LatExBefore", ylabel="LatExBefore")
-    plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], 0,topo.sim.time(), filename="LatInBefore", ylabel="LatInBefore")
+  
     
 
 class SimpleHomeo(OutputFnWithState):
@@ -416,9 +425,11 @@ def measure_histogram(iterations=1000,sheet_name="V1"):
     
     pylab.figure()
     pylab.subplot(111, yscale='log')
+    #pylab.subplot(111)
     
-    pylab.hist(concat_activities,(numpy.arange(20.0)/20.0))
-    pylab.axis(ymin=1,ymax=100000000)
+    pylab.hist(concat_activities,(numpy.arange(20.0)/20.0),normed=True)
+    pylab.axis(ymin=0.0000001,ymax=100)
+    pylab.show()
       
     
     pylab.savefig(normalize_path(str(topo.sim.time()) + 'activity_histogram.png'))
@@ -567,11 +578,17 @@ class CascadeHomeostatic(OutputFnWithState):
                 tmp = zeros(x.shape, x.dtype.char)                 
                 for i in xrange(self.num_cascades):
                     self.y_counts[i] = (1.0-self.a_smoothing)*((x >= self.thresholds[i])*1.0) + self.a_smoothing*self.y_counts[i]
-                    self.a -= self.a_eta *   ((self.y_counts[i] >= self.targets[i])*2.0-1.0)
+                    self.a -= self.a_eta * ((self.y_counts[i] >= self.targets[i])*2.0-1.0)
                     tmp += ((self.y_counts[i] >= self.targets[i])*2.0-1.0)
                 #self.a_grad = tmp*(1-self.g_smoothing) + self.a_grad*self.g_smoothing
                 self.a_grad = x*(1-self.g_smoothing) + self.a_grad*self.g_smoothing
                 self.y_count=self.a_grad
+                
+                print '%05g %05g %05g %05g %05g %05g %05g %05g %05g' % tuple(self.targets)
+                print '%05g %05g %05g %05g %05g %05g %05g %05g %05g' % (self.y_counts[0][24,24],self.y_counts[1][24,24],self.y_counts[2][24,24],self.y_counts[3][24,24],self.y_counts[4][24,24],self.y_counts[5][24,24],self.y_counts[6][24,24],self.y_counts[7][24,24],self.y_counts[8][24,24])
+                print [self.y_count[24,24],self.a[24,24],self.b[24,24]]
+                print "\n"
+                
 
   
 class ActivityHysteresis(OutputFnWithState):
@@ -723,3 +740,19 @@ class SequenceSelector(PatternGenerator):
                        
         return image_array
     
+def measure_ot(lat_exc,lat_inh):
+    import topo
+    topo.sim["V1"].in_connections[2].strength=lat_exc
+    topo.sim["V1"].in_connections[3].strength=lat_inh
+    
+    import topo.commands.analysis
+    import topo.commands.pylabplots
+    
+    filename = "E=" + str(lat_exc) + "_I=" + str(lat_inh) 
+     
+    topo.commands.analysis.sheet_name="V1"
+    topo.commands.analysis.coordinate = [0.0,0.0]
+    topo.commands.analysis.measure_or_tuning_fullfield(num_phase=12,num_orientation=24,frequencies=[2.4],
+                               curve_parameters=[{"contrast":30},{"contrast":60},{"contrast":90}])
+    
+    topo.commands.pylabplots.or_tuning_curve_batch("./GC_with_LGNGC/",filename,pylab.plot,"degrees","V1",[0,0],"orientation")
