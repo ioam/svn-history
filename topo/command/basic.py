@@ -213,7 +213,8 @@ def load_snapshot(snapshot_name):
                 "Error:"
             p.warning(m)
             raise 
-        
+
+    snapshot.close()
 
 
 def save_script_repr(script_name=None):
