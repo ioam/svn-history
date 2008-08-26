@@ -54,12 +54,11 @@ commands below.)
 
 <H4><A NAME="linux">Linux/UNIX:</A></H4>
 
-Most Linux and other UNIX platforms already have all of the necessary
+<P>Most Linux and other UNIX platforms already have all of the necessary
 programs and libraries required for Topographica.  But if your
-distribution does not include <code>svn</code>
-<!--CB: with ssl?-->
-or <code>php</code> by default, first obtain versions of those programs
-for your system and install them.
+distribution does not include <code>svn</code> or <code>php</code> by
+default, first obtain versions of those programs for your system and
+install them.
 
 <P>The Topographica files can be checked out by using the command:
 
@@ -72,143 +71,74 @@ working directory; omitting the final <code>topographica</code> will
 put the files directly into your present directory.
 
 <P>To get the bleeding-edge (trunk) version, replace <code>tags/LATEST_STABLE</code> with 
-<code>trunk</code>. Note that the bleeding-edge version
-is not always usable due to work in progress (but you can check to see if the
-code currently builds on a specific platform
-(<a href="http://buildbot.topographica.org/one_box_per_builder?builder=lodestar_build">Fedora</a>,
-<a href="http://buildbot.topographica.org/one_box_per_builder?builder=doozy_build">Ubuntu 7</a>,
-<a href="http://buildbot.topographica.org/one_box_per_builder?builder=sake_build">OS X 10.5</a>) and whether our   
-<a href="http://buildbot.topographica.org/one_box_per_builder?builder=lodestar_tests&builder=lodestar_slow-tests">code tests pass</a>).
+<code>trunk</code>. Note that the bleeding-edge version is not always
+usable due to work in progress (but you can check to see if the code
+currently builds on a specific platform, or if our code tests pass, by
+visiting our <A HREF="http://buildbot.topographica.org/">automatic
+tests page</A>).
 
 <P>The checkout process will likely take several minutes (probably
 appearing to hang at certain points), as there are some extremely
 large files involved. Once it has completed, you can return to
 instructions for <a href="index.html#building-topographica">building
-Topographica</a>.
+Topographica</a> (although ensure your system has the prerequisites as
+listed on that page for your platform)</a>.
 
 
 <H4><A NAME="osx">Mac OS X:</A></H4>
 
-Topographica can be downloaded and built on Mac OS X (or later) using the <A
-HREF="#linux">Linux</A> instructions above, but you will likely first
-need to install several packages required by Topographica. These
-instructions also assume that you will be using Mac OS X 10.5
-(Leopard); other OS X versions may require small changes to this
-procedure, to make sure that compatible libraries are available.  On
-that version of the system, you would do the following:
-
 <!-- note that out-of-date X11 instructions were removed in 
 r8900. At that revision, we topographica wasn't working with X11.-->
 
-<!-- CEBALERT: need to run through these on a fresh OS X 10.5 machine -->
-<ol>
-<li> From the Apple developer web site, download <A
-HREF="http://developer.apple.com/tools/xcode/">Xcode 3.0</A>
-(which, among other development utilities, provides the required GCC
-C/C++ compiler).  Other versions should also work, but have not
-necessarily been tested.
+<P>Topographica can be downloaded via SVN on Mac OS X using the Linux
+instructions, once you have obtained the Subversion program. You can
+download and install a binary from
+the <A HREF="http://subversion.tigris.org/getting.html">Subversion
+downloads page</A>, or you can use your package manager to install
+it. We have used Fink (installed as described in the list
+of <A HREF="index.html#mac-prerequisites">prerequisites</A> for Mac):
+in a Terminal window, type <code>fink install svn</code>.
 
-<li> Download and install the <A
-HREF="http://www.finkproject.org/download/">Fink 0.9.0 Binary
-Installer</A> package. Again, other versions should work, but have not
-necessarily been tested. If you prefer, you could use instead use a
-different package manager (e.g. Macports), but we have not tested
-that.
-
-<li> Start the Terminal application and enter the following command:
-<code>fink install svn libpng3 freetype219</code>. (These packages
-provide, respectively, the Subversion program required to access the
-Topographica code repository, the PNG format handling, and the font
-handling for the matplotlib library used by Topographica.)
-
-<li> If you want to compile a local copy of the documentation
-(e.g. for online help), use Fink to get imagemagick, transfig, php,
-and m4 (if these are not already installed): <code>fink install
-php4 m4 tetex imagemagick transfig</code>.
-<!-- with fink for os x 10.5 (i.e. not binary fink), this command 
-takes at least 6 hours to run on sake...and then it finishes with:
-Failed: Fink::SysState: Could not resolve inconsistent dependencies-->
-</ol>
-
-<P>If you have trouble running <code>fink</code>, make sure the Fink
-installation is actually in your path (the default Fink path is
-<code>/sw/bin/</code>; the installer should have set this up for
-you). Also, if you prefer not to use the commandline, you can install
-<a href="http://finkcommander.sourceforge.net/">FinkCommander</a>, a
-GUI for Fink that allows you to search for the packages above and
-click to install them.
-
-<P>Once these programs are installed, simply follow the <A
-HREF="#linux">Linux</A> instructions above.
+<P>Once you have SVN, simply follow the <A HREF="#linux">Linux</A>
+instructions above.
 
 
 <H4><A NAME="windows">Windows:</A></H4>
-<!--  CEB: One day we might have instructions for building -->
-<!--  Topographica on Windows, compiling everything from source...
-<!--  see the list of current tasks.-->
 
-<P><em>Please note that we have only recently moved from an older
-revision control system (CVS) to SVN, and the SVN setup on Windows is
-not yet complete.  To get the SVN version to build on Windows as of
-1/2008, you will probably need to update some of the included external
-packages.</em>
+<!--CB: I assume 32 bit win xp. Don't know how much that matters...-->
 
-<P>Under Windows, we recommend installing
-<A HREF="http://www.tortoisesvn.net/">TortoiseSVN</A> (tested 01/2008
-using TortoiseSVN 1.4.7), which comes as an easy-to-install
-executable. In general, TortoiseSVN users can easily translate
-commandline SVN instructions (e.g. those we give for linux users) by
-right clicking in an SVN-controlled directory and choosing the
-appropriate command from the TortoiseSVN submenu.
+<P>We support obtaining Topographica by SVN and building it on Windows
+via <A HREF="http://www.mingw.org/">MSYS/MinGW</A>. If your system
+does not already have MSYS/MinGW, please install
+MSYS 1.0.11 and MingGW 5.1.4 (from the MinGW <A HREF="http://sourceforge.net/project/showfiles.php?group_id=2435">download page</A>). Other versions might work, but we
+have not tested them. <!--CEBALERT: also in topographica-win: move or doc-->
 
-<!--TortoiseCVS includes everything required
-for read/write access, but if you are using another CVS client
-you might also need an SSH client such as
-<A HREF="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</A>.
--->
+<P>Once you have installed MSYS/MinGW, you will need to install Subversion.
+The easiest way to do this is to download the installer from the 
+<A HREF="http://subversion.tigris.org/getting.html">Subversion downloads
+page</A>.
 
-<P>After installing TortoiseSVN if you do not already have it, open
-the Windows directory where you want the Topographica files to be
-located on your machine (you might first wish to create a
-'topographica' folder), then right click, select <code>SVN
-Checkout</code>, and fill in the <code>URL of repository</code> with
-<pre>
-https://topographica.svn.sourceforge.net/svnroot/topographica/tags/LATEST_STABLE/topographica
-</pre>
+<P>Currently, we do not provide a method to compile Python on Windows.
+Therefore, it is also necessary to install Python 2.5.2 if your system does
+not already have
+it. An <A HREF="http://python.org/ftp/python/2.5.2/python-2.5.2.msi">installer
+package</A> is available from Python.org.
 
-Ensure that the <code>Checkout directory</code> shows the location
-into which you want the files to be placed (e.g. <code>c:\Documents
-and Settings\username\My Documents\topographica</code>), then
-click <code>OK</code>. As the files download, you will be informed of
-the transfer speed and amount transferred; the total as of 01/2008 is
-about 85 MBytes.
+<P>Having installed Python, it is finally necessary to install two further 
+packages that we do not yet support building from source:
+<ul>
+<li>Install <A HREF="http://effbot.org/downloads/PIL-1.1.5.win32-py2.5.exe">PIL 1.1.5</A> if your system does not already have it</li>
+<li>Install the GNU <A HREF="http://downloads.sourceforge.net/gnuwin32/jpeg-6b-4.exe">JPEG library</A> (again, if your system does not already have it).</li>
+</ul>
 
-<P>Following this step, it is necessary to obtain the Windows versions
-of Topographica's support tools. In the folder that contains your
-new <code>topographica</code> folder (i.e. the parent folder
-of <code>topographica</code>), right click again and choose <code>SVN
-Checkout</code> as before. Edit the last part of <code>URL of
-repository</code>, changing
-<code>topographica</code> to <code>topographica-win</code>. The URL
-should then read: 
-<pre>
-https://topographica.svn.sourceforge.net/svnroot/topographica/tags/LATEST_STABLE/topographica-win
-</pre>
-After clicking <code>OK</code>, you will have to wait longer
-than last time, since the Windows support tools are distributed as
-binaries (the total as of 01/2008 is about 125 MBytes).
+<P>Once these requirements are all present, you can follow the <A HREF="#linux">Linux SVN</A> instructions above
+by opening an MSYS terminal (double click on the MSYS icon on your desktop).
+If you have any problems, please feel free to ask for help in our
+<A HREF="http://sourceforge.net/forum/forum.php?forum_id=552131">Windows forum</A>.
+<!-- CEBALERT: Did I miss anything? Find my list... -->
 
-<P>Once the transfer has completed, move
-the <code>topographica-win</code> folder into
-the <code>topographica</code> folder (e.g. right click and hold down
-on <code>topographica-win</code>, drag over <code>topographica</code>,
-let go, then choose <code>Move</code>).
 
-<P>Now that you have TortoiseSVN installed, and the SVN version of
-Topographica, you can return to instructions
-for <a href="index.html#building-topographica">building
-Topographica</a>.
-
+<!--
 <H4><A NAME="windows">Cygwin:</A></H4>
 
 <P><A HREF="http://www.cygwin.com/">Cygwin</a> is a set of Unix
@@ -223,26 +153,14 @@ these makefiles so that Topographica can be installed under
 Cygwin should <A
 HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107">contact
 Jim</a> for more details.
-
-
-<!-- CB: error messages need to be updated. Maybe see if we get any
-these days?
-<H3>Problems with SVN?</H3>
-
-Sometimes the SourceForge.net svn service experiences problems. If you
-receive messages such as "connection closed by remote host", or the
-cvs connection times out, you may wish to check the SourceForge.net 
-<a href="https://sourceforge.net/docman/display_doc.php?docid=2352&group_id=1">status
-page</a>. Be aware that this page is not always updated as fast as
-problems appear.
 -->
 
 
 <H3>Updating using Subversion</H3>
 
-Linux/UNIX/Mac users who have Topographica checked out via SVN can
-update their copy of Topographica by changing to the
-directory containing the Topographica files and then doing:
+Users who have Topographica checked out via SVN can update their copy
+of Topographica by changing to the directory containing the
+Topographica files and then doing:
 
 <pre>
   svn update 
@@ -267,8 +185,8 @@ svn switch $TOPOROOT/tags/LATEST_STABLE/topographica
 To switch from the LATEST_STABLE version to the trunk version, replace
 <code>tags/LATEST_STABLE</code> with <code>trunk</code>.  (Note that
 before deciding whether to update to the bleeding-edge (trunk)
-version, you can check its
-<a href="http://buildbot.topographica.org/one_box_per_builder?builder=linux_tests&builder=linux_slow-tests">status</a>.)
+version, you can check its status on our 
+<a href="http://buildbot.topographica.org/">automatic tests page</a>.)
 Alternatively, to switch to a separate branch named 'some-branch', replace
 <code>tags/LATEST_STABLE</code> with <code>branches/some-branch</code>
 
@@ -277,15 +195,13 @@ Alternatively, to switch to a separate branch named 'some-branch', replace
 <P>You can discover if your copy is from the trunk or a particular
 branch or tag by typing <code>svn info | grep URL</code>.
 <!--CB: will need to clarify this when revisions are in branches/ -->
+
+<!--
 To see what other versions of the code are available, you can view the
 <a href="http://topographica.svn.sourceforge.net/viewvc/topographica/tags/">tags</a>
 directory of the SVN repository in your web browser, or type
 <code>svn ls --verbose $TOPOROOT/tags/</code>. 
-
-
-
-<P>Windows TortoiseSVN users can right click in the topographica
-directory and select <code>SVN Update</code> to get the new files.
+-->
 
 <P>Note that updating the external/ subdirectory sometimes takes a
 long time, if some of the external packages have been upgraded, and in
