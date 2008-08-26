@@ -268,7 +268,7 @@ topo.sim.connect('LGNOff','V1',delay=0.05, dest_port=('Activity','JointNormalize
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
                  connection_type=CFProjection,
-                 strength=1.0,
+                 strength=locals().get('exc_strength',1.0),
                  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
                  nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0.0) 
 
