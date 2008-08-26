@@ -402,4 +402,7 @@ dist: doc distdir reference-manual FORCE
 
 ChangeLog.txt: FORCE
 	make -C external svn2cl
-	external/svn2cl --include-rev --group-by-day --separate-daylogs -o ChangeLog.txt
+	external/svn2cl --include-rev --group-by-day --separate-daylogs --break-before-msg --stdout https://topographica.svn.sourceforge.net/svnroot/topographica/ | sed -e 's|/trunk/topographica/||g' > ChangeLog.txt
+
+
+
