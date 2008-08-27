@@ -16,14 +16,13 @@ from .. import param
 import topo.pattern.basic
 from topo.plotting import plot
 from topo.plotting.bitmap import *
-from topo.base.sheet import Sheet
+from topo.base.sheet import Sheet, BoundingBox
 from topo.base.simulation import *
 from topo.base import patterngenerator
 from topo.base.cf import CFProjection, CFSheet
 from topo.misc.numbergenerator import UniformRandom
 from topo.learningfn.optimized import CFPLF_Hebbian_opt
 from topo.sheet.generator import *
-
 
 ### Only for ImageSaver
 from numpy.oldnumeric import resize,array,zeros
