@@ -84,13 +84,13 @@ topo.sim['Retina']=sheet.GeneratorSheet(
     nominal_bounds=sheet.BoundingBox(radius=0.5+0.25+0.375))
 
 topo.sim['LGNOn']=sheet.CFSheet(
-    nominal_density=24.0,
+    nominal_density=locals().get('default_lgn_density',24.0),
     nominal_bounds=sheet.BoundingBox(radius=0.5+0.25),
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
     measure_maps=False)
 
 topo.sim['LGNOff']=sheet.CFSheet(
-    nominal_density=24.0,
+    nominal_density=locals().get('default_lgn_density',24.0),
     nominal_bounds=sheet.BoundingBox(radius=0.5+0.25),
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
     measure_maps=False)
