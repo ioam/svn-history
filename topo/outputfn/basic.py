@@ -319,7 +319,7 @@ class PatternCombine(OutputFn):
 
 
 
-### JABALERT: Is this the right location for this class?  It brings in
+### JABALERT: Need to move this class out of this file, as it brings in
 ### dependencies on PatternGeneratorParameter and Gaussian, which are
 ### not things that many OutputFns will need.  Perhaps move to som.py?
 class KernelMax(OutputFn):
