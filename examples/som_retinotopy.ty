@@ -22,13 +22,14 @@ __version__='$Revision$'
 import numpy
 from math import exp, sqrt
 
-from topo import pattern
-import topo.pattern.random
 from topo import learningfn
-import topo.learningfn.projfn 
-from topo import responsefn
-import topo.responsefn.optimized 
 from topo import outputfn
+from topo import pattern
+from topo import responsefn
+
+import topo.learningfn.projfn 
+import topo.pattern.random
+import topo.responsefn.optimized 
 
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet,CFProjection
