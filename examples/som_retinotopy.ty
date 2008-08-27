@@ -22,15 +22,18 @@ __version__='$Revision$'
 import numpy
 from math import exp, sqrt
 
+from topo import pattern
 import topo.pattern.random
-import topo.pattern.basic
+from topo import learningfn
+import topo.learningfn.projfn 
+from topo import responsefn
+import topo.responsefn.optimized 
+from topo import outputfn
 
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet,CFProjection
-from topo.learningfn.projfn import CFPLF_EuclideanHebbian
-from topo.misc.numbergenerator import UniformRandom,BoundedNumber,ExponentialDecay
-from topo.outputfn.basic import KernelMax
-from topo.responsefn.optimized import CFPRF_EuclideanDistance_opt
+
+from topo.misc import numbergenerator  
 from topo.sheet.generator import GeneratorSheet
 
 
@@ -43,18 +46,20 @@ GeneratorSheet.nominal_density = locals().get('default_retina_density',10.0)
 # Local variable to allow inputs to be controlled easily
 input_seed=locals().get('input_seed',0)
 
-input_pattern = topo.pattern.basic.Gaussian(
+input_pattern = pattern.Gaussian(
     scale=1.0,
     size=2*sqrt(2.0*0.1*24.0)/24.0,
     aspect_ratio=1.0,
-    x=UniformRandom(lbound=-0.5,ubound=0.5,seed=input_seed+12),
-    y=UniformRandom(lbound=-0.5,ubound=0.5,seed=input_seed+56),
+    x=numbergenerator.UniformRandom(lbound=-0.5,ubound=0.5,
+                                    seed=input_seed+12),
+    y=numbergenerator.UniformRandom(lbound=-0.5,ubound=0.5,
+                                    seed=input_seed+56),
     orientation=0)
 
 
 # Local variable to allow weights to be controlled easily
 weight_seed=locals().get('weight_seed',0)
-topo.pattern.random.seed((weight_seed+67,weight_seed+89))
+pattern.random.seed((weight_seed+67,weight_seed+89))
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 
@@ -62,16 +67,21 @@ default_density=locals().get('default_density',10.0)
 topo.sim['V1'] = CFSheet(
     nominal_density = default_density,
     # Original CMVC simulation used an initial radius of 13.3/40.0 (~0.33)
-    output_fn = KernelMax(density=default_density,
-        kernel_radius=BoundedNumber(bounds=(0.5/40,None),generator=
-            ExponentialDecay(starting_value = locals().get('radius_0',1.0),
-                             time_constant=40000/5.0))))
+    output_fn = outputfn.KernelMax(density=default_density,
+        kernel_radius=numbergenerator.BoundedNumber(
+            bounds=(0.5/40,None),
+            generator=numbergenerator.ExponentialDecay(
+                starting_value=locals().get('radius_0',1.0),
+                time_constant=40000/5.0))))
 
-topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,connection_type=CFProjection,
-    weights_generator = topo.pattern.random.UniformRandom(),
+topo.sim.connect(
+    'Retina','V1',name='Afferent',delay=0.05,
+    connection_type=CFProjection,
+    weights_generator = pattern.random.UniformRandom(),
     nominal_bounds_template=BoundingBox(radius=1.0), # fully connected network.
-    learning_rate=ExponentialDecay(starting_value = locals().get('alpha_0',0.42),
-                                   time_constant=40000/6.0),
-    response_fn = CFPRF_EuclideanDistance_opt(),
-    learning_fn = CFPLF_EuclideanHebbian())
+    learning_rate=numbergenerator.ExponentialDecay(
+        starting_value = locals().get('alpha_0',0.42),
+        time_constant=40000/6.0),
+    response_fn = responsefn.optimized.CFPRF_EuclideanDistance_opt(),
+    learning_fn = learningfn.projfn.CFPLF_EuclideanHebbian())
 
