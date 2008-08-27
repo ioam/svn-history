@@ -19,68 +19,59 @@ $Id$
 __version__='$Revision$'
 
 
-import numpy
 from math import exp, sqrt
+import numpy
 
 from topo import learningfn
+from topo import numbergen
 from topo import outputfn
 from topo import pattern
+from topo import projection
 from topo import responsefn
+from topo import sheet
 
 import topo.learningfn.projfn 
 import topo.pattern.random
 import topo.responsefn.optimized 
 
-from topo.base.boundingregion import BoundingBox
-from topo.base.cf import CFSheet,CFProjection
-
-from topo.misc import numbergenerator  
-from topo.sheet.generator import GeneratorSheet
-
 
 # input pattern
-GeneratorSheet.period = 1.0
-GeneratorSheet.phase = 0.05
+sheet.GeneratorSheet.period = 1.0
+sheet.GeneratorSheet.phase = 0.05
 # The locals().get calls allow the parameter to be overriden on the command line
-GeneratorSheet.nominal_density = locals().get('default_retina_density',10.0)
+sheet.GeneratorSheet.nominal_density = locals().get('default_retina_density',10.0)
 
 # Local variable to allow inputs to be controlled easily
 input_seed=locals().get('input_seed',0)
 
-input_pattern = pattern.Gaussian(
-    scale=1.0,
-    size=2*sqrt(2.0*0.1*24.0)/24.0,
-    aspect_ratio=1.0,
-    x=numbergenerator.UniformRandom(lbound=-0.5,ubound=0.5,
-                                    seed=input_seed+12),
-    y=numbergenerator.UniformRandom(lbound=-0.5,ubound=0.5,
-                                    seed=input_seed+56),
-    orientation=0)
+input_pattern = pattern.Gaussian(scale=1.0,size=2*sqrt(2.0*0.1*24.0)/24.0,
+    aspect_ratio=1.0,orientation=0,
+    x=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=input_seed+12),
+    y=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=input_seed+56))
 
 
 # Local variable to allow weights to be controlled easily
 weight_seed=locals().get('weight_seed',0)
 pattern.random.seed((weight_seed+67,weight_seed+89))
 
-topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
+topo.sim['Retina'] = sheet.GeneratorSheet(input_generator=input_pattern)
 
 default_density=locals().get('default_density',10.0)
-topo.sim['V1'] = CFSheet(
+topo.sim['V1'] = sheet.CFSheet(
     nominal_density = default_density,
     # Original CMVC simulation used an initial radius of 13.3/40.0 (~0.33)
     output_fn = outputfn.KernelMax(density=default_density,
-        kernel_radius=numbergenerator.BoundedNumber(
+        kernel_radius=numbergen.BoundedNumber(
             bounds=(0.5/40,None),
-            generator=numbergenerator.ExponentialDecay(
+            generator=numbergen.ExponentialDecay(
                 starting_value=locals().get('radius_0',1.0),
                 time_constant=40000/5.0))))
 
-topo.sim.connect(
-    'Retina','V1',name='Afferent',delay=0.05,
-    connection_type=CFProjection,
+topo.sim.connect('Retina','V1',name='Afferent',delay=0.05,
+    connection_type=projection.CFProjection,
     weights_generator = pattern.random.UniformRandom(),
-    nominal_bounds_template=BoundingBox(radius=1.0), # fully connected network.
-    learning_rate=numbergenerator.ExponentialDecay(
+    nominal_bounds_template=sheet.BoundingBox(radius=1.0), # fully connected network.
+    learning_rate=numbergen.ExponentialDecay(
         starting_value = locals().get('alpha_0',0.42),
         time_constant=40000/6.0),
     response_fn = responsefn.optimized.CFPRF_EuclideanDistance_opt(),
