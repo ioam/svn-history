@@ -11,6 +11,7 @@ from .. import param
 from ..param.parameterized import ParamOverrides
 
 from topo.base.patterngenerator import PatternGenerator
+from topo.pattern import Composite, Gaussian
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.outputfn.basic import IdentityOF
 
@@ -101,6 +102,7 @@ class BinaryUniformRandom(RandomGenerator):
         return params['offset']+params['scale']*(self.random_generator.uniform(rmin,rmin+1.0,shape).round())
 
 
+
 class GaussianRandom(RandomGenerator):
     """
     2D Gaussian random noise pattern generator.
@@ -116,3 +118,19 @@ class GaussianRandom(RandomGenerator):
     def _distrib(self,shape,params):
         return params['offset']+params['scale']*self.random_generator.standard_normal(shape)
 
+
+
+class GaussianCloud(Composite):
+    """Uniform random noise masked by a circular Gaussian."""
+    ### JABALERT: Should be possible to eliminate this class; see teststimuli.py.
+
+    operator = param.Parameter(numpy.multiply)
+    
+    gaussian_size = param.Number(default=1.0,doc="Size of the Gaussian pattern.")
+
+    def __init__(self,**params_to_override):
+        params = ParamOverrides(self,params_to_override)
+        super(GaussianCloud,self).__init__(**params)
+
+        self.generators=[Gaussian(aspect_ratio=1.0, size=params['gaussian_size']),
+                         UniformRandom()]
