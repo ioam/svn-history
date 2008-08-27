@@ -25,12 +25,12 @@ These simulations are intended to be close (but approximate) matches
 to the various map simulations in chapter 5 of Miikkulainen, Bednar,
 Choe, and Sirosh (2005), Computational Maps in the Visual Cortex,
 Springer.  Specifically:
-    dataset='Gaussian', dims=['or']:           Figure 5.9
-    dataset='Nature',   dims=['or']:           Figure 5.13 Nature
-    dataset='Gaussian', dims=['od','dr']:      Figure 5.23
-    dataset='Gaussian', dims=['or','od']:      Figure 5.27
-    dataset='Gaussian', dims=['or','od','dr']: Figure 5.29
-    dataset='Nature',   dims=['or','od','dr']: Figure 5.31
+    dataset='Gaussian', dims=['or']:           CVMC Figure 5.9
+    dataset='Nature',   dims=['or']:           CVMC Figure 5.13 Nature
+    dataset='Gaussian', dims=['od','dr']:      CVMC Figure 5.23
+    dataset='Gaussian', dims=['or','od']:      CVMC Figure 5.27
+    dataset='Gaussian', dims=['or','od','dr']: CVMC Figure 5.29
+    dataset='Nature',   dims=['or','od','dr']: CVMC Figure 5.31
 
 Known differences include:
 
@@ -52,6 +52,25 @@ Known differences include:
 
 There may be other small differences, as this file has not yet been
 compared exhaustively to the original simulations.
+
+Furhermore, some combinations of dimensions can approximately replicate 
+various map simulations in:
+ - Tikesh Ramtohul. A self-organizing model of disparity maps in the primary visual cortex. 
+   Master's thesis, The University of Edinburgh, Scotland, UK, 2006.
+ - James A. Bednar, Judah B. De Paula, and Risto Miikkulainen. Self-organization of color 
+   opponent receptive fields and laterally connected orientation maps. Neurocomputing, 65-66:69-76, 2005. 
+   Presented at the 2004 Computational Neuroscience Meeting.
+ - Judah Ben De Paula. Modeling the Self-Organization of Color Selectivity in the Visual Cortex. 
+   PhD thesis, Department of Computer Sciences, The University of Texas at Austin, Austin, TX, 2007.
+ - Christopher M. Palmer and James A. Bednar. Topographic and laminar organization of spatial 
+   frequency and orientation in a developmental model of V1 using natural images. In Society for 
+   Neuroscience Abstracts. Society for Neuroscience, www.sfn.org, 2007. Program No. 395.13.
+
+Specifically:
+    dataset='Gaussian',    dims=['or','dy']:           ramtohul:msc06
+    dataset='Nature',      dims=['or','rg']:           jbednar:neurocomputing05
+    dataset='Nature',      dims=['or','cr']:           depaula:phd07
+    dataset='Nature',      dims=['or','sf']:           palmer:sfn07
 
 $Id$
 """
