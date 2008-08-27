@@ -21,103 +21,8 @@ from topo.base.simulation import EPConnectionEvent
 from topo.misc.inlinec import optimized
 from topo.misc.keyedlist import KeyedList
 from topo.outputfn.basic import PiecewiseLinear
+from topo.sheet import JointNormalizingCFSheet, JointNormalizingCFSheet_Continuous
 
-
-class JointNormalizingCFSheet(CFSheet):
-    """
-    A type of CFSheet extended to support joint sum-based normalization.
-
-    For L1 normalization, joint normalization means normalizing the
-    sum of (the absolute values of) all weights in a set of
-    corresponding CFs in different Projections, rather than only
-    considering weights in the same CF.
-
-    This class makes it possible for a model to use joint
-    normalization, by providing a mechanism for grouping Projections
-    (see _port_match), plus a learn() function that computes the joint
-    sums.  Joint normalization also requires having ConnectionField
-    store and return a norm_total for each neuron, and having an
-    OutputFn that will respect this norm_total rather than the strict
-    total of the ConnectionField's weights.  At present,
-    CFPOF_DivisiveNormalizeL1 and CFPOF_DivisiveNormalizeL1_opt do use
-    norm_total; others can be extended to do something similar if
-    necessary.
-
-    To enable joint normalization, you can declare that all the
-    incoming connections that should be normalized together each
-    have a dest_port of:
-
-    dest_port=('Activity','JointNormalize', 'AfferentGroup1'),
-
-    Then all those that have this dest_port will be normalized
-    together, as long as an appropriate OutputFn is being used.
-    """
-
-    # JABALERT: Should check that whenever a connection is added to a
-    # group, it has the same no of cfs as the existing connections.
-    def start(self):
-        self._normalize_weights()        
-
-                       
-    def compute_joint_norm_totals(self,projlist,mask):
-        """
-        Compute norm_total for each CF in each projection from a group to be normalized jointly.
-        """
-
-        # Assumes that all Projections in the list have the same r,c size
-        assert len(projlist)>=1
-        proj  = projlist[0]
-        rows,cols = proj.cfs.shape
-
-        for r in range(rows):
-            for c in range(cols):
-                if(mask[r,c] != 0):
-                    sums = [p.cfs[r,c].norm_total for p in projlist]
-                    joint_sum = Numeric.add.reduce(sums)
-                    for p in projlist:
-                        p.cfs[r,c].norm_total=joint_sum
-
-
-    def _normalize_weights(self,mask = None):
-        """
-        Apply the weights_output_fn for every group of Projections.
-        
-        The mask is telling which neurons need to be normalized.
-        """
-        
-        if(mask == None):
-            mask = Numeric.ones(self.shape,activity_type)
-        
-        for key,projlist in self._grouped_in_projections('JointNormalize'):
-            if key == None:
-                normtype='Independent'
-            else:
-                normtype='Joint'
-                self.compute_joint_norm_totals(projlist,mask)
-
-            self.debug(normtype + "ly normalizing:")
-
-            for p in projlist:
-                p.apply_learn_output_fn(mask)
-                self.debug('  ',p.name)
-
-
-    def learn(self):
-        """
-        Call the learn() method on every Projection to the Sheet, and
-        call the output functions (jointly if necessary).
-        """
-        # Ask all projections to learn independently
-        for proj in self.in_connections:
-            if not isinstance(proj,Projection):
-                self.debug("Skipping non-Projection "+proj.name)
-            else:
-                proj.learn()
-
-        # Apply output function in groups determined by dest_port
-        self._normalize_weights(self.activity)
-
-        
 
 class LISSOM(JointNormalizingCFSheet):
     """
@@ -259,20 +164,6 @@ class LISSOM(JointNormalizingCFSheet):
             e=EPConnectionEvent(conn.delay+self.simulation.time(),conn,data)
             self.simulation.enqueue_event(e)
 
-
-class JointNormalizingCFSheet_Continuous(JointNormalizingCFSheet):
-    """
-    CFSheet that runs continuously, with no 'resting' periods between pattern presentations.
-    
-    Note that learning occurs only when the time is a whole number.
-    """
-    def process_current_time(self):
-        if(float(topo.sim.time()) % 1.0 == 0.0):
-            #self.activate()
-            if (self.plastic):
-                 self.learn()
-        else:
-             self.activate()
 
 
 
