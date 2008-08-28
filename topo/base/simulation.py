@@ -900,8 +900,65 @@ class Simulation(param.Parameterized,OptionalSingleton):
         else:
             register = cls.register
             
-        return OptionalSingleton.__new__(cls,register)
+        n = OptionalSingleton.__new__(cls,register)
 
+        # CEBALERT: without removing references to the Sheets from
+        # from instances of Slice, those instances of Slice and the
+        # Sheets they refer to are never garbage collected. 
+        #
+        # This temporary implementation of cleanup code explicitly
+        # removes references to Sheets from Slice instances for
+        # typical simulations.
+        #
+        # 1: Better than having cleanup code here would be to make a
+        # change to Slice, so that a Slice either doesn't have a
+        # reference to a Sheet, or doesn't hold onto that reference.
+        #
+        # 2: Some cleanup code will always be required here in
+        # Simulation.__new__: As well as removing references to Sheets
+        # from Slices, it is also necessary to remove references to
+        # sheets from Simulation's lists of EPs - otherwise the sheets
+        # are not garbage collected and memory usage will go up every
+        # time a new Simulation is created. This cleanup must be in
+        # Simulation.__new__ so that it runs whenever a simulation is
+        # created or unpickled (it can't be done e.g. in
+        # load_snapshot).
+        #
+        # 3: this particular implementation assumes the only instances
+        # of Slice are in ConnectionFields, which is true for our
+        # simulations. (This won't matter when the slice cleanup
+        # becomes unnecessary.)
+        if hasattr(n,'_cleanup'):
+            n._cleanup()
+        # if we don't collect() here (exactly here - not in _cleanup,
+        # and not later), gc seems to lose track of some objects and
+        # there is still a (smaller) memory increase with every call
+        # to load_snapshot()
+        import gc
+        gc.collect()
+
+        return n
+
+    # CEBALERT: see gc alert in __new__()
+    def _cleanup(self):
+        # will always be required: in case eps haven't been started
+        # so are still in the list
+        if hasattr(self,'eps_to_start'):
+            self.eps_to_start[:]=[]
+            
+        if hasattr(self,'_event_processors'):
+            for name,EP in self._event_processors.items():
+                for c in EP.in_connections:
+                    if hasattr(c,'_cleanup'):
+                        c._cleanup()
+                # will always be required
+                self._event_processors[name]=None
+                # (check when cleaning up existing mechanism for
+                # adding sheets e.g. sim['x']=sheet could first set
+                # sim['x'] to None if there is already a sheet with
+                # name x...)
+                
+                
 
     def _set_time(self,time=0):
         """

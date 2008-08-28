@@ -808,6 +808,13 @@ class CFProjection(Projection):
         raise NotImplementedError
 
 
+    # CEBALERT: see gc alert in simulation.__new__
+    def _cleanup(self):
+        for cf in self.cfs.flat:
+            cf.input_sheet=None
+            cf.input_sheet_slice=None
+            cf.weights_slice=None
+
 
 class CFIter(object):
     """

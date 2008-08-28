@@ -96,7 +96,7 @@ Priorities:
     ## change the behavior if the sequence length is longer than the
     ## period, but I'm not sure how important that is, and it might
     ## actually be useful the other way.
-
+(8) gc alert in simulation.__new__
 
 * Parameters
 (8) FixedPoint doesn't work properly with Number (removing fixedpoint anyway?)
