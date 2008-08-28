@@ -4,8 +4,7 @@ The Model Editor allows you to view, manipulate or create a Topographica
 model. By combining pre-defined components and changing each
 component's parameters, you can produce useful models without any
 programming. The result can then be saved to a .ty script, which you
-can edit to add any features not yet supported by the Model Editor
-(such as dynamic numbers).
+can edit to add any features not yet supported by the Model Editor.
 
 <h2>Opening the Model Editor</h2>
 <p>The model editor can be accessed through the Topographica
