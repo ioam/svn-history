@@ -25,6 +25,7 @@ from topo.base.sheetview import SheetView
 import numpy.oldnumeric.mlab as MLab
 import numpy.oldnumeric.random_array as RandomArray
 
+from topo import param
 
 from random import random
 
@@ -50,7 +51,7 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     ## This code should never be seen.  It means that calling code did
     ## not take the precaution of clipping the input matrices.
     if max(rmat.ravel()) > 1 or max(gmat.ravel()) > 1 or max(bmat.ravel()) > 1:
-	topo.base.parameterizedobject.Parameterized().warning('HSVBitmap inputs exceed 1. Clipping to 1.0')
+	param.Parameterized().warning('HSVBitmap inputs exceed 1. Clipping to 1.0')
 	if max(rmat.ravel()) > 0: rmat = clip(rmat,0.0,1.0)
 	if max(gmat.ravel()) > 0: gmat = clip(gmat,0.0,1.0)
 	if max(bmat.ravel()) > 0: bmat = clip(bmat,0.0,1.0)

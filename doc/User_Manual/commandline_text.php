@@ -341,11 +341,11 @@ by starting Topographica as:
 
 <pre>
   ./topographica -c "from topo import param" \
-  -c "param.parameterized.min_print_level=parameterizedobject.VERBOSE" ...
+  -c "param.parameterized.min_print_level=param.parameterized.VERBOSE" ...
 </pre>
 
 Instead of VERBOSE, you can use any of the other message levels
-defined in parameterizedobject.py, such as DEBUG, which gives even
+defined in parameterized.py, such as DEBUG, which gives even
 more information (typically much more than is useful).
 
 

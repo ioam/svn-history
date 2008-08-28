@@ -62,7 +62,7 @@ CFProjection.learning_fn = CFPLF_Hebbian_opt()
 CFProjection.response_fn = CFPRF_DotProduct_opt()
 
 
-#topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.MESSAGE
+#param.parameterized.min_print_level = param.parameterized.MESSAGE
 
 
 ###########################################

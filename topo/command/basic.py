@@ -352,8 +352,7 @@ def run_batch(script_file,output_directory="Output",
 
     # Ensure that saved state includes all parameter values
     from topo.command.basic import save_script_repr
-    from topo.param import parameterized as parameterizedobject
-    parameterizedobject.script_repr_suppress_defaults=False
+    param.parameterized.script_repr_suppress_defaults=False
 
     # Make sure pylab plots are saved to disk
 
