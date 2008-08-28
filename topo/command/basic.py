@@ -136,8 +136,8 @@ def save_snapshot(snapshot_name=None,xml=False):
     with the notable exception of class attributes. Python does not
     pickle class attributes, but this function stores class attributes
     of any Parameterized class that is declared within the topo
-    package. See the topo.base.PicklableClassAttributes class for more
-    information.
+    package. See the topo.param.parameterized.PicklableClassAttributes
+    class for more information.
     """
     if not snapshot_name:
         snapshot_name = topo.sim.basename() + ".typ"
