@@ -31,7 +31,7 @@ topo_t000000.00_c1&gt;&gt;&gt; topo.sim['V1'].density
                Out[1]:50.0
 
 topo_t000000.00_c2&gt;&gt;&gt; topo.sim['V1'].output_fn
-               Out[2]:KernelMax(crop_radius_mugtiplier=...)
+               Out[2]:KernelMax(crop_radius_multiplier=...)
 
 topo_t000000.00_c3&gt;&gt;&gt; from topo.outputfn import *
 
