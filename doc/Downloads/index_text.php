@@ -11,11 +11,12 @@ use <A HREF="http://subversion.tigris.org/">Subversion</A> (SVN). This
 is recommended for users who want more frequent updates, or who need
 to modify the source code.
 
-<P>The following sections describe how to obtain, build (if
-necessary), and run Topographica
+<P>The following sections describe how to obtain and build (if
+necessary) Topographica
 on <A HREF="#win">Windows</A>, <A HREF="#mac">OS X</A>,
-and <A HREF="#lin">Linux/UNIX</A>.
-
+and <A HREF="#lin">Linux/UNIX</A>. Afterwards, there are instructions
+on how to <A HREF="#running-topographica">run Topographica</A>.
+<!--running topographica in the downloads section?-->
 
 <H3><A NAME="win">Windows</A></H3>
 
@@ -40,7 +41,7 @@ can open an MSYS terminal by double clicking the icon on your
 desktop. From there, change to the directory where you downloaded
 Topographica (e.g. <code> cd /c/topographica/</code>) and
 type <code>make win-msys-patch</code>.  Once that command has
-completed, you can follow the <A HREF="#building-topographica">linux
+completed, you can follow the <A HREF="#building-topographica">common
 build</A> instructions below.
 
 
@@ -104,32 +105,32 @@ GUI for Fink that allows you to search for the packages above and
 click to install them.
 </ul>
 
-
 <P>Finally, if you do not already have Tcl/Tk version 8.5 or later
 installed on your system, you will need to install it to use the
 Topographica GUI. The easiest method is to
 install <A HREF="http://www.activestate.com/Products/activetcl/">ActiveTcl</A>,
 although any Framework build of Tcl/Tk 8.5 should work.
 
-<P>Having obtained these prerequisites, you can now download Topographica.
+<P>Having obtained these prerequisites, you can obtain and build
+Topographica, as described below.
 
 
 <H4>Obtaining Topographica</H4>
  
 <!--Might be better just to duplicate linux section here-->
-<P>After opening a Terminal (usually found in the Utilities folder in
-the Applications section of Finder), please follow the instructions
-for <A HREF="#linux-obtaining">obtaining Topographica in
-linux</A>. Once you have followed that section, you can proceed to build
-Topographica as described below.
+<P>No special steps are required to obtain Topographica on OS X;
+please follow the common instructions
+for <A HREF="#common-obtain">obtaining Topographica</A>. Once you have
+followed that section, you can proceed to build Topographica as
+described below.
 
 <H4>Building Topographica</H4>
 
-<P>Again using the Terminal, enter the <code>topographica</code>
-directory and type <code>make osx-tk-patch</code> (this allows
-Python to find the correct version of Tcl/Tk). Having done this,
-please now follow the instructions for <A HREF="#building-topographica">building
-Topographica on linux</A>.
+<P>Using the Terminal application, enter the <code>topographica</code>
+directory and type <code>make osx-tk-patch</code> (this allows Python
+to find the correct version of Tcl/Tk). Having done this, you can now
+follow the common instructions
+for <A HREF="#building-topographica">building Topographica</A>.
 
 
 <H3><A NAME="lin">Linux/UNIX</A></H3>
@@ -161,11 +162,17 @@ sometimes specific versions must be specified (e.g.
 <code>libfreetype6-dev</code>).  Example for Ubuntu 7.10:
 <blockquote><code>sudo apt-get install  libfreetype6 libfreetype6-dev libpng12-0 libpng12-dev libx11-dev zlib1g</code></blockquote>
 
-<P>Once these libraries are installed, you can proceed to obtain Topographica.
+<P>Once these libraries are installed, you can proceed to
+the <A HREF="#common-obtain">common instructions</A> for all
+platforms.
 
 
+<H3><A NAME="common">All platforms</A></H3>
 
-<H4><A NAME="linux-obtaining">Obtaining Topographica</A></H4>
+<P>The instructions below assume you have followed any necessary
+platform-specific instructions described above.
+
+<H4><A NAME="common-obtain">Obtaining Topographica</A></H4>
 
 <P>If you want frequent updates, or you want to modify the source
 code, please first follow our <A HREF="cvs.html">SVN
@@ -189,8 +196,8 @@ this approach does increase the disk space and compile time
 requirements.
 -->
 
-<P>Once you have satisfied the prerequisites and have downloaded and
-extracted Topographica, just type
+<P>Once you have satisfied the prerequisites for your platform and
+have downloaded and extracted Topographica, type
 <code>make</code> (which may be called <code>gmake</code> on some
 systems) from within the <code>topographica/</code> directory.  It is
 best to do this as a regular user in the user's own directory, not as
