@@ -811,9 +811,13 @@ class CFProjection(Projection):
     # CEBALERT: see gc alert in simulation.__new__
     def _cleanup(self):
         for cf in self.cfs.flat:
-            cf.input_sheet=None
-            cf.input_sheet_slice=None
-            cf.weights_slice=None
+            # cf could be None or maybe something else
+            if hasattr(cf,'input_sheet'):
+                cf.input_sheet=None
+            if hasattr(cf,'input_sheet_slice'):
+                cf.input_sheet_slice=None
+            if hasattr(cf,'weights_slice'):
+                cf.weights_slice=None
 
 
 class CFIter(object):
