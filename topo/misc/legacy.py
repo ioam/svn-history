@@ -8,13 +8,19 @@ __version__='$Revision: 8021 $'
 import imp
 import sys
 
-# If we were using pickle rather than cpickle, could subclass the
+# CB: If we were using pickle rather than cpickle, could subclass the
 # unpickler to look for module Xs as module X if Xs can't be found,
 # and probably simplify quite a lot of the legacy code installation.
 #
 # Maybe we could do that by trying to use cpickle initially, then
 # falling back to pickle when we do a 'legacy load' of the snapshot.
 
+
+# CB: Could probably simplify some things in here where I've
+# accidentally used the more complex code like fake_a_class for simply
+# linking one class to another after renaming the class (fake_a_class()
+# is to create a class in a module where the class doesn't exist at
+# all any more). But things are working at the moment...
 
 def preprocess_state(class_,state_mod_fn): 
     """
@@ -429,3 +435,7 @@ from topo.misc.trace import *
 """
         fake_a_module('traces',topo.misc,code)
 
+        # rXXXX duplicate SineGratingDisk removed
+        import topo.pattern.basic
+        import topo.pattern.teststimuli
+        topo.pattern.basic.SineGratingDisk = topo.pattern.teststimuli.SineGratingDisk

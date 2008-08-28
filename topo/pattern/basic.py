@@ -533,57 +533,6 @@ class Selector(PatternGenerator):
 
 
 
-class SineGratingDisk(PatternGenerator):
-    """A sine grating masked by a circular disk so that only a round patch is visible."""
-    ### JABALERT: This class should not be necessary, if we can provide a way
-    ### to control the parameters of subparts of Composite objects
-    ### more easily (e.g. in the Test Pattern window, or when
-    ### measuring tuning curves).
-
-
-    aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-        precedence=0.31,doc=
-        "Ratio of width to height; size*aspect_ratio gives the width of the disk.")
-
-    size  = param.Number(default=0.5,doc="Top to bottom height of the disk")
-    
-    smoothing = param.Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,0.5),
-                       precedence=0.61,doc="Width of the Gaussian fall-off")
-
-    phase  = param.Number(default=1.0, doc="phase of the sine grating")
-
-    frequency  = param.Number(default=2.4,doc="frequency of the sine grating")
-
-       
-    def __call__(self,**params_to_override):
-        params = ParamOverrides(self,params_to_override)
-
-        bounds = params['bounds']
-        xdensity=params['xdensity']
-        ydensity=params['ydensity']
-        x=params['x']
-        y=params['y']
-        scale=params['scale']
-        offset=params['offset']
-        size=params['size']
-        orientation=params['orientation']
-        size=params['size']
-        phase=params['phase']
-        frequency=params['frequency']
-        aspect_ratio=params['aspect_ratio']
-        smoothing=params['smoothing']
-
-      
-        input_1=SineGrating(phase=phase, frequency=frequency, orientation=orientation, scale=scale, offset=offset)
-        input_2=Disk(aspect_ratio=aspect_ratio,smoothing=smoothing,x=x, y=y,size=size,scale=scale, offset=offset)
-        
-        patterns = [input_1(xdensity=xdensity,ydensity=ydensity,bounds=bounds),
-                            input_2(xdensity=xdensity,ydensity=ydensity,bounds=bounds)]
-                      
-        image_array = numpy.minimum.reduce(patterns)
-        return image_array
-
-
 ### JABALERT: This class should be eliminated if at all possible; it
 ### is just a specialized version of Composite, and should be
 ### implementable directly using what is already in Composite.    
