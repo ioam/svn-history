@@ -16,19 +16,18 @@
   optional XML snapshot
   <A HREF="../Reference_Manual/topo.command.basic-module.html#save_snapshot">saving</A> and
   <A HREF="../Reference_Manual/topo.command.basic-module.html#load_snapshot">loading</A>
-<!-- (do 'make -C external gnosis') --><BR>
   simpler and more complete support for dynamic parameters<BR>  
 <!-- dynamic parameters now update at most once per simulation time<BR> -->
   updated to Python 2.5 and numpy 1.1.1.<BR>
   source code moved from CVS to Subversion (<A HREF="../Downloads/cvs.html">SVN</A>)<BR>
-<!--  replaced FixedPoint with mxnumber (or gmpy?) for speed<BR> -->
+<!--  replaced FixedPoint with gmpy for speed and to have rational no. for time<BR> -->
   automatic Windows and Mac <A target="_top" href="http://buildbot.topographica.org">daily builds</A><br>
   automatic running and startup <A target="_top" href="http://buildbot.topographica.org">performance measurement</A><br>
   contrib dir<BR>
   divisive and multiplicative connections<BR>
   simulation time is now a rational number for precision<BR>
   PyTables HDF5 interface<BR>
-<!-- topo/misc/legacy.py<BR> -->
+<!-- topo/misc/legacy.py i.e. we can now support old snapshots if necessary<BR> -->
   <A HREF="../Downloads/git.html">Instructions</A> for checking out Git version of repository<BR>
 </dd>
 <dt>Command-line and batch:</dt>
@@ -40,12 +39,11 @@
   <!-- , e.g.
   &nbsp;&nbsp;&nbsp;<A HREF="../Reference_Manual/topo.misc.commandline-module.html#gui">topo.misc.commandline.gui()</A> or<BR>
   &nbsp;&nbsp;&nbsp;<A HREF="../Reference_Manual/topo.misc.commandline-module.html#auto_import_commands">topo.misc.commandline.auto_import_commands()</A>--><BR>
-<!--  added -p option to call Psyco JIT optimizer<BR> -->
 </dd>
 <dt>GUI:</dt>
 <dd>
   plot windows can be docked into main window<BR>
-  uses tk8.5 for anti-aliased fonts<BR>
+  uses tk8.5 for anti-aliased fonts <!--and potential to move to platform-specific themes--><BR>
 <!--  cleaned up ParametersFrame and TaggedSlider behavior<BR> -->
 </dd>
 </font>
