@@ -131,11 +131,15 @@ packages that we do not yet support building from source:
 <li>Install the GNU <A HREF="http://downloads.sourceforge.net/gnuwin32/jpeg-6b-4.exe">JPEG library</A> (again, if your system does not already have it).</li>
 </ul>
 
-<P>Once these requirements are all present, you can follow the <A HREF="#linux">Linux SVN</A> instructions above
-by opening an MSYS terminal (double click on the MSYS icon on your desktop).
-If you have any problems, please feel free to ask for help in our
-<A HREF="http://sourceforge.net/forum/forum.php?forum_id=552131">Windows forum</A>.
-<!-- CEBALERT: Did I miss anything? Find my list... -->
+<P>Once these requirements are all present, you can follow the <A
+HREF="#linux">Linux SVN</A> instructions above by opening an MSYS
+terminal (double click on the MSYS icon on your desktop). Note that
+while using an MSYS terminal, you can enter commands as given for
+Linux/UNIX rather than any alternative that might be given for
+Windows.  If you have any problems, please feel free to ask for help
+in our <A
+HREF="http://sourceforge.net/forum/forum.php?forum_id=552131">Windows
+forum</A>.  
 
 
 <!--
