@@ -2899,8 +2899,12 @@ class ScrolledWindow(T.Toplevel):
         self.maxsize(self.winfo_screenwidth(),self.winfo_screenheight())
 
         self.topframe = T.Frame(self)
-        self.botframe = T.Frame(self)
-
+        # CEBALERT: specifying 20 necessary because otherwise nothing
+        # requests any height for the frame. I feel there should be
+        # way to have the (status) label request the right height but
+        # make no request about the width.
+        self.botframe = T.Frame(self,height=20)
+        
         self.botframe.pack(side='bottom',expand='no',fill='x')
         self.topframe.pack(side='top',expand='yes',fill='both')
         
@@ -2959,7 +2963,11 @@ class AppWindow(ScrolledWindow):
         # just self)
         self.status = StatusBar(self.botframe) 
         if status:
-            self.status.pack(side="bottom",fill="both",expand="yes")
+            # place doesn't interfere with parent's geometry
+            # (don't want status bar to cause horizontal resizing,
+            # but DO want it to cause vertical resizing - the vertical
+            # part doesn't work, see earlier HACKALERT by botframe)
+            self.status.place(relx=0,rely=0,relwidth=1.0,height='')
 
     def renew(self):
         # CEBALERT: doesn't work on OS X, and is a strange color on
