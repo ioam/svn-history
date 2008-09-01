@@ -92,8 +92,9 @@ php4 m4 tetex imagemagick transfig</code>.
 <!-- with fink for os x 10.5 (i.e. not binary fink), this command 
 takes at least 6 hours to run on sake...and then it finishes with:
 Failed: Fink::SysState: Could not resolve inconsistent dependencies-->
-<!--above comment might be out of date now because there's binary fink 
 for 10.5 -->
+<!--even with 10.5 and the binary, getting those tools + dependencies
+takes ages -->
 
 <li>If you have trouble running <code>fink</code>, make sure the Fink
 installation is actually in your path (the default Fink path is
