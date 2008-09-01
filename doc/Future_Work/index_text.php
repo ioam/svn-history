@@ -3,41 +3,14 @@ below, a large number of changes and new features are scheduled over
 the next few months, as well as over the next few years.  Our current
 <a href="current.html">lower-level list of tasks</a> is kept separately.
 
-<H2>Most urgent (Spring 2008):</H2>
+<H2>Most urgent (Winter 2008-2009):</H2>
 <DL COMPACT>
-<DT>ALERTs</DT><DD>
-There are a large number of relatively small problems noted in the
-source code for the simulator; these are marked with comments
-containing the string ALERT.  These comments help clarify how the code
-should look when it is fully polished, and act as our to-do list.
-They also help prevent poor programming style from being propagated to
-other parts of the code before we have a chance to correct it.  We are
-slowly working to correct these issues.
-
 <P><DT>Stable APIs</DT><DD>
 The Topographica API (determined by the classes in base/) is gradually
 becoming more stable, and by the time of the 1.0 release it should be
 possible to build add-in components and model scripts and expect them
 to be usable in future versions (or to have a conversion program
 available for them).
-
-<P><DT>Spiking support</DT><DD>
-Topographica primarily supports firing-rate (scalar) units, but
-spiking models are currently under development, and preliminary
-versions are included already.  We will be developing interfaces
-between spiking and non-spiking Sheets and analysis tools for spiking
-neurons.  We primarily expect to support integrate-and-fire and
-related computationally tractable spiking unit models.  More detailed
-compartmental models can be simulated in NEST, Neuron or Genesis instead,
-and packaged up using the Sheet interface so that they can be used
-in Topographica.
-
-<P><DT>Polishing the GUI model editor</DT><DD>
-The Topographica model editor allows a model to be constructed,
-modified, visualized, and edited.  However, there are a few operations
-not currently supported, such as setting a parameter to a random
-stream of numbers.  These limitations mean that in most cases
-some editing of the generated .ty script file will be necessary.
 </DL>
 
 
@@ -97,13 +70,15 @@ and 3D (wireframe mesh) plots available based on
 <A HREF="http://matplotlib.sourceforge.net/">MatPlotLib</A> for any
 program object selected by the user.  We will also eventually be
 making the general-purpose template-based plotting use the 2D plots,
-which will make it possible to do
+which will make it simpler to do
 <A HREF="http://matplotlib.sourceforge.net/screenshots/pcolor_demo_large.png">contour</A>
-plots, as well as matrix plots showing axis ticks and labels.  We
-also plan to use MatPlotLib 2D plots to allow any SheetView(s) to be
+plots, as well as matrix plots showing axis ticks and labels.
+<!--
+  We also plan to use MatPlotLib 2D plots to allow any SheetView(s) to be
 used as a contour or vector field overlay on top of a bitmap, e.g. for joint
 preference maps (such as direction arrows on top of an orientation
-bitmap plot).
+bitmap plot); currently some of these are implemented but they could
+be done more generally. -->
 <!-- Plan: Templates accept a Contours parameter, which can be a list
 of (sheetview, threshold) pairs, which will be drawn in order. -->
 
@@ -115,29 +90,22 @@ including allowing a threshold so that a colormap plot can be
 shown on top of a monochrome background plot, e.g. an activity blob on
 top of an ocular dominance or other grayscale map. -->
 							 
+<P><DT>Spiking support</DT><DD>
+Topographica primarily supports firing-rate (scalar) units, but
+spiking models are currently under development, and preliminary
+versions are included already.  We will be developing interfaces
+between spiking and non-spiking Sheets and analysis tools for spiking
+neurons.  We primarily expect to support integrate-and-fire and
+related computationally tractable spiking unit models.  More detailed
+compartmental models can be simulated in NEST, Neuron or Genesis instead,
+and packaged up using the Sheet interface so that they can be used
+in Topographica.
+
 </DL>
 
 
 <H2>Eventually:</H2>
 <DL COMPACT>
-
-<P><DT>Improve documentation</DT><DD>
-The reference manual is generated automatically from the source code,
-and needs significant attention to ensure that it is readable and
-consistent.  For instance, not all parameters are documented yet, but
-all will need to be.
-
-<P><DT>More testing code</DT><DD>
-Topographica has a fairly complete test library, but there are still
-classes and functions without corresponding tests.  Eventually, there
-should be tests for everything.
-
-<P><DT>Pycheck/pylint</DT><DD>
-It would be helpful to go through the output from the pycheck and
-pylint programs (included with Topographica), fixing any suspicious
-things, and disabling the remaining warnings.  That way, new code
-could be automatically checked with those programs and the warnings
-would be likely to be meaningful.
 
 <P><DT>Animating plot histories</DT><DD>
 GUI plot windows save a history of each plot, and it should be
@@ -199,17 +167,6 @@ release if it can be made more general.  Such fine-grained parallelism
 will be restricted to specific Sheet and/or Projection types, because
 it requires access to the inner workings of the Sheet.
 
-<P><DT>More non-visual modalities</DT><DD>
-Most of the specific support in Topographica is designed with visual
-areas in mind, but is written generally so that it applies to any
-topographically organized region.  We plan to implement specific
-models of non-visual areas, providing input generation, models of
-subcortical processing, and appropriate visualizations.  For instance,
-there are now models of somatosensory areas, such as hand surfaces and
-rat whisker barrels, and motor areas controlling eye movements.
-Additional contributions from Topographica users with experience in
-these domains will be particularly helpful.
-
 <P><DT>Data import/export</DT><DD>   It will be crucial to provide
 easy-to-use interfaces for exchanging data and calling code in other
 simulators, such as Matlab (see the optional external package
@@ -225,6 +182,49 @@ Sheet or Projection using a PatternCombine OutputFn.  This capability
 will eventually be extended so that it is easier to use, to make it
 simpler to test which components are required for a certain behavior,
 and to replicate animal lesion experiments.
+
+</DL>
+
+<H2>Ongoing:</H2>
+<DL COMPACT>
+
+<DT>ALERTs</DT><DD>
+There are a large number of relatively small problems noted in the
+source code for the simulator; these are marked with comments
+containing the string ALERT.  These comments help clarify how the code
+should look when it is fully polished, and act as our to-do list.
+They also help prevent poor programming style from being propagated to
+other parts of the code before we have a chance to correct it.  We are
+slowly working to correct these issues.
+
+<P><DT>Improve documentation</DT><DD>
+The reference manual is generated automatically from the source code,
+and needs significant attention to ensure that it is readable and
+consistent.  For instance, not all parameters are documented yet, but
+all will need to be.
+
+<P><DT>More testing code</DT><DD>
+Topographica has a fairly complete test library, but there are still
+classes and functions without corresponding tests.  Eventually, there
+should be tests for everything.
+
+<P><DT>Pycheck/pylint</DT><DD>
+It would be helpful to go through the output from the pycheck and
+pylint programs (included with Topographica), fixing any suspicious
+things, and disabling the remaining warnings.  That way, new code
+could be automatically checked with those programs and the warnings
+would be likely to be meaningful.
+
+<P><DT>More non-visual modalities</DT><DD>
+Most of the specific support in Topographica is designed with visual
+areas in mind, but is written generally so that it applies to any
+topographically organized region.  We are implementing specific
+models of non-visual areas, providing input generation, models of
+subcortical processing, and appropriate visualizations.  For instance,
+there are now models of somatosensory areas, such as hand surfaces and
+rat whisker barrels, motor areas controlling eye movements, and auditory inputs. 
+Additional contributions from Topographica users with experience in
+these domains will be particularly helpful.
 
 <P><DT>More library components</DT><DD>
 Topographica currently includes examples of each type of library
