@@ -22,7 +22,7 @@
   <A HREF="../Reference_Manual/topo.commands.basic-module.html#load_snapshot">loading</A>
 <!-- (do 'make -C external gnosis') --><BR>
   simpler and more complete support for dynamic parameters<BR>  
-  updated to Python 2.5<BR>
+  updated to Python 2.5 and numpy 1.1.1.<BR>
   source code repository moved from CVS to Subversion (<A HREF="../Downloads/cvs.html">SVN</A>)<BR>
   simulation time is now a rational number<BR>
 <!-- Simplified package importing API (promoting basic.py, etc.; not yet done) -->
@@ -57,7 +57,11 @@
   new example files for robotics interfacing<BR>
   &nbsp;&nbsp;&nbsp;(<A HREF="../Reference_Manual/topo.misc.playerrobot-module.html">misc/playerrobot.py</A>,
   <A HREF="../Reference_Manual/topo.misc.robotics-module.html">misc/robotics.py</A>)<br>
-  new joint simulations for OR/OD, OR/DR<BR>
+  new joint simulations, plots, and analysis for combined modelling of 
+  position, orientation, ocular dominance, stereoscopic disparity,
+  motion direction, speed, spatial frequency, and color
+  (examples/lissom.ty).
+  <BR>
 </dd>
 <dt>Component library:</dt>
 <dd>
@@ -84,6 +88,33 @@
 </tr>
 </table>
 </center>
+
+
+<!--  To add:
+Buildbots
+Simplified example file syntax
+Docking
+Dynamic parameters now update once per simulation time
+Added OutputFnDebugger
+Clean up hierarchical.ty, cfsom.ty?
+PyTables HDF5 interface?
+added stop_updating and restore_updating functions to OutputFn and PipelineOF to allow functions with state to freeze their state during e.g. pattern_present
+Use tk8.5 for anti-aliased fonts
+New functions for analyzing V1 complex cells
+Optimized Trace learning rule
+New code allowing for divisive and multiplicative connections
+New Naka-Rushton output function (used for gain control)
+Instructions for checking out Git version of repository
+Added topo/misc/legacy.py
+Added Jitter class
+Added an example of how to generate activity movies (examples/lissom_or_movie.ty)
+Replaced FixedPoint with mxnumber (or gmpy?) for speed
+Added mouse model (examples/lissom_oo_or_species.ty)
+Added combined (joint) plots using contour and arrow overlays
+Added new preference map types (Hue, Direction, Speed...)
+Added contrib dir
+-->
+
 
 <p><b>26 October 07:</b> Version 0.9.4 
 <A target="_top" href="../Downloads/index.html">released</A>, including:
