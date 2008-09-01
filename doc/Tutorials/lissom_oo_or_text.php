@@ -160,12 +160,14 @@ align="middle" WIDTH="490" HEIGHT="421">
 only</span> is turned on; it is usually off by default.
 
 <p> The plot shows the afferent weights to V1 (i.e., connections from
-the ON and OFF channels of the LGN), followed by the lateral excitatory
-and lateral inhibitory weights to that neuron from nearby neurons in
-V1. The afferent weights represent the retinal pattern that would most
-excite the neuron.  For the particular neuron shown above, the optimal
-retinal stimulus would be a short, bright line oriented at about 160
-degrees (from 10 o'clock to 4 o'clock) in the center of the retina.
+the ON and OFF channels of the LGN), followed by the lateral
+excitatory and lateral inhibitory weights to that neuron from nearby
+neurons in V1. The afferent weights represent the retinal pattern that
+would most excite the neuron.  For the particular neuron shown above,
+the optimal retinal stimulus would be a short, bright line oriented at
+about 160 degrees (from 10 o'clock to 4 o'clock) in the center of the
+retina. (Note that the particular neuron you are viewing may have a
+different preferred orientation.)
 </p><p></p></li>
 
 <li>If all neurons had the same weight pattern, the response
@@ -175,7 +177,8 @@ inputs). To see what the other neurons look like, select
 <a name="Projection-plot"><span class='t_item'>Projection</span></a>
 from the <span class='t_item'>Plots</span> menu, then select <span
 class='t_item'>LGNOnAfferent</span> from the drop-down <span
-class='t_item'>Projection</span> list:
+class='t_item'>Projection</span> list, followed by refresh:
+<!--CEBALERT: need to put in the arrow picture?-->
   
 
 <p class="center">
@@ -279,7 +282,7 @@ try presenting a vertical line
 (<span_class='t_item'>orientation</span> of <code>pi/2</code>) and
 then, in the <span class='w_title'>Activity</span> window, right click
 on one of the cyan-colored patches of activity (for instance, around unit
-41,24) <!--CB: bit out of date, but fortunately still close.-->. This will bring up a menu:
+41,24 on the plot above; your own plot will likely be different) <!--CB: bit out of date, but fortunately still close.-->. This will bring up a menu:
 
 <p class="center">
 <img src="images/lissom_oo_or_activity_rightclick.png" alt="Right-click menu"
@@ -477,13 +480,12 @@ class='t_item'>LGNOnAfferent</span>.  On a very fast machine you could
 even <span class='t_item'>Auto-refresh</span> an <span class='w_title'>Orientation Preference</span> window
 (probably practical only if you reduce the nominal_density of V1).
 
-<p></p></li><li>Now click the mouse into the <span class='t_item'>Run for</span> field
-of the <span class='w_title'>Topographica Console</span> window, and hit Go a few
-times, each time looking at
-the random input(s) and the response to them in the
-<span class='w_title'>Activity</span> window.  The effect on the network weights of
-learning this input can be seen in the <span class='w_title'>Projection</span>
-window.
+<p></p></li><li>Now hit Go a few times on the <span
+class='w_title'>Topographica Console</span> window, each time looking
+at the random input(s) and the response to them in the <span
+class='w_title'>Activity</span> window.  The effect on the network
+weights of learning this input can be seen in the <span
+class='w_title'>Projection</span> window.
 
 <p></p></li><li>With each new input, you may be able to see small
 changes in the weights of a few neurons in the <span
@@ -562,12 +564,10 @@ an Orientation Map</b></span>.<p></p></li>
 -->
 
 <p><li> If you are <em>really</em> patient, you can change the number
-of units to something closer to real primate cortex, by quitting,
-editing the Python code file <code>examples/lissom_oo_or.ty</code> to
-change the <code>nominal_density</code> of V1 from 48 to 142,
-and doing:
+of units to something closer to real primate cortex, by quitting
+and then restarting with a higher density in V1:
 <blockquote><code class='to_type'>
-  ./topographica examples/lissom_oo_or.ty -g
+  ./topographica -c default_density=142 examples/lissom_oo_or.ty -g
   </code></blockquote>
 <p></p>
   
