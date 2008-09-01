@@ -1,7 +1,5 @@
-<p><b>16 May 2008:</b> Updates since version 0.9.4
-  (currently available only via <A
-  HREF="../Downloads/cvs.html">SVN</A>, but to be included in the next
-  release):
+<p><b>02 September 2008:</b> Version 0.9.5 about to be
+<A target="_top" href="../Downloads/index.html">released</A>, including:
 <center>
 <table width="100%" cellpadding="5">
 <tr>
@@ -13,29 +11,42 @@
   numerous bugfixes and performance improvements<br>
 <!-- fixed a number of pychecker warnings.<BR> -->
 <!-- moved current to-do items to the sf.net trackers<BR> -->
-<!--  made start() method of EventProcessors be called just before the first
-  execution of the simulator after the EP is added, e.g. to allow joint
-  normalization across a Sheet's projections<BR> -->
+<!-- EventProcessor.start() run only when Simulation starts, e.g. to allow joint normalization across a Sheet's projections<BR> -->
   simulation can now be locked to real time<BR>
-  added optional XML snapshot
-  <A HREF="../Reference_Manual/topo.commands.basic-module.html#save_snapshot">saving</A> and
-  <A HREF="../Reference_Manual/topo.commands.basic-module.html#load_snapshot">loading</A>
+  optional XML snapshot
+  <A HREF="../Reference_Manual/topo.command.basic-module.html#save_snapshot">saving</A> and
+  <A HREF="../Reference_Manual/topo.command.basic-module.html#load_snapshot">loading</A>
 <!-- (do 'make -C external gnosis') --><BR>
   simpler and more complete support for dynamic parameters<BR>  
+<!-- dynamic parameters now update at most once per simulation time<BR> -->
   updated to Python 2.5 and numpy 1.1.1.<BR>
-  source code repository moved from CVS to Subversion (<A HREF="../Downloads/cvs.html">SVN</A>)<BR>
-  simulation time is now a rational number<BR>
-<!-- Simplified package importing API (promoting basic.py, etc.; not yet done) -->
+  source code moved from CVS to Subversion (<A HREF="../Downloads/cvs.html">SVN</A>)<BR>
+<!--  replaced FixedPoint with mxnumber (or gmpy?) for speed<BR> -->
+  automatic Windows and Mac <A target="_top" href="http://buildbot.topographica.org">daily builds</A><br>
+  automatic running and startup <A target="_top" href="http://buildbot.topographica.org">performance measurement</A><br>
+  contrib dir<BR>
+  divisive and multiplicative connections<BR>
+  simulation time is now a rational number for precision<BR>
+  PyTables HDF5 interface<BR>
+<!-- topo/misc/legacy.py<BR> -->
+  <A HREF="../Downloads/git.html">Instructions</A> for checking out Git version of repository<BR>
 </dd>
 <dt>Command-line and batch:</dt>
 <dd>
-  command prompt uses <A
-  HREF="http://ipython.scipy.org/">IPython</A> for better debugging, help<BR> 
-  command-line options can be called explicitly, e.g.<BR>
-  &nbsp;&nbsp;&nbsp;<A HREF="../Reference_Manual/topo.misc.commandline-module.html#gui">topo.misc.commandline.gui()</A> or<BR>
-  &nbsp;&nbsp;&nbsp;<A HREF="../Reference_Manual/topo.misc.commandline-module.html#auto_import_commands">topo.misc.commandline.auto_import_commands()</A><BR>
+  simplified example file syntax (see examples/lissom_oo_or.ty and examples/som_retinotopy.py)<BR>
+  command prompt uses <A HREF="http://ipython.scipy.org/">IPython</A> for better debugging, help<BR> 
   simulation name set automatically from .ty script name by default<BR>
+  command-line options can be called explicitly<BR>
+  <!-- , e.g.
+  &nbsp;&nbsp;&nbsp;<A HREF="../Reference_Manual/topo.misc.commandline-module.html#gui">topo.misc.commandline.gui()</A> or<BR>
+  &nbsp;&nbsp;&nbsp;<A HREF="../Reference_Manual/topo.misc.commandline-module.html#auto_import_commands">topo.misc.commandline.auto_import_commands()</A>--><BR>
 <!--  added -p option to call Psyco JIT optimizer<BR> -->
+</dd>
+<dt>GUI:</dt>
+<dd>
+  plot windows can be docked into main window<BR>
+  uses tk8.5 for anti-aliased fonts<BR>
+<!--  cleaned up ParametersFrame and TaggedSlider behavior<BR> -->
 </dd>
 </font>
 </dl>
@@ -43,44 +54,47 @@
 <td width="50%">
 <dl COMPACT>
 <font size="-1">
-<!--  
-<dt>GUI:</dt>
-<dd>
-  cleaned up ParametersFrame and TaggedSlider behavior<BR>
-</dd>
 <dt>Plotting:</dt>
 <dd>
+  new preference map types (Hue, Direction, Speed)<BR>
+  combined (joint) plots using contour and arrow overlays<BR>
+  example of generating activity movies (examples/lissom_or_movie.ty)<BR>
 </dd>
--->
 <dt>Example scripts:</dt>
 <dd>
-  new example files for robotics interfacing<BR>
+  example files for robotics interfacing<BR>
   &nbsp;&nbsp;&nbsp;(<A HREF="../Reference_Manual/topo.misc.playerrobot-module.html">misc/playerrobot.py</A>,
   <A HREF="../Reference_Manual/topo.misc.robotics-module.html">misc/robotics.py</A>)<br>
-  new joint simulations, plots, and analysis for combined modelling of 
-  position, orientation, ocular dominance, stereoscopic disparity,
-  motion direction, speed, spatial frequency, and color
-  (examples/lissom.ty).
-  <BR>
+  simulation, plots, and analysis for modelling of<br>
+  &nbsp;&nbsp;&nbsp;any combination of position, orientation, ocular dominance,<br>
+  &nbsp;&nbsp;&nbsp;stereoscopic disparity, motion direction, speed, spatial<br>
+  &nbsp;&nbsp;&nbsp;frequency, and color (examples/lissom.ty).<BR>
+<!--  mouse model (examples/lissom_oo_or_species.ty)<BR> -->
 </dd>
 <dt>Component library:</dt>
 <dd>
-  added <A HREF="../Reference_Manual/topo.commands.analysis-module.html#decode_feature">decode_feature</A> for estimating perceived values,<br>
-  &nbsp;&nbsp;&nbsp;e.g. for calculating aftereffects<BR>
-  PatternGenerator for real-time camera inputs<BR>
+  OutputFns: 
+  <?php classref('topo.outputfn.basic','PoissonSample')?>,<BR>
+  &nbsp;&nbsp;&nbsp;<?php classref('topo.outputfn.homeostatic','ScalingOF')?> (for homeostatic plasticity),<BR>
+  &nbsp;&nbsp;&nbsp;<?php classref('topo.outputfn.basic','NakaRushton')?> (for contrast gain control)<BR>
+  &nbsp;&nbsp;&nbsp;<?php classref('topo.outputfn.basic','AttributeTrackingOF')?> (for analyzing or plotting values over time)<BR>
   Pipeline OutputFns can now be constructed easily using +<BR>
 <!-- &nbsp;&nbsp;&nbsp;('x=HalfRectify() ; y=Square() ; z=x+y' gives 'z==PipelineOF(output_fns=x,y)')<BR> -->
-  new Output_Fn classes: 
-  <?php classref('topo.outputfns.basic','PoissonSample')?>,<BR>
-  &nbsp;&nbsp;&nbsp;<?php classref('topo.outputfns.homeostatic','ScalingOF')?> (for homeostatic plasticity),<BR>
-  &nbsp;&nbsp;&nbsp;<?php classref('topo.outputfns.basic','AttributeTrackingOF')?> 
-  (for analyzing or plotting values over time)<BR>
-  allowed <?php classref('topo.sheets.lissom','LISSOM')?>
-  normalization to be <A
-  HREF="../Reference_Manual/topo.sheets.lissom.LISSOM-class.html#post_initialization_weights_output_fn">changed</A> after initialization<BR>
-  new CompositeSheetMask, AndMask, and OrMask classes<BR>
-  NumberGenerators can now be combined and modified using arithmetic expressions
+  PatternGenerator: <?php classref('topo.misc.robotics','CameraImage')?> (for real-time camera inputs)<BR>
+<!--  allowed <?php classref('topo.sheet.lissom','LISSOM')?>  normalization to be 
+  <A HREF="../Reference_Manual/topo.sheet.lissom.LISSOM-class.html#post_initialization_weights_output_fn">changed</A>
+  after initialization<BR> -->
+  CoordMapper: <?php classref('topo.coordmapper.basic','Jitter')?><BR>
+  SheetMasks: <?php classref('topo.base.projection','AndMask')?>,
+  <?php classref('topo.base.projection','OrMask')?>,
+  <?php classref('topo.base.projection','CompositeSheetMask')?><BR>
+  command: <A HREF="../Reference_Manual/topo.command.analysis-module.html#decode_feature">decode_feature</A> (for estimating perceived values)<br>
+  &nbsp;&nbsp;&nbsp;(e.g. for calculating aftereffects)<BR>
+  <?php classref('topo.numbergen','NumberGenerator')?>s
+  can now be combined and modified using arithmetic expressions
 <!-- (e.g. abs(2*UniformRandom()-5) is now a NumberGenerator too).--><BR>
+  functions for analyzing V1 complex cells<BR>
+<!-- provide stop_updating and restore_updating to allow functions with state to freeze their state<BR> -->
 </dd>
 </font>
 </dl>
@@ -90,33 +104,7 @@
 </center>
 
 
-<!--  To add:
-Buildbots
-Simplified example file syntax
-Docking
-Dynamic parameters now update once per simulation time
-Added OutputFnDebugger
-Clean up hierarchical.ty, cfsom.ty?
-PyTables HDF5 interface?
-added stop_updating and restore_updating functions to OutputFn and PipelineOF to allow functions with state to freeze their state during e.g. pattern_present
-Use tk8.5 for anti-aliased fonts
-New functions for analyzing V1 complex cells
-Optimized Trace learning rule
-New code allowing for divisive and multiplicative connections
-New Naka-Rushton output function (used for gain control)
-Instructions for checking out Git version of repository
-Added topo/misc/legacy.py
-Added Jitter class
-Added an example of how to generate activity movies (examples/lissom_or_movie.ty)
-Replaced FixedPoint with mxnumber (or gmpy?) for speed
-Added mouse model (examples/lissom_oo_or_species.ty)
-Added combined (joint) plots using contour and arrow overlays
-Added new preference map types (Hue, Direction, Speed...)
-Added contrib dir
--->
-
-
-<p><b>26 October 07:</b> Version 0.9.4 
+<p><b>26 October 2007:</b> Version 0.9.4 
 <A target="_top" href="../Downloads/index.html">released</A>, including:
 
 <center>
@@ -197,7 +185,7 @@ Screenshots:
 <A target="_top" href="../images/071018_modeleditor_ubuntu.png">model editor</A>.
 <br><br>
 
-<p><b>23 April 07:</b> Version 0.9.3 
+<p><b>23 April 2007:</b> Version 0.9.3 
 <A target="_top" href="../Downloads/index.html">released</A>, including:
 
 <center>
@@ -274,12 +262,12 @@ Screenshots:
 <br><br>
 
 
-<p><b>29 November 06:</b> There will be a short talk on Topographica
+<p><b>29 November 2006:</b> There will be a short talk on Topographica
 at the <A target="_top" href="http://us.pycon.org/TX2007/">PyCon 2007</A>
 convention, February 23-25, 2007.
 <br><br>
 
-<p><b>22 November 06:</b> Version 0.9.2
+<p><b>22 November 2006:</b> Version 0.9.2
 <A target="_top" href="../Downloads/index.html">released</A>, including
 numerous bugfixes (e.g. to support GCC 4.1.x compilers),
 much more complete user manual,
@@ -295,7 +283,7 @@ random dot stereogram input pattern).
 <!-- Choice class to select randomly from a list of choices -->
 <br><br>
 
-<p><b>02 November 06:</b> Some users have reported problems when using
+<p><b>02 November 2006:</b> Some users have reported problems when using
 optimized code on systems with the most recent GCC 4.1.x C/C++
 compilers.  We have added a patch to the included weave
 inline-compilation package that should fix the problem, currently
@@ -306,7 +294,7 @@ weave-uninstall ; make".  These changes will be included in the next
 official release.
 <br><br>
 
-<p><b>23 July 06:</b> Version 0.9.1
+<p><b>23 July 2006:</b> Version 0.9.1
 <A target="_top" href="../Downloads/index.html">released</A>.
 This is a bugfix release only, upgrading the included Tcl/Tk package
 to correct a syntax error in its configure script, which had
@@ -315,7 +303,7 @@ Ubuntu 6.06).  There is no benefit to updating if 0.9.0 already runs
 on your platform.
 <br><br>
 
-<p><b>07 June 06:</b> Version 0.9.0
+<p><b>07 June 2006:</b> Version 0.9.0
 <A target="_top" href="../Downloads/index.html">released</A>, including 
 numerous bugfixes, 
 context-sensitive (balloon) help for nearly every parameter and control,
@@ -337,7 +325,7 @@ more library components (e.g. Oja rule, CPCA, covariance),
 prototype spiking neuron support, and
 much-improved <A target="_top" href="../User_Manual/modeleditor.html">model editor</A>.
 
-<p><b>15 May 06:</b> New book <A target="_top"
+<p><b>15 May 2006:</b> New book <A target="_top"
 HREF="http://computationalmaps.org"><i>Computational Maps in the
 Visual Cortex</i></A> available, including background on modeling
 computational maps, a review of visual cortex models, and <A
@@ -346,7 +334,7 @@ extended set of examples of the types of models supported by
 Topographica</a>.
 <br><br>
 
-<p><b>20 February 06:</b> Version 0.8.2 released, including numerous
+<p><b>20 February 2006:</b> Version 0.8.2 released, including numerous
 bugfixes, 
 circular receptive fields,
 shared-weight projections,
@@ -369,7 +357,7 @@ and progress reports during learning.  See the
 <A target="_top" href="../images/060220_topographica_screen_shot.png">Linux screenshot</A>.
 <br><br>
 
-<p><b>22 December 05:</b> Version 0.8.1 released, including numerous
+<p><b>22 December 2005:</b> Version 0.8.1 released, including numerous
 bugfixes, more flexible plotting (including weight colorization),
 user-controllable optimization, properties panels, more-useful
 <A TARGET="_top" href="../Reference_Manual/index.html">reference manual</A>,
@@ -377,7 +365,7 @@ image input patterns, and a prototype graphical
 model editor.  <!-- Plus SOMs with selectable Projections -->
 <br><br>
 
-<p><b>8 November 05:</b> New site launched with Topographica version
+<p><b>8 November 2005:</b> New site launched with Topographica version
 0.8.0, including a new
  <a target="_top" href="../Tutorials/lissom_or.html">LISSOM tutorial</a>.
 (<a target="_top" href="../images/051107_topographica_screen_shot_white.png">Linux screenshot</a>).
