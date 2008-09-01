@@ -4,12 +4,14 @@ perspective.  This information complements the complete and detailed
 component-level information in the reference manual, as well as the
 step-by-step explanations in the tutorials.
 
+<!--CEBALERT: consider dividing this list into sections?-->
 <P>
 <A HREF="introduction.html">Introduction</A><BR>
 <A HREF="overview.html">Overview of Topographica design and features</A><BR>
 <A HREF="time.html">Representing time in Topographica</A><BR>
 <A HREF="space.html">Representing space in Topographica (coordinate systems)</A><BR>
-<A HREF="commandline.html">Using the Topographica command line and script language</A><BR>
+<A HREF="interactive.html">Starting Topographica scripts interactively</A><BR>
+<A HREF="commandline.html">The Topographica command line and script language</A><BR>
 <A HREF="batch.html">Running Topographica in batch mode</A><BR>
 <A HREF="parameters.html">Controlling simulation parameters</A><BR>
 <A HREF="patterns.html">Generating patterns</A><BR>

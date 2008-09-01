@@ -148,6 +148,29 @@ interactive work (such as tab completion). The
 IPython Quick Tutorial</A> is a good place to learn about these.
 
 
+<H3>Recreating results from interactive sessions</H3>
+
+<P>While interactive creation and exploration of a simulation can be
+very helpful, often you will want to create a representation of your
+simulation that you can use again. One way of doing this is to save an
+existing simulation that you have already created at the commandline
+(see <A
+HREF="../Reference_Manual/topo.command.basic-module.html#save_script_repr">save_script_repr</A>
+for how to save a runnable specification of your simulation (but not
+its internal state), or <A
+HREF="../Reference_Manual/topo.command.basic-module.html#save_snapshot">save_snapshot</A>
+for how to save your simulation's current state). Another way is to
+create a .ty script file yourself, and then run it with Topographica.
+As discussed in the <A HREF="interactive.html#ty-files">Topographica
+scripts</A> section, exactly the same commands can be entered in a .ty
+file as at the commandline, and running the .ty file (either by
+passing it at startup to the topographica program on the commandline,
+or by passing it as an argument to <code>execfile()</code>) is
+equivalent to entering its commands manually.
+
+<!--CEB: also mention IPython session recording...-->
+
+
 
 <H2>Plotting from the command line</H2>
 
@@ -260,102 +283,38 @@ simulations without any GUI, for batch or remote processing.
 and declared) from the appropriate file before it is used.  Python
 requires such importing to avoid confusion between similar commands
 defined in different files; see the Python documentation for
-<A HREF="http://docs.python.org/tut/node8.html">more information about imports</A> in Python.
+<A HREF="http://docs.python.org/tut/node8.html">more information about imports</A>.
 
-<P>Topographica uses Python's idea of 'namespaces' to make expressions
-written for use with Topographcia more readable. For example,
-Topographica provides a class called UniformRandom, used to generate a
-sequence of numbers from a uniform random distribution. Topographica
-also provides a class with the same name that is used to generate
-two-dimensional patterns. The two are in different files: the first is
-topo/numbergen/basic.py, and the second is in
-topo/pattern/random.py. Were you to type the following:
-<pre>
-from topo.numbergen import UniformRandom
-from topo.pattern.random import UniformRandom
-</pre>
-you would only have access to the pattern.random version at the
-commandline (its name having overwritten the numbergen version). To
-avoid this kind of confusion, we recommend not importing classnames
-alone for library components, but instead qualifying the names. In the
-current example, we instead recommend typing:
-<pre>
-from topo import numbergen
-from topo import pattern
-import topo.pattern.random
-</pre>
-This will subsequently allow you to refer
-to <code>numbergen.UniformRandom</code>
-and <code>pattern.random.UniformRandom</code>, which, while
-involving more typing, cuts out confusion about which class you might
-be referring to.
-
-<P>You might decide that in many cases, using the namespace at the
-command-line involves too much typing; you are free to use whichever
-technique you prefer. When <A HREF="#ty-files">composing scripts</A>
-that others might read, however, we do strongly recommend that you
-follow our convention
+<!-- do we really recommend this? -->
+<P>To avoid confusion, we recommend you take advantage of Python's
+namespaces (as mentioned earlier in the <A
+HREF="interactive.html#imports">Imports</A> section of the
+Topographica Scripts page) when working interactively at the
+commandline. For instance, <code>pattern.random.UniformRandom</code>
+is clearly distinct from <code>numbergen.UniformRandom</code>;
+importing one or the other (or both!) as only
+<code>UniformRandom</code> (e.g. <code>from numbergen import
+UniformRandom</code>) could lead to confusion. Of course you might
+decide that in many cases, using the namespace at the command-line
+involves too much typing; you are free to use whichever technique you
+prefer.
 
 <H3><a name="option-a">Simplifying imports during interactive runs</a></H3>
 
-When working interactively at the command-line, typing common import
-lines (such as <code>from topo.command.analysis import save_plotgroup,
+When working interactively, typing common import lines (such as
+<code>from topo.command.analysis import save_plotgroup,
 measure_or_pref</code>, from the earlier example) can be tedious.
 Topographica therefore provides the "-a" command-line option, which
 automatically imports every command in topo/command/*.py.  The "-g"
 option also automatically enables "-a", so that the commands will be
 available in the GUI as well.  Thus if you start Topographica as
-"./topographica -a" or "./topographica -g", then you can omit
-the <code>from topo.command... import ...</code> lines above.  Still,
-it is best never to rely on this behavior when writing .ty script
-files (see below) or .py code, because of the great potential for
-confusion, so please use "-a" only for interactive debugging.
+"./topographica -a" or "./topographica -g", then you can omit the
+<code>from topo.command... import ...</code> lines above.  Still, it
+is best never to rely on this behavior when writing .ty script files
+or .py code, because of the great potential for confusion, so please
+use "-a" only for interactive debugging.
 
 
-<H2><a name="ty-files">Topographica scripts</a></H2>
-
-<!-- CEBALERT: does this kind of text exist elsewhere? I thought it
-did, but i couldn't find it. I'm sure it existed sometime...-->
-<P>While interactive creation and exploration of a simulation can be
-very helpful, often you will want to create a representation of your
-simulation that you can use over and over again. One way of doing this
-is to save an existing simulation that you have already created at the
-commandline
-(see <A HREF="../Reference_Manual/topo.command.basic-module.html#save_script_repr">save_script_repr</A>
-for how to save a runnable specification of your simulation (but not
-its internal state),
-or <A HREF="../Reference_Manual/topo.command.basic-module.html#save_snapshot">save_snapshot</A>
-for how to save your simulation's current state). Another way is to
-create a .ty script file yourself, and then run it with Topographica.
-Exactly the same commands can be entered in a .ty file as at the
-commandline, and running the .ty file (either by passing it at startup
-to the topographica program on the commandline, or by passing it as an
-argument to <code>execfile()</code>) is equivalent to entering its
-commands manually.  We provide a number of example scripts in the
-examples/ directory, which you can use as the basis for your own
-scripts.
-
-<H3>Imports in .ty files</H3>
-
-<P>As mentioned above, we recommend you qualify class names of
-components with their namespace so that it is clear which class
-exactly you are referring to. This makes scripts much easier to read
-at a later date, and also much easier for others to read. Our
-examples/ files (such as som_retinotopy.ty) demonstrate how we
-recommend using imports.  Many scripts are likely to contain something
-similar to the following section:
-<pre>
-from topo import learningfn
-from topo import numbergen
-from topo import outputfn
-from topo import pattern
-from topo import projection
-from topo import responsefn
-from topo import sheet
-</pre>
-This subsequently allows a script to refer to <code>pattern.Gaussian</code>, 
-<code>numbergen.UniformRandom</code>, <code>learningfn.Oja</code>, and
-so on, in a way that is clear and easy to read.
 
 
 <H2>Customizing the command prompt</H2>
@@ -560,3 +519,5 @@ This gives a ParametersFrame representing the Parameters
 of <code>topo.sim['V1']</code>, allowing values to be inspected and
 changed. (This is the same editing window as is available through
 the <a href="modeleditor.html#parameters">model editor</a>.)
+
+

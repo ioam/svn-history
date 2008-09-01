@@ -14,9 +14,8 @@ to modify the source code.
 <P>The following sections describe how to obtain and build (if
 necessary) Topographica
 on <A HREF="#win">Windows</A>, <A HREF="#mac">OS X</A>,
-and <A HREF="#lin">Linux/UNIX</A>. Afterwards, there are instructions
-on how to <A HREF="#running-topographica">run Topographica</A>.
-<!--running topographica in the downloads section?-->
+and <A HREF="#lin">Linux/UNIX</A>. 
+
 
 <H3><A NAME="win">Windows</A></H3>
 
@@ -223,75 +222,24 @@ system.  If you do the tests on a machine without a functioning
 DISPLAY, such as a remote text-only session, there will be some
 warnings about GUI tests being skipped.
 
-<P>If all goes well, a script named <code>topographica</code> will be created in the
-<code>topographica/</code> directory; you can use this to start
-Topographica as described in
-the <A HREF="#running-topographica">Running Topographica</A> section
-below.  If you have problems, try adding <code>-k</code> to
-the <code>make</code> command, which will allow the make process to
-skip any components that do not build properly on your
+<P>If all goes well, a script named <code>topographica</code> will be
+created in the <code>topographica/</code> directory; you can use this
+to start Topographica as described in the <A
+HREF="../User_Manual/interactive.html">Running Topographica</A>
+section of the User Manual. Or, if you want to get straight into 
+working with a full network, a good way to begin is by working
+through the <A HREF="../Tutorials/som_retinotopy.html">SOM</A> or <A
+HREF="../Tutorials/lissom_oo_or.html">LISSOM</A> tutorials.
+
+<P>If you have problems during the build process, try adding
+<code>-k</code> to the <code>make</code> command, which will allow the
+make process to skip any components that do not build properly on your
 machine. Topographica is highly modular, and most functionality should
 be accessible even without some of those components.
 
-
-
-<H3><A NAME="running-topographica">Running Topographica</A></H3>
-
-Once you have the program installed and built, you can run
-Topographica on the example models.  On most systems (including Linux,
-Unix, and Mac), just open a terminal window, go to your topographica/
-directory, and type e.g.:
-
-<pre title="Win: topographica -g examples\cfsom_or.ty">
-  ./topographica -g examples/cfsom_or.ty
-</pre>
-
-or
-
-<pre title="Win: topographica -g examples\hierarchical.ty">
-  ./topographica -g examples/hierarchical.ty
-</pre>
-
-or
-
-<pre title="Win: topographica -g examples\som_retinotopy.ty">
-  ./topographica -g examples/som_retinotopy.ty
-</pre>
-
-or
-
-<pre title="Win: topographica -g examples\lissom_oo_or.ty">
-  ./topographica -g examples/lissom_oo_or.ty
-</pre>
-
-(Windows users can type similar commands at a Windows command prompt:
-hold your mouse over a command above to see the Windows equivalent, or
-see our note about <A
-HREF="win32notes.html#unix-commands-on-win">translating Unix shell
-commands to Windows</A>.  Alternatively, Windows users can double
-click on one of the <code>.ty</code> scripts in the examples
-directory; <code>.ty</code> files are associated with Topographica.)
-
-<P>Note that the first time Topographica is run on a given example,
-there may be a short pause while the program compiles some of the
-optimized components used in that example.  (Some components,
-generally those with <code>_opt</code> in their names, use code
-written in C++ internally for speed, and this code must be compiled.)
-The compiled versions are stored in <code>~/.python25_compiled/</code>
-on most systems (or in the temporary directory
-<code>%TEMP%\%USERNAME%</code> on Windows), and they will be reused on
-the next run unless the source files have changed.  Thus you should
-only notice such pauses the first time you use a particular component,
-at which time you may also notice various inscrutable messages from
-the compiler (which may generally be ignored).
-
-<P>In any case, a good way to get started with these examples is to
-work through  
-the <A HREF="../Tutorials/som_retinotopy.html">SOM</A> or 
-<A HREF="../Tutorials/lissom_oo_or.html">LISSOM</A> tutorials.
-Have fun with Topographica, and be sure to subscribe to the 
-<A
+<P> Have fun with Topographica, and be sure to subscribe to the <A
 HREF="https://lists.sourceforge.net/lists/listinfo/topographica-announce">topographica-announce</A>
 mailing list to hear about future updates!
+
 
 
