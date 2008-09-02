@@ -4,7 +4,7 @@
 This tutorial shows how to use the
 <a href="http://topographica.org/">Topographica</a> simulator to explore a
 simple retinotopic map simulation.  This particular example, taken
-from Chapter 3 of the <A
+from Chapter 3 of the book <A
 href="http://computationalmaps.org">Computational Maps in the Visual
 Cortex</A>, uses a Kohonen-type Self-Organizing Map (SOM).
 Topographica also supports a wide range of other models, and is easily
@@ -98,8 +98,9 @@ align="middle" WIDTH="379" HEIGHT="545">
 </p>
 
 <p> Each neuron is fully connected to the input units, and thus has a
-24x24 array of weights (or 10x10 if you reduced the density as
-suggested above).  Initially, the weights are uniformly random.
+24x24 array of weights (or 10x10 if you are using the default
+(reduced) density as suggested above).  Initially, the weights are
+uniformly random.
 </p>
 
 <p></p>
@@ -330,7 +331,7 @@ topographic grid not to flatten out (despite local order in patches).
 <br> <br>
 
 <P>Similarly, consider changing the initial learning rate from
-re<code>0.42</code> to e.g. <code>1.0</code> (e.g. by passing <code>-c
+<code>0.42</code> to e.g. <code>1.0</code> (e.g. by passing <code>-c
 alpha_0=1.0</code> on the command line).  The retina and V1 densities
 cannot be changed after the simulation has started; to change those
 provide their values on the command line as above (or edit the
@@ -356,6 +357,7 @@ map except for a discontinuity.
 of map.  E.g. if an oriented pattern is used, with random
 orientations, neurons will become selective for orientation and not
 just position.  See the <code>examples/obermayer_pnas90.ty</code> file
+<!--CEBALERT: check that one works? -->
 for more details. <!--, though that simulation is quite
 processor-intensive compared to this one. --> In general, the map
 should form a representation of the dimensions over which the input
