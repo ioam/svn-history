@@ -358,7 +358,6 @@ map except for a discontinuity.
 of map.  E.g. if an oriented pattern is used, with random
 orientations, neurons will become selective for orientation and not
 just position.  See the <code>examples/obermayer_pnas90.ty</code> file
-<!--CEBALERT: check that one works? -->
 for more details. <!--, though that simulation is quite
 processor-intensive compared to this one. --> In general, the map
 should form a representation of the dimensions over which the input
