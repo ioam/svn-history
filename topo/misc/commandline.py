@@ -36,35 +36,6 @@ licensing information.
 """
 
 
-class CommandPrompt(object):
-
-    # For portable ANSI output, could use TerminalController from:
-    # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/475116
-    # (or other such solutions)
-    # Predefined alternatives
-    basic_format   = '"Topographica>>> "'
-    simtime_format = '"topo_t%g>>> " % topo.sim.time()'
-    ansi_format    = '"\x1b[32;40;1mTopographica\x1b[33;40;1m_t%g>>>\x1b[m " % topo.sim.time()'
-
-    # Select from one of the predefined alternatives (or any other format):
-    format = simtime_format
-
-    def __str__(self): return str(eval(self.format,__main__.__dict__))
-    def split(self,*args):
-        return str(self).split(*args)
-
-
-    """
-    Provides a dynamically updated command prompt for sys.ps2.
-
-    This function uses the exact same prompt strings that are defined in
-    CommandPrompt (above), but it replaces any occurrances of the substring '>>>'
-    with '...'.
-    """
-
-    def __str__(self): return str(eval(self.format.replace('>>>','...'),__main__.__dict__))
-
-
 
 ##### Command-prompt formatting
 #    
@@ -82,7 +53,7 @@ class IPCommandPromptHandler(object):
         """
         import __main__
         IP = __main__.__dict__['__IP']
-        prompt = getattr(IP.outputcache,self._prompt)
+        prompt = getattr(IP.outputcache,cls._prompt)
         prompt.p_template = format
         prompt.set_p_str()        
         cls._format = format
@@ -104,7 +75,8 @@ class CommandPrompt(IPCommandPromptHandler):
     values.
 
     See the IPython manual for details:
-    http://ipython.scipy.org/doc/manual/node12.html#SECTION000125000000000000000
+    http://ipython.scipy.org/doc/manual/html/config/index.html
+
     Examples:
       # Use one of the predefined formats:
       CommandPrompt.set_format(CommandPrompt.basic_format)
