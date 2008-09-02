@@ -20,7 +20,6 @@ __version__='$Revision$'
 
 
 from math import exp, sqrt
-import numpy
 
 from topo import learningfn
 from topo import numbergen
