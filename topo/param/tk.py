@@ -808,7 +808,8 @@ class TkParameterizedBase(Parameterized):
         source = parameterized_object or self.get_source_po(name)
         return source.get_value_generator(name) 
 
-        
+    # CEBALERT: shouldn't this use __set_parameter? Presumably doing
+    # that kind of thing is part of the cleanup required in this file.
     def set_parameter_value(self,name,val,parameterized_object=None):
         """
         Set the value of the parameter specified by name to val.
@@ -962,7 +963,14 @@ class TkParameterizedBase(Parameterized):
         # tagged slider just goes to the default value)
         # CEBALERT: set_in_bounds not valid for POMetaclass?
         parameter,sourcePO=self.get_parameter_object(param_name,with_location=True)
-        if hasattr(parameter,'set_in_bounds') and isinstance(sourcePO,Parameterized): 
+
+        # CEBHACKALERT: GeneratorSheet.input_generator should be a
+        # property? But it's a Parameter...
+        # Setting input_generator rather than calling set_input_generator()
+        # is probably a trap...
+        if param_name=='input_generator' and hasattr(sourcePO,'set_input_generator'):
+            sourcePO.set_input_generator(val)
+        elif hasattr(parameter,'set_in_bounds') and isinstance(sourcePO,Parameterized):
             parameter.set_in_bounds(sourcePO,val)
         else:
             setattr(sourcePO,param_name,val)
