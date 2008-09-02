@@ -28,7 +28,7 @@
   simulation time is now a rational number for precision<BR>
   PyTables HDF5 interface<BR>
 <!-- topo/misc/legacy.py i.e. we can now support old snapshots if necessary<BR> -->
-  <A HREF="../Downloads/git.html">Instructions</A> for checking out Git version of repository<BR>
+<!-- incomplete <A HREF="../Downloads/git.html">Instructions</A> for checking out Git version of repository<BR> -->
 </dd>
 <dt>Command-line and batch:</dt>
 <dd>
