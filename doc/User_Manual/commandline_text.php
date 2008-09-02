@@ -214,7 +214,6 @@ Topographica&gt; matrixplot3d(V1.activity)
 <P>The prompt can also be used for any mathematical calculation or
 plotting one might wish to do, a la Matlab:
 
-<!-- JABALERT! Should include screenshots of what the plotting looks like -->
 <pre>
 $ ./topographica -g
 Topographica&gt; from numpy import *
@@ -319,22 +318,42 @@ use "-a" only for interactive debugging.
 
 <H2>Customizing the command prompt</H2>
 
-<!--CEBALERT: out of date...-->
-<P>The contents of the command prompt itself are controlled by
-the class variable <code>CommandPrompt.format</code>, which can be set
-to any Python code that evaluates to a string.  As of 12/2006, the
-default prompt is <code>Topographica_t0></code>, where 0 is the
-current value of <code>topo.sim.time()</code> when the prompt is
-printed.  This can be changed by doing something like:
+<P>The contents of the command prompt itself are controlled by the
+<A HREF="../Reference_Manual/topo.misc.commandline.CommandPrompt-class.html">CommandPrompt</A> class, and can be set to
+any Python code that evaluates to a string.  As of 09/2008, the
+default prompt is <code>topo_t000000.00_c1>>></code>, where
+<code>t000000.00</code> is the current value of
+<code>topo.sim.time()</code> when the prompt is printed, and the
+<code>1</code> following <code>c</code> is IPython's record of your command number (IPython
+caches your input and output in the lists <code>In</code> and
+<code>Out</code> respectively; the command number allows you to access
+a specific entry as e.g. <code>In[1]</code>).
+
+<P>You can change the prompt format by doing something like:
 
 <pre>
   from topo.misc.commandline import CommandPrompt
-  CommandPrompt.format = '"Topographica_t%g> " % topo.sim.time()'
+  CommandPrompt.set_format('${my_var}>>> ')        
 </pre>
 
-Here any Python expression that returns a string when evaluated
-in __main__ can be used, to include information other than the
-current simulation time.  If your terminal supports ANSI colors, you
+where in this case the value of a variable <code>my_var</code> will be
+checked each time before the prompt is printed. IPython allows the
+prompt to be configured in many ways; see IPython's <A
+HREF="http://ipython.scipy.org/doc/manual/html/config/index.html">
+User Manual</A> for full details about what you can pass as an argument
+to <code>CommandPrompt.set_format</code> in Topographcia.
+
+<P>In addition to the input prompt described above, there is also an
+output prompt (e.g. <code>Out[3]:</code>) and a continuation prompt
+(e.g. <code>....:</code>). You can also customize these in the same
+way as the input prompt by using the <A
+HREF="../Reference_Manual/topo.misc.commandline.OutputPrompt-class.html">OutputPrompt</A>
+and <A
+HREF="../Reference_Manual/topo.misc.commandline.CommandPrompt2-class.html">CommandPrompt2</A>
+classes, respectively, in the same way.
+
+<!--
+If your terminal supports ANSI colors, you
 can use those in your prompt if you wish:
 
 <pre>
@@ -351,9 +370,11 @@ We've provided a shortcut for the above format to make it easier:
 
 <P><IMG HEIGHT=66 WIDTH=283 SRC="../images/ansiprompt.png">
 
-<!-- Could use TerminalController from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/475116 for portable output... -->  
 <P>Note that ANSI colors are not used by default, because terminals
 that do not support them will display them as unrecognizable symbols.
+-->
+<!-- Could use TerminalController from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/475116 for portable output... -->  
+
 				    
 <H2><A name="toporc">Site-specific customizations</A></H2>
 
