@@ -32,7 +32,7 @@ build the documentation separately from compiling Topographica itself.
 If PHP4, m4, bibtex, convert, and fig2dev are installed on your system
 (as in most Linux distributions), just change to the topographica
 directory and type "make doc reference-manual".  (This step is only
-necessary when building from CVS; released versions include the
+necessary when building from SVN; released versions include the
 documentation already built.)  
 
 Once the documentation has been built, load doc/index.html into your
@@ -45,7 +45,7 @@ match this particular copy of Topographica.)
 
 BUILDING TOPOGRAPHICA
 
-The topographica CVS directory includes the files necessary to build
+The topographica directory includes the files necessary to build
 Topographica from source code on most platforms.  All non-standard
 external libraries are included and for most platforms are built from
 source.  This approach makes the initial compilation time longer and
