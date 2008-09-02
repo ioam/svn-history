@@ -2,13 +2,13 @@
 
 <!--CEBALERT: seems we've never done a relese from svn...-->
 
-<P>The latest version of Topographica is always available by CVS, but
+<P>The latest version of Topographica is always available by SVN, but
 we also make more stable versions available periodically.  To make
 such a release, the steps we generally follow are:
 
 <ol>
 <li><P>Ensure that no one besides yourself has any modified files checked
-  out in CVS; if they do, make sure all of it gets checked in or
+  out in SVN; if they do, make sure all of it gets checked in or
   does not need to be included in the release, and ensure that none
   of it will be checked in until the release is complete.
   
@@ -48,7 +48,7 @@ such a release, the steps we generally follow are:
   Future_Work/index_text.php and Future_Work/current_text.php to
   reflect completed tasks and changes in priority.
 
-<li><P>Check in any modified files into CVS.
+<li><P>Check any modified files into SVN.
    
 <li><P>Save all open files from within any editor, and do a "make dist"
   to create a candidate distribution archive.  (To ensure that
@@ -83,7 +83,7 @@ such a release, the steps we generally follow are:
     using "make sf-web-site".
 
 <li><P>Notify the other developers that they may once again commit new
-    code to the CVS repository.
+    code to the SVN repository.
 
 <li>Send an announcement to topographica-announce at lists.sf.net.
 </ol>
