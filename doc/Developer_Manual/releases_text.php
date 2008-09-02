@@ -11,8 +11,13 @@ such a release, the steps we generally follow are:
   out in SVN; if they do, make sure all of it gets checked in or
   does not need to be included in the release, and ensure that none
   of it will be checked in until the release is complete.
-  
-<li><P>Increment the RELEASE number and the RELEASE_TAG in ./Makefile,
+
+<li><P>Make sure you have checked out topographica-win. If not:
+<pre>
+svn co $TOPOROOT/trunk/topographica-win topographica-win
+</pre>  
+
+<li><P>Increment the RELEASE number <!--and the RELEASE_TAG--> in ./Makefile,
   and do "make new-version".
    
 <li><P>Update the documentation files, especially README.txt and
@@ -53,7 +58,10 @@ such a release, the steps we generally follow are:
 <li><P>Save all open files from within any editor, and do a "make dist"
   to create a candidate distribution archive.  (To ensure that
   all files are saved in Emacs, you can do "M-x compile RET make
-  dist".)
+  dist".) Note that this step is best done on a local disk rather 
+  than on a network drive. (Additionally, using a scratch copy of 
+  Topographica on which you have run 'make -C external clean' will
+  speed things up, but this is not necessary.)
   
 <li><P>Unpack the distribution archive and examine it:
     <ol>
