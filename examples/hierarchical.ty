@@ -9,109 +9,124 @@ $Id$
 """
 __version__='$Revision$'
 
+from math import pi
 import numpy
 
-from topo import param
-
-from topo.base.cf import CFProjection, CFSheet
-from topo.base.patterngenerator import BoundingBox
-from topo.learningfn.optimized import CFPLF_Hebbian_opt
-from topo.responsefn.optimized import CFPRF_DotProduct_opt
-from topo.sheet.generator import GeneratorSheet
-from topo.misc.numbergenerator import UniformRandom
-#from topo.projection.basic import OneToOneProjection
+from topo import learningfn
+from topo import numbergen
 from topo import outputfn
-from topo import pattern 
+from topo import pattern
+from topo import projection
+from topo import responsefn
+from topo import sheet
+
+import topo.learningfn.optimized 
 import topo.pattern.random
+import topo.responsefn.optimized 
 
 
-
-###########################################
-# Set parameters
-
-# input patterns
-
-GeneratorSheet.period = 1.0
-GeneratorSheet.phase = 0.25
-GeneratorSheet.nominal_density = 20
-
-left_input_pattern = pattern.Line(
-    thickness=0.02,
-    bounds=BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
-    x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
-    y=UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
-    orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56))
-
-right_input_pattern = pattern.Line(
-    thickness=0.02,
-    bounds=BoundingBox(points=((-0.8,-1.05),(0.8,1.05))),
-    x=UniformRandom(lbound=-0.5,ubound=0.5,seed=100),
-    y=UniformRandom(lbound=-0.5,ubound=0.5,seed=200),
-    orientation=UniformRandom(lbound=-pi,ubound=pi,seed=300))
-
-
-# cortical sheet
-CFSheet.nominal_density = locals().get('default_density',10.0)
-
-# sheet activation saturates at 1
-CFSheet.output_fn = outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
-
-CFProjection.weights_generator = pattern.random.UniformRandom()
-CFProjection.nominal_bounds_template=BoundingBox(radius=0.1)
-CFProjection.learning_fn = CFPLF_Hebbian_opt()
-CFProjection.response_fn = CFPRF_DotProduct_opt()
-
-
+# Increase verbosity of message printing
+#from topo import param
 #param.parameterized.min_print_level = param.parameterized.MESSAGE
 
 
-###########################################
-# build simulation
+### input patterns
+
+sheet.GeneratorSheet.period = 1.0
+sheet.GeneratorSheet.phase = 0.25
+sheet.GeneratorSheet.nominal_density = 20
+
+left_input_pattern = pattern.Line(
+    thickness=0.02,
+    bounds=sheet.BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
+    x=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=12),
+    y=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=34),
+    orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56))
+
+right_input_pattern = pattern.Line(
+    thickness=0.02,
+    bounds=sheet.BoundingBox(points=((-0.8,-1.05),(0.8,1.05))),
+    x=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=100),
+    y=numbergen.UniformRandom(lbound=-0.5,ubound=0.5,seed=200),
+    orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=300))
 
 
-# Sheets
-topo.sim['LeftRetina'] = GeneratorSheet(input_generator=left_input_pattern,
-	nominal_bounds = BoundingBox(points=((-0.75,-0.5),(0.75,0.5))))
-topo.sim['RightRetina'] = GeneratorSheet(input_generator=right_input_pattern,
-	nominal_bounds = BoundingBox(points=((-0.5,-0.75),(0.5,0.75))))
+### Specify weight initialization, response function, and learning function
+projection.CFProjection.weights_generator = pattern.random.UniformRandom()
+projection.CFProjection.nominal_bounds_template= sheet.BoundingBox(radius=0.1)
+projection.CFProjection.learning_fn = learningfn.optimized.CFPLF_Hebbian_opt()
+projection.CFProjection.response_fn = responsefn.optimized.CFPRF_DotProduct_opt()
 
-topo.sim['V1'] = CFSheet()
-topo.sim['V2'] = CFSheet(nominal_bounds = BoundingBox(points=((-0.4,-0.4),(0.4,0.6))))
-topo.sim['V3'] = CFSheet(nominal_density=5)
-#topo.sim['RegionX'] = CFSheet(nominal_density=4)
+
+### Specify cortical sheets' density and output function
+sheet.CFSheet.nominal_density = locals().get('default_density',10.0)
+# sheet activation saturates at 1
+sheet.CFSheet.output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
+
+
+### Sheets
+topo.sim['LeftRetina'] = sheet.GeneratorSheet(
+    input_generator=left_input_pattern,
+    nominal_bounds = sheet.BoundingBox(points=((-0.75,-0.5),(0.75,0.5))))
+
+topo.sim['RightRetina'] = sheet.GeneratorSheet(
+    input_generator=right_input_pattern,
+    nominal_bounds = sheet.BoundingBox(points=((-0.5,-0.75),(0.5,0.75))))
+
+topo.sim['V1'] = sheet.CFSheet()
+
+topo.sim['V2'] = sheet.CFSheet(
+    nominal_bounds = sheet.BoundingBox(points=((-0.4,-0.4),(0.4,0.6))))
+
+topo.sim['V3'] = sheet.CFSheet(nominal_density=5)
+
+#topo.sim['RegionX'] = sheet.CFSheet(nominal_density=4)
+
+
+### Connections
 
 # Projections to V1
-topo.sim.connect('LeftRetina','V1',delay=0.5,connection_type=CFProjection,name='AfferentLeft')
-topo.sim.connect('RightRetina','V1',delay=0.5,connection_type=CFProjection,name='AfferentRight')
-#topo.sim.connect('V2','V1',delay=0.5,connection_type=CFProjection,name='FeedbackFromV2')
+topo.sim.connect('LeftRetina','V1',delay=0.5,name='AfferentLeft',
+                 connection_type=projection.CFProjection)
+topo.sim.connect('RightRetina','V1',delay=0.5,name='AfferentRight',
+                 connection_type=projection.CFProjection)
+
+# feedback
+#topo.sim.connect('V2','V1',delay=0.5,name='FeedbackFromV2',
+#                 connection_type=projection.CFProjection)
 
 
 # Projections to V2
-topo.sim.connect('LeftRetina','V2',delay=0.5,connection_type=CFProjection,
-                  name='AfferentLeft')
-topo.sim.connect('RightRetina','V2',delay=0.5,connection_type=CFProjection,
-                  name='AfferentRight')
-topo.sim.connect('V1','V2',delay=0.5,connection_type=CFProjection,
-                  name='AfferentV1')
-topo.sim.connect('V3','V2',delay=0.5,connection_type=CFProjection,
-                  name='FeedbackFromV3')
+topo.sim.connect('LeftRetina','V2',delay=0.5,name='AfferentLeft',
+                 connection_type=projection.CFProjection)
+                  
+topo.sim.connect('RightRetina','V2',delay=0.5,name='AfferentRight',
+                 connection_type=projection.CFProjection)
+
+topo.sim.connect('V1','V2',delay=0.5,name='AfferentV1',
+                 connection_type=projection.CFProjection)
+
+topo.sim.connect('V3','V2',delay=0.5,name='FeedbackFromV3',
+                 connection_type=projection.CFProjection)
 
 # Projections to V3
-topo.sim.connect('V2','V3',delay=0.5,connection_type=CFProjection,
-                  name='Afferent')
+topo.sim.connect('V2','V3',delay=0.5,name='Afferent',
+                 connection_type=projection.CFProjection)
 
 # Projections to RegionX
-#topo.sim.connect('V1','RegionX',delay=0.5,connection_type=OneToOneProjection)
+#topo.sim.connect('V1','RegionX',delay=0.5,
+#                 connection_type=OneToOneProjection)
 
 
 
-# example scheduled action
-topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
+### example scheduled action
+topo.sim.startup_commands.append("from topo import sheet")
 
-topo.sim.schedule_command(10,"""topo.sim['V1'].projections()['AfferentLeft'].change_bounds(BoundingBox(radius=0.05))""")
+topo.sim.schedule_command(
+    10,"topo.sim['V1'].projections('AfferentLeft').change_bounds(sheet.BoundingBox(radius=0.05))")
 
 
-# Set default locations for the Model Editor
+### Set default locations for the Model Editor
 #topo.sim['RegionX'    ].layout_location=(135,130)
 topo.sim['V3'         ].layout_location=(500, 90)
 topo.sim['V2'         ].layout_location=(500,230)
@@ -119,6 +134,5 @@ topo.sim['V1'         ].layout_location=(135,320)
 topo.sim['LeftRetina' ].layout_location=(151,520)
 topo.sim['RightRetina'].layout_location=(369,520)
 
-
 # set default input generator (e.g. for the GUI)
-GeneratorSheet.params()['input_generator'].default=pattern.Line()
+sheet.GeneratorSheet.params()['input_generator'].default=pattern.Line()
