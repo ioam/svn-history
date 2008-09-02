@@ -88,23 +88,14 @@ win-msys-patch-uninstall:
 	${RM} /c/Python25/Lib/distutils.cfg
 	${RM} /c/Python25/Lib/site-packages/topographica.pth
 
-# Mac OS X: to build python with tcl/tk from /Library/Frameworks
-osx-tk-patch:
-	patch --force external/Makefile external/Makefile_OSX_tk.diff
-	touch osx-tk-patch
-
-osx-tk-patch-uninstall:
-	patch --force --reverse external/Makefile external/Makefile_OSX_tk.diff
-	${RM} osx-tk-patch
-
 # Mac OS X: to build python with X11 Tkinter
-osx-x11-patch: 
-	patch --force external/Makefile external/Makefile_OSX_X11.diff
-	touch osx-x11-patch
+#osx-x11-patch: 
+#	patch --force external/Makefile external/Makefile_OSX_X11.diff
+#	touch osx-x11-patch
 
-osx-x11-patch-uninstall:
-	patch --force --reverse external/Makefile external/Makefile_OSX_X11.diff
-	${RM} osx-x11-patch
+#osx-x11-patch-uninstall:
+#	patch --force --reverse external/Makefile external/Makefile_OSX_X11.diff
+#	${RM} osx-x11-patch
 
 
 saved-examples: 

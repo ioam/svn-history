@@ -61,7 +61,9 @@ python: ${PYTHON}.tgz tk blt
 	echo ${PREFIX}
 	tar -xzf ${PYTHON}.tgz
 # Configure for specific operating system versions
+# (note that tcl+tk+blt are currently built unnecessarily on mac)
 ifeq ("$(shell uname -s)","Darwin")
+	patch -p0 < Python_OSX_tk.diff # build python with tcl/tk from /Library/Frameworks
 ifeq ("$(shell uname -r | cut -d . -f 1)","9") # Darwin 9.x == Mac OS X 10.5 (Leopard)
 	cd ${PYTHON}; ./configure --prefix=${PREFIX} MACOSX_DEPLOYMENT_TARGET=10.5
 else

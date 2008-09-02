@@ -112,26 +112,9 @@ Topographica GUI. The easiest method is to
 install <A HREF="http://www.activestate.com/Products/activetcl/">ActiveTcl</A>,
 although any Framework build of Tcl/Tk 8.5 should work.
 
-<P>Having obtained these prerequisites, you can obtain and build
-Topographica, as described below.
-
-
-<H4>Obtaining Topographica</H4>
- 
-<!--Might be better just to duplicate linux section here-->
-<P>No special steps are required to obtain Topographica on OS X;
-please follow the common instructions
-for <A HREF="#common-obtain">obtaining Topographica</A>. Once you have
-followed that section, you can proceed to build Topographica as
-described below.
-
-<H4>Building Topographica</H4>
-
-<P>Using the Terminal application, enter the <code>topographica</code>
-directory and type <code>make osx-tk-patch</code> (this allows Python
-to find the correct version of Tcl/Tk). Having done this, you can now
-follow the common instructions
-for <A HREF="#building-topographica">building Topographica</A>.
+<P>Having satisfied these prerequisites, you can follow the
+instructions for <A HREF="#common">obtaining and building</A>
+Topographica.
 
 
 <H3><A NAME="lin">Linux/UNIX</A></H3>
