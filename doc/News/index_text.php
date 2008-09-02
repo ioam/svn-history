@@ -42,6 +42,7 @@
 </dd>
 <dt>GUI:</dt>
 <dd>
+  model editor fully supports dynamic parameters (described in the lissom_oo_or tutorial)<BR>
   plot windows can be docked into main window<BR>
   uses tk8.5 for anti-aliased fonts <!--and potential to move to platform-specific themes--><BR>
 <!--  cleaned up ParametersFrame and TaggedSlider behavior<BR> -->
