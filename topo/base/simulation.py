@@ -816,9 +816,9 @@ class Simulation(param.Parameterized,OptionalSingleton):
         
         Some potentially useful number classes::
         
-        - mx.Number.Rational, mx.Number.Float: provide Python with access
-          to the fast GNU Multi-Precision library, but require GMP to be
-          built.
+        - gmpy.mpq: gmpy provides Python with access to the fast GNU
+          Multi-Precision library (which requires GMP to be built);
+          gmpy.mpq is gmpy's rational type.
         
         - fixedpoint.FixedPoint: pure Python fixed-point number, but
           quite slow.
