@@ -518,23 +518,23 @@ this input changes the weights, and can experiment with different inputs.
 
 <p><li>Once you have a particular input pattern designed, you can see
 how that pattern would affect the cortex over many iterations.  To do
-so, open a Model Editor window and right click on the Retina, then
-select Properties from the resulting menu. In the Parameters window
+so, open a <span class='w_title'>Model Editor</span> window and right click on the Retina's diagram, then
+select <span class='t_item'>Properties</span> from the resulting menu. In the <span class='w_title'>Parameters of Retina</span> window
 that opens, select the pattern type you want to use for the <span
 class='t_item'>Input Generator</span> item, and then right click on
-that pattern and modify any of its parameters as you wish. Note that
+that pattern, choose <span class='t_item'>Properties</span> and, in the new window, modify any of its parameters as you wish. Note that
 you will probably want to have dynamic values for certain
 parameters. For instance, to have a random orientation for each
-presentation, right click on Orientation and select 'Enter dynamic
-value'.  The slider will disappear from the entry box, and you can
+presentation, right click on <span class='t_item'>Orientation</span> and select <span class='t_item'>Enter dynamic
+value</span>.  The slider will disappear from the entry box, and you can
 type in an expression such as
 <code>UniformRandom(lbound=-pi,ubound=pi)</code>.  <!--CEBALERT: and
 hope nobody's imported pattern.random.UniformRandom into
 __main__...--> When you have finished configuring your pattern, press
-Apply or Close on the Parameters of Gaussian window. Having setup the
-Input generator on the Retina's properties window, click Apply or
-Close on this window too. Now when you press Go on the console window
-(assuming Run for is set to 1), you should see your pattern being
+<span class='b_press'>Apply</span> or <span class='b_press'>Close</span> on the <span class='w_title'>Parameters of Gaussian</span> window. Having now set up the
+input generator on the <span class='w_title'>Parameters of Retina</span> window, click <span class='b_press'>Apply</span> or
+<span class='b_press'>Close</span> on this too. Now when you press <span class='b_press'>Go</span> on the console window
+(assuming <span class='t_item'>Run for</span> is set to 1), you should see your pattern being
 presented in the Activity Window.
 
 <p></p></li><li>After a few steps (or to do e.g. 20 steps in a row,
@@ -553,17 +553,19 @@ selective for each orientation.
 
 <li>If you are patient, you can even run a full, more realistic,
 simulation with your favorite type of input. To do this, quit and
-start again, then change the Retina's
-<span class='t_item'>Input generator</span> as before via the Model Editor, but make sure not to change the
-<code>Learning rate</code> this time.  Then you can change
-<span class='t_item'>Run for</span> to 10000 and press <span class='b_press'>Go</span>) to see how
-a full simulation would work with your new inputs.  <!--If you hit the
-<span class='b_press'>Activity</span> button ** while it's training, you'll see a window
-pop up when it's done (which will be at least several minutes, for
-recent machines, or even longer with older machines).--> Running for 10000 iterations
-will likely take at least several minutes for recent machines; if you are less
-patient, try doing 1000 iterations at a time instead before looking at
-an Orientation Map</b></span>.<p></p></li>
+start again, then change the Retina's <span class='t_item'>Input
+generator</span> as before via the Model Editor, but make sure not to
+change the learning rate this time.  Then you can change <span
+class='t_item'>Run for</span> to 10000 and press <span
+class='b_press'>Go</span> to see how a full simulation would work
+with your new inputs.  <!--If you hit the <span
+class='b_press'>Activity</span> button ** while it's training, you'll
+see a window pop up when it's done (which will be at least several
+minutes, for recent machines, or even longer with older machines).-->
+Running for 10000 iterations will likely take at least several minutes
+for recent machines; if you are less patient, try doing 1000
+iterations at a time instead before looking at an Orientation
+Map</b></span>.<p></p></li>
 
 <p><li> If you are <em>really</em> patient, you can change the number
 of units to something closer to real primate cortex, by quitting
