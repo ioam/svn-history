@@ -357,8 +357,8 @@ map except for a discontinuity.
 <P>Finally, you could change the input pattern to get a different type
 of map.  E.g. if an oriented pattern is used, with random
 orientations, neurons will become selective for orientation and not
-just position.  See the <code>examples/obermayer_pnas90.ty</code> file
-for more details. <!--, though that simulation is quite
+just position.  <!--See the <code>examples/obermayer_pnas90.ty</code> file
+for more details, though that simulation is quite
 processor-intensive compared to this one. --> In general, the map
 should form a representation of the dimensions over which the input
 varies, with each neuron representing one location in this space, and
