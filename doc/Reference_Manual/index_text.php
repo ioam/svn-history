@@ -177,8 +177,15 @@ included within Python functions, usually for a specific speed optimization.
 This functionality is available for any user-defined library function, 
 for cases when speed is crucial.</DD>
 
+<P><DT><A href="http://code.google.com/p/gmpy/">gmpy</A></DT>
+<DD>A C-coded Python extension module that wraps the GMP library to
+provide Python with fast multiprecision arithmetic. Topographica uses
+gmpy's rational type as its default simulation time. Since gmpy
+requires GMP to be built, Topographica will fall back to a slower,
+purely Python implementation of fixed-point numbers (<A
+HREF="http://fixedpoint.sourceforge.net/">fixedpoint</A>).
 
-<!--CEBALERT: remember to add GMP, mxNumber, (gnosis) -->
+<!--CBENHANCEMENT: add gnosis when (if) we begin to advertise it-->
 
 </DL>
 
@@ -200,10 +207,9 @@ build process.
 
 <P><DT><A href="http://www.scipy.org/">SciPy</A></DT>
 <DD>
-<!--CBALERT: update this text. JAB has more information already?
+<!--CBALERT: update this text. JA has more information already?
 It's easy on Ubuntu linux because you can get the package manager
-to add the libraries. Also on Windows, it's already working
--->
+to add the libraries. Also on Windows, it's already working.-->
 SciPy includes many, many functions useful in scientific research,
 such as statistics, linear algebra, image processing, integration and
 differential equation solvers, etc.  However, because of all the
