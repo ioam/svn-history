@@ -10,7 +10,6 @@ $Id$
 __version__='$Revision$'
 
 from math import pi
-import numpy
 
 from topo import learningfn
 from topo import numbergen
