@@ -1116,7 +1116,7 @@ class TkParameterized(TkParameterizedBase):
                             variable=self.dynamic_var)
 
 
-    def __update_dynamic_menu_entry(param_name):
+    def __update_dynamic_menu_entry(self,param_name):
         """Keep track of status of dynamic entry."""
         param,po = self.get_parameter_object(param_name,with_location=True)
         currently_dynamic = param_is_dynamically_generated(param,po)
