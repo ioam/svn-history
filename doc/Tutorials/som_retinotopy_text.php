@@ -333,9 +333,10 @@ topographic grid not to flatten out (despite local order in patches).
 <P>Similarly, consider changing the initial learning rate from
 <code>0.42</code> to e.g. <code>1.0</code> (e.g. by passing <code>-c
 alpha_0=1.0</code> on the command line).  The retina and V1 densities
-cannot be changed after the simulation has started; to change those
-provide their values on the command line as above (or edit the
-<code>som_retinotopy.ty</code> file) and start Topographica again.
+cannot be changed after the simulation has started, but again, they
+can be changed by providing their values on the command line as above
+(or by editing the <code>som_retinotopy.ty</code> file) and starting
+Topographica again.
 
 <P>You can also try changing the input_seed ("-c input_seed=XX"), to
 get a different stream of inputs, or weight_seed ("-c
