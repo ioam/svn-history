@@ -111,7 +111,8 @@ instructions above.
 via <A HREF="http://www.mingw.org/">MSYS/MinGW</A>. If your system
 does not already have MSYS/MinGW, please install
 MSYS 1.0.11 and MingGW 5.1.4 (from the MinGW <A HREF="http://sourceforge.net/project/showfiles.php?group_id=2435">download page</A>). Other versions might work, but we
-have not tested them. <!--CEBALERT: also in topographica-win: move or doc-->
+have not tested them. 
+<!--CBENHANCEMENT: readymade MSYS/MinGW in topographica-win: move or doc-->
 
 <P>Once you have installed MSYS/MinGW, you will need to install Subversion.
 The easiest way to do this is to download the installer from the 
