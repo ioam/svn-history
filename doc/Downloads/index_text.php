@@ -84,6 +84,7 @@ Topographica code repository, the PNG format handling, and the font
 handling for the matplotlib library used by Topographica.)
 
 <!--
+CBENHANCEMENT: make doc on mac?
  <li> If you want to compile a local copy of the documentation
 (e.g. for online help), use Fink to get imagemagick, transfig, php,
 and m4 (if these are not already installed): <code>fink install
@@ -92,9 +93,9 @@ php4 m4 tetex imagemagick transfig</code>.
 <!-- with fink for os x 10.5 (i.e. not binary fink), this command 
 takes at least 6 hours to run on sake...and then it finishes with:
 Failed: Fink::SysState: Could not resolve inconsistent dependencies-->
-for 10.5 -->
 <!--even with 10.5 and the binary, getting those tools + dependencies
-takes ages -->
+takes ages & anyway exits with a 'failed to resolve dependencies' 
+error-->
 
 <li>If you have trouble running <code>fink</code>, make sure the Fink
 installation is actually in your path (the default Fink path is
