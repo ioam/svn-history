@@ -1,7 +1,5 @@
 <H1>LISSOM Orientation Map</H1>
 
-<!-- CEBALERT: the html in this file is a mix of standards (i.e., it's a mess). -->
-
 <p>
 This tutorial shows how to use the
 <a href="http://topographica.org/">Topographica</a> software to explore a
@@ -177,8 +175,8 @@ inputs). To see what the other neurons look like, select
 <a name="Projection-plot"><span class='t_item'>Projection</span></a>
 from the <span class='t_item'>Plots</span> menu, then select <span
 class='t_item'>LGNOnAfferent</span> from the drop-down <span
-class='t_item'>Projection</span> list, followed by refresh:
-<!--CEBALERT: need to put in the arrow picture?-->
+class='t_item'>Projection</span> list, followed by the refresh
+arrow next to 'Update command':
   
 
 <p class="center">
