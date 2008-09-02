@@ -512,54 +512,58 @@ training iteration will nearly wipe out any existing weights.
 <p></p></li><li>For more control over the training inputs, open the 
 <span class='w_title'>Test Pattern</span> window, select a
 <span class='t_item'>Pattern generator</span>, e.g. <span class='t_item'>Disk</span>, and other
-parameters as desired.  Then enable <span class='t_item'>Learning</span> in that
+parameters as desired.  Then enable <span class='t_item'>Plastic</span> in that
 window, and hit <span class='b_press'>Present</span>.  You should again see how
 this input changes the weights, and can experiment with different inputs.
 
-<!--CEBHACKALERT: need to support dynamic params in the ME for this to be useful -->
-<!--
 <p><li>Once you have a particular input pattern designed, you can see
 how that pattern would affect the cortex over many iterations.  To do
-so, right click on the Retina and select a new pattern for the <span
-class='t_item'>Input Generator</span> item, then right click on that
-item and modify any of its parameters you like.  At present the Model
-Editor does not support dynamic parameters (such as random positions
-and orientations); to choose those you will need to edit the .ty
-script file for the simulation.
--->
+so, open a Model Editor window and right click on the Retina, then
+select Properties from the resulting menu. In the Parameters window
+that opens, select the pattern type you want to use for the <span
+class='t_item'>Input Generator</span> item, and then right click on
+that pattern and modify any of its parameters as you wish. Note that
+you will probably want to have dynamic values for certain
+parameters. For instance, to have a random orientation for each
+presentation, right click on Orientation and select 'Enter dynamic
+value'.  The slider will disappear from the entry box, and you can
+type in an expression such as
+<code>UniformRandom(lbound=-pi,ubound=pi)</code>.  <!--CEBALERT: and
+hope nobody's imported pattern.random.UniformRandom into
+__main__...--> When you have finished configuring your pattern, press
+Apply or Close on the Parameters of Gaussian window. Having setup the
+Input generator on the Retina's properties window, click Apply or
+Close on this window too. Now when you press Go on the console window
+(assuming Run for is set to 1), you should see your pattern being
+presented in the Activity Window.
 
-<p></p></li><li>After a few steps,
-<!--
-(or to do e.g. 20 steps in a row, change
-<span class='t_item'>Learning iterations</span> to 20 and press return)
--->you can
-plot (or refresh) an <span class='w_title'>Orientation
-Preference</span> map to see what sort of
-orientation map has developed.  (Press the 'Refresh' button next to
-the <span class='t_item'>Update command</span> item if no plot is visible when
-first opening the window.  Measuring a new map will usually take about 15
-seconds to complete.)  If you've changed the learning rate to
-a high value, or haven't presented many inputs, the map will not
+<p></p></li><li>After a few steps (or to do e.g. 20 steps in a row,
+change <span class='t_item'>Run for</span> to 20 and press return) you
+can plot (or refresh) an <span class='w_title'>Orientation
+Preference</span> map to see what sort of orientation map has
+developed.  (Press the 'Refresh' button next to the <span
+class='t_item'>Update command</span> item if no plot is visible when
+first opening the window.  Measuring a new map will usually take about
+15 seconds to complete.)  If you've changed the learning rate to a
+high value, or haven't presented many inputs, the map will not
 resemble actual animal maps, but it should still have patches
 selective for each orientation.
 <p></p></li>
 
 
-<!--
 <li>If you are patient, you can even run a full, more realistic,
-simulation with your favorite type of input. (**no you can't, or at
-least not this way: UPDATE.)  To do this, quit and
-start again and change the
-<span class='t_item'>Pattern generator</span> as before, but make sure not to change
-<code>alpha_input</code>.  Then you can change
-<span class='t_item'>Learning iterations</span> to 10000 and ** <span class='b_press'>Train</span>), to see how
-a full simulation would work with your new inputs.  If you hit the
+simulation with your favorite type of input. To do this, quit and
+start again, then change the Retina's
+<span class='t_item'>Input generator</span> as before via the Model Editor, but make sure not to change the
+<code>Learning rate</code> this time.  Then you can change
+<span class='t_item'>Run for</span> to 10000 and press <span class='b_press'>Go</span>) to see how
+a full simulation would work with your new inputs.  <!--If you hit the
 <span class='b_press'>Activity</span> button ** while it's training, you'll see a window
 pop up when it's done (which will be at least several minutes, for
-recent machines, or even longer with older machines).  If you are less
+recent machines, or even longer with older machines).--> Running for 10000 iterations
+will likely take at least several minutes for recent machines; if you are less
 patient, try doing 1000 iterations at a time instead before looking at
 an Orientation Map</b></span>.<p></p></li>
--->
 
 <p><li> If you are <em>really</em> patient, you can change the number
 of units to something closer to real primate cortex, by quitting
