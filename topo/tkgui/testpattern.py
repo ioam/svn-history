@@ -17,6 +17,9 @@ __version__='$Revision$'
 ### making objects with different parameters in the different eyes,
 ### e.g. to test ocular dominance or disparity.
 
+# CBENHANCEMENT: add 'use for learning' to install current pattern
+# (saving previous ones)?
+
 from Tkinter import Frame
 
 from .. import param
