@@ -4,8 +4,8 @@ PYLINT = bin/pylint --rcfile=doc/buildbot/pylintrc
 
 PYCHECKER = bin/pychecker --config doc/buildbot/pycheckrc
 
-RELEASE = 0.9.4
-RELEASE_TAG = release_0_9_4
+RELEASE = 0.9.5
+RELEASE_TAG = release_0_9_5
 
 TEST_VERBOSITY = 1
 
