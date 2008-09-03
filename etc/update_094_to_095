@@ -1,37 +1,6 @@
 #!bin/python
 
-
-
-## >  |  > 6. (optional) Write a python function to update a .ty script using the
-## >  |  >    old names to use the new ones; this would go into
-## >  |  >    topo/misc/legacy.py.  We'll probably add lots more to such a script
-## >  |  >    later, e.g. based on the SVN version number in it, but for now it
-## >  |  >    can be very simple search-and-replaces.
-## >  |
-## >  |  Okay. Here's a start:
-## >  |
-## >  |  str = open(filename,'r').read()
-## >  |  for old,new in replacements:
-## >  |      str = new.join(str.split(old))
-## >  |  os.rename(filename,filename+'.bak')
-## >  |  open(filename,'w').write(str)
-## >  |
-## >  |  where replacements is list of strings to be replaced and their
-## >  |  replacements.
-## >
-## >  Sounds good.  We can then make a list of replacements with a
-## >  corresponding range of SVN version numbers, and then can add something
-## >  to search in the str for the __version__, and can filter the
-## >  replacements list so that it contains only the right replacements to
-## >  apply for that range of versions.
-## >
-## >  The replacements will presumably need to be regexps eventually.  For
-## >  this task it's fine for them to be strings, but in general we'll
-## >  provably have to do some fancier patching.  Anyway, the version above
-## >  looks like all we need for now.
-
-## The main issue is to get a list of all the renaming or moving that
-## you've done; do you have that?
+__version__ = '$Revision: 9030 $'
 
 import os
 import sys
@@ -46,7 +15,6 @@ E.g.:   update_094_to_095 my_script.ty
 if len(sys.argv)!=2:
     usage()
     sys.exit(-1)
-
 
 
 info = """
@@ -70,8 +38,6 @@ Topographica 0.9.5, you have two options:
 """
 
 print info
-
-
 
 # should be ordered most to least specific, but it isn't yet
 replacements = [
@@ -145,3 +111,53 @@ new_filename = filename+'_0.9.5'
 open(new_filename,'w').write(str)
 
 print "\n\nUpdating finished; output written to %s"%new_filename
+
+
+### NOTES
+
+## >  |  > 6. (optional) Write a python function to update a .ty script using the
+## >  |  >    old names to use the new ones; this would go into
+## >  |  >    topo/misc/legacy.py.  We'll probably add lots more to such a script
+## >  |  >    later, e.g. based on the SVN version number in it, but for now it
+## >  |  >    can be very simple search-and-replaces.
+## >  |
+## >  |  Okay. Here's a start:
+## >  |
+## >  |  str = open(filename,'r').read()
+## >  |  for old,new in replacements:
+## >  |      str = new.join(str.split(old))
+## >  |  os.rename(filename,filename+'.bak')
+## >  |  open(filename,'w').write(str)
+## >  |
+## >  |  where replacements is list of strings to be replaced and their
+## >  |  replacements.
+## >
+## >  Sounds good.  We can then make a list of replacements with a
+## >  corresponding range of SVN version numbers, and then can add something
+## >  to search in the str for the __version__, and can filter the
+## >  replacements list so that it contains only the right replacements to
+## >  apply for that range of versions.
+## >
+## >  The replacements will presumably need to be regexps eventually.  For
+## >  this task it's fine for them to be strings, but in general we'll
+## >  provably have to do some fancier patching.  Anyway, the version above
+## >  looks like all we need for now.
+
+## The main issue is to get a list of all the renaming or moving that
+## you've done; do you have that?
+
+
+# SKIPPED
+## 	  renamed JointNormalizingCFSheet_Continouse
+## 	  renamed JointNormalizingCFSheet_Continouse
+## 	  ConnectionField's slice_array was renamed to input_sheet_slice.
+## 	  Removed topo/params (git-svn dcommit appears not to have
+## 	  Moved topo.params to topo.param.
+## 	  Removed PatternGeneratorParameter
+## 	  Removed CoordinateMapperFnParameter.
+## 	  Removed OutputFnParameter, ResponseFnParameter, and
+## 	  Removed LearningFnParameter and ResponseFnParameter. Also cleaned
+## 	  Moved OutputFnWithState from functionfamilies.py to
+## 	  Removed OutputFnParameter and CFPOutputFnParameter.
+## 	  Removed DynamicNumber and did basic testing, fixing some other
+## 	  averaging, removed JointScalingOF and AdaptingHomeostaticMaxEnt
