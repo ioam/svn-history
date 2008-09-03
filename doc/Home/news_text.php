@@ -9,9 +9,10 @@ print '<table width="100%" cellpadding="5"><tr><td bgcolor="'.$banner_bg_color.'
 <A target="_top" href="../Downloads/index.html">released</A>; see the 
   <A target="_top" href="../News/index.html">News</A> page for more details.<BR>
   Screenshots: 
-  <A target="_top" href="../images/071018_plotting1_ubuntu.png">plotting 1</A>, 
-  <A target="_top" href="../images/071018_plotting2_ubuntu.png">plotting 2</A>, 
-  <A target="_top" href="../images/071018_modeleditor_ubuntu.png">model editor</A>.
+  <A target="_top" href="../images/080903_plotting1_fedora.png">plotting 1</A> (Linux), 
+<!--  <A target="_top" href="../images/080903_plotting2_mac.png">plotting 2</A> (Mac), -->
+  <A target="_top" href="../images/080903_docking_fedora.png">docking</A> (Linux),
+  <A target="_top" href="../images/080903_modeleditor_fedora.png">model editor</A> (Linux).
 </i>
 
 </blockquote>
