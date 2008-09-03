@@ -30,6 +30,7 @@
 <!-- topo/misc/legacy.py i.e. we can now support old snapshots if necessary<BR> -->
 <!-- incomplete <A HREF="../Downloads/git.html">Instructions</A> for checking out Git version of repository<BR> -->
 </dd>
+<BR>
 <dt>Command-line and batch:</dt>
 <dd>
   simplified example file syntax (see examples/lissom_oo_or.ty and examples/som_retinotopy.py)<BR>
@@ -38,8 +39,9 @@
   command-line options can be called explicitly<BR>
   <!-- , e.g.
   &nbsp;&nbsp;&nbsp;<A HREF="../Reference_Manual/topo.misc.commandline-module.html#gui">topo.misc.commandline.gui()</A> or<BR>
-  &nbsp;&nbsp;&nbsp;<A HREF="../Reference_Manual/topo.misc.commandline-module.html#auto_import_commands">topo.misc.commandline.auto_import_commands()</A>--><BR>
+  &nbsp;&nbsp;&nbsp;<A HREF="../Reference_Manual/topo.misc.commandline-module.html#auto_import_commands">topo.misc.commandline.auto_import_commands()</A><BR>-->
 </dd>
+<BR>
 <dt>GUI:</dt>
 <dd>
   model editor fully supports dynamic parameters (described in the lissom_oo_or tutorial)<BR>
@@ -59,6 +61,7 @@
   combined (joint) plots using contour and arrow overlays<BR>
   example of generating activity movies (examples/lissom_or_movie.ty)<BR>
 </dd>
+<BR>
 <dt>Example scripts:</dt>
 <dd>
   example files for robotics interfacing<BR>
@@ -70,6 +73,7 @@
   &nbsp;&nbsp;&nbsp;frequency, and color (examples/lissom.ty).<BR>
 <!--  mouse model (examples/lissom_oo_or_species.ty)<BR> -->
 </dd>
+<BR>
 <dt>Component library:</dt>
 <dd>
   OutputFns: 
