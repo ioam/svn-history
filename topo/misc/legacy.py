@@ -128,7 +128,6 @@ def fake_a_module(name,parent,source_code,parent_path=None):
     setattr(parent,name,module)
 
 
-
 class SnapshotSupport(object):
 
     @staticmethod
@@ -323,19 +322,69 @@ from topo.param import Dict as DictParameter
 
         # DynamicNumber was removed in rXXXX
         class DynamicNumber(object):
-            # placeholder: use code from topo.base.parameterclasses.DynamicNumber
-            # (e.g. revision 7604)
-            def __new__(cls,*args,**kw):
-                # just haven't gotten round to it; doesn't seem necessary
-                raise NotImplementedError("""
-                Please email ceball at users.sf.net, requesting an
-                update to the legacy snapshot support. If possible,
-                please make your snapshot available for testing.""")
+            """
+            Provide support for existing code that uses DynamicNumber:
+            see __new__().
+            """
+            warnedA = False  # suppress warnings for the moment.
+            warnedB = False
+
+            def __new__(cls,default=None,**params):
+                """
+                If bounds or softbounds or any params are supplied, assume
+                we're dealing with DynamicNumber declared as a parameter
+                of a ParameterizedObject class.  In this case, return a
+                new *Number* parameter instead.
+
+                Otherwise, assume we're dealing with DynamicNumber
+                supplied as the value of a Number Parameter. In this case,
+                return a DynamicNumber (but one which is not a Parameter,
+                just a simple wrapper).
+
+                * Of course, this is not 100% reliable: if someone defines
+                * a class with a DynamicNumber but doesn't pass any doc or
+                * bounds or whatever. But in such cases, they'll get the
+                * ParameterizedObject warning about being unable to set a
+                * class attribute.
+
+                Most of the code is to generate warning messages.
+
+                """
+                if len(params)>0:
+                    ####################
+                    m = "\n------------------------------------------------------------\nPlease update your code - instead of using the 'DynamicNumber' Parameter in the code for your class, please use the 'Number' Parameter; the Number Parameter now supports dynamic values automatically.\n\nE.g. change\n\nclass X(Parameterized):\n    y=DynamicNumber(NumberGenerator())\n\nto\n\n\nclass X(Parameterized):\n    y=Number(NumberGenerator())\n------------------------------------------------------------\n"
+                    if not cls.warnedA:
+                        param.Parameterized().warning(m)
+                        cls.warnedA=True
+                    ####################
+
+                    n = Number(default,**params)
+                    return n
+                else:
+                    ####################
+                    m = "\n------------------------------------------------------------\nPlease update your code - instead of using DynamicNumber to contain a number generator, pass the number generator straight to the Number parameter:\n\nE.g. in code using the class below...\n\nclass X(Parameterized):\n    y=Number(0.0)\n\n\nchange\n\nx = X(y=DynamicNumber(NumberGenerator()))\n\nto\n\nx = X(y=NumberGenerator())\n------------------------------------------------------------\n"
+                    if not cls.warnedB:
+                        param.Parameterized().warning(m)
+                        cls.warnedB=True
+                    ####################
+                    return object.__new__(cls,default)
+
+
+            def __init__(self,default=0.0,bounds=None,softbounds=None,**params):
+                self.val = default
+            def __call__(self):
+                return self.val()
+
+
+
+
+
             
 
         import topo.base.parameterclasses
         topo.base.parameterclasses.DynamicNumber = DynamicNumber
-
+        import topo.param
+        topo.param.DynamicNumber = DynamicNumber
 
         from topo.base.cf import CFProjection
         from numpy import array
@@ -439,3 +488,8 @@ from topo.misc.trace import *
         import topo.pattern.basic
         import topo.pattern.teststimuli
         topo.pattern.basic.SineGratingDisk = topo.pattern.teststimuli.SineGratingDisk
+
+
+
+def install_legacy_support():
+    SnapshotSupport.install()
