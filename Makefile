@@ -345,6 +345,7 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} -r images
 #@@	   ${RM} -r topographica-win win_build_exe.py
 #@@	   ${RM} -r tmp/
+#@@	   ${RM} -r contrib/
 #@@	   ${RM} -r .svn */.svn */*/.svn */*/*/.svn */*/*/*/.svn
 #@@	   ${CD} topo/tests/reference ; make clean
 #@@	   ${RM} -r doc/buildbot/
