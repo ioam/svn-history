@@ -285,7 +285,7 @@ clean-weave:
 	rm -rf ~/.python2*_compiled/ | cat
 
 clean-pyc:
-	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc examples/*.pyc
+	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc examples/*.pyc contrib/*.pyc
 
 clean-doc:
 	make -C doc clean
@@ -337,7 +337,7 @@ sf-web-site: reference-manual doc
 # but it is enabled when the distribution directory is created.
 #
 #@@distclean: FORCE clean
-#@@	   ${RM} .#* */.#* */*/.#* */*~ .cvsignore ChangeLog.txt */.cvsignore */*/.cvsignore */*/*/.cvsignore
+#@@	   ${RM} .#* */.#* */*/.#* */*~ ChangeLog.txt 
 #@@	   ${RM} etc/topographica.elc ImageSaver*.ppm countalerts* annotate.out emacslog
 #@@	   ${RM} current_profile ./topo/tests/testsnapshot.typ script ./topo/tests/*.ty_*DATA timing* ./topo/tests/testplotfilesaver*.png
 #@@	   ${RM} examples/disparity_energy.ty
@@ -369,10 +369,12 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} examples/*.typ
 #@@	   ${RM} -r Output
 #@@	   ${RM} -r images
-#@@	   ${RM} -r topographica-win
+#@@	   ${RM} -r topographica-win win_build_exe.py
 #@@	   ${RM} -r tmp/
-#@@	   ${RM} -r .svn */.svn */*/.svn */*/*/.svn
+#@@	   ${RM} -r .svn */.svn */*/.svn */*/*/.svn */*/*/*/.svn
 #@@	   ${CD} topo/tests/reference ; make clean
+#@@	   ${RM} -r doc/buildbot/
+
 
 # Make public distribution archive
 distarc: FORCE distclean 
