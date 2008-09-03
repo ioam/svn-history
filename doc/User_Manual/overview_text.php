@@ -173,8 +173,7 @@ is considered the actual response of each unit.  (The Projection
 activity is just a handy way of computing and reasoning about the
 contribution of each Projection to this overall Sheet activity.)
 
-<!-- CEBALERT: 'The' to 'One'?-->
-<P>The specific type of Projection currently implemented is 
+<P>One specific type of Projection currently implemented is 
 <?php classref('topo.base.cf','CFProjection')?>, i.e. a Projection that
 consists of a set of <?php
 classref('topo.base.cf','ConnectionField')?> objects, each of which
