@@ -103,9 +103,11 @@
 </dl>
 </td>
 </tr>
+<tr><td colspan='2'><small>We also provide a <A
+HREF="../Downloads/update_script.html">utility to update scripts</A>
+that were written for version 0.9.4.</small> </td></tr>
 </table>
 </center>
-
 
 <p><b>26 October 2007:</b> Version 0.9.4 
 <A target="_top" href="../Downloads/index.html">released</A>, including:
