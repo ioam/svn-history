@@ -22,6 +22,9 @@ import sys
 # is to create a class in a module where the class doesn't exist at
 # all any more). But things are working at the moment...
 
+# CEBALERT: should have ONE list for the update script and for this,
+# rather than having (effectively) a list in each.
+
 def preprocess_state(class_,state_mod_fn): 
     """
     Allow processing of state with state_mod_fn before
@@ -489,7 +492,34 @@ from topo.misc.trace import *
         import topo.pattern.teststimuli
         topo.pattern.basic.SineGratingDisk = topo.pattern.teststimuli.SineGratingDisk
 
+        # rXXXX homeostatic of moved into basic
+        code = \
+"""
+from topo.outputfn import HomeostaticMaxEnt # and what else?
+"""
+        fake_a_module('homeostatic',topo.outputfns,code,'topo.outputfns')
 
+        # rXXXX renamed CFProjection.weights_shape to CFProjection.cf_shape
+        param.parameterized._param_name_changes['topo.base.cf.CFProjection']={'weights_shape':'cf_shape'}
+        
+
+
+# CEBALERT: rename SnapshotSupport and integrate LegacySupport so that
+# the difference is clear.
+
+def LegacySupport():
+    """
+    Support for running old scripts. Use in conjunction with
+    SnapshotSupport.install() to avoid duplication.
+    """
+    # rXXXX renamed CFProjection.weights_shape to CFProjection.cf_shape 
+    import topo.base.cf
+    cfp = topo.base.cf.CFProjection
+    type.__setattr__(cfp,'weights_shape',cfp.__dict__['cf_shape'])
+
+
+        
 
 def install_legacy_support():
     SnapshotSupport.install()
+    LegacySupport()
