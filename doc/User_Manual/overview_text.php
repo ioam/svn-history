@@ -119,11 +119,10 @@ that could be relevant for a model.
 	  topographic map models as-is, but others need specific
 	  extensions.
             <ul>
-<!--CEBALERT: CFSOM is deprecated... -->
-            <li><?php classref('topo.sheet.cfsom','CFSOM')?>: 
-	      CFSheet with extensions to support the Kohonen SOM algorithm.
             <li><?php classref('topo.sheet.lissom','LISSOM')?>: 
 	      CFSheet with extensions to support the LISSOM algorithm.
+            <li><?php classref('topo.sheet.saccade','SaccadeController')?>: 
+             CFSheet with extensions to support saccades.
             </ul>
         </ul>
     </ul>
