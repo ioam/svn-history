@@ -64,11 +64,12 @@ download <A HREF="http://developer.apple.com/tools/xcode/">Xcode
 GCC C/C++ compiler (among other development utilities). Other versions
 should also work, but have not necessarily been tested.
 
-<P>Now it is necessary to install two third-party support libraries
-(libpng and freetype) if your system does not already have them. These
-can be installed however you wish; you can download binaries, or, if
-you have a package manager such
-as <A HREF="http://www.finkproject.org/">Fink</A>
+<P>Now it is necessary to install two third-party support libraries -
+libpng and freetype - if your system does not already have them. These
+provide the PNG format handling and the font handling for the
+matplotlib library used by Topographica, and can be installed however
+you wish: you can download binaries, or, if you have a package manager
+such as <A HREF="http://www.finkproject.org/">Fink</A>
 or <A HREF="http://www.macports.org/">MacPorts</A>, you can use it to
 obtain and install them. We have used Fink successfully:
 <ul>
@@ -76,12 +77,10 @@ obtain and install them. We have used Fink successfully:
 HREF="http://www.finkproject.org/download/">Fink 0.9.0 Binary
 Installer</A> package. Again, other versions should work, but have not
 necessarily been tested.
-<li> Start the Terminal application (usually found in the Utilities folder
-in the Applications section of Finder) and enter the following command:
-<code>fink install libpng3 freetype219</code>. (These packages
-provide, respectively, the Subversion program required to access the
-Topographica code repository, the PNG format handling, and the font
-handling for the matplotlib library used by Topographica.)
+<li> Start the Terminal application (usually found in the Utilities
+folder in the Applications section of Finder) and enter the following
+command:
+<code>fink install libpng3 freetype219</code>. 
 
 <!--
 CBENHANCEMENT: make doc on mac?
