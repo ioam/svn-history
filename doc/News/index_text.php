@@ -8,45 +8,54 @@
 <font size="-1">  
 <dt>General improvements:</dt>
 <dd>
-  numerous bugfixes and performance improvements<br>
+<!--CB: surely these divs should be some kind of li?-->
+  <div class="i2">- numerous bugfixes and performance improvements</div>
 <!-- fixed a number of pychecker warnings.<BR> -->
 <!-- moved current to-do items to the sf.net trackers<BR> -->
 <!-- EventProcessor.start() run only when Simulation starts, e.g. to allow joint normalization across a Sheet's projections<BR> -->
-  simulation can now be locked to real time<BR>
-  optional XML snapshot
+
+  <div class="i2">- simulation can now be locked to real time</div>
+
+  <div class="i2">- optional XML snapshot
   <A HREF="../Reference_Manual/topo.command.basic-module.html#save_snapshot">saving</A> and
-  <A HREF="../Reference_Manual/topo.command.basic-module.html#load_snapshot">loading</A>
-  simpler and more complete support for dynamic parameters<BR>  
+  <A HREF="../Reference_Manual/topo.command.basic-module.html#load_snapshot">loading</A></div>
+
+  <div class="i2">- simpler and more complete support for dynamic parameters</div>
 <!-- dynamic parameters now update at most once per simulation time<BR> -->
-  updated to Python 2.5 and numpy 1.1.1.<BR>
-  source code moved from CVS to Subversion (<A HREF="../Downloads/cvs.html">SVN</A>)<BR>
+
+  <div class="i2">- updated to Python 2.5 and numpy 1.1.1.</div>
+
+  <div class="i2">- source code moved from CVS to Subversion (<A HREF="../Downloads/cvs.html">SVN</A>)</div>
 <!--  replaced FixedPoint with gmpy for speed and to have rational no. for time<BR> -->
-  automatic Windows and Mac <A target="_top" href="http://buildbot.topographica.org">daily builds</A><br>
-  automatic running and startup <A target="_top" href="http://buildbot.topographica.org">performance measurement</A><br>
-  contrib dir<BR>
-  divisive and multiplicative connections<BR>
-  simulation time is now a rational number for precision<BR>
-  PyTables HDF5 interface<BR>
+  <div class="i2">- automatic Windows and Mac <A target="_top" href="http://buildbot.topographica.org">daily builds</A></div>
+  <div class="i2">- automatic running and startup <A target="_top" href="http://buildbot.topographica.org">performance measurement</A></div>
+<!--CEBALERT: we removing that for the release!-->
+  <div class="i2">- contrib dir</div>
+  <div class="i2">- divisive and multiplicative connections</div>
+  <div class="i2">- simulation time is now a rational number for precision</div>
+  <div class="i2">- PyTables HDF5 interface</div>
 <!-- topo/misc/legacy.py i.e. we can now support old snapshots if necessary<BR> -->
 <!-- incomplete <A HREF="../Downloads/git.html">Instructions</A> for checking out Git version of repository<BR> -->
 </dd>
 <BR>
 <dt>Command-line and batch:</dt>
 <dd>
-  simplified example file syntax (see examples/lissom_oo_or.ty and examples/som_retinotopy.py)<BR>
-  command prompt uses <A HREF="http://ipython.scipy.org/">IPython</A> for better debugging, help<BR> 
-  simulation name set automatically from .ty script name by default<BR>
-  command-line options can be called explicitly<BR>
+  <div class="i2">- simplified example file syntax (see examples/lissom_oo_or.ty and examples/som_retinotopy.py)</div>
+  <div class="i2">- command prompt uses <A HREF="http://ipython.scipy.org/">IPython</A> for better debugging, help</div> 
+  <div class="i2">- simulation name set automatically from .ty script name by default</div>
+  <div class="i2">- command-line options can be called explicitly</div>
   <!-- , e.g.
-  &nbsp;&nbsp;&nbsp;<A HREF="../Reference_Manual/topo.misc.commandline-module.html#gui">topo.misc.commandline.gui()</A> or<BR>
-  &nbsp;&nbsp;&nbsp;<A HREF="../Reference_Manual/topo.misc.commandline-module.html#auto_import_commands">topo.misc.commandline.auto_import_commands()</A><BR>-->
+  <A HREF="../Reference_Manual/topo.misc.commandline-module.html#gui">topo.misc.commandline.gui()</A> or
+  ;<A HREF="../Reference_Manual/topo.misc.commandline-module.html#auto_import_commands">topo.misc.commandline.auto_import_commands()</A><BR>-->
 </dd>
 <BR>
 <dt>GUI:</dt>
 <dd>
-  model editor fully supports dynamic parameters (described in the lissom_oo_or tutorial)<BR>
-  plot windows can be docked into main window<BR>
-  uses tk8.5 for anti-aliased fonts <!--and potential to move to platform-specific themes--><BR>
+  <div class="i2">- model editor fully supports dynamic parameters (described in the lissom_oo_or tutorial)</div>
+  
+  <div class="i2">- plot windows can be docked into main window</div>
+
+  <div class="i2">- uses tk8.5 for anti-aliased fonts <!--and potential to move to platform-specific themes--></div>
 <!--  cleaned up ParametersFrame and TaggedSlider behavior<BR> -->
 </dd>
 </font>
@@ -57,54 +66,53 @@
 <font size="-1">
 <dt>Plotting:</dt>
 <dd>
-  new preference map types (Hue, Direction, Speed)<BR>
-  combined (joint) plots using contour and arrow overlays<BR>
-  example of generating activity movies (examples/lissom_or_movie.ty)<BR>
+  <div class="i2">- new preference map types (Hue, Direction, Speed)</div>
+  <div class="i2">- combined (joint) plots using contour and arrow overlays</div>
+  <div class="i2">- example of generating activity movies (examples/lissom_or_movie.ty)</div>
 </dd>
 <BR>
 <dt>Example scripts:</dt>
 <dd>
-  example files for robotics interfacing<BR>
-  &nbsp;&nbsp;&nbsp;(<A HREF="../Reference_Manual/topo.misc.playerrobot-module.html">misc/playerrobot.py</A>,
-  <A HREF="../Reference_Manual/topo.misc.robotics-module.html">misc/robotics.py</A>)<br>
-  simulation, plots, and analysis for modelling of<br>
-  &nbsp;&nbsp;&nbsp;any combination of position, orientation, ocular dominance,<br>
-  &nbsp;&nbsp;&nbsp;stereoscopic disparity, motion direction, speed, spatial<br>
-  &nbsp;&nbsp;&nbsp;frequency, and color (examples/lissom.ty).<BR>
+  <div class="i2">- example files for robotics interfacing (<A HREF="../Reference_Manual/topo.misc.playerrobot-module.html">misc/playerrobot.py</A>,
+  <A HREF="../Reference_Manual/topo.misc.robotics-module.html">misc/robotics.py</A>)</div>
+  <div class="i2">- simulation, plots, and analysis for modelling of any combination of position, orientation, ocular dominance, stereoscopic disparity, motion direction, speed, spatial frequency, and color (examples/lissom.ty).</div>
 <!--  mouse model (examples/lissom_oo_or_species.ty)<BR> -->
 </dd>
 <BR>
 <dt>Component library:</dt>
 <dd>
-  OutputFns: 
-  <?php classref('topo.outputfn.basic','PoissonSample')?>,<BR>
-  &nbsp;&nbsp;&nbsp;<?php classref('topo.outputfn.homeostatic','ScalingOF')?> (for homeostatic plasticity),<BR>
-  &nbsp;&nbsp;&nbsp;<?php classref('topo.outputfn.basic','NakaRushton')?> (for contrast gain control)<BR>
-  &nbsp;&nbsp;&nbsp;<?php classref('topo.outputfn.basic','AttributeTrackingOF')?> (for analyzing or plotting values over time)<BR>
-  Pipeline OutputFns can now be constructed easily using +<BR>
+  <div class="i2">- OutputFns: 
+  <?php classref('topo.outputfn.basic','PoissonSample')?>,
+  <?php classref('topo.outputfn.homeostatic','ScalingOF')?> (for homeostatic plasticity),
+ <?php classref('topo.outputfn.basic','NakaRushton')?> (for contrast gain control),
+  <?php classref('topo.outputfn.basic','AttributeTrackingOF')?> (for analyzing or plotting values over time)</div>
+  
+<div class="i2">- Pipeline OutputFns can now be constructed easily using +</div>
 <!-- &nbsp;&nbsp;&nbsp;('x=HalfRectify() ; y=Square() ; z=x+y' gives 'z==PipelineOF(output_fns=x,y)')<BR> -->
-  PatternGenerator: <?php classref('topo.misc.robotics','CameraImage')?> (for real-time camera inputs)<BR>
+<div class="i2">- PatternGenerator: <?php classref('topo.misc.robotics','CameraImage')?> (for real-time camera inputs)</div>
 <!--  allowed <?php classref('topo.sheet.lissom','LISSOM')?>  normalization to be 
   <A HREF="../Reference_Manual/topo.sheet.lissom.LISSOM-class.html#post_initialization_weights_output_fn">changed</A>
   after initialization<BR> -->
-  CoordMapper: <?php classref('topo.coordmapper.basic','Jitter')?><BR>
-  SheetMasks: <?php classref('topo.base.projection','AndMask')?>,
+
+  <div class="i2">- CoordMapper: <?php classref('topo.coordmapper.basic','Jitter')?></div>
+  <div class="i2">- SheetMasks: <?php classref('topo.base.projection','AndMask')?>,
   <?php classref('topo.base.projection','OrMask')?>,
-  <?php classref('topo.base.projection','CompositeSheetMask')?><BR>
-  command: <A HREF="../Reference_Manual/topo.command.analysis-module.html#decode_feature">decode_feature</A> (for estimating perceived values)<br>
-  &nbsp;&nbsp;&nbsp;(e.g. for calculating aftereffects)<BR>
-  <?php classref('topo.numbergen','NumberGenerator')?>s
+  <?php classref('topo.base.projection','CompositeSheetMask')?></div>
+
+  <div class="i2">- command: <A HREF="../Reference_Manual/topo.command.analysis-module.html#decode_feature">decode_feature</A> (for estimating perceived values, e.g. for calculating aftereffects)</div>
+
+  <div class="i2">- <?php classref('topo.numbergen','NumberGenerator')?>s
   can now be combined and modified using arithmetic expressions
-<!-- (e.g. abs(2*UniformRandom()-5) is now a NumberGenerator too).--><BR>
-  functions for analyzing V1 complex cells<BR>
+<!-- (e.g. abs(2+UniformRandom()-5) is now a NumberGenerator too).--></div>
+  <div class="i2">- functions for analyzing V1 complex cells</div>
 <!-- provide stop_updating and restore_updating to allow functions with state to freeze their state<BR> -->
 </dd>
 </font>
 </dl>
 </td>
 </tr>
-<tr><td colspan='2'><small>We also provide a <A
-HREF="../Downloads/update_script.html">utility to update scripts</A>
+<tr><td colspan='2'><small>We also provide a utility to <A
+HREF="../Downloads/update_script.html">update scripts</A>
 that were written for version 0.9.4.</small> </td></tr>
 </table>
 </center>

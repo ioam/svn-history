@@ -137,3 +137,11 @@ body {
 
 
 /* */
+
+
+/* indent after line 1 */
+.i2 {
+	padding-left: 1em;
+	text-indent: -1em;
+}
+
