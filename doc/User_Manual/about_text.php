@@ -1,11 +1,10 @@
-<!--CEBALERT: is this an up-to-date list?-->
 <P>
-The Topographica software code and documentation are
-copyright 2005-2007 James A. Bednar, Jan Antolik, Christopher Ball,
-Yoonsuck Choe, Julien Ciroux, Judah B. De Paula, Foivos Demertzis,
-Veldri Kurniawan, Judith Law, Alan Lindsay, Louise Mathews, Lewis Ng,
-Christopher Palmer, Ruaidhri Primrose, Jefferson Provost, Tikesh
-Ramtohul, Yiu Fai Sit, Stuart Wilson, and Roger Zhao.
+The Topographica software code and documentation are copyright
+2005-2008 James A. Bednar, Jan Antolik, Christopher Ball, Yoonsuck
+Choe, Julien Ciroux, Judah B. De Paula, Foivos Demertzis, Kateryna
+Gerasymova, Veldri Kurniawan, Judith Law, Alan Lindsay, Louise
+Mathews, Lewis Ng, Christopher Palmer, Ruaidhri Primrose, Jefferson
+Provost, Tikesh Ramtohul, Yiu Fai Sit, Stuart Wilson, and Roger Zhao.
 
 <P>The development of Topographica was supported in part by the
 U.S. National Institutes of Mental Health under Human Brain Project

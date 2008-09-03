@@ -21,15 +21,9 @@ the United Kingdom and the United States.  The principal developers are:
   <p><dt><a target="_top"
       href="http://homepages.inf.ed.ac.uk/v1cball/">Chris Ball</a>,
       September 2005-</dt>
-  <dd>Chris has worked on nearly every part of Topographica.  From
-      September 2008 he will be a PhD student in Edinburgh, working on
+  <dd>Chris has worked on nearly every part of Topographica.  Since
+      September 2008 he has been a PhD student in Edinburgh, working on
       modeling the development of auditory cortex.
-
-  <p><dt><a target="_top" href="http://faculty.cs.tamu.edu/choe/">Yoonsuck Choe</a>, 2002-</dt>
-  <dd>Yoonsuck is an Assistant Professor at Texas A&amp;M University.
-      He is implementing spiking neuron support,
-      primarily for integrate-and-fire neurons, and contributed
-      significantly to the web site and other graphical design.
 
   <p><dt>Judith Law, September 2005-</dt>
   <dd>Judith is working on her PhD thesis about V1 surround modulation
@@ -40,15 +34,6 @@ the United Kingdom and the United States.  The principal developers are:
   <dd>Chris is working on his PhD thesis about spatial frequency
       representations in V1 at the University of Edinburgh, but also
       maintains receptive field plotting support and other analysis code.
-
-  <p><dt><a target="_top" href="http://www.cs.utexas.edu/~jp/">Jefferson
-      Provost</a>, 2002-</dt> 
-  <dd>Jeff is a postdoctoral researcher in the Neuroscience Department at
-      the University of Pittsburgh.  He wrote the initial GUI
-      implementation (first in Scheme, then in Python), and the first
-      Python version of most of the base classes (Sheet, CFSheet,
-      CFSOM, Parameterized, LISSOM, etc.), but is now primarily
-      a Topographica user rather than a developer.
 
   <p><dt>Roger Zhao, September 2006-</dt>
   <dd>Roger is working on his PhD thesis about face aftereffects at the
@@ -66,6 +51,12 @@ Other significant contributors include:
   <dd>Risto is a Professor of Computer Science at the University of
       Texas at Austin.
 
+  <p><dt><a target="_top" href="http://faculty.cs.tamu.edu/choe/">Yoonsuck Choe</a>, 2002-</dt>
+  <dd>Yoonsuck is an Assistant Professor at Texas A&amp;M University.
+      He implemented preliminary spiking neuron support,
+      primarily for integrate-and-fire neurons, and also contributed
+      significantly to the web site and other graphical design.
+
   <p><dt>Julien Ciroux, October 2005 - April 2006</dt>
   <dd>Julien recently received an MSc from the University of Edinburgh
       (topic: modeling the McCollough effect in LISSOM).  He implemented the
@@ -75,6 +66,12 @@ Other significant contributors include:
   <dd>Foivos is working on his undergraduate degree at the
       University of Edinburgh, with a project of developing
       more sample models for Topographica.
+
+  <p><dt>Kateryna Gerasymova, May 2008 - September 2008</dt>
+  <dd>In a MSc-level project in collaboration with Humboldt University
+      (Berlin), Kateryna implemented numerous separate and joint maps
+      and analysis routines, e.g. for direction, ocular dominance, and
+      color.
 
   <p><dt><a target="_top" href="http://porter.csres.utexas.edu/judah/">Judah De Paula</a>, 2004-2006</dt>
   <dd>Judah has now completed his PhD at the University of Texas (topic:
@@ -100,6 +97,16 @@ Other significant contributors include:
   <dd>Ruaidrhi is working on his undergraduate degree at the
       University of Edinburgh, with a project of developing
       more sample models for Topographica.
+
+  <p><dt><a target="_top" href="http://www.cs.utexas.edu/~jp/">Jefferson
+      Provost</a>, 2002-2008</dt> 
+  <dd>Jeff worked on Topographica as a postdoctoral researcher in the
+      Neuroscience Department at the University of Pittsburgh, and
+      earlier at the University of Texas at Austin.  He wrote the
+      initial GUI implementation (first in Scheme, then in Python),
+      and the first Python version of most of the base classes (Sheet,
+      CFSheet, CFSOM, Parameterized, LISSOM, etc.), plus support
+      for robotics interfacing and for non-uniform projection mappings.
 
   <p><dt><a target="_top"
       href="http://www.cs.utexas.edu/users/yfsit/">Yiu Fai Sit</a>,

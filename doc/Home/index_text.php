@@ -56,8 +56,7 @@ people to join our globally distributed development team.  Although
 the code is still under very active development, it is in daily use in
 numerous research projects and academic classes.  Given the fast pace
 of current development, being a developer is probably the best way to
-keep up with all of the changes.  We anticipate making a solid 1.0
-release by Spring 2008 that will be ready for widespread deployment.
+keep up with all of the changes.  
 
 <P>Also see our <A target="_top"
 HREF="http://nn.cs.utexas.edu/area-view.php?RECORD_KEY%28Areas%29=AreaID&AreaID(Areas)=11">
