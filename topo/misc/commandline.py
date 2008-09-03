@@ -173,6 +173,16 @@ def gui(start=True):
 
 
 
+def l_action(option,opt_str,value,parser):
+    """Callback function for the -l option."""
+    boolean_option_action(option,opt_str,value,parser)
+    from topo.misc.legacy import install_legacy_support
+    print "Enabling legacy support."
+    install_legacy_support()
+    
+topo_parser.add_option("-l","--legacy",action="callback",callback=l_action,dest="legacy",default=False,help="""\
+launch Topographica with legacy support enabled.""")
+
 ###### CB: TESTING (Jun 2008)
 def start_gui_from_ide_newthread():
     # e.g. from IDLE
@@ -203,6 +213,7 @@ topo_parser.add_option("-g","--gui",action="callback",callback=g_action,dest="gu
 launch an interactive graphical user interface; \
 equivalent to -c 'from topo.misc.commandline import gui ; gui()'. \
 Implies -a.""")
+
 
 
 def G_action(option,opt_str,value,parser):
