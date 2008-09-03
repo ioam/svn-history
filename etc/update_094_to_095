@@ -35,6 +35,7 @@ Topographica 0.9.5, you have two options:
     (e.g. ./topographica -l -g your_script.ty
 
 
+$Id$
 """
 
 print info
