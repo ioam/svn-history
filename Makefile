@@ -336,48 +336,10 @@ sf-web-site: reference-manual doc
 # This is ordinarily commented out in the SVN version for safety, 
 # but it is enabled when the distribution directory is created.
 #
-# CEBALERT: should change so that we have a list of examples to KEEP instead
-#
 #@@distclean: FORCE clean
 #@@	   ${RM} .#* */.#* */*/.#* */*~ ChangeLog.txt 
 #@@	   ${RM} etc/topographica.elc ImageSaver*.ppm countalerts* annotate.out emacslog
 #@@	   ${RM} current_profile ./topo/tests/testsnapshot.typ script ./topo/tests/*.ty_*DATA timing* ./topo/tests/testplotfilesaver*.png
-#@@	   ${RM} examples/cc_lissom_oo_or*.ty
-#@@	   ${RM} examples/disparity_energy.ty
-#@@	   ${RM} examples/goodhill_network90.ty
-#@@	   ${RM} examples/homeostatic.ty
-#@@	   ${RM} examples/joublin_bc96.ty
-#@@	   ${RM} examples/laminar.ty
-#@@	   ${RM} examples/laminar_or.ty
-#@@	   ${RM} examples/laminar_lissom.ty
-#@@	   ${RM} examples/laminar_nolearning.ty
-#@@	   ${RM} examples/laminar_oo_or.ty*
-#@@	   ${RM} examples/leaky_lissom_or.ty
-#@@	   ${RM} examples/lesi.ty
-#@@	   ${RM} examples/lgn_lateral.ty*
-#@@	   ${RM} examples/lissom_fsa.ty
-#@@	   ${RM} examples/lissom_oo_dr.ty
-#@@	   ${RM} examples/lissom_oo_od.ty
-#@@	   ${RM} examples/lissom_oo_or_od_dr_dy_sf_rg_cr.ty
-#@@	   ${RM} examples/lissom_oo_or_od_dr_dy.ty
-#@@	   ${RM} examples/lissom_oo_or_cr.ty
-#@@	   ${RM} examples/lissom_oo_or_dy_photo.ty
-#@@	   ${RM} examples/lissom_oo_or_homeostatic*.ty
-#@@	   ${RM} examples/lissom_oo_or_noshrinking.ty
-#@@	   ${RM} examples/lissom_oo_or_noshrinking_adapthomeo.ty
-#@@	   ${RM} examples/lissom_oo_or_noshrinking_latswitch.ty
-#@@	   ${RM} examples/lissom_oo_or_rg.ty
-#@@	   ${RM} examples/lissom_oo_or_species_tracked.ty
-#@@	   ${RM} examples/lissom_oo_or_species.ty
-#@@	   ${RM} examples/lissom_or_homeomaxent.ty
-#@@	   ${RM} examples/lissom_or_homeoscale.ty
-#@@	   ${RM} examples/lissom_or_noshrinking.ty
-#@@	   ${RM} examples/lissom_or_noshrinking_latswitch.ty
-#@@	   ${RM} examples/lissom_or_sf.ty
-#@@	   ${RM} examples/ohzawa_science90.ty
-#@@	   ${RM} examples/saccade_demo.ty
-#@@	   ${RM} examples/sullivan_neurocomputing04.ty
-#@@	   ${RM} examples/sullivan_nn06.ty
 #@@	   ${RM} examples/*.typ
 #@@	   ${RM} -r Output
 #@@	   ${RM} -r images
@@ -386,6 +348,9 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} -r .svn */.svn */*/.svn */*/*/.svn */*/*/*/.svn
 #@@	   ${CD} topo/tests/reference ; make clean
 #@@	   ${RM} -r doc/buildbot/
+## delete all examples except those listed below
+## CB: how to read in a whole list?
+#@@	   find examples/*.ty -maxdepth 1 ! -name cfsom_or.ty ! -name goodhill_network90.ty ! -name hierarchical.ty ! -name leaky_lissom_or.ty ! -name lissom_fsa.ty ! -name lissom_oo_or.ty ! -name lissom_or_movie.ty ! -name lissom_or.ty ! -name lissom.ty ! -name lissom_whisker_barrels.ty ! -name obermayer_pnas90.ty ! -name som_retinotopy.ty ! -name sullivan_neurocomputing04.ty ! -name sullivan_nn06.ty ! -name tiny.ty -exec rm {} \;
 
 
 # Make public distribution archive
