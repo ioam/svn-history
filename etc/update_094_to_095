@@ -7,8 +7,9 @@ import sys
 
 def usage():
     print """
-Usage: update_094_to_095 [file] 
-E.g.:   update_094_to_095 my_script.ty
+Usage: etc/update_094_to_095 [file] 
+
+Example: etc/update_094_to_095 my_script.ty
 """
 
 # Parse arguments
@@ -18,6 +19,9 @@ if len(sys.argv)!=2:
 
 
 info = """
+$Id$
+
+
 This utility converts a script written for Topographica 0.9.4 into one
 that will work with Topographica 0.9.5.
 
@@ -35,7 +39,6 @@ Topographica 0.9.5, you have two options:
     (e.g. ./topographica -l -g your_script.ty
 
 
-$Id$
 """
 
 print info
