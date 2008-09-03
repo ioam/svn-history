@@ -25,7 +25,8 @@ svn co $TOPOROOT/trunk/topographica-win topographica-win
   making sure that the auto-generated pages are working properly,
   and that those written by hand match the current version of the
   code.  In particular, doc/Reference_Manual/index_text.php needs
-  to match the current version of the reference manual.
+  to match the current version of the reference manual (don't forget
+  to <code>make reference-manual</code>).
 
 <li><P>Update the tutorials to match changes to the GUI, if necessary.
   A simple way to get updated versions of each image is to:
