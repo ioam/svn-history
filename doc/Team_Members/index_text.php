@@ -110,7 +110,7 @@ Other significant contributors include:
 
   <p><dt><a target="_top"
       href="http://www.cs.utexas.edu/users/yfsit/">Yiu Fai Sit</a>,
-      May 2005 - </dt>
+      May 2005 - 2006</dt>
   <dd>Sit is a PhD student at the University of Texas (topic:
       the role of feedback in a hierarchical LISSOM model of V1 and
       V2).  He was responsible for making the first Topographica
