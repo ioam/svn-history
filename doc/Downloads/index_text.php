@@ -143,7 +143,7 @@ before <code>make</code> will succeed.  On some systems the
 <code>-dev</code> packages are called <code>-devel</code>, and
 sometimes specific versions must be specified (e.g.
 <code>libpng12-dev</code>,
-<code>libfreetype6-dev</code>).  Example for Ubuntu 7.10:
+<code>libfreetype6-dev</code>).  Example for Ubuntu 7.0 or 8.04.1:
 <blockquote><code>sudo apt-get install  libfreetype6 libfreetype6-dev libpng12-0 libpng12-dev libx11-dev zlib1g</code></blockquote>
 
 <P>Once these libraries are installed, you can proceed to
