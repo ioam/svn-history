@@ -1,12 +1,6 @@
-"""
-
-If your script still doesn't work, try enabling legacy support
-(XXX cmd) or submitting it to the Topographica developers.
-
-./topographica -c "from topo.misc.legacy import install_legacy_support; install_legacy_support()" <SCRIPT> -g etc
+#!bin/python
 
 
-"""
 
 ## >  |  > 6. (optional) Write a python function to update a .ty script using the
 ## >  |  >    old names to use the new ones; this would go into
@@ -41,6 +35,43 @@ If your script still doesn't work, try enabling legacy support
 
 import os
 import sys
+
+def usage():
+    print """
+Usage: update_094_to_095 [file] 
+E.g.:   update_094_to_095 my_script.ty
+"""
+
+# Parse arguments
+if len(sys.argv)!=2:
+    usage()
+    sys.exit(-1)
+
+
+
+info = """
+This utility converts a script written for Topographica 0.9.4 into one
+that will work with Topographica 0.9.5.
+
+Your original script will not be altered; a new version will be saved
+with the filename suffix '_0.9.5'.
+
+If you find that the new version of your script will not run in
+Topographica 0.9.5, you have two options:
+
+(1) Submit your script to the Topographica developers, and we will
+    improve this updating script to handle the problem
+
+(2) Try to run the new script in Topographica with legacy support
+    enabled by passing '-l' at startup
+    (e.g. ./topographica -l -g your_script.ty
+
+
+"""
+
+print info
+
+
 
 # should be ordered most to least specific, but it isn't yet
 replacements = [
@@ -98,19 +129,19 @@ removals = [
  
 
 filename = sys.argv[1] 
-#os.rename(filename,filename+'.bak')
 
 str = open(filename,'r').read()
 
-
-### REPLACEMENTS
+print "* Replacing names."
 for old,new in replacements:
     str = new.join(str.split(old))
 
 
-### REMOVALS
-# not yet implemented 
+### REMOVALS not yet implemented 
 
 
-#print str
-open(filename+'_0.9.5','w').write(str)
+
+new_filename = filename+'_0.9.5'
+open(new_filename,'w').write(str)
+
+print "\n\nUpdating finished; output written to %s"%new_filename
