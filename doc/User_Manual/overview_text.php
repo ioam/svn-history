@@ -427,13 +427,13 @@ probably no reason to use Topographica at all, except perhaps as an
 example of how to use Python and C together with various external
 libraries.
 
-<P>Note that different parts of any particular model may be implemented
-at different levels from this list.  For instance, even for a model that
-is fully supported by the Topographica primitives in level 5, you may
-want to add an interface to an external sensor such as a camera, which
-<!--CEBALERT: still true about camera?-->
-would have to be implemented at level 1 because no such interface
-currently exists.  Data from the camera would then presumably appear
-in a form compatible with one of the lower layers 3-5, and could then
-be used	with the other Topographica primitives.
+<P>Note that different parts of any particular model may be
+implemented at different levels from this list.  For instance, even
+for a model that is fully supported by the Topographica primitives in
+level 5, you may want to add an interface to an external sensor such
+as a microphone, which would have to be implemented at level 1 because
+no such interface currently exists.  Data from the microphone would
+then presumably appear in a form compatible with one of the lower
+layers 3-5, and could then be used with the other Topographica
+primitives (as has already been done for a camera).
 
