@@ -337,7 +337,7 @@ sf-web-site: reference-manual doc
 # but it is enabled when the distribution directory is created.
 #
 #@@distclean: FORCE clean
-#@@	   ${RM} .#* */.#* */*/.#* */*~ ChangeLog.txt 
+#@@	   ${RM} .#* */.#* */*/.#* */*~ 
 #@@	   ${RM} etc/topographica.elc ImageSaver*.ppm countalerts* annotate.out emacslog
 #@@	   ${RM} current_profile ./topo/tests/testsnapshot.typ script ./topo/tests/*.ty_*DATA timing* ./topo/tests/testplotfilesaver*.png
 #@@	   ${RM} examples/*.typ
