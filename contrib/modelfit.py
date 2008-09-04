@@ -8,7 +8,7 @@ from topo.base.functionfamily import IdentityOF
 import topo
 from topo.base.boundingregion import BoundingBox
 from topo.pattern.image import Image
-
+import contrib.jacommands
 
 class ModelFit():
     
@@ -16,14 +16,14 @@ class ModelFit():
     weigths = []
     retina_diameter=1.0
     density=48
-    epochs = 1000
+    epochs = 200
     learning_rate = 0.1
     inputDC = 0
     modelDC = 0
     meanModelResponses=[]
     
     def init(self):
-        for freq in [8.0]:
+        for freq in [1.0,2.0,4.0,8.0]:
             for xpos in xrange(0,int(freq)):
                 for ypos in xrange(0,int(freq)):
                     x=xpos*(self.retina_diameter/freq)-self.retina_diameter/2 + self.retina_diameter/freq/2 
@@ -139,17 +139,17 @@ class ModelFit():
             
             if x == i:
                  correct+=1.0
-            if i%200 == 0:
+            if i%50 == 0:
                 print "figure"                
-                pylab.subplot(5,5,i/200+1)
+                pylab.subplot(5,5,i/50+1)
                 pylab.imshow(toMatrix(activities[i].T.A,48,48),vmin=0,vmax=0.15)
-                pylab.subplot(5,5,5+i/200+1)
+                pylab.subplot(5,5,5+i/50+1)
                 pylab.imshow(toMatrix(modelActivities[i].A,48,48),vmin=0,vmax=0.15)
-                pylab.subplot(5,5,10+i/200+1)
+                pylab.subplot(5,5,10+i/50+1)
                 pylab.imshow(toMatrix(modelActivities[x].A,48,48),vmin=0,vmax=0.15)
-                pylab.subplot(5,5,15+i/200+1)
+                pylab.subplot(5,5,15+i/50+1)
                 pylab.imshow(inputs[i],vmin=0,vmax=0.6)
-                pylab.subplot(5,5,20+i/200+1)
+                pylab.subplot(5,5,20+i/50+1)
                 pylab.imshow(inputs[x],vmin=0,vmax=0.6)
                 
                  
@@ -171,15 +171,31 @@ def toMatrix(array,x,y):
 def runModelFit():
     
     
-    image_filenames=["images/mymix/%03d.pgm" %(i+1) for i in xrange(128)]
-    print image_filenames
-    Image 
-    inputs=[Image(filename=f,
-                       size=10.0,  #size_normalization='original',(size=10.0)
-                       x=UniformRandom(lbound=-0.75,ubound=0.75,seed=511),
-                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=1023),
-                       orientation=UniformRandom(lbound=-3.14,ubound=3.14,seed=511))
-    for f in image_filenames]
+    train_image_filenames=["images/mymix/%d.pgm" %(i) for i in xrange(99)]
+    train_inputs=[Image(filename=f,
+                       size=2.0,  size_normalization='stretch_to_fit',
+                       #x=UniformRandom(lbound=-0.75,ubound=0.75,seed=511),
+                       #y=UniformRandom(lbound=-0.75,ubound=0.75,seed=1023),
+                       x=0,
+                       y=0)
+                       #orientation=UniformRandom(lbound=-3.14,ubound=3.14,seed=511))
+    for f in train_image_filenames]
+    
+    train_combined_inputs =contrib.jacommands.SequenceSelector(generators=train_inputs)
+
+    test_image_filenames=["images/mymix/%d.pgm" %(i+100) for i in xrange(90)]
+    test_inputs=[Image(filename=f,
+                       size=2.0,  size_normalization='stretch_to_fit',
+                       #x=UniformRandom(lbound=-0.75,ubound=0.75,seed=511),
+                       #y=UniformRandom(lbound=-0.75,ubound=0.75,seed=1023),
+                       x=0,
+                       y=0)
+                       #orientation=UniformRandom(lbound=-3.14,ubound=3.14,seed=511))
+    for f in test_image_filenames]
+    test_combined_inputs =topo.patterns.basic.SequenceSelector(generators=test_inputs)
+    
+    
+    
 
     combined_inputs =topo.pattern.basic.Selector(generators=inputs)
     topo.sim['Retina'].set_input_generator(combined_corners)
@@ -191,11 +207,13 @@ def runModelFit():
     mf.density = topo.sim["Retina"].nominal_density
     mf.init()
     topo.sim["V1"].plastic = False
+
+    topo.sim['Retina'].set_input_generator(train_combined_inputs)
     
     inputs = []
     activities = []
     topo.sim["V1"].output_fn=IdentityOF()    
-    for i in xrange(0,1000):
+    for i in xrange(0,99):
         topo.sim.run(0.15)
         inputs.append(topo.sim["Retina"].activity.copy())
         activities.append(topo.sim["V1"].activity.copy().flatten())
@@ -205,10 +223,12 @@ def runModelFit():
     
     mf.testModel(inputs,numpy.mat(activities))
 
+    topo.sim['Retina'].set_input_generator(test_combined_inputs)
+
     inputs = []
     activities = []
         
-    for i in xrange(0,100):
+    for i in xrange(0,90):
         topo.sim.run(0.15)
         inputs.append(topo.sim["Retina"].activity.copy())
         activities.append(topo.sim["V1"].activity.copy().flatten())
