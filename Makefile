@@ -322,7 +322,7 @@ new-version: FORCE
 # Make a new LATEST_STABLE on the web, using the currently checked-out version
 TOPOROOT=https://topographica.svn.sourceforge.net/svnroot/topographica
 LATEST_STABLE:
-	svn delete ${TOPOROOT}/tags/LATEST_STABLE
+	svn delete ${TOPOROOT}/tags/LATEST_STABLE -m "Updating LATEST_STABLE."
 	svn copy ${TOPOROOT}/trunk ${TOPOROOT}/tags/LATEST_STABLE -m "Updating LATEST_STABLE."
 
 
