@@ -6,7 +6,15 @@ CC = gcc
 # own Python, e.g. on Windows.)
 PYSETUP_OPT = --prefix=${PREFIX}
 
-default: python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
+default: osx_skip_tk python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
+
+# avoid building blt, tcl, and tk on OS X
+osx_skip_tk:
+ifeq ("$(shell uname -s)","Darwin")
+	touch blt
+	touch tcl
+	touch tk
+endif
 
 
 all: default pyaudiolab mlabwrap scipy ipython pyrex pytables psyco gnuplotpy
@@ -61,7 +69,6 @@ python: ${PYTHON}.tgz tk blt
 	echo ${PREFIX}
 	tar -xzf ${PYTHON}.tgz
 # Configure for specific operating system versions
-# (note that tcl+tk+blt are currently built unnecessarily on mac)
 ifeq ("$(shell uname -s)","Darwin")
 	patch -p0 < Python_OSX_tk.diff # build python with tcl/tk from /Library/Frameworks
 ifeq ("$(shell uname -r | cut -d . -f 1)","9") # Darwin 9.x == Mac OS X 10.5 (Leopard)
