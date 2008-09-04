@@ -3,13 +3,20 @@ with earlier ones being higher priority than later ones.  Tasks
 within each section are also ordered approximately by priority.
 
 <DL COMPACT>
-<P><DT>Tasks to be addressed for the upcoming n release</DT><DD>
+<P>We are slowly changing over to use
+sourceforge's <a href="http://sourceforge.net/tracker/?group_id=53602">trackers</a>;
+those are becoming our primary record of outstanding tasks, so please
+check there first. In particular, <em>new tasks should be submitted to
+a tracker rather than added to this list</em>.
+
+<P><DT>Tasks to be addressed for the upcoming 1.0 release</DT><DD>
 What the developers are working on most actively right now.
 
+<!--
 <P><DT>Tasks to be addressed after the upcoming n+1 release</DT><DD>
 Tasks that the developers hope to be able to start on after finishing
 their work for the current release.
-  
+-->  
 <P><DT>Things we hope to take care of eventually</DT><DD>
 Tasks of lower priority; if you would like to see one of these tasks
 completed any time soon, please volunteer (even if a developer is
@@ -26,10 +33,6 @@ with no initials are not (yet) assigned to a specific developer (so
 please feel free to volunteer!!!!). Dates indicate when the item was
 first added to the list, or a change was made.
 
-<P>We are slowly changing over to use sourceforge's <a
-href="http://sourceforge.net/tracker/?group_id=53602">trackers</a>, so
-please also check there. Ideally, <B>new tasks should be submitted to a
-tracker rather than added to this list</B>.
 
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
@@ -40,48 +43,45 @@ tracker rather than added to this list</B>.
 <H2>ALERTs in topo.base</H2>
 
 <pre>
-
 Priorities:
-9: release 0.9.5
 8: release 1.0
 3: release someday
 0: remove alert
 
-* boundingregion.py cleanup: release 1.0 
+* (8) boundingregion.py cleanup
 
-
-* sheetviews: release 1.0 (JAB)
-
+* (8) sheetviews: release 1.0 (JAB)
 
 * cf.py
-(8) learning rate moves to learning function (rather than cfprojection)
+(8) learning rate moves to learning function rather than cfprojection (CEB)
 (8) where mask created (by cfprojection/cf)  (CEB)
-(8) learning rate a parameter of CFPLearningFn
-(8) CFPOutputFn mask parameter could be dropped now a masked iterator can be passed in
-(3) calculation of no. of units (internal)
-
+(8) learning rate a parameter of CFPLearningFn (CEB)
+(8) CFPOutputFn mask parameter could be dropped now a masked iterator 
+    can be passed in (CEB)
 (8) JCALERT! We might want to change the default value of the
 ### input value to self.src.activity; but it fails, raising a
 ### type error. It probably has to be clarified why this is
-### happening
+### happening (CEB)
+(3) calculation of no. of units (internal)
 
 
 * functionfamily.py
-(8) OutputFn: norm_value
-(8) LearningFn should have learning_rate param (see same alert in cf.py)
+(8) OutputFn: rename norm_value (CEB)
+(8) LearningFn should have learning_rate param 
+    (see same alert in cf.py) (CEB)
 
-
-* Projection
-(8) other SheetMask + subclasses cleanup (I'm not yet familiar with problems)
-
+* projection.py
+(8) other SheetMask + subclasses cleanup 
 
 * Slice
-(8) M[slice]-style syntax (first figuring out performance implications of attribute access) (CEB)
-(8) cleanup (CEB)
+(8) M[slice]-style syntax (first figuring out performance implications
+of attribute access) (CEB)
+(8) general cleanup (CEB)
 
 
 * PatternGenerator
-(8) needs to support plasticity of output functions (after fixing Pipeline's plasticity support)
+(8) needs to support plasticity of output functions (after fixing
+Pipeline's plasticity support)
 
 
 * Simulation
@@ -96,16 +96,17 @@ Priorities:
     ## change the behavior if the sequence length is longer than the
     ## period, but I'm not sure how important that is, and it might
     ## actually be useful the other way.
-(8) gc alert in simulation.__new__
+(8) gc alert in simulation.__new__ (CEB)
 
 * Parameters
-(8) FixedPoint doesn't work properly with Number (removing fixedpoint anyway?)
+(8) FixedPoint doesn't work properly with Number (removing fixedpoint
+anyway?) (CEB)
 (3) logging: use python's instead of our own?
 (3) script_repr: 
 # JABALERT: Only partially achieved so far -- objects of the same
 # type and parameter values are treated as different, so anything
 # for which instantiate == True is reported as being non-default.
-(8) ParamOverrides should check_params()
+(8) ParamOverrides should check_params() (CEB)
 
 </pre>
 
@@ -116,7 +117,7 @@ Priorities:
 <!-- ------------------------------------------------------------------------ -->
 
 
-<H2>Tasks to be addressed in upcoming release:</H2>
+<!--<H2>Tasks to be addressed in upcoming release:</H2>-->
 
 
 <!-- ------------------------------------------------------------------------ -->
@@ -131,11 +132,11 @@ Priorities:
 <H2>Tasks to be addressed by release 1.0</H2>
 
 
-<H4>2007/10/03 (CB): Urgent tkgui + plotgroup cleanup</H4>
-<ul>
-<li>Cleanup + doc of tkparameterizedobject.py and parametersframe.py</li>
-<li>Cleanup + doc of plotgroup.py</li>
-</ul>
+<H4>2007/10/03 (CB): Urgent param/tk cleanup</H4>
+Cleanup + doc of param/tk.py. Includes fixing 'from param import tk'.
+
+<H4>2007/10/03 (CB): Urgent plotgroup cleanup</H4>
+Cleanup + doc of plotgroup.py
 
 <H4>CB: Idle branch</H4>
 Merge or abandon idle branch. 
@@ -171,19 +172,13 @@ are a bit out of date.  Add a section about plotting 'Orientation
 tuning fullfield' tuning curves.  CB: would the tutorial benefit from
 being split up a little more?  Maybe it's getting daunting?
 
-
-<H4>data archive format</H4>
-
-
 <H4>CB: c++ comparisons</H4>
 or/oo_or: Some BaseRN/BaseN combinations don't match. oo_dr: input
 parameters don't match - need to adjust c++ lissom.
 
 <H4>ConnectionField tests</H4>
-no guarantee that code in/related to connectionfield is valid at all densities
-
-<H4>speed-tests should check results</H4>
-
+no guarantee that code in/related to connectionfield is valid at all
+densities (tied to c++ comparisons task).
 
 <H4>2008/01/25 (JB): Organization of examples/</H4>
 The examples directory is getting quite big and confusing, at least in
@@ -212,8 +207,6 @@ difference in the resulting matrix sizes at the default densities, but
 for high enough LGN densities we would expect that a few CFs around
 the edge would be cut off slightly using the current values.
 
-
-
 <H4>option to clean up external/</H4>
 add an option to clean up external/ once topographica has been
 built, to free up some space for users while still leaving it
@@ -240,13 +233,13 @@ updatable
 
 <H4>2007/10/03 (CB): Less-urgent tkgui cleanup</H4>
 <ul>
-<li>Use parametersframe/tkparameterizedobject in more places (topoconsole, 
-right click menus...) </li>
-<li>Restriction on operations in parallel? (E.g. run and map measurement.)</li>
+<li>Use parametersframe/tkparameterizedobject in more places
+(topoconsole, right click menus...) </li>
+<li>Restriction on operations in parallel? (E.g. run and map
+measurement.)</li>
 </ul>
 
-
-<H4>cleanup test_pattern_present</H4> 
+<H4>(CB) cleanup test_pattern_present</H4> 
 (or wherever I tried to add test for not-run simulation before
 presenting patterns/saving generators)
 
@@ -256,9 +249,8 @@ presenting patterns/saving generators)
 test for recent run() problems - to catch problems with other future
 number types
 
-
 <H4>Mac</H4>
-Have someone else get OS X 10.5 X11 working
+Have someone else get OS X 10.5 X11 (rather than aqua) working
 
 <H4>parameters out</H4>
 to different package
@@ -272,9 +264,9 @@ dynamic generators.)
 Need to implement more of the optimizations from the C++ LISSOM code.
 
 <H4>2007/03/29: Makefiles to python scripts</H4>
-Control tests from a python file rather than the Makefile.  Can then include
-more tests of examples, by specifying sheet to look at etc.  And importantly,
-can easily run tests on Windows version.
+Control tests from a python file rather than the Makefile.  Can then
+include more tests of examples, by specifying sheet to look at etc.
+And importantly, can easily run tests on Windows version.
 
 
 <H4>2007/03/26: Support for optimization</H4>
@@ -292,7 +284,6 @@ Measurement of numpy.sum(X)/X.sum()/sum(X) performance. Difference
 between simulation results on different platforms (for slow-tests in
 Makefile).
 
-
 <H4>alternatives to allow users to include optimized code</H4>
 pyrex/cython, ...
 
@@ -300,7 +291,6 @@ pyrex/cython, ...
 defaults to something like lambda:0; the gui could set
 to topo.sim.time. Rather than having a default of topo.sim.time
 in places that don't know about simulations. In parameterclasses?
-
 
 <H4>2007/12/23: who's tracking the results of...</H4>
 <ul>
@@ -312,37 +302,24 @@ And others...
 
 
 <H4>2007/07/07: more tests </H4>
-We need a test with non-square input sheets, non-square LISSOM sheets, etc., 
-with both types of non-squareness...and we also need to test whatever
-map measurement that we can (e.g. or maps).  Could also add coverage
-testing, e.g. using 
+We need a test with non-square input sheets, non-square LISSOM sheets,
+etc., with both types of non-squareness...and we also need to test
+whatever map measurement that we can (e.g. or maps).  Could also add
+coverage testing, e.g. using
 <a href="http://darcs.idyll.org/~t/projects/figleaf/doc/">figleaf</a>
 or <a href="http://nedbatchelder.com/code/modules/rees-coverage.html">coverage.py</a>.
 
-
-
 <H4>2007/02/26: consider an alternative debugger</H4>
 http://www.digitalpeers.com/pythondebugger/.
-
-
-
-
-<H4>2007/03/29: tidy up c++ lissom matching</H4>
-Set c++ lissom params so that topographica doesn't have to set ganglia
-weight mask specially. Generalize oo_or_map_topo.params.
-
-
 
 <H4>2007/02/28 (CB): OneDPowerSpectrum & Audio PatternGenerators</H4>
 Finish the two classes. Make a demo with Audio. Both currently don't work
 with test pattern window because plotting expects 2d arrays.
 
-
 <H4>2005/01/01: components from external packages </H4>
 Could consider using or taking components from: SciPy,
 ScientificPython, Chaco, Pyro (the robotics package), g, logger
 (instead of our custom messaging functions).
-
 
 <H4>2007/02/23: which version of libraries is numpy using?</H4>
 <pre>
@@ -373,11 +350,15 @@ Topographica.
 <H4>2007/05/29 (JP) Mac (aqua) GUI cleanup</H4>
 The Mac GUI needs a variety of things to make it more Mac-like.
 <ul>
-<li> Pmw radio buttons are broken on mac.  Their selected state is invisible. E.g. in Test pattern window.
-<li> Various window styles need to be tweaked: e.g.  EntryFields should be sunken, backgrounds, light grey (not white), etc.
+<li>Various window styles need to be tweaked: e.g.  EntryFields
+should be sunken, backgrounds, light grey (not white), etc.
 <li> Tooltip timing is screwed up.
 </ul>
-(Note that some of these would be fixed by switching to Tile (see 'investigate using Tile' task). Do any Mac apps use a series of separate windows as topographica does? Anyway, we are already considering (or will consider sometime!) if it's possible to have a workspace for topographica (like matlab has) with tkinter.)
+(Note that some of these might be fixed automatically when we take
+advantage of tk 8.5's themes. We have the bigger problem anyway of the
+fact that no other Mac apps use a series of separate windows (as
+topographica does).
+
 
 <H4>2007/06/07: plotgrouppanel's plots </H4>
 Maybe should be one canvas with bitmaps drawn on. Then we'd get
@@ -385,63 +366,15 @@ canvas methods (eg postscript()). But right-click code will need
 updating. Should be easy to lay out plots on a canvas, just like
 the grid() code that we have at the moment.
 
-
 <H4>Run tkgui in its own thread?</H4>
 
+<H4>2007/05/09: topoconsole workspace</H4>
+Can we have a matlab-like workspace?
 
-
-
-
-<!-- 2007/04/18
-Information about OS X & icons, from Kevin Walzer (www.codebykevin.com)
-
-The application icon is part of the application bundle structure. See
-the link below for some basic tips on how to create an icon and specify
-it in your application. (Note this article does not deal specifically
-with deploying Python applications, but the parts about the icon are
-applicable.)
-
-http://tk-components.sourceforge.net/tk-bundle-tutorial/index.html
-
-The easiest way to specify the icon with a Python application is part of
-the setup file you use with py2app (which wraps all Python packages into
-an application package on the Mac).  Here's a basic example:
-
-"""
-Script for building the example.
-
-Usage:
-    python setup.py py2app
-"""
-from distutils.core import setup
-import py2app
-import os
-
-imagedir = (os.getcwd() + "/images")
-helpdir = (os.getcwd() + "/html")
-
-setup(
-    app = ['Phynchronicity.py'],
-    data_files = [imagedir, helpdir],
-    options=dict(py2app=
-                    dict(iconfile='Phynchronicity.icns',
-                    plist = 'Info.plist'),
-             ),
-    )
-
-You can get more information about using py2app, and help with
-questions, on the MacPython mailing list.
-
--->
-
-
-<!-- Also suggested by Geisler, 7/1/2005:
-  Package as a Matlab toolbox to get the right people to use it?
-  Package it as an easy-to-use out-of-the-box optical imaging simulator
-    -- need to tell it what stimulus, what eccentricity, what cortical patch
-  Be able to look at the effects of attention
-  Add specific models for intrinsic or voltage-sensitive-dye imaging 
--->
+<H4>2006/02/21: read-only objects</H4>
+Might someday be interesting to have read-only objects, aiming at
+copy-on-write semantics, but this seems quite difficult to achieve in
+Python.
 
 
 <!-- From Tue Sep  6 15:32:25 BST 2005 meeting with Eyal
@@ -595,11 +528,6 @@ To figure out:
    Normalize toggle again it does not revert to the old response.
 -->
 
-<H4>2006/02/21: read-only objects</H4>
-Might someday be interesting to have read-only objects, aiming at
-copy-on-write semantics, but this seems quite difficult to achieve in
-Python.
-
 
 <!-- ------------------------------------------------------------------------ -->
 <!-- ------------------------------------------------------------------------ -->
@@ -608,7 +536,8 @@ Python.
 
 <H2>Ongoing work</H2>
 
-<H4>2006/04/10: optional external packages on platforms other than linux</H4>
+<H4>2006/04/10: optional external packages on platforms other than
+linux</H4>
 Optional packages (e.g. mlabwrap, pyaudio) on Windows and OS X.
 
 
@@ -617,21 +546,19 @@ And writing doc strings at the same time. E.g. the x and y widgets in
 the Unit Weights window can be Numbers with bounds, etc.
 
 
-<H4>2006/02/23 (all): ensuring classes are declared abstract if they are abstract</H4>
+<H4>2006/02/23 (all): ensuring classes are declared abstract if they
+are abstract</H4>
 Plus making sure base and simple classes are imported into packages
 (i.e. Sheet into topo/sheets/, Projection into topo/projections/,
 Constant into topo/patterns/, and so on).
 
-
 <H4>2006/02/21 (all): documentation, unit tests</H4>
-Improving both, plus eliminating ALERTs.
-Could use Sphinx instead of epydoc for Reference Manual; apparently searchable.
+Improving both, plus eliminating ALERTs.  Could use Sphinx instead of
+epydoc for Reference Manual; apparently searchable.
 
-			     
 <H4>2007/03/14 (CB): gnosis.xml.pickle </H4>
 Needs to be updated for numpy. I'm working with module's author at the
 moment.
-
 
 <H4>2007/03/14: building scipy</H4>
 how to build scipy without requiring any of the external linear
@@ -640,22 +567,17 @@ users could install the optimized versions if they wished.
 Investigate garnumpy.
 
 
-<H4>2007/05/09: topoconsole workspace</H4>
-Can we have a matlab-like workspace?
-
-
 <H4>2007/07/24 (JB): Matlab Toolbox for Dimensionality Reduction</H4>
-
 Consider interfacing to this toolbox, which contains Matlab
 implementations of twenty techniques for dimensionality reduction. A
 number of these implementations were developed from scratch, whereas
 other implementations are based on software that is already available
-on the Web.  http://www.cs.unimaas.nl/l.vandermaaten/dr
-CB: or consider a python/numpy alternative? E.g. http://mdp-toolkit.sourceforge.net/
+on the Web.  http://www.cs.unimaas.nl/l.vandermaaten/dr CB: or
+consider a python/numpy alternative?
+E.g. http://mdp-toolkit.sourceforge.net/
 
 
 <H4>2007/07/24 (JB): Digital Embryo Workshop</H4>
-
 Consider interfacing to this toolbox, which is handy for generating
 novel 3D objects, e.g. to use as training stimuli (perhaps for
 somatosensory simulations?).
@@ -1197,3 +1119,55 @@ Parameterized.name returns __name__ rather than None?
 
 
 
+
+
+<!-- 2007/04/18
+Information about OS X & icons, from Kevin Walzer (www.codebykevin.com)
+
+The application icon is part of the application bundle structure. See
+the link below for some basic tips on how to create an icon and specify
+it in your application. (Note this article does not deal specifically
+with deploying Python applications, but the parts about the icon are
+applicable.)
+
+http://tk-components.sourceforge.net/tk-bundle-tutorial/index.html
+
+The easiest way to specify the icon with a Python application is part of
+the setup file you use with py2app (which wraps all Python packages into
+an application package on the Mac).  Here's a basic example:
+
+"""
+Script for building the example.
+
+Usage:
+    python setup.py py2app
+"""
+from distutils.core import setup
+import py2app
+import os
+
+imagedir = (os.getcwd() + "/images")
+helpdir = (os.getcwd() + "/html")
+
+setup(
+    app = ['Phynchronicity.py'],
+    data_files = [imagedir, helpdir],
+    options=dict(py2app=
+                    dict(iconfile='Phynchronicity.icns',
+                    plist = 'Info.plist'),
+             ),
+    )
+
+You can get more information about using py2app, and help with
+questions, on the MacPython mailing list.
+
+-->
+
+
+<!-- Also suggested by Geisler, 7/1/2005:
+  Package as a Matlab toolbox to get the right people to use it?
+  Package it as an easy-to-use out-of-the-box optical imaging simulator
+    -- need to tell it what stimulus, what eccentricity, what cortical patch
+  Be able to look at the effects of attention
+  Add specific models for intrinsic or voltage-sensitive-dye imaging 
+-->
