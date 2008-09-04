@@ -5,7 +5,6 @@ PYLINT = bin/pylint --rcfile=doc/buildbot/pylintrc
 PYCHECKER = bin/pychecker --config doc/buildbot/pycheckrc
 
 RELEASE = 0.9.5
-RELEASE_TAG = release_0_9_5
 
 TEST_VERBOSITY = 1
 
@@ -308,7 +307,7 @@ build-win-exe: topographica
 ## Run these from a relatively clean copy of the topographica directory 
 ## (without stray files, especially in doc/).
 
-svn-release: LATEST_STABLE sf-web-site
+svn-release: LATEST_STABLE tag-release sf-web-site 
 
 # Update any topographica-win files that keep track of the version number
 # CEBALERT: maintainer must have checked out topographica-win
@@ -322,9 +321,11 @@ new-version: FORCE
 # Make a new LATEST_STABLE on the web, using the currently checked-out version
 TOPOROOT=https://topographica.svn.sourceforge.net/svnroot/topographica
 LATEST_STABLE:
-	svn delete ${TOPOROOT}/tags/LATEST_STABLE -m "Updating LATEST_STABLE."
-	svn copy ${TOPOROOT}/trunk ${TOPOROOT}/tags/LATEST_STABLE -m "Updating LATEST_STABLE."
+	svn delete ${TOPOROOT}/tags/LATEST_STABLE -m "Update LATEST_STABLE."
+	svn copy ${TOPOROOT}/trunk ${TOPOROOT}/tags/LATEST_STABLE -m "Update LATEST_STABLE."
 
+tag-release: 
+	svn copy ${TOPOROOT}/trunk ${TOPOROOT}/releases/${RELEASE} -m "Create release ${RELEASE}"
 
 # Update Topographica.org web site
 sf-web-site: reference-manual doc
