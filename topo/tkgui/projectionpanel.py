@@ -184,7 +184,7 @@ class ConnectionFieldsPanel(UnitsPanel):
         self.redraw_plots()
 
     def _plot_title(self):
-        return 'Connection Fields of %s unit (%g,%g) at time %s' % \
+        return 'Connection Fields of %s unit (%4.3f,%4.3f) at time %s' % \
                (self.sheet.name, self.plotgroup.x,self.plotgroup.y,
                 topo.sim.timestr(self.plotgroup.time))
 
