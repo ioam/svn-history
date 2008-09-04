@@ -90,37 +90,11 @@ dollar signs.
 
 <P>For Python files, the <CODE>Id:</CODE> tag should be placed at the
 end of the Python doc string for that module, surrounded by dollar
-signs, on a line by itself.  
-
-<P>If you include the following in
-your <code>~/.subversion/config</code> file, these things will be done
-automatically for you:
-
-<pre>
-# ... (other content you have already)
-[auto-props]
-# ... (other content you have already)
-Makefile = svn:eol-style=native;svn:keywords="Author Date Id Revision"
-*.ty = svn:eol-style=native;svn:keywords="Author Date Id Revision"
-*.py = svn:eol-style=native;svn:keywords="Author Date Id Revision"
-*.txt = svn:eol-style=native;svn:keywords="Author Date Id Revision"
-*.diff = svn:eol-style=native
-*.png = svn:mime-type=image/png
-*.jpg = svn:mime-type=image/jpeg
-</pre>
-
-<p>You will usually also need to set "enable-auto-props yes", as the 
-config file usually has auto-props disabled by default.
-
-<!-- .cvsignore -> svn property on directory; document 
-svn propget svn:ignore .
-svn propset svn:ignore -F <filename> .
--->
-
-<!--
-CB: going to remove Revision tags?
-In addition, just after the doc string,
-the version number of the file should be declared.  For example:
+signs, on a line by itself. Also for Python files, we include a
+<code>__version__</code> attribute that could potentially be accessed
+from the code. To do this, use the <code>"&#36;Revision&#36;"</code>
+tag for SVN. In general, then, Python files will usually begin like
+this:
 
 <PRE>
   """
@@ -130,22 +104,57 @@ the version number of the file should be declared.  For example:
   """
   __version__ = "&#36;Revision&#36;"
 </PRE>
--->
 
 
-<!--
-Authentication realm: <https://topographica.svn.sf.net:443> SourceForge Subversion area
--->
+<P>By default, SVN will not actually fill in tags on new files you add
+to the repository. Therefore, please include the following in your
+<code>~/.subversion/config</code> file:
 
+<pre>
+# ... (other content you may already have)
+[auto-props]
+# ... (other content you may already have)
+Makefile = svn:eol-style=native;svn:keywords="Author Date Id Revision"
+*.ty = svn:eol-style=native;svn:keywords="Author Date Id Revision"
+*.py = svn:eol-style=native;svn:keywords="Author Date Id Revision"
+*.txt = svn:eol-style=native;svn:keywords="Author Date Id Revision"
+*.diff = svn:eol-style=native
+*.png = svn:mime-type=image/png
+*.jpg = svn:mime-type=image/jpeg
+</pre>
 
+(You will usually also need to set "enable-auto-props yes", as the
+config file usually has auto-props disabled by default.) 
 
-<!--
-[lodestar]v1cball: svn commit ...
-Authentication realm: <https://topographica.svn.sourceforge.net:443> SourceForge Subversion area
-Password for 'v1cball': 
+<P> In addition to setting up the tags for completion, the code above
+also ensures that files have the correct end-of-line style, and that
+the mime-type is set correctly. Therefore, it is important to make
+sure you have the above in your <code>config</code> file.
 
-Authentication realm: <https://topographica.svn.sourceforge.net:443> SourceForge Subversion area
-Username: ceball
-Password for 'ceball': X
+<P>Finally, when making a change that will cause a new file to be
+produced on other users' systems (e.g. adding an external package that
+will be unpacked and built), it is important to tell SVN that it
+should ignore such generated files. For instance, if you add the
+external package <code>my_package-1.0.tar.gz</code>, when it is built
+it will probably generate <code>external/my_package-1.0/</code> and
+<code>external/my-package</code>. When you (or another user) subsequently
+types <code>svn status</code>, svn will output something like:
+<pre>
+?  external/my_package
+?  external/my_package-1.0
+</pre>
 
--->
+To prevent this, you need to edit the <code>svn:ignore</code> property
+on the <code>external/</code> directory by doing something like this:
+
+<pre>
+svn propget svn:ignore external/ > tmp
+emacs tmp   # edit tmp to include the entries above
+svn propset svn:ignore external/ - F tmp
+rm tmp
+</pre>
+
+<P>Similarly, when removing a file, please update any relevant
+<code>svn:ignore</code> property so that unused files become apparent
+to all users.
+
