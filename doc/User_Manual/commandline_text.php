@@ -161,7 +161,7 @@ its internal state), or <A
 HREF="../Reference_Manual/topo.command.basic-module.html#save_snapshot">save_snapshot</A>
 for how to save your simulation's current state). Another way is to
 create a .ty script file yourself, and then run it with Topographica.
-As discussed in the <A HREF="interactive.html#ty-files">Topographica
+As discussed in the <A HREF="scripts.html#ty-files">Topographica
 scripts</A> section, exactly the same commands can be entered in a .ty
 file as at the commandline, and running the .ty file (either by
 passing it at startup to the topographica program on the commandline,
@@ -287,7 +287,7 @@ defined in different files; see the Python documentation for
 <!-- do we really recommend this? -->
 <P>To avoid confusion, we recommend you take advantage of Python's
 namespaces (as mentioned earlier in the <A
-HREF="interactive.html#imports">Imports</A> section of the
+HREF="scripts.html#imports">Imports</A> section of the
 Topographica Scripts page) when working interactively at the
 commandline. For instance, <code>pattern.random.UniformRandom</code>
 is clearly distinct from <code>numbergen.UniformRandom</code>;

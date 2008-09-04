@@ -10,7 +10,7 @@ step-by-step explanations in the tutorials.
 <A HREF="overview.html">Overview of Topographica design and features</A><BR>
 <A HREF="time.html">Representing time in Topographica</A><BR>
 <A HREF="space.html">Representing space in Topographica (coordinate systems)</A><BR>
-<A HREF="interactive.html">Starting Topographica scripts interactively</A><BR>
+<A HREF="scripts.html">Starting Topographica scripts interactively</A><BR>
 <A HREF="commandline.html">The Topographica command line and script language</A><BR>
 <A HREF="batch.html">Running Topographica in batch mode</A><BR>
 <A HREF="parameters.html">Controlling simulation parameters</A><BR>

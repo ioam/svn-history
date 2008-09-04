@@ -1,0 +1,187 @@
+<H1>Starting Topographica scripts interactively</H1>
+
+<P>
+Once you have <A HREF="../Downloads/index.html">installed
+Topographica</A> you are ready to try running it. You can choose to
+run Topographica interactively (with or without a graphical display),
+or in 'batch mode'. This section introduces how to run Topographica
+interactively; batch mode is described <A
+HREF="batch.html">separately</A>.
+
+<!--<H2>Running Topographica Interactively with the GUI</H2>-->
+
+
+<H2>Starting Topographica</H2>
+
+<P>To start Topographica with one of our example scripts, on most
+systems (including Linux, Unix, and Mac) just open a terminal window,
+go to your <code>topographica/</code> directory, and type e.g.:
+
+<pre title="Win: topographica -g examples\cfsom_or.ty">
+  ./topographica -g examples/cfsom_or.ty
+</pre>
+
+or
+
+<pre title="Win: topographica -g examples\hierarchical.ty">
+  ./topographica -g examples/hierarchical.ty
+</pre>
+
+or
+
+<pre title="Win: topographica -g examples\som_retinotopy.ty">
+  ./topographica -g examples/som_retinotopy.ty
+</pre>
+
+or
+
+<pre title="Win: topographica -g examples\lissom_oo_or.ty">
+  ./topographica -g examples/lissom_oo_or.ty
+</pre>
+
+(Windows users can type similar commands at a Windows command prompt:
+hold your mouse over a command above to see the Windows equivalent, or
+see our note about <A
+HREF="../Downloads/win32notes.html#unix-commands-on-win">translating Unix shell
+commands to Windows</A>.  Alternatively, Windows users can double
+click on one of the <code>.ty</code> scripts in the examples
+directory; <code>.ty</code> files are associated with Topographica.)
+
+<!--CEBALERT: describe Simulation/Run script GUI?-->
+
+<P>Note that the first time Topographica is run on a given example,
+there may be a short pause while the program compiles some of the
+optimized components used in that example.  (Some components,
+generally those with <code>_opt</code> in their names, use code
+written in C++ internally for speed, and this code must be compiled.)
+The compiled versions are stored in <code>~/.python25_compiled/</code>
+on most systems (or in the temporary directory
+<code>%TEMP%\%USERNAME%</code> on Windows), and they will be reused on
+the next run unless the source files have changed.  Thus you should
+only notice such pauses the first time you use a particular component,
+at which time you may also notice various inscrutable messages from
+the compiler. These messages vary depending on platform (because they
+come from the compiler), and may generally be ignored.
+
+
+<H2><a name="ty-files">Topographica Scripts</a></H2>
+
+<P>Topographica scripts consist of a collection of Python commands,
+usually intended to define and build a particular model. Our
+convention is to give script filenames the suffix <code>.ty</code> to
+distinguish them from ordinary Python scripts (conventionally
+<code>.py</code> files). 
+
+<P>As illustrated above, we provide a number of sample scripts in the
+examples/ directory, but you are free to write your own and run them
+in just the same way. The same commands are valid in script files as
+at the <A HREF="commandline.html">commandline</A>: running a script
+file is equivalent to entering the commands manually at the
+commandline.
+
+<P>Our example scripts, while quite various, have some common
+sections, and we anticipate that your own scripts will also contain
+some of these. The first such section is the list of imports.
+
+<H3><A NAME="imports">Imports</A></H3>
+
+<P>Python requires that each command and class be imported (i.e.,
+loaded and declared) from the appropriate file before use.  This
+avoids confusion between similar commands defined in different files
+(see the Python documentation for <A
+HREF="http://docs.python.org/tut/node8.html">more information about
+imports</A>). Therefore, most scripts begin with a list of imports
+similar to the following:
+
+<pre>
+from math import exp, sqrt
+import numpy
+
+from topo import learningfn
+from topo import numbergen
+from topo import outputfn
+from topo import pattern
+from topo import projection
+from topo import responsefn
+from topo import sheet
+</pre>
+
+<P>As described in the <A
+HREF="overview.html#class-hierarchies">overview</A>, Topographica
+provides a number of component libraries such as <A
+HREF="../Reference_Manual/topo.pattern-module.html">pattern</A>, <A
+HREF="../Reference_Manual/topo.numbergen-module.html">numbergen</A>, and so
+on. Within each of these, a number of related classes and functions
+are available. Topographica uses Python's idea of 'namespaces' to make
+expressions written for use with Topographica more readable. For
+example, Topographica provides a class called UniformRandom, used to
+generate a sequence of numbers from a uniform random
+distribution. Topographica also provides a class with the same name
+that is used to generate two-dimensional patterns. The two are in
+different files: the first is topo/numbergen/basic.py, and the second
+is topo/pattern/random.py. Were you to type the following:
+
+<pre>
+from topo.numbergen import UniformRandom
+from topo.pattern.random import UniformRandom
+</pre>
+
+you would only have access to the pattern.random version in your
+script (and at the commandline), because its name would have
+overwritten the numbergen version. To avoid this kind of confusion, we
+recommend not importing classnames alone for library components, but
+instead qualifying the names. Using the <code>from topo import
+numbergen</code> style of import allows you to refer to
+<code>numbergen.UniformRandom</code> throughout your script, which,
+while involving more typing, cuts out confusion about which class you
+might be referring to (making your script easier to read and less
+prone to errors).
+
+<!--CEBALERT: ...other sections include defining input pattern,
+sheets, connections-->
+
+
+<H2>Startup options</H2>
+
+<P>Topographica accepts a number of startup options. Details are
+available by passing -h to Topographica (<code>./topographica
+-h</code>), but a few in particular are often useful. We have already
+seen <code>-g</code>, which starts an interactive session with the
+GUI. To run a script interactively without the GUI, pass
+<code>-i</code> instead of <code>-g</code>. (Note that
+<code>-g</code>, as well as starting the GUI, also imports a number of
+useful commands; you can use <code>-a</code> as described in the <A
+HREF="commandline.html#option-a">commandline</A> section to perform
+the same without the GUI.)
+
+<P>Please note that when writing a script, you should not rely on
+anything to have been automatically imported (as is done by
+<code>-g</code> and <code>-a</code>), because other users will not
+necessarily start Topographica in the same way as you: scripts should
+explicitly import everything they need.
+
+<P>In addition to startup options for the Topographica program,
+scripts themselves can also be controlled by options passed at
+startup. For instance, many of our examples read variables that can
+optionally be set at startup, such as
+<code>default_retina_density</code>, <code>default_lgn_density</code>,
+and <code>default_density</code>, e.g.:
+
+<pre>./topographica -i -c default_retina_density=12 -c default_density=12 \
+examples/lissom_oo_or.ty 
+</pre>
+
+In this case, we are specifying that the retina and V1 sheets in a
+LISSOM simulation should have a density of 12 rather than the default
+of 24 and 48, respectively. Using lower densities is useful during
+initial testing or exploration of a model; higher densities can be
+used to produce results for publication. <!--CEBALERT: link to
+book/scaling paper?-->
+
+<P>Your own scripts can read any startup variables you require (see
+our examples for how to read any such variable). Note that startup
+variables must be set before the script is executed, i.e.  they should
+be passed on the commandline before the script.
+
+
+

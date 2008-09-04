@@ -209,7 +209,7 @@ warnings about GUI tests being skipped.
 <P>If all goes well, a script named <code>topographica</code> will be
 created in the <code>topographica/</code> directory; you can use this
 to start Topographica as described in the <A
-HREF="../User_Manual/interactive.html">Running Topographica</A>
+HREF="../User_Manual/scripts.html">Running Topographica</A>
 section of the User Manual. Or, if you want to get straight into 
 working with a full network, a good way to begin is by working
 through the <A HREF="../Tutorials/som_retinotopy.html">SOM</A> or <A
