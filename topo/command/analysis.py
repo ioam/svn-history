@@ -1431,9 +1431,9 @@ pg.add_plot('Corner Orientation Preference&Selectivity',[('Hue','OrientationPref
 pg.add_plot('Corner Orientation Selectivity',[('Strength','OrientationSelectivity')])
 
 
-def measure_corner_or_pref(divisions=20,num_orientation=8,scale=1.0,offset=0.0,display=False,
+def measure_corner_or_pref(divisions=10,num_orientation=4,scale=1.0,offset=0.0,display=False,
                            pattern_presenter=PatternPresenter(gaussian_corner,apply_output_fn=True,duration=1.0),
-                          x_range=(-1.4,1.4),y_range=(-1.4,1.4),weighted_average=True):
+                          x_range=(-1.2,1.2),y_range=(-1.2,1.2),weighted_average=True):
     """
     Measure orientation preference map, using a corner formed by two gaussians by default.
 
