@@ -159,17 +159,22 @@ problems with Topographica</a>.
 IPython and/or Python can have trouble finding the correct library to support this action at the commandline; more information is available on the <A HREF="http://ipython.scipy.org/moin/InstallationOSXLeopard">IPython site</A>. 
 
 <P>To fix the problem on OS X 10.5, you can install the latest version of readline, as suggested by one of our users:
-<!--CEB: hope to update this with specific commands from Roger-->
 <blockquote>
 <ol>
-<li>Download the latest version of readline for python (2.5.1):
-http://pypi.python.org/packages/2.5/r/readline/readline-2.5.1-py2.5-macosx-10.5-i386.egg</li>
 
-<li>Install Easy Install (http://peak.telecommunity.com/dist/ez_setup.py)</li>
+<li>First, <A HREF="http://peak.telecommunity.com/dist/ez_setup.py">download</A>
+"Easy Install" to your <code>topographica/</code> directory. Then,
+from a Terminal window, change to your <code>topographica/</code>
+directory and type <code>bin/python ez_setup.py</code>. Note that you
+must have an Internet connection at this point.</li>
 
-<li>easy_install readline-2.5.1-py2.5-macosx-10.5-i386.egg.</li>
-</ol>
-Note that Mac 'system' also ships with easy_install, so step 2 and 3 needs to be run within Topographica package.
+<li><A HREF="http://pypi.python.org/packages/2.5/r/readline/">Download</A> the latest version of Python's readline appropriate for your system (again, download to your <code>topographica/</code> directory).</li>
+
+<li>Assuming you
+downloaded <code>readline-2.5.1-py2.5-macosx-10.5-i386.egg</code>,
+execute the following command at the Terminal: <code>bin/easy_install
+readline-2.5.1-py2.5-macosx-10.5-i386.egg</code> (alter the command to
+match the version of readline you downloaded).
 </blockquote>
   
 <!----------------------------------------------------------------------------->
