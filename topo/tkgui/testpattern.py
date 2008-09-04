@@ -162,15 +162,12 @@ class TestPattern(SheetPanel):
         """
         topo.sim.run(0.0)  # ensure EPs are start()ed
         
-	topo.sim.state_push()
+        topo.sim.state_push()
         wipe_out_activity()
         topo.sim.event_clear(EPConnectionEvent)
-
         input_dict = dict([(sheet.name,sheet.input_generator) for sheet in self.plotgroup._sheets()])
-
         pattern_present(input_dict,self.duration,
                         plastic=self.plastic,overwrite_previous=False)
-
         topo.guimain.auto_refresh()
-	topo.sim.state_pop()
+        topo.sim.state_pop()
         
