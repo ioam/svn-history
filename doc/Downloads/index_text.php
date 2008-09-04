@@ -81,6 +81,7 @@ necessarily been tested.
 folder in the Applications section of Finder) and enter the following
 command:
 <code>fink install libpng3 freetype219</code>. 
+<!--libpng might already be present on macs...--> 
 
 <!--
 CBENHANCEMENT: make doc on mac?
@@ -219,7 +220,10 @@ HREF="../Tutorials/lissom_oo_or.html">LISSOM</A> tutorials.
 <code>-k</code> to the <code>make</code> command, which will allow the
 make process to skip any components that do not build properly on your
 machine. Topographica is highly modular, and most functionality should
-be accessible even without some of those components.
+be accessible even without some of those components. If you do
+experience problems during the installation or subsequent use of
+Topographica on your platform, please check
+our <A HREF="../FAQ/index.html#plat">platform-specific FAQ</A>.
 
 <P> Have fun with Topographica, and be sure to subscribe to the <A
 HREF="https://lists.sourceforge.net/lists/listinfo/topographica-announce">topographica-announce</A>

@@ -1,5 +1,16 @@
 <H1>Frequently Asked Questions about Topographica</H1>
 
+<P>Here we collect together some answers to <A HREF="#general">general
+questions</A> about Topographica, followed
+by <A HREF="#plat">platform-specific questions</A> about using or
+installing Topographica. 
+
+<P>If you have a problem that isn't answered
+below, please feel free to ask us (either in one of
+our <A HREF="../Forums/index.html">forums</A>, or by
+email). <!-- address?-->
+
+<H3><A NAME='general'>General Questions</A></H3>
 <OL>
 
 <!----------------------------------------------------------------------------->
@@ -133,7 +144,35 @@ guidelines for <a href="../Forums/problems.html">Reporting specific
 problems with Topographica</a>.
   
 <!----------------------------------------------------------------------------->
-
-
   
+</OL>
+
+
+<H3><A NAME='plat'>Platform-specific Questions</A></H3>
+
+<OL>
+
+<!----------------------------------------------------------------------------->
+<LI><B>Q:</B> <i>While using the Topographica commandline on OS X, sometimes Topographica quits when I press the up or down arrows on my keyboard. (Related: On OS X 10.5 Leopard I can't access previously entered commands by pressing up on the keyboard.) What can I do about this?</i>
+
+<P><B>A:</B> 
+IPython and/or Python can have trouble finding the correct library to support this action at the commandline; more information is available on the <A HREF="http://ipython.scipy.org/moin/InstallationOSXLeopard">IPython site</A>. 
+
+<P>To fix the problem on OS X 10.5, you can install the latest version of readline, as suggested by one of our users:
+<!--CEB: hope to update this with specific commands from Roger-->
+<blockquote>
+<ol>
+<li>Download the latest version of readline for python (2.5.1):
+http://pypi.python.org/packages/2.5/r/readline/readline-2.5.1-py2.5-macosx-10.5-i386.egg</li>
+
+<li>Install Easy Install (http://peak.telecommunity.com/dist/ez_setup.py)</li>
+
+<li>easy_install readline-2.5.1-py2.5-macosx-10.5-i386.egg.</li>
+</ol>
+Note that Mac 'system' also ships with easy_install, so step 2 and 3 needs to be run within Topographica package.
+</blockquote>
+  
+<!----------------------------------------------------------------------------->
+
+
 </OL>
