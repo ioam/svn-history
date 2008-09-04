@@ -16,7 +16,8 @@ plus Topographica-specific conventions such as
 
 <P>If you are familiar with other programming languages, but not
 Python, the best place to start is to run the Python tutorial on the
-www.python.org web site.  On the first pass, don't try to memorize
+<A target="_top" HREF="http://docs.python.org/">docs.python.org</A>
+web site.  On the first pass, don't try to memorize
 anything, just try to get a feel for the overall syntax and workings
 of Python.  Then try looking at the Topographica code.  After working
 with Topographica a while, it is then a good idea to revisit the
@@ -41,7 +42,8 @@ not Java</A>, and the <A
 HREF="http://www.ferg.org/projects/python_java_side-by-side.html">Python
 and Java Side-by-side comparison</A> may also be useful.  For those
 without prior experience in any programming language, you are probably
-really a user, not a Topographica developer <code>:-)</code>.
+really a user, not a Topographica developer <code>:-)</code>, but
+feel free to get started by learning Python.
 
 
 <H2><A NAME="conventions">General conventions</A></H2>
@@ -56,9 +58,10 @@ differences between Topographica authors if there are disagreements.
 <P>One particular guideline of these that Jim does not always follow
 is that he likes to use lines much longer than 80 characters, e.g. for
 a string.  Other differences are listed elsewhere in this file, such
-as in the REVISION INFO section.
+as in the
+<A HREF="revrevisioncontrol.html">revision control</A> section.
 
-<P>To keep things simple and consistent, we should try to use what
+<P>To keep things simple and consistent, we try to use what
 seems to be the most common Python names for the following concepts
 (as opposed to those from C++ or Java):
 
@@ -68,8 +71,8 @@ seems to be the most common Python names for the following concepts
 <DT>superclass</DT><DD> (although 'base class' is also ok)
 </DL>
 
-<P>Typically, classes are named with InitialCapitalLetters, member
-functions and attributes (variables and parameters) are lower_case,
+<P>Typically, classes are named with InitialCapitalLetters, functions,
+methods, attributes, and parameters are lower_case_with_underscores,
 and filenames are lowercasewithnounderscores.py.
 
 <P>For whitespace, the convention is to use no more than one blank

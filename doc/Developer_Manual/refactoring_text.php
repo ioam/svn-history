@@ -25,31 +25,34 @@ Improving the Design of Existing Code</A>, pp. 417-418) contains a
 nice list of "bad smells" in code that drive a developer to want or
 need to refactor it:
 
-    * Duplicated Code
-    * Long Method
-    * Large Class
-    * Long Parameter List
-    * Divergent Change
-    * Shotgun Surgery
-    * Feature Envy
-    * Data Clumps
-    * Primitive Obsession
-    * Switch Statements
-    * Parallel Inheritance Hierarchies
-    * Lazy Class
-    * Speculative Generality
-    * Temporary Field
-    * Message Chains
-    * Middle Man
-    * Inappropriate Intimacy
-    * Alternative Classes with Different Interfaces
-    * Incomplete Library Class
-    * Data Class
-    * Refused Bequest
-    * Comments
+<ul>
+<li> Duplicated Code
+<li> Long Method
+<li> Large Class
+<li> Long Parameter List
+<li> Divergent Change
+<li> Shotgun Surgery
+<li> Feature Envy
+<li> Data Clumps
+<li> Primitive Obsession
+<li> Switch Statements
+<li> Parallel Inheritance Hierarchies
+<li> Lazy Class
+<li> Speculative Generality
+<li> Temporary Field
+<li> Message Chains
+<li> Middle Man
+<li> Inappropriate Intimacy
+<li> Alternative Classes with Different Interfaces
+<li> Incomplete Library Class
+<li> Data Class
+<li> Refused Bequest
+<li> Comments
+</ul>
 
-More information is available from:
-http://sis36.berkeley.edu/projects/streek/agile/bad-smells-in-code.html
+More information is available from the 
+<A HREF="http://sis36.berkeley.edu/projects/streek/agile/bad-smells-in-code.html">bad
+smells</A> site.
 
 
 <H1>Refactoring/testing tips</H1>

@@ -39,7 +39,7 @@ version instead.
 the bottleneck for our simulations, see
 <A href="http://lwn.net/Articles/250967/">Ulrich Drepper's article</A>.
 If you are ambitious, even the most optimized components in
-Topographica could be further improved using these technqiues,
+Topographica could be further improved using these techniques,
 possibly substantially.
 
 
@@ -66,7 +66,7 @@ maintain than e.g. explicitly writing <code>for</code> loops).
 <!-- CB: update to numpy! & cleanup numpy/Numeric in following section!-->
 
 However, there are certain cases where the performance of numpy is
-not sufficient, or where numpy is unsuitable (for example, many
+not sufficient, or where numpy is unsuitable (for example, some
 numpy operations do not act in-place on arrays).  Other components
 may be able to be implemented much more quickly if certain assumptions
 are made about the nature of their arguments, or the types of
@@ -114,7 +114,7 @@ time. <code>topo.misc.util</code> contains the
 this.
 
 <P>For instance, if we have a simple simulation consisting of a
-<code>CFSOM</code> sheet connected to a <code>GeneratorSheet</code>
+SOM-based sheet connected to a <code>GeneratorSheet</code>
 with a <code>CFProjection</code>, we might wish to find out if there
 is an obvious bottleneck that could be eliminated, speeding up the
 network's performance. For concreteness, let us say that in this

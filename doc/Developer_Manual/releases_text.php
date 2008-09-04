@@ -45,10 +45,10 @@ svn co $TOPOROOT/trunk/topographica-win topographica-win
   <P>Be sure to work through the tutorial once it is updated, to make
   sure all of the instructions still make sense for the new release.
   
-<li><P>Update Changelog.txt (using "make Changelog.txt",
-  removing any overlap on the starting date, filling the new items in
-  Emacs, and checking in the result), and summarize major changes in it
-  for the release notes.
+<li><P>Update Changelog.txt (by making a copy of ChangeLog.txt, doing
+  "make Changelog.txt", and pasting the new items at the top of the
+  copy (so that any fixes to the old items are preserved).  Also
+  summarize major changes in it for the release notes in News/.
 
 <li><P>Update the remaining work lists in
   Future_Work/index_text.php and Future_Work/current_text.php to
@@ -73,7 +73,7 @@ svn co $TOPOROOT/trunk/topographica-win topographica-win
     <li><P>Double-check the generated documentation to ensure that it is
       complete and was generated properly.
       
-    <li><P>Compile the source on various platforms, ensure that there are 
+    <li><P>Compile the source on various platforms, ensuring that there are 
       no errors.  Also perform a self-test on the various platforms
       ("make tests").
     </ol>
@@ -82,8 +82,8 @@ svn co $TOPOROOT/trunk/topographica-win topographica-win
 
 <li><P>When the package is ready for release, copy binaries to
     SourceForge using their admin interface, and add a news release
-    and screenshot. The upload command is currently something like
-<code>rsync -avP -e ssh topographica-0.9.5.tar.gz  ceball@frs.sourceforge.net:uploads/</code>
+    and screenshots. As of 8/2008, the upload command would be something like
+    <code>rsync -avP -e ssh topographica-0.9.5.tar.gz  ceball@frs.sourceforge.net:uploads/</code>
 
 
 <li><P>Build on Windows and make .exe versions, test them, and upload
