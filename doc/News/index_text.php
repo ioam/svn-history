@@ -33,6 +33,8 @@
   <div class="i2">- divisive and multiplicative connections</div>
   <div class="i2">- simulation time is now a rational number for precision</div>
   <div class="i2">- PyTables HDF5 interface</div>
+  <div class="i2">- more options for 
+  <A target="_top" href="../User_Manual/noise.html">adding noise</A></div>
 <!-- topo/misc/legacy.py i.e. we can now support old snapshots if necessary<BR> -->
 <!-- incomplete <A HREF="../Downloads/git.html">Instructions</A> for checking out Git version of repository<BR> -->
 </dd>

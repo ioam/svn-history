@@ -17,6 +17,7 @@ step-by-step explanations in the tutorials.
 <A HREF="patterns.html">Generating patterns</A><BR>
 <A HREF="plotting.html">Plotting and visualization</A><BR>
 <A HREF="modeleditor.html">Graphical model editor</A><BR>
+<A HREF="noise.html">Adding noise</A><BR>
 <A HREF="publishing.html">Publishing results from Topographica</A><BR>
 <A HREF="about.html">About Topographica</A><BR>
 
