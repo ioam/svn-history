@@ -19,7 +19,7 @@ from .. import param
 
 import numpy, numpy.random
 import numpy.oldnumeric as Numeric
-from numpy import exp,zeros,ones
+from numpy import exp,zeros,ones,power
 from numpy.oldnumeric import dot
 
 import topo
@@ -246,6 +246,24 @@ class HalfRectifyAndSquare(OutputFn):
     def __call__(self,x):
         clip_lower(x,self.lower_bound)
         x *= x
+
+
+class HalfRectifyAndPower(OutputFn):
+    """
+    Output function that applies a half-wave rectification (clips at zero)
+    and then makes e-th power of it.
+    """
+    lower_bound = param.Number(default=0.0,softbounds=(0.0,1.0))
+    
+    e = param.Number(default=2.0,doc="""The exponent of the input x.""")
+    t = param.Number(default=0.0,doc="""The threshold of x.""")
+    
+    def __call__(self,x):
+        x -= self.t
+        clip_lower(x,self.lower_bound)
+        a = power(x,self.e)
+        x*=0
+        x+=a
 
 
 
