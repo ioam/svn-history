@@ -73,5 +73,5 @@ changed.  Similarly, any errors in the commands provided before or
 after run_batch will not show up in the .out file stored in the
 simulation directory, because that is closed when run_batch completes.
 Thus it's usually best to use run_batch's options rather than
-separate commands as shown here.
+the separate commands shown in this example.
 

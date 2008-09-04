@@ -16,7 +16,7 @@ discussion.
 
 <P><DT><A HREF="http://lists.sourceforge.net/lists/listinfo/topographica-cvs">topographica-cvs</A></DT> 
 <DD>Mailing list announcing changes made to any Topographica file in
-the CVS repository.  Extremely high traffic (often several emails per
+the SVN repository.  Extremely high traffic (often several emails per
 day), and likely to be of interest only for active developers.</DD>
 </DL>
 

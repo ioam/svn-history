@@ -60,7 +60,9 @@ value cannot be changed after the Parameterized object that owns the
 Parameter has been created.  Some classes, such as
 <?php classref('topo.param','Number')?>,
 allow the parameter values to be generated from a sequence or random
-distribution, such as for generating random input patterns.
+distribution, such as for generating random input patterns; in this
+case the random number will be updated at most once for each unique
+value of simulation time.  <!-- Explain more? -->
 
 <P>Some Parameter types or instances can also be declared to have
 <code>softbounds</code>, which are used to suggest the sizes of GUI

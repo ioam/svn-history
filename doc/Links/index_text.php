@@ -33,19 +33,26 @@ Informatics</A> of the
 <P>If you use this software in work leading to an academic
 publication, please cite this reference:
 
+<BLOCKQUOTE>
+James&nbsp;A. Bednar.
+<A HREF="http://www.brains-minds-media.org/archive/1402">Understanding
+Neural Maps with Topographica</A>.
+<CITE>Brains, Minds, and Media</CITE>, 3:bmm1402, 2008.
+</BLOCKQUOTE>
+
+or in BibTeX format:
+
 <pre>
-@Article{bednar:neurocomputing04-sw,
-  author       = "James A. Bednar and Yoonsuck Choe and Judah {De Paula}
-                  and Risto Miikkulainen and Jefferson Provost and Tal
-                  Tversky",
-  title	       = "Modeling Cortical Maps with {Topographica}",
-  journal      = "Neurocomputing",
-  year	       = 2004,
-  pages        = "1129--1135",
-  url	       = "<A TARGET="_top" HREF="http://nn.cs.utexas.edu/keyword?bednar:neurocomputing04-sw">http://nn.cs.utexas.edu/keyword?bednar:neurocomputing04-sw</A>",
+@Article{bednar:bmm08,
+  author       = "James A. Bednar",
+  title	       = "Understanding Neural Maps with {Topographica}",
+  journal      = "Brains, Minds, and Media",
+  year	       = 2008,
+  volume       = 3,
+  pages	       = "bmm1402",
+  url          = "http://www.brains-minds-media.org/archive/1402",
 }
 </pre>
-
 <P>
 <A TARGET="_TOP" HREF="http://www.computationalmaps.org">
       <IMG SRC="../images/cmvc-cover-icon.jpg" ALT="Computational Maps in the Visual Cortex (2005) Miikkulainen, Bednar, Choe, and Sirosh" WIDTH="162" HEIGHT="251" BORDER="0" ALIGN="RIGHT"></a>
@@ -81,7 +88,8 @@ scaling equations that underlie Sheet coordinates
   <dd>Highly graphical Java-based simulator covering numerous levels,
     from ion channels to behavioral experiments.  Can be used for some
     of the same types of models supported by Topographica, but does
-    not have an explicit focus on topographically organized areas.<BR><BR>
+    not have an explicit focus on topographically organized areas.
+    May not currently be maintained.<BR><BR>
 
   <dt><A TARGET="_top" HREF="http://www.nest-initiative.org">NEST</A></dt>
   <dd>NEST (formerly called BLISS) is a general-purpose simulator for
@@ -137,3 +145,7 @@ scaling equations that underlie Sheet coordinates
     Kohonen SOM models of topographic maps).<BR><BR>
 </dl>
 
+<!-- NEED to update with the actual address of the comparison page! -->
+Other potentially useful simulators are listed at the
+<A TARGET="_top" HREF="http://grey.colorado.edu/emergent/index.php/Main_Page">Emergent</A>
+site.

@@ -17,7 +17,7 @@ visualize any quantities of interest.
 <dd>Plots the strength of each weight in each ConnectionField of one unit.
 <dt><A HREF="../Tutorials/lissom_oo_or.html#Projection-plot">Projection</A></dt>
 <dd>Plots an array of ConnectionFields making up a Projection to one Sheet.
-<dt>ProjectionActivity</dt>
+<dt><A HREF="../Tutorials/som_retinotopy.html#Projection-activity-plot">ProjectionActivity</A></dt>
 <dd>Plots the contribution from each Projection to the activity of one Sheet.
 </dl>  
 
@@ -116,8 +116,12 @@ topo/command/analysis.py</A>. The available plots include:
 <dd>Measure preference for sine gratings between two eyes.
 <dt>Spatial Frequency Preference</dt>
 <dd>Measure preference for sine grating frequency.
+<dt>Direction Preference, Speed Preference</dt>
+<dd>Measure motion direction and speed for drifting sine gratings.
 <dt>PhaseDisparity Preference</dt>
 <dd>Measure preference for sine gratings differing in phase between two sheets.
+<dt>Hue Preference</dt>
+<dd>Measure preference for color.
 </dl>
 
 
@@ -303,7 +307,7 @@ Preference plots:
   calling the command "measure_or_pref", which is defined next.
 <li>To this plot group, add up to one plot per Sheet named
   "Orientation Preference", plotting any SheetView named
-  OrientationPreference in color (as the Hue channel).
+  OrientationPreference, using a color plot (as the Hue channel).
 <li>Add up to one more plot per Sheet, this time plotting the
   Orientation in the Hue channel and the Orientation Selectivity in
   the Confidence channel (so that unselective neurons show up white).

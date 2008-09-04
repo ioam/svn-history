@@ -21,15 +21,19 @@ manually.
   I get errors when loading a saved snapshot.</i>
 
 <P><B>A:</B>
-As of 0.9.4, Topographica saves the state by using Python's pickling
+As of 0.9.5, Topographica saves the state by using Python's pickling
 procedure, which saves <em>everything</em> in the current simulation.
-The disadvantage of this approach is that most changes in the
+The disadvantage of this approach is that changes in the
 definition of any of the classes used (apart from changing parameter
-values or strictly adding code) will cause the reloading to fail.
-Until we have set up an archival storage format, probably based on XML,
-snapshots should be considered temporary. You can, however, email
-the Topographica developers or file a bug report to get help loading
-your snapshot.  
+values or strictly adding code) can cause the reloading to fail.
+Whenever possible, we provide legacy snapshot support that maps from
+the old definition into the new one, and so snapshots <em>should</em>
+continue to be loadable.  However, if you have trouble with a
+particular file, please file a bug report so that we can extend the
+legacy support to be able to load it.  In the long run we plan to set
+up an archival storage format, probably based on XML and/or HDF5, to
+work around these issues.
+  
   
 <!----------------------------------------------------------------------------->
 <LI><B>Q:</B> <i>When I try to save a snapshot of my network, I get
@@ -65,9 +69,11 @@ difference obvious).  So you can either:
 <P>1. Move any classes, functions, etc. that you need from your .ty file
 into somewhere in a .py file that your script then imports.  That's
 usually the best long-term solution, because then anyone can use your
-classes.  However, this approach is not always appropriate, if there
-are very specialized classes or functions in the .ty file that are not
-useful for other people.
+classes.  If there are very specialized classes or functions in the
+.ty file that are not useful for other people, you can consider
+putting it into the contrib/ subdirectory, with a suitably unique
+filename.  However, this approach may not be appropriate if you find
+it easier to develop the functions in one file.
 
 <P>or
 
@@ -78,6 +84,41 @@ etc., and then reloading the saved snapshot should work fine.
 <P>The warning is just telling you that you need to do option 2; if you
 want to suppress the warning entirely you can do option 1.
 </LI>
+
+
+<!----------------------------------------------------------------------------->
+<LI><B>Q:</B> <i>What models or algorithms does Topographica support?</i>
+
+<P><B>A:</B> 
+Topographica is built in a highly modular fashion, and thus it can
+support an effectively infinite number of algorithms with little or no
+change to the underlying code.  For instance, there is no particular
+Topographica component that implements the SOM algorithm -- instead, a
+SOM network like examples/som_retinotopy.ty is simply built from:
+
+<ol>
+<li>An input pattern specified from a large library of possible 
+  <?php classref('topo.base.patterngenerator','PatternGenerator')?>s
+<li>A general-purpose
+  <?php classref('topo.sheet.basic','GeneratorSheet')?> 
+  for presenting input patterns
+<li>A general-purpose weight projection class 
+  <?php classref('topo.base.cf','CFProjection')?> 
+<li>A general-purpose array of units
+  <?php classref('topo.base.cf','CFSheet')?> 
+<li>A specialized transfer function 
+  (<?php classref('topo.outputfn.basic','KernelMax')?>) that picks a
+  winning unit and activates the rest according to a user-specified
+  kernel function.
+</ol>
+
+<P>This approach makes it simple to change specific aspects of a model
+(e.g. the specific kernel function) without necessarly requiring any
+new code, as long as the new function has already been written for any
+previous model.  For this example, only the KernelMax function (about
+50 lines of Python code) was added specifically for supporting SOM;
+the other components are all used in a wide variety of other models.
+<BR><BR>
 
 
 <!----------------------------------------------------------------------------->

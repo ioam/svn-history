@@ -110,7 +110,7 @@ the fundamental neural unit in the simulator is a two-dimensional
 Conceptually, a sheet is a continuous, two-dimensional area (as in
 m4_bib2html_npcite_named(amari:topographic,[[Amari]],roquedasilvafilho:phd92,[[Roque
 da Silva Filho et al. 1992]])), which is typically approximated by a
-finite array of neurons.  Topographica models consist of an
+finite array of individual neurons.  Topographica models consist of an
 interconnected set of such sheets, where each brain region is
 represented by one or more sheets.
 
@@ -134,8 +134,8 @@ complex, as needed for a particular study.
 including lateral connections from the same sheet to itself, and
 recurrent feedback between sheets.  Sheet-to-sheet connections are
 called <i>projections</i>; these typically consist of a large set of
-individual connections between sheets.  For one cell in each sheet in
-the figure, example connections are shown for each projection,
+individual connections between units in each sheet.  For one unit in
+each sheet in the figure, example connections are shown for each projection,
 including lateral projections in V1 and higher areas.  Each circular
 patch of connections is called a <i>connection field</i>, consisting of 
 input connections from a spatially restricted region of a sheet.
@@ -259,7 +259,7 @@ validating models and for generating predictions.
 </table>
 
 The figure at right shows a Topographica 0.9.1 screenshot with
-examples of the visualization types currently supported; the exact
+examples of the visualization types supported in that version; the exact
 contents of each window will vary in other Topographica versions.
 Here the user is studying the behavior of an orientation map in the
 primary visual cortex (V1), using a model similar to the one depicted
@@ -314,4 +314,5 @@ specific objects discussed can be found in the
 <A HREF="../Reference_Manual/">reference manual</A>.
 
 <HR>
+<!-- Why do no citations show up here??? -->
 m4_bib2html_bibliography(topographica)

@@ -98,9 +98,9 @@ align="middle" WIDTH="379" HEIGHT="545">
 </p>
 
 <p> Each neuron is fully connected to the input units, and thus has a
-24x24 array of weights (or 10x10 if you are using the default
-(reduced) density as suggested above).  Initially, the weights are
-uniformly random.
+24x24 array of weights as shown above, or a 10x10 array if using the
+default (reduced) density.  Initially, the weights are uniformly
+random.
 </p>
 
 <p></p>
@@ -147,7 +147,7 @@ and the V1 Y CoG plot shows the preferred Y locations.  The monochrome
 values are scaled so that the neuron with the smallest X preference is
 colored black, and that with the largest is colored white, regardless
 of the absolute preference values (due to Normalization being
-enabled).  Thus the absolute values of the X preferences are not
+enabled).  Thus the absolute values of the X or Y preferences are not
 visible in these plots.  (Without normalization, values below 0.0 are
 cropped to black, so only normalized plots are useful for this
 particular example.)
@@ -158,8 +158,8 @@ is proportional to the X CoG, and the amount of green in the plot is
 proportional to the Y CoG.  Where both X and Y are low, the plot is
 black or very dark, and where both are high the plot is yellow
 (because red and green light together appears yellow).  This provides
-a way to visualize how smoothly both X and Y are mapped, although at
-this stage of training it is not particularly useful.
+a way to visualize how smoothly the combined (X,Y) position is mapped,
+although at this stage of training it is not particularly useful.
 
 <P><li>The behavior of this randomly connected network can be visualized
 by plotting the activation of each neuron, which shows the final
@@ -196,10 +196,10 @@ retina. The <span class='t_item'>V1</span> plot shows the response
 to that input, which for a SOM is initially a large Gaussian-shaped
 blob centered around the maximally responding unit.
 
-<P>To see more detail about what the responses were before SOM's
-neighborhood function forced them into a Gaussian shape, you can look
-at the Projection Activity plot, which shows the feedforward activity
-in V1:
+<P><a name="Projection-activity-plot">To see more detail about what
+the responses were before SOM's neighborhood function forced them into
+a Gaussian shape, you can look at the Projection Activity plot</a>,
+which shows the feedforward activity in V1:
 
 <p class='center'>
 <IMG WIDTH="379" HEIGHT="418" SRC="images/som_projection_activity_000001.png" align="middle" alt="Projection Activity at 0">
@@ -215,7 +215,7 @@ vector to the initial random weight vector is random.
 
 <P><li> If you now hit the <span class='t_item'>Refresh</span> arrow
 on the Update command in the <span class='w_title'>Projection</span>
-window, you'll see that some of the neurons have learned new weight
+window, you'll see that most of the neurons have learned new weight
 patterns based on this input.
 
 <p class='center'>
@@ -225,7 +225,8 @@ align="middle" WIDTH="379" HEIGHT="545">
 
 (You should probably turn on the <span
 class='t_item'>Auto-refresh</span> button so that this plot will stay
-updated for the rest of this session.)  Some of the weights have now
+updated for the rest of this session.)  Some of the weights to each
+neuron have now
 changed due to learning.  In the SOM algorithm, the unit with the
 maximum response (i.e., the minimum Euclidean distance between its
 weight vector and the input pattern) is chosen, and the weights of
@@ -265,8 +266,8 @@ Gravity</span> should result in something like:
 </p>
 
 The X and Y CoG plots are now smooth, but not yet the axis-aligned gradients
-(e.g. left to right) that an optimal topographic mapping would
-have. Similarly, the topographic grid plot:
+(e.g. left to right and bottom to top) that an optimal topographic
+mapping would have. Similarly, the topographic grid plot:
 
 <p class='center'>
 <IMG WIDTH="420" HEIGHT="475" SRC="images/som_grid_005000.png" align="middle" alt="Grid at 100">
@@ -312,9 +313,9 @@ dimension happens to be in the same orientation as the retina, while
 the mapping for the y dimension is flipped so that the neurons along
 the top edge of V1 respond to the bottom edge of the retina.  Nothing
 in the network drives it to have any particular overall orientation or
-mapping apart from aligning to the square shape, and the map can be
-flipped or rotated by 90 degrees along any axis with equivalent
-results.
+mapping apart from aligning to the square shape, and the map may turn
+out to be flipped or rotated by 90 degrees along any axis with
+equivalent results.
 
 <P><LI>Now, re-run the basic simulation by quitting and restarting
 Topographica.  This time, change one of the parameter values, either
@@ -328,7 +329,7 @@ passing <code>-c radius_0=0.1</code> on the command line
 <emph>before</emph> the .ty file.  With such a small learning radius,
 global ordering is unlikely to happen, and one can expect the
 topographic grid not to flatten out (despite local order in patches).
-<br> <br>
+<br>
 
 <P>Similarly, consider changing the initial learning rate from
 <code>0.42</code> to e.g. <code>1.0</code> (e.g. by passing <code>-c

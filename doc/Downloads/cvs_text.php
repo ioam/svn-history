@@ -4,7 +4,8 @@
 version control system used for managing Topographica development.  SVN
 keeps track of every change made to any file, and can reconstruct the
 state of the software from any date and time in the history of
-Topographica development since 2004.  The Topographica SVN repository
+Topographica development since January 2004 (see the ChangeLog.txt
+file for info on each revision).  The Topographica SVN repository
 is hosted by <A HREF="http://sourceforge.net/projects/topographica">
 SourceForge.net</A>.  The essentials for using SVN at SourceForge are
 described below; see the <A

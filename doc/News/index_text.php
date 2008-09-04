@@ -19,8 +19,7 @@
   <div class="i2">- optional XML snapshot
   <A HREF="../Reference_Manual/topo.command.basic-module.html#save_snapshot">saving</A> and
   <A HREF="../Reference_Manual/topo.command.basic-module.html#load_snapshot">loading</A></div>
-
-  <div class="i2">- simpler and more complete support for dynamic parameters</div>
+  <div class="i2">- simpler and more complete support for dynamic parameters</div>  
 <!-- dynamic parameters now update at most once per simulation time<BR> -->
 
   <div class="i2">- updated to Python 2.5 and numpy 1.1.1.</div>
@@ -40,8 +39,9 @@
 <BR>
 <dt>Command-line and batch:</dt>
 <dd>
-  <div class="i2">- simplified example file syntax (see examples/lissom_oo_or.ty and examples/som_retinotopy.py)</div>
-  <div class="i2">- command prompt uses <A HREF="http://ipython.scipy.org/">IPython</A> for better debugging, help</div> 
+  <div class="i2">- simplified example file syntax
+  (see examples/lissom_oo_or.ty and som_retinotopy.py)</div>
+  <div class="i2">- command prompt uses <A HREF="http://ipython.scipy.org/">IPython</A> for better debugging, help</div>
   <div class="i2">- simulation name set automatically from .ty script name by default</div>
   <div class="i2">- command-line options can be called explicitly</div>
   <!-- , e.g.
@@ -51,10 +51,9 @@
 <BR>
 <dt>GUI:</dt>
 <dd>
-  <div class="i2">- model editor fully supports dynamic parameters (described in the lissom_oo_or tutorial)</div>
-  
+  <div class="i2">- model editor fully supports dynamic parameters
+  (described in the lissom_oo_or tutorial)</div>
   <div class="i2">- plot windows can be docked into main window</div>
-
   <div class="i2">- uses tk8.5 for anti-aliased fonts <!--and potential to move to platform-specific themes--></div>
 <!--  cleaned up ParametersFrame and TaggedSlider behavior<BR> -->
 </dd>
@@ -68,7 +67,8 @@
 <dd>
   <div class="i2">- new preference map types (Hue, Direction, Speed)</div>
   <div class="i2">- combined (joint) plots using contour and arrow overlays</div>
-  <div class="i2">- example of generating activity movies (examples/lissom_or_movie.ty)</div>
+  <div class="i2">- example of generating activity movies
+  (examples/lissom_or_movie.ty)</div>
 </dd>
 <BR>
 <dt>Example scripts:</dt>
@@ -82,12 +82,10 @@
 <dt>Component library:</dt>
 <dd>
   <div class="i2">- OutputFns: 
-  <?php classref('topo.outputfn.basic','PoissonSample')?>,
-  <?php classref('topo.outputfn.homeostatic','ScalingOF')?> (for homeostatic plasticity),
- <?php classref('topo.outputfn.basic','NakaRushton')?> (for contrast gain control),
+  <?php classref('topo.outputfn.basic','PoissonSample')?>,<BR>
+  <?php classref('topo.outputfn.basic','ScalingOF')?> (for homeostatic plasticity),<BR>
+  <?php classref('topo.outputfn.basic','NakaRushton')?> (for contrast gain control)<BR>
   <?php classref('topo.outputfn.basic','AttributeTrackingOF')?> (for analyzing or plotting values over time)</div>
-  
-<div class="i2">- Pipeline OutputFns can now be constructed easily using +</div>
 <!-- &nbsp;&nbsp;&nbsp;('x=HalfRectify() ; y=Square() ; z=x+y' gives 'z==PipelineOF(output_fns=x,y)')<BR> -->
 <div class="i2">- PatternGenerator: <?php classref('topo.misc.robotics','CameraImage')?> (for real-time camera inputs)</div>
 <!--  allowed <?php classref('topo.sheet.lissom','LISSOM')?>  normalization to be 
@@ -98,13 +96,13 @@
   <div class="i2">- SheetMasks: <?php classref('topo.base.projection','AndMask')?>,
   <?php classref('topo.base.projection','OrMask')?>,
   <?php classref('topo.base.projection','CompositeSheetMask')?></div>
-
-  <div class="i2">- command: <A HREF="../Reference_Manual/topo.command.analysis-module.html#decode_feature">decode_feature</A> (for estimating perceived values, e.g. for calculating aftereffects)</div>
-
-  <div class="i2">- <?php classref('topo.numbergen','NumberGenerator')?>s
-  can now be combined and modified using arithmetic expressions
-<!-- (e.g. abs(2+UniformRandom()-5) is now a NumberGenerator too).--></div>
+  <div class="i2">- command: <A HREF="../Reference_Manual/topo.command.analysis-module.html#decode_feature">decode_feature</A> (for estimating perceived values)
+  (e.g. for calculating aftereffects)</div>
   <div class="i2">- functions for analyzing V1 complex cells</div>
+  <div class="i2">- <?php classref('topo.base.functionfamily','PipelineOF')?> OutputFns can now be constructed easily using +</div>
+  <div class="i2">- <?php classref('topo.numbergen.basic','NumberGenerator')?>s
+  can now be constructed using +,-,/,*,abs etc.
+<!-- (e.g. abs(2*UniformRandom()-5) is now a NumberGenerator too).--></div>
 <!-- provide stop_updating and restore_updating to allow functions with state to freeze their state<BR> -->
 </dd>
 </font>
@@ -181,8 +179,8 @@ that were written for version 0.9.4.</small> </td></tr>
 <dt>Component library:</dt>
 <dd>
   new
-  <A HREF="../Reference_Manual/topo.coordmapperfns-module.html">
-  coordmapperfns</A> (Grid, Pipeline, Polar/Cartesian)<br>
+  <A HREF="../Reference_Manual/topo.coordmapper-module.html">
+  coordmapper</A>s (Grid, Pipeline, Polar/Cartesian)<br>
   <!-- OutputFnDebugger for keeping track of statistics<br> -->
 </dd>
 </font>
@@ -336,7 +334,7 @@ more library components (e.g. Oja rule, CPCA, covariance),
 <!-- better plot size handling, -->
 <!-- command history buffer, -->
 prototype spiking neuron support, and
-much-improved <A target="_top" href="../User_Manual/modeleditor.html">model editor</A>.
+much-improved <A target="_top" href="../User_Manual/modeleditor.html">model editor</A>.<BR><BR>
 
 <p><b>15 May 2006:</b> New book <A target="_top"
 HREF="http://computationalmaps.org"><i>Computational Maps in the

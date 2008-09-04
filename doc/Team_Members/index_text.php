@@ -5,13 +5,11 @@ the United Kingdom and the United States.  The principal developers are:
   <p><dt><a target="_top" href="http://homepages.inf.ed.ac.uk/jbednar">James
       A. Bednar</a>, Lead author and project manager, 2002 - </dt>
   <dd>Jim is a Lecturer at the University of Edinburgh.  Topographica
-      was inspired by Jim's C++ <a target="_top"
-      href="http://nn.cs.utexas.edu/keyword?lissomsw">LISSOM</a>
-      simulator, but is entirely reimplemented in Python for
-      extensibility and generality.  Jim reviews all code and is the
-      last word on the design and features.
-  <br>
-  <br>
+      was inspired by Jim's C++ 
+      <a target="_top" href="http://nn.cs.utexas.edu/keyword?lissomsw">LISSOM</a>
+      simulator in use from 1995-2004, but has been entirely reimplemented in
+      Python for extensibility and generality.  Jim reviews all code
+      and is the last word on the design and features.  <br> <br>
 
   <p><dt>Jan Antolik, September 2006 - </dt>
   <dd>Jan is working on his PhD thesis about feedback from V2 to V1 at the

@@ -1,4 +1,7 @@
 <h1>Topographica Model Editor</h1>
+<!-- For historical reasons, this file is written in a
+  very different style from the rest, and it should
+  probably be pared down and made more direct. -->
 
 The Model Editor allows you to view, manipulate or create a Topographica
 model. By combining pre-defined components and changing each
@@ -13,11 +16,11 @@ choose the model editor. A new window will appear with a toolbar on
 the left, a view bar at the top and a work area in the middle.
 
 <h2>Viewing a Model</h2>
-<p>In order to understand the behaviour of a model it is often useful
-to know how the model is connected. The model editor can help you with
-this visualisation.
+<p>For an existing model, the model editor allows you to see how the
+components of the model are connected, as well as allowing you to
+change the properties of any component.
 
-<p>Import the model you wish to visualise and then open a model editor
+<p>First load the model you wish to visualise and then open a model editor
 window (as described above). The model editor will automatically
 display the existing model.  The location of each Sheet will typically
 be random initially, but the Sheets can be rearranged using the Move
