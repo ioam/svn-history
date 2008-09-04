@@ -8,31 +8,31 @@ import pdb
 
 from topo import param
 
-import topo.patterns.basic
-import topo.commands.analysis
+import topo.pattern.basic
+import topo.command.analysis
 #from scipy.integrate import dblquad
 #from scipy.optimize.tnc import fmin_tnc
 #from scipy.optimize.optimize import fmin, fmin_powell
 from math import pi, sqrt, exp, pow
 from numpy.oldnumeric import zeros, Float, sum
-from topo.projections.basic import CFProjection
+from topo.projection.basic import CFProjection
 from topo.base.boundingregion import BoundingBox
-from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay
-from topo.patterns.basic import Gaussian,Selector,Null
-from topo.outputfns.basic import HomeostaticMaxEnt,OutputFnWithState
-from topo.sheets.lissom import LISSOM
-from topo.sheets.optimized import NeighborhoodMask_Opt, LISSOM_Opt
+from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay
+from topo.pattern.basic import Gaussian,Selector,Null
+from topo.outputfn.basic import HomeostaticMaxEnt,OutputFnWithState
+from topo.sheet.lissom import LISSOM
+from topo.sheet.optimized import NeighborhoodMask_Opt, LISSOM_Opt
 from topo.plotting.plotfilesaver import * 
-from topo.commands.pylabplots import or_tuning_curve_batch, matrixplot
-from topo.commands.analysis import save_plotgroup, measure_or_tuning_fullfield
-from topo.misc.filepaths import normalize_path,application_path
-from topo.commands.pylabplots import plot_tracked_attributes
+from topo.command.pylabplots import or_tuning_curve_batch, matrixplot
+from topo.command.analysis import save_plotgroup, measure_or_tuning_fullfield
+from topo.misc.filepath import normalize_path,application_path
+from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.parameterclasses import Number, Parameter,Parameter,ClassSelectorParameter,ListParameter
-from topo.base.functionfamilies import CoordinateMapperFn
+from topo.base.functionfamily import CoordinateMapperFn
 from topo.plotting.bitmap import MontageBitmap
 #from topo.misc.trace import ActivityMovie,InMemoryRecorder
 from topo.base.patterngenerator import PatternGenerator,Constant 
-from topo.outputfns.basic import  Sigmoid
+from topo.outputfn.basic import  Sigmoid
 
 import matplotlib 
 matplotlib.use('Agg')
@@ -292,19 +292,19 @@ def divide_with_constant(x,y):
     
 
 def AddGC():
-    from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1,Sigmoid 
-    from topo.projections.basic import CFProjection, SharedWeightCFProjection
+    from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1,Sigmoid 
+    from topo.projection.basic import CFProjection, SharedWeightCFProjection
     from topo.base.boundingregion import BoundingBox
     lgn_surroundg = Gaussian(size=locals().get('LGNLatSurroundSize',0.5),aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 
 
     topo.sim.connect('LGNOn','LGNOn',delay=0.05,dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
-                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',35),
+                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',135),
                     nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOn',
                     weights_generator=lgn_surroundg)
     
     topo.sim.connect('LGNOff','LGNOff',delay=0.05,dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
-                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',35),
+                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',135),
                     nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOff',
                     weights_generator=lgn_surroundg)
     
@@ -339,11 +339,11 @@ def homeostatic_analysis_function():
     
   
     #if __main__.__dict__['cascade'] == True: 
-    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1].output_fns[0], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
-    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1].output_fns[2], 0, topo.sim.time(), filename="V1", ylabel="V1")
+    #plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1].output_fns[0], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
+    #plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1].output_fns[2], 0, topo.sim.time(), filename="V1", ylabel="V1")
     #else:
-    #    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1].output_fns[0], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
-    #    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1].output_fns[3], 0, topo.sim.time(), filename="V1", ylabel="V1")
+    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], 0, topo.sim.time(), filename="Afferent", ylabel="Afferent")
+    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], 0, topo.sim.time(), filename="V1", ylabel="V1")
 
   
     
@@ -740,19 +740,23 @@ class SequenceSelector(PatternGenerator):
                        
         return image_array
     
-def measure_ot(lat_exc,lat_inh):
+def measure_ot(lat_exc,lat_inh,e,t):
     import topo
     topo.sim["V1"].in_connections[2].strength=lat_exc
     topo.sim["V1"].in_connections[3].strength=lat_inh
     
-    import topo.commands.analysis
-    import topo.commands.pylabplots
+    topo.sim["V1"].output_fn.output_fns[1].t = t
+    topo.sim["V1"].output_fn.output_fns[1].e = e
     
-    filename = "E=" + str(lat_exc) + "_I=" + str(lat_inh) 
+    
+    import topo.command.analysis
+    import topo.command.pylabplots
+    
+    filename = "Exc=" + str(lat_exc) + "_Inh=" + str(lat_inh) + "_E=" + str(e) +  "_T="+ str(t) 
      
     topo.commands.analysis.sheet_name="V1"
     topo.commands.analysis.coordinate = [0.0,0.0]
-    topo.commands.analysis.measure_or_tuning_fullfield(num_phase=12,num_orientation=24,frequencies=[2.4],
-                               curve_parameters=[{"contrast":30},{"contrast":60},{"contrast":90}])
+    topo.commands.analysis.measure_or_tuning_fullfield(display=True,num_phase=4,num_orientation=80,frequencies=[2.4],
+                               curve_parameters=[{"contrast":1},{"contrast":5},{"contrast":10},{"contrast":50},{"contrast":90}])
     
-    topo.commands.pylabplots.or_tuning_curve_batch("./GC_with_LGNGC/",filename,pylab.plot,"degrees","V1",[0,0],"orientation")
+    topo.commands.pylabplots.or_tuning_curve_batch("./GC_with_LGNGC_HR/",filename,pylab.plot,"degrees","V1",[0,0],"orientation")
