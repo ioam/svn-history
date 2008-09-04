@@ -1,4 +1,4 @@
-<p><b>03 September 2008:</b> Version 0.9.5 about to be
+<p><b>03 September 2008:</b> Version 0.9.5 
 <A target="_top" href="../Downloads/index.html">released</A>, including:
 <center>
 <table width="100%" cellpadding="5">
