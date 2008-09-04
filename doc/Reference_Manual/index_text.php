@@ -249,8 +249,7 @@ On Linux, building should require nothing more than <code>make -C external pyaud
 <DD>
 You can use the external <code>gnuplot</code> command to generate plots on
 some platforms (at least UNIX, and also probably Mac OS X).  To build
-it on Linux or Mac, first install Numeric (e.g. using
-<code>cvs update -D 2007-04-15 external/Makefile external/Numeric-24.0.tar.gz; make -C external numeric ; cvs update -d -P -A external/Makefile external/Numeric-24.0.tar.gz</code>),
+it on Linux or Mac, first install Numeric (which you can download <A HREF="http://sourceforge.net/project/showfiles.php?group_id=1369&package_id=1351">here</A>),
 and then do <code>make -C external gnuplotpy</code>.  At that point 
 you can e.g. use <code>matrixplot3d_gnuplot()</code> in place of 
 <A href="../User_Manual/commandline.html#gnuplotpy"><code>matrixplot3d()</code></A>

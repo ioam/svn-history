@@ -164,7 +164,7 @@ or <code>.tar.gz</code> archive package from our
 <A HREF="http://sourceforge.net/project/showfiles.php?group_id=53602">downloads</A>
 page, and then unpack it. You will need to do this in a writable
 directory with approximately 500 megabytes of spaces available (as of
-10/2007).
+09/2008).
 
 <H4><A NAME="building-topographica">Building Topographica</A></H4>
 
@@ -185,7 +185,7 @@ have downloaded and extracted Topographica, type
 systems) from within the <code>topographica/</code> directory.  It is
 best to do this as a regular user in the user's own directory, not as
 a root user with special privileges, because Topographica does not
-need any special access to your system.  You will currently (10/2007)
+need any special access to your system.  You will currently (09/2008)
 need to do this on a machine with a functioning DISPLAY, not on a
 remote text-only windowless session, because of build requirements for
 the MatPlotLib library.  (Note that many systems provide xfvb for this
