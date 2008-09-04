@@ -204,6 +204,25 @@ topo.sim.connect('LGNOff','V1Simple',delay=0.05,dest_port=('Activity','JointNorm
                                                 time_constant=locals().get('S_tc',3200)))))
 
 
+simpleLateral  =  locals().get('SL',False)
+if simpleLateral:
+	topo.sim.connect('V1Simple','V1Simple',delay=0.05,name='LateralExcitatoryL4',
+	                 connection_type=CFProjection,strength=locals().get('SxLatExcStr',0.1),
+	                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=locals().get('CxLatExcSize',0.04)),
+	                 nominal_bounds_template=BoundingBox(radius=locals().get('CxLatExcBB',0.04)),
+	                 learning_rate=0.0)
+	
+	topo.sim.connect('V1Simple','V1Simple',delay=0.05,name='LateralInhibitoryL4',
+	                 connection_type=CFProjection,strength=-locals().get('SxLatInhStr',0.1),
+	                 weights_generator=topo.patterns.basic.Composite(operator=numpy.multiply, 
+	                     generators=[Gaussian(aspect_ratio=1.0, size=locals().get('CxLatInhSize',0.22917)),
+	                                topo.patterns.random.UniformRandom()]),
+	                 nominal_bounds_template=BoundingBox(radius=0.22917/2),
+	                 learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
+                               ExponentialDecay(starting_value = locals().get('LatInh_lr',0.3),
+                                                time_constant=locals().get('LatInh_tc',3200)))))
+
+
 #V1 Complex
 
 topo.sim.connect('V1Simple','V1Complex',delay=0.05,
@@ -236,21 +255,21 @@ topo.sim.connect('V1Complex','V1Complex',delay=0.05,name='LateralInhibitory',
                                 topo.pattern.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.22917),
                  learning_rate=(BoundedNumber(bounds=(0.137,None),generator=
-                               ExponentialDecay(starting_value = locals().get('C_lr',0.3),
-                                                time_constant=locals().get('C_tc',3200)))))
+                               ExponentialDecay(starting_value = locals().get('LatInh_lr',0.3),
+                                                time_constant=locals().get('LatInh_tc',3200)))))
 
 OFComplex = "topo.sim['V1Complex'].output_fn"
 OFSimple = "topo.sim['V1Simple'].output_fn"
 
-topo.sim.schedule_command(5000,"secondStage()")
+topo.sim.schedule_command(10000,"secondStage()")
 
 
-topo.sim.schedule_command(10001,OFComplex+".r=4;"+ OFComplex + ".k=-3")
-topo.sim.schedule_command(10001,OFSimple+".k=-10.5;")
+topo.sim.schedule_command(20000,OFComplex+".r=4;"+ OFComplex + ".k=-3")
+topo.sim.schedule_command(20000,OFSimple+".k=-10.5;")
 
 
 def offset_tf():
-	return topo.sim.time()-5000
+	return topo.sim.time()-10000
 
 
 def secondStage():
@@ -277,7 +296,7 @@ def secondStage():
     													  ExponentialDecay(starting_value = __main__.__dict__.get('SSS_lr',0.3)
     													  ,time_fn=offset_tf,time_constant=__main__.__dict__.get('S_tc',3200))))
     topo.sim['V1Complex'].in_connections[0].learning_rate=__main__.__dict__.get('SSC_lr',0.0)
-    topo.sim['V1Simple'].in_connections[0].strength=3
-    topo.sim['V1Simple'].in_connections[1].strength=3
+    topo.sim['V1Simple'].in_connections[0].strength=4
+    topo.sim['V1Simple'].in_connections[1].strength=4
     randomize_V1Simple_relative_LGN_strength()
 
