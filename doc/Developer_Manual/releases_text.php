@@ -82,14 +82,20 @@ svn co $TOPOROOT/trunk/topographica-win topographica-win
 
 <li><P>When the package is ready for release, copy binaries to
     SourceForge using their admin interface, and add a news release
-    and screenshot.
+    and screenshot. The upload command is currently something like
+<code>rsync -avP -e ssh topographica-0.9.5.tar.gz  ceball@frs.sourceforge.net:uploads/</code>
+
 
 <li><P>Build on Windows and make .exe versions, test them, and upload
     them to SourceForge.
 
-<li><P>Tag the files in cvs as being the latest stable version using
-    "make LATEST_STABLE", and update the public web site with this version 
-    using "make sf-web-site".
+<li><P>Tag the files in SVN as being the latest stable version using
+    "make LATEST_STABLE", copy the trunk to svn's releases/ directory
+    using "make tag-release", and update the public web site with this version 
+    using "make sf-web-site". Note that this last step should be run from
+    the copy of Topographica you created for distribution so that no stray
+    files from doc/ are uploaded. Also note that these three commands can
+    be run together with "make svn-release".
 
 <li><P>Notify the other developers that they may once again commit new
     code to the SVN repository.
