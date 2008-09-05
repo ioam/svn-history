@@ -73,9 +73,11 @@ svn co $TOPOROOT/trunk/topographica-win topographica-win
     <li><P>Double-check the generated documentation to ensure that it is
       complete and was generated properly.
       
+<!--CEBALERT: need to make slow-tests' list of scripts only
+include those present in release-->
     <li><P>Compile the source on various platforms, ensuring that there are 
       no errors.  Also perform a self-test on the various platforms
-      ("make tests").
+      ("make tests; make slow-tests"). 
     </ol>
     
 <li><P>If you find problems, go back to step 6 and start over.
