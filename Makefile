@@ -331,6 +331,9 @@ sf-web-site: reference-manual doc
 	rsync -v -arHz -e ssh doc/. topographica.sf.net:/home/groups/t/to/topographica/htdocs/.
 
 
+SCRIPTS_TO_KEEP_IN_DIST= ^cfsom_or.ty ^goodhill_network90.ty ^hierarchical.ty ^leaky_lissom_or.ty ^lissom_fsa.ty ^lissom_oo_or.ty ^lissom_or_movie.ty ^lissom_or.ty ^lissom.ty ^lissom_whisker_barrels.ty ^obermayer_pnas90.ty ^som_retinotopy.ty ^sullivan_neurocomputing04.ty ^sullivan_nn06.ty ^tiny.ty
+
+
 # Clear out everything not intended for the public distribution
 #
 # This is ordinarily commented out in the SVN version for safety, 
@@ -349,9 +352,7 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} -r .svn */.svn */*/.svn */*/*/.svn */*/*/*/.svn
 #@@	   ${CD} topo/tests/reference ; make clean
 #@@	   ${RM} -r doc/buildbot/
-## delete all examples except those listed below
-## CB: how to read in a whole list?
-#@@	   find examples/*.ty -maxdepth 1 ! -name cfsom_or.ty ! -name goodhill_network90.ty ! -name hierarchical.ty ! -name leaky_lissom_or.ty ! -name lissom_fsa.ty ! -name lissom_oo_or.ty ! -name lissom_or_movie.ty ! -name lissom_or.ty ! -name lissom.ty ! -name lissom_whisker_barrels.ty ! -name obermayer_pnas90.ty ! -name som_retinotopy.ty ! -name sullivan_neurocomputing04.ty ! -name sullivan_nn06.ty ! -name tiny.ty -exec rm {} \;
+#@@	   find examples/*.ty -maxdepth 1 ${subst ^,! -name ,${SCRIPTS_TO_KEEP_IN_DIST}} -exec rm {} \;
 
 
 # Make public distribution archive
