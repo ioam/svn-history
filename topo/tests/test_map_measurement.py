@@ -33,6 +33,10 @@ sim_name = 'lissom_oo_or'
 # For or tuning (and possibly others)
 topo.command.analysis.sheet_name = 'V1'
 
+# CEB: tests should store params of commands
+# so we don't have to update data if someone
+# e.g. edits a default value.
+
 plotgroups_to_test = [
     # Several plotgroups are commented out because I was only thinking
     # about map measurement that results in sheet_views stored for V1.
