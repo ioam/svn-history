@@ -165,18 +165,6 @@ class LISSOM(JointNormalizingCFSheet):
             self.simulation.enqueue_event(e)
 
 
-class JointNormalizingCFSheet_Continuous(JointNormalizingCFSheet):
-    """
-    CFSheet that runs continuously, with no 'resting' periods between pattern presentations.
-    Note that learning occurs only when the time is a whole number.
-    """
-    def process_current_time(self):
-        if(float(topo.sim.time()) % 1.0 == 0.0):
-            if (self.plastic):
-                 self.learn()
-        else:
-             self.activate()
-
 class JointScaling(LISSOM):
     """
     LISSOM sheet extended to allow joint auto-scaling of Afferent input projections.
