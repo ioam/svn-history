@@ -15,6 +15,10 @@ from topo.base.cf import CFPResponseFn, CFPRF_Plugin
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 from topo.responsefn.projfn import CFPRF_EuclideanDistance
 
+
+    
+
+    
 class CFPRF_DotProduct_opt(CFPResponseFn):
     """
     Dot-product response function.
@@ -34,22 +38,28 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
         X = input_activity.ravel()
         cfs = iterator.proj._cfs
         mask = iterator.proj.dest.mask.data
-        
+
+        weight_arrays = iterator.proj._weight_arrays
+        slice_arrays = iterator.proj._slice_arrays
+            
         code = """
+
             double *tact = temp_act;
 	    float *wj;
 	    PyArrayObject *array;
-	    
+
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
+                PyObject *weight_arraysr = PyList_GetItem(weight_arrays,r);
+                PyObject *slice_arraysr = PyList_GetItem(slice_arrays,r);
 		for (int l=0; l<cols; ++l) {
                     if((*mask++) == 0.0)
                         *tact = 0;
                     else {
                         PyObject *cf = PyList_GetItem(cfsr,l);
-                        PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
-                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"input_sheet_slice");
-    
+                        PyObject *weights_obj = PyList_GetItem(weight_arraysr,l);
+                        PyObject *slice_obj = PyList_GetItem(slice_arraysr,l);
+                            
                         // This code is optimized for contiguous arrays, which are typical,
                         // but we make it work for noncontiguous arrays (e.g. views) by
                         // creating a contiguous copy if necessary.
@@ -83,11 +93,6 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                         }  
                         *tact = tot*strength;
                         
-    
-                        // Anything obtained with PyObject_GetAttrString must be explicitly freed
-                        Py_DECREF(weights_obj);
-                        Py_DECREF(slice_obj);
-                        
                         if(array != 0)
                             Py_DECREF(array);
                     }
@@ -95,7 +100,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                 }
             }
         """
-	inline(code, ['mask','X', 'strength', 'icols', 'temp_act','cfs','cols','rows'], local_dict=locals())
+	inline(code, ['mask','X', 'strength', 'icols', 'temp_act','cfs','cols','rows','slice_arrays','weight_arrays'], local_dict=locals())
 
 class CFPRF_DotProduct(CFPRF_Plugin):
     """

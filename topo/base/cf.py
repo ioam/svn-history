@@ -84,7 +84,7 @@ class ConnectionField(param.Parameterized):
     # Specifies how to get a submatrix from the source sheet that is aligned
     # properly with this weight matrix.  The information is stored as an
     # array for speed of access from optimized C components.
-    input_sheet_slice = []   
+    input_sheet_slice = []
 
     _has_norm_total = False
     
@@ -659,12 +659,39 @@ class CFProjection(Projection):
             # only, and should disappear one day
             self._cfs = cflist
 
+            self._create_fast_access_to_weights_and_slices()
+
+
         ### JCALERT! We might want to change the default value of the
         ### input value to self.src.activity; but it fails, raising a
         ### type error. It probably has to be clarified why this is
         ### happening
         self.input_buffer = None
         self.activity = array(self.dest.activity)
+
+
+    #####
+    def _create_fast_access_to_weights_and_slices(self):
+    # could make input_sheet_slice and weights be read-only properties
+    # so that they can't be overwritten (easily) - thus guaranteeing
+    # that this code would be a safe optimization
+        _weight_arrays = []
+        _slice_arrays = []
+        
+        for cfs_row in self._cfs:
+            _weight_arrays_row = []
+            _slice_arrays_row = []
+            for cf in cfs_row:
+                _weight_arrays_row.append(cf.weights)
+                _slice_arrays_row.append(cf.input_sheet_slice)
+            _weight_arrays.append(_weight_arrays_row)
+            _slice_arrays.append(_slice_arrays_row)
+            
+        self._weight_arrays = _weight_arrays
+        self._slice_arrays = _slice_arrays
+    #####         
+                
+        
 
     # CEB: have not yet decided proper location for this method
     def create_mask(self,shape,bounds_template,sheet):
@@ -798,6 +825,13 @@ class CFProjection(Projection):
                 cfs[r,c].change_bounds(template=slice_template,
                                         mask=mask_template,
                                         output_fn=output_fn)
+
+        # CEBALERT: would NOT need to call this if CF could simply fill
+        # new values into the slice (in place) rather than replacing
+        # the whole object! Slice cleanup is an urgent to-do item anyway.
+        self._create_fast_access_to_weights_and_slices()
+        # (this also slows down the bounds changes)
+
 
     def change_density(self, new_wt_density):
         """
