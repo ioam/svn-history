@@ -26,10 +26,13 @@ need instead to follow the instructions on building from source.
 <H4>Installation program</H4>
 
 <P>The easiest way to install Topographica is to download and run the
-self-installing
-<a href="https://sourceforge.net/project/platformdownload.php?group_id=53602&sel_platform=6233">.exe</a> file. Once you have done this, you can skip straight to the 
-<A HREF="#running-topographica">Running Topographica</A> instructions
-below.
+self-installing <a
+href="https://sourceforge.net/project/platformdownload.php?group_id=53602&sel_platform=6233">.exe</a>
+file. Once you have done this, you can skip straight to the <A
+HREF="#running-topographica">Running Topographica</A> instructions
+below. (Note that we have not yet produced an installer for the latest
+0.9.5 release of Topographica, but one is coming soon. Meanwhile, you
+can use the 0.9.4 release or try building from source.)
 
 <H4>Build from source</H4>
 
