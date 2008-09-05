@@ -16,9 +16,11 @@
 
   <div class="i2">- simulation can now be locked to real time</div>
 
-  <div class="i2">- optional XML snapshot
+<!--  <div class="i2">- optional XML snapshot
   <A HREF="../Reference_Manual/topo.command.basic-module.html#save_snapshot">saving</A> and
   <A HREF="../Reference_Manual/topo.command.basic-module.html#load_snapshot">loading</A></div>
+-->
+
   <div class="i2">- simpler and more complete support for dynamic parameters</div>  
 <!-- dynamic parameters now update at most once per simulation time<BR> -->
 
