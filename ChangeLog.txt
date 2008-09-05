@@ -1,3 +1,594 @@
+2008-09-04  ceball
+
+	* [r9142] doc/FAQ/index_text.php:
+	  Made OS X's readline instructions more explicit.
+
+	* [r9141] doc/User_Manual:
+	  More to ignore.
+
+	* [r9140] doc/Downloads/index_text.php,
+	  doc/FAQ/index_text.php:
+	  Added section to FAQ for platform-specific questions.
+
+	* [r9139] external/Makefile:
+	  Added target to avoid building tcl, tk, and blt on OS X.
+
+2008-09-04  jbednar
+
+	* [r9138] doc/Home/news_text.php,
+	  doc/News/index_text.php:
+	  Updated release date
+
+	* [r9137] doc/Home/news_text.php,
+	  doc/News/index_text.php:
+	  Declared ready for release
+
+	* [r9136] doc/News/index_text.php,
+	  doc/User_Manual/index_text.php,
+	  doc/User_Manual/noise_text.php:
+	  Added page about noise
+
+	* [r9135] doc/Developer_Manual/coding_text.php,
+	  doc/Developer_Manual/imports_text.php,
+	  doc/Developer_Manual/optimization_text.php,
+	  doc/Developer_Manual/refactoring_text.php,
+	  doc/Developer_Manual/releases_text.php:
+	  Minor edits
+
+	* [r9134] topo/tkgui/projectionpanel.py:
+	  Fixed coordinate display so that it doesn't make the window size
+	  change when dragging sliders
+
+2008-09-04  ceball
+
+	* [r9133] doc/Future_Work/current_text.php:
+	  Updated and cleaned up tasks.
+
+2008-09-04  antolikjan
+
+	* [r9132]
+	  examples/gc_lissom_oo_or_homeostatic_new.ty:
+	  "minor parameter changes"
+
+	* [r9131]
+	  examples/cc_lissom_oo_or_simple_rv.ty:
+	  parameter changes
+
+	* [r9130] contrib/modelfit.py:
+	  "minor input changes"
+
+	* [r9129] contrib/jacommands.py:
+	  "few minor changes"
+
+	* [r9128] topo/tkgui/testpattern.py:
+	  corrected some indentition problems
+
+	* [r9127] topo/sheet/lissom.py:
+	  Added the JointNormalizingCFSheet_Continuous class
+
+	* [r9126] topo/outputfn/basic.py:
+	  Added the HalfRectifyAndPower output function
+
+	* [r9125] topo/learningfn/optimized.py:
+	  
+
+	* [r9124] topo/command/analysis.py:
+	  
+
+2008-09-04  ceball
+
+	* [r9123]
+	  doc/Developer_Manual/revisioncontrol_text.php:
+	  Added more info about using svn.
+
+	* [r9122] doc/Downloads/index_text.php,
+	  doc/Reference_Manual/index_text.php:
+	  Updated some information.
+
+	* [r9121] doc/Downloads,
+	  doc/User_Manual:
+	  More to ignore.
+
+	* [r9120] doc/Downloads/index_text.php,
+	  doc/User_Manual/commandline_text.php,
+	  doc/User_Manual/index_text.php,
+	  doc/User_Manual/scripts_text.php:
+	  Added missing scripts page to User Manual, and updated links to
+	  it.
+
+	* [r9119] doc/images/080903_plotting2_mac.png:
+	  Cropped image.
+
+	* [r9118]
+	  doc/Developer_Manual/releases_text.php:
+	  Updated release procedure.
+
+	* [r9117] Makefile:
+	  Added target to create svn copy of release.
+
+	* [r9116] Makefile:
+	  Restored mistakenly removed log message in make LATEST_STABLE.
+
+	* [r9115] /tags/LATEST_STABLE:
+	  Updating LATEST_STABLE.
+
+	* [r9114] /tags/LATEST_STABLE:
+	  Updating LATEST_STABLE
+
+	* [r9113] Makefile:
+	  Fixed LATEST_STABLE target.
+
+2008-09-04  jbednar
+
+	* [r9112] doc/shared/util.php:
+	  Reorganized menu
+
+	* [r9111] doc/Downloads/cvs_text.php,
+	  doc/FAQ/index_text.php,
+	  doc/Forums/index_text.php,
+	  doc/Links/index_text.php,
+	  doc/News/index_text.php,
+	  doc/Team_Members/index_text.php,
+	  doc/Tutorials/lissom_oo_or_text.php,
+	  doc/Tutorials/som_retinotopy_text.php,
+	  doc/User_Manual/batch_text.php,
+	  doc/User_Manual/introduction_text.php.m4,
+	  doc/User_Manual/modeleditor_text.php,
+	  doc/User_Manual/overview_text.php,
+	  doc/User_Manual/parameters_text.php,
+	  doc/User_Manual/plotting_text.php:
+	  Misc fixes and cleanup
+
+2008-09-03  ceball
+
+	* [r9110] topo/tests/reference/Makefile:
+	  Fixed deletion of directories from reference runs.
+
+	* [r9109] topo/pattern/audio.py,
+	  topo/pattern/basic.py:
+	  Temporarily moved OneDPowerSpectrum(PatternGenerator) from
+	  topo.pattern.basic to topo.pattern.audio because
+	  OneDPowerSpectrum should not yet appear in lists such as those
+	  presented in the GUI.
+
+	* [r9108] doc/Home/news_text.php:
+	  Added Mac screenshot.
+
+	* [r9107] doc/images/080903_plotting2_mac.png:
+	  Added screenshot showing plotting on Mac.
+
+	* [r9106] doc/Home/news_text.php:
+	  Updated screenshot links for 0.9.5.
+
+	* [r9105]
+	  doc/images/080903_modeleditor_fedora.png:
+	  Added screenshot showing model editor.
+
+	* [r9104] doc/images/080903_docking_fedora.png:
+	  Added screenshot showing docking.
+
+	* [r9103]
+	  doc/images/080903_plotting1_fedora.png:
+	  Added new screenshot.
+
+	* [r9102] doc/News/index_text.php,
+	  doc/shared/topo.css:
+	  Added div tags around individual items, and set up the divs to
+	  indent lines after the first one.
+
+	* [r9101] doc/Downloads/update_script_text.php,
+	  doc/News/index_text.php:
+	  Added info about updating old scripts.
+
+	* [r9100] topo/misc/legacy.py:
+	  Added snapshot support for topo.outputfns.homeostatic. Added
+	  demonstration code for supporting old scripts as well as old
+	  snapshots (i.e. for scripts that haven't been/can't be updated).
+
+	* [r9099] etc/update_094_to_095:
+	  Minor changes.
+
+	* [r9098] etc/update_094_to_095:
+	  Added Id string to update script, since Revision didn't seem to
+	  work.
+
+	* [r9097] etc/update_094_to_095:
+	  Moved notes to the end and added Revision string.
+
+	* [r9096] etc/update_094_to_095,
+	  etc/update_094_to_095.py:
+	  Removed .py suffix from update_094_to_095.py
+
+	* [r9095] etc/update_094_to_095.py:
+	  Made renaming script a little friendlier.
+
+	* [r9094] topo/misc/commandline.py:
+	  Added '-l' install legacy support option.
+
+	* [r9093] etc/update_094_to_095.py:
+	  Initial version.
+
+	* [r9092] topo/misc/legacy.py:
+	  Restored full support for non-existent DynamicNumber class. Added
+	  an 'install_legacy_support()' function - currently just a
+	  convenience function for installing snapshot support.
+
+	* [r9091] doc/User_Manual/overview_text.php:
+	  Replaced CFSOM example with SaccadeController.
+
+	* [r9090] Makefile:
+	  Remove contrib/ from release.
+
+	* [r9089] Makefile:
+	  Keep ChangeLog in release.
+
+	* [r9088] doc/User_Manual/overview_text.php:
+	  Replaced example of sensor that isn't currently supported.
+
+	* [r9087] examples/README.txt:
+	  Updated list of examples.
+
+	* [r9086] Makefile:
+	  'make dist' now deletes all examples except those on the list to
+	  include (syntax of command could be improved).
+
+2008-09-03  jbednar
+
+	* [r9085] doc/Team_Members/index_text.php:
+	  Fixed ending date
+
+2008-09-03  ceball
+
+	* [r9084] doc/Team_Members/index_text.php:
+	  Minor alteration to formatting.
+
+	* [r9083] doc/Downloads/index_text.php:
+	  Minor alteration to description around Mac instructions.
+
+2008-09-03  jbednar
+
+	* [r9082] doc/News/index_text.php:
+	  Minor reformatting
+
+	* [r9081] /trunk/topographica-win/common/setup.py,
+	  /trunk/topographica-win/create_installer/topographica.iss:
+	  Updated release number
+
+	* [r9080] Makefile:
+	  Updated release number
+
+	* [r9079] doc/Downloads/index_text.php,
+	  doc/Home/news_text.php,
+	  doc/News/index_text.php:
+	  Minor fixes
+
+	* [r9078] README.txt,
+	  doc/Home/index_text.php,
+	  doc/Team_Members/index_text.php,
+	  doc/User_Manual/about_text.php,
+	  topo/__init__.py:
+	  Updated develop list and copyright dates
+
+2008-09-03  ceball
+
+	* [r9077] doc/User_Manual/overview_text.php:
+	  Minor change.
+
+	* [r9076] Makefile:
+	  More examples to remove (list is probably slightly brutal and
+	  probably omits some that should be removed); we need to change to
+	  a list of examples to keep.
+
+	* [r9075] Makefile:
+	  More to clean when making distribution.
+
+	* [r9074]
+	  doc/Developer_Manual/releases_text.php:
+	  Minor addition.
+
+	* [r9073] topo/tests/reference/Makefile:
+	  Added Makefile to clean out reference test dirs.
+
+2008-09-02  ceball
+
+	* [r9072] topo/numbergen:
+	  Added svn:ignore.
+
+	* [r9071]
+	  doc/Developer_Manual/releases_text.php:
+	  Minor additions to release procedure.
+
+	* [r9070]
+	  doc/Developer_Manual/releases_text.php:
+	  Replaced CVS with SVN.
+
+	* [r9069] doc/Tutorials/lissom_oo_or_text.php:
+	  Cleanup of text recently added to lissom tutorial.
+
+	* [r9068] Makefile,
+	  doc/Downloads/index_text.php,
+	  external/Makefile:
+	  Made important action of osx-tk-patch be applied automatically on
+	  mac (now tcl, tk, and blt are unnecessarily built on mac - but
+	  the manual patch step is now not required).
+
+	* [r9067] Makefile:
+	  Temporarily removed lissom_oo_or_homeostatic simulations from the
+	  list of those to test.
+
+	* [r9066] examples/cfsom_or.ty:
+	  Updated to make better use of namespaces.
+
+	* [r9065] examples/hierarchical.ty:
+	  Removed unused import (numpy).
+
+	* [r9064] examples/som_retinotopy.ty:
+	  Removed unused import (numpy).
+
+	* [r9063] examples/hierarchical.ty:
+	  Updated to make better use of namespaces.
+
+2008-09-02  jbednar
+
+	* [r9062] README.txt:
+	  Minor fixes
+
+2008-09-02  ceball
+
+	* [r9061]
+	  doc/Tutorials/som_retinotopy_text.php:
+	  Commented out reference to obermayer_pnas90 example.
+
+	* [r9060] doc/News/index_text.php:
+	  Commented out link to git instructions because they are not yet
+	  finished, and we can't definitely support git usage yet.
+
+	* [r9059] doc/User_Manual/commandline_text.php:
+	  Updated section about customizing command prompt.
+
+	* [r9058]
+	  doc/Tutorials/som_retinotopy_text.php:
+	  Dealt with ALERT.
+
+	* [r9057] topo/misc/commandline.py:
+	  Fixed erroneous reference to 'self' variable. Removed duplicate
+	  and out-of-date class CommandPrompt. Updated link to IPython
+	  documentation.
+
+	* [r9056] doc/News/index_text.php:
+	  Added model editor's dynamic parameter support + note that it's
+	  described in the tutorial.
+
+	* [r9055] topo/tkgui/testpattern.py:
+	  Added note.
+
+	* [r9054] doc/Tutorials/lissom_oo_or_text.php:
+	  Added section about using the Model Editor to install a pattern
+	  for learning. (Reinstated from c++ lissom.)
+
+	* [r9053] topo/param/tk.py:
+	  Added workaround to GUI to allow it to set a GeneratorSheet's
+	  input_generator.
+
+	* [r9052] topo/param/tk.py:
+	  Fixed bug in GUI: right clicking on a parameter wasn't working
+	  because of a missing 'self' argument (not sure how this error was
+	  introduced...).
+
+	* [r9051] doc/Tutorials/lissom_oo_or_text.php:
+	  Clarified description of 'refresh' button.
+
+	* [r9050]
+	  doc/Developer_Manual/imports_text.php:
+	  Removed ALERT.
+
+	* [r9049] topo/base/simulation.py:
+	  Switched info about mxNumber to gmpy.
+
+	* [r9048] doc/Downloads/index_text.php:
+	  Added info about unsuccessful attempts to get tools required to
+	  build docs on mac.
+
+	* [r9047] doc/Downloads/cvs_text.php:
+	  Changed ALERT to ENHANCEMENT.
+
+	* [r9046] doc/Reference_Manual/index_text.php:
+	  Addressed ALERT: added description of gmpy.
+
+	* [r9045]
+	  doc/Tutorials/som_retinotopy_text.php:
+	  Minor alteration to text.
+
+	* [r9044]
+	  doc/Tutorials/som_retinotopy_text.php:
+	  Minor alterations to text.
+
+2008-09-01  ceball
+
+	* [r9043] doc/Downloads/index_text.php:
+	  Updated comment about mac.
+
+	* [r9042] topo/param/tk.py:
+	  Made AppWindow's status bar have a width equal to the window's
+	  (i.e. stopped it altering the master window's width);
+	  unfortunately, this seems to mean I have to fix its height as
+	  well. Should address SF.net #2087402. Needs testing on non-linux
+	  platforms.
+
+	* [r9041] doc/News/index_text.php:
+	  Altered some commented-out items (including removing some).
+
+2008-09-01  jbednar
+
+	* [r9040] doc/Future_Work/index_text.php:
+	  Reordered and updated big to-do items
+
+	* [r9039] doc/Home/news_text.php,
+	  doc/News/index_text.php:
+	  Updated with recent changes in preparation for 0.9.5 release
+
+2008-09-01  ceball
+
+	* [r9038] doc/Tutorials/lissom_oo_or_text.php:
+	  Minor updates to lissom_oo_or tutorial.
+
+	* [r9037] doc/Downloads/cvs_text.php:
+	  Clarification for Windows/MSYS users.
+
+	* [r9036] doc/Downloads/index_text.php,
+	  doc/User_Manual/commandline_text.php,
+	  doc/User_Manual/index_text.php:
+	  Created a 'running scripts interactively' section in the user
+	  manual (by moving and editing text from the downloads and
+	  commandline pages).
+
+2008-09-01  jbednar
+
+	* [r9035] doc/News/index_text.php:
+	  Minor updates to new features, plus more complete list as a
+	  comment for now
+
+2008-08-28  ceball
+
+	* [r9034] doc/User_Manual/commandline_text.php:
+	  First pass at an 'imports' section.
+
+	* [r9033] topo/command/basic.py:
+	  Corrected reference in a docstring.
+
+	* [r9032] doc/User_Manual/modeleditor_text.php:
+	  Removed out-of-date statement that model editor doesn't support
+	  dynamic numbers.
+
+	* [r9031] doc/User_Manual/commandline_text.php:
+	  Fixed typo.
+
+	* [r9030] topo/base/cf.py:
+	  Corrected CFProjection's 'cleanup' code (CFs could be None).
+
+	* [r9029] doc/FAQ/index_text.php,
+	  doc/User_Manual/commandline_text.php,
+	  examples/hierarchical.ty,
+	  topo/command/basic.py,
+	  topo/tests/testplot.py:
+	  Renamed some missed instances of 'parameterizedobject' to
+	  'parameterized'.
+
+	* [r9028] topo/misc/legacy.py,
+	  topo/pattern/basic.py:
+	  Removed duplicate SineGratingDisk class.
+
+	* [r9027] doc/Future_Work/current_text.php,
+	  topo/base/cf.py,
+	  topo/base/simulation.py:
+	  Fixed memory leak with load_snapshot() (SF.net #2065608).
+
+	* [r9026] doc/Downloads/index_text.php:
+	  Made an explicit 'all platforms' section. Entire text now needs
+	  reviewing for coherence.
+
+2008-08-27  gerasymo
+
+	* [r9025] examples/lissom.ty:
+	  New doc string about further publications that can be replicated
+	  with this file.
+
+2008-08-27  jbednar
+
+	* [r9024] examples/lissom_oo_or.ty:
+	  Allowed command-line overriding of LGN density
+
+	* [r9023] examples/lissom_oo_or.ty,
+	  examples/som_retinotopy.ty:
+	  Updated to reflect new recommended conventions on imports and
+	  file organization
+
+	* [r9022] topo/outputfn/basic.py:
+	  Updated alert.
+
+	* [r9021] topo/sheet/__init__.py,
+	  topo/sheet/basic.py,
+	  topo/sheet/generator.py,
+	  topo/sheet/lissom.py:
+	  Added basic.py and moved the basic Sheet classes into it, for
+	  consistency with other library directories. Also made BoundingBox
+	  available from topo.sheet, because it's required for using
+	  Sheets.
+
+	* [r9020] topo/tests/testcfsom.py:
+	  Added missing import
+
+	* [r9019] topo/misc/numbergenerator.py,
+	  topo/numbergen,
+	  topo/numbergen/__init__.py,
+	  topo/numbergen/basic.py:
+	  Moved NumberGenerator classes into their own directory for
+	  consistency with other library directories
+
+	* [r9018] topo/pattern/random.py:
+	  Added GaussianCloud pattern to simplify initial weights
+
+2008-08-27  gerasymo
+
+	* [r9017]
+	  examples/lissom_oo_or_od_dr_dy_rg_cr.ty:
+	  Results of this file can be obtained from lissom.ty with
+	  dims=['or','od','dr','dy','rg','cr']
+
+	* [r9016]
+	  examples/lissom_oo_or_od_dr_dy_rg_cr.ty:
+	  Right BoundingBox size: 0.27083 instead of 0.25; other trivial
+	  changes.
+
+2008-08-27  jbednar
+
+	* [r9015] examples/som_retinotopy.ty:
+	  Sorted imports
+
+	* [r9014] ChangeLog.txt:
+	  Fixed confusing date
+
+2008-08-27  ceball
+
+	* [r9013] examples/som_retinotopy.ty:
+	  Updated to use namespaces better.
+
+2008-08-26  ceball
+
+	* [r9012] doc/Downloads/cvs_text.php,
+	  doc/Downloads/index_text.php:
+	  First pass at updating and reorganizing Topographica's download
+	  instructions.
+
+2008-08-26  jbednar
+
+	* [r9011] ChangeLog.txt,
+	  Makefile:
+	  Changed svn2cl to work on repository instead of just the trunk,
+	  in order to catch the tags marking releases
+
+2008-08-26  ceball
+
+	* [r9010] topo/command/basic.py:
+	  Added missing close() for file (although I think it makes no
+	  difference in this case because the file should have been closed
+	  anyway when the function ended).
+
+2008-08-26  antolikjan
+
+	* [r9009] contrib/jacommands.py:
+	  
+
+	* [r9008]
+	  examples/gc_lissom_oo_or_homeostatic_new.ty:
+	  
+
+	* [r9007]
+	  examples/gc_lissom_oo_or_homeostatic_new.ty:
+	  
+
+	* [r9006] contrib/jacommands.py:
+	  
 2008-08-25  ceball
 
 	* [r9005] topo/tkgui/editor.py,
