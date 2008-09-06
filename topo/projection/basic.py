@@ -131,8 +131,6 @@ class SharedWeightCFProjection(CFProjection):
         # (see note about cfs and _cfs in ConnectionField.__init__)
         self.cfs = array(cflist)
 
-        self._create_fast_access_to_weights_and_slices()
-
 
     def change_bounds(self, nominal_bounds_template):
         """

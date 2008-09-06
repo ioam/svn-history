@@ -590,6 +590,43 @@ class CFProjection(Projection):
 
     precedence = param.Number(default=0.8)
 
+    #####
+    def __create_fast_access_to_weights_and_slices(self):
+    # could make input_sheet_slice and weights be read-only properties
+    # so that they can't be overwritten (easily) - thus guaranteeing
+    # that this code would be a safe optimization
+        weight_arrays = []
+        slice_arrays = []
+        
+        for cfs_row in self._cfs:
+            weight_arrays_row = []
+            slice_arrays_row = []
+            for cf in cfs_row:
+                weight_arrays_row.append(cf.weights)
+                slice_arrays_row.append(cf.input_sheet_slice)
+            weight_arrays.append(weight_arrays_row)
+            slice_arrays.append(slice_arrays_row)
+            
+        self.__weight_arrays = weight_arrays
+        self.__slice_arrays = slice_arrays
+
+    def _get_weight_arrays(self):
+        try:
+            return self.__weight_arrays
+        except AttributeError:
+            self.__create_fast_access_to_weights_and_slices()
+            return self.__weight_arrays
+
+    def _get_slice_arrays(self):
+        try:
+            return self.__slice_arrays
+        except AttributeError:
+            self.__create_fast_access_to_weights_and_slices()
+            return self.__slice_arrays
+        
+    _weight_arrays = property(_get_weight_arrays)
+    _slice_arrays = property(_get_slice_arrays)
+    #####
 
     def __init__(self,initialize_cfs=True,**params):
         """
@@ -659,7 +696,6 @@ class CFProjection(Projection):
             # only, and should disappear one day
             self._cfs = cflist
 
-            self._create_fast_access_to_weights_and_slices()
 
 
         ### JCALERT! We might want to change the default value of the
@@ -668,29 +704,6 @@ class CFProjection(Projection):
         ### happening
         self.input_buffer = None
         self.activity = array(self.dest.activity)
-
-
-    #####
-    def _create_fast_access_to_weights_and_slices(self):
-    # could make input_sheet_slice and weights be read-only properties
-    # so that they can't be overwritten (easily) - thus guaranteeing
-    # that this code would be a safe optimization
-        _weight_arrays = []
-        _slice_arrays = []
-        
-        for cfs_row in self._cfs:
-            _weight_arrays_row = []
-            _slice_arrays_row = []
-            for cf in cfs_row:
-                _weight_arrays_row.append(cf.weights)
-                _slice_arrays_row.append(cf.input_sheet_slice)
-            _weight_arrays.append(_weight_arrays_row)
-            _slice_arrays.append(_slice_arrays_row)
-            
-        self._weight_arrays = _weight_arrays
-        self._slice_arrays = _slice_arrays
-    #####         
-                
         
 
     # CEB: have not yet decided proper location for this method
@@ -829,8 +842,14 @@ class CFProjection(Projection):
         # CEBALERT: would NOT need to call this if CF could simply fill
         # new values into the slice (in place) rather than replacing
         # the whole object! Slice cleanup is an urgent to-do item anyway.
-        self._create_fast_access_to_weights_and_slices()
-        # (this also slows down the bounds changes)
+        #self._create_fast_access_to_weights_and_slices()
+        del self.__slice_arrays
+
+        # ...And would also not need to call this if CF's change_bounds
+        # altered the array in place (currently it copies the array)
+        del self.__weight_arrays
+        
+        # (these also slow down iteration immediately after the bounds changes)
 
 
     def change_density(self, new_wt_density):
