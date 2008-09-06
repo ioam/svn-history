@@ -592,6 +592,8 @@ class CFProjection(Projection):
 
     #####
     def __create_fast_access_to_weights_and_slices(self):
+    # should probably move all this to the end of the class
+    #
     # could make input_sheet_slice and weights be read-only properties
     # so that they can't be overwritten (easily) - thus guaranteeing
     # that this code would be a safe optimization
@@ -623,9 +625,23 @@ class CFProjection(Projection):
         except AttributeError:
             self.__create_fast_access_to_weights_and_slices()
             return self.__slice_arrays
-        
-    _weight_arrays = property(_get_weight_arrays)
-    _slice_arrays = property(_get_slice_arrays)
+
+    def _del_weight_arrays(self):
+        try:
+            del self.__weight_arrays
+        except AttributeError:
+            pass
+
+    def _del_slice_arrays(self):
+        try:
+            del self.__slice_arrays
+        except AttributeError:
+            pass
+
+    _weight_arrays = property(fget=_get_weight_arrays,
+                              fdel=_del_weight_arrays)
+    _slice_arrays = property(fget=_get_slice_arrays,
+                             fdel=_del_slice_arrays)
     #####
 
     def __init__(self,initialize_cfs=True,**params):
@@ -843,11 +859,11 @@ class CFProjection(Projection):
         # new values into the slice (in place) rather than replacing
         # the whole object! Slice cleanup is an urgent to-do item anyway.
         #self._create_fast_access_to_weights_and_slices()
-        del self.__slice_arrays
+        del self._slice_arrays
 
         # ...And would also not need to call this if CF's change_bounds
         # altered the array in place (currently it copies the array)
-        del self.__weight_arrays
+        del self._weight_arrays
         
         # (these also slow down iteration immediately after the bounds changes)
 
