@@ -43,9 +43,6 @@ from common_control import run_comparisons
 from topo_or_defs import *
 
 BaseN=locals().get("BaseN",24)
-# CB: something's not matching for 48, but this simulation can
-# definitely match at that density (so just a parameter mismatch -
-# will be fixed as generalization progresses...)
 BaseRN=locals().get("BaseRN",24)
 
 locals().update(initialize_variables(BaseRN,BaseN))
