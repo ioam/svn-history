@@ -36,7 +36,7 @@ the United Kingdom and the United States.  The principal developers are:
   <p><dt>Roger Zhao, September 2006 - </dt>
   <dd>Roger is working on his PhD thesis about face aftereffects at the
       University of Edinburgh, and contributes face-related code to
-      Topographica.
+      Topographica. He also helps out with Mac OS X support.
 
 </dl>
 
