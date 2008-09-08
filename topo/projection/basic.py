@@ -55,7 +55,16 @@ class SharedWeightCF(ConnectionField):
 	the CF are implemented as a numpy view into the single master
 	copy of the weights stored in the CF template.
         """
+        ### CEB: see JAHACKALERT below
+        # (Note that x and y should not be specified in the __init__
+        # definition above, and that then these three lines should be
+        # removed. But currently there is no call to super's
+        # __init__.)
+        self.initialized=False
         self.x = x; self.y = y
+        self.initialized=True
+        ### 
+        
         self.input_sheet = input_sheet
 
         self._create_input_sheet_slice(template)
@@ -111,8 +120,8 @@ class SharedWeightCFProjection(CFProjection):
                                                                                  center_col)
 
         self.__sharedcf=self.cf_type(self.src,
-                                     self.center_unitxcenter,
-                                     self.center_unitycenter,
+                                     x=self.center_unitxcenter,
+                                     y=self.center_unitycenter,
                                      template=self.bounds_template,
                                      weights_generator=self.weights_generator,
                                      mask=self.mask_template,
@@ -124,7 +133,8 @@ class SharedWeightCFProjection(CFProjection):
         for y in self.dest.sheet_rows()[::-1]:
             row = []
             for x in self.dest.sheet_cols():
-                cf = SharedWeightCF(scf,self.src,x,y,bounds_template)
+                cf = SharedWeightCF(scf,self.src,x=x,y=y,
+                                    template=bounds_template)
                 row.append(cf)
             cflist.append(row)
         self._cfs = cflist

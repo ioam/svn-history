@@ -63,12 +63,12 @@ class ConnectionField(param.Parameterized):
     including many other ConnectionFields.
     """
 
-    x = param.Number(default=0.0,softbounds=(-1.0,1.0),doc="""
+    x = param.Number(default=0.0,softbounds=(-1.0,1.0),constant=True,doc="""
         The x coordinate of the location of the center of this ConnectionField
         on the input Sheet, e.g. for use when determining where the weight matrix
         lines up with the input Sheet matrix.""")
     
-    y = param.Number(default=0.0,softbounds=(-1.0,1.0),doc="""
+    y = param.Number(default=0.0,softbounds=(-1.0,1.0),constant=True,doc="""
         The y coordinate of the location of the center of this ConnectionField
         on the input Sheet, e.g. for use when determining where the weight matrix
         lines up with the input Sheet matrix.""")
@@ -157,7 +157,7 @@ class ConnectionField(param.Parameterized):
 
 
     # CEBALERT: do something for mask_template=None
-    def __init__(self,input_sheet,x=0.0,y=0.0,template=BoundingBox(radius=0.1),
+    def __init__(self,input_sheet,template=BoundingBox(radius=0.1),
                  weights_generator=patterngenerator.Constant(),mask=None,
                  output_fn=IdentityOF(),**params):
         """
@@ -189,8 +189,6 @@ class ConnectionField(param.Parameterized):
         """
         super(ConnectionField,self).__init__(**params)
         self.input_sheet = input_sheet
-        self.x = x
-        self.y = y
 
         self._create_input_sheet_slice(template)
 
@@ -209,7 +207,7 @@ class ConnectionField(param.Parameterized):
         # CBENHANCEMENT: might want to do something about a size
         # that's specified (right now the size is assumed to be that
         # of the bounds)
-        w = weights_generator(x=x,y=y,bounds=self.bounds,
+        w = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
                               xdensity=input_sheet.xdensity,
                               ydensity=input_sheet.ydensity,
                               mask=self.mask)
@@ -695,7 +693,7 @@ class CFProjection(Projection):
                             of = self.weights_output_fn.single_cf_fn
                         else:
                             of = IdentityOF()
-                        row.append(self.cf_type(self.src,x_cf,y_cf,
+                        row.append(self.cf_type(self.src,x=x_cf,y=y_cf,
                                                 template=slice_template,
                                                 weights_generator=self.weights_generator,
                                                 mask=mask_template, 
