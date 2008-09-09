@@ -47,8 +47,6 @@ locals().update(initialize_variables(BaseRN,BaseN))
 
 # ********************************************************************
 num_eyes=4
-delta=0.083
-beta=0.633
 speed=1.0; blur_scale=2*2.38
 # ********************************************************************
 
@@ -67,7 +65,6 @@ sigma_s = 4*sigma_c
 # radius of LGN afferent connections
 r_L = 4.7*sigma_s
 
-#blur_scale=2*2.33
 
 ## CEBALERT
 from math import ceil
@@ -78,8 +75,8 @@ if RN%2==1:RN+=1
 ##
 
 # CB: need to deal with this more cleanly
-acs/=2.0 # divided by n_aff_inputs
-alpha_input=0.007*acs
+acs/=8.0 # divided by n_aff_inputs
+alpha_input=0.007*acs 
 # ********************************************************************
 
 
@@ -243,8 +240,8 @@ for i in range(num_eyes):
 topo.sim['Primary'] = LISSOM(nominal_density=BaseN,
                              nominal_bounds=BoundingBox(radius=0.5),
                              tsettle=tsettle,
-                             output_fn=PiecewiseLinear(lower_bound=delta,
-                                                       upper_bound=beta),
+                             output_fn=PiecewiseLinear(lower_bound=delta_i,
+                                                       upper_bound=beta_i),
                              precedence=num_eyes+2)
 
 
