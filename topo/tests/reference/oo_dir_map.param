@@ -29,13 +29,13 @@ set RN=BaseRN*area_scale+2*retina_edge_buffer
 
 
 # Define random generators to link all the eyes, and a sign term for the direction
-for i=0  i<inputs_pereye i=i+1  input_define_generator ix${i} "Random RN/2 RN/2" \
+for i=0  i<inputs_pereye i=i+1  input_define_generator ix${i} "Random RN/2 RN/2 Precision 1" \
 "Master cx for all eyes"
 
-for i=0  i<inputs_pereye i=i+1  input_define_generator iy${i} "Random RN/2 RN/2" \
+for i=0  i<inputs_pereye i=i+1  input_define_generator iy${i} "Random RN/2 RN/2 Precision 1" \
 "Master cy for all eyes"
 
-for i=0  i<inputs_pereye i=i+1  input_define_generator it${i} "Random PI/2 PI/2" \
+for i=0  i<inputs_pereye i=i+1  input_define_generator it${i} "Random PI/2 PI/2 Precision 1" \
 "Master theta for all eyes"
 
 input_define_generator sgn "Random 0.0 1.0"  \
