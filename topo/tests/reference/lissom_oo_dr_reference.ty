@@ -12,11 +12,9 @@ __version__='$Revision: 5436 $'
 
 
 import copy
-import fixedpoint
 import numpy.oldnumeric as Numeric
 
 from math import pi, sqrt
-from fixedpoint import FixedPoint
 
 from topo import param
 
@@ -90,13 +88,6 @@ initialize_clissom_data(name,inh_rad=inh_rad,rf_radius=rf_radius,
 
 #######################
 
-
-
-
-# Number of decimal places for simulator time
-fixedpoint.DEFAULT_PRECISION=3
-from fixedpoint import FixedPoint
-topo.sim.set_time_type(FixedPoint,3)
 
 # input generation params
 GeneratorSheet.nominal_density = BaseRN*area_scale
@@ -277,32 +268,32 @@ off_weights = topo.pattern.basic.Composite(
 
 for i in range(num_eyes):
     
-    topo.sim.connect('Eye%s'%i,'Ganglia%s0'%i,delay=FixedPoint("0.05"),
+    topo.sim.connect('Eye%s'%i,'Ganglia%s0'%i,delay=0.05,
                      connection_type=SharedWeightCFProjection,strength=1.0,
                      nominal_bounds_template=lgn_weight_bounds,
                      weights_generator=on_weights,name="Afferent%s0"%i)
 
-    topo.sim.connect('Eye%s'%i,'Ganglia%s1'%i,delay = FixedPoint("0.05"),
+    topo.sim.connect('Eye%s'%i,'Ganglia%s1'%i,delay =0.05,
                      connection_type=SharedWeightCFProjection,strength=1.0,
                      nominal_bounds_template=lgn_weight_bounds,
                      weights_generator=off_weights,name="Afferent%s0"%i)
 
-    topo.sim.connect('Ganglia%s0'%i,'Primary',delay=FixedPoint("0.05"),
+    topo.sim.connect('Ganglia%s0'%i,'Primary',delay=0.05,
                      dest_port=('Activity','JointNormalize', 'Afferent'),
                      connection_type=CFProjection,strength=1.0,name='Afferent%s0'%i,
                      nominal_bounds_template=afferent_weight_bounds)
 
-    topo.sim.connect('Ganglia%s1'%i,'Primary',delay=FixedPoint("0.05"),
+    topo.sim.connect('Ganglia%s1'%i,'Primary',delay=0.05,
                      dest_port=('Activity','JointNormalize', 'Afferent'),
                      connection_type=CFProjection,strength=1.0,name='Afferent%s1'%i,
                      nominal_bounds_template=afferent_weight_bounds)
 
 
-topo.sim.connect('Primary','Primary',delay=FixedPoint("0.05"),
+topo.sim.connect('Primary','Primary',delay=0.05,
                  connection_type=CFProjection,strength=0.9,name='LateralExcitatory',
                  nominal_bounds_template=excitatory_weight_bounds)
             
-topo.sim.connect('Primary','Primary',delay=FixedPoint("0.05"),
+topo.sim.connect('Primary','Primary',delay=0.05,
                  connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
                  nominal_bounds_template=inhibitory_weight_bounds)
 
