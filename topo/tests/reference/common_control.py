@@ -120,7 +120,10 @@ def run_comparisons(l):
     topo.sim.run(95) #100
     check()
 
-    topo.sim.run(100) #200 *
+    topo.sim.run(98) #198 
+    check() 
+
+    topo.sim.run(2) #200 *
     check() 
 
     topo.sim.run(150) #350

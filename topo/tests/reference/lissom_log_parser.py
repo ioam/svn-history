@@ -28,7 +28,9 @@ def dprint(txt,d=True):
 
 
 
-def get_input_params():
+precision = 1
+
+def get_input_params(old_compat=False):
     """
 
     Return iterators over list of float values for C++ LISSOM's cx,
@@ -60,13 +62,19 @@ def get_input_params():
         for eye,i in zip(eyes,range(n_eyes)):
 
             # e.g. eye='1 [Obj0 cx:-0.2 cy:13.8 theta:011.7]]  ['
-            cx,cy,theta =[float(W.split(":")[1].split("]")[0])
+            cx,cy,theta =[W.split(":")[1].split("]")[0]
                           for W in eye.split(" ")[2:5]]
             
-            input_params[i]['cx'].append(cx)
-            input_params[i]['cy'].append(cy)
-            input_params[i]['theta'].append(theta)
+            if not old_compat:
+                for X in ['cx','cy','theta']:
+                    input_params[i][X].append(round(float(locals()[X]),1))
+            else: # old compat: log file with degrees etc
+                input_params[i]['cx'].append(float(cx))
+                input_params[i]['cy'].append(float(cy))
+                input_params[i]['theta'].append(float(theta))
 
+            del cx; del cy; del theta 
+                
             
         if len(eyes)>1: # CeBALERLT: not general (assuming motion just because more than 1 eye)
 
@@ -76,23 +84,24 @@ def get_input_params():
             X2=complex(input_params[len(eyes)-1]['cx'][lineno],
                        input_params[len(eyes)-1]['cy'][lineno])
 
-            realdir=180*arg(X2-X1)/pi
+            realdir=arg(X2-X1)
 
-            # for 0<=realdir<360 (instead of -180<=realdir<180)
-            if realdir<0:realdir+=360
+            # for 0<=realdir<2pi (instead of -pi<=realdir<pi)
+            if realdir<0:realdir+=2*pi
 
-            topo_dir = theta+90 # dir that will be given to topographica
+            topo_dir = input_params[0]['theta'][lineno]+pi/2 # dir that will be given to topographica
 
             # if realdir & topo_dir aren't the same, it's because
-            # c lissom used sign=-1 (& the dirs will be 180 apart)
+            # c lissom used sign=-1 (& the dirs will be pi apart)
             
-            E=3 # (imprecision from getting dir from 1-dp positions)
+            E=0.05 # (imprecision from getting dir from 1-dp positions)
             if abs(realdir-topo_dir)<E:
                 s=1
-            elif 180-E<=abs(realdir-topo_dir)<180+E:
+            elif pi-E<=abs(realdir-topo_dir)<pi+E:
                 s=-1
             else:
-                assert False
+                assert False # if using speed=0, just replace this line with s=0
+                # CEBALERT: should actually handle that case!
             #####
 
             for i in range(n_eyes):
@@ -337,7 +346,9 @@ def _clissomcmd(name):
 
     cmd+=training_check(95) #100
 
-    cmd+=training_check(100) #200
+    cmd+=training_check(98) #198
+
+    cmd+=training_check(2) #200
 
     cmd+=training_check(150) #350
 

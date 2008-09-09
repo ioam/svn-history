@@ -1,4 +1,15 @@
 """
+CEB: this file will be removed - right now it exists as a handy
+monitor for buildbot (since some of the various combinations of
+densities fail for e.g. make oo_or_comparisons, buildbot's failure
+warning is currently useless for that test).
+
+The version of c++ lissom currently included in Topographica cannot be
+used to regenerate these results - you'd need to use a lissom binary
+from before we fixed Precision.
+
+---
+
 LISSOM simulation designed to match C++ LISSOM's oo_or_map_topo
 simulation.
 
@@ -48,9 +59,6 @@ $Id: lissom_oo_or_reference.ty 8319 2008-04-05 05:38:39Z ceball $
 """
 __version__='$Revision: 8319 $'
 
-
-### This file will be deleted and data will be checked in for the
-### new version
 
 
 ## from topo.param import Parameterized
@@ -154,7 +162,7 @@ GeneratorSheet.period = 1.0
 GeneratorSheet.phase=0.05
 
 # take the input pattern position parameters from the log file output of the equivalent c++ simulation
-n_inputs,input_params = get_input_params()
+n_inputs,input_params = get_input_params(old_compat=True)
 
 print "Number of patterns available for learning iterations:",n_inputs
 

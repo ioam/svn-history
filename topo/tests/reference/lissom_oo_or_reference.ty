@@ -113,7 +113,7 @@ input_pattern = topo.pattern.basic.Gaussian(
     aspect_ratio= gaussian_width/gaussian_height,
     x=lambda : input_params[0]['cx'].next()/BaseRN - 0.5*LN/BaseRN,
     y=lambda : input_params[0]['cy'].next()/BaseRN - 0.5*LN/BaseRN,
-    orientation=lambda : round(2*pi*input_params[0]['theta'].next()/360.0,1))
+    orientation=lambda : input_params[0]['theta'].next())
 
 retina_bounds = BoundingBox(radius=0.5*RN/(BaseRN*area_scale))
 lgn_bounds = BoundingBox(radius=0.5*LN/(BaseLN*area_scale))
