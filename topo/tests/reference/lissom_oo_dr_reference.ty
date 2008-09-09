@@ -18,7 +18,7 @@ import numpy.oldnumeric as Numeric
 from math import pi, sqrt
 from fixedpoint import FixedPoint
 
-from .. import param
+from topo import param
 
 import topo.pattern.basic
 
