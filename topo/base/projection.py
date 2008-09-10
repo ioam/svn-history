@@ -333,9 +333,9 @@ class ProjectionSheet(Sheet):
     is the identity function.
     """
 
-    src_ports=['Activity']
-    
     dest_ports=['Activity']
+    
+    src_ports=['Activity']
     
     output_fn = param.ClassSelector(OutputFn,default=IdentityOF(),
         doc="Output function to apply (if apply_output_fn is true) to this Sheet's activity.")

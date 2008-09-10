@@ -97,10 +97,10 @@ class EventProcessor(param.Parameterized):
     """
     __abstract = True
 
-    src_ports=[None]
-    
     dest_ports=[None]
 
+    src_ports=[None]
+    
 
     def __init__(self,**params):
         """
