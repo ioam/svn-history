@@ -30,6 +30,31 @@ from topo.misc.util import NxN
 from topo.outputfn.basic import PiecewiseLinear
 
 
+
+class ActivityCopy(Sheet):
+    """
+    Copies incoming Activity patterns to its activity matrix and output port.
+
+    Trivial Sheet class that is useful primarily as a placeholder for
+    data that is computed elsewhere but that you want to appear as a
+    Sheet, e.g. when wrapping an external simulation.
+    """
+
+    dest_ports=['Activity']
+    src_ports=['Activity']
+    
+    def input_event(self,conn,data):
+        self.input_data=data
+
+    def process_current_time(self):
+        if hasattr(self, 'input_data'):
+            self.activity*=0
+            self.activity+=self.input_data
+            self.send_output(src_port='Activity',data=self.activity)
+            del self.input_data
+
+
+
 # JLALERT: This sheet should have override_plasticity_state/restore_plasticity_state
 # functions that call override_plasticity_state/restore_plasticty_state on the
 # sheet output_fn and input_generator output_fn.
