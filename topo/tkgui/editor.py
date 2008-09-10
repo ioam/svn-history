@@ -22,7 +22,7 @@ from tkFileDialog import asksaveasfilename
 from Tile import Combobox
 
 from .. import param
-from ..param import tk
+from ..param import tk,parameterized
 
 import topo
 from topo.command.analysis import update_activity
@@ -538,15 +538,17 @@ class EditorCanvas(Canvas):
 
 
 
-# CEBALERT: Should be a TkParameterized or something
-class ModelEditor(object):
+# JABALERT: I made this into parameterized.Parameterized to make self.warning work,
+# but it should be changed to a PlotGroupPanel eventually
+class ModelEditor(parameterized.Parameterized):
     """
     This class constructs the main editor window. It uses a instance
     of GUICanvas as the main editing canvas and inserts the
     three-option toolbar in a Frame along the left side of the window.
     """
 
-    def __init__(self,master):
+    def __init__(self,master,**params):
+        parameterized.Parameterized.__init__(self,**params)
         
         # create editor window and set title
         root = tk.AppWindow(master)
@@ -614,20 +616,21 @@ class ModelEditor(object):
                 if self.next_x > canvas_region[2]:
                     self.next_x = self.xstart + 15
                     self.next_y = self.ystart + 15
-                    
+
             editor_node = EditorSheet(self.canvas, node, (x, y), node.name)
+                
             node.layout_location=(x,y)
             self.canvas.add_object(editor_node)
 
         # create the editor covers for the connections
         
         for editor_node in self.canvas.object_list:
-            for con in editor_node.sheet.out_connections:
+            for con in editor_node.simobj.out_connections:
                 # create cover for a projection
                 editor_connection = EditorProjection("", self.canvas, editor_node)
                 # find the EditorNode that the proj connects to
                 for dest in self.canvas.object_list:
-                    if (dest.sheet == con.dest):
+                    if (dest.simobj == con.dest):
                         # connect the connection to the destination node
                         editor_connection.connect(dest, con)
                         break
@@ -803,18 +806,18 @@ class NodeTool(Frame):
         # pass the class name (set by ParametersFrameWithApply) here.
         # Same goes for projections. (i.e. Allow people to set the name
         # for a new sheet or projection.)
-        sheet_name=self.sheet_list[self.current_option].name
+        name=self.sheet_list[self.current_option].name
         # Instead, should have a popup that asks for the name.
 
-        if sheet_name:
-            sheet = self.sheet_list[self.current_option](name=sheet_name)
+        if name:
+            simobj = self.sheet_list[self.current_option](name=name)
         else:
-            sheet = self.sheet_list[self.current_option]()
+            simobj = self.sheet_list[self.current_option]()
             
         sim = self.canvas.simulation # get the current simulation
-        sim[sheet.name] = sheet
-        # create the cover for the sheet and return it.
-        return EditorSheet(self.canvas, sheet, (x, y), sheet.name)
+        sim[simobj.name] = simobj
+        # create the cover for the simobj and return it.
+        return EditorSheet(self.canvas, simobj, (x, y), simobj.name)
 
 
     #   Util Methods
@@ -889,8 +892,8 @@ class ConnectionTool(Frame):
         if self.parameter_tool.focus:
             self.parameter_tool.update_parameters()
         sim = self.canvas.simulation
-        from_node = editor_connection.from_node.sheet
-        to_node = node.sheet
+        from_node = editor_connection.from_node.simobj
+        to_node = node.simobj
         con_type = self.proj_list[self.current_option]
         con_name = con_type.name
         # CEBHACKALERT: see alert about sheet name
@@ -1004,8 +1007,8 @@ class EditorObject(object):
         ### JABALERT: Should be expanded to allow a per-object description,
         ### and should be bound to the actual editor object as well.
         return self.name + " is of type " + \
-               shortclassname(self.parameterized_obj) + \
-               ":\n\n" + str(getdoc(self.parameterized_obj))
+               shortclassname(self.simobj) + \
+               ":\n\n" + str(getdoc(self.simobj))
 
     def show_properties(self):
         "Show parameters frame for object."
@@ -1060,14 +1063,14 @@ class EditorNode(EditorObject):
     attributes. 
     """
 
-    def __init__(self, canvas, pos, name):
+    def __init__(self, canvas, simobj, pos, name):
         EditorObject.__init__(self, name, canvas)
         self.from_connections = [] # connections from this node
         self.to_connections = [] # connections to this node
         self.x = pos[0] # set the x and y coords of the centre of this node
         self.y = pos[1]
         self.mode = canvas.display_mode
-
+        self.simobj = simobj
 
     #   Connection methods
 
@@ -1105,7 +1108,7 @@ class EditorNode(EditorObject):
 
     def show_properties(self):
         EditorObject.show_properties(self)
-        self.parameter_frame.set_PO(self.sheet)
+        self.parameter_frame.set_PO(self.simobj)
         Label(self.parameter_window, text = '\n\nConnections').pack(side = TOP)
         connections = list(set(self.to_connections).union(set(self.from_connections)))
         connection_list = [con.name for con in connections]
@@ -1141,16 +1144,9 @@ class EditorSheet(EditorNode):
     view = param.Enumeration(default='activity',
                        available=['normal','activity'])
     
-    def __init__(self, canvas, sheet, pos, name):
-        EditorNode.__init__(self, canvas, pos, name)
-        # CEBALERT: couldn't the object be stored in something like
-        # self.parameterized_object rather than specifically
-        # self.sheet or self.connection? I've added a copy but 'sheet'
-        # needs to be replaced (here and in other classes).
-        self.sheet = sheet # the topo sheet that this object represents
-        self.parameterized_obj = self.sheet
-        
-        sheet.layout_location = (self.x,self.y) # store the ed coords in the topo sheet
+    def __init__(self, canvas, simobj, pos, name):
+        EditorNode.__init__(self, canvas, simobj, pos, name)
+        simobj.layout_location = (self.x,self.y) # store the ed coords in the topo sheet
         self.element_count = self.matrix_element_count()
         self.set_bounds()
 
@@ -1200,9 +1196,9 @@ class EditorSheet(EditorNode):
                 colour = ''
                 x, y = self.x - w + h, self.y - h
                 # AL, the idea will be to allow any available plots to be shown on the sheet.
-                # eg m = self.sheet.sheet_views['OrientationPreference'].view()[0]
+                # eg m = self.simobj.sheet_views['OrientationPreference'].view()[0]
                 update_activity()
-                m = self.sheet.sheet_views['Activity'].view()[0]
+                m = self.simobj.sheet_views['Activity'].view()[0]
                 if self.normalize == True:
                     m = self.normalize_plot(m)
                 matrix_width, matrix_height = self.element_count
@@ -1304,14 +1300,14 @@ class EditorSheet(EditorNode):
             self.canvas.delete(id)
         self.canvas.delete(self.label)
         self.canvas.remove_object(self) # remove from canvas' object list
-        del topo.sim[self.sheet.name] # actually delete the sheet
+        del topo.sim[self.simobj.name] # actually delete the sheet
 
     def move(self, x, y):
         # the connections position is updated
         old = self.x, self.y
         self.x = x
         self.y = y
-        self.sheet.layout_location = (self.x,self.y) # update topo sheet position
+        self.simobj.layout_location = (self.x,self.y) # update topo sheet position
         self.draw(self.x - old[0], self.y - old[1])
 
 
@@ -1374,18 +1370,18 @@ class EditorSheet(EditorNode):
 
     def matrix_element_count(self):
         # returns the length and width of the matrix that holds this sheet's plot values
-        l,b,r,t = self.sheet.bounds.aarect().lbrt()
-        density = self.sheet.xdensity
+        l,b,r,t = self.simobj.bounds.aarect().lbrt()
+        density = self.simobj.xdensity
         return int(density * (r - l)), int(density * (t - b))
     
     def set_bounds(self):
         # Use the default sheet bounds as to set the "normal" size
         # of SheetObject in the GUI, so simulations using very large
         # sheets still look normal.
-        dl,db,dr,dt = self.sheet.__class__.nominal_bounds.aarect().lbrt()
+        dl,db,dr,dt = self.simobj.__class__.nominal_bounds.aarect().lbrt()
         width_fact = 120.0 / (dr - dl) 
         height_fact = 60.0 / (dt - db)
-        l,b,r,t = self.sheet.bounds.aarect().lbrt()
+        l,b,r,t = self.simobj.bounds.aarect().lbrt()
         self.width = width_fact * (r - l) * self.canvas.scaling_factor
         self.height = height_fact * (t - b) * self.canvas.scaling_factor
 
@@ -1449,9 +1445,7 @@ class EditorConnection(EditorObject):
         self.draw()
 
     def connect(self, to_node, con) : # pass the node this connection is to
-        self.connection = con # store the topo connection this object represents
-        # CEBALERT: see earlier alert about sheet attribute name
-        self.parameterized_obj = self.connection
+        self.simobj = con
         if (self.name == ""):
             self.name = con.name
         self.to_node = to_node # store a reference to the node this is connected to
@@ -1465,15 +1459,15 @@ class EditorConnection(EditorObject):
         # removal code, so presumably projections do get removed from
         # the screen. But I'm confused about what is treated as a
         # connection, and what as a projection in the model editor).
-        if hasattr(self,'connection'):
-            self.connection.remove()
+        if hasattr(self,'simobj'):
+            self.simobj.remove()
 
 
     #   Util methods
     
     def show_properties(self):
         EditorObject.show_properties(self)
-        self.parameter_frame.set_PO(self.connection)
+        self.parameter_frame.set_PO(self.simobj)
 
 class EditorProjection(EditorConnection):
 
@@ -1696,10 +1690,10 @@ class EditorProjection(EditorConnection):
             return (factor * self.normal_radius, factor * self.normal_radius * 
                 self.from_node.height / self.from_node.width)
         node = self.from_node
-        node_bounds = node.sheet.bounds.aarect().lbrt()
+        node_bounds = node.simobj.bounds.aarect().lbrt()
 
         try:
-            bounds = self.connection.bounds_template.lbrt()
+            bounds = self.simobj.bounds_template.lbrt()
         except AttributeError:
             return (factor * self.normal_radius, factor * self.normal_radius * 
                 self.from_node.height / self.from_node.width)
