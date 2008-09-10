@@ -15,13 +15,7 @@ __version__='$Revision$'
 
 from math import pi
 
-from topo import learningfn
-from topo import numbergen
-from topo import outputfn
-from topo import pattern
-from topo import projection
-from topo import responsefn
-from topo import sheet
+from topo import learningfn,numbergen,outputfn,pattern,projection,responsefn,sheet
 
 import topo.learningfn.projfn
 import topo.responsefn.optimized
