@@ -580,13 +580,14 @@ def species_analysis_function():
     development.
 
     """
+
     import topo
     import copy
     from topo.command.analysis import save_plotgroup, PatternPresenter, update_activity
     from topo.base.projection import ProjectionSheet
     from topo.sheet.generator import GeneratorSheet
     from topo.pattern.basic import Gaussian, SineGrating
-    from topo.command.basic import pattern_present, wipe_out_activity
+    from topo.command.basic import pattern_present, wipe_out_activity, save_snapshot
     from topo.base.simulation import EPConnectionEvent
 
 
@@ -632,6 +633,8 @@ def species_analysis_function():
     
     save_plotgroup("Orientation Preference")
 
+    save_plotgroup("Retinotopy")
+
     #Restore original values
     topo.sim["V1"].state_pop()
     topo.sim["V1"].output_fn.state_pop()
@@ -655,49 +658,43 @@ def species_analysis_function():
     plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], 0,
                             topo.sim.time(), filename="LatInBefore", ylabel="LatInBefore")
 
+    save_snapshot()
 
 
-#Function for plotting LGN out connections to V1
-
-class CFPOF_Jitter(CFPOutputFn):
+       
+def plot_out_connections(cfprojection_name, units):
     """
-    Applies the specified single_cf_fn to each CF in the CFProjection
-    for which the mask is nonzero.
     """
-    single_cf_fn = ClassSelectorParameter(OutputFn,default=IdentityOF(),
-                                          doc="Accepts an OutputFn that will be applied to each CF individually.")
+    from topo.command.pylabplots import matrixplot
+
+    proj=topo.sim["V1"].projections()[cfprojection_name]
+
+    iterator=MaskedCFIter(proj)
     
-    def __call__(self, iterator, mask, **params):
-        """
-        Apply the single_cf_fn to each CF for which the mask is nonzero.
-        """
-        row, col = iterator.proj.src.shape
-        
-        
-        lgn_cf={}
-        for x in range(row):
-            lgn_cf[x]={}
-            for y in range(col):
-                lgn_cf[x][y]={}
-                lgn_cf[x][y]=zeros(iterator.proj.dest.shape)
-                
+    row, col = iterator.proj.src.shape
+    
+    
+    lgn_cf={}
+    for x in range(row):
+        lgn_cf[x]={}
+        for y in range(col):
+            lgn_cf[x][y]={}
+            lgn_cf[x][y]=zeros(iterator.proj.dest.shape)
+            
         for x in range(row):
             for y in range(col):
                 for cf,v1x,v1y in iterator():
-                    if (mask[v1x][v1y] != 0):
-                        r1,r2,c1,c2= cf.input_sheet_slice
-                        rx=range(r1, r2)
-                        ry=range(c1, c2)
-                        if x in rx:
-                            if y in ry:
-                                indx = rx.index(x)
-                                indy = ry.index(y)
-                                
-                                lgn_cf[x][y][v1x][v1y] += cf.weights[indx][indy]
-                                
+                    #if (mask[v1x][v1y] != 0):
+                    r1,r2,c1,c2= cf.input_sheet_slice
+                    rx=range(r1, r2)
+                    ry=range(c1, c2)
+                    if x in rx:
+                        if y in ry:
+                            indx = rx.index(x)
+                            indy = ry.index(y)
+                            
+                            lgn_cf[x][y][v1x][v1y] += cf.weights[indx][indy]
+                            
 
-        topo.command.pylabplots.matrixplot(lgn_cf[24][24])
-        topo.command.pylabplots.matrixplot(lgn_cf[11][11])
-        topo.command.pylabplots.matrixplot(lgn_cf[36][36])
-        topo.command.pylabplots.matrixplot(lgn_cf[11][36])
-       
+        for unit in units: 
+            matrixplot(lgn_cf[unit[0]][unit[1]])
