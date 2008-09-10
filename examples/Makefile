@@ -10,22 +10,16 @@ all_long: lissom_oo_or_10000.typ som_retinotopy_40000.typ lissom_or_10000.typ li
 saved-examples: lissom_oo_or_10000.typ
 
 # Allow extra arguments to be passed to the Topographica command line
-TOPOCMD=
+TOPOCMD= -a
 
 # Define typical commands used in the examples
-SNAPSHOT = -c "from topo.commands.basic import save_snapshot ; save_snapshot"
+SNAPSHOT = -c "save_snapshot"
 
-OR_ANALYSIS = -c "from topo.commands.analysis import measure_or_pref,measure_position_pref,measure_cog,measure_or_tuning_fullfield; \
-measure_or_pref(); \
-measure_cog(); \
-"
+OR_ANALYSIS = -c "measure_or_pref(); measure_cog()"
 #measure_or_tuning_fullfield(); \
 #measure_position_pref(); \
 
-RETINOTOPY_ANALYSIS = -c "from topo.commands.analysis import measure_position_pref,measure_cog ;\
-measure_position_pref(); \
-measure_cog(); \
-"
+RETINOTOPY_ANALYSIS = -c "measure_position_pref(); measure_cog()"
 
 tests: test_running
 
