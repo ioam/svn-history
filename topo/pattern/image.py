@@ -344,7 +344,7 @@ class GenericImage(PatternGenerator):
         """
         state = super(GenericImage,self).__getstate__()
 
-        if '_image' in state:
+        if '_image' in state and state['_image'] is not None:
             import StringIO
             f = StringIO.StringIO()
             image = state['_image']
