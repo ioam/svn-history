@@ -64,7 +64,7 @@ replacements = [
     ('topo.projections'              , 'topo.projection'),
     ('topo.sheets'                   , 'topo.sheet'),
     ('topo.eps'                      , 'topo.ep'),
-    ('topo.coordmapperfns'           , 'topo.coordmapperfn'),
+    ('topo.coordmapperfns'           , 'topo.coordmapper'),
     ('topo.learningfns'              , 'topo.learningfn'),
     ('topo.outputfns'                , 'topo.outputfn'),
     ('topo.responsefns'              , 'topo.responsefn'),
