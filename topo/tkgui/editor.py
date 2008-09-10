@@ -33,6 +33,7 @@ from topo.misc.filepath import normalize_path
 import topo.sheet
 from topo.sheet import *
 from topo.base.sheet import Sheet
+from topo.base.simulation import EventProcessor
 
 # import all projections
 import topo.projection
@@ -595,9 +596,9 @@ class ModelEditor(parameterized.Parameterized):
         self.import_model()
 
     def import_model(self):
-        # get a list of all the sheets in the simulation
+        # get a list of all the objects in the simulation
         sim = self.canvas.simulation
-        node_dictionary = sim.objects(Sheet)
+        node_dictionary = sim.objects(EventProcessor)
         node_list = node_dictionary.values()
 
         # create the editor covers for the nodes
@@ -617,7 +618,11 @@ class ModelEditor(parameterized.Parameterized):
                     self.next_x = self.xstart + 15
                     self.next_y = self.ystart + 15
 
-            editor_node = EditorSheet(self.canvas, node, (x, y), node.name)
+            # Could handle more EventProcessor subclasses here
+            if isinstance(node,Sheet):
+                editor_node = EditorSheet(self.canvas, node, (x, y), node.name)
+            else:
+                editor_node = EditorEP(self.canvas, node, (x, y), node.name)
                 
             node.layout_location=(x,y)
             self.canvas.add_object(editor_node)
@@ -626,8 +631,12 @@ class ModelEditor(parameterized.Parameterized):
         
         for editor_node in self.canvas.object_list:
             for con in editor_node.simobj.out_connections:
-                # create cover for a projection
-                editor_connection = EditorProjection("", self.canvas, editor_node)
+                # Could handle more EditorConnection subclasses here
+                if isinstance(con,CFProjection):
+                    editor_connection = EditorProjection("", self.canvas, editor_node)
+                else:
+                    editor_connection = EditorEPConnection("", self.canvas, editor_node)
+                
                 # find the EditorNode that the proj connects to
                 for dest in self.canvas.object_list:
                     if (dest.simobj == con.dest):
@@ -1132,12 +1141,11 @@ class EditorNode(EditorObject):
         con.show_properties()
         
 
-class EditorSheet(EditorNode):
+
+# JABALERT: Should probably combine this with EditorNode
+class EditorEP(EditorNode):
     """
-    Represents any topo sheet. It is a subclass of EditorNode and fills in the
-    methods that are not defined. It is represented by a Paralellogram in its
-    Canvas. The colours used for drawing can be set. Uses bounding box to
-    determine if x, y coord is within its boundary.
+    Represents any topo EventProcessor as a small, fixed-size oval by default.
     """
     normalize = param.Boolean(default=False)
     show_density = param.Boolean(default=False)
@@ -1147,12 +1155,11 @@ class EditorSheet(EditorNode):
     def __init__(self, canvas, simobj, pos, name):
         EditorNode.__init__(self, canvas, simobj, pos, name)
         simobj.layout_location = (self.x,self.y) # store the ed coords in the topo sheet
-        self.element_count = self.matrix_element_count()
         self.set_bounds()
 
         self.set_colours()
         col = self.colour[1]
-        self.init_draw(col, False) # create a new paralellogram
+        self.init_draw(col, False) # create a new parallelogram
         self.currentCol = col
         self.gradient = 1
         self.viewing_choices = [('Normal', lambda: self.select_view('normal')),
@@ -1186,79 +1193,17 @@ class EditorSheet(EditorNode):
         self.colour = colour[self.mode] # colours for drawing this node on the canvas
 
     def init_draw(self, colour, focus):
-        self.id = []
         if focus : label_colour = colour
         else : label_colour = 'black'
-        factor = self.canvas.scaling_factor
-        h, w = 0.5 * self.height * factor, 0.5 * self.width *factor
-        if not(self.focus):
-            if self.view == 'activity':
-                colour = ''
-                x, y = self.x - w + h, self.y - h
-                # AL, the idea will be to allow any available plots to be shown on the sheet.
-                # eg m = self.simobj.sheet_views['OrientationPreference'].view()[0]
-                update_activity()
-                m = self.simobj.sheet_views['Activity'].view()[0]
-                if self.normalize == True:
-                    m = self.normalize_plot(m)
-                matrix_width, matrix_height = self.element_count
-                dX, dY = (w * 2)/ matrix_width, (h * 2) / matrix_height
-                for i in range(matrix_height):
-                    for j in range(matrix_width):
-                        a = i * dY
-                        x1, y1 = x - a + (j * dX), y + a
-                        x2, y2 = x1 - dY, y1 + dY
-                        x3, x4 = x2 + dX, x1 + dX
-                        point = m[i][j]
-                        if point < 0 : point = 0.0
-                        if point > 1 : point = 1.0
-                        col = '#' + (self.dec_to_hex_str(point, 3)) * 3
-                        self.id = self.id + [self.canvas.create_polygon
-                           (x1, y1, x2, y2, x3, y2, x4, y1, fill = col, outline = col)]
+        h, w = 0.5*self.height, 0.5*self.width
+
         x, y = self.x, self.y
-        x1,y1 = (x - w - h, y + h)
-        x2,y2 = (x - w + h, y - h)
-        x3,y3 = x2 + (w * 2), y2
-        x4,y4 = x1 + (w * 2), y1
-        self.id = self.id + [self.canvas.create_polygon(x1, y1, x2, y2, x3, y3, x4, y4, 
-            fill = colour , outline = "black")]
+        x1,y1 = (x-w,y-h)
+        x2,y2 = (x+w,y+h)
+
+        self.id = [self.canvas.create_oval(x1,y1,x2,y2,fill=colour,outline="black")]
         dX = w + 5
         self.label = self.canvas.create_text(x - dX, y, anchor = E, fill = label_colour, text = self.name)
-        # adds a density grid over the sheet
-        if self.show_density:
-            x, y = self.x - w + h, self.y - h
-            matrix_width, matrix_height = self.element_count
-            dX, dY = (w * 2)/ matrix_width, (h * 2) / matrix_height
-            for i in range(matrix_height + 1):
-                x1 = x - (i * dY)
-                x2 = x1 + (w * 2)
-                y1 = y + (i * dY)
-                self.id = self.id + [self.canvas.create_line(x1, y1, x2, y1, fill = 'slate blue')]
-            for j in range(matrix_width + 1):
-                x1 = x + (j * dX)
-                x2 = x1 - (h * 2)
-                y1 = y
-                y2 = y1 + (h * 2)
-                self.id = self.id + [self.canvas.create_line(x1, y1, x2, y2, fill = 'slate blue')]
-
-    def normalize_plot(self,a):
-        """ 
-        Normalize an array s.
-        In case of a constant array, ones is returned for value greater than zero,
-        and zeros in case of value inferior or equal to zero.
-        """
-        # AL is it possible to use the normalize method in plot?
-        from numpy.oldnumeric import zeros, ones, Float, divide
-        a_offset = a-min(a.ravel())
-        max_a_offset = max(a_offset.ravel())
-        if max_a_offset>0:
-             a = divide(a_offset,float(max_a_offset))
-        else:
-             if min(a.ravel())<=0:
-                  a=zeros(a.shape,Float)
-             else:
-                  a=ones(a.shape,Float)
-        return a
 
     def dec_to_hex_str(self, val, length):
         # expects a normalised value and maps it to a hex value of the given length
@@ -1343,10 +1288,161 @@ class EditorSheet(EditorNode):
 
     #   Util methods
 
+    def in_bounds(self, pos_x, pos_y):
+        x = self.x - pos_x; y = self.y - pos_y
+        
+        return ((pos_x> self.x-self.width)  and (pos_x<= self.x+self.width) and 
+                (pos_y> self.y-self.height) and (pos_y<= self.y+self.height))
+
+
+    def set_bounds(self):
+        # Default representation: fixed-size node
+        self.width=15
+        self.height=self.width*0.7
+
+
+    def set_mode(self, mode):
+        self.mode = mode
+        self.set_colours()
+
+        for id in self.id:
+            self.canvas.delete(id)
+        self.canvas.delete(self.label) # remove label
+        self.init_draw(self.colour[not self.focus], self.focus)
+        for con in self.to_connections:
+            con.set_mode(mode)
+        for con in self.from_connections:
+            con.draw()
+
+
+
+
+class EditorSheet(EditorEP):
+    """
+    Represents any topo sheet. It is a subclass of EditorEP and fills in the
+    methods that are not defined. It is represented by a Parallelogram in its
+    Canvas. The colours used for drawing can be set. Uses bounding box to
+    determine if x, y coord is within its boundary.
+    """
+    normalize = param.Boolean(default=False)
+    show_density = param.Boolean(default=False)
+    view = param.Enumeration(default='activity',
+                       available=['normal','activity'])
+    
+    def __init__(self, canvas, simobj, pos, name):
+        # Should call EditorEP's constructor instead
+        EditorNode.__init__(self, canvas, simobj, pos, name)
+        simobj.layout_location = (self.x,self.y) # store the ed coords in the topo sheet
+        self.element_count = self.matrix_element_count()
+        self.set_bounds()
+
+        self.set_colours()
+        col = self.colour[1]
+        self.init_draw(col, False) # create a new parallelogram
+        self.currentCol = col
+        self.gradient = 1
+        self.viewing_choices = [('Normal', lambda: self.select_view('normal')),
+                                ('Activity', lambda: self.select_view('activity'))]
+
+
+    #   Draw methods
+
+    def set_focus(self, focus):
+        for id in self.id:
+            self.canvas.delete(id)
+        self.canvas.delete(self.label) # remove label	
+        EditorNode.set_focus(self, focus) # call to super's set focus
+        col = self.colour[not focus]
+        self.init_draw(col, focus) # create new one with correct colour
+        self.currentCol = col
+        self.draw()
+
+    def select_view(self, view_choice):
+        self.view = view_choice
+        self.set_focus(False)
+        self.canvas.redraw_objects()
+
+    def init_draw(self, colour, focus):
+        self.id = []
+        if focus : label_colour = colour
+        else : label_colour = 'black'
+        factor = self.canvas.scaling_factor
+        h, w = 0.5 * self.height * factor, 0.5 * self.width *factor
+        if not(self.focus):
+            if self.view == 'activity':
+                colour = ''
+                x, y = self.x - w + h, self.y - h
+                # AL, the idea will be to allow any available plots to be shown on the sheet.
+                # eg m = self.simobj.sheet_views['OrientationPreference'].view()[0]
+                update_activity()
+                m = self.simobj.sheet_views['Activity'].view()[0]
+                if self.normalize == True:
+                    m = self.normalize_plot(m)
+                matrix_width, matrix_height = self.element_count
+                dX, dY = (w * 2)/ matrix_width, (h * 2) / matrix_height
+                for i in range(matrix_height):
+                    for j in range(matrix_width):
+                        a = i * dY
+                        x1, y1 = x - a + (j * dX), y + a
+                        x2, y2 = x1 - dY, y1 + dY
+                        x3, x4 = x2 + dX, x1 + dX
+                        point = m[i][j]
+                        if point < 0 : point = 0.0
+                        if point > 1 : point = 1.0
+                        col = '#' + (self.dec_to_hex_str(point, 3)) * 3
+                        self.id = self.id + [self.canvas.create_polygon
+                           (x1, y1, x2, y2, x3, y2, x4, y1, fill = col, outline = col)]
+        x, y = self.x, self.y
+        x1,y1 = (x - w - h, y + h)
+        x2,y2 = (x - w + h, y - h)
+        x3,y3 = x2 + (w * 2), y2
+        x4,y4 = x1 + (w * 2), y1
+        self.id = self.id + [self.canvas.create_polygon(x1, y1, x2, y2, x3, y3, x4, y4, 
+            fill = colour , outline = "black")]
+        dX = w + 5
+        self.label = self.canvas.create_text(x - dX, y, anchor = E, fill = label_colour, text = self.name)
+        # adds a density grid over the sheet
+        if self.show_density:
+            x, y = self.x - w + h, self.y - h
+            matrix_width, matrix_height = self.element_count
+            dX, dY = (w * 2)/ matrix_width, (h * 2) / matrix_height
+            for i in range(matrix_height + 1):
+                x1 = x - (i * dY)
+                x2 = x1 + (w * 2)
+                y1 = y + (i * dY)
+                self.id = self.id + [self.canvas.create_line(x1, y1, x2, y1, fill = 'slate blue')]
+            for j in range(matrix_width + 1):
+                x1 = x + (j * dX)
+                x2 = x1 - (h * 2)
+                y1 = y
+                y2 = y1 + (h * 2)
+                self.id = self.id + [self.canvas.create_line(x1, y1, x2, y2, fill = 'slate blue')]
+
+    def normalize_plot(self,a):
+        """ 
+        Normalize an array s.
+        In case of a constant array, ones is returned for value greater than zero,
+        and zeros in case of value inferior or equal to zero.
+        """
+        # AL is it possible to use the normalize method in plot?
+        from numpy.oldnumeric import zeros, ones, Float, divide
+        a_offset = a-min(a.ravel())
+        max_a_offset = max(a_offset.ravel())
+        if max_a_offset>0:
+             a = divide(a_offset,float(max_a_offset))
+        else:
+             if min(a.ravel())<=0:
+                  a=zeros(a.shape,Float)
+             else:
+                  a=ones(a.shape,Float)
+        return a
+
+    #   Util methods
+
     def in_bounds(self, pos_x, pos_y) : # returns true if point lies in a bounding box
         # if the coord is pressed within the parallelogram representation this 
         # returns true.
-        # Get the paralellogram points and centers them around the given point
+        # Get the parallelogram points and centers them around the given point
         x = self.x - pos_x; y = self.y - pos_y
         w = 0.5 * self.width * self.canvas.scaling_factor
         h = 0.5 * self.height * self.canvas.scaling_factor
@@ -1385,30 +1481,9 @@ class EditorSheet(EditorNode):
         self.width = width_fact * (r - l) * self.canvas.scaling_factor
         self.height = height_fact * (t - b) * self.canvas.scaling_factor
 
-    def set_mode(self, mode):
-        self.mode = mode
-        self.set_colours()
-
-        for id in self.id:
-            self.canvas.delete(id)
-        self.canvas.delete(self.label) # remove label
-        self.init_draw(self.colour[not self.focus], self.focus)
-        for con in self.to_connections:
-            con.set_mode(mode)
-        for con in self.from_connections:
-            con.draw()
 
 
 
-
-### JABALERT: From the behavior in the Model Editor, this seems to be
-### treating all Connections as Projections.  Specifically, the self
-### Connection of a GeneratorSheet is rendered like a lateral
-### connection (with a dotted oval) rather than with (e.g.) a circular
-### arrow.  The Projection support should also acknowledge that it is
-### specific to CFProjection, because other representations would be
-### appropriate for other types of Projection.
-###
 class EditorConnection(EditorObject):
 
     """
@@ -1436,8 +1511,6 @@ class EditorConnection(EditorObject):
     
     def move(self):
         # if one of the nodes connected by this connection move, then move by redrawing	
-        self.gradient = self.calculate_gradient()
-        self.update_factor()
         self.draw() 
 
     def update_position(self, pos) : # update the temporary point
@@ -1469,36 +1542,27 @@ class EditorConnection(EditorObject):
         EditorObject.show_properties(self)
         self.parameter_frame.set_PO(self.simobj)
 
-class EditorProjection(EditorConnection):
 
+# JABALERT: Should probably combine this with EditorConnection
+class EditorEPConnection(EditorConnection):
     """
-    Represents any topo projection. It is a subclass of EditorConnection and fills 
-    in the methods that are not defined. Can be represented by a representation of a
-    projection's receptive field or by a line with an arrow head in the middle;
-    lateral projections are represented by a dotted ellipse around the centre.
-    Can determine if x,y coord is within the triangular receptive field or within an
-    area around the arrow head. The same can be determined for a lateral projection 
-    ellipse.
+    Represents any topo EPConnection using a line with an arrow head in the middle.
     """	
-    def __init__(self, name, canvas, from_node, receptive_field = True):
+    def __init__(self, name, canvas, from_node):
         EditorConnection.__init__(self, name, canvas, from_node)
         # if more than one connection between nodes, 
         # this will reflect how to draw this connection
         self.draw_index = 0
         self.deviation = 0
-        self.normal_radius = 15
-        self.radius = self.get_radius()
         self.gradient = (1,1)
         self.id = (None,None)
         self.label = None
         self.balloon = tk.Balloon(canvas)
-        self.factor = self.get_factor()
-        self.receptive_field = receptive_field
         self.set_colours()
-        self.view = 'radius'
-        self.viewing_choices = [('Field Radius', lambda: self.select_view('radius')),
-                                ('Line', lambda: self.select_view('line')),
-                                ('Fixed Size', lambda: self.select_view('normal'))]
+        self.view = 'line'
+        self.draw_fn = self.draw_line
+        self.viewing_choices = [('Line', lambda: self.select_view('line'))]
+        self.update_factor()
 
 
     #   Draw methods
@@ -1528,10 +1592,7 @@ class EditorProjection(EditorConnection):
         else:
             to_position = self.to_node.get_pos()
 
-        {'normal' : self.draw_normal,
-         'line' :   self.draw_line,
-         'radius' : self.draw_radius
-        }[self.view](from_position, to_position)
+        self.draw_fn(from_position, to_position)
 
     def draw_line(self,from_position, to_position):
         # set the colour to be used depending on whether connection has the focus.
@@ -1569,6 +1630,124 @@ class EditorProjection(EditorConnection):
             dY = self.draw_index * 20 * factor
             self.label = self.canvas.create_text(middle[0] - dX,
                 middle[1] - dY, fill = text_col, text = self.name, anchor = E)
+
+
+    #   Update methods
+    def remove(self):
+        if (self.to_node != None) : # if a connection had been made then remove it from the 'to' node
+            self.to_node.remove_connection(self, self.TO)
+            self.from_node.remove_connection(self, self.FROM) # and remove from 'from' node
+        for id in self.id : # remove the representation from the canvas
+            self.canvas.delete(id)
+        self.canvas.delete(self.label)
+
+        # CEBALERT: see earlier alert about EditorObject not inheriting from object.
+        EditorConnection.remove(self) #super(EditorProjection,self).remove()
+        
+
+    def move(self):
+        # if one of the nodes connected by this connection move, then move by redrawing	
+        self.gradient = self.calculate_gradient()
+        self.update_factor()
+        self.draw() 
+
+    def decrement_draw_index(self):
+        self.draw_index -= 1
+        if self.to_node == self.from_node:
+            self.update_factor()
+        else: 
+            self.connect_to_coord((self.from_node.width / 2) - 10)
+
+    def connect(self, to_node, con):
+        EditorConnection.connect(self, to_node, con)
+        self.draw_index = self.from_node.get_connection_count(to_node)-1
+        if (self.from_node == to_node):
+            self.update_factor() 
+        else:
+            self.connect_to_coord((self.from_node.width / 2) - 10)
+        self.gradient = self.calculate_gradient()
+        self.radius = self.get_radius()
+
+    #   Util methods
+    
+    def get_middle(self, pos1, pos2) : # returns the middle of two points
+        return (pos1[0] + (pos2[0] - pos1[0])*0.5, pos1[1] + (pos2[1] - pos1[1])*0.5)
+
+    def get_radius(self):
+        """Not implemented in this class"""
+        return (0,0)
+
+    def update_factor(self):
+        pass
+
+    def connect_to_coord(self, width):
+        n = self.draw_index
+        sign = math.pow(-1, n)
+        self.deviation = sign * width + (-sign) * math.pow(0.5, math.ceil(0.5 * (n))) * width
+
+    # returns the gradients of the two lines making the opening 'v' part of the receptive field. 
+    # this depends on the draw_index, as it determines where the projection's representation begins.
+    def calculate_gradient(self):
+        """Not implemented in this class"""
+        return (1,1)
+
+    def in_bounds(self, x, y) : # returns true if point lies in a bounding box
+        factor = self.canvas.scaling_factor
+        # If connections are represented as lines
+        # currently uses an extent around the arrow head.
+        to_position = self.to_node.get_pos()
+        from_position = self.from_node.get_pos()
+        if (self.to_node == self.from_node):
+            dev = self.draw_index * 15 * factor
+            middle = (to_position[0], to_position[1] - ((30 * factor) + dev))
+        else:
+            dev = self.deviation * 0.5
+            middle = self.get_middle(from_position, to_position)
+        if ((x < middle[0] + 10 + dev) & (x > middle[0] - 10 + dev) & (y < middle[1] + 10) & (y > middle[1] - 10)):
+            return True
+        return False
+
+    def set_mode(self, mode):
+        self.mode = mode
+        self.set_colours()
+        self.draw()
+
+
+
+class EditorProjection(EditorEPConnection):
+    """
+    Represents any topo CFProjection. It is a subclass of EditorEPConnection and fills 
+    in the methods that are not defined. Can be represented by a representation of a
+    projection's receptive field or by a line with an arrow head in the middle;
+    lateral projections are represented by a dotted ellipse around the centre.
+    Can determine if x,y coord is within the triangular receptive field or within an
+    area around the arrow head. The same can be determined for a lateral projection 
+    ellipse.
+    """
+    
+    def __init__(self, name, canvas, from_node, receptive_field = True):
+        EditorEPConnection.__init__(self, name, canvas, from_node)
+        # if more than one connection between nodes, 
+        # this will reflect how to draw this connection
+        self.normal_radius = 15
+        self.radius = self.get_radius()
+        self.receptive_field = receptive_field
+        self.view = 'radius'
+        self.viewing_choices = [('Field Radius', lambda: self.select_view('radius')),
+                                ('Line', lambda: self.select_view('line')),
+                                ('Fixed Size', lambda: self.select_view('normal'))]
+
+
+    #   Draw methods
+
+    def draw(self):
+        self.draw_fn = \
+        {'normal' : self.draw_normal,
+         'line' :   self.draw_line,
+         'radius' : self.draw_radius
+        }[self.view]
+        EditorEPConnection.draw(self)
+
 
     def draw_radius(self, from_position, to_position):
          # set the colour to be used depending on whether connection has the focus.
@@ -1609,6 +1788,7 @@ class EditorProjection(EditorConnection):
             self.label = self.canvas.create_text(middle[0] - dX,
                 middle[1] - dY, fill = text_col, text = self.name, anchor = E)
 
+
     def draw_normal(self, from_position, to_position):
         # set the colour to be used depending on whether connection has the focus.
         if (self.focus) : 
@@ -1647,43 +1827,8 @@ class EditorProjection(EditorConnection):
                 middle[1] - dY, fill = text_col, text = self.name, anchor = E)
 	
 
-    #   Update methods
-    
-    def remove(self):
-        if (self.to_node != None) : # if a connection had been made then remove it from the 'to' node
-            self.to_node.remove_connection(self, self.TO)
-            self.from_node.remove_connection(self, self.FROM) # and remove from 'from' node
-        for id in self.id : # remove the representation from the canvas
-            self.canvas.delete(id)
-        self.canvas.delete(self.label)
-
-        # CEBALERT: see earlier alert about EditorObject not inheriting from object.
-        EditorConnection.remove(self) #super(EditorProjection,self).remove()
-        
-
-    def decrement_draw_index(self):
-        self.draw_index -= 1
-        if self.to_node == self.from_node:
-            self.update_factor()
-        else: 
-            self.connect_to_coord((self.from_node.width / 2) - 10)
-
-    def connect(self, to_node, con):
-        EditorConnection.connect(self, to_node, con)
-        self.draw_index = self.from_node.get_connection_count(to_node)-1
-        if (self.from_node == to_node):
-            self.factor = self.get_factor() 
-        else:
-            self.connect_to_coord((self.from_node.width / 2) - 10)
-        self.gradient = self.calculate_gradient()
-        self.radius = self.get_radius()
-
-
     #   Util methods
     
-    def get_middle(self, pos1, pos2) : # returns the middle of two points
-        return (pos1[0] + (pos2[0] - pos1[0])*0.5, pos1[1] + (pos2[1] - pos1[1])*0.5)
-
     def get_radius(self):
         factor = self.canvas.scaling_factor
         if self.to_node == None:
@@ -1715,11 +1860,6 @@ class EditorProjection(EditorConnection):
     def update_factor(self):
         self.factor = self.get_factor()
 
-    def connect_to_coord(self, width):
-        n = self.draw_index
-        sign = math.pow(-1, n)
-        self.deviation = sign * width + (-sign) * math.pow(0.5, math.ceil(0.5 * (n))) * width
-
     # returns the gradients of the two lines making the opening 'v' part of the receptive field. 
     # this depends on the draw_index, as it determines where the projection's representation begins.
     def calculate_gradient(self):
@@ -1749,19 +1889,7 @@ class EditorProjection(EditorConnection):
     def in_bounds(self, x, y) : # returns true if point lies in a bounding box
         factor = self.canvas.scaling_factor
         if self.view == 'line':
-            # If connections are represented as lines
-            # currently uses an extent around the arrow head.
-            to_position = self.to_node.get_pos()
-            from_position = self.from_node.get_pos()
-            if (self.to_node == self.from_node):
-                dev = self.draw_index * 15 * factor
-                middle = (to_position[0], to_position[1] - ((30 * factor) + dev))
-            else:
-                dev = self.deviation * 0.5
-                middle = self.get_middle(from_position, to_position)
-            if ((x < middle[0] + 10 + dev) & (x > middle[0] - 10 + dev) & (y < middle[1] + 10) & (y > middle[1] - 10)):
-                return True
-            return False
+            return EditorEPConnection.in_bounds(self,x,y)
         else:
             # returns true if x, y lie inside the oval representing this lateral projection
             if (self.to_node == None or self.to_node == self.from_node):
@@ -1807,10 +1935,3 @@ class EditorProjection(EditorConnection):
             if (((0 - a_CA) / self.gradient[1] >= 0) and ((0 - a_BA) / self.gradient[0] <= 0)):
                 return True
             return False
-
-    def set_mode(self, mode):
-        self.mode = mode
-        self.set_colours()
-        self.draw()
-
-
