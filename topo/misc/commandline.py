@@ -161,15 +161,25 @@ topo_parser.add_option("-i","--interactive",action="callback",callback=i_action,
                        dest="interactive",default=False,
                        help="provide an interactive prompt even if stdin does not appear to be a terminal.")
 
-def gui(start=True):
-    """Start the GUI as if -g were supplied in the command used to launch Topographica."""
-    if matplotlib_imported: 
-        from matplotlib import rcParams
-        rcParams['backend']='TkAgg'
-    auto_import_commands()
-    if start:
-        import topo.tkgui
-        topo.tkgui.start()
+
+def v_action(option,opt_str,value,parser):
+    """Callback function for the -v option."""
+    import topo.param.parameterized
+    topo.param.parameterized.min_print_level=topo.param.parameterized.VERBOSE
+    print "Enabling verbose message output."
+    
+topo_parser.add_option("-v","--verbose",action="callback",callback=v_action,dest="verbose",default=False,help="""\
+enable verbose messaging output.""")
+
+
+def d_action(option,opt_str,value,parser):
+    """Callback function for the -d option."""
+    import topo.param.parameterized
+    topo.param.parameterized.min_print_level=topo.param.parameterized.DEBUG
+    print "Enabling debugging message output."
+    
+topo_parser.add_option("-d","--debug",action="callback",callback=d_action,dest="debug",default=False,help="""\
+enable debugging message output (implies --verbose).""")
 
 
 
@@ -182,6 +192,18 @@ def l_action(option,opt_str,value,parser):
     
 topo_parser.add_option("-l","--legacy",action="callback",callback=l_action,dest="legacy",default=False,help="""\
 launch Topographica with legacy support enabled.""")
+
+
+def gui(start=True):
+    """Start the GUI as if -g were supplied in the command used to launch Topographica."""
+    if matplotlib_imported: 
+        from matplotlib import rcParams
+        rcParams['backend']='TkAgg'
+    auto_import_commands()
+    if start:
+        import topo.tkgui
+        topo.tkgui.start()
+
 
 ###### CB: TESTING (Jun 2008)
 def start_gui_from_ide_newthread():
