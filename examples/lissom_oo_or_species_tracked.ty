@@ -24,9 +24,9 @@ from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF, IdentityOF, ActivityAveragingOF, AttributeTrackingOF 
 from topo.outputfns.basic import Sigmoid, HalfRectify, HomeostaticMaxEnt
-from topo.misc.numbergenerators import UniformRandom, BoundedNumber, ExponentialDecay, ExponentialRandom
+from topo.misc.numbergenerators import UniformRandom, BoundedNumber
 from topo.patterns.image import Image
-from topo.coordmapperfns.basic import Jitter, ExpJitter
+from topo.coordmapperfns.basic import Jitter
 import contrib.jsldefs
 from contrib.jsldefs import species_analysis_function
 
@@ -545,11 +545,11 @@ if changestrength==True:
 
 if species=="cat":
     
-    topo.commands.analysis.plotgroups["Orientation Preference"].update_command="measure_or_pref(frequencies=[0.48],pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175))"
-    topo.commands.analysis.plotgroups["Retinotopy"].update_command="measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[0.48],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=False, apply_output_fn=True,duration=1.0)"
+    topo.plotting.plotgroup.plotgroups["Orientation Preference"].update_command="measure_or_pref(frequencies=[0.48],pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175))"
+    topo.plotting.plotgroup.plotgroups["Retinotopy"].update_command="measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[0.48],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=False, apply_output_fn=True,duration=1.0)"
     
 
 elif species=="mouse":
-    topo.commands.analysis.plotgroups["Orientation Preference"].update_command="measure_or_pref(frequencies=[1.83],pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175))"
-    topo.commands.analysis.plotgroups["Retinotopy"].update_command="measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[1.83],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=False, apply_output_fn=True,duration=1.0)"
+    topo.plotting.plotgroup.plotgroups["Orientation Preference"].update_command="measure_or_pref(frequencies=[1.83],pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175))"
+    topo.plotting.plotgroup.plotgroups["Retinotopy"].update_command="measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[1.83],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=False, apply_output_fn=True,duration=1.0)"
 
