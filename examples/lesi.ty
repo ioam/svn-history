@@ -17,6 +17,7 @@ from math import pi, sqrt
 
 import topo.pattern.basic
 import topo.pattern.random
+import topo.patterns.image
 
 from topo.sheet.lissom import LISSOM, JointScaling
 from topo.sheet.generator import GeneratorSheet
@@ -36,7 +37,7 @@ from contrib.jsldefs import lesi_analysis_function
 
 ###############################################################
 ####Different input types which can be used for development###
-dataset=locals().get('dataset',"Gaussian") #set the input type by choosing the dataset parameter 
+dataset=locals().get('dataset',"Natural") #set the input type by choosing the dataset parameter 
 
 if dataset=="Gaussian":
     input_type=Gaussian
@@ -53,6 +54,7 @@ if dataset=="Gaussian":
 elif dataset=="Natural":
     
     input_type=topo.pattern.image.Image
+
     image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
     inputs=[input_type(filename=f,
                        size=10.0,  #size_normalization='original',(size=10.0)
@@ -353,7 +355,7 @@ topo.sim.connect('V1Exc','V1Inh', delay=0.05,
                  nominal_bounds_template = BoundingBox(radius=0.03),learning_rate=0)
 
 topo.sim.connect('V1Exc','V1Inh', delay=0.05,
-                 connection_type=CFProjection,strength =locals().get('exin',1.0), name='V1Exc_to_V1Inh',
+                 connection_type=CFProjection,strength =locals().get('exin',2.0), name='V1Exc_to_V1Inh',
                  output_fn=ExtoIn_OF,
                  weights_generator=gauss_rand(size=2*0.22917),
                  nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.8087)
