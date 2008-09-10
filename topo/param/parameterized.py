@@ -788,7 +788,7 @@ class Parameterized(object):
     # is because, to do this, state_push() would need to be a
     # @bothmethod, but that complicates inheritance in cases where we
     # already have a state_push() method. I need to decide what to do
-    # about that.
+    # about that. (isinstance(g,Parameterized) below is used to exclude classes.)
     def state_push(self):
         """
         Save this instance's state.
@@ -810,7 +810,7 @@ class Parameterized(object):
                 g._saved_Dynamic_time.append(g._Dynamic_time)
                 # CB: not storing the time_fn: assuming that doesn't
                 # change.
-            elif hasattr(g,'state_push'):
+            elif hasattr(g,'state_push') and isinstance(g,Parameterized):
                 g.state_push()
 
     def state_pop(self):
@@ -824,7 +824,7 @@ class Parameterized(object):
             if hasattr(g,'_Dynamic_last'):
                 g._Dynamic_last = g._saved_Dynamic_last.pop()
                 g._Dynamic_time = g._saved_Dynamic_time.pop()
-            elif hasattr(g,'state_pop'):
+            elif hasattr(g,'state_pop') and isinstance(g,Parameterized):
                 g.state_pop()
         
         
