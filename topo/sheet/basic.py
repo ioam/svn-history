@@ -183,6 +183,25 @@ class SequenceGeneratorSheet(GeneratorSheet):
 
 
 
+def compute_joint_norm_totals(projlist,mask):
+    """
+    Compute norm_total for each CF in each projection from a group to
+    be normalized jointly.
+    """
+    # Assumes that all Projections in the list have the same r,c size
+    assert len(projlist)>=1
+    proj  = projlist[0]
+    rows,cols = proj.cfs.shape
+
+    for r in range(rows):
+        for c in range(cols):
+            if(mask[r,c] != 0):
+                sums = [p.cfs[r,c].norm_total for p in projlist]
+                joint_sum = numpy.add.reduce(sums)
+                for p in projlist:
+                    p.cfs[r,c].norm_total=joint_sum
+
+
 class JointNormalizingCFSheet(CFSheet):
     """
     A type of CFSheet extended to support joint sum-based normalization.
@@ -213,29 +232,14 @@ class JointNormalizingCFSheet(CFSheet):
     together, as long as an appropriate OutputFn is being used.
     """
 
+    joint_norm_fn = param.Callable(default=compute_joint_norm_totals,doc="""
+    Function to use to compute the norm_total for each CF in each
+    projection from a group to be normalized jointly.""")
+
     # JABALERT: Should check that whenever a connection is added to a
     # group, it has the same no of cfs as the existing connections.
     def start(self):
         self._normalize_weights()        
-
-                       
-    def compute_joint_norm_totals(self,projlist,mask):
-        """
-        Compute norm_total for each CF in each projection from a group to be normalized jointly.
-        """
-
-        # Assumes that all Projections in the list have the same r,c size
-        assert len(projlist)>=1
-        proj  = projlist[0]
-        rows,cols = proj.cfs.shape
-
-        for r in range(rows):
-            for c in range(cols):
-                if(mask[r,c] != 0):
-                    sums = [p.cfs[r,c].norm_total for p in projlist]
-                    joint_sum = numpy.add.reduce(sums)
-                    for p in projlist:
-                        p.cfs[r,c].norm_total=joint_sum
 
 
     def _normalize_weights(self,mask = None):
@@ -253,7 +257,7 @@ class JointNormalizingCFSheet(CFSheet):
                 normtype='Independent'
             else:
                 normtype='Joint'
-                self.compute_joint_norm_totals(projlist,mask)
+                self.joint_norm_fn(projlist,mask)
 
             self.debug(normtype + "ly normalizing:")
 
