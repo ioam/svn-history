@@ -730,7 +730,7 @@ class Parameterized(object):
     
     is equivalent to:
     
-       if max(foo.print_level,pararameterized.min_print_level) >= MESSAGE:
+       if max(foo.print_level,parameterized.min_print_level) >= MESSAGE:
            print foo.name+':', 'The answer is', 42
     """
 
