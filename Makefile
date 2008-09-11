@@ -12,8 +12,8 @@ TEST_VERBOSITY = 1
 IMPORT_WEAVE = 1
 
 # no. of decimal places to require for verifying a match in slow-tests
-# (must match across platforms)
-TESTDP = 12
+# (must match across platforms & for optimized vs unoptimized)
+TESTDP = 7
 
 ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
 	TIMER = 

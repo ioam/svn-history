@@ -41,6 +41,7 @@ import topo.outputfn.optimized
 import topo.pattern.random
 import topo.responsefn.optimized 
 import topo.sheet.lissom
+import topo.sheet.optimized
 
 
 ### Specify weight initialization, response function, and learning function
@@ -92,7 +93,8 @@ topo.sim['LGNOff']=sheet.CFSheet(
 topo.sim['V1'] = sheet.lissom.LISSOM(
     nominal_density=locals().get('default_density',48.0),
     nominal_bounds=sheet.BoundingBox(radius=0.5),tsettle=9,
-    output_fn=outputfn.PiecewiseLinear(lower_bound=0.083,upper_bound=0.633))
+    output_fn=outputfn.PiecewiseLinear(lower_bound=0.083,upper_bound=0.633),
+    joint_norm_fn=sheet.optimized.compute_joint_norm_totals_opt)
 
 
 
