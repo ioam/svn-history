@@ -41,7 +41,7 @@
       > ~/research/topographica/bin/python setup.py install
 
   Then just run this file using Topographica as for any other example
-  (being sure to run the expoerts in step 3 beforehand):
+  (being sure to run the exports in step 3 beforehand):
 
       ./topographica -g examples/perrinet_retina.ty
 
