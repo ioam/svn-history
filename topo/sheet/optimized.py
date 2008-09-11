@@ -60,9 +60,8 @@ def compute_joint_norm_totals_opt(projlist,mask):
     """    
     inline(code, ['projlist','mask','rows','cols','length'], local_dict=locals())
 
-# need this?
-#provide_unoptimized_equivalent("compute_joint_norm_totals_opt",
-#                               "compute_joint_norm_totals",locals())
+provide_unoptimized_equivalent("compute_joint_norm_totals_opt",
+                               "compute_joint_norm_totals",locals())
 
 
 class LISSOM_Opt(LISSOM):
