@@ -1,3 +1,61 @@
+<p><b>12 September 2008:</b> Updates since the 0.9.5 release
+(currently available in the latest SVN version):
+
+<center>
+<table width="100%" cellpadding="5">
+<tr>
+<td width="50%">
+<dl COMPACT>
+<font size="-1">  
+<!--CB: surely these divs should be some kind of li?-->
+<!--  <div class="i2">- optional XML snapshot
+  <A HREF="../Reference_Manual/topo.command.basic-module.html#save_snapshot">saving</A> and
+  <A HREF="../Reference_Manual/topo.command.basic-module.html#load_snapshot">loading</A></div>
+-->
+<!-- incomplete <A HREF="../Downloads/git.html">Instructions</A> for checking out Git version of repository<BR> -->
+<!--  mouse model (examples/lissom_oo_or_species.ty)<BR> -->
+<dt>General improvements:</dt>
+<dd>
+<!--CB: surely these divs should be some kind of li?-->
+  <div class="i2">- significant performance improvements (nearly 2X)</div>
+  <div class="i2">- minor bugfixes</div>
+</dd>
+<dt>GUI:</dt>
+<dd>
+  <div class="i2">- model editor supports non-Sheet EventProcessors
+  and non-CFProjection EPConnections</div>
+</dd>
+<dt>Command-line and batch:</dt>
+<dd>
+  <div class="i2">- -v option to print verbose messages</div>
+  <div class="i2">- -d option to print debugging messages</div>
+</dd>
+</font>
+</dl>
+</td>
+<td width="50%">
+<dl COMPACT>
+<font size="-1">
+<dt>Example scripts:</dt>
+<dd>
+  <div class="i2">- example file for interfacing to external simulator (examples/perrinet_retina.ty)</div>
+<!--  mouse model (examples/lissom_oo_or_species.ty)<BR> -->
+</dd>
+<dt>Component library:</dt>
+<dd>
+  <div class="i2">- OutputFns: 
+  <?php classref('topo.outputfn.basic','HalfRectifyAndPower')?></div>
+  <div class="i2">- Sheets: 
+  <?php classref('topo.sheet.basic','ActivityCopy')?></div>
+</dd>
+</font>
+</dl>
+</td>
+</tr>
+</table>
+</center>
+
+
 <p><b>05 September 2008:</b> Version 0.9.5 
 <A target="_top" href="../Downloads/index.html">released</A>, including:
 <center>
@@ -30,7 +88,7 @@
 <!--  replaced FixedPoint with gmpy for speed and to have rational no. for time<BR> -->
   <div class="i2">- automatic Windows and Mac <A target="_top" href="http://buildbot.topographica.org">daily builds</A></div>
   <div class="i2">- automatic running and startup <A target="_top" href="http://buildbot.topographica.org">performance measurement</A></div>
-<!--CEBALERT: we removing that for the release!-->
+<!--CEBALERT: we're removing that for the release!-->
   <div class="i2">- contrib dir</div>
   <div class="i2">- divisive and multiplicative connections</div>
   <div class="i2">- simulation time is now a rational number for precision</div>
