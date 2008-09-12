@@ -29,7 +29,7 @@ from topo.patterns.image import Image
 from topo.coordmapperfns.basic import Jitter
 import contrib.jsldefs
 from contrib.jsldefs import species_analysis_function
-
+import topo.plotting.plotgroup
 
 species=locals().get('species',"mouse")
 onoff = locals().get('onoff',False)
