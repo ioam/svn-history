@@ -13,6 +13,7 @@ from fixedpoint import FixedPoint
 import topo.pattern.basic
 import topo.pattern.random
 
+
 from topo.pattern.basic import Gaussian, Rectangle
 from topo.sheet.lissom import JointScaling, LISSOM
 from topo.sheet.generator import GeneratorSheet
@@ -20,13 +21,13 @@ from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet, CFPLF_PluginScaled, CFPOF_Plugin
 from topo.base.boundingregion import BoundingBox
-from topo.learningfns.optimized import CFPLF_Hebbian_opt
-from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF, IdentityOF, ActivityAveragingOF, AttributeTrackingOF 
-from topo.outputfns.basic import Sigmoid, HalfRectify, HomeostaticMaxEnt
-from topo.misc.numbergenerators import UniformRandom, BoundedNumber
-from topo.patterns.image import Image
-from topo.coordmapperfns.basic import Jitter
+from topo.learningfn.optimized import CFPLF_Hebbian_opt
+from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.outputfn.basic import PiecewiseLinear, DivisiveNormalizeL1, PipelineOF, IdentityOF, ActivityAveragingOF, AttributeTrackingOF 
+from topo.outputfn.basic import Sigmoid, HalfRectify, HomeostaticMaxEnt
+from topo.misc.numbergenerator import UniformRandom, BoundedNumber
+from topo.pattern.image import Image
+from topo.coordmapper.basic import Jitter
 import contrib.jsldefs
 from contrib.jsldefs import species_analysis_function
 import topo.plotting.plotgroup
@@ -342,11 +343,11 @@ def gauss_rand(size):
 
 #Function for generating "cloud" connections
 
-from topo.patterns.basic import Disk
+from topo.pattern.basic import Disk
 def cloud():
-    return topo.patterns.basic.Composite(operator=numpy.multiply, 
+    return topo.pattern.basic.Composite(operator=numpy.multiply, 
                                          generators=[Disk(smoothing=0.0),
-                                                     topo.patterns.random.BinaryUniformRandom(on_probability=on_probability)])
+                                                     topo.pattern.random.BinaryUniformRandom(on_probability=on_probability)])
 #Whether or not to use divisive weights normalization
 norm=locals().get('norm',True)
 
@@ -479,7 +480,7 @@ if lat_cloud==True:
                      connection_type=CFProjection,
                      cf_shape=cloud(),
                      strength=1.0*locals().get('exc_strength',1.0),
-                     weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=Lat_exc_size),
+                     weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=Lat_exc_size),
                      nominal_bounds_template=BoundingBox(radius=Lat_exc_size),learning_rate=0.0) 
         
     topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
@@ -493,7 +494,7 @@ else:
     topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                      connection_type=CFProjection,
                      strength=1.0*locals().get('exc_strength',1.0),
-                     weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=Lat_exc_size*0.75),
+                     weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=Lat_exc_size*0.75),
                      nominal_bounds_template=BoundingBox(radius=Lat_exc_size),learning_rate=0.0) 
         
     topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
