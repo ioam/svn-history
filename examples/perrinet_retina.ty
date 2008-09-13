@@ -48,10 +48,8 @@
   You can then present any input pattern you like and see the results.
 """
 
-import pylab
 import numpy
 from topo import sheet,numbergen,pattern,projection
-import topo.pattern.image
 from topo.base.simulation import EventProcessor
 import perrinet_retina_pynest as pynr
 
@@ -62,51 +60,45 @@ class PyNNRetina(EventProcessor):
     implemented in PyNEST/PyNN.
     """
 
-    dest_ports=['Activity']
-    src_ports=['ONActivity','OFFActivity']
+    dest_ports=["Activity"]
+    src_ports=["ONActivity","OFFActivity"]
     
     def __init__(self,**params):
         super(PyNNRetina,self).__init__(**params)
         self.ps=pynr.retina_debug()
-        self.ps.update({'simtime' : 4000*0.1})
-        self.N=self.ps['N']
-        self.dt=self.ps['dt']
-        self.simtime=self.ps['simtime']
+        self.ps.update({"simtime" : 4000*0.1})
+        self.N=self.ps["N"]
+        self.dt=self.ps["dt"]
+        self.simtime=self.ps["simtime"]
 
     def input_event(self,conn,data):
-        self.input_data=data
-
-    def process_current_time(self):
-        if hasattr(self, 'input_data'):
-            self.ps.update({'amplitude' : .10*self.input_data})
-            on_list,off_list=pynr.run_retina(self.ps)
-            self.process_spikelist(on_list,'ONActivity')
-            self.process_spikelist(off_list,'OFFActivity')
-            del self.input_data
+        self.ps.update({"amplitude" : .10*data})
+        on_list,off_list=pynr.run_retina(self.ps)
+        self.process_spikelist(on_list,"ONActivity")
+        self.process_spikelist(off_list,"OFFActivity")
 
     def process_spikelist(self,spikelist,port):
         spikes=numpy.array(spikelist)
         spike_time=numpy.cumsum(spikes[:,0]) * self.dt
-        spike_out = pynr.spikelist2spikematrix(
+        spike_out=pynr.spikelist2spikematrix(
             spikes,self.N,self.simtime/self.dt,self.dt)
         self.send_output(src_port=port,data=spike_out)
 
 
-topo.sim['PyNNR']=PyNNRetina()
-N=topo.sim['PyNNR'].N
+topo.sim["PyNNR"]=PyNNRetina()
+N=topo.sim["PyNNR"].N
 
-topo.sim['Photoreceptors']=sheet.GeneratorSheet(
+topo.sim["Photoreceptors"]=sheet.GeneratorSheet(
      nominal_density=N, period=1.0, phase=0.05,
-     input_generator=pattern.Gaussian())
+     input_generator=pattern.Gaussian(
+         orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=1)))
 
-topo.sim['ON_RGC'] =sheet.ActivityCopy(
-    nominal_density=N, precedence=0.7)
-topo.sim['OFF_RGC']=sheet.ActivityCopy(
-    nominal_density=N, precedence=0.7)
+topo.sim["ON_RGC"] =sheet.ActivityCopy(nominal_density=N, precedence=0.7)
+topo.sim["OFF_RGC"]=sheet.ActivityCopy(nominal_density=N, precedence=0.7)
 
-topo.sim.connect('Photoreceptors','PyNNR',
-    delay=0.05,src_port='Activity',dest_port='Activity')
-topo.sim.connect('PyNNR','ON_RGC',
-    delay=0.05,src_port='ONActivity',dest_port='Activity')
-topo.sim.connect('PyNNR','OFF_RGC',
-    delay=0.05,src_port='OFFActivity',dest_port='Activity')
+topo.sim.connect("Photoreceptors","PyNNR",
+    delay=0.05,src_port="Activity",dest_port="Activity")
+topo.sim.connect("PyNNR","ON_RGC",
+    delay=0.05,src_port="ONActivity",dest_port="Activity")
+topo.sim.connect("PyNNR","OFF_RGC",
+    delay=0.05,src_port="OFFActivity",dest_port="Activity")
