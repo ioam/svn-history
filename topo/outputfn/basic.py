@@ -775,17 +775,21 @@ class HomeostaticMaxEnt(OutputFnWithRandomState):
         """
         Save the current state of the output function to an internal stack.
         """
-        self.__current_state_stack.append((copy.copy(self.a), copy.copy(self.b), copy.copy(self.y_avg)))
-        super(HomeostaticMaxEnt,self).state_push()
-
+        if self.first_call:
+            super(HomeostaticMaxEnt,self).state_push()
+        else:
+            self.__current_state_stack.append((copy.copy(self.a), copy.copy(self.b), copy.copy(self.y_avg)))
+            super(HomeostaticMaxEnt,self).state_push()
+        
     def state_pop(self):
         """
         Pop the most recently saved state off the stack.
         
         See state_push() for more details.
         """
-        self.a, self.b, self.y_avg =  self.__current_state_stack.pop()
-        super(HomeostaticMaxEnt,self).state_pop()
+        if self.__current_state_stack:
+            self.a, self.b, self.y_avg =  self.__current_state_stack.pop()
+            super(HomeostaticMaxEnt,self).state_pop()
         
                 
 class CascadeHomeostatic(OutputFnWithState):
