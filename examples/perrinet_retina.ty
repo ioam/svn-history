@@ -49,30 +49,32 @@
 """
 
 import numpy
-from topo import sheet,numbergen,pattern,projection
+from topo import sheet,numbergen,pattern,param,projection
 from topo.base.simulation import EventProcessor
 import perrinet_retina_pynest as pynr
 
 
 class PyNNRetina(EventProcessor):
     """
-    Wrapper around Laurent Perrinet's retina.py model
+    Wrapper around Laurent Perrinet's spiking retina.py model
     implemented in PyNEST/PyNN.
     """
 
     dest_ports=["Activity"]
     src_ports=["ONActivity","OFFActivity"]
-    
+    N = param.Number(default=8,bounds=(0,None),doc="Network width")
+    simtime = param.Number(default=4000*0.1,bounds=(0,None),
+        doc="Duration to simulate for each input")
+
     def __init__(self,**params):
         super(PyNNRetina,self).__init__(**params)
-        self.ps=pynr.retina_debug()
-        self.ps.update({"simtime" : 4000*0.1})
-        self.N=self.ps["N"]
+        self.ps=pynr.retina_default()
+        self.ps.update({"simtime":self.simtime})
+        self.ps.update({"N":self.N})
         self.dt=self.ps["dt"]
-        self.simtime=self.ps["simtime"]
 
     def input_event(self,conn,data):
-        self.ps.update({"amplitude" : .10*data})
+        self.ps.update({"amplitude":.10*data})
         on_list,off_list=pynr.run_retina(self.ps)
         self.process_spikelist(on_list,"ONActivity")
         self.process_spikelist(off_list,"OFFActivity")
@@ -84,9 +86,8 @@ class PyNNRetina(EventProcessor):
             spikes,self.N,self.simtime/self.dt,self.dt)
         self.send_output(src_port=port,data=spike_out)
 
-
-topo.sim["PyNNR"]=PyNNRetina()
-N=topo.sim["PyNNR"].N
+N=locals().get('default_density',32)
+topo.sim["PyNNR"]=PyNNRetina(N=N)
 
 topo.sim["Photoreceptors"]=sheet.GeneratorSheet(
      nominal_density=N, period=1.0, phase=0.05,
@@ -96,9 +97,14 @@ topo.sim["Photoreceptors"]=sheet.GeneratorSheet(
 topo.sim["ON_RGC"] =sheet.ActivityCopy(nominal_density=N, precedence=0.7)
 topo.sim["OFF_RGC"]=sheet.ActivityCopy(nominal_density=N, precedence=0.7)
 
-topo.sim.connect("Photoreceptors","PyNNR",
+topo.sim.connect("Photoreceptors","PyNNR",name=' ',
     delay=0.05,src_port="Activity",dest_port="Activity")
-topo.sim.connect("PyNNR","ON_RGC",
+topo.sim.connect("PyNNR","ON_RGC",name='  ',
     delay=0.05,src_port="ONActivity",dest_port="Activity")
-topo.sim.connect("PyNNR","OFF_RGC",
+topo.sim.connect("PyNNR","OFF_RGC",name='   ',
     delay=0.05,src_port="OFFActivity",dest_port="Activity")
+
+topo.sim['OFF_RGC'].layout_location=(359,62)
+topo.sim['ON_RGC'].layout_location=(135,62)
+topo.sim['PyNNR'].layout_location=(247,118)
+topo.sim['Photoreceptors'].layout_location=(247,166)
