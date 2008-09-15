@@ -27,7 +27,6 @@ from topo.command.pylabplots import or_tuning_curve_batch, matrixplot
 from topo.command.analysis import save_plotgroup, measure_or_tuning_fullfield
 from topo.misc.filepath import normalize_path,application_path
 from topo.command.pylabplots import plot_tracked_attributes
-from topo.base.parameterclasses import Number, Parameter,Parameter,ClassSelectorParameter,ListParameter
 from topo.base.functionfamily import CoordinateMapperFn
 from topo.plotting.bitmap import MontageBitmap
 #from topo.misc.trace import ActivityMovie,InMemoryRecorder
@@ -603,6 +602,7 @@ class ActivityHysteresis(OutputFnWithState):
     def __init__(self,**params):
         super(ActivityHysteresis,self).__init__(**params)
         self.first_call = True
+        self.old_a = 0 
         
     def __call__(self,x):
         if (self.first_call == True):
@@ -624,17 +624,17 @@ class Translator(PatternGenerator):
     by an amount based on the global time.
     """
 
-    generator = ClassSelectorParameter(default=Constant(scale=0.0),
+    generator = param.ClassSelector(default=Constant(scale=0.0),
         class_=PatternGenerator,doc="""Pattern to be translated.""")
         
-    direction = Number(default=0,bounds=(-pi,pi),doc="""
+    direction = param.Number(default=0,bounds=(-pi,pi),doc="""
         The direction in which the pattern should move, in radians.""")
     
-    speed = Number(default=1,bounds=(0.0,None),doc="""
+    speed = param.Number(default=1,bounds=(0.0,None),doc="""
         The speed with which the pattern should move,
         in sheet coordinates per simulation time unit.""")
     
-    reset_period = Number(default=1,bounds=(0.0,None),doc="""
+    reset_period = param.Number(default=1,bounds=(0.0,None),doc="""
         When pattern position should be reset, usually to the value of a dynamic parameter.
 
         The pattern is reset whenever fmod(simulation_time,reset_time)==0.""")
@@ -699,11 +699,11 @@ class SequenceSelector(PatternGenerator):
     PatternGenerator that selects from a list of other PatternGenerators in a sequential order.
     """
 
-    generators = ListParameter(default=[Constant()],precedence=0.97,
+    generators = param.List(default=[Constant()],precedence=0.97,
                                class_=PatternGenerator,bounds=(1,None),
         doc="List of patterns from which to select.")
 
-    size  = Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
+    size  = param.Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
 
 
     def __init__(self,generators,**params):
