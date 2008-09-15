@@ -13,9 +13,8 @@ REM numpy.diff
 copy ..\..\external\numpy.diff .
 
 REM Gnosis_Utils
-..\util\gunzip -c ..\..\external\Gnosis_Utils-1.2.1.tar.gz > ..\..\external\Gnosis_Utils-1.2.1.tar
-..\util\tar xvf ..\..\external\Gnosis_Utils-1.2.1.tar
-copy ..\..\external\Gnosis_Utils-1.2.1 .
+..\util\gunzip -c ..\..\external\Gnosis_Utils-1.3.0-alpha-7.tar.gz > ..\..\external\Gnosis_Utils-1.3.0-alpha-7.tar
+..\util\tar xvf ..\..\external\Gnosis_Utils-1.3.0-alpha-7.tar
 
 REM Tile
 copy ..\..\external\Tile.py .
@@ -23,17 +22,14 @@ copy ..\..\external\Tile.py .
 REM scrodget
 ..\util\gunzip -c ..\..\external\pyscrodget-0.0.1_2.1.tar.gz > ..\..\external\pyscrodget-0.0.1_2.1.tar
 ..\util\tar xvf ..\..\external\pyscrodget-0.0.1_2.1.tar
-copy ..\..\pyscrodget-0.0.1_2.1 .
 
 REM snit
 ..\util\gunzip -c ..\..\external\snit-2.2.1.tar.gz > ..\..\external\snit-2.2.1.tar
 ..\util\tar xvf ..\..\external\snit-2.2.1.tar
-copy ..\..\snit-2.2.1 .
 
 REM tooltip
 ..\util\gunzip -c ..\..\external\tooltip-1.4.tar.gz > ..\..\external\tooltip-1.4.tar
 ..\util\tar xvf ..\..\external\tooltip-1.4.tar
-copy ..\..\tooltip-1.4 .
 
 REM ******************************************************************
 
@@ -87,8 +83,9 @@ move fixedpoint-0.1.2_patched.py c:\python25\Lib\site-packages\fixedpoint.py
 REM CEBALERT: skipped: pychecker common pylint epydoc docutils
 
 REM * gnosis
-cd Gnosis_Utils-1.2.1\
+cd Gnosis_Utils-1.3.0-alpha-7\
 c:\python25\python.exe setup.py install
+REM CEBALERT: need to patch gnosis
 cd ..
 
 REM * ipython
