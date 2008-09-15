@@ -1,11 +1,13 @@
 @echo off
 
-REM Assumes we're going to c:\Python25; be careful to update everything if you decide to
-REM change this. (Should have used a variable, but that can't cover the graphical installs)
+REM Assumes we're going to c:\Python25; be careful to update
+REM everything if you decide to change this. (Should have used a
+REM variable, but that can't cover the graphical installs)
 
 set startdir=%CD%
 
-REM ** GRAB PACKAGES IN COMMON WITH topographica\external
+REM ******************************************************************
+REM Copy in packages that are commmon with topographica\external
 
 REM numpy.diff
 copy ..\..\external\numpy.diff .
@@ -15,12 +17,30 @@ REM Gnosis_Utils
 ..\util\tar xvf ..\..\external\Gnosis_Utils-1.2.1.tar
 copy ..\..\external\Gnosis_Utils-1.2.1 .
 
+REM Tile
+copy ..\..\external\Tile.py .
+
+REM scrodget
+..\util\gunzip -c ..\..\external\pyscrodget-0.0.1_2.1.tar.gz > ..\..\external\pyscrodget-0.0.1_2.1.tar
+..\util\tar xvf ..\..\external\pyscrodget-0.0.1_2.1.tar
+copy ..\..\pyscrodget-0.0.1_2.1 .
+
+REM snit
+..\util\gunzip -c ..\..\external\snit-2.2.1.tar.gz > ..\..\external\snit-2.2.1.tar
+..\util\tar xvf ..\..\external\snit-2.2.1.tar
+copy ..\..\snit-2.2.1 .
+
+REM tooltip
+..\util\gunzip -c ..\..\external\tooltip-1.4.tar.gz > ..\..\external\tooltip-1.4.tar
+..\util\tar xvf ..\..\external\tooltip-1.4.tar
+copy ..\..\tooltip-1.4 .
+
+REM ******************************************************************
 
 
+REM CEBALERT: because of some path trouble in some of the installation
+REM programs, we move to working in c:\create_python_topo
 cd ..
-
-REM CEBALERT: because of some path trouble with some of the installation
-REM programs, we move to working in c:\create_python_topo.
 xcopy /E /I create_python_topo c:\create_python_topo
 xcopy /E /I util c:\create_python_topo\util
 c:
@@ -28,19 +48,19 @@ cd \
 cd create_python_topo
 
 
-REM ** INSTALL PACKAGES
+REM ******************************************************************
+REM INSTALL PACKAGES
 
-REM osx_skip_tk python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
-REM binary:
-REM python jpeg pil numpy matplotlib weave(scipy) 
+REM python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
 
-
-REM * python,tcl/tk
+REM * python
 start /w msiexec /i python-2.5.1.msi ALLUSERS=0 TARGETDIR=c:\python25 ADDLOCAL=DefaultFeature,TclTk
+
+REM * jpeg
+REM CEBALERT: included in PIL binary?
 
 REM * numpy
 start /w numpy-1.1.1-win32-superpack-python2.5.exe
-
 REM patch numpy
 set storecpt=%cd%
 cd c:\python25\Lib\site-packages
@@ -50,26 +70,48 @@ cd %storecpt%
 REM * matplotlib
 start /w matplotlib-0.91.4.win32-py2.5.exe
 
-REM * scipy
+REM * weave
+REM (we just take it from scipy, since it's not available separately
+REM as a binary)
 start /w scipy-0.6.0.win32-py2.5.exe
+xcopy /E /I c:\python25\Lib\site-packages\scipy\weave c:\python25\Lib\site-packages\weave
+
+REM * fixedpoint
+REM CEBALERT: should use the patch executable in utils to create the
+REM patch from the diff and fixedpoint.tgz file in external\
+move fixedpoint-0.1.2_patched.py c:\python25\Lib\site-packages\fixedpoint.py
+
+REM CEBALERT: skipped: pychecker common pylint epydoc docutils
 
 REM * gnosis
 cd Gnosis_Utils-1.2.1\
 c:\python25\python.exe setup.py install
 cd ..
 
-REM * weave
-REM we just take it from scipy, since it's not available
-REM separately as a binary 
-xcopy /E /I c:\python25\Lib\site-packages\scipy\weave c:\python25\Lib\site-packages\weave
+REM * ipython
+start /w ipython-0.8.4.win32-setup.exe
+
+REM * gmpy 
+REM CEBALERT: newer version than on linux
+start /w gmpy-1.03-gmp-4.2.1.win32-py2.5.exe
+
+REM * tilewrapper
+move Tile.py c:\python25\Lib\site-packages\Tile.py
+
+REM * scrodget
+REM depends on snit
+REM CEBALERT: need to install snit!
+cd pyscrodget-0.0.1_2.1\
+c:\python25\python.exe setup.py install
+cd ..
+
+REM * tooltip
+REM CEBALERT: need to install tooltip!
+REM ******************************************************************
 
 
-REM ** For fixedpoint, the patched version from unix is used.
-REM ** CEBALERT: use the patch executable in utils to create the
-REM patch from the diff and fixedpoint.tgz file in external\
-move fixedpoint-0.1.2_patched.py c:\python25\Lib\site-packages\fixedpoint.py
-
-
+REM ******************************************************************
+REM install c compiler
 xcopy /E /I mingw c:\python25\mingw\
 util\gunzip c:\python25\mingw\*.gz 
 copy util\tar.exe c:\python25\mingw
@@ -83,8 +125,9 @@ tar xvf "c:\python25\mingw\mingw-runtime-3.9.tar"
 tar xvf "c:\python25\mingw\binutils-2.15.91-20040904-1.tar" 
 del *.tar
 del tar.exe
-
 cd ..\..
+REM ******************************************************************
+
 
 rmdir /Q /S create_python_topo
 
