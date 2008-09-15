@@ -59,6 +59,9 @@ start /w msiexec /i python-2.5.1.msi ALLUSERS=0 TARGETDIR=c:\python25 ADDLOCAL=D
 REM * jpeg
 REM CEBALERT: included in PIL binary?
 
+REM * PIL
+start /w PIL-1.1.5.win32-py2.5.exe
+
 REM * numpy
 start /w numpy-1.1.1-win32-superpack-python2.5.exe
 REM patch numpy
