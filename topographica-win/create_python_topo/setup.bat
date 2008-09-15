@@ -90,6 +90,7 @@ cd ..
 
 REM * ipython
 start /w ipython-0.8.4.win32-setup.exe
+REM CEBALERT: readline?
 
 REM * gmpy 
 REM CEBALERT: newer version than on linux
@@ -133,11 +134,11 @@ rmdir /Q /S create_python_topo
 
 echo.
 echo.
-echo Now test this has worked by renaming c:\Python25 to c:\python_topo 
-echo and replacing your copy of Topographica's python_topo with this new one.
-echo To be sure this copy works correctly, you should make sure any other
-echo copy of Topographica is uninstalled first (or try on a computer that does
-echo not have Python installed).
+echo Now test this has worked by moving c:\Python25 to your Topographica
+echo directory (replacing the one already there). To be sure this copy 
+echo works correctly, you should make sure any other copy of Topographica 
+echo is uninstalled first (or try on a computer that does not have Python 
+echo installed).
 echo.
 echo If successful, tar.gz this python_topo and add it to cvs at
 echo topographica-win\common\python_topo.tar.gz.
