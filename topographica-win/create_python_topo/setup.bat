@@ -101,13 +101,13 @@ move Tile.py c:\python25\Lib\site-packages\Tile.py
 
 REM * scrodget
 REM depends on snit
-REM CEBALERT: need to install snit!
+move snit-2.2.1 c:\python25\tcl\
 cd pyscrodget-0.0.1_2.1\
 c:\python25\python.exe setup.py install
 cd ..
 
 REM * tooltip
-REM CEBALERT: need to install tooltip!
+move tooltip-1.4 c:\python25\tcl\
 REM ******************************************************************
 
 
