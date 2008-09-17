@@ -80,7 +80,7 @@ class ConnectionField(param.Parameterized):
 
     _has_norm_total = False
     
-    __slots__ = ['weights','input_sheet_slice']
+    __slots__ = ['weights','input_sheet_slice','mask']
 
     def __get_norm_total(self):
         """
