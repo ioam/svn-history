@@ -1,36 +1,5 @@
 """
-Simulation for development of stable orientation maps based on
-lissom_oo_or_noshrinking.ty (see Chapman et. al, J. Neurosci
-16(20):6443, 1996).  The development is also robust to changes in the
-input (e.g., number of Gaussians in the retinal input or brightness of
-each Gaussian).
 
-Afferent projection activities for individual units are scaled based
-on maintaining a target average afferent activity. The learning rates
-of afferent projections are also scaled in order to maintain the
-overall rate of learning despite changes in LGN activity.
-
-The sigmoidal output function for V1 is regulated using the Triesch
-rule (Jochen Triesch, ICANN 2005, LNCS 3696 pp.65-70), which maintains
-stable activity in V1 given a target average activity.
-
-The afferent target and the target V1 activity are adapted based on
-the frequency of occurance of activation in V1 by setting the
-frequency parameter. A simulation using 2 gaussian patterns per
-iteration as the retinal input has a frequency parameter of 2
-therefore frequency values should be chosen relative to this, i.e. a
-simulation using 4 gaussian patterns per iteration has an optimum
-frequency parameter of ~ 3.56, natural images have a frequency ~ 5.0
-and noisy disks a frequency ~ 7.5. 
-
-The balance parameter which adjusts the balance between afferent input
-and V1 activity can also be adjusted to improve map organization.
-
-A separate version including functions for tracking parameters during
-development and for reproducing published figures is also available.
-(lissom_oo_or_homeostatic_tracked.ty)
-
-Not yet fully tested.
 $Id: lissom_oo_or_homeostatic.ty 8650 2008-06-17 04:28:07Z jbednar $
 
 """
@@ -47,7 +16,7 @@ import topo.pattern.random
 
 from topo.pattern.basic import Gaussian
 from topo.sheet.lissom import JointScaling, LISSOM
-from topo.sheet.optimized import LISSOM_Opt
+from topo.sheet.optimized import LISSOM_Opt,compute_joint_norm_totals_opt
 from topo.sheet.generator import GeneratorSheet
 from topo.projection.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefn.optimized import CFPRF_DotProduct_opt
@@ -78,17 +47,16 @@ if dataset=="Gaussian":
     combined_inputs = topo.pattern.basic.SeparatedComposite(min_separation=0,generators=inputs)
     
 elif dataset=="Natural":
-    
-    input_type=topo.pattern.image.Image
-    image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
-    inputs=[input_type(filename=f,
-                       size=10.0,  #size_normalization='original',(size=10.0)
-                       x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
-                       y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
-                       orientation=UniformRandom(lbound=-pi,ubound=pi,seed=65))
-		for f in image_filenames]
+	input_type=topo.pattern.image.Image
+	image_filenames=["images/mcgill_img/foliage/%02d.png"%(i+1) for i in xrange(98)]
+	inputs=[input_type(filename=f,
+				size=10.0,  #size_normalization='original',(size=10.0)
+				x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+				y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
+				orientation=UniformRandom(lbound=-pi,ubound=pi,seed=65))
+			for f in image_filenames]
 
-    combined_inputs =topo.pattern.basic.Selector(generators=inputs)
+	combined_inputs =topo.pattern.basic.Selector(generators=inputs)
 
 
 ###############################################################################
@@ -176,12 +144,12 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=locals().get('default_retinal_
                                   period=1.0, phase=0.05,
                                   nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
 
-topo.sim['LGNOn']=LISSOM_Opt(nominal_density=locals().get('default_retinal_density', 24),
+topo.sim['LGNOn']=LISSOM(nominal_density=locals().get('default_retinal_density', 24),
                           nominal_bounds=BoundingBox(radius=0.5+0.25+0.25),
                           output_fn=LGN_on_output_fn,tsettle=0,
                           measure_maps=False)
                           
-topo.sim['LGNOff']=LISSOM_Opt(nominal_density=locals().get('default_retinal_density', 24),
+topo.sim['LGNOff']=LISSOM(nominal_density=locals().get('default_retinal_density', 24),
                            nominal_bounds=BoundingBox(radius=0.5+0.25+0.25),
                            output_fn=LGN_off_output_fn,tsettle=0,
                            measure_maps=False)
@@ -193,6 +161,10 @@ topo.sim['V1'] = JointScaling(nominal_density=locals().get('default_density',48.
                               output_fn=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),V1_OF]),
                               target=afferent_target, smoothing=smoothing,
                               target_lr=locals().get('target_lr',0.045))
+
+#make normalization fast
+topo.sim["V1"].joint_norm_fn=compute_joint_norm_totals_opt
+
 
 V1Inh = locals().get('V1Inh',False)
 
@@ -280,15 +252,3 @@ topo.sim.grid_layout([[None,    'V1',     None],
                       ['LGNOn', None,     'LGNOff'],
                       [None,    'Retina', None]], xstart=150)
 
-### Input pattern changes
-
-if dataset=="NoisyDiskstoNatural":
-    changetime = locals().get('changetime',6000) #set time of eye-opening
-    new_frequency = locals().get('new_frequency',5)
-    new_balance = locals().get('new_balance',4)
-    new_mu=0.0045*new_frequency
-    new_afferent_target = new_mu*new_balance
-    topo.sim.schedule_command(changetime,'topo.sim["Retina"].set_input_generator(natural_combined_inputs,push_existing=False)')
-    topo.sim.schedule_command(changetime,'topo.sim["V1"].target=new_afferent_target')
-    topo.sim.schedule_command(changetime,'topo.sim["V1"].output_fn.mu=new_mu')
-    
