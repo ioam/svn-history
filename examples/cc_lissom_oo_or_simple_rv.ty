@@ -25,7 +25,7 @@ from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfn.optimized import CFPLF_Hebbian_opt, CFPLF_Trace_opt
 from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfn.basic import PiecewiseLinear,DivisiveNormalizeL1, PipelineOF, HomeostaticMaxEnt,CascadeHomeostatic,AttributeTrackingOF,Sigmoid
+from topo.outputfn.basic import HalfRectify,PiecewiseLinear,DivisiveNormalizeL1, PipelineOF, HomeostaticMaxEnt,CascadeHomeostatic,AttributeTrackingOF,Sigmoid
 from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialDecay, Choice
 from topo.pattern.basic import Gaussian
 from topo.learningfn.projfn import CFPLF_Trace
@@ -47,15 +47,16 @@ dataset=locals().get('dataset',"Line") #set the input type by choosing the datas
 if dataset=="Line":
 	input= Translator(generator=topo.pattern.basic.Line(   x=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=1023),   y=UniformRandom(lbound=-(core_size+0.15),ubound=(core_size+0.15),seed=53),size=1.0, offset=0.5,scale=Choice(choices=[-0.5,0.5],seed=56),bounds = BoundingBox(radius=0.8),thickness=0.04,smoothing=0.0),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
 elif dataset=="Natural":
-    input_type=topo.pattern.image.Image
-    image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
-    inputs=[input_type(filename=f,
-                       size=10.0,  #size_normalization='original',(size=10.0)
-                       x=0,
-                       y=0,
-                       orientation=0)
-		for f in image_filenames]
-    input =Translator(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
+	import topo.pattern.image 
+	input_type=topo.pattern.image.Image
+	image_filenames=["images/mcgill_img/foliage/%02d.png"%(i+1) for i in xrange(98)]
+	inputs=[input_type(filename=f,
+				size=10.0,  #size_normalization='original',(size=10.0)
+				x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
+				y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
+				orientation=UniformRandom(lbound=-pi,ubound=pi,seed=65))
+			for f in image_filenames]	
+	input =Translator(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
 
 
 ring=topo.pattern.basic.Ring(x=UniformRandom(lbound=-1.1,ubound=1.1,seed=1023),
@@ -97,8 +98,14 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 units=[(0.25,0.25),(-0.25,0.25),
        (0.25,-0.25),(-0.25,-0.25)]
 
+
 V1Simple_OF=Sigmoid(r=locals().get('r_init',22),k=locals().get('k_init',-12))
-V1Complex_OF=Sigmoid(r=locals().get('r_init',14.5),k=locals().get('k_init',-3))
+
+if locals().get('COF',"Sigmoid") == "HR":
+    V1Complex_OF=HalfRectify()
+else:
+	V1Complex_OF=Sigmoid(r=locals().get('r_init',14.5),k=locals().get('k_init',-3))
+
 
 
 
