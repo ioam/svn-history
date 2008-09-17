@@ -68,7 +68,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
 
 
                         PyObject *weights_obj = *((PyObject **)((char *)cf + weights_offset));
-                        PyObject *slice_obj = *((PyObject **)((char *)cf + slice_offset));
+                        PyArrayObject *slice_obj = *((PyArrayObject **)((char *)cf + slice_offset));
                                                     
                         // This code is optimized for contiguous arrays, which are typical,
                         // but we make it work for noncontiguous arrays (e.g. views) by
@@ -80,7 +80,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                             array = (PyArrayObject*) PyArray_ContiguousFromObject(weights_obj,PyArray_FLOAT,2,2);
                             wj = (float *) array->data;
                         }
-                        int *slice = (int *)(((PyArrayObject*)slice_obj)->data);
+                        int *slice = (int *)(slice_obj->data);
                         
                         int rr1 = *slice++;
                         int rr2 = *slice++;
