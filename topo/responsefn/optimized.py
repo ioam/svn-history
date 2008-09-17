@@ -67,17 +67,23 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                         PyObject *cf = PyList_GetItem(cfsr,l);
 
 
-                        PyObject *weights_obj = *((PyObject **)((char *)cf + weights_offset));
+                        PyArrayObject *weights_obj = *((PyArrayObject **)((char *)cf + weights_offset));
                         PyArrayObject *slice_obj = *((PyArrayObject **)((char *)cf + slice_offset));
                                                     
                         // This code is optimized for contiguous arrays, which are typical,
                         // but we make it work for noncontiguous arrays (e.g. views) by
                         // creating a contiguous copy if necessary.
+
+                        // CEBALERT: I think there are better alternatives
+                        // e.g. PyArray_GETCONTIGUOUS (PyArrayObject*) (PyObject* op)
+                        // (p248 of numpybook), which only acts if necessary...
+                        // Do we have a case where we know this code is being
+                        // called, so that I can test it easily?
                         array=0;
-                        if(PyArray_ISCONTIGUOUS((PyArrayObject*)weights_obj))
-                            wj = (float *)(((PyArrayObject*)weights_obj)->data);
+                        if(PyArray_ISCONTIGUOUS(weights_obj))
+                            wj = (float *)(weights_obj->data);
                         else {
-                            array = (PyArrayObject*) PyArray_ContiguousFromObject(weights_obj,PyArray_FLOAT,2,2);
+                            array = (PyArrayObject*) PyArray_ContiguousFromObject((PyObject*)weights_obj,PyArray_FLOAT,2,2);
                             wj = (float *) array->data;
                         }
                         int *slice = (int *)(slice_obj->data);
