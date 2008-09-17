@@ -52,9 +52,9 @@ elif dataset=="Natural":
 	image_filenames=["images/mcgill_img/foliage/%02d.png"%(i+1) for i in xrange(98)]
 	inputs=[input_type(filename=f,
 				size=10.0,  #size_normalization='original',(size=10.0)
-				x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
-				y=UniformRandom(lbound=-0.75,ubound=0.75,seed=36),
-				orientation=UniformRandom(lbound=-pi,ubound=pi,seed=65))
+				x=0,
+				y=0,
+				orientation=0)
 			for f in image_filenames]	
 	input =Translator(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
 
