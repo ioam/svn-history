@@ -78,16 +78,9 @@ class ConnectionField(param.Parameterized):
         The default of 1 gives a minimum matrix of 3x3. 0 would
         allow a 1x1 matrix.""")
 
-    # Weights matrix; not yet initialized.
-    weights = []
-
-    # Specifies how to get a submatrix from the source sheet that is aligned
-    # properly with this weight matrix.  The information is stored as an
-    # array for speed of access from optimized C components.
-    input_sheet_slice = []
-
     _has_norm_total = False
     
+    __slots__ = ['weights','input_sheet_slice']
 
     def __get_norm_total(self):
         """
@@ -588,59 +581,6 @@ class CFProjection(Projection):
 
     precedence = param.Number(default=0.8)
 
-    #####
-    def __create_fast_access_to_weights_and_slices(self):
-    # should probably move all this to the end of the class
-    #
-    # could make input_sheet_slice and weights be read-only properties
-    # so that they can't be overwritten (easily) - thus guaranteeing
-    # that this code would be a safe optimization
-        weight_arrays = []
-        slice_arrays = []
-        
-        for cfs_row in self._cfs:
-            weight_arrays_row = []
-            slice_arrays_row = []
-            for cf in cfs_row:
-                weight_arrays_row.append(cf.weights)
-                slice_arrays_row.append(cf.input_sheet_slice)
-            weight_arrays.append(weight_arrays_row)
-            slice_arrays.append(slice_arrays_row)
-            
-        self.__weight_arrays = weight_arrays
-        self.__slice_arrays = slice_arrays
-
-    def _get_weight_arrays(self):
-        try:
-            return self.__weight_arrays
-        except AttributeError:
-            self.__create_fast_access_to_weights_and_slices()
-            return self.__weight_arrays
-
-    def _get_slice_arrays(self):
-        try:
-            return self.__slice_arrays
-        except AttributeError:
-            self.__create_fast_access_to_weights_and_slices()
-            return self.__slice_arrays
-
-    def _del_weight_arrays(self):
-        try:
-            del self.__weight_arrays
-        except AttributeError:
-            pass
-
-    def _del_slice_arrays(self):
-        try:
-            del self.__slice_arrays
-        except AttributeError:
-            pass
-
-    _weight_arrays = property(fget=_get_weight_arrays,
-                              fdel=_del_weight_arrays)
-    _slice_arrays = property(fget=_get_slice_arrays,
-                             fdel=_del_slice_arrays)
-    #####
 
     def __init__(self,initialize_cfs=True,**params):
         """
@@ -852,18 +792,6 @@ class CFProjection(Projection):
                 cfs[r,c].change_bounds(template=slice_template,
                                         mask=mask_template,
                                         output_fn=output_fn)
-
-        # CEBALERT: would NOT need to call this if CF could simply fill
-        # new values into the slice (in place) rather than replacing
-        # the whole object! Slice cleanup is an urgent to-do item anyway.
-        #self._create_fast_access_to_weights_and_slices()
-        del self._slice_arrays
-
-        # ...And would also not need to call this if CF's change_bounds
-        # altered the array in place (currently it copies the array)
-        del self._weight_arrays
-        
-        # (these also slow down iteration immediately after the bounds changes)
 
 
     def change_density(self, new_wt_density):

@@ -39,10 +39,20 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
         cfs = iterator.proj._cfs
         mask = iterator.proj.dest.mask.data
 
-        weight_arrays = iterator.proj._weight_arrays
-        slice_arrays = iterator.proj._slice_arrays
-            
+        cf_type = iterator.proj.cf_type
+    
         code = """
+            // CEBALERT: should provide a macro for getting offset
+
+            ///// GET WEIGHTS OFFSET
+            PyMemberDescrObject *weights_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"weights");
+            Py_ssize_t weights_offset = weights_descr->d_member->offset;
+            Py_DECREF(weights_descr);
+
+            ///// GET SLICE OFFSET
+            PyMemberDescrObject *slice_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"input_sheet_slice");
+            Py_ssize_t slice_offset = slice_descr->d_member->offset;
+            Py_DECREF(slice_descr);
 
             double *tact = temp_act;
 	    float *wj;
@@ -50,16 +60,16 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
 
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
-                PyObject *weight_arraysr = PyList_GetItem(weight_arrays,r);
-                PyObject *slice_arraysr = PyList_GetItem(slice_arrays,r);
 		for (int l=0; l<cols; ++l) {
                     if((*mask++) == 0.0)
                         *tact = 0;
                     else {
                         PyObject *cf = PyList_GetItem(cfsr,l);
-                        PyObject *weights_obj = PyList_GetItem(weight_arraysr,l);
-                        PyObject *slice_obj = PyList_GetItem(slice_arraysr,l);
-                            
+
+
+                        PyObject *weights_obj = *((PyObject **)((char *)cf + weights_offset));
+                        PyObject *slice_obj = *((PyObject **)((char *)cf + slice_offset));
+                                                    
                         // This code is optimized for contiguous arrays, which are typical,
                         // but we make it work for noncontiguous arrays (e.g. views) by
                         // creating a contiguous copy if necessary.
@@ -100,7 +110,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                 }
             }
         """
-	inline(code, ['mask','X', 'strength', 'icols', 'temp_act','cfs','cols','rows','slice_arrays','weight_arrays'], local_dict=locals())
+	inline(code, ['mask','X', 'strength', 'icols', 'temp_act','cfs','cols','rows','cf_type'], local_dict=locals(), headers=['<structmember.h>'])
 
 class CFPRF_DotProduct(CFPRF_Plugin):
     """
