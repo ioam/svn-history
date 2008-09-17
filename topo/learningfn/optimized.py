@@ -40,7 +40,26 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         if(single_connection_learning_rate==0): return
         irows,icols = input_activity.shape
+        cf_type = iterator.proj.cf_type
         hebbian_code = """
+            // CEBALERT: should provide a macro for getting offset
+
+            ///// GET WEIGHTS OFFSET
+            PyMemberDescrObject *weights_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"weights");
+            Py_ssize_t weights_offset = weights_descr->d_member->offset;
+            Py_DECREF(weights_descr);
+
+            ///// GET SLICE OFFSET
+            PyMemberDescrObject *slice_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"input_sheet_slice");
+            Py_ssize_t slice_offset = slice_descr->d_member->offset;
+            Py_DECREF(slice_descr);
+
+            ///// GET MASK OFFSET
+            PyMemberDescrObject *mask_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"mask");
+            Py_ssize_t mask_offset = mask_descr->d_member->offset;
+            Py_DECREF(mask_descr);
+
+
             double *x = output_activity;
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
@@ -50,13 +69,14 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                         load *= single_connection_learning_rate;
 
                         PyObject *cf = PyList_GetItem(cfsr,l);
-                        PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
-                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"input_sheet_slice");
-                        PyObject *mask_obj    = PyObject_GetAttrString(cf,"mask");
 
-                        float *wi = (float *)(((PyArrayObject*)weights_obj)->data);
-                        int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
-                        float *m  = (float *)(((PyArrayObject*)mask_obj)->data);
+                        PyArrayObject *weights_obj = *((PyArrayObject **)((char *)cf + weights_offset));
+                        PyArrayObject *slice_obj = *((PyArrayObject **)((char *)cf + slice_offset));
+                        PyArrayObject *mask_obj = *((PyArrayObject **)((char *)cf + mask_offset));
+                        
+                        float *wi = (float *)(weights_obj->data);
+                        int *slice = (int *)(slice_obj->data);
+                        float *m = (float *)(mask_obj->data);
                         
                         int rr1 = *slice++;
                         int rr2 = *slice++;
@@ -82,11 +102,6 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                             }
                             inpj += icols;
                         }
-
-                        // Anything obtained with PyObject_GetAttrString must be explicitly freed
-                        Py_DECREF(weights_obj);
-                        Py_DECREF(slice_obj);
-                        Py_DECREF(mask_obj);
                         
                         // store the sum of the cf's weights
                         PyObject *total_obj = PyFloat_FromDouble(total);  //(new ref)
@@ -98,7 +113,12 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
             }
         """
 
-        inline(hebbian_code, ['input_activity', 'output_activity','rows', 'cols', 'icols', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
+        inline(hebbian_code, ['input_activity', 'output_activity','rows', 'cols',
+                              'icols', 'cfs', 'single_connection_learning_rate',
+                              'cf_type'],
+               local_dict=locals(),
+               headers=['<structmember.h>'])               
+
 
 class CFPLF_Scaled_opt(CFPLF_PluginScaled):
     """
