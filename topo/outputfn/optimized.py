@@ -32,11 +32,28 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     def __call__(self, iterator, mask, **params):
         rows,cols = mask.shape
 
+        cf_type=iterator.proj.cf_type
+
         cfs = iterator.proj._cfs
         # The original code normalized only the CFs for units that were
         # activated; it might be possible to restore that extra optimization
         # if some way is found to override that for the first iteration.
         code = """
+            // CEBALERT: should provide a macro for getting offset
+
+            ///// GET WEIGHTS OFFSET
+            PyMemberDescrObject *weights_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"weights");
+            Py_ssize_t weights_offset = weights_descr->d_member->offset;
+            Py_DECREF(weights_descr);
+
+            ///// GET SLICE OFFSET
+            PyMemberDescrObject *slice_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"input_sheet_slice");
+            Py_ssize_t slice_offset = slice_descr->d_member->offset;
+            Py_DECREF(slice_descr);
+
+            // CB: I doubt norm_total can be a property and a slot, but maybe
+            // it could be, or maybe we could use the actual attribute...
+            
             double *x = mask;
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
@@ -45,12 +62,17 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                     if (load != 0)
                     {
                         PyObject *cf = PyList_GetItem(cfsr,l);
-                        PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
-                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"input_sheet_slice");
+
+                        PyArrayObject *weights_obj = *((PyArrayObject **)((char *)cf + weights_offset));
+                        PyArrayObject *slice_obj = *((PyArrayObject **)((char *)cf + slice_offset));
+
                         PyObject *sum_obj     = PyObject_GetAttrString(cf,"norm_total");
                         
-                        float *wi = (float *)(((PyArrayObject*)weights_obj)->data);
-                        int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
+                        float *wi = (float *)(weights_obj->data);
+                        int *slice = (int *)(slice_obj->data);
+                        
+
+
                         double total = PyFloat_AsDouble(sum_obj); // sum of the cf's weights
 
                         int rr1 = *slice++;
@@ -66,8 +88,6 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                         }
 
                         // Anything obtained with PyObject_GetAttrString must be explicitly freed
-                        Py_DECREF(weights_obj);
-                        Py_DECREF(slice_obj);
                         Py_DECREF(sum_obj);
 
                         // Indicate that norm_total is stale
@@ -76,7 +96,8 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                 }
             }
         """    
-        inline(code, ['mask','rows','cols','cfs'], local_dict=locals())
+        inline(code, ['mask','rows','cols','cfs','cf_type'], local_dict=locals(),
+               headers=['<structmember.h>'])
 
 
 class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
