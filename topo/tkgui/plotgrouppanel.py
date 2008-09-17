@@ -316,7 +316,10 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         # sheets, then this can be changed (e.g. we can put in plot
         # but not coords, and use a check for coords to discover if
         # there is a sheet or not).
-        
+
+        # CEBALERT: need to get the coords (sheet & matrix) correctly
+        # one time and make all related methods use that info. See
+        # Chris P's recent change (r9220).
         if plot.plot_src_name is not '':
             canvas_x,canvas_y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
             sf = plot.scale_factor
