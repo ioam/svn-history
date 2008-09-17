@@ -872,6 +872,7 @@ class SheetPanel(PlotGroupPanel):
                 topo.guimain.auto_refresh_panels.remove(self)
 
 
+
     def _connection_fields_window(self):
         """
         Open a Connection Fields plot for the unit currently
@@ -879,9 +880,11 @@ class SheetPanel(PlotGroupPanel):
         """
         if 'plot' in self._right_click_info:
             sheet = topo.sim[self._right_click_info['plot'].plot_src_name]
-            x,y =  self._right_click_info['coords'][1]
             # CEBERRORALERT: should avoid requesting cf out of range.
-            topo.guimain['Plots']["Connection Fields"](x=x,y=y,sheet=sheet)
+            rows_ultratrue,cols_ultratrue = self._right_click_info['coords'][0]
+            center_x,center_y = sheet.matrixidx2sheet(rows_ultratrue,cols_ultratrue)
+            topo.guimain['Plots']["Connection Fields"](x=center_x,y=center_y,sheet=sheet)                     
+
             
     def _receptive_field_window(self):
         """
@@ -890,9 +893,9 @@ class SheetPanel(PlotGroupPanel):
         """
         if 'plot' in self._right_click_info:
             plot = self._right_click_info['plot']
-            x,y = self._right_click_info['coords'][1]
             sheet = topo.sim[plot.plot_src_name]
-            center_x,center_y = sheet.closest_cell_center(x,y)
+            rows_ultratrue,cols_ultratrue = self._right_click_info['coords'][0]
+            center_x,center_y = sheet.matrixidx2sheet(rows_ultratrue,cols_ultratrue)
 
             # RFHACK:
             # just matrixplot for whatever generators have the views
