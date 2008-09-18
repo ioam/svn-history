@@ -80,7 +80,7 @@ detailed example of wrapping an external NEST simulation using the
 Topographica Sheet interface.  Shorter examples of how to interface
 with a variety of other simulators follow.
 
-<H2><A NAME="s:perrinet-model"><BR>
+<H2><A NAME="perrinet-model"><BR>
 Interfacing to Perrinet retinal model in PyNN
 </H2>
 
@@ -108,12 +108,13 @@ file.
 <P>The Topographica model resulting from wrapping this network as a
 Photoreceptor Sheet (<TT>Photoreceptors</TT>), a connection to PyNN
 (<TT>PyNNR</TT>), and two ganglion cell Sheets (<TT>ON_RGC</TT> and
-<TT>OFF_RGC</TT>)is:
+<TT>OFF_RGC</TT>) is:
 
-<center><img name="images/perrinet_retina_modeleditor2.png"></center>
+<P><img SRC="images/perrinet_retina_modeleditor2.png">
 
-and the corresponding code is:
+<P>and the corresponding code is:
 
+<P>
 <pre>
           import numpy
           from topo import sheet,numbergen,pattern,param,projection
@@ -244,7 +245,7 @@ plots for a wide variety of underlying simulations.
 
 <H2>Interfacing to other Python code (e.g., PyNEST, NEURON)</H2>
 
-<P>The general approach outlined <A HREF="s:perrinet-model">above</A> can be
+<P>The general approach outlined <A HREF="#perrinet-model">above</A> can be
 used for any other model running in an external simulator that has a
 Python interface.  In each case, a new Topographica EventProcessor
 class can be created to accept incoming events, process them somehow,
@@ -275,7 +276,7 @@ mlab.plot(x)
 <P>Any Matlab function (including user scripts) can be called similarly,
 with seamless interchange of scalar and array data between the two
 systems.  This capability makes it simple to develop
-interfaces like the one outlined <A HREF="s:perrinet-model">above</A>,
+interfaces like the one outlined <A HREF="#perrinet-model">above</A>,
 or just to use small bits of Matlab code when appropriate.
 
 
