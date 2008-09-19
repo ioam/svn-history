@@ -38,7 +38,9 @@
 <font size="-1">
 <dt>Example scripts:</dt>
 <dd>
-  <div class="i2">- example file for interfacing to external simulator (examples/perrinet_retina.ty)</div>
+  <div class="i2">- example file for
+  <a href="../User_Manual/interfacing.html">interfacing to external simulators</a>
+  (examples/perrinet_retina.ty)</div>
 <!--  mouse model (examples/lissom_oo_or_species.ty)<BR> -->
 </dd>
 <dt>Component library:</dt>
