@@ -37,21 +37,14 @@ cd ..\..
 REM not using the makefile...
 del /Q /F Makefile
 
-REM delete files created by setup_cvs_copy\setup.bat
-del /Q /F topographica
 del /Q /F topographica.bat
 
-
-print %cd%
 REM ** delete external/
 rmdir /Q /S external
-
 
 REM ** Finally, remove topographica-win\
 REM (includes this file!)
 rmdir /Q /S topographica-win
-
-
 
 
 :end
