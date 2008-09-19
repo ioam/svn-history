@@ -25,6 +25,10 @@ from topo.pattern.basic import Gaussian
 from topo.outputfn.basic import PiecewiseLinear
 
 
+# because param.tk still might depend on some stuff done
+# by tkgui, such as installing tile if necessary.
+import topo.tkgui
+topo.tkgui.start()
 
 
 class SomeFrame(tk.TkParameterized,Frame):

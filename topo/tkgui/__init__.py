@@ -122,7 +122,9 @@ global TK_SUPPORTS_DOCK
 TK_SUPPORTS_DOCK = True
 
 
-# CEBALERT: this function needs some cleaning up
+# CEBALERT: this function needs some cleaning up.
+# Some stuff should be moved out to topo.param.tk,
+# which could also make this file much simpler.
 
 # gets set to the TopoConsole instance created by start.
 console = None
