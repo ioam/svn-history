@@ -24,7 +24,7 @@ from topo.command.basic import pattern_present, wipe_out_activity
 from topo.misc.numbergenerator import UniformRandom
 from topo.misc.util import frange
 from topo.misc.distribution import Distribution
-from topo.pattern.basic import SineGrating, Gaussian
+from topo.pattern.basic import SineGrating, Gaussian, Rectangle
 from topo.pattern.teststimuli import SineGratingDisk, OrientationContrastPattern, SineGratingRectangle
 from topo.pattern.random import GaussianRandom
 from topo.sheet.generator import GeneratorSheet
@@ -608,14 +608,14 @@ pg= create_plotgroup(name='RF Projection',category="Other",
 pg.add_plot('RFs',[('Strength','RFs')])
 
 
-def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
-                pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),True,duration=1.0),
+def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=True,
+                pattern_presenter=PatternPresenter(Rectangle(size=0.1,aspect_ratio=1.0),True,duration=1.00),
                 x_range=(-0.2,0.2),y_range=(-0.2,0.2)):
     """
     Map receptive fields by reverse correlation.
 
-    Presents a large collection of input patterns, typically small
-    Gaussians, keeping track of which units in the specified
+    Presents a large collection of input patterns, typically pixel
+    by pixel on and off, keeping track of which units in the specified
     input_sheet were active when each unit in other Sheets in the
     simulation was active.  This data can then be used to plot
     receptive fields for each unit.  Note that the results are true
@@ -633,6 +633,7 @@ def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
     
     # RFHACK: Should improve how parameters are passed, and add a
     # default value for this parameter
+
     if not input_sheet_name:
         raise ValueError("Must set topo.command.analysis.input_sheet_name before calling measure_rfs")
 
@@ -650,16 +651,18 @@ def measure_rfs(divisions=10,scale=30.0,offset=0.5,display=False,
     density=resolution*input_sheet.nominal_density/100.0
     divisions = density*(r-l)-1
     size = 1.0/(density)
-    x_range=(r,l)
-    y_range=(t,b)
-    
+    x_range=(r-size/2,l)
+    y_range=(t-size,b)
+    size=size*1
+
+
     if divisions <= 0:
         raise ValueError("Divisions must be greater than 0")
 
     feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
                       Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions),
                       Feature(name="scale",range=(-scale,scale),step=scale*2)]   
-                      
+               
     param_dict = {"size":size,"scale":scale,"offset":offset}
 
     x=ReverseCorrelation(feature_values,input_sheet=input_sheet) #+change argument
