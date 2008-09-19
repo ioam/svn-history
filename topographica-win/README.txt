@@ -2,50 +2,29 @@
 Files for setting up Topographica on Windows
 ********************************************
 
-CEBALERT: currently, Python cannot be built on Windows with a free
-compiler. Until that changes, we have to use pre-built binaries. As
-indicated in doc/Future_Work/current_work.html, we might eventually
-be able to use pyMinGW.
+Currently, Topographica can be used in two different ways on Windows.
 
-This topographica-win module is therefore a more complicated
-than it would otherwise need to be. The way it works at the moment is
-like this:
+The first is by building Topographica in the MSYS/MinGW environment.
+For that, the topographica directory and a working MSYS/MinGW
+environment are required. We provide a working MSYS/MinGW setup in the
+msys/ subdirectory; apart from that subdirectory, nothing else in
+topographica-win is needed to build topographica this way. Further
+instructions are provided in the Topographica installation
+instructions.
 
-
-Creating python_topo/
-====================
-
-* This step need only be performed if we change Python version or
-* update an external package (e.g. numpy), and it is only performed
-* by one developer: the result is committed to the repository.
-
-A developer uses the script in create_python_topo/ to setup a copy of
-Python plus all the extras (e.g. numpy) needed for Topographica. The
-binary version of Python that we get from python.org expects to be the
-only copy of Python on the computer, and the extras will only install
-into that one directory.
-
-The result is a python_topo/ directory, containing all the files
-necessary for Topographica. This is zipped up and put into the common/
-subdirectory for use by the setup routines.
-
-See the create_python_topo/ directory.
+The second method of using Topographica on Windows is by installing
+our binary setup .exe file. topographica-win contains the tools
+necessary for Topographica developers to create this installer.
 
 
-Setting up Topographica
-=======================
+To create an .exe installer
+===========================
 
-Developers want a CVS-controlled copy of Topographica, whereas users
-just require an installation program. Therefore, there are two further
-subdirectories: create_installer/ and setup_cvs_copy/.
+(1) If external packages (such as python or numpy) need to be updated,
+follow the instructions in create_python_topo/README.txt
 
-- Developers
-After checking out topographica-win, Windows developers
-run the setup script in setup_cvs_copy/. This makes their
-copy of Topographica ready to run.
+(2) Follow the instructions in setup_cvs_copy/README.txt
 
-- Making an installation program
-To make an installation program for distribution to users,
-follow the instructions in create_installer/.
+(3) Follow the instructions in create_installer/README.txt
 
 
