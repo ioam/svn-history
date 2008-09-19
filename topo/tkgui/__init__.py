@@ -154,6 +154,9 @@ def start(mainloop=False,banner=True,root=None,console_has_console=False):
         root = Tkinter.Tk()
     root.withdraw()
 
+    if Tkinter.TkVersion < 8.5:
+        root.tk.call("package","require","tile")
+
     if system_platform=='mac': 
         import topo.misc.filepath
         pack_path = os.path.join(topo.misc.filepath.application_path,
