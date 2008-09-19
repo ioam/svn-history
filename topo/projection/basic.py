@@ -63,7 +63,9 @@ class SharedWeightCF(ConnectionField):
         self.initialized=False
         self.x = x; self.y = y
         self.initialized=True
-        ### 
+        ###
+        self.mask=mask # CEBALERT: same deal: mask would be set if __init__ called,
+        # along with some of the other attributes below - needs cleaning up!
         
         self.input_sheet = input_sheet
 

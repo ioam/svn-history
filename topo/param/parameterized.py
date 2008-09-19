@@ -60,6 +60,23 @@ def descendents(class_):
 
 
 
+def get_all_slots(class_):
+    """
+    Return a list of slot names for slots defined in this class and
+    its superclasses.
+    """
+    # A subclass's __slots__ attribute does not contain slots defined
+    # in its superclass (the superclass' __slots__ end up as
+    # attributes of the subclass).
+    all_slots = []
+    parent_param_classes = [class_ for class_ in classlist(class_)[1::]]
+    for class_ in parent_param_classes:
+        if hasattr(class_,'__slots__'):
+            all_slots+=class_.__slots__
+    return all_slots
+    
+
+
 
 # CEBALERT: decorators hide the docstring when using help().  Consider
 # the decorator module: would allow doc to be seen for the actual
@@ -121,6 +138,16 @@ class ParameterMetaclass(type):
         else:
             return type.__getattribute__(mcs,name)
         
+
+
+# CEBALERT: we break some aspects of slot handling for Parameter and
+# Parameterized. The __new__ methods in the metaclasses for those two
+# classes omit to handle the case where __dict__ is passed in
+# __slots__ (and they possibly omit other things too). Additionally,
+# various bits of code in the Parameterized class assumes that all
+# Parameterized instances have a __dict__, but I'm not sure that's
+# guaranteed to be true (although it's true at the moment).
+
 
 # CB: we could maybe reduce the complexity by doing something to allow
 # a parameter to discover things about itself when created (would also
@@ -388,17 +415,8 @@ class Parameter(object):
         All Parameters have slots, not a dict, so we have to support
         pickle and deepcopy ourselves.
         """
-        # The only complication is that a subclass' __slots__ do
-        # not contain superclass' __slots__ (the superclass' __slots__
-        # end up as attributes of the subclass).
-        parent_param_classes = [class_ for class_ in classlist(type(self))[1::]]
-        
-        all_slots = []
-        for class_ in parent_param_classes:
-            all_slots+=class_.__slots__
-        
         state = {}
-        for slot in all_slots:
+        for slot in get_all_slots(type(self)):
             state[slot] = getattr(self,slot)
 
         return state
@@ -1173,19 +1191,26 @@ class Parameterized(object):
             print '%s.%s = %s' % (self.name,name,val)
 
 
-    # CB: this method *only* exists because object has no __getstate__
-    # and we use __getstate__ in some subclasses.
-    # In the future, if we want to control something about
-    # __getstate__ for all classes, it will be easier if subclasses
-    # that already have a __getstate__ go through this
-    # method. Otherwise we might get hard-to-track bugs when sublasses
-    # that an have existing __getstate__ method are not altered.
     def __getstate__(self):
         """
         Save the object's state: return a dictionary that is a shallow
-        copy of the object's __dict__.
+        copy of the object's __dict__ and that also includes the
+        object's __slots__ (if it has any).
         """
-        return self.__dict__.copy()
+        # remind me, why is it a copy? why not just state.update(self.__dict__)?        
+        state = self.__dict__.copy()
+
+        for slot in get_all_slots(type(self)):
+            state[slot] = getattr(self,slot)
+
+        # Note that Parameterized object pickling assumes that
+        # attributes to be saved are only in __dict__ or __slots__
+        # (the standard Python places to store attributes, so that's a
+        # reasonable assumption). (Additionally, class attributes that
+        # are Parameters are also handled, even when they haven't been
+        # instantiated - see PickleableClassAttributes.)
+
+        return state
 
 
     def __setstate__(self,state):
@@ -1195,7 +1220,8 @@ class Parameterized(object):
         During this process the object is considered uninitialized.
         """
         self.initialized=False
-        self.__dict__.update(state)
+        for name,value in state.items():
+            setattr(self,name,value)                
         self.initialized=True
 
 
@@ -1283,6 +1309,7 @@ _param_name_changes = {}
 #
 # (not yet finished - do we need to add information about version numbers?)
 
+# CEBALERT: Can't this stuff move to the ParameterizedMetaclass?
 import __main__
 class PicklableClassAttributes(object):
     """
