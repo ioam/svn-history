@@ -15,6 +15,7 @@ copy ..\..\external\numpy.diff .
 REM Gnosis_Utils
 ..\util\gunzip -c ..\..\external\Gnosis_Utils-1.3.0-alpha-7.tar.gz > ..\..\external\Gnosis_Utils-1.3.0-alpha-7.tar
 ..\util\tar xvf ..\..\external\Gnosis_Utils-1.3.0-alpha-7.tar
+copy ..\..\external\Gnosis_Utils.diff .
 
 REM Tile
 copy ..\..\external\Tile.py .
@@ -84,8 +85,8 @@ REM CEBALERT: skipped: pychecker common pylint epydoc docutils
 
 REM * gnosis
 cd Gnosis_Utils-1.3.0-alpha-7\
+..\util\patch.exe -p0 < ..\Gnosis_Utils.diff
 c:\python25\python.exe setup.py install
-REM CEBALERT: need to patch gnosis
 cd ..
 
 REM * ipython
