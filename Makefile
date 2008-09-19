@@ -264,6 +264,9 @@ v_lissom:
 map-tests:
 	./topographica -c "default_density=8" examples/lissom_oo_or.ty -c "topo.sim.run(100);from topo.tests.test_map_measurement import *; test(plotgroups_to_test)" 
 
+generate-map-tests-data:
+	./topographica -c "default_density=8" examples/lissom_oo_or.ty -c "topo.sim.run(100);from topo.tests.test_map_measurement import *; generate(plotgroups_to_test)" 
+
 script-repr-tests:
 	./topographica examples/hierarchical.ty -a -c "save_script_repr('topo/tests/script_repr_test.ty')"
 	./topographica topo/tests/script_repr_test.ty
