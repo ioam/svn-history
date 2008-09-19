@@ -118,6 +118,8 @@ else:
     right_click_release_events = ['ButtonRelease-2']
     
 
+global TK_SUPPORTS_DOCK
+TK_SUPPORTS_DOCK = True
 
 
 # CEBALERT: this function needs some cleaning up
@@ -162,6 +164,12 @@ def start(mainloop=False,banner=True,root=None,console_has_console=False):
         pack_path = os.path.join(topo.misc.filepath.application_path,
                                  "lib")
         root.tk.call("lappend","auto_path",pack_path)
+
+    try:
+        root.tk.call("wm","forget",root._w)
+    except Tkinter.TclError:
+        global TK_SUPPORTS_DOCK
+        TK_SUPPORTS_DOCK=False
 
 
     root.menubar = ControllableMenu(root)
