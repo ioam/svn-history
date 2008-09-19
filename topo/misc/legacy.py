@@ -112,6 +112,10 @@ from topo.%s.%s import *
         # gotta supply the path because mod is fake...
         fake_a_module(x,mod,code,'topo.%s'%old)
 
+# CB: should use a factory to produce functions or should use
+# decorations.  Would avoid code duplication and make it simpler to
+# see what's happening
+
 # CB: not fully tested (don't know if it's enough to support all user
 # code).
 def fake_a_module(name,parent,source_code,parent_path=None):
@@ -501,6 +505,19 @@ from topo.outputfn import HomeostaticMaxEnt # and what else?
 
         # rXXXX renamed CFProjection.weights_shape to CFProjection.cf_shape
         param.parameterized._param_name_changes['topo.base.cf.CFProjection']={'weights_shape':'cf_shape'}
+
+        # rXXXX CF's bounds made into read-only attribute (since the value
+        # actually comes from the slice).
+        # (Problem exposed when Parameterized's __setstate__ changed to
+        # set all state attributes, rather than just those in __dict__?)        
+        def cf_bounds_property(state):
+            try:
+                del state['bounds']
+            except KeyError:
+                pass
+
+        from topo.base.cf import ConnectionField
+        preprocess_state(ConnectionField,cf_bounds_property)
         
 
 
