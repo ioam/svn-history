@@ -36,9 +36,9 @@ from topo.misc.filepath import application_path, resolve_path
 # CEBALERT: while Windows version doesn't have identical paths, need this try/except
 try:
     # should just use resolve_path('/lib/py.../Vera.ttf') here
-    TITLE_FONT = ImageFont.truetype(os.path.join(application_path,'lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
+    TITLE_FONT = ImageFont.truetype(resolve_path('lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
 except:
-    TITLE_FONT = ImageFont.truetype(resolve_path('python_topo/Lib/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'))
+    TITLE_FONT = ImageFont.truetype(resolve_path('python_topo/Lib/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
 
 
 ### JCALERT: To do:
