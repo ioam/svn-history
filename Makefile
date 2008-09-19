@@ -15,6 +15,7 @@ IMPORT_WEAVE = 1
 # (must match across platforms & for optimized vs unoptimized)
 TESTDP = 7
 
+# CEBALERT: tied to exact windows version!
 ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
 	TIMER = 
 else
@@ -349,14 +350,17 @@ SCRIPTS_TO_KEEP_IN_DIST= ^cfsom_or.ty ^goodhill_network90.ty ^hierarchical.ty ^l
 #@@	   ${RM} examples/*.typ
 #@@	   ${RM} -r Output
 #@@	   ${RM} -r images
-#@@	   ${RM} -r topographica-win win_build_exe.py
+#@@	   ${RM} -r win_build_exe.py
 #@@	   ${RM} -r tmp/
 #@@	   ${RM} -r contrib/
 #@@	   ${RM} -r .svn */.svn */*/.svn */*/*/.svn */*/*/*/.svn
 #@@	   ${CD} topo/tests/reference ; make clean
 #@@	   ${RM} -r doc/buildbot/
 #@@	   find examples/*.ty -maxdepth 1 ${subst ^,! -name ,${SCRIPTS_TO_KEEP_IN_DIST}} -exec rm {} \;
-
+#@@	   ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
+#@@	   else
+#@@	   	${RM} -r topographica-win 
+#@@	   endif
 
 # Make public distribution archive
 distarc: FORCE distclean 
