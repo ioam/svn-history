@@ -874,6 +874,26 @@ svn2cl-clean:
 
 svn2cl-uninstall:
 	rm -rf svn2cl ${SVN2CL}
+
+
+##############################################################
+# pyttk (CB: currently unused - will replace Tile.py)
+#
+PYTTK = pyttk-0.2.6
+
+PYTTK_UNINSTALL += ${PYTHON_LIB}/site-packages/pyttk.py
+
+pyttk: ${PYTTK}.tar.gz python
+	tar -xzf ${PYTTK}.tar.gz
+	cd ${PYTTK}; ${PREFIX}/bin/python setup.py install ${PYSETUP_OPT}
+	touch pyttk
+
+pyttk-clean:
+	rm -rf ${PYTTK}
+pyttk-uninstall:
+	rm -rf pyttk ${foreach f,${PYTTK_UNINSTALL}, ${PREFIX}/${f}}
+
+
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
