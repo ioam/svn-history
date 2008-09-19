@@ -62,7 +62,7 @@ feature preference maps, decoding activity values, and 1D, 2D, or 3D
 activity or map plotting.
 
 <P>To be a part of Topographica, a model will generally need to
-support one or more <?php classref('topo.base.sheet','Sheet')?>
+support one or more <?php classref('topo.base.sheet','Sheet')?> 
  objects.  A Sheet is required to have a fixed area and density of
 neurons, and to be able to generate a floating-point array of the
 appropriate size when asked for its current pattern of activity.  Once
