@@ -41,6 +41,7 @@ if len(sys.argv)>2:
 # topographica script
 f = open(os.path.join(path,"topographica"),'w')
 
+f.write("#! python_topo/python.exe")
 f.write("# Startup script for Topographica\n")
 f.write("\n")
 f.write("# for gcc compiler\n")
