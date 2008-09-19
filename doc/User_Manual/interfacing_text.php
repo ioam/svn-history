@@ -63,7 +63,7 @@ activity or map plotting.
 
 <P>To be a part of Topographica, a model will generally need to
 support one or more <?php classref('topo.base.sheet','Sheet')?>
-objects.  A Sheet is required to have a fixed area and density of
+ objects.  A Sheet is required to have a fixed area and density of
 neurons, and to be able to generate a floating-point array of the
 appropriate size when asked for its current pattern of activity.  Once
 this activity matrix is available for a new Sheet type, then nearly
@@ -122,7 +122,7 @@ Photoreceptor Sheet (<TT>Photoreceptors</TT>), a connection to PyNN
 (1)       <B>import perrinet_retina_pynest as pynr</B>
            
 (2)       class PyNNRetina(EventProcessor):
-(3)       dest_ports=["Activity"]
+(3)           dest_ports=["Activity"]
               src_ports=["ONActivity","OFFActivity"]
               N = param.Number(default=8,bounds=(0,None),doc="Network width")
               simtime = param.Number(default=4000*0.1,bounds=(0,None),
@@ -318,7 +318,7 @@ NEST).  Although the general problem of simulator interoperatibility
 is difficult to address, in this specific case it is relatively easy
 to get practical benefits from combining simulators.
 
-<P>Although the approach outlined above is general purpose, it does
+<P>While the approach outlined above is general purpose, it does
 require coding a Topographica component to match each specific model
 implemented externally.  A useful but more complex alternative would
 be to provide a detailed mapping between object types in an external
