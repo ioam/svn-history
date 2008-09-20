@@ -30,14 +30,13 @@ to stick to the LATEST_STABLE version except to fix specific problems.
 
 <H3>Downloading via Subversion</H3>
 
-The SVN installation instructions differ on the various platforms, as
-outlined below.  Regardless of platform, please note that the
-Topographica repository contains some very large files, and the SVN
-download process may appear to hang or freeze at various times while
-these files are downloaded.  Unfortunately, SVN does not provide any
-sort of feedback that this is occurring, so please just be patient
-when downloading.  Such pauses should be rare after the first SVN
-download, unless one of the large files has been updated.
+<P>Many platforms (e.g. Linux and other UNIX platforms) already have
+all of the necessary programs and libraries required to obtain
+Topographica by SVN.  If your machine does not have <code>svn</code>
+installed, you will first need to obtain and install it. (We provide
+instructions below for getting SVN on <A HREF="#mac">Mac</A> and <A
+HREF="#Windows">Windows</A>.
+
 
 <P>The location (URL) of the Topographica repository is:
 <pre>
@@ -45,103 +44,64 @@ https://topographica.svn.sourceforge.net/svnroot/topographica
 </pre>
 
 In commands given on this page, <code>$TOPOROOT</code> is used to
-represent that URL, so please replace it in commands you enter. (For
-instance, linux users might first type
-<code>export TOPOROOT=https://topographica.svn.sourceforge.net/svnroot/topographica</code>,
-and then <code>$TOPOROOT</code> will be substituted for them in the
-commands below.)
+represent that URL, so please replace it in commands you
+enter. (Depending on your shell type, you might want to begin by
+typing:
 
+<pre>
+export TOPOROOT=https://topographica.svn.sourceforge.net/svnroot/topographica
+</pre>
 
+so that <code>$TOPOROOT</code> will be substituted in the commands
+below.)
 
-<H4><A NAME="linux">Linux/UNIX:</A></H4>
-
-<P>Most Linux and other UNIX platforms already have all of the necessary
-programs and libraries required for Topographica.  But if your
-distribution does not include <code>svn</code> or <code>php</code> by
-default, first obtain versions of those programs for your system and
-install them.
-
-<P>The Topographica files can be checked out by using the command:
+<P><A NAME="linux">The Topographica files can be checked out by using
+the command</A>:
 
 <pre>
 svn co $TOPOROOT/tags/LATEST_STABLE/topographica topographica
 </pre>
 
-<P>This will create a <code>topographica</code> directory in your present
-working directory; omitting the final <code>topographica</code> will 
-put the files directly into your present directory.
+<P>This will create a <code>topographica</code> directory in your
+present working directory; omitting the final
+<code>topographica</code> will put the files directly into your
+present directory.
 
-<P>To get the bleeding-edge (trunk) version, replace <code>tags/LATEST_STABLE</code> with 
-<code>trunk</code>. Note that the bleeding-edge version is not always
-usable due to work in progress (but you can check to see if the code
-currently builds on a specific platform, or if our code tests pass, by
-visiting our <A HREF="http://buildbot.topographica.org/">automatic
-tests page</A>).
+<P>To get the bleeding-edge (trunk) version, replace
+<code>tags/LATEST_STABLE</code> with <code>trunk</code>. Note that the
+bleeding-edge version is not always usable due to work in progress
+(but you can check to see if the code currently builds on a specific
+platform, or if our code tests pass, by visiting our <A
+HREF="http://buildbot.topographica.org/">automatic tests page</A>).
 
 <P>The checkout process will likely take several minutes (probably
 appearing to hang at certain points), as there are some extremely
-large files involved. Once it has completed, you can return to
-instructions for <a href="index.html#building-topographica">building
-Topographica</a> (although ensure your system has the prerequisites as
-listed on that page for your platform)</a>.
+large files involved. Once it has completed, you can return to the
+instructions for <a href="index.html">installing Topographica</a>.
 
 
-<H4><A NAME="osx">Mac OS X:</A></H4>
+<H4><A NAME="osx">Getting Subversion on Mac OS X</A></H4>
 
 <!-- note that out-of-date X11 instructions were removed in 
 r8900. At that revision, we topographica wasn't working with X11.-->
 
-<P>Topographica can be downloaded via SVN on Mac OS X using the Linux
-instructions, once you have obtained the Subversion program. You can
-download and install a binary from
-the <A HREF="http://subversion.tigris.org/getting.html">Subversion
-downloads page</A>, or you can use your package manager to install
-it. We have used Fink (installed as described in the list
-of <A HREF="index.html#mac-prerequisites">prerequisites</A> for Mac):
-in a Terminal window, type <code>fink install svn</code>.
-
-<P>Once you have SVN, simply follow the <A HREF="#linux">Linux</A>
-instructions above.
+<P>You can download and install a binary version of svn from the <A
+HREF="http://subversion.tigris.org/getting.html">Subversion downloads
+page</A>, or you can use your package manager to install it. We have
+used Fink (installed as described in the list of <A
+HREF="index.html#mac-prerequisites">prerequisites</A> for Mac): in a
+Terminal window, type <code>fink install svn</code>.
 
 
-<H4><A NAME="windows">Windows:</A></H4>
+<H4><A NAME="windows">Getting Subversion on Windows</A></H4>
 
-<!--CB: I assume 32 bit win xp. Don't know how much that matters...-->
 
-<P>We support obtaining Topographica by SVN and building it on Windows
-via <A HREF="http://www.mingw.org/">MSYS/MinGW</A>. If your system
-does not already have MSYS/MinGW, please install
-MSYS 1.0.11 and MingGW 5.1.4 (from the MinGW <A HREF="http://sourceforge.net/project/showfiles.php?group_id=2435">download page</A>). Other versions might work, but we
-have not tested them. 
-<!--CBENHANCEMENT: readymade MSYS/MinGW in topographica-win: move or doc-->
-
-<P>Once you have installed MSYS/MinGW, you will need to install Subversion.
-The easiest way to do this is to download the installer from the 
-<A HREF="http://subversion.tigris.org/getting.html">Subversion downloads
-page</A>.
-
-<P>Currently, we do not provide a method to compile Python on Windows.
-Therefore, it is also necessary to install Python 2.5.2 if your system does
-not already have
-it. An <A HREF="http://python.org/ftp/python/2.5.2/python-2.5.2.msi">installer
-package</A> is available from Python.org.
-
-<P>Having installed Python, it is finally necessary to install two further 
-packages that we do not yet support building from source:
-<ul>
-<li>Install <A HREF="http://effbot.org/downloads/PIL-1.1.5.win32-py2.5.exe">PIL 1.1.5</A> if your system does not already have it</li>
-<li>Install the GNU <A HREF="http://downloads.sourceforge.net/gnuwin32/jpeg-6b-4.exe">JPEG library</A> (again, if your system does not already have it).</li>
-</ul>
-
-<P>Once these requirements are all present, you can follow the <A
-HREF="#linux">Linux SVN</A> instructions above by opening an MSYS
-terminal (double click on the MSYS icon on your desktop). Note that
-while using an MSYS terminal, you can enter commands as given for
-Linux/UNIX rather than any alternative that might be given for
-Windows.  If you have any problems, please feel free to ask for help
-in our <A
-HREF="http://sourceforge.net/forum/forum.php?forum_id=552131">Windows
-forum</A>.  
+<P>The easiest way to install Subversion on Windows is to download the
+installer from the <A
+HREF="http://subversion.tigris.org/getting.html">Subversion
+downloads</A> page. Whatever subversion client you get, you need to
+make sure it is in your MSYS path (by typing e.g. <code>export 
+PATH=/c/svnclient:$PATH</code>).
 
 
 <!--

@@ -11,41 +11,59 @@ use <A HREF="http://subversion.tigris.org/">Subversion</A> (SVN). This
 is recommended for users who want more frequent updates, or who need
 to modify the source code.
 
-<P>The following sections describe how to obtain and build (if
-necessary) Topographica
+<P>The following sections describe how to obtain Topographica and build it (if
+necessary) 
 on <A HREF="#win">Windows</A>, <A HREF="#mac">OS X</A>,
 and <A HREF="#lin">Linux/UNIX</A>. 
 
 
 <H3><A NAME="win">Windows</A></H3>
 
-<P>Windows users will generally want to use the installation program we
-provide, but if you want to develop Topographica on Windows, you will
-need instead to follow the instructions on building from source. 
-
-<H4>Installation program</H4>
-
-<P>The easiest way to install Topographica is to download and run the
-self-installing <a
+<P>Windows users will generally want to use the self-installing <a
 href="https://sourceforge.net/project/platformdownload.php?group_id=53602&sel_platform=6233">.exe</a>
-file. Once you have done this, you can skip straight to the <A
-HREF="#running-topographica">Running Topographica</A> instructions
-below. (Note that we have not yet produced an installer for the latest
-0.9.5 release of Topographica, but one is coming soon. Meanwhile, you
-can use the 0.9.4 release or try building from source.)
+file we provide. Once you have installed it, you can skip straight to
+the <A HREF="#postinstall">After Installation</A> section below.
 
-<H4>Build from source</H4>
+<H4><A NAME="win-prerequisites">Build from source</H4>
 
-<P>If you want frequent updates or you want to modify the source,
-first follow our <A HREF="cvs.html">SVN instructions</A>. Having
-installed the software recommended there (including MSYS/MinGW), you
-can open an MSYS terminal by double clicking the icon on your
-desktop. From there, change to the directory where you downloaded
-Topographica (e.g. <code> cd /c/topographica/</code>) and
-type <code>make win-msys-patch</code>.  Once that command has
-completed, you can follow the <A HREF="#building-topographica">common
-build</A> instructions below.
+<P>If instead you want to develop Topographica on Windows, or you want
+frequent updates, you will probably need to install some additional
+software on your machine.
 
+<!--CB: I assume 32 bit win xp. Don't know how much that matters...-->
+
+<P>We first recommend that you install a more convenient environment
+for working at the command line than is provided by default. We
+support building Topographica on Windows via <A
+HREF="http://www.mingw.org/">MSYS/MinGW</A>. If your system does not
+already have MSYS/MinGW, please install MSYS 1.0.11 and MingGW 5.1.4
+(from the MinGW <A
+HREF="http://sourceforge.net/project/showfiles.php?group_id=2435">download
+page</A>). Other versions might work, but we have not tested them.
+
+<!--CBENHANCEMENT: readymade MSYS/MinGW in topographica-win: move or doc-->
+
+<P>In addition to MSYS, because we do not currently provide a method
+to compile Python on Windows, it is also necessary to install Python
+2.5 if your system does not already have it. An <A
+HREF="http://python.org/ftp/python/2.5.2/python-2.5.2.msi">installer
+package</A> is available from Python.org. Note that currently Python
+must be installed to <code>c:\Python25\</code>.
+
+<!--CEBALERT: need JPEG?-->
+<P>Having installed Python, it is finally necessary to install two further 
+packages that we do not yet support building from source:
+<ul>
+<li>Install <A HREF="http://effbot.org/downloads/PIL-1.1.5.win32-py2.5.exe">PIL 1.1.5</A> if your system does not already have it</li>
+<li>Install the GNU <A HREF="http://downloads.sourceforge.net/gnuwin32/jpeg-6b-4.exe">JPEG library</A> (again, if your system does not already have it).</li>
+</ul>
+
+<P>Once these requirements are all present, you can follow the <A
+HREF="#common-obtain">common instructions</A> below by using an MSYS
+terminal (double click on the MSYS icon on your desktop; note that
+while using an MSYS terminal, you can enter commands as given for
+Linux/UNIX rather than any alternative that might be given for
+Windows).
 
 
 <H3><A NAME="mac">Mac OS X</A></H3>
@@ -191,35 +209,43 @@ make</code> to build using a virtual display instead.)  The build
 process will take a while to complete (e.g. about 5-10 minutes on a
 1.5GHz Pentium IV machine with a local disk).
 
-<P>If you have the php, m4, bibtex, convert,
-and fig2dev commands installed, you can also make local copies of the
-HTML documentation from the web site; to do so, type <code>make
-all</code> instead of (or after) <code>make</code>.  (If you don't
-have those commands, in most distributions you can get them by
-installing the php5-cli, m4, tetex, imagemagick, and transfig packages).
-<code>make all</code> will also run the regression tests and example
-files, to ensure that everything is functioning properly on your
-system.  If you do the tests on a machine without a functioning
-DISPLAY, such as a remote text-only session, there will be some
-warnings about GUI tests being skipped.
-
 <P>If all goes well, a script named <code>topographica</code> will be
-created in the <code>topographica/</code> directory; you can use this
-to start Topographica as described in the <A
-HREF="../User_Manual/scripts.html">Running Topographica</A>
-section of the User Manual. Or, if you want to get straight into 
-working with a full network, a good way to begin is by working
-through the <A HREF="../Tutorials/som_retinotopy.html">SOM</A> or <A
-HREF="../Tutorials/lissom_oo_or.html">LISSOM</A> tutorials.
-
-<P>If you have problems during the build process, try adding
-<code>-k</code> to the <code>make</code> command, which will allow the
-make process to skip any components that do not build properly on your
+created in the <code>topographica/</code> directory. If you have
+problems during the build process, try adding <code>-k</code> to the
+<code>make</code> command, which will allow the make process to skip
+any components that do not build properly on your
 machine. Topographica is highly modular, and most functionality should
 be accessible even without some of those components. If you do
 experience problems during the installation or subsequent use of
-Topographica on your platform, please check
-our <A HREF="../FAQ/index.html#plat">platform-specific FAQ</A>.
+Topographica on your platform, please check our <A
+HREF="../FAQ/index.html#plat">platform-specific FAQ</A>.
+
+<P>If desired, you can also make local copies of the HTML
+documentation from the web site. To do so, you must have the php, m4,
+bibtex, convert, and fig2dev commands installed; type <code>make
+all</code> instead of (or after) <code>make</code>.  (If you don't
+have those commands, in most distributions you can get them by
+installing the php5-cli, m4, tetex, imagemagick, and transfig
+packages).  <code>make all</code> will also run the regression tests
+and example files, to ensure that everything is functioning properly
+on your system.  If you do the tests on a machine without a
+functioning DISPLAY, such as a remote text-only session, there will be
+some warnings about GUI tests being skipped.
+
+
+<H3><A NAME="postinstall">After installation</A></H3>
+
+<P>Linux, Mac, and Windows MSYS users can use the
+<code>topographica</code> script to start Topographica. Windows users
+who installed the .exe can double click on the Topographica icon on
+the desktop. 
+
+<P>Running Topographica interactively is described in more detail in
+the <A HREF="../User_Manual/scripts.html">User Manual</A>. If you want
+to get straight into working with a full network, a good way to begin
+is by working through the <A
+HREF="../Tutorials/som_retinotopy.html">SOM</A> or <A
+HREF="../Tutorials/lissom_oo_or.html">LISSOM</A> tutorials.
 
 <P> Have fun with Topographica, and be sure to subscribe to the <A
 HREF="https://lists.sourceforge.net/lists/listinfo/topographica-announce">topographica-announce</A>
