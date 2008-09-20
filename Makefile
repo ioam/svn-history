@@ -82,7 +82,6 @@ ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
 	bin/python external/msys_path.py /c/Python25/Lib/site-packages/topographica.pth ${PREFIX}/lib ${PREFIX}/lib/site-packages
 	patch --force external/Makefile external/Makefile_win_msys.diff
 	touch win-msys-patch
-else
 endif
 
 
