@@ -50,13 +50,17 @@ HREF="http://python.org/ftp/python/2.5.2/python-2.5.2.msi">installer
 package</A> is available from Python.org. Note that currently Python
 must be installed to <code>c:\Python25\</code>.
 
-<!--CEBALERT: need JPEG?-->
-<P>Having installed Python, it is finally necessary to install two further 
-packages that we do not yet support building from source:
+<P>Having installed Python, you also need to install some 
+extra packages that we do not yet support building from source:
 <ul>
 <li>Install <A HREF="http://effbot.org/downloads/PIL-1.1.5.win32-py2.5.exe">PIL 1.1.5</A> if your system does not already have it</li>
+<!--CEBALERT: JPEG lib is included in pil binary, I think
 <li>Install the GNU <A HREF="http://downloads.sourceforge.net/gnuwin32/jpeg-6b-4.exe">JPEG library</A> (again, if your system does not already have it).</li>
+-->
+<li>Download and extract <A HREF="http://sourceforge.net/project/showfiles.php?group_id=11464&package_id=107795&release_id=562098">tile082.zip</A>; put the <code>tile0.8.2/</code> directory into your <code>topographica/Lib/</code> directory.
 </ul>
+
+<P>
 
 <P>Once these requirements are all present, you can follow the <A
 HREF="#common-obtain">common instructions</A> below by using an MSYS
