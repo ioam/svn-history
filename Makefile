@@ -47,7 +47,7 @@ DIST_ZIP                   = ${DIST_DIRNAME}.zip
 
 
 # Default does not include doc, in case user lacks PHP
-default: ext-packages topographica
+default: win-msys-patch ext-packages topographica
 
 all: default reference-manual doc tests examples 
 
@@ -63,6 +63,7 @@ uninstall:
 # Windows: to build topographica using msys, having already installed
 # binary python, pil, jpeg
 win-msys-patch:
+ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
 	mkdir -p bin
 	ln -f -s /c/Python25/python.exe bin/python
 ## prerequisites
@@ -81,12 +82,18 @@ win-msys-patch:
 	bin/python external/msys_path.py /c/Python25/Lib/site-packages/topographica.pth ${PREFIX}/lib ${PREFIX}/lib/site-packages
 	patch --force external/Makefile external/Makefile_win_msys.diff
 	touch win-msys-patch
+else
+endif
+
+
 
 win-msys-patch-uninstall:
 	patch --force --reverse external/Makefile external/Makefile_win_msys.diff
 	${RM} win-msys-patch
 	${RM} /c/Python25/Lib/distutils.cfg
 	${RM} /c/Python25/Lib/site-packages/topographica.pth
+# CEBALERT: incomplete
+
 
 # Mac OS X: to build python with X11 Tkinter
 #osx-x11-patch: 
