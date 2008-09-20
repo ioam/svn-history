@@ -6,14 +6,22 @@ CC = gcc
 # own Python, e.g. on Windows.)
 PYSETUP_OPT = --prefix=${PREFIX}
 
-default: osx_skip_tk python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
+default: platform-skip python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
 
+platform-skip:
 # avoid building blt, tcl, and tk on OS X
-osx_skip_tk:
 ifeq ("$(shell uname -s)","Darwin")
 	touch blt
 	touch tcl
 	touch tk
+endif
+ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
+	touch blt
+	touch tcl
+	touch tk
+	touch python
+	touch jpeg
+	touch pil
 endif
 
 
