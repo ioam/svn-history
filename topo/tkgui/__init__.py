@@ -167,12 +167,10 @@ def start(mainloop=False,banner=True,root=None,console_has_console=False):
                                  "lib")
         root.tk.call("lappend","auto_path",pack_path)
 
-    try:
-        root.tk.call("wm","forget",root._w)
-    except Tkinter.TclError:
+    # tcl equivalent of 'if not hasattr(wm,forget)' would be better
+    if system_platform=='mac' or Tkinter.TkVersion<8.5:
         global TK_SUPPORTS_DOCK
         TK_SUPPORTS_DOCK=False
-
 
     root.menubar = ControllableMenu(root)
     root.configure(menu=root.menubar)
