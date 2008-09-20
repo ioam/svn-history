@@ -1368,6 +1368,10 @@ class PicklableClassAttributes(object):
         for class_name,state in state['class_attributes'].items():
             # from e.g. "topo.base.parameter.Parameter", we want "topo.base.parameter"
             module_path = class_name[0:class_name.rindex('.')]
+
+            ### ? globals()[module.split('.')[0]] = __import__(module)
+            # exec 'import '+module_path in __main__.__dict__
+
             exec 'import '+module_path in __main__.__dict__
 
             try:
