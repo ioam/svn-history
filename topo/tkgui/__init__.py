@@ -161,11 +161,23 @@ def start(mainloop=False,banner=True,root=None,console_has_console=False):
     if Tkinter.TkVersion < 8.5:
         root.tk.call("package","require","tile")
 
-    if system_platform=='mac': 
-        import topo.misc.filepath
+    # allow tcl/tk to find extras on special platforms
+    import topo.misc.filepath
+    if system_platform=='mac':
         pack_path = os.path.join(topo.misc.filepath.application_path,
                                  "lib")
         root.tk.call("lappend","auto_path",pack_path)
+    elif system_platform=='win':
+        # for win/msys; win/bin has packages put in its tcl dir
+        pack_paths = [os.path.join(topo.misc.filepath.application_path,
+                                   "Lib"),
+                      os.path.join(topo.misc.filepath.application_path,
+                                   "share")]
+
+        for path in pack_paths:
+            root.tk.call("lappend","auto_path",path)
+        
+        
 
     # tcl equivalent of 'if not hasattr(wm,forget)' would be better
     if system_platform=='mac' or Tkinter.TkVersion<8.5:
