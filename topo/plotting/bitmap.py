@@ -33,13 +33,20 @@ from .. import param
 
 from topo.misc.filepath import application_path, resolve_path
 
-# CEBALERT: while Windows version doesn't have identical paths, need this try/except
+# CEBALERT: while the Windows version of Python doesn't have the same
+# directory structure as the standard version, we need this
+# try/except. (Note that Windows could be 'normal'/'binary' Windows,
+# or 'MSYS' Windows; those two have different directories.) This
+# serves as an example of what needs to be fixed in the Windows
+# versions.
 try:
     # should just use resolve_path('/lib/py.../Vera.ttf') here
     TITLE_FONT = ImageFont.truetype(resolve_path('lib/python2.5/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
 except:
-    TITLE_FONT = ImageFont.truetype(resolve_path('python_topo/Lib/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
-
+    try:
+        TITLE_FONT = ImageFont.truetype(resolve_path('python_topo/Lib/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
+    except:
+        TITLE_FONT = ImageFont.truetype(resolve_path('Lib/site-packages/matplotlib/mpl-data/fonts/ttf/Vera.ttf'),20)
 
 ### JCALERT: To do:
 ###        - Update the test file.
