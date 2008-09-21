@@ -16,11 +16,14 @@ from ..param import tk
 from topo.base.patterngenerator import PatternGenerator
 
 
-# because param.tk still might depend on some stuff done
-# by tkgui, such as installing tile if necessary.
-import topo.tkgui
-topo.tkgui.start()
 
+# CEBALERT: will be removed eventually when param.tk
+# doesn't depend on anything from tkgui.__init__
+# (plus this test will move to the param package...)
+import os
+if os.getenv("DISPLAY"):
+    import topo.tkgui
+    topo.tkgui.start()
 
 
 class TestPO(param.Parameterized):
