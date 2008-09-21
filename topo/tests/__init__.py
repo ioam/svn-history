@@ -182,6 +182,10 @@ def all_suite():
     return suite
 
 
+# Note that this is set up so that if all the tests are run and
+# there's no DISPLAY, tests requiring DISPLAY are skipped - but if a
+# test is run individually via run_named() and it requires DISPLAY, an
+# error will be raised.
 def _check_for_display(suite):
     """
     Return True if no DISPLAY required or DISPLAY is required and it exists,
@@ -262,20 +266,3 @@ def run_named(name,verbosity=2):
     run(verbosity,test_modules=[test_module])
         
 
-
-def start_tkgui():
-    """
-    Starts tkgui silently if $DISPLAY is set, otherwise raises an Exception.
-
-    (Raises the exception for the benefit of single tests run from the
-    commandline; tests loaded through run() will not be executed
-    without a DISPLAY anyway.)
-
-    Used in tests that require tkgui to be running.
-    """
-    if os.getenv("DISPLAY"):
-        import topo.tkgui; topo.tkgui.start(banner=False)
-    else:
-        raise Exception("Cannot run test without a valid DISPLAY.")
-        
-        
