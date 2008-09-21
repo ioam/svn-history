@@ -111,8 +111,8 @@ REM * tooltip
 move tooltip-1.4 c:\python25\tcl\
 
 REM * tile 0.8.2 (ADDITIONAL, until python 2.6 which has tk 8.5)
-..\util\gunzip -c tile0.8.2.tar.gz > tile0.8.2.tar
-..\util\tar xf tile0.8.2.tar
+util\gunzip -c tile0.8.2.tar.gz > tile0.8.2.tar
+util\tar xf tile0.8.2.tar
 move tile0.8.2 c:\python25\tcl\
 
 
