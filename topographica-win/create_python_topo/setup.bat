@@ -14,7 +14,7 @@ copy ..\..\external\numpy.diff .
 
 REM Gnosis_Utils
 ..\util\gunzip -c ..\..\external\Gnosis_Utils-1.3.0-alpha-7.tar.gz > ..\..\external\Gnosis_Utils-1.3.0-alpha-7.tar
-..\util\tar xvf ..\..\external\Gnosis_Utils-1.3.0-alpha-7.tar
+..\util\tar xf ..\..\external\Gnosis_Utils-1.3.0-alpha-7.tar
 copy ..\..\external\Gnosis_Utils.diff .
 
 REM Tile
@@ -22,15 +22,15 @@ copy ..\..\external\Tile.py .
 
 REM scrodget
 ..\util\gunzip -c ..\..\external\pyscrodget-0.0.1_2.1.tar.gz > ..\..\external\pyscrodget-0.0.1_2.1.tar
-..\util\tar xvf ..\..\external\pyscrodget-0.0.1_2.1.tar
+..\util\tar xf ..\..\external\pyscrodget-0.0.1_2.1.tar
 
 REM snit
 ..\util\gunzip -c ..\..\external\snit-2.2.1.tar.gz > ..\..\external\snit-2.2.1.tar
-..\util\tar xvf ..\..\external\snit-2.2.1.tar
+..\util\tar xf ..\..\external\snit-2.2.1.tar
 
 REM tooltip
 ..\util\gunzip -c ..\..\external\tooltip-1.4.tar.gz > ..\..\external\tooltip-1.4.tar
-..\util\tar xvf ..\..\external\tooltip-1.4.tar
+..\util\tar xf ..\..\external\tooltip-1.4.tar
 
 REM ******************************************************************
 
@@ -112,7 +112,7 @@ move tooltip-1.4 c:\python25\tcl\
 
 REM * tile 0.8.2 (ADDITIONAL, until python 2.6 which has tk 8.5)
 ..\util\gunzip -c tile0.8.2.tar.gz > tile0.8.2.tar
-..\util\tar xvf tile0.8.2.tar
+..\util\tar xf tile0.8.2.tar
 move tile0.8.2 c:\python25\tcl\
 
 
@@ -126,12 +126,12 @@ util\gunzip c:\python25\mingw\*.gz
 copy util\tar.exe c:\python25\mingw
 
 cd \python25\mingw
-tar xvf "c:\python25\mingw\gcc-core-3.4.2-20040916-1.tar" 
-tar xvf "c:\python25\mingw\gcc-g++-3.4.2-20040916-1.tar" 
-tar xvf "c:\python25\mingw\gcc-g77-3.4.2-20040916-1.tar" 
-tar xvf "c:\python25\mingw\w32api-3.6.tar" 
-tar xvf "c:\python25\mingw\mingw-runtime-3.9.tar" 
-tar xvf "c:\python25\mingw\binutils-2.15.91-20040904-1.tar" 
+tar xf "c:\python25\mingw\gcc-core-3.4.2-20040916-1.tar" 
+tar xf "c:\python25\mingw\gcc-g++-3.4.2-20040916-1.tar" 
+tar xf "c:\python25\mingw\gcc-g77-3.4.2-20040916-1.tar" 
+tar xf "c:\python25\mingw\w32api-3.6.tar" 
+tar xf "c:\python25\mingw\mingw-runtime-3.9.tar" 
+tar xf "c:\python25\mingw\binutils-2.15.91-20040904-1.tar" 
 del *.tar
 del tar.exe
 cd ..\..
