@@ -898,6 +898,7 @@ class SheetPanel(PlotGroupPanel):
             plot = self._right_click_info['plot']
             sheet = topo.sim[plot.plot_src_name]
             center_x,center_y=self._right_click_info['coords'][1]
+            r,c = self._right_click_info['coords'][0]
 
             # RFHACK:
             # just matrixplot for whatever generators have the views
@@ -905,7 +906,7 @@ class SheetPanel(PlotGroupPanel):
                 try:
                     view=g.sheet_views[('RFs',sheet.name,center_x,center_y)]
                     matrixplot(view.view()[0],
-                               title=("position (%3.0f, %3.0f) Receptive Field of %s unit (%2.2f,%2.2f) at time %s"% (rows_ultratrue,cols_ultratrue,sheet.name,center_x,center_y,topo.sim.timestr(view.timestamp))))#,rows_ultratrue,cols_ultratrue)))
+                               title=("position (%3.0f, %3.0f) Receptive Field of %s unit (%2.2f,%2.2f) at time %s"% (r,c,sheet.name,center_x,center_y,topo.sim.timestr(view.timestamp))))
 
                 except KeyError:
                     # maybe lose this warning
