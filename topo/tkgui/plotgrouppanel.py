@@ -301,7 +301,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         """
         Return a dictionary containing the event itself, and, if the
         event occurs on a plot of a sheet, store the plot and the
-        coordinates on the sheet.
+        coordinates ((r,c) and (x,y) for the cell center) on the sheet.
 
         Then, call func.
         """
@@ -319,17 +319,15 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         # but not coords, and use a check for coords to discover if
         # there is a sheet or not).
 
-        # CEBALERT: need to get the coords (sheet & matrix) correctly
-        # one time and make all related methods use that info. See
-        # Chris P's recent change (r9220).
         if plot.plot_src_name is not '':
             canvas_x,canvas_y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
             sf = plot.scale_factor
+            # CEBALERT: now check this!
             canvas_r,canvas_c=int(floor(canvas_y/sf)),int(floor(canvas_x/sf))
 
             sheet = topo.sim[plot.plot_src_name]
             r,c = canvas_r,canvas_c 
-            x,y = sheet.matrix2sheet(r,c)
+            x,y = sheet.matrixidx2sheet(r,c)
 
             ## The plot doesn't correspond exactly to the sheet (there
             ## is some kind of border), so only store the plot and
@@ -357,9 +355,7 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
                 label="Combined plot: %s %s"%(plot.plot_src_name,plot.name),
                 state=NORMAL)            
             (r,c),(x,y) = event_info['coords']
-            rowss,colss = r,c                       
             sheet = topo.sim[plot.plot_src_name]    
-            x,y = sheet.matrixidx2sheet(rowss,colss) 
             self._canvas_menu.entryconfig("unit_menu",
                 label="Single unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),
                 state=NORMAL)
@@ -383,9 +379,6 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         if 'plot' in event_info:
             plot = event_info['plot']
             (r,c),(x,y) = event_info['coords']
-            rowss,colss = r,c                      
-            sheet = topo.sim[plot.plot_src_name]    
-            x,y = sheet.matrixidx2sheet(rowss,colss)
             location_string="%s Unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(plot.plot_src_name,r,c,x,y)
             # CB: isn't there a nicer way to allow more info to be added?
             self.messageBar.message('state', self._dynamic_info_string(event_info,location_string))
@@ -892,8 +885,7 @@ class SheetPanel(PlotGroupPanel):
         if 'plot' in self._right_click_info:
             sheet = topo.sim[self._right_click_info['plot'].plot_src_name]
             # CEBERRORALERT: should avoid requesting cf out of range.
-            rows_ultratrue,cols_ultratrue = self._right_click_info['coords'][0]
-            center_x,center_y = sheet.matrixidx2sheet(rows_ultratrue,cols_ultratrue)
+            center_x,center_y = self._right_click_info['coords'][1]
             topo.guimain['Plots']["Connection Fields"](x=center_x,y=center_y,sheet=sheet)                     
 
             
@@ -905,8 +897,7 @@ class SheetPanel(PlotGroupPanel):
         if 'plot' in self._right_click_info:
             plot = self._right_click_info['plot']
             sheet = topo.sim[plot.plot_src_name]
-            rows_ultratrue,cols_ultratrue = self._right_click_info['coords'][0]
-            center_x,center_y = sheet.matrixidx2sheet(rows_ultratrue,cols_ultratrue)
+            center_x,center_y=self._right_click_info['coords'][1]
 
             # RFHACK:
             # just matrixplot for whatever generators have the views
