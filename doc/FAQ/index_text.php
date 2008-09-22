@@ -98,6 +98,21 @@ want to suppress the warning entirely you can do option 1.
 
 
 <!----------------------------------------------------------------------------->
+<LI><B>Q:</B> <i>Topographica seems to build fine, but when I run the
+GUI or the tests, I get an "ImportError: No module named _tkagg".</i>
+
+<P><B>A:</B> As of 10/2007, if Topographica was built on a machine
+without a functioning Xwindows DISPLAY, e.g. via a remote login using
+ssh, the build process would complete but Matplotlib would have failed
+silently because it could not find the current display to extract some
+parameters.  As of 9/2008 (version 0.9.5), we can no longer reproduce
+this problem, and thus it appears to have been fixed by Matplotlib's
+maintainers.  However, if you do encounter something like this, you
+can try rebuilding Topographica while logged in rather than remotely.
+If that works, please let us know that we should continue to suggest
+that people avoid building in a remote session.
+  
+<!----------------------------------------------------------------------------->
 <LI><B>Q:</B> <i>What models or algorithms does Topographica support?</i>
 
 <P><B>A:</B> 
@@ -178,6 +193,5 @@ match the version of readline you downloaded).
 </blockquote>
   
 <!----------------------------------------------------------------------------->
-
 
 </OL>
