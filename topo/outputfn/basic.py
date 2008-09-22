@@ -250,13 +250,17 @@ class HalfRectifyAndSquare(OutputFn):
 
 class HalfRectifyAndPower(OutputFn):
     """
-    Output function that applies a half-wave rectification (clips at zero)
-    and then makes e-th power of it.
+    Output function that applies a half-wave rectification (i.e.,
+    clips at zero), and then raises the result to the e-th power
+    (where the exponent e can be selected arbitrarily).
     """
     lower_bound = param.Number(default=0.0,softbounds=(0.0,1.0))
     
-    e = param.Number(default=2.0,doc="""The exponent of the input x.""")
-    t = param.Number(default=0.0,doc="""The threshold of x.""")
+    e = param.Number(default=2.0,doc="""
+        The exponent to which the thresholded value is raised.""")
+    
+    t = param.Number(default=0.0,doc="""
+        The threshold level subtracted from x.""")
     
     def __call__(self,x):
         x -= self.t
@@ -738,7 +742,9 @@ class HomeostaticMaxEnt(OutputFnWithRandomState):
 	self.first_call = True
 	self.n_step=0
         self.__current_state_stack=[]
-
+        self.a=None
+        self.b=None
+        self.y_avg=None
 
     def __call__(self,x):      
 	if self.first_call:
@@ -775,11 +781,9 @@ class HomeostaticMaxEnt(OutputFnWithRandomState):
         """
         Save the current state of the output function to an internal stack.
         """
-        if self.first_call:
-            super(HomeostaticMaxEnt,self).state_push()
-        else:
-            self.__current_state_stack.append((copy.copy(self.a), copy.copy(self.b), copy.copy(self.y_avg)))
-            super(HomeostaticMaxEnt,self).state_push()
+        self.__current_state_stack.append((copy.copy(self.a), copy.copy(self.b), copy.copy(self.y_avg)))
+        super(HomeostaticMaxEnt,self).state_push()
+
         
     def state_pop(self):
         """
@@ -787,9 +791,8 @@ class HomeostaticMaxEnt(OutputFnWithRandomState):
         
         See state_push() for more details.
         """
-        if self.__current_state_stack:
-            self.a, self.b, self.y_avg =  self.__current_state_stack.pop()
-            super(HomeostaticMaxEnt,self).state_pop()
+        self.a, self.b, self.y_avg =  self.__current_state_stack.pop()
+        super(HomeostaticMaxEnt,self).state_pop()
         
                 
 class CascadeHomeostatic(OutputFnWithState):
