@@ -357,6 +357,9 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
                 label="Combined plot: %s %s"%(plot.plot_src_name,plot.name),
                 state=NORMAL)            
             (r,c),(x,y) = event_info['coords']
+            rowss,colss = r,c                       
+            sheet = topo.sim[plot.plot_src_name]    
+            x,y = sheet.matrixidx2sheet(rowss,colss) 
             self._canvas_menu.entryconfig("unit_menu",
                 label="Single unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(r,c,x,y),
                 state=NORMAL)
@@ -380,6 +383,9 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         if 'plot' in event_info:
             plot = event_info['plot']
             (r,c),(x,y) = event_info['coords']
+            rowss,colss = r,c                      
+            sheet = topo.sim[plot.plot_src_name]    
+            x,y = sheet.matrixidx2sheet(rowss,colss)
             location_string="%s Unit:(% 3d,% 3d) Coord:(% 2.2f,% 2.2f)"%(plot.plot_src_name,r,c,x,y)
             # CB: isn't there a nicer way to allow more info to be added?
             self.messageBar.message('state', self._dynamic_info_string(event_info,location_string))
