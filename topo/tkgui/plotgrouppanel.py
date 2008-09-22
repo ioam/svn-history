@@ -765,8 +765,8 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         
         self.plot_frame.configure(text=title)
         #print "title"
-        self.parent.title(title.replace(" at time ","/"))
-          
+        self.parent.title((topo.sim.name,title.replace(" at time ","/"))) 
+    
     def destroy(self):
         """overrides toplevel destroy, adding removal from autorefresh panels"""
         if self in topo.guimain.auto_refresh_panels:
