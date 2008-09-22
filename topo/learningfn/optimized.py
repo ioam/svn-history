@@ -13,7 +13,8 @@ from numpy import zeros
 from .. import param
 
 from topo.base.sheet import activity_type
-from topo.base.cf import CFPLearningFn,CFPLF_Plugin,CFPLF_PluginScaled
+from topo.base.cf import CFPLearningFn,CFPLF_Plugin
+from topo.learningfn.projfn import CFPLF_PluginScaled
 from topo.base.functionfamily import Hebbian,LearningFn
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 
@@ -31,6 +32,9 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
     As a side effect, sets the norm_total attribute on any cf whose
     weights are updated during learning, to speed up later operations
     that might depend on it.
+
+    May return without modifying anything if the learning rate turns
+    out to be zero.
     """
     single_cf_fn = param.ClassSelector(LearningFn,default=Hebbian(),readonly=True)
     
@@ -38,7 +42,9 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
         rows,cols = output_activity.shape
         cfs = iterator.proj._cfs
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
-        if(single_connection_learning_rate==0): return
+        if single_connection_learning_rate==0:
+            return
+        
         irows,icols = input_activity.shape
         cf_type = iterator.proj.cf_type
         hebbian_code = """
@@ -120,6 +126,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                headers=['<structmember.h>'])               
 
 
+
 class CFPLF_Scaled_opt(CFPLF_PluginScaled):
     """
     CF-aware Scaled Hebbian learning rule.
@@ -143,7 +150,9 @@ class CFPLF_Scaled_opt(CFPLF_PluginScaled):
         rows,cols = output_activity.shape
         cfs = iterator.proj._cfs
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
-        if(single_connection_learning_rate==0): return
+        if single_connection_learning_rate==0:
+            return
+        
         irows,icols = input_activity.shape
         hebbian_code = """
             double *x = output_activity;
@@ -240,7 +249,10 @@ class CFPLF_Trace_opt(CFPLearningFn):
         cfs = iterator.proj._cfs
         single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
         irows,icols = input_activity.shape
-        if(single_connection_learning_rate==0): return
+        
+        if single_connection_learning_rate==0:
+            return
+        
         ##Initialise traces to zero if they don't already exist
         if not hasattr(self,'traces'):
             self.traces=zeros(output_activity.shape,activity_type)
