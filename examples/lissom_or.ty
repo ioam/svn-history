@@ -1,18 +1,19 @@
 """
 Example of a LISSOM-based orientation map (without ON/OFF channels).
 
-Intended to be a close (but approximate) match to the orientation
-mapsimulation from figure 6.4 (Reduced) of Miikkulainen, Bednar, Choe,
-and Sirosh (2005), Computational Maps in the Visual Cortex, Springer,
-except:
+Intended to be a close (but approximate) match to the orientation map
+simulation from figure 6.4 (Reduced) of Miikkulainen, Bednar, Choe, and Sirosh
+(2005), Computational Maps in the Visual Cortex, Springer.  Known
+differences include:
 
  - The default_density is smaller for practicality (142 in the book).
  - The matching is not yet perfect at different densities
- - The lateral inhibitory radius is 0.5 matrix units greater than in the 
-   book, becauseTopographica enforces good circular-shaped CF outlines.
+ - The lateral inhibitory radius is up to 0.5 matrix units greater
+   than in the book, because Topographica enforces good
+   circular-shaped CF outlines.
  - Input patterns are evaluated on the entire retina, instead of only up
    to bounds_multiplier=2.5 times the gaussian sigma in the book
- - Weight patterns are not smoothed around the edges, unlike
+ - Initial weight patterns are not smoothed around the edges, unlike
    smooth_circular_outlines=True and smooth_circular_radius_trim=-0.25
    used in the book
  - Initial weight patterns are all random within a gaussian envelope
@@ -20,6 +21,9 @@ except:
    preset_sigma_inh=71.76 lateral weights used in the book.
  - Inhibitory weight pruning is disabled (not pruning all weights below
    1e-5 as in the book)
+
+There may be other small differences, as this file has not yet been
+compared exhaustively to the original simulations.
 
 $Id$
 """
@@ -40,58 +44,66 @@ import topo.sheet.lissom
 import topo.sheet.optimized
 
 
-num_inputs=2
-input_type=pattern.Gaussian
-inputs=[input_type(x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
-                   y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
-                   orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
-                   size=0.088388, aspect_ratio=4.66667, scale=1.0,
-                   bounds=sheet.BoundingBox(radius=0.8)) # JABALERT: What does this bounds do?
-        for i in xrange(num_inputs)]
-
-combined_inputs = pattern.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
-                                 
-# Default for tutorial
-pattern.Line.scale=0.7
-
-# Specify weight initialization, response function, and learning function
+### Specify weight initialization, response function, and learning function
 projection.CFProjection.cf_shape=pattern.Disk(smoothing=0.0)
 projection.CFProjection.weights_generator=pattern.Constant()
 projection.CFProjection.response_fn=responsefn.optimized.CFPRF_DotProduct_opt()
 projection.CFProjection.learning_fn=learningfn.optimized.CFPLF_Hebbian_opt()
 projection.CFProjection.weights_output_fn=outputfn.optimized.CFPOF_DivisiveNormalizeL1_opt()
 
-
-###########################################
-# build simulation
-
-
-topo.sim['Retina']=sheet.GeneratorSheet(nominal_density=locals().get('default_retina_density',24.0),
-                                  input_generator=combined_inputs,
-                                  period=1.0, phase=0.05,
-                                  nominal_bounds=sheet.BoundingBox(radius=0.5+0.25))
+### Default for tutorial
+pattern.Line.scale=0.7
+pattern.Gaussian.size=0.08333
+pattern.Gaussian.aspect_ratio=4.0
 
 
-topo.sim['V1'] = sheet.lissom.LISSOM(nominal_density=locals().get('default_density',48.0),tsettle=9)
+### Input patterns
+num_inputs=2
+input_type=pattern.Gaussian
+inputs=[input_type(x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
+                   y=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=34+i),
+                   orientation=numbergen.UniformRandom(lbound=-pi,ubound=pi,seed=56+i),
+                   size=0.088388, aspect_ratio=4.66667, scale=1.0,
+                   bounds=sheet.BoundingBox(radius=0.8))
+        for i in xrange(num_inputs)]
 
-topo.sim['V1'].output_fn.lower_bound=0.1
-topo.sim['V1'].output_fn.upper_bound=0.65
+combined_inputs = pattern.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
+                                 
 
 
-topo.sim.connect('Retina','V1',delay=0.10,
-                 connection_type=projection.CFProjection,strength=1.0,name='Afferent',
-                 weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.27083),
-                 nominal_bounds_template=sheet.BoundingBox(radius=0.27083),learning_rate=0.9590)
+### Sheets
+topo.sim['Retina']=sheet.GeneratorSheet(
+    nominal_density=locals().get('default_retina_density',24.0),
+    input_generator=combined_inputs, period=1.0, phase=0.05,
+    nominal_bounds=sheet.BoundingBox(radius=0.5+0.25))
 
-topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
-                 connection_type=projection.CFProjection,strength=0.9,
-                 weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.10417),
-                 nominal_bounds_template=sheet.BoundingBox(radius=0.10417),learning_rate=2.55528) 
+topo.sim['V1'] = sheet.lissom.LISSOM(
+    nominal_density=locals().get('default_density',48.0),
+    nominal_bounds=sheet.BoundingBox(radius=0.5),tsettle=9,
+    output_fn=outputfn.PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
+#   joint_norm_fn=sheet.optimized.compute_joint_norm_totals_opt) # Need to enable
+
+
+
+### Connections
+
+topo.sim.connect(
+    'Retina','V1',delay=0.10,strength=1.0,name='Afferent',
+    connection_type=projection.CFProjection,learning_rate=0.9590,
+    nominal_bounds_template=sheet.BoundingBox(radius=0.27083),
+    weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.27083))
+
+topo.sim.connect(
+    'V1','V1',delay=0.05,strength=0.9,name='LateralExcitatory',
+    connection_type=projection.CFProjection,learning_rate=2.55528,
+    nominal_bounds_template=sheet.BoundingBox(radius=0.10417),
+    weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.10417))
             
-topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
-                 connection_type=projection.CFProjection,strength=-0.9,
-                 weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.22917),
-                 nominal_bounds_template=sheet.BoundingBox(radius=0.22917),learning_rate=1.80873)  
+topo.sim.connect(
+    'V1','V1',delay=0.05,strength=-0.9,name='LateralInhibitory',
+    connection_type=projection.CFProjection,learning_rate=1.80873,
+    nominal_bounds_template=sheet.BoundingBox(radius=0.22917),
+    weights_generator=pattern.random.GaussianCloud(gaussian_size=2*0.22917))
 
 
 
