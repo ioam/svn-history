@@ -139,12 +139,6 @@ topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
 
 
 
-### Actions scheduled to occur as the simulation proceeds.#
-
-
-topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
-
-
 ### Schedule learning rate changes
 #
 topo.sim.schedule_command( 100,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.548')

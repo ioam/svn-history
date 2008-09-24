@@ -113,10 +113,6 @@ topo.sim.connect('V1Inh','V1Inh', delay=0.05,
                  weights_generator=topo.pattern.basic.Gaussian(aspect_ratio=1.0, size=0.04), 
                  nominal_bounds_template = BoundingBox(radius=0.03),learning_rate=0)
 
-### Actions scheduled to occur as the simulation proceeds.#
-
-
-topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
 
 ### Schedule learning rate changes
 #
