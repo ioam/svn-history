@@ -17,7 +17,7 @@ from math import pi, sqrt
 
 import topo.pattern.basic
 import topo.pattern.random
-import topo.patterns.image
+import topo.pattern.image
 
 from topo.sheet.lissom import LISSOM, JointScaling
 from topo.sheet.generator import GeneratorSheet
