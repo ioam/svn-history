@@ -117,7 +117,7 @@ class TestCFSom(unittest.TestCase):
 
 ##         ImageGenerator.nominal_density = 100
 ##         ImageGenerator.nominal_bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
-##         input = ImageGenerator(filename='examples/ellen_arthur.pgm')
+##         input = ImageGenerator(filename='images/ellen_arthur.pgm')
     
     
 ##         save = ImageSaver(pixel_scale=1.5)

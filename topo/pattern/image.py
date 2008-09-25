@@ -375,7 +375,7 @@ class FileImage(GenericImage):
     details of supported image file formats.
     """
 
-    filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9,doc="""
+    filename = Filename(default='images/ellen_arthur.pgm',precedence=0.9,doc="""
         File path (can be relative to Topographica's base path) to a bitmap image.
         The image can be in any format accepted by PIL, e.g. PNG, JPG, TIFF, or PGM.
         """)
