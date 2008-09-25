@@ -23,7 +23,6 @@ from topo.misc import patternfn
 import topo.learningfn.projfn 
 import topo.pattern.random
 import topo.responsefn.optimized 
-import topo.sheet.cfsom
 
 
 # CEBALERT: keep old behavior until we investigate why changing
@@ -142,13 +141,19 @@ topo.sim.connect('Retina','V1',delay=0.05,connection_type=projection.CFProjectio
                  response_fn = responsefn.optimized.CFPRF_DotProduct_opt(),
                  coord_mapper=XYModulo())
 
-topo.sim['Complex Cell Layer'] = sheet.cfsom.CFSOM(nominal_density=default_density,
-                                                   learning_length=12000,radius_0=0.25,alpha_0=0.99)
-                         
+topo.sim['Complex Cell Layer'] = sheet.CFSheet(
+    nominal_density = default_density,
+    output_fn = outputfn.KernelMax(density=default_density,
+        kernel_radius=numbergen.ExponentialDecay(
+            starting_value=0.25,time_constant=12000/8.0,base=0.5)))
+
+
 topo.sim.connect('V1','Complex Cell Layer',delay=0.05,connection_type=projection.CFProjection,
                  weights_generator = pattern.random.UniformRandom(),
                  nominal_bounds_template=sheet.BoundingBox(radius=0.1),
                  response_fn = responsefn.optimized.CFPRF_DotProduct_opt(),
-                 learning_fn=learningfn.projfn.CFPLF_Trace(trace_strength=0.2))
+                 learning_fn=learningfn.projfn.CFPLF_Trace(trace_strength=0.2),
+                 learning_rate=numbergen.ExponentialDecay(
+                     starting_value=0.99,time_constant=12000/8.0,base=0.5))
 
 
