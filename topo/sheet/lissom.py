@@ -318,7 +318,7 @@ def schedule_events(sheet_str="topo.sim['V1']",st=0.5,aff_name="Afferent"):
     """
 
     # Allow sheet.BoundingBox calls (below) after reloading a snapshot
-    topo.sim.startup_commands.append("import topo.sheet")
+    topo.sim.startup_commands.append("from topo import sheet")
 
     # Lateral excitatory bounds changes
     # Convenience variable: excitatory projection
