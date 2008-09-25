@@ -33,8 +33,6 @@ Additionally, several other examples are also included:
   sullivan_neurocomputing04.ty - A temporal trace and SOM-based model 
                                  of complex cell development
 
-  sullivan_nn06.ty             - Synaptic scaling model
-
 
 Other scripts may also be included, but these are likely to be works
 in progress, incomplete, or otherwise not particularly useful.  Once a
