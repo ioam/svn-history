@@ -262,6 +262,9 @@ strength=[2.33, 2.38, 2.53, 2.8] # 2.33 for speed=0, 2.38 for speed=1, 2.53 for 
 if dataset=="Nature":
     strength=[4.7, 4.8, 5.1, 5.8] 
 
+# Convenience variable; number of afferent connections to V1
+num_aff=len(center_polarities)*len(eyes)*len(lags)*len(opponent_types)
+
 for e in eyes:
     for n in lags:
 	for l in center_polarities:
@@ -362,7 +365,7 @@ for e in eyes:
                     strength=1.0,name=e+opponent+'LGN'+l+'Afferent'+n,
                     weights_generator=pattern.random.GaussianCloud(gaussian_size=2*v1aff_radius),
                     nominal_bounds_template=sheet.BoundingBox(radius=v1aff_radius),
-                    learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids) 
+                    learning_rate=0.9590/num_aff/ids) 
 
             for channel in xrange(2,sf_channels+1):
                 topo.sim.connect(
@@ -371,7 +374,7 @@ for e in eyes:
                     strength=1.0,name=e+'LGN'+l+'Afferent'+n+'SF'+str(channel),
                     weights_generator=pattern.random.GaussianCloud(gaussian_size=2*v1aff_radius*sf_spacing**(channel-1)),
                     nominal_bounds_template=sheet.BoundingBox(radius=v1aff_radius*sf_spacing**(channel-1)),
-                    learning_rate=0.9590/len(center_polarities)/len(eyes)/len(lags)/len(opponent_types)/ids) 
+                    learning_rate=0.9590/num_aff/ids) 
 
 
 topo.sim.connect('V1','V1',delay=0.05,name='LateralExcitatory',
@@ -394,8 +397,7 @@ sheet.lissom.schedule_events("topo.sim['V1']",st=st,
 
 
 ### Default locations for model editor
-vs=[None]*(len(opponent_types)*len(center_polarities)*len(eyes)*len(lags)-1) + ['V1'] + \
-   [None]*(len(opponent_types)*len(center_polarities)*len(eyes)*len(lags))
+vs=[None]*(num_aff-1) + ['V1'] + [None]*(num_aff)
 
 ls=[]
 for e in eyes:
