@@ -181,81 +181,9 @@ topo.sim.connect('V1','V1',delay=0.05,name='LateralInhibitory',
 
 
 ### Actions scheduled to occur as the simulation proceeds.
-topo.sim.startup_commands.append("from topo import sheet")
-
-# Convenience variable: timescale
-st=1.0/2.0
-
-### Lateral excitatory bounds changes
-LE='topo.sim["V1"].projections()["LateralExcitatory"]'
-
-topo.sim.schedule_command(  200*st,LE+'.change_bounds(sheet.BoundingBox(radius=0.06250))')
-topo.sim.schedule_command(  500*st,LE+'.change_bounds(sheet.BoundingBox(radius=0.04375))')
-topo.sim.schedule_command( 1000*st,LE+'.change_bounds(sheet.BoundingBox(radius=0.03500))')
-topo.sim.schedule_command( 2000*st,LE+'.change_bounds(sheet.BoundingBox(radius=0.02800))')
-topo.sim.schedule_command( 3000*st,LE+'.change_bounds(sheet.BoundingBox(radius=0.02240))')
-topo.sim.schedule_command( 4000*st,LE+'.change_bounds(sheet.BoundingBox(radius=0.01344))')
-topo.sim.schedule_command( 5000*st,LE+'.change_bounds(sheet.BoundingBox(radius=0.00806))')
-topo.sim.schedule_command( 6500*st,LE+'.change_bounds(sheet.BoundingBox(radius=0.00484))')
-topo.sim.schedule_command( 8000*st,LE+'.change_bounds(sheet.BoundingBox(radius=0.00290))')
-topo.sim.schedule_command(20000*st,LE+'.change_bounds(sheet.BoundingBox(radius=0.00174))')
-
-### Lateral excitatory learning rate changes
-topo.sim.schedule_command(  200*st,LE+'.learning_rate=0.12168/ids*'+LE+'.n_units()')
-topo.sim.schedule_command(  500*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
-topo.sim.schedule_command( 1000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
-topo.sim.schedule_command( 2000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
-topo.sim.schedule_command( 3000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
-topo.sim.schedule_command( 4000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
-topo.sim.schedule_command( 5000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
-topo.sim.schedule_command( 6500*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
-topo.sim.schedule_command( 8000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
-topo.sim.schedule_command(20000*st,LE+'.learning_rate=0.06084/ids*'+LE+'.n_units()')
-
-### Lateral inhibitory learning rate and strength changes
-LI='topo.sim["V1"].projections()["LateralInhibitory"]'
-
-topo.sim.schedule_command( 1000*st,LI+'.learning_rate=1.80873/ids/5.0*2.0')
-topo.sim.schedule_command( 2000*st,LI+'.learning_rate=1.80873/ids/5.0*3.0')
-topo.sim.schedule_command( 5000*st,LI+'.learning_rate=1.80873/ids/5.0*5.0')
-
-topo.sim.schedule_command( 1000*st,LI+'.strength=-2.2')
-topo.sim.schedule_command( 2000*st,LI+'.strength=-2.6')
-
-### Afferent learning rate changes
-for opponent in opponent_types:
-    for n in lags:
-        for e in eyes:
-            for l in center_polarities:
-                S ='topo.sim["V1"].projections()["'+e+opponent+' LGN'+l+'Afferent'+n+'"]'
-                topo.sim.schedule_command(  500*st,S+'.learning_rate=0.6850/num_aff/ids')
-                topo.sim.schedule_command( 2000*st,S+'.learning_rate=0.5480/num_aff/ids')
-                topo.sim.schedule_command( 4000*st,S+'.learning_rate=0.4110/num_aff/ids')
-                topo.sim.schedule_command(20000*st,S+'.learning_rate=0.2055/num_aff/ids')
-
-### Activation function threshold changes
-OF='topo.sim["V1"].output_fn'
-
-topo.sim.schedule_command(  200*st,OF+'.lower_bound=0.086;'+OF+'.upper_bound=0.636') 
-topo.sim.schedule_command(  500*st,OF+'.lower_bound=0.096;'+OF+'.upper_bound=0.636') 
-topo.sim.schedule_command( 1000*st,OF+'.lower_bound=0.126;'+OF+'.upper_bound=0.656') 
-topo.sim.schedule_command( 2000*st,OF+'.lower_bound=0.156;'+OF+'.upper_bound=0.676') 
-topo.sim.schedule_command( 3000*st,OF+'.lower_bound=0.176;'+OF+'.upper_bound=0.706') 
-topo.sim.schedule_command( 4000*st,OF+'.lower_bound=0.176;'+OF+'.upper_bound=0.736') 
-topo.sim.schedule_command( 5000*st,OF+'.lower_bound=0.186;'+OF+'.upper_bound=0.766') 
-topo.sim.schedule_command( 6500*st,OF+'.lower_bound=0.196;'+OF+'.upper_bound=0.796') 
-topo.sim.schedule_command( 8000*st,OF+'.lower_bound=0.206;'+OF+'.upper_bound=0.826') 
-topo.sim.schedule_command(20000*st,OF+'.lower_bound=0.216;'+OF+'.upper_bound=0.856') 
-
-### Just to get more progress reports
-topo.sim.schedule_command(12000*st,'pass')
-topo.sim.schedule_command(16000*st,'pass')
-
-### Settling steps changes
-topo.sim.schedule_command( 2000*st,'topo.sim["V1"].tsettle=10')
-topo.sim.schedule_command( 5000*st,'topo.sim["V1"].tsettle=11')
-topo.sim.schedule_command( 6500*st,'topo.sim["V1"].tsettle=12')
-topo.sim.schedule_command( 8000*st,'topo.sim["V1"].tsettle=13')
+sheet.lissom.schedule_events("topo.sim['V1']",st=1.0/2.0,
+                             aff_name="Afferent",ids=ids,
+                             increase_inhibition=True)
 
 # default locations for model editor
 vs = [None]*(num_aff-1) + ['V1'] + [None]*(num_aff)
