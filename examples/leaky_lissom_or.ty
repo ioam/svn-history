@@ -1,5 +1,7 @@
 """
-Example of a LISSOM-based orientation map.
+Example of an SLISSOM-based spiking orientation map.
+
+Work in progress.
 
 $Id$
 """
