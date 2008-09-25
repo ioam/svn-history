@@ -301,7 +301,8 @@ class JointScaling(LISSOM):
         self.x_avg,self.scaled_x_avg, self.sf, self.lr_sf=self.__current_state_stack.pop()
 
 
-def schedule_events(sheet_str="topo.sim['V1']",st=0.5,aff_name="Afferent"):
+def schedule_events(sheet_str="topo.sim['V1']",st=0.5,aff_name="Afferent",
+                    ids=1.0,increase_inhibition=False):
     """
     Convenience function for scheduling a default set of events
     typically used with a LISSOM sheet.  The parameters used
@@ -315,6 +316,14 @@ def schedule_events(sheet_str="topo.sim['V1']",st=0.5,aff_name="Afferent"):
     The st argument determines the timescale relative to a
     20000-iteration simulation, and results in the default
     10000-iteration simulation for the default st=0.5.
+
+    The ids argument specifies the input density scale, i.e. how much
+    input there is at each iteration, on average, relative to the
+    default.
+
+    If increase_inhibition is true, gradually increases the strength
+    of the inhibitory connection, typically used for natural image
+    simulations.    
     """
 
     # Allow sheet.BoundingBox calls (below) after reloading a snapshot
@@ -336,24 +345,40 @@ def schedule_events(sheet_str="topo.sim['V1']",st=0.5,aff_name="Afferent"):
     topo.sim.schedule_command(20000*st,LE+'.change_bounds(sheet.BoundingBox(radius=0.00174))')
     
     # Lateral excitatory learning rate changes
-    topo.sim.schedule_command(  200*st,LE+'.learning_rate=0.12168*'+LE+'.n_units()')
-    topo.sim.schedule_command(  500*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-    topo.sim.schedule_command( 1000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-    topo.sim.schedule_command( 2000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-    topo.sim.schedule_command( 3000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-    topo.sim.schedule_command( 4000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-    topo.sim.schedule_command( 5000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-    topo.sim.schedule_command( 6500*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-    topo.sim.schedule_command( 8000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
-    topo.sim.schedule_command(20000*st,LE+'.learning_rate=0.06084*'+LE+'.n_units()')
+    idss=("" if ids==1 else "/%3.1f"%ids)
+    estr='%s.learning_rate=%%s%s*%s.n_units()'%(LE,idss,LE)
     
+    topo.sim.schedule_command(  200*st,estr%'0.12168')
+    topo.sim.schedule_command(  500*st,estr%'0.06084')
+    topo.sim.schedule_command( 1000*st,estr%'0.06084')
+    topo.sim.schedule_command( 2000*st,estr%'0.06084')
+    topo.sim.schedule_command( 3000*st,estr%'0.06084')
+    topo.sim.schedule_command( 4000*st,estr%'0.06084')
+    topo.sim.schedule_command( 5000*st,estr%'0.06084')
+    topo.sim.schedule_command( 6500*st,estr%'0.06084')
+    topo.sim.schedule_command( 8000*st,estr%'0.06084')
+    topo.sim.schedule_command(20000*st,estr%'0.06084')
+    
+    ### Lateral inhibitory learning rate and strength changes
+    if increase_inhibition:
+        LI=sheet_str+".projections()['LateralInhibitory']"
+        istr='%s.learning_rate=%%s%s'%(LI,idss)
+    
+        topo.sim.schedule_command( 1000*st,istr%'1.80873/5.0*2.0')
+        topo.sim.schedule_command( 2000*st,istr%'1.80873/5.0*3.0')
+        topo.sim.schedule_command( 5000*st,istr%'1.80873/5.0*5.0')
+    
+        topo.sim.schedule_command( 1000*st,LI+'.strength=-2.2')
+        topo.sim.schedule_command( 2000*st,LI+'.strength=-2.6')
+
+
     # Afferent learning rate changes (for every Projection named Afferent)
     sheet_=eval(sheet_str)
     projs = [pn for pn in sheet_.projections().keys() if pn.count(aff_name)]
     num_aff=len(projs)
     for pn in projs:
         ps="%s.projections()['%s'].learning_rate=%%s%s" % \
-            (sheet_str,pn,"" if num_aff==1 else "/%d"%num_aff)
+            (sheet_str,pn,idss if num_aff==1 else "%s/%d"%(idss,num_aff))
         topo.sim.schedule_command(  500*st,ps%('0.6850'))
         topo.sim.schedule_command( 2000*st,ps%('0.5480'))
         topo.sim.schedule_command( 4000*st,ps%('0.4110'))
