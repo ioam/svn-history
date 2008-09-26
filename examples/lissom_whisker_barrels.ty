@@ -39,9 +39,12 @@ def shuffle_positions(w_x,w_y,g,r_seed):
 	y_indices=zeros([g,g,w_x,w_y])
 	for whisker_x in range(w_x):
 		for whisker_y in range(w_y):
-			for i in range(g):
-        			x_indices[i,:,whisker_x,whisker_y]=shuffle(arange(g))
-				y_indices[:,i,whisker_x,whisker_y]=shuffle(arange(g))
+			for k in range(g):
+			      	a = arange(g)
+                                shuffle(a)
+                                x_indices[k,:,whisker_x,whisker_y]= a
+				shuffle(a)
+				y_indices[:,k,whisker_x,whisker_y]= a
 				
 	seed(None)
 	return [x_indices,y_indices]
@@ -168,12 +171,12 @@ def plot_deflections(w_x,w_y,edge,deflections,mags,stimulus_angle,save_plot,tilt
 # Generating input patterns, and testing & plotting responses
 ##########################################################################
 
-from topo.base.parameterclasses import Integer, Number, BooleanParameter, Dynamic
+from topo import param
 from topo.base.patterngenerator import PatternGenerator
-from topo.commands.analysis import PatternPresenter, Subplotting
-from topo.base.functionfamilies import CoordinateMapperFn
-from topo.coordmapperfns.basic import Grid
-from topo.misc.numbergenerators import UniformRandom, ExponentialDecay, VonmisesRandom
+from topo.command.analysis import PatternPresenter, Subplotting
+from topo.base.functionfamily import CoordinateMapperFn
+from topo.coordmapper.basic import Grid
+from topo.misc.numbergenerator import UniformRandom, ExponentialDecay, VonMisesRandom
 
 import topo
 
@@ -184,45 +187,45 @@ global_seed=locals().get("global_seed",1)
 random_seed_generator=UniformRandom(lbound=0.0,ubound=1000,seed=global_seed*25)
 
 
-plot_deflections_on=BooleanParameter(default=False)
+plot_deflections_on=param.Boolean(default=False)
 
 ###############################################################################
 
 class WhiskerArray(PatternGenerator):
 	
-    w_x=Integer(default=3,bounds=(1,None),softbounds=(0.0,10.0),precedence=0.31,doc=""" Number of whiskers rows""")
+    w_x=param.Integer(default=3,bounds=(1,None),softbounds=(0.0,10.0),precedence=0.31,doc=""" Number of whiskers rows""")
 	
-    w_y=Integer(default=3,bounds=(1,None),softbounds=(0.0,10.0),precedence=0.31,doc=""" Number of whisker columns""")
+    w_y=param.Integer(default=3,bounds=(1,None),softbounds=(0.0,10.0),precedence=0.31,doc=""" Number of whisker columns""")
 	  
-    num_ganglion_cells = Integer(default=7,doc="""
+    num_ganglion_cells = param.Integer(default=7,doc="""
         Square root of the number of ganglion cells per whisker.""")
 
-    deflection = Number(default=pi/4,softbounds=(0.0,2*pi),doc="""
+    deflection = param.Number(default=pi/4,softbounds=(0.0,2*pi),doc="""
         Whisker deflection angle, in radians""")
 
-    whisker = Integer(default=(0), doc="""
+    whisker = param.Integer(default=(0), doc="""
         Which whiskers are to receive inputs; use (0) for all.""")
     
-    random_ganglion_seed = Number(default = global_seed*5489) # was just 5489 
+    random_ganglion_seed = param.Number(default = global_seed*5489) # was just 5489 
     
-    edge=Number(default=1.0,doc=""" Border of the input vector plots""")
+    edge=param.Number(default=1.0,doc=""" Border of the input vector plots""")
 
 	
-    tilt = Number(default=0.0, doc="""
+    tilt = param.Number(default=0.0, doc="""
         The tilt of the stimulus plane, + = front whiskers get larger deflection.""")
 
-    whisker_length = Number(default=5)
+    whisker_length = param.Number(default=5)
     
-    whisker_convergence = Number(default=1e7, doc="""
+    whisker_convergence = param.Number(default=1e7, doc="""
     	The convergence of the whisker deflection from the deflection angle""") 
     
     flipped_whisker=[None,None]
     
-    flipped_whisker_convergence=Number(default=1e7)
+    flipped_whisker_convergence=param.Number(default=1e7)
     
-    save_plot=BooleanParameter(default=False, doc='save the stimulus plot?')
+    save_plot=param.Boolean(default=False, doc='save the stimulus plot?')
         
-    anglotopy = Number(default=1e7, doc="""
+    anglotopy = param.Number(default=1e7, doc="""
         Correlation between Angle and Somatotopy, i.e. variance of deflection angle from contact angle""")
 	
         
@@ -234,16 +237,16 @@ class WhiskerArray(PatternGenerator):
 	                                                                                    
     def function(self,params):
         self.sequence_angle = params.get('deflection',self.deflection)
-        self.deflection_angles = VonmisesRandom(mu=self.sequence_angle,kappa=params.get('anglotopy',self.anglotopy))
+        self.deflection_angles = VonMisesRandom(mu=self.sequence_angle,kappa=params.get('anglotopy',self.anglotopy))
 	self.deflection_angle=self.deflection_angles()
 	
 	self.gens=numpy.ones(shape=(self.w_x,self.w_y),dtype=object)
 	for i in range(self.w_x):
 		for j in range(self.w_y):
 				if [i,j]==params.get('flipped_whisker',self.flipped_whisker):
-					self.gens[i,j]=VonmisesRandom(mu=self.deflection_angle,kappa=params.get('flipped_convergence',self.flipped_whisker_convergence),seed=random_seed_generator())
+					self.gens[i,j]=VonMisesRandom(mu=self.deflection_angle,kappa=params.get('flipped_convergence',self.flipped_whisker_convergence),seed=random_seed_generator())
 				else:
-					self.gens[i,j]=VonmisesRandom(mu=self.deflection_angle,kappa=params.get('convergence',self.whisker_convergence),seed=random_seed_generator())
+					self.gens[i,j]=VonMisesRandom(mu=self.deflection_angle,kappa=params.get('convergence',self.whisker_convergence),seed=random_seed_generator())
 	
 	self.whisker_deflections=numpy.ones(shape=(self.w_x,self.w_y))
 	for i in range(self.w_x):
@@ -274,10 +277,10 @@ class TestWhiskerArray(PatternGenerator):
     A second WhiskerArray Class for testing the map.
     """
 
-    deflection = Number(default=pi/4,softbounds=(0.0,2*pi),doc="""
+    deflection = param.Number(default=pi/4,softbounds=(0.0,2*pi),doc="""
         Deflection of whisker array motion, in radians from 0 to 2*pi, assuming a stationary surface.""")
     
-    whisker = Integer(default=0, doc="""
+    whisker = param.Integer(default=0, doc="""
         Which whiskers are to receive inputs; use 0 for all.""")
 	
 
@@ -384,10 +387,10 @@ class BarrelMapper(CoordinateMapperFn):
     Divides the 2D, assuming that barrels are of size 1.0. This borrows from Grid() 
     """
 
-    xdensity = Number(default=1, bounds=(0,None), doc="""
+    xdensity = param.Number(default=1, bounds=(0,None), doc="""
         This is actually w_x""")
 
-    ydensity = Number(default=1, bounds=(0,None), doc="""
+    ydensity = param.Number(default=1, bounds=(0,None), doc="""
         This is actually w_y""")
 
     def __call__(self,x,y):
@@ -418,27 +421,27 @@ import copy
 from math import pi, sqrt, fmod
 from fixedpoint import FixedPoint
 
-import topo.patterns.basic
-import topo.patterns.random
+import topo.pattern.basic
+import topo.pattern.random
 import random
 
-from topo.patterns.basic import Gaussian,Sweeper
-from topo.sheets.lissom import LISSOM
-from topo.sheets.generatorsheet import GeneratorSheet
-from topo.projections.basic import CFProjection
-from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.pattern.basic import Gaussian,Sweeper
+from topo.sheet.lissom import LISSOM
+from topo.sheet.basic import GeneratorSheet
+from topo.projection.basic import CFProjection
+from topo.responsefn.optimized import CFPRF_DotProduct_opt
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
-from topo.learningfns.optimized import CFPLF_Hebbian_opt
-from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
-from topo.misc.numbergenerators import UniformRandom, ExponentialDecay, VonmisesRandom
+from topo.learningfn.optimized import CFPLF_Hebbian_opt
+from topo.outputfn.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.outputfn.basic import DivisiveNormalizeL1
+from topo.misc.numbergenerator import UniformRandom, ExponentialDecay, VonMisesRandom
                                
 # Specify weight initialization, response function, and learning function
 numpy.random.seed((global_seed*3,global_seed*3))
 
-CFProjection.weights_shape = topo.patterns.basic.Constant()
-CFProjection.weights_generator = topo.patterns.basic.Constant()
+CFProjection.cf_shape = topo.pattern.basic.Constant()
+CFProjection.weights_generator = topo.pattern.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
@@ -462,7 +465,7 @@ von_kappa=0.0
 
 topo.sim['Ganglia0']=GeneratorSheet(nominal_density=WhiskerArray.num_ganglion_cells,
                                              input_generator=WhiskerArray(num_ganglion_cells=num_ganglion_cells,
-                                             	deflection=VonmisesRandom(mu=von_mu,kappa=von_kappa,seed=global_seed*76),
+                                             	deflection=VonMisesRandom(mu=von_mu,kappa=von_kappa,seed=global_seed*76),
 						tilt=locals().get('tilt',UniformRandom(lbound=0.0,ubound=1.0,seed=global_seed*123)),
 						w_x=w_x, w_y=w_y,
 						flipped_whisker_convergence=locals().get('flipped_convergence',1e7),
@@ -478,19 +481,19 @@ topo.sim['S1'] = LISSOM(nominal_density=locals().get('default_pidensity',21),tse
 
 topo.sim.connect('Ganglia0','S1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
                      connection_type=CFProjection,strength=1.0,name='Afferent0',
-                     weights_generator=topo.patterns.random.UniformRandom(), nominal_bounds_template=BoundingBox(radius=0.5),learning_rate=1.0,
+                     weights_generator=topo.pattern.random.UniformRandom(), nominal_bounds_template=BoundingBox(radius=0.5),learning_rate=1.0,
 		     coord_mapper=BarrelMapper(xdensity=w_x,ydensity=w_y))
 		  
 
 topo.sim.connect('S1','S1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                  connection_type=CFProjection,strength=1.0,
-                 weights_generator=topo.patterns.random.UniformRandom(),
+                 weights_generator=topo.pattern.random.UniformRandom(),
                  nominal_bounds_template=BoundingBox(radius=locals().get("ex_radius",0.3)), learning_rate=1.0) #ExponentialDecay(starting_value=1.0, time_constant=1000.0))
 		           
    
 topo.sim.connect('S1','S1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                  connection_type=CFProjection,strength=-1.0,
-                 weights_generator=topo.patterns.random.UniformRandom(),
+                 weights_generator=topo.pattern.random.UniformRandom(),
                  nominal_bounds_template=BoundingBox(radius=locals().get("inhib_radius",0.6)),learning_rate=1.0) 
 
 ### Actions scheduled to occur as the simulation proceeds.
