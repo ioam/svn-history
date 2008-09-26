@@ -414,7 +414,9 @@ from topo.param import Dict as DictParameter
         fake_a_package('responsefns','responsefn',['basic','optimized','projfn'])
         fake_a_package('learningfns','learningfn',['basic','optimized','projfn'])
         fake_a_package('coordmapperfns','coordmapper',['basic'])
-        fake_a_package('sheets','sheet',['cfsom','composer','generator',
+        # note there's no legacy support for people using CFSOM. We could
+        # add that if necessary.
+        fake_a_package('sheets','sheet',['composer','generator',
                                          'lissom','optimized','saccade','slissom'])
         fake_a_package('eps','ep',['basic'])
         fake_a_package('patterns','pattern',['basic','image','random','rds','teststimuli']) # missed audio
