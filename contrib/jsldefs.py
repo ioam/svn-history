@@ -6,7 +6,7 @@ import matplotlib
 import os, topo, __main__
 import pylab
 import numpy
-from numpy import exp,zeros,ones,concatenate,median, abs,array,where
+from numpy import exp,zeros,ones,concatenate,median, abs,array,where, ravel
 from pylab import save
 
 from topo import param
@@ -22,10 +22,147 @@ import numpy.oldnumeric as Numeric
 from topo.misc.filepath import normalize_path
 from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.cf import CFPOutputFn
-from topo.base.parameterclasses import Parameter,Number,ClassSelectorParameter,Integer,BooleanParameter
+from topo import param
 from topo.base.functionfamily import OutputFn, IdentityOF
 from topo.outputfn.basic import IdentityOF 
+import string
+import time
+import re
+from topo.misc import filepath
 
+def coords(projection_name):
+    proj = topo.sim["V1"].projections()[projection_name]
+    x=[]
+    y=[]
+    rows,cols = proj.dest.shape
+    for r in range(rows):
+        for c in range(cols):
+            x.append(proj._cfs[r][c].x)
+            y.append(proj._cfs[r][c].y)
+    data=zip(x,y)
+    save(normalize_path("coords"+projection_name),data,fmt='%.6f', delimiter=',')
+    return x,y
+
+def run_param_batch(script_file,filename,chunk,sheet,value,endtime,output_directory="Output",
+                    **params):
+    """
+
+    """
+    import sys # CEBALERT: why I have to import this again? (Also done elsewhere below.)
+    
+   
+    from topo.misc.commandline import auto_import_commands
+    auto_import_commands()
+    
+    command_used_to_start = string.join(sys.argv)
+    
+    starttime=time.time()
+    startnote = "Batch run started at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000",
+                                                           time.gmtime())
+    print startnote
+
+    # Ensure that saved state includes all parameter values
+    from topo.command.basic import save_script_repr
+    param.parameterized.script_repr_suppress_defaults=False
+
+    # Make sure pylab plots are saved to disk
+
+    # Construct simulation name
+    scriptbase= re.sub('.ty$','',os.path.basename(script_file))
+    prefix = ""
+    prefix += time.strftime("%Y%m%d%H%M")
+    prefix += "_" + scriptbase
+
+    simname = prefix
+
+    # Construct parameter-value portion of filename; should do more filtering
+    for a in params.keys():
+        val=params[a]
+        
+        # Special case to give reasonable filenames for lists
+        valstr= ("_".join([str(i) for i in val]) if isinstance(val,list)
+                 else str(params[a]))
+        prefix += "," + a + "=" + valstr
+
+
+    # Set provided parameter values in main namespace
+    for a in params.keys():
+        __main__.__dict__[a] = params[a]
+
+
+    # Create output directories
+    if not os.path.isdir(normalize_path(output_directory)):
+        os.mkdir(normalize_path(output_directory))
+
+    filepath.output_path = normalize_path(os.path.join(output_directory,prefix))
+    
+    if os.path.isdir(filepath.output_path):
+	print "Batch run: Warning -- directory: " +  \
+              filepath.output_path + \
+              " already exists! Run aborted; rename directory or wait one minute before trying again."
+        import sys
+        sys.exit(-1)
+    else:
+	os.mkdir(filepath.output_path)
+        print "Batch run output will be in " + filepath.output_path
+
+    ##################################
+    # capture stdout
+    #
+    import StringIO
+    stdout = StringIO.StringIO()
+    sys.stdout = stdout
+    ##################################
+
+
+    # Run script in main
+    try:
+        execfile(script_file,__main__.__dict__)
+
+        topo.sim.name=simname
+
+        # Run each segment, doing the analysis and saving the script state each time
+        data_file = open(normalize_path(filename),'a')
+        param_analysis_function(data_file)
+        cont=selectivity_test(sheet, value)
+        coords("LateralExcitatory")
+        #save_script_repr()
+        while cont==True and topo.sim.time()<=endtime:
+            topo.sim.run(chunk)
+            param_analysis_function(data_file)
+            cont=selectivity_test(sheet, value)
+            #save_script_repr()
+            elapsedtime=time.time()-starttime
+            param.Parameterized(name="run_batch").message(
+                "Elapsed real time %02d:%02d." % (int(elapsedtime/60),int(elapsedtime%60)))
+        data_file.close()    
+    except:
+        import traceback
+        traceback.print_exc(file=sys.stdout)
+        sys.stderr.write("Warning -- Error detected: execution halted.\n")
+
+    
+    endnote = "Batch run completed at %s." % time.strftime("%a %d %b %Y %H:%M:%S +0000",
+                                                           time.gmtime())
+
+    ##################################
+    # Write stdout to output file and restore original stdout
+    stdout_file = open(normalize_path(simname+".out"),'w')
+    stdout_file.write(command_used_to_start+"\n")
+    stdout_file.write(startnote+"\n")
+    stdout_file.write(stdout.getvalue())
+    stdout_file.write(endnote+"\n")
+    stdout.close()
+    sys.stdout = sys.__stdout__
+    ##################################
+
+    # ALERT: Need to count number of errors and warnings and put that on stdout
+    # and at the end of the .out file, so that they will be sure to be noticed.
+    
+    print endnote
+
+
+    
 #########################################################################
 ##Sheet types only used lissom_oo_or_homeostatic_tracked.ty for reproducing published figures##
 from topo.sheet.lissom import LISSOM
@@ -263,14 +400,6 @@ class JointScaling_affonly(LISSOM):
 
 
 
-
-
-
-
-
-
-
-
 #############################################################################
 #Functions for analysis#####################################################
 
@@ -359,11 +488,183 @@ class StoreStability(param.Parameterized):
         #   a 4"x4" image * 80 dpi ==> 320x320 pixel image
         pylab.savefig(normalize_path("AverageStability"+sheet+str(topo.sim.time())+".png"), dpi=100)
 
+from topo.base.arrayutil import wrap
+import numpy
+from numpy.oldnumeric import sqrt
+
+def map_gradient(sheet, data_file, time, cyclic=True,cyclic_range=1.0):
+    """
+    Compute and show the gradient plot of the supplied data.
+    Translated from Octave code originally written by Yoonsuck Choe.
+    
+    If the data is specified to be cyclic, negative differences will
+    be wrapped into the range specified (1.0 by default).
+    """
+    map=topo.sim[sheet].sheet_views['OrientationPreference'].view()[0]
+    selectivity=topo.sim[sheet].sheet_views['OrientationSelectivity'].view()[0]
+    avg_selectivity=median(selectivity.flat)
+    r,c = topo.sim[sheet].shape
+    dx = numpy.diff(map,1,axis=1)[0:r-1,0:c-1]
+    dy = numpy.diff(map,1,axis=0)[0:r-1,0:c-1]
+    
+    if cyclic: # Wrap into the specified range
+        # Convert negative differences to an equivalent positive value
+        dx = wrap(0,cyclic_range,dx)
+        dy = wrap(0,cyclic_range,dy)
+        #
+        # Make it increase as gradient reaches the halfway point,
+        # and decrease from there
+        dx = 0.5*cyclic_range-abs(dx-0.5*cyclic_range)
+        dy = 0.5*cyclic_range-abs(dy-0.5*cyclic_range)
+
+    
+    mat_gradient=sqrt(dx*dx+dy*dy)
+    tot_gradient=sum(mat_gradient.flat)
+    param_data = (avg_selectivity, tot_gradient)
+    data_file.write(str(time)+", "+str(avg_selectivity)+",  "+str(tot_gradient)+"\n")
+    #save(normalize_path(str(time)),param_data,fmt='%.6f', delimiter=',')  
 
 # Used by homeostatic analysis function
 default_analysis_plotgroups=["Activity"]
 Selectivity=StoreMedSelectivity()
 Stability=StoreStability()
+
+#Avg selectivity needs to be more than value for test to be False and simulation to be stopped
+def selectivity_test(sheet, value):
+    selectivity=topo.sim[sheet].sheet_views['OrientationSelectivity'].view()[0]
+    avg_selectivity=median(selectivity.flat)
+    if avg_selectivity<=value:
+        return True
+    else:
+        return False
+
+def save_map(sheet):
+    map=topo.sim[sheet].sheet_views['OrientationPreference'].view()[0]
+    save(normalize_path("Map"+str(topo.sim.time())),map,fmt='%.6f', delimiter=',')
+        
+from topo.command.pylabplots import generate_figure
+
+def two_photon_plot(preference, size=(10,10), cell_size=100):
+    pylab.hsv()
+    pylab.figure(figsize=size)
+    x,y = coords("LateralExcitatory")
+    map=topo.sim["V1"].sheet_views[preference].view()[0]
+    data=ravel(map)
+    pylab.scatter(x,y,s=cell_size,c=data,marker='o')
+    pylab.savefig(normalize_path(preference+str(topo.sim.time())+".png"), dpi=100)
+    generate_figure(title=preference)
+
+def param_analysis_function(data_file):
+    """
+
+    Analysis function specific to this simulation which can be used in
+    batch mode to plots and/or store tracked attributes during
+    development.
+
+    """
+    import topo
+    import copy
+    from topo.command.analysis import save_plotgroup, PatternPresenter, update_activity
+    from topo.base.projection import ProjectionSheet
+    from topo.sheet.generator import GeneratorSheet
+    from topo.pattern.basic import Gaussian, SineGrating
+    from topo.command.basic import pattern_present, wipe_out_activity
+    from topo.base.simulation import EPConnectionEvent
+
+
+    # Build a list of all sheets worth measuring
+    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
+    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
+    input_sheets = topo.sim.objects(GeneratorSheet).values()
+    
+    # Set potentially reasonable defaults; not necessarily useful
+    topo.command.analysis.coordinate=(0.0,0.0)
+    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
+    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
+    topo.plotting.plotgroup.RFProjectionPlotGroup.input_sheet=topo.sim["Retina"]
+    topo.plotting.plotgroup.RFProjectionPlotGroup.sheet=topo.sim["V1"]
+    
+    # Save all plotgroups listed in default_analysis_plotgroups
+    for pg in default_analysis_plotgroups:
+        save_plotgroup(pg)
+
+    # Plot all projections for all measured_sheets
+    for s in measured_sheets:
+        for p in s.projections().values():
+            save_plotgroup("Projection",projection=p)
+
+
+    #uncomment if want to ignore output function in selectivity measurement
+    #present a pattern without plasticity to ensure that values are initialized at t=0
+    pattern_present(inputs={"Retina":SineGrating()},duration=1.0,
+                    plastic=False,apply_output_fn=True,overwrite_previous=False)  
+
+    topo.sim["V1"].state_push()
+    topo.sim["V1"].output_fn.state_push()
+     
+
+    if topo.sim["V1"].sf==None:
+        pass
+    else:
+        topo.sim["V1"].sf *=0.0
+        topo.sim["V1"].sf +=1.0
+            
+    topo.sim["V1"].output_fn.output_fns[1].a *=0.0
+    topo.sim["V1"].output_fn.output_fns[1].b *=0.0
+    topo.sim["V1"].output_fn.output_fns[1].a +=12.0
+    topo.sim["V1"].output_fn.output_fns[1].b +=-5.0
+
+    
+    save_plotgroup("Orientation Preference")
+    #save_plotgroup("Retinotopy")
+    #Save raw retinotopy data for analysis
+    #retinotopy=topo.sim["V1"].sheet_views['RetinotopyPreference'].view()[0]
+    #save(normalize_path("retinotopy"+str(topo.sim.time())),retinotopy,fmt='%.6f', delimiter=',')
+    #save_plotgroup("Bar X Preference")
+    #save_plotgroup("Bar Y Preference") 
+    #Xpref=topo.sim["V1"].sheet_views['XPreference'].view()[0]
+    #save(normalize_path("Xpref"+str(topo.sim.time())),Xpref,fmt='%.6f', delimiter=',')
+    #Ypref=topo.sim["V1"].sheet_views['YPreference'].view()[0]
+    #save(normalize_path("Ypref"+str(topo.sim.time())),Ypref,fmt='%.6f', delimiter=',')
+    #save_plotgroup("Retinotopy_XY")
+    #RetXpref=topo.sim["V1"].sheet_views['RetxPreference'].view()[0]
+    #save(normalize_path("RetXpref"+str(topo.sim.time())),Xpref,fmt='%.6f', delimiter=',')
+    #RetYpref=topo.sim["V1"].sheet_views['RetyPreference'].view()[0]
+    #save(normalize_path("RetYpref"+str(topo.sim.time())),Ypref,fmt='%.6f', delimiter=',')
+
+    #Restore original values
+    topo.sim["V1"].state_pop()
+    topo.sim["V1"].output_fn.state_pop()
+
+    map_gradient("V1", data_file, topo.sim.time())
+    Selectivity("V1", "Selectivity", 0, topo.sim.time())
+    Stability("V1", "Stability", 0, topo.sim.time())
+    save_map("V1")
+
+    #two_photon_plot("RetxPreference", size=(5,5), cell_size=10)
+    #two_photon_plot("RetyPreference", size=(5,5), cell_size=10)
+    #two_photon_plot("OrientationPreference", size=(5,5), cell_size=10)   
+   
+
+    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], 0, 
+                            topo.sim.time(), filename="Afferent", ylabel="Afferent", raw=True)
+    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], 0, 
+                            topo.sim.time(), filename="V1", ylabel="V1", raw=True)
+    
+
+    plot_tracked_attributes(topo.sim["V1"].projections()["LGNOnAfferent"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="On_before", ylabel="On_before")
+    plot_tracked_attributes(topo.sim["V1"].projections()["LGNOffAfferent"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="Off_before", ylabel="Off_before")
+
+
+    plot_tracked_attributes(topo.sim["V1"].projections()["LateralExcitatory"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="LatExBefore", ylabel="LatExBefore")
+    plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], 0,
+                            topo.sim.time(), filename="LatInBefore", ylabel="LatInBefore")
+
+    #save_snapshot()
+    #save_plotgroup("RF Projection")
 
 def homeostatic_analysis_function():
     """
@@ -601,15 +902,15 @@ def species_analysis_function():
     if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
     if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
 
-    # Save all plotgroups listed in default_analysis_plotgroups
+    #Save all plotgroups listed in default_analysis_plotgroups
     for pg in default_analysis_plotgroups:
         save_plotgroup(pg)
 
-    # Plot all projections for all measured_sheets
+    #Plot all projections for all measured_sheets
     for s in measured_sheets:
         for p in s.projections().values():
             save_plotgroup("Projection",projection=p)
-
+            
     #present a pattern without plasticity to ensure that values are initialized at t=0
     pattern_present(inputs={"Retina":SineGrating()},duration=1.0,
                     plastic=False,apply_output_fn=True,overwrite_previous=False)        
@@ -619,38 +920,39 @@ def species_analysis_function():
     topo.sim["V1"].state_push()
     topo.sim["V1"].output_fn.state_push()
      
-
-    if topo.sim["V1"].sf==None:
-        pass
-    else:
-        topo.sim["V1"].sf *=0.0
-        topo.sim["V1"].sf +=1.0
-            
-    topo.sim["V1"].output_fn.output_fns[1].a *=0.0
-    topo.sim["V1"].output_fn.output_fns[1].b *=0.0
-    topo.sim["V1"].output_fn.output_fns[1].a +=12.0
-    topo.sim["V1"].output_fn.output_fns[1].b +=-5.0
+    topo.sim["V1"].projections()["LGNOnAfferent"].strength=1.0
+    topo.sim["V1"].projections()["LGNOffAfferent"].strength=1.0
+    topo.sim["V1"].output_fn.output_fns[0].a *=0.0
+    topo.sim["V1"].output_fn.output_fns[0].b *=0.0
+    topo.sim["V1"].output_fn.output_fns[0].a +=12.0
+    topo.sim["V1"].output_fn.output_fns[0].b +=-5.0
     
     save_plotgroup("Orientation Preference")
 
-    save_plotgroup("Retinotopy")
+    #save_plotgroup("Retinotopy")
+
+    #Save raw retinotopy data for analysis
+    #retinotopy=topo.sim["V1"].sheet_views['Retinotopy'].view()[0]
+    #save(normalize_path("retinotopy"+str(topo.sim.time())),,fmt='%.6f', delimiter=',')
 
     #Restore original values
     topo.sim["V1"].state_pop()
     topo.sim["V1"].output_fn.state_pop()
 
+    topo.sim["V1"].projections()["LGNOnAfferent"].strength=__main__.__dict__['aff_strength']
+    topo.sim["V1"].projections()["LGNOffAfferent"].strength=__main__.__dict__['aff_strength']
+
     Selectivity("V1", "Selectivity", 0, topo.sim.time())
     Stability("V1", "Stability", 0, topo.sim.time())
-    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[0], 0, 
-                            topo.sim.time(), filename="Afferent", ylabel="Afferent", raw=True)
-    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[2], 0, 
+   
+    plot_tracked_attributes(topo.sim["V1"].output_fn.output_fns[1], 0, 
                             topo.sim.time(), filename="V1", ylabel="V1", raw=True)
     
 
-    plot_tracked_attributes(topo.sim["V1"].projections()["LGNOnAfferent"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="On_before", ylabel="On_before")
-    plot_tracked_attributes(topo.sim["V1"].projections()["LGNOffAfferent"].output_fn.output_fns[1], 0,
-                            topo.sim.time(), filename="Off_before", ylabel="Off_before")
+    #plot_tracked_attributes(topo.sim["V1"].projections()["LGNOnAfferent"].output_fn.output_fns[1], 0,
+    #                        topo.sim.time(), filename="On_before", ylabel="On_before")
+    #plot_tracked_attributes(topo.sim["V1"].projections()["LGNOffAfferent"].output_fn.output_fns[1], 0,
+    #                        topo.sim.time(), filename="Off_before", ylabel="Off_before")
 
 
     plot_tracked_attributes(topo.sim["V1"].projections()["LateralExcitatory"].output_fn.output_fns[1], 0,
@@ -658,20 +960,75 @@ def species_analysis_function():
     plot_tracked_attributes(topo.sim["V1"].projections()["LateralInhibitory"].output_fn.output_fns[1], 0,
                             topo.sim.time(), filename="LatInBefore", ylabel="LatInBefore")
 
-    save_snapshot()
+    #save_snapshot()
+
+def rfs_analysis_function():
+    """
+
+    Analysis function specific to this simulation which can be used in
+    batch mode to plots and/or store tracked attributes during
+    development.
+
+    """
+    
+    import topo
+    import copy
+    from topo.command.analysis import save_plotgroup, PatternPresenter, update_activity, ultragrid_zoom_3
+    from topo.base.projection import ProjectionSheet
+    from topo.sheet.generator import GeneratorSheet
+    from topo.pattern.basic import Gaussian, SineGrating
+    from topo.command.basic import pattern_present, wipe_out_activity, save_snapshot
+    from topo.base.simulation import EPConnectionEvent
 
 
+    # Build a list of all sheets worth measuring
+    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
+    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
+    input_sheets = topo.sim.objects(GeneratorSheet).values()
+    
+    # Set potentially reasonable defaults; not necessarily useful
+    topo.command.analysis.coordinate=(0.0,0.0)
+    if input_sheets:    topo.command.analysis.input_sheet_name=input_sheets[0].name
+    if measured_sheets: topo.command.analysis.sheet_name=measured_sheets[0].name
+    topo.command.analysis.input_sheet=topo.sim["Retina"]
+    topo.plotting.plotgroup.RFProjectionPlotGroup.input_sheet=topo.sim["Retina"]
+    topo.plotting.plotgroup.RFProjectionPlotGroup.sheet=topo.sim["V1"]
+    
+    #topo.plotting.plotgroup.plotgroups["RF Projection"].update_command="measure_rfs(scale=10.0,display=False,use_full=True,l=-1.0,b=-1.0,r=1.0,t=1.0)"
+    #present a pattern without plasticity to ensure that values are initialized at t=0
+    pattern_present(inputs={"Retina":SineGrating()},duration=1.0,
+                    plastic=False,apply_output_fn=True,overwrite_previous=False)
+    
+    Retina_pix=topo.sim["Retina"].shape[0]
+    V1_pix=topo.sim["V1"].shape[0]
+    topo.sim["V1"].state_push()
+    topo.sim["V1"].output_fn.state_push()
+     
+    topo.sim["V1"].projections()["LGNOnAfferent"].strength=1.0
+    topo.sim["V1"].projections()["LGNOffAfferent"].strength=1.0
+    topo.sim["V1"].output_fn.output_fns[0].a *=0.0
+    topo.sim["V1"].output_fn.output_fns[0].b *=0.0
+    topo.sim["V1"].output_fn.output_fns[0].a +=12.0
+    topo.sim["V1"].output_fn.output_fns[0].b +=-5.0
+
+    save_plotgroup("RF Projection")
+    ultragrid_zoom_3(0,0,0,Retina_pix,0,Retina_pix,V1_pix,9999999999,normalize_path("RFS"+str(topo.sim.time())))
+
+    #Restore original values
+    topo.sim["V1"].state_pop()
+    topo.sim["V1"].output_fn.state_pop()
        
 def plot_out_connections(cfprojection_name, units):
     """
     """
     from topo.command.pylabplots import matrixplot
 
+    from topo.base.cf import MaskedCFIter
     proj=topo.sim["V1"].projections()[cfprojection_name]
 
     iterator=MaskedCFIter(proj)
     
-    row, col = iterator.proj.src.shape
+    row, col = proj.src.shape
     
     
     lgn_cf={}
@@ -679,22 +1036,22 @@ def plot_out_connections(cfprojection_name, units):
         lgn_cf[x]={}
         for y in range(col):
             lgn_cf[x][y]={}
-            lgn_cf[x][y]=zeros(iterator.proj.dest.shape)
+            lgn_cf[x][y]=zeros(proj.dest.shape) #for every cell in LGN there is an array the size of V1
             
-        for x in range(row):
-            for y in range(col):
-                for cf,v1x,v1y in iterator():
-                    #if (mask[v1x][v1y] != 0):
-                    r1,r2,c1,c2= cf.input_sheet_slice
-                    rx=range(r1, r2)
-                    ry=range(c1, c2)
-                    if x in rx:
-                        if y in ry:
-                            indx = rx.index(x)
-                            indy = ry.index(y)
-                            
-                            lgn_cf[x][y][v1x][v1y] += cf.weights[indx][indy]
+    for x in range(row): #for every cell in lgn
+        for y in range(col):
+            for cf,v1x,v1y in iterator(): # for every cf in V1
+                #if (mask[v1x][v1y] != 0):
+                r1,r2,c1,c2= cf.input_sheet_slice # cells of lgn in that cf
+                rx=range(r1, r2)
+                ry=range(c1, c2)
+                if x in rx: # if the lgn cell is in that cf
+                    if y in ry:
+                        indx = rx.index(x) #make note of the index of that cell in the cf
+                        indy = ry.index(y)
+                        
+                        lgn_cf[x][y][v1x][v1y] += cf.weights[indx][indy] # fill in the array of v1 at that position with the weight of the cell
                             
 
-        for unit in units: 
-            matrixplot(lgn_cf[unit[0]][unit[1]])
+    for unit in units: 
+        matrixplot(lgn_cf[unit[0]][unit[1]])
