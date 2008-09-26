@@ -179,15 +179,36 @@ class Choice(RandomDistribution):
 
 class NormalRandom(RandomDistribution):
     """
-    Specified with mean mu and standard deviation sigma.
+    Normally distributed (Gaussian) random number.
 
+    Specified with mean mu and standard deviation sigma.
     See the random module for further details.    
     """
-    mu = param.Number(default=0.0,doc="mean of the distribution")
-    sigma = param.Number(default=1.0,doc="standard deviation of the distribution")
+    mu = param.Number(default=0.0,doc="Mean value.")
+    sigma = param.Number(default=1.0,doc="Standard deviation.")
     
     def __call__(self):
         return self.random_generator.normalvariate(self.mu,self.sigma)
+
+
+class VonMisesRandom(RandomDistribution):
+    """
+    Circularly normal distributed random number.
+
+    If kappa is zero, this distribution reduces to a uniform random
+    angle over the range 0 to 2*pi.  Otherwise, it is concentrated to
+    a greater or lesser degree (determined by kappa) around the mean
+    mu.  See the random module for further details.
+    """
+    #JABALERT: Shouldn't this have bounds=(0.0,2*pi)?
+    mu = param.Number(default=0.0,doc="""
+        Mean value, in the range 0 to 2*pi.""")
+    
+    kappa = param.Number(default=1.0,doc="""
+        Concentration (inverse variance).""")
+
+    def __call__(self):
+        return self.random_generator.vonmisesvariate(self.mu,self.kappa)
 
 
 import topo
