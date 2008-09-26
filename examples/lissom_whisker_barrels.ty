@@ -219,7 +219,7 @@ class WhiskerArray(PatternGenerator):
     whisker_convergence = param.Number(default=1e7, doc="""
     	The convergence of the whisker deflection from the deflection angle""") 
     
-    flipped_whisker=[None,None]
+    flipped_whisker=param.Parameter(default=[None,None])
     
     flipped_whisker_convergence=param.Number(default=1e7)
     
@@ -266,6 +266,12 @@ class WhiskerArray(PatternGenerator):
 
     
 ###############################################################################
+
+# JABHACKALERT: Uses fallback to global variables w_x and w_y; should be rewritten to
+# accept them properly as parameters or constructor arguments.
+# Default size of whisker array
+w_x=locals().get('w_x',3)
+w_y=locals().get('w_y',3)
 
 # JABALERT: This class should share a parent class with WhiskerArray, instead
 # of hard-coding references to parameter values of WhiskerArray.  The
