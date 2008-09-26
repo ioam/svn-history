@@ -302,7 +302,7 @@ class JointScaling(LISSOM):
 
 
 def schedule_events(sheet_str="topo.sim['V1']",st=0.5,aff_name="Afferent",
-                    ids=1.0,increase_inhibition=False):
+                    ids=1.0,ars=1.0,increase_inhibition=False):
     """
     Convenience function for scheduling a default set of events
     typically used with a LISSOM sheet.  The parameters used
@@ -319,7 +319,8 @@ def schedule_events(sheet_str="topo.sim['V1']",st=0.5,aff_name="Afferent",
 
     The ids argument specifies the input density scale, i.e. how much
     input there is at each iteration, on average, relative to the
-    default.
+    default.  The ars argument specifies how much to scale the
+    afferent learning rate, if necessary.
 
     If increase_inhibition is true, gradually increases the strength
     of the inhibitory connection, typically used for natural image
@@ -376,9 +377,10 @@ def schedule_events(sheet_str="topo.sim['V1']",st=0.5,aff_name="Afferent",
     sheet_=eval(sheet_str)
     projs = [pn for pn in sheet_.projections().keys() if pn.count(aff_name)]
     num_aff=len(projs)
+    arss="" if ars==1.0 else "*%3.1f"%ars
     for pn in projs:
-        ps="%s.projections()['%s'].learning_rate=%%s%s" % \
-            (sheet_str,pn,idss if num_aff==1 else "%s/%d"%(idss,num_aff))
+        ps="%s.projections()['%s'].learning_rate=%%s%s%s" % \
+            (sheet_str,pn,idss if num_aff==1 else "%s/%d"%(idss,num_aff),arss)
         topo.sim.schedule_command(  500*st,ps%('0.6850'))
         topo.sim.schedule_command( 2000*st,ps%('0.5480'))
         topo.sim.schedule_command( 4000*st,ps%('0.4110'))
