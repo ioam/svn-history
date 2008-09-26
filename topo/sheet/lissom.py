@@ -393,7 +393,7 @@ def schedule_events(sheet_str="topo.sim['V1']",st=0.5,aff_name="Afferent",
     ubi=sheet_.output_fn.upper_bound
     
     topo.sim.schedule_command(  200*st,bstr%(lbi+0.01,ubi+0.01))
-    topo.sim.schedule_command(  500*st,bstr%(lbi+0.02,ubi+0.01)) # Error: should be ubi+0.02
+    topo.sim.schedule_command(  500*st,bstr%(lbi+0.02,ubi+0.02))
     topo.sim.schedule_command( 1000*st,bstr%(lbi+0.05,ubi+0.03))
     topo.sim.schedule_command( 2000*st,bstr%(lbi+0.08,ubi+0.05))
     topo.sim.schedule_command( 3000*st,bstr%(lbi+0.10,ubi+0.08))
