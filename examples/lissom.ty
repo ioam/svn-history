@@ -421,6 +421,12 @@ sheet.lissom.schedule_events("topo.sim['V1']",st=st,
                              aff_name="Afferent",ids=ids,
                              increase_inhibition=(dataset=="Nature"))
 
+# These simulations are slow, so we want more progress reports
+topo.sim.schedule_command(25*st,'pass')
+topo.sim.schedule_command(50*st,'pass')
+topo.sim.schedule_command(100*st,'pass')
+topo.sim.schedule_command(150*st,'pass')
+
 
 ### Default locations for model editor
 vs=[None]*(num_aff-1) + ['V1'] + [None]*(num_aff)
