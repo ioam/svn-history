@@ -225,18 +225,6 @@ class PatternPresenter(param.Parameterized):
                 else:
                     self.warning('Ocularity is defined only when there are inputs for Right and Left retinas.')
 
-        # For WhiskerArray only; used to set the delay/lag in each input sheet
-        if features_values.has_key("deflection"):
-            from __main__ import num_lags # Assumed to be defined in .ty file
-            if num_lags==1:
-                step_offset=1
-            else:
-                step_offset=0
-
-            for i in xrange(num_lags):
-                inputs[input_sheet_names[i]].step=i+step_offset
-
-
         if features_values.has_key("contrastcentre")or param_dict.has_key("contrastcentre"):
             if self.contrast_parameter=='michelson_contrast':
                 for g in inputs.itervalues():
