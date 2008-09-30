@@ -18,12 +18,10 @@ from topo.misc.filepath import resolve_path, normalize_path
 import topo
 
 
-# CEBALERT: will these 'script="examples..."' paths work on Windows?
+### train-tests
 
-# CBALERT: guess I should have named this generate_data, since it's a function (same for TestScript).
-
-# CB: look_at's not a great variable name.
-def GenerateData(script="examples/lissom_oo_or.ty",data_filename=None,look_at='V1',run_for=[1,99,150],**args):
+def generate_data(script="examples/lissom_oo_or.ty",data_filename=None,
+                  look_at='V1',run_for=[1,99,150],**args):
     """
     Run the specified script, saving activity from look_at at times
     specified in run_for.
@@ -55,9 +53,11 @@ def GenerateData(script="examples/lissom_oo_or.ty",data_filename=None,look_at='V
     
     pickle.dump(data,open(normalize_path(data_filename),'wb'),2)
 
+# old name
+GenerateData=generate_data
 
 
-def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None):
+def test_script(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None):
     """
     Run script with the parameters specified when its DATA file was
     generated, and check for changes.
@@ -109,11 +109,13 @@ def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None
     print result+"\n"
 
 
+# old name
+TestScript = test_script
 
 
-# CB: ought to tell users that they should expect variation in results etc
-# so they might know what is significant. Or use repeat(3 or 4) and return
-# the minimum value to try to make the result more reliable.
+### speed-tests
+
+# except variation in these results! see python's timeit module documentation
 def time_sim_run(script="examples/lissom_oo_or.ty",iterations=10):
     """
     Execute the script in __main__, then time topo.sim.run(iterations).
@@ -127,7 +129,8 @@ def time_sim_run(script="examples/lissom_oo_or.ty",iterations=10):
     return timeit.Timer('topo.sim.run('+`iterations`+')','gc.enable(); import topo').timeit(number=1)
 
      
-def generate_speed_data(script="examples/lissom_oo_or.ty",iterations=100,data_filename=None):
+def generate_speed_data(script="examples/lissom_oo_or.ty",iterations=100,data_filename=None,
+                        **args):
     """
     Calls time_sim_run(script,iterations) and saves 'iterations=time'
     to script_SPEEDDATA.
@@ -135,10 +138,18 @@ def generate_speed_data(script="examples/lissom_oo_or.ty",iterations=100,data_fi
     if data_filename==None:
         data_filename=script+"_SPEEDDATA"
 
+    for arg,val in args.items():
+        __main__.__dict__[arg]=val
+                
     how_long = time_sim_run(script,iterations)
 
     speed_data_file = open(normalize_path(data_filename),'w')
-    speed_data_file.write("%s=%s"%(iterations,how_long))
+
+    speed_data = {'args':args,
+                  'iterations':iterations,
+                  'how_long':how_long}
+    
+    speed_data_file.write(speed_data)
     speed_data_file.close()
 
 
@@ -152,11 +163,24 @@ def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
 
     speed_data_file = open(resolve_path(data_filename),'r')
         
-    info = speed_data_file.readline()
+    speed_data = speed_data_file.readline()
     speed_data_file.close()
 
-    iterations,old_time = info.split('=')
-    iterations = float(iterations); old_time=float(old_time)
+    #### support old data files
+    if isinstance(speed_data,str):
+        iterations,old_time = speed_data.split('=')
+        iterations = float(iterations); old_time=float(old_time)
+        speed_data = {'iterations':iterations,
+                      'how_long':old_time,
+                      'args':{}}
+    ####
+        
+    old_time = speed_data['how_long']
+    iterations = speed_data['iterations']
+    args = speed_data['args']
+    
+    for arg,val in args.items():
+        __main__.__dict__[arg]=val
     
     new_time = time_sim_run(script,iterations)
 
@@ -174,11 +198,12 @@ def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
 
 
 
-### startup timing: almost copy+paste of the speed functions above
+### startup timing
 
-# CB: ought to tell users that they should expect variation in results etc
-# so they might know what is significant. Or use repeat(3 or 4) and return
-# the minimum value to try to make the result more reliable.
+# CEBALERT: was almost copy+paste of the speed functions above, but
+# now these ones need updating. Can I first share more of the code?
+
+# except variation in these results! see python's timeit module documentation
 def time_sim_startup(script="examples/lissom_oo_or.ty",density=24):
     return timeit.Timer("execfile('%s',__main__.__dict__)"%script,'import __main__;gc.enable()').timeit(number=1)
 
