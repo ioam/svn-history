@@ -237,7 +237,7 @@ slow-tests: print-info train-tests all-speed-tests map-tests
 
 # General rules for generating test data and running the tests
 %_DATA:
-	./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",density=8,run_for=[1,99,150])'
+	./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",run_for=[1,99,150],look_at="V1",default_density=8,default_retina_density=24,default_lgn_density=24)'
 
 %_TEST: %_DATA
 	${TIMER}./topographica -c 'import_weave=${IMPORT_WEAVE}' -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",decimal=${TESTDP})'
