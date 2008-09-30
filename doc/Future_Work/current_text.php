@@ -131,6 +131,10 @@ anyway?) (CEB)
 
 <H2>Tasks to be addressed by release 1.0</H2>
 
+<H4>2008/09/30 (CB): clean up python code for slow-tests</H4>
+
+<H4>2008/09/30 (CB): coordinates in GUI</H4>
+
 
 <H4>2007/10/03 (CB): Urgent param/tk cleanup</H4>
 Cleanup + doc of param/tk.py. Includes fixing 'from param import tk'.
