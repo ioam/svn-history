@@ -1,40 +1,8 @@
 """
-Contains tests to check a particular script's results or speed have not changed.
+Contains tests to check a particular script's results or speed have
+not changed.
 
-
-Test that the results of a script have not changed
-==================================================
-
-The current results from running x are checked against the results
-stored in x_DATA, where x is the path to the script (including the
-filename).
-
-You can generate a new data file like this:
-  ./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(x)'
-
-You can run the test like this:
-  ./topographica -c 'from topo.tests.test_script import TestScript; TestScript(x,6)'
-
-You can specify which sheet to look at, its density, the number of iterations, and
-how many decimal places to check (defaulting to all).
-
-The script x is assumed to support 'default_density' (see e.g. examples/lissom_oo_or.ty)
-
-
-
-Test that the speed of running a simulation has not changed
-===========================================================
-
-You can generate a new data file like this:
-  ./topographica -c 'from topo.tests.test_script import *; generate_speed_data(script="examples/hierarchical.ty",iterations=50)'
-
-You can run a test like this:
-  ./topographica -c 'from topo.tests.test_script import compare_speed_data; compare_speed_data("examples/hierarchical.ty")'
-
-
-You should select enough iterations that the timings can be reliable.
-
-
+See the Makefile for examples of usage.
 
 $Id$
 """
@@ -53,12 +21,16 @@ import topo
 # CEBALERT: will these 'script="examples..."' paths work on Windows?
 
 # CBALERT: guess I should have named this generate_data, since it's a function (same for TestScript).
-def GenerateData(script="examples/lissom_oo_or.ty",data_filename=None,look_at='V1',density=4,run_for=[1,99,150]):
-    """
-    Run script (with the sheet look_at set to the specified density)
-    for the times in run_for; after each run_for time the activity of
-    look_at is saved.
 
+# CB: look_at's not a great variable name.
+def GenerateData(script="examples/lissom_oo_or.ty",data_filename=None,look_at='V1',run_for=[1,99,150],**args):
+    """
+    Run the specified script, saving activity from look_at at times
+    specified in run_for.
+
+    args are set in __main__ before the script is executed (allowing
+    one to specify e.g.  default_density).
+    
     For the default data_filename of None, saves the resulting data to
     the pickle script_DATA.
     """
@@ -66,7 +38,9 @@ def GenerateData(script="examples/lissom_oo_or.ty",data_filename=None,look_at='V
         data_filename=script+"_DATA"
     
     # we must execute in main because e.g. scheduled events are run in __main__
-    __main__.__dict__['default_density']=density
+    for arg,val in args.items():
+        __main__.__dict__[arg]=val
+
     execfile(script,__main__.__dict__)
     
     data = {}
@@ -74,9 +48,9 @@ def GenerateData(script="examples/lissom_oo_or.ty",data_filename=None,look_at='V
     for time in run_for:
         topo.sim.run(time)
         data[topo.sim.time()] = copy.deepcopy(topo.sim[look_at].activity)
-        
+
+    data['args']=args
     data['run_for']=run_for
-    data['density']=density
     data['look_at']=look_at
     
     pickle.dump(data,open(normalize_path(data_filename),'wb'),2)
@@ -106,11 +80,19 @@ def TestScript(script="examples/lissom_oo_or.ty",data_filename=None,decimal=None
         raise
 
     # retrieve parameters used when script was run
-    run_for=data['run_for']    
-    look_at=data['look_at']
-    density=data['density']
-    
-    __main__.__dict__['default_density']=density
+    run_for=data['run_for']
+    look_at = data['look_at']
+
+    ## support old data files which contain only 'density'
+    ## (i.e. default_density)
+    if 'args' not in data:
+        data['args']={'default_density' : data['density']}
+
+    args = data['args']
+
+    for arg,val in args.items():
+        __main__.__dict__[arg]=val
+        
     execfile(script,__main__.__dict__)        
 
     for time in run_for:
@@ -338,7 +320,7 @@ def compare_with_and_without_snapshot_LoadSnapshot(script="examples/lissom_oo_or
 
 
 
-
+## CEBALERT: for reference simulations - should be moved elsewhere
 def run_multiple_density_comparisons(ref_script):
     from topo.misc.util import cross_product
     import subprocess
