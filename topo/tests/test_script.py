@@ -143,14 +143,12 @@ def generate_speed_data(script="examples/lissom_oo_or.ty",iterations=100,data_fi
                 
     how_long = time_sim_run(script,iterations)
 
-    speed_data_file = open(normalize_path(data_filename),'w')
-
     speed_data = {'args':args,
                   'iterations':iterations,
                   'how_long':how_long}
-    
-    speed_data_file.write(speed_data)
-    speed_data_file.close()
+
+    pickle.dump(speed_data,open(normalize_path(data_filename),'wb'),2)
+
 
 
 def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
@@ -162,18 +160,21 @@ def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
         data_filename=script+"_SPEEDDATA"
 
     speed_data_file = open(resolve_path(data_filename),'r')
-        
-    speed_data = speed_data_file.readline()
-    speed_data_file.close()
 
-    #### support old data files
-    if isinstance(speed_data,str):
+    try:
+        speed_data = pickle.load(speed_data_file)
+    except:
+        ## support old data files (used to be string in the file
+        ## rather than pickle)
+        speed_data = speed_data_file.readline()
+
         iterations,old_time = speed_data.split('=')
         iterations = float(iterations); old_time=float(old_time)
         speed_data = {'iterations':iterations,
                       'how_long':old_time,
                       'args':{}}
-    ####
+
+    speed_data_file.close()
         
     old_time = speed_data['how_long']
     iterations = speed_data['iterations']
