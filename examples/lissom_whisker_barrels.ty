@@ -193,9 +193,11 @@ plot_deflections_on=param.Boolean(default=False)
 
 class WhiskerArray(PatternGenerator):
 	
-    w_x=param.Integer(default=3,bounds=(1,None),softbounds=(0.0,10.0),precedence=0.31,doc=""" Number of whiskers rows""")
+    w_x=param.Integer(default=3,bounds=(1,None),softbounds=(0.0,10.0),precedence=0.31,doc="""
+        Number of whisker rows""")
 	
-    w_y=param.Integer(default=3,bounds=(1,None),softbounds=(0.0,10.0),precedence=0.31,doc=""" Number of whisker columns""")
+    w_y=param.Integer(default=3,bounds=(1,None),softbounds=(0.0,10.0),precedence=0.31,doc="""
+        Number of whisker columns""")
 	  
     num_ganglion_cells = param.Integer(default=7,doc="""
         Square root of the number of ganglion cells per whisker.""")
@@ -482,7 +484,7 @@ topo.sim['Ganglia0']=GeneratorSheet(nominal_density=WhiskerArray.num_ganglion_ce
                                              nominal_bounds=BoundingBox(points=[(-w_y/2.0,-w_x/2.0),(w_y/2.0,w_x/2.0)]))
 					   
 					     
-topo.sim['S1'] = LISSOM(nominal_density=locals().get('default_pidensity',21),tsettle=9,
+topo.sim['S1'] = LISSOM(nominal_density=locals().get('default_density',21),tsettle=9,
      nominal_bounds=BoundingBox(points=[(-w_y/2.0,-w_x/2.0),(w_y/2.0,w_x/2.0)])) 
 
 topo.sim.connect('Ganglia0','S1',delay=FixedPoint("0.05"),dest_port=('Activity','JointNormalize', 'Afferent'),
