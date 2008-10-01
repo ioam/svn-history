@@ -1,8 +1,14 @@
 """
-Example of a LISSOM-based orientation, direction, ocular dominance, disparity, spatial frequency and color preference map.
+Example of a LISSOM-based position, orientation, direction, speed,
+ocular dominance, disparity, spatial frequency, and color preference
+map.
 
-Direction, ocular dominance, disparity, spatial frequency and color dimensions can be turned on and off.
+Orientation, direction, ocular dominance, disparity, spatial frequency
+and color dimensions can be turned on and off.  All maps have position
+information, and speed is always present when direction is included.
+
 Here are examples of the commands that you could use to get the specified combinations of maps:
+
   OR:               ./topographica -c "dims=['or']"                     examples/lissom.ty
   OR/DR:            ./topographica -c "dims=['or','dr']"                examples/lissom.ty
   OR/OD:            ./topographica -c "dims=['or','od']"                examples/lissom.ty
@@ -12,6 +18,7 @@ Here are examples of the commands that you could use to get the specified combin
   OR/OD/DR/DY/SF:   ./topographica -c "dims=['or','od','dr','dy','sf']" examples/lissom.ty
   OR/OD/DR/DY/RG:   ./topographica -c "dims=['or','od','dr','dy','rg']" examples/lissom.ty
   OR/OD/DR/DY/CR:   ./topographica -c "dims=['or','od','dr','dy','cr']" examples/lissom.ty
+  OR/OD/DR/DY/CR/SF:./topographica -c "dims=['or','od','dr','dy','cr','sf']" examples/lissom.ty
 
 OR/OD/DR/DY is the default.
 
@@ -25,6 +32,7 @@ These simulations are intended to be close (but approximate) matches
 to the various map simulations in chapter 5 of Miikkulainen, Bednar,
 Choe, and Sirosh (2005), Computational Maps in the Visual Cortex,
 Springer.  Specifically:
+
     dataset='Gaussian', dims=['or']:           CVMC Figure 5.9
     dataset='Nature',   dims=['or']:           CVMC Figure 5.13 Nature
     dataset='Gaussian', dims=['od','dr']:      CVMC Figure 5.23
@@ -86,6 +94,8 @@ __version__='$Revision: 8706 $'
 from math import pi, sqrt
 import numpy
 import copy
+
+from colorsys import hsv_to_rgb
 
 from topo import learningfn,numbergen,outputfn,pattern,projection,responsefn,sheet 
 
