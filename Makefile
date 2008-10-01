@@ -180,7 +180,7 @@ oo_or_comparisons:
 # Test that the specified scripts haven't changed in results or speed.
 #SCRIPTS=^cfsom_or.ty ^lissom_oo_or.ty ^som_retinotopy.ty
 # ^lissom_or_noshrinking.ty  - only matches to 4 dp with IMPORT_WEAVE=0 
-SCRIPTS= ^cfsom_or.ty ^hierarchical.ty ^lissom_or.ty ^lissom_oo_or.ty ^som_retinotopy.ty ^sullivan_neurocomputing04.ty ^lissom.ty
+SCRIPTS= ^cfsom_or.ty ^hierarchical.ty ^lissom_or.ty ^lissom_oo_or.ty ^som_retinotopy.ty ^sullivan_neurocomputing04.ty ^lissom.ty #^lissom_fsa.ty ^lissom_whisker_barrels.ty
 # CEB: tests on these scripts temporarily suspended (SF.net #2053538)
 # ^lissom_oo_or_homeostatic.ty ^lissom_oo_or_homeostatic_tracked.ty
 
@@ -237,13 +237,25 @@ slow-tests: print-info train-tests all-speed-tests map-tests
 
 # General rules for generating test data and running the tests
 %_DATA:
-	./topographica -c 'from topo.tests.test_script import GenerateData; GenerateData(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",run_for=[1,99,150],look_at="V1",default_density=8,default_retina_density=24,default_lgn_density=24)'
+	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",run_for=[1,99,150],look_at="V1",default_density=8,default_retina_density=24,default_lgn_density=24)'
 
 %_TEST: %_DATA
 	${TIMER}./topographica -c 'import_weave=${IMPORT_WEAVE}' -c 'from topo.tests.test_script import TestScript; TestScript(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_DATA",decimal=${TESTDP})'
-# CB: Beyond 14 dp, the results of the current tests do not match on ppc64 and i686 (using linux).
-# In the future, decimal=14 might have to be reduced (if the tests change, or to accommodate other
+# CB: Beyond 14 dp, the results of the current tests do not match on
+# ppc64 and i686 (using linux).  In the future, decimal=14 might have
+# to be reduced (if the tests change, or to accommodate other
 # processors/platforms).
+
+# Special versions for specific scripts:
+topo/tests/lissom.ty_DATA:
+	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom.ty",data_filename="topo/tests/lissom.ty_DATA",run_for=[1,99,150],look_at="V1",default_density=8,default_retina_density=6,default_lgn_density=6,dims=["or","od","dr","dy","cr","sf"])'
+
+topo/tests/lissom_fsa.ty_DATA:
+	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_fsa.ty",data_filename="topo/tests/lissom_fsa.ty_DATA",run_for=[1,99,150],look_at="FSA",default_density=8,default_retina_density=24,default_lgn_density=24)'
+
+topo/tests/lissom_whisker_barrels.ty_DATA:
+	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_whisker_barrels.ty",data_filename="topo/tests/lissom_whisker_barrels.ty_DATA",run_for=[1,99,150],look_at="S1")'
+
 
 
 v_lissom:
