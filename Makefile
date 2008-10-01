@@ -246,18 +246,6 @@ slow-tests: print-info train-tests all-speed-tests map-tests
 # to be reduced (if the tests change, or to accommodate other
 # processors/platforms).
 
-# Special versions for specific scripts:
-topo/tests/lissom.ty_DATA:
-	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom.ty",data_filename="topo/tests/lissom.ty_DATA",run_for=[1,99,150],look_at="V1",default_density=8,default_retina_density=6,default_lgn_density=6,dims=["or","od","dr","dy","cr","sf"])'
-
-topo/tests/lissom_fsa.ty_DATA:
-	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_fsa.ty",data_filename="topo/tests/lissom_fsa.ty_DATA",run_for=[1,99,150],look_at="FSA",default_density=8,default_retina_density=24,default_lgn_density=24)'
-
-topo/tests/lissom_whisker_barrels.ty_DATA:
-	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_whisker_barrels.ty",data_filename="topo/tests/lissom_whisker_barrels.ty_DATA",run_for=[1,99,150],look_at="S1")'
-
-
-
 v_lissom:
 	make -C topo/tests/reference/	
 	${TIMER}./topographica -c "profiling=True;iterations=20000" topo/tests/reference/lissom_oo_or_reference.ty
@@ -277,6 +265,28 @@ v_lissom:
 	${TIMER}./topographica -c 'from topo.tests.test_script import compare_startup_speed_data; compare_startup_speed_data(script="examples/${notdir $*}",data_filename="topo/tests/${notdir $*}_STARTUPSPEEDDATA")'
 
 .SECONDARY: ${SPEEDDATA} ${TRAINDATA} ${STARTUPSPEEDDATA} # Make sure that *_*DATA is kept around
+
+
+# Special versions for specific scripts:
+topo/tests/lissom.ty_DATA:
+	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom.ty",data_filename="topo/tests/lissom.ty_DATA",run_for=[1,99,150],look_at="V1",default_density=8,default_retina_density=6,default_lgn_density=6,dims=["or","od","dr","dy","cr","sf"])'
+
+topo/tests/lissom.ty_SPEEDDATA:
+	./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/lissom.ty",data_filename="topo/tests/lissom.ty_SPEEDDATA",iterations=250,look_at="V1",default_density=8,default_retina_density=6,default_lgn_density=6,dims=["or","od","dr","dy","cr","sf"])'
+
+topo/tests/lissom_fsa.ty_DATA:
+	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_fsa.ty",data_filename="topo/tests/lissom_fsa.ty_DATA",run_for=[1,99,150],look_at="FSA",default_density=8,default_retina_density=24,default_lgn_density=24)'
+
+topo/tests/lissom_fsa.ty_SPEEDDATA:
+	./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/lissom_fsa.ty",data_filename="topo/tests/lissom_fsa.ty_SPEEDDATA",iterations=250,look_at="FSA")'
+
+topo/tests/lissom_whisker_barrels.ty_DATA:
+	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_whisker_barrels.ty",data_filename="topo/tests/lissom_whisker_barrels.ty_DATA",run_for=[1,99,150],look_at="S1")'
+
+topo/tests/lissom_whisker_barrels.ty_SPEEDDATA:
+	./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/lissom_whisker_barrels.ty",data_filename="topo/tests/lissom_whisker_barrels.ty_SPEEDDATA",iterations=250,look_at="S1")'
+
+
 
 
 # pass a list of plotgroup names to test() instead of plotgroups_to_test to restrict the tests
