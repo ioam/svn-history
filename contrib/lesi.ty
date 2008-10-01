@@ -17,7 +17,7 @@ from math import pi, sqrt
 
 import topo.pattern.basic
 import topo.pattern.random
-import topo.patterns.image
+import topo.pattern.image
 
 from topo.sheet.lissom import LISSOM, JointScaling
 from topo.sheet.generator import GeneratorSheet
@@ -35,6 +35,18 @@ from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialD
 import contrib.jsldefs
 from contrib.jsldefs import lesi_analysis_function
 
+
+"""
+To Do:
+1. Triesch rule
+2. Triesch rule with random initial parameters
+3. Afferent scaling and learning rate scaling
+4. Natural images (may need to change strengths to increase inhibition)
+Maybe 5. Replace strengths with homeostatic mechanisms
+Maybe 6. Change radii of lateral connections to make longer range
+"""
+
+
 ###############################################################
 ####Different input types which can be used for development###
 dataset=locals().get('dataset',"Natural") #set the input type by choosing the dataset parameter 
@@ -45,11 +57,11 @@ if dataset=="Gaussian":
     inputs=[input_type(x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i),
                        y=UniformRandom(lbound=-0.75,ubound=0.75,seed=35+i),
                        orientation=UniformRandom(lbound=-pi,ubound=pi,seed=21+i),
-                       size=0.088388, aspect_ratio=4.66667, scale= locals().get('scale', 1.0), bounds=BoundingBox(radius=1.125))
+                       size=0.088388, aspect_ratio=4.66667, scale= locals().get('scale', 1.0), bounds=BoundingBox(radius=0.8))
             #Set the contrast of the gaussian patterns by setting the scale parameter.
             for i in xrange(num_inputs)]
     
-    combined_inputs = topo.pattern.basic.SeparatedComposite(min_separation=0,generators=inputs)
+    combined_inputs = topo.pattern.basic.SeparatedComposite(min_separation=0.595826,generators=inputs, bounds=BoundingBox(radius=1.125))#min sep etc.
     
 elif dataset=="Natural":
     
@@ -118,9 +130,6 @@ elif dataset=="NoisyDiskstoNatural":
 
 ###############################################################################
 
-#Sheet coordinates of units to track for debugging
-units=locals().get('units',[(0.0, 0.0), (0.25,0.25), (0.49,0.49)])
-
 #Quickly set sheet density, high_density = True in published figures.
 
 high_density=locals().get('hd',False)
@@ -134,6 +143,9 @@ else:
 #Smoothing value for exponential averaging
 smoothing=locals().get('smoothing',0.999)
 V1_smoothing=locals().get('V1_smoothing',0.999) # Allows different smoothing for averaging  V1 activity and averaging afferent activity.
+
+#Sheet coordinates of units to track for debugging
+units=locals().get('units',[(0.0, 0.0), (0.25,0.25), (0.49,0.49)])
 
 #Output functions: Sheets
 #LGN
@@ -227,41 +239,22 @@ else:
     pi = None
 
 ###########################################
-# build simulation
-
-#Smoothing value for exponential averaging
-smoothing=locals().get('smoothing',0.999)
-
-#Output functions: Sheets
-#LGN
-LGN_on_output_fn=HalfRectify()
-LGN_off_output_fn=HalfRectify()
-
-#Set targets based on frequency of occurance of V1 activation
-frequency=locals().get('frequency',2)
-
-#Target average afferent activity and target average V1 activity set based on
-#frequency and balance between afferent and lateral activity
-mu=locals().get('mu',0.0045*frequency)
-balance = locals().get('balance',4.0)
-afferent_target = locals().get('afferent_target',mu*balance)
-
-
 ###########################################
 # build simulation
 
-#Sheet coordinates of units to track for debugging
-units=locals().get('units',[(0.0, 0.0), (0.25,0.25), (0.49,0.49)])
-
 Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1Exc']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
-HE=HomeostaticMaxEnt(smoothing=0.999, eta=locals().get('eta',0.0002*15), mu=mu, step=15)
+HE=HomeostaticMaxEnt(smoothing=0.999, eta=locals().get('eta',0.0002*15), mu=0.01, step=15)
 V1_Tracker=AttributeTrackingOF(object=HE,coordframe="topo.sim['V1Exc']", attrib_names=['a', 'b','y_avg'], units=units, step=15)
-V1_OF_exc=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
+#V1_OF_exc=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
+V1_OF_exc=PipelineOF(output_fns=[HE, V1_Tracker])
 
+#S=HomeostaticMaxEnt(smoothing=0.999,  eta=locals().get('eta',0.0002*14), mu=3*mu, step=14)
+#V1_Tracker_inh=AttributeTrackingOF(object=S,coordframe="topo.sim['V1Inh']", attrib_names=['a', 'b','y_avg'], units=units, step=14)
 
-S=HomeostaticMaxEnt(smoothing=0.999,  eta=locals().get('eta',0.0002*14), mu=2*mu, step=14)
-V1_Tracker_inh=AttributeTrackingOF(object=S,coordframe="topo.sim['V1Inh']", attrib_names=['a', 'b','y_avg'], units=units, step=14)
-V1_OF_inh=PipelineOF(output_fns=[S, V1_Tracker_inh])
+S=Sigmoid(r=14.5, k=-4.0)
+V1Inh_Avg=ActivityAveragingOF(initial_average=0.0,smoothing=smoothing,step=14)
+V1_Tracker_inh=AttributeTrackingOF(object=V1Inh_Avg,coordframe="topo.sim['V1Inh']", attrib_names=['x_avg'], units=units, step=14)
+V1_OF_inh=PipelineOF(output_fns=[S,V1Inh_Avg,V1_Tracker_inh])
 
 
 # sheet initialization
@@ -280,11 +273,15 @@ topo.sim['LGNOff']=CFSheet(nominal_density=24.0,
                            output_fn=LGN_off_output_fn,
                            measure_maps=False)
 
-topo.sim['V1Exc'] = JointScaling(nominal_density=locals().get('default_density',48.0),
-                                 nominal_bounds=BoundingBox(radius=0.5),tsettle=15,
-                                 plastic=True,output_fn=V1_OF_exc,
-                                 target=afferent_target, smoothing=smoothing,
-                                 target_lr=locals().get('target_lr',0.045))
+#topo.sim['V1Exc'] = JointScaling(nominal_density=locals().get('default_density',48.0),
+#                                 nominal_bounds=BoundingBox(radius=0.5),tsettle=15,
+#                                 plastic=True,output_fn=V1_OF_exc,
+#                                 target=afferent_target, smoothing=smoothing,
+#                                 target_lr=locals().get('target_lr',0.045))
+
+topo.sim['V1Exc'] =  LISSOM(nominal_density=locals().get('default_density',48.0),
+                            nominal_bounds=BoundingBox(radius=0.5),tsettle=15,
+                            output_fn=V1_OF_exc)
 
 topo.sim['V1Inh'] =  LISSOM(nominal_density=locals().get('default_density',48.0),
                             nominal_bounds=BoundingBox(radius=0.5),tsettle=14,
@@ -355,7 +352,7 @@ topo.sim.connect('V1Exc','V1Inh', delay=0.05,
                  nominal_bounds_template = BoundingBox(radius=0.03),learning_rate=0)
 
 topo.sim.connect('V1Exc','V1Inh', delay=0.05,
-                 connection_type=CFProjection,strength =locals().get('exin',2.0), name='V1Exc_to_V1Inh',
+                 connection_type=CFProjection,strength =locals().get('exin',1.0), name='V1Exc_to_V1Inh',
                  output_fn=ExtoIn_OF,
                  weights_generator=gauss_rand(size=2*0.22917),
                  nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.8087)
