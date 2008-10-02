@@ -135,7 +135,10 @@ def get_date_version_time(logfile,timings=None,startups=None):
 
     if datei is None or versioni is None or timingi is None or startupi is None:
         print "...not all data available - build didn't complete?"
-        # doesn't skip next time, but probably should
+        if timings:
+            timings[script][build] = None
+        if startups:
+            startups[script][build] = None
         return None
 
 
@@ -215,14 +218,14 @@ def update_timings(location="/home/ceball/buildbot/buildmaster/slow-tests_x86_ub
             if build not in timings[script] and build not in exclusions: 
                 print "Adding timing for build...",build
 		do_timings=True
-            elif build in exclusions:
+            elif build in exclusions and build not in timings[script]:
                 print "Build %s excluded; timing skipped."%build
                 timings[script][build]=None
             
             if build not in startups[script] and build not in exclusions:
                 print "Adding startup time for build...",build
             	do_startups=True
-            elif build in exclusions:
+            elif build in exclusions and build not in startups[script]:
                 print "Build %s excluded; startup timing skipped."%build
                 startups[script][build]=None
 		
