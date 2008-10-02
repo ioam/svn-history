@@ -763,8 +763,8 @@ Many commands accept 'display=True' so that the progress can be viewed in an ope
         title = self._plot_title()
         
         self.plot_frame.configure(text=title)
-        #print "title"
-        self.parent.title((topo.sim.name,title.replace(" at time ","/"))) 
+        self.parent.title(topo.sim.name+": "+title)
+        # JABALERT: Used to say .replace(" at time ","/"); was there a reason?
     
     def destroy(self):
         """overrides toplevel destroy, adding removal from autorefresh panels"""
@@ -906,7 +906,8 @@ class SheetPanel(PlotGroupPanel):
                 try:
                     view=g.sheet_views[('RFs',sheet.name,center_x,center_y)]
                     matrixplot(view.view()[0],
-                               title=("position (%3.0f, %3.0f) Receptive Field of %s unit (%2.2f,%2.2f) at time %s"% (r,c,sheet.name,center_x,center_y,topo.sim.timestr(view.timestamp))))
+                               title=("Receptive Field of %s unit (%d,%d) at coord (%3.0f, %3.0f) at time %s" %
+                                      (sheet.name,r,c,center_x,center_y,topo.sim.timestr(view.timestamp))))
 
                 except KeyError:
                     # maybe lose this warning

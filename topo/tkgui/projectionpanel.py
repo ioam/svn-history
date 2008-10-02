@@ -111,7 +111,7 @@ class ProjectionActivityPanel(ProjectionSheetPanel):
         self.auto_refresh = True
 
     def _plot_title(self):
-        return "Activity in Projections to %s at time %s"%(self.plotgroup.sheet.name,topo.sim.timestr(self.plotgroup.time))
+        return "Activity in projections to %s at time %s"%(self.plotgroup.sheet.name,topo.sim.timestr(self.plotgroup.time))
 
 
 
@@ -295,7 +295,7 @@ class ProjectionPanel(PlotMatrixPanel):
 
         
     def _plot_title(self):
-        return 'Projection ' + self.projection.name + ' from ' + self.projection.src.name + ' to ' \
+        return self.projection.name + ' projection from ' + self.projection.src.name + ' to ' \
                + self.sheet.name + ' at time ' + topo.sim.timestr(self.plotgroup.time)
 
     def setup_plotgroup(self):
