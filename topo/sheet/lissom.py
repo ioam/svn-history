@@ -36,28 +36,28 @@ class LISSOM(JointNormalizingCFSheet):
     activate again.
     """
     
-    strict_tsettle = param.Parameter(default = None,
-        doc='This parameter when defined tells the LISSOM sheet not to send afferent output until the strict_tsettle time')    
+    strict_tsettle = param.Parameter(default = None,doc="""
+        If non-None, delay sending output until activation_count reaches this value.""")
     
     mask_init_time=param.Integer(default=5,bounds=(0,None),doc=""" 
-       Determines when a new mask is initialized in each new iteration.
+        Determines when a new mask is initialized in each new iteration.
 
-       The mask is reset whenever new input comes in.  Once the
-       activation_count (see tsettle) reaches mask_init_time, the mask
-       is initialized to reflect the current activity profile.""")
+        The mask is reset whenever new input comes in.  Once the
+        activation_count (see tsettle) reaches mask_init_time, the mask
+        is initialized to reflect the current activity profile.""")
 
     tsettle=param.Integer(default=8,bounds=(0,None),doc="""
-       Number of times to activate the LISSOM sheet for each external input event.
+        Number of times to activate the LISSOM sheet for each external input event.
        
-       A counter is incremented each time an input is received from any
-       source, and once the counter reaches tsettle, the last activation
-       step is skipped so that there will not be any further recurrent
-       activation.  The next external (i.e., afferent or feedback)
-       event will then start the counter over again.""")
+        A counter is incremented each time an input is received from any
+        source, and once the counter reaches tsettle, the last activation
+        step is skipped so that there will not be any further recurrent
+        activation.  The next external (i.e., afferent or feedback)
+        event will then start the counter over again.""")
 
     continuous_learning = param.Boolean(default=False, doc="""
-       Whether to modify the weights after every settling step.
-       If false, waits until settling is completed before doing learning.""")
+        Whether to modify the weights after every settling step.
+        If false, waits until settling is completed before doing learning.""")
 
     output_fn = param.ClassSelector(OutputFn,default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
     
@@ -65,12 +65,13 @@ class LISSOM(JointNormalizingCFSheet):
     
     post_initialization_weights_output_fn = param.ClassSelector(
         CFPOutputFn,default=None,doc="""
-        Weights output_fn which can be set after an initial normalization step""")
+        Weights output_fn that can be set after an initial normalization step.""")
 
-    beginning_of_iteration = param.Parameter(default=[],instantiate=False,doc="""
-    This list holds list of functions to be executed at the beginning of each iteration""")
-    end_of_iteration = param.Parameter(default=[],instantiate=False,doc="""
-    This list holds list of functions to be executed at the end of each iteration""")
+    beginning_of_iteration = param.HookList(default=[],instantiate=False,doc="""
+        List of callables to be executed at the beginning of each iteration.""")
+    
+    end_of_iteration = param.HookList(default=[],instantiate=False,doc="""
+        List of callables to be executed at the end of each iteration.""")
 
     
     def __init__(self,**params):
@@ -93,8 +94,7 @@ class LISSOM(JointNormalizingCFSheet):
     def input_event(self,conn,data):
         # On a new afferent input, clear the activity
         if self.new_iteration:
-            for f in self.beginning_of_iteration:
-                f()
+            for f in self.beginning_of_iteration: f()
             self.new_iteration = False
             self.activity *= 0.0
             for proj in self.in_connections:
@@ -130,8 +130,7 @@ class LISSOM(JointNormalizingCFSheet):
                 # (determined by tsettle), reset various counters, learn
                 # if appropriate, and avoid further activation until an
                 # external event arrives.
-                for f in self.end_of_iteration:
-                    f()
+                for f in self.end_of_iteration: f()
 
                 self.activation_count = 0
                 self.new_iteration = True # used by input_event when it is called
@@ -162,6 +161,7 @@ class LISSOM(JointNormalizingCFSheet):
 
     def send_output(self,src_port=None,data=None):
         """Send some data out to all connections on the given src_port."""
+        
         out_conns_on_src_port = [conn for conn in self.out_connections
                                  if self._port_match(conn.src_port,[src_port])]
 
@@ -169,8 +169,9 @@ class LISSOM(JointNormalizingCFSheet):
             if self.strict_tsettle != None:
                if self.activation_count < self.strict_tsettle:
                    if len(conn.dest_port)>2 and conn.dest_port[2] == 'Afferent':
-                    continue
-            self.verbose("Sending output on src_port %s via connection %s to %s" % (str(src_port), conn.name, conn.dest.name))
+                       continue
+            self.verbose("Sending output on src_port %s via connection %s to %s" %
+                         (str(src_port), conn.name, conn.dest.name))
             e=EPConnectionEvent(conn.delay+self.simulation.time(),conn,data)
             self.simulation.enqueue_event(e)
 
@@ -258,7 +259,7 @@ class JointScaling(LISSOM):
                         if hasattr(proj.learning_fn,'learning_rate_scaling_factor'):
                             proj.learning_fn.update_scaling_factor(self.lr_sf)
                         else:
-                            raise ValueError("Projections to be joint scaled must have a learning_fn that supports scaling e.g. CFPLF_PluginScaled")
+                            raise ValueError("Projections to be joint scaled must have a learning_fn that supports scaling, such as CFPLF_PluginScaled")
                    
                 else:
                     raise ValueError("Only Afferent scaling currently supported")                  
@@ -274,6 +275,7 @@ class JointScaling(LISSOM):
         projection, combined to calculate the activity for this sheet,
         and the result is sent out.
         """
+        
         self.activity *= 0.0
 
         if self.x_avg is None:
@@ -303,12 +305,12 @@ class JointScaling(LISSOM):
         super(JointScaling,self).state_push(**args)
         self.__current_state_stack.append((copy.copy(self.x_avg),copy.copy(self.scaled_x_avg),
                                            copy.copy(self.sf), copy.copy(self.lr_sf)))
-        
-        
+
 
     def state_pop(self,**args):
         super(JointScaling,self).state_pop(**args)
         self.x_avg,self.scaled_x_avg, self.sf, self.lr_sf=self.__current_state_stack.pop()
+
 
 
 def schedule_events(sheet_str="topo.sim['V1']",st=0.5,aff_name="Afferent",

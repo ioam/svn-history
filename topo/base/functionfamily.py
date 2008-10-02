@@ -237,29 +237,35 @@ class IdentityMF(CoordinateMapperFn):
 
 
 class PatternDrivenAnalysis(param.Parameterized):
-    """ This is an abstract class that defines a pattern driven analysis paradigm.
-        It defines the 4 elementary spots in the code flow of this paradigm: one slot 
-        that is before any analysis is performed, second one that is after all the 
-        analysis was performed. The third and fourth slots are analogously before or after 
-        each individual pattern presentation. 
-        
-        Any code implementing this class has to obey this simple code flow.
-         
-        All the hooks from the lists corresponding to each of the 4 time slots 
-        have to be called in an appropriate spot of the code of the particular implementation.
-        
-        eg. before any analysis is performed one should run:
-            for f in before_analysis_session:
-                f()
     """
-        
+    Abstract base class for various stimulus-response types of analysis.
+
+    This type of analysis consists of presenting a set of input
+    patterns and collecting the responses to each one, which one will
+    often want to do in a way that does not affect the current state
+    of the network.
+
+    To achieve this, the class defines several types of hooks where
+    arbitrary function objects (i.e., callables) can be registered.
+    These hooks are generally used to ensure that unrelated previous
+    activity is eliminated, that subsequent patterns do not interact,
+    and that the initial state is restored after analysis.
+
+    Any subclasses must ensure that these hook lists are run at the
+    appropriate stage in their processing, using e.g. 
+    "for f in some_hook_list: f()".
+    """
     
     __abstract = True
-   
-    before_analysis_session = param.Parameter(default=[],instantiate=False)
-    before_pattern_presentation = param.Parameter(default=[],instantiate=False)
-    after_pattern_presentation = param.Parameter(default=[],instantiate=False)
-    after_analysis_session = param.Parameter(default=[],instantiate=False)
 
-    def __call__(self,x):
-        raise NotImplementedError
+    before_analysis_session = param.HookList(default=[],instantiate=False,doc="""
+        List of callable objects to be run before an analysis session begins.""")
+    
+    before_pattern_presentation = param.HookList(default=[],instantiate=False,doc="""
+        List of callable objects to be run before each pattern is presented.""")
+    
+    after_pattern_presentation = param.HookList(default=[],instantiate=False,doc="""
+        List of callable objects to be run after each pattern is presented.""")
+    
+    after_analysis_session = param.HookList(default=[],instantiate=False,doc="""
+        List of callable objects to be run after an analysis session ends.""")

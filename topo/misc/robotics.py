@@ -182,8 +182,9 @@ class RealTimeSimulation(Simulation):
        The desired real length of one simulation time unit, in milliseconds.""")
 
     run_start_hooks = param.HookList(default=[],doc="""
-       A list of callable objects to be called on entry to .run(), before any events
-       are processed.""")
+       A list of callable objects to be called on entry to .run(),
+       before any events are processed.""")
+    
     
     run_stop_hooks = param.HookList(default=[],doc="""
        A list of callable objects to be called on exit from .run()
