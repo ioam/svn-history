@@ -1,4 +1,4 @@
-<p><b>12 September 2008:</b> Updates since the 0.9.5 release
+<p><b>02 October 2008:</b> Updates since the 0.9.5 release
 (currently available in the latest SVN version):
 
 <center>
@@ -19,6 +19,7 @@
 <!--CB: surely these divs should be some kind of li?-->
   <div class="i2">- significant performance improvements (nearly 2X)</div>
   <div class="i2">- minor bugfixes</div>
+<!--  <div class="i2">- updated Windows packages</div> -->
 </dd>
 <dt>GUI:</dt>
 <dd>
@@ -41,7 +42,8 @@
   <div class="i2">- example file for
   <a href="../User_Manual/interfacing.html">interfacing to external simulators</a>
   (examples/perrinet_retina.ty)</div>
-<!--  mouse model (examples/lissom_oo_or_species.ty)<BR> -->
+  <div class="i2">- removed outdated or in-progress examples</div>
+  <div class="i2">- greatly simplified remaining example scripts</div>
 </dd>
 <dt>Component library:</dt>
 <dd>
