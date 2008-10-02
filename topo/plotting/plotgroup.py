@@ -441,20 +441,21 @@ class TemplatePlotGroup(SheetPlotGroup):
     examples. 
     """
 
-    doc = param.String(default="",
-      doc="Documentation string describing this type of plot.")
+    doc = param.String(default="",doc="""
+        Documentation string describing this type of plot.""")
 
     plot_immediately=param.Boolean(False,doc="""
-      Whether to call the plot command at once or only when the user asks for a refresh.
-
-      Should be set to true for quick plots, but false for those that take a long time
-      to calculate, so that the user can change the update command if necessary.""")
+        Whether to call the plot command at once or only when the user asks for a refresh.
+ 
+        Should be set to true for quick plots, but false for those that take a long time
+        to calculate, so that the user can change the update command if necessary.""")
     
-    prerequisites=param.List([],
-      doc="List of preference maps which must exist before this plot can be calculated.")
+    prerequisites=param.List([],doc="""
+        List of preference maps that must exist before this plot can be calculated.""")
 
-    category = param.String(default="User",
-      doc="Category to which this plot belongs, which will be created if necessary.")
+    category = param.String(default="User",doc="""
+        Category to which this plot belongs, which will be created if necessary.""")
+
 
     # JCALERT! We might eventually write these two functions
     # 'Python-like' by using keyword argument to specify each
