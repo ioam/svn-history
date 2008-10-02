@@ -166,6 +166,7 @@ def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
     except:
         ## support old data files (used to be string in the file
         ## rather than pickle)
+        speed_data_file.seek(0)
         speed_data = speed_data_file.readline()
 
         iterations,old_time = speed_data.split('=')
@@ -179,7 +180,7 @@ def compare_speed_data(script="examples/lissom_oo_or.ty",data_filename=None):
     old_time = speed_data['how_long']
     iterations = speed_data['iterations']
     args = speed_data['args']
-    
+
     for arg,val in args.items():
         __main__.__dict__[arg]=val
     
