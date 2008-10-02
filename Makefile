@@ -277,15 +277,8 @@ topo/tests/lissom.ty_SPEEDDATA:
 topo/tests/lissom_fsa.ty_DATA:
 	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_fsa.ty",data_filename="topo/tests/lissom_fsa.ty_DATA",run_for=[1,99,150],look_at="FSA",default_density=8,default_retina_density=24,default_lgn_density=24)'
 
-topo/tests/lissom_fsa.ty_SPEEDDATA:
-	./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/lissom_fsa.ty",data_filename="topo/tests/lissom_fsa.ty_SPEEDDATA",iterations=250)'
-
 topo/tests/lissom_whisker_barrels.ty_DATA:
 	./topographica -c 'from topo.tests.test_script import generate_data; generate_data(script="examples/lissom_whisker_barrels.ty",data_filename="topo/tests/lissom_whisker_barrels.ty_DATA",run_for=[1,99,150],look_at="S1")'
-
-topo/tests/lissom_whisker_barrels.ty_SPEEDDATA:
-	./topographica -c 'from topo.tests.test_script import generate_speed_data; generate_speed_data(script="examples/lissom_whisker_barrels.ty",data_filename="topo/tests/lissom_whisker_barrels.ty_SPEEDDATA",iterations=250)'
-
 
 
 
