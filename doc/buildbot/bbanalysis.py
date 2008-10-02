@@ -127,10 +127,15 @@ def get_date_version_time(logfile,timings=None,startups=None):
 
     if not ok2:
         print "...speed test invalid because results didn't match"
+        if timings:
+            timings[script][build] = None
+        if startups:
+            startups[script][build] = None
         return None
 
     if datei is None or versioni is None or timingi is None or startupi is None:
         print "...not all data available - build didn't complete?"
+        # doesn't skip next time, but probably should
         return None
 
 
@@ -170,6 +175,7 @@ def get_date_version_time(logfile,timings=None,startups=None):
             timings[script][build] = (date,version,timing,cpu_usage)
         else:
             print "...build %s had %s percent cpu during timing (not >95)"%(build,cpu_usage)
+            timings[script][build] = None
 
     if startups:
 
@@ -177,6 +183,7 @@ def get_date_version_time(logfile,timings=None,startups=None):
             startups[script][build] = (date,version,startup,startcpusage)
         else:
             print "...build %s had %s percent cpu during startup (not >95)"%(build,startcpusage)
+            timings[script][build] = None
 
     return (build,date,version,timing,startup,cpu_usage)
 
