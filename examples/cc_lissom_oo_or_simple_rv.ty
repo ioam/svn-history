@@ -30,7 +30,7 @@ from topo.misc.numbergenerator import UniformRandom, BoundedNumber, ExponentialD
 from topo.pattern.basic import Gaussian
 from topo.learningfn.projfn import CFPLF_Trace
 from topo.base.functionfamily import CoordinateMapperFn
-from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Translator
+from contrib.jacommands import randomize_V1Simple_relative_LGN_strength,ActivityHysteresis, Translator,SimpleHomeo, Habituation, Jitterer
 
 
 topo.sim.name = "CCSimple"
@@ -56,13 +56,13 @@ elif dataset=="Natural":
 				x=0,
 				y=0,
 				orientation=0)
-			for f in image_filenames]	
-	input =Translator(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),speed=locals().get('Speed',0.02))
+			for f in image_filenames]
+	input =Jitterer(generator=topo.pattern.basic.Selector(generators=inputs),orientation=UniformRandom(lbound=-pi,ubound=pi,seed=56),reset_period=locals().get('Period',5),jitter_magnitude=locals().get('JM',0.02))
 
 
 ring=topo.pattern.basic.Ring(x=UniformRandom(lbound=-1.1,ubound=1.1,seed=1023),
                                                             y=UniformRandom(lbound=-1.1,ubound=1.1,seed=511),
-                                                            size=2, aspect_ratio=1.0, scale=0.8,thickness=0.03,
+                                                            size=2, aspect_ratio=1.0, scale=0.8,thickness=locals().get('Thickness',0.03),
                                                             offset=0.0,
                                                             bounds=BoundingBox(radius=1.125), smoothing=0.02)
 
@@ -100,7 +100,10 @@ units=[(0.25,0.25),(-0.25,0.25),
        (0.25,-0.25),(-0.25,-0.25)]
 
 
-V1Simple_OF=Sigmoid(r=locals().get('r_init',22),k=locals().get('k_init',-12))
+if locals().get('SOF',"Sigmoid") == "Homeo":
+	V1Simple_OF = SimpleHomeo(a_init=22,b_init=-12,mu=locals().get('SMU',0.1),eta=0.02)
+else:
+	V1Simple_OF=Sigmoid(r=22,k=-12)
 
 if locals().get('COF',"Sigmoid") == "HR":
     V1Complex_OF=HalfRectify()
@@ -130,19 +133,19 @@ topo.sim['FakeRetina2']=GeneratorSheet(nominal_density=48.0,
                                   nominal_bounds=BoundingBox(radius=core_size+0.25))
 
 
-topo.sim['LGNOn']=CFSheet(nominal_density=48.0,
+topo.sim['LGNOn']=LISSOM(nominal_density=48.0,
                           nominal_bounds=BoundingBox(radius=core_size+0.25),
-                          output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                          output_fn=HalfRectify(),
                           measure_maps=False)
 
-topo.sim['LGNOff']=CFSheet(nominal_density=48.0,
+topo.sim['LGNOff']=LISSOM(nominal_density=48.0,
                            nominal_bounds=BoundingBox(radius=core_size+0.25),
-                           output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                           output_fn=HalfRectify(),
                            measure_maps=False)
 
 topo.sim['V1Simple'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',48.0),
                         nominal_bounds=BoundingBox(radius=core_size),
-                        output_fn=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),V1Simple_OF]))
+                        output_fn=PipelineOF(output_fns=[ActivityHysteresis(time_constant=0.5),V1Simple_OF,Habituation()]))
 
                         
 topo.sim['V1Complex'] = JointNormalizingCFSheet_Continuous(nominal_density=locals().get('default_density',48.0),
@@ -304,7 +307,15 @@ def secondStage():
     													  ExponentialDecay(starting_value = __main__.__dict__.get('SSS_lr',0.3)
     													  ,time_fn=offset_tf,time_constant=__main__.__dict__.get('S_tc',3200))))
     topo.sim['V1Complex'].in_connections[0].learning_rate=__main__.__dict__.get('SSC_lr',0.0)
-    topo.sim['V1Simple'].in_connections[0].strength=4
-    topo.sim['V1Simple'].in_connections[1].strength=4
+    
+    if dataset=="Natural":
+        topo.sim['V1Simple'].in_connections[0].strength=__main__.__dict__.get('SSA_Strength',2)
+        topo.sim['V1Simple'].in_connections[1].strength=__main__.__dict__.get('SSA_Strength',2)
+        topo.sim['V1Complex'].in_connections[2].strength=__main__.__dict__.get('SSLI_Strength',-0.7)
+    else:
+        topo.sim['V1Simple'].in_connections[0].strength=4
+        topo.sim['V1Simple'].in_connections[1].strength=4
     randomize_V1Simple_relative_LGN_strength()
+    
+    
 
