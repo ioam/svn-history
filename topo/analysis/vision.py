@@ -140,13 +140,13 @@ def phase_preference_scatter_plot(sheet_name):
     pylab.plot([-180,-180],[360,360])
     pylab.axis([-180,360,-180,360])
     pylab.grid()
-    pylab.savefig(normalize_path(str(topo.sim.time()) + sheet_name + "_scatter.png"))
+    pylab.savefig(normalize_path(str(topo.sim.timestr()) + sheet_name + "_scatter.png"))
 
 ###############################################################################
 pg= create_plotgroup(name='Orientation Preference and Complexity',category="Preference Maps",
 
              doc='Measure preference for sine grating orientation.',
-             update_command='fm = measure_or_pref(frequencies=[3.0],num_orientation=8,scale=0.3,num_phase=32,             pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0));analyze_complexity(fm)')
+             update_command='from topo.analysis.vision import analyze_complexity; fm = measure_or_pref(frequencies=[3.0],num_orientation=8,scale=0.3,num_phase=32,             pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0));analyze_complexity(fm)')
 pg.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pg.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
