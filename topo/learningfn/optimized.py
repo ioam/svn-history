@@ -17,6 +17,7 @@ from topo.base.cf import CFPLearningFn,CFPLF_Plugin
 from topo.learningfn.projfn import CFPLF_PluginScaled
 from topo.base.functionfamily import Hebbian,LearningFn
 from topo.misc.inlinec import inline, provide_unoptimized_equivalent
+from topo.learningfn.basic import BCMFixed
 
 from projfn import CFPLF_Trace
 
@@ -121,6 +122,115 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
 
         inline(hebbian_code, ['input_activity', 'output_activity','rows', 'cols',
                               'icols', 'cfs', 'single_connection_learning_rate',
+                              'cf_type'],
+               local_dict=locals(),
+               headers=['<structmember.h>'])               
+
+
+class CFPLF_BCMFixed_opt(CFPLearningFn):
+    """
+    CF-aware BCM learning rule.
+
+    Implemented in C for speed.  Should be equivalent to
+    BCMFixed for CF sheets, except faster.  
+
+    As a side effect, sets the norm_total attribute on any cf whose
+    weights are updated during learning, to speed up later operations
+    that might depend on it.
+
+    May return without modifying anything if the learning rate turns
+    out to be zero.
+    """
+    
+    unit_threshold=param.Number(default=0.5,bounds=(0,None),doc="Threshold between LTD and LTP.")
+    
+    def __call__(self, iterator, input_activity, output_activity, learning_rate, **params):
+        rows,cols = output_activity.shape
+        cfs = iterator.proj._cfs
+        single_connection_learning_rate = self.constant_sum_connection_rate(iterator.proj,learning_rate)
+        if single_connection_learning_rate==0:
+            return
+        
+        unit_threshold=self.unit_threshold
+        
+        irows,icols = input_activity.shape
+        cf_type = iterator.proj.cf_type
+        hebbian_code = """
+            // CEBALERT: should provide a macro for getting offset
+
+            ///// GET WEIGHTS OFFSET
+            PyMemberDescrObject *weights_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"weights");
+            Py_ssize_t weights_offset = weights_descr->d_member->offset;
+            Py_DECREF(weights_descr);
+
+            ///// GET SLICE OFFSET
+            PyMemberDescrObject *slice_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"input_sheet_slice");
+            Py_ssize_t slice_offset = slice_descr->d_member->offset;
+            Py_DECREF(slice_descr);
+
+            ///// GET MASK OFFSET
+            PyMemberDescrObject *mask_descr = (PyMemberDescrObject *)PyObject_GetAttrString(cf_type,"mask");
+            Py_ssize_t mask_offset = mask_descr->d_member->offset;
+            Py_DECREF(mask_descr);
+
+
+            double *x = output_activity;
+            for (int r=0; r<rows; ++r) {
+                PyObject *cfsr = PyList_GetItem(cfs,r);
+                for (int l=0; l<cols; ++l) {
+                    double load = *x++;
+                    double unit_activity= load;
+                    if (load != 0) {
+                        load *= single_connection_learning_rate;
+
+                        PyObject *cf = PyList_GetItem(cfsr,l);
+
+                        PyArrayObject *weights_obj = *((PyArrayObject **)((char *)cf + weights_offset));
+                        PyArrayObject *slice_obj = *((PyArrayObject **)((char *)cf + slice_offset));
+                        PyArrayObject *mask_obj = *((PyArrayObject **)((char *)cf + mask_offset));
+                        
+                        float *wi = (float *)(weights_obj->data);
+                        int *slice = (int *)(slice_obj->data);
+                        float *m = (float *)(mask_obj->data);
+                        
+                        int rr1 = *slice++;
+                        int rr2 = *slice++;
+                        int cc1 = *slice++;
+                        int cc2 = *slice;
+                        
+                        double total = 0.0;
+                        
+                        // modify non-masked weights
+                        double *inpj = input_activity+icols*rr1+cc1;
+                        for (int i=rr1; i<rr2; ++i) {
+                            double *inpi = inpj;
+                            for (int j=cc1; j<cc2; ++j) {
+                                // The mask is floating point, so we have to 
+                                // use a robust comparison instead of testing 
+                                // against exactly 0.0.
+                                if (*(m++) >= 0.000001) {
+                                    *wi += load * *inpi * (unit_activity - unit_threshold);
+                                    if (*wi<0) { *wi = 0;}
+                                    total += fabs(*wi);
+                                }
+                                ++wi;
+                                ++inpi;
+                            }
+                            inpj += icols;
+                        }
+                        
+                        // store the sum of the cf's weights
+                        PyObject *total_obj = PyFloat_FromDouble(total);  //(new ref)
+                        PyObject_SetAttrString(cf,"_norm_total",total_obj);
+                        PyObject_SetAttrString(cf,"_has_norm_total",Py_True);
+                        Py_DECREF(total_obj);
+                    }
+                }
+            }
+        """
+
+        inline(hebbian_code, ['input_activity', 'output_activity','rows', 'cols',
+                              'icols', 'cfs', 'single_connection_learning_rate','unit_threshold',
                               'cf_type'],
                local_dict=locals(),
                headers=['<structmember.h>'])               
