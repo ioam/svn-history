@@ -1,3 +1,20 @@
+# CB: this file is difficult to understand because it's been built up
+# over a long time. Now that it's clearer what we want it to achieve,
+# I could simplify it significantly.
+
+# A complication is that as the buildbot setup has changed, the shell
+# command that is checked for the timings has changed number. This
+# means the timing data can change directory and filename. Therefore,
+# this script cannot be used to get all historical data in one
+# go. There's a MIN_BUILD variable that specifies the first build to
+# check. That can be changed together with the filename_pattern
+# variable to do chunks of the historical data, if desired. Once the
+# script has processed data, it's stored in a pickle, so the data
+# doesn't need to be retrieved again. As it is, we have a timings
+# pickle on doozy that has quite a lot of historical data (i.e. I have
+# changed MIN_BUILD and filename_pattern as time has gone on, to keep
+# up to date with changes to the buildbot config).
+
 
 import sys
 import re
@@ -9,7 +26,8 @@ from sys import argv
 #logfile = 'LOG'
 script = "lissom_oo_or.ty"
 
-#CB: approx for now
+# Replace this mechanism with bars under the x-axis, so that
+# ranges can be annotated.
 annotations = {
     (8100,66.5):((0,0),"A"),
     (8600,58):((0,4),"B"),
@@ -18,6 +36,8 @@ annotations = {
     (8100,56.5):((-20,-2),"E"),
     (8425,55):((0,2),"F")
     }
+# CB: the above's just approx for now; needs updating. Also need
+# to add the key.
 
 
 V=re.compile(r'[0-9]*-log')
@@ -63,8 +83,9 @@ def save_startups(startups):
     pickle.dump(startups,f,0)
     f.close()
 
-# excluded for some other reason
-exclusions = [153]
+# exclude these builds
+exclusions = []
+exclusions.append(153) # doc why this is excluded
 exclusions.append(425) # ran with wrong no. of iterations
 
 def get_date_version_time(logfile,timings=None,startups=None):
@@ -112,18 +133,6 @@ def get_date_version_time(logfile,timings=None,startups=None):
         print "...not all data available - build didn't complete?"
         return None
 
-#
-#    try:
-#        startupi
-#    except:
-#        print build
-#        for l in all_lines:
-#            if l.startswith("[examples/%s startup]"%script):
-#                print "*****",l,script
-#     
-#        raise
-#
-
 
     datel= all_lines[datei]
     d=re.compile(r'at [0-9]*')
@@ -139,7 +148,6 @@ def get_date_version_time(logfile,timings=None,startups=None):
     timing = float(timel[start+5:stop-1])
 
     cpusel = all_lines[timingi+1]
-#    if cpusel.find('elapsed')>0:
     start,stop = cpusel.index('elapsed')+8,cpusel.index('%CPU')
     cpu_usage = float(cpusel[start:stop])
 
@@ -149,43 +157,31 @@ def get_date_version_time(logfile,timings=None,startups=None):
     startup = float(startupl[start+5:stop-1])
 
     startcpusel = all_lines[startupi+1]
-#    if cpusel.find('elapsed')>0:
 
     try:
         start,stop = startcpusel.index('elapsed')+8,startcpusel.index('%CPU')
         startcpusage = float(startcpusel[start:stop])
     except ValueError:
-        startcpusage = 99  # HACK to get some data
+        startcpusage = 99  # HACK: for cases where it's missing, assume 99!
     
-
-    
-#    timingl = all_lines[timingi]
-#    u=re.compile(r'[0-9\.]*user')
-#    user = float(u.findall(timingl)[0].rstrip('user'))
-#    s=re.compile(r'[0-9\.]*system')
-#    system = float(s.findall(timingl)[0].rstrip('system'))
-#    cpu_time=user+system
-
     if timings:
 
-        if cpu_usage>95 and build not in exclusions:            
+        if cpu_usage>95:
             timings[script][build] = (date,version,timing,cpu_usage)
         else:
-            timings[script][build]=None
-            #print "...build %s had %s percent cpu during timing (not >95)"%(build,cpu_usage)
+            print "...build %s had %s percent cpu during timing (not >95)"%(build,cpu_usage)
 
     if startups:
 
-        if startcpusage>95 and build not in exclusions:
+        if startcpusage>95:
             startups[script][build] = (date,version,startup,startcpusage)
         else:
-            startups[script][build] = None
-            #print "...build %s had %s percent cpu during startup (not >95)"%(build,startcpusage)
+            print "...build %s had %s percent cpu during startup (not >95)"%(build,startcpusage)
 
     return (build,date,version,timing,startup,cpu_usage)
 
 
-MIN_BUILD=153
+MIN_BUILD=153 # where to start analysis 
 filename_pattern = '*-log-shell_3-stdio'
 def update_timings(location="/home/ceball/buildbot/buildmaster/slow-tests_x86_ubuntu7.04/"):
 
@@ -209,13 +205,19 @@ def update_timings(location="/home/ceball/buildbot/buildmaster/slow-tests_x86_ub
             
 	    do_timings=do_startups=False
 
-            if build not in timings[script]: 
+            if build not in timings[script] and build not in exclusions: 
                 print "Adding timing for build...",build
 		do_timings=True
+            elif build in exclusions:
+                print "Build %s excluded; timing skipped."%build
+                timings[script][build]=None
             
-            if build not in startups[script]:
+            if build not in startups[script] and build not in exclusions:
                 print "Adding startup time for build...",build
             	do_startups=True
+            elif build in exclusions:
+                print "Build %s excluded; startup timing skipped."%build
+                startups[script][build]=None
 		
 	    if do_timings and do_startups:
                 get_date_version_time(filename,timings,startups)
