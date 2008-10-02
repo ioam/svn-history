@@ -1,3 +1,921 @@
+2008-10-01  ceball
+
+	* [r9334] Makefile:
+	  Re-enabled lissom.ty and lissom_fsa.ty for slow-tests.
+
+	* [r9333] Makefile:
+	  Removed specification of sheet to inspect from special speed
+	  tests (data not inspected during speed tests).
+
+2008-10-01  jbednar
+
+	* [r9332] Makefile:
+	  Added SPEEDDATA targets for special .ty files; not yet enabled by
+	  default
+
+2008-10-01  ceball
+
+	* [r9331] topo/tests/test_script.py:
+	  Fixed bug in new-style speed tests (wasn't pickling/unpickling
+	  the data).
+
+2008-10-01  jbednar
+
+	* [r9330] Makefile:
+	  Removed lissom.ty from SCRIPTS for the moment, as it causes
+	  problems for the speed tests
+
+	* [r9329] examples/lissom_whisker_barrels.ty:
+	  Minor cleanup. Fixed default_density processing.
+
+	* [r9328] examples/lissom.ty:
+	  Minor cleanup to docstring. Added missing import
+
+	* [r9327] Makefile,
+	  topo/tests/lissom.ty_DATA:
+	  Added special _DATA targets for unusual .ty files
+
+2008-10-01  judelaw
+
+	* [r9326] contrib/lesi.ty:
+	  Current version with homeostatic plasticity in Exc sheet but no
+	  afferent scaling, works well with gaussians
+
+2008-09-30  ceball
+
+	* [r9325] topo/tests/test_script.py:
+	  Cleaned up train-tests section (no change to results). Made
+	  speed-tests more flexible (can specify densities etc; should be
+	  no change but not yet tested). Removed out-of-date ALERTs
+	  (Windows ALERT was invalid because we use an MSYS terminal to run
+	  these tests on Windows).
+
+	* [r9324] topo/tests/test_script.py:
+	  Added flexibility to data generation command, allowing any
+	  'startup parameters' for a script to be set (e.g.
+	  default_density, default_retina_density, etc).
+
+	* [r9323] Makefile:
+	  Updated data generation command for train-tests, showing how to
+	  set command-line arguments for a script, and how to specify the
+	  name of the sheet to inspect.
+
+	* [r9322] doc/Future_Work/current_text.php:
+	  Added tasks so that I don't forget about them.
+
+2008-09-28  jbednar
+
+	* [r9321] examples/lissom.ty:
+	  Added more progress reports in hopes of making unoptimized tests
+	  to pass on buildbot
+
+	* [r9320] examples/whiskers:
+	  Removed no-longer-used Matlab whisker support files
+
+	* [r9319] topo/command/analysis.py:
+	  Removed outdated whisker support
+
+	* [r9318] topo/tests/lissom_oo_or_dy.ty_DATA:
+	  Removed test file for obsolete script
+
+	* [r9317] topo/tests/lissom_oo_od.ty_DATA,
+	  topo/tests/sullivan_nn06.ty_DATA:
+	  Removed test data for outdated scripts
+
+2008-09-27  jbednar
+
+	* [r9316] examples/lissom_whisker_barrels.ty,
+	  examples/whiskers/dfl_key_white_vert.png,
+	  topo/command/dfl_key_white_vert.png:
+	  Moved deflection key from examples/whiskers to topo/command with
+	  the other color keys
+
+2008-09-26  ceball
+
+	* [r9315] topo/misc/legacy.py:
+	  Removed legacy redirection of topo.sheets.cfsom to
+	  topo.sheet.cfsom now that CFSOM has been deleted. We could add
+	  legacy support for the CFSOM class if necessary.
+
+	* [r9314] examples/lissom_oo_dr.ty:
+	  Removed unused example (duplicates lissom.ty).
+
+2008-09-26  jbednar
+
+	* [r9313] examples/lissom_whisker_barrels.ty:
+	  Fixed problems that made previous release unrunnable
+
+	* [r9312] topo/numbergen/basic.py:
+	  Expanded docstrings and added missing VonMisesRandom class
+
+	* [r9311] examples/lissom_whisker_barrels.ty:
+	  Updated to Stuart's current version; results slightly different
+	  from the J. Neuroscience paper submission due to change in random
+	  number code
+
+	* [r9310] examples/lissom_whisker_barrels.ty:
+	  Updated to version used for J. Neuroscience paper submission; not
+	  runnable in the current Topographica
+
+2008-09-26  judelaw
+
+	* [r9309] contrib/laminar_oo_or.ty:
+	  re added correct copy of laminar_oo_or.ty
+
+	* [r9308] contrib/laminar_oo_or.ty,
+	  contrib/laminar_oo_or.ty*:
+	  removing file commited in error
+
+	* [r9307] contrib/jsldefs.py,
+	  contrib/laminar_oo_or.ty,
+	  contrib/laminar_oo_or.ty*,
+	  contrib/laminar_or.ty,
+	  contrib/lesi.ty,
+	  contrib/lissom_oo_or_homeostatic.ty,
+	  contrib/lissom_oo_or_homeostatic_tracked.ty,
+	  contrib/lissom_oo_or_noshrinking.ty,
+	  contrib/lissom_oo_or_noshrinking_latswitch.ty,
+	  contrib/lissom_oo_or_species.ty,
+	  contrib/lissom_oo_or_species_tracked.ty,
+	  contrib/lissom_or_noshrinking.ty,
+	  contrib/lissom_or_noshrinking_latswitch.ty:
+	  added inprogress example files
+
+	* [r9306] examples/laminar_oo_or.ty,
+	  examples/laminar_or.ty,
+	  examples/lesi.ty,
+	  examples/lissom_oo_or_homeostatic.ty,
+	  examples/lissom_oo_or_homeostatic_tracked.ty,
+	  examples/lissom_oo_or_noshrinking.ty,
+	  examples/lissom_oo_or_noshrinking_latswitch.ty,
+	  examples/lissom_oo_or_species.ty,
+	  examples/lissom_oo_or_species_tracked.ty,
+	  examples/lissom_or_noshrinking.ty,
+	  examples/lissom_or_noshrinking_latswitch.ty:
+	  moved inprogress example files to contrib/
+
+2008-09-26  jbednar
+
+	* [r9305] examples/lissom.ty:
+	  Minor cleanup; should be no change to results
+
+	* [r9304] examples/lissom_or.ty:
+	  Changed to use schedule_event; should be no change in results
+
+	* [r9303] topo/sheet/lissom.py:
+	  Fixed longstanding tiny bug in parameter values -- the upper
+	  threshold change at 500 iterations was being skipped for the
+	  lissom_oo_or*.ty simulations, compared to the parameters in the
+	  CMVC book. Changed it to match the book value, which does not
+	  affect slow-tests (which only test to 250), but does affect the
+	  final organized map slightly.
+
+	* [r9302] examples/lissom_fsa.ty:
+	  Simplified by using standard set of scheduled events, and
+	  improved convergence, though it is still not as good as the
+	  published version. The afferent learning rates and most of the
+	  scheduled events are now different from the previous version, and
+	  thus the results have changed significantly.
+
+	* [r9301] topo/sheet/lissom.py:
+	  Added control over afferent learning rate scaling
+
+2008-09-25  jbednar
+
+	* [r9300] examples/lissom_fsa.ty:
+	  Cleaned up formatting; should be no change in results
+
+	* [r9299] Makefile:
+	  Removed tests for obsolete scripts
+
+	* [r9298] examples/ellen_arthur.pgm,
+	  topo/pattern/image.py,
+	  topo/tests/testcfsom.py:
+	  Moved sample image out of examples/ and into images/
+
+	* [r9297] topo/sheet/cfsom.py:
+	  Removed obsolete code; see examples/cfsom_or.ty for current
+	  approach
+
+	* [r9296]
+	  examples/sullivan_neurocomputing04.ty:
+	  Changed to use current SOM implementation, to allow cfsom.py to
+	  be deleted
+
+	* [r9295]
+	  examples/sullivan_neurocomputing04.ty:
+	  Cleaned up formatting; should be no change in results
+
+	* [r9294] Makefile,
+	  examples/README.txt,
+	  examples/sullivan_nn06.ty:
+	  Removed sullivan_nn06.ty; never completed.
+
+	* [r9293] examples/leaky_lissom_or.ty:
+	  Clarified docstring
+
+	* [r9292] examples/ohzawa_science90.ty:
+	  Removed; not very useful
+
+	* [r9291] examples/lissom_oo_or_dy.ty,
+	  examples/lissom_oo_or_dy_photo.ty:
+	  Obsolete; DY simulation now in lissom.ty, though these files
+	  produce somewhat different results and may still have some
+	  information relevant to reproducing the Ramtohul (2006) thesis.
+	  In particular, lissom_oo_or_dy_photo.ty shows how to use stereo
+	  pair image inputs.
+
+	* [r9290] examples/lissom_oo_od.ty:
+	  Obsolete; OD simulation now in lissom.ty
+
+	* [r9289] examples/lissom_or_sf.ty:
+	  Obsolete; basic SF simulation now in lissom.ty, and Chris Palmer
+	  has newer more complex SF sims
+
+	* [r9288] examples/lissom_photo_or.ty:
+	  Obsolete; photo simulation now in lissom.ty
+
+	* [r9287] examples/lissom_oo_or_cr.ty:
+	  Changed to use schedule_events; should be no change in results
+	  (though not verified)
+
+	* [r9286] examples/lissom_oo_or_cr.ty:
+	  Cleaned up to match lissom.ty. May be deleted, as it can be
+	  reproduced by lissom.ty, but kept as an example for now.
+
+	* [r9285] examples/lissom.ty:
+	  Minor simplification
+
+	* [r9284] examples/lissom_oo_or_rg.ty:
+	  Results can be reproduced using lissom.ty
+
+	* [r9283] examples/lissom.ty,
+	  topo/sheet/lissom.py:
+	  Generalized schedule_events for use in lissom.ty; should have no
+	  change in results for any simulation
+
+	* [r9282] topo/sheet/lissom.py:
+	  Fixed apparent bug in previous checkin
+
+	* [r9281] examples/lissom.ty:
+	  Cleaned up, shortened lines, simplified, and changed to style of
+	  lissom_oo_or.ty; should have no change in results
+
+2008-09-24  jbednar
+
+	* [r9280] examples/lissom_oo_or.ty,
+	  examples/lissom_oo_or_species.ty,
+	  examples/lissom_whisker_barrels.ty,
+	  topo/sheet/lissom.py:
+	  Moved scheduled events into a shared sheet.lissom.schedule_events
+	  command
+
+	* [r9279] Makefile:
+	  Added test for lissom.ty
+
+	* [r9278] topo/tests/lissom.ty_DATA:
+	  Current version, for reference
+
+	* [r9277] examples/laminar_or.ty,
+	  examples/lissom_or_noshrinking_latswitch.ty:
+	  Minor cleanup, removing unused code. Should have no change in
+	  results
+
+	* [r9276] examples/lissom_or.ty:
+	  Cleaned up formatting to match lissom_oo_or.ty; no change in
+	  results
+
+	* [r9275] examples/lissom_oo_or.ty:
+	  Trivial cleanup of formatting; no change in results
+
+	* [r9274] examples/lissom_or.ty:
+	  Partial update to match style of lissom_oo_or.ty; should be no
+	  change in results.
+
+	* [r9273]
+	  examples/cc_lissom_oo_or_simple_rv.ty,
+	  examples/lesi.ty:
+	  Fixed references to old topo directory names
+
+2008-09-23  gerasymo
+
+	* [r9272] examples/lissom_oo_or_od_dr_dy.ty:
+	  Results of this file can be obtained from lissom.ty with
+	  dims=['or','od','dr','dy']
+
+	* [r9271]
+	  examples/lissom_oo_or_od_dr_dy_sf_rg_cr.ty:
+	  Results of this file can be obtained from lissom.ty with
+	  dims=['or','od','dr','dy','sf','rg','cr']
+
+2008-09-22  ceball
+
+	* [r9270] topo/tkgui/plotgrouppanel.py:
+	  Changed missed from r9269.
+
+	* [r9269] topo/tkgui/plotgrouppanel.py:
+	  Simplified getting sheet coordinates from mouse events during
+	  subsequent processing: store (x,y) of cell center in the event
+	  (addresses ALERT: simplifies r9219 and r9265; should be no
+	  visible change).
+
+2008-09-22  jbednar
+
+	* [r9268] doc/Downloads/index_text.php,
+	  doc/FAQ/index_text.php:
+	  Moved outdated warning into a FAQ
+
+	* [r9267] topo/outputfn/basic.py:
+	  Fixed formatting and docstring for recent changes. Simplified
+	  first_call changes for HomeostaticMaxEnt
+
+	* [r9266] topo/base/cf.py,
+	  topo/learningfn/optimized.py,
+	  topo/learningfn/projfn.py:
+	  Moved CFPLF_PluginScaled out of base and into learningfn
+	  directory with the other learningfns. Fixed formatting on recent
+	  changes.
+
+2008-09-22  chrispalmer
+
+	* [r9265] topo/tkgui/plotgrouppanel.py:
+	  corrects reporting of pixel coord values in status bar and pop up
+	  window to centre of pixel
+
+	* [r9264] topo/tkgui/plotgrouppanel.py:
+	  adds current file name to window titles
+
+2008-09-22  jbednar
+
+	* [r9263] examples/perrinet_retina_pynest.py:
+	  Reformatted and cleaned up for release
+
+2008-09-21  ceball
+
+	* [r9262] /trunk/topographica-win/create_python_topo/setup.bat:
+	  Fixed tile installation.
+
+	* [r9261] topo/tests/testparametersframe.py,
+	  topo/tests/testtkparameterizedobject.py:
+	  Files missed from previous check-in.
+
+	* [r9260] topo/tests/__init__.py:
+	  Removed unused function and added comment.
+
+	* [r9259] /trunk/topographica-win/create_python_topo/setup.bat:
+	  Now prints fewer messages (in the hope of making error messages
+	  visible).
+
+2008-09-20  ceball
+
+	* [r9258] doc/Downloads/index_text.php:
+	  Updated win/msys instructions.
+
+	* [r9257] topo/tkgui/__init__.py:
+	  Allow win/msys's tcl to find extra packages.
+
+	* [r9256] topo/plotting/bitmap.py:
+	  Fixed TITLE_FONT for MSYS/Windows (as opposed to binary Windows).
+
+	* [r9255] external/matplotlib-0.91.4.tar.gz:
+	  Re-archived and re-compressed version to try to get MSYS to work
+	  with it (should be no other changes).
+
+	* [r9254] doc/Downloads/cvs_text.php,
+	  doc/Downloads/index_text.php:
+	  Further attempts to unify the installation instructions.
+
+	* [r9253] topo/param/parameterized.py:
+	  Added note to myself that has been lying around for ages.
+
+	* [r9252] external/Makefile_win_msys.diff:
+	  Updated win-msys-patch.
+
+	* [r9251] external/Makefile_OSX_tk.diff:
+	  Removed unused patch.
+
+	* [r9250] Makefile:
+	  Removed unnecessary 'else'.
+
+	* [r9249] external/Makefile:
+	  Added in windows/msys packages to skip (rather than applying via
+	  patch).
+
+	* [r9248] Makefile:
+	  win-msys-patch is applied by default when the Makefile is run on
+	  Windows/MSYS.
+
+	* [r9247] topo/tkgui/__init__.py:
+	  Fixed test for wm forget (docking); was broken on linux.
+
+2008-09-19  ceball
+
+	* [r9246] /trunk/topographica-win/README.txt:
+	  Updated to reflect current status.
+
+	* [r9245] /trunk/topographica-win/create_python_topo/README.txt:
+	  Updated to reflect current status.
+
+	* [r9244]
+	  /trunk/topographica-win/create_installer/prepare_for_installer.bat:
+	  Minor corrections.
+
+	* [r9243] Makefile:
+	  Don't delete topographica-win on Windows (it's done later).
+
+	* [r9242] /trunk/topographica-win/create_installer/README.txt,
+	  /trunk/topographica-win/create_installer/prepare_for_installer.bat:
+	  Untested simplifications to Windows's .exe creation routine.
+
+	* [r9241] /trunk/topographica-win/common/setup.py:
+	  Allow Windows's topographica script to work from msys (works
+	  without the gui, but hangs with the gui - still useful for
+	  developers to run all but make gui-tests).
+
+	* [r9240] /trunk/topographica-win/create_python_topo/setup.bat:
+	  Added patching of gnosis utils.
+
+	* [r9239] topo/tests/testparametersframe.py,
+	  topo/tests/testtkparameterizedobject.py,
+	  topo/tkgui/__init__.py:
+	  Made sure param.tk tests start tkgui so that tests can run
+	  successfully on platforms without tk 8.5 (hack).
+
+	* [r9238] /trunk/topographica-win/create_python_topo/setup.bat,
+	  /trunk/topographica-win/create_python_topo/tile0.8.2.tar.gz:
+	  Added tile 0.8.2 binary.
+
+	* [r9237] topo/tkgui/__init__.py,
+	  topo/tkgui/plotgrouppanel.py:
+	  Hide docking if Tk version doesn't support it.
+
+	* [r9236] external/Makefile:
+	  Added pyttk build steps, for future use.
+
+	* [r9235] topo/tkgui/__init__.py:
+	  Added support for versions of Tk below 8.5. If Tk 8.5 is not
+	  installed, then tile 0.8.2 or greater must be available.
+
+	* [r9234] topo/plotting/bitmap.py:
+	  TITLE_FONT: Restored option accidentally removed in previous
+	  commit, and simplified default call.
+
+	* [r9233] topo/plotting/bitmap.py:
+	  Fixed TITLE_FONT for Windows.
+
+	* [r9232] Makefile:
+	  Added command for generating map tests data.
+
+	* [r9231]
+	  topo/tests/lissom_oo_or_t000100.00_Contrast_Response.data,
+	  topo/tests/lissom_oo_or_t000100.00_Corner_OR_Preference.data,
+	  topo/tests/lissom_oo_or_t000100.00_Orientation_Preference.data,
+	  topo/tests/lissom_oo_or_t000100.00_Orientation_Tuning.data,
+	  topo/tests/lissom_oo_or_t000100.00_Orientation_Tuning_Fullfield.data,
+	  topo/tests/lissom_oo_or_t000100.00_Position_Preference.data,
+	  topo/tests/lissom_oo_or_t000100.00_Size_Tuning.data,
+	  topo/tests/lissom_oo_or_t000100.00_Spatial_Frequency_Preference.data:
+	  Data generated with current version of lissom_oo_or.ty. (Results
+	  match previous ones to 4 d.p.)
+
+	* [r9230] topo/misc/legacy.py:
+	  Added support for old snapshots (ConnectionField's bounds
+	  property). Addresses SF.net #2118376.
+
+	* [r9229] topo/param/parameterized.py,
+	  topo/projection/basic.py:
+	  Extracted get_all_slots() from Parameter so that it can also be
+	  used in Parameterized objects that have slots. Added slot
+	  handling to Parameterized instance pickling. Addresses part of
+	  SF.net #2118376 (still need to add legacy support).
+
+2008-09-19  chrispalmer
+
+	* [r9228] topo/command/analysis.py:
+	  correction to fix spacing presentation of pixel by pixel stimulus
+	  to correction receptive field measurement by reverse correlation
+
+2008-09-19  jbednar
+
+	* [r9227] doc/User_Manual/interfacing_text.php:
+	  Fixed spacing
+
+2008-09-19  ceball
+
+	* [r9226] doc/User_Manual/interfacing_text.php:
+	  Fixed an indentation problem, and made minor changes to text.
+
+2008-09-19  jbednar
+
+	* [r9225] doc/News/index_text.php:
+	  Added pointer to interfacing page
+
+2008-09-18  jbednar
+
+	* [r9224]
+	  doc/User_Manual/images/perrinet_retina_modeleditor2.png,
+	  doc/User_Manual/interfacing_text.php:
+	  Minor fixes to interfacing page
+
+	* [r9223]
+	  doc/User_Manual/images/perrinet_retina_modeleditor2.png:
+	  Added for interfacing page
+
+	* [r9222] doc/User_Manual/index_text.php,
+	  doc/User_Manual/interfacing_text.php:
+	  Added page about interfacing; adapted from my fin08 submission
+
+2008-09-17  ceball
+
+	* [r9221] topo/tkgui/plotgrouppanel.py:
+	  Added ALERT.
+
+2008-09-17  chrispalmer
+
+	* [r9220] topo/tkgui/plotgrouppanel.py:
+	  changed title of individual receptive field display to give more
+	  info
+
+	* [r9219] topo/tkgui/plotgrouppanel.py:
+	  fixed right click request to display indiviual unit connection
+	  fields and receptive fields
+
+2008-09-17  antolikjan
+
+	* [r9218]
+	  examples/cc_lissom_oo_or_simple_rv.ty:
+	  "repaired bug in image presentation"
+
+	* [r9217]
+	  examples/cc_lissom_oo_or_simple_rv.ty:
+	  "repaired bug in image presentation"
+
+2008-09-17  ceball
+
+	* [r9216] topo/base/cf.py:
+	  File missed from r9215.
+
+	* [r9215] topo/learningfn/optimized.py:
+	  Converted CFPLF_Hebbian_opt to access weights, input_sheet_slice,
+	  and mask as slots.
+
+	* [r9214] topo/outputfn/optimized.py:
+	  Converted CFPOF_DivisiveNormalizeL1_opt to access weights and
+	  input_sheet_slice as slots.
+
+	* [r9213] topo/responsefn/optimized.py:
+	  Simplified handling of weights_obj.
+
+	* [r9212] topo/responsefn/optimized.py:
+	  Simplified handling of slice_obj.
+
+	* [r9211] topo/base/cf.py,
+	  topo/responsefn/optimized.py:
+	  Made ConnectionField's weights and input_sheet_slice be slots,
+	  allowing fast access from optimized C functions. No longer need a
+	  shadow list of weights and slices.
+
+2008-09-17  antolikjan
+
+	* [r9210]
+	  examples/gc_lissom_oo_or_homeostatic_new.ty:
+	  "moved to the new images set"
+
+	* [r9209]
+	  examples/cc_lissom_oo_or_simple_rv.ty:
+	  "changed to new image set"
+
+2008-09-15  ceball
+
+	* [r9208] /trunk/topographica-win/create_python_topo/setup.bat:
+	  Added tooltip and snit to Windows binary installation.
+
+	* [r9207] /trunk/topographica-win/setup_cvs_copy/setup.bat:
+	  Minor update.
+
+	* [r9206] /trunk/topographica-win/create_python_topo/setup.bat:
+	  Minor updates to Windows' binary setup.
+
+	* [r9205] /trunk/topographica-win/create_python_topo/setup.bat:
+	  Corrections to create_python_topo's setup.bat
+
+	* [r9204]
+	  /trunk/topographica-win/create_python_topo/psyco-1.5.2.win32-py2.4.exe,
+	  /trunk/topographica-win/create_python_topo/setup.bat:
+	  Updating Topographica's Windows binary installation...
+
+	* [r9203]
+	  /trunk/topographica-win/create_python_topo/PIL-1.1.5.win32-py2.4.exe,
+	  /trunk/topographica-win/create_python_topo/PIL-1.1.5.win32-py2.5.exe,
+	  /trunk/topographica-win/create_python_topo/gmpy-1.03-gmp-4.2.1.win32-py2.5.exe,
+	  /trunk/topographica-win/create_python_topo/ipython-0.8.4.win32-setup.exe,
+	  /trunk/topographica-win/create_python_topo/libsndfile-1_0_17.zip,
+	  /trunk/topographica-win/create_python_topo/setup.bat:
+	  Updating Topographica's Windows binary installation...
+
+2008-09-15  antolikjan
+
+	* [r9202] contrib/jacommands.py:
+	  "renamed import pathes related to the new renaming scheme"
+
+2008-09-15  ceball
+
+	* [r9201] /trunk/topographica-win/create_python_topo/README.txt,
+	  /trunk/topographica-win/create_python_topo/matplotlib-0.90.1.win32-py2.4.exe,
+	  /trunk/topographica-win/create_python_topo/matplotlib-0.91.4.win32-py2.5.exe,
+	  /trunk/topographica-win/create_python_topo/setup.bat:
+	  
+
+	* [r9200]
+	  /trunk/topographica-win/create_python_topo/matplotlib-0.90.0.win32-py2.4.exe:
+	  Updating Topographica's Windows binary installation...
+
+	* [r9199]
+	  /trunk/topographica-win/create_python_topo/numpy-1.0.2.win32-py2.4.exe,
+	  /trunk/topographica-win/create_python_topo/numpy-1.1.1-win32-superpack-python2.5.exe,
+	  /trunk/topographica-win/create_python_topo/scipy-0.5.2.win32-py2.4.exe,
+	  /trunk/topographica-win/create_python_topo/scipy-0.6.0.win32-py2.5.exe:
+	  Updating Windows binary packages...
+
+2008-09-15  jbednar
+
+	* [r9198] doc/Downloads/index_text.php:
+	  Added notes about installing documentation on Mac
+
+2008-09-15  ceball
+
+	* [r9197] doc/buildbot/master.cfg:
+	  Updated mac build procedure. Changes have been running on the
+	  actual buildbot for a while already.
+
+2008-09-14  jbednar
+
+	* [r9196] examples/perrinet_retina.ty:
+	  Made Topographica be in charge of the network size. Added Model
+	  Editor layout.
+
+2008-09-13  jbednar
+
+	* [r9195] examples/perrinet_retina.ty:
+	  Minor reformatting and simplification. Changed processing to
+	  occur in input_event rather than process_current_time for
+	  simplicity. Made input vary as a demo
+
+2008-09-13  judelaw
+
+	* [r9194] topo/outputfn/basic.py:
+	  changed HomeostaticMaxEnt state_push and state_pop to allow them
+	  to be called before the parameters have been initialized
+
+2008-09-12  jbednar
+
+	* [r9193] doc/News/index_text.php:
+	  Added notes about updates since 0.9.5
+
+2008-09-12  judelaw
+
+	* [r9192]
+	  examples/lissom_oo_or_species_tracked.ty:
+	  brought up to date with release 0.95 using conversion script
+
+	* [r9191]
+	  examples/lissom_oo_or_species_tracked.ty:
+	  added missing import
+
+2008-09-11  ceball
+
+	* [r9190] Makefile,
+	  examples/lissom_oo_or.ty,
+	  topo/tests/reference/fixed_params/lissom_oo_or_reference_fixed.ty:
+	  Switched lissom_oo_or example and reference test to use optimized
+	  joint normalization function. Reduced slow-tests matching
+	  requirement to 7 dp.
+
+	* [r9189] topo/sheet/optimized.py:
+	  Uncommented 'provide unoptimized equivalent' of
+	  compute_joint_norm_totals_opt.
+
+	* [r9188] examples/perrinet_retina.ty:
+	  Fixed typo.
+
+2008-09-10  jbednar
+
+	* [r9187] examples/perrinet_retina.ty,
+	  examples/perrinet_retina_pynest.py:
+	  Greatly cleaned-up version of code originally developed at
+	  CodeJam07
+
+	* [r9186] topo/sheet/basic.py:
+	  Added ActivityCopy sheet
+
+	* [r9185] topo/base/projection.py,
+	  topo/base/simulation.py:
+	  Trivial clarification -- swapped declaration order of src and
+	  dest ports to match chronological order of processing
+
+	* [r9184] topo/tkgui/editor.py:
+	  Generalized Model Editor to have a representation for
+	  EventProcessor distinct from Sheet, and for EPConnection distinct
+	  from CFProjection.
+
+	* [r9183] topo/tkgui/editor.py:
+	  Fixed broken warning message. Simplified handling of Simulation
+	  objects.
+
+2008-09-10  ceball
+
+	* [r9182] topo/pattern/image.py:
+	  Fixed bug pickling GenericImage when image_cache==False.
+
+	* [r9181] topo/sheet/basic.py,
+	  topo/sheet/optimized.py:
+	  Extracted JointNormalizingCFSheet's compute_joint_norm_totals()
+	  method into a function. JointNormalizingCFSheets now have a
+	  joint_norm_fn parameter, allowing compute_joint_norm_totals_opt()
+	  to be used independently of LISSOM_Opt (although the results
+	  using compute_joint_norm_totals_opt() have not been verified
+	  yet).
+
+	* [r9180] etc/update_094_to_095:
+	  Fixed bug in update script.
+
+2008-09-10  jbednar
+
+	* [r9179] examples/cfsom_or.ty,
+	  examples/hierarchical.ty,
+	  examples/lissom_oo_or.ty,
+	  examples/som_retinotopy.ty:
+	  Shortened import lists
+
+	* [r9178] topo/param/parameterized.py:
+	  Fixed typo in docs
+
+	* [r9177] topo/misc/commandline.py:
+	  Added verbose and debugging commandline options
+
+2008-09-10  judelaw
+
+	* [r9176]
+	  examples/lissom_oo_or_species_tracked.ty:
+	  took out references to exponential jitter, changed module
+	  importing plotgroups from
+
+	* [r9175] examples/lesi.ty,
+	  examples/lissom_oo_or_species_tracked.ty:
+	  work in progress
+
+	* [r9174] contrib/jsldefs.py:
+	  added function for plotting out connections of units in a
+	  projection (plot_out_connections())
+
+2008-09-10  ceball
+
+	* [r9173] etc/update_094_to_095:
+	  Set svn:executable ON
+
+	* [r9172] topo/param/parameterized.py:
+	  Avoid state_push() and state_pop() being called on classes.
+	  Addresses SF.net #2103756.
+
+2008-09-10  jbednar
+
+	* [r9171] examples/Makefile:
+	  Fixed broken paths to commands
+
+	* [r9170] doc/Downloads/index_text.php:
+	  Minor clarification
+
+2008-09-09  ceball
+
+	* [r9169]
+	  topo/tests/reference/common_control.py,
+	  topo/tests/reference/fixed_params/lissom_oo_or_reference_fixed.ty,
+	  topo/tests/reference/lissom_log_parser.py,
+	  topo/tests/reference/lissom_oo_dr_reference.ty,
+	  topo/tests/reference/lissom_oo_or_reference.ty,
+	  topo/tests/reference/support_clissom/lissom5.gz:
+	  Version of C++ lissom that outputs angle in radians rather than
+	  degrees (removes added complexity of angle conversions). Also
+	  added check of weights+activities just before first bounds
+	  change, to aid detection of incorrect bounds changes. OO DR
+	  simulation reverted to LISSOM (had been switched to LISSOM_Opt by
+	  mistake).
+
+	* [r9168]
+	  topo/tests/reference/lissom_oo_dr_reference.ty,
+	  topo/tests/reference/oo_dir_map.param:
+	  Simplification of parameters; Topographcia and c++ reference oo
+	  dr simulations now match until the first bounds change.
+
+	* [r9167]
+	  topo/tests/reference/lissom_oo_dr_reference.ty:
+	  Removed fixedpoint.
+
+	* [r9166]
+	  topo/tests/reference/oo_dir_map.param:
+	  Set Precision on generators.
+
+	* [r9165]
+	  topo/tests/reference/support_clissom/lissom5.gz:
+	  Compiled from CVS after fixing handling of Precision.
+
+	* [r9164]
+	  topo/tests/reference/lissom_oo_dr_reference.ty:
+	  Fixed import error.
+
+2008-09-08  ceball
+
+	* [r9163] topo/base/cf.py,
+	  topo/projection/basic.py:
+	  Made ConnectionField's x and y be constant parameters. Removed
+	  superfluous code in ConnectionField's __init__ relating to x and
+	  y.
+
+2008-09-06  ceball
+
+	* [r9162] doc/Team_Members/index_text.php:
+	  Added OS X credit.
+
+	* [r9161]
+	  topo/tests/reference/lissom_oo_dr_reference.ty:
+	  Removed comment that does not apply to this file (copied from
+	  oo_or version).
+
+	* [r9160]
+	  doc/Developer_Manual/revisioncontrol_text.php:
+	  Added minor note to mac users about .DS_* files.
+
+	* [r9159] topo/base/cf.py:
+	  Added handling of del to weight_arrays and slice_arrays (missed
+	  from previous commit).
+
+	* [r9158] topo/base/cf.py,
+	  topo/projection/basic.py:
+	  Made _weight_arrays and _slice_arrays optimization more robust
+	  (by making them properties, the lists of arrays can be created
+	  when they are requested - which allows e.g. old snapshots to work
+	  and means e.g. subclasses of CFProjection don't have to call code
+	  to create the arrays). Haven't evaluated performance, but this
+	  change should have little impact.
+
+2008-09-05  ceball
+
+	* [r9157] topo/base/cf.py,
+	  topo/projection/basic.py,
+	  topo/responsefn/optimized.py:
+	  Added demo of providing c with faster access to CF weights and
+	  slices. Reduces run time over first 300 iterations of
+	  lissom_oo_or density=48 to about 65% of original.
+
+	* [r9156]
+	  doc/Developer_Manual/releases_text.php:
+	  Added ALERT.
+
+	* [r9155] Makefile:
+	  Simplified list of scripts to keep for distribution.
+
+2008-09-05  jbednar
+
+	* [r9154] topo/sheet/lissom.py:
+	  Removed extra copy of class
+
+2008-09-05  ceball
+
+	* [r9153] Makefile:
+	  Removed unnecessary step during make LATEST_STABLE.
+
+	* [r9152] /tags/LATEST_STABLE:
+	  Update LATEST_STABLE.
+
+	* [r9151] /tags/LATEST_STABLE:
+	  Update LATEST_STABLE.
+
+	* [r9150] /releases/0.9.5/trunk:
+	  Create release 0.9.5
+
+	* [r9149] doc/News/index_text.php:
+	  Update to news list.
+
+	* [r9148] doc/Downloads/index_text.php:
+	  Added note that binaries are coming soon for Windows.
+
+	* [r9147]
+	  topo/tests/lissom_oo_or_t000100.00_Corner_OR_Preference.data,
+	  topo/tests/test_map_measurement.py:
+	  New data for Corner OR Preference after defaults were altered.
+
+	* [r9146] ChangeLog.txt:
+	  Updated ChangeLog.
+
+	* [r9145] /releases/0.9.5:
+	  Create release 0.9.5
+
+	* [r9144] /tags/LATEST_STABLE:
+	  Update LATEST_STABLE.
+
+	* [r9143] /tags/LATEST_STABLE:
+	  Update LATEST_STABLE.
+
 2008-09-04  ceball
 
 	* [r9142] doc/FAQ/index_text.php:
@@ -46435,4 +47353,3 @@
 
 	* [r1] /branches, /tags, /trunk:
 	  New repository initialized by cvs2svn.
-
