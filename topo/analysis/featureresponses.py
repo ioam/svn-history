@@ -25,6 +25,7 @@ from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.command.basic import restore_input_generators, save_input_generators
 from topo.misc.distribution import Distribution
 from topo.misc.util import cross_product, frange
+from topo.base.functionfamily import PatternDrivenAnalysis 
 
 
 # CB: having a class called DistributionMatrix with an attribute
@@ -134,7 +135,7 @@ class FullMatrix(param.Parameterized):
 
 # CB: FeatureResponses and ReverseCorrelation need cleanup; I began but haven't finished.
 
-class FeatureResponses(param.Parameterized):
+class FeatureResponses(PatternDrivenAnalysis):
     """
     Systematically vary input pattern feature values and collate the responses.
 
@@ -159,6 +160,10 @@ class FeatureResponses(param.Parameterized):
     def __init__(self,features,**params):
         super(FeatureResponses,self).__init__(**params)
         self.initialize_featureresponses(features)
+        self.before_analysis_session.append(save_input_generators)
+        self.before_pattern_presentation.append(topo.command.basic.wipe_out_activity)
+        self.before_pattern_presentation.append(topo.sim.event_clear)
+        self.after_analysis_session.append(restore_input_generators)
         
     def initialize_featureresponses(self,features):
         """Create an empty DistributionMatrix for each feature and each sheet."""
@@ -178,7 +183,10 @@ class FeatureResponses(param.Parameterized):
         
     def measure_responses(self,pattern_presenter,param_dict,features,display):
         """Present the given input patterns and collate the responses."""
-        save_input_generators()
+        
+        """ Call all the hooks that should be executed before the analysis session"""
+        for f in self.before_analysis_session:
+            f()
 
         self.param_dict=param_dict
         self.pattern_presenter = pattern_presenter
@@ -205,14 +213,22 @@ class FeatureResponses(param.Parameterized):
         if hasattr(topo,'guimain'): topo.guimain.open_progress_window(timer)
             
         timer.call_fixed_num_times(self.permutations)
-
-        restore_input_generators()
+        
+        """ Call all the hooks that should be executed before the analysis session"""
+        for f in self.after_analysis_session:
+            f()
 
 
     def present_permutation(self,permutation):
         topo.sim.state_push()
         settings = dict(zip(self.feature_names, permutation))
+        
+        for f in self.before_pattern_presentation:
+            f()
         self.pattern_presenter(settings,self.param_dict)
+        for f in self.after_pattern_presentation:
+            f()
+
         if self.refresh_act_wins:topo.guimain.refresh_activity_windows()
         self._update(permutation)
         topo.sim.state_pop()
@@ -340,7 +356,7 @@ class FeatureMaps(FeatureResponses):
         False, and the number of test patterns will usually need
         to be increased instead.
         """
-	self.measure_responses(pattern_presenter,param_dict,self.features,display)    
+        self.measure_responses(pattern_presenter,param_dict,self.features,display)    
 	
         for sheet in self.sheets_to_measure():
             bounding_box = sheet.bounds
