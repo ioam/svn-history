@@ -10,9 +10,6 @@ from topo import param
 
 import topo.pattern.basic
 import topo.command.analysis
-#from scipy.integrate import dblquad
-#from scipy.optimize.tnc import fmin_tnc
-#from scipy.optimize.optimize import fmin, fmin_powell
 from math import pi, sqrt, exp, pow
 from numpy.oldnumeric import zeros, Float, sum
 from topo.projection.basic import CFProjection
@@ -29,9 +26,10 @@ from topo.misc.filepath import normalize_path,application_path
 from topo.command.pylabplots import plot_tracked_attributes
 from topo.base.functionfamily import CoordinateMapperFn
 from topo.plotting.bitmap import MontageBitmap
-#from topo.misc.trace import ActivityMovie,InMemoryRecorder
 from topo.base.patterngenerator import PatternGenerator,Constant 
 from topo.outputfn.basic import  Sigmoid
+
+
 
 import matplotlib 
 matplotlib.use('Agg')
@@ -298,12 +296,12 @@ def AddGC():
 
 
     topo.sim.connect('LGNOn','LGNOn',delay=0.05,dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
-                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',135),
+                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',10),
                     nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOn',
                     weights_generator=lgn_surroundg)
     
     topo.sim.connect('LGNOff','LGNOff',delay=0.05,dest_port=('Activity'),activity_group=(0.6,divide_with_constant),
-                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',135),
+                    connection_type=SharedWeightCFProjection,strength=__main__.__dict__.get('LGNLatStr',10),
                     nominal_bounds_template=BoundingBox(radius=0.5),name='LGNLateralOff',
                     weights_generator=lgn_surroundg)
     
@@ -603,6 +601,10 @@ class ActivityHysteresis(OutputFnWithState):
         super(ActivityHysteresis,self).__init__(**params)
         self.first_call = True
         self.old_a = 0 
+        import topo.sheet.lissom
+        import topo.base.functionfamily
+        topo.sheet.lissom.LISSOM.beginning_of_iteration.append(self.reset)
+        topo.base.functionfamily.PatternDrivenAnalysis.before_analysis_session.append(self.reset)
         
     def __call__(self,x):
         if (self.first_call == True):
@@ -614,6 +616,37 @@ class ActivityHysteresis(OutputFnWithState):
         self.old_a = self.old_a + (new_a - self.old_a)*self.time_constant
         x*=0
         x += self.old_a
+        
+    def reset(self):
+        self.old_a *= 0
+
+class Habituation(OutputFnWithState):
+    """ 
+    This output function allows the activity to be smoothly interpolated between 
+    individual time step of the simulation. The time_constant paremater controls the 
+    time scale of this interpolation. 
+    """
+
+    smoothing  = param.Number(default = 0.99,doc="""The time constant defining the width of the window over which activity is averaged""")
+    alpha = param.Number(default = 1.0,doc="""This parameter defines how strong influence on the output of the neuron does the habituation has """)
+
+    def __init__(self,**params):
+        super(Habituation,self).__init__(**params)
+        self.first_call = True
+        self.y_avg = 0 
+        
+    def __call__(self,x):
+        if (self.first_call == True):
+           self.old_a = x.copy() * 0.0
+           self.first_call = False
+        
+        x_orig = copy(x)
+        if self.plastic:                
+           self.y_avg = (1.0-self.smoothing)*x + self.smoothing*self.y_avg 
+   
+        x -= self.alpha *self.y_avg
+        x -= x*((x<=0) * 1.0)
+
         
 class Translator(PatternGenerator):
     """
@@ -693,6 +726,62 @@ class Translator(PatternGenerator):
         # JAHACKALERT: I want it to move in perpendicular orientation
         # JAB: Does it do that now, or not?  Please clarify.
         return generator(xdensity=xdensity,ydensity=ydensity,bounds=bounds,x=self.x+t*cos(self.inspect_value("orientation")+pi/2)*self.speed,y=self.y+t*sin(self.inspect_value("orientation")+pi/2)*self.speed,orientation=self.inspect_value("orientation"),index=self.inspect_value("index"))#,scale=self.inspect_value("scale"))
+
+
+class Jitterer(PatternGenerator):
+    """
+    PatternGenerator that moves another PatternGenerator over time.
+    
+    To create a pattern at a new location, asks the underlying
+    PatternGenerator to create a new pattern at a location translated
+    by an amount based on the global time.
+    """
+
+    generator = param.ClassSelector(default=Constant(scale=0.0),
+        class_=PatternGenerator,doc="""Pattern to be translated.""")
+        
+    jitter_magnitude = param.Number(default=0.02,bounds=(0.0,None),doc="""
+        The speed with which the pattern should move,
+        in sheet coordinates per simulation time unit.""")
+    
+    reset_period = param.Number(default=1,bounds=(0.0,None),doc="""
+        When pattern position should be reset, usually to the value of a dynamic parameter.
+
+        The pattern is reset whenever fmod(simulation_time,reset_time)==0.""")
+    
+    last_time = 0.0
+
+
+    def __init__(self,**params):
+        super(Jitterer,self).__init__(**params)
+        self.orientation = params.get('orientation',self.orientation)
+        self.r = UniformRandom()
+        self.index = 0
+        
+    def __call__(self,**params):
+        """Construct new pattern out of the underlying one."""
+        generator = params.get('generator', self.generator)
+        xdensity=params.get('xdensity',self.xdensity)
+        ydensity=params.get('ydensity',self.ydensity)
+        bounds = params.get('bounds',self.bounds)
+
+        if((float(topo.sim.time()) >= self.last_time + self.reset_period) or (float(topo.sim.time()) <=0.05)):
+            if ((float(topo.sim.time()) <= (self.last_time+self.reset_period+1.0)) and (float(topo.sim.time()) >=0.05))    :
+                return Null()(xdensity=xdensity,ydensity=ydensity,bounds=bounds)
+        
+            self.last_time += self.reset_period
+            # time to reset the parameter
+            (self.x, self.y, self.scale) = (generator.x,generator.y,generator.scale)
+            if isinstance(generator,Selector):
+                self.index = generator.index
+            generator.force_new_dynamic_value('x')
+            generator.force_new_dynamic_value('y')
+            generator.force_new_dynamic_value('scale')
+            discards = self.orientation
+            
+        (a,b,c) = (generator.x,generator.y,generator.scale)   
+        return generator(xdensity=xdensity,ydensity=ydensity,bounds=bounds,x=self.x+self.jitter_magnitude*self.r(),y=self.y+self.jitter_magnitude*self.r(),orientation=self.inspect_value("orientation"),index=self.inspect_value("index"))
+
 
 class SequenceSelector(PatternGenerator):
     """
