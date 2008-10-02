@@ -711,9 +711,29 @@ class List(Parameter):
                 if not l <= max_length:
                     raise ValueError("%s: list length must be at most %s."%(self._attrib_name,max_length))
 
+        self._check_type(val)
+
+    def _check_type(self,val):
         if self.class_!=None:
             for v in val:
                 assert isinstance(v,self.class_),repr(v)+" is not an instance of " + repr(self.class_) + "."
+
+
+
+class HookList(List):
+    """
+    Parameter whose value is a list of callable objects.
+
+    This type of List Parameter is typically used to provide a place
+    for users to register a set of commands to be called at a
+    specified place in some sequence of processing steps.
+    """
+    __slots__ = ['class_','bounds']
+
+    def _check_type(self,val):
+        for v in val:
+            assert callable(v),repr(v)+" is not callable."
+
 
 
 class Dict(ClassSelector):
