@@ -529,6 +529,9 @@ class CFProjection(Projection):
     # to be fixed to support null CFs without crashing.    
     allow_null_cfs = param.Boolean(default=False,
         doc="Whether or not the projection can have entirely empty CFs")
+
+    share_mask_for_connection_fields = param.Boolean(default=True,
+        doc="Whether or not to share single mask for all CFs")
     
     nominal_bounds_template = BoundingRegionParameter(
         default=BoundingBox(radius=0.1),doc="""
@@ -606,9 +609,9 @@ class CFProjection(Projection):
                                min_matrix_radius=self.cf_type.min_matrix_radius)
         
         self.bounds_template = slice_template.bounds
-        mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
-
-        self.mask_template = mask_template # (stored for subclasses)
+        
+        self.mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
+        mask_template = self.mask_template
 
         # CB: instead of building as a list of list, should build as
         # an array.  Note that the list of lists must still be
@@ -631,6 +634,10 @@ class CFProjection(Projection):
                             of = self.weights_output_fn.single_cf_fn
                         else:
                             of = IdentityOF()
+                            
+                        if not self.share_mask_for_connection_fields:   
+                           mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
+                                
                         row.append(self.cf_type(self.src,x=x_cf,y=y_cf,
                                                 template=slice_template,
                                                 weights_generator=self.weights_generator,
