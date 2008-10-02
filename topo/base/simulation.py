@@ -1364,7 +1364,7 @@ class Simulation(param.Parameterized,OptionalSingleton):
         self._time, self.events = self._events_stack.pop()        
 
 
-    def event_clear(self,event_type):
+    def event_clear(self,event_type=EPConnectionEvent):
         """
         Clear out all scheduled events of the specified type.
 
