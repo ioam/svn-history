@@ -530,9 +530,6 @@ class CFProjection(Projection):
     allow_null_cfs = param.Boolean(default=False,
         doc="Whether or not the projection can have entirely empty CFs")
 
-    share_mask_for_connection_fields = param.Boolean(default=True,
-        doc="Whether or not to share single mask for all CFs")
-    
     nominal_bounds_template = BoundingRegionParameter(
         default=BoundingBox(radius=0.1),doc="""
         Bounds defining the Sheet area covered by a prototypical ConnectionField.
@@ -546,6 +543,13 @@ class CFProjection(Projection):
         default=patterngenerator.Constant(),constant=True,
         doc="Define the shape of the connection fields.")
 
+    same_cf_shape_for_all_cfs = param.Boolean(default=True,doc="""
+        Whether or not to share a single cf_shape mask for all CFs.
+        If True, the cf_shape is evaluated only once and shared for
+        all CFs, which saves computation time and memory.  If False,
+        the cf_shape is evaluated once for each CF, allowing each to
+        have its own shape.""")
+    
     learning_fn = param.ClassSelector(CFPLearningFn,
         default=CFPLF_Plugin(),
         doc='Function for computing changes to the weights based on one activation step.')
@@ -635,8 +639,8 @@ class CFProjection(Projection):
                         else:
                             of = IdentityOF()
                             
-                        if not self.share_mask_for_connection_fields:   
-                           mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
+                        if not self.same_cf_shape_for_all_cfs:
+                            mask_template = self.create_mask(self.cf_shape,self.bounds_template,self.src)
                                 
                         row.append(self.cf_type(self.src,x=x_cf,y=y_cf,
                                                 template=slice_template,

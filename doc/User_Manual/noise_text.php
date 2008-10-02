@@ -106,7 +106,7 @@ of the same shape to have the same specific jittered values (e.g. for
 matching ON and OFF projections).  Different seeds will allow the
 projections to be jittered independently of each other.
 
-<P>Also note that the coord_mapper varies the incoming connection
+<P>Also note that the coord_mapper varies the <i>incoming</i> connection
 field location.  Because of how connection fields are currently
 implemented, it is much more difficult to vary the outgoing connection
 field location.  In the case of the LGN->V1 projection, one can
@@ -118,12 +118,14 @@ varies the outgoing connection field of the LGN.
 
 Another type of noise is differences in the connection field shapes
 between neurons in the same projection.  Most of the example .ty files
-specify circular weights outlines, but it is also possible to have
-noisy outlines where only some values within the circle have any
-effect.  Unfortunately, the current implementation of CFProjection
-(see the mask_template attribute) restricts any such noise to
-be the same per neuron, and that code would need to be generalized
-first before this type of noise can be investigated.
+specify simple circular weights outlines, and to save memory by
+default all CFs in a projection share the same weight outliine.
+If you want to try using noisy outlines where only some values withi
+the circle have any effect, first set
+CFProjection.same_cf_shape_for_all_cfs=False, then set 
+CFProjection.cf_shape to a PatternGenerator that returns different
+results each time it is evaluated.
+
 
 <H2>Weight adjustment noise</H2>
 

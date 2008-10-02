@@ -20,6 +20,9 @@
   <div class="i2">- significant performance improvements (nearly 2X)</div>
   <div class="i2">- minor bugfixes</div>
 <!--  <div class="i2">- updated Windows packages</div> -->
+  <div class="i2">- more options for 
+  <A target="_top" href="../User_Manual/noise.html">adding noise</A>
+  to ConnectionField shapes</div>
 </dd>
 <dt>GUI:</dt>
 <dd>
