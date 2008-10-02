@@ -665,7 +665,7 @@ def plot_modulation_ratio(fullmatrix):
         pylab.subplot(313)
         #pylab.hist(numpy.concatenate(array(v1s),array(v1c)),bins)
         pylab.axis([0,2.0,0,3500])
-        pylab.savefig(normalize_path(str(topo.sim.time()) + 'RM.png'))
+        pylab.savefig(normalize_path(str(topo.sim.timestr()) + 'RM.png'))
         #pylab.show()
 
 
