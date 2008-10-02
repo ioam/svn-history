@@ -266,7 +266,7 @@ def sgn(x):
 
 def plott(t,tytle,filename):
 
-    from pylab import title,xlabel,ylabel,savefig,figure,annotate
+    from pylab import title,xlabel,ylabel,savefig,figure,annotate,figtext
     
     builds=[]
     versions=[]
