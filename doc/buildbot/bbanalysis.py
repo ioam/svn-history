@@ -65,6 +65,7 @@ def save_startups(startups):
 
 # excluded for some other reason
 exclusions = [153]
+exclusions.append(425) # ran with wrong no. of iterations
 
 def get_date_version_time(logfile,timings=None,startups=None):
 
