@@ -164,7 +164,7 @@ class TestPattern(SheetPanel):
         
         topo.sim.state_push()
         wipe_out_activity()
-        topo.sim.event_clear(EPConnectionEvent)
+        topo.sim.event_clear()
         input_dict = dict([(sheet.name,sheet.input_generator) for sheet in self.plotgroup._sheets()])
         pattern_present(input_dict,self.duration,
                         plastic=self.plastic,overwrite_previous=False)
