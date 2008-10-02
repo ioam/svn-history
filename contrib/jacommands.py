@@ -852,70 +852,70 @@ def measure_ot(lat_exc,lat_inh,e,t):
     
     
     
-class CascadeHomeostatic(OutputFnWithState):
-    """
-    """
-
-    a_init = param.Number(default=13,doc="Multiplicative parameter controlling the exponential.")
-    
-    b_init = param.Number(default=-4,doc="Additive parameter controlling the exponential.")
-    
-    b_eta = param.Number(default=0.02,doc="Learning rate for homeostatic plasticity.")
-    
-    a_eta = param.Number(default=0.002,doc="Learning rate for homeostatic plasticity.")
-    
-    mu = param.Number(default=0.01,doc="Target average firing rate.")
-    
-    b_smoothing = param.Number(default=0.997, doc="""
-        Weighting of previous activity vs. current activity when calculating the average.""")
-    
-    a_smoothing = param.Number(default=0.9997, doc="""
-        Weighting of previous activity vs. current activity when calculating the average.""")
-        
-    num_cascades = param.Number(default=9,doc="Target average firing rate.")
-    thresholds = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
-
-    step = param.Number(default=1, doc="""
-        How often to update the a and b parameters.
-    For instance, step=1 means to update it every time this OF is
-        called; step=2 means to update it every other time.""")
-    
-
-    def __init__(self,**params):
-        super(CascadeHomeostatic,self).__init__(**params)
-    self.first_call = True
-    self.n_step=0
-      
-
-    def __call__(self,x):
-        if self.first_call:
-            self.first_call = False
-            self.a = ones(x.shape, x.dtype.char) * self.a_init
-            self.b = ones(x.shape, x.dtype.char) * self.b_init
-            self.y_avg = zeros(x.shape, x.dtype.char) 
-        self.y_counts = []
-        self.targets = []
-        for i in xrange(self.num_cascades):
-            self.y_counts.append(zeros(x.shape, x.dtype.char))
-            self.targets.append(exp(-self.thresholds[i]/self.mu))
-        print self.targets
-    
-        # Apply sigmoid function to x, resulting in what Triesch calls y
-        x_orig = copy.copy(x)
-                   
-        x *= 0.0
-        x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
-            
-    
-        self.n_step += 1
-        if self.n_step == self.step:
-            self.n_step = 0
-            if self.plastic:                
-                self.y_avg = (1.0-self.b_smoothing)*x + self.b_smoothing*self.y_avg #Calculate average for use in debugging only
-                self.b -= self.b_eta * (self.y_avg - self.mu)
-                    
-                for i in xrange(self.num_cascades):
-                     self.y_counts[i] = (1.0-self.a_smoothing)*((x >= self.thresholds[i])*1.0) + self.a_smoothing*self.y_counts[i]
-                     self.a -= self.a_eta *   ((self.y_counts[i] >= self.targets[i])*2.0-1.0)
-                        
-                self.y_count=self.y_counts[2] 
+#class CascadeHomeostatic(OutputFnWithState):
+#    """
+#    """
+#
+#    a_init = param.Number(default=13,doc="Multiplicative parameter controlling the exponential.")
+#    
+#    b_init = param.Number(default=-4,doc="Additive parameter controlling the exponential.")
+#    
+#    b_eta = param.Number(default=0.02,doc="Learning rate for homeostatic plasticity.")
+#    
+#    a_eta = param.Number(default=0.002,doc="Learning rate for homeostatic plasticity.")
+#    
+#    mu = param.Number(default=0.01,doc="Target average firing rate.")
+#    
+#    b_smoothing = param.Number(default=0.997, doc="""
+#        Weighting of previous activity vs. current activity when calculating the average.""")
+#    
+#    a_smoothing = param.Number(default=0.9997, doc="""
+#        Weighting of previous activity vs. current activity when calculating the average.""")
+#        
+#    num_cascades = param.Number(default=9,doc="Target average firing rate.")
+#    thresholds = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
+#
+#    step = param.Number(default=1, doc="""
+#        How often to update the a and b parameters.
+#    For instance, step=1 means to update it every time this OF is
+#        called; step=2 means to update it every other time.""")
+#    
+#
+#    def __init__(self,**params):
+#        super(CascadeHomeostatic,self).__init__(**params)
+#    self.first_call = True
+#    self.n_step=0
+#      
+#
+#    def __call__(self,x):
+#        if self.first_call:
+#            self.first_call = False
+#            self.a = ones(x.shape, x.dtype.char) * self.a_init
+#            self.b = ones(x.shape, x.dtype.char) * self.b_init
+#            self.y_avg = zeros(x.shape, x.dtype.char) 
+#        self.y_counts = []
+#        self.targets = []
+#        for i in xrange(self.num_cascades):
+#            self.y_counts.append(zeros(x.shape, x.dtype.char))
+#            self.targets.append(exp(-self.thresholds[i]/self.mu))
+#        print self.targets
+#    
+#        # Apply sigmoid function to x, resulting in what Triesch calls y
+#        x_orig = copy.copy(x)
+#                   
+#        x *= 0.0
+#        x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
+#            
+#    
+#        self.n_step += 1
+#        if self.n_step == self.step:
+#            self.n_step = 0
+#            if self.plastic:                
+#                self.y_avg = (1.0-self.b_smoothing)*x + self.b_smoothing*self.y_avg #Calculate average for use in debugging only
+#                self.b -= self.b_eta * (self.y_avg - self.mu)
+#                    
+#                for i in xrange(self.num_cascades):
+#                     self.y_counts[i] = (1.0-self.a_smoothing)*((x >= self.thresholds[i])*1.0) + self.a_smoothing*self.y_counts[i]
+#                     self.a -= self.a_eta *   ((self.y_counts[i] >= self.targets[i])*2.0-1.0)
+#                        
+#                self.y_count=self.y_counts[2] 
