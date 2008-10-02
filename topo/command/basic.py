@@ -54,6 +54,11 @@ def restore_input_generators():
         sheet.pop_input_generator()
 
 
+def clear_event_queue():
+    """Remove pending events from the simulator's event queue."""
+    topo.sim.event_clear()
+
+
 def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=False,apply_output_fn=True):
     """
     Present the specified test patterns for the specified duration.

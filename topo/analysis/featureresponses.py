@@ -23,6 +23,7 @@ from topo.base.sheet import Sheet, activity_type
 from topo.base.sheetview import SheetView
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.command.basic import restore_input_generators, save_input_generators
+from topo.command.basic import wipe_out_activity, clear_event_queue
 from topo.misc.distribution import Distribution
 from topo.misc.util import cross_product, frange
 from topo.base.functionfamily import PatternDrivenAnalysis 
@@ -161,8 +162,8 @@ class FeatureResponses(PatternDrivenAnalysis):
         super(FeatureResponses,self).__init__(**params)
         self.initialize_featureresponses(features)
         self.before_analysis_session.append(save_input_generators)
-        self.before_pattern_presentation.append(topo.command.basic.wipe_out_activity)
-        self.before_pattern_presentation.append(topo.sim.event_clear)
+        self.before_pattern_presentation.append(wipe_out_activity)
+        self.before_pattern_presentation.append(clear_event_queue)
         self.after_analysis_session.append(restore_input_generators)
         
     def initialize_featureresponses(self,features):
@@ -184,9 +185,8 @@ class FeatureResponses(PatternDrivenAnalysis):
     def measure_responses(self,pattern_presenter,param_dict,features,display):
         """Present the given input patterns and collate the responses."""
         
-        """ Call all the hooks that should be executed before the analysis session"""
-        for f in self.before_analysis_session:
-            f()
+        # Run hooks before the analysis session
+        for f in self.before_analysis_session: f()
 
         self.param_dict=param_dict
         self.pattern_presenter = pattern_presenter
@@ -202,7 +202,6 @@ class FeatureResponses(PatternDrivenAnalysis):
             else:
                 self.warning("No GUI available for display.")
 
-
         # CEBALERT: when there are multiple sheets, this can make it seem
         # like topographica's stuck in a loop (because the counter goes
         # to 100% lots of times...e.g. hierarchical's orientation tuning fullfield.)
@@ -214,20 +213,20 @@ class FeatureResponses(PatternDrivenAnalysis):
             
         timer.call_fixed_num_times(self.permutations)
         
-        """ Call all the hooks that should be executed before the analysis session"""
-        for f in self.after_analysis_session:
-            f()
+        # Run hooks after the analysis session
+        for f in self.after_analysis_session: f()
 
 
     def present_permutation(self,permutation):
+        """Present a pattern with the specified set of feature values."""
+        
         topo.sim.state_push()
         settings = dict(zip(self.feature_names, permutation))
         
-        for f in self.before_pattern_presentation:
-            f()
+        # Run hooks before and after pattern presentation
+        for f in self.before_pattern_presentation: f()
         self.pattern_presenter(settings,self.param_dict)
-        for f in self.after_pattern_presentation:
-            f()
+        for f in self.after_pattern_presentation: f()
 
         if self.refresh_act_wins:topo.guimain.refresh_activity_windows()
         self._update(permutation)
