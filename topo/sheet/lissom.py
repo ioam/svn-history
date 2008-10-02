@@ -67,6 +67,11 @@ class LISSOM(JointNormalizingCFSheet):
         CFPOutputFn,default=None,doc="""
         Weights output_fn which can be set after an initial normalization step""")
 
+    beginning_of_iteration = param.Parameter(default=[],instantiate=False,doc="""
+    This list holds list of functions to be executed at the beginning of each iteration""")
+    end_of_iteration = param.Parameter(default=[],instantiate=False,doc="""
+    This list holds list of functions to be executed at the end of each iteration""")
+
     
     def __init__(self,**params):
         super(LISSOM,self).__init__(**params)
@@ -88,6 +93,8 @@ class LISSOM(JointNormalizingCFSheet):
     def input_event(self,conn,data):
         # On a new afferent input, clear the activity
         if self.new_iteration:
+            for f in self.beginning_of_iteration:
+                f()
             self.new_iteration = False
             self.activity *= 0.0
             for proj in self.in_connections:
@@ -123,6 +130,9 @@ class LISSOM(JointNormalizingCFSheet):
                 # (determined by tsettle), reset various counters, learn
                 # if appropriate, and avoid further activation until an
                 # external event arrives.
+                for f in self.end_of_iteration:
+                    f()
+
                 self.activation_count = 0
                 self.new_iteration = True # used by input_event when it is called
                 if (self.plastic and not self.continuous_learning):
