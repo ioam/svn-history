@@ -38,9 +38,9 @@ annotations = {
     }
 # CB: the above's just approx for now; needs updating. 
 
-annotations_key = {'A':'something',
-                   'B':'something else',
-                   'C':'another thing'}
+## annotations_key = {'A':'something',
+##                    'B':'something else',
+##                    'C':'another thing'}
 
 
 V=re.compile(r'[0-9]*-log')
@@ -308,11 +308,11 @@ def plott(t,tytle,filename):
     xlabel("build")
     ylabel("time /s")
 
-    key = ""
-    for k,v in annotations_key.items():
-        key+="%s: %s\n"%(k,v)
+##     key = ""
+##     for k,v in annotations_key.items():
+##         key+="%s: %s\n"%(k,v)
 
-    figtext(0,0,key)
+##     figtext(0,0,key)
         
     savefig(filename+"_buildno.png")
 
