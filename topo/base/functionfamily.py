@@ -236,3 +236,30 @@ class IdentityMF(CoordinateMapperFn):
         return x,y
 
 
+class PatternDrivenAnalysis(param.Parameterized):
+    """ This is an abstract class that defines a pattern driven analysis paradigm.
+        It defines the 4 elementary spots in the code flow of this paradigm: one slot 
+        that is before any analysis is performed, second one that is after all the 
+        analysis was performed. The third and fourth slots are analogously before or after 
+        each individual pattern presentation. 
+        
+        Any code implementing this class has to obey this simple code flow.
+         
+        All the hooks from the lists corresponding to each of the 4 time slots 
+        have to be called in an appropriate spot of the code of the particular implementation.
+        
+        eg. before any analysis is performed one should run:
+            for f in before_analysis_session:
+                f()
+    """
+        
+    
+    __abstract = True
+   
+    before_analysis_session = param.Parameter(default=[],instantiate=False)
+    before_pattern_presentation = param.Parameter(default=[],instantiate=False)
+    after_pattern_presentation = param.Parameter(default=[],instantiate=False)
+    after_analysis_session = param.Parameter(default=[],instantiate=False)
+
+    def __call__(self,x):
+        raise NotImplementedError
