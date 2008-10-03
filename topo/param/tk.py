@@ -1880,7 +1880,12 @@ class String_ObjectTranslator(Translator):
 class CSPTranslator(String_ObjectTranslator):
         
     def string2object(self,string_):
-        obj = self.cache.get(string_) or string_
+        #### move to superclass
+        if string_ in self.cache:
+            obj = self.cache[string_]
+        else:
+            obj = string_
+        ####
 
         ## instantiate if it's just a class
         if isinstance(obj,type) and isinstance(string_,str):
@@ -1896,7 +1901,15 @@ class CSPTranslator(String_ObjectTranslator):
                 self.cache[name]=object_
         ##
 
-        return inverse(self.cache).get(object_) or object_
+        inverse_cache = inverse(self.cache)
+
+        #### move to superclass
+        if object_ in inverse_cache:
+            return inverse_cache[object_]
+        else:
+            return object_
+        ####
+
 
     def __copy__(self):
         # because this one's object2string can modify cache
