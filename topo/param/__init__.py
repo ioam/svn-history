@@ -253,13 +253,16 @@ class Number(Dynamic):
     can be set to a callable to get a dynamically generated
     number (see Dynamic).
 
-    When not being dynamically generated, bounds are checked when
-    a Number is created or set. Using a default value outside the
-    hard bounds, or one that is not numeric, results in an
-    exception. When being dynamically generated, bounds are
-    checked when a the value of a Number is requested. A generated
-    value that is not numeric, or is outside the hard bounds,
-    results in an exception.
+    When not being dynamically generated, bounds are checked when a
+    Number is created or set. Using a default value outside the hard
+    bounds, or one that is not numeric, results in an exception. When
+    being dynamically generated, bounds are checked when a the value
+    of a Number is requested. A generated value that is not numeric,
+    or is outside the hard bounds, results in an exception.
+
+    As a special case, if allow_None=True (which is true by default if
+    the parameter has a default of None when declared) then a value
+    of None is also allowed.
 
     A separate function set_in_bounds() is provided that will
     silently crop the given value into the legal range, for use
@@ -273,9 +276,9 @@ class Number(Dynamic):
     Example of creating a Number::
       AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
     """
-    __slots__ = ['bounds','_softbounds']
+    __slots__ = ['bounds','_softbounds','allow_None']
  
-    def __init__(self,default=0.0,bounds=None,softbounds=None,**params):
+    def __init__(self,default=0.0,bounds=None,softbounds=None,allow_None=False,**params):
         """
         Initialize this parameter object and store the bounds.
 
@@ -284,7 +287,8 @@ class Number(Dynamic):
         super(Number,self).__init__(default=default,**params)
         
         self.bounds = bounds
-        self._softbounds = softbounds  
+        self._softbounds = softbounds
+        self.allow_None = (default is None or allow_None)
         if not callable(default): self._check_value(default)  
         
 
@@ -347,6 +351,9 @@ class Number(Dynamic):
                 if val > vmax:
                     return vmax
 
+        elif self.allow_None and val==None:
+            return val
+        
         else:
             # non-numeric value sent in: reverts to default value
             return  self.default
@@ -359,6 +366,9 @@ class Number(Dynamic):
         Checks that the value is numeric and that it is within the hard
         bounds; if not, an exception is raised.
         """
+        if self.allow_None and val==None:
+            return
+
         if not (is_number(val)):
             raise ValueError("Parameter '%s' only takes numeric values"%(self._attrib_name))
         if self.bounds!=None:
@@ -414,21 +424,30 @@ class Magnitude(Number):
         Number.__init__(self,default=default,bounds=(0.0,1.0),softbounds=softbounds,**params)
 
 
+# JAB: Should this and other Parameters below be a Dynamic instead?
 class Boolean(Parameter):
-    __slots__ = ['bounds']
+    __slots__ = ['bounds','allow_None']
 
     # CB: what does bounds=(0,1) mean/do for this Parameter?
-    def __init__(self,default=False,bounds=(0,1),**params):
-        """Initialize a Boolean parameter, allowing values True or False."""
-        Parameter.__init__(self,default=default,**params)
+    def __init__(self,default=False,bounds=(0,1),allow_None=False,**params):
         self.bounds = bounds
-
+        self.allow_None = (default is None or allow_None)
+        Parameter.__init__(self,default=default,**params)
+        
     def __set__(self,obj,val):
-        if not isinstance(val,bool):
-            raise ValueError("Boolean '%s' only takes a Boolean value."%self._attrib_name)
-
-        if val is not True and val is not False:
-            raise ValueError("Boolean '%s' must be True or False."%self._attrib_name)
+        if self.allow_None:
+            if not isinstance(val,bool) and val is not None:
+                raise ValueError("Boolean '%s' only takes a Boolean value or None."
+                                 %self._attrib_name)
+    
+            if val is not True and val is not False and val is not None:
+                raise ValueError("Boolean '%s' must be True, False, or None."%self._attrib_name)
+        else:
+            if not isinstance(val,bool):
+                raise ValueError("Boolean '%s' only takes a Boolean value."%self._attrib_name)
+    
+            if val is not True and val is not False:
+                raise ValueError("Boolean '%s' must be True or False."%self._attrib_name)
 
         super(Boolean,self).__set__(obj,val)
 
@@ -588,10 +607,11 @@ class ObjectSelector(Selector):
     """
     Parameter whose value is set to an object from its list of possible objects.
     """
-    __slots__ = ['objects'] 
+    __slots__ = ['objects','allow_None']
 
-    def __init__(self,default=None,objects=[],instantiate=True,**params):
+    def __init__(self,default=None,objects=[],instantiate=True,allow_None=False,**params):
         self.objects = objects
+        self.allow_None = (default is None or allow_None)
         self._check_value(default)
         super(ObjectSelector,self).__init__(default=default,instantiate=instantiate,**params)
         
@@ -602,7 +622,7 @@ class ObjectSelector(Selector):
         """
         val must be None or one of the objects in self.objects.
         """
-        if val is not None and val not in self.objects:
+        if not (val in self.objects) and not (val is None and self.allow_None):
             raise ValueError("%s not in Parameter %s's list of possible objects" \
                              %(val,self._attrib_name))
 
@@ -629,20 +649,21 @@ class ClassSelector(Selector):
     """
     Parameter whose value is an instance of the specified class.    
     """
-    __slots__ = ['class_']
+    __slots__ = ['class_','allow_None']
 
-    def __init__(self,class_,default=None,instantiate=True,**params):
+    def __init__(self,class_,default=None,instantiate=True,allow_None=False,**params):
         self.class_ = class_
+        self.allow_None = (default is None or allow_None)
         self._check_value(default)
         super(ClassSelector,self).__init__(default=default,instantiate=instantiate,**params)
 
 
     def _check_value(self,val,obj=None):
         """val must be None or an instance of self.class_"""
-        if not (isinstance(val,self.class_) or val is None):
+        if not (isinstance(val,self.class_)) and not (val is None and self.allow_None):
             raise ValueError(
-                "Parameter '%s' must be an instance of %s"%(self._attrib_name,
-                                                            self.class_.__name__))
+                "Parameter '%s' value must be an instance of %s, not '%s'" %
+                (self._attrib_name, self.class_.__name__, val))
 
     def __set__(self,obj,val):
         self._check_value(val,obj)
@@ -742,6 +763,8 @@ class Dict(ClassSelector):
     """
     def __init__(self,**params):
         super(Dict,self).__init__(dict,**params)
+
+
 
 class InstanceMethodWrapper(object):
     """
