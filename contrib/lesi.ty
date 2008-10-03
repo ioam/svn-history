@@ -66,8 +66,8 @@ if dataset=="Gaussian":
 elif dataset=="Natural":
     
     input_type=topo.pattern.image.Image
-
-    image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
+    image_filenames=["/group/project/csng/images/mcgill_img/foliage/%02d.png"%(i+1) for i in xrange(98)]  
+    #image_filenames=["images/shouval/combined%02d.png"%(i+1) for i in xrange(25)]
     inputs=[input_type(filename=f,
                        size=10.0,  #size_normalization='original',(size=10.0)
                        x=UniformRandom(lbound=-0.75,ubound=0.75,seed=12),
@@ -157,7 +157,8 @@ frequency=locals().get('frequency',2)
 
 #Target average afferent activity and target average V1 activity set based on
 #frequency and balance between afferent and lateral activity
-mu=locals().get('mu',0.0045*frequency)
+mu=locals().get('mu',0.005*frequency)
+mu_inh=locals().get('mu_inh',mu*2)
 balance = locals().get('balance',4.0)
 afferent_target = locals().get('afferent_target',mu*balance)
 
@@ -243,18 +244,22 @@ else:
 # build simulation
 
 Attrib_Tracker=AttributeTrackingOF(object="topo.sim['V1Exc']", attrib_names=['x_avg', 'sf', 'lr_sf', 'scaled_x_avg'], units=units)
-HE=HomeostaticMaxEnt(smoothing=0.999, eta=locals().get('eta',0.0002*15), mu=0.01, step=15)
+HE=HomeostaticMaxEnt(smoothing=0.999, eta=locals().get('eta',0.0002*15), mu=mu, step=15)
 V1_Tracker=AttributeTrackingOF(object=HE,coordframe="topo.sim['V1Exc']", attrib_names=['a', 'b','y_avg'], units=units, step=15)
-#V1_OF_exc=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
-V1_OF_exc=PipelineOF(output_fns=[HE, V1_Tracker])
+V1_OF_exc=PipelineOF(output_fns=[Attrib_Tracker, HE, V1_Tracker])
 
-#S=HomeostaticMaxEnt(smoothing=0.999,  eta=locals().get('eta',0.0002*14), mu=3*mu, step=14)
-#V1_Tracker_inh=AttributeTrackingOF(object=S,coordframe="topo.sim['V1Inh']", attrib_names=['a', 'b','y_avg'], units=units, step=14)
+homeo_inh=locals().get('homeo_inh',False)
+if homeo_inh==True:
+    S=HomeostaticMaxEnt(smoothing=0.999,  eta=locals().get('eta',0.0002*14), mu=mu_inh, step=14)
+    V1_Tracker_inh=AttributeTrackingOF(object=S,coordframe="topo.sim['V1Inh']", attrib_names=['a', 'b','y_avg'], units=units, step=14)
+    V1_OF_inh=PipelineOF(output_fns=[S, V1_Tracker_inh])
 
-S=Sigmoid(r=14.5, k=-4.0)
-V1Inh_Avg=ActivityAveragingOF(initial_average=0.0,smoothing=smoothing,step=14)
-V1_Tracker_inh=AttributeTrackingOF(object=V1Inh_Avg,coordframe="topo.sim['V1Inh']", attrib_names=['x_avg'], units=units, step=14)
-V1_OF_inh=PipelineOF(output_fns=[S,V1Inh_Avg,V1_Tracker_inh])
+
+else:
+    S=Sigmoid(r=14.5, k=-4.0)
+    V1Inh_Avg=ActivityAveragingOF(initial_average=0.0,smoothing=smoothing,step=14)
+    V1_Tracker_inh=AttributeTrackingOF(object=V1Inh_Avg,coordframe="topo.sim['V1Inh']", attrib_names=['x_avg'], units=units, step=14)
+    V1_OF_inh=PipelineOF(output_fns=[S,V1Inh_Avg,V1_Tracker_inh])
 
 
 # sheet initialization
@@ -273,15 +278,11 @@ topo.sim['LGNOff']=CFSheet(nominal_density=24.0,
                            output_fn=LGN_off_output_fn,
                            measure_maps=False)
 
-#topo.sim['V1Exc'] = JointScaling(nominal_density=locals().get('default_density',48.0),
-#                                 nominal_bounds=BoundingBox(radius=0.5),tsettle=15,
-#                                 plastic=True,output_fn=V1_OF_exc,
-#                                 target=afferent_target, smoothing=smoothing,
-#                                 target_lr=locals().get('target_lr',0.045))
-
-topo.sim['V1Exc'] =  LISSOM(nominal_density=locals().get('default_density',48.0),
-                            nominal_bounds=BoundingBox(radius=0.5),tsettle=15,
-                            output_fn=V1_OF_exc)
+topo.sim['V1Exc'] = JointScaling(nominal_density=locals().get('default_density',48.0),
+                                 nominal_bounds=BoundingBox(radius=0.5),tsettle=15,
+                                 plastic=True,output_fn=V1_OF_exc,
+                                 target=afferent_target, smoothing=smoothing,
+                                 target_lr=locals().get('target_lr',0.045))
 
 topo.sim['V1Inh'] =  LISSOM(nominal_density=locals().get('default_density',48.0),
                             nominal_bounds=BoundingBox(radius=0.5),tsettle=14,
@@ -373,6 +374,8 @@ topo.sim.connect('V1Inh','V1Inh', delay=0.05,
 
 import topo.command.analysis
 topo.command.analysis.plotgroups["Orientation Preference"].update_command="measure_or_pref(pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=True,duration=1.0))"
+topo.plotting.plotgroup.plotgroups["Retinotopy"].update_command="measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[2.4],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=False, apply_output_fn=True,duration=1.0)"
+topo.plotting.plotgroup.plotgroups["Retinotopy_XY"].update_command="measure_retinotopy_xy(num_phase=18,num_orientation=4,frequencies=[2.4],divisions=4,scale=1.0,offset=0.0,display=False, weighted_average=True, apply_output_fn=True,duration=1.0)"
 
 import topo.analysis.featureresponses
 topo.analysis.featureresponses.FeatureMaps.selectivity_multiplier=1.0
