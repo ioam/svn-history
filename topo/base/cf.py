@@ -670,6 +670,7 @@ class CFProjection(Projection):
         
 
     # CEB: have not yet decided proper location for this method
+    # JAB: should it be in PatternGenerator?
     def create_mask(self,shape,bounds_template,sheet):
         """
         Create the mask (see ConnectionField.__init__()).
