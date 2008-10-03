@@ -27,14 +27,24 @@ script = "lissom_oo_or.ty"
 
 alphabet = map(chr,range(65,91))
 
-# leave time as None to have it be looked up
+# leave time as None to have it be looked up.
+# Note that you have to specify a version for which timing data
+# exists.  If you were to specify a version for which there's no
+# timing data, you'd have to fill in a time to use as the y
+# coordinate...and that would have to be an invented time.
 annotations = {
-    (8102,66.5):'Did X over range 8005-8102',
-    (8102,56.5):'Did something',
-    (8603,None):'Did Y',
-    (8249,None):'Did something',
-    (8392,None):'Did something',
-    (8432,None):'Did something'
+    # Near the start of the buildbot graph, I seem to remember making
+    # multiple small changes and seeing the performance improve
+    # gradually. Need to check that.
+    (7984,None):"Revert Event to an object (rather than it being parameterized) [r7981]"
+    # changes leading up to 8048?
+    # changes leading up to 8082?
+    (8089,None):"Remove apparently unnecessary array copy during change_bounds() [r8084]",
+    # 8105?
+    (8247,None):'Use mx.Number.Float for simulation time [r8244]',
+    (8383,None):'Use gmpy.mpq for simulation time [r8383]',
+    (9157,None):'Provide C code with faster access to weights [r9157]',
+    (9190,None):'Use optimized joint normalization function [r9190]'
     }
 
 
@@ -64,6 +74,8 @@ def _get_svnversion_timings():
 
 svnversion_timings = _get_svnversion_timings()
 
+#for v in sorted(svnversion_timings.keys()):
+#    print "%s: %s"%(v,svnversion_timings[v])
 
 def _keys_and_points(annotations):
     points = sorted(annotations)
@@ -171,11 +183,11 @@ def get_date_version_time(logfile,timings=None,startups=None):
         i+=1;
 
     if not ok:
-        print "...build %s currently incomplete"%build
+        #print "...build %s currently incomplete"%build
         return None
 
     if not ok2:
-        print "...speed test invalid because results didn't match"
+        #print "...speed test invalid because results didn't match"
         if timings:
             timings[script][build] = None
         if startups:
@@ -183,7 +195,7 @@ def get_date_version_time(logfile,timings=None,startups=None):
         return None
 
     if datei is None or versioni is None or timingi is None or startupi is None:
-        print "...not all data available - build didn't complete?"
+        #print "...not all data available - build didn't complete?"
         if timings:
             timings[script][build] = None
         if startups:
@@ -226,7 +238,7 @@ def get_date_version_time(logfile,timings=None,startups=None):
         if cpu_usage>95:
             timings[script][build] = (date,version,timing,cpu_usage)
         else:
-            print "...build %s had %s percent cpu during timing (not >95)"%(build,cpu_usage)
+            #print "...build %s had %s percent cpu during timing (not >95)"%(build,cpu_usage)
             timings[script][build] = None
 
     if startups:
@@ -234,7 +246,7 @@ def get_date_version_time(logfile,timings=None,startups=None):
         if startcpusage>95:
             startups[script][build] = (date,version,startup,startcpusage)
         else:
-            print "...build %s had %s percent cpu during startup (not >95)"%(build,startcpusage)
+            #print "...build %s had %s percent cpu during startup (not >95)"%(build,startcpusage)
             timings[script][build] = None
 
     return (build,date,version,timing,startup,cpu_usage)
@@ -265,17 +277,17 @@ def update_timings(location="/home/ceball/buildbot/buildmaster/slow-tests_x86_ub
 	    do_timings=do_startups=False
 
             if build not in timings[script] and build not in exclusions: 
-                print "Adding timing for build...",build
+                #print "Adding timing for build...",build
 		do_timings=True
             elif build in exclusions and build not in timings[script]:
-                print "Build %s excluded; timing skipped."%build
+                #print "Build %s excluded; timing skipped."%build
                 timings[script][build]=None
             
             if build not in startups[script] and build not in exclusions:
-                print "Adding startup time for build...",build
+                #print "Adding startup time for build...",build
             	do_startups=True
             elif build in exclusions and build not in startups[script]:
-                print "Build %s excluded; startup timing skipped."%build
+                #print "Build %s excluded; startup timing skipped."%build
                 startups[script][build]=None
 		
 	    if do_timings and do_startups:
