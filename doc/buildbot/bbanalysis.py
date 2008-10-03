@@ -38,10 +38,28 @@ annotations = {
     }
 # CB: the above's just approx for now; needs updating. 
 
-## annotations_key = {'A':'something',
-##                    'B':'something else',
-##                    'C':'another thing'}
+annotations_key = {'A':(0.0,'something'),
+                   'B':(0.0,'something else'),
+                   'C':(0.0,'another thing')}
 
+
+# CB: in progress - obviously the page construction should
+# be separated out, etc
+def write_page():
+    locn = "/home/ceball/buildbot/buildmaster/public_html/p/"
+    imgfile = "lissom_oo_or_250_svnversion.png"
+
+    key = "<table>"
+    for k,v in annotations_key.items():
+        key+="<tr><td>%s</td><td>%s</td><td>%s</td></tr>"%(k,v[0],v[1])
+    key+="</table>"
+        
+    s = "<html><body><p><img src='%s' /></p><p>%s</p></body></html>"%(locn+imgfile,key)
+
+    f = open(locn+"running.html",'w')
+    f.write(s)
+    f.close()
+    
 
 V=re.compile(r'[0-9]*-log')
 def get_build_no(logfilename):
