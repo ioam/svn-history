@@ -120,7 +120,7 @@ Another type of noise is differences in the connection field shapes
 between neurons in the same projection.  Most of the example .ty files
 specify simple circular weights outlines, and to save memory by
 default all CFs in a projection share the same weight outliine.
-If you want to try using noisy outlines where only some values withi
+If you want to try using noisy outlines where only some values within
 the circle have any effect, first set
 CFProjection.same_cf_shape_for_all_cfs=False, then set 
 CFProjection.cf_shape to a PatternGenerator that returns different
