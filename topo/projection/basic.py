@@ -135,7 +135,8 @@ class SharedWeightCFProjection(CFProjection):
         for y in self.dest.sheet_rows()[::-1]:
             row = []
             for x in self.dest.sheet_cols():
-                cf = SharedWeightCF(scf,self.src,x=x,y=y,
+                x_cf,y_cf = self.coord_mapper(x,y)
+                cf = SharedWeightCF(scf,self.src,x=x_cf,y=y_cf, #JUDE ADDED
                                     template=bounds_template)
                 row.append(cf)
             cflist.append(row)
