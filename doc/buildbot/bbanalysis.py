@@ -54,7 +54,7 @@ def write_page():
         key+="<tr><td>%s</td><td>%s</td><td>%s</td></tr>"%(k,v[0],v[1])
     key+="</table>"
         
-    s = "<html><body><p><img src='%s' /></p><p>%s</p></body></html>"%(locn+imgfile,key)
+    s = "<html><body><p><img src='%s' /></p><p>%s</p></body></html>"%(imgfile,key)
 
     f = open(locn+"running.html",'w')
     f.write(s)
