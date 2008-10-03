@@ -123,14 +123,18 @@ class GaussianRandom(RandomGenerator):
 class GaussianCloud(Composite):
     """Uniform random noise masked by a circular Gaussian."""
     ### JABALERT: Should be possible to eliminate this class; see teststimuli.py.
-
+    
     operator = param.Parameter(numpy.multiply)
     
     gaussian_size = param.Number(default=1.0,doc="Size of the Gaussian pattern.")
 
-    def __init__(self,**params_to_override):
-        params = ParamOverrides(self,params_to_override)
-        super(GaussianCloud,self).__init__(**params)
+    aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.31,doc="""
+        Ratio of gaussian width to height; width is gaussian_size*aspect_ratio.""")
 
-        self.generators=[Gaussian(aspect_ratio=1.0, size=params['gaussian_size']),
-                         UniformRandom()]
+    def __call__(self,**params_to_override):
+        params = ParamOverrides(self,params_to_override)
+        params['generators']=[
+            Gaussian(aspect_ratio=params['aspect_ratio'],size=params['gaussian_size']),
+            UniformRandom()]
+        return super(GaussianCloud,self).__call__(**params)
