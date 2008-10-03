@@ -11,6 +11,7 @@ from numpy.oldnumeric import around,bitwise_and,sin,add,Float,bitwise_or
 from numpy import alltrue
 
 from .. import param
+from ..param.parameterized import ParamOverrides
 
 import topo
 # Imported here so that all PatternGenerators will be in the same package
@@ -375,7 +376,7 @@ class Composite(PatternGenerator):
     def _advance_pattern_generators(self,generators):
         """
         Subclasses can override this method to provide constraints on
-        the values of genertators' parameters and/or eliminate
+        the values of generators' parameters and/or eliminate
         generators from this list if necessary.
         """
         return generators
@@ -399,9 +400,7 @@ class Composite(PatternGenerator):
                        y=params['y']+size*(pg.x*sin(orientation)+
                                         pg.y*cos(orientation)),
                        orientation=pg.orientation+orientation,
-                       size=pg.size*params['size'],
-                       scale=pg.scale*params['scale'],
-                       offset=pg.offset+params['offset'])
+                       size=pg.size*params['size'])
                     for pg in generators]
         image_array = self.operator.reduce(patterns)
         return image_array
