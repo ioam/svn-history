@@ -36,7 +36,7 @@ annotations = {
     # Near the start of the buildbot graph, I seem to remember making
     # multiple small changes and seeing the performance improve
     # gradually. Need to check that.
-    (7984,None):"Revert Event to an object (rather than it being parameterized) [r7981]"
+    (7984,None):"Revert Event to an object (rather than it being parameterized) [r7981]",
     # changes leading up to 8048?
     # changes leading up to 8082?
     (8089,None):"Remove apparently unnecessary array copy during change_bounds() [r8084]",
