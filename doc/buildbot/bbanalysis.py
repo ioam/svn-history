@@ -23,24 +23,46 @@ from glob import glob
 
 from sys import argv
 
-#logfile = 'LOG'
 script = "lissom_oo_or.ty"
 
 alphabet = map(chr,range(65,91))
 
-
-# Replace this mechanism with bars under the x-axis, so that
-# ranges can be annotated.
-
+# leave time as None to have it be looked up
 annotations = {
-    (8100,66.5):'Did X over range 8005-8102',
-    (8100,56.5):'Did something',
-    (8600,58):'Did Y',
-    (8250,53.5):'Did something',
-    (8395,54.3):'Did something',
-    (8425,55):'Did something'
+    (8102,66.5):'Did X over range 8005-8102',
+    (8102,56.5):'Did something',
+    (8603,None):'Did Y',
+    (8249,None):'Did something',
+    (8392,None):'Did something',
+    (8432,None):'Did something'
     }
-# CB: the above's just approx for now; needs updating. 
+
+
+
+
+def get_timings():
+    f = open('/home/ceball/buildbot/timings.pkl')
+    timings = pickle.load(f)
+    f.close()
+    return timings
+
+
+
+def _get_svnversion_timings():
+    _timings = get_timings()
+    for build in _timings[script]:
+        info = _timings[script][build]
+        if info is not None:
+            version = info[1]
+            timing = info[2]
+            if version in svnversion_timings:
+                if timing<svnversion_timings[version]:
+                    svnversion_timings[version]=timing
+            else:
+                svnversion_timings[version]=timing
+
+svnversion_timings = _get_svnversion_timings()
+
 
 def _keys_and_points(annotations):
     points = sorted(annotations)
@@ -58,7 +80,7 @@ def write_page():
     for key,point in _keys_and_points(annotations):
         event = key
         version = point[0]
-        performance = point[1]
+        performance = point[1] or svnversion_timings[version]
         description = annotations[point]
         key_text+="<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>"%(event,version,performance,description)
 
@@ -91,11 +113,6 @@ def create_startups(i_am_sure=False):
         f.close()
 
     
-def get_timings():
-    f = open('/home/ceball/buildbot/timings.pkl')
-    timings = pickle.load(f)
-    f.close()
-    return timings
 
 def save_timings(timings):
     f = open('/home/ceball/buildbot/timings.pkl','w')
@@ -321,9 +338,10 @@ def plott(t,tytle,filename):
     arrowprops={'width':0.25,'frac':0.05,'headwidth':5}
     for key,point in _keys_and_points(annotations):
         text = key
-        coords = point
-        text_coords = point[0]+xshift,point[1]+yshift
-        annotate(text,coords,xytext=text_coords)
+        version = point[0]
+        timing = point[1] or svnversion_timings[version]
+        text_coords = version+xshift,timing+yshift
+        annotate(text,(version,timing),xytext=text_coords)
 
     savefig(filename+"_svnversion.png")
 
