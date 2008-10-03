@@ -30,12 +30,9 @@ class RandomGenerator(PatternGenerator):
 
     __abstract = True
 
-    # The standard x, y, and orientation variables are currently ignored,
-    # so they aren't shown in auto-generated lists of parameters (e.g. in the GUI)
-    x       = param.Number(precedence=-1)
-    y       = param.Number(precedence=-1)
-    size    = param.Number(precedence=-1)
-    orientation   = param.Number(precedence=-1)
+    # The orientation is ignored, so we don't show it in
+    # auto-generated lists of parameters (e.g. in the GUI)
+    orientation = param.Number(precedence=-1)
 
     random_generator = param.Parameter(
         default=numpy.random.RandomState(seed=(500,500)),precedence=-1,doc=
@@ -62,11 +59,8 @@ class RandomGenerator(PatternGenerator):
         shape = SheetCoordinateSystem(params['bounds'],params['xdensity'],params['ydensity']).shape
 
         result = self._distrib(shape,params)
+        self._apply_mask(params,result)
 
-        mask = params['mask']
-        if mask is not None:
-            result*=mask
-            
         output_fn = params['output_fn']
         if output_fn is not IdentityOF: # Optimization (but may not actually help)
             output_fn(result)

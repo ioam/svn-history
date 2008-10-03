@@ -141,13 +141,7 @@ class PatternGenerator(param.Parameterized):
             
         result = params['scale']*self.function(params)+params['offset']
 
-        mask = params['mask']
-        if self.mask_shape is not None:
-            mask = self.mask_shape(
-                x=params['x'],y=params['y'],bounds=params['bounds'],
-                size=params['size'],ydensity=params['ydensity'],xdensity=params['xdensity'])
-        if mask is not None:
-            result*=mask
+        self._apply_mask(params,result)
             
         output_fn = params['output_fn']
         # Optimization (not clear that is helps; does make small (-0.5s out of 75s)
@@ -205,6 +199,18 @@ class PatternGenerator(param.Parameterized):
         return pattern_x, pattern_y
 
 
+    def _apply_mask(self,params,mat):
+        """Create (if necessary) and apply the mask to the given matrix mat."""
+        mask = params['mask']
+        mask_shape = params['mask_shape']
+        if mask_shape is not None:
+            mask = mask_shape(
+                x=params['x'],y=params['y'],bounds=params['bounds'],
+                size=params['size'],ydensity=params['ydensity'],xdensity=params['xdensity'])
+        if mask is not None:
+            mat*=mask
+
+
 # Override class type; must be set here rather than when mask_shape is declared,
 # to avoid referring to class not yet constructed
 #PatternGenerator.get_param_descriptor("mask_shape")[0].class_=PatternGenerator
@@ -218,13 +224,9 @@ from numpy.oldnumeric import ones, Float
 class Constant(PatternGenerator):
     """Constant pattern generator, i.e., a solid, uniform field of the same value."""
 
-    # The standard position and orientation variables are ignored for this special case,
-    # so we hide them from auto-generated lists of parameters (e.g. in the GUI)
-    x = param.Number(precedence=-1)
-    y = param.Number(precedence=-1)
+    # The orientation is ignored, so we don't show it in
+    # auto-generated lists of parameters (e.g. in the GUI)
     orientation = param.Number(precedence=-1)
-    size = param.Number(precedence=-1)
-    
 
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
@@ -235,10 +237,7 @@ class Constant(PatternGenerator):
         shape = SheetCoordinateSystem(params['bounds'],params['xdensity'],params['ydensity']).shape
 
         result = params['scale']*ones(shape, Float)+params['offset']
-
-        mask = params['mask']
-        if mask is not None:
-            result*=mask
+        self._apply_mask(params,result)
 
         output_fn = params['output_fn']
         if output_fn is not IdentityOF: # Optimization (but may not actually help)
