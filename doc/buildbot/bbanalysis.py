@@ -28,6 +28,8 @@ script = "lissom_oo_or.ty"
 
 # Replace this mechanism with bars under the x-axis, so that
 # ranges can be annotated.
+
+# {(head_x,head_y):((tail_x_shift,tail_y_shift),"key_name")}
 annotations = {
     (8100,66.5):((0,0),"A"),
     (8600,58):((0,4),"B"),
@@ -39,9 +41,10 @@ annotations = {
 # CB: the above's just approx for now; needs updating. 
 
 from topo.misc.keyedlist import KeyedList
-annotations_key = KeyedList([('A',(0.0,'something')),                             
-                             ('B',(0.0,'something else')),
-                             ('C',(0.0,'another thing'))])
+# [(key_name, ('version(range)','performance','description'))]
+annotations_key = KeyedList([('A',('8100','0.0','something')),
+                             ('B',('8100-8101','0.0','something else')),
+                             ('C',('8200','0.0','another thing'))])
 
 
 # CB: in progress - obviously the page construction should
@@ -51,8 +54,9 @@ def write_page():
     imgfile = "lissom_oo_or_250_svnversion.png"
 
     key = "<table>"
+    key+="<tr><td>Event</td><td>Version</td><td>Performance</td><td>Description</td></tr>"
     for k,v in annotations_key.items():
-        key+="<tr><td>%s</td><td>%s</td><td>%s</td></tr>"%(k,v[0],v[1])
+        key+="<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>"%(k,v[0],v[1],v[2])
     key+="</table>"
         
     s = "<html><body><p><img src='%s' /></p><p>%s</p></body></html>"%(imgfile,key)
