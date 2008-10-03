@@ -47,8 +47,8 @@ def get_timings():
     return timings
 
 
-
 def _get_svnversion_timings():
+    svnversion_timings = {}
     _timings = get_timings()
     for build in _timings[script]:
         info = _timings[script][build]
@@ -60,6 +60,7 @@ def _get_svnversion_timings():
                     svnversion_timings[version]=timing
             else:
                 svnversion_timings[version]=timing
+    return svnversion_timings
 
 svnversion_timings = _get_svnversion_timings()
 
@@ -333,15 +334,15 @@ def plott(t,tytle,filename):
     ylabel("time /s")
 
 
-    xshift=0
-    yshift=0
-    arrowprops={'width':0.25,'frac':0.05,'headwidth':5}
+    xshift=2
+    yshift=1
+    arrowprops={'width':0.01,'frac':0.05,'headwidth':0}
     for key,point in _keys_and_points(annotations):
         text = key
         version = point[0]
         timing = point[1] or svnversion_timings[version]
         text_coords = version+xshift,timing+yshift
-        annotate(text,(version,timing),xytext=text_coords)
+        annotate(text,(version,timing),xytext=text_coords,arrowprops=arrowprops)
 
     savefig(filename+"_svnversion.png")
 
