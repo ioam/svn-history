@@ -96,7 +96,9 @@ def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=Fals
 
     if not apply_output_fn:
         for each in topo.sim.objects(Sheet).values():
-             each.apply_output_fn = False
+            if hasattr(each,'measure_maps'):
+               if each.measure_maps: 
+                   each.apply_output_fn = False
 
 
     gen_eps_list = topo.sim.objects(GeneratorSheet)
