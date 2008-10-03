@@ -39,9 +39,9 @@ annotations = {
 # CB: the above's just approx for now; needs updating. 
 
 from topo.misc.keyedlist import KeyedList
-annotations_key = KeyedList([('A':(0.0,'something')),                             
-                             ('B':(0.0,'something else')),
-                             ('C':(0.0,'another thing'))])
+annotations_key = KeyedList([('A',(0.0,'something')),                             
+                             ('B',(0.0,'something else')),
+                             ('C',(0.0,'another thing'))])
 
 
 # CB: in progress - obviously the page construction should
