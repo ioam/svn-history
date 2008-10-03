@@ -98,10 +98,16 @@ class PatternGenerator(param.Parameterized):
     offset = param.Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.11,doc="""
         Additive offset to input pattern, defaulting to 0.0""")
 
-    mask = param.Parameter(default=None,precedence=0.06,doc="""
+    mask = param.Parameter(default=None,precedence=-1,doc="""
         Optional object (expected to be an array) with which to multiply the
         pattern array after it has been created, before any output_fn is
         applied. This can be used to shape the pattern.""")
+
+    # Note that the class type is overridden to PatternGenerator below
+    #mask_shape = param.ClassSelector(param.Parameterized,default=None,precedence=0.06,doc="""
+    mask_shape = param.Parameter(default=None,precedence=0.06,doc="""
+        Optional PatternGenerator used to construct a mask to be applied to
+        the pattern.""")
     
     output_fn = param.ClassSelector(OutputFn,default=IdentityOF(),precedence=0.08,doc="""
         Optional function to apply to the pattern array after it has been created.
@@ -136,9 +142,13 @@ class PatternGenerator(param.Parameterized):
         result = params['scale']*self.function(params)+params['offset']
 
         mask = params['mask']
+        if self.mask_shape is not None:
+            mask = self.mask_shape(
+                x=params['x'],y=params['y'],bounds=params['bounds'],
+                size=params['size'],ydensity=params['ydensity'],xdensity=params['xdensity'])
         if mask is not None:
             result*=mask
-
+            
         output_fn = params['output_fn']
         # Optimization (not clear that is helps; does make small (-0.5s out of 75s)
         # difference to startup time of lissom_oo_or)
@@ -194,6 +204,10 @@ class PatternGenerator(param.Parameterized):
         pattern_x = add.outer(sin(orientation)*y, cos(orientation)*x)
         return pattern_x, pattern_y
 
+
+# Override class type; must be set here rather than when mask_shape is declared,
+# to avoid referring to class not yet constructed
+#PatternGenerator.get_param_descriptor("mask_shape")[0].class_=PatternGenerator
 
 
 # Trivial example of a PatternGenerator, provided for when a default is
