@@ -1897,9 +1897,6 @@ class CSPTranslator(String_ObjectTranslator):
         ##
 
         return inverse(self.cache).get(object_) or object_
-    
-    def update(self):
-        self.cache = self.param.get_range()
 
     def __copy__(self):
         # because this one's object2string can modify cache
