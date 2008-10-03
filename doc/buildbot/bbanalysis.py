@@ -26,26 +26,26 @@ from sys import argv
 #logfile = 'LOG'
 script = "lissom_oo_or.ty"
 
+alphabet = map(chr,range(65,91))
+
+
 # Replace this mechanism with bars under the x-axis, so that
 # ranges can be annotated.
 
-# {(head_x,head_y):((tail_x_shift,tail_y_shift),"key_name")}
 annotations = {
-    (8100,66.5):((0,0),"A"),
-    (8600,58):((0,4),"B"),
-    (8250,53.5):((0,0),"C"),
-    (8395,54.3):((20,-2),"D"),
-    (8100,56.5):((-20,-2),"E"),
-    (8425,55):((0,2),"F")
+    (8100,66.5):'Did X over range 8005-8102',
+    (8100,56.5):'Did something',
+    (8600,58):'Did Y',
+    (8250,53.5):'Did something',
+    (8395,54.3):'Did something',
+    (8425,55):'Did something'
     }
 # CB: the above's just approx for now; needs updating. 
 
-from topo.misc.keyedlist import KeyedList
-# [(key_name, ('version(range)','performance','description'))]
-annotations_key = KeyedList([('A',('8100','0.0','something')),
-                             ('B',('8100-8101','0.0','something else')),
-                             ('C',('8200','0.0','another thing'))])
-
+def _keys_and_points(annotations):
+    points = sorted(annotations)
+    keys = alphabet[0:len(points)]
+    return zip(keys,points)
 
 # CB: in progress - obviously the page construction should
 # be separated out, etc
@@ -53,13 +53,18 @@ def write_page():
     locn = "/home/ceball/buildbot/buildmaster/public_html/p/"
     imgfile = "lissom_oo_or_250_svnversion.png"
 
-    key = "<table>"
-    key+="<tr><td>Event</td><td>Version</td><td>Performance</td><td>Description</td></tr>"
-    for k,v in annotations_key.items():
-        key+="<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>"%(k,v[0],v[1],v[2])
-    key+="</table>"
+    key_text = "<table>"
+    key_text+="<tr><td>Event</td><td>Version</td><td>Performance</td><td>Description</td></tr>"
+    for key,point in _keys_and_points(annotations):
+        event = key
+        version = point[0]
+        performance = point[1]
+        description = annotations[point]
+        key_text+="<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>"%(event,version,performance,description)
+
+    key_text+="</table>"
         
-    s = "<html><body><p><img src='%s' /></p><p>%s</p></body></html>"%(imgfile,key)
+    s = "<html><body><p><img src='%s' /></p><p>%s</p></body></html>"%(imgfile,key_text)
 
     f = open(locn+"running.html",'w')
     f.write(s)
@@ -310,17 +315,15 @@ def plott(t,tytle,filename):
     xlabel("svnversion")
     ylabel("time /s")
 
-    for k,v in annotations.items():
-        if v[0]==(0,0):
-            arrowprops=None
-        else:
-            arrowprops={'width':0.25,'frac':0.05,'headwidth':5}
-        
-        #CEBALERT:necessary cos of bug in matplotlib where arrow can\t be vertical or horizontal?
-        xshift=sgn(v[0][0])*max(abs(v[0][0]),0.01)
-        yshift=sgn(v[0][1])*max(abs(v[0][1]),0.01)
 
-        annotate(v[1],k,xytext=(k[0]+xshift,k[1]+yshift),arrowprops=arrowprops)
+    xshift=0
+    yshift=0
+    arrowprops={'width':0.25,'frac':0.05,'headwidth':5}
+    for key,point in _keys_and_points(annotations):
+        text = key
+        coords = point
+        text_coords = point[0]+xshift,point[1]+yshift
+        annotate(text,coords,xytext=text_coords)
 
     savefig(filename+"_svnversion.png")
 
@@ -330,12 +333,6 @@ def plott(t,tytle,filename):
     title("lissom_oo_or.ty, 250 iterations")
     xlabel("build")
     ylabel("time /s")
-
-##     key = ""
-##     for k,v in annotations_key.items():
-##         key+="%s: %s\n"%(k,v)
-
-##     figtext(0,0,key)
         
     savefig(filename+"_buildno.png")
 
