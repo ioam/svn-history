@@ -298,10 +298,6 @@ class PatternPresenter(param.Parameterized):
                     g.offset=0.0
                     g.scale=g.contrast
             
-        wipe_out_activity()
-        
-        topo.sim.event_clear(EPConnectionEvent)
-            
         pattern_present(inputs, self.duration, plastic=False,
                      apply_output_fn=self.apply_output_fn)
 
