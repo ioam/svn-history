@@ -748,7 +748,7 @@ class HomeostaticMaxEnt(OutputFnWithRandomState):
 
     def __call__(self,x):      
 	if self.first_call:
-	    self.first_call = False
+            self.first_call = False
             if self.a_init==None:
                 self.a = self.random_generator.uniform(low=10, high=20,size=x.shape)
             else:
@@ -763,7 +763,7 @@ class HomeostaticMaxEnt(OutputFnWithRandomState):
         x_orig = copy.copy(x)
        
         x *= 0.0
-	x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
+        x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
 		
 
 	self.n_step += 1
@@ -781,7 +781,8 @@ class HomeostaticMaxEnt(OutputFnWithRandomState):
         """
         Save the current state of the output function to an internal stack.
         """
-        self.__current_state_stack.append((copy.copy(self.a), copy.copy(self.b), copy.copy(self.y_avg)))
+       
+        self.__current_state_stack.append((copy.copy(self.a), copy.copy(self.b), copy.copy(self.y_avg), copy.copy(self.first_call)))
         super(HomeostaticMaxEnt,self).state_push()
 
         
@@ -791,7 +792,8 @@ class HomeostaticMaxEnt(OutputFnWithRandomState):
         
         See state_push() for more details.
         """
-        self.a, self.b, self.y_avg =  self.__current_state_stack.pop()
+       
+        self.a, self.b, self.y_avg, self.first_call =  self.__current_state_stack.pop()
         super(HomeostaticMaxEnt,self).state_pop()
         
 
