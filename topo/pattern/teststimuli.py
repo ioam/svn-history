@@ -1,5 +1,6 @@
 """
-Patterns based on patches of Sine Gratings as used in experiments.
+Composite patterns such as patches of sine gratings as used in
+psychophysical or physiological experiments.
 
 $Id$
 """
@@ -25,6 +26,18 @@ from topo.pattern.basic import SineGrating, Disk, Ring, Rectangle
 from topo.misc.patternfn import gaussian,gabor,line,disk,ring
 from topo.misc.numbergenerator import UniformRandom
 
+# Simpler versions using the mask instead:
+#class SineGratingDisk_m(SineGrating):
+#    """2D sine grating pattern generator with a circular mask."""
+#    mask_shape = param.Parameter(default=Disk(smoothing=0))
+#
+#class SineGratingRectangle_m(SineGrating):
+#    """2D sine grating pattern generator with a rectangular mask."""
+#    mask_shape = param.Parameter(default=Rectangle())
+#
+#class SineGratingRing_m(SineGrating):
+#    """2D sine grating pattern generator with a ring-shaped mask."""
+#    mask_shape = param.Parameter(default=Ring(smoothing=0))
 
 
 class SineGratingDisk(PatternGenerator):
@@ -71,17 +84,17 @@ class SineGratingDisk(PatternGenerator):
 
 
 class SineGratingRectangle(PatternGenerator):
-    """A sine grating masked by a rectangle so that only a rectangluar patch is visible"""
+    """A sine grating masked by a rectangle so that only a rectangular patch is visible"""
  
     aspect_ratio  = param.Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-        precedence=0.31,doc=
-        "Ratio of width to height; size*aspect_ratio gives the width of the disk.")
+        precedence=0.31,doc="""Ratio of width to height
+        size*aspect_ratio gives the width of the rectangle.""")
 
-    size  = param.Number(default=0.5,doc="Top to bottom height of the disk")
+    size  = param.Number(default=0.5,doc="Top to bottom height of the rectangle")
     
-    phase  = param.Number(default=1.0, doc="phase of the sine grating")
+    phase  = param.Number(default=1.0, doc="Phase of the sine grating")
 
-    frequency  = param.Number(default=2.4,doc="frequency of the sine grating")
+    frequency  = param.Number(default=2.4,doc="Frequency of the sine grating")
 
        
     def __call__(self,**params_to_override):
