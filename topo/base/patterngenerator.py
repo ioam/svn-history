@@ -104,8 +104,7 @@ class PatternGenerator(param.Parameterized):
         applied. This can be used to shape the pattern.""")
 
     # Note that the class type is overridden to PatternGenerator below
-    #mask_shape = param.ClassSelector(param.Parameterized,default=None,precedence=0.06,doc="""
-    mask_shape = param.Parameter(default=None,precedence=0.06,doc="""
+    mask_shape = param.ClassSelector(param.Parameterized,default=None,precedence=0.06,doc="""
         Optional PatternGenerator used to construct a mask to be applied to
         the pattern.""")
     
@@ -213,7 +212,7 @@ class PatternGenerator(param.Parameterized):
 
 # Override class type; must be set here rather than when mask_shape is declared,
 # to avoid referring to class not yet constructed
-#PatternGenerator.get_param_descriptor("mask_shape")[0].class_=PatternGenerator
+PatternGenerator.get_param_descriptor("mask_shape")[0].class_=PatternGenerator
 
 
 # Trivial example of a PatternGenerator, provided for when a default is
