@@ -1633,6 +1633,9 @@ class TkParameterized(TkParameterizedBase):
         def f(event,name=name):
             v = self._tkvars[name].get()
             self._tkvar_set(name,v)
+            # CEBSUPERHACKALERT: variable traces vanish so need this
+            self._handle_gui_set(name)
+            
         w.bind("<<ComboboxSelected>>",f)
 
         # CEBALERT: hack to 
