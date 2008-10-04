@@ -394,11 +394,10 @@ class Composite(PatternGenerator):
         # will lead to problems/limitations in the future).
         orientation=params['orientation']
         size = params['size']
-        patterns = [pg(xdensity=params['xdensity'],ydensity=params['ydensity'],bounds=params['bounds'],mask=params['mask'],
-                       x=params['x']+size*(pg.x*cos(orientation)-
-                                        pg.y*sin(orientation)),
-                       y=params['y']+size*(pg.x*sin(orientation)+
-                                        pg.y*cos(orientation)),
+        patterns = [pg(xdensity=params['xdensity'],ydensity=params['ydensity'],
+                       bounds=params['bounds'],mask=params['mask'],
+                       x=params['x']+size*(pg.x*cos(orientation)- pg.y*sin(orientation)),
+                       y=params['y']+size*(pg.x*sin(orientation)+ pg.y*cos(orientation)),
                        orientation=pg.orientation+orientation,
                        size=pg.size*params['size'])
                     for pg in generators]
