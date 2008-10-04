@@ -376,8 +376,9 @@ are less sensitive to the scale or contrast.
 </dt><dd> controls frequency of a sine grating or Gabor 
 </dd><dt><span class='t_item'>phase</span></dt><dd> controls phase of a sine grating or Gabor 
 </dd><dt><span class='t_item'>mask_shape</span></dt><dd> allows the
-  pattern to be masked by another pattern (e.g. try a mask_shape of
-  Disk or Ring with a SineGrating or UniformRandom pattern)
+pattern to be masked by another pattern (e.g. try a mask_shape of
+Disk or Ring with a SineGrating or UniformRandom pattern).  The
+parameters of the mask_shape pattern can be edited by right-clicking on it.
 </dd></dl>
 </blockquote>
 </p>
