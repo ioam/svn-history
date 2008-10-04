@@ -354,8 +354,8 @@ control its size, location, etc.:
 
 </p><blockquote>
 <dl compact="compact">
-<dt><span class='t_item'>orientation</span>                          </dt><dd> controls the angle (try pi/4 or -pi/4)
-</dd><dt><span class='t_item'>x</span> and <span class='t_item'>y</span>         </dt><dd> 
+<dt><span class='t_item'>orientation</span></dt><dd> controls the angle (try pi/4 or -pi/4)
+</dd><dt><span class='t_item'>x</span> and <span class='t_item'>y</span></dt><dd> 
 control the position on the retina (try 0 or 0.5)
 </dd><dt><span class='t_item'>size</span></dt><dd>
 controls the overall size of e.g. Gaussians and rings
@@ -365,17 +365,19 @@ controls the ratio between width and height; will be scaled by the
 </dd><dt><span class='t_item'>smoothing</span>
 </dt><dd> controls the amount of Gaussian falloff around the edges of patterns such as rings and lines
 </dd><dt><span class='t_item'>scale</span>
-
 </dt><dd> controls the brightness (try 1.0 for a sine grating).  Note
 that this relatively simple model is very sensitive to the scale, and
 scales higher than about 1.2 will result in a broad,
 orientation-unselective response, while low scales will give no
 response.  More complex models (and actual brains!)
 are less sensitive to the scale or contrast.
-</dd><dt><span class='t_item'>offset</span>                         </dt><dd> is added to every pixel
+</dd><dt><span class='t_item'>offset</span></dt><dd> is added to every pixel
 </dd><dt><span class='t_item'>frequency</span>
 </dt><dd> controls frequency of a sine grating or Gabor 
-</dd><dt><span class='t_item'>phase</span>                          </dt><dd> controls phase of a sine grating or Gabor 
+</dd><dt><span class='t_item'>phase</span></dt><dd> controls phase of a sine grating or Gabor 
+</dd><dt><span class='t_item'>mask_shape</span></dt><dd> allows the
+  pattern to be masked by another pattern (e.g. try a mask_shape of
+  Disk or Ring with a SineGrating or UniformRandom pattern)
 </dd></dl>
 </blockquote>
 </p>

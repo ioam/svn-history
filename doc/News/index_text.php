@@ -54,6 +54,9 @@
   <?php classref('topo.outputfn.basic','HalfRectifyAndPower')?></div>
   <div class="i2">- Sheets: 
   <?php classref('topo.sheet.basic','ActivityCopy')?></div>
+  <div class="i2">- Added mask_shape parameter to 
+  <?php classref('topo.sheet.basic','PatternGenerator')?>
+  to make it easy to specify a mask for any pattern, e.g. in the GUI</div>
 </dd>
 </font>
 </dl>
