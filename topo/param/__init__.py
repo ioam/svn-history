@@ -642,7 +642,10 @@ class ObjectSelector(Selector):
 
         (Returns the dictionary {object.name:object}.)
         """
-        return dict([(obj.name,obj) for obj in self.objects])
+        d=dict([(obj.name,obj) for obj in self.objects])
+#        if self.allow_None:
+#            d['None']=None
+        return d
 
     
 class ClassSelector(Selector):
@@ -681,8 +684,10 @@ class ClassSelector(Selector):
         (see concrete_descendents()).
         """
         classes = concrete_descendents(self.class_)
-        return dict([(name,class_) for name,class_ in classes.items()])
-
+        d=dict([(name,class_) for name,class_ in classes.items()])
+        if self.allow_None:
+            d['None']=None
+        return d
 
 
 class List(Parameter):
