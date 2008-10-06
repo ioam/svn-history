@@ -24,8 +24,8 @@ from topo.command.basic import pattern_present, wipe_out_activity
 from topo.misc.numbergenerator import UniformRandom
 from topo.misc.util import frange
 from topo.misc.distribution import Distribution
-from topo.pattern.basic import SineGrating, Gaussian, Rectangle, Disk
-from topo.pattern.teststimuli import OrientationContrastPattern
+from topo.pattern.basic import SineGrating, Gaussian, Rectangle
+from topo.pattern.teststimuli import SineGratingDisk, OrientationContrastPattern, SineGratingRectangle
 from topo.pattern.random import GaussianRandom
 from topo.sheet.generator import GeneratorSheet
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
@@ -231,12 +231,13 @@ class PatternPresenter(param.Parameterized):
                     g.offsetcentre=0.5
                     g.scalecentre=2*g.offsetcentre*g.contrastcentre/100.0
 
+            
 	
             elif self.contrast_parameter=='weber_contrast':
                 # Weber_contrast is currently only well defined for
                 # the special case where the background offset is equal
                 # to the target offset in the pattern type
-                # SineGrating(mask_shape=Disk())
+                # SineGratingDisk
                 for g in inputs.itervalues():
                     g.offsetcentre=0.5   #In this case this is the offset of both the background and the sine grating
                     g.scalecentre=2*g.offsetcentre*g.contrastcentre/100.0
@@ -261,7 +262,7 @@ class PatternPresenter(param.Parameterized):
                 # Weber_contrast is currently only well defined for
                 # the special case where the background offset is equal
                 # to the target offset in the pattern type
-                # SineGrating(mask_shape=Disk())
+                # SineGratingDisk
                 for g in inputs.itervalues():
                     g.offsetsurround=0.5   #In this case this is the offset of both the background and the sine grating
                     g.scalesurround=2*g.offsetsurround*g.contrastsurround/100.0
@@ -280,12 +281,13 @@ class PatternPresenter(param.Parameterized):
                     g.offset=0.5
                     g.scale=2*g.offset*g.contrast/100.0
 
+            
 	
             elif self.contrast_parameter=='weber_contrast':
                 # Weber_contrast is currently only well defined for
                 # the special case where the background offset is equal
                 # to the target offset in the pattern type
-                # SineGrating(mask_shape=Disk())
+                # SineGratingDisk
                 for g in inputs.itervalues():
                     g.offset=0.5   #In this case this is the offset of both the background and the sine grating
                     g.scale=2*g.offset*g.contrast/100.0
@@ -1092,7 +1094,7 @@ create_plotgroup(template_plot_type="curve",name='Orientation Tuning',category="
 def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
                       curve_parameters=[{"contrast":30},{"contrast":60},{"contrast":80}, {"contrast":90}],
                       display=False,size=0.5,
-                      pattern_presenter=PatternPresenter(pattern_generator=SineGrating(mask_shape=Disk(smoothing=0.0)),
+                      pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
                                                          apply_output_fn=True,duration=1.0,
                                                          contrast_parameter="weber_contrast")):
     """
@@ -1151,8 +1153,7 @@ create_plotgroup(template_plot_type="curve",name='Size Tuning',category="Tuning 
 def measure_size_response(num_phase=18,
                           curve_parameters=[{"contrast":30}, {"contrast":60},{"contrast":80},{"contrast":90}],
                           num_sizes=10,display=False,
-                          pattern_presenter=PatternPresenter(pattern_generator=
-							     SineGrating(mask_shape=Disk(smoothing=0.0)),
+                          pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
                                                              apply_output_fn=True,duration=1.0,
                                                              contrast_parameter="weber_contrast")):
     """
@@ -1227,8 +1228,7 @@ create_plotgroup(template_plot_type="curve",name='Contrast Response',category="T
 
 def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relative_orientations=[0.0, pi/6, pi/4, pi/2],
                               size=0.5,display=False,frequency=2.4,
-                              num_phase=18,pattern_presenter=PatternPresenter(pattern_generator=
-									      SineGrating(mask_shape=Disk(smoothing=0.0)),
+                              num_phase=18,pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
                                                                               apply_output_fn=True,duration=1.0,
                                                                               contrast_parameter="weber_contrast")):
     """
@@ -1483,7 +1483,7 @@ def measure_retinotopy(num_phase=18,num_orientation=4,frequencies=[2.4],division
    
     size=float((x_range[0]-x_range[1]))/divisions
     retinotopy=range(divisions*divisions)
-    pattern_presenter=PatternPresenter(SineGrating(mask_shape=Rectangle),apply_output_fn=apply_output_fn,duration=duration, divisions=divisions)
+    pattern_presenter=PatternPresenter(SineGratingRectangle(),apply_output_fn=apply_output_fn,duration=duration, divisions=divisions)
     
     feature_values = [Feature(name="retinotopy",values=retinotopy),
                       Feature(name="orientation",range=(0.0,2*pi),step=step_orientation,cyclic=True),
