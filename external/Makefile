@@ -6,7 +6,7 @@ CC = gcc
 # own Python, e.g. on Windows.)
 PYSETUP_OPT = --prefix=${PREFIX}
 
-default: platform-skip python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip
+default: platform-skip python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip readline
 
 platform-skip:
 # avoid building blt, tcl, and tk on OS X
@@ -902,6 +902,24 @@ pyttk-uninstall:
 	rm -rf pyttk ${foreach f,${PYTTK_UNINSTALL}, ${PREFIX}/${f}}
 
 
+#############################################################
+# GNU READLINE
+READLINE = readline-5.2
+
+READLINE_UNINSTALL += lib/libreadline.* 
+READLINE_UNINSTALL += include/readline.h
+
+readline: ${READLINE}.tar.gz
+	tar -xzf ${READLINE}.tar.gz
+	cd ${READLINE}; ./configure --prefix=${PREFIX} 
+	make -C ${READLINE}
+	make -C ${READLINE} install
+	touch readline
+
+readline-clean: 
+	rm -rf ${READLINE} 
+readline-uninstall:
+	rm -rf readline $(foreach f, ${READLINE_UNINSTALL}, ${PREFIX}/${f})
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
