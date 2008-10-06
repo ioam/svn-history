@@ -1,29 +1,8 @@
 """
-Example of a LISSOM-based orientation map (with ON/OFF channels).
+Work in progress for developing spoken word/color association simulation
+from Plebe et al.
 
-Intended to be a close (but approximate) match to the orientation map
-simulation from figure 5.9 of Miikkulainen, Bednar, Choe, and Sirosh
-(2005), Computational Maps in the Visual Cortex, Springer.  Known
-differences include:
-
- - The default_density is smaller for practicality (142 in the book).
- - The matching is not yet perfect at different densities
- - The lateral inhibitory radius is up to 0.5 matrix units greater
-   than in the book, because Topographica enforces good
-   circular-shaped CF outlines.
- - Input patterns are evaluated on the entire retina, instead of only up
-   to bounds_multiplier=2.5 times the gaussian sigma in the book
- - Initial weight patterns are not smoothed around the edges, unlike
-   smooth_circular_outlines=True and smooth_circular_radius_trim=-0.25
-   used in the book
- - Initial weight patterns are all random within a gaussian envelope
-   rather than random afferent and Gaussian sigma preset_sigma_exc=11.076
-   preset_sigma_inh=71.76 lateral weights used in the book.
- - Inhibitory weight pruning is disabled (not pruning all weights below
-   1e-5 as in the book)
-
-There may be other small differences, as this file has not yet been
-compared exhaustively to the original simulations.
+Currently has only Intensity, LGN, and V1.
 
 $Id$
 """
@@ -71,28 +50,28 @@ inputs=[input_type(x=numbergen.UniformRandom(lbound=-0.75,ubound=0.75,seed=12+i)
 combined_inputs = pattern.SeparatedComposite(min_separation=2.2*0.27083,generators=inputs)
 
 ### Area scaling -- V1 is 1.0x1.0 by default
-default_area = locals().get('default_area',1.0)
+default_area = locals().get('default_area',3.0)
 
 ### Sheets
 topo.sim['Retina']=sheet.GeneratorSheet(
-    nominal_density=locals().get('default_retina_density',24.0),
+    nominal_density=locals().get('default_retina_density',32.0),
     input_generator=combined_inputs, period=1.0, phase=0.05,
-    nominal_bounds=sheet.BoundingBox(radius=default_area/2.0+0.25+0.375))
+    nominal_bounds=sheet.BoundingBox(radius=default_area/2.0+0.27083+2.618/32.0))
 
 topo.sim['LGNOn']=sheet.CFSheet(
-    nominal_density=locals().get('default_lgn_density',24.0),
-    nominal_bounds=sheet.BoundingBox(radius=default_area/2.0+0.25),
+    nominal_density=locals().get('default_lgn_density',32.0),
+    nominal_bounds=sheet.BoundingBox(radius=default_area/2.0+0.27083),
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
     measure_maps=False)
 
 topo.sim['LGNOff']=sheet.CFSheet(
-    nominal_density=locals().get('default_lgn_density',24.0),
+    nominal_density=locals().get('default_lgn_density',32.0),
     nominal_bounds=sheet.BoundingBox(radius=default_area/2.0+0.25),
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
     measure_maps=False)
 
 topo.sim['V1'] = sheet.lissom.LISSOM(
-    nominal_density=locals().get('default_density',48.0),
+    nominal_density=locals().get('default_density',32.0),
     nominal_bounds=sheet.BoundingBox(radius=default_area/2.0),tsettle=9,
     output_fn=outputfn.PiecewiseLinear(lower_bound=0.083,upper_bound=0.633),
     joint_norm_fn=sheet.optimized.compute_joint_norm_totals_opt)
@@ -102,9 +81,9 @@ topo.sim['V1'] = sheet.lissom.LISSOM(
 ### Connections
 
 # DoG weights for the LGN
-centerg   = pattern.Gaussian(size=0.07385,aspect_ratio=1.0,
+centerg   = pattern.Gaussian(size=0.6545/32.0,aspect_ratio=1.0,
                              output_fn=outputfn.DivisiveNormalizeL1())
-surroundg = pattern.Gaussian(size=0.29540,aspect_ratio=1.0,
+surroundg = pattern.Gaussian(size=2.618/32.0,aspect_ratio=1.0,
                              output_fn=outputfn.DivisiveNormalizeL1())
 
 on_weights = pattern.Composite(
