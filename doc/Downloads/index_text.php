@@ -5,11 +5,11 @@ Windows and Mac OS X.  It should work on non-Linux versions of UNIX as
 well, as long as standard GNU tools like make and GCC are installed.
 
 <P>Whatever platform you use, there are two ways to obtain
-Topographica.  The first, recommended for most users, is to download
-one of our installation packages. The second is to
-use <A HREF="http://subversion.tigris.org/">Subversion</A> (SVN). This
-is recommended for users who want more frequent updates, or who need
-to modify the source code.
+Topographica.  The first, described below and recommended for most
+users, is to download one of our installation packages for official
+releases. The second is to use Subversion (SVN), as described on a
+<A HREF="cvs.html">separate page</A>, for users who want more frequent
+updates, or who need to modify the source code.
 
 <P>The following sections describe how to obtain Topographica and build it (if
 necessary) 
