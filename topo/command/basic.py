@@ -70,6 +70,9 @@ def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=Fals
     original simulation time.  Thus this input is not considered part
     of the regular simulation, and is usually for testing purposes.
 
+    As a special case, if 'inputs' is just a single pattern, and not
+    a dictionary, it is presented to all GeneratorSheets.
+    
     If a simulation is not provided, the active simulation, if one
     exists, is requested.
 
@@ -100,15 +103,18 @@ def pattern_present(inputs={},duration=1.0,plastic=False,overwrite_previous=Fals
                if each.measure_maps: 
                    each.apply_output_fn = False
 
-
-    gen_eps_list = topo.sim.objects(GeneratorSheet)
-    
     # Register the inputs on each input sheet
-    for each in inputs.keys():
-        if gen_eps_list.has_key(each):
-            gen_eps_list[each].set_input_generator(inputs[each])
-        else:
-            param.Parameterized().warning('%s not a valid Sheet Name.' % each)
+    generatorsheets = topo.sim.objects(GeneratorSheet)
+    if not isinstance(inputs,dict):
+        for g in generatorsheets.values():
+            g.set_input_generator(inputs)
+    else:
+        for each in inputs.keys():
+            if generatorsheets.has_key(each):
+                generatorsheets[each].set_input_generator(inputs[each])
+            else:
+                param.Parameterized().warning(
+                    '%s not a valid Sheet name for pattern_present.' % each)
 
     topo.sim.event_push()
     topo.sim.run(duration) 
@@ -288,7 +294,7 @@ def default_analysis_function():
     # Test response to a standardized pattern
     from topo.pattern.basic import Gaussian
     from math import pi
-    pattern_present(inputs={"Retina":Gaussian(orientation=pi/4,aspect_ratio=4.7)})
+    pattern_present(inputs=Gaussian(orientation=pi/4,aspect_ratio=4.7))
     save_plotgroup("Activity",saver_params={"filename_suffix":"_45d"})
 
 
@@ -300,8 +306,7 @@ def default_analysis_function():
 # in any case.
 def run_batch(script_file,output_directory="Output",
               analysis_fn = default_analysis_function,
-              times = [50,100,500,1000,2000,3000,4000,5000,10000],
-              **params):
+              times = 1.0,**params):
     """
     Run a Topographica simulation in batch mode.
 
@@ -332,11 +337,17 @@ def run_batch(script_file,output_directory="Output",
     which a unique individual directory will be created for this
     particular run.  The optional analysis_fn can be any python
     function to be called at each of the simulation iterations defined
-    in the analysis times list.  This function should perform whatever
-    analysis of the simulation you want to perform, such as plotting
-    or calculating some statistics.  The analysis_fn should avoid
-    using any GUI functions (i.e., should not import anything from
-    topo.tkgui), and it should save all of its results into files.
+    in the analysis times list.  The analysis_fn should perform
+    whatever analysis of the simulation you want to perform, such as
+    plotting or calculating some statistics.  The analysis_fn should
+    avoid using any GUI functions (i.e., should not import anything
+    from topo.tkgui), and it should save all of its results into
+    files.
+
+    As a special case, a number can be passed for the times list, in
+    which case it is used to scale a default list of times up to
+    10000; e.g. times=2 will select a default list of times up to
+    20000.  Alternatively, an explicit list of times can be supplied.
 
     Any other optional parameters supplied will be set in the main
     namespace before any scripts are run.  They will also be used to
@@ -410,6 +421,9 @@ def run_batch(script_file,output_directory="Output",
     sys.stdout = stdout
     ##################################
 
+    # Default case: times is just a number that scales a standard list of times
+    if not isinstance(times,list):
+        times=[t*times for t in [50,100,500,1000,2000,3000,4000,5000,10000]]
 
     # Run script in main
     try:
@@ -418,7 +432,7 @@ def run_batch(script_file,output_directory="Output",
         topo.sim.name=simname
 
         # Run each segment, doing the analysis and saving the script state each time
-        for run_to in times:
+        for run_to in times_:
             topo.sim.run(run_to - topo.sim.time())
             analysis_fn()
             save_script_repr()
