@@ -8,20 +8,21 @@ PYSETUP_OPT = --prefix=${PREFIX}
 
 default: platform-skip python jpeg pil numpy matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis ipython gmpy tilewrapper scrodget tooltip readline
 
+# uses touch -a to avoid changing modification dates
 platform-skip:
 # avoid building blt, tcl, and tk on OS X
 ifeq ("$(shell uname -s)","Darwin")
-	touch blt
-	touch tcl
-	touch tk
+	touch -a blt
+	touch -a tcl
+	touch -a tk
 endif
 ifeq ("$(shell uname -s)","MINGW32_NT-5.1")
-	touch blt
-	touch tcl
-	touch tk
-	touch python
-	touch jpeg
-	touch pil
+	touch -a blt
+	touch -a tcl
+	touch -a tk
+	touch -a python
+	touch -a jpeg
+	touch -a pil
 endif
 
 
