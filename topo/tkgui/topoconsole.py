@@ -162,7 +162,10 @@ class DockManager(Tile.Notebook):
         self.tab(self._tab_ids[win],text=title)
 
     def _set_toplevel_title(self,win,title):
-        self.tk.call("wm","title",win._w,topo.sim.name+": "+title)
+        prefix = topo.sim.name+": "
+        if not title.startswith(prefix):
+            title=prefix+title
+        self.tk.call("wm","title",win._w,title)
 
     def add(self, child, cnf={}, **kw):
         self._tab_ids[child]=len(self.tabs())
