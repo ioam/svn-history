@@ -432,7 +432,7 @@ def run_batch(script_file,output_directory="Output",
         topo.sim.name=simname
 
         # Run each segment, doing the analysis and saving the script state each time
-        for run_to in times_:
+        for run_to in times:
             topo.sim.run(run_to - topo.sim.time())
             analysis_fn()
             save_script_repr()
