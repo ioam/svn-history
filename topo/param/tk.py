@@ -2283,8 +2283,8 @@ class ParametersFrame(TkParameterized,T.Frame):
         title.pack(side = "top")
         self.balloon.bind(title,getdoc(self.get_parameter_object(param_name,self._extraPO)))
         ############################
-        
-        parameter_frame = type(self)(parameter_window,parameterized_object=PO_to_edit,msg_handler=self.msg_handler)
+
+        parameter_frame = type(self)(parameter_window,parameterized_object=PO_to_edit,msg_handler=self.msg_handler,on_change=self.on_change,on_modify=self.on_modify)
         parameter_frame.pack()
 
 
