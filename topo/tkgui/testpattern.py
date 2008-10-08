@@ -104,7 +104,11 @@ class TestPattern(SheetPanel):
         self.params_frame.hide_param('Close')
         self.params_frame.hide_param('Refresh')
 
-        self.pack_param('edit_sheet',parent=self.pg_control_pane,on_modify=self.switch_sheet)
+        # CEB: 'new_default=True' is temporary so that the current
+        # behavior is the same as before. See ALERT below about None
+        # becoming the default & meaning 'apply to all sheets'.
+        self.pack_param('edit_sheet',parent=self.pg_control_pane,on_modify=self.switch_sheet,widget_options={'new_default':True,
+                            'sort_fn_args':{'cmp':lambda x, y: cmp(-x.precedence,-y.precedence)}})
         self.pack_param('pattern_generator',parent=self.pg_control_pane,
                         on_modify=self.change_pattern_generator,side="top")
         
@@ -129,7 +133,11 @@ class TestPattern(SheetPanel):
 
 
     def switch_sheet(self):
-        self.pattern_generator = self.edit_sheet.input_generator
+        # CEBALERT: temporary hack (test pattern window going to be
+        # changed so that None means apply to all sheets).
+        if self.edit_sheet is not None:
+            self.pattern_generator = self.edit_sheet.input_generator
+
         self.change_pattern_generator()
 
         
@@ -138,6 +146,9 @@ class TestPattern(SheetPanel):
         Set the current PatternGenerator to the one selected and get the
         ParametersFrameWithApply to draw the relevant widgets
         """
+        # CEBALERT: if pattern generator is set to None, there will be
+        # an error. Need to handle None in the appropriate place
+        # (presumably tk.py).
         self.params_frame.set_PO(self.pattern_generator)
 
         for sheet in self.plotgroup._sheets():
