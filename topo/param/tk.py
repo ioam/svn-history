@@ -281,6 +281,32 @@ def keys_sorted_by_value_unique(d, **sort_kwargs):
     return [i[val] for val in values]
 
 
+def keys_sorted_by_value_unique_None_safe(d, **sort_kwargs):
+    """
+    None is handled separately: if present, it always comes out at the
+    end of the list. Allows callers to use any sort function without
+    worrying that None will not match the other objects (e.g. for
+    using an attribute present on all the other objects, such as
+    precedence of sheets).
+    """
+    if 'None' in d:
+        assert d['None'] is None
+        None_in_d = True
+    else:
+        None_in_d = False
+        
+    if None_in_d:
+        del d['None']
+        
+    sorted_keys = keys_sorted_by_value_unique(d,**sort_kwargs)
+
+    if None_in_d:
+        d['None']=None
+        sorted_keys.append('None')
+        
+    return sorted_keys
+
+
 def is_button(widget):
     """
     Simple detection of Button-like widgets that are not Checkbuttons
@@ -1554,6 +1580,10 @@ class TkParameterized(TkParameterizedBase):
 
     def _X(self,name,widget_options):
 
+        # CEBALERT: need to document how & why people should use 'sort_fn_args'
+        # and 'new_default' when calling pack_param(). Also, simplify it if
+        # possible.
+        
         self.translators[name].update()
         
         new_range = self.translators[name].cache.keys()
@@ -1565,7 +1595,7 @@ class TkParameterized(TkParameterizedBase):
             sort_fn_args = widget_options['sort_fn_args']
             del widget_options['sort_fn_args']
             if sort_fn_args is not None:
-                new_range = keys_sorted_by_value_unique(self.translators[name].cache,**sort_fn_args)
+                new_range = keys_sorted_by_value_unique_None_safe(self.translators[name].cache,**sort_fn_args)
 
         assert len(new_range)>0 # CB: remove    
 
@@ -1865,10 +1895,18 @@ class String_ObjectTranslator(Translator):
         self.update()
         
     def string2object(self,string_):
-        return self.cache.get(string_) or string_
+        if string_ in self.cache:
+            return self.cache[string_]
+        else:
+            return string_
         
     def object2string(self,object_):
-        return inverse(self.cache).get(object_) or object_
+        inverse_cache = inverse(self.cache)
+        if object_ in inverse_cache:
+            return inverse_cache[object_]
+        else:
+            return object_
+
 
     def update(self):
         self.cache = self.param.get_range()
@@ -1883,13 +1921,7 @@ class String_ObjectTranslator(Translator):
 class CSPTranslator(String_ObjectTranslator):
         
     def string2object(self,string_):
-        #### move to superclass
-        if string_ in self.cache:
-            obj = self.cache[string_]
-        else:
-            obj = string_
-        ####
-
+        obj = super(CSPTranslator,self).string2object(string_)
         ## instantiate if it's just a class
         if isinstance(obj,type) and isinstance(string_,str):
             obj = obj()
@@ -1903,15 +1935,7 @@ class CSPTranslator(String_ObjectTranslator):
             if type(object_)==obj or type(object_)==type(obj):
                 self.cache[name]=object_
         ##
-
-        inverse_cache = inverse(self.cache)
-
-        #### move to superclass
-        if object_ in inverse_cache:
-            return inverse_cache[object_]
-        else:
-            return object_
-        ####
+        return super(CSPTranslator,self).object2string(object_)
 
 
     def __copy__(self):
