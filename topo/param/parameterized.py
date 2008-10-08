@@ -674,9 +674,17 @@ def container_script_repr(container,imports,prefix,settings):
     
     return rep
 
+# why I have to type prefix and settings?
+def function_script_repr(fn,imports,prefix,settings):
+    name = fn.func_name
+    module = fn.__module__
+    imports.append('import %s'%module)
+    return module+'.'+name
+    
+
 script_repr_reg[list]=container_script_repr
 script_repr_reg[tuple]=container_script_repr
-
+script_repr_reg[FunctionType]=function_script_repr
 
 
 # If not None, the value of this Parameter will be called (using '()')
