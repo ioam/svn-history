@@ -636,6 +636,7 @@ class ObjectSelector(Selector):
 ##         super(ObjectSelector,self).__set__(obj,val)
 
 
+    # CebAlert; move some bits into superclass (same for clsselector)?
     def get_range(self):
         """
         Return the possible objects to which this parameter could be set.
@@ -643,8 +644,8 @@ class ObjectSelector(Selector):
         (Returns the dictionary {object.name:object}.)
         """
         d=dict([(obj.name,obj) for obj in self.objects])
-#        if self.allow_None:
-#            d['None']=None
+        if self.allow_None:
+            d['None']=None
         return d
 
     
@@ -652,6 +653,7 @@ class ClassSelector(Selector):
     """
     Parameter whose value is an instance of the specified class.    
     """
+    # CEBALERT: allow_None already a slot from superclass?
     __slots__ = ['class_','allow_None']
 
     def __init__(self,class_,default=None,instantiate=True,allow_None=False,**params):
