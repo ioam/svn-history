@@ -128,6 +128,7 @@ disabling all color coding for Strength/Hue/Confidence plots.""")
             self._canvas_menu.add_cascade(menu=newmenu,label=chan+' channel', indexname=chan)
 
             # The c=chan construction is required so that each lambda has its own copy of the string
+            newmenu.add_command(label="Print matrix",          command=lambda c=chan: self.__print_matrix(c))
             newmenu.add_command(label="Plot with axis labels", command=lambda c=chan: self.__plot_matrix(c))
             newmenu.add_command(label="Plot as 3D wireframe",  command=lambda c=chan: self.__plot_matrix3d(c))
             newmenu.add_command(label="Fourier transform",     command=lambda c=chan: self.__fft(c))
