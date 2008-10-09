@@ -30,7 +30,6 @@ from topo.pattern.random import GaussianRandom
 from topo.sheet.generator import GeneratorSheet
 from topo.analysis.featureresponses import ReverseCorrelation, FeatureMaps, FeatureCurves
 from topo.plotting.plotgroup import create_plotgroup, plotgroups
-from topo.command.pylabplots import matrixplot_hsv
 
 
 
