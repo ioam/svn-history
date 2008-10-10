@@ -291,11 +291,6 @@ class TestParameterTypeRepresentations(unittest.TestCase):
 
         self.f.pack_param('osp')  # have to pack AFTER populating range for OptionMenu widget to work (see ALERT in tkparameterizedobject.py)
 
-        # after packing, the value of r should not be its original
-        # value (None) since that's not in the range
-        self.assertNotEqual(self.f.osp,None)
-        # should be: self.assertEqual(f.r,some_pos[0])
-        # but order not currently kept.
         
         # (otherwise, could do the following:
 ##         f = SomeFrame(Toplevel())
